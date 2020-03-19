@@ -29,26 +29,27 @@ class LDAPAuthorizationBackend(LDAPBackend):
 
     def pre_check(self, username, password):
         if not settings.AUTH_LDAP:
-            return False
-        logger.info('Authentication LDAP backend')
+            error = 'Not enabled auth ldap'
+            return False, error
         if not username:
-            logger.info('Authenticate failed: username is None')
-            return False
+            error = 'Username is None'
+            return False, error
         if not password:
-            logger.info('Authenticate failed: password is None')
-            return False
+            error = 'Password is None'
+            return False, error
         if settings.AUTH_LDAP_USER_LOGIN_ONLY_IN_USERS:
             user_model = self.get_user_model()
             exist = user_model.objects.filter(username=username).exists()
             if not exist:
-                msg = 'Authentication failed: user ({}) is not in the user list'
-                logger.info(msg.format(username))
-                return False
-        return True
+                error = 'user ({}) is not in the user list'.format(username)
+                return False, error
+        return True, ''
 
     def authenticate(self, request=None, username=None, password=None, **kwargs):
-        match = self.pre_check(username, password)
+        logger.info('Authentication LDAP backend')
+        match, msg = self.pre_check(username, password)
         if not match:
+            logger.info('Authenticate failed: {}'.format(msg))
             return None
         ldap_user = LDAPUser(self, username=username.strip(), request=request)
         user = self.authenticate_ldap_user(ldap_user, password)
@@ -130,5 +131,5 @@ class LDAPUser(_LDAPUser):
                 setattr(self._user, field, value)
 
         email = getattr(self._user, 'email', '')
-        email = construct_user_email(email, self._user.username)
+        email = construct_user_email(self._user.username, email)
         setattr(self._user, 'email', email)

@@ -37,15 +37,15 @@ class UserMFAForm(forms.ModelForm):
         'When enabled, '
         'you will enter the MFA binding process the next time you log in. '
         'you can also directly bind in '
-        '"personal information -> quick modification -> change MFA Settings"!')
+        '"personal information -> quick modification -> change MFA Settings"!'
+    )
 
     class Meta:
         model = User
         fields = ['mfa_level']
         widgets = {'mfa_level': forms.RadioSelect()}
         help_texts = {
-            'mfa_level': _('* Enable MFA authentication '
-                           'to make the account more secure.'),
+            'mfa_level': _('* Enable MFA to make the account more secure.'),
         }
 
 
@@ -57,7 +57,7 @@ class UserFirstLoginFinishForm(forms.Form):
         'In order to protect you and your company, '
         'please keep your account, '
         'password and key sensitive information properly. '
-        '(for example: setting complex password, enabling MFA authentication)'
+        '(for example: setting complex password, enabling MFA)'
     )
 
 

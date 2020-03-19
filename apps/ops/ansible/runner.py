@@ -55,7 +55,7 @@ def get_default_options():
     return options
 
 
-# Jumpserver not use playbook
+# JumpServer not use playbook
 class PlayBookRunner:
     """
     用于执行AnsiblePlaybook的接口.简化Playbook对象的使用.

@@ -412,11 +412,11 @@ class MFAMixin:
             return self.check_otp(code)
 
     def mfa_enabled_but_not_set(self):
-        if self.mfa_enabled and \
-                self.mfa_is_otp() and \
-                not self.otp_secret_key:
-            return True
-        return False
+        if not self.mfa_enabled:
+            return False, None
+        if self.mfa_is_otp() and not self.otp_secret_key:
+            return True, reverse('users:user-otp-enable-start')
+        return False, None
 
 
 class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
@@ -424,11 +424,13 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     SOURCE_LDAP = 'ldap'
     SOURCE_OPENID = 'openid'
     SOURCE_RADIUS = 'radius'
+    SOURCE_CAS = 'cas'
     SOURCE_CHOICES = (
         (SOURCE_LOCAL, _('Local')),
         (SOURCE_LDAP, 'LDAP/AD'),
         (SOURCE_OPENID, 'OpenID'),
         (SOURCE_RADIUS, 'Radius'),
+        (SOURCE_CAS, 'CAS'),
     )
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
@@ -532,9 +534,17 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     def is_local(self):
         return self.source == self.SOURCE_LOCAL
 
-    def save(self, *args, **kwargs):
+    def set_unprovide_attr_if_need(self):
         if not self.name:
             self.name = self.username
+        if not self.email or '@' not in self.email:
+            email = '{}@{}'.format(self.username, settings.EMAIL_SUFFIX)
+            if '@' in self.username:
+                email = self.username
+            self.email = email
+
+    def save(self, *args, **kwargs):
+        self.set_unprovide_attr_if_need()
         if self.username == 'admin':
             self.role = 'Admin'
             self.is_active = True
@@ -547,6 +557,11 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
 
     def set_avatar(self, f):
         self.avatar.save(self.username, f)
+
+    @classmethod
+    def get_avatar_url(cls, username):
+        user_default = settings.STATIC_URL + "img/avatar/user.png"
+        return user_default
 
     def avatar_url(self):
         admin_default = settings.STATIC_URL + "img/avatar/admin.png"
@@ -580,6 +595,11 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
                    created_by=_('System'))
         user.save()
         user.groups.add(UserGroup.initial())
+
+    def can_send_created_mail(self):
+        if self.email and self.source == self.SOURCE_LOCAL:
+            return True
+        return False
 
     @classmethod
     def generate_fake(cls, count=100):

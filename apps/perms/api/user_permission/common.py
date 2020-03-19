@@ -11,7 +11,7 @@ from rest_framework.generics import (
 from common.permissions import IsOrgAdminOrAppUser, IsOrgAdmin
 from common.utils import get_logger
 from ...utils import (
-    AssetPermissionUtilV2
+    AssetPermissionUtil
 )
 from ...hands import User, Asset, SystemUser
 from ... import serializers
@@ -51,8 +51,8 @@ class GetUserAssetPermissionActionsApi(UserAssetPermissionMixin,
         asset = get_object_or_404(Asset, id=asset_id)
         system_user = get_object_or_404(SystemUser, id=system_id)
 
-        system_users_actions = self.util.get_asset_system_users_with_actions(asset)
-        actions = system_users_actions.get(system_user)
+        system_users_actions = self.util.get_asset_system_users_id_with_actions(asset)
+        actions = system_users_actions.get(system_user.id)
         return {"actions": actions}
 
 
@@ -81,9 +81,8 @@ class ValidateUserAssetPermissionApi(UserAssetPermissionMixin, APIView):
         asset = get_object_or_404(Asset, id=asset_id)
         system_user = get_object_or_404(SystemUser, id=system_id)
 
-        system_users_actions = self.util.get_asset_system_users_with_actions(
-            asset)
-        actions = system_users_actions.get(system_user)
+        system_users_actions = self.util.get_asset_system_users_id_with_actions(asset)
+        actions = system_users_actions.get(system_user.id)
         if actions is None:
             return Response({'msg': False}, status=403)
         if action_name in Action.value_to_choices(actions):
@@ -95,7 +94,7 @@ class RefreshAssetPermissionCacheApi(RetrieveAPIView):
     permission_classes = (IsOrgAdmin,)
 
     def retrieve(self, request, *args, **kwargs):
-        AssetPermissionUtilV2.expire_all_user_tree_cache()
+        AssetPermissionUtil.expire_all_user_tree_cache()
         return Response({'msg': True}, status=200)
 
 
@@ -107,11 +106,14 @@ class UserGrantedAssetSystemUsersApi(UserAssetPermissionMixin, ListAPIView):
     def get_queryset(self):
         asset_id = self.kwargs.get('asset_id')
         asset = get_object_or_404(Asset, id=asset_id)
-        system_users_with_actions = self.util.get_asset_system_users_with_actions(asset)
-        system_users = []
-        for system_user, actions in system_users_with_actions.items():
+        system_users_with_actions = self.util.get_asset_system_users_id_with_actions(asset)
+        system_users_id = system_users_with_actions.keys()
+        system_users = SystemUser.objects.filter(id__in=system_users_id)\
+            .only(*self.serializer_class.Meta.only_fields) \
+            .order_by('priority')
+        system_users = list(system_users)
+        for system_user in system_users:
+            actions = system_users_with_actions.get(system_user.id, 0)
             system_user.actions = actions
-            system_users.append(system_user)
-        system_users.sort(key=lambda x: x.priority)
         return system_users
 

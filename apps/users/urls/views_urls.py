@@ -13,6 +13,7 @@ urlpatterns = [
     path('password/forgot/sendmail-success/', views.UserForgotPasswordSendmailSuccessView.as_view(), name='forgot-password-sendmail-success'),
     path('password/reset/', views.UserResetPasswordView.as_view(), name='reset-password'),
     path('password/reset/success/', views.UserResetPasswordSuccessView.as_view(), name='reset-password-success'),
+    path('password/verify/', views.UserVerifyPasswordView.as_view(), name='user-verify-password'),
 
     # Profile
     path('profile/', views.UserProfileView.as_view(), name='user-profile'),
@@ -20,7 +21,8 @@ urlpatterns = [
     path('profile/password/update/', views.UserPasswordUpdateView.as_view(), name='user-password-update'),
     path('profile/pubkey/update/', views.UserPublicKeyUpdateView.as_view(), name='user-pubkey-update'),
     path('profile/pubkey/generate/', views.UserPublicKeyGenerateView.as_view(), name='user-pubkey-generate'),
-    path('profile/otp/enable/authentication/', views.UserCheckPasswordView.as_view(), name='user-otp-enable-authentication'),
+
+    path('profile/otp/enable/start/', views.UserOtpEnableStartView.as_view(), name='user-otp-enable-start'),
     path('profile/otp/enable/install-app/', views.UserOtpEnableInstallAppView.as_view(), name='user-otp-enable-install-app'),
     path('profile/otp/enable/bind/', views.UserOtpEnableBindView.as_view(), name='user-otp-enable-bind'),
     path('profile/otp/disable/authentication/', views.UserDisableMFAView.as_view(), name='user-otp-disable-authentication'),

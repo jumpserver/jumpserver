@@ -84,7 +84,7 @@
                                             </tr>
                                             {% endif %}
                                             <tr>
-                                                <td class="text-navy">{% trans 'MFA certification' %}</td>
+                                                <td class="text-navy">{% trans 'MFA' %}</td>
                                                 <td>
                                                     {% if user.mfa_force_enabled %}
                                                         {% trans 'Force enable' %}
@@ -166,7 +166,7 @@
                                                                 ">{% trans 'Disable' %}
                                                             {% endif %}
                                                         {% else %}
-                                                            {% url 'users:user-otp-enable-authentication' %}
+                                                            {% url 'users:user-otp-enable-start' %}
                                                             ">{% trans 'Enable' %}
                                                         {% endif %}
                                                 </a>

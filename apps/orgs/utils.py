@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 #
-import traceback
+import uuid
+from inspect import signature
+from functools import wraps
 from werkzeug.local import LocalProxy
 from contextlib import contextmanager
 
@@ -28,7 +30,7 @@ def get_org_from_request(request):
 
 
 def set_current_org(org):
-    if isinstance(org, str):
+    if isinstance(org, (str, uuid.UUID)):
         org = Organization.get_instance(org)
     setattr(thread_local, 'current_org_id', org.id)
 
@@ -108,6 +110,31 @@ def filter_org_queryset(queryset):
     # print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
     queryset = queryset.filter(**kwargs)
     return queryset
+
+
+def org_aware_func(org_arg_name):
+    """
+    :param org_arg_name: 函数中包含org_id的对象是哪个参数
+    :return:
+    """
+    def decorate(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            sig = signature(func)
+            values = sig.bind(*args, **kwargs)
+            org_aware_resource = values.arguments.get(org_arg_name)
+            if not org_aware_resource:
+                return func(*args, **kwargs)
+            if hasattr(org_aware_resource, '__getitem__'):
+                org_aware_resource = org_aware_resource[0]
+            if not hasattr(org_aware_resource, "org_id"):
+                print("Error: {} not has org_id attr".format(org_aware_resource))
+                return func(*args, **kwargs)
+            with tmp_to_org(org_aware_resource.org_id):
+                # print("Current org id: {}".format(org_aware_resource.org_id))
+                return func(*args, **kwargs)
+        return wrapper
+    return decorate
 
 
 current_org = LocalProxy(get_current_org)

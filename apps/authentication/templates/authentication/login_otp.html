@@ -1,88 +1,32 @@
+{% extends '_base_only_content.html' %}
 {% load static %}
 {% load i18n %}
-<!DOCTYPE html>
-<html>
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>  {{ JMS_TITLE }} </title>
-    <link rel="shortcut icon" href="{{ FAVICON_URL }}" type="image/x-icon">
-    {% include '_head_css_js.html' %}
-    <link href="{% static "css/jumpserver.css" %}" rel="stylesheet">
-    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
-    <script src="{% static "js/jumpserver.js" %}"></script>
-    <script src="{% static "js/plugins/qrcode/qrcode.min.js" %}"></script>
-    <style>
-        .captcha {
-             float: right;
-         }
-    </style>
-</head>
+{% block title %}
+    {% trans 'MFA' %}
+{% endblock %}
 
-<body class="gray-bg">
-    <div class="loginColumns animated fadeInDown">
-        <div class="row">
-            <div class="col-md-6">
-                <h2 class="font-bold">{% trans 'Welcome to the Jumpserver open source fortress' %}</h2>
-                <p>
-                    {% trans "The world's first fully open source fortress, using the GNU GPL v2.0 open source protocol, is a professional operation and maintenance audit system in compliance with 4A." %}
-                </p>
-                <p>
-                    {% trans "Developed using Python/Django, following the Web 2.0 specification and equipped with industry-leading Web Terminal solutions, with beautiful interactive interface and good user experience." %}
-                </p>
-                <p>
-                    {% trans 'Distributed architecture is adopted to support multi-machine room deployment across regions, central node provides API, and each machine room deploys login node, which can be extended horizontally and without concurrent access restrictions.' %}
-                </p>
-                <p>
-                    {% trans  "Changes the world, starting with a little bit." %}
-                </p>
-
-            </div>
-            <div class="col-md-6">
-                <div class="ibox-content">
-                    <div>
-                        <img src="{% static 'img/logo.png' %}" width="60" height="60">
-                        <span class="font-bold text-center" style="font-size: 24px; font-family: inherit; margin-left: 20px">{% trans 'MFA certification' %}</span>
-                    </div>
-                    <div  class="m-t">
-
-                        <div class="form-group">
-                            <p style="margin:30px auto;" class="text-center"><strong style="color:#000000">{% trans 'The account protection has been opened, please complete the following operations according to the prompts' %}</strong></p>
-                            <div class="text-center">
-                                <img src="{% static 'img/otp_auth.png' %}" alt="" width="72px" height="117">
-                            </div>
-                            <p style="margin: 30px auto">&nbsp;{% trans 'Open Authenticator and enter the 6-bit dynamic code' %}</p>
-                        </div>
-
-                        <form class="m-t" role="form" method="post" action="">
-
-                            {% csrf_token %}
-                            {% if 'otp_code' in form.errors %}
-                                <p class="red-fonts">{{ form.otp_code.errors.as_text }}</p>
-                            {% endif %}
-                            <div class="form-group">
-                                <input type="text" class="form-control" name="otp_code" placeholder="{% trans 'Six figures' %}" required="">
-                            </div>
-                            <button type="submit" class="btn btn-primary block full-width m-b">{% trans 'Next' %}</button>
-
-                            <a href="#">
-                                <small>{% trans "Can't provide security? Please contact the administrator!" %}</small>
-                            </a>
-
-                        </form>
-                    </div>
-                    <p class="m-t">
-                    </p>
-                </div>
-            </div>
+{% block content %}
+    <form class="m-t" role="form" method="post" action="">
+        {% csrf_token %}
+        {% if 'otp_code' in form.errors %}
+            <p class="red-fonts">{{ form.otp_code.errors.as_text }}</p>
+        {% endif %}
+        <div class="form-group">
+            <select class="form-control">
+                <option value="otp" selected>{% trans 'One-time password' %}</option>
+            </select>
         </div>
-        <hr/>
-        <div class="row">
-            <div class="col-md-12">
-                 {% include '_copyright.html' %}
-            </div>
+        <div class="form-group">
+            <input type="text" class="form-control" name="otp_code" placeholder="" required="" autofocus="autofocus">
+            <span class="help-block">
+                {% trans 'Open Google Authenticator and enter the 6-bit dynamic code' %}
+            </span>
         </div>
-    </div>
-</body>
-</html>
+        <button type="submit" class="btn btn-primary block full-width m-b">{% trans 'Next' %}</button>
+
+        <div>
+            <small>{% trans "Can't provide security? Please contact the administrator!" %}</small>
+        </div>
+    </form>
+{% endblock %}

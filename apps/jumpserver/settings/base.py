@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_swagger',
     'drf_yasg',
+    'django_cas_ng',
     'channels',
     'django_filters',
     'bootstrap3',
@@ -75,6 +76,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'authentication.backends.openid.middleware.OpenIDAuthenticationMiddleware',
+    'django_cas_ng.middleware.CASMiddleware',
     'jumpserver.middleware.TimezoneMiddleware',
     'jumpserver.middleware.DemoMiddleware',
     'jumpserver.middleware.RequestMiddleware',
@@ -219,8 +221,6 @@ EMAIL_RECIPIENT = DYNAMIC.EMAIL_RECIPIENT
 EMAIL_USE_SSL = DYNAMIC.EMAIL_USE_SSL
 EMAIL_USE_TLS = DYNAMIC.EMAIL_USE_TLS
 
-
-AUTHENTICATION_BACKENDS = DYNAMIC.AUTHENTICATION_BACKENDS
 
 # Custom User Auth model
 AUTH_USER_MODEL = 'users.User'

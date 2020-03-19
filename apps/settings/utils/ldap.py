@@ -1,21 +1,38 @@
 # coding: utf-8
 #
 
-from ldap3 import Server, Connection
+import json
+from ldap3 import Server, Connection, SIMPLE
+from ldap3.core.exceptions import (
+    LDAPSocketOpenError,
+    LDAPSocketReceiveError,
+    LDAPSessionTerminatedByServerError,
+    LDAPUserNameIsMandatoryError,
+    LDAPPasswordIsMandatoryError,
+    LDAPInvalidDnError,
+    LDAPInvalidServerError,
+    LDAPBindError,
+    LDAPInvalidFilterError,
+    LDAPExceptionError,
+    LDAPConfigurationError,
+    LDAPAttributeError,
+)
 from django.conf import settings
 from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _
+from copy import deepcopy
 
 from common.const import LDAP_AD_ACCOUNT_DISABLE
 from common.utils import timeit, get_logger
 from users.utils import construct_user_email
 from users.models import User
+from authentication.backends.ldap import LDAPAuthorizationBackend, LDAPUser
 
 logger = get_logger(__file__)
 
 __all__ = [
     'LDAPConfig', 'LDAPServerUtil', 'LDAPCacheUtil', 'LDAPImportUtil',
-    'LDAPSyncUtil', 'LDAP_USE_CACHE_FLAGS'
+    'LDAPSyncUtil', 'LDAP_USE_CACHE_FLAGS', 'LDAPTestUtil',
 ]
 
 LDAP_USE_CACHE_FLAGS = [1, '1', 'true', 'True', True]
@@ -28,9 +45,10 @@ class LDAPConfig(object):
         self.bind_dn = None
         self.password = None
         self.use_ssl = None
-        self.search_ougroup = None
+        self.search_ou = None
         self.search_filter = None
         self.attr_map = None
+        self.auth_ldap = None
         if isinstance(config, dict):
             self.load_from_config(config)
         else:
@@ -41,18 +59,20 @@ class LDAPConfig(object):
         self.bind_dn = config.get('bind_dn')
         self.password = config.get('password')
         self.use_ssl = config.get('use_ssl')
-        self.search_ougroup = config.get('search_ougroup')
+        self.search_ou = config.get('search_ou')
         self.search_filter = config.get('search_filter')
         self.attr_map = config.get('attr_map')
+        self.auth_ldap = config.get('auth_ldap')
 
     def load_from_settings(self):
         self.server_uri = settings.AUTH_LDAP_SERVER_URI
         self.bind_dn = settings.AUTH_LDAP_BIND_DN
         self.password = settings.AUTH_LDAP_BIND_PASSWORD
         self.use_ssl = settings.AUTH_LDAP_START_TLS
-        self.search_ougroup = settings.AUTH_LDAP_SEARCH_OU
+        self.search_ou = settings.AUTH_LDAP_SEARCH_OU
         self.search_filter = settings.AUTH_LDAP_SEARCH_FILTER
         self.attr_map = settings.AUTH_LDAP_USER_ATTR_MAP
+        self.auth_ldap = settings.AUTH_LDAP
 
 
 class LDAPServerUtil(object):
@@ -93,7 +113,7 @@ class LDAPServerUtil(object):
             cookie = self.connection.result['controls']['1.2.840.113556.1.4.319']['value']['cookie']
             return cookie
         except Exception as e:
-            logger.error(e)
+            logger.error(e, exc_info=True)
             return None
 
     def get_search_filter_extra(self):
@@ -129,7 +149,7 @@ class LDAPServerUtil(object):
     def search_user_entries(self):
         logger.info("Search user entries")
         user_entries = list()
-        search_ous = str(self.config.search_ougroup).split('|')
+        search_ous = str(self.config.search_ou).split('|')
         for search_ou in search_ous:
             logger.info("Search user entries ou: {}".format(search_ou))
             self.search_user_entries_ou(search_ou)
@@ -332,4 +352,221 @@ class LDAPImportUtil(object):
         return errors
 
 
+class LDAPTestUtil(object):
+    class LDAPInvalidSearchOuOrFilterError(LDAPExceptionError):
+        pass
 
+    class LDAPInvalidAttributeMapError(LDAPExceptionError):
+        pass
+
+    class LDAPNotEnabledAuthError(LDAPExceptionError):
+        pass
+
+    class LDAPBeforeLoginCheckError(LDAPExceptionError):
+        pass
+
+    def __init__(self, config=None):
+        self.config = LDAPConfig(config)
+        self.user_entries = []
+
+    def _test_connection_bind(self, authentication=None, user=None, password=None):
+        server = Server(self.config.server_uri)
+        connection = Connection(
+            server, user=user, password=password, authentication=authentication
+        )
+        ret = connection.bind()
+        return ret
+
+    # test server uri
+
+    def _test_server_uri(self):
+        self._test_connection_bind()
+
+    def test_server_uri(self):
+        try:
+            self._test_server_uri()
+        except LDAPSocketOpenError as e:
+            error = _("Host or port is disconnected: {}".format(e))
+        except LDAPSessionTerminatedByServerError as e:
+            error = _('The port is not the port of the LDAP service: {}'.format(e))
+        except LDAPSocketReceiveError as e:
+            error = _('Please enter the certificate: {}'.format(e))
+        except Exception as e:
+            error = _('Unknown error: {}'.format(e))
+        else:
+            return
+        raise LDAPInvalidServerError(error)
+
+    # test bind dn
+
+    def _test_bind_dn(self):
+        user = self.config.bind_dn
+        password = self.config.password
+        ret = self._test_connection_bind(
+            authentication=SIMPLE, user=user, password=password
+        )
+        if not ret:
+            msg = _('Bind DN or Password incorrect')
+            raise LDAPInvalidDnError(msg)
+
+    def test_bind_dn(self):
+        try:
+            self._test_bind_dn()
+        except LDAPUserNameIsMandatoryError as e:
+            error = _('Please enter Bind DN: {}'.format(e))
+        except LDAPPasswordIsMandatoryError as e:
+            error = _('Please enter Password: {}'.format(e))
+        except LDAPInvalidDnError as e:
+            error = _('Please enter correct Bind DN and Password: {}'.format(e))
+        except Exception as e:
+            error = _('Unknown error: {}'.format(e))
+        else:
+            return
+        raise LDAPBindError(error)
+
+    # test search ou
+
+    def _test_search_ou_and_filter(self):
+        config = deepcopy(self.config)
+        util = LDAPServerUtil(config=config)
+        search_ous = str(self.config.search_ou).split('|')
+        for search_ou in search_ous:
+            util.config.search_ou = search_ou
+            user_entries = util.search_user_entries()
+            logger.debug('Search ou: {}, count user: {}'.format(search_ou, len(user_entries)))
+            if len(user_entries) == 0:
+                error = _('Invalid User OU or User search filter: {}'.format(search_ou))
+                raise self.LDAPInvalidSearchOuOrFilterError(error)
+
+    def test_search_ou_and_filter(self):
+        try:
+            self._test_search_ou_and_filter()
+        except LDAPInvalidFilterError as e:
+            error = e
+        except self.LDAPInvalidSearchOuOrFilterError as e:
+            error = e
+        except LDAPAttributeError as e:
+            error = e
+            raise self.LDAPInvalidAttributeMapError(error)
+        except Exception as e:
+            error = _('Unknown error: {}'.format(e))
+        else:
+            return
+        raise self.LDAPInvalidSearchOuOrFilterError(error)
+
+    # test attr map
+
+    def _test_attr_map(self):
+        attr_map = self.config.attr_map
+        if not isinstance(attr_map, dict):
+            attr_map = json.loads(attr_map)
+            self.config.attr_map = attr_map
+
+        should_contain_attr = {'username', 'name', 'email'}
+        actually_contain_attr = set(attr_map.keys())
+        result = should_contain_attr - actually_contain_attr
+        if len(result) != 0:
+            error = _('LDAP User attr map not include: {}'.format(result))
+            raise self.LDAPInvalidAttributeMapError(error)
+
+    def test_attr_map(self):
+        try:
+            self._test_attr_map()
+        except json.JSONDecodeError:
+            error = _('LDAP User attr map is not dict')
+        except self.LDAPInvalidAttributeMapError as e:
+            error = e
+        except Exception as e:
+            error = _('Unknown error: {}'.format(e))
+        else:
+            return
+        raise self.LDAPInvalidAttributeMapError(error)
+
+    # test search
+
+    def test_search(self):
+        util = LDAPServerUtil(config=self.config)
+        self.user_entries = util.search_user_entries()
+
+    # test auth ldap enabled
+
+    def test_enabled_auth_ldap(self):
+        if not self.config.auth_ldap:
+            error = _('LDAP authentication is not enabled')
+            raise self.LDAPNotEnabledAuthError(error)
+
+    # test config
+
+    def _test_config(self):
+        self.test_server_uri()
+        self.test_bind_dn()
+        self.test_attr_map()
+        self.test_search_ou_and_filter()
+        self.test_search()
+        self.test_enabled_auth_ldap()
+
+    def test_config(self):
+        status = False
+        try:
+            self._test_config()
+        except LDAPInvalidServerError as e:
+            msg = _('Error (Invalid LDAP server): {}'.format(e))
+        except LDAPBindError as e:
+            msg = _('Error (Invalid Bind DN): {}'.format(e))
+        except self.LDAPInvalidAttributeMapError as e:
+            msg = _('Error (Invalid LDAP User attr map): {}'.format(e))
+        except self.LDAPInvalidSearchOuOrFilterError as e:
+            msg = _('Error (Invalid User OU or User search filter): {}'.format(e))
+        except self.LDAPNotEnabledAuthError as e:
+            msg = _('Error (Not enabled LDAP authentication): {}'.format(e))
+        except Exception as e:
+            msg = _('Error (Unknown): {}').format(e)
+        else:
+            status = True
+            msg = _('Succeed: Match {} s user'.format(len(self.user_entries)))
+
+        if not status:
+            logger.error(msg, exc_info=True)
+        return status, msg
+
+    # test login
+
+    def _test_before_login_check(self, username, password):
+        ok, msg = self.test_config()
+        if not ok:
+            raise LDAPConfigurationError(msg)
+
+        backend = LDAPAuthorizationBackend()
+        ok, msg = backend.pre_check(username, password)
+        if not ok:
+            raise self.LDAPBeforeLoginCheckError(msg)
+
+    @staticmethod
+    def _test_login_auth(username, password):
+        backend = LDAPAuthorizationBackend()
+        ldap_user = LDAPUser(backend, username=username.strip())
+        ldap_user._authenticate_user_dn(password)
+
+    def _test_login(self, username, password):
+        self._test_before_login_check(username, password)
+        self._test_login_auth(username, password)
+
+    def test_login(self, username, password):
+        status = False
+        try:
+            self._test_login(username, password)
+        except LDAPConfigurationError as e:
+            msg = _('Authentication failed (configuration incorrect): {}'.format(e))
+        except self.LDAPBeforeLoginCheckError as e:
+            msg = _('Authentication failed (before login check failed): {}'.format(e))
+        except LDAPUser.AuthenticationFailed as e:
+            msg = _('Authentication failed (username or password incorrect): {}'.format(e))
+        except Exception as e:
+            msg = _("Authentication failed (Unknown): {}".format(e))
+        else:
+            status = True
+            msg = _("Authentication success: {}".format(username))
+
+        if not status:
+            logger.error(msg, exc_info=True)
+        return status, msg

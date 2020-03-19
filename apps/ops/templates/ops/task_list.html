@@ -35,7 +35,7 @@ $(document).ready(function () {
                 $(td).html(innerHtml);
             }},
             {targets: 2, createdCell: function (td, cellData) {
-                var summary = cellData ? cellData.stat : {failed: 0, success: 0, total: 0};
+                var summary = cellData || {failed: 0, success: 0, total: 0};
                 var innerHtml = '<span class="text-danger">failed</span>/<span class="text-navy">success</span>/total';
                 innerHtml = innerHtml.replace('failed', summary.failed)
                     .replace('success', summary.success)
@@ -79,10 +79,10 @@ $(document).ready(function () {
         ajax_url: '{% url "api-ops:task-list" %}',
         columns: [
             {data: "id"}, {data: "name", className: "text-left"},
-            {data: "latest_history", orderable: false},
-            {data: "latest_history", orderable: false},
-            {data: "latest_history", orderable: false}, {data: "latest_history"},
-            {data: "latest_history", orderable:false}, {data: "id", orderable: false},
+            {data: "summary", orderable: false},
+            {data: "latest_execution", orderable: false},
+            {data: "latest_execution", orderable: false}, {data: "latest_execution"},
+            {data: "latest_execution", orderable:false}, {data: "id", orderable: false},
         ],
         order: [],
         op_html: $('#actions').html()

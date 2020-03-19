@@ -248,7 +248,7 @@ function formSubmit(props) {
                 noneFieldErrorRef.css('display', 'block');
                 noneFieldErrorRef.html(noneFieldErrorMsg);
             }
-            $('.has-error').get(0).scrollIntoView();
+            $('.has-error :visible').get(0).scrollIntoView();
         }
     })
 }
@@ -264,11 +264,15 @@ function requestApi(props) {
     if (props.flash_message === false) {
         flash_message = false;
     }
+    var dataBody = props.body || props.data;
+    if (typeof(dataBody) === "object") {
+        dataBody = JSON.stringify(dataBody)
+    }
 
     $.ajax({
         url: props.url,
         type: props.method || "PATCH",
-        data: props.body || props.data,
+        data: dataBody,
         contentType: props.content_type || "application/json; charset=utf-8",
         dataType: props.data_type || "json"
     }).done(function (data, textStatue, jqXHR) {
@@ -315,16 +319,22 @@ function objectDelete(obj, name, url, redirectTo, title, success_message) {
     function doDelete() {
         var body = {};
         var success = function () {
-            // swal('Deleted!', "[ "+name+"]"+" has been deleted ", "success");
             if (!redirectTo) {
                 $(obj).parent().parent().remove();
             } else {
                 window.location.href = redirectTo;
             }
         };
-        var fail = function () {
-            // swal("错误", "删除"+"[ "+name+" ]"+"遇到错误", "error");
-            swal(gettext('Error'), "[ " + name + " ]" + gettext("Being used by the asset, please unbind the asset first."), "error");
+        var fail = function (responseText, responseJSON, status) {
+            var errorMsg = '';
+            if (responseJSON && responseJSON.error) {
+                errorMsg = '';
+            } else if (status === 404) {
+                errorMsg = gettext("Not found")
+            } else {
+                errorMsg = gettext("Server error")
+            }
+            swal(gettext('Error'), "[ " + name + " ] " + errorMsg);
         };
         requestApi({
             url: url,
@@ -628,7 +638,7 @@ jumpserver.initServerSideDataTable = function (options) {
         style: select_style,
         selector: 'td:first-child'
     };
-    var dom = '<"#uc.pull-left"> <"pull-right"<"inline"l> <"#fb.inline"> <"inline"f><"#fa.inline">>' +
+    var dom = '<"#uc.pull-left"> <"pull-right"<"#lb.inline"> <"inline"l> <"#fb.inline"> <"inline"f><"#fa.inline">>' +
         'tr' +
         '<"row m-t"<"col-md-8"<"#op.col-md-6"><"col-md-6 text-center"i>><"col-md-4"p>>';
     var table = ele.DataTable({
@@ -767,6 +777,7 @@ jumpserver.initServerSideDataTable = function (options) {
         $('#uc').html(options.uc_html || '');
         $('#fb').html(options.fb_html || '');
         $('#fa').html(options.fa_html || '');
+        $('#lb').html(options.lb_html || '');
     });
     var table_id = table.settings()[0].sTableId;
     $('#' + table_id + ' .ipt_check_all').on('click', function () {
@@ -1205,6 +1216,14 @@ function objectAttrsIsBool(obj, attrs) {
     })
 }
 
+function objectAttrsIsNumber(obj, attrs) {
+    attrs.forEach(function (attr) {
+        if (!obj[attr]) {
+            obj[attr] = null;
+        }
+    })
+}
+
 function cleanDateStr(d) {
     for (var i = 0; i < 3; i++) {
         if (!isNaN(Date.parse(d))) {
@@ -1396,8 +1415,8 @@ function showCeleryTaskLog(taskId) {
 }
 
 function getUserLang(){
-    let userLangZh = document.cookie.indexOf('django_language=en');
-    if (userLangZh === -1){
+    let userLangEN = document.cookie.indexOf('django_language=en');
+    if (userLangEN === -1){
         return 'zh-CN'
     }
     else{
@@ -1447,4 +1466,35 @@ function initDateRangePicker(selector, options) {
 
 function reloadPage() {
     setTimeout( function () {window.location.reload();}, 300);
+}
+
+function isEmptyObject(obj) {
+    return Object.keys(obj).length === 0
+}
+
+function getStatusIcon(status, mapping, title) {
+    var navy = '<i class="fa fa-circle text-navy" title=""></i>';
+    var danger = '<i class="fa fa-circle text-danger" title=""></i>';
+    var warning = '<i class="fa fa-circle text-warning" title=""></i>';
+    var icons = {
+        navy: navy,
+        danger: danger,
+        warning: warning
+    };
+    var defaultMapping = {
+        true: 'navy',
+        false: 'danger',
+        1: 'navy',
+        0: 'danger',
+        default: 'navy'
+    };
+    if (!mapping) {
+      mapping = defaultMapping;
+    }
+    var name = mapping[status] || mapping['default'];
+    var icon = icons[name];
+    if (title) {
+        icon = icon.replace('title=""', 'title="' + title + '"')
+    }
+    return icon;
 }

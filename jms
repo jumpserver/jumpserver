@@ -7,6 +7,7 @@ import threading
 import datetime
 import logging
 import logging.handlers
+import psutil
 import time
 import argparse
 import sys
@@ -351,6 +352,7 @@ def watch_services():
             rotate_log_if_need()
             time.sleep(30)
         except KeyboardInterrupt:
+            print("Start stop service") 
             time.sleep(1)
             break
     clean_up()
@@ -437,6 +439,11 @@ def stop_service(srv, sig=15):
         os.kill(pid, sig)
         with LOCK:
             process = processes.pop(s, None)
+        if process is None:
+            try:
+                process = psutil.Process(pid)
+            except:
+                pass
         if process is None:
             print("\033[31m No process found\033[0m")
             continue
@@ -529,6 +536,7 @@ if __name__ == '__main__':
         start_services_and_watch(srv)
         os._exit(0)
     elif action == "stop":
+        print("Stop service")
         if args.force:
             stop_service_force(srv)
         else:

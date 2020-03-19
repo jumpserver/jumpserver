@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from django.template import loader
 
 
+from orgs.utils import current_org
 from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor
 from common.utils import get_logger
 from ..backends import (
@@ -28,6 +29,22 @@ class CommandQueryMixin:
     ]
     default_days_ago = 5
 
+    @staticmethod
+    def get_org_id():
+        if current_org.is_default():
+            org_id = ''
+        else:
+            org_id = current_org.id
+        return org_id
+
+    def get_query_risk_level(self):
+        risk_level = self.request.query_params.get('risk_level')
+        if risk_level is None:
+            return None
+        if risk_level.isdigit():
+            return int(risk_level)
+        return None
+
     def get_queryset(self):
         # 解决访问 /docs/ 问题
         if hasattr(self, 'swagger_fake_view'):
@@ -38,7 +55,8 @@ class CommandQueryMixin:
         queryset = multi_command_storage.filter(
             date_from=date_from, date_to=date_to, input=q.get("input"),
             user=q.get("user"), asset=q.get("asset"),
-            system_user=q.get("system_user")
+            system_user=q.get("system_user"),
+            risk_level=self.get_query_risk_level(), org_id=self.get_org_id(),
         )
         return queryset
 

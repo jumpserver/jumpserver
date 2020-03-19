@@ -3,11 +3,10 @@
 {% load i18n %}
 
 {% block small_title %}
-    {% trans 'Bind' %}
+    {% trans 'Bind one-time password authenticator' %}
 {% endblock %}
 
 {% block content %}
-
     <div class="verify">
         <p style="margin:20px auto;">
             <strong style="color: #000000">
@@ -17,21 +16,15 @@
 
         <div id="qr_code"></div>
         <div style="display: block; margin: 0">Secret: {{ otp_secret_key }}</div>
-
         <form class="" role="form" method="post" action="">
             {% csrf_token %}
-
             <div class="form-input">
                 <input type="text" class="" name="otp_code" placeholder="{% trans 'Six figures' %}" required="">
             </div>
-
             <button type="submit" class="next">{% trans 'Next' %}</button>
-
-
             {% if 'otp_code' in form.errors %}
                 <p style="color: #ed5565">{{ form.otp_code.errors.as_text }}</p>
             {% endif %}
-
         </form>
     </div>
 

@@ -268,16 +268,16 @@ function updateAssetNodes(nodes) {
 }
 
 function refreshAssetHardware() {
-    var the_url = "{% url 'api-assets:asset-refresh' pk=asset.id %}";
+    var the_url = "{% url 'api-assets:asset-task-create' pk=asset.id %}";
     var success = function(data) {
-        console.log(data);
         var task_id = data.task;
         showCeleryTaskLog(task_id);
     };
     requestApi({
         url: the_url,
         success: success,
-        method: 'GET'
+        data: {action: "refresh"},
+        method: 'POST'
     });
 }
 
@@ -345,16 +345,15 @@ $(document).ready(function () {
 }).on('click', '#btn_refresh_asset', function () {
     refreshAssetHardware()
 }).on('click', '#btn-test-is-alive', function () {
-    var the_url = "{% url 'api-assets:asset-alive-test' pk=asset.id %}";
-
+    var the_url = "{% url 'api-assets:asset-task-create' pk=asset.id %}";
     var success = function(data) {
         var task_id = data.task;
         showCeleryTaskLog(task_id);
     };
-
     requestApi({
         url: the_url,
-        method: 'GET',
+        method: 'POST',
+        data: {action: "test"},
         success: success
     });
 })

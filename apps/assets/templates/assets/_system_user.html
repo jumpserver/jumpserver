@@ -34,6 +34,7 @@
                             {% bootstrap_field form.name layout="horizontal" %}
                             {% bootstrap_field form.login_mode layout="horizontal" %}
                             {% bootstrap_field form.username layout="horizontal" %}
+                            {% bootstrap_field form.username_same_with_user layout="horizontal" %}
                             {% bootstrap_field form.priority layout="horizontal" %}
                             {% bootstrap_field form.protocol layout="horizontal" %}
 
@@ -63,6 +64,7 @@
                                 {% bootstrap_field form.cmd_filters layout="horizontal" %}
                             </div>
                             <h3>{% trans 'Other' %}</h3>
+                            {% bootstrap_field form.sftp_root layout="horizontal" %}
                             {% bootstrap_field form.sudo layout="horizontal" %}
                             {% bootstrap_field form.shell layout="horizontal" %}
                             {% bootstrap_field form.comment layout="horizontal" %}
@@ -226,6 +228,10 @@ $(document).ready(function () {
     $('.select2').select2();
     authFieldsDisplay();
     fieldDisplay();
+    var checked = $("#id_username_same_with_user").prop('checked');
+    if (checked) {
+        $("#id_username").attr("disabled", true)
+    }
 })
 .on('change', auto_generate_key, function(){
     authFieldsDisplay();
@@ -246,7 +252,7 @@ $(document).ready(function () {
     var data = form.serializeObject();
 
     objectAttrsIsList(data, ['cmd_filters']);
-    objectAttrsIsBool(data, ["auto_generate_key", "auto_push"]);
+    objectAttrsIsBool(data, ["auto_generate_key", "auto_push", "username_same_with_user"]);
     data["private_key"] = $("#id_private_key").data('file');
 
     var props = {
@@ -261,6 +267,15 @@ $(document).ready(function () {
     readFile($(this)).on("onload", function (evt, data) {
          $(this).data("file", data)
     })
+}).on("change", '#id_username_same_with_user', function () {
+    var checked = $(this).prop('checked');
+    var usernameRef = $("#id_username");
+    if (checked) {
+        usernameRef.val('');
+        usernameRef.attr("disabled", true)
+    } else {
+        usernameRef.attr("disabled", false)
+    }
 })
 
 </script>

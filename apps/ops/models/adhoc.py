@@ -10,45 +10,35 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from django_celery_beat.models import PeriodicTask
 
 from common.utils import get_logger, lazyproperty
 from common.fields.model import (
     JsonListTextField, JsonDictCharField, EncryptJsonDictCharField,
     JsonDictTextField,
 )
-from orgs.utils import set_to_root_org, get_current_org, set_current_org
-from ..celery.utils import (
-    delete_celery_periodic_task, create_or_update_celery_periodic_tasks,
-    disable_celery_periodic_task
-)
+from orgs.mixins.models import OrgModelMixin
 from ..ansible import AdHocRunner, AnsibleError
 from ..inventory import JMSInventory
+from ..mixin import PeriodTaskModelMixin
 
-__all__ = ["Task", "AdHoc", "AdHocRunHistory"]
+__all__ = ["Task", "AdHoc", "AdHocExecution"]
 
 
 logger = get_logger(__file__)
 
 
-class Task(models.Model):
+class Task(PeriodTaskModelMixin, OrgModelMixin):
     """
     This task is different ansible task, Task like 'push system user', 'get asset info' ..
     One task can have some versions of adhoc, run a task only run the latest version adhoc
     """
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    name = models.CharField(max_length=128, verbose_name=_('Name'))
-    interval = models.IntegerField(verbose_name=_("Interval"), null=True, blank=True, help_text=_("Units: seconds"))
-    crontab = models.CharField(verbose_name=_("Crontab"), null=True, blank=True, max_length=128, help_text=_("5 * * * *"))
-    is_periodic = models.BooleanField(default=False)
     callback = models.CharField(max_length=128, blank=True, null=True, verbose_name=_("Callback"))  # Callback must be a registered celery task
     is_deleted = models.BooleanField(default=False)
     comment = models.TextField(blank=True, verbose_name=_("Comment"))
-    created_by = models.CharField(max_length=128, blank=True, default='')
     date_created = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name=_("Date created"))
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
     latest_adhoc = models.ForeignKey('ops.AdHoc', on_delete=models.SET_NULL, null=True, related_name='task_latest')
-    latest_history = models.ForeignKey('ops.AdHocRunHistory', on_delete=models.SET_NULL, null=True, related_name='task_latest')
+    latest_execution = models.ForeignKey('ops.AdHocExecution', on_delete=models.SET_NULL, null=True, related_name='task_latest')
     total_run_amount = models.IntegerField(default=0)
     success_run_amount = models.IntegerField(default=0)
     _ignore_auto_created_by = True
@@ -63,29 +53,29 @@ class Task(models.Model):
 
     @property
     def is_success(self):
-        if self.latest_history:
-            return self.latest_history.is_success
+        if self.latest_execution:
+            return self.latest_execution.is_success
         else:
             return False
 
     @property
     def timedelta(self):
-        if self.latest_history:
-            return self.latest_history.timedelta
+        if self.latest_execution:
+            return self.latest_execution.timedelta
         else:
             return 0
 
     @property
     def date_start(self):
-        if self.latest_history:
-            return self.latest_history.date_start
+        if self.latest_execution:
+            return self.latest_execution.date_start
         else:
             return None
 
     @property
     def assets_amount(self):
-        if self.latest_history:
-            return self.latest_history.hosts_amount
+        if self.latest_execution:
+            return self.latest_execution.hosts_amount
         return 0
 
     def get_latest_adhoc(self):
@@ -106,8 +96,8 @@ class Task(models.Model):
         failed = total - success
         return {'total': total, 'success': success, 'failed': failed}
 
-    def get_run_history(self):
-        return self.history.all()
+    def get_run_execution(self):
+        return self.execution.all()
 
     def run(self):
         latest_adhoc = self.get_latest_adhoc()
@@ -116,58 +106,29 @@ class Task(models.Model):
         else:
             return {'error': 'No adhoc'}
 
-    def register_as_period_task(self):
-        from ..tasks import run_ansible_task
-        interval = None
-        crontab = None
-
-        if self.interval:
-            interval = self.interval
-        elif self.crontab:
-            crontab = self.crontab
-
-        tasks = {
-            self.__str__(): {
-                "task": run_ansible_task.name,
-                "interval": interval,
-                "crontab": crontab,
-                "args": (str(self.id),),
-                "kwargs": {"callback": self.callback},
-                "enabled": True,
-            }
-        }
-        create_or_update_celery_periodic_tasks(tasks)
-
-    def save(self, **kwargs):
-        instance = super().save(**kwargs)
-        if self.is_periodic:
-            self.register_as_period_task()
-        else:
-            disable_celery_periodic_task(self.__str__())
-        return instance
-
-    def delete(self, using=None, keep_parents=False):
-        super().delete(using=using, keep_parents=keep_parents)
-        delete_celery_periodic_task(self.__str__())
-
     @property
-    def schedule(self):
-        try:
-            return PeriodicTask.objects.get(name=str(self))
-        except PeriodicTask.DoesNotExist:
-            return None
+    def period_key(self):
+        return self.__str__()
+
+    def get_register_task(self):
+        from ..tasks import run_ansible_task
+        name = self.__str__()
+        task = run_ansible_task.name
+        args = (str(self.id),)
+        kwargs = {"callback": self.callback}
+        return name, task, args, kwargs
 
     def __str__(self):
-        return self.name + '@' + str(self.created_by)
+        return self.name + '@' + str(self.org_id)
 
     class Meta:
         db_table = 'ops_task'
-        unique_together = ('name', 'created_by')
+        unique_together = ('name', 'org_id')
         ordering = ('-date_updated',)
         get_latest_by = 'date_created'
 
 
-class AdHoc(models.Model):
+class AdHoc(OrgModelMixin):
     """
     task: A task reference
     _tasks: [{'name': 'task_name', 'action': {'module': '', 'args': ''}, 'other..': ''}, ]
@@ -185,7 +146,7 @@ class AdHoc(models.Model):
     hosts = models.ManyToManyField('assets.Asset', verbose_name=_("Host"))
     run_as_admin = models.BooleanField(default=False, verbose_name=_('Run as admin'))
     run_as = models.CharField(max_length=64, default='', blank=True, null=True, verbose_name=_('Username'))
-    become = EncryptJsonDictCharField(max_length=1024, default='', null=True, blank=True, verbose_name=_("Become"))
+    become = EncryptJsonDictCharField(max_length=1024, default='', blank=True, null=True, verbose_name=_("Become"))
     created_by = models.CharField(max_length=64, default='', blank=True, null=True, verbose_name=_('Create by'))
     date_created = models.DateTimeField(auto_now_add=True, db_index=True)
 
@@ -217,22 +178,24 @@ class AdHoc(models.Model):
             hid = current_task.request.id
         except AttributeError:
             hid = str(uuid.uuid4())
-        history = AdHocRunHistory(
+        execution = AdHocExecution(
             id=hid, adhoc=self, task=self.task,
-            task_display=str(self.task)
+            task_display=str(self.task),
+            date_start=timezone.now(),
+            hosts_amount=self.hosts.count(),
         )
-        history.save()
-        return history.start()
+        execution.save()
+        return execution.start()
 
     @property
     def short_id(self):
         return str(self.id).split('-')[-1]
 
     @property
-    def latest_history(self):
+    def latest_execution(self):
         try:
-            return self.history.all().latest()
-        except AdHocRunHistory.DoesNotExist:
+            return self.execution.all().latest()
+        except AdHocExecution.DoesNotExist:
             return None
 
     def save(self, **kwargs):
@@ -244,7 +207,7 @@ class AdHoc(models.Model):
     def __str__(self):
         return "{} of {}".format(self.task.name, self.short_id)
 
-    def __eq__(self, other):
+    def same_with(self, other):
         if not isinstance(other, self.__class__):
             return False
         fields_check = []
@@ -261,15 +224,15 @@ class AdHoc(models.Model):
         get_latest_by = 'date_created'
 
 
-class AdHocRunHistory(models.Model):
+class AdHocExecution(OrgModelMixin):
     """
     AdHoc running history.
     """
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    task = models.ForeignKey(Task, related_name='history', on_delete=models.SET_NULL, null=True)
+    task = models.ForeignKey(Task, related_name='execution', on_delete=models.SET_NULL, null=True)
     task_display = models.CharField(max_length=128, blank=True, default='', verbose_name=_("Task display"))
     hosts_amount = models.IntegerField(default=0, verbose_name=_("Host amount"))
-    adhoc = models.ForeignKey(AdHoc, related_name='history', on_delete=models.SET_NULL, null=True)
+    adhoc = models.ForeignKey(AdHoc, related_name='execution', on_delete=models.SET_NULL, null=True)
     date_start = models.DateTimeField(auto_now_add=True, verbose_name=_('Start time'))
     date_finished = models.DateTimeField(blank=True, null=True, verbose_name=_('End time'))
     timedelta = models.FloatField(default=0.0, verbose_name=_('Time'), null=True)
@@ -308,13 +271,9 @@ class AdHocRunHistory(models.Model):
             return {}, {}
 
     def start(self):
-        self.task.latest_history = self
+        self.task.latest_execution = self
         self.task.save()
-        current_org = get_current_org()
-        set_to_root_org()
         time_start = time.time()
-        date_start = timezone.now()
-        is_success = False
         summary = {}
         raw = ''
 
@@ -322,30 +281,31 @@ class AdHocRunHistory(models.Model):
             date_start_s = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             print(_("{} Start task: {}").format(date_start_s, self.task.name))
             raw, summary = self.start_runner()
-            is_success = summary.get('success', False)
         except Exception as e:
             logger.error(e, exc_info=True)
             raw = {"dark": {"all": str(e)}, "contacted": []}
         finally:
+            self.clean_up(summary, time_start)
             date_end = timezone.now()
             date_end_s = date_end.strftime('%Y-%m-%d %H:%M:%S')
             print(_("{} Task finish").format(date_end_s))
             print('.\n\n.')
-            task = Task.objects.get(id=self.task_id)
-            task.total_run_amount = models.F('total_run_amount') + 1
-            if is_success:
-                task.success_run_amount = models.F('success_run_amount') + 1
-            task.save()
-            AdHocRunHistory.objects.filter(id=self.id).update(
-                date_start=date_start,
-                is_finished=True,
-                is_success=is_success,
-                date_finished=timezone.now(),
-                timedelta=time.time() - time_start,
-                summary=summary
-            )
-            set_current_org(current_org)
             return raw, summary
+
+    def clean_up(self, summary, time_start):
+        is_success = summary.get('success', False)
+        task = Task.objects.get(id=self.task_id)
+        task.total_run_amount = models.F('total_run_amount') + 1
+        if is_success:
+            task.success_run_amount = models.F('success_run_amount') + 1
+        task.save()
+        AdHocExecution.objects.filter(id=self.id).update(
+            is_finished=True,
+            is_success=is_success,
+            date_finished=timezone.now(),
+            timedelta=time.time() - time_start,
+            summary=summary
+        )
 
     @property
     def success_hosts(self):
@@ -359,5 +319,5 @@ class AdHocRunHistory(models.Model):
         return self.short_id
 
     class Meta:
-        db_table = "ops_adhoc_history"
+        db_table = "ops_adhoc_execution"
         get_latest_by = 'date_start'

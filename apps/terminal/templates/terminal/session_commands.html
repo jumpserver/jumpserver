@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% load common_tags %}
+
+{% block custom_head_css_js %}
+    <link href="{% static 'css/plugins/ladda/ladda-themeless.min.css' %}" rel="stylesheet">
+    <link href="{% static "css/plugins/footable/footable.core.css" %}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li>
+                                <a class="text-center" href="{% url 'terminal:session-detail' pk=object.id %}"> {% trans 'Session detail' %} </a>
+                            </li>
+                            <li class="active">
+                                <a class="text-center" href="{% url 'terminal:session-commands' pk=object.id %}"> {% trans 'Commands' %} </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-10" style="padding-left: 0;">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span style="float: left">{% trans 'Command list' %} <b></b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table id="command-log" class="footable table table-stripped toggle-arrow-tiny" data-page-size="10">
+                                        <thead>
+                                        <tr>
+                                            <th data-toggle="true">ID</th>
+                                            <th>{% trans 'Command' %}</th>
+                                            <th data-hide="all"></th>
+                                            <th style="">{% trans 'Datetime' %}</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for command in object_list %}
+                                            <tr>
+                                                <td>{{ forloop.counter }}</td>
+                                                <td>{{ command.input | truncatechars:40 }}</td>
+                                                <td><pre style="border: none;background: none; white-space: pre-wrap;">
+$ {{ command.input }}
+
+{{ command.output }}
+                                                </pre></td>
+                                                <td>{{ command.timestamp|ts_to_date}}</td>
+                                            </tr>
+                                        {% empty %}
+                                            <tr>
+                                                <td colspan="3">{% trans "There is no command about this session" %}</td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                        <tfoot>
+                                        <tr>
+                                            <td colspan="5">
+                                                <ul class="pagination pull-right"></ul>
+                                            </td>
+                                        </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block custom_foot_js %}
+<script src="{% static "js/plugins/footable/footable.all.min.js" %}"></script>
+<script>
+$(document).ready(function () {
+    $('.footable').footable();
+})
+</script>
+{% endblock %}

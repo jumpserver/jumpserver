@@ -113,10 +113,11 @@ function initNodeTree(options) {
     $.get(treeUrl, function (data, status) {
         zTree = $.fn.zTree.init($("#nodeTree"), setting, data);
         rootNodeAddDom(zTree, function () {
-            const url = '{% url 'api-assets:refresh-nodes-cache' %}';
+            const url = '{% url 'api-assets:node-task-create' pk=DEFAULT_PK %}';
             requestApi({
                 url: url,
-                method: 'GET',
+                method: 'POST',
+                data: {action: "refresh_cache"},
                 flash_message: false,
                 success: function () {
                     initNodeTree(options);
@@ -173,20 +174,14 @@ function removeTreeNode() {
 	if (!current_node){
 	    return
     }
-	if (current_node.children && current_node.children.length > 0) {
-		toastr.error("{% trans 'Have child node, cancel' %}");
-	 } else if (current_node.meta.node.assets_amount !== 0) {
-        toastr.error("{% trans 'Have assets, cancel' %}");
-    } else {
-        var url = "{% url 'api-assets:node-detail' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", current_node_id);
-		$.ajax({
-            url: url,
-            method: "DELETE",
-            success: function () {
-                zTree.removeNode(current_node);
-            }
-        });
-	}
+    var url = "{% url 'api-assets:node-detail' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", current_node_id);
+    requestApi({
+        url: url,
+        method: "DELETE",
+        success: function () {
+            zTree.removeNode(current_node)
+        }
+    })
 }
 
 function editTreeNode() {

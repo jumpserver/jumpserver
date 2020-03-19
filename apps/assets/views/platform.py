@@ -48,6 +48,9 @@ class PlatformUpdateView(generic.UpdateView):
     model = Platform
     template_name = 'assets/platform_create_update.html'
 
+    def post(self, *args, **kwargs):
+        pass
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         meta_form = PlatformMetaForm(initial=self.object.meta)

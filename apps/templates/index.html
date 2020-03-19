@@ -58,7 +58,6 @@
     </div>
     <div class="row">
         <div class="col-sm-2 border-bottom white-bg dashboard-header" style="margin-left:15px;height: 346px">
-            <h2>{% trans ' Top 5 Active user' %}</h2>
             <small>{% trans 'In the past week, a total of ' %}<span class="text-info">{{ user_visit_count_weekly }}</span>{% trans ' users have logged in ' %}<span class="text-success">{{ asset_visit_count_weekly }}</span>{% trans ' times asset.' %}</small>
             <ul class="list-group clear-list m-t">
                 {% for data in user_visit_count_top_five %}
@@ -133,9 +132,8 @@
                                         <small class="text-navy">{{ data.total }}{% trans ' times' %}</small>
                                     </div>
                                     <div class="col-xs-7 content no-top-border">
-                                        <p class="m-b-xs">{% trans 'The last time a user logged in' %}</p>
-                                        <p>{{ data.last.user }}</p>
-                                        <p>{% trans 'At ' %}{{ data.last.date_start |date:"Y-m-d H:i:s" }}</p>
+                                        <p class="m-b-xs">{% trans 'The time last logged in' %}</p>
+                                        <p>{% trans 'At' %} {{ data.last|date:"Y-m-d H:i:s" }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -175,7 +173,6 @@
                                             {% endifequal %}
                                             <strong>{{ login.user }}</strong> {% trans 'Login in ' %}{{ login.asset }} <br>
                                             <small class="text-muted">{{ login.date_start }}</small>
-
                                         </div>
                                     </div>
                                 {% endfor %}
@@ -221,9 +218,8 @@
                                         <small class="text-navy">{{ data.total }}{% trans ' times' %}</small>
                                     </div>
                                     <div class="col-xs-7 content no-top-border">
-                                        <p class="m-b-xs">{% trans 'The last time logged on to the host' %}</p>
-                                        <p>{{ data.last.asset }}</p>
-                                        <p>{% trans 'At ' %}{{ data.last.date_start |date:"Y-m-d H:i:s" }}</p>
+                                        <p class="m-b-xs">{% trans 'The time last logged in' %}</p>
+                                        <p>{% trans 'At' %} {{ data.last|date:"Y-m-d H:i:s" }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -298,16 +294,16 @@ $(document).ready(function(){
                 ],
                 series : [
                     {
-                        name:"{% trans 'Login count' %}",
+                        name: "{% trans 'Login count' %}",
                         type:'line',
-                        smooth:true,
+                        smooth: true,
                         itemStyle: {normal: {areaStyle: {type: 'default'}}},
                         data: {{ month_total_visit_count|safe}}
                     },
                     {
-                        name:"{% trans 'Active users' %}",
-                        type:'line',
-                        smooth:true,
+                        name: "{% trans 'Active users' %}",
+                        type: 'line',
+                        smooth: true,
                         itemStyle: {normal: {areaStyle: {type: 'default'}}},
                         data: {{ month_user|safe }}
                     },

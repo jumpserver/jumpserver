@@ -1,5 +1,5 @@
 # coding: utf-8
-
+import time
 import pickle
 from collections import defaultdict
 from functools import reduce
@@ -8,7 +8,7 @@ from django.core.cache import cache
 from django.db.models import Q
 from django.conf import settings
 
-from orgs.utils import set_to_root_org
+from orgs.utils import current_org
 from common.utils import get_logger, timeit, lazyproperty
 from common.tree import TreeNode
 from assets.utils import TreeService
@@ -19,8 +19,7 @@ logger = get_logger(__file__)
 
 
 __all__ = [
-    'is_obj_attr_has', 'sort_assets',
-    'ParserNode', 'AssetPermissionUtilV2',
+    'ParserNode', 'AssetPermissionUtil',
 ]
 
 
@@ -59,25 +58,48 @@ def get_system_user_permissions(system_user):
 
 
 class AssetPermissionUtilCacheMixin:
-    user_tree_cache_key = 'USER_PERM_TREE_{}_{}'
+    user_tree_cache_key = 'USER_PERM_TREE_{}_{}_{}'
     user_tree_cache_ttl = settings.ASSETS_PERM_CACHE_TIME
     user_tree_cache_enable = settings.ASSETS_PERM_CACHE_ENABLE
+    user_tree_map = {}
     cache_policy = '0'
     obj_id = ''
     _filter_id = 'None'
 
     @property
     def cache_key(self):
-        return self.user_tree_cache_key.format(self.obj_id, self._filter_id)
+        return self.get_cache_key()
+
+    def get_cache_key(self, org_id=None):
+        if org_id is None:
+            org_id = current_org.org_id()
+
+        key = self.user_tree_cache_key.format(
+            org_id, self.obj_id, self._filter_id
+        )
+        return key
 
     def expire_user_tree_cache(self):
         cache.delete(self.cache_key)
 
     @classmethod
     def expire_all_user_tree_cache(cls):
-        key = cls.user_tree_cache_key.format('*', '*')
-        key = key.split('_')[:-1]
-        key = '_'.join(key)
+        expire_cache_key = "USER_TREE_EXPIRED_AT"
+        latest_expired = cache.get(expire_cache_key, 0)
+        now = time.time()
+        if now - latest_expired < 60:
+            return
+        key = cls.user_tree_cache_key.format('*', '1', '1')
+        key = key.replace('_1', '')
+        cache.delete_pattern(key)
+        cache.set(expire_cache_key, now)
+
+    @classmethod
+    def expire_org_tree_cache(cls, org_id=None):
+        if org_id is None:
+            org_id = current_org.org_id()
+        key = cls.user_tree_cache_key.format(org_id, '*', '1')
+        key = key.replace('_1', '')
         cache.delete_pattern(key)
 
     def set_user_tree_to_cache(self, user_tree):
@@ -111,7 +133,7 @@ class AssetPermissionUtilCacheMixin:
         self.set_user_tree_to_cache(user_tree)
 
 
-class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
+class AssetPermissionUtil(AssetPermissionUtilCacheMixin):
     get_permissions_map = {
         "User": get_user_permissions,
         "UserGroup": get_user_group_permissions,
@@ -134,9 +156,12 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
         self._user_tree = None
         self._user_tree_filter_id = 'None'
 
+        if not isinstance(obj, User):
+            self.cache_policy = '0'
+
     @staticmethod
     def change_org_if_need():
-        set_to_root_org()
+        pass
 
     @lazyproperty
     def full_tree(self):
@@ -157,9 +182,7 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
     @timeit
     def filter_permissions(self, **filters):
         self.cache_policy = '0'
-        # filters_json = json.dumps(filters, sort_keys=True)
         self._permissions = self.permissions.filter(**filters)
-        # self._filter_id = md5(filters_json.encode()).hexdigest()
 
     @lazyproperty
     def user_tree(self):
@@ -253,6 +276,8 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
 
         # 获取单独授权资产，并没有在授权的节点上
         for key, assets in nodes_single_assets.items():
+            if not self.full_tree.contains(key):
+                continue
             node = self.full_tree.get_node(key, deep=True)
             parent_id = self.full_tree.parent(key).identifier
             parent = user_tree.get_node(parent_id)
@@ -280,21 +305,6 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
             if not ancestors:
                 continue
             user_tree.safe_add_ancestors(child, ancestors)
-            # parent_id = ancestors[0].identifier
-            # user_tree.move_node(child.identifier, parent_id)
-
-    @staticmethod
-    def add_empty_node_if_need(user_tree):
-        """
-        添加空节点，如果根节点没有子节点的话
-        """
-        if not user_tree.children(user_tree.root):
-            node_key = Node.empty_key
-            node_value = Node.empty_value
-            user_tree.create_node(
-                identifier=node_key, tag=node_value,
-                parent=user_tree.root,
-            )
 
     def add_favorite_node_if_need(self, user_tree):
         if not isinstance(self.object, User):
@@ -321,16 +331,10 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
 
     @timeit
     def get_user_tree(self):
-        # 使用锁，保证多次获取tree的时候顺序执行，可以使用缓存
-        user_tree = self.get_user_tree_from_local()
-        if user_tree:
-            return user_tree
         user_tree = self.get_user_tree_from_cache_if_need()
         if user_tree:
-            self.set_user_tree_to_local(user_tree)
             return user_tree
         user_tree = TreeService()
-        user_tree._invalid_assets = self.full_tree._invalid_assets
         full_tree_root = self.full_tree.root_node()
         user_tree.create_node(
             tag=full_tree_root.tag,
@@ -340,13 +344,12 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
         self.add_single_assets_node_to_user_tree(user_tree)
         self.parse_user_tree_to_full_tree(user_tree)
         self.add_favorite_node_if_need(user_tree)
-        self.add_empty_node_if_need(user_tree)
         self.set_user_tree_to_cache_if_need(user_tree)
         self.set_user_tree_to_local(user_tree)
         return user_tree
 
     # Todo: 是否可以获取多个资产的系统用户
-    def get_asset_system_users_with_actions(self, asset):
+    def get_asset_system_users_id_with_actions(self, asset):
         nodes = asset.get_nodes()
         nodes_keys_related = set()
         for node in nodes:
@@ -367,35 +370,35 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
             queryset = queryset.filter(args)
         else:
             queryset = queryset.none()
-        queryset = queryset.distinct().prefetch_related('system_users')
+        asset_protocols = asset.protocols_as_dict.keys()
+        values = queryset.filter(system_users__protocol__in=asset_protocols).distinct()\
+            .values_list('system_users', 'actions')
         system_users_actions = defaultdict(int)
-        for perm in queryset:
-            system_users = perm.system_users.all()
-            if not system_users or not perm.actions:
+        for system_user_id, actions in values:
+            if None in (system_user_id, actions):
                 continue
-            for s in system_users:
-                if not asset.has_protocol(s.protocol):
-                    continue
-                system_users_actions[s] |= perm.actions
+            for i, action in values:
+                system_users_actions[i] |= actions
         return system_users_actions
 
     def get_permissions_nodes_and_assets(self):
         from assets.models import Node
-        permissions = self.permissions.values_list('assets', 'nodes__key').distinct()
-        nodes_keys = set()
-        assets_ids = set()
-        for asset_id, node_key in permissions:
-            if asset_id:
-                assets_ids.add(asset_id)
-            if node_key:
-                nodes_keys.add(node_key)
+        permissions = self.permissions
+        nodes_keys = permissions.exclude(nodes__isnull=True)\
+            .values_list('nodes__key', flat=True)
+        assets_ids = permissions.exclude(assets__isnull=True)\
+            .values_list('assets', flat=True)
+        nodes_keys = set(nodes_keys)
+        assets_ids = set(assets_ids)
         nodes_keys = Node.clean_children_keys(nodes_keys)
         return nodes_keys, assets_ids
 
     @timeit
     def get_assets(self):
         nodes_keys, assets_ids = self.get_permissions_nodes_and_assets()
-        queryset = Node.get_nodes_all_assets(nodes_keys, extra_assets_ids=assets_ids)
+        queryset = Node.get_nodes_all_assets(
+            nodes_keys, extra_assets_ids=assets_ids
+        )
         return queryset.valid()
 
     def get_nodes_assets(self, node, deep=False):
@@ -414,30 +417,9 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
         return SystemUser.objects.filter(id__in=system_users_id)
 
 
-def is_obj_attr_has(obj, val, attrs=("hostname", "ip", "comment")):
-    if not attrs:
-        vals = [val for val in obj.__dict__.values() if isinstance(val, (str, int))]
-    else:
-        vals = [getattr(obj, attr) for attr in attrs if
-                hasattr(obj, attr) and isinstance(hasattr(obj, attr), (str, int))]
-
-    for v in vals:
-        if str(v).find(val) != -1:
-            return True
-    return False
-
-
-def sort_assets(assets, order_by='hostname', reverse=False):
-    if order_by == 'ip':
-        assets = sorted(assets, key=lambda asset: [int(d) for d in asset.ip.split('.') if d.isdigit()], reverse=reverse)
-    else:
-        assets = sorted(assets, key=lambda asset: getattr(asset, order_by), reverse=reverse)
-    return assets
-
-
 class ParserNode:
     nodes_only_fields = ("key", "value", "id")
-    assets_only_fields = ("hostname", "id", "ip", "protocols", "org_id")
+    assets_only_fields = ("hostname", "id", "ip", "protocols", "domain", "org_id")
     system_users_only_fields = (
         "id", "name", "username", "protocol", "priority", "login_mode",
     )
@@ -490,6 +472,7 @@ class ParserNode:
                     'ip': asset.ip,
                     'protocols': asset.protocols_as_list,
                     'platform': asset.platform_base,
+                    'domain': asset.domain_id,
                     'org_name': asset.org_name,
                 },
             }

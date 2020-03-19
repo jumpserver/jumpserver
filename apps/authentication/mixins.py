@@ -6,7 +6,7 @@ from django.conf import settings
 from common.utils import get_object_or_none, get_request_ip, get_logger
 from users.models import User
 from users.utils import (
-    is_block_login, clean_failed_count, increase_login_failed_count,
+    is_block_login, clean_failed_count
 )
 from . import errors
 from .utils import check_user_valid
@@ -91,8 +91,9 @@ class AuthMixin:
             return
         if not user.mfa_enabled:
             return
-        if not user.otp_secret_key and user.mfa_is_otp():
-            return
+        unset, url = user.mfa_enabled_but_not_set()
+        if unset:
+            raise errors.MFAUnsetError(user, self.request, url)
         raise errors.MFARequiredError()
 
     def check_user_mfa(self, code):

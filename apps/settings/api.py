@@ -12,15 +12,14 @@ from django.utils.translation import ugettext_lazy as _
 
 from .utils import (
     LDAPServerUtil, LDAPCacheUtil, LDAPImportUtil, LDAPSyncUtil,
-    LDAP_USE_CACHE_FLAGS
-
+    LDAP_USE_CACHE_FLAGS, LDAPTestUtil,
 )
 from .tasks import sync_ldap_user_task
 from common.permissions import IsOrgAdmin, IsSuperUser
 from common.utils import get_logger
 from .serializers import (
-    MailTestSerializer, LDAPTestSerializer, LDAPUserSerializer,
-    PublicSettingSerializer,
+    MailTestSerializer, LDAPTestConfigSerializer, LDAPUserSerializer,
+    PublicSettingSerializer, LDAPTestLoginSerializer,
 )
 from users.models import User
 
@@ -67,10 +66,18 @@ class MailTestingAPI(APIView):
             return Response({"error": str(serializer.errors)}, status=401)
 
 
-class LDAPTestingAPI(APIView):
+class LDAPTestingConfigAPI(APIView):
     permission_classes = (IsSuperUser,)
-    serializer_class = LDAPTestSerializer
-    success_message = _("Test ldap success")
+    serializer_class = LDAPTestConfigSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if not serializer.is_valid():
+            return Response({"error": str(serializer.errors)}, status=401)
+        config = self.get_ldap_config(serializer)
+        ok, msg = LDAPTestUtil(config).test_config()
+        status = 200 if ok else 401
+        return Response(msg, status=status)
 
     @staticmethod
     def get_ldap_config(serializer):
@@ -78,39 +85,36 @@ class LDAPTestingAPI(APIView):
         bind_dn = serializer.validated_data["AUTH_LDAP_BIND_DN"]
         password = serializer.validated_data["AUTH_LDAP_BIND_PASSWORD"]
         use_ssl = serializer.validated_data.get("AUTH_LDAP_START_TLS", False)
-        search_ougroup = serializer.validated_data["AUTH_LDAP_SEARCH_OU"]
+        search_ou = serializer.validated_data["AUTH_LDAP_SEARCH_OU"]
         search_filter = serializer.validated_data["AUTH_LDAP_SEARCH_FILTER"]
         attr_map = serializer.validated_data["AUTH_LDAP_USER_ATTR_MAP"]
+        auth_ldap = serializer.validated_data.get('AUTH_LDAP', False)
         config = {
             'server_uri': server_uri,
             'bind_dn': bind_dn,
             'password': password,
             'use_ssl': use_ssl,
-            'search_ougroup': search_ougroup,
+            'search_ou': search_ou,
             'search_filter': search_filter,
-            'attr_map': json.loads(attr_map),
+            'attr_map': attr_map,
+            'auth_ldap': auth_ldap
         }
         return config
+
+
+class LDAPTestingLoginAPI(APIView):
+    permission_classes = (IsSuperUser,)
+    serializer_class = LDAPTestLoginSerializer
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         if not serializer.is_valid():
             return Response({"error": str(serializer.errors)}, status=401)
-
-        attr_map = serializer.validated_data["AUTH_LDAP_USER_ATTR_MAP"]
-        try:
-            json.loads(attr_map)
-        except json.JSONDecodeError:
-            return Response({"error": _("LDAP attr map not valid")}, status=401)
-
-        config = self.get_ldap_config(serializer)
-        util = LDAPServerUtil(config=config)
-        try:
-            users = util.search()
-        except Exception as e:
-            return Response({"error": str(e)}, status=401)
-
-        return Response({"msg": _("Match {} s users").format(len(users))})
+        username = serializer.validated_data['username']
+        password = serializer.validated_data['password']
+        ok, msg = LDAPTestUtil().test_login(username, password)
+        status = 200 if ok else 401
+        return Response(msg, status=status)
 
 
 class LDAPUserListApi(generics.ListAPIView):
