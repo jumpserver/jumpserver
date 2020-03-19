@@ -45,7 +45,7 @@ class UserPublicKeyGenerateView(PermissionsMixin, View):
 
     def get(self, request, *args, **kwargs):
         username = request.user.username
-        private, public = ssh_key_gen(username, hostname='jumpserver')
+        private, public = ssh_key_gen(username=username, hostname='jumpserver')
         request.user.public_key = public
         request.user.save()
         response = HttpResponse(private, content_type='text/plain')
