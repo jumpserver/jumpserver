@@ -307,6 +307,7 @@ $(document).ready(function(){
 
     function doRemove() {
        if (!current_node_id) {
+           toastr.error("{% trans 'Please select node' %}");
            return
        }
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-17 13:50+0800\n"
+"POT-Creation-Date: 2020-03-18 17:58+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -29,7 +29,7 @@ msgstr "自定义"
 #: assets/models/asset.py:353 assets/models/authbook.py:23
 #: assets/models/gathered_user.py:14 assets/serializers/admin_user.py:32
 #: assets/serializers/asset_user.py:48 assets/serializers/asset_user.py:85
-#: assets/serializers/system_user.py:45 assets/serializers/system_user.py:169
+#: assets/serializers/system_user.py:44 assets/serializers/system_user.py:176
 #: assets/templates/assets/admin_user_list.html:23
 #: assets/templates/assets/asset_list.html:170
 #: assets/templates/assets/domain_detail.html:55
@@ -236,7 +236,7 @@ msgstr "数据库"
 #: assets/templates/assets/cmd_filter_detail.html:60
 #: assets/templates/assets/cmd_filter_list.html:25
 #: assets/templates/assets/cmd_filter_rule_list.html:57
-#: assets/templates/assets/domain_detail.html:71
+#: assets/templates/assets/domain_detail.html:67
 #: assets/templates/assets/domain_gateway_list.html:67
 #: assets/templates/assets/domain_list.html:24
 #: assets/templates/assets/platform_detail.html:64
@@ -313,7 +313,6 @@ msgstr "参数"
 #: assets/templates/assets/admin_user_detail.html:63
 #: assets/templates/assets/asset_detail.html:120
 #: assets/templates/assets/cmd_filter_detail.html:72
-#: assets/templates/assets/domain_detail.html:67
 #: assets/templates/assets/system_user_detail.html:108
 #: common/mixins/models.py:49 ops/templates/ops/adhoc_detail.html:84
 #: orgs/models.py:16 perms/models/base.py:54
@@ -500,7 +499,7 @@ msgstr "详情"
 #: assets/templates/assets/cmd_filter_list.html:56
 #: assets/templates/assets/cmd_filter_rule_list.html:81
 #: assets/templates/assets/domain_detail.html:19
-#: assets/templates/assets/domain_detail.html:98
+#: assets/templates/assets/domain_detail.html:94
 #: assets/templates/assets/domain_gateway_list.html:92
 #: assets/templates/assets/domain_list.html:50
 #: assets/templates/assets/label_list.html:39
@@ -555,7 +554,7 @@ msgstr "更新"
 #: assets/templates/assets/cmd_filter_list.html:57
 #: assets/templates/assets/cmd_filter_rule_list.html:82
 #: assets/templates/assets/domain_detail.html:23
-#: assets/templates/assets/domain_detail.html:99
+#: assets/templates/assets/domain_detail.html:95
 #: assets/templates/assets/domain_gateway_list.html:93
 #: assets/templates/assets/domain_list.html:51
 #: assets/templates/assets/label_list.html:40
@@ -780,7 +779,7 @@ msgid "Platform"
 msgstr "系统平台"
 
 #: assets/forms/asset.py:99 assets/forms/asset.py:134 assets/models/node.py:497
-#: assets/serializers/system_user.py:44 assets/serializers/system_user.py:168
+#: assets/serializers/system_user.py:43 assets/serializers/system_user.py:175
 #: assets/templates/assets/asset_create.html:42
 #: perms/forms/asset_permission.py:92 perms/forms/asset_permission.py:99
 #: perms/templates/perms/asset_permission_list.html:36
@@ -1032,7 +1031,7 @@ msgstr "主机名"
 #: assets/templates/assets/domain_gateway_list.html:65
 #: assets/templates/assets/system_user_detail.html:78
 #: assets/templates/assets/system_user_list.html:26
-#: terminal/forms/storage.py:152
+#: terminal/forms/storage.py:145
 #: terminal/templates/terminal/session_detail.html:60
 #: terminal/templates/terminal/session_list.html:29
 #: terminal/templates/terminal/session_list.html:73
@@ -1441,7 +1440,7 @@ msgstr "登录模式"
 msgid "SFTP Root"
 msgstr "SFTP根路径"
 
-#: assets/models/user.py:190 assets/templates/assets/system_user_list.html:73
+#: assets/models/user.py:195 assets/templates/assets/system_user_list.html:73
 #: assets/templates/assets/user_asset_list.html:79 audits/models.py:21
 #: audits/templates/audits/ftp_log_list.html:53
 #: audits/templates/audits/ftp_log_list.html:76
@@ -1556,23 +1555,23 @@ msgstr "值"
 msgid "The same level node name cannot be the same"
 msgstr "同级别节点名字不能重复"
 
-#: assets/serializers/system_user.py:46 assets/serializers/system_user.py:170
+#: assets/serializers/system_user.py:45 assets/serializers/system_user.py:177
 msgid "Login mode display"
 msgstr "登录模式显示"
 
-#: assets/serializers/system_user.py:86
+#: assets/serializers/system_user.py:85
 msgid "Username same with user with protocol {} only allow 1"
 msgstr "用户名和用户相同的一种协议只允许存在一个"
 
-#: assets/serializers/system_user.py:99
+#: assets/serializers/system_user.py:98
 msgid "* Automatic login mode must fill in the username."
 msgstr "自动登录模式，必须填写用户名"
 
-#: assets/serializers/system_user.py:107
+#: assets/serializers/system_user.py:106
 msgid "Path should starts with /"
 msgstr "路径应该以 / 开头"
 
-#: assets/serializers/system_user.py:118
+#: assets/serializers/system_user.py:117
 msgid "Password or private key required"
 msgstr "密码或密钥密码需要一个"
 
@@ -1624,25 +1623,25 @@ msgstr "更新节点资产硬件信息: {}"
 msgid "Gather assets users"
 msgstr "收集资产上的用户"
 
-#: assets/tasks/push_system_user.py:149
+#: assets/tasks/push_system_user.py:148
 #: assets/tasks/system_user_connectivity.py:86
 msgid "System user is dynamic: {}"
 msgstr "系统用户是动态的: {}"
 
-#: assets/tasks/push_system_user.py:180
+#: assets/tasks/push_system_user.py:179
 msgid "Start push system user for platform: [{}]"
 msgstr "推送系统用户到平台: [{}]"
 
-#: assets/tasks/push_system_user.py:181
+#: assets/tasks/push_system_user.py:180
 #: assets/tasks/system_user_connectivity.py:78
 msgid "Hosts count: {}"
 msgstr "主机数量: {}"
 
-#: assets/tasks/push_system_user.py:198 assets/tasks/push_system_user.py:214
+#: assets/tasks/push_system_user.py:197 assets/tasks/push_system_user.py:213
 msgid "Push system users to assets: {}"
 msgstr "推送系统用户到入资产: {}"
 
-#: assets/tasks/push_system_user.py:206
+#: assets/tasks/push_system_user.py:205
 msgid "Push system users to asset: {}({}) => {}"
 msgstr "推送系统用户到入资产: {}({}) => {}"
 
@@ -2135,18 +2134,22 @@ msgstr "删除选择资产"
 msgid "Cancel"
 msgstr "取消"
 
-#: assets/templates/assets/asset_list.html:267
-msgid "Asset Deleted."
-msgstr "已被删除"
+#: assets/templates/assets/asset_list.html:262
+msgid "Asset Deleting failed."
+msgstr "删除失败"
 
-#: assets/templates/assets/asset_list.html:268
-#: assets/templates/assets/asset_list.html:276
+#: assets/templates/assets/asset_list.html:263
+#: assets/templates/assets/asset_list.html:272
 msgid "Asset Delete"
 msgstr "删除"
 
-#: assets/templates/assets/asset_list.html:275
-msgid "Asset Deleting failed."
-msgstr "删除失败"
+#: assets/templates/assets/asset_list.html:271
+msgid "Asset Deleted."
+msgstr "已被删除"
+
+#: assets/templates/assets/asset_list.html:310
+msgid "Please select node"
+msgstr "请选择节点"
 
 #: assets/templates/assets/asset_update.html:7
 msgid "Configuration"
@@ -3189,11 +3192,11 @@ msgstr "命令 `{}` 不允许被执行 ......."
 msgid "Task end"
 msgstr "任务结束"
 
-#: ops/tasks.py:65
+#: ops/tasks.py:68
 msgid "Clean task history period"
 msgstr "定期清除任务历史"
 
-#: ops/tasks.py:78
+#: ops/tasks.py:81
 msgid "Clean celery log period"
 msgstr "定期清除Celery日志"
 
@@ -3210,7 +3213,7 @@ msgstr "执行历史"
 #: ops/templates/ops/adhoc_detail.html:51
 #: ops/templates/ops/command_execution_list.html:65
 #: ops/templates/ops/task_adhoc.html:57 ops/templates/ops/task_list.html:13
-#: terminal/forms/storage.py:158
+#: terminal/forms/storage.py:151
 msgid "Hosts"
 msgstr "主机"
 
@@ -4270,9 +4273,7 @@ msgid "Please enter Password: {}"
 msgstr "请输入密码: {}"
 
 #: settings/utils/ldap.py:420
-#, fuzzy
-#| msgid "Please enter correct Bind DN and Password: {}"
-msgid "Please enter Correct Bind DN and Password: {}"
+msgid "Please enter correct Bind DN and Password: {}"
 msgstr "请输入正确的绑定DN和密码: {}"
 
 #: settings/utils/ldap.py:438
@@ -4821,22 +4822,22 @@ msgid "Endpoint suffix"
 msgstr "端点后缀"
 
 #: terminal/forms/storage.py:61 terminal/forms/storage.py:84
-#: terminal/forms/storage.py:108 terminal/forms/storage.py:132
+#: terminal/forms/storage.py:108 terminal/forms/storage.py:125
 msgid "Bucket"
 msgstr "桶名称"
 
 #: terminal/forms/storage.py:64 terminal/forms/storage.py:87
-#: terminal/forms/storage.py:111 terminal/forms/storage.py:135
+#: terminal/forms/storage.py:111 terminal/forms/storage.py:128
 msgid "Access key"
 msgstr ""
 
 #: terminal/forms/storage.py:68 terminal/forms/storage.py:91
-#: terminal/forms/storage.py:115 terminal/forms/storage.py:139
+#: terminal/forms/storage.py:115 terminal/forms/storage.py:132
 msgid "Secret key"
 msgstr ""
 
 #: terminal/forms/storage.py:72 terminal/forms/storage.py:95
-#: terminal/forms/storage.py:119 terminal/forms/storage.py:146
+#: terminal/forms/storage.py:119 terminal/forms/storage.py:139
 msgid "Endpoint"
 msgstr "端点"
 
@@ -4849,7 +4850,7 @@ msgid ""
 "            "
 msgstr ""
 
-#: terminal/forms/storage.py:97 terminal/forms/storage.py:121
+#: terminal/forms/storage.py:97
 #, python-brace-format
 msgid ""
 "\n"
@@ -4859,14 +4860,14 @@ msgid ""
 "            "
 msgstr ""
 
-#: terminal/forms/storage.py:143 xpack/plugins/cloud/models.py:263
+#: terminal/forms/storage.py:136 xpack/plugins/cloud/models.py:263
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:29
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:106
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:46
 msgid "Region"
 msgstr "地域"
 
-#: terminal/forms/storage.py:160
+#: terminal/forms/storage.py:153
 msgid ""
 "\n"
 "            Tips: If there are multiple hosts, separate them with a comma "
@@ -4881,11 +4882,11 @@ msgstr ""
 "            eg: http://www.jumpserver.a.com,http://www.jumpserver.b.com\n"
 "            "
 
-#: terminal/forms/storage.py:168
+#: terminal/forms/storage.py:161
 msgid "Index"
 msgstr "索引"
 
-#: terminal/forms/storage.py:171
+#: terminal/forms/storage.py:164
 msgid "Doc type"
 msgstr "文档类型"
 
