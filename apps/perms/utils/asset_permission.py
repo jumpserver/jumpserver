@@ -315,10 +315,13 @@ class AssetPermissionUtil(AssetPermissionUtilCacheMixin):
             identifier=node_key, tag=node_value,
             parent=user_tree.root,
         )
+        node = user_tree.get_node(node_key)
         assets_id = FavoriteAsset.get_user_favorite_assets_id(self.object)
         all_valid_assets = user_tree.all_valid_assets(user_tree.root)
         valid_assets_id = set(assets_id) & all_valid_assets
         user_tree.set_assets(node_key, valid_assets_id)
+        # 必须设置这个，否则看不到个数
+        node.data['all_assets'] = None
 
     def set_user_tree_to_local(self, user_tree):
         self._user_tree = user_tree
