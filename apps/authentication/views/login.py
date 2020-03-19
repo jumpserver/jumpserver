@@ -185,8 +185,8 @@ class UserLogoutView(TemplateView):
 
     @staticmethod
     def get_backend_logout_url():
-        if settings.AUTH_CAS:
-            return settings.CAS_LOGOUT_URL_NAME
+        # if settings.AUTH_CAS:
+        #     return settings.CAS_LOGOUT_URL_NAME
         return None
 
     def get(self, request, *args, **kwargs):
