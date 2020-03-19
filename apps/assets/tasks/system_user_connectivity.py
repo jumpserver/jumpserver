@@ -50,8 +50,8 @@ def test_system_user_connectivity_util(system_user, assets, task_name):
     )
 
     def run_task(_tasks, _hosts, _username):
-        old_name = "({})".format(system_user.username)
-        new_name = "({})".format(_username)
+        old_name = "{}".format(system_user)
+        new_name = "{}({})".format(system_user.name, _username)
         _task_name = task_name.replace(old_name, new_name)
         _task, created = update_or_create_ansible_task(
             task_name=_task_name, hosts=_hosts, tasks=_tasks,
