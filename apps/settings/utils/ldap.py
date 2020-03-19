@@ -417,7 +417,7 @@ class LDAPTestUtil(object):
         except LDAPPasswordIsMandatoryError as e:
             error = _('Please enter Password: {}'.format(e))
         except LDAPInvalidDnError as e:
-            error = _('Please enter Correct Bind DN and Password: {}'.format(e))
+            error = _('Please enter correct Bind DN and Password: {}'.format(e))
         except Exception as e:
             error = _('Unknown error: {}'.format(e))
         else:
