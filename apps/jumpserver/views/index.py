@@ -24,7 +24,8 @@ class MonthLoginMetricMixin:
 
     @lazyproperty
     def session_month_dates(self):
-        return self.session_month.dates('date_start', 'day')
+        dates = self.session_month.dates('date_start', 'day')
+        return dates
 
     def get_month_day_metrics(self):
         month_str = [
@@ -57,12 +58,22 @@ class MonthLoginMetricMixin:
     def asset_disabled_total(self):
         return Asset.objects.filter(is_active=False).count()
 
+    @staticmethod
+    def get_date_start_2_end(d):
+        time_min = timezone.datetime.min.time()
+        time_max = timezone.datetime.max.time()
+        tz = timezone.get_current_timezone()
+        ds = timezone.datetime.combine(d, time_min).replace(tzinfo=tz)
+        de = timezone.datetime.combine(d, time_max).replace(tzinfo=tz)
+        return ds, de
+
     def get_date_login_count(self, date):
         tp = "LOGIN"
         count = self.__get_data_from_cache(date, tp)
         if count is not None:
             return count
-        count = Session.objects.filter(date_start__date=date).count()
+        ds, de = self.get_date_start_2_end(date)
+        count = Session.objects.filter(date_start__range=(ds, de)).count()
         self.__set_data_to_cache(date, tp, count)
         return count
 
@@ -80,7 +91,8 @@ class MonthLoginMetricMixin:
         count = self.__get_data_from_cache(date, tp)
         if count is not None:
             return count
-        count = Session.objects.filter(date_start__date=date)\
+        ds, de = self.get_date_start_2_end(date)
+        count = Session.objects.filter(date_start__range=(ds, de))\
             .values('user').distinct().count()
         self.__set_data_to_cache(date, tp, count)
         return count
@@ -97,7 +109,8 @@ class MonthLoginMetricMixin:
         count = self.__get_data_from_cache(date, tp)
         if count is not None:
             return count
-        count = Session.objects.filter(date_start__date=date) \
+        ds, de = self.get_date_start_2_end(date)
+        count = Session.objects.filter(date_start__range=(ds, de)) \
             .values('asset').distinct().count()
         self.__set_data_to_cache(date, tp, count)
         return count
