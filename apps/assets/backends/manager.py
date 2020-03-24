@@ -154,8 +154,8 @@ class AssetUserManager:
 
     @staticmethod
     def create(**kwargs):
-        authbook = AuthBook(**kwargs)
-        authbook.save()
+        # 使用create方法创建AuthBook对象，解决并发创建问题（添加锁机制）
+        authbook = AuthBook.objects.create(**kwargs)
         return authbook
 
     def __getattr__(self, item):

@@ -232,7 +232,8 @@ FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o755
 # Cache use redis
 CACHES = {
     'default': {
-        'BACKEND': 'redis_cache.RedisCache',
+        # 'BACKEND': 'redis_cache.RedisCache',
+        'BACKEND': 'redis_lock.django_cache.RedisCache',
         'LOCATION': 'redis://:%(password)s@%(host)s:%(port)s/%(db)s' % {
             'password': CONFIG.REDIS_PASSWORD,
             'host': CONFIG.REDIS_HOST,
