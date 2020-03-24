@@ -2,6 +2,8 @@
 #
 
 from django.db import models
+from django.db.models import Max
+from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.models import OrgManager
@@ -11,12 +13,30 @@ __all__ = ['AuthBook']
 
 
 class AuthBookQuerySet(models.QuerySet):
-    def latest_version(self):
-        return self.filter(is_latest=True)
+    def delete(self):
+        raise PermissionError("Bulk delete authbook deny")
 
 
 class AuthBookManager(OrgManager):
-    pass
+
+    def get_max_version(self, username, asset):
+        version_max = self.filter(username=username, asset=asset)\
+            .aggregate(Max('version'))
+        version_max = version_max['version__max'] or 0
+        return version_max
+
+    def create(self, **kwargs):
+        username = kwargs['username']
+        asset = kwargs['asset']
+        key_lock = 'KEY_LOCK_CREATE_AUTH_BOOK_{}_{}'.format(username, asset.id)
+        with cache.lock(key_lock, expire=60):
+            self.filter(username=username, asset=asset, is_latest=True)\
+                .update(is_latest=False)
+            max_version = self.get_max_version(username, asset)
+            kwargs['version'] = max_version + 1
+            kwargs['is_latest'] = True
+            obj = super().create(**kwargs)
+        return obj
 
 
 class AuthBook(BaseUser):
@@ -32,31 +52,6 @@ class AuthBook(BaseUser):
 
     class Meta:
         verbose_name = _('AuthBook')
-
-    def set_to_latest(self):
-        self.remove_pre_latest()
-        self.is_latest = True
-        self.save()
-
-    def get_pre_latest(self):
-        pre_obj = self.__class__.objects.filter(
-            username=self.username, asset=self.asset
-        ).latest_version().first()
-        return pre_obj
-
-    def remove_pre_latest(self):
-        pre_obj = self.get_pre_latest()
-        if pre_obj:
-            pre_obj.is_latest = False
-            pre_obj.save()
-
-    def set_version(self):
-        pre_obj = self.get_pre_latest()
-        if pre_obj:
-            self.version = pre_obj.version + 1
-        else:
-            self.version = 1
-        self.save()
 
     def get_related_assets(self):
         return [self.asset]
