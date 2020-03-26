@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Max
 from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _
@@ -18,25 +18,7 @@ class AuthBookQuerySet(models.QuerySet):
 
 
 class AuthBookManager(OrgManager):
-
-    def get_max_version(self, username, asset):
-        version_max = self.filter(username=username, asset=asset)\
-            .aggregate(Max('version'))
-        version_max = version_max['version__max'] or 0
-        return version_max
-
-    def create(self, **kwargs):
-        username = kwargs['username']
-        asset = kwargs['asset']
-        key_lock = 'KEY_LOCK_CREATE_AUTH_BOOK_{}_{}'.format(username, asset.id)
-        with cache.lock(key_lock, expire=60):
-            self.filter(username=username, asset=asset, is_latest=True)\
-                .update(is_latest=False)
-            max_version = self.get_max_version(username, asset)
-            kwargs['version'] = max_version + 1
-            kwargs['is_latest'] = True
-            obj = super().create(**kwargs)
-        return obj
+    pass
 
 
 class AuthBook(BaseUser):
@@ -58,6 +40,36 @@ class AuthBook(BaseUser):
 
     def generate_id_with_asset(self, asset):
         return self.id
+
+    @classmethod
+    def get_max_version(cls, username, asset):
+        version_max = cls.objects.filter(username=username, asset=asset) \
+            .aggregate(Max('version'))
+        version_max = version_max['version__max'] or 0
+        return version_max
+
+    @classmethod
+    def create(cls, **kwargs):
+        """
+        使用并发锁机制创建AuthBook对象, (主要针对并发创建 username, asset 相同的对象时)
+        并更新其他对象的 is_latest=False (其他对象: 与当前对象的 username, asset 相同)
+        同时设置自己的 is_latest=True, version=max_version + 1
+        """
+        username = kwargs['username']
+        asset = kwargs['asset']
+        key_lock = 'KEY_LOCK_CREATE_AUTH_BOOK_{}_{}'.format(username, asset.id)
+        with cache.lock(key_lock):
+            with transaction.atomic():
+                cls.objects.filter(
+                    username=username, asset=asset, is_latest=True
+                ).update(is_latest=False)
+                max_version = cls.get_max_version(username, asset)
+                kwargs.update({
+                    'version': max_version + 1,
+                    'is_latest': True
+                })
+                obj = cls.objects.create(**kwargs)
+                return obj
 
     @property
     def connectivity(self):
