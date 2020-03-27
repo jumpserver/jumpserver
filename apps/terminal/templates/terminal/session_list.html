@@ -240,7 +240,7 @@ $(document).ready(function() {
     var hasConfirm = getCookie('replayConfirm');
     if (!hasConfirm) {
         var help_text = "{% trans "Visit doc for replay play offline: " %}";
-        help_text += "http://docs.jumpserver.org";
+        help_text += "https://github.com/jumpserver/videoplayer";
         var r = confirm(help_text);
         setCookie("replayConfirm", "1")
     }
