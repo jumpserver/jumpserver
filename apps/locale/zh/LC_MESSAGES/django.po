@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-18 17:58+0800\n"
+"POT-Creation-Date: 2020-03-23 03:05+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -3120,23 +3120,23 @@ msgstr "Become"
 msgid "Create by"
 msgstr "创建者"
 
-#: ops/models/adhoc.py:232
+#: ops/models/adhoc.py:233
 msgid "Task display"
 msgstr "任务展示"
 
-#: ops/models/adhoc.py:233
+#: ops/models/adhoc.py:234
 msgid "Host amount"
 msgstr "主机数量"
 
-#: ops/models/adhoc.py:235
+#: ops/models/adhoc.py:236
 msgid "Start time"
 msgstr "开始时间"
 
-#: ops/models/adhoc.py:236
+#: ops/models/adhoc.py:237
 msgid "End time"
 msgstr "完成时间"
 
-#: ops/models/adhoc.py:237 ops/templates/ops/adhoc_history.html:55
+#: ops/models/adhoc.py:238 ops/templates/ops/adhoc_history.html:55
 #: ops/templates/ops/task_history.html:61 ops/templates/ops/task_list.html:16
 #: xpack/plugins/change_auth_plan/models.py:172
 #: xpack/plugins/change_auth_plan/models.py:294
@@ -3146,31 +3146,31 @@ msgstr "完成时间"
 msgid "Time"
 msgstr "时间"
 
-#: ops/models/adhoc.py:238 ops/templates/ops/adhoc_detail.html:104
+#: ops/models/adhoc.py:239 ops/templates/ops/adhoc_detail.html:104
 #: ops/templates/ops/adhoc_history.html:53
 #: ops/templates/ops/adhoc_history_detail.html:67
 #: ops/templates/ops/task_detail.html:82 ops/templates/ops/task_history.html:59
 msgid "Is finished"
 msgstr "是否完成"
 
-#: ops/models/adhoc.py:239 ops/templates/ops/adhoc_history.html:54
+#: ops/models/adhoc.py:240 ops/templates/ops/adhoc_history.html:54
 #: ops/templates/ops/task_history.html:60
 msgid "Is success"
 msgstr "是否成功"
 
-#: ops/models/adhoc.py:240
+#: ops/models/adhoc.py:241
 msgid "Adhoc raw result"
 msgstr "结果"
 
-#: ops/models/adhoc.py:241
+#: ops/models/adhoc.py:242
 msgid "Adhoc result summary"
 msgstr "汇总"
 
-#: ops/models/adhoc.py:281 xpack/plugins/change_auth_plan/utils.py:86
+#: ops/models/adhoc.py:282 xpack/plugins/change_auth_plan/utils.py:89
 msgid "{} Start task: {}"
 msgstr "{} 任务开始: {}"
 
-#: ops/models/adhoc.py:290 xpack/plugins/change_auth_plan/utils.py:98
+#: ops/models/adhoc.py:291 xpack/plugins/change_auth_plan/utils.py:101
 msgid "{} Task finish"
 msgstr "{} 任务结束"
 
@@ -6275,6 +6275,10 @@ msgstr "步骤"
 msgid "Change auth plan task"
 msgstr "改密计划任务"
 
+#: xpack/plugins/change_auth_plan/serializers.py:58
+msgid "* For security, do not change {}'s password"
+msgstr "* 为了安全，不能修改 {} 的密码"
+
 #: xpack/plugins/change_auth_plan/serializers.py:68
 msgid "* Please enter custom password"
 msgstr "* 请输入自定义密码"
@@ -6344,11 +6348,11 @@ msgstr "执行失败"
 msgid "Create plan"
 msgstr "创建计划"
 
-#: xpack/plugins/change_auth_plan/utils.py:237
+#: xpack/plugins/change_auth_plan/utils.py:262
 msgid "Failed to connect asset"
 msgstr "连接资产失败"
 
-#: xpack/plugins/change_auth_plan/utils.py:239
+#: xpack/plugins/change_auth_plan/utils.py:264
 msgid "Incorrect password"
 msgstr "密码错误"
 

@@ -132,6 +132,9 @@ class AdHocResultCallback(CallbackMixin, CallbackModule, CMDCallBackModule):
     def display_failed_stderr(self):
         pass
 
+    def set_play_context(self, context):
+        context.ssh_args = '-C -o ControlMaster=no'
+
 
 class CommandResultCallback(AdHocResultCallback):
     """

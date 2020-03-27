@@ -4,7 +4,7 @@ asn1crypto==0.24.0
 bcrypt==3.1.4
 billiard==3.5.0.3
 boto3==1.12.14
-botocore==1.9.5
+botocore==1.15.26
 celery==4.1.1
 certifi==2018.1.18
 cffi==1.13.2
@@ -61,8 +61,8 @@ pytz==2018.3
 PyYAML==5.1
 redis==2.10.6
 requests==2.22.0
-jms-storage==0.0.27
-s3transfer==0.1.13
+jms-storage==0.0.28
+s3transfer==0.3.3
 simplejson==3.13.2
 six==1.11.0
 sshpubkeys==3.1.0
@@ -96,3 +96,5 @@ django-cas-ng==4.0.1
 python-cas==1.5.0
 ipython
 huaweicloud-sdk-python==1.0.21
+django-redis==4.11.0
+python-redis-lock==3.5.0
