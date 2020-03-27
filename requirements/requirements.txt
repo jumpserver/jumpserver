@@ -96,3 +96,5 @@ django-cas-ng==4.0.1
 python-cas==1.5.0
 ipython
 huaweicloud-sdk-python==1.0.21
+django-redis==4.11.0
+python-redis-lock==3.5.0

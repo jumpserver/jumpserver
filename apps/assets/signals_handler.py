@@ -15,7 +15,6 @@ from .utils import TreeService
 from .tasks import (
     update_assets_hardware_info_util,
     test_asset_connectivity_util,
-    push_system_user_to_assets,
     push_system_user_to_assets_manual,
     push_system_user_to_assets,
     add_nodes_assets_to_system_users
@@ -235,9 +234,3 @@ def on_node_update_or_created(sender, **kwargs):
     Node.refresh_nodes()
     with tmp_to_root_org():
         Node.refresh_nodes()
-
-
-@receiver(post_save, sender=AuthBook)
-def on_authbook_created(sender, instance=None, created=True, **kwargs):
-    if created and instance:
-        instance.set_version()
