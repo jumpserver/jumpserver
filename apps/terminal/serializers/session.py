@@ -21,7 +21,7 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
             "user_id", "asset_id", "system_user_id",
             "login_from", "login_from_display", "remote_addr",
             "is_success",  "is_finished", "has_replay", "can_replay",
-            "protocol", "date_start", "date_end",
+            "can_join", "protocol", "date_start", "date_end",
             "terminal",
         ]
 
