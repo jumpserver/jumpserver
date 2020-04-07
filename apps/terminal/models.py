@@ -244,9 +244,11 @@ class Session(OrgModelMixin):
         return False
 
     def can_join(self):
-        if self.protocol in ['ssh', 'telnet', 'mysql']:
-            return True
-        return False
+        if self.is_finished:
+            return False
+        if self.protocol not in ['ssh', 'telnet', 'mysql']:
+            return False
+        return True
 
     def save_to_storage(self, f):
         local_path = self.get_local_path()

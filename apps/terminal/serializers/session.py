@@ -6,7 +6,7 @@ from ..models import Session
 
 __all__ = [
     'SessionSerializer', 'SessionDisplaySerializer',
-    'ReplaySerializer',
+    'ReplaySerializer', 'SessionJoinValidateSerializer',
 ]
 
 
@@ -35,3 +35,8 @@ class SessionDisplaySerializer(SessionSerializer):
 
 class ReplaySerializer(serializers.Serializer):
     file = serializers.FileField(allow_empty_file=True)
+
+
+class SessionJoinValidateSerializer(serializers.Serializer):
+    user_id = serializers.UUIDField()
+    session_id = serializers.UUIDField()
