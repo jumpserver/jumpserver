@@ -117,6 +117,17 @@ $(document).ready(function () {
 .on('click', '#btn_bulk_update', function(){
     // var action = $('#slct_bulk_update').val();
     var params = getUrlParams(table.ajax.url());
+    var searchParams = '';
+    var searchValue = $('input[type=search]').val();
+    var searchMap = parseTableFilter(searchValue);
+    if (Object.keys(searchMap).length === 0) {
+        searchParams = searchValue;
+    } else {
+        $.each(searchMap, function (k, v) {
+            searchParams +=  k + '=' + v + '&'
+        })
+    }
+    params += '&' + searchParams;
 
     var exportPath = "{% url 'api-terminal:command-export' %}";
     var url = exportPath + "?" + params;
