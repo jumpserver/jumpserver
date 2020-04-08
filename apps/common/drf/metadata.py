@@ -84,7 +84,8 @@ class SimpleMetadataWithFilters(SimpleMetadata):
     def get_filters_fields(self, request, view):
         fields = []
         if hasattr(view, 'get_filter_fields'):
-            fields = view.get_filter_fields(request)
+            # fields = view.get_filter_fields(request)
+            fields = view.get_filter_fields()
         elif hasattr(view, 'filter_fields'):
             fields = view.filter_fields
         return fields
