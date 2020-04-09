@@ -1256,7 +1256,8 @@ function toSafeDateISOStr(s) {
 
 function toSafeLocalDateStr(d) {
     var date = safeDate(d);
-    var date_s = date.toLocaleString(getUserLang(), {hour12: false});
+    // var date_s = date.toLocaleString(getUserLang(), {hour12: false});
+    var date_s = date.toLocaleString(getUserLang(), {hourCycle: "h23"});
     return date_s.split("/").join('-')
 }
 

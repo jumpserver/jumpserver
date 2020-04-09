@@ -3,4 +3,5 @@
 
 from .user import *
 from .group import *
+from .profile import *
 from .relation import *
