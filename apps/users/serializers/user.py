@@ -30,7 +30,7 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
         (1, CUSTOM_PASSWORD)
     )
     password_strategy = serializers.ChoiceField(
-        choices=PASSWORD_STRATEGY_CHOICES, required=True, initial=0,
+        choices=PASSWORD_STRATEGY_CHOICES, required=False, initial=0,
         label=_('Password strategy'), write_only=True
     )
 
@@ -62,9 +62,9 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
     def set_role_choices(self):
         role = self.fields['role']
-        choices = role.choices
+        choices = role._choices
         choices.pop('App', None)
-        role.choices = choices
+        role._choices = choices
 
     def validate_role(self, value):
         request = self.context.get('request')
