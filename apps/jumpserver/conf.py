@@ -142,7 +142,6 @@ class Config(dict):
         'AUTH_OPENID_CLIENT_SECRET': '',
         'AUTH_OPENID_IGNORE_SSL_VERIFICATION': True,
         'AUTH_OPENID_SHARE_SESSION': True,
-        'CAS_ROOT_PROXIED_AS': '',
 
         'AUTH_RADIUS': False,
         'RADIUS_SERVER': 'localhost',
@@ -155,6 +154,7 @@ class Config(dict):
         'CAS_SERVER_URL': "http://host/cas/",
         'CAS_LOGOUT_COMPLETELY': True,
         'CAS_VERSION': 3,
+        'CAS_ROOT_PROXIED_AS': '',  # Such as  http://jumpserver.org:8080
 
         'OTP_VALID_WINDOW': 2,
         'OTP_ISSUER_NAME': 'JumpServer',
