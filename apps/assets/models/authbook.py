@@ -14,7 +14,9 @@ __all__ = ['AuthBook']
 
 class AuthBookQuerySet(models.QuerySet):
     def delete(self):
-        raise PermissionError("Bulk delete authbook deny")
+        if self.count() > 1:
+            raise PermissionError(_("Bulk delete deny"))
+        return super().delete()
 
 
 class AuthBookManager(OrgManager):
