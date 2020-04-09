@@ -37,7 +37,7 @@ class SerializerMixin:
         serializer_class = None
         if hasattr(self, 'serializer_classes') and \
                 isinstance(self.serializer_classes, dict):
-            if self.action == 'list' and self.request.query_params.get('draw'):
+            if self.action in ['list', 'metadata'] and self.request.query_params.get('draw'):
                 serializer_class = self.serializer_classes.get('display')
             if serializer_class is None:
                 serializer_class = self.serializer_classes.get(

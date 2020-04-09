@@ -481,7 +481,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         max_length=30, default='', blank=True, verbose_name=_('Created by')
     )
     source = models.CharField(
-        max_length=30, default=SOURCE_LOCAL, choices=SOURCE_CHOICES,
+        max_length=30, default=SOURCE_LDAP, choices=SOURCE_CHOICES,
         verbose_name=_('Source')
     )
     date_password_last_updated = models.DateTimeField(

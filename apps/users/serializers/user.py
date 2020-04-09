@@ -23,7 +23,16 @@ class UserOrgSerializer(serializers.Serializer):
 
 
 class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
-    admin_orgs = UserOrgSerializer(many=True, read_only=True)
+    EMAIL_SET_PASSWORD = _('Reset link will be generated and sent to the user')
+    CUSTOM_PASSWORD = _('Set password')
+    PASSWORD_STRATEGY_CHOICES = (
+        (0, EMAIL_SET_PASSWORD),
+        (1, CUSTOM_PASSWORD)
+    )
+    password_strategy = serializers.ChoiceField(
+        choices=PASSWORD_STRATEGY_CHOICES, required=True, initial=0,
+        label=_('Password strategy'), write_only=True
+    )
 
     class Meta:
         model = User
@@ -33,8 +42,9 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'groups', 'role', 'wechat', 'phone', 'mfa_level',
             'comment', 'source', 'is_valid', 'is_expired',
             'is_active', 'created_by', 'is_first_login',
+            'password_strategy',
             'date_password_last_updated', 'date_expired',
-            'avatar_url', 'admin_orgs',
+            'avatar_url',
         ]
         extra_kwargs = {
             'password': {'write_only': True, 'required': False, 'allow_null': True, 'allow_blank': True},
@@ -45,6 +55,16 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'avatar_url': {'label': _('Avatar url')},
             'created_by': {'read_only': True, 'allow_blank': True},
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.set_role_choices()
+
+    def set_role_choices(self):
+        role = self.fields['role']
+        choices = role.choices
+        choices.pop('App', None)
+        role.choices = choices
 
     def validate_role(self, value):
         request = self.context.get('request')
@@ -92,6 +112,7 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     def validate(self, attrs):
         attrs = self.change_password_to_raw(attrs)
         attrs = self.clean_auth_fields(attrs)
+        attrs.pop('password_strategy', None)
         return attrs
 
 
@@ -157,8 +178,17 @@ class ResetOTPSerializer(serializers.Serializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    admin_orgs = UserOrgSerializer(many=True, read_only=True)
+
     class Meta:
         model = User
         fields = [
-            'id', 'username', 'name', 'role', 'email'
+            'id', 'name', 'username', 'email',
+            'role', 'wechat', 'phone', 'mfa_level',
+            'comment', 'source', 'is_valid', 'is_expired',
+            'is_active', 'created_by', 'is_first_login',
+            'date_password_last_updated', 'date_expired',
+            'avatar_url',
+
+            'groups', 'admin_orgs',
         ]
