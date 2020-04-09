@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-09 10:47+0800\n"
+"POT-Creation-Date: 2020-04-09 23:31+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -26,7 +26,7 @@ msgstr "自定义"
 #: applications/templates/applications/remote_app_list.html:27
 #: applications/templates/applications/user_remote_app_list.html:18
 #: assets/forms/domain.py:15 assets/forms/label.py:13
-#: assets/models/asset.py:353 assets/models/authbook.py:25
+#: assets/models/asset.py:353 assets/models/authbook.py:27
 #: assets/models/gathered_user.py:14 assets/serializers/admin_user.py:32
 #: assets/serializers/asset_user.py:47 assets/serializers/asset_user.py:84
 #: assets/serializers/system_user.py:44 assets/serializers/system_user.py:176
@@ -1123,11 +1123,15 @@ msgstr "主机名原始"
 msgid "Labels"
 msgstr "标签管理"
 
-#: assets/models/authbook.py:26 ops/templates/ops/task_detail.html:70
+#: assets/models/authbook.py:18
+msgid "Bulk delete deny"
+msgstr "拒绝批量删除"
+
+#: assets/models/authbook.py:28 ops/templates/ops/task_detail.html:70
 msgid "Latest version"
 msgstr "最新版本"
 
-#: assets/models/authbook.py:27
+#: assets/models/authbook.py:29
 #: assets/templates/assets/_asset_user_list.html:22
 #: ops/templates/ops/adhoc_history.html:56
 #: ops/templates/ops/adhoc_history_detail.html:55
@@ -1135,7 +1139,7 @@ msgstr "最新版本"
 msgid "Version"
 msgstr "版本"
 
-#: assets/models/authbook.py:36
+#: assets/models/authbook.py:38
 msgid "AuthBook"
 msgstr ""
 
