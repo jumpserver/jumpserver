@@ -75,8 +75,8 @@ REDIS_PORT: 6379
 # CAS 配置
 # AUTH_CAS': False,
 # CAS_SERVER_URL': "http://host/cas/",
-# CAS_LOGOUT_COMPLETELY': True,
 # CAS_ROOT_PROXIED_AS': 'http://jumpserver-host:port',  
+# CAS_LOGOUT_COMPLETELY': True,
 # CAS_VERSION': 3,
 
 # LDAP/AD settings

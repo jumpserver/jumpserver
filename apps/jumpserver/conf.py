@@ -152,9 +152,9 @@ class Config(dict):
 
         'AUTH_CAS': False,
         'CAS_SERVER_URL': "http://host/cas/",
+        'CAS_ROOT_PROXIED_AS': '',
         'CAS_LOGOUT_COMPLETELY': True,
         'CAS_VERSION': 3,
-        'CAS_ROOT_PROXIED_AS': '',
 
         'OTP_VALID_WINDOW': 2,
         'OTP_ISSUER_NAME': 'JumpServer',
