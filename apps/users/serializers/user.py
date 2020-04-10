@@ -178,7 +178,7 @@ class ResetOTPSerializer(serializers.Serializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    admin_orgs = UserOrgSerializer(many=True, read_only=True)
+    admin_or_audit_orgs = UserOrgSerializer(many=True, read_only=True)
 
     class Meta:
         model = User
@@ -188,7 +188,5 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'comment', 'source', 'is_valid', 'is_expired',
             'is_active', 'created_by', 'is_first_login',
             'date_password_last_updated', 'date_expired',
-            'avatar_url',
-
-            'groups', 'admin_orgs',
+            'avatar_url', 'groups', 'admin_or_audit_orgs',
         ]
