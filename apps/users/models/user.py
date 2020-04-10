@@ -563,10 +563,10 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         user_default = settings.STATIC_URL + "img/avatar/user.png"
         return user_default
 
-    def admin_orgs(self):
-        from orgs.models import Organization
-        orgs = Organization.get_user_admin_or_audit_orgs(self)
-        return orgs
+    # def admin_orgs(self):
+    #     from orgs.models import Organization
+    #     orgs = Organization.get_user_admin_or_audit_orgs(self)
+    #     return orgs
 
     def avatar_url(self):
         admin_default = settings.STATIC_URL + "img/avatar/admin.png"

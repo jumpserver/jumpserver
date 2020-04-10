@@ -23,7 +23,7 @@ class UserOrgSerializer(serializers.Serializer):
 
 
 class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
-    admin_orgs = UserOrgSerializer(many=True, read_only=True)
+    admin_or_audit_orgs = UserOrgSerializer(many=True, read_only=True)
 
     class Meta:
         model = User
@@ -34,7 +34,7 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'comment', 'source', 'is_valid', 'is_expired',
             'is_active', 'created_by', 'is_first_login',
             'date_password_last_updated', 'date_expired',
-            'avatar_url', 'admin_orgs',
+            'avatar_url', 'admin_or_audit_orgs',
         ]
         extra_kwargs = {
             'password': {'write_only': True, 'required': False, 'allow_null': True, 'allow_blank': True},
