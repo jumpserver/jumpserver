@@ -42,8 +42,7 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'groups', 'role', 'wechat', 'phone', 'mfa_level',
             'comment', 'source', 'is_valid', 'is_expired',
             'is_active', 'created_by', 'is_first_login',
-            'password_strategy',
-            'date_password_last_updated', 'date_expired',
+            'password_strategy', 'date_password_last_updated', 'date_expired',
             'avatar_url',
         ]
         extra_kwargs = {

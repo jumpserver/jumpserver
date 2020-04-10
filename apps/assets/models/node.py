@@ -574,14 +574,13 @@ class Node(OrgModelMixin, SomeNodesMixin, TreeMixin, FamilyMixin, FullValueMixin
         org = get_current_org()
         if not org or not org.is_real():
             Organization.default().change_to()
-        i = 0
-        while i < count:
-            nodes = list(cls.objects.all())
-            if count > 100:
-                length = 100
-            else:
-                length = count
+        nodes = list(cls.objects.all())
+        if count > 100:
+            length = 100
+        else:
+            length = count
 
-            for i in range(length):
-                node = random.choice(nodes)
-                node.create_child('Node {}'.format(i))
+        for i in range(length):
+            node = random.choice(nodes)
+            child = node.create_child('Node {}'.format(i))
+            print("{}. {}".format(i, child))

@@ -278,7 +278,7 @@ class AdHocExecution(OrgModelMixin):
         raw = ''
 
         try:
-            date_start_s = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            date_start_s = timezone.now().now().strftime('%Y-%m-%d %H:%M:%S')
             print(_("{} Start task: {}").format(date_start_s, self.task.name))
             raw, summary = self.start_runner()
         except Exception as e:
@@ -286,7 +286,7 @@ class AdHocExecution(OrgModelMixin):
             raw = {"dark": {"all": str(e)}, "contacted": []}
         finally:
             self.clean_up(summary, time_start)
-            date_end = timezone.now()
+            date_end = timezone.now().now()
             date_end_s = date_end.strftime('%Y-%m-%d %H:%M:%S')
             print(_("{} Task finish").format(date_end_s))
             print('.\n\n.')

@@ -146,10 +146,15 @@ function initTable() {
                         .replace("sessionID", cellData)
                         .replace("terminalID", rowData.terminal)
                 }
+                var joinBtn = ' <a disabled data-session="sessionID" class="btn btn-xs btn-info btn-join" >{% trans "Join" %}</a>';
+                joinBtn = joinBtn.replace("sessionID", rowData.id);
+                if (rowData.can_join){
+                    joinBtn = joinBtn.replace("disabled", "")
+                }
                 if (rowData.is_finished) {
                     btnGroup += replayBtn + downloadBtn
                 } else {
-                    btnGroup += termBtn;
+                    btnGroup += termBtn + joinBtn;
                 }
                 $(td).html(btnGroup);
             }},
@@ -240,11 +245,16 @@ $(document).ready(function() {
     var hasConfirm = getCookie('replayConfirm');
     if (!hasConfirm) {
         var help_text = "{% trans "Visit doc for replay play offline: " %}";
-        help_text += "http://docs.jumpserver.org";
+        help_text += "https://github.com/jumpserver/videoplayer";
         var r = confirm(help_text);
         setCookie("replayConfirm", "1")
     }
     window.open(downloadUrl)
+})
+.on('click', '.btn-join', function () {
+    var sessionID = $(this).data("session");
+    var joinUrl = "/luna/join/?shareroom=" + sessionID;
+    window.open(joinUrl, "height=600, width=800, top=400, left=400, toolbar=no, menubar=no, scrollbars=no, location=no, status=no");
 })
 .on("click", '#session_table_filter input', function (e) {
     e.preventDefault();
