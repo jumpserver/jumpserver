@@ -330,4 +330,6 @@ def get_source_choices():
         choices.append((User.SOURCE_OPENID, choices_all[User.SOURCE_OPENID]))
     if settings.AUTH_RADIUS:
         choices.append((User.SOURCE_RADIUS, choices_all[User.SOURCE_RADIUS]))
+    if settings.AUTH_CAS:
+        choices.append((User.SOURCE_CAS, choices_all[User.SOURCE_CAS]))
     return choices
