@@ -146,7 +146,7 @@ function initTable() {
                         .replace("sessionID", cellData)
                         .replace("terminalID", rowData.terminal)
                 }
-                var joinBtn = ' <a disabled data-session="sessionID" class="btn btn-xs btn-info btn-join" >{% trans "Join" %}</a>';
+                var joinBtn = ' <a disabled data-session="sessionID" class="btn btn-xs btn-info btn-join" >{% trans "Monitoring" %}</a>';
                 joinBtn = joinBtn.replace("sessionID", rowData.id);
                 if (rowData.can_join){
                     joinBtn = joinBtn.replace("disabled", "")
