@@ -24,7 +24,7 @@ def get_org_from_request(request):
         oid = Organization.DEFAULT_ID
     elif oid.lower() == "root":
         oid = Organization.ROOT_ID
-    org = Organization.get_instance(oid)
+    org = Organization.get_instance(oid, True)
     return org
 
 

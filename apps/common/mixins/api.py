@@ -9,7 +9,7 @@ from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 
-from common.drf.filters import IDSpmFilter, CustomFilter
+from common.drf.filters import IDSpmFilter, CustomFilter, IDInFilter
 from ..utils import lazyproperty
 
 __all__ = [
@@ -49,7 +49,7 @@ class SerializerMixin:
 
 
 class ExtraFilterFieldsMixin:
-    default_added_filters = [CustomFilter, IDSpmFilter]
+    default_added_filters = [CustomFilter, IDSpmFilter, IDInFilter]
     filter_backends = api_settings.DEFAULT_FILTER_BACKENDS
     extra_filter_fields = []
     extra_filter_backends = []
