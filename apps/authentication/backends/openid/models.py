@@ -157,7 +157,7 @@ class Client(object):
         userinfo = self.get_userinfo(token=token_response['access_token'])
         with transaction.atomic():
             name = userinfo.get('name', '')
-            username = userinfo.get('preferred_username', ''),
+            username = userinfo.get('preferred_username', '')
             email = userinfo.get('email', '')
             email = construct_user_email(username, email)
 
