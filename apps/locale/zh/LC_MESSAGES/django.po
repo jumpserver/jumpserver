@@ -6425,7 +6425,7 @@ msgstr "选择管理员"
 
 #: xpack/plugins/cloud/forms.py:85
 msgid "Tips: The asset information is always covered"
-msgstr ""
+msgstr "提示：资产信息总是被覆盖"
 
 #: xpack/plugins/cloud/meta.py:9 xpack/plugins/cloud/views.py:27
 #: xpack/plugins/cloud/views.py:44 xpack/plugins/cloud/views.py:62
