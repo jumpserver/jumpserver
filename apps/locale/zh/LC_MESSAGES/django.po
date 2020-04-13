@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-09 23:31+0800\n"
+"POT-Creation-Date: 2020-04-13 13:44+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -3586,7 +3586,6 @@ msgid "Add node to this permission"
 msgstr "添加节点"
 
 #: perms/templates/perms/asset_permission_asset.html:105
-#: terminal/templates/terminal/session_list.html:149
 #: users/templates/users/user_detail.html:226
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:101
 msgid "Join"
@@ -5064,6 +5063,10 @@ msgstr "终断任务已发送，请等待"
 msgid "Terminate"
 msgstr "终断"
 
+#: terminal/templates/terminal/session_list.html:149
+msgid "Monitoring"
+msgstr "监控"
+
 #: terminal/templates/terminal/session_list.html:179
 msgid "Finish session success"
 msgstr "标记会话完成成功"
@@ -6422,7 +6425,7 @@ msgstr "选择管理员"
 
 #: xpack/plugins/cloud/forms.py:85
 msgid "Tips: The asset information is always covered"
-msgstr ""
+msgstr "提示：资产信息总是被覆盖"
 
 #: xpack/plugins/cloud/meta.py:9 xpack/plugins/cloud/views.py:27
 #: xpack/plugins/cloud/views.py:44 xpack/plugins/cloud/views.py:62
@@ -7411,9 +7414,6 @@ msgstr "创建"
 
 #~ msgid "If set id, will use this id update user existed"
 #~ msgstr "如果设置了id，则会使用该行信息更新该id的用户"
-
-#~ msgid "Monitor"
-#~ msgstr "监控"
 
 #~ msgid "Beijing Duizhan Tech, Inc."
 #~ msgstr "北京堆栈科技有限公司"
