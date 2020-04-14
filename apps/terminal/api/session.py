@@ -141,7 +141,7 @@ class SessionJoinValidateAPI(views.APIView):
         if not session:
             msg = _('Session does not exist: {}'.format(session_id))
             return Response({'ok': False, 'msg': msg}, status=401)
-        if not session.can_join():
+        if not session.can_join:
             msg = _('Session is finished or the protocol not supported')
             return Response({'ok': False, 'msg': msg}, status=401)
 

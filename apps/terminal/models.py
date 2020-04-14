@@ -243,6 +243,7 @@ class Session(OrgModelMixin):
             return True
         return False
 
+    @property
     def can_join(self):
         if self.is_finished:
             return False
