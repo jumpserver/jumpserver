@@ -2,6 +2,7 @@
 #
 
 from django.shortcuts import get_object_or_404
+from django.conf import settings
 from rest_framework.generics import ListAPIView
 
 from common.permissions import IsOrgAdminOrAppUser
@@ -45,7 +46,9 @@ class UserGrantedAssetsApi(UserAssetPermissionMixin, ListAPIView):
         return queryset
 
     def get_queryset(self):
-        queryset = self.util.get_assets().only(*self.only_fields)
+        queryset = self.util.get_assets().only(*self.only_fields).order_by(
+            settings.TERMINAL_ASSET_LIST_SORT_BY
+        )
         return queryset
 
 
