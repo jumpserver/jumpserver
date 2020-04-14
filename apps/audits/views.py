@@ -122,6 +122,7 @@ class OperateLogListView(PermissionsMixin, DatetimeSearchMixin, ListView):
         context = {
             'user_list': current_org.get_org_members(),
             'actions': self.actions_dict,
+            'search_action': self.action,
             'resource_type_list': get_resource_type_list(),
             'date_from': self.date_from,
             'date_to': self.date_to,
