@@ -236,7 +236,7 @@ $(document).ready(function() {
 }).on('click', '.btn-replay', function () {
     var sessionID = $(this).data("session");
     var replayUrl = "/luna/replay/" + sessionID;
-    window.open(replayUrl, "height=600, width=800, top=400, left=400, toolbar=no, menubar=no, scrollbars=no, location=no, status=no");
+    window.open(replayUrl, "_blank", "height=600, width=800, top=400, left=400, toolbar=no, menubar=no, scrollbars=no, location=no, status=no");
 })
 .on('click', '.btn-download', function () {
     var sessionID = $(this).data("session");
@@ -254,7 +254,7 @@ $(document).ready(function() {
 .on('click', '.btn-join', function () {
     var sessionID = $(this).data("session");
     var joinUrl = "/luna/join/?shareroom=" + sessionID;
-    window.open(joinUrl, "height=600, width=800, top=400, left=400, toolbar=no, menubar=no, scrollbars=no, location=no, status=no");
+    window.open(joinUrl)
 })
 .on("click", '#session_table_filter input', function (e) {
     e.preventDefault();
