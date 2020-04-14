@@ -44,7 +44,7 @@
             <select class="select2 form-control" name="action">
                 <option value="">{% trans 'Action' %}</option>
                 {% for k, v in actions.items %}
-                    <option value="{{ k }}" {% if k == action %} selected {% endif %}>{{ v }}</option>
+                    <option value="{{ k }}" {% if k == search_action %} selected {% endif %}>{{ v }}</option>
                 {% endfor %}
             </select>
         </div>

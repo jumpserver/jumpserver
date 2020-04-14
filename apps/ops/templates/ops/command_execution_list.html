@@ -39,8 +39,8 @@
         <div class="input-group">
             <select class="select2 form-control" name="user">
                 <option value="">{% trans 'User' %}</option>
-                {% for u in user_list %}
-                    <option value="{{ u.id }}" {% if u.id == user_id %} selected {% endif %}>{{ u }}</option>
+                {% for id, u in user_list %}
+                    <option value="{{ id }}" {% if id == user_id %} selected {% endif %}>{{ u }}</option>
                 {% endfor %}
             </select>
         </div>
