@@ -84,8 +84,7 @@ class SimpleMetadataWithFilters(SimpleMetadata):
     def get_filters_fields(self, request, view):
         fields = []
         if hasattr(view, 'get_filter_fields'):
-            # fields = view.get_filter_fields(request)
-            fields = view.get_filter_fields()
+            fields = view.get_filter_fields(request)
         elif hasattr(view, 'filter_fields'):
             fields = view.filter_fields
         return fields
@@ -93,9 +92,9 @@ class SimpleMetadataWithFilters(SimpleMetadata):
     def get_ordering_fields(self, request, view):
         fields = []
         if hasattr(view, 'get_ordering_fields'):
-            fields = view.get_filter_fields(request)
+            fields = view.get_ordering_fields(request)
         elif hasattr(view, 'ordering_fields'):
-            fields = view.filter_fields
+            fields = view.ordering_fields
         return fields
 
     def determine_metadata(self, request, view):
