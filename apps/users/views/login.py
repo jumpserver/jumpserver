@@ -43,11 +43,13 @@ class UserForgotPasswordView(FormView):
         user = get_object_or_none(User, email=email)
         if not user:
             error = _('Email address invalid, please input again')
-            return self.get(request, errors=error)
+            form.add_error('email', error)
+            return self.form_invalid(form)
         elif not user.can_update_password():
             error = _('User auth from {}, go there change password'.format(
                 user.source))
-            return self.get(request, errors=error)
+            form.add_error('email', error)
+            return self.form_invalid(form)
         else:
             send_reset_password_mail(user)
             return redirect('users:forgot-password-sendmail-success')
