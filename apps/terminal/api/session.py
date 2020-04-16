@@ -1,22 +1,27 @@
 # -*- coding: utf-8 -*-
 #
+from django.utils.translation import ugettext as _
 from django.shortcuts import get_object_or_404, reverse
 from django.core.files.storage import default_storage
-from rest_framework import viewsets
+from rest_framework import viewsets, views
 from rest_framework.response import Response
 
-from common.utils import is_uuid, get_logger
+from common.utils import is_uuid, get_logger, get_object_or_none
 from common.mixins.api import AsyncApiMixin
-from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor
+from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor, IsAppUser
 from common.drf.filters import DatetimeRangeFilter
 from orgs.mixins.api import OrgBulkModelViewSet
+from orgs.utils import tmp_to_root_org, tmp_to_org
+from users.models import User
 from ..utils import find_session_replay_local, download_session_replay
 from ..hands import SystemUser
 from ..models import Session
 from .. import serializers
 
 
-__all__ = ['SessionViewSet', 'SessionReplayViewSet',]
+__all__ = [
+    'SessionViewSet', 'SessionReplayViewSet', 'SessionJoinValidateAPI'
+]
 logger = get_logger(__name__)
 
 
@@ -117,3 +122,36 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
                 return Response({"error": url})
         data = self.get_replay_data(session, url)
         return Response(data)
+
+
+class SessionJoinValidateAPI(views.APIView):
+    permission_classes = (IsAppUser, )
+    serializer_class = serializers.SessionJoinValidateSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if not serializer.is_valid():
+            msg = str(serializer.errors)
+            return Response({'ok': False, 'msg': msg}, status=401)
+        user_id = serializer.validated_data['user_id']
+        session_id = serializer.validated_data['session_id']
+
+        with tmp_to_root_org():
+            session = get_object_or_none(Session, pk=session_id)
+        if not session:
+            msg = _('Session does not exist: {}'.format(session_id))
+            return Response({'ok': False, 'msg': msg}, status=401)
+        if not session.can_join:
+            msg = _('Session is finished or the protocol not supported')
+            return Response({'ok': False, 'msg': msg}, status=401)
+
+        user = get_object_or_none(User, pk=user_id)
+        if not user:
+            msg = _('User does not exist: {}'.format(user_id))
+            return Response({'ok': False, 'msg': msg}, status=401)
+        with tmp_to_org(session.org):
+            if not user.admin_or_audit_orgs:
+                msg = _('User does not have permission')
+                return Response({'ok': False, 'msg': msg}, status=401)
+
+        return Response({'ok': True, 'msg': ''}, status=200)

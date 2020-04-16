@@ -17,7 +17,13 @@ __all__ = [
 ]
 
 
+class UserOrgSerializer(serializers.Serializer):
+    id = serializers.CharField()
+    name = serializers.CharField()
+
+
 class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+    admin_or_audit_orgs = UserOrgSerializer(many=True, read_only=True)
 
     class Meta:
         model = User
@@ -27,7 +33,8 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'groups', 'role', 'wechat', 'phone', 'mfa_level',
             'comment', 'source', 'is_valid', 'is_expired',
             'is_active', 'created_by', 'is_first_login',
-            'date_password_last_updated', 'date_expired', 'avatar_url',
+            'date_password_last_updated', 'date_expired',
+            'avatar_url', 'admin_or_audit_orgs',
         ]
         extra_kwargs = {
             'password': {'write_only': True, 'required': False, 'allow_null': True, 'allow_blank': True},

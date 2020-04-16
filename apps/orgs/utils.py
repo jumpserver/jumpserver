@@ -11,10 +11,9 @@ from .models import Organization
 
 
 def get_org_from_request(request):
-    oid = request.session.get("oid")
+    oid = request.META.get("HTTP_X_JMS_ORG")
     if not oid:
-        oid = request.META.get("HTTP_X_JMS_ORG")
-
+        oid = request.session.get("oid")
     request_params_oid = request.GET.get("oid")
     if request_params_oid:
         oid = request.GET.get("oid")

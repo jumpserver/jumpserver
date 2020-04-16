@@ -146,10 +146,15 @@ function initTable() {
                         .replace("sessionID", cellData)
                         .replace("terminalID", rowData.terminal)
                 }
+                var joinBtn = ' <a disabled data-session="sessionID" class="btn btn-xs btn-info btn-join" >{% trans "Monitoring" %}</a>';
+                joinBtn = joinBtn.replace("sessionID", rowData.id);
+                if (rowData.can_join){
+                    joinBtn = joinBtn.replace("disabled", "")
+                }
                 if (rowData.is_finished) {
                     btnGroup += replayBtn + downloadBtn
                 } else {
-                    btnGroup += termBtn;
+                    btnGroup += termBtn + joinBtn;
                 }
                 $(td).html(btnGroup);
             }},
@@ -231,7 +236,7 @@ $(document).ready(function() {
 }).on('click', '.btn-replay', function () {
     var sessionID = $(this).data("session");
     var replayUrl = "/luna/replay/" + sessionID;
-    window.open(replayUrl, "height=600, width=800, top=400, left=400, toolbar=no, menubar=no, scrollbars=no, location=no, status=no");
+    window.open(replayUrl, "_blank", "height=600, width=800, top=400, left=400, toolbar=no, menubar=no, scrollbars=no, location=no, status=no");
 })
 .on('click', '.btn-download', function () {
     var sessionID = $(this).data("session");
@@ -245,6 +250,11 @@ $(document).ready(function() {
         setCookie("replayConfirm", "1")
     }
     window.open(downloadUrl)
+})
+.on('click', '.btn-join', function () {
+    var sessionID = $(this).data("session");
+    var joinUrl = "/luna/join/?shareroom=" + sessionID;
+    window.open(joinUrl)
 })
 .on("click", '#session_table_filter input', function (e) {
     e.preventDefault();

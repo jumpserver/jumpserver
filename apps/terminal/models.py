@@ -243,6 +243,14 @@ class Session(OrgModelMixin):
             return True
         return False
 
+    @property
+    def can_join(self):
+        if self.is_finished:
+            return False
+        if self.protocol not in ['ssh', 'telnet', 'mysql']:
+            return False
+        return True
+
     def save_to_storage(self, f):
         local_path = self.get_local_path()
         try:

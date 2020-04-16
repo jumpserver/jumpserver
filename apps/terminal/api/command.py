@@ -63,7 +63,7 @@ class CommandQueryMixin:
     def filter_queryset(self, queryset):
         return queryset
 
-    def get_filter_fields(self):
+    def get_filter_fields(self, request):
         fields = self.filter_fields
         fields.extend(["date_from", "date_to"])
         return fields

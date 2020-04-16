@@ -390,7 +390,7 @@ class LDAPTestUtil(object):
         except LDAPSessionTerminatedByServerError as e:
             error = _('The port is not the port of the LDAP service: {}'.format(e))
         except LDAPSocketReceiveError as e:
-            error = _('Please enter the certificate: {}'.format(e))
+            error = _('Please add certificate: {}'.format(e))
         except Exception as e:
             error = _('Unknown error: {}'.format(e))
         else:

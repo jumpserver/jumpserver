@@ -64,13 +64,20 @@ REDIS_PORT: 6379
 # AUTH_OPENID_CLIENT_SECRET: client-secret
 # AUTH_OPENID_IGNORE_SSL_VERIFICATION: True
 # AUTH_OPENID_SHARE_SESSION: True
-#
+
 # Use Radius authorization
 # 使用Radius来认证
 # AUTH_RADIUS: false
 # RADIUS_SERVER: localhost
 # RADIUS_PORT: 1812
 # RADIUS_SECRET: 
+
+# CAS 配置
+# AUTH_CAS': False,
+# CAS_SERVER_URL': "http://host/cas/",
+# CAS_ROOT_PROXIED_AS': 'http://jumpserver-host:port',  
+# CAS_LOGOUT_COMPLETELY': True,
+# CAS_VERSION': 3,
 
 # LDAP/AD settings
 # LDAP 搜索分页数量

@@ -101,6 +101,15 @@ class CustomMetaDictField(serializers.DictField):
         filter_value = {k: v for k, v in value.items() if k in fields_names}
         return filter_value
 
+    @staticmethod
+    def strip_value(value):
+        new_value = {}
+        for k, v in value.items():
+            if isinstance(v, str):
+                v = v.strip()
+            new_value[k] = v
+        return new_value
+
     def get_value(self, dictionary):
         """
         反序列化时调用
@@ -108,4 +117,5 @@ class CustomMetaDictField(serializers.DictField):
         value = super().get_value(dictionary)
         value = self.convert_value_key(dictionary, value)
         value = self.filter_value_key(dictionary, value)
+        value = self.strip_value(value)
         return value
