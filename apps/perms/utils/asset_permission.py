@@ -347,7 +347,6 @@ class AssetPermissionUtil(AssetPermissionUtilCacheMixin):
         self.add_direct_nodes_to_user_tree(user_tree)
         self.add_single_assets_node_to_user_tree(user_tree)
         self.parse_user_tree_to_full_tree(user_tree)
-        print(user_tree.all_assets('2'))
         self.add_favorite_node_if_need(user_tree)
         self.set_user_tree_to_cache_if_need(user_tree)
         self.set_user_tree_to_local(user_tree)
