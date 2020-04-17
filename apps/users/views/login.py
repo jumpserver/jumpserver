@@ -46,9 +46,8 @@ class UserForgotPasswordView(FormView):
             form.add_error('email', error)
             return self.form_invalid(form)
         elif not user.can_update_password():
-            error = _('User auth from {}, go there change password'.format(
-                user.source))
-            form.add_error('email', error)
+            error = _('User auth from {}, go there change password')
+            form.add_error('email', error.format(user.get_source_display()))
             return self.form_invalid(form)
         else:
             send_reset_password_mail(user)
@@ -114,8 +113,8 @@ class UserResetPasswordView(FormView):
             return self.form_invalid(form)
 
         if not user.can_update_password():
-            error = _('User auth from {}, go there change password'.format(user.source))
-            form.add_error('new_password', error)
+            error = _('User auth from {}, go there change password')
+            form.add_error('new_password', error.format(user.get_source_display()))
             return self.form_invalid(form)
 
         password = form.cleaned_data['new_password']
