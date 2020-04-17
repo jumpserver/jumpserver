@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-13 13:44+0800\n"
+"POT-Creation-Date: 2020-04-17 20:49+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -58,8 +58,7 @@ msgstr "自定义"
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:54
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_subtask_list.html:13
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:14
-#: xpack/plugins/cloud/models.py:269
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:37
+#: xpack/plugins/cloud/models.py:266
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:47
 #: xpack/plugins/orgs/templates/orgs/org_list.html:17
 #: xpack/plugins/vault/forms.py:13 xpack/plugins/vault/forms.py:15
@@ -143,8 +142,8 @@ msgstr "运行参数"
 #: perms/templates/perms/remote_app_permission_user.html:49
 #: settings/models.py:26
 #: settings/templates/settings/_ldap_list_users_modal.html:32
-#: terminal/models.py:26 terminal/models.py:341 terminal/models.py:373
-#: terminal/models.py:410 terminal/templates/terminal/base_storage_list.html:31
+#: terminal/models.py:26 terminal/models.py:342 terminal/models.py:374
+#: terminal/models.py:411 terminal/templates/terminal/base_storage_list.html:31
 #: terminal/templates/terminal/terminal_detail.html:43
 #: terminal/templates/terminal/terminal_list.html:30 users/forms/profile.py:20
 #: users/models/group.py:15 users/models/user.py:440
@@ -183,7 +182,7 @@ msgstr "名称"
 #: assets/templates/assets/cmd_filter_rule_list.html:53
 #: audits/templates/audits/login_log_list.html:58
 #: perms/templates/perms/remote_app_permission_remote_app.html:50
-#: terminal/models.py:375 terminal/models.py:412
+#: terminal/models.py:376 terminal/models.py:413
 #: terminal/templates/terminal/base_storage_list.html:32
 #: tickets/models/ticket.py:43 tickets/templates/tickets/ticket_detail.html:33
 #: tickets/templates/tickets/ticket_list.html:35
@@ -248,8 +247,8 @@ msgstr "数据库"
 #: perms/templates/perms/asset_permission_detail.html:97
 #: perms/templates/perms/database_app_permission_detail.html:93
 #: perms/templates/perms/remote_app_permission_detail.html:89
-#: settings/models.py:31 terminal/models.py:36 terminal/models.py:380
-#: terminal/models.py:417 terminal/templates/terminal/base_storage_list.html:33
+#: settings/models.py:31 terminal/models.py:36 terminal/models.py:381
+#: terminal/models.py:418 terminal/templates/terminal/base_storage_list.html:33
 #: terminal/templates/terminal/terminal_detail.html:63
 #: tickets/templates/tickets/ticket_detail.html:104 users/models/group.py:16
 #: users/models/user.py:473 users/templates/users/user_detail.html:115
@@ -261,10 +260,10 @@ msgstr "数据库"
 #: xpack/plugins/change_auth_plan/models.py:75
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:115
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:19
-#: xpack/plugins/cloud/models.py:53 xpack/plugins/cloud/models.py:139
+#: xpack/plugins/cloud/models.py:53 xpack/plugins/cloud/models.py:136
 #: xpack/plugins/cloud/templates/cloud/account_detail.html:67
 #: xpack/plugins/cloud/templates/cloud/account_list.html:15
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:128
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:102
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:18
 #: xpack/plugins/gathered_user/models.py:26
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:59
@@ -324,7 +323,7 @@ msgstr "参数"
 #: users/templates/users/user_detail.html:97
 #: xpack/plugins/change_auth_plan/models.py:79
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:111
-#: xpack/plugins/cloud/models.py:56 xpack/plugins/cloud/models.py:145
+#: xpack/plugins/cloud/models.py:56 xpack/plugins/cloud/models.py:142
 #: xpack/plugins/gathered_user/models.py:30
 msgid "Created by"
 msgstr "创建者"
@@ -351,9 +350,9 @@ msgstr "创建者"
 #: tickets/templates/tickets/ticket_detail.html:52 users/models/group.py:18
 #: users/templates/users/user_group_detail.html:58
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:103
-#: xpack/plugins/cloud/models.py:59 xpack/plugins/cloud/models.py:148
+#: xpack/plugins/cloud/models.py:59 xpack/plugins/cloud/models.py:145
 #: xpack/plugins/cloud/templates/cloud/account_detail.html:63
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:108
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:98
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:55
 msgid "Date created"
 msgstr "创建日期"
@@ -406,7 +405,7 @@ msgstr "远程应用"
 #: users/templates/users/user_pubkey_update.html:80
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:65
 #: xpack/plugins/cloud/templates/cloud/account_create_update.html:29
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:52
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:49
 #: xpack/plugins/gathered_user/templates/gathered_user/task_create_update.html:40
 #: xpack/plugins/interface/templates/interface/interface.html:72
 #: xpack/plugins/orgs/templates/orgs/org_create_update.html:29
@@ -872,7 +871,6 @@ msgstr "用户名"
 #: ops/templates/ops/task_detail.html:95
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:82
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:72
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:82
 msgid "Yes"
 msgstr "是"
 
@@ -880,7 +878,6 @@ msgstr "是"
 #: ops/templates/ops/task_detail.html:97
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:84
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:74
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:84
 msgid "No"
 msgstr "否"
 
@@ -1410,7 +1407,7 @@ msgstr "资产管理"
 #: assets/models/user.py:111 assets/templates/assets/system_user_users.html:76
 #: templates/_nav.html:17 users/views/group.py:28 users/views/group.py:45
 #: users/views/group.py:63 users/views/group.py:82 users/views/group.py:99
-#: users/views/login.py:158 users/views/profile/password.py:40
+#: users/views/login.py:164 users/views/profile/password.py:40
 #: users/views/profile/pubkey.py:36 users/views/user.py:50
 #: users/views/user.py:67 users/views/user.py:111 users/views/user.py:178
 #: users/views/user.py:206 users/views/user.py:220 users/views/user.py:234
@@ -1731,7 +1728,7 @@ msgstr "资产列表"
 #: ops/templates/ops/command_execution_create.html:112
 #: settings/templates/settings/_ldap_list_users_modal.html:41
 #: users/templates/users/_granted_assets.html:7
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:65
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:62
 msgid "Loading"
 msgstr "加载中"
 
@@ -1891,7 +1888,7 @@ msgstr "自动生成密钥"
 #: perms/templates/perms/remote_app_permission_create_update.html:51
 #: terminal/templates/terminal/terminal_update.html:38
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:61
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:47
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:44
 #: xpack/plugins/gathered_user/templates/gathered_user/task_create_update.html:35
 msgid "Other"
 msgstr "其它"
@@ -1960,7 +1957,7 @@ msgstr "选择节点"
 #: users/templates/users/user_list.html:184
 #: users/templates/users/user_password_verify.html:20
 #: xpack/plugins/cloud/templates/cloud/account_create_update.html:30
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:53
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:50
 #: xpack/plugins/gathered_user/templates/gathered_user/task_create_update.html:41
 #: xpack/plugins/interface/templates/interface/interface.html:103
 #: xpack/plugins/orgs/templates/orgs/org_create_update.html:30
@@ -2000,7 +1997,7 @@ msgstr "资产用户"
 #: users/templates/users/user_detail.html:126
 #: users/templates/users/user_profile.html:150
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:126
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:139
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:129
 #: xpack/plugins/license/templates/license/license_detail.html:80
 msgid "Quick modify"
 msgstr "快速修改"
@@ -2533,7 +2530,7 @@ msgstr "启用"
 msgid "-"
 msgstr ""
 
-#: audits/models.py:78 xpack/plugins/cloud/models.py:204
+#: audits/models.py:78 xpack/plugins/cloud/models.py:201
 msgid "Failed"
 msgstr "失败"
 
@@ -2566,7 +2563,7 @@ msgstr "多因子认证"
 #: audits/models.py:87 audits/templates/audits/login_log_list.html:63
 #: xpack/plugins/change_auth_plan/models.py:286
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_subtask_list.html:15
-#: xpack/plugins/cloud/models.py:217
+#: xpack/plugins/cloud/models.py:214
 msgid "Reason"
 msgstr "原因"
 
@@ -2574,7 +2571,7 @@ msgstr "原因"
 #: tickets/templates/tickets/ticket_detail.html:34
 #: tickets/templates/tickets/ticket_list.html:36
 #: tickets/templates/tickets/ticket_list.html:104
-#: xpack/plugins/cloud/models.py:214 xpack/plugins/cloud/models.py:272
+#: xpack/plugins/cloud/models.py:211 xpack/plugins/cloud/models.py:269
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:50
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:48
 msgid "Status"
@@ -2642,8 +2639,8 @@ msgstr "导出"
 msgid "Handlers"
 msgstr "操作者"
 
-#: audits/views.py:86 audits/views.py:130 audits/views.py:167
-#: audits/views.py:212 audits/views.py:244 templates/_nav.html:146
+#: audits/views.py:86 audits/views.py:131 audits/views.py:168
+#: audits/views.py:213 audits/views.py:245 templates/_nav.html:146
 msgid "Audits"
 msgstr "日志审计"
 
@@ -2651,19 +2648,19 @@ msgstr "日志审计"
 msgid "FTP log"
 msgstr "FTP日志"
 
-#: audits/views.py:131 templates/_nav.html:151
+#: audits/views.py:132 templates/_nav.html:151
 msgid "Operate log"
 msgstr "操作日志"
 
-#: audits/views.py:168 templates/_nav.html:152
+#: audits/views.py:169 templates/_nav.html:152
 msgid "Password change log"
 msgstr "改密日志"
 
-#: audits/views.py:213 templates/_nav.html:149
+#: audits/views.py:214 templates/_nav.html:149
 msgid "Login log"
 msgstr "登录日志"
 
-#: audits/views.py:245
+#: audits/views.py:246
 msgid "Command execution log"
 msgstr "命令执行"
 
@@ -3047,13 +3044,13 @@ msgstr "没有该主机 {} 权限"
 
 #: ops/mixin.py:29 ops/mixin.py:92 ops/mixin.py:162
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:98
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:98
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:88
 msgid "Cycle perform"
 msgstr "周期执行"
 
 #: ops/mixin.py:33 ops/mixin.py:90 ops/mixin.py:111 ops/mixin.py:150
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:90
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:90
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:80
 msgid "Regularly perform"
 msgstr "定期执行"
 
@@ -3061,8 +3058,8 @@ msgstr "定期执行"
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:54
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:79
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:17
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:40
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:79
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:37
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:69
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:16
 #: xpack/plugins/gathered_user/templates/gathered_user/task_create_update.html:28
 msgid "Periodic perform"
@@ -3183,7 +3180,7 @@ msgstr "{} 任务结束"
 
 #: ops/models/command.py:24
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:56
-#: xpack/plugins/cloud/models.py:212
+#: xpack/plugins/cloud/models.py:209
 msgid "Result"
 msgstr "结果"
 
@@ -3401,7 +3398,7 @@ msgstr "内容"
 #: ops/templates/ops/task_list.html:73
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:135
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:54
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:148
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:138
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:58
 #: xpack/plugins/gathered_user/templates/gathered_user/task_list.html:44
 msgid "Run"
@@ -3836,11 +3833,11 @@ msgstr "远程应用授权远程应用列表"
 msgid "Test mail sent to {}, please check"
 msgstr "邮件已经发送{}, 请检查"
 
-#: settings/api.py:227
+#: settings/api.py:242
 msgid "Get ldap users is None"
 msgstr "获取 LDAP 用户为 None"
 
-#: settings/api.py:234
+#: settings/api.py:249
 msgid "Imported {} users successfully"
 msgstr "导入 {} 个用户成功"
 
@@ -4883,9 +4880,9 @@ msgid ""
 "            "
 msgstr ""
 
-#: terminal/forms/storage.py:136 xpack/plugins/cloud/models.py:266
+#: terminal/forms/storage.py:136 xpack/plugins/cloud/models.py:263
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:29
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:112
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:106
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:46
 msgid "Region"
 msgstr "地域"
@@ -4976,7 +4973,7 @@ msgstr "回放"
 msgid "Date end"
 msgstr "结束日期"
 
-#: terminal/models.py:342
+#: terminal/models.py:343
 msgid "Args"
 msgstr "参数"
 
@@ -5404,7 +5401,7 @@ msgstr "复制用户公钥到这里"
 msgid "Join user groups"
 msgstr "添加到用户组"
 
-#: users/forms/user.py:103 users/views/login.py:119
+#: users/forms/user.py:103 users/views/login.py:124
 #: users/views/profile/password.py:57
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
@@ -5923,8 +5920,8 @@ msgstr "新的公钥已设置成功，请下载对应的私钥"
 msgid "Update user"
 msgstr "更新用户"
 
-#: users/templates/users/user_update.html:22 users/views/login.py:48
-#: users/views/login.py:113
+#: users/templates/users/user_update.html:22 users/views/login.py:49
+#: users/views/login.py:117
 msgid "User auth from {}, go there change password"
 msgstr "用户认证源来自 {}, 请去相应系统修改密码"
 
@@ -6146,28 +6143,28 @@ msgstr "用户组授权资产"
 msgid "Email address invalid, please input again"
 msgstr "邮箱地址错误，重新输入"
 
-#: users/views/login.py:61
+#: users/views/login.py:63
 msgid "Send reset password message"
 msgstr "发送重置密码邮件"
 
-#: users/views/login.py:62
+#: users/views/login.py:64
 msgid "Send reset password mail success, login your mail box and follow it "
 msgstr ""
 "发送重置邮件成功, 请登录邮箱查看, 按照提示操作 (如果没收到,请等待3-5分钟)"
 
-#: users/views/login.py:75
+#: users/views/login.py:77
 msgid "Reset password success"
 msgstr "重置密码成功"
 
-#: users/views/login.py:76
+#: users/views/login.py:78
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
-#: users/views/login.py:100 users/views/login.py:110
+#: users/views/login.py:102 users/views/login.py:112
 msgid "Token invalid or expired"
 msgstr "Token错误或失效"
 
-#: users/views/login.py:158
+#: users/views/login.py:164
 msgid "First login"
 msgstr "首次登录"
 
@@ -6423,10 +6420,6 @@ msgstr "选择节点"
 msgid "Select admins"
 msgstr "选择管理员"
 
-#: xpack/plugins/cloud/forms.py:85
-msgid "Tips: The asset information is always covered"
-msgstr "提示：资产信息总是被覆盖"
-
 #: xpack/plugins/cloud/meta.py:9 xpack/plugins/cloud/views.py:27
 #: xpack/plugins/cloud/views.py:44 xpack/plugins/cloud/views.py:62
 #: xpack/plugins/cloud/views.py:78 xpack/plugins/cloud/views.py:92
@@ -6471,52 +6464,48 @@ msgstr "地域"
 msgid "Instances"
 msgstr "实例"
 
-#: xpack/plugins/cloud/models.py:136
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:69
-msgid "Covered always"
-msgstr "总是覆盖"
-
-#: xpack/plugins/cloud/models.py:142
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:104
+#: xpack/plugins/cloud/models.py:139
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:94
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:17
 msgid "Date last sync"
 msgstr "最后同步日期"
 
-#: xpack/plugins/cloud/models.py:153 xpack/plugins/cloud/models.py:210
+#: xpack/plugins/cloud/models.py:150 xpack/plugins/cloud/models.py:207
 msgid "Sync instance task"
 msgstr "同步实例任务"
 
-#: xpack/plugins/cloud/models.py:205
+#: xpack/plugins/cloud/models.py:202
 msgid "Succeed"
 msgstr "成功"
 
-#: xpack/plugins/cloud/models.py:220 xpack/plugins/cloud/models.py:275
+#: xpack/plugins/cloud/models.py:217 xpack/plugins/cloud/models.py:272
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:51
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:49
 msgid "Date sync"
 msgstr "同步日期"
 
-#: xpack/plugins/cloud/models.py:248
+#: xpack/plugins/cloud/models.py:245
 msgid "Unsync"
 msgstr "未同步"
 
-#: xpack/plugins/cloud/models.py:249 xpack/plugins/cloud/models.py:250
+#: xpack/plugins/cloud/models.py:246 xpack/plugins/cloud/models.py:247
 msgid "Synced"
 msgstr "已同步"
 
-#: xpack/plugins/cloud/models.py:251
+#: xpack/plugins/cloud/models.py:248
 msgid "Released"
 msgstr "已释放"
 
-#: xpack/plugins/cloud/models.py:256
+#: xpack/plugins/cloud/models.py:253
 msgid "Sync task"
 msgstr "同步任务"
 
-#: xpack/plugins/cloud/models.py:260
+#: xpack/plugins/cloud/models.py:257
 msgid "Sync instance task history"
 msgstr "同步实例任务历史"
 
-#: xpack/plugins/cloud/models.py:263
+#: xpack/plugins/cloud/models.py:260
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:114
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:45
 msgid "Instance"
 msgstr "实例"
@@ -6595,7 +6584,7 @@ msgstr "创建账户"
 msgid "Node & AdminUser"
 msgstr "节点 & 管理用户"
 
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:66
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:63
 msgid "Load failed"
 msgstr "加载失败"
 
@@ -6620,11 +6609,11 @@ msgstr "同步历史列表"
 msgid "Sync instance list"
 msgstr "同步实例列表"
 
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:145
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:135
 msgid "Run task manually"
 msgstr "手动执行任务"
 
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:188
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:178
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:102
 msgid "Sync success"
 msgstr "同步成功"
@@ -6661,7 +6650,7 @@ msgstr "执行次数"
 msgid "Instance count"
 msgstr "实例个数"
 
-#: xpack/plugins/cloud/utils.py:38
+#: xpack/plugins/cloud/utils.py:37
 msgid "Account unavailable"
 msgstr "账户无效"
 
@@ -6954,6 +6943,12 @@ msgstr "密码匣子"
 #: xpack/plugins/vault/views.py:39
 msgid "vault create"
 msgstr "创建"
+
+#~ msgid "Tips: The asset information is always covered"
+#~ msgstr "提示：资产信息总是被覆盖"
+
+#~ msgid "Covered always"
+#~ msgstr "总是覆盖"
 
 #~ msgid "* For security, do not change {}'s password"
 #~ msgstr "* 为了安全，不能修改 {} 的密码"
