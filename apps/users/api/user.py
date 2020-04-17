@@ -49,7 +49,12 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         if isinstance(users, User):
             users = [users]
         if current_org and current_org.is_real():
-            current_org.users.add(*users)
+            # current_org.users.add(*users)
+            # 如果在真实组织下创建用户，使用上面的语句会出现用户角色显示不稳定的问题
+            # 可能是current_org的users add操作是进程不安全的
+            # User Model 中的 remove 操作没有出现问题，暂时不做更改
+            for user in users:
+                user.related_user_orgs.add(current_org.id)
         self.send_created_signal(users)
 
     def get_permissions(self):
