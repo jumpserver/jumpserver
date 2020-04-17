@@ -109,17 +109,21 @@ class UserResetPasswordView(FormView):
         token = self.request.GET.get('token')
         user = User.validate_reset_password_token(token)
         if not user:
-            return self.get(self.request, errors=_('Token invalid or expired'))
+            error = _('Token invalid or expired')
+            form.add_error('new_password', error)
+            return self.form_invalid(form)
 
         if not user.can_update_password():
-            errors = _('User auth from {}, go there change password'.format(user.source))
-            return self.get(self.request, errors=errors)
+            error = _('User auth from {}, go there change password'.format(user.source))
+            form.add_error('new_password', error)
+            return self.form_invalid(form)
 
         password = form.cleaned_data['new_password']
         is_ok = check_password_rules(password)
         if not is_ok:
-            errors = _('* Your password does not meet the requirements')
-            return self.get(self.request, errors=errors)
+            error = _('* Your password does not meet the requirements')
+            form.add_error('new_password', error)
+            return self.form_invalid(form)
 
         user.reset_password(password)
         User.expired_reset_password_token(token)
