@@ -73,7 +73,7 @@ class Organization(models.Model):
         return org
 
     # @lazyproperty
-    # lazyproperty 导致用户列表中角色显示出现不问题的情况, 如果不加会导致数据库操作次数太多
+    # lazyproperty 导致用户列表中角色显示出现不稳定的情况, 如果不加会导致数据库操作次数太多
     def org_users(self):
         from users.models import User
         if self.is_real():
