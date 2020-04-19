@@ -67,6 +67,7 @@ OIDC_RP_PROVIDER_TOKEN_ENDPOINT = 'https://rddev2.fit2cloud.com/auth/realms/cmp/
 OIDC_RP_PROVIDER_JWKS_ENDPOINT = 'https://rddev2.fit2cloud.com/auth/realms/cmp/protocol/openid-connect/certs'
 OIDC_RP_PROVIDER_USERINFO_ENDPOINT = 'https://rddev2.fit2cloud.com/auth/realms/cmp/protocol/openid-connect/userinfo'
 OIDC_RP_PROVIDER_END_SESSION_ENDPOINT = 'https://rddev2.fit2cloud.com/auth/realms/cmp/protocol/openid-connect/logout'
+OIDC_RP_ID_TOKEN_MAX_AGE = 60
 
 OIDC_RP_CLIENT_ID = 'jumpserver'
 OIDC_RP_CLIENT_SECRET = '5302e5ed-0654-45f5-b3e7-3133f0d15fdb'
