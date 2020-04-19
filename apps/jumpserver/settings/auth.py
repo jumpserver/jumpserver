@@ -56,6 +56,20 @@ AUTH_OPENID_SHARE_SESSION = CONFIG.AUTH_OPENID_SHARE_SESSION
 AUTH_OPENID_LOGIN_URL = reverse_lazy("authentication:openid:openid-login")
 AUTH_OPENID_LOGIN_COMPLETE_URL = reverse_lazy("authentication:openid:openid-login-complete")
 
+# oidc rp
+AUTH_OIDC_RP = True
+OIDC_RP_LOGIN_URL_NAME = "authentication:oidc-rp:oidc_auth_request"
+OIDC_RP_LOGOUT_URL_NAME = "authentication:oidc-rp:oidc_end_session"
+
+OIDC_RP_PROVIDER_ENDPOINT = 'https://rddev2.fit2cloud.com/auth'
+OIDC_RP_PROVIDER_AUTHORIZATION_ENDPOINT = 'https://rddev2.fit2cloud.com/auth/realms/cmp/protocol/openid-connect/auth'
+OIDC_RP_PROVIDER_TOKEN_ENDPOINT = 'https://rddev2.fit2cloud.com/auth/realms/cmp/protocol/openid-connect/token'
+OIDC_RP_PROVIDER_JWKS_ENDPOINT = 'https://rddev2.fit2cloud.com/auth/realms/cmp/protocol/openid-connect/certs'
+OIDC_RP_PROVIDER_USERINFO_ENDPOINT = 'https://rddev2.fit2cloud.com/auth/realms/cmp/protocol/openid-connect/userinfo'
+OIDC_RP_PROVIDER_END_SESSION_ENDPOINT = 'https://rddev2.fit2cloud.com/auth/realms/cmp/protocol/openid-connect/logout'
+
+OIDC_RP_CLIENT_ID = 'jumpserver'
+OIDC_RP_CLIENT_SECRET = '5302e5ed-0654-45f5-b3e7-3133f0d15fdb'
 
 # Radius Auth
 AUTH_RADIUS = CONFIG.AUTH_RADIUS

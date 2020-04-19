@@ -282,6 +282,7 @@ class DynamicConfig:
 
     def LOGIN_URL(self):
         auth_openid = self.get('AUTH_OPENID')
+        auth_oidc_rp = self.get('AUTH_OIDC_RP')
         if auth_openid:
             return reverse_lazy("authentication:openid:openid-login")
         return self.get('LOGIN_URL')
@@ -290,6 +291,7 @@ class DynamicConfig:
         backends = [
             'authentication.backends.pubkey.PublicKeyAuthBackend',
             'django.contrib.auth.backends.ModelBackend',
+            'oidc_rp.backends.OIDCAuthBackend',
         ]
         if self.get('AUTH_LDAP'):
             backends.insert(0, 'authentication.backends.ldap.LDAPAuthorizationBackend')
