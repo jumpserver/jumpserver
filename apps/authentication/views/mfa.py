@@ -6,6 +6,9 @@ from django.views.generic.edit import FormView
 from .. import forms, errors, mixins
 from .utils import redirect_to_guard_view
 
+from common.utils import get_logger
+
+logger = get_logger(__name__)
 __all__ = ['UserLoginOtpView']
 
 
@@ -22,6 +25,7 @@ class UserLoginOtpView(mixins.AuthMixin, FormView):
         except errors.MFAFailedError as e:
             form.add_error('otp_code', e.msg)
             return super().form_invalid(form)
-        except:
+        except Exception as e:
+            logger.error(e)
             return redirect_to_guard_view()
 
