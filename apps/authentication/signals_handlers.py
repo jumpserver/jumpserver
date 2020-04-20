@@ -19,13 +19,6 @@ def on_user_logged_out(sender, request, user, **kwargs):
     query.update({
         'redirect_uri': settings.BASE_SITE_URL
     })
-    # oidc rp
-    if settings.AUTH_OIDC_RP:
-        end_session_endpoint = reverse(settings.OIDC_RP_LOGOUT_URL_NAME)
-        openid_logout_url = "%s?%s" % (end_session_endpoint, query.urlencode())
-        request.COOKIES['next'] = openid_logout_url
-        return
-
     # openid (keycloak)
     if settings.AUTH_OPENID and settings.AUTH_OPENID_SHARE_SESSION:
         client = new_client()
