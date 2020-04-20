@@ -133,7 +133,7 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
             user = self.check_user_auth_if_need()
             self.check_user_mfa_if_need(user)
             self.check_user_login_confirm_if_need(user)
-        except errors.CredentialError:
+        except (errors.CredentialError, errors.SessionEmptyError):
             return self.format_redirect_url(self.login_url)
         except errors.MFARequiredError:
             return self.format_redirect_url(self.login_otp_url)

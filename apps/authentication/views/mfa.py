@@ -22,4 +22,6 @@ class UserLoginOtpView(mixins.AuthMixin, FormView):
         except errors.MFAFailedError as e:
             form.add_error('otp_code', e.msg)
             return super().form_invalid(form)
+        except:
+            return redirect_to_guard_view()
 
