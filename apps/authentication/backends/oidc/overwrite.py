@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+
 from oidc_rp import backends as oidc_rp_backends
 from oidc_rp.models import OIDCUser
 
@@ -33,18 +34,16 @@ def overwrite_update_oidc_user_from_claims(oidc_user, claims):
 
 # Overwrite the oidc object to fit Jumpserver
 
-overwrite_infos = (
-    {
-        oidc_rp_backends: {
-            'create_oidc_user_from_claims': overwrite_create_oidc_user_from_claims,
-            'update_oidc_user_from_claims': overwrite_update_oidc_user_from_claims
-        }
+
+overwrite_infos = {
+    oidc_rp_backends: {
+        'create_oidc_user_from_claims': overwrite_create_oidc_user_from_claims,
+        'update_oidc_user_from_claims': overwrite_update_oidc_user_from_claims
     },
-)
+}
 
 
 def perform_overwrite():
-    for overwrite_info in overwrite_infos:
-        for obj, attrs in overwrite_info.items():
-            for old_attr, new_attr in attrs.items():
-                setattr(obj, old_attr, new_attr)
+    for overwrite_object, attrs in overwrite_infos.items():
+        for attr_name, attr_value in attrs.items():
+            setattr(overwrite_object, attr_name, attr_value)

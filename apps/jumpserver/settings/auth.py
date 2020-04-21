@@ -59,8 +59,8 @@ AUTH_OPENID_LOGIN_COMPLETE_URL = reverse_lazy("authentication:openid:openid-logi
 # oidc rp
 # jumpserver
 AUTH_OIDC_RP = CONFIG.AUTH_OIDC_RP
-OIDC_RP_LOGIN_URL_NAME = "authentication:oidc-rp:oidc_auth_request"
-OIDC_RP_LOGOUT_URL_NAME = "authentication:oidc-rp:oidc_end_session"
+OIDC_RP_LOGIN_URL_NAME = "authentication:oidc-rp:oidc-login"
+OIDC_RP_LOGOUT_URL_NAME = "authentication:oidc-rp:oidc-logout"
 # https://django-oidc-rp.readthedocs.io/en/stable/settings.html#required-settings
 OIDC_RP_CLIENT_ID = CONFIG.OIDC_RP_CLIENT_ID
 OIDC_RP_CLIENT_SECRET = CONFIG.OIDC_RP_CLIENT_SECRET

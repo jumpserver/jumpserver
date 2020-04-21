@@ -195,12 +195,7 @@ class UserLogoutView(TemplateView):
             return reverse(settings.OIDC_RP_LOGOUT_URL_NAME)
 
     def get(self, request, *args, **kwargs):
-        if settings.AUTH_OIDC_RP:
-            # oidc_rp 是在自身的end-session view中call的logout()
-            # 所以在这里不能call
-            pass
-        else:
-            auth_logout(request)
+        auth_logout(request)
 
         backend_logout_url = self.get_backend_logout_url()
         if backend_logout_url:
