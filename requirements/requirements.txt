@@ -98,3 +98,4 @@ ipython
 huaweicloud-sdk-python==1.0.21
 django-redis==4.11.0
 python-redis-lock==3.5.0
+django-oidc-rp==0.3.4
