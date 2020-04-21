@@ -3,9 +3,11 @@ from django.conf import settings
 from django.dispatch import receiver
 from django.contrib.auth.signals import user_logged_out
 from django_auth_ldap.backend import populate_user
+from django.db import transaction
 
-from common.utils import reverse
+from oidc_rp.signals import oidc_user_created
 from users.models import User
+from users.utils import construct_user_email
 from .backends.openid import new_client
 from .backends.openid.signals import (
     post_create_or_update_openid_user, post_openid_login_success
@@ -49,4 +51,24 @@ def on_ldap_create_user(sender, user, ldap_user, **kwargs):
             user.save()
 
 
+@receiver(oidc_user_created)
+def on_oidc_user_created(sender, request, oidc_user, **kwargs):
+    name = oidc_user.userinfo.get('name')
+    username = oidc_user.userinfo.get('preferred_username')
+    email = oidc_user.userinfo.get('email')
+    email = construct_user_email(username, email)
+    defaults = {
+        'name': name,
+        'username': username,
+        'email': email
+    }
+    if username not in ['admin']:
+        defaults['source'] = User.SOURCE_OPENID
 
+    oidc_user.user.delete()
+    user, created = User.objects.update_or_create(
+        defaults=defaults, username=username
+    )
+
+    oidc_user.user = user
+    oidc_user.user.save()
