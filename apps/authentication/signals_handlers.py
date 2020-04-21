@@ -3,11 +3,9 @@ from django.conf import settings
 from django.dispatch import receiver
 from django.contrib.auth.signals import user_logged_out
 from django_auth_ldap.backend import populate_user
-from django.db import transaction
 
 from oidc_rp.signals import oidc_user_created
 from users.models import User
-from users.utils import construct_user_email
 from .backends.openid import new_client
 from .backends.openid.signals import (
     post_create_or_update_openid_user, post_openid_login_success

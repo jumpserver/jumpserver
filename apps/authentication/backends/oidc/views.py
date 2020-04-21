@@ -1,13 +1,56 @@
 from django.conf import settings
 from django.http import HttpResponseRedirect, QueryDict
-from oidc_rp.conf import settings as oidc_rp_settings
-from oidc_rp.views import OIDCEndSessionView
+from django.urls import reverse
+from django.utils.crypto import get_random_string
+from django.utils.http import is_safe_url, urlencode
 
-__all__ = ['OverwriteOIDCEndSessionView']
+from oidc_rp.conf import settings as oidc_rp_settings
+from oidc_rp.views import OIDCEndSessionView, OIDCAuthRequestView
+
+__all__ = ['OverwriteOIDCAuthRequestView', 'OverwriteOIDCEndSessionView']
+
+
+class OverwriteOIDCAuthRequestView(OIDCAuthRequestView):
+    def get(self, request):
+        """ Processes GET requests. """
+        # Defines common parameters used to bootstrap the authentication request.
+        authentication_request_params = request.GET.dict()
+        authentication_request_params.update({
+            'scope': oidc_rp_settings.SCOPES,
+            'response_type': 'code',
+            'client_id': oidc_rp_settings.CLIENT_ID,
+            'redirect_uri': request.build_absolute_uri(
+                reverse(settings.OIDC_RP_LOGIN_CALLBACK_URL_NAME)
+            ),
+        })
+
+        # States should be used! They are recommended in order to maintain state between the
+        # authentication request and the callback.
+        if oidc_rp_settings.USE_STATE:
+            state = get_random_string(oidc_rp_settings.STATE_LENGTH)
+            authentication_request_params.update({'state': state})
+            request.session['oidc_auth_state'] = state
+
+        # Nonces should be used too! In that case the generated nonce is stored both in the
+        # authentication request parameters and in the user's session.
+        if oidc_rp_settings.USE_NONCE:
+            nonce = get_random_string(oidc_rp_settings.NONCE_LENGTH)
+            authentication_request_params.update({'nonce': nonce, })
+            request.session['oidc_auth_nonce'] = nonce
+
+        # Stores the "next" URL in the session if applicable.
+        next_url = request.GET.get('next')
+        request.session['oidc_auth_next_url'] = next_url \
+            if is_safe_url(url=next_url, allowed_hosts=(request.get_host(), )) else None
+
+        # Redirects the user to authorization endpoint.
+        query = urlencode(authentication_request_params)
+        redirect_url = '{url}?{query}'.format(
+            url=oidc_rp_settings.PROVIDER_AUTHORIZATION_ENDPOINT, query=query)
+        return HttpResponseRedirect(redirect_url)
 
 
 class OverwriteOIDCEndSessionView(OIDCEndSessionView):
-
     def post(self, request):
         """ Processes POST requests. """
         logout_url = settings.LOGOUT_REDIRECT_URL or '/'

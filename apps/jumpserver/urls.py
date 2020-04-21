@@ -1,7 +1,6 @@
 # ~*~ coding: utf-8 ~*~
 from __future__ import unicode_literals
 
-from oidc_rp import views as oidc_rp_views
 from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
@@ -43,9 +42,6 @@ app_view_patterns = [
     path('applications/', include('applications.urls.views_urls', namespace='applications')),
     path('tickets/', include('tickets.urls.views_urls', namespace='tickets')),
     re_path(r'flower/(?P<path>.*)', views.celery_flower_view, name='flower-view'),
-
-    # oidc rp callback
-    path('auth/oidc-rp/auth/cb/', oidc_rp_views.OIDCAuthCallbackView.as_view(), name='oidc_auth_callback'),
 ]
 
 

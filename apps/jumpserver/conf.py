@@ -310,7 +310,7 @@ class DynamicConfig:
             backends.insert(0, 'authentication.backends.openid.backends.OpenIDAuthorizationPasswordBackend')
             backends.insert(0, 'authentication.backends.openid.backends.OpenIDAuthorizationCodeBackend')
         if self.static_config.get('AUTH_OIDC_RP'):
-            backends.insert(0, 'oidc_rp.backends.OIDCAuthBackend')
+            backends.insert(0, 'authentication.backends.oidc.backends.OIDCAuthCodeBackend')
             backends.insert(0, 'authentication.backends.oidc.backends.OIDCAuthPasswordBackend',)
         if self.static_config.get('AUTH_RADIUS'):
             backends.insert(0, 'authentication.backends.radius.RadiusBackend')

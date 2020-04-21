@@ -60,6 +60,7 @@ AUTH_OPENID_LOGIN_COMPLETE_URL = reverse_lazy("authentication:openid:openid-logi
 # jumpserver
 AUTH_OIDC_RP = CONFIG.AUTH_OIDC_RP
 OIDC_RP_LOGIN_URL_NAME = "authentication:oidc-rp:oidc-login"
+OIDC_RP_LOGIN_CALLBACK_URL_NAME = "authentication:oidc-rp:oidc-callback"
 OIDC_RP_LOGOUT_URL_NAME = "authentication:oidc-rp:oidc-logout"
 # https://django-oidc-rp.readthedocs.io/en/stable/settings.html#required-settings
 OIDC_RP_CLIENT_ID = CONFIG.OIDC_RP_CLIENT_ID
@@ -71,7 +72,6 @@ OIDC_RP_PROVIDER_JWKS_ENDPOINT = CONFIG.OIDC_RP_PROVIDER_JWKS_ENDPOINT
 OIDC_RP_PROVIDER_USERINFO_ENDPOINT = CONFIG.OIDC_RP_PROVIDER_USERINFO_ENDPOINT
 OIDC_RP_PROVIDER_END_SESSION_ENDPOINT = CONFIG.OIDC_RP_PROVIDER_END_SESSION_ENDPOINT
 OIDC_RP_ID_TOKEN_MAX_AGE = CONFIG.OIDC_RP_ID_TOKEN_MAX_AGE
-OIDC_RP_USER_DETAILS_HANDLER = "authentication.backends.oidc.utils.user_details_handler"
 
 
 # Radius Auth
