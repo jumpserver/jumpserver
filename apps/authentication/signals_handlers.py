@@ -4,6 +4,7 @@ from django.dispatch import receiver
 from django.contrib.auth.signals import user_logged_out
 from django_auth_ldap.backend import populate_user
 
+from oidc_rp.signals import oidc_user_created
 from users.models import User
 from .backends.openid import new_client
 from .backends.openid.signals import (
@@ -14,20 +15,17 @@ from .signals import post_auth_success
 
 @receiver(user_logged_out)
 def on_user_logged_out(sender, request, user, **kwargs):
-    if not settings.AUTH_OPENID:
-        return
-    if not settings.AUTH_OPENID_SHARE_SESSION:
-        return
     query = QueryDict('', mutable=True)
     query.update({
         'redirect_uri': settings.BASE_SITE_URL
     })
-    client = new_client()
-    openid_logout_url = "%s?%s" % (
-        client.get_url_end_session_endpoint(),
-        query.urlencode()
-    )
-    request.COOKIES['next'] = openid_logout_url
+    # openid (keycloak)
+    if settings.AUTH_OPENID and settings.AUTH_OPENID_SHARE_SESSION:
+        client = new_client()
+        end_session_endpoint = client.get_url_end_session_endpoint()
+        openid_logout_url = "%s?%s" % (end_session_endpoint, query.urlencode())
+        request.COOKIES['next'] = openid_logout_url
+        return
 
 
 @receiver(post_create_or_update_openid_user)
@@ -51,4 +49,7 @@ def on_ldap_create_user(sender, user, ldap_user, **kwargs):
             user.save()
 
 
-
+@receiver(oidc_user_created)
+def on_oidc_user_created(sender, request, oidc_user, **kwargs):
+    oidc_user.user.source = User.SOURCE_OPENID
+    oidc_user.user.save()

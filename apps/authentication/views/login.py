@@ -61,6 +61,8 @@ class UserLoginView(mixins.AuthMixin, FormView):
             redirect_url = reverse("authentication:openid:openid-login")
         elif settings.AUTH_CAS:
             redirect_url = reverse(settings.CAS_LOGIN_URL_NAME)
+        elif settings.AUTH_OIDC_RP:
+            redirect_url = reverse(settings.OIDC_RP_LOGIN_URL_NAME)
 
         if redirect_url:
             query_string = request.GET.urlencode()
@@ -187,16 +189,22 @@ class UserLogoutView(TemplateView):
     def get_backend_logout_url():
         # if settings.AUTH_CAS:
         #     return settings.CAS_LOGOUT_URL_NAME
-        return None
+
+        # oidc rp
+        if settings.AUTH_OIDC_RP:
+            return reverse(settings.OIDC_RP_LOGOUT_URL_NAME)
 
     def get(self, request, *args, **kwargs):
         auth_logout(request)
+
         backend_logout_url = self.get_backend_logout_url()
         if backend_logout_url:
             return redirect(backend_logout_url)
+
         next_uri = request.COOKIES.get("next")
         if next_uri:
             return redirect(next_uri)
+
         response = super().get(request, *args, **kwargs)
         return response
 

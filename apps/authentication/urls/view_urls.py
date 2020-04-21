@@ -18,4 +18,5 @@ urlpatterns = [
     # openid
     path('openid/', include(('authentication.backends.openid.urls', 'authentication'), namespace='openid')),
     path('cas/', include(('authentication.backends.cas.urls', 'authentication'), namespace='cas')),
+    path('oidc-rp/', include(('authentication.backends.oidc.urls', 'authentication'), namespace='oidc-rp')),
 ]
