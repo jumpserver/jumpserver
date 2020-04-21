@@ -53,22 +53,5 @@ def on_ldap_create_user(sender, user, ldap_user, **kwargs):
 
 @receiver(oidc_user_created)
 def on_oidc_user_created(sender, request, oidc_user, **kwargs):
-    name = oidc_user.userinfo.get('name')
-    username = oidc_user.userinfo.get('preferred_username')
-    email = oidc_user.userinfo.get('email')
-    email = construct_user_email(username, email)
-    defaults = {
-        'name': name,
-        'username': username,
-        'email': email
-    }
-    if username not in ['admin']:
-        defaults['source'] = User.SOURCE_OPENID
-
-    oidc_user.user.delete()
-    user, created = User.objects.update_or_create(
-        defaults=defaults, username=username
-    )
-
-    oidc_user.user = user
+    oidc_user.user.source = User.SOURCE_OPENID
     oidc_user.user.save()

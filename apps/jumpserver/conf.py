@@ -301,7 +301,6 @@ class DynamicConfig:
         backends = [
             'authentication.backends.pubkey.PublicKeyAuthBackend',
             'django.contrib.auth.backends.ModelBackend',
-            'oidc_rp.backends.OIDCAuthBackend',
         ]
         if self.get('AUTH_LDAP'):
             backends.insert(0, 'authentication.backends.ldap.LDAPAuthorizationBackend')
@@ -310,6 +309,9 @@ class DynamicConfig:
         if self.static_config.get('AUTH_OPENID'):
             backends.insert(0, 'authentication.backends.openid.backends.OpenIDAuthorizationPasswordBackend')
             backends.insert(0, 'authentication.backends.openid.backends.OpenIDAuthorizationCodeBackend')
+        if self.static_config.get('AUTH_OIDC_RP'):
+            backends.insert(0, 'oidc_rp.backends.OIDCAuthBackend')
+            backends.insert(0, 'authentication.backends.oidc.backends.OIDCAuthPasswordBackend',)
         if self.static_config.get('AUTH_RADIUS'):
             backends.insert(0, 'authentication.backends.radius.RadiusBackend')
         return backends
