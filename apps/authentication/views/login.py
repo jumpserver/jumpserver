@@ -61,8 +61,6 @@ class UserLoginView(mixins.AuthMixin, FormView):
             redirect_url = reverse("authentication:openid:openid-login")
         elif settings.AUTH_CAS:
             redirect_url = reverse(settings.CAS_LOGIN_URL_NAME)
-        elif settings.AUTH_OIDC_RP:
-            redirect_url = reverse(settings.OIDC_RP_LOGIN_URL_NAME)
 
         if redirect_url:
             query_string = request.GET.urlencode()
@@ -113,7 +111,6 @@ class UserLoginView(mixins.AuthMixin, FormView):
         context = {
             'demo_mode': os.environ.get("DEMO_MODE"),
             'AUTH_OPENID': settings.AUTH_OPENID,
-            'AUTH_OIDC_RP': settings.AUTH_OIDC_RP,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
