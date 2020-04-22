@@ -143,18 +143,6 @@ class Config(dict):
         'AUTH_OPENID_IGNORE_SSL_VERIFICATION': True,
         'AUTH_OPENID_SHARE_SESSION': True,
 
-
-        'AUTH_OIDC_RP': False,
-        'OIDC_RP_CLIENT_ID': 'client-id',
-        'OIDC_RP_CLIENT_SECRET': 'client-secret',
-        'OIDC_RP_PROVIDER_ENDPOINT': 'https://op-endpoint.com',
-        'OIDC_RP_PROVIDER_AUTHORIZATION_ENDPOINT': 'https://op-endpoint.com/authorize',
-        'OIDC_RP_PROVIDER_TOKEN_ENDPOINT': 'https://op-endpoint.com/token',
-        'OIDC_RP_PROVIDER_JWKS_ENDPOINT': 'https://op-endpoint.com/jwk',
-        'OIDC_RP_PROVIDER_USERINFO_ENDPOINT': 'https://op-endpoint.com/userinfo',
-        'OIDC_RP_PROVIDER_END_SESSION_ENDPOINT': 'https://op-endpoint.com/logout',
-        'OIDC_RP_ID_TOKEN_MAX_AGE': 60,
-
         'AUTH_RADIUS': False,
         'RADIUS_SERVER': 'localhost',
         'RADIUS_PORT': 1812,
@@ -307,9 +295,6 @@ class DynamicConfig:
         if self.static_config.get('AUTH_OPENID'):
             backends.insert(0, 'authentication.backends.openid.backends.OpenIDAuthorizationPasswordBackend')
             backends.insert(0, 'authentication.backends.openid.backends.OpenIDAuthorizationCodeBackend')
-        if self.static_config.get('AUTH_OIDC_RP'):
-            backends.insert(0, 'authentication.backends.oidc.backends.OIDCAuthCodeBackend')
-            backends.insert(0, 'authentication.backends.oidc.backends.OIDCAuthPasswordBackend',)
         if self.static_config.get('AUTH_RADIUS'):
             backends.insert(0, 'authentication.backends.radius.RadiusBackend')
         return backends

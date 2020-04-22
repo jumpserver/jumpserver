@@ -4,7 +4,6 @@ from django.dispatch import receiver
 from django.contrib.auth.signals import user_logged_out
 from django_auth_ldap.backend import populate_user
 
-from oidc_rp.signals import oidc_user_created
 from users.models import User
 from .backends.openid import new_client
 from .backends.openid.signals import (
@@ -47,9 +46,3 @@ def on_ldap_create_user(sender, user, ldap_user, **kwargs):
         if not exists:
             user.source = user.SOURCE_LDAP
             user.save()
-
-
-@receiver(oidc_user_created)
-def on_oidc_user_created(sender, request, oidc_user, **kwargs):
-    oidc_user.user.source = User.SOURCE_OPENID
-    oidc_user.user.save()
