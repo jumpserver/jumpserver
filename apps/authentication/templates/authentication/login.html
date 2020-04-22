@@ -52,14 +52,21 @@
             </div>
         </div>
 
-        {% if AUTH_OPENID %}
+        {% if AUTH_OPENID or AUTH_OIDC_RP %}
             <div class="hr-line-dashed"></div>
             <p class="text-muted text-center">{% trans "More login options" %}</p>
             <div>
+                {% if AUTH_OIDC_RP %}
+                    <button type="button" class="btn btn-default btn-sm btn-block" onclick="location.href='{% url 'authentication:oidc-rp:oidc-login' %}'">
+                        <i class="fa fa-openid"></i>
+                        {% trans 'OpenID' %}
+                    </button>
+                {% elif AUTH_OPENID %}
                 <button type="button" class="btn btn-default btn-sm btn-block" onclick="location.href='{% url 'authentication:openid:openid-login' %}'">
                     <i class="fa fa-openid"></i>
                     {% trans 'Keycloak' %}
                 </button>
+                {% endif %}
             </div>
         {% endif %}
 
