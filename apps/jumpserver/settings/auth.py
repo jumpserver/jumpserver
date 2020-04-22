@@ -59,6 +59,9 @@ AUTH_OPENID_LOGIN_COMPLETE_URL = reverse_lazy("authentication:openid:openid-logi
 # oidc rp
 # jumpserver
 AUTH_OIDC_RP = CONFIG.AUTH_OIDC_RP
+if AUTH_OIDC_RP:
+    # 优先使用AUTH_OIDC_RP
+    AUTH_OPENID = False
 OIDC_RP_LOGIN_URL_NAME = "authentication:oidc-rp:oidc-login"
 OIDC_RP_LOGIN_CALLBACK_URL_NAME = "authentication:oidc-rp:oidc-callback"
 OIDC_RP_LOGOUT_URL_NAME = "authentication:oidc-rp:oidc-logout"

@@ -326,7 +326,7 @@ def get_source_choices():
     ]
     if settings.AUTH_LDAP:
         choices.append((User.SOURCE_LDAP, choices_all[User.SOURCE_LDAP]))
-    if settings.AUTH_OPENID:
+    if settings.AUTH_OPENID or settings.AUTH_OIDC_RP:
         choices.append((User.SOURCE_OPENID, choices_all[User.SOURCE_OPENID]))
     if settings.AUTH_RADIUS:
         choices.append((User.SOURCE_RADIUS, choices_all[User.SOURCE_RADIUS]))
