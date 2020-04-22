@@ -46,8 +46,14 @@ class OIDCAuthCodeBackend(OIDCAuthBackend):
             ),
         }
 
+        import base64
+        client_id_secret = "{}: {}".format(oidc_rp_settings.CLIENT_ID, oidc_rp_settings.CLIENT_SECRET)
+        client_id_secret_base64 = base64.b64encode(client_id_secret.encode('utf-8'))
+        headers = {'authorization': "Basic {}".format(client_id_secret_base64)}
+        print('>>> request headers: {}'.format(headers))
+
         # Calls the token endpoint.
-        token_response = requests.post(oidc_rp_settings.PROVIDER_TOKEN_ENDPOINT, data=token_payload)
+        token_response = requests.post(oidc_rp_settings.PROVIDER_TOKEN_ENDPOINT, data=token_payload, headers=headers)
         token_response.raise_for_status()
         token_response_data = token_response.json()
 
