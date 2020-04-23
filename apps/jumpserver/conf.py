@@ -14,9 +14,10 @@ import types
 import errno
 import json
 import yaml
+from urllib.parse import urlparse
 from importlib import import_module
 from django.urls import reverse_lazy
-from .utils import build_absolute_uri, is_absolute_uri
+from .utils import build_absolute_uri
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
@@ -274,13 +275,16 @@ class Config(dict):
         if not self.AUTH_OPENID:
             return
 
-        provider_endpoint = self.AUTH_OPENID_PROVIDER_ENDPOINT
-        configs = list(self.items())
-        for key, value in configs:
+        base = self.AUTH_OPENID_PROVIDER_ENDPOINT
+        config = list(self.items())
+        for key, value in config:
             result = re.match(r'^AUTH_OPENID_PROVIDER_.*_ENDPOINT$', key)
             if result is None:
                 continue
-            value = build_absolute_uri(provider_endpoint, value)
+            if value is None:
+                # None 在 url 中有特殊含义 (比如对于: end_session_endpoint)
+                continue
+            value = build_absolute_uri(base, value)
             self[key] = value
 
     def compatible(self):
@@ -389,7 +393,8 @@ class DynamicConfig:
         if self.static_config.get('AUTH_CAS'):
             backends.insert(0, 'authentication.backends.cas.CASBackend')
         if self.static_config.get('AUTH_OPENID'):
-            pass
+            backends.insert(0, 'jms_oidc_rp.backends.OIDCAuthCodeBackend')
+            backends.insert(0, 'jms_oidc_rp.backends.OIDCAuthPasswordBackend')
         if self.static_config.get('AUTH_RADIUS'):
             backends.insert(0, 'authentication.backends.radius.RadiusBackend')
         return backends
