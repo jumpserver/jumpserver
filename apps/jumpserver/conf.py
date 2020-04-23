@@ -136,14 +136,13 @@ class Config(dict):
         'AUTH_LDAP_USER_LOGIN_ONLY_IN_USERS': False,
         'AUTH_LDAP_OPTIONS_OPT_REFERRALS': -1,
 
-        # ----------------------------------------------------------------------
         # OpenID 配置参数
-        # ----------------------------------------------------------------------
         # OpenID 公有配置参数 (version <= 1.5.8 或 version >= 1.5.8)
         'AUTH_OPENID': False,
         'AUTH_OPENID_CLIENT_ID': 'client-id',
         'AUTH_OPENID_CLIENT_SECRET': 'client-secret',
         'AUTH_OPENID_SHARE_SESSION': True,
+        'AUTH_OPENID_IGNORE_SSL_VERIFICATION': True,
         # OpenID 新配置参数 (version >= 1.5.8)
         'AUTH_OPENID_PROVIDER_ENDPOINT': 'https://op-example.com/',
         'AUTH_OPENID_PROVIDER_AUTHORIZATION_ENDPOINT': 'https://op-example.com/authorize',
@@ -156,13 +155,10 @@ class Config(dict):
         'AUTH_OPENID_SCOPES': 'openid email',
         'AUTH_OPENID_ID_TOKEN_MAX_AGE': 60,
         'AUTH_OPENID_ID_TOKEN_INCLUDE_USERINFO': True,
-        'AUTH_OPENID_PROVIDER_USE_SSL': True,
         # OpenID 旧配置参数 (version <= 1.5.8 (discarded))
         'BASE_SITE_URL': 'http://localhost:8080',
         'AUTH_OPENID_SERVER_URL': 'http://openid',
         'AUTH_OPENID_REALM_NAME': None,
-        'AUTH_OPENID_IGNORE_SSL_VERIFICATION': True,
-        # ----------------------------------------------------------------------
 
         'AUTH_RADIUS': False,
         'RADIUS_SERVER': 'localhost',
@@ -243,10 +239,6 @@ class Config(dict):
 
         compatible_keycloak_config = [
             (
-                'AUTH_OPENID_PROVIDER_USE_SSL',
-                not self.AUTH_OPENID_IGNORE_SSL_VERIFICATION
-            ),
-            (
                 'AUTH_OPENID_PROVIDER_ENDPOINT',
                 self.AUTH_OPENID_SERVER_URL
             ),
@@ -285,7 +277,7 @@ class Config(dict):
         provider_endpoint = self.AUTH_OPENID_PROVIDER_ENDPOINT
         configs = list(self.items())
         for key, value in configs:
-            result = re.match(r'^AUTH_OPENID_PROVIDER_.*_ENDPOINTS$', key)
+            result = re.match(r'^AUTH_OPENID_PROVIDER_.*_ENDPOINT$', key)
             if result is None:
                 continue
             value = build_absolute_uri(provider_endpoint, value)
@@ -397,8 +389,7 @@ class DynamicConfig:
         if self.static_config.get('AUTH_CAS'):
             backends.insert(0, 'authentication.backends.cas.CASBackend')
         if self.static_config.get('AUTH_OPENID'):
-            backends.insert(0, 'authentication.backends.openid.backends.OpenIDAuthorizationPasswordBackend')
-            backends.insert(0, 'authentication.backends.openid.backends.OpenIDAuthorizationCodeBackend')
+            pass
         if self.static_config.get('AUTH_RADIUS'):
             backends.insert(0, 'authentication.backends.radius.RadiusBackend')
         return backends

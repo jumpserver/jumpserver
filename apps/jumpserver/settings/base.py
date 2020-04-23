@@ -75,7 +75,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'authentication.backends.openid.middleware.OpenIDAuthenticationMiddleware',
     'django_cas_ng.middleware.CASMiddleware',
     'jumpserver.middleware.TimezoneMiddleware',
     'jumpserver.middleware.DemoMiddleware',

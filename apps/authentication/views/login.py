@@ -58,7 +58,7 @@ class UserLoginView(mixins.AuthMixin, FormView):
         if self.request.GET.get("admin", 0):
             return None
         if settings.AUTH_OPENID:
-            redirect_url = reverse("authentication:openid:openid-login")
+            redirect_url = reverse("authentication:oidc:login")
         elif settings.AUTH_CAS:
             redirect_url = reverse(settings.CAS_LOGIN_URL_NAME)
 
