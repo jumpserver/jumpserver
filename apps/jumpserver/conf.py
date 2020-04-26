@@ -14,10 +14,9 @@ import types
 import errno
 import json
 import yaml
-from urllib.parse import urlparse
 from importlib import import_module
 from django.urls import reverse_lazy
-from .utils import build_absolute_uri
+from urllib.parse import urljoin, urlparse
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
@@ -37,6 +36,38 @@ def import_string(dotted_path):
         raise ImportError('Module "%s" does not define a "%s" attribute/class' % (
             module_path, class_name)
         ) from err
+
+
+def is_absolute_uri(uri):
+    """ 判断一个uri是否是绝对地址 """
+    if not isinstance(uri, str):
+        return False
+
+    result = re.match(r'^http[s]?://.*', uri)
+    if result is None:
+        return False
+
+    return True
+
+
+def build_absolute_uri(base, uri):
+    """ 构建绝对uri地址 """
+    if uri is None:
+        return base
+
+    if isinstance(uri, int):
+        uri = str(uri)
+
+    if not isinstance(uri, str):
+        return base
+
+    if is_absolute_uri(uri):
+        return uri
+
+    parsed_base = urlparse(base)
+    url = "{}://{}".format(parsed_base.scheme, parsed_base.netloc)
+    path = '{}/{}/'.format(parsed_base.path.strip('/'), uri.strip('/'))
+    return urljoin(url, path)
 
 
 class DoesNotExist(Exception):
