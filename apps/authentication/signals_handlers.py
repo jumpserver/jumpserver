@@ -1,13 +1,10 @@
 from django.dispatch import receiver
-from django_auth_ldap.backend import populate_user
 
-from users.models import User
+from jms_oidc_rp.signals import oidc_user_login_success
+
+from .signals import post_auth_success
 
 
-@receiver(populate_user)
-def on_ldap_create_user(sender, user, ldap_user, **kwargs):
-    if user and user.username not in ['admin']:
-        exists = User.objects.filter(username=user.username).exists()
-        if not exists:
-            user.source = user.SOURCE_LDAP
-            user.save()
+@oidc_user_login_success
+def on_oidc_user_login_success(sender, request, user, **kwargs):
+    post_auth_success.send(sender, user=user, request=request)
