@@ -10,6 +10,16 @@
     </li>
 {% endif %}
 
+{# 在这新增 #}
+<li id="11111111111">
+    <a href="#">
+        <i class="fa fa-group" style="width: 14px"></i> <span class="nav-label">{% trans 'Users' %}</span><span class="fa arrow"></span>
+    </a>
+    <ul class="nav nav-second-level active">
+        <li id="user"><a href="{% url 'users:user-list' %}">{% trans 'User list' %}</a></li>
+        <li id="user-group"><a href="{% url 'users:user-group-list' %}">{% trans 'User group' %}</a></li>
+    </ul>
+</li>
 {# Users #}
 {% if request.user.can_admin_current_org %}
     <li id="users">
@@ -20,7 +30,7 @@
             <li id="user"><a href="{% url 'users:user-list' %}">{% trans 'User list' %}</a></li>
             <li id="user-group"><a href="{% url 'users:user-group-list' %}">{% trans 'User group' %}</a></li>
         </ul>
-    </li>
+    </>
 {% endif %}
 
 {# User info #}
