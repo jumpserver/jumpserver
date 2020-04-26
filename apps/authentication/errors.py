@@ -171,7 +171,7 @@ class MFARequiredError(NeedMoreInfoError):
             'error': self.error,
             'msg': self.msg,
             'data': {
-                'choices': ['otp'],
+                'choices': ['code'],
                 'url': reverse('api-auth:mfa-challenge')
             }
         }

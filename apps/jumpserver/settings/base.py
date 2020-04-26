@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'authentication.apps.AuthenticationConfig',  # authentication
     'applications.apps.ApplicationsConfig',
     'tickets.apps.TicketsConfig',
+    'jms_oidc_rp',
     'rest_framework',
     'rest_framework_swagger',
     'drf_yasg',
@@ -56,7 +57,6 @@ INSTALLED_APPS = [
     'django_filters',
     'bootstrap3',
     'captcha',
-    'oidc_rp',
     'django_celery_beat',
     'django.contrib.auth',
     'django.contrib.admin',
@@ -76,13 +76,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'authentication.backends.openid.middleware.OpenIDAuthenticationMiddleware',
+    'jms_oidc_rp.middleware.OIDCRefreshIDTokenMiddleware',
     'django_cas_ng.middleware.CASMiddleware',
     'jumpserver.middleware.TimezoneMiddleware',
     'jumpserver.middleware.DemoMiddleware',
     'jumpserver.middleware.RequestMiddleware',
     'orgs.middleware.OrgMiddleware',
-    'oidc_rp.middleware.OIDCRefreshIDTokenMiddleware',
 ]
 
 
@@ -105,7 +104,7 @@ TEMPLATES = [
                 'django.template.context_processors.media',
                 'jumpserver.context_processor.jumpserver_processor',
                 'orgs.context_processor.org_processor',
-                'oidc_rp.context_processors.oidc',
+                'jms_oidc_rp.context_processors.oidc',
             ],
         },
     },
