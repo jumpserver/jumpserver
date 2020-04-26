@@ -185,21 +185,18 @@ class UserLogoutView(TemplateView):
 
     @staticmethod
     def get_backend_logout_url():
+        if settings.AUTH_OPENID:
+            return settings.AUTH_OPENID_AUTH_LOGOUT_URL_NAME
         # if settings.AUTH_CAS:
         #     return settings.CAS_LOGOUT_URL_NAME
         return None
 
     def get(self, request, *args, **kwargs):
-        auth_logout(request)
-
         backend_logout_url = self.get_backend_logout_url()
         if backend_logout_url:
             return redirect(backend_logout_url)
 
-        next_uri = request.COOKIES.get("next")
-        if next_uri:
-            return redirect(next_uri)
-
+        auth_logout(request)
         response = super().get(request, *args, **kwargs)
         return response
 
