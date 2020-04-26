@@ -36,3 +36,10 @@ xpack
 logs/*
 ### Vagrant ###
 .vagrant/
+
+###vscode
+.vscode
+
+
+### test
+test.py
