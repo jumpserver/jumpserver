@@ -427,8 +427,8 @@ class DynamicConfig:
         if self.static_config.get('AUTH_CAS'):
             backends.insert(0, 'authentication.backends.cas.CASBackend')
         if self.static_config.get('AUTH_OPENID'):
-            backends.insert(0, 'jms_oidc_rp.backends.OIDCAuthCodeBackend')
             backends.insert(0, 'jms_oidc_rp.backends.OIDCAuthPasswordBackend')
+            backends.insert(0, 'jms_oidc_rp.backends.OIDCAuthCodeBackend')
         if self.static_config.get('AUTH_RADIUS'):
             backends.insert(0, 'authentication.backends.radius.RadiusBackend')
         return backends

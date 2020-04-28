@@ -56,9 +56,18 @@ def on_ldap_create_user(sender, user, ldap_user, **kwargs):
 @receiver(openid_create_or_update_user)
 def on_openid_create_or_update_user(sender, request, user, created, name, username, email, **kwargs):
     if created:
+        logger.debug(
+            "Receive OpenID user created signal: {}, "
+            "Set user source is: {}".format(user, User.SOURCE_OPENID)
+        )
         user.source = User.SOURCE_OPENID
         user.save()
     elif not created and settings.AUTH_OPENID_ALWAYS_UPDATE_USER:
+        logger.debug(
+            "Receive OpenID user updated signal: {}, "
+            "Update user info: {}"
+            "".format(user, "name: {}|username: {}|email: {}".format(name, username, email))
+        )
         user.name = name
         user.username = username
         user.email = email
