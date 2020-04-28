@@ -66,9 +66,9 @@ AUTH_OPENID_IGNORE_SSL_VERIFICATION = CONFIG.AUTH_OPENID_IGNORE_SSL_VERIFICATION
 AUTH_OPENID_USE_STATE = CONFIG.AUTH_OPENID_USE_STATE
 AUTH_OPENID_USE_NONCE = CONFIG.AUTH_OPENID_USE_NONCE
 AUTH_OPENID_ALWAYS_UPDATE_USER = CONFIG.AUTH_OPENID_ALWAYS_UPDATE_USER
-AUTH_OPENID_AUTH_LOGIN_URL_NAME = 'authentication:oidc:login'
-AUTH_OPENID_AUTH_LOGIN_CALLBACK_URL_NAME = 'authentication:oidc:login-callback'
-AUTH_OPENID_AUTH_LOGOUT_URL_NAME = 'authentication:oidc:logout'
+AUTH_OPENID_AUTH_LOGIN_URL_NAME = 'authentication:openid:login'
+AUTH_OPENID_AUTH_LOGIN_CALLBACK_URL_NAME = 'authentication:openid:login-callback'
+AUTH_OPENID_AUTH_LOGOUT_URL_NAME = 'authentication:openid:logout'
 # ==============================================================================
 
 # Radius Auth
