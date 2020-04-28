@@ -7,11 +7,9 @@ from django_auth_ldap.backend import populate_user
 from django.conf import settings
 from django_cas_ng.signals import cas_user_authenticated
 
-from jms_oidc_rp.signals import oidc_user_created, oidc_user_updated
-from jms_oidc_rp.backends import get_userinfo_from_claims
+from jms_oidc_rp.signals import openid_user_create_or_update
 
 from common.utils import get_logger
-from .utils import construct_user_email
 from .signals import post_user_create
 from .models import User
 
@@ -55,19 +53,15 @@ def on_ldap_create_user(sender, user, ldap_user, **kwargs):
             user.save()
 
 
-@receiver(oidc_user_created)
-def on_oidc_user_created(sender, request, oidc_user, **kwargs):
-    oidc_user.user.source = User.SOURCE_OPENID
-    oidc_user.user.save()
-
-
-@receiver(oidc_user_updated)
-def on_oidc_user_updated(sender, request, oidc_user, **kwargs):
-    if not settings.AUTH_OPENID_ALWAYS_UPDATE_USER_INFORMATION:
+@receiver(openid_user_create_or_update)
+def on_openid_user_create_or_update(sender, request, user, created, name, username, email):
+    if created:
+        user.source = User.SOURCE_OPENID
+        user.save()
         return
-    name, username, email = get_userinfo_from_claims(oidc_user.userinfo)
-    email = construct_user_email(username, email)
-    oidc_user.user.name = name
-    oidc_user.user.username = username
-    oidc_user.user.email = email
-    oidc_user.user.save()
+
+    if not created and settings.AUTH_OPENID_ALWAYS_UPDATE_USER:
+        user.name = name
+        user.username = username
+        user.email = email
+        user.save()
