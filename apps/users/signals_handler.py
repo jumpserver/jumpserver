@@ -7,7 +7,7 @@ from django_auth_ldap.backend import populate_user
 from django.conf import settings
 from django_cas_ng.signals import cas_user_authenticated
 
-from jms_oidc_rp.signals import openid_user_create_or_update
+from jms_oidc_rp.signals import openid_create_or_update_user
 
 from common.utils import get_logger
 from .signals import post_user_create
@@ -53,14 +53,12 @@ def on_ldap_create_user(sender, user, ldap_user, **kwargs):
             user.save()
 
 
-@receiver(openid_user_create_or_update)
-def on_openid_user_create_or_update(sender, request, user, created, name, username, email, **kwargs):
+@receiver(openid_create_or_update_user)
+def on_openid_create_or_update_user(sender, request, user, created, name, username, email, **kwargs):
     if created:
         user.source = User.SOURCE_OPENID
         user.save()
-        return
-
-    if not created and settings.AUTH_OPENID_ALWAYS_UPDATE_USER:
+    elif not created and settings.AUTH_OPENID_ALWAYS_UPDATE_USER:
         user.name = name
         user.username = username
         user.email = email
