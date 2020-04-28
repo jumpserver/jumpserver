@@ -54,7 +54,7 @@ def on_ldap_create_user(sender, user, ldap_user, **kwargs):
 
 
 @receiver(openid_user_create_or_update)
-def on_openid_user_create_or_update(sender, request, user, created, name, username, email):
+def on_openid_user_create_or_update(sender, request, user, created, name, username, email, **kwargs):
     if created:
         user.source = User.SOURCE_OPENID
         user.save()
