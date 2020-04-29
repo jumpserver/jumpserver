@@ -17,5 +17,5 @@ urlpatterns = [
 
     # openid
     path('cas/', include(('authentication.backends.cas.urls', 'authentication'), namespace='cas')),
-    path('oidc/', include(('jms_oidc_rp.urls', 'authentication'), namespace='oidc')),
+    path('openid/', include(('jms_oidc_rp.urls', 'authentication'), namespace='openid')),
 ]

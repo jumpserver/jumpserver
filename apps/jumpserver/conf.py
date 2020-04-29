@@ -184,15 +184,12 @@ class Config(dict):
         'AUTH_OPENID_PROVIDER_END_SESSION_ENDPOINT': 'https://op-example.com/logout',
         'AUTH_OPENID_PROVIDER_SIGNATURE_ALG': 'HS256',
         'AUTH_OPENID_PROVIDER_SIGNATURE_KEY': None,
-        'AUTH_OPENID_PROVIDER_CLAIMS_NAME': None,
-        'AUTH_OPENID_PROVIDER_CLAIMS_USERNAME': None,
-        'AUTH_OPENID_PROVIDER_CLAIMS_EMAIL': None,
         'AUTH_OPENID_SCOPES': 'openid profile email',
         'AUTH_OPENID_ID_TOKEN_MAX_AGE': 60,
-        'AUTH_OPENID_ID_TOKEN_INCLUDE_USERINFO': True,
+        'AUTH_OPENID_ID_TOKEN_INCLUDE_CLAIMS': True,
         'AUTH_OPENID_USE_STATE': True,
         'AUTH_OPENID_USE_NONCE': True,
-        'AUTH_OPENID_ALWAYS_UPDATE_USER_INFORMATION': True,
+        'AUTH_OPENID_ALWAYS_UPDATE_USER': True,
         # OpenID 旧配置参数 (version <= 1.5.8 (discarded))
         'BASE_SITE_URL': 'http://localhost:8080',
         'AUTH_OPENID_SERVER_URL': 'http://openid',
@@ -430,8 +427,8 @@ class DynamicConfig:
         if self.static_config.get('AUTH_CAS'):
             backends.insert(0, 'authentication.backends.cas.CASBackend')
         if self.static_config.get('AUTH_OPENID'):
-            backends.insert(0, 'jms_oidc_rp.backends.OIDCAuthCodeBackend')
             backends.insert(0, 'jms_oidc_rp.backends.OIDCAuthPasswordBackend')
+            backends.insert(0, 'jms_oidc_rp.backends.OIDCAuthCodeBackend')
         if self.static_config.get('AUTH_RADIUS'):
             backends.insert(0, 'authentication.backends.radius.RadiusBackend')
         return backends
