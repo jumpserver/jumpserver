@@ -9,6 +9,7 @@ from rest_framework.views import Response, APIView
 from django.conf import settings
 from django.core.mail import send_mail, get_connection
 from django.utils.translation import ugettext_lazy as _
+from rest_framework import serializers
 
 from .utils import (
     LDAPServerUtil, LDAPCacheUtil, LDAPImportUtil, LDAPSyncUtil,
@@ -276,45 +277,11 @@ class PublicSettingApi(generics.RetrieveAPIView):
 
 class SettingsApi(generics.RetrieveUpdateAPIView):
     serializer_class = SettingsSerializer
-    BASIC_CATEGORY = ['SITE_URL', 'USER_GUIDE_URL', 'EMAIL_SUBJECT_PREFIX']
-
-    EMAIL_CATEGORY = ['EMAIL_HOST', 'EMAIL_PORT', 'EMAIL_HOST_USER',
-                      'EMAIL_HOST_PASSWORD', 'EMAIL_FROM', 'EMAIL_RECIPIENT',
-                      'EMAIL_USE_SSL', 'EMAIL_USE_TLS']
-
-    EMAIL_CONTENT_CATEGORY = ['EMAIL_CUSTOM_USER_CREATED_SUBJECT', 'EMAIL_CUSTOM_USER_CREATED_HONORIFIC',
-                              'EMAIL_CUSTOM_USER_CREATED_BODY', 'EMAIL_CUSTOM_USER_CREATED_SIGNATURE', ]
-
-    LDAP_CATEGORY = ['AUTH_LDAP_SERVER_URI', 'AUTH_LDAP_BIND_DN',
-                     'AUTH_LDAP_BIND_PASSWORD', 'AUTH_LDAP_SEARCH_OU',
-                     'AUTH_LDAP_SEARCH_FILTER', 'AUTH_LDAP_USER_ATTR_MAP',
-                     'AUTH_LDAP']
-
-    TERMINAL_CATEGORY = ['TERMINAL_PASSWORD_AUTH', 'TERMINAL_PUBLIC_KEY_AUTH',
-                         'TERMINAL_HEARTBEAT_INTERVAL', 'TERMINAL_ASSET_LIST_SORT_BY',
-                         'TERMINAL_ASSET_LIST_PAGE_SIZE', 'TERMINAL_SESSION_KEEP_DURATION',
-                         'TERMINAL_TELNET_REGEX']
-
-    SECURITY_CATEGORY = ['SECURITY_MFA_AUTH', 'SECURITY_COMMAND_EXECUTION',
-                         'SECURITY_SERVICE_ACCOUNT_REGISTRATION', 'SECURITY_LOGIN_LIMIT_COUNT',
-                         'SECURITY_LOGIN_LIMIT_TIME', 'SECURITY_MAX_IDLE_TIME',
-                         'SECURITY_PASSWORD_EXPIRATION_TIME', 'SECURITY_PASSWORD_MIN_LENGTH',
-                         'SECURITY_PASSWORD_UPPER_CASE', 'SECURITY_PASSWORD_LOWER_CASE',
-                         'SECURITY_PASSWORD_NUMBER', 'SECURITY_PASSWORD_SPECIAL_CHAR']
-
-    SETTING_CATEGORIES = {
-        "basic": BASIC_CATEGORY,
-        'email': EMAIL_CATEGORY,
-        'email_content': EMAIL_CONTENT_CATEGORY,
-        'ldap': LDAP_CATEGORY,
-        'terminal': TERMINAL_CATEGORY,
-        'security': SECURITY_CATEGORY
-    }
 
     def get_object(self):
-        instance = {category_name: self._get_setting_fields_obj(category_fields)
-                    for category_name, category_fields in self.SETTING_CATEGORIES.items()}
-
+        instance = {category: self._get_setting_fields_obj(list(category_serializer.get_fields()))
+                    for category, category_serializer in self.serializer_class().get_fields().items()
+                    if isinstance(category_serializer, serializers.Serializer)}
         return ObjectDict(instance)
 
     def perform_update(self, serializer):

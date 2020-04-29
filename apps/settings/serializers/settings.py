@@ -20,7 +20,7 @@ class EmailSettingSerializer(serializers.Serializer):
     EMAIL_HOST = serializers.CharField(max_length=1024, required=True)
     EMAIL_PORT = serializers.CharField(max_length=5, required=True)
     EMAIL_HOST_USER = serializers.CharField(max_length=128, required=True)
-    EMAIL_HOST_PASSWORD = serializers.CharField(max_length=1024, required=False, write_only=True)
+    EMAIL_HOST_PASSWORD = serializers.CharField(max_length=1024, write_only=True, required=False, )
     EMAIL_FROM = serializers.CharField(max_length=128, allow_blank=True, required=False)
     EMAIL_RECIPIENT = serializers.CharField(max_length=128, allow_blank=True, required=False)
     EMAIL_USE_SSL = serializers.BooleanField(required=False)
@@ -39,7 +39,7 @@ class LdapSettingSerializer(serializers.Serializer):
 
     AUTH_LDAP_SERVER_URI = serializers.CharField(required=True)
     AUTH_LDAP_BIND_DN = serializers.CharField(required=False)
-    AUTH_LDAP_BIND_PASSWORD = serializers.CharField(max_length=1024, write_only=True)
+    AUTH_LDAP_BIND_PASSWORD = serializers.CharField(max_length=1024, write_only=True, required=False)
     AUTH_LDAP_SEARCH_OU = serializers.CharField(max_length=1024, allow_blank=True, required=False)
     AUTH_LDAP_SEARCH_FILTER = serializers.CharField(max_length=1024, required=True)
     AUTH_LDAP_USER_ATTR_MAP = serializers.CharField(max_length=1024, required=True)
@@ -63,10 +63,10 @@ class TerminalSettingSerializer(serializers.Serializer):
     TERMINAL_PASSWORD_AUTH = serializers.BooleanField(required=False)
     TERMINAL_PUBLIC_KEY_AUTH = serializers.BooleanField(required=False)
     TERMINAL_HEARTBEAT_INTERVAL = serializers.IntegerField(min_value=5, max_value=99999, required=True)
-    TERMINAL_ASSET_LIST_SORT_BY = serializers.ChoiceField(SORT_BY_CHOICES)
-    TERMINAL_ASSET_LIST_PAGE_SIZE = serializers.ChoiceField(PAGE_SIZE_CHOICES)
+    TERMINAL_ASSET_LIST_SORT_BY = serializers.ChoiceField(SORT_BY_CHOICES, required=False)
+    TERMINAL_ASSET_LIST_PAGE_SIZE = serializers.ChoiceField(PAGE_SIZE_CHOICES, required=False)
     TERMINAL_SESSION_KEEP_DURATION = serializers.IntegerField(min_value=1, max_value=99999, required=True)
-    TERMINAL_TELNET_REGEX = serializers.CharField(required=False, allow_blank=True)
+    TERMINAL_TELNET_REGEX = serializers.CharField(allow_blank=True, required=False)
 
 
 class SecuritySettingSerializer(serializers.Serializer):
