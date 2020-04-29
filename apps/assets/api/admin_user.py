@@ -36,7 +36,7 @@ class AdminUserViewSet(OrgBulkModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset.annotate(_assets_amount=Count('assets'))
+        queryset = queryset.annotate(assets_amount=Count('assets'))
         return queryset
 
     def destroy(self, request, *args, **kwargs):

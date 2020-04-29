@@ -31,7 +31,6 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
     search_fields = filter_fields
     serializer_classes = {
         'default': serializers.UserSerializer,
-        'display': serializers.UserDisplaySerializer
     }
     permission_classes = (IsOrgAdmin, CanUpdateDeleteUser)
 
