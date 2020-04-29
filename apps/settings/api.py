@@ -2,7 +2,7 @@
 #
 
 import json
-
+from collections.abc import Iterable
 from smtplib import SMTPSenderRefused
 from rest_framework import generics
 from rest_framework.views import Response, APIView
@@ -19,9 +19,7 @@ from common.permissions import IsOrgAdmin, IsSuperUser
 from common.utils import get_logger
 from .serializers import (
     MailTestSerializer, LDAPTestConfigSerializer, LDAPUserSerializer,
-    PublicSettingSerializer, LDAPTestLoginSerializer, BaseSettingSerializer,
-    BasicSettingSerializer, EmailContentSettingSerializer, EmailSettingSerializer,
-    SecuritySettingSerializer, LdapSettingSerializer, TerminalSettingSerializer
+    PublicSettingSerializer, LDAPTestLoginSerializer, SettingsSerializer
 )
 from users.models import User
 
@@ -276,58 +274,60 @@ class PublicSettingApi(generics.RetrieveAPIView):
         return instance
 
 
-class BaseSettingApi(generics.RetrieveUpdateAPIView):
-    permission_classes = (IsSuperUser,)
-    serializer_class = BaseSettingSerializer
-    setting_fields = []
+class SettingsApi(generics.RetrieveUpdateAPIView):
+    serializer_class = SettingsSerializer
+    BASIC_CATEGORY = ['SITE_URL', 'USER_GUIDE_URL', 'EMAIL_SUBJECT_PREFIX']
+
+    EMAIL_CATEGORY = ['EMAIL_HOST', 'EMAIL_PORT', 'EMAIL_HOST_USER',
+                      'EMAIL_HOST_PASSWORD', 'EMAIL_FROM', 'EMAIL_RECIPIENT',
+                      'EMAIL_USE_SSL', 'EMAIL_USE_TLS']
+
+    EMAIL_CONTENT_CATEGORY = ['EMAIL_CUSTOM_USER_CREATED_SUBJECT', 'EMAIL_CUSTOM_USER_CREATED_HONORIFIC',
+                              'EMAIL_CUSTOM_USER_CREATED_BODY', 'EMAIL_CUSTOM_USER_CREATED_SIGNATURE', ]
+
+    LDAP_CATEGORY = ['AUTH_LDAP_SERVER_URI', 'AUTH_LDAP_BIND_DN',
+                     'AUTH_LDAP_BIND_PASSWORD', 'AUTH_LDAP_SEARCH_OU',
+                     'AUTH_LDAP_SEARCH_FILTER', 'AUTH_LDAP_USER_ATTR_MAP',
+                     'AUTH_LDAP']
+
+    TERMINAL_CATEGORY = ['TERMINAL_PASSWORD_AUTH', 'TERMINAL_PUBLIC_KEY_AUTH',
+                         'TERMINAL_HEARTBEAT_INTERVAL', 'TERMINAL_ASSET_LIST_SORT_BY',
+                         'TERMINAL_ASSET_LIST_PAGE_SIZE', 'TERMINAL_SESSION_KEEP_DURATION',
+                         'TERMINAL_TELNET_REGEX']
+
+    SECURITY_CATEGORY = ['SECURITY_MFA_AUTH', 'SECURITY_COMMAND_EXECUTION',
+                         'SECURITY_SERVICE_ACCOUNT_REGISTRATION', 'SECURITY_LOGIN_LIMIT_COUNT',
+                         'SECURITY_LOGIN_LIMIT_TIME', 'SECURITY_MAX_IDLE_TIME',
+                         'SECURITY_PASSWORD_EXPIRATION_TIME', 'SECURITY_PASSWORD_MIN_LENGTH',
+                         'SECURITY_PASSWORD_UPPER_CASE', 'SECURITY_PASSWORD_LOWER_CASE',
+                         'SECURITY_PASSWORD_NUMBER', 'SECURITY_PASSWORD_SPECIAL_CHAR']
+
+    SETTING_CATEGORIES = {
+        "basic": BASIC_CATEGORY,
+        'email': EMAIL_CATEGORY,
+        'email_content': EMAIL_CONTENT_CATEGORY,
+        'ldap': LDAP_CATEGORY,
+        'terminal': TERMINAL_CATEGORY,
+        'security': SECURITY_CATEGORY
+    }
 
     def get_object(self):
-        instance = {field: getattr(settings, field) for field in self.setting_fields}
+        instance = {category_name: self._get_setting_fields_obj(category_fields)
+                    for category_name, category_fields in self.SETTING_CATEGORIES.items()}
+
         return ObjectDict(instance)
 
     def perform_update(self, serializer):
         serializer.save()
 
+    def _get_setting_fields_obj(self, category_fields):
+        if isinstance(category_fields, Iterable):
+            fields_data = {field_name: getattr(settings, field_name)
+                           for field_name in category_fields}
+            return ObjectDict(fields_data)
 
-class BasicSettingApi(BaseSettingApi):
-    serializer_class = BasicSettingSerializer
-    setting_fields = ['SITE_URL', 'USER_GUIDE_URL', 'EMAIL_SUBJECT_PREFIX']
+        if isinstance(category_fields, str):
+            fields_data = {category_fields: getattr(settings, category_fields)}
+            return ObjectDict(fields_data)
 
-
-class EmailSettingApi(BaseSettingApi):
-    serializer_class = EmailSettingSerializer
-    setting_fields = ['EMAIL_HOST', 'EMAIL_PORT', 'EMAIL_HOST_USER',
-                      'EMAIL_HOST_PASSWORD', 'EMAIL_FROM', 'EMAIL_RECIPIENT',
-                      'EMAIL_USE_SSL', 'EMAIL_USE_TLS']
-
-
-class EmailContentSettingApi(BaseSettingApi):
-    serializer_class = EmailContentSettingSerializer
-    setting_fields = ['EMAIL_CUSTOM_USER_CREATED_SUBJECT', 'EMAIL_CUSTOM_USER_CREATED_HONORIFIC',
-                      'EMAIL_CUSTOM_USER_CREATED_BODY', 'EMAIL_CUSTOM_USER_CREATED_SIGNATURE', ]
-
-
-class LdapSettingApi(BaseSettingApi):
-    serializer_class = LdapSettingSerializer
-    setting_fields = ['AUTH_LDAP_SERVER_URI', 'AUTH_LDAP_BIND_DN',
-                      'AUTH_LDAP_BIND_PASSWORD', 'AUTH_LDAP_SEARCH_OU',
-                      'AUTH_LDAP_SEARCH_FILTER', 'AUTH_LDAP_USER_ATTR_MAP',
-                      'AUTH_LDAP']
-
-
-class TerminalSettingApi(BaseSettingApi):
-    serializer_class = TerminalSettingSerializer
-    setting_fields = ['TERMINAL_PASSWORD_AUTH', 'TERMINAL_PUBLIC_KEY_AUTH',
-                      'TERMINAL_HEARTBEAT_INTERVAL', 'TERMINAL_ASSET_LIST_SORT_BY',
-                      'TERMINAL_ASSET_LIST_PAGE_SIZE', 'TERMINAL_SESSION_KEEP_DURATION',
-                      'TERMINAL_TELNET_REGEX']
-
-
-class SecuritySettingApi(BaseSettingApi):
-    serializer_class = SecuritySettingSerializer
-    setting_fields = ['SECURITY_MFA_AUTH', 'SECURITY_COMMAND_EXECUTION',
-                      'SECURITY_SERVICE_ACCOUNT_REGISTRATION', 'SECURITY_LOGIN_LIMIT_COUNT',
-                      'SECURITY_LOGIN_LIMIT_TIME', 'SECURITY_MAX_IDLE_TIME',
-                      'SECURITY_PASSWORD_EXPIRATION_TIME', 'SECURITY_PASSWORD_MIN_LENGTH',
-                      'SECURITY_PASSWORD_UPPER_CASE', 'SECURITY_PASSWORD_LOWER_CASE',
-                      'SECURITY_PASSWORD_NUMBER', 'SECURITY_PASSWORD_SPECIAL_CHAR']
+        return ObjectDict()
