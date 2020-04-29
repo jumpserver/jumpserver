@@ -10,7 +10,8 @@ from common.utils import signer
 
 class SettingQuerySet(models.QuerySet):
     def __getattr__(self, item):
-        instances = self.filter(name=item)
+        queryset = list(self)
+        instances = [i for i in queryset if i.name == item]
         if len(instances) == 1:
             return instances[0]
         else:

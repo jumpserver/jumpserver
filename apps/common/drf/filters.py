@@ -9,7 +9,7 @@ import logging
 
 from common import const
 
-__all__ = ["DatetimeRangeFilter", "IDSpmFilter", "CustomFilter"]
+__all__ = ["DatetimeRangeFilter", "IDSpmFilter", 'IDInFilter', "CustomFilter"]
 
 
 class DatetimeRangeFilter(filters.BaseFilterBackend):
@@ -65,6 +65,25 @@ class IDSpmFilter(filters.BaseFilterBackend):
         if not resources_id or not isinstance(resources_id, list):
             return queryset
         queryset = queryset.filter(id__in=resources_id)
+        return queryset
+
+
+class IDInFilter(filters.BaseFilterBackend):
+    def get_schema_fields(self, view):
+        return [
+            coreapi.Field(
+                name='ids', location='query', required=False,
+                type='string', example='/api/v1/users/users?ids=1,2,3',
+                description='Filter by id set'
+            )
+        ]
+
+    def filter_queryset(self, request, queryset, view):
+        ids = request.query_params.get('ids')
+        if not ids:
+            return queryset
+        id_list = [i.strip() for i in ids.split(',')]
+        queryset = queryset.filter(id__in=id_list)
         return queryset
 
 

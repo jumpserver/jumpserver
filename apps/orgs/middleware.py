@@ -34,8 +34,7 @@ class OrgMiddleware:
     def __call__(self, request):
         self.set_permed_org_if_need(request)
         org = get_org_from_request(request)
-        if org is not None:
-            request.current_org = org
-            set_current_org(org)
+        request.current_org = org
+        set_current_org(org)
         response = self.get_response(request)
         return response
