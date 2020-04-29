@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from common.utils import validate_ssh_public_key
-from common.mixins import BulkSerializerMixin
+from common.mixins import CommonSerializerMixin
 from common.serializers import AdaptedBulkListSerializer
 from common.permissions import CanUpdateDeleteUser
 from ..models import User
@@ -13,7 +13,7 @@ from ..models import User
 __all__ = [
     'UserSerializer', 'UserPKUpdateSerializer',
     'ChangeUserPasswordSerializer', 'ResetOTPSerializer',
-    'UserProfileSerializer', 'UserDisplaySerializer',
+    'UserProfileSerializer',
 ]
 
 
@@ -22,7 +22,7 @@ class UserOrgSerializer(serializers.Serializer):
     name = serializers.CharField()
 
 
-class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+class UserSerializer(CommonSerializerMixin, serializers.ModelSerializer):
     EMAIL_SET_PASSWORD = _('Reset link will be generated and sent to the user')
     CUSTOM_PASSWORD = _('Set password')
     PASSWORD_STRATEGY_CHOICES = (
@@ -33,18 +33,27 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
         choices=PASSWORD_STRATEGY_CHOICES, required=False, initial=0,
         label=_('Password strategy'), write_only=True
     )
+    can_update = serializers.SerializerMethodField()
+    can_delete = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         list_serializer_class = AdaptedBulkListSerializer
-        fields = [
-            'id', 'name', 'username', 'password', 'email', 'public_key',
-            'groups', 'role', 'wechat', 'phone', 'mfa_level',
+        # mini 是指能识别对象的最小单元
+        fields_mini = ['id', 'name', 'username']
+        # small 指的是 不需要计算的直接能从一张表中获取到的数据
+        fields_small = fields_mini + [
+            'password', 'email', 'public_key', 'wechat', 'phone', 'mfa_level',
             'comment', 'source', 'is_valid', 'is_expired',
             'is_active', 'created_by', 'is_first_login',
             'password_strategy', 'date_password_last_updated', 'date_expired',
-            'avatar_url',
+            'avatar_url', 'source_display',
         ]
+        fields = fields_small + [
+            'groups', 'role', 'groups_display', 'role_display',
+            'can_update', 'can_delete'
+        ]
+
         extra_kwargs = {
             'password': {'write_only': True, 'required': False, 'allow_null': True, 'allow_blank': True},
             'public_key': {'write_only': True},
@@ -53,6 +62,11 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'is_expired': {'label': _('Is expired')},
             'avatar_url': {'label': _('Avatar url')},
             'created_by': {'read_only': True, 'allow_blank': True},
+            'can_update': {'read_only': True},
+            'can_delete': {'read_only': True},
+            'groups_display': {'label': _('Groups name')},
+            'source_display': {'label': _('Source name')},
+            'role_display': {'label': _('Role name')},
         }
 
     def __init__(self, *args, **kwargs):
@@ -60,7 +74,9 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
         self.set_role_choices()
 
     def set_role_choices(self):
-        role = self.fields['role']
+        role = self.fields.get('role')
+        if not role:
+            return
         choices = role._choices
         choices.pop('App', None)
         role._choices = choices
@@ -114,17 +130,6 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
         attrs.pop('password_strategy', None)
         return attrs
 
-
-class UserDisplaySerializer(UserSerializer):
-    can_update = serializers.SerializerMethodField()
-    can_delete = serializers.SerializerMethodField()
-
-    class Meta(UserSerializer.Meta):
-        fields = UserSerializer.Meta.fields + [
-            'groups_display', 'role_display', 'source_display',
-            'can_update', 'can_delete',
-        ]
-
     def get_can_update(self, obj):
         return CanUpdateDeleteUser.has_update_object_permission(
             self.context['request'], self.context['view'], obj
@@ -134,17 +139,6 @@ class UserDisplaySerializer(UserSerializer):
         return CanUpdateDeleteUser.has_delete_object_permission(
             self.context['request'], self.context['view'], obj
         )
-
-    def get_extra_kwargs(self):
-        kwargs = super().get_extra_kwargs()
-        kwargs.update({
-            'can_update': {'read_only': True},
-            'can_delete': {'read_only': True},
-            'groups_display': {'label': _('Groups name')},
-            'source_display': {'label': _('Source name')},
-            'role_display': {'label': _('Role name')},
-        })
-        return kwargs
 
 
 class UserPKUpdateSerializer(serializers.ModelSerializer):
