@@ -18,7 +18,7 @@ __all__ = [
 class UserGroupSerializer(BulkOrgResourceModelSerializer):
     users = serializers.PrimaryKeyRelatedField(
         required=False, many=True, queryset=User.objects, label=_('User'),
-        write_only=True
+        # write_only=True, group can return many to many on detail
     )
 
     class Meta:
@@ -38,7 +38,7 @@ class UserGroupSerializer(BulkOrgResourceModelSerializer):
 
     def set_fields_queryset(self):
         users_field = self.fields['users']
-        users_field.child_relation.queryset = utils.get_current_org_members()
+        users_field.child_relation.queryset = utils.get_current_org_members(exclude=('Auditor',))
 
     def validate_users(self, users):
         for user in users:
