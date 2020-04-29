@@ -72,7 +72,8 @@ class Organization(models.Model):
             org = cls.default() if default else None
         return org
 
-    @lazyproperty
+    # @lazyproperty
+    # lazyproperty 导致用户列表中角色显示出现不稳定的情况, 如果不加会导致数据库操作次数太多
     def org_users(self):
         from users.models import User
         if self.is_real():
@@ -83,9 +84,9 @@ class Organization(models.Model):
         return users
 
     def get_org_users(self):
-        return self.org_users
+        return self.org_users()
 
-    @lazyproperty
+    # @lazyproperty
     def org_admins(self):
         from users.models import User
         if self.is_real():
@@ -93,7 +94,7 @@ class Organization(models.Model):
         return User.objects.filter(role=User.ROLE_ADMIN)
 
     def get_org_admins(self):
-        return self.org_admins
+        return self.org_admins()
 
     def org_id(self):
         if self.is_real():
@@ -103,7 +104,7 @@ class Organization(models.Model):
         else:
             return ''
 
-    @lazyproperty
+    # @lazyproperty
     def org_auditors(self):
         from users.models import User
         if self.is_real():
@@ -111,7 +112,7 @@ class Organization(models.Model):
         return User.objects.filter(role=User.ROLE_AUDITOR)
 
     def get_org_auditors(self):
-        return self.org_auditors
+        return self.org_auditors()
 
     def get_org_members(self, exclude=()):
         from users.models import User

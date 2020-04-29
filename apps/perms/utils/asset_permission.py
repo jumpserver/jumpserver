@@ -290,7 +290,7 @@ class AssetPermissionUtil(AssetPermissionUtilCacheMixin):
     def parse_user_tree_to_full_tree(self, user_tree):
         """
         经过前面两个动作，用户授权的节点已放到树上，但是树不是完整的，
-        这里要讲树构造成一个完整的书
+        这里要讲树构造成一个完整的树
         """
         # 开始修正user_tree，保证父节点都在树上
         root_children = user_tree.children('')
@@ -300,7 +300,8 @@ class AssetPermissionUtil(AssetPermissionUtilCacheMixin):
             if child.identifier.startswith('-'):
                 continue
             ancestors = self.full_tree.ancestors(
-                child.identifier, with_self=False, deep=True
+                child.identifier, with_self=False, deep=True,
+                with_assets=False,
             )
             if not ancestors:
                 continue
