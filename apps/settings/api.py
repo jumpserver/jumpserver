@@ -12,17 +12,18 @@ from django.utils.translation import ugettext_lazy as _
 
 from .utils import (
     LDAPServerUtil, LDAPCacheUtil, LDAPImportUtil, LDAPSyncUtil,
-    LDAP_USE_CACHE_FLAGS, LDAPTestUtil,
+    LDAP_USE_CACHE_FLAGS, LDAPTestUtil, ObjectDict
 )
 from .tasks import sync_ldap_user_task
 from common.permissions import IsOrgAdmin, IsSuperUser
 from common.utils import get_logger
 from .serializers import (
     MailTestSerializer, LDAPTestConfigSerializer, LDAPUserSerializer,
-    PublicSettingSerializer, LDAPTestLoginSerializer,
+    PublicSettingSerializer, LDAPTestLoginSerializer, BaseSettingSerializer,
+    BasicSettingSerializer, EmailContentSettingSerializer, EmailSettingSerializer,
+    SecuritySettingSerializer, LdapSettingSerializer, TerminalSettingSerializer
 )
 from users.models import User
-
 
 logger = get_logger(__file__)
 
@@ -59,7 +60,7 @@ class MailTestingAPI(APIView):
                     use_tls=email_use_tls, use_ssl=email_use_ssl,
                 )
                 send_mail(
-                    subject, message,  email_from, [email_recipient],
+                    subject, message, email_from, [email_recipient],
                     connection=connection
                 )
             except SMTPSenderRefused as e:
@@ -275,3 +276,58 @@ class PublicSettingApi(generics.RetrieveAPIView):
         return instance
 
 
+class BaseSettingApi(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsSuperUser,)
+    serializer_class = BaseSettingSerializer
+    setting_fields = []
+
+    def get_object(self):
+        instance = {field: getattr(settings, field) for field in self.setting_fields}
+        return ObjectDict(instance)
+
+    def perform_update(self, serializer):
+        serializer.save()
+
+
+class BasicSettingApi(BaseSettingApi):
+    serializer_class = BasicSettingSerializer
+    setting_fields = ['SITE_URL', 'USER_GUIDE_URL', 'EMAIL_SUBJECT_PREFIX']
+
+
+class EmailSettingApi(BaseSettingApi):
+    serializer_class = EmailSettingSerializer
+    setting_fields = ['EMAIL_HOST', 'EMAIL_PORT', 'EMAIL_HOST_USER',
+                      'EMAIL_HOST_PASSWORD', 'EMAIL_FROM', 'EMAIL_RECIPIENT',
+                      'EMAIL_USE_SSL', 'EMAIL_USE_TLS']
+
+
+class EmailContentSettingApi(BaseSettingApi):
+    serializer_class = EmailContentSettingSerializer
+    setting_fields = ['EMAIL_CUSTOM_USER_CREATED_SUBJECT', 'EMAIL_CUSTOM_USER_CREATED_HONORIFIC',
+                      'EMAIL_CUSTOM_USER_CREATED_BODY', 'EMAIL_CUSTOM_USER_CREATED_SIGNATURE', ]
+
+
+class LdapSettingApi(BaseSettingApi):
+    serializer_class = LdapSettingSerializer
+    setting_fields = ['AUTH_LDAP_SERVER_URI', 'AUTH_LDAP_BIND_DN',
+                      'AUTH_LDAP_BIND_PASSWORD', 'AUTH_LDAP_SEARCH_OU',
+                      'AUTH_LDAP_SEARCH_FILTER', 'AUTH_LDAP_USER_ATTR_MAP',
+                      'AUTH_LDAP']
+
+
+class TerminalSettingApi(BaseSettingApi):
+    serializer_class = TerminalSettingSerializer
+    setting_fields = ['TERMINAL_PASSWORD_AUTH', 'TERMINAL_PUBLIC_KEY_AUTH',
+                      'TERMINAL_HEARTBEAT_INTERVAL', 'TERMINAL_ASSET_LIST_SORT_BY',
+                      'TERMINAL_ASSET_LIST_PAGE_SIZE', 'TERMINAL_SESSION_KEEP_DURATION',
+                      'TERMINAL_TELNET_REGEX']
+
+
+class SecuritySettingApi(BaseSettingApi):
+    serializer_class = SecuritySettingSerializer
+    setting_fields = ['SECURITY_MFA_AUTH', 'SECURITY_COMMAND_EXECUTION',
+                      'SECURITY_SERVICE_ACCOUNT_REGISTRATION', 'SECURITY_LOGIN_LIMIT_COUNT',
+                      'SECURITY_LOGIN_LIMIT_TIME', 'SECURITY_MAX_IDLE_TIME',
+                      'SECURITY_PASSWORD_EXPIRATION_TIME', 'SECURITY_PASSWORD_MIN_LENGTH',
+                      'SECURITY_PASSWORD_UPPER_CASE', 'SECURITY_PASSWORD_LOWER_CASE',
+                      'SECURITY_PASSWORD_NUMBER', 'SECURITY_PASSWORD_SPECIAL_CHAR']
