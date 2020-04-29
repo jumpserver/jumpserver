@@ -14,5 +14,6 @@ urlpatterns = [
     path('ldap/users/import/', api.LDAPUserImportAPI.as_view(), name='ldap-user-import'),
     path('ldap/cache/refresh/', api.LDAPCacheRefreshAPI.as_view(), name='ldap-cache-refresh'),
 
+    path('setting/', api.SettingsApi.as_view(), name='settings-setting'),
     path('public/', api.PublicSettingApi.as_view(), name='public-setting'),
 ]
