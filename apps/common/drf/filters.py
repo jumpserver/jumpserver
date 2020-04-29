@@ -4,7 +4,9 @@ import coreapi
 from rest_framework import filters
 from rest_framework.fields import DateTimeField
 from rest_framework.serializers import ValidationError
+from rest_framework.compat import coreapi, coreschema
 from django.core.cache import cache
+from django.core.exceptions import ImproperlyConfigured
 import logging
 
 from common import const
@@ -13,15 +15,48 @@ __all__ = ["DatetimeRangeFilter", "IDSpmFilter", "CustomFilter"]
 
 
 class DatetimeRangeFilter(filters.BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
+    def get_schema_fields(self, view):
+        ret = []
+        fields = self._get_date_range_filter_fields(view)
+
+        for attr, date_range_keyword in fields.items():
+            if len(date_range_keyword) != 2:
+                continue
+            for v in date_range_keyword:
+                ret.append(
+                    coreapi.Field(
+                        name=v, location='query', required=False, type='string',
+                        schema=coreschema.String(
+                            title=v,
+                            description='%s %s' % (attr, v)
+                        )
+                    )
+                )
+
+        return ret
+
+    def _get_date_range_filter_fields(self, view):
         if not hasattr(view, 'date_range_filter_fields'):
-            return queryset
+            return {}
         try:
-            fields = dict(view.date_range_filter_fields)
+            return dict(view.date_range_filter_fields)
         except ValueError:
-            msg = "View {} datetime_filter_fields set is error".format(view.name)
+            msg = """
+                View {} `date_range_filter_fields` set is improperly.
+                For example:
+                ```
+                    class ExampleView:
+                        date_range_filter_fields = [
+                            ('db column', ('query param date from', 'query param date to'))
+                        ]
+                ```
+            """.format(view.name)
             logging.error(msg)
-            return queryset
+            raise ImproperlyConfigured(msg)
+
+    def filter_queryset(self, request, queryset, view):
+        fields = self._get_date_range_filter_fields(view)
+
         kwargs = {}
         for attr, date_range_keyword in fields.items():
             if len(date_range_keyword) != 2:

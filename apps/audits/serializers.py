@@ -14,10 +14,13 @@ class FTPLogSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class LoginLogSerializer(serializers.ModelSerializer):
+class UserLoginLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.UserLoginLog
-        fields = '__all__'
+        fields = (
+            'username', 'type', 'ip', 'city', 'user_agent',
+            'mfa', 'reason', 'status', 'datetime'
+        )
 
 
 class OperateLogSerializer(serializers.ModelSerializer):
