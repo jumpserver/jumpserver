@@ -60,6 +60,7 @@ js_i18n_patterns = i18n_patterns(
 
 urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
+    path('workform/', include('workform.urls'), name='workform'),
     path('api/v1/', include(api_v1)),
     path('api/v2/', include(api_v2)),
     re_path('api/(?P<app>\w+)/(?P<version>v\d)/.*', views.redirect_format_api),

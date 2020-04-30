@@ -1,4 +1,6 @@
 {% load i18n %}
+{% include '_nav_newmenu.html' %}
+
 <li id="assets">
     <a href="{% url 'assets:user-asset-list' %}">
         <i class="fa fa-files-o" style="width: 14px"></i><span class="nav-label">{% trans 'My assets' %}</span><span class="label label-info pull-right"></span>

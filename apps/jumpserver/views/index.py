@@ -226,7 +226,8 @@ class IndexView(PermissionsMixin, MonthLoginMetricMixin, WeekSessionMetricMixin,
         if not request.user.is_authenticated:
             return self.handle_no_permission()
         if request.user.is_common_user:
-            return redirect('assets:user-asset-list')
+            #return redirect('assets:user-asset-list')
+            return redirect('workform:test1')
         return super(IndexView, self).dispatch(request, *args, **kwargs)
 
     @staticmethod

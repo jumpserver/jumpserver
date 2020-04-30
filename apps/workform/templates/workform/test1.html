@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block custom_head_css_js %}
+{% endblock %}
+
+{% block content %}
+<div class="wrapper wrapper-content">
+    <section class="content">
+      <div class="row">
+        <div class="col-xs-12">
+
+        <div class="box">
+        <div class="box-header">
+          <h3 class="box-title">资产总表<small>(不含软件)</small></h3>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+
+            <table id="assets_table" class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>主机域名</th>
+                        <th>环境</th>
+                        <th>操作系统类型</th>
+                        <th>账号</th>
+                        <th>密码</th>
+                        <th>ip-内网</th>
+                        <th>ip-外网</th>
+                        <th>CPU</th>
+                        <th>内存</th>
+                        <th>描述信息</th>
+                        <th>系统盘</th>
+                        <th>数据盘</th>
+                        <th>带宽</th>
+                        <th>安全组</th>
+                        <th>分组</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                                                <th>序号</th>
+                        <th>主机域名</th>
+                        <th>环境</th>
+                        <th>操作系统类型</th>
+                        <th>账号</th>
+                        <th>密码</th>
+                        <th>ip-内网</th>
+                        <th>ip-外网</th>
+                        <th>CPU</th>
+                        <th>内存</th>
+                        <th>描述信息</th>
+                        <th>系统盘</th>
+                        <th>数据盘</th>
+                        <th>带宽</th>
+                        <th>安全组</th>
+                        <th>分组</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <!-- /.box-body -->
+      </div>
+      <!-- /.box -->
+        </div>
+    <!-- /.col -->
+      </div>
+    <!-- /.row -->
+    </section>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}
