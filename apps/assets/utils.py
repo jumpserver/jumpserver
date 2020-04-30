@@ -1,5 +1,6 @@
 # ~*~ coding: utf-8 ~*~
 #
+import time
 from treelib import Tree
 from treelib.exceptions import NodeIDAbsentError
 from collections import defaultdict
@@ -77,8 +78,15 @@ class TreeService(Tree):
         return ancestor_ids
 
     def ancestors(self, nid, with_self=False, deep=False, with_assets=True):
+        # now = time.time()
+        # print("Start get ancestor_ids")
         ancestor_ids = self.ancestors_ids(nid, with_self=with_self)
+        # now2 = time.time()
+        # interval = (now2 - now) * 1000
+        # print("Start get ancestor_ids using: {}".format(interval))
         ancestors = [self.get_node(i, deep=deep) for i in ancestor_ids]
+        # interval = (time.time() - now2) * 1000
+        # print("Get ancestors done: {}".format(interval))
         if with_assets:
             return ancestors
         for n in ancestors:

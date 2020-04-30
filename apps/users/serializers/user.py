@@ -33,6 +33,7 @@ class UserSerializer(CommonSerializerMixin, serializers.ModelSerializer):
         choices=PASSWORD_STRATEGY_CHOICES, required=False, initial=0,
         label=_('Password strategy'), write_only=True
     )
+    mfa_level_display = serializers.ReadOnlyField(source='get_mfa_level_display')
     can_update = serializers.SerializerMethodField()
     can_delete = serializers.SerializerMethodField()
 
@@ -44,10 +45,11 @@ class UserSerializer(CommonSerializerMixin, serializers.ModelSerializer):
         # small 指的是 不需要计算的直接能从一张表中获取到的数据
         fields_small = fields_mini + [
             'password', 'email', 'public_key', 'wechat', 'phone', 'mfa_level',
+            'mfa_level_display',
             'comment', 'source', 'is_valid', 'is_expired',
             'is_active', 'created_by', 'is_first_login',
             'password_strategy', 'date_password_last_updated', 'date_expired',
-            'avatar_url', 'source_display',
+            'avatar_url', 'source_display', 'date_joined', 'last_login'
         ]
         fields = fields_small + [
             'groups', 'role', 'groups_display', 'role_display',

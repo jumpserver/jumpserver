@@ -40,8 +40,9 @@ class UserGroupSerializer(BulkOrgResourceModelSerializer):
         self.set_fields_queryset()
 
     def set_fields_queryset(self):
-        users_field = self.fields['users']
-        users_field.child_relation.queryset = utils.get_current_org_members(exclude=('Auditor',))
+        users_field = self.fields.get('users')
+        if users_field:
+            users_field.child_relation.queryset = utils.get_current_org_members(exclude=('Auditor',))
 
     def validate_users(self, users):
         for user in users:
