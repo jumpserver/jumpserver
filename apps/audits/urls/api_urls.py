@@ -12,6 +12,7 @@ app_name = "audits"
 
 router = DefaultRouter()
 router.register(r'ftp-logs', api.FTPLogViewSet, 'ftp-log')
+router.register(r'login-logs', api.UserLoginLogViewSet, 'login-log')
 
 urlpatterns = [
 ]

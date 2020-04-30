@@ -2,27 +2,27 @@
 #
 
 import json
-
+from collections.abc import Iterable
 from smtplib import SMTPSenderRefused
 from rest_framework import generics
 from rest_framework.views import Response, APIView
 from django.conf import settings
 from django.core.mail import send_mail, get_connection
 from django.utils.translation import ugettext_lazy as _
+from rest_framework import serializers
 
 from .utils import (
     LDAPServerUtil, LDAPCacheUtil, LDAPImportUtil, LDAPSyncUtil,
-    LDAP_USE_CACHE_FLAGS, LDAPTestUtil,
+    LDAP_USE_CACHE_FLAGS, LDAPTestUtil, ObjectDict
 )
 from .tasks import sync_ldap_user_task
 from common.permissions import IsOrgAdmin, IsSuperUser
 from common.utils import get_logger
 from .serializers import (
     MailTestSerializer, LDAPTestConfigSerializer, LDAPUserSerializer,
-    PublicSettingSerializer, LDAPTestLoginSerializer,
+    PublicSettingSerializer, LDAPTestLoginSerializer, SettingsSerializer
 )
 from users.models import User
-
 
 logger = get_logger(__file__)
 
@@ -59,7 +59,7 @@ class MailTestingAPI(APIView):
                     use_tls=email_use_tls, use_ssl=email_use_ssl,
                 )
                 send_mail(
-                    subject, message,  email_from, [email_recipient],
+                    subject, message, email_from, [email_recipient],
                     connection=connection
                 )
             except SMTPSenderRefused as e:
@@ -275,3 +275,26 @@ class PublicSettingApi(generics.RetrieveAPIView):
         return instance
 
 
+class SettingsApi(generics.RetrieveUpdateAPIView):
+    serializer_class = SettingsSerializer
+
+    def get_object(self):
+        instance = {category: self._get_setting_fields_obj(list(category_serializer.get_fields()))
+                    for category, category_serializer in self.serializer_class().get_fields().items()
+                    if isinstance(category_serializer, serializers.Serializer)}
+        return ObjectDict(instance)
+
+    def perform_update(self, serializer):
+        serializer.save()
+
+    def _get_setting_fields_obj(self, category_fields):
+        if isinstance(category_fields, Iterable):
+            fields_data = {field_name: getattr(settings, field_name)
+                           for field_name in category_fields}
+            return ObjectDict(fields_data)
+
+        if isinstance(category_fields, str):
+            fields_data = {category_fields: getattr(settings, category_fields)}
+            return ObjectDict(fields_data)
+
+        return ObjectDict()
