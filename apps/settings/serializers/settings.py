@@ -121,4 +121,4 @@ class SettingsSerializer(serializers.Serializer):
                 setting.category = category
                 setting.encrypted = encrypted
                 setting.cleaned_value = field_value
-            setting.save()
+                setting.save()
