@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+<div class="wrapper wrapper-content">
+  <!-- Main content -->
+  <section class="content">
+      <div class="row">
+          <div class="col-xs-12">
+              <div class="box">
+                  <div class="box-body">
+                      <form action="{% url 'workform:service_msg' %}" method="post" class="form-inline">
+                          {% csrf_token %}
+                          <div style="float: left" class="input-group">
+                              <label for="phone">手机号码</label>
+                              <input type="text" id="phoneno" name="phoneno" class="datepicker" autocomplete="on">
+                          </div>
+                          <div style="float: left">
+                              <input class="form-inline" id="phonesearch" type="submit" value="搜索"/>
+                          </div>
+                          <div style="float: right ">
+                              <p>
+                                  手机发短信间隔（默认1分钟）<br>
+                                  同一IP地址，一天内申请验证码不能超过的次数 100次<br>
+                                  同一手机号，一天内申请验证码不能超过的次数 15 次<br>
+                                  IP允许时间-默认20分钟<br>
+                                  IP允许时间内允许20次<br>
+                                  超过IP允许时间后禁止时间-10分钟
+                              </p>
+                          </div>
+                      </form>
+                  </div>
+                  <div class="box-body">
+                  </div>
+
+                  <div class="box-body">
+                      <table id="example2" class="table table-bordered table-hover text-center">
+                          <thead>
+                              <tr>
+                                  <th style="width: 20%">手机号码</th>
+                                  <th style="width: 30%">实名用户名</th>
+                                  <th style="width: 30%">平台类型</th>
+                                  <th style="width: 20%">IdentityType</th>
+                              </tr>
+                          </thead>
+                      </table>
+                      <table id="example2" class="table table-bordered table-hover text-center">
+                          {% for l in RealNameList %}
+                              <tr>
+                              <td style="width: 20%">{{ l.IdentityId }}</td>
+                              <td style="width: 30%">{{ l.Key }}</td>
+                              <td style="width: 30%">{{ l.AccountType }}</td>
+                              <td style="width: 20%">{{ l.IdentityType }}</td>
+                              </tr>
+                          {% endfor %}
+                      </table>
+                  </div>
+                  <br>
+                  <br>
+                  <div class="box-body">
+                      <table id="example2" class="table table-bordered table-hover text-center">
+                          <thead>
+                              <tr>
+                                  <th class="c1">No.</th>
+                                  <th class="c2">手机号码</th>
+                                  <th class="c3">请求时间</th>
+                                  <th class="c3">发送时间</th>
+                                  <th class="c3">接收时间</th>
+                                  <th class="c4">消息内容</th>
+                                  <th class="c2">消息代码</th>
+                                  <th class="c2">操作平台</th>
+                                  <th class="c2">类型</th>
+                                  <th class="c2">IP地址</th>
+                              </tr>
+                          </thead>
+                          {% for l in SmsReportList %}
+                              <tr>
+                              <td class="c1">{{ forloop.counter }}</td>
+                              <td class="c2">{{ l.phone_number }}</td>
+                              <td class="c3">{{ l.submit_time }}</td>
+                              <td class="c3">{{ l.send_time }}</td>
+                              <td class="c3">{{ l.receive_time }}</td>
+                              <td class="c4">{{ l.message }}</td>
+                              <td class="c2">{{ l.status_code }}</td>
+                              <td class="c2">{{ l.source_site }}</td>
+                              <td class="c2">{{ l.source_type }}</td>
+                              <td class="c2">{{ l.source_ip }}</td>
+                              </tr>
+                          {% endfor %}
+                      </table>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}
