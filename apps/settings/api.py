@@ -72,13 +72,13 @@ class MailTestingAPI(APIView):
                             continue
                         else:
                             break
-                return Response({"error": str(resp)}, status=401)
+                return Response({"error": str(resp)}, status=400)
             except Exception as e:
                 print(e)
-                return Response({"error": str(e)}, status=401)
+                return Response({"error": str(e)}, status=400)
             return Response({"msg": self.success_message.format(email_recipient)})
         else:
-            return Response({"error": str(serializer.errors)}, status=401)
+            return Response({"error": str(serializer.errors)}, status=400)
 
 
 class LDAPTestingConfigAPI(APIView):
@@ -88,10 +88,10 @@ class LDAPTestingConfigAPI(APIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         if not serializer.is_valid():
-            return Response({"error": str(serializer.errors)}, status=401)
+            return Response({"error": str(serializer.errors)}, status=400)
         config = self.get_ldap_config(serializer)
         ok, msg = LDAPTestUtil(config).test_config()
-        status = 200 if ok else 401
+        status = 200 if ok else 400
         return Response(msg, status=status)
 
     @staticmethod
@@ -124,11 +124,11 @@ class LDAPTestingLoginAPI(APIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         if not serializer.is_valid():
-            return Response({"error": str(serializer.errors)}, status=401)
+            return Response({"error": str(serializer.errors)}, status=400)
         username = serializer.validated_data['username']
         password = serializer.validated_data['password']
         ok, msg = LDAPTestUtil().test_login(username, password)
-        status = 200 if ok else 401
+        status = 200 if ok else 400
         return Response(msg, status=status)
 
 
@@ -236,14 +236,14 @@ class LDAPUserImportAPI(APIView):
         try:
             users = self.get_ldap_users()
         except Exception as e:
-            return Response({'error': str(e)}, status=401)
+            return Response({'error': str(e)}, status=400)
 
         if users is None:
-            return Response({'msg': _('Get ldap users is None')}, status=401)
+            return Response({'msg': _('Get ldap users is None')}, status=400)
 
         errors = LDAPImportUtil().perform_import(users)
         if errors:
-            return Response({'errors': errors}, status=401)
+            return Response({'errors': errors}, status=400)
 
         count = users if users is None else len(users)
         return Response({'msg': _('Imported {} users successfully').format(count)})
@@ -276,6 +276,7 @@ class PublicSettingApi(generics.RetrieveAPIView):
 
 
 class SettingsApi(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsSuperUser,)
     serializer_class = SettingsSerializer
 
     def get_object(self):

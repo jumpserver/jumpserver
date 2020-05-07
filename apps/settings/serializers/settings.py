@@ -75,7 +75,7 @@ class SecuritySettingSerializer(serializers.Serializer):
     SECURITY_SERVICE_ACCOUNT_REGISTRATION = serializers.BooleanField(required=True)
     SECURITY_LOGIN_LIMIT_COUNT = serializers.IntegerField(min_value=3, max_value=99999, required=True)
     SECURITY_LOGIN_LIMIT_TIME = serializers.IntegerField(min_value=5, max_value=99999, required=True)
-    SECURITY_MAX_IDLE_TIME = serializers.IntegerField(min_value=5, max_value=99999, required=False)
+    SECURITY_MAX_IDLE_TIME = serializers.IntegerField(min_value=1, max_value=99999, required=False)
     SECURITY_PASSWORD_EXPIRATION_TIME = serializers.IntegerField(min_value=1, max_value=99999, required=True)
     SECURITY_PASSWORD_MIN_LENGTH = serializers.IntegerField(min_value=6, max_value=30, required=True)
     SECURITY_PASSWORD_UPPER_CASE = serializers.BooleanField(required=False)
