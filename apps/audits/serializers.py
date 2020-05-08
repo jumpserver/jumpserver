@@ -11,7 +11,10 @@ class FTPLogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.FTPLog
-        fields = '__all__'
+        fields = (
+            'id', 'user', 'remote_addr', 'asset', 'system_user',
+            'operate', 'filename', 'is_success', 'date_start'
+        )
 
 
 class UserLoginLogSerializer(serializers.ModelSerializer):
