@@ -20,6 +20,8 @@ from urllib.parse import urljoin, urlparse
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
+XPACK_DIR = os.path.join(BASE_DIR, 'xpack')
+HAS_XPACK = os.path.isdir(XPACK_DIR)
 
 
 def import_string(dotted_path):
@@ -242,7 +244,7 @@ class Config(dict):
         'TASK_LOG_KEEP_DAYS': 10,
         'ASSETS_PERM_CACHE_TIME': 3600 * 24,
         'SECURITY_MFA_VERIFY_TTL': 3600,
-        'ASSETS_PERM_CACHE_ENABLE': False,
+        'ASSETS_PERM_CACHE_ENABLE': HAS_XPACK,
         'SYSLOG_ADDR': '',  # '192.168.0.1:514'
         'SYSLOG_FACILITY': 'user',
         'SYSLOG_SOCKTYPE': 2,
