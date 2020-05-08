@@ -219,7 +219,7 @@ class TotalCountMixin:
         return count
 
     @staticmethod
-    def get_total_count_online_assets():
+    def get_total_count_online_sessions():
         return Session.objects.filter(is_finished=False).count()
 
 
@@ -239,7 +239,7 @@ class IndexApi(TotalCountMixin, WeekSessionMetricMixin, MonthLoginMetricMixin, A
                 'total_count_assets': self.get_total_count_assets(),
                 'total_count_users': self.get_total_count_users(),
                 'total_count_online_users': self.get_total_count_online_users(),
-                'total_count_online_assets': self.get_total_count_online_assets(),
+                'total_count_online_sessions': self.get_total_count_online_sessions(),
             })
 
         if _all or query_params.get('month_metrics'):
