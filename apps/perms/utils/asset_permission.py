@@ -301,7 +301,6 @@ class AssetPermissionUtil(AssetPermissionUtilCacheMixin):
                 continue
             ancestors = self.full_tree.ancestors(
                 child.identifier, with_self=False, deep=True,
-                with_assets=False,
             )
             if not ancestors:
                 continue
@@ -350,6 +349,9 @@ class AssetPermissionUtil(AssetPermissionUtilCacheMixin):
         self.add_favorite_node_if_need(user_tree)
         self.set_user_tree_to_cache_if_need(user_tree)
         self.set_user_tree_to_local(user_tree)
+        for n in user_tree.all_nodes():
+            if n.identifier in ['3', '3:0']:
+                logger.info('{} - {}'.format(n.tag, n.data))
         return user_tree
 
     # Todo: 是否可以获取多个资产的系统用户
