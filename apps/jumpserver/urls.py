@@ -7,9 +7,10 @@ from django.conf.urls.static import static
 from django.conf.urls.i18n import i18n_patterns
 from django.views.i18n import JavaScriptCatalog
 
-from . import views
+from . import views, api
 
 api_v1 = [
+    path('index/', api.IndexApi.as_view()),
     path('users/', include('users.urls.api_urls', namespace='api-users')),
     path('assets/', include('assets.urls.api_urls', namespace='api-assets')),
     path('perms/', include('perms.urls.api_urls', namespace='api-perms')),
