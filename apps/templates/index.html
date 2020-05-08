@@ -50,7 +50,7 @@
 
                 </div>
                 <div class="ibox-content">
-                        <h1 class="no-margins"><a href="{% url 'terminal:session-online-list' %}"> <span id="total_count_online_assets"></span></a></h1>
+                        <h1 class="no-margins"><a href="{% url 'terminal:session-online-list' %}"> <span id="total_count_online_sessions"></span></a></h1>
                     <small>Online sessions</small>
                 </div>
             </div>
@@ -422,7 +422,7 @@ function renderTotalCount(){
          $('#total_count_assets').html(data['total_count_assets']);
          $('#total_count_users').html(data['total_count_users']);
          $('#total_count_online_users').html(data['total_count_online_users']);
-         $('#total_count_online_assets').html(data['total_count_online_assets']);
+         $('#total_count_online_sessions').html(data['total_count_online_sessions']);
      };
     renderRequestApi('total_count=1', success);
 }
