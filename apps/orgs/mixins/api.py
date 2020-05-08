@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from django.shortcuts import get_object_or_404
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework_bulk import BulkModelViewSet
 from common.mixins import CommonApiMixin
 
@@ -41,6 +41,10 @@ class OrgQuerySetMixin:
 
 
 class OrgModelViewSet(CommonApiMixin, OrgQuerySetMixin, ModelViewSet):
+    pass
+
+
+class OrgGenericViewSet(CommonApiMixin, OrgQuerySetMixin, GenericViewSet):
     pass
 
 
