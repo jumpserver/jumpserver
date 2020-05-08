@@ -42,7 +42,7 @@ class LdapSettingSerializer(serializers.Serializer):
     AUTH_LDAP_BIND_PASSWORD = serializers.CharField(max_length=1024, write_only=True, required=False)
     AUTH_LDAP_SEARCH_OU = serializers.CharField(max_length=1024, allow_blank=True, required=False)
     AUTH_LDAP_SEARCH_FILTER = serializers.CharField(max_length=1024, required=True)
-    AUTH_LDAP_USER_ATTR_MAP = serializers.CharField(max_length=1024, required=True)
+    AUTH_LDAP_USER_ATTR_MAP = serializers.DictField(required=True)
     AUTH_LDAP = serializers.BooleanField(required=False)
 
 
