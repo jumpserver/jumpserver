@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-08 18:40+0800\n"
+"POT-Creation-Date: 2020-05-09 14:47+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1177,13 +1177,12 @@ msgstr "默认资产组"
 
 #: assets/models/label.py:15 assets/templates/assets/system_user_users.html:63
 #: audits/models.py:18 audits/models.py:38 audits/models.py:51
-#: audits/templates/audits/ftp_log_list.html:37
+#: audits/serializers.py:69 audits/templates/audits/ftp_log_list.html:37
 #: audits/templates/audits/ftp_log_list.html:74
 #: audits/templates/audits/operate_log_list.html:37
 #: audits/templates/audits/password_change_log_list.html:37
 #: audits/templates/audits/password_change_log_list.html:54
-#: authentication/models.py:43 ops/models/command.py:25
-#: ops/templates/ops/command_execution_list.html:41
+#: authentication/models.py:43 ops/templates/ops/command_execution_list.html:41
 #: ops/templates/ops/command_execution_list.html:66
 #: perms/forms/asset_permission.py:83 perms/forms/database_app_permission.py:38
 #: perms/forms/remote_app_permission.py:40 perms/models/base.py:49
@@ -1643,8 +1642,8 @@ msgstr "获取认证信息错误"
 msgid "Close"
 msgstr "关闭"
 
-#: assets/templates/assets/_asset_user_list.html:24
-#: audits/templates/audits/operate_log_list.html:75
+#: assets/templates/assets/_asset_user_list.html:24 audits/models.py:43
+#: audits/models.py:54 audits/templates/audits/operate_log_list.html:75
 #: audits/templates/audits/password_change_log_list.html:57
 #: ops/templates/ops/task_adhoc.html:61
 #: terminal/templates/terminal/command_list.html:34
@@ -2344,6 +2343,19 @@ msgstr "文件名"
 msgid "Success"
 msgstr "成功"
 
+#: audits/models.py:25 audits/templates/audits/ftp_log_list.html:81
+#: ops/models/command.py:28 ops/templates/ops/adhoc_history.html:50
+#: ops/templates/ops/adhoc_history_detail.html:59
+#: ops/templates/ops/command_execution_list.html:72
+#: ops/templates/ops/task_history.html:56 perms/models/base.py:52
+#: perms/templates/perms/asset_permission_detail.html:81
+#: perms/templates/perms/database_app_permission_detail.html:77
+#: perms/templates/perms/remote_app_permission_detail.html:73
+#: terminal/models.py:199 terminal/templates/terminal/session_detail.html:72
+#: terminal/templates/terminal/session_list.html:32
+msgid "Date start"
+msgstr "开始日期"
+
 #: audits/models.py:33
 #: authentication/templates/authentication/_access_key_modal.html:22
 msgid "Create"
@@ -2420,18 +2432,29 @@ msgstr "状态"
 msgid "Date login"
 msgstr "登录日期"
 
-#: audits/templates/audits/ftp_log_list.html:81 ops/models/command.py:28
-#: ops/templates/ops/adhoc_history.html:50
-#: ops/templates/ops/adhoc_history_detail.html:59
-#: ops/templates/ops/command_execution_list.html:72
-#: ops/templates/ops/task_history.html:56 perms/models/base.py:52
-#: perms/templates/perms/asset_permission_detail.html:81
-#: perms/templates/perms/database_app_permission_detail.html:77
-#: perms/templates/perms/remote_app_permission_detail.html:73
-#: terminal/models.py:199 terminal/templates/terminal/session_detail.html:72
-#: terminal/templates/terminal/session_list.html:32
-msgid "Date start"
-msgstr "开始日期"
+#: audits/serializers.py:65 ops/models/command.py:24
+msgid "Result"
+msgstr "结果"
+
+#: audits/serializers.py:66 ops/models/adhoc.py:240
+#: ops/templates/ops/adhoc_history.html:54
+#: ops/templates/ops/task_history.html:60
+msgid "Is success"
+msgstr "是否成功"
+
+#: audits/serializers.py:67 ops/templates/ops/adhoc_detail.html:51
+#: ops/templates/ops/command_execution_list.html:65
+#: ops/templates/ops/task_adhoc.html:57 ops/templates/ops/task_list.html:13
+#: terminal/forms/storage.py:151
+msgid "Hosts"
+msgstr "主机"
+
+#: audits/serializers.py:68 ops/templates/ops/adhoc_detail.html:70
+#: ops/templates/ops/adhoc_detail.html:75
+#: ops/templates/ops/command_execution_list.html:68
+#: ops/templates/ops/task_adhoc.html:59
+msgid "Run as"
+msgstr "运行用户"
 
 #: audits/templates/audits/login_log_list.html:34
 #: perms/templates/perms/asset_permission_user.html:74
@@ -2974,11 +2997,6 @@ msgstr "时间"
 msgid "Is finished"
 msgstr "是否完成"
 
-#: ops/models/adhoc.py:240 ops/templates/ops/adhoc_history.html:54
-#: ops/templates/ops/task_history.html:60
-msgid "Is success"
-msgstr "是否成功"
-
 #: ops/models/adhoc.py:241
 msgid "Adhoc raw result"
 msgstr "结果"
@@ -2994,24 +3012,6 @@ msgstr "{} 任务开始: {}"
 #: ops/models/adhoc.py:291
 msgid "{} Task finish"
 msgstr "{} 任务结束"
-
-#: ops/models/command.py:21 ops/templates/ops/adhoc_detail.html:51
-#: ops/templates/ops/command_execution_list.html:65
-#: ops/templates/ops/task_adhoc.html:57 ops/templates/ops/task_list.html:13
-#: terminal/forms/storage.py:151
-msgid "Hosts"
-msgstr "主机"
-
-#: ops/models/command.py:22 ops/templates/ops/adhoc_detail.html:70
-#: ops/templates/ops/adhoc_detail.html:75
-#: ops/templates/ops/command_execution_list.html:68
-#: ops/templates/ops/task_adhoc.html:59
-msgid "Run as"
-msgstr "运行用户"
-
-#: ops/models/command.py:24
-msgid "Result"
-msgstr "结果"
 
 #: ops/models/command.py:29
 msgid "Date finished"

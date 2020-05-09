@@ -62,6 +62,9 @@ class CommandExecutionSerializer(serializers.ModelSerializer):
             'date_start', 'result', 'is_success'
         )
         extra_kwargs = {
-            'result': {'label': _('Result')},
+            'result': {'label': _('Result')},  # model 上的方法，只能在这修改
             'is_success': {'label': _('Is success')},
+            'hosts': {'label': _('Hosts')},  # 外键，会生成 sql。不在 model 上修改
+            'run_as': {'label': _('Run as')},
+            'user': {'label': _('User')},
         }
