@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-08 15:42+0800\n"
+"POT-Creation-Date: 2020-05-09 13:17+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -26,7 +26,7 @@ msgstr "自定义"
 #: applications/templates/applications/remote_app_list.html:27
 #: applications/templates/applications/user_remote_app_list.html:18
 #: assets/forms/domain.py:15 assets/forms/label.py:13
-#: assets/models/asset.py:353 assets/models/authbook.py:27
+#: assets/models/asset.py:352 assets/models/authbook.py:27
 #: assets/models/gathered_user.py:14 assets/serializers/admin_user.py:32
 #: assets/serializers/asset_user.py:47 assets/serializers/asset_user.py:84
 #: assets/serializers/system_user.py:44 assets/serializers/system_user.py:176
@@ -112,7 +112,7 @@ msgstr "运行参数"
 #: applications/templates/applications/user_database_app_list.html:16
 #: applications/templates/applications/user_remote_app_list.html:16
 #: assets/forms/asset.py:21 assets/forms/domain.py:77 assets/forms/user.py:74
-#: assets/forms/user.py:96 assets/models/asset.py:146 assets/models/base.py:232
+#: assets/forms/user.py:96 assets/models/asset.py:145 assets/models/base.py:232
 #: assets/models/cluster.py:18 assets/models/cmd_filter.py:21
 #: assets/models/domain.py:20 assets/models/group.py:20
 #: assets/models/label.py:18 assets/templates/assets/_node_detail_modal.html:27
@@ -204,7 +204,7 @@ msgstr "主机"
 #: applications/models/database_app.py:27
 #: applications/templates/applications/database_app_detail.html:60
 #: applications/templates/applications/database_app_list.html:26
-#: assets/forms/asset.py:25 assets/models/asset.py:192
+#: assets/forms/asset.py:25 assets/models/asset.py:191
 #: assets/models/domain.py:50
 #: assets/templates/assets/domain_gateway_list.html:64
 msgid "Port"
@@ -227,7 +227,7 @@ msgstr "数据库"
 #: applications/templates/applications/remote_app_list.html:28
 #: applications/templates/applications/user_database_app_list.html:20
 #: applications/templates/applications/user_remote_app_list.html:19
-#: assets/models/asset.py:151 assets/models/asset.py:227
+#: assets/models/asset.py:150 assets/models/asset.py:226
 #: assets/models/base.py:237 assets/models/cluster.py:29
 #: assets/models/cmd_filter.py:23 assets/models/cmd_filter.py:56
 #: assets/models/domain.py:21 assets/models/domain.py:53
@@ -309,7 +309,7 @@ msgstr "参数"
 #: applications/models/remote_app.py:39
 #: applications/templates/applications/database_app_detail.html:72
 #: applications/templates/applications/remote_app_detail.html:68
-#: assets/models/asset.py:225 assets/models/base.py:240
+#: assets/models/asset.py:224 assets/models/base.py:240
 #: assets/models/cluster.py:28 assets/models/cmd_filter.py:26
 #: assets/models/cmd_filter.py:59 assets/models/group.py:21
 #: assets/templates/assets/admin_user_detail.html:63
@@ -335,7 +335,7 @@ msgstr "创建者"
 #: applications/models/remote_app.py:42
 #: applications/templates/applications/database_app_detail.html:68
 #: applications/templates/applications/remote_app_detail.html:64
-#: assets/models/asset.py:226 assets/models/base.py:238
+#: assets/models/asset.py:225 assets/models/base.py:238
 #: assets/models/cluster.py:26 assets/models/domain.py:23
 #: assets/models/gathered_user.py:19 assets/models/group.py:22
 #: assets/models/label.py:25 assets/templates/assets/admin_user_detail.html:59
@@ -737,7 +737,7 @@ msgstr "不能移除资产的管理用户账号"
 msgid "Latest version could not be delete"
 msgstr "最新版本的不能被删除"
 
-#: assets/forms/asset.py:83 assets/models/asset.py:196
+#: assets/forms/asset.py:83 assets/models/asset.py:195
 #: assets/models/user.py:109 assets/templates/assets/asset_detail.html:186
 #: assets/templates/assets/asset_detail.html:194
 #: assets/templates/assets/system_user_assets.html:118
@@ -748,7 +748,7 @@ msgstr "最新版本的不能被删除"
 msgid "Nodes"
 msgstr "节点"
 
-#: assets/forms/asset.py:86 assets/models/asset.py:200
+#: assets/forms/asset.py:86 assets/models/asset.py:199
 #: assets/models/cluster.py:19 assets/models/user.py:65
 #: assets/templates/assets/admin_user_list.html:62
 #: assets/templates/assets/asset_detail.html:72 templates/_nav.html:44
@@ -766,7 +766,7 @@ msgstr "管理用户"
 msgid "Label"
 msgstr "标签"
 
-#: assets/forms/asset.py:92 assets/models/asset.py:195
+#: assets/forms/asset.py:92 assets/models/asset.py:194
 #: assets/models/domain.py:26 assets/models/domain.py:52
 #: assets/templates/assets/asset_detail.html:76
 #: assets/templates/assets/user_asset_list.html:80
@@ -774,8 +774,8 @@ msgstr "标签"
 msgid "Domain"
 msgstr "网域"
 
-#: assets/forms/asset.py:95 assets/models/asset.py:170
-#: assets/models/asset.py:194 assets/serializers/asset.py:67
+#: assets/forms/asset.py:95 assets/models/asset.py:169
+#: assets/models/asset.py:193 assets/serializers/asset.py:67
 #: assets/templates/assets/asset_detail.html:100
 #: assets/templates/assets/user_asset_list.html:78
 msgid "Platform"
@@ -980,24 +980,24 @@ msgstr "SFTP的起始路径，tmp目录, 用户home目录或者自定义"
 msgid "Username is dynamic, When connect asset, using current user's username"
 msgstr "用户名是动态的，登录资产时使用当前用户的用户名登录"
 
-#: assets/models/asset.py:147 xpack/plugins/cloud/providers/base.py:16
+#: assets/models/asset.py:146 xpack/plugins/cloud/providers/base.py:16
 msgid "Base"
 msgstr "基础"
 
-#: assets/models/asset.py:148 assets/templates/assets/platform_detail.html:56
+#: assets/models/asset.py:147 assets/templates/assets/platform_detail.html:56
 msgid "Charset"
 msgstr "编码"
 
-#: assets/models/asset.py:149 assets/templates/assets/platform_detail.html:60
+#: assets/models/asset.py:148 assets/templates/assets/platform_detail.html:60
 #: tickets/models/ticket.py:38
 msgid "Meta"
 msgstr "元数据"
 
-#: assets/models/asset.py:150
+#: assets/models/asset.py:149
 msgid "Internal"
 msgstr "内部的"
 
-#: assets/models/asset.py:187 assets/models/domain.py:49
+#: assets/models/asset.py:186 assets/models/domain.py:49
 #: assets/serializers/asset_user.py:46
 #: assets/templates/assets/_asset_list_modal.html:47
 #: assets/templates/assets/_asset_user_list.html:20
@@ -1014,7 +1014,7 @@ msgstr "内部的"
 msgid "IP"
 msgstr "IP"
 
-#: assets/models/asset.py:188 assets/serializers/asset_user.py:45
+#: assets/models/asset.py:187 assets/serializers/asset_user.py:45
 #: assets/serializers/gathered_user.py:20
 #: assets/templates/assets/_asset_list_modal.html:46
 #: assets/templates/assets/_asset_user_auth_update_modal.html:9
@@ -1031,7 +1031,7 @@ msgstr "IP"
 msgid "Hostname"
 msgstr "主机名"
 
-#: assets/models/asset.py:191 assets/models/domain.py:51
+#: assets/models/asset.py:190 assets/models/domain.py:51
 #: assets/models/user.py:114 assets/templates/assets/asset_detail.html:68
 #: assets/templates/assets/domain_gateway_list.html:65
 #: assets/templates/assets/system_user_detail.html:78
@@ -1043,84 +1043,84 @@ msgstr "主机名"
 msgid "Protocol"
 msgstr "协议"
 
-#: assets/models/asset.py:193 assets/serializers/asset.py:69
+#: assets/models/asset.py:192 assets/serializers/asset.py:69
 #: assets/templates/assets/asset_create.html:24
 #: assets/templates/assets/user_asset_list.html:77
 #: perms/serializers/user_permission.py:60
 msgid "Protocols"
 msgstr "协议组"
 
-#: assets/models/asset.py:197 assets/models/cmd_filter.py:22
+#: assets/models/asset.py:196 assets/models/cmd_filter.py:22
 #: assets/models/domain.py:54 assets/models/label.py:22
 #: assets/templates/assets/asset_detail.html:108 authentication/models.py:45
 msgid "Is active"
 msgstr "激活"
 
-#: assets/models/asset.py:203 assets/templates/assets/asset_detail.html:64
+#: assets/models/asset.py:202 assets/templates/assets/asset_detail.html:64
 msgid "Public IP"
 msgstr "公网IP"
 
-#: assets/models/asset.py:204 assets/templates/assets/asset_detail.html:116
+#: assets/models/asset.py:203 assets/templates/assets/asset_detail.html:116
 msgid "Asset number"
 msgstr "资产编号"
 
-#: assets/models/asset.py:207 assets/templates/assets/asset_detail.html:80
+#: assets/models/asset.py:206 assets/templates/assets/asset_detail.html:80
 msgid "Vendor"
 msgstr "制造商"
 
-#: assets/models/asset.py:208 assets/templates/assets/asset_detail.html:84
+#: assets/models/asset.py:207 assets/templates/assets/asset_detail.html:84
 msgid "Model"
 msgstr "型号"
 
-#: assets/models/asset.py:209 assets/templates/assets/asset_detail.html:112
+#: assets/models/asset.py:208 assets/templates/assets/asset_detail.html:112
 msgid "Serial number"
 msgstr "序列号"
 
-#: assets/models/asset.py:211
+#: assets/models/asset.py:210
 msgid "CPU model"
 msgstr "CPU型号"
 
-#: assets/models/asset.py:212
+#: assets/models/asset.py:211
 msgid "CPU count"
 msgstr "CPU数量"
 
-#: assets/models/asset.py:213
+#: assets/models/asset.py:212
 msgid "CPU cores"
 msgstr "CPU核数"
 
-#: assets/models/asset.py:214
+#: assets/models/asset.py:213
 msgid "CPU vcpus"
 msgstr "CPU总数"
 
-#: assets/models/asset.py:215 assets/templates/assets/asset_detail.html:92
+#: assets/models/asset.py:214 assets/templates/assets/asset_detail.html:92
 msgid "Memory"
 msgstr "内存"
 
-#: assets/models/asset.py:216
+#: assets/models/asset.py:215
 msgid "Disk total"
 msgstr "硬盘大小"
 
-#: assets/models/asset.py:217
+#: assets/models/asset.py:216
 msgid "Disk info"
 msgstr "硬盘信息"
 
-#: assets/models/asset.py:219 assets/templates/assets/asset_detail.html:104
+#: assets/models/asset.py:218 assets/templates/assets/asset_detail.html:104
 msgid "OS"
 msgstr "操作系统"
 
-#: assets/models/asset.py:220
+#: assets/models/asset.py:219
 msgid "OS version"
 msgstr "系统版本"
 
-#: assets/models/asset.py:221
+#: assets/models/asset.py:220
 msgid "OS arch"
 msgstr "系统架构"
 
-#: assets/models/asset.py:222
+#: assets/models/asset.py:221
 msgid "Hostname raw"
 msgstr "主机名原始"
 
-#: assets/models/asset.py:224 assets/templates/assets/asset_create.html:46
+#: assets/models/asset.py:223 assets/templates/assets/asset_create.html:46
 #: assets/templates/assets/asset_detail.html:220 templates/_nav.html:46
 msgid "Labels"
 msgstr "标签管理"
@@ -2881,8 +2881,8 @@ msgid "More login options"
 msgstr "更多登录方式"
 
 #: authentication/templates/authentication/login.html:61
-msgid "Keycloak"
-msgstr ""
+msgid "OpenID"
+msgstr "OpenID"
 
 #: authentication/templates/authentication/login_otp.html:17
 msgid "One-time password"
@@ -6529,11 +6529,11 @@ msgstr "同步实例任务历史"
 msgid "Instance"
 msgstr "实例"
 
-#: xpack/plugins/cloud/providers/aliyun.py:16
+#: xpack/plugins/cloud/providers/aliyun.py:19
 msgid "Alibaba Cloud"
 msgstr "阿里云"
 
-#: xpack/plugins/cloud/providers/aws.py:14
+#: xpack/plugins/cloud/providers/aws.py:15
 msgid "AWS (International)"
 msgstr "AWS (国际)"
 
@@ -6541,51 +6541,59 @@ msgstr "AWS (国际)"
 msgid "AWS (China)"
 msgstr "AWS (中国)"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:13
+#: xpack/plugins/cloud/providers/huaweicloud.py:17
 msgid "Huawei Cloud"
 msgstr "华为云"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:16
-msgid "CN North-Beijing4"
-msgstr "华北-北京4"
-
-#: xpack/plugins/cloud/providers/huaweicloud.py:17
-msgid "CN East-Shanghai1"
-msgstr "华东-上海1"
-
-#: xpack/plugins/cloud/providers/huaweicloud.py:18
-msgid "CN East-Shanghai2"
-msgstr "华东-上海2"
-
-#: xpack/plugins/cloud/providers/huaweicloud.py:19
-msgid "CN South-Guangzhou"
-msgstr "华南-广州"
-
 #: xpack/plugins/cloud/providers/huaweicloud.py:20
-msgid "CN Southwest-Guiyang1"
-msgstr "西南-贵阳1"
+msgid "AF-Johannesburg"
+msgstr "非洲-约翰内斯堡"
 
 #: xpack/plugins/cloud/providers/huaweicloud.py:21
-msgid "AP-Hong-Kong"
-msgstr "亚太-香港"
-
-#: xpack/plugins/cloud/providers/huaweicloud.py:22
 msgid "AP-Bangkok"
 msgstr "亚太-曼谷"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:22
+msgid "AP-Hong Kong"
+msgstr "亚太-香港"
 
 #: xpack/plugins/cloud/providers/huaweicloud.py:23
 msgid "AP-Singapore"
 msgstr "亚太-新加坡"
 
 #: xpack/plugins/cloud/providers/huaweicloud.py:24
-msgid "AF-Johannesburg"
-msgstr "非洲-约翰内斯堡"
+msgid "CN East-Shanghai1"
+msgstr "华东-上海1"
 
 #: xpack/plugins/cloud/providers/huaweicloud.py:25
-msgid "LA-Santiago"
-msgstr "拉美-圣地亚哥"
+msgid "CN East-Shanghai2"
+msgstr "华东-上海2"
 
-#: xpack/plugins/cloud/providers/qcloud.py:14
+#: xpack/plugins/cloud/providers/huaweicloud.py:26
+msgid "CN North-Beijing1"
+msgstr "华北-北京1"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:27
+msgid "CN North-Beijing4"
+msgstr "华北-北京4"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:28
+msgid "CN Northeast-Dalian"
+msgstr "东北-大连"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:29
+msgid "CN South-Guangzhou"
+msgstr "华南-广州"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:30
+msgid "CN Southwest-Guiyang1"
+msgstr "西南-贵阳1"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:31
+msgid "EU-Paris"
+msgstr "欧洲-巴黎"
+
+#: xpack/plugins/cloud/providers/qcloud.py:17
 msgid "Tencent Cloud"
 msgstr "腾讯云"
 
@@ -6980,6 +6988,9 @@ msgstr "密码匣子"
 #: xpack/plugins/vault/views.py:39
 msgid "vault create"
 msgstr "创建"
+
+#~ msgid "LA-Santiago"
+#~ msgstr "拉美-圣地亚哥"
 
 #~ msgid "Total hosts"
 #~ msgstr "主机总数"
