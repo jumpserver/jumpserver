@@ -18,15 +18,15 @@ from ..inventory import JMSInventory
 
 class CommandExecution(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    hosts = models.ManyToManyField('assets.Asset')
-    run_as = models.ForeignKey('assets.SystemUser', on_delete=models.CASCADE)
+    hosts = models.ManyToManyField('assets.Asset', verbose_name=_('Hosts'))
+    run_as = models.ForeignKey('assets.SystemUser', on_delete=models.CASCADE, verbose_name=_('Run as'))
     command = models.TextField(verbose_name=_("Command"))
     _result = models.TextField(blank=True, null=True, verbose_name=_('Result'))
-    user = models.ForeignKey('users.User', on_delete=models.CASCADE, null=True)
-    is_finished = models.BooleanField(default=False)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_start = models.DateTimeField(null=True)
-    date_finished = models.DateTimeField(null=True)
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE, null=True, verbose_name=_('User'))
+    is_finished = models.BooleanField(default=False, verbose_name=_('Is finished'))
+    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date created'))
+    date_start = models.DateTimeField(null=True, verbose_name=_('Date start'))
+    date_finished = models.DateTimeField(null=True, verbose_name=_('Date finished'))
 
     def __str__(self):
         return self.command[:10]
