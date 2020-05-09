@@ -21,7 +21,7 @@ class RemoteAppPermissionSerializer(BulkOrgResourceModelSerializer):
         mini_fields = ['id', 'name']
         small_fields = mini_fields + [
             'comment', 'is_active', 'date_start', 'date_expired', 'is_valid',
-            'create_by', 'date_created'
+            'created_by', 'date_created'
         ]
         m2m_fields = [
             'users', 'user_groups', 'remote_apps', 'system_users',
