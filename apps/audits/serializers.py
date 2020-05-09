@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-
+from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from terminal.models import Session
@@ -61,3 +61,7 @@ class CommandExecutionSerializer(serializers.ModelSerializer):
             'hosts', 'run_as', 'command', 'user', 'is_finished',
             'date_start', 'result', 'is_success'
         )
+        extra_kwargs = {
+            'result': {'label': _('Result')},
+            'is_success': {'label': _('Is success')},
+        }

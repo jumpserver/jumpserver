@@ -22,7 +22,7 @@ class FTPLog(OrgModelMixin):
     operate = models.CharField(max_length=16, verbose_name=_("Operate"))
     filename = models.CharField(max_length=1024, verbose_name=_("Filename"))
     is_success = models.BooleanField(default=True, verbose_name=_("Success"))
-    date_start = models.DateTimeField(auto_now_add=True)
+    date_start = models.DateTimeField(auto_now_add=True, verbose_name=_('Date start'))
 
 
 class OperateLog(OrgModelMixin):
@@ -40,7 +40,7 @@ class OperateLog(OrgModelMixin):
     resource_type = models.CharField(max_length=64, verbose_name=_("Resource Type"))
     resource = models.CharField(max_length=128, verbose_name=_("Resource"))
     remote_addr = models.CharField(max_length=128, verbose_name=_("Remote addr"), blank=True, null=True)
-    datetime = models.DateTimeField(auto_now=True)
+    datetime = models.DateTimeField(auto_now=True, verbose_name=_('Datetime'))
 
     def __str__(self):
         return "<{}> {} <{}>".format(self.user, self.action, self.resource)
@@ -51,7 +51,7 @@ class PasswordChangeLog(models.Model):
     user = models.CharField(max_length=128, verbose_name=_('User'))
     change_by = models.CharField(max_length=128, verbose_name=_("Change by"))
     remote_addr = models.CharField(max_length=128, verbose_name=_("Remote addr"), blank=True, null=True)
-    datetime = models.DateTimeField(auto_now=True)
+    datetime = models.DateTimeField(auto_now=True, verbose_name=_('Datetime'))
 
     def __str__(self):
         return "{} change {}'s password".format(self.change_by, self.user)
