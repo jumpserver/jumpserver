@@ -42,7 +42,7 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
     class Meta:
         model = AssetPermission
         mini_fields = ['id', 'name']
-        small_fields = [
+        small_fields = mini_fields + [
             'is_active', 'is_expired', 'is_valid', 'actions', 'created_by', 'date_created'
         ]
         m2m_fields = [
