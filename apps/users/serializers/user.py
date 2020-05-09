@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
@@ -34,8 +35,11 @@ class UserSerializer(CommonSerializerMixin, serializers.ModelSerializer):
         label=_('Password strategy'), write_only=True
     )
     mfa_level_display = serializers.ReadOnlyField(source='get_mfa_level_display')
+    login_blocked = serializers.SerializerMethodField()
     can_update = serializers.SerializerMethodField()
     can_delete = serializers.SerializerMethodField()
+
+    key_prefix_block = "_LOGIN_BLOCK_{}"
 
     class Meta:
         model = User
@@ -53,7 +57,7 @@ class UserSerializer(CommonSerializerMixin, serializers.ModelSerializer):
         ]
         fields = fields_small + [
             'groups', 'role', 'groups_display', 'role_display',
-            'can_update', 'can_delete'
+            'can_update', 'can_delete', 'login_blocked',
         ]
 
         extra_kwargs = {
@@ -141,6 +145,11 @@ class UserSerializer(CommonSerializerMixin, serializers.ModelSerializer):
         return CanUpdateDeleteUser.has_delete_object_permission(
             self.context['request'], self.context['view'], obj
         )
+
+    def get_login_blocked(self, obj):
+        key_block = self.key_prefix_block.format(obj.username)
+        blocked = bool(cache.get(key_block))
+        return blocked
 
 
 class UserPKUpdateSerializer(serializers.ModelSerializer):

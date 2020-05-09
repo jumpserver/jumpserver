@@ -3,9 +3,9 @@ import logging
 from functools import reduce
 
 from django.db import models
-from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
+from common.utils import lazyproperty
 from orgs.models import Organization
 from orgs.utils import get_current_org
 from assets.models import Asset, SystemUser, Node
@@ -86,6 +86,18 @@ class AssetPermission(BasePermission):
         unique_together = [('org_id', 'name')]
         verbose_name = _("Asset permission")
         ordering = ('name',)
+
+    @lazyproperty
+    def assets_amount(self):
+        return self.assets.count()
+
+    @lazyproperty
+    def nodes_amount(self):
+        return self.nodes.count()
+
+    @lazyproperty
+    def system_users_amount(self):
+        return self.system_users.count()
 
     @classmethod
     def get_queryset_with_prefetch(cls):

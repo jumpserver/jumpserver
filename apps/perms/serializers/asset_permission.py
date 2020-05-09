@@ -3,12 +3,12 @@
 
 from rest_framework import serializers
 
-from common.fields import StringManyToManyField
+from django.db.models import Count
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from perms.models import AssetPermission, Action
 
 __all__ = [
-    'AssetPermissionCreateUpdateSerializer', 'AssetPermissionListSerializer',
+    'AssetPermissionSerializer',
     'ActionsField',
 ]
 
@@ -34,27 +34,29 @@ class ActionsDisplayField(ActionsField):
         return [choices.get(i) for i in values]
 
 
-class AssetPermissionCreateUpdateSerializer(BulkOrgResourceModelSerializer):
+class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
     actions = ActionsField(required=False, allow_null=True)
-
-    class Meta:
-        model = AssetPermission
-        exclude = ('created_by', 'date_created')
-
-
-class AssetPermissionListSerializer(BulkOrgResourceModelSerializer):
-    users = StringManyToManyField(many=True, read_only=True)
-    user_groups = StringManyToManyField(many=True, read_only=True)
-    assets = StringManyToManyField(many=True, read_only=True)
-    nodes = StringManyToManyField(many=True, read_only=True)
-    system_users = StringManyToManyField(many=True, read_only=True)
-    actions = ActionsDisplayField()
     is_valid = serializers.BooleanField()
     is_expired = serializers.BooleanField()
 
     class Meta:
         model = AssetPermission
-        fields = '__all__'
+        mini_fields = ['id', 'name']
+        small_fields = [
+            'is_active', 'is_expired', 'is_valid', 'actions', 'created_by', 'date_created'
+        ]
+        m2m_fields = [
+            'users', 'user_groups', 'assets', 'nodes', 'system_users',
+            'users_amount', 'user_groups_amount', 'assets_amount', 'nodes_amount', 'system_users_amount',
+        ]
+        fields = small_fields + m2m_fields
 
-
-
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        """ Perform necessary eager loading of data. """
+        queryset = queryset.annotate(
+            users_amount=Count('users'), user_groups_amount=Count('user_groups'),
+            assets_amount=Count('assets'), nodes_amount=Count('nodes'),
+            system_users_amount=Count('system_users')
+        )
+        return queryset
