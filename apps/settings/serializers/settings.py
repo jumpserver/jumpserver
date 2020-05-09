@@ -42,7 +42,7 @@ class LdapSettingSerializer(serializers.Serializer):
     AUTH_LDAP_BIND_PASSWORD = serializers.CharField(max_length=1024, write_only=True, required=False)
     AUTH_LDAP_SEARCH_OU = serializers.CharField(max_length=1024, allow_blank=True, required=False)
     AUTH_LDAP_SEARCH_FILTER = serializers.CharField(max_length=1024, required=True)
-    AUTH_LDAP_USER_ATTR_MAP = serializers.CharField(max_length=1024, required=True)
+    AUTH_LDAP_USER_ATTR_MAP = serializers.DictField(required=True)
     AUTH_LDAP = serializers.BooleanField(required=False)
 
 
@@ -75,7 +75,7 @@ class SecuritySettingSerializer(serializers.Serializer):
     SECURITY_SERVICE_ACCOUNT_REGISTRATION = serializers.BooleanField(required=True)
     SECURITY_LOGIN_LIMIT_COUNT = serializers.IntegerField(min_value=3, max_value=99999, required=True)
     SECURITY_LOGIN_LIMIT_TIME = serializers.IntegerField(min_value=5, max_value=99999, required=True)
-    SECURITY_MAX_IDLE_TIME = serializers.IntegerField(min_value=5, max_value=99999, required=False)
+    SECURITY_MAX_IDLE_TIME = serializers.IntegerField(min_value=1, max_value=99999, required=False)
     SECURITY_PASSWORD_EXPIRATION_TIME = serializers.IntegerField(min_value=1, max_value=99999, required=True)
     SECURITY_PASSWORD_MIN_LENGTH = serializers.IntegerField(min_value=6, max_value=30, required=True)
     SECURITY_PASSWORD_UPPER_CASE = serializers.BooleanField(required=False)

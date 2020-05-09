@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-import coreapi
 from rest_framework import filters
 from rest_framework.fields import DateTimeField
 from rest_framework.serializers import ValidationError
@@ -146,3 +145,10 @@ class CustomFilter(filters.BaseFilterBackend):
 
     def filter_queryset(self, request, queryset, view):
         return queryset
+
+
+def current_user_filter(user_field='user'):
+    class CurrentUserFilter(filters.BaseFilterBackend):
+        def filter_queryset(self, request, queryset, view):
+            return queryset.filter(**{user_field: request.user})
+    return CurrentUserFilter
