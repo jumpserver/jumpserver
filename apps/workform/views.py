@@ -21,11 +21,6 @@ from aliyunsdkcore.request import CommonRequest
 from django.contrib.auth.decorators import login_required
 
 @login_required
-def test1(request):
-    aaa = 'sdfsaf'
-    return render(request, 'workform/test1.html')
-
-@login_required
 def service_msg(request):
     if request.method == "POST":
         ###########################
