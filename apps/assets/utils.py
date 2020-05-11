@@ -1,6 +1,5 @@
 # ~*~ coding: utf-8 ~*~
 #
-import time
 from treelib import Tree
 from treelib.exceptions import NodeIDAbsentError
 from collections import defaultdict
@@ -77,21 +76,9 @@ class TreeService(Tree):
             ancestor_ids.pop(0)
         return ancestor_ids
 
-    def ancestors(self, nid, with_self=False, deep=False, with_assets=True):
-        # now = time.time()
-        # print("Start get ancestor_ids")
+    def ancestors(self, nid, with_self=False, deep=False):
         ancestor_ids = self.ancestors_ids(nid, with_self=with_self)
-        # now2 = time.time()
-        # interval = (now2 - now) * 1000
-        # print("Start get ancestor_ids using: {}".format(interval))
         ancestors = [self.get_node(i, deep=deep) for i in ancestor_ids]
-        # interval = (time.time() - now2) * 1000
-        # print("Get ancestors done: {}".format(interval))
-        if with_assets:
-            return ancestors
-        for n in ancestors:
-            n.data['assets'] = set()
-            n.data['all_assets'] = None
         return ancestors
 
     def get_node_full_tag(self, nid):
@@ -116,6 +103,7 @@ class TreeService(Tree):
         node = super().get_node(nid)
         if deep:
             node = self.copy_node(node)
+            node.data = {}
         return node
 
     def parent(self, nid, deep=False):

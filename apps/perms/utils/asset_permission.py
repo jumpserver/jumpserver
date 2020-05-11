@@ -302,7 +302,6 @@ class AssetPermissionUtil(AssetPermissionUtilCacheMixin):
                 continue
             ancestors = self.full_tree.ancestors(
                 child.identifier, with_self=False, deep=True,
-                with_assets=False,
             )
             # print("Get ancestors: {}".format(len(ancestors)))
             if not ancestors:

@@ -93,6 +93,9 @@ class AuthFailedError(Exception):
             'msg': self.msg,
         }
 
+    def __str__(self):
+        return str(self.msg)
+
 
 class CredentialError(AuthFailedNeedLogMixin, AuthFailedNeedBlockMixin, AuthFailedError):
     def __init__(self, error, username, ip, request):
@@ -168,7 +171,7 @@ class MFARequiredError(NeedMoreInfoError):
             'error': self.error,
             'msg': self.msg,
             'data': {
-                'choices': ['otp'],
+                'choices': ['code'],
                 'url': reverse('api-auth:mfa-challenge')
             }
         }

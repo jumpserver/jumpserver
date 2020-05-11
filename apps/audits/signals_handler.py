@@ -136,8 +136,8 @@ def on_user_auth_success(sender, user, request, **kwargs):
 
 
 @receiver(post_auth_failed)
-def on_user_auth_failed(sender, username, request, reason, **kwargs):
+def on_user_auth_failed(sender, username, request, reason='', **kwargs):
     logger.debug('User login failed: {}'.format(username))
     data = generate_data(username, request)
-    data.update({'reason': reason, 'status': False})
+    data.update({'reason': reason[:128], 'status': False})
     write_login_log(**data)
