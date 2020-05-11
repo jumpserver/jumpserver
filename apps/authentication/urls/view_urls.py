@@ -16,6 +16,6 @@ urlpatterns = [
     path('logout/', views.UserLogoutView.as_view(), name='logout'),
 
     # openid
-    path('openid/', include(('authentication.backends.openid.urls', 'authentication'), namespace='openid')),
     path('cas/', include(('authentication.backends.cas.urls', 'authentication'), namespace='cas')),
+    path('openid/', include(('jms_oidc_rp.urls', 'authentication'), namespace='openid')),
 ]
