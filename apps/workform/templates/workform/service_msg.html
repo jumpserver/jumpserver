@@ -2,101 +2,156 @@
 {% load static %}
 {% load i18n %}
 
-{% block content %}
-<div class="wrapper wrapper-content">
-  <!-- Main content -->
-  <section class="content">
-      <div class="row">
-          <div class="col-xs-12">
-              <div class="box">
-                  <div class="box-body">
-                      <form action="{% url 'workform:service_msg' %}" method="post" class="form-inline">
-                          {% csrf_token %}
-                          <div style="float: left" class="input-group">
-                              <label for="phone">手机号码</label>
-                              <input type="text" id="phoneno" name="phoneno" class="datepicker" autocomplete="on">
-                          </div>
-                          <div style="float: left">
-                              <input class="form-inline" id="phonesearch" type="submit" value="搜索"/>
-                          </div>
-                          <div style="float: right ">
-                              <p>
-                                  手机发短信间隔（默认1分钟）<br>
-                                  同一IP地址，一天内申请验证码不能超过的次数 100次<br>
-                                  同一手机号，一天内申请验证码不能超过的次数 15 次<br>
-                                  IP允许时间-默认20分钟<br>
-                                  IP允许时间内允许20次<br>
-                                  超过IP允许时间后禁止时间-10分钟
-                              </p>
-                          </div>
-                      </form>
-                  </div>
-                  <div class="box-body">
-                  </div>
-
-                  <div class="box-body">
-                      <table id="example2" class="table table-bordered table-hover text-center">
-                          <thead>
-                              <tr>
-                                  <th style="width: 20%">手机号码</th>
-                                  <th style="width: 30%">实名用户名</th>
-                                  <th style="width: 30%">平台类型</th>
-                                  <th style="width: 20%">IdentityType</th>
-                              </tr>
-                          </thead>
-                      </table>
-                      <table id="example2" class="table table-bordered table-hover text-center">
-                          {% for l in RealNameList %}
-                              <tr>
-                              <td style="width: 20%">{{ l.IdentityId }}</td>
-                              <td style="width: 30%">{{ l.Key }}</td>
-                              <td style="width: 30%">{{ l.AccountType }}</td>
-                              <td style="width: 20%">{{ l.IdentityType }}</td>
-                              </tr>
-                          {% endfor %}
-                      </table>
-                  </div>
-                  <br>
-                  <br>
-                  <div class="box-body">
-                      <table id="example2" class="table table-bordered table-hover text-center">
-                          <thead>
-                              <tr>
-                                  <th class="c1">No.</th>
-                                  <th class="c2">手机号码</th>
-                                  <th class="c3">请求时间</th>
-                                  <th class="c3">发送时间</th>
-                                  <th class="c3">接收时间</th>
-                                  <th class="c4">消息内容</th>
-                                  <th class="c2">消息代码</th>
-                                  <th class="c2">操作平台</th>
-                                  <th class="c2">类型</th>
-                                  <th class="c2">IP地址</th>
-                              </tr>
-                          </thead>
-                          {% for l in SmsReportList %}
-                              <tr>
-                              <td class="c1">{{ forloop.counter }}</td>
-                              <td class="c2">{{ l.phone_number }}</td>
-                              <td class="c3">{{ l.submit_time }}</td>
-                              <td class="c3">{{ l.send_time }}</td>
-                              <td class="c3">{{ l.receive_time }}</td>
-                              <td class="c4">{{ l.message }}</td>
-                              <td class="c2">{{ l.status_code }}</td>
-                              <td class="c2">{{ l.source_site }}</td>
-                              <td class="c2">{{ l.source_type }}</td>
-                              <td class="c2">{{ l.source_ip }}</td>
-                              </tr>
-                          {% endfor %}
-                      </table>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </section>
-</div>
-
+{% block custom_head_css_js %}
+<style>
+    td {}
+</style>
 {% endblock %}
 
-{% block scripts %}
+{% block content %}
+
+{% comment %}
+此模板引用user列表页
+{% endcomment %}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <form action="{% url 'workform:service_msg' %}" method="post" class="form-inline">
+                        {% csrf_token %}
+                        <input type="text" id="phoneno" name="phoneno" class="datepicker" autocomplete="on">
+                        <input class="form-inline" id="phonesearch" type="submit" value="搜索"/>
+                    </form>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="" id="content_start">
+                        <table class="table table-striped table-bordered table-hover " id="msg_rule">
+                            <thead>
+                                <th style="width:50%" class="text-left">
+                                    阿里云规则
+                                </th>
+                                <th style="width:50%" class="text-left">
+                                    万方服务规则
+                                </th>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th style="width:50%" class="text-left">同一个签名,对同一个手机号码的发送频率<br>
+                                    1分钟内短信发送条数不超过 2 条<br>
+                                    1小时内短信发送条数不超过 4 条<br>
+                                    1个自然日内短信发送条数不超过 15 条</th>
+                                    <th style="width:50%" class="text-left">手机发短信间隔（默认1分钟）<br>
+                                    同一IP地址，一天内申请验证码不能超过的次数 50次<br>
+                                    同一手机号，一天内申请验证码不能超过的次数 4 次<br>
+                                    IP允许时间-默认10分钟<br>
+                                    IP允许时间内允许4次<br>
+                                    超过IP允许时间后禁止时间-10分钟</th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="uc pull-left m-r-5 btn btn-sm btn-primary"> 医药平台实名认证信息 </div>
+                    <table class="table table-striped table-bordered table-hover text-center" id="user_list_table">
+                        <thead>
+                            <tr>
+                                <th style="width: 20%" class="text-center">手机号码</th>
+                                <th style="width: 30%" class="text-center">实名用户名</th>
+                                <th style="width: 30%" class="text-center">平台类型</th>
+                                <th style="width: 20%" class="text-center">IdentityType</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for i in realname_list %}
+                            <tr>
+                                <td>{{ i.IdentityId }}</td>
+                                <td>{{ i.Key }}</td>
+                                <td>{{ i.AccountType }}</td>
+                                <td>{{ i.IdentityType }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="uc pull-left m-r-5 btn btn-sm btn-primary"> 短信发送记录信息 </div>
+                    <table class="table table-striped table-bordered table-hover text-center" id="user_list_table">
+                        <thead>
+                            <tr>
+                                <th style="width: 2%" class="text-center">No.</th>
+                                <th style="width: 8%" class="text-center">手机号码</th>
+                                <th style="width: 10%" class="text-center">请求时间</th>
+                                <th style="width: 10%" class="text-center">发送时间</th>
+                                <th style="width: 10%" class="text-center">接收时间</th>
+                                <th style="width: auto" class="text-center">消息内容</th>
+                                <th style="width: 8%" class="text-center">消息代码</th>
+                                <th style="width: 8%" class="text-center">操作平台</th>
+                                <th style="width: 8%" class="text-center">类型</th>
+                                <th style="width: 8%" class="text-center">IP地址</th>
+                            </tr>
+                        </thead>
+                        <tbody valign="middle">
+                        {% for i in sms_list %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ i.phoneno }}</td>
+                                <td>{{ i.user_send_time }}</td>
+                                <td>{{ i.ali_send_time }}</td>
+                                <td>{{ i.user_receive_time }}</td>
+                                <td class="text-left">{{ i.message }}</td>
+                                {% if i.ali_sendstatus == 1 %}
+                                    <td>等待回执</td>
+                                {% elif i.ali_sendstatus == 2 %}
+                                    <td>发送失败</td>
+                                {% elif i.ali_sendstatus == 3 %}
+                                    <td>发送成功</td>
+                                {% elif i.ali_sendstatus == 4 %}
+                                    <td>万方请求失败</td>
+                                {% endif %}
+                                <td>{{ i.source }}</td>
+                                <td>{{ i.type }}</td>
+                                <td>{{ i.ip }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    <table class="table table-striped table-bordered table-hover" id="editable" >
+                        <thead>
+                            <tr>
+                                {% block table_head %} {% endblock %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% block table_body %} {% endblock %}
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            {% block content_bottom_left %} {% endblock %}
+                        </div>
+                        {% comment %}
+                        {% block table_pagination %}
+                        {% include '_pagination.html' %}
+                        {% endcomment %}
+                        {% endblock %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% block custom_foot_js %}
+<script src="{% static 'js/jquery.form.min.js' %}"></script>
 {% endblock %}
