@@ -87,7 +87,7 @@ class Config(dict):
         # Django Config, Must set before start
         'SECRET_KEY': '',
         'BOOTSTRAP_TOKEN': '',
-        'DEBUG': True,
+        'DEBUG': False,
         'LOG_LEVEL': 'DEBUG',
         'LOG_DIR': os.path.join(PROJECT_DIR, 'logs'),
         'DB_ENGINE': 'mysql',
