@@ -50,6 +50,7 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
             'users_amount', 'user_groups_amount', 'assets_amount', 'nodes_amount', 'system_users_amount',
         ]
         fields = small_fields + m2m_fields
+        read_only_fields = ['created_by', 'date_created']
 
     @classmethod
     def setup_eager_loading(cls, queryset):
