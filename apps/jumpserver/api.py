@@ -36,7 +36,7 @@ class MonthLoginMetricMixin:
     @staticmethod
     def get_cache_key(date, tp):
         date_str = date.strftime("%Y%m%d")
-        key = "SESSION_MONTH_{}_{}".format(tp, date_str)
+        key = "SESSION_MONTH_{}_{}_{}".format(current_org.id, tp, date_str)
         return key
 
     def __get_data_from_cache(self, date, tp):
