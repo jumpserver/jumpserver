@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-08 15:42+0800\n"
+"POT-Creation-Date: 2020-05-11 16:53+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -2769,7 +2769,7 @@ msgid ""
 msgstr "账号已被锁定（请联系管理员解锁 或 {}分钟后重试）"
 
 #: authentication/errors.py:48 users/views/profile/otp.py:63
-#: users/views/profile/otp.py:102
+#: users/views/profile/otp.py:100 users/views/profile/otp.py:116
 msgid "MFA code invalid, or ntp sync server time"
 msgstr "MFA验证码不正确，或者服务器端时间不对"
 
@@ -2832,10 +2832,10 @@ msgid "Show"
 msgstr "显示"
 
 #: authentication/templates/authentication/_access_key_modal.html:66
-#: users/models/user.py:360 users/templates/users/user_disable_mfa.html:32
-#: users/templates/users/user_profile.html:94
+#: users/models/user.py:360 users/templates/users/user_profile.html:94
 #: users/templates/users/user_profile.html:163
 #: users/templates/users/user_profile.html:166
+#: users/templates/users/user_verify_mfa.html:32
 msgid "Disable"
 msgstr "禁用"
 
@@ -2894,10 +2894,10 @@ msgstr "请打开 Google Authenticator，输入6位动态码"
 
 #: authentication/templates/authentication/login_otp.html:26
 #: users/templates/users/first_login.html:100
-#: users/templates/users/user_disable_mfa.html:26
 #: users/templates/users/user_otp_check_password.html:15
 #: users/templates/users/user_otp_enable_bind.html:24
 #: users/templates/users/user_otp_enable_install_app.html:29
+#: users/templates/users/user_verify_mfa.html:26
 msgid "Next"
 msgstr "下一步"
 
@@ -5766,26 +5766,6 @@ msgstr "解除用户登录限制后，此用户即可正常登录"
 msgid "Reset user MFA success"
 msgstr "重置用户多因子认证成功"
 
-#: users/templates/users/user_disable_mfa.html:6
-#: users/templates/users/user_otp_check_password.html:6
-msgid "Authenticate"
-msgstr "验证身份"
-
-#: users/templates/users/user_disable_mfa.html:11
-msgid ""
-"The account protection has been opened, please complete the following "
-"operations according to the prompts"
-msgstr "账号保护已开启，请根据提示完成以下操作"
-
-#: users/templates/users/user_disable_mfa.html:13
-msgid "Open Authenticator and enter the 6-bit dynamic code"
-msgstr "请打开 验证器，输入6位动态码"
-
-#: users/templates/users/user_disable_mfa.html:23
-#: users/templates/users/user_otp_enable_bind.html:22
-msgid "Six figures"
-msgstr "6位数字"
-
 #: users/templates/users/user_group_detail.html:17
 #: users/templates/users/user_group_granted_asset.html:18
 #: users/views/group.py:83
@@ -5844,6 +5824,11 @@ msgstr "用户已失效"
 msgid "User is inactive"
 msgstr "用户已禁用"
 
+#: users/templates/users/user_otp_check_password.html:6
+#: users/templates/users/user_verify_mfa.html:6
+msgid "Authenticate"
+msgstr "验证身份"
+
 #: users/templates/users/user_otp_enable_bind.html:6
 msgid "Bind one-time password authenticator"
 msgstr "绑定一次性密码验证器"
@@ -5853,6 +5838,11 @@ msgid ""
 "Use the mobile Google Authenticator application to scan the following qr "
 "code for a 6-bit verification code"
 msgstr "使用手机 Google Authenticator 应用扫描以下二维码，获取6位验证码"
+
+#: users/templates/users/user_otp_enable_bind.html:22
+#: users/templates/users/user_verify_mfa.html:23
+msgid "Six figures"
+msgstr "6位数字"
 
 #: users/templates/users/user_otp_enable_install_app.html:6
 msgid "Install app"
@@ -5935,6 +5925,16 @@ msgstr "更新用户"
 #: users/views/login.py:116
 msgid "User auth from {}, go there change password"
 msgstr "用户认证源来自 {}, 请去相应系统修改密码"
+
+#: users/templates/users/user_verify_mfa.html:11
+msgid ""
+"The account protection has been opened, please complete the following "
+"operations according to the prompts"
+msgstr "账号保护已开启，请根据提示完成以下操作"
+
+#: users/templates/users/user_verify_mfa.html:13
+msgid "Open Authenticator and enter the 6-bit dynamic code"
+msgstr "请打开 验证器，输入6位动态码"
 
 # msgid "Update user"
 # msgstr "更新用户"
@@ -6183,19 +6183,19 @@ msgstr "首次登录"
 msgid "Profile setting"
 msgstr "个人信息设置"
 
-#: users/views/profile/otp.py:130
+#: users/views/profile/otp.py:144
 msgid "MFA enable success"
 msgstr "多因子认证启用成功"
 
-#: users/views/profile/otp.py:131
+#: users/views/profile/otp.py:145
 msgid "MFA enable success, return login page"
 msgstr "多因子认证启用成功，返回到登录页面"
 
-#: users/views/profile/otp.py:133
+#: users/views/profile/otp.py:147
 msgid "MFA disable success"
 msgstr "多因子认证禁用成功"
 
-#: users/views/profile/otp.py:134
+#: users/views/profile/otp.py:148
 msgid "MFA disable success, return login page"
 msgstr "多因子认证禁用成功，返回登录页面"
 
@@ -6529,11 +6529,11 @@ msgstr "同步实例任务历史"
 msgid "Instance"
 msgstr "实例"
 
-#: xpack/plugins/cloud/providers/aliyun.py:16
+#: xpack/plugins/cloud/providers/aliyun.py:19
 msgid "Alibaba Cloud"
 msgstr "阿里云"
 
-#: xpack/plugins/cloud/providers/aws.py:14
+#: xpack/plugins/cloud/providers/aws.py:15
 msgid "AWS (International)"
 msgstr "AWS (国际)"
 
@@ -6541,51 +6541,59 @@ msgstr "AWS (国际)"
 msgid "AWS (China)"
 msgstr "AWS (中国)"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:13
+#: xpack/plugins/cloud/providers/huaweicloud.py:17
 msgid "Huawei Cloud"
 msgstr "华为云"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:16
-msgid "CN North-Beijing4"
-msgstr "华北-北京4"
-
-#: xpack/plugins/cloud/providers/huaweicloud.py:17
-msgid "CN East-Shanghai1"
-msgstr "华东-上海1"
-
-#: xpack/plugins/cloud/providers/huaweicloud.py:18
-msgid "CN East-Shanghai2"
-msgstr "华东-上海2"
-
-#: xpack/plugins/cloud/providers/huaweicloud.py:19
-msgid "CN South-Guangzhou"
-msgstr "华南-广州"
-
 #: xpack/plugins/cloud/providers/huaweicloud.py:20
-msgid "CN Southwest-Guiyang1"
-msgstr "西南-贵阳1"
+msgid "AF-Johannesburg"
+msgstr "非洲-约翰内斯堡"
 
 #: xpack/plugins/cloud/providers/huaweicloud.py:21
-msgid "AP-Hong-Kong"
-msgstr "亚太-香港"
-
-#: xpack/plugins/cloud/providers/huaweicloud.py:22
 msgid "AP-Bangkok"
 msgstr "亚太-曼谷"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:22
+msgid "AP-Hong Kong"
+msgstr "亚太-香港"
 
 #: xpack/plugins/cloud/providers/huaweicloud.py:23
 msgid "AP-Singapore"
 msgstr "亚太-新加坡"
 
 #: xpack/plugins/cloud/providers/huaweicloud.py:24
-msgid "AF-Johannesburg"
-msgstr "非洲-约翰内斯堡"
+msgid "CN East-Shanghai1"
+msgstr "华东-上海1"
 
 #: xpack/plugins/cloud/providers/huaweicloud.py:25
-msgid "LA-Santiago"
-msgstr "拉美-圣地亚哥"
+msgid "CN East-Shanghai2"
+msgstr "华东-上海2"
 
-#: xpack/plugins/cloud/providers/qcloud.py:14
+#: xpack/plugins/cloud/providers/huaweicloud.py:26
+msgid "CN North-Beijing1"
+msgstr "华北-北京1"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:27
+msgid "CN North-Beijing4"
+msgstr "华北-北京4"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:28
+msgid "CN Northeast-Dalian"
+msgstr "东北-大连"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:29
+msgid "CN South-Guangzhou"
+msgstr "华南-广州"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:30
+msgid "CN Southwest-Guiyang1"
+msgstr "西南-贵阳1"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:31
+msgid "EU-Paris"
+msgstr ""
+
+#: xpack/plugins/cloud/providers/qcloud.py:17
 msgid "Tencent Cloud"
 msgstr "腾讯云"
 
@@ -6980,6 +6988,9 @@ msgstr "密码匣子"
 #: xpack/plugins/vault/views.py:39
 msgid "vault create"
 msgstr "创建"
+
+#~ msgid "LA-Santiago"
+#~ msgstr "拉美-圣地亚哥"
 
 #~ msgid "Total hosts"
 #~ msgstr "主机总数"
