@@ -11,7 +11,7 @@
                     <h5>{% trans 'Total users' %}</h5>
                 </div>
                 <div class="ibox-content">
-                    <h1 class="no-margins"><a href="{% url 'users:user-list' %}">{{ users_count }}</a></h1>
+                    <h1 class="no-margins"><a href="{% url 'users:user-list' %}"><span id="total_count_users"></span></a></h1>
                     <small>All users</small>
                 </div>
             </div>
@@ -19,12 +19,12 @@
         <div class="col-sm-3">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
-                    <span class="label label-info pull-right">Hosts</span>
-                    <h5>{% trans 'Total hosts' %}</h5>
+                    <span class="label label-info pull-right">Assets</span>
+                    <h5>{% trans 'Total assets' %}</h5>
                 </div>
                 <div class="ibox-content">
-                    <h1 class="no-margins"><a href="{% url 'assets:asset-list' %}">{{ assets_count }}</a></h1>
-                    <small>All hosts</small>
+                    <h1 class="no-margins"><a href="{% url 'assets:asset-list' %}"><span id="total_count_assets"></span></a></h1>
+                    <small>All assets</small>
                 </div>
             </div>
         </div>
@@ -36,7 +36,7 @@
                     <h5>{% trans 'Online users' %}</h5>
                 </div>
                 <div class="ibox-content">
-                    <h1 class="no-margins"><a href="{% url 'terminal:session-online-list' %}"> <span id="online_users"></span>{{ online_user_count }}</a></h1>
+                    <h1 class="no-margins"><a href="{% url 'terminal:session-online-list' %}"> <span id="total_count_online_users"></span></a></h1>
                     <small>Online users</small>
                 </div>
             </div>
@@ -50,7 +50,7 @@
 
                 </div>
                 <div class="ibox-content">
-                        <h1 class="no-margins"><a href="{% url 'terminal:session-online-list' %}"> <span id="online_hosts"></span>{{ online_asset_count }}</a></h1>
+                        <h1 class="no-margins"><a href="{% url 'terminal:session-online-list' %}"> <span id="total_count_online_sessions"></span></a></h1>
                     <small>Online sessions</small>
                 </div>
             </div>
@@ -58,19 +58,11 @@
     </div>
     <div class="row">
         <div class="col-sm-2 border-bottom white-bg dashboard-header" style="margin-left:15px;height: 346px">
-            <small>{% trans 'In the past week, a total of ' %}<span class="text-info">{{ user_visit_count_weekly }}</span>{% trans ' users have logged in ' %}<span class="text-success">{{ asset_visit_count_weekly }}</span>{% trans ' times asset.' %}</small>
-            <ul class="list-group clear-list m-t">
-                {% for data in user_visit_count_top_five %}
-                    <li class="list-group-item fist-item">
-                        <span class="pull-right">
-                            {{ data.total }}{% trans ' times/week' %}
-                        </span>
-                        <span class="label ">{{ forloop.counter }}</span> {{ data.user }}
-                    </li>
-                {% endfor %}
+            <small>{% trans 'In the past week, a total of ' %}<span class="text-info" id="week_total_count_login_users"></span>{% trans ' users have logged in ' %}<span class="text-success" id="week_total_count_login_times"></span>{% trans ' times asset.' %}</small>
+            <ul class="list-group clear-list m-t" id="week_login_times_top5_users">
             </ul>
         </div>
-        <div class="col-sm-7" id="top10" style="margin-left: -15px;height: 346px;padding: 15px 0 15px 0;"></div>
+        <div class="col-sm-7" id="month_metrics_echarts" style="margin-left: -15px;height: 346px;padding: 15px 0 15px 0;"></div>
         <div class="col-sm-3 white-bg" id="top1" style="margin-left: -15px;height: 346px">
             <div class="statistic-box">
                 <h4>
@@ -81,13 +73,13 @@
                 </p>
                 <div class="row text-center">
                     <div class="col-sm-6">
-                        <div id="activeUser"  style="width: 140px; height: 140px;">
+                        <div id="month_total_count_users_pie"  style="width: 140px; height: 140px;">
                         </div>
                         <h5>{% trans 'User' %}</h5>
                     </div>
                     <div class="col-sm-6">
-                        <div id="activeAsset" style="width: 140px; height: 140px;"></div>
-                        <h5>{% trans 'Host' %}</h5>
+                        <div id="month_total_count_assets_pie" style="width: 140px; height: 140px;"></div>
+                        <h5>{% trans 'Asset' %}</h5>
                     </div>
                 </div>
                 <div class="m-t">
@@ -120,27 +112,7 @@
                     <h3><i class="fa fa-inbox"></i>{% trans 'Top 10 assets in a week'%}</h3>
                     <small><i class="fa fa-map-marker"></i>{% trans 'Login frequency and last login record.' %}</small>
                 </div>
-                <div class="ibox-content inspinia-timeline">
-                    {% if week_asset_hot_ten %}
-                        {% for data in week_asset_hot_ten %}
-                            <div class="timeline-item">
-                                <div class="row">
-                                    <div class="col-xs-5 date ellipsis">
-                                        <i class="fa fa-info-circle"></i>
-                                        <strong data-toggle="tooltip" title="{{ data.asset }}">{{ data.asset }}</strong>
-                                        <br/>
-                                        <small class="text-navy">{{ data.total }}{% trans ' times' %}</small>
-                                    </div>
-                                    <div class="col-xs-7 content no-top-border">
-                                        <p class="m-b-xs">{% trans 'The time last logged in' %}</p>
-                                        <p>{% trans 'At' %} {{ data.last|date:"Y-m-d H:i:s" }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <p class="text-center">{% trans '(No)' %}</p>
-                    {% endif %}
+                <div class="ibox-content inspinia-timeline" id="week_login_times_top10_assets">
                 </div>
             </div>
         </div>
@@ -158,27 +130,7 @@
                 </div>
                 <div class="ibox-content">
                     <div>
-                        <div class="feed-activity-list">
-                            {% if last_login_ten %}
-                                {% for login in last_login_ten %}
-                                    <div class="feed-element">
-                                        <a href="#" class="pull-left">
-                                            <img alt="image" class="img-circle" src="{% static 'img/avatar/user.png' %}">
-                                        </a>
-                                        <div class="media-body ">
-                                            {% ifequal login.is_finished 0 %}
-                                                <small class="pull-right text-navy">{{ login.date_start|timesince }} {% trans 'Before' %}</small>
-                                            {% else %}
-                                                <small class="pull-right">{{ login.date_start|timesince }} {% trans 'Before' %}</small>
-                                            {% endifequal %}
-                                            <strong>{{ login.user }}</strong> {% trans 'Login in ' %}{{ login.asset }} <br>
-                                            <small class="text-muted">{{ login.date_start }}</small>
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            {% else %}
-                                <p class="text-center">{% trans '(No)' %}</p>
-                            {% endif %}
+                        <div class="feed-activity-list" id="week_login_record_top10_sessions">
                         </div>
                     </div>
                 </div>
@@ -206,27 +158,7 @@
                     <h3><i class="fa fa-user"></i>{% trans 'Top 10 users in a week' %}</h3>
                     <small><i class="fa fa-map-marker"></i>{% trans 'User login frequency and last login record.' %}</small>
                 </div>
-                <div class="ibox-content inspinia-timeline">
-                    {% if week_user_hot_ten %}
-                        {% for data in week_user_hot_ten %}
-                            <div class="timeline-item">
-                                <div class="row">
-                                    <div class="col-xs-5 date ellipsis">
-                                        <i class="fa fa-info-circle"></i>
-                                        <strong data-toggle="tooltip" title="{{ data.user }}">{{ data.user }}</strong>
-                                        <br/>
-                                        <small class="text-navy">{{ data.total }}{% trans ' times' %}</small>
-                                    </div>
-                                    <div class="col-xs-7 content no-top-border">
-                                        <p class="m-b-xs">{% trans 'The time last logged in' %}</p>
-                                        <p>{% trans 'At' %} {{ data.last|date:"Y-m-d H:i:s" }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <p class="text-center">{% trans '(No)' %}</p>
-                    {% endif %}
+                <div class="ibox-content inspinia-timeline" id="week_login_times_top10_users">
                 </div>
             </div>
         </div>
@@ -238,27 +170,15 @@
 {% block custom_foot_js %}
 <script src="{% static 'js/plugins/echarts/echarts.js' %}"></script>
 <script>
-$(document).ready(function(){
-    $('#show').click(function(){
-        $('#show').css('display', 'none');
-        $('#more').css('display', 'block');
-    });
-    $("[data-toggle='tooltip']").tooltip();
-});
-    require.config({
-        paths: {
-            'echarts': '/static/js/plugins/echarts/chart/',
-            'echarts/chart/line': '/static/js/plugins/echarts/chart/line',
-            'echarts/chart/pie': '/static/js/plugins/echarts/chart/pie'
-        }
-    });
+
+function requireMonthMetricsECharts(data){
     require(
         [
             'echarts',
             'echarts/chart/line'
         ],
         function (ec) {
-            var top10Chart = ec.init(document.getElementById('top10'));
+            var monthMetricsECharts = ec.init(document.getElementById('month_metrics_echarts'));
             var option = {
                 title : {
                     text: "{% trans 'Monthly data overview' %}",
@@ -284,7 +204,7 @@ $(document).ready(function(){
                     {
                         type : 'category',
                         boundaryGap : false,
-                        data : {{ month_str|safe}}
+                        data : data['month_metrics_date'],
                     }
                 ],
                 yAxis : [
@@ -298,38 +218,42 @@ $(document).ready(function(){
                         type:'line',
                         smooth: true,
                         itemStyle: {normal: {areaStyle: {type: 'default'}}},
-                        data: {{ month_total_visit_count|safe}}
+                        data: data['month_metrics_total_count_login']
                     },
                     {
                         name: "{% trans 'Active users' %}",
                         type: 'line',
                         smooth: true,
                         itemStyle: {normal: {areaStyle: {type: 'default'}}},
-                        data: {{ month_user|safe }}
+                        data: data['month_metrics_total_count_active_users']
                     },
                     {
                         name:"{% trans 'Active assets' %}",
                         type:'line',
                         smooth:true,
                         itemStyle: {normal: {areaStyle: {type: 'default'}}},
-                        data: {{ mouth_asset|safe }}
+                        data: data['month_metrics_total_count_active_assets']
                     }
                 ]
             };
-            top10Chart.setOption(option);
+            monthMetricsECharts.setOption(option);
         }
     );
+
+}
+
+function requireMonthTotalCountUsersPie(data){
     require(
         [
             'echarts',
             'echarts/chart/pie'
         ],
         function (ec) {
-            var auChart = ec.init(document.getElementById('activeUser'));
+            var monthTotalCountUsersPie = ec.init(document.getElementById('month_total_count_users_pie'));
             var option = {
                 tooltip : {
                     trigger: 'item',
-                    formatter: "{b} <br> {c} ({d}%)"
+                    formatter: "{b} <br> {c} <br> ({d}%)"
                 },
                 legend: {
                     show: false,
@@ -364,6 +288,7 @@ $(document).ready(function(){
                         name:"{% trans 'Access to the source' %}",
                         type:'pie',
                         radius : ['50%', '70%'],
+                        avoidLabelOverlap: false,
                         itemStyle : {
                             normal : {
                                 label : {
@@ -385,33 +310,36 @@ $(document).ready(function(){
                             }
                         },
                         data:[
-                            {value:{{ month_user_active }}, name:"{% trans 'Monthly active users' %}"},
-                            {value:{{ month_user_disabled }}, name:"{% trans 'Disable user' %}"},
-                            {value:{{ month_user_inactive }}, name:"{% trans 'Month not logged in user' %}"}
+                            {value:data['month_total_count_active_users'], name:"{% trans 'Monthly active users' %}"},
+                            {value:data['month_total_count_disabled_users'], name:"{% trans 'Disable user' %}"},
+                            {value:data['month_total_count_inactive_users'], name:"{% trans 'Month not logged in user' %}"}
                         ]
                     }
                 ]
             };
-            auChart.setOption(option);
+            monthTotalCountUsersPie.setOption(option);
         }
     );
+}
+
+function requireMonthTotalCountAssetsPie(data){
     require(
         [
             'echarts',
             'echarts/chart/pie'
         ],
         function (ec) {
-            var aaChart = ec.init(document.getElementById('activeAsset'));
+            var monthTotalCountAssetsPie = ec.init(document.getElementById('month_total_count_assets_pie'));
             var option = {
                 tooltip : {
                     trigger: 'item',
-                    formatter: "{b} <br> {c} ({d}%)"
+                    formatter: "{b} <br> {c} <br> ({d}%)"
                 },
                 legend: {
                     show: false,
                     orient : 'vertical',
                     x : 'left',
-                    data:["{% trans 'Month is logged into the host' %}", "{% trans 'Disable host' %}", "{% trans 'Month not logged on host' %}"]
+                    data:["{% trans 'Month is logged into the asset' %}", "{% trans 'Disable host' %}", "{% trans 'Month not logged on host' %}"]
                 },
                 toolbox: {
                     show : false,
@@ -461,16 +389,230 @@ $(document).ready(function(){
                             }
                         },
                         data:[
-                            {value:{{ month_asset_active }}, name:"{% trans 'Month is logged into the host' %}"},
-                            {value:{{ month_asset_disabled }}, name:"{% trans 'Disable host' %}"},
-                            {value:{{ month_asset_inactive }}, name:"{% trans 'Month not logged on host' %}"}
+                            {value:data['month_total_count_active_assets'], name:"{% trans 'Month is logged into the host' %}"},
+                            {value:data['month_total_count_disabled_assets'], name:"{% trans 'Disable host' %}"},
+                            {value:data['month_total_count_inactive_assets'], name:"{% trans 'Month not logged on host' %}"}
                         ]
                     }
                 ]
             };
-            aaChart.setOption(option);
+            monthTotalCountAssetsPie.setOption(option);
         }
     );
+}
+
+var indexUrl = "/api/v1/index/";
+
+function renderRequestApi(query, success, error){
+    var url = indexUrl + "?" + query;
+    if (!error){
+        error = function (){console.log("Request url error: " + url)}
+    }
+    requestApi({
+        url: url,
+        method: "GET",
+        success: success,
+        error: error,
+        flash_message: false,
+    })
+}
+
+function renderTotalCount(){
+     var success = function (data) {
+         $('#total_count_assets').html(data['total_count_assets']);
+         $('#total_count_users').html(data['total_count_users']);
+         $('#total_count_online_users').html(data['total_count_online_users']);
+         $('#total_count_online_sessions').html(data['total_count_online_sessions']);
+     };
+    renderRequestApi('total_count=1', success);
+}
+
+function renderMonthMetricsECharts(){
+    var success = function (data) {
+        requireMonthMetricsECharts(data)
+    };
+    renderRequestApi('month_metrics=1', success)
+}
+
+function renderMonthTotalCountUsersPie(){
+    var success = function (data) {
+        requireMonthTotalCountUsersPie(data)
+    };
+    renderRequestApi('month_total_count_users=1', success)
+
+}
+
+function renderMonthTotalCountAssetsPie(){
+    var success = function (data) {
+        requireMonthTotalCountAssetsPie(data)
+    };
+    renderRequestApi('month_total_count_assets=1', success)
+}
+
+function renderWeekTotalCount(){
+    var success = function (data) {
+        $('#week_total_count_login_users').html(data['week_total_count_login_users']);
+        $('#week_total_count_login_times').html(data['week_total_count_login_times'])
+    };
+    renderRequestApi('week_total_count=1', success)
+}
+
+function renderWeekLoginTimesTop5Users(){
+    var success = function (data){
+        var html = "";
+        var html_cell = "" +
+            "<li class=\"list-group-item fist-item\">" +
+            "<span class=\"pull-right\">" +
+            "{TOTAL} {% trans ' times/week' %}" +
+            "</span>" +
+            "<span class=\"label \">{INDEX}</span> {USER}" +
+            "</li>";
+
+        $.each(data['week_login_times_top5_users'], function(index, value){
+            html += html_cell.replace('{TOTAL}', value['total'])
+                .replace('{USER}', value['user'])
+                .replace('{INDEX}', index+1)
+        });
+        $('#week_login_times_top5_users').html(html)
+    };
+    renderRequestApi('week_login_times_top5_users=1', success)
+}
+
+function renderWeekLoginTimesTop10Assets(){
+    var success = function (data){
+        var html = "";
+        var html_cell = "" +
+            "<div class=\"timeline-item\">" +
+            "<div class=\"row\">" +
+            "<div class=\"col-xs-5 date ellipsis\">" +
+            "<i class=\"fa fa-info-circle\"></i>" +
+            "<strong data-toggle=\"tooltip\" title=\"{ASSET}\">{ASSET}</strong>" +
+            "<br/>" +
+            "<small class=\"text-navy\">{TOTAL}{% trans ' times' %}</small>" +
+            "</div>" +
+            "<div class=\"col-xs-7 content no-top-border\">" +
+            "<p class=\"m-b-xs\">{% trans 'The time last logged in' %}</p>" +
+            "<p>{% trans 'At' %} {DATE_LAST}</p>" +
+            "</div>" +
+            "</div>" +
+            "</div>";
+
+        var assets = data['week_login_times_top10_assets'];
+        if (assets.length !== 0){
+            $.each(assets, function(index, value){
+                html += html_cell
+                    .replaceAll('{ASSET}', value['asset'])
+                    .replace('{TOTAL}', value['total'])
+                    .replace('{DATE_LAST}', toSafeLocalDateStr(value['last']))
+            });
+        }
+        else{
+            html += "<p class=\"text-center\">{% trans '(No)' %}</p>"
+        }
+        $('#week_login_times_top10_assets').html(html)
+    };
+    renderRequestApi('week_login_times_top10_assets=1', success)
+}
+
+function renderWeekLoginTimesTop10Users(){
+    var success = function (data){
+        var html = "";
+        var html_cell = "" +
+            "<div class=\"timeline-item\">" +
+            "<div class=\"row\">" +
+            "<div class=\"col-xs-5 date ellipsis\">" +
+            "<i class=\"fa fa-info-circle\"></i>" +
+            "<strong data-toggle=\"tooltip\" title=\"{USER}\">{USER}</strong>" +
+            "<br/>" +
+            "<small class=\"text-navy\">{TOTAL}{% trans ' times' %}</small>" +
+            "</div>" +
+            "<div class=\"col-xs-7 content no-top-border\">" +
+            "<p class=\"m-b-xs\">{% trans 'The time last logged in' %}</p>" +
+            "<p>{% trans 'At' %} {DATE_LAST}</p>" +
+            "</div>" +
+            "</div>" +
+            "</div>";
+
+        var users = data['week_login_times_top10_users'];
+        if (users.length !== 0){
+            $.each(users, function(index, value){
+                html += html_cell.replaceAll('{USER}', value['user'])
+                    .replace('{TOTAL}', value['total'])
+                    .replace('{DATE_LAST}', toSafeLocalDateStr(value['last']))
+            });
+        }
+        else{
+            html += "<p class=\"text-center\">{% trans '(No)' %}</p>"
+        }
+        $('#week_login_times_top10_users').html(html)
+    };
+    renderRequestApi('week_login_times_top10_users=1', success)
+}
+
+function renderWeekLoginRecordTop10Sessions(){
+    var success = function (data){
+        var html = "";
+        var html_cell = "" +
+            "<div class=\"feed-element\">" +
+            "<a href=\"#\" class=\"pull-left\">" +
+            "<img alt=\"image\" class=\"img-circle\" src=\"{% static 'img/avatar/user.png' %}\">" +
+            "</a>" +
+            "<div class=\"media-body \">" +
+            "<small class=\"pull-right {TEXT_NAVY}\">{TIMESINCE} {% trans 'Before' %}</small>" +
+            "<strong>{USER}</strong> {% trans 'Login in ' %}{ASSET} <br>" +
+            "<small class=\"text-muted\">{DATE_START}</small>" +
+            "</div>" +
+            "</div>";
+
+        var users = data['week_login_record_top10_sessions'];
+        if (users.length !== 0){
+            $.each(users, function(index, value){
+                console.log(value['is_finished'])
+                html += html_cell.replaceAll('{USER}', value['user'])
+                    .replace('{ASSET}', value['asset'])
+                    .replace('{DATE_START}', toSafeLocalDateStr(value['date_start']))
+                    .replace('{TEXT_NAVY}', value['is_finished']?'':'text-navy')
+                    .replace('{TIMESINCE}', value['timesince'])
+
+            });
+        }
+        else{
+            html += "<p class=\"text-center\">{% trans '(No)' %}</p>"
+        }
+        $('#week_login_record_top10_sessions').html(html)
+
+    };
+    renderRequestApi('week_login_record_top10_sessions=1', success)
+}
+
+function renderData(){
+    renderTotalCount();
+    renderMonthMetricsECharts();
+    renderMonthTotalCountUsersPie();
+    renderMonthTotalCountAssetsPie();
+    renderWeekTotalCount();
+    renderWeekLoginTimesTop5Users();
+    renderWeekLoginTimesTop10Assets();
+    renderWeekLoginRecordTop10Sessions();
+    renderWeekLoginTimesTop10Users();
+}
+
+require.config({
+    paths: {
+        'echarts': '/static/js/plugins/echarts/chart/',
+        'echarts/chart/line': '/static/js/plugins/echarts/chart/line',
+        'echarts/chart/pie': '/static/js/plugins/echarts/chart/pie'
+    }
+});
+
+$(document).ready(function(){
+    $('#show').click(function(){
+        $('#show').css('display', 'none');
+        $('#more').css('display', 'block');
+    });
+    $("[data-toggle='tooltip']").tooltip();
+    renderData()
+});
 </script>
 
 {% endblock %}
