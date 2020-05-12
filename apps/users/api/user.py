@@ -29,9 +29,7 @@ __all__ = [
 class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
     filter_fields = ('username', 'email', 'name', 'id')
     search_fields = filter_fields
-    serializer_classes = {
-        'default': serializers.UserSerializer,
-    }
+    serializer_class = serializers.UserSerializer
     permission_classes = (IsOrgAdmin, CanUpdateDeleteUser)
 
     def get_queryset(self):
