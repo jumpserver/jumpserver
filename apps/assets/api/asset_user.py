@@ -84,12 +84,15 @@ class AssetUserViewSet(CommonApiMixin, BulkModelViewSet):
 
     def get_object(self):
         pk = self.kwargs.get("pk")
+        if pk is None:
+            return
         queryset = self.get_queryset()
         obj = queryset.get(id=pk)
         return obj
 
     def get_exception_handler(self):
         def handler(e, context):
+            logger.error(e, exc_info=True)
             return Response({"error": str(e)}, status=400)
         return handler
 
