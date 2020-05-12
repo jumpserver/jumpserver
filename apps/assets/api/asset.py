@@ -33,7 +33,7 @@ class AssetViewSet(OrgBulkModelViewSet):
     API endpoint that allows Asset to be viewed or edited.
     """
     model = Asset
-    filter_fields = ("hostname", "ip", "systemuser__id", "admin_user__id")
+    filter_fields = ("hostname", "ip", "systemuser__id", "admin_user__id", "platform__name")
     search_fields = ("hostname", "ip")
     ordering_fields = ("hostname", "ip", "port", "cpu_cores")
     serializer_classes = {
