@@ -181,19 +181,17 @@ class ResetOTPSerializer(serializers.Serializer):
         pass
 
 
+class UserRoleSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=24)
+    display = serializers.CharField(max_length=64)
+
+
 class UserProfileSerializer(UserSerializer):
     admin_or_audit_orgs = UserOrgSerializer(many=True, read_only=True)
+    current_org_roles = serializers.ListField()
 
     class Meta(UserSerializer.Meta):
-        # fields = [
-        #     'id', 'name', 'username', 'email',
-        #     'role', 'wechat', 'phone', 'mfa_level',
-        #     'comment', 'source', 'is_valid', 'is_expired',
-        #     'is_active', 'created_by', 'is_first_login',
-        #     'date_password_last_updated', 'date_expired',
-        #     'avatar_url', 'groups', 'admin_or_audit_orgs',
-        # ]
         fields = UserSerializer.Meta.fields + [
-            'admin_or_audit_orgs'
+            'admin_or_audit_orgs', 'current_org_roles'
         ]
 

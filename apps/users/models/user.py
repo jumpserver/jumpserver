@@ -159,6 +159,14 @@ class RoleMixin:
             roles.append(str(_('User')))
         return " | ".join(roles)
 
+    def current_org_roles(self):
+        roles = []
+        if self.can_admin_current_org:
+            roles.append('Admin')
+        if self.can_audit_current_org:
+            roles.append('Auditor')
+        return roles
+
     @property
     def is_superuser(self):
         if self.role == 'Admin':
