@@ -174,20 +174,19 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 
 ## 安装及使用指南
 
--  [Docker 快速安装文档](http://docs.jumpserver.org/zh/docs/dockerinstall.html)
--  [Step by Step 安装文档](http://docs.jumpserver.org/zh/docs/step_by_step.html)
+-  [快速安装文档](https://docs.jumpserver.org/zh/master/install/setup_by_fast/)
+-  [快速入门文档](https://docs.jumpserver.org/zh/master/admin-guide/quick_start/)
 -  [完整文档](http://docs.jumpserver.org)
 
-## 演示视频和截屏
+## 演示视频
 
 我们提供了演示视频和系统截图可以让你快速了解 JumpServer：
 
 - [演示视频](https://jumpserver.oss-cn-hangzhou.aliyuncs.com/jms-media/%E3%80%90%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91%E3%80%91Jumpserver%20%E5%A0%A1%E5%9E%92%E6%9C%BA%20V1.5.0%20%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91%20-%20final.mp4)
-- [系统截图](http://docs.JumpServer.org/zh/docs/snapshot.html)
 
 ## License & Copyright
 
-Copyright (c) 2014-2019 飞致云 FIT2CLOUD, All rights reserved.
+Copyright (c) 2014-2020 飞致云 FIT2CLOUD, All rights reserved.
 
 Licensed under The GNU General Public License version 2 (GPLv2)  (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
