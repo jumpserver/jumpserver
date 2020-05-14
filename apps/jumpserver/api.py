@@ -234,11 +234,23 @@ class IndexApi(TotalCountMixin, WeekSessionMetricMixin, MonthLoginMetricMixin, A
 
         _all = query_params.get('all')
 
-        if _all or query_params.get('total_count'):
+        if _all or query_params.get('total_count') or query_params.get('total_count_users'):
+            data.update({
+                'total_count_users': self.get_total_count_users(),
+            })
+
+        if _all or query_params.get('total_count') or query_params.get('total_count_assets'):
             data.update({
                 'total_count_assets': self.get_total_count_assets(),
-                'total_count_users': self.get_total_count_users(),
+            })
+
+        if _all or query_params.get('total_count') or query_params.get('total_count_online_users'):
+            data.update({
                 'total_count_online_users': self.get_total_count_online_users(),
+            })
+
+        if _all or query_params.get('total_count') or query_params.get('total_count_online_sessions'):
+            data.update({
                 'total_count_online_sessions': self.get_total_count_online_sessions(),
             })
 
