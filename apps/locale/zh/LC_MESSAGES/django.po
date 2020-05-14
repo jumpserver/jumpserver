@@ -5598,7 +5598,7 @@ msgstr "上一步"
 
 #: users/templates/users/first_login_done.html:31
 msgid "Welcome to use jumpserver, visit "
-msgstr "欢迎使用JumpServer开源跳板机系统"
+msgstr "欢迎使用 JumpServer 堡垒机"
 
 #: users/templates/users/first_login_done.html:32
 msgid "Use guide"
