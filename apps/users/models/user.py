@@ -165,6 +165,8 @@ class RoleMixin:
             roles.append('Admin')
         if self.can_audit_current_org:
             roles.append('Auditor')
+        else:
+            roles.append('User')
         return roles
 
     @property
