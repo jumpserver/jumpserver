@@ -1,21 +1,28 @@
 # JumpServer 多云环境下更好用的堡垒机
 
 [![Python3](https://img.shields.io/badge/python-3.6-green.svg?style=plastic)](https://www.python.org/)
-[![Django](https://img.shields.io/badge/django-2.1-brightgreen.svg?style=plastic)](https://www.djangoproject.com/)
-[![Ansible](https://img.shields.io/badge/ansible-2.4.2.0-blue.svg?style=plastic)](https://www.ansible.com/)
-[![Paramiko](https://img.shields.io/badge/paramiko-2.4.1-green.svg?style=plastic)](http://www.paramiko.org/)
+[![Django](https://img.shields.io/badge/django-2.2-brightgreen.svg?style=plastic)](https://www.djangoproject.com/)
 
-JumpServer 是全球首款开源的堡垒机，使用 GNU GPL v2.0 开源协议，是符合 4A 机制的运维安全审计系统。
+JumpServer 是全球首款开源的堡垒机，使用 GNU GPL v2.0 开源协议，是符合 4A 规范的运维安全审计系统。
 
-JumpServer 使用 Python / Django 进行开发，遵循 Web 2.0 规范，配备了业界领先的 Web Terminal 方案，交互界面美观、用户体验好。
+JumpServer 使用 Python / Django 为主进行开发，遵循 Web 2.0 规范，配备了业界领先的 Web Terminal 方案，交互界面美观、用户体验好。
 
 JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向扩展，无资产数量及并发限制。
 
 改变世界，从一点点开始。
 
-注: [KubeOperator](https://github.com/KubeOperator/KubeOperator) 是 JumpServer 团队在 Kubernetes 领域的的又一全新力作，欢迎关注和使用。
+> 注: [KubeOperator](https://github.com/KubeOperator/KubeOperator) 是 JumpServer 团队在 Kubernetes 领域的的又一全新力作，欢迎关注和使用。
 
-## 核心功能列表
+## 特色优势
+
+- 开源: 零门槛，线上快速获取和安装；
+- 分布式: 轻松支持大规模并发访问；
+- 无插件: 仅需浏览器，极致的 Web Terminal 使用体验；
+- 多云支持: 一套系统，同时管理不同云上面的资产；
+- 云端存储: 审计录像云端存储，永不丢失；
+- 多租户: 一套系统，多个子公司和部门同时使用。
+
+## 功能列表
 
 <table>
   <tr>
@@ -172,17 +179,22 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
   </tr>
 </table>
 
-## 安装及使用指南
+## 快速开始
 
--  [快速安装文档](https://docs.jumpserver.org/zh/master/install/setup_by_fast/)
--  [快速入门文档](https://docs.jumpserver.org/zh/master/admin-guide/quick_start/)
--  [完整文档](http://docs.jumpserver.org)
-
-## 演示视频
-
-我们提供了演示视频和系统截图可以让你快速了解 JumpServer：
-
+- [极速安装](https://docs.jumpserver.org/zh/master/install/setup_by_fast/)
+- [完整文档](https://docs.jumpserver.org)
 - [演示视频](https://jumpserver.oss-cn-hangzhou.aliyuncs.com/jms-media/%E3%80%90%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91%E3%80%91Jumpserver%20%E5%A0%A1%E5%9E%92%E6%9C%BA%20V1.5.0%20%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91%20-%20final.mp4)
+
+## 案例研究
+
+- [JumpServer 堡垒机护航顺丰科技超大规模资产安全运维](https://blog.fit2cloud.com/?p=1147)；
+- [JumpServer 堡垒机让“大智慧”的混合 IT 运维更智慧](https://blog.fit2cloud.com/?p=882)；
+- [携程 JumpServer 堡垒机部署与运营实战](https://blog.fit2cloud.com/?p=851)；
+- [小红书的JumpServer堡垒机大规模资产跨版本迁移之路](https://blog.fit2cloud.com/?p=516)；
+- [JumpServer堡垒机助力中手游提升多云环境下安全运维能力](https://blog.fit2cloud.com/?p=732)；
+- [中通快递：JumpServer主机安全运维实践](https://blog.fit2cloud.com/?p=708)；
+- [东方明珠：JumpServer高效管控异构化、分布式云端资产](https://blog.fit2cloud.com/?p=687)；
+- [江苏农信：JumpServer堡垒机助力行业云安全运维](https://blog.fit2cloud.com/?p=666)。
 
 ## License & Copyright
 
