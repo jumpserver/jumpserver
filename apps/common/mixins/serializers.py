@@ -9,7 +9,7 @@ from rest_framework.settings import api_settings
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SkipField, empty
 
-__all__ = ['BulkSerializerMixin', 'BulkListSerializerMixin', 'CommonSerializerMixin']
+__all__ = ['BulkSerializerMixin', 'BulkListSerializerMixin', 'CommonSerializerMixin', 'CommonBulkSerializerMixin']
 
 
 class BulkSerializerMixin(object):
@@ -233,3 +233,6 @@ class EagerLoadQuerySetFields:
 class CommonSerializerMixin(DynamicFieldsMixin):
     pass
 
+
+class CommonBulkSerializerMixin(BulkSerializerMixin, CommonSerializerMixin):
+    pass

@@ -437,6 +437,15 @@ class DynamicConfig:
             backends.insert(0, 'authentication.backends.radius.RadiusBackend')
         return backends
 
+    def XPACK_LICENSE_IS_VALID(self):
+        if not HAS_XPACK:
+            return False
+        try:
+            from xpack.plugins.license.models import License
+            return bool(License.is_valid)
+        except:
+            return False
+
     def get_from_db(self, item):
         if self.db_setting is not None:
             value = self.db_setting.get(item)

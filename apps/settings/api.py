@@ -270,6 +270,8 @@ class PublicSettingApi(generics.RetrieveAPIView):
             "data": {
                 "WINDOWS_SKIP_ALL_MANUAL_PASSWORD": settings.WINDOWS_SKIP_ALL_MANUAL_PASSWORD,
                 "SECURITY_MAX_IDLE_TIME": settings.SECURITY_MAX_IDLE_TIME,
+                "XPACK_ENABLED": settings.XPACK_ENABLED,
+                "XPACK_LICENSE_IS_VALID": settings.XPACK_LICENSE_IS_VALID
             }
         }
         return instance

@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from common.utils import validate_ssh_public_key
-from common.mixins import CommonSerializerMixin
+from common.mixins import CommonBulkSerializerMixin
 from common.serializers import AdaptedBulkListSerializer
 from common.permissions import CanUpdateDeleteUser
 from ..models import User
@@ -23,7 +23,7 @@ class UserOrgSerializer(serializers.Serializer):
     name = serializers.CharField()
 
 
-class UserSerializer(CommonSerializerMixin, serializers.ModelSerializer):
+class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
     EMAIL_SET_PASSWORD = _('Reset link will be generated and sent to the user')
     CUSTOM_PASSWORD = _('Set password')
     PASSWORD_STRATEGY_CHOICES = (
@@ -108,6 +108,9 @@ class UserSerializer(CommonSerializerMixin, serializers.ModelSerializer):
         return password
 
     def validate_groups(self, groups):
+        """
+        审计员不能加入到组中
+        """
         role = self.initial_data.get('role')
         if self.instance:
             role = role or self.instance.role
