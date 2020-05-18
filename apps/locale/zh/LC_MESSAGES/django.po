@@ -1671,7 +1671,7 @@ msgstr "定期测试系统用户可连接性: {}"
 
 #: assets/tasks/utils.py:17
 msgid "Asset has been disabled, skipped: {}"
-msgstr "资产或许不支持ansible, 跳过: {}"
+msgstr "资产已经被禁用, 跳过: {}"
 
 #: assets/tasks/utils.py:21
 msgid "Asset may not be support ansible, skipped: {}"
