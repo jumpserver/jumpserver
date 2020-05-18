@@ -218,7 +218,7 @@ function addGroups(groupsId) {
 }
 
 function removeGroup(groupId) {
-    var theUrl = "{% url 'api-perms:asset-permissions-user-groups-relation-list' %}?assetpermission={{ object.id }}";
+    var theUrl = "{% url 'api-perms:asset-permissions-user-groups-relation-list' %}?assetpermission={{ object.id }}&usergroup=groupId";
     theUrl = theUrl.replace("groupId", groupId);
     var success = function(data) {
         location.reload();
