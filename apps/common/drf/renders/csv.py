@@ -21,7 +21,9 @@ class JMSCSVRender(BaseRenderer):
 
     @staticmethod
     def _get_show_fields(fields, template):
-        if template in ('import', 'update'):
+        if template == 'import':
+            return [v for k, v in fields.items() if not v.read_only and k != "org_id" and k != 'id']
+        elif template == 'update':
             return [v for k, v in fields.items() if not v.read_only and k != "org_id"]
         else:
             return [v for k, v in fields.items() if not v.write_only and k != "org_id"]
