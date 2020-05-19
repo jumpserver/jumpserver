@@ -135,6 +135,19 @@ $(document).ready(function () {
         }
     };
     requestApi(data)
+}).on('click', '.btn-api-keydel', function (){
+    var url = "{% url "api-auth:access-key-detail" pk=DEFAULT_PK %}";
+    url = url.replace("{{ DEFAULT_PK }}", $(this).data("id")) ;
+    var data = {
+        url: url,
+        method: "DELETE",
+        success: function () {
+            ak_table.ajax.reload();
+        },
+        success_message: "{% trans 'Delete success' %}"
+
+    };
+    requestApi(data)
 })
 </script>
 {% endblock %}
