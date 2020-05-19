@@ -36,14 +36,14 @@ class ActionsDisplayField(ActionsField):
 
 class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
     actions = ActionsField(required=False, allow_null=True)
-    is_valid = serializers.BooleanField()
-    is_expired = serializers.BooleanField()
+    is_valid = serializers.BooleanField(read_only=True)
+    is_expired = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = AssetPermission
         mini_fields = ['id', 'name']
         small_fields = mini_fields + [
-            'is_active', 'actions', 'created_by', 'date_created'
+            'is_active', 'is_expired', 'is_valid', 'actions', 'created_by', 'date_created'
         ]
         m2m_fields = [
             'users', 'user_groups', 'assets', 'nodes', 'system_users',
