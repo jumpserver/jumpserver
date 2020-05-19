@@ -477,6 +477,7 @@ class ParserNode:
                     'platform': asset.platform_base,
                     'domain': asset.domain_id,
                     'org_name': asset.org_name,
+                    'org_id': asset.org_id
                 },
             }
         }
