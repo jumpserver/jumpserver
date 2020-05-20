@@ -36,8 +36,8 @@ class ActionsDisplayField(ActionsField):
 
 class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
     actions = ActionsField(required=False, allow_null=True)
-    is_valid = serializers.BooleanField()
-    is_expired = serializers.BooleanField()
+    is_valid = serializers.BooleanField(read_only=True)
+    is_expired = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = AssetPermission
