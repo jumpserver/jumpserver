@@ -16,7 +16,7 @@ class GatheredUserSerializer(OrgResourceModelSerializerMixin):
             'present', 'date_created', 'date_updated'
         ]
         read_only_fields = fields
-        labels = {
-            'hostname': _("Hostname"),
-            'ip': "IP"
+        extra_kwargs = {
+            'hostname': {'label': _("Hostname")},
+            'ip': {'label': 'IP'},
         }
