@@ -442,7 +442,7 @@ class DynamicConfig:
             return False
         try:
             from xpack.plugins.license.models import License
-            return bool(License.is_valid)
+            return License.has_valid_license()
         except:
             return False
 
