@@ -62,8 +62,7 @@ class AuthMixin:
             password = request.POST.get('password', '')
             public_key = request.POST.get('public_key', '')
         user, error = check_user_valid(
-            username=username, password=password,
-            public_key=public_key
+            request=request, username=username, password=password, public_key=public_key
         )
         ip = self.get_request_ip()
         if not user:

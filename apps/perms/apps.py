@@ -5,3 +5,7 @@ from django.apps import AppConfig
 
 class PermsConfig(AppConfig):
     name = 'perms'
+
+    def ready(self):
+        super().ready()
+        from . import signals_handler

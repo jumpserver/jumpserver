@@ -16,7 +16,7 @@ class TerminalSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'name', 'remote_addr', 'http_port', 'ssh_port',
             'comment', 'is_accepted', "is_active", 'session_online',
-            'is_alive'
+            'is_alive', 'date_created', 'command_storage', 'replay_storage'
         ]
 
     @staticmethod
