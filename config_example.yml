@@ -56,6 +56,7 @@ REDIS_PORT: 6379
 # Use OpenID Authorization
 # 使用 OpenID 进行认证设置
 # AUTH_OPENID: False # True or False
+# BASE_SITE_URL: None
 # AUTH_OPENID_CLIENT_ID: client-id
 # AUTH_OPENID_CLIENT_SECRET: client-secret
 # AUTH_OPENID_PROVIDER_ENDPOINT: https://op-example.com/
