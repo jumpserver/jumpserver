@@ -196,6 +196,16 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 - [东方明珠：JumpServer高效管控异构化、分布式云端资产](https://blog.fit2cloud.com/?p=687)；
 - [江苏农信：JumpServer堡垒机助力行业云安全运维](https://blog.fit2cloud.com/?p=666)。
 
+## 安全说明
+
+JumpServer是一款安全产品，请参考 [基本安全建议](https://docs.jumpserver.org/zh/master/install/install_security/) 部署安装.
+
+如果你发现安全问题，可以直接联系我们：
+
+- ibuler@fit2cloud.com 
+- support@fit2cloud.com 
+- 400-052-0755
+
 ## License & Copyright
 
 Copyright (c) 2014-2020 飞致云 FIT2CLOUD, All rights reserved.
