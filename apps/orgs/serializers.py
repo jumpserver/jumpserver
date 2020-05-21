@@ -1,12 +1,10 @@
 
-import re
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
-from users.models import User, UserGroup
+from users.models import UserGroup
 from assets.models import Asset, Domain, AdminUser, SystemUser, Label
 from perms.models import AssetPermission
 from common.serializers import AdaptedBulkListSerializer
-from users.serializers import UserOrgSerializer
 from .utils import set_current_org, get_current_org
 from .models import Organization
 from .mixins.serializers import OrgMembershipSerializerMixin
@@ -21,9 +19,9 @@ class OrgSerializer(ModelSerializer):
 
 
 class OrgReadSerializer(ModelSerializer):
-    admins = UserOrgSerializer(many=True, read_only=True)
-    auditors = UserOrgSerializer(many=True, read_only=True)
-    users = UserOrgSerializer(many=True, read_only=True)
+    admins = serializers.SlugRelatedField(slug_field='name', many=True, read_only=True)
+    auditors = serializers.SlugRelatedField(slug_field='name', many=True, read_only=True)
+    users = serializers.SlugRelatedField(slug_field='name', many=True, read_only=True)
     user_groups = serializers.SerializerMethodField()
     assets = serializers.SerializerMethodField()
     domains = serializers.SerializerMethodField()
@@ -93,3 +91,12 @@ class OrgAllUserSerializer(serializers.Serializer):
     @staticmethod
     def get_user_display(obj):
         return str(obj)
+
+
+class OrgRetrieveSerializer(OrgReadSerializer):
+    admins = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    auditors = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    users = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+
+    class Meta(OrgReadSerializer.Meta):
+        pass
