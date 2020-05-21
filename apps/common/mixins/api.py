@@ -27,16 +27,15 @@ class JSONResponseMixin(object):
 
 class SerializerMixin:
     def get_serializer_class(self):
-        if not hasattr(self, 'serializer_classes') or isinstance(self.serializer_classes, dict):
-            return super().get_serializer_class()
-
         serializer_class = None
-        if self.action in ['list', 'metadata'] and self.request.query_params.get('draw'):
-            serializer_class = self.serializer_classes.get('display')
-        if serializer_class is None:
-            serializer_class = self.serializer_classes.get(
-                self.action, self.serializer_classes.get('default')
-            )
+        if hasattr(self, 'serializer_classes') and isinstance(self.serializer_classes, dict):
+            if self.action in ['list', 'metadata'] and self.request.query_params.get('draw'):
+                serializer_class = self.serializer_classes.get('display')
+            if serializer_class is None:
+                serializer_class = self.serializer_classes.get(
+                    self.action, self.serializer_classes.get('default')
+                )
+        print(serializer_class)
         if serializer_class:
             return serializer_class
         return super().get_serializer_class()
