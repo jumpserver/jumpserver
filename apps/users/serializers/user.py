@@ -14,7 +14,7 @@ from ..models import User
 __all__ = [
     'UserSerializer', 'UserPKUpdateSerializer',
     'ChangeUserPasswordSerializer', 'ResetOTPSerializer',
-    'UserProfileSerializer',
+    'UserProfileSerializer', 'UserOrgSerializer'
 ]
 
 
