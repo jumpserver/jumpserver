@@ -14,7 +14,7 @@ from ..utils import lazyproperty
 
 __all__ = [
     "JSONResponseMixin", "CommonApiMixin",
-    "IDSpmFilterMixin", 'AsyncApiMixin',
+    'AsyncApiMixin',
 ]
 
 
@@ -25,30 +25,27 @@ class JSONResponseMixin(object):
         return JsonResponse(context)
 
 
-class IDSpmFilterMixin:
-    def get_filter_backends(self):
-        backends = super().get_filter_backends()
-        backends.append(IDSpmFilter)
-        return backends
-
-
 class SerializerMixin:
     def get_serializer_class(self):
+        if not hasattr(self, 'serializer_classes') or isinstance(self.serializer_classes, dict):
+            return super().get_serializer_class()
+
         serializer_class = None
-        if hasattr(self, 'serializer_classes') and \
-                isinstance(self.serializer_classes, dict):
-            if self.action in ['list', 'metadata'] and self.request.query_params.get('draw'):
-                serializer_class = self.serializer_classes.get('display')
-            if serializer_class is None:
-                serializer_class = self.serializer_classes.get(
-                    self.action, self.serializer_classes.get('default')
-                )
+        if self.action in ['list', 'metadata'] and self.request.query_params.get('draw'):
+            serializer_class = self.serializer_classes.get('display')
+        if serializer_class is None:
+            serializer_class = self.serializer_classes.get(
+                self.action, self.serializer_classes.get('default')
+            )
         if serializer_class:
             return serializer_class
         return super().get_serializer_class()
 
 
 class ExtraFilterFieldsMixin:
+    """
+    额外的 api filter
+    """
     default_added_filters = [CustomFilter, IDSpmFilter, IDInFilter]
     filter_backends = api_settings.DEFAULT_FILTER_BACKENDS
     extra_filter_fields = []
@@ -57,9 +54,10 @@ class ExtraFilterFieldsMixin:
     def get_filter_backends(self):
         if self.filter_backends != self.__class__.filter_backends:
             return self.filter_backends
-        return list(self.filter_backends) + \
-               self.default_added_filters + \
-               list(self.extra_filter_backends)
+        backends = list(self.filter_backends) + \
+                   list(self.default_added_filters) + \
+                   list(self.extra_filter_backends)
+        return backends
 
     def filter_queryset(self, queryset):
         for backend in self.get_filter_backends():
@@ -72,6 +70,9 @@ class CommonApiMixin(SerializerMixin, ExtraFilterFieldsMixin):
 
 
 class InterceptMixin:
+    """
+    Hack默认的dispatch, 让用户可以实现 self.do
+    """
     def dispatch(self, request, *args, **kwargs):
         self.args = args
         self.kwargs = kwargs
