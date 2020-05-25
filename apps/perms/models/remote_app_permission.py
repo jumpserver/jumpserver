@@ -23,6 +23,10 @@ class RemoteAppPermission(BasePermission):
     def get_all_remote_apps(self):
         return set(self.remote_apps.all())
 
+    @property
+    def all_remote_apps(self):
+        return self.remote_apps.all()
+
     @lazyproperty
     def remote_apps_amount(self):
         return self.remote_apps.count()

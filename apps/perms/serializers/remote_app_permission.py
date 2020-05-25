@@ -36,8 +36,8 @@ class RemoteAppPermissionSerializer(BulkOrgResourceModelSerializer):
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
         queryset = queryset.annotate(
-            users_amount=Count('users'), user_groups_amount=Count('user_groups'),
-            remote_apps_amount=Count('remote_apps'),  system_users_amount=Count('system_users')
+            users_amount=Count('users', distinct=True), user_groups_amount=Count('user_groups', distinct=True),
+            remote_apps_amount=Count('remote_apps', distinct=True),  system_users_amount=Count('system_users', distinct=True)
         )
         return queryset
 

@@ -1,8 +1,8 @@
 # coding: utf-8
 #
+from perms.serializers.base import PermissionAllUserSerializer
 from rest_framework import serializers
 
-from applications.models import DatabaseApp
 from common.mixins import BulkSerializerMixin
 from common.serializers import AdaptedBulkListSerializer
 
@@ -50,16 +50,9 @@ class DatabaseAppPermissionUserGroupRelationSerializer(RelationMixin, serializer
         ]
 
 
-class DatabaseAppPermissionAllUserSerializer(serializers.Serializer):
-    user = serializers.UUIDField(read_only=True, source='id')
-    user_display = serializers.SerializerMethodField()
-
-    class Meta:
-        only_fields = ['id', 'username', 'name']
-
-    @staticmethod
-    def get_user_display(obj):
-        return str(obj)
+class DatabaseAppPermissionAllUserSerializer(PermissionAllUserSerializer):
+    class Meta(PermissionAllUserSerializer.Meta):
+        pass
 
 
 class DatabaseAppPermissionDatabaseAppRelationSerializer(RelationMixin, serializers.ModelSerializer):
