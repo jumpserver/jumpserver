@@ -35,7 +35,6 @@ class SerializerMixin:
                 serializer_class = self.serializer_classes.get(
                     self.action, self.serializer_classes.get('default')
                 )
-        print(serializer_class)
         if serializer_class:
             return serializer_class
         return super().get_serializer_class()
