@@ -1,10 +1,8 @@
 # coding: utf-8
 #
-import perms.serializers.base
-from perms.api.base import RelationMixin
+from perms.api.base import RelationViewSet
 from rest_framework import generics
-from django.db.models import F, Value
-from django.db.models.functions import Concat
+from django.db.models import F
 from django.shortcuts import get_object_or_404
 
 from common.permissions import IsOrgAdmin
@@ -33,10 +31,9 @@ class RemoteAppPermissionAllUserListApi(generics.ListAPIView):
         return users
 
 
-class RemoteAppPermissionUserRelationViewSet(RelationMixin):
+class RemoteAppPermissionUserRelationViewSet(RelationViewSet):
     serializer_class = serializers.RemoteAppPermissionUserRelationSerializer
-    model = models.RemoteAppPermission.users.through
-    relation_query_name = 'remoteapppermission'
+    m2m_field = models.RemoteAppPermission.users.field
     permission_classes = (IsOrgAdmin,)
     filterset_fields = [
         'id', 'user', 'remoteapppermission'
@@ -49,10 +46,9 @@ class RemoteAppPermissionUserRelationViewSet(RelationMixin):
         return queryset
 
 
-class RemoteAppPermissionRemoteAppRelationViewSet(RelationMixin):
+class RemoteAppPermissionRemoteAppRelationViewSet(RelationViewSet):
     serializer_class = serializers.RemoteAppPermissionRemoteAppRelationSerializer
-    model = models.RemoteAppPermission.remote_apps.through
-    relation_query_name = 'remoteapppermission'
+    m2m_field = models.RemoteAppPermission.remote_apps.field
     permission_classes = (IsOrgAdmin,)
     filterset_fields = [
         'id', 'remoteapp', 'remoteapppermission',
