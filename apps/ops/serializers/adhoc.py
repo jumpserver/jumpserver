@@ -19,10 +19,13 @@ class AdHocExecutionSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_stat(obj):
+        count_failed_hosts = len(obj.failed_hosts)
+        count_success_hosts = len(obj.success_hosts)
+        count_total = count_success_hosts + count_failed_hosts
         return {
-            "total": obj.hosts_amount,
-            "success": len(obj.summary.get("contacted", [])),
-            "failed": len(obj.summary.get("dark", [])),
+            "total": count_total,
+            "success": count_success_hosts,
+            "failed": count_failed_hosts
         }
 
     def get_field_names(self, declared_fields, info):

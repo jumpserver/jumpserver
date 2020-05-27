@@ -173,11 +173,12 @@ class Config(dict):
         # OpenID 配置参数
         # OpenID 公有配置参数 (version <= 1.5.8 或 version >= 1.5.8)
         'AUTH_OPENID': False,
+        'BASE_SITE_URL': None,
         'AUTH_OPENID_CLIENT_ID': 'client-id',
         'AUTH_OPENID_CLIENT_SECRET': 'client-secret',
         'AUTH_OPENID_SHARE_SESSION': True,
         'AUTH_OPENID_IGNORE_SSL_VERIFICATION': True,
-        # OpenID 新配置参数 (version >= 1.5.8)
+        # OpenID 新配置参数 (version >= 1.5.9)
         'AUTH_OPENID_PROVIDER_ENDPOINT': 'https://op-example.com/',
         'AUTH_OPENID_PROVIDER_AUTHORIZATION_ENDPOINT': 'https://op-example.com/authorize',
         'AUTH_OPENID_PROVIDER_TOKEN_ENDPOINT': 'https://op-example.com/token',
@@ -193,7 +194,6 @@ class Config(dict):
         'AUTH_OPENID_USE_NONCE': True,
         'AUTH_OPENID_ALWAYS_UPDATE_USER': True,
         # OpenID 旧配置参数 (version <= 1.5.8 (discarded))
-        'BASE_SITE_URL': 'http://localhost:8080',
         'AUTH_OPENID_SERVER_URL': 'http://openid',
         'AUTH_OPENID_REALM_NAME': None,
 

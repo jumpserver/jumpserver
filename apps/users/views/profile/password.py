@@ -67,7 +67,7 @@ class UserVerifyPasswordView(FormView):
     def form_valid(self, form):
         user = get_user_or_pre_auth_user(self.request)
         password = form.cleaned_data.get('password')
-        user = authenticate(username=user.username, password=password)
+        user = authenticate(request=self.request, username=user.username, password=password)
         if not user:
             form.add_error("password", _("Password invalid"))
             return self.form_invalid(form)
