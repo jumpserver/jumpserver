@@ -64,6 +64,14 @@ js_i18n_patterns = i18n_patterns(
 )
 
 
+apps = [
+    'users', 'assets', 'perms', 'terminal', 'ops', 'audits', 'orgs', 'auth',
+    'applications', 'tickets', 'settings', 'xpack'
+    'flower', 'luna', 'koko', 'ws', 'i18n', 'jsi18n', 'docs', 'redocs',
+    'zh-hans'
+]
+
+
 urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
     path('api/v1/', include(api_v1)),
@@ -78,6 +86,10 @@ urlpatterns = [
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
             + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += js_i18n_patterns
+
+# 兼容之前的
+old_app_pattern = '|'.join(apps)
+urlpatterns += [re_path(old_app_pattern, views.redirect_old_apps_view)]
 
 handler404 = 'jumpserver.views.handler404'
 handler500 = 'jumpserver.views.handler500'
