@@ -83,26 +83,12 @@ class UserOtpEnableBindView(TemplateView, FormView):
         return super().get_context_data(**kwargs)
 
 
-class UserVerifyMFAView(FormView):
+class UserDisableMFAView(FormView):
     template_name = 'users/user_verify_mfa.html'
     form_class = forms.UserCheckOtpCodeForm
     success_url = reverse_lazy('users:user-otp-settings-success')
     permission_classes = [IsValidUser]
 
-    def form_valid(self, form):
-        user = self.request.user
-        otp_code = form.cleaned_data.get('otp_code')
-
-        valid = user.check_mfa(otp_code)
-        if valid:
-            return super().form_valid(form)
-        else:
-            error = _('MFA code invalid, or ntp sync server time')
-            form.add_error('otp_code', error)
-            return super().form_invalid(form)
-
-
-class UserDisableMFAView(UserVerifyMFAView):
     def form_valid(self, form):
         user = self.request.user
         otp_code = form.cleaned_data.get('otp_code')
@@ -118,8 +104,23 @@ class UserDisableMFAView(UserVerifyMFAView):
             return super().form_invalid(form)
 
 
-class UserOtpUpdateView(UserVerifyMFAView):
+class UserOtpUpdateView(FormView):
+    template_name = 'users/user_verify_mfa.html'
+    form_class = forms.UserCheckOtpCodeForm
     success_url = reverse_lazy('users:user-otp-enable-bind')
+    permission_classes = [IsValidUser]
+
+    def form_valid(self, form):
+        user = self.request.user
+        otp_code = form.cleaned_data.get('otp_code')
+
+        valid = user.check_mfa(otp_code)
+        if valid:
+            return super().form_valid(form)
+        else:
+            error = _('MFA code invalid, or ntp sync server time')
+            form.add_error('otp_code', error)
+            return super().form_invalid(form)
 
 
 class UserOtpSettingsSuccessView(TemplateView):
