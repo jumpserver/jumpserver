@@ -48,8 +48,8 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         fields_mini = ['id', 'name', 'username']
         # small 指的是 不需要计算的直接能从一张表中获取到的数据
         fields_small = fields_mini + [
-            'password', 'email', 'public_key', 'wechat', 'phone', 'mfa_level',
-            'mfa_level_display',
+            'password', 'email', 'public_key', 'wechat', 'phone', 'mfa_level', 'mfa_enabled',
+            'mfa_level_display', 'mfa_force_enabled',
             'comment', 'source', 'is_valid', 'is_expired',
             'is_active', 'created_by', 'is_first_login',
             'password_strategy', 'date_password_last_updated', 'date_expired',
