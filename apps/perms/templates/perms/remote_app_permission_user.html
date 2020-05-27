@@ -179,9 +179,13 @@
         var body = {
             user_groups: groups
         };
+        var success = function(data) {
+            location.reload();
+        };
         requestApi({
             url: the_url,
-            body: JSON.stringify(body)
+            body: JSON.stringify(body),
+            success: success
         });
     }
     $(document).ready(function () {
