@@ -3,7 +3,8 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework_bulk import BulkModelViewSet
-from common.mixins import CommonApiMixin
+from common.mixins import CommonApiMixin, RelationMixin
+from orgs.utils import current_org
 
 from ..utils import set_to_root_org, filter_org_queryset
 from ..models import Organization
@@ -79,4 +80,13 @@ class OrgMembershipModelViewSetMixin:
 
     def get_queryset(self):
         queryset = self.membership_class.objects.filter(organization=self.org)
+        return queryset
+
+
+class OrgRelationMixin(RelationMixin):
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        org_id = current_org.org_id()
+        if org_id is not None:
+            queryset = queryset.filter(**{f'{self.from_field}__org_id': org_id})
         return queryset

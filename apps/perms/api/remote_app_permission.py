@@ -13,7 +13,6 @@ from ..serializers import (
     RemoteAppPermissionUpdateRemoteAppSerializer,
 )
 
-
 __all__ = [
     'RemoteAppPermissionViewSet',
     'RemoteAppPermissionAddUserApi', 'RemoteAppPermissionAddRemoteAppApi',
