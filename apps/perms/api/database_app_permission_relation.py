@@ -1,14 +1,12 @@
 # coding: utf-8
 #
-
 from rest_framework import generics
 from django.db.models import F, Value
 from django.db.models.functions import Concat
 from django.shortcuts import get_object_or_404
 
-from orgs.mixins.api import OrgBulkModelViewSet
-from orgs.utils import current_org
 from common.permissions import IsOrgAdmin
+from .base import RelationViewSet
 from .. import models, serializers
 
 __all__ = [
@@ -21,19 +19,9 @@ __all__ = [
 ]
 
 
-class RelationMixin(OrgBulkModelViewSet):
-    def get_queryset(self):
-        queryset = self.model.objects.all()
-        org_id = current_org.org_id()
-        if org_id is not None:
-            queryset = queryset.filter(databaseapppermission__org_id=org_id)
-        queryset = queryset.annotate(databaseapppermission_display=F('databaseapppermission__name'))
-        return queryset
-
-
-class DatabaseAppPermissionUserRelationViewSet(RelationMixin):
+class DatabaseAppPermissionUserRelationViewSet(RelationViewSet):
     serializer_class = serializers.DatabaseAppPermissionUserRelationSerializer
-    model = models.DatabaseAppPermission.users.through
+    m2m_field = models.DatabaseAppPermission.users.field
     permission_classes = (IsOrgAdmin,)
     filterset_fields = [
         'id', 'user', 'databaseapppermission'
@@ -46,9 +34,9 @@ class DatabaseAppPermissionUserRelationViewSet(RelationMixin):
         return queryset
 
 
-class DatabaseAppPermissionUserGroupRelationViewSet(RelationMixin):
+class DatabaseAppPermissionUserGroupRelationViewSet(RelationViewSet):
     serializer_class = serializers.DatabaseAppPermissionUserGroupRelationSerializer
-    model = models.DatabaseAppPermission.user_groups.through
+    m2m_field = models.DatabaseAppPermission.user_groups.field
     permission_classes = (IsOrgAdmin,)
     filterset_fields = [
         'id', "usergroup", "databaseapppermission"
@@ -77,9 +65,9 @@ class DatabaseAppPermissionAllUserListApi(generics.ListAPIView):
         return users
 
 
-class DatabaseAppPermissionDatabaseAppRelationViewSet(RelationMixin):
+class DatabaseAppPermissionDatabaseAppRelationViewSet(RelationViewSet):
     serializer_class = serializers.DatabaseAppPermissionDatabaseAppRelationSerializer
-    model = models.DatabaseAppPermission.database_apps.through
+    m2m_field = models.DatabaseAppPermission.database_apps.field
     permission_classes = (IsOrgAdmin,)
     filterset_fields = [
         'id', 'databaseapp', 'databaseapppermission',
@@ -110,9 +98,9 @@ class DatabaseAppPermissionAllDatabaseAppListApi(generics.ListAPIView):
         return database_apps
 
 
-class DatabaseAppPermissionSystemUserRelationViewSet(RelationMixin):
+class DatabaseAppPermissionSystemUserRelationViewSet(RelationViewSet):
     serializer_class = serializers.DatabaseAppPermissionSystemUserRelationSerializer
-    model = models.DatabaseAppPermission.system_users.through
+    m2m_field = models.DatabaseAppPermission.system_users.field
     permission_classes = (IsOrgAdmin,)
     filterset_fields = [
         'id', 'systemuser', 'databaseapppermission'
