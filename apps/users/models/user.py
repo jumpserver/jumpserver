@@ -47,6 +47,10 @@ class AuthMixin:
             post_user_change_password.send(self.__class__, user=self)
             super().set_password(raw_password)
 
+    def set_public_key(self, public_key):
+        self.public_key = public_key
+        self.save()
+
     def can_update_password(self):
         return self.is_local
 
@@ -78,6 +82,14 @@ class AuthMixin:
             except (TabError, TypeError):
                 pass
         return PubKey()
+
+    def get_public_key_comment(self):
+        return self.public_key_obj.comment
+
+    def get_public_key_hash_md5(self):
+        if not callable(self.public_key_obj.hash_md5):
+            return ''
+        return self.public_key_obj.hash_md5()
 
     def reset_password(self, new_password):
         self.set_password(new_password)

@@ -193,8 +193,12 @@ class UserRoleSerializer(serializers.Serializer):
 class UserProfileSerializer(UserSerializer):
     admin_or_audit_orgs = UserOrgSerializer(many=True, read_only=True)
     current_org_roles = serializers.ListField(read_only=True)
-    public_key_comment = serializers.SerializerMethodField()
-    public_key_hash_md5 = serializers.SerializerMethodField()
+    public_key_comment = serializers.CharField(
+        source='get_public_key_comment', required=False, read_only=True, max_length=128
+    )
+    public_key_hash_md5 = serializers.CharField(
+        source='get_public_key_hash_md5', required=False, read_only=True, max_length=128
+    )
 
     class Meta(UserSerializer.Meta):
         fields = UserSerializer.Meta.fields + [
@@ -225,16 +229,6 @@ class UserProfileSerializer(UserSerializer):
         if 'public_key' in fields:
             fields.remove('public_key')
             extra_kwargs.pop('public_key', None)
-
-    @staticmethod
-    def get_public_key_comment(obj):
-        return obj.public_key_obj.comment
-
-    @staticmethod
-    def get_public_key_hash_md5(obj):
-        if callable(obj.public_key_obj.hash_md5):
-            return obj.public_key_obj.hash_md5()
-        return ''
 
 
 class UserUpdatePasswordSerializer(serializers.ModelSerializer):
@@ -273,4 +267,27 @@ class UserUpdatePasswordSerializer(serializers.ModelSerializer):
 
 
 class UserUpdatePublicKeySerializer(serializers.ModelSerializer):
-    pass
+    public_key_comment = serializers.CharField(
+        source='get_public_key_comment', required=False, read_only=True, max_length=128
+    )
+    public_key_hash_md5 = serializers.CharField(
+        source='get_public_key_hash_md5', required=False, read_only=True, max_length=128
+    )
+
+    class Meta:
+        model = User
+        fields = ['public_key_comment', 'public_key_hash_md5', 'public_key']
+        extra_kwargs = {
+            'public_key': {'required': True, 'write_only': True, 'max_length': 2048}
+        }
+
+    @staticmethod
+    def validate_public_key(value):
+        if not validate_ssh_public_key(value):
+            raise serializers.ValidationError(_('Not a valid ssh public key'))
+        return value
+
+    def update(self, instance, validated_data):
+        new_public_key = self.validated_data.get('public_key')
+        instance.set_public_key(new_public_key)
+        return instance
