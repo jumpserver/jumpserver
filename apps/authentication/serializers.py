@@ -15,9 +15,11 @@ __all__ = [
 
 
 class AccessKeySerializer(serializers.ModelSerializer):
+    id_display = serializers.UUIDField(source='id', read_only=True)
+
     class Meta:
         model = AccessKey
-        fields = ['id', 'secret', 'is_active', 'date_created']
+        fields = ['id', 'secret', 'is_active', 'date_created', 'id_display']
         read_only_fields = ['id', 'secret', 'date_created']
 
 
