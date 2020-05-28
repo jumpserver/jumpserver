@@ -26,8 +26,8 @@ __all__ = [
 class UserGrantedRemoteAppsApi(generics.ListAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = RemoteAppSerializer
-    filter_fields = ['name', 'id']
-    search_fields = ['name']
+    filter_fields = ['name', 'id', 'type', 'comment']
+    search_fields = ['name', 'comment']
 
     def get_object(self):
         user_id = self.kwargs.get('pk', '')
