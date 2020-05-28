@@ -55,7 +55,7 @@ class UserUpdatePKApi(UserQuerysetMixin, generics.UpdateAPIView):
         user.save()
 
 
-class UserProfileApi(generics.RetrieveAPIView):
+class UserProfileApi(generics.RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = serializers.UserProfileSerializer
 

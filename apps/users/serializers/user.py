@@ -191,10 +191,46 @@ class UserRoleSerializer(serializers.Serializer):
 
 class UserProfileSerializer(UserSerializer):
     admin_or_audit_orgs = UserOrgSerializer(many=True, read_only=True)
-    current_org_roles = serializers.ListField()
+    current_org_roles = serializers.ListField(read_only=True)
+    public_key_comment = serializers.SerializerMethodField()
+    public_key_hash_md5 = serializers.SerializerMethodField()
 
     class Meta(UserSerializer.Meta):
         fields = UserSerializer.Meta.fields + [
-            'admin_or_audit_orgs', 'current_org_roles'
+            'public_key_comment', 'public_key_hash_md5', 'admin_or_audit_orgs', 'current_org_roles'
         ]
+        extra_kwargs = dict(UserSerializer.Meta.extra_kwargs)
+        extra_kwargs.update({
+            'name': {'read_only': True, 'max_length': 128},
+            'username': {'read_only': True, 'max_length': 128},
+            'email': {'read_only': True},
+            'mfa_level': {'read_only': True},
+            'source': {'read_only': True},
+            'is_valid': {'read_only': True},
+            'is_active': {'read_only': True},
+            'groups': {'read_only': True},
+            'roles': {'read_only': True},
+            'password_strategy': {'read_only': True},
+            'date_expired': {'read_only': True},
+            'date_joined': {'read_only': True},
+            'last_login': {'read_only': True},
+            'role': {'read_only': True},
+        })
 
+        if 'password' in fields:
+            fields.remove('password')
+            extra_kwargs.pop('password', None)
+
+        if 'public_key' in fields:
+            fields.remove('public_key')
+            extra_kwargs.pop('public_key', None)
+
+    @staticmethod
+    def get_public_key_comment(obj):
+        return obj.public_key_obj.comment
+
+    @staticmethod
+    def get_public_key_hash_md5(obj):
+        if callable(obj.public_key_obj.hash_md5):
+            return obj.public_key_obj.hash_md5()
+        return ''
