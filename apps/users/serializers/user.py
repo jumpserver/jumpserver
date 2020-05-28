@@ -14,7 +14,8 @@ from ..models import User
 __all__ = [
     'UserSerializer', 'UserPKUpdateSerializer',
     'ChangeUserPasswordSerializer', 'ResetOTPSerializer',
-    'UserProfileSerializer', 'UserOrgSerializer'
+    'UserProfileSerializer', 'UserOrgSerializer',
+    'UserUpdatePasswordSerializer', 'UserUpdatePublicKeySerializer'
 ]
 
 
@@ -234,3 +235,42 @@ class UserProfileSerializer(UserSerializer):
         if callable(obj.public_key_obj.hash_md5):
             return obj.public_key_obj.hash_md5()
         return ''
+
+
+class UserUpdatePasswordSerializer(serializers.ModelSerializer):
+    old_password = serializers.CharField(required=True, max_length=128, write_only=True)
+    new_password = serializers.CharField(required=True, max_length=128, write_only=True)
+    new_password_again = serializers.CharField(required=True, max_length=128, write_only=True)
+
+    class Meta:
+        model = User
+        fields = ['old_password', 'new_password', 'new_password_again']
+
+    def validate_old_password(self, value):
+        if not self.instance.check_password(value):
+            msg = 'The old password is incorrect'
+            raise serializers.ValidationError(msg)
+        return value
+
+    @staticmethod
+    def validate_new_password(value):
+        from ..utils import check_password_rules
+        if not check_password_rules(value):
+            msg = _('Password does not match security rules')
+            raise serializers.ValidationError(msg)
+        return value
+
+    def validate_new_password_again(self, value):
+        if value != self.initial_data.get('new_password', ''):
+            msg = 'The newly set password is inconsistent'
+            raise serializers.ValidationError(msg)
+        return value
+
+    def update(self, instance, validated_data):
+        new_password = self.validated_data.get('new_password')
+        instance.reset_password(new_password)
+        return instance
+
+
+class UserUpdatePublicKeySerializer(serializers.ModelSerializer):
+    pass

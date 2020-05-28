@@ -14,6 +14,7 @@ from .mixins import UserQuerysetMixin
 __all__ = [
     'UserResetPasswordApi', 'UserResetPKApi',
     'UserProfileApi', 'UserUpdatePKApi',
+    'UserPasswordApi', 'UserPublicKeyApi'
 ]
 
 
@@ -66,3 +67,24 @@ class UserProfileApi(generics.RetrieveUpdateAPIView):
         age = request.session.get_expiry_age()
         request.session.set_expiry(age)
         return super().retrieve(request, *args, **kwargs)
+
+
+class UserPasswordApi(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = serializers.UserUpdatePasswordSerializer
+
+    def get_object(self):
+        return self.request.user
+
+
+class UserPublicKeyApi(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = serializers.UserUpdatePublicKeySerializer
+
+    def get_object(self):
+        return self.request.user
+
+    def perform_update(self, serializer):
+        user = self.get_object()
+        user.public_key = serializer.validated_data['public_key']
+        user.save()
