@@ -110,7 +110,7 @@ class PeriodTaskSerializerMixin(serializers.Serializer):
         max_length=128, allow_blank=True,
         allow_null=True, required=False, label=_('Regularly perform')
     )
-    interval = serializers.IntegerField(allow_null=True, required=False)
+    interval = serializers.IntegerField(allow_null=True, required=False, label=_('Interval'))
 
     INTERVAL_MAX = 65535
     INTERVAL_MIN = 1
