@@ -15,7 +15,7 @@ class TimezoneMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        tzname = request.META.get('TZ')
+        tzname = request.META.get('HTTP_X_TZ')
         if tzname:
             timezone.activate(pytz.timezone(tzname))
         else:

@@ -2,27 +2,27 @@
 #
 
 import json
-
+from collections.abc import Iterable
 from smtplib import SMTPSenderRefused
 from rest_framework import generics
 from rest_framework.views import Response, APIView
 from django.conf import settings
 from django.core.mail import send_mail, get_connection
 from django.utils.translation import ugettext_lazy as _
+from rest_framework import serializers
 
 from .utils import (
     LDAPServerUtil, LDAPCacheUtil, LDAPImportUtil, LDAPSyncUtil,
-    LDAP_USE_CACHE_FLAGS, LDAPTestUtil,
+    LDAP_USE_CACHE_FLAGS, LDAPTestUtil, ObjectDict
 )
 from .tasks import sync_ldap_user_task
 from common.permissions import IsOrgAdmin, IsSuperUser
 from common.utils import get_logger
 from .serializers import (
     MailTestSerializer, LDAPTestConfigSerializer, LDAPUserSerializer,
-    PublicSettingSerializer, LDAPTestLoginSerializer,
+    PublicSettingSerializer, LDAPTestLoginSerializer, SettingsSerializer
 )
 from users.models import User
-
 
 logger = get_logger(__file__)
 
@@ -59,7 +59,7 @@ class MailTestingAPI(APIView):
                     use_tls=email_use_tls, use_ssl=email_use_ssl,
                 )
                 send_mail(
-                    subject, message,  email_from, [email_recipient],
+                    subject, message, email_from, [email_recipient],
                     connection=connection
                 )
             except SMTPSenderRefused as e:
@@ -72,13 +72,13 @@ class MailTestingAPI(APIView):
                             continue
                         else:
                             break
-                return Response({"error": str(resp)}, status=401)
+                return Response({"error": str(resp)}, status=400)
             except Exception as e:
                 print(e)
-                return Response({"error": str(e)}, status=401)
+                return Response({"error": str(e)}, status=400)
             return Response({"msg": self.success_message.format(email_recipient)})
         else:
-            return Response({"error": str(serializer.errors)}, status=401)
+            return Response({"error": str(serializer.errors)}, status=400)
 
 
 class LDAPTestingConfigAPI(APIView):
@@ -88,10 +88,10 @@ class LDAPTestingConfigAPI(APIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         if not serializer.is_valid():
-            return Response({"error": str(serializer.errors)}, status=401)
+            return Response({"error": str(serializer.errors)}, status=400)
         config = self.get_ldap_config(serializer)
         ok, msg = LDAPTestUtil(config).test_config()
-        status = 200 if ok else 401
+        status = 200 if ok else 400
         return Response(msg, status=status)
 
     @staticmethod
@@ -124,11 +124,11 @@ class LDAPTestingLoginAPI(APIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         if not serializer.is_valid():
-            return Response({"error": str(serializer.errors)}, status=401)
+            return Response({"error": str(serializer.errors)}, status=400)
         username = serializer.validated_data['username']
         password = serializer.validated_data['password']
         ok, msg = LDAPTestUtil().test_login(username, password)
-        status = 200 if ok else 401
+        status = 200 if ok else 400
         return Response(msg, status=status)
 
 
@@ -236,14 +236,14 @@ class LDAPUserImportAPI(APIView):
         try:
             users = self.get_ldap_users()
         except Exception as e:
-            return Response({'error': str(e)}, status=401)
+            return Response({'error': str(e)}, status=400)
 
         if users is None:
-            return Response({'msg': _('Get ldap users is None')}, status=401)
+            return Response({'msg': _('Get ldap users is None')}, status=400)
 
         errors = LDAPImportUtil().perform_import(users)
         if errors:
-            return Response({'errors': errors}, status=401)
+            return Response({'errors': errors}, status=400)
 
         count = users if users is None else len(users)
         return Response({'msg': _('Imported {} users successfully').format(count)})
@@ -270,8 +270,34 @@ class PublicSettingApi(generics.RetrieveAPIView):
             "data": {
                 "WINDOWS_SKIP_ALL_MANUAL_PASSWORD": settings.WINDOWS_SKIP_ALL_MANUAL_PASSWORD,
                 "SECURITY_MAX_IDLE_TIME": settings.SECURITY_MAX_IDLE_TIME,
+                "XPACK_ENABLED": settings.XPACK_ENABLED,
+                "XPACK_LICENSE_IS_VALID": settings.XPACK_LICENSE_IS_VALID
             }
         }
         return instance
 
 
+class SettingsApi(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsSuperUser,)
+    serializer_class = SettingsSerializer
+
+    def get_object(self):
+        instance = {category: self._get_setting_fields_obj(list(category_serializer.get_fields()))
+                    for category, category_serializer in self.serializer_class().get_fields().items()
+                    if isinstance(category_serializer, serializers.Serializer)}
+        return ObjectDict(instance)
+
+    def perform_update(self, serializer):
+        serializer.save()
+
+    def _get_setting_fields_obj(self, category_fields):
+        if isinstance(category_fields, Iterable):
+            fields_data = {field_name: getattr(settings, field_name)
+                           for field_name in category_fields}
+            return ObjectDict(fields_data)
+
+        if isinstance(category_fields, str):
+            fields_data = {category_fields: getattr(settings, category_fields)}
+            return ObjectDict(fields_data)
+
+        return ObjectDict()

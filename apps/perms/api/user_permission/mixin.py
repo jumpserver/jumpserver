@@ -2,6 +2,7 @@
 #
 from common.utils import lazyproperty
 from common.tree import TreeNodeSerializer
+from django.db.models import QuerySet
 from ..mixin import UserPermissionMixin
 from ...utils import AssetPermissionUtil, ParserNode
 from ...hands import Node, Asset
@@ -32,7 +33,8 @@ class UserNodeTreeMixin:
     nodes_only_fields = ParserNode.nodes_only_fields
 
     def parse_nodes_to_queryset(self, nodes):
-        nodes = nodes.only(*self.nodes_only_fields)
+        if isinstance(nodes, QuerySet):
+            nodes = nodes.only(*self.nodes_only_fields)
         _queryset = []
 
         for node in nodes:

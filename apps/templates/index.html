@@ -58,11 +58,11 @@
     </div>
     <div class="row">
         <div class="col-sm-2 border-bottom white-bg dashboard-header" style="margin-left:15px;height: 346px">
-            <small>{% trans 'In the past week, a total of ' %}<span class="text-info" id="week_total_count_login_users"></span>{% trans ' users have logged in ' %}<span class="text-success" id="week_total_count_login_times"></span>{% trans ' times asset.' %}</small>
-            <ul class="list-group clear-list m-t" id="week_login_times_top5_users">
+            <small>{% trans 'In the past week, a total of ' %}<span class="text-info" id="dates_total_count_login_users"></span>{% trans ' users have logged in ' %}<span class="text-success" id="dates_total_count_login_times"></span>{% trans ' times asset.' %}</small>
+            <ul class="list-group clear-list m-t" id="dates_login_times_top5_users">
             </ul>
         </div>
-        <div class="col-sm-7" id="month_metrics_echarts" style="margin-left: -15px;height: 346px;padding: 15px 0 15px 0;"></div>
+        <div class="col-sm-7" id="dates_metrics_echarts" style="margin-left: -15px;height: 346px;padding: 15px 0 15px 0;"></div>
         <div class="col-sm-3 white-bg" id="top1" style="margin-left: -15px;height: 346px">
             <div class="statistic-box">
                 <h4>
@@ -73,12 +73,12 @@
                 </p>
                 <div class="row text-center">
                     <div class="col-sm-6">
-                        <div id="month_total_count_users_pie"  style="width: 140px; height: 140px;">
+                        <div id="dates_total_count_users_pie"  style="width: 140px; height: 140px;">
                         </div>
                         <h5>{% trans 'User' %}</h5>
                     </div>
                     <div class="col-sm-6">
-                        <div id="month_total_count_assets_pie" style="width: 140px; height: 140px;"></div>
+                        <div id="dates_total_count_assets_pie" style="width: 140px; height: 140px;"></div>
                         <h5>{% trans 'Asset' %}</h5>
                     </div>
                 </div>
@@ -112,7 +112,7 @@
                     <h3><i class="fa fa-inbox"></i>{% trans 'Top 10 assets in a week'%}</h3>
                     <small><i class="fa fa-map-marker"></i>{% trans 'Login frequency and last login record.' %}</small>
                 </div>
-                <div class="ibox-content inspinia-timeline" id="week_login_times_top10_assets">
+                <div class="ibox-content inspinia-timeline" id="dates_login_times_top10_assets">
                 </div>
             </div>
         </div>
@@ -130,7 +130,7 @@
                 </div>
                 <div class="ibox-content">
                     <div>
-                        <div class="feed-activity-list" id="week_login_record_top10_sessions">
+                        <div class="feed-activity-list" id="dates_login_record_top10_sessions">
                         </div>
                     </div>
                 </div>
@@ -158,7 +158,7 @@
                     <h3><i class="fa fa-user"></i>{% trans 'Top 10 users in a week' %}</h3>
                     <small><i class="fa fa-map-marker"></i>{% trans 'User login frequency and last login record.' %}</small>
                 </div>
-                <div class="ibox-content inspinia-timeline" id="week_login_times_top10_users">
+                <div class="ibox-content inspinia-timeline" id="dates_login_times_top10_users">
                 </div>
             </div>
         </div>
@@ -178,7 +178,7 @@ function requireMonthMetricsECharts(data){
             'echarts/chart/line'
         ],
         function (ec) {
-            var monthMetricsECharts = ec.init(document.getElementById('month_metrics_echarts'));
+            var monthMetricsECharts = ec.init(document.getElementById('dates_metrics_echarts'));
             var option = {
                 title : {
                     text: "{% trans 'Monthly data overview' %}",
@@ -204,7 +204,7 @@ function requireMonthMetricsECharts(data){
                     {
                         type : 'category',
                         boundaryGap : false,
-                        data : data['month_metrics_date'],
+                        data : data['dates_metrics_date'],
                     }
                 ],
                 yAxis : [
@@ -218,21 +218,21 @@ function requireMonthMetricsECharts(data){
                         type:'line',
                         smooth: true,
                         itemStyle: {normal: {areaStyle: {type: 'default'}}},
-                        data: data['month_metrics_total_count_login']
+                        data: data['dates_metrics_total_count_login']
                     },
                     {
                         name: "{% trans 'Active users' %}",
                         type: 'line',
                         smooth: true,
                         itemStyle: {normal: {areaStyle: {type: 'default'}}},
-                        data: data['month_metrics_total_count_active_users']
+                        data: data['dates_metrics_total_count_active_users']
                     },
                     {
                         name:"{% trans 'Active assets' %}",
                         type:'line',
                         smooth:true,
                         itemStyle: {normal: {areaStyle: {type: 'default'}}},
-                        data: data['month_metrics_total_count_active_assets']
+                        data: data['dates_metrics_total_count_active_assets']
                     }
                 ]
             };
@@ -249,7 +249,7 @@ function requireMonthTotalCountUsersPie(data){
             'echarts/chart/pie'
         ],
         function (ec) {
-            var monthTotalCountUsersPie = ec.init(document.getElementById('month_total_count_users_pie'));
+            var monthTotalCountUsersPie = ec.init(document.getElementById('dates_total_count_users_pie'));
             var option = {
                 tooltip : {
                     trigger: 'item',
@@ -310,9 +310,9 @@ function requireMonthTotalCountUsersPie(data){
                             }
                         },
                         data:[
-                            {value:data['month_total_count_active_users'], name:"{% trans 'Monthly active users' %}"},
-                            {value:data['month_total_count_disabled_users'], name:"{% trans 'Disable user' %}"},
-                            {value:data['month_total_count_inactive_users'], name:"{% trans 'Month not logged in user' %}"}
+                            {value:data['dates_total_count_active_users'], name:"{% trans 'Monthly active users' %}"},
+                            {value:data['dates_total_count_disabled_users'], name:"{% trans 'Disable user' %}"},
+                            {value:data['dates_total_count_inactive_users'], name:"{% trans 'Month not logged in user' %}"}
                         ]
                     }
                 ]
@@ -329,7 +329,7 @@ function requireMonthTotalCountAssetsPie(data){
             'echarts/chart/pie'
         ],
         function (ec) {
-            var monthTotalCountAssetsPie = ec.init(document.getElementById('month_total_count_assets_pie'));
+            var monthTotalCountAssetsPie = ec.init(document.getElementById('dates_total_count_assets_pie'));
             var option = {
                 tooltip : {
                     trigger: 'item',
@@ -389,9 +389,9 @@ function requireMonthTotalCountAssetsPie(data){
                             }
                         },
                         data:[
-                            {value:data['month_total_count_active_assets'], name:"{% trans 'Month is logged into the host' %}"},
-                            {value:data['month_total_count_disabled_assets'], name:"{% trans 'Disable host' %}"},
-                            {value:data['month_total_count_inactive_assets'], name:"{% trans 'Month not logged on host' %}"}
+                            {value:data['dates_total_count_active_assets'], name:"{% trans 'Month is logged into the host' %}"},
+                            {value:data['dates_total_count_disabled_assets'], name:"{% trans 'Disable host' %}"},
+                            {value:data['dates_total_count_inactive_assets'], name:"{% trans 'Month not logged on host' %}"}
                         ]
                     }
                 ]
@@ -431,14 +431,14 @@ function renderMonthMetricsECharts(){
     var success = function (data) {
         requireMonthMetricsECharts(data)
     };
-    renderRequestApi('month_metrics=1', success)
+    renderRequestApi('dates_metrics=1', success)
 }
 
 function renderMonthTotalCountUsersPie(){
     var success = function (data) {
         requireMonthTotalCountUsersPie(data)
     };
-    renderRequestApi('month_total_count_users=1', success)
+    renderRequestApi('dates_total_count_users=1', success)
 
 }
 
@@ -446,15 +446,15 @@ function renderMonthTotalCountAssetsPie(){
     var success = function (data) {
         requireMonthTotalCountAssetsPie(data)
     };
-    renderRequestApi('month_total_count_assets=1', success)
+    renderRequestApi('dates_total_count_assets=1', success)
 }
 
 function renderWeekTotalCount(){
     var success = function (data) {
-        $('#week_total_count_login_users').html(data['week_total_count_login_users']);
-        $('#week_total_count_login_times').html(data['week_total_count_login_times'])
+        $('#dates_total_count_login_users').html(data['dates_total_count_login_users']);
+        $('#dates_total_count_login_times').html(data['dates_total_count_login_times'])
     };
-    renderRequestApi('week_total_count=1', success)
+    renderRequestApi('dates_total_count=1', success)
 }
 
 function renderWeekLoginTimesTop5Users(){
@@ -468,14 +468,14 @@ function renderWeekLoginTimesTop5Users(){
             "<span class=\"label \">{INDEX}</span> {USER}" +
             "</li>";
 
-        $.each(data['week_login_times_top5_users'], function(index, value){
+        $.each(data['dates_login_times_top5_users'], function(index, value){
             html += html_cell.replace('{TOTAL}', value['total'])
                 .replace('{USER}', value['user'])
                 .replace('{INDEX}', index+1)
         });
-        $('#week_login_times_top5_users').html(html)
+        $('#dates_login_times_top5_users').html(html)
     };
-    renderRequestApi('week_login_times_top5_users=1', success)
+    renderRequestApi('dates_login_times_top5_users=1', success)
 }
 
 function renderWeekLoginTimesTop10Assets(){
@@ -497,7 +497,7 @@ function renderWeekLoginTimesTop10Assets(){
             "</div>" +
             "</div>";
 
-        var assets = data['week_login_times_top10_assets'];
+        var assets = data['dates_login_times_top10_assets'];
         if (assets.length !== 0){
             $.each(assets, function(index, value){
                 html += html_cell
@@ -509,9 +509,9 @@ function renderWeekLoginTimesTop10Assets(){
         else{
             html += "<p class=\"text-center\">{% trans '(No)' %}</p>"
         }
-        $('#week_login_times_top10_assets').html(html)
+        $('#dates_login_times_top10_assets').html(html)
     };
-    renderRequestApi('week_login_times_top10_assets=1', success)
+    renderRequestApi('dates_login_times_top10_assets=1', success)
 }
 
 function renderWeekLoginTimesTop10Users(){
@@ -533,7 +533,7 @@ function renderWeekLoginTimesTop10Users(){
             "</div>" +
             "</div>";
 
-        var users = data['week_login_times_top10_users'];
+        var users = data['dates_login_times_top10_users'];
         if (users.length !== 0){
             $.each(users, function(index, value){
                 html += html_cell.replaceAll('{USER}', value['user'])
@@ -544,9 +544,9 @@ function renderWeekLoginTimesTop10Users(){
         else{
             html += "<p class=\"text-center\">{% trans '(No)' %}</p>"
         }
-        $('#week_login_times_top10_users').html(html)
+        $('#dates_login_times_top10_users').html(html)
     };
-    renderRequestApi('week_login_times_top10_users=1', success)
+    renderRequestApi('dates_login_times_top10_users=1', success)
 }
 
 function renderWeekLoginRecordTop10Sessions(){
@@ -564,7 +564,7 @@ function renderWeekLoginRecordTop10Sessions(){
             "</div>" +
             "</div>";
 
-        var users = data['week_login_record_top10_sessions'];
+        var users = data['dates_login_record_top10_sessions'];
         if (users.length !== 0){
             $.each(users, function(index, value){
                 console.log(value['is_finished'])
@@ -579,10 +579,10 @@ function renderWeekLoginRecordTop10Sessions(){
         else{
             html += "<p class=\"text-center\">{% trans '(No)' %}</p>"
         }
-        $('#week_login_record_top10_sessions').html(html)
+        $('#dates_login_record_top10_sessions').html(html)
 
     };
-    renderRequestApi('week_login_record_top10_sessions=1', success)
+    renderRequestApi('dates_login_record_top10_sessions=1', success)
 }
 
 function renderData(){

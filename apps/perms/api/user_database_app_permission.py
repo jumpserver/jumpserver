@@ -26,8 +26,8 @@ __all__ = [
 class UserGrantedDatabaseAppsApi(generics.ListAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = DatabaseAppSerializer
-    filter_fields = ['id', 'name']
-    search_fields = ['name']
+    filter_fields = ['id', 'name', 'type', 'comment']
+    search_fields = ['name', 'comment']
 
     def get_object(self):
         user_id = self.kwargs.get('pk', '')

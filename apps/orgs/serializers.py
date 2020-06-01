@@ -1,8 +1,7 @@
 
-import re
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
-from users.models import User, UserGroup
+from users.models import UserGroup
 from assets.models import Asset, Domain, AdminUser, SystemUser, Label
 from perms.models import AssetPermission
 from common.serializers import AdaptedBulkListSerializer
@@ -92,3 +91,12 @@ class OrgAllUserSerializer(serializers.Serializer):
     @staticmethod
     def get_user_display(obj):
         return str(obj)
+
+
+class OrgRetrieveSerializer(OrgReadSerializer):
+    admins = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    auditors = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    users = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+
+    class Meta(OrgReadSerializer.Meta):
+        pass

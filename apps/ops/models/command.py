@@ -23,10 +23,10 @@ class CommandExecution(OrgModelMixin):
     command = models.TextField(verbose_name=_("Command"))
     _result = models.TextField(blank=True, null=True, verbose_name=_('Result'))
     user = models.ForeignKey('users.User', on_delete=models.CASCADE, null=True)
-    is_finished = models.BooleanField(default=False)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_start = models.DateTimeField(null=True)
-    date_finished = models.DateTimeField(null=True)
+    is_finished = models.BooleanField(default=False, verbose_name=_('Is finished'))
+    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date created'))
+    date_start = models.DateTimeField(null=True, verbose_name=_('Date start'))
+    date_finished = models.DateTimeField(null=True, verbose_name=_('Date finished'))
 
     def __str__(self):
         return self.command[:10]

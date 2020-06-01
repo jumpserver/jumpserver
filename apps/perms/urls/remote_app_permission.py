@@ -7,6 +7,9 @@ from .. import api
 
 router = BulkRouter()
 router.register('remote-app-permissions', api.RemoteAppPermissionViewSet, 'remote-app-permission')
+router.register('remote-app-permissions-users-relations', api.RemoteAppPermissionUserRelationViewSet, 'remote-app-permissions-users-relation')
+router.register('remote-app-permissions-remote-apps-relations', api.RemoteAppPermissionRemoteAppRelationViewSet, 'remote-app-permissions-remote-apps-relation')
+
 
 remote_app_permission_urlpatterns = [
     # 查询用户授权的RemoteApp
@@ -32,7 +35,9 @@ remote_app_permission_urlpatterns = [
     path('remote-app-permissions/<uuid:pk>/users/remove/', api.RemoteAppPermissionRemoveUserApi.as_view(), name='remote-app-permission-remove-user'),
     path('remote-app-permissions/<uuid:pk>/remote-apps/remove/', api.RemoteAppPermissionRemoveRemoteAppApi.as_view(), name='remote-app-permission-remove-remote-app'),
     path('remote-app-permissions/<uuid:pk>/remote-apps/add/', api.RemoteAppPermissionAddRemoteAppApi.as_view(), name='remote-app-permission-add-remote-app'),
+
+    path('remote-app-permissions/<uuid:pk>/remote-apps/all/', api.RemoteAppPermissionAllRemoteAppListApi.as_view(), name='remote-app-permission-all-remote-apps'),
+    path('remote-app-permissions/<uuid:pk>/users/all/', api.RemoteAppPermissionAllUserListApi.as_view(), name='remote-app-permission-all-users'),
 ]
 
 remote_app_permission_urlpatterns += router.urls
-

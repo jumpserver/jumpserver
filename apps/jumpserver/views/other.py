@@ -3,7 +3,7 @@
 import re
 import time
 
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse, Http404
 from django.conf import settings
 from django.views.generic import View
 from django.utils.translation import ugettext_lazy as _
@@ -16,7 +16,7 @@ from common.http import HttpResponseTemporaryRedirect
 
 __all__ = [
     'LunaView', 'I18NView', 'KokoView', 'WsView', 'HealthCheckView',
-    'redirect_format_api'
+    'redirect_format_api', 'redirect_old_apps_view'
 ]
 
 
@@ -49,6 +49,14 @@ def redirect_format_api(request, *args, **kwargs):
         return HttpResponseTemporaryRedirect(_path)
     else:
         return JsonResponse({"msg": "Redirect url failed: {}".format(_path)}, status=404)
+
+
+def redirect_old_apps_view(request, *args, **kwargs):
+    path = request.get_full_path()
+    if path.find('/core') != -1:
+        raise Http404()
+    new_path = '/core{}'.format(path)
+    return HttpResponseTemporaryRedirect(new_path)
 
 
 class HealthCheckView(APIView):

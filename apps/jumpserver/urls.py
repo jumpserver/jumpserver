@@ -43,6 +43,11 @@ app_view_patterns = [
     path('applications/', include('applications.urls.views_urls', namespace='applications')),
     path('tickets/', include('tickets.urls.views_urls', namespace='tickets')),
     re_path(r'flower/(?P<path>.*)', views.celery_flower_view, name='flower-view'),
+    re_path('luna/.*', views.LunaView.as_view(), name='luna-view'),
+    re_path('koko/.*', views.KokoView.as_view(), name='koko-view'),
+    re_path('ws/.*', views.WsView.as_view(), name='ws-view'),
+    path('i18n/<str:lang>/', views.I18NView.as_view(), name='i18n-switch'),
+    path('settings/', include('settings.urls.view_urls', namespace='settings')),
 ]
 
 
@@ -59,32 +64,38 @@ js_i18n_patterns = i18n_patterns(
 )
 
 
+apps = [
+    'users', 'assets', 'perms', 'terminal', 'ops', 'audits', 'orgs', 'auth',
+    'applications', 'tickets', 'settings', 'xpack'
+    'flower', 'luna', 'koko', 'ws', 'i18n', 'jsi18n', 'docs', 'redocs',
+    'zh-hans'
+]
+
+
 urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
     path('api/v1/', include(api_v1)),
     path('api/v2/', include(api_v2)),
     re_path('api/(?P<app>\w+)/(?P<version>v\d)/.*', views.redirect_format_api),
     path('api/health/', views.HealthCheckView.as_view(), name="health"),
-    re_path('luna/.*', views.LunaView.as_view(), name='luna-view'),
-    re_path('koko/.*', views.KokoView.as_view(), name='koko-view'),
-    re_path('ws/.*', views.WsView.as_view(), name='ws-view'),
-    path('i18n/<str:lang>/', views.I18NView.as_view(), name='i18n-switch'),
-    path('settings/', include('settings.urls.view_urls', namespace='settings')),
-
     # External apps url
-    path('captcha/', include('captcha.urls')),
+    path('core/auth/captcha/', include('captcha.urls')),
+    path('core/', include(app_view_patterns)),
 ]
 
-urlpatterns += app_view_patterns
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
             + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += js_i18n_patterns
+
+# 兼容之前的
+old_app_pattern = '|'.join(apps)
+urlpatterns += [re_path(old_app_pattern, views.redirect_old_apps_view)]
 
 handler404 = 'jumpserver.views.handler404'
 handler500 = 'jumpserver.views.handler500'
 
 if settings.DEBUG:
-    urlpatterns += [
+    app_view_patterns += [
         re_path('^swagger(?P<format>\.json|\.yaml)$',
                 views.get_swagger_view().without_ui(cache_timeout=1), name='schema-json'),
         path('docs/', views.get_swagger_view().with_ui('swagger', cache_timeout=1), name="docs"),
