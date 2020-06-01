@@ -194,6 +194,8 @@ class SizedModelFieldsMixin(BaseDynamicFieldsPlugin):
         size = query_params.get(self.arg_name)
         if not size:
             return []
+        if size not in ['mini', 'small']:
+            return []
         size_fields = getattr(self.serializer.Meta, 'fields_{}'.format(size), None)
         if not size_fields or not isinstance(size_fields, Iterable):
             return []
