@@ -74,7 +74,7 @@ class AssetPlatformViewSet(ModelViewSet):
     queryset = Platform.objects.all()
     permission_classes = (IsSuperUser,)
     serializer_class = serializers.PlatformSerializer
-    filterset_fields = ['name', 'base']
+    filter_fields = ['name', 'base']
     search_fields = ['name']
 
     def check_object_permissions(self, request, obj):

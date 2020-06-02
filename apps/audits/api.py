@@ -24,12 +24,11 @@ class FTPLogViewSet(ListModelMixin, OrgGenericViewSet):
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))
     ]
-    filter_fields = ['user', 'asset', 'system_user']
-    search_fields = ['filename']
+    filter_fields = ['user', 'asset', 'system_user', 'filename']
+    search_fields = filter_fields
 
 
-class UserLoginLogViewSet(ListModelMixin,
-                          CommonGenericViewSet):
+class UserLoginLogViewSet(ListModelMixin, CommonGenericViewSet):
     queryset = UserLoginLog.objects.all()
     permission_classes = [IsOrgAdmin | IsOrgAuditor]
     serializer_class = UserLoginLogSerializer
@@ -61,7 +60,7 @@ class OperateLogViewSet(ListModelMixin, OrgGenericViewSet):
     date_range_filter_fields = [
         ('datetime', ('date_from', 'date_to'))
     ]
-    filter_fields = ['user', 'action', 'resource_type', 'resource']
+    filter_fields = ['user', 'action', 'resource_type', 'resource', 'remote_addr']
     search_fields = ['resource']
     ordering = ['-datetime']
 
@@ -74,7 +73,7 @@ class PasswordChangeLogViewSet(ListModelMixin, CommonGenericViewSet):
     date_range_filter_fields = [
         ('datetime', ('date_from', 'date_to'))
     ]
-    filterset_fields = ['user']
+    filter_fields = ['user', 'change_by', 'remote_addr']
     ordering = ['-datetime']
 
     def get_queryset(self):

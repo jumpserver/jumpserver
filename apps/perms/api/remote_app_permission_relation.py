@@ -35,7 +35,7 @@ class RemoteAppPermissionUserRelationViewSet(RelationViewSet):
     serializer_class = serializers.RemoteAppPermissionUserRelationSerializer
     m2m_field = models.RemoteAppPermission.users.field
     permission_classes = (IsOrgAdmin,)
-    filterset_fields = [
+    filter_fields = [
         'id', 'user', 'remoteapppermission'
     ]
     search_fields = ('user__name', 'user__username', 'remoteapppermission__name')
@@ -50,7 +50,7 @@ class RemoteAppPermissionRemoteAppRelationViewSet(RelationViewSet):
     serializer_class = serializers.RemoteAppPermissionRemoteAppRelationSerializer
     m2m_field = models.RemoteAppPermission.remote_apps.field
     permission_classes = (IsOrgAdmin,)
-    filterset_fields = [
+    filter_fields = [
         'id', 'remoteapp', 'remoteapppermission',
     ]
     search_fields = [

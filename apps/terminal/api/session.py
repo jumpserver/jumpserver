@@ -32,7 +32,7 @@ class SessionViewSet(OrgBulkModelViewSet):
         'display': serializers.SessionDisplaySerializer,
     }
     permission_classes = (IsOrgAdminOrAppUser, )
-    filterset_fields = [
+    filter_fields = [
         "user", "asset", "system_user", "remote_addr",
         "protocol", "terminal", "is_finished",
     ]

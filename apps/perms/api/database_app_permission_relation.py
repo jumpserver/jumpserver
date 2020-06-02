@@ -23,7 +23,7 @@ class DatabaseAppPermissionUserRelationViewSet(RelationViewSet):
     serializer_class = serializers.DatabaseAppPermissionUserRelationSerializer
     m2m_field = models.DatabaseAppPermission.users.field
     permission_classes = (IsOrgAdmin,)
-    filterset_fields = [
+    filter_fields = [
         'id', 'user', 'databaseapppermission'
     ]
     search_fields = ('user__name', 'user__username', 'databaseapppermission__name')
@@ -38,7 +38,7 @@ class DatabaseAppPermissionUserGroupRelationViewSet(RelationViewSet):
     serializer_class = serializers.DatabaseAppPermissionUserGroupRelationSerializer
     m2m_field = models.DatabaseAppPermission.user_groups.field
     permission_classes = (IsOrgAdmin,)
-    filterset_fields = [
+    filter_fields = [
         'id', "usergroup", "databaseapppermission"
     ]
     search_fields = ["usergroup__name", "databaseapppermission__name"]
@@ -69,7 +69,7 @@ class DatabaseAppPermissionDatabaseAppRelationViewSet(RelationViewSet):
     serializer_class = serializers.DatabaseAppPermissionDatabaseAppRelationSerializer
     m2m_field = models.DatabaseAppPermission.database_apps.field
     permission_classes = (IsOrgAdmin,)
-    filterset_fields = [
+    filter_fields = [
         'id', 'databaseapp', 'databaseapppermission',
     ]
     search_fields = [
@@ -102,7 +102,7 @@ class DatabaseAppPermissionSystemUserRelationViewSet(RelationViewSet):
     serializer_class = serializers.DatabaseAppPermissionSystemUserRelationSerializer
     m2m_field = models.DatabaseAppPermission.system_users.field
     permission_classes = (IsOrgAdmin,)
-    filterset_fields = [
+    filter_fields = [
         'id', 'systemuser', 'databaseapppermission'
     ]
     search_fields = [
