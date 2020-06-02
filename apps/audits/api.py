@@ -24,7 +24,7 @@ class FTPLogViewSet(ListModelMixin, OrgGenericViewSet):
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))
     ]
-    filterset_fields = ['user', 'asset', 'system_user']
+    filter_fields = ['user', 'asset', 'system_user']
     search_fields = ['filename']
 
 
@@ -63,7 +63,7 @@ class OperateLogViewSet(ListModelMixin, OrgGenericViewSet):
     ]
     filter_fields = ['user', 'action', 'resource_type', 'resource']
     search_fields = ['resource']
-    ordering_fields = ['-datetime']
+    ordering = ['-datetime']
 
 
 class PasswordChangeLogViewSet(ListModelMixin, CommonGenericViewSet):
@@ -75,7 +75,7 @@ class PasswordChangeLogViewSet(ListModelMixin, CommonGenericViewSet):
         ('datetime', ('date_from', 'date_to'))
     ]
     filterset_fields = ['user']
-    ordering_fields = ['-datetime']
+    ordering = ['-datetime']
 
     def get_queryset(self):
         users = current_org.get_org_members()
@@ -94,4 +94,4 @@ class CommandExecutionViewSet(ListModelMixin, OrgGenericViewSet):
         ('date_start', ('date_from', 'date_to'))
     ]
     search_fields = ['command']
-    ordering_fields = ['-date_created']
+    ordering = ['-date_created']
