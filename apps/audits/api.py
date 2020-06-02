@@ -37,8 +37,8 @@ class UserLoginLogViewSet(ListModelMixin,
     date_range_filter_fields = [
         ('datetime', ('date_from', 'date_to'))
     ]
-    filterset_fields = ['username']
-    search_fields = ['ip', 'city', 'username']
+    filter_fields = ['username', 'ip', 'city', 'type', 'status', 'mfa']
+    search_fields =['username', 'ip', 'city']
 
     @staticmethod
     def get_org_members():
@@ -61,8 +61,8 @@ class OperateLogViewSet(ListModelMixin, OrgGenericViewSet):
     date_range_filter_fields = [
         ('datetime', ('date_from', 'date_to'))
     ]
-    filterset_fields = ['user', 'action', 'resource_type']
-    search_fields = ['filename']
+    filter_fields = ['user', 'action', 'resource_type', 'resource']
+    search_fields = ['resource']
     ordering_fields = ['-datetime']
 
 
