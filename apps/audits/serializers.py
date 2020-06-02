@@ -13,7 +13,7 @@ class FTPLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.FTPLog
         fields = (
-            'user', 'remote_addr', 'asset', 'system_user',
+            'id', 'user', 'remote_addr', 'asset', 'system_user',
             'operate', 'filename', 'is_success', 'date_start'
         )
 
@@ -26,7 +26,7 @@ class UserLoginLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.UserLoginLog
         fields = (
-            'username', 'type', 'type_display', 'ip', 'city', 'user_agent',
+            'id', 'username', 'type', 'type_display', 'ip', 'city', 'user_agent',
             'mfa', 'reason', 'status', 'status_display', 'datetime', 'mfa_display'
         )
 
@@ -35,7 +35,7 @@ class OperateLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.OperateLog
         fields = (
-            'user', 'action', 'resource_type', 'resource',
+            'id', 'user', 'action', 'resource_type', 'resource',
             'remote_addr', 'datetime'
         )
 
@@ -44,7 +44,7 @@ class PasswordChangeLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.PasswordChangeLog
         fields = (
-            'user', 'change_by', 'remote_addr', 'datetime'
+            'id', 'user', 'change_by', 'remote_addr', 'datetime'
         )
 
 
@@ -58,7 +58,7 @@ class CommandExecutionSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommandExecution
         fields = (
-            'hosts', 'run_as', 'command', 'user', 'is_finished',
+            'id', 'hosts', 'run_as', 'command', 'user', 'is_finished',
             'date_start', 'result', 'is_success'
         )
         extra_kwargs = {
