@@ -25,6 +25,7 @@ urlpatterns = [
     path('password/verify/', users_view.UserVerifyPasswordView.as_view(), name='user-verify-password'),
 
     # Profile
+    path('profile/pubkey/generate/', users_view.UserPublicKeyGenerateView.as_view(), name='user-pubkey-generate'),
     path('profile/otp/enable/start/', users_view.UserOtpEnableStartView.as_view(), name='user-otp-enable-start'),
     path('profile/otp/enable/install-app/', users_view.UserOtpEnableInstallAppView.as_view(),
          name='user-otp-enable-install-app'),
