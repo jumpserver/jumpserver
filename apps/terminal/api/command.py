@@ -86,7 +86,6 @@ class CommandQueryMixin:
 
         if date_to_q:
             date_to_st = dt_parser(date_to_q).timestamp()
-
         return date_from_st, date_to_st
 
 
