@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from django.core.cache import cache
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
@@ -199,17 +200,24 @@ class UserProfileSerializer(UserSerializer):
     public_key_hash_md5 = serializers.CharField(
         source='get_public_key_hash_md5', required=False, read_only=True, max_length=128
     )
+    MFA_LEVEL_CHOICES = (
+        (0, _('Disable')),
+        (1, _('Enable')),
+    )
+    mfa_level = serializers.ChoiceField(choices=MFA_LEVEL_CHOICES, label=_('MFA'))
+    guide_url = serializers.SerializerMethodField()
 
     class Meta(UserSerializer.Meta):
         fields = UserSerializer.Meta.fields + [
-            'public_key_comment', 'public_key_hash_md5', 'admin_or_audit_orgs', 'current_org_roles'
+            'public_key_comment', 'public_key_hash_md5', 'admin_or_audit_orgs', 'current_org_roles',
+            'guide_url'
         ]
         extra_kwargs = dict(UserSerializer.Meta.extra_kwargs)
         extra_kwargs.update({
             'name': {'read_only': True, 'max_length': 128},
             'username': {'read_only': True, 'max_length': 128},
             'email': {'read_only': True},
-            'mfa_level': {'read_only': True},
+            # 'mfa_level': {'read_only': True},
             'source': {'read_only': True},
             'is_valid': {'read_only': True},
             'is_active': {'read_only': True},
@@ -229,6 +237,10 @@ class UserProfileSerializer(UserSerializer):
         if 'public_key' in fields:
             fields.remove('public_key')
             extra_kwargs.pop('public_key', None)
+
+    @staticmethod
+    def get_guide_url(obj):
+        return settings.USER_GUIDE_URL
 
 
 class UserUpdatePasswordSerializer(serializers.ModelSerializer):
