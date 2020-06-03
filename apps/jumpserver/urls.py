@@ -67,14 +67,14 @@ if settings.XPACK_ENABLED:
     )
 
 js_i18n_patterns = i18n_patterns(
-    # path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
+    path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
 )
 
 
 apps = [
     'users', 'assets', 'perms', 'terminal', 'ops', 'audits', 'orgs', 'auth',
     'applications', 'tickets', 'settings', 'xpack'
-    'flower', 'luna', 'koko', 'ws', 'i18n', 'jsi18n', 'docs', 'redocs',
+    'flower', 'luna', 'koko', 'ws', 'docs', 'redocs',
 ]
 
 
@@ -94,23 +94,25 @@ urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
             + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += js_i18n_patterns
 
-# 兼容之前的
-old_app_pattern = '|'.join(apps)
-urlpatterns += [re_path(old_app_pattern, views.redirect_old_apps_view)]
-
 handler404 = 'jumpserver.views.handler404'
 handler500 = 'jumpserver.views.handler500'
 
 if settings.DEBUG:
-    app_view_patterns += [
-        re_path('^swagger(?P<format>\.json|\.yaml)$',
+    urlpatterns += [
+        re_path('^api/swagger(?P<format>\.json|\.yaml)$',
                 views.get_swagger_view().without_ui(cache_timeout=1), name='schema-json'),
-        path('docs/', views.get_swagger_view().with_ui('swagger', cache_timeout=1), name="docs"),
-        path('redoc/', views.get_swagger_view().with_ui('redoc', cache_timeout=1), name='redoc'),
+        path('api/docs/', views.get_swagger_view().with_ui('swagger', cache_timeout=1), name="docs"),
+        path('api/redoc/', views.get_swagger_view().with_ui('redoc', cache_timeout=1), name='redoc'),
 
-        re_path('^v2/swagger(?P<format>\.json|\.yaml)$',
+        re_path('^api/v2/swagger(?P<format>\.json|\.yaml)$',
                 views.get_swagger_view().without_ui(cache_timeout=1), name='schema-json'),
-        path('docs/v2/', views.get_swagger_view("v2").with_ui('swagger', cache_timeout=1), name="docs"),
-        path('redoc/v2/', views.get_swagger_view("v2").with_ui('redoc', cache_timeout=1), name='redoc'),
+        path('api/docs/v2/', views.get_swagger_view("v2").with_ui('swagger', cache_timeout=1), name="docs"),
+        path('api/redoc/v2/', views.get_swagger_view("v2").with_ui('redoc', cache_timeout=1), name='redoc'),
     ]
+
+
+# 兼容之前的
+old_app_pattern = '|'.join(apps)
+urlpatterns += [re_path(old_app_pattern, views.redirect_old_apps_view)]
+
 

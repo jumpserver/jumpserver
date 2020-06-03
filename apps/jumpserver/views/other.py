@@ -6,6 +6,7 @@ import time
 from django.http import HttpResponseRedirect, JsonResponse, Http404
 from django.conf import settings
 from django.views.generic import View
+from django.shortcuts import redirect
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.views import APIView
 from django.views.decorators.csrf import csrf_exempt
@@ -55,6 +56,8 @@ def redirect_old_apps_view(request, *args, **kwargs):
     path = request.get_full_path()
     if path.find('/core') != -1:
         raise Http404()
+    if path in ['/docs/', '/docs', '/core/docs/', '/core/docs']:
+        return redirect('/api/docs/')
     new_path = '/core{}'.format(path)
     return HttpResponseTemporaryRedirect(new_path)
 
