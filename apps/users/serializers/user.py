@@ -217,7 +217,7 @@ class UserProfileSerializer(UserSerializer):
             'name': {'read_only': True, 'max_length': 128},
             'username': {'read_only': True, 'max_length': 128},
             'email': {'read_only': True},
-            # 'mfa_level': {'read_only': True},
+            'is_first_login': {'label': _('Is first login'), 'read_only': False},
             'source': {'read_only': True},
             'is_valid': {'read_only': True},
             'is_active': {'read_only': True},
