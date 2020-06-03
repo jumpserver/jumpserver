@@ -204,7 +204,7 @@ class UserProfileSerializer(UserSerializer):
         (0, _('Disable')),
         (1, _('Enable')),
     )
-    mfa_level = serializers.ChoiceField(choices=MFA_LEVEL_CHOICES, label=_('MFA'))
+    mfa_level = serializers.ChoiceField(choices=MFA_LEVEL_CHOICES, label=_('MFA'), required=False)
     guide_url = serializers.SerializerMethodField()
 
     class Meta(UserSerializer.Meta):
@@ -241,6 +241,11 @@ class UserProfileSerializer(UserSerializer):
     @staticmethod
     def get_guide_url(obj):
         return settings.USER_GUIDE_URL
+
+    def validate_mfa_level(self, mfa_level):
+        if self.instance and self.instance.mfa_force_enabled:
+            return 2
+        return mfa_level
 
 
 class UserUpdatePasswordSerializer(serializers.ModelSerializer):
