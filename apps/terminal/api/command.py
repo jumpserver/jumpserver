@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.shortcuts import HttpResponse
 from rest_framework import viewsets
 from rest_framework import generics
+from rest_framework.fields import DateTimeField
 from rest_framework.response import Response
 from django.template import loader
 
@@ -71,12 +72,21 @@ class CommandQueryMixin:
     def get_date_range(self):
         now = timezone.now()
         days_ago = now - timezone.timedelta(days=self.default_days_ago)
-        default_start_st = days_ago.timestamp()
-        default_end_st = now.timestamp()
+        date_from_st = days_ago.timestamp()
+        date_to_st = now.timestamp()
+
         query_params = self.request.query_params
-        date_from_st = query_params.get("date_from") or default_start_st
-        date_to_st = query_params.get("date_to") or default_end_st
-        return float(date_from_st), float(date_to_st)
+        date_from_q = query_params.get("date_from")
+        date_to_q = query_params.get("date_to")
+
+        dt_parser = DateTimeField().to_internal_value
+
+        if date_from_q:
+            date_from_st = dt_parser(date_from_q).timestamp()
+
+        if date_to_q:
+            date_to_st = dt_parser(date_to_q).timestamp()
+        return date_from_st, date_to_st
 
 
 class CommandViewSet(CommandQueryMixin, viewsets.ModelViewSet):
