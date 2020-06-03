@@ -129,62 +129,6 @@ class UserResetPasswordView(FormView):
         return redirect('authentication:reset-password-success')
 
 
-class UserFirstLoginView(PermissionsMixin, SessionWizardView):
+class UserFirstLoginView(PermissionsMixin, TemplateView):
     template_name = 'users/first_login.html'
     permission_classes = [IsValidUser]
-    form_list = [
-        forms.UserProfileForm,
-        forms.UserPublicKeyForm,
-        forms.UserMFAForm,
-        forms.UserFirstLoginFinishForm
-    ]
-    file_storage = default_storage
-
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated and not request.user.is_first_login:
-            return redirect(reverse('index'))
-        return super().dispatch(request, *args, **kwargs)
-
-    def done(self, form_list, **kwargs):
-        user = self.request.user
-        for form in form_list:
-            for field in form:
-                if field.value():
-                    setattr(user, field.name, field.value())
-        user.is_first_login = False
-        user.save()
-        context = {
-            'user_guide_url': settings.USER_GUIDE_URL
-        }
-        return render(self.request, 'users/first_login_done.html', context)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({'app': _('Users'), 'action': _('First login')})
-        return context
-
-    def get_form_initial(self, step):
-        user = self.request.user
-        if step == '0':
-            return {
-                'username': user.username or '',
-                'name': user.name or user.username,
-                'email': user.email or '',
-                'wechat': user.wechat or '',
-                'phone': user.phone or ''
-            }
-        return super().get_form_initial(step)
-
-    def get_form(self, step=None, data=None, files=None):
-        form = super().get_form(step, data, files)
-        form.instance = self.request.user
-
-        if isinstance(form, forms.UserMFAForm):
-            choices = form.fields["mfa_level"].choices
-            if self.request.user.mfa_force_enabled:
-                choices = [(k, v) for k, v in choices if k == 2]
-            else:
-                choices = [(k, v) for k, v in choices if k in [0, 1]]
-            form.fields["mfa_level"].choices = choices
-            form.fields["mfa_level"].initial = self.request.user.mfa_level
-        return form

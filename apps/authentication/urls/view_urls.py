@@ -33,6 +33,7 @@ urlpatterns = [
          name='user-otp-disable-authentication'),
     path('profile/otp/update/', users_view.UserOtpUpdateView.as_view(), name='user-otp-update'),
     path('profile/otp/settings-success/', users_view.UserOtpSettingsSuccessView.as_view(), name='user-otp-settings-success'),
+    path('first-login/', users_view.UserFirstLoginView.as_view(), name='user-first-login'),
 
     # openid
     path('cas/', include(('authentication.backends.cas.urls', 'authentication'), namespace='cas')),

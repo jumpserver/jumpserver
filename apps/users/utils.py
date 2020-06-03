@@ -206,7 +206,7 @@ def get_user_or_pre_auth_user(request):
 
 def redirect_user_first_login_or_index(request, redirect_field_name):
     if request.user.is_first_login:
-        return reverse('users:user-first-login')
+        return reverse('authentication:user-first-login')
     url_in_post = request.POST.get(redirect_field_name)
     if url_in_post:
         return url_in_post
