@@ -67,7 +67,7 @@ if settings.XPACK_ENABLED:
     )
 
 js_i18n_patterns = i18n_patterns(
-    path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
+    # path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
 )
 
 
@@ -87,6 +87,7 @@ urlpatterns = [
     # External apps url
     path('core/auth/captcha/', include('captcha.urls')),
     path('core/', include(app_view_patterns)),
+    path('ui/', views.UIView.as_view())
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \

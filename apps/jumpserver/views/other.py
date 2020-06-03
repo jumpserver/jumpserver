@@ -16,7 +16,7 @@ from common.http import HttpResponseTemporaryRedirect
 
 __all__ = [
     'LunaView', 'I18NView', 'KokoView', 'WsView', 'HealthCheckView',
-    'redirect_format_api', 'redirect_old_apps_view'
+    'redirect_format_api', 'redirect_old_apps_view', 'UIView'
 ]
 
 
@@ -73,6 +73,12 @@ class WsView(APIView):
         msg = _("Websocket server run on port: {}, you should proxy it on nginx"
                 .format(self.ws_port))
         return JsonResponse({"msg": msg})
+
+
+class UIView(View):
+    def get(self, request):
+        msg = "如果你能看到这个页面，证明你的配置是有问题的，请参考文档设置好nginx, UI由Lina项目提供"
+        return HttpResponse(msg)
 
 
 class KokoView(View):

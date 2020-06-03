@@ -51,7 +51,7 @@ class UserForgotPasswordView(FormView):
             return self.form_invalid(form)
         else:
             send_reset_password_mail(user)
-            return redirect('users:forgot-password-sendmail-success')
+            return redirect('authentication:forgot-password-sendmail-success')
 
 
 class UserForgotPasswordSendmailSuccessView(TemplateView):
@@ -126,7 +126,7 @@ class UserResetPasswordView(FormView):
 
         user.reset_password(password)
         User.expired_reset_password_token(token)
-        return redirect('users:reset-password-success')
+        return redirect('authentication:reset-password-success')
 
 
 class UserFirstLoginView(PermissionsMixin, SessionWizardView):
