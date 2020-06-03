@@ -31,31 +31,10 @@ api_v2 = [
     path('users/', include('users.urls.api_urls_v2', namespace='api-users-v2')),
 ]
 
-disabled_view_pattern = [
-    path('users/', include('users.urls.views_urls', namespace='users')),
-    path('assets/', include('assets.urls.views_urls', namespace='assets')),
-    path('perms/', include('perms.urls.views_urls', namespace='perms')),
-    path('terminal/', include('terminal.urls.views_urls', namespace='terminal')),
-    path('ops/', include('ops.urls.view_urls', namespace='ops')),
-    path('audits/', include('audits.urls.view_urls', namespace='audits')),
-    path('orgs/', include('orgs.urls.views_urls', namespace='orgs')),
-    path('applications/', include('applications.urls.views_urls', namespace='applications')),
-    path('tickets/', include('tickets.urls.views_urls', namespace='tickets')),
-    re_path(r'flower/(?P<path>.*)', views.celery_flower_view, name='flower-view'),
-    re_path('luna/.*', views.LunaView.as_view(), name='luna-view'),
-    re_path('koko/.*', views.KokoView.as_view(), name='koko-view'),
-    re_path('ws/.*', views.WsView.as_view(), name='ws-view'),
-    path('i18n/<str:lang>/', views.I18NView.as_view(), name='i18n-switch'),
-    path('settings/', include('settings.urls.view_urls', namespace='settings')),
-]
-
 
 app_view_patterns = [
     path('auth/', include('authentication.urls.view_urls'), name='auth'),
 ]
-
-if os.environ.get('ENABLE_OLD_VIEW'):
-    app_view_patterns += disabled_view_pattern
 
 
 if settings.XPACK_ENABLED:

@@ -14,11 +14,11 @@ from django.views.generic import FormView
 
 from common.utils import get_object_or_none
 from common.permissions import PermissionsMixin, IsValidUser
-from ..models import User
-from ..utils import (
+from ...models import User
+from ...utils import (
     send_reset_password_mail, get_password_check_rules, check_password_rules
 )
-from .. import forms
+from ... import forms
 
 
 __all__ = [
