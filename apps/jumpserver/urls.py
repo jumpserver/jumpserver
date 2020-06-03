@@ -1,5 +1,6 @@
 # ~*~ coding: utf-8 ~*~
 from __future__ import unicode_literals
+import os
 
 from django.urls import path, include, re_path
 from django.conf import settings
@@ -30,8 +31,7 @@ api_v2 = [
     path('users/', include('users.urls.api_urls_v2', namespace='api-users-v2')),
 ]
 
-
-app_view_patterns = [
+disabled_view_pattern = [
     path('users/', include('users.urls.views_urls', namespace='users')),
     path('assets/', include('assets.urls.views_urls', namespace='assets')),
     path('perms/', include('perms.urls.views_urls', namespace='perms')),
@@ -39,7 +39,6 @@ app_view_patterns = [
     path('ops/', include('ops.urls.view_urls', namespace='ops')),
     path('audits/', include('audits.urls.view_urls', namespace='audits')),
     path('orgs/', include('orgs.urls.views_urls', namespace='orgs')),
-    path('auth/', include('authentication.urls.view_urls'), name='auth'),
     path('applications/', include('applications.urls.views_urls', namespace='applications')),
     path('tickets/', include('tickets.urls.views_urls', namespace='tickets')),
     re_path(r'flower/(?P<path>.*)', views.celery_flower_view, name='flower-view'),
@@ -49,6 +48,14 @@ app_view_patterns = [
     path('i18n/<str:lang>/', views.I18NView.as_view(), name='i18n-switch'),
     path('settings/', include('settings.urls.view_urls', namespace='settings')),
 ]
+
+
+app_view_patterns = [
+    path('auth/', include('authentication.urls.view_urls'), name='auth'),
+]
+
+if os.environ.get('ENABLE_OLD_VIEW'):
+    app_view_patterns += disabled_view_pattern
 
 
 if settings.XPACK_ENABLED:
@@ -68,7 +75,6 @@ apps = [
     'users', 'assets', 'perms', 'terminal', 'ops', 'audits', 'orgs', 'auth',
     'applications', 'tickets', 'settings', 'xpack'
     'flower', 'luna', 'koko', 'ws', 'i18n', 'jsi18n', 'docs', 'redocs',
-    'zh-hans'
 ]
 
 
