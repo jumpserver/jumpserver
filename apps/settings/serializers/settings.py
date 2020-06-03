@@ -55,10 +55,10 @@ class TerminalSettingSerializer(serializers.Serializer):
     PAGE_SIZE_CHOICES = (
         ('all', _('All')),
         ('auto', _('Auto')),
-        (10, 10),
-        (15, 15),
-        (25, 25),
-        (50, 50),
+        ('10', '10'),
+        ('15', '15'),
+        ('25', '25'),
+        ('50', '50'),
     )
     TERMINAL_PASSWORD_AUTH = serializers.BooleanField(required=False)
     TERMINAL_PUBLIC_KEY_AUTH = serializers.BooleanField(required=False)
