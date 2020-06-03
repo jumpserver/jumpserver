@@ -89,7 +89,10 @@ class AuthMixin:
     def get_public_key_hash_md5(self):
         if not callable(self.public_key_obj.hash_md5):
             return ''
-        return self.public_key_obj.hash_md5()
+        try:
+            return self.public_key_obj.hash_md5()
+        except:
+            return ''
 
     def reset_password(self, new_password):
         self.set_password(new_password)
