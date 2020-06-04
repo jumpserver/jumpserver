@@ -55,7 +55,7 @@ class MailTestingAPI(APIView):
                 email_recipient = email_recipient or email_from
                 connection = get_connection(
                     host=email_host, port=email_port,
-                    uesrname=email_host_user, password=email_host_password,
+                    username=email_host_user, password=email_host_password,
                     use_tls=email_use_tls, use_ssl=email_use_ssl,
                 )
                 send_mail(
