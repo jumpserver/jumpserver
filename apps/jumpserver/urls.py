@@ -31,7 +31,8 @@ api_v2 = [
 
 app_view_patterns = [
     path('auth/', include('authentication.urls.view_urls'), name='auth'),
-    path('ops/', include('ops.urls.view_urls'), name='ops')
+    path('ops/', include('ops.urls.view_urls'), name='ops'),
+    re_path(r'flower/(?P<path>.*)', views.celery_flower_view, name='flower-view'),
 ]
 
 

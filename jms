@@ -251,7 +251,7 @@ def get_start_flower_kwargs():
         'celery', 'flower',
         '-A', 'ops',
         '-l', 'INFO',
-        '--url_prefix=flower',
+        '--url_prefix=/core/flower',
         '--auto_refresh=False',
         '--max_tasks=1000',
         '--tasks_columns=uuid,name,args,state,received,started,runtime,worker'
