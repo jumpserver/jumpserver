@@ -48,8 +48,9 @@ class AuthMixin:
             super().set_password(raw_password)
 
     def set_public_key(self, public_key):
-        self.public_key = public_key
-        self.save()
+        if self.can_update_ssh_key():
+            self.public_key = public_key
+            self.save()
 
     def can_update_password(self):
         return self.is_local
@@ -58,7 +59,7 @@ class AuthMixin:
         return self.can_use_ssh_key_login()
 
     def can_use_ssh_key_login(self):
-        return settings.TERMINAL_PUBLIC_KEY_AUTH
+        return self.is_local and settings.TERMINAL_PUBLIC_KEY_AUTH
 
     def is_public_key_valid(self):
         """
