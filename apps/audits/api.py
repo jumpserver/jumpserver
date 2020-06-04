@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 #
-from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import ListModelMixin
+from django.db.models import F, Value
+from django.db.models.functions import Concat
 
-from common.mixins.api import CommonApiMixin
 from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor, IsOrgAdmin
 from common.drf.filters import DatetimeRangeFilter, current_user_filter
 from common.api import CommonGenericViewSet
-from orgs.mixins.api import OrgGenericViewSet
+from orgs.mixins.api import OrgGenericViewSet, OrgBulkModelViewSet, OrgRelationMixin
 from orgs.utils import current_org
 from ops.models import CommandExecution
 from .models import FTPLog, UserLoginLog, OperateLog, PasswordChangeLog
 from .serializers import FTPLogSerializer, UserLoginLogSerializer, CommandExecutionSerializer
-from .serializers import OperateLogSerializer, PasswordChangeLogSerializer
+from .serializers import OperateLogSerializer, PasswordChangeLogSerializer, CommandExecutionHostsRelationSerializer
 from .filters import CurrentOrgMembersFilter
 
 
@@ -88,9 +88,31 @@ class CommandExecutionViewSet(ListModelMixin, OrgGenericViewSet):
     model = CommandExecution
     serializer_class = CommandExecutionSerializer
     permission_classes = [IsOrgAdmin | IsOrgAuditor]
-    extra_filter_backends = [DatetimeRangeFilter, current_user_filter(), CurrentOrgMembersFilter]
+    extra_filter_backends = [DatetimeRangeFilter, CurrentOrgMembersFilter]
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))
     ]
+    filter_fields = ['user__name', 'command', 'run_as__name']
     search_fields = ['command']
     ordering = ['-date_created']
+
+
+class CommandExecutionHostRelationViewSet(OrgRelationMixin, OrgBulkModelViewSet):
+    serializer_class = CommandExecutionHostsRelationSerializer
+    m2m_field = CommandExecution.hosts.field
+    permission_classes = (IsOrgAdmin,)
+    filter_fields = [
+        'id', 'asset', 'commandexecution'
+    ]
+    search_fields = ('asset__hostname', )
+    http_method_names = ['options', 'get']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.annotate(
+            asset_display=Concat(
+                F('asset__hostname'), Value('('),
+                F('asset__ip'), Value(')')
+            )
+        )
+        return queryset

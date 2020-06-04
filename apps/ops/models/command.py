@@ -9,7 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 from django.db import models
 
-
+from common.utils import lazyproperty
 from orgs.models import Organization
 from orgs.mixins.models import OrgModelMixin
 from ..ansible.runner import CommandRunner
@@ -39,6 +39,14 @@ class CommandExecution(OrgModelMixin):
             username = self.run_as.username
         inv = JMSInventory(self.hosts.all(), run_as=username)
         return inv
+
+    @lazyproperty
+    def run_as_display(self):
+        return str(self.run_as)
+
+    @lazyproperty
+    def user_display(self):
+        return str(self.user)
 
     @property
     def result(self):

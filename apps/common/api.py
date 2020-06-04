@@ -17,7 +17,7 @@ from .utils import get_logger
 from .mixins import CommonApiMixin
 
 __all__ = [
-    'LogTailApi', 'ResourcesIDCacheApi',
+    'LogTailApi', 'ResourcesIDCacheApi', 'CommonGenericViewSet'
 ]
 
 logger = get_logger(__file__)

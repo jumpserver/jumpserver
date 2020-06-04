@@ -2,7 +2,10 @@
 #
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
+from django.db.models import F
 
+from common.mixins import BulkSerializerMixin
+from common.serializers import AdaptedBulkListSerializer
 from terminal.models import Session
 from ops.models import CommandExecution
 from . import models
@@ -55,12 +58,16 @@ class SessionAuditSerializer(serializers.ModelSerializer):
 
 
 class CommandExecutionSerializer(serializers.ModelSerializer):
+    is_success = serializers.BooleanField(read_only=True, label=_('Is success'))
+
     class Meta:
         model = CommandExecution
-        fields = (
-            'id', 'hosts', 'run_as', 'command', 'user', 'is_finished',
+        fields_mini = ['id']
+        fields_small = fields_mini + [
+            'run_as', 'command', 'user', 'is_finished',
             'date_start', 'result', 'is_success'
-        )
+        ]
+        fields = fields_small + ['hosts', 'run_as_display', 'user_display']
         extra_kwargs = {
             'result': {'label': _('Result')},  # model 上的方法，只能在这修改
             'is_success': {'label': _('Is success')},
@@ -68,3 +75,22 @@ class CommandExecutionSerializer(serializers.ModelSerializer):
             'run_as': {'label': _('Run as')},
             'user': {'label': _('User')},
         }
+
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        """ Perform necessary eager loading of data. """
+        queryset = queryset.annotate(user_display=F('user__name'))\
+            .annotate(run_as_display=F('run_as__name'))
+        return queryset
+
+
+class CommandExecutionHostsRelationSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+    asset_display = serializers.ReadOnlyField()
+    commandexecution_display = serializers.ReadOnlyField()
+
+    class Meta:
+        list_serializer_class = AdaptedBulkListSerializer
+        model = CommandExecution.hosts.through
+        fields = [
+            'id', 'asset', 'asset_display', 'commandexecution', 'commandexecution_display'
+        ]
