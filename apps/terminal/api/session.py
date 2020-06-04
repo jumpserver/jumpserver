@@ -59,7 +59,7 @@ class SessionViewSet(OrgBulkModelViewSet):
         return super().perform_create(serializer)
 
     def get_permissions(self):
-        if self.request.method.lower() in ['get']:
+        if self.request.method.lower() in ['get', 'options']:
             self.permission_classes = (IsOrgAdminOrAppUser | IsOrgAuditor, )
         return super().get_permissions()
 

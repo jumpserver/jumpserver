@@ -10,7 +10,7 @@ from users.models import User
 from assets.models import Asset
 from terminal.models import Session
 from orgs.utils import current_org
-from common.permissions import IsOrgAdmin
+from common.permissions import IsOrgAdmin, IsOrgAuditor
 from common.utils import lazyproperty
 
 __all__ = ['IndexApi']
@@ -224,7 +224,7 @@ class TotalCountMixin:
 
 
 class IndexApi(TotalCountMixin, DatesLoginMetricMixin, APIView):
-    permission_classes = (IsOrgAdmin,)
+    permission_classes = (IsOrgAdmin | IsOrgAuditor,)
     http_method_names = ['get']
 
     def get(self, request, *args, **kwargs):
