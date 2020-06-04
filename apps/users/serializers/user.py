@@ -234,10 +234,6 @@ class UserProfileSerializer(UserSerializer):
             fields.remove('password')
             extra_kwargs.pop('password', None)
 
-        if 'public_key' in fields:
-            fields.remove('public_key')
-            extra_kwargs.pop('public_key', None)
-
     @staticmethod
     def get_guide_url(obj):
         return settings.USER_GUIDE_URL
@@ -246,6 +242,13 @@ class UserProfileSerializer(UserSerializer):
         if self.instance and self.instance.mfa_force_enabled:
             return 2
         return mfa_level
+
+    def validate_public_key(self, public_key):
+        if self.instance and self.instance.can_update_ssh_key():
+            if not validate_ssh_public_key(public_key):
+                raise serializers.ValidationError(_('Not a valid ssh public key'))
+            return public_key
+        return None
 
 
 class UserUpdatePasswordSerializer(serializers.ModelSerializer):

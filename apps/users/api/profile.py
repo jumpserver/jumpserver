@@ -83,8 +83,3 @@ class UserPublicKeyApi(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
-
-    def perform_update(self, serializer):
-        user = self.get_object()
-        user.public_key = serializer.validated_data['public_key']
-        user.save()
