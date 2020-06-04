@@ -31,6 +31,7 @@ api_v2 = [
 
 app_view_patterns = [
     path('auth/', include('authentication.urls.view_urls'), name='auth'),
+    path('ops/', include('ops.urls.view_urls'), name='ops')
 ]
 
 
