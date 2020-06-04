@@ -82,7 +82,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'created_by', 'date_created', 'hardware_info',
         ]
         fields_fk = [
-            'admin_user', 'domain', 'platform'
+            'admin_user', 'admin_user_display', 'domain', 'platform'
         ]
         fk_only_fields = {
             'platform': ['name']
