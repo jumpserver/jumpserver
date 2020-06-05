@@ -92,8 +92,8 @@ class CommandExecutionViewSet(ListModelMixin, OrgGenericViewSet):
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))
     ]
-    filter_fields = ['user__name', 'command', 'run_as__name']
-    search_fields = ['command']
+    filter_fields = ['user__name', 'command', 'run_as__name', 'is_finished']
+    search_fields = ['command', 'user__name', 'run_as__name']
     ordering = ['-date_created']
 
 

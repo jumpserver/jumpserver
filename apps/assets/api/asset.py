@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 
-import random
-
-from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import RetrieveAPIView
 from django.shortcuts import get_object_or_404
