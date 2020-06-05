@@ -5,7 +5,7 @@ from django.db.models import F, Value
 from django.db.models.functions import Concat
 
 from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor, IsOrgAdmin
-from common.drf.filters import DatetimeRangeFilter, current_user_filter
+from common.drf.filters import DatetimeRangeFilter
 from common.api import CommonGenericViewSet
 from orgs.mixins.api import OrgGenericViewSet, OrgBulkModelViewSet, OrgRelationMixin
 from orgs.utils import current_org
@@ -13,7 +13,6 @@ from ops.models import CommandExecution
 from .models import FTPLog, UserLoginLog, OperateLog, PasswordChangeLog
 from .serializers import FTPLogSerializer, UserLoginLogSerializer, CommandExecutionSerializer
 from .serializers import OperateLogSerializer, PasswordChangeLogSerializer, CommandExecutionHostsRelationSerializer
-from .filters import CurrentOrgMembersFilter
 
 
 class FTPLogViewSet(ListModelMixin, OrgGenericViewSet):
@@ -88,13 +87,18 @@ class CommandExecutionViewSet(ListModelMixin, OrgGenericViewSet):
     model = CommandExecution
     serializer_class = CommandExecutionSerializer
     permission_classes = [IsOrgAdmin | IsOrgAuditor]
-    extra_filter_backends = [DatetimeRangeFilter, CurrentOrgMembersFilter]
+    extra_filter_backends = [DatetimeRangeFilter]
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))
     ]
     filter_fields = ['user__name', 'command', 'run_as__name', 'is_finished']
     search_fields = ['command', 'user__name', 'run_as__name']
     ordering = ['-date_created']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.filter(run_as__org_id=current_org.org_id())
+        return queryset
 
 
 class CommandExecutionHostRelationViewSet(OrgRelationMixin, OrgBulkModelViewSet):
