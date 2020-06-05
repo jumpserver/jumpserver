@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework import generics, serializers
 from rest_framework.viewsets import GenericViewSet
 
+from common.permissions import IsValidUser
 from .http import HttpResponseTemporaryRedirect
 from .const import KEY_CACHE_RESOURCES_ID
 from .utils import get_logger
@@ -30,7 +31,7 @@ class OutputSerializer(serializers.Serializer):
 
 
 class LogTailApi(generics.RetrieveAPIView):
-    permission_classes = ()
+    permission_classes = (IsValidUser,)
     buff_size = 1024 * 10
     serializer_class = OutputSerializer
     end = False
@@ -86,6 +87,7 @@ class LogTailApi(generics.RetrieveAPIView):
 
 
 class ResourcesIDCacheApi(APIView):
+    permission_classes = (IsValidUser,)
 
     def post(self, request, *args, **kwargs):
         spm = str(uuid.uuid4())
