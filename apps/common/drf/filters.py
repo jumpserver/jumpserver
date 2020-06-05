@@ -96,7 +96,7 @@ class IDSpmFilter(filters.BaseFilterBackend):
             return queryset
         cache_key = const.KEY_CACHE_RESOURCES_ID.format(spm)
         resources_id = cache.get(cache_key)
-        if not resources_id or not isinstance(resources_id, list):
+        if resources_id is None or not isinstance(resources_id, list):
             return queryset
         queryset = queryset.filter(id__in=resources_id)
         return queryset
