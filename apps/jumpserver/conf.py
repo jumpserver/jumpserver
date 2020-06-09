@@ -16,6 +16,7 @@ import json
 import yaml
 from importlib import import_module
 from django.urls import reverse_lazy
+from django.contrib.staticfiles.templatetags.staticfiles import static
 from urllib.parse import urljoin, urlparse
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -446,6 +447,29 @@ class DynamicConfig:
         except:
             return False
 
+    def LOGO_URLS(self):
+        logo_urls = {'logo_logout': static('img/logo.png'),
+                     'logo_index': static('img/logo_text.png'),
+                     'login_image': static('img/login_image.png'),
+                     'favicon': static('img/facio.ico')}
+        if not HAS_XPACK:
+            return logo_urls
+        try:
+            from xpack.plugins.interface.models import Interface
+            obj = Interface.interface()
+            if obj:
+                if obj.logo_logout:
+                    logo_urls.update({'logo_logout': obj.logo_logout.url})
+                if obj.logo_index:
+                    logo_urls.update({'logo_index': obj.logo_index.url})
+                if obj.login_image:
+                    logo_urls.update({'login_image': obj.login_image.url})
+                if obj.favicon:
+                    logo_urls.update({'favicon': obj.favicon.url})
+        except:
+            pass
+        return logo_urls
+
     def get_from_db(self, item):
         if self.db_setting is not None:
             value = self.db_setting.get(item)
@@ -641,4 +665,3 @@ class ConfigManager:
     @classmethod
     def get_dynamic_config(cls, config):
         return DynamicConfig(config)
-

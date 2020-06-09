@@ -274,7 +274,8 @@ class PublicSettingApi(generics.RetrieveAPIView):
                 "XPACK_LICENSE_IS_VALID": settings.XPACK_LICENSE_IS_VALID,
                 "LOGIN_CONFIRM_ENABLE": settings.LOGIN_CONFIRM_ENABLE,
                 "SECURITY_VIEW_AUTH_NEED_MFA": settings.SECURITY_VIEW_AUTH_NEED_MFA,
-                "SECURITY_MFA_VERIFY_TTL": settings.SECURITY_MFA_VERIFY_TTL
+                "SECURITY_MFA_VERIFY_TTL": settings.SECURITY_MFA_VERIFY_TTL,
+                "LOGO_URLS": settings.LOGO_URLS
             }
         }
         return instance
