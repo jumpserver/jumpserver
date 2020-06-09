@@ -41,6 +41,16 @@ class GatewaySerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'date_updated', 'created_by', 'comment',
         ]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.protocol_limit_to_ssh()
+
+    def protocol_limit_to_ssh(self):
+        protocol_field = self.fields['protocol']
+        choices = protocol_field.choices
+        choices.pop('rdp')
+        protocol_field._choices = choices
+
 
 class GatewayWithAuthSerializer(GatewaySerializer):
     def get_field_names(self, declared_fields, info):
@@ -49,6 +59,8 @@ class GatewayWithAuthSerializer(GatewaySerializer):
             ['password', 'private_key']
         )
         return fields
+
+
 
 
 class DomainWithGatewaySerializer(BulkOrgResourceModelSerializer):
