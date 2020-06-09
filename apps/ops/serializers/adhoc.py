@@ -59,6 +59,20 @@ class TaskSerializer(serializers.ModelSerializer):
         ]
 
 
+class TaskDetailSerializer(TaskSerializer):
+    last_success = serializers.SerializerMethodField()
+    last_failure = serializers.SerializerMethodField()
+
+    def get_last_success(self, obj):
+        return obj.last_success[0], ''
+
+    def get_last_failure(self, obj):
+        return obj.last_failure[0], ' => '.join(obj.last_failure[1:])
+
+    class Meta(TaskSerializer.Meta):
+        fields = TaskSerializer.Meta.fields + ['last_success', 'last_failure']
+
+
 class AdHocSerializer(serializers.ModelSerializer):
     become_display = serializers.ReadOnlyField()
 
