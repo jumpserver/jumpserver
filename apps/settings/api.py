@@ -272,7 +272,9 @@ class PublicSettingApi(generics.RetrieveAPIView):
                 "SECURITY_MAX_IDLE_TIME": settings.SECURITY_MAX_IDLE_TIME,
                 "XPACK_ENABLED": settings.XPACK_ENABLED,
                 "XPACK_LICENSE_IS_VALID": settings.XPACK_LICENSE_IS_VALID,
-                "LOGIN_CONFIRM_ENABLE": settings.LOGIN_CONFIRM_ENABLE
+                "LOGIN_CONFIRM_ENABLE": settings.LOGIN_CONFIRM_ENABLE,
+                "SECURITY_VIEW_AUTH_NEED_MFA": settings.SECURITY_VIEW_AUTH_NEED_MFA,
+                "SECURITY_MFA_VERIFY_TTL": settings.SECURITY_MFA_VERIFY_TTL
             }
         }
         return instance
