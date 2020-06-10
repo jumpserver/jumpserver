@@ -1150,13 +1150,13 @@ msgstr ""
 #: xpack/plugins/change_auth_plan/models.py:197
 #: xpack/plugins/change_auth_plan/models.py:284
 msgid "SSH private key"
-msgstr "ssh密钥"
+msgstr "SSH密钥"
 
 #: assets/models/base.py:236 xpack/plugins/change_auth_plan/models.py:74
 #: xpack/plugins/change_auth_plan/models.py:193
 #: xpack/plugins/change_auth_plan/models.py:280
 msgid "SSH public key"
-msgstr "ssh公钥"
+msgstr "SSH公钥"
 
 #: assets/models/base.py:239 assets/models/gathered_user.py:20
 #: assets/templates/assets/cmd_filter_detail.html:68 common/mixins/models.py:51
@@ -2826,7 +2826,7 @@ msgstr "多因子认证验证码"
 
 #: authentication/models.py:39
 msgid "Private Token"
-msgstr "ssh密钥"
+msgstr "SSH密钥"
 
 #: authentication/models.py:44 users/templates/users/user_detail.html:258
 msgid "Reviewers"
@@ -4545,7 +4545,7 @@ msgid ""
 "        "
 msgstr ""
 "\n"
-"                您的ssh密钥没有设置或已失效，请点击 <a href="
+"                您的SSH密钥没有设置或已失效，请点击 <a href="
 "\"%(user_pubkey_update)s\"> 链接 </a> 更新\n"
 "        "
 
@@ -5399,7 +5399,7 @@ msgstr "不能和原来的密钥相同"
 #: users/forms/profile.py:137 users/forms/user.py:90
 #: users/serializers/user.py:167 users/serializers/user.py:287
 msgid "Not a valid ssh public key"
-msgstr "ssh密钥不合法"
+msgstr "SSH密钥不合法"
 
 #: users/forms/user.py:27 users/models/user.py:472
 #: users/templates/users/_select_user_modal.html:15
@@ -5585,7 +5585,7 @@ msgstr "授权的数据库应用"
 
 #: users/templates/users/_user_update_pk_modal.html:4
 msgid "Update User SSH Public Key"
-msgstr "更新ssh密钥"
+msgstr "更新SSH密钥"
 
 #: users/templates/users/first_login.html:19
 #: users/templates/users/first_login_done.html:19
@@ -5764,12 +5764,12 @@ msgstr "将会失效用户当前密钥，并发送重置邮件到用户邮箱"
 
 #: users/templates/users/user_detail.html:456
 msgid "Successfully updated the SSH public key."
-msgstr "更新ssh密钥成功"
+msgstr "更新SSH密钥成功"
 
 #: users/templates/users/user_detail.html:457
 #: users/templates/users/user_detail.html:461
 msgid "User SSH public key update"
-msgstr "ssh密钥"
+msgstr "SSH密钥"
 
 #: users/templates/users/user_detail.html:506
 msgid "After unlocking the user, the user can log in normally."
@@ -5911,7 +5911,7 @@ msgstr "重置并下载SSH密钥"
 
 #: users/templates/users/user_pubkey_update.html:55
 msgid "Old public key"
-msgstr "原来ssh密钥"
+msgstr "原来SSH密钥"
 
 #: users/templates/users/user_pubkey_update.html:63
 msgid "Fingerprint"
@@ -6125,7 +6125,7 @@ msgstr ""
 
 #: users/utils.py:175
 msgid "SSH Key Reset"
-msgstr "重置ssh密钥"
+msgstr "重置SSH密钥"
 
 #: users/utils.py:177
 #, python-format
@@ -7480,7 +7480,7 @@ msgstr "创建"
 #~ msgstr "导入 {} 个用户成功; 导入 {} 这些用户失败，因为对象没有属性'keys'"
 
 #~ msgid "Invalid private key"
-#~ msgstr "ssh密钥不合法"
+#~ msgstr "SSH密钥不合法"
 
 #~ msgid "Login JumpServer"
 #~ msgstr "登录 JumpServer"
