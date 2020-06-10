@@ -77,9 +77,13 @@ class AssetPlatformViewSet(ModelViewSet):
     filter_fields = ['name', 'base']
     search_fields = ['name']
 
+    def get_permissions(self):
+        if self.request.method.lower() in ['get', 'options']:
+            self.permission_classes = (IsOrgAdmin,)
+        return super().get_permissions()
+
     def check_object_permissions(self, request, obj):
-        if request.method.lower() in ['delete', 'put', 'patch'] and \
-                obj.internal:
+        if request.method.lower() in ['delete', 'put', 'patch'] and obj.internal:
             self.permission_denied(
                 request, message={"detail": "Internal platform"}
             )

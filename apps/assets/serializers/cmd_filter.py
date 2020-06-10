@@ -2,7 +2,6 @@
 #
 import re
 from rest_framework import serializers
-from django.utils.translation import ugettext_lazy as _
 
 from common.fields import ChoiceDisplayField
 from common.serializers import AdaptedBulkListSerializer
@@ -27,11 +26,20 @@ class CommandFilterSerializer(BulkOrgResourceModelSerializer):
 
 
 class CommandFilterRuleSerializer(BulkOrgResourceModelSerializer):
-    serializer_choice_field = ChoiceDisplayField
+    # serializer_choice_field = ChoiceDisplayField
     invalid_pattern = re.compile(r'[\.\*\+\[\\\?\{\}\^\$\|\(\)\#\<\>]')
+    type_display = serializers.ReadOnlyField(source='get_type_display')
+    action_display = serializers.ReadOnlyField(source='get_action_display')
 
     class Meta:
         model = CommandFilterRule
+        fields_mini = ['id']
+        fields_small = fields_mini + [
+           'type', 'type_display', 'content', 'priority',
+           'action', 'action_display',
+           'comment', 'created_by', 'date_created', 'date_updated'
+        ]
+        fields_fk = ['filter']
         fields = '__all__'
         list_serializer_class = AdaptedBulkListSerializer
 
