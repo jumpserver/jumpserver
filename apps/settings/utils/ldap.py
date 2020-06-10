@@ -386,13 +386,13 @@ class LDAPTestUtil(object):
         try:
             self._test_server_uri()
         except LDAPSocketOpenError as e:
-            error = _("Host or port is disconnected: {}".format(e))
+            error = _("Host or port is disconnected: {}").format(e)
         except LDAPSessionTerminatedByServerError as e:
-            error = _('The port is not the port of the LDAP service: {}'.format(e))
+            error = _('The port is not the port of the LDAP service: {}').format(e)
         except LDAPSocketReceiveError as e:
-            error = _('Please add certificate: {}'.format(e))
+            error = _('Please add certificate: {}').format(e)
         except Exception as e:
-            error = _('Unknown error: {}'.format(e))
+            error = _('Unknown error: {}').format(e)
         else:
             return
         raise LDAPInvalidServerError(error)
@@ -413,13 +413,13 @@ class LDAPTestUtil(object):
         try:
             self._test_bind_dn()
         except LDAPUserNameIsMandatoryError as e:
-            error = _('Please enter Bind DN: {}'.format(e))
+            error = _('Please enter Bind DN: {}').format(e)
         except LDAPPasswordIsMandatoryError as e:
-            error = _('Please enter Password: {}'.format(e))
+            error = _('Please enter Password: {}').format(e)
         except LDAPInvalidDnError as e:
-            error = _('Please enter correct Bind DN and Password: {}'.format(e))
+            error = _('Please enter correct Bind DN and Password: {}').format(e)
         except Exception as e:
-            error = _('Unknown error: {}'.format(e))
+            error = _('Unknown error: {}').format(e)
         else:
             return
         raise LDAPBindError(error)
@@ -433,9 +433,9 @@ class LDAPTestUtil(object):
         for search_ou in search_ous:
             util.config.search_ou = search_ou
             user_entries = util.search_user_entries()
-            logger.debug('Search ou: {}, count user: {}'.format(search_ou, len(user_entries)))
+            logger.debug('Search ou: {}, count user: {}').format(search_ou, len(user_entries))
             if len(user_entries) == 0:
-                error = _('Invalid User OU or User search filter: {}'.format(search_ou))
+                error = _('Invalid User OU or User search filter: {}').format(search_ou)
                 raise self.LDAPInvalidSearchOuOrFilterError(error)
 
     def test_search_ou_and_filter(self):
@@ -449,7 +449,7 @@ class LDAPTestUtil(object):
             error = e
             raise self.LDAPInvalidAttributeMapError(error)
         except Exception as e:
-            error = _('Unknown error: {}'.format(e))
+            error = _('Unknown error: {}').format(e)
         else:
             return
         raise self.LDAPInvalidSearchOuOrFilterError(error)
@@ -466,7 +466,7 @@ class LDAPTestUtil(object):
         actually_contain_attr = set(attr_map.keys())
         result = should_contain_attr - actually_contain_attr
         if len(result) != 0:
-            error = _('LDAP User attr map not include: {}'.format(result))
+            error = _('LDAP User attr map not include: {}').format(result)
             raise self.LDAPInvalidAttributeMapError(error)
 
     def test_attr_map(self):
@@ -477,7 +477,7 @@ class LDAPTestUtil(object):
         except self.LDAPInvalidAttributeMapError as e:
             error = e
         except Exception as e:
-            error = _('Unknown error: {}'.format(e))
+            error = _('Unknown error: {}').format(e)
         else:
             return
         raise self.LDAPInvalidAttributeMapError(error)
@@ -510,20 +510,20 @@ class LDAPTestUtil(object):
         try:
             self._test_config()
         except LDAPInvalidServerError as e:
-            msg = _('Error (Invalid LDAP server): {}'.format(e))
+            msg = _('Error (Invalid LDAP server): {}').format(e)
         except LDAPBindError as e:
-            msg = _('Error (Invalid Bind DN): {}'.format(e))
+            msg = _('Error (Invalid Bind DN): {}').format(e)
         except self.LDAPInvalidAttributeMapError as e:
-            msg = _('Error (Invalid LDAP User attr map): {}'.format(e))
+            msg = _('Error (Invalid LDAP User attr map): {}').format(e)
         except self.LDAPInvalidSearchOuOrFilterError as e:
-            msg = _('Error (Invalid User OU or User search filter): {}'.format(e))
+            msg = _('Error (Invalid User OU or User search filter): {}').format(e)
         except self.LDAPNotEnabledAuthError as e:
-            msg = _('Error (Not enabled LDAP authentication): {}'.format(e))
+            msg = _('Error (Not enabled LDAP authentication): {}').format(e)
         except Exception as e:
             msg = _('Error (Unknown): {}').format(e)
         else:
             status = True
-            msg = _('Succeed: Match {} s user'.format(len(self.user_entries)))
+            msg = _('Succeed: Match {} s user').format(len(self.user_entries))
 
         if not status:
             logger.error(msg, exc_info=True)
@@ -556,16 +556,16 @@ class LDAPTestUtil(object):
         try:
             self._test_login(username, password)
         except LDAPConfigurationError as e:
-            msg = _('Authentication failed (configuration incorrect): {}'.format(e))
+            msg = _('Authentication failed (configuration incorrect): {}').format(e)
         except self.LDAPBeforeLoginCheckError as e:
-            msg = _('Authentication failed (before login check failed): {}'.format(e))
+            msg = _('Authentication failed (before login check failed): {}').format(e)
         except LDAPUser.AuthenticationFailed as e:
-            msg = _('Authentication failed (username or password incorrect): {}'.format(e))
+            msg = _('Authentication failed (username or password incorrect): {}').format(e)
         except Exception as e:
-            msg = _("Authentication failed (Unknown): {}".format(e))
+            msg = _("Authentication failed (Unknown): {}").format(e)
         else:
             status = True
-            msg = _("Authentication success: {}".format(username))
+            msg = _("Authentication success: {}").format(username)
 
         if not status:
             logger.error(msg, exc_info=True)
