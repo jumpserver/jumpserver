@@ -11,7 +11,7 @@ from common.serializers import CeleryTaskSerializer
 from orgs.utils import current_org
 from ..models import Task, AdHoc, AdHocExecution
 from ..serializers import TaskSerializer, AdHocSerializer, \
-    AdHocExecutionSerializer
+    AdHocExecutionSerializer, TaskDetailSerializer
 from ..tasks import run_ansible_task
 
 __all__ = [
@@ -25,6 +25,11 @@ class TaskViewSet(viewsets.ModelViewSet):
     search_fields = filter_fields
     serializer_class = TaskSerializer
     permission_classes = (IsOrgAdmin,)
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return TaskDetailSerializer
+        return super().get_serializer_class()
 
     def get_queryset(self):
         queryset = super().get_queryset()
