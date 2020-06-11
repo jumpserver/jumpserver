@@ -112,21 +112,29 @@ class EncryptMixin:
     """
     EncryptMixin要放在最前面
     """
+
+    def decrypt_from_signer(self, value):
+        return signer.unsign(value) or ''
+
+    def decrypt_from_aes(self, value):
+        try:
+            return aes_crypto.decrypt(value)
+        except (TypeError, ValueError):
+            pass
+
     def from_db_value(self, value, expression, connection, context):
         if value is None:
             return value
         value = force_text(value)
 
-        plain_value = ''
         # 优先采用 aes 解密
-        try:
-            plain_value = aes_crypto.decrypt(value)
-        except (TypeError, ValueError):
-            pass
+        plain_value = self.decrypt_from_aes(value)
 
         # 如果没有解开，使用原来的signer解密
         if not plain_value:
-            plain_value = signer.unsign(value) or ''
+            plain_value = self.decrypt_from_signer(value)
+
+        # 可能和Json mix，所以要先解密，再json
         sp = super()
         if hasattr(sp, 'from_db_value'):
             plain_value = sp.from_db_value(plain_value, expression, connection, context)
@@ -135,6 +143,8 @@ class EncryptMixin:
     def get_prep_value(self, value):
         if value is None:
             return value
+
+        # 先 json 再解密
         sp = super()
         if hasattr(sp, 'get_prep_value'):
             value = sp.get_prep_value(value)
