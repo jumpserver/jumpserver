@@ -128,13 +128,15 @@ class Task(PeriodTaskModelMixin, OrgModelMixin):
 
     def _last_adhocexecution(self, is_success, key):
         obj = AdHocExecution.objects.filter(task_id=self.id, is_success=is_success).order_by('-date_finished').first()
-        body = obj.summary.get(key)
+        body = obj.summary and obj.summary.get(key)
+
         if body:
             asset, body = body.popitem()
-            action, body = body.popitem()
-            return asset, action, body.get('msg', '')
-        else:
-            return '', '', ''
+            if body:
+                action, body = body.popitem()
+                return asset, action, (body or '') and body.get('msg', '')
+            return asset, '', ''
+        return '', '', ''
 
     def __str__(self):
         return self.name + '@' + str(self.org_id)
