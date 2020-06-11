@@ -169,7 +169,7 @@ class AssetPermissionUtil(AssetPermissionUtilCacheMixin):
 
     @property
     def permissions(self):
-        if self._permissions:
+        if self._permissions is not None:
             return self._permissions
         if self.object is None:
             return AssetPermission.objects.none()
@@ -351,6 +351,7 @@ class AssetPermissionUtil(AssetPermissionUtilCacheMixin):
         self.add_favorite_node_if_need(user_tree)
         self.set_user_tree_to_cache_if_need(user_tree)
         self.set_user_tree_to_local(user_tree)
+        print(user_tree)
         return user_tree
 
     # Todo: 是否可以获取多个资产的系统用户
