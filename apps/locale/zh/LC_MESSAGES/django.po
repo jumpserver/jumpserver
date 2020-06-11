@@ -1545,7 +1545,7 @@ msgstr "后端"
 #: users/templates/users/user_profile_update.html:46
 #: users/templates/users/user_pubkey_update.html:46
 msgid "Public key"
-msgstr "ssh公钥"
+msgstr "SSH公钥"
 
 #: assets/serializers/base.py:45
 msgid ""
@@ -5382,7 +5382,7 @@ msgstr "自动配置并下载SSH密钥"
 #: users/forms/profile.py:118 users/forms/user.py:34
 #: users/templates/users/user_update.html:30
 msgid "ssh public key"
-msgstr "ssh公钥"
+msgstr "SSH公钥"
 
 #: users/forms/profile.py:119 users/forms/user.py:35
 msgid "ssh-rsa AAAA..."
