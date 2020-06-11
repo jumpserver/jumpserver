@@ -16,7 +16,8 @@ __all__ = [
     'UserSerializer', 'UserPKUpdateSerializer',
     'ChangeUserPasswordSerializer', 'ResetOTPSerializer',
     'UserProfileSerializer', 'UserOrgSerializer',
-    'UserUpdatePasswordSerializer', 'UserUpdatePublicKeySerializer'
+    'UserUpdatePasswordSerializer', 'UserUpdatePublicKeySerializer',
+    'UserRetrieveSerializer'
 ]
 
 
@@ -40,7 +41,6 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
     login_blocked = serializers.SerializerMethodField()
     can_update = serializers.SerializerMethodField()
     can_delete = serializers.SerializerMethodField()
-    login_confirm_settings = serializers.PrimaryKeyRelatedField(read_only=True, source='login_confirm_setting.reviewers', many=True)
 
     key_prefix_block = "_LOGIN_BLOCK_{}"
 
@@ -60,7 +60,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         ]
         fields = fields_small + [
             'groups', 'role', 'groups_display', 'role_display',
-            'can_update', 'can_delete', 'login_blocked', 'login_confirm_settings'
+            'can_update', 'can_delete', 'login_blocked',
         ]
 
         extra_kwargs = {
@@ -156,6 +156,14 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         key_block = self.key_prefix_block.format(obj.username)
         blocked = bool(cache.get(key_block))
         return blocked
+
+
+class UserRetrieveSerializer(UserSerializer):
+    login_confirm_settings = serializers.PrimaryKeyRelatedField(read_only=True,
+                                                                source='login_confirm_setting.reviewers', many=True)
+
+    class Meta(UserSerializer.Meta):
+        fields = UserSerializer.Meta.fields + ['login_confirm_settings']
 
 
 class UserPKUpdateSerializer(serializers.ModelSerializer):
