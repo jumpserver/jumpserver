@@ -118,26 +118,6 @@ class Task(PeriodTaskModelMixin, OrgModelMixin):
         kwargs = {"callback": self.callback}
         return name, task, args, kwargs
 
-    @lazyproperty
-    def last_success(self):
-        return self._last_adhocexecution(True, 'contacted')
-
-    @lazyproperty
-    def last_failure(self):
-        return self._last_adhocexecution(False, 'dark')
-
-    def _last_adhocexecution(self, is_success, key):
-        obj = AdHocExecution.objects.filter(task_id=self.id, is_success=is_success).order_by('-date_finished').first()
-        body = obj.summary and obj.summary.get(key)
-
-        if body:
-            asset, body = body.popitem()
-            if body:
-                action, body = body.popitem()
-                return asset, action, (body or '') and body.get('msg', '')
-            return asset, '', ''
-        return '', '', ''
-
     def __str__(self):
         return self.name + '@' + str(self.org_id)
 
