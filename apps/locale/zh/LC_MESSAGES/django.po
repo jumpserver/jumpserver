@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-20 19:25+0800\n"
+"POT-Creation-Date: 2020-06-15 13:54+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -5850,8 +5850,10 @@ msgid "Install app"
 msgstr "安装应用"
 
 #: users/templates/users/user_otp_enable_install_app.html:13
-msgid "Download and install the Google Authenticator application on your phone"
-msgstr "请在手机端下载并安装 Google Authenticator 应用"
+msgid ""
+"Download and install the Google Authenticator application on your phone or "
+"applet of WeChat"
+msgstr "请在手机端或微信小程序下载并安装 Google Authenticator 应用"
 
 #: users/templates/users/user_otp_enable_install_app.html:18
 msgid "Android downloads"
@@ -5865,7 +5867,7 @@ msgstr "iPhone手机下载"
 msgid ""
 "After installation, click the next step to enter the binding page (if "
 "installed, go to the next step directly)."
-msgstr "安装完成后点击下一步进入绑定页面（如已安装，直接进入下一步"
+msgstr "安装完成后点击下一步进入绑定页面（如已安装，直接进入下一步）"
 
 #: users/templates/users/user_password_verify.html:8
 #: users/templates/users/user_password_verify.html:9
