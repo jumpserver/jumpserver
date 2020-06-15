@@ -13,7 +13,7 @@ class TicketSerializer(serializers.ModelSerializer):
         model = models.Ticket
         fields = [
             'id', 'user', 'user_display', 'title', 'body',
-            'assignees', 'assignees_display',
+            'assignees', 'assignees_display', 'assignee', 'assignee_display',
             'status', 'action', 'date_created', 'date_updated',
             'type', 'type_display', 'action_display',
         ]
