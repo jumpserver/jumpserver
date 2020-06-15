@@ -87,6 +87,7 @@ if settings.DEBUG:
 
 # 兼容之前的
 old_app_pattern = '|'.join(apps)
+old_app_pattern = r'^{}'.format(old_app_pattern)
 urlpatterns += [re_path(old_app_pattern, views.redirect_old_apps_view)]
 
 
