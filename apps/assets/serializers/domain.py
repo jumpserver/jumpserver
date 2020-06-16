@@ -15,11 +15,18 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
 
     class Meta:
         model = Domain
-        fields = [
-            'id', 'name', 'asset_count', 'gateway_count', 'comment', 'assets',
-            'date_created'
+        fields_mini = ['id', 'name']
+        fields_small = fields_mini + [
+            'comment', 'date_created'
         ]
-        read_only_fields = ( 'asset_count', 'gateway_count', 'date_created')
+        fields_m2m = [
+            'asset_count', 'assets', 'gateway_count',
+        ]
+        fields = fields_small + fields_m2m
+        read_only_fields = ('asset_count', 'gateway_count', 'date_created')
+        extra_kwargs = {
+            'assets': {'required': False}
+        }
         list_serializer_class = AdaptedBulkListSerializer
 
     @staticmethod
