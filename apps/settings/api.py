@@ -275,7 +275,14 @@ class PublicSettingApi(generics.RetrieveAPIView):
                 "LOGIN_CONFIRM_ENABLE": settings.LOGIN_CONFIRM_ENABLE,
                 "SECURITY_VIEW_AUTH_NEED_MFA": settings.SECURITY_VIEW_AUTH_NEED_MFA,
                 "SECURITY_MFA_VERIFY_TTL": settings.SECURITY_MFA_VERIFY_TTL,
-                "LOGO_URLS": settings.LOGO_URLS
+                "LOGO_URLS": settings.LOGO_URLS,
+                "PASSWORD_RULE": {
+                    'SECURITY_PASSWORD_MIN_LENGTH': settings.SECURITY_PASSWORD_MIN_LENGTH,
+                    'SECURITY_PASSWORD_UPPER_CASE': settings.SECURITY_PASSWORD_UPPER_CASE,
+                    'SECURITY_PASSWORD_LOWER_CASE': settings.SECURITY_PASSWORD_LOWER_CASE,
+                    'SECURITY_PASSWORD_NUMBER': settings.SECURITY_PASSWORD_NUMBER,
+                    'SECURITY_PASSWORD_SPECIAL_CHAR': settings.SECURITY_PASSWORD_SPECIAL_CHAR,
+                }
             }
         }
         return instance

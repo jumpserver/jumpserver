@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-15 20:30+0800\n"
+"POT-Creation-Date: 2020-06-16 11:02+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -2719,6 +2719,14 @@ msgstr "角色只能为 {}"
 #: users/serializers/user.py:109 users/serializers/user.py:282
 msgid "Password does not match security rules"
 msgstr "密码不满足安全规则"
+
+#: users/serializers/user.py:274
+msgid "The old password is incorrect"
+msgstr "旧密码错误"
+
+#: users/serializers/user.py:288
+msgid "The newly set password is inconsistent"
+msgstr "两次密码不一致"
 
 #: users/serializers_v2/user.py:36
 msgid "name not unique"

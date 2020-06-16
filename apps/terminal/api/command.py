@@ -26,7 +26,8 @@ class CommandQueryMixin:
     command_store = get_command_storage()
     permission_classes = [IsOrgAdminOrAppUser | IsOrgAuditor]
     filter_fields = [
-        "asset", "system_user", "user", "session",
+        "asset", "system_user", "user", "session", "risk_level",
+        "input"
     ]
     default_days_ago = 5
 

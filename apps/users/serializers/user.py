@@ -271,7 +271,7 @@ class UserUpdatePasswordSerializer(serializers.ModelSerializer):
 
     def validate_old_password(self, value):
         if not self.instance.check_password(value):
-            msg = 'The old password is incorrect'
+            msg = _('The old password is incorrect')
             raise serializers.ValidationError(msg)
         return value
 
@@ -285,7 +285,7 @@ class UserUpdatePasswordSerializer(serializers.ModelSerializer):
 
     def validate_new_password_again(self, value):
         if value != self.initial_data.get('new_password', ''):
-            msg = 'The newly set password is inconsistent'
+            msg = _('The newly set password is inconsistent')
             raise serializers.ValidationError(msg)
         return value
 
