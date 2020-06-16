@@ -16,6 +16,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.shortcuts import reverse
 
+from jumpserver.const import LOCAL_DYNAMIC_SETTINGS
 from orgs.utils import current_org
 from common.utils import signer, date_expired_default, get_logger, lazyproperty
 from common import fields
@@ -394,7 +395,7 @@ class MFAMixin:
 
     @property
     def mfa_force_enabled(self):
-        if settings.SECURITY_MFA_AUTH:
+        if LOCAL_DYNAMIC_SETTINGS.SECURITY_MFA_AUTH:
             return True
         return self.mfa_level == 2
 
