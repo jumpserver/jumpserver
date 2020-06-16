@@ -65,7 +65,7 @@ class AssetByNodeFilterBackend(filters.BaseFilterBackend):
 
 
 class LabelFilterBackend(filters.BaseFilterBackend):
-    sep = '#'
+    sep = ':'
     query_arg = 'label'
 
     def get_schema_fields(self, view):
@@ -84,6 +84,8 @@ class LabelFilterBackend(filters.BaseFilterBackend):
 
         q = None
         for kv in labels_query:
+            if '#' in kv:
+                self.sep = '#'
             if self.sep not in kv:
                 continue
             key, value = kv.strip().split(self.sep)[:2]
