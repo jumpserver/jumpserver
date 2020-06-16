@@ -433,7 +433,7 @@ class LDAPTestUtil(object):
         for search_ou in search_ous:
             util.config.search_ou = search_ou
             user_entries = util.search_user_entries()
-            logger.debug('Search ou: {}, count user: {}').format(search_ou, len(user_entries))
+            logger.debug('Search ou: {}, count user: {}'.format(search_ou, len(user_entries)))
             if len(user_entries) == 0:
                 error = _('Invalid User OU or User search filter: {}').format(search_ou)
                 raise self.LDAPInvalidSearchOuOrFilterError(error)
