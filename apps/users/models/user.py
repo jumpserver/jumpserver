@@ -16,7 +16,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.shortcuts import reverse
 
-from jumpserver.const import LOCAL_DYNAMIC_SETTINGS
+from common.local import LOCAL_DYNAMIC_SETTINGS
 from orgs.utils import current_org
 from common.utils import signer, date_expired_default, get_logger, lazyproperty
 from common import fields
