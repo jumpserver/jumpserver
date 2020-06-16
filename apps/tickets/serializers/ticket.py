@@ -23,7 +23,8 @@ class TicketSerializer(serializers.ModelSerializer):
         ]
         extra_kwargs = {
             'status': {'label': _('Status')},
-            'action': {'label': _('Action')}
+            'action': {'label': _('Action')},
+            'user_display': {'label': _('User')}
         }
 
     def create(self, validated_data):

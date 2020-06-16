@@ -986,7 +986,7 @@ msgstr "状态"
 msgid "Date login"
 msgstr "登录日期"
 
-#: audits/serializers.py:61 audits/serializers.py:73 ops/models/adhoc.py:240
+#: audits/serializers.py:61 audits/serializers.py:73 ops/models/adhoc.py:244
 msgid "Is success"
 msgstr "是否成功"
 
@@ -1002,6 +1002,10 @@ msgstr "主机"
 #: audits/serializers.py:75
 msgid "Run as"
 msgstr "运行用户"
+
+#: authentication/api/mfa.py:60
+msgid "Code is invalid"
+msgstr "Code无效"
 
 #: authentication/backends/api.py:53
 msgid "Invalid signature header. No credentials provided."
@@ -1500,46 +1504,46 @@ msgstr "Become"
 msgid "Create by"
 msgstr "创建者"
 
-#: ops/models/adhoc.py:233
+#: ops/models/adhoc.py:237
 msgid "Task display"
 msgstr "任务展示"
 
-#: ops/models/adhoc.py:234
+#: ops/models/adhoc.py:238
 msgid "Host amount"
 msgstr "主机数量"
 
-#: ops/models/adhoc.py:236
+#: ops/models/adhoc.py:240
 msgid "Start time"
 msgstr "开始时间"
 
-#: ops/models/adhoc.py:237
+#: ops/models/adhoc.py:241
 msgid "End time"
 msgstr "完成时间"
 
-#: ops/models/adhoc.py:238 xpack/plugins/change_auth_plan/models.py:179
+#: ops/models/adhoc.py:242 xpack/plugins/change_auth_plan/models.py:179
 #: xpack/plugins/change_auth_plan/models.py:310
 #: xpack/plugins/gathered_user/models.py:79
 msgid "Time"
 msgstr "时间"
 
-#: ops/models/adhoc.py:239 ops/models/command.py:26
+#: ops/models/adhoc.py:243 ops/models/command.py:26
 #: terminal/serializers/session.py:30
 msgid "Is finished"
 msgstr "是否完成"
 
-#: ops/models/adhoc.py:241
+#: ops/models/adhoc.py:245
 msgid "Adhoc raw result"
 msgstr "结果"
 
-#: ops/models/adhoc.py:242
+#: ops/models/adhoc.py:246
 msgid "Adhoc result summary"
 msgstr "汇总"
 
-#: ops/models/adhoc.py:282 xpack/plugins/change_auth_plan/utils.py:137
+#: ops/models/adhoc.py:286 xpack/plugins/change_auth_plan/utils.py:137
 msgid "{} Start task: {}"
 msgstr "{} 任务开始: {}"
 
-#: ops/models/adhoc.py:291 xpack/plugins/change_auth_plan/utils.py:149
+#: ops/models/adhoc.py:295 xpack/plugins/change_auth_plan/utils.py:149
 msgid "{} Task finish"
 msgstr "{} 任务结束"
 
