@@ -144,14 +144,8 @@ class AssetDisplaySerializer(AssetSerializer):
     connectivity = ConnectivitySerializer(read_only=True, label=_("Connectivity"))
 
     class Meta(AssetSerializer.Meta):
-        fields = [
-            'id', 'ip', 'hostname', 'protocol', 'port',
-            'protocols', 'is_active', 'public_ip',
-            'number', 'vendor', 'model', 'sn',
-            'cpu_model', 'cpu_count', 'cpu_cores', 'cpu_vcpus', 'memory',
-            'disk_total', 'disk_info', 'os', 'os_version', 'os_arch',
-            'hostname_raw', 'comment', 'created_by', 'date_created',
-            'hardware_info', 'connectivity',
+        fields = AssetSerializer.Meta.fields + [
+            'connectivity',
         ]
 
     @classmethod
