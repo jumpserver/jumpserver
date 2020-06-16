@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-from rest_framework.mixins import ListModelMixin
+from rest_framework.mixins import ListModelMixin, CreateModelMixin
 from django.db.models import F, Value
 from django.db.models.functions import Concat
 
@@ -15,7 +15,9 @@ from .serializers import FTPLogSerializer, UserLoginLogSerializer, CommandExecut
 from .serializers import OperateLogSerializer, PasswordChangeLogSerializer, CommandExecutionHostsRelationSerializer
 
 
-class FTPLogViewSet(ListModelMixin, OrgGenericViewSet):
+class FTPLogViewSet(CreateModelMixin,
+                    ListModelMixin,
+                    OrgGenericViewSet):
     model = FTPLog
     serializer_class = FTPLogSerializer
     permission_classes = (IsOrgAdminOrAppUser | IsOrgAuditor,)
