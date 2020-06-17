@@ -275,6 +275,7 @@ class PublicSettingApi(generics.RetrieveAPIView):
                 "LOGIN_CONFIRM_ENABLE": settings.LOGIN_CONFIRM_ENABLE,
                 "SECURITY_VIEW_AUTH_NEED_MFA": settings.SECURITY_VIEW_AUTH_NEED_MFA,
                 "SECURITY_MFA_VERIFY_TTL": settings.SECURITY_MFA_VERIFY_TTL,
+                "SECURITY_COMMAND_EXECUTION": settings.SECURITY_COMMAND_EXECUTION,
                 "LOGO_URLS": settings.LOGO_URLS,
                 "PASSWORD_RULE": {
                     'SECURITY_PASSWORD_MIN_LENGTH': settings.SECURITY_PASSWORD_MIN_LENGTH,
