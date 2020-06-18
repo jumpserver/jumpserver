@@ -38,9 +38,9 @@ def construct_user_created_email_body(user):
         </div>
         """) % {
         'username': user.username,
-        'rest_password_url': reverse('users:reset-password', external=True),
+        'rest_password_url': reverse('authentication:reset-password', external=True),
         'rest_password_token': user.generate_reset_token(),
-        'forget_password_url': reverse('users:forgot-password', external=True),
+        'forget_password_url': reverse('authentication:forgot-password', external=True),
         'email': user.email,
         'login_url': reverse('authentication:login', external=True),
     }
@@ -100,9 +100,9 @@ def send_reset_password_mail(user):
     <br>
     """) % {
         'name': user.name,
-        'rest_password_url': reverse('users:reset-password', external=True),
+        'rest_password_url': reverse('authentication:reset-password', external=True),
         'rest_password_token': user.generate_reset_token(),
-        'forget_password_url': reverse('users:forgot-password', external=True),
+        'forget_password_url': reverse('authentication:forgot-password', external=True),
         'email': user.email,
         'login_url': reverse('authentication:login', external=True),
     }
@@ -140,7 +140,7 @@ def send_password_expiration_reminder_mail(user):
         'date_password_expired': datetime.fromtimestamp(datetime.timestamp(
             user.date_password_expired)).strftime('%Y-%m-%d %H:%M'),
         'update_password_url': reverse('users:user-password-update', external=True),
-        'forget_password_url': reverse('users:forgot-password', external=True),
+        'forget_password_url': reverse('authentication:forgot-password', external=True),
         'email': user.email,
         'login_url': reverse('authentication:login', external=True),
     }
@@ -205,8 +205,8 @@ def get_user_or_pre_auth_user(request):
 
 
 def redirect_user_first_login_or_index(request, redirect_field_name):
-    if request.user.is_first_login:
-        return reverse('users:user-first-login')
+    # if request.user.is_first_login:
+    #     return reverse('authentication:user-first-login')
     url_in_post = request.POST.get(redirect_field_name)
     if url_in_post:
         return url_in_post

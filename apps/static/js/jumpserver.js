@@ -3,6 +3,10 @@
 //此函数用于checkbox的全选和反选
 var checked = false;
 
+function gettext(s) {
+    return s
+}
+
 function check_all(form) {
     var checkboxes = document.getElementById(form);
     if (checked === false) {
@@ -138,11 +142,11 @@ function setAjaxCSRFToken() {
 }
 
 function activeNav(prefix) {
-    var path = document.location.pathname;
-    if (prefix) {
-        path = path.replace(prefix, '');
-        console.log(path);
+    if (!prefix) {
+        prefix = '/core'
     }
+    var path = document.location.pathname;
+    path = path.replace(prefix, '');
     var urlArray = path.split("/");
     var app = urlArray[1];
     var resource = urlArray[2];

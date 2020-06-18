@@ -225,3 +225,4 @@ def model_to_json(instance, sort_keys=True, indent=2, cls=None):
     if cls is None:
         cls = DjangoJSONEncoder
     return json.dumps(data, sort_keys=sort_keys, indent=indent, cls=cls)
+

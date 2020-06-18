@@ -5,7 +5,7 @@ import uuid
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView, Response
 from rest_framework.generics import (
-    ListAPIView, get_object_or_404, RetrieveAPIView
+    ListAPIView, get_object_or_404, RetrieveAPIView, DestroyAPIView
 )
 
 from common.permissions import IsOrgAdminOrAppUser, IsOrgAdmin
@@ -25,6 +25,7 @@ __all__ = [
     'UserGrantedAssetSystemUsersApi',
     'ValidateUserAssetPermissionApi',
     'GetUserAssetPermissionActionsApi',
+    'UserAssetPermissionsCacheApi',
 ]
 
 
@@ -117,3 +118,10 @@ class UserGrantedAssetSystemUsersApi(UserAssetPermissionMixin, ListAPIView):
             system_user.actions = actions
         return system_users
 
+
+class UserAssetPermissionsCacheApi(UserAssetPermissionMixin, DestroyAPIView):
+    permission_classes = (IsOrgAdmin,)
+
+    def destroy(self, request, *args, **kwargs):
+        self.util.expire_user_tree_cache()
+        return Response(status=204)

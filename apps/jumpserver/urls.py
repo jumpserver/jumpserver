@@ -4,8 +4,6 @@ from __future__ import unicode_literals
 from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
-from django.conf.urls.i18n import i18n_patterns
-from django.views.i18n import JavaScriptCatalog
 
 from . import views, api
 
@@ -32,16 +30,8 @@ api_v2 = [
 
 
 app_view_patterns = [
-    path('users/', include('users.urls.views_urls', namespace='users')),
-    path('assets/', include('assets.urls.views_urls', namespace='assets')),
-    path('perms/', include('perms.urls.views_urls', namespace='perms')),
-    path('terminal/', include('terminal.urls.views_urls', namespace='terminal')),
-    path('ops/', include('ops.urls.view_urls', namespace='ops')),
-    path('audits/', include('audits.urls.view_urls', namespace='audits')),
-    path('orgs/', include('orgs.urls.views_urls', namespace='orgs')),
     path('auth/', include('authentication.urls.view_urls'), name='auth'),
-    path('applications/', include('applications.urls.views_urls', namespace='applications')),
-    path('tickets/', include('tickets.urls.views_urls', namespace='tickets')),
+    path('ops/', include('ops.urls.view_urls'), name='ops'),
     re_path(r'flower/(?P<path>.*)', views.celery_flower_view, name='flower-view'),
 ]
 
@@ -54,9 +44,12 @@ if settings.XPACK_ENABLED:
         path('xpack/', include('xpack.urls.api_urls', namespace='api-xpack'))
     )
 
-js_i18n_patterns = i18n_patterns(
-    path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
-)
+
+apps = [
+    'users', 'assets', 'perms', 'terminal', 'ops', 'audits', 'orgs', 'auth',
+    'applications', 'tickets', 'settings', 'xpack'
+    'flower', 'luna', 'koko', 'ws', 'docs', 'redocs',
+]
 
 
 urlpatterns = [
@@ -65,34 +58,36 @@ urlpatterns = [
     path('api/v2/', include(api_v2)),
     re_path('api/(?P<app>\w+)/(?P<version>v\d)/.*', views.redirect_format_api),
     path('api/health/', views.HealthCheckView.as_view(), name="health"),
-    re_path('luna/.*', views.LunaView.as_view(), name='luna-view'),
-    re_path('koko/.*', views.KokoView.as_view(), name='koko-view'),
-    re_path('ws/.*', views.WsView.as_view(), name='ws-view'),
-    path('i18n/<str:lang>/', views.I18NView.as_view(), name='i18n-switch'),
-    path('settings/', include('settings.urls.view_urls', namespace='settings')),
-
     # External apps url
-    path('captcha/', include('captcha.urls')),
+    path('core/auth/captcha/', include('captcha.urls')),
+    path('core/', include(app_view_patterns)),
+    path('ui/', views.UIView.as_view())
 ]
 
-urlpatterns += app_view_patterns
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
             + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-urlpatterns += js_i18n_patterns
+# urlpatterns += js_i18n_patterns
 
 handler404 = 'jumpserver.views.handler404'
 handler500 = 'jumpserver.views.handler500'
 
 if settings.DEBUG:
     urlpatterns += [
-        re_path('^swagger(?P<format>\.json|\.yaml)$',
+        re_path('^api/swagger(?P<format>\.json|\.yaml)$',
                 views.get_swagger_view().without_ui(cache_timeout=1), name='schema-json'),
-        path('docs/', views.get_swagger_view().with_ui('swagger', cache_timeout=1), name="docs"),
-        path('redoc/', views.get_swagger_view().with_ui('redoc', cache_timeout=1), name='redoc'),
+        path('api/docs/', views.get_swagger_view().with_ui('swagger', cache_timeout=1), name="docs"),
+        path('api/redoc/', views.get_swagger_view().with_ui('redoc', cache_timeout=1), name='redoc'),
 
-        re_path('^v2/swagger(?P<format>\.json|\.yaml)$',
+        re_path('^api/v2/swagger(?P<format>\.json|\.yaml)$',
                 views.get_swagger_view().without_ui(cache_timeout=1), name='schema-json'),
-        path('docs/v2/', views.get_swagger_view("v2").with_ui('swagger', cache_timeout=1), name="docs"),
-        path('redoc/v2/', views.get_swagger_view("v2").with_ui('redoc', cache_timeout=1), name='redoc'),
+        path('api/docs/v2/', views.get_swagger_view("v2").with_ui('swagger', cache_timeout=1), name="docs"),
+        path('api/redoc/v2/', views.get_swagger_view("v2").with_ui('redoc', cache_timeout=1), name='redoc'),
     ]
+
+
+# 兼容之前的
+old_app_pattern = '|'.join(apps)
+old_app_pattern = r'^{}'.format(old_app_pattern)
+urlpatterns += [re_path(old_app_pattern, views.redirect_old_apps_view)]
+
 

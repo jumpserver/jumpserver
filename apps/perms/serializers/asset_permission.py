@@ -3,12 +3,12 @@
 
 from rest_framework import serializers
 
-from common.fields import StringManyToManyField
+from django.db.models import Count
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from perms.models import AssetPermission, Action
 
 __all__ = [
-    'AssetPermissionCreateUpdateSerializer', 'AssetPermissionListSerializer',
+    'AssetPermissionSerializer',
     'ActionsField',
 ]
 
@@ -34,27 +34,31 @@ class ActionsDisplayField(ActionsField):
         return [choices.get(i) for i in values]
 
 
-class AssetPermissionCreateUpdateSerializer(BulkOrgResourceModelSerializer):
+class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
     actions = ActionsField(required=False, allow_null=True)
+    is_valid = serializers.BooleanField(read_only=True)
+    is_expired = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = AssetPermission
-        exclude = ('created_by', 'date_created')
+        mini_fields = ['id', 'name']
+        small_fields = mini_fields + [
+            'is_active', 'is_expired', 'is_valid', 'actions', 'created_by', 'date_created',
+            'date_expired', 'date_start', 'comment'
+        ]
+        m2m_fields = [
+            'users', 'user_groups', 'assets', 'nodes', 'system_users',
+            'users_amount', 'user_groups_amount', 'assets_amount', 'nodes_amount', 'system_users_amount',
+        ]
+        fields = small_fields + m2m_fields
+        read_only_fields = ['created_by', 'date_created']
 
-
-class AssetPermissionListSerializer(BulkOrgResourceModelSerializer):
-    users = StringManyToManyField(many=True, read_only=True)
-    user_groups = StringManyToManyField(many=True, read_only=True)
-    assets = StringManyToManyField(many=True, read_only=True)
-    nodes = StringManyToManyField(many=True, read_only=True)
-    system_users = StringManyToManyField(many=True, read_only=True)
-    actions = ActionsDisplayField()
-    is_valid = serializers.BooleanField()
-    is_expired = serializers.BooleanField()
-
-    class Meta:
-        model = AssetPermission
-        fields = '__all__'
-
-
-
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        """ Perform necessary eager loading of data. """
+        queryset = queryset.annotate(
+            users_amount=Count('users', distinct=True), user_groups_amount=Count('user_groups', distinct=True),
+            assets_amount=Count('assets', distinct=True), nodes_amount=Count('nodes', distinct=True),
+            system_users_amount=Count('system_users', distinct=True)
+        )
+        return queryset

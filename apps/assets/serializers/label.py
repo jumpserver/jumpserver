@@ -20,6 +20,9 @@ class LabelSerializer(BulkOrgResourceModelSerializer):
         read_only_fields = (
             'category', 'date_created', 'asset_count', 'get_category_display'
         )
+        extra_kwargs = {
+            'assets': {'required': False}
+        }
         list_serializer_class = AdaptedBulkListSerializer
 
     @staticmethod

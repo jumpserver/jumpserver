@@ -11,12 +11,18 @@ from .models import Organization
 
 
 def get_org_from_request(request):
-    oid = request.META.get("HTTP_X_JMS_ORG")
+    # query中优先级最高
+    oid = request.GET.get("oid")
+
+    # 其次header
+    if not oid:
+        oid = request.META.get("HTTP_X_JMS_ORG")
+    # 其次cookie
+    if not oid:
+        oid = request.COOKIES.get('X-JMS-ORG')
+    # 其次session
     if not oid:
         oid = request.session.get("oid")
-    request_params_oid = request.GET.get("oid")
-    if request_params_oid:
-        oid = request.GET.get("oid")
 
     if not oid:
         oid = Organization.DEFAULT_ID
@@ -24,7 +30,7 @@ def get_org_from_request(request):
         oid = Organization.DEFAULT_ID
     elif oid.lower() == "root":
         oid = Organization.ROOT_ID
-    org = Organization.get_instance(oid)
+    org = Organization.get_instance(oid, True)
     return org
 
 

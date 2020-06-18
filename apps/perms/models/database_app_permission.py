@@ -4,6 +4,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from common.utils import lazyproperty
 from .base import BasePermission
 
 __all__ = [
@@ -28,3 +29,11 @@ class DatabaseAppPermission(BasePermission):
 
     def get_all_database_apps(self):
         return self.database_apps.all()
+
+    @lazyproperty
+    def database_apps_amount(self):
+        return self.database_apps.count()
+
+    @lazyproperty
+    def system_users_amount(self):
+        return self.system_users.count()

@@ -16,6 +16,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.shortcuts import reverse
 
+from common.local import LOCAL_DYNAMIC_SETTINGS
 from orgs.utils import current_org
 from common.utils import signer, date_expired_default, get_logger, lazyproperty
 from common import fields
@@ -47,6 +48,11 @@ class AuthMixin:
             post_user_change_password.send(self.__class__, user=self)
             super().set_password(raw_password)
 
+    def set_public_key(self, public_key):
+        if self.can_update_ssh_key():
+            self.public_key = public_key
+            self.save()
+
     def can_update_password(self):
         return self.is_local
 
@@ -54,7 +60,7 @@ class AuthMixin:
         return self.can_use_ssh_key_login()
 
     def can_use_ssh_key_login(self):
-        return settings.TERMINAL_PUBLIC_KEY_AUTH
+        return self.is_local and settings.TERMINAL_PUBLIC_KEY_AUTH
 
     def is_public_key_valid(self):
         """
@@ -78,6 +84,17 @@ class AuthMixin:
             except (TabError, TypeError):
                 pass
         return PubKey()
+
+    def get_public_key_comment(self):
+        return self.public_key_obj.comment
+
+    def get_public_key_hash_md5(self):
+        if not callable(self.public_key_obj.hash_md5):
+            return ''
+        try:
+            return self.public_key_obj.hash_md5()
+        except:
+            return ''
 
     def reset_password(self, new_password):
         self.set_password(new_password)
@@ -158,6 +175,16 @@ class RoleMixin:
         if self in current_org.get_org_users():
             roles.append(str(_('User')))
         return " | ".join(roles)
+
+    def current_org_roles(self):
+        roles = []
+        if self.can_admin_current_org:
+            roles.append('Admin')
+        if self.can_audit_current_org:
+            roles.append('Auditor')
+        else:
+            roles.append('User')
+        return roles
 
     @property
     def is_superuser(self):
@@ -368,7 +395,7 @@ class MFAMixin:
 
     @property
     def mfa_force_enabled(self):
-        if settings.SECURITY_MFA_AUTH:
+        if LOCAL_DYNAMIC_SETTINGS.SECURITY_MFA_AUTH:
             return True
         return self.mfa_level == 2
 
@@ -415,7 +442,7 @@ class MFAMixin:
         if not self.mfa_enabled:
             return False, None
         if self.mfa_is_otp() and not self.otp_secret_key:
-            return True, reverse('users:user-otp-enable-start')
+            return True, reverse('authentication:user-otp-enable-start')
         return False, None
 
 

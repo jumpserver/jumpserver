@@ -150,6 +150,10 @@ class AdHoc(OrgModelMixin):
     created_by = models.CharField(max_length=64, default='', blank=True, null=True, verbose_name=_('Create by'))
     date_created = models.DateTimeField(auto_now_add=True, db_index=True)
 
+    @lazyproperty
+    def run_times(self):
+        return self.execution.count()
+
     @property
     def inventory(self):
         if self.become:

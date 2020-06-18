@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from .. import models
@@ -12,7 +13,7 @@ class TicketSerializer(serializers.ModelSerializer):
         model = models.Ticket
         fields = [
             'id', 'user', 'user_display', 'title', 'body',
-            'assignees', 'assignees_display',
+            'assignees', 'assignees_display', 'assignee', 'assignee_display',
             'status', 'action', 'date_created', 'date_updated',
             'type', 'type_display', 'action_display',
         ]
@@ -20,6 +21,11 @@ class TicketSerializer(serializers.ModelSerializer):
             'user_display', 'assignees_display',
             'date_created', 'date_updated',
         ]
+        extra_kwargs = {
+            'status': {'label': _('Status')},
+            'action': {'label': _('Action')},
+            'user_display': {'label': _('User')}
+        }
 
     def create(self, validated_data):
         validated_data.pop('action')

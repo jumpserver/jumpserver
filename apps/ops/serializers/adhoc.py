@@ -8,10 +8,16 @@ from ..models import Task, AdHoc, AdHocExecution, CommandExecution
 
 class AdHocExecutionSerializer(serializers.ModelSerializer):
     stat = serializers.SerializerMethodField()
+    last_success = serializers.ListField(source='success_hosts')
+    last_failure = serializers.DictField(source='failed_hosts')
 
     class Meta:
         model = AdHocExecution
-        fields = '__all__'
+        fields = [
+            'id', 'task', 'task_display', 'hosts_amount', 'adhoc', 'date_start', 'stat',
+            'date_finished', 'timedelta', 'is_finished', 'is_success', 'result', 'summary',
+            'short_id', 'adhoc_short_id', 'last_success', 'last_failure'
+        ]
 
     @staticmethod
     def get_task(obj):
@@ -28,17 +34,15 @@ class AdHocExecutionSerializer(serializers.ModelSerializer):
             "failed": count_failed_hosts
         }
 
-    def get_field_names(self, declared_fields, info):
-        fields = super().get_field_names(declared_fields, info)
-        fields.extend(['short_id', 'adhoc_short_id'])
-        return fields
-
 
 class AdHocExecutionExcludeResultSerializer(AdHocExecutionSerializer):
-    def get_field_names(self, declared_fields, info):
-        fields = super().get_field_names(declared_fields, info)
-        fields = [i for i in fields if i not in ['result', 'summary']]
-        return fields
+    class Meta:
+        model = AdHocExecution
+        fields = [
+            'id', 'task', 'task_display', 'hosts_amount', 'adhoc', 'date_start', 'stat',
+            'date_finished', 'timedelta', 'is_finished', 'is_success',
+            'short_id', 'adhoc_short_id', 'last_success', 'last_failure'
+        ]
 
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -59,8 +63,16 @@ class TaskSerializer(serializers.ModelSerializer):
         ]
 
 
+class TaskDetailSerializer(TaskSerializer):
+    contents = serializers.ListField(source='latest_adhoc.tasks')
+
+    class Meta(TaskSerializer.Meta):
+        fields = TaskSerializer.Meta.fields + ['contents']
+
+
 class AdHocSerializer(serializers.ModelSerializer):
     become_display = serializers.ReadOnlyField()
+    tasks = serializers.ListField()
 
     class Meta:
         model = AdHoc
@@ -76,6 +88,29 @@ class AdHocSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "become": {'write_only': True}
         }
+
+
+class AdHocExecutionNestSerializer(serializers.ModelSerializer):
+    last_success = serializers.ListField(source='success_hosts')
+    last_failure = serializers.DictField(source='failed_hosts')
+    last_run = serializers.CharField(source='short_id')
+
+    class Meta:
+        model = AdHocExecution
+        fields = (
+            'last_success', 'last_failure', 'last_run', 'timedelta', 'is_finished',
+            'is_success'
+        )
+
+
+class AdHocDetailSerializer(AdHocSerializer):
+    latest_execution = AdHocExecutionNestSerializer(allow_null=True)
+    task_name = serializers.CharField(source='task.name')
+
+    class Meta(AdHocSerializer.Meta):
+        fields = AdHocSerializer.Meta.fields + [
+            'latest_execution', 'created_by', 'run_times', 'task_name'
+        ]
 
 
 class CommandExecutionSerializer(serializers.ModelSerializer):

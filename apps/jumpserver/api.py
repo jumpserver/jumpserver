@@ -10,33 +10,42 @@ from users.models import User
 from assets.models import Asset
 from terminal.models import Session
 from orgs.utils import current_org
-from common.permissions import IsOrgAdmin
+from common.permissions import IsOrgAdmin, IsOrgAuditor
 from common.utils import lazyproperty
 
 __all__ = ['IndexApi']
 
 
-class MonthLoginMetricMixin:
+class DatesLoginMetricMixin:
+    @lazyproperty
+    def days(self):
+        query_params = self.request.query_params
+        if query_params.get('monthly'):
+            return 30
+        return 7
 
     @lazyproperty
-    def session_month(self):
-        month_ago = timezone.now() - timezone.timedelta(days=30)
-        session_month = Session.objects.filter(date_start__gt=month_ago)
-        return session_month
+    def sessions_queryset(self):
+        days = timezone.now() - timezone.timedelta(days=self.days)
+        sessions_queryset = Session.objects.filter(date_start__gt=days)
+        return sessions_queryset
 
     @lazyproperty
-    def session_month_dates(self):
-        dates = self.session_month.dates('date_start', 'day')
+    def session_dates_list(self):
+        now = timezone.now()
+        dates = [(now - timezone.timedelta(days=i)).date() for i in range(self.days)]
+        dates.reverse()
+        # dates = self.sessions_queryset.dates('date_start', 'day')
         return dates
 
-    def get_month_metrics_date(self):
-        month_metrics_date = [d.strftime('%m-%d') for d in self.session_month_dates] or ['0']
-        return month_metrics_date
+    def get_dates_metrics_date(self):
+        dates_metrics_date = [d.strftime('%m-%d') for d in self.session_dates_list] or ['0']
+        return dates_metrics_date
 
     @staticmethod
     def get_cache_key(date, tp):
         date_str = date.strftime("%Y%m%d")
-        key = "SESSION_MONTH_{}_{}_{}".format(current_org.id, tp, date_str)
+        key = "SESSION_DATE_{}_{}_{}".format(current_org.id, tp, date_str)
         return key
 
     def __get_data_from_cache(self, date, tp):
@@ -69,9 +78,9 @@ class MonthLoginMetricMixin:
         self.__set_data_to_cache(date, tp, count)
         return count
 
-    def get_month_metrics_total_count_login(self):
+    def get_dates_metrics_total_count_login(self):
         data = []
-        for d in self.session_month_dates:
+        for d in self.session_dates_list:
             count = self.get_date_login_count(d)
             data.append(count)
         if len(data) == 0:
@@ -88,9 +97,9 @@ class MonthLoginMetricMixin:
         self.__set_data_to_cache(date, tp, count)
         return count
 
-    def get_month_metrics_total_count_active_users(self):
+    def get_dates_metrics_total_count_active_users(self):
         data = []
-        for d in self.session_month_dates:
+        for d in self.session_dates_list:
             count = self.get_date_user_count(d)
             data.append(count)
         return data
@@ -105,90 +114,81 @@ class MonthLoginMetricMixin:
         self.__set_data_to_cache(date, tp, count)
         return count
 
-    def get_month_metrics_total_count_active_assets(self):
+    def get_dates_metrics_total_count_active_assets(self):
         data = []
-        for d in self.session_month_dates:
+        for d in self.session_dates_list:
             count = self.get_date_asset_count(d)
             data.append(count)
         return data
 
     @lazyproperty
-    def month_total_count_active_users(self):
-        count = len(set(self.session_month.values_list('user', flat=True)))
+    def dates_total_count_active_users(self):
+        count = len(set(self.sessions_queryset.values_list('user', flat=True)))
         return count
 
     @lazyproperty
-    def month_total_count_inactive_users(self):
+    def dates_total_count_inactive_users(self):
         total = current_org.get_org_members().count()
-        active = self.month_total_count_active_users
+        active = self.dates_total_count_active_users
         count = total - active
         if count < 0:
             count = 0
         return count
 
     @lazyproperty
-    def month_total_count_disabled_users(self):
+    def dates_total_count_disabled_users(self):
         return current_org.get_org_members().filter(is_active=False).count()
 
     @lazyproperty
-    def month_total_count_active_assets(self):
-        return len(set(self.session_month.values_list('asset', flat=True)))
+    def dates_total_count_active_assets(self):
+        return len(set(self.sessions_queryset.values_list('asset', flat=True)))
 
     @lazyproperty
-    def month_total_count_inactive_assets(self):
+    def dates_total_count_inactive_assets(self):
         total = Asset.objects.all().count()
-        active = self.month_total_count_active_assets
+        active = self.dates_total_count_active_assets
         count = total - active
         if count < 0:
             count = 0
         return count
 
     @lazyproperty
-    def month_total_count_disabled_assets(self):
+    def dates_total_count_disabled_assets(self):
         return Asset.objects.filter(is_active=False).count()
-
-
-class WeekSessionMetricMixin:
-    session_week = None
-
-    @lazyproperty
-    def session_week(self):
-        week_ago = timezone.now() - timezone.timedelta(weeks=1)
-        session_week = Session.objects.filter(date_start__gt=week_ago)
-        return session_week
-
-    def get_week_login_times_top5_users(self):
-        users = self.session_week.values_list('user', flat=True)
+    
+    # 以下是从week中而来
+    def get_dates_login_times_top5_users(self):
+        users = self.sessions_queryset.values_list('user', flat=True)
         users = [
             {'user': user, 'total': total}
             for user, total in Counter(users).most_common(5)
         ]
         return users
 
-    def get_week_total_count_login_users(self):
-        return len(set(self.session_week.values_list('user', flat=True)))
+    def get_dates_total_count_login_users(self):
+        return len(set(self.sessions_queryset.values_list('user', flat=True)))
 
-    def get_week_total_count_login_times(self):
-        return self.session_week.count()
+    def get_dates_total_count_login_times(self):
+        return self.sessions_queryset.count()
 
-    def get_week_login_times_top10_assets(self):
-        assets = self.session_week.values("asset")\
-            .annotate(total=Count("asset"))\
-            .annotate(last=Max("date_start")).order_by("-total")[:10]
+    def get_dates_login_times_top10_assets(self):
+        assets = self.sessions_queryset.values("asset") \
+                     .annotate(total=Count("asset")) \
+                     .annotate(last=Max("date_start")).order_by("-total")[:10]
         for asset in assets:
             asset['last'] = str(asset['last'])
         return list(assets)
 
-    def get_week_login_times_top10_users(self):
-        users = self.session_week.values("user") \
-                     .annotate(total=Count("user")) \
-                     .annotate(last=Max("date_start")).order_by("-total")[:10]
+    def get_dates_login_times_top10_users(self):
+        users = self.sessions_queryset.values("user") \
+                    .annotate(total=Count("user")) \
+                    .annotate(last=Max("date_start")).order_by("-total")[:10]
         for user in users:
             user['last'] = str(user['last'])
         return list(users)
 
-    def get_week_login_record_top10_sessions(self):
-        sessions = self.session_week.order_by('-date_start')[:10]
+    def get_dates_login_record_top10_sessions(self):
+        sessions = self.sessions_queryset.order_by('-date_start')[:10]
         for session in sessions:
             session.avatar_url = User.get_avatar_url("")
         sessions = [
@@ -223,8 +223,8 @@ class TotalCountMixin:
         return Session.objects.filter(is_finished=False).count()
 
 
-class IndexApi(TotalCountMixin, WeekSessionMetricMixin, MonthLoginMetricMixin, APIView):
-    permission_classes = (IsOrgAdmin,)
+class IndexApi(TotalCountMixin, DatesLoginMetricMixin, APIView):
+    permission_classes = (IsOrgAdmin | IsOrgAuditor,)
     http_method_names = ['get']
 
     def get(self, request, *args, **kwargs):
@@ -234,60 +234,72 @@ class IndexApi(TotalCountMixin, WeekSessionMetricMixin, MonthLoginMetricMixin, A
 
         _all = query_params.get('all')
 
-        if _all or query_params.get('total_count'):
+        if _all or query_params.get('total_count') or query_params.get('total_count_users'):
+            data.update({
+                'total_count_users': self.get_total_count_users(),
+            })
+
+        if _all or query_params.get('total_count') or query_params.get('total_count_assets'):
             data.update({
                 'total_count_assets': self.get_total_count_assets(),
-                'total_count_users': self.get_total_count_users(),
+            })
+
+        if _all or query_params.get('total_count') or query_params.get('total_count_online_users'):
+            data.update({
                 'total_count_online_users': self.get_total_count_online_users(),
+            })
+
+        if _all or query_params.get('total_count') or query_params.get('total_count_online_sessions'):
+            data.update({
                 'total_count_online_sessions': self.get_total_count_online_sessions(),
             })
 
-        if _all or query_params.get('month_metrics'):
+        if _all or query_params.get('dates_metrics'):
             data.update({
-                'month_metrics_date': self.get_month_metrics_date(),
-                'month_metrics_total_count_login': self.get_month_metrics_total_count_login(),
-                'month_metrics_total_count_active_users': self.get_month_metrics_total_count_active_users(),
-                'month_metrics_total_count_active_assets': self.get_month_metrics_total_count_active_assets(),
+                'dates_metrics_date': self.get_dates_metrics_date(),
+                'dates_metrics_total_count_login': self.get_dates_metrics_total_count_login(),
+                'dates_metrics_total_count_active_users': self.get_dates_metrics_total_count_active_users(),
+                'dates_metrics_total_count_active_assets': self.get_dates_metrics_total_count_active_assets(),
             })
 
-        if _all or query_params.get('month_total_count_users'):
+        if _all or query_params.get('dates_total_count_users'):
             data.update({
-                'month_total_count_active_users': self.month_total_count_active_users,
-                'month_total_count_inactive_users': self.month_total_count_inactive_users,
-                'month_total_count_disabled_users': self.month_total_count_disabled_users,
+                'dates_total_count_active_users': self.dates_total_count_active_users,
+                'dates_total_count_inactive_users': self.dates_total_count_inactive_users,
+                'dates_total_count_disabled_users': self.dates_total_count_disabled_users,
             })
 
-        if _all or query_params.get('month_total_count_assets'):
+        if _all or query_params.get('dates_total_count_assets'):
             data.update({
-                'month_total_count_active_assets': self.month_total_count_active_assets,
-                'month_total_count_inactive_assets': self.month_total_count_inactive_assets,
-                'month_total_count_disabled_assets': self.month_total_count_disabled_assets,
+                'dates_total_count_active_assets': self.dates_total_count_active_assets,
+                'dates_total_count_inactive_assets': self.dates_total_count_inactive_assets,
+                'dates_total_count_disabled_assets': self.dates_total_count_disabled_assets,
             })
 
-        if _all or query_params.get('week_total_count'):
+        if _all or query_params.get('dates_total_count'):
             data.update({
-                'week_total_count_login_users': self.get_week_total_count_login_users(),
-                'week_total_count_login_times': self.get_week_total_count_login_times(),
+                'dates_total_count_login_users': self.get_dates_total_count_login_users(),
+                'dates_total_count_login_times': self.get_dates_total_count_login_times(),
             })
 
-        if _all or query_params.get('week_login_times_top5_users'):
+        if _all or query_params.get('dates_login_times_top5_users'):
             data.update({
-                'week_login_times_top5_users': self.get_week_login_times_top5_users(),
+                'dates_login_times_top5_users': self.get_dates_login_times_top5_users(),
             })
 
-        if _all or query_params.get('week_login_times_top10_assets'):
+        if _all or query_params.get('dates_login_times_top10_assets'):
             data.update({
-                'week_login_times_top10_assets': self.get_week_login_times_top10_assets(),
+                'dates_login_times_top10_assets': self.get_dates_login_times_top10_assets(),
             })
 
-        if _all or query_params.get('week_login_times_top10_users'):
+        if _all or query_params.get('dates_login_times_top10_users'):
             data.update({
-                'week_login_times_top10_users': self.get_week_login_times_top10_users(),
+                'dates_login_times_top10_users': self.get_dates_login_times_top10_users(),
             })
 
-        if _all or query_params.get('week_login_record_top10_sessions'):
+        if _all or query_params.get('dates_login_record_top10_sessions'):
             data.update({
-                'week_login_record_top10_sessions': self.get_week_login_record_top10_sessions()
+                'dates_login_record_top10_sessions': self.get_dates_login_record_top10_sessions()
             })
 
         return JsonResponse(data, status=200)

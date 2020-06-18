@@ -10,6 +10,9 @@ class IndexView(PermissionsMixin, TemplateView):
     template_name = 'index.html'
     permission_classes = [IsValidUser]
 
+    def get(self, request, *args, **kwargs):
+        return redirect('/ui/')
+
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return self.handle_no_permission()

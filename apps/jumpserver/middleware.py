@@ -15,11 +15,14 @@ class TimezoneMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        tzname = request.META.get('TZ')
-        if tzname:
-            timezone.activate(pytz.timezone(tzname))
-        else:
-            timezone.deactivate()
+        tzname = request.META.get('HTTP_X_TZ')
+        if not tzname or tzname == 'undefined':
+            return self.get_response(request)
+        try:
+            tz = pytz.timezone(tzname)
+            timezone.activate(tz)
+        except pytz.UnknownTimeZoneError:
+            pass
         response = self.get_response(request)
         return response
 

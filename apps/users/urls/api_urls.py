@@ -21,6 +21,8 @@ urlpatterns = [
     path('connection-token/', auth_api.UserConnectionTokenApi.as_view(),
          name='connection-token'),
     path('profile/', api.UserProfileApi.as_view(), name='user-profile'),
+    path('profile/password/', api.UserPasswordApi.as_view(), name='user-password'),
+    path('profile/public-key/', api.UserPublicKeyApi.as_view(), name='user-public-key'),
     path('otp/reset/', api.UserResetOTPApi.as_view(), name='my-otp-reset'),
     path('users/<uuid:pk>/otp/reset/', api.UserResetOTPApi.as_view(), name='user-reset-otp'),
     path('users/<uuid:pk>/password/', api.UserChangePasswordApi.as_view(), name='change-user-password'),

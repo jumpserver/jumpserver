@@ -15,11 +15,18 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
 
     class Meta:
         model = Domain
-        fields = [
-            'id', 'name', 'asset_count', 'gateway_count', 'comment', 'assets',
-            'date_created'
+        fields_mini = ['id', 'name']
+        fields_small = fields_mini + [
+            'comment', 'date_created'
         ]
-        read_only_fields = ( 'asset_count', 'gateway_count', 'date_created')
+        fields_m2m = [
+            'asset_count', 'assets', 'gateway_count',
+        ]
+        fields = fields_small + fields_m2m
+        read_only_fields = ('asset_count', 'gateway_count', 'date_created')
+        extra_kwargs = {
+            'assets': {'required': False}
+        }
         list_serializer_class = AdaptedBulkListSerializer
 
     @staticmethod
@@ -41,6 +48,16 @@ class GatewaySerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'date_updated', 'created_by', 'comment',
         ]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.protocol_limit_to_ssh()
+
+    def protocol_limit_to_ssh(self):
+        protocol_field = self.fields['protocol']
+        choices = protocol_field.choices
+        choices.pop('rdp')
+        protocol_field._choices = choices
+
 
 class GatewayWithAuthSerializer(GatewaySerializer):
     def get_field_names(self, declared_fields, info):
@@ -49,6 +66,8 @@ class GatewayWithAuthSerializer(GatewaySerializer):
             ['password', 'private_key']
         )
         return fields
+
+
 
 
 class DomainWithGatewaySerializer(BulkOrgResourceModelSerializer):

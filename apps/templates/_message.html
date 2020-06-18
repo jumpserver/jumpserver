@@ -39,7 +39,7 @@
 {% block first_login_message %}
     {% if request.user.is_authenticated and request.user.is_first_login %}
     <div class="alert alert-danger help-message alert-dismissable">
-        {% url 'users:user-first-login' as first_login_url %}
+        {% url 'authentication:user-first-login' as first_login_url %}
         {% blocktrans %}
         Your information was incomplete. Please click <a href="{{ first_login_url }}"> this link </a>to complete your information.
         {% endblocktrans %}
