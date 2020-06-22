@@ -5,8 +5,8 @@ import re
 import pyotp
 import base64
 import logging
+import time
 
-from django.http import Http404
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.core.cache import cache
@@ -333,3 +333,15 @@ def get_source_choices():
     if settings.AUTH_CAS:
         choices.append((User.SOURCE_CAS, choices_all[User.SOURCE_CAS]))
     return choices
+
+
+def is_auth_valid(session, key):
+    return True if session.get(key, 0) > time.time() else False
+
+
+def is_auth_password_valid(session):
+    return is_auth_valid(session, 'auth_password_expired_at')
+
+
+def is_auth_opt_valid(session):
+    return is_auth_valid(session, 'auth_opt_expired_at')

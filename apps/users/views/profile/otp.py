@@ -7,17 +7,19 @@ from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 from django.contrib.auth import logout as auth_logout
 from django.conf import settings
-from django.shortcuts import redirect
+from django.http.response import HttpResponseForbidden
 
 from authentication.mixins import AuthMixin
 from users.models import User
 from common.utils import get_logger
 from common.utils import get_object_or_none
 from common.permissions import IsValidUser
+from common.http import get_remote_addr
 from ... import forms
 from .password import UserVerifyPasswordView
 from ...utils import (
     generate_otp_uri, check_otp_code, get_user_or_pre_auth_user,
+    is_auth_password_valid, is_auth_opt_valid
 )
 
 __all__ = [
@@ -57,52 +59,59 @@ class UserOtpEnableBindView(AuthMixin, TemplateView, FormView):
     success_url = reverse_lazy('authentication:user-otp-settings-success')
 
     def get(self, request, *args, **kwargs):
-        return self._check_can_bind() or super().get(request, *args, **kwargs)
+        if self._check_can_bind():
+            return super().get(request, *args, **kwargs)
+        return HttpResponseForbidden()
 
     def post(self, request, *args, **kwargs):
-        return self._check_can_bind() or super().post(request, *args, **kwargs)
+        if self._check_can_bind():
+            return super().post(request, *args, **kwargs)
+        return HttpResponseForbidden()
 
     def _check_can_bind(self):
-        """
-        :return:
-            - `None` 表示验证成功
-            - `Response` 验证失败，调用函数需直接返回该 `Response`
-        """
-
         request = self.request
+        session = request.session
         request_user = request.user
         session_user = None
+        user = None
+        login_stage = 'anonymous'
 
         if not self.request.session.is_empty():
             user_id = self.request.session.get('user_id')
             session_user = get_object_or_none(User, pk=user_id)
 
-        auth_password = request.session.get('auth_password')
         if request_user.is_authenticated:
-            # 用户已登录，在 `mfa_enabled` 启用，而且 `otp_secret_key` 不为空的情况，跳转到
-            # otp 认证界面
-            if request_user.mfa_enabled and request_user.otp_secret_key:
-                logger.warn(f'OPT_BIND-> authenticated '
-                            f'request_user.username={request_user.username}, '
-                            f'request_user.mfa_enabled={request_user.mfa_enabled}, '
-                            f'request_user.otp_secret_key={request_user.otp_secret_key}')
-                return redirect(reverse('authentication:user-otp-update'))
-            return None
+            user = request_user
+            login_stage = 'authenticated'
+
+            if request_user.mfa_enabled:
+                if request_user.otp_secret_key:
+                    # 重置
+                    if is_auth_opt_valid(session):
+                        return True
+                else:
+                    # 绑定
+                    if is_auth_password_valid(session):
+                        return True
+            else:
+                # 启用
+                if is_auth_password_valid(session):
+                    return True
         elif session_user:
-            # 未登录，但是验证过了密码，如果是 `reset` 流程，需要 `mfa_enabled` 启用，`otp_secret_key` 为空
-            if not all((auth_password, session_user.mfa_enabled, not session_user.otp_secret_key)):
-                logger.warn(f'OPT_BIND-> auth_password '
-                            f'session_user.username={session_user.username}, '
-                            f'auth_password={auth_password}, '
-                            f'session_user.mfa_enabled={session_user.mfa_enabled}, '
-                            f'session_user.otp_secret_key={session_user.otp_secret_key}')
-                return redirect(reverse('authentication:login'))
-            return None
-        else:
-            # 未登录，没有验证过密码，直接跳转到登录界面
-            logger.warn(f'OPT_BIND-> anonymous '
-                        f'REMOTE_ADDR={request.META.get("HTTP_X_FORWARDED_HOST") or request.META.get("REMOTE_ADDR")}')
-            return redirect(reverse('authentication:login'))
+            user = session_user
+            login_stage = 'auth_password'
+
+            if all((is_auth_password_valid(session), session_user.mfa_enabled, not session_user.otp_secret_key)):
+                return True
+
+        logger.warn(f'OPT_BIND-> '
+                    f'REMOTE_ADDR={get_remote_addr(request)}, '
+                    f'login_stage={login_stage}, '
+                    f'username={user.username}, '
+                    f'mfa_enabled={user.mfa_enabled}, '
+                    f'otp_secret_key={user.otp_secret_key}')
+
+        return False
 
     def form_valid(self, form):
         otp_code = form.cleaned_data.get('otp_code')
@@ -169,8 +178,7 @@ class UserOtpUpdateView(FormView):
 
         valid = user.check_mfa(otp_code)
         if valid:
-            user.otp_secret_key = ''
-            user.save()
+            self.request.session['auth_opt_expired_at'] = time.time() + settings.AUTH_EXPIRED_SECONDS
             return super().form_valid(form)
         else:
             error = _('MFA code invalid, or ntp sync server time')
