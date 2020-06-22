@@ -3,18 +3,20 @@
 import time
 from hashlib import md5
 from threading import Thread
+from collections import defaultdict
 
+from django.db.models.signals import m2m_changed
 from django.core.cache import cache
 from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 
-from common.drf.filters import IDSpmFilter, CustomFilter
+from common.drf.filters import IDSpmFilter, CustomFilter, IDInFilter
 from ..utils import lazyproperty
 
 __all__ = [
     "JSONResponseMixin", "CommonApiMixin",
-    "IDSpmFilterMixin", 'AsyncApiMixin',
+    'AsyncApiMixin', 'RelationMixin'
 ]
 
 
@@ -25,19 +27,11 @@ class JSONResponseMixin(object):
         return JsonResponse(context)
 
 
-class IDSpmFilterMixin:
-    def get_filter_backends(self):
-        backends = super().get_filter_backends()
-        backends.append(IDSpmFilter)
-        return backends
-
-
 class SerializerMixin:
     def get_serializer_class(self):
         serializer_class = None
-        if hasattr(self, 'serializer_classes') and \
-                isinstance(self.serializer_classes, dict):
-            if self.action == 'list' and self.request.query_params.get('draw'):
+        if hasattr(self, 'serializer_classes') and isinstance(self.serializer_classes, dict):
+            if self.action in ['list', 'metadata'] and self.request.query_params.get('draw'):
                 serializer_class = self.serializer_classes.get('display')
             if serializer_class is None:
                 serializer_class = self.serializer_classes.get(
@@ -49,7 +43,10 @@ class SerializerMixin:
 
 
 class ExtraFilterFieldsMixin:
-    default_added_filters = [CustomFilter, IDSpmFilter]
+    """
+    额外的 api filter
+    """
+    default_added_filters = [CustomFilter, IDSpmFilter, IDInFilter]
     filter_backends = api_settings.DEFAULT_FILTER_BACKENDS
     extra_filter_fields = []
     extra_filter_backends = []
@@ -57,9 +54,10 @@ class ExtraFilterFieldsMixin:
     def get_filter_backends(self):
         if self.filter_backends != self.__class__.filter_backends:
             return self.filter_backends
-        return list(self.filter_backends) + \
-               self.default_added_filters + \
-               list(self.extra_filter_backends)
+        backends = list(self.filter_backends) + \
+                   list(self.default_added_filters) + \
+                   list(self.extra_filter_backends)
+        return backends
 
     def filter_queryset(self, queryset):
         for backend in self.get_filter_backends():
@@ -72,6 +70,9 @@ class CommonApiMixin(SerializerMixin, ExtraFilterFieldsMixin):
 
 
 class InterceptMixin:
+    """
+    Hack默认的dispatch, 让用户可以实现 self.do
+    """
     def dispatch(self, request, *args, **kwargs):
         self.args = args
         self.kwargs = kwargs
@@ -188,3 +189,47 @@ class AsyncApiMixin(InterceptMixin):
             data["error"] = str(e)
             data["status"] = "error"
             cache.set(key, data, 600)
+
+
+class RelationMixin:
+    m2m_field = None
+    from_field = None
+    to_field = None
+    to_model = None
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        assert self.m2m_field is not None, '''
+        `m2m_field` should not be `None`
+        '''
+
+        self.from_field = self.m2m_field.m2m_field_name()
+        self.to_field = self.m2m_field.m2m_reverse_field_name()
+        self.to_model = self.m2m_field.related_model
+        self.through = getattr(self.m2m_field.model, self.m2m_field.attname).through
+
+    def get_queryset(self):
+        queryset = self.through.objects.all()
+        return queryset
+
+    def send_post_add_signal(self, instances):
+        if not isinstance(instances, list):
+            instances = [instances]
+
+        from_to_mapper = defaultdict(list)
+
+        for i in instances:
+            to_id = getattr(i, self.to_field).id
+            from_obj = getattr(i, self.from_field)
+            from_to_mapper[from_obj].append(to_id)
+
+        for from_obj, to_ids in from_to_mapper.items():
+            m2m_changed.send(
+                sender=self.through, instance=from_obj, action='post_add',
+                reverse=False, model=self.to_model, pk_set=to_ids
+            )
+
+    def perform_create(self, serializer):
+        instance = serializer.save()
+        self.send_post_add_signal(instance)

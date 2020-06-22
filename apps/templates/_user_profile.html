@@ -23,7 +23,7 @@
                     <input type="text" id="left-side-org-filter" placeholder="{% trans 'Search' %}" class="form-control">
                     {% for org in ADMIN_OR_AUDIT_ORGS %}
                         <li>
-                            <a class="org-dropdown" href="{% url 'orgs:org-switch' pk=org.id %}" data-id="{{ org.id }}">
+                            <a class="org-dropdown" href="" data-id="{{ org.id }}">
                                 {{ org.name }}
                                 {% if org.id == CURRENT_ORG.id %}
                                     <span class="fa fa-circle" style="padding-top: 5px; color: #1ab394"></span>

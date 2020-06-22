@@ -15,7 +15,7 @@ __all__ = [
 
 class RemoteAppViewSet(OrgBulkModelViewSet):
     model = RemoteApp
-    filter_fields = ('name',)
+    filter_fields = ('name', 'type', 'comment')
     search_fields = filter_fields
     permission_classes = (IsOrgAdmin,)
     serializer_class = RemoteAppSerializer

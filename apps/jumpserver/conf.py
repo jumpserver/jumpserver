@@ -16,6 +16,7 @@ import json
 import yaml
 from importlib import import_module
 from django.urls import reverse_lazy
+from django.contrib.staticfiles.templatetags.staticfiles import static
 from urllib.parse import urljoin, urlparse
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -123,7 +124,7 @@ class Config(dict):
         # Django Config, Must set before start
         'SECRET_KEY': '',
         'BOOTSTRAP_TOKEN': '',
-        'DEBUG': True,
+        'DEBUG': False,
         'LOG_LEVEL': 'DEBUG',
         'LOG_DIR': os.path.join(PROJECT_DIR, 'logs'),
         'DB_ENGINE': 'mysql',
@@ -257,6 +258,8 @@ class Config(dict):
         'LOGIN_CONFIRM_ENABLE': False,
         'WINDOWS_SKIP_ALL_MANUAL_PASSWORD': False,
         'ORG_CHANGE_TO_URL': '',
+        'LANGUAGE_CODE': 'zh',
+        'TIME_ZONE': 'Asia/Shanghai',
         'CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED': True
     }
 
@@ -435,6 +438,38 @@ class DynamicConfig:
         if self.static_config.get('AUTH_RADIUS'):
             backends.insert(0, 'authentication.backends.radius.RadiusBackend')
         return backends
+
+    def XPACK_LICENSE_IS_VALID(self):
+        if not HAS_XPACK:
+            return False
+        try:
+            from xpack.plugins.license.models import License
+            return License.has_valid_license()
+        except:
+            return False
+
+    def LOGO_URLS(self):
+        logo_urls = {'logo_logout': static('img/logo.png'),
+                     'logo_index': static('img/logo_text.png'),
+                     'login_image': static('img/login_image.png'),
+                     'favicon': static('img/facio.ico')}
+        if not HAS_XPACK:
+            return logo_urls
+        try:
+            from xpack.plugins.interface.models import Interface
+            obj = Interface.interface()
+            if obj:
+                if obj.logo_logout:
+                    logo_urls.update({'logo_logout': obj.logo_logout.url})
+                if obj.logo_index:
+                    logo_urls.update({'logo_index': obj.logo_index.url})
+                if obj.login_image:
+                    logo_urls.update({'login_image': obj.login_image.url})
+                if obj.favicon:
+                    logo_urls.update({'favicon': obj.favicon.url})
+        except:
+            pass
+        return logo_urls
 
     def get_from_db(self, item):
         if self.db_setting is not None:
@@ -631,4 +666,3 @@ class ConfigManager:
     @classmethod
     def get_dynamic_config(cls, config):
         return DynamicConfig(config)
-

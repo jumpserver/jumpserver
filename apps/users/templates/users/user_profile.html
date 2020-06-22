@@ -162,11 +162,11 @@
                                                             {% if request.user.mfa_force_enabled %}
                                                                 " disabled >{% trans 'Disable' %}
                                                             {% else %}
-                                                                {% url 'users:user-otp-disable-authentication' %}
+                                                                {% url 'authentication:user-otp-disable-authentication' %}
                                                                 ">{% trans 'Disable' %}
                                                             {% endif %}
                                                         {% else %}
-                                                            {% url 'users:user-otp-enable-start' %}
+                                                            {% url 'authentication:user-otp-enable-start' %}
                                                             ">{% trans 'Enable' %}
                                                         {% endif %}
                                                 </a>
@@ -178,7 +178,7 @@
                                         <td>{% trans 'Update MFA' %}:</td>
                                         <td>
                                             <span class="pull-right">
-                                                <a type="button" class="btn btn-primary btn-xs" style="width: 54px" href="{% url 'users:user-otp-update' %}">{% trans 'Update' %}</a>
+                                                <a type="button" class="btn btn-primary btn-xs" style="width: 54px" href="{% url 'authentication:user-otp-update' %}">{% trans 'Update' %}</a>
                                             </span>
                                         </td>
                                     </tr>

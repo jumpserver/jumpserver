@@ -33,7 +33,7 @@ class AssetPermissionUserRelationViewSet(RelationMixin):
     serializer_class = serializers.AssetPermissionUserRelationSerializer
     model = models.AssetPermission.users.through
     permission_classes = (IsOrgAdmin,)
-    filterset_fields = [
+    filter_fields = [
         'id', "user", "assetpermission",
     ]
     search_fields = ("user__name", "user__username", "assetpermission__name")
@@ -64,7 +64,7 @@ class AssetPermissionUserGroupRelationViewSet(RelationMixin):
     serializer_class = serializers.AssetPermissionUserGroupRelationSerializer
     model = models.AssetPermission.user_groups.through
     permission_classes = (IsOrgAdmin,)
-    filterset_fields = [
+    filter_fields = [
         'id', "usergroup", "assetpermission"
     ]
     search_fields = ["usergroup__name", "assetpermission__name"]
@@ -80,7 +80,7 @@ class AssetPermissionAssetRelationViewSet(RelationMixin):
     serializer_class = serializers.AssetPermissionAssetRelationSerializer
     model = models.AssetPermission.assets.through
     permission_classes = (IsOrgAdmin,)
-    filterset_fields = [
+    filter_fields = [
         'id', 'asset', 'assetpermission',
     ]
     search_fields = ["id", "asset__hostname", "asset__ip", "assetpermission__name"]
@@ -111,7 +111,7 @@ class AssetPermissionNodeRelationViewSet(RelationMixin):
     serializer_class = serializers.AssetPermissionNodeRelationSerializer
     model = models.AssetPermission.nodes.through
     permission_classes = (IsOrgAdmin,)
-    filterset_fields = [
+    filter_fields = [
         'id', 'node', 'assetpermission',
     ]
     search_fields = ["node__value", "assetpermission__name"]
@@ -127,7 +127,7 @@ class AssetPermissionSystemUserRelationViewSet(RelationMixin):
     serializer_class = serializers.AssetPermissionSystemUserRelationSerializer
     model = models.AssetPermission.system_users.through
     permission_classes = (IsOrgAdmin,)
-    filterset_fields = [
+    filter_fields = [
         'id', 'systemuser', 'assetpermission',
     ]
     search_fields = [

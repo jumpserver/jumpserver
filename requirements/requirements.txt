@@ -1,11 +1,11 @@
-amqp==2.1.4
-ansible==2.8.2
+amqp==2.5.2
+ansible==2.8.8
 asn1crypto==0.24.0
 bcrypt==3.1.4
-billiard==3.5.0.3
+billiard==3.6.3.0
 boto3==1.12.14
 botocore==1.15.26
-celery==4.1.1
+celery==4.4.2
 certifi==2018.1.18
 cffi==1.13.2
 chardet==3.0.4
@@ -14,14 +14,14 @@ coreapi==2.3.3
 coreschema==0.0.4
 cryptography==2.8
 decorator==4.1.2
-Django==2.2.10
+Django==2.2.13
 django-auth-ldap==1.7.0
 django-bootstrap3==9.1.0
 django-celery-beat==1.4.0
 django-filter==2.0.0
 django-formtools==2.1
 django-ranged-response==0.2.0
-django-redis-cache==1.7.1
+django-redis-cache==2.1.1
 django-rest-swagger==2.1.2
 django-simple-captcha==0.5.6
 django-timezone-field==3.1
@@ -41,7 +41,7 @@ itsdangerous==0.24
 itypes==1.1.0
 Jinja2==2.10.1
 jmespath==0.9.3
-kombu==4.2.1
+kombu==4.6.8
 ldap3==2.4
 MarkupSafe==1.1.1
 mysqlclient==1.3.14
@@ -49,7 +49,7 @@ olefile==0.44
 openapi-codec==1.3.2
 paramiko==2.4.2
 passlib==1.7.1
-Pillow==6.2.0
+Pillow==6.2.2
 pyasn1==0.4.8
 pycparser==2.19
 pycrypto==2.6.1
@@ -59,7 +59,7 @@ python-dateutil==2.6.1
 python-gssapi==0.6.4
 pytz==2018.3
 PyYAML==5.1
-redis==2.10.6
+redis==3.2.0
 requests==2.22.0
 jms-storage==0.0.29
 s3transfer==0.3.3
@@ -68,7 +68,7 @@ six==1.11.0
 sshpubkeys==3.1.0
 uritemplate==3.0.0
 urllib3==1.25.2
-vine==1.1.4
+vine==1.3.0
 drf-yasg==1.9.1
 Werkzeug==0.15.3
 drf-nested-routers==0.91
@@ -89,7 +89,7 @@ flower==0.9.3
 channels-redis==2.4.0
 channels==2.3.0
 daphne==2.3.0
-psutil==5.6.5
+psutil==5.6.6
 django-cas-ng==4.0.1
 python-cas==1.5.0
 ipython

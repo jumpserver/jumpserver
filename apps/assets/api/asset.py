@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 
-import random
-
-from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import RetrieveAPIView
 from django.shortcuts import get_object_or_404
@@ -33,7 +30,10 @@ class AssetViewSet(OrgBulkModelViewSet):
     API endpoint that allows Asset to be viewed or edited.
     """
     model = Asset
-    filter_fields = ("hostname", "ip", "systemuser__id", "admin_user__id")
+    filter_fields = (
+        "hostname", "ip", "systemuser__id", "admin_user__id", "platform__base",
+        "is_active"
+    )
     search_fields = ("hostname", "ip")
     ordering_fields = ("hostname", "ip", "port", "cpu_cores")
     serializer_classes = {
@@ -74,12 +74,16 @@ class AssetPlatformViewSet(ModelViewSet):
     queryset = Platform.objects.all()
     permission_classes = (IsSuperUser,)
     serializer_class = serializers.PlatformSerializer
-    filterset_fields = ['name', 'base']
+    filter_fields = ['name', 'base']
     search_fields = ['name']
 
+    def get_permissions(self):
+        if self.request.method.lower() in ['get', 'options']:
+            self.permission_classes = (IsOrgAdmin,)
+        return super().get_permissions()
+
     def check_object_permissions(self, request, obj):
-        if request.method.lower() in ['delete', 'put', 'patch'] and \
-                obj.internal:
+        if request.method.lower() in ['delete', 'put', 'patch'] and obj.internal:
             self.permission_denied(
                 request, message={"detail": "Internal platform"}
             )

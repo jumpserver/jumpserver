@@ -16,4 +16,3 @@ class UserGroupViewSet(OrgBulkModelViewSet):
     search_fields = filter_fields
     permission_classes = (IsOrgAdmin,)
     serializer_class = UserGroupSerializer
-

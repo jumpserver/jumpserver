@@ -18,5 +18,5 @@ class GatheredUserViewSet(OrgModelViewSet):
     permission_classes = [IsOrgAdmin]
     extra_filter_backends = [AssetRelatedByNodeFilterBackend]
 
-    filter_fields = ['asset', 'username', 'present']
+    filter_fields = ['asset', 'username', 'present', 'asset__ip', 'asset__hostname']
     search_fields = ['username', 'asset__ip', 'asset__hostname']

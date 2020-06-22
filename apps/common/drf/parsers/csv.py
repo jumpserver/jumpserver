@@ -58,6 +58,12 @@ class JMSCSVParser(BaseParser):
                 col = col.replace("“", '"').replace("”", '"').\
                     replace("‘", '"').replace('’', '"').replace("'", '"')
                 col = json.loads(col)
+            # 字典转换
+            if isinstance(col, str) and col.find("{") != -1 and col.find("}") != -1:
+                # 替换中文格式引号
+                col = col.replace("“", '"').replace("”", '"'). \
+                    replace("‘", '"').replace('’', '"').replace("'", '"')
+                col = json.loads(col)
             _row.append(col)
         return _row
 
@@ -68,7 +74,7 @@ class JMSCSVParser(BaseParser):
         """
         _row_data = {}
         for k, v in row_data.items():
-            if isinstance(v, list) \
+            if isinstance(v, list) or isinstance(v, dict)\
                     or isinstance(v, str) and k.strip() and v.strip():
                 _row_data[k] = v
         return _row_data

@@ -3,9 +3,10 @@
 import re
 import time
 
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse, Http404
 from django.conf import settings
 from django.views.generic import View
+from django.shortcuts import redirect
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.views import APIView
 from django.views.decorators.csrf import csrf_exempt
@@ -16,7 +17,7 @@ from common.http import HttpResponseTemporaryRedirect
 
 __all__ = [
     'LunaView', 'I18NView', 'KokoView', 'WsView', 'HealthCheckView',
-    'redirect_format_api'
+    'redirect_format_api', 'redirect_old_apps_view', 'UIView'
 ]
 
 
@@ -51,6 +52,16 @@ def redirect_format_api(request, *args, **kwargs):
         return JsonResponse({"msg": "Redirect url failed: {}".format(_path)}, status=404)
 
 
+def redirect_old_apps_view(request, *args, **kwargs):
+    path = request.get_full_path()
+    if path.find('/core') != -1:
+        raise Http404()
+    if path in ['/docs/', '/docs', '/core/docs/', '/core/docs']:
+        return redirect('/api/docs/')
+    new_path = '/core{}'.format(path)
+    return HttpResponseTemporaryRedirect(new_path)
+
+
 class HealthCheckView(APIView):
     permission_classes = ()
 
@@ -65,6 +76,12 @@ class WsView(APIView):
         msg = _("Websocket server run on port: {}, you should proxy it on nginx"
                 .format(self.ws_port))
         return JsonResponse({"msg": msg})
+
+
+class UIView(View):
+    def get(self, request):
+        msg = "如果你能看到这个页面，证明你的配置是有问题的，请参考文档设置好nginx, UI由Lina项目提供"
+        return HttpResponse(msg)
 
 
 class KokoView(View):

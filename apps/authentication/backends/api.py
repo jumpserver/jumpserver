@@ -106,6 +106,9 @@ class AccessKeyAuthentication(authentication.BaseAuthentication):
             raise exceptions.AuthenticationFailed(_('User disabled.'))
         return access_key.user, None
 
+    def authenticate_header(self, request):
+        return 'Sign access_key_id:Signature'
+
 
 class AccessTokenAuthentication(authentication.BaseAuthentication):
     keyword = 'Bearer'
@@ -142,6 +145,9 @@ class AccessTokenAuthentication(authentication.BaseAuthentication):
             msg = _('Invalid token or cache refreshed.')
             raise exceptions.AuthenticationFailed(msg)
         return user, None
+
+    def authenticate_header(self, request):
+        return self.keyword
 
 
 class PrivateTokenAuthentication(authentication.TokenAuthentication):

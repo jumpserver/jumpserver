@@ -51,6 +51,11 @@ user_permission_urlpatterns = [
     # Asset System users
     path('<uuid:pk>/assets/<uuid:asset_id>/system-users/', api.UserGrantedAssetSystemUsersApi.as_view(), name='user-asset-system-users'),
     path('assets/<uuid:asset_id>/system-users/', api.UserGrantedAssetSystemUsersApi.as_view(), name='my-asset-system-users'),
+
+    # Expire user permission cache
+    path('<uuid:pk>/asset-permissions/cache/', api.UserAssetPermissionsCacheApi.as_view(),
+         name='user-asset-permission-cache'),
+    path('asset-permissions/cache/', api.UserAssetPermissionsCacheApi.as_view(), name='my-asset-permission-cache'),
 ]
 
 user_group_permission_urlpatterns = [

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 import time
+from django.utils.translation import ugettext as _
 from rest_framework.permissions import AllowAny
 from rest_framework.generics import CreateAPIView
 from rest_framework.serializers import ValidationError
@@ -56,4 +57,4 @@ class UserOtpVerifyApi(CreateAPIView):
             request.session["MFA_VERIFY_TIME"] = int(time.time())
             return Response({"ok": "1"})
         else:
-            return Response({"error": "Code not valid"}, status=400)
+            return Response({"error": _("Code is invalid")}, status=400)

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from django.utils.translation import ugettext_lazy as _
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.serializers import AdaptedBulkListSerializer
 from ..models import Session
@@ -24,6 +25,10 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
             "can_join", "protocol", "date_start", "date_end",
             "terminal",
         ]
+        extra_kwargs = {
+            "protocol": {'label': _('Protocol')},
+            'is_finished': {'label': _('Is finished')}
+        }
 
 
 class SessionDisplaySerializer(SessionSerializer):

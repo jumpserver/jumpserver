@@ -27,6 +27,7 @@ class TerminalViewSet(viewsets.ModelViewSet):
     queryset = Terminal.objects.filter(is_deleted=False)
     serializer_class = serializers.TerminalSerializer
     permission_classes = (IsSuperUser,)
+    filter_fields = ['name', 'remote_addr']
 
     def create(self, request, *args, **kwargs):
         name = request.data.get('name')
