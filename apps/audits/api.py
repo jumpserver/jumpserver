@@ -27,6 +27,7 @@ class FTPLogViewSet(CreateModelMixin,
     ]
     filter_fields = ['user', 'asset', 'system_user', 'filename']
     search_fields = filter_fields
+    ordering = ['-date_start']
 
 
 class UserLoginLogViewSet(ListModelMixin, CommonGenericViewSet):
