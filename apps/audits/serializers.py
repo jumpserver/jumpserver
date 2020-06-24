@@ -12,12 +12,13 @@ from . import models
 
 
 class FTPLogSerializer(serializers.ModelSerializer):
+    operate_display = serializers.ReadOnlyField(source='get_operate_display')
 
     class Meta:
         model = models.FTPLog
         fields = (
             'id', 'user', 'remote_addr', 'asset', 'system_user',
-            'operate', 'filename', 'is_success', 'date_start'
+            'operate', 'filename', 'is_success', 'date_start', 'operate_display'
         )
 
 
