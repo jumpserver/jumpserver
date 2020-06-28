@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-24 16:46+0800\n"
+"POT-Creation-Date: 2020-06-28 18:58+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -608,7 +608,7 @@ msgid "Assets"
 msgstr "资产管理"
 
 #: assets/models/user.py:111 templates/_nav.html:17
-#: users/views/profile/password.py:42 users/views/profile/pubkey.py:36
+#: users/views/profile/password.py:40 users/views/profile/pubkey.py:36
 msgid "Users"
 msgstr "用户管理"
 
@@ -1133,8 +1133,8 @@ msgid ""
 "after {} minutes)"
 msgstr "账号已被锁定（请联系管理员解锁 或 {}分钟后重试）"
 
-#: authentication/errors.py:48 users/views/profile/otp.py:107
-#: users/views/profile/otp.py:146 users/views/profile/otp.py:166
+#: authentication/errors.py:48 users/views/profile/otp.py:63
+#: users/views/profile/otp.py:102 users/views/profile/otp.py:121
 msgid "MFA code invalid, or ntp sync server time"
 msgstr "MFA验证码不正确，或者服务器端时间不对"
 
@@ -1363,6 +1363,11 @@ msgstr "%(name)s 创建成功"
 #, python-format
 msgid "%(name)s was updated successfully"
 msgstr "%(name)s 更新成功"
+
+#: common/drf/parsers/csv.py:22
+#, python-format
+msgid "The max size of CSV is %d bytes"
+msgstr "CSV 文件最大为 %d 字节"
 
 #: common/fields/form.py:33
 msgid "Not a valid json"
@@ -2647,7 +2652,7 @@ msgstr "复制用户公钥到这里"
 msgid "Join user groups"
 msgstr "添加到用户组"
 
-#: users/forms/user.py:103 users/views/profile/password.py:59
+#: users/forms/user.py:103 users/views/profile/password.py:57
 #: users/views/profile/reset.py:123
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
@@ -3483,27 +3488,27 @@ msgstr ""
 "    <br>\n"
 "    "
 
-#: users/views/profile/otp.py:190
+#: users/views/profile/otp.py:145
 msgid "MFA enable success"
 msgstr "多因子认证启用成功"
 
-#: users/views/profile/otp.py:191
+#: users/views/profile/otp.py:146
 msgid "MFA enable success, return login page"
 msgstr "多因子认证启用成功，返回到登录页面"
 
-#: users/views/profile/otp.py:193
+#: users/views/profile/otp.py:148
 msgid "MFA disable success"
 msgstr "多因子认证禁用成功"
 
-#: users/views/profile/otp.py:194
+#: users/views/profile/otp.py:149
 msgid "MFA disable success, return login page"
 msgstr "多因子认证禁用成功，返回登录页面"
 
-#: users/views/profile/password.py:43
+#: users/views/profile/password.py:41
 msgid "Password update"
 msgstr "密码更新"
 
-#: users/views/profile/password.py:74
+#: users/views/profile/password.py:72
 msgid "Password invalid"
 msgstr "用户名或密码无效"
 
