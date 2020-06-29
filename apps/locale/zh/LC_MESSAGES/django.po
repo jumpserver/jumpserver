@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-20 19:25+0800\n"
+"POT-Creation-Date: 2020-07-01 14:32+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -16,6 +16,556 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: access_control/forms.py:14 access_control/models.py:11
+#: access_control/templates/access_control/access_control_list.html:16
+msgid "Date from"
+msgstr "开始时间"
+
+#: access_control/forms.py:15 access_control/models.py:12
+#: access_control/templates/access_control/access_control_list.html:17
+msgid "Date to"
+msgstr "结束时间"
+
+#: access_control/forms.py:31 access_control/models.py:13
+#: assets/models/user.py:111 assets/templates/assets/system_user_users.html:76
+#: templates/_nav.html:17 users/views/group.py:28 users/views/group.py:45
+#: users/views/group.py:63 users/views/group.py:82 users/views/group.py:99
+#: users/views/login.py:163 users/views/profile/password.py:40
+#: users/views/profile/pubkey.py:36 users/views/user.py:50
+#: users/views/user.py:67 users/views/user.py:111 users/views/user.py:178
+#: users/views/user.py:206 users/views/user.py:220 users/views/user.py:234
+#: users/views/user.py:248 users/views/user.py:262 users/views/user.py:276
+msgid "Users"
+msgstr "用户管理"
+
+#: access_control/models.py:9
+msgid "name"
+msgstr "名称"
+
+#: access_control/models.py:10
+#: access_control/templates/access_control/access_control_list.html:15
+msgid "IPs"
+msgstr "IPs"
+
+#: access_control/templates/access_control/access_control_create_update.html:13
+#: applications/templates/applications/database_app_create_update.html:12
+#: applications/templates/applications/remote_app_create_update.html:12
+#: assets/templates/assets/_system_user.html:73
+#: assets/templates/assets/admin_user_create_update.html:41
+#: assets/templates/assets/asset_bulk_update.html:23
+#: assets/templates/assets/asset_create.html:81
+#: assets/templates/assets/cmd_filter_create_update.html:15
+#: assets/templates/assets/cmd_filter_rule_create_update.html:36
+#: assets/templates/assets/domain_create_update.html:16
+#: assets/templates/assets/gateway_create_update.html:54
+#: assets/templates/assets/label_create_update.html:18
+#: assets/templates/assets/platform_create_update.html:20
+#: perms/templates/perms/asset_permission_create_update.html:127
+#: perms/templates/perms/database_app_permission_create_update.html:82
+#: perms/templates/perms/remote_app_permission_create_update.html:82
+#: settings/templates/settings/basic_setting.html:45
+#: settings/templates/settings/email_content_setting.html:35
+#: settings/templates/settings/email_setting.html:46
+#: settings/templates/settings/ldap_setting.html:45
+#: settings/templates/settings/security_setting.html:54
+#: settings/templates/settings/terminal_setting.html:53
+#: terminal/templates/terminal/base_storage_create_update.html:12
+#: terminal/templates/terminal/terminal_update.html:43
+#: users/templates/users/_user.html:51
+#: users/templates/users/user_bulk_update.html:23
+#: users/templates/users/user_detail.html:168
+#: users/templates/users/user_group_create_update.html:27
+#: users/templates/users/user_password_update.html:75
+#: users/templates/users/user_profile.html:209
+#: users/templates/users/user_profile_update.html:67
+#: users/templates/users/user_pubkey_update.html:74
+#: users/templates/users/user_pubkey_update.html:80
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:65
+#: xpack/plugins/cloud/templates/cloud/account_create_update.html:29
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:52
+#: xpack/plugins/gathered_user/templates/gathered_user/task_create_update.html:40
+#: xpack/plugins/interface/templates/interface/interface.html:72
+#: xpack/plugins/orgs/templates/orgs/org_create_update.html:29
+#: xpack/plugins/vault/templates/vault/vault_create.html:41
+msgid "Reset"
+msgstr "重置"
+
+#: access_control/templates/access_control/access_control_create_update.html:14
+#: applications/templates/applications/database_app_create_update.html:13
+#: applications/templates/applications/remote_app_create_update.html:14
+#: assets/templates/assets/_system_user.html:74
+#: assets/templates/assets/admin_user_create_update.html:42
+#: assets/templates/assets/asset_bulk_update.html:24
+#: assets/templates/assets/asset_create.html:82
+#: assets/templates/assets/asset_list.html:45
+#: assets/templates/assets/cmd_filter_create_update.html:16
+#: assets/templates/assets/cmd_filter_rule_create_update.html:37
+#: assets/templates/assets/domain_create_update.html:17
+#: assets/templates/assets/gateway_create_update.html:55
+#: assets/templates/assets/label_create_update.html:19
+#: assets/templates/assets/platform_create_update.html:21
+#: audits/templates/audits/login_log_list.html:95
+#: perms/templates/perms/asset_permission_create_update.html:128
+#: perms/templates/perms/database_app_permission_create_update.html:83
+#: perms/templates/perms/remote_app_permission_create_update.html:83
+#: settings/templates/settings/basic_setting.html:46
+#: settings/templates/settings/email_content_setting.html:36
+#: settings/templates/settings/email_setting.html:47
+#: settings/templates/settings/ldap_setting.html:49
+#: settings/templates/settings/security_setting.html:55
+#: settings/templates/settings/terminal_setting.html:55
+#: terminal/templates/terminal/base_storage_create_update.html:13
+#: terminal/templates/terminal/command_list.html:48
+#: terminal/templates/terminal/session_list.html:50
+#: terminal/templates/terminal/terminal_update.html:44
+#: users/templates/users/_user.html:52
+#: users/templates/users/forgot_password.html:24
+#: users/templates/users/user_bulk_update.html:24
+#: users/templates/users/user_list.html:40
+#: users/templates/users/user_password_update.html:76
+#: users/templates/users/user_profile_update.html:68
+#: users/templates/users/user_pubkey_update.html:81
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:66
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:67
+#: xpack/plugins/interface/templates/interface/interface.html:74
+#: xpack/plugins/vault/templates/vault/vault_create.html:42
+msgid "Submit"
+msgstr "提交"
+
+#: access_control/templates/access_control/access_control_detail.html:13
+#: applications/templates/applications/database_app_detail.html:13
+#: applications/templates/applications/remote_app_detail.html:13
+#: assets/templates/assets/admin_user_assets.html:13
+#: assets/templates/assets/admin_user_detail.html:13
+#: assets/templates/assets/cmd_filter_detail.html:14
+#: assets/templates/assets/cmd_filter_rule_list.html:14
+#: assets/templates/assets/domain_detail.html:13
+#: assets/templates/assets/domain_gateway_list.html:15
+#: assets/templates/assets/platform_detail.html:13
+#: assets/templates/assets/system_user_assets.html:22
+#: assets/templates/assets/system_user_detail.html:13
+#: assets/templates/assets/system_user_users.html:21
+#: ops/templates/ops/adhoc_history.html:128
+#: ops/templates/ops/task_adhoc.html:114
+#: ops/templates/ops/task_history.html:135
+#: perms/templates/perms/asset_permission_asset.html:14
+#: perms/templates/perms/asset_permission_detail.html:13
+#: perms/templates/perms/asset_permission_user.html:14
+#: perms/templates/perms/database_app_permission_database_app.html:14
+#: perms/templates/perms/database_app_permission_detail.html:13
+#: perms/templates/perms/database_app_permission_user.html:14
+#: perms/templates/perms/remote_app_permission_detail.html:13
+#: perms/templates/perms/remote_app_permission_remote_app.html:13
+#: perms/templates/perms/remote_app_permission_user.html:13
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:13
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:18
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:17
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:106
+#: xpack/plugins/change_auth_plan/views.py:91
+msgid "Detail"
+msgstr "详情"
+
+#: access_control/templates/access_control/access_control_detail.html:16
+#: applications/templates/applications/database_app_detail.html:16
+#: applications/templates/applications/database_app_list.html:53
+#: applications/templates/applications/remote_app_detail.html:16
+#: applications/templates/applications/remote_app_list.html:59
+#: assets/templates/assets/_asset_user_list.html:67
+#: assets/templates/assets/admin_user_detail.html:19
+#: assets/templates/assets/admin_user_list.html:46
+#: assets/templates/assets/asset_detail.html:24
+#: assets/templates/assets/asset_list.html:89
+#: assets/templates/assets/cmd_filter_detail.html:24
+#: assets/templates/assets/cmd_filter_list.html:56
+#: assets/templates/assets/cmd_filter_rule_list.html:81
+#: assets/templates/assets/domain_detail.html:19
+#: assets/templates/assets/domain_detail.html:94
+#: assets/templates/assets/domain_gateway_list.html:92
+#: assets/templates/assets/domain_list.html:50
+#: assets/templates/assets/label_list.html:39
+#: assets/templates/assets/platform_detail.html:16
+#: assets/templates/assets/platform_list.html:40
+#: assets/templates/assets/system_user_detail.html:30
+#: assets/templates/assets/system_user_list.html:55 audits/models.py:34
+#: perms/templates/perms/asset_permission_detail.html:25
+#: perms/templates/perms/asset_permission_list.html:144
+#: perms/templates/perms/database_app_permission_detail.html:25
+#: perms/templates/perms/database_app_permission_list.html:64
+#: perms/templates/perms/remote_app_permission_detail.html:25
+#: perms/templates/perms/remote_app_permission_list.html:64
+#: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
+#: terminal/templates/terminal/base_storage_list.html:63
+#: terminal/templates/terminal/base_storage_list.html:70
+#: terminal/templates/terminal/terminal_detail.html:16
+#: terminal/templates/terminal/terminal_list.html:74
+#: users/templates/users/user_asset_permission.html:127
+#: users/templates/users/user_database_app_permission.html:110
+#: users/templates/users/user_detail.html:12
+#: users/templates/users/user_group_detail.html:23
+#: users/templates/users/user_group_list.html:51
+#: users/templates/users/user_list.html:84
+#: users/templates/users/user_list.html:87
+#: users/templates/users/user_profile.html:181
+#: users/templates/users/user_profile.html:191
+#: users/templates/users/user_profile.html:201
+#: users/templates/users/user_remote_app_permission.html:110
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:27
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:56
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:20
+#: xpack/plugins/cloud/templates/cloud/account_list.html:40
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:26
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:60
+#: xpack/plugins/gathered_user/templates/gathered_user/task_list.html:46
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:24
+#: xpack/plugins/orgs/templates/orgs/org_list.html:93
+msgid "Update"
+msgstr "更新"
+
+#: access_control/templates/access_control/access_control_detail.html:20
+#: access_control/templates/access_control/access_control_list.html:33
+#: applications/templates/applications/database_app_detail.html:20
+#: applications/templates/applications/database_app_list.html:54
+#: applications/templates/applications/remote_app_detail.html:20
+#: applications/templates/applications/remote_app_list.html:60
+#: assets/templates/assets/_asset_user_list.html:70
+#: assets/templates/assets/admin_user_detail.html:23
+#: assets/templates/assets/admin_user_list.html:47
+#: assets/templates/assets/asset_detail.html:28
+#: assets/templates/assets/asset_list.html:90
+#: assets/templates/assets/cmd_filter_detail.html:28
+#: assets/templates/assets/cmd_filter_list.html:57
+#: assets/templates/assets/cmd_filter_rule_list.html:82
+#: assets/templates/assets/domain_detail.html:23
+#: assets/templates/assets/domain_detail.html:95
+#: assets/templates/assets/domain_gateway_list.html:93
+#: assets/templates/assets/domain_list.html:51
+#: assets/templates/assets/label_list.html:40
+#: assets/templates/assets/platform_detail.html:20
+#: assets/templates/assets/platform_list.html:41
+#: assets/templates/assets/system_user_detail.html:34
+#: assets/templates/assets/system_user_list.html:56 audits/models.py:35
+#: authentication/templates/authentication/_access_key_modal.html:65
+#: ops/templates/ops/task_list.html:74
+#: perms/templates/perms/asset_permission_detail.html:29
+#: perms/templates/perms/asset_permission_list.html:145
+#: perms/templates/perms/database_app_permission_detail.html:29
+#: perms/templates/perms/database_app_permission_list.html:65
+#: perms/templates/perms/remote_app_permission_detail.html:29
+#: perms/templates/perms/remote_app_permission_list.html:65
+#: terminal/templates/terminal/base_storage_list.html:60
+#: terminal/templates/terminal/base_storage_list.html:67
+#: terminal/templates/terminal/terminal_list.html:76
+#: users/templates/users/user_asset_permission.html:128
+#: users/templates/users/user_database_app_permission.html:111
+#: users/templates/users/user_detail.html:16
+#: users/templates/users/user_group_detail.html:27
+#: users/templates/users/user_group_list.html:53
+#: users/templates/users/user_list.html:94
+#: users/templates/users/user_list.html:98
+#: users/templates/users/user_remote_app_permission.html:111
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:31
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:58
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:24
+#: xpack/plugins/cloud/templates/cloud/account_list.html:42
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:30
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:61
+#: xpack/plugins/gathered_user/templates/gathered_user/task_list.html:47
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:28
+#: xpack/plugins/orgs/templates/orgs/org_list.html:95
+msgid "Delete"
+msgstr "删除"
+
+#: access_control/templates/access_control/access_control_detail.html:48
+#: access_control/templates/access_control/access_control_list.html:14
+#: applications/models/database_app.py:18 applications/models/remote_app.py:21
+#: applications/templates/applications/database_app_detail.html:48
+#: applications/templates/applications/database_app_list.html:23
+#: applications/templates/applications/remote_app_detail.html:48
+#: applications/templates/applications/remote_app_list.html:25
+#: applications/templates/applications/user_database_app_list.html:16
+#: applications/templates/applications/user_remote_app_list.html:16
+#: assets/forms/asset.py:21 assets/forms/domain.py:77 assets/forms/user.py:74
+#: assets/forms/user.py:96 assets/models/asset.py:145 assets/models/base.py:232
+#: assets/models/cluster.py:18 assets/models/cmd_filter.py:21
+#: assets/models/domain.py:20 assets/models/group.py:20
+#: assets/models/label.py:18 assets/templates/assets/_node_detail_modal.html:27
+#: assets/templates/assets/admin_user_detail.html:51
+#: assets/templates/assets/admin_user_list.html:21
+#: assets/templates/assets/cmd_filter_detail.html:56
+#: assets/templates/assets/cmd_filter_list.html:22
+#: assets/templates/assets/domain_detail.html:51
+#: assets/templates/assets/domain_gateway_list.html:62
+#: assets/templates/assets/domain_list.html:21
+#: assets/templates/assets/label_list.html:14
+#: assets/templates/assets/platform_detail.html:48
+#: assets/templates/assets/platform_list.html:16
+#: assets/templates/assets/system_user_detail.html:62
+#: assets/templates/assets/system_user_list.html:24 ops/mixin.py:24
+#: ops/templates/ops/task_detail.html:58 ops/templates/ops/task_list.html:11
+#: orgs/models.py:12 perms/models/base.py:48
+#: perms/templates/perms/asset_permission_detail.html:57
+#: perms/templates/perms/asset_permission_list.html:32
+#: perms/templates/perms/asset_permission_list.html:183
+#: perms/templates/perms/asset_permission_user.html:53
+#: perms/templates/perms/database_app_permission_detail.html:57
+#: perms/templates/perms/database_app_permission_list.html:14
+#: perms/templates/perms/database_app_permission_user.html:53
+#: perms/templates/perms/remote_app_permission_detail.html:57
+#: perms/templates/perms/remote_app_permission_list.html:14
+#: perms/templates/perms/remote_app_permission_remote_app.html:49
+#: perms/templates/perms/remote_app_permission_user.html:49
+#: settings/models.py:26
+#: settings/templates/settings/_ldap_list_users_modal.html:32
+#: terminal/models.py:26 terminal/models.py:342 terminal/models.py:374
+#: terminal/models.py:411 terminal/templates/terminal/base_storage_list.html:31
+#: terminal/templates/terminal/terminal_detail.html:43
+#: terminal/templates/terminal/terminal_list.html:30 users/forms/profile.py:20
+#: users/models/group.py:15 users/models/user.py:440
+#: users/templates/users/_select_user_modal.html:13
+#: users/templates/users/user_asset_permission.html:37
+#: users/templates/users/user_asset_permission.html:154
+#: users/templates/users/user_database_app_permission.html:36
+#: users/templates/users/user_detail.html:49
+#: users/templates/users/user_granted_database_app.html:34
+#: users/templates/users/user_granted_remote_app.html:34
+#: users/templates/users/user_group_detail.html:50
+#: users/templates/users/user_group_list.html:14
+#: users/templates/users/user_list.html:14
+#: users/templates/users/user_profile.html:51
+#: users/templates/users/user_pubkey_update.html:57
+#: users/templates/users/user_remote_app_permission.html:36
+#: xpack/plugins/change_auth_plan/forms.py:57
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:59
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:12
+#: xpack/plugins/cloud/models.py:35
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:47
+#: xpack/plugins/cloud/templates/cloud/account_list.html:12
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:53
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:12
+#: xpack/plugins/gathered_user/templates/gathered_user/task_list.html:16
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:51
+#: xpack/plugins/orgs/templates/orgs/org_list.html:12
+#: xpack/plugins/orgs/templates/orgs/org_users.html:46
+msgid "Name"
+msgstr "名称"
+
+#: access_control/templates/access_control/access_control_detail.html:52
+#: applications/models/database_app.py:22
+#: applications/templates/applications/database_app_detail.html:52
+#: applications/templates/applications/database_app_list.html:24
+#: applications/templates/applications/user_database_app_list.html:17
+#: assets/models/cmd_filter.py:51
+#: assets/templates/assets/cmd_filter_rule_list.html:53
+#: audits/templates/audits/login_log_list.html:58
+#: perms/templates/perms/remote_app_permission_remote_app.html:50
+#: terminal/models.py:376 terminal/models.py:413
+#: terminal/templates/terminal/base_storage_list.html:32
+#: tickets/models/ticket.py:43 tickets/templates/tickets/ticket_detail.html:33
+#: tickets/templates/tickets/ticket_list.html:35
+#: users/templates/users/user_granted_database_app.html:35
+msgid "Type"
+msgstr "类型"
+
+#: access_control/templates/access_control/access_control_detail.html:56
+#: applications/models/database_app.py:25
+#: applications/templates/applications/database_app_detail.html:56
+#: applications/templates/applications/database_app_list.html:25
+#: applications/templates/applications/user_database_app_list.html:18
+#: ops/models/adhoc.py:146
+#: users/templates/users/user_granted_database_app.html:36
+msgid "Host"
+msgstr "主机"
+
+#: access_control/templates/access_control/access_control_detail.html:60
+#: applications/models/database_app.py:27
+#: applications/templates/applications/database_app_detail.html:60
+#: applications/templates/applications/database_app_list.html:26
+#: assets/forms/asset.py:25 assets/models/asset.py:191
+#: assets/models/domain.py:50
+#: assets/templates/assets/domain_gateway_list.html:64
+msgid "Port"
+msgstr "端口"
+
+#: access_control/templates/access_control/access_control_detail.html:64
+#: applications/models/database_app.py:29
+#: applications/templates/applications/database_app_detail.html:64
+#: applications/templates/applications/database_app_list.html:27
+#: applications/templates/applications/user_database_app_list.html:19
+#: users/templates/users/user_granted_database_app.html:37
+msgid "Database"
+msgstr "数据库"
+
+# msgid "Created by"
+# msgstr "创建者"
+#: access_control/templates/access_control/access_control_detail.html:68
+#: applications/models/remote_app.py:42
+#: applications/templates/applications/database_app_detail.html:68
+#: applications/templates/applications/remote_app_detail.html:64
+#: assets/models/asset.py:225 assets/models/base.py:238
+#: assets/models/cluster.py:26 assets/models/domain.py:23
+#: assets/models/gathered_user.py:19 assets/models/group.py:22
+#: assets/models/label.py:25 assets/templates/assets/admin_user_detail.html:59
+#: assets/templates/assets/cmd_filter_detail.html:64
+#: assets/templates/assets/domain_detail.html:63
+#: assets/templates/assets/system_user_detail.html:104
+#: common/mixins/models.py:50 ops/models/adhoc.py:38
+#: ops/templates/ops/adhoc_detail.html:88 ops/templates/ops/task_detail.html:62
+#: orgs/models.py:17 perms/models/base.py:55
+#: perms/templates/perms/asset_permission_detail.html:89
+#: perms/templates/perms/database_app_permission_detail.html:85
+#: perms/templates/perms/remote_app_permission_detail.html:81
+#: terminal/templates/terminal/terminal_detail.html:59
+#: tickets/templates/tickets/ticket_detail.html:52 users/models/group.py:18
+#: users/templates/users/user_group_detail.html:58
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:103
+#: xpack/plugins/cloud/models.py:59 xpack/plugins/cloud/models.py:148
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:63
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:108
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:59
+msgid "Date created"
+msgstr "创建日期"
+
+#: access_control/templates/access_control/access_control_detail.html:72
+#: applications/models/remote_app.py:39
+#: applications/templates/applications/database_app_detail.html:72
+#: applications/templates/applications/remote_app_detail.html:68
+#: assets/models/asset.py:224 assets/models/base.py:240
+#: assets/models/cluster.py:28 assets/models/cmd_filter.py:26
+#: assets/models/cmd_filter.py:59 assets/models/group.py:21
+#: assets/templates/assets/admin_user_detail.html:63
+#: assets/templates/assets/asset_detail.html:120
+#: assets/templates/assets/cmd_filter_detail.html:72
+#: assets/templates/assets/system_user_detail.html:108
+#: common/mixins/models.py:49 ops/templates/ops/adhoc_detail.html:84
+#: orgs/models.py:16 perms/models/base.py:54
+#: perms/templates/perms/asset_permission_detail.html:93
+#: perms/templates/perms/database_app_permission_detail.html:89
+#: perms/templates/perms/remote_app_permission_detail.html:85
+#: users/models/user.py:481 users/serializers/group.py:32
+#: users/templates/users/user_detail.html:97
+#: xpack/plugins/change_auth_plan/models.py:79
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:111
+#: xpack/plugins/cloud/models.py:56 xpack/plugins/cloud/models.py:145
+#: xpack/plugins/gathered_user/models.py:30
+msgid "Created by"
+msgstr "创建者"
+
+# msgid "Date created"
+# msgstr "创建日期"
+#: access_control/templates/access_control/access_control_detail.html:76
+#: applications/models/database_app.py:33 applications/models/remote_app.py:45
+#: applications/templates/applications/database_app_detail.html:76
+#: applications/templates/applications/database_app_list.html:28
+#: applications/templates/applications/remote_app_detail.html:72
+#: applications/templates/applications/remote_app_list.html:28
+#: applications/templates/applications/user_database_app_list.html:20
+#: applications/templates/applications/user_remote_app_list.html:19
+#: assets/models/asset.py:150 assets/models/asset.py:226
+#: assets/models/base.py:237 assets/models/cluster.py:29
+#: assets/models/cmd_filter.py:23 assets/models/cmd_filter.py:56
+#: assets/models/domain.py:21 assets/models/domain.py:53
+#: assets/models/group.py:23 assets/models/label.py:23
+#: assets/templates/assets/admin_user_detail.html:67
+#: assets/templates/assets/admin_user_list.html:24
+#: assets/templates/assets/asset_detail.html:128
+#: assets/templates/assets/cmd_filter_detail.html:60
+#: assets/templates/assets/cmd_filter_list.html:25
+#: assets/templates/assets/cmd_filter_rule_list.html:57
+#: assets/templates/assets/domain_detail.html:67
+#: assets/templates/assets/domain_gateway_list.html:67
+#: assets/templates/assets/domain_list.html:24
+#: assets/templates/assets/platform_detail.html:64
+#: assets/templates/assets/platform_list.html:18
+#: assets/templates/assets/system_user_detail.html:112
+#: assets/templates/assets/system_user_list.html:29
+#: assets/templates/assets/user_asset_list.html:81 ops/models/adhoc.py:37
+#: orgs/models.py:18 perms/models/base.py:56
+#: perms/templates/perms/asset_permission_detail.html:97
+#: perms/templates/perms/database_app_permission_detail.html:93
+#: perms/templates/perms/remote_app_permission_detail.html:89
+#: settings/models.py:31 terminal/models.py:36 terminal/models.py:381
+#: terminal/models.py:418 terminal/templates/terminal/base_storage_list.html:33
+#: terminal/templates/terminal/terminal_detail.html:63
+#: tickets/templates/tickets/ticket_detail.html:104 users/models/group.py:16
+#: users/models/user.py:473 users/templates/users/user_detail.html:115
+#: users/templates/users/user_granted_database_app.html:38
+#: users/templates/users/user_granted_remote_app.html:37
+#: users/templates/users/user_group_detail.html:62
+#: users/templates/users/user_group_list.html:16
+#: users/templates/users/user_profile.html:138
+#: xpack/plugins/change_auth_plan/models.py:75
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:115
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:19
+#: xpack/plugins/cloud/models.py:53 xpack/plugins/cloud/models.py:139
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:67
+#: xpack/plugins/cloud/templates/cloud/account_list.html:15
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:128
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:18
+#: xpack/plugins/gathered_user/models.py:26
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:63
+#: xpack/plugins/orgs/templates/orgs/org_list.html:23
+msgid "Comment"
+msgstr "备注"
+
+#: access_control/templates/access_control/access_control_list.html:7
+msgid "Create AccessControl"
+msgstr "创建访问控制"
+
+#: access_control/templates/access_control/access_control_list.html:18
+#: applications/templates/applications/database_app_list.html:29
+#: applications/templates/applications/remote_app_list.html:29
+#: applications/templates/applications/user_database_app_list.html:21
+#: applications/templates/applications/user_remote_app_list.html:20
+#: assets/models/cmd_filter.py:55
+#: assets/templates/assets/_asset_user_list.html:25
+#: assets/templates/assets/admin_user_list.html:25
+#: assets/templates/assets/asset_list.html:28
+#: assets/templates/assets/cmd_filter_list.html:26
+#: assets/templates/assets/cmd_filter_rule_list.html:58
+#: assets/templates/assets/domain_gateway_list.html:68
+#: assets/templates/assets/domain_list.html:25
+#: assets/templates/assets/label_list.html:17
+#: assets/templates/assets/platform_list.html:19
+#: assets/templates/assets/system_user_list.html:30
+#: assets/templates/assets/system_user_users.html:64 audits/models.py:39
+#: audits/templates/audits/operate_log_list.html:45
+#: audits/templates/audits/operate_log_list.html:71
+#: authentication/templates/authentication/_access_key_modal.html:34
+#: ops/templates/ops/adhoc_history.html:57 ops/templates/ops/task_adhoc.html:62
+#: ops/templates/ops/task_history.html:63 ops/templates/ops/task_list.html:17
+#: perms/forms/asset_permission.py:20
+#: perms/templates/perms/asset_permission_asset.html:54
+#: perms/templates/perms/asset_permission_create_update.html:63
+#: perms/templates/perms/asset_permission_list.html:39
+#: perms/templates/perms/asset_permission_list.html:96
+#: perms/templates/perms/asset_permission_user.html:54
+#: perms/templates/perms/database_app_permission_database_app.html:54
+#: perms/templates/perms/database_app_permission_list.html:20
+#: perms/templates/perms/database_app_permission_user.html:54
+#: perms/templates/perms/remote_app_permission_list.html:20
+#: terminal/templates/terminal/base_storage_list.html:34
+#: terminal/templates/terminal/session_list.html:34
+#: terminal/templates/terminal/terminal_list.html:37
+#: tickets/templates/tickets/ticket_list.html:108
+#: users/templates/users/_granted_assets.html:29
+#: users/templates/users/user_asset_permission.html:44
+#: users/templates/users/user_asset_permission.html:79
+#: users/templates/users/user_database_app_permission.html:42
+#: users/templates/users/user_group_list.html:17
+#: users/templates/users/user_list.html:20
+#: users/templates/users/user_remote_app_permission.html:42
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:60
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_subtask_list.html:18
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:20
+#: xpack/plugins/cloud/templates/cloud/account_list.html:16
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:52
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:19
+#: xpack/plugins/gathered_user/templates/gathered_user/task_list.html:20
+#: xpack/plugins/orgs/templates/orgs/org_list.html:24
+#: xpack/plugins/orgs/templates/orgs/org_users.html:47
+msgid "Action"
+msgstr "动作"
 
 #: applications/const.py:52
 msgid "Custom"
@@ -104,176 +654,6 @@ msgstr "目标地址"
 msgid "Operating parameter"
 msgstr "运行参数"
 
-#: applications/models/database_app.py:18 applications/models/remote_app.py:21
-#: applications/templates/applications/database_app_detail.html:48
-#: applications/templates/applications/database_app_list.html:23
-#: applications/templates/applications/remote_app_detail.html:48
-#: applications/templates/applications/remote_app_list.html:25
-#: applications/templates/applications/user_database_app_list.html:16
-#: applications/templates/applications/user_remote_app_list.html:16
-#: assets/forms/asset.py:21 assets/forms/domain.py:77 assets/forms/user.py:74
-#: assets/forms/user.py:96 assets/models/asset.py:145 assets/models/base.py:232
-#: assets/models/cluster.py:18 assets/models/cmd_filter.py:21
-#: assets/models/domain.py:20 assets/models/group.py:20
-#: assets/models/label.py:18 assets/templates/assets/_node_detail_modal.html:27
-#: assets/templates/assets/admin_user_detail.html:51
-#: assets/templates/assets/admin_user_list.html:21
-#: assets/templates/assets/cmd_filter_detail.html:56
-#: assets/templates/assets/cmd_filter_list.html:22
-#: assets/templates/assets/domain_detail.html:51
-#: assets/templates/assets/domain_gateway_list.html:62
-#: assets/templates/assets/domain_list.html:21
-#: assets/templates/assets/label_list.html:14
-#: assets/templates/assets/platform_detail.html:48
-#: assets/templates/assets/platform_list.html:16
-#: assets/templates/assets/system_user_detail.html:62
-#: assets/templates/assets/system_user_list.html:24 ops/mixin.py:24
-#: ops/templates/ops/task_detail.html:58 ops/templates/ops/task_list.html:11
-#: orgs/models.py:12 perms/models/base.py:48
-#: perms/templates/perms/asset_permission_detail.html:57
-#: perms/templates/perms/asset_permission_list.html:32
-#: perms/templates/perms/asset_permission_list.html:183
-#: perms/templates/perms/asset_permission_user.html:53
-#: perms/templates/perms/database_app_permission_detail.html:57
-#: perms/templates/perms/database_app_permission_list.html:14
-#: perms/templates/perms/database_app_permission_user.html:53
-#: perms/templates/perms/remote_app_permission_detail.html:57
-#: perms/templates/perms/remote_app_permission_list.html:14
-#: perms/templates/perms/remote_app_permission_remote_app.html:49
-#: perms/templates/perms/remote_app_permission_user.html:49
-#: settings/models.py:26
-#: settings/templates/settings/_ldap_list_users_modal.html:32
-#: terminal/models.py:26 terminal/models.py:342 terminal/models.py:374
-#: terminal/models.py:411 terminal/templates/terminal/base_storage_list.html:31
-#: terminal/templates/terminal/terminal_detail.html:43
-#: terminal/templates/terminal/terminal_list.html:30 users/forms/profile.py:20
-#: users/models/group.py:15 users/models/user.py:440
-#: users/templates/users/_select_user_modal.html:13
-#: users/templates/users/user_asset_permission.html:37
-#: users/templates/users/user_asset_permission.html:154
-#: users/templates/users/user_database_app_permission.html:36
-#: users/templates/users/user_detail.html:49
-#: users/templates/users/user_granted_database_app.html:34
-#: users/templates/users/user_granted_remote_app.html:34
-#: users/templates/users/user_group_detail.html:50
-#: users/templates/users/user_group_list.html:14
-#: users/templates/users/user_list.html:14
-#: users/templates/users/user_profile.html:51
-#: users/templates/users/user_pubkey_update.html:57
-#: users/templates/users/user_remote_app_permission.html:36
-#: xpack/plugins/change_auth_plan/forms.py:57
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:59
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:12
-#: xpack/plugins/cloud/models.py:35
-#: xpack/plugins/cloud/templates/cloud/account_detail.html:47
-#: xpack/plugins/cloud/templates/cloud/account_list.html:12
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:53
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:12
-#: xpack/plugins/gathered_user/templates/gathered_user/task_list.html:16
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:51
-#: xpack/plugins/orgs/templates/orgs/org_list.html:12
-#: xpack/plugins/orgs/templates/orgs/org_users.html:46
-msgid "Name"
-msgstr "名称"
-
-#: applications/models/database_app.py:22
-#: applications/templates/applications/database_app_detail.html:52
-#: applications/templates/applications/database_app_list.html:24
-#: applications/templates/applications/user_database_app_list.html:17
-#: assets/models/cmd_filter.py:51
-#: assets/templates/assets/cmd_filter_rule_list.html:53
-#: audits/templates/audits/login_log_list.html:58
-#: perms/templates/perms/remote_app_permission_remote_app.html:50
-#: terminal/models.py:376 terminal/models.py:413
-#: terminal/templates/terminal/base_storage_list.html:32
-#: tickets/models/ticket.py:43 tickets/templates/tickets/ticket_detail.html:33
-#: tickets/templates/tickets/ticket_list.html:35
-#: users/templates/users/user_granted_database_app.html:35
-msgid "Type"
-msgstr "类型"
-
-#: applications/models/database_app.py:25
-#: applications/templates/applications/database_app_detail.html:56
-#: applications/templates/applications/database_app_list.html:25
-#: applications/templates/applications/user_database_app_list.html:18
-#: ops/models/adhoc.py:146
-#: users/templates/users/user_granted_database_app.html:36
-msgid "Host"
-msgstr "主机"
-
-#: applications/models/database_app.py:27
-#: applications/templates/applications/database_app_detail.html:60
-#: applications/templates/applications/database_app_list.html:26
-#: assets/forms/asset.py:25 assets/models/asset.py:191
-#: assets/models/domain.py:50
-#: assets/templates/assets/domain_gateway_list.html:64
-msgid "Port"
-msgstr "端口"
-
-#: applications/models/database_app.py:29
-#: applications/templates/applications/database_app_detail.html:64
-#: applications/templates/applications/database_app_list.html:27
-#: applications/templates/applications/user_database_app_list.html:19
-#: users/templates/users/user_granted_database_app.html:37
-msgid "Database"
-msgstr "数据库"
-
-# msgid "Date created"
-# msgstr "创建日期"
-#: applications/models/database_app.py:33 applications/models/remote_app.py:45
-#: applications/templates/applications/database_app_detail.html:76
-#: applications/templates/applications/database_app_list.html:28
-#: applications/templates/applications/remote_app_detail.html:72
-#: applications/templates/applications/remote_app_list.html:28
-#: applications/templates/applications/user_database_app_list.html:20
-#: applications/templates/applications/user_remote_app_list.html:19
-#: assets/models/asset.py:150 assets/models/asset.py:226
-#: assets/models/base.py:237 assets/models/cluster.py:29
-#: assets/models/cmd_filter.py:23 assets/models/cmd_filter.py:56
-#: assets/models/domain.py:21 assets/models/domain.py:53
-#: assets/models/group.py:23 assets/models/label.py:23
-#: assets/templates/assets/admin_user_detail.html:67
-#: assets/templates/assets/admin_user_list.html:24
-#: assets/templates/assets/asset_detail.html:128
-#: assets/templates/assets/cmd_filter_detail.html:60
-#: assets/templates/assets/cmd_filter_list.html:25
-#: assets/templates/assets/cmd_filter_rule_list.html:57
-#: assets/templates/assets/domain_detail.html:67
-#: assets/templates/assets/domain_gateway_list.html:67
-#: assets/templates/assets/domain_list.html:24
-#: assets/templates/assets/platform_detail.html:64
-#: assets/templates/assets/platform_list.html:18
-#: assets/templates/assets/system_user_detail.html:112
-#: assets/templates/assets/system_user_list.html:29
-#: assets/templates/assets/user_asset_list.html:81 ops/models/adhoc.py:37
-#: orgs/models.py:18 perms/models/base.py:56
-#: perms/templates/perms/asset_permission_detail.html:97
-#: perms/templates/perms/database_app_permission_detail.html:93
-#: perms/templates/perms/remote_app_permission_detail.html:89
-#: settings/models.py:31 terminal/models.py:36 terminal/models.py:381
-#: terminal/models.py:418 terminal/templates/terminal/base_storage_list.html:33
-#: terminal/templates/terminal/terminal_detail.html:63
-#: tickets/templates/tickets/ticket_detail.html:104 users/models/group.py:16
-#: users/models/user.py:473 users/templates/users/user_detail.html:115
-#: users/templates/users/user_granted_database_app.html:38
-#: users/templates/users/user_granted_remote_app.html:37
-#: users/templates/users/user_group_detail.html:62
-#: users/templates/users/user_group_list.html:16
-#: users/templates/users/user_profile.html:138
-#: xpack/plugins/change_auth_plan/models.py:75
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:115
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:19
-#: xpack/plugins/cloud/models.py:53 xpack/plugins/cloud/models.py:139
-#: xpack/plugins/cloud/templates/cloud/account_detail.html:67
-#: xpack/plugins/cloud/templates/cloud/account_list.html:15
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:128
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:18
-#: xpack/plugins/gathered_user/models.py:26
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:63
-#: xpack/plugins/orgs/templates/orgs/org_list.html:23
-msgid "Comment"
-msgstr "备注"
-
 #: applications/models/database_app.py:41
 #: perms/forms/database_app_permission.py:44
 #: perms/models/database_app_permission.py:17
@@ -307,59 +687,6 @@ msgstr "应用路径"
 msgid "Parameters"
 msgstr "参数"
 
-#: applications/models/remote_app.py:39
-#: applications/templates/applications/database_app_detail.html:72
-#: applications/templates/applications/remote_app_detail.html:68
-#: assets/models/asset.py:224 assets/models/base.py:240
-#: assets/models/cluster.py:28 assets/models/cmd_filter.py:26
-#: assets/models/cmd_filter.py:59 assets/models/group.py:21
-#: assets/templates/assets/admin_user_detail.html:63
-#: assets/templates/assets/asset_detail.html:120
-#: assets/templates/assets/cmd_filter_detail.html:72
-#: assets/templates/assets/system_user_detail.html:108
-#: common/mixins/models.py:49 ops/templates/ops/adhoc_detail.html:84
-#: orgs/models.py:16 perms/models/base.py:54
-#: perms/templates/perms/asset_permission_detail.html:93
-#: perms/templates/perms/database_app_permission_detail.html:89
-#: perms/templates/perms/remote_app_permission_detail.html:85
-#: users/models/user.py:481 users/serializers/group.py:32
-#: users/templates/users/user_detail.html:97
-#: xpack/plugins/change_auth_plan/models.py:79
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:111
-#: xpack/plugins/cloud/models.py:56 xpack/plugins/cloud/models.py:145
-#: xpack/plugins/gathered_user/models.py:30
-msgid "Created by"
-msgstr "创建者"
-
-# msgid "Created by"
-# msgstr "创建者"
-#: applications/models/remote_app.py:42
-#: applications/templates/applications/database_app_detail.html:68
-#: applications/templates/applications/remote_app_detail.html:64
-#: assets/models/asset.py:225 assets/models/base.py:238
-#: assets/models/cluster.py:26 assets/models/domain.py:23
-#: assets/models/gathered_user.py:19 assets/models/group.py:22
-#: assets/models/label.py:25 assets/templates/assets/admin_user_detail.html:59
-#: assets/templates/assets/cmd_filter_detail.html:64
-#: assets/templates/assets/domain_detail.html:63
-#: assets/templates/assets/system_user_detail.html:104
-#: common/mixins/models.py:50 ops/models/adhoc.py:38
-#: ops/templates/ops/adhoc_detail.html:88 ops/templates/ops/task_detail.html:62
-#: orgs/models.py:17 perms/models/base.py:55
-#: perms/templates/perms/asset_permission_detail.html:89
-#: perms/templates/perms/database_app_permission_detail.html:85
-#: perms/templates/perms/remote_app_permission_detail.html:81
-#: terminal/templates/terminal/terminal_detail.html:59
-#: tickets/templates/tickets/ticket_detail.html:52 users/models/group.py:18
-#: users/templates/users/user_group_detail.html:58
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:103
-#: xpack/plugins/cloud/models.py:59 xpack/plugins/cloud/models.py:148
-#: xpack/plugins/cloud/templates/cloud/account_detail.html:63
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:108
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:59
-msgid "Date created"
-msgstr "创建日期"
-
 #: applications/models/remote_app.py:49 perms/forms/remote_app_permission.py:46
 #: perms/models/remote_app_permission.py:15
 #: perms/templates/perms/remote_app_permission_create_update.html:46
@@ -374,286 +701,10 @@ msgstr "创建日期"
 msgid "RemoteApp"
 msgstr "远程应用"
 
-#: applications/templates/applications/database_app_create_update.html:12
-#: applications/templates/applications/remote_app_create_update.html:12
-#: assets/templates/assets/_system_user.html:73
-#: assets/templates/assets/admin_user_create_update.html:41
-#: assets/templates/assets/asset_bulk_update.html:23
-#: assets/templates/assets/asset_create.html:81
-#: assets/templates/assets/cmd_filter_create_update.html:15
-#: assets/templates/assets/cmd_filter_rule_create_update.html:36
-#: assets/templates/assets/domain_create_update.html:16
-#: assets/templates/assets/gateway_create_update.html:54
-#: assets/templates/assets/label_create_update.html:18
-#: assets/templates/assets/platform_create_update.html:20
-#: perms/templates/perms/asset_permission_create_update.html:127
-#: perms/templates/perms/database_app_permission_create_update.html:82
-#: perms/templates/perms/remote_app_permission_create_update.html:82
-#: settings/templates/settings/basic_setting.html:45
-#: settings/templates/settings/email_content_setting.html:35
-#: settings/templates/settings/email_setting.html:46
-#: settings/templates/settings/ldap_setting.html:45
-#: settings/templates/settings/security_setting.html:54
-#: settings/templates/settings/terminal_setting.html:53
-#: terminal/templates/terminal/base_storage_create_update.html:12
-#: terminal/templates/terminal/terminal_update.html:43
-#: users/templates/users/_user.html:51
-#: users/templates/users/user_bulk_update.html:23
-#: users/templates/users/user_detail.html:168
-#: users/templates/users/user_group_create_update.html:27
-#: users/templates/users/user_password_update.html:75
-#: users/templates/users/user_profile.html:209
-#: users/templates/users/user_profile_update.html:67
-#: users/templates/users/user_pubkey_update.html:74
-#: users/templates/users/user_pubkey_update.html:80
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:65
-#: xpack/plugins/cloud/templates/cloud/account_create_update.html:29
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:52
-#: xpack/plugins/gathered_user/templates/gathered_user/task_create_update.html:40
-#: xpack/plugins/interface/templates/interface/interface.html:72
-#: xpack/plugins/orgs/templates/orgs/org_create_update.html:29
-#: xpack/plugins/vault/templates/vault/vault_create.html:41
-msgid "Reset"
-msgstr "重置"
-
-#: applications/templates/applications/database_app_create_update.html:13
-#: applications/templates/applications/remote_app_create_update.html:14
-#: assets/templates/assets/_system_user.html:74
-#: assets/templates/assets/admin_user_create_update.html:42
-#: assets/templates/assets/asset_bulk_update.html:24
-#: assets/templates/assets/asset_create.html:82
-#: assets/templates/assets/asset_list.html:45
-#: assets/templates/assets/cmd_filter_create_update.html:16
-#: assets/templates/assets/cmd_filter_rule_create_update.html:37
-#: assets/templates/assets/domain_create_update.html:17
-#: assets/templates/assets/gateway_create_update.html:55
-#: assets/templates/assets/label_create_update.html:19
-#: assets/templates/assets/platform_create_update.html:21
-#: audits/templates/audits/login_log_list.html:95
-#: perms/templates/perms/asset_permission_create_update.html:128
-#: perms/templates/perms/database_app_permission_create_update.html:83
-#: perms/templates/perms/remote_app_permission_create_update.html:83
-#: settings/templates/settings/basic_setting.html:46
-#: settings/templates/settings/email_content_setting.html:36
-#: settings/templates/settings/email_setting.html:47
-#: settings/templates/settings/ldap_setting.html:49
-#: settings/templates/settings/security_setting.html:55
-#: settings/templates/settings/terminal_setting.html:55
-#: terminal/templates/terminal/base_storage_create_update.html:13
-#: terminal/templates/terminal/command_list.html:48
-#: terminal/templates/terminal/session_list.html:50
-#: terminal/templates/terminal/terminal_update.html:44
-#: users/templates/users/_user.html:52
-#: users/templates/users/forgot_password.html:24
-#: users/templates/users/user_bulk_update.html:24
-#: users/templates/users/user_list.html:40
-#: users/templates/users/user_password_update.html:76
-#: users/templates/users/user_profile_update.html:68
-#: users/templates/users/user_pubkey_update.html:81
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:66
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:67
-#: xpack/plugins/interface/templates/interface/interface.html:74
-#: xpack/plugins/vault/templates/vault/vault_create.html:42
-msgid "Submit"
-msgstr "提交"
-
-#: applications/templates/applications/database_app_detail.html:13
-#: applications/templates/applications/remote_app_detail.html:13
-#: assets/templates/assets/admin_user_assets.html:13
-#: assets/templates/assets/admin_user_detail.html:13
-#: assets/templates/assets/cmd_filter_detail.html:14
-#: assets/templates/assets/cmd_filter_rule_list.html:14
-#: assets/templates/assets/domain_detail.html:13
-#: assets/templates/assets/domain_gateway_list.html:15
-#: assets/templates/assets/platform_detail.html:13
-#: assets/templates/assets/system_user_assets.html:22
-#: assets/templates/assets/system_user_detail.html:13
-#: assets/templates/assets/system_user_users.html:21
-#: ops/templates/ops/adhoc_history.html:128
-#: ops/templates/ops/task_adhoc.html:114
-#: ops/templates/ops/task_history.html:135
-#: perms/templates/perms/asset_permission_asset.html:14
-#: perms/templates/perms/asset_permission_detail.html:13
-#: perms/templates/perms/asset_permission_user.html:14
-#: perms/templates/perms/database_app_permission_database_app.html:14
-#: perms/templates/perms/database_app_permission_detail.html:13
-#: perms/templates/perms/database_app_permission_user.html:14
-#: perms/templates/perms/remote_app_permission_detail.html:13
-#: perms/templates/perms/remote_app_permission_remote_app.html:13
-#: perms/templates/perms/remote_app_permission_user.html:13
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:13
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:18
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:17
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:106
-#: xpack/plugins/change_auth_plan/views.py:91
-msgid "Detail"
-msgstr "详情"
-
-#: applications/templates/applications/database_app_detail.html:16
-#: applications/templates/applications/database_app_list.html:53
-#: applications/templates/applications/remote_app_detail.html:16
-#: applications/templates/applications/remote_app_list.html:59
-#: assets/templates/assets/_asset_user_list.html:67
-#: assets/templates/assets/admin_user_detail.html:19
-#: assets/templates/assets/admin_user_list.html:46
-#: assets/templates/assets/asset_detail.html:24
-#: assets/templates/assets/asset_list.html:89
-#: assets/templates/assets/cmd_filter_detail.html:24
-#: assets/templates/assets/cmd_filter_list.html:56
-#: assets/templates/assets/cmd_filter_rule_list.html:81
-#: assets/templates/assets/domain_detail.html:19
-#: assets/templates/assets/domain_detail.html:94
-#: assets/templates/assets/domain_gateway_list.html:92
-#: assets/templates/assets/domain_list.html:50
-#: assets/templates/assets/label_list.html:39
-#: assets/templates/assets/platform_detail.html:16
-#: assets/templates/assets/platform_list.html:40
-#: assets/templates/assets/system_user_detail.html:30
-#: assets/templates/assets/system_user_list.html:55 audits/models.py:34
-#: perms/templates/perms/asset_permission_detail.html:25
-#: perms/templates/perms/asset_permission_list.html:144
-#: perms/templates/perms/database_app_permission_detail.html:25
-#: perms/templates/perms/database_app_permission_list.html:64
-#: perms/templates/perms/remote_app_permission_detail.html:25
-#: perms/templates/perms/remote_app_permission_list.html:64
-#: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
-#: terminal/templates/terminal/base_storage_list.html:63
-#: terminal/templates/terminal/base_storage_list.html:70
-#: terminal/templates/terminal/terminal_detail.html:16
-#: terminal/templates/terminal/terminal_list.html:74
-#: users/templates/users/user_asset_permission.html:127
-#: users/templates/users/user_database_app_permission.html:110
-#: users/templates/users/user_detail.html:12
-#: users/templates/users/user_group_detail.html:23
-#: users/templates/users/user_group_list.html:51
-#: users/templates/users/user_list.html:84
-#: users/templates/users/user_list.html:87
-#: users/templates/users/user_profile.html:181
-#: users/templates/users/user_profile.html:191
-#: users/templates/users/user_profile.html:201
-#: users/templates/users/user_remote_app_permission.html:110
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:27
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:56
-#: xpack/plugins/cloud/templates/cloud/account_detail.html:20
-#: xpack/plugins/cloud/templates/cloud/account_list.html:40
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:26
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:60
-#: xpack/plugins/gathered_user/templates/gathered_user/task_list.html:46
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:24
-#: xpack/plugins/orgs/templates/orgs/org_list.html:93
-msgid "Update"
-msgstr "更新"
-
-#: applications/templates/applications/database_app_detail.html:20
-#: applications/templates/applications/database_app_list.html:54
-#: applications/templates/applications/remote_app_detail.html:20
-#: applications/templates/applications/remote_app_list.html:60
-#: assets/templates/assets/_asset_user_list.html:70
-#: assets/templates/assets/admin_user_detail.html:23
-#: assets/templates/assets/admin_user_list.html:47
-#: assets/templates/assets/asset_detail.html:28
-#: assets/templates/assets/asset_list.html:90
-#: assets/templates/assets/cmd_filter_detail.html:28
-#: assets/templates/assets/cmd_filter_list.html:57
-#: assets/templates/assets/cmd_filter_rule_list.html:82
-#: assets/templates/assets/domain_detail.html:23
-#: assets/templates/assets/domain_detail.html:95
-#: assets/templates/assets/domain_gateway_list.html:93
-#: assets/templates/assets/domain_list.html:51
-#: assets/templates/assets/label_list.html:40
-#: assets/templates/assets/platform_detail.html:20
-#: assets/templates/assets/platform_list.html:41
-#: assets/templates/assets/system_user_detail.html:34
-#: assets/templates/assets/system_user_list.html:56 audits/models.py:35
-#: authentication/templates/authentication/_access_key_modal.html:65
-#: ops/templates/ops/task_list.html:74
-#: perms/templates/perms/asset_permission_detail.html:29
-#: perms/templates/perms/asset_permission_list.html:145
-#: perms/templates/perms/database_app_permission_detail.html:29
-#: perms/templates/perms/database_app_permission_list.html:65
-#: perms/templates/perms/remote_app_permission_detail.html:29
-#: perms/templates/perms/remote_app_permission_list.html:65
-#: terminal/templates/terminal/base_storage_list.html:60
-#: terminal/templates/terminal/base_storage_list.html:67
-#: terminal/templates/terminal/terminal_list.html:76
-#: users/templates/users/user_asset_permission.html:128
-#: users/templates/users/user_database_app_permission.html:111
-#: users/templates/users/user_detail.html:16
-#: users/templates/users/user_group_detail.html:27
-#: users/templates/users/user_group_list.html:53
-#: users/templates/users/user_list.html:94
-#: users/templates/users/user_list.html:98
-#: users/templates/users/user_remote_app_permission.html:111
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:31
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:58
-#: xpack/plugins/cloud/templates/cloud/account_detail.html:24
-#: xpack/plugins/cloud/templates/cloud/account_list.html:42
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:30
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:61
-#: xpack/plugins/gathered_user/templates/gathered_user/task_list.html:47
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:28
-#: xpack/plugins/orgs/templates/orgs/org_list.html:95
-msgid "Delete"
-msgstr "删除"
-
 #: applications/templates/applications/database_app_list.html:9
 #: applications/views/database_app.py:69 applications/views/database_app.py:84
 msgid "Create DatabaseApp"
 msgstr "创建数据库应用"
-
-#: applications/templates/applications/database_app_list.html:29
-#: applications/templates/applications/remote_app_list.html:29
-#: applications/templates/applications/user_database_app_list.html:21
-#: applications/templates/applications/user_remote_app_list.html:20
-#: assets/models/cmd_filter.py:55
-#: assets/templates/assets/_asset_user_list.html:25
-#: assets/templates/assets/admin_user_list.html:25
-#: assets/templates/assets/asset_list.html:28
-#: assets/templates/assets/cmd_filter_list.html:26
-#: assets/templates/assets/cmd_filter_rule_list.html:58
-#: assets/templates/assets/domain_gateway_list.html:68
-#: assets/templates/assets/domain_list.html:25
-#: assets/templates/assets/label_list.html:17
-#: assets/templates/assets/platform_list.html:19
-#: assets/templates/assets/system_user_list.html:30
-#: assets/templates/assets/system_user_users.html:64 audits/models.py:39
-#: audits/templates/audits/operate_log_list.html:45
-#: audits/templates/audits/operate_log_list.html:71
-#: authentication/templates/authentication/_access_key_modal.html:34
-#: ops/templates/ops/adhoc_history.html:57 ops/templates/ops/task_adhoc.html:62
-#: ops/templates/ops/task_history.html:63 ops/templates/ops/task_list.html:17
-#: perms/forms/asset_permission.py:20
-#: perms/templates/perms/asset_permission_asset.html:54
-#: perms/templates/perms/asset_permission_create_update.html:63
-#: perms/templates/perms/asset_permission_list.html:39
-#: perms/templates/perms/asset_permission_list.html:96
-#: perms/templates/perms/asset_permission_user.html:54
-#: perms/templates/perms/database_app_permission_database_app.html:54
-#: perms/templates/perms/database_app_permission_list.html:20
-#: perms/templates/perms/database_app_permission_user.html:54
-#: perms/templates/perms/remote_app_permission_list.html:20
-#: terminal/templates/terminal/base_storage_list.html:34
-#: terminal/templates/terminal/session_list.html:34
-#: terminal/templates/terminal/terminal_list.html:37
-#: tickets/templates/tickets/ticket_list.html:108
-#: users/templates/users/_granted_assets.html:29
-#: users/templates/users/user_asset_permission.html:44
-#: users/templates/users/user_asset_permission.html:79
-#: users/templates/users/user_database_app_permission.html:42
-#: users/templates/users/user_group_list.html:17
-#: users/templates/users/user_list.html:20
-#: users/templates/users/user_remote_app_permission.html:42
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:60
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_subtask_list.html:18
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:20
-#: xpack/plugins/cloud/templates/cloud/account_list.html:16
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:52
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:19
-#: xpack/plugins/gathered_user/templates/gathered_user/task_list.html:20
-#: xpack/plugins/orgs/templates/orgs/org_list.html:24
-#: xpack/plugins/orgs/templates/orgs/org_users.html:47
-msgid "Action"
-msgstr "动作"
 
 #: applications/templates/applications/remote_app_list.html:4
 msgid ""
@@ -1200,7 +1251,7 @@ msgid "Default"
 msgstr "默认"
 
 #: assets/models/cluster.py:36 assets/models/label.py:14
-#: users/models/user.py:600
+#: users/models/user.py:604
 msgid "System"
 msgstr "系统"
 
@@ -1333,7 +1384,7 @@ msgstr "默认资产组"
 #: tickets/models/ticket.py:128 tickets/templates/tickets/ticket_detail.html:32
 #: tickets/templates/tickets/ticket_list.html:34
 #: tickets/templates/tickets/ticket_list.html:103 users/forms/group.py:15
-#: users/models/user.py:143 users/models/user.py:159 users/models/user.py:588
+#: users/models/user.py:143 users/models/user.py:159 users/models/user.py:592
 #: users/serializers/group.py:20
 #: users/templates/users/user_asset_permission.html:38
 #: users/templates/users/user_asset_permission.html:64
@@ -1408,17 +1459,6 @@ msgstr "手动登录"
 #: templates/_nav.html:39 xpack/plugins/change_auth_plan/models.py:50
 msgid "Assets"
 msgstr "资产管理"
-
-#: assets/models/user.py:111 assets/templates/assets/system_user_users.html:76
-#: templates/_nav.html:17 users/views/group.py:28 users/views/group.py:45
-#: users/views/group.py:63 users/views/group.py:82 users/views/group.py:99
-#: users/views/login.py:163 users/views/profile/password.py:40
-#: users/views/profile/pubkey.py:36 users/views/user.py:50
-#: users/views/user.py:67 users/views/user.py:111 users/views/user.py:178
-#: users/views/user.py:206 users/views/user.py:220 users/views/user.py:234
-#: users/views/user.py:248 users/views/user.py:262 users/views/user.py:276
-msgid "Users"
-msgstr "用户管理"
 
 #: assets/models/user.py:112 users/templates/users/user_group_list.html:90
 #: users/templates/users/user_list.html:135
@@ -2721,39 +2761,43 @@ msgstr ""
 msgid "Invalid token or cache refreshed."
 msgstr ""
 
-#: authentication/errors.py:21
+#: authentication/errors.py:22
 msgid "Username/password check failed"
 msgstr "用户名/密码 校验失败"
 
-#: authentication/errors.py:22
+#: authentication/errors.py:23
 msgid "MFA failed"
 msgstr "多因子认证失败"
 
-#: authentication/errors.py:23
+#: authentication/errors.py:24
 msgid "MFA unset"
 msgstr "多因子认证没有设定"
 
-#: authentication/errors.py:24
+#: authentication/errors.py:25
 msgid "Username does not exist"
 msgstr "用户名不存在"
 
-#: authentication/errors.py:25
+#: authentication/errors.py:26
 msgid "Password expired"
 msgstr "密码已过期"
 
-#: authentication/errors.py:26
+#: authentication/errors.py:27
 msgid "Disabled or expired"
 msgstr "禁用或失效"
 
-#: authentication/errors.py:27
+#: authentication/errors.py:28
 msgid "This account is inactive."
 msgstr "此账户已禁用"
 
-#: authentication/errors.py:37
+#: authentication/errors.py:29
+msgid "Access control denied."
+msgstr "访问控制拒绝了您的登录"
+
+#: authentication/errors.py:39
 msgid "No session found, check your cookie"
 msgstr "会话已变更，刷新页面"
 
-#: authentication/errors.py:39
+#: authentication/errors.py:41
 #, python-brace-format
 msgid ""
 "The username or password you entered is incorrect, please enter it again. "
@@ -2763,34 +2807,34 @@ msgstr ""
 "您输入的用户名或密码不正确，请重新输入。 您还可以尝试 {times_try} 次（账号将"
 "被临时 锁定 {block_time} 分钟）"
 
-#: authentication/errors.py:45
+#: authentication/errors.py:47
 msgid ""
 "The account has been locked (please contact admin to unlock it or try again "
 "after {} minutes)"
 msgstr "账号已被锁定（请联系管理员解锁 或 {}分钟后重试）"
 
-#: authentication/errors.py:48 users/views/profile/otp.py:63
+#: authentication/errors.py:50 users/views/profile/otp.py:63
 #: users/views/profile/otp.py:102 users/views/profile/otp.py:121
 msgid "MFA code invalid, or ntp sync server time"
 msgstr "MFA验证码不正确，或者服务器端时间不对"
 
-#: authentication/errors.py:50
+#: authentication/errors.py:52
 msgid "MFA required"
 msgstr "需要多因子认证"
 
-#: authentication/errors.py:51
+#: authentication/errors.py:53
 msgid "MFA not set, please set it first"
 msgstr "多因子认证没有设置，请先完成设置"
 
-#: authentication/errors.py:52
+#: authentication/errors.py:54
 msgid "Login confirm required"
 msgstr "需要登录复核"
 
-#: authentication/errors.py:53
+#: authentication/errors.py:55
 msgid "Wait login confirm ticket for accept"
 msgstr "等待登录复核处理"
 
-#: authentication/errors.py:54
+#: authentication/errors.py:56
 msgid "Login confirm ticket was {}"
 msgstr "登录复核 {}"
 
@@ -4354,7 +4398,7 @@ msgstr "认证成功: {}"
 
 #: settings/views.py:19 settings/views.py:46 settings/views.py:73
 #: settings/views.py:105 settings/views.py:134 settings/views.py:161
-#: templates/_nav.html:187
+#: templates/_nav.html:196
 msgid "Settings"
 msgstr "系统设置"
 
@@ -4605,6 +4649,11 @@ msgstr "账户列表"
 #: templates/_nav.html:172
 msgid "Sync instance"
 msgstr "同步实例"
+
+#: templates/_nav.html:187
+#| msgid "Access control denied."
+msgid "Access control"
+msgstr "访问控制"
 
 #: templates/_nav_user.html:10
 msgid "My Applications"
@@ -5434,7 +5483,7 @@ msgstr "设置密码"
 msgid "Password strategy"
 msgstr "密码策略"
 
-#: users/models/user.py:142 users/models/user.py:596
+#: users/models/user.py:142 users/models/user.py:600
 msgid "Administrator"
 msgstr "管理员"
 
@@ -5472,7 +5521,7 @@ msgstr "微信"
 msgid "Date password last updated"
 msgstr "最后更新密码日期"
 
-#: users/models/user.py:599
+#: users/models/user.py:603
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 

@@ -180,6 +180,15 @@
     </li>
 {% endif %}
 
+{# Access control #}
+{% if request.user.can_admin_current_org %}
+    <li id="access_control">
+        <a href="{% url 'access-controls:access-control-list' %}">
+            <i class="fa fa-gears"></i> <span class="nav-label">{% trans 'Access control' %}</span><span class="label label-info pull-right"></span>
+        </a>
+    </li>
+{% endif %}
+
 {# Settings #}
 {% if request.user.is_superuser %}
     <li id="settings">

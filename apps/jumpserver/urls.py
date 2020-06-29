@@ -23,6 +23,7 @@ api_v1 = [
     path('common/', include('common.urls.api_urls', namespace='api-common')),
     path('applications/', include('applications.urls.api_urls', namespace='api-applications')),
     path('tickets/', include('tickets.urls.api_urls', namespace='api-tickets')),
+    path('access-controls/', include('access_control.api_urls', namespace='api-access-control'))
 ]
 
 api_v2 = [
@@ -42,6 +43,7 @@ app_view_patterns = [
     path('auth/', include('authentication.urls.view_urls'), name='auth'),
     path('applications/', include('applications.urls.views_urls', namespace='applications')),
     path('tickets/', include('tickets.urls.views_urls', namespace='tickets')),
+    path('access-control/', include('access_control.view_urls', namespace='access-controls')),
     re_path(r'flower/(?P<path>.*)', views.celery_flower_view, name='flower-view'),
 ]
 

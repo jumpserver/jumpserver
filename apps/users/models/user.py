@@ -497,6 +497,10 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     def get_absolute_url(self):
         return reverse('users:user-detail', args=(self.id,))
 
+    @lazyproperty
+    def cached_login_policies(self):
+        return self.login_policies.all()
+
     @property
     def groups_display(self):
         return ' '.join([group.name for group in self.groups.all()])

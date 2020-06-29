@@ -10,3 +10,8 @@ class HttpResponseTemporaryRedirect(HttpResponse):
     def __init__(self, redirect_to):
         HttpResponse.__init__(self)
         self['Location'] = iri_to_uri(redirect_to)
+
+
+def get_remote_ip(request):
+    meta = request.META
+    return meta.get('HTTP_X_FORWARDED_FOR', meta.get('REMOTE_ADDR', ''))

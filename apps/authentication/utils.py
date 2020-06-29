@@ -2,6 +2,7 @@
 #
 from django.contrib.auth import authenticate
 
+from access_control.utils import check_user_policies
 from . import errors
 
 
@@ -21,5 +22,6 @@ def check_user_valid(**kwargs):
         return None, errors.reason_user_inactive
     elif user.password_has_expired:
         return None, errors.reason_password_expired
-
+    elif not check_user_policies(user, request):
+        return None, errors.reason_access_control_denied
     return user, ''

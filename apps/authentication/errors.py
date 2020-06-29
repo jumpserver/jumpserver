@@ -16,6 +16,7 @@ reason_user_not_exist = 'user_not_exist'
 reason_password_expired = 'password_expired'
 reason_user_invalid = 'user_invalid'
 reason_user_inactive = 'user_inactive'
+reason_access_control_denied = 'access_control_denied'
 
 reason_choices = {
     reason_password_failed: _('Username/password check failed'),
@@ -24,7 +25,8 @@ reason_choices = {
     reason_user_not_exist: _("Username does not exist"),
     reason_password_expired: _("Password expired"),
     reason_user_invalid: _('Disabled or expired'),
-    reason_user_inactive: _("This account is inactive.")
+    reason_user_inactive: _("This account is inactive."),
+    reason_access_control_denied: _('Access control denied.')
 }
 old_reason_choices = {
     '0': '-',
