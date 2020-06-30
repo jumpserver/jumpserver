@@ -24,6 +24,14 @@ def gen_key_pair():
     return rsa_private_key, rsa_public_key
 
 
+def rsa_encrypt(message, rsa_public_key):
+    """ 加密登录密码 """
+    key = RSA.importKey(rsa_public_key)
+    cipher = PKCS1_v1_5.new(key)
+    cipher_text = base64.b64encode(cipher.encrypt(message.encode())).decode()
+    return cipher_text
+
+
 def rsa_decrypt(cipher_text, rsa_private_key=None):
     """ 解密登录密码 """
     if rsa_private_key is None:
