@@ -129,13 +129,16 @@
 </body>
 <script type="text/javascript" src="/static/js/plugins/jsencrypt/jsencrypt.min.js"></script>
 <script>
+    function encryptLoginPassword(password, rsaPublicKey){
+        var jsencrypt = new JSEncrypt(); //加密对象
+        jsencrypt.setPublicKey(rsaPublicKey); // 设置密钥
+        return jsencrypt.encrypt(password); //加密
+    }
     function doLogin() {
         //公钥加密
         var rsaPublicKey = "{{ rsa_public_key }}"
         var password =$('#password').val(); //明文密码
-        var jsencrypt = new JSEncrypt(); //加密对象
-        jsencrypt.setPublicKey(rsaPublicKey); // 设置密钥
-        var passwordEncrypted = jsencrypt.encrypt(password); //加密
+        var passwordEncrypted = encryptLoginPassword(password, rsaPublicKey)
         $('#password').val(passwordEncrypted); //返回给密码输入input
         $('#contact-form').submit();//post提交
     }
