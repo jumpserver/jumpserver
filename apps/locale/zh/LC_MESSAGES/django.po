@@ -3755,7 +3755,7 @@ msgstr "腾讯云"
 
 #: xpack/plugins/cloud/serializers.py:53
 msgid "History count"
-msgstr "用户数量"
+msgstr "执行次数"
 
 #: xpack/plugins/cloud/serializers.py:54
 msgid "Instance count"
