@@ -48,6 +48,7 @@ def check_user_valid(**kwargs):
             password = rsa_decrypt(password, rsa_private_key)
         except Exception as e:
             logger.error(e, exc_info=True)
+            logger.error('Need decrypt password => {}'.format(password))
             return None, errors.reason_password_decrypt_failed
 
     user = authenticate(request, username=username,
