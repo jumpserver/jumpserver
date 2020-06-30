@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-28 18:58+0800\n"
+"POT-Creation-Date: 2020-06-30 17:24+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -84,7 +84,7 @@ msgstr "数据库"
 #: users/templates/users/user_group_detail.html:62
 #: users/templates/users/user_group_list.html:16
 #: users/templates/users/user_profile.html:138
-#: xpack/plugins/change_auth_plan/models.py:77 xpack/plugins/cloud/models.py:53
+#: xpack/plugins/change_auth_plan/models.py:76 xpack/plugins/cloud/models.py:53
 #: xpack/plugins/cloud/models.py:139 xpack/plugins/gathered_user/models.py:26
 msgid "Comment"
 msgstr "备注"
@@ -110,7 +110,7 @@ msgstr "数据库应用"
 #: users/templates/users/user_asset_permission.html:40
 #: users/templates/users/user_asset_permission.html:70
 #: users/templates/users/user_granted_remote_app.html:36
-#: xpack/plugins/change_auth_plan/models.py:283
+#: xpack/plugins/change_auth_plan/models.py:282
 #: xpack/plugins/cloud/models.py:269
 msgid "Asset"
 msgstr "资产"
@@ -134,7 +134,7 @@ msgstr "参数"
 #: assets/models/group.py:21 common/mixins/models.py:49 orgs/models.py:16
 #: perms/models/base.py:54 users/models/user.py:508
 #: users/serializers/group.py:35 users/templates/users/user_detail.html:97
-#: xpack/plugins/change_auth_plan/models.py:81 xpack/plugins/cloud/models.py:56
+#: xpack/plugins/change_auth_plan/models.py:80 xpack/plugins/cloud/models.py:56
 #: xpack/plugins/cloud/models.py:145 xpack/plugins/gathered_user/models.py:30
 msgid "Created by"
 msgstr "创建者"
@@ -233,7 +233,7 @@ msgstr "网域"
 
 #: assets/models/asset.py:195 assets/models/user.py:109
 #: perms/models/asset_permission.py:81
-#: xpack/plugins/change_auth_plan/models.py:56
+#: xpack/plugins/change_auth_plan/models.py:55
 #: xpack/plugins/gathered_user/models.py:24
 msgid "Nodes"
 msgstr "节点"
@@ -343,8 +343,8 @@ msgstr ""
 #: users/templates/users/user_detail.html:53
 #: users/templates/users/user_list.html:15
 #: users/templates/users/user_profile.html:47
-#: xpack/plugins/change_auth_plan/models.py:47
-#: xpack/plugins/change_auth_plan/models.py:279
+#: xpack/plugins/change_auth_plan/models.py:46
+#: xpack/plugins/change_auth_plan/models.py:278
 msgid "Username"
 msgstr "用户名"
 
@@ -359,21 +359,21 @@ msgstr "用户名"
 #: users/templates/users/user_profile_update.html:41
 #: users/templates/users/user_pubkey_update.html:41
 #: users/templates/users/user_update.html:20
-#: xpack/plugins/change_auth_plan/models.py:68
-#: xpack/plugins/change_auth_plan/models.py:191
-#: xpack/plugins/change_auth_plan/models.py:286
+#: xpack/plugins/change_auth_plan/models.py:67
+#: xpack/plugins/change_auth_plan/models.py:190
+#: xpack/plugins/change_auth_plan/models.py:285
 msgid "Password"
 msgstr "密码"
 
-#: assets/models/base.py:235 xpack/plugins/change_auth_plan/models.py:72
-#: xpack/plugins/change_auth_plan/models.py:198
-#: xpack/plugins/change_auth_plan/models.py:293
+#: assets/models/base.py:235 xpack/plugins/change_auth_plan/models.py:71
+#: xpack/plugins/change_auth_plan/models.py:197
+#: xpack/plugins/change_auth_plan/models.py:292
 msgid "SSH private key"
 msgstr "SSH密钥"
 
-#: assets/models/base.py:236 xpack/plugins/change_auth_plan/models.py:75
-#: xpack/plugins/change_auth_plan/models.py:194
-#: xpack/plugins/change_auth_plan/models.py:289
+#: assets/models/base.py:236 xpack/plugins/change_auth_plan/models.py:74
+#: xpack/plugins/change_auth_plan/models.py:193
+#: xpack/plugins/change_auth_plan/models.py:288
 msgid "SSH public key"
 msgstr "SSH公钥"
 
@@ -603,7 +603,7 @@ msgid "Username same with user"
 msgstr "用户名与用户相同"
 
 #: assets/models/user.py:110 templates/_nav.html:39
-#: xpack/plugins/change_auth_plan/models.py:52
+#: xpack/plugins/change_auth_plan/models.py:51
 msgid "Assets"
 msgstr "资产管理"
 
@@ -914,8 +914,8 @@ msgid "Success"
 msgstr "成功"
 
 #: audits/models.py:43 ops/models/command.py:28 perms/models/base.py:52
-#: terminal/models.py:199 xpack/plugins/change_auth_plan/models.py:177
-#: xpack/plugins/change_auth_plan/models.py:308
+#: terminal/models.py:199 xpack/plugins/change_auth_plan/models.py:176
+#: xpack/plugins/change_auth_plan/models.py:307
 #: xpack/plugins/gathered_user/models.py:76
 msgid "Date start"
 msgstr "开始日期"
@@ -999,7 +999,7 @@ msgstr "Agent"
 msgid "MFA"
 msgstr "多因子认证"
 
-#: audits/models.py:105 xpack/plugins/change_auth_plan/models.py:304
+#: audits/models.py:105 xpack/plugins/change_auth_plan/models.py:303
 #: xpack/plugins/cloud/models.py:217
 msgid "Reason"
 msgstr "原因"
@@ -1085,39 +1085,43 @@ msgstr ""
 msgid "Invalid token or cache refreshed."
 msgstr ""
 
-#: authentication/errors.py:21
+#: authentication/errors.py:22
 msgid "Username/password check failed"
 msgstr "用户名/密码 校验失败"
 
-#: authentication/errors.py:22
+#: authentication/errors.py:23
+msgid "Password decrypt failed"
+msgstr "密码解密失败"
+
+#: authentication/errors.py:24
 msgid "MFA failed"
 msgstr "多因子认证失败"
 
-#: authentication/errors.py:23
+#: authentication/errors.py:25
 msgid "MFA unset"
 msgstr "多因子认证没有设定"
 
-#: authentication/errors.py:24
+#: authentication/errors.py:26
 msgid "Username does not exist"
 msgstr "用户名不存在"
 
-#: authentication/errors.py:25
+#: authentication/errors.py:27
 msgid "Password expired"
 msgstr "密码已过期"
 
-#: authentication/errors.py:26
+#: authentication/errors.py:28
 msgid "Disabled or expired"
 msgstr "禁用或失效"
 
-#: authentication/errors.py:27
+#: authentication/errors.py:29
 msgid "This account is inactive."
 msgstr "此账户已禁用"
 
-#: authentication/errors.py:37
+#: authentication/errors.py:39
 msgid "No session found, check your cookie"
 msgstr "会话已变更，刷新页面"
 
-#: authentication/errors.py:39
+#: authentication/errors.py:41
 #, python-brace-format
 msgid ""
 "The username or password you entered is incorrect, please enter it again. "
@@ -1127,34 +1131,34 @@ msgstr ""
 "您输入的用户名或密码不正确，请重新输入。 您还可以尝试 {times_try} 次（账号将"
 "被临时 锁定 {block_time} 分钟）"
 
-#: authentication/errors.py:45
+#: authentication/errors.py:47
 msgid ""
 "The account has been locked (please contact admin to unlock it or try again "
 "after {} minutes)"
 msgstr "账号已被锁定（请联系管理员解锁 或 {}分钟后重试）"
 
-#: authentication/errors.py:48 users/views/profile/otp.py:63
+#: authentication/errors.py:50 users/views/profile/otp.py:63
 #: users/views/profile/otp.py:102 users/views/profile/otp.py:121
 msgid "MFA code invalid, or ntp sync server time"
 msgstr "MFA验证码不正确，或者服务器端时间不对"
 
-#: authentication/errors.py:50
+#: authentication/errors.py:52
 msgid "MFA required"
 msgstr "需要多因子认证"
 
-#: authentication/errors.py:51
+#: authentication/errors.py:53
 msgid "MFA not set, please set it first"
 msgstr "多因子认证没有设置，请先完成设置"
 
-#: authentication/errors.py:52
+#: authentication/errors.py:54
 msgid "Login confirm required"
 msgstr "需要登录复核"
 
-#: authentication/errors.py:53
+#: authentication/errors.py:55
 msgid "Wait login confirm ticket for accept"
 msgstr "等待登录复核处理"
 
-#: authentication/errors.py:54
+#: authentication/errors.py:56
 msgid "Login confirm ticket was {}"
 msgstr "登录复核 {}"
 
@@ -1334,7 +1338,7 @@ msgstr "欢迎回来，请输入用户名和密码登录"
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: authentication/views/login.py:168
+#: authentication/views/login.py:172
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -1342,15 +1346,15 @@ msgstr ""
 "等待 <b>{}</b> 确认, 你也可以复制链接发给他/她 <br/>\n"
 "                  不要关闭本页面"
 
-#: authentication/views/login.py:173
+#: authentication/views/login.py:177
 msgid "No ticket found"
 msgstr "没有发现工单"
 
-#: authentication/views/login.py:205
+#: authentication/views/login.py:209
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: authentication/views/login.py:206
+#: authentication/views/login.py:210
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
@@ -1552,8 +1556,8 @@ msgstr "开始时间"
 msgid "End time"
 msgstr "完成时间"
 
-#: ops/models/adhoc.py:242 xpack/plugins/change_auth_plan/models.py:180
-#: xpack/plugins/change_auth_plan/models.py:311
+#: ops/models/adhoc.py:242 xpack/plugins/change_auth_plan/models.py:179
+#: xpack/plugins/change_auth_plan/models.py:310
 #: xpack/plugins/gathered_user/models.py:79
 msgid "Time"
 msgstr "时间"
@@ -2666,7 +2670,7 @@ msgid "Set password"
 msgstr "设置密码"
 
 #: users/forms/user.py:132 users/serializers/user.py:38
-#: xpack/plugins/change_auth_plan/models.py:61
+#: xpack/plugins/change_auth_plan/models.py:60
 #: xpack/plugins/change_auth_plan/serializers.py:30
 msgid "Password strategy"
 msgstr "密码策略"
@@ -3542,65 +3546,65 @@ msgid "Token invalid or expired"
 msgstr "Token错误或失效"
 
 #: xpack/plugins/change_auth_plan/meta.py:9
-#: xpack/plugins/change_auth_plan/models.py:89
-#: xpack/plugins/change_auth_plan/models.py:184
+#: xpack/plugins/change_auth_plan/models.py:88
+#: xpack/plugins/change_auth_plan/models.py:183
 msgid "Change auth plan"
 msgstr "改密计划"
 
-#: xpack/plugins/change_auth_plan/models.py:41
+#: xpack/plugins/change_auth_plan/models.py:40
 msgid "Custom password"
 msgstr "自定义密码"
 
-#: xpack/plugins/change_auth_plan/models.py:42
+#: xpack/plugins/change_auth_plan/models.py:41
 msgid "All assets use the same random password"
 msgstr "所有资产使用相同的随机密码"
 
-#: xpack/plugins/change_auth_plan/models.py:43
+#: xpack/plugins/change_auth_plan/models.py:42
 msgid "All assets use different random password"
 msgstr "所有资产使用不同的随机密码"
 
-#: xpack/plugins/change_auth_plan/models.py:65
+#: xpack/plugins/change_auth_plan/models.py:64
 msgid "Password rules"
 msgstr "密码规则"
 
-#: xpack/plugins/change_auth_plan/models.py:188
+#: xpack/plugins/change_auth_plan/models.py:187
 msgid "Change auth plan snapshot"
 msgstr "改密计划快照"
 
-#: xpack/plugins/change_auth_plan/models.py:203
-#: xpack/plugins/change_auth_plan/models.py:297
+#: xpack/plugins/change_auth_plan/models.py:202
+#: xpack/plugins/change_auth_plan/models.py:296
 msgid "Change auth plan execution"
 msgstr "改密计划执行"
 
-#: xpack/plugins/change_auth_plan/models.py:270
+#: xpack/plugins/change_auth_plan/models.py:269
 msgid "Ready"
 msgstr ""
 
-#: xpack/plugins/change_auth_plan/models.py:271
+#: xpack/plugins/change_auth_plan/models.py:270
 msgid "Preflight check"
 msgstr ""
 
-#: xpack/plugins/change_auth_plan/models.py:272
+#: xpack/plugins/change_auth_plan/models.py:271
 msgid "Change auth"
 msgstr ""
 
-#: xpack/plugins/change_auth_plan/models.py:273
+#: xpack/plugins/change_auth_plan/models.py:272
 msgid "Verify auth"
 msgstr ""
 
-#: xpack/plugins/change_auth_plan/models.py:274
+#: xpack/plugins/change_auth_plan/models.py:273
 msgid "Keep auth"
 msgstr ""
 
-#: xpack/plugins/change_auth_plan/models.py:275
+#: xpack/plugins/change_auth_plan/models.py:274
 msgid "Finished"
 msgstr "结束"
 
-#: xpack/plugins/change_auth_plan/models.py:301
+#: xpack/plugins/change_auth_plan/models.py:300
 msgid "Step"
 msgstr "步骤"
 
-#: xpack/plugins/change_auth_plan/models.py:318
+#: xpack/plugins/change_auth_plan/models.py:317
 msgid "Change auth plan task"
 msgstr "改密计划任务"
 
