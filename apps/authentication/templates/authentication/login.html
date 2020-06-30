@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-    <form class="m-t" role="form" method="post" action="">
+    <form id="form" class="m-t" role="form" method="post" action="">
         {% csrf_token %}
         {% if form.non_field_errors %}
             <div style="line-height: 17px;">
@@ -26,7 +26,7 @@
             {% endif %}
         </div>
         <div class="form-group">
-            <input type="password" class="form-control" name="{{ form.password.html_name }}" placeholder="{% trans 'Password' %}" required="">
+            <input type="password" class="form-control" id="password" name="{{ form.password.html_name }}" placeholder="{% trans 'Password' %}" required="">
             {% if form.errors.password %}
                 <div class="help-block field-error">
                     <p class="red-fonts">{{ form.errors.password.as_text }}</p>
@@ -36,7 +36,7 @@
         <div>
             {{ form.captcha }}
         </div>
-        <button type="submit" class="btn btn-primary block full-width m-b">{% trans 'Login' %}</button>
+        <button type="submit" class="btn btn-primary block full-width m-b" onclick="doLogin();return false;">{% trans 'Login' %}</button>
 
         {% if demo_mode %}
             <p class="text-muted font-bold" style="color: red">
@@ -64,4 +64,17 @@
         {% endif %}
 
     </form>
+    <script type="text/javascript" src="/static/js/plugins/jsencrypt/jsencrypt.min.js"></script>
+    <script>
+    function doLogin() {
+        //公钥加密
+        var rsaPublicKey = "{{ rsa_public_key }}"
+        var password =$('#password').val(); //明文密码
+        var jsencrypt = new JSEncrypt(); //加密对象
+        jsencrypt.setPublicKey(rsaPublicKey); // 设置密钥
+        var passwordEncrypted = jsencrypt.encrypt(password); //加密
+        $('#password').val(passwordEncrypted); //返回给密码输入input
+        $('#form').submit();//post提交
+    }
+    </script>
 {% endblock %}

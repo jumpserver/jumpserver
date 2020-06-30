@@ -10,6 +10,7 @@ from users.utils import (
 )
 
 reason_password_failed = 'password_failed'
+reason_password_decrypt_failed = 'password_decrypt_failed'
 reason_mfa_failed = 'mfa_failed'
 reason_mfa_unset = 'mfa_unset'
 reason_user_not_exist = 'user_not_exist'
@@ -19,6 +20,7 @@ reason_user_inactive = 'user_inactive'
 
 reason_choices = {
     reason_password_failed: _('Username/password check failed'),
+    reason_password_decrypt_failed: _('Password decrypt failed'),
     reason_mfa_failed: _('MFA failed'),
     reason_mfa_unset: _('MFA unset'),
     reason_user_not_exist: _("Username does not exist"),

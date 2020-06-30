@@ -10,7 +10,7 @@ class UserLoginForm(forms.Form):
     username = forms.CharField(label=_('Username'), max_length=100)
     password = forms.CharField(
         label=_('Password'), widget=forms.PasswordInput,
-        max_length=128, strip=False
+        max_length=1024, strip=False
     )
 
     def confirm_login_allowed(self, user):

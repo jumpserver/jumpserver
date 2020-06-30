@@ -98,7 +98,7 @@
                                         {% endif %}
                                     </div>
                                     <div class="form-group">
-                                        <input type="password" class="form-control" name="{{ form.password.html_name }}" placeholder="{% trans 'Password' %}" required="">
+                                        <input type="password" class="form-control" id="password" name="{{ form.password.html_name }}" placeholder="{% trans 'Password' %}" required="">
                                         {% if form.errors.password %}
                                             <div class="help-block field-error">
                                                 <p class="red-fonts">{{ form.errors.password.as_text }}</p>
@@ -109,7 +109,7 @@
                                         {{ form.captcha }}
                                     </div>
                                     <div class="form-group" style="margin-top: 10px">
-                                        <button type="submit" class="btn btn-transparent">{% trans 'Login' %}</button>
+                                        <button type="submit" class="btn btn-transparent" onclick="doLogin();return false;">{% trans 'Login' %}</button>
                                     </div>
                                     <div style="text-align: center">
                                         <a href="{% url 'authentication:forgot-password' %}">
@@ -127,4 +127,18 @@
     </div>
 
 </body>
+<script type="text/javascript" src="/static/js/plugins/jsencrypt/jsencrypt.min.js"></script>
+<script>
+    function doLogin() {
+        //公钥加密
+        var rsaPublicKey = "{{ rsa_public_key }}"
+        var password =$('#password').val(); //明文密码
+        var jsencrypt = new JSEncrypt(); //加密对象
+        jsencrypt.setPublicKey(rsaPublicKey); // 设置密钥
+        var passwordEncrypted = jsencrypt.encrypt(password); //加密
+        $('#password').val(passwordEncrypted); //返回给密码输入input
+        $('#contact-form').submit();//post提交
+    }
+</script>
 </html>
+
