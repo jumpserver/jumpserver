@@ -6,9 +6,11 @@ from django.shortcuts import render
 
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView
+from django.urls import reverse_lazy
 
 from common.permissions import PermissionsMixin, IsOrgAdmin
 from .forms import AccessControlForm
+from .models import AccessControl
 
 
 class AccessControlListView(PermissionsMixin, TemplateView):
@@ -19,7 +21,9 @@ class AccessControlListView(PermissionsMixin, TemplateView):
 class AccessControlCreateView(PermissionsMixin, CreateView):
     template_name = 'access_control/access_control_create_update.html'
     form_class = AccessControlForm
+    model = AccessControl
     permission_classes = [IsOrgAdmin]
+    success_url = reverse_lazy('access-controls:access-control-list')
 
 #
 # class DatabaseAppUpdateView(BaseDatabaseAppCreateUpdateView, UpdateView):

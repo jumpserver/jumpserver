@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from access_control import views
 
 app_name = 'access_control'
 

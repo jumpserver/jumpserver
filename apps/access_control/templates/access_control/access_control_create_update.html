@@ -4,9 +4,40 @@
 {% load i18n %}
 
 {% block form %}
-    <form id="AccessControlForm" method="post" class="form-horizontal">
+    <form id="AccessControlForm" method="post" action="" class="form-horizontal">
         {% csrf_token %}
-        {% bootstrap_form form layout="horizontal" %}
+{#        {% bootstrap_form form layout="horizontal" %}#}
+
+        {% bootstrap_field form.name layout="horizontal" %}
+        {% bootstrap_field form.ips layout="horizontal" %}
+        <div class="form-group {% if form.date_start.errors or form.date_to.errors %} has-error {% endif %}"
+             id="date_5">
+            <label for="{{ form.date_to.id_for_label }}"
+                   class="col-sm-2 control-label">{% trans 'Validity period' %}</label>
+            <div class="col-sm-9">
+                <div class="input-daterange input-group" id="datepicker">
+                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    {% if form.errors %}
+                        <input type="text" class="input-sm form-control" id="date_from" name="date_from"
+                               value="{{ form.date_from.value }}">
+                        <span class="input-group-addon">to</span>
+                        <input type="text" class="input-sm form-control" id="date_to" name="date_to"
+                               value="{{ form.date_to.value }}">
+                    {% else %}
+                        <input type="text" class="input-sm form-control" id="date_from" name="date_from"
+                               value="{{ form.date_from.value|date:'Y-m-d H:i' }}">
+                        <span class="input-group-addon">to</span>
+                        <input type="text" class="input-sm form-control" id="date_to" name="date_to"
+                               value="{{ form.date_to.value|date:'Y-m-d H:i' }}">
+                    {% endif %}
+                </div>
+                <span class="help-block ">{{ form.date_to.errors }}</span>
+                <span class="help-block ">{{ form.date_from.errors }}</span>
+            </div>
+        </div>
+
+        {% bootstrap_field form.users layout="horizontal" %}
+
         <div class="hr-line-dashed"></div>
         <div class="form-group">
             <div class="col-sm-4 col-sm-offset-2">
@@ -18,13 +49,20 @@
 {% endblock %}
 
 {% block custom_foot_js %}
-<script type="text/javascript">
+    <script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>
+    <script type="text/javascript" src='{% static "js/plugins/daterangepicker/moment.min.js" %}'></script>
+    <script type="text/javascript" src='{% static "js/plugins/daterangepicker/daterangepicker.min.js" %}'></script>
+    <link rel="stylesheet" type="text/css" href={% static "css/plugins/daterangepicker/daterangepicker.css" %}/>
 
-$(document).ready(function () {
-    $('.select2').select2({
-        closeOnSelect: false
-    });
-    usersSelect2Init('.users-select2')
-})
-</script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('.select2').select2({
+                closeOnSelect: false
+            });
+            initDateRangePicker('#date_from');
+            initDateRangePicker('#date_to');
+            usersSelect2Init('.users-select2')
+        })
+    </script>
 {% endblock %}

@@ -1,6 +1,6 @@
 from rest_framework_bulk.routes import BulkRouter
 
-from .api import LoginPolicyViewSet
+from access_control.api import LoginPolicyViewSet
 
 app_name = 'access-control'
 
