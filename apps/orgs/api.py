@@ -22,6 +22,8 @@ logger = get_logger(__file__)
 
 
 class OrgViewSet(BulkModelViewSet):
+    filter_fields = ('name',)
+    search_fields = ('name', 'comment')
     queryset = Organization.objects.all()
     serializer_class = OrgSerializer
     permission_classes = (IsSuperUserOrAppUser,)
