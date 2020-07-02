@@ -11,6 +11,7 @@ from . import views, api
 
 api_v1 = [
     path('index/', api.IndexApi.as_view()),
+    path('index-export/', api.ExportIndexApi.as_view(), name='export-index'),
     path('users/', include('users.urls.api_urls', namespace='api-users')),
     path('assets/', include('assets.urls.api_urls', namespace='api-assets')),
     path('perms/', include('perms.urls.api_urls', namespace='api-perms')),

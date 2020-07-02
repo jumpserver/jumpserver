@@ -1,10 +1,18 @@
+import os
+
 from django.core.cache import cache
 from django.utils import timezone
 from django.utils.timesince import timesince
 from django.db.models import Count, Max
-from django.http.response import JsonResponse
+from django.http.response import JsonResponse, FileResponse
+from django.conf import settings
 from rest_framework.views import APIView
 from collections import Counter
+from pyecharts.charts import Line
+from pyecharts import options as opts
+from pyecharts.charts import Bar, Page
+from pyecharts.render import make_snapshot
+from snapshot_phantomjs import snapshot
 
 from users.models import User
 from assets.models import Asset
@@ -293,3 +301,93 @@ class IndexApi(TotalCountMixin, WeekSessionMetricMixin, MonthLoginMetricMixin, A
         return JsonResponse(data, status=200)
 
 
+class ExportIndexApi(TotalCountMixin, WeekSessionMetricMixin, MonthLoginMetricMixin, APIView):
+    permission_classes = (IsOrgAdmin,)
+    http_method_names = ['get']
+
+    def get(self, request, *args, **kwargs):
+        month_metrics_date = self.get_month_metrics_date()
+        month_metrics_total_count_login = self.get_month_metrics_total_count_login()
+        month_metrics_total_count_active_users = self.get_month_metrics_total_count_active_users()
+        month_metrics_total_count_active_assets = self.get_month_metrics_total_count_active_assets()
+
+        c1 = (
+            Line()
+                .add_xaxis(month_metrics_date)
+                .add_yaxis("登录次数", month_metrics_total_count_login, is_smooth=True)
+                .add_yaxis("活跃用户", month_metrics_total_count_active_users, is_smooth=True)
+                .add_yaxis("活跃资产", month_metrics_total_count_active_assets, is_smooth=True)
+                .set_series_opts(
+                areastyle_opts=opts.AreaStyleOpts(opacity=1),
+                label_opts=opts.LabelOpts(is_show=False),
+            )
+                .set_global_opts(
+                title_opts=opts.TitleOpts(title="会话统计"),
+                xaxis_opts=opts.AxisOpts(
+                    axistick_opts=opts.AxisTickOpts(is_align_with_label=True),
+                    is_scale=False,
+                    boundary_gap=False,
+                    offset=1,
+                ),
+            )
+                # .render("line_areastyle_boundary_gap.html")
+        )
+
+        total_count_assets = self.get_total_count_assets()
+        total_count_users = self.get_total_count_users()
+        total_count_online_users = self.get_total_count_online_users()
+        total_count_online_sessions = self.get_total_count_online_sessions()
+
+        c2 = (
+            Bar()
+                .add_xaxis(
+                [
+                    "用户总数",
+                    "资产总数",
+                    "在线用户",
+                    "在线会话",
+                ]
+            )
+                .add_yaxis("", [total_count_users, total_count_assets, total_count_online_users, total_count_online_sessions])
+                .set_global_opts(
+                xaxis_opts=opts.AxisOpts(axislabel_opts=opts.LabelOpts(rotate=-15), offset=1),
+                title_opts=opts.TitleOpts(title="概览", subtitle=""),
+            )
+                # .render("bar_rotate_xaxis_label.html")
+        )
+
+        week_login_times_top10_users = self.get_week_login_times_top10_users()
+        x, y = zip(*[(item['user'], item['total']) for item in week_login_times_top10_users])
+        c3 = (
+            Bar()
+                .add_xaxis(x)
+                .add_yaxis("", y)
+                .set_global_opts(
+                xaxis_opts=opts.AxisOpts(axislabel_opts=opts.LabelOpts(rotate=-15), offset=1),
+                title_opts=opts.TitleOpts(title="周用户 TOP10", subtitle=""),
+            )
+        )
+
+        week_login_times_top10_assets = self.get_week_login_times_top10_assets()
+        x, y = zip(*[(item['asset'], item['total']) for item in week_login_times_top10_assets])
+        c4 = (
+            Bar()
+                .add_xaxis(x)
+                .add_yaxis("", y)
+                .set_global_opts(
+                xaxis_opts=opts.AxisOpts(axislabel_opts=opts.LabelOpts(rotate=-15), offset=1),
+                title_opts=opts.TitleOpts(title="周资产 TOP10", subtitle=""),
+            )
+        )
+
+        path = os.path.join(os.path.dirname(settings.BASE_DIR), 'tmp', 'export_index.html')
+
+        page = Page()
+        page.add(c1, c2, c3, c4)
+        page.render(path)
+
+        response = FileResponse(open(path, mode='rb'))
+        response['Content-Type'] = 'application/octet-stream'
+        disposition = "attachment; filename*=UTF-8''{}".format('export_index.html')
+        response["Content-Disposition"] = disposition
+        return response
