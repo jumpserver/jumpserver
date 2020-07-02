@@ -11,8 +11,6 @@ from collections import Counter
 from pyecharts.charts import Line
 from pyecharts import options as opts
 from pyecharts.charts import Bar, Page
-from pyecharts.render import make_snapshot
-from snapshot_phantomjs import snapshot
 
 from users.models import User
 from assets.models import Asset
@@ -357,7 +355,7 @@ class ExportIndexApi(TotalCountMixin, WeekSessionMetricMixin, MonthLoginMetricMi
         )
 
         week_login_times_top10_users = self.get_week_login_times_top10_users()
-        x, y = zip(*[(item['user'], item['total']) for item in week_login_times_top10_users])
+        x, y = list(zip(*[(item['user'], item['total']) for item in week_login_times_top10_users])) or [[], []]
         c3 = (
             Bar()
                 .add_xaxis(x)
@@ -369,7 +367,7 @@ class ExportIndexApi(TotalCountMixin, WeekSessionMetricMixin, MonthLoginMetricMi
         )
 
         week_login_times_top10_assets = self.get_week_login_times_top10_assets()
-        x, y = zip(*[(item['asset'], item['total']) for item in week_login_times_top10_assets])
+        x, y = list(zip(*[(item['asset'], item['total']) for item in week_login_times_top10_assets])) or [[], []]
         c4 = (
             Bar()
                 .add_xaxis(x)
