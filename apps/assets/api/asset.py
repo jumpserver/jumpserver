@@ -14,7 +14,7 @@ from .. import serializers
 from ..tasks import (
     update_asset_hardware_info_manual, test_asset_connectivity_manual
 )
-from ..filters import AssetByNodeFilterBackend, LabelFilterBackend
+from ..filters import AssetByNodeFilterBackend, LabelFilterBackend, IpInFilterBackend
 
 
 logger = get_logger(__file__)
@@ -32,7 +32,7 @@ class AssetViewSet(OrgBulkModelViewSet):
     model = Asset
     filter_fields = (
         "hostname", "ip", "systemuser__id", "admin_user__id", "platform__base",
-        "is_active"
+        "is_active", 'ip'
     )
     search_fields = ("hostname", "ip")
     ordering_fields = ("hostname", "ip", "port", "cpu_cores")
@@ -41,7 +41,7 @@ class AssetViewSet(OrgBulkModelViewSet):
         'display': serializers.AssetDisplaySerializer,
     }
     permission_classes = (IsOrgAdminOrAppUser,)
-    extra_filter_backends = [AssetByNodeFilterBackend, LabelFilterBackend]
+    extra_filter_backends = [AssetByNodeFilterBackend, LabelFilterBackend, IpInFilterBackend]
 
     def set_assets_node(self, assets):
         if not isinstance(assets, list):

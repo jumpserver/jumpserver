@@ -27,23 +27,23 @@ class TicketSerializer(serializers.ModelSerializer):
             'user_display': {'label': _('User')}
         }
 
-    def create(self, validated_data):
-        validated_data.pop('action')
-        return super().create(validated_data)
-
-    def update(self, instance, validated_data):
-        action = validated_data.get("action")
-        user = self.context["request"].user
-
-        if action and user not in instance.assignees.all():
-            error = {"action": "Only assignees can update"}
-            raise serializers.ValidationError(error)
-        if instance.status == instance.STATUS_CLOSED:
+        def create(self, validated_data):
             validated_data.pop('action')
-        instance = super().update(instance, validated_data)
-        if not instance.status == instance.STATUS_CLOSED and action:
-            instance.perform_action(action, user)
-        return instance
+            return super().create(validated_data)
+
+        def update(self, instance, validated_data):
+            action = validated_data.get("action")
+            user = self.context["request"].user
+
+            if action and user not in instance.assignees.all():
+                error = {"action": "Only assignees can update"}
+                raise serializers.ValidationError(error)
+            if instance.status == instance.STATUS_CLOSED:
+                validated_data.pop('action')
+            instance = super().update(instance, validated_data)
+            if not instance.status == instance.STATUS_CLOSED and action:
+                instance.perform_action(action, user)
+            return instance
 
 
 class CurrentTicket(object):
