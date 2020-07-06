@@ -17,13 +17,14 @@ __all__ = ['Domain', 'Gateway']
 
 class Domain(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
+    name = models.CharField(max_length=128, verbose_name=_('Name'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
     date_created = models.DateTimeField(auto_now_add=True, null=True,
                                         verbose_name=_('Date created'))
 
     class Meta:
         verbose_name = _("Domain")
+        unique_together = [('org_id', 'name')]
 
     def __str__(self):
         return self.name
