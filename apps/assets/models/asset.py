@@ -245,10 +245,6 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
         return self.platform.base
 
     @lazyproperty
-    def admin_user_display(self):
-        return self.admin_user.name
-
-    @lazyproperty
     def admin_user_username(self):
         """求可连接性时，直接用用户名去取，避免再查一次admin user
         serializer 中直接通过annotate方式返回了这个

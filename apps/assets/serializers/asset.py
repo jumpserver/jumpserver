@@ -67,6 +67,9 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
         slug_field='name', queryset=Platform.objects.all(), label=_("Platform")
     )
     protocols = ProtocolsField(label=_('Protocols'), required=False)
+    domain_display = serializers.ReadOnlyField(source='domain.name')
+    admin_user_display = serializers.ReadOnlyField(source='admin_user.name')
+
     """
     资产的数据结构
     """
@@ -82,7 +85,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'created_by', 'date_created', 'hardware_info',
         ]
         fields_fk = [
-            'admin_user', 'admin_user_display', 'domain', 'platform'
+            'admin_user', 'admin_user_display', 'domain', 'domain_display', 'platform'
         ]
         fk_only_fields = {
             'platform': ['name']
