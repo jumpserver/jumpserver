@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-30 17:24+0800\n"
+"POT-Creation-Date: 2020-07-07 14:11+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -58,7 +58,7 @@ msgid "Host"
 msgstr "主机"
 
 #: applications/models/database_app.py:27 assets/models/asset.py:191
-#: assets/models/domain.py:50
+#: assets/models/domain.py:51
 msgid "Port"
 msgstr "端口"
 
@@ -73,7 +73,7 @@ msgstr "数据库"
 #: assets/models/asset.py:150 assets/models/asset.py:226
 #: assets/models/base.py:237 assets/models/cluster.py:29
 #: assets/models/cmd_filter.py:23 assets/models/cmd_filter.py:56
-#: assets/models/domain.py:21 assets/models/domain.py:53
+#: assets/models/domain.py:21 assets/models/domain.py:54
 #: assets/models/group.py:23 assets/models/label.py:23 ops/models/adhoc.py:37
 #: orgs/models.py:18 perms/models/base.py:56 settings/models.py:32
 #: terminal/models.py:36 terminal/models.py:381 terminal/models.py:418
@@ -85,7 +85,7 @@ msgstr "数据库"
 #: users/templates/users/user_group_list.html:16
 #: users/templates/users/user_profile.html:138
 #: xpack/plugins/change_auth_plan/models.py:76 xpack/plugins/cloud/models.py:53
-#: xpack/plugins/cloud/models.py:139 xpack/plugins/gathered_user/models.py:26
+#: xpack/plugins/cloud/models.py:140 xpack/plugins/gathered_user/models.py:26
 msgid "Comment"
 msgstr "备注"
 
@@ -99,7 +99,7 @@ msgstr "备注"
 msgid "DatabaseApp"
 msgstr "数据库应用"
 
-#: applications/models/remote_app.py:23 assets/models/asset.py:356
+#: applications/models/remote_app.py:23 assets/models/asset.py:352
 #: assets/models/authbook.py:27 assets/models/gathered_user.py:14
 #: assets/serializers/admin_user.py:32 assets/serializers/asset_user.py:47
 #: assets/serializers/asset_user.py:84 assets/serializers/system_user.py:44
@@ -111,7 +111,7 @@ msgstr "数据库应用"
 #: users/templates/users/user_asset_permission.html:70
 #: users/templates/users/user_granted_remote_app.html:36
 #: xpack/plugins/change_auth_plan/models.py:282
-#: xpack/plugins/cloud/models.py:269
+#: xpack/plugins/cloud/models.py:266
 msgid "Asset"
 msgstr "资产"
 
@@ -135,7 +135,7 @@ msgstr "参数"
 #: perms/models/base.py:54 users/models/user.py:508
 #: users/serializers/group.py:35 users/templates/users/user_detail.html:97
 #: xpack/plugins/change_auth_plan/models.py:80 xpack/plugins/cloud/models.py:56
-#: xpack/plugins/cloud/models.py:145 xpack/plugins/gathered_user/models.py:30
+#: xpack/plugins/cloud/models.py:146 xpack/plugins/gathered_user/models.py:30
 msgid "Created by"
 msgstr "创建者"
 
@@ -148,7 +148,7 @@ msgstr "创建者"
 #: common/mixins/models.py:50 ops/models/adhoc.py:38 ops/models/command.py:27
 #: orgs/models.py:17 perms/models/base.py:55 users/models/group.py:18
 #: users/templates/users/user_group_detail.html:58
-#: xpack/plugins/cloud/models.py:59 xpack/plugins/cloud/models.py:148
+#: xpack/plugins/cloud/models.py:59 xpack/plugins/cloud/models.py:149
 msgid "Date created"
 msgstr "创建日期"
 
@@ -202,7 +202,7 @@ msgstr "内部的"
 msgid "Platform"
 msgstr "系统平台"
 
-#: assets/models/asset.py:186 assets/models/domain.py:49
+#: assets/models/asset.py:186 assets/models/domain.py:50
 #: assets/serializers/asset_user.py:46 settings/serializers/settings.py:52
 #: users/templates/users/_granted_assets.html:26
 #: users/templates/users/user_asset_permission.html:156
@@ -216,7 +216,7 @@ msgstr "IP"
 msgid "Hostname"
 msgstr "主机名"
 
-#: assets/models/asset.py:190 assets/models/domain.py:51
+#: assets/models/asset.py:190 assets/models/domain.py:52
 #: assets/models/user.py:114 terminal/serializers/session.py:29
 msgid "Protocol"
 msgstr "协议"
@@ -227,7 +227,7 @@ msgid "Protocols"
 msgstr "协议组"
 
 #: assets/models/asset.py:194 assets/models/domain.py:26
-#: assets/models/domain.py:52
+#: assets/models/domain.py:53
 msgid "Domain"
 msgstr "网域"
 
@@ -239,14 +239,14 @@ msgid "Nodes"
 msgstr "节点"
 
 #: assets/models/asset.py:196 assets/models/cmd_filter.py:22
-#: assets/models/domain.py:54 assets/models/label.py:22
+#: assets/models/domain.py:55 assets/models/label.py:22
 #: authentication/models.py:45
 msgid "Is active"
 msgstr "激活"
 
 #: assets/models/asset.py:199 assets/models/cluster.py:19
 #: assets/models/user.py:65 templates/_nav.html:44
-#: xpack/plugins/cloud/models.py:133
+#: xpack/plugins/cloud/models.py:133 xpack/plugins/cloud/serializers.py:82
 msgid "Admin user"
 msgstr "管理用户"
 
@@ -498,11 +498,11 @@ msgstr "动作"
 msgid "Command filter rule"
 msgstr "命令过滤规则"
 
-#: assets/models/domain.py:61
+#: assets/models/domain.py:62
 msgid "Gateway"
 msgstr "网关"
 
-#: assets/models/domain.py:67
+#: assets/models/domain.py:68
 msgid "Password should not contain special characters"
 msgstr "不能包含特殊字符"
 
@@ -552,7 +552,7 @@ msgstr "默认资产组"
 msgid "User"
 msgstr "用户"
 
-#: assets/models/label.py:19 assets/models/node.py:488 settings/models.py:28
+#: assets/models/label.py:19 assets/models/node.py:502 settings/models.py:28
 msgid "Value"
 msgstr "值"
 
@@ -560,33 +560,33 @@ msgstr "值"
 msgid "Category"
 msgstr "分类"
 
-#: assets/models/node.py:209
+#: assets/models/node.py:223
 msgid "New node"
 msgstr "新节点"
 
-#: assets/models/node.py:370
+#: assets/models/node.py:384
 msgid "ungrouped"
 msgstr "未分组"
 
-#: assets/models/node.py:372 users/templates/users/_granted_assets.html:130
+#: assets/models/node.py:386 users/templates/users/_granted_assets.html:130
 msgid "empty"
 msgstr "空"
 
-#: assets/models/node.py:374
+#: assets/models/node.py:388
 msgid "favorite"
 msgstr "收藏夹"
 
-#: assets/models/node.py:487
+#: assets/models/node.py:501
 msgid "Key"
 msgstr "键"
 
-#: assets/models/node.py:497 assets/serializers/system_user.py:43
+#: assets/models/node.py:511 assets/serializers/system_user.py:43
 #: assets/serializers/system_user.py:175 perms/forms/asset_permission.py:92
 #: perms/forms/asset_permission.py:99
 #: users/templates/users/user_asset_permission.html:41
 #: users/templates/users/user_asset_permission.html:73
 #: users/templates/users/user_asset_permission.html:158
-#: xpack/plugins/cloud/models.py:129
+#: xpack/plugins/cloud/models.py:129 xpack/plugins/cloud/serializers.py:83
 msgid "Node"
 msgstr "节点"
 
@@ -680,15 +680,15 @@ msgstr "协议格式 {}/{}"
 msgid "Protocol duplicate: {}"
 msgstr "协议重复: {}"
 
-#: assets/serializers/asset.py:108
+#: assets/serializers/asset.py:111
 msgid "Hardware info"
 msgstr "硬件信息"
 
-#: assets/serializers/asset.py:109 orgs/mixins/serializers.py:27
+#: assets/serializers/asset.py:112 orgs/mixins/serializers.py:27
 msgid "Org name"
 msgstr "组织名称"
 
-#: assets/serializers/asset.py:144 assets/serializers/asset.py:175
+#: assets/serializers/asset.py:147 assets/serializers/asset.py:178
 msgid "Connectivity"
 msgstr "连接"
 
@@ -970,7 +970,7 @@ msgstr "启用"
 msgid "-"
 msgstr ""
 
-#: audits/models.py:96 xpack/plugins/cloud/models.py:204
+#: audits/models.py:96 xpack/plugins/cloud/models.py:201
 msgid "Failed"
 msgstr "失败"
 
@@ -1000,12 +1000,12 @@ msgid "MFA"
 msgstr "多因子认证"
 
 #: audits/models.py:105 xpack/plugins/change_auth_plan/models.py:303
-#: xpack/plugins/cloud/models.py:217
+#: xpack/plugins/cloud/models.py:214
 msgid "Reason"
 msgstr "原因"
 
 #: audits/models.py:106 tickets/serializers/ticket.py:25
-#: xpack/plugins/cloud/models.py:214 xpack/plugins/cloud/models.py:272
+#: xpack/plugins/cloud/models.py:211 xpack/plugins/cloud/models.py:269
 msgid "Status"
 msgstr "状态"
 
@@ -1018,7 +1018,7 @@ msgid "Is success"
 msgstr "是否成功"
 
 #: audits/serializers.py:73 ops/models/command.py:24
-#: xpack/plugins/cloud/models.py:212
+#: xpack/plugins/cloud/models.py:209
 msgid "Result"
 msgstr "结果"
 
@@ -2777,7 +2777,7 @@ msgstr "安全令牌验证"
 
 #: users/templates/users/_base_otp.html:14 users/templates/users/_user.html:13
 #: users/templates/users/user_profile_update.html:55
-#: xpack/plugins/cloud/models.py:119
+#: xpack/plugins/cloud/models.py:119 xpack/plugins/cloud/serializers.py:81
 msgid "Account"
 msgstr "账户"
 
@@ -3672,59 +3672,59 @@ msgstr "地域"
 msgid "Instances"
 msgstr "实例"
 
-#: xpack/plugins/cloud/models.py:136 xpack/plugins/cloud/serializers.py:80
-msgid "Covered always"
-msgstr "总是被覆盖"
+#: xpack/plugins/cloud/models.py:137 xpack/plugins/cloud/serializers.py:85
+msgid "Always update"
+msgstr "总是更新"
 
-#: xpack/plugins/cloud/models.py:142
+#: xpack/plugins/cloud/models.py:143
 msgid "Date last sync"
 msgstr "最后同步日期"
 
-#: xpack/plugins/cloud/models.py:153 xpack/plugins/cloud/models.py:210
+#: xpack/plugins/cloud/models.py:154 xpack/plugins/cloud/models.py:207
 msgid "Sync instance task"
 msgstr "同步实例任务"
 
-#: xpack/plugins/cloud/models.py:205
+#: xpack/plugins/cloud/models.py:202
 msgid "Succeed"
 msgstr "成功"
 
-#: xpack/plugins/cloud/models.py:220 xpack/plugins/cloud/models.py:275
+#: xpack/plugins/cloud/models.py:217 xpack/plugins/cloud/models.py:272
 msgid "Date sync"
 msgstr "同步日期"
 
-#: xpack/plugins/cloud/models.py:248
+#: xpack/plugins/cloud/models.py:245
 msgid "Unsync"
 msgstr "未同步"
 
-#: xpack/plugins/cloud/models.py:249 xpack/plugins/cloud/models.py:250
+#: xpack/plugins/cloud/models.py:246 xpack/plugins/cloud/models.py:247
 msgid "Synced"
 msgstr "已同步"
 
-#: xpack/plugins/cloud/models.py:251
+#: xpack/plugins/cloud/models.py:248
 msgid "Released"
 msgstr "已释放"
 
-#: xpack/plugins/cloud/models.py:256
+#: xpack/plugins/cloud/models.py:253
 msgid "Sync task"
 msgstr "同步任务"
 
-#: xpack/plugins/cloud/models.py:260
+#: xpack/plugins/cloud/models.py:257
 msgid "Sync instance task history"
 msgstr "同步实例任务历史"
 
-#: xpack/plugins/cloud/models.py:263
+#: xpack/plugins/cloud/models.py:260
 msgid "Instance"
 msgstr "实例"
 
-#: xpack/plugins/cloud/models.py:266
+#: xpack/plugins/cloud/models.py:263
 msgid "Region"
 msgstr "地域"
 
-#: xpack/plugins/cloud/providers/aliyun.py:19
+#: xpack/plugins/cloud/providers/aliyun.py:22
 msgid "Alibaba Cloud"
 msgstr "阿里云"
 
-#: xpack/plugins/cloud/providers/aws.py:15
+#: xpack/plugins/cloud/providers/aws.py:18
 msgid "AWS (International)"
 msgstr "AWS (国际)"
 
@@ -3732,63 +3732,63 @@ msgstr "AWS (国际)"
 msgid "AWS (China)"
 msgstr "AWS (中国)"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:17
+#: xpack/plugins/cloud/providers/huaweicloud.py:20
 msgid "Huawei Cloud"
 msgstr "华为云"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:20
+#: xpack/plugins/cloud/providers/huaweicloud.py:23
 msgid "AF-Johannesburg"
 msgstr "非洲-约翰内斯堡"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:21
+#: xpack/plugins/cloud/providers/huaweicloud.py:24
 msgid "AP-Bangkok"
 msgstr "亚太-曼谷"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:22
+#: xpack/plugins/cloud/providers/huaweicloud.py:25
 msgid "AP-Hong Kong"
 msgstr "亚太-香港"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:23
+#: xpack/plugins/cloud/providers/huaweicloud.py:26
 msgid "AP-Singapore"
 msgstr "亚太-新加坡"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:24
+#: xpack/plugins/cloud/providers/huaweicloud.py:27
 msgid "CN East-Shanghai1"
 msgstr "华东-上海1"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:25
+#: xpack/plugins/cloud/providers/huaweicloud.py:28
 msgid "CN East-Shanghai2"
 msgstr "华东-上海2"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:26
+#: xpack/plugins/cloud/providers/huaweicloud.py:29
 msgid "CN North-Beijing1"
 msgstr "华北-北京1"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:27
+#: xpack/plugins/cloud/providers/huaweicloud.py:30
 msgid "CN North-Beijing4"
 msgstr "华北-北京4"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:28
+#: xpack/plugins/cloud/providers/huaweicloud.py:31
 msgid "CN Northeast-Dalian"
 msgstr "华北-大连"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:29
+#: xpack/plugins/cloud/providers/huaweicloud.py:32
 msgid "CN South-Guangzhou"
 msgstr "华南-广州"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:30
+#: xpack/plugins/cloud/providers/huaweicloud.py:33
 msgid "CN Southwest-Guiyang1"
 msgstr "西南-贵阳1"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:31
+#: xpack/plugins/cloud/providers/huaweicloud.py:34
 msgid "EU-Paris"
 msgstr "欧洲-巴黎"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:32
+#: xpack/plugins/cloud/providers/huaweicloud.py:35
 msgid "LA-Santiago"
 msgstr "拉美-圣地亚哥"
 
-#: xpack/plugins/cloud/providers/qcloud.py:17
+#: xpack/plugins/cloud/providers/qcloud.py:20
 msgid "Tencent Cloud"
 msgstr "腾讯云"
 
@@ -3800,11 +3800,7 @@ msgstr "用户数量"
 msgid "Instance count"
 msgstr "实例个数"
 
-#: xpack/plugins/cloud/serializers.py:78
-msgid "Account name"
-msgstr "账户名称"
-
-#: xpack/plugins/cloud/serializers.py:79
+#: xpack/plugins/cloud/serializers.py:84
 #: xpack/plugins/gathered_user/serializers.py:20
 msgid "Periodic display"
 msgstr "定时执行"
@@ -3892,6 +3888,12 @@ msgstr "企业版"
 #: xpack/plugins/license/models.py:78
 msgid "Ultimate edition"
 msgstr "旗舰版"
+
+#~ msgid "Covered always"
+#~ msgstr "总是被覆盖"
+
+#~ msgid "Account name"
+#~ msgstr "账户名称"
 
 #~ msgid "Target URL"
 #~ msgstr "目标URL"
@@ -5844,9 +5846,6 @@ msgstr "旗舰版"
 
 #~ msgid "Gather user plan"
 #~ msgstr "收集用户计划"
-
-#~ msgid "Task update"
-#~ msgstr "更新"
 
 #~ msgid "Task create"
 #~ msgstr "创建"
