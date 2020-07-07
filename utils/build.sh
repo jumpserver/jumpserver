@@ -5,8 +5,8 @@ utils_dir=$(pwd)
 project_dir=$(dirname "$utils_dir")
 release_dir=${project_dir}/release
 
-# 编译翻译文件
-cd "${project_dir}/apps" && python manage.py compilemessages
+# 安装依赖包
+yum -y install git
 
 # 打包
 cd "${project_dir}" || exit 3
