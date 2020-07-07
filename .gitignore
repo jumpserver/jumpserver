@@ -36,3 +36,5 @@ xpack
 logs/*
 ### Vagrant ###
 .vagrant/
+release/*
+releashe
