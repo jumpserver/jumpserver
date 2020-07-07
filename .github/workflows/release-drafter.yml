@@ -15,6 +15,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Get version
+        id: get_version
+        run: |
+          TAG=$(basename ${GITHUB_REF})
+          VERSION=${TAG/v/}
+          echo "::set-output name=TAG::$TAG"
+          echo "::set-output name=VERSION::$VERSION"
       - name: Create Release
         id: create_release
         uses: release-drafter/release-drafter@v5
@@ -22,6 +29,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           config-name: release-config.yml
+          version: ${{ steps.get_version.outputs.TAG }}
+          tag: ${{ steps.get_version.outputs.TAG }}
 
   build-and-release:
     needs: create-realese
