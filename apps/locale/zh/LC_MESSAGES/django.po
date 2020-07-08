@@ -756,7 +756,7 @@ msgstr "定期测试管理账号可连接性: {}"
 
 #: assets/tasks/admin_user_connectivity.py:67
 msgid "Test admin user connectivity: {}"
-msgstr "测试管理行号可连接性: {}"
+msgstr "测试管理帐号可连接性: {}"
 
 #: assets/tasks/asset_connectivity.py:27
 msgid "Test assets connectivity"
