@@ -1,9 +1,13 @@
+from collections import namedtuple
+
 from django.db.transaction import atomic
+from django.db.models import F
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from common.const.http import POST
+from users.models.user import User
+from common.const.http import POST, GET
 from common.drf.api import JMSModelViewSet
 from common.permissions import IsValidUser
 from common.utils.django import get_object_or_none
@@ -37,6 +41,45 @@ class RequestAssetPermTicketViewSet(JMSModelViewSet):
         if instance.action == action:
             action_display = dict(instance.ACTION_CHOICES).get(action)
             raise TicketActionYet(detail=_('Ticket has %s') % action_display)
+
+    @action(detail=False, methods=[GET], permission_classes=[IsValidUser])
+    def assignees(self, request, *args, **kwargs):
+        org_mapper = {}
+        UserTuple = namedtuple('UserTuple', ('id', 'name', 'username'))
+        user = request.user
+        superusers = User.objects.filter(role=User.ROLE_ADMIN)
+
+        users_with_org = User.objects.filter(related_admin_orgs__users=user).annotate(
+            org_id=F('related_admin_orgs__id'), org_name=F('related_admin_orgs__name'))
+
+        for user in users_with_org:
+            org_id = user.org_id
+
+            if org_id not in org_mapper:
+                org_mapper[org_id] = {
+                    'org_id': org_id,
+                    'org_name': user.org_name,
+                    'children': set()  # 去重
+                }
+            org_mapper[org_id]['children'].add(UserTuple(user.id, user.name, user.username))
+
+        result = [
+            {
+                'org_id': None,
+                'org_name': _('Superuser'),
+                'children': [UserTuple(user.id, user.name, user.username)._asdict()
+                             for user in superusers]
+            }
+        ]
+
+        for org in org_mapper.values():
+            children = org['children']
+            new_children = []
+            for user in children:
+                new_children.append(user._asdict())
+            org['children'] = new_children
+            result.append(org)
+        return Response(data=result)
 
     @action(detail=True, methods=[POST], permission_classes=[IsAssignee, IsValidUser])
     def reject(self, request, *args, **kwargs):

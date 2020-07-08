@@ -320,3 +320,9 @@ class UserUpdatePublicKeySerializer(serializers.ModelSerializer):
         new_public_key = self.validated_data.get('public_key')
         instance.set_public_key(new_public_key)
         return instance
+
+
+class MiniUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'name', 'username']

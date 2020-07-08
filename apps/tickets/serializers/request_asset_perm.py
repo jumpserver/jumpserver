@@ -1,9 +1,9 @@
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse
+from django.db.models import Q
 
 from users.models.user import User
-from orgs.utils import current_org
 from ..models import Ticket
 
 
@@ -56,8 +56,10 @@ class RequestAssetPermTicketSerializer(serializers.ModelSerializer):
         }
 
     def validate_assignees(self, assignees):
-        count = (current_org.org_admins() | User.objects.filter(role=User.ROLE_ADMIN)).filter(
-            id__in=[assignee.id for assignee in assignees]).count()
+        user = self.context['request'].user
+
+        count = User.objects.filter(Q(related_admin_orgs__users=user) | Q(role=User.ROLE_ADMIN)).filter(
+            id__in=[assignee.id for assignee in assignees]).distinct().count()
 
         if count != len(assignees):
             raise serializers.ValidationError(_('Must be organization admin or superuser'))
