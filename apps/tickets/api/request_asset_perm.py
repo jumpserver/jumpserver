@@ -10,9 +10,11 @@ from common.utils.django import get_object_or_none
 from common.drf.serializers import EmptySerializer
 from perms.models.asset_permission import AssetPermission, Asset
 from assets.models.user import SystemUser
-from ..exceptions import (ConfirmedAssetsChanged, ConfirmedSystemUserChanged,
-                          TicketClosed, TicketActionYet, NotHaveConfirmedAssets,
-                          NotHaveConfirmedSystemUser)
+from ..exceptions import (
+    ConfirmedAssetsChanged, ConfirmedSystemUserChanged,
+    TicketClosed, TicketActionYet, NotHaveConfirmedAssets,
+    NotHaveConfirmedSystemUser
+)
 from .. import serializers
 from ..models import Ticket
 from ..permissions import IsAssignee
@@ -51,7 +53,7 @@ class RequestAssetPermTicketViewSet(JmsModelViewSet):
         self._check_can_set_action(instance, action)
 
         meta = instance.meta
-        confirmed_assets = meta['confirmed_assets']
+        confirmed_assets = meta.get('confirmed_assets', [])
         assets = list(Asset.objects.filter(id__in=confirmed_assets))
         if not assets:
             raise NotHaveConfirmedAssets(detail=_('Confirm assets first'))
@@ -59,7 +61,7 @@ class RequestAssetPermTicketViewSet(JmsModelViewSet):
         if len(assets) != len(confirmed_assets):
             raise ConfirmedAssetsChanged(detail=_('Confirmed assets changed'))
 
-        confirmed_system_user = meta['confirmed_system_user']
+        confirmed_system_user = meta.get('confirmed_system_user')
         if not confirmed_system_user:
             raise NotHaveConfirmedSystemUser(detail=_('Confirm system-user first'))
 
@@ -67,9 +69,17 @@ class RequestAssetPermTicketViewSet(JmsModelViewSet):
         if system_user is None:
             raise ConfirmedSystemUserChanged(detail=_('Confirmed system-user changed'))
 
+        self._create_asset_permission(instance, assets, system_user)
+        return Response({'detail': _('Succeed')})
+
+    def _create_asset_permission(self, instance: Ticket, assets, system_user):
+        meta = instance.meta
+        request = self.request
         ap_kwargs = {
             'name': meta.get('name', ''),
-            'created_by': self.request.user.username
+            'created_by': self.request.user.username,
+            'comment': '%s request assets, approved by %s'.format(instance.user_display,
+                                                                  instance.assignee_display)
         }
         date_start = meta.get('date_start')
         date_expired = meta.get('date_expired')
@@ -84,4 +94,4 @@ class RequestAssetPermTicketViewSet(JmsModelViewSet):
             ap.system_users.add(system_user)
             ap.assets.add(*assets)
 
-        return Response()
+        return ap
