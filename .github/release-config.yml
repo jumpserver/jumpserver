@@ -1,0 +1,44 @@
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+categories:
+  - title: '🌱 新功能 Features'
+    labels:
+      - 'feature'
+      - 'enhancement'
+      - 'feat'
+      - '新功能'
+  - title: '🚀 性能优化 Optimization'
+    labels:
+      - 'perf'
+      - 'opt'
+      - 'refactor'
+      - 'Optimization'
+      - '优化'
+  - title: '🐛 Bug修复 Bug Fixes'
+    labels:
+      - 'fix'
+      - 'bugfix'
+      - 'bug'
+  - title: '🧰 其它 Maintenance'
+    labels:
+      - 'chore'
+      - 'docs'
+exclude-labels:
+  - 'no'
+  - '无需处理'
+  - 'wontfix'
+change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+version-resolver:
+  major:
+    labels:
+      - 'major'
+  minor:
+    labels:
+      - 'minor'
+  patch:
+    labels:
+      - 'patch'
+  default: patch
+template: |
+  ## 版本变化  What’s Changed
+  $CHANGES
