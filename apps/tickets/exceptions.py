@@ -1,25 +1,25 @@
-from common.exceptions import JmsException
+from common.exceptions import JMSException
 
 
-class NotHaveConfirmedAssets(JmsException):
+class NotHaveConfirmedAssets(JMSException):
     pass
 
 
-class ConfirmedAssetsChanged(JmsException):
+class ConfirmedAssetsChanged(JMSException):
     pass
 
 
-class NotHaveConfirmedSystemUser(JmsException):
+class NotHaveConfirmedSystemUser(JMSException):
     pass
 
 
-class ConfirmedSystemUserChanged(JmsException):
+class ConfirmedSystemUserChanged(JMSException):
     pass
 
 
-class TicketClosed(JmsException):
+class TicketClosed(JMSException):
     pass
 
 
-class TicketActionYet(JmsException):
+class TicketActionYet(JMSException):
     pass

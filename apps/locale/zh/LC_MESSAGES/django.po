@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-07 19:24+0800\n"
+"POT-Creation-Date: 2020-07-08 12:17+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -2399,30 +2399,38 @@ msgstr "结束日期"
 msgid "Args"
 msgstr "参数"
 
-#: tickets/api/request_asset_perm.py:34
+#: tickets/api/request_asset_perm.py:36
 msgid "Ticket closed"
 msgstr "工单已关闭"
 
-#: tickets/api/request_asset_perm.py:37
+#: tickets/api/request_asset_perm.py:39
 #, python-format
 msgid "Ticket has %s"
 msgstr "工单已%s"
 
-#: tickets/api/request_asset_perm.py:57
+#: tickets/api/request_asset_perm.py:59
 msgid "Confirm assets first"
 msgstr "请先确认资产"
 
-#: tickets/api/request_asset_perm.py:60
+#: tickets/api/request_asset_perm.py:62
 msgid "Confirmed assets changed"
 msgstr "确认的资产变更了"
 
-#: tickets/api/request_asset_perm.py:64
+#: tickets/api/request_asset_perm.py:66
 msgid "Confirm system-user first"
 msgstr "请先确认系统用户"
 
-#: tickets/api/request_asset_perm.py:68
+#: tickets/api/request_asset_perm.py:70
 msgid "Confirmed system-user changed"
 msgstr "确认的系统用户变更了"
+
+#: tickets/api/request_asset_perm.py:73 xpack/plugins/cloud/models.py:205
+msgid "Succeed"
+msgstr "成功"
+
+#: tickets/api/request_asset_perm.py:81
+msgid "{} request assets, approved by {}"
+msgstr "{} 申请资产，通过人 {}"
 
 #: tickets/models/ticket.py:18 tickets/models/ticket.py:72
 msgid "Open"
@@ -3701,10 +3709,6 @@ msgstr "最后同步日期"
 #: xpack/plugins/cloud/models.py:153 xpack/plugins/cloud/models.py:210
 msgid "Sync instance task"
 msgstr "同步实例任务"
-
-#: xpack/plugins/cloud/models.py:205
-msgid "Succeed"
-msgstr "成功"
 
 #: xpack/plugins/cloud/models.py:220 xpack/plugins/cloud/models.py:275
 msgid "Date sync"

@@ -7,5 +7,5 @@ class JmsGenericViewSet(SerializerMixin2, QuerySetMixin, ExtraFilterFieldsMixin,
     pass
 
 
-class JmsModelViewSet(SerializerMixin2, QuerySetMixin, ExtraFilterFieldsMixin, ModelViewSet):
+class JMSModelViewSet(SerializerMixin2, QuerySetMixin, ExtraFilterFieldsMixin, ModelViewSet):
     pass

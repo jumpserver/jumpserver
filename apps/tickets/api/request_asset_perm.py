@@ -4,7 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from common.const.http import POST
-from common.drf.api import JmsModelViewSet
+from common.drf.api import JMSModelViewSet
 from common.permissions import IsValidUser
 from common.utils.django import get_object_or_none
 from common.drf.serializers import EmptySerializer
@@ -20,7 +20,7 @@ from ..models import Ticket
 from ..permissions import IsAssignee
 
 
-class RequestAssetPermTicketViewSet(JmsModelViewSet):
+class RequestAssetPermTicketViewSet(JMSModelViewSet):
     queryset = Ticket.objects.filter(type=Ticket.TYPE_REQUEST_ASSET_PERM)
     serializer_classes = {
         'default': serializers.RequestAssetPermTicketSerializer,
@@ -78,7 +78,7 @@ class RequestAssetPermTicketViewSet(JmsModelViewSet):
         ap_kwargs = {
             'name': meta.get('name', ''),
             'created_by': self.request.user.username,
-            'comment': '%s request assets, approved by %s'.format(instance.user_display,
+            'comment': _('{} request assets, approved by {}').format(instance.user_display,
                                                                   instance.assignee_display)
         }
         date_start = meta.get('date_start')
