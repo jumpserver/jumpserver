@@ -42,14 +42,7 @@ class UserGroupSerializer(BulkOrgResourceModelSerializer):
     def set_fields_queryset(self):
         users_field = self.fields.get('users')
         if users_field:
-            users_field.child_relation.queryset = utils.get_current_org_members(exclude=('Auditor',))
-
-    def validate_users(self, users):
-        for user in users:
-            if user.is_super_auditor:
-                msg = _('Auditors cannot be join in the user group')
-                raise serializers.ValidationError(msg)
-        return users
+            users_field.child_relation.queryset = utils.get_current_org_members()
 
     @classmethod
     def setup_eager_loading(cls, queryset):
