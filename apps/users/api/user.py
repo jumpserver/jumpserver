@@ -18,6 +18,7 @@ from ..serializers import UserSerializer, UserRetrieveSerializer
 from .mixins import UserQuerysetMixin
 from ..models import User
 from ..signals import post_user_create
+from ..filters import OrgRoleUserFilterBackend
 
 
 logger = get_logger(__name__)
@@ -35,6 +36,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         'default': UserSerializer,
         'retrieve': UserRetrieveSerializer
     }
+    extra_filter_backends = [OrgRoleUserFilterBackend]
 
     def get_queryset(self):
         return super().get_queryset().prefetch_related('groups')

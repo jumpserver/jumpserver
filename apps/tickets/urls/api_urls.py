@@ -7,6 +7,7 @@ from .. import api
 app_name = 'tickets'
 router = BulkRouter()
 
+router.register('tickets/request-asset-perm', api.RequestAssetPermTicketViewSet, 'ticket-request-asset-perm')
 router.register('tickets', api.TicketViewSet, 'ticket')
 router.register('tickets/(?P<ticket_id>[0-9a-zA-Z\-]{36})/comments', api.TicketCommentViewSet, 'ticket-comment')
 
