@@ -128,3 +128,14 @@ class RequestAssetPermTicketSerializer(serializers.ModelSerializer):
     def _is_assignee(self, obj: Ticket):
         user = self.context['request'].user
         return obj.is_assignee(user)
+
+
+class AssigneeSerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    name = serializers.CharField()
+    username = serializers.CharField()
+
+
+class OrgAssigneeSerializer(serializers.Serializer):
+    org_name = serializers.CharField()
+    org_admins = AssigneeSerializer(many=True)
