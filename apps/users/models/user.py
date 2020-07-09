@@ -234,6 +234,11 @@ class RoleMixin:
         return self.role == self.ROLE.APP
 
     @lazyproperty
+    def user_all_orgs(self):
+        from orgs.models import Organization
+        return Organization.get_user_all_orgs(self)
+
+    @lazyproperty
     def user_orgs(self):
         from orgs.models import Organization
         return Organization.get_user_user_orgs(self)

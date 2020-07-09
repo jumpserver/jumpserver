@@ -11,6 +11,8 @@ import time
 import ipaddress
 import psutil
 
+from .timezone import dt_formater
+
 
 UUID_PATTERN = re.compile(r'\w{8}(-\w{4}){3}-\w{12}')
 ipip_db = None

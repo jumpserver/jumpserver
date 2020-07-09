@@ -27,6 +27,11 @@ class UserOrgSerializer(serializers.Serializer):
     name = serializers.CharField()
 
 
+class UserOrgLabelSerializer(serializers.Serializer):
+    value = serializers.CharField(source='id')
+    label = serializers.CharField(source='name')
+
+
 class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
     EMAIL_SET_PASSWORD = _('Reset link will be generated and sent to the user')
     CUSTOM_PASSWORD = _('Set password')
@@ -214,6 +219,7 @@ class UserRoleSerializer(serializers.Serializer):
 
 class UserProfileSerializer(UserSerializer):
     admin_or_audit_orgs = UserOrgSerializer(many=True, read_only=True)
+    user_all_orgs = UserOrgLabelSerializer(many=True, read_only=True)
     current_org_roles = serializers.ListField(read_only=True)
     public_key_comment = serializers.CharField(
         source='get_public_key_comment', required=False, read_only=True, max_length=128
@@ -231,7 +237,7 @@ class UserProfileSerializer(UserSerializer):
     class Meta(UserSerializer.Meta):
         fields = UserSerializer.Meta.fields + [
             'public_key_comment', 'public_key_hash_md5', 'admin_or_audit_orgs', 'current_org_roles',
-            'guide_url'
+            'guide_url', 'user_all_orgs'
         ]
         extra_kwargs = dict(UserSerializer.Meta.extra_kwargs)
         extra_kwargs.update({
