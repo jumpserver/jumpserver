@@ -16,7 +16,7 @@ if [[ -d '.git' ]];then
   git archive --format tar HEAD | tar x -C "${to_dir}"
 else
   cp -R . /tmp/jumpserver
-  mv -R /tmp/jumpserver/* "${to_dir}"
+  mv /tmp/jumpserver/* "${to_dir}"
 fi
 
 if [[ $(uname) == 'Darwin' ]];then
