@@ -1,9 +1,13 @@
+from collections import namedtuple
+
 from django.db.transaction import atomic
+from django.db.models import F
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from common.const.http import POST
+from users.models.user import User
+from common.const.http import POST, GET
 from common.drf.api import JMSModelViewSet
 from common.permissions import IsValidUser
 from common.utils.django import get_object_or_none
@@ -26,6 +30,7 @@ class RequestAssetPermTicketViewSet(JMSModelViewSet):
         'default': serializers.RequestAssetPermTicketSerializer,
         'approve': EmptySerializer,
         'reject': EmptySerializer,
+        'assignees': serializers.OrgAssigneeSerializer,
     }
     permission_classes = (IsValidUser,)
     filter_fields = ['status', 'title', 'action', 'user_display']
@@ -37,6 +42,41 @@ class RequestAssetPermTicketViewSet(JMSModelViewSet):
         if instance.action == action:
             action_display = dict(instance.ACTION_CHOICES).get(action)
             raise TicketActionYet(detail=_('Ticket has %s') % action_display)
+
+    @action(detail=False, methods=[GET], permission_classes=[IsValidUser])
+    def assignees(self, request, *args, **kwargs):
+        org_mapper = {}
+        UserTuple = namedtuple('UserTuple', ('id', 'name', 'username'))
+        user = request.user
+        superusers = User.objects.filter(role=User.ROLE_ADMIN)
+
+        admins_with_org = User.objects.filter(related_admin_orgs__users=user).annotate(
+            org_id=F('related_admin_orgs__id'), org_name=F('related_admin_orgs__name')
+        )
+
+        for user in admins_with_org:
+            org_id = user.org_id
+
+            if org_id not in org_mapper:
+                org_mapper[org_id] = {
+                    'org_name': user.org_name,
+                    'org_admins': set()  # 去重
+                }
+            org_mapper[org_id]['org_admins'].add(UserTuple(user.id, user.name, user.username))
+
+        result = [
+            {
+                'org_name': _('Superuser'),
+                'org_admins': set(UserTuple(user.id, user.name, user.username)
+                                  for user in superusers)
+            }
+        ]
+
+        for org in org_mapper.values():
+            result.append(org)
+        serializer_class = self.get_serializer_class()
+        serilizer = serializer_class(instance=result, many=True)
+        return Response(data=serilizer.data)
 
     @action(detail=True, methods=[POST], permission_classes=[IsAssignee, IsValidUser])
     def reject(self, request, *args, **kwargs):

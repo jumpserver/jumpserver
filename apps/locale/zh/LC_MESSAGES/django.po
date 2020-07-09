@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-08 15:05+0800\n"
+"POT-Creation-Date: 2020-07-09 10:05+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -211,7 +211,7 @@ msgstr "IP"
 
 #: assets/models/asset.py:187 assets/serializers/asset_user.py:45
 #: assets/serializers/gathered_user.py:20 settings/serializers/settings.py:51
-#: tickets/serializers/request_asset_perm.py:13
+#: tickets/serializers/request_asset_perm.py:14
 #: users/templates/users/_granted_assets.html:25
 #: users/templates/users/user_asset_permission.html:157
 msgid "Hostname"
@@ -485,7 +485,7 @@ msgstr "每行一个命令"
 #: assets/models/cmd_filter.py:55 audits/models.py:57
 #: authentication/templates/authentication/_access_key_modal.html:34
 #: perms/forms/asset_permission.py:20
-#: tickets/serializers/request_asset_perm.py:51
+#: tickets/serializers/request_asset_perm.py:54
 #: tickets/serializers/ticket.py:26
 #: users/templates/users/_granted_assets.html:29
 #: users/templates/users/user_asset_permission.html:44
@@ -540,7 +540,7 @@ msgstr "默认资产组"
 #: templates/index.html:78 terminal/backends/command/models.py:18
 #: terminal/backends/command/serializers.py:12 terminal/models.py:185
 #: tickets/models/ticket.py:35 tickets/models/ticket.py:130
-#: tickets/serializers/request_asset_perm.py:52
+#: tickets/serializers/request_asset_perm.py:55
 #: tickets/serializers/ticket.py:27 users/forms/group.py:15
 #: users/models/user.py:160 users/models/user.py:176 users/models/user.py:615
 #: users/serializers/group.py:20
@@ -648,6 +648,7 @@ msgstr "SFTP根路径"
 #: perms/models/remote_app_permission.py:16 templates/_nav.html:45
 #: terminal/backends/command/models.py:20
 #: terminal/backends/command/serializers.py:14 terminal/models.py:189
+#: tickets/serializers/request_asset_perm.py:16
 #: users/templates/users/_granted_assets.html:27
 #: users/templates/users/user_asset_permission.html:42
 #: users/templates/users/user_asset_permission.html:76
@@ -918,7 +919,7 @@ msgid "Success"
 msgstr "成功"
 
 #: audits/models.py:43 ops/models/command.py:28 perms/models/base.py:52
-#: terminal/models.py:199 tickets/serializers/request_asset_perm.py:15
+#: terminal/models.py:199 tickets/serializers/request_asset_perm.py:18
 #: xpack/plugins/change_auth_plan/models.py:177
 #: xpack/plugins/change_auth_plan/models.py:308
 #: xpack/plugins/gathered_user/models.py:76
@@ -1009,7 +1010,7 @@ msgstr "多因子认证"
 msgid "Reason"
 msgstr "原因"
 
-#: audits/models.py:106 tickets/serializers/request_asset_perm.py:50
+#: audits/models.py:106 tickets/serializers/request_asset_perm.py:53
 #: tickets/serializers/ticket.py:25 xpack/plugins/cloud/models.py:214
 #: xpack/plugins/cloud/models.py:272
 msgid "Status"
@@ -1699,7 +1700,7 @@ msgstr "动作"
 msgid "Asset permission"
 msgstr "资产授权"
 
-#: perms/models/base.py:53 tickets/serializers/request_asset_perm.py:17
+#: perms/models/base.py:53 tickets/serializers/request_asset_perm.py:20
 #: users/models/user.py:505 users/templates/users/user_detail.html:93
 #: users/templates/users/user_profile.html:120
 msgid "Date expired"
@@ -2432,36 +2433,40 @@ msgstr "结束日期"
 msgid "Args"
 msgstr "参数"
 
-#: tickets/api/request_asset_perm.py:36
+#: tickets/api/request_asset_perm.py:40
 msgid "Ticket closed"
 msgstr "工单已关闭"
 
-#: tickets/api/request_asset_perm.py:39
+#: tickets/api/request_asset_perm.py:43
 #, python-format
 msgid "Ticket has %s"
 msgstr "工单已%s"
 
-#: tickets/api/request_asset_perm.py:59
+#: tickets/api/request_asset_perm.py:69
+msgid "Superuser"
+msgstr "超级管理员"
+
+#: tickets/api/request_asset_perm.py:102
 msgid "Confirm assets first"
 msgstr "请先确认资产"
 
-#: tickets/api/request_asset_perm.py:62
+#: tickets/api/request_asset_perm.py:105
 msgid "Confirmed assets changed"
 msgstr "确认的资产变更了"
 
-#: tickets/api/request_asset_perm.py:66
+#: tickets/api/request_asset_perm.py:109
 msgid "Confirm system-user first"
 msgstr "请先确认系统用户"
 
-#: tickets/api/request_asset_perm.py:70
+#: tickets/api/request_asset_perm.py:113
 msgid "Confirmed system-user changed"
 msgstr "确认的系统用户变更了"
 
-#: tickets/api/request_asset_perm.py:73 xpack/plugins/cloud/models.py:205
+#: tickets/api/request_asset_perm.py:116 xpack/plugins/cloud/models.py:205
 msgid "Succeed"
 msgstr "成功"
 
-#: tickets/api/request_asset_perm.py:81
+#: tickets/api/request_asset_perm.py:124
 msgid "{} request assets, approved by {}"
 msgstr "{} 申请资产，通过人 {}"
 
@@ -2525,19 +2530,19 @@ msgstr "{} {} 这个工单"
 msgid "this ticket"
 msgstr "这个工单"
 
-#: tickets/serializers/request_asset_perm.py:11
+#: tickets/serializers/request_asset_perm.py:12
 msgid "IP group"
 msgstr "IP组"
 
-#: tickets/serializers/request_asset_perm.py:21
+#: tickets/serializers/request_asset_perm.py:24
 msgid "Confirmed assets"
 msgstr "确认的资产"
 
-#: tickets/serializers/request_asset_perm.py:25
+#: tickets/serializers/request_asset_perm.py:28
 msgid "Confirmed system user"
 msgstr "确认的系统用户"
 
-#: tickets/serializers/request_asset_perm.py:58
+#: tickets/serializers/request_asset_perm.py:65
 msgid "Must be organization admin or superuser"
 msgstr "必须是组织管理员或者超级管理员"
 
@@ -2777,10 +2782,6 @@ msgstr "最后更新密码日期"
 #: users/models/user.py:626
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
-
-#: users/serializers/group.py:50
-msgid "Auditors cannot be join in the user group"
-msgstr "审计员不能被加入到用户组"
 
 #: users/serializers/user.py:69 users/serializers/user.py:229
 msgid "Is first login"
@@ -3948,6 +3949,9 @@ msgstr "企业版"
 msgid "Ultimate edition"
 msgstr "旗舰版"
 
+#~ msgid "Auditors cannot be join in the user group"
+#~ msgstr "审计员不能被加入到用户组"
+
 #~ msgid "Always update"
 #~ msgstr "总是更新"
 
@@ -4757,9 +4761,6 @@ msgstr "旗舰版"
 
 #~ msgid "Tips: Some provider use token except password"
 #~ msgstr "提示：一些邮件提供商需要输入的是Token"
-
-#~ msgid "Send user"
-#~ msgstr "发送账号"
 
 #~ msgid "Tips: Send mail account, default SMTP account as the send account"
 #~ msgstr "提示：发送邮件账号，默认使用SMTP账号作为发送账号"

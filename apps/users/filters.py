@@ -1,6 +1,7 @@
 from rest_framework.compat import coreapi, coreschema
 from rest_framework import filters
 
+from users.models.user import User
 from orgs.utils import current_org
 
 
@@ -11,7 +12,7 @@ class OrgRoleUserFilterBackend(filters.BaseFilterBackend):
             return queryset
 
         if org_role == 'admins':
-            return queryset & current_org.get_org_admins()
+            return queryset & (current_org.get_org_admins() | User.objects.filter(role=User.ROLE_ADMIN))
         elif org_role == 'auditors':
             return queryset & current_org.get_org_auditors()
         elif org_role == 'users':

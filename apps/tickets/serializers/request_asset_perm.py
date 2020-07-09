@@ -1,8 +1,9 @@
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse
+from django.db.models import Q
 
-from orgs.utils import current_org
+from users.models.user import User
 from ..models import Ticket
 
 
@@ -10,7 +11,9 @@ class RequestAssetPermTicketSerializer(serializers.ModelSerializer):
     ips = serializers.ListField(child=serializers.IPAddressField(), source='meta.ips',
                                 default=list, label=_('IP group'))
     hostname = serializers.CharField(max_length=256, source='meta.hostname', default=None,
-                                      allow_blank=True, label=_('Hostname'))
+                                     allow_blank=True, label=_('Hostname'))
+    system_user = serializers.CharField(max_length=256, source='meta.system_user', default='',
+                                        allow_blank=True, label=_('System user'))
     date_start = serializers.DateTimeField(source='meta.date_start', allow_null=True,
                                            required=False, label=_('Date start'))
     date_expired = serializers.DateTimeField(source='meta.date_expired', allow_null=True,
@@ -33,7 +36,7 @@ class RequestAssetPermTicketSerializer(serializers.ModelSerializer):
             'status', 'action', 'date_created', 'date_updated', 'system_user_waitlist_url',
             'type', 'type_display', 'action_display', 'ips', 'confirmed_assets',
             'date_start', 'date_expired', 'confirmed_system_user', 'hostname',
-            'assets_waitlist_url'
+            'assets_waitlist_url', 'system_user'
         ]
         m2m_fields = [
             'user', 'user_display', 'assignees', 'assignees_display',
@@ -53,7 +56,11 @@ class RequestAssetPermTicketSerializer(serializers.ModelSerializer):
         }
 
     def validate_assignees(self, assignees):
-        count = current_org.org_admins().filter(id__in=[assignee.id for assignee in assignees]).count()
+        user = self.context['request'].user
+
+        count = User.objects.filter(Q(related_admin_orgs__users=user) | Q(role=User.ROLE_ADMIN)).filter(
+            id__in=[assignee.id for assignee in assignees]).distinct().count()
+
         if count != len(assignees):
             raise serializers.ValidationError(_('Must be organization admin or superuser'))
         return assignees
@@ -61,7 +68,10 @@ class RequestAssetPermTicketSerializer(serializers.ModelSerializer):
     def get_system_user_waitlist_url(self, instance: Ticket):
         if not self._is_assignee(instance):
             return None
-        return {'url': reverse('api-assets:system-user-list')}
+        meta = instance.meta
+        url = reverse('api-assets:system-user-list')
+        query = meta.get('system_user', '')
+        return '{}?search={}'.format(url, query)
 
     def get_assets_waitlist_url(self, instance: Ticket):
         if not self._is_assignee(instance):
@@ -118,3 +128,14 @@ class RequestAssetPermTicketSerializer(serializers.ModelSerializer):
     def _is_assignee(self, obj: Ticket):
         user = self.context['request'].user
         return obj.is_assignee(user)
+
+
+class AssigneeSerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    name = serializers.CharField()
+    username = serializers.CharField()
+
+
+class OrgAssigneeSerializer(serializers.Serializer):
+    org_name = serializers.CharField()
+    org_admins = AssigneeSerializer(many=True)
