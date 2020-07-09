@@ -1,4 +1,5 @@
 # ~*~ coding: utf-8 ~*~
+import time
 
 from django.urls import reverse_lazy, reverse
 from django.utils.translation import ugettext as _
@@ -6,13 +7,17 @@ from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 from django.contrib.auth import logout as auth_logout
 from django.conf import settings
+from django.http.response import HttpResponseForbidden
 
-from common.utils import get_logger
+from authentication.mixins import AuthMixin
+from users.models import User
+from common.utils import get_logger, get_object_or_none
 from common.permissions import IsValidUser
 from ... import forms
 from .password import UserVerifyPasswordView
 from ...utils import (
     generate_otp_uri, check_otp_code, get_user_or_pre_auth_user,
+    is_auth_password_time_valid, is_auth_otp_time_valid
 )
 
 __all__ = [
@@ -46,10 +51,49 @@ class UserOtpEnableInstallAppView(TemplateView):
         return super().get_context_data(**kwargs)
 
 
-class UserOtpEnableBindView(TemplateView, FormView):
+class UserOtpEnableBindView(AuthMixin, TemplateView, FormView):
     template_name = 'users/user_otp_enable_bind.html'
     form_class = forms.UserCheckOtpCodeForm
     success_url = reverse_lazy('authentication:user-otp-settings-success')
+
+    def get(self, request, *args, **kwargs):
+        if self._check_can_bind():
+            return super().get(request, *args, **kwargs)
+        return HttpResponseForbidden()
+
+    def post(self, request, *args, **kwargs):
+        if self._check_can_bind():
+            return super().post(request, *args, **kwargs)
+        return HttpResponseForbidden()
+
+    def _check_authenticated_user_can_bind(self):
+        user = self.request.user
+        session = self.request.session
+
+        if not user.mfa_enabled:
+            return is_auth_password_time_valid(session)
+
+        if not user.otp_secret_key:
+            return is_auth_password_time_valid(session)
+
+        return is_auth_otp_time_valid(session)
+
+    def _check_unauthenticated_user_can_bind(self):
+        session_user = None
+        if not self.request.session.is_empty():
+            user_id = self.request.session.get('user_id')
+            session_user = get_object_or_none(User, pk=user_id)
+
+        if session_user:
+            if all((is_auth_password_time_valid(self.request.session), session_user.mfa_enabled, not session_user.otp_secret_key)):
+                return True
+        return False
+
+    def _check_can_bind(self):
+        if self.request.user.is_authenticated:
+            return self._check_authenticated_user_can_bind()
+        else:
+            return self._check_unauthenticated_user_can_bind()
 
     def form_valid(self, form):
         otp_code = form.cleaned_data.get('otp_code')
@@ -116,6 +160,7 @@ class UserOtpUpdateView(FormView):
 
         valid = user.check_mfa(otp_code)
         if valid:
+            self.request.session['auth_opt_expired_at'] = time.time() + settings.AUTH_EXPIRED_SECONDS
             return super().form_valid(form)
         else:
             error = _('MFA code invalid, or ntp sync server time')

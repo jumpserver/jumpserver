@@ -30,7 +30,7 @@ class JMSCSVRender(BaseRenderer):
 
     @staticmethod
     def _gen_table(data, fields):
-        data = data[:100]
+        data = data[:10000]
         yield ['*{}'.format(f.label) if f.required else f.label for f in fields]
 
         for item in data:

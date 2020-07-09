@@ -260,7 +260,8 @@ class Config(dict):
         'WINDOWS_SKIP_ALL_MANUAL_PASSWORD': False,
         'ORG_CHANGE_TO_URL': '',
         'LANGUAGE_CODE': 'zh',
-        'TIME_ZONE': 'Asia/Shanghai'
+        'TIME_ZONE': 'Asia/Shanghai',
+        'CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED': True
     }
 
     def compatible_auth_openid_of_key(self):
