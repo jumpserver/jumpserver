@@ -3,6 +3,7 @@ import uuid
 
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
+from django.conf import settings
 
 from common.permissions import (
     IsCurrentUserOrReadOnly
@@ -64,8 +65,9 @@ class UserProfileApi(generics.RetrieveUpdateAPIView):
         return self.request.user
 
     def retrieve(self, request, *args, **kwargs):
-        age = request.session.get_expiry_age()
-        request.session.set_expiry(age)
+        if not settings.SESSION_EXPIRE_AT_BROWSER_CLOSE:
+            age = request.session.get_expiry_age()
+            request.session.set_expiry(age)
         return super().retrieve(request, *args, **kwargs)
 
 

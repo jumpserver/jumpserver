@@ -4,6 +4,7 @@ import time
 from hashlib import md5
 from threading import Thread
 from collections import defaultdict
+from itertools import chain
 
 from django.db.models.signals import m2m_changed
 from django.core.cache import cache
@@ -15,8 +16,8 @@ from common.drf.filters import IDSpmFilter, CustomFilter, IDInFilter
 from ..utils import lazyproperty
 
 __all__ = [
-    "JSONResponseMixin", "CommonApiMixin",
-    'AsyncApiMixin', 'RelationMixin'
+    'JSONResponseMixin', 'CommonApiMixin', 'AsyncApiMixin', 'RelationMixin',
+    'SerializerMixin2', 'QuerySetMixin', 'ExtraFilterFieldsMixin'
 ]
 
 
@@ -54,9 +55,10 @@ class ExtraFilterFieldsMixin:
     def get_filter_backends(self):
         if self.filter_backends != self.__class__.filter_backends:
             return self.filter_backends
-        backends = list(self.filter_backends) + \
-                   list(self.default_added_filters) + \
-                   list(self.extra_filter_backends)
+        backends = list(chain(
+            self.filter_backends,
+            self.default_added_filters,
+            self.extra_filter_backends))
         return backends
 
     def filter_queryset(self, queryset):
@@ -233,3 +235,32 @@ class RelationMixin:
     def perform_create(self, serializer):
         instance = serializer.save()
         self.send_post_add_signal(instance)
+
+
+class SerializerMixin2:
+    serializer_classes = {}
+
+    def get_serializer_class(self):
+        if self.serializer_classes:
+            serializer_class = self.serializer_classes.get(
+                self.action, self.serializer_classes.get('default')
+            )
+
+            if isinstance(serializer_class, dict):
+                serializer_class = serializer_class.get(
+                    self.request.method.lower, serializer_class.get('default')
+                )
+
+            assert serializer_class, '`serializer_classes` config error'
+            return serializer_class
+        return super().get_serializer_class()
+
+
+class QuerySetMixin:
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        serializer_class = self.get_serializer_class()
+        if serializer_class and hasattr(serializer_class, 'setup_eager_loading'):
+            queryset = serializer_class.setup_eager_loading(queryset)
+
+        return queryset

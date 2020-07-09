@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 
-import coreapi
+from rest_framework.compat import coreapi, coreschema
 from rest_framework import filters
 from django.db.models import Q
 
@@ -117,3 +117,23 @@ class AssetRelatedByNodeFilterBackend(AssetByNodeFilterBackend):
     def perform_query(pattern, queryset):
         return queryset.filter(asset__nodes__key__regex=pattern).distinct()
 
+
+class IpInFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        ips = request.query_params.get('ips')
+        if not ips:
+            return queryset
+        ip_list = [i.strip() for i in ips.split(',')]
+        queryset = queryset.filter(ip__in=ip_list)
+        return queryset
+
+    def get_schema_fields(self, view):
+        return [
+            coreapi.Field(
+                name='ips', location='query', required=False, type='string',
+                schema=coreschema.String(
+                    title='ips',
+                    description='ip in filter'
+                )
+            )
+        ]

@@ -199,6 +199,20 @@ class FamilyMixin:
             )
             return child
 
+    def get_or_create_child(self, value, _id=None):
+        """
+        :return: Node, bool (created)
+        """
+        children = self.get_children()
+        exist = children.filter(value=value).exists()
+        if exist:
+            child = children.filter(value=value).first()
+            created = False
+        else:
+            child = self.create_child(value, _id)
+            created = True
+        return child, created
+
     def get_next_child_key(self):
         mark = self.child_mark
         self.child_mark += 1

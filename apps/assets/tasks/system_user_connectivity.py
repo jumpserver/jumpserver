@@ -31,7 +31,10 @@ def test_system_user_connectivity_util(system_user, assets, task_name):
     """
     from ops.utils import update_or_create_ansible_task
 
-    hosts = clean_ansible_task_hosts(assets, system_user=system_user)
+    # hosts = clean_ansible_task_hosts(assets, system_user=system_user)
+    # TODO: 这里不传递系统用户，因为clean_ansible_task_hosts会通过system_user来判断是否可以推送，
+    #  不符合测试可连接性逻辑， 后面需要优化此逻辑
+    hosts = clean_ansible_task_hosts(assets)
     if not hosts:
         return {}
     platform_hosts_map = {}

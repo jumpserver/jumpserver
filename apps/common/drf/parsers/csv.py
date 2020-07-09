@@ -6,18 +6,27 @@ import chardet
 import codecs
 import unicodecsv
 
+from django.utils.translation import ugettext as _
 from rest_framework.parsers import BaseParser
-from rest_framework.exceptions import ParseError
+from rest_framework.exceptions import ParseError, APIException
+from rest_framework import status
 
 from common.utils import get_logger
 
 logger = get_logger(__file__)
 
 
+class CsvDataTooBig(APIException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_code = 'csv_data_too_big'
+    default_detail = _('The max size of CSV is %d bytes')
+
+
 class JMSCSVParser(BaseParser):
     """
     Parses CSV file to serializer data
     """
+    CSV_UPLOAD_MAX_SIZE = 1024 * 1024 * 10
 
     media_type = 'text/csv'
 
@@ -46,23 +55,31 @@ class JMSCSVParser(BaseParser):
         return fields_map
 
     @staticmethod
-    def _process_row(row):
+    def _replace_chinese_quot(str_):
+        trans_table = str.maketrans({
+            '“': '"',
+            '”': '"',
+            '‘': '"',
+            '’': '"',
+            '\'': '"'
+        })
+        return str_.translate(trans_table)
+
+    @classmethod
+    def _process_row(cls, row):
         """
         构建json数据前的行处理
         """
         _row = []
+
         for col in row:
             # 列表转换
-            if isinstance(col, str) and col.find("[") != -1 and col.find("]") != -1:
-                # 替换中文格式引号
-                col = col.replace("“", '"').replace("”", '"').\
-                    replace("‘", '"').replace('’', '"').replace("'", '"')
+            if isinstance(col, str) and col.startswith('[') and col.endswith(']'):
+                col = cls._replace_chinese_quot(col)
                 col = json.loads(col)
             # 字典转换
-            if isinstance(col, str) and col.find("{") != -1 and col.find("}") != -1:
-                # 替换中文格式引号
-                col = col.replace("“", '"').replace("”", '"'). \
-                    replace("‘", '"').replace('’', '"').replace("'", '"')
+            if isinstance(col, str) and col.startswith("{") and col.endswith("}"):
+                col = cls._replace_chinese_quot(col)
                 col = json.loads(col)
             _row.append(col)
         return _row
@@ -82,10 +99,18 @@ class JMSCSVParser(BaseParser):
     def parse(self, stream, media_type=None, parser_context=None):
         parser_context = parser_context or {}
         try:
-            serializer = parser_context["view"].get_serializer()
+            view = parser_context['view']
+            meta = view.request.META
+            serializer = view.get_serializer()
         except Exception as e:
             logger.debug(e, exc_info=True)
             raise ParseError('The resource does not support imports!')
+
+        content_length = int(meta.get('CONTENT_LENGTH', meta.get('HTTP_CONTENT_LENGTH', 0)))
+        if content_length > self.CSV_UPLOAD_MAX_SIZE:
+            msg = CsvDataTooBig.default_detail % self.CSV_UPLOAD_MAX_SIZE
+            logger.error(msg)
+            raise CsvDataTooBig(msg)
 
         try:
             stream_data = stream.read()

@@ -22,7 +22,7 @@ from common.utils import get_request_ip, get_object_or_none
 from users.utils import (
     redirect_user_first_login_or_index
 )
-from .. import forms, mixins, errors
+from .. import forms, mixins, errors, utils
 
 
 __all__ = [
@@ -108,9 +108,13 @@ class UserLoginView(mixins.AuthMixin, FormView):
             return self.form_class
 
     def get_context_data(self, **kwargs):
+        # 生成加解密密钥对，public_key传递给前端，private_key存入session中供解密使用
+        rsa_private_key, rsa_public_key = utils.gen_key_pair()
+        self.request.session['rsa_private_key'] = rsa_private_key
         context = {
             'demo_mode': os.environ.get("DEMO_MODE"),
             'AUTH_OPENID': settings.AUTH_OPENID,
+            'rsa_public_key': rsa_public_key.replace('\n', '\\n')
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
