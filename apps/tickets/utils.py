@@ -1,23 +1,30 @@
 # -*- coding: utf-8 -*-
 #
+from urllib.parse import urljoin
 from django.conf import settings
 from django.utils.translation import ugettext as _
 
-from common.utils import get_logger, reverse
+from common.utils import get_logger
 from common.tasks import send_mail_async
 
 logger = get_logger(__name__)
+from tickets.models import Ticket
 
 
-def send_new_ticket_mail_to_assignees(ticket, assignees):
+def send_new_ticket_mail_to_assignees(ticket: Ticket, assignees):
     recipient_list = [user.email for user in assignees]
     user = ticket.user
     if not recipient_list:
         logger.error("Ticket not has assignees: {}".format(ticket.id))
         return
     subject = '{}: {}'.format(_("New ticket"), ticket.title)
-    detail_url = reverse('tickets:ticket-detail',
-                         kwargs={'pk': ticket.id}, external=True)
+
+    # 这里要设置前端地址，因为要直接跳转到页面
+    if ticket.type == ticket.TYPE_REQUEST_ASSET_PERM:
+        detail_url = urljoin(settings.SITE_URL, f'/tickets/tickets/request-asset-perm/{ticket.id}')
+    else:
+        detail_url = urljoin(settings.SITE_URL, f'/tickets/tickets/{ticket.id}')
+
     message = _("""
         <div>
             <p>Your has a new ticket</p>

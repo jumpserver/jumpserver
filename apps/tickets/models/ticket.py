@@ -7,11 +7,12 @@ from django.utils.translation import ugettext_lazy as _
 
 from common.mixins.models import CommonModelMixin
 from common.fields.model import JsonDictTextField
+from orgs.mixins.models import OrgModelMixin
 
 __all__ = ['Ticket', 'Comment']
 
 
-class Ticket(CommonModelMixin):
+class Ticket(OrgModelMixin, CommonModelMixin):
     STATUS_OPEN = 'open'
     STATUS_CLOSED = 'closed'
     STATUS_CHOICES = (
@@ -46,6 +47,8 @@ class Ticket(CommonModelMixin):
     status = models.CharField(choices=STATUS_CHOICES, max_length=16, default='open')
     action = models.CharField(choices=ACTION_CHOICES, max_length=16, default='', blank=True)
 
+    origin_objects = models.Manager()
+
     def __str__(self):
         return '{}: {}'.format(self.user_display, self.title)
 
@@ -79,13 +82,15 @@ class Ticket(CommonModelMixin):
         self.status = status
         self.save()
 
-    def create_action_comment(self, action, user):
+    def create_action_comment(self, action, user, extra_comment=None):
         action_display = dict(self.ACTION_CHOICES).get(action)
         body = '{} {} {}'.format(user, action_display, _("this ticket"))
+        if extra_comment is not None:
+            body += extra_comment
         self.comments.create(body=body, user=user, user_display=str(user))
 
-    def perform_action(self, action, user):
-        self.create_action_comment(action, user)
+    def perform_action(self, action, user, extra_comment=None):
+        self.create_action_comment(action, user, extra_comment)
         self.action = action
         self.status = self.STATUS_CLOSED
         self.assignee = user

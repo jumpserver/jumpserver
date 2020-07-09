@@ -1,22 +1,23 @@
-from collections import namedtuple
-
 from django.db.transaction import atomic
-from django.db.models import F
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.request import Request
 
+from orgs.models import Organization, ROLE as ORG_ROLE
 from users.models.user import User
 from common.const.http import POST, GET
 from common.drf.api import JMSModelViewSet
 from common.permissions import IsValidUser
 from common.utils.django import get_object_or_none
+from common.utils.timezone import dt_parser
 from common.drf.serializers import EmptySerializer
 from perms.models.asset_permission import AssetPermission, Asset
 from assets.models.user import SystemUser
 from ..exceptions import (
     ConfirmedAssetsChanged, ConfirmedSystemUserChanged,
-    TicketClosed, TicketActionYet, NotHaveConfirmedAssets,
+    TicketClosed, TicketActionAlready, NotHaveConfirmedAssets,
     NotHaveConfirmedSystemUser
 )
 from .. import serializers
@@ -25,15 +26,15 @@ from ..permissions import IsAssignee
 
 
 class RequestAssetPermTicketViewSet(JMSModelViewSet):
-    queryset = Ticket.objects.filter(type=Ticket.TYPE_REQUEST_ASSET_PERM)
+    queryset = Ticket.origin_objects.filter(type=Ticket.TYPE_REQUEST_ASSET_PERM)
     serializer_classes = {
         'default': serializers.RequestAssetPermTicketSerializer,
         'approve': EmptySerializer,
         'reject': EmptySerializer,
-        'assignees': serializers.OrgAssigneeSerializer,
+        'assignees': serializers.AssigneeSerializer,
     }
     permission_classes = (IsValidUser,)
-    filter_fields = ['status', 'title', 'action', 'user_display']
+    filter_fields = ['status', 'title', 'action', 'user_display', 'org_id']
     search_fields = ['user_display', 'title']
 
     def _check_can_set_action(self, instance, action):
@@ -41,49 +42,39 @@ class RequestAssetPermTicketViewSet(JMSModelViewSet):
             raise TicketClosed(detail=_('Ticket closed'))
         if instance.action == action:
             action_display = dict(instance.ACTION_CHOICES).get(action)
-            raise TicketActionYet(detail=_('Ticket has %s') % action_display)
+            raise TicketActionAlready(detail=_('Ticket has %s') % action_display)
 
     @action(detail=False, methods=[GET], permission_classes=[IsValidUser])
-    def assignees(self, request, *args, **kwargs):
-        org_mapper = {}
-        UserTuple = namedtuple('UserTuple', ('id', 'name', 'username'))
+    def assignees(self, request: Request, *args, **kwargs):
         user = request.user
-        superusers = User.objects.filter(role=User.ROLE.ADMIN)
+        org_id = request.query_params.get('org_id', Organization.DEFAULT_ID)
 
-        admins_with_org = User.objects.filter(related_admin_orgs__users=user).annotate(
-            org_id=F('related_admin_orgs__id'), org_name=F('related_admin_orgs__name')
-        )
+        q = Q(role=User.ROLE.ADMIN)
+        if org_id != Organization.DEFAULT_ID:
+            q |= Q(m2m_org_members__role=ORG_ROLE.ADMIN, orgs__id=org_id, orgs__members=user)
+        org_admins = User.objects.filter(q).distinct()
 
-        for user in admins_with_org:
-            org_id = user.org_id
+        return self.get_paginated_response_with_query_set(org_admins)
 
-            if org_id not in org_mapper:
-                org_mapper[org_id] = {
-                    'org_name': user.org_name,
-                    'org_admins': set()  # 去重
-                }
-            org_mapper[org_id]['org_admins'].add(UserTuple(user.id, user.name, user.username))
+    def _get_extra_comment(self, instance):
+        meta = instance.meta
+        ips = ', '.join(meta.get('ips', []))
+        confirmed_assets = ', '.join(meta.get('confirmed_assets', []))
 
-        result = [
-            {
-                'org_name': _('Superuser'),
-                'org_admins': set(UserTuple(user.id, user.name, user.username)
-                                  for user in superusers)
-            }
-        ]
-
-        for org in org_mapper.values():
-            result.append(org)
-        serializer_class = self.get_serializer_class()
-        serilizer = serializer_class(instance=result, many=True)
-        return Response(data=serilizer.data)
+        return f'''
+            {_('IP group')}: {ips}
+            {_('Hostname')}: {meta.get('hostname', '')}
+            {_('System user')}: {meta.get('system_user', '')}
+            {_('Confirmed assets')}: {confirmed_assets}
+            {_('Confirmed system user')}: {meta.get('confirmed_system_user', '')}
+        '''
 
     @action(detail=True, methods=[POST], permission_classes=[IsAssignee, IsValidUser])
     def reject(self, request, *args, **kwargs):
         instance = self.get_object()
         action = instance.ACTION_REJECT
         self._check_can_set_action(instance, action)
-        instance.perform_action(action, request.user)
+        instance.perform_action(action, request.user, self._get_extra_comment(instance))
         return Response()
 
     @action(detail=True, methods=[POST], permission_classes=[IsAssignee, IsValidUser])
@@ -109,29 +100,33 @@ class RequestAssetPermTicketViewSet(JMSModelViewSet):
         if system_user is None:
             raise ConfirmedSystemUserChanged(detail=_('Confirmed system-user changed'))
 
-        self._create_asset_permission(instance, assets, system_user)
+        self._create_asset_permission(instance, assets, system_user, request.user)
         return Response({'detail': _('Succeed')})
 
-    def _create_asset_permission(self, instance: Ticket, assets, system_user):
+    def _create_asset_permission(self, instance: Ticket, assets, system_user, user):
         meta = instance.meta
         request = self.request
+
         ap_kwargs = {
-            'name': meta.get('name', ''),
+            'name': _('From request ticket: {} {}').format(instance.user_display, instance.id),
             'created_by': self.request.user.username,
             'comment': _('{} request assets, approved by {}').format(instance.user_display,
-                                                                  instance.assignee_display)
+                                                                     instance.assignees_display)
         }
-        date_start = meta.get('date_start')
-        date_expired = meta.get('date_expired')
+        date_start = dt_parser(meta.get('date_start'))
+        date_expired = dt_parser(meta.get('date_expired'))
         if date_start:
             ap_kwargs['date_start'] = date_start
         if date_expired:
             ap_kwargs['date_expired'] = date_expired
 
         with atomic():
-            instance.perform_action(instance.ACTION_APPROVE, request.user)
+            instance.perform_action(instance.ACTION_APPROVE,
+                                    request.user,
+                                    self._get_extra_comment(instance))
             ap = AssetPermission.objects.create(**ap_kwargs)
             ap.system_users.add(system_user)
             ap.assets.add(*assets)
+            ap.users.add(user)
 
         return ap
