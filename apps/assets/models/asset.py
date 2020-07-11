@@ -221,7 +221,7 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     hostname_raw = models.CharField(max_length=128, blank=True, null=True, verbose_name=_('Hostname raw'))
 
     labels = models.ManyToManyField('assets.Label', blank=True, related_name='assets', verbose_name=_("Labels"))
-    created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
+    created_by = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Created by'))
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
 
