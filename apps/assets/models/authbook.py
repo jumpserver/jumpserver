@@ -59,10 +59,9 @@ class AuthBook(BaseUser):
         username = kwargs['username']
         asset = kwargs['asset']
         with transaction.atomic():
-            # 使用select_for_update限制并发创建相同的username、asset数据
-            cls.objects.select_for_update().filter(
-                username=username, asset=asset, is_latest=True
-            ).update(is_latest=False)
+            # 使用select_for_update限制并发创建相同的username、asset条目
+            instances = cls.objects.select_for_update().filter(username=username, asset=asset)
+            instances.filter(is_latest=True).update(is_latest=False)
             max_version = cls.get_max_version(username, asset)
             kwargs.update({
                 'version': max_version + 1,
