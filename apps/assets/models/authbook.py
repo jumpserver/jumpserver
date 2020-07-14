@@ -3,7 +3,6 @@
 
 from django.db import models, transaction
 from django.db.models import Max
-from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.models import OrgManager
