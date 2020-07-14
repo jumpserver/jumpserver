@@ -65,11 +65,6 @@ class CommandQueryMixin:
     def filter_queryset(self, queryset):
         return queryset
 
-    def get_filter_fields(self, request):
-        fields = self.filter_fields
-        fields.extend(["date_from", "date_to"])
-        return fields
-
     def get_date_range(self):
         now = timezone.now()
         days_ago = now - timezone.timedelta(days=self.default_days_ago)
