@@ -26,6 +26,14 @@ logger = get_logger(__name__)
 
 
 class AssetUserFilterBackend(filters.BaseFilterBackend):
+
+    @staticmethod
+    def is_query_node_all_children(request):
+        include_node_children = request.query_params.get('include_node_children')
+        if include_node_children is not None:
+            return include_node_children == '1'
+        return False
+
     def filter_queryset(self, request, queryset, view):
         kwargs = {}
         for field in view.filter_fields:
@@ -34,7 +42,12 @@ class AssetUserFilterBackend(filters.BaseFilterBackend):
                 continue
             if field == "node_id":
                 value = get_object_or_none(Node, pk=value)
-                kwargs["node"] = value
+                if self.is_query_node_all_children(request):
+                    # 过滤当前节点及其子孙节点下包含的所有资产相关的资产用户
+                    # 因为没有queryset没有提供nodes_in参数， 所以先获取所有的assets，使用assets参数进行过滤
+                    kwargs["assets"] = value.get_all_assets()
+                else:
+                    kwargs["node"] = value
                 continue
             elif field == "asset_id":
                 field = "asset"
