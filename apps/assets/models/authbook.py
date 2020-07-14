@@ -59,8 +59,12 @@ class AuthBook(BaseUser):
         """
         username = kwargs['username']
         asset = kwargs['asset']
-        key_lock = 'KEY_LOCK_CREATE_AUTH_BOOK_{}_{}'.format(username, asset.id)
-        with cache.lock(key_lock):
+        lock_key = 'KEY_LOCK_CREATE_AUTH_BOOK_{}_{}'.format(username, asset.id)
+        lock = cache.lock(lock_key, expire=60)
+
+        acquired = lock.acquire(timeout=60)
+        if acquired:
+            # 将获取锁的超时时间和锁本身过期时间设置为一致，保证并发创建时不会丢失，最长等待60s后执行
             with transaction.atomic():
                 cls.objects.filter(
                     username=username, asset=asset, is_latest=True
@@ -71,7 +75,9 @@ class AuthBook(BaseUser):
                     'is_latest': True
                 })
                 obj = cls.objects.create(**kwargs)
-                return obj
+            if lock.locked():
+                lock.release()
+            return obj
 
     @property
     def connectivity(self):
