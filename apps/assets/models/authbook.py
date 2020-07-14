@@ -59,24 +59,17 @@ class AuthBook(BaseUser):
         """
         username = kwargs['username']
         asset = kwargs['asset']
-        lock_key = 'KEY_LOCK_CREATE_AUTH_BOOK_{}_{}'.format(username, asset.id)
-        lock = cache.lock(lock_key, expire=60)
-
-        acquired = lock.acquire(timeout=60)
-        if acquired:
-            # 将获取锁的超时时间和锁本身过期时间设置为一致，保证并发创建时不会丢失，最长等待60s后执行
-            with transaction.atomic():
-                cls.objects.filter(
-                    username=username, asset=asset, is_latest=True
-                ).update(is_latest=False)
-                max_version = cls.get_max_version(username, asset)
-                kwargs.update({
-                    'version': max_version + 1,
-                    'is_latest': True
-                })
-                obj = cls.objects.create(**kwargs)
-            if lock.locked():
-                lock.release()
+        with transaction.atomic():
+            # 使用select_for_update限制并发创建相同的username、asset数据
+            cls.objects.select_for_update().filter(
+                username=username, asset=asset, is_latest=True
+            ).update(is_latest=False)
+            max_version = cls.get_max_version(username, asset)
+            kwargs.update({
+                'version': max_version + 1,
+                'is_latest': True
+            })
+            obj = cls.objects.create(**kwargs)
             return obj
 
     @property
