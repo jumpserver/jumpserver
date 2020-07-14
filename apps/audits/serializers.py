@@ -17,7 +17,7 @@ class FTPLogSerializer(serializers.ModelSerializer):
         model = models.FTPLog
         fields = (
             'id', 'user', 'remote_addr', 'asset', 'system_user',
-            'operate', 'filename', 'is_success', 'date_start'
+            'operate', 'filename', 'is_success', 'date_start', 'org_id'
         )
 
 
@@ -39,7 +39,7 @@ class OperateLogSerializer(serializers.ModelSerializer):
         model = models.OperateLog
         fields = (
             'id', 'user', 'action', 'resource_type', 'resource',
-            'remote_addr', 'datetime'
+            'remote_addr', 'datetime', 'org_id'
         )
 
 
@@ -65,7 +65,7 @@ class CommandExecutionSerializer(serializers.ModelSerializer):
         fields_mini = ['id']
         fields_small = fields_mini + [
             'run_as', 'command', 'user', 'is_finished',
-            'date_start', 'result', 'is_success'
+            'date_start', 'result', 'is_success', 'org_id'
         ]
         fields = fields_small + ['hosts', 'run_as_display', 'user_display']
         extra_kwargs = {
