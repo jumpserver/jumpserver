@@ -217,7 +217,7 @@ def get_start_celery_ansible_kwargs():
 
 def get_start_celery_default_kwargs():
     print("\n- Start Celery as Distributed Task Queue: Celery")
-    return get_start_worker_kwargs('celery', 2)
+    return get_start_worker_kwargs('celery', 4)
 
 
 def get_start_worker_kwargs(queue, num):
