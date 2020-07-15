@@ -43,4 +43,7 @@ def on_create_set_created_by(sender, instance=None, **kwargs):
         return
     if hasattr(instance, 'created_by') and not instance.created_by:
         if current_request and current_request.user.is_authenticated:
-            instance.created_by = current_request.user.name
+            user_name = current_request.user.name
+            if isinstance(user_name, str):
+                user_name = user_name[:30]
+            instance.created_by = user_name
