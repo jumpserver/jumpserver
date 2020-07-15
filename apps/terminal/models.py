@@ -188,7 +188,7 @@ class Session(OrgModelMixin):
     asset_id = models.CharField(blank=True, default='', max_length=36, db_index=True)
     system_user = models.CharField(max_length=128, verbose_name=_("System user"), db_index=True)
     system_user_id = models.CharField(blank=True, default='', max_length=36, db_index=True)
-    login_from = models.CharField(max_length=2, choices=LOGIN_FROM_CHOICES, default="ST")
+    login_from = models.CharField(max_length=2, choices=LOGIN_FROM_CHOICES, default="ST", verbose_name=_("Login from"))
     remote_addr = models.CharField(max_length=128, verbose_name=_("Remote addr"), blank=True, null=True)
     is_success = models.BooleanField(default=True, db_index=True)
     is_finished = models.BooleanField(default=False, db_index=True)
