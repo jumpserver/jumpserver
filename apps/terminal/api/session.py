@@ -44,7 +44,7 @@ class SessionViewSet(OrgBulkModelViewSet):
     permission_classes = (IsOrgAdminOrAppUser, )
     filter_fields = [
         "user", "asset", "system_user", "remote_addr",
-        "protocol", "terminal", "is_finished",
+        "protocol", "terminal", "is_finished", 'login_from',
     ]
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))

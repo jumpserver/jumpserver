@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-15 14:34+0800\n"
+"POT-Creation-Date: 2020-07-15 17:13+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -2428,6 +2428,10 @@ msgstr "线程数"
 #: terminal/models.py:159
 msgid "Boot Time"
 msgstr "运行时间"
+
+#: terminal/models.py:191
+msgid "Login from"
+msgstr "登录来源"
 
 #: terminal/models.py:195
 msgid "Replay"
@@ -5103,9 +5107,6 @@ msgstr "旗舰版"
 
 #~ msgid "There is no command about this session"
 #~ msgstr "该会话没有命令记录"
-
-#~ msgid "Login from"
-#~ msgstr "登录来源"
 
 #~ msgid "Replay session"
 #~ msgstr "回放会话"
