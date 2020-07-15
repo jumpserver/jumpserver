@@ -87,7 +87,11 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         if not role:
             return
         choices = role._choices
-        choices.pop('App', None)
+        choices.pop(User.ROLE_APP, None)
+        request = self.context.get('request')
+        if request and hasattr(request, 'user') and not request.user.is_superuser:
+            choices.pop(User.ROLE_ADMIN, None)
+            choices.pop(User.ROLE_AUDITOR, None)
         role._choices = choices
 
     def validate_role(self, value):
