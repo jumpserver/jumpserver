@@ -11,7 +11,7 @@ User = get_user_model()
 
 
 class CreateUserMixin:
-    def get_django_user(self, username, password=None):
+    def get_django_user(self, username, password=None, *args, **kwargs):
         if isinstance(username, bytes):
             username = username.decode()
         try:
