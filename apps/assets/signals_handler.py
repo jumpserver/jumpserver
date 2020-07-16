@@ -185,7 +185,9 @@ def on_asset_nodes_add(sender, instance=None, action='', model=None, pk_set=None
 
     system_users_assets = defaultdict(set)
     for system_user in system_users:
-        system_users_assets[system_user].update(set(assets))
+        assets_has_set = system_user.assets.all().filter(id__in=assets).values_list('id', flat=True)
+        assets_remain = set(assets) - set(assets_has_set)
+        system_users_assets[system_user].update(assets_remain)
     for system_user, _assets in system_users_assets.items():
         system_user.assets.add(*tuple(_assets))
 

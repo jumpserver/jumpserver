@@ -64,7 +64,7 @@ GATHER_ASSET_USERS_TASKS = [
         "action": {
             "module": "shell",
             "args": "users=$(getent passwd | grep -v 'nologin' | "
-                    "grep -v 'shudown' | awk -F: '{ print $1 }');for i in $users;do last -F $i -1 | "
+                    "grep -v 'shudown' | awk -F: '{ print $1 }');for i in $users;do last -w -F $i -1 | "
                     "head -1 | grep -v '^$'  | awk '{ print $1\"@\"$3\"@\"$5,$6,$7,$8 }';done"
         }
     }

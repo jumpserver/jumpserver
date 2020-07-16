@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-09 10:05+0800\n"
+"POT-Creation-Date: 2020-07-15 17:13+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -85,7 +85,7 @@ msgstr "数据库"
 #: users/templates/users/user_group_list.html:16
 #: users/templates/users/user_profile.html:138
 #: xpack/plugins/change_auth_plan/models.py:77 xpack/plugins/cloud/models.py:53
-#: xpack/plugins/cloud/models.py:139 xpack/plugins/gathered_user/models.py:26
+#: xpack/plugins/cloud/models.py:140 xpack/plugins/gathered_user/models.py:26
 msgid "Comment"
 msgstr "备注"
 
@@ -100,7 +100,7 @@ msgid "DatabaseApp"
 msgstr "数据库应用"
 
 #: applications/models/remote_app.py:23 assets/models/asset.py:352
-#: assets/models/authbook.py:27 assets/models/gathered_user.py:14
+#: assets/models/authbook.py:26 assets/models/gathered_user.py:14
 #: assets/serializers/admin_user.py:32 assets/serializers/asset_user.py:47
 #: assets/serializers/asset_user.py:84 assets/serializers/system_user.py:44
 #: assets/serializers/system_user.py:176 audits/models.py:38
@@ -111,7 +111,7 @@ msgstr "数据库应用"
 #: users/templates/users/user_asset_permission.html:70
 #: users/templates/users/user_granted_remote_app.html:36
 #: xpack/plugins/change_auth_plan/models.py:283
-#: xpack/plugins/cloud/models.py:269
+#: xpack/plugins/cloud/models.py:266
 msgid "Asset"
 msgstr "资产"
 
@@ -135,7 +135,7 @@ msgstr "参数"
 #: perms/models/base.py:54 users/models/user.py:508
 #: users/serializers/group.py:35 users/templates/users/user_detail.html:97
 #: xpack/plugins/change_auth_plan/models.py:81 xpack/plugins/cloud/models.py:56
-#: xpack/plugins/cloud/models.py:145 xpack/plugins/gathered_user/models.py:30
+#: xpack/plugins/cloud/models.py:146 xpack/plugins/gathered_user/models.py:30
 msgid "Created by"
 msgstr "创建者"
 
@@ -148,7 +148,7 @@ msgstr "创建者"
 #: common/mixins/models.py:50 ops/models/adhoc.py:38 ops/models/command.py:27
 #: orgs/models.py:17 perms/models/base.py:55 users/models/group.py:18
 #: users/templates/users/user_group_detail.html:58
-#: xpack/plugins/cloud/models.py:59 xpack/plugins/cloud/models.py:148
+#: xpack/plugins/cloud/models.py:59 xpack/plugins/cloud/models.py:149
 msgid "Date created"
 msgstr "创建日期"
 
@@ -247,7 +247,7 @@ msgstr "激活"
 
 #: assets/models/asset.py:199 assets/models/cluster.py:19
 #: assets/models/user.py:65 templates/_nav.html:44
-#: xpack/plugins/cloud/models.py:133
+#: xpack/plugins/cloud/models.py:133 xpack/plugins/cloud/serializers.py:82
 msgid "Admin user"
 msgstr "管理用户"
 
@@ -319,19 +319,19 @@ msgstr "主机名原始"
 msgid "Labels"
 msgstr "标签管理"
 
-#: assets/models/authbook.py:18
+#: assets/models/authbook.py:17
 msgid "Bulk delete deny"
 msgstr "拒绝批量删除"
 
-#: assets/models/authbook.py:28
+#: assets/models/authbook.py:27
 msgid "Latest version"
 msgstr "最新版本"
 
-#: assets/models/authbook.py:29
+#: assets/models/authbook.py:28
 msgid "Version"
 msgstr "版本"
 
-#: assets/models/authbook.py:38
+#: assets/models/authbook.py:37
 msgid "AuthBook"
 msgstr ""
 
@@ -590,7 +590,7 @@ msgstr "键"
 #: users/templates/users/user_asset_permission.html:41
 #: users/templates/users/user_asset_permission.html:73
 #: users/templates/users/user_asset_permission.html:158
-#: xpack/plugins/cloud/models.py:129
+#: xpack/plugins/cloud/models.py:129 xpack/plugins/cloud/serializers.py:83
 msgid "Node"
 msgstr "节点"
 
@@ -612,7 +612,7 @@ msgid "Assets"
 msgstr "资产管理"
 
 #: assets/models/user.py:111 templates/_nav.html:17
-#: users/views/profile/password.py:40 users/views/profile/pubkey.py:36
+#: users/views/profile/password.py:42 users/views/profile/pubkey.py:36
 msgid "Users"
 msgstr "用户管理"
 
@@ -874,7 +874,7 @@ msgstr "没有匹配到资产，结束任务"
 #: users/templates/users/user_list.html:98
 #: users/templates/users/user_remote_app_permission.html:111
 msgid "Delete"
-msgstr "删除文件"
+msgstr "删除"
 
 #: audits/models.py:27
 msgid "Upload"
@@ -976,7 +976,7 @@ msgstr "启用"
 msgid "-"
 msgstr ""
 
-#: audits/models.py:96 xpack/plugins/cloud/models.py:204
+#: audits/models.py:96 xpack/plugins/cloud/models.py:201
 msgid "Failed"
 msgstr "失败"
 
@@ -1006,13 +1006,13 @@ msgid "MFA"
 msgstr "多因子认证"
 
 #: audits/models.py:105 xpack/plugins/change_auth_plan/models.py:304
-#: xpack/plugins/cloud/models.py:217
+#: xpack/plugins/cloud/models.py:214
 msgid "Reason"
 msgstr "原因"
 
 #: audits/models.py:106 tickets/serializers/request_asset_perm.py:53
-#: tickets/serializers/ticket.py:25 xpack/plugins/cloud/models.py:214
-#: xpack/plugins/cloud/models.py:272
+#: tickets/serializers/ticket.py:25 xpack/plugins/cloud/models.py:211
+#: xpack/plugins/cloud/models.py:269
 msgid "Status"
 msgstr "状态"
 
@@ -1025,7 +1025,7 @@ msgid "Is success"
 msgstr "是否成功"
 
 #: audits/serializers.py:73 ops/models/command.py:24
-#: xpack/plugins/cloud/models.py:212
+#: xpack/plugins/cloud/models.py:209
 msgid "Result"
 msgstr "结果"
 
@@ -1144,8 +1144,8 @@ msgid ""
 "after {} minutes)"
 msgstr "账号已被锁定（请联系管理员解锁 或 {}分钟后重试）"
 
-#: authentication/errors.py:50 users/views/profile/otp.py:63
-#: users/views/profile/otp.py:102 users/views/profile/otp.py:121
+#: authentication/errors.py:50 users/views/profile/otp.py:107
+#: users/views/profile/otp.py:146 users/views/profile/otp.py:166
 msgid "MFA code invalid, or ntp sync server time"
 msgstr "MFA验证码不正确，或者服务器端时间不对"
 
@@ -1440,10 +1440,6 @@ msgstr "字段必须唯一"
 msgid "<h1>Flow service unavailable, check it</h1>"
 msgstr ""
 
-#: jumpserver/views/index.py:26 templates/_nav.html:7
-msgid "Dashboard"
-msgstr "仪表盘"
-
 #: jumpserver/views/other.py:26
 msgid ""
 "<div>Luna is a separately deployed program, you need to deploy Luna, koko, "
@@ -1625,6 +1621,14 @@ msgstr "更新任务内容: {}"
 #: ops/utils.py:70
 msgid "Disk used more than 80%: {} => {}"
 msgstr "磁盘使用率超过 80%: {} => {}"
+
+#: orgs/api.py:57
+msgid "Organization contains undeleted resources"
+msgstr "组织内包含未删除的资源"
+
+#: orgs/api.py:61
+msgid "The current organization cannot be deleted"
+msgstr "当能删除当前所在组织"
 
 #: orgs/mixins/models.py:56 orgs/mixins/serializers.py:26 orgs/models.py:31
 msgid "Organization"
@@ -2018,6 +2022,10 @@ msgstr ""
 "                您的SSH密钥没有设置或已失效，请点击 <a href="
 "\"%(user_pubkey_update)s\"> 链接 </a> 更新\n"
 "        "
+
+#: templates/_nav.html:7
+msgid "Dashboard"
+msgstr "仪表盘"
 
 #: templates/_nav.html:20
 msgid "User list"
@@ -2421,6 +2429,10 @@ msgstr "线程数"
 msgid "Boot Time"
 msgstr "运行时间"
 
+#: terminal/models.py:191
+msgid "Login from"
+msgstr "登录来源"
+
 #: terminal/models.py:195
 msgid "Replay"
 msgstr "回放"
@@ -2433,11 +2445,11 @@ msgstr "结束日期"
 msgid "Args"
 msgstr "参数"
 
-#: tickets/api/request_asset_perm.py:40
+#: tickets/api/request_asset_perm.py:41
 msgid "Ticket closed"
 msgstr "工单已关闭"
 
-#: tickets/api/request_asset_perm.py:43
+#: tickets/api/request_asset_perm.py:44
 #, python-format
 msgid "Ticket has %s"
 msgstr "工单已%s"
@@ -2446,27 +2458,27 @@ msgstr "工单已%s"
 msgid "Superuser"
 msgstr "超级管理员"
 
-#: tickets/api/request_asset_perm.py:102
+#: tickets/api/request_asset_perm.py:99
 msgid "Confirm assets first"
 msgstr "请先确认资产"
 
-#: tickets/api/request_asset_perm.py:105
+#: tickets/api/request_asset_perm.py:102
 msgid "Confirmed assets changed"
 msgstr "确认的资产变更了"
 
-#: tickets/api/request_asset_perm.py:109
+#: tickets/api/request_asset_perm.py:106
 msgid "Confirm system-user first"
 msgstr "请先确认系统用户"
 
-#: tickets/api/request_asset_perm.py:113
+#: tickets/api/request_asset_perm.py:110
 msgid "Confirmed system-user changed"
 msgstr "确认的系统用户变更了"
 
-#: tickets/api/request_asset_perm.py:116 xpack/plugins/cloud/models.py:205
+#: tickets/api/request_asset_perm.py:113 xpack/plugins/cloud/models.py:202
 msgid "Succeed"
 msgstr "成功"
 
-#: tickets/api/request_asset_perm.py:124
+#: tickets/api/request_asset_perm.py:121
 msgid "{} request assets, approved by {}"
 msgstr "{} 申请资产，通过人 {}"
 
@@ -2720,7 +2732,7 @@ msgstr "复制用户公钥到这里"
 msgid "Join user groups"
 msgstr "添加到用户组"
 
-#: users/forms/user.py:103 users/views/profile/password.py:57
+#: users/forms/user.py:103 users/views/profile/password.py:59
 #: users/views/profile/reset.py:123
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
@@ -2837,7 +2849,7 @@ msgstr "安全令牌验证"
 
 #: users/templates/users/_base_otp.html:14 users/templates/users/_user.html:13
 #: users/templates/users/user_profile_update.html:55
-#: xpack/plugins/cloud/models.py:119
+#: xpack/plugins/cloud/models.py:119 xpack/plugins/cloud/serializers.py:81
 msgid "Account"
 msgstr "账户"
 
@@ -3552,27 +3564,27 @@ msgstr ""
 "    <br>\n"
 "    "
 
-#: users/views/profile/otp.py:145
+#: users/views/profile/otp.py:190
 msgid "MFA enable success"
 msgstr "多因子认证启用成功"
 
-#: users/views/profile/otp.py:146
+#: users/views/profile/otp.py:191
 msgid "MFA enable success, return login page"
 msgstr "多因子认证启用成功，返回到登录页面"
 
-#: users/views/profile/otp.py:148
+#: users/views/profile/otp.py:193
 msgid "MFA disable success"
 msgstr "多因子认证禁用成功"
 
-#: users/views/profile/otp.py:149
+#: users/views/profile/otp.py:194
 msgid "MFA disable success, return login page"
 msgstr "多因子认证禁用成功，返回登录页面"
 
-#: users/views/profile/password.py:41
+#: users/views/profile/password.py:43
 msgid "Password update"
 msgstr "密码更新"
 
-#: users/views/profile/password.py:72
+#: users/views/profile/password.py:74
 msgid "Password invalid"
 msgstr "用户名或密码无效"
 
@@ -3732,55 +3744,55 @@ msgstr "地域"
 msgid "Instances"
 msgstr "实例"
 
-#: xpack/plugins/cloud/models.py:136 xpack/plugins/cloud/serializers.py:80
-msgid "Covered always"
-msgstr "总是被覆盖"
+#: xpack/plugins/cloud/models.py:137 xpack/plugins/cloud/serializers.py:85
+msgid "Always update"
+msgstr "总是更新"
 
-#: xpack/plugins/cloud/models.py:142
+#: xpack/plugins/cloud/models.py:143
 msgid "Date last sync"
 msgstr "最后同步日期"
 
-#: xpack/plugins/cloud/models.py:153 xpack/plugins/cloud/models.py:210
+#: xpack/plugins/cloud/models.py:154 xpack/plugins/cloud/models.py:207
 msgid "Sync instance task"
 msgstr "同步实例任务"
 
-#: xpack/plugins/cloud/models.py:220 xpack/plugins/cloud/models.py:275
+#: xpack/plugins/cloud/models.py:217 xpack/plugins/cloud/models.py:272
 msgid "Date sync"
 msgstr "同步日期"
 
-#: xpack/plugins/cloud/models.py:248
+#: xpack/plugins/cloud/models.py:245
 msgid "Unsync"
 msgstr "未同步"
 
-#: xpack/plugins/cloud/models.py:249 xpack/plugins/cloud/models.py:250
+#: xpack/plugins/cloud/models.py:246 xpack/plugins/cloud/models.py:247
 msgid "Synced"
 msgstr "已同步"
 
-#: xpack/plugins/cloud/models.py:251
+#: xpack/plugins/cloud/models.py:248
 msgid "Released"
 msgstr "已释放"
 
-#: xpack/plugins/cloud/models.py:256
+#: xpack/plugins/cloud/models.py:253
 msgid "Sync task"
 msgstr "同步任务"
 
-#: xpack/plugins/cloud/models.py:260
+#: xpack/plugins/cloud/models.py:257
 msgid "Sync instance task history"
 msgstr "同步实例任务历史"
 
-#: xpack/plugins/cloud/models.py:263
+#: xpack/plugins/cloud/models.py:260
 msgid "Instance"
 msgstr "实例"
 
-#: xpack/plugins/cloud/models.py:266
+#: xpack/plugins/cloud/models.py:263
 msgid "Region"
 msgstr "地域"
 
-#: xpack/plugins/cloud/providers/aliyun.py:19
+#: xpack/plugins/cloud/providers/aliyun.py:22
 msgid "Alibaba Cloud"
 msgstr "阿里云"
 
-#: xpack/plugins/cloud/providers/aws.py:15
+#: xpack/plugins/cloud/providers/aws.py:18
 msgid "AWS (International)"
 msgstr "AWS (国际)"
 
@@ -3788,63 +3800,63 @@ msgstr "AWS (国际)"
 msgid "AWS (China)"
 msgstr "AWS (中国)"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:17
+#: xpack/plugins/cloud/providers/huaweicloud.py:20
 msgid "Huawei Cloud"
 msgstr "华为云"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:20
+#: xpack/plugins/cloud/providers/huaweicloud.py:23
 msgid "AF-Johannesburg"
 msgstr "非洲-约翰内斯堡"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:21
+#: xpack/plugins/cloud/providers/huaweicloud.py:24
 msgid "AP-Bangkok"
 msgstr "亚太-曼谷"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:22
+#: xpack/plugins/cloud/providers/huaweicloud.py:25
 msgid "AP-Hong Kong"
 msgstr "亚太-香港"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:23
+#: xpack/plugins/cloud/providers/huaweicloud.py:26
 msgid "AP-Singapore"
 msgstr "亚太-新加坡"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:24
+#: xpack/plugins/cloud/providers/huaweicloud.py:27
 msgid "CN East-Shanghai1"
 msgstr "华东-上海1"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:25
+#: xpack/plugins/cloud/providers/huaweicloud.py:28
 msgid "CN East-Shanghai2"
 msgstr "华东-上海2"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:26
+#: xpack/plugins/cloud/providers/huaweicloud.py:29
 msgid "CN North-Beijing1"
 msgstr "华北-北京1"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:27
+#: xpack/plugins/cloud/providers/huaweicloud.py:30
 msgid "CN North-Beijing4"
 msgstr "华北-北京4"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:28
+#: xpack/plugins/cloud/providers/huaweicloud.py:31
 msgid "CN Northeast-Dalian"
 msgstr "华北-大连"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:29
+#: xpack/plugins/cloud/providers/huaweicloud.py:32
 msgid "CN South-Guangzhou"
 msgstr "华南-广州"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:30
+#: xpack/plugins/cloud/providers/huaweicloud.py:33
 msgid "CN Southwest-Guiyang1"
 msgstr "西南-贵阳1"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:31
+#: xpack/plugins/cloud/providers/huaweicloud.py:34
 msgid "EU-Paris"
 msgstr "欧洲-巴黎"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:32
+#: xpack/plugins/cloud/providers/huaweicloud.py:35
 msgid "LA-Santiago"
 msgstr "拉美-圣地亚哥"
 
-#: xpack/plugins/cloud/providers/qcloud.py:17
+#: xpack/plugins/cloud/providers/qcloud.py:20
 msgid "Tencent Cloud"
 msgstr "腾讯云"
 
@@ -3856,11 +3868,7 @@ msgstr "执行次数"
 msgid "Instance count"
 msgstr "实例个数"
 
-#: xpack/plugins/cloud/serializers.py:78
-msgid "Account name"
-msgstr "账户名称"
-
-#: xpack/plugins/cloud/serializers.py:79
+#: xpack/plugins/cloud/serializers.py:84
 #: xpack/plugins/gathered_user/serializers.py:20
 msgid "Periodic display"
 msgstr "定时执行"
@@ -3949,11 +3957,14 @@ msgstr "企业版"
 msgid "Ultimate edition"
 msgstr "旗舰版"
 
+#~ msgid "Covered always"
+#~ msgstr "总是被覆盖"
+
+#~ msgid "Account name"
+#~ msgstr "账户名称"
+
 #~ msgid "Auditors cannot be join in the user group"
 #~ msgstr "审计员不能被加入到用户组"
-
-#~ msgid "Always update"
-#~ msgstr "总是更新"
 
 #~ msgid "Target URL"
 #~ msgstr "目标URL"
@@ -5096,9 +5107,6 @@ msgstr "旗舰版"
 
 #~ msgid "There is no command about this session"
 #~ msgstr "该会话没有命令记录"
-
-#~ msgid "Login from"
-#~ msgstr "登录来源"
 
 #~ msgid "Replay session"
 #~ msgstr "回放会话"

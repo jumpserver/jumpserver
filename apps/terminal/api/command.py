@@ -55,20 +55,16 @@ class CommandQueryMixin:
         q = self.request.query_params
         multi_command_storage = get_multi_command_storage()
         queryset = multi_command_storage.filter(
-            date_from=date_from, date_to=date_to, input=q.get("input"),
-            user=q.get("user"), asset=q.get("asset"),
-            system_user=q.get("system_user"),
+            date_from=date_from, date_to=date_to,
+            user=q.get("user"), asset=q.get("asset"), system_user=q.get("system_user"),
+            input=q.get("input"), session=q.get("session_id"),
             risk_level=self.get_query_risk_level(), org_id=self.get_org_id(),
         )
         return queryset
 
     def filter_queryset(self, queryset):
+        # 解决es存储命令时，父类根据filter_fields过滤出现异常的问题，返回的queryset类型list
         return queryset
-
-    def get_filter_fields(self, request):
-        fields = self.filter_fields
-        fields.extend(["date_from", "date_to"])
-        return fields
 
     def get_date_range(self):
         now = timezone.now()

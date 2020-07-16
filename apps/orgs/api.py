@@ -2,6 +2,7 @@
 #
 
 from django.shortcuts import get_object_or_404
+from django.utils.translation import ugettext as _
 from rest_framework import status, generics
 from rest_framework.views import Response
 from rest_framework_bulk import BulkModelViewSet
@@ -53,10 +54,12 @@ class OrgViewSet(BulkModelViewSet):
         for model in models:
             data = self.get_data_from_model(model)
             if data:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
+                msg = _('Organization contains undeleted resources')
+                return Response(data={'error': msg}, status=status.HTTP_403_FORBIDDEN)
         else:
             if str(current_org) == str(self.org):
-                return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+                msg = _('The current organization cannot be deleted')
+                return Response(data={'error': msg}, status=status.HTTP_403_FORBIDDEN)
             self.org.delete()
             return Response({'msg': True}, status=status.HTTP_200_OK)
 
