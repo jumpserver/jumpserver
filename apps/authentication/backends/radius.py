@@ -11,7 +11,7 @@ User = get_user_model()
 
 
 class CreateUserMixin:
-    def get_django_user(self, username, password=None):
+    def get_django_user(self, username, password=None, *args, **kwargs):
         if isinstance(username, bytes):
             username = username.decode()
         try:
@@ -26,6 +26,12 @@ class CreateUserMixin:
             user.source = user.SOURCE_RADIUS
             user.save()
         return user
+
+    def authenticate(self, *args, **kwargs):
+        # 校验用户时，会传入public_key参数，父类authentication中不接受public_key参数，所以要pop掉
+        # TODO:需要优化各backend的authenticate方法，django进行调用前会检测各authenticate的参数
+        kwargs.pop('public_key', None)
+        return super().authenticate(*args, *kwargs)
 
 
 class RadiusBackend(CreateUserMixin, RADIUSBackend):
