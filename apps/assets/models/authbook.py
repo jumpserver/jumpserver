@@ -3,7 +3,6 @@
 
 from django.db import models, transaction
 from django.db.models import Max
-from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.models import OrgManager
@@ -59,19 +58,17 @@ class AuthBook(BaseUser):
         """
         username = kwargs['username']
         asset = kwargs['asset']
-        key_lock = 'KEY_LOCK_CREATE_AUTH_BOOK_{}_{}'.format(username, asset.id)
-        with cache.lock(key_lock):
-            with transaction.atomic():
-                cls.objects.filter(
-                    username=username, asset=asset, is_latest=True
-                ).update(is_latest=False)
-                max_version = cls.get_max_version(username, asset)
-                kwargs.update({
-                    'version': max_version + 1,
-                    'is_latest': True
-                })
-                obj = cls.objects.create(**kwargs)
-                return obj
+        with transaction.atomic():
+            # 使用select_for_update限制并发创建相同的username、asset条目
+            instances = cls.objects.select_for_update().filter(username=username, asset=asset)
+            instances.filter(is_latest=True).update(is_latest=False)
+            max_version = cls.get_max_version(username, asset)
+            kwargs.update({
+                'version': max_version + 1,
+                'is_latest': True
+            })
+            obj = cls.objects.create(**kwargs)
+            return obj
 
     @property
     def connectivity(self):
