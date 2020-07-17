@@ -1,0 +1,45 @@
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+
+name: Auto add PR label
+
+jobs:
+  add_pr_labels:
+    name: Auto add pull request labels if need
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add labels
+        if: ${{ !contains(github.event.pull_request.labels, '无需处理') }}
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_ISSUE_URL: ${{ github.event.pull_request.issue_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -x
+          echo ${PR_TITLE}
+          echo ${PR_ISSUE_URL}
+          label=""
+          if [[ ${PR_TITLE} =~ "fix" ]];then
+            label="fix"
+          elif [[ ${PR_TITLE} =~ "feat" ]];then
+            label="新功能"
+          elif [[ ${PR_TITLE} =~ "perf" || ${PR_TITLE} =~ "refactor" ]];then
+            label="优化"
+          elif [[ ${PR_TITLE} =~ "ci" ]];then
+            label="无需处理"
+          fi
+          if [[ -z "${label}" ]];then
+            exit 0
+          fi
+          data='{"labels":["'"${label}"'"]}'
+          echo $data
+          curl \
+                --fail \
+                -X PATCH \
+                --data ${data} \
+                -H 'Content-Type: application/json' \
+                -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+                "${PR_ISSUE_URL}"
