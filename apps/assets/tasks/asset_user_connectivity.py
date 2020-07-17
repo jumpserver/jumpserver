@@ -85,7 +85,7 @@ def test_asset_user_connectivity_util(asset_user, task_name):
         raw, summary = test_user_connectivity(
             task_name=task_name, asset=asset_user.asset,
             username=asset_user.username, password=asset_user.password,
-            private_key=asset_user.private_key
+            private_key=asset_user.private_key_file
         )
     except Exception as e:
         logger.warn("Failed run adhoc {}, {}".format(task_name, e))
