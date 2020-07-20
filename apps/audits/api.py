@@ -43,7 +43,7 @@ class UserLoginLogViewSet(ListModelMixin, CommonGenericViewSet):
 
     @staticmethod
     def get_org_members():
-        users = current_org.get_org_members().values_list('username', flat=True)
+        users = current_org.get_members().values_list('username', flat=True)
         return users
 
     def get_queryset(self):
@@ -79,7 +79,7 @@ class PasswordChangeLogViewSet(ListModelMixin, CommonGenericViewSet):
     ordering = ['-datetime']
 
     def get_queryset(self):
-        users = current_org.get_org_members()
+        users = current_org.get_members()
         queryset = super().get_queryset().filter(
             user__in=[user.__str__() for user in users]
         )

@@ -124,7 +124,7 @@ class UserLoginLog(models.Model):
                 Q(username__contains=keyword)
             )
         if not current_org.is_root():
-            username_list = current_org.get_org_members().values_list('username', flat=True)
+            username_list = current_org.get_members().values_list('username', flat=True)
             login_logs = login_logs.filter(username__in=username_list)
         return login_logs
 

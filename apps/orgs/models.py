@@ -1,21 +1,30 @@
 import uuid
-from django.conf import settings
+from functools import partial
 
 from django.db import models
+from django.db.models import signals
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import is_uuid, lazyproperty
+from common.utils import is_uuid
+from common.const import choices
+from common.db.models import ChoiceSet
+
+
+class ROLE(ChoiceSet):
+    ADMIN = choices.ADMIN, _('Organization administrator')
+    USER = choices.USER, _('User')
+    AUDITOR = choices.AUDITOR, _("Organization auditor")
 
 
 class Organization(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, unique=True, verbose_name=_("Name"))
-    users = models.ManyToManyField('users.User', related_name='related_user_orgs', blank=True)
-    admins = models.ManyToManyField('users.User', related_name='related_admin_orgs', blank=True)
-    auditors = models.ManyToManyField('users.User', related_name='related_audit_orgs', blank=True)
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
+    members = models.ManyToManyField('users.User', related_name='orgs', through='orgs.OrganizationMember',
+                                     through_fields=('org', 'user'))
 
     orgs = None
     CACHE_PREFIX = 'JMS_ORG_{}'
@@ -72,29 +81,24 @@ class Organization(models.Model):
             org = cls.default() if default else None
         return org
 
-    # @lazyproperty
-    # lazyproperty 导致用户列表中角色显示出现不稳定的情况, 如果不加会导致数据库操作次数太多
-    def org_users(self):
+    def get_org_members_by_role(self, role):
         from users.models import User
         if self.is_real():
-            return self.users.all()
-        users = User.objects.filter(role=User.ROLE_USER)
-        if self.is_default() and not settings.DEFAULT_ORG_SHOW_ALL_USERS:
-            users = users.filter(related_user_orgs__isnull=True)
+            return self.members.filter(m2m_org_members__role=role)
+        users = User.objects.filter(role=role)
         return users
 
-    def get_org_users(self):
-        return self.org_users()
+    @property
+    def users(self):
+        return self.get_org_members_by_role(ROLE.USER)
 
-    # @lazyproperty
-    def org_admins(self):
-        from users.models import User
-        if self.is_real():
-            return self.admins.all()
-        return User.objects.filter(role=User.ROLE_ADMIN)
+    @property
+    def admins(self):
+        return self.get_org_members_by_role(ROLE.ADMIN)
 
-    def get_org_admins(self):
-        return self.org_admins()
+    @property
+    def auditors(self):
+        return self.get_org_members_by_role(ROLE.AUDITOR)
 
     def org_id(self):
         if self.is_real():
@@ -104,43 +108,31 @@ class Organization(models.Model):
         else:
             return ''
 
-    # @lazyproperty
-    def org_auditors(self):
+    def get_members(self, exclude=()):
         from users.models import User
         if self.is_real():
-            return self.auditors.all()
-        return User.objects.filter(role=User.ROLE_AUDITOR)
+            members = self.members.exclude(m2m_org_members__role__in=exclude)
+        else:
+            members = User.objects.exclude(role__in=exclude)
 
-    def get_org_auditors(self):
-        return self.org_auditors()
-
-    def get_org_members(self, exclude=()):
-        from users.models import User
-        members = User.objects.none()
-        if 'Admin' not in exclude:
-            members |= self.get_org_admins()
-        if 'User' not in exclude:
-            members |= self.get_org_users()
-        if 'Auditor' not in exclude:
-            members |= self.get_org_auditors()
-        return members.exclude(role=User.ROLE_APP).distinct()
+        return members.exclude(role=User.ROLE.APP).distinct()
 
     def can_admin_by(self, user):
         if user.is_superuser:
             return True
-        if self.get_org_admins().filter(id=user.id):
+        if self.admins.filter(id=user.id).exists():
             return True
         return False
 
     def can_audit_by(self, user):
         if user.is_super_auditor:
             return True
-        if self.get_org_auditors().filter(id=user.id):
+        if self.auditors.filter(id=user.id).exists():
             return True
         return False
 
     def can_user_by(self, user):
-        if self.get_org_users().filter(id=user.id):
+        if self.users.filter(id=user.id).exists():
             return True
         return False
 
@@ -148,43 +140,44 @@ class Organization(models.Model):
         return self.id not in (self.DEFAULT_NAME, self.ROOT_ID, self.SYSTEM_ID)
 
     @classmethod
+    def get_user_orgs_by_role(cls, user, role):
+        if not isinstance(role, (tuple, list)):
+            role = (role, )
+
+        return cls.objects.filter(
+            m2m_org_members__role__in=role,
+            m2m_org_members__user_id=user.id
+        ).distinct()
+
+    @classmethod
     def get_user_admin_orgs(cls, user):
-        admin_orgs = []
         if user.is_anonymous:
-            return admin_orgs
-        elif user.is_superuser:
-            admin_orgs = list(cls.objects.all())
-            admin_orgs.append(cls.default())
-        elif user.is_org_admin:
-            admin_orgs = user.related_admin_orgs.all()
-        return admin_orgs
+            return cls.objects.none()
+        if user.is_superuser:
+            return [*cls.objects.all(), cls.default()]
+        return cls.get_user_orgs_by_role(user, ROLE.ADMIN)
 
     @classmethod
     def get_user_user_orgs(cls, user):
-        user_orgs = []
         if user.is_anonymous:
-            return user_orgs
-        user_orgs = user.related_user_orgs.all()
-        return user_orgs
+            return cls.objects.none()
+        return cls.get_user_orgs_by_role(user, ROLE.USER)
 
     @classmethod
     def get_user_audit_orgs(cls, user):
-        audit_orgs = []
         if user.is_anonymous:
-            return audit_orgs
-        elif user.is_super_auditor:
-            audit_orgs = list(cls.objects.all())
-            audit_orgs.append(cls.default())
-        elif user.is_org_auditor:
-            audit_orgs = user.related_audit_orgs.all()
-        return audit_orgs
+            return cls.objects.none()
+        if user.is_super_auditor:
+            return [*cls.objects.all(), cls.default()]
+        return cls.get_user_orgs_by_role(user, ROLE.AUDITOR)
 
     @classmethod
-    def get_user_admin_or_audit_orgs(self, user):
-        admin_orgs = self.get_user_admin_orgs(user)
-        audit_orgs = self.get_user_audit_orgs(user)
-        orgs = set(admin_orgs) | set(audit_orgs)
-        return orgs
+    def get_user_admin_or_audit_orgs(cls, user):
+        if user.is_anonymous:
+            return cls.objects.none()
+        if user.is_superuser or user.is_super_auditor:
+            return [*cls.objects.all(), cls.default()]
+        return cls.get_user_orgs_by_role(user, (ROLE.AUDITOR, ROLE.ADMIN))
 
     @classmethod
     def default(cls):
@@ -211,8 +204,122 @@ class Organization(models.Model):
         from .utils import set_current_org
         set_current_org(self)
 
-    @classmethod
-    def all_orgs(cls):
-        orgs = list(cls.objects.all())
-        orgs.append(cls.default())
-        return orgs
+
+def _convert_to_uuid_set(users):
+    rst = set()
+    for user in users:
+        if isinstance(user, models.Model):
+            rst.add(user.id)
+        elif not isinstance(user, uuid.UUID):
+            rst.add(uuid.UUID(user))
+    return rst
+
+
+def _none2list(*args):
+    return ([] if v is None else v for v in args)
+
+
+class OrgMemeberManager(models.Manager):
+
+    def remove_users_by_role(self, org, users=None, admins=None, auditors=None):
+        if not any((users, admins, auditors)):
+            return
+        users, admins, auditors = _none2list(users, admins, auditors)
+
+        send = partial(signals.m2m_changed.send, sender=self.model, instance=org, reverse=False,
+                       model=Organization, pk_set=[*users, *admins, *auditors], using=self.db)
+
+        send(action="pre_remove")
+        self.filter(org_id=org.id).filter(
+            Q(user__in=users, role=ROLE.USER) |
+            Q(user__in=admins, role=ROLE.ADMIN) |
+            Q(user__in=auditors, role=ROLE.AUDITOR)
+        ).delete()
+        send(action="post_remove")
+
+    def add_users_by_role(self, org, users=None, admins=None, auditors=None):
+        if not any((users, admins, auditors)):
+            return
+        users, admins, auditors = _none2list(users, admins, auditors)
+
+        add_mapper = (
+            (users, ROLE.USER),
+            (admins, ROLE.ADMIN),
+            (auditors, ROLE.AUDITOR)
+        )
+
+        oms_add = []
+        for users, role in add_mapper:
+            for user in users:
+                if isinstance(user, models.Model):
+                    user = user.id
+                oms_add.append(self.model(org_id=org.id, user_id=user, role=role))
+
+        send = partial(signals.m2m_changed.send, sender=self.model, instance=org, reverse=False,
+                       model=Organization, pk_set=[*users, *admins, *auditors], using=self.db)
+
+        send(action='pre_add')
+        self.bulk_create(oms_add)
+        send(action='post_add')
+
+    def _get_remove_add_set(self, new_users, old_users):
+        if new_users is None:
+            return None, None
+        new_users = _convert_to_uuid_set(new_users)
+        return (old_users - new_users), (new_users - old_users)
+
+    def set_users_by_role(self, org, users=None, admins=None, auditors=None):
+        oms = self.filter(org_id=org.id).values_list('role', 'user_id')
+
+        old_users, old_admins, old_auditors = set(), set(), set()
+
+        mapper = {
+            ROLE.USER: old_users,
+            ROLE.ADMIN: old_admins,
+            ROLE.AUDITOR: old_auditors
+        }
+
+        for role, user_id in oms:
+            if role in mapper:
+                mapper[role].add(user_id)
+
+        users_remove, users_add = self._get_remove_add_set(users, old_users)
+        admins_remove, admins_add = self._get_remove_add_set(admins, old_admins)
+        auditors_remove, auditors_add = self._get_remove_add_set(auditors, old_auditors)
+
+        self.remove_users_by_role(
+            org,
+            users_remove,
+            admins_remove,
+            auditors_remove
+        )
+
+        self.add_users_by_role(
+            org,
+            users_add,
+            admins_add,
+            auditors_add
+        )
+
+
+class OrganizationMember(models.Model):
+    """
+    注意：直接调用该 `Model.delete` `Model.objects.delete` 不会触发清理该用户的信号
+    """
+
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    org = models.ForeignKey(Organization, related_name='m2m_org_members', on_delete=models.CASCADE, verbose_name=_('Organization'))
+    user = models.ForeignKey('users.User', related_name='m2m_org_members', on_delete=models.CASCADE, verbose_name=_('User'))
+    role = models.CharField(max_length=16, choices=ROLE.choices, default=ROLE.USER, verbose_name=_("Role"))
+    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
+    date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
+    created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
+
+    objects = OrgMemeberManager()
+
+    class Meta:
+        unique_together = [('org', 'user', 'role')]
+        db_table = 'orgs_organization_members'
+
+    def __str__(self):
+        return '{} is {}: {}'.format(self.user.name, self.org.name, self.role)

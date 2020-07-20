@@ -1,16 +1,18 @@
 
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
-from users.models import UserGroup
-from assets.models import Asset, Domain, AdminUser, SystemUser, Label
-from perms.models import AssetPermission
+
+from users.models.user import User
 from common.serializers import AdaptedBulkListSerializer
-from .utils import set_current_org, get_current_org
-from .models import Organization
+from .models import Organization, OrganizationMember
 from .mixins.serializers import OrgMembershipSerializerMixin
 
 
 class OrgSerializer(ModelSerializer):
+    users = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), write_only=True)
+    admins = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), write_only=True)
+    auditors = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), write_only=True)
+
     class Meta:
         model = Organization
         list_serializer_class = AdaptedBulkListSerializer
@@ -21,11 +23,27 @@ class OrgSerializer(ModelSerializer):
         fields_m2m = ['users', 'admins', 'auditors']
         fields = fields_small + fields_m2m
         read_only_fields = ['created_by', 'date_created']
-        extra_kwargs = {
-            'admins': {'write_only': True},
-            'users': {'write_only': True},
-            'auditors': {'write_only': True},
-        }
+
+    def create(self, validated_data):
+        members = self._pop_memebers(validated_data)
+        instance = Organization.objects.create(**validated_data)
+        OrganizationMember.objects.add_users_by_role(instance, *members)
+        return instance
+
+    def _pop_memebers(self, validated_data):
+        return (
+            validated_data.pop('users', None),
+            validated_data.pop('admins', None),
+            validated_data.pop('auditors', None)
+        )
+
+    def update(self, instance, validated_data):
+        members = self._pop_memebers(validated_data)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        OrganizationMember.objects.set_users_by_role(instance, *members)
+        return instance
 
 
 class OrgReadSerializer(OrgSerializer):
@@ -34,14 +52,14 @@ class OrgReadSerializer(OrgSerializer):
 
 class OrgMembershipAdminSerializer(OrgMembershipSerializerMixin, ModelSerializer):
     class Meta:
-        model = Organization.admins.through
+        model = Organization.members.through
         list_serializer_class = AdaptedBulkListSerializer
         fields = '__all__'
 
 
 class OrgMembershipUserSerializer(OrgMembershipSerializerMixin, ModelSerializer):
     class Meta:
-        model = Organization.users.through
+        model = Organization.members.through
         list_serializer_class = AdaptedBulkListSerializer
         fields = '__all__'
 

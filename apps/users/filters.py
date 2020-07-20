@@ -12,13 +12,13 @@ class OrgRoleUserFilterBackend(filters.BaseFilterBackend):
             return queryset
 
         if org_role == 'admins':
-            return queryset & (current_org.get_org_admins() | User.objects.filter(role=User.ROLE_ADMIN))
+            return queryset & (current_org.admins | User.objects.filter(role=User.ROLE_ADMIN))
         elif org_role == 'auditors':
-            return queryset & current_org.get_org_auditors()
+            return queryset & current_org.auditors
         elif org_role == 'users':
-            return queryset & current_org.get_org_users()
+            return queryset & current_org.users
         elif org_role == 'members':
-            return queryset & current_org.get_org_members()
+            return queryset & current_org.get_members()
 
     def get_schema_fields(self, view):
         return [
