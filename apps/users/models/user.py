@@ -240,14 +240,18 @@ class RoleMixin:
 
     @lazyproperty
     def is_org_admin(self):
-        if self.is_superuser or self.related_admin_orgs.exists():
+        from orgs.models import OrganizationMembers
+        ROLE_ADMIN = OrganizationMembers.ROLE_ADMIN
+        if self.is_superuser or self.orgs_through.filter(role=ROLE_ADMIN).exists():
             return True
         else:
             return False
 
     @lazyproperty
     def is_org_auditor(self):
-        if self.is_super_auditor or self.related_audit_orgs.exists():
+        from orgs.models import OrganizationMembers
+        ROLE_AUDITOR = OrganizationMembers.ROLE_AUDITOR
+        if self.is_super_auditor or self.orgs_through.filter(role=ROLE_AUDITOR).exists():
             return True
         else:
             return False

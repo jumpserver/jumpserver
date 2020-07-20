@@ -26,23 +26,23 @@ def on_org_create_or_update(sender, instance=None, created=False, **kwargs):
         instance.expire_cache()
 
 
-@receiver(m2m_changed, sender=Organization.users.through)
-def on_org_user_changed(sender, instance=None, **kwargs):
-    if isinstance(instance, Organization):
-        old_org = current_org
-        set_current_org(instance)
-        if kwargs['action'] == 'pre_remove':
-            users = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
-            for user in users:
-                perms = AssetPermission.objects.filter(users=user)
-                user_groups = UserGroup.objects.filter(users=user)
-                for perm in perms:
-                    perm.users.remove(user)
-                for user_group in user_groups:
-                    user_group.users.remove(user)
-        set_current_org(old_org)
-
-
-@receiver(m2m_changed, sender=Organization.admins.through)
-def on_org_admin_change(sender, **kwargs):
-    Organization._user_admin_orgs = None
+# @receiver(m2m_changed, sender=Organization.users.through)
+# def on_org_user_changed(sender, instance=None, **kwargs):
+#     if isinstance(instance, Organization):
+#         old_org = current_org
+#         set_current_org(instance)
+#         if kwargs['action'] == 'pre_remove':
+#             users = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
+#             for user in users:
+#                 perms = AssetPermission.objects.filter(users=user)
+#                 user_groups = UserGroup.objects.filter(users=user)
+#                 for perm in perms:
+#                     perm.users.remove(user)
+#                 for user_group in user_groups:
+#                     user_group.users.remove(user)
+#         set_current_org(old_org)
+#
+#
+# @receiver(m2m_changed, sender=Organization.admins.through)
+# def on_org_admin_change(sender, **kwargs):
+#     Organization._user_admin_orgs = None
