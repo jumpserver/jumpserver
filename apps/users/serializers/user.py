@@ -9,7 +9,8 @@ from common.utils import validate_ssh_public_key
 from common.mixins import CommonBulkSerializerMixin
 from common.serializers import AdaptedBulkListSerializer
 from common.permissions import CanUpdateDeleteUser
-from ..models import User
+from common.drf.fields import GroupConcatedPrimaryKeyRelatedField
+from ..models import User, UserGroup
 
 
 __all__ = [
@@ -38,10 +39,16 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         label=_('Password strategy'), write_only=True
     )
     mfa_level_display = serializers.ReadOnlyField(source='get_mfa_level_display')
+    groups = GroupConcatedPrimaryKeyRelatedField(
+        label=_('User group'), many=True, queryset=UserGroup.objects.all(), required=False
+    )
     login_blocked = serializers.SerializerMethodField()
     can_update = serializers.SerializerMethodField()
     can_delete = serializers.SerializerMethodField()
-
+    org_role = serializers.CharField(
+        label=_('Organization role name'), write_only=True,
+        allow_null=True, required=False, allow_blank=True
+    )
     key_prefix_block = "_LOGIN_BLOCK_{}"
 
     class Meta:
@@ -52,7 +59,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         # small 指的是 不需要计算的直接能从一张表中获取到的数据
         fields_small = fields_mini + [
             'password', 'email', 'public_key', 'wechat', 'phone', 'mfa_level', 'mfa_enabled',
-            'mfa_level_display', 'mfa_force_enabled',
+            'mfa_level_display', 'mfa_force_enabled', 'super_role_display',
             'comment', 'source', 'is_valid', 'is_expired',
             'is_active', 'created_by', 'is_first_login',
             'password_strategy', 'date_password_last_updated', 'date_expired',
@@ -60,7 +67,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         ]
         fields = fields_small + [
             'groups', 'role', 'groups_display', 'role_display',
-            'can_update', 'can_delete', 'login_blocked',
+            'can_update', 'can_delete', 'login_blocked', 'org_role'
         ]
 
         extra_kwargs = {
@@ -75,7 +82,8 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
             'can_delete': {'read_only': True},
             'groups_display': {'label': _('Groups name')},
             'source_display': {'label': _('Source name')},
-            'role_display': {'label': _('Role name')},
+            'role_display': {'label': _('Organization role name'), 'source': 'org_role_display'},
+            'super_role_display': {'label': _('Super role name')},
         }
 
     def __init__(self, *args, **kwargs):
@@ -87,17 +95,17 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         if not role:
             return
         choices = role._choices
-        choices.pop(User.ROLE_APP, None)
+        choices.pop(User.ROLE.APP, None)
         request = self.context.get('request')
         if request and hasattr(request, 'user') and not request.user.is_superuser:
-            choices.pop(User.ROLE_ADMIN, None)
-            choices.pop(User.ROLE_AUDITOR, None)
+            choices.pop(User.ROLE.ADMIN, None)
+            choices.pop(User.ROLE.AUDITOR, None)
         role._choices = choices
 
     def validate_role(self, value):
         request = self.context.get('request')
-        if not request.user.is_superuser and value != User.ROLE_USER:
-            role_display = dict(User.ROLE_CHOICES)[User.ROLE_USER]
+        if not request.user.is_superuser and value != User.ROLE.USER:
+            role_display = User.ROLE.USER.label
             msg = _("Role limit to {}".format(role_display))
             raise serializers.ValidationError(msg)
         return value
@@ -121,7 +129,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         role = self.initial_data.get('role')
         if self.instance:
             role = role or self.instance.role
-        if role == User.ROLE_AUDITOR:
+        if role == User.ROLE.AUDITOR:
             return []
         return groups
 

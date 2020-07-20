@@ -3,10 +3,10 @@ from django.db.models import Aggregate
 
 class GroupConcat(Aggregate):
     function = 'GROUP_CONCAT'
-    template = '%(function)s(%(distinct)s %(expressions)s %(order_by)s %(separator))'
+    template = '%(function)s(%(expressions)s %(order_by)s %(separator)s)'
     allow_distinct = False
 
-    def __init__(self, expression, distinct=False, order_by=None, separator=',', **extra):
+    def __init__(self, expression, order_by=None, separator=',', **extra):
         order_by_clause = ''
         if order_by is not None:
             order = 'ASC'
@@ -21,8 +21,7 @@ class GroupConcat(Aggregate):
 
         super().__init__(
             expression,
-            distinct='DISTINCT' if distinct else '',
             order_by=order_by_clause,
-            separator=f'SEPARATOR {separator}',
+            separator=f"SEPARATOR '{separator}'",
             **extra
         )

@@ -18,8 +18,10 @@ from django.shortcuts import reverse
 
 from common.local import LOCAL_DYNAMIC_SETTINGS
 from orgs.utils import current_org
-from common.utils import signer, date_expired_default, get_logger, lazyproperty
+from common.utils import date_expired_default, get_logger, lazyproperty
 from common import fields
+from common.const import choices
+from common.db.models import ChoiceSet
 from ..signals import post_user_change_password
 
 
@@ -150,45 +152,58 @@ class AuthMixin:
 
 
 class RoleMixin:
-    ROLE_ADMIN = 'Admin'
-    ROLE_USER = 'User'
-    ROLE_APP = 'App'
-    ROLE_AUDITOR = 'Auditor'
+    class ROLE(ChoiceSet):
+        ADMIN = choices.ADMIN, _('Super administrator')
+        USER = choices.USER, _('User')
+        AUDITOR = choices.AUDITOR, _('Super auditor')
+        APP = 'App', _('Application')
 
-    ROLE_CHOICES = (
-        (ROLE_ADMIN, _('Administrator')),
-        (ROLE_USER, _('User')),
-        (ROLE_APP, _('Application')),
-        (ROLE_AUDITOR, _("Auditor"))
-    )
-    role = ROLE_USER
+    role = ROLE.USER
 
     @property
-    def role_display(self):
+    def super_role_display(self):
+        return self.get_role_display()
+
+    @property
+    def org_role_display(self):
+        from orgs.models import ROLE as ORG_ROLE
+
         if not current_org.is_real():
-            return self.get_role_display()
-        roles = []
-        if self in current_org.get_org_admins():
-            roles.append(str(_('Org admin')))
-        if self in current_org.get_org_auditors():
-            roles.append(str(_('Org auditor')))
-        if self in current_org.get_org_users():
-            roles.append(str(_('User')))
-        return " | ".join(roles)
+            if self.is_superuser:
+                return ORG_ROLE.ADMIN.label
+            else:
+                return ORG_ROLE.USER.label
+
+        if hasattr(self, 'gc_m2m_org_members__role'):
+            names = self.gc_m2m_org_members__role
+            if isinstance(names, str):
+                roles = set(self.gc_m2m_org_members__role.split(','))
+            else:
+                roles = set()
+        else:
+            roles = set(self.m2m_org_members.filter(
+                org_id=current_org.id
+            ).values_list('role', flat=True))
+
+        return ' | '.join([str(ORG_ROLE[role]) for role in roles if role in ORG_ROLE])
 
     def current_org_roles(self):
-        roles = []
-        if self.can_admin_current_org:
-            roles.append('Admin')
-        if self.can_audit_current_org:
-            roles.append('Auditor')
-        else:
-            roles.append('User')
+        from orgs.models import OrganizationMember, ROLE as ORG_ROLE
+        if not current_org.is_real():
+            if self.is_superuser:
+                return [ORG_ROLE.ADMIN]
+            else:
+                return [ORG_ROLE.USER]
+
+        roles = list(set(OrganizationMember.objects.filter(
+            org_id=current_org.id, user=self
+        ).values_list('role', flat=True)))
+
         return roles
 
     @property
     def is_superuser(self):
-        if self.role == 'Admin':
+        if self.role == self.ROLE.ADMIN:
             return True
         else:
             return False
@@ -196,13 +211,13 @@ class RoleMixin:
     @is_superuser.setter
     def is_superuser(self, value):
         if value is True:
-            self.role = 'Admin'
+            self.role = self.ROLE.ADMIN
         else:
-            self.role = 'User'
+            self.role = self.ROLE.USER
 
     @property
     def is_super_auditor(self):
-        return self.role == 'Auditor'
+        return self.role == self.ROLE.AUDITOR
 
     @property
     def is_common_user(self):
@@ -216,7 +231,7 @@ class RoleMixin:
 
     @property
     def is_app(self):
-        return self.role == 'App'
+        return self.role == self.ROLE.APP
 
     @lazyproperty
     def user_orgs(self):
@@ -240,14 +255,16 @@ class RoleMixin:
 
     @lazyproperty
     def is_org_admin(self):
-        if self.is_superuser or self.related_admin_orgs.exists():
+        from orgs.models import ROLE as ORG_ROLE
+        if self.is_superuser or self.m2m_org_members.filter(role=ORG_ROLE.ADMIN).exists():
             return True
         else:
             return False
 
     @lazyproperty
     def is_org_auditor(self):
-        if self.is_super_auditor or self.related_audit_orgs.exists():
+        from orgs.models import ROLE as ORG_ROLE
+        if self.is_super_auditor or self.m2m_org_members.filter(role=ORG_ROLE.AUDITOR).exists():
             return True
         else:
             return False
@@ -283,7 +300,7 @@ class RoleMixin:
     def create_app_user(cls, name, comment):
         app = cls.objects.create(
             username=name, name=name, email='{}@local.domain'.format(name),
-            is_active=False, role='App', comment=comment,
+            is_active=False, role=cls.ROLE.APP, comment=comment,
             is_first_login=False, created_by='System'
         )
         access_key = app.create_access_key()
@@ -473,7 +490,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         blank=True, verbose_name=_('User group')
     )
     role = models.CharField(
-        choices=RoleMixin.ROLE_CHOICES, default='User', max_length=10,
+        choices=RoleMixin.ROLE.choices, default='User', max_length=10,
         blank=True, verbose_name=_('Role')
     )
     avatar = models.ImageField(
@@ -526,6 +543,12 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
 
     @property
     def groups_display(self):
+        if hasattr(self, 'gc_groups__name'):
+            names = self.gc_groups__name
+            if isinstance(names, str):
+                return ' '.join(set(self.gc_groups__name.split(',')))
+            else:
+                return ''
         return ' '.join([group.name for group in self.groups.all()])
 
     @property
@@ -646,7 +669,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
                        email=forgery_py.internet.email_address(),
                        name=forgery_py.name.full_name(),
                        password=make_password(forgery_py.lorem_ipsum.word()),
-                       role=choice(list(dict(User.ROLE_CHOICES).keys())),
+                       role=choice(list(dict(User.ROLE.choices).keys())),
                        wechat=forgery_py.internet.user_name(True),
                        comment=forgery_py.lorem_ipsum.sentence(),
                        created_by=choice(cls.objects.all()).username)

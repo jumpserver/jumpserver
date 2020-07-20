@@ -11,12 +11,6 @@ from .. import api
 app_name = 'orgs'
 router = DefaultRouter()
 
-# 将会删除
-router.register(r'orgs/(?P<org_id>[0-9a-zA-Z\-]{36})/membership/admins',
-                api.OrgMembershipAdminsViewSet, 'membership-admins')
-router.register(r'orgs/(?P<org_id>[0-9a-zA-Z\-]{36})/membership/users',
-                api.OrgMembershipUsersViewSet, 'membership-users'),
-
 router.register(r'orgs', api.OrgViewSet, 'org')
 
 old_version_urlpatterns = [

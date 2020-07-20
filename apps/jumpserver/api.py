@@ -128,7 +128,7 @@ class DatesLoginMetricMixin:
 
     @lazyproperty
     def dates_total_count_inactive_users(self):
-        total = current_org.get_org_members().count()
+        total = current_org.get_members().count()
         active = self.dates_total_count_active_users
         count = total - active
         if count < 0:
@@ -137,7 +137,7 @@ class DatesLoginMetricMixin:
 
     @lazyproperty
     def dates_total_count_disabled_users(self):
-        return current_org.get_org_members().filter(is_active=False).count()
+        return current_org.get_members().filter(is_active=False).count()
 
     @lazyproperty
     def dates_total_count_active_assets(self):
@@ -207,7 +207,7 @@ class DatesLoginMetricMixin:
 class TotalCountMixin:
     @staticmethod
     def get_total_count_users():
-        return current_org.get_org_members().count()
+        return current_org.get_members().count()
 
     @staticmethod
     def get_total_count_assets():

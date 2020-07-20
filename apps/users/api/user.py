@@ -1,11 +1,13 @@
 # ~*~ coding: utf-8 ~*~
 from django.core.cache import cache
+from django.db.models import CharField
 from django.utils.translation import ugettext as _
 
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
 
+from common.db.aggregates import GroupConcat
 from common.permissions import (
     IsOrgAdmin, IsOrgAdminOrAppUser,
     CanUpdateDeleteUser, IsSuperUser
@@ -13,6 +15,7 @@ from common.permissions import (
 from common.mixins import CommonApiMixin
 from common.utils import get_logger
 from orgs.utils import current_org
+from orgs.models import ROLE as ORG_ROLE, OrganizationMember
 from .. import serializers
 from ..serializers import UserSerializer, UserRetrieveSerializer
 from .mixins import UserQuerysetMixin
@@ -39,7 +42,11 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
     extra_filter_backends = [OrgRoleUserFilterBackend]
 
     def get_queryset(self):
-        return super().get_queryset().prefetch_related('groups')
+        return super().get_queryset().annotate(
+            gc_m2m_org_members__role=GroupConcat('m2m_org_members__role'),
+            gc_groups__name=GroupConcat('groups__name'),
+            gc_groups=GroupConcat('groups__id', output_field=CharField())
+        )
 
     def send_created_signal(self, users):
         if not isinstance(users, list):
@@ -48,11 +55,32 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
             post_user_create.send(self.__class__, user=user)
 
     def perform_create(self, serializer):
+        validated_data = serializer.validated_data
+        if isinstance(validated_data, list):
+            org_roles = [item.pop('org_role', None) for item in validated_data]
+        else:
+            org_roles = [validated_data.pop('org_role', None)]
+
         users = serializer.save()
         if isinstance(users, User):
             users = [users]
         if current_org and current_org.is_real():
-            current_org.users.add(*users)
+            mapper = {
+                ORG_ROLE.USER: [],
+                ORG_ROLE.ADMIN: [],
+                ORG_ROLE.AUDITOR: []
+            }
+
+            for user, role in zip(users, org_roles):
+                if role in mapper:
+                    mapper[role].append(user)
+                else:
+                    mapper[ORG_ROLE.USER].append(user)
+            OrganizationMember.objects.set_users_by_role(
+                current_org, users=mapper[ORG_ROLE.USER],
+                admins=mapper[ORG_ROLE.ADMIN],
+                auditors=mapper[ORG_ROLE.AUDITOR]
+            )
         self.send_created_signal(users)
 
     def get_permissions(self):
@@ -78,7 +106,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         users_ids = [
             d.get("id") or d.get("pk") for d in serializer.validated_data
         ]
-        users = current_org.get_org_members().filter(id__in=users_ids)
+        users = current_org.get_members().filter(id__in=users_ids)
         for user in users:
             self.check_object_permissions(self.request, user)
         return super().perform_bulk_update(serializer)

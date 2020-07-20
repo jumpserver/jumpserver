@@ -17,14 +17,14 @@ __all__ = [
 
 
 class UserCreateUpdateFormMixin(OrgModelForm):
-    role_choices = ((i, n) for i, n in User.ROLE_CHOICES if i != User.ROLE_APP)
+    role_choices = ((i, n) for i, n in User.ROLE.choices if i != User.ROLE.APP)
     password = forms.CharField(
         label=_('Password'), widget=forms.PasswordInput,
         max_length=128, strip=False, required=False,
     )
     role = forms.ChoiceField(
         choices=role_choices, required=True,
-        initial=User.ROLE_USER, label=_("Role")
+        initial=User.ROLE.USER, label=_("Role")
     )
     source = forms.ChoiceField(
         choices=get_source_choices, required=True,
