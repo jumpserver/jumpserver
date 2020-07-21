@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-21 12:34+0800\n"
+"POT-Creation-Date: 2020-07-21 14:38+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1696,12 +1696,12 @@ msgid "Upload download"
 msgstr "上传下载"
 
 #: perms/models/asset_permission.py:39
-msgid "GUI copy"
-msgstr "GUI 复制"
+msgid "Clipboard copy"
+msgstr "剪切板复制"
 
 #: perms/models/asset_permission.py:40
-msgid "GUI paste"
-msgstr "GUI 粘贴"
+msgid "Clipboard paste"
+msgstr "剪切板粘贴"
 
 #: perms/models/asset_permission.py:90
 msgid "Actions"
@@ -3964,6 +3964,12 @@ msgstr "企业版"
 #: xpack/plugins/license/models.py:78
 msgid "Ultimate edition"
 msgstr "旗舰版"
+
+#~ msgid "GUI copy"
+#~ msgstr "GUI 复制"
+
+#~ msgid "GUI paste"
+#~ msgstr "GUI 粘贴"
 
 #~ msgid "Covered always"
 #~ msgstr "总是被覆盖"
