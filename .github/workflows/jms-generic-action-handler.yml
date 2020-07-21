@@ -1,0 +1,12 @@
+on: [push, pull_request, release]
+
+name: JumpServer repos generic handler
+
+jobs:
+  generic_handler:
+    name: Run generic handler
+    runs-on: ubuntu-latest
+    steps:
+      - uses: jumpserver/action-generic-handler@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.PRIVATE_TOKEN }}
