@@ -93,6 +93,12 @@ def delete_celery_periodic_task(task_name):
     PeriodicTasks.update_changed()
 
 
+def get_celery_periodic_task(task_name):
+    from django_celery_beat.models import PeriodicTask
+    task = PeriodicTask.objects.filter(name=task_name).first()
+    return task
+
+
 def get_celery_task_log_path(task_id):
     task_id = str(task_id)
     rel_path = os.path.join(task_id[0], task_id[1], task_id + '.log')
