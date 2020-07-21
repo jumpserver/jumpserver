@@ -111,7 +111,7 @@ def clean_celery_periodic_tasks():
         task = get_celery_periodic_task(task_name)
         if task is None:
             logger.info('Task does not exist: {}'.format(task_name))
-            return
+            continue
         disable_celery_periodic_task(task_name)
         delete_celery_periodic_task(task_name)
         task = get_celery_periodic_task(task_name)
