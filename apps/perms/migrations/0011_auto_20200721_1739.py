@@ -7,6 +7,7 @@ from ..models.asset_permission import Action
 
 
 def migrate_asset_permission(apps, schema_editor):
+    # 已有的资产权限默认拥有剪切板复制粘贴动作
     AssetPermission = apps.get_model('perms', 'AssetPermission')
     AssetPermission.objects.all().update(actions=F('actions').bitor(Action.CLIPBOARD_COPY_PASTE))
 
