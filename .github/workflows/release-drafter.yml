@@ -1,0 +1,46 @@
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+name: Create Release And Upload assets
+
+jobs:
+  create-realese:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Get version
+        id: get_version
+        run: |
+          TAG=$(basename ${GITHUB_REF})
+          VERSION=${TAG/v/}
+          echo "::set-output name=TAG::$TAG"
+          echo "::set-output name=VERSION::$VERSION"
+      - name: Create Release
+        id: create_release
+        uses: release-drafter/release-drafter@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          config-name: release-config.yml
+          version: ${{ steps.get_version.outputs.TAG }}
+          tag: ${{ steps.get_version.outputs.TAG }}
+
+  build-and-release:
+    needs: create-realese
+    name: Build and Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build it and upload
+        uses: jumpserver/action-build-upload-assets@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-realese.outputs.upload_url }}
