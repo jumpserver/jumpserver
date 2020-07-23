@@ -21,7 +21,7 @@ class UserPermissionMixin:
     obj = None
 
     def initial(self, *args, **kwargs):
-        super().initial(*args, *kwargs)
+        super().initial(*args, **kwargs)
         self.obj = self.get_obj()
 
     def get_obj(self):
