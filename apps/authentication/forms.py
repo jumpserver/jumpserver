@@ -2,6 +2,7 @@
 #
 
 from django import forms
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from captcha.fields import CaptchaField
 
@@ -21,9 +22,24 @@ class UserLoginForm(forms.Form):
             )
 
 
-class UserLoginCaptchaForm(UserLoginForm):
+class UserCheckOtpCodeForm(forms.Form):
+    otp_code = forms.CharField(label=_('MFA code'), max_length=6)
+
+
+class CaptchaMixin(forms.Form):
     captcha = CaptchaField()
 
 
-class UserCheckOtpCodeForm(forms.Form):
-    otp_code = forms.CharField(label=_('MFA code'), max_length=6)
+class ChallengeMixin(forms.Form):
+    challenge = forms.CharField(label=_('MFA code'), max_length=6,
+                                required=False)
+
+
+def get_user_login_form_cls(*, captcha=False):
+    bases = []
+    if settings.SECURITY_LOGIN_CAPTCHA_ENABLED and captcha:
+        bases.append(CaptchaMixin)
+    if settings.SECURITY_LOGIN_CHALLENGE_ENABLED:
+        bases.append(ChallengeMixin)
+    bases.append(UserLoginForm)
+    return type('UserLoginForm', tuple(bases), {})

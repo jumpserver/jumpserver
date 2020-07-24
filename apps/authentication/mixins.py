@@ -54,15 +54,19 @@ class AuthMixin:
         self.check_is_block()
         request = self.request
         if hasattr(request, 'data'):
-            username = request.data.get('username', '')
-            password = request.data.get('password', '')
-            public_key = request.data.get('public_key', '')
+            data = request.data
         else:
-            username = request.POST.get('username', '')
-            password = request.POST.get('password', '')
-            public_key = request.POST.get('public_key', '')
+            data = request.POST
+        username = data.get('username', '')
+        password = data.get('password', '')
+        challenge = data.get('challenge', '')
+        public_key = data.get('public_key', '')
         user, error = check_user_valid(
-            request=request, username=username, password=password, public_key=public_key
+            request=request,
+            username=username,
+            password=password,
+            public_key=public_key,
+            challenge=challenge
         )
         ip = self.get_request_ip()
         if not user:

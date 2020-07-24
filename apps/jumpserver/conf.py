@@ -238,6 +238,8 @@ class Config(dict):
         'SECURITY_PASSWORD_LOWER_CASE': False,
         'SECURITY_PASSWORD_NUMBER': False,
         'SECURITY_PASSWORD_SPECIAL_CHAR': False,
+        'SECURITY_LOGIN_CHALLENGE_ENABLED': False,
+        'SECURITY_LOGIN_CAPTCHA_ENABLED': True,
 
         'HTTP_BIND_HOST': '0.0.0.0',
         'HTTP_LISTEN_PORT': 8080,

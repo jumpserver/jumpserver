@@ -47,8 +47,8 @@ def check_user_valid(**kwargs):
     password = kwargs.pop('password', None)
     public_key = kwargs.pop('public_key', None)
     username = kwargs.pop('username', None)
+    challenge = kwargs.get('challenge', '')
     request = kwargs.get('request')
-
     # 获取解密密钥，对密码进行解密
     rsa_private_key = request.session.get('rsa_private_key')
     if rsa_private_key is not None:
@@ -58,9 +58,10 @@ def check_user_valid(**kwargs):
             logger.error(e, exc_info=True)
             logger.error('Need decrypt password => {}'.format(password))
             return None, errors.reason_password_decrypt_failed
-
-    user = authenticate(request, username=username,
-                        password=password, public_key=public_key)
+    user = authenticate(request,
+                        username=username,
+                        password=password+challenge.strip(),
+                        public_key=public_key)
     if not user:
         return None, errors.reason_password_failed
     elif user.is_expired:
