@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 #
+from functools import partial
 import time
 from django.conf import settings
+from django.contrib.auth import authenticate
 
 from common.utils import get_object_or_none, get_request_ip, get_logger
 from users.models import User
@@ -9,7 +11,7 @@ from users.utils import (
     is_block_login, clean_failed_count
 )
 from . import errors
-from .utils import check_user_valid
+from .utils import rsa_decrypt
 from .signals import post_auth_success, post_auth_failed
 
 logger = get_logger(__name__)
@@ -54,21 +56,41 @@ class AuthMixin:
         self.check_is_block()
         request = self.request
         if hasattr(request, 'data'):
-            username = request.data.get('username', '')
-            password = request.data.get('password', '')
-            public_key = request.data.get('public_key', '')
+            data = request.data
         else:
-            username = request.POST.get('username', '')
-            password = request.POST.get('password', '')
-            public_key = request.POST.get('public_key', '')
-        user, error = check_user_valid(
-            request=request, username=username, password=password, public_key=public_key
-        )
+            data = request.POST
+        username = data.get('username', '')
+        password = data.get('password', '')
+        challenge = data.get('challenge', '')
+        public_key = data.get('public_key', '')
         ip = self.get_request_ip()
+
+        CredentialError = partial(errors.CredentialError, username=username, ip=ip, request=request)
+
+        # 获取解密密钥，对密码进行解密
+        rsa_private_key = request.session.get('rsa_private_key')
+        if rsa_private_key is not None:
+            try:
+                password = rsa_decrypt(password, rsa_private_key)
+            except Exception as e:
+                logger.error(e, exc_info=True)
+                logger.error('Need decrypt password => {}'.format(password))
+                raise CredentialError(error=errors.reason_password_decrypt_failed)
+
+        user = authenticate(request,
+                            username=username,
+                            password=password + challenge.strip(),
+                            public_key=public_key)
+
         if not user:
-            raise errors.CredentialError(
-                username=username, error=error, ip=ip, request=request
-            )
+            raise CredentialError(error=errors.reason_password_failed)
+        elif user.is_expired:
+            raise CredentialError(error=errors.reason_user_inactive)
+        elif not user.is_active:
+            raise CredentialError(error=errors.reason_user_inactive)
+        elif user.password_has_expired:
+            raise CredentialError(error=errors.reason_password_expired)
+
         clean_failed_count(username, ip)
         request.session['auth_password'] = 1
         request.session['user_id'] = str(user.id)
