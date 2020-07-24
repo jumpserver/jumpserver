@@ -22,7 +22,8 @@ from common.utils import get_request_ip, get_object_or_none
 from users.utils import (
     redirect_user_first_login_or_index
 )
-from .. import forms, mixins, errors, utils
+from .. import mixins, errors, utils
+from ..forms import get_user_login_form_cls
 
 
 __all__ = [
@@ -35,8 +36,6 @@ __all__ = [
 @method_decorator(csrf_protect, name='dispatch')
 @method_decorator(never_cache, name='dispatch')
 class UserLoginView(mixins.AuthMixin, FormView):
-    form_class = forms.UserLoginForm
-    form_class_captcha = forms.UserLoginCaptchaForm
     key_prefix_captcha = "_LOGIN_INVALID_{}"
     redirect_field_name = 'next'
 
@@ -87,7 +86,8 @@ class UserLoginView(mixins.AuthMixin, FormView):
             form.add_error(None, e.msg)
             ip = self.get_request_ip()
             cache.set(self.key_prefix_captcha.format(ip), 1, 3600)
-            new_form = self.form_class_captcha(data=form.data)
+            form_cls = get_user_login_form_cls(captcha=True)
+            new_form = form_cls(data=form.data)
             new_form._errors = form.errors
             context = self.get_context_data(form=new_form)
             return self.render_to_response(context)
@@ -103,9 +103,9 @@ class UserLoginView(mixins.AuthMixin, FormView):
     def get_form_class(self):
         ip = get_request_ip(self.request)
         if cache.get(self.key_prefix_captcha.format(ip)):
-            return self.form_class_captcha
+            return get_user_login_form_cls(captcha=True)
         else:
-            return self.form_class
+            return get_user_login_form_cls()
 
     def get_context_data(self, **kwargs):
         # 生成加解密密钥对，public_key传递给前端，private_key存入session中供解密使用

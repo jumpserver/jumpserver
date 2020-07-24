@@ -33,6 +33,16 @@
                 </div>
             {% endif %}
         </div>
+        {% if form.challenge %}
+            <div class="form-group">
+                <input type="challenge" class="form-control" id="challenge" name="{{ form.challenge.html_name }}" placeholder="{% trans 'MFA code' %}" >
+                {% if form.errors.challenge %}
+                    <div class="help-block field-error">
+                        <p class="red-fonts">{{ form.errors.challenge.as_text }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
         <div>
             {{ form.captcha }}
         </div>
