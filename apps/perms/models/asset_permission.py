@@ -29,7 +29,6 @@ class Action:
     CLIPBOARD_PASTE = 0b1 << 4
     ALL = 0xff
     UPDOWNLOAD = UPLOAD | DOWNLOAD
-    CLIPBOARD_COPY_PASTE = CLIPBOARD_COPY | CLIPBOARD_PASTE
 
     DB_CHOICES = (
         (ALL, _('All')),
@@ -39,7 +38,6 @@ class Action:
         (UPDOWNLOAD, _("Upload download")),
         (CLIPBOARD_COPY, _('Clipboard copy')),
         (CLIPBOARD_PASTE, _('Clipboard paste')),
-        (CLIPBOARD_COPY_PASTE, _('Clipboard copy paste'))
     )
 
     NAME_MAP = {
@@ -50,7 +48,6 @@ class Action:
         UPDOWNLOAD: "updownload",
         CLIPBOARD_COPY: 'clipboard_copy',
         CLIPBOARD_PASTE: 'clipboard_paste',
-        CLIPBOARD_COPY_PASTE: 'clipboard_copy_paste'
     }
 
     NAME_MAP_REVERSE = {v: k for k, v in NAME_MAP.items()}

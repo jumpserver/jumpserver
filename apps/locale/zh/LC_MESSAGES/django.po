@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-21 16:29+0800\n"
+"POT-Creation-Date: 2020-07-21 14:38+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -104,7 +104,7 @@ msgstr "数据库应用"
 #: assets/serializers/admin_user.py:32 assets/serializers/asset_user.py:47
 #: assets/serializers/asset_user.py:84 assets/serializers/system_user.py:44
 #: assets/serializers/system_user.py:176 audits/models.py:38
-#: perms/forms/asset_permission.py:89 perms/models/asset_permission.py:90
+#: perms/forms/asset_permission.py:89 perms/models/asset_permission.py:87
 #: templates/index.html:82 terminal/backends/command/models.py:19
 #: terminal/backends/command/serializers.py:13 terminal/models.py:187
 #: users/templates/users/user_asset_permission.html:40
@@ -233,7 +233,7 @@ msgid "Domain"
 msgstr "网域"
 
 #: assets/models/asset.py:195 assets/models/user.py:109
-#: perms/models/asset_permission.py:91
+#: perms/models/asset_permission.py:88
 #: xpack/plugins/change_auth_plan/models.py:56
 #: xpack/plugins/gathered_user/models.py:24
 msgid "Nodes"
@@ -643,7 +643,7 @@ msgstr "SFTP根路径"
 
 #: assets/models/user.py:195 audits/models.py:39
 #: perms/forms/asset_permission.py:95 perms/forms/remote_app_permission.py:49
-#: perms/models/asset_permission.py:92
+#: perms/models/asset_permission.py:89
 #: perms/models/database_app_permission.py:22
 #: perms/models/remote_app_permission.py:16 templates/_nav.html:45
 #: terminal/backends/command/models.py:20
@@ -1675,43 +1675,39 @@ msgstr "资产和节点至少选一个"
 msgid "System users"
 msgstr "系统用户"
 
-#: perms/models/asset_permission.py:35 settings/serializers/settings.py:56
+#: perms/models/asset_permission.py:34 settings/serializers/settings.py:56
 msgid "All"
 msgstr "全部"
 
-#: perms/models/asset_permission.py:36
+#: perms/models/asset_permission.py:35
 msgid "Connect"
 msgstr "连接"
 
-#: perms/models/asset_permission.py:37
+#: perms/models/asset_permission.py:36
 msgid "Upload file"
 msgstr "上传文件"
 
-#: perms/models/asset_permission.py:38
+#: perms/models/asset_permission.py:37
 msgid "Download file"
 msgstr "下载文件"
 
-#: perms/models/asset_permission.py:39
+#: perms/models/asset_permission.py:38
 msgid "Upload download"
 msgstr "上传下载"
 
-#: perms/models/asset_permission.py:40
+#: perms/models/asset_permission.py:39
 msgid "Clipboard copy"
 msgstr "剪切板复制"
 
-#: perms/models/asset_permission.py:41
+#: perms/models/asset_permission.py:40
 msgid "Clipboard paste"
 msgstr "剪切板粘贴"
 
-#: perms/models/asset_permission.py:42
-msgid "Clipboard copy paste"
-msgstr "剪切板复制粘贴"
-
-#: perms/models/asset_permission.py:93
+#: perms/models/asset_permission.py:90
 msgid "Actions"
 msgstr "动作"
 
-#: perms/models/asset_permission.py:97 templates/_nav.html:78
+#: perms/models/asset_permission.py:94 templates/_nav.html:78
 #: users/templates/users/_user_detail_nav_header.html:31
 msgid "Asset permission"
 msgstr "资产授权"
