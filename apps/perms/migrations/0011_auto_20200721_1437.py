@@ -2,13 +2,6 @@
 
 from django.db import migrations, models
 
-from django.db.models import F
-from ..models.asset_permission import AssetPermission, Action
-
-
-def old_asset_permission_add_clipboard_action():
-    AssetPermission.objects.all().update(actions=F('actions') | Action.CLIPBOARD_COPY_PASTE)
-
 
 class Migration(migrations.Migration):
 
