@@ -21,14 +21,11 @@ logger = logging.getLogger(__name__)
 
 class Action:
     NONE = 0
-
-    CONNECT = 0b1
-    UPLOAD = 0b1 << 1
-    DOWNLOAD = 0b1 << 2
-    GUI_COPY = 0b1 << 3
-    GUI_PASTE = 0b1 << 4
-    ALL = 0xff
+    CONNECT = 0b00000001
+    UPLOAD = 0b00000010
+    DOWNLOAD = 0b00000100
     UPDOWNLOAD = UPLOAD | DOWNLOAD
+    ALL = 0b11111111
 
     DB_CHOICES = (
         (ALL, _('All')),
@@ -36,8 +33,6 @@ class Action:
         (UPLOAD, _('Upload file')),
         (DOWNLOAD, _('Download file')),
         (UPDOWNLOAD, _("Upload download")),
-        (GUI_COPY, _('GUI copy')),
-        (GUI_PASTE, _('GUI paste')),
     )
 
     NAME_MAP = {
@@ -46,11 +41,9 @@ class Action:
         UPLOAD: "upload_file",
         DOWNLOAD: "download_file",
         UPDOWNLOAD: "updownload",
-        GUI_COPY: 'gui_copy',
-        GUI_PASTE: 'gui_paste',
     }
 
-    NAME_MAP_REVERSE = {v: k for k, v in NAME_MAP.items()}
+    NAME_MAP_REVERSE = dict({v: k for k, v in NAME_MAP.items()})
     CHOICES = []
     for i, j in DB_CHOICES:
         CHOICES.append((NAME_MAP[i], j))
