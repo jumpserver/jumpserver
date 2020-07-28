@@ -38,9 +38,9 @@ class JMSCSVParser(BaseParser):
             yield row
 
     @staticmethod
-    def _get_fields_map(serializer):
+    def _get_fields_map(serializer_cls):
         fields_map = {}
-        fields = serializer.fields
+        fields = serializer_cls().fields
         fields_map.update({v.label: k for k, v in fields.items()})
         fields_map.update({k: k for k, _ in fields.items()})
         return fields_map
@@ -82,7 +82,8 @@ class JMSCSVParser(BaseParser):
     def parse(self, stream, media_type=None, parser_context=None):
         parser_context = parser_context or {}
         try:
-            serializer = parser_context["view"].get_serializer()
+            view = parser_context['view']
+            serializer_cls = view.get_serializer_class()
         except Exception as e:
             logger.debug(e, exc_info=True)
             raise ParseError('The resource does not support imports!')
@@ -96,7 +97,7 @@ class JMSCSVParser(BaseParser):
             rows = self._gen_rows(binary, charset=encoding)
 
             header = next(rows)
-            fields_map = self._get_fields_map(serializer)
+            fields_map = self._get_fields_map(serializer_cls)
             header = [fields_map.get(name.strip('*'), '') for name in header]
 
             data = []
