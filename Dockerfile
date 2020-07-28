@@ -9,18 +9,23 @@ RUN cd utils && bash -ixeu build.sh
 
 
 FROM registry.fit2cloud.com/public/python:v3
+ARG PIP_MIRROR=https://pypi.douban.com/simple
+ENV PIP_MIRROR=$PIP_MIRROR
+ARG MYSQL_MIRROR=https://mirrors.tuna.tsinghua.edu.cn/mysql/yum/mysql57-community-el6/
+ENV MYSQL_MIRROR=$MYSQL_MIRROR
+
 WORKDIR /opt/jumpserver
-COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/jumpserver
 
+COPY ./requirements ./requirements
 RUN useradd jumpserver
-
 RUN yum -y install epel-release && \
-      echo -e "[mysql]\nname=mysql\nbaseurl=https://mirrors.tuna.tsinghua.edu.cn/mysql/yum/mysql57-community-el6/\ngpgcheck=0\nenabled=1" > /etc/yum.repos.d/mysql.repo
-
-COPY . .
+      echo -e "[mysql]\nname=mysql\nbaseurl=${MYSQL_MIRROR}\ngpgcheck=0\nenabled=1" > /etc/yum.repos.d/mysql.repo
 RUN yum -y install $(cat requirements/rpm_requirements.txt)
-RUN pip install --upgrade pip setuptools && pip install wheel && \
-    pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements/requirements.txt || pip install -r requirements/requirements.txt
+RUN pip install --upgrade pip setuptools wheel -i ${PIP_MIRROR} && \
+    pip config set global.index-url ${PIP_MIRROR}
+RUN pip install -r requirements/requirements.txt || pip install -r requirements/requirements.txt
+
+COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/
 RUN mkdir -p /root/.ssh/ && echo -e "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null" > /root/.ssh/config
 
 RUN echo > config.yml
