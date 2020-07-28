@@ -39,7 +39,7 @@ class ServiceAccountSerializer(serializers.ModelSerializer):
     def save(self, **kwargs):
         self.validated_data['email'] = self.get_email()
         self.validated_data['username'] = self.get_username()
-        self.validated_data['role'] = User.ROLE_APP
+        self.validated_data['role'] = User.ROLE.APP
         return super().save(**kwargs)
 
     def create(self, validated_data):

@@ -12,7 +12,7 @@ class OrgRoleUserFilterBackend(filters.BaseFilterBackend):
             return queryset
 
         if org_role == 'admins':
-            return queryset & (current_org.admins | User.objects.filter(role=User.ROLE_ADMIN))
+            return queryset & (current_org.admins | User.objects.filter(role=User.ROLE.ADMIN))
         elif org_role == 'auditors':
             return queryset & current_org.auditors
         elif org_role == 'users':

@@ -58,7 +58,7 @@ class RequestAssetPermTicketSerializer(serializers.ModelSerializer):
     def validate_assignees(self, assignees):
         user = self.context['request'].user
 
-        count = User.objects.filter(Q(related_admin_orgs__users=user) | Q(role=User.ROLE_ADMIN)).filter(
+        count = User.objects.filter(Q(related_admin_orgs__users=user) | Q(role=User.ROLE.ADMIN)).filter(
             id__in=[assignee.id for assignee in assignees]).distinct().count()
 
         if count != len(assignees):
