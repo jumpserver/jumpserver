@@ -48,7 +48,7 @@ class RequestAssetPermTicketViewSet(JMSModelViewSet):
         org_mapper = {}
         UserTuple = namedtuple('UserTuple', ('id', 'name', 'username'))
         user = request.user
-        superusers = User.objects.filter(role=User.ROLE_ADMIN)
+        superusers = User.objects.filter(role=User.ROLE.ADMIN)
 
         admins_with_org = User.objects.filter(related_admin_orgs__users=user).annotate(
             org_id=F('related_admin_orgs__id'), org_name=F('related_admin_orgs__name')
