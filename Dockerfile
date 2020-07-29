@@ -25,7 +25,7 @@ RUN pip install --upgrade pip setuptools wheel -i ${PIP_MIRROR} && \
     pip config set global.index-url ${PIP_MIRROR}
 RUN pip install -r requirements/requirements.txt || pip install -r requirements/requirements.txt
 
-COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/
+COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/jumpserver
 RUN mkdir -p /root/.ssh/ && echo -e "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null" > /root/.ssh/config
 
 RUN echo > config.yml
