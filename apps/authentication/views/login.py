@@ -109,12 +109,18 @@ class UserLoginView(mixins.AuthMixin, FormView):
 
     def get_context_data(self, **kwargs):
         # 生成加解密密钥对，public_key传递给前端，private_key存入session中供解密使用
-        rsa_private_key, rsa_public_key = utils.gen_key_pair()
-        self.request.session['rsa_private_key'] = rsa_private_key
+        rsa_private_key = self.request.session.get('rsa_private_key')
+        rsa_public_key = self.request.session.get('rsa_public_key')
+        if not all((rsa_private_key, rsa_public_key)):
+            rsa_private_key, rsa_public_key = utils.gen_key_pair()
+            rsa_public_key = rsa_public_key.replace('\n', '\\n')
+            self.request.session['rsa_private_key'] = rsa_private_key
+            self.request.session['rsa_public_key'] = rsa_public_key
+
         context = {
             'demo_mode': os.environ.get("DEMO_MODE"),
             'AUTH_OPENID': settings.AUTH_OPENID,
-            'rsa_public_key': rsa_public_key.replace('\n', '\\n')
+            'rsa_public_key': rsa_public_key
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
