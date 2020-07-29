@@ -12,7 +12,6 @@ class TerminalSerializer(BulkModelSerializer):
 
     class Meta:
         model = Terminal
-        list_serializer_class = AdaptedBulkListSerializer
         fields = [
             'id', 'name', 'remote_addr', 'http_port', 'ssh_port',
             'comment', 'is_accepted', "is_active", 'session_online',
