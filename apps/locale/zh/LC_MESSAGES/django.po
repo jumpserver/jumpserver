@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-29 15:03+0800\n"
+"POT-Creation-Date: 2020-07-31 19:20+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -131,9 +131,10 @@ msgstr "参数"
 #: applications/models/remote_app.py:39 assets/models/asset.py:224
 #: assets/models/base.py:240 assets/models/cluster.py:28
 #: assets/models/cmd_filter.py:26 assets/models/cmd_filter.py:60
-#: assets/models/group.py:21 common/mixins/models.py:49 orgs/models.py:23
-#: orgs/models.py:316 perms/models/base.py:54 users/models/user.py:530
-#: users/serializers/group.py:35 users/templates/users/user_detail.html:97
+#: assets/models/group.py:21 common/db/models.py:66 common/mixins/models.py:49
+#: orgs/models.py:23 orgs/models.py:316 perms/models/base.py:54
+#: users/models/user.py:530 users/serializers/group.py:35
+#: users/templates/users/user_detail.html:97
 #: xpack/plugins/change_auth_plan/models.py:81 xpack/plugins/cloud/models.py:56
 #: xpack/plugins/cloud/models.py:146 xpack/plugins/gathered_user/models.py:30
 msgid "Created by"
@@ -144,7 +145,7 @@ msgstr "创建者"
 #: applications/models/remote_app.py:42 assets/models/asset.py:225
 #: assets/models/base.py:238 assets/models/cluster.py:26
 #: assets/models/domain.py:23 assets/models/gathered_user.py:19
-#: assets/models/group.py:22 assets/models/label.py:25
+#: assets/models/group.py:22 assets/models/label.py:25 common/db/models.py:68
 #: common/mixins/models.py:50 ops/models/adhoc.py:38 ops/models/command.py:27
 #: orgs/models.py:24 orgs/models.py:314 perms/models/base.py:55
 #: users/models/group.py:18 users/templates/users/user_group_detail.html:58
@@ -241,7 +242,7 @@ msgstr "节点"
 
 #: assets/models/asset.py:196 assets/models/cmd_filter.py:22
 #: assets/models/domain.py:55 assets/models/label.py:22
-#: authentication/models.py:45
+#: authentication/models.py:48
 msgid "Is active"
 msgstr "激活"
 
@@ -379,7 +380,8 @@ msgid "SSH public key"
 msgstr "SSH公钥"
 
 #: assets/models/base.py:239 assets/models/gathered_user.py:20
-#: common/mixins/models.py:51 ops/models/adhoc.py:39 orgs/models.py:315
+#: common/db/models.py:69 common/mixins/models.py:51 ops/models/adhoc.py:39
+#: orgs/models.py:315
 msgid "Date updated"
 msgstr "更新日期"
 
@@ -534,9 +536,9 @@ msgid "Default asset group"
 msgstr "默认资产组"
 
 #: assets/models/label.py:15 audits/models.py:36 audits/models.py:56
-#: audits/models.py:69 audits/serializers.py:77 authentication/models.py:43
-#: orgs/models.py:16 orgs/models.py:312 perms/forms/asset_permission.py:83
-#: perms/forms/database_app_permission.py:38
+#: audits/models.py:69 audits/serializers.py:77 authentication/models.py:46
+#: authentication/models.py:90 orgs/models.py:16 orgs/models.py:312
+#: perms/forms/asset_permission.py:83 perms/forms/database_app_permission.py:38
 #: perms/forms/remote_app_permission.py:40 perms/models/base.py:49
 #: templates/index.html:78 terminal/backends/command/models.py:18
 #: terminal/backends/command/serializers.py:12 terminal/models.py:185
@@ -1042,94 +1044,94 @@ msgstr "运行用户"
 msgid "Code is invalid"
 msgstr "Code无效"
 
-#: authentication/backends/api.py:53
+#: authentication/backends/api.py:52
 msgid "Invalid signature header. No credentials provided."
 msgstr ""
 
-#: authentication/backends/api.py:56
+#: authentication/backends/api.py:55
 msgid "Invalid signature header. Signature string should not contain spaces."
 msgstr ""
 
-#: authentication/backends/api.py:63
+#: authentication/backends/api.py:62
 msgid "Invalid signature header. Format like AccessKeyId:Signature"
 msgstr ""
 
-#: authentication/backends/api.py:67
+#: authentication/backends/api.py:66
 msgid ""
 "Invalid signature header. Signature string should not contain invalid "
 "characters."
 msgstr ""
 
-#: authentication/backends/api.py:87 authentication/backends/api.py:103
+#: authentication/backends/api.py:86 authentication/backends/api.py:102
 msgid "Invalid signature."
 msgstr ""
 
-#: authentication/backends/api.py:94
+#: authentication/backends/api.py:93
 msgid "HTTP header: Date not provide or not %a, %d %b %Y %H:%M:%S GMT"
 msgstr ""
 
-#: authentication/backends/api.py:99
+#: authentication/backends/api.py:98
 msgid "Expired, more than 15 minutes"
 msgstr ""
 
-#: authentication/backends/api.py:106
+#: authentication/backends/api.py:105
 msgid "User disabled."
 msgstr "用户已禁用"
 
-#: authentication/backends/api.py:124
+#: authentication/backends/api.py:123
 msgid "Invalid token header. No credentials provided."
 msgstr ""
 
-#: authentication/backends/api.py:127
+#: authentication/backends/api.py:126
 msgid "Invalid token header. Sign string should not contain spaces."
 msgstr ""
 
-#: authentication/backends/api.py:134
+#: authentication/backends/api.py:133
 msgid ""
 "Invalid token header. Sign string should not contain invalid characters."
 msgstr ""
 
-#: authentication/backends/api.py:145
+#: authentication/backends/api.py:144
 msgid "Invalid token or cache refreshed."
 msgstr ""
 
-#: authentication/errors.py:22
+#: authentication/errors.py:23
 msgid "Username/password check failed"
 msgstr "用户名/密码 校验失败"
 
-#: authentication/errors.py:23
+#: authentication/errors.py:24
 msgid "Password decrypt failed"
 msgstr "密码解密失败"
 
-#: authentication/errors.py:24
+#: authentication/errors.py:25
 msgid "MFA failed"
 msgstr "多因子认证失败"
 
-#: authentication/errors.py:25
+#: authentication/errors.py:26
 msgid "MFA unset"
 msgstr "多因子认证没有设定"
 
-#: authentication/errors.py:26
+#: authentication/errors.py:27
 msgid "Username does not exist"
 msgstr "用户名不存在"
 
-#: authentication/errors.py:27
+#: authentication/errors.py:28
 msgid "Password expired"
 msgstr "密码已过期"
 
-#: authentication/errors.py:28
+#: authentication/errors.py:29
 msgid "Disabled or expired"
 msgstr "禁用或失效"
 
-#: authentication/errors.py:29
+#: authentication/errors.py:30
 msgid "This account is inactive."
 msgstr "此账户已禁用"
 
-#: authentication/errors.py:39
+#: authentication/errors.py:40
 msgid "No session found, check your cookie"
 msgstr "会话已变更，刷新页面"
 
-#: authentication/errors.py:41
+#: authentication/errors.py:42
 #, python-brace-format
 msgid ""
 "The username or password you entered is incorrect, please enter it again. "
@@ -1139,36 +1141,40 @@ msgstr ""
 "您输入的用户名或密码不正确，请重新输入。 您还可以尝试 {times_try} 次（账号将"
 "被临时 锁定 {block_time} 分钟）"
 
-#: authentication/errors.py:47
+#: authentication/errors.py:48
 msgid ""
 "The account has been locked (please contact admin to unlock it or try again "
 "after {} minutes)"
 msgstr "账号已被锁定（请联系管理员解锁 或 {}分钟后重试）"
 
-#: authentication/errors.py:50 users/views/profile/otp.py:107
+#: authentication/errors.py:51 users/views/profile/otp.py:107
 #: users/views/profile/otp.py:146 users/views/profile/otp.py:166
 msgid "MFA code invalid, or ntp sync server time"
 msgstr "MFA验证码不正确，或者服务器端时间不对"
 
-#: authentication/errors.py:52
+#: authentication/errors.py:53
 msgid "MFA required"
 msgstr "需要多因子认证"
 
-#: authentication/errors.py:53
+#: authentication/errors.py:54
 msgid "MFA not set, please set it first"
 msgstr "多因子认证没有设置，请先完成设置"
 
-#: authentication/errors.py:54
+#: authentication/errors.py:55
 msgid "Login confirm required"
 msgstr "需要登录复核"
 
-#: authentication/errors.py:55
+#: authentication/errors.py:56
 msgid "Wait login confirm ticket for accept"
 msgstr "等待登录复核处理"
 
-#: authentication/errors.py:56
+#: authentication/errors.py:57
 msgid "Login confirm ticket was {}"
 msgstr "登录复核 {}"
+
+#: authentication/errors.py:213
+msgid "SSO auth closed"
+msgstr "SSO 认证关闭了"
 
 #: authentication/forms.py:26 authentication/forms.py:34
 #: authentication/templates/authentication/login.html:38
@@ -1177,7 +1183,7 @@ msgstr "登录复核 {}"
 msgid "MFA code"
 msgstr "多因子认证验证码"
 
-#: authentication/models.py:19
+#: authentication/models.py:22
 #: authentication/templates/authentication/_access_key_modal.html:32
 #: perms/models/base.py:51 users/templates/users/_select_user_modal.html:18
 #: users/templates/users/user_detail.html:132
@@ -1185,22 +1191,30 @@ msgstr "多因子认证验证码"
 msgid "Active"
 msgstr "激活中"
 
-#: authentication/models.py:39
+#: authentication/models.py:42
 msgid "Private Token"
 msgstr "SSH密钥"
 
-#: authentication/models.py:44 users/templates/users/user_detail.html:258
+#: authentication/models.py:47 users/templates/users/user_detail.html:258
 msgid "Reviewers"
 msgstr "审批人"
 
-#: authentication/models.py:53 tickets/models/ticket.py:27
+#: authentication/models.py:56 tickets/models/ticket.py:27
 #: users/templates/users/user_detail.html:250
 msgid "Login confirm"
 msgstr "登录复核"
 
-#: authentication/models.py:63
+#: authentication/models.py:66
 msgid "City"
 msgstr "城市"
+
+#: authentication/models.py:88
+msgid "Token"
+msgstr ""
+
+#: authentication/models.py:89
+msgid "Expired"
+msgstr "过期时间"
 
 #: authentication/templates/authentication/_access_key_modal.html:6
 msgid "API key list"
@@ -1349,7 +1363,7 @@ msgstr "欢迎回来，请输入用户名和密码登录"
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: authentication/views/login.py:172
+#: authentication/views/login.py:178
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -1357,15 +1371,15 @@ msgstr ""
 "等待 <b>{}</b> 确认, 你也可以复制链接发给他/她 <br/>\n"
 "                  不要关闭本页面"
 
-#: authentication/views/login.py:177
+#: authentication/views/login.py:183
 msgid "No ticket found"
 msgstr "没有发现工单"
 
-#: authentication/views/login.py:209
+#: authentication/views/login.py:215
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: authentication/views/login.py:210
+#: authentication/views/login.py:216
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
@@ -1379,10 +1393,19 @@ msgstr "%(name)s 创建成功"
 msgid "%(name)s was updated successfully"
 msgstr "%(name)s 更新成功"
 
+#: common/db/models.py:67
+msgid "Updated by"
+msgstr "更新人"
+
 #: common/drf/parsers/csv.py:22
 #, python-format
 msgid "The max size of CSV is %d bytes"
 msgstr "CSV 文件最大为 %d 字节"
+
+#: common/exceptions.py:15
+#, python-format
+msgid "%s object does not exist."
+msgstr "%s对象不存在"
 
 #: common/fields/form.py:33
 msgid "Not a valid json"
@@ -5540,9 +5563,6 @@ msgstr "旗舰版"
 
 #~ msgid "Corporation"
 #~ msgstr "公司"
-
-#~ msgid "Expired"
-#~ msgstr "过期时间"
 
 #~ msgid "Edition"
 #~ msgstr "版本"

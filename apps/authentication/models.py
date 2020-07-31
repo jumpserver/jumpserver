@@ -1,10 +1,13 @@
 import uuid
-from django.db import models
+from functools import partial
+
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _, ugettext as __
 from rest_framework.authtoken.models import Token
 from django.conf import settings
+from django.utils.crypto import get_random_string
 
+from common.db import models
 from common.mixins.models import CommonModelMixin
 from common.utils import get_object_or_none, get_request_ip, get_ip_city
 
@@ -76,3 +79,12 @@ class LoginConfirmSetting(CommonModelMixin):
     def __str__(self):
         return '{} confirm'.format(self.user.username)
 
+
+class SSOToken(models.JMSBaseModel):
+    """
+    类似腾讯企业邮的 [单点登录](https://exmail.qq.com/qy_mng_logic/doc#10036)
+    出于安全考虑，这里的 `token` 使用一次随即过期。但我们保留每一个生成过的 `token`。
+    """
+    authkey = models.UUIDField(primary_key=True, default=uuid.uuid4, verbose_name=_('Token'))
+    expired = models.BooleanField(default=False, verbose_name=_('Expired'))
+    user = models.ForeignKey('users.User', on_delete=models.PROTECT, verbose_name=_('User'), db_constraint=False)

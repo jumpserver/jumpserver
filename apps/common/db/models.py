@@ -1,4 +1,18 @@
-from functools import partial
+"""
+此文件作为 `django.db.models` 的 shortcut
+
+这样做的优点与缺点为：
+优点：
+    - 包命名都统一为 `models`
+    - 用户在使用的时候只导入本文件即可
+缺点：
+    - 此文件中添加代码的时候，注意不要跟 `django.db.models` 中的命名冲突
+"""
+
+import uuid
+
+from django.db.models import *
+from django.utils.translation import ugettext_lazy as _
 
 
 class Choice(str):
@@ -46,3 +60,20 @@ class ChoiceSetType(type):
 
 class ChoiceSet(metaclass=ChoiceSetType):
     choices = None  # 用于 Django Model 中的 choices 配置， 为了代码提示在此声明
+
+
+class JMSBaseModel(Model):
+    created_by = CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
+    updated_by = CharField(max_length=32, null=True, blank=True, verbose_name=_('Updated by'))
+    date_created = DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
+    date_updated = DateTimeField(auto_now=True, verbose_name=_('Date updated'))
+
+    class Meta:
+        abstract = True
+
+
+class JMSModel(JMSBaseModel):
+    id = UUIDField(default=uuid.uuid4, primary_key=True)
+
+    class Meta:
+        abstract = True
