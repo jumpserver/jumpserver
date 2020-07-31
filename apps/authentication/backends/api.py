@@ -5,14 +5,13 @@ import uuid
 import time
 
 from django.core.cache import cache
-from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.utils.six import text_type
 from django.contrib.auth import get_user_model
+from django.contrib.auth.backends import ModelBackend
 from rest_framework import HTTP_HEADER_ENCODING
 from rest_framework import authentication, exceptions
 from common.auth import signature
-from rest_framework.authentication import CSRFCheck
 
 from common.utils import get_object_or_none, make_signature, http_to_unixtime
 from ..models import AccessKey, PrivateToken
@@ -197,3 +196,10 @@ class SignatureAuthentication(signature.SignatureAuthentication):
             return user, secret
         except AccessKey.DoesNotExist:
             return None, None
+
+
+class SSOAuthentication(ModelBackend):
+    """
+    什么也不做呀😺
+    """
+    pass

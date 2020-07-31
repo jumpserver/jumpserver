@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse
 from django.conf import settings
 
+from common.exceptions import JMSException
 from .signals import post_auth_failed
 from users.utils import (
     increase_login_failed_count, get_login_failed_count
@@ -205,3 +206,8 @@ class LoginConfirmOtherError(LoginConfirmBaseError):
     def __init__(self, ticket_id, status):
         msg = login_confirm_error_msg.format(status)
         super().__init__(ticket_id=ticket_id, msg=msg)
+
+
+class SSOAuthClosed(JMSException):
+    default_code = 'sso_auth_closed'
+    default_detail = _('SSO auth closed')
