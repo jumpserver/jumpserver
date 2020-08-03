@@ -12,11 +12,12 @@
 import uuid
 
 from django.db.models import *
+from django.db.models.functions import Concat
 from django.utils.translation import ugettext_lazy as _
 
 
 class Choice(str):
-    def __new__(cls, value, label):
+    def __new__(cls, value, label=''):  # `deepcopy` 的时候不会传 `label`
         self = super().__new__(cls, value)
         self.label = label
         return self
@@ -77,3 +78,7 @@ class JMSModel(JMSBaseModel):
 
     class Meta:
         abstract = True
+
+
+def concated_display(name1, name2):
+    return Concat(F(name1), Value('('), F(name2), Value(')'))

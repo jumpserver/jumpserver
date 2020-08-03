@@ -150,6 +150,13 @@ class Organization(models.Model):
         ).distinct()
 
     @classmethod
+    def get_user_all_orgs(cls, user):
+        return [
+            *cls.objects.filter(members=user).distinct(),
+            cls.default()
+        ]
+
+    @classmethod
     def get_user_admin_orgs(cls, user):
         if user.is_anonymous:
             return cls.objects.none()
@@ -161,7 +168,10 @@ class Organization(models.Model):
     def get_user_user_orgs(cls, user):
         if user.is_anonymous:
             return cls.objects.none()
-        return cls.get_user_orgs_by_role(user, ROLE.USER)
+        return [
+            *cls.get_user_orgs_by_role(user, ROLE.USER),
+            cls.default()
+        ]
 
     @classmethod
     def get_user_audit_orgs(cls, user):

@@ -18,7 +18,7 @@ __all__ = [
     'ChangeUserPasswordSerializer', 'ResetOTPSerializer',
     'UserProfileSerializer', 'UserOrgSerializer',
     'UserUpdatePasswordSerializer', 'UserUpdatePublicKeySerializer',
-    'UserRetrieveSerializer'
+    'UserRetrieveSerializer', 'MiniUserSerializer',
 ]
 
 
