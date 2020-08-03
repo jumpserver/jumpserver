@@ -1,11 +1,12 @@
-
+from django.db.models import F
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 
 from users.models.user import User
 from common.serializers import AdaptedBulkListSerializer
+from common.drf.serializers import BulkModelSerializer
+from common.db.models import concated_display as display
 from .models import Organization, OrganizationMember
-from .mixins.serializers import OrgMembershipSerializerMixin
 
 
 class OrgSerializer(ModelSerializer):
@@ -50,30 +51,20 @@ class OrgReadSerializer(OrgSerializer):
     pass
 
 
-class OrgMembershipAdminSerializer(OrgMembershipSerializerMixin, ModelSerializer):
+class OrgMemberSerializer(BulkModelSerializer):
+    org_display = serializers.CharField()
+    user_display = serializers.CharField()
+
     class Meta:
         model = Organization.members.through
-        list_serializer_class = AdaptedBulkListSerializer
-        fields = '__all__'
+        fields = ('id', 'org', 'user', 'role', 'org_display', 'user_display')
 
-
-class OrgMembershipUserSerializer(OrgMembershipSerializerMixin, ModelSerializer):
-    class Meta:
-        model = Organization.members.through
-        list_serializer_class = AdaptedBulkListSerializer
-        fields = '__all__'
-
-
-class OrgAllUserSerializer(serializers.Serializer):
-    user = serializers.UUIDField(read_only=True, source='id')
-    user_display = serializers.SerializerMethodField()
-
-    class Meta:
-        only_fields = ['id', 'username', 'name']
-
-    @staticmethod
-    def get_user_display(obj):
-        return str(obj)
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        return queryset.annotate(
+            org_display=F('org__name'),
+            user_display=display('user__name', 'user__username')
+        ).distinct()
 
 
 class OrgRetrieveSerializer(OrgReadSerializer):

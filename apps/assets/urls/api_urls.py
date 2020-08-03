@@ -1,7 +1,6 @@
 # coding:utf-8
 from django.urls import path, re_path
 from rest_framework_nested import routers
-# from rest_framework.routers import DefaultRouter
 from rest_framework_bulk.routes import BulkRouter
 
 from common import api as capi
