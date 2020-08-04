@@ -139,7 +139,7 @@ class AuthMixin:
 
     def get_ticket_or_create(self, confirm_setting):
         ticket = self.get_ticket()
-        if not ticket or ticket.status == ticket.STATUS_CLOSED:
+        if not ticket or ticket.status == ticket.STATUS.CLOSED:
             ticket = confirm_setting.create_confirm_ticket(self.request)
             self.request.session['auth_ticket_id'] = str(ticket.id)
         return ticket
@@ -148,12 +148,12 @@ class AuthMixin:
         ticket = self.get_ticket()
         if not ticket:
             raise errors.LoginConfirmOtherError('', "Not found")
-        if ticket.status == ticket.STATUS_OPEN:
+        if ticket.status == ticket.STATUS.OPEN:
             raise errors.LoginConfirmWaitError(ticket.id)
-        elif ticket.action == ticket.ACTION_APPROVE:
+        elif ticket.action == ticket.ACTION.APPROVE:
             self.request.session["auth_confirm"] = "1"
             return
-        elif ticket.action == ticket.ACTION_REJECT:
+        elif ticket.action == ticket.ACTION.REJECT:
             raise errors.LoginConfirmOtherError(
                 ticket.id, ticket.get_action_display()
             )

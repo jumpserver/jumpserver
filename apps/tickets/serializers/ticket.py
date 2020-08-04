@@ -3,14 +3,18 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from .. import models
+from ..exceptions import (
+    TicketClosed, OnlyTicketAssigneeCanOperate,
+    TicketCanNotOperate
+)
+from ..models import Ticket, Comment
 
 __all__ = ['TicketSerializer', 'CommentSerializer']
 
 
 class TicketSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.Ticket
+        model = Ticket
         fields = [
             'id', 'user', 'user_display', 'title', 'body',
             'assignees', 'assignees_display', 'assignee', 'assignee_display',
@@ -32,17 +36,33 @@ class TicketSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
-        action = validated_data.get("action")
-        user = self.context["request"].user
+        action = validated_data.get('action')
+        user = self.context['request'].user
 
-        if action and user not in instance.assignees.all():
-            error = {"action": "Only assignees can update"}
-            raise serializers.ValidationError(error)
-        if instance.status == instance.STATUS_CLOSED:
-            validated_data.pop('action')
-        instance = super().update(instance, validated_data)
-        if not instance.status == instance.STATUS_CLOSED and action:
-            instance.perform_action(action, user)
+        if instance.type not in (Ticket.TYPE.GENERAL,
+                                 Ticket.TYPE.LOGIN_CONFIRM):
+            # 暂时的兼容操作吧，后期重构工单
+            raise TicketCanNotOperate
+
+        if instance.status == instance.STATUS.CLOSED:
+            raise TicketClosed
+
+        if action:
+            if user not in instance.assignees.all():
+                raise OnlyTicketAssigneeCanOperate
+
+            # 有 `action` 时忽略 `status`
+            validated_data.pop('status', None)
+
+            instance = super().update(instance, validated_data)
+            if not instance.status == instance.STATUS.CLOSED and action:
+                instance.perform_action(action, user)
+        else:
+            status = validated_data.get('status')
+            instance = super().update(instance, validated_data)
+            if status:
+                instance.perform_status(status, user)
+
         return instance
 
 
@@ -65,7 +85,7 @@ class CommentSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = models.Comment
+        model = Comment
         fields = [
             'id', 'ticket', 'body', 'user', 'user_display',
             'date_created', 'date_updated'

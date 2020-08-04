@@ -1,4 +1,3 @@
-from django.db.transaction import atomic
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.decorators import action
@@ -26,7 +25,7 @@ from ..permissions import IsAssignee
 
 
 class RequestAssetPermTicketViewSet(JMSModelViewSet):
-    queryset = Ticket.origin_objects.filter(type=Ticket.TYPE_REQUEST_ASSET_PERM)
+    queryset = Ticket.origin_objects.filter(type=Ticket.TYPE.REQUEST_ASSET_PERM)
     serializer_classes = {
         'default': serializers.RequestAssetPermTicketSerializer,
         'approve': EmptySerializer,
@@ -38,10 +37,10 @@ class RequestAssetPermTicketViewSet(JMSModelViewSet):
     search_fields = ['user_display', 'title']
 
     def _check_can_set_action(self, instance, action):
-        if instance.status == instance.STATUS_CLOSED:
-            raise TicketClosed(detail=_('Ticket closed'))
+        if instance.status == instance.STATUS.CLOSED:
+            raise TicketClosed
         if instance.action == action:
-            action_display = dict(instance.ACTION_CHOICES).get(action)
+            action_display = instance.ACTION.get(action)
             raise TicketActionAlready(detail=_('Ticket has %s') % action_display)
 
     @action(detail=False, methods=[GET], permission_classes=[IsValidUser])
@@ -72,7 +71,7 @@ class RequestAssetPermTicketViewSet(JMSModelViewSet):
     @action(detail=True, methods=[POST], permission_classes=[IsAssignee, IsValidUser])
     def reject(self, request, *args, **kwargs):
         instance = self.get_object()
-        action = instance.ACTION_REJECT
+        action = instance.ACTION.REJECT
         self._check_can_set_action(instance, action)
         instance.perform_action(action, request.user, self._get_extra_comment(instance))
         return Response()
@@ -80,7 +79,7 @@ class RequestAssetPermTicketViewSet(JMSModelViewSet):
     @action(detail=True, methods=[POST], permission_classes=[IsAssignee, IsValidUser])
     def approve(self, request, *args, **kwargs):
         instance = self.get_object()
-        action = instance.ACTION_APPROVE
+        action = instance.ACTION.APPROVE
         self._check_can_set_action(instance, action)
 
         meta = instance.meta
@@ -100,10 +99,10 @@ class RequestAssetPermTicketViewSet(JMSModelViewSet):
         if system_user is None:
             raise ConfirmedSystemUserChanged(detail=_('Confirmed system-user changed'))
 
-        self._create_asset_permission(instance, assets, system_user, request.user)
+        self._create_asset_permission(instance, assets, system_user)
         return Response({'detail': _('Succeed')})
 
-    def _create_asset_permission(self, instance: Ticket, assets, system_user, user):
+    def _create_asset_permission(self, instance: Ticket, assets, system_user):
         meta = instance.meta
         request = self.request
 
@@ -120,13 +119,12 @@ class RequestAssetPermTicketViewSet(JMSModelViewSet):
         if date_expired:
             ap_kwargs['date_expired'] = date_expired
 
-        with atomic():
-            instance.perform_action(instance.ACTION_APPROVE,
-                                    request.user,
-                                    self._get_extra_comment(instance))
-            ap = AssetPermission.objects.create(**ap_kwargs)
-            ap.system_users.add(system_user)
-            ap.assets.add(*assets)
-            ap.users.add(user)
+        instance.perform_action(instance.ACTION.APPROVE,
+                                request.user,
+                                self._get_extra_comment(instance))
+        ap = AssetPermission.objects.create(**ap_kwargs)
+        ap.system_users.add(system_user)
+        ap.assets.add(*assets)
+        ap.users.add(instance.user)
 
         return ap

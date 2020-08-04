@@ -17,7 +17,7 @@ from ..models import Ticket
 class RequestAssetPermTicketSerializer(serializers.ModelSerializer):
     ips = serializers.ListField(child=serializers.IPAddressField(), source='meta.ips',
                                 default=list, label=_('IP group'))
-    hostname = serializers.CharField(max_length=256, source='meta.hostname', default=None,
+    hostname = serializers.CharField(max_length=256, source='meta.hostname', default='',
                                      allow_blank=True, label=_('Hostname'))
     system_user = serializers.CharField(max_length=256, source='meta.system_user', default='',
                                         allow_blank=True, label=_('System user'))
@@ -135,7 +135,7 @@ class RequestAssetPermTicketSerializer(serializers.ModelSerializer):
 
     def _create_body(self, validated_data):
         meta = validated_data['meta']
-        type = dict(Ticket.TYPE_CHOICES).get(validated_data.get('type', ''))
+        type = Ticket.TYPE.get(validated_data.get('type', ''))
         date_start = dt_parser(meta.get('date_start')).strftime(settings.DATETIME_DISPLAY_FORMAT)
         date_expired = dt_parser(meta.get('date_expired')).strftime(settings.DATETIME_DISPLAY_FORMAT)
 
@@ -159,7 +159,7 @@ class RequestAssetPermTicketSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         # `type` 与 `user` 用户不可提交，
-        validated_data['type'] = self.Meta.model.TYPE_REQUEST_ASSET_PERM
+        validated_data['type'] = self.Meta.model.TYPE.REQUEST_ASSET_PERM
         validated_data['user'] = self.context['request'].user
         # `confirmed` 相关字段只能审批人修改，所以创建时直接清理掉
         self._pop_confirmed_fields()
