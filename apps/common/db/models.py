@@ -52,7 +52,7 @@ class ChoiceSetType(type):
         return self._choices_dict.__getitem__(item)
 
     def get(self, item, default=None):
-        return self._choices_dict.get(item, default=None)
+        return self._choices_dict.get(item, default)
 
     @property
     def choices(self):

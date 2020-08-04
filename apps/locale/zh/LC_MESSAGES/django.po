@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-31 19:20+0800\n"
+"POT-Creation-Date: 2020-08-04 15:33+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -47,7 +47,7 @@ msgid "Name"
 msgstr "名称"
 
 #: applications/models/database_app.py:22 assets/models/cmd_filter.py:52
-#: terminal/models.py:376 terminal/models.py:413 tickets/models/ticket.py:46
+#: terminal/models.py:376 terminal/models.py:413 tickets/models/ticket.py:40
 #: users/templates/users/user_granted_database_app.html:35
 msgid "Type"
 msgstr "类型"
@@ -131,8 +131,8 @@ msgstr "参数"
 #: applications/models/remote_app.py:39 assets/models/asset.py:224
 #: assets/models/base.py:240 assets/models/cluster.py:28
 #: assets/models/cmd_filter.py:26 assets/models/cmd_filter.py:60
-#: assets/models/group.py:21 common/db/models.py:66 common/mixins/models.py:49
-#: orgs/models.py:23 orgs/models.py:316 perms/models/base.py:54
+#: assets/models/group.py:21 common/db/models.py:67 common/mixins/models.py:49
+#: orgs/models.py:23 orgs/models.py:326 perms/models/base.py:54
 #: users/models/user.py:530 users/serializers/group.py:35
 #: users/templates/users/user_detail.html:97
 #: xpack/plugins/change_auth_plan/models.py:81 xpack/plugins/cloud/models.py:56
@@ -145,9 +145,9 @@ msgstr "创建者"
 #: applications/models/remote_app.py:42 assets/models/asset.py:225
 #: assets/models/base.py:238 assets/models/cluster.py:26
 #: assets/models/domain.py:23 assets/models/gathered_user.py:19
-#: assets/models/group.py:22 assets/models/label.py:25 common/db/models.py:68
+#: assets/models/group.py:22 assets/models/label.py:25 common/db/models.py:69
 #: common/mixins/models.py:50 ops/models/adhoc.py:38 ops/models/command.py:27
-#: orgs/models.py:24 orgs/models.py:314 perms/models/base.py:55
+#: orgs/models.py:24 orgs/models.py:324 perms/models/base.py:55
 #: users/models/group.py:18 users/templates/users/user_group_detail.html:58
 #: xpack/plugins/cloud/models.py:59 xpack/plugins/cloud/models.py:149
 msgid "Date created"
@@ -190,7 +190,7 @@ msgstr "基础"
 msgid "Charset"
 msgstr "编码"
 
-#: assets/models/asset.py:148 tickets/models/ticket.py:41
+#: assets/models/asset.py:148 tickets/models/ticket.py:35
 msgid "Meta"
 msgstr "元数据"
 
@@ -380,8 +380,8 @@ msgid "SSH public key"
 msgstr "SSH公钥"
 
 #: assets/models/base.py:239 assets/models/gathered_user.py:20
-#: common/db/models.py:69 common/mixins/models.py:51 ops/models/adhoc.py:39
-#: orgs/models.py:315
+#: common/db/models.py:70 common/mixins/models.py:51 ops/models/adhoc.py:39
+#: orgs/models.py:325
 msgid "Date updated"
 msgstr "更新日期"
 
@@ -488,7 +488,7 @@ msgstr "每行一个命令"
 #: authentication/templates/authentication/_access_key_modal.html:34
 #: perms/forms/asset_permission.py:20
 #: tickets/serializers/request_asset_perm.py:60
-#: tickets/serializers/ticket.py:26
+#: tickets/serializers/ticket.py:30
 #: users/templates/users/_granted_assets.html:29
 #: users/templates/users/user_asset_permission.html:44
 #: users/templates/users/user_asset_permission.html:79
@@ -537,14 +537,14 @@ msgstr "默认资产组"
 
 #: assets/models/label.py:15 audits/models.py:36 audits/models.py:56
 #: audits/models.py:69 audits/serializers.py:77 authentication/models.py:46
-#: authentication/models.py:90 orgs/models.py:16 orgs/models.py:312
+#: authentication/models.py:90 orgs/models.py:16 orgs/models.py:322
 #: perms/forms/asset_permission.py:83 perms/forms/database_app_permission.py:38
 #: perms/forms/remote_app_permission.py:40 perms/models/base.py:49
 #: templates/index.html:78 terminal/backends/command/models.py:18
 #: terminal/backends/command/serializers.py:12 terminal/models.py:185
-#: tickets/models/ticket.py:36 tickets/models/ticket.py:135
+#: tickets/models/ticket.py:30 tickets/models/ticket.py:137
 #: tickets/serializers/request_asset_perm.py:61
-#: tickets/serializers/ticket.py:27 users/forms/group.py:15
+#: tickets/serializers/ticket.py:31 users/forms/group.py:15
 #: users/models/user.py:157 users/models/user.py:643
 #: users/serializers/group.py:20
 #: users/templates/users/user_asset_permission.html:38
@@ -692,7 +692,7 @@ msgstr "协议重复: {}"
 msgid "Hardware info"
 msgstr "硬件信息"
 
-#: assets/serializers/asset.py:112 orgs/mixins/serializers.py:27
+#: assets/serializers/asset.py:112 orgs/mixins/serializers.py:26
 msgid "Org name"
 msgstr "组织名称"
 
@@ -1014,7 +1014,7 @@ msgid "Reason"
 msgstr "原因"
 
 #: audits/models.py:106 tickets/serializers/request_asset_perm.py:59
-#: tickets/serializers/ticket.py:25 xpack/plugins/cloud/models.py:211
+#: tickets/serializers/ticket.py:29 xpack/plugins/cloud/models.py:211
 #: xpack/plugins/cloud/models.py:269
 msgid "Status"
 msgstr "状态"
@@ -1199,7 +1199,7 @@ msgstr "SSH密钥"
 msgid "Reviewers"
 msgstr "审批人"
 
-#: authentication/models.py:56 tickets/models/ticket.py:27
+#: authentication/models.py:56 tickets/models/ticket.py:23
 #: users/templates/users/user_detail.html:250
 msgid "Login confirm"
 msgstr "登录复核"
@@ -1263,7 +1263,7 @@ msgstr "删除成功"
 
 #: authentication/templates/authentication/_access_key_modal.html:155
 #: authentication/templates/authentication/_mfa_confirm_modal.html:53
-#: templates/_modal.html:22 tickets/models/ticket.py:73
+#: templates/_modal.html:22 tickets/models/ticket.py:67
 msgid "Close"
 msgstr "关闭"
 
@@ -1393,7 +1393,7 @@ msgstr "%(name)s 创建成功"
 msgid "%(name)s was updated successfully"
 msgstr "%(name)s 更新成功"
 
-#: common/db/models.py:67
+#: common/db/models.py:68
 msgid "Updated by"
 msgstr "更新人"
 
@@ -1649,16 +1649,16 @@ msgstr "更新任务内容: {}"
 msgid "Disk used more than 80%: {} => {}"
 msgstr "磁盘使用率超过 80%: {} => {}"
 
-#: orgs/api.py:54
+#: orgs/api.py:58
 msgid "Organization contains undeleted resources"
 msgstr ""
 
-#: orgs/api.py:58
+#: orgs/api.py:62
 msgid "The current organization cannot be deleted"
 msgstr ""
 
-#: orgs/mixins/models.py:56 orgs/mixins/serializers.py:26 orgs/models.py:40
-#: orgs/models.py:311
+#: orgs/mixins/models.py:56 orgs/mixins/serializers.py:25 orgs/models.py:40
+#: orgs/models.py:321
 msgid "Organization"
 msgstr "组织"
 
@@ -1670,7 +1670,7 @@ msgstr "组织管理员"
 msgid "Organization auditor"
 msgstr "组织审计员"
 
-#: orgs/models.py:313 users/forms/user.py:27 users/models/user.py:499
+#: orgs/models.py:323 users/forms/user.py:27 users/models/user.py:499
 #: users/templates/users/_select_user_modal.html:15
 #: users/templates/users/user_detail.html:73
 #: users/templates/users/user_list.html:16
@@ -2506,100 +2506,108 @@ msgstr "结束日期"
 msgid "Args"
 msgstr "参数"
 
-#: tickets/api/request_asset_perm.py:42
-msgid "Ticket closed"
-msgstr "工单已关闭"
-
-#: tickets/api/request_asset_perm.py:45
+#: tickets/api/request_asset_perm.py:44
 #, python-format
 msgid "Ticket has %s"
 msgstr "工单已%s"
 
-#: tickets/api/request_asset_perm.py:90
+#: tickets/api/request_asset_perm.py:89
 msgid "Confirm assets first"
 msgstr "请先确认资产"
 
-#: tickets/api/request_asset_perm.py:93
+#: tickets/api/request_asset_perm.py:92
 msgid "Confirmed assets changed"
 msgstr "确认的资产变更了"
 
-#: tickets/api/request_asset_perm.py:97
+#: tickets/api/request_asset_perm.py:96
 msgid "Confirm system-user first"
 msgstr "请先确认系统用户"
 
-#: tickets/api/request_asset_perm.py:101
+#: tickets/api/request_asset_perm.py:100
 msgid "Confirmed system-user changed"
 msgstr "确认的系统用户变更了"
 
-#: tickets/api/request_asset_perm.py:104 xpack/plugins/cloud/models.py:202
+#: tickets/api/request_asset_perm.py:103 xpack/plugins/cloud/models.py:202
 msgid "Succeed"
 msgstr "成功"
 
-#: tickets/api/request_asset_perm.py:111
+#: tickets/api/request_asset_perm.py:110
 msgid "From request ticket: {} {}"
 msgstr "来自工单申请: {} {}"
 
-#: tickets/api/request_asset_perm.py:113
+#: tickets/api/request_asset_perm.py:112
 msgid "{} request assets, approved by {}"
 msgstr "{} 申请资产，通过人 {}"
 
-#: tickets/models/ticket.py:19 tickets/models/ticket.py:75
+#: tickets/exceptions.py:23
+msgid "Ticket closed"
+msgstr "工单已关闭"
+
+#: tickets/exceptions.py:32
+msgid "Only assignee can operate ticket"
+msgstr "只有审批人可以操作工单"
+
+#: tickets/exceptions.py:37
+msgid "Ticket can not be operated"
+msgstr "不能操作该工单"
+
+#: tickets/models/ticket.py:18 tickets/models/ticket.py:69
 msgid "Open"
 msgstr "开启"
 
-#: tickets/models/ticket.py:20
+#: tickets/models/ticket.py:19
 msgid "Closed"
 msgstr "关闭"
 
-#: tickets/models/ticket.py:26
+#: tickets/models/ticket.py:22
 msgid "General"
 msgstr "一般"
 
-#: tickets/models/ticket.py:28
+#: tickets/models/ticket.py:24
 msgid "Request asset permission"
 msgstr "申请资产权限"
 
-#: tickets/models/ticket.py:33
+#: tickets/models/ticket.py:27
 msgid "Approve"
 msgstr "同意"
 
-#: tickets/models/ticket.py:34
+#: tickets/models/ticket.py:28
 msgid "Reject"
 msgstr "拒绝"
 
-#: tickets/models/ticket.py:37 tickets/models/ticket.py:136
+#: tickets/models/ticket.py:31 tickets/models/ticket.py:138
 msgid "User display name"
 msgstr "用户显示名称"
 
-#: tickets/models/ticket.py:39
+#: tickets/models/ticket.py:33
 msgid "Title"
 msgstr "标题"
 
-#: tickets/models/ticket.py:40 tickets/models/ticket.py:137
+#: tickets/models/ticket.py:34 tickets/models/ticket.py:139
 msgid "Body"
 msgstr "内容"
 
-#: tickets/models/ticket.py:42
+#: tickets/models/ticket.py:36
 msgid "Assignee"
 msgstr "处理人"
 
-#: tickets/models/ticket.py:43
+#: tickets/models/ticket.py:37
 msgid "Assignee display name"
 msgstr "处理人名称"
 
-#: tickets/models/ticket.py:44
+#: tickets/models/ticket.py:38
 msgid "Assignees"
 msgstr "待处理人"
 
-#: tickets/models/ticket.py:45
+#: tickets/models/ticket.py:39
 msgid "Assignees display name"
 msgstr "待处理人名称"
 
-#: tickets/models/ticket.py:76
+#: tickets/models/ticket.py:70
 msgid "{} {} this ticket"
 msgstr "{} {} 这个工单"
 
-#: tickets/models/ticket.py:87
+#: tickets/models/ticket.py:85
 msgid "this ticket"
 msgstr "这个工单"
 

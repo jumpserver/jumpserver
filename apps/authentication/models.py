@@ -71,7 +71,7 @@ class LoginConfirmSetting(CommonModelMixin):
         reviewer = self.reviewers.all()
         ticket = Ticket.objects.create(
             user=self.user, title=title, body=body,
-            type=Ticket.TYPE_LOGIN_CONFIRM,
+            type=Ticket.TYPE.LOGIN_CONFIRM,
         )
         ticket.assignees.set(reviewer)
         return ticket
