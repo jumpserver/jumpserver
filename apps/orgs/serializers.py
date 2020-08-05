@@ -6,7 +6,7 @@ from users.models.user import User
 from common.serializers import AdaptedBulkListSerializer
 from common.drf.serializers import BulkModelSerializer
 from common.db.models import concated_display as display
-from .models import Organization, OrganizationMember
+from .models import Organization, OrganizationMember, ROLE as ORG_ROLE
 
 
 class OrgSerializer(ModelSerializer):
@@ -54,10 +54,11 @@ class OrgReadSerializer(OrgSerializer):
 class OrgMemberSerializer(BulkModelSerializer):
     org_display = serializers.CharField()
     user_display = serializers.CharField()
+    role_display = serializers.CharField(source='get_role_display')
 
     class Meta:
-        model = Organization.members.through
-        fields = ('id', 'org', 'user', 'role', 'org_display', 'user_display')
+        model = OrganizationMember
+        fields = ('id', 'org', 'user', 'role', 'org_display', 'user_display', 'role_display')
 
     @classmethod
     def setup_eager_loading(cls, queryset):
