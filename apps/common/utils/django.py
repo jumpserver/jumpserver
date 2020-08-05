@@ -2,7 +2,6 @@
 #
 import re
 from django.shortcuts import reverse as dj_reverse
-from django.db.models import Subquery, QuerySet
 from django.conf import settings
 from django.utils import timezone
 

@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 #
+from urllib.parse import urlencode
 from functools import partial
 import time
+
 from django.conf import settings
 from django.contrib.auth import authenticate
+from django.shortcuts import reverse
 
 from common.utils import get_object_or_none, get_request_ip, get_logger
 from users.models import User
@@ -91,12 +94,30 @@ class AuthMixin:
         elif user.password_has_expired:
             raise CredentialError(error=errors.reason_password_expired)
 
+        self._check_passwd_is_too_simple(user, password)
+
         clean_failed_count(username, ip)
         request.session['auth_password'] = 1
         request.session['user_id'] = str(user.id)
         auth_backend = getattr(user, 'backend', 'django.contrib.auth.backends.ModelBackend')
         request.session['auth_backend'] = auth_backend
         return user
+
+    @classmethod
+    def _check_passwd_is_too_simple(cls, user, password):
+        if user.is_superuser and password == 'admin':
+            reset_passwd_url = reverse('authentication:reset-password')
+            query_str = urlencode({
+                'token': user.generate_reset_token()
+            })
+            reset_passwd_url = f'{reset_passwd_url}?{query_str}'
+
+            flash_page_url = reverse('authentication:passwd-too-simple-flash-msg')
+            query_str = urlencode({
+                'redirect_url': reset_passwd_url
+            })
+
+            raise errors.PasswdTooSimple(f'{flash_page_url}?{query_str}')
 
     def check_user_auth_if_need(self):
         request = self.request
