@@ -13,6 +13,7 @@ from common.utils.django import get_object_or_none
 from common.utils.timezone import dt_parser
 from common.drf.serializers import EmptySerializer
 from perms.models.asset_permission import AssetPermission, Asset
+from perms.models import Action
 from assets.models.user import SystemUser
 from ..exceptions import (
     ConfirmedAssetsChanged, ConfirmedSystemUserChanged,
@@ -105,12 +106,14 @@ class RequestAssetPermTicketViewSet(JMSModelViewSet):
     def _create_asset_permission(self, instance: Ticket, assets, system_user):
         meta = instance.meta
         request = self.request
+        actions = meta.get('actions', Action.CONNECT)
 
         ap_kwargs = {
             'name': _('From request ticket: {} {}').format(instance.user_display, instance.id),
             'created_by': self.request.user.username,
             'comment': _('{} request assets, approved by {}').format(instance.user_display,
-                                                                     instance.assignees_display)
+                                                                     instance.assignees_display),
+            'actions': actions,
         }
         date_start = dt_parser(meta.get('date_start'))
         date_expired = dt_parser(meta.get('date_expired'))
@@ -118,7 +121,6 @@ class RequestAssetPermTicketViewSet(JMSModelViewSet):
             ap_kwargs['date_start'] = date_start
         if date_expired:
             ap_kwargs['date_expired'] = date_expired
-
         instance.perform_action(instance.ACTION.APPROVE,
                                 request.user,
                                 self._get_extra_comment(instance))
