@@ -11,10 +11,14 @@ from orgs.utils import tmp_to_root_org
 from orgs.models import Organization, ROLE as ORG_ROLE
 from assets.models.asset import Asset
 from users.models.user import User
+from perms.serializers import ActionsField
+from perms.models import Action
 from ..models import Ticket
 
 
 class RequestAssetPermTicketSerializer(serializers.ModelSerializer):
+    actions = ActionsField(source='meta.actions', choices=Action.DB_CHOICES,
+                           default=Action.CONNECT)
     ips = serializers.ListField(child=serializers.IPAddressField(), source='meta.ips',
                                 default=list, label=_('IP group'))
     hostname = serializers.CharField(max_length=256, source='meta.hostname', default='',
@@ -42,7 +46,7 @@ class RequestAssetPermTicketSerializer(serializers.ModelSerializer):
             'status', 'action', 'date_created', 'date_updated', 'system_user_waitlist_url',
             'type', 'type_display', 'action_display', 'ips', 'confirmed_assets',
             'date_start', 'date_expired', 'confirmed_system_user', 'hostname',
-            'assets_waitlist_url', 'system_user', 'org_id'
+            'assets_waitlist_url', 'system_user', 'org_id', 'actions'
         ]
         m2m_fields = [
             'user', 'user_display', 'assignees', 'assignees_display',
