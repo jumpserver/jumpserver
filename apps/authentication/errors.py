@@ -211,3 +211,12 @@ class LoginConfirmOtherError(LoginConfirmBaseError):
 class SSOAuthClosed(JMSException):
     default_code = 'sso_auth_closed'
     default_detail = _('SSO auth closed')
+
+
+class PasswdTooSimple(JMSException):
+    default_code = 'passwd_too_simple'
+    default_detail = _('Your password is too simple, please change it for security')
+
+    def __init__(self, url, *args, **kwargs):
+        super(PasswdTooSimple, self).__init__(*args, **kwargs)
+        self.url = url

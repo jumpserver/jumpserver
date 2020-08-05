@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-04 15:33+0800\n"
+"POT-Creation-Date: 2020-08-05 16:43+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1359,11 +1359,11 @@ msgstr "复制成功"
 msgid "Welcome back, please enter username and password to login"
 msgstr "欢迎回来，请输入用户名和密码登录"
 
-#: authentication/views/login.py:82
+#: authentication/views/login.py:83
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: authentication/views/login.py:178
+#: authentication/views/login.py:183
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -1371,17 +1371,25 @@ msgstr ""
 "等待 <b>{}</b> 确认, 你也可以复制链接发给他/她 <br/>\n"
 "                  不要关闭本页面"
 
-#: authentication/views/login.py:183
+#: authentication/views/login.py:188
 msgid "No ticket found"
 msgstr "没有发现工单"
 
-#: authentication/views/login.py:215
+#: authentication/views/login.py:220
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: authentication/views/login.py:216
+#: authentication/views/login.py:221
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
+
+#: authentication/views/login.py:236
+msgid "Please change your password"
+msgstr "请修改密码"
+
+#: authentication/views/login.py:237
+msgid "Your password is too simple, please change it for security"
+msgstr "你的密码过于简单，为了安全，请修改"
 
 #: common/const/__init__.py:6
 #, python-format
@@ -4221,9 +4229,6 @@ msgstr "旗舰版"
 
 #~ msgid "Update asset user auth"
 #~ msgstr "更新资产用户认证信息"
-
-#~ msgid "Please input password"
-#~ msgstr "请输入密码"
 
 #~ msgid "Asset user auth"
 #~ msgstr "资产用户信息"
