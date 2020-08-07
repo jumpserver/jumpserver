@@ -6,6 +6,7 @@ from .asset_permission import asset_permission_urlpatterns
 from .remote_app_permission import remote_app_permission_urlpatterns
 from .database_app_permission import database_app_permission_urlpatterns
 from .system_user_permission import system_users_permission_urlpatterns
+from .k8s_app_permission import k8s_app_permission_urlpatterns
 
 app_name = 'perms'
 
@@ -16,5 +17,6 @@ old_version_urlpatterns = [
 urlpatterns = asset_permission_urlpatterns + \
               remote_app_permission_urlpatterns + \
               database_app_permission_urlpatterns + \
+              k8s_app_permission_urlpatterns + \
               old_version_urlpatterns + \
               system_users_permission_urlpatterns

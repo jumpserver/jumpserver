@@ -9,3 +9,5 @@ from .asset_permission_relation import *
 from .database_app_permission import *
 from .database_app_permission_relation import *
 from .base import *
+from .k8s_app_permission import *
+from .k8s_app_permission_relation import *
