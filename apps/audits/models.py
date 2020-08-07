@@ -58,7 +58,7 @@ class OperateLog(OrgModelMixin):
     resource_type = models.CharField(max_length=64, verbose_name=_("Resource Type"))
     resource = models.CharField(max_length=128, verbose_name=_("Resource"))
     remote_addr = models.CharField(max_length=128, verbose_name=_("Remote addr"), blank=True, null=True)
-    datetime = models.DateTimeField(auto_now=True, verbose_name=_('Datetime'))
+    datetime = models.DateTimeField(auto_now=True, verbose_name=_('Datetime'), db_index=True)
 
     def __str__(self):
         return "<{}> {} <{}>".format(self.user, self.action, self.resource)
