@@ -56,6 +56,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         allow_null=True, required=False, allow_blank=True,
         choices=ORG_ROLE.choices
     )
+    total_role_display = serializers.SerializerMethodField(label=_('Total role name'))
     key_prefix_block = "_LOGIN_BLOCK_{}"
 
     class Meta:
@@ -67,7 +68,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         fields_small = fields_mini + [
             'password', 'email', 'public_key', 'wechat', 'phone', 'mfa_level', 'mfa_enabled',
             'mfa_level_display', 'mfa_force_enabled', 'role_display', 'org_role_display',
-            'comment', 'source', 'is_valid', 'is_expired',
+            'total_role_display', 'comment', 'source', 'is_valid', 'is_expired',
             'is_active', 'created_by', 'is_first_login',
             'password_strategy', 'date_password_last_updated', 'date_expired',
             'avatar_url', 'source_display', 'date_joined', 'last_login'
@@ -108,6 +109,9 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
             choices.pop(User.ROLE.ADMIN, None)
             choices.pop(User.ROLE.AUDITOR, None)
         role._choices = choices
+
+    def get_total_role_display(self, instance):
+        return ' | '.join({str(instance.role_display), str(instance.org_role_display)})
 
     def validate_role(self, value):
         request = self.context.get('request')
