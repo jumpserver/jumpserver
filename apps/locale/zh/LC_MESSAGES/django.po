@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-05 16:43+0800\n"
+"POT-Creation-Date: 2020-08-07 18:48+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -212,7 +212,7 @@ msgstr "IP"
 
 #: assets/models/asset.py:187 assets/serializers/asset_user.py:45
 #: assets/serializers/gathered_user.py:20 settings/serializers/settings.py:51
-#: tickets/serializers/request_asset_perm.py:21
+#: tickets/serializers/request_asset_perm.py:25
 #: users/templates/users/_granted_assets.html:25
 #: users/templates/users/user_asset_permission.html:157
 msgid "Hostname"
@@ -487,7 +487,7 @@ msgstr "每行一个命令"
 #: assets/models/cmd_filter.py:56 audits/models.py:57
 #: authentication/templates/authentication/_access_key_modal.html:34
 #: perms/forms/asset_permission.py:20
-#: tickets/serializers/request_asset_perm.py:60
+#: tickets/serializers/request_asset_perm.py:64
 #: tickets/serializers/ticket.py:30
 #: users/templates/users/_granted_assets.html:29
 #: users/templates/users/user_asset_permission.html:44
@@ -543,7 +543,7 @@ msgstr "默认资产组"
 #: templates/index.html:78 terminal/backends/command/models.py:18
 #: terminal/backends/command/serializers.py:12 terminal/models.py:185
 #: tickets/models/ticket.py:30 tickets/models/ticket.py:137
-#: tickets/serializers/request_asset_perm.py:61
+#: tickets/serializers/request_asset_perm.py:65
 #: tickets/serializers/ticket.py:31 users/forms/group.py:15
 #: users/models/user.py:157 users/models/user.py:643
 #: users/serializers/group.py:20
@@ -651,7 +651,7 @@ msgstr "SFTP根路径"
 #: perms/models/remote_app_permission.py:16 templates/_nav.html:45
 #: terminal/backends/command/models.py:20
 #: terminal/backends/command/serializers.py:14 terminal/models.py:189
-#: tickets/serializers/request_asset_perm.py:23
+#: tickets/serializers/request_asset_perm.py:27
 #: users/templates/users/_granted_assets.html:27
 #: users/templates/users/user_asset_permission.html:42
 #: users/templates/users/user_asset_permission.html:76
@@ -922,7 +922,7 @@ msgid "Success"
 msgstr "成功"
 
 #: audits/models.py:43 ops/models/command.py:28 perms/models/base.py:52
-#: terminal/models.py:199 tickets/serializers/request_asset_perm.py:25
+#: terminal/models.py:199 tickets/serializers/request_asset_perm.py:29
 #: xpack/plugins/change_auth_plan/models.py:177
 #: xpack/plugins/change_auth_plan/models.py:308
 #: xpack/plugins/gathered_user/models.py:76
@@ -1003,7 +1003,7 @@ msgstr "Agent"
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
 #: authentication/templates/authentication/login_otp.html:6
 #: users/forms/profile.py:52 users/models/user.py:511
-#: users/serializers/user.py:234 users/templates/users/user_detail.html:77
+#: users/serializers/user.py:240 users/templates/users/user_detail.html:77
 #: users/templates/users/user_profile.html:87
 msgid "MFA"
 msgstr "多因子认证"
@@ -1013,7 +1013,7 @@ msgstr "多因子认证"
 msgid "Reason"
 msgstr "原因"
 
-#: audits/models.py:106 tickets/serializers/request_asset_perm.py:59
+#: audits/models.py:106 tickets/serializers/request_asset_perm.py:63
 #: tickets/serializers/ticket.py:29 xpack/plugins/cloud/models.py:211
 #: xpack/plugins/cloud/models.py:269
 msgid "Status"
@@ -1176,6 +1176,10 @@ msgstr "登录复核 {}"
 msgid "SSO auth closed"
 msgstr "SSO 认证关闭了"
 
+#: authentication/errors.py:218 authentication/views/login.py:237
+msgid "Your password is too simple, please change it for security"
+msgstr "你的密码过于简单，为了安全，请修改"
+
 #: authentication/forms.py:26 authentication/forms.py:34
 #: authentication/templates/authentication/login.html:38
 #: authentication/templates/authentication/xpack_login.html:118
@@ -1242,7 +1246,7 @@ msgid "Show"
 msgstr "显示"
 
 #: authentication/templates/authentication/_access_key_modal.html:66
-#: users/models/user.py:409 users/serializers/user.py:231
+#: users/models/user.py:409 users/serializers/user.py:237
 #: users/templates/users/user_profile.html:94
 #: users/templates/users/user_profile.html:163
 #: users/templates/users/user_profile.html:166
@@ -1251,7 +1255,7 @@ msgid "Disable"
 msgstr "禁用"
 
 #: authentication/templates/authentication/_access_key_modal.html:67
-#: users/models/user.py:410 users/serializers/user.py:232
+#: users/models/user.py:410 users/serializers/user.py:238
 #: users/templates/users/user_profile.html:92
 #: users/templates/users/user_profile.html:170
 msgid "Enable"
@@ -1386,10 +1390,6 @@ msgstr "退出登录成功，返回到登录页面"
 #: authentication/views/login.py:236
 msgid "Please change your password"
 msgstr "请修改密码"
-
-#: authentication/views/login.py:237
-msgid "Your password is too simple, please change it for security"
-msgstr "你的密码过于简单，为了安全，请修改"
 
 #: common/const/__init__.py:6
 #, python-format
@@ -1703,7 +1703,7 @@ msgstr "提示：RDP 协议不支持单独控制上传或下载文件"
 #: perms/forms/asset_permission.py:86 perms/forms/database_app_permission.py:41
 #: perms/forms/remote_app_permission.py:43 perms/models/base.py:50
 #: templates/_nav.html:21 users/forms/user.py:168 users/models/group.py:31
-#: users/models/user.py:495 users/serializers/user.py:48
+#: users/models/user.py:495 users/serializers/user.py:49
 #: users/templates/users/_select_user_modal.html:16
 #: users/templates/users/user_asset_permission.html:39
 #: users/templates/users/user_asset_permission.html:67
@@ -1769,7 +1769,7 @@ msgstr "动作"
 msgid "Asset permission"
 msgstr "资产授权"
 
-#: perms/models/base.py:53 tickets/serializers/request_asset_perm.py:27
+#: perms/models/base.py:53 tickets/serializers/request_asset_perm.py:31
 #: users/models/user.py:527 users/templates/users/user_detail.html:93
 #: users/templates/users/user_profile.html:120
 msgid "Date expired"
@@ -2514,36 +2514,36 @@ msgstr "结束日期"
 msgid "Args"
 msgstr "参数"
 
-#: tickets/api/request_asset_perm.py:44
+#: tickets/api/request_asset_perm.py:45
 #, python-format
 msgid "Ticket has %s"
 msgstr "工单已%s"
 
-#: tickets/api/request_asset_perm.py:89
+#: tickets/api/request_asset_perm.py:90
 msgid "Confirm assets first"
 msgstr "请先确认资产"
 
-#: tickets/api/request_asset_perm.py:92
+#: tickets/api/request_asset_perm.py:93
 msgid "Confirmed assets changed"
 msgstr "确认的资产变更了"
 
-#: tickets/api/request_asset_perm.py:96
+#: tickets/api/request_asset_perm.py:97
 msgid "Confirm system-user first"
 msgstr "请先确认系统用户"
 
-#: tickets/api/request_asset_perm.py:100
+#: tickets/api/request_asset_perm.py:101
 msgid "Confirmed system-user changed"
 msgstr "确认的系统用户变更了"
 
-#: tickets/api/request_asset_perm.py:103 xpack/plugins/cloud/models.py:202
+#: tickets/api/request_asset_perm.py:104 xpack/plugins/cloud/models.py:202
 msgid "Succeed"
 msgstr "成功"
 
-#: tickets/api/request_asset_perm.py:110
+#: tickets/api/request_asset_perm.py:112
 msgid "From request ticket: {} {}"
 msgstr "来自工单申请: {} {}"
 
-#: tickets/api/request_asset_perm.py:112
+#: tickets/api/request_asset_perm.py:114
 msgid "{} request assets, approved by {}"
 msgstr "{} 申请资产，通过人 {}"
 
@@ -2619,27 +2619,27 @@ msgstr "{} {} 这个工单"
 msgid "this ticket"
 msgstr "这个工单"
 
-#: tickets/serializers/request_asset_perm.py:19
+#: tickets/serializers/request_asset_perm.py:23
 msgid "IP group"
 msgstr "IP组"
 
-#: tickets/serializers/request_asset_perm.py:31
+#: tickets/serializers/request_asset_perm.py:35
 msgid "Confirmed assets"
 msgstr "确认的资产"
 
-#: tickets/serializers/request_asset_perm.py:34
+#: tickets/serializers/request_asset_perm.py:38
 msgid "Confirmed system user"
 msgstr "确认的系统用户"
 
-#: tickets/serializers/request_asset_perm.py:83
+#: tickets/serializers/request_asset_perm.py:87
 msgid "Invalid `org_id`"
 msgstr "无效的 `org_id`"
 
-#: tickets/serializers/request_asset_perm.py:92
+#: tickets/serializers/request_asset_perm.py:96
 msgid "Field `assignees` must be organization admin or superuser"
 msgstr "字段 assignees 必须是组织管理员或者超级管理员"
 
-#: tickets/serializers/request_asset_perm.py:142
+#: tickets/serializers/request_asset_perm.py:146
 #, python-brace-format
 msgid ""
 "\n"
@@ -2808,8 +2808,8 @@ msgid "Public key should not be the same as your old one."
 msgstr "不能和原来的密钥相同"
 
 #: users/forms/profile.py:137 users/forms/user.py:90
-#: users/serializers/user.py:194 users/serializers/user.py:276
-#: users/serializers/user.py:334
+#: users/serializers/user.py:200 users/serializers/user.py:282
+#: users/serializers/user.py:340
 msgid "Not a valid ssh public key"
 msgstr "SSH密钥不合法"
 
@@ -2833,15 +2833,15 @@ msgstr "添加到用户组"
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
 
-#: users/forms/user.py:124 users/serializers/user.py:36
+#: users/forms/user.py:124 users/serializers/user.py:37
 msgid "Reset link will be generated and sent to the user"
 msgstr "生成重置密码链接，通过邮件发送给用户"
 
-#: users/forms/user.py:125 users/serializers/user.py:37
+#: users/forms/user.py:125 users/serializers/user.py:38
 msgid "Set password"
 msgstr "设置密码"
 
-#: users/forms/user.py:132 users/serializers/user.py:44
+#: users/forms/user.py:132 users/serializers/user.py:45
 #: xpack/plugins/change_auth_plan/models.py:61
 #: xpack/plugins/change_auth_plan/serializers.py:30
 msgid "Password strategy"
@@ -2887,51 +2887,55 @@ msgstr "管理员"
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
-#: users/serializers/user.py:54 users/serializers/user.py:90
+#: users/serializers/user.py:55 users/serializers/user.py:93
 msgid "Organization role name"
 msgstr "组织角色名称"
 
-#: users/serializers/user.py:81 users/serializers/user.py:247
+#: users/serializers/user.py:59
+msgid "Total role name"
+msgstr "汇总角色名称"
+
+#: users/serializers/user.py:84 users/serializers/user.py:253
 msgid "Is first login"
 msgstr "首次登录"
 
-#: users/serializers/user.py:82
+#: users/serializers/user.py:85
 msgid "Is valid"
 msgstr "账户是否有效"
 
-#: users/serializers/user.py:83
+#: users/serializers/user.py:86
 msgid "Is expired"
 msgstr " 是否过期"
 
-#: users/serializers/user.py:84
+#: users/serializers/user.py:87
 msgid "Avatar url"
 msgstr "头像路径"
 
-#: users/serializers/user.py:88
+#: users/serializers/user.py:91
 msgid "Groups name"
 msgstr "用户组名"
 
-#: users/serializers/user.py:89
+#: users/serializers/user.py:92
 msgid "Source name"
 msgstr "用户来源名"
 
-#: users/serializers/user.py:91
+#: users/serializers/user.py:94
 msgid "Super role name"
 msgstr "超级角色名称"
 
-#: users/serializers/user.py:114
+#: users/serializers/user.py:120
 msgid "Role limit to {}"
 msgstr "角色只能为 {}"
 
-#: users/serializers/user.py:126 users/serializers/user.py:300
+#: users/serializers/user.py:132 users/serializers/user.py:306
 msgid "Password does not match security rules"
 msgstr "密码不满足安全规则"
 
-#: users/serializers/user.py:292
+#: users/serializers/user.py:298
 msgid "The old password is incorrect"
 msgstr "旧密码错误"
 
-#: users/serializers/user.py:306
+#: users/serializers/user.py:312
 msgid "The newly set password is inconsistent"
 msgstr "两次密码不一致"
 
