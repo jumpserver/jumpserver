@@ -179,6 +179,7 @@ class Session(OrgModelMixin):
         ('vnc', 'vnc'),
         ('telnet', 'telnet'),
         ('mysql', 'mysql'),
+        ('k8s', 'kubernetes')
     )
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)

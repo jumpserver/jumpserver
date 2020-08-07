@@ -91,12 +91,14 @@ class SystemUser(BaseUser):
     PROTOCOL_TELNET = 'telnet'
     PROTOCOL_VNC = 'vnc'
     PROTOCOL_MYSQL = 'mysql'
+    PROTOCOL_K8S = 'k8s'
     PROTOCOL_CHOICES = (
         (PROTOCOL_SSH, 'ssh'),
         (PROTOCOL_RDP, 'rdp'),
         (PROTOCOL_TELNET, 'telnet'),
         (PROTOCOL_VNC, 'vnc'),
         (PROTOCOL_MYSQL, 'mysql'),
+        (PROTOCOL_K8S, 'k8s'),
     )
 
     LOGIN_AUTO = 'auto'
@@ -118,6 +120,7 @@ class SystemUser(BaseUser):
     login_mode = models.CharField(choices=LOGIN_MODE_CHOICES, default=LOGIN_AUTO, max_length=10, verbose_name=_('Login mode'))
     cmd_filters = models.ManyToManyField('CommandFilter', related_name='system_users', verbose_name=_("Command filter"), blank=True)
     sftp_root = models.CharField(default='tmp', max_length=128, verbose_name=_("SFTP Root"))
+    token = models.TextField(default='', verbose_name=_('Token'))
     _prefer = 'system_user'
 
     def __str__(self):

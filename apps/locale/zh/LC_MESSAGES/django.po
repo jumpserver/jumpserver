@@ -21,15 +21,15 @@ msgstr ""
 msgid "Custom"
 msgstr "自定义"
 
-#: applications/models/database_app.py:18 applications/models/remote_app.py:21
-#: assets/models/asset.py:145 assets/models/base.py:232
-#: assets/models/cluster.py:18 assets/models/cmd_filter.py:21
-#: assets/models/domain.py:20 assets/models/group.py:20
-#: assets/models/label.py:18 ops/mixin.py:24 orgs/models.py:22
-#: perms/models/base.py:48 settings/models.py:27 terminal/models.py:26
-#: terminal/models.py:342 terminal/models.py:374 terminal/models.py:411
-#: users/forms/profile.py:20 users/models/group.py:15 users/models/user.py:489
-#: users/templates/users/_select_user_modal.html:13
+#: applications/models/database_app.py:18 applications/models/k8s_app.py:11
+#: applications/models/remote_app.py:21 assets/models/asset.py:145
+#: assets/models/base.py:232 assets/models/cluster.py:18
+#: assets/models/cmd_filter.py:21 assets/models/domain.py:20
+#: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
+#: orgs/models.py:22 perms/models/base.py:48 settings/models.py:27
+#: terminal/models.py:26 terminal/models.py:342 terminal/models.py:374
+#: terminal/models.py:411 users/forms/profile.py:20 users/models/group.py:15
+#: users/models/user.py:489 users/templates/users/_select_user_modal.html:13
 #: users/templates/users/user_asset_permission.html:37
 #: users/templates/users/user_asset_permission.html:154
 #: users/templates/users/user_database_app_permission.html:36
@@ -46,8 +46,9 @@ msgstr "自定义"
 msgid "Name"
 msgstr "名称"
 
-#: applications/models/database_app.py:22 assets/models/cmd_filter.py:52
-#: terminal/models.py:376 terminal/models.py:413 tickets/models/ticket.py:40
+#: applications/models/database_app.py:22 applications/models/k8s_app.py:14
+#: assets/models/cmd_filter.py:52 terminal/models.py:376 terminal/models.py:413
+#: tickets/models/ticket.py:40
 #: users/templates/users/user_granted_database_app.html:35
 msgid "Type"
 msgstr "类型"
@@ -69,16 +70,16 @@ msgstr "数据库"
 
 # msgid "Date created"
 # msgstr "创建日期"
-#: applications/models/database_app.py:33 applications/models/remote_app.py:45
-#: assets/models/asset.py:150 assets/models/asset.py:226
-#: assets/models/base.py:237 assets/models/cluster.py:29
-#: assets/models/cmd_filter.py:23 assets/models/cmd_filter.py:57
-#: assets/models/domain.py:21 assets/models/domain.py:54
-#: assets/models/group.py:23 assets/models/label.py:23 ops/models/adhoc.py:37
-#: orgs/models.py:25 perms/models/base.py:56 settings/models.py:32
-#: terminal/models.py:36 terminal/models.py:381 terminal/models.py:418
-#: users/models/group.py:16 users/models/user.py:522
-#: users/templates/users/user_detail.html:115
+#: applications/models/database_app.py:33 applications/models/k8s_app.py:18
+#: applications/models/remote_app.py:45 assets/models/asset.py:150
+#: assets/models/asset.py:226 assets/models/base.py:237
+#: assets/models/cluster.py:29 assets/models/cmd_filter.py:23
+#: assets/models/cmd_filter.py:57 assets/models/domain.py:21
+#: assets/models/domain.py:54 assets/models/group.py:23
+#: assets/models/label.py:23 ops/models/adhoc.py:37 orgs/models.py:25
+#: perms/models/base.py:56 settings/models.py:32 terminal/models.py:36
+#: terminal/models.py:381 terminal/models.py:418 users/models/group.py:16
+#: users/models/user.py:522 users/templates/users/user_detail.html:115
 #: users/templates/users/user_granted_database_app.html:38
 #: users/templates/users/user_granted_remote_app.html:37
 #: users/templates/users/user_group_detail.html:62
@@ -98,6 +99,19 @@ msgstr "备注"
 #: users/templates/users/user_database_app_permission.html:64
 msgid "DatabaseApp"
 msgstr "数据库应用"
+
+#: applications/models/k8s_app.py:9
+msgid "Kubernetes"
+msgstr ""
+
+#: applications/models/k8s_app.py:16 assets/models/cluster.py:40
+msgid "Cluster"
+msgstr "集群"
+
+#: applications/models/k8s_app.py:26 perms/models/k8s_app_permission.py:18
+#: perms/utils/k8s_app_permission.py:70
+msgid "KubernetesApp"
+msgstr "Kubernetes应用"
 
 #: applications/models/remote_app.py:23 assets/models/asset.py:352
 #: assets/models/authbook.py:26 assets/models/gathered_user.py:14
@@ -219,12 +233,12 @@ msgid "Hostname"
 msgstr "主机名"
 
 #: assets/models/asset.py:190 assets/models/domain.py:52
-#: assets/models/user.py:114 terminal/serializers/session.py:29
+#: assets/models/user.py:116 terminal/serializers/session.py:29
 msgid "Protocol"
 msgstr "协议"
 
 #: assets/models/asset.py:192 assets/serializers/asset.py:69
-#: perms/serializers/user_permission.py:60
+#: perms/serializers/user_permission.py:71
 msgid "Protocols"
 msgstr "协议组"
 
@@ -233,7 +247,7 @@ msgstr "协议组"
 msgid "Domain"
 msgstr "网域"
 
-#: assets/models/asset.py:195 assets/models/user.py:109
+#: assets/models/asset.py:195 assets/models/user.py:111
 #: perms/models/asset_permission.py:91
 #: xpack/plugins/change_auth_plan/models.py:56
 #: xpack/plugins/gathered_user/models.py:24
@@ -427,10 +441,6 @@ msgstr "系统"
 msgid "Default Cluster"
 msgstr "默认Cluster"
 
-#: assets/models/cluster.py:40
-msgid "Cluster"
-msgstr "集群"
-
 #: assets/models/cluster.py:56
 msgid "Beijing unicom"
 msgstr "北京联通"
@@ -443,7 +453,7 @@ msgstr "北京电信"
 msgid "BGP full netcom"
 msgstr "BGP全网通"
 
-#: assets/models/cmd_filter.py:33 assets/models/user.py:119
+#: assets/models/cmd_filter.py:33 assets/models/user.py:121
 msgid "Command filter"
 msgstr "命令过滤器"
 
@@ -468,7 +478,7 @@ msgstr "允许"
 msgid "Filter"
 msgstr "过滤器"
 
-#: assets/models/cmd_filter.py:53 assets/models/user.py:113
+#: assets/models/cmd_filter.py:53 assets/models/user.py:115
 msgid "Priority"
 msgstr "优先级"
 
@@ -597,57 +607,62 @@ msgstr "键"
 msgid "Node"
 msgstr "节点"
 
-#: assets/models/user.py:105
+#: assets/models/user.py:107
 msgid "Automatic login"
 msgstr "自动登录"
 
-#: assets/models/user.py:106
+#: assets/models/user.py:108
 msgid "Manually login"
 msgstr "手动登录"
 
-#: assets/models/user.py:108
+#: assets/models/user.py:110
 msgid "Username same with user"
 msgstr "用户名与用户相同"
 
-#: assets/models/user.py:110 templates/_nav.html:39
+#: assets/models/user.py:112 templates/_nav.html:39
 #: xpack/plugins/change_auth_plan/models.py:52
 msgid "Assets"
 msgstr "资产管理"
 
-#: assets/models/user.py:111 templates/_nav.html:17
+#: assets/models/user.py:113 templates/_nav.html:17
 #: users/views/profile/password.py:42 users/views/profile/pubkey.py:36
 msgid "Users"
 msgstr "用户管理"
 
-#: assets/models/user.py:112 users/templates/users/user_group_list.html:90
+#: assets/models/user.py:114 users/templates/users/user_group_list.html:90
 #: users/templates/users/user_profile.html:124
 msgid "User groups"
 msgstr "用户组"
 
-#: assets/models/user.py:115
+#: assets/models/user.py:117
 msgid "Auto push"
 msgstr "自动推送"
 
-#: assets/models/user.py:116
+#: assets/models/user.py:118
 msgid "Sudo"
 msgstr "Sudo"
 
-#: assets/models/user.py:117
+#: assets/models/user.py:119
 msgid "Shell"
 msgstr "Shell"
 
-#: assets/models/user.py:118
+#: assets/models/user.py:120
 msgid "Login mode"
 msgstr "登录模式"
 
-#: assets/models/user.py:120
+#: assets/models/user.py:122
 msgid "SFTP Root"
 msgstr "SFTP根路径"
 
-#: assets/models/user.py:195 audits/models.py:39
+#: assets/models/user.py:123 authentication/models.py:88
+msgid "Token"
+msgstr ""
+
+#: assets/models/user.py:198 audits/models.py:39
 #: perms/forms/asset_permission.py:95 perms/forms/remote_app_permission.py:49
 #: perms/models/asset_permission.py:92
 #: perms/models/database_app_permission.py:22
+#: perms/models/k8s_app_permission.py:22
 #: perms/models/remote_app_permission.py:16 templates/_nav.html:45
 #: terminal/backends/command/models.py:20
 #: terminal/backends/command/serializers.py:14 terminal/models.py:189
@@ -1212,10 +1227,6 @@ msgstr "登录复核"
 msgid "City"
 msgstr "城市"
 
-#: authentication/models.py:88
-msgid "Token"
-msgstr ""
-
 #: authentication/models.py:89
 msgid "Expired"
 msgstr "过期时间"
@@ -1779,6 +1790,10 @@ msgstr "失效日期"
 #: users/templates/users/_user_detail_nav_header.html:61
 msgid "DatabaseApp permission"
 msgstr "数据库应用授权"
+
+#: perms/models/k8s_app_permission.py:27
+msgid "KubernetesApp permission"
+msgstr "Kubernetes应用授权"
 
 #: perms/models/remote_app_permission.py:20
 #: users/templates/users/_user_detail_nav_header.html:47

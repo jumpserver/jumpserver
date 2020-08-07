@@ -33,13 +33,14 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'login_mode', 'login_mode_display',
             'priority', 'username_same_with_user',
             'auto_push', 'cmd_filters', 'sudo', 'shell', 'comment',
-            'auto_generate_key', 'sftp_root',
+            'auto_generate_key', 'sftp_root', 'token',
             'assets_amount', 'date_created', 'created_by'
         ]
         extra_kwargs = {
             'password': {"write_only": True},
             'public_key': {"write_only": True},
             'private_key': {"write_only": True},
+            'token': {"write_only": True},
             'nodes_amount': {'label': _('Node')},
             'assets_amount': {'label': _('Asset')},
             'login_mode_display': {'label': _('Login mode display')},
@@ -169,7 +170,7 @@ class SystemUserWithAuthInfoSerializer(SystemUserSerializer):
             'login_mode', 'login_mode_display',
             'priority', 'username_same_with_user',
             'auto_push', 'sudo', 'shell', 'comment',
-            'auto_generate_key', 'sftp_root',
+            'auto_generate_key', 'sftp_root', 'token'
         ]
         extra_kwargs = {
             'nodes_amount': {'label': _('Node')},
