@@ -161,7 +161,7 @@ class RoleMixin:
     role = ROLE.USER
 
     @property
-    def super_role_display(self):
+    def role_display(self):
         return self.get_role_display()
 
     @property

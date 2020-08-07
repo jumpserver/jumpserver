@@ -10,6 +10,7 @@ from common.mixins import CommonBulkSerializerMixin
 from common.serializers import AdaptedBulkListSerializer
 from common.permissions import CanUpdateDeleteUser
 from common.drf.fields import GroupConcatedPrimaryKeyRelatedField
+from orgs.models import ROLE as ORG_ROLE
 from ..models import User, UserGroup
 
 
@@ -50,9 +51,10 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
     login_blocked = serializers.SerializerMethodField()
     can_update = serializers.SerializerMethodField()
     can_delete = serializers.SerializerMethodField()
-    org_role = serializers.CharField(
+    org_role = serializers.ChoiceField(
         label=_('Organization role name'), write_only=True,
-        allow_null=True, required=False, allow_blank=True
+        allow_null=True, required=False, allow_blank=True,
+        choices=ORG_ROLE.choices
     )
     key_prefix_block = "_LOGIN_BLOCK_{}"
 
@@ -64,7 +66,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         # small 指的是 不需要计算的直接能从一张表中获取到的数据
         fields_small = fields_mini + [
             'password', 'email', 'public_key', 'wechat', 'phone', 'mfa_level', 'mfa_enabled',
-            'mfa_level_display', 'mfa_force_enabled', 'super_role_display',
+            'mfa_level_display', 'mfa_force_enabled', 'role_display', 'org_role_display',
             'comment', 'source', 'is_valid', 'is_expired',
             'is_active', 'created_by', 'is_first_login',
             'password_strategy', 'date_password_last_updated', 'date_expired',
@@ -87,8 +89,8 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
             'can_delete': {'read_only': True},
             'groups_display': {'label': _('Groups name')},
             'source_display': {'label': _('Source name')},
-            'role_display': {'label': _('Organization role name'), 'source': 'org_role_display'},
-            'super_role_display': {'label': _('Super role name')},
+            'org_role_display': {'label': _('Organization role name')},
+            'role_display': {'label': _('Super role name')},
         }
 
     def __init__(self, *args, **kwargs):
