@@ -9,6 +9,7 @@ from functools import reduce
 from collections import OrderedDict
 
 from django.db import models
+from django.db.models.fields.related import lazy_related_operation
 from django.utils.translation import ugettext_lazy as _
 
 from common.fields.model import JsonDictTextField
@@ -16,6 +17,8 @@ from common.utils import lazyproperty
 from orgs.mixins.models import OrgModelMixin, OrgManager
 from .base import ConnectivityMixin
 from .utils import Connectivity
+from ..fields import AssetNodeManyToManyDescriptor
+
 
 __all__ = ['Asset', 'ProtocolsMixin', 'Platform']
 logger = logging.getLogger(__name__)
@@ -383,3 +386,20 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
             except IntegrityError:
                 print('Error continue')
                 continue
+
+
+def reset_asset_node_m2m_field(asset_model, node_model):
+    setattr(asset_model, 'nodes',
+            AssetNodeManyToManyDescriptor(
+                asset_model.nodes.rel,
+                reverse=asset_model.nodes.reverse
+            ))
+
+    setattr(node_model, 'assets',
+            AssetNodeManyToManyDescriptor(
+                node_model.assets.rel,
+                reverse=node_model.assets.reverse
+            ))
+
+
+lazy_related_operation(reset_asset_node_m2m_field, Asset, 'assets.Node')

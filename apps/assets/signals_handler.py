@@ -192,44 +192,6 @@ def on_asset_nodes_add(sender, instance=None, action='', model=None, pk_set=None
         system_user.assets.add(*tuple(_assets))
 
 
-@receiver(m2m_changed, sender=Asset.nodes.through)
-def on_asset_nodes_remove(sender, instance=None, action='', model=None,
-                          pk_set=None, **kwargs):
-
-    """
-    监控资产删除节点关系, 或节点删除资产，避免产生游离资产
-    """
-    if action not in ["post_remove", "pre_clear", "post_clear"]:
-        return
-    if action == "pre_clear":
-        if model == Node:
-            instance._nodes = list(instance.nodes.all())
-        else:
-            instance._assets = list(instance.assets.all())
-        return
-    logger.debug("Assets node remove signal recv: {}".format(action))
-    if action == "post_remove":
-        queryset = model.objects.filter(pk__in=pk_set)
-    else:
-        if model == Node:
-            queryset = instance._nodes
-        else:
-            queryset = instance._assets
-    if model == Node:
-        assets = [instance]
-    else:
-        assets = queryset
-    if isinstance(assets, list):
-        assets_not_has_node = []
-        for asset in assets:
-            if asset.nodes.all().count() == 0:
-                assets_not_has_node.append(asset.id)
-    else:
-        assets_not_has_node = assets.annotate(nodes_count=Count('nodes'))\
-            .filter(nodes_count=0).values_list('id', flat=True)
-    Node.org_root().assets.add(*tuple(assets_not_has_node))
-
-
 @receiver([post_save, post_delete], sender=Node)
 def on_node_update_or_created(sender, **kwargs):
     # 刷新节点
