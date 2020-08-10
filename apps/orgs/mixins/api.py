@@ -55,8 +55,8 @@ class OrgBulkModelViewSet(CommonApiMixin, OrgQuerySetMixin, BulkModelViewSet):
         filtered_count = filtered.count()
         if filtered_count == 1:
             return True
-        if qs_count <= filtered_count:
-            return False
+        if qs_count > filtered_count:
+            return True
         if self.request.query_params.get('spm', ''):
             return True
         return False
