@@ -81,3 +81,4 @@ class LoginConfirmSettingSerializer(serializers.ModelSerializer):
 class SSOTokenSerializer(serializers.Serializer):
     username = serializers.CharField(write_only=True)
     login_url = serializers.CharField(read_only=True)
+    next = serializers.CharField(write_only=True, allow_blank=True, required=False, allow_null=True)
