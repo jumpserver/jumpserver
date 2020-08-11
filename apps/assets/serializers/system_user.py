@@ -34,7 +34,8 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'priority', 'username_same_with_user',
             'auto_push', 'cmd_filters', 'sudo', 'shell', 'comment',
             'auto_generate_key', 'sftp_root', 'token',
-            'assets_amount', 'date_created', 'created_by'
+            'assets_amount', 'date_created', 'created_by',
+            'home', 'system_groups'
         ]
         extra_kwargs = {
             'password': {"write_only": True},
@@ -144,13 +145,14 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
 
 
 class SystemUserListSerializer(SystemUserSerializer):
+
     class Meta(SystemUserSerializer.Meta):
         fields = [
             'id', 'name', 'username', 'protocol',
             'login_mode', 'login_mode_display',
             'priority', "username_same_with_user",
             'auto_push', 'sudo', 'shell', 'comment',
-            "assets_amount",
+            "assets_amount", 'home', 'system_groups',
             'auto_generate_key',
             'sftp_root',
         ]

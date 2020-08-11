@@ -3,9 +3,10 @@
 from itertools import groupby
 from celery import shared_task
 from django.utils.translation import ugettext as _
+from django.db.models import Empty
 
 from common.utils import encrypt_password, get_logger
-from orgs.utils import tmp_to_org, org_aware_func
+from orgs.utils import org_aware_func
 from . import const
 from .utils import clean_ansible_task_hosts, group_asset_by_platform
 
@@ -17,20 +18,42 @@ __all__ = [
 ]
 
 
+def _split_by_comma(raw: str):
+    try:
+        return [i.strip() for i in raw.split(',')]
+    except AttributeError:
+        return []
+
+
+def _dump_args(args: dict):
+    return ' '.join([f'{k}={v}' for k, v in args.items() if v is not Empty])
+
+
 def get_push_unixlike_system_user_tasks(system_user, username=None):
     if username is None:
         username = system_user.username
     password = system_user.password
     public_key = system_user.public_key
 
+    groups = _split_by_comma(system_user.system_groups)
+
+    if groups:
+        groups = '"%s"' % ','.join(groups)
+
+    add_user_args = {
+        'name': username,
+        'shell': system_user.shell or Empty,
+        'state': 'present',
+        'home': system_user.home or Empty,
+        'groups': groups or Empty
+    }
+
     tasks = [
         {
             'name': 'Add user {}'.format(username),
             'action': {
                 'module': 'user',
-                'args': 'name={} shell={} state=present'.format(
-                    username, system_user.shell or '/bin/bash',
-                ),
+                'args': _dump_args(add_user_args),
             }
         },
         {
@@ -102,6 +125,11 @@ def get_push_windows_system_user_tasks(system_user, username=None):
     if username is None:
         username = system_user.username
     password = system_user.password
+    groups = {'Users', 'Remote Desktop Users'}
+    if system_user.system_groups:
+        groups.update(_split_by_comma(system_user.system_groups))
+    groups = ','.join(groups)
+
     tasks = []
     if not password:
         return tasks
@@ -116,9 +144,9 @@ def get_push_windows_system_user_tasks(system_user, username=None):
                     'update_password=always '
                     'password_expired=no '
                     'password_never_expires=yes '
-                    'groups="Users,Remote Desktop Users" '
+                    'groups="{}" '
                     'groups_action=add '
-                    ''.format(username, username, password),
+                    ''.format(username, username, password, groups),
         }
     }
     tasks.append(task)
