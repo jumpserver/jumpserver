@@ -9,6 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 from common.utils import signer
+from common.fields.model import JsonListCharField
 from .base import BaseUser
 from .asset import Asset
 
@@ -121,6 +122,8 @@ class SystemUser(BaseUser):
     cmd_filters = models.ManyToManyField('CommandFilter', related_name='system_users', verbose_name=_("Command filter"), blank=True)
     sftp_root = models.CharField(default='tmp', max_length=128, verbose_name=_("SFTP Root"))
     token = models.TextField(default='', verbose_name=_('Token'))
+    home = models.CharField(max_length=4096, default='', verbose_name=_('Home'), blank=True)
+    system_groups = models.CharField(default='', max_length=4096, verbose_name=_('System groups'), blank=True)
     _prefer = 'system_user'
 
     def __str__(self):
