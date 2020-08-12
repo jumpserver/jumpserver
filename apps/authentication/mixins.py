@@ -16,6 +16,7 @@ from users.utils import (
 from . import errors
 from .utils import rsa_decrypt
 from .signals import post_auth_success, post_auth_failed
+from .const import RSA_PRIVATE_KEY
 
 logger = get_logger(__name__)
 
@@ -55,7 +56,19 @@ class AuthMixin:
             logger.warn('Ip was blocked' + ': ' + username + ':' + ip)
             raise errors.BlockLoginError(username=username, ip=ip)
 
-    def check_user_auth(self):
+    def decrypt_passwd(self, raw_passwd):
+        # 获取解密密钥，对密码进行解密
+        rsa_private_key = self.request.session.get(RSA_PRIVATE_KEY)
+        if rsa_private_key is not None:
+            try:
+                return rsa_decrypt(raw_passwd, rsa_private_key)
+            except Exception as e:
+                logger.error(e, exc_info=True)
+                logger.error(f'Decrypt password faild: password[{raw_passwd}] rsa_private_key[{rsa_private_key}]')
+                return None
+        return raw_passwd
+
+    def check_user_auth(self, decrypt_passwd=False):
         self.check_is_block()
         request = self.request
         if hasattr(request, 'data'):
@@ -70,14 +83,9 @@ class AuthMixin:
 
         CredentialError = partial(errors.CredentialError, username=username, ip=ip, request=request)
 
-        # 获取解密密钥，对密码进行解密
-        rsa_private_key = request.session.get('rsa_private_key')
-        if rsa_private_key is not None:
-            try:
-                password = rsa_decrypt(password, rsa_private_key)
-            except Exception as e:
-                logger.error(e, exc_info=True)
-                logger.error('Need decrypt password => {}'.format(password))
+        if decrypt_passwd:
+            password = self.decrypt_passwd(password)
+            if not password:
                 raise CredentialError(error=errors.reason_password_decrypt_failed)
 
         user = authenticate(request,
@@ -119,14 +127,14 @@ class AuthMixin:
 
             raise errors.PasswdTooSimple(f'{flash_page_url}?{query_str}')
 
-    def check_user_auth_if_need(self):
+    def check_user_auth_if_need(self, decrypt_passwd=False):
         request = self.request
         if request.session.get('auth_password') and \
                 request.session.get('user_id'):
             user = self.get_user_from_session()
             if user:
                 return user
-        return self.check_user_auth()
+        return self.check_user_auth(decrypt_passwd=decrypt_passwd)
 
     def check_user_mfa_if_need(self, user):
         if self.request.session.get('auth_mfa'):

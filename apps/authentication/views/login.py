@@ -22,6 +22,7 @@ from common.utils import get_request_ip, get_object_or_none
 from users.utils import (
     redirect_user_first_login_or_index
 )
+from ..const import RSA_PRIVATE_KEY, RSA_PUBLIC_KEY
 from .. import mixins, errors, utils
 from ..forms import get_user_login_form_cls
 
@@ -82,7 +83,7 @@ class UserLoginView(mixins.AuthMixin, FormView):
         if not self.request.session.test_cookie_worked():
             return HttpResponse(_("Please enable cookies and try again."))
         try:
-            self.check_user_auth()
+            self.check_user_auth(decrypt_passwd=True)
         except errors.AuthFailedError as e:
             form.add_error(None, e.msg)
             ip = self.get_request_ip()
@@ -94,6 +95,7 @@ class UserLoginView(mixins.AuthMixin, FormView):
             return self.render_to_response(context)
         except errors.PasswdTooSimple as e:
             return redirect(e.url)
+        self.clear_rsa_key()
         return self.redirect_to_guard_view()
 
     def redirect_to_guard_view(self):
@@ -110,15 +112,19 @@ class UserLoginView(mixins.AuthMixin, FormView):
         else:
             return get_user_login_form_cls()
 
+    def clear_rsa_key(self):
+        self.request.session[RSA_PRIVATE_KEY] = None
+        self.request.session[RSA_PUBLIC_KEY] = None
+
     def get_context_data(self, **kwargs):
         # 生成加解密密钥对，public_key传递给前端，private_key存入session中供解密使用
-        rsa_private_key = self.request.session.get('rsa_private_key')
-        rsa_public_key = self.request.session.get('rsa_public_key')
+        rsa_private_key = self.request.session.get(RSA_PRIVATE_KEY)
+        rsa_public_key = self.request.session.get(RSA_PUBLIC_KEY)
         if not all((rsa_private_key, rsa_public_key)):
             rsa_private_key, rsa_public_key = utils.gen_key_pair()
             rsa_public_key = rsa_public_key.replace('\n', '\\n')
-            self.request.session['rsa_private_key'] = rsa_private_key
-            self.request.session['rsa_public_key'] = rsa_public_key
+            self.request.session[RSA_PRIVATE_KEY] = rsa_private_key
+            self.request.session[RSA_PUBLIC_KEY] = rsa_public_key
 
         context = {
             'demo_mode': os.environ.get("DEMO_MODE"),
