@@ -111,7 +111,12 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         role._choices = choices
 
     def get_total_role_display(self, instance):
-        return ' | '.join({str(instance.role_display), str(instance.org_role_display)})
+        role_display = instance.role_display
+        org_role_display = instance.org_role_display
+        if role_display == org_role_display:
+            return role_display
+        else:
+            return f'{role_display} | {org_role_display}'
 
     def validate_role(self, value):
         request = self.context.get('request')
