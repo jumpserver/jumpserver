@@ -5,12 +5,12 @@ from rest_framework import serializers
 from common.utils import get_object_or_none
 from users.models import User
 from users.serializers import UserProfileSerializer
-from .models import AccessKey, LoginConfirmSetting
+from .models import AccessKey, LoginConfirmSetting, SSOToken
 
 
 __all__ = [
     'AccessKeySerializer', 'OtpVerifySerializer', 'BearerTokenSerializer',
-    'MFAChallengeSerializer', 'LoginConfirmSettingSerializer',
+    'MFAChallengeSerializer', 'LoginConfirmSettingSerializer', 'SSOTokenSerializer',
 ]
 
 
@@ -76,3 +76,9 @@ class LoginConfirmSettingSerializer(serializers.ModelSerializer):
         model = LoginConfirmSetting
         fields = ['id', 'user', 'reviewers', 'date_created', 'date_updated']
         read_only_fields = ['date_created', 'date_updated']
+
+
+class SSOTokenSerializer(serializers.Serializer):
+    username = serializers.CharField(write_only=True)
+    login_url = serializers.CharField(read_only=True)
+    next = serializers.CharField(write_only=True, allow_blank=True, required=False, allow_null=True)

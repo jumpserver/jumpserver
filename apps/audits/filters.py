@@ -20,7 +20,7 @@ class CurrentOrgMembersFilter(filters.BaseFilterBackend):
         ]
 
     def _get_user_list(self):
-        users = current_org.get_org_members(exclude=('Auditor',))
+        users = current_org.get_members(exclude=('Auditor',))
         return users
 
     def filter_queryset(self, request, queryset, view):

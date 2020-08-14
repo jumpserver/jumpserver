@@ -67,22 +67,30 @@
             </div>
             <div class="box-3">
                 <div style="background-color: white">
-                    <div style="margin-top: 30px;padding-top: 40px;padding-left: 20px;padding-right: 20px;height: 80px">
-                        <span style="font-size: 21px;font-weight:400;color: #151515;letter-spacing: 0;">{{ JMS_TITLE }}</span>
-                    </div>
+                    {% if form.challenge %}
+                        <div style="margin-top: 20px;padding-top: 30px;padding-left: 20px;padding-right: 20px;height: 60px">
+                    {% else %}
+                        <div style="margin-top: 20px;padding-top: 40px;padding-left: 20px;padding-right: 20px;height: 80px">
+                    {% endif %}
+                            <span style="font-size: 21px;font-weight:400;color: #151515;letter-spacing: 0;">{{ JMS_TITLE }}</span>
+                        </div>
                     <div style="font-size: 12px;color: #999999;letter-spacing: 0;line-height: 18px;margin-top: 18px">
                         {% trans 'Welcome back, please enter username and password to login' %}
                     </div>
-                    <div style="margin-bottom: 10px">
+                    <div style="margin-bottom: 0px">
                         <div>
                             <div class="col-md-1"></div>
-                            <div class="contact-form col-md-10" style="margin-top: 20px;height: 35px">
+                            <div class="contact-form col-md-10" style="margin-top: 0px;height: 35px">
                                 <form id="contact-form" action="" method="post" role="form" novalidate="novalidate">
                                     {% csrf_token %}
                                     {% if form.non_field_errors %}
-                                    <div style="height: 70px;color: red;line-height: 17px;">
-                                        <p class="red-fonts">{{ form.non_field_errors.as_text }}</p>
-                                    </div>
+                                        {% if form.challenge %}
+                                            <div style="height: 50px;color: red;line-height: 17px;">
+                                        {% else %}
+                                            <div style="height: 70px;color: red;line-height: 17px;">
+                                        {% endif %}
+                                            <p class="red-fonts">{{ form.non_field_errors.as_text }}</p>
+                                        </div>
                                     {% elif form.errors.captcha %}
                                         <p class="red-fonts">{% trans 'Captcha invalid' %}</p>
                                     {% else %}
@@ -105,6 +113,16 @@
                                             </div>
                                         {% endif %}
                                     </div>
+                                    {% if form.challenge %}
+                                        <div class="form-group">
+                                            <input type="challenge" class="form-control" id="challenge" name="{{ form.challenge.html_name }}" placeholder="{% trans 'MFA code' %}" >
+                                            {% if form.errors.challenge %}
+                                                <div class="help-block field-error">
+                                                    <p class="red-fonts">{{ form.errors.challenge.as_text }}</p>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
                                     <div class="form-group" style="height: 50px;margin-bottom: 0;font-size: 13px">
                                         {{ form.captcha }}
                                     </div>

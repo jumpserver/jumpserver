@@ -23,6 +23,7 @@ REMOTE_APP_TYPE_CHROME_FIELDS = [
 REMOTE_APP_TYPE_MYSQL_WORKBENCH_FIELDS = [
     {'name': 'mysql_workbench_ip'},
     {'name': 'mysql_workbench_name'},
+    {'name': 'mysql_workbench_port'},
     {'name': 'mysql_workbench_username'},
     {'name': 'mysql_workbench_password', 'write_only': True}
 ]

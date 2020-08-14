@@ -1,3 +1,5 @@
+from django.utils.translation import gettext_lazy as _
+
 from common.exceptions import JMSException
 
 
@@ -18,8 +20,19 @@ class ConfirmedSystemUserChanged(JMSException):
 
 
 class TicketClosed(JMSException):
+    default_detail = _('Ticket closed')
+    default_code = 'ticket_closed'
+
+
+class TicketActionAlready(JMSException):
     pass
 
 
-class TicketActionYet(JMSException):
-    pass
+class OnlyTicketAssigneeCanOperate(JMSException):
+    default_detail = _('Only assignee can operate ticket')
+    default_code = 'can_not_operate'
+
+
+class TicketCanNotOperate(JMSException):
+    default_detail = _('Ticket can not be operated')
+    default_code = 'ticket_can_not_be_operated'

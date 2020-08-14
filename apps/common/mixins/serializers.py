@@ -8,7 +8,6 @@ from rest_framework.utils import html
 from rest_framework.settings import api_settings
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SkipField, empty
-
 __all__ = ['BulkSerializerMixin', 'BulkListSerializerMixin', 'CommonSerializerMixin', 'CommonBulkSerializerMixin']
 
 
@@ -49,6 +48,15 @@ class BulkSerializerMixin(object):
         if self.parent:
             self.initial_data = data
         return super().run_validation(data)
+
+    @classmethod
+    def many_init(cls, *args, **kwargs):
+        meta = getattr(cls, 'Meta', None)
+        assert meta is not None, 'Must have `Meta`'
+        if not hasattr(meta, 'list_serializer_class'):
+            from common.drf.serializers import AdaptedBulkListSerializer
+            meta.list_serializer_class = AdaptedBulkListSerializer
+        return super(BulkSerializerMixin, cls).many_init(*args, **kwargs)
 
 
 class BulkListSerializerMixin(object):

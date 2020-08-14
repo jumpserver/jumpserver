@@ -20,7 +20,7 @@ def get_session_asset_list():
 
 
 def get_session_user_list():
-    return User.objects.exclude(role=User.ROLE_APP).values_list('username', flat=True)
+    return User.objects.exclude(role=User.ROLE.APP).values_list('username', flat=True)
 
 
 def get_session_system_user_list():

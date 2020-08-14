@@ -75,8 +75,8 @@ if settings.DEBUG:
     urlpatterns += [
         re_path('^api/swagger(?P<format>\.json|\.yaml)$',
                 views.get_swagger_view().without_ui(cache_timeout=1), name='schema-json'),
-        path('api/docs/', views.get_swagger_view().with_ui('swagger', cache_timeout=1), name="docs"),
-        path('api/redoc/', views.get_swagger_view().with_ui('redoc', cache_timeout=1), name='redoc'),
+        re_path('api/docs/?', views.get_swagger_view().with_ui('swagger', cache_timeout=1), name="docs"),
+        re_path('api/redoc/?', views.get_swagger_view().with_ui('redoc', cache_timeout=1), name='redoc'),
 
         re_path('^api/v2/swagger(?P<format>\.json|\.yaml)$',
                 views.get_swagger_view().without_ui(cache_timeout=1), name='schema-json'),

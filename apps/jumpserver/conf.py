@@ -211,6 +211,9 @@ class Config(dict):
         'CAS_LOGOUT_COMPLETELY': True,
         'CAS_VERSION': 3,
 
+        'AUTH_SSO': False,
+        'AUTH_SSO_AUTHKEY_TTL': 60 * 15,
+
         'OTP_VALID_WINDOW': 2,
         'OTP_ISSUER_NAME': 'JumpServer',
         'EMAIL_SUFFIX': 'jumpserver.org',
@@ -238,6 +241,8 @@ class Config(dict):
         'SECURITY_PASSWORD_LOWER_CASE': False,
         'SECURITY_PASSWORD_NUMBER': False,
         'SECURITY_PASSWORD_SPECIAL_CHAR': False,
+        'SECURITY_LOGIN_CHALLENGE_ENABLED': False,
+        'SECURITY_LOGIN_CAPTCHA_ENABLED': True,
 
         'HTTP_BIND_HOST': '0.0.0.0',
         'HTTP_LISTEN_PORT': 8080,
@@ -438,6 +443,8 @@ class DynamicConfig:
             backends.insert(0, 'jms_oidc_rp.backends.OIDCAuthCodeBackend')
         if self.static_config.get('AUTH_RADIUS'):
             backends.insert(0, 'authentication.backends.radius.RadiusBackend')
+        if self.static_config.get('AUTH_SSO'):
+            backends.insert(0, 'authentication.backends.api.SSOAuthentication')
         return backends
 
     def XPACK_LICENSE_IS_VALID(self):

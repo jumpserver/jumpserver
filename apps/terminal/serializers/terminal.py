@@ -1,13 +1,12 @@
 from rest_framework import serializers
 
-from common.mixins import BulkSerializerMixin
-from common.serializers import AdaptedBulkListSerializer
+from common.drf.serializers import BulkModelSerializer, AdaptedBulkListSerializer
 from ..models import (
     Terminal, Status, Session, Task
 )
 
 
-class TerminalSerializer(serializers.ModelSerializer):
+class TerminalSerializer(BulkModelSerializer):
     session_online = serializers.SerializerMethodField()
     is_alive = serializers.BooleanField(read_only=True)
 
@@ -30,7 +29,7 @@ class StatusSerializer(serializers.ModelSerializer):
         model = Status
 
 
-class TaskSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+class TaskSerializer(BulkModelSerializer):
 
     class Meta:
         fields = '__all__'

@@ -17,14 +17,14 @@ __all__ = [
 
 
 class UserCreateUpdateFormMixin(OrgModelForm):
-    role_choices = ((i, n) for i, n in User.ROLE_CHOICES if i != User.ROLE_APP)
+    role_choices = ((i, n) for i, n in User.ROLE.choices if i != User.ROLE.APP)
     password = forms.CharField(
         label=_('Password'), widget=forms.PasswordInput,
         max_length=128, strip=False, required=False,
     )
     role = forms.ChoiceField(
         choices=role_choices, required=True,
-        initial=User.ROLE_USER, label=_("Role")
+        initial=User.ROLE.USER, label=_("Role")
     )
     source = forms.ChoiceField(
         choices=get_source_choices, required=True,
@@ -60,9 +60,9 @@ class UserCreateUpdateFormMixin(OrgModelForm):
         roles = []
         # Super admin user
         if self.request.user.is_superuser:
-            roles.append((User.ROLE_ADMIN, dict(User.ROLE_CHOICES).get(User.ROLE_ADMIN)))
-            roles.append((User.ROLE_USER, dict(User.ROLE_CHOICES).get(User.ROLE_USER)))
-            roles.append((User.ROLE_AUDITOR, dict(User.ROLE_CHOICES).get(User.ROLE_AUDITOR)))
+            roles.append((User.ROLE.ADMIN, User.ROLE.ADMIN.label))
+            roles.append((User.ROLE.USER, User.ROLE.USER.label))
+            roles.append((User.ROLE.AUDITOR, User.ROLE.AUDITOR.label))
 
         # Org admin user
         else:
@@ -70,10 +70,10 @@ class UserCreateUpdateFormMixin(OrgModelForm):
             # Update
             if user:
                 role = kwargs.get('instance').role
-                roles.append((role, dict(User.ROLE_CHOICES).get(role)))
+                roles.append((role, User.ROLE[role]))
             # Create
             else:
-                roles.append((User.ROLE_USER, dict(User.ROLE_CHOICES).get(User.ROLE_USER)))
+                roles.append((User.ROLE.USER, User.ROLE.USER.label))
 
         field = self.fields['role']
         field.choices = set(roles)

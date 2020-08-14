@@ -5,17 +5,17 @@ import logging
 import uuid
 
 from django.core.cache import cache
-from django.shortcuts import get_object_or_404, redirect
-from django.utils import timezone
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.views import APIView, Response
 from rest_framework.permissions import AllowAny
 
-
+from common.drf.api import JMSBulkModelViewSet
 from common.utils import get_object_or_none
 from common.permissions import IsAppUser, IsOrgAdminOrAppUser, IsSuperUser
 from ..models import Terminal, Status, Session
 from .. import serializers
+from .. import exceptions
 
 __all__ = [
     'TerminalViewSet', 'TerminalTokenApi', 'StatusViewSet', 'TerminalConfig',
@@ -23,13 +23,16 @@ __all__ = [
 logger = logging.getLogger(__file__)
 
 
-class TerminalViewSet(viewsets.ModelViewSet):
+class TerminalViewSet(JMSBulkModelViewSet):
     queryset = Terminal.objects.filter(is_deleted=False)
     serializer_class = serializers.TerminalSerializer
     permission_classes = (IsSuperUser,)
     filter_fields = ['name', 'remote_addr']
 
     def create(self, request, *args, **kwargs):
+        if isinstance(request.data, list):
+            raise exceptions.BulkCreateNotSupport()
+
         name = request.data.get('name')
         remote_ip = request.META.get('REMOTE_ADDR')
         x_real_ip = request.META.get('X-Real-IP')

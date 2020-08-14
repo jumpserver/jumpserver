@@ -16,6 +16,7 @@ from users.models import User
 from orgs.mixins.models import OrgModelMixin
 from common.mixins import CommonModelMixin
 from common.fields.model import EncryptJsonDictTextField
+from common.db.models import ChoiceSet
 from .backends import get_multi_command_storage
 from .backends.command.models import AbstractSessionCommand
 from . import const
@@ -169,17 +170,17 @@ class Status(models.Model):
 
 
 class Session(OrgModelMixin):
-    LOGIN_FROM_CHOICES = (
-        ('ST', 'SSH Terminal'),
-        ('WT', 'Web Terminal'),
-    )
-    PROTOCOL_CHOICES = (
-        ('ssh', 'ssh'),
-        ('rdp', 'rdp'),
-        ('vnc', 'vnc'),
-        ('telnet', 'telnet'),
-        ('mysql', 'mysql'),
-    )
+    class LOGIN_FROM(ChoiceSet):
+        ST = 'ST', 'SSH Terminal'
+        WT = 'WT', 'Web Terminal'
+
+    class PROTOCOL(ChoiceSet):
+        SSH = 'ssh', 'ssh'
+        RDP = 'rdp', 'rdp'
+        VNC = 'vnc', 'vnc'
+        TELNET = 'telnet', 'telnet'
+        MYSQL = 'mysql', 'mysql'
+        K8S = 'k8s', 'kubernetes'
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     user = models.CharField(max_length=128, verbose_name=_("User"), db_index=True)
@@ -188,14 +189,14 @@ class Session(OrgModelMixin):
     asset_id = models.CharField(blank=True, default='', max_length=36, db_index=True)
     system_user = models.CharField(max_length=128, verbose_name=_("System user"), db_index=True)
     system_user_id = models.CharField(blank=True, default='', max_length=36, db_index=True)
-    login_from = models.CharField(max_length=2, choices=LOGIN_FROM_CHOICES, default="ST", verbose_name=_("Login from"))
+    login_from = models.CharField(max_length=2, choices=LOGIN_FROM.choices, default="ST", verbose_name=_("Login from"))
     remote_addr = models.CharField(max_length=128, verbose_name=_("Remote addr"), blank=True, null=True)
     is_success = models.BooleanField(default=True, db_index=True)
     is_finished = models.BooleanField(default=False, db_index=True)
     has_replay = models.BooleanField(default=False, verbose_name=_("Replay"))
     has_command = models.BooleanField(default=False, verbose_name=_("Command"))
     terminal = models.ForeignKey(Terminal, null=True, on_delete=models.SET_NULL)
-    protocol = models.CharField(choices=PROTOCOL_CHOICES, default='ssh', max_length=8, db_index=True)
+    protocol = models.CharField(choices=PROTOCOL.choices, default='ssh', max_length=8, db_index=True)
     date_start = models.DateTimeField(verbose_name=_("Date start"), db_index=True, default=timezone.now)
     date_end = models.DateTimeField(verbose_name=_("Date end"), null=True)
 
@@ -245,9 +246,10 @@ class Session(OrgModelMixin):
 
     @property
     def can_join(self):
+        _PROTOCOL = self.PROTOCOL
         if self.is_finished:
             return False
-        if self.protocol not in ['ssh', 'telnet', 'mysql']:
+        if self.protocol not in [_PROTOCOL.SSH, _PROTOCOL.TELNET, _PROTOCOL.MYSQL, _PROTOCOL.K8S]:
             return False
         return True
 

@@ -11,6 +11,8 @@ from django.core.cache import cache
 from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
+from rest_framework import status
+from rest_framework_bulk.drf3.mixins import BulkDestroyModelMixin
 
 from common.drf.filters import IDSpmFilter, CustomFilter, IDInFilter
 from ..utils import lazyproperty
@@ -65,6 +67,17 @@ class ExtraFilterFieldsMixin:
         for backend in self.get_filter_backends():
             queryset = backend().filter_queryset(self.request, queryset, self)
         return queryset
+
+
+class PaginatedResponseMixin:
+    def get_paginated_response_with_query_set(self, queryset):
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class CommonApiMixin(SerializerMixin, ExtraFilterFieldsMixin):
@@ -212,10 +225,11 @@ class RelationMixin:
         self.through = getattr(self.m2m_field.model, self.m2m_field.attname).through
 
     def get_queryset(self):
+        # 注意，此处拦截了 `get_queryset` 没有 `super`
         queryset = self.through.objects.all()
         return queryset
 
-    def send_post_add_signal(self, instances):
+    def send_m2m_changed_signal(self, instances, action):
         if not isinstance(instances, list):
             instances = [instances]
 
@@ -228,13 +242,17 @@ class RelationMixin:
 
         for from_obj, to_ids in from_to_mapper.items():
             m2m_changed.send(
-                sender=self.through, instance=from_obj, action='post_add',
+                sender=self.through, instance=from_obj, action=action,
                 reverse=False, model=self.to_model, pk_set=to_ids
             )
 
     def perform_create(self, serializer):
         instance = serializer.save()
-        self.send_post_add_signal(instance)
+        self.send_m2m_changed_signal(instance, 'post_add')
+
+    def perform_destroy(self, instance):
+        instance.delete()
+        self.send_m2m_changed_signal(instance, 'post_remove')
 
 
 class SerializerMixin2:
@@ -264,3 +282,12 @@ class QuerySetMixin:
             queryset = serializer_class.setup_eager_loading(queryset)
 
         return queryset
+
+
+class AllowBulkDestoryMixin:
+    def allow_bulk_destroy(self, qs, filtered):
+        """
+        我们规定，批量删除的情况必须用 `id` 指定要删除的数据。
+        """
+        query = str(filtered.query)
+        return '`id` IN (' in query or '`id` =' in query

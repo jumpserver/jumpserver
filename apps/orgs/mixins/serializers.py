@@ -11,8 +11,7 @@ from ..utils import get_current_org_id_for_serializer
 
 __all__ = [
     "OrgResourceSerializerMixin", "BulkOrgResourceSerializerMixin",
-    "BulkOrgResourceModelSerializer", "OrgMembershipSerializerMixin",
-    "OrgResourceModelSerializerMixin",
+    "BulkOrgResourceModelSerializer", "OrgResourceModelSerializerMixin",
 ]
 
 
@@ -53,9 +52,3 @@ class BulkOrgResourceSerializerMixin(BulkSerializerMixin, OrgResourceSerializerM
 
 class BulkOrgResourceModelSerializer(BulkOrgResourceSerializerMixin, serializers.ModelSerializer):
     pass
-
-
-class OrgMembershipSerializerMixin:
-    def run_validation(self, initial_data=None):
-        initial_data['organization'] = str(self.context['org'].id)
-        return super().run_validation(initial_data)

@@ -14,6 +14,7 @@ __all__ = [
     'ActionsSerializer', 'AssetSystemUserSerializer',
     'RemoteAppSystemUserSerializer',
     'DatabaseAppSystemUserSerializer',
+    'K8sAppSystemUserSerializer',
 ]
 
 
@@ -44,6 +45,16 @@ class RemoteAppSystemUserSerializer(serializers.ModelSerializer):
 
 
 class DatabaseAppSystemUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SystemUser
+        only_fields = (
+            'id', 'name', 'username', 'priority', 'protocol', 'login_mode',
+        )
+        fields = list(only_fields)
+        read_only_fields = fields
+
+
+class K8sAppSystemUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = SystemUser
         only_fields = (

@@ -8,6 +8,7 @@ from .. import api
 app_name = 'authentication'
 router = DefaultRouter()
 router.register('access-keys', api.AccessKeyViewSet, 'access-key')
+router.register('sso', api.SSOViewSet, 'sso')
 
 
 urlpatterns = [

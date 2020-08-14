@@ -1,23 +1,24 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext as _
 from rest_framework import status, generics
 from rest_framework.views import Response
 from rest_framework_bulk import BulkModelViewSet
 
 from common.permissions import IsSuperUserOrAppUser
-from .models import Organization
-from .serializers import OrgSerializer, OrgReadSerializer, \
-    OrgMembershipUserSerializer, OrgMembershipAdminSerializer, \
-    OrgAllUserSerializer, OrgRetrieveSerializer
+from common.drf.api import JMSBulkRelationModelViewSet
+from .models import Organization, ROLE
+from .serializers import (
+    OrgSerializer, OrgReadSerializer,
+    OrgRetrieveSerializer, OrgMemberSerializer
+)
 from users.models import User, UserGroup
 from assets.models import Asset, Domain, AdminUser, SystemUser, Label
 from perms.models import AssetPermission
 from orgs.utils import current_org
 from common.utils import get_logger
-from .mixins.api import OrgMembershipModelViewSetMixin
+from .filters import OrgMemberRelationFilterSet
 
 logger = get_logger(__file__)
 
@@ -39,7 +40,7 @@ class OrgViewSet(BulkModelViewSet):
 
     def get_data_from_model(self, model):
         if model == User:
-            data = model.objects.filter(related_user_orgs__id=self.org.id)
+            data = model.objects.filter(orgs__id=self.org.id, m2m_org_members__role=ROLE.USER)
         else:
             data = model.objects.filter(org_id=self.org.id)
         return data
@@ -64,26 +65,13 @@ class OrgViewSet(BulkModelViewSet):
             return Response({'msg': True}, status=status.HTTP_200_OK)
 
 
-class OrgMembershipAdminsViewSet(OrgMembershipModelViewSetMixin, BulkModelViewSet):
-    serializer_class = OrgMembershipAdminSerializer
-    membership_class = Organization.admins.through
-    permission_classes = (IsSuperUserOrAppUser, )
-
-
-class OrgMembershipUsersViewSet(OrgMembershipModelViewSetMixin, BulkModelViewSet):
-    serializer_class = OrgMembershipUserSerializer
-    membership_class = Organization.users.through
-    permission_classes = (IsSuperUserOrAppUser, )
-
-
-class OrgAllUserListApi(generics.ListAPIView):
+class OrgMemberRelationBulkViewSet(JMSBulkRelationModelViewSet):
     permission_classes = (IsSuperUserOrAppUser,)
-    serializer_class = OrgAllUserSerializer
-    filter_fields = ("username", "name")
-    search_fields = filter_fields
+    m2m_field = Organization.members.field
+    serializer_class = OrgMemberSerializer
+    filterset_class = OrgMemberRelationFilterSet
 
-    def get_queryset(self):
-        pk = self.kwargs.get("pk")
-        org = get_object_or_404(Organization, pk=pk)
-        users = org.get_org_users().only(*self.serializer_class.Meta.only_fields)
-        return users
+    def perform_bulk_destroy(self, queryset):
+        objs = list(queryset.all().prefetch_related('user', 'org'))
+        queryset.delete()
+        self.send_m2m_changed_signal(objs, action='post_remove')
