@@ -5,7 +5,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import force_text
 
-from ..utils import signer, aes_crypto
+from ..utils import signer, aes_crypto, aes_ecb_crypto
 
 
 __all__ = [
@@ -117,9 +117,17 @@ class EncryptMixin:
         return signer.unsign(value) or ''
 
     def decrypt_from_aes(self, value):
+        """
+        先尝试使用GCM模式解密，如果解不开，再尝试使用原来的ECB模式解密
+        """
         try:
             return aes_crypto.decrypt(value)
-        except (TypeError, ValueError):
+        except ValueError:
+            pass
+
+        try:
+            return aes_ecb_crypto.decrypt(value)
+        except (TypeError, ValueError, UnicodeDecodeError):
             pass
 
     def from_db_value(self, value, expression, connection, context):
