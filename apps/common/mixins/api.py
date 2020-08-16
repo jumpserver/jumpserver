@@ -11,8 +11,6 @@ from django.core.cache import cache
 from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
-from rest_framework import status
-from rest_framework_bulk.drf3.mixins import BulkDestroyModelMixin
 
 from common.drf.filters import IDSpmFilter, CustomFilter, IDInFilter
 from ..utils import lazyproperty
