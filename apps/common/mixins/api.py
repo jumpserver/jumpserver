@@ -11,8 +11,6 @@ from django.core.cache import cache
 from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
-from rest_framework import status
-from rest_framework_bulk.drf3.mixins import BulkDestroyModelMixin
 
 from common.drf.filters import IDSpmFilter, CustomFilter, IDInFilter
 from ..utils import lazyproperty
@@ -237,6 +235,7 @@ class RelationMixin:
 
         for i in instances:
             to_id = getattr(i, self.to_field).id
+            # TODO 优化，不应该每次都查询数据库
             from_obj = getattr(i, self.from_field)
             from_to_mapper[from_obj].append(to_id)
 

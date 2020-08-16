@@ -96,23 +96,13 @@ class AssetPermissionAllAssetSerializer(serializers.Serializer):
 
 
 class AssetPermissionNodeRelationSerializer(RelationMixin, serializers.ModelSerializer):
-    node_display = serializers.SerializerMethodField()
+    node_display = serializers.CharField(source='node.full_value', read_only=True)
 
     class Meta(RelationMixin.Meta):
         model = AssetPermission.nodes.through
         fields = [
             'id', 'node', "node_display",
         ]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.tree = Node.tree()
-
-    def get_node_display(self, obj):
-        if hasattr(obj, 'node_key'):
-            return self.tree.get_node_full_tag(obj.node_key)
-        else:
-            return obj.node.full_value
 
 
 class AssetPermissionSystemUserRelationSerializer(RelationMixin, serializers.ModelSerializer):

@@ -18,3 +18,18 @@ class JMSObjectDoesNotExist(APIException):
         if detail is None and object_name:
             detail = self.default_detail % object_name
         super(JMSObjectDoesNotExist, self).__init__(detail=detail, code=code)
+
+
+class SomeoneIsDoingThis(JMSException):
+    status_code = status.HTTP_409_CONFLICT
+    default_detail = _('Someone else is doing this. Please wait for complete')
+
+
+class Timeout(JMSException):
+    status_code = status.HTTP_408_REQUEST_TIMEOUT
+    default_detail = _('Your request timeout')
+
+
+class M2MReverseNotAllowed(JMSException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_detail = _('M2M reverse not allowed')
