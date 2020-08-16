@@ -119,3 +119,52 @@ def on_remoteapps_permission_user_groups_changed(sender, instance=None, action='
                                             reverse=False, **kwargs):
     on_asset_permission_user_groups_changed(sender, instance=instance,
                                             action=action, reverse=reverse, **kwargs)
+
+
+from itertools import chain
+from assets.models import Node, Asset
+from users.models import User, UserGroup
+from perms.models import GrantedNode
+from typing import List
+
+
+def inc_granted_count(obj):
+    obj._granted_count = getattr(obj, '_granted_count', 0) + 1
+
+
+def update_users_tree_for_add(nodes: List[Node], users: List[User]):
+    ancestor_keys = {node: node.get_ancestor_keys() for node in nodes}
+    ancestors = Node.objects.filter(key__in=chain(*ancestor_keys.values()))
+    ancestors = {node.key: node for node in ancestors}
+    for node, keys in ancestor_keys:
+        inc_granted_count(node)
+        node._granted = True
+        for key in keys:
+            ancestor = ancestors[key]  # TODO 404
+            inc_granted_count(ancestor)
+    keys = ancestors.keys() | {n.key for n in ancestor_keys.keys()}
+    all_nodes = [*ancestors.values(), *ancestor_keys.keys()]
+
+    for user in users:
+        to_create = []
+        to_update = []
+        granted_nodes = GrantedNode.objects.filter(key__in=keys, user=user)
+        granted_nodes_map = {gn.key: gn for gn in granted_nodes}
+        for node in all_nodes:
+            _granted = getattr(node, '_granted', False),
+            if node.key in granted_nodes_map:
+                granted_node = granted_nodes_map[node.key]
+                if _granted:
+                    granted_node.granted = True
+                granted_node.granted_count += node._granted_count
+                to_update.append(granted_node)
+            else:
+                granted_node = GrantedNode(
+                    key=node.key,
+                    user=user,
+                    granted=_granted,
+                    granted_count=node._granted_count
+                ),
+                to_create.append(granted_node)
+        GrantedNode.objects.bulk_create(to_create)
+        GrantedNode.objects.bulk_update(to_update)

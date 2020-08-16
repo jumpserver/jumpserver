@@ -2,19 +2,19 @@ import uuid
 import logging
 from functools import reduce
 
-from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from common.db import models
 from common.utils import lazyproperty
 from orgs.models import Organization
 from orgs.utils import get_current_org
-from assets.models import Asset, SystemUser, Node
+from assets.models import Asset, SystemUser, Node, FamilyMixin
 
 from .base import BasePermission
 
 
 __all__ = [
-    'AssetPermission', 'Action',
+    'AssetPermission', 'Action', 'GrantedNode',
 ]
 logger = logging.getLogger(__name__)
 
@@ -174,3 +174,9 @@ class AssetPermission(BasePermission):
                 print('Error continue')
                 continue
 
+
+class GrantedNode(FamilyMixin, models.JMSBaseModel):
+    key = models.CharField(unique=True, max_length=64, verbose_name=_("Key"), db_index=True)  # '1:1:1:1'
+    user = models.ForeignKey('users.User', db_constraint=False, on_delete=models.CASCADE)
+    granted = models.BooleanField(default=False, db_index=True)
+    granted_count = models.IntegerField(default=0)
