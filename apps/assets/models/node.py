@@ -2,132 +2,35 @@
 #
 import uuid
 import re
-import time
 
 from django.db import models, transaction
 from django.db.models import Q
 from django.db.utils import IntegrityError
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
-from django.core.cache import cache
+from django.db.transaction import atomic
 
-from common.utils import get_logger, lazyproperty
+from common.utils import get_logger
+from common.utils.common import lazyproperty
 from orgs.mixins.models import OrgModelMixin, OrgManager
 from orgs.utils import get_current_org, tmp_to_org, current_org
 from orgs.models import Organization
 
 
-__all__ = ['Node']
+__all__ = ['Node', 'FamilyMixin', 'compute_parent_key']
 logger = get_logger(__name__)
+
+
+def compute_parent_key(key):
+    try:
+        return key[:key.rindex(':')]
+    except ValueError:
+        return ''
 
 
 class NodeQuerySet(models.QuerySet):
     def delete(self):
-        raise PermissionError("Bulk delete node deny")
-
-
-class TreeCache:
-    updated_time_cache_key = 'NODE_TREE_UPDATED_AT_{}'
-    cache_time = 3600
-    assets_updated_time_cache_key = 'NODE_TREE_ASSETS_UPDATED_AT_{}'
-
-    def __init__(self, tree, org_id):
-        now = time.time()
-        self.created_time = now
-        self.assets_created_time = now
-        self.tree = tree
-        self.org_id = org_id
-
-    def _has_changed(self, tp="tree"):
-        if tp == "assets":
-            key = self.assets_updated_time_cache_key.format(self.org_id)
-        else:
-            key = self.updated_time_cache_key.format(self.org_id)
-        updated_time = cache.get(key, 0)
-        if updated_time > self.created_time:
-            return True
-        else:
-            return False
-
-    @classmethod
-    def set_changed(cls, tp="tree", t=None, org_id=None):
-        if org_id is None:
-            org_id = current_org.id
-        if tp == "assets":
-            key = cls.assets_updated_time_cache_key.format(org_id)
-        else:
-            key = cls.updated_time_cache_key.format(org_id)
-        ttl = cls.cache_time
-        if not t:
-            t = time.time()
-        cache.set(key, t, ttl)
-
-    def tree_has_changed(self):
-        return self._has_changed("tree")
-
-    def set_tree_changed(self, t=None):
-        logger.debug("Set tree tree changed")
-        self.__class__.set_changed(t=t, tp="tree")
-
-    def assets_has_changed(self):
-        return self._has_changed("assets")
-
-    def set_tree_assets_changed(self, t=None):
-        logger.debug("Set tree assets changed")
-        self.__class__.set_changed(t=t, tp="assets")
-
-    def get(self):
-        if self.tree_has_changed():
-            self.renew()
-            return self.tree
-        if self.assets_has_changed():
-            self.tree.init_assets()
-        return self.tree
-
-    def renew(self):
-        new_obj = self.__class__.new(self.org_id)
-        self.tree = new_obj.tree
-        self.created_time = new_obj.created_time
-        self.assets_created_time = new_obj.assets_created_time
-
-    @classmethod
-    def new(cls, org_id=None):
-        from ..utils import TreeService
-        logger.debug("Create node tree")
-        if not org_id:
-            org_id = current_org.id
-        with tmp_to_org(org_id):
-            tree = TreeService.new()
-            obj = cls(tree, org_id)
-            obj.tree = tree
-            return obj
-
-
-class TreeMixin:
-    _org_tree_map = {}
-
-    @classmethod
-    def tree(cls):
-        org_id = current_org.org_id()
-        t = cls.get_local_tree_cache(org_id)
-
-        if t is None:
-            t = TreeCache.new()
-            cls._org_tree_map[org_id] = t
-        return t.get()
-
-    @classmethod
-    def get_local_tree_cache(cls, org_id=None):
-        t = cls._org_tree_map.get(org_id)
-        return t
-
-    @classmethod
-    def refresh_tree(cls, t=None):
-        TreeCache.set_changed(tp="tree", t=t, org_id=current_org.id)
-
-    @classmethod
-    def refresh_node_assets(cls, t=None):
-        TreeCache.set_changed(tp="assets", t=t, org_id=current_org.id)
+        raise NotImplementedError
 
 
 class FamilyMixin:
@@ -175,13 +78,16 @@ class FamilyMixin:
         return re.match(children_pattern, self.key)
 
     def get_children(self, with_self=False):
-        pattern = self.get_children_key_pattern(with_self=with_self)
-        return Node.objects.filter(key__regex=pattern)
+        q = Q(parent_key=self.key)
+        if with_self:
+            q |= Q(key=self.key)
+        return Node.objects.filter(q)
 
     def get_all_children(self, with_self=False):
-        pattern = self.get_all_children_pattern(with_self=with_self)
-        children = Node.objects.filter(key__regex=pattern)
-        return children
+        q = Q(key__istartswith=f'{self.key}:')
+        if with_self:
+            q |= Q(key=self.key)
+        return Node.objects.filter(q)
 
     @property
     def children(self):
@@ -192,10 +98,10 @@ class FamilyMixin:
         return self.get_all_children(with_self=False)
 
     def create_child(self, value, _id=None):
-        with transaction.atomic():
+        with atomic(savepoint=False):
             child_key = self.get_next_child_key()
             child = self.__class__.objects.create(
-                id=_id, key=child_key, value=value
+                id=_id, key=child_key, value=value, parent_key=self.key,
             )
             return child
 
@@ -255,10 +161,13 @@ class FamilyMixin:
         ancestor_keys = self.get_ancestor_keys(with_self=with_self)
         return self.__class__.objects.filter(key__in=ancestor_keys)
 
-    @property
-    def parent_key(self):
-        parent_key = ":".join(self.key.split(":")[:-1])
-        return parent_key
+    # @property
+    # def parent_key(self):
+    #     parent_key = ":".join(self.key.split(":")[:-1])
+    #     return parent_key
+
+    def compute_parent_key(self):
+        return compute_parent_key(self.key)
 
     def is_parent(self, other):
         return other.is_children(self)
@@ -300,25 +209,14 @@ class FamilyMixin:
         return [*tuple(ancestors), self, *tuple(children)]
 
 
-class FullValueMixin:
-    key = ''
-
-    @lazyproperty
-    def full_value(self):
-        if self.is_org_root():
-            return self.value
-        value = self.tree().get_node_full_tag(self.key)
-        return value
-
-
 class NodeAssetsMixin:
     key = ''
     id = None
 
-    @lazyproperty
-    def assets_amount(self):
-        amount = self.tree().assets_amount(self.key)
-        return amount
+    # @lazyproperty
+    # def assets_amount(self):
+    #     amount = self.tree().assets_amount(self.key)
+    #     return amount
 
     def get_all_assets(self):
         from .asset import Asset
@@ -496,12 +394,15 @@ class SomeNodesMixin:
                     logger.info('Modify key ( {} > {} )'.format(old_key, new_key))
 
 
-class Node(OrgModelMixin, SomeNodesMixin, TreeMixin, FamilyMixin, FullValueMixin, NodeAssetsMixin):
+class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     key = models.CharField(unique=True, max_length=64, verbose_name=_("Key"))  # '1:1:1:1'
     value = models.CharField(max_length=128, verbose_name=_("Value"))
     child_mark = models.IntegerField(default=0)
     date_create = models.DateTimeField(auto_now_add=True)
+    parent_key = models.CharField(max_length=64, verbose_name=_("Parent key"),
+                                  db_index=True, default='')
+    assets_amount = models.IntegerField(default=0)
 
     objects = OrgManager.from_queryset(NodeQuerySet)()
     is_node = True
@@ -536,17 +437,19 @@ class Node(OrgModelMixin, SomeNodesMixin, TreeMixin, FamilyMixin, FullValueMixin
     def name(self):
         return self.value
 
+    @lazyproperty
+    def full_value(self):
+        # 不要在列表中调用该属性
+        values = self.__class__.objects.filter(
+            key__in=self.get_ancestor_keys()
+        ).values_list('key', 'value')
+        values = [v for k, v in sorted(values, key=lambda x: len(x[0]))]
+        values.append(self.value)
+        return ' / '.join(values)
+
     @property
     def level(self):
         return len(self.key.split(':'))
-
-    @classmethod
-    def refresh_nodes(cls):
-        cls.refresh_tree()
-
-    @classmethod
-    def refresh_assets(cls):
-        cls.refresh_node_assets()
 
     def as_tree_node(self):
         from common.tree import TreeNode

@@ -2,7 +2,6 @@
 import time
 import pickle
 from collections import defaultdict
-from functools import reduce
 
 from django.core.cache import cache
 from django.db.models import Q
@@ -14,6 +13,8 @@ from common.tree import TreeNode
 from assets.utils import TreeService
 from ..models import AssetPermission
 from ..hands import Node, Asset, SystemUser, User, FavoriteAsset
+from users.models import UserGroup
+from perms.models.base import BasePermissionQuerySet
 
 logger = get_logger(__file__)
 
@@ -357,34 +358,26 @@ class AssetPermissionUtil(AssetPermissionUtilCacheMixin):
     # Todo: 是否可以获取多个资产的系统用户
     def get_asset_system_users_id_with_actions(self, asset):
         nodes = asset.get_nodes()
-        nodes_keys_related = set()
+        node_keys = set()
         for node in nodes:
-            ancestor_keys = node.get_ancestor_keys(with_self=True)
-            nodes_keys_related.update(set(ancestor_keys))
-        kwargs = {"assets": asset}
-
-        if nodes_keys_related:
-            kwargs["nodes__key__in"] = nodes_keys_related
+            node_keys = node.get_ancestor_keys(with_self=True)
+            node_keys.update(node_keys)
 
         queryset = self.permissions
-        if kwargs == 1:
-            queryset = queryset.filter(**kwargs)
-        elif len(kwargs) > 1:
-            kwargs = [{k: v} for k, v in kwargs.items()]
-            args = [Q(**kw) for kw in kwargs]
-            args = reduce(lambda x, y: x | y, args)
-            queryset = queryset.filter(args)
-        else:
-            queryset = queryset.none()
+        queryset = queryset.filter(
+            Q(assets=asset) |
+            Q(nodes__key__in=node_keys)
+        )
         asset_protocols = asset.protocols_as_dict.keys()
+
         values = queryset.filter(system_users__protocol__in=asset_protocols).distinct()\
             .values_list('system_users', 'actions')
         system_users_actions = defaultdict(int)
+
         for system_user_id, actions in values:
             if None in (system_user_id, actions):
                 continue
-            for i, action in values:
-                system_users_actions[i] |= actions
+            system_users_actions[system_user_id] |= actions
         return system_users_actions
 
     def get_permissions_nodes_and_assets(self):
@@ -486,3 +479,41 @@ class ParserNode:
         }
         tree_node = TreeNode(**data)
         return tree_node
+
+
+def get_asset_system_users_id_with_actions(asset_perm_queryset: BasePermissionQuerySet, asset: Asset):
+    nodes = asset.get_nodes()
+    node_keys = set()
+    for node in nodes:
+        ancestor_keys = node.get_ancestor_keys(with_self=True)
+        node_keys.update(ancestor_keys)
+
+    queryset = asset_perm_queryset.filter(
+        Q(assets=asset) |
+        Q(nodes__key__in=node_keys)
+    )
+    asset_protocols = asset.protocols_as_dict.keys()
+    values = queryset.filter(
+        system_users__protocol__in=asset_protocols
+    ).distinct().values_list('system_users', 'actions')
+    system_users_actions = defaultdict(int)
+
+    for system_user_id, actions in values:
+        if None in (system_user_id, actions):
+            continue
+        system_users_actions[system_user_id] |= actions
+    return system_users_actions
+
+
+def get_asset_system_users_id_with_actions_by_user(user: User, asset: Asset):
+    queryset = AssetPermission.objects.filter(
+        Q(users=user) | Q(user_groups__users=user)
+    )
+    return get_asset_system_users_id_with_actions(queryset, asset)
+
+
+def get_asset_system_users_id_with_actions_by_group(group: UserGroup, asset: Asset):
+    queryset = AssetPermission.objects.filter(
+        user_groups=group
+    )
+    return get_asset_system_users_id_with_actions(queryset, asset)
