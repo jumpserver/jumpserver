@@ -228,4 +228,4 @@ def update_users_tree_for_add(granted_nodes: List[Node], assets: List[Asset],
             gn.granted_count = F('granted_count') + gn._granted_count
             gn.asset_granted_count = F('asset_granted_count') + gn._asset_granted_count
         GrantedNode.objects.bulk_update(to_update)
-        GrantedNode.objects.bulk_create(to_create)
+        GrantedNode.objects.bulk_create(to_create.values())
