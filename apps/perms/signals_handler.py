@@ -2,6 +2,7 @@
 #
 from django.db.models.signals import m2m_changed, post_save, post_delete
 from django.dispatch import receiver
+from django.db.models import F
 
 from common.utils import get_logger
 from common.decorator import on_transaction_commit
@@ -128,22 +129,26 @@ from perms.models import GrantedNode
 from typing import List
 
 
-def inc_granted_count(obj):
-    obj._granted_count = getattr(obj, '_granted_count', 0) + 1
+def inc_granted_count(obj, value=1):
+    obj._granted_count = getattr(obj, '_granted_count', 0) + value
 
 
-def update_users_tree_for_add(nodes: List[Node], users: List[User]):
-    ancestor_keys = {node: node.get_ancestor_keys() for node in nodes}
-    ancestors = Node.objects.filter(key__in=chain(*ancestor_keys.values()))
+ADD = object()
+REMOVE = object()
+
+
+def update_users_tree_for_add(nodes, users, action=ADD):
+    ancestor_keys_map = {node: node.get_ancestor_keys() for node in nodes}
+    ancestors = Node.objects.filter(key__in=chain(*ancestor_keys_map.values()))
     ancestors = {node.key: node for node in ancestors}
-    for node, keys in ancestor_keys:
+    for node, keys in ancestor_keys_map:
         inc_granted_count(node)
         node._granted = True
         for key in keys:
             ancestor = ancestors[key]  # TODO 404
             inc_granted_count(ancestor)
-    keys = ancestors.keys() | {n.key for n in ancestor_keys.keys()}
-    all_nodes = [*ancestors.values(), *ancestor_keys.keys()]
+    keys = ancestors.keys() | {n.key for n in ancestor_keys_map.keys()}
+    all_nodes = [*ancestors.values(), *ancestor_keys_map.keys()]
 
     for user in users:
         to_create = []
@@ -155,10 +160,22 @@ def update_users_tree_for_add(nodes: List[Node], users: List[User]):
             if node.key in granted_nodes_map:
                 granted_node = granted_nodes_map[node.key]
                 if _granted:
-                    granted_node.granted = True
-                granted_node.granted_count += node._granted_count
+                    if action is ADD:
+                        if granted_node.granted:
+                            #相同节点不能授权两次
+                            raise ValueError('')
+                        granted_node.granted = True
+                    elif action is REMOVE:
+                        if not granted_node.granted:
+                            # 数据有问题
+                            raise ValueError('')
+                        granted_node.granted = False
+                inc_granted_count(granted_node, node._granted_count)
                 to_update.append(granted_node)
             else:
+                if action is REMOVE:
+                    # 数据有问题
+                    raise ValueError('')
                 granted_node = GrantedNode(
                     key=node.key,
                     user=user,
@@ -166,5 +183,10 @@ def update_users_tree_for_add(nodes: List[Node], users: List[User]):
                     granted_count=node._granted_count
                 ),
                 to_create.append(granted_node)
-        GrantedNode.objects.bulk_create(to_create)
+        for gn in to_update:
+            if action is ADD:
+                gn.granted_count = F('granted_count') + gn._granted_count
+            elif action is REMOVE:
+                gn.granted_count = F('granted_count') - gn._granted_count
         GrantedNode.objects.bulk_update(to_update)
+        GrantedNode.objects.bulk_create(to_create)
