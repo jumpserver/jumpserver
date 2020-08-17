@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-from django.db.models.signals import m2m_changed, post_save, post_delete
+from django.db.models.signals import m2m_changed, post_save, post_delete, pre_delete
 from django.dispatch import receiver
 from django.db.models import Q
 
@@ -20,10 +20,22 @@ logger = get_logger(__file__)
 @on_transaction_commit
 def on_permission_change(sender, action='', **kwargs):
     logger.debug('Asset permission changed, refresh user tree cache')
-
     AssetPermissionUtil.expire_all_user_tree_cache()
 
 # Todo: 检查授权规则到期，从而修改授权规则
+
+
+@receiver([pre_delete], sender=AssetPermission)
+def on_permission_change(instance=None, **kwargs):
+    if isinstance(instance, AssetPermission):
+        nodes = list(instance.nodes.all())
+        assets = list(instance.assets.all())
+        user_ap_query_name = AssetPermission.users.field.related_query_name()
+        group_ap_query_name = AssetPermission.user_groups.field.related_query_name()
+        user_ap_q = Q(**{f'{user_ap_query_name}': instance})
+        group_ap_q = Q(**{f'groups__{group_ap_query_name}': instance})
+        users = list(User.objects.filter(user_ap_q | group_ap_q).distinct())
+        update_users_tree_for_add(users, assets=assets, nodes=nodes, action=REMOVE)
 
 
 @receiver(m2m_changed, sender=AssetPermission.nodes.through)

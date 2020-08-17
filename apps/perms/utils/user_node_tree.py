@@ -12,7 +12,7 @@ def inc_granted_count(obj, value=1):
 
 
 def inc_asset_granted_count(obj, value=1):
-    obj._granted_count = getattr(obj, '_asset_granted_count', 0) + value
+    obj._asset_granted_count = getattr(obj, '_asset_granted_count', 0) + value
 
 
 ADD = 'add'
