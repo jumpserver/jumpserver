@@ -180,3 +180,4 @@ class GrantedNode(FamilyMixin, models.JMSBaseModel):
     user = models.ForeignKey('users.User', db_constraint=False, on_delete=models.CASCADE)
     granted = models.BooleanField(default=False, db_index=True)
     granted_count = models.IntegerField(default=0)
+    asset_granted_count = models.IntegerField(default=0)
