@@ -6,7 +6,7 @@ from users.models.user import User
 from common.serializers import AdaptedBulkListSerializer
 from common.drf.serializers import BulkModelSerializer
 from common.db.models import concated_display as display
-from .models import Organization, OrganizationMember, ROLE as ORG_ROLE
+from .models import Organization, OrganizationMember
 
 
 class OrgSerializer(ModelSerializer):
