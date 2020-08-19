@@ -1,10 +1,9 @@
 from itertools import chain
 
-from django.db.models import F, Count, Value, BooleanField
+from django.db.models import F, Count
 
-from assets.models import Node, Asset
+from assets.models import Node
 from perms.models import GrantedNode
-from users.models import User
 
 
 def inc_granted_count(obj, value=1):
