@@ -1678,11 +1678,11 @@ msgstr "磁盘使用率超过 80%: {} => {}"
 
 #: orgs/api.py:58
 msgid "Organization contains undeleted resources"
-msgstr ""
+msgstr "组织包含未删除的资源"
 
 #: orgs/api.py:62
 msgid "The current organization cannot be deleted"
-msgstr ""
+msgstr "当前组织不能被删除"
 
 #: orgs/mixins/models.py:56 orgs/mixins/serializers.py:25 orgs/models.py:40
 #: orgs/models.py:384
