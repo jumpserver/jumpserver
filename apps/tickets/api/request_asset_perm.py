@@ -1,3 +1,5 @@
+import textwrap
+
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.decorators import action
@@ -62,13 +64,13 @@ class RequestAssetPermTicketViewSet(JMSModelViewSet):
         ips = ', '.join(meta.get('ips', []))
         confirmed_assets = ', '.join(meta.get('confirmed_assets', []))
 
-        return f'''
+        return textwrap.dedent(f'''\
             {_('IP group')}: {ips}
             {_('Hostname')}: {meta.get('hostname', '')}
             {_('System user')}: {meta.get('system_user', '')}
             {_('Confirmed assets')}: {confirmed_assets}
             {_('Confirmed system user')}: {meta.get('confirmed_system_user', '')}
-        '''
+        ''')
 
     @action(detail=True, methods=[POST], permission_classes=[IsAssignee, IsValidUser])
     def reject(self, request, *args, **kwargs):
