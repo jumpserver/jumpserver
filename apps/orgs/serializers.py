@@ -10,9 +10,9 @@ from .models import Organization, OrganizationMember, ROLE as ORG_ROLE
 
 
 class OrgSerializer(ModelSerializer):
-    users = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), write_only=True)
-    admins = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), write_only=True)
-    auditors = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), write_only=True)
+    users = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), write_only=True, required=False)
+    admins = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), write_only=True, required=False)
+    auditors = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), write_only=True, required=False)
 
     class Meta:
         model = Organization
