@@ -107,7 +107,7 @@ class CommandExecutionViewSet(ListModelMixin, OrgGenericViewSet):
 class CommandExecutionHostRelationViewSet(OrgRelationMixin, OrgBulkModelViewSet):
     serializer_class = CommandExecutionHostsRelationSerializer
     m2m_field = CommandExecution.hosts.field
-    permission_classes = (IsOrgAdmin,)
+    permission_classes = [IsOrgAdmin | IsOrgAuditor]
     filter_fields = [
         'id', 'asset', 'commandexecution'
     ]
