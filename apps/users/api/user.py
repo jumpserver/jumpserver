@@ -56,31 +56,25 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
 
     def perform_create(self, serializer):
         validated_data = serializer.validated_data
-        if isinstance(validated_data, list):
-            org_roles = [item.pop('org_role', None) for item in validated_data]
-        else:
-            org_roles = [validated_data.pop('org_role', None)]
 
+        # `org_roles` 先 `pop`
+        if isinstance(validated_data, list):
+            org_roles = [item.pop('org_roles', []) for item in validated_data]
+        else:
+            org_roles = [validated_data.pop('org_roles', [])]
+
+        # 创建用户
         users = serializer.save()
         if isinstance(users, User):
             users = [users]
-        if current_org and current_org.is_real():
-            mapper = {
-                ORG_ROLE.USER: [],
-                ORG_ROLE.ADMIN: [],
-                ORG_ROLE.AUDITOR: []
-            }
 
-            for user, role in zip(users, org_roles):
-                if role in mapper:
-                    mapper[role].append(user)
-                else:
-                    mapper[ORG_ROLE.USER].append(user)
-            OrganizationMember.objects.set_users_by_role(
-                current_org, users=mapper[ORG_ROLE.USER],
-                admins=mapper[ORG_ROLE.ADMIN],
-                auditors=mapper[ORG_ROLE.AUDITOR]
-            )
+        # 只有真实存在的组织才真正关联用户
+        if current_org and current_org.is_real():
+            for user, roles in zip(users, org_roles):
+                if not roles:
+                    # 当前组织创建的用户，至少是该组织的`User`
+                    roles.append(ORG_ROLE.USER)
+                OrganizationMember.objects.set_user_roles(current_org, user, roles)
         self.send_created_signal(users)
 
     def get_permissions(self):
@@ -100,6 +94,23 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         for obj in objects:
             self.check_object_permissions(self.request, obj)
             self.perform_destroy(obj)
+
+    def perform_update(self, serializer):
+        validated_data = serializer.validated_data
+        # `org_roles` 先 `pop`
+        if isinstance(validated_data, list):
+            org_roles = [item.pop('org_roles', None) for item in validated_data]
+        else:
+            org_roles = [validated_data.pop('org_roles', None)]
+
+        users = serializer.save()
+        if isinstance(users, User):
+            users = [users]
+        if current_org and current_org.is_real():
+            for user, roles in zip(users, org_roles):
+                if roles is not None:
+                    # roles 是 `Node` 表明不需要更新
+                    OrganizationMember.objects.set_user_roles(current_org, user, roles)
 
     def perform_bulk_update(self, serializer):
         # TODO: 需要测试
