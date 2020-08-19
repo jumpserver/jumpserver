@@ -170,7 +170,7 @@ class AuthMixin:
         if not ticket_id:
             ticket = None
         else:
-            ticket = get_object_or_none(Ticket, pk=ticket_id)
+            ticket = Ticket.origin_objects.get(pk=ticket_id)
         return ticket
 
     def get_ticket_or_create(self, confirm_setting):
