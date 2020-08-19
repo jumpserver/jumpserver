@@ -182,3 +182,9 @@ class CanUpdateDeleteUser(permissions.BasePermission):
         if request.method in ['PUT', 'PATCH']:
             return self.has_update_object_permission(request, view, obj)
         return True
+
+
+class IsObjectOwner(IsValidUser):
+    def has_object_permission(self, request, view, obj):
+        return (super().has_object_permission(request, view, obj) and
+                request.user == getattr(obj, 'user', None))
