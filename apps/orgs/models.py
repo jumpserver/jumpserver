@@ -13,7 +13,7 @@ from common.db.models import ChoiceSet
 
 class ROLE(ChoiceSet):
     ADMIN = choices.ADMIN, _('Organization administrator')
-    USER = choices.USER, _('User')
+    USER = choices.USER, _('Organization User')
     AUDITOR = choices.AUDITOR, _("Organization auditor")
 
 
@@ -229,15 +229,29 @@ def _none2list(*args):
     return ([] if v is None else v for v in args)
 
 
+class UserRoleMapper(dict):
+    def __init__(self, container=set):
+        super().__init__()
+        self.users = container()
+        self.admins = container()
+        self.auditors = container()
+
+        self[ROLE.USER] = self.users
+        self[ROLE.ADMIN] = self.admins
+        self[ROLE.AUDITOR] = self.auditors
+
+
 class OrgMemeberManager(models.Manager):
 
     def remove_users_by_role(self, org, users=None, admins=None, auditors=None):
+        from users.models import User
+
         if not any((users, admins, auditors)):
             return
         users, admins, auditors = _none2list(users, admins, auditors)
 
         send = partial(signals.m2m_changed.send, sender=self.model, instance=org, reverse=False,
-                       model=Organization, pk_set=[*users, *admins, *auditors], using=self.db)
+                       model=User, pk_set=[*users, *admins, *auditors], using=self.db)
 
         send(action="pre_remove")
         self.filter(org_id=org.id).filter(
@@ -248,6 +262,8 @@ class OrgMemeberManager(models.Manager):
         send(action="post_remove")
 
     def add_users_by_role(self, org, users=None, admins=None, auditors=None):
+        from users.models import User
+
         if not any((users, admins, auditors)):
             return
         users, admins, auditors = _none2list(users, admins, auditors)
@@ -266,7 +282,7 @@ class OrgMemeberManager(models.Manager):
                 oms_add.append(self.model(org_id=org.id, user_id=user, role=role))
 
         send = partial(signals.m2m_changed.send, sender=self.model, instance=org, reverse=False,
-                       model=Organization, pk_set=[*users, *admins, *auditors], using=self.db)
+                       model=User, pk_set=[*users, *admins, *auditors], using=self.db)
 
         send(action='pre_add')
         self.bulk_create(oms_add)
@@ -278,24 +294,56 @@ class OrgMemeberManager(models.Manager):
         new_users = _convert_to_uuid_set(new_users)
         return (old_users - new_users), (new_users - old_users)
 
+    def set_user_roles(self, org, user, roles):
+        """
+        设置某个用户在某个组织里的角色
+        """
+        old_roles = set(self.filter(org_id=org.id, user=user).values_list('role', flat=True))
+        new_roles = set(roles)
+
+        roles_remove = old_roles - new_roles
+        roles_add = new_roles - old_roles
+
+        to_remove = UserRoleMapper()
+        to_add = UserRoleMapper()
+
+        for role in roles_remove:
+            if role in to_remove:
+                to_remove[role].add(user)
+        for role in roles_add:
+            if role in to_add:
+                to_add[role].add(user)
+
+        self.remove_users_by_role(
+            org,
+            to_remove.users,
+            to_remove.admins,
+            to_remove.auditors
+        )
+
+        self.add_users_by_role(
+            org,
+            to_add.users,
+            to_add.admins,
+            to_add.auditors
+        )
+
     def set_users_by_role(self, org, users=None, admins=None, auditors=None):
+        """
+        给组织设置带角色的用户
+        """
+
         oms = self.filter(org_id=org.id).values_list('role', 'user_id')
 
-        old_users, old_admins, old_auditors = set(), set(), set()
-
-        mapper = {
-            ROLE.USER: old_users,
-            ROLE.ADMIN: old_admins,
-            ROLE.AUDITOR: old_auditors
-        }
+        old_mapper = UserRoleMapper()
 
         for role, user_id in oms:
-            if role in mapper:
-                mapper[role].add(user_id)
+            if role in old_mapper:
+                old_mapper[role].add(user_id)
 
-        users_remove, users_add = self._get_remove_add_set(users, old_users)
-        admins_remove, admins_add = self._get_remove_add_set(admins, old_admins)
-        auditors_remove, auditors_add = self._get_remove_add_set(auditors, old_auditors)
+        users_remove, users_add = self._get_remove_add_set(users, old_mapper.users)
+        admins_remove, admins_add = self._get_remove_add_set(admins, old_mapper.admins)
+        auditors_remove, auditors_add = self._get_remove_add_set(auditors, old_mapper.auditors)
 
         self.remove_users_by_role(
             org,

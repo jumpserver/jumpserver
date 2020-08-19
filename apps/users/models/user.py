@@ -154,7 +154,7 @@ class AuthMixin:
 class RoleMixin:
     class ROLE(ChoiceSet):
         ADMIN = choices.ADMIN, _('System administrator')
-        USER = choices.USER, _('User')
+        USER = choices.USER, _('System User')
         AUDITOR = choices.AUDITOR, _('System auditor')
         APP = 'App', _('Application')
 
@@ -164,15 +164,15 @@ class RoleMixin:
     def role_display(self):
         return self.get_role_display()
 
-    @property
-    def org_role_display(self):
+    @lazyproperty
+    def org_roles(self):
         from orgs.models import ROLE as ORG_ROLE
 
         if not current_org.is_real():
             if self.is_superuser:
-                return ORG_ROLE.ADMIN.label
+                return [ORG_ROLE.ADMIN]
             else:
-                return ORG_ROLE.USER.label
+                return [ORG_ROLE.USER]
 
         if hasattr(self, 'gc_m2m_org_members__role'):
             names = self.gc_m2m_org_members__role
@@ -184,8 +184,14 @@ class RoleMixin:
             roles = set(self.m2m_org_members.filter(
                 org_id=current_org.id
             ).values_list('role', flat=True))
+        roles = list(roles)
+        roles.sort()
+        return roles
 
-        return ' | '.join([str(ORG_ROLE[role]) for role in roles if role in ORG_ROLE])
+    @lazyproperty
+    def org_role_display(self):
+        from orgs.models import ROLE as ORG_ROLE
+        return ' | '.join([str(ORG_ROLE[role]) for role in self.org_roles if role in ORG_ROLE])
 
     def current_org_roles(self):
         from orgs.models import OrganizationMember, ROLE as ORG_ROLE
