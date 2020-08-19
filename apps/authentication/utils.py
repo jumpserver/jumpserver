@@ -34,7 +34,13 @@ def rsa_decrypt(cipher_text, rsa_private_key=None):
     if rsa_private_key is None:
         # rsa_private_key 为 None，可以能是API请求认证，不需要解密
         return cipher_text
+
     key = RSA.importKey(rsa_private_key)
     cipher = PKCS1_v1_5.new(key)
-    message = cipher.decrypt(base64.b64decode(cipher_text.encode()), 'error').decode()
+    cipher_decoded = base64.b64decode(cipher_text.encode())
+    # Todo: 弄明白为何要以下这么写，https://xbuba.com/questions/57035263
+    if len(cipher_decoded) == 127:
+        hex_fixed = '00' + cipher_decoded.hex()
+        cipher_decoded = base64.b16decode(hex_fixed.upper())
+    message = cipher.decrypt(cipher_decoded, b'error').decode()
     return message
