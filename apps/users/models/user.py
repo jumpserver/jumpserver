@@ -155,8 +155,8 @@ class AuthMixin:
 class RoleMixin:
     class ROLE(ChoiceSet):
         ADMIN = choices.ADMIN, _('System administrator')
-        USER = choices.USER, _('User')
         AUDITOR = choices.AUDITOR, _('System auditor')
+        USER = choices.USER, _('User')
         APP = 'App', _('Application')
 
     role = ROLE.USER

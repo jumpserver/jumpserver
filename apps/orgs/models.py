@@ -13,8 +13,8 @@ from common.db.models import ChoiceSet
 
 class ROLE(ChoiceSet):
     ADMIN = choices.ADMIN, _('Organization administrator')
-    USER = choices.USER, _('User')
     AUDITOR = choices.AUDITOR, _("Organization auditor")
+    USER = choices.USER, _('User')
 
 
 class Organization(models.Model):
