@@ -7,6 +7,7 @@ import time
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.shortcuts import reverse
+from django.contrib.auth import BACKEND_SESSION_KEY
 
 from common.utils import get_object_or_none, get_request_ip, get_logger
 from users.models import User
@@ -27,8 +28,14 @@ class AuthMixin:
     def get_user_from_session(self):
         if self.request.session.is_empty():
             raise errors.SessionEmptyError()
-        if self.request.user and not self.request.user.is_anonymous:
-            return self.request.user
+
+        if all((self.request.user,
+                not self.request.user.is_anonymous,
+                BACKEND_SESSION_KEY in self.request.session)):
+            user = self.request.user
+            user.backend = self.request.session[BACKEND_SESSION_KEY]
+            return user
+
         user_id = self.request.session.get('user_id')
         if not user_id:
             user = None
