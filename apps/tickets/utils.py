@@ -21,9 +21,9 @@ def send_new_ticket_mail_to_assignees(ticket: Ticket, assignees):
 
     # 这里要设置前端地址，因为要直接跳转到页面
     if ticket.type == ticket.TYPE.REQUEST_ASSET_PERM:
-        detail_url = urljoin(settings.SITE_URL, f'/tickets/tickets/request-asset-perm/{ticket.id}')
+        detail_url = urljoin(settings.SITE_URL, f'/ui/#/tickets/tickets/request-asset-perm/{ticket.id}')
     else:
-        detail_url = urljoin(settings.SITE_URL, f'/tickets/tickets/{ticket.id}')
+        detail_url = urljoin(settings.SITE_URL, f'/ui/#/tickets/tickets/{ticket.id}')
 
     message = _("""
         <div>
