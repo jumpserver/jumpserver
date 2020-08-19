@@ -52,7 +52,6 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
     can_delete = serializers.SerializerMethodField()
     org_roles = serializers.ListField(label=_('Organization role name'), allow_null=True, required=False,
                                       child=serializers.ChoiceField(choices=ORG_ROLE.choices))
-    total_role_display = serializers.SerializerMethodField(label=_('Total role name'))
     key_prefix_block = "_LOGIN_BLOCK_{}"
 
     class Meta:
@@ -87,6 +86,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
             'source_display': {'label': _('Source name')},
             'org_role_display': {'label': _('Organization role name')},
             'role_display': {'label': _('Super role name')},
+            'total_role_display': {'label': _('Total role name')}
         }
 
     def __init__(self, *args, **kwargs):
@@ -104,14 +104,6 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
             choices.pop(User.ROLE.ADMIN, None)
             choices.pop(User.ROLE.AUDITOR, None)
         role._choices = choices
-
-    def get_total_role_display(self, instance):
-        role_display = instance.role_display
-        org_role_display = instance.org_role_display
-        if role_display == org_role_display:
-            return role_display
-        else:
-            return f'{role_display} | {org_role_display}'
 
     def validate_role(self, value):
         request = self.context.get('request')

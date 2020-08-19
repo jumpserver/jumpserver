@@ -13,7 +13,7 @@ from common.db.models import ChoiceSet
 
 class ROLE(ChoiceSet):
     ADMIN = choices.ADMIN, _('Organization administrator')
-    USER = choices.USER, _('Organization User')
+    USER = choices.USER, _('User')
     AUDITOR = choices.AUDITOR, _("Organization auditor")
 
 
@@ -242,6 +242,21 @@ class UserRoleMapper(dict):
 
 
 class OrgMemeberManager(models.Manager):
+
+    def remove_users(self, org, users):
+        from users.models import User
+        pk_set = []
+        for user in users:
+            if hasattr(user, 'pk'):
+                pk_set.append(user.pk)
+            else:
+                pk_set.append(user)
+
+        send = partial(signals.m2m_changed.send, sender=self.model, instance=org, reverse=False,
+                       model=User, pk_set=pk_set, using=self.db)
+        send(action="pre_remove")
+        self.filter(org_id=org.id, user_id__in=pk_set).delete()
+        send(action="post_remove")
 
     def remove_users_by_role(self, org, users=None, admins=None, auditors=None):
         from users.models import User

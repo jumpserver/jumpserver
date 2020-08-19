@@ -18,6 +18,7 @@ from django.shortcuts import reverse
 
 from common.local import LOCAL_DYNAMIC_SETTINGS
 from orgs.utils import current_org
+from orgs.models import OrganizationMember
 from common.utils import date_expired_default, get_logger, lazyproperty
 from common import fields
 from common.const import choices
@@ -154,7 +155,7 @@ class AuthMixin:
 class RoleMixin:
     class ROLE(ChoiceSet):
         ADMIN = choices.ADMIN, _('System administrator')
-        USER = choices.USER, _('System User')
+        USER = choices.USER, _('User')
         AUDITOR = choices.AUDITOR, _('System auditor')
         APP = 'App', _('Application')
 
@@ -189,9 +190,19 @@ class RoleMixin:
         return roles
 
     @lazyproperty
-    def org_role_display(self):
+    def org_roles_label_list(self):
         from orgs.models import ROLE as ORG_ROLE
-        return ' | '.join([str(ORG_ROLE[role]) for role in self.org_roles if role in ORG_ROLE])
+        return [str(ORG_ROLE[role]) for role in self.org_roles if role in ORG_ROLE]
+
+    @lazyproperty
+    def org_role_display(self):
+        return ' | '.join(self.org_roles_label_list)
+
+    @lazyproperty
+    def total_role_display(self):
+        roles = list({self.role_display, *self.org_roles_label_list})
+        roles.sort()
+        return ' | '.join(roles)
 
     def current_org_roles(self):
         from orgs.models import OrganizationMember, ROLE as ORG_ROLE
@@ -320,12 +331,7 @@ class RoleMixin:
     def remove(self):
         if not current_org.is_real():
             return
-        if self.can_user_current_org:
-            current_org.users.remove(self)
-        if self.can_admin_current_org:
-            current_org.admins.remove(self)
-        if self.can_audit_current_org:
-            current_org.auditors.remove(self)
+        OrganizationMember.objects.remove_users(current_org, [self])
 
 
 class TokenMixin:
