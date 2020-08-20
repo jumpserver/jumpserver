@@ -4,6 +4,7 @@ from urllib.parse import urljoin
 from django.conf import settings
 from django.utils.translation import ugettext as _
 
+from common.const.front_urls import TICKET_DETAIL
 from common.utils import get_logger
 from common.tasks import send_mail_async
 
@@ -20,11 +21,7 @@ def send_new_ticket_mail_to_assignees(ticket: Ticket, assignees):
     subject = '{}: {}'.format(_("New ticket"), ticket.title)
 
     # 这里要设置前端地址，因为要直接跳转到页面
-    if ticket.type == ticket.TYPE.REQUEST_ASSET_PERM:
-        detail_url = urljoin(settings.SITE_URL, f'/tickets/tickets/request-asset-perm/{ticket.id}')
-    else:
-        detail_url = urljoin(settings.SITE_URL, f'/tickets/tickets/{ticket.id}')
-
+    detail_url = urljoin(settings.SITE_URL, TICKET_DETAIL.format(id=ticket.id))
     message = _("""
         <div>
             <p>Your has a new ticket</p>

@@ -1,3 +1,5 @@
+import textwrap
+
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.decorators import action
@@ -8,7 +10,7 @@ from orgs.models import Organization, ROLE as ORG_ROLE
 from users.models.user import User
 from common.const.http import POST, GET
 from common.drf.api import JMSModelViewSet
-from common.permissions import IsValidUser
+from common.permissions import IsValidUser, IsObjectOwner
 from common.utils.django import get_object_or_none
 from common.utils.timezone import dt_parser
 from common.drf.serializers import EmptySerializer
@@ -31,6 +33,7 @@ class RequestAssetPermTicketViewSet(JMSModelViewSet):
         'default': serializers.RequestAssetPermTicketSerializer,
         'approve': EmptySerializer,
         'reject': EmptySerializer,
+        'close': EmptySerializer,
         'assignees': serializers.AssigneeSerializer,
     }
     permission_classes = (IsValidUser,)
@@ -61,13 +64,13 @@ class RequestAssetPermTicketViewSet(JMSModelViewSet):
         ips = ', '.join(meta.get('ips', []))
         confirmed_assets = ', '.join(meta.get('confirmed_assets', []))
 
-        return f'''
+        return textwrap.dedent(f'''\
             {_('IP group')}: {ips}
             {_('Hostname')}: {meta.get('hostname', '')}
             {_('System user')}: {meta.get('system_user', '')}
             {_('Confirmed assets')}: {confirmed_assets}
             {_('Confirmed system user')}: {meta.get('confirmed_system_user', '')}
-        '''
+        ''')
 
     @action(detail=True, methods=[POST], permission_classes=[IsAssignee, IsValidUser])
     def reject(self, request, *args, **kwargs):
@@ -101,6 +104,13 @@ class RequestAssetPermTicketViewSet(JMSModelViewSet):
             raise ConfirmedSystemUserChanged(detail=_('Confirmed system-user changed'))
 
         self._create_asset_permission(instance, assets, system_user)
+        return Response({'detail': _('Succeed')})
+
+    @action(detail=True, methods=[POST], permission_classes=[IsAssignee | IsObjectOwner])
+    def close(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.status = Ticket.STATUS.CLOSED
+        instance.save()
         return Response({'detail': _('Succeed')})
 
     def _create_asset_permission(self, instance: Ticket, assets, system_user):

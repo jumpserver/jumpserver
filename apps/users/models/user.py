@@ -18,6 +18,7 @@ from django.shortcuts import reverse
 
 from common.local import LOCAL_DYNAMIC_SETTINGS
 from orgs.utils import current_org
+from orgs.models import OrganizationMember
 from common.utils import date_expired_default, get_logger, lazyproperty
 from common import fields
 from common.const import choices
@@ -153,9 +154,9 @@ class AuthMixin:
 
 class RoleMixin:
     class ROLE(ChoiceSet):
-        ADMIN = choices.ADMIN, _('Super administrator')
+        ADMIN = choices.ADMIN, _('System administrator')
+        AUDITOR = choices.AUDITOR, _('System auditor')
         USER = choices.USER, _('User')
-        AUDITOR = choices.AUDITOR, _('Super auditor')
         APP = 'App', _('Application')
 
     role = ROLE.USER
@@ -164,15 +165,15 @@ class RoleMixin:
     def role_display(self):
         return self.get_role_display()
 
-    @property
-    def org_role_display(self):
+    @lazyproperty
+    def org_roles(self):
         from orgs.models import ROLE as ORG_ROLE
 
         if not current_org.is_real():
             if self.is_superuser:
-                return ORG_ROLE.ADMIN.label
+                return [ORG_ROLE.ADMIN]
             else:
-                return ORG_ROLE.USER.label
+                return [ORG_ROLE.USER]
 
         if hasattr(self, 'gc_m2m_org_members__role'):
             names = self.gc_m2m_org_members__role
@@ -184,8 +185,24 @@ class RoleMixin:
             roles = set(self.m2m_org_members.filter(
                 org_id=current_org.id
             ).values_list('role', flat=True))
+        roles = list(roles)
+        roles.sort()
+        return roles
 
-        return ' | '.join([str(ORG_ROLE[role]) for role in roles if role in ORG_ROLE])
+    @lazyproperty
+    def org_roles_label_list(self):
+        from orgs.models import ROLE as ORG_ROLE
+        return [str(ORG_ROLE[role]) for role in self.org_roles if role in ORG_ROLE]
+
+    @lazyproperty
+    def org_role_display(self):
+        return ' | '.join(self.org_roles_label_list)
+
+    @lazyproperty
+    def total_role_display(self):
+        roles = list({self.role_display, *self.org_roles_label_list})
+        roles.sort()
+        return ' | '.join(roles)
 
     def current_org_roles(self):
         from orgs.models import OrganizationMember, ROLE as ORG_ROLE
@@ -314,12 +331,7 @@ class RoleMixin:
     def remove(self):
         if not current_org.is_real():
             return
-        if self.can_user_current_org:
-            current_org.users.remove(self)
-        if self.can_admin_current_org:
-            current_org.admins.remove(self)
-        if self.can_audit_current_org:
-            current_org.auditors.remove(self)
+        OrganizationMember.objects.remove_users(current_org, [self])
 
 
 class TokenMixin:

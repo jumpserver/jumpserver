@@ -7,7 +7,6 @@ from rest_framework import serializers
 
 from common.utils import validate_ssh_public_key
 from common.mixins import CommonBulkSerializerMixin
-from common.serializers import AdaptedBulkListSerializer
 from common.permissions import CanUpdateDeleteUser
 from common.drf.fields import GroupConcatedPrimaryKeyRelatedField
 from orgs.models import ROLE as ORG_ROLE
@@ -51,17 +50,12 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
     login_blocked = serializers.SerializerMethodField()
     can_update = serializers.SerializerMethodField()
     can_delete = serializers.SerializerMethodField()
-    org_role = serializers.ChoiceField(
-        label=_('Organization role name'), write_only=True,
-        allow_null=True, required=False, allow_blank=True,
-        choices=ORG_ROLE.choices
-    )
-    total_role_display = serializers.SerializerMethodField(label=_('Total role name'))
+    org_roles = serializers.ListField(label=_('Organization role name'), allow_null=True, required=False,
+                                      child=serializers.ChoiceField(choices=ORG_ROLE.choices))
     key_prefix_block = "_LOGIN_BLOCK_{}"
 
     class Meta:
         model = User
-        list_serializer_class = AdaptedBulkListSerializer
         # mini 是指能识别对象的最小单元
         fields_mini = ['id', 'name', 'username']
         # small 指的是 不需要计算的直接能从一张表中获取到的数据
@@ -75,7 +69,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         ]
         fields = fields_small + [
             'groups', 'role', 'groups_display', 'role_display',
-            'can_update', 'can_delete', 'login_blocked', 'org_role'
+            'can_update', 'can_delete', 'login_blocked', 'org_roles'
         ]
 
         extra_kwargs = {
@@ -92,6 +86,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
             'source_display': {'label': _('Source name')},
             'org_role_display': {'label': _('Organization role name')},
             'role_display': {'label': _('Super role name')},
+            'total_role_display': {'label': _('Total role name')}
         }
 
     def __init__(self, *args, **kwargs):
@@ -109,9 +104,6 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
             choices.pop(User.ROLE.ADMIN, None)
             choices.pop(User.ROLE.AUDITOR, None)
         role._choices = choices
-
-    def get_total_role_display(self, instance):
-        return ' | '.join({str(instance.role_display), str(instance.org_role_display)})
 
     def validate_role(self, value):
         request = self.context.get('request')

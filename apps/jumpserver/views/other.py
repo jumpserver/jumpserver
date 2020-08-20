@@ -52,6 +52,7 @@ def redirect_format_api(request, *args, **kwargs):
         return JsonResponse({"msg": "Redirect url failed: {}".format(_path)}, status=404)
 
 
+@csrf_exempt
 def redirect_old_apps_view(request, *args, **kwargs):
     path = request.get_full_path()
     if path.find('/core') != -1:
