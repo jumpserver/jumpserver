@@ -255,10 +255,10 @@ class FamilyMixin:
         ancestor_keys = self.get_ancestor_keys(with_self=with_self)
         return self.__class__.objects.filter(key__in=ancestor_keys)
 
-    @property
-    def parent_key(self):
-        parent_key = ":".join(self.key.split(":")[:-1])
-        return parent_key
+    # @property
+    # def parent_key(self):
+    #     parent_key = ":".join(self.key.split(":")[:-1])
+    #     return parent_key
 
     def is_parent(self, other):
         return other.is_children(self)
@@ -315,10 +315,10 @@ class NodeAssetsMixin:
     key = ''
     id = None
 
-    @lazyproperty
-    def assets_amount(self):
-        amount = self.tree().assets_amount(self.key)
-        return amount
+    # @lazyproperty
+    # def assets_amount(self):
+    #     amount = self.tree().assets_amount(self.key)
+    #     return amount
 
     def get_all_assets(self):
         from .asset import Asset
@@ -502,7 +502,7 @@ class Node(OrgModelMixin, SomeNodesMixin, TreeMixin, FamilyMixin, FullValueMixin
     value = models.CharField(max_length=128, verbose_name=_("Value"))
     child_mark = models.IntegerField(default=0)
     date_create = models.DateTimeField(auto_now_add=True)
-    parent_key = models.CharField(unique=True, max_length=64, verbose_name=_("Parent key"),
+    parent_key = models.CharField(max_length=64, verbose_name=_("Parent key"),
                                   db_index=True, default='')
     assets_amount = models.IntegerField(default=0)
 

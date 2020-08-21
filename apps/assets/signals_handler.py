@@ -1,12 +1,17 @@
 # -*- coding: utf-8 -*-
 #
+from operator import add, sub
+from functools import partial
+
 from collections import defaultdict
 from django.db.models.signals import (
     post_save, m2m_changed, post_delete
 )
 from django.db.models.aggregates import Count
+from django.db.models import Q, F
 from django.dispatch import receiver
 
+from common.const.signals import PRE_ADD, POST_REMOVE, PRE_CLEAR
 from common.utils import get_logger
 from common.decorator import on_transaction_commit
 from orgs.utils import tmp_to_root_org
@@ -228,6 +233,51 @@ def on_asset_nodes_remove(sender, instance=None, action='', model=None,
         assets_not_has_node = assets.annotate(nodes_count=Count('nodes'))\
             .filter(nodes_count=0).values_list('id', flat=True)
     Node.org_root().assets.add(*tuple(assets_not_has_node))
+
+
+def _update_node_assets_amount(node: Node, asset_pk_set: set, operator=add):
+    """
+    :param asset_pk_set: 内部不会修改该值
+    """
+    ancestor_keys = node.get_ancestor_keys(with_self=True)
+    for ancestor_key in ancestor_keys:
+        # 祖先节点的顺序是从下往上的
+        asset_pk_set -= set(Asset.objects.filter(
+            id__in=asset_pk_set
+        ).filter(
+            Q(nodes__key__startswith=f'{ancestor_key}:') |
+            Q(nodes__key=ancestor_key)
+        ).distinct().values_list('id', flat=True))
+        if not asset_pk_set:
+            # 该节点包含所有要增加的资产，它及其祖先都不用更新资产数
+            break
+        Node.objects.filter(
+            key=ancestor_key
+        ).update(assets_amount=operator(F('assets_amount'), len(asset_pk_set)))
+
+
+@receiver(m2m_changed, sender=Asset.nodes.through)
+def update_nodes_assets_amount(action, instance, reverse, pk_set, **kwargs):
+    if action == PRE_ADD:
+        operator = add
+    elif action == POST_REMOVE:
+        operator = sub
+    elif action in (PRE_CLEAR,):
+        raise ValueError
+    else:
+        return
+    _update = partial(_update_node_assets_amount, operator=operator)
+
+    if reverse:
+        node: Node = instance
+        asset_pk_set = set(pk_set)
+        _update(node, asset_pk_set)
+    else:
+        asset_pk_set = set(instance.id)
+        node_pk_set = pk_set
+        nodes = Node.objects.filter(id__in=node_pk_set)
+        for node in nodes:
+            _update(node, asset_pk_set)
 
 
 @receiver([post_save, post_delete], sender=Node)
