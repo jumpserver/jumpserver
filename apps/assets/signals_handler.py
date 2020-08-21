@@ -258,15 +258,18 @@ def _update_node_assets_amount(node: Node, asset_pk_set: set, operator=add):
 
 @receiver(m2m_changed, sender=Asset.nodes.through)
 def update_nodes_assets_amount(action, instance, reverse, pk_set, **kwargs):
-    if action == PRE_ADD:
-        operator = add
-    elif action == POST_REMOVE:
-        operator = sub
-    elif action in (PRE_CLEAR,):
+    refused = (PRE_CLEAR,)
+    if action in refused:
         raise ValueError
-    else:
+
+    mapper = {
+        PRE_ADD: add,
+        POST_REMOVE: sub
+    }
+    if action not in mapper:
         return
-    _update = partial(_update_node_assets_amount, operator=operator)
+
+    _update = partial(_update_node_assets_amount, operator=mapper[action])
 
     if reverse:
         node: Node = instance
@@ -274,8 +277,7 @@ def update_nodes_assets_amount(action, instance, reverse, pk_set, **kwargs):
         _update(node, asset_pk_set)
     else:
         asset_pk_set = set(instance.id)
-        node_pk_set = pk_set
-        nodes = Node.objects.filter(id__in=node_pk_set)
+        nodes = Node.objects.filter(id__in=pk_set)
         for node in nodes:
             _update(node, asset_pk_set)
 
