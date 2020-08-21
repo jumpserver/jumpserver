@@ -4,6 +4,10 @@
 [![Django](https://img.shields.io/badge/django-2.2-brightgreen.svg?style=plastic)](https://www.djangoproject.com/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/jumpserver/jms_all.svg)](https://hub.docker.com/u/jumpserver)
 
+|Developer Wanted|
+|------------------|
+|JumpServer 正在寻找开发者，一起为改变世界做些贡献吧，哪怕一点点，联系我 <ibuler@fit2cloud.com> |
+
 JumpServer 是全球首款开源的堡垒机，使用 GNU GPL v2.0 开源协议，是符合 4A 规范的运维安全审计系统。
 
 JumpServer 使用 Python / Django 为主进行开发，遵循 Web 2.0 规范，配备了业界领先的 Web Terminal 方案，交互界面美观、用户体验好。
