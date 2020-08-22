@@ -263,7 +263,7 @@ def update_nodes_assets_amount(action, instance, reverse, pk_set, **kwargs):
         _update(node, asset_pk_set)
     else:
         asset_pk = instance.id
-        node_keys = Node.objects.filter(id__in=pk_set).values_list('key', flat=True)
+        node_keys = set(Node.objects.filter(id__in=pk_set).values_list('key', flat=True))
 
         parent_keys = set()
         for key in node_keys:
