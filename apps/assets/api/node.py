@@ -156,7 +156,6 @@ class NodeChildrenAsTreeApi(NodeChildrenApi):
     def get_queryset(self):
         queryset = super().get_queryset()
         queryset = [node.as_tree_node() for node in queryset]
-        queryset = self.add_assets_if_need(queryset)
         queryset = sorted(queryset)
         return queryset
 
@@ -171,10 +170,6 @@ class NodeChildrenAsTreeApi(NodeChildrenApi):
         for asset in assets:
             queryset.append(asset.as_tree_node(self.instance))
         return queryset
-
-    def check_need_refresh_nodes(self):
-        if self.request.query_params.get('refresh', '0') == '1':
-            Node.refresh_nodes()
 
 
 class NodeAssetsApi(generics.ListAPIView):
@@ -267,7 +262,6 @@ class NodeTaskCreateApi(generics.CreateAPIView):
 
     @staticmethod
     def refresh_nodes_cache():
-        Node.refresh_nodes()
         Task = namedtuple('Task', ['id'])
         task = Task(id="0")
         return task

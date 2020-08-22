@@ -17,8 +17,15 @@ from orgs.utils import get_current_org, tmp_to_org, current_org
 from orgs.models import Organization
 
 
-__all__ = ['Node', 'FamilyMixin']
+__all__ = ['Node', 'FamilyMixin', 'compute_parent_key']
 logger = get_logger(__name__)
+
+
+def compute_parent_key(key):
+    try:
+        return key[:key.rindex(':')]
+    except ValueError:
+        return ''
 
 
 class NodeQuerySet(models.QuerySet):
@@ -175,13 +182,16 @@ class FamilyMixin:
         return re.match(children_pattern, self.key)
 
     def get_children(self, with_self=False):
-        pattern = self.get_children_key_pattern(with_self=with_self)
-        return Node.objects.filter(key__regex=pattern)
+        q = Q(parent_key=self.key)
+        if with_self:
+            q |= Q(key=self.key)
+        return Node.objects.filter(q)
 
     def get_all_children(self, with_self=False):
-        pattern = self.get_all_children_pattern(with_self=with_self)
-        children = Node.objects.filter(key__regex=pattern)
-        return children
+        q = Q(key__startswith=f'{self.key}:')
+        if with_self:
+            q |= Q(key=self.key)
+        return Node.objects.filter(q)
 
     @property
     def children(self):
@@ -261,7 +271,7 @@ class FamilyMixin:
     #     return parent_key
 
     def compute_parent_key(self):
-        return ":".join(self.key.split(":")[:-1])
+        return compute_parent_key(self.key)
 
     def is_parent(self, other):
         return other.is_children(self)

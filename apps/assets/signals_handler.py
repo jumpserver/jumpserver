@@ -12,7 +12,7 @@ from django.dispatch import receiver
 from common.const.signals import PRE_ADD, POST_ADD, POST_REMOVE, PRE_CLEAR
 from common.utils import get_logger
 from common.decorator import on_transaction_commit
-from .models import Asset, SystemUser, Node
+from .models import Asset, SystemUser, Node, compute_parent_key
 from users.models import User
 from .tasks import (
     update_assets_hardware_info_util,
@@ -254,14 +254,60 @@ def update_nodes_assets_amount(action, instance, reverse, pk_set, **kwargs):
     if action not in mapper:
         return
 
-    _update = partial(_update_node_assets_amount, operator=mapper[action])
+    operator = mapper[action]
+    _update = partial(_update_node_assets_amount, operator=operator)
 
     if reverse:
         node: Node = instance
         asset_pk_set = set(pk_set)
         _update(node, asset_pk_set)
     else:
-        asset_pk_set = set(instance.id)
-        nodes = Node.objects.filter(id__in=pk_set)
-        for node in nodes:
-            _update(node, asset_pk_set)
+        asset_pk = instance.id
+        node_keys = Node.objects.filter(id__in=pk_set).values_list('key', flat=True)
+
+        parent_keys = set()
+        for key in node_keys:
+            parent_keys.update(Node.get_node_ancestor_keys(key))
+
+        # 如果该节点存在父节点中，干掉
+        node_keys -= parent_keys
+
+        for key in node_keys:
+            exists = Asset.objects.filter(
+                id=asset_pk
+            ).filter(
+                Q(nodes__key__startswith=f'{key}:') | Q(nodes__key=key)
+            ).exists()
+            if exists:
+                # 如果资产还存在该节点，那么他及其祖先节点都不用处理
+                _parent_key = compute_parent_key(key)
+                # 这里判断 `_parent_key` 不能是空，防止数据错误导致的死循环
+                # 判断是否在集合里，来区分是否已被处理过
+                while _parent_key and _parent_key in parent_keys:
+                    parent_keys.remove(_parent_key)
+                    _parent_key = compute_parent_key(_parent_key)
+                continue
+            else:
+                to_update_keys = [key]
+                _parent_key = compute_parent_key(key)
+                # 这里判断 `_parent_key` 不能是空，防止数据错误导致的死循环
+                # 判断是否在集合里，来区分是否已被处理过
+                while _parent_key and _parent_key in parent_keys:
+                    exists = Asset.objects.filter(
+                        id=asset_pk
+                    ).filter(
+                        Q(nodes__key__startswith=f'{_parent_key}:') | Q(nodes__key=_parent_key)
+                    ).exists()
+                    if exists:
+                        while _parent_key and _parent_key in parent_keys:
+                            parent_keys.remove(_parent_key)
+                            _parent_key = compute_parent_key(_parent_key)
+                        break
+                    else:
+                        to_update_keys.append(_parent_key)
+                        parent_keys.remove(_parent_key)
+                        _parent_key = compute_parent_key(_parent_key)
+
+                Node.objects.filter(key__in=to_update_keys).update(
+                    assets_amount=operator(F('assets_amount'), 1)
+                )
