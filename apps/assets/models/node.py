@@ -496,7 +496,7 @@ class SomeNodesMixin:
                     logger.info('Modify key ( {} > {} )'.format(old_key, new_key))
 
 
-class Node(OrgModelMixin, SomeNodesMixin, TreeMixin, FamilyMixin, FullValueMixin, NodeAssetsMixin):
+class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, FullValueMixin, NodeAssetsMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     key = models.CharField(unique=True, max_length=64, verbose_name=_("Key"), db_index=True)  # '1:1:1:1'
     value = models.CharField(max_length=128, verbose_name=_("Value"))
@@ -542,14 +542,6 @@ class Node(OrgModelMixin, SomeNodesMixin, TreeMixin, FamilyMixin, FullValueMixin
     @property
     def level(self):
         return len(self.key.split(':'))
-
-    @classmethod
-    def refresh_nodes(cls):
-        cls.refresh_tree()
-
-    @classmethod
-    def refresh_assets(cls):
-        cls.refresh_node_assets()
 
     def as_tree_node(self):
         from common.tree import TreeNode

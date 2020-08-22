@@ -3,20 +3,18 @@
 from operator import add, sub
 from functools import partial
 
-from collections import defaultdict
 from django.db.models.signals import (
-    post_save, m2m_changed, post_delete
+    post_save, m2m_changed
 )
 from django.db.models.aggregates import Count
-from django.db.models import Q, F
+from django.db.models import Q, F, Model
 from django.dispatch import receiver
 
-from common.const.signals import PRE_ADD, POST_REMOVE, PRE_CLEAR
+from common.const.signals import PRE_ADD, POST_ADD, POST_REMOVE, PRE_CLEAR
 from common.utils import get_logger
 from common.decorator import on_transaction_commit
-from orgs.utils import tmp_to_root_org
-from .models import Asset, SystemUser, Node, AuthBook
-from .utils import TreeService
+from .models import Asset, SystemUser, Node
+from users.models import User
 from .tasks import (
     update_assets_hardware_info_util,
     test_asset_connectivity_util,
@@ -59,15 +57,6 @@ def on_asset_created_or_update(sender, instance=None, created=False, **kwargs):
             instance.nodes.add(Node.org_root())
 
 
-@receiver(post_delete, sender=Asset)
-def on_asset_delete(sender, instance=None, **kwargs):
-    """
-    当资产删除时，刷新节点，节点中存在节点和资产的关系
-    """
-    logger.debug("Asset delete signal recv: {}".format(instance))
-    Node.refresh_assets()
-
-
 @receiver(post_save, sender=SystemUser, dispatch_uid="jms")
 def on_system_user_update(sender, instance=None, created=True, **kwargs):
     """
@@ -87,7 +76,7 @@ def on_system_user_assets_change(sender, instance=None, action='', model=None, p
     """
     当系统用户和资产关系发生变化时，应该重新推送系统用户到新添加的资产中
     """
-    if action != "post_add":
+    if action != POST_ADD:
         return
     logger.debug("System user assets change signal recv: {}".format(instance))
     queryset = model.objects.filter(pk__in=pk_set)
@@ -106,7 +95,7 @@ def on_system_user_users_change(sender, instance=None, action='', model=None, pk
     """
     当系统用户和用户关系发生变化时，应该重新推送系统用户资产中
     """
-    if action != "post_add":
+    if action != POST_ADD:
         return
     if not instance.username_same_with_user:
         return
@@ -125,7 +114,7 @@ def on_system_user_nodes_change(sender, instance=None, action=None, model=None, 
     """
     当系统用户和节点关系发生变化时，应该将节点下资产关联到新的系统用户上
     """
-    if action != "post_add":
+    if action != POST_ADD:
         return
     logger.info("System user nodes update signal recv: {}".format(instance))
 
@@ -140,99 +129,87 @@ def on_system_user_nodes_change(sender, instance=None, action=None, model=None, 
 
 
 @receiver(m2m_changed, sender=SystemUser.groups.through)
-def on_system_user_groups_change(sender, instance=None, action=None, model=None,
-                                 pk_set=None, reverse=False, **kwargs):
+def on_system_user_groups_change(instance, action, pk_set, reverse, **kwargs):
     """
     当系统用户和用户组关系发生变化时，应该将组下用户关联到新的系统用户上
     """
-    if action != "post_add" or reverse:
+    if action != POST_ADD:
         return
     logger.info("System user groups update signal recv: {}".format(instance))
-    groups = model.objects.filter(pk__in=pk_set).annotate(users_count=Count("users"))
-    users = groups.filter(users_count__gt=0).values_list('users', flat=True)
-    instance.users.add(*tuple(users))
+    if reverse:
+        system_user_pk_set = [instance.id]
+        group_pk_set = pk_set
+    else:
+        system_user_pk_set = pk_set
+        group_pk_set = [instance.id]
+
+    user_pk_set = User.objects.filter(
+        groups__in=group_pk_set
+    ).distinct().values_list('id', flat=True)
+
+    m2m_model = SystemUser.users.through
+    exist = set(m2m_model.objects.filter(
+        systemuser_id__in=system_user_pk_set,
+        user_id__in=user_pk_set
+    ).values_list('systemuser_id', 'user_id'))
+
+    to_create = []
+    for system_user_pk in system_user_pk_set:
+        for user_pk in user_pk_set:
+            if (system_user_pk, user_pk) in exist:
+                continue
+            to_create.append(m2m_model(
+                systemuser_id=system_user_pk,
+                user_id=user_pk
+            ))
+    m2m_model.objects.bulk_create(to_create)
 
 
 @receiver(m2m_changed, sender=Asset.nodes.through)
-def on_asset_nodes_change(sender, instance=None, action='', **kwargs):
+def on_asset_nodes_add(instance, action, reverse, pk_set, **kwargs):
     """
-    资产节点发生变化时，刷新节点
-    """
-    if action.startswith('post'):
-        logger.debug("Asset nodes change signal recv: {}".format(instance))
-        Node.refresh_assets()
-        with tmp_to_root_org():
-            Node.refresh_assets()
+    本操作共访问 4 次数据库
 
-
-@receiver(m2m_changed, sender=Asset.nodes.through)
-def on_asset_nodes_add(sender, instance=None, action='', model=None, pk_set=None, **kwargs):
-    """
     当资产的节点发生变化时，或者 当节点的资产关系发生变化时，
     节点下新增的资产，添加到节点关联的系统用户中
     """
-    if action != "post_add":
+    if action != POST_ADD:
         return
     logger.debug("Assets node add signal recv: {}".format(action))
-    if model == Node:
-        nodes = model.objects.filter(pk__in=pk_set).values_list('key', flat=True)
-        assets = [instance.id]
-    else:
+    if reverse:
         nodes = [instance.key]
-        assets = model.objects.filter(pk__in=pk_set).values_list('id', flat=True)
+        asset_ids = pk_set
+    else:
+        nodes = Node.objects.filter(pk__in=pk_set).values_list('key', flat=True)
+        asset_ids = [instance.id]
+
     # 节点资产发生变化时，将资产关联到节点及祖先节点关联的系统用户, 只关注新增的
     nodes_ancestors_keys = set()
-    node_tree = TreeService.new()
     for node in nodes:
-        ancestors_keys = node_tree.ancestors_ids(nid=node)
-        nodes_ancestors_keys.update(ancestors_keys)
-    system_users = SystemUser.objects.filter(nodes__key__in=nodes_ancestors_keys)
+        nodes_ancestors_keys.update(Node.get_node_ancestor_keys(node, with_self=True))
 
-    system_users_assets = defaultdict(set)
-    for system_user in system_users:
-        assets_has_set = system_user.assets.all().filter(id__in=assets).values_list('id', flat=True)
-        assets_remain = set(assets) - set(assets_has_set)
-        system_users_assets[system_user].update(assets_remain)
-    for system_user, _assets in system_users_assets.items():
-        system_user.assets.add(*tuple(_assets))
+    # 查询所有祖先节点关联的系统用户，都是要跟资产建立关系的
+    system_user_ids = SystemUser.objects.filter(
+        nodes__key__in=nodes_ancestors_keys
+    ).distinct().values_list('id', flat=True)
 
+    # 查询所有已存在的关系
+    m2m_model = SystemUser.assets.through
+    exist = set(m2m_model.objects.filter(
+        systemuser_id__in=system_user_ids, asset_id__in=asset_ids
+    ).values_list('systemuser_id', 'asset_id'))
 
-@receiver(m2m_changed, sender=Asset.nodes.through)
-def on_asset_nodes_remove(sender, instance=None, action='', model=None,
-                          pk_set=None, **kwargs):
+    to_create = []
 
-    """
-    监控资产删除节点关系, 或节点删除资产，避免产生游离资产
-    """
-    if action not in ["post_remove", "pre_clear", "post_clear"]:
-        return
-    if action == "pre_clear":
-        if model == Node:
-            instance._nodes = list(instance.nodes.all())
-        else:
-            instance._assets = list(instance.assets.all())
-        return
-    logger.debug("Assets node remove signal recv: {}".format(action))
-    if action == "post_remove":
-        queryset = model.objects.filter(pk__in=pk_set)
-    else:
-        if model == Node:
-            queryset = instance._nodes
-        else:
-            queryset = instance._assets
-    if model == Node:
-        assets = [instance]
-    else:
-        assets = queryset
-    if isinstance(assets, list):
-        assets_not_has_node = []
-        for asset in assets:
-            if asset.nodes.all().count() == 0:
-                assets_not_has_node.append(asset.id)
-    else:
-        assets_not_has_node = assets.annotate(nodes_count=Count('nodes'))\
-            .filter(nodes_count=0).values_list('id', flat=True)
-    Node.org_root().assets.add(*tuple(assets_not_has_node))
+    for system_user_id in system_user_ids:
+        for asset_id in asset_ids:
+            if (system_user_id, asset_id) in exist:
+                continue
+            to_create.append(m2m_model(
+                systemuser_id=system_user_id,
+                asset_id=asset_id
+            ))
+    m2m_model.objects.bulk_create(to_create)
 
 
 def _update_node_assets_amount(node: Node, asset_pk_set: set, operator=add):
@@ -280,11 +257,3 @@ def update_nodes_assets_amount(action, instance, reverse, pk_set, **kwargs):
         nodes = Node.objects.filter(id__in=pk_set)
         for node in nodes:
             _update(node, asset_pk_set)
-
-
-@receiver([post_save, post_delete], sender=Node)
-def on_node_update_or_created(sender, **kwargs):
-    # 刷新节点
-    Node.refresh_nodes()
-    with tmp_to_root_org():
-        Node.refresh_nodes()
