@@ -4,10 +4,9 @@ from operator import add, sub
 from functools import partial
 
 from django.db.models.signals import (
-    post_save, m2m_changed
+    post_save, m2m_changed, pre_save
 )
-from django.db.models.aggregates import Count
-from django.db.models import Q, F, Model
+from django.db.models import Q, F
 from django.dispatch import receiver
 
 from common.const.signals import PRE_ADD, POST_ADD, POST_REMOVE, PRE_CLEAR
@@ -35,6 +34,15 @@ def update_asset_hardware_info_on_created(asset):
 def test_asset_conn_on_created(asset):
     logger.debug("Test asset `{}` connectivity".format(asset))
     test_asset_connectivity_util.delay([asset])
+
+
+@receiver(pre_save, sender=Node)
+def set_parent_key_if_need(instance: Node, **kwargs):
+    # 这里暂时全部更新 `parent_key` 字段
+    # 注意：如果 `Node` 更新指定 `update_fields` 一定要加上
+    # `parent_key` 字段，如下
+    #   `Node.objects.update(update_fields=['parent_key'])`
+    instance.parent_key = instance.compute_parent_key()
 
 
 @receiver(post_save, sender=Asset)

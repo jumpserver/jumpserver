@@ -260,6 +260,9 @@ class FamilyMixin:
     #     parent_key = ":".join(self.key.split(":")[:-1])
     #     return parent_key
 
+    def compute_parent_key(self):
+        return ":".join(self.key.split(":")[:-1])
+
     def is_parent(self, other):
         return other.is_children(self)
 
