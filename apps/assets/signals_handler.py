@@ -271,48 +271,48 @@ def _remove_ancestor_keys(ancestor_key, tree_set):
         ancestor_key = compute_parent_key(ancestor_key)
 
 
+def _is_asset_exists_in_node(asset_pk, node_key):
+    return Asset.objects.filter(
+        id=asset_pk
+    ).filter(
+        Q(nodes__key__startswith=f'{node_key}:') | Q(nodes__key=node_key)
+    ).exists()
+
+
 def _update_nodes_asset_amount(node_keys, asset_pk, operator):
     # 所有相关节点的祖先节点，组成一棵局部树
-    parent_keys = set()
+    ancestor_keys = set()
     for key in node_keys:
-        parent_keys.update(Node.get_node_ancestor_keys(key))
+        ancestor_keys.update(Node.get_node_ancestor_keys(key))
 
     # 相关节点可能是其他相关节点的祖先节点，如果是从相关节点里干掉
-    node_keys -= parent_keys
+    node_keys -= ancestor_keys
 
     to_update_keys = []
     for key in node_keys:
         # 遍历相关节点，处理它及其祖先节点
-
         # 查询该节点是否包含待处理资产
-        exists = Asset.objects.filter(
-            id=asset_pk
-        ).filter(
-            Q(nodes__key__startswith=f'{key}:') | Q(nodes__key=key)
-        ).exists()
+        exists = _is_asset_exists_in_node(asset_pk, key)
+        parent_key = compute_parent_key(key)
 
-        _parent_key = compute_parent_key(key)
         if exists:
             # 如果资产在该节点，那么他及其祖先节点都不用处理
-            _remove_ancestor_keys(_parent_key, parent_keys)
+            _remove_ancestor_keys(parent_key, ancestor_keys)
             continue
         else:
+            # 不存在，要更新本节点
             to_update_keys.append(key)
-            # 这里判断 `_parent_key` 不能是空，防止数据错误导致的死循环
+            # 这里判断 `parent_key` 不能是空，防止数据错误导致的死循环
             # 判断是否在集合里，来区分是否已被处理过
-            while _parent_key and _parent_key in parent_keys:
-                exists = Asset.objects.filter(
-                    id=asset_pk
-                ).filter(
-                    Q(nodes__key__startswith=f'{_parent_key}:') | Q(nodes__key=_parent_key)
-                ).exists()
+            while parent_key and parent_key in ancestor_keys:
+                exists = _is_asset_exists_in_node(asset_pk, parent_key)
                 if exists:
-                    _remove_ancestor_keys(_parent_key, parent_keys)
+                    _remove_ancestor_keys(parent_key, ancestor_keys)
                     break
                 else:
-                    to_update_keys.append(_parent_key)
-                    parent_keys.remove(_parent_key)
-                    _parent_key = compute_parent_key(_parent_key)
+                    to_update_keys.append(parent_key)
+                    ancestor_keys.remove(parent_key)
+                    parent_key = compute_parent_key(parent_key)
 
     Node.objects.filter(key__in=to_update_keys).update(
         assets_amount=operator(F('assets_amount'), 1)
