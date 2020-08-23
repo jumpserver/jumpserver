@@ -260,7 +260,7 @@ def _update_node_assets_amount(node: Node, asset_pk_set: set, operator=add):
             break
         ancestor.assets_amount = operator(F('assets_amount'), len(asset_pk_set))
         to_update.append(ancestor)
-    Node.objects.bulk_update(to_update)
+    Node.objects.bulk_update(to_update, fields=('assets_amount', 'parent_key'))
 
 
 def _remove_ancestor_keys(ancestor_key, tree_set):
