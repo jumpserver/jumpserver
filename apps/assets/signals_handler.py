@@ -263,6 +263,62 @@ def _update_node_assets_amount(node: Node, asset_pk_set: set, operator=add):
     Node.objects.bulk_update(to_update)
 
 
+def _remove_ancestor_keys(ancestor_key, tree_set):
+    # 这里判断 `ancestor_key` 不能是空，防止数据错误导致的死循环
+    # 判断是否在集合里，来区分是否已被处理过
+    while ancestor_key and ancestor_key in tree_set:
+        tree_set.remove(ancestor_key)
+        ancestor_key = compute_parent_key(ancestor_key)
+
+
+def _update_nodes_asset_amount(node_keys, asset_pk, operator):
+    # 所有相关节点的祖先节点，组成一棵局部树
+    parent_keys = set()
+    for key in node_keys:
+        parent_keys.update(Node.get_node_ancestor_keys(key))
+
+    # 相关节点可能是其他相关节点的祖先节点，如果是从相关节点里干掉
+    node_keys -= parent_keys
+
+    to_update_keys = []
+    for key in node_keys:
+        # 遍历相关节点，处理它及其祖先节点
+
+        # 查询该节点是否包含待处理资产
+        exists = Asset.objects.filter(
+            id=asset_pk
+        ).filter(
+            Q(nodes__key__startswith=f'{key}:') | Q(nodes__key=key)
+        ).exists()
+
+        _parent_key = compute_parent_key(key)
+        if exists:
+            # 如果资产在该节点，那么他及其祖先节点都不用处理
+            _remove_ancestor_keys(_parent_key, parent_keys)
+            continue
+        else:
+            to_update_keys.append(key)
+            # 这里判断 `_parent_key` 不能是空，防止数据错误导致的死循环
+            # 判断是否在集合里，来区分是否已被处理过
+            while _parent_key and _parent_key in parent_keys:
+                exists = Asset.objects.filter(
+                    id=asset_pk
+                ).filter(
+                    Q(nodes__key__startswith=f'{_parent_key}:') | Q(nodes__key=_parent_key)
+                ).exists()
+                if exists:
+                    _remove_ancestor_keys(_parent_key, parent_keys)
+                    break
+                else:
+                    to_update_keys.append(_parent_key)
+                    parent_keys.remove(_parent_key)
+                    _parent_key = compute_parent_key(_parent_key)
+
+    Node.objects.filter(key__in=to_update_keys).update(
+        assets_amount=operator(F('assets_amount'), 1)
+    )
+
+
 @receiver(m2m_changed, sender=Asset.nodes.through)
 def update_nodes_assets_amount(action, instance, reverse, pk_set, **kwargs):
     # 不允许 `pre_clear` ，因为该信号没有 `pk_set`
@@ -286,51 +342,6 @@ def update_nodes_assets_amount(action, instance, reverse, pk_set, **kwargs):
         _update_node_assets_amount(node, asset_pk_set, operator)
     else:
         asset_pk = instance.id
+        # 与资产直接关联的节点
         node_keys = set(Node.objects.filter(id__in=pk_set).values_list('key', flat=True))
-
-        parent_keys = set()
-        for key in node_keys:
-            parent_keys.update(Node.get_node_ancestor_keys(key))
-
-        # 如果该节点存在父节点中，干掉
-        node_keys -= parent_keys
-
-        for key in node_keys:
-            exists = Asset.objects.filter(
-                id=asset_pk
-            ).filter(
-                Q(nodes__key__startswith=f'{key}:') | Q(nodes__key=key)
-            ).exists()
-            if exists:
-                # 如果资产还存在该节点，那么他及其祖先节点都不用处理
-                _parent_key = compute_parent_key(key)
-                # 这里判断 `_parent_key` 不能是空，防止数据错误导致的死循环
-                # 判断是否在集合里，来区分是否已被处理过
-                while _parent_key and _parent_key in parent_keys:
-                    parent_keys.remove(_parent_key)
-                    _parent_key = compute_parent_key(_parent_key)
-                continue
-            else:
-                to_update_keys = [key]
-                _parent_key = compute_parent_key(key)
-                # 这里判断 `_parent_key` 不能是空，防止数据错误导致的死循环
-                # 判断是否在集合里，来区分是否已被处理过
-                while _parent_key and _parent_key in parent_keys:
-                    exists = Asset.objects.filter(
-                        id=asset_pk
-                    ).filter(
-                        Q(nodes__key__startswith=f'{_parent_key}:') | Q(nodes__key=_parent_key)
-                    ).exists()
-                    if exists:
-                        while _parent_key and _parent_key in parent_keys:
-                            parent_keys.remove(_parent_key)
-                            _parent_key = compute_parent_key(_parent_key)
-                        break
-                    else:
-                        to_update_keys.append(_parent_key)
-                        parent_keys.remove(_parent_key)
-                        _parent_key = compute_parent_key(_parent_key)
-
-                Node.objects.filter(key__in=to_update_keys).update(
-                    assets_amount=operator(F('assets_amount'), 1)
-                )
+        _update_nodes_asset_amount(node_keys, asset_pk, operator)
