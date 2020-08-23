@@ -11,7 +11,11 @@ def fill_node_value(apps, schema_editor):
         assets_amount = Asset.objects.filter(
             Q(nodes__key__startswith=f'{node.key}:') | Q(nodes=node)
         ).distinct().count()
-        parent_key = ':'.join(node.key.split(':')[0:-1])
+        key = node.key
+        try:
+            parent_key = key[:key.rindex(':')]
+        except ValueError:
+            parent_key = ''
         node.assets_amount = assets_amount
         node.parent_key = parent_key
         node.save()
