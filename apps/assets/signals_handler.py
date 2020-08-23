@@ -222,27 +222,51 @@ def on_asset_nodes_add(instance, action, reverse, pk_set, **kwargs):
 
 def _update_node_assets_amount(node: Node, asset_pk_set: set, operator=add):
     """
+    本函数触及三次数据库
+
     :param asset_pk_set: 内部不会修改该值
+
+    * -> Node
+    # -> Asset
+
+           * [3]
+          / \
+         *   * [2]
+        /     \
+       *       * [1]
+      /       / \
+     *   [a] #  # [b]
+
     """
+    # 获取节点[1]祖先节点的 `key` 含自己，也就是[1, 2, 3]节点的`key`
     ancestor_keys = node.get_ancestor_keys(with_self=True)
-    for ancestor_key in ancestor_keys:
-        # 祖先节点的顺序是从下往上的
+    ancestors = Node.objects.filter(key__in=ancestor_keys).order_by('-key')
+    to_update = []
+    for ancestor in ancestors:
+        # 迭代祖先节点的`key`，顺序是 [1] -> [2] -> [3]
+        # 查询该节点及其后代节点是否包含要操作的资产，将包含的从要操作的
+        # 资产集合中去掉，他们是重复节点，无论增加或删除都不会影响节点的资产数量
+
         asset_pk_set -= set(Asset.objects.filter(
             id__in=asset_pk_set
         ).filter(
-            Q(nodes__key__startswith=f'{ancestor_key}:') |
-            Q(nodes__key=ancestor_key)
+            Q(nodes__key__startswith=f'{ancestor.key}:') |
+            Q(nodes__key=ancestor.key)
         ).distinct().values_list('id', flat=True))
         if not asset_pk_set:
-            # 该节点包含所有要增加的资产，它及其祖先都不用更新资产数
+            # 要操作的资产集合为空，说明都是重复资产，不用改变节点资产数量
+            # 而且既然它包含了，它的祖先节点肯定也包含了，所以祖先节点都不用
+            # 处理了
             break
-        Node.objects.filter(
-            key=ancestor_key
-        ).update(assets_amount=operator(F('assets_amount'), len(asset_pk_set)))
+        ancestor.assets_amount = operator(F('assets_amount'), len(asset_pk_set))
+        to_update.append(ancestor)
+    Node.objects.bulk_update(to_update)
 
 
 @receiver(m2m_changed, sender=Asset.nodes.through)
 def update_nodes_assets_amount(action, instance, reverse, pk_set, **kwargs):
+    # 不允许 `pre_clear` ，因为该信号没有 `pk_set`
+    # [官网](https://docs.djangoproject.com/en/3.1/ref/signals/#m2m-changed)
     refused = (PRE_CLEAR,)
     if action in refused:
         raise ValueError
@@ -255,12 +279,11 @@ def update_nodes_assets_amount(action, instance, reverse, pk_set, **kwargs):
         return
 
     operator = mapper[action]
-    _update = partial(_update_node_assets_amount, operator=operator)
 
     if reverse:
         node: Node = instance
         asset_pk_set = set(pk_set)
-        _update(node, asset_pk_set)
+        _update_node_assets_amount(node, asset_pk_set, operator)
     else:
         asset_pk = instance.id
         node_keys = set(Node.objects.filter(id__in=pk_set).values_list('key', flat=True))
