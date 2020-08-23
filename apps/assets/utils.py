@@ -5,6 +5,8 @@ from treelib.exceptions import NodeIDAbsentError
 from collections import defaultdict
 from copy import deepcopy
 
+from django.db.models import Q
+
 from common.utils import get_logger, timeit, lazyproperty
 from .models import Asset, Node
 
@@ -193,3 +195,14 @@ class TreeService(Tree):
 
     # def __setstate__(self, state):
     #     self.__dict__ = state
+
+
+def check_node_assets_amount():
+    for node in Node.objects.all():
+        assets_amount = Asset.objects.filter(
+            Q(nodes__key__startswith=f'{node.key}:') | Q(nodes=node)
+        ).distinct().count()
+
+        if node.assets_amount != assets_amount:
+            print(f'<Node:{node.key}> wrong assets amount '
+                  f'{node.assets_amount} right is {assets_amount}')
