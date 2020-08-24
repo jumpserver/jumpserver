@@ -269,7 +269,7 @@ def push_system_user_to_assets(system_user, assets, username=None):
     assets = _get_objects_if_need(Asset, assets)
     return push_system_user_util(system_user, assets, task_name, username=username)
 
-
+from django_redis.client import DefaultClient
 # @shared_task
 # @register_as_period_task(interval=3600)
 # @after_app_ready_start

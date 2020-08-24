@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 from operator import add, sub
-from functools import partial
 
 from django.db.models.signals import (
     post_save, m2m_changed, pre_save

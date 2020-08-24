@@ -1,0 +1,1 @@
+ASSETS_UPDATE_NODE_TREE_KEY = 'distributed_lock_assets_update_node_tree'

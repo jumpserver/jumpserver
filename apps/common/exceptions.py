@@ -18,3 +18,8 @@ class JMSObjectDoesNotExist(APIException):
         if detail is None and object_name:
             detail = self.default_detail % object_name
         super(JMSObjectDoesNotExist, self).__init__(detail=detail, code=code)
+
+
+class SomeoneIsDoingThis(JMSException):
+    status_code = status.HTTP_409_CONFLICT
+    default_detail = _('Someone else is doing this. Please wait for complete')
