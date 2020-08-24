@@ -145,16 +145,25 @@ def on_system_user_groups_change(instance, action, pk_set, reverse, **kwargs):
         return
     logger.info("System user groups update signal recv: {}".format(instance))
     if reverse:
+        system_user_pk_set = pk_set
+        username_same_with_users = set(SystemUser.objects.filter(
+            username_same_with_user=True,
+            id__in=pk_set).values_list('id', flat=True)
+        )
+        group_pk_set = [instance.id]
+    else:
+        username_same_with_users = set()
+        if instance.username_same_with_user:
+            username_same_with_users.add(instance.id)
         system_user_pk_set = [instance.id]
         group_pk_set = pk_set
-    else:
-        system_user_pk_set = pk_set
-        group_pk_set = [instance.id]
 
+    # 查询组的所有用户 `id`
     user_pk_set = User.objects.filter(
         groups__in=group_pk_set
     ).distinct().values_list('id', flat=True)
 
+    # 查询已存在的`SystemUser`与`User`的关系
     m2m_model = SystemUser.users.through
     exist = set(m2m_model.objects.filter(
         systemuser_id__in=system_user_pk_set,
@@ -163,6 +172,7 @@ def on_system_user_groups_change(instance, action, pk_set, reverse, **kwargs):
 
     to_create = []
     for system_user_pk in system_user_pk_set:
+        old_len = len(to_create)
         for user_pk in user_pk_set:
             if (system_user_pk, user_pk) in exist:
                 continue
@@ -170,6 +180,10 @@ def on_system_user_groups_change(instance, action, pk_set, reverse, **kwargs):
                 systemuser_id=system_user_pk,
                 user_id=user_pk
             ))
+        # 当 `SystemUser` 是 `username_same_with_user` 并且有新用户添加，推送它
+        if system_user_pk_set in username_same_with_users and len(to_create) > old_len:
+            push_system_user_to_assets_manual.delay(system_user_pk)
+
     m2m_model.objects.bulk_create(to_create)
 
 
@@ -208,22 +222,22 @@ def on_asset_nodes_add(instance, action, reverse, pk_set, **kwargs):
     ).values_list('systemuser_id', 'asset_id'))
 
     to_create = []
-
     for system_user_id in system_user_ids:
+        asset_ids_to_push = []
         for asset_id in asset_ids:
             if (system_user_id, asset_id) in exist:
                 continue
+            asset_ids_to_push.append(asset_id)
             to_create.append(m2m_model(
                 systemuser_id=system_user_id,
                 asset_id=asset_id
             ))
+        push_system_user_to_assets.delay(system_user_id, asset_ids_to_push)
     m2m_model.objects.bulk_create(to_create)
 
 
 def _update_node_assets_amount(node: Node, asset_pk_set: set, operator=add):
     """
-    本函数触及三次数据库
-
     :param asset_pk_set: 内部不会修改该值
 
     * -> Node
