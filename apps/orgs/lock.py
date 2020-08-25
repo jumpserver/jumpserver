@@ -22,7 +22,7 @@ ARGV[2]: commitingvalue
 ARGV[3]: timeout
 """
 change_lock_state_to_commiting_script = '''
-if redis.call("get", KEYS[1]) == ARGV[1]
+if (redis.call("get", KEYS[1]) == ARGV[1])
 then
     return redis.call("set", KEYS[1], ARGV[2], "EX", ARGV[3], "XX")
 else
@@ -38,7 +38,7 @@ KEYS[1]： key
 ARGV[1]: 两个 `value` 中的其中一个
 ARGV[2]: 两个 `value` 中的其中一个
 """
-unlock_script = '''
+release_script = '''
 if (redis.call("get",KEYS[1]) == ARGV[1] or redis.call("get",KEYS[1]) == ARGV[2])
 then
     return redis.call("del",KEYS[1])
@@ -46,11 +46,11 @@ else
     return 0
 end
 '''
-release_script_obj = client.register_script(unlock_script)
+release_script_obj = client.register_script(release_script)
 
 
 def acquire(key, value, timeout):
-    return cache.set(key, value, timeout=timeout, nx=True)
+    return client.set(key, value, ex=timeout, nx=True)
 
 
 def change_lock_state_to_commiting(key, doingvalue, commitingvalue, timeout=600):
@@ -84,10 +84,10 @@ def _generate_value(request: Request, stage=DOING):
 default_wait_msg = SomeoneIsDoingThis.default_detail
 
 
-def with_distributed_lock(key, timeout=60, wait_msg=default_wait_msg):
+def with_distributed_lock(key, timeout=300, wait_msg=default_wait_msg):
     def decorator(fun):
         @wraps(fun)
-        def wrapper(self, request, *args, **kwargs):
+        def wrapper(request, *args, **kwargs):
             _key = key.format(org_id=current_org.id)
             doing_value = _generate_value(request)
             commiting_value = _generate_value(request, stage=COMMITING)
@@ -96,7 +96,7 @@ def with_distributed_lock(key, timeout=60, wait_msg=default_wait_msg):
                 if not lock:
                     raise SomeoneIsDoingThis(detail=wait_msg)
                 with atomic(savepoint=False):
-                    ret = fun(self, request, *args, **kwargs)
+                    ret = fun(request, *args, **kwargs)
                     # 提交事务前，检查一下锁是否还在
                     # 锁在的话，更新锁的状态为 `commiting`，延长锁时间，确保事务提交
                     # 锁不在的话回滚
@@ -108,3 +108,5 @@ def with_distributed_lock(key, timeout=60, wait_msg=default_wait_msg):
             finally:
                 # 释放锁，锁的两个值都要尝试，不确定异常是从什么位置抛出的
                 release(_key, commiting_value, doing_value)
+        return wrapper
+    return decorator

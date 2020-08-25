@@ -230,7 +230,12 @@ class NodeRemoveAssetsApi(generics.UpdateAPIView):
             assets = [asset for asset in assets if asset.nodes.count() > 1]
             instance.assets.remove(*tuple(assets))
 
+from django.utils.decorators import method_decorator
+from orgs.lock import with_distributed_lock
+from common.const.distributed_lock_key import ASSETS_UPDATE_NODE_TREE_KEY
 
+
+@method_decorator(with_distributed_lock(ASSETS_UPDATE_NODE_TREE_KEY), name='put')
 class NodeReplaceAssetsApi(generics.UpdateAPIView):
     model = Node
     serializer_class = serializers.NodeAssetsSerializer
