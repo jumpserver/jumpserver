@@ -102,6 +102,7 @@ def with_distributed_lock(key, timeout=300, wait_msg=default_wait_msg):
     def decorator(fun):
         @wraps(fun)
         def wrapper(request, *args, **kwargs):
+            # `key`可能是组织相关的，如果是把组织`id`加上
             _key = key.format(org_id=current_org.id)
             doing_value = _generate_value(request)
             commiting_value = _generate_value(request, stage=COMMITING)
