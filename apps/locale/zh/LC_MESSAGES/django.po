@@ -1166,7 +1166,7 @@ msgstr ""
 
 #: authentication/errors.py:48
 msgid ""
-"The account has been locked (please contact admin to unlock it or try again "
+"The account has been locked (please contact admin to release it or try again "
 "after {} minutes)"
 msgstr "账号已被锁定（请联系管理员解锁 或 {}分钟后重试）"
 

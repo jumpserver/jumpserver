@@ -10,15 +10,18 @@ from functools import wraps
 from orgs.utils import current_org
 from common.exceptions import SomeoneIsDoingThis, Timeout
 from common.utils.timezone import dt_formater, now
-from common.const.distributed_lock_key import ASSETS_UPDATE_NODE_TREE_KEY
 
 client = cache.client.get_client(write=True)
 
-# KEYS[1]： doingkey
-# ARGV[1]: doingvalue
-# ARGV[2]: commitingvalue
-# ARGV[3]: timeout
-commiting_lock_script = '''
+
+"""
+将锁的状态从 `doing` 切换到 `commiting`
+KEYS[1]： key
+ARGV[1]: doingvalue
+ARGV[2]: commitingvalue
+ARGV[3]: timeout
+"""
+change_lock_state_to_commiting_script = '''
 if redis.call("get", KEYS[1]) == ARGV[1]
 then
     return redis.call("set", KEYS[1], ARGV[2], "EX", ARGV[3], "XX")
@@ -26,13 +29,15 @@ else
     return 0
 end
 '''
-commiting_lock_fun = client.register_script(commiting_lock_script)
+change_lock_state_to_commiting_script_obj = client.register_script(change_lock_state_to_commiting_script)
 
 
-def change_lock_state_to_commiting(key, doingvalue, commitingvalue, timeout):
-    return bool(commiting_lock_fun(keys=(key,), args=(doingvalue, commitingvalue, timeout)))
-
-
+"""
+释放锁，两种`value`都要检查`doing`和`commiting`
+KEYS[1]： key
+ARGV[1]: 两个 `value` 中的其中一个
+ARGV[2]: 两个 `value` 中的其中一个
+"""
 unlock_script = '''
 if (redis.call("get",KEYS[1]) == ARGV[1] or redis.call("get",KEYS[1]) == ARGV[2])
 then
@@ -41,11 +46,21 @@ else
     return 0
 end
 '''
-unlock_fun = client.register_script(unlock_script)
+release_script_obj = client.register_script(unlock_script)
 
 
-def unlock(key, value1, value2):
-    return unlock_fun(keys=(key,), args=(value1, value2))
+def acquire(key, value, timeout):
+    return cache.set(key, value, timeout=timeout, nx=True)
+
+
+def change_lock_state_to_commiting(key, doingvalue, commitingvalue, timeout):
+    # 将锁的状态从 `doing` 切换到 `commiting`
+    return bool(change_lock_state_to_commiting_script_obj(keys=(key,), args=(doingvalue, commitingvalue, timeout)))
+
+
+def release(key, value1, value2):
+    # 释放锁，两种`value`都要检查`doing`和`commiting`
+    return release_script_obj(keys=(key,), args=(value1, value2))
 
 
 VALUE_TEMPLATE = '{stage}:{username}:{user_id}:{now}:{rand_str}'
@@ -77,7 +92,7 @@ def with_distributed_lock(key, timeout=60, wait_msg=default_wait_msg):
             doing_value = _generate_value(request)
             commiting_value = _generate_value(request, stage=COMMITING)
             try:
-                lock = cache.set(_key, doing_value, timeout=timeout, nx=True)
+                lock = acquire(_key, doing_value, timeout)
                 if not lock:
                     raise SomeoneIsDoingThis(detail=wait_msg)
                 with atomic(savepoint=False):
@@ -92,4 +107,4 @@ def with_distributed_lock(key, timeout=60, wait_msg=default_wait_msg):
                     return ret
             finally:
                 # 释放锁，锁的两个值都要尝试，不确定异常是从什么位置抛出的
-                unlock(_key, commiting_value, doing_value)
+                release(_key, commiting_value, doing_value)
