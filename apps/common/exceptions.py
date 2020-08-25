@@ -23,3 +23,8 @@ class JMSObjectDoesNotExist(APIException):
 class SomeoneIsDoingThis(JMSException):
     status_code = status.HTTP_409_CONFLICT
     default_detail = _('Someone else is doing this. Please wait for complete')
+
+
+class Timeout(JMSException):
+    status_code = status.HTTP_408_REQUEST_TIMEOUT
+    default_detail = _('Your request timeout')
