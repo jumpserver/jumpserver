@@ -1,1 +1,1 @@
-ASSETS_UPDATE_NODE_TREE_KEY = 'distributed_lock_{org_id}_assets_update_node_tree'
+UPDATE_NODE_TREE_LOCK_KEY = 'distributed_lock_{org_id}_assets_update_node_tree'
