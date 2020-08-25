@@ -89,13 +89,13 @@ def with_distributed_lock(key, timeout=300, wait_msg=default_wait_msg):
     被装饰的 `View` 必须取消自身的 `ATOMIC_REQUESTS`，因为该装饰器要有事务的完全控制权
     [官网](https://docs.djangoproject.com/en/3.1/topics/db/transactions/#tying-transactions-to-http-requests)
 
-    1. 获取锁：只有当锁对应的 `key` 不存在时成功获取，value 设置为 doing
+    1. 获取锁：只有当锁对应的 `key` 不存在时成功获取，`value` 设置为 `doing`
     2. 开启事务：本次请求的事务必须确保在这里开启
-    3. 执行 View 体
-    4. View 体执行结束未异常，此时事务还未提交
-    5. 检查锁是否过时，过时事务回滚，不过时，重新设置key延长key有效期，已确保足够时间提交事务，同时把key的状态改为 commiting
+    3. 执行 `View` 体
+    4. `View` 体执行结束未异常，此时事务还未提交
+    5. 检查锁是否过时，过时事务回滚，不过时，重新设置`key`延长`key`有效期，已确保足够时间提交事务，同时把`key`的状态改为`commiting`
     6. 提交事务
-    7. 释放锁，释放的时候会检查 doing 与 commiting 的值，因为删除或者更改锁必须提供与当前锁的 value 相同的值，确保不误删
+    7. 释放锁，释放的时候会检查`doing`与`commiting`的值，因为删除或者更改锁必须提供与当前锁的`value`相同的值，确保不误删
        [锁参考文章](http://doc.redisfans.com/string/set.html#id2)
     """
 
