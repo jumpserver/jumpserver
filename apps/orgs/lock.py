@@ -53,7 +53,7 @@ def acquire(key, value, timeout):
     return cache.set(key, value, timeout=timeout, nx=True)
 
 
-def change_lock_state_to_commiting(key, doingvalue, commitingvalue, timeout):
+def change_lock_state_to_commiting(key, doingvalue, commitingvalue, timeout=600):
     # 将锁的状态从 `doing` 切换到 `commiting`
     return bool(change_lock_state_to_commiting_script_obj(keys=(key,), args=(doingvalue, commitingvalue, timeout)))
 
@@ -100,7 +100,7 @@ def with_distributed_lock(key, timeout=60, wait_msg=default_wait_msg):
                     # 提交事务前，检查一下锁是否还在
                     # 锁在的话，更新锁的状态为 `commiting`，延长锁时间，确保事务提交
                     # 锁不在的话回滚
-                    ok = change_lock_state_to_commiting(_key, doing_value, commiting_value, timeout)
+                    ok = change_lock_state_to_commiting(_key, doing_value, commiting_value)
                     if not ok:
                         # 超时或者被中断了
                         raise Timeout
