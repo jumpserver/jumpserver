@@ -7,17 +7,15 @@ from rest_framework.serializers import ValidationError
 from rest_framework.response import Response
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404, Http404
-from django.utils.decorators import method_decorator
 from django.db.models.signals import m2m_changed
+from django.db.models import Count
 
 from common.exceptions import SomeoneIsDoingThis
 from common.const.signals import PRE_REMOVE, POST_REMOVE
 from common.utils import get_logger, get_object_or_none
 from common.tree import TreeNodeSerializer
-from common.const.distributed_lock_key import UPDATE_NODE_TREE_LOCK_KEY
 from orgs.mixins.api import OrgModelViewSet
 from orgs.mixins import generics
-from orgs.lock import with_distributed_lock
 from ..hands import IsOrgAdmin
 from ..models import Node, Asset
 from ..tasks import (
@@ -210,8 +208,6 @@ class NodeAddChildrenApi(generics.UpdateAPIView):
         return Response("OK")
 
 
-@method_decorator(with_distributed_lock(UPDATE_NODE_TREE_LOCK_KEY), name='patch')
-@method_decorator(with_distributed_lock(UPDATE_NODE_TREE_LOCK_KEY), name='put')
 class NodeAddAssetsApi(generics.UpdateAPIView):
     model = Node
     serializer_class = serializers.NodeAssetsSerializer
@@ -224,8 +220,6 @@ class NodeAddAssetsApi(generics.UpdateAPIView):
         instance.assets.add(*tuple(assets))
 
 
-@method_decorator(with_distributed_lock(UPDATE_NODE_TREE_LOCK_KEY), name='patch')
-@method_decorator(with_distributed_lock(UPDATE_NODE_TREE_LOCK_KEY), name='put')
 class NodeRemoveAssetsApi(generics.UpdateAPIView):
     model = Node
     serializer_class = serializers.NodeAssetsSerializer
@@ -234,12 +228,12 @@ class NodeRemoveAssetsApi(generics.UpdateAPIView):
 
     def perform_update(self, serializer):
         assets = serializer.validated_data.get('assets')
-        instance = self.get_object()
-        if instance != Node.org_root():
-            instance.assets.remove(*tuple(assets))
-        else:
-            assets = [asset for asset in assets if asset.nodes.count() > 1]
-            instance.assets.remove(*tuple(assets))
+        node = self.get_object()
+        node.assets.remove(*assets)
+
+        # 把孤儿资产添加到 root 节点
+        orphan_assets = Asset.objects.filter(id__in=[a.id for a in assets], nodes__isnull=True).distinct()
+        Node.org_root().assets.add(*orphan_assets)
 
 
 class NodeReplaceAssetsApi(generics.UpdateAPIView):
