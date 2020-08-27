@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
 #
-from operator import add, sub
+from typing import List
 
 from django.db.models.signals import (
     post_save, m2m_changed, pre_save
 )
-from django.db.models import Q, F
+from django.db.models import Q
 from django.dispatch import receiver
+from django.utils.crypto import get_random_string
 
-from common.const.signals import PRE_ADD, POST_ADD, POST_REMOVE, PRE_CLEAR
+from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR
 from common.utils import get_logger
 from common.decorator import on_transaction_commit
-from .models import Asset, SystemUser, Node, compute_parent_key
+from .thread_pools import UpdateNodeAssetsAmountPool
+from .models import Asset, SystemUser, Node
 from users.models import User
 from .tasks import (
     update_assets_hardware_info_util,
@@ -235,126 +237,42 @@ def on_asset_nodes_add(instance, action, reverse, pk_set, **kwargs):
     m2m_model.objects.bulk_create(to_create)
 
 
-def _update_node_assets_amount(node: Node, asset_pk_set: set, operator=add):
-    """
-    :param asset_pk_set: 内部不会修改该值
-
-    * -> Node
-    # -> Asset
-
-           * [3]
-          / \
-         *   * [2]
-        /     \
-       *       * [1]
-      /       / \
-     *   [a] #  # [b]
-
-    """
-    # 获取节点[1]祖先节点的 `key` 含自己，也就是[1, 2, 3]节点的`key`
-    ancestor_keys = node.get_ancestor_keys(with_self=True)
-    ancestors = Node.objects.filter(key__in=ancestor_keys).order_by('-key')
-    to_update = []
-    for ancestor in ancestors:
-        # 迭代祖先节点的`key`，顺序是 [1] -> [2] -> [3]
-        # 查询该节点及其后代节点是否包含要操作的资产，将包含的从要操作的
-        # 资产集合中去掉，他们是重复节点，无论增加或删除都不会影响节点的资产数量
-
-        asset_pk_set -= set(Asset.objects.filter(
-            id__in=asset_pk_set
-        ).filter(
-            Q(nodes__key__startswith=f'{ancestor.key}:') |
-            Q(nodes__key=ancestor.key)
-        ).distinct().values_list('id', flat=True))
-        if not asset_pk_set:
-            # 要操作的资产集合为空，说明都是重复资产，不用改变节点资产数量
-            # 而且既然它包含了，它的祖先节点肯定也包含了，所以祖先节点都不用
-            # 处理了
-            break
-        ancestor.assets_amount = operator(F('assets_amount'), len(asset_pk_set))
-        to_update.append(ancestor)
-    Node.objects.bulk_update(to_update, fields=('assets_amount', 'parent_key'))
-
-
-def _remove_ancestor_keys(ancestor_key, tree_set):
-    # 这里判断 `ancestor_key` 不能是空，防止数据错误导致的死循环
-    # 判断是否在集合里，来区分是否已被处理过
-    while ancestor_key and ancestor_key in tree_set:
-        tree_set.remove(ancestor_key)
-        ancestor_key = compute_parent_key(ancestor_key)
-
-
-def _is_asset_exists_in_node(asset_pk, node_key):
-    return Asset.objects.filter(
-        id=asset_pk
-    ).filter(
-        Q(nodes__key__startswith=f'{node_key}:') | Q(nodes__key=node_key)
-    ).exists()
-
-
-def _update_nodes_asset_amount(node_keys, asset_pk, operator):
-    # 所有相关节点的祖先节点，组成一棵局部树
-    ancestor_keys = set()
+def update_nodes_asset_amount(node_keys: List[str]):
     for key in node_keys:
-        ancestor_keys.update(Node.get_node_ancestor_keys(key))
+        assets_amount = Asset.objects.filter(Q(nodes__key__startswith=f'{key}:') | Q(nodes__key=key)).distinct().count()
+        Node.objects.filter(key=key).update(assets_amount=assets_amount)
 
-    # 相关节点可能是其他相关节点的祖先节点，如果是从相关节点里干掉
-    node_keys -= ancestor_keys
 
-    to_update_keys = []
-    for key in node_keys:
-        # 遍历相关节点，处理它及其祖先节点
-        # 查询该节点是否包含待处理资产
-        exists = _is_asset_exists_in_node(asset_pk, key)
-        parent_key = compute_parent_key(key)
+def get_nodes_ancestors_keys(node_keys: List[str], with_self=True):
+    keys = set()
+    for node_key in node_keys:
+        keys.update(Node.get_node_ancestor_keys(node_key, with_self=with_self))
+    return Node.objects.filter(key__in=keys).distinct().values_list('key', flat=True)
 
-        if exists:
-            # 如果资产在该节点，那么他及其祖先节点都不用处理
-            _remove_ancestor_keys(parent_key, ancestor_keys)
-            continue
-        else:
-            # 不存在，要更新本节点
-            to_update_keys.append(key)
-            # 这里判断 `parent_key` 不能是空，防止数据错误导致的死循环
-            # 判断是否在集合里，来区分是否已被处理过
-            while parent_key and parent_key in ancestor_keys:
-                exists = _is_asset_exists_in_node(asset_pk, parent_key)
-                if exists:
-                    _remove_ancestor_keys(parent_key, ancestor_keys)
-                    break
-                else:
-                    to_update_keys.append(parent_key)
-                    ancestor_keys.remove(parent_key)
-                    parent_key = compute_parent_key(parent_key)
 
-    Node.objects.filter(key__in=to_update_keys).update(
-        assets_amount=operator(F('assets_amount'), 1)
-    )
+def update_nodes_and_ancestors_asset_amount(node_keys: List[str], action):
+    ident = get_random_string()
+    try:
+        logger.info(f'begin[{ident}] update_nodes_and_ancestors_asset_amount {action} with node_keys: {node_keys}')
+        nodes_and_ancestors = get_nodes_ancestors_keys(node_keys)
+        update_nodes_asset_amount(nodes_and_ancestors)
+        logger.info(f'finish[{ident}] update_nodes_and_ancestors_asset_amount')
+    except Exception:
+        logger.exception(f'exception[{ident}] update_nodes_and_ancestors_asset_amount')
+
+
+update_node_assets_amount_pool = UpdateNodeAssetsAmountPool()
 
 
 @receiver(m2m_changed, sender=Asset.nodes.through)
+@on_transaction_commit
 def update_nodes_assets_amount(action, instance, reverse, pk_set, **kwargs):
-    # 不允许 `pre_clear` ，因为该信号没有 `pk_set`
-    # [官网](https://docs.djangoproject.com/en/3.1/ref/signals/#m2m-changed)
-    refused = (PRE_CLEAR,)
-    if action in refused:
-        raise ValueError
-
-    mapper = {
-        PRE_ADD: add,
-        POST_REMOVE: sub
-    }
-    if action not in mapper:
+    if action not in (POST_ADD, POST_REMOVE, POST_CLEAR):
         return
-
-    operator = mapper[action]
-
     if reverse:
-        node: Node = instance
-        asset_pk_set = set(pk_set)
-        _update_node_assets_amount(node, asset_pk_set, operator)
+        node_keys = {instance.key}
     else:
-        asset_pk = instance.id
         # 与资产直接关联的节点
-        node_keys = set(Node.objects.filter(id__in=pk_set).values_list('key', flat=True))
-        _update_nodes_asset_amount(node_keys, asset_pk, operator)
+        node_keys = {*Node.objects.filter(id__in=pk_set).values_list('key', flat=True)}
+
+    update_node_assets_amount_pool.submit(update_nodes_and_ancestors_asset_amount, node_keys, action)
