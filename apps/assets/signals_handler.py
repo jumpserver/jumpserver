@@ -12,7 +12,7 @@ from django.utils.crypto import get_random_string
 from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR
 from common.utils import get_logger
 from common.decorator import on_transaction_commit
-from .thread_pools import UpdateNodeAssetsAmountPool
+from .thread_pools import UpdateNodeAssetsAmountThreadPool
 from .models import Asset, SystemUser, Node
 from users.models import User
 from .tasks import (
@@ -261,7 +261,7 @@ def update_nodes_and_ancestors_asset_amount(node_keys: List[str], action):
         logger.exception(f'exception[{ident}] update_nodes_and_ancestors_asset_amount')
 
 
-update_node_assets_amount_pool = UpdateNodeAssetsAmountPool()
+update_node_assets_amount_pool = UpdateNodeAssetsAmountThreadPool()
 
 
 @receiver(m2m_changed, sender=Asset.nodes.through)

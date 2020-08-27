@@ -5,7 +5,7 @@
 from concurrent.futures import ThreadPoolExecutor
 
 
-class UpdateNodeAssetsAmountPool(ThreadPoolExecutor):
+class UpdateNodeAssetsAmountThreadPool(ThreadPoolExecutor):
     """
     单例
     """
