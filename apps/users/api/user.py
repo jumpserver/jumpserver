@@ -44,9 +44,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
     def get_queryset(self):
         return super().get_queryset().annotate(
             gc_m2m_org_members__role=GroupConcat('m2m_org_members__role'),
-            gc_groups__name=GroupConcat('groups__name'),
-            gc_groups=GroupConcat('groups__id', output_field=CharField())
-        )
+        ).prefetch_related('groups')
 
     def send_created_signal(self, users):
         if not isinstance(users, list):
