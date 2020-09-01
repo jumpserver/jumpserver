@@ -560,12 +560,6 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
 
     @property
     def groups_display(self):
-        if hasattr(self, 'gc_groups__name'):
-            names = self.gc_groups__name
-            if isinstance(names, str):
-                return ' '.join(set(self.gc_groups__name.split(',')))
-            else:
-                return ''
         return ' '.join([group.name for group in self.groups.all()])
 
     @property
