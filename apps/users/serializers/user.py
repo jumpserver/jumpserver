@@ -44,9 +44,6 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         label=_('Password strategy'), write_only=True
     )
     mfa_level_display = serializers.ReadOnlyField(source='get_mfa_level_display')
-    groups = GroupConcatedPrimaryKeyRelatedField(
-        label=_('User group'), many=True, queryset=UserGroup.objects.all(), required=False
-    )
     login_blocked = serializers.SerializerMethodField()
     can_update = serializers.SerializerMethodField()
     can_delete = serializers.SerializerMethodField()
