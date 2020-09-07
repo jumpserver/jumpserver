@@ -16,7 +16,7 @@ def clean_login_log_period():
     try:
         days = int(settings.LOGIN_LOG_KEEP_DAYS)
     except ValueError:
-        days = 90
+        days = 9999
     expired_day = now - datetime.timedelta(days=days)
     UserLoginLog.objects.filter(datetime__lt=expired_day).delete()
 
@@ -28,6 +28,6 @@ def clean_operation_log_period():
     try:
         days = int(settings.LOGIN_LOG_KEEP_DAYS)
     except ValueError:
-        days = 90
+        days = 9999
     expired_day = now - datetime.timedelta(days=days)
     OperateLog.objects.filter(datetime__lt=expired_day).delete()
