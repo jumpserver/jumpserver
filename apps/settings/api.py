@@ -2,6 +2,7 @@
 #
 
 import json
+import threading
 from collections.abc import Iterable
 from smtplib import SMTPSenderRefused
 from rest_framework import generics
@@ -15,7 +16,7 @@ from .utils import (
     LDAPServerUtil, LDAPCacheUtil, LDAPImportUtil, LDAPSyncUtil,
     LDAP_USE_CACHE_FLAGS, LDAPTestUtil, ObjectDict
 )
-from .tasks import sync_ldap_user_task
+from .tasks import sync_ldap_user
 from common.permissions import IsOrgAdmin, IsSuperUser
 from common.utils import get_logger
 from .serializers import (
@@ -204,8 +205,9 @@ class LDAPUserListApi(generics.ListAPIView):
         if sync_util.task_no_start:
             # 任务外部设置 task running 状态
             sync_util.set_task_status(sync_util.TASK_STATUS_IS_RUNNING)
-            task = sync_ldap_user_task.delay()
-            data = {'msg': 'Cache no data, sync task {} started.'.format(task.id)}
+            t = threading.Thread(target=sync_ldap_user)
+            t.start()
+            data = {'msg': 'Sync start.'}
             return Response(data=data, status=409)
         # 同步任务正在执行
         if sync_util.task_is_running:
@@ -214,7 +216,7 @@ class LDAPUserListApi(generics.ListAPIView):
         # 同步任务执行结束
         if sync_util.task_is_over:
             msg = sync_util.get_task_error_msg()
-            data = {'error': 'Synchronization task report error: {}'.format(msg)}
+            data = {'error': 'Synchronization error: {}'.format(msg)}
             return Response(data=data, status=400)
 
         return super().list(request, *args, **kwargs)
