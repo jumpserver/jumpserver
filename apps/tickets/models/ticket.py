@@ -40,6 +40,7 @@ class Ticket(OrgModelMixin, CommonModelMixin):
     type = models.CharField(max_length=16, choices=TYPE.choices, default=TYPE.GENERAL, verbose_name=_("Type"))
     status = models.CharField(choices=STATUS.choices, max_length=16, default='open')
     action = models.CharField(choices=ACTION.choices, max_length=16, default='', blank=True)
+    comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
 
     origin_objects = models.Manager()
 
