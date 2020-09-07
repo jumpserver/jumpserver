@@ -266,7 +266,8 @@ class Config(dict):
         'ORG_CHANGE_TO_URL': '',
         'LANGUAGE_CODE': 'zh',
         'TIME_ZONE': 'Asia/Shanghai',
-        'CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED': True
+        'CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED': True,
+        'USER_LOGIN_SINGLE_MACHINE_ENABLED': False
     }
 
     def compatible_auth_openid_of_key(self):

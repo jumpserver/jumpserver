@@ -116,7 +116,10 @@ REDIS_PORT: 6379
 
 # Perm show single asset to ungrouped node
 # 是否把未授权节点资产放入到 未分组 节点中
-# PERM_SINGLE_ASSET_TO_UNGROUP_NODE: false
+# PERM_SINGLE_ASSET_TO_UNGROUP_NODE: False
+#
+# 同一账号仅允许在一台设备登录
+# USER_LOGIN_SINGLE_MACHINE_ENABLED: False
 #
 # 启用定时任务
 # PERIOD_TASK_ENABLE: True
