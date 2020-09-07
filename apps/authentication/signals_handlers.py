@@ -18,7 +18,7 @@ def on_user_auth_login_success(sender, user, request, **kwargs):
         if session_key and session_key != request.session.session_key:
             session = import_module(settings.SESSION_ENGINE).SessionStore(session_key)
             session.delete()
-        cache.set(user_id, request.session.session_key)
+        cache.set(user_id, request.session.session_key, settings.SESSION_COOKIE_AGE)
 
 
 @receiver(openid_user_login_success)
