@@ -267,7 +267,7 @@ class Config(dict):
         'LANGUAGE_CODE': 'zh',
         'TIME_ZONE': 'Asia/Shanghai',
         'CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED': True,
-        'ONLY_ALLOW_SINGLE_MACHINE_LOGIN': False
+        'USER_LOGIN_SINGLE_MACHINE_ENABLED': False
     }
 
     def compatible_auth_openid_of_key(self):
