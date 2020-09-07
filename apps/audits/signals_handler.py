@@ -5,6 +5,7 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.db import transaction
 from django.utils import timezone
+from django_cas_ng.signals import cas_user_authenticated
 from rest_framework.renderers import JSONRenderer
 from rest_framework.request import Request
 
@@ -140,4 +141,12 @@ def on_user_auth_failed(sender, username, request, reason='', **kwargs):
     logger.debug('User login failed: {}'.format(username))
     data = generate_data(username, request)
     data.update({'reason': reason[:128], 'status': False})
+    write_login_log(**data)
+
+
+@receiver(cas_user_authenticated)
+def on_user_cas_login_success(sender, user, request, **kwargs):
+    logger.debug('User login success: {}'.format(user.username))
+    data = generate_data(user.username, request)
+    data.update({'mfa': int(user.mfa_enabled), 'status': True})
     write_login_log(**data)
