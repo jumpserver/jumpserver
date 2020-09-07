@@ -118,6 +118,9 @@ REDIS_PORT: 6379
 # 是否把未授权节点资产放入到 未分组 节点中
 # PERM_SINGLE_ASSET_TO_UNGROUP_NODE: false
 #
+# 仅允许单机登录
+# ONLY_ALLOW_SINGLE_MACHINE_LOGIN: false
+#
 # 启用定时任务
 # PERIOD_TASK_ENABLE: True
 #
