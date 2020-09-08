@@ -206,7 +206,7 @@ v2.1.0 是 v2.0.0 之后的功能版本。
 - [Lina](https://github.com/jumpserver/lina) JumpServer Web UI 项目
 - [Luna](https://github.com/jumpserver/luna) JumpServer Web Terminal 项目
 - [KoKo](https://github.com/jumpserver/koko) JumpServer 字符协议 Connector 项目，替代原来 Python版本的 [CoCo](https://github.com/jumpserver/coco)
-- [Guacamole] (https://github.com/jumpserver/docker-guacamole) JumpServer 图形协议 Connector 项目，依赖 [Apache Guacamole](https://guacamole.apache.org/)
+- [Guacamole](https://github.com/jumpserver/docker-guacamole) JumpServer 图形协议 Connector 项目，依赖 [Apache Guacamole](https://guacamole.apache.org/)
 
 
 ## 案例研究
