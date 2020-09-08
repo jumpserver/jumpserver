@@ -199,9 +199,7 @@ class TreeService(Tree):
 
 def check_node_assets_amount():
     for node in Node.objects.all():
-        assets_amount = Asset.objects.filter(
-            Q(nodes__key__istartswith=f'{node.key}:') | Q(nodes=node)
-        ).distinct().count()
+        assets_amount = node.get_all_assets().count()
 
         if node.assets_amount != assets_amount:
             print(f'<Node:{node.key}> wrong assets amount '

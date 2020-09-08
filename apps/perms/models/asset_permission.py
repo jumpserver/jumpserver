@@ -177,11 +177,40 @@ class AssetPermission(BasePermission):
 
 
 class UserGrantedMappingNode(FamilyMixin, models.JMSBaseModel):
+    """
+    该表保存的是用户授权的节点，会根据授权的节点来生成到根节点的树，不会存直接授权节点的子节点
+
+    完整树如下：
+
+    ROOT
+    |- A节点
+         |
+         | - A-1
+        | - A-2
+    |- B节点
+       |
+       | - B-1
+       | - B-2
+           | - B-2-1
+
+    如果授权了 Root 节点，那么表中只保存 ROOT 节点，由于返回树时异步，分层的，所以先会返回 ROOT 节点，
+    请求 ROOT 节点子节点时，查询 ROOT 节点时直接授权的，那么会查 assets.Node 表 下的子节点依次
+
+    如果只授权了 A节点，那么会根据直接授权的节点来生成一个到顶部的树, 表中只存一下节点
+    ROOT
+    |- A节点
+
+    如果也授权某些单独的资产，单独的资产不再某些节点中，如果PERM_SINGLE_ASSET_TO_UNGROUP_NODE 为 False,
+    则会根据assets.Node推演所在的节点，存到表中，设置 granted=False, assets_granted=True
+
+    """
     node = models.ForeignKey('assets.Node', default=None, on_delete=models.CASCADE,
                              db_constraint=False, null=True, related_name='mapping_nodes')
     key = models.CharField(max_length=64, verbose_name=_("Key"), db_index=True)  # '1:1:1:1'
     user = models.ForeignKey('users.User', db_constraint=False, on_delete=models.CASCADE)
+    # 是否直接被授权规则授权
     granted = models.BooleanField(default=False, db_index=True)
+    # 是否是根据授权资产推演出来的
     asset_granted = models.BooleanField(default=False, db_index=True)
     parent_key = models.CharField(max_length=64, default='', verbose_name=_('Parent key'), db_index=True)  # '1:1:1:1'
     assets_amount = models.IntegerField(default=0)

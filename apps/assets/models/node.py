@@ -218,12 +218,20 @@ class NodeAssetsMixin:
     #     amount = self.tree().assets_amount(self.key)
     #     return amount
 
+    @classmethod
+    def correct_all_nodes_assets_amount(cls):
+        nodes = cls.objects.all()
+        for node in nodes:
+            amount = node.get_all_assets().count()
+            if node.assets_amount == amount:
+                continue
+            node.assets_amount = amount
+            node.save()
+
     def get_all_assets(self):
         from .asset import Asset
-        if self.is_org_root():
-            return Asset.objects.filter(org_id=self.org_id)
-        pattern = '^{0}$|^{0}:'.format(self.key)
-        return Asset.objects.filter(nodes__key__regex=pattern).distinct()
+        q = Q(nodes__key__istartswith=f'{self.key}:') | Q(nodes=self)
+        return Asset.objects.filter(q).distinct()
 
     def get_assets(self):
         from .asset import Asset
