@@ -202,6 +202,12 @@ v2.1.0 是 v2.0.0 之后的功能版本。
 - [完整文档](https://docs.jumpserver.org)
 - [演示视频](https://jumpserver.oss-cn-hangzhou.aliyuncs.com/jms-media/%E3%80%90%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91%E3%80%91Jumpserver%20%E5%A0%A1%E5%9E%92%E6%9C%BA%20V1.5.0%20%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91%20-%20final.mp4)
 
+## 组件项目
+- [Lina](https://github.com/jumpserver/lina) JumpServer Web UI 项目
+- [KoKo](https://github.com/jumpserver/koko) JumpServer 字符协议 Connector 项目
+- [Guacamole] (https://github.com/jumpserver/docker-guacamole) JumpServer 图形协议 Connector 项目，依赖 [Apache Guacamole](https://guacamole.apache.org/)
+
+
 ## 案例研究
 
 - [JumpServer 堡垒机护航顺丰科技超大规模资产安全运维](https://blog.fit2cloud.com/?p=1147)；
