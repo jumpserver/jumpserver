@@ -5,6 +5,7 @@ from django.utils.decorators import method_decorator
 from perms.api.user_permission.mixin import UserGrantedNodeDispatchMixin
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
+from django.conf import settings
 
 from assets.api.mixin import SerializeToTreeNodeMixin
 from common.utils import get_object_or_none
@@ -73,6 +74,12 @@ class MyUngroupAssetsAsTreeApi(UserGrantedAssetsAsTreeForAdminApi):
     获取 直接授权 的资产
     """
     permission_classes = (IsValidUser,)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if not settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
+            queryset = queryset.none()
+        return queryset
 
     def get_user(self):
         return self.request.user
