@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 #
 from django.db.models import Q
+from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
 from perms.api.user_permission.mixin import UserGrantedNodeDispatchMixin
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
+from django.conf import settings
 
 from assets.api.mixin import SerializeToTreeNodeMixin
 from common.utils import get_object_or_none
@@ -23,11 +25,11 @@ from orgs.utils import tmp_to_root_org
 logger = get_logger(__name__)
 
 __all__ = [
-    'UserGrantedAssetsForAdminApi',
-    'MyGrantedAllAssetsAsTreeApi',
-    'UserGrantedNodeAssetsForAdminApi', 'MyGrantedAssetsApi', 'MyGrantedAllAssetsApi',
-    'UserGrantedAssetsAsTreeForAdminApi', 'MyGrantedNodeAssetsApi',
-    'MyUngroupedAssetsAsTreeApi',
+    'UserGrantedAssetsForAdminApi', 'MyGrantedAssetsApi',
+    'UserGrantedAssetsAsTreeForAdminApi',
+    'MyGrantedAllAssetsApi', 'MyGrantedAllAssetsAsTreeApi',
+    'MyUngroupedAssetsAsTreeApi', 'MyFavoriteAssetsAsTreeApi',
+    'MyGrantedNodeAssetsApi', 'UserGrantedNodeAssetsForAdminApi',
 ]
 
 
@@ -121,7 +123,7 @@ class MyGrantedAllAssetsAsTreeApi(UserGrantedAssetsAsTreeForAdminApi, MyGrantedA
 
 
 """
------ 未分组的资产或者树的API -----
+----- 未分组的资产树的API -----
 """
 
 
@@ -131,6 +133,28 @@ class MyUngroupedAssetsAsTreeApi(UserGrantedAssetsAsTreeForAdminApi):
     获取 直接授权 的资产
     """
     permission_classes = (IsValidUser,)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if not settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
+            queryset = queryset.none()
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        if not settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
+            return Response(data=[])
+
+        queryset = self.filter_queryset(self.get_queryset())
+        data = self.serialize_assets(queryset, None)
+        favorite_node = {
+            'id': '',
+            'name': _('Ungrouped'),
+            'title': _('Ungrouped'),
+            'isParent': True,
+            'open': False,
+        }
+        data.insert(0, favorite_node)
+        return Response(data=data)
 
     def get_user(self):
         return self.request.user
@@ -142,12 +166,22 @@ class MyUngroupedAssetsAsTreeApi(UserGrantedAssetsAsTreeForAdminApi):
 
 
 @method_decorator(tmp_to_root_org(), name='list')
-class MyFavoriteAssetsAsTreeApi(MyGrantedAllAssetsApi):
+class MyFavoriteAssetsAsTreeApi(SerializeToTreeNodeMixin, MyGrantedAllAssetsApi):
     permission_classes = (IsValidUser,)
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+        from assets.models import FavoriteAsset
+        favorite_assets = FavoriteAsset.objects.filter(user=self.get_user()).values_list('asset', flat=True)
+        queryset = self.filter_queryset(self.get_queryset()).filter(id__in=favorite_assets)
         data = self.serialize_assets(queryset, None)
+        favorite_node = {
+            'id': '',
+            'name': _('Favorite'),
+            'title': _('Favorite'),
+            'isParent': True,
+            'open': False,
+        }
+        data.insert(0, favorite_node)
         return Response(data=data)
 
 
