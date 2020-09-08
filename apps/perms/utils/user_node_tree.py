@@ -118,6 +118,7 @@ def compute_tmp_mapping_node_from_perm(user: User):
         Q(granted_by_permissions__users=user) |
         Q(granted_by_permissions__user_groups__users=user)
     ).distinct().only(*node_only_fields)
+    granted_key_set = {_node.key for _node in nodes}
 
     # 查询直接授权资产
     asset_ids = Asset.objects.filter(
@@ -129,6 +130,10 @@ def compute_tmp_mapping_node_from_perm(user: User):
 
     # 给授权节点设置 _granted 标识，同时去重
     for _node in nodes:
+        ancestor_keys = set(_node.get_ancestor_keys())
+        if ancestor_keys & granted_key_set:
+            continue
+
         if _node.key not in key2leaf_nodes_mapper:
             set_granted(_node)
             key2leaf_nodes_mapper[_node.key] = _node
@@ -136,10 +141,14 @@ def compute_tmp_mapping_node_from_perm(user: User):
     # 查询授权资产关联的节点设置
     granted_asset_nodes = Node.objects.filter(
         assets__id__in=asset_ids
-    ).only(*node_only_fields)
+    ).distinct().only(*node_only_fields)
 
     # 给资产授权关联的节点设置 _asset_granted 标识，同时去重
     for _node in granted_asset_nodes:
+        ancestor_keys = set(_node.get_ancestor_keys())
+        if ancestor_keys & granted_key_set:
+            continue
+
         if _node.key not in key2leaf_nodes_mapper:
             key2leaf_nodes_mapper[_node.key] = _node
         set_asset_granted(key2leaf_nodes_mapper[_node.key])
@@ -154,7 +163,7 @@ def compute_tmp_mapping_node_from_perm(user: User):
     ancestor_keys -= key2leaf_nodes_mapper.keys()
     # 查出祖先节点
     ancestors = Node.objects.filter(key__in=ancestor_keys).only(*node_only_fields)
-    return [*key2leaf_nodes_mapper.values(), *ancestors]
+    return [*leaf_nodes, *ancestors]
 
 
 def create_mapping_nodes(user, nodes, clear=True):
