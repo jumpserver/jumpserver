@@ -13,9 +13,7 @@ from orgs.utils import tmp_to_root_org
 from perms.utils.asset_permission import get_asset_system_users_id_with_actions_by_user
 from common.permissions import IsOrgAdminOrAppUser, IsOrgAdmin, IsValidUser
 from common.utils import get_logger, lazyproperty
-from ...utils import (
-    AssetPermissionUtil
-)
+
 from ...hands import User, Asset, SystemUser
 from ... import serializers
 from ...models import Action
@@ -98,7 +96,6 @@ class RefreshAssetPermissionCacheApi(RetrieveAPIView):
     permission_classes = (IsOrgAdmin,)
 
     def retrieve(self, request, *args, **kwargs):
-        AssetPermissionUtil.expire_all_user_tree_cache()
         return Response({'msg': True}, status=200)
 
 
