@@ -213,17 +213,19 @@ class NodeAssetsMixin:
     key = ''
     id = None
 
-    # @lazyproperty
-    # def assets_amount(self):
-    #     amount = self.tree().assets_amount(self.key)
-    #     return amount
+    @classmethod
+    def clear_all_nodes_assets_amount(cls):
+        nodes = cls.objects.all()
+        for node in nodes:
+            count = node.get_all_assets().count()
 
     def get_all_assets(self):
         from .asset import Asset
         if self.is_org_root():
             return Asset.objects.filter(org_id=self.org_id)
-        pattern = '^{0}$|^{0}:'.format(self.key)
-        return Asset.objects.filter(nodes__key__regex=pattern).distinct()
+
+        q = Q(nodes__key__startswith=self.key) | Q(nodes__key=self.key)
+        return Asset.objects.filter(q).distinct()
 
     def get_assets(self):
         from .asset import Asset
