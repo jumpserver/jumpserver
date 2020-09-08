@@ -206,6 +206,12 @@ v2.1.0 是 v2.0.0 之后的功能版本。
 - [完整文档](https://docs.jumpserver.org)
 - [演示视频](https://jumpserver.oss-cn-hangzhou.aliyuncs.com/jms-media/%E3%80%90%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91%E3%80%91Jumpserver%20%E5%A0%A1%E5%9E%92%E6%9C%BA%20V1.5.0%20%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91%20-%20final.mp4)
 
+## 组件项目
+- [Lina](https://github.com/jumpserver/lina) JumpServer Web UI 项目
+- [Luna](https://github.com/jumpserver/luna) JumpServer Web Terminal 项目
+- [Koko](https://github.com/jumpserver/koko) JumpServer 字符协议 Connector 项目，替代原来 Python 版本的 [Coco](https://github.com/jumpserver/coco)
+- [Guacamole](https://github.com/jumpserver/docker-guacamole) JumpServer 图形协议 Connector 项目，依赖 [Apache Guacamole](https://guacamole.apache.org/)
+
 ## JumpServer 企业版 
 - [申请企业版试用](https://jinshuju.net/f/kyOYpi)
 > 注：企业版支持离线安装，申请通过后会提供高速下载链接。

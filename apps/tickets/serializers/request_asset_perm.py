@@ -46,7 +46,7 @@ class RequestAssetPermTicketSerializer(serializers.ModelSerializer):
             'status', 'action', 'date_created', 'date_updated', 'system_user_waitlist_url',
             'type', 'type_display', 'action_display', 'ips', 'confirmed_assets',
             'date_start', 'date_expired', 'confirmed_system_user', 'hostname',
-            'assets_waitlist_url', 'system_user', 'org_id', 'actions'
+            'assets_waitlist_url', 'system_user', 'org_id', 'actions', 'comment'
         ]
         m2m_fields = [
             'user', 'user_display', 'assignees', 'assignees_display',
