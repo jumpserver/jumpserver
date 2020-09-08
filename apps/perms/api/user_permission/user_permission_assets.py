@@ -23,11 +23,17 @@ from orgs.utils import tmp_to_root_org
 logger = get_logger(__name__)
 
 __all__ = [
-    'UserGrantedAssetsForAdminApi', 'MyGrantedAssetsAsTreeApi',
-    'UserGrantedNodeAssetsForAdminApi', 'MyGrantedAssetsApi',
+    'UserGrantedAssetsForAdminApi',
+    'MyGrantedAllAssetsAsTreeApi',
+    'UserGrantedNodeAssetsForAdminApi', 'MyGrantedAssetsApi', 'MyGrantedAllAssetsApi',
     'UserGrantedAssetsAsTreeForAdminApi', 'MyGrantedNodeAssetsApi',
-    'MyUngroupAssetsAsTreeApi',
+    'MyUngroupedAssetsAsTreeApi',
 ]
+
+
+"""
+----- 直接授权的资产，而非全部资产 -----
+"""
 
 
 class UserGrantedAssetsForAdminApi(ListAPIView):
@@ -67,19 +73,13 @@ class UserGrantedAssetsAsTreeForAdminApi(SerializeToTreeNodeMixin, UserGrantedAs
         return Response(data=data)
 
 
-@method_decorator(tmp_to_root_org(), name='list')
-class MyUngroupAssetsAsTreeApi(UserGrantedAssetsAsTreeForAdminApi):
-    """
-    获取 直接授权 的资产
-    """
-    permission_classes = (IsValidUser,)
-
-    def get_user(self):
-        return self.request.user
+"""
+----- 授权的全部资产，而非全部资产 -----
+"""
 
 
 @method_decorator(tmp_to_root_org(), name='list')
-class MyGrantedAssetsAsTreeApi(UserGrantedAssetsAsTreeForAdminApi):
+class MyGrantedAllAssetsApi(UserGrantedAssetsForAdminApi):
     """
     获取 直接授权 + 节点授权 的资产
     """
@@ -110,6 +110,45 @@ class MyGrantedAssetsAsTreeApi(UserGrantedAssetsAsTreeForAdminApi):
 
     def get_user(self):
         return self.request.user
+
+
+@method_decorator(tmp_to_root_org(), name='list')
+class MyGrantedAllAssetsAsTreeApi(UserGrantedAssetsAsTreeForAdminApi, MyGrantedAllAssetsApi):
+    """
+    获取 直接授权 + 节点授权 的资产
+    """
+    permission_classes = (IsValidUser, )
+
+
+"""
+----- 未分组的资产或者树的API -----
+"""
+
+
+@method_decorator(tmp_to_root_org(), name='list')
+class MyUngroupedAssetsAsTreeApi(UserGrantedAssetsAsTreeForAdminApi):
+    """
+    获取 直接授权 的资产
+    """
+    permission_classes = (IsValidUser,)
+
+    def get_user(self):
+        return self.request.user
+
+
+"""
+----- 收藏的节点作为树的API -----
+"""
+
+
+@method_decorator(tmp_to_root_org(), name='list')
+class MyFavoriteAssetsAsTreeApi(MyGrantedAllAssetsApi):
+    permission_classes = (IsValidUser,)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        data = self.serialize_assets(queryset, None)
+        return Response(data=data)
 
 
 @method_decorator(tmp_to_root_org(), name='list')

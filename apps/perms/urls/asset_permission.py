@@ -27,8 +27,9 @@ user_permission_urlpatterns = [
 
     # Tree Node 的数据格式返回
     path('<uuid:pk>/assets/tree/', api.UserGrantedAssetsAsTreeForAdminApi.as_view(), name='user-assets-as-tree'),
-    path('assets/tree/', api.MyGrantedAssetsAsTreeApi.as_view(), name='my-assets-as-tree'),
-    path('ungroup/assets/tree/', api.MyUngroupAssetsAsTreeApi.as_view(), name='my-ungroup-assets-as-tree'),
+    path('assets/tree/', api.MyGrantedAllAssetsApi.as_view(), name='my-all-assets-as-tree'),
+    path('ungrouped/assets/tree/', api.MyUngroupedAssetsAsTreeApi.as_view(), name='my-ungrouped-assets-as-tree'),
+    path('favorite/assets/tree/', api.MyFavoriteAssetsAsTreeApi.as_view(), name='my-ungroup-assets-as-tree'),
     # ^--------------------------------------------------------^
 
     # 获取用户所有`直接授权的节点`与`直接授权资产`关联的节点
