@@ -131,7 +131,8 @@ class UserGrantedAssetSystemUsersForAdminApi(ListAPIView):
 class MyGrantedAssetSystemUsersApi(UserGrantedAssetSystemUsersForAdminApi):
     permission_classes = (IsValidUser,)
 
-    def get_user(self):
+    @lazyproperty
+    def user(self):
         return self.request.user
 
 
