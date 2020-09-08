@@ -3,6 +3,7 @@ from operator import or_
 from uuid import uuid4
 import threading
 
+from django.conf import settings
 from django.db.models import F, Count, Q, Value, BooleanField
 
 from common.utils import get_logger
@@ -120,12 +121,6 @@ def compute_tmp_mapping_node_from_perm(user: User):
     ).distinct().only(*node_only_fields)
     granted_key_set = {_node.key for _node in nodes}
 
-    # 查询直接授权资产
-    asset_ids = Asset.objects.filter(
-        Q(granted_by_permissions__users=user) |
-        Q(granted_by_permissions__user_groups__users=user)
-    ).distinct().values_list('id', flat=True)
-
     key2leaf_nodes_mapper = {}
 
     # 给授权节点设置 _granted 标识，同时去重
@@ -139,19 +134,30 @@ def compute_tmp_mapping_node_from_perm(user: User):
             key2leaf_nodes_mapper[_node.key] = _node
 
     # 查询授权资产关联的节点设置
-    granted_asset_nodes = Node.objects.filter(
-        assets__id__in=asset_ids
-    ).distinct().only(*node_only_fields)
+    def process_permed_direct_assets():
+        # 查询直接授权资产
+        asset_ids = Asset.objects.filter(
+            Q(granted_by_permissions__users=user) |
+            Q(granted_by_permissions__user_groups__users=user)
+        ).distinct().values_list('id', flat=True)
+        # 查询授权资产关联的节点设置
+        granted_asset_nodes = Node.objects.filter(
+            assets__id__in=asset_ids
+        ).distinct().only(*node_only_fields)
 
-    # 给资产授权关联的节点设置 _asset_granted 标识，同时去重
-    for _node in granted_asset_nodes:
-        ancestor_keys = set(_node.get_ancestor_keys())
-        if ancestor_keys & granted_key_set:
-            continue
+        # 给资产授权关联的节点设置 _asset_granted 标识，同时去重
+        for _node in granted_asset_nodes:
+            ancestor_keys = set(_node.get_ancestor_keys())
+            if ancestor_keys & granted_key_set:
+                continue
 
-        if _node.key not in key2leaf_nodes_mapper:
-            key2leaf_nodes_mapper[_node.key] = _node
-        set_asset_granted(key2leaf_nodes_mapper[_node.key])
+            if _node.key not in key2leaf_nodes_mapper:
+                key2leaf_nodes_mapper[_node.key] = _node
+            set_asset_granted(key2leaf_nodes_mapper[_node.key])
+
+    if not settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
+        process_permed_direct_assets()
+
     leaf_nodes = key2leaf_nodes_mapper.values()
 
     # 计算所有祖先节点
