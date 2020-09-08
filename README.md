@@ -20,8 +20,8 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 
 ## 特色优势
 
-- 开源: 零门槛，线上快速获取和安装, 修复版本视情况而定；
-, 修复版本视情况而定- 分布式: 轻松支持大规模并发访问；
+- 开源: 零门槛，线上快速获取和安装；
+- 分布式: 轻松支持大规模并发访问；
 - 无插件: 仅需浏览器，极致的 Web Terminal 使用体验；
 - 多云支持: 一套系统，同时管理不同云上面的资产；
 - 云端存储: 审计录像云端存储，永不丢失；
@@ -212,6 +212,9 @@ v2.1.0 是 v2.0.0 之后的功能版本。
 - [Koko](https://github.com/jumpserver/koko) JumpServer 字符协议 Connector 项目，替代原来 Python 版本的 [Coco](https://github.com/jumpserver/coco)
 - [Guacamole](https://github.com/jumpserver/docker-guacamole) JumpServer 图形协议 Connector 项目，依赖 [Apache Guacamole](https://guacamole.apache.org/)
 
+## JumpServer 企业版 
+- [申请企业版试用](https://jinshuju.net/f/kyOYpi)
+> 注：企业版支持离线安装，申请通过后会提供高速下载链接。
 
 ## 案例研究
 
