@@ -92,7 +92,7 @@ def run_user_mapping_node_task(user: User):
     commiting_value = _generate_value(stage=lock.COMMITING)
 
     try:
-        locked = lock.acquire(key, doing_value, timeout=60)
+        locked = lock.acquire(key, doing_value, timeout=600)
         if not locked:
             logger.error(f'update_mapping_node_task_locked_failed for user: {user.id}')
             raise lock.SomeoneIsDoingThis
