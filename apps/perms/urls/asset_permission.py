@@ -22,12 +22,12 @@ user_permission_urlpatterns = [
     # 获取用户所有直接授权的资产
 
     # 以 serializer 格式返回
-    path('<uuid:pk>/assets/', api.UserGrantedAssetsForAdminApi.as_view(), name='user-assets'),
-    path('assets/', api.MyGrantedAssetsApi.as_view(), name='my-assets'),
+    path('<uuid:pk>/assets/', api.UserDirectGrantedAssetsForAdminApi.as_view(), name='user-assets'),
+    path('assets/', api.MyDirectGrantedAssetsApi.as_view(), name='my-assets'),
 
     # Tree Node 的数据格式返回
-    path('<uuid:pk>/assets/tree/', api.UserGrantedAssetsAsTreeForAdminApi.as_view(), name='user-assets-as-tree'),
-    path('assets/tree/', api.MyGrantedAssetsAsTreeApi.as_view(), name='my-assets-as-tree'),
+    path('<uuid:pk>/assets/tree/', api.UserDirectGrantedAssetsAsTreeForAdminApi.as_view(), name='user-assets-as-tree'),
+    path('assets/tree/', api.MyAllAssetsAsTreeApi.as_view(), name='my-assets-as-tree'),
     path('ungroup/assets/tree/', api.MyUngroupAssetsAsTreeApi.as_view(), name='my-ungroup-assets-as-tree'),
     # ^--------------------------------------------------------^
 

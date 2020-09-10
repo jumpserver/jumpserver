@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 #
+from common.permissions import IsOrgAdminOrAppUser, IsValidUser
+from common.utils import lazyproperty
 from rest_framework.generics import get_object_or_404
 
 from users.models import User
@@ -34,3 +36,20 @@ class UserGrantedNodeDispatchMixin:
 
     def on_ungranted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
         raise NotImplementedError
+
+
+class ForAdminMixin:
+    permission_classes = (IsOrgAdminOrAppUser,)
+
+    @lazyproperty
+    def user(self):
+        user_id = self.kwargs.get('pk')
+        return User.objects.get(id=user_id)
+
+
+class ForUserMixin:
+    permission_classes = (IsValidUser,)
+
+    @lazyproperty
+    def user(self):
+        return self.request.user

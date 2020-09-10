@@ -19,30 +19,28 @@ from perms.utils.user_node_tree import get_node_all_granted_assets
 from perms.pagination import GrantedAssetLimitOffsetPagination
 from assets.models import Asset
 from orgs.utils import tmp_to_root_org
+from .mixin import ForAdminMixin, ForUserMixin
 
 
 logger = get_logger(__name__)
 
 __all__ = [
-    'UserGrantedAssetsForAdminApi', 'MyGrantedAssetsAsTreeApi',
-    'UserGrantedNodeAssetsForAdminApi', 'MyGrantedAssetsApi',
-    'UserGrantedAssetsAsTreeForAdminApi', 'MyGrantedNodeAssetsApi',
+    'UserDirectGrantedAssetsForAdminApi', 'MyAllAssetsAsTreeApi',
+    'UserGrantedNodeAssetsForAdminApi', 'MyDirectGrantedAssetsApi',
+    'UserDirectGrantedAssetsAsTreeForAdminApi', 'MyGrantedNodeAssetsApi',
     'MyUngroupAssetsAsTreeApi',
 ]
 
 
-class UserGrantedAssetsForAdminApi(ListAPIView):
-    permission_classes = (IsOrgAdminOrAppUser,)
+@method_decorator(tmp_to_root_org(), name='list')
+class UserDirectGrantedAssetsApi(ListAPIView):
     serializer_class = serializers.AssetGrantedSerializer
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
     filter_fields = ['hostname', 'ip', 'id', 'comment']
     search_fields = ['hostname', 'ip', 'comment']
 
-    def get_user(self):
-        return User.objects.get(id=self.kwargs.get('pk'))
-
     def get_queryset(self):
-        user = self.get_user()
+        user = self.user
 
         return Asset.objects.filter(
             Q(granted_by_permissions__users=user) |
@@ -53,47 +51,41 @@ class UserGrantedAssetsForAdminApi(ListAPIView):
 
 
 @method_decorator(tmp_to_root_org(), name='list')
-class MyGrantedAssetsApi(UserGrantedAssetsForAdminApi):
-    permission_classes = (IsValidUser,)
-
-    def get_user(self):
-        return self.request.user
-
-
-@method_decorator(tmp_to_root_org(), name='list')
-class UserGrantedAssetsAsTreeForAdminApi(SerializeToTreeNodeMixin, UserGrantedAssetsForAdminApi):
+class AssetsAsTreeMixin(SerializeToTreeNodeMixin):
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         data = self.serialize_assets(queryset, None)
         return Response(data=data)
 
 
-@method_decorator(tmp_to_root_org(), name='list')
-class MyUngroupAssetsAsTreeApi(UserGrantedAssetsAsTreeForAdminApi):
-    """
-    获取 直接授权 的资产
-    """
-    permission_classes = (IsValidUser,)
+class UserDirectGrantedAssetsForAdminApi(ForAdminMixin, UserDirectGrantedAssetsApi):
+    pass
 
+
+class MyDirectGrantedAssetsApi(ForUserMixin, UserDirectGrantedAssetsApi):
+    pass
+
+
+@method_decorator(tmp_to_root_org(), name='list')
+class UserDirectGrantedAssetsAsTreeForAdminApi(ForAdminMixin, AssetsAsTreeMixin, UserDirectGrantedAssetsApi):
+    pass
+
+
+@method_decorator(tmp_to_root_org(), name='list')
+class MyUngroupAssetsAsTreeApi(ForUserMixin, AssetsAsTreeMixin, UserDirectGrantedAssetsApi):
     def get_queryset(self):
         queryset = super().get_queryset()
         if not settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
             queryset = queryset.none()
         return queryset
 
-    def get_user(self):
-        return self.request.user
-
 
 @method_decorator(tmp_to_root_org(), name='list')
-class MyGrantedAssetsAsTreeApi(UserGrantedAssetsAsTreeForAdminApi):
-    """
-    获取 直接授权 + 节点授权 的资产
-    """
-    permission_classes = (IsValidUser, )
+class UserAllGrantedAssetsApi(ListAPIView):
+    only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
 
     def get_queryset(self):
-        user = self.get_user()
+        user = self.user
 
         granted_node_keys = Node.objects.filter(
             Q(granted_by_permissions__users=user) |
@@ -115,25 +107,22 @@ class MyGrantedAssetsAsTreeApi(UserGrantedAssetsAsTreeForAdminApi):
             *self.only_fields
         )
 
-    def get_user(self):
-        return self.request.user
+
+class MyAllAssetsAsTreeApi(ForUserMixin, AssetsAsTreeMixin, UserAllGrantedAssetsApi):
+    pass
 
 
 @method_decorator(tmp_to_root_org(), name='list')
-class UserGrantedNodeAssetsForAdminApi(UserGrantedNodeDispatchMixin, ListAPIView):
-    permission_classes = (IsOrgAdminOrAppUser,)
+class UserGrantedNodeAssetsApi(UserGrantedNodeDispatchMixin, ListAPIView):
     serializer_class = serializers.AssetGrantedSerializer
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
     filter_fields = ['hostname', 'ip', 'id', 'comment']
     search_fields = ['hostname', 'ip', 'comment']
     pagination_class = GrantedAssetLimitOffsetPagination
 
-    def get_user(self):
-        return User.objects.get(id=self.kwargs.get('pk'))
-
     def get_queryset(self):
         node_id = self.kwargs.get("node_id")
-        user = self.get_user()
+        user = self.user
 
         mapping_node: UserGrantedMappingNode = get_object_or_none(
             UserGrantedMappingNode, user=user, node_id=node_id)
@@ -149,13 +138,13 @@ class UserGrantedNodeAssetsForAdminApi(UserGrantedNodeDispatchMixin, ListAPIView
 
     def on_ungranted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
         self.node = mapping_node
-        user = self.get_user()
+        user = self.user
         return get_node_all_granted_assets(user, node.key)
 
 
-@method_decorator(tmp_to_root_org(), name='list')
-class MyGrantedNodeAssetsApi(UserGrantedNodeAssetsForAdminApi):
-    permission_classes = (IsValidUser,)
+class UserGrantedNodeAssetsForAdminApi(ForAdminMixin, UserGrantedNodeAssetsApi):
+    pass
 
-    def get_user(self):
-        return self.request.user
+
+class MyGrantedNodeAssetsApi(ForUserMixin, UserGrantedNodeAssetsApi):
+    pass

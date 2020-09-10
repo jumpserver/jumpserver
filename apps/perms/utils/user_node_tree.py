@@ -4,7 +4,7 @@ from uuid import uuid4
 import threading
 
 from django.conf import settings
-from django.db.models import F, Count, Q, Value, BooleanField
+from django.db.models import F, Q, Value, BooleanField
 
 from common.utils import get_logger
 from common.const.distributed_lock_key import UPDATE_MAPPING_NODE_TASK_LOCK_KEY

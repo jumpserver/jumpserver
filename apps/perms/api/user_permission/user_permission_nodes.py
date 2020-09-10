@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from django.db.models import Q, F
+from perms.api.user_permission.mixin import ForAdminMixin, ForUserMixin
 from rest_framework.generics import (
     ListAPIView
 )
@@ -15,8 +16,6 @@ from common.utils import lazyproperty
 from perms.models import UserGrantedMappingNode
 from orgs.utils import tmp_to_root_org
 from assets.api.mixin import SerializeToTreeNodeMixin
-from users.models import User, UserGroup
-from common.permissions import IsOrgAdminOrAppUser, IsValidUser
 from common.utils import get_logger
 from ...hands import Node
 from .mixin import UserGrantedNodeDispatchMixin
@@ -64,23 +63,6 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, GrantedNodeBaseApi):
         nodes = self.get_nodes()
         nodes = self.serialize_nodes(nodes, with_asset_amount=True)
         return Response(data=nodes)
-
-
-class ForAdminMixin:
-    permission_classes = (IsOrgAdminOrAppUser,)
-
-    @lazyproperty
-    def user(self):
-        user_id = self.kwargs.get('pk')
-        return User.objects.get(id=user_id)
-
-
-class ForUserMixin:
-    permission_classes = (IsValidUser,)
-
-    @lazyproperty
-    def user(self):
-        return self.request.user
 
 
 class UserGrantedNodeChildrenMixin(UserGrantedNodeDispatchMixin):
