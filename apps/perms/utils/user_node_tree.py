@@ -1,7 +1,9 @@
-from functools import reduce
+from functools import reduce, wraps
 from operator import or_
 from uuid import uuid4
 import threading
+from typing import Callable
+import inspect
 
 from django.conf import settings
 from django.db.models import F, Q, Value, BooleanField
@@ -86,28 +88,46 @@ def _generate_value(stage=lock.DOING):
     )
 
 
-def build_user_mapping_node_with_lock(user: User):
-    key = UPDATE_MAPPING_NODE_TASK_LOCK_KEY.format(user_id=user.id)
-    doing_value = _generate_value()
-    commiting_value = _generate_value(stage=lock.COMMITING)
+def build_user_mapping_node_lock(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        call_args = inspect.getcallargs(func, *args, **kwargs)
+        user = call_args.get('user')
+        if user is None or not isinstance(user, User):
+            raise ValueError('You function must have `user` argument')
 
-    try:
-        locked = lock.acquire(key, doing_value, timeout=600)
-        if not locked:
-            logger.error(f'update_mapping_node_task_locked_failed for user: {user.id}')
-            raise lock.SomeoneIsDoingThis
+        key = UPDATE_MAPPING_NODE_TASK_LOCK_KEY.format(user_id=user.id)
+        doing_value = _generate_value()
+        commiting_value = _generate_value(stage=lock.COMMITING)
 
-        with atomic(savepoint=False):
-            tasks = RebuildUserTreeTask.objects.filter(user=user)
-            if tasks:
-                rebuild_mapping_nodes(user)
-                tasks.delete()
+        try:
+            locked = lock.acquire(key, doing_value, timeout=600)
+            if not locked:
+                logger.error(f'update_mapping_node_task_locked_failed for user: {user.id}')
+                raise lock.SomeoneIsDoingThis
+
+            with atomic(savepoint=False):
+                func(*args, **kwargs)
                 ok = lock.change_lock_state_to_commiting(key, doing_value, commiting_value)
                 if not ok:
                     logger.error(f'update_mapping_node_task_timeout for user: {user.id}')
                     raise lock.Timeout
-    finally:
-        lock.release(key, commiting_value, doing_value)
+        finally:
+            lock.release(key, commiting_value, doing_value)
+    return wrapper
+
+
+@build_user_mapping_node_lock
+def rebuild_user_mapping_nodes_if_need_with_lock(user: User):
+    tasks = RebuildUserTreeTask.objects.filter(user=user)
+    if tasks:
+        tasks.delete()
+        rebuild_user_mapping_nodes(user)
+
+
+@build_user_mapping_node_lock
+def rebuild_user_mapping_nodes_with_lock(user: User):
+    rebuild_user_mapping_nodes(user)
 
 
 @tmp_to_root_org()
@@ -205,7 +225,7 @@ def set_node_granted_asset_amount(user, node):
     setattr(node, TMP_GRANTED_ASSET_AMOUNT, assets_amount)
 
 
-def rebuild_mapping_nodes(user):
+def rebuild_user_mapping_nodes(user):
     tmp_nodes = compute_tmp_mapping_node_from_perm(user)
     for _node in tmp_nodes:
         set_node_granted_asset_amount(user, _node)

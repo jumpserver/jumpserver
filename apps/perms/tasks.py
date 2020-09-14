@@ -1,28 +1,25 @@
 # ~*~ coding: utf-8 ~*~
 from __future__ import absolute_import, unicode_literals
 
-import time
-
 from celery import shared_task
 from common.utils import get_logger
-from perms.utils.user_node_tree import build_user_mapping_node_with_lock
+from users.models import User
+from perms.models import RebuildUserTreeTask
+from perms.utils.user_node_tree import rebuild_user_mapping_nodes_if_need_with_lock
 
 logger = get_logger(__file__)
 
 
-@shared_task()
-def build_users_perm_tree_celery_task():
-    from users.models import User
-    users = User.objects.all()
-    users_amount = users.count()
-    width = len(str(users_amount))
+@shared_task(queue='node_tree')
+def rebuild_user_mapping_nodes_celery_task(user_id):
+    logger.info(f'rebuild user[{user_id}] mapping nodes')
+    user = User.objects.get(id=user_id)
+    rebuild_user_mapping_nodes_if_need_with_lock(user)
 
-    for i, user in enumerate(users):
-        try:
-            logger.info(f'{i+1:0>{width}}/{users_amount} build_mapping_nodes for {user} begin')
-            t1 = time.time()
-            build_user_mapping_node_with_lock(user)
-            t2 = time.time()
-            logger.info(f'{i+1:0>{width}}/{users_amount} build_mapping_nodes for {user} finish cost {t2-t1}s')
-        except:
-            continue
+
+@shared_task(queue='node_tree')
+def dispatch_mapping_node_tasks():
+    user_ids = RebuildUserTreeTask.objects.all().values_list('user_id', flat=True).distinct()
+    for id in user_ids:
+        logger.info(f'dispatch mapping node task for user[{id}]')
+        rebuild_user_mapping_nodes_celery_task.delay(id)

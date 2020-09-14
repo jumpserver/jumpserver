@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 #
-from collections import defaultdict
 from itertools import chain
 
 from django.db.models.signals import m2m_changed, pre_delete
 from django.dispatch import receiver
 from django.db import transaction
-from django.db.models import Q, F
+from django.db.models import Q
 
+from perms.tasks import dispatch_mapping_node_tasks
 from perms.async_tasks.mapping_node_task import submit_update_mapping_node_task
 from users.models import User
 from assets.models import Asset
@@ -33,7 +33,7 @@ def create_rebuild_user_tree_task(user_ids):
     RebuildUserTreeTask.objects.bulk_create(
         [RebuildUserTreeTask(user_id=i) for i in user_ids]
     )
-    transaction.on_commit(submit_update_mapping_node_task)
+    transaction.on_commit(dispatch_mapping_node_tasks)
 
 
 def create_rebuild_user_tree_task_by_asset_perm(asset_perm: AssetPermission):

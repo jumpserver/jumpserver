@@ -10,9 +10,9 @@ def fill_node_value(apps, schema_editor):
     node_queryset = Node.objects.all()
     node_amount = node_queryset.count()
     width = len(str(node_amount))
-
+    print('\n')
     for i, node in enumerate(node_queryset):
-        print(f'{i+1:0>{width}}/{node_amount} compute node[{node.key}]`s assets_amount ...')
+        print(f'\t{i+1:0>{width}}/{node_amount} compute node[{node.key}]`s assets_amount ...')
         assets_amount = Asset.objects.filter(
             Q(nodes__key__istartswith=f'{node.key}:') | Q(nodes=node)
         ).distinct().count()
@@ -24,6 +24,7 @@ def fill_node_value(apps, schema_editor):
         node.assets_amount = assets_amount
         node.parent_key = parent_key
         node.save()
+    print('  ' + '.'*65, end='')
 
 
 class Migration(migrations.Migration):

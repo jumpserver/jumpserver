@@ -1,5 +1,5 @@
 from django.utils.crypto import get_random_string
-from perms.utils import build_user_mapping_node_with_lock
+from perms.utils import rebuild_user_mapping_nodes_if_need_with_lock
 
 from common.thread_pools import SingletonThreadPoolExecutor
 from common.utils import get_logger
@@ -31,7 +31,7 @@ def run_mapping_node_tasks():
 
         user = task.user
         try:
-            build_user_mapping_node_with_lock(user)
+            rebuild_user_mapping_nodes_if_need_with_lock(user)
         except:
             logger.exception(f'[{ident}]mapping_node_tasks_exception')
             failed_user_ids.append(user.id)
@@ -44,4 +44,4 @@ def submit_update_mapping_node_task():
 
 
 def submit_update_mapping_node_task_for_user(user):
-    executor.submit(build_user_mapping_node_with_lock, user)
+    executor.submit(rebuild_user_mapping_nodes_if_need_with_lock, user)
