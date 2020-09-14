@@ -149,6 +149,7 @@ class SystemUserListSerializer(SystemUserSerializer):
     class Meta(SystemUserSerializer.Meta):
         fields = [
             'id', 'name', 'username', 'protocol',
+            'password', 'public_key', 'private_key',
             'login_mode', 'login_mode_display',
             'priority', "username_same_with_user",
             'auto_push', 'sudo', 'shell', 'comment',
@@ -156,6 +157,12 @@ class SystemUserListSerializer(SystemUserSerializer):
             'auto_generate_key',
             'sftp_root',
         ]
+
+        extra_kwargs = {
+            'password': {"write_only": True},
+            'public_key': {"write_only": True},
+            'private_key': {"write_only": True},
+        }
 
     @classmethod
     def setup_eager_loading(cls, queryset):
