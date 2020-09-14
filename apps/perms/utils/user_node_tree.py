@@ -86,7 +86,7 @@ def _generate_value(stage=lock.DOING):
     )
 
 
-def run_user_mapping_node_task(user: User):
+def build_user_mapping_node_with_lock(user: User):
     key = UPDATE_MAPPING_NODE_TASK_LOCK_KEY.format(user_id=user.id)
     doing_value = _generate_value()
     commiting_value = _generate_value(stage=lock.COMMITING)
@@ -207,9 +207,8 @@ def set_node_granted_asset_amount(user, node):
 
 def rebuild_mapping_nodes(user):
     tmp_nodes = compute_tmp_mapping_node_from_perm(user)
-    if True:  # TODO 这里可以配置
-        for _node in tmp_nodes:
-            set_node_granted_asset_amount(user, _node)
+    for _node in tmp_nodes:
+        set_node_granted_asset_amount(user, _node)
     create_mapping_nodes(user, tmp_nodes)
 
 
