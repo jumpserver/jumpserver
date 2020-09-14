@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.auth import user_logged_in
 from django.core.cache import cache
 from django.dispatch import receiver
+from django_cas_ng.signals import cas_user_authenticated
 
 from jms_oidc_rp.signals import openid_user_login_failed, openid_user_login_success
 
@@ -29,3 +30,8 @@ def on_oidc_user_login_success(sender, request, user, **kwargs):
 @receiver(openid_user_login_failed)
 def on_oidc_user_login_failed(sender, username, request, reason, **kwargs):
     post_auth_failed.send(sender, username=username, request=request, reason=reason)
+
+
+@receiver(cas_user_authenticated)
+def on_cas_user_login_success(sender, request, user, **kwargs):
+    post_auth_success.send(sender, user=user, request=request)
