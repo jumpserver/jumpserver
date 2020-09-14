@@ -19,10 +19,10 @@ def build_users_perm_tree_celery_task():
 
     for i, user in enumerate(users):
         try:
-            logger.info(f'{i:0>{width}}/{users_amount} build_mapping_nodes for {user} begin')
+            logger.info(f'{i+1:0>{width}}/{users_amount} build_mapping_nodes for {user} begin')
             t1 = time.time()
             build_user_mapping_node_with_lock(user)
             t2 = time.time()
-            logger.info(f'{i:0>{width}}/{users_amount} build_mapping_nodes for {user} finish cost {t2-t1}s')
+            logger.info(f'{i+1:0>{width}}/{users_amount} build_mapping_nodes for {user} finish cost {t2-t1}s')
         except:
             continue

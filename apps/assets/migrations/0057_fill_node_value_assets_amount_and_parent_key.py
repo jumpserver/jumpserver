@@ -12,7 +12,7 @@ def fill_node_value(apps, schema_editor):
     width = len(str(node_amount))
 
     for i, node in enumerate(node_queryset):
-        print(f'{i:0>{width}}/{node_amount} compute node[{node.key}]`s assets_amount ...')
+        print(f'{i+1:0>{width}}/{node_amount} compute node[{node.key}]`s assets_amount ...')
         assets_amount = Asset.objects.filter(
             Q(nodes__key__istartswith=f'{node.key}:') | Q(nodes=node)
         ).distinct().count()
