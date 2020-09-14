@@ -52,9 +52,9 @@ class OrgReadSerializer(OrgSerializer):
 
 
 class OrgMemberSerializer(BulkModelSerializer):
-    org_display = serializers.CharField()
-    user_display = serializers.CharField()
-    role_display = serializers.CharField(source='get_role_display')
+    org_display = serializers.CharField(read_only=True)
+    user_display = serializers.CharField(read_only=True)
+    role_display = serializers.CharField(source='get_role_display', read_only=True)
 
     class Meta:
         model = OrganizationMember
