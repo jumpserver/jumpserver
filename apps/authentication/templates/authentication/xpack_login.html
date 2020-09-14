@@ -156,7 +156,7 @@
         var rsaPublicKey = "{{ rsa_public_key }}";
         var password =$('#password').val();
         var passwordEncrypted = encryptLoginPassword(password, rsaPublicKey);
-        var serialize_array = $('#form').serializeArray();
+        var serialize_array = $('#contact-form').serializeArray();
         $.each(serialize_array, function(index,obj){
             if(obj.name=='password'){
                 obj.value=passwordEncrypted};
@@ -174,7 +174,7 @@
             },
         });
     };
-    }
+
 </script>
 </html>
 
