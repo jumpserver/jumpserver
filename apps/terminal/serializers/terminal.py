@@ -1,8 +1,10 @@
 from rest_framework import serializers
+from django.utils.translation import ugettext_lazy as _
 
 from common.drf.serializers import BulkModelSerializer, AdaptedBulkListSerializer
+from common.utils import is_uuid
 from ..models import (
-    Terminal, Status, Session, Task
+    Terminal, Status, Session, Task, CommandStorage, ReplayStorage
 )
 
 
@@ -17,6 +19,31 @@ class TerminalSerializer(BulkModelSerializer):
             'comment', 'is_accepted', "is_active", 'session_online',
             'is_alive', 'date_created', 'command_storage', 'replay_storage'
         ]
+
+    @staticmethod
+    def get_kwargs_may_be_uuid(value):
+        kwargs = {}
+        if is_uuid(value):
+            kwargs['id'] = value
+        else:
+            kwargs['name'] = value
+        return kwargs
+
+    def validate_command_storage(self, value):
+        kwargs = self.get_kwargs_may_be_uuid(value)
+        storage = CommandStorage.objects.filter(**kwargs).first()
+        if storage:
+            return storage.name
+        else:
+            raise serializers.ValidationError(_('Not found'))
+
+    def validate_replay_storage(self, value):
+        kwargs = self.get_kwargs_may_be_uuid(value)
+        storage = ReplayStorage.objects.filter(**kwargs).first()
+        if storage:
+            return storage.name
+        else:
+            raise serializers.ValidationError(_('Not found'))
 
     @staticmethod
     def get_session_online(obj):
