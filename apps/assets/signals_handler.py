@@ -4,11 +4,12 @@ from operator import add, sub
 
 from assets.utils import is_asset_exists_in_node
 from django.db.models.signals import (
-    post_save, m2m_changed
+    post_save, m2m_changed, pre_delete, post_delete
 )
 from django.db.models import Q, F
 from django.dispatch import receiver
 
+from common.local import thread_local
 from common.exceptions import M2MReverseNotAllowed
 from common.const.signals import PRE_ADD, POST_ADD, POST_REMOVE, PRE_CLEAR
 from common.utils import get_logger
@@ -318,3 +319,28 @@ def update_nodes_assets_amount(action, instance, reverse, pk_set, **kwargs):
         # 与资产直接关联的节点
         node_keys = set(Node.objects.filter(id__in=pk_set).values_list('key', flat=True))
         _update_nodes_asset_amount(node_keys, asset_pk, operator)
+
+
+ASSET_DELETE_SIGNAL_FOR_NODE_TREE_PARAMS = 'asset_delete_signal_for_node_tree_params'
+
+
+@receiver(pre_delete, sender=Asset)
+def on_asset_delete(instance: Asset, **kwargs):
+    node_keys = Node.objects.filter(
+        assets=instance
+    ).distinct().values_list('key', flat=True)
+
+    params = {
+        'node_keys': set(node_keys),
+        'asset_pk': instance.id,
+        'operator': sub
+    }
+
+    setattr(thread_local, ASSET_DELETE_SIGNAL_FOR_NODE_TREE_PARAMS, params)
+
+
+@receiver(post_delete, sender=Asset)
+def on_asset_post_delete(instance: Asset, **kwargs):
+    params = getattr(thread_local, ASSET_DELETE_SIGNAL_FOR_NODE_TREE_PARAMS, None)
+    if params and params.get('asset_pk') == instance.id:
+        _update_nodes_asset_amount(**params)
