@@ -82,12 +82,27 @@
         return jsencrypt.encrypt(password); //加密
     }
     function doLogin() {
-        //公钥加密
-        var rsaPublicKey = "{{ rsa_public_key }}"
-        var password =$('#password').val(); //明文密码
-        var passwordEncrypted = encryptLoginPassword(password, rsaPublicKey)
-        $('#password').val(passwordEncrypted); //返回给密码输入input
-        $('#form').submit();//post提交
-    }
+        var rsaPublicKey = "{{ rsa_public_key }}";
+        var password =$('#password').val();
+        var passwordEncrypted = encryptLoginPassword(password, rsaPublicKey);
+        var serialize_array = $('#form').serializeArray();
+        $.each(serialize_array, function(index,obj){
+            if(obj.name=='password'){
+                obj.value=passwordEncrypted};
+        });
+
+        $.ajax({
+            type: 'POST',
+            url: '',
+            data: serialize_array,
+            success: function(data){
+                $('body').html(data);
+            },
+            error: function(data){
+                alert('服务器异常');
+            },
+        });
+    };
+
     </script>
 {% endblock %}
