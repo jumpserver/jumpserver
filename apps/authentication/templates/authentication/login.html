@@ -46,8 +46,8 @@
         <div>
             {{ form.captcha }}
         </div>
-        <button type="submit" class="btn btn-primary block full-width m-b" onclick="doLogin();return false;">{% trans 'Login' %}</button>
-
+        <button id="submit-button-id" type="submit" class="btn btn-primary block full-width m-b" onclick="doLogin();return false;">{% trans 'Login' %}</button>
+        <span id="logging-hidden-id" style="display:none">{% trans 'Logging' %}...</span>
         {% if demo_mode %}
             <p class="text-muted font-bold" style="color: red">
                 Demo账号: admin 密码: admin
@@ -82,6 +82,11 @@
         return jsencrypt.encrypt(password); //加密
     }
     function doLogin() {
+        var login_text = $('#submit-button-id').text();
+        var logging_text = $('#logging-hidden-id').text();
+        $("#submit-button-id").attr('disabled', 'true');
+        $("#submit-button-id").text(logging_text);
+
         var rsaPublicKey = "{{ rsa_public_key }}";
         var password =$('#password').val();
         var passwordEncrypted = encryptLoginPassword(password, rsaPublicKey);
@@ -99,6 +104,8 @@
                 $('body').html(data);
             },
             error: function(data){
+                $("#submit-button-id").removeAttr('disabled');
+                $("#submit-button-id").text(login_text);
                 alert('服务器异常');
             },
         });

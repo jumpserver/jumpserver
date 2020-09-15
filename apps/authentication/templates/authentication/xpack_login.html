@@ -127,7 +127,8 @@
                                         {{ form.captcha }}
                                     </div>
                                     <div class="form-group" style="margin-top: 10px">
-                                        <button type="submit" class="btn btn-transparent" onclick="doLogin();return false;">{% trans 'Login' %}</button>
+                                        <button id="submit-button-id" type="submit" class="btn btn-transparent" onclick="doLogin();return false;">{% trans 'Login' %}</button>
+                                        <span id="logging-hidden-id" style="display:none">{% trans 'Logging' %}...</span>
                                     </div>
                                     <div style="text-align: center">
                                         <a href="{% url 'authentication:forgot-password' %}">
@@ -153,6 +154,11 @@
         return jsencrypt.encrypt(password); //加密
     }
     function doLogin() {
+        var login_text = $('#submit-button-id').text();
+        var logging_text = $('#logging-hidden-id').text();
+        $("#submit-button-id").attr('disabled', 'true');
+        $("#submit-button-id").text(logging_text);
+
         var rsaPublicKey = "{{ rsa_public_key }}";
         var password =$('#password').val();
         var passwordEncrypted = encryptLoginPassword(password, rsaPublicKey);
@@ -170,6 +176,8 @@
                 $('body').html(data);
             },
             error: function(data){
+                $("#submit-button-id").removeAttr('disabled');
+                $("#submit-button-id").text(login_text);
                 alert('服务器异常');
             },
         });

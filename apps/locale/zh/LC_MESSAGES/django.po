@@ -1320,6 +1320,8 @@ msgstr "代码错误"
 #: templates/_base_only_msg_content.html:51 templates/_header_bar.html:83
 msgid "Login"
 msgstr "登录"
+msgid "Logging"
+msgstr "登录中"
 
 #: authentication/templates/authentication/login.html:17
 #: authentication/templates/authentication/xpack_login.html:95
