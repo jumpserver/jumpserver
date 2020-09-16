@@ -2536,6 +2536,42 @@ msgstr "结束日期"
 msgid "Args"
 msgstr "参数"
 
+#: terminal/utils.py:95
+#, python-format
+msgid ""
+"Insecure Command Alert: [%(name)s->%(login_from)s@%(remote_addr)s] $"
+"%(command)s"
+msgstr "危险命令告警: [%(name)s->%(login_from)s@%(remote_addr)s] $%(command)s"
+
+#: terminal/utils.py:103
+#, python-format
+msgid ""
+"\n"
+"        Command: %(command)s\n"
+"        <br>\n"
+"        Asset: %(host_name)s (%(host_ip)s)\n"
+"        <br>\n"
+"        User: %(user)s\n"
+"        <br>\n"
+"        Level: %(risk_level)s\n"
+"        <br>\n"
+"        Session: <a href=\"%(session_detail_url)s\">session detail</a>\n"
+"        <br>\n"
+"        "
+msgstr ""
+"\n"
+"        命令: %(command)s\n"
+"        <br>\n"
+"        资产: %(host_name)s (%(host_ip)s)\n"
+"        <br>\n"
+"        用户: %(user)s\n"
+"        <br>\n"
+"        等级: %(risk_level)s\n"
+"        <br>\n"
+"        会话: <a href=\"%(session_detail_url)s\">会话详情</a>\n"
+"        <br>\n"
+"        "
+
 #: tickets/api/request_asset_perm.py:48
 #, python-format
 msgid "Ticket has %s"

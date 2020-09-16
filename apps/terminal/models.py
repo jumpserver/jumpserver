@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import os
 import uuid
 import jms_storage
+from assets.models import Asset
 
 from django.db import models
 from django.db.models.signals import post_save
@@ -223,6 +224,10 @@ class Session(OrgModelMixin):
         else:
             local_path = rel_path
         return local_path
+
+    @property
+    def asset_obj(self):
+        return Asset.objects.get(id=self.asset_id)
 
     @property
     def _date_start_first_has_replay_rdp_session(self):

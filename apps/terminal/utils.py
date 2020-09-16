@@ -2,15 +2,19 @@
 #
 import os
 
+from django.conf import settings
 from django.core.cache import cache
 from django.core.files.storage import default_storage
+from django.db.models import Q
+from django.utils.translation import ugettext as _
 import jms_storage
 
 from assets.models import Asset, SystemUser
 from users.models import User
-from common.utils import get_logger
+from common.utils import get_logger, reverse
+from common.tasks import send_mail_async
 from .const import USERS_CACHE_KEY, ASSETS_CACHE_KEY, SYSTEM_USER_CACHE_KEY
-from .models import ReplayStorage
+from .models import ReplayStorage, Session, Command
 
 logger = get_logger(__name__)
 
@@ -86,3 +90,40 @@ def get_session_replay_url(session):
     if local_path is None:
         local_path, url = download_session_replay(session)
     return local_path, url
+
+
+def send_command_alert_mail(risk_level, **kwargs):
+    session_obj = Session.objects.get(id=kwargs.get('session_id'))
+    subject = _("Insecure Command Alert: [%(name)s->%(login_from)s@%(remote_addr)s] $%(command)s") % {
+                    'name': kwargs.get('user'),
+                    'login_from': session_obj.get_login_from_display(),
+                    'remote_addr': session_obj.remote_addr,
+                    'command': kwargs.get('input')
+                 }
+    recipient_list = list(User.objects.filter(Q(role=User.ROLE.AUDITOR) | Q(role=User.ROLE.ADMIN))
+                          .values_list('email', flat=True))
+    message = _("""
+        Command: %(command)s
+        <br>
+        Asset: %(host_name)s (%(host_ip)s)
+        <br>
+        User: %(user)s
+        <br>
+        Level: %(risk_level)s
+        <br>
+        Session: <a href="%(session_detail_url)s">session detail</a>
+        <br>
+        """) % {
+            'command': kwargs.get('input'),
+            'host_name': kwargs.get('asset'),
+            'host_ip': session_obj.asset_obj.ip,
+            'user': kwargs.get('user'),
+            'risk_level': Command.get_risk_level_str(risk_level),
+            'session_detail_url': reverse('api-terminal:session-detail',
+                                          kwargs={'pk': kwargs.get('session_id')},
+                                          external=True, api_to_ui=True),
+        }
+    if settings.DEBUG:
+        logger.debug(message)
+
+    send_mail_async.delay(subject, message, recipient_list, html_message=message)

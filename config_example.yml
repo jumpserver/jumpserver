@@ -120,7 +120,13 @@ REDIS_PORT: 6379
 #
 # 同一账号仅允许在一台设备登录
 # USER_LOGIN_SINGLE_MACHINE_ENABLED: False
-#
+
+# 启用危险命令告警邮件通知
+# SEND_COMMAND_ALERT_EMAIL_ENABLED：True
+
+# 危险命令告警等级（大于等于INSECURE_COMMAND_LEVEL等级时，发送告警邮件）
+# INSECURE_COMMAND_LEVEL: 5
+
 # 启用定时任务
 # PERIOD_TASK_ENABLE: True
 #
