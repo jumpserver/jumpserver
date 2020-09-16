@@ -13,6 +13,7 @@ from django.template import loader
 from orgs.utils import current_org
 from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor
 from common.utils import get_logger
+from common.mixins import ExtraFilterFieldsMixin
 from ..backends import (
     get_command_storage, get_multi_command_storage,
     SessionCommandSerializer,
@@ -86,7 +87,7 @@ class CommandQueryMixin:
         return date_from_st, date_to_st
 
 
-class CommandViewSet(CommandQueryMixin, viewsets.ModelViewSet):
+class CommandViewSet(ExtraFilterFieldsMixin, CommandQueryMixin, viewsets.ModelViewSet):
     """接受app发送来的command log, 格式如下
     {
         "user": "admin",
