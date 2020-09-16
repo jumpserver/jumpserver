@@ -256,7 +256,9 @@ class Config(dict):
         'FORCE_SCRIPT_NAME': '',
         'LOGIN_CONFIRM_ENABLE': False,
         'WINDOWS_SKIP_ALL_MANUAL_PASSWORD': False,
-        'ORG_CHANGE_TO_URL': ''
+        'ORG_CHANGE_TO_URL': '',
+        'SEND_COMMAND_ALERT_EMAIL_ENABLED': False,
+        'INSECURE_COMMAND_LEVEL': 5
     }
 
     def compatible_auth_openid_of_key(self):

@@ -118,6 +118,13 @@ REDIS_PORT: 6379
 # 是否把未授权节点资产放入到 未分组 节点中
 # PERM_SINGLE_ASSET_TO_UNGROUP_NODE: false
 #
+
+# 启用危险命令告警邮件通知
+# SEND_COMMAND_ALERT_EMAIL_ENABLED：True
+
+# 危险命令告警等级（大于等于INSECURE_COMMAND_LEVEL等级时，发送告警邮件）
+# INSECURE_COMMAND_LEVEL: 5
+
 # 启用定时任务
 # PERIOD_TASK_ENABLE: True
 #
