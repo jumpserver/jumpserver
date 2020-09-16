@@ -40,10 +40,10 @@ class CreateUserMixin:
 
 
 class RadiusBackend(CreateUserMixin, RADIUSBackend):
-    def authenticate(self, request, username=None, password=None, **kwargs):
+    def authenticate(self, request, username='', password='', **kwargs):
         return super().authenticate(request, username=username, password=password)
 
 
 class RadiusRealmBackend(CreateUserMixin, RADIUSRealmBackend):
-    def authenticate(self, request, username=None, password=None, realm=None, **kwargs):
+    def authenticate(self, request, username='', password='', realm=None, **kwargs):
         return super().authenticate(request, username=username, password=password, realm=realm)
