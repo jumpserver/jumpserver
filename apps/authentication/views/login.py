@@ -17,6 +17,7 @@ from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import FormView
 from django.conf import settings
 from django.urls import reverse_lazy
+from django.contrib.auth import BACKEND_SESSION_KEY
 
 from common.const.front_urls import TICKET_DETAIL
 from common.utils import get_request_ip, get_object_or_none
@@ -205,12 +206,12 @@ class UserLoginWaitConfirmView(TemplateView):
 class UserLogoutView(TemplateView):
     template_name = 'flash_message_standalone.html'
 
-    @staticmethod
-    def get_backend_logout_url():
-        if settings.AUTH_OPENID:
+    def get_backend_logout_url(self):
+        backend = self.request.session.get(BACKEND_SESSION_KEY, '')
+        if 'OIDC' in backend:
             return settings.AUTH_OPENID_AUTH_LOGOUT_URL_NAME
-        # if settings.AUTH_CAS:
-        #     return settings.CAS_LOGOUT_URL_NAME
+        elif 'CAS' in backend:
+            return settings.CAS_LOGOUT_URL_NAME
         return None
 
     def get(self, request, *args, **kwargs):

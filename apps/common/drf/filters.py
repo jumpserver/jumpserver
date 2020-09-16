@@ -98,7 +98,11 @@ class IDSpmFilter(filters.BaseFilterBackend):
         resources_id = cache.get(cache_key)
         if resources_id is None or not isinstance(resources_id, list):
             return queryset
-        queryset = queryset.filter(id__in=resources_id)
+        if isinstance(queryset, list):
+            # CommandViewSet
+            queryset = [q for q in queryset if q['id'] in resources_id]
+        else:
+            queryset = queryset.filter(id__in=resources_id)
         return queryset
 
 
