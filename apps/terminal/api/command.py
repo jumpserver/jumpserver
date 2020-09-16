@@ -3,7 +3,6 @@
 import time
 from django.utils import timezone
 from django.shortcuts import HttpResponse
-from django.core.cache import cache
 from rest_framework import viewsets
 from rest_framework import generics
 from rest_framework.fields import DateTimeField
@@ -14,7 +13,6 @@ from django.template import loader
 from orgs.utils import current_org
 from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor
 from common.utils import get_logger
-from common import const
 from ..backends import (
     get_command_storage, get_multi_command_storage,
     SessionCommandSerializer,
@@ -64,23 +62,8 @@ class CommandQueryMixin:
         )
         return queryset
 
-    def filter_queryset_spm(self, queryset):
-        spm = self.request.query_params.get('spm')
-        if not spm:
-            return queryset
-        cache_key = const.KEY_CACHE_RESOURCES_ID.format(spm)
-        resources_id = cache.get(cache_key)
-        if resources_id is None or not isinstance(resources_id, list):
-            return queryset
-        if isinstance(queryset, list):
-            queryset = [q for q in queryset if q['id'] in resources_id]
-        else:
-            queryset = queryset.filter(id__in=resources_id)
-        return queryset
-
     def filter_queryset(self, queryset):
         # 解决es存储命令时，父类根据filter_fields过滤出现异常的问题，返回的queryset类型list
-        queryset = self.filter_queryset_spm(queryset)
         return queryset
 
     def get_date_range(self):
