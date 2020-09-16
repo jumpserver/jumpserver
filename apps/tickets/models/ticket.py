@@ -79,7 +79,6 @@ class Ticket(OrgModelMixin, CommonModelMixin):
         )
         self.status = status
         self.assignee = user
-        self.assignees_display = str(user)
         self.save()
 
     def create_comment(self, action_display, user, extra_comment=None):
@@ -97,7 +96,6 @@ class Ticket(OrgModelMixin, CommonModelMixin):
         self.action = action
         self.status = self.STATUS.CLOSED
         self.assignee = user
-        self.assignees_display = str(user)
         self.save()
 
     def is_assignee(self, user):
