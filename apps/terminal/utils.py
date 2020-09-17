@@ -92,13 +92,13 @@ def get_session_replay_url(session):
     return local_path, url
 
 
-def send_command_alert_mail(risk_level, **kwargs):
-    session_obj = Session.objects.get(id=kwargs.get('session_id'))
+def send_command_alert_mail(command):
+    session_obj = Session.objects.get(id=command['session'])
     subject = _("Insecure Command Alert: [%(name)s->%(login_from)s@%(remote_addr)s] $%(command)s") % {
-                    'name': kwargs.get('user'),
+                    'name': command['user'],
                     'login_from': session_obj.get_login_from_display(),
                     'remote_addr': session_obj.remote_addr,
-                    'command': kwargs.get('input')
+                    'command': command['input']
                  }
     recipient_list = list(User.objects.filter(Q(role=User.ROLE.AUDITOR) | Q(role=User.ROLE.ADMIN))
                           .values_list('email', flat=True))
@@ -114,13 +114,13 @@ def send_command_alert_mail(risk_level, **kwargs):
         Session: <a href="%(session_detail_url)s">session detail</a>
         <br>
         """) % {
-            'command': kwargs.get('input'),
-            'host_name': kwargs.get('asset'),
+            'command': command['input'],
+            'host_name': command['asset'],
             'host_ip': session_obj.asset_obj.ip,
-            'user': kwargs.get('user'),
-            'risk_level': Command.get_risk_level_str(risk_level),
+            'user': command['user'],
+            'risk_level': Command.get_risk_level_str(command['risk_level']),
             'session_detail_url': reverse('api-terminal:session-detail',
-                                          kwargs={'pk': kwargs.get('session_id')},
+                                          kwargs={'pk': command['session']},
                                           external=True, api_to_ui=True),
         }
     if settings.DEBUG:

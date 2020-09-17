@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 #
+import json
 import time
+
+from django.conf import settings
 from django.utils import timezone
 from django.shortcuts import HttpResponse
-from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import viewsets
 from rest_framework import generics
@@ -14,7 +16,7 @@ from django.template import loader
 from orgs.utils import current_org
 from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor
 from common.utils import get_logger
-from terminal.signals import post_command_executed
+from terminal.utils import send_command_alert_mail
 
 from ..backends import (
     get_command_storage, get_multi_command_storage,
@@ -22,7 +24,7 @@ from ..backends import (
 )
 
 logger = get_logger(__name__)
-__all__ = ['CommandViewSet', 'CommandExportApi', 'InsecureCommandSignalApi']
+__all__ = ['CommandViewSet', 'CommandExportApi', 'insecure_command_alert_api']
 
 
 class CommandQueryMixin:
@@ -102,14 +104,8 @@ class CommandViewSet(CommandQueryMixin, viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data, many=True)
         if serializer.is_valid():
-            data = serializer.validated_data
-            ok = self.command_store.bulk_save(data)
+            ok = self.command_store.bulk_save(serializer.validated_data)
             if ok:
-                for command in data:
-                    post_command_executed.send(
-                        sender=self.__class__, user=command['user'], session_id=command['session'],
-                        input=command['input'], asset=command['asset'], risk_level=command['risk_level']
-                    )
                 return Response("ok", status=201)
             else:
                 return Response("Save error", status=500)
@@ -139,20 +135,17 @@ class CommandExportApi(CommandQueryMixin, generics.ListAPIView):
         return response
 
 
-@method_decorator(csrf_exempt, name='dispatch')
-class InsecureCommandSignalApi(generics.GenericAPIView):
-    serializer_class = SessionCommandSerializer
-
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data, many=True)
-        if serializer.is_valid():
-            for command in serializer.validated_data:
-                post_command_executed.send(
-                    sender=self.__class__, user=command['user'], session_id=command['session'],
-                    input=command['input'], asset=command['asset'], risk_level=command['risk_level']
-                )
-            return Response("ok", status=200)
-        else:
-            msg = "Command not valid: {}".format(serializer.errors)
-            logger.error(msg)
-            return Response({"msg": msg}, status=400)
+@csrf_exempt
+def insecure_command_alert_api(request):
+    if request.method == 'POST':
+        commands = json.loads(request.body)
+        for command in commands:
+            if command['risk_level'] >= settings.INSECURE_COMMAND_LEVEL and \
+                    settings.SEND_COMMAND_ALERT_EMAIL_ENABLED:
+                try:
+                    send_command_alert_mail(command)
+                except Exception as e:
+                    logger.error(e)
+        return HttpResponse("ok")
+    else:
+        return HttpResponse("request method error")
