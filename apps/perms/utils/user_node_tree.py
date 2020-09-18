@@ -290,7 +290,7 @@ def get_node_all_granted_assets_from_perm(user: User, key):
 
     granted_nodes = Node.objects.filter(
         Q(key__startswith=f'{key}:') | Q(key=key)
-    ).filter(granted_q)
+    ).filter(granted_q).distinct()
 
     # 直接授权资产查询条件
     granted_asset_filter_q = (Q(nodes__key__startswith=f'{key}:') | Q(nodes__key=key)) & granted_q
@@ -301,7 +301,7 @@ def get_node_all_granted_assets_from_perm(user: User, key):
         q |= Q(nodes__key__startswith=f'{_node.key}:')
         q |= Q(nodes__key=_node.key)
 
-    asset_qs = Asset.objects.filter(q)
+    asset_qs = Asset.objects.filter(q).distinct()
     return asset_qs
 
 
