@@ -2,7 +2,6 @@ from functools import reduce, wraps
 from operator import or_
 from uuid import uuid4
 import threading
-from typing import Callable
 import inspect
 
 from django.conf import settings
@@ -33,13 +32,13 @@ def get_granted_q(user: User):
 
 TMP_GRANTED_FIELD = '_granted'
 TMP_ASSET_GRANTED_FIELD = '_asset_granted'
-TMP_GRANTED_ASSET_AMOUNT = '_granted_asset_amount'
+TMP_GRANTED_ASSET_AMOUNT_FIELD = '_granted_assets_amount'
 
 
 node_annotate_mapping_node = {
     TMP_GRANTED_FIELD: F('mapping_nodes__granted'),
     TMP_ASSET_GRANTED_FIELD: F('mapping_nodes__asset_granted'),
-    TMP_GRANTED_ASSET_AMOUNT: F('mapping_nodes__assets_amount')
+    TMP_GRANTED_ASSET_AMOUNT_FIELD: F('mapping_nodes__assets_amount')
 }
 
 
@@ -56,8 +55,8 @@ def is_asset_granted(node):
     return getattr(node, TMP_ASSET_GRANTED_FIELD, False)
 
 
-def get_granted_asset_amount(node):
-    return getattr(node, TMP_GRANTED_ASSET_AMOUNT, 0)
+def get_granted_assets_amount(node):
+    return getattr(node, TMP_GRANTED_ASSET_AMOUNT_FIELD, 0)
 
 
 def obj_field_add(obj, field, value=1):
@@ -197,7 +196,7 @@ def create_mapping_nodes(user, nodes, clear=True):
     for node in nodes:
         _granted = getattr(node, TMP_GRANTED_FIELD, False)
         _asset_granted = getattr(node, TMP_ASSET_GRANTED_FIELD, False)
-        _granted_asset_amount = getattr(node, TMP_GRANTED_ASSET_AMOUNT, 0)
+        _granted_assets_amount = getattr(node, TMP_GRANTED_ASSET_AMOUNT_FIELD, 0)
         to_create.append(UserGrantedMappingNode(
             user=user,
             node=node,
@@ -205,7 +204,7 @@ def create_mapping_nodes(user, nodes, clear=True):
             parent_key=node.parent_key,
             granted=_granted,
             asset_granted=_asset_granted,
-            assets_amount=_granted_asset_amount,
+            assets_amount=_granted_assets_amount,
         ))
 
     if clear:
@@ -213,7 +212,7 @@ def create_mapping_nodes(user, nodes, clear=True):
     UserGrantedMappingNode.objects.bulk_create(to_create)
 
 
-def set_node_granted_asset_amount(user, node):
+def set_node_granted_assets_amount(user, node):
     """
     不依赖`UserGrantedMappingNode`直接查询授权计算资产数量
     """
@@ -222,13 +221,13 @@ def set_node_granted_asset_amount(user, node):
         assets_amount = node.assets_amount
     else:
         assets_amount = count_node_all_granted_assets(user, node.key)
-    setattr(node, TMP_GRANTED_ASSET_AMOUNT, assets_amount)
+    setattr(node, TMP_GRANTED_ASSET_AMOUNT_FIELD, assets_amount)
 
 
 def rebuild_user_mapping_nodes(user):
     tmp_nodes = compute_tmp_mapping_node_from_perm(user)
     for _node in tmp_nodes:
-        set_node_granted_asset_amount(user, _node)
+        set_node_granted_assets_amount(user, _node)
     create_mapping_nodes(user, tmp_nodes)
 
 
@@ -307,3 +306,23 @@ def get_node_all_granted_assets_from_perm(user: User, key):
 
 def count_node_all_granted_assets(user: User, key):
     return get_node_all_granted_assets_from_perm(user, key).count()
+
+
+def get_ungranted_node_children(user, key=''):
+    """
+    获取用户授权树中未授权节点的子节点
+    只匹配在 `UserGrantedMappingNode` 中存在的节点
+    """
+    nodes = Node.objects.filter(
+        mapping_nodes__user=user,
+        parent_key=key
+    ).annotate(
+        _granted_assets_amount=F('mapping_nodes__assets_amount'),
+        _granted=F('mapping_nodes__granted')
+    ).distinct()
+
+    # 设置节点授权资产数量
+    for _node in nodes:
+        if not is_granted(_node):
+            _node.assets_amount = get_granted_assets_amount(_node)
+    return nodes

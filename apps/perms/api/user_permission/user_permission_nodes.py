@@ -8,8 +8,8 @@ from rest_framework.generics import (
 from rest_framework.response import Response
 
 from perms.utils.user_node_tree import (
-    TMP_GRANTED_FIELD, TMP_GRANTED_ASSET_AMOUNT, node_annotate_mapping_node,
-    is_granted, get_granted_asset_amount, node_annotate_set_granted,
+    node_annotate_mapping_node, get_ungranted_node_children,
+    is_granted, get_granted_assets_amount, node_annotate_set_granted,
 )
 from common.utils.django import get_object_or_none
 from common.utils import lazyproperty
@@ -74,18 +74,7 @@ class UserGrantedNodeChildrenMixin(UserGrantedNodeDispatchMixin):
         self.submit_update_mapping_node_task(user)
 
         if not key:
-            nodes = Node.objects.filter(
-                mapping_nodes__user=user,
-                parent_key=''
-            ).annotate(
-                _granted_asset_amount=F('mapping_nodes__assets_amount'),
-                _granted=F('mapping_nodes__granted')
-            ).distinct()
-
-            # 设置节点授权资产数量
-            for _node in nodes:
-                if not getattr(_node, TMP_GRANTED_FIELD, False):
-                    _node.assets_amount = getattr(_node, TMP_GRANTED_ASSET_AMOUNT, 0)
+            nodes = get_ungranted_node_children(user)
         else:
             mapping_node = get_object_or_none(
                 UserGrantedMappingNode, user=user, key=key
@@ -98,20 +87,7 @@ class UserGrantedNodeChildrenMixin(UserGrantedNodeDispatchMixin):
 
     def on_ungranted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
         user = self.user
-
-        nodes = Node.objects.filter(
-            parent_key=key,
-            mapping_nodes__user=user,
-        ).annotate(
-            _granted_asset_amount=F('mapping_nodes__assets_amount'),
-            _granted=F('mapping_nodes__granted')
-        ).distinct()
-
-        # 设置节点授权资产数量
-        for _node in nodes:
-            if not getattr(_node, TMP_GRANTED_FIELD, False):
-                _node.assets_amount = getattr(_node, TMP_GRANTED_ASSET_AMOUNT, 0)
-
+        nodes = get_ungranted_node_children(user, key)
         return nodes
 
 
@@ -134,7 +110,7 @@ class UserGrantedNodesMixin:
         for _node in nodes:
             if not is_granted(_node):
                 # 未授权的节点资产数量设置为 `UserGrantedMappingNode` 中的数量
-                _node.assets_amount = get_granted_asset_amount(_node)
+                _node.assets_amount = get_granted_assets_amount(_node)
             else:
                 # 直接授权的节点
                 # 增加查询后代节点的过滤条件

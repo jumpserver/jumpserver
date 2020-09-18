@@ -4,7 +4,6 @@ from rest_framework.generics import ListAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from django.db.models import Q, F
-from django.utils.decorators import method_decorator
 
 from users.models import User
 from common.permissions import IsValidUser, IsOrgAdminOrAppUser
@@ -14,9 +13,9 @@ from .user_permission_nodes import MyGrantedNodesAsTreeApi
 from .mixin import UserGrantedNodeDispatchMixin
 from perms.models import UserGrantedMappingNode
 from perms.utils.user_node_tree import (
-    TMP_GRANTED_FIELD, TMP_GRANTED_ASSET_AMOUNT, node_annotate_mapping_node,
-    is_asset_granted, is_granted, get_granted_asset_amount, node_annotate_set_granted,
-    get_granted_q,
+    TMP_GRANTED_FIELD, TMP_GRANTED_ASSET_AMOUNT_FIELD, node_annotate_mapping_node,
+    is_granted, get_granted_assets_amount, node_annotate_set_granted,
+    get_granted_q, get_ungranted_node_children
 )
 
 from assets.models import Asset
@@ -53,7 +52,7 @@ class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
         for _node in nodes:
             if not is_granted(_node):
                 # 未授权的节点资产数量设置为 `UserGrantedMappingNode` 中的数量
-                _node.assets_amount = get_granted_asset_amount(_node)
+                _node.assets_amount = get_granted_assets_amount(_node)
             else:
                 # 直接授权的节点
 
@@ -107,7 +106,7 @@ class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(UserGrantedNodeDispatch
         # TODO 可配置
         for _node in nodes:
             if not is_granted(_node):
-                _node.assets_amount = get_granted_asset_amount(_node)
+                _node.assets_amount = get_granted_assets_amount(_node)
 
         if mapping_node.asset_granted:
             assets = Asset.objects.filter(
@@ -128,9 +127,7 @@ class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(UserGrantedNodeDispatch
         nodes = []
         assets = []
         if not key:
-            root_nodes = Node.objects.filter(
-                mapping_nodes__user=user, parent_key=''
-            )
+            root_nodes = get_ungranted_node_children(user)
             nodes.extend(root_nodes)
         else:
             mapping_node: UserGrantedMappingNode = get_object_or_none(
