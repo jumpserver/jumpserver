@@ -8,12 +8,11 @@ from django.db import transaction
 from django.db.models import Q
 
 from perms.tasks import dispatch_mapping_node_tasks
-from perms.async_tasks.mapping_node_task import submit_update_mapping_node_task
 from users.models import User
 from assets.models import Asset
 from common.utils import get_logger
 from common.exceptions import M2MReverseNotAllowed
-from common.const.signals import POST_ADD, POST_REMOVE, PRE_CLEAR
+from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR
 from .models import AssetPermission, RemoteAppPermission, RebuildUserTreeTask
 
 
@@ -47,7 +46,7 @@ def create_rebuild_user_tree_task_by_asset_perm(asset_perm: AssetPermission):
 
 
 def need_rebuild_mapping_node(action):
-    return action in (POST_REMOVE, POST_ADD, PRE_CLEAR)
+    return action in (POST_REMOVE, POST_ADD, POST_CLEAR)
 
 
 @receiver(m2m_changed, sender=AssetPermission.nodes.through)
@@ -66,7 +65,7 @@ def on_permission_nodes_changed(instance, action, reverse, pk_set, model, **kwar
 
     # TODO 待优化
     for system_user in system_users:
-        system_user.nodes.add(*tuple(nodes))
+        system_user.nodes.add(*nodes)
 
 
 @receiver(m2m_changed, sender=AssetPermission.assets.through)

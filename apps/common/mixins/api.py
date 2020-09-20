@@ -235,6 +235,7 @@ class RelationMixin:
 
         for i in instances:
             to_id = getattr(i, self.to_field).id
+            # TODO 优化，不应该每次都查询数据库
             from_obj = getattr(i, self.from_field)
             from_to_mapper[from_obj].append(to_id)
 
