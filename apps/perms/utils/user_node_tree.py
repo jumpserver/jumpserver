@@ -139,17 +139,22 @@ def compute_tmp_mapping_node_from_perm(user: User):
 
     # 查询直接授权节点
     nodes = Node.objects.filter(
-        Q(granted_by_permissions__users=user) |
-        Q(granted_by_permissions__user_groups__users=user)
+        get_granted_q(user)
     ).distinct().only(*node_only_fields)
     granted_key_set = {_node.key for _node in nodes}
+
+    def _has_ancestor_granted(node):
+        """
+        判断一个节点是否有授权过的祖先节点
+        """
+        ancestor_keys = set(node.get_ancestor_keys())
+        return ancestor_keys & granted_key_set
 
     key2leaf_nodes_mapper = {}
 
     # 给授权节点设置 _granted 标识，同时去重
     for _node in nodes:
-        ancestor_keys = set(_node.get_ancestor_keys())
-        if ancestor_keys & granted_key_set:
+        if _has_ancestor_granted(_node):
             continue
 
         if _node.key not in key2leaf_nodes_mapper:
@@ -157,11 +162,10 @@ def compute_tmp_mapping_node_from_perm(user: User):
             key2leaf_nodes_mapper[_node.key] = _node
 
     # 查询授权资产关联的节点设置
-    def process_permed_direct_assets():
+    def process_direct_granted_assets():
         # 查询直接授权资产
         asset_ids = Asset.objects.filter(
-            Q(granted_by_permissions__users=user) |
-            Q(granted_by_permissions__user_groups__users=user)
+            get_granted_q(user)
         ).distinct().values_list('id', flat=True)
         # 查询授权资产关联的节点设置
         granted_asset_nodes = Node.objects.filter(
@@ -170,8 +174,7 @@ def compute_tmp_mapping_node_from_perm(user: User):
 
         # 给资产授权关联的节点设置 _asset_granted 标识，同时去重
         for _node in granted_asset_nodes:
-            ancestor_keys = set(_node.get_ancestor_keys())
-            if ancestor_keys & granted_key_set:
+            if _has_ancestor_granted(_node):
                 continue
 
             if _node.key not in key2leaf_nodes_mapper:
@@ -179,7 +182,7 @@ def compute_tmp_mapping_node_from_perm(user: User):
             set_asset_granted(key2leaf_nodes_mapper[_node.key])
 
     if not settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
-        process_permed_direct_assets()
+        process_direct_granted_assets()
 
     leaf_nodes = key2leaf_nodes_mapper.values()
 
@@ -274,8 +277,7 @@ def get_node_all_granted_assets(user: User, key):
 
     if only_asset_granted_nodes_qs:
         only_asset_granted_nodes_q = reduce(or_, only_asset_granted_nodes_qs)
-        only_asset_granted_nodes_q &= Q(granted_by_permissions__users=user) | Q(
-            granted_by_permissions__user_groups__users=user)
+        only_asset_granted_nodes_q &= get_granted_q(user)
         q.append(only_asset_granted_nodes_q)
 
     if q:
