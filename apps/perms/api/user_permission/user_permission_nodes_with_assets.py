@@ -13,7 +13,7 @@ from .user_permission_nodes import MyGrantedNodesAsTreeApi
 from .mixin import UserGrantedNodeDispatchMixin
 from perms.models import UserGrantedMappingNode
 from perms.utils.user_node_tree import (
-    TMP_GRANTED_FIELD, TMP_GRANTED_ASSET_AMOUNT_FIELD, node_annotate_mapping_node,
+    TMP_GRANTED_FIELD, TMP_GRANTED_ASSETS_AMOUNT_FIELD, node_annotate_mapping_node,
     is_granted, get_granted_assets_amount, node_annotate_set_granted,
     get_granted_q, get_ungranted_node_children
 )

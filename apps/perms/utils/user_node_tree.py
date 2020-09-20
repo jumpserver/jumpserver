@@ -1,5 +1,5 @@
 from functools import reduce, wraps
-from operator import or_
+from operator import or_, and_
 from uuid import uuid4
 import threading
 import inspect
@@ -23,25 +23,34 @@ ADD = 'add'
 REMOVE = 'remove'
 
 
+# 使用场景
+# Asset.objects.filter(get_granted_q(user))
 def get_granted_q(user: User):
-    return (
-            Q(granted_by_permissions__users=user) |
-            Q(granted_by_permissions__user_groups__users=user)
-    )
+    _now = now()
+    return reduce(and_, (
+        Q(granted_by_permissions__date_start__lt=_now),
+        Q(granted_by_permissions__date_expired__gt=_now),
+        Q(granted_by_permissions__is_active=True),
+        (Q(granted_by_permissions__users=user) | Q(granted_by_permissions__user_groups__users=user))
+    ))
 
 
 TMP_GRANTED_FIELD = '_granted'
 TMP_ASSET_GRANTED_FIELD = '_asset_granted'
-TMP_GRANTED_ASSET_AMOUNT_FIELD = '_granted_assets_amount'
+TMP_GRANTED_ASSETS_AMOUNT_FIELD = '_granted_assets_amount'
 
 
+# 使用场景
+# `Node.objects.annotate(**node_annotate_mapping_node)`
 node_annotate_mapping_node = {
     TMP_GRANTED_FIELD: F('mapping_nodes__granted'),
     TMP_ASSET_GRANTED_FIELD: F('mapping_nodes__asset_granted'),
-    TMP_GRANTED_ASSET_AMOUNT_FIELD: F('mapping_nodes__assets_amount')
+    TMP_GRANTED_ASSETS_AMOUNT_FIELD: F('mapping_nodes__assets_amount')
 }
 
 
+# 使用场景
+# `Node.objects.annotate(**node_annotate_set_granted)`
 node_annotate_set_granted = {
     TMP_GRANTED_FIELD: Value(True, output_field=BooleanField()),
 }
@@ -56,12 +65,7 @@ def is_asset_granted(node):
 
 
 def get_granted_assets_amount(node):
-    return getattr(node, TMP_GRANTED_ASSET_AMOUNT_FIELD, 0)
-
-
-def obj_field_add(obj, field, value=1):
-    new_value = getattr(obj, field, 0) + value
-    setattr(obj, field, new_value)
+    return getattr(node, TMP_GRANTED_ASSETS_AMOUNT_FIELD, 0)
 
 
 def set_granted(obj):
@@ -196,7 +200,7 @@ def create_mapping_nodes(user, nodes, clear=True):
     for node in nodes:
         _granted = getattr(node, TMP_GRANTED_FIELD, False)
         _asset_granted = getattr(node, TMP_ASSET_GRANTED_FIELD, False)
-        _granted_assets_amount = getattr(node, TMP_GRANTED_ASSET_AMOUNT_FIELD, 0)
+        _granted_assets_amount = getattr(node, TMP_GRANTED_ASSETS_AMOUNT_FIELD, 0)
         to_create.append(UserGrantedMappingNode(
             user=user,
             node=node,
@@ -221,7 +225,7 @@ def set_node_granted_assets_amount(user, node):
         assets_amount = node.assets_amount
     else:
         assets_amount = count_node_all_granted_assets(user, node.key)
-    setattr(node, TMP_GRANTED_ASSET_AMOUNT_FIELD, assets_amount)
+    setattr(node, TMP_GRANTED_ASSETS_AMOUNT_FIELD, assets_amount)
 
 
 def rebuild_user_mapping_nodes(user):
