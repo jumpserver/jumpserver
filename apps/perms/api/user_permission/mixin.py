@@ -2,7 +2,6 @@
 #
 from common.permissions import IsOrgAdminOrAppUser, IsValidUser
 from common.utils import lazyproperty
-from rest_framework.generics import get_object_or_404
 
 from users.models import User
 from perms.models import UserGrantedMappingNode
