@@ -5,11 +5,9 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from django.db.models import Q, F
 
-from users.models import User
-from common.permissions import IsValidUser, IsOrgAdminOrAppUser
+from common.permissions import IsValidUser
 from common.utils.django import get_object_or_none
 from common.utils import get_logger
-from common.utils.common import lazyproperty
 from .mixin import UserGrantedNodeDispatchMixin, ForUserMixin, ForAdminMixin
 from perms.models import UserGrantedMappingNode
 from perms.utils.user_node_tree import (
