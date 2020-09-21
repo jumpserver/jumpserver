@@ -85,6 +85,10 @@ class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
 
 
 class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(UserGrantedNodeDispatchMixin, SerializeToTreeNodeMixin, ListAPIView):
+    """
+    带资产的授权树
+    """
+
     permission_classes = (IsOrgAdminOrAppUser, )
 
     def on_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
