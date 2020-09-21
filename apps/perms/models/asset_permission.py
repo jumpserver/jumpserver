@@ -99,6 +99,14 @@ class AssetPermission(BasePermission):
         ordering = ('name',)
 
     @lazyproperty
+    def users_amount(self):
+        return self.users.count()
+
+    @lazyproperty
+    def user_groups_amount(self):
+        return self.user_groups.count()
+
+    @lazyproperty
     def assets_amount(self):
         return self.assets.count()
 
