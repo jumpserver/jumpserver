@@ -100,17 +100,8 @@ class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(UserGrantedNodeDispatch
     def on_ungranted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
         user = self.user
         assets = Asset.objects.none()
-        nodes = Node.objects.filter(
-            parent_key=key,
-            mapping_nodes__user=user,
-        ).annotate(
-            **node_annotate_mapping_node
-        ).distinct()
 
-        # TODO 可配置
-        for _node in nodes:
-            if not is_granted(_node):
-                _node.assets_amount = get_granted_assets_amount(_node)
+        nodes = get_ungranted_node_children(user, key)
 
         if mapping_node.asset_granted:
             assets = Asset.org_objects.filter(
