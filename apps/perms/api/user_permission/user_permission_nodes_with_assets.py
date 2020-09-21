@@ -10,7 +10,7 @@ from common.permissions import IsValidUser, IsOrgAdminOrAppUser
 from common.utils.django import get_object_or_none
 from common.utils import get_logger
 from common.utils.common import lazyproperty
-from .mixin import UserGrantedNodeDispatchMixin
+from .mixin import UserGrantedNodeDispatchMixin, ForUserMixin, ForAdminMixin
 from perms.models import UserGrantedMappingNode
 from perms.utils.user_node_tree import (
     node_annotate_mapping_node, get_ungrouped_node,
@@ -84,12 +84,10 @@ class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
         return Response(data=data)
 
 
-class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(UserGrantedNodeDispatchMixin, SerializeToTreeNodeMixin, ListAPIView):
+class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(ForAdminMixin, UserGrantedNodeDispatchMixin, SerializeToTreeNodeMixin, ListAPIView):
     """
     带资产的授权树
     """
-
-    permission_classes = (IsOrgAdminOrAppUser, )
 
     def on_direct_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
         nodes = Node.objects.filter(parent_key=key)
@@ -109,11 +107,6 @@ class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(UserGrantedNodeDispatch
             ).filter(get_granted_q(user)).distinct()
             assets = assets.prefetch_related('platform')
         return nodes, assets
-
-    @lazyproperty
-    def user(self):
-        user_id = self.kwargs.get('pk')
-        return User.objects.get(id=user_id)
 
     @tmp_to_root_org()
     def list(self, request: Request, *args, **kwargs):
@@ -140,9 +133,5 @@ class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(UserGrantedNodeDispatch
         return Response(data=[*nodes, *assets])
 
 
-class MyGrantedNodeChildrenWithAssetsAsTreeApi(UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi):
-    permission_classes = (IsValidUser, )
-
-    @lazyproperty
-    def user(self):
-        return self.request.user
+class MyGrantedNodeChildrenWithAssetsAsTreeApi(ForUserMixin, UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi):
+    pass

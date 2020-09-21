@@ -14,7 +14,7 @@ from ...hands import Node
 from ... import serializers
 from perms.models import UserGrantedMappingNode
 from perms.utils.user_node_tree import (
-    get_node_all_granted_assets, UNGROUPED_NODE_KEY, get_direct_granted_assets
+    get_node_all_granted_assets, get_direct_granted_assets
 )
 from perms.pagination import GrantedAssetLimitOffsetPagination
 from assets.models import Asset
@@ -41,9 +41,8 @@ class UserDirectGrantedAssetsApi(ListAPIView):
 
     def get_queryset(self):
         user = self.user
-        assets = get_direct_granted_assets(
-            user
-        ).prefetch_related('platform').only(*self.only_fields)
+        assets = get_direct_granted_assets(user)\
+            .prefetch_related('platform').only(*self.only_fields)
         return assets
 
 
