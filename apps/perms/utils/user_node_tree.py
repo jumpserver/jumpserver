@@ -42,8 +42,6 @@ def get_granted_q(user: User):
     ))
 
 
-
-
 # 使用场景
 # `Node.objects.annotate(**node_annotate_mapping_node)`
 node_annotate_mapping_node = {

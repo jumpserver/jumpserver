@@ -32,6 +32,11 @@ class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
 
     @tmp_to_root_org()
     def list(self, request: Request, *args, **kwargs):
+        """
+        Node = UserGrantedMappingNode + 授权节点的子节点
+        Asset = 授权节点的资产 + 直接授权的资产
+        """
+
         user = request.user
 
         # 获取 `UserGrantedMappingNode` 中对应的 `Node`
