@@ -6,6 +6,7 @@ import inspect
 
 from django.conf import settings
 from django.db.models import F, Q, Value, BooleanField
+from django.utils.translation import gettext as _
 
 from common.utils import get_logger
 from common.const.distributed_lock_key import UPDATE_MAPPING_NODE_TASK_LOCK_KEY
@@ -22,6 +23,12 @@ logger = get_logger(__name__)
 ADD = 'add'
 REMOVE = 'remove'
 
+UNGROUPED_NODE_KEY = 'ungrouped'
+
+TMP_GRANTED_FIELD = '_granted'
+TMP_ASSET_GRANTED_FIELD = '_asset_granted'
+TMP_GRANTED_ASSETS_AMOUNT_FIELD = '_granted_assets_amount'
+
 
 # 使用场景
 # Asset.objects.filter(get_granted_q(user))
@@ -35,9 +42,6 @@ def get_granted_q(user: User):
     ))
 
 
-TMP_GRANTED_FIELD = '_granted'
-TMP_ASSET_GRANTED_FIELD = '_asset_granted'
-TMP_GRANTED_ASSETS_AMOUNT_FIELD = '_granted_assets_amount'
 
 
 # 使用场景
@@ -332,3 +336,17 @@ def get_ungranted_node_children(user, key=''):
         if not is_granted(_node):
             _node.assets_amount = get_granted_assets_amount(_node)
     return nodes
+
+
+def get_direct_granted_assets(user):
+    return Asset.org_objects.filter(get_granted_q(user)).distinct()
+
+
+def get_ungrouped_node(user):
+    assets_amount = get_direct_granted_assets(user).count()
+    return Node(
+        id=UNGROUPED_NODE_KEY,
+        key=UNGROUPED_NODE_KEY,
+        value=_(UNGROUPED_NODE_KEY),
+        assets_amount=assets_amount
+    )

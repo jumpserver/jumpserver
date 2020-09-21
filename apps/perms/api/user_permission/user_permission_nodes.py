@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from perms.utils.user_node_tree import (
     node_annotate_mapping_node, get_ungranted_node_children,
     is_granted, get_granted_assets_amount, node_annotate_set_granted,
+    get_ungrouped_node,
 )
 from common.utils.django import get_object_or_none
 from common.utils import lazyproperty
@@ -75,6 +76,8 @@ class UserGrantedNodeChildrenMixin(UserGrantedNodeDispatchMixin):
 
         if not key:
             nodes = get_ungranted_node_children(user)
+            ungrouped_node = get_ungrouped_node(user)
+            nodes = [ungrouped_node, *nodes]
         else:
             mapping_node = get_object_or_none(
                 UserGrantedMappingNode, user=user, key=key

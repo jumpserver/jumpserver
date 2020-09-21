@@ -9,13 +9,13 @@ from django.conf import settings
 
 from assets.api.mixin import SerializeToTreeNodeMixin
 from common.utils import get_object_or_none
-from users.models import User
-from common.permissions import IsOrgAdminOrAppUser, IsValidUser
 from common.utils import get_logger
 from ...hands import Node
 from ... import serializers
 from perms.models import UserGrantedMappingNode
-from perms.utils.user_node_tree import get_node_all_granted_assets
+from perms.utils.user_node_tree import (
+    get_node_all_granted_assets, UNGROUPED_NODE_KEY, get_direct_granted_assets
+)
 from perms.pagination import GrantedAssetLimitOffsetPagination
 from assets.models import Asset
 from orgs.utils import tmp_to_root_org
@@ -41,13 +41,10 @@ class UserDirectGrantedAssetsApi(ListAPIView):
 
     def get_queryset(self):
         user = self.user
-
-        return Asset.objects.filter(
-            Q(granted_by_permissions__users=user) |
-            Q(granted_by_permissions__user_groups__users=user)
-        ).distinct().only(
-            *self.only_fields
-        )
+        assets = get_direct_granted_assets(
+            user
+        ).prefetch_related('platform').only(*self.only_fields)
+        return assets
 
 
 @method_decorator(tmp_to_root_org(), name='list')

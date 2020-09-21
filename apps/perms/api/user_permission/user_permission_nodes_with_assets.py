@@ -9,13 +9,14 @@ from users.models import User
 from common.permissions import IsValidUser, IsOrgAdminOrAppUser
 from common.utils.django import get_object_or_none
 from common.utils import get_logger
-from .user_permission_nodes import MyGrantedNodesAsTreeApi
+from common.utils.common import lazyproperty
 from .mixin import UserGrantedNodeDispatchMixin
 from perms.models import UserGrantedMappingNode
 from perms.utils.user_node_tree import (
-    TMP_GRANTED_FIELD, TMP_GRANTED_ASSETS_AMOUNT_FIELD, node_annotate_mapping_node,
+    node_annotate_mapping_node, get_ungrouped_node,
     is_granted, get_granted_assets_amount, node_annotate_set_granted,
-    get_granted_q, get_ungranted_node_children
+    get_granted_q, get_ungranted_node_children, UNGROUPED_NODE_KEY,
+    get_direct_granted_assets
 )
 
 from assets.models import Asset
@@ -24,13 +25,6 @@ from orgs.utils import tmp_to_root_org
 from ...hands import Node
 
 logger = get_logger(__name__)
-
-__all__ = [
-    'MyGrantedNodesAsTreeApi',
-    'UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi',
-    'MyGrantedNodesWithAssetsAsTreeApi',
-    'MyGrantedNodeChildrenWithAssetsAsTreeApi',
-]
 
 
 class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
@@ -90,11 +84,12 @@ class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(UserGrantedNodeDispatch
 
     def on_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
         nodes = Node.objects.filter(parent_key=key)
-        assets = Asset.objects.filter(nodes__key=key).distinct()
+        assets = Asset.org_objects.filter(nodes__key=key).distinct()
+        assets = assets.prefetch_related('platform')
         return nodes, assets
 
     def on_ungranted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
-        user = self.get_user()
+        user = self.user
         assets = Asset.objects.none()
         nodes = Node.objects.filter(
             parent_key=key,
@@ -109,18 +104,20 @@ class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(UserGrantedNodeDispatch
                 _node.assets_amount = get_granted_assets_amount(_node)
 
         if mapping_node.asset_granted:
-            assets = Asset.objects.filter(
+            assets = Asset.org_objects.filter(
                 nodes__key=key,
-            ).filter(get_granted_q(user))
+            ).filter(get_granted_q(user)).distinct()
+            assets = assets.prefetch_related('platform')
         return nodes, assets
 
-    def get_user(self):
+    @lazyproperty
+    def user(self):
         user_id = self.kwargs.get('pk')
         return User.objects.get(id=user_id)
 
     @tmp_to_root_org()
     def list(self, request: Request, *args, **kwargs):
-        user = self.get_user()
+        user = self.user
         key = request.query_params.get('key')
         self.submit_update_mapping_node_task(user)
 
@@ -128,7 +125,12 @@ class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(UserGrantedNodeDispatch
         assets = []
         if not key:
             root_nodes = get_ungranted_node_children(user)
+            ungrouped_node = get_ungrouped_node(user)
+            nodes.append(ungrouped_node)
             nodes.extend(root_nodes)
+        elif key == UNGROUPED_NODE_KEY:
+            assets = get_direct_granted_assets(user)
+            assets = assets.prefetch_related('platform')
         else:
             mapping_node: UserGrantedMappingNode = get_object_or_none(
                 UserGrantedMappingNode, user=user, key=key)
@@ -141,5 +143,6 @@ class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(UserGrantedNodeDispatch
 class MyGrantedNodeChildrenWithAssetsAsTreeApi(UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi):
     permission_classes = (IsValidUser, )
 
-    def get_user(self):
+    @lazyproperty
+    def user(self):
         return self.request.user
