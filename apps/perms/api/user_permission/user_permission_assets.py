@@ -126,14 +126,14 @@ class UserGrantedNodeAssetsApi(UserGrantedNodeDispatchMixin, ListAPIView):
         node = Node.objects.get(id=node_id)
         return self.dispatch_node_process(node.key, mapping_node, node)
 
-    def on_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
+    def on_direct_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
         self.node = node
         return Asset.objects.filter(
             Q(nodes__key__startswith=f'{node.key}:') |
             Q(nodes__id=node.id)
         ).distinct()
 
-    def on_ungranted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
+    def on_undirect_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
         self.node = mapping_node
         user = self.user
         return get_node_all_granted_assets(user, node.key)

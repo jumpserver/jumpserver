@@ -85,10 +85,10 @@ class UserGrantedNodeChildrenMixin(UserGrantedNodeDispatchMixin):
             nodes = self.dispatch_node_process(key, mapping_node, None)
         return nodes
 
-    def on_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
+    def on_direct_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
         return Node.objects.filter(parent_key=key)
 
-    def on_ungranted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
+    def on_undirect_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
         user = self.user
         nodes = get_ungranted_node_children(user, key)
         return nodes

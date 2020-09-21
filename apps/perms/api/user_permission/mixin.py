@@ -22,19 +22,19 @@ class UserGrantedNodeDispatchMixin:
             granted = UserGrantedMappingNode.objects.filter(key__in=ancestor_keys, granted=True).exists()
             if not granted:
                 raise JMSObjectDoesNotExist(object_name=Node._meta.object_name)
-            queryset = self.on_granted_node(key, mapping_node, node)
+            queryset = self.on_direct_granted_node(key, mapping_node, node)
         else:
             if mapping_node.granted:
                 # granted_node
-                queryset = self.on_granted_node(key, mapping_node, node)
+                queryset = self.on_direct_granted_node(key, mapping_node, node)
             else:
-                queryset = self.on_ungranted_node(key, mapping_node, node)
+                queryset = self.on_undirect_granted_node(key, mapping_node, node)
         return queryset
 
-    def on_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
+    def on_direct_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
         raise NotImplementedError
 
-    def on_ungranted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
+    def on_undirect_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
         raise NotImplementedError
 
 

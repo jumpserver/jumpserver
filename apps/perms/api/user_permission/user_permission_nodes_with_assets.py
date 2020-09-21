@@ -91,13 +91,13 @@ class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(UserGrantedNodeDispatch
 
     permission_classes = (IsOrgAdminOrAppUser, )
 
-    def on_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
+    def on_direct_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
         nodes = Node.objects.filter(parent_key=key)
         assets = Asset.org_objects.filter(nodes__key=key).distinct()
         assets = assets.prefetch_related('platform')
         return nodes, assets
 
-    def on_ungranted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
+    def on_undirect_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
         user = self.user
         assets = Asset.objects.none()
 
