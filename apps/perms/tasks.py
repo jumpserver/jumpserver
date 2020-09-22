@@ -16,7 +16,7 @@ logger = get_logger(__file__)
 
 @shared_task(queue='node_tree')
 def rebuild_user_mapping_nodes_celery_task(user_id):
-    logger.info(f'rebuild user[{user_id}] mapping nodes')
+    logger.info(f'>>> rebuild user[{user_id}] mapping nodes')
     user = User.objects.get(id=user_id)
     rebuild_user_mapping_nodes_if_need_with_lock(user)
 
@@ -25,7 +25,7 @@ def rebuild_user_mapping_nodes_celery_task(user_id):
 def dispatch_mapping_node_tasks():
     user_ids = RebuildUserTreeTask.objects.all().values_list('user_id', flat=True).distinct()
     for id in user_ids:
-        logger.info(f'dispatch mapping node task for user[{id}]')
+        logger.info(f'>>> dispatch mapping node task for user[{id}]')
         rebuild_user_mapping_nodes_celery_task.delay(id)
 
 
@@ -40,7 +40,7 @@ def check_asset_permission_expired():
     ids = AssetPermission.objects.filter(
         date_expired__gt=start, date_expired__lt=end
     ).distinct().values_list('id', flat=True)
-    logger.info(f'checking {start} to {end} have {ids} expired')
+    logger.info(f'>>> checking {start} to {end} have {ids} expired')
     dispatch_process_expired_asset_permission.delay(ids)
 
 
