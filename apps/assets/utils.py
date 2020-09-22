@@ -1,13 +1,8 @@
 # ~*~ coding: utf-8 ~*~
 #
-from treelib import Tree
-from treelib.exceptions import NodeIDAbsentError
-from collections import defaultdict
-from copy import deepcopy
-
 from django.db.models import Q
 
-from common.utils import get_logger, timeit, lazyproperty
+from common.utils import get_logger
 from .models import Asset, Node
 
 
@@ -21,7 +16,7 @@ def check_node_assets_amount():
         ).distinct().count()
 
         if node.assets_amount != assets_amount:
-            print(f'<Node:{node.key}> wrong assets amount '
+            print(f'>>> <Node:{node.key}> wrong assets amount '
                   f'{node.assets_amount} right is {assets_amount}')
             node.assets_amount = assets_amount
             node.save()
