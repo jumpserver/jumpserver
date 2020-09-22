@@ -13,7 +13,7 @@ from perms.models import UserGrantedMappingNode
 from perms.utils.user_node_tree import (
     node_annotate_mapping_node, get_ungrouped_node,
     is_granted, get_granted_assets_amount, node_annotate_set_granted,
-    get_granted_q, get_ungranted_node_children, UNGROUPED_NODE_KEY,
+    get_granted_query, get_ungranted_node_children, UNGROUPED_NODE_KEY,
     get_direct_granted_assets
 )
 
@@ -71,7 +71,7 @@ class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
 
         # 查询出所有资产
         all_assets = Asset.objects.filter(
-            get_granted_q(user) |
+            get_granted_query(user) |
             granted_q
         ).annotate(parent_key=F('nodes__key')).distinct()
 
@@ -102,7 +102,7 @@ class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(ForAdminMixin, UserGran
         if mapping_node.asset_granted:
             assets = Asset.org_objects.filter(
                 nodes__key=key,
-            ).filter(get_granted_q(user)).distinct()
+            ).filter(get_granted_query(user)).distinct()
             assets = assets.prefetch_related('platform')
         return nodes, assets
 

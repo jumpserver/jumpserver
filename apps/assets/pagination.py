@@ -17,16 +17,13 @@ class AssetLimitOffsetPagination(LimitOffsetPagination):
         exclude_query_params = {
             self.limit_query_param,
             self.offset_query_param,
-            'node', 'all', 'show_current_asset'
+            'node', 'all', 'show_current_asset',
+            'node_id', 'display', 'draw',
         }
 
-        has_filter = False
         for k, v in self._request.query_params.items():
             if k not in exclude_query_params and v is not None:
-                has_filter = True
-                break
-        if has_filter:
-            return super().get_count(queryset)
+                return super().get_count(queryset)
 
         is_query_all = self._view.is_query_node_all_assets
         if is_query_all:

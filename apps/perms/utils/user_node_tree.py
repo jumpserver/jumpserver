@@ -32,7 +32,7 @@ TMP_GRANTED_ASSETS_AMOUNT_FIELD = '_granted_assets_amount'
 
 # 使用场景
 # Asset.objects.filter(get_granted_q(user))
-def get_granted_q(user: User):
+def get_granted_query(user: User):
     _now = now()
     return reduce(and_, (
         Q(granted_by_permissions__date_start__lt=_now),
@@ -141,7 +141,7 @@ def compute_tmp_mapping_node_from_perm(user: User):
 
     # 查询直接授权节点
     nodes = Node.objects.filter(
-        get_granted_q(user)
+        get_granted_query(user)
     ).distinct().only(*node_only_fields)
     granted_key_set = {_node.key for _node in nodes}
 
@@ -167,7 +167,7 @@ def compute_tmp_mapping_node_from_perm(user: User):
     def process_direct_granted_assets():
         # 查询直接授权资产
         asset_ids = Asset.objects.filter(
-            get_granted_q(user)
+            get_granted_query(user)
         ).distinct().values_list('id', flat=True)
         # 查询授权资产关联的节点设置
         granted_asset_nodes = Node.objects.filter(
@@ -279,7 +279,7 @@ def get_node_all_granted_assets(user: User, key):
 
     if only_asset_granted_nodes_qs:
         only_asset_granted_nodes_q = reduce(or_, only_asset_granted_nodes_qs)
-        only_asset_granted_nodes_q &= get_granted_q(user)
+        only_asset_granted_nodes_q &= get_granted_query(user)
         q.append(only_asset_granted_nodes_q)
 
     if q:
@@ -293,7 +293,7 @@ def get_node_all_granted_assets_from_perm(user: User, key):
     1. 查询该节点下的直接授权节点
     2. 查询该节点下授权资产关联的节点
     """
-    granted_q = get_granted_q(user)
+    granted_q = get_granted_query(user)
 
     granted_nodes = Node.objects.filter(
         Q(key__startswith=f'{key}:') | Q(key=key)
@@ -337,7 +337,7 @@ def get_ungranted_node_children(user, key=''):
 
 
 def get_direct_granted_assets(user):
-    return Asset.org_objects.filter(get_granted_q(user)).distinct()
+    return Asset.org_objects.filter(get_granted_query(user)).distinct()
 
 
 def get_ungrouped_node(user):
