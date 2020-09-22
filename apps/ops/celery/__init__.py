@@ -4,6 +4,7 @@ import os
 
 from kombu import Exchange, Queue
 from celery import Celery
+from celery.schedules import crontab
 
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'jumpserver.settings')
@@ -33,6 +34,11 @@ app.conf.beat_schedule = {
     'check-asset-permission-expired': {
         'task': 'perms.tasks.check_asset_permission_expired',
         'schedule': settings.PERM_EXPIRED_CHECK_PERIODIC,
+        'args': ()
+    },
+    'check-node-assets-amount': {
+        'task': 'assets.tasks.nodes_amount.check_node_assets_amount_celery_task',
+        'schedule': crontab(minute=0, hour=0),
         'args': ()
     },
 }
