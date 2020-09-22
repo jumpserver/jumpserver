@@ -158,6 +158,7 @@ def parse_service(s):
     all_services = [
         'gunicorn', 'celery_ansible', 'celery_default',
         'beat', 'flower', 'daphne', 'celery_node_tree',
+        'check_asset_perm_expired',
     ]
     if s == 'all':
         return all_services
@@ -168,7 +169,7 @@ def parse_service(s):
     elif s == "task":
         return ["celery_ansible", "celery_default", "beat"]
     elif s == "celery":
-        return ["celery_ansible", "celery_default", "celery_node_tree"]
+        return ["celery_ansible", "celery_default", "celery_node_tree", "check_asset_perm_expired"]
     elif "," in s:
         services = set()
         for i in s.split(','):
@@ -223,6 +224,11 @@ def get_start_celery_default_kwargs():
 def get_start_celery_node_tree_kwargs():
     print("\n- Start Celery as Distributed Task Queue: NodeTree")
     return get_start_worker_kwargs('node_tree', 10)
+
+
+def get_start_celery_check_asset_perm_expired_kwargs():
+    print("\n- Start Celery as Distributed Task Queue: CheckAseetPermissionExpired")
+    return get_start_worker_kwargs('check_asset_perm_expired', 1)
 
 
 def get_start_worker_kwargs(queue, num):
@@ -369,6 +375,7 @@ def start_service(s):
         "celery_ansible": get_start_celery_ansible_kwargs,
         "celery_default": get_start_celery_default_kwargs,
         "celery_node_tree": get_start_celery_node_tree_kwargs,
+        "check_asset_perm_expired": get_start_celery_check_asset_perm_expired_kwargs,
         "beat": get_start_beat_kwargs,
         "flower": get_start_flower_kwargs,
         "daphne": get_start_daphne_kwargs,
