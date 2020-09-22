@@ -85,7 +85,7 @@ class FilterAssetByNodeMixin:
         show_current_asset_arg = request.query_params.get('show_current_asset')
         if show_current_asset_arg is not None:
             return show_current_asset_arg != '1'
-        return query_all_arg == '1'
+        return query_all_arg != '0'
 
     @lazyproperty
     def node(self):
