@@ -127,12 +127,19 @@ class UserGrantedNodeAssetsApi(UserGrantedNodeDispatchMixin, ListAPIView):
 
     def on_direct_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
         self.node = node
-        return Asset.objects.filter(
-            Q(nodes__key__startswith=f'{node.key}:') |
-            Q(nodes__id=node.id)
-        ).distinct()
+        # 最初的写法是：
+        #   Asset.objects.filter(Q(nodes__key__startswith=f'{node.key}:') | Q(nodes__id=node.id))
+        #   可是 startswith 会导致表关联时 Asset 索引失效
 
-    def on_undirect_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
+        node_ids = Node.objects.filter(
+            Q(key__startswith=f'{node.key}:') |
+            Q(id=node.id)
+        ).values_list('id', flat=True).distinct()
+
+        asset_qs = Asset.objects.filter(nodes__id__in=list(node_ids)).distinct()
+        return asset_qs
+
+    def on_indirect_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
         self.node = mapping_node
         user = self.user
         return get_node_all_granted_assets(user, node.key)

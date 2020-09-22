@@ -4,6 +4,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from django.db.models import Q, F
+from django.conf import settings
 
 from common.permissions import IsValidUser
 from common.utils.django import get_object_or_none
@@ -93,7 +94,7 @@ class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(ForAdminMixin, UserGran
         assets = assets.prefetch_related('platform')
         return nodes, assets
 
-    def on_undirect_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
+    def on_indirect_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
         user = self.user
         assets = Asset.objects.none()
 
@@ -116,8 +117,9 @@ class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(ForAdminMixin, UserGran
         assets = []
         if not key:
             root_nodes = get_ungranted_node_children(user)
-            ungrouped_node = get_ungrouped_node(user)
-            nodes.append(ungrouped_node)
+            if settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
+                ungrouped_node = get_ungrouped_node(user)
+                nodes.append(ungrouped_node)
             nodes.extend(root_nodes)
         elif key == UNGROUPED_NODE_KEY:
             assets = get_direct_granted_assets(user)

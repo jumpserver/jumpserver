@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-from django.db.models import Q, F
+from django.db.models import Q
+from django.conf import settings
 from perms.api.user_permission.mixin import ForAdminMixin, ForUserMixin
 from rest_framework.generics import (
     ListAPIView
@@ -75,9 +76,10 @@ class UserGrantedNodeChildrenMixin(UserGrantedNodeDispatchMixin):
         self.submit_update_mapping_node_task(user)
 
         if not key:
-            nodes = get_ungranted_node_children(user)
-            ungrouped_node = get_ungrouped_node(user)
-            nodes = [ungrouped_node, *nodes]
+            nodes = list(get_ungranted_node_children(user))
+            if settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
+                ungrouped_node = get_ungrouped_node(user)
+                nodes.insert(0, ungrouped_node)
         else:
             mapping_node = get_object_or_none(
                 UserGrantedMappingNode, user=user, key=key
@@ -88,7 +90,7 @@ class UserGrantedNodeChildrenMixin(UserGrantedNodeDispatchMixin):
     def on_direct_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
         return Node.objects.filter(parent_key=key)
 
-    def on_undirect_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
+    def on_indirect_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
         user = self.user
         nodes = get_ungranted_node_children(user, key)
         return nodes

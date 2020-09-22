@@ -27,13 +27,13 @@ class UserGrantedNodeDispatchMixin:
                 # granted_node
                 queryset = self.on_direct_granted_node(key, mapping_node, node)
             else:
-                queryset = self.on_undirect_granted_node(key, mapping_node, node)
+                queryset = self.on_indirect_granted_node(key, mapping_node, node)
         return queryset
 
     def on_direct_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
         raise NotImplementedError
 
-    def on_undirect_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
+    def on_indirect_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
         raise NotImplementedError
 
 

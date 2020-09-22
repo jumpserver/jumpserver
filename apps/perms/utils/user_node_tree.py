@@ -229,7 +229,10 @@ def set_node_granted_assets_amount(user, node):
     if _granted:
         assets_amount = node.assets_amount
     else:
-        assets_amount = count_node_all_granted_assets(user, node.key)
+        if settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
+            assets_amount = count_dirent_granted_node_assets(user, node.key)
+        else:
+            assets_amount = count_node_all_granted_assets(user, node.key)
     setattr(node, TMP_GRANTED_ASSETS_AMOUNT_FIELD, assets_amount)
 
 
@@ -287,6 +290,27 @@ def get_node_all_granted_assets(user: User, key):
     return assets
 
 
+def get_direct_granted_node_ids(user: User, key):
+    granted_q = get_granted_query(user)
+
+    # 先查出该节点下的直接授权节点
+    granted_nodes = Node.objects.filter(
+        Q(key__startswith=f'{key}:') | Q(key=key)
+    ).filter(granted_q).distinct().only('id', 'key')
+
+    node_ids = set()
+    # 根据直接授权节点查询他们的子节点
+    q = Q()
+    for _node in granted_nodes:
+        q |= Q(key__startswith=f'{_node.key}:')
+        node_ids.add(_node.id)
+
+    if q:
+        descendant_ids = Node.objects.filter(q).values_list('id', flat=True).distinct()
+        node_ids.update(descendant_ids)
+    return node_ids
+
+
 def get_node_all_granted_assets_from_perm(user: User, key):
     """
     此算法依据 `AssetPermission` 的数据查询
@@ -294,26 +318,26 @@ def get_node_all_granted_assets_from_perm(user: User, key):
     2. 查询该节点下授权资产关联的节点
     """
     granted_q = get_granted_query(user)
-
-    granted_nodes = Node.objects.filter(
-        Q(key__startswith=f'{key}:') | Q(key=key)
-    ).filter(granted_q).distinct()
-
     # 直接授权资产查询条件
-    granted_asset_filter_q = (Q(nodes__key__startswith=f'{key}:') | Q(nodes__key=key)) & granted_q
-
-    # 根据授权节点构建资产查询条件
-    q = granted_asset_filter_q
-    for _node in granted_nodes:
-        q |= Q(nodes__key__startswith=f'{_node.key}:')
-        q |= Q(nodes__key=_node.key)
-
+    q = (Q(nodes__key__startswith=f'{key}:') | Q(nodes__key=key)) & granted_q
+    node_ids = get_direct_granted_node_ids(user, key)
+    q |= Q(nodes__id__in=node_ids)
     asset_qs = Asset.objects.filter(q).distinct()
+    return asset_qs
+
+
+def get_direct_granted_node_assets_from_perm(user: User, key):
+    node_ids = get_direct_granted_node_ids(user, key)
+    asset_qs = Asset.objects.filter(nodes__id__in=node_ids).distinct()
     return asset_qs
 
 
 def count_node_all_granted_assets(user: User, key):
     return get_node_all_granted_assets_from_perm(user, key).count()
+
+
+def count_dirent_granted_node_assets(user: User, key):
+    return get_direct_granted_node_assets_from_perm(user, key).count()
 
 
 def get_ungranted_node_children(user, key=''):
