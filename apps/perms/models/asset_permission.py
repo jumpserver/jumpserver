@@ -5,7 +5,6 @@ from functools import reduce
 from django.utils.translation import ugettext_lazy as _
 
 from common.db import models
-from common.fields.model import JsonListTextField
 from common.utils import lazyproperty
 from orgs.models import Organization
 from orgs.utils import get_current_org
@@ -17,6 +16,8 @@ from .base import BasePermission
 __all__ = [
     'AssetPermission', 'Action', 'UserGrantedMappingNode', 'RebuildUserTreeTask',
 ]
+
+# 使用场景
 logger = logging.getLogger(__name__)
 
 
@@ -193,6 +194,21 @@ class UserGrantedMappingNode(FamilyMixin, models.JMSBaseModel):
     asset_granted = models.BooleanField(default=False, db_index=True)
     parent_key = models.CharField(max_length=64, default='', verbose_name=_('Parent key'), db_index=True)  # '1:1:1:1'
     assets_amount = models.IntegerField(default=0)
+
+    GRANTED_DIRECT = 1
+    GRANTED_INDIRECT = 2
+    GRANTED_NONE = 0
+
+    @classmethod
+    def get_node_granted_status(cls, key, user):
+        ancestor_keys = Node.get_node_ancestor_keys(key, with_self=True)
+        has_direct_granted = UserGrantedMappingNode.objects.filter(
+            key__in=ancestor_keys, granted=True, user=user
+        ).exists()
+        if has_direct_granted:
+            return cls.GRANTED_DIRECT
+
+        return cls.GRANTED_NONE
 
 
 class RebuildUserTreeTask(models.JMSBaseModel):

@@ -2,17 +2,15 @@
 #
 from django.db.models import Q
 from django.utils.decorators import method_decorator
-from perms.api.user_permission.mixin import UserGrantedNodeDispatchMixin
+from perms.api.user_permission.mixin import UserNodeGrantStatusDispatchMixin
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from django.conf import settings
 
 from assets.api.mixin import SerializeToTreeNodeMixin
-from common.utils import get_object_or_none
 from common.utils import get_logger
 from ...hands import Node
 from ... import serializers
-from perms.models import UserGrantedMappingNode
 from perms.utils.user_node_tree import (
     get_node_all_granted_assets, get_direct_granted_assets
 )
@@ -109,7 +107,7 @@ class MyAllAssetsAsTreeApi(ForUserMixin, AssetsAsTreeMixin, UserAllGrantedAssets
 
 
 @method_decorator(tmp_to_root_org(), name='list')
-class UserGrantedNodeAssetsApi(UserGrantedNodeDispatchMixin, ListAPIView):
+class UserGrantedNodeAssetsApi(UserNodeGrantStatusDispatchMixin, ListAPIView):
     serializer_class = serializers.AssetGrantedSerializer
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
     filter_fields = ['hostname', 'ip', 'id', 'comment']
@@ -118,31 +116,24 @@ class UserGrantedNodeAssetsApi(UserGrantedNodeDispatchMixin, ListAPIView):
 
     def get_queryset(self):
         node_id = self.kwargs.get("node_id")
-        user = self.user
-
-        mapping_node: UserGrantedMappingNode = get_object_or_none(
-            UserGrantedMappingNode, user=user, node_id=node_id)
         node = Node.objects.get(id=node_id)
-        return self.dispatch_node_process(node.key, mapping_node, node)
+        return self.dispatch_get_data(node.key, self.user)
 
-    def on_direct_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
-        self.node = node
+    def get_data_on_node_direct_granted(self, key):
         # 最初的写法是：
         #   Asset.objects.filter(Q(nodes__key__startswith=f'{node.key}:') | Q(nodes__id=node.id))
         #   可是 startswith 会导致表关联时 Asset 索引失效
-
         node_ids = Node.objects.filter(
-            Q(key__startswith=f'{node.key}:') |
-            Q(id=node.id)
+            Q(key__startswith=f'{key}:') |
+            Q(key=key)
         ).values_list('id', flat=True).distinct()
+        return Asset.objects.filter(nodes__id__in=list(node_ids)).distinct()
 
-        asset_qs = Asset.objects.filter(nodes__id__in=list(node_ids)).distinct()
-        return asset_qs
+    def get_data_on_node_indirect_granted(self, key):
+        return get_node_all_granted_assets(self.user, key)
 
-    def on_indirect_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
-        self.node = mapping_node
-        user = self.user
-        return get_node_all_granted_assets(user, node.key)
+    def get_data_on_node_not_granted(self, key):
+        return Asset.objects.none()
 
 
 class UserGrantedNodeAssetsForAdminApi(ForAdminMixin, UserGrantedNodeAssetsApi):

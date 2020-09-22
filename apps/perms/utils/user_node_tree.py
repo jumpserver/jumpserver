@@ -31,14 +31,23 @@ TMP_GRANTED_ASSETS_AMOUNT_FIELD = '_granted_assets_amount'
 
 
 # 使用场景
-# Asset.objects.filter(get_granted_q(user))
-def get_granted_query(user: User):
+# Asset.objects.filter(get_user_direct_granted_resources_q_by_asset_permissions(user))
+def get_user_direct_granted_resources_q_by_asset_permissions(user: User):
+    """
+    获取用户关联的 asset permission 或者 用户组关联的 asset permission 获取规则,
+    前提 AssetPermission 对象中的 related_name 为 granted_by_permissions
+    :param user:
+    :return:
+    """
     _now = now()
     return reduce(and_, (
         Q(granted_by_permissions__date_start__lt=_now),
         Q(granted_by_permissions__date_expired__gt=_now),
         Q(granted_by_permissions__is_active=True),
-        (Q(granted_by_permissions__users=user) | Q(granted_by_permissions__user_groups__users=user))
+        (
+            Q(granted_by_permissions__users=user) |
+            Q(granted_by_permissions__user_groups__users=user)
+        )
     ))
 
 
@@ -58,7 +67,7 @@ node_annotate_set_granted = {
 }
 
 
-def is_granted(node):
+def is_direct_granted_by_annotate(node):
     return getattr(node, TMP_GRANTED_FIELD, False)
 
 
@@ -76,6 +85,44 @@ def set_granted(obj):
 
 def set_asset_granted(obj):
     setattr(obj, TMP_ASSET_GRANTED_FIELD, True)
+
+
+def get_user_granted_nodes_with_asset_amount(user):
+    # 获取 `UserGrantedMappingNode` 中对应的 `Node`
+    nodes = Node.objects.filter(
+        mapping_nodes__user=user,
+    ).annotate(
+        **node_annotate_mapping_node
+    ).distinct()
+
+    key_to_node_mapper = {}
+    nodes_descendant_q = Q()
+
+    for _node in nodes:
+        if not is_direct_granted_by_annotate(_node):
+            # 未授权的节点资产数量设置为 `UserGrantedMappingNode` 中的数量
+            _node.assets_amount = get_granted_assets_amount(_node)
+        else:
+            # 直接授权的节点
+            # 增加查询后代节点的过滤条件
+            nodes_descendant_q |= Q(key__startswith=f'{_node.key}:')
+        key_to_node_mapper[_node.key] = _node
+
+    if nodes_descendant_q:
+        descendant_nodes = Node.objects.filter(
+            nodes_descendant_q
+        ).annotate(
+            **node_annotate_set_granted
+        )
+        for _node in descendant_nodes:
+            key_to_node_mapper[_node.key] = _node
+
+    all_nodes = key_to_node_mapper.values()
+    return all_nodes
+
+
+def get_user_granted_all_assets(user):
+    pass
 
 
 VALUE_TEMPLATE = '{stage}:{rand_str}:thread:{thread_name}:{thread_id}:{now}'
@@ -141,7 +188,7 @@ def compute_tmp_mapping_node_from_perm(user: User):
 
     # 查询直接授权节点
     nodes = Node.objects.filter(
-        get_granted_query(user)
+        get_user_direct_granted_resources_q_by_asset_permissions(user)
     ).distinct().only(*node_only_fields)
     granted_key_set = {_node.key for _node in nodes}
 
@@ -167,7 +214,7 @@ def compute_tmp_mapping_node_from_perm(user: User):
     def process_direct_granted_assets():
         # 查询直接授权资产
         asset_ids = Asset.objects.filter(
-            get_granted_query(user)
+            get_user_direct_granted_resources_q_by_asset_permissions(user)
         ).distinct().values_list('id', flat=True)
         # 查询授权资产关联的节点设置
         granted_asset_nodes = Node.objects.filter(
@@ -230,7 +277,7 @@ def set_node_granted_assets_amount(user, node):
         assets_amount = node.assets_amount
     else:
         if settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
-            assets_amount = count_dirent_granted_node_assets(user, node.key)
+            assets_amount = count_direct_granted_node_assets(user, node.key)
         else:
             assets_amount = count_node_all_granted_assets(user, node.key)
     setattr(node, TMP_GRANTED_ASSETS_AMOUNT_FIELD, assets_amount)
@@ -282,7 +329,7 @@ def get_node_all_granted_assets(user: User, key):
 
     if only_asset_granted_nodes_qs:
         only_asset_granted_nodes_q = reduce(or_, only_asset_granted_nodes_qs)
-        only_asset_granted_nodes_q &= get_granted_query(user)
+        only_asset_granted_nodes_q &= get_user_direct_granted_resources_q_by_asset_permissions(user)
         q.append(only_asset_granted_nodes_q)
 
     if q:
@@ -291,7 +338,7 @@ def get_node_all_granted_assets(user: User, key):
 
 
 def get_direct_granted_node_ids(user: User, key):
-    granted_q = get_granted_query(user)
+    granted_q = get_user_direct_granted_resources_q_by_asset_permissions(user)
 
     # 先查出该节点下的直接授权节点
     granted_nodes = Node.objects.filter(
@@ -317,7 +364,7 @@ def get_node_all_granted_assets_from_perm(user: User, key):
     1. 查询该节点下的直接授权节点
     2. 查询该节点下授权资产关联的节点
     """
-    granted_q = get_granted_query(user)
+    granted_q = get_user_direct_granted_resources_q_by_asset_permissions(user)
     # 直接授权资产查询条件
     q = (Q(nodes__key__startswith=f'{key}:') | Q(nodes__key=key)) & granted_q
     node_ids = get_direct_granted_node_ids(user, key)
@@ -336,11 +383,11 @@ def count_node_all_granted_assets(user: User, key):
     return get_node_all_granted_assets_from_perm(user, key).count()
 
 
-def count_dirent_granted_node_assets(user: User, key):
+def count_direct_granted_node_assets(user: User, key):
     return get_direct_granted_node_assets_from_perm(user, key).count()
 
 
-def get_ungranted_node_children(user, key=''):
+def get_indirect_granted_node_children(user, key=''):
     """
     获取用户授权树中未授权节点的子节点
     只匹配在 `UserGrantedMappingNode` 中存在的节点
@@ -355,13 +402,21 @@ def get_ungranted_node_children(user, key=''):
 
     # 设置节点授权资产数量
     for _node in nodes:
-        if not is_granted(_node):
+        if not is_direct_granted_by_annotate(_node):
             _node.assets_amount = get_granted_assets_amount(_node)
     return nodes
 
 
 def get_direct_granted_assets(user):
-    return Asset.org_objects.filter(get_granted_query(user)).distinct()
+    q = get_user_direct_granted_resources_q_by_asset_permissions(user)
+    return Asset.org_objects.filter(q).distinct()
+
+
+def get_top_level_granted_nodes(user):
+    nodes = get_indirect_granted_node_children(user, key='')
+    ungrouped_node = get_ungrouped_node(user)
+    nodes.insert(0, ungrouped_node)
+    return nodes
 
 
 def get_ungrouped_node(user):
