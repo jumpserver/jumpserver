@@ -3,16 +3,16 @@
 from rest_framework.generics import ListAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
-from django.db.models import Q, F
 
 from common.permissions import IsValidUser
 from common.utils import get_logger
 from .mixin import UserNodeGrantStatusDispatchMixin, ForUserMixin, ForAdminMixin
-from perms.utils.user_asset_permission import (
-    get_user_direct_granted_resources_q_by_asset_permissions,
+from ...utils.user_asset_permission import (
+    get_user_resources_q_granted_by_permissions,
     get_indirect_granted_node_children, UNGROUPED_NODE_KEY,
-    get_direct_granted_assets, get_top_level_granted_nodes,
-    get_user_granted_nodes_list_via_mapping_node
+    get_user_direct_granted_assets, get_top_level_granted_nodes,
+    get_user_granted_nodes_list_via_mapping_node,
+    get_user_granted_all_assets
 )
 
 from assets.models import Asset
@@ -26,20 +26,6 @@ logger = get_logger(__name__)
 class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
     permission_classes = (IsValidUser,)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.assets_granted_by_nodes_q = Q()
-
-    def get_all_granted_assets(self, user):
-        # 查询出所有资产
-        direct_q = get_user_direct_granted_resources_q_by_asset_permissions(user)
-        q = direct_q | self.assets_granted_by_nodes_q
-
-        all_assets = Asset.objects.filter(q)\
-            .annotate(parent_key=F('nodes__key'))\
-            .distinct()
-        return all_assets
-
     @tmp_to_root_org()
     def list(self, request: Request, *args, **kwargs):
         """
@@ -52,7 +38,7 @@ class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
 
         user = request.user
         all_nodes = get_user_granted_nodes_list_via_mapping_node(user)
-        all_assets = self.get_all_granted_assets(user)
+        all_assets = get_user_granted_all_assets(user)
 
         data = [
             *self.serialize_nodes(all_nodes, with_asset_amount=True),
@@ -76,7 +62,7 @@ class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(ForAdminMixin, UserNode
     def get_data_on_node_indirect_granted(self, key):
         user = self.user
         nodes = get_indirect_granted_node_children(user, key)
-        direct_granted_q = get_user_direct_granted_resources_q_by_asset_permissions(user)
+        direct_granted_q = get_user_resources_q_granted_by_permissions(user)
 
         assets = Asset.org_objects.filter(
             nodes__key=key,
@@ -95,7 +81,7 @@ class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(ForAdminMixin, UserNode
             root_nodes = get_top_level_granted_nodes(user)
             nodes.extend(root_nodes)
         elif key == UNGROUPED_NODE_KEY:
-            assets = get_direct_granted_assets(user)
+            assets = get_user_direct_granted_assets(user)
             assets = assets.prefetch_related('platform')
         else:
             nodes, assets = self.dispatch_get_data(key, user)

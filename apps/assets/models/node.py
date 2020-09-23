@@ -221,18 +221,24 @@ class NodeAssetsMixin:
 
     def get_all_assets(self):
         from .asset import Asset
-        if self.is_org_root():
-            return Asset.objects.filter(org_id=self.org_id)
-
         q = Q(nodes__key__startswith=self.key) | Q(nodes__key=self.key)
         return Asset.objects.filter(q).distinct()
 
+    @classmethod
+    def get_node_all_assets_by_key_v2(cls, key):
+        from .asset import Asset
+        node_ids = cls.objects.filter(
+            Q(key__startswith=f'{key}:') |
+            Q(key=key)
+        ).values_list('id', flat=True).distinct()
+        assets = Asset.objects.filter(
+            nodes__id__in=list(node_ids)
+        ).distinct()
+        return assets
+
     def get_assets(self):
         from .asset import Asset
-        if self.is_org_root():
-            assets = Asset.objects.filter(Q(nodes=self) | Q(nodes__isnull=True))
-        else:
-            assets = Asset.objects.filter(nodes=self)
+        assets = Asset.objects.filter(nodes=self)
         return assets.distinct()
 
     def get_valid_assets(self):

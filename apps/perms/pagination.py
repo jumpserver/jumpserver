@@ -17,7 +17,7 @@ class GrantedAssetLimitOffsetPagination(LimitOffsetPagination):
                 break
         if has_filter:
             return super().get_count(queryset)
-        node = self._view.node
+        node = self._view.pagination_node
         return node.assets_amount
 
     def paginate_queryset(self, queryset, request: Request, view=None):

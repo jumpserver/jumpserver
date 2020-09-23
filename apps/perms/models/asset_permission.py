@@ -202,13 +202,14 @@ class UserGrantedMappingNode(FamilyMixin, models.JMSBaseModel):
     @classmethod
     def get_node_granted_status(cls, key, user):
         ancestor_keys = Node.get_node_ancestor_keys(key, with_self=True)
-        has_direct_granted = UserGrantedMappingNode.objects.filter(
+        has_granted = UserGrantedMappingNode.objects.filter(
             key__in=ancestor_keys, granted=True, user=user
-        ).exists()
-        if has_direct_granted:
+        ).values_list('granted', flat=True)
+        if not has_granted:
+            return cls.GRANTED_NONE
+        if any(list(has_granted)):
             return cls.GRANTED_DIRECT
-
-        return cls.GRANTED_NONE
+        return cls.GRANTED_INDIRECT
 
 
 class RebuildUserTreeTask(models.JMSBaseModel):

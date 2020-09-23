@@ -13,6 +13,10 @@ class UserNodeGrantStatusDispatchMixin:
     def submit_update_mapping_node_task(self, user):
         submit_update_mapping_node_task_for_user(user)
 
+    @staticmethod
+    def get_mapping_node_by_key(key):
+        return UserGrantedMappingNode.objects.get(key=key)
+
     def dispatch_get_data(self, key, user):
         status = UserGrantedMappingNode.get_node_granted_status(key, user)
         if status == UserGrantedMappingNode.GRANTED_DIRECT:
