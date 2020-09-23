@@ -438,8 +438,9 @@ def get_user_direct_granted_assets(user):
 
 def get_top_level_granted_nodes(user):
     nodes = list(get_indirect_granted_node_children(user, key=''))
-    ungrouped_node = get_ungrouped_node(user)
-    nodes.insert(0, ungrouped_node)
+    if settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
+        ungrouped_node = get_ungrouped_node(user)
+        nodes.insert(0, ungrouped_node)
     return nodes
 
 
