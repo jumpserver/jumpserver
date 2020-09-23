@@ -15,7 +15,7 @@ from common.utils.timezone import dt_formater, now
 from assets.models import Node, Asset
 from django.db.transaction import atomic
 from orgs import lock
-from perms.models import UserGrantedMappingNode, RebuildUserTreeTask
+from perms.models import UserGrantedMappingNode, RebuildUserTreeTask, AssetPermission
 from users.models import User
 
 logger = get_logger(__name__)
@@ -443,8 +443,22 @@ def get_top_level_granted_nodes(user):
     return nodes
 
 
+def count_user_direct_granted_assets(user):
+    asset_perm_ids = set()
+    asset_perm_ids.update(
+        AssetPermission.objects.filter(users=user).distinct().values_list('id', flat=True)
+    )
+    asset_perm_ids.update(
+        AssetPermission.objects.filter(user_groups__users=user).distinct().values_list('id', flat=True)
+    )
+    count = AssetPermission.objects.filter(
+        id__in=asset_perm_ids, assets__id__isnull=False
+    ).distinct().values_list('assets__id').count()
+    return count
+
+
 def get_ungrouped_node(user):
-    assets_amount = get_user_direct_granted_assets(user).count()
+    assets_amount = count_user_direct_granted_assets(user)
     return Node(
         id=UNGROUPED_NODE_KEY,
         key=UNGROUPED_NODE_KEY,
