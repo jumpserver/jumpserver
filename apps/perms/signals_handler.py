@@ -32,7 +32,7 @@ def create_rebuild_user_tree_task(user_ids):
     RebuildUserTreeTask.objects.bulk_create(
         [RebuildUserTreeTask(user_id=i) for i in user_ids]
     )
-    transaction.on_commit(dispatch_mapping_node_tasks)
+    transaction.on_commit(dispatch_mapping_node_tasks.delay)
 
 
 def create_rebuild_user_tree_task_by_asset_perm(asset_perm: AssetPermission):
