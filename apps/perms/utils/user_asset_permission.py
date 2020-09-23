@@ -87,7 +87,7 @@ def set_asset_granted(obj):
     setattr(obj, TMP_ASSET_GRANTED_FIELD, True)
 
 
-def get_user_granted_nodes_with_asset_amount(user):
+def get_user_granted_nodes_list_via_mapping_node(user):
     # 获取 `UserGrantedMappingNode` 中对应的 `Node`
     nodes = Node.objects.filter(
         mapping_nodes__user=user,
@@ -98,15 +98,15 @@ def get_user_granted_nodes_with_asset_amount(user):
     key_to_node_mapper = {}
     nodes_descendant_q = Q()
 
-    for _node in nodes:
-        if not is_direct_granted_by_annotate(_node):
+    for node in nodes:
+        if not is_direct_granted_by_annotate(node):
             # 未授权的节点资产数量设置为 `UserGrantedMappingNode` 中的数量
-            _node.assets_amount = get_granted_assets_amount(_node)
+            node.assets_amount = get_granted_assets_amount(node)
         else:
             # 直接授权的节点
             # 增加查询后代节点的过滤条件
-            nodes_descendant_q |= Q(key__startswith=f'{_node.key}:')
-        key_to_node_mapper[_node.key] = _node
+            nodes_descendant_q |= Q(key__startswith=f'{node.key}:')
+        key_to_node_mapper[node.key] = node
 
     if nodes_descendant_q:
         descendant_nodes = Node.objects.filter(
@@ -114,8 +114,8 @@ def get_user_granted_nodes_with_asset_amount(user):
         ).annotate(
             **node_annotate_set_granted
         )
-        for _node in descendant_nodes:
-            key_to_node_mapper[_node.key] = _node
+        for node in descendant_nodes:
+            key_to_node_mapper[node.key] = node
 
     all_nodes = key_to_node_mapper.values()
     return all_nodes
@@ -301,9 +301,10 @@ def get_node_all_granted_assets(user: User, key):
 
     # 查询该节点下的授权节点
     granted_mapping_nodes = UserGrantedMappingNode.objects.filter(
-        user=user,
-        granted=True,
-    ).filter(Q(key__startswith=f'{key}:') | Q(key=key))
+        user=user, granted=True,
+    ).filter(
+        Q(key__startswith=f'{key}:') | Q(key=key)
+    )
 
     # 根据授权节点构建资产查询条件
     granted_nodes_qs = []
@@ -413,7 +414,7 @@ def get_direct_granted_assets(user):
 
 
 def get_top_level_granted_nodes(user):
-    nodes = get_indirect_granted_node_children(user, key='')
+    nodes = list(get_indirect_granted_node_children(user, key=''))
     ungrouped_node = get_ungrouped_node(user)
     nodes.insert(0, ungrouped_node)
     return nodes

@@ -8,12 +8,11 @@ from django.db.models import Q, F
 from common.permissions import IsValidUser
 from common.utils import get_logger
 from .mixin import UserNodeGrantStatusDispatchMixin, ForUserMixin, ForAdminMixin
-from perms.utils.user_node_tree import (
-    node_annotate_mapping_node,
-    is_direct_granted_by_annotate, get_granted_assets_amount, node_annotate_set_granted,
+from perms.utils.user_asset_permission import (
     get_user_direct_granted_resources_q_by_asset_permissions,
     get_indirect_granted_node_children, UNGROUPED_NODE_KEY,
-    get_direct_granted_assets, get_top_level_granted_nodes
+    get_direct_granted_assets, get_top_level_granted_nodes,
+    get_user_granted_nodes_list_via_mapping_node
 )
 
 from assets.models import Asset
@@ -31,47 +30,8 @@ class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
         super().__init__(*args, **kwargs)
         self.assets_granted_by_nodes_q = Q()
 
-    def get_all_granted_nodes(self, user):
-        # 获取 `UserGrantedMappingNode` 中对应的 `Node`
-        nodes = Node.objects.filter(
-            mapping_nodes__user=user,
-        ).annotate(
-            **node_annotate_mapping_node
-        ).distinct()
-
-        key_to_node_mapper = {}
-        nodes_descendant_q = Q()
-
-        for _node in nodes:
-            if not is_direct_granted_by_annotate(_node):
-                # 未授权的节点资产数量设置为 `UserGrantedMappingNode` 中的数量
-                _node.assets_amount = get_granted_assets_amount(_node)
-            else:
-                # 直接授权的节点
-
-                # 增加查询后代节点的过滤条件
-                nodes_descendant_q |= Q(key__startswith=f'{_node.key}:')
-
-                # 增加查询该节点及其后代节点资产的过滤条件
-                self.assets_granted_by_nodes_q |= Q(nodes__key__startswith=f'{_node.key}:')
-                self.assets_granted_by_nodes_q |= Q(nodes__key=_node.key)
-
-            key_to_node_mapper[_node.key] = _node
-
-        if nodes_descendant_q:
-            descendant_nodes = Node.objects.filter(
-                nodes_descendant_q
-            ).annotate(
-                **node_annotate_set_granted
-            )
-            for _node in descendant_nodes:
-                key_to_node_mapper[_node.key] = _node
-
-        return list(key_to_node_mapper.values())
-
     def get_all_granted_assets(self, user):
         # 查询出所有资产
-
         direct_q = get_user_direct_granted_resources_q_by_asset_permissions(user)
         q = direct_q | self.assets_granted_by_nodes_q
 
@@ -91,7 +51,7 @@ class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
         """
 
         user = request.user
-        all_nodes = self.get_all_granted_nodes(user)
+        all_nodes = get_user_granted_nodes_list_via_mapping_node(user)
         all_assets = self.get_all_granted_assets(user)
 
         data = [

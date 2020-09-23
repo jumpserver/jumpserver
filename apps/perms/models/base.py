@@ -13,7 +13,7 @@ from orgs.mixins.models import OrgManager
 
 
 __all__ = [
-    'BasePermission',
+    'BasePermission', 'BasePermissionQuerySet'
 ]
 
 

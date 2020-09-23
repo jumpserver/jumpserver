@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
 #
 import abc
-from perms.api.user_permission.mixin import ForAdminMixin, ForUserMixin
 from rest_framework.generics import (
     ListAPIView
 )
 from rest_framework.response import Response
 from rest_framework.request import Request
 
-from perms.utils.user_node_tree import (
+from perms.utils.user_asset_permission import (
     get_indirect_granted_node_children,
-    get_top_level_granted_nodes, get_user_granted_nodes_with_asset_amount
+    get_user_granted_nodes_list_via_mapping_node,
+    get_top_level_granted_nodes,
 )
 from orgs.utils import tmp_to_root_org
 from assets.api.mixin import SerializeToTreeNodeMixin
 from common.utils import get_logger
+from .mixin import ForAdminMixin, ForUserMixin, UserNodeGrantStatusDispatchMixin
 from ...hands import Node, User
-from .mixin import UserNodeGrantStatusDispatchMixin
 from ... import serializers
 
 
@@ -119,7 +119,7 @@ class UserGrantedNodesMixin:
     user: User
 
     def get_nodes(self):
-        return get_user_granted_nodes_with_asset_amount(self.user)
+        return get_user_granted_nodes_list_via_mapping_node(self.user)
 
 
 # ------------------------------------------

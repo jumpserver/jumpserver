@@ -11,7 +11,7 @@ from assets.api.mixin import SerializeToTreeNodeMixin
 from common.utils import get_logger
 from ...hands import Node
 from ... import serializers
-from perms.utils.user_node_tree import (
+from perms.utils.user_asset_permission import (
     get_node_all_granted_assets, get_direct_granted_assets
 )
 from perms.pagination import GrantedAssetLimitOffsetPagination
@@ -40,7 +40,8 @@ class UserDirectGrantedAssetsApi(ListAPIView):
     def get_queryset(self):
         user = self.user
         assets = get_direct_granted_assets(user)\
-            .prefetch_related('platform').only(*self.only_fields)
+            .prefetch_related('platform')\
+            .only(*self.only_fields)
         return assets
 
 
@@ -112,11 +113,13 @@ class UserGrantedNodeAssetsApi(UserNodeGrantStatusDispatchMixin, ListAPIView):
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
     filter_fields = ['hostname', 'ip', 'id', 'comment']
     search_fields = ['hostname', 'ip', 'comment']
-    pagination_class = GrantedAssetLimitOffsetPagination
+    # pagination_class = GrantedAssetLimitOffsetPagination
+    node: Node
 
     def get_queryset(self):
         node_id = self.kwargs.get("node_id")
         node = Node.objects.get(id=node_id)
+        self.node = node
         return self.dispatch_get_data(node.key, self.user)
 
     def get_data_on_node_direct_granted(self, key):
@@ -127,13 +130,19 @@ class UserGrantedNodeAssetsApi(UserNodeGrantStatusDispatchMixin, ListAPIView):
             Q(key__startswith=f'{key}:') |
             Q(key=key)
         ).values_list('id', flat=True).distinct()
-        return Asset.objects.filter(nodes__id__in=list(node_ids)).distinct()
+        assets = Asset.objects.filter(
+            nodes__id__in=list(node_ids)
+        ).distinct()
+        return assets
 
     def get_data_on_node_indirect_granted(self, key):
         return get_node_all_granted_assets(self.user, key)
 
     def get_data_on_node_not_granted(self, key):
         return Asset.objects.none()
+
+    def get_node_required_by_pagination(self):
+        pass
 
 
 class UserGrantedNodeAssetsForAdminApi(ForAdminMixin, UserGrantedNodeAssetsApi):

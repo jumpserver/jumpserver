@@ -9,7 +9,7 @@ from common.utils import get_logger
 from common.utils.timezone import now
 from users.models import User
 from perms.models import RebuildUserTreeTask, AssetPermission
-from perms.utils.user_node_tree import rebuild_user_mapping_nodes_if_need_with_lock
+from perms.utils.user_asset_permission import rebuild_user_mapping_nodes_if_need_with_lock
 
 logger = get_logger(__file__)
 

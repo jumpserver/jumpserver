@@ -4,8 +4,7 @@ from django.db.models import Q
 
 from common.utils import get_logger
 from ..models import AssetPermission
-from ..hands import Asset, User
-from users.models import UserGroup
+from ..hands import Asset, User, UserGroup
 from perms.models.base import BasePermissionQuerySet
 
 logger = get_logger(__file__)
