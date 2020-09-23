@@ -41,18 +41,16 @@ class FamilyMixin:
 
     @staticmethod
     def clean_children_keys(nodes_keys):
-        nodes_keys = list(nodes_keys)
-        nodes_keys.sort()
+        sort_key = lambda k: [int(i) for i in k.split(':')]
+        nodes_keys = sorted(list(nodes_keys), key=sort_key)
 
         nodes_keys_clean = []
-
         base_key = ''
         for key in nodes_keys:
             if key.startswith(base_key + ':'):
                 continue
             nodes_keys_clean.append(key)
             base_key = key
-
         return nodes_keys_clean
 
     @classmethod
