@@ -18,3 +18,9 @@ class FavoriteAsset(CommonModelMixin):
     @classmethod
     def get_user_favorite_assets_id(cls, user):
         return cls.objects.filter(user=user).values_list('asset', flat=True)
+
+    @classmethod
+    def get_user_favorite_assets(cls, user):
+        from assets.models import Asset
+        query_name = cls.asset.field.related_query_name()
+        return Asset.objects.filter(**{f'{query_name}__user_id': user.id}).distinct()

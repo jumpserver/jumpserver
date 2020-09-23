@@ -9,7 +9,7 @@ from django.conf import settings
 from assets.api.mixin import SerializeToTreeNodeMixin
 from common.utils import get_logger
 from perms.pagination import GrantedAssetLimitOffsetPagination
-from assets.models import Asset, Node
+from assets.models import Asset, Node, FavoriteAsset
 from orgs.utils import tmp_to_root_org
 from ... import serializers
 from ...utils.user_asset_permission import (
@@ -105,13 +105,12 @@ class UserGrantedNodeAssetsApi(UserNodeGrantStatusDispatchMixin, ListAPIView):
     def get_queryset(self):
         node_id = self.kwargs.get("node_id")
         node = Node.objects.get(id=node_id)
+        if node.is_favorite_node():
+            return FavoriteAsset.get_user_favorite_assets(self.user)
         self.pagination_node = node
         return self.dispatch_get_data(node.key, self.user)
 
     def get_data_on_node_direct_granted(self, key):
-        # 最初的写法是：
-        #   Asset.objects.filter(Q(nodes__key__startswith=f'{node.key}:') | Q(nodes__id=node.id))
-        #   可是 startswith 会导致表关联时 Asset 索引失效
         # 如果这个节点是直接授权的(或者说祖先节点直接授权的), 获取下面的所有资产
         return Node.get_node_all_assets_by_key_v2(key)
 

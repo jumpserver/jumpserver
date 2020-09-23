@@ -10,15 +10,14 @@ class GrantedAssetLimitOffsetPagination(LimitOffsetPagination):
             'key', 'all', 'show_current_asset',
             'cache_policy', 'display', 'draw'
         }
-        has_filter = False
         for k, v in self._request.query_params.items():
             if k not in exclude_query_params and v is not None:
-                has_filter = True
-                break
-        if has_filter:
+                return super().get_count(queryset)
+        node = getattr(self._view, 'pagination_node', None)
+        if node:
+            return node.assets_amount
+        else:
             return super().get_count(queryset)
-        node = self._view.pagination_node
-        return node.assets_amount
 
     def paginate_queryset(self, queryset, request: Request, view=None):
         self._request = request

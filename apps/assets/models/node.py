@@ -228,6 +228,9 @@ class NodeAssetsMixin:
 
     @classmethod
     def get_node_all_assets_by_key_v2(cls, key):
+        # 最初的写法是：
+        #   Asset.objects.filter(Q(nodes__key__startswith=f'{node.key}:') | Q(nodes__id=node.id))
+        #   可是 startswith 会导致表关联时 Asset 索引失效
         from .asset import Asset
         node_ids = cls.objects.filter(
             Q(key__startswith=f'{key}:') |
@@ -299,6 +302,9 @@ class SomeNodesMixin:
 
     def is_default_node(self):
         return self.key == self.default_key
+
+    def is_favorite_node(self):
+        return self.key == self.favorite_key
 
     def is_org_root(self):
         if self.key.isdigit():

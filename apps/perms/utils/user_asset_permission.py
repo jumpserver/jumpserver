@@ -12,7 +12,7 @@ from common.utils import get_logger
 from common.const.distributed_lock_key import UPDATE_MAPPING_NODE_TASK_LOCK_KEY
 from orgs.utils import tmp_to_root_org
 from common.utils.timezone import dt_formater, now
-from assets.models import Node, Asset
+from assets.models import Node, Asset, FavoriteAsset
 from django.db.transaction import atomic
 from orgs import lock
 from perms.models import UserGrantedMappingNode, RebuildUserTreeTask, AssetPermission
@@ -441,7 +441,9 @@ def get_top_level_granted_nodes(user):
     if settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
         ungrouped_node = get_ungrouped_node(user)
         nodes.insert(0, ungrouped_node)
-    nodes.insert(0, Node.favorite_node())
+    favorite_node = Node.favorite_node()
+    favorite_node.assets_amount = FavoriteAsset.get_user_favorite_assets(user).count()
+    nodes.insert(0, favorite_node)
     return nodes
 
 

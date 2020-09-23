@@ -15,7 +15,7 @@ from ...utils.user_asset_permission import (
     get_user_granted_all_assets
 )
 
-from assets.models import Asset
+from assets.models import Asset, FavoriteAsset
 from assets.api import SerializeToTreeNodeMixin
 from orgs.utils import tmp_to_root_org
 from ...hands import Node
@@ -83,6 +83,8 @@ class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(ForAdminMixin, UserNode
         elif key == UNGROUPED_NODE_KEY:
             assets = get_user_direct_granted_assets(user)
             assets = assets.prefetch_related('platform')
+        elif key == Node.favorite_key:
+            assets = FavoriteAsset.get_user_favorite_assets(user)
         else:
             nodes, assets = self.dispatch_get_data(key, user)
         return nodes, assets
