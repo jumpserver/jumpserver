@@ -203,7 +203,7 @@ class UserGrantedMappingNode(FamilyMixin, models.JMSBaseModel):
     def get_node_granted_status(cls, key, user):
         ancestor_keys = Node.get_node_ancestor_keys(key, with_self=True)
         has_granted = UserGrantedMappingNode.objects.filter(
-            key__in=ancestor_keys, granted=True, user=user
+            key__in=ancestor_keys, user=user
         ).values_list('granted', flat=True)
         if not has_granted:
             return cls.GRANTED_NONE

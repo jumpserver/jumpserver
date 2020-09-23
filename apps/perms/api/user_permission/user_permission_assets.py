@@ -9,9 +9,8 @@ from django.conf import settings
 from assets.api.mixin import SerializeToTreeNodeMixin
 from common.utils import get_logger
 from perms.pagination import GrantedAssetLimitOffsetPagination
-from assets.models import Asset
+from assets.models import Asset, Node
 from orgs.utils import tmp_to_root_org
-from ...hands import Node
 from ... import serializers
 from ...utils.user_asset_permission import (
     get_node_all_granted_assets, get_user_direct_granted_assets,
