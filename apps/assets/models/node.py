@@ -41,16 +41,18 @@ class FamilyMixin:
 
     @staticmethod
     def clean_children_keys(nodes_keys):
-        nodes_keys = sorted(list(nodes_keys), key=lambda x: (len(x), x))
+        nodes_keys = list(nodes_keys)
+        nodes_keys.sort()
+
         nodes_keys_clean = []
-        for key in nodes_keys[::-1]:
-            found = False
-            for k in nodes_keys:
-                if key.startswith(k + ':'):
-                    found = True
-                    break
-            if not found:
-                nodes_keys_clean.append(key)
+
+        base_key = ''
+        for key in nodes_keys:
+            if key.startswith(base_key + ':'):
+                continue
+            nodes_keys_clean.append(key)
+            base_key = key
+
         return nodes_keys_clean
 
     @classmethod
@@ -265,21 +267,23 @@ class NodeAssetsMixin:
 
     @classmethod
     def get_nodes_all_assets_ids(cls, nodes_keys):
-        nodes_keys = cls.clean_children_keys(nodes_keys)
-        assets_ids = set()
-        for key in nodes_keys:
-            node_assets_ids = cls.tree().all_assets(key)
-            assets_ids.update(set(node_assets_ids))
+        assets_ids = cls.get_nodes_all_assets(nodes_keys).values_list('id', flat=True)
         return assets_ids
 
     @classmethod
     def get_nodes_all_assets(cls, nodes_keys, extra_assets_ids=None):
         from .asset import Asset
         nodes_keys = cls.clean_children_keys(nodes_keys)
-        assets_ids = cls.get_nodes_all_assets_ids(nodes_keys)
+        q = Q()
+        for key in nodes_keys:
+            q |= Q(nodes__key__startswith=f'{key}:')
+            q |= Q(nodes__key=key)
         if extra_assets_ids:
-            assets_ids.update(set(extra_assets_ids))
-        return Asset.objects.filter(id__in=assets_ids)
+            q |= Q(id__in=extra_assets_ids)
+        if q:
+            return Asset.objects.filter(q).distinct()
+        else:
+            return Asset.objects.none()
 
 
 class SomeNodesMixin:
