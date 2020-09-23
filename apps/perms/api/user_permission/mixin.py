@@ -22,7 +22,7 @@ class UserNodeGrantStatusDispatchMixin:
         if status == UserGrantedMappingNode.GRANTED_DIRECT:
             return self.get_data_on_node_direct_granted(key)
         elif status == UserGrantedMappingNode.GRANTED_INDIRECT:
-            return self.get_data_on_node_direct_granted(key)
+            return self.get_data_on_node_indirect_granted(key)
         else:
             return self.get_data_on_node_not_granted(key)
 
