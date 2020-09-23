@@ -441,6 +441,7 @@ def get_top_level_granted_nodes(user):
     if settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
         ungrouped_node = get_ungrouped_node(user)
         nodes.insert(0, ungrouped_node)
+    nodes.insert(0, Node.favorite_node())
     return nodes
 
 
