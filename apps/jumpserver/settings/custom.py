@@ -12,6 +12,17 @@ DEFAULT_TERMINAL_COMMAND_STORAGE = {
     },
 }
 TERMINAL_COMMAND_STORAGE = DYNAMIC.TERMINAL_COMMAND_STORAGE or {}
+
+# Server 类型的录像存储
+SERVER_REPLAY_STORAGE = CONFIG.SERVER_REPLAY_STORAGE
+# SERVER_REPLAY_STORAGE = {
+#     'TYPE': 's3',
+#     'BUCKET': '',
+#     'ACCESS_KEY': '',
+#     'SECRET_KEY': '',
+#     'ENDPOINT': ''
+# }
+
 DEFAULT_TERMINAL_REPLAY_STORAGE = {
     "default": {
         "TYPE": "server",
