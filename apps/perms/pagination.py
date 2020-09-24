@@ -1,6 +1,10 @@
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.request import Request
 
+from common.utils import get_logger
+
+logger = get_logger(__name__)
+
 
 class GrantedAssetLimitOffsetPagination(LimitOffsetPagination):
     def get_count(self, queryset):
@@ -15,6 +19,7 @@ class GrantedAssetLimitOffsetPagination(LimitOffsetPagination):
                 return super().get_count(queryset)
         node = getattr(self._view, 'pagination_node', None)
         if node:
+            logger.debug(f'{self._request.get_full_path()} hit node.assets_amount[{node.assets_amount}]')
             return node.assets_amount
         else:
             return super().get_count(queryset)

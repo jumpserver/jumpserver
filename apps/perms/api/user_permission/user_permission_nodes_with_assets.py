@@ -9,7 +9,7 @@ from common.utils import get_logger
 from .mixin import UserNodeGrantStatusDispatchMixin, ForUserMixin, ForAdminMixin
 from ...utils.user_asset_permission import (
     get_user_resources_q_granted_by_permissions,
-    get_indirect_granted_node_children, UNGROUPED_NODE_KEY,
+    get_indirect_granted_node_children, UNGROUPED_NODE_KEY, FAVORITE_NODE_KEY,
     get_user_direct_granted_assets, get_top_level_granted_nodes,
     get_user_granted_nodes_list_via_mapping_node,
     get_user_granted_all_assets
@@ -83,7 +83,7 @@ class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(ForAdminMixin, UserNode
         elif key == UNGROUPED_NODE_KEY:
             assets = get_user_direct_granted_assets(user)
             assets = assets.prefetch_related('platform')
-        elif key == Node.favorite_key:
+        elif key == FAVORITE_NODE_KEY:
             assets = FavoriteAsset.get_user_favorite_assets(user)
         else:
             nodes, assets = self.dispatch_get_data(key, user)

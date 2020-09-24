@@ -14,19 +14,12 @@ from orgs.utils import tmp_to_root_org
 from ... import serializers
 from ...utils.user_asset_permission import (
     get_node_all_granted_assets, get_user_direct_granted_assets,
-    get_user_granted_all_assets
+    get_user_granted_all_assets, FAVORITE_NODE_KEY
 )
 from .mixin import ForAdminMixin, ForUserMixin
 
 
 logger = get_logger(__name__)
-
-__all__ = [
-    'UserDirectGrantedAssetsForAdminApi', 'MyAllAssetsAsTreeApi',
-    'UserGrantedNodeAssetsForAdminApi', 'MyDirectGrantedAssetsApi',
-    'UserDirectGrantedAssetsAsTreeForAdminApi', 'MyGrantedNodeAssetsApi',
-    'MyUngroupAssetsAsTreeApi'
-]
 
 
 @method_decorator(tmp_to_root_org(), name='list')
@@ -48,6 +41,24 @@ class UserDirectGrantedAssetsApi(ListAPIView):
 
 
 @method_decorator(tmp_to_root_org(), name='list')
+class UserFavoriteGrantedAssetsApi(ListAPIView):
+    """
+    用户直接授权的资产的列表，也就是授权规则上直接授权的资产，并非是来自节点的
+    """
+    serializer_class = serializers.AssetGrantedSerializer
+    only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
+    filter_fields = ['hostname', 'ip', 'id', 'comment']
+    search_fields = ['hostname', 'ip', 'comment']
+
+    def get_queryset(self):
+        user = self.user
+        assets = FavoriteAsset.get_user_favorite_assets(user)\
+            .prefetch_related('platform')\
+            .only(*self.only_fields)
+        return assets
+
+
+@method_decorator(tmp_to_root_org(), name='list')
 class AssetsAsTreeMixin(SerializeToTreeNodeMixin):
     """
     将 资产 序列话成树的结构返回
@@ -63,6 +74,14 @@ class UserDirectGrantedAssetsForAdminApi(ForAdminMixin, UserDirectGrantedAssetsA
 
 
 class MyDirectGrantedAssetsApi(ForUserMixin, UserDirectGrantedAssetsApi):
+    pass
+
+
+class UserFavoriteGrantedAssetsForAdminApi(ForAdminMixin, UserFavoriteGrantedAssetsApi):
+    pass
+
+
+class MyFavoriteGrantedAssetsApi(ForUserMixin, UserFavoriteGrantedAssetsApi):
     pass
 
 
@@ -105,8 +124,6 @@ class UserGrantedNodeAssetsApi(UserNodeGrantStatusDispatchMixin, ListAPIView):
     def get_queryset(self):
         node_id = self.kwargs.get("node_id")
         node = Node.objects.get(id=node_id)
-        if node.is_favorite_node():
-            return FavoriteAsset.get_user_favorite_assets(self.user)
         self.pagination_node = node
         return self.dispatch_get_data(node.key, self.user)
 

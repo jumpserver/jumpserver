@@ -24,6 +24,7 @@ ADD = 'add'
 REMOVE = 'remove'
 
 UNGROUPED_NODE_KEY = 'ungrouped'
+FAVORITE_NODE_KEY = 'favorite'
 
 TMP_GRANTED_FIELD = '_granted'
 TMP_ASSET_GRANTED_FIELD = '_asset_granted'
@@ -85,7 +86,6 @@ def set_granted(obj):
 
 def set_asset_granted(obj):
     setattr(obj, TMP_ASSET_GRANTED_FIELD, True)
-
 
 
 VALUE_TEMPLATE = '{stage}:{rand_str}:thread:{thread_name}:{thread_id}:{now}'
@@ -293,15 +293,15 @@ def get_user_granted_nodes_list_via_mapping_node(user):
 
 
 def get_user_granted_all_assets(user, via_mapping_node=True):
-    resource_q = get_user_resources_q_granted_by_permissions(user)
+    asset_perm_ids = get_user_all_assetpermission_ids(user)
     if via_mapping_node:
         granted_node_keys = UserGrantedMappingNode.objects.filter(
             user=user, granted=True,
         ).values_list('key', flat=True).distinct()
     else:
-        granted_node_keys = Node.objects.filter(resource_q) \
-            .distinct() \
-            .values_list('key', flat=True)
+        granted_node_keys = Node.objects.filter(
+            granted_by_permissions__id__in=asset_perm_ids
+        ).distinct().values_list('key', flat=True)
     granted_node_keys = Node.clean_children_keys(granted_node_keys)
 
     granted_node_q = Q()
@@ -309,8 +309,10 @@ def get_user_granted_all_assets(user, via_mapping_node=True):
         granted_node_q |= Q(nodes__key__startswith=f'{_key}:')
         granted_node_q |= Q(nodes__key=_key)
 
-    q = granted_node_q | resource_q
-    return Asset.objects.filter(q).distinct()
+    assets__id = get_user_direct_granted_assets(user, asset_perm_ids).values_list('id', flat=True)
+
+    q = granted_node_q | Q(id__in=list(assets__id))
+    return Asset.org_objects.filter(q).distinct()
 
 
 def get_node_all_granted_assets(user: User, key):
@@ -431,33 +433,36 @@ def get_indirect_granted_node_children(user, key=''):
     return nodes
 
 
-def get_user_direct_granted_assets(user):
-    q = get_user_resources_q_granted_by_permissions(user)
-    return Asset.org_objects.filter(q).distinct()
-
-
 def get_top_level_granted_nodes(user):
     nodes = list(get_indirect_granted_node_children(user, key=''))
     if settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
         ungrouped_node = get_ungrouped_node(user)
         nodes.insert(0, ungrouped_node)
-    favorite_node = Node.favorite_node()
-    favorite_node.assets_amount = FavoriteAsset.get_user_favorite_assets(user).count()
+    favorite_node = get_favorite_node(user)
     nodes.insert(0, favorite_node)
     return nodes
 
 
-def count_user_direct_granted_assets(user):
+def get_user_all_assetpermission_ids(user: User):
     asset_perm_ids = set()
     asset_perm_ids.update(
-        AssetPermission.objects.filter(users=user).distinct().values_list('id', flat=True)
+        AssetPermission.objects.valid().filter(users=user).distinct().values_list('id', flat=True)
     )
     asset_perm_ids.update(
-        AssetPermission.objects.filter(user_groups__users=user).distinct().values_list('id', flat=True)
+        AssetPermission.objects.valid().filter(user_groups__users=user).distinct().values_list('id', flat=True)
     )
-    count = AssetPermission.objects.filter(
-        id__in=asset_perm_ids, assets__id__isnull=False
-    ).distinct().values_list('assets__id').count()
+    return asset_perm_ids
+
+
+def get_user_direct_granted_assets(user, asset_perm_ids=None):
+    if asset_perm_ids is None:
+        asset_perm_ids = get_user_all_assetpermission_ids(user)
+    assets = Asset.org_objects.filter(granted_by_permissions__id__in=asset_perm_ids).distinct()
+    return assets
+
+
+def count_user_direct_granted_assets(user):
+    count = get_user_direct_granted_assets(user).values_list('id').count()
     return count
 
 
@@ -467,5 +472,15 @@ def get_ungrouped_node(user):
         id=UNGROUPED_NODE_KEY,
         key=UNGROUPED_NODE_KEY,
         value=_(UNGROUPED_NODE_KEY),
+        assets_amount=assets_amount
+    )
+
+
+def get_favorite_node(user):
+    assets_amount = FavoriteAsset.get_user_favorite_assets(user).values_list('id').count()
+    return Node(
+        id=FAVORITE_NODE_KEY,
+        key=FAVORITE_NODE_KEY,
+        value=_(FAVORITE_NODE_KEY),
         assets_amount=assets_amount
     )
