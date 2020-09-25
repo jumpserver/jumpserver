@@ -14,7 +14,7 @@ from orgs.utils import tmp_to_root_org
 from ... import serializers
 from ...utils.user_asset_permission import (
     get_node_all_granted_assets, get_user_direct_granted_assets,
-    get_user_granted_all_assets, FAVORITE_NODE_KEY
+    get_user_granted_all_assets
 )
 from .mixin import ForAdminMixin, ForUserMixin
 
