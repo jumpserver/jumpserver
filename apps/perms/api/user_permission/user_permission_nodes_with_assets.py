@@ -5,7 +5,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from common.permissions import IsValidUser
-from common.utils import get_logger
+from common.utils import get_logger, get_object_or_none
 from .mixin import UserNodeGrantStatusDispatchMixin, ForUserMixin, ForAdminMixin
 from ...utils.user_asset_permission import (
     get_user_resources_q_granted_by_permissions,
@@ -89,10 +89,20 @@ class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(ForAdminMixin, UserNode
             nodes, assets = self.dispatch_get_data(key, user)
         return nodes, assets
 
+    def id2key_if_have(self):
+        id = self.request.query_params.get('id')
+        if id is not None:
+            node = get_object_or_none(Node, id=id)
+            if node:
+                return node.key
+
     @tmp_to_root_org()
     def list(self, request: Request, *args, **kwargs):
         self.submit_update_mapping_node_task(self.user)
         key = self.request.query_params.get('key')
+        if key is None:
+            key = self.id2key_if_have()
+
         user = self.user
         nodes, assets = self.get_data(key, user)
 

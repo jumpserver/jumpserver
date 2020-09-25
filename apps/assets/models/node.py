@@ -277,6 +277,22 @@ class SomeNodesMixin:
     empty_key = '-11'
     empty_value = _("empty")
 
+    @classmethod
+    def default_node(cls):
+        with tmp_to_org(Organization.default()):
+            defaults = {'value': cls.default_value}
+            try:
+                obj, created = cls.objects.get_or_create(
+                    defaults=defaults, key=cls.default_key,
+                )
+            except IntegrityError as e:
+                logger.error("Create default node failed: {}".format(e))
+                cls.modify_other_org_root_node_key()
+                obj, created = cls.objects.get_or_create(
+                    defaults=defaults, key=cls.default_key,
+                )
+            return obj
+
     def is_default_node(self):
         return self.key == self.default_key
 
