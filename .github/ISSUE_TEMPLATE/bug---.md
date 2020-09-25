@@ -2,7 +2,7 @@
 name: Bug 提交
 about: 提交产品缺陷帮助我们更好的改进
 title: "[BUG]"
-labels: bug
+labels: bug, 待处理
 assignees: wojiushixiaobai
 
 ---
