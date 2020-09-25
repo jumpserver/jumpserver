@@ -268,7 +268,10 @@ class Config(dict):
         'TIME_ZONE': 'Asia/Shanghai',
         'CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED': True,
         'USER_LOGIN_SINGLE_MACHINE_ENABLED': False,
-        'TICKETS_ENABLED': True
+        'TICKETS_ENABLED': True,
+        'SESSION_COOKIE_SECURE': False,
+        'CSRF_COOKIE_SECURE': False,
+        'REFERER_CHECK_ENABLED': False,
     }
 
     def compatible_auth_openid_of_key(self):
