@@ -7,7 +7,6 @@ from rest_framework.generics import (
 from rest_framework.response import Response
 from rest_framework.request import Request
 
-
 from orgs.utils import tmp_to_root_org
 from assets.api.mixin import SerializeToTreeNodeMixin
 from common.utils import get_logger
@@ -18,6 +17,7 @@ from ...utils.user_asset_permission import (
     get_indirect_granted_node_children,
     get_user_granted_nodes_list_via_mapping_node,
     get_top_level_granted_nodes,
+    init_user_tree_if_need,
 )
 
 
@@ -31,7 +31,7 @@ __all__ = [
     'MyGrantedNodeChildrenApi',
     'UserGrantedNodeChildrenAsTreeForAdminApi',
     'MyGrantedNodeChildrenAsTreeApi',
-    'BaseNodeAsTreeApi',
+    'BaseGrantedNodeAsTreeApi',
     'UserGrantedNodesMixin',
 ]
 
@@ -47,42 +47,41 @@ class _GrantedNodeStructApi(ListAPIView, metaclass=abc.ABCMeta):
         raise NotImplementedError
 
 
+class NodeChildrenMixin:
+    def get_children(self):
+        raise NotImplementedError
+
+    def get_nodes(self):
+        nodes = self.get_children()
+        return nodes
+
+
 class BaseGrantedNodeApi(_GrantedNodeStructApi, metaclass=abc.ABCMeta):
     serializer_class = serializers.NodeGrantedSerializer
 
     @tmp_to_root_org()
     def list(self, request, *args, **kwargs):
+        init_user_tree_if_need(self.user)
         nodes = self.get_nodes()
         serializer = self.get_serializer(nodes, many=True)
         return Response(serializer.data)
 
 
-class BaseNodeChildrenApi(BaseGrantedNodeApi, metaclass=abc.ABCMeta):
-    serializer_class = serializers.NodeGrantedSerializer
-
-    def get_children(self):
-        raise NotImplementedError
-
-    def get_nodes(self):
-        nodes = self.get_children()
-        return nodes
+class BaseNodeChildrenApi(NodeChildrenMixin, BaseGrantedNodeApi, metaclass=abc.ABCMeta):
+    pass
 
 
-class BaseNodeAsTreeApi(SerializeToTreeNodeMixin, _GrantedNodeStructApi, metaclass=abc.ABCMeta):
+class BaseGrantedNodeAsTreeApi(SerializeToTreeNodeMixin, _GrantedNodeStructApi, metaclass=abc.ABCMeta):
     @tmp_to_root_org()
     def list(self, request, *args, **kwargs):
+        init_user_tree_if_need(self.user)
         nodes = self.get_nodes()
         nodes = self.serialize_nodes(nodes, with_asset_amount=True)
         return Response(data=nodes)
 
 
-class BaseNodeChildrenAsTreeApi(BaseNodeAsTreeApi, metaclass=abc.ABCMeta):
-    def get_children(self):
-        raise NotImplementedError
-
-    def get_nodes(self):
-        nodes = self.get_children()
-        return nodes
+class BaseNodeChildrenAsTreeApi(NodeChildrenMixin, BaseGrantedNodeAsTreeApi, metaclass=abc.ABCMeta):
+    pass
 
 
 class UserGrantedNodeChildrenMixin(UserNodeGrantStatusDispatchMixin):
@@ -92,9 +91,6 @@ class UserGrantedNodeChildrenMixin(UserNodeGrantStatusDispatchMixin):
     def get_children(self):
         user = self.user
         key = self.request.query_params.get('key')
-
-        # 启动一个线程去更新用户的树，如果说用户的树应该发生变更
-        self.submit_update_mapping_node_task(user)
 
         if not key:
             nodes = list(get_top_level_granted_nodes(user))
@@ -149,7 +145,7 @@ class MyGrantedNodesApi(ForUserMixin, UserGrantedNodesMixin, BaseGrantedNodeApi)
     pass
 
 
-class MyGrantedNodesAsTreeApi(ForUserMixin, UserGrantedNodesMixin, BaseNodeAsTreeApi):
+class MyGrantedNodesAsTreeApi(ForUserMixin, UserGrantedNodesMixin, BaseGrantedNodeAsTreeApi):
     pass
 
 # ------------------------------------------

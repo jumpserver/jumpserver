@@ -484,3 +484,16 @@ def get_favorite_node(user):
         value=_(FAVORITE_NODE_KEY),
         assets_amount=assets_amount
     )
+
+
+def init_user_tree_if_need(user):
+    """
+    升级授权树策略后，用户的数据可能还未初始化，为防止用户显示没有数据
+    先检查 MappingNode 如果没有数据，同步创建用户授权树
+    """
+    if not UserGrantedMappingNode.objects.filter(user=user).exists():
+        try:
+            rebuild_user_mapping_nodes_with_lock(user)
+        except lock.SomeoneIsDoingThis:
+            # 您的数据正在初始化，请稍等
+            raise lock.SomeoneIsDoingThis(detail=_('Please wait while your data is being initialized'))

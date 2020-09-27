@@ -6,12 +6,9 @@ from common.permissions import IsOrgAdminOrAppUser, IsValidUser
 from common.utils import lazyproperty
 from users.models import User
 from perms.models import UserGrantedMappingNode
-from perms.async_tasks.mapping_node_task import submit_update_mapping_node_task_for_user
 
 
 class UserNodeGrantStatusDispatchMixin:
-    def submit_update_mapping_node_task(self, user):
-        submit_update_mapping_node_task_for_user(user)
 
     @staticmethod
     def get_mapping_node_by_key(key):

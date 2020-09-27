@@ -12,7 +12,7 @@ from ...utils.user_asset_permission import (
     get_indirect_granted_node_children, UNGROUPED_NODE_KEY, FAVORITE_NODE_KEY,
     get_user_direct_granted_assets, get_top_level_granted_nodes,
     get_user_granted_nodes_list_via_mapping_node,
-    get_user_granted_all_assets
+    get_user_granted_all_assets, init_user_tree_if_need,
 )
 
 from assets.models import Asset, FavoriteAsset
@@ -37,6 +37,7 @@ class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
         """
 
         user = request.user
+        init_user_tree_if_need(user)
         all_nodes = get_user_granted_nodes_list_via_mapping_node(user)
         all_assets = get_user_granted_all_assets(user)
 
@@ -98,12 +99,12 @@ class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(ForAdminMixin, UserNode
 
     @tmp_to_root_org()
     def list(self, request: Request, *args, **kwargs):
-        self.submit_update_mapping_node_task(self.user)
         key = self.request.query_params.get('key')
         if key is None:
             key = self.id2key_if_have()
 
         user = self.user
+        init_user_tree_if_need(user)
         nodes, assets = self.get_data(key, user)
 
         tree_nodes = self.serialize_nodes(nodes, with_asset_amount=True)

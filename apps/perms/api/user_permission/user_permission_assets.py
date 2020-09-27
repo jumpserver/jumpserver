@@ -58,7 +58,7 @@ class UserFavoriteGrantedAssetsApi(ListAPIView):
 @method_decorator(tmp_to_root_org(), name='list')
 class AssetsAsTreeMixin(SerializeToTreeNodeMixin):
     """
-    将 资产 序列话成树的结构返回
+    将 资产 序列化成树的结构返回
     """
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
