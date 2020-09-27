@@ -6,6 +6,7 @@ import pytz
 from django.utils import timezone
 from django.shortcuts import HttpResponse
 from django.conf import settings
+from django.core.exceptions import MiddlewareNotUsed
 
 from .utils import set_current_request
 
@@ -43,6 +44,7 @@ class DemoMiddleware:
 
         if self.DEMO_MODE_ENABLED:
             print("Demo mode enabled, reject unsafe method and url")
+            raise MiddlewareNotUsed
 
     def __call__(self, request):
         if self.DEMO_MODE_ENABLED and request.method not in self.SAFE_METHOD \
