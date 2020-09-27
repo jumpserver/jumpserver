@@ -42,9 +42,6 @@ class UserDirectGrantedAssetsApi(ListAPIView):
 
 @method_decorator(tmp_to_root_org(), name='list')
 class UserFavoriteGrantedAssetsApi(ListAPIView):
-    """
-    用户直接授权的资产的列表，也就是授权规则上直接授权的资产，并非是来自节点的
-    """
     serializer_class = serializers.AssetGrantedSerializer
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
     filter_fields = ['hostname', 'ip', 'id', 'comment']
