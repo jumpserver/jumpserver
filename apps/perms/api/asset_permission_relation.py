@@ -111,7 +111,7 @@ class AssetPermissionAllAssetListApi(generics.ListAPIView):
             asset_q |= Q(nodes__key__startswith=f'{key}:')
             asset_q |= Q(nodes__key=key)
 
-        assets = Asset.objects.filter(asset_q).only(*self.serializer_class.Meta.only_fields)
+        assets = Asset.objects.filter(asset_q).only(*self.serializer_class.Meta.only_fields).distinct()
         return assets
 
 

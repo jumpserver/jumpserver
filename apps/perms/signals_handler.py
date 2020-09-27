@@ -2,13 +2,13 @@
 #
 from itertools import chain
 
-from django.db.models.signals import m2m_changed, pre_delete
+from django.db.models.signals import m2m_changed, pre_delete, pre_save
 from django.dispatch import receiver
 from django.db import transaction
 from django.db.models import Q
 
 from perms.tasks import dispatch_mapping_node_tasks
-from users.models import User
+from users.models import User, UserGroup
 from assets.models import Asset
 from common.utils import get_logger
 from common.exceptions import M2MReverseNotAllowed
@@ -19,7 +19,11 @@ from .models import AssetPermission, RemoteAppPermission, RebuildUserTreeTask
 logger = get_logger(__file__)
 
 
-# Todo: 检查授权规则到期，从而修改授权规则
+@receiver([pre_save], sender=AssetPermission)
+def on_asset_perm_deactive(instance: AssetPermission, **kwargs):
+    old = AssetPermission.objects.only('is_active').get(id=instance.id)
+    if instance.is_active != old.is_active:
+        create_rebuild_user_tree_task_by_asset_perm(instance)
 
 
 @receiver([pre_delete], sender=AssetPermission)
@@ -32,16 +36,17 @@ def create_rebuild_user_tree_task(user_ids):
     RebuildUserTreeTask.objects.bulk_create(
         [RebuildUserTreeTask(user_id=i) for i in user_ids]
     )
-    transaction.on_commit(dispatch_mapping_node_tasks)
+    transaction.on_commit(dispatch_mapping_node_tasks.delay)
 
 
 def create_rebuild_user_tree_task_by_asset_perm(asset_perm: AssetPermission):
-    user_ap_query_name = AssetPermission.users.field.related_query_name()
-    group_ap_query_name = AssetPermission.user_groups.field.related_query_name()
-
-    user_ap_q = Q(**{f'{user_ap_query_name}': asset_perm})
-    group_ap_q = Q(**{f'groups__{group_ap_query_name}': asset_perm})
-    user_ids = User.objects.filter(user_ap_q | group_ap_q).distinct().values_list('id', flat=True)
+    user_ids = set()
+    user_ids.update(
+        UserGroup.objects.filter(assetpermissions=asset_perm).distinct().values_list('users__id', flat=True)
+    )
+    user_ids.update(
+        User.objects.filter(assetpermissions=asset_perm).distinct().values_list('id', flat=True)
+    )
     create_rebuild_user_tree_task(user_ids)
 
 

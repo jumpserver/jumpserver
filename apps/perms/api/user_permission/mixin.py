@@ -1,45 +1,41 @@
 # -*- coding: utf-8 -*-
 #
+from rest_framework.request import Request
+
 from common.permissions import IsOrgAdminOrAppUser, IsValidUser
 from common.utils import lazyproperty
-from rest_framework.generics import get_object_or_404
-
 from users.models import User
 from perms.models import UserGrantedMappingNode
-from common.exceptions import JMSObjectDoesNotExist
-from perms.async_tasks.mapping_node_task import submit_update_mapping_node_task_for_user
-from ...hands import Node
 
 
-class UserGrantedNodeDispatchMixin:
+class UserNodeGrantStatusDispatchMixin:
 
-    def submit_update_mapping_node_task(self, user):
-        submit_update_mapping_node_task_for_user(user)
+    @staticmethod
+    def get_mapping_node_by_key(key):
+        return UserGrantedMappingNode.objects.get(key=key)
 
-    def dispatch_node_process(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
-        if mapping_node is None:
-            ancestor_keys = Node.get_node_ancestor_keys(key)
-            granted = UserGrantedMappingNode.objects.filter(key__in=ancestor_keys, granted=True).exists()
-            if not granted:
-                raise JMSObjectDoesNotExist(object_name=Node._meta.object_name)
-            queryset = self.on_granted_node(key, mapping_node, node)
+    def dispatch_get_data(self, key, user):
+        status = UserGrantedMappingNode.get_node_granted_status(key, user)
+        if status == UserGrantedMappingNode.GRANTED_DIRECT:
+            return self.get_data_on_node_direct_granted(key)
+        elif status == UserGrantedMappingNode.GRANTED_INDIRECT:
+            return self.get_data_on_node_indirect_granted(key)
         else:
-            if mapping_node.granted:
-                # granted_node
-                queryset = self.on_granted_node(key, mapping_node, node)
-            else:
-                queryset = self.on_ungranted_node(key, mapping_node, node)
-        return queryset
+            return self.get_data_on_node_not_granted(key)
 
-    def on_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
+    def get_data_on_node_direct_granted(self, key):
         raise NotImplementedError
 
-    def on_ungranted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
+    def get_data_on_node_indirect_granted(self, key):
+        raise NotImplementedError
+
+    def get_data_on_node_not_granted(self, key):
         raise NotImplementedError
 
 
 class ForAdminMixin:
     permission_classes = (IsOrgAdminOrAppUser,)
+    kwargs: dict
 
     @lazyproperty
     def user(self):
@@ -49,6 +45,7 @@ class ForAdminMixin:
 
 class ForUserMixin:
     permission_classes = (IsValidUser,)
+    request: Request
 
     @lazyproperty
     def user(self):

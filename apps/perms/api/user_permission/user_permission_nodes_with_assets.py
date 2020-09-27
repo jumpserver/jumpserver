@@ -3,34 +3,25 @@
 from rest_framework.generics import ListAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
-from django.db.models import Q, F
 
-from users.models import User
-from common.permissions import IsValidUser, IsOrgAdminOrAppUser
-from common.utils.django import get_object_or_none
-from common.utils import get_logger
-from .user_permission_nodes import MyGrantedNodesAsTreeApi
-from .mixin import UserGrantedNodeDispatchMixin
-from perms.models import UserGrantedMappingNode
-from perms.utils.user_node_tree import (
-    TMP_GRANTED_FIELD, TMP_GRANTED_ASSETS_AMOUNT_FIELD, node_annotate_mapping_node,
-    is_granted, get_granted_assets_amount, node_annotate_set_granted,
-    get_granted_q, get_ungranted_node_children
+from common.permissions import IsValidUser
+from common.utils import get_logger, get_object_or_none
+from .mixin import UserNodeGrantStatusDispatchMixin, ForUserMixin, ForAdminMixin
+from ...utils.user_asset_permission import (
+    get_user_resources_q_granted_by_permissions,
+    get_indirect_granted_node_children, UNGROUPED_NODE_KEY, FAVORITE_NODE_KEY,
+    get_user_direct_granted_assets, get_top_level_granted_nodes,
+    get_user_granted_nodes_list_via_mapping_node,
+    get_user_granted_all_assets, init_user_tree_if_need,
+    get_user_all_assetpermission_ids,
 )
 
-from assets.models import Asset
+from assets.models import Asset, FavoriteAsset
 from assets.api import SerializeToTreeNodeMixin
 from orgs.utils import tmp_to_root_org
 from ...hands import Node
 
 logger = get_logger(__name__)
-
-__all__ = [
-    'MyGrantedNodesAsTreeApi',
-    'UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi',
-    'MyGrantedNodesWithAssetsAsTreeApi',
-    'MyGrantedNodeChildrenWithAssetsAsTreeApi',
-]
 
 
 class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
@@ -38,45 +29,18 @@ class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
 
     @tmp_to_root_org()
     def list(self, request: Request, *args, **kwargs):
+        """
+        此算法依赖 UserGrantedMappingNode
+        获取所有授权的节点和资产
+
+        Node = UserGrantedMappingNode + 授权节点的子节点
+        Asset = 授权节点的资产 + 直接授权的资产
+        """
+
         user = request.user
-
-        # 获取 `UserGrantedMappingNode` 中对应的 `Node`
-        nodes = Node.objects.filter(
-            mapping_nodes__user=user,
-        ).annotate(**node_annotate_mapping_node).distinct()
-
-        key2nodes_mapper = {}
-        descendant_q = Q()
-        granted_q = Q()
-
-        for _node in nodes:
-            if not is_granted(_node):
-                # 未授权的节点资产数量设置为 `UserGrantedMappingNode` 中的数量
-                _node.assets_amount = get_granted_assets_amount(_node)
-            else:
-                # 直接授权的节点
-
-                # 增加查询该节点及其后代节点资产的过滤条件
-                granted_q |= Q(nodes__key__startswith=f'{_node.key}:')
-                granted_q |= Q(nodes__key=_node.key)
-
-                # 增加查询后代节点的过滤条件
-                descendant_q |= Q(key__startswith=f'{_node.key}:')
-
-            key2nodes_mapper[_node.key] = _node
-
-        if descendant_q:
-            descendant_nodes = Node.objects.filter(descendant_q).annotate(**node_annotate_set_granted)
-            for _node in descendant_nodes:
-                key2nodes_mapper[_node.key] = _node
-
-        all_nodes = key2nodes_mapper.values()
-
-        # 查询出所有资产
-        all_assets = Asset.objects.filter(
-            get_granted_q(user) |
-            granted_q
-        ).annotate(parent_key=F('nodes__key')).distinct()
+        init_user_tree_if_need(user)
+        all_nodes = get_user_granted_nodes_list_via_mapping_node(user)
+        all_assets = get_user_granted_all_assets(user)
 
         data = [
             *self.serialize_nodes(all_nodes, with_asset_amount=True),
@@ -85,61 +49,70 @@ class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
         return Response(data=data)
 
 
-class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(UserGrantedNodeDispatchMixin, SerializeToTreeNodeMixin, ListAPIView):
-    permission_classes = (IsOrgAdminOrAppUser, )
+class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(ForAdminMixin, UserNodeGrantStatusDispatchMixin,
+                                                         SerializeToTreeNodeMixin, ListAPIView):
+    """
+    带资产的授权树
+    """
 
-    def on_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
+    def get_data_on_node_direct_granted(self, key):
         nodes = Node.objects.filter(parent_key=key)
-        assets = Asset.objects.filter(nodes__key=key).distinct()
+        assets = Asset.org_objects.filter(nodes__key=key).distinct()
+        assets = assets.prefetch_related('platform')
         return nodes, assets
 
-    def on_ungranted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
-        user = self.get_user()
-        assets = Asset.objects.none()
-        nodes = Node.objects.filter(
-            parent_key=key,
-            mapping_nodes__user=user,
-        ).annotate(
-            **node_annotate_mapping_node
+    def get_data_on_node_indirect_granted(self, key):
+        user = self.user
+        asset_perm_ids = get_user_all_assetpermission_ids(user)
+
+        nodes = get_indirect_granted_node_children(user, key)
+
+        assets = Asset.org_objects.filter(
+            nodes__key=key,
+        ).filter(
+            granted_by_permissions__id__in=asset_perm_ids
         ).distinct()
-
-        # TODO 可配置
-        for _node in nodes:
-            if not is_granted(_node):
-                _node.assets_amount = get_granted_assets_amount(_node)
-
-        if mapping_node.asset_granted:
-            assets = Asset.objects.filter(
-                nodes__key=key,
-            ).filter(get_granted_q(user))
+        assets = assets.prefetch_related('platform')
         return nodes, assets
 
-    def get_user(self):
-        user_id = self.kwargs.get('pk')
-        return User.objects.get(id=user_id)
+    def get_data_on_node_not_granted(self, key):
+        return Node.objects.none(), Asset.objects.none()
+
+    def get_data(self, key, user):
+        assets, nodes = [], []
+        if not key:
+            root_nodes = get_top_level_granted_nodes(user)
+            nodes.extend(root_nodes)
+        elif key == UNGROUPED_NODE_KEY:
+            assets = get_user_direct_granted_assets(user)
+            assets = assets.prefetch_related('platform')
+        elif key == FAVORITE_NODE_KEY:
+            assets = FavoriteAsset.get_user_favorite_assets(user)
+        else:
+            nodes, assets = self.dispatch_get_data(key, user)
+        return nodes, assets
+
+    def id2key_if_have(self):
+        id = self.request.query_params.get('id')
+        if id is not None:
+            node = get_object_or_none(Node, id=id)
+            if node:
+                return node.key
 
     @tmp_to_root_org()
     def list(self, request: Request, *args, **kwargs):
-        user = self.get_user()
-        key = request.query_params.get('key')
-        self.submit_update_mapping_node_task(user)
+        key = self.request.query_params.get('key')
+        if key is None:
+            key = self.id2key_if_have()
 
-        nodes = []
-        assets = []
-        if not key:
-            root_nodes = get_ungranted_node_children(user)
-            nodes.extend(root_nodes)
-        else:
-            mapping_node: UserGrantedMappingNode = get_object_or_none(
-                UserGrantedMappingNode, user=user, key=key)
-            nodes, assets = self.dispatch_node_process(key, mapping_node)
-        nodes = self.serialize_nodes(nodes, with_asset_amount=True)
-        assets = self.serialize_assets(assets, key)
-        return Response(data=[*nodes, *assets])
+        user = self.user
+        init_user_tree_if_need(user)
+        nodes, assets = self.get_data(key, user)
+
+        tree_nodes = self.serialize_nodes(nodes, with_asset_amount=True)
+        tree_assets = self.serialize_assets(assets, key)
+        return Response(data=[*tree_nodes, *tree_assets])
 
 
-class MyGrantedNodeChildrenWithAssetsAsTreeApi(UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi):
-    permission_classes = (IsValidUser, )
-
-    def get_user(self):
-        return self.request.user
+class MyGrantedNodeChildrenWithAssetsAsTreeApi(ForUserMixin, UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi):
+    pass

@@ -1,25 +1,24 @@
 # -*- coding: utf-8 -*-
 #
-from django.db.models import Q, F
-from perms.api.user_permission.mixin import ForAdminMixin, ForUserMixin
+import abc
 from rest_framework.generics import (
     ListAPIView
 )
 from rest_framework.response import Response
+from rest_framework.request import Request
 
-from perms.utils.user_node_tree import (
-    node_annotate_mapping_node, get_ungranted_node_children,
-    is_granted, get_granted_assets_amount, node_annotate_set_granted,
-)
-from common.utils.django import get_object_or_none
-from common.utils import lazyproperty
-from perms.models import UserGrantedMappingNode
 from orgs.utils import tmp_to_root_org
 from assets.api.mixin import SerializeToTreeNodeMixin
 from common.utils import get_logger
-from ...hands import Node
-from .mixin import UserGrantedNodeDispatchMixin
+from .mixin import ForAdminMixin, ForUserMixin, UserNodeGrantStatusDispatchMixin
+from ...hands import Node, User
 from ... import serializers
+from ...utils.user_asset_permission import (
+    get_indirect_granted_node_children,
+    get_user_granted_nodes_list_via_mapping_node,
+    get_top_level_granted_nodes,
+    init_user_tree_if_need,
+)
 
 
 logger = get_logger(__name__)
@@ -32,12 +31,13 @@ __all__ = [
     'MyGrantedNodeChildrenApi',
     'UserGrantedNodeChildrenAsTreeForAdminApi',
     'MyGrantedNodeChildrenAsTreeApi',
-    'NodeChildrenAsTreeApi',
+    'BaseGrantedNodeAsTreeApi',
+    'UserGrantedNodesMixin',
 ]
 
 
-class GrantedNodeBaseApi(ListAPIView):
-    @lazyproperty
+class _GrantedNodeStructApi(ListAPIView, metaclass=abc.ABCMeta):
+    @property
     def user(self):
         raise NotImplementedError
 
@@ -47,113 +47,105 @@ class GrantedNodeBaseApi(ListAPIView):
         raise NotImplementedError
 
 
-class NodeChildrenApi(GrantedNodeBaseApi):
+class NodeChildrenMixin:
+    def get_children(self):
+        raise NotImplementedError
+
+    def get_nodes(self):
+        nodes = self.get_children()
+        return nodes
+
+
+class BaseGrantedNodeApi(_GrantedNodeStructApi, metaclass=abc.ABCMeta):
     serializer_class = serializers.NodeGrantedSerializer
 
     @tmp_to_root_org()
     def list(self, request, *args, **kwargs):
+        init_user_tree_if_need(self.user)
         nodes = self.get_nodes()
         serializer = self.get_serializer(nodes, many=True)
         return Response(serializer.data)
 
 
-class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, GrantedNodeBaseApi):
+class BaseNodeChildrenApi(NodeChildrenMixin, BaseGrantedNodeApi, metaclass=abc.ABCMeta):
+    pass
+
+
+class BaseGrantedNodeAsTreeApi(SerializeToTreeNodeMixin, _GrantedNodeStructApi, metaclass=abc.ABCMeta):
     @tmp_to_root_org()
     def list(self, request, *args, **kwargs):
+        init_user_tree_if_need(self.user)
         nodes = self.get_nodes()
         nodes = self.serialize_nodes(nodes, with_asset_amount=True)
         return Response(data=nodes)
 
 
-class UserGrantedNodeChildrenMixin(UserGrantedNodeDispatchMixin):
+class BaseNodeChildrenAsTreeApi(NodeChildrenMixin, BaseGrantedNodeAsTreeApi, metaclass=abc.ABCMeta):
+    pass
 
-    def get_nodes(self):
+
+class UserGrantedNodeChildrenMixin(UserNodeGrantStatusDispatchMixin):
+    user: User
+    request: Request
+
+    def get_children(self):
         user = self.user
         key = self.request.query_params.get('key')
 
-        self.submit_update_mapping_node_task(user)
-
         if not key:
-            nodes = get_ungranted_node_children(user)
+            nodes = list(get_top_level_granted_nodes(user))
         else:
-            mapping_node = get_object_or_none(
-                UserGrantedMappingNode, user=user, key=key
-            )
-            nodes = self.dispatch_node_process(key, mapping_node, None)
+            nodes = self.dispatch_get_data(key, user)
         return nodes
 
-    def on_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
+    def get_data_on_node_direct_granted(self, key):
         return Node.objects.filter(parent_key=key)
 
-    def on_ungranted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
-        user = self.user
-        nodes = get_ungranted_node_children(user, key)
+    def get_data_on_node_indirect_granted(self, key):
+        nodes = get_indirect_granted_node_children(self.user, key)
         return nodes
+
+    def get_data_on_node_not_granted(self, key):
+        return Node.objects.none()
 
 
 class UserGrantedNodesMixin:
     """
     查询用户授权的所有节点 直接授权节点 + 授权资产关联的节点
     """
+    user: User
 
     def get_nodes(self):
-        user = self.user
-
-        # 获取 `UserGrantedMappingNode` 中对应的 `Node`
-        nodes = Node.objects.filter(
-            mapping_nodes__user=user,
-        ).annotate(**node_annotate_mapping_node).distinct()
-
-        key2nodes_mapper = {}
-        descendant_q = Q()
-
-        for _node in nodes:
-            if not is_granted(_node):
-                # 未授权的节点资产数量设置为 `UserGrantedMappingNode` 中的数量
-                _node.assets_amount = get_granted_assets_amount(_node)
-            else:
-                # 直接授权的节点
-                # 增加查询后代节点的过滤条件
-                descendant_q |= Q(key__startswith=f'{_node.key}:')
-
-            key2nodes_mapper[_node.key] = _node
-
-        if descendant_q:
-            descendant_nodes = Node.objects.filter(descendant_q).annotate(**node_annotate_set_granted)
-            for _node in descendant_nodes:
-                key2nodes_mapper[_node.key] = _node
-
-        all_nodes = key2nodes_mapper.values()
-        return all_nodes
+        return get_user_granted_nodes_list_via_mapping_node(self.user)
 
 
 # ------------------------------------------
 # 最终的 api
-class UserGrantedNodeChildrenForAdminApi(ForAdminMixin, UserGrantedNodeChildrenMixin, NodeChildrenApi):
+class UserGrantedNodeChildrenForAdminApi(ForAdminMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenApi):
     pass
 
 
-class MyGrantedNodeChildrenApi(ForUserMixin, UserGrantedNodeChildrenMixin, NodeChildrenApi):
+class MyGrantedNodeChildrenApi(ForUserMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenApi):
     pass
 
 
-class UserGrantedNodeChildrenAsTreeForAdminApi(ForAdminMixin, UserGrantedNodeChildrenMixin, NodeChildrenAsTreeApi):
+class UserGrantedNodeChildrenAsTreeForAdminApi(ForAdminMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenAsTreeApi):
     pass
 
 
-class MyGrantedNodeChildrenAsTreeApi(ForUserMixin, UserGrantedNodeChildrenMixin, NodeChildrenAsTreeApi):
+class MyGrantedNodeChildrenAsTreeApi(ForUserMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenAsTreeApi):
     pass
 
 
-class UserGrantedNodesForAdminApi(ForAdminMixin, UserGrantedNodesMixin, NodeChildrenApi):
+class UserGrantedNodesForAdminApi(ForAdminMixin, UserGrantedNodesMixin, BaseGrantedNodeApi):
     pass
 
 
-class MyGrantedNodesApi(ForUserMixin, UserGrantedNodesMixin, NodeChildrenApi):
+class MyGrantedNodesApi(ForUserMixin, UserGrantedNodesMixin, BaseGrantedNodeApi):
     pass
 
 
-class MyGrantedNodesAsTreeApi(ForUserMixin, UserGrantedNodesMixin, NodeChildrenAsTreeApi):
+class MyGrantedNodesAsTreeApi(ForUserMixin, UserGrantedNodesMixin, BaseGrantedNodeAsTreeApi):
     pass
 
 # ------------------------------------------

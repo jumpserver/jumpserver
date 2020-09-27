@@ -41,16 +41,16 @@ class FamilyMixin:
 
     @staticmethod
     def clean_children_keys(nodes_keys):
-        nodes_keys = sorted(list(nodes_keys), key=lambda x: (len(x), x))
+        sort_key = lambda k: [int(i) for i in k.split(':')]
+        nodes_keys = sorted(list(nodes_keys), key=sort_key)
+
         nodes_keys_clean = []
-        for key in nodes_keys[::-1]:
-            found = False
-            for k in nodes_keys:
-                if key.startswith(k + ':'):
-                    found = True
-                    break
-            if not found:
-                nodes_keys_clean.append(key)
+        base_key = ''
+        for key in nodes_keys:
+            if key.startswith(base_key + ':'):
+                continue
+            nodes_keys_clean.append(key)
+            base_key = key
         return nodes_keys_clean
 
     @classmethod
@@ -213,26 +213,29 @@ class NodeAssetsMixin:
     key = ''
     id = None
 
-    @classmethod
-    def clear_all_nodes_assets_amount(cls):
-        nodes = cls.objects.all()
-        for node in nodes:
-            count = node.get_all_assets().count()
-
     def get_all_assets(self):
         from .asset import Asset
-        if self.is_org_root():
-            return Asset.objects.filter(org_id=self.org_id)
-
-        q = Q(nodes__key__startswith=self.key) | Q(nodes__key=self.key)
+        q = Q(nodes__key__startswith=f'{self.key}:') | Q(nodes__key=self.key)
         return Asset.objects.filter(q).distinct()
+
+    @classmethod
+    def get_node_all_assets_by_key_v2(cls, key):
+        # 最初的写法是：
+        #   Asset.objects.filter(Q(nodes__key__startswith=f'{node.key}:') | Q(nodes__id=node.id))
+        #   可是 startswith 会导致表关联时 Asset 索引失效
+        from .asset import Asset
+        node_ids = cls.objects.filter(
+            Q(key__startswith=f'{key}:') |
+            Q(key=key)
+        ).values_list('id', flat=True).distinct()
+        assets = Asset.objects.filter(
+            nodes__id__in=list(node_ids)
+        ).distinct()
+        return assets
 
     def get_assets(self):
         from .asset import Asset
-        if self.is_org_root():
-            assets = Asset.objects.filter(Q(nodes=self) | Q(nodes__isnull=True))
-        else:
-            assets = Asset.objects.filter(nodes=self)
+        assets = Asset.objects.filter(nodes=self)
         return assets.distinct()
 
     def get_valid_assets(self):
@@ -242,50 +245,53 @@ class NodeAssetsMixin:
         return self.get_all_assets().valid()
 
     @classmethod
-    def _get_nodes_all_assets(cls, nodes_keys):
-        """
-        当节点比较多的时候，这种正则方式性能差极了
-        :param nodes_keys:
-        :return:
-        """
-        from .asset import Asset
-        nodes_keys = cls.clean_children_keys(nodes_keys)
-        nodes_children_pattern = set()
-        for key in nodes_keys:
-            children_pattern = cls.get_node_all_children_key_pattern(key)
-            nodes_children_pattern.add(children_pattern)
-        pattern = '|'.join(nodes_children_pattern)
-        return Asset.objects.filter(nodes__key__regex=pattern).distinct()
-
-    @classmethod
     def get_nodes_all_assets_ids(cls, nodes_keys):
-        nodes_keys = cls.clean_children_keys(nodes_keys)
-        assets_ids = set()
-        for key in nodes_keys:
-            node_assets_ids = cls.tree().all_assets(key)
-            assets_ids.update(set(node_assets_ids))
+        assets_ids = cls.get_nodes_all_assets(nodes_keys).values_list('id', flat=True)
         return assets_ids
 
     @classmethod
     def get_nodes_all_assets(cls, nodes_keys, extra_assets_ids=None):
         from .asset import Asset
         nodes_keys = cls.clean_children_keys(nodes_keys)
-        assets_ids = cls.get_nodes_all_assets_ids(nodes_keys)
+        q = Q()
+        node_ids = ()
+        for key in nodes_keys:
+            q |= Q(key__startswith=f'{key}:')
+            q |= Q(key=key)
+        if q:
+            node_ids = Node.objects.filter(q).distinct().values_list('id', flat=True)
+
+        q = Q(nodes__id__in=list(node_ids))
         if extra_assets_ids:
-            assets_ids.update(set(extra_assets_ids))
-        return Asset.objects.filter(id__in=assets_ids)
+            q |= Q(id__in=extra_assets_ids)
+        if q:
+            return Asset.org_objects.filter(q).distinct()
+        else:
+            return Asset.objects.none()
 
 
 class SomeNodesMixin:
     key = ''
     default_key = '1'
     default_value = 'Default'
-    ungrouped_key = '-10'
-    ungrouped_value = _('ungrouped')
     empty_key = '-11'
     empty_value = _("empty")
-    favorite_key = '-12'
-    favorite_value = _("favorite")
+
+    @classmethod
+    def default_node(cls):
+        with tmp_to_org(Organization.default()):
+            defaults = {'value': cls.default_value}
+            try:
+                obj, created = cls.objects.get_or_create(
+                    defaults=defaults, key=cls.default_key,
+                )
+            except IntegrityError as e:
+                logger.error("Create default node failed: {}".format(e))
+                cls.modify_other_org_root_node_key()
+                obj, created = cls.objects.get_or_create(
+                    defaults=defaults, key=cls.default_key,
+                )
+            return obj
 
     def is_default_node(self):
         return self.key == self.default_key
@@ -320,51 +326,15 @@ class SomeNodesMixin:
 
     @classmethod
     def org_root(cls):
-        root = cls.objects.filter(key__regex=r'^[0-9]+$')
+        root = cls.objects.filter(parent_key='').exclude(key__startswith='-')
         if root:
             return root[0]
         else:
             return cls.create_org_root_node()
 
     @classmethod
-    def ungrouped_node(cls):
-        with tmp_to_org(Organization.system()):
-            defaults = {'value': cls.ungrouped_value}
-            obj, created = cls.objects.get_or_create(
-                defaults=defaults, key=cls.ungrouped_key
-            )
-            return obj
-
-    @classmethod
-    def default_node(cls):
-        with tmp_to_org(Organization.default()):
-            defaults = {'value': cls.default_value}
-            try:
-                obj, created = cls.objects.get_or_create(
-                    defaults=defaults, key=cls.default_key,
-                )
-            except IntegrityError as e:
-                logger.error("Create default node failed: {}".format(e))
-                cls.modify_other_org_root_node_key()
-                obj, created = cls.objects.get_or_create(
-                    defaults=defaults, key=cls.default_key,
-                )
-            return obj
-
-    @classmethod
-    def favorite_node(cls):
-        with tmp_to_org(Organization.system()):
-            defaults = {'value': cls.favorite_value}
-            obj, created = cls.objects.get_or_create(
-                defaults=defaults, key=cls.favorite_key
-            )
-            return obj
-
-    @classmethod
     def initial_some_nodes(cls):
         cls.default_node()
-        cls.ungrouped_node()
-        cls.favorite_node()
 
     @classmethod
     def modify_other_org_root_node_key(cls):

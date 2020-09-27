@@ -257,6 +257,7 @@ class Config(dict):
         'SYSLOG_FACILITY': 'user',
         'SYSLOG_SOCKTYPE': 2,
         'PERM_SINGLE_ASSET_TO_UNGROUP_NODE': False,
+        'PERM_EXPIRED_CHECK_PERIODIC': 60,
         'WINDOWS_SSH_DEFAULT_SHELL': 'cmd',
         'FLOWER_URL': "127.0.0.1:5555",
         'DEFAULT_ORG_SHOW_ALL_USERS': True,

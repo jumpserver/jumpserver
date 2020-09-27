@@ -13,7 +13,7 @@ from orgs.mixins.models import OrgManager
 
 
 __all__ = [
-    'BasePermission',
+    'BasePermission', 'BasePermissionQuerySet'
 ]
 
 
@@ -46,8 +46,8 @@ class BasePermissionManager(OrgManager):
 class BasePermission(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
-    users = models.ManyToManyField('users.User', blank=True, verbose_name=_("User"))
-    user_groups = models.ManyToManyField('users.UserGroup', blank=True, verbose_name=_("User group"))
+    users = models.ManyToManyField('users.User', blank=True, verbose_name=_("User"), related_name='%(class)ss')
+    user_groups = models.ManyToManyField('users.UserGroup', blank=True, verbose_name=_("User group"), related_name='%(class)ss')
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
     date_start = models.DateTimeField(default=timezone.now, db_index=True, verbose_name=_("Date start"))
     date_expired = models.DateTimeField(default=date_expired_default, db_index=True, verbose_name=_('Date expired'))
