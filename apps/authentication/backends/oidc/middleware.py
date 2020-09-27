@@ -4,7 +4,7 @@ from django.conf import settings
 
 
 class OIDCRefreshIDTokenMiddleware(_OIDCRefreshIDTokenMiddleware):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         if not settings.AUTH_OPENID:
             raise MiddlewareNotUsed
