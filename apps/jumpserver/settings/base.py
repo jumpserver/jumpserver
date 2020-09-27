@@ -76,13 +76,13 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'jms_oidc_rp.middleware.OIDCRefreshIDTokenMiddleware',
-    'django_cas_ng.middleware.CASMiddleware',
     'jumpserver.middleware.TimezoneMiddleware',
     'jumpserver.middleware.DemoMiddleware',
     'jumpserver.middleware.RequestMiddleware',
     'jumpserver.middleware.RefererCheckMiddleware',
     'orgs.middleware.OrgMiddleware',
+    'authentication.backends.oidc.middleware.OIDCRefreshIDTokenMiddleware',
+    'authentication.backends.cas.middleware.CASMiddleware',
 ]
 
 
