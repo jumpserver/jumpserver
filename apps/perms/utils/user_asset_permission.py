@@ -8,6 +8,7 @@ from django.conf import settings
 from django.db.models import F, Q, Value, BooleanField
 from django.utils.translation import gettext as _
 
+from common.http import is_true
 from common.utils import get_logger
 from common.const.distributed_lock_key import UPDATE_MAPPING_NODE_TASK_LOCK_KEY
 from orgs.utils import tmp_to_root_org
@@ -247,10 +248,12 @@ def set_node_granted_assets_amount(user, node):
 
 
 def rebuild_user_mapping_nodes(user):
+    logger.info(f'>>> {dt_formater(now())} start rebuild {user} mapping nodes')
     tmp_nodes = compute_tmp_mapping_node_from_perm(user)
     for _node in tmp_nodes:
         set_node_granted_assets_amount(user, _node)
     create_mapping_nodes(user, tmp_nodes)
+    logger.info(f'>>> {dt_formater(now())} end rebuild {user} mapping nodes')
 
 
 def get_user_granted_nodes_list_via_mapping_node(user):
@@ -486,12 +489,13 @@ def get_favorite_node(user):
     )
 
 
-def init_user_tree_if_need(user):
+def rebuild_user_tree_if_need(request, user):
     """
     升级授权树策略后，用户的数据可能还未初始化，为防止用户显示没有数据
     先检查 MappingNode 如果没有数据，同步创建用户授权树
     """
-    if not UserGrantedMappingNode.objects.filter(user=user).exists():
+    if is_true(request.query_params.get('rebuild_tree')) or \
+            not UserGrantedMappingNode.objects.filter(user=user).exists():
         try:
             rebuild_user_mapping_nodes_with_lock(user)
         except lock.SomeoneIsDoingThis:
