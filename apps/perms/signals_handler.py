@@ -2,7 +2,7 @@
 #
 from itertools import chain
 
-from django.db.models.signals import m2m_changed, pre_delete
+from django.db.models.signals import m2m_changed, pre_delete, pre_save
 from django.dispatch import receiver
 from django.db import transaction
 from django.db.models import Q
@@ -19,7 +19,11 @@ from .models import AssetPermission, RemoteAppPermission, RebuildUserTreeTask
 logger = get_logger(__file__)
 
 
-# Todo: 检查授权规则到期，从而修改授权规则
+@receiver([pre_save], sender=AssetPermission)
+def on_asset_perm_deactive(instance: AssetPermission, **kwargs):
+    old = AssetPermission.objects.only('is_active').get(id=instance.id)
+    if instance.is_active != old.is_active:
+        create_rebuild_user_tree_task_by_asset_perm(instance)
 
 
 @receiver([pre_delete], sender=AssetPermission)
