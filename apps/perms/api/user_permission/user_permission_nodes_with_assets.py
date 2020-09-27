@@ -13,6 +13,7 @@ from ...utils.user_asset_permission import (
     get_user_direct_granted_assets, get_top_level_granted_nodes,
     get_user_granted_nodes_list_via_mapping_node,
     get_user_granted_all_assets, init_user_tree_if_need,
+    get_user_all_assetpermission_ids,
 )
 
 from assets.models import Asset, FavoriteAsset
@@ -62,13 +63,14 @@ class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(ForAdminMixin, UserNode
 
     def get_data_on_node_indirect_granted(self, key):
         user = self.user
+        asset_perm_ids = get_user_all_assetpermission_ids(user)
+
         nodes = get_indirect_granted_node_children(user, key)
-        direct_granted_q = get_user_resources_q_granted_by_permissions(user)
 
         assets = Asset.org_objects.filter(
             nodes__key=key,
         ).filter(
-            direct_granted_q
+            granted_by_permissions__id__in=asset_perm_ids
         ).distinct()
         assets = assets.prefetch_related('platform')
         return nodes, assets
