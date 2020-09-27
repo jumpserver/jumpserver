@@ -75,7 +75,6 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     """
     class Meta:
         model = Asset
-        list_serializer_class = AdaptedBulkListSerializer
         fields_mini = ['id', 'hostname', 'ip']
         fields_small = fields_mini + [
             'protocol', 'port', 'protocols', 'is_active', 'public_ip',

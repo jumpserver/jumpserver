@@ -6,7 +6,8 @@ from rest_framework import filters
 from django.db.models import Q
 
 from common.utils import dict_get_any, is_uuid, get_object_or_none
-from .models import Node, Label
+from .models import Label
+from assets.models import Node
 
 
 class AssetByNodeFilterBackend(filters.BaseFilterBackend):
@@ -43,10 +44,6 @@ class AssetByNodeFilterBackend(filters.BaseFilterBackend):
             node = get_object_or_none(Node, key=node_id)
         return node, True
 
-    @staticmethod
-    def perform_query(pattern, queryset):
-        return queryset.filter(nodes__key__regex=pattern).distinct()
-
     def filter_queryset(self, request, queryset, view):
         node, has_query_arg = self.get_query_node(request)
         if not has_query_arg:
@@ -56,12 +53,41 @@ class AssetByNodeFilterBackend(filters.BaseFilterBackend):
             return queryset
         query_all = self.is_query_all(request)
         if query_all:
-            pattern = node.get_all_children_pattern(with_self=True)
+            return queryset.filter(
+                Q(nodes__key__istartswith=f'{node.key}:') |
+                Q(nodes__key=node.key)
+            ).distinct()
         else:
-            # pattern = node.get_children_key_pattern(with_self=True)
-            # 只显示当前节点下资产
-            pattern = r"^{}$".format(node.key)
-        return self.perform_query(pattern, queryset)
+            return queryset.filter(nodes__key=node.key).distinct()
+
+
+class FilterAssetByNodeFilterBackend(filters.BaseFilterBackend):
+    """
+    需要与 `assets.api.mixin.FilterAssetByNodeMixin` 配合使用
+    """
+    fields = ['node', 'all']
+
+    def get_schema_fields(self, view):
+        return [
+            coreapi.Field(
+                name=field, location='query', required=False,
+                type='string', example='', description='', schema=None,
+            )
+            for field in self.fields
+        ]
+
+    def filter_queryset(self, request, queryset, view):
+        node = view.node
+        if node is None:
+            return queryset
+        query_all = view.is_query_node_all_assets
+        if query_all:
+            return queryset.filter(
+                Q(nodes__key__istartswith=f'{node.key}:') |
+                Q(nodes__key=node.key)
+            ).distinct()
+        else:
+            return queryset.filter(nodes__key=node.key).distinct()
 
 
 class LabelFilterBackend(filters.BaseFilterBackend):

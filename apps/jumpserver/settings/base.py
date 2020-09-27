@@ -81,6 +81,7 @@ MIDDLEWARE = [
     'jumpserver.middleware.TimezoneMiddleware',
     'jumpserver.middleware.DemoMiddleware',
     'jumpserver.middleware.RequestMiddleware',
+    'jumpserver.middleware.RefererCheckMiddleware',
     'orgs.middleware.OrgMiddleware',
 ]
 
@@ -245,6 +246,6 @@ CACHES = {
     }
 }
 
-
 FORCE_SCRIPT_NAME = CONFIG.FORCE_SCRIPT_NAME
-
+SESSION_COOKIE_SECURE = CONFIG.SESSION_COOKIE_SECURE
+CSRF_COOKIE_SECURE = CONFIG.CSRF_COOKIE_SECURE

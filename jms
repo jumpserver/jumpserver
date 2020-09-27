@@ -157,7 +157,7 @@ def is_running(s, unlink=True):
 def parse_service(s):
     all_services = [
         'gunicorn', 'celery_ansible', 'celery_default',
-        'beat', 'flower', 'daphne',
+        'beat', 'flower', 'daphne', 'celery_node_tree',
     ]
     if s == 'all':
         return all_services
@@ -168,7 +168,7 @@ def parse_service(s):
     elif s == "task":
         return ["celery_ansible", "celery_default", "beat"]
     elif s == "celery":
-        return ["celery_ansible", "celery_default"]
+        return ["celery_ansible", "celery_default", "celery_node_tree"]
     elif "," in s:
         services = set()
         for i in s.split(','):
@@ -218,6 +218,11 @@ def get_start_celery_ansible_kwargs():
 def get_start_celery_default_kwargs():
     print("\n- Start Celery as Distributed Task Queue: Celery")
     return get_start_worker_kwargs('celery', 4)
+
+
+def get_start_celery_node_tree_kwargs():
+    print("\n- Start Celery as Distributed Task Queue: NodeTree")
+    return get_start_worker_kwargs('node_tree', 10)
 
 
 def get_start_worker_kwargs(queue, num):
@@ -363,6 +368,7 @@ def start_service(s):
         "gunicorn": get_start_gunicorn_kwargs,
         "celery_ansible": get_start_celery_ansible_kwargs,
         "celery_default": get_start_celery_default_kwargs,
+        "celery_node_tree": get_start_celery_node_tree_kwargs,
         "beat": get_start_beat_kwargs,
         "flower": get_start_flower_kwargs,
         "daphne": get_start_daphne_kwargs,

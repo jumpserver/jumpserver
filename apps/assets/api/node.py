@@ -1,16 +1,24 @@
 # ~*~ coding: utf-8 ~*~
+from functools import partial
+from collections import namedtuple, defaultdict
 
-from collections import namedtuple
 from rest_framework import status
 from rest_framework.serializers import ValidationError
 from rest_framework.response import Response
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404, Http404
+from django.utils.decorators import method_decorator
+from django.db.models.signals import m2m_changed
 
+from common.exceptions import SomeoneIsDoingThis
+from common.const.signals import PRE_REMOVE, POST_REMOVE
+from assets.models import Asset
 from common.utils import get_logger, get_object_or_none
 from common.tree import TreeNodeSerializer
+from common.const.distributed_lock_key import UPDATE_NODE_TREE_LOCK_KEY
 from orgs.mixins.api import OrgModelViewSet
 from orgs.mixins import generics
+from orgs.lock import org_level_transaction_lock
 from ..hands import IsOrgAdmin
 from ..models import Node
 from ..tasks import (
@@ -18,12 +26,13 @@ from ..tasks import (
     test_node_assets_connectivity_manual,
 )
 from .. import serializers
+from .mixin import SerializeToTreeNodeMixin
 
 
 logger = get_logger(__file__)
 __all__ = [
     'NodeViewSet', 'NodeChildrenApi', 'NodeAssetsApi',
-    'NodeAddAssetsApi', 'NodeRemoveAssetsApi', 'NodeReplaceAssetsApi',
+    'NodeAddAssetsApi', 'NodeRemoveAssetsApi', 'MoveAssetsToNodeApi',
     'NodeAddChildrenApi', 'NodeListAsTreeApi',
     'NodeChildrenAsTreeApi',
     'NodeTaskCreateApi',
@@ -136,7 +145,7 @@ class NodeChildrenApi(generics.ListCreateAPIView):
         return queryset
 
 
-class NodeChildrenAsTreeApi(NodeChildrenApi):
+class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
     """
     节点子节点作为树返回，
     [
@@ -150,31 +159,23 @@ class NodeChildrenAsTreeApi(NodeChildrenApi):
 
     """
     model = Node
-    serializer_class = TreeNodeSerializer
-    http_method_names = ['get']
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        queryset = [node.as_tree_node() for node in queryset]
-        queryset = self.add_assets_if_need(queryset)
-        queryset = sorted(queryset)
-        return queryset
+    def list(self, request, *args, **kwargs):
+        nodes = self.get_queryset().order_by('value')
+        nodes = self.serialize_nodes(nodes, with_asset_amount=True)
+        assets = self.get_assets()
+        data = [*nodes, *assets]
+        return Response(data=data)
 
-    def add_assets_if_need(self, queryset):
+    def get_assets(self):
         include_assets = self.request.query_params.get('assets', '0') == '1'
         if not include_assets:
-            return queryset
+            return []
         assets = self.instance.get_assets().only(
             "id", "hostname", "ip", "os",
             "org_id", "protocols",
         )
-        for asset in assets:
-            queryset.append(asset.as_tree_node(self.instance))
-        return queryset
-
-    def check_need_refresh_nodes(self):
-        if self.request.query_params.get('refresh', '0') == '1':
-            Node.refresh_nodes()
+        return self.serialize_assets(assets, self.instance.key)
 
 
 class NodeAssetsApi(generics.ListAPIView):
@@ -208,6 +209,8 @@ class NodeAddChildrenApi(generics.UpdateAPIView):
         return Response("OK")
 
 
+@method_decorator(org_level_transaction_lock(UPDATE_NODE_TREE_LOCK_KEY), name='patch')
+@method_decorator(org_level_transaction_lock(UPDATE_NODE_TREE_LOCK_KEY), name='put')
 class NodeAddAssetsApi(generics.UpdateAPIView):
     model = Node
     serializer_class = serializers.NodeAssetsSerializer
@@ -220,6 +223,8 @@ class NodeAddAssetsApi(generics.UpdateAPIView):
         instance.assets.add(*tuple(assets))
 
 
+@method_decorator(org_level_transaction_lock(UPDATE_NODE_TREE_LOCK_KEY), name='patch')
+@method_decorator(org_level_transaction_lock(UPDATE_NODE_TREE_LOCK_KEY), name='put')
 class NodeRemoveAssetsApi(generics.UpdateAPIView):
     model = Node
     serializer_class = serializers.NodeAssetsSerializer
@@ -228,15 +233,17 @@ class NodeRemoveAssetsApi(generics.UpdateAPIView):
 
     def perform_update(self, serializer):
         assets = serializer.validated_data.get('assets')
-        instance = self.get_object()
-        if instance != Node.org_root():
-            instance.assets.remove(*tuple(assets))
-        else:
-            assets = [asset for asset in assets if asset.nodes.count() > 1]
-            instance.assets.remove(*tuple(assets))
+        node = self.get_object()
+        node.assets.remove(*assets)
+
+        # 把孤儿资产添加到 root 节点
+        orphan_assets = Asset.objects.filter(id__in=[a.id for a in assets], nodes__isnull=True).distinct()
+        Node.org_root().assets.add(*orphan_assets)
 
 
-class NodeReplaceAssetsApi(generics.UpdateAPIView):
+@method_decorator(org_level_transaction_lock(UPDATE_NODE_TREE_LOCK_KEY), name='patch')
+@method_decorator(org_level_transaction_lock(UPDATE_NODE_TREE_LOCK_KEY), name='put')
+class MoveAssetsToNodeApi(generics.UpdateAPIView):
     model = Node
     serializer_class = serializers.NodeAssetsSerializer
     permission_classes = (IsOrgAdmin,)
@@ -244,9 +251,39 @@ class NodeReplaceAssetsApi(generics.UpdateAPIView):
 
     def perform_update(self, serializer):
         assets = serializer.validated_data.get('assets')
-        instance = self.get_object()
-        for asset in assets:
-            asset.nodes.set([instance])
+        node = self.get_object()
+        self.remove_old_nodes(assets)
+        node.assets.add(*assets)
+
+    def remove_old_nodes(self, assets):
+        m2m_model = Asset.nodes.through
+
+        # 查询资产与节点关系表，查出要移动资产与节点的所有关系
+        relates = m2m_model.objects.filter(asset__in=assets).values_list('asset_id', 'node_id')
+        if relates:
+            # 对关系以资产进行分组，用来发 `reverse=False` 信号
+            asset_nodes_mapper = defaultdict(set)
+            for asset_id, node_id in relates:
+                asset_nodes_mapper[asset_id].add(node_id)
+
+            # 组建一个资产 id -> Asset 的 mapper
+            asset_mapper = {asset.id: asset for asset in assets}
+
+            # 创建删除关系信号发送函数
+            senders = []
+            for asset_id, node_id_set in asset_nodes_mapper.items():
+                senders.append(partial(m2m_changed.send, sender=m2m_model, instance=asset_mapper[asset_id],
+                                       reverse=False, model=Node, pk_set=node_id_set))
+            # 发送 pre 信号
+            [sender(action=PRE_REMOVE) for sender in senders]
+            num = len(relates)
+            asset_ids, node_ids = zip(*relates)
+            # 删除之前的关系
+            rows, _i = m2m_model.objects.filter(asset_id__in=asset_ids, node_id__in=node_ids).delete()
+            if rows != num:
+                raise SomeoneIsDoingThis
+            # 发送 post 信号
+            [sender(action=POST_REMOVE) for sender in senders]
 
 
 class NodeTaskCreateApi(generics.CreateAPIView):
@@ -267,7 +304,6 @@ class NodeTaskCreateApi(generics.CreateAPIView):
 
     @staticmethod
     def refresh_nodes_cache():
-        Node.refresh_nodes()
         Task = namedtuple('Task', ['id'])
         task = Task(id="0")
         return task

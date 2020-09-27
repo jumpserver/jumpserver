@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-
+from assets.api import FilterAssetByNodeMixin
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import RetrieveAPIView
 from django.shortcuts import get_object_or_404
@@ -14,7 +14,7 @@ from .. import serializers
 from ..tasks import (
     update_asset_hardware_info_manual, test_asset_connectivity_manual
 )
-from ..filters import AssetByNodeFilterBackend, LabelFilterBackend, IpInFilterBackend
+from ..filters import FilterAssetByNodeFilterBackend, LabelFilterBackend, IpInFilterBackend
 
 
 logger = get_logger(__file__)
@@ -25,7 +25,7 @@ __all__ = [
 ]
 
 
-class AssetViewSet(OrgBulkModelViewSet):
+class AssetViewSet(FilterAssetByNodeMixin, OrgBulkModelViewSet):
     """
     API endpoint that allows Asset to be viewed or edited.
     """
@@ -41,7 +41,7 @@ class AssetViewSet(OrgBulkModelViewSet):
         'display': serializers.AssetDisplaySerializer,
     }
     permission_classes = (IsOrgAdminOrAppUser,)
-    extra_filter_backends = [AssetByNodeFilterBackend, LabelFilterBackend, IpInFilterBackend]
+    extra_filter_backends = [FilterAssetByNodeFilterBackend, LabelFilterBackend, IpInFilterBackend]
 
     def set_assets_node(self, assets):
         if not isinstance(assets, list):

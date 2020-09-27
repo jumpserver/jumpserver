@@ -18,6 +18,7 @@ from importlib import import_module
 from django.urls import reverse_lazy
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from urllib.parse import urljoin, urlparse
+from django.utils.translation import ugettext_lazy as _
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
@@ -269,6 +270,9 @@ class Config(dict):
         'CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED': True,
         'USER_LOGIN_SINGLE_MACHINE_ENABLED': False,
         'TICKETS_ENABLED': True,
+        'SESSION_COOKIE_SECURE': False,
+        'CSRF_COOKIE_SECURE': False,
+        'REFERER_CHECK_ENABLED': False,
         'SERVER_REPLAY_STORAGE': {}
     }
 
@@ -458,6 +462,16 @@ class DynamicConfig:
             return License.has_valid_license()
         except:
             return False
+
+    def XPACK_INTERFACE_LOGIN_TITLE(self):
+        default_title = _('Welcome to the JumpServer open source fortress')
+        if not HAS_XPACK:
+            return default_title
+        try:
+            from xpack.plugins.interface.models import Interface
+            return Interface.get_login_title()
+        except:
+            return default_title
 
     def LOGO_URLS(self):
         logo_urls = {'logo_logout': static('img/logo.png'),

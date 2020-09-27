@@ -1,82 +1,159 @@
 # -*- coding: utf-8 -*-
 #
-
-from django.shortcuts import get_object_or_404
+from django.db.models import Q, F
+from perms.api.user_permission.mixin import ForAdminMixin, ForUserMixin
 from rest_framework.generics import (
-    ListAPIView, get_object_or_404
+    ListAPIView
 )
+from rest_framework.response import Response
 
-from common.permissions import IsOrgAdminOrAppUser
+from perms.utils.user_node_tree import (
+    node_annotate_mapping_node, get_ungranted_node_children,
+    is_granted, get_granted_assets_amount, node_annotate_set_granted,
+)
+from common.utils.django import get_object_or_none
+from common.utils import lazyproperty
+from perms.models import UserGrantedMappingNode
+from orgs.utils import tmp_to_root_org
+from assets.api.mixin import SerializeToTreeNodeMixin
 from common.utils import get_logger
-from ...hands import Node, NodeSerializer
+from ...hands import Node
+from .mixin import UserGrantedNodeDispatchMixin
 from ... import serializers
-from .mixin import UserNodeTreeMixin, UserAssetPermissionMixin
 
 
 logger = get_logger(__name__)
 
 __all__ = [
-    'UserGrantedNodesApi',
-    'UserGrantedNodesAsTreeApi',
-    'UserGrantedNodeChildrenApi',
-    'UserGrantedNodeChildrenAsTreeApi',
+    'UserGrantedNodesForAdminApi',
+    'MyGrantedNodesApi',
+    'MyGrantedNodesAsTreeApi',
+    'UserGrantedNodeChildrenForAdminApi',
+    'MyGrantedNodeChildrenApi',
+    'UserGrantedNodeChildrenAsTreeForAdminApi',
+    'MyGrantedNodeChildrenAsTreeApi',
+    'NodeChildrenAsTreeApi',
 ]
 
 
-class UserGrantedNodesApi(UserAssetPermissionMixin, ListAPIView):
-    """
-    查询用户授权的所有节点的API
-    """
-    permission_classes = (IsOrgAdminOrAppUser,)
+class GrantedNodeBaseApi(ListAPIView):
+    @lazyproperty
+    def user(self):
+        raise NotImplementedError
+
+    def get_nodes(self):
+        # 不使用 `get_queryset` 单独定义 `get_nodes` 的原因是
+        # `get_nodes` 返回的不一定是 `queryset`
+        raise NotImplementedError
+
+
+class NodeChildrenApi(GrantedNodeBaseApi):
     serializer_class = serializers.NodeGrantedSerializer
-    nodes_only_fields = NodeSerializer.Meta.only_fields
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        if self.serializer_class == serializers.NodeGrantedSerializer:
-            context["tree"] = self.tree
-        return context
-
-    def get_queryset(self):
-        node_keys = self.util.get_nodes()
-        queryset = Node.objects.filter(key__in=node_keys)\
-            .only(*self.nodes_only_fields)
-        return queryset
+    @tmp_to_root_org()
+    def list(self, request, *args, **kwargs):
+        nodes = self.get_nodes()
+        serializer = self.get_serializer(nodes, many=True)
+        return Response(serializer.data)
 
 
-class UserGrantedNodesAsTreeApi(UserNodeTreeMixin, UserGrantedNodesApi):
-    pass
+class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, GrantedNodeBaseApi):
+    @tmp_to_root_org()
+    def list(self, request, *args, **kwargs):
+        nodes = self.get_nodes()
+        nodes = self.serialize_nodes(nodes, with_asset_amount=True)
+        return Response(data=nodes)
 
 
-class UserGrantedNodeChildrenApi(UserGrantedNodesApi):
-    node = None
-    root_keys = None  # 如果是第一次访问，则需要把二级节点添加进去，这个 roots_keys
+class UserGrantedNodeChildrenMixin(UserGrantedNodeDispatchMixin):
 
-    def get(self, request, *args, **kwargs):
-        key = self.request.query_params.get("key")
-        pk = self.request.query_params.get("id")
+    def get_nodes(self):
+        user = self.user
+        key = self.request.query_params.get('key')
 
-        node = None
-        if pk is not None:
-            node = get_object_or_404(Node, id=pk)
-        elif key is not None:
-            node = get_object_or_404(Node, key=key)
-        self.node = node
-        return super().get(request, *args, **kwargs)
+        self.submit_update_mapping_node_task(user)
 
-    def get_queryset(self):
-        if self.node:
-            children = self.tree.children(self.node.key)
+        if not key:
+            nodes = get_ungranted_node_children(user)
         else:
-            children = self.tree.children(self.tree.root)
-            # 默认打开组织节点下的节点
-            self.root_keys = [child.identifier for child in children]
-            for key in self.root_keys:
-                children.extend(self.tree.children(key))
-        node_keys = [n.identifier for n in children]
-        queryset = Node.objects.filter(key__in=node_keys)
-        return queryset
+            mapping_node = get_object_or_none(
+                UserGrantedMappingNode, user=user, key=key
+            )
+            nodes = self.dispatch_node_process(key, mapping_node, None)
+        return nodes
+
+    def on_granted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
+        return Node.objects.filter(parent_key=key)
+
+    def on_ungranted_node(self, key, mapping_node: UserGrantedMappingNode, node: Node = None):
+        user = self.user
+        nodes = get_ungranted_node_children(user, key)
+        return nodes
 
 
-class UserGrantedNodeChildrenAsTreeApi(UserNodeTreeMixin, UserGrantedNodeChildrenApi):
+class UserGrantedNodesMixin:
+    """
+    查询用户授权的所有节点 直接授权节点 + 授权资产关联的节点
+    """
+
+    def get_nodes(self):
+        user = self.user
+
+        # 获取 `UserGrantedMappingNode` 中对应的 `Node`
+        nodes = Node.objects.filter(
+            mapping_nodes__user=user,
+        ).annotate(**node_annotate_mapping_node).distinct()
+
+        key2nodes_mapper = {}
+        descendant_q = Q()
+
+        for _node in nodes:
+            if not is_granted(_node):
+                # 未授权的节点资产数量设置为 `UserGrantedMappingNode` 中的数量
+                _node.assets_amount = get_granted_assets_amount(_node)
+            else:
+                # 直接授权的节点
+                # 增加查询后代节点的过滤条件
+                descendant_q |= Q(key__startswith=f'{_node.key}:')
+
+            key2nodes_mapper[_node.key] = _node
+
+        if descendant_q:
+            descendant_nodes = Node.objects.filter(descendant_q).annotate(**node_annotate_set_granted)
+            for _node in descendant_nodes:
+                key2nodes_mapper[_node.key] = _node
+
+        all_nodes = key2nodes_mapper.values()
+        return all_nodes
+
+
+# ------------------------------------------
+# 最终的 api
+class UserGrantedNodeChildrenForAdminApi(ForAdminMixin, UserGrantedNodeChildrenMixin, NodeChildrenApi):
     pass
+
+
+class MyGrantedNodeChildrenApi(ForUserMixin, UserGrantedNodeChildrenMixin, NodeChildrenApi):
+    pass
+
+
+class UserGrantedNodeChildrenAsTreeForAdminApi(ForAdminMixin, UserGrantedNodeChildrenMixin, NodeChildrenAsTreeApi):
+    pass
+
+
+class MyGrantedNodeChildrenAsTreeApi(ForUserMixin, UserGrantedNodeChildrenMixin, NodeChildrenAsTreeApi):
+    pass
+
+
+class UserGrantedNodesForAdminApi(ForAdminMixin, UserGrantedNodesMixin, NodeChildrenApi):
+    pass
+
+
+class MyGrantedNodesApi(ForUserMixin, UserGrantedNodesMixin, NodeChildrenApi):
+    pass
+
+
+class MyGrantedNodesAsTreeApi(ForUserMixin, UserGrantedNodesMixin, NodeChildrenAsTreeApi):
+    pass
+
+# ------------------------------------------
