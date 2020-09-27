@@ -2,6 +2,7 @@
 from __future__ import absolute_import, unicode_literals
 from datetime import timedelta
 
+from django.db import transaction
 from django.db.models import Q
 from django.conf import settings
 from celery import shared_task
@@ -9,23 +10,25 @@ from common.utils import get_logger
 from common.utils.timezone import now
 from users.models import User
 from perms.models import RebuildUserTreeTask, AssetPermission
-from perms.utils.user_asset_permission import rebuild_user_mapping_nodes_if_need_with_lock
+from perms.utils.user_asset_permission import rebuild_user_mapping_nodes_if_need_with_lock, lock
 
 logger = get_logger(__file__)
 
 
 @shared_task(queue='node_tree')
 def rebuild_user_mapping_nodes_celery_task(user_id):
-    logger.info(f'>>> rebuild user[{user_id}] mapping nodes')
     user = User.objects.get(id=user_id)
-    rebuild_user_mapping_nodes_if_need_with_lock(user)
+    try:
+        rebuild_user_mapping_nodes_if_need_with_lock(user)
+    except lock.SomeoneIsDoingThis:
+        pass
 
 
 @shared_task(queue='node_tree')
 def dispatch_mapping_node_tasks():
     user_ids = RebuildUserTreeTask.objects.all().values_list('user_id', flat=True).distinct()
+    logger.info(f'>>> dispatch_mapping_node_tasks for users {list(user_ids)}')
     for id in user_ids:
-        logger.info(f'>>> dispatch mapping node task for user[{id}]')
         rebuild_user_mapping_nodes_celery_task.delay(id)
 
 
@@ -55,3 +58,10 @@ def dispatch_process_expired_asset_permission(asset_perm_ids):
     )
 
     dispatch_mapping_node_tasks.delay()
+
+
+def create_rebuild_user_tree_task(user_ids):
+    RebuildUserTreeTask.objects.bulk_create(
+        [RebuildUserTreeTask(user_id=i) for i in user_ids]
+    )
+    transaction.on_commit(dispatch_mapping_node_tasks.delay)

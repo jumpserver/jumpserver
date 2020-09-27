@@ -9,6 +9,7 @@ from django_cas_ng.signals import cas_user_authenticated
 
 from jms_oidc_rp.signals import openid_create_or_update_user
 
+from perms.tasks import create_rebuild_user_tree_task
 from common.utils import get_logger
 from .signals import post_user_create
 from .models import User
@@ -27,14 +28,12 @@ def on_user_create(sender, user=None, **kwargs):
 
 
 @receiver(m2m_changed, sender=User.groups.through)
-def on_user_groups_change(sender, instance=None, action='', **kwargs):
-    """
-    资产节点发生变化时，刷新节点
-    """
+def on_user_groups_change(instance, action, reverse, pk_set, **kwargs):
     if action.startswith('post'):
-        logger.debug("User group member change signal recv: {}".format(instance))
-        from perms.utils import AssetPermissionUtil
-        AssetPermissionUtil.expire_all_user_tree_cache()
+        if reverse:
+            create_rebuild_user_tree_task(pk_set)
+        else:
+            create_rebuild_user_tree_task([instance.id])
 
 
 @receiver(cas_user_authenticated)

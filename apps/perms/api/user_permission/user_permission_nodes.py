@@ -17,7 +17,7 @@ from ...utils.user_asset_permission import (
     get_indirect_granted_node_children,
     get_user_granted_nodes_list_via_mapping_node,
     get_top_level_granted_nodes,
-    init_user_tree_if_need,
+    rebuild_user_tree_if_need,
 )
 
 
@@ -61,7 +61,7 @@ class BaseGrantedNodeApi(_GrantedNodeStructApi, metaclass=abc.ABCMeta):
 
     @tmp_to_root_org()
     def list(self, request, *args, **kwargs):
-        init_user_tree_if_need(self.user)
+        rebuild_user_tree_if_need(request, self.user)
         nodes = self.get_nodes()
         serializer = self.get_serializer(nodes, many=True)
         return Response(serializer.data)
@@ -73,8 +73,8 @@ class BaseNodeChildrenApi(NodeChildrenMixin, BaseGrantedNodeApi, metaclass=abc.A
 
 class BaseGrantedNodeAsTreeApi(SerializeToTreeNodeMixin, _GrantedNodeStructApi, metaclass=abc.ABCMeta):
     @tmp_to_root_org()
-    def list(self, request, *args, **kwargs):
-        init_user_tree_if_need(self.user)
+    def list(self, request: Request, *args, **kwargs):
+        rebuild_user_tree_if_need(request, self.user)
         nodes = self.get_nodes()
         nodes = self.serialize_nodes(nodes, with_asset_amount=True)
         return Response(data=nodes)

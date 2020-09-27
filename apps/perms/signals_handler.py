@@ -4,16 +4,16 @@ from itertools import chain
 
 from django.db.models.signals import m2m_changed, pre_delete, pre_save
 from django.dispatch import receiver
-from django.db import transaction
+
 from django.db.models import Q
 
-from perms.tasks import dispatch_mapping_node_tasks
+from perms.tasks import create_rebuild_user_tree_task
 from users.models import User, UserGroup
 from assets.models import Asset
-from common.utils import get_logger
+from common.utils import get_logger, get_object_or_none
 from common.exceptions import M2MReverseNotAllowed
 from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR
-from .models import AssetPermission, RemoteAppPermission, RebuildUserTreeTask
+from .models import AssetPermission, RemoteAppPermission
 
 
 logger = get_logger(__file__)
@@ -21,22 +21,18 @@ logger = get_logger(__file__)
 
 @receiver([pre_save], sender=AssetPermission)
 def on_asset_perm_deactive(instance: AssetPermission, **kwargs):
-    old = AssetPermission.objects.only('is_active').get(id=instance.id)
-    if instance.is_active != old.is_active:
-        create_rebuild_user_tree_task_by_asset_perm(instance)
+    try:
+        old = AssetPermission.objects.only('is_active').get(id=instance.id)
+        if instance.is_active != old.is_active:
+            create_rebuild_user_tree_task_by_asset_perm(instance)
+    except AssetPermission.DoesNotExist:
+        pass
 
 
 @receiver([pre_delete], sender=AssetPermission)
 def on_asset_permission_delete(instance, **kwargs):
     # 授权删除之前，查出所有相关用户
     create_rebuild_user_tree_task_by_asset_perm(instance)
-
-
-def create_rebuild_user_tree_task(user_ids):
-    RebuildUserTreeTask.objects.bulk_create(
-        [RebuildUserTreeTask(user_id=i) for i in user_ids]
-    )
-    transaction.on_commit(dispatch_mapping_node_tasks.delay)
 
 
 def create_rebuild_user_tree_task_by_asset_perm(asset_perm: AssetPermission):
