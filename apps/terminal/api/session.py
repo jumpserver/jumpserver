@@ -125,7 +125,7 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
 
         if serializer.is_valid():
             file = serializer.validated_data['file']
-            name, err = session.save_to_storage(file)
+            name, err = session.save_replay_to_storage(file)
             if not name:
                 msg = "Failed save replay `{}`: {}".format(session_id, err)
                 logger.error(msg)
@@ -155,6 +155,7 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
         return data
 
     def is_need_async(self):
+        return False
         if self.action != 'retrieve':
             return False
         return True

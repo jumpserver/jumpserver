@@ -9,11 +9,12 @@ from django.utils import timezone
 from django.conf import settings
 from django.core.files.storage import default_storage
 
-
 from ops.celery.decorator import (
     register_as_period_task, after_app_ready_start, after_app_shutdown_clean_periodic
 )
 from .models import Status, Session, Command
+from .backends import server_replay_storage
+from .utils import find_session_replay_local
 
 
 CACHE_REFRESH_INTERVAL = 10
@@ -68,3 +69,26 @@ def clean_expired_session_period():
         # 删除session记录
         session.delete()
 
+
+@shared_task
+def upload_session_replay_to_external_storage(session_id):
+    logger.info(f'Start upload session to external storage: {session_id}')
+    session = Session.objects.filter(id=session_id).first()
+    if not session:
+        logger.error(f'Session db item not found: {session_id}')
+        return
+    local_path, foobar = find_session_replay_local(session)
+    if not local_path:
+        logger.error(f'Session replay not found, may be upload error: {local_path}')
+        return
+    abs_path = default_storage.path(local_path)
+    remote_path = session.get_rel_replay_path()
+    ok, err = server_replay_storage.upload(abs_path, remote_path)
+    if not ok:
+        logger.error(f'Session replay upload to external error: {err}')
+        return
+    try:
+        default_storage.delete(local_path)
+    except:
+        pass
+    return
