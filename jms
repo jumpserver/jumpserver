@@ -167,7 +167,7 @@ def parse_service(s):
     elif s == 'ws':
         return ['daphne']
     elif s == "task":
-        return ["celery_ansible", "celery_default", "beat"]
+        return ["celery_ansible", "celery_default", "celery_node_tree", "check_asset_perm_expired", "beat"]
     elif s == "celery":
         return ["celery_ansible", "celery_default", "celery_node_tree", "check_asset_perm_expired"]
     elif "," in s:
