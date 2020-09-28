@@ -102,11 +102,12 @@ class UserAllGrantedAssetsApi(ListAPIView):
 
     def get_queryset(self):
         queryset = get_user_granted_all_assets(self.user)
+        queryset = queryset.prefetch_related('platform')
         return queryset.only(*self.only_fields)
 
 
 class MyAllAssetsAsTreeApi(ForUserMixin, AssetsAsTreeMixin, UserAllGrantedAssetsApi):
-    pass
+    search_fields = ['hostname', 'ip']
 
 
 @method_decorator(tmp_to_root_org(), name='list')
