@@ -405,8 +405,8 @@ class CommandStorage(CommonModelMixin):
         storage = jms_storage.get_log_storage(self.config)
         return storage.ping()
 
-    def can_delete(self):
-        return not self.in_defaults()
+    def is_using(self):
+        return Terminal.objects.filter(command_storage=self.name).exists()
 
 
 class ReplayStorage(CommonModelMixin):
@@ -458,5 +458,5 @@ class ReplayStorage(CommonModelMixin):
         src = os.path.join(settings.BASE_DIR, 'common', target)
         return storage.is_valid(src, target)
 
-    def can_delete(self):
-        return not self.in_defaults()
+    def is_using(self):
+        return Terminal.objects.filter(replay_storage=self.name).exists()
