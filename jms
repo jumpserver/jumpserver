@@ -3,6 +3,7 @@
 
 import os
 import subprocess
+from multiprocessing import Process
 import threading
 import datetime
 import logging
@@ -13,6 +14,8 @@ import argparse
 import sys
 import shutil
 import signal
+from redis import Redis
+import redis_lock
 from collections import defaultdict
 import daemon
 from daemon import pidfile
@@ -70,6 +73,8 @@ try:
     os.makedirs(os.path.join(BASE_DIR, "data", "media"))
 except:
     pass
+
+redis = Redis(host=CONFIG.REDIS_HOST, port=CONFIG.REDIS_PORT, password=CONFIG.REDIS_PASSWORD)
 
 
 def check_database_connection():
@@ -271,19 +276,11 @@ def get_start_flower_kwargs():
 
 def get_start_beat_kwargs():
     print("\n- Start Beat as Periodic Task Scheduler")
-    os.environ.setdefault('PYTHONOPTIMIZE', '1')
-    if os.getuid() == 0:
-        os.environ.setdefault('C_FORCE_ROOT', '1')
-
-    scheduler = "django_celery_beat.schedulers:DatabaseScheduler"
+    utils_dir = os.path.join(BASE_DIR, 'utils')
     cmd = [
-        'celery', 'beat',
-        '-A', 'ops',
-        '-l', 'INFO',
-        '--scheduler', scheduler,
-        '--max-interval', '60'
+        sys.executable, 'start_celery_beat.py',
     ]
-    return {"cmd": cmd, 'cwd': APPS_DIR}
+    return {"cmd": cmd, 'cwd': utils_dir}
 
 
 processes = {}
@@ -298,11 +295,14 @@ def watch_services():
         now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         for s, p in processes.items():
             print("{} Check service status: {} -> ".format(now, s), end='')
-            try:
-                p.wait(timeout=1)
-            except subprocess.TimeoutExpired:
-                pass
-            ok = is_running(s)
+            if isinstance(p, Process):
+                ok = p.is_alive()
+            else:
+                try:
+                    p.wait(timeout=1)
+                except subprocess.TimeoutExpired:
+                    pass
+                ok = is_running(s)
             if not ok:
                 stopped_services[s] = ''
                 print("stopped with code: {}({})".format(p.returncode, p.pid))
@@ -368,6 +368,16 @@ def watch_services():
     clean_up()
 
 
+def start_beat(cmd, **kwargs):
+    def start_process_check_lock():
+        lock = redis_lock.Lock(redis, "beat-start-lock")
+        with lock.acquire(blocking=True, timeout=None):
+            print("Get beat lock run it")
+            subprocess.call(cmd, **kwargs)
+    p = Process(target=start_process_check_lock, args=())
+    return p
+
+
 def start_service(s):
     services_kwargs = {
         "gunicorn": get_start_gunicorn_kwargs,
@@ -400,7 +410,7 @@ def start_service(s):
 
 def start_services_and_watch(s):
     logging.info(time.ctime())
-    logging.info('Jumpserver version {}, more see https://www.jumpserver.org'.format(
+    logging.info('JumpServer version {}, more see https://www.jumpserver.org'.format(
         __version__)
     )
 
