@@ -155,21 +155,20 @@ def is_running(s, unlink=True):
 
 
 def parse_service(s):
-    all_services = [
-        'gunicorn', 'celery_ansible', 'celery_default',
-        'beat', 'flower', 'daphne', 'celery_node_tree',
-        'check_asset_perm_expired',
-    ]
+    web_services = ['gunicorn', 'flower', 'daphne']
+    celery_services = ["celery_ansible", "celery_default", "celery_node_tree", "check_asset_perm_expired"]
+    task_services = celery_services + ['beat']
+    all_services = web_services + task_services
     if s == 'all':
         return all_services
     elif s == "web":
-        return ['gunicorn', 'flower', 'daphne']
+        return web_services
     elif s == 'ws':
         return ['daphne']
     elif s == "task":
-        return ["celery_ansible", "celery_default", "celery_node_tree", "check_asset_perm_expired", "beat"]
+        return task_services
     elif s == "celery":
-        return ["celery_ansible", "celery_default", "celery_node_tree", "check_asset_perm_expired"]
+        return celery_services
     elif "," in s:
         services = set()
         for i in s.split(','):
