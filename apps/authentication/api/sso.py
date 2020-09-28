@@ -73,12 +73,12 @@ class SSOViewSet(AuthMixin, JmsGenericViewSet):
             token.save()
         except (ValueError, SSOToken.DoesNotExist):
             self.send_auth_signal(success=False, reason='authkey_invalid')
-            return HttpResponseRedirect(reverse('authentication:login'))
+            return HttpResponseRedirect(next_url)
 
         # 判断是否过期
         if (utcnow().timestamp() - token.date_created.timestamp()) > settings.AUTH_SSO_AUTHKEY_TTL:
             self.send_auth_signal(success=False, reason='authkey_timeout')
-            return HttpResponseRedirect(reverse('authentication:login'))
+            return HttpResponseRedirect(next_url)
 
         user = token.user
         login(self.request, user, 'authentication.backends.api.SSOAuthentication')
