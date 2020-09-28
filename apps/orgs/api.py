@@ -84,8 +84,19 @@ class OrgMemberRelationBulkViewSet(JMSBulkRelationModelViewSet):
             return data
 
         query_params = Q()
-        for d in data:
-            query_params |= Q(**d)
+        for _data in data:
+            query_fields = {}
+            org = _data.get('org')
+            if org:
+                query_fields.update({'org': org})
+            user = _data.get('user')
+            if user:
+                query_fields.update({'user': user})
+            role = _data.get('role')
+            if role:
+                query_fields.update({'role': role})
+            query_params |= Q(**query_fields)
+
         if not query_params:
             return data
 
