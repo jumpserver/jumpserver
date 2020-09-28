@@ -20,8 +20,11 @@ class BaseStorageViewSetMixin:
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        if not instance.can_delete():
+        if instance.in_defaults():
             data = {'msg': _('Deleting the default storage is not allowed')}
+            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+        if instance.is_using():
+            data = {'msg': _('Cannot delete storage that is being used')}
             return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
         return super().destroy(request, *args, **kwargs)
 
