@@ -44,7 +44,7 @@ def check_asset_permission_expired():
         date_expired__gt=start, date_expired__lt=end
     ).distinct().values_list('id', flat=True)
     logger.info(f'>>> checking {start} to {end} have {ids} expired')
-    dispatch_process_expired_asset_permission.delay(ids)
+    dispatch_process_expired_asset_permission.delay(list(ids))
 
 
 @shared_task(queue='node_tree')
