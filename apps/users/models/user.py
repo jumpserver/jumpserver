@@ -393,16 +393,20 @@ class TokenMixin:
 
     @classmethod
     def validate_reset_password_token(cls, token):
+        if not token:
+            return None
+        key = cls.CACHE_KEY_USER_RESET_PASSWORD_PREFIX.format(token)
+        value = cache.get(key)
+        if not value:
+            return None
         try:
-            key = cls.CACHE_KEY_USER_RESET_PASSWORD_PREFIX.format(token)
-            value = cache.get(key)
             user_id = value.get('id', '')
             email = value.get('email', '')
             user = cls.objects.get(id=user_id, email=email)
+            return user
         except (AttributeError, cls.DoesNotExist) as e:
             logger.error(e, exc_info=True)
-            user = None
-        return user
+            return None
 
     def set_cache(self, token):
         key = self.CACHE_KEY_USER_RESET_PASSWORD_PREFIX.format(token)

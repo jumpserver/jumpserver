@@ -16,7 +16,8 @@ from common.utils import get_object_or_none
 from common.permissions import PermissionsMixin, IsValidUser
 from ...models import User
 from ...utils import (
-    send_reset_password_mail, get_password_check_rules, check_password_rules
+    send_reset_password_mail, get_password_check_rules, check_password_rules,
+    send_reset_password_success_mail
 )
 from ... import forms
 
@@ -126,6 +127,7 @@ class UserResetPasswordView(FormView):
 
         user.reset_password(password)
         User.expired_reset_password_token(token)
+        send_reset_password_success_mail(self.request, user)
         return redirect('authentication:reset-password-success')
 
 

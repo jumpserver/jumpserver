@@ -164,6 +164,11 @@ def get_request_ip_or_data(request):
     return ip
 
 
+def get_request_user_agent(request):
+    user_agent = request.META.get('HTTP_USER_AGENT', '')
+    return user_agent
+
+
 def validate_ip(ip):
     try:
         ipaddress.ip_address(ip)
