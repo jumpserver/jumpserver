@@ -271,19 +271,11 @@ def get_start_flower_kwargs():
 
 def get_start_beat_kwargs():
     print("\n- Start Beat as Periodic Task Scheduler")
-    os.environ.setdefault('PYTHONOPTIMIZE', '1')
-    if os.getuid() == 0:
-        os.environ.setdefault('C_FORCE_ROOT', '1')
-
-    scheduler = "django_celery_beat.schedulers:DatabaseScheduler"
+    utils_dir = os.path.join(BASE_DIR, 'utils')
     cmd = [
-        'celery', 'beat',
-        '-A', 'ops',
-        '-l', 'INFO',
-        '--scheduler', scheduler,
-        '--max-interval', '60'
+        sys.executable, 'start_celery_beat.py',
     ]
-    return {"cmd": cmd, 'cwd': APPS_DIR}
+    return {"cmd": cmd, 'cwd': utils_dir}
 
 
 processes = {}
@@ -299,7 +291,7 @@ def watch_services():
         for s, p in processes.items():
             print("{} Check service status: {} -> ".format(now, s), end='')
             try:
-                p.wait(timeout=1)
+                p.wait(timeout=1)  # 不wait，子进程可能无法回收
             except subprocess.TimeoutExpired:
                 pass
             ok = is_running(s)
@@ -400,7 +392,7 @@ def start_service(s):
 
 def start_services_and_watch(s):
     logging.info(time.ctime())
-    logging.info('Jumpserver version {}, more see https://www.jumpserver.org'.format(
+    logging.info('JumpServer version {}, more see https://www.jumpserver.org'.format(
         __version__)
     )
 
