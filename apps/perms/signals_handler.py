@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
 #
-from itertools import chain
-
 from django.db.models.signals import m2m_changed, pre_delete, pre_save
 from django.dispatch import receiver
 
-from django.db.models import Q
-
-from perms.tasks import create_rebuild_user_tree_task
+from perms.tasks import create_rebuild_user_tree_task, \
+    create_rebuild_user_tree_task_by_related_nodes_or_assets
 from users.models import User, UserGroup
 from assets.models import Asset
-from common.utils import get_logger, get_object_or_none
+from common.utils import get_logger
 from common.exceptions import M2MReverseNotAllowed
 from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR
 from .models import AssetPermission, RemoteAppPermission
@@ -203,15 +200,9 @@ def on_node_asset_change(action, instance, reverse, pk_set, **kwargs):
 
     if reverse:
         asset_pk_set = pk_set
+        node_pk_set = [instance.id]
     else:
         asset_pk_set = [instance.id]
+        node_pk_set = pk_set
 
-    user_ap_query_name = AssetPermission.users.field.related_query_name()
-    group_ap_query_name = AssetPermission.user_groups.field.related_query_name()
-
-    user_ap_q = Q(**{f'{user_ap_query_name}__assets__id__in': asset_pk_set})
-    group_ap_q = Q(**{f'groups__{group_ap_query_name}__assets__id__in': asset_pk_set})
-
-    from_user_ids = User.objects.filter(user_ap_q).values_list('id', flat=True)
-    from_group_ids = User.objects.filter(group_ap_q).values_list('id', flat=True)
-    create_rebuild_user_tree_task(chain(from_user_ids, from_group_ids))
+    create_rebuild_user_tree_task_by_related_nodes_or_assets.delay(node_pk_set, asset_pk_set)

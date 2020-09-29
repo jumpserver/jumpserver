@@ -9,6 +9,7 @@ from celery import shared_task
 from common.utils import get_logger
 from common.utils.timezone import now, dt_formater, dt_parser
 from users.models import User
+from assets.models import Node
 from perms.models import RebuildUserTreeTask, AssetPermission
 from perms.utils.user_asset_permission import rebuild_user_mapping_nodes_if_need_with_lock, lock
 
@@ -81,3 +82,41 @@ def create_rebuild_user_tree_task(user_ids):
         [RebuildUserTreeTask(user_id=i) for i in user_ids]
     )
     transaction.on_commit(dispatch_mapping_node_tasks.delay)
+
+
+@shared_task(queue='node_tree')
+def create_rebuild_user_tree_task_by_related_nodes_or_assets(node_ids, asset_ids):
+    node_ids = set(node_ids)
+    node_keys = set()
+    nodes = Node.objects.filter(id__in=node_ids)
+    for _node in nodes:
+        node_keys.update(_node.get_ancestor_keys())
+    node_ids.update(
+        Node.objects.filter(key__in=node_keys).values_list('id', flat=True)
+    )
+
+    asset_perm_ids = set()
+    asset_perm_ids.update(
+        AssetPermission.objects.filter(
+            assets__id__in=asset_ids
+        ).values_list('id', flat=True).distinct()
+    )
+    asset_perm_ids.update(
+        AssetPermission.objects.filter(
+            nodes__id__in=node_ids
+        ).values_list('id', flat=True).distinct()
+    )
+
+    user_ids = set()
+    user_ids.update(
+        User.objects.filter(
+            assetpermissions__id__in=asset_perm_ids
+        ).distinct().values_list('id', flat=True)
+    )
+    user_ids.update(
+        User.objects.filter(
+            groups__assetpermissions__id__in=asset_perm_ids
+        ).distinct().values_list('id', flat=True)
+    )
+
+    create_rebuild_user_tree_task(user_ids)
