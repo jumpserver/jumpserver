@@ -14,8 +14,6 @@ import argparse
 import sys
 import shutil
 import signal
-from redis import Redis
-import redis_lock
 from collections import defaultdict
 import daemon
 from daemon import pidfile
@@ -73,8 +71,6 @@ try:
     os.makedirs(os.path.join(BASE_DIR, "data", "media"))
 except:
     pass
-
-redis = Redis(host=CONFIG.REDIS_HOST, port=CONFIG.REDIS_PORT, password=CONFIG.REDIS_PASSWORD)
 
 
 def check_database_connection():
@@ -366,16 +362,6 @@ def watch_services():
             time.sleep(1)
             break
     clean_up()
-
-
-def start_beat(cmd, **kwargs):
-    def start_process_check_lock():
-        lock = redis_lock.Lock(redis, "beat-start-lock")
-        with lock.acquire(blocking=True, timeout=None):
-            print("Get beat lock run it")
-            subprocess.call(cmd, **kwargs)
-    p = Process(target=start_process_check_lock, args=())
-    return p
 
 
 def start_service(s):

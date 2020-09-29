@@ -28,7 +28,7 @@ cmd = [
     '--max-interval', '60'
 ]
 
-with redis_lock.Lock(redis, name="name-of-the-lock", expire=60, auto_renewal=True):
+with redis_lock.Lock(redis, name="beat-distribute-start-lock", expire=60, auto_renewal=True):
     print("Get beat lock start to run it")
     code = subprocess.call(cmd, cwd=APPS_DIR)
     sys.exit(code)
