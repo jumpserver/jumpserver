@@ -71,10 +71,10 @@ class DatabaseAppPermissionUtil:
         return system_users
 
 
-def construct_database_apps_tree_root():
+def construct_database_apps_tree_root(amount):
     tree_root = {
         'id': 'ID_DATABASE_APP_ROOT',
-        'name': _('DatabaseApp'),
+        'name': '{} ({})'.format(_('DatabaseApp'), amount),
         'title': 'DatabaseApp',
         'pId': '',
         'open': False,
