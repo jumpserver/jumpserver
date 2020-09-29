@@ -3,6 +3,7 @@ from typing import List
 from assets.models import Node, Asset
 from assets.pagination import AssetLimitOffsetPagination
 from common.utils import lazyproperty, dict_get_any, is_uuid, get_object_or_none
+from assets.utils import get_node, is_query_node_all_assets
 
 
 class SerializeToTreeNodeMixin:
@@ -80,21 +81,8 @@ class FilterAssetByNodeMixin:
 
     @lazyproperty
     def is_query_node_all_assets(self):
-        request = self.request
-        query_all_arg = request.query_params.get('all')
-        show_current_asset_arg = request.query_params.get('show_current_asset')
-        if show_current_asset_arg is not None:
-            return show_current_asset_arg != '1'
-        return query_all_arg != '0'
+        return is_query_node_all_assets(self.request)
 
     @lazyproperty
     def node(self):
-        node_id = dict_get_any(self.request.query_params, ['node', 'node_id'])
-        if not node_id:
-            return None
-
-        if is_uuid(node_id):
-            node = get_object_or_none(Node, id=node_id)
-        else:
-            node = get_object_or_none(Node, key=node_id)
-        return node
+        return get_node(self.request)
