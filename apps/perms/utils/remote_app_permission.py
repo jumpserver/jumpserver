@@ -70,10 +70,10 @@ class RemoteAppPermissionUtil:
         return system_users
 
 
-def construct_remote_apps_tree_root():
+def construct_remote_apps_tree_root(amount):
     tree_root = {
         'id': 'ID_REMOTE_APP_ROOT',
-        'name': _('RemoteApp'),
+        'name': '{} ({})'.format(_('RemoteApp'), amount),
         'title': 'RemoteApp',
         'pId': '',
         'open': False,

@@ -64,10 +64,10 @@ class K8sAppPermissionUtil:
         return system_users
 
 
-def construct_k8s_apps_tree_root():
+def construct_k8s_apps_tree_root(amount):
     tree_root = {
         'id': 'ID_K8S_APP_ROOT',
-        'name': _('KubernetesApp'),
+        'name': '{} ({})'.format(_('KubernetesApp'), amount),
         'title': 'K8sApp',
         'pId': '',
         'open': False,
