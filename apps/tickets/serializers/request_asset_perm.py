@@ -33,19 +33,20 @@ class RequestAssetPermTicketSerializer(serializers.ModelSerializer):
                                              source='meta.confirmed_assets',
                                              default=list, required=False,
                                              label=_('Confirmed assets'))
-    confirmed_system_user = serializers.UUIDField(source='meta.confirmed_system_user',
-                                                  default='', required=False,
+    confirmed_system_users = serializers.ListField(child=serializers.UUIDField(),
+                                                  source='meta.confirmed_system_users',
+                                                  default=list, required=False,
                                                   label=_('Confirmed system user'))
     assets_waitlist_url = serializers.SerializerMethodField()
-    system_user_waitlist_url = serializers.SerializerMethodField()
+    system_users_waitlist_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Ticket
         mini_fields = ['id', 'title']
         small_fields = [
-            'status', 'action', 'date_created', 'date_updated', 'system_user_waitlist_url',
+            'status', 'action', 'date_created', 'date_updated', 'system_users_waitlist_url',
             'type', 'type_display', 'action_display', 'ips', 'confirmed_assets',
-            'date_start', 'date_expired', 'confirmed_system_user', 'hostname',
+            'date_start', 'date_expired', 'confirmed_system_users', 'hostname',
             'assets_waitlist_url', 'system_user', 'org_id', 'actions', 'comment'
         ]
         m2m_fields = [
@@ -96,7 +97,7 @@ class RequestAssetPermTicketSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(_('Field `assignees` must be organization admin or superuser'))
         return attrs
 
-    def get_system_user_waitlist_url(self, instance: Ticket):
+    def get_system_users_waitlist_url(self, instance: Ticket):
         if not self._is_assignee(instance):
             return None
         return reverse('api-assets:system-user-list')
@@ -190,16 +191,14 @@ class RequestAssetPermTicketSerializer(serializers.ModelSerializer):
             meta['date_expired'] = dt_formater(date_expired)
 
         # UUID 的转换
-        confirmed_system_user = meta.get('confirmed_system_user')
-        if confirmed_system_user:
-            meta['confirmed_system_user'] = str(confirmed_system_user)
+        confirmed_system_users = meta.get('confirmed_system_users')
+        if confirmed_system_users:
+            meta['confirmed_system_users'] = [str(system_user) for system_user in confirmed_system_users]
 
         confirmed_assets = meta.get('confirmed_assets')
         if confirmed_assets:
-            new_confirmed_assets = []
-            for asset in confirmed_assets:
-                new_confirmed_assets.append(str(asset))
-            meta['confirmed_assets'] = new_confirmed_assets
+            meta['confirmed_assets'] = [str(asset) for asset in confirmed_assets]
+
         with tmp_to_root_org():
             return super().save(**kwargs)
 
@@ -220,7 +219,7 @@ class RequestAssetPermTicketSerializer(serializers.ModelSerializer):
     def _pop_confirmed_fields(self):
         meta = self.validated_data['meta']
         meta.pop('confirmed_assets', None)
-        meta.pop('confirmed_system_user', None)
+        meta.pop('confirmed_system_users', None)
 
     def _is_assignee(self, obj: Ticket):
         user = self.context['request'].user
