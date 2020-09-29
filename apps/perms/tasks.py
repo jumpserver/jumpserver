@@ -4,10 +4,10 @@ from datetime import timedelta
 
 from django.db import transaction
 from django.db.models import Q
-from django.conf import settings
+from django.db.transaction import atomic
 from celery import shared_task
 from common.utils import get_logger
-from common.utils.timezone import now
+from common.utils.timezone import now, dt_formater, dt_parser
 from users.models import User
 from perms.models import RebuildUserTreeTask, AssetPermission
 from perms.utils.user_asset_permission import rebuild_user_mapping_nodes_if_need_with_lock, lock
@@ -33,15 +33,31 @@ def dispatch_mapping_node_tasks():
 
 
 @shared_task(queue='check_asset_perm_expired')
+@atomic()
 def check_asset_permission_expired():
     """
     这里的任务要足够短，不要影响周期任务
     """
-    periodic = settings.PERM_EXPIRED_CHECK_PERIODIC
+    from settings.models import Setting
+
+    setting_name = 'last_asset_perm_expired_check'
+
     end = now()
-    start = end - timedelta(seconds=periodic * 1.2)
+    default_start = end - timedelta(days=36000)  # Long long ago in china
+
+    defaults = {'value': dt_formater(default_start)}
+    setting, created = Setting.objects.get_or_create(
+        name=setting_name, defaults=defaults
+    )
+    if created:
+        start = default_start
+    else:
+        start = dt_parser(setting.value)
+    setting.value = dt_formater(end)
+    setting.save()
+
     ids = AssetPermission.objects.filter(
-        date_expired__gt=start, date_expired__lt=end
+        date_expired__gte=start, date_expired__lte=end
     ).distinct().values_list('id', flat=True)
     logger.info(f'>>> checking {start} to {end} have {ids} expired')
     dispatch_process_expired_asset_permission.delay(list(ids))
