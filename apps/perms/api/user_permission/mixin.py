@@ -11,8 +11,8 @@ from perms.models import UserGrantedMappingNode
 class UserNodeGrantStatusDispatchMixin:
 
     @staticmethod
-    def get_mapping_node_by_key(key):
-        return UserGrantedMappingNode.objects.get(key=key)
+    def get_mapping_node_by_key(key, user):
+        return UserGrantedMappingNode.objects.get(key=key, user=user)
 
     def dispatch_get_data(self, key, user):
         status = UserGrantedMappingNode.get_node_granted_status(key, user)

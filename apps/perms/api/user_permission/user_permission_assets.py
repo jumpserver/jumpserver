@@ -130,7 +130,7 @@ class UserGrantedNodeAssetsApi(UserNodeGrantStatusDispatchMixin, ListAPIView):
         return Node.get_node_all_assets_by_key_v2(key)
 
     def get_data_on_node_indirect_granted(self, key):
-        self.pagination_node = self.get_mapping_node_by_key(key)
+        self.pagination_node = self.get_mapping_node_by_key(key, self.user)
         return get_node_all_granted_assets(self.user, key)
 
     def get_data_on_node_not_granted(self, key):

@@ -229,15 +229,8 @@ class SystemUserNodeRelationSerializer(RelationMixin, serializers.ModelSerialize
             'id', 'node', "node_display",
         ]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.tree = Node.tree()
-
     def get_node_display(self, obj):
-        if hasattr(obj, 'node_key'):
-            return self.tree.get_node_full_tag(obj.node_key)
-        else:
-            return obj.node.full_value
+        return obj.node.full_value
 
 
 class SystemUserUserRelationSerializer(RelationMixin, serializers.ModelSerializer):
