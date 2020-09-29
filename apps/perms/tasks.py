@@ -45,7 +45,10 @@ def check_asset_permission_expired():
     end = now()
     default_start = end - timedelta(days=36000)  # Long long ago in china
 
-    setting, created = Setting.objects.get_or_create(name=setting_name, defaults={'value': dt_formater(default_start)})
+    defaults = {'value': dt_formater(default_start)}
+    setting, created = Setting.objects.get_or_create(
+        name=setting_name, defaults=defaults
+    )
     if created:
         start = default_start
     else:
