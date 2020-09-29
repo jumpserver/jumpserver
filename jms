@@ -291,14 +291,11 @@ def watch_services():
         now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         for s, p in processes.items():
             print("{} Check service status: {} -> ".format(now, s), end='')
-            if isinstance(p, Process):
-                ok = p.is_alive()
-            else:
-                try:
-                    p.wait(timeout=1)
-                except subprocess.TimeoutExpired:
-                    pass
-                ok = is_running(s)
+            try:
+                p.wait(timeout=1)  # 不wait，子进程可能无法回收
+            except subprocess.TimeoutExpired:
+                pass
+            ok = is_running(s)
             if not ok:
                 stopped_services[s] = ''
                 print("stopped with code: {}({})".format(p.returncode, p.pid))
