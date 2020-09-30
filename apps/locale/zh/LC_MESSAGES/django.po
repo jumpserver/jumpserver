@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-30 15:11+0800\n"
+"POT-Creation-Date: 2020-09-30 16:04+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -3616,12 +3616,11 @@ msgstr ""
 "    <br>\n"
 "    "
 
-#: users/utils.py:116 users/views/profile/reset.py:77
+#: users/utils.py:117 users/views/profile/reset.py:77
 msgid "Reset password success"
 msgstr "重置密码成功"
 
-#: users/utils.py:118
-#, python-format
+#: users/utils.py:119
 msgid ""
 "\n"
 "    \n"
@@ -3653,7 +3652,7 @@ msgid ""
 "    Browser: %(browser)s\n"
 "    <br>\n"
 "    \n"
-
+"    "
 msgstr ""
 "\n"
 "    \n"
@@ -3662,8 +3661,7 @@ msgstr ""
 "    \n"
 "    \n"
 "    <br>\n"
-"    你的 JumpServer 密码刚刚已经成功更新。"
-"    <br>\n"
+"    你的 JumpServer 密码刚刚已经成功更新。    <br>\n"
 "    \n"
 "    <br>\n"
 "    如果这次密码更新不是由你发起的，那么你的账号可能存在安全问题。\n"
@@ -3671,8 +3669,7 @@ msgstr ""
 "    <br>\n"
 "    \n"
 "    <br>\n"
-"    如果你有任何疑问，可以联系管理员。"
-"    <br>\n"
+"    如果你有任何疑问，可以联系管理员。    <br>\n"
 "    <br>\n"
 "    ---\n"
 "    <br>\n"
@@ -3683,12 +3680,13 @@ msgstr ""
 "    浏览器: %(browser)s\n"
 "    <br>\n"
 "    \n"
+"    "
 
-#: users/utils.py:155
+#: users/utils.py:160
 msgid "Security notice"
 msgstr "安全通知"
 
-#: users/utils.py:157
+#: users/utils.py:162
 #, python-format
 msgid ""
 "\n"
@@ -3737,11 +3735,11 @@ msgstr ""
 "    <br>\n"
 "    "
 
-#: users/utils.py:193
+#: users/utils.py:198
 msgid "Expiration notice"
 msgstr "过期通知"
 
-#: users/utils.py:195
+#: users/utils.py:200
 #, python-format
 msgid ""
 "\n"
@@ -3763,11 +3761,11 @@ msgstr ""
 "       <br>\n"
 "       "
 
-#: users/utils.py:214
+#: users/utils.py:219
 msgid "SSH Key Reset"
 msgstr "重置SSH密钥"
 
-#: users/utils.py:216
+#: users/utils.py:221
 #, python-format
 msgid ""
 "\n"
