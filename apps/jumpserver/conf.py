@@ -455,6 +455,9 @@ class DynamicConfig:
             backends.insert(0, 'authentication.backends.api.SSOAuthentication')
         return backends
 
+    def AUTH_DB(self):
+        return len(self.AUTHENTICATION_BACKENDS()) == 2
+
     def XPACK_LICENSE_IS_VALID(self):
         if not HAS_XPACK:
             return False
