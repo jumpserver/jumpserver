@@ -1,5 +1,6 @@
 import uuid
 from functools import partial
+from itertools import chain
 
 from django.db import models
 from django.db.models import signals
@@ -229,6 +230,10 @@ def _none2list(*args):
     return ([] if v is None else v for v in args)
 
 
+def _users2pks(users, admins, auditors):
+    return [user.pk for user in chain(users, admins, auditors)]
+
+
 class UserRoleMapper(dict):
     def __init__(self, container=set):
         super().__init__()
@@ -266,7 +271,7 @@ class OrgMemeberManager(models.Manager):
         users, admins, auditors = _none2list(users, admins, auditors)
 
         send = partial(signals.m2m_changed.send, sender=self.model, instance=org, reverse=False,
-                       model=User, pk_set=[*users, *admins, *auditors], using=self.db)
+                       model=User, pk_set=_users2pks(users, admins, auditors), using=self.db)
 
         send(action="pre_remove")
         self.filter(org_id=org.id).filter(
@@ -297,7 +302,7 @@ class OrgMemeberManager(models.Manager):
                 oms_add.append(self.model(org_id=org.id, user_id=user, role=role))
 
         send = partial(signals.m2m_changed.send, sender=self.model, instance=org, reverse=False,
-                       model=User, pk_set=[*users, *admins, *auditors], using=self.db)
+                       model=User, pk_set=_users2pks(users, admins, auditors), using=self.db)
 
         send(action='pre_add')
         self.bulk_create(oms_add)
