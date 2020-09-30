@@ -131,7 +131,7 @@
                                         <button type="submit" class="btn btn-transparent" onclick="doLogin();return false;">{% trans 'Login' %}</button>
                                     </div>
                                     <div style="text-align: center">
-                                        <a href="{% url 'authentication:forgot-password' %}">
+                                        <a id="forgot_password" href="#">
                                             <small>{% trans 'Forgot password' %}?</small>
                                         </a>
                                     </div>
@@ -143,6 +143,7 @@
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
 </body>
@@ -161,6 +162,18 @@
         $('#password-hidden').val(passwordEncrypted); //返回给密码输入input
         $('#contact-form').submit();//post提交
     }
+
+    var authDB = '{{ AUTH_DB }}';
+    var forgotPasswordUrl = "{% url 'authentication:forgot-password' %}";
+    $(document).ready(function () {
+    }).on('click', '#forgot_password', function () {
+        if (authDB === 'True'){
+            window.open(forgotPasswordUrl, "_blank")
+        }
+        else{
+            alert("{% trans 'You are using another authentication server, please contact your administrator' %}")
+        }
+    })
 </script>
 </html>
 

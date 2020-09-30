@@ -131,7 +131,8 @@ class UserLoginView(mixins.AuthMixin, FormView):
         context = {
             'demo_mode': os.environ.get("DEMO_MODE"),
             'AUTH_OPENID': settings.AUTH_OPENID,
-            'rsa_public_key': rsa_public_key
+            'rsa_public_key': rsa_public_key,
+            'AUTH_DB': settings.AUTH_DB
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
