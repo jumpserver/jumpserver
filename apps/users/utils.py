@@ -148,6 +148,9 @@ def send_reset_password_success_mail(request, user):
         'ip_address': get_request_ip_or_data(request),
         'browser': get_request_user_agent(request),
     }
+    if settings.DEBUG:
+        logger.debug(message)
+
     send_mail_async.delay(subject, message, recipient_list, html_message=message)
 
 
