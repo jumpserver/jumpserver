@@ -125,6 +125,8 @@ class TreeService(Tree):
 
     def assets(self, nid):
         node = self.get_node(nid)
+        if not node:
+            return set()
         return node.data.get("assets", set())
 
     def valid_assets(self, nid):
@@ -132,6 +134,8 @@ class TreeService(Tree):
 
     def all_assets(self, nid):
         node = self.get_node(nid)
+        if not node:
+            return set()
         if node.data is None:
             node.data = {}
         all_assets = node.data.get("all_assets")
