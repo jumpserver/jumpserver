@@ -23,6 +23,8 @@ from common.utils import date_expired_default, get_logger, lazyproperty
 from common import fields
 from common.const import choices
 from common.db.models import ChoiceSet
+from rbac.models import RoleBinding
+
 from ..signals import post_user_change_password
 
 
@@ -691,3 +693,15 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
                 continue
             user.groups.add(choice(UserGroup.objects.all()))
             user.save()
+
+    @property
+    def is_build_in(self):
+        role_bindings = RoleBinding.objects.filter(user=self)
+        for i in role_bindings:
+            if i.role.is_build_in:
+                return True
+        return False
+
+    @property
+    def rbac_role(self):
+        return RoleBinding.objects.filter(user=self).values_list('role__type').distinct()

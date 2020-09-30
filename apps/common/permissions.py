@@ -2,6 +2,8 @@
 #
 import time
 
+from django.contrib.auth import get_permission_codename
+from django.shortcuts import get_object_or_404
 from rest_framework import permissions
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.conf import settings
@@ -188,3 +190,48 @@ class IsObjectOwner(IsValidUser):
     def has_object_permission(self, request, view, obj):
         return (super().has_object_permission(request, view, obj) and
                 request.user == getattr(obj, 'user', None))
+
+
+class RBACPermissionMixin(object):
+    action_perm_map = {
+        'list': 'list',
+        'create': 'add',
+        'update': 'change',
+        'partial_update': 'change',
+        'retrieve': 'view',
+        'destroy': 'delete',
+    }
+
+    def has_permission(self, request, view):
+        action = self.action_perm_map.get(view.action)
+        obj = None
+        pk = view.kwargs.get('pk')
+        if pk:
+            obj = get_object_or_404(view.model, pk=pk)
+        view_codename = get_permission_codename(action, view.model._meta)
+        perm = '%s.%s' % (view.model._meta.app_label, view_codename)
+        if not request.user.has_perm(perm, obj=obj):
+            return False
+        return True
+
+
+class RBACPermission(RBACPermissionMixin, IsValidUser):
+    pass
+
+
+class IsSystemAdminUser(IsValidUser):
+
+    def has_permission(self, request, view):
+        pass
+
+
+class IsOrgAdminUser(IsValidUser):
+
+    def has_permission(self, request, view):
+        pass
+
+
+class IsSystemOrOrgAdminUser(IsValidUser):
+
+    def has_permission(self, request, view):
+        pass

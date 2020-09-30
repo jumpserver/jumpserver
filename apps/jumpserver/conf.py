@@ -436,7 +436,8 @@ class DynamicConfig:
     def AUTHENTICATION_BACKENDS(self):
         backends = [
             'authentication.backends.pubkey.PublicKeyAuthBackend',
-            'django.contrib.auth.backends.ModelBackend',
+            'authentication.backends.django.ModelBackend',
+            'rbac.backends.RBACBackend',
         ]
         if self.get('AUTH_LDAP'):
             backends.insert(0, 'authentication.backends.ldap.LDAPAuthorizationBackend')

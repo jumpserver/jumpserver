@@ -2,6 +2,17 @@
 #
 from ..const import CONFIG, DYNAMIC
 
+# Account's secret storage
+ACCOUNT_STORAGE_BACKEND = {
+    'ENGINE': 'accounts.backend.VaultBackend',
+    'CONFIG': {
+        'url': 'http://localhost:8200',
+        'token': 's.gBsoQtLT1VdZ62BTPQNGkebP',
+        'engine': 'jumpserver',
+        'key': 'secret'
+    }
+}
+
 # Storage settings
 COMMAND_STORAGE = {
     'ENGINE': 'terminal.backends.command.db',

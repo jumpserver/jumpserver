@@ -21,6 +21,9 @@ api_v1 = [
     path('common/', include('common.urls.api_urls', namespace='api-common')),
     path('applications/', include('applications.urls.api_urls', namespace='api-applications')),
     path('tickets/', include('tickets.urls.api_urls', namespace='api-tickets')),
+    path('accounts/', include('accounts.urls', namespace='api-account')),
+    path('namespaces/', include('namespaces.urls', namespace='api-namespace')),
+    path('rbac/', include('rbac.urls', namespace='api-rbac')),
 ]
 
 api_v2 = [
