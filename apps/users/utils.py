@@ -13,7 +13,7 @@ from django.core.cache import cache
 from datetime import datetime
 
 from common.tasks import send_mail_async
-from common.utils import reverse, get_object_or_none
+from common.utils import reverse, get_object_or_none, get_request_ip_or_data, get_request_user_agent
 from .models import User
 
 
@@ -105,6 +105,48 @@ def send_reset_password_mail(user):
         'forget_password_url': reverse('authentication:forgot-password', external=True),
         'email': user.email,
         'login_url': reverse('authentication:login', external=True),
+    }
+    if settings.DEBUG:
+        logger.debug(message)
+
+    send_mail_async.delay(subject, message, recipient_list, html_message=message)
+
+
+def send_reset_password_success_mail(request, user):
+    subject = _('Reset password success')
+    recipient_list = [user.email]
+    message = _("""
+    
+    Hi %(name)s:
+    <br>
+    
+    
+    <br>
+    Your JumpServer password has just been successfully updated.
+    <br>
+    
+    <br>
+    If the password update was not initiated by you, your account may have security issues. 
+    It is recommended that you log on to the JumpServer immediately and change your password.
+    <br>
+    
+    <br>
+    If you have any questions, you can contact the administrator.
+    <br>
+    <br>
+    ---
+    <br>
+    <br>
+    IP Address: %(ip_address)s
+    <br>
+    <br>
+    Browser: %(browser)s
+    <br>
+    
+    """) % {
+        'name': user.name,
+        'ip_address': get_request_ip_or_data(request),
+        'browser': get_request_user_agent(request),
     }
     if settings.DEBUG:
         logger.debug(message)

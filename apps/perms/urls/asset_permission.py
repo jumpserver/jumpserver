@@ -2,6 +2,7 @@
 
 from django.urls import path, include
 from rest_framework_bulk.routes import BulkRouter
+
 from .. import api
 
 router = BulkRouter()
@@ -13,46 +14,70 @@ router.register('asset-permissions-nodes-relations', api.AssetPermissionNodeRela
 router.register('asset-permissions-system-users-relations', api.AssetPermissionSystemUserRelationViewSet, 'asset-permissions-system-users-relation')
 
 user_permission_urlpatterns = [
-    path('<uuid:pk>/assets/', api.UserGrantedAssetsApi.as_view(), name='user-assets'),
-    path('assets/', api.UserGrantedAssetsApi.as_view(), name='my-assets'),
+    # 统一说明：
+    # `<uuid:pk>`: `User.pk`
+    # 直接授权：在 `AssetPermission` 中关联的对象
 
-    # Assets as tree
-    path('<uuid:pk>/assets/tree/', api.UserGrantedAssetsAsTreeApi.as_view(), name='user-assets-as-tree'),
-    path('assets/tree/', api.UserGrantedAssetsAsTreeApi.as_view(), name='my-assets-as-tree'),
+    # ---------------------------------------------------------
+    # 获取用户所有直接授权的资产
 
-    # Nodes
-    path('<uuid:pk>/nodes/', api.UserGrantedNodesApi.as_view(), name='user-nodes'),
-    path('nodes/', api.UserGrantedNodesApi.as_view(), name='my-nodes'),
+    # 以 serializer 格式返回
+    path('<uuid:pk>/assets/', api.UserDirectGrantedAssetsForAdminApi.as_view(), name='user-assets'),
+    path('assets/', api.MyDirectGrantedAssetsApi.as_view(), name='my-assets'),
 
-    # Node children
-    path('<uuid:pk>/nodes/children/', api.UserGrantedNodeChildrenApi.as_view(), name='user-nodes-children'),
-    path('nodes/children/', api.UserGrantedNodesApi.as_view(), name='my-nodes-children'),
+    # Tree Node 的数据格式返回
+    path('<uuid:pk>/assets/tree/', api.UserDirectGrantedAssetsAsTreeForAdminApi.as_view(), name='user-assets-as-tree'),
+    path('assets/tree/', api.MyAllAssetsAsTreeApi.as_view(), name='my-assets-as-tree'),
+    path('ungroup/assets/tree/', api.MyUngroupAssetsAsTreeApi.as_view(), name='my-ungroup-assets-as-tree'),
+    # ^--------------------------------------------------------^
 
-    # Node as tree
-    path('<uuid:pk>/nodes/tree/', api.UserGrantedNodesAsTreeApi.as_view(), name='user-nodes-as-tree'),
-    path('nodes/tree/', api.UserGrantedNodesAsTreeApi.as_view(), name='my-nodes-as-tree'),
+    # 获取用户所有`直接授权的节点`与`直接授权资产`关联的节点
+    # 以 serializer 格式返回
+    path('<uuid:pk>/nodes/', api.UserGrantedNodesForAdminApi.as_view(), name='user-nodes'),
+    path('nodes/', api.MyGrantedNodesApi.as_view(), name='my-nodes'),
 
-    # Node with assets as tree
-    path('<uuid:pk>/nodes-with-assets/tree/', api.UserGrantedNodesWithAssetsAsTreeApi.as_view(), name='user-nodes-with-assets-as-tree'),
-    path('nodes-with-assets/tree/', api.UserGrantedNodesWithAssetsAsTreeApi.as_view(), name='my-nodes-with-assets-as-tree'),
+    # 以 Tree Node 的数据格式返回
+    path('<uuid:pk>/nodes/tree/', api.MyGrantedNodesAsTreeApi.as_view(), name='user-nodes-as-tree'),
+    path('nodes/tree/', api.MyGrantedNodesAsTreeApi.as_view(), name='my-nodes-as-tree'),
+    # ^--------------------------------------------------------^
 
-    # Node children as tree
-    path('<uuid:pk>/nodes/children/tree/', api.UserGrantedNodeChildrenAsTreeApi.as_view(), name='user-nodes-children-as-tree'),
-    path('nodes/children/tree/', api.UserGrantedNodeChildrenAsTreeApi.as_view(), name='my-nodes-children-as-tree'),
+    # 一层一层的获取用户授权的节点，
+    # 以 Serializer 的数据格式返回
+    path('<uuid:pk>/nodes/children/', api.UserGrantedNodeChildrenForAdminApi.as_view(), name='user-nodes-children'),
+    path('nodes/children/', api.MyGrantedNodeChildrenApi.as_view(), name='my-nodes-children'),
 
-    # Node children with assets as tree
-    path('<uuid:pk>/nodes/children-with-assets/tree/', api.UserGrantedNodeChildrenWithAssetsAsTreeApi.as_view(), name='user-nodes-children-with-assets-as-tree'),
-    path('nodes/children-with-assets/tree/', api.UserGrantedNodeChildrenWithAssetsAsTreeApi.as_view(), name='my-nodes-children-with-assets-as-tree'),
+    # 以 Tree Node 的数据格式返回
+    path('<uuid:pk>/nodes/children/tree/', api.UserGrantedNodeChildrenAsTreeForAdminApi.as_view(), name='user-nodes-children-as-tree'),
+    # 部分调用位置
+    # - 普通用户 -> 我的资产 -> 展开节点 时调用
+    path('nodes/children/tree/', api.MyGrantedNodeChildrenAsTreeApi.as_view(), name='my-nodes-children-as-tree'),
+    # ^--------------------------------------------------------^
 
-    # Node assets
-    path('<uuid:pk>/nodes/<uuid:node_id>/assets/', api.UserGrantedNodeAssetsApi.as_view(), name='user-node-assets'),
-    path('nodes/<uuid:node_id>/assets/', api.UserGrantedNodeAssetsApi.as_view(), name='my-node-assets'),
+    # 此接口会返回整棵树
+    # 普通用户 -> 命令执行 -> 左侧树
+    path('nodes-with-assets/tree/', api.MyGrantedNodesWithAssetsAsTreeApi.as_view(), name='my-nodes-with-assets-as-tree'),
+
+    # 主要用于 luna 页面，带资产的节点树
+    path('<uuid:pk>/nodes/children-with-assets/tree/', api.UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi.as_view(), name='user-nodes-children-with-assets-as-tree'),
+    path('nodes/children-with-assets/tree/', api.MyGrantedNodeChildrenWithAssetsAsTreeApi.as_view(), name='my-nodes-children-with-assets-as-tree'),
+
+    # 查询授权树上某个节点的所有资产
+    path('<uuid:pk>/nodes/<uuid:node_id>/assets/', api.UserGrantedNodeAssetsForAdminApi.as_view(), name='user-node-assets'),
+    path('nodes/<uuid:node_id>/assets/', api.MyGrantedNodeAssetsApi.as_view(), name='my-node-assets'),
+
+    # 未分组的资产
+    path('<uuid:pk>/nodes/ungrouped/assets/', api.UserDirectGrantedAssetsForAdminApi.as_view(), name='user-ungrouped-assets'),
+    path('nodes/ungrouped/assets/', api.MyDirectGrantedAssetsApi.as_view(), name='my-ungrouped-assets'),
+
+    # 收藏的资产
+    path('<uuid:pk>/nodes/favorite/assets/', api.UserFavoriteGrantedAssetsForAdminApi.as_view(), name='user-ungrouped-assets'),
+    path('nodes/favorite/assets/', api.MyFavoriteGrantedAssetsApi.as_view(), name='my-ungrouped-assets'),
 
     # Asset System users
-    path('<uuid:pk>/assets/<uuid:asset_id>/system-users/', api.UserGrantedAssetSystemUsersApi.as_view(), name='user-asset-system-users'),
-    path('assets/<uuid:asset_id>/system-users/', api.UserGrantedAssetSystemUsersApi.as_view(), name='my-asset-system-users'),
+    path('<uuid:pk>/assets/<uuid:asset_id>/system-users/', api.UserGrantedAssetSystemUsersForAdminApi.as_view(), name='user-asset-system-users'),
+    path('assets/<uuid:asset_id>/system-users/', api.MyGrantedAssetSystemUsersApi.as_view(), name='my-asset-system-users'),
 
-    # Expire user permission cache
+    # TODO 要废弃 Expire user permission cache
     path('<uuid:pk>/asset-permissions/cache/', api.UserAssetPermissionsCacheApi.as_view(),
          name='user-asset-permission-cache'),
     path('asset-permissions/cache/', api.UserAssetPermissionsCacheApi.as_view(), name='my-asset-permission-cache'),

@@ -1,82 +1,151 @@
 # -*- coding: utf-8 -*-
 #
-
-from django.shortcuts import get_object_or_404
+import abc
 from rest_framework.generics import (
-    ListAPIView, get_object_or_404
+    ListAPIView
 )
+from rest_framework.response import Response
+from rest_framework.request import Request
 
-from common.permissions import IsOrgAdminOrAppUser
+from orgs.utils import tmp_to_root_org
+from assets.api.mixin import SerializeToTreeNodeMixin
 from common.utils import get_logger
-from ...hands import Node, NodeSerializer
+from .mixin import ForAdminMixin, ForUserMixin, UserNodeGrantStatusDispatchMixin
+from ...hands import Node, User
 from ... import serializers
-from .mixin import UserNodeTreeMixin, UserAssetPermissionMixin
+from ...utils.user_asset_permission import (
+    get_indirect_granted_node_children,
+    get_user_granted_nodes_list_via_mapping_node,
+    get_top_level_granted_nodes,
+    rebuild_user_tree_if_need,
+)
 
 
 logger = get_logger(__name__)
 
 __all__ = [
-    'UserGrantedNodesApi',
-    'UserGrantedNodesAsTreeApi',
-    'UserGrantedNodeChildrenApi',
-    'UserGrantedNodeChildrenAsTreeApi',
+    'UserGrantedNodesForAdminApi',
+    'MyGrantedNodesApi',
+    'MyGrantedNodesAsTreeApi',
+    'UserGrantedNodeChildrenForAdminApi',
+    'MyGrantedNodeChildrenApi',
+    'UserGrantedNodeChildrenAsTreeForAdminApi',
+    'MyGrantedNodeChildrenAsTreeApi',
+    'BaseGrantedNodeAsTreeApi',
+    'UserGrantedNodesMixin',
 ]
 
 
-class UserGrantedNodesApi(UserAssetPermissionMixin, ListAPIView):
-    """
-    查询用户授权的所有节点的API
-    """
-    permission_classes = (IsOrgAdminOrAppUser,)
+class _GrantedNodeStructApi(ListAPIView, metaclass=abc.ABCMeta):
+    @property
+    def user(self):
+        raise NotImplementedError
+
+    def get_nodes(self):
+        # 不使用 `get_queryset` 单独定义 `get_nodes` 的原因是
+        # `get_nodes` 返回的不一定是 `queryset`
+        raise NotImplementedError
+
+
+class NodeChildrenMixin:
+    def get_children(self):
+        raise NotImplementedError
+
+    def get_nodes(self):
+        nodes = self.get_children()
+        return nodes
+
+
+class BaseGrantedNodeApi(_GrantedNodeStructApi, metaclass=abc.ABCMeta):
     serializer_class = serializers.NodeGrantedSerializer
-    nodes_only_fields = NodeSerializer.Meta.only_fields
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        if self.serializer_class == serializers.NodeGrantedSerializer:
-            context["tree"] = self.tree
-        return context
-
-    def get_queryset(self):
-        node_keys = self.util.get_nodes()
-        queryset = Node.objects.filter(key__in=node_keys)\
-            .only(*self.nodes_only_fields)
-        return queryset
+    @tmp_to_root_org()
+    def list(self, request, *args, **kwargs):
+        rebuild_user_tree_if_need(request, self.user)
+        nodes = self.get_nodes()
+        serializer = self.get_serializer(nodes, many=True)
+        return Response(serializer.data)
 
 
-class UserGrantedNodesAsTreeApi(UserNodeTreeMixin, UserGrantedNodesApi):
+class BaseNodeChildrenApi(NodeChildrenMixin, BaseGrantedNodeApi, metaclass=abc.ABCMeta):
     pass
 
 
-class UserGrantedNodeChildrenApi(UserGrantedNodesApi):
-    node = None
-    root_keys = None  # 如果是第一次访问，则需要把二级节点添加进去，这个 roots_keys
+class BaseGrantedNodeAsTreeApi(SerializeToTreeNodeMixin, _GrantedNodeStructApi, metaclass=abc.ABCMeta):
+    @tmp_to_root_org()
+    def list(self, request: Request, *args, **kwargs):
+        rebuild_user_tree_if_need(request, self.user)
+        nodes = self.get_nodes()
+        nodes = self.serialize_nodes(nodes, with_asset_amount=True)
+        return Response(data=nodes)
 
-    def get(self, request, *args, **kwargs):
-        key = self.request.query_params.get("key")
-        pk = self.request.query_params.get("id")
 
-        node = None
-        if pk is not None:
-            node = get_object_or_404(Node, id=pk)
-        elif key is not None:
-            node = get_object_or_404(Node, key=key)
-        self.node = node
-        return super().get(request, *args, **kwargs)
+class BaseNodeChildrenAsTreeApi(NodeChildrenMixin, BaseGrantedNodeAsTreeApi, metaclass=abc.ABCMeta):
+    pass
 
-    def get_queryset(self):
-        if self.node:
-            children = self.tree.children(self.node.key)
+
+class UserGrantedNodeChildrenMixin(UserNodeGrantStatusDispatchMixin):
+    user: User
+    request: Request
+
+    def get_children(self):
+        user = self.user
+        key = self.request.query_params.get('key')
+
+        if not key:
+            nodes = list(get_top_level_granted_nodes(user))
         else:
-            children = self.tree.children(self.tree.root)
-            # 默认打开组织节点下的节点
-            self.root_keys = [child.identifier for child in children]
-            for key in self.root_keys:
-                children.extend(self.tree.children(key))
-        node_keys = [n.identifier for n in children]
-        queryset = Node.objects.filter(key__in=node_keys)
-        return queryset
+            nodes = self.dispatch_get_data(key, user)
+        return nodes
+
+    def get_data_on_node_direct_granted(self, key):
+        return Node.objects.filter(parent_key=key)
+
+    def get_data_on_node_indirect_granted(self, key):
+        nodes = get_indirect_granted_node_children(self.user, key)
+        return nodes
+
+    def get_data_on_node_not_granted(self, key):
+        return Node.objects.none()
 
 
-class UserGrantedNodeChildrenAsTreeApi(UserNodeTreeMixin, UserGrantedNodeChildrenApi):
+class UserGrantedNodesMixin:
+    """
+    查询用户授权的所有节点 直接授权节点 + 授权资产关联的节点
+    """
+    user: User
+
+    def get_nodes(self):
+        return get_user_granted_nodes_list_via_mapping_node(self.user)
+
+
+# ------------------------------------------
+# 最终的 api
+class UserGrantedNodeChildrenForAdminApi(ForAdminMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenApi):
     pass
+
+
+class MyGrantedNodeChildrenApi(ForUserMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenApi):
+    pass
+
+
+class UserGrantedNodeChildrenAsTreeForAdminApi(ForAdminMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenAsTreeApi):
+    pass
+
+
+class MyGrantedNodeChildrenAsTreeApi(ForUserMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenAsTreeApi):
+    pass
+
+
+class UserGrantedNodesForAdminApi(ForAdminMixin, UserGrantedNodesMixin, BaseGrantedNodeApi):
+    pass
+
+
+class MyGrantedNodesApi(ForUserMixin, UserGrantedNodesMixin, BaseGrantedNodeApi):
+    pass
+
+
+class MyGrantedNodesAsTreeApi(ForUserMixin, UserGrantedNodesMixin, BaseGrantedNodeAsTreeApi):
+    pass
+
+# ------------------------------------------

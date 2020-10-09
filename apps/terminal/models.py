@@ -253,13 +253,17 @@ class Session(OrgModelMixin):
             return False
         return True
 
-    def save_to_storage(self, f):
+    def save_replay_to_storage(self, f):
         local_path = self.get_local_path()
         try:
             name = default_storage.save(local_path, f)
-            return name, None
         except OSError as e:
             return None, e
+
+        if settings.SERVER_REPLAY_STORAGE:
+            from .tasks import upload_session_replay_to_external_storage
+            upload_session_replay_to_external_storage.delay(str(self.id))
+        return name, None
 
     @classmethod
     def set_sessions_active(cls, sessions_id):
@@ -401,8 +405,8 @@ class CommandStorage(CommonModelMixin):
         storage = jms_storage.get_log_storage(self.config)
         return storage.ping()
 
-    def can_delete(self):
-        return not self.in_defaults()
+    def is_using(self):
+        return Terminal.objects.filter(command_storage=self.name).exists()
 
 
 class ReplayStorage(CommonModelMixin):
@@ -454,6 +458,5 @@ class ReplayStorage(CommonModelMixin):
         src = os.path.join(settings.BASE_DIR, 'common', target)
         return storage.is_valid(src, target)
 
-    def can_delete(self):
-        return not self.in_defaults()
-
+    def is_using(self):
+        return Terminal.objects.filter(replay_storage=self.name).exists()

@@ -47,6 +47,10 @@ class AssetManager(OrgManager):
         )
 
 
+class AssetOrgManager(OrgManager):
+    pass
+
+
 class AssetQuerySet(models.QuerySet):
     def active(self):
         return self.filter(is_active=True)
@@ -226,6 +230,7 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
 
     objects = AssetManager.from_queryset(AssetQuerySet)()
+    org_objects = AssetOrgManager.from_queryset(AssetQuerySet)()
     _connectivity = None
 
     def __str__(self):

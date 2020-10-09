@@ -155,20 +155,20 @@ def is_running(s, unlink=True):
 
 
 def parse_service(s):
-    all_services = [
-        'gunicorn', 'celery_ansible', 'celery_default',
-        'beat', 'flower', 'daphne',
-    ]
+    web_services = ['gunicorn', 'flower', 'daphne']
+    celery_services = ["celery_ansible", "celery_default", "celery_node_tree", "check_asset_perm_expired"]
+    task_services = celery_services + ['beat']
+    all_services = web_services + task_services
     if s == 'all':
         return all_services
     elif s == "web":
-        return ['gunicorn', 'flower', 'daphne']
+        return web_services
     elif s == 'ws':
         return ['daphne']
     elif s == "task":
-        return ["celery_ansible", "celery_default", "beat"]
+        return task_services
     elif s == "celery":
-        return ["celery_ansible", "celery_default"]
+        return celery_services
     elif "," in s:
         services = set()
         for i in s.split(','):
@@ -220,6 +220,16 @@ def get_start_celery_default_kwargs():
     return get_start_worker_kwargs('celery', 4)
 
 
+def get_start_celery_node_tree_kwargs():
+    print("\n- Start Celery as Distributed Task Queue: NodeTree")
+    return get_start_worker_kwargs('node_tree', 2)
+
+
+def get_start_celery_check_asset_perm_expired_kwargs():
+    print("\n- Start Celery as Distributed Task Queue: CheckAseetPermissionExpired")
+    return get_start_worker_kwargs('check_asset_perm_expired', 1)
+
+
 def get_start_worker_kwargs(queue, num):
     # Todo: Must set this environment, otherwise not no ansible result return
     os.environ.setdefault('PYTHONOPTIMIZE', '1')
@@ -261,19 +271,11 @@ def get_start_flower_kwargs():
 
 def get_start_beat_kwargs():
     print("\n- Start Beat as Periodic Task Scheduler")
-    os.environ.setdefault('PYTHONOPTIMIZE', '1')
-    if os.getuid() == 0:
-        os.environ.setdefault('C_FORCE_ROOT', '1')
-
-    scheduler = "django_celery_beat.schedulers:DatabaseScheduler"
+    utils_dir = os.path.join(BASE_DIR, 'utils')
     cmd = [
-        'celery', 'beat',
-        '-A', 'ops',
-        '-l', 'INFO',
-        '--scheduler', scheduler,
-        '--max-interval', '60'
+        sys.executable, 'start_celery_beat.py',
     ]
-    return {"cmd": cmd, 'cwd': APPS_DIR}
+    return {"cmd": cmd, 'cwd': utils_dir}
 
 
 processes = {}
@@ -289,7 +291,7 @@ def watch_services():
         for s, p in processes.items():
             print("{} Check service status: {} -> ".format(now, s), end='')
             try:
-                p.wait(timeout=1)
+                p.wait(timeout=1)  # 不wait，子进程可能无法回收
             except subprocess.TimeoutExpired:
                 pass
             ok = is_running(s)
@@ -363,6 +365,8 @@ def start_service(s):
         "gunicorn": get_start_gunicorn_kwargs,
         "celery_ansible": get_start_celery_ansible_kwargs,
         "celery_default": get_start_celery_default_kwargs,
+        "celery_node_tree": get_start_celery_node_tree_kwargs,
+        "check_asset_perm_expired": get_start_celery_check_asset_perm_expired_kwargs,
         "beat": get_start_beat_kwargs,
         "flower": get_start_flower_kwargs,
         "daphne": get_start_daphne_kwargs,
@@ -388,7 +392,7 @@ def start_service(s):
 
 def start_services_and_watch(s):
     logging.info(time.ctime())
-    logging.info('Jumpserver version {}, more see https://www.jumpserver.org'.format(
+    logging.info('JumpServer version {}, more see https://www.jumpserver.org'.format(
         __version__)
     )
 

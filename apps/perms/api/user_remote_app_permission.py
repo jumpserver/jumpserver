@@ -59,7 +59,8 @@ class UserGrantedRemoteAppsAsTreeApi(UserGrantedRemoteAppsApi):
         tree_root = None
         data = []
         if not only_remote_app:
-            tree_root = construct_remote_apps_tree_root()
+            amount = len(remote_apps)
+            tree_root = construct_remote_apps_tree_root(amount)
             data.append(tree_root)
         for remote_app in remote_apps:
             node = parse_remote_app_to_tree_node(tree_root, remote_app)

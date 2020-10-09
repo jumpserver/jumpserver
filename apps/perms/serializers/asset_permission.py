@@ -56,9 +56,5 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.annotate(
-            users_amount=Count('users', distinct=True), user_groups_amount=Count('user_groups', distinct=True),
-            assets_amount=Count('assets', distinct=True), nodes_amount=Count('nodes', distinct=True),
-            system_users_amount=Count('system_users', distinct=True)
-        )
+        queryset = queryset.prefetch_related('users', 'user_groups', 'assets', 'nodes', 'system_users')
         return queryset

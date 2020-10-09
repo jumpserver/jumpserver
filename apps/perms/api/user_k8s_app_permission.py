@@ -51,7 +51,8 @@ class UserGrantedK8sAppsAsTreeApi(UserGrantedK8sAppsApi):
         tree_root = None
         data = []
         if not only_k8s_app:
-            tree_root = utils.construct_k8s_apps_tree_root()
+            amount = len(k8s_apps)
+            tree_root = utils.construct_k8s_apps_tree_root(amount)
             data.append(tree_root)
         for k8s_app in k8s_apps:
             node = utils.parse_k8s_app_to_tree_node(tree_root, k8s_app)

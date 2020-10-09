@@ -1,83 +1,52 @@
 # -*- coding: utf-8 -*-
 #
+from rest_framework.request import Request
+
+from common.permissions import IsOrgAdminOrAppUser, IsValidUser
 from common.utils import lazyproperty
-from common.tree import TreeNodeSerializer
-from django.db.models import QuerySet
-from ..mixin import UserPermissionMixin
-from ...utils import AssetPermissionUtil, ParserNode
-from ...hands import Node, Asset
+from users.models import User
+from perms.models import UserGrantedMappingNode
 
 
-class UserAssetPermissionMixin(UserPermissionMixin):
-    util = None
-
-    def get_cache_policy(self):
-        return self.request.query_params.get('cache_policy', '0')
-
-    @lazyproperty
-    def util(self):
-        cache_policy = self.get_cache_policy()
-        system_user_id = self.request.query_params.get("system_user")
-        util = AssetPermissionUtil(self.obj, cache_policy=cache_policy)
-        if system_user_id:
-            util.filter_permissions(system_users=system_user_id)
-        return util
-
-    @lazyproperty
-    def tree(self):
-        return self.util.get_user_tree()
-
-
-class UserNodeTreeMixin:
-    serializer_class = TreeNodeSerializer
-    nodes_only_fields = ParserNode.nodes_only_fields
-
-    def parse_nodes_to_queryset(self, nodes):
-        if isinstance(nodes, QuerySet):
-            nodes = nodes.only(*self.nodes_only_fields)
-        _queryset = []
-
-        for node in nodes:
-            assets_amount = self.tree.valid_assets_amount(node.key)
-            if assets_amount == 0 and not node.key.startswith('-'):
-                continue
-            node.assets_amount = assets_amount
-            data = ParserNode.parse_node_to_tree_node(node)
-            _queryset.append(data)
-        return _queryset
-
-    def get_serializer_queryset(self, queryset):
-        queryset = self.parse_nodes_to_queryset(queryset)
-        return queryset
-
-    def get_serializer(self, queryset=None, many=True, **kwargs):
-        if queryset is None:
-            queryset = Node.objects.none()
-        queryset = self.get_serializer_queryset(queryset)
-        queryset.sort()
-        return super().get_serializer(queryset, many=many, **kwargs)
-
-
-class UserAssetTreeMixin:
-    serializer_class = TreeNodeSerializer
-    nodes_only_fields = ParserNode.assets_only_fields
+class UserNodeGrantStatusDispatchMixin:
 
     @staticmethod
-    def parse_assets_to_queryset(assets, node):
-        _queryset = []
-        for asset in assets:
-            data = ParserNode.parse_asset_to_tree_node(node, asset)
-            _queryset.append(data)
-        return _queryset
+    def get_mapping_node_by_key(key, user):
+        return UserGrantedMappingNode.objects.get(key=key, user=user)
 
-    def get_serializer_queryset(self, queryset):
-        queryset = queryset.only(*self.nodes_only_fields)
-        _queryset = self.parse_assets_to_queryset(queryset, None)
-        return _queryset
+    def dispatch_get_data(self, key, user):
+        status = UserGrantedMappingNode.get_node_granted_status(key, user)
+        if status == UserGrantedMappingNode.GRANTED_DIRECT:
+            return self.get_data_on_node_direct_granted(key)
+        elif status == UserGrantedMappingNode.GRANTED_INDIRECT:
+            return self.get_data_on_node_indirect_granted(key)
+        else:
+            return self.get_data_on_node_not_granted(key)
 
-    def get_serializer(self, queryset=None, many=True, **kwargs):
-        if queryset is None:
-            queryset = Asset.objects.none()
-        queryset = self.get_serializer_queryset(queryset)
-        queryset.sort()
-        return super().get_serializer(queryset, many=many, **kwargs)
+    def get_data_on_node_direct_granted(self, key):
+        raise NotImplementedError
+
+    def get_data_on_node_indirect_granted(self, key):
+        raise NotImplementedError
+
+    def get_data_on_node_not_granted(self, key):
+        raise NotImplementedError
+
+
+class ForAdminMixin:
+    permission_classes = (IsOrgAdminOrAppUser,)
+    kwargs: dict
+
+    @lazyproperty
+    def user(self):
+        user_id = self.kwargs.get('pk')
+        return User.objects.get(id=user_id)
+
+
+class ForUserMixin:
+    permission_classes = (IsValidUser,)
+    request: Request
+
+    @lazyproperty
+    def user(self):
+        return self.request.user

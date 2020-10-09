@@ -18,6 +18,7 @@ from importlib import import_module
 from django.urls import reverse_lazy
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from urllib.parse import urljoin, urlparse
+from django.utils.translation import ugettext_lazy as _
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
@@ -256,6 +257,7 @@ class Config(dict):
         'SYSLOG_FACILITY': 'user',
         'SYSLOG_SOCKTYPE': 2,
         'PERM_SINGLE_ASSET_TO_UNGROUP_NODE': False,
+        'PERM_EXPIRED_CHECK_PERIODIC': 60 * 60,
         'WINDOWS_SSH_DEFAULT_SHELL': 'cmd',
         'FLOWER_URL': "127.0.0.1:5555",
         'DEFAULT_ORG_SHOW_ALL_USERS': True,
@@ -268,7 +270,11 @@ class Config(dict):
         'TIME_ZONE': 'Asia/Shanghai',
         'CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED': True,
         'USER_LOGIN_SINGLE_MACHINE_ENABLED': False,
-        'TICKETS_ENABLED': True
+        'TICKETS_ENABLED': True,
+        'SESSION_COOKIE_SECURE': False,
+        'CSRF_COOKIE_SECURE': False,
+        'REFERER_CHECK_ENABLED': False,
+        'SERVER_REPLAY_STORAGE': {}
     }
 
     def compatible_auth_openid_of_key(self):
@@ -449,6 +455,9 @@ class DynamicConfig:
             backends.insert(0, 'authentication.backends.api.SSOAuthentication')
         return backends
 
+    def AUTH_DB(self):
+        return len(self.AUTHENTICATION_BACKENDS()) == 2
+
     def XPACK_LICENSE_IS_VALID(self):
         if not HAS_XPACK:
             return False
@@ -457,6 +466,16 @@ class DynamicConfig:
             return License.has_valid_license()
         except:
             return False
+
+    def XPACK_INTERFACE_LOGIN_TITLE(self):
+        default_title = _('Welcome to the JumpServer open source fortress')
+        if not HAS_XPACK:
+            return default_title
+        try:
+            from xpack.plugins.interface.models import Interface
+            return Interface.get_login_title()
+        except:
+            return default_title
 
     def LOGO_URLS(self):
         logo_urls = {'logo_logout': static('img/logo.png'),
