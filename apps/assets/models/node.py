@@ -464,10 +464,7 @@ class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
         if not org or not org.is_real():
             Organization.default().change_to()
         nodes = list(cls.objects.all())
-        if count > 100:
-            length = 100
-        else:
-            length = count
+        length = count
 
         for i in range(length):
             node = random.choice(nodes)

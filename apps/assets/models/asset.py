@@ -384,7 +384,7 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
                 else:
                     _nodes = [Node.default_node()]
                 asset.nodes.set(_nodes)
-                logger.debug('Generate fake asset : %s' % asset.ip)
+                print('Generate fake asset %s: %s' % (i, asset.ip))
             except IntegrityError:
                 print('Error continue')
                 continue
