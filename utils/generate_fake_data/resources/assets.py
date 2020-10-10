@@ -32,11 +32,14 @@ class SystemUsersGenerator(FakeDataGenerator):
         protocols = list(dict(SystemUser.PROTOCOL_CHOICES).keys())
         for i in batch:
             username = forgery_py.internet.user_name(True)
+            protocol = random.choice(protocols)
+            name = username.title()
+            name = f'{name}-{protocol}'
             system_users.append(SystemUser(
-                name=username.title(),
+                name=name,
                 username=username,
                 password=forgery_py.basic.password(),
-                protocol=random.choice(protocols),
+                protocol=protocol,
                 org_id=self.org.id,
                 created_by='Fake',
             ))
