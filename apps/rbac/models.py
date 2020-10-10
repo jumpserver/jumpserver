@@ -16,6 +16,9 @@ class Role(models.JMSModel):
     permissions = models.ManyToManyField('auth.Permission', verbose_name=_('Permissions'))
     is_build_in = models.BooleanField(default=False, verbose_name=_('Is build in'))
 
+    class Meta:
+        verbose_name = _('Role')
+
     def __str__(self):
         return self.name
 
@@ -28,4 +31,5 @@ class RoleBinding(models.JMSModel):
     date_expired = models.DateTimeField(verbose_name=_('Date expired'))
 
     class Meta:
+        verbose_name = _('Role Binding')
         unique_together = [('user', 'role')]

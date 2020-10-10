@@ -9,15 +9,17 @@ prop_field_data = [
     {'id': 3, 'name': 'gateway', 'type': Type.IP, 'required': 0},
     {'id': 4, 'name': 'dns', 'type': Type.IP, 'required': 0},
     {'id': 5, 'name': 'ssh-key', 'type': Type.STR, 'required': 1},
+    {'id': 6, 'name': 'db-name', 'type': Type.STR, 'required': 1},
 
 ]
 
 account_type_data = [
-    {'name': 'app_demo', 'category': Category.APP, 'base_type': None, 'protocol': 'HTTPS', 'prop_fields': []},
-    {'name': 'mysql_demo', 'category': Category.DATABASE, 'base_type': None, 'protocol': 'TCP/IP', 'prop_fields': [1]},
-    {'name': 'unix_ssh_demo', 'category': Category.OS, 'base_type': None, 'protocol': 'SSH', 'prop_fields': [1]},
-    {'name': 'unix_ssh_key_demo', 'category': Category.OS, 'base_type': None, 'protocol': 'SSH', 'prop_fields': [1,5]},
-    {'name': 'network_device_demo', 'category': Category.OS, 'base_type': None, 'protocol': 'SSH', 'prop_fields': [2,3,4]},
+    {'name': 'app', 'category': Category.APP, 'base_type': None, 'protocol': 'HTTPS', 'prop_fields': []},
+    {'name': 'mysql', 'category': Category.DATABASE, 'base_type': None, 'protocol': 'TCP/IP', 'prop_fields': [1,6]},
+    {'name': 'unix_ssh', 'category': Category.OS, 'base_type': None, 'protocol': 'SSH', 'prop_fields': [1]},
+    {'name': 'unix_ssh_key', 'category': Category.OS, 'base_type': None, 'protocol': 'SSH', 'prop_fields': [1,5]},
+    {'name': 'network_device', 'category': Category.NETWORK_DEVICE, 'base_type': None, 'protocol': 'SSH', 'prop_fields': [2,3,4]},
+    {'name': 'windows_rdp', 'category': Category.OS, 'base_type': None, 'protocol': 'RDP', 'prop_fields': [1]},
 ]
 
 

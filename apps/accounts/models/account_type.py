@@ -5,7 +5,7 @@ from django.db import models
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
-from common.mixins.models import CommonModelMixin
+from common.db.models import JMSModel
 
 __all__ = ['PropField', 'AccountType']
 
@@ -59,6 +59,9 @@ class PropField(models.Model):
     choices = jsonfield.JSONField()
     required = models.BooleanField(default=False, verbose_name=_('Required'))
 
+    class Meta:
+        verbose_name = _('Prop Field')
+
     def __str__(self):
         return self.name
 
@@ -73,13 +76,16 @@ class PropField(models.Model):
         return field(**kwargs)
 
 
-class AccountType(CommonModelMixin):
-    name = models.CharField(max_length=256, verbose_name=_('Name'))
+class AccountType(JMSModel):
+    name = models.CharField(max_length=255, unique=True, verbose_name=_('Name'))
     category = models.CharField(max_length=64, choices=Category.CHOICES, verbose_name=_('Category'))
     base_type = models.ForeignKey('AccountType', null=True, related_name='sub_types',
                                   on_delete=models.PROTECT, verbose_name=_('Base Type'))
     protocol = models.CharField(max_length=32, verbose_name=_('Protocol'))
     prop_fields = models.ManyToManyField('PropField', verbose_name=_('Properties Definition'))
+
+    class Meta:
+        verbose_name = _('Account Type')
 
     def __str__(self):
         return self.name

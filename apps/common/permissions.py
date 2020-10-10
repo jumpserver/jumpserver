@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 import time
+from copy import deepcopy
 
 from django.contrib.auth import get_permission_codename
 from django.shortcuts import get_object_or_404
@@ -8,6 +9,7 @@ from rest_framework import permissions
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.conf import settings
 
+from rbac.models import Role
 from orgs.utils import current_org
 
 
@@ -192,46 +194,55 @@ class IsObjectOwner(IsValidUser):
                 request.user == getattr(obj, 'user', None))
 
 
-class RBACPermissionMixin(object):
-    action_perm_map = {
-        'list': 'list',
+class RBACPermission(IsValidUser):
+    perms_map = {
+        'list': 'view',
+        'retrieve': 'view',
         'create': 'add',
         'update': 'change',
         'partial_update': 'change',
-        'retrieve': 'view',
         'destroy': 'delete',
     }
 
     def has_permission(self, request, view):
-        action = self.action_perm_map.get(view.action)
+        extra_action_perms_map = getattr(view, 'extra_action_perms_map', {})
+        perms_map = deepcopy(self.perms_map)
+        perms_map.update(extra_action_perms_map)
+        action = perms_map.get(view.action)
         obj = None
         pk = view.kwargs.get('pk')
         if pk:
             obj = get_object_or_404(view.model, pk=pk)
         view_codename = get_permission_codename(action, view.model._meta)
         perm = '%s.%s' % (view.model._meta.app_label, view_codename)
-        if not request.user.has_perm(perm, obj=obj):
-            return False
-        return True
-
-
-class RBACPermission(RBACPermissionMixin, IsValidUser):
-    pass
+        return super().has_permission(request, view) and \
+            request.user.has_perm(perm, obj=obj)
 
 
 class IsSystemAdminUser(IsValidUser):
 
     def has_permission(self, request, view):
-        pass
+        return super(IsSystemAdminUser, self).has_permission(request, view) and \
+               Role.TypeChoices.system in request.user.rbac_role
 
 
 class IsOrgAdminUser(IsValidUser):
 
     def has_permission(self, request, view):
-        pass
+        return super(IsOrgAdminUser, self).has_permission(request, view) and \
+               Role.TypeChoices.org in request.user.rbac_role
 
 
 class IsSystemOrOrgAdminUser(IsValidUser):
 
     def has_permission(self, request, view):
-        pass
+        return super(IsSystemOrOrgAdminUser, self).has_permission(request, view) and \
+               (Role.TypeChoices.org in request.user.rbac_role or
+                Role.TypeChoices.system in request.user.rbac_role)
+
+
+class IsNamespaceUser(IsValidUser):
+
+    def has_permission(self, request, view):
+        return super(IsNamespaceUser, self).has_permission(request, view) and \
+               Role.TypeChoices.namespace in request.user.rbac_role

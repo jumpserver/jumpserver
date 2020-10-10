@@ -8,7 +8,9 @@ from rest_framework.utils import html
 from rest_framework.settings import api_settings
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SkipField, empty
-__all__ = ['BulkSerializerMixin', 'BulkListSerializerMixin', 'CommonSerializerMixin', 'CommonBulkSerializerMixin']
+__all__ = ['BulkSerializerMixin', 'BulkListSerializerMixin', 'CommonSerializerMixin',
+           'CommonBulkSerializerMixin', 'ActionSerializerMixin'
+           ]
 
 
 class BulkSerializerMixin(object):
@@ -246,3 +248,11 @@ class CommonSerializerMixin(DynamicFieldsMixin):
 
 class CommonBulkSerializerMixin(BulkSerializerMixin, CommonSerializerMixin):
     pass
+
+
+class ActionSerializerMixin(object):
+    def get_serializer_class(self):
+        try:
+            return self.serializer_action_classes[self.action]
+        except (KeyError, AttributeError):
+            return super(ActionSerializerMixin, self).get_serializer_class()

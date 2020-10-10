@@ -11,6 +11,8 @@ __all__ = ['Account']
 
 logger = get_logger(__file__)
 
+storage = get_account_storage()
+
 
 class SecretType(object):
     PASSWORD = 'password'
@@ -40,15 +42,31 @@ class Account(models.JMSModel, OrgModelMixin):
     namespace = models.ForeignKey('namespaces.Namespace', on_delete=models.PROTECT, verbose_name=_('Namespace'))
 
     class Meta:
-        pass
+        verbose_name = _('Account')
+        permissions = (
+            ('gain_secret', _('Can gain secret')),
+            ('connect_account', _('Can connect account')),
+        )
         # TODO
         # unique_together = [('username', 'address')]
+
+    def save_extra_props(self, extra_props):
+        self.extra_props = extra_props
+        self.save()
+
+    def create_secret(self, secret):
+        storage.create_secret(self, {storage.key: secret})
+
+    def update_secret(self, secret):
+        storage.update_secret(self, {storage.key: secret})
+
+    def get_secret(self):
+        return storage.get_secret(self)
 
     def save(self, **kwargs):
         self.secret = ''
         super(Account, self).save(**kwargs)
 
     def delete(self, using=None, keep_parents=False):
-        storage = get_account_storage()
         storage.delete_secret(self)
         super(Account, self).delete(using=None, keep_parents=False)

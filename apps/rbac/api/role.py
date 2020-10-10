@@ -1,8 +1,6 @@
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.viewsets import GenericViewSet
-from rest_framework import mixins
+from common.permissions import RBACPermission
+from rest_framework.viewsets import ModelViewSet
 
-from accounts.api import CsrfExemptSessionAuthentication
 from rbac.models import Role, RoleBinding
 from rbac.serializers import RoleSerializer, RoleBindingSerializer
 
@@ -10,15 +8,9 @@ from rbac.serializers import RoleSerializer, RoleBindingSerializer
 __all__ = ['RoleViewSet', 'RoleBindingViewSet']
 
 
-class RoleViewSet(mixins.CreateModelMixin,
-                  mixins.RetrieveModelMixin,
-                  mixins.UpdateModelMixin,
-                  mixins.DestroyModelMixin,
-                  mixins.ListModelMixin,
-                  GenericViewSet):
-    # TODO all permission_classes of view to be added
-    permission_classes = (IsAuthenticated,)
-    authentication_classes = (CsrfExemptSessionAuthentication,)
+class RoleViewSet(ModelViewSet):
+
+    permission_classes = (RBACPermission,)
 
     filter_fields = ('name', 'type', 'is_build_in')
     search_fields = filter_fields
@@ -29,15 +21,9 @@ class RoleViewSet(mixins.CreateModelMixin,
     serializer_class = RoleSerializer
 
 
-class RoleBindingViewSet(mixins.CreateModelMixin,
-                         mixins.RetrieveModelMixin,
-                         mixins.UpdateModelMixin,
-                         mixins.DestroyModelMixin,
-                         mixins.ListModelMixin,
-                         GenericViewSet):
+class RoleBindingViewSet(ModelViewSet):
 
-    permission_classes = (IsAuthenticated,)
-    authentication_classes = (CsrfExemptSessionAuthentication,)
+    permission_classes = (RBACPermission,)
 
     filter_fields = ('user', 'role')
     search_fields = filter_fields

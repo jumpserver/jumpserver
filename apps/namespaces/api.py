@@ -1,22 +1,14 @@
-from rest_framework import mixins
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.viewsets import GenericViewSet
+from rest_framework.viewsets import ModelViewSet
 
-from accounts.api import CsrfExemptSessionAuthentication
+from common.permissions import RBACPermission
 from rbac.models import RoleBinding
 from namespaces.models import Namespace
 from namespaces.serializers import NamespaceSerializer
 
 
-class NamespaceViewSet(mixins.CreateModelMixin,
-                       mixins.RetrieveModelMixin,
-                       mixins.UpdateModelMixin,
-                       mixins.DestroyModelMixin,
-                       mixins.ListModelMixin,
-                       GenericViewSet):
+class NamespaceViewSet(ModelViewSet):
 
-    permission_classes = (IsAuthenticated,)
-    authentication_classes = (CsrfExemptSessionAuthentication,)
+    permission_classes = (RBACPermission,)
 
     filter_fields = ('name',)
     search_fields = filter_fields

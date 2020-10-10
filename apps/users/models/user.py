@@ -704,4 +704,4 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
 
     @property
     def rbac_role(self):
-        return RoleBinding.objects.filter(user=self).values_list('role__type').distinct()
+        return RoleBinding.objects.filter(user=self).values_list('role__type', flat=True).distinct()

@@ -9,4 +9,5 @@ class Namespace(models.JMSModel, OrgModelMixin):
     comment = models.TextField(default='', verbose_name=_('Comment'))
 
     class Meta:
+        verbose_name = _('Namespace')
         unique_together = [('name', 'org_id')]

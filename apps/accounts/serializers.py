@@ -20,6 +20,9 @@ class AccountSerializer(serializers.ModelSerializer):
             'comment', 'created_by', 'date_created', 'date_updated',
         )
         read_only_fields = ('id', 'type_display', 'namespace_display', 'created_by')
+        extra_kwargs = {
+            'secret': {'write_only': True}
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -36,20 +39,12 @@ class AccountSerializer(serializers.ModelSerializer):
             return
         self.fields['extra_props'] = tp.generate_serializer()()
 
-    def to_representation(self, instance):
-        data = super(AccountSerializer, self).to_representation(instance)
-        data['secret'] = storage.get_secret(instance)
-        return data
-
-    # TODO overwrite save
-
     def create(self, validated_data):
         extra_props = validated_data.pop('extra_props', {})
         with transaction.atomic():
             instance = super(AccountSerializer, self).create(validated_data)
-            storage.create_secret(instance, {storage.key: validated_data['secret']})
-            instance.extra_props = extra_props
-            instance.save()
+            instance.create_secret(validated_data['secret'])
+            instance.save_extra_props(extra_props)
         return instance
 
     def update(self, instance, validated_data):
@@ -58,11 +53,26 @@ class AccountSerializer(serializers.ModelSerializer):
         with transaction.atomic():
             instance = super(AccountSerializer, self).update(instance, validated_data)
             if secret:
-                storage.update_secret(instance, {storage.key: secret})
+                instance.update_secret(secret)
             if extra_props:
-                instance.extra_props = extra_props
-            instance.save()
+                instance.save_extra_props(extra_props)
         return instance
+
+
+class AccountWithSecretSerializer(AccountSerializer):
+
+    class Meta:
+        model = Account
+        fields = (
+            'id', 'name', 'username', 'address', 'secret', 'secret_type',
+            'type', 'type_display', 'extra_props', 'namespace', 'namespace_display',
+            'comment', 'created_by', 'date_created', 'date_updated',
+        )
+
+    def to_representation(self, instance):
+        data = super(AccountWithSecretSerializer, self).to_representation(instance)
+        data['secret'] = instance.get_secret()
+        return data
 
 
 class PropFieldSerializer(serializers.ModelSerializer):
