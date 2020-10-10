@@ -75,56 +75,10 @@ class OrgMemberRelationBulkViewSet(JMSBulkRelationModelViewSet):
     serializer_class = OrgMemberSerializer
     filterset_class = OrgMemberRelationFilterSet
 
-    @staticmethod
-    def clear_request_data(request):
-        data = request.data
-
-        ignore_already_exist = request.query_params.get('ignore_already_exist')
-        if not ignore_already_exist:
-            return data
-
-        query_params = Q()
-        for _data in data:
-            query_fields = {}
-            org = _data.get('org')
-            if org:
-                query_fields.update({'org': org})
-            user = _data.get('user')
-            if user:
-                query_fields.update({'user': user})
-            role = _data.get('role')
-            if role:
-                query_fields.update({'role': role})
-            query_params |= Q(**query_fields)
-
-        if not query_params:
-            return data
-
-        members = OrganizationMember.objects.filter(query_params)
-        members = [
-            {'org': str(member.org_id), 'user': str(member.user_id), 'role': member.role}
-            for member in members
-        ]
-        if not members:
-            return data
-
-        for member in members:
-            if member in data:
-                data.remove(member)
-        return data
-
-    def create(self, request, *args, **kwargs):
-        bulk = isinstance(request.data, list)
-
-        if not bulk:
-            return CreateModelMixin.create(self, request, *args, **kwargs)
-
-        else:
-            data = self.clear_request_data(request)
-            serializer = self.get_serializer(data=data, many=True)
-            serializer.is_valid(raise_exception=True)
-            self.perform_bulk_create(serializer)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    def perform_bulk_create(self, serializer):
+        data = serializer.validated_data
+        relations = [OrganizationMember(**i) for i in data]
+        OrganizationMember.objects.bulk_create(relations, ignore_conflicts=True)
 
     def perform_bulk_destroy(self, queryset):
         objs = list(queryset.all().prefetch_related('user', 'org'))
