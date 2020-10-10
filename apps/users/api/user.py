@@ -1,7 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 from django.core.cache import cache
-from django.db.models import CharField
 from django.utils.translation import ugettext as _
+from rest_framework.decorators import action
 
 from rest_framework import generics
 from rest_framework.response import Response
@@ -17,7 +17,7 @@ from common.utils import get_logger
 from orgs.utils import current_org
 from orgs.models import ROLE as ORG_ROLE, OrganizationMember
 from .. import serializers
-from ..serializers import UserSerializer, UserRetrieveSerializer
+from ..serializers import UserSerializer, UserRetrieveSerializer, MiniUserSerializer
 from .mixins import UserQuerysetMixin
 from ..models import User
 from ..signals import post_user_create
@@ -37,7 +37,8 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
     permission_classes = (IsOrgAdmin, CanUpdateDeleteUser)
     serializer_classes = {
         'default': UserSerializer,
-        'retrieve': UserRetrieveSerializer
+        'retrieve': UserRetrieveSerializer,
+        'suggestion': MiniUserSerializer
     }
     extra_filter_backends = [OrgRoleUserFilterBackend]
 
@@ -52,27 +53,24 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         for user in users:
             post_user_create.send(self.__class__, user=user)
 
+    @staticmethod
+    def set_users_to_org(users, org_roles):
+        # 只有真实存在的组织才真正关联用户
+        if not current_org or not current_org.is_real():
+            return
+        for user, roles in zip(users, org_roles):
+            if not roles:
+                # 当前组织创建的用户，至少是该组织的`User`
+                roles = [ORG_ROLE.USER]
+            OrganizationMember.objects.set_user_roles(current_org, user, roles)
+
     def perform_create(self, serializer):
-        validated_data = serializer.validated_data
-
-        # `org_roles` 先 `pop`
-        if isinstance(validated_data, list):
-            org_roles = [item.pop('org_roles', []) for item in validated_data]
-        else:
-            org_roles = [validated_data.pop('org_roles', [])]
-
+        org_roles = self.get_serializer_org_roles(serializer)
         # 创建用户
         users = serializer.save()
         if isinstance(users, User):
             users = [users]
-
-        # 只有真实存在的组织才真正关联用户
-        if current_org and current_org.is_real():
-            for user, roles in zip(users, org_roles):
-                if not roles:
-                    # 当前组织创建的用户，至少是该组织的`User`
-                    roles.append(ORG_ROLE.USER)
-                OrganizationMember.objects.set_user_roles(current_org, user, roles)
+        self.set_users_to_org(users, org_roles)
         self.send_created_signal(users)
 
     def get_permissions(self):
@@ -93,22 +91,22 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
             self.check_object_permissions(self.request, obj)
             self.perform_destroy(obj)
 
-    def perform_update(self, serializer):
+    @staticmethod
+    def get_serializer_org_roles(serializer):
         validated_data = serializer.validated_data
         # `org_roles` 先 `pop`
         if isinstance(validated_data, list):
             org_roles = [item.pop('org_roles', None) for item in validated_data]
         else:
             org_roles = [validated_data.pop('org_roles', None)]
+        return org_roles
 
+    def perform_update(self, serializer):
+        org_roles = self.get_serializer_org_roles(serializer)
         users = serializer.save()
         if isinstance(users, User):
             users = [users]
-        if current_org and current_org.is_real():
-            for user, roles in zip(users, org_roles):
-                if roles is not None:
-                    # roles 是 `Node` 表明不需要更新
-                    OrganizationMember.objects.set_user_roles(current_org, user, roles)
+        self.set_users_to_org(users, org_roles)
 
     def perform_bulk_update(self, serializer):
         # TODO: 需要测试
@@ -119,6 +117,20 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         for user in users:
             self.check_object_permissions(self.request, user)
         return super().perform_bulk_update(serializer)
+
+    @action(methods=['get'], detail=False, permission_classes=(IsOrgAdminOrAppUser,))
+    def suggestion(self, request):
+        queryset = User.objects.exclude(role=User.ROLE.APP)
+        queryset = self.filter_queryset(queryset)
+        queryset = queryset[:3]
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class UserChangePasswordApi(UserQuerysetMixin, generics.RetrieveUpdateAPIView):
