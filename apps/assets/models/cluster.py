@@ -38,27 +38,3 @@ class Cluster(models.Model):
     class Meta:
         ordering = ['name']
         verbose_name = _("Cluster")
-
-    @classmethod
-    def generate_fake(cls, count=5):
-        from random import seed, choice
-        import forgery_py
-        from django.db import IntegrityError
-
-        seed()
-        for i in range(count):
-            cluster = cls(name=forgery_py.name.full_name(),
-                          bandwidth='200M',
-                          contact=forgery_py.name.full_name(),
-                          phone=forgery_py.address.phone(),
-                          address=forgery_py.address.city() + forgery_py.address.street_address(),
-                          # operator=choice(['北京联通', '北京电信', 'BGP全网通']),
-                          operator=choice([_('Beijing unicom'), _('Beijing telecom'), _('BGP full netcom')]),
-                          comment=forgery_py.lorem_ipsum.sentence(),
-                          created_by='Fake')
-            try:
-                cluster.save()
-                logger.debug('Generate fake asset group: %s' % cluster.name)
-            except IntegrityError:
-                print('Error continue')
-                continue

@@ -136,53 +136,6 @@ class AssetPermission(BasePermission):
         assets = Asset.objects.filter(id__in=assets_ids)
         return assets
 
-    @classmethod
-    def generate_fake(cls, count=100):
-        from ..hands import User, Node, SystemUser
-        import random
-
-        org = get_current_org()
-        if not org or not org.is_real():
-            Organization.default().change_to()
-
-        nodes = list(Node.objects.all())
-        assets = list(Asset.objects.all())
-        system_users = list(SystemUser.objects.all())
-        users = User.objects.filter(username='admin')
-
-        for i in range(count):
-            name = "fake_perm_to_admin_{}".format(str(uuid.uuid4())[:6])
-            perm = cls(name=name)
-            try:
-                perm.save()
-                perm.users.set(users)
-                if system_users and len(system_users) > 3:
-                    _system_users = random.sample(system_users, 3)
-                elif system_users:
-                    _system_users = [system_users[0]]
-                else:
-                    _system_users = []
-                perm.system_users.set(_system_users)
-
-                if nodes and len(nodes) > 3:
-                    _nodes = random.sample(nodes, 3)
-                else:
-                    _nodes = [Node.default_node()]
-                perm.nodes.set(_nodes)
-
-                if assets and len(assets) > 3:
-                    _assets = random.sample(assets, 3)
-                elif assets:
-                    _assets = [assets[0]]
-                else:
-                    _assets = []
-                perm.assets.set(_assets)
-
-                logger.debug('Generate fake perm: %s' % perm.name)
-
-            except Exception as e:
-                print('Error continue')
-                continue
 
 
 class UserGrantedMappingNode(FamilyMixin, models.JMSBaseModel):
