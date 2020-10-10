@@ -35,7 +35,9 @@ def on_asset_permission_delete(instance, **kwargs):
 def create_rebuild_user_tree_task_by_asset_perm(asset_perm: AssetPermission):
     user_ids = set()
     user_ids.update(
-        UserGroup.objects.filter(assetpermissions=asset_perm).distinct().values_list('users__id', flat=True)
+        UserGroup.objects.filter(
+            assetpermissions=asset_perm, users__id__isnull=False
+        ).distinct().values_list('users__id', flat=True)
     )
     user_ids.update(
         User.objects.filter(assetpermissions=asset_perm).distinct().values_list('id', flat=True)
