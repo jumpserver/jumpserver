@@ -18,7 +18,7 @@ class AssetLimitOffsetPagination(LimitOffsetPagination):
             self.limit_query_param,
             self.offset_query_param,
             'node', 'all', 'show_current_asset',
-            'node_id', 'display', 'draw',
+            'node_id', 'display', 'draw', 'fields_size',
         }
 
         for k, v in self._request.query_params.items():
