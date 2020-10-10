@@ -355,36 +355,3 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     class Meta:
         unique_together = [('org_id', 'hostname')]
         verbose_name = _("Asset")
-
-    @classmethod
-    def generate_fake(cls, count=100):
-        from .user import AdminUser, SystemUser
-        from random import seed, choice
-        from django.db import IntegrityError
-        from .node import Node
-        from orgs.utils import get_current_org
-        from orgs.models import Organization
-        org = get_current_org()
-        if not org or not org.is_real():
-            Organization.default().change_to()
-
-        nodes = list(Node.objects.all())
-        seed()
-        for i in range(count):
-            ip = [str(i) for i in random.sample(range(255), 4)]
-            asset = cls(ip='.'.join(ip),
-                        hostname='.'.join(ip),
-                        admin_user=choice(AdminUser.objects.all()),
-                        created_by='Fake')
-            try:
-                asset.save()
-                asset.protocols = 'ssh/22'
-                if nodes and len(nodes) > 3:
-                    _nodes = random.sample(nodes, 3)
-                else:
-                    _nodes = [Node.default_node()]
-                asset.nodes.set(_nodes)
-                print('Generate fake asset %s: %s' % (i, asset.ip))
-            except IntegrityError:
-                print('Error continue')
-                continue
