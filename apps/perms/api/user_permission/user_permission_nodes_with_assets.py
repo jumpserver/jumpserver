@@ -3,6 +3,7 @@
 from rest_framework.generics import ListAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
+from django.db.models import F
 
 from common.permissions import IsValidUser
 from common.utils import get_logger, get_object_or_none
@@ -41,6 +42,7 @@ class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
         rebuild_user_tree_if_need(request, user)
         all_nodes = get_user_granted_nodes_list_via_mapping_node(user)
         all_assets = get_user_granted_all_assets(user)
+        all_assets = all_assets.annotate(parent_key=F('nodes__key'))
 
         data = [
             *self.serialize_nodes(all_nodes, with_asset_amount=True),
