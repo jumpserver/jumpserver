@@ -77,6 +77,7 @@ class AssetsGenerator(FakeDataGenerator):
         for i in batch:
             ip = forgery_py.internet.ip_v4()
             hostname = forgery_py.email.address().replace('@', '.')
+            hostname = f'{hostname}-{ip}'
             data = dict(
                 ip=ip,
                 hostname=hostname,

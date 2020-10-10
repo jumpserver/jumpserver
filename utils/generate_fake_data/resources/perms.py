@@ -80,4 +80,3 @@ class AssetPermissionGenerator(FakeDataGenerator):
         self.set_assets(created)
         self.set_nodes(created)
         self.set_system_users(created)
-
