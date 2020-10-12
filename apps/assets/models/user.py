@@ -65,26 +65,6 @@ class AdminUser(BaseUser):
         unique_together = [('name', 'org_id')]
         verbose_name = _("Admin user")
 
-    @classmethod
-    def generate_fake(cls, count=10):
-        from random import seed
-        import forgery_py
-        from django.db import IntegrityError
-
-        seed()
-        for i in range(count):
-            obj = cls(name=forgery_py.name.full_name(),
-                      username=forgery_py.internet.user_name(),
-                      password=forgery_py.lorem_ipsum.word(),
-                      comment=forgery_py.lorem_ipsum.sentence(),
-                      created_by='Fake')
-            try:
-                obj.save()
-                logger.debug('Generate fake asset group: %s' % obj.name)
-            except IntegrityError:
-                print('Error continue')
-                continue
-
 
 class SystemUser(BaseUser):
     PROTOCOL_SSH = 'ssh'
@@ -199,23 +179,3 @@ class SystemUser(BaseUser):
         ordering = ['name']
         unique_together = [('name', 'org_id')]
         verbose_name = _("System user")
-
-    @classmethod
-    def generate_fake(cls, count=10):
-        from random import seed
-        import forgery_py
-        from django.db import IntegrityError
-
-        seed()
-        for i in range(count):
-            obj = cls(name=forgery_py.name.full_name(),
-                      username=forgery_py.internet.user_name(),
-                      password=forgery_py.lorem_ipsum.word(),
-                      comment=forgery_py.lorem_ipsum.sentence(),
-                      created_by='Fake')
-            try:
-                obj.save()
-                logger.debug('Generate fake asset group: %s' % obj.name)
-            except IntegrityError:
-                print('Error continue')
-                continue

@@ -97,9 +97,11 @@ class FamilyMixin:
     def all_children(self):
         return self.get_all_children(with_self=False)
 
-    def create_child(self, value, _id=None):
+    def create_child(self, value=None, _id=None):
         with atomic(savepoint=False):
             child_key = self.get_next_child_key()
+            if value is None:
+                value = child_key
             child = self.__class__.objects.create(
                 id=_id, key=child_key, value=value, parent_key=self.key,
             )
@@ -456,20 +458,3 @@ class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
         if self.has_children_or_has_assets():
             return
         return super().delete(using=using, keep_parents=keep_parents)
-
-    @classmethod
-    def generate_fake(cls, count=100):
-        import random
-        org = get_current_org()
-        if not org or not org.is_real():
-            Organization.default().change_to()
-        nodes = list(cls.objects.all())
-        if count > 100:
-            length = 100
-        else:
-            length = count
-
-        for i in range(length):
-            node = random.choice(nodes)
-            child = node.create_child('Node {}'.format(i))
-            print("{}. {}".format(i, child))

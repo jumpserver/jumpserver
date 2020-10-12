@@ -256,6 +256,13 @@ def rebuild_user_mapping_nodes(user):
     logger.info(f'>>> {dt_formater(now())} end rebuild {user} mapping nodes')
 
 
+def rebuild_all_user_mapping_nodes():
+    from users.models import User
+    users = User.objects.all()
+    for user in users:
+        rebuild_user_mapping_nodes(user)
+
+
 def get_user_granted_nodes_list_via_mapping_node(user):
     """
     这里的 granted nodes, 是整棵树需要的node，推算出来的也算

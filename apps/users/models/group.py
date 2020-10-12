@@ -39,20 +39,3 @@ class UserGroup(OrgModelMixin):
         else:
             group = default_group[0]
         return group
-
-    @classmethod
-    def generate_fake(cls, count=100):
-        from random import seed, choice
-        import forgery_py
-        from . import User
-
-        seed()
-        for i in range(count):
-            group = cls(name=forgery_py.name.full_name(),
-                        comment=forgery_py.lorem_ipsum.sentence(),
-                        created_by=choice(User.objects.all()).username)
-            try:
-                group.save()
-            except IntegrityError:
-                print('Error continue')
-                continue
