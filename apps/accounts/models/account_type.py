@@ -71,7 +71,8 @@ class AccountType(JMSModel):
     def __str__(self):
         return self.name
 
-    def generate_serializer(self):
+    def to_serializer_cls(self):
         fields = self.prop_fields.all()
         serializer_fields = {f.name: f.to_serializer_field() for f in fields}
-        return type('AccountTypeSerializer', (serializers.Serializer,), serializer_fields)
+        name = 'AccountTypeSerializer{}'.format(self.name.title())
+        return type(name, (serializers.Serializer,), serializer_fields)

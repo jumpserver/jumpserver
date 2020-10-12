@@ -34,7 +34,7 @@ class AccountSerializer(serializers.ModelSerializer):
         tp = AccountType.objects.filter(id=account_type).first()
         if not tp:
             return
-        self.fields['extra_props'] = tp.generate_serializer()()
+        self.fields['extra_props'] = tp.to_serializer_cls()()
 
     def create(self, validated_data):
         extra_props = validated_data.pop('extra_props', {})
