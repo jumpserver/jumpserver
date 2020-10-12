@@ -231,7 +231,7 @@ def _none2list(*args):
 
 
 def _users2pks(users, admins, auditors):
-    return [user.pk for user in chain(users, admins, auditors)]
+    return [user.pk for user in chain(users, admins, auditors) if hasattr(user, 'pk')]
 
 
 class UserRoleMapper(dict):
@@ -295,11 +295,11 @@ class OrgMemeberManager(models.Manager):
         )
 
         oms_add = []
-        for users, role in add_mapper:
-            for user in users:
-                if isinstance(user, models.Model):
-                    user = user.id
-                oms_add.append(self.model(org_id=org.id, user_id=user, role=role))
+        for _users, _role in add_mapper:
+            for _user in _users:
+                if isinstance(_user, models.Model):
+                    _user = _user.id
+                oms_add.append(self.model(org_id=org.id, user_id=_user, role=_role))
 
         send = partial(signals.m2m_changed.send, sender=self.model, instance=org, reverse=False,
                        model=User, pk_set=_users2pks(users, admins, auditors), using=self.db)
