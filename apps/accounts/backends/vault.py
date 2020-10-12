@@ -1,42 +1,15 @@
 import os
 import hvac
-from abc import ABCMeta, abstractmethod
 
-from django.conf import settings
-from django.utils.module_loading import import_string
+
 
 from common.utils import get_logger
+from .base import Backend
 
 logger = get_logger(__file__)
 
 
-def get_account_storage():
-    config = settings.ACCOUNT_STORAGE_BACKEND
-    engine_class = import_string(config['ENGINE'])
-    storage = engine_class(**config['CONFIG'])
-    return storage
 
-
-class Backend(metaclass=ABCMeta):
-    @abstractmethod
-    def get_metadata(self, *args, **kwargs):
-        pass
-
-    @abstractmethod
-    def get_secret(self, *args, **kwargs):
-        pass
-
-    @abstractmethod
-    def create_secret(self, *args, **kwargs):
-        pass
-
-    @abstractmethod
-    def update_secret(self, *args, **kwargs):
-        pass
-
-    @abstractmethod
-    def delete_secret(self, *args, **kwargs):
-        pass
 
 
 class VaultBackend(Backend):
@@ -72,7 +45,8 @@ class VaultBackend(Backend):
         """secret_data should be a k/v dict"""
         path = self.get_secret_path(instance)
         key = self.client.secrets.kv.v2.create_or_update_secret(
-            mount_point=self.engine, path=path, secret=data)
+            mount_point=self.engine, path=path, secret=data
+        )
         return key
 
     def update_secret(self, instance, data):
@@ -80,10 +54,12 @@ class VaultBackend(Backend):
         if old_secret != data.get(self.key):
             path = self.get_secret_path(instance)
             key = self.client.secrets.kv.v2.create_or_update_secret(
-                mount_point=self.engine, path=path, secret=data)
+                mount_point=self.engine, path=path, secret=data
+            )
             return key
 
     def delete_secret(self, instance):
         path = self.get_secret_path(instance)
         self.client.secrets.kv.v2.delete_metadata_and_all_versions(
-            mount_point=self.engine, path=path)
+            mount_point=self.engine, path=path
+        )

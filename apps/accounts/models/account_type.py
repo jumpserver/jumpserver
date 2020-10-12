@@ -5,56 +5,29 @@ from django.db import models
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
-from common.db.models import JMSModel
+from common.db.models import JMSModel, ChoiceSet
 
 __all__ = ['PropField', 'AccountType']
 
 
-class Type(object):
-    STR = 'string'
-    INT = 'integer'
-    LIST = 'list'
-    IP = 'ip'
-    DATETIME = 'datetime'
-
-    CHOICES = (
-        (STR, _('String')),
-        (INT, _('Integer')),
-        (LIST, _('List')),
-        (IP, _('Ip')),
-        (DATETIME, _('Datetime')),
-    )
-
-    TYPE_TO_SERIALIZER_MAP = {
-        STR: serializers.CharField,
-        INT: serializers.IntegerField,
-        LIST: serializers.ListField,
-        IP: serializers.IPAddressField,
-        DATETIME: serializers.DateTimeField,
-    }
-
-
-class Category(object):
-    OS = 'os'
-    DATABASE = 'db'
-    NETWORK_DEVICE = 'network_device'
-    APP = 'app'
-    CLOUD = 'cloud'
-    Other = 'other'
-
-    CHOICES = (
-        (OS, _('Operation System')),
-        (DATABASE, _('Database')),
-        (NETWORK_DEVICE, _('Network Device')),
-        (APP, _('Application')),
-        (CLOUD, _('Cloud')),
-        (Other, _('Other')),
-    )
-
-
 class PropField(models.Model):
+    class PropType(ChoiceSet):
+        STR = 'string', _('String')
+        INT = 'integer', _('Integer')
+        LIST = 'list', _('List')
+        IP = 'ip', 'IP'
+        DATETIME = _('Datetime')
+
+        TYPE_TO_SERIALIZER_MAP = {
+            STR: serializers.CharField,
+            INT: serializers.IntegerField,
+            LIST: serializers.ListField,
+            IP: serializers.IPAddressField,
+            DATETIME: serializers.DateTimeField,
+        }
+
     name = models.CharField(max_length=128, verbose_name=_('Name'))
-    type = models.CharField(max_length=32, choices=Type.CHOICES, default=Type.STR, verbose_name=_('Type'))
+    type = models.CharField(max_length=32, choices=PropType.choices, default=PropType.STR, verbose_name=_('Type'))
     default = jsonfield.JSONField()
     choices = jsonfield.JSONField()
     required = models.BooleanField(default=False, verbose_name=_('Required'))
@@ -66,7 +39,7 @@ class PropField(models.Model):
         return self.name
 
     def to_serializer_field(self):
-        field = Type.TYPE_TO_SERIALIZER_MAP.get(self.type)
+        field = self.PropType.TYPE_TO_SERIALIZER_MAP.get(self.type)
         kwargs = {'required': False}
         if self.required:
             kwargs['required'] = True
@@ -77,8 +50,16 @@ class PropField(models.Model):
 
 
 class AccountType(JMSModel):
+    class Category(ChoiceSet):
+        OS = 'os',  _('Operation System')
+        DATABASE = _('Database')
+        NETWORK_DEVICE = 'network_device', _('Network Device')
+        APP = 'app', _('Application')
+        CLOUD = 'cloud', _('Cloud')
+        Other = 'other',  _('Other')
+
     name = models.CharField(max_length=255, unique=True, verbose_name=_('Name'))
-    category = models.CharField(max_length=64, choices=Category.CHOICES, verbose_name=_('Category'))
+    category = models.CharField(max_length=64, choices=Category.choices, default=Category.OS, verbose_name=_('Category'))
     base_type = models.ForeignKey('AccountType', null=True, related_name='sub_types',
                                   on_delete=models.PROTECT, verbose_name=_('Base Type'))
     protocol = models.CharField(max_length=32, verbose_name=_('Protocol'))

@@ -1,25 +1,23 @@
 
 from accounts.models import AccountType, PropField
-from accounts.models.account_type import Type, Category
 from django.db import transaction
 
 prop_field_data = [
-    {'id': 1, 'name': 'port', 'type': Type.INT, 'required': 1},
-    {'id': 2, 'name': 'subnet', 'type': Type.IP, 'required': 0},
-    {'id': 3, 'name': 'gateway', 'type': Type.IP, 'required': 0},
-    {'id': 4, 'name': 'dns', 'type': Type.IP, 'required': 0},
-    {'id': 5, 'name': 'ssh-key', 'type': Type.STR, 'required': 1},
-    {'id': 6, 'name': 'db-name', 'type': Type.STR, 'required': 1},
-
+    {'id': 1, 'name': 'port', 'type': PropField.PropType.INT, 'required': 1},
+    {'id': 2, 'name': 'subnet', 'type': PropField.PropType.IP, 'required': 0},
+    {'id': 3, 'name': 'gateway', 'type': PropField.PropType.IP, 'required': 0},
+    {'id': 4, 'name': 'dns', 'type': PropField.PropType.IP, 'required': 0},
+    {'id': 5, 'name': 'ssh-key', 'type': PropField.PropType.STR, 'required': 1},
+    {'id': 6, 'name': 'db-name', 'type': PropField.PropType.STR, 'required': 1},
 ]
 
 account_type_data = [
-    {'name': 'app', 'category': Category.APP, 'base_type': None, 'protocol': 'HTTPS', 'prop_fields': []},
-    {'name': 'mysql', 'category': Category.DATABASE, 'base_type': None, 'protocol': 'TCP/IP', 'prop_fields': [1,6]},
-    {'name': 'unix_ssh', 'category': Category.OS, 'base_type': None, 'protocol': 'SSH', 'prop_fields': [1]},
-    {'name': 'unix_ssh_key', 'category': Category.OS, 'base_type': None, 'protocol': 'SSH', 'prop_fields': [1,5]},
-    {'name': 'network_device', 'category': Category.NETWORK_DEVICE, 'base_type': None, 'protocol': 'SSH', 'prop_fields': [2,3,4]},
-    {'name': 'windows_rdp', 'category': Category.OS, 'base_type': None, 'protocol': 'RDP', 'prop_fields': [1]},
+    {'name': 'app', 'category': AccountType.Category.APP, 'base_type': None, 'protocol': 'HTTPS', 'prop_fields': []},
+    {'name': 'mysql', 'category': AccountType.Category.DATABASE, 'base_type': None, 'protocol': 'TCP/IP', 'prop_fields': [1,6]},
+    {'name': 'unix_ssh', 'category': AccountType.Category.OS, 'base_type': None, 'protocol': 'SSH', 'prop_fields': [1]},
+    {'name': 'unix_ssh_key', 'category': AccountType.Category.OS, 'base_type': None, 'protocol': 'SSH', 'prop_fields': [1,5]},
+    {'name': 'network_device', 'category': AccountType.Category.NETWORK_DEVICE, 'base_type': None, 'protocol': 'SSH', 'prop_fields': [2,3,4]},
+    {'name': 'windows_rdp', 'category': AccountType.Category.OS, 'base_type': None, 'protocol': 'RDP', 'prop_fields': [1]},
 ]
 
 

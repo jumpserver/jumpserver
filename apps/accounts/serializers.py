@@ -1,11 +1,8 @@
 
-from accounts.backend import get_account_storage
 from django.db import transaction
 from rest_framework import serializers
 
-from accounts.models import Account, AccountType, PropField
-
-storage = get_account_storage()
+from .models import Account, AccountType, PropField
 
 
 class AccountSerializer(serializers.ModelSerializer):

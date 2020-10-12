@@ -24,7 +24,7 @@ class Choice(str):
 
 
 class ChoiceSetType(type):
-    def __new__(cls, name, bases, attrs):
+    def __new__(mcs, name, bases, attrs):
         _choices = []
         collected = set()
         new_attrs = {}
@@ -43,7 +43,7 @@ class ChoiceSetType(type):
                         collected.add(c)
         new_attrs['_choices'] = _choices
         new_attrs['_choices_dict'] = {c: c.label for c in _choices}
-        return type.__new__(cls, name, bases, new_attrs)
+        return type.__new__(mcs, name, bases, new_attrs)
 
     def __contains__(self, item):
         return self._choices_dict.__contains__(item)

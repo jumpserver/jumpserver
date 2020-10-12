@@ -1,17 +1,15 @@
 import jsonfield
 
-from accounts.backend import get_account_storage
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import get_logger
 from common.db import models
 from orgs.mixins.models import OrgModelMixin
+from ..backends import storage
 
 __all__ = ['Account']
 
 logger = get_logger(__file__)
-
-storage = get_account_storage()
 
 
 class SecretType(object):
@@ -65,8 +63,8 @@ class Account(models.JMSModel, OrgModelMixin):
 
     def save(self, **kwargs):
         self.secret = ''
-        super(Account, self).save(**kwargs)
+        super().save(**kwargs)
 
     def delete(self, using=None, keep_parents=False):
         storage.delete_secret(self)
-        super(Account, self).delete(using=None, keep_parents=False)
+        super().delete(using=None, keep_parents=False)
