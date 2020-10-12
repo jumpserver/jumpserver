@@ -9,7 +9,7 @@ from rest_framework.settings import api_settings
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SkipField, empty
 __all__ = ['BulkSerializerMixin', 'BulkListSerializerMixin', 'CommonSerializerMixin',
-           'CommonBulkSerializerMixin', 'ActionSerializerMixin'
+           'CommonBulkSerializerMixin',
            ]
 
 

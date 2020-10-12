@@ -19,11 +19,11 @@ class PropField(models.Model):
         DATETIME = _('Datetime')
 
         TYPE_TO_SERIALIZER_MAP = {
-            STR: serializers.CharField,
-            INT: serializers.IntegerField,
-            LIST: serializers.ListField,
-            IP: serializers.IPAddressField,
-            DATETIME: serializers.DateTimeField,
+            STR[0]: serializers.CharField,
+            INT[0]: serializers.IntegerField,
+            LIST[0]: serializers.ListField,
+            IP[0]: serializers.IPAddressField,
+            DATETIME[0]: serializers.DateTimeField,
         }
 
     name = models.CharField(max_length=128, verbose_name=_('Name'))
@@ -73,6 +73,8 @@ class AccountType(JMSModel):
 
     def to_serializer_cls(self):
         fields = self.prop_fields.all()
+        if self.base_type:
+            fields = (self.base_type.prop_fields.all() | fields).distinct()
         serializer_fields = {f.name: f.to_serializer_field() for f in fields}
         name = 'AccountTypeSerializer{}'.format(self.name.title())
         return type(name, (serializers.Serializer,), serializer_fields)

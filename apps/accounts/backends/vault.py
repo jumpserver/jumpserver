@@ -10,7 +10,9 @@ logger = get_logger(__file__)
 
 class VaultBackend(Backend):
     # TODO: Is there need to write error log in all functions when vault server error?
-    def __init__(self, url='', token='', verify=False, **kwargs):
+    def __init__(self, url='', token='', key='', engine='', verify=False, **kwargs):
+        self.key = key
+        self.engine = engine
         self.client = hvac.Client(url=url, token=token, verify=verify)
         if not self.client.is_authenticated():
             error_msg = 'Unable to authenticate to the Vault service'

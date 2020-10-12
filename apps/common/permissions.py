@@ -4,6 +4,7 @@ import time
 from copy import deepcopy
 
 from django.contrib.auth import get_permission_codename
+from django.shortcuts import get_object_or_404
 from rest_framework import exceptions
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.conf import settings
@@ -202,28 +203,34 @@ class RBACPermission(permissions.DjangoModelPermissions):
         'update': ['change'],
         'partial_update': ['change'],
         'destroy': ['delete'],
+        'metadata': [],  # for OPTIONS method
     }
 
     @staticmethod
-    def get_perm_code(perm, model_cls):
+    def get_perm_code(perm_action, model_cls):
         kwargs = {
             'app_label': model_cls._meta.app_label,
             'model_name': model_cls._meta.model_name
         }
-        return f'%(app_label)s.{perm}_%(model_name)s' % kwargs
+        return f'%(app_label)s.{perm_action}_%(model_name)s' % kwargs
 
-    def get_action_required_permissions(self, action, view, model_cls):
+    def get_action_required_permissions(self, view, model_cls):
         """
-        Given a model and an HTTP method, return the list of permission
+        Given a model and an action, return the list of permission
         codes that the user is required to have.
         """
         extra_action_perms_map = getattr(view, 'extra_action_perms_map', {})
         perms_map = deepcopy(self.perms_map)
         perms_map.update(extra_action_perms_map)
 
-        if action not in self.perms_map:
-            raise exceptions.MethodNotAllowed(action)
-        return [self.get_perm_code(perm, model_cls) for perm in self.perms_map[action]]
+        if view.action not in self.perms_map:
+            raise exceptions.MethodNotAllowed(view.action)
+
+        perms = []
+        for perm_actions in self.perms_map[view.action]:
+            for perm_action in perm_actions:
+                perms.append(self.get_perm_code(perm_action, model_cls))
+        return perms
 
     def has_permission(self, request, view):
         if getattr(view, '_ignore_model_permissions', False):
@@ -233,7 +240,7 @@ class RBACPermission(permissions.DjangoModelPermissions):
             return False
 
         queryset = self._queryset(view)
-        perms = self.get_action_required_permissions(request.action, view, queryset.model)
+        perms = self.get_action_required_permissions(view, queryset.model)
         return request.user.has_perms(perms)
 
 

@@ -11,11 +11,11 @@ class Backend(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def create_secret(self, account):
+    def create_secret(self, account, data):
         pass
 
     @abstractmethod
-    def update_secret(self, account):
+    def update_secret(self, account, data):
         pass
 
     @abstractmethod

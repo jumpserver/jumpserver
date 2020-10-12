@@ -4,7 +4,7 @@ from ..const import CONFIG, DYNAMIC
 
 # Account's secret storage
 ACCOUNT_STORAGE_BACKEND = {
-    'ENGINE': 'accounts.backend.VaultBackend',
+    'ENGINE': 'accounts.backends.VaultBackend',
     'CONFIG': {
         'url': 'http://localhost:8200',
         'token': 's.gBsoQtLT1VdZ62BTPQNGkebP',

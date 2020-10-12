@@ -83,14 +83,14 @@ class PropFieldSerializer(serializers.ModelSerializer):
 
 
 class AccountTypeSerializer(serializers.ModelSerializer):
-    new_prop_fields = PropFieldSerializer(many=True, required=False, write_only=True)
+    additional_prop_fields = PropFieldSerializer(many=True, required=False, write_only=True)
     prop_fields_info = serializers.SerializerMethodField()
 
     class Meta:
         model = AccountType
         fields = (
             'id', 'name', 'category', 'base_type', 'protocol', 'prop_fields',
-            'prop_fields_info', 'new_prop_fields', 'created_by', 'date_created', 'date_updated',
+            'prop_fields_info', 'additional_prop_fields', 'created_by', 'date_created', 'date_updated',
         )
         read_only_fields = ('id', 'created_by')
         extra_kwargs = {'prop_fields': {'allow_empty': True}}
@@ -102,10 +102,10 @@ class AccountTypeSerializer(serializers.ModelSerializer):
         return serializer.data
 
     def save(self, **kwargs):
-        new_prop_fields = self.validated_data.pop('new_prop_fields', [])
+        additional_prop_fields = self.validated_data.pop('additional_prop_fields', [])
         with transaction.atomic():
             instance = super(AccountTypeSerializer, self).save(**kwargs)
-            for field in new_prop_fields:
+            for field in additional_prop_fields:
                 field_obj = PropField.objects.create(**field)
                 instance.prop_fields.add(field_obj)
         return instance
