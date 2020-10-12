@@ -204,6 +204,14 @@ class RBACPermission(permissions.DjangoModelPermissions):
         'destroy': ['delete'],
     }
 
+    @staticmethod
+    def get_perm_code(perm, model_cls):
+        kwargs = {
+            'app_label': model_cls._meta.app_label,
+            'model_name': model_cls._meta.model_name
+        }
+        return f'%(app_label)s.{perm}_%(model_name)s' % kwargs
+
     def get_action_required_permissions(self, action, view, model_cls):
         """
         Given a model and an HTTP method, return the list of permission
@@ -213,16 +221,9 @@ class RBACPermission(permissions.DjangoModelPermissions):
         perms_map = deepcopy(self.perms_map)
         perms_map.update(extra_action_perms_map)
 
-        kwargs = {
-            'app_label': model_cls._meta.app_label,
-            'model_name': model_cls._meta.model_name
-        }
-
         if action not in self.perms_map:
             raise exceptions.MethodNotAllowed(action)
-
-        format_perm = lambda perm: f'%(app_label)s.{perm}_%(model_name)s' % kwargs
-        return [format_perm(perm) for perm in self.perms_map[action]]
+        return [self.get_perm_code(perm, model_cls) for perm in self.perms_map[action]]
 
     def has_permission(self, request, view):
         if getattr(view, '_ignore_model_permissions', False):
