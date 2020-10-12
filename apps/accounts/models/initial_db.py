@@ -3,12 +3,12 @@ from accounts.models import AccountType, PropField
 from django.db import transaction
 
 prop_field_data = [
-    {'id': 1, 'name': 'port', 'type': PropField.PropType.INT, 'required': 1},
-    {'id': 2, 'name': 'subnet', 'type': PropField.PropType.IP, 'required': 0},
-    {'id': 3, 'name': 'gateway', 'type': PropField.PropType.IP, 'required': 0},
-    {'id': 4, 'name': 'dns', 'type': PropField.PropType.IP, 'required': 0},
-    {'id': 5, 'name': 'ssh-key', 'type': PropField.PropType.STR, 'required': 1},
-    {'id': 6, 'name': 'db-name', 'type': PropField.PropType.STR, 'required': 1},
+    {'id': 1, 'name': 'port', 'type': PropField.TypeChoices.INT, 'required': 1},
+    {'id': 2, 'name': 'subnet', 'type': PropField.TypeChoices.IP, 'required': 0},
+    {'id': 3, 'name': 'gateway', 'type': PropField.TypeChoices.IP, 'required': 0},
+    {'id': 4, 'name': 'dns', 'type': PropField.TypeChoices.IP, 'required': 0},
+    {'id': 5, 'name': 'ssh-key', 'type': PropField.TypeChoices.STR, 'required': 1},
+    {'id': 6, 'name': 'db-name', 'type': PropField.TypeChoices.STR, 'required': 1},
 ]
 
 account_type_data = [

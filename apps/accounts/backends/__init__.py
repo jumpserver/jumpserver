@@ -12,7 +12,7 @@ def get_account_storage():
 
 class Storage(LazyObject):
     def _setup(self):
-        self._wrapped = get_account_storage()()
+        self._wrapped = get_account_storage()
 
 
 storage = Storage()

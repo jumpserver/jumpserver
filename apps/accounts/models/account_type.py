@@ -11,7 +11,7 @@ __all__ = ['PropField', 'AccountType']
 
 
 class PropField(models.Model):
-    class PropType(ChoiceSet):
+    class TypeChoices(ChoiceSet):
         STR = 'string', _('String')
         INT = 'integer', _('Integer')
         LIST = 'list', _('List')
@@ -27,7 +27,7 @@ class PropField(models.Model):
         }
 
     name = models.CharField(max_length=128, verbose_name=_('Name'))
-    type = models.CharField(max_length=32, choices=PropType.choices, default=PropType.STR, verbose_name=_('Type'))
+    type = models.CharField(max_length=32, choices=TypeChoices.choices, default=TypeChoices.STR, verbose_name=_('Type'))
     default = jsonfield.JSONField()
     choices = jsonfield.JSONField()
     required = models.BooleanField(default=False, verbose_name=_('Required'))
@@ -39,7 +39,7 @@ class PropField(models.Model):
         return self.name
 
     def to_serializer_field(self):
-        field = self.PropType.TYPE_TO_SERIALIZER_MAP.get(self.type)
+        field = self.TypeChoices.TYPE_TO_SERIALIZER_MAP.get(self.type)
         kwargs = {'required': False}
         if self.required:
             kwargs['required'] = True
