@@ -13,13 +13,10 @@ __all__ = ['PermissionViewSet', 'ContentTypeViewSet']
 
 
 class PermissionViewSet(ModelViewSet):
-
     permission_classes = (IsAuthenticated,)
-
     filter_fields = ('name', 'codename')
     search_fields = filter_fields
     ordering_fields = ('name', 'codename')
-
     model = Permission
     queryset = Permission.objects.all()
     serializer_class = PermissionSerializer

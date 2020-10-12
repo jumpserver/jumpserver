@@ -4,10 +4,10 @@ import time
 from copy import deepcopy
 
 from django.contrib.auth import get_permission_codename
-from django.shortcuts import get_object_or_404
-from rest_framework import permissions
+from rest_framework import exceptions
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.conf import settings
+from rest_framework import permissions
 
 from rbac.models import Role
 from orgs.utils import current_org
@@ -194,29 +194,46 @@ class IsObjectOwner(IsValidUser):
                 request.user == getattr(obj, 'user', None))
 
 
-class RBACPermission(IsValidUser):
+class RBACPermission(permissions.DjangoModelPermissions):
     perms_map = {
-        'list': 'view',
-        'retrieve': 'view',
-        'create': 'add',
-        'update': 'change',
-        'partial_update': 'change',
-        'destroy': 'delete',
+        'list': ['view'],
+        'retrieve': ['view'],
+        'create': ['add'],
+        'update': ['change'],
+        'partial_update': ['change'],
+        'destroy': ['delete'],
     }
 
-    def has_permission(self, request, view):
+    def get_action_required_permissions(self, action, view, model_cls):
+        """
+        Given a model and an HTTP method, return the list of permission
+        codes that the user is required to have.
+        """
         extra_action_perms_map = getattr(view, 'extra_action_perms_map', {})
         perms_map = deepcopy(self.perms_map)
         perms_map.update(extra_action_perms_map)
-        action = perms_map.get(view.action)
-        obj = None
-        pk = view.kwargs.get('pk')
-        if pk:
-            obj = get_object_or_404(view.model, pk=pk)
-        view_codename = get_permission_codename(action, view.model._meta)
-        perm = '%s.%s' % (view.model._meta.app_label, view_codename)
-        return super().has_permission(request, view) and \
-            request.user.has_perm(perm, obj=obj)
+
+        kwargs = {
+            'app_label': model_cls._meta.app_label,
+            'model_name': model_cls._meta.model_name
+        }
+
+        if action not in self.perms_map:
+            raise exceptions.MethodNotAllowed(action)
+
+        format_perm = lambda perm: f'%(app_label)s.{perm}_%(model_name)s' % kwargs
+        return [format_perm(perm) for perm in self.perms_map[action]]
+
+    def has_permission(self, request, view):
+        if getattr(view, '_ignore_model_permissions', False):
+            return True
+
+        if not request.user or (not request.user.is_authenticated and self.authenticated_users_only):
+            return False
+
+        queryset = self._queryset(view)
+        perms = self.get_action_required_permissions(request.action, view, queryset.model)
+        return request.user.has_perms(perms)
 
 
 class IsSystemAdminUser(IsValidUser):

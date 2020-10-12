@@ -248,11 +248,3 @@ class CommonSerializerMixin(DynamicFieldsMixin):
 
 class CommonBulkSerializerMixin(BulkSerializerMixin, CommonSerializerMixin):
     pass
-
-
-class ActionSerializerMixin(object):
-    def get_serializer_class(self):
-        try:
-            return self.serializer_action_classes[self.action]
-        except (KeyError, AttributeError):
-            return super(ActionSerializerMixin, self).get_serializer_class()
