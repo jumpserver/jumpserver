@@ -223,11 +223,11 @@ class RBACPermission(permissions.DjangoModelPermissions):
         perms_map = deepcopy(self.perms_map)
         perms_map.update(extra_action_perms_map)
 
-        if view.action not in self.perms_map:
+        if view.action not in perms_map:
             raise exceptions.MethodNotAllowed(view.action)
 
         perms = []
-        for perm_actions in self.perms_map[view.action]:
+        for perm_actions in perms_map[view.action]:
             for perm_action in perm_actions:
                 perms.append(self.get_perm_code(perm_action, model_cls))
         return perms

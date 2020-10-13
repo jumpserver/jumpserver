@@ -15,8 +15,10 @@ prop_field_data = [
     {'id': 4, 'name': 'DNS', 'type': PropField.TypeChoices.IP, 'required': 0},
     {'id': 5, 'name': 'SSH-KEY', 'type': PropField.TypeChoices.STR, 'required': 1},
     {'id': 6, 'name': 'DB-NAME', 'type': PropField.TypeChoices.STR, 'required': 1},
-    {'id': 7, 'name': 'SID', 'type': PropField.TypeChoices.STR, 'required': 1},
-    {'id': 8, 'name': 'SECURE', 'type': PropField.TypeChoices.STR, 'choices': ('TLS', 'NLA'), 'required': 1},
+    {'id': 7, 'name': 'SID', 'type': PropField.TypeChoices.STR, 'required': 0},
+    {'id': 8, 'name': 'SERVICE-NAME', 'type': PropField.TypeChoices.STR, 'required': 0},
+    {'id': 9, 'name': 'TNS-NAME', 'type': PropField.TypeChoices.STR, 'required': 0},
+    {'id': 10, 'name': 'SECURE', 'type': PropField.TypeChoices.STR, 'choices': ('TLS', 'NLA'), 'required': 1},
 
 ]
 
@@ -66,13 +68,13 @@ account_type_data = [
      'category': AccountType.Category.DATABASE,
      'base_type_id': None,
      'protocol': 'TCP/IP',
-     'prop_fields': [1, 7]
+     'prop_fields': [1, 7, 8, 9]
      },
     {'name': 'MariaDB',
      'category': AccountType.Category.DATABASE,
      'base_type_id': '1a91de6836624856888c04c95435cf6f',
      'protocol': 'TCP/IP',
-     'prop_fields': [1, 7]
+     'prop_fields': []
      },
 
     # OS
@@ -91,7 +93,7 @@ account_type_data = [
     {'id': 'ed81d10f895842ab8cd30e02279ead03',
      'name': 'Windows Server',
      'category': AccountType.Category.OS,
-     'base_type_id': 'ed81d10f895842ab8cd30e02279ead03',
+     'base_type_id': None,
      'protocol': 'RDP',
      'prop_fields': []
      },
@@ -99,13 +101,13 @@ account_type_data = [
      'category': AccountType.Category.OS,
      'base_type_id': 'ed81d10f895842ab8cd30e02279ead03',
      'protocol': 'RDP',
-     'prop_fields': [8]
+     'prop_fields': [10]
      },
     {'name': 'Windows Server(NLA)',
      'category': AccountType.Category.OS,
      'base_type_id': 'ed81d10f895842ab8cd30e02279ead03',
      'protocol': 'RDP',
-     'prop_fields': [8]
+     'prop_fields': [10]
      },
     {'name': 'VNC Server',
      'category': AccountType.Category.OS,
@@ -120,7 +122,7 @@ account_type_data = [
      'category': AccountType.Category.NETWORK_DEVICE,
      'base_type_id': None,
      'protocol': 'SSH',
-     'prop_fields': [5]
+     'prop_fields': [1, 5]
      },
     {'name': 'Network Device(Telnet)',
      'category': AccountType.Category.NETWORK_DEVICE,
@@ -132,7 +134,7 @@ account_type_data = [
      'category': AccountType.Category.NETWORK_DEVICE,
      'base_type_id': 'dea0bdf8081a45a7bb655d1fb482b120',
      'protocol': 'SSH',
-     'prop_fields': [1]
+     'prop_fields': []
      },
 
     # CLOUD
@@ -140,6 +142,14 @@ account_type_data = [
      'category': AccountType.Category.CLOUD,
      'base_type_id': None,
      'protocol': 'HTTPS',
+     'prop_fields': []
+     },
+
+    # OTHER
+    {'name': 'GENERIC',
+     'category': AccountType.Category.Other,
+     'base_type_id': None,
+     'protocol': '',
      'prop_fields': []
      },
 ]

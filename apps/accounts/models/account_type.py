@@ -52,7 +52,7 @@ class PropField(models.Model):
 class AccountType(JMSModel):
     class Category(ChoiceSet):
         OS = 'os',  _('Operation System')
-        DATABASE = _('Database')
+        DATABASE = 'database', _('Database')
         NETWORK_DEVICE = 'network_device', _('Network Device')
         APP = 'app', _('Application')
         CLOUD = 'cloud', _('Cloud')
