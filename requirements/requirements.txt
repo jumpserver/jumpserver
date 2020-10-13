@@ -17,7 +17,7 @@ decorator==4.1.2
 Django==2.2.13
 django-auth-ldap==1.7.0
 django-bootstrap3==9.1.0
-django-celery-beat==1.4.0
+django-celery-beat==2.0
 django-filter==2.0.0
 django-formtools==2.1
 django-ranged-response==0.2.0
