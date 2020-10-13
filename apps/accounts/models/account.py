@@ -26,7 +26,7 @@ class Account(models.JMSModel, OrgModelMixin):
     secret = models.TextField(verbose_name=_('Secret'))
     type = models.ForeignKey('accounts.AccountType', on_delete=models.PROTECT, verbose_name=_('Type'))
     extra_props = jsonfield.JSONField()
-    is_active = models.BooleanField(default=True, verbose_name=_('Active'))
+    is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
     comment = models.TextField(default='', verbose_name=_('Comment'))
 
     namespace = models.ForeignKey('namespaces.Namespace', on_delete=models.PROTECT, verbose_name=_('Namespace'))
