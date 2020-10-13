@@ -60,6 +60,7 @@ class SerializeToTreeNodeMixin:
                 'isParent': False,
                 'open': False,
                 'iconSkin': self.get_platform(asset),
+                'chkDisabled': not asset.is_active,
                 'meta': {
                     'type': 'asset',
                     'asset': {
