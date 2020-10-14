@@ -10,6 +10,7 @@ from common.permissions import (
 )
 from .. import serializers
 from ..models import User
+from ..utils import send_reset_password_success_mail
 from .mixins import UserQuerysetMixin
 
 __all__ = [
@@ -85,3 +86,7 @@ class UserPublicKeyApi(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+    def perform_update(self, serializer):
+        super().perform_update(serializer)
+        send_reset_password_success_mail(self.request, self.get_object())
