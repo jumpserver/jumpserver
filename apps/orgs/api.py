@@ -2,14 +2,12 @@
 #
 
 from django.utils.translation import ugettext as _
-from django.db.models import Q
-from rest_framework import status, generics
+from rest_framework import status
 from rest_framework.views import Response
 from rest_framework_bulk import BulkModelViewSet
-from rest_framework.mixins import CreateModelMixin
 
 from common.permissions import IsSuperUserOrAppUser
-from common.drf.api import JMSBulkRelationModelViewSet
+from common.drf.api import JMSBulkRelationModelViewSet, JMSModelViewSet
 from .models import Organization, ROLE
 from .serializers import (
     OrgSerializer, OrgReadSerializer,

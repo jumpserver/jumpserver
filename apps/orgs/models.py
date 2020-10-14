@@ -305,7 +305,7 @@ class OrgMemeberManager(models.Manager):
                        model=User, pk_set=_users2pks(users, admins, auditors), using=self.db)
 
         send(action='pre_add')
-        self.bulk_create(oms_add)
+        self.bulk_create(oms_add, ignore_conflicts=True)
         send(action='post_add')
 
     def _get_remove_add_set(self, new_users, old_users):
