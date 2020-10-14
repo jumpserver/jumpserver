@@ -17,7 +17,7 @@ from common.utils import get_logger
 from orgs.utils import current_org
 from orgs.models import ROLE as ORG_ROLE, OrganizationMember
 from .. import serializers
-from ..serializers import UserSerializer, UserRetrieveSerializer, MiniUserSerializer
+from ..serializers import UserSerializer, UserRetrieveSerializer, MiniUserSerializer, InviteSerializer
 from .mixins import UserQuerysetMixin
 from ..models import User
 from ..signals import post_user_create
@@ -38,7 +38,8 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
     serializer_classes = {
         'default': UserSerializer,
         'retrieve': UserRetrieveSerializer,
-        'suggestion': MiniUserSerializer
+        'suggestion': MiniUserSerializer,
+        'invite': InviteSerializer,
     }
     extra_filter_backends = [OrgRoleUserFilterBackend]
 
@@ -118,7 +119,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
             self.check_object_permissions(self.request, user)
         return super().perform_bulk_update(serializer)
 
-    @action(methods=['get'], detail=False, permission_classes=(IsOrgAdminOrAppUser,))
+    @action(methods=['get'], detail=False, permission_classes=(IsOrgAdmin,))
     def suggestion(self, request):
         queryset = User.objects.exclude(role=User.ROLE.APP)
         queryset = self.filter_queryset(queryset)
@@ -131,6 +132,25 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+    @action(methods=['post'], detail=False, permission_classes=(IsOrgAdmin,))
+    def invite(self, request):
+        data = request.data
+        if not isinstance(data, list):
+            data = [request.data]
+        if not current_org or not current_org.is_real():
+            error = {"error": "Not a valid org"}
+            return Response(error, status=400)
+
+        serializer_cls = self.get_serializer_class()
+        serializer = serializer_cls(data=data, many=True)
+        serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
+        for i in validated_data:
+            i['org_id'] = current_org.org_id()
+        relations = [OrganizationMember(**i) for i in validated_data]
+        OrganizationMember.objects.bulk_create(relations, ignore_conflicts=True)
+        return Response(serializer.data, status=201)
 
 
 class UserChangePasswordApi(UserQuerysetMixin, generics.RetrieveUpdateAPIView):
