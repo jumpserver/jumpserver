@@ -37,12 +37,12 @@ def get_asset_system_users_id_with_actions(asset_perm_queryset: BasePermissionQu
 def get_asset_system_users_id_with_actions_by_user(user: User, asset: Asset):
     queryset = AssetPermission.objects.filter(
         Q(users=user) | Q(user_groups__users=user)
-    )
+    ).valid()
     return get_asset_system_users_id_with_actions(queryset, asset)
 
 
 def get_asset_system_users_id_with_actions_by_group(group: UserGroup, asset: Asset):
     queryset = AssetPermission.objects.filter(
         user_groups=group
-    )
+    ).valid()
     return get_asset_system_users_id_with_actions(queryset, asset)

@@ -9,9 +9,8 @@ from django.db.models.signals import (
 from django.db.models import Q, F
 from django.dispatch import receiver
 
-from common.local import thread_local
 from common.exceptions import M2MReverseNotAllowed
-from common.const.signals import PRE_ADD, POST_ADD, POST_REMOVE, PRE_CLEAR
+from common.const.signals import PRE_ADD, POST_ADD, POST_REMOVE, PRE_CLEAR, PRE_REMOVE
 from common.utils import get_logger
 from common.decorator import on_transaction_commit
 from .models import Asset, SystemUser, Node, compute_parent_key
@@ -321,26 +320,26 @@ def update_nodes_assets_amount(action, instance, reverse, pk_set, **kwargs):
         _update_nodes_asset_amount(node_keys, asset_pk, operator)
 
 
-ASSET_DELETE_SIGNAL_FOR_NODE_TREE_PARAMS = 'asset_delete_signal_for_node_tree_params'
+RELATED_NODE_IDS = '_related_node_ids'
 
 
 @receiver(pre_delete, sender=Asset)
-def on_asset_delete(instance: Asset, **kwargs):
-    node_keys = Node.objects.filter(
+def on_asset_delete(instance: Asset, using, **kwargs):
+    node_ids = set(Node.objects.filter(
         assets=instance
-    ).distinct().values_list('key', flat=True)
-
-    params = {
-        'node_keys': set(node_keys),
-        'asset_pk': instance.id,
-        'operator': sub
-    }
-
-    setattr(thread_local, ASSET_DELETE_SIGNAL_FOR_NODE_TREE_PARAMS, params)
+    ).distinct().values_list('id', flat=True))
+    setattr(instance, RELATED_NODE_IDS, node_ids)
+    m2m_changed.send(
+        sender=Asset.nodes.through, instance=instance, reverse=False,
+        model=Node, pk_set=node_ids, using=using, action=PRE_REMOVE
+    )
 
 
 @receiver(post_delete, sender=Asset)
-def on_asset_post_delete(instance: Asset, **kwargs):
-    params = getattr(thread_local, ASSET_DELETE_SIGNAL_FOR_NODE_TREE_PARAMS, None)
-    if params and params.get('asset_pk') == instance.id:
-        _update_nodes_asset_amount(**params)
+def on_asset_post_delete(instance: Asset, using, **kwargs):
+    node_ids = getattr(instance, RELATED_NODE_IDS, None)
+    if node_ids:
+        m2m_changed.send(
+            sender=Asset.nodes.through, instance=instance, reverse=False,
+            model=Node, pk_set=node_ids, using=using, action=POST_REMOVE
+        )
