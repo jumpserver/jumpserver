@@ -22,7 +22,9 @@ class PermissionViewSet(ModelViewSet):
     serializer_class = PermissionSerializer
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.queryset)
+        queryset = self.filter_queryset(self.get_queryset())
+        if request.query_params.get('user_perms'):
+            queryset = queryset.filter(role__rolebinding__user=request.user)
         result = utils.group_permissions(queryset)
         return Response(result)
 
@@ -39,6 +41,6 @@ class ContentTypeViewSet(mixins.ListModelMixin,
     serializer_class = ContentTypeSerializer
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.queryset)
+        queryset = self.filter_queryset(self.get_queryset())
         result = utils.group_content_types(queryset)
         return Response(result)

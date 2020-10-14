@@ -6,10 +6,10 @@ from ..const import CONFIG, DYNAMIC
 ACCOUNT_STORAGE_BACKEND = {
     'ENGINE': 'accounts.backends.VaultBackend',
     'CONFIG': {
-        'url': 'http://localhost:8200',
-        'token': 's.gBsoQtLT1VdZ62BTPQNGkebP',
-        'engine': 'jumpserver',
-        'key': 'secret'
+        'url': CONFIG.VAULT_URL,
+        'token': CONFIG.VAULT_TOKEN,
+        'engine': CONFIG.VAULT_ENGINE,
+        'key': CONFIG.VAULT_KEY,
     }
 }
 

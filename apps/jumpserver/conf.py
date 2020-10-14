@@ -154,6 +154,12 @@ class Config(dict):
         'LOGIN_URL': reverse_lazy('authentication:login'),
 
         # Custom Config
+        # VAULT
+        'VAULT_URL': 'http://localhost:8200',
+        'VAULT_TOKEN': 's.gBsoQtLT1VdZ62BTPQNGkebP',
+        'VAULT_ENGINE': 'jumpserver',
+        'VAULT_KEY': 'secret',
+
         # Auth LDAP settings
         'AUTH_LDAP': False,
         'AUTH_LDAP_SERVER_URI': 'ldap://localhost:389',

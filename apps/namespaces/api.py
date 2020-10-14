@@ -21,6 +21,6 @@ class NamespaceViewSet(ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         if user.is_build_in:
-            return self.filter_queryset(self.queryset)
+            return self.filter_queryset(self.get_queryset())
         namespace_ids = RoleBinding.objects.filter(user=user).values_list('namespaces').distinct()
-        return self.filter_queryset(self.queryset).filter(id__in=namespace_ids)
+        return self.filter_queryset(self.get_queryset()).filter(id__in=namespace_ids)

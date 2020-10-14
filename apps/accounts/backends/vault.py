@@ -19,6 +19,21 @@ class VaultBackend(Backend):
             logger.error(error_msg)
             raise hvac.exceptions.Unauthorized(error_msg)
 
+        if not self.check_engine_exist(self.engine):
+            self.create_engine(self.engine)
+
+    def check_engine_exist(self, engine):
+        engine_path = engine + '/'
+        api_path = '/v1/sys/mounts/'
+        return engine_path in self.client.adapter.get(url=api_path)
+
+    def create_engine(self, engine, version=2):
+        params = {"type": "kv",
+                  "options": {"version": version}
+                  }
+        api_path = hvac.utils.format_url('/v1/sys/mounts/{mount_point}', mount_point=engine)
+        return self.client.adapter.post(url=api_path, json=params)
+
     @classmethod
     def get_secret_path(cls, account):
         org = str(account.org_id) or 'default_org'
