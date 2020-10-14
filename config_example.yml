@@ -1,5 +1,5 @@
 # SECURITY WARNING: keep the secret key used in production secret!
-# 加密秘钥 生产环境中请修改为随机字符串，请勿外泄, 可使用命令生成 
+# 加密秘钥 生产环境中请修改为随机字符串，请勿外泄, 可使用命令生成
 # $ cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 49;echo
 SECRET_KEY:
 
@@ -35,7 +35,7 @@ DB_ENGINE: mysql
 DB_HOST: 127.0.0.1
 DB_PORT: 3306
 DB_USER: jumpserver
-DB_PASSWORD: 
+DB_PASSWORD:
 DB_NAME: jumpserver
 
 # When Django start it will bind this host and port
@@ -135,3 +135,9 @@ REDIS_PORT: 6379
 #
 # Windows 登录跳过手动输入密码
 # WINDOWS_SKIP_ALL_MANUAL_PASSWORD: False
+
+# VAULT
+ VAULT_URL: http://localhost:8200
+ VAULT_TOKEN: s.gBsoQtLT1VdZ62BTPQNGkebP
+ VAULT_ENGINE: jumpserver
+ VAULT_KEY: secret
