@@ -43,6 +43,7 @@ class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
         all_nodes = get_user_granted_nodes_list_via_mapping_node(user)
         all_assets = get_user_granted_all_assets(user)
         all_assets = all_assets.annotate(parent_key=F('nodes__key'))
+        all_assets = all_assets.prefetch_related('platform')
 
         data = [
             *self.serialize_nodes(all_nodes, with_asset_amount=True),
