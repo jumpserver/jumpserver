@@ -1,7 +1,9 @@
 # ~*~ coding: utf-8 ~*~
 
-from rest_framework.views import APIView, Response
 from django.views.generic.detail import SingleObjectMixin
+from django.utils.translation import ugettext as _
+from rest_framework.views import APIView, Response
+from rest_framework.serializers import ValidationError
 
 from common.utils import get_logger
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
@@ -42,6 +44,10 @@ class GatewayTestConnectionApi(SingleObjectMixin, APIView):
     def post(self, request, *args, **kwargs):
         self.object = self.get_object(Gateway.objects.all())
         local_port = self.request.data.get('port') or self.object.port
+        try:
+            local_port = int(local_port)
+        except ValueError:
+            raise ValidationError({'port': _('Number required')})
         ok, e = self.object.test_connective(local_port=local_port)
         if ok:
             return Response("ok")
