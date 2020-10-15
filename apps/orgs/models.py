@@ -230,8 +230,14 @@ def _none2list(*args):
     return ([] if v is None else v for v in args)
 
 
-def _users2pks(users, admins, auditors):
-    return [user.pk for user in chain(users, admins, auditors) if hasattr(user, 'pk')]
+def _users2pks_if_need(users, admins, auditors):
+    pks = []
+    for user in chain(users, admins, auditors):
+        if hasattr(user, 'pk'):
+            pks.append(user.pk)
+        else:
+            pks.append(user)
+    return pks
 
 
 class UserRoleMapper(dict):
@@ -271,7 +277,7 @@ class OrgMemeberManager(models.Manager):
         users, admins, auditors = _none2list(users, admins, auditors)
 
         send = partial(signals.m2m_changed.send, sender=self.model, instance=org, reverse=False,
-                       model=User, pk_set=_users2pks(users, admins, auditors), using=self.db)
+                       model=User, pk_set=_users2pks_if_need(users, admins, auditors), using=self.db)
 
         send(action="pre_remove")
         self.filter(org_id=org.id).filter(
@@ -302,7 +308,7 @@ class OrgMemeberManager(models.Manager):
                 oms_add.append(self.model(org_id=org.id, user_id=_user, role=_role))
 
         send = partial(signals.m2m_changed.send, sender=self.model, instance=org, reverse=False,
-                       model=User, pk_set=_users2pks(users, admins, auditors), using=self.db)
+                       model=User, pk_set=_users2pks_if_need(users, admins, auditors), using=self.db)
 
         send(action='pre_add')
         self.bulk_create(oms_add, ignore_conflicts=True)

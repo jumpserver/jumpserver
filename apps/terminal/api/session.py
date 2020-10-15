@@ -155,7 +155,6 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
         return data
 
     def is_need_async(self):
-        return False
         if self.action != 'retrieve':
             return False
         return True
