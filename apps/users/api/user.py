@@ -52,6 +52,19 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         for user in users:
             post_user_create.send(self.__class__, user=user)
 
+    @staticmethod
+    def set_users_to_org(users, org_roles, update=False):
+        # 只有真实存在的组织才真正关联用户
+        if not current_org or not current_org.is_real():
+            return
+        for user, roles in zip(users, org_roles):
+            if update and roles is None:
+                continue
+            if not roles:
+                # 当前组织创建的用户，至少是该组织的`User`
+                roles = [ORG_ROLE.USER]
+            OrganizationMember.objects.set_user_roles(current_org, user, roles)
+
     def perform_create(self, serializer):
         validated_data = serializer.validated_data
 
@@ -104,11 +117,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         users = serializer.save()
         if isinstance(users, User):
             users = [users]
-        if current_org and current_org.is_real():
-            for user, roles in zip(users, org_roles):
-                if roles is not None:
-                    # roles 是 `Node` 表明不需要更新
-                    OrganizationMember.objects.set_user_roles(current_org, user, roles)
+        self.set_users_to_org(users, org_roles, update=True)
 
     def perform_bulk_update(self, serializer):
         # TODO: 需要测试
