@@ -227,7 +227,7 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     labels = models.ManyToManyField('assets.Label', blank=True, related_name='assets', verbose_name=_("Labels"))
     created_by = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Created by'))
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
-    comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
+    comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
     objects = AssetManager.from_queryset(AssetQuerySet)()
     org_objects = AssetOrgManager.from_queryset(AssetQuerySet)()
