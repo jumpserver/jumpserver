@@ -16,7 +16,7 @@ class ApplicationSerializer(BulkOrgResourceModelSerializer):
         model = models.Application
         fields = [
             'id', 'name', 'category', 'type', 'get_type_display', 'attrs',
-            'created_by', 'date_created', 'date_updated', 'comment'
+            'domain', 'created_by', 'date_created', 'date_updated', 'comment'
         ]
         read_only_fields = [
             'created_by', 'date_created', 'date_updated', 'get_type_display',
@@ -26,15 +26,15 @@ class ApplicationSerializer(BulkOrgResourceModelSerializer):
         super().__init__(*args, **kwargs)
         app_type = ''
         attrs_data = {}
-        if self.instance:
-            app_type = self.instance.type
-            attrs_data = self.instance.attrs
         request = self.context.get('request')
         if request:
             app_type = request.query_params.get('type')
         if hasattr(self, 'initial_data'):
             app_type = self.initial_data.get('type')
             attrs_data = self.initial_data.get('attrs')
+        if self.instance:
+            app_type = self.instance.type
+            attrs_data = self.instance.attrs
         if not app_type:
             return
         attrs_cls = models.Category.get_type_serializer_cls(app_type)
