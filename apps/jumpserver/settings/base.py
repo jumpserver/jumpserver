@@ -241,6 +241,9 @@ CACHES = {
             'host': CONFIG.REDIS_HOST,
             'port': CONFIG.REDIS_PORT,
             'db': CONFIG.REDIS_DB_CACHE,
+        },
+        'OPTIONS': {
+            "REDIS_CLIENT_KWARGS": {"health_check_interval": 30}
         }
     }
 }
