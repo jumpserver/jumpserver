@@ -1,20 +1,21 @@
 
 from django.db import transaction
+from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
 from .models import Account, AccountType, PropField
 
 
 class AccountSerializer(serializers.ModelSerializer):
-    type_display = serializers.CharField(source='type.name', read_only=True)
-    namespace_display = serializers.CharField(source='namespace.name', read_only=True)
+    type_display = serializers.CharField(source='type.name', read_only=True, label=_('AccountType'))
+    namespace_display = serializers.CharField(source='namespace.name', read_only=True, label=_('Namespace'))
 
     class Meta:
         model = Account
         fields = (
             'id', 'name', 'username', 'address', 'secret', 'secret_type',
             'type', 'type_display', 'extra_props', 'namespace', 'namespace_display',
-            'comment', 'created_by', 'date_created', 'date_updated',
+            'is_active', 'comment', 'created_by', 'date_created', 'date_updated',
         )
         read_only_fields = ('id', 'type_display', 'namespace_display', 'created_by')
         extra_kwargs = {
@@ -63,7 +64,7 @@ class AccountWithSecretSerializer(AccountSerializer):
         fields = (
             'id', 'name', 'username', 'address', 'secret', 'secret_type',
             'type', 'type_display', 'extra_props', 'namespace', 'namespace_display',
-            'comment', 'created_by', 'date_created', 'date_updated',
+            'is_active', 'comment', 'created_by', 'date_created', 'date_updated',
         )
 
     def to_representation(self, instance):
@@ -79,18 +80,20 @@ class PropFieldSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'name', 'type', 'default', 'choices', 'required',
         )
-        read_only_fields = ('id',)
+        read_only_fields = fields
 
 
 class AccountTypeSerializer(serializers.ModelSerializer):
-    additional_prop_fields = PropFieldSerializer(many=True, required=False, write_only=True)
+    custom_fields = PropFieldSerializer(many=True, required=False,
+                                        write_only=True, label=_('Custom fields'))
     prop_fields_info = serializers.SerializerMethodField()
 
     class Meta:
         model = AccountType
         fields = (
-            'id', 'name', 'category', 'base_type', 'protocol', 'prop_fields',
-            'prop_fields_info', 'additional_prop_fields', 'created_by', 'date_created', 'date_updated',
+            'id', 'name', 'category', 'base_type', 'protocol',
+            'prop_fields', 'prop_fields_info', 'custom_fields',
+            'created_by', 'date_created', 'date_updated',
         )
         read_only_fields = ('id', 'created_by')
         extra_kwargs = {'prop_fields': {'allow_empty': True}}
@@ -98,14 +101,16 @@ class AccountTypeSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_prop_fields_info(obj):
         prop_fields = obj.prop_fields.all()
+        if obj.base_type:
+            prop_fields = (obj.base_type.prop_fields.all() | prop_fields).distinct()
         serializer = PropFieldSerializer(prop_fields, many=True)
         return serializer.data
 
     def save(self, **kwargs):
-        additional_prop_fields = self.validated_data.pop('additional_prop_fields', [])
+        custom_fields = self.validated_data.pop('custom_fields', [])
         with transaction.atomic():
             instance = super(AccountTypeSerializer, self).save(**kwargs)
-            for field in additional_prop_fields:
+            for field in custom_fields:
                 field_obj = PropField.objects.create(**field)
                 instance.prop_fields.add(field_obj)
         return instance

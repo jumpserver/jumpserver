@@ -1,12 +1,17 @@
-from django.utils.translation import ugettext as _
+from rest_framework import mixins
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
+from rbac.models import RoleBinding
 from common.permissions import RBACPermission
 from common.drf.api import JMSModelViewSet
-from .models import Account, AccountType
-from .serializers import AccountSerializer, AccountTypeSerializer, AccountWithSecretSerializer
+from .models import Account, AccountType, PropField
+from .serializers import AccountSerializer, \
+                         AccountTypeSerializer, \
+                         AccountWithSecretSerializer, \
+                         PropFieldSerializer
 
 
 class AccountViewSet(JMSModelViewSet):
@@ -27,13 +32,12 @@ class AccountViewSet(JMSModelViewSet):
         'connect': AccountWithSecretSerializer,
     }
 
-    def list(self, request, *args, **kwargs):
-        namespace_id = request.query_params.get('namespace_id')
-        if not namespace_id:
-            return Response({"msg": _("namespace's id is required")}, status=400)
-        self.queryset = self.filter_queryset(self.get_queryset())\
-            .filter(namespace_id=namespace_id)
-        return super().list(request, *args, **kwargs)
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_build_in:
+            return self.filter_queryset(self.queryset)
+        namespace_ids = RoleBinding.objects.filter(user=user).values_list('namespaces').distinct()
+        return self.filter_queryset(self.queryset).filter(namespace_id__in=namespace_ids)
 
     @action(methods=['get'], detail=True,  url_path='gain-secret')
     def gain_secret(self, request, pk=None):
@@ -57,3 +61,12 @@ class AccountTypeViewSet(ModelViewSet):
     model = AccountType
     queryset = AccountType.objects.all()
     serializer_class = AccountTypeSerializer
+
+
+class PropFieldViewSet(mixins.ListModelMixin,
+                       GenericViewSet):
+    permission_classes = (IsAuthenticated,)
+
+    model = PropField
+    queryset = PropField.objects.all()
+    serializer_class = PropFieldSerializer

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-13 11:26+0800\n"
+"POT-Creation-Date: 2020-10-16 17:59+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -16,10 +16,6 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#: accounts/api.py:33
-msgid "namespace's id is required"
-msgstr "需要传入命名空间的id值"
 
 #: accounts/apps.py:7
 msgid "Account Management"
@@ -147,7 +143,8 @@ msgstr "激活"
 msgid "Comment"
 msgstr "备注"
 
-#: accounts/models/account.py:32 namespaces/models.py:12 rbac/models.py:10
+#: accounts/models/account.py:32 accounts/serializers.py:11
+#: namespaces/models.py:12 rbac/models.py:10
 msgid "Namespace"
 msgstr "命名空间"
 
@@ -233,11 +230,19 @@ msgstr "协议"
 
 #: accounts/models/account_type.py:66
 msgid "Properties Definition"
-msgstr "额外字段"
+msgstr "包含字段"
 
 #: accounts/models/account_type.py:69
 msgid "Account Type"
 msgstr "账户类型"
+
+#: accounts/serializers.py:10
+msgid "AccountType"
+msgstr "账户类型"
+
+#: accounts/serializers.py:87
+msgid "Custom fields"
+msgstr "自定义字段"
 
 #: applications/const.py:53
 msgid "Custom"
@@ -1620,13 +1625,13 @@ msgstr ""
 "div><div>如果你看到了这个页面，证明你访问的不是nginx监听的端口，祝你好运</"
 "div>"
 
+#: namespaces/api.py:35
+msgid "Please delete the sub items first"
+msgstr "删除失败：请先删除子项目"
+
 #: namespaces/apps.py:7
 msgid "Namespace Management"
 msgstr "命名空间管理"
-
-#: namespaces/serializers.py:19
-msgid "Duplicate name"
-msgstr "名字重复"
 
 #: ops/api/celery.py:57
 msgid "Waiting task start"
@@ -4304,6 +4309,12 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Duplicate name"
+#~ msgstr "名字重复"
+
+#~ msgid "namespace's id is required"
+#~ msgstr "需要传入命名空间的id值"
 
 #, fuzzy
 #~| msgid "Is active"

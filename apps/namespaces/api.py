@@ -1,3 +1,7 @@
+from django.utils.translation import ugettext as _
+
+from rest_framework import status
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from common.permissions import RBACPermission
@@ -21,6 +25,13 @@ class NamespaceViewSet(ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         if user.is_build_in:
-            return self.filter_queryset(self.get_queryset())
+            return self.filter_queryset(self.queryset)
         namespace_ids = RoleBinding.objects.filter(user=user).values_list('namespaces').distinct()
-        return self.filter_queryset(self.get_queryset()).filter(id__in=namespace_ids)
+        return self.filter_queryset(self.queryset).filter(id__in=namespace_ids)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.account_set.all().exists():
+            return Response({'msg': _('Please delete the sub items first')},
+                            status=status.HTTP_400_BAD_REQUEST)
+        return super(NamespaceViewSet, self).destroy(request, *args, **kwargs)

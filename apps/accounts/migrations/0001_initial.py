@@ -13,11 +13,11 @@ prop_field_data = [
     {'id': 2, 'name': 'SUBNET', 'type': PropField.TypeChoices.IP, 'required': 0},
     {'id': 3, 'name': 'GATEWAY', 'type': PropField.TypeChoices.IP, 'required': 0},
     {'id': 4, 'name': 'DNS', 'type': PropField.TypeChoices.IP, 'required': 0},
-    {'id': 5, 'name': 'SSH-KEY', 'type': PropField.TypeChoices.STR, 'required': 1},
-    {'id': 6, 'name': 'DB-NAME', 'type': PropField.TypeChoices.STR, 'required': 1},
+    {'id': 5, 'name': 'SSH_KEY', 'type': PropField.TypeChoices.STR, 'required': 1},
+    {'id': 6, 'name': 'DB_NAME', 'type': PropField.TypeChoices.STR, 'required': 1},
     {'id': 7, 'name': 'SID', 'type': PropField.TypeChoices.STR, 'required': 0},
-    {'id': 8, 'name': 'SERVICE-NAME', 'type': PropField.TypeChoices.STR, 'required': 0},
-    {'id': 9, 'name': 'TNS-NAME', 'type': PropField.TypeChoices.STR, 'required': 0},
+    {'id': 8, 'name': 'SERVICE_NAME', 'type': PropField.TypeChoices.STR, 'required': 0},
+    {'id': 9, 'name': 'TNS_NAME', 'type': PropField.TypeChoices.STR, 'required': 0},
     {'id': 10, 'name': 'SECURE', 'type': PropField.TypeChoices.STR, 'choices': ('TLS', 'NLA'), 'required': 1},
 
 ]
@@ -146,7 +146,7 @@ account_type_data = [
      },
 
     # OTHER
-    {'name': 'GENERIC',
+    {'name': 'Generic',
      'category': AccountType.Category.Other,
      'base_type_id': None,
      'protocol': '',
