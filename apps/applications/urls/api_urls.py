@@ -10,6 +10,7 @@ from .. import api
 app_name = 'applications'
 
 router = BulkRouter()
+router.register(r'applications', api.ApplicationViewSet, 'application')
 router.register(r'remote-apps', api.RemoteAppViewSet, 'remote-app')
 router.register(r'database-apps', api.DatabaseAppViewSet, 'database-app')
 router.register(r'k8s-apps', api.K8sAppViewSet, 'k8s-app')
