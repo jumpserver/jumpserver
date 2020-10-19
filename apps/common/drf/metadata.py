@@ -7,6 +7,7 @@ from collections import OrderedDict
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.utils.encoding import force_text
+from rest_framework.fields import empty
 
 from rest_framework.metadata import SimpleMetadata
 from rest_framework import exceptions, serializers
@@ -57,6 +58,10 @@ class SimpleMetadataWithFilters(SimpleMetadata):
         field_info = OrderedDict()
         field_info['type'] = self.label_lookup[field]
         field_info['required'] = getattr(field, 'required', False)
+
+        default = getattr(field, 'default', False)
+        if default and isinstance(default, (str, int)):
+            field_info['default'] = default
 
         for attr in self.attrs:
             value = getattr(field, attr, None)

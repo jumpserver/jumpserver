@@ -1,11 +1,12 @@
 from rest_framework import serializers
+from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from .. import models
 
-__all__ = [
-    'K8sAppSerializer',
-]
+
+class K8sAttrsSerializer(serializers.Serializer):
+    cluster = serializers.CharField(label=_('Cluster'))
 
 
 class K8sAppSerializer(BulkOrgResourceModelSerializer):

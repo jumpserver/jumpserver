@@ -1,14 +1,34 @@
 # coding: utf-8
 #
+from rest_framework import serializers
+from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.serializers import AdaptedBulkListSerializer
 
 from .. import models
 
-__all__ = [
-    'DatabaseAppSerializer',
-]
+
+class DatabaseAttrsSerializer(serializers.Serializer):
+    host = serializers.CharField()
+    port = serializers.IntegerField()
+    database = serializers.CharField(allow_blank=True, allow_null=True)
+
+
+class MySQLAttrsSerializer(DatabaseAttrsSerializer):
+    port = serializers.IntegerField(default=3306, label=_('Port'))
+
+
+class PostgreAttrsSerializer(DatabaseAttrsSerializer):
+    port = serializers.IntegerField(default=5432)
+
+
+class OracleAttrsSerializer(DatabaseAttrsSerializer):
+    port = serializers.IntegerField(default=1521)
+
+
+class MariaDBAttrsSerializer(MySQLAttrsSerializer):
+    pass
 
 
 class DatabaseAppSerializer(BulkOrgResourceModelSerializer):
