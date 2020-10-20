@@ -44,3 +44,17 @@ class ApplicationSerializer(BulkOrgResourceModelSerializer):
             attrs_serializer = attrs_cls()
         self.fields['attrs'] = attrs_serializer
 
+    def create(self, validated_data):
+        attrs = validated_data.pop('attrs', {})
+        instance = super().create(validated_data)
+        instance.attrs = attrs
+        instance.save()
+        return instance
+
+    def update(self, instance, validated_data):
+        attrs = validated_data.pop('attrs', {})
+        instance = super().update(instance, validated_data)
+        instance.attrs = attrs
+        instance.save()
+        return instance
+
