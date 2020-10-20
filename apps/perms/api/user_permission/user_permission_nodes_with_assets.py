@@ -19,7 +19,6 @@ from ...utils.user_asset_permission import (
 
 from assets.models import Asset, FavoriteAsset
 from assets.api import SerializeToTreeNodeMixin
-from orgs.utils import tmp_to_root_org
 from ...hands import Node
 
 logger = get_logger(__name__)
@@ -28,7 +27,6 @@ logger = get_logger(__name__)
 class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
     permission_classes = (IsValidUser,)
 
-    @tmp_to_root_org()
     def list(self, request: Request, *args, **kwargs):
         """
         此算法依赖 UserGrantedMappingNode
@@ -102,7 +100,6 @@ class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(ForAdminMixin, UserNode
             if node:
                 return node.key
 
-    @tmp_to_root_org()
     def list(self, request: Request, *args, **kwargs):
         key = self.request.query_params.get('key')
         if key is None:
