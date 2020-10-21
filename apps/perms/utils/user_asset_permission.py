@@ -6,7 +6,7 @@ import inspect
 
 from django.conf import settings
 from django.db.models import F, Q, Value, BooleanField
-from django.utils.translation import gettext as _
+from django.utils.translation import ugettext_lazy as _
 
 from common.http import is_true
 from common.utils import get_logger
@@ -25,7 +25,9 @@ ADD = 'add'
 REMOVE = 'remove'
 
 UNGROUPED_NODE_KEY = 'ungrouped'
+UNGROUPED_NODE_VALUE = _('Ungrouped')
 FAVORITE_NODE_KEY = 'favorite'
+FAVORITE_NODE_VALUE = _('Favorite')
 
 TMP_GRANTED_FIELD = '_granted'
 TMP_ASSET_GRANTED_FIELD = '_asset_granted'
@@ -481,17 +483,19 @@ def get_ungrouped_node(user):
     return Node(
         id=UNGROUPED_NODE_KEY,
         key=UNGROUPED_NODE_KEY,
-        value=_(UNGROUPED_NODE_KEY),
+        value=UNGROUPED_NODE_VALUE,
         assets_amount=assets_amount
     )
 
 
 def get_favorite_node(user):
-    assets_amount = FavoriteAsset.get_user_favorite_assets(user).values_list('id').count()
+    assets_amount = FavoriteAsset.get_user_favorite_assets(user)\
+        .values_list('id')\
+        .count()
     return Node(
         id=FAVORITE_NODE_KEY,
         key=FAVORITE_NODE_KEY,
-        value=_(FAVORITE_NODE_KEY),
+        value=FAVORITE_NODE_VALUE,
         assets_amount=assets_amount
     )
 

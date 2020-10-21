@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-30 16:04+0800\n"
+"POT-Creation-Date: 2020-10-21 14:31+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -147,7 +147,7 @@ msgstr "参数"
 #: assets/models/base.py:240 assets/models/cluster.py:28
 #: assets/models/cmd_filter.py:26 assets/models/cmd_filter.py:60
 #: assets/models/group.py:21 common/db/models.py:67 common/mixins/models.py:49
-#: orgs/models.py:24 orgs/models.py:394 perms/models/base.py:54
+#: orgs/models.py:24 orgs/models.py:400 perms/models/base.py:54
 #: users/models/user.py:546 users/serializers/group.py:35
 #: users/templates/users/user_detail.html:97
 #: xpack/plugins/change_auth_plan/models.py:81 xpack/plugins/cloud/models.py:57
@@ -162,7 +162,7 @@ msgstr "创建者"
 #: assets/models/domain.py:23 assets/models/gathered_user.py:19
 #: assets/models/group.py:22 assets/models/label.py:25 common/db/models.py:69
 #: common/mixins/models.py:50 ops/models/adhoc.py:38 ops/models/command.py:27
-#: orgs/models.py:25 orgs/models.py:392 perms/models/base.py:55
+#: orgs/models.py:25 orgs/models.py:398 perms/models/base.py:55
 #: users/models/group.py:18 users/templates/users/user_group_detail.html:58
 #: xpack/plugins/cloud/models.py:60 xpack/plugins/cloud/models.py:158
 msgid "Date created"
@@ -180,6 +180,10 @@ msgstr "远程应用"
 #: assets/api/admin_user.py:46
 msgid "Deleted failed, There are related assets"
 msgstr "删除失败，存在关联资产"
+
+#: assets/api/domain.py:50
+msgid "Number required"
+msgstr "需要为数字"
 
 #: assets/api/node.py:58
 msgid "You can't update the root node name"
@@ -234,7 +238,7 @@ msgid "Hostname"
 msgstr "主机名"
 
 #: assets/models/asset.py:194 assets/models/domain.py:52
-#: assets/models/user.py:117 terminal/serializers/session.py:29
+#: assets/models/user.py:97 terminal/serializers/session.py:29
 msgid "Protocol"
 msgstr "协议"
 
@@ -248,7 +252,7 @@ msgstr "协议组"
 msgid "Domain"
 msgstr "网域"
 
-#: assets/models/asset.py:199 assets/models/user.py:112
+#: assets/models/asset.py:199 assets/models/user.py:92
 #: perms/models/asset_permission.py:93
 #: xpack/plugins/change_auth_plan/models.py:56
 #: xpack/plugins/gathered_user/models.py:24
@@ -396,7 +400,7 @@ msgstr "SSH公钥"
 
 #: assets/models/base.py:239 assets/models/gathered_user.py:20
 #: common/db/models.py:70 common/mixins/models.py:51 ops/models/adhoc.py:39
-#: orgs/models.py:393
+#: orgs/models.py:399
 msgid "Date updated"
 msgstr "更新日期"
 
@@ -442,19 +446,7 @@ msgstr "系统"
 msgid "Default Cluster"
 msgstr "默认Cluster"
 
-#: assets/models/cluster.py:56
-msgid "Beijing unicom"
-msgstr "北京联通"
-
-#: assets/models/cluster.py:56
-msgid "Beijing telecom"
-msgstr "北京电信"
-
-#: assets/models/cluster.py:56
-msgid "BGP full netcom"
-msgstr "BGP全网通"
-
-#: assets/models/cmd_filter.py:33 assets/models/user.py:122
+#: assets/models/cmd_filter.py:33 assets/models/user.py:102
 msgid "Command filter"
 msgstr "命令过滤器"
 
@@ -479,7 +471,7 @@ msgstr "允许"
 msgid "Filter"
 msgstr "过滤器"
 
-#: assets/models/cmd_filter.py:53 assets/models/user.py:116
+#: assets/models/cmd_filter.py:53 assets/models/user.py:96
 msgid "Priority"
 msgstr "优先级"
 
@@ -548,9 +540,9 @@ msgstr "默认资产组"
 
 #: assets/models/label.py:15 audits/models.py:36 audits/models.py:56
 #: audits/models.py:69 audits/serializers.py:77 authentication/models.py:46
-#: authentication/models.py:90 orgs/models.py:18 orgs/models.py:390
+#: authentication/models.py:90 orgs/models.py:18 orgs/models.py:396
 #: perms/forms/asset_permission.py:83 perms/forms/database_app_permission.py:38
-#: perms/forms/remote_app_permission.py:40 perms/models/asset_permission.py:216
+#: perms/forms/remote_app_permission.py:40 perms/models/asset_permission.py:169
 #: perms/models/base.py:49 templates/index.html:78
 #: terminal/backends/command/models.py:18
 #: terminal/backends/command/serializers.py:12 terminal/models.py:186
@@ -571,7 +563,7 @@ msgstr "默认资产组"
 msgid "User"
 msgstr "用户"
 
-#: assets/models/label.py:19 assets/models/node.py:372 settings/models.py:28
+#: assets/models/label.py:19 assets/models/node.py:374 settings/models.py:28
 msgid "Value"
 msgstr "值"
 
@@ -579,23 +571,23 @@ msgstr "值"
 msgid "Category"
 msgstr "分类"
 
-#: assets/models/node.py:129
+#: assets/models/node.py:131
 msgid "New node"
 msgstr "新节点"
 
-#: assets/models/node.py:278 users/templates/users/_granted_assets.html:130
+#: assets/models/node.py:280 users/templates/users/_granted_assets.html:130
 msgid "empty"
 msgstr "空"
 
-#: assets/models/node.py:371 perms/models/asset_permission.py:191
+#: assets/models/node.py:373 perms/models/asset_permission.py:144
 msgid "Key"
 msgstr "键"
 
-#: assets/models/node.py:375 perms/models/asset_permission.py:195
+#: assets/models/node.py:377 perms/models/asset_permission.py:148
 msgid "Parent key"
 msgstr "ssh私钥"
 
-#: assets/models/node.py:384 assets/serializers/system_user.py:45
+#: assets/models/node.py:386 assets/serializers/system_user.py:45
 #: assets/serializers/system_user.py:185 perms/forms/asset_permission.py:92
 #: perms/forms/asset_permission.py:99
 #: users/templates/users/user_asset_permission.html:41
@@ -605,66 +597,66 @@ msgstr "ssh私钥"
 msgid "Node"
 msgstr "节点"
 
-#: assets/models/user.py:108
+#: assets/models/user.py:88
 msgid "Automatic login"
 msgstr "自动登录"
 
-#: assets/models/user.py:109
+#: assets/models/user.py:89
 msgid "Manually login"
 msgstr "手动登录"
 
-#: assets/models/user.py:111
+#: assets/models/user.py:91
 msgid "Username same with user"
 msgstr "用户名与用户相同"
 
-#: assets/models/user.py:113 templates/_nav.html:39
+#: assets/models/user.py:93 templates/_nav.html:39
 #: xpack/plugins/change_auth_plan/models.py:52
 msgid "Assets"
 msgstr "资产管理"
 
-#: assets/models/user.py:114 templates/_nav.html:17
+#: assets/models/user.py:94 templates/_nav.html:17
 #: users/views/profile/password.py:42 users/views/profile/pubkey.py:36
 msgid "Users"
 msgstr "用户管理"
 
-#: assets/models/user.py:115 users/templates/users/user_group_list.html:90
+#: assets/models/user.py:95 users/templates/users/user_group_list.html:90
 #: users/templates/users/user_profile.html:124
 msgid "User groups"
 msgstr "用户组"
 
-#: assets/models/user.py:118
+#: assets/models/user.py:98
 msgid "Auto push"
 msgstr "自动推送"
 
-#: assets/models/user.py:119
+#: assets/models/user.py:99
 msgid "Sudo"
 msgstr "Sudo"
 
-#: assets/models/user.py:120
+#: assets/models/user.py:100
 msgid "Shell"
 msgstr "Shell"
 
-#: assets/models/user.py:121
+#: assets/models/user.py:101
 msgid "Login mode"
 msgstr "登录模式"
 
-#: assets/models/user.py:123
+#: assets/models/user.py:103
 msgid "SFTP Root"
 msgstr "SFTP根路径"
 
-#: assets/models/user.py:124 authentication/models.py:88
+#: assets/models/user.py:104 authentication/models.py:88
 msgid "Token"
 msgstr ""
 
-#: assets/models/user.py:125
+#: assets/models/user.py:105
 msgid "Home"
 msgstr "家目录"
 
-#: assets/models/user.py:126
+#: assets/models/user.py:106
 msgid "System groups"
 msgstr "用户组"
 
-#: assets/models/user.py:201 audits/models.py:39
+#: assets/models/user.py:181 audits/models.py:39
 #: perms/forms/asset_permission.py:95 perms/forms/remote_app_permission.py:49
 #: perms/models/asset_permission.py:94
 #: perms/models/database_app_permission.py:22
@@ -1024,7 +1016,7 @@ msgstr "Agent"
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
 #: authentication/templates/authentication/login_otp.html:6
 #: users/forms/profile.py:52 users/models/user.py:527
-#: users/serializers/user.py:229 users/templates/users/user_detail.html:77
+#: users/serializers/user.py:228 users/templates/users/user_detail.html:77
 #: users/templates/users/user_profile.html:87
 msgid "MFA"
 msgstr "多因子认证"
@@ -1263,7 +1255,7 @@ msgid "Show"
 msgstr "显示"
 
 #: authentication/templates/authentication/_access_key_modal.html:66
-#: users/models/user.py:425 users/serializers/user.py:226
+#: users/models/user.py:425 users/serializers/user.py:225
 #: users/templates/users/user_profile.html:94
 #: users/templates/users/user_profile.html:163
 #: users/templates/users/user_profile.html:166
@@ -1272,7 +1264,7 @@ msgid "Disable"
 msgstr "禁用"
 
 #: authentication/templates/authentication/_access_key_modal.html:67
-#: users/models/user.py:426 users/serializers/user.py:227
+#: users/models/user.py:426 users/serializers/user.py:226
 #: users/templates/users/user_profile.html:92
 #: users/templates/users/user_profile.html:170
 msgid "Enable"
@@ -1547,36 +1539,36 @@ msgstr "等待任务开始"
 msgid "Not has host {} permission"
 msgstr "没有该主机 {} 权限"
 
-#: ops/mixin.py:29 ops/mixin.py:92 ops/mixin.py:162
+#: ops/mixin.py:29 ops/mixin.py:92 ops/mixin.py:160
 msgid "Cycle perform"
 msgstr "周期执行"
 
-#: ops/mixin.py:33 ops/mixin.py:90 ops/mixin.py:111 ops/mixin.py:150
+#: ops/mixin.py:33 ops/mixin.py:90 ops/mixin.py:109 ops/mixin.py:148
 msgid "Regularly perform"
 msgstr "定期执行"
 
-#: ops/mixin.py:108 ops/mixin.py:147
+#: ops/mixin.py:106 ops/mixin.py:145
 #: xpack/plugins/change_auth_plan/serializers.py:53
 msgid "Periodic perform"
 msgstr "定时执行"
 
-#: ops/mixin.py:113
+#: ops/mixin.py:111
 msgid "Interval"
 msgstr "间隔"
 
-#: ops/mixin.py:122
+#: ops/mixin.py:120
 msgid "* Please enter a valid crontab expression"
 msgstr "* 请输入有效的 crontab 表达式"
 
-#: ops/mixin.py:129
+#: ops/mixin.py:127
 msgid "Range {} to {}"
 msgstr "输入在 {} - {} 范围之间"
 
-#: ops/mixin.py:140
+#: ops/mixin.py:138
 msgid "Require periodic or regularly perform setting"
 msgstr "需要周期或定期设置"
 
-#: ops/mixin.py:151
+#: ops/mixin.py:149
 msgid ""
 "eg: Every Sunday 03:05 run <5 3 * * 0> <br> Tips: Using 5 digits linux "
 "crontab expressions <min hour day month week> (<a href='https://tool.lu/"
@@ -1587,7 +1579,7 @@ msgstr ""
 "分 时 日 月 星期> （<a href='https://tool.lu/crontab/' target='_blank'>在线工"
 "具</a>） <br>注意： 如果同时设置了定期执行和周期执行，优先使用定期执行"
 
-#: ops/mixin.py:162
+#: ops/mixin.py:160
 msgid "Tips: (Units: hour)"
 msgstr "提示：（单位： 时）"
 
@@ -1698,16 +1690,16 @@ msgstr "更新任务内容: {}"
 msgid "Disk used more than 80%: {} => {}"
 msgstr "磁盘使用率超过 80%: {} => {}"
 
-#: orgs/api.py:62
+#: orgs/api.py:60
 msgid "Organization contains undeleted resources"
 msgstr "组织包含未删除的资源"
 
-#: orgs/api.py:66
+#: orgs/api.py:64
 msgid "The current organization cannot be deleted"
 msgstr "当前组织不能被删除"
 
 #: orgs/mixins/models.py:56 orgs/mixins/serializers.py:25 orgs/models.py:41
-#: orgs/models.py:389
+#: orgs/models.py:395
 msgid "Organization"
 msgstr "组织"
 
@@ -1719,7 +1711,7 @@ msgstr "组织管理员"
 msgid "Organization auditor"
 msgstr "组织审计员"
 
-#: orgs/models.py:391 users/forms/user.py:27 users/models/user.py:515
+#: orgs/models.py:397 users/forms/user.py:27 users/models/user.py:515
 #: users/templates/users/_select_user_modal.html:15
 #: users/templates/users/user_detail.html:73
 #: users/templates/users/user_list.html:16
@@ -1727,7 +1719,7 @@ msgstr "组织审计员"
 msgid "Role"
 msgstr "角色"
 
-#: perms/const.py:7
+#: perms/const.py:7 perms/utils/user_asset_permission.py:28
 msgid "Ungrouped"
 msgstr "未分组"
 
@@ -1837,7 +1829,11 @@ msgstr "Kubernetes应用授权"
 msgid "RemoteApp permission"
 msgstr "远程应用授权"
 
-#: perms/utils/user_asset_permission.py:503
+#: perms/utils/user_asset_permission.py:30
+msgid "Favorite"
+msgstr "收藏夹"
+
+#: perms/utils/user_asset_permission.py:514
 msgid "Please wait while your data is being initialized"
 msgstr "数据正在初始化，请稍等"
 
@@ -2442,19 +2438,19 @@ msgstr "登录了"
 msgid "Filters"
 msgstr "过滤"
 
-#: terminal/api/session.py:191
+#: terminal/api/session.py:190
 msgid "Session does not exist: {}"
 msgstr "会话不存在: {}"
 
-#: terminal/api/session.py:194
+#: terminal/api/session.py:193
 msgid "Session is finished or the protocol not supported"
 msgstr "会话已经完成或协议不支持"
 
-#: terminal/api/session.py:199
+#: terminal/api/session.py:198
 msgid "User does not exist: {}"
 msgstr "用户不存在: {}"
 
-#: terminal/api/session.py:203
+#: terminal/api/session.py:202
 msgid "User does not have permission"
 msgstr "用户没有权限"
 
@@ -2786,7 +2782,7 @@ msgstr ""
 "        </div>\n"
 "     "
 
-#: users/api/user.py:156
+#: users/api/user.py:190
 msgid "Could not reset self otp, use profile reset instead"
 msgstr "不能在该页面重置多因子认证, 请去个人信息页面重置"
 
@@ -2868,8 +2864,8 @@ msgid "Public key should not be the same as your old one."
 msgstr "不能和原来的密钥相同"
 
 #: users/forms/profile.py:137 users/forms/user.py:90
-#: users/serializers/user.py:189 users/serializers/user.py:271
-#: users/serializers/user.py:329
+#: users/serializers/user.py:188 users/serializers/user.py:270
+#: users/serializers/user.py:328
 msgid "Not a valid ssh public key"
 msgstr "SSH密钥不合法"
 
@@ -2893,15 +2889,15 @@ msgstr "添加到用户组"
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
 
-#: users/forms/user.py:124 users/serializers/user.py:36
+#: users/forms/user.py:124 users/serializers/user.py:35
 msgid "Reset link will be generated and sent to the user"
 msgstr "生成重置密码链接，通过邮件发送给用户"
 
-#: users/forms/user.py:125 users/serializers/user.py:37
+#: users/forms/user.py:125 users/serializers/user.py:36
 msgid "Set password"
 msgstr "设置密码"
 
-#: users/forms/user.py:132 users/serializers/user.py:44
+#: users/forms/user.py:132 users/serializers/user.py:43
 #: xpack/plugins/change_auth_plan/models.py:61
 #: xpack/plugins/change_auth_plan/serializers.py:30
 msgid "Password strategy"
@@ -2947,55 +2943,55 @@ msgstr "管理员"
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
-#: users/serializers/user.py:50 users/serializers/user.py:84
+#: users/serializers/user.py:49 users/serializers/user.py:83
 msgid "Organization role name"
 msgstr "组织角色名称"
 
-#: users/serializers/user.py:75 users/serializers/user.py:242
+#: users/serializers/user.py:74 users/serializers/user.py:241
 msgid "Is first login"
 msgstr "首次登录"
 
-#: users/serializers/user.py:76
+#: users/serializers/user.py:75
 msgid "Is valid"
 msgstr "账户是否有效"
 
-#: users/serializers/user.py:77
+#: users/serializers/user.py:76
 msgid "Is expired"
 msgstr " 是否过期"
 
-#: users/serializers/user.py:78
+#: users/serializers/user.py:77
 msgid "Avatar url"
 msgstr "头像路径"
 
-#: users/serializers/user.py:82
+#: users/serializers/user.py:81
 msgid "Groups name"
 msgstr "用户组名"
 
-#: users/serializers/user.py:83
+#: users/serializers/user.py:82
 msgid "Source name"
 msgstr "用户来源名"
 
-#: users/serializers/user.py:85
+#: users/serializers/user.py:84
 msgid "Super role name"
 msgstr "超级角色名称"
 
-#: users/serializers/user.py:86
+#: users/serializers/user.py:85
 msgid "Total role name"
 msgstr "汇总角色名称"
 
-#: users/serializers/user.py:109
+#: users/serializers/user.py:108
 msgid "Role limit to {}"
 msgstr "角色只能为 {}"
 
-#: users/serializers/user.py:121 users/serializers/user.py:295
+#: users/serializers/user.py:120 users/serializers/user.py:294
 msgid "Password does not match security rules"
 msgstr "密码不满足安全规则"
 
-#: users/serializers/user.py:287
+#: users/serializers/user.py:286
 msgid "The old password is incorrect"
 msgstr "旧密码错误"
 
-#: users/serializers/user.py:301
+#: users/serializers/user.py:300
 msgid "The newly set password is inconsistent"
 msgstr "两次密码不一致"
 
@@ -3616,11 +3612,12 @@ msgstr ""
 "    <br>\n"
 "    "
 
-#: users/utils.py:117 users/views/profile/reset.py:77
+#: users/utils.py:116 users/views/profile/reset.py:77
 msgid "Reset password success"
 msgstr "重置密码成功"
 
-#: users/utils.py:119
+#: users/utils.py:118
+#, python-format
 msgid ""
 "\n"
 "    \n"
@@ -3682,11 +3679,11 @@ msgstr ""
 "    \n"
 "    "
 
-#: users/utils.py:160
+#: users/utils.py:158
 msgid "Security notice"
 msgstr "安全通知"
 
-#: users/utils.py:162
+#: users/utils.py:160
 #, python-format
 msgid ""
 "\n"
@@ -3735,11 +3732,11 @@ msgstr ""
 "    <br>\n"
 "    "
 
-#: users/utils.py:198
+#: users/utils.py:196
 msgid "Expiration notice"
 msgstr "过期通知"
 
-#: users/utils.py:200
+#: users/utils.py:198
 #, python-format
 msgid ""
 "\n"
@@ -3761,11 +3758,11 @@ msgstr ""
 "       <br>\n"
 "       "
 
-#: users/utils.py:219
+#: users/utils.py:217
 msgid "SSH Key Reset"
 msgstr "重置SSH密钥"
 
-#: users/utils.py:221
+#: users/utils.py:219
 #, python-format
 msgid ""
 "\n"
@@ -4199,11 +4196,17 @@ msgstr "旗舰版"
 msgid "Community edition"
 msgstr "社区版"
 
+#~ msgid "Beijing unicom"
+#~ msgstr "北京联通"
+
+#~ msgid "Beijing telecom"
+#~ msgstr "北京电信"
+
+#~ msgid "BGP full netcom"
+#~ msgstr "BGP全网通"
+
 #~ msgid "ungrouped"
 #~ msgstr "未分组"
-
-#~ msgid "favorite"
-#~ msgstr "收藏夹"
 
 #~ msgid "Organization User"
 #~ msgstr "组织用户"
