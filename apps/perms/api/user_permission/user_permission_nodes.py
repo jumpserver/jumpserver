@@ -7,7 +7,6 @@ from rest_framework.generics import (
 from rest_framework.response import Response
 from rest_framework.request import Request
 
-from orgs.utils import tmp_to_root_org
 from assets.api.mixin import SerializeToTreeNodeMixin
 from common.utils import get_logger
 from .mixin import ForAdminMixin, ForUserMixin, UserNodeGrantStatusDispatchMixin
@@ -59,7 +58,6 @@ class NodeChildrenMixin:
 class BaseGrantedNodeApi(_GrantedNodeStructApi, metaclass=abc.ABCMeta):
     serializer_class = serializers.NodeGrantedSerializer
 
-    @tmp_to_root_org()
     def list(self, request, *args, **kwargs):
         rebuild_user_tree_if_need(request, self.user)
         nodes = self.get_nodes()
@@ -72,7 +70,6 @@ class BaseNodeChildrenApi(NodeChildrenMixin, BaseGrantedNodeApi, metaclass=abc.A
 
 
 class BaseGrantedNodeAsTreeApi(SerializeToTreeNodeMixin, _GrantedNodeStructApi, metaclass=abc.ABCMeta):
-    @tmp_to_root_org()
     def list(self, request: Request, *args, **kwargs):
         rebuild_user_tree_if_need(request, self.user)
         nodes = self.get_nodes()

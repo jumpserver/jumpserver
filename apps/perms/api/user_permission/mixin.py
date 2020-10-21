@@ -4,6 +4,7 @@ from rest_framework.request import Request
 
 from common.permissions import IsOrgAdminOrAppUser, IsValidUser
 from common.utils import lazyproperty
+from orgs.utils import tmp_to_root_org
 from users.models import User
 from perms.models import UserGrantedMappingNode
 
@@ -46,6 +47,10 @@ class ForAdminMixin:
 class ForUserMixin:
     permission_classes = (IsValidUser,)
     request: Request
+
+    def get(self, request, *args, **kwargs):
+        with tmp_to_root_org():
+            return super().get(request, *args, **kwargs)
 
     @lazyproperty
     def user(self):

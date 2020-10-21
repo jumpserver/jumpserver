@@ -17,14 +17,14 @@ decorator==4.1.2
 Django==2.2.13
 django-auth-ldap==1.7.0
 django-bootstrap3==9.1.0
-django-celery-beat==1.4.0
+django-celery-beat==2.0
 django-filter==2.0.0
 django-formtools==2.1
 django-ranged-response==0.2.0
 django-redis-cache==2.1.1
 django-rest-swagger==2.1.2
 django-simple-captcha==0.5.6
-django-timezone-field==3.1
+django-timezone-field==4.0
 djangorestframework==3.9.4
 djangorestframework-bulk==0.2.1
 docutils==0.14
@@ -59,7 +59,7 @@ python-dateutil==2.6.1
 python-gssapi==0.6.4
 pytz==2018.3
 PyYAML==5.1
-redis==3.2.0
+redis==3.5.3
 requests==2.22.0
 jms-storage==0.0.34
 s3transfer==0.3.3

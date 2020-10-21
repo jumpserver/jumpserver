@@ -23,7 +23,7 @@ class Organization(models.Model):
     name = models.CharField(max_length=128, unique=True, verbose_name=_("Name"))
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
-    comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
+    comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
     members = models.ManyToManyField('users.User', related_name='orgs', through='orgs.OrganizationMember',
                                      through_fields=('org', 'user'))
 
