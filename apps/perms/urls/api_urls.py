@@ -3,6 +3,7 @@
 from django.urls import re_path
 from common import api as capi
 from .asset_permission import asset_permission_urlpatterns
+from .application_permission import application_permission_urlpatterns
 from .remote_app_permission import remote_app_permission_urlpatterns
 from .database_app_permission import database_app_permission_urlpatterns
 from .system_user_permission import system_users_permission_urlpatterns
@@ -15,6 +16,7 @@ old_version_urlpatterns = [
 ]
 
 urlpatterns = asset_permission_urlpatterns + \
+              application_permission_urlpatterns + \
               remote_app_permission_urlpatterns + \
               database_app_permission_urlpatterns + \
               k8s_app_permission_urlpatterns + \
