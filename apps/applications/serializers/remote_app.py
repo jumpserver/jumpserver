@@ -15,7 +15,7 @@ from ..models import RemoteApp
 
 
 class RemoteAppAttrsSerializer(serializers.Serializer):
-    asset = serializers.PrimaryKeyRelatedField(queryset=Asset.objects, label=_("Assets"))
+    asset = serializers.CharField(max_length=36, label=_('Assets'))
     path = serializers.CharField(label=_('Remote App path'))
 
 

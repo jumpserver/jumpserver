@@ -101,7 +101,7 @@ class Category(ChoiceSet):
 
 class Application(CommonModelMixin, OrgModelMixin):
     name = models.CharField(max_length=128, verbose_name=_('Name'))
-    domain = models.ForeignKey('assets.Domain', on_delete=models.SET_NULL, null=True)
+    domain = models.ForeignKey('assets.Domain', on_delete=models.SET_NULL, null=True, default=None)
     category = models.CharField(max_length=16, choices=Category.choices, verbose_name=_('Category'))
     type = models.CharField(max_length=16, choices=Category.get_all_type_choices(), verbose_name=_('Type'))
     attrs = JSONField()
