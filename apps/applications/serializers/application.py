@@ -32,9 +32,6 @@ class ApplicationSerializer(BulkOrgResourceModelSerializer):
         if hasattr(self, 'initial_data'):
             app_type = self.initial_data.get('type')
             attrs_data = self.initial_data.get('attrs')
-        if self.instance:
-            app_type = self.instance.type
-            attrs_data = self.instance.attrs
         if not app_type:
             return
         attrs_cls = models.Category.get_type_serializer_cls(app_type)
@@ -52,8 +49,10 @@ class ApplicationSerializer(BulkOrgResourceModelSerializer):
         return instance
 
     def update(self, instance, validated_data):
-        attrs = validated_data.pop('attrs', {})
+        new_attrs = validated_data.pop('attrs', {})
         instance = super().update(instance, validated_data)
+        attrs = instance.attrs
+        attrs.update(new_attrs)
         instance.attrs = attrs
         instance.save()
         return instance

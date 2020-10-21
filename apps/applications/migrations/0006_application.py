@@ -6,6 +6,107 @@ import django_mysql.models
 import uuid
 
 
+CATEGORY_DB_LIST = ['mysql', 'oracle', 'postgresql', 'mariadb']
+CATEGORY_REMOTE_LIST = ['chrome', 'mysql_workbench', 'vmware_client', 'custom']
+CATEGORY_CLOUD_LIST = ['k8s']
+
+CATEGORY_DB = 'db'
+CATEGORY_REMOTE = 'remote_app'
+CATEGORY_CLOUD = 'cloud'
+CATEGORY_LIST = [CATEGORY_DB, CATEGORY_REMOTE, CATEGORY_CLOUD]
+
+
+def get_application_category(old_app):
+    _type = old_app.type
+    if _type in CATEGORY_DB_LIST:
+        category = CATEGORY_DB
+    elif _type in CATEGORY_REMOTE_LIST:
+        category = CATEGORY_REMOTE
+    elif _type in CATEGORY_CLOUD_LIST:
+        category = CATEGORY_CLOUD
+    else:
+        category = None
+    return category
+
+
+def common_to_application_json(old_app):
+    category = get_application_category(old_app)
+    date_updated = old_app.date_updated if hasattr(old_app, 'date_updated') else old_app.date_created
+    return {
+        'name': old_app.name,
+        'type': old_app.type,
+        'category': category,
+        'comment': old_app.comment,
+        'created_by': old_app.created_by,
+        'date_created': old_app.date_created,
+        'date_updated': date_updated,
+        'org_id': old_app.org_id
+    }
+
+
+def db_to_application_json(database):
+    app_json = common_to_application_json(database)
+    app_json.update({
+        'attrs': {
+            'host': database.host,
+            'port': database.port,
+            'database': database.database
+        }
+    })
+    return app_json
+
+
+def remote_to_application_json(remote):
+    app_json = common_to_application_json(remote)
+    attrs = {
+        'asset': str(remote.asset.id),
+        'path': remote.path,
+    }
+    attrs.update(remote.params)
+    app_json.update({
+        'attrs': attrs
+    })
+    return app_json
+
+
+def k8s_to_application_json(k8s):
+    app_json = common_to_application_json(k8s)
+    app_json.update({
+        'attrs': {
+            'cluster': k8s.cluster
+        }
+    })
+    return app_json
+
+
+def migrate_and_integrate_applications(apps, schema_editor):
+    db_alias = schema_editor.connection.alias
+
+    database_app_model = apps.get_model("applications", "DatabaseApp")
+    remote_app_model = apps.get_model("applications", "RemoteApp")
+    k8s_app_model = apps.get_model("applications", "K8sApp")
+
+    database_apps = database_app_model.objects.using(db_alias).all()
+    remote_apps = remote_app_model.objects.using(db_alias).all()
+    k8s_apps = k8s_app_model.objects.using(db_alias).all()
+
+    database_applications = [db_to_application_json(db_app) for db_app in database_apps]
+    remote_applications = [remote_to_application_json(remote_app) for remote_app in remote_apps]
+    k8s_applications = [k8s_to_application_json(k8s_app) for k8s_app in k8s_apps]
+
+    applications_json = database_applications + remote_applications + k8s_applications
+    application_model = apps.get_model("applications", "Application")
+    applications = [
+        application_model(**application_json)
+        for application_json in applications_json
+        if application_json['category'] in CATEGORY_LIST
+    ]
+    applications_created = application_model.objects.bulk_create(applications)
+    print('Migrate and integrate applications count: {}/{}'.format(
+        len(applications_created), len(applications_json)
+    ))
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -27,11 +128,12 @@ class Migration(migrations.Migration):
                 ('type', models.CharField(choices=[('mysql', 'MySQL'), ('oracle', 'Oracle'), ('postgresql', 'PostgreSQL'), ('mariadb', 'MariaDB'), ('chrome', 'Chrome'), ('mysql_workbench', 'MySQL Workbench'), ('vmware_client', 'vSphere Client'), ('custom', 'Custom'), ('k8s', 'Kubernetes')], max_length=16, verbose_name='Type')),
                 ('attrs', django_mysql.models.JSONField(default=dict)),
                 ('comment', models.TextField(blank=True, default='', max_length=128, verbose_name='Comment')),
-                ('domain', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='assets.Domain')),
+                ('domain', models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='assets.Domain')),
             ],
             options={
                 'ordering': ('name',),
                 'unique_together': {('org_id', 'name')},
             },
         ),
+        migrations.RunPython(migrate_and_integrate_applications),
     ]
