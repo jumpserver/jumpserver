@@ -33,6 +33,7 @@ def common_to_application_json(old_app):
     category = get_application_category(old_app)
     date_updated = old_app.date_updated if hasattr(old_app, 'date_updated') else old_app.date_created
     return {
+        'id': old_app.id,
         'name': old_app.name,
         'type': old_app.type,
         'category': category,
