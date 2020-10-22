@@ -57,7 +57,7 @@ class RBACBackend(ModelBackend):
     def has_perm(self, user_obj, perm, obj=None):
         """
         这里扩展一下 perm， 原来的perm 是 accounts.create_account，现在支持了多种scope的权限，所以我们定义一下格式
-        org:org_id|ns:ns_id|module.action_model
+        ns:ns_id|org:org_id|module.action_model
         如: ns:82364313-97f2-44ad-b206-17c94fa2a82c|org:82364313-97f2-44ad-b206-17c94fa2a82c|accounts.create_account
         :param user_obj:
         :param perm:
