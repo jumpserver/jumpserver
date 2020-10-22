@@ -10,9 +10,9 @@ from rest_framework.request import Request
 from assets.api.mixin import SerializeToTreeNodeMixin
 from common.utils import get_logger
 from .mixin import ForAdminMixin, ForUserMixin, UserNodeGrantStatusDispatchMixin
-from ...hands import Node, User
-from ... import serializers
-from ...utils.user_asset_permission import (
+from perms.hands import Node, User
+from perms import serializers
+from perms.utils.asset.user_permission import (
     get_indirect_granted_node_children,
     get_user_granted_nodes_list_via_mapping_node,
     get_top_level_granted_nodes,

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-from perms.api.user_permission.mixin import UserNodeGrantStatusDispatchMixin
+from perms.api.asset.user_permission.mixin import UserNodeGrantStatusDispatchMixin
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from django.conf import settings
@@ -9,8 +9,8 @@ from assets.api.mixin import SerializeToTreeNodeMixin
 from common.utils import get_logger
 from perms.pagination import GrantedAssetLimitOffsetPagination
 from assets.models import Asset, Node, FavoriteAsset
-from ... import serializers
-from ...utils.user_asset_permission import (
+from perms import serializers
+from perms.utils.asset.user_permission import (
     get_node_all_granted_assets, get_user_direct_granted_assets,
     get_user_granted_all_assets
 )

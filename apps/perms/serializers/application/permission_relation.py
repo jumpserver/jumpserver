@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from common.mixins import BulkSerializerMixin
 from common.serializers import AdaptedBulkListSerializer
-from ..models import ApplicationPermission
+from perms.models import ApplicationPermission
 
 __all__ = [
     'ApplicationPermissionUserRelationSerializer',

@@ -11,7 +11,7 @@ from common.utils.timezone import now, dt_formater, dt_parser
 from users.models import User
 from assets.models import Node
 from perms.models import RebuildUserTreeTask, AssetPermission
-from perms.utils.user_asset_permission import rebuild_user_mapping_nodes_if_need_with_lock, lock
+from perms.utils.asset.user_permission import rebuild_user_mapping_nodes_if_need_with_lock, lock
 
 logger = get_logger(__file__)
 

@@ -5,8 +5,8 @@ from rest_framework.response import Response
 
 from applications.api.mixin import SerializeApplicationToTreeNodeMixin
 from perms import serializers
-from perms.api.user_permission.mixin import ForAdminMixin, ForUserMixin
-from perms.utils.user_application_permission import (
+from perms.api.asset.user_permission.mixin import ForAdminMixin, ForUserMixin
+from perms.utils.application.user_permission import (
     get_user_granted_all_applications
 )
 

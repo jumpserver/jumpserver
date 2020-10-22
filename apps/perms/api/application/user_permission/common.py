@@ -8,13 +8,13 @@ from rest_framework.generics import (
 )
 
 from applications.models import Application
-from perms.utils.application_permission import (
+from perms.utils.application.permission import (
     get_application_system_users_id
 )
-from perms.api.user_permission.mixin import ForAdminMixin, ForUserMixin
+from perms.api.asset.user_permission.mixin import ForAdminMixin, ForUserMixin
 from common.permissions import IsOrgAdminOrAppUser
-from ...hands import User, SystemUser
-from ... import serializers
+from perms.hands import User, SystemUser
+from perms import serializers
 
 
 __all__ = [
