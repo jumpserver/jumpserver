@@ -75,30 +75,19 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
         model = Asset
         only_fields = [
             "id", "hostname", "ip", "protocols", "os", 'domain',
-            "platform", "comment", "org_id",
+            "platform", "comment", "org_id", "is_active"
         ]
         fields = only_fields + ['org_name']
         read_only_fields = fields
 
 
 class NodeGrantedSerializer(serializers.ModelSerializer):
-    assets_amount = serializers.SerializerMethodField()
-
     class Meta:
         model = Node
         fields = [
             'id', 'name', 'key', 'value', 'org_id', "assets_amount"
         ]
         read_only_fields = fields
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.tree = self.context.get("tree")
-
-    def get_assets_amount(self, obj):
-        if not self.tree:
-            return 0
-        return self.tree.assets_amount(obj.key)
 
 
 class ActionsSerializer(serializers.Serializer):

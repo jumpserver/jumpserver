@@ -3,12 +3,13 @@
 from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
 from django.db import transaction
+from django.db.models import Q
 from django.utils.translation import ugettext as _
 from django.conf import settings
 
+from assets.models import Asset, Node
 from orgs.mixins.api import RootOrgViewMixin
 from common.permissions import IsValidUser
-from perms.utils import AssetPermissionUtil
 from ..models import CommandExecution
 from ..serializers import CommandExecutionSerializer
 from ..tasks import run_command_execution
@@ -27,9 +28,34 @@ class CommandExecutionViewSet(RootOrgViewMixin, viewsets.ModelViewSet):
         data = serializer.validated_data
         assets = data["hosts"]
         system_user = data["run_as"]
-        util = AssetPermissionUtil(self.request.user)
-        util.filter_permissions(system_users=system_user.id)
-        permed_assets = util.get_assets().filter(id__in=[a.id for a in assets])
+        user = self.request.user
+
+        q = Q(granted_by_permissions__system_users__id=system_user.id) & (
+                Q(granted_by_permissions__users=user) |
+                Q(granted_by_permissions__user_groups__users=user)
+        )
+
+        permed_assets = set()
+        permed_assets.update(
+            Asset.objects.filter(
+                id__in=[a.id for a in assets]
+            ).filter(q).distinct()
+        )
+        node_keys = Node.objects.filter(q).distinct().values_list('key', flat=True)
+
+        nodes_assets_q = Q()
+        for _key in node_keys:
+            nodes_assets_q |= Q(nodes__key__startswith=f'{_key}:')
+            nodes_assets_q |= Q(nodes__key=_key)
+
+        permed_assets.update(
+            Asset.objects.filter(
+                id__in=[a.id for a in assets]
+            ).filter(
+                nodes_assets_q
+            ).distinct()
+        )
+
         invalid_assets = set(assets) - set(permed_assets)
         if invalid_assets:
             msg = _("Not has host {} permission").format(

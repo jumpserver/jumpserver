@@ -202,4 +202,6 @@ class SSOAuthentication(ModelBackend):
     """
     什么也不做呀😺
     """
-    pass
+
+    def authenticate(self, request, sso_token=None, **kwargs):
+        pass

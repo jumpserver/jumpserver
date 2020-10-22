@@ -60,6 +60,11 @@ class OrgMemberSerializer(BulkModelSerializer):
         model = OrganizationMember
         fields = ('id', 'org', 'user', 'role', 'org_display', 'user_display', 'role_display')
 
+    def get_unique_together_validators(self):
+        if self.parent:
+            return []
+        return super().get_unique_together_validators()
+
     @classmethod
     def setup_eager_loading(cls, queryset):
         return queryset.annotate(

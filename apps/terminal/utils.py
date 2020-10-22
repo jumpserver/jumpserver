@@ -3,44 +3,17 @@
 import os
 
 from django.conf import settings
-from django.core.cache import cache
 from django.core.files.storage import default_storage
 from django.db.models import Q
 from django.utils.translation import ugettext as _
 import jms_storage
 
-from assets.models import Asset, SystemUser
 from users.models import User
 from common.utils import get_logger, reverse
 from common.tasks import send_mail_async
-from .const import USERS_CACHE_KEY, ASSETS_CACHE_KEY, SYSTEM_USER_CACHE_KEY
 from .models import ReplayStorage, Session, Command
 
 logger = get_logger(__name__)
-
-
-def get_session_asset_list():
-    return Asset.objects.values_list('hostname', flat=True)
-
-
-def get_session_user_list():
-    return User.objects.exclude(role=User.ROLE.APP).values_list('username', flat=True)
-
-
-def get_session_system_user_list():
-    return SystemUser.objects.values_list('username', flat=True)
-
-
-def get_user_list_from_cache():
-    return cache.get(USERS_CACHE_KEY)
-
-
-def get_asset_list_from_cache():
-    return cache.get(ASSETS_CACHE_KEY)
-
-
-def get_system_user_list_from_cache():
-    return cache.get(SYSTEM_USER_CACHE_KEY)
 
 
 def find_session_replay_local(session):
@@ -66,6 +39,8 @@ def download_session_replay(session):
         for storage in replay_storages
         if not storage.in_defaults()
     }
+    if settings.SERVER_REPLAY_STORAGE:
+        configs['SERVER_REPLAY_STORAGE'] = settings.SERVER_REPLAY_STORAGE
     if not configs:
         msg = "Not found replay file, and not remote storage set"
         return None, msg

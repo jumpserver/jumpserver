@@ -8,9 +8,8 @@ from rest_framework import serializers
 from common.utils import validate_ssh_public_key
 from common.mixins import CommonBulkSerializerMixin
 from common.permissions import CanUpdateDeleteUser
-from common.drf.fields import GroupConcatedPrimaryKeyRelatedField
 from orgs.models import ROLE as ORG_ROLE
-from ..models import User, UserGroup
+from ..models import User
 
 
 __all__ = [
@@ -18,7 +17,7 @@ __all__ = [
     'ChangeUserPasswordSerializer', 'ResetOTPSerializer',
     'UserProfileSerializer', 'UserOrgSerializer',
     'UserUpdatePasswordSerializer', 'UserUpdatePublicKeySerializer',
-    'UserRetrieveSerializer', 'MiniUserSerializer',
+    'UserRetrieveSerializer', 'MiniUserSerializer', 'InviteSerializer'
 ]
 
 
@@ -339,3 +338,10 @@ class MiniUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'name', 'username']
+
+
+class InviteSerializer(serializers.Serializer):
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.exclude(role=User.ROLE.APP)
+    )
+    role = serializers.ChoiceField(choices=ORG_ROLE.choices)

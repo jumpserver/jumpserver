@@ -2,12 +2,12 @@
 #
 
 from django.utils.translation import ugettext as _
-from rest_framework import status, generics
+from rest_framework import status
 from rest_framework.views import Response
 from rest_framework_bulk import BulkModelViewSet
 
 from common.permissions import IsSuperUserOrAppUser
-from common.drf.api import JMSBulkRelationModelViewSet
+from common.drf.api import JMSBulkRelationModelViewSet, JMSModelViewSet
 from .models import Organization, ROLE
 from .serializers import (
     OrgSerializer, OrgReadSerializer,
@@ -19,6 +19,8 @@ from perms.models import AssetPermission
 from orgs.utils import current_org
 from common.utils import get_logger
 from .filters import OrgMemberRelationFilterSet
+from .models import OrganizationMember
+
 
 logger = get_logger(__file__)
 
@@ -70,6 +72,11 @@ class OrgMemberRelationBulkViewSet(JMSBulkRelationModelViewSet):
     m2m_field = Organization.members.field
     serializer_class = OrgMemberSerializer
     filterset_class = OrgMemberRelationFilterSet
+
+    def perform_bulk_create(self, serializer):
+        data = serializer.validated_data
+        relations = [OrganizationMember(**i) for i in data]
+        OrganizationMember.objects.bulk_create(relations, ignore_conflicts=True)
 
     def perform_bulk_destroy(self, queryset):
         objs = list(queryset.all().prefetch_related('user', 'org'))

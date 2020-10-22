@@ -129,5 +129,5 @@ def update_assets_hardware_info_period():
 def update_node_assets_hardware_info_manual(node):
     task_name = _("Update node asset hardware information: {}").format(node.name)
     assets = node.get_all_assets()
-    result = update_assets_hardware_info_util.delay(assets, task_name=task_name)
+    result = update_assets_hardware_info_util(assets, task_name=task_name)
     return result

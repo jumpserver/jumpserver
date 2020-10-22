@@ -394,16 +394,20 @@ class TokenMixin:
 
     @classmethod
     def validate_reset_password_token(cls, token):
+        if not token:
+            return None
+        key = cls.CACHE_KEY_USER_RESET_PASSWORD_PREFIX.format(token)
+        value = cache.get(key)
+        if not value:
+            return None
         try:
-            key = cls.CACHE_KEY_USER_RESET_PASSWORD_PREFIX.format(token)
-            value = cache.get(key)
             user_id = value.get('id', '')
             email = value.get('email', '')
             user = cls.objects.get(id=user_id, email=email)
+            return user
         except (AttributeError, cls.DoesNotExist) as e:
             logger.error(e, exc_info=True)
-            user = None
-        return user
+            return None
 
     def set_cache(self, token):
         key = self.CACHE_KEY_USER_RESET_PASSWORD_PREFIX.format(token)
@@ -667,31 +671,6 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         if self.email and self.source == self.SOURCE_LOCAL:
             return True
         return False
-
-    @classmethod
-    def generate_fake(cls, count=100):
-        from random import seed, choice
-        import forgery_py
-        from django.db import IntegrityError
-        from .group import UserGroup
-
-        seed()
-        for i in range(count):
-            user = cls(username=forgery_py.internet.user_name(True),
-                       email=forgery_py.internet.email_address(),
-                       name=forgery_py.name.full_name(),
-                       password=make_password(forgery_py.lorem_ipsum.word()),
-                       role=choice(list(dict(User.ROLE.choices).keys())),
-                       wechat=forgery_py.internet.user_name(True),
-                       comment=forgery_py.lorem_ipsum.sentence(),
-                       created_by=choice(cls.objects.all()).username)
-            try:
-                user.save()
-            except IntegrityError:
-                print('Duplicate Error, continue ...')
-                continue
-            user.groups.add(choice(UserGroup.objects.all()))
-            user.save()
 
     @property
     def is_build_in(self):

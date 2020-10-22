@@ -75,7 +75,6 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     """
     class Meta:
         model = Asset
-        list_serializer_class = AdaptedBulkListSerializer
         fields_mini = ['id', 'hostname', 'ip']
         fields_small = fields_mini + [
             'protocol', 'port', 'protocols', 'is_active', 'public_ip',
@@ -116,6 +115,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
         queryset = queryset.select_related('admin_user', 'domain', 'platform')
+        queryset = queryset.prefetch_related('nodes', 'labels')
         return queryset
 
     def compatible_with_old_protocol(self, validated_data):
@@ -153,7 +153,7 @@ class AssetDisplaySerializer(AssetSerializer):
 
     @classmethod
     def setup_eager_loading(cls, queryset):
-        """ Perform necessary eager loading of data. """
+        queryset = super().setup_eager_loading(queryset)
         queryset = queryset\
             .annotate(admin_user_username=F('admin_user__username'))
         return queryset

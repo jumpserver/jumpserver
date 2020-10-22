@@ -1,5 +1,6 @@
 import uuid
 from functools import partial
+from itertools import chain
 
 from django.db import models
 from django.db.models import signals
@@ -22,7 +23,7 @@ class Organization(models.Model):
     name = models.CharField(max_length=128, unique=True, verbose_name=_("Name"))
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
-    comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
+    comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
     members = models.ManyToManyField('users.User', related_name='orgs', through='orgs.OrganizationMember',
                                      through_fields=('org', 'user'))
 
@@ -229,6 +230,16 @@ def _none2list(*args):
     return ([] if v is None else v for v in args)
 
 
+def _users2pks_if_need(users, admins, auditors):
+    pks = []
+    for user in chain(users, admins, auditors):
+        if hasattr(user, 'pk'):
+            pks.append(user.pk)
+        else:
+            pks.append(user)
+    return pks
+
+
 class UserRoleMapper(dict):
     def __init__(self, container=set):
         super().__init__()
@@ -266,7 +277,7 @@ class OrgMemeberManager(models.Manager):
         users, admins, auditors = _none2list(users, admins, auditors)
 
         send = partial(signals.m2m_changed.send, sender=self.model, instance=org, reverse=False,
-                       model=User, pk_set=[*users, *admins, *auditors], using=self.db)
+                       model=User, pk_set=_users2pks_if_need(users, admins, auditors), using=self.db)
 
         send(action="pre_remove")
         self.filter(org_id=org.id).filter(
@@ -290,17 +301,17 @@ class OrgMemeberManager(models.Manager):
         )
 
         oms_add = []
-        for users, role in add_mapper:
-            for user in users:
-                if isinstance(user, models.Model):
-                    user = user.id
-                oms_add.append(self.model(org_id=org.id, user_id=user, role=role))
+        for _users, _role in add_mapper:
+            for _user in _users:
+                if isinstance(_user, models.Model):
+                    _user = _user.id
+                oms_add.append(self.model(org_id=org.id, user_id=_user, role=_role))
 
         send = partial(signals.m2m_changed.send, sender=self.model, instance=org, reverse=False,
-                       model=User, pk_set=[*users, *admins, *auditors], using=self.db)
+                       model=User, pk_set=_users2pks_if_need(users, admins, auditors), using=self.db)
 
         send(action='pre_add')
-        self.bulk_create(oms_add)
+        self.bulk_create(oms_add, ignore_conflicts=True)
         send(action='post_add')
 
     def _get_remove_add_set(self, new_users, old_users):

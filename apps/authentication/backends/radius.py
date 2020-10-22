@@ -2,7 +2,7 @@
 #
 import traceback
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 from radiusauth.backends import RADIUSBackend, RADIUSRealmBackend
 from django.conf import settings
 
@@ -38,16 +38,12 @@ class CreateUserMixin:
                 return [], False, False
             return None
 
-    def authenticate(self, *args, **kwargs):
-        # 校验用户时，会传入public_key参数，父类authentication中不接受public_key参数，所以要pop掉
-        # TODO:需要优化各backend的authenticate方法，django进行调用前会检测各authenticate的参数
-        kwargs.pop('public_key', None)
-        return super().authenticate(*args, **kwargs)
-
 
 class RadiusBackend(CreateUserMixin, RADIUSBackend):
-    pass
+    def authenticate(self, request, username='', password='', **kwargs):
+        return super().authenticate(request, username=username, password=password)
 
 
 class RadiusRealmBackend(CreateUserMixin, RADIUSRealmBackend):
-    pass
+    def authenticate(self, request, username='', password='', realm=None, **kwargs):
+        return super().authenticate(request, username=username, password=password, realm=realm)
