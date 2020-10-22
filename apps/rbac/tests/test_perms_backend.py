@@ -6,6 +6,7 @@ import uuid
 from users.models import User
 from django.contrib.auth.models import Permission
 from orgs.models import Organization
+from namespaces.models import Namespace
 from rbac.models import Role, SystemRoleBinding, OrgRoleBinding, NamespaceRoleBinding
 
 from rbac.backends import RBACBackend
@@ -50,6 +51,7 @@ class OrgScopeTestCase(TestCase):
 
     app = 'accounts'
     codename = 'add_account'
+    no_codename = 'del_account'
 
     def setUp(self) -> None:
         username = str(uuid.uuid4())
@@ -63,11 +65,17 @@ class OrgScopeTestCase(TestCase):
         self.org_role_binding = OrgRoleBinding.objects.create(user=self.user, role=self.role, org=self.org)
 
     def test_has_system_perm(self):
-        backend = RBACBackend()
+        backend = self.backend = RBACBackend()
         has = backend.has_perm(self.user, f'org:{self.org.id}|{self.app}.{self.codename}')
-        self.assertTrue(has, 'Should be has add account perm, but not')
+        self.assertTrue(has, 'Should be has org add account perm, but not')
 
-        not_has = backend.has_perm(self.user, f'org:{self.org.id}|{self.app}.del_account')
+        not_has = backend.has_perm(self.user, f'org:{self.org.id}|{self.app}.{self.no_codename}')
+        self.assertFalse(not_has, 'Should be not has del org account perm, but not')
+
+        not_has = backend.has_perm(self.user, f'{self.app}.{self.codename}')
+        self.assertFalse(not_has, 'Should not be has add system account perm, but not')
+
+        not_has = backend.has_perm(self.user, f'{self.app}.{self.no_codename}')
         self.assertFalse(not_has, 'Should be not has del account perm, but not')
 
     def tearDown(self) -> None:
@@ -75,3 +83,45 @@ class OrgScopeTestCase(TestCase):
         self.org_role_binding.delete()
         self.role.delete()
 
+
+class NamespaceScopeTestCase(TestCase):
+    user: User
+    role: Role
+    namespace: Namespace
+    namespace_role_binding: SystemRoleBinding
+
+    app = 'accounts'
+    codename = 'add_account'
+    no_codename = 'del_account'
+
+    def setUp(self) -> None:
+        username = str(uuid.uuid4())
+        name = username
+        email = f'{name}@fit2cloud.com'
+        self.user, created = User.objects.get_or_create(username=username, name=username, email=email)
+        self.role, created = Role.objects.get_or_create(name='Namespace account creator', type=Role.TypeChoices.namespace)
+        self.org, created = Organization.objects.get_or_create(name='Test org')
+        self.org.change_to()
+        self.namespace, created = Namespace.objects.get_or_create(name='Test namespace')
+        account_create_permissions = Permission.objects.filter(codename=self.codename, content_type__app_label=self.app)
+        self.role.permissions.set(account_create_permissions)
+        self.namespace_role_binding = NamespaceRoleBinding.objects.create(user=self.user, role=self.role, namespace=self.namespace)
+
+    def test_has_system_perm(self):
+        backend = self.backend = RBACBackend()
+        has = backend.has_perm(self.user, f'ns:{self.namespace.id}|org:{self.org.id}|{self.app}.{self.codename}')
+        self.assertTrue(has, 'Should be has namespace add account perm, but not')
+
+        not_has = backend.has_perm(self.user, f'org:{self.org.id}|{self.app}.{self.no_codename}')
+        self.assertFalse(not_has, 'Should be not has del namespace account perm, but not')
+
+        not_has = backend.has_perm(self.user, f'org:{self.org.id}|{self.app}.{self.codename}')
+        self.assertFalse(not_has, 'Should not be has add org account perm, but has')
+
+        not_has = backend.has_perm(self.user, f'{self.app}.{self.codename}')
+        self.assertFalse(not_has, 'Should not be has add system account perm, but has')
+
+    def tearDown(self) -> None:
+        self.user.delete()
+        self.namespace_role_binding.delete()
+        self.role.delete()
