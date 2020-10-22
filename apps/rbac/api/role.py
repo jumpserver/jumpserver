@@ -1,10 +1,10 @@
 from rest_framework.viewsets import ModelViewSet
 
 from common.permissions import IsSuperUser
-from ..models import Role, RoleNamespaceBinding, RoleOrgBinding
+from ..models import Role, NamespaceRoleBinding, OrgRoleBinding
 from ..serializers import RoleSerializer, RoleNamespaceBindingSerializer, RoleOrgBindingSerializer
 
-__all__ = ['RoleViewSet', 'RoleNamespaceBindingViewSet', 'RoleOrgBindingViewSet']
+__all__ = ['RoleViewSet', 'NamespaceRoleBindingViewSet', 'OrgRoleBindingViewSet']
 
 
 class RoleViewSet(ModelViewSet):
@@ -16,19 +16,19 @@ class RoleViewSet(ModelViewSet):
     serializer_class = RoleSerializer
 
 
-class RoleNamespaceBindingViewSet(ModelViewSet):
+class NamespaceRoleBindingViewSet(ModelViewSet):
     permission_classes = ()
     filter_fields = ('user', 'role')
     search_fields = filter_fields
     ordering_fields = ('role',)
-    queryset = RoleNamespaceBinding.objects.all()
+    queryset = NamespaceRoleBinding.objects.all()
     serializer_class = RoleNamespaceBindingSerializer
 
 
-class RoleOrgBindingViewSet(ModelViewSet):
+class OrgRoleBindingViewSet(ModelViewSet):
     permission_classes = ()
     filter_fields = ('user', 'role')
     search_fields = filter_fields
     ordering_fields = ('role',)
-    queryset = RoleOrgBinding.objects.all()
+    queryset = OrgRoleBinding.objects.all()
     serializer_class = RoleOrgBindingSerializer

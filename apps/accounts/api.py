@@ -5,17 +5,17 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
-from common.permissions import RBACPermission, IsSuperUser
+from common.permissions import IsSuperUser
 from common.drf.api import JMSModelViewSet
+from namespaces.permissions import NamespaceRBACPermission
 from .models import Account, AccountType, PropField
-from .serializers import AccountSerializer, \
-                         AccountTypeSerializer, \
-                         AccountWithSecretSerializer, \
-                         PropFieldSerializer
+from .serializers import (
+    AccountSerializer, AccountTypeSerializer, AccountWithSecretSerializer, PropFieldSerializer
+)
 
 
 class AccountViewSet(JMSModelViewSet):
-    permission_classes = (RBACPermission,)
+    permission_classes = (NamespaceRBACPermission,)
     extra_action_perms_map = {
         'gain_secret': ['gain_secret'],
         'connect': ['connect'],

@@ -1,6 +1,6 @@
 
 from rest_framework import serializers
-from rbac.models import Role, RoleNamespaceBinding
+from rbac.models import Role, NamespaceRoleBinding
 from rbac.serializers import PermissionSerializer
 
 
@@ -32,7 +32,7 @@ class RoleNamespaceBindingSerializer(serializers.ModelSerializer):
     namespace_info = serializers.SerializerMethodField()
 
     class Meta:
-        model = RoleNamespaceBinding
+        model = NamespaceRoleBinding
         fields = (
             'id', 'user', 'user_info', 'role', 'role_info',
             'namespace', 'namespace_info', 'created_by',
@@ -62,7 +62,7 @@ class RoleOrgBindingSerializer(serializers.ModelSerializer):
     org_info = serializers.SerializerMethodField()
 
     class Meta:
-        model = RoleNamespaceBinding
+        model = NamespaceRoleBinding
         fields = (
             'id', 'user', 'user_info', 'role', 'role_info',
             'orgs', 'org_info', 'created_by', 'updated_by',

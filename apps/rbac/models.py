@@ -22,20 +22,42 @@ class Role(models.JMSModel):
         return self.name
 
 
-class RoleNamespaceBinding(models.JMSModel):
+class BaseRoleBinding(models.JMSModel):
     user = models.ForeignKey('users.User', on_delete=models.CASCADE, verbose_name=_('User'))
     role = models.ForeignKey(Role, on_delete=models.PROTECT, verbose_name=_('Role'))
+
+    class Meta:
+        abstract = True
+
+
+class NamespaceRoleBinding(BaseRoleBinding):
     namespace = models.ForeignKey('namespaces.Namespace', on_delete=models.CASCADE, verbose_name=_('Namespaces'))
 
     class Meta:
-        verbose_name = _('Role Namespace Binding')
+        verbose_name = _('Namespace Role Binding')
         unique_together = [('user', 'role', 'namespace')]
 
 
-class RoleOrgBinding(models.JMSModel):
-    user = models.ForeignKey('users.User', on_delete=models.CASCADE, verbose_name=_('User'))
-    role = models.ForeignKey(Role, on_delete=models.PROTECT, verbose_name=_('Role'))
+class OrgRoleBinding(BaseRoleBinding):
     org = models.ForeignKey('orgs.Organization', on_delete=models.CASCADE, verbose_name=_('Organizations'))
 
     class Meta:
         verbose_name = _('Role Org Binding')
+        unique_together = [('user', 'role', 'org')]
+
+
+class SystemRoleBinding(BaseRoleBinding):
+    unique_together = [('user', 'role')]
+
+    class Meta:
+        verbose_name = _('Role Org Binding')
+
+
+from users.models import User
+from django.contrib.auth.models import Permission
+from orgs.models import Organization
+from rbac.models import Role, SystemRoleBinding, OrgRoleBinding, NamespaceRoleBinding
+
+laoguang, created = User.objects.get_or_create(username='laoguang', email='laoguang@fit2cloud.com')
+org = Organization.objects.get_or_create(name='rbac')
+
