@@ -1,7 +1,7 @@
 from django.db.models import Q
 
 from common.utils import get_logger
-from ..models import ApplicationPermission
+from perms.models import ApplicationPermission
 
 logger = get_logger(__file__)
 

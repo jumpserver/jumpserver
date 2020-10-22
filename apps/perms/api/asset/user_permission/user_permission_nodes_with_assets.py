@@ -8,8 +8,7 @@ from django.db.models import F
 from common.permissions import IsValidUser
 from common.utils import get_logger, get_object_or_none
 from .mixin import UserNodeGrantStatusDispatchMixin, ForUserMixin, ForAdminMixin
-from ...utils.user_asset_permission import (
-    get_user_resources_q_granted_by_permissions,
+from perms.utils.asset.user_permission import (
     get_indirect_granted_node_children, UNGROUPED_NODE_KEY, FAVORITE_NODE_KEY,
     get_user_direct_granted_assets, get_top_level_granted_nodes,
     get_user_granted_nodes_list_via_mapping_node,
@@ -19,7 +18,7 @@ from ...utils.user_asset_permission import (
 
 from assets.models import Asset, FavoriteAsset
 from assets.api import SerializeToTreeNodeMixin
-from ...hands import Node
+from perms.hands import Node
 
 logger = get_logger(__name__)
 

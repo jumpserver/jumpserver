@@ -10,8 +10,8 @@ from orgs.mixins.api import OrgRelationMixin
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import current_org
 from common.permissions import IsOrgAdmin
-from .. import serializers
-from .. import models
+from perms import serializers
+from perms import models
 
 __all__ = [
     'ApplicationPermissionUserRelationViewSet',

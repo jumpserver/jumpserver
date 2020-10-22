@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
 #
 
-from .asset_permission import *
-from .application_permission import *
-from .user_permission import *
-from .user_permission_application import *
-from .asset_permission_relation import *
-from .application_permission_relation import *
-from .user_group_permission import *
-from .user_group_permission_application import *
+from .asset import *
+from .application import *
+
+# TODO: 删除
 from .remote_app_permission import *
 from .remote_app_permission_relation import *
 from .user_remote_app_permission import *

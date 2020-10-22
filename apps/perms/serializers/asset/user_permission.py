@@ -6,8 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from assets.models import Node, SystemUser, Asset
 from assets.serializers import ProtocolsField
-from .asset_permission import ActionsField
-from applications.models import Application
+from perms.serializers.asset.permission import ActionsField
 
 __all__ = [
     'NodeGrantedSerializer',
@@ -16,8 +15,6 @@ __all__ = [
     'RemoteAppSystemUserSerializer',
     'DatabaseAppSystemUserSerializer',
     'K8sAppSystemUserSerializer',
-    'ApplicationGrantedSerializer',
-    'ApplicationSystemUserSerializer'
 ]
 
 
@@ -34,49 +31,6 @@ class AssetSystemUserSerializer(serializers.ModelSerializer):
             'sftp_root', 'username_same_with_user',
         )
         fields = list(only_fields) + ["actions"]
-        read_only_fields = fields
-
-
-class ApplicationSystemUserSerializer(serializers.ModelSerializer):
-    """
-    查看授权的应用系统用户的数据结构，这个和SystemUserSerializer不同，字段少
-    """
-    class Meta:
-        model = SystemUser
-        only_fields = (
-            'id', 'name', 'username', 'priority', 'protocol', 'login_mode'
-        )
-        fields = list(only_fields)
-        read_only_fields = fields
-
-
-class RemoteAppSystemUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SystemUser
-        only_fields = (
-            'id', 'name', 'username', 'priority', 'protocol', 'login_mode',
-        )
-        fields = list(only_fields)
-        read_only_fields = fields
-
-
-class DatabaseAppSystemUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SystemUser
-        only_fields = (
-            'id', 'name', 'username', 'priority', 'protocol', 'login_mode',
-        )
-        fields = list(only_fields)
-        read_only_fields = fields
-
-
-class K8sAppSystemUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SystemUser
-        only_fields = (
-            'id', 'name', 'username', 'priority', 'protocol', 'login_mode',
-        )
-        fields = list(only_fields)
         read_only_fields = fields
 
 
@@ -110,14 +64,33 @@ class ActionsSerializer(serializers.Serializer):
     actions = ActionsField(read_only=True)
 
 
-class ApplicationGrantedSerializer(serializers.ModelSerializer):
-    """
-    被授权应用的数据结构
-    """
+# TODO: 删除
+class RemoteAppSystemUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Application
-        only_fields = [
-            'id', 'name', 'domain', 'category', 'type', 'comment', 'org_id'
-        ]
-        fields = only_fields + ['org_name']
+        model = SystemUser
+        only_fields = (
+            'id', 'name', 'username', 'priority', 'protocol', 'login_mode',
+        )
+        fields = list(only_fields)
         read_only_fields = fields
+
+
+class DatabaseAppSystemUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SystemUser
+        only_fields = (
+            'id', 'name', 'username', 'priority', 'protocol', 'login_mode',
+        )
+        fields = list(only_fields)
+        read_only_fields = fields
+
+
+class K8sAppSystemUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SystemUser
+        only_fields = (
+            'id', 'name', 'username', 'priority', 'protocol', 'login_mode',
+        )
+        fields = list(only_fields)
+        read_only_fields = fields
+

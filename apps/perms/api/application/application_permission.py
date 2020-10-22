@@ -2,8 +2,8 @@
 #
 from common.permissions import IsOrgAdmin
 from orgs.mixins.api import OrgBulkModelViewSet
-from ..models import ApplicationPermission
-from .. import serializers
+from perms.models import ApplicationPermission
+from perms import serializers
 
 
 class ApplicationPermissionViewSet(OrgBulkModelViewSet):
