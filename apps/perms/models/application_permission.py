@@ -2,10 +2,12 @@
 #
 
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import lazyproperty
 from .base import BasePermission
+from users.models import User
 
 __all__ = [
     'ApplicationPermission',
@@ -36,3 +38,11 @@ class ApplicationPermission(BasePermission):
     @lazyproperty
     def system_users_amount(self):
         return self.system_users.count()
+
+    def get_all_users(self):
+        users_id = self.users.all().values_list('id', flat=True)
+        user_groups_id = self.user_groups.all().values_list('id', flat=True)
+        users = User.objects.filter(
+            Q(id__in=users_id) | Q(groups__id__in=user_groups_id)
+        )
+        return users

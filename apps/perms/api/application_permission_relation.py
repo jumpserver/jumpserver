@@ -2,11 +2,10 @@
 #
 from rest_framework import generics
 from django.db.models import F, Value
-from django.db.models import Q
 from django.db.models.functions import Concat
 from django.shortcuts import get_object_or_404
 
-from assets.models import Node, Asset
+from applications.models import Application
 from orgs.mixins.api import OrgRelationMixin
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import current_org
@@ -18,7 +17,9 @@ __all__ = [
     'ApplicationPermissionUserRelationViewSet',
     'ApplicationPermissionUserGroupRelationViewSet',
     'ApplicationPermissionApplicationRelationViewSet',
-    'ApplicationPermissionSystemUserRelationViewSet'
+    'ApplicationPermissionSystemUserRelationViewSet',
+    'ApplicationPermissionAllApplicationListApi',
+    'ApplicationPermissionAllUserListApi',
 ]
 
 
@@ -96,3 +97,32 @@ class ApplicationPermissionSystemUserRelationViewSet(RelationMixin):
                 Value(')')
             ))
         return queryset
+
+
+class ApplicationPermissionAllApplicationListApi(generics.ListAPIView):
+    permission_classes = (IsOrgAdmin,)
+    serializer_class = serializers.ApplicationPermissionAllApplicationSerializer
+    only_fields = serializers.ApplicationPermissionAllApplicationSerializer.Meta.only_fields
+    filter_fields = ('name',)
+    search_fields = filter_fields
+
+    def get_queryset(self):
+        pk = self.kwargs.get('pk')
+        perm = get_object_or_404(models.ApplicationPermission, pk=pk)
+        applications = Application.objects.filter(granted_by_permissions=perm)\
+            .only(*self.only_fields).distinct()
+        return applications
+
+
+class ApplicationPermissionAllUserListApi(generics.ListAPIView):
+    permission_classes = (IsOrgAdmin,)
+    serializer_class = serializers.ApplicationPermissionAllUserSerializer
+    only_fields = serializers.ApplicationPermissionAllUserSerializer.Meta.only_fields
+    filter_fields = ('username', 'name')
+    search_fields = filter_fields
+
+    def get_queryset(self):
+        pk = self.kwargs.get('pk')
+        perm = get_object_or_404(models.ApplicationPermission, pk=pk)
+        users = perm.get_all_users().only(*self.only_fields).distinct()
+        return users
