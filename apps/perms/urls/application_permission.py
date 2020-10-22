@@ -13,17 +13,17 @@ router.register('application-permissions-user-groups-relations', api.Application
 router.register('application-permissions-applications-relations', api.ApplicationPermissionApplicationRelationViewSet, 'application-permissions-application-relation')
 router.register('application-permissions-system-users-relations', api.ApplicationPermissionSystemUserRelationViewSet, 'application-permissions-system-users-relation')
 
-"""
 user_permission_urlpatterns = [
-    path('<uuid:pk>/applications/', api.UserGrantedApplicationsApi.as_view(), name='user-applications'),
-    path('applications/', api.UserGrantedApplicationsApi.as_view(), name='my-applications'),
+    path('<uuid:pk>/applications/', api.UserAllGrantedApplicationsApi.as_view(), name='user-applications'),
+    path('applications/', api.MyAllGrantedApplicationsApi.as_view(), name='my-applications'),
 
-    # Application as tree
-    path('<uuid:pk>/applications/tree/', api.UserGrantedApplicationsAsTreeApi.as_view(), name='user-applications-as-tree'),
-    path('applications/tree/', api.UserGrantedApplicationsAsTreeApi.as_view(), name='my-applications-as-tree'),
+    # Application As Tree
+    path('<uuid:pk>/applications/tree/', api.UserAllGrantedApplicationsAsTreeApi.as_view(), name='user-applications-as-tree'),
+    path('applications/tree/', api.MyAllGrantedApplicationsAsTreeApi.as_view(), name='my-applications-as-tree'),
 
+    # Application System Users
     path('<uuid:pk>/applications/<uuid:application_id>/system-users/', api.UserGrantedApplicationSystemUsersApi.as_view(), name='user-application-system-users'),
-    path('applications/<uuid:application_id>/system-users/', api.UserGrantedApplicationSystemUsersApi.as_view(), name='user-application-system-users'),
+    path('applications/<uuid:application_id>/system-users/', api.MyGrantedApplicationSystemUsersApi.as_view(), name='my-application-system-users'),
 ]
 
 user_group_permission_urlpatterns = [
@@ -31,11 +31,11 @@ user_group_permission_urlpatterns = [
 ]
 
 permission_urlpatterns = [
-    # 授权规则中授权的用户和数据库应用
+    # 授权规则中授权的用户和应用
     path('<uuid:pk>/applications/all/', api.ApplicationPermissionAllApplicationListApi.as_view(), name='application-permission-all-applications'),
     path('<uuid:pk>/users/all/', api.ApplicationPermissionAllUserListApi.as_view(), name='application-permission-all-users'),
 
-    # 验证用户是否有某个数据库应用的权限
+    # 验证用户是否有某个应用的权限
     path('user/validate/', api.ValidateUserApplicationPermissionApi.as_view(), name='validate-user-application-permission'),
 ]
 
@@ -46,5 +46,3 @@ application_permission_urlpatterns = [
 ]
 
 application_permission_urlpatterns += router.urls
-"""
-application_permission_urlpatterns = router.urls

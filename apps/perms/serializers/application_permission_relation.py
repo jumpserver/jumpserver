@@ -4,15 +4,15 @@ from rest_framework import serializers
 
 from common.mixins import BulkSerializerMixin
 from common.serializers import AdaptedBulkListSerializer
-from assets.models import Asset, Node
 from ..models import ApplicationPermission
-from users.models import User
 
 __all__ = [
     'ApplicationPermissionUserRelationSerializer',
     'ApplicationPermissionUserGroupRelationSerializer',
     'ApplicationPermissionApplicationRelationSerializer',
-    'ApplicationPermissionSystemUserRelationSerializer'
+    'ApplicationPermissionSystemUserRelationSerializer',
+    'ApplicationPermissionAllApplicationSerializer',
+    'ApplicationPermissionAllUserSerializer'
 ]
 
 
@@ -67,3 +67,26 @@ class ApplicationPermissionSystemUserRelationSerializer(RelationMixin, serialize
             'id', 'systemuser', 'systemuser_display'
         ]
 
+
+class ApplicationPermissionAllApplicationSerializer(serializers.Serializer):
+    application = serializers.UUIDField(read_only=True, source='id')
+    application_display = serializers.SerializerMethodField()
+
+    class Meta:
+        only_fields = ['id', 'name']
+
+    @staticmethod
+    def get_application_display(obj):
+        return str(obj)
+
+
+class ApplicationPermissionAllUserSerializer(serializers.Serializer):
+    user = serializers.UUIDField(read_only=True, source='id')
+    user_display = serializers.SerializerMethodField()
+
+    class Meta:
+        only_fields = ['id', 'username', 'name']
+
+    @staticmethod
+    def get_user_display(obj):
+        return str(obj)

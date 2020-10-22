@@ -113,3 +113,6 @@ class Application(CommonModelMixin, OrgModelMixin):
     class Meta:
         unique_together = [('org_id', 'name')]
         ordering = ('name',)
+
+    def __str__(self):
+        return '{}({})'.format(self.name, self.get_category_display())

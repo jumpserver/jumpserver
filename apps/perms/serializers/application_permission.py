@@ -3,7 +3,6 @@
 
 from rest_framework import serializers
 
-from django.db.models import Count
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from perms.models import ApplicationPermission
 
