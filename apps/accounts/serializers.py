@@ -8,13 +8,14 @@ from .models import Account, AccountType, PropField
 
 class AccountSerializer(serializers.ModelSerializer):
     type_display = serializers.CharField(source='type.name', read_only=True, label=_('AccountType'))
+    secret_type = serializers.CharField(source='type.secret_type', read_only=True, label=_('SecretType'))
     namespace_display = serializers.CharField(source='namespace.name', read_only=True, label=_('Namespace'))
 
     class Meta:
         model = Account
         fields = (
-            'id', 'name', 'username', 'address', 'secret', 'secret_type',
-            'type', 'type_display', 'extra_props', 'namespace', 'namespace_display',
+            'id', 'name', 'username', 'address', 'secret', 'secret_type', 'type',
+            'type_display', 'extra_props', 'namespace', 'namespace_display',
             'is_active', 'comment', 'created_by', 'date_created', 'date_updated',
         )
         read_only_fields = ('id', 'type_display', 'namespace_display', 'created_by')
@@ -58,12 +59,13 @@ class AccountSerializer(serializers.ModelSerializer):
 
 
 class AccountWithSecretSerializer(AccountSerializer):
+    secret_type = serializers.CharField(source='type.secret_type', read_only=True, label=_('SecretType'))
 
     class Meta:
         model = Account
         fields = (
-            'id', 'name', 'username', 'address', 'secret', 'secret_type',
-            'type', 'type_display', 'extra_props', 'namespace', 'namespace_display',
+            'id', 'name', 'username', 'address', 'secret', 'secret_type', 'type',
+            'type_display', 'extra_props', 'namespace', 'namespace_display',
             'is_active', 'comment', 'created_by', 'date_created', 'date_updated',
         )
 
@@ -91,9 +93,9 @@ class AccountTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = AccountType
         fields = (
-            'id', 'name', 'category', 'base_type', 'protocol',
-            'prop_fields', 'prop_fields_info', 'custom_fields',
-            'created_by', 'date_created', 'date_updated',
+            'id', 'name', 'category', 'secret_type', 'base_type',
+            'protocol', 'prop_fields', 'prop_fields_info',
+            'custom_fields', 'created_by', 'date_created', 'date_updated',
         )
         read_only_fields = ('id', 'created_by')
         extra_kwargs = {'prop_fields': {'allow_empty': True}}

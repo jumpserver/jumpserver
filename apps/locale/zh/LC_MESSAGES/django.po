@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-16 17:59+0800\n"
+"POT-Creation-Date: 2020-10-19 22:13+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -21,38 +21,8 @@ msgstr ""
 msgid "Account Management"
 msgstr "账户管理"
 
-#: accounts/models/account.py:17 assets/models/base.py:234
-#: assets/serializers/asset_user.py:71 authentication/forms.py:13
-#: authentication/templates/authentication/login.html:29
-#: authentication/templates/authentication/xpack_login.html:109
-#: users/forms/user.py:22 users/forms/user.py:193
-#: users/templates/users/user_otp_check_password.html:13
-#: users/templates/users/user_password_update.html:43
-#: users/templates/users/user_password_verify.html:18
-#: users/templates/users/user_profile_update.html:41
-#: users/templates/users/user_pubkey_update.html:41
-#: users/templates/users/user_update.html:20
-#: xpack/plugins/change_auth_plan/models.py:68
-#: xpack/plugins/change_auth_plan/models.py:191
-#: xpack/plugins/change_auth_plan/models.py:286
-msgid "Password"
-msgstr "密码"
-
-#: accounts/models/account.py:18
-msgid "SSH Key"
-msgstr "SSH密钥"
-
-#: accounts/models/account.py:19 assets/models/user.py:124
-#: authentication/models.py:88
-msgid "Token"
-msgstr "Token"
-
-#: accounts/models/account.py:20
-msgid "Cert"
-msgstr "证书"
-
-#: accounts/models/account.py:22 accounts/models/account_type.py:29
-#: accounts/models/account_type.py:61 applications/models/database_app.py:18
+#: accounts/models/account.py:17 accounts/models/account_type.py:29
+#: accounts/models/account_type.py:67 applications/models/database_app.py:18
 #: applications/models/k8s_app.py:11 applications/models/remote_app.py:21
 #: assets/models/asset.py:145 assets/models/base.py:232
 #: assets/models/cluster.py:18 assets/models/cmd_filter.py:21
@@ -78,7 +48,7 @@ msgstr "证书"
 msgid "Name"
 msgstr "名称"
 
-#: accounts/models/account.py:23 assets/models/base.py:233
+#: accounts/models/account.py:18 assets/models/base.py:233
 #: assets/models/gathered_user.py:15 audits/models.py:99
 #: authentication/forms.py:11
 #: authentication/templates/authentication/login.html:21
@@ -93,20 +63,16 @@ msgstr "名称"
 msgid "Username"
 msgstr "用户名"
 
-#: accounts/models/account.py:24 assets/models/cluster.py:23
+#: accounts/models/account.py:19 assets/models/cluster.py:23
 msgid "Address"
 msgstr "地址"
 
-#: accounts/models/account.py:25
-msgid "Secret type"
-msgstr "密钥类型"
-
-#: accounts/models/account.py:26
+#: accounts/models/account.py:20
 #: authentication/templates/authentication/_access_key_modal.html:31
 msgid "Secret"
-msgstr "密钥"
+msgstr "密码"
 
-#: accounts/models/account.py:27 accounts/models/account_type.py:30
+#: accounts/models/account.py:21 accounts/models/account_type.py:30
 #: applications/models/database_app.py:22 applications/models/k8s_app.py:14
 #: assets/models/cmd_filter.py:52 terminal/models.py:383 terminal/models.py:420
 #: tickets/models/ticket.py:40
@@ -114,7 +80,7 @@ msgstr "密钥"
 msgid "Type"
 msgstr "类型"
 
-#: accounts/models/account.py:29 assets/models/asset.py:196
+#: accounts/models/account.py:23 assets/models/asset.py:196
 #: assets/models/cmd_filter.py:22 assets/models/domain.py:55
 #: assets/models/label.py:22 authentication/models.py:48
 msgid "Is active"
@@ -122,7 +88,7 @@ msgstr "激活"
 
 # msgid "Date created"
 # msgstr "创建日期"
-#: accounts/models/account.py:30 applications/models/database_app.py:33
+#: accounts/models/account.py:24 applications/models/database_app.py:33
 #: applications/models/k8s_app.py:18 applications/models/remote_app.py:45
 #: assets/models/asset.py:150 assets/models/asset.py:226
 #: assets/models/base.py:237 assets/models/cluster.py:29
@@ -143,23 +109,23 @@ msgstr "激活"
 msgid "Comment"
 msgstr "备注"
 
-#: accounts/models/account.py:32 accounts/serializers.py:11
-#: namespaces/models.py:12 rbac/models.py:10
+#: accounts/models/account.py:26 accounts/serializers.py:12
+#: namespaces/models.py:12
 msgid "Namespace"
 msgstr "命名空间"
 
-#: accounts/models/account.py:35 users/templates/users/_base_otp.html:14
+#: accounts/models/account.py:29 users/templates/users/_base_otp.html:14
 #: users/templates/users/_user.html:13
 #: users/templates/users/user_profile_update.html:55
 #: xpack/plugins/cloud/models.py:124 xpack/plugins/cloud/serializers.py:83
 msgid "Account"
 msgstr "账户"
 
-#: accounts/models/account.py:37
+#: accounts/models/account.py:31
 msgid "Can gain secret"
-msgstr "获取：密钥"
+msgstr "获取：密码"
 
-#: accounts/models/account.py:38
+#: accounts/models/account.py:32
 msgid "Can connect account"
 msgstr "连接：账户"
 
@@ -214,25 +180,59 @@ msgstr "云"
 msgid "Other"
 msgstr "其它"
 
-#: accounts/models/account_type.py:62 assets/models/label.py:21
+#: accounts/models/account_type.py:62 assets/models/base.py:234
+#: assets/serializers/asset_user.py:71 authentication/forms.py:13
+#: authentication/templates/authentication/login.html:29
+#: authentication/templates/authentication/xpack_login.html:109
+#: users/forms/user.py:22 users/forms/user.py:193
+#: users/templates/users/user_otp_check_password.html:13
+#: users/templates/users/user_password_update.html:43
+#: users/templates/users/user_password_verify.html:18
+#: users/templates/users/user_profile_update.html:41
+#: users/templates/users/user_pubkey_update.html:41
+#: users/templates/users/user_update.html:20
+#: xpack/plugins/change_auth_plan/models.py:68
+#: xpack/plugins/change_auth_plan/models.py:191
+#: xpack/plugins/change_auth_plan/models.py:286
+msgid "Password"
+msgstr "密码"
+
+#: accounts/models/account_type.py:63
+msgid "SSH Key"
+msgstr "SSH密钥"
+
+#: accounts/models/account_type.py:64 assets/models/user.py:124
+#: authentication/models.py:88
+msgid "Token"
+msgstr "Token"
+
+#: accounts/models/account_type.py:65
+msgid "Cert"
+msgstr "证书"
+
+#: accounts/models/account_type.py:68 assets/models/label.py:21
 msgid "Category"
 msgstr "分类"
 
-#: accounts/models/account_type.py:64
+#: accounts/models/account_type.py:69
+msgid "Secret type"
+msgstr "密码类型"
+
+#: accounts/models/account_type.py:71
 msgid "Base Type"
 msgstr "父类型"
 
-#: accounts/models/account_type.py:65 assets/models/asset.py:190
+#: accounts/models/account_type.py:72 assets/models/asset.py:190
 #: assets/models/domain.py:52 assets/models/user.py:117
 #: terminal/serializers/session.py:29
 msgid "Protocol"
 msgstr "协议"
 
-#: accounts/models/account_type.py:66
+#: accounts/models/account_type.py:73
 msgid "Properties Definition"
 msgstr "包含字段"
 
-#: accounts/models/account_type.py:69
+#: accounts/models/account_type.py:76
 msgid "Account Type"
 msgstr "账户类型"
 
@@ -240,7 +240,13 @@ msgstr "账户类型"
 msgid "AccountType"
 msgstr "账户类型"
 
-#: accounts/serializers.py:87
+#: accounts/serializers.py:11 accounts/serializers.py:62
+#, fuzzy
+#| msgid "Secret type"
+msgid "SecretType"
+msgstr "密码类型"
+
+#: accounts/serializers.py:90
 msgid "Custom fields"
 msgstr "自定义字段"
 
@@ -554,7 +560,7 @@ msgstr "运营商"
 msgid "Default"
 msgstr "默认"
 
-#: assets/models/cluster.py:36 assets/models/label.py:14 rbac/models.py:8
+#: assets/models/cluster.py:36 assets/models/label.py:14
 #: users/models/user.py:663
 msgid "System"
 msgstr "系统"
@@ -672,7 +678,7 @@ msgstr "默认资产组"
 #: authentication/models.py:90 orgs/models.py:17 orgs/models.py:385
 #: perms/forms/asset_permission.py:83 perms/forms/database_app_permission.py:38
 #: perms/forms/remote_app_permission.py:40 perms/models/base.py:49
-#: rbac/models.py:27 templates/index.html:78
+#: rbac/models.py:26 templates/index.html:78
 #: terminal/backends/command/models.py:18
 #: terminal/backends/command/serializers.py:12 terminal/models.py:187
 #: tickets/models/ticket.py:30 tickets/models/ticket.py:138
@@ -1801,7 +1807,7 @@ msgid "The current organization cannot be deleted"
 msgstr "当前组织不能被删除"
 
 #: orgs/mixins/models.py:56 orgs/mixins/serializers.py:25 orgs/models.py:40
-#: orgs/models.py:384 rbac/models.py:9
+#: orgs/models.py:384
 msgid "Organization"
 msgstr "组织"
 
@@ -1813,7 +1819,7 @@ msgstr "组织管理员"
 msgid "Organization auditor"
 msgstr "组织审计员"
 
-#: orgs/models.py:386 rbac/models.py:20 rbac/models.py:28
+#: orgs/models.py:386 rbac/models.py:19 rbac/models.py:27
 #: users/forms/user.py:27 users/models/user.py:513
 #: users/templates/users/_select_user_modal.html:15
 #: users/templates/users/user_detail.html:73
@@ -1904,7 +1910,7 @@ msgstr "动作"
 msgid "Asset permission"
 msgstr "资产授权"
 
-#: perms/models/base.py:53 rbac/models.py:31
+#: perms/models/base.py:53 rbac/models.py:30
 #: tickets/serializers/request_asset_perm.py:31 users/models/user.py:541
 #: users/templates/users/user_detail.html:93
 #: users/templates/users/user_profile.html:120
@@ -1929,37 +1935,43 @@ msgstr "远程应用授权"
 msgid "Authorization Management"
 msgstr "授权管理"
 
-# msgid "Date created"
-# msgstr "创建日期"
-#: rbac/models.py:11
-msgid "Common"
-msgstr "普通用户"
+#: rbac/models.py:8
+msgid "System role"
+msgstr "系统角色"
 
-#: rbac/models.py:13
+#: rbac/models.py:9
+msgid "Organization role"
+msgstr "组织角色"
+
+#: rbac/models.py:10
+msgid "Namespace role"
+msgstr "命名空间角色"
+
+#: rbac/models.py:12
 msgid "Role name"
 msgstr "角色名"
 
-#: rbac/models.py:15
+#: rbac/models.py:14
 msgid "Role type"
 msgstr "角色类型"
 
-#: rbac/models.py:16
+#: rbac/models.py:15
 msgid "Permissions"
 msgstr "权限"
 
-#: rbac/models.py:17
+#: rbac/models.py:16
 msgid "Is build in"
 msgstr "内建"
 
-#: rbac/models.py:29
+#: rbac/models.py:28
 msgid "Namespaces"
 msgstr "命名空间"
 
-#: rbac/models.py:30
+#: rbac/models.py:29
 msgid "Organizations"
 msgstr "组织"
 
-#: rbac/models.py:34
+#: rbac/models.py:33
 msgid "Role Binding"
 msgstr "角色授权"
 

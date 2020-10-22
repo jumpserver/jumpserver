@@ -27,24 +27,28 @@ account_type_data = [
     {'id': '0b92526c3ee5464895c73f74f47f873d',
      'name': 'Microsoft RemoteApp',
      'category': AccountType.Category.APP,
+     'secret_type': 'password',
      'base_type_id': None,
      'protocol': 'HTTPS',
      'prop_fields': []
      },
     {'name': 'vSphere Client',
      'category': AccountType.Category.APP,
+     'secret_type': 'password',
      'base_type_id': '0b92526c3ee5464895c73f74f47f873d',
      'protocol': 'HTTPS',
      'prop_fields': []
      },
     {'name': 'Web Service',
      'category': AccountType.Category.APP,
+    'secret_type': 'password',
      'base_type_id': '0b92526c3ee5464895c73f74f47f873d',
      'protocol': 'HTTPS',
      'prop_fields': []
      },
     {'name': 'MySQL Workbench',
      'category': AccountType.Category.APP,
+     'secret_type': 'password',
      'base_type_id': '0b92526c3ee5464895c73f74f47f873d',
      'protocol': 'HTTPS',
      'prop_fields': []
@@ -54,24 +58,28 @@ account_type_data = [
     {'id': '1a91de6836624856888c04c95435cf6f',
      'name': 'MySQL',
      'category': AccountType.Category.DATABASE,
+     'secret_type': 'password',
      'base_type_id': None,
      'protocol': 'TCP/IP',
      'prop_fields': [1, 6]
      },
     {'name': 'PostgreSQL',
      'category': AccountType.Category.DATABASE,
+     'secret_type': 'password',
      'base_type_id': None,
      'protocol': 'TCP/IP',
      'prop_fields': [1, 6]
      },
     {'name': 'Oracle',
      'category': AccountType.Category.DATABASE,
+     'secret_type': 'password',
      'base_type_id': None,
      'protocol': 'TCP/IP',
      'prop_fields': [1, 7, 8, 9]
      },
     {'name': 'MariaDB',
      'category': AccountType.Category.DATABASE,
+     'secret_type': 'password',
      'base_type_id': '1a91de6836624856888c04c95435cf6f',
      'protocol': 'TCP/IP',
      'prop_fields': []
@@ -80,12 +88,14 @@ account_type_data = [
     # OS
     {'name': 'Unix SSH(password)',
      'category': AccountType.Category.OS,
+     'secret_type': 'password',
      'base_type_id': None,
      'protocol': 'SSH',
      'prop_fields': [1]
      },
     {'name': 'Unix SSH(ssh-key)',
      'category': AccountType.Category.OS,
+     'secret_type': 'ssh-key',
      'base_type_id': None,
      'protocol': 'SSH',
      'prop_fields': [1, 5]
@@ -93,24 +103,28 @@ account_type_data = [
     {'id': 'ed81d10f895842ab8cd30e02279ead03',
      'name': 'Windows Server',
      'category': AccountType.Category.OS,
+     'secret_type': 'password',
      'base_type_id': None,
      'protocol': 'RDP',
      'prop_fields': []
      },
     {'name': 'Windows Server(TLS)',
      'category': AccountType.Category.OS,
+     'secret_type': 'password',
      'base_type_id': 'ed81d10f895842ab8cd30e02279ead03',
      'protocol': 'RDP',
      'prop_fields': [10]
      },
     {'name': 'Windows Server(NLA)',
      'category': AccountType.Category.OS,
+     'secret_type': 'password',
      'base_type_id': 'ed81d10f895842ab8cd30e02279ead03',
      'protocol': 'RDP',
      'prop_fields': [10]
      },
     {'name': 'VNC Server',
      'category': AccountType.Category.OS,
+     'secret_type': 'password',
      'base_type_id': None,
      'protocol': 'VNC',
      'prop_fields': [1]
@@ -120,18 +134,21 @@ account_type_data = [
     {'id': 'dea0bdf8081a45a7bb655d1fb482b120',
      'name': 'Network Device(ssh-key)',
      'category': AccountType.Category.NETWORK_DEVICE,
+     'secret_type': 'ssh-key',
      'base_type_id': None,
      'protocol': 'SSH',
      'prop_fields': [1, 5]
      },
     {'name': 'Network Device(Telnet)',
      'category': AccountType.Category.NETWORK_DEVICE,
+     'secret_type': 'ssh-key',
      'base_type_id': None,
      'protocol': 'TELNET',
      'prop_fields': [1]
      },
     {'name': 'Huawei Network Device(SSH)',
      'category': AccountType.Category.NETWORK_DEVICE,
+     'secret_type': 'ssh-key',
      'base_type_id': 'dea0bdf8081a45a7bb655d1fb482b120',
      'protocol': 'SSH',
      'prop_fields': []
@@ -140,6 +157,7 @@ account_type_data = [
     # CLOUD
     {'name': 'Kubernetes',
      'category': AccountType.Category.CLOUD,
+     'secret_type': 'password',
      'base_type_id': None,
      'protocol': 'HTTPS',
      'prop_fields': []
@@ -148,6 +166,7 @@ account_type_data = [
     # OTHER
     {'name': 'Generic',
      'category': AccountType.Category.Other,
+     'secret_type': 'password',
      'base_type_id': None,
      'protocol': '',
      'prop_fields': []

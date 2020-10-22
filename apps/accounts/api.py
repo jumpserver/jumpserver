@@ -1,11 +1,11 @@
-from rest_framework import mixins
+
+from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
-from rbac.models import RoleBinding
-from common.permissions import RBACPermission
+from common.permissions import RBACPermission, IsSuperUser
 from common.drf.api import JMSModelViewSet
 from .models import Account, AccountType, PropField
 from .serializers import AccountSerializer, \
@@ -32,12 +32,12 @@ class AccountViewSet(JMSModelViewSet):
         'connect': AccountWithSecretSerializer,
     }
 
-    def get_queryset(self):
-        user = self.request.user
-        if user.is_build_in:
-            return self.filter_queryset(self.queryset)
-        namespace_ids = RoleBinding.objects.filter(user=user).values_list('namespaces').distinct()
-        return self.filter_queryset(self.queryset).filter(namespace_id__in=namespace_ids)
+    def list(self, request, *args, **kwargs):
+        namespace_id = request.query_params.get('namespace_id')
+        if not namespace_id:
+            return Response({'msg': '缺少必要参数'}, status=status.HTTP_400_BAD_REQUEST)
+        self.queryset = self.filter_queryset(self.get_queryset()).filter(namespace_id=namespace_id).distinct()
+        return super(AccountViewSet, self).list(request, *args, **kwargs)
 
     @action(methods=['get'], detail=True,  url_path='gain-secret')
     def gain_secret(self, request, pk=None):
@@ -53,7 +53,7 @@ class AccountViewSet(JMSModelViewSet):
 
 
 class AccountTypeViewSet(ModelViewSet):
-    permission_classes = (RBACPermission,)
+    permission_classes = (IsSuperUser,)
     filter_fields = ('name', 'category')
     search_fields = filter_fields
     ordering_fields = ('name', 'category', 'date_created')

@@ -5,6 +5,7 @@ from copy import deepcopy
 
 from django.contrib.auth import get_permission_codename
 from django.shortcuts import get_object_or_404
+from namespaces.models import Namespace
 from rest_framework import exceptions
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.conf import settings
@@ -12,6 +13,7 @@ from rest_framework import permissions
 
 from rbac.models import Role
 from orgs.utils import current_org
+from rest_framework.exceptions import PermissionDenied
 
 
 class IsValidUser(permissions.IsAuthenticated, permissions.BasePermission):
@@ -195,7 +197,7 @@ class IsObjectOwner(IsValidUser):
                 request.user == getattr(obj, 'user', None))
 
 
-class RBACPermission(permissions.DjangoModelPermissions):
+class _RBACPermission(permissions.DjangoModelPermissions):
     perms_map = {
         'list': ['view'],
         'retrieve': ['view'],
@@ -227,9 +229,8 @@ class RBACPermission(permissions.DjangoModelPermissions):
             raise exceptions.MethodNotAllowed(view.action)
 
         perms = []
-        for perm_actions in perms_map[view.action]:
-            for perm_action in perm_actions:
-                perms.append(self.get_perm_code(perm_action, model_cls))
+        for perm_action in perms_map[view.action]:
+            perms.append(self.get_perm_code(perm_action, model_cls))
         return perms
 
     def has_permission(self, request, view):
@@ -244,30 +245,33 @@ class RBACPermission(permissions.DjangoModelPermissions):
         return request.user.has_perms(perms)
 
 
-class IsSystemAdminUser(IsValidUser):
+class RBACPermission(_RBACPermission):
+
+    @staticmethod
+    def get_namespace_id(request, view):
+        if view.action == 'create':
+            namespace_id = request.POST.get('namespace_id')
+        elif view.action == 'list':
+            namespace_id = request.query_params.get('namespace_id')
+        # TODO custom action
+        else:
+            sub_obj = view.get_object()
+            namespace_id = sub_obj.namespace.id
+        if not namespace_id:
+            return None
+        namespace = Namespace.objects.filter(id=namespace_id).first()
+        return namespace
 
     def has_permission(self, request, view):
-        return super(IsSystemAdminUser, self).has_permission(request, view) and \
-               Role.TypeChoices.system in request.user.rbac_role
+        if getattr(view, '_ignore_model_permissions', False):
+            return True
+        if not request.user or (not request.user.is_authenticated and self.authenticated_users_only):
+            return False
+        if view.action == 'metadata':
+            return True
+        namespace_id = self.get_namespace_id(request, view)
+        org_id = self.get_org_id(request, view)
 
-
-class IsOrgAdminUser(IsValidUser):
-
-    def has_permission(self, request, view):
-        return super(IsOrgAdminUser, self).has_permission(request, view) and \
-               Role.TypeChoices.org in request.user.rbac_role
-
-
-class IsSystemOrOrgAdminUser(IsValidUser):
-
-    def has_permission(self, request, view):
-        return super(IsSystemOrOrgAdminUser, self).has_permission(request, view) and \
-               (Role.TypeChoices.org in request.user.rbac_role or
-                Role.TypeChoices.system in request.user.rbac_role)
-
-
-class IsNamespaceUser(IsValidUser):
-
-    def has_permission(self, request, view):
-        return super(IsNamespaceUser, self).has_permission(request, view) and \
-               Role.TypeChoices.namespace in request.user.rbac_role
+        queryset = self._queryset(view)
+        perms = self.get_action_required_permissions(view, queryset.model)
+        return request.user.has_perms(perms)

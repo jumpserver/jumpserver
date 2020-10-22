@@ -13,16 +13,10 @@ logger = get_logger(__file__)
 
 
 class Account(models.JMSModel, OrgModelMixin):
-    class SecretType(models.ChoiceSet):
-        PASSWORD = 'password',  _('Password')
-        SSH_KEY = 'ssh-key',  _('SSH Key')
-        TOKEN = 'token', _('Token')
-        CERT = 'cert', _('Cert')
 
     name = models.CharField(max_length=256, verbose_name=_('Name'))
     username = models.CharField(max_length=256, null=True, blank=True, verbose_name=_('Username'))
     address = models.CharField(max_length=1024, verbose_name=_('Address'))
-    secret_type = models.CharField(max_length=32, choices=SecretType.choices, verbose_name=_('Secret type'))
     secret = models.TextField(verbose_name=_('Secret'))
     type = models.ForeignKey('accounts.AccountType', on_delete=models.PROTECT, verbose_name=_('Type'))
     extra_props = jsonfield.JSONField()

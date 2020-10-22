@@ -1,10 +1,10 @@
 
 from rest_framework import serializers
-from rbac.models import Role, RoleBinding
+from rbac.models import Role, RoleNamespaceBinding
 from rbac.serializers import PermissionSerializer
 
 
-__all__ = ['RoleSerializer', 'RoleBindingSerializer']
+__all__ = ['RoleSerializer', 'RoleNamespaceBindingSerializer', 'RoleOrgBindingSerializer']
 
 
 class RoleSerializer(serializers.ModelSerializer):
@@ -26,22 +26,19 @@ class RoleSerializer(serializers.ModelSerializer):
         return serializer.data
 
 
-class RoleBindingSerializer(serializers.ModelSerializer):
+class RoleNamespaceBindingSerializer(serializers.ModelSerializer):
     user_info = serializers.SerializerMethodField()
     role_info = serializers.SerializerMethodField()
     namespace_info = serializers.SerializerMethodField()
-    org_info = serializers.SerializerMethodField()
 
     class Meta:
-        model = RoleBinding
+        model = RoleNamespaceBinding
         fields = (
-            'id', 'user', 'user_info', 'role', 'role_info', 'namespaces', 'namespace_info', 'orgs',
-            'org_info', 'date_expired', 'created_by', 'updated_by', 'date_created', 'date_updated'
+            'id', 'user', 'user_info', 'role', 'role_info',
+            'namespace', 'namespace_info', 'created_by',
+            'updated_by', 'date_created', 'date_updated'
         )
         read_only_fields = ('id', 'created_by', 'updated_by')
-        extra_kwargs = {'orgs': {'allow_empty': True},
-                        'namespaces': {'allow_empty': True},
-                        }
 
     @staticmethod
     def get_user_info(obj):
@@ -55,10 +52,35 @@ class RoleBindingSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_namespace_info(obj):
-        namespaces = obj.namespaces.all()
-        return [{'id': n.id, 'name': n.name, 'comment': n.comment} for n in namespaces]
+        namespace = obj.namespace
+        return {'id': namespace.id, 'name': namespace.name, 'comment': namespace.comment}
+
+
+class RoleOrgBindingSerializer(serializers.ModelSerializer):
+    user_info = serializers.SerializerMethodField()
+    role_info = serializers.SerializerMethodField()
+    org_info = serializers.SerializerMethodField()
+
+    class Meta:
+        model = RoleNamespaceBinding
+        fields = (
+            'id', 'user', 'user_info', 'role', 'role_info',
+            'orgs', 'org_info', 'created_by', 'updated_by',
+            'date_created', 'date_updated'
+        )
+        read_only_fields = ('id', 'created_by', 'updated_by')
+
+    @staticmethod
+    def get_user_info(obj):
+        user = obj.user
+        return {'id': user.id, 'name': user.name, 'username': user.username}
+
+    @staticmethod
+    def get_role_info(obj):
+        role = obj.role
+        return {'id': role.id, 'name': role.name, 'type': role.type}
 
     @staticmethod
     def get_org_info(obj):
-        orgs = obj.orgs.all()
-        return [{'id': o.id, 'name': o.name} for o in orgs]
+        org = obj.org
+        return {'id': org.id, 'name': org.name}

@@ -58,8 +58,15 @@ class AccountType(JMSModel):
         CLOUD = 'cloud', _('Cloud')
         Other = 'other',  _('Other')
 
+    class SecretType(ChoiceSet):
+        PASSWORD = 'password',  _('Password')
+        SSH_KEY = 'ssh-key',  _('SSH Key')
+        TOKEN = 'token', _('Token')
+        CERT = 'cert', _('Cert')
+
     name = models.CharField(max_length=255, unique=True, verbose_name=_('Name'))
     category = models.CharField(max_length=64, choices=Category.choices, default=Category.OS, verbose_name=_('Category'))
+    secret_type = models.CharField(max_length=32, choices=SecretType.choices, verbose_name=_('Secret type'))
     base_type = models.ForeignKey('AccountType', null=True, related_name='sub_types',
                                   on_delete=models.PROTECT, verbose_name=_('Base Type'))
     protocol = models.CharField(max_length=32, verbose_name=_('Protocol'))

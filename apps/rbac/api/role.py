@@ -1,15 +1,14 @@
-from common.permissions import RBACPermission
 from rest_framework.viewsets import ModelViewSet
 
-from ..models import Role, RoleBinding
-from ..serializers import RoleSerializer, RoleBindingSerializer
+from common.permissions import IsSuperUser
+from ..models import Role, RoleNamespaceBinding, RoleOrgBinding
+from ..serializers import RoleSerializer, RoleNamespaceBindingSerializer, RoleOrgBindingSerializer
 
-
-__all__ = ['RoleViewSet', 'RoleBindingViewSet']
+__all__ = ['RoleViewSet', 'RoleNamespaceBindingViewSet', 'RoleOrgBindingViewSet']
 
 
 class RoleViewSet(ModelViewSet):
-    permission_classes = (RBACPermission,)
+    permission_classes = (IsSuperUser,)
     filter_fields = ('name', 'type', 'is_build_in')
     search_fields = filter_fields
     ordering_fields = ('type',)
@@ -17,10 +16,19 @@ class RoleViewSet(ModelViewSet):
     serializer_class = RoleSerializer
 
 
-class RoleBindingViewSet(ModelViewSet):
-    permission_classes = (RBACPermission,)
+class RoleNamespaceBindingViewSet(ModelViewSet):
+    permission_classes = ()
     filter_fields = ('user', 'role')
     search_fields = filter_fields
     ordering_fields = ('role',)
-    queryset = RoleBinding.objects.all()
-    serializer_class = RoleBindingSerializer
+    queryset = RoleNamespaceBinding.objects.all()
+    serializer_class = RoleNamespaceBindingSerializer
+
+
+class RoleOrgBindingViewSet(ModelViewSet):
+    permission_classes = ()
+    filter_fields = ('user', 'role')
+    search_fields = filter_fields
+    ordering_fields = ('role',)
+    queryset = RoleOrgBinding.objects.all()
+    serializer_class = RoleOrgBindingSerializer
