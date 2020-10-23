@@ -7,6 +7,162 @@ import django.utils.timezone
 import uuid
 
 
+def old_perm_to_application_permission_json(old_perm):
+    return {
+        'id': old_perm.id,
+        'name': old_perm.name,
+        'is_active': old_perm.is_active,
+        'date_start': old_perm.date_start,
+        'date_expired': old_perm.date_expired,
+        'created_by': old_perm.created_by,
+        'comment': old_perm.comment,
+        'org_id': old_perm.org_id
+    }
+
+
+def common_old_perm_relation_to_application_permission_json(old_perm_relation, data_json):
+    return {
+        'applicationpermission_id': getattr(old_perm_relation, data_json['relation_app_perm_id']),
+    }
+
+
+def old_perm_relation_app_to_application_permission_json(old_perm_relation_app, data_json):
+    data = common_old_perm_relation_to_application_permission_json(old_perm_relation_app, data_json)
+    data.update({
+        'application_id': getattr(old_perm_relation_app, data_json['relation_app_id'])
+    })
+    return data
+
+
+def old_perm_relation_system_user_to_application_permission_json(old_perm_relation_system_user, data_json):
+    data = common_old_perm_relation_to_application_permission_json(old_perm_relation_system_user, data_json)
+    data.update({
+        'systemuser_id': old_perm_relation_system_user.systemuser_id,
+    })
+    return data
+
+
+def old_perm_relation_user_group_to_application_permission_json(old_perm_relation_user_group, data_json):
+    data = common_old_perm_relation_to_application_permission_json(old_perm_relation_user_group, data_json)
+    data.update({
+        'usergroup_id': old_perm_relation_user_group.usergroup_id,
+    })
+    return data
+
+
+def old_perm_relation_user_to_application_permission_json(old_perm_relation_user, data_json):
+    data = common_old_perm_relation_to_application_permission_json(old_perm_relation_user, data_json)
+    data.update({
+        'user_id': old_perm_relation_user.user_id,
+    })
+    return data
+
+
+OLD_PERM_MODELS_NAME_MAP_DATA_JSON = {
+    'DatabaseAppPermission': {
+        'app_m2m_fields': 'database_apps',
+        'relation_app_perm_id': 'databaseapppermission_id',
+        'relation_app_id': 'databaseapp_id'
+    },
+    'RemoteAppPermission': {
+        'app_m2m_fields': 'remote_apps',
+        'relation_app_perm_id': 'remoteapppermission_id',
+        'relation_app_id': 'remoteapp_id'
+    },
+    'K8sAppPermission': {
+        'app_m2m_fields': 'k8s_apps',
+        'relation_app_perm_id': 'k8sapppermission_id',
+        'relation_app_id': 'k8sapp_id'
+    }
+}
+
+
+def migrate_and_integrate_application_permissions(apps, schema_editor):
+    db_alias = schema_editor.connection.alias
+
+    new_app_perms_json = []
+    new_app_perms_relation_apps_json = []
+    new_app_perms_relation_system_users_json = []
+    new_app_perms_relation_user_groups_json = []
+    new_app_perms_relation_users_json = []
+
+    for old_perm_model_name, data_json in OLD_PERM_MODELS_NAME_MAP_DATA_JSON.items():
+
+        # model
+        old_perm_model = apps.get_model("perms", old_perm_model_name)
+
+        # instances
+        old_perms = old_perm_model.objects.using(db_alias).all()
+        old_perms_relation_apps = getattr(old_perm_model, data_json['app_m2m_fields']).through.objects.using(db_alias).all()
+        old_perms_relation_system_users = old_perm_model.system_users.through.objects.using(db_alias).all()
+        old_perms_relation_user_groups = old_perm_model.user_groups.through.objects.using(db_alias).all()
+        old_perms_relation_users = old_perm_model.users.through.objects.using(db_alias).all()
+
+        # json
+        perms_json = [
+            old_perm_to_application_permission_json(old_perm)
+            for old_perm in old_perms
+        ]
+        perms_relation_apps_json = [
+            old_perm_relation_app_to_application_permission_json(old_perm_relation_app, data_json)
+            for old_perm_relation_app in old_perms_relation_apps
+        ]
+        perms_relation_system_users_json = [
+            old_perm_relation_system_user_to_application_permission_json(old_perm_relation_system_user, data_json)
+            for old_perm_relation_system_user in old_perms_relation_system_users
+        ]
+        perms_relation_user_groups_json = [
+            old_perm_relation_user_group_to_application_permission_json(old_perm_relation_user_group, data_json)
+            for old_perm_relation_user_group in old_perms_relation_user_groups
+        ]
+        perms_relation_users_json = [
+            old_perm_relation_user_to_application_permission_json(old_perm_relation_user, data_json)
+            for old_perm_relation_user in old_perms_relation_users
+        ]
+
+        new_app_perms_json.extend(perms_json)
+        new_app_perms_relation_apps_json.extend(perms_relation_apps_json)
+        new_app_perms_relation_system_users_json.extend(perms_relation_system_users_json)
+        new_app_perms_relation_user_groups_json.extend(perms_relation_user_groups_json)
+        new_app_perms_relation_users_json.extend(perms_relation_users_json)
+
+    # model
+    new_app_perm_model = apps.get_model("perms", "ApplicationPermission")
+    new_app_perm_relation_app_model = new_app_perm_model.applications.through
+    new_app_perm_relation_system_user_model = new_app_perm_model.system_users.through
+    new_app_perm_relation_user_group_model = new_app_perm_model.user_groups.through
+    new_app_perm_relation_user_model = new_app_perm_model.users.through
+
+    # instances
+    new_app_perm_objects = [
+        new_app_perm_model(**data)
+        for data in new_app_perms_json
+    ]
+    new_app_perm_relation_app_objects = [
+        new_app_perm_relation_app_model(**data)
+        for data in new_app_perms_relation_apps_json
+    ]
+    new_app_perm_relation_system_user_objects = [
+        new_app_perm_relation_system_user_model(**data)
+        for data in new_app_perms_relation_system_users_json
+    ]
+    new_app_perm_relation_user_group_objects = [
+        new_app_perm_relation_user_group_model(**data)
+        for data in new_app_perms_relation_user_groups_json
+    ]
+    new_app_perm_relation_user_objects = [
+        new_app_perm_relation_user_model(**data)
+        for data in new_app_perms_relation_users_json
+    ]
+
+    # create
+    new_app_perm_model.objects.using(db_alias).bulk_create(new_app_perm_objects)
+    new_app_perm_relation_app_model.objects.using(db_alias).bulk_create(new_app_perm_relation_app_objects)
+    new_app_perm_relation_system_user_model.objects.using(db_alias).bulk_create(new_app_perm_relation_system_user_objects)
+    new_app_perm_relation_user_group_model.objects.using(db_alias).bulk_create(new_app_perm_relation_user_group_objects)
+    new_app_perm_relation_user_model.objects.using(db_alias).bulk_create(new_app_perm_relation_user_objects)
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -41,4 +197,5 @@ class Migration(migrations.Migration):
                 'unique_together': {('org_id', 'name')},
             },
         ),
+        migrations.RunPython(migrate_and_integrate_application_permissions),
     ]
