@@ -98,6 +98,16 @@ class Category(ChoiceSet):
         mapper = cls.get_all_type_serializer_mapper()
         return mapper.get(tp, None)
 
+    @classmethod
+    def get_category_serializer_cls(cls, cg):
+        from ..serializers import remote_app, database_app, k8s_app
+        mapper = {
+            cls.db: database_app.DatabaseCategorySerializer,
+            cls.remote_app: remote_app.RemmoteAppCategorySerializer,
+            cls.cloud: k8s_app.CloudCategorySerializer,
+        }
+        return mapper.get(cg, None)
+
 
 class Application(CommonModelMixin, OrgModelMixin):
     name = models.CharField(max_length=128, verbose_name=_('Name'))
