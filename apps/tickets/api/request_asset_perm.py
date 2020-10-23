@@ -104,6 +104,9 @@ class RequestAssetPermTicketViewSet(JMSModelViewSet):
         if system_users is None:
             raise ConfirmedSystemUserChanged(detail=_('Confirmed system-users changed'))
 
+        instance.perform_action(instance.ACTION.APPROVE,
+                                request.user,
+                                self._get_extra_comment(instance))
         self._create_asset_permission(instance, assets, system_users)
         return Response({'detail': _('Succeed')})
 
@@ -116,14 +119,13 @@ class RequestAssetPermTicketViewSet(JMSModelViewSet):
 
     def _create_asset_permission(self, instance: Ticket, assets, system_users):
         meta = instance.meta
-        request = self.request
         actions = meta.get('actions', Action.CONNECT)
 
         ap_kwargs = {
             'name': _('From request ticket: {} {}').format(instance.user_display, instance.id),
             'created_by': self.request.user.username,
             'comment': _('{} request assets, approved by {}').format(instance.user_display,
-                                                                     instance.assignees_display),
+                                                                     instance.assignee_display),
             'actions': actions,
         }
         date_start = dt_parser(meta.get('date_start'))
@@ -132,9 +134,7 @@ class RequestAssetPermTicketViewSet(JMSModelViewSet):
             ap_kwargs['date_start'] = date_start
         if date_expired:
             ap_kwargs['date_expired'] = date_expired
-        instance.perform_action(instance.ACTION.APPROVE,
-                                request.user,
-                                self._get_extra_comment(instance))
+
         ap = AssetPermission.objects.create(**ap_kwargs)
         ap.system_users.add(*system_users)
         ap.assets.add(*assets)
