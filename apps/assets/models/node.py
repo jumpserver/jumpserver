@@ -377,6 +377,11 @@ class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
     parent_key = models.CharField(max_length=64, verbose_name=_("Parent key"),
                                   db_index=True, default='')
     assets_amount = models.IntegerField(default=0)
+    left = models.IntegerField(default=0, null=False)
+    right = models.IntegerField(default=0, null=False)
+    level = models.IntegerField(default=0, null=False)
+    parent = models.ForeignKey('self', db_constraint=False, on_delete=models.PROTECT,
+                               default=None, null=True)
 
     objects = OrgManager.from_queryset(NodeQuerySet)()
     is_node = True
