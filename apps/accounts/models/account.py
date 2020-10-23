@@ -13,10 +13,11 @@ logger = get_logger(__file__)
 
 
 class Account(models.JMSModel, OrgModelMixin):
-    name = models.CharField(max_length=256, verbose_name=_('Name'))
-    username = models.CharField(max_length=256, null=True, blank=True, verbose_name=_('Username'))
-    address = models.CharField(max_length=1024, verbose_name=_('Address'))
+    name = models.CharField(max_length=1024, verbose_name=_('Name'))
+    username = models.CharField(max_length=1024, null=True, blank=True, verbose_name=_('Username'))
     secret = models.TextField(verbose_name=_('Secret'))
+    address = models.CharField(max_length=1024, verbose_name=_('Address'))
+    port = models.IntegerField(null=True, verbose_name=_('Address'))
     type = models.ForeignKey('accounts.AccountType', on_delete=models.PROTECT, verbose_name=_('Type'))
     privileged = models.BooleanField(default=True, verbose_name=_('Privileged'))
     extra_props = jsonfield.JSONField()
@@ -33,6 +34,12 @@ class Account(models.JMSModel, OrgModelMixin):
         )
         # TODO
         # unique_together = [('username', 'address')]
+
+    def __str__(self):
+        name = f'{self.type.protocol}://{self.username}@{self.address}'
+        if self.port:
+            name += f':{self.port}'
+        return name
 
     def save_extra_props(self, extra_props):
         self.extra_props = extra_props
