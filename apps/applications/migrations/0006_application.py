@@ -130,6 +130,7 @@ class Migration(migrations.Migration):
                 ('attrs', django_mysql.models.JSONField(default=dict)),
                 ('comment', models.TextField(blank=True, default='', max_length=128, verbose_name='Comment')),
                 ('domain', models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='assets.Domain')),
+                ('domain', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='applications', to='assets.Domain', verbose_name='Domain')),
             ],
             options={
                 'ordering': ('name',),
