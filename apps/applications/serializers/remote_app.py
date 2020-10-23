@@ -14,8 +14,11 @@ from .. import const
 from ..models import RemoteApp
 
 
-class RemoteAppAttrsSerializer(serializers.Serializer):
+class RemmoteAppCategorySerializer(serializers.Serializer):
     asset = serializers.CharField(max_length=36, label=_('Assets'))
+
+
+class RemoteAppAttrsSerializer(RemmoteAppCategorySerializer):
     path = serializers.CharField(label=_('Remote App path'))
 
 

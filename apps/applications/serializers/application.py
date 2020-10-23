@@ -11,7 +11,6 @@ __all__ = [
 
 
 class ApplicationSerializer(BulkOrgResourceModelSerializer):
-
     class Meta:
         model = models.Application
         fields = [

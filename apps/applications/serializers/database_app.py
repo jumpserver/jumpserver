@@ -9,10 +9,14 @@ from common.serializers import AdaptedBulkListSerializer
 from .. import models
 
 
-class DatabaseAttrsSerializer(serializers.Serializer):
+class DatabaseCategorySerializer(serializers.Serializer):
     host = serializers.CharField()
     port = serializers.IntegerField()
     database = serializers.CharField(allow_blank=True, allow_null=True)
+
+
+class DatabaseAttrsSerializer(DatabaseCategorySerializer):
+    pass
 
 
 class MySQLAttrsSerializer(DatabaseAttrsSerializer):

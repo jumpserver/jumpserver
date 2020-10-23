@@ -29,7 +29,7 @@ def get_user_database_app_permissions(user, include_group=True):
 
 def get_user_group_database_app_permission(user_group):
     return DatabaseAppPermission.objects.all().valid().filter(
-        user_group=user_group
+        user_groups=user_group
     )
 
 
