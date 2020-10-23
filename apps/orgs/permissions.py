@@ -20,8 +20,8 @@ class OrgRBACPermission(SystemRBACPermission):
             org_id = self.default_get_rbac_org_id(view)
         return org_id
 
-    def get_action_required_permissions(self, view, model_cls):
-        perms = super().get_action_required_permissions(view, model_cls)
+    def get_org_required_permissions(self, view, model_cls):
+        perms = self.get_action_required_permissions(view, model_cls)
         org_id = self.get_org_id(view)
         perms = [f'org:{org_id}|{p}' for p in perms]
         return set(perms)
@@ -32,5 +32,5 @@ class OrgRBACPermission(SystemRBACPermission):
         if not self.user_is_valid(request):
             return False
         queryset = self._queryset(view)
-        perms = self.get_action_required_permissions(view, queryset.model)
+        perms = self.get_org_required_permissions(view, queryset.model)
         return request.user.has_perms(perms)

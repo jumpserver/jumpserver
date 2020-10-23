@@ -23,8 +23,8 @@ class PermissionViewSet(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        if request.query_params.get('user_perms'):
-            queryset = queryset.filter(role__rolebinding__user=request.user)
+        # if request.query_params.get('user_perms'):
+        #     queryset = queryset.filter(role__rolenamespacebinding__user=request.user)
         result = utils.group_permissions(queryset)
         return Response(result)
 

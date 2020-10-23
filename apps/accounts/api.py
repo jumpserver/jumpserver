@@ -1,12 +1,11 @@
-
 from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
-from common.permissions import IsSuperUser
 from common.drf.api import JMSModelViewSet
+from rbac.permissions import IsSystemAdminUser
 from namespaces.permissions import NamespaceRBACPermission
 from .models import Account, AccountType, PropField
 from .serializers import (
@@ -53,7 +52,7 @@ class AccountViewSet(JMSModelViewSet):
 
 
 class AccountTypeViewSet(ModelViewSet):
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsSystemAdminUser,)
     filter_fields = ('name', 'category')
     search_fields = filter_fields
     ordering_fields = ('name', 'category', 'date_created')

@@ -4,10 +4,9 @@ from django.utils.translation import ugettext as _
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
-from rbac.models import NamespaceRoleBinding
+from rbac.models import NamespaceRoleBinding, OrgRoleBinding
 from namespaces.models import Namespace
 from namespaces.serializers import NamespaceSerializer
 
@@ -27,7 +26,7 @@ class NamespaceViewSet(ModelViewSet):
         if user.is_build_in:
             return self.filter_queryset(self.queryset)
         namespace_ids = NamespaceRoleBinding.objects.filter(user=user).values_list('namespace').distinct()
-        org_ids = RoleRoleBinding.objects.filter(user=user).values_list('org').distinct()
+        org_ids = OrgRoleBinding.objects.filter(user=user).values_list('org').distinct()
         return self.filter_queryset(self.queryset).\
             filter(Q(id__in=namespace_ids) | Q(org_id__in=org_ids)).distinct()
 
@@ -37,13 +36,3 @@ class NamespaceViewSet(ModelViewSet):
             return Response({'msg': _('Please delete the sub items first')},
                             status=status.HTTP_400_BAD_REQUEST)
         return super(NamespaceViewSet, self).destroy(request, *args, **kwargs)
-
-
-class NamespaceUserView(APIView):
-    permission_classes = (IsAuthenticated,)
-
-    def get(self, request):
-        namespace_id = request.query_params.get('namespace_id')
-        bindings = NamespaceRoleBinding.objects.filter(namespaces=namespace_id)
-        data = [{'username': b.user.username, 'role': b.role.name} for b in bindings]
-        return Response(data, status=status.HTTP_200_OK)

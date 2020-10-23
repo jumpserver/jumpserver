@@ -235,6 +235,8 @@ class SystemRBACPermission(permissions.DjangoModelPermissions):
         return True
 
     def has_permission(self, request, view):
+        if request.user.is_build_in:
+            return True
         if view.action == 'metadata':
             return True
         if not self.user_is_valid(request):

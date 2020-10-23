@@ -13,7 +13,8 @@ class NamespaceRBACPermission(OrgRBACPermission):
             nid = request.data.get('namespace_id', '')
             return nid
         if action in ['list']:
-            nid = view.kwargs.get('nid', '')
+            # nid = view.kwargs.get('nid', '')
+            nid = request.query_params.get('namespace_id', '')
             return nid
         return ''
 
@@ -24,8 +25,8 @@ class NamespaceRBACPermission(OrgRBACPermission):
             namespace_id = self.default_get_rbac_namespace_id(view)
         return namespace_id
 
-    def get_action_required_permissions(self, view, model_cls):
-        perms = super().get_action_required_permissions(view, model_cls)
+    def get_namespace_required_permissions(self, view, model_cls):
+        perms = self.get_action_required_permissions(view, model_cls)
         namespace_id = self.get_namespace_id(view)
         perms = [f'ns:{namespace_id}|{p}' for p in perms]
         return set(perms)
@@ -34,5 +35,5 @@ class NamespaceRBACPermission(OrgRBACPermission):
         if super().has_permission(request, view):
             return True
         queryset = self._queryset(view)
-        perms = self.get_action_required_permissions(view, queryset.model)
+        perms = self.get_namespace_required_permissions(view, queryset.model)
         return request.user.has_perms(perms)

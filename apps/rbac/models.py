@@ -35,7 +35,7 @@ class NamespaceRoleBinding(BaseRoleBinding):
 
     class Meta:
         verbose_name = _('Namespace Role Binding')
-        unique_together = [('user', 'role', 'namespace')]
+        unique_together = [('user', 'namespace')]
 
 
 class OrgRoleBinding(BaseRoleBinding):
@@ -43,21 +43,11 @@ class OrgRoleBinding(BaseRoleBinding):
 
     class Meta:
         verbose_name = _('Role Org Binding')
-        unique_together = [('user', 'role', 'org')]
+        unique_together = [('user', 'org')]
 
 
 class SystemRoleBinding(BaseRoleBinding):
-    unique_together = [('user', 'role')]
 
     class Meta:
         verbose_name = _('Role Org Binding')
-
-
-from users.models import User
-from django.contrib.auth.models import Permission
-from orgs.models import Organization
-from rbac.models import Role, SystemRoleBinding, OrgRoleBinding, NamespaceRoleBinding
-
-laoguang, created = User.objects.get_or_create(username='laoguang', email='laoguang@fit2cloud.com')
-org = Organization.objects.get_or_create(name='rbac')
 

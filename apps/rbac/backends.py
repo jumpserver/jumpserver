@@ -5,38 +5,31 @@ from rbac.models import NamespaceRoleBinding, OrgRoleBinding, SystemRoleBinding
 class RBACBackend(ModelBackend):
 
     @staticmethod
-    def get_namespace_permissions(user_obj, namespace_id):
+    def format_perms(perms):
+        return ["%s.%s" % (ct, codename) for ct, codename in perms]
+
+    def get_namespace_permissions(self, user_obj, namespace_id):
         perms = []
         bindings = NamespaceRoleBinding.objects.filter(user=user_obj, namespace=namespace_id).all()
         for i in bindings:
             perms += i.role.permissions.all().values_list('content_type__app_label', 'codename')
-        return set(perms)
+        return self.format_perms(perms)
 
-    @staticmethod
-    def get_org_permissions(user_obj, org_id):
+    def get_org_permissions(self, user_obj, org_id):
         perms = []
+        if org_id == 'DEFAULT':
+            return self.format_perms(perms)
         bindings = OrgRoleBinding.objects.filter(user=user_obj, org=org_id).all()
         for i in bindings:
             perms += i.role.permissions.all().values_list('content_type__app_label', 'codename')
-        return set(perms)
+        return self.format_perms(perms)
 
-    @staticmethod
-    def get_system_permissions(user_obj):
+    def get_system_permissions(self, user_obj):
         perms = []
         bindings = SystemRoleBinding.objects.filter(user=user_obj).all()
         for i in bindings:
             perms += i.role.permissions.all().values_list('content_type__app_label', 'codename')
-        return set(perms)
-
-    def get_all_permissions(self, user_obj, namespace='', org=''):
-        if not user_obj.is_active or user_obj.is_anonymous:
-            return set()
-        perms = self.get_system_permissions(user_obj)
-        if org:
-            perms.update(self.get_org_permissions(user_obj, org))
-        if namespace:
-            perms.update(self.get_namespace_permissions(user_obj, namespace))
-        return ["%s.%s" % (ct, codename) for ct, codename in perms]
+        return self.format_perms(perms)
 
     def parse_perm(self, perm):
         cleaned_perm = {
@@ -64,12 +57,18 @@ class RBACBackend(ModelBackend):
         :param obj:
         :return:
         """
+        if not user_obj.is_active:
+            return False
+
         scoped_perm = self.parse_perm(perm)
         namespace = scoped_perm.get('ns')
         org = scoped_perm.get('org')
         perm = scoped_perm.get('perm')
-        permissions = self.get_all_permissions(user_obj, org=org, namespace=namespace)
-        return user_obj.is_active and perm in permissions
+        if namespace:
+            return perm in self.get_namespace_permissions(user_obj, namespace)
+        if org:
+            return perm in self.get_org_permissions(user_obj, org)
+        return perm in self.get_system_permissions(user_obj)
 
     def has_module_perms(self, user_obj, app_label):
         return True

@@ -23,6 +23,7 @@ from common.utils import date_expired_default, get_logger, lazyproperty
 from common import fields
 from common.const import choices
 from common.db.models import ChoiceSet
+from rbac.models import SystemRoleBinding, Role
 
 from ..signals import post_user_change_password
 
@@ -674,4 +675,8 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
 
     @property
     def is_build_in(self):
+        return self.is_superuser
+
+    @property
+    def is_sys_admin(self):
         return self.is_superuser
