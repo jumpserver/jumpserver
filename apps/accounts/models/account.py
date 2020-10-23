@@ -13,12 +13,12 @@ logger = get_logger(__file__)
 
 
 class Account(models.JMSModel, OrgModelMixin):
-
     name = models.CharField(max_length=256, verbose_name=_('Name'))
     username = models.CharField(max_length=256, null=True, blank=True, verbose_name=_('Username'))
     address = models.CharField(max_length=1024, verbose_name=_('Address'))
     secret = models.TextField(verbose_name=_('Secret'))
     type = models.ForeignKey('accounts.AccountType', on_delete=models.PROTECT, verbose_name=_('Type'))
+    privileged = models.BooleanField(default=True, verbose_name=_('Privileged'))
     extra_props = jsonfield.JSONField()
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
     comment = models.TextField(default='', verbose_name=_('Comment'))
