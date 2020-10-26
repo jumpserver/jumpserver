@@ -8,9 +8,13 @@ class RBACBackend(ModelBackend):
     def format_perms(perms):
         return ["%s.%s" % (ct, codename) for ct, codename in perms]
 
-    def get_namespace_permissions(self, user_obj, namespace_id):
+    def get_namespace_permissions(self, user_obj, namespace_id, org_id):
         perms = []
-        bindings = NamespaceRoleBinding.objects.filter(user=user_obj, namespace=namespace_id).all()
+        if org_id == 'DEFAULT':
+            bindings = NamespaceRoleBinding.objects.filter(user=user_obj, namespace=namespace_id).all()
+        else:
+            bindings = NamespaceRoleBinding.objects.\
+                filter(user=user_obj, namespace=namespace_id, namespace__org_id=org_id).all()
         for i in bindings:
             perms += i.role.permissions.all().values_list('content_type__app_label', 'codename')
         return self.format_perms(perms)
@@ -61,13 +65,13 @@ class RBACBackend(ModelBackend):
             return False
 
         scoped_perm = self.parse_perm(perm)
-        namespace = scoped_perm.get('ns')
-        org = scoped_perm.get('org')
+        namespace_id = scoped_perm.get('ns')
+        org_id = scoped_perm.get('org')
         perm = scoped_perm.get('perm')
-        if namespace:
-            return perm in self.get_namespace_permissions(user_obj, namespace)
-        if org:
-            return perm in self.get_org_permissions(user_obj, org)
+        if namespace_id:
+            return perm in self.get_namespace_permissions(user_obj, namespace_id, org_id)
+        if org_id:
+            return perm in self.get_org_permissions(user_obj, org_id)
         return perm in self.get_system_permissions(user_obj)
 
     def has_module_perms(self, user_obj, app_label):

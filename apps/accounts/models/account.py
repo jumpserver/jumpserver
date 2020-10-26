@@ -17,7 +17,7 @@ class Account(models.JMSModel, OrgModelMixin):
     username = models.CharField(max_length=1024, null=True, blank=True, verbose_name=_('Username'))
     secret = models.TextField(verbose_name=_('Secret'))
     address = models.CharField(max_length=1024, verbose_name=_('Address'))
-    port = models.IntegerField(null=True, verbose_name=_('Address'))
+    port = models.IntegerField(null=True, verbose_name=_('Port'))
     type = models.ForeignKey('accounts.AccountType', on_delete=models.PROTECT, verbose_name=_('Type'))
     privileged = models.BooleanField(default=True, verbose_name=_('Privileged'))
     extra_props = jsonfield.JSONField()

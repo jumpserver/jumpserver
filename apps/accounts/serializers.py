@@ -14,9 +14,10 @@ class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
         fields = (
-            'id', 'name', 'username', 'address', 'secret', 'secret_type', 'type',
-            'type_display', 'extra_props', 'namespace', 'namespace_display',
-            'is_active', 'comment', 'created_by', 'date_created', 'date_updated',
+            'id', 'name', 'username', 'address', 'secret', 'secret_type',
+            'port', 'type', 'privileged', 'type_display', 'extra_props',
+            'namespace', 'namespace_display', 'is_active', 'comment',
+            'created_by', 'date_created', 'date_updated',
         )
         read_only_fields = ('id', 'type_display', 'namespace_display', 'created_by')
         extra_kwargs = {
@@ -64,9 +65,10 @@ class AccountWithSecretSerializer(AccountSerializer):
     class Meta:
         model = Account
         fields = (
-            'id', 'name', 'username', 'address', 'secret', 'secret_type', 'type',
-            'type_display', 'extra_props', 'namespace', 'namespace_display',
-            'is_active', 'comment', 'created_by', 'date_created', 'date_updated',
+            'id', 'name', 'username', 'address', 'secret', 'secret_type',
+            'port', 'type', 'privileged', 'type_display', 'extra_props',
+            'namespace', 'namespace_display', 'is_active', 'comment',
+            'created_by', 'date_created', 'date_updated'
         )
 
     def to_representation(self, instance):

@@ -2,17 +2,17 @@ from django.db.models import Q
 from django.utils.translation import ugettext as _
 
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from rbac.models import NamespaceRoleBinding, OrgRoleBinding
 from namespaces.models import Namespace
+from namespaces.permissions import NamespacePermission
 from namespaces.serializers import NamespaceSerializer
 
 
 class NamespaceViewSet(ModelViewSet):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (NamespacePermission,)
     filter_fields = ('name',)
     search_fields = filter_fields
     ordering_fields = ('name', 'date_created')

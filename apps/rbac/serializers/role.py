@@ -65,7 +65,7 @@ class OrgRoleBindingSerializer(serializers.ModelSerializer):
         model = OrgRoleBinding
         fields = (
             'id', 'user', 'user_info', 'role', 'role_info',
-            'orgs', 'org_info', 'created_by', 'updated_by',
+            'org', 'org_info', 'created_by', 'updated_by',
             'date_created', 'date_updated'
         )
         read_only_fields = ('id', 'created_by', 'updated_by')
