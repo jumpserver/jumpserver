@@ -31,7 +31,7 @@ class ApplicationViewSet(OrgBulkModelViewSet):
         attrs_cls = None
         if app_type:
             attrs_cls = models.Category.get_type_serializer_cls(app_type)
-        elif self.request.method.lower() in ['get', 'option', 'head']:
+        elif self.request.method.lower() in ['get', 'options', 'head']:
             if app_category:
                 attrs_cls = models.Category.get_category_serializer_cls(app_category)
             else:
