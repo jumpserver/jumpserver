@@ -241,8 +241,8 @@ def push_system_user_a_asset_manual(system_user, asset, username=None):
 
 @shared_task(queue="ansible")
 def push_system_user_to_assets(system_user, assets, username=None):
-    task_name = _("Push system users to assets: {}").format(system_user.name)
     system_user = get_object_if_need(SystemUser, system_user)
+    task_name = _("Push system users to assets: {}").format(system_user.name)
     assets = get_objects_if_need(Asset, assets)
     return push_system_user_util(system_user, assets, task_name, username=username)
 
