@@ -9,7 +9,7 @@ from celery.exceptions import SoftTimeLimitExceeded
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import get_logger, get_object_or_none, get_disk_usage
+from common.utils import get_logger, get_object_or_none, get_disk_usage, get_log_keep_day
 from orgs.utils import tmp_to_root_org, tmp_to_org
 from .celery.decorator import (
     register_as_period_task, after_app_shutdown_clean_periodic,
@@ -83,10 +83,10 @@ def clean_tasks_adhoc_period():
 @after_app_shutdown_clean_periodic
 @register_as_period_task(interval=3600*24, description=_("Clean celery log period"))
 def clean_celery_tasks_period():
-    expire_days = settings.TASK_LOG_KEEP_DAYS
     logger.debug("Start clean celery task history")
-    one_month_ago = timezone.now() - timezone.timedelta(days=expire_days)
-    tasks = CeleryTask.objects.filter(date_start__lt=one_month_ago)
+    expire_days = get_log_keep_day('TASK_LOG_KEEP_DAYS')
+    days_ago = timezone.now() - timezone.timedelta(days=expire_days)
+    tasks = CeleryTask.objects.filter(date_start__lt=days_ago)
     tasks.delete()
     tasks = CeleryTask.objects.filter(date_start__isnull=True)
     tasks.delete()
