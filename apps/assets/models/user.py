@@ -72,6 +72,9 @@ class SystemUser(BaseUser):
     PROTOCOL_TELNET = 'telnet'
     PROTOCOL_VNC = 'vnc'
     PROTOCOL_MYSQL = 'mysql'
+    PROTOCOL_ORACLE = 'oracle'
+    PROTOCOL_MARIADB = 'mariadb'
+    PROTOCOL_POSTGRESQL = 'postgresql'
     PROTOCOL_K8S = 'k8s'
     PROTOCOL_CHOICES = (
         (PROTOCOL_SSH, 'ssh'),
@@ -79,6 +82,9 @@ class SystemUser(BaseUser):
         (PROTOCOL_TELNET, 'telnet'),
         (PROTOCOL_VNC, 'vnc'),
         (PROTOCOL_MYSQL, 'mysql'),
+        (PROTOCOL_ORACLE, 'oracle'),
+        (PROTOCOL_MARIADB, 'mariadb'),
+        (PROTOCOL_POSTGRESQL, 'postgresql'),
         (PROTOCOL_K8S, 'k8s'),
     )
 
@@ -127,6 +133,24 @@ class SystemUser(BaseUser):
     def login_mode_display(self):
         return self.get_login_mode_display()
 
+    @property
+    def db_application_protocols(self):
+        return [
+            self.PROTOCOL_MYSQL, self.PROTOCOL_ORACLE, self.PROTOCOL_MARIADB,
+            self.PROTOCOL_POSTGRESQL
+        ]
+
+    @property
+    def k8s_application_protocols(self):
+        return [self.PROTOCOL_K8S]
+
+    @property
+    def application_category_protocols(self):
+        protocols = []
+        protocols.extend(self.db_application_protocols)
+        protocols.extend(self.k8s_application_protocols)
+        return protocols
+
     def is_need_push(self):
         if self.auto_push and self.protocol in [self.PROTOCOL_SSH, self.PROTOCOL_RDP]:
             return True
@@ -139,11 +163,11 @@ class SystemUser(BaseUser):
 
     @property
     def is_need_test_asset_connective(self):
-        return self.protocol not in [self.PROTOCOL_MYSQL]
+        return self.protocol not in self.application_category_protocols
 
     @property
     def can_perm_to_asset(self):
-        return self.protocol not in [self.PROTOCOL_MYSQL]
+        return self.protocol not in self.application_category_protocols
 
     def _merge_auth(self, other):
         super()._merge_auth(other)
