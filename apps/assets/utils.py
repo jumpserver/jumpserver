@@ -33,7 +33,7 @@ def is_asset_exists_in_node(asset_pk, node_key):
 
 def is_query_node_all_assets(request):
     request = request
-    query_all_arg = request.query_params.get('all')
+    query_all_arg = request.query_params.get('all', 'true')
     show_current_asset_arg = request.query_params.get('show_current_asset')
     if show_current_asset_arg is not None:
         return not is_true(show_current_asset_arg)

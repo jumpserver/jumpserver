@@ -140,7 +140,7 @@ def on_system_user_groups_change(instance, action, pk_set, reverse, **kwargs):
     logger.info("System user groups update signal recv: {}".format(instance))
 
     users = User.objects.filter(groups__id__in=pk_set).distinct()
-    instance.users.add(users)
+    instance.users.add(*users)
 
 
 @receiver(m2m_changed, sender=Asset.nodes.through)
