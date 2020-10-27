@@ -99,13 +99,17 @@ class Category(ChoiceSet):
         return mapper.get(tp, None)
 
     @classmethod
-    def get_category_serializer_cls(cls, cg):
+    def get_category_serializer_mapper(cls):
         from ..serializers import remote_app, database_app, k8s_app
-        mapper = {
+        return {
             cls.db: database_app.DatabaseCategorySerializer,
             cls.remote_app: remote_app.RemmoteAppCategorySerializer,
             cls.cloud: k8s_app.CloudCategorySerializer,
         }
+
+    @classmethod
+    def get_category_serializer_cls(cls, cg):
+        mapper = cls.get_category_serializer_mapper()
         return mapper.get(cg, None)
 
 

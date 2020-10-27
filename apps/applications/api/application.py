@@ -24,20 +24,33 @@ class ApplicationViewSet(OrgBulkModelViewSet):
         serializer_class = super().get_serializer_class()
         app_type = self.request.query_params.get('type')
         app_category = self.request.query_params.get('category')
+        type_options = list(dict(models.Category.get_all_type_serializer_mapper()).keys())
+        category_options = list(dict(models.Category.get_category_serializer_mapper()).keys())
 
-        # TODO: app_type invalid
-        # TODO: app_category invalid
+        if app_type and app_type not in type_options:
+            raise JMSException(
+                'Invalid query parameter `type`, select from the following options: {}'
+                ''.format(type_options)
+            )
+        if app_category and app_category not in category_options:
+            raise JMSException(
+                'Invalid query parameter `category`, select from the following options: {}'
+                ''.format(category_options)
+            )
 
-        attrs_cls = None
+        if self.action in [
+            'create', 'update', 'partial_update', 'bulk_update', 'partial_bulk_update'
+        ] and not app_type:
+            # action: create / update ...
+            raise JMSException(
+                'The `{}` action must take the `type` query parameter'.format(self.action)
+            )
+
         if app_type:
             attrs_cls = models.Category.get_type_serializer_cls(app_type)
-        elif self.action in ['list', 'retrieve', 'metadata']:
-            if app_category:
-                attrs_cls = models.Category.get_category_serializer_cls(app_category)
-            else:
-                attrs_cls = serializers.CommonCategorySerializer
-
-        if not attrs_cls:
-            raise JMSException(detail='Please bring the query parameter Category or Type')
-
+        elif app_category:
+            # action: list / retrieve / metadata
+            attrs_cls = models.Category.get_category_serializer_cls(app_category)
+        else:
+            attrs_cls = serializers.CommonCategorySerializer
         return type('ApplicationDynamicSerializer', (serializer_class,), {'attrs': attrs_cls()})
