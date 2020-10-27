@@ -24,3 +24,11 @@ class SessionCommandSerializer(serializers.Serializer):
     def get_risk_level_display(obj):
         risk_mapper = dict(AbstractSessionCommand.RISK_LEVEL_CHOICES)
         return risk_mapper.get(obj.risk_level)
+
+
+class InsecureCommandAlertSerializer(serializers.Serializer):
+    input = serializers.CharField()
+    asset = serializers.CharField()
+    user = serializers.CharField()
+    risk_level = serializers.IntegerField()
+    session = serializers.UUIDField()
