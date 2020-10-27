@@ -11,7 +11,7 @@ from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from assets.models import Asset
 
 from .. import const
-from ..models import RemoteApp
+from ..models import RemoteApp, Category, Application
 
 
 class RemmoteAppCategorySerializer(serializers.Serializer):
@@ -108,17 +108,39 @@ class RemoteAppConnectionInfoSerializer(serializers.ModelSerializer):
     parameter_remote_app = serializers.SerializerMethodField()
 
     class Meta:
-        model = RemoteApp
+        model = Application
         fields = [
-            'id', 'name', 'asset', 'parameter_remote_app',
+            'id', 'name', 'parameter_remote_app',
         ]
         read_only_fields = ['parameter_remote_app']
 
     @staticmethod
-    def get_parameter_remote_app(obj):
+    def get_parameters(obj):
+        """
+        返回Guacamole需要的RemoteApp配置参数信息中的parameters参数
+        """
+        serializer_cls = Category.get_type_serializer_cls(obj.type)
+        fields = serializer_cls().get_fields()
+        fields.pop('asset', None)
+        fields_name = list(fields.keys())
+        attrs = obj.attrs
+        _parameters = list()
+        _parameters.append(obj.type)
+        for field_name in list(fields_name):
+            value = attrs.get(field_name, None)
+            if not value:
+                continue
+            if field_name == 'path':
+                value = '\"%s\"' % value
+            _parameters.append(str(value))
+        _parameters = ' '.join(_parameters)
+        return _parameters
+
+    def get_parameter_remote_app(self, obj):
+        parameters = self.get_parameters(obj)
         parameter = {
             'program': const.REMOTE_APP_BOOT_PROGRAM_NAME,
             'working_directory': '',
-            'parameters': obj.parameters,
+            'parameters': parameters,
         }
         return parameter

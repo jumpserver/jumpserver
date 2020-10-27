@@ -4,7 +4,7 @@
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
 from ..hands import IsOrgAdmin, IsAppUser
-from ..models import RemoteApp
+from ..models import RemoteApp, Application
 from ..serializers import RemoteAppSerializer, RemoteAppConnectionInfoSerializer
 
 
@@ -22,6 +22,6 @@ class RemoteAppViewSet(OrgBulkModelViewSet):
 
 
 class RemoteAppConnectionInfoApi(generics.RetrieveAPIView):
-    model = RemoteApp
+    model = Application
     permission_classes = (IsAppUser, )
     serializer_class = RemoteAppConnectionInfoSerializer
