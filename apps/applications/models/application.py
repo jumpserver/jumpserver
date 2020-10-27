@@ -112,6 +112,10 @@ class Category(ChoiceSet):
         mapper = cls.get_category_serializer_mapper()
         return mapper.get(cg, None)
 
+    @classmethod
+    def is_remote_app(cls, cg):
+        return cg == cls.remote_app
+
 
 class Application(CommonModelMixin, OrgModelMixin):
     name = models.CharField(max_length=128, verbose_name=_('Name'))

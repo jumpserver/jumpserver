@@ -106,11 +106,12 @@ class RemoteAppSerializer(BulkOrgResourceModelSerializer):
 
 class RemoteAppConnectionInfoSerializer(serializers.ModelSerializer):
     parameter_remote_app = serializers.SerializerMethodField()
+    asset = serializers.SerializerMethodField()
 
     class Meta:
         model = Application
         fields = [
-            'id', 'name', 'parameter_remote_app',
+            'id', 'name', 'asset', 'parameter_remote_app',
         ]
         read_only_fields = ['parameter_remote_app']
 
@@ -144,3 +145,7 @@ class RemoteAppConnectionInfoSerializer(serializers.ModelSerializer):
             'parameters': parameters,
         }
         return parameter
+
+    @staticmethod
+    def get_asset(obj):
+        return obj.attrs.get('asset')
