@@ -4,12 +4,16 @@ import os
 
 from django.conf import settings
 from django.core.files.storage import default_storage
+from django.utils.translation import ugettext as _
+
 import jms_storage
 
-from common.utils import get_logger
+from common.tasks import send_mail_async
+from common.utils import get_logger, reverse
+from settings.models import Setting
 
 from .backends import server_replay_storage
-from .models import ReplayStorage
+from .models import ReplayStorage, Session, Command
 
 logger = get_logger(__name__)
 
@@ -63,3 +67,42 @@ def get_session_replay_url(session):
     if local_path is None:
         local_path, url = download_session_replay(session)
     return local_path, url
+
+
+def send_command_alert_mail(command):
+    session_obj = Session.objects.get(id=command['session'])
+    subject = _("Insecure Command Alert: [%(name)s->%(login_from)s@%(remote_addr)s] $%(command)s") % {
+                    'name': command['user'],
+                    'login_from': session_obj.get_login_from_display(),
+                    'remote_addr': session_obj.remote_addr,
+                    'command': command['input']
+                 }
+    try:
+        recipient_list = Setting.objects.get(name='SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER').value.split(',')
+    except Setting.DoesNotExist:
+        recipient_list = []
+    message = _("""
+        Command: %(command)s
+        <br>
+        Asset: %(host_name)s (%(host_ip)s)
+        <br>
+        User: %(user)s
+        <br>
+        Level: %(risk_level)s
+        <br>
+        Session: <a href="%(session_detail_url)s">session detail</a>
+        <br>
+        """) % {
+            'command': command['input'],
+            'host_name': command['asset'],
+            'host_ip': session_obj.asset_obj.ip,
+            'user': command['user'],
+            'risk_level': Command.get_risk_level_str(command['risk_level']),
+            'session_detail_url': reverse('api-terminal:session-detail',
+                                          kwargs={'pk': command['session']},
+                                          external=True, api_to_ui=True),
+        }
+    if settings.DEBUG:
+        logger.debug(message)
+
+    send_mail_async.delay(subject, message, recipient_list, html_message=message)

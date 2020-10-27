@@ -12,6 +12,7 @@ from django.conf import settings
 from django.core.files.storage import default_storage
 from django.core.cache import cache
 
+from assets.models import Asset
 from users.models import User
 from orgs.mixins.models import OrgModelMixin
 from common.mixins import CommonModelMixin
@@ -223,6 +224,10 @@ class Session(OrgModelMixin):
         else:
             local_path = rel_path
         return local_path
+
+    @property
+    def asset_obj(self):
+        return Asset.objects.get(id=self.asset_id)
 
     @property
     def _date_start_first_has_replay_rdp_session(self):
