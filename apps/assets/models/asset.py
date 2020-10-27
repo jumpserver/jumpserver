@@ -313,6 +313,13 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
         }
         return info
 
+    def nodes_display(self):
+        names = []
+        for n in self.nodes.all():
+            full_value = n.full_value.replace(' ', '')
+            names.append(full_value)
+        return names
+
     def as_node(self):
         from .node import Node
         fake_node = Node()

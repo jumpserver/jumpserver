@@ -13,7 +13,7 @@ from django.db.transaction import atomic
 from common.utils import get_logger
 from common.utils.common import lazyproperty
 from orgs.mixins.models import OrgModelMixin, OrgManager
-from orgs.utils import get_current_org, tmp_to_org, current_org
+from orgs.utils import get_current_org, tmp_to_org
 from orgs.models import Organization
 
 
@@ -205,6 +205,29 @@ class FamilyMixin:
             sibling = sibling.exclude(key=self.key)
         return sibling
 
+    @classmethod
+    def create_node_by_full_value(cls, full_value):
+        full_value = full_value.replace(' ', '')
+        if not full_value:
+            return []
+        nodes_family = full_value.split('/')
+        org_root = cls.org_root()
+        if nodes_family[0] == org_root.value:
+            nodes_family = nodes_family[1:]
+        return cls.create_nodes_recurse(nodes_family, org_root)
+
+    @classmethod
+    def create_nodes_recurse(cls, values, parent=None):
+        if not values:
+            return None
+        if parent is None:
+            parent = cls.org_root()
+        value = values[0]
+        child, created = parent.get_or_create_child(value=value)
+        if len(values) == 1:
+            return child
+        return cls.create_nodes_recurse(values[1:], child)
+
     def get_family(self):
         ancestors = self.get_ancestors()
         children = self.get_all_children()
@@ -372,6 +395,7 @@ class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     key = models.CharField(unique=True, max_length=64, verbose_name=_("Key"))  # '1:1:1:1'
     value = models.CharField(max_length=128, verbose_name=_("Value"))
+    full_value = models.CharField(max_length=4096, verbose_name=_('Full value'), default='')
     child_mark = models.IntegerField(default=0)
     date_create = models.DateTimeField(auto_now_add=True)
     parent_key = models.CharField(max_length=64, verbose_name=_("Parent key"),
@@ -412,14 +436,14 @@ class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
         return self.value
 
     @lazyproperty
-    def full_value(self):
+    def computed_full_value(self):
         # 不要在列表中调用该属性
         values = self.__class__.objects.filter(
             key__in=self.get_ancestor_keys()
         ).values_list('key', 'value')
         values = [v for k, v in sorted(values, key=lambda x: len(x[0]))]
         values.append(self.value)
-        return ' / '.join(values)
+        return '/'.join(values)
 
     @property
     def level(self):
