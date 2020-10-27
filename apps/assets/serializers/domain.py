@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from common.serializers import AdaptedBulkListSerializer
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-
+from common.validators import NoSpecialChars
 from ..models import Domain, Gateway
 from .base import AuthSerializerMixin
 
@@ -47,6 +47,9 @@ class GatewaySerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'private_key', 'public_key', 'domain', 'is_active', 'date_created',
             'date_updated', 'created_by', 'comment',
         ]
+        extra_kwargs = {
+            'password': {'validators': [NoSpecialChars()]}
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

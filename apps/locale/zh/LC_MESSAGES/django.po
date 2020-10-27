@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-21 14:31+0800\n"
+"POT-Creation-Date: 2020-10-27 20:00+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -24,7 +24,7 @@ msgstr "自定义"
 #: applications/models/database_app.py:18 applications/models/k8s_app.py:11
 #: applications/models/remote_app.py:21 assets/models/asset.py:149
 #: assets/models/base.py:232 assets/models/cluster.py:18
-#: assets/models/cmd_filter.py:21 assets/models/domain.py:20
+#: assets/models/cmd_filter.py:21 assets/models/domain.py:21
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
 #: orgs/models.py:23 perms/models/base.py:48 settings/models.py:27
 #: terminal/models.py:27 terminal/models.py:348 terminal/models.py:380
@@ -59,7 +59,7 @@ msgid "Host"
 msgstr "主机"
 
 #: applications/models/database_app.py:27 assets/models/asset.py:195
-#: assets/models/domain.py:51
+#: assets/models/domain.py:52
 msgid "Port"
 msgstr "端口"
 
@@ -74,8 +74,8 @@ msgstr "数据库"
 #: applications/models/remote_app.py:45 assets/models/asset.py:154
 #: assets/models/asset.py:230 assets/models/base.py:237
 #: assets/models/cluster.py:29 assets/models/cmd_filter.py:23
-#: assets/models/cmd_filter.py:57 assets/models/domain.py:21
-#: assets/models/domain.py:54 assets/models/group.py:23
+#: assets/models/cmd_filter.py:57 assets/models/domain.py:22
+#: assets/models/domain.py:55 assets/models/group.py:23
 #: assets/models/label.py:23 ops/models/adhoc.py:37 orgs/models.py:26
 #: perms/models/base.py:56 settings/models.py:32 terminal/models.py:37
 #: terminal/models.py:387 terminal/models.py:424 tickets/models/ticket.py:43
@@ -125,7 +125,7 @@ msgstr "Kubernetes应用"
 #: users/templates/users/user_asset_permission.html:40
 #: users/templates/users/user_asset_permission.html:70
 #: users/templates/users/user_granted_remote_app.html:36
-#: xpack/plugins/change_auth_plan/models.py:282
+#: xpack/plugins/change_auth_plan/models.py:283
 #: xpack/plugins/cloud/models.py:275
 msgid "Asset"
 msgstr "资产"
@@ -159,7 +159,7 @@ msgstr "创建者"
 # msgstr "创建者"
 #: applications/models/remote_app.py:42 assets/models/asset.py:229
 #: assets/models/base.py:238 assets/models/cluster.py:26
-#: assets/models/domain.py:23 assets/models/gathered_user.py:19
+#: assets/models/domain.py:24 assets/models/gathered_user.py:19
 #: assets/models/group.py:22 assets/models/label.py:25 common/db/models.py:69
 #: common/mixins/models.py:50 ops/models/adhoc.py:38 ops/models/command.py:27
 #: orgs/models.py:25 orgs/models.py:398 perms/models/base.py:55
@@ -222,7 +222,7 @@ msgstr "内部的"
 msgid "Platform"
 msgstr "系统平台"
 
-#: assets/models/asset.py:190 assets/models/domain.py:50
+#: assets/models/asset.py:190 assets/models/domain.py:51
 #: assets/serializers/asset_user.py:46 settings/serializers/settings.py:52
 #: users/templates/users/_granted_assets.html:26
 #: users/templates/users/user_asset_permission.html:156
@@ -237,7 +237,7 @@ msgstr "IP"
 msgid "Hostname"
 msgstr "主机名"
 
-#: assets/models/asset.py:194 assets/models/domain.py:52
+#: assets/models/asset.py:194 assets/models/domain.py:53
 #: assets/models/user.py:97 terminal/serializers/session.py:29
 msgid "Protocol"
 msgstr "协议"
@@ -247,8 +247,8 @@ msgstr "协议"
 msgid "Protocols"
 msgstr "协议组"
 
-#: assets/models/asset.py:198 assets/models/domain.py:26
-#: assets/models/domain.py:53
+#: assets/models/asset.py:198 assets/models/domain.py:27
+#: assets/models/domain.py:54
 msgid "Domain"
 msgstr "网域"
 
@@ -260,7 +260,7 @@ msgid "Nodes"
 msgstr "节点"
 
 #: assets/models/asset.py:200 assets/models/cmd_filter.py:22
-#: assets/models/domain.py:55 assets/models/label.py:22
+#: assets/models/domain.py:56 assets/models/label.py:22
 #: authentication/models.py:48
 msgid "Is active"
 msgstr "激活"
@@ -365,7 +365,7 @@ msgstr ""
 #: users/templates/users/user_list.html:15
 #: users/templates/users/user_profile.html:47
 #: xpack/plugins/change_auth_plan/models.py:47
-#: xpack/plugins/change_auth_plan/models.py:278
+#: xpack/plugins/change_auth_plan/models.py:279
 msgid "Username"
 msgstr "用户名"
 
@@ -381,20 +381,20 @@ msgstr "用户名"
 #: users/templates/users/user_pubkey_update.html:41
 #: users/templates/users/user_update.html:20
 #: xpack/plugins/change_auth_plan/models.py:68
-#: xpack/plugins/change_auth_plan/models.py:190
-#: xpack/plugins/change_auth_plan/models.py:285
+#: xpack/plugins/change_auth_plan/models.py:191
+#: xpack/plugins/change_auth_plan/models.py:286
 msgid "Password"
 msgstr "密码"
 
 #: assets/models/base.py:235 xpack/plugins/change_auth_plan/models.py:72
-#: xpack/plugins/change_auth_plan/models.py:197
-#: xpack/plugins/change_auth_plan/models.py:292
+#: xpack/plugins/change_auth_plan/models.py:198
+#: xpack/plugins/change_auth_plan/models.py:293
 msgid "SSH private key"
 msgstr "SSH密钥"
 
 #: assets/models/base.py:236 xpack/plugins/change_auth_plan/models.py:75
-#: xpack/plugins/change_auth_plan/models.py:193
-#: xpack/plugins/change_auth_plan/models.py:288
+#: xpack/plugins/change_auth_plan/models.py:194
+#: xpack/plugins/change_auth_plan/models.py:289
 msgid "SSH public key"
 msgstr "SSH公钥"
 
@@ -506,13 +506,13 @@ msgstr "动作"
 msgid "Command filter rule"
 msgstr "命令过滤规则"
 
-#: assets/models/domain.py:62
+#: assets/models/domain.py:63
 msgid "Gateway"
 msgstr "网关"
 
-#: assets/models/domain.py:68
-msgid "Password should not contain special characters"
-msgstr "不能包含特殊字符"
+#: assets/models/domain.py:69
+msgid "Password should not contains special characters"
+msgstr "密码不能包含特殊字符"
 
 #: assets/models/gathered_user.py:16
 msgid "Present"
@@ -937,7 +937,7 @@ msgstr "成功"
 #: audits/models.py:43 ops/models/command.py:28 perms/models/base.py:52
 #: terminal/models.py:200 tickets/serializers/request_asset_perm.py:29
 #: xpack/plugins/change_auth_plan/models.py:177
-#: xpack/plugins/change_auth_plan/models.py:307
+#: xpack/plugins/change_auth_plan/models.py:308
 #: xpack/plugins/gathered_user/models.py:76
 msgid "Date start"
 msgstr "开始日期"
@@ -1021,7 +1021,7 @@ msgstr "Agent"
 msgid "MFA"
 msgstr "多因子认证"
 
-#: audits/models.py:105 xpack/plugins/change_auth_plan/models.py:303
+#: audits/models.py:105 xpack/plugins/change_auth_plan/models.py:304
 #: xpack/plugins/cloud/models.py:223
 msgid "Reason"
 msgstr "原因"
@@ -1491,13 +1491,17 @@ msgstr ""
 msgid "Invalid ip"
 msgstr "无效IP"
 
-#: common/validators.py:11
+#: common/validators.py:13
 msgid "Special char not allowed"
 msgstr "不能包含特殊字符"
 
-#: common/validators.py:23
+#: common/validators.py:25
 msgid "This field must be unique."
 msgstr "字段必须唯一"
+
+#: common/validators.py:33
+msgid "Should not contains special characters"
+msgstr "不能包含特殊字符"
 
 #: jumpserver/conf.py:471 templates/_base_only_msg_content.html:27
 #: xpack/plugins/interface/api.py:18 xpack/plugins/interface/models.py:36
@@ -1628,7 +1632,7 @@ msgid "End time"
 msgstr "完成时间"
 
 #: ops/models/adhoc.py:242 xpack/plugins/change_auth_plan/models.py:180
-#: xpack/plugins/change_auth_plan/models.py:310
+#: xpack/plugins/change_auth_plan/models.py:311
 #: xpack/plugins/gathered_user/models.py:79
 msgid "Time"
 msgstr "时间"
@@ -2590,16 +2594,16 @@ msgstr "请先确认系统用户"
 msgid "Confirmed system-users changed"
 msgstr "确认的系统用户变更了"
 
-#: tickets/api/request_asset_perm.py:108 tickets/api/request_asset_perm.py:115
+#: tickets/api/request_asset_perm.py:111 tickets/api/request_asset_perm.py:118
 #: xpack/plugins/cloud/models.py:211
 msgid "Succeed"
 msgstr "成功"
 
-#: tickets/api/request_asset_perm.py:123
+#: tickets/api/request_asset_perm.py:125
 msgid "From request ticket: {} {}"
 msgstr "来自工单申请: {} {}"
 
-#: tickets/api/request_asset_perm.py:125
+#: tickets/api/request_asset_perm.py:127
 msgid "{} request assets, approved by {}"
 msgstr "{} 申请资产，通过人 {}"
 
@@ -3858,44 +3862,44 @@ msgstr "所有资产使用不同的随机密码"
 msgid "Password rules"
 msgstr "密码规则"
 
-#: xpack/plugins/change_auth_plan/models.py:187
+#: xpack/plugins/change_auth_plan/models.py:188
 msgid "Change auth plan snapshot"
 msgstr "改密计划快照"
 
-#: xpack/plugins/change_auth_plan/models.py:202
-#: xpack/plugins/change_auth_plan/models.py:296
+#: xpack/plugins/change_auth_plan/models.py:203
+#: xpack/plugins/change_auth_plan/models.py:297
 msgid "Change auth plan execution"
 msgstr "改密计划执行"
 
-#: xpack/plugins/change_auth_plan/models.py:269
+#: xpack/plugins/change_auth_plan/models.py:270
 msgid "Ready"
 msgstr ""
 
-#: xpack/plugins/change_auth_plan/models.py:270
+#: xpack/plugins/change_auth_plan/models.py:271
 msgid "Preflight check"
 msgstr ""
 
-#: xpack/plugins/change_auth_plan/models.py:271
+#: xpack/plugins/change_auth_plan/models.py:272
 msgid "Change auth"
 msgstr ""
 
-#: xpack/plugins/change_auth_plan/models.py:272
+#: xpack/plugins/change_auth_plan/models.py:273
 msgid "Verify auth"
 msgstr ""
 
-#: xpack/plugins/change_auth_plan/models.py:273
+#: xpack/plugins/change_auth_plan/models.py:274
 msgid "Keep auth"
 msgstr ""
 
-#: xpack/plugins/change_auth_plan/models.py:274
+#: xpack/plugins/change_auth_plan/models.py:275
 msgid "Finished"
 msgstr "结束"
 
-#: xpack/plugins/change_auth_plan/models.py:300
+#: xpack/plugins/change_auth_plan/models.py:301
 msgid "Step"
 msgstr "步骤"
 
-#: xpack/plugins/change_auth_plan/models.py:317
+#: xpack/plugins/change_auth_plan/models.py:318
 msgid "Change auth plan task"
 msgstr "改密计划任务"
 
