@@ -137,7 +137,6 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     def perform_nodes_display_create(self, instance, nodes_display):
         if not nodes_display:
             return
-        return
         nodes_to_set = []
         for full_value in nodes_display:
             full_value = full_value.replace(' ', '')

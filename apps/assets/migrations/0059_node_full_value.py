@@ -14,6 +14,19 @@ def get_node_ancestor_keys(key, with_self=False):
     return parent_keys
 
 
+def migrate_nodes_value_with_slash(apps, schema_editor):
+    model = apps.get_model("assets", "Node")
+    db_alias = schema_editor.connection.alias
+    nodes = model.objects.using(db_alias).filter(value__contains='/')
+    print('')
+    print("- Start migrate node value if has /")
+    for i, node in enumerate(list(nodes)):
+        new_value = node.value.replace('/', '|')
+        print("{} start migrate node value: {} => {}".format(i, node.value, new_value))
+        node.value = new_value
+        node.save()
+
+
 def migrate_nodes_full_value(apps, schema_editor):
     model = apps.get_model("assets", "Node")
     db_alias = schema_editor.connection.alias
@@ -40,5 +53,6 @@ class Migration(migrations.Migration):
             name='full_value',
             field=models.CharField(default='', max_length=4096, verbose_name='Full value'),
         ),
+        migrations.RunPython(migrate_nodes_value_with_slash),
         migrations.RunPython(migrate_nodes_full_value)
     ]

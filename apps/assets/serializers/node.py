@@ -25,6 +25,9 @@ class NodeSerializer(BulkOrgResourceModelSerializer):
         read_only_fields = ['key', 'org_id']
 
     def validate_value(self, data):
+        if '/' in data:
+            error = _("Can't contains: " + "/")
+            raise serializers.ValidationError(error)
         if self.instance:
             instance = self.instance
             siblings = instance.get_siblings()
