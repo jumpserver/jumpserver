@@ -102,10 +102,10 @@ def migrate_and_integrate_applications(apps, schema_editor):
         for application_json in applications_json
         if application_json['category'] in CATEGORY_LIST
     ]
-    applications_created = application_model.objects.bulk_create(applications)
-    print('Migrate and integrate applications count: {}/{}'.format(
-        len(applications_created), len(applications_json)
-    ))
+    for application in applications:
+        if application_model.objects.using(db_alias).filter(name=application.name).exists():
+            application.name = '{}-{}'.format(application.name, application.type)
+        application.save()
 
 
 class Migration(migrations.Migration):

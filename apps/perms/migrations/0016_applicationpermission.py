@@ -156,7 +156,10 @@ def migrate_and_integrate_application_permissions(apps, schema_editor):
     ]
 
     # create
-    new_app_perm_model.objects.using(db_alias).bulk_create(new_app_perm_objects)
+    for new_app_perm_object in new_app_perm_objects:
+        if new_app_perm_model.objects.using(db_alias).filter(name=new_app_perm_object.name).exists():
+            new_app_perm_object.name = '{}-{}'.format(new_app_perm_object.name, str(new_app_perm_object.id)[:4])
+        new_app_perm_object.save()
     new_app_perm_relation_app_model.objects.using(db_alias).bulk_create(new_app_perm_relation_app_objects)
     new_app_perm_relation_system_user_model.objects.using(db_alias).bulk_create(new_app_perm_relation_system_user_objects)
     new_app_perm_relation_user_group_model.objects.using(db_alias).bulk_create(new_app_perm_relation_user_group_objects)
