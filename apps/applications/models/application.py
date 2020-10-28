@@ -133,4 +133,6 @@ class Application(CommonModelMixin, OrgModelMixin):
         ordering = ('name',)
 
     def __str__(self):
-        return '{}({})'.format(self.name, self.get_category_display())
+        category_display = self.get_category_display()
+        type_display = self.get_type_display()
+        return f'{self.name}({type_display})[{category_display}]'
