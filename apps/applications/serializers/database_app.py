@@ -10,9 +10,11 @@ from .. import models
 
 
 class DatabaseCategorySerializer(serializers.Serializer):
-    host = serializers.CharField(label=_('Host'))
+    host = serializers.CharField(max_length=128, label=_('Host'))
     port = serializers.IntegerField(label=_('Port'))
-    database = serializers.CharField(allow_blank=True, allow_null=True, label=_('Database'))
+    database = serializers.CharField(
+        max_length=128, allow_blank=True, allow_null=True, label=_('Database')
+    )
 
 
 class DatabaseAttrsSerializer(DatabaseCategorySerializer):
