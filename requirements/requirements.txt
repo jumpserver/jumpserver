@@ -98,3 +98,4 @@ django-redis==4.11.0
 python-redis-lock==3.5.0
 jumpserver-django-oidc-rp==0.3.7.5
 django-mysql==3.9.0
+gmssl==3.2.1
