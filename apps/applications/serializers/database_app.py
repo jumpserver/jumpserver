@@ -10,9 +10,9 @@ from .. import models
 
 
 class DatabaseCategorySerializer(serializers.Serializer):
-    host = serializers.CharField()
-    port = serializers.IntegerField()
-    database = serializers.CharField(allow_blank=True, allow_null=True)
+    host = serializers.CharField(label=_('Host'))
+    port = serializers.IntegerField(label=_('Port'))
+    database = serializers.CharField(allow_blank=True, allow_null=True, label=_('Database'))
 
 
 class DatabaseAttrsSerializer(DatabaseCategorySerializer):
@@ -24,11 +24,11 @@ class MySQLAttrsSerializer(DatabaseAttrsSerializer):
 
 
 class PostgreAttrsSerializer(DatabaseAttrsSerializer):
-    port = serializers.IntegerField(default=5432)
+    port = serializers.IntegerField(default=5432, label=_('Port'))
 
 
 class OracleAttrsSerializer(DatabaseAttrsSerializer):
-    port = serializers.IntegerField(default=1521)
+    port = serializers.IntegerField(default=1521, label=_('Port'))
 
 
 class MariaDBAttrsSerializer(MySQLAttrsSerializer):
