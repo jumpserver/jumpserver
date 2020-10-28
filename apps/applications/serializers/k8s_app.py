@@ -6,7 +6,7 @@ from .. import models
 
 
 class CloudCategorySerializer(serializers.Serializer):
-    cluster = serializers.CharField(label=_('Cluster'))
+    cluster = serializers.CharField(max_length=1024, label=_('Cluster'))
 
 
 class K8sAttrsSerializer(CloudCategorySerializer):
