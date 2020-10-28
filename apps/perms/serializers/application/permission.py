@@ -2,6 +2,7 @@
 #
 
 from rest_framework import serializers
+from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from perms.models import ApplicationPermission
@@ -12,8 +13,8 @@ __all__ = [
 
 
 class ApplicationPermissionSerializer(BulkOrgResourceModelSerializer):
-    category_display = serializers.ReadOnlyField(source='get_category_display')
-    type_display = serializers.ReadOnlyField(source='get_type_display')
+    category_display = serializers.ReadOnlyField(source='get_category_display', label=_('Category'))
+    type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type'))
     is_valid = serializers.BooleanField(read_only=True)
     is_expired = serializers.BooleanField(read_only=True)
 

@@ -2,6 +2,7 @@
 #
 
 from rest_framework import serializers
+from django.utils.translation import ugettext_lazy as _
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
 from .. import models
@@ -12,8 +13,8 @@ __all__ = [
 
 
 class ApplicationSerializer(BulkOrgResourceModelSerializer):
-    category_display = serializers.ReadOnlyField(source='get_category_display')
-    type_display = serializers.ReadOnlyField(source='get_type_display')
+    category_display = serializers.ReadOnlyField(source='get_category_display', label=_('Category'))
+    type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type'))
 
     class Meta:
         model = models.Application
