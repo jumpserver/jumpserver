@@ -104,6 +104,7 @@ class SystemUser(BaseUser):
     token = models.TextField(default='', verbose_name=_('Token'))
     home = models.CharField(max_length=4096, default='', verbose_name=_('Home'), blank=True)
     system_groups = models.CharField(default='', max_length=4096, verbose_name=_('System groups'), blank=True)
+    ad_domain = models.CharField(default='', max_length=256)
     _prefer = 'system_user'
 
     def __str__(self):
