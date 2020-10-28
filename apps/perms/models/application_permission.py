@@ -8,6 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 from common.utils import lazyproperty
 from .base import BasePermission
 from users.models import User
+from applications.models import Category
 
 __all__ = [
     'ApplicationPermission',
@@ -15,6 +16,8 @@ __all__ = [
 
 
 class ApplicationPermission(BasePermission):
+    category = models.CharField(max_length=16, choices=Category.choices, verbose_name=_('Category'))
+    type = models.CharField(max_length=16, choices=Category.get_all_type_choices(), verbose_name=_('Type'))
     applications = models.ManyToManyField('applications.Application', related_name='granted_by_permissions', blank=True, verbose_name=_("Application"))
     system_users = models.ManyToManyField('assets.SystemUser', related_name='granted_by_application_permissions', verbose_name=_("System user"))
 
