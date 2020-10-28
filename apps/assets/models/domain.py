@@ -48,7 +48,7 @@ class Gateway(BaseUser):
         (PROTOCOL_SSH, 'ssh'),
         (PROTOCOL_RDP, 'rdp'),
     )
-    ip = models.GenericIPAddressField(max_length=32, verbose_name=_('IP'), db_index=True)
+    ip = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
     port = models.IntegerField(default=22, verbose_name=_('Port'))
     protocol = models.CharField(choices=PROTOCOL_CHOICES, max_length=16, default=PROTOCOL_SSH, verbose_name=_("Protocol"))
     domain = models.ForeignKey(Domain, on_delete=models.CASCADE, verbose_name=_("Domain"))
