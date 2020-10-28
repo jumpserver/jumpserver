@@ -12,6 +12,8 @@ __all__ = [
 
 
 class ApplicationPermissionSerializer(BulkOrgResourceModelSerializer):
+    category_display = serializers.ReadOnlyField(source='get_category_display')
+    type_display = serializers.ReadOnlyField(source='get_type_display')
     is_valid = serializers.BooleanField(read_only=True)
     is_expired = serializers.BooleanField(read_only=True)
 
@@ -19,8 +21,8 @@ class ApplicationPermissionSerializer(BulkOrgResourceModelSerializer):
         model = ApplicationPermission
         mini_fields = ['id', 'name']
         small_fields = mini_fields + [
-            'is_active', 'is_expired', 'is_valid', 'created_by', 'date_created',
-            'date_expired', 'date_start', 'comment'
+            'category', 'category_display', 'type', 'type_display', 'is_active', 'is_expired',
+            'is_valid', 'created_by', 'date_created', 'date_expired', 'date_start', 'comment'
         ]
         m2m_fields = [
             'users', 'user_groups', 'applications', 'system_users',

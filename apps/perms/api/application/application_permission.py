@@ -12,7 +12,8 @@ class ApplicationPermissionViewSet(OrgBulkModelViewSet):
     """
     model = ApplicationPermission
     serializer_class = serializers.ApplicationPermissionSerializer
-    filter_fields = ['name']
+    filter_fields = ['name', 'category', 'type']
+    search_fields = filter_fields
     permission_classes = (IsOrgAdmin,)
 
     def get_queryset(self):
