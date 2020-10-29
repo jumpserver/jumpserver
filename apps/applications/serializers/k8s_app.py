@@ -5,11 +5,11 @@ from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from .. import models
 
 
-class CloudCategorySerializer(serializers.Serializer):
+class CloudAttrsSerializer(serializers.Serializer):
     cluster = serializers.CharField(max_length=1024, label=_('Cluster'))
 
 
-class K8sAttrsSerializer(CloudCategorySerializer):
+class K8sAttrsSerializer(CloudAttrsSerializer):
     pass
 
 

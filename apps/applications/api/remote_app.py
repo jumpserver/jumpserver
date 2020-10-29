@@ -27,8 +27,14 @@ class RemoteAppConnectionInfoApi(generics.RetrieveAPIView):
     permission_classes = (IsAppUser, )
     serializer_class = RemoteAppConnectionInfoSerializer
 
+    @staticmethod
+    def check_category_allowed(obj):
+        if not obj.category_is_remote_app:
+            raise JMSException(
+                'The request instance(`{}`) is not of category `remote_app`'.format(obj.category)
+            )
+
     def get_object(self):
         obj = super().get_object()
-        if not models.Category.is_remote_app(obj.category):
-            raise JMSException('The request instance is not of category `remote_app`')
+        self.check_category_allowed(obj)
         return obj

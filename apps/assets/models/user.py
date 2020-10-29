@@ -140,14 +140,14 @@ class SystemUser(BaseUser):
         ]
 
     @property
-    def k8s_application_protocols(self):
+    def cloud_application_protocols(self):
         return [self.PROTOCOL_K8S]
 
     @property
     def application_category_protocols(self):
         protocols = []
         protocols.extend(self.db_application_protocols)
-        protocols.extend(self.k8s_application_protocols)
+        protocols.extend(self.cloud_application_protocols)
         return protocols
 
     def is_need_push(self):

@@ -9,7 +9,7 @@ from common.serializers import AdaptedBulkListSerializer
 from .. import models
 
 
-class DatabaseCategorySerializer(serializers.Serializer):
+class DBAttrsSerializer(serializers.Serializer):
     host = serializers.CharField(max_length=128, label=_('Host'))
     port = serializers.IntegerField(label=_('Port'))
     database = serializers.CharField(
@@ -17,19 +17,15 @@ class DatabaseCategorySerializer(serializers.Serializer):
     )
 
 
-class DatabaseAttrsSerializer(DatabaseCategorySerializer):
-    pass
-
-
-class MySQLAttrsSerializer(DatabaseAttrsSerializer):
+class MySQLAttrsSerializer(DBAttrsSerializer):
     port = serializers.IntegerField(default=3306, label=_('Port'))
 
 
-class PostgreAttrsSerializer(DatabaseAttrsSerializer):
+class PostgreAttrsSerializer(DBAttrsSerializer):
     port = serializers.IntegerField(default=5432, label=_('Port'))
 
 
-class OracleAttrsSerializer(DatabaseAttrsSerializer):
+class OracleAttrsSerializer(DBAttrsSerializer):
     port = serializers.IntegerField(default=1521, label=_('Port'))
 
 
