@@ -8,11 +8,14 @@ from rest_framework import serializers
 
 from common.serializers import AdaptedBulkListSerializer
 from common.fields.serializer import CustomMetaDictField
+from common.utils import get_logger
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from assets.models import Asset
 
 from .. import const
 from ..models import RemoteApp, Category, Application
+
+logger = get_logger(__file__)
 
 
 class CharPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
@@ -35,8 +38,25 @@ class CharPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
 
 
 class RemoteAppAttrsSerializer(serializers.Serializer):
+    asset_info = serializers.SerializerMethodField()
     asset = CharPrimaryKeyRelatedField(queryset=Asset.objects, required=False, label=_("Assets"))
     path = serializers.CharField(max_length=128, label=_('Remote App path'))
+
+    @staticmethod
+    def get_asset_info(obj):
+        asset_info = {}
+        asset_id = obj.get('asset')
+        if not asset_id:
+            return asset_info
+        try:
+            asset = Asset.objects.get(id=asset_id)
+            asset_info.update({
+                'id': str(asset.id),
+                'hostname': asset.hostname
+            })
+        except ObjectDoesNotExist as e:
+            logger.error(e)
+        return asset_info
 
 
 class ChromeAttrsSerializer(RemoteAppAttrsSerializer):
