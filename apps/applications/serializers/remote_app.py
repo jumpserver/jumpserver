@@ -35,7 +35,7 @@ class CharPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
 
 
 class RemoteAppAttrsSerializer(serializers.Serializer):
-    asset = CharPrimaryKeyRelatedField(queryset=Asset.objects, label=_("Assets"))
+    asset = CharPrimaryKeyRelatedField(queryset=Asset.objects, required=False, label=_("Assets"))
     path = serializers.CharField(max_length=128, label=_('Remote App path'))
 
 
@@ -51,7 +51,7 @@ class MySQLWorkbenchAttrsSerializer(RemoteAppAttrsSerializer):
     REMOTE_APP_PATH = 'C:\Program Files\MySQL\MySQL Workbench 8.0 CE\MySQLWorkbench.exe'
     path = serializers.CharField(max_length=128, label=_('Remote App path'), default=REMOTE_APP_PATH)
     mysql_workbench_ip = serializers.CharField(max_length=128, allow_blank=True, required=False, label=_('IP'))
-    mysql_workbench_port = serializers.IntegerField(label=_('Port'))
+    mysql_workbench_port = serializers.IntegerField(required=False, label=_('Port'))
     mysql_workbench_name = serializers.CharField(max_length=128, allow_blank=True, required=False, label=_('Database'))
     mysql_workbench_username = serializers.CharField(max_length=128, allow_blank=True, required=False, label=_('Username'))
     mysql_workbench_password = serializers.CharField(max_length=128, allow_blank=True, required=False, write_only=True, label=_('Password'))
