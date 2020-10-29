@@ -39,11 +39,11 @@ class SerializeApplicationToTreeNodeMixin:
             'meta': {'type': 'k8s_app'}
         }
 
-    def dispatch_serialize(self, application):
+    def _serialize(self, application):
         method_name = f'_serialize_{application.category}'
         data = getattr(self, method_name)(application)
         return data
 
     def serialize_applications(self, applications):
-        data = [self.dispatch_serialize(application) for application in applications]
+        data = [self._serialize(application) for application in applications]
         return data

@@ -102,9 +102,9 @@ class Category(ChoiceSet):
     def get_category_serializer_mapper(cls):
         from ..serializers import remote_app, database_app, k8s_app
         return {
-            cls.db: database_app.DatabaseCategorySerializer,
-            cls.remote_app: remote_app.RemmoteAppCategorySerializer,
-            cls.cloud: k8s_app.CloudCategorySerializer,
+            cls.db: database_app.DBAttrsSerializer,
+            cls.remote_app: remote_app.RemoteAppAttrsSerializer,
+            cls.cloud: k8s_app.CloudAttrsSerializer,
         }
 
     @classmethod
@@ -113,8 +113,9 @@ class Category(ChoiceSet):
         return mapper.get(cg, None)
 
     @classmethod
-    def is_remote_app(cls, cg):
-        return cg == cls.remote_app
+    def get_no_password_serializer_cls(cls):
+        from ..serializers import common
+        return common.NoPasswordSerializer
 
 
 class Application(CommonModelMixin, OrgModelMixin):
@@ -136,3 +137,6 @@ class Application(CommonModelMixin, OrgModelMixin):
         category_display = self.get_category_display()
         type_display = self.get_type_display()
         return f'{self.name}({type_display})[{category_display}]'
+
+    def category_is_remote_app(self):
+        return self.category == Category.remote_app

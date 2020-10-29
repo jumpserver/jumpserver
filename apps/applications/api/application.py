@@ -41,16 +41,17 @@ class ApplicationViewSet(OrgBulkModelViewSet):
         if self.action in [
             'create', 'update', 'partial_update', 'bulk_update', 'partial_bulk_update'
         ] and not app_type:
-            # action: create / update ...
+            # action: create / update
             raise JMSException(
                 'The `{}` action must take the `type` query parameter'.format(self.action)
             )
 
         if app_type:
+            # action: create / update / list / retrieve / metadata
             attrs_cls = models.Category.get_type_serializer_cls(app_type)
         elif app_category:
             # action: list / retrieve / metadata
             attrs_cls = models.Category.get_category_serializer_cls(app_category)
         else:
-            attrs_cls = serializers.CommonCategorySerializer
+            attrs_cls = models.Category.get_no_password_serializer_cls()
         return type('ApplicationDynamicSerializer', (serializer_class,), {'attrs': attrs_cls()})

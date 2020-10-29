@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 
-class CommonCategorySerializer(serializers.JSONField):
+class NoPasswordSerializer(serializers.JSONField):
     def to_representation(self, value):
         new_value = {}
         for k, v in value.items():
