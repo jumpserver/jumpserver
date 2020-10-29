@@ -3,6 +3,7 @@
 
 import copy
 from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 
 from common.serializers import AdaptedBulkListSerializer
@@ -14,42 +15,61 @@ from .. import const
 from ..models import RemoteApp, Category, Application
 
 
+class CharPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
+
+    def to_internal_value(self, data):
+        if self.pk_field is not None:
+            data = self.pk_field.to_internal_value(data)
+        try:
+            instance = self.get_queryset().get(pk=data)
+            return str(instance.id)
+        except ObjectDoesNotExist:
+            self.fail('does_not_exist', pk_value=data)
+        except (TypeError, ValueError):
+            self.fail('incorrect_type', data_type=type(data).__name__)
+
+    def to_representation(self, value):
+        if self.pk_field is not None:
+            return self.pk_field.to_representation(value)
+        return value
+
+
 class RemoteAppAttrsSerializer(serializers.Serializer):
-    asset = serializers.CharField(max_length=36, label=_('Assets'))
+    asset = CharPrimaryKeyRelatedField(queryset=Asset.objects, label=_("Assets"))
     path = serializers.CharField(max_length=128, label=_('Remote App path'))
 
 
 class ChromeAttrsSerializer(RemoteAppAttrsSerializer):
     REMOTE_APP_PATH = 'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe'
     path = serializers.CharField(max_length=128, label=_('Remote App path'), default=REMOTE_APP_PATH)
-    chrome_target = serializers.CharField(max_length=128, label=_('Target URL'))
-    chrome_username = serializers.CharField(max_length=128, label=_('Username'))
-    chrome_password = serializers.CharField(max_length=128, write_only=True, label=_('Password'))
+    chrome_target = serializers.CharField(max_length=128, allow_blank=True, required=False, label=_('Target URL'))
+    chrome_username = serializers.CharField(max_length=128, allow_blank=True, required=False, label=_('Username'))
+    chrome_password = serializers.CharField(max_length=128, allow_blank=True, required=False, write_only=True, label=_('Password'))
 
 
 class MySQLWorkbenchAttrsSerializer(RemoteAppAttrsSerializer):
     REMOTE_APP_PATH = 'C:\Program Files\MySQL\MySQL Workbench 8.0 CE\MySQLWorkbench.exe'
     path = serializers.CharField(max_length=128, label=_('Remote App path'), default=REMOTE_APP_PATH)
-    mysql_workbench_ip = serializers.CharField(max_length=128, label=_('IP'))
+    mysql_workbench_ip = serializers.CharField(max_length=128, allow_blank=True, required=False, label=_('IP'))
     mysql_workbench_port = serializers.IntegerField(label=_('Port'))
-    mysql_workbench_name = serializers.CharField(max_length=128, label=_('Database'))
-    mysql_workbench_username = serializers.CharField(max_length=128, label=_('Username'))
-    mysql_workbench_password = serializers.CharField(max_length=128, write_only=True, label=_('Password'))
+    mysql_workbench_name = serializers.CharField(max_length=128, allow_blank=True, required=False, label=_('Database'))
+    mysql_workbench_username = serializers.CharField(max_length=128, allow_blank=True, required=False, label=_('Username'))
+    mysql_workbench_password = serializers.CharField(max_length=128, allow_blank=True, required=False, write_only=True, label=_('Password'))
 
 
 class VMwareClientAttrsSerializer(RemoteAppAttrsSerializer):
     REMOTE_APP_PATH = 'C:\Program Files (x86)\VMware\Infrastructure\Virtual Infrastructure Client\Launcher\VpxClient.exe'
     path = serializers.CharField(max_length=128, label=_('Remote App path'), default=REMOTE_APP_PATH)
-    vmware_target = serializers.CharField(max_length=128, label=_('Target URL'))
-    vmware_username = serializers.CharField(max_length=128, label=_('Username'))
-    vmware_password = serializers.CharField(max_length=128, write_only=True, label=_('Password'))
+    vmware_target = serializers.CharField(max_length=128, allow_blank=True, required=False, label=_('Target URL'))
+    vmware_username = serializers.CharField(max_length=128, allow_blank=True, required=False, label=_('Username'))
+    vmware_password = serializers.CharField(max_length=128, allow_blank=True, required=False, write_only=True, label=_('Password'))
 
 
 class CustomRemoteAppAttrsSeralizers(RemoteAppAttrsSerializer):
-    custom_cmdline = serializers.CharField(max_length=128, label=_('Operating parameter'))
-    custom_target = serializers.CharField(max_length=128, label=_('Target url'))
-    custom_username = serializers.CharField(max_length=128, label=_('Username'))
-    custom_password = serializers.CharField(max_length=128, write_only=True, label=_('Password'))
+    custom_cmdline = serializers.CharField(max_length=128, allow_blank=True, required=False, label=_('Operating parameter'))
+    custom_target = serializers.CharField(max_length=128, allow_blank=True, required=False, label=_('Target url'))
+    custom_username = serializers.CharField(max_length=128, allow_blank=True, required=False, label=_('Username'))
+    custom_password = serializers.CharField(max_length=128, allow_blank=True, required=False, write_only=True, label=_('Password'))
 
 
 class RemoteAppConnectionInfoSerializer(serializers.ModelSerializer):
