@@ -63,14 +63,14 @@ class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(ForAdminMixin, UserNode
 
     def get_data_on_node_indirect_granted(self, key):
         user = self.user
-        asset_perm_ids = get_user_all_assetpermissions_id(user)
+        asset_perms_id = get_user_all_assetpermissions_id(user)
 
         nodes = get_indirect_granted_node_children(user, key)
 
         assets = Asset.org_objects.filter(
             nodes__key=key,
         ).filter(
-            granted_by_permissions__id__in=asset_perm_ids
+            granted_by_permissions__id__in=asset_perms_id
         ).distinct()
         assets = assets.prefetch_related('platform')
         return nodes, assets
