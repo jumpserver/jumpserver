@@ -22,7 +22,7 @@ __all__ = [
 class AllGrantedApplicationsMixin(ListAPIView):
     only_fields = serializers.ApplicationGrantedSerializer.Meta.only_fields
     serializer_class = serializers.ApplicationGrantedSerializer
-    filter_fields = ['id', 'name', 'comment']
+    filter_fields = ['id', 'name', 'category', 'type', 'comment']
     search_fields = ['name', 'comment']
     user: None
 
@@ -32,14 +32,7 @@ class AllGrantedApplicationsMixin(ListAPIView):
 
 
 class UserAllGrantedApplicationsApi(ForAdminMixin, AllGrantedApplicationsMixin):
-    only_fields = serializers.ApplicationGrantedSerializer.Meta.only_fields
-    serializer_class = serializers.ApplicationGrantedSerializer
-    filter_fields = ['id', 'name', 'comment']
-    search_fields = ['name', 'comment']
-
-    def get_queryset(self):
-        queryset = get_user_granted_all_applications(self.user)
-        return queryset.only(*self.only_fields)
+    pass
 
 
 class MyAllGrantedApplicationsApi(ForUserMixin, AllGrantedApplicationsMixin):
