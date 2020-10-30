@@ -13,7 +13,7 @@ class DBAttrsSerializer(serializers.Serializer):
     host = serializers.CharField(max_length=128, label=_('Host'))
     port = serializers.IntegerField(label=_('Port'))
     database = serializers.CharField(
-        max_length=128, allow_blank=True, allow_null=True, label=_('Database')
+        max_length=128, required=False, allow_blank=True, allow_null=True, label=_('Database')
     )
 
 
