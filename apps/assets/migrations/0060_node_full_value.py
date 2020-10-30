@@ -44,7 +44,7 @@ def migrate_nodes_full_value(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0060_auto_20201028_1652'),
+        ('assets', '0059_auto_20201027_1905'),
     ]
 
     operations = [

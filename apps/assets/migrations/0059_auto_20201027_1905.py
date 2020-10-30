@@ -20,4 +20,9 @@ class Migration(migrations.Migration):
             name='ad_domain',
             field=models.CharField(default='', max_length=256),
         ),
+        migrations.AlterField(
+            model_name='gateway',
+            name='ip',
+            field=models.CharField(db_index=True, max_length=128, verbose_name='IP'),
+        ),
     ]
