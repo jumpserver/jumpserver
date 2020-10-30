@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 import os
-from ..const import PROJECT_DIR, CONFIG
+from ..const import PROJECT_DIR, CONFIG, DYNAMIC
 
 LOG_DIR = os.path.join(PROJECT_DIR, 'logs')
 JUMPSERVER_LOG_FILE = os.path.join(LOG_DIR, 'jumpserver.log')
@@ -127,8 +127,7 @@ LOGGING = {
         'syslog': {
             'handlers': ['syslog'],
             'level': 'INFO'
-        },
-
+        }
     }
 }
 
@@ -138,16 +137,11 @@ if os.environ.get("DEBUG_DB"):
        'level': 'DEBUG'
     }
 
-SYSLOG_ENABLE = CONFIG.SYSLOG_ENABLE
+SYSLOG_ENABLE = DYNAMIC.SYSLOG_ENABLE
+SYSLOG_ADDR = DYNAMIC.SYSLOG_ADDR
+SYSLOG_FACILITY = DYNAMIC.SYSLOG_FACILITY
+SYSLOG_SOCKTYPE = DYNAMIC.SYSLOG_SOCKTYPE
 
-if CONFIG.SYSLOG_ADDR != '' and len(CONFIG.SYSLOG_ADDR.split(':')) == 2:
-    host, port = CONFIG.SYSLOG_ADDR.split(':')
-    LOGGING['handlers']['syslog'].update({
-        'class': 'logging.handlers.SysLogHandler',
-        'facility': CONFIG.SYSLOG_FACILITY,
-        'address': (host, int(port)),
-        'socktype': CONFIG.SYSLOG_SOCKTYPE,
-    })
 
 if not os.path.isdir(LOG_DIR):
     os.makedirs(LOG_DIR)

@@ -298,9 +298,11 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
     serializer_class = SettingsSerializer
 
     def get_object(self):
-        instance = {category: self._get_setting_fields_obj(list(category_serializer.get_fields()))
-                    for category, category_serializer in self.serializer_class().get_fields().items()
-                    if isinstance(category_serializer, serializers.Serializer)}
+        instance = {
+            category: self._get_setting_fields_obj(list(category_serializer.get_fields()))
+            for category, category_serializer in self.serializer_class().get_fields().items()
+            if isinstance(category_serializer, serializers.Serializer)
+        }
         return ObjectDict(instance)
 
     def perform_update(self, serializer):
@@ -308,8 +310,10 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
 
     def _get_setting_fields_obj(self, category_fields):
         if isinstance(category_fields, Iterable):
-            fields_data = {field_name: getattr(settings, field_name)
-                           for field_name in category_fields}
+            fields_data = {
+                field_name: getattr(settings, field_name)
+                for field_name in category_fields
+            }
             return ObjectDict(fields_data)
 
         if isinstance(category_fields, str):

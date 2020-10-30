@@ -84,6 +84,13 @@ class SecuritySettingSerializer(serializers.Serializer):
     SECURITY_PASSWORD_SPECIAL_CHAR = serializers.BooleanField(required=False)
 
 
+class LoggingSettingSerializer(serializers.Serializer):
+    SYSLOG_ENABLE = serializers.BooleanField(required=False)
+    SYSLOG_ADDR = serializers.CharField(max_length=2048)
+    SYSLOG_FACILITY = serializers.CharField()
+    SYSLOG_SOCKTYPE = serializers.ChoiceField(choices=((2, 'UDP'), (1, 'TCP')))
+
+
 class SettingsSerializer(serializers.Serializer):
     basic = BasicSettingSerializer(required=False)
     email = EmailSettingSerializer(required=False)
@@ -91,6 +98,7 @@ class SettingsSerializer(serializers.Serializer):
     ldap = LdapSettingSerializer(required=False)
     terminal = TerminalSettingSerializer(required=False)
     security = SecuritySettingSerializer(required=False)
+    logging = LoggingSettingSerializer(required=False)
 
     encrypt_fields = ["EMAIL_HOST_PASSWORD", "AUTH_LDAP_BIND_PASSWORD"]
 
