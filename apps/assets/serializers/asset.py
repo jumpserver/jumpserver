@@ -139,7 +139,6 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             return
         nodes_to_set = []
         for full_value in nodes_display:
-            full_value = full_value.replace(' ', '')
             node = Node.objects.filter(full_value=full_value).first()
             if node:
                 nodes_to_set.append(node)

@@ -207,7 +207,6 @@ class FamilyMixin:
 
     @classmethod
     def create_node_by_full_value(cls, full_value):
-        full_value = full_value.replace(' ', '')
         if not full_value:
             return []
         nodes_family = full_value.split('/')
