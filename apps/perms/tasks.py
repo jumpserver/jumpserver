@@ -65,10 +65,10 @@ def check_asset_permission_expired():
 
 
 @shared_task(queue='node_tree')
-def dispatch_process_expired_asset_permission(asset_perm_ids):
+def dispatch_process_expired_asset_permission(asset_perms_id):
     user_ids = User.objects.filter(
-        Q(assetpermissions__id__in=asset_perm_ids) |
-        Q(groups__assetpermissions__id__in=asset_perm_ids)
+        Q(assetpermissions__id__in=asset_perms_id) |
+        Q(groups__assetpermissions__id__in=asset_perms_id)
     ).distinct().values_list('id', flat=True)
     RebuildUserTreeTask.objects.bulk_create(
         [RebuildUserTreeTask(user_id=user_id) for user_id in user_ids]
@@ -95,13 +95,13 @@ def create_rebuild_user_tree_task_by_related_nodes_or_assets(node_ids, asset_ids
         Node.objects.filter(key__in=node_keys).values_list('id', flat=True)
     )
 
-    asset_perm_ids = set()
-    asset_perm_ids.update(
+    asset_perms_id = set()
+    asset_perms_id.update(
         AssetPermission.objects.filter(
             assets__id__in=asset_ids
         ).values_list('id', flat=True).distinct()
     )
-    asset_perm_ids.update(
+    asset_perms_id.update(
         AssetPermission.objects.filter(
             nodes__id__in=node_ids
         ).values_list('id', flat=True).distinct()
@@ -110,12 +110,12 @@ def create_rebuild_user_tree_task_by_related_nodes_or_assets(node_ids, asset_ids
     user_ids = set()
     user_ids.update(
         User.objects.filter(
-            assetpermissions__id__in=asset_perm_ids
+            assetpermissions__id__in=asset_perms_id
         ).distinct().values_list('id', flat=True)
     )
     user_ids.update(
         User.objects.filter(
-            groups__assetpermissions__id__in=asset_perm_ids
+            groups__assetpermissions__id__in=asset_perms_id
         ).distinct().values_list('id', flat=True)
     )
 

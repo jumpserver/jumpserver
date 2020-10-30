@@ -305,14 +305,14 @@ def get_user_granted_nodes_list_via_mapping_node(user):
 
 
 def get_user_granted_all_assets(user, via_mapping_node=True):
-    asset_perm_ids = get_user_all_assetpermissions_id(user)
+    asset_perms_id = get_user_all_assetpermissions_id(user)
     if via_mapping_node:
         granted_node_keys = UserGrantedMappingNode.objects.filter(
             user=user, granted=True,
         ).values_list('key', flat=True).distinct()
     else:
         granted_node_keys = Node.objects.filter(
-            granted_by_permissions__id__in=asset_perm_ids
+            granted_by_permissions__id__in=asset_perms_id
         ).distinct().values_list('key', flat=True)
     granted_node_keys = Node.clean_children_keys(granted_node_keys)
 
@@ -321,7 +321,7 @@ def get_user_granted_all_assets(user, via_mapping_node=True):
         granted_node_q |= Q(nodes__key__startswith=f'{_key}:')
         granted_node_q |= Q(nodes__key=_key)
 
-    assets__id = get_user_direct_granted_assets(user, asset_perm_ids).values_list('id', flat=True)
+    assets__id = get_user_direct_granted_assets(user, asset_perms_id).values_list('id', flat=True)
 
     q = granted_node_q | Q(id__in=list(assets__id))
     return Asset.org_objects.filter(q).distinct()
