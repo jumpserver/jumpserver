@@ -87,6 +87,7 @@ class UserLoginView(mixins.AuthMixin, FormView):
         try:
             self.check_user_auth(decrypt_passwd=True)
         except errors.AuthFailedError as e:
+            e = self.check_is_block(raise_exception=False) or e
             form.add_error(None, e.msg)
             ip = self.get_request_ip()
             cache.set(self.key_prefix_captcha.format(ip), 1, 3600)

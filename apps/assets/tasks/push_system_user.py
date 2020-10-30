@@ -2,7 +2,7 @@
 
 from itertools import groupby
 from celery import shared_task
-from common.db.utils import get_object_if_need, get_objects_if_need
+from common.db.utils import get_object_if_need, get_objects_if_need, get_objects
 from django.utils.translation import ugettext as _
 from django.db.models import Empty
 
@@ -240,10 +240,10 @@ def push_system_user_a_asset_manual(system_user, asset, username=None):
 
 
 @shared_task(queue="ansible")
-def push_system_user_to_assets(system_user, assets, username=None):
+def push_system_user_to_assets(system_user_id, assets_id, username=None):
+    system_user = SystemUser.objects.get(id=system_user_id)
+    assets = get_objects(Asset, assets_id)
     task_name = _("Push system users to assets: {}").format(system_user.name)
-    system_user = get_object_if_need(SystemUser, system_user)
-    assets = get_objects_if_need(Asset, assets)
     return push_system_user_util(system_user, assets, task_name, username=username)
 
 # @shared_task

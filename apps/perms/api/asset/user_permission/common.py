@@ -10,13 +10,13 @@ from rest_framework.generics import (
 )
 
 from orgs.utils import tmp_to_root_org
-from perms.utils.asset_permission import get_asset_system_users_id_with_actions_by_user
+from perms.utils.asset.permission import get_asset_system_users_id_with_actions_by_user
 from common.permissions import IsOrgAdminOrAppUser, IsOrgAdmin, IsValidUser
 from common.utils import get_logger, lazyproperty
 
-from ...hands import User, Asset, SystemUser
-from ... import serializers
-from ...models import Action
+from perms.hands import User, Asset, SystemUser
+from perms import serializers
+from perms.models import Action
 
 logger = get_logger(__name__)
 

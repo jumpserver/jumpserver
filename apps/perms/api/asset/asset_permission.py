@@ -5,11 +5,11 @@ from django.db.models import Q
 from common.permissions import IsOrgAdmin
 from orgs.mixins.api import OrgBulkModelViewSet
 from common.utils import get_object_or_none
-from ..models import AssetPermission
-from ..hands import (
+from perms.models import AssetPermission
+from perms.hands import (
     User, UserGroup, Asset, Node, SystemUser,
 )
-from .. import serializers
+from perms import serializers
 
 
 __all__ = [

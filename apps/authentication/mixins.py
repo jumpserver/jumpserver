@@ -53,7 +53,7 @@ class AuthMixin:
         ip = ip or get_request_ip(self.request)
         return ip
 
-    def check_is_block(self):
+    def check_is_block(self, raise_exception=True):
         if hasattr(self.request, 'data'):
             username = self.request.data.get("username")
         else:
@@ -61,7 +61,11 @@ class AuthMixin:
         ip = self.get_request_ip()
         if is_block_login(username, ip):
             logger.warn('Ip was blocked' + ': ' + username + ':' + ip)
-            raise errors.BlockLoginError(username=username, ip=ip)
+            exception = errors.BlockLoginError(username=username, ip=ip)
+            if raise_exception:
+                raise errors.BlockLoginError(username=username, ip=ip)
+            else:
+                return exception
 
     def decrypt_passwd(self, raw_passwd):
         # 获取解密密钥，对密码进行解密

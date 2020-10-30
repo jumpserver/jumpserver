@@ -180,6 +180,9 @@ class Session(OrgModelMixin):
         VNC = 'vnc', 'vnc'
         TELNET = 'telnet', 'telnet'
         MYSQL = 'mysql', 'mysql'
+        ORACLE = 'oracle', 'oracle'
+        MARIADB = 'mariadb', 'mariadb'
+        POSTGRESQL = 'postgresql', 'postgresql'
         K8S = 'k8s', 'kubernetes'
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
@@ -196,7 +199,7 @@ class Session(OrgModelMixin):
     has_replay = models.BooleanField(default=False, verbose_name=_("Replay"))
     has_command = models.BooleanField(default=False, verbose_name=_("Command"))
     terminal = models.ForeignKey(Terminal, null=True, on_delete=models.SET_NULL)
-    protocol = models.CharField(choices=PROTOCOL.choices, default='ssh', max_length=8, db_index=True)
+    protocol = models.CharField(choices=PROTOCOL.choices, default='ssh', max_length=16, db_index=True)
     date_start = models.DateTimeField(verbose_name=_("Date start"), db_index=True, default=timezone.now)
     date_end = models.DateTimeField(verbose_name=_("Date end"), null=True)
 

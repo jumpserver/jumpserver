@@ -48,3 +48,11 @@ def union_queryset(*args, base_queryset=None):
         base_queryset = args[0].model.objects
     queryset = base_queryset.filter(id__in=queryset_id)
     return queryset
+
+
+def get_log_keep_day(s, defaults=200):
+    try:
+        days = int(getattr(settings, s))
+    except ValueError:
+        days = defaults
+    return days
