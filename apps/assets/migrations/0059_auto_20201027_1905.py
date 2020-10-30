@@ -15,4 +15,14 @@ class Migration(migrations.Migration):
             name='protocol',
             field=models.CharField(choices=[('ssh', 'ssh'), ('rdp', 'rdp'), ('telnet', 'telnet'), ('vnc', 'vnc'), ('mysql', 'mysql'), ('oracle', 'oracle'), ('mariadb', 'mariadb'), ('postgresql', 'postgresql'), ('k8s', 'k8s')], default='ssh', max_length=16, verbose_name='Protocol'),
         ),
+        migrations.AddField(
+            model_name='systemuser',
+            name='ad_domain',
+            field=models.CharField(default='', max_length=256),
+        ),
+        migrations.AlterField(
+            model_name='gateway',
+            name='ip',
+            field=models.CharField(db_index=True, max_length=128, verbose_name='IP'),
+        ),
     ]

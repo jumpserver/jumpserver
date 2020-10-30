@@ -124,7 +124,10 @@ def migrate_and_integrate_application_permissions(apps, schema_editor):
         for old_perm in old_perms:
             if category == CATEGORY_REMOTE:
                 type_list = list(old_perm.remote_apps.values_list('type', flat=True))
-                _type = max(type_list, key=type_list.count)
+                if len(type_list) == 0:
+                    _type = TYPE_REMOTE_CHROME
+                else:
+                    _type = max(type_list, key=type_list.count)
             else:
                 _type = data_json['type']
             perm_json = old_perm_to_application_permission_json(old_perm, category, _type)
