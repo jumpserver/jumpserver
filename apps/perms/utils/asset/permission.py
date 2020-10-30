@@ -11,16 +11,19 @@ logger = get_logger(__file__)
 
 
 def get_asset_system_users_id_with_actions(asset_perm_queryset: BasePermissionQuerySet, asset: Asset):
+    asset_perms_id = set(asset_perm_queryset.values_list('id', flat=True))
+
     nodes = asset.get_nodes()
     node_keys = set()
     for node in nodes:
         ancestor_keys = node.get_ancestor_keys(with_self=True)
         node_keys.update(ancestor_keys)
 
-    queryset = asset_perm_queryset.filter(
+    queryset = AssetPermission.objects.filter(id__in=asset_perms_id).filter(
         Q(assets=asset) |
         Q(nodes__key__in=node_keys)
     )
+
     asset_protocols = asset.protocols_as_dict.keys()
     values = queryset.filter(
         system_users__protocol__in=asset_protocols
