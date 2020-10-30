@@ -38,3 +38,20 @@ class ApplicationPermissionSerializer(BulkOrgResourceModelSerializer):
         queryset = queryset.prefetch_related('users', 'user_groups', 'applications', 'system_users')
         return queryset
 
+    def validate_applications(self, applications):
+        if self.instance:
+            permission_type = self.instance.type
+        else:
+            permission_type = self.initial_data['type']
+
+        other_type_applications = [
+            application for application in applications
+            if application.type != permission_type
+        ]
+        if len(other_type_applications) > 0:
+            error = _(
+                'The application list contains applications '
+                'that are different from the permission type. ({})'
+            ).format(', '.join([application.name for application in other_type_applications]))
+            raise serializers.ValidationError(error)
+        return applications
