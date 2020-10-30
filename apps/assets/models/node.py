@@ -481,6 +481,21 @@ class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
             return
         return super().delete(using=using, keep_parents=keep_parents)
 
+    def update_child_full_value(self):
+        nodes = self.get_all_children(with_self=True)
+        sort_key_func = lambda n: [int(i) for i in n.key.split(':')]
+        nodes_sorted = sorted(list(nodes), key=sort_key_func)
+        nodes_mapper = {n.key: n for n in nodes_sorted}
+        for node in nodes_sorted:
+            parent = nodes_mapper.get(node.parent_key)
+            if not parent:
+                logger.error(f'Node parent node in mapper: {node.parent_key} {node.value}')
+                continue
+            node.full_value = parent.full_value + '/' + node.value
+        self.__class__.objects.bulk_update(nodes, ['full_value'])
+
     def save(self, *args, **kwargs):
         self.full_value = self.computed_full_value()
-        return super().save(*args, **kwargs)
+        instance = super().save(*args, **kwargs)
+        self.update_child_full_value()
+        return instance
