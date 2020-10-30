@@ -37,7 +37,7 @@ def migrate_nodes_full_value(apps, schema_editor):
         ancestor_keys = get_node_ancestor_keys(node.key, True)
         values = model.objects.filter(key__in=ancestor_keys).values_list('key', 'value')
         values = [v for k, v in sorted(values, key=lambda x: len(x[0]))]
-        node.full_value = '/'.join(values)
+        node.full_value = '/' + '/'.join(values)
         node.save()
 
 

@@ -410,7 +410,7 @@ class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
         ordering = ['key']
 
     def __str__(self):
-        return self.value
+        return self.full_value
 
     # def __eq__(self, other):
     #     if not other:
@@ -434,7 +434,6 @@ class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
     def name(self):
         return self.value
 
-    @lazyproperty
     def computed_full_value(self):
         # 不要在列表中调用该属性
         values = self.__class__.objects.filter(
@@ -442,7 +441,7 @@ class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
         ).values_list('key', 'value')
         values = [v for k, v in sorted(values, key=lambda x: len(x[0]))]
         values.append(self.value)
-        return '/'.join(values)
+        return '/' + '/'.join(values)
 
     @property
     def level(self):
@@ -481,3 +480,7 @@ class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
         if self.has_children_or_has_assets():
             return
         return super().delete(using=using, keep_parents=keep_parents)
+
+    def save(self, *args, **kwargs):
+        self.full_value = self.computed_full_value()
+        return super().save(*args, **kwargs)
