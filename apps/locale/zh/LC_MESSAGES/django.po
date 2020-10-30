@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-27 20:00+0800\n"
+"POT-Creation-Date: 2020-10-27 10:29+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -114,7 +114,7 @@ msgstr "集群"
 msgid "KubernetesApp"
 msgstr "Kubernetes应用"
 
-#: applications/models/remote_app.py:23 assets/models/asset.py:357
+#: applications/models/remote_app.py:23 assets/models/asset.py:364
 #: assets/models/authbook.py:26 assets/models/gathered_user.py:14
 #: assets/serializers/admin_user.py:32 assets/serializers/asset_user.py:47
 #: assets/serializers/asset_user.py:84 assets/serializers/system_user.py:46
@@ -563,7 +563,7 @@ msgstr "默认资产组"
 msgid "User"
 msgstr "用户"
 
-#: assets/models/label.py:19 assets/models/node.py:374 settings/models.py:28
+#: assets/models/label.py:19 assets/models/node.py:397 settings/models.py:28
 msgid "Value"
 msgstr "值"
 
@@ -575,19 +575,23 @@ msgstr "分类"
 msgid "New node"
 msgstr "新节点"
 
-#: assets/models/node.py:280 users/templates/users/_granted_assets.html:130
+#: assets/models/node.py:303 users/templates/users/_granted_assets.html:130
 msgid "empty"
 msgstr "空"
 
-#: assets/models/node.py:373 perms/models/asset_permission.py:144
+#: assets/models/node.py:396 perms/models/asset_permission.py:144
 msgid "Key"
 msgstr "键"
 
-#: assets/models/node.py:377 perms/models/asset_permission.py:148
+#: assets/models/node.py:398
+msgid "Full value"
+msgstr "全称"
+
+#: assets/models/node.py:401 perms/models/asset_permission.py:148
 msgid "Parent key"
 msgstr "ssh私钥"
 
-#: assets/models/node.py:386 assets/serializers/system_user.py:45
+#: assets/models/node.py:410 assets/serializers/system_user.py:45
 #: assets/serializers/system_user.py:185 perms/forms/asset_permission.py:92
 #: perms/forms/asset_permission.py:99
 #: users/templates/users/user_asset_permission.html:41
@@ -701,15 +705,27 @@ msgstr "协议格式 {}/{}"
 msgid "Protocol duplicate: {}"
 msgstr "协议重复: {}"
 
-#: assets/serializers/asset.py:110
+#: assets/serializers/asset.py:70
+msgid "Domain name"
+msgstr "网域名称"
+
+#: assets/serializers/asset.py:71
+msgid "Admin user name"
+msgstr "管理用户名称"
+
+#: assets/serializers/asset.py:72
+msgid "Nodes name"
+msgstr "节点名称"
+
+#: assets/serializers/asset.py:111
 msgid "Hardware info"
 msgstr "硬件信息"
 
-#: assets/serializers/asset.py:111 orgs/mixins/serializers.py:26
+#: assets/serializers/asset.py:112 orgs/mixins/serializers.py:26
 msgid "Org name"
 msgstr "组织名称"
 
-#: assets/serializers/asset.py:147 assets/serializers/asset.py:178
+#: assets/serializers/asset.py:168 assets/serializers/asset.py:199
 msgid "Connectivity"
 msgstr "连接"
 

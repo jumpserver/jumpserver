@@ -67,8 +67,9 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
         slug_field='name', queryset=Platform.objects.all(), label=_("Platform")
     )
     protocols = ProtocolsField(label=_('Protocols'), required=False)
-    domain_display = serializers.ReadOnlyField(source='domain.name')
-    admin_user_display = serializers.ReadOnlyField(source='admin_user.name')
+    domain_display = serializers.ReadOnlyField(source='domain.name', label=_('Domain name'))
+    admin_user_display = serializers.ReadOnlyField(source='admin_user.name', label=_('Admin user name'))
+    nodes_display = serializers.ListField(child=serializers.CharField(), label=_('Nodes name'), required=False)
 
     """
     资产的数据结构
@@ -90,7 +91,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'platform': ['name']
         }
         fields_m2m = [
-            'nodes', 'labels',
+            'nodes', 'nodes_display', 'labels',
         ]
         annotates_fields = {
             # 'admin_user_display': 'admin_user__name'
@@ -133,14 +134,32 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
         if protocols_data:
             validated_data["protocols"] = ' '.join(protocols_data)
 
+    def perform_nodes_display_create(self, instance, nodes_display):
+        if not nodes_display:
+            return
+        nodes_to_set = []
+        for full_value in nodes_display:
+            node = Node.objects.filter(full_value=full_value).first()
+            if node:
+                nodes_to_set.append(node)
+            else:
+                node = Node.create_node_by_full_value(full_value)
+            nodes_to_set.append(node)
+        instance.nodes.set(nodes_to_set)
+
     def create(self, validated_data):
         self.compatible_with_old_protocol(validated_data)
+        nodes_display = validated_data.pop('nodes_display')
         instance = super().create(validated_data)
+        self.perform_nodes_display_create(instance, nodes_display)
         return instance
 
     def update(self, instance, validated_data):
+        nodes_display = validated_data.pop('nodes_display')
         self.compatible_with_old_protocol(validated_data)
-        return super().update(instance, validated_data)
+        instance = super().update(instance, validated_data)
+        self.perform_nodes_display_create(instance, nodes_display)
+        return instance
 
 
 class AssetDisplaySerializer(AssetSerializer):
