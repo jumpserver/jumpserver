@@ -316,7 +316,7 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     def nodes_display(self):
         names = []
         for n in self.nodes.all():
-            names.append(self.full_value)
+            names.append(n.full_value)
         return names
 
     def as_node(self):
