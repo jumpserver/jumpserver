@@ -305,7 +305,7 @@ def get_user_granted_nodes_list_via_mapping_node(user):
 
 
 def get_user_granted_all_assets(user, via_mapping_node=True):
-    asset_perm_ids = get_user_all_assetpermission_ids(user)
+    asset_perm_ids = get_user_all_assetpermissions_id(user)
     if via_mapping_node:
         granted_node_keys = UserGrantedMappingNode.objects.filter(
             user=user, granted=True,
@@ -455,21 +455,17 @@ def get_top_level_granted_nodes(user):
     return nodes
 
 
-def get_user_all_assetpermission_ids(user: User):
-    asset_perm_ids = set()
-    asset_perm_ids.update(
-        AssetPermission.objects.valid().filter(users=user).distinct().values_list('id', flat=True)
-    )
-    asset_perm_ids.update(
-        AssetPermission.objects.valid().filter(user_groups__users=user).distinct().values_list('id', flat=True)
-    )
-    return asset_perm_ids
+def get_user_all_assetpermissions_id(user: User):
+    asset_perms_id = AssetPermission.objects.valid().filter(
+        Q(users=user) | Q(user_groups__users=user)
+    ).distinct().values_list('id', flat=True)
+    return asset_perms_id
 
 
-def get_user_direct_granted_assets(user, asset_perm_ids=None):
-    if asset_perm_ids is None:
-        asset_perm_ids = get_user_all_assetpermission_ids(user)
-    assets = Asset.org_objects.filter(granted_by_permissions__id__in=asset_perm_ids).distinct()
+def get_user_direct_granted_assets(user, asset_perms_id=None):
+    if asset_perms_id is None:
+        asset_perms_id = get_user_all_assetpermissions_id(user)
+    assets = Asset.org_objects.filter(granted_by_permissions__id__in=asset_perms_id).distinct()
     return assets
 
 

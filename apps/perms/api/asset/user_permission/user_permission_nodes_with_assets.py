@@ -13,7 +13,7 @@ from perms.utils.asset.user_permission import (
     get_user_direct_granted_assets, get_top_level_granted_nodes,
     get_user_granted_nodes_list_via_mapping_node,
     get_user_granted_all_assets, rebuild_user_tree_if_need,
-    get_user_all_assetpermission_ids,
+    get_user_all_assetpermissions_id,
 )
 
 from assets.models import Asset, FavoriteAsset
@@ -63,7 +63,7 @@ class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(ForAdminMixin, UserNode
 
     def get_data_on_node_indirect_granted(self, key):
         user = self.user
-        asset_perm_ids = get_user_all_assetpermission_ids(user)
+        asset_perm_ids = get_user_all_assetpermissions_id(user)
 
         nodes = get_indirect_granted_node_children(user, key)
 
