@@ -149,13 +149,13 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
 
     def create(self, validated_data):
         self.compatible_with_old_protocol(validated_data)
-        nodes_display = validated_data.pop('nodes_display')
+        nodes_display = validated_data.pop('nodes_display', '')
         instance = super().create(validated_data)
         self.perform_nodes_display_create(instance, nodes_display)
         return instance
 
     def update(self, instance, validated_data):
-        nodes_display = validated_data.pop('nodes_display')
+        nodes_display = validated_data.pop('nodes_display', '')
         self.compatible_with_old_protocol(validated_data)
         instance = super().update(instance, validated_data)
         self.perform_nodes_display_create(instance, nodes_display)
