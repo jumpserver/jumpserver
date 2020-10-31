@@ -365,7 +365,8 @@ def get_node_all_granted_assets(user: User, key):
 
     if only_asset_granted_nodes_qs:
         only_asset_granted_nodes_q = reduce(or_, only_asset_granted_nodes_qs)
-        only_asset_granted_nodes_q &= get_user_resources_q_granted_by_permissions(user)
+        asset_perms_id = get_user_all_assetpermission_ids(user)
+        only_asset_granted_nodes_q &= Q(granted_by_permissions__id__in=asset_perms_id)
         q.append(only_asset_granted_nodes_q)
 
     if q:
