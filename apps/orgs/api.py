@@ -2,6 +2,7 @@
 #
 
 from django.utils.translation import ugettext as _
+from django.db.models import Q
 from rest_framework import status
 from rest_framework.views import Response
 from rest_framework_bulk import BulkModelViewSet
@@ -72,6 +73,7 @@ class OrgMemberRelationBulkViewSet(JMSBulkRelationModelViewSet):
     m2m_field = Organization.members.field
     serializer_class = OrgMemberSerializer
     filterset_class = OrgMemberRelationFilterSet
+    search_fields = ('user__name', 'user__username', 'org__name')
 
     def perform_bulk_create(self, serializer):
         data = serializer.validated_data
