@@ -2,6 +2,7 @@
 #
 
 from rest_framework import serializers
+from django.utils.translation import ugettext_lazy as _
 
 from assets.models import SystemUser
 from applications.models import Application
@@ -29,10 +30,13 @@ class ApplicationGrantedSerializer(serializers.ModelSerializer):
     """
     被授权应用的数据结构
     """
+    category_display = serializers.ReadOnlyField(source='get_category_display', label=_('Category'))
+    type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type'))
+
     class Meta:
         model = Application
         only_fields = [
             'id', 'name', 'domain', 'category', 'type', 'comment', 'org_id'
         ]
-        fields = only_fields + ['org_name']
+        fields = only_fields + ['category_display', 'type_display', 'org_name']
         read_only_fields = fields
