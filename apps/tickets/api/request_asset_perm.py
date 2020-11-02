@@ -2,16 +2,15 @@ import textwrap
 
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
+from rest_framework.mixins import ListModelMixin
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.request import Request
 
 from orgs.models import Organization, ROLE as ORG_ROLE
 from users.models.user import User
-from common.const.http import POST, GET
-from common.drf.api import JMSModelViewSet
+from common.const.http import POST
+from common.drf.api import JMSModelViewSet, JmsGenericViewSet
 from common.permissions import IsValidUser, IsObjectOwner
-from common.utils.django import get_object_or_none
 from common.utils.timezone import dt_parser
 from common.drf.serializers import EmptySerializer
 from perms.models.asset_permission import AssetPermission, Asset
@@ -46,18 +45,6 @@ class RequestAssetPermTicketViewSet(JMSModelViewSet):
         if instance.action == action:
             action_display = instance.ACTION.get(action)
             raise TicketActionAlready(detail=_('Ticket has %s') % action_display)
-
-    @action(detail=False, methods=[GET], permission_classes=[IsValidUser])
-    def assignees(self, request: Request, *args, **kwargs):
-        user = request.user
-        org_id = request.query_params.get('org_id', Organization.DEFAULT_ID)
-
-        q = Q(role=User.ROLE.ADMIN)
-        if org_id != Organization.DEFAULT_ID:
-            q |= Q(m2m_org_members__role=ORG_ROLE.ADMIN, orgs__id=org_id, orgs__members=user)
-        org_admins = User.objects.filter(q).distinct()
-
-        return self.get_paginated_response_with_query_set(org_admins)
 
     def _get_extra_comment(self, instance):
         meta = instance.meta
@@ -141,3 +128,20 @@ class RequestAssetPermTicketViewSet(JMSModelViewSet):
         ap.users.add(instance.user)
 
         return ap
+
+
+class AssigneeViewSet(ListModelMixin, JmsGenericViewSet):
+    serializer_class = serializers.AssigneeSerializer
+    permission_classes = (IsValidUser,)
+    filter_fields = ('username', 'email', 'name', 'id', 'source')
+    search_fields = filter_fields
+
+    def get_queryset(self):
+        user = self.request.user
+        org_id = self.request.query_params.get('org_id', Organization.DEFAULT_ID)
+
+        q = Q(role=User.ROLE.ADMIN)
+        if org_id != Organization.DEFAULT_ID:
+            q |= Q(m2m_org_members__role=ORG_ROLE.ADMIN, orgs__id=org_id, orgs__members=user)
+        org_admins = User.objects.filter(q).distinct()
+        return org_admins
