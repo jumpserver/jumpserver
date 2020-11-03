@@ -36,6 +36,7 @@ def get_push_unixlike_system_user_tasks(system_user, username=None):
         username = system_user.username
     password = system_user.password
     public_key = system_user.public_key
+    comment = system_user.name
 
     groups = _split_by_comma(system_user.system_groups)
 
@@ -47,7 +48,8 @@ def get_push_unixlike_system_user_tasks(system_user, username=None):
         'shell': system_user.shell or Empty,
         'state': 'present',
         'home': system_user.home or Empty,
-        'groups': groups or Empty
+        'groups': groups or Empty,
+        'comment': comment
     }
 
     tasks = [
