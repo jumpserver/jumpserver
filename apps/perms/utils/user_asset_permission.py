@@ -508,4 +508,7 @@ def rebuild_user_tree_if_need(request, user):
             rebuild_user_mapping_nodes_with_lock(user)
         except lock.SomeoneIsDoingThis:
             # 您的数据正在初始化，请稍等
-            raise lock.SomeoneIsDoingThis(detail=_('Please wait while your data is being initialized'))
+            raise lock.SomeoneIsDoingThis(
+                detail=_('Please wait while your data is being initialized'),
+                code='rebuild_tree_conflict'
+            )

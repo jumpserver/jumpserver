@@ -38,10 +38,10 @@ def common_exception_handler(exc, context):
         if getattr(exc, 'wait', None):
             headers['Retry-After'] = '%d' % exc.wait
 
-        if isinstance(exc.detail, (list, dict)):
-            data = exc.detail
+        if isinstance(exc.detail, str) and isinstance(exc.get_codes(), str):
+            data = {'detail': exc.detail, 'code': exc.get_codes()}
         else:
-            data = {'detail': exc.detail}
+            data = exc.detail
 
         set_rollback()
         return Response(data, status=exc.status_code, headers=headers)
