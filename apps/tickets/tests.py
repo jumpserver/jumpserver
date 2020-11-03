@@ -43,19 +43,19 @@ class TicketTest(APITestCase):
         ])
 
         new_user = User.objects.create
-        new_org_memeber = OrganizationMember.objects.create
+        new_org_member = OrganizationMember.objects.create
 
         u = new_user(name='user-01', username='user-01', email='user-01@jms.com')
-        new_org_memeber(org=org_01, user=u, role=ORG_ROLE.USER)
-        new_org_memeber(org=org_02, user=u, role=ORG_ROLE.USER)
+        new_org_member(org=org_01, user=u, role=ORG_ROLE.USER)
+        new_org_member(org=org_02, user=u, role=ORG_ROLE.USER)
         self.user_01 = u
 
         u = new_user(name='org-admin-01', username='org-admin-01', email='org-admin-01@jms.com')
-        new_org_memeber(org=org_01, user=u, role=ORG_ROLE.ADMIN)
+        new_org_member(org=org_01, user=u, role=ORG_ROLE.ADMIN)
         self.org_admin_01 = u
 
         u = new_user(name='org-admin-02', username='org-admin-02', email='org-admin-02@jms.com')
-        new_org_memeber(org=org_02, user=u, role=ORG_ROLE.ADMIN)
+        new_org_member(org=org_02, user=u, role=ORG_ROLE.ADMIN)
         self.org_admin_02 = u
 
     def test_create_request_asset_perm(self):

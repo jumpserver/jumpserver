@@ -26,12 +26,12 @@ class OrgSerializer(ModelSerializer):
         read_only_fields = ['created_by', 'date_created']
 
     def create(self, validated_data):
-        members = self._pop_memebers(validated_data)
+        members = self._pop_members(validated_data)
         instance = Organization.objects.create(**validated_data)
         OrganizationMember.objects.add_users_by_role(instance, *members)
         return instance
 
-    def _pop_memebers(self, validated_data):
+    def _pop_members(self, validated_data):
         return (
             validated_data.pop('users', None),
             validated_data.pop('admins', None),
@@ -39,7 +39,7 @@ class OrgSerializer(ModelSerializer):
         )
 
     def update(self, instance, validated_data):
-        members = self._pop_memebers(validated_data)
+        members = self._pop_members(validated_data)
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
