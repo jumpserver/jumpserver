@@ -95,7 +95,7 @@ class SystemUserNodeRelationViewSet(BaseRelationViewSet):
         'id', 'node', 'systemuser',
     ]
     search_fields = [
-        "node__value", "systemuser__name", "systemuser_username"
+        "node__value", "systemuser__name", "systemuser__username"
     ]
 
     def get_objects_attr(self):
