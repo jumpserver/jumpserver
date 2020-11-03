@@ -66,24 +66,27 @@ def get_push_unixlike_system_user_tasks(system_user, username=None):
                 'module': 'group',
                 'args': 'name={} state=present'.format(username),
             }
-        },
-        {
-            'name': 'Check home dir exists',
-            'action': {
-                'module': 'stat',
-                'args': 'path=/home/{}'.format(username)
-            },
-            'register': 'home_existed'
-        },
-        {
-            'name': "Set home dir permission",
-            'action': {
-                'module': 'file',
-                'args': "path=/home/{0} owner={0} group={0} mode=700".format(username)
-            },
-            'when': 'home_existed.stat.exists == true'
         }
     ]
+    if not system_user.home:
+        tasks.extend([
+            {
+                'name': 'Check home dir exists',
+                'action': {
+                    'module': 'stat',
+                    'args': 'path=/home/{}'.format(username)
+                },
+                'register': 'home_existed'
+            },
+            {
+                'name': "Set home dir permission",
+                'action': {
+                    'module': 'file',
+                    'args': "path=/home/{0} owner={0} group={0} mode=700".format(username)
+                },
+                'when': 'home_existed.stat.exists == true'
+            }
+        ])
     if password:
         tasks.append({
             'name': 'Set {} password'.format(username),
