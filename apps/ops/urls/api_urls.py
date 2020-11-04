@@ -3,13 +3,16 @@ from __future__ import unicode_literals
 
 from django.urls import path
 from rest_framework.routers import DefaultRouter
+from rest_framework_bulk.routes import BulkRouter
 from .. import api
 
 
 app_name = "ops"
 
 router = DefaultRouter()
-router.register(r'tasks', api.TaskViewSet, 'task')
+bulk_router = BulkRouter()
+
+bulk_router.register(r'tasks', api.TaskViewSet, 'task')
 router.register(r'adhoc', api.AdHocViewSet, 'adhoc')
 router.register(r'adhoc-executions', api.AdHocRunHistoryViewSet, 'execution')
 router.register(r'command-executions', api.CommandExecutionViewSet, 'command-execution')
@@ -22,3 +25,4 @@ urlpatterns = [
 ]
 
 urlpatterns += router.urls
+urlpatterns += bulk_router.urls
