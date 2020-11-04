@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from rest_framework import serializers
 from django.shortcuts import reverse
 
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import Task, AdHoc, AdHocExecution, CommandExecution
 
 
@@ -45,7 +46,7 @@ class AdHocExecutionExcludeResultSerializer(AdHocExecutionSerializer):
         ]
 
 
-class TaskSerializer(serializers.ModelSerializer):
+class TaskSerializer(BulkOrgResourceModelSerializer):
     summary = serializers.ReadOnlyField(source='history_summary')
     latest_execution = AdHocExecutionExcludeResultSerializer(read_only=True)
 
