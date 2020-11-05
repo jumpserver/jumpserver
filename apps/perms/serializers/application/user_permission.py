@@ -36,7 +36,7 @@ class ApplicationGrantedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Application
         only_fields = [
-            'id', 'name', 'domain', 'category', 'type', 'comment', 'org_id'
+            'id', 'name', 'domain', 'category', 'type', 'attrs', 'comment', 'org_id'
         ]
         fields = only_fields + ['category_display', 'type_display', 'org_name']
         read_only_fields = fields
