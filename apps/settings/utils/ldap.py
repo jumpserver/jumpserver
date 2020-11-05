@@ -125,7 +125,7 @@ class LDAPServerUtil(object):
             return '(|{})'.format(extra)
         if self.search_value:
             for attr in self.config.attr_map.values():
-                extra += '({}={})'.format(attr, self.search_value)
+                extra += '({}={})'.format(attr, '*{}*'.format(self.search_value))
             return '(|{})'.format(extra)
         return extra
 
@@ -222,7 +222,7 @@ class LDAPCacheUtil(object):
         elif self.search_value:
             filter_users = [
                 user for user in users
-                if self.search_value in ','.join(user.values())
+                if self.search_value.lower() in ','.join(user.values()).lower()
             ]
         else:
             filter_users = users
