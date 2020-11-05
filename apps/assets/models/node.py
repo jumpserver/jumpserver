@@ -440,7 +440,7 @@ class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
             key__in=self.get_ancestor_keys()
         ).values_list('key', 'value')
         values = [v for k, v in sorted(values, key=lambda x: len(x[0]))]
-        values.append(self.value)
+        values.append(str(self.value))
         return '/' + '/'.join(values)
 
     @property
