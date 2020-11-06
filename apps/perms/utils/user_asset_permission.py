@@ -1,5 +1,5 @@
 from functools import reduce, wraps
-from operator import or_, and_
+from operator import or_
 from uuid import uuid4
 import threading
 import inspect
@@ -229,9 +229,13 @@ def set_node_granted_assets_amount(user, node, asset_perms_id=None):
     setattr(node, TMP_GRANTED_ASSETS_AMOUNT_FIELD, assets_amount)
 
 
+@tmp_to_root_org()
 def rebuild_user_mapping_nodes(user):
     logger.info(f'>>> {dt_formater(now())} start rebuild {user} mapping nodes')
     asset_perms_id = get_user_all_assetpermissions_id(user)
+    if not asset_perms_id:
+        # 没有授权直接返回
+        return
     tmp_nodes = compute_tmp_mapping_node_from_perm(user, asset_perms_id)
     for _node in tmp_nodes:
         set_node_granted_assets_amount(user, _node, asset_perms_id)
