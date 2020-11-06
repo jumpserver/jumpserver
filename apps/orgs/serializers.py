@@ -1,12 +1,13 @@
 from django.db.models import F
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
+from django.utils.translation import ugettext_lazy as _
 
 from users.models.user import User
 from common.serializers import AdaptedBulkListSerializer
 from common.drf.serializers import BulkModelSerializer
 from common.db.models import concated_display as display
-from .models import Organization, OrganizationMember
+from .models import Organization, OrganizationMember, ROLE
 
 
 class OrgSerializer(ModelSerializer):
@@ -71,6 +72,28 @@ class OrgMemberSerializer(BulkModelSerializer):
             org_display=F('org__name'),
             user_display=display('user__name', 'user__username')
         ).distinct()
+
+
+class OrgMemberAdminSerializer(BulkModelSerializer):
+    role = serializers.HiddenField(default=ROLE.ADMIN)
+    organization = serializers.PrimaryKeyRelatedField(
+        label=_('Organization'), queryset=Organization.objects.all(), required=True, source='org'
+    )
+
+    class Meta:
+        model = OrganizationMember
+        fields = ('id', 'organization', 'user', 'role')
+
+
+class OrgMemberUserSerializer(BulkModelSerializer):
+    role = serializers.HiddenField(default=ROLE.USER)
+    organization = serializers.PrimaryKeyRelatedField(
+        label=_('Organization'), queryset=Organization.objects.all(), required=True, source='org'
+    )
+
+    class Meta:
+        model = OrganizationMember
+        fields = ('id', 'organization', 'user', 'role')
 
 
 class OrgRetrieveSerializer(OrgReadSerializer):

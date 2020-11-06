@@ -2,17 +2,17 @@
 #
 
 from django.utils.translation import ugettext as _
-from django.db.models import Q
 from rest_framework import status
 from rest_framework.views import Response
 from rest_framework_bulk import BulkModelViewSet
 
 from common.permissions import IsSuperUserOrAppUser
-from common.drf.api import JMSBulkRelationModelViewSet, JMSModelViewSet
+from common.drf.api import JMSBulkRelationModelViewSet
 from .models import Organization, ROLE
 from .serializers import (
     OrgSerializer, OrgReadSerializer,
-    OrgRetrieveSerializer, OrgMemberSerializer
+    OrgRetrieveSerializer, OrgMemberSerializer,
+    OrgMemberAdminSerializer, OrgMemberUserSerializer
 )
 from users.models import User, UserGroup
 from assets.models import Asset, Domain, AdminUser, SystemUser, Label
@@ -74,6 +74,54 @@ class OrgMemberRelationBulkViewSet(JMSBulkRelationModelViewSet):
     serializer_class = OrgMemberSerializer
     filterset_class = OrgMemberRelationFilterSet
     search_fields = ('user__name', 'user__username', 'org__name')
+
+    def perform_bulk_create(self, serializer):
+        data = serializer.validated_data
+        relations = [OrganizationMember(**i) for i in data]
+        OrganizationMember.objects.bulk_create(relations, ignore_conflicts=True)
+
+    def perform_bulk_destroy(self, queryset):
+        objs = list(queryset.all().prefetch_related('user', 'org'))
+        queryset.delete()
+        self.send_m2m_changed_signal(objs, action='post_remove')
+
+
+class OrgMemberAdminRelationBulkViewSet(JMSBulkRelationModelViewSet):
+    permission_classes = (IsSuperUserOrAppUser,)
+    m2m_field = Organization.members.field
+    serializer_class = OrgMemberAdminSerializer
+    filterset_class = OrgMemberRelationFilterSet
+    search_fields = ('user__name', 'user__username', 'org__name')
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        org_id = self.kwargs.get('org_id')
+        queryset = queryset.filter(org_id=org_id, role=ROLE.ADMIN)
+        return queryset
+
+    def perform_bulk_create(self, serializer):
+        data = serializer.validated_data
+        relations = [OrganizationMember(**i) for i in data]
+        OrganizationMember.objects.bulk_create(relations, ignore_conflicts=True)
+
+    def perform_bulk_destroy(self, queryset):
+        objs = list(queryset.all().prefetch_related('user', 'org'))
+        queryset.delete()
+        self.send_m2m_changed_signal(objs, action='post_remove')
+
+
+class OrgMemberUserRelationBulkViewSet(JMSBulkRelationModelViewSet):
+    permission_classes = (IsSuperUserOrAppUser,)
+    m2m_field = Organization.members.field
+    serializer_class = OrgMemberUserSerializer
+    filterset_class = OrgMemberRelationFilterSet
+    search_fields = ('user__name', 'user__username', 'org__name')
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        org_id = self.kwargs.get('org_id')
+        queryset = queryset.filter(org_id=org_id, role=ROLE.USER)
+        return queryset
 
     def perform_bulk_create(self, serializer):
         data = serializer.validated_data
