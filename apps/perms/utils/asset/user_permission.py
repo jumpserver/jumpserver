@@ -215,7 +215,7 @@ def compute_tmp_mapping_node_from_perm(user: User, asset_perms_id=None):
     return [*leaf_nodes, *ancestors]
 
 
-def create_mapping_nodes(user, nodes, clear=True):
+def create_mapping_nodes(user, nodes):
     to_create = []
     for node in nodes:
         _granted = getattr(node, TMP_GRANTED_FIELD, False)
@@ -231,8 +231,6 @@ def create_mapping_nodes(user, nodes, clear=True):
             assets_amount=_granted_assets_amount,
         ))
 
-    if clear:
-        UserGrantedMappingNode.objects.filter(user=user).delete()
     UserGrantedMappingNode.objects.bulk_create(to_create)
 
 
@@ -254,6 +252,9 @@ def set_node_granted_assets_amount(user, node, asset_perms_id=None):
 @tmp_to_root_org()
 def rebuild_user_mapping_nodes(user):
     logger.info(f'>>> {dt_formater(now())} start rebuild {user} mapping nodes')
+
+    # 先删除旧的授权树🌲
+    UserGrantedMappingNode.objects.filter(user=user).delete()
     asset_perms_id = get_user_all_assetpermissions_id(user)
     if not asset_perms_id:
         # 没有授权直接返回
