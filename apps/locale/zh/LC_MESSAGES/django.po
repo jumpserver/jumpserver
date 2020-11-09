@@ -1358,9 +1358,6 @@ msgstr "正在使用其他认证服务器，请联系管理员"
 msgid "One-time password"
 msgstr "一次性密码"
 
-#: authentication/templates/authentication/login_otp.html:23
-msgid "Open Google Authenticator and enter the 6-bit dynamic code"
-msgstr "请打开 Google Authenticator，输入6位动态码"
 
 #: authentication/templates/authentication/login_otp.html:26
 #: users/templates/users/user_otp_check_password.html:15
@@ -3431,9 +3428,9 @@ msgstr "绑定一次性密码验证器"
 
 #: users/templates/users/user_otp_enable_bind.html:13
 msgid ""
-"Use the mobile Google Authenticator application to scan the following qr "
+"Use the mobile Authenticator application to scan the following qr "
 "code for a 6-bit verification code"
-msgstr "使用手机 Google Authenticator 应用扫描以下二维码，获取6位验证码"
+msgstr "使用手机验证器应用扫描以下二维码，获取6位验证码"
 
 #: users/templates/users/user_otp_enable_bind.html:22
 #: users/templates/users/user_verify_mfa.html:23
@@ -3446,9 +3443,9 @@ msgstr "安装应用"
 
 #: users/templates/users/user_otp_enable_install_app.html:13
 msgid ""
-"Download and install the Google Authenticator application on your phone or "
+"Download and install the Authenticator application on your phone or "
 "applet of WeChat"
-msgstr "请在手机端或微信小程序下载并安装 Google Authenticator 应用"
+msgstr "请在手机端或微信小程序下载并安装验证器应用"
 
 #: users/templates/users/user_otp_enable_install_app.html:18
 msgid "Android downloads"
@@ -3535,8 +3532,8 @@ msgid ""
 msgstr "账号保护已开启，请根据提示完成以下操作"
 
 #: users/templates/users/user_verify_mfa.html:13
-msgid "Open Authenticator and enter the 6-bit dynamic code"
-msgstr "请打开 验证器，输入6位动态码"
+msgid "Open mobile Authenticator and enter the 6-bit dynamic code"
+msgstr "请打开手机验证器，输入6位动态码"
 
 # msgid "Update user"
 # msgstr "更新用户"
