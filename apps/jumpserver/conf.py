@@ -369,7 +369,7 @@ class Config(dict):
         tp = type(default_value)
         # 对bool特殊处理
         if tp is bool and isinstance(v, str):
-            if v in ("true", "True", "1"):
+            if v.lower() in ("true", "1"):
                 return True
             else:
                 return False
