@@ -5,6 +5,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from django.db.models import F
 
+from orgs.utils import tmp_to_root_org
 from common.permissions import IsValidUser
 from common.utils import get_logger, get_object_or_none
 from .mixin import UserNodeGrantStatusDispatchMixin, ForUserMixin, ForAdminMixin
@@ -26,6 +27,7 @@ logger = get_logger(__name__)
 class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
     permission_classes = (IsValidUser,)
 
+    @tmp_to_root_org()
     def list(self, request: Request, *args, **kwargs):
         """
         此算法依赖 UserGrantedMappingNode
