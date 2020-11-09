@@ -127,7 +127,6 @@ class Application(CommonModelMixin, OrgModelMixin):
     comment = models.TextField(
         max_length=128, default='', blank=True, verbose_name=_('Comment')
     )
-    objects = QuerySet.as_manager()
 
     class Meta:
         unique_together = [('org_id', 'name')]
