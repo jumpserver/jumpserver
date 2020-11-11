@@ -14,7 +14,7 @@ class K8sAttrsSerializer(CloudAttrsSerializer):
 
 
 class K8sAppSerializer(BulkOrgResourceModelSerializer):
-    type_display = serializers.CharField(source='get_type_display', read_only=True)
+    type_display = serializers.CharField(source='get_type_display', read_only=True, label=_('Type for display'))
 
     class Meta:
         model = models.K8sApp

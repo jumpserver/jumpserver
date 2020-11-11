@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from rest_framework import serializers
+from django.utils.translation import ugettext_lazy as _
 
 from common.serializers import AdaptedBulkListSerializer
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
@@ -10,9 +11,9 @@ from .base import AuthSerializerMixin
 
 
 class DomainSerializer(BulkOrgResourceModelSerializer):
-    asset_count = serializers.SerializerMethodField()
-    application_count = serializers.SerializerMethodField()
-    gateway_count = serializers.SerializerMethodField()
+    asset_count = serializers.SerializerMethodField(label=_('Assets count'))
+    application_count = serializers.SerializerMethodField(label=_('Applications count'))
+    gateway_count = serializers.SerializerMethodField(label=_('Gateways count'))
 
     class Meta:
         model = Domain
@@ -26,7 +27,7 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
         fields = fields_small + fields_m2m
         read_only_fields = ('asset_count', 'gateway_count', 'date_created')
         extra_kwargs = {
-            'assets': {'required': False}
+            'assets': {'required': False, 'label': _('Assets')},
         }
         list_serializer_class = AdaptedBulkListSerializer
 

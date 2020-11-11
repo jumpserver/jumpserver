@@ -46,3 +46,6 @@ class DatabaseAppSerializer(BulkOrgResourceModelSerializer):
             'created_by', 'date_created', 'date_updated'
             'get_type_display',
         ]
+        extra_kwargs = {
+            'get_type_display': {'label': _('Type for display')},
+        }
