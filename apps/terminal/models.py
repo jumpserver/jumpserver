@@ -257,9 +257,25 @@ class Session(OrgModelMixin):
         _PROTOCOL = self.PROTOCOL
         if self.is_finished:
             return False
-        if self.protocol not in [_PROTOCOL.SSH, _PROTOCOL.TELNET, _PROTOCOL.MYSQL, _PROTOCOL.K8S]:
+        if self.protocol in [_PROTOCOL.SSH, _PROTOCOL.TELNET, _PROTOCOL.K8S]:
+            return True
+        else:
             return False
-        return True
+
+    @property
+    def db_protocols(self):
+        _PROTOCOL = self.PROTOCOL
+        return [_PROTOCOL.MYSQL, _PROTOCOL.MARIADB, _PROTOCOL.ORACLE, _PROTOCOL.POSTGRESQL]
+
+    @property
+    def can_termination(self):
+        _PROTOCOL = self.PROTOCOL
+        if self.is_finished:
+            return False
+        if self.protocol in self.db_protocols:
+            return False
+        else:
+            return True
 
     def save_replay_to_storage(self, f):
         local_path = self.get_local_path()
