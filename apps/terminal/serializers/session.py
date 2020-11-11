@@ -27,7 +27,15 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
         ]
         extra_kwargs = {
             "protocol": {'label': _('Protocol')},
-            'is_finished': {'label': _('Is finished')}
+            'user_id': {'label': _('User ID')},
+            'asset_id': {'label': _('Asset ID')},
+            'system_user_id': {'label': _('System user ID')},
+            'login_from_display': {'label': _('Login from for display')},
+            'is_success': {'label': _('Is success')},
+            'can_replay': {'label': _('Can replay')},
+            'can_join': {'label': _('Can join')},
+            'terminal': {'label': _('Terminal')},
+            'is_finished': {'label': _('Is finished')},
         }
 
 

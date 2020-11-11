@@ -2,8 +2,8 @@
 #
 
 from rest_framework import serializers
+from django.utils.translation import ugettext_lazy as _
 
-from django.db.models import Count
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from perms.models import AssetPermission, Action
 
@@ -54,6 +54,16 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
         ]
         fields = small_fields + m2m_fields
         read_only_fields = ['created_by', 'date_created']
+        extra_kwargs = {
+            'is_expired': {'label': _('Is expired')},
+            'is_valid': {'label': _('Is valid')},
+            'actions': {'label': _('Actions')},
+            'users_amount': {'label': _('Users amount')},
+            'user_groups_amount': {'label': _('User groups amount')},
+            'assets_amount': {'label': _('Assets amount')},
+            'nodes_amount': {'label': _('Nodes amount')},
+            'system_users_amount': {'label': _('System users amount')},
+        }
 
     @classmethod
     def setup_eager_loading(cls, queryset):

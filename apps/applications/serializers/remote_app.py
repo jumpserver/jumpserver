@@ -143,7 +143,7 @@ class RemoteAppParamsDictField(CustomMetaDictField):
 
 # TODO: DELETE
 class RemoteAppSerializer(BulkOrgResourceModelSerializer):
-    params = RemoteAppParamsDictField()
+    params = RemoteAppParamsDictField(label=_('Parameters'))
     type_fields_map = const.REMOTE_APP_TYPE_FIELDS_MAP
 
     class Meta:
@@ -157,6 +157,10 @@ class RemoteAppSerializer(BulkOrgResourceModelSerializer):
             'created_by', 'date_created', 'asset_info',
             'get_type_display'
         ]
+        extra_kwargs = {
+            'asset_info': {'label': _('Asset info')},
+            'get_type_display': {'label': _('Type for display')},
+        }
 
     def process_params(self, instance, validated_data):
         new_params = copy.deepcopy(validated_data.get('params', {}))

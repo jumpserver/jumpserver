@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 #
 from rest_framework import serializers
-from django.db.models import Prefetch, F, Count
+from django.db.models import F
 
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-from common.serializers import AdaptedBulkListSerializer
-from ..models import Asset, Node, Label, Platform
+from ..models import Asset, Node, Platform
 from .base import ConnectivitySerializer
 
 __all__ = [

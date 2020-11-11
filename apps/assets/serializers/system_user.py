@@ -41,10 +41,11 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'public_key': {"write_only": True},
             'private_key': {"write_only": True},
             'token': {"write_only": True},
-            'nodes_amount': {'label': _('Node')},
-            'assets_amount': {'label': _('Asset')},
+            'nodes_amount': {'label': _('Nodes amount')},
+            'assets_amount': {'label': _('Assets amount')},
             'login_mode_display': {'label': _('Login mode display')},
             'created_by': {'read_only': True},
+            'ad_domain': {'label': _('Ad domain')},
         }
 
     def validate_auto_push(self, value):
@@ -156,11 +157,15 @@ class SystemUserListSerializer(SystemUserSerializer):
             'auto_generate_key', 'ad_domain',
             'sftp_root',
         ]
-
         extra_kwargs = {
             'password': {"write_only": True},
             'public_key': {"write_only": True},
             'private_key': {"write_only": True},
+            'nodes_amount': {'label': _('Nodes amount')},
+            'assets_amount': {'label': _('Assets amount')},
+            'login_mode_display': {'label': _('Login mode display')},
+            'created_by': {'read_only': True},
+            'ad_domain': {'label': _('Ad domain')},
         }
 
     @classmethod

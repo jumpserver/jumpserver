@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-10 15:38+0800\n"
+"POT-Creation-Date: 2020-11-11 16:16+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -149,10 +149,10 @@ msgstr "Kubernetes应用"
 #: applications/models/remote_app.py:23 assets/models/asset.py:363
 #: assets/models/authbook.py:26 assets/models/gathered_user.py:14
 #: assets/serializers/admin_user.py:32 assets/serializers/asset_user.py:47
-#: assets/serializers/asset_user.py:84 assets/serializers/system_user.py:45
-#: assets/serializers/system_user.py:186 audits/models.py:38
-#: perms/forms/asset_permission.py:89 perms/models/asset_permission.py:92
-#: templates/index.html:82 terminal/backends/command/models.py:19
+#: assets/serializers/asset_user.py:84 assets/serializers/system_user.py:191
+#: audits/models.py:38 perms/forms/asset_permission.py:89
+#: perms/models/asset_permission.py:92 templates/index.html:82
+#: terminal/backends/command/models.py:19
 #: terminal/backends/command/serializers.py:13 terminal/models.py:192
 #: users/templates/users/user_asset_permission.html:40
 #: users/templates/users/user_asset_permission.html:70
@@ -172,6 +172,7 @@ msgid "App path"
 msgstr "应用路径"
 
 #: applications/models/remote_app.py:36
+#: applications/serializers/remote_app.py:146
 msgid "Parameters"
 msgstr "参数"
 
@@ -209,10 +210,17 @@ msgstr "创建日期"
 msgid "RemoteApp"
 msgstr "远程应用"
 
+#: applications/serializers/database_app.py:50
+#: applications/serializers/k8s_app.py:17
+#: applications/serializers/remote_app.py:162 audits/serializers.py:26
+msgid "Type for display"
+msgstr "类型（显示名称）"
+
 #: applications/serializers/remote_app.py:36 assets/models/user.py:99
-#: templates/_nav.html:39 xpack/plugins/change_auth_plan/models.py:52
+#: assets/serializers/domain.py:30 templates/_nav.html:39
+#: xpack/plugins/change_auth_plan/models.py:52
 msgid "Assets"
-msgstr "资产管理"
+msgstr "资产"
 
 #: applications/serializers/remote_app.py:37
 #: applications/serializers/remote_app.py:58
@@ -280,6 +288,10 @@ msgstr "运行参数"
 msgid "Target url"
 msgstr "目标URL"
 
+#: applications/serializers/remote_app.py:161
+msgid "Asset info"
+msgstr "资产信息"
+
 #: assets/api/admin_user.py:46
 msgid "Deleted failed, There are related assets"
 msgstr "删除失败，存在关联资产"
@@ -321,7 +333,7 @@ msgid "Internal"
 msgstr "内部的"
 
 #: assets/models/asset.py:173 assets/models/asset.py:197
-#: assets/serializers/asset.py:67
+#: assets/serializers/asset.py:66
 msgid "Platform"
 msgstr "系统平台"
 
@@ -338,7 +350,7 @@ msgstr "主机名"
 msgid "Protocol"
 msgstr "协议"
 
-#: assets/models/asset.py:196 assets/serializers/asset.py:69
+#: assets/models/asset.py:196 assets/serializers/asset.py:68
 #: perms/serializers/asset/user_permission.py:41
 msgid "Protocols"
 msgstr "协议组"
@@ -599,7 +611,7 @@ msgid "Default asset group"
 msgstr "默认资产组"
 
 #: assets/models/label.py:15 audits/models.py:36 audits/models.py:56
-#: audits/models.py:69 audits/serializers.py:77 authentication/models.py:46
+#: audits/models.py:69 audits/serializers.py:80 authentication/models.py:46
 #: authentication/models.py:90 orgs/models.py:18 orgs/models.py:396
 #: perms/forms/asset_permission.py:83 perms/forms/database_app_permission.py:38
 #: perms/forms/remote_app_permission.py:40 perms/models/asset_permission.py:169
@@ -647,9 +659,8 @@ msgstr "全称"
 msgid "Parent key"
 msgstr "ssh私钥"
 
-#: assets/models/node.py:409 assets/serializers/system_user.py:44
-#: assets/serializers/system_user.py:185 perms/forms/asset_permission.py:92
-#: perms/forms/asset_permission.py:99
+#: assets/models/node.py:409 assets/serializers/system_user.py:190
+#: perms/forms/asset_permission.py:92 perms/forms/asset_permission.py:99
 #: users/templates/users/user_asset_permission.html:41
 #: users/templates/users/user_asset_permission.html:73
 #: users/templates/users/user_asset_permission.html:158
@@ -749,40 +760,41 @@ msgstr "可连接"
 msgid "Unknown"
 msgstr "未知"
 
-#: assets/serializers/asset.py:24
+#: assets/serializers/asset.py:23
 msgid "Protocol format should {}/{}"
 msgstr "协议格式 {}/{}"
 
-#: assets/serializers/asset.py:41
+#: assets/serializers/asset.py:40
 msgid "Protocol duplicate: {}"
 msgstr "协议重复: {}"
 
-#: assets/serializers/asset.py:70
+#: assets/serializers/asset.py:69
 msgid "Domain name"
 msgstr "网域名称"
 
-#: assets/serializers/asset.py:71
+#: assets/serializers/asset.py:70
 msgid "Admin user name"
 msgstr "管理用户名称"
 
-#: assets/serializers/asset.py:72
+#: assets/serializers/asset.py:71
 msgid "Nodes name"
 msgstr "节点名称"
 
-#: assets/serializers/asset.py:111
+#: assets/serializers/asset.py:110
 msgid "Hardware info"
 msgstr "硬件信息"
 
-#: assets/serializers/asset.py:112 orgs/mixins/serializers.py:26
+#: assets/serializers/asset.py:111 orgs/mixins/serializers.py:26
 msgid "Org name"
 msgstr "组织名称"
 
-#: assets/serializers/asset.py:166 assets/serializers/asset.py:197
+#: assets/serializers/asset.py:165 assets/serializers/asset.py:196
 msgid "Connectivity"
 msgstr "连接"
 
 #: assets/serializers/asset_user.py:44
 #: authentication/templates/authentication/_access_key_modal.html:30
+#: users/serializers/group.py:37
 msgid "ID"
 msgstr "ID"
 
@@ -811,6 +823,18 @@ msgstr "暂不支持OPENSSH格式的密钥，使用 ssh-keygen -t rsa -m pem生�
 msgid "private key invalid"
 msgstr "密钥不合法"
 
+#: assets/serializers/domain.py:14
+msgid "Assets count"
+msgstr "资产数量"
+
+#: assets/serializers/domain.py:15
+msgid "Applications count"
+msgstr "应用数量"
+
+#: assets/serializers/domain.py:16
+msgid "Gateways count"
+msgstr "网关数量"
+
 #: assets/serializers/node.py:18
 msgid "value"
 msgstr "值"
@@ -823,23 +847,38 @@ msgstr ""
 msgid "The same level node name cannot be the same"
 msgstr "同级别节点名字不能重复"
 
-#: assets/serializers/system_user.py:46 assets/serializers/system_user.py:187
-msgid "Login mode display"
-msgstr "登录模式显示"
+#: assets/serializers/system_user.py:44 assets/serializers/system_user.py:164
+#: perms/serializers/asset/permission.py:64
+msgid "Nodes amount"
+msgstr "节点数量"
 
-#: assets/serializers/system_user.py:86
+#: assets/serializers/system_user.py:45 assets/serializers/system_user.py:165
+#: perms/serializers/asset/permission.py:63
+msgid "Assets amount"
+msgstr "资产数量"
+
+#: assets/serializers/system_user.py:46 assets/serializers/system_user.py:166
+#: assets/serializers/system_user.py:192
+msgid "Login mode display"
+msgstr "登录模式（显示名称）"
+
+#: assets/serializers/system_user.py:48 assets/serializers/system_user.py:168
+msgid "Ad domain"
+msgstr "Ad 网域"
+
+#: assets/serializers/system_user.py:87
 msgid "Username same with user with protocol {} only allow 1"
 msgstr "用户名和用户相同的一种协议只允许存在一个"
 
-#: assets/serializers/system_user.py:99
+#: assets/serializers/system_user.py:100
 msgid "* Automatic login mode must fill in the username."
 msgstr "自动登录模式，必须填写用户名"
 
-#: assets/serializers/system_user.py:107
+#: assets/serializers/system_user.py:108
 msgid "Path should starts with /"
 msgstr "路径应该以 / 开头"
 
-#: assets/serializers/system_user.py:118
+#: assets/serializers/system_user.py:119
 msgid "Password or private key required"
 msgstr "密码或密钥密码需要一个"
 
@@ -1080,9 +1119,9 @@ msgstr "登录IP"
 msgid "Login city"
 msgstr "登录城市"
 
-#: audits/models.py:103
+#: audits/models.py:103 audits/serializers.py:37
 msgid "User agent"
-msgstr "Agent"
+msgstr "用户代理"
 
 #: audits/models.py:104
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
@@ -1108,22 +1147,43 @@ msgstr "状态"
 msgid "Date login"
 msgstr "登录日期"
 
-#: audits/serializers.py:62 audits/serializers.py:74 ops/models/adhoc.py:244
+#: audits/serializers.py:15
+msgid "Operate for display"
+msgstr "操作（显示名称）"
+
+#: audits/serializers.py:27
+msgid "Status for display"
+msgstr "状态（显示名称）"
+
+#: audits/serializers.py:28
+msgid "MFA for display"
+msgstr "多因子认证状态（显示名称）"
+
+#: audits/serializers.py:65 audits/serializers.py:77 ops/models/adhoc.py:244
+#: terminal/serializers/session.py:34
 msgid "Is success"
 msgstr "是否成功"
 
-#: audits/serializers.py:73 ops/models/command.py:24
+#: audits/serializers.py:76 ops/models/command.py:24
 #: xpack/plugins/cloud/models.py:218
 msgid "Result"
 msgstr "结果"
 
-#: audits/serializers.py:75
+#: audits/serializers.py:78
 msgid "Hosts"
 msgstr "主机"
 
-#: audits/serializers.py:76
+#: audits/serializers.py:79
 msgid "Run as"
 msgstr "运行用户"
+
+#: audits/serializers.py:81
+msgid "Run as for display"
+msgstr "运行用户（显示名称）"
+
+#: audits/serializers.py:82
+msgid "User for display"
+msgstr "用户（显示名称）"
 
 #: authentication/api/mfa.py:60
 msgid "Code is invalid"
@@ -1711,7 +1771,7 @@ msgid "Time"
 msgstr "时间"
 
 #: ops/models/adhoc.py:243 ops/models/command.py:26
-#: terminal/serializers/session.py:30
+#: terminal/serializers/session.py:38
 msgid "Is finished"
 msgstr "是否完成"
 
@@ -1885,7 +1945,7 @@ msgstr "剪贴板粘贴"
 msgid "Clipboard copy paste"
 msgstr "剪贴板复制粘贴"
 
-#: perms/models/asset_permission.py:95
+#: perms/models/asset_permission.py:95 perms/serializers/asset/permission.py:60
 msgid "Actions"
 msgstr "动作"
 
@@ -1919,6 +1979,60 @@ msgid ""
 "The application list contains applications that are different from the "
 "permission type. ({})"
 msgstr ""
+
+#: perms/serializers/asset/permission.py:58 users/serializers/user.py:76
+msgid "Is expired"
+msgstr " 是否过期"
+
+#: perms/serializers/asset/permission.py:59
+#: perms/serializers/database_app_permission.py:43
+#: perms/serializers/database_app_permission.py:62
+#: perms/serializers/k8s_app_permission.py:41
+#: perms/serializers/k8s_app_permission.py:60
+#: perms/serializers/remote_app_permission.py:36 users/serializers/user.py:75
+msgid "Is valid"
+msgstr "账户是否有效"
+
+#: perms/serializers/asset/permission.py:61
+#: perms/serializers/database_app_permission.py:44
+#: perms/serializers/database_app_permission.py:63
+#: perms/serializers/k8s_app_permission.py:42
+#: perms/serializers/k8s_app_permission.py:61
+#: perms/serializers/remote_app_permission.py:37 users/serializers/group.py:36
+msgid "Users amount"
+msgstr "用户数量"
+
+#: perms/serializers/asset/permission.py:62
+#: perms/serializers/database_app_permission.py:45
+#: perms/serializers/database_app_permission.py:64
+#: perms/serializers/k8s_app_permission.py:43
+#: perms/serializers/k8s_app_permission.py:62
+#: perms/serializers/remote_app_permission.py:38
+msgid "User groups amount"
+msgstr "用户组数量"
+
+#: perms/serializers/asset/permission.py:65
+#: perms/serializers/database_app_permission.py:46
+#: perms/serializers/database_app_permission.py:65
+#: perms/serializers/k8s_app_permission.py:44
+#: perms/serializers/k8s_app_permission.py:63
+#: perms/serializers/remote_app_permission.py:39
+msgid "System users amount"
+msgstr "系统用户数量"
+
+#: perms/serializers/database_app_permission.py:47
+#: perms/serializers/database_app_permission.py:66
+#: perms/serializers/k8s_app_permission.py:45
+msgid "Database apps amount"
+msgstr "数据库应用数量"
+
+#: perms/serializers/k8s_app_permission.py:64
+msgid "K8s apps amount"
+msgstr "K8S 应用数量"
+
+#: perms/serializers/remote_app_permission.py:40
+msgid "Remote apps amount"
+msgstr "远程应用数量"
 
 #: perms/utils/asset/user_permission.py:30
 msgid "Favorite"
@@ -2282,9 +2396,9 @@ msgstr "Web终端"
 msgid "File manager"
 msgstr "文件管理"
 
-#: templates/_nav.html:110
+#: templates/_nav.html:110 terminal/serializers/session.py:37
 msgid "Terminal"
-msgstr "终端管理"
+msgstr "终端"
 
 #: templates/_nav.html:121
 msgid "Job Center"
@@ -2592,6 +2706,14 @@ msgstr "会话"
 msgid "Risk level"
 msgstr "风险等级"
 
+#: terminal/backends/command/serializers.py:19
+msgid "Risk level for display"
+msgstr "风险等级（显示名称）"
+
+#: terminal/backends/command/serializers.py:21
+msgid "Timestamp"
+msgstr "时间戳"
+
 #: terminal/exceptions.py:8
 msgid "Bulk create not support"
 msgstr "不支持批量创建"
@@ -2656,6 +2778,30 @@ msgstr "结束日期"
 msgid "Args"
 msgstr "参数"
 
+#: terminal/serializers/session.py:30
+msgid "User ID"
+msgstr "用户 ID"
+
+#: terminal/serializers/session.py:31
+msgid "Asset ID"
+msgstr "资产 ID"
+
+#: terminal/serializers/session.py:32
+msgid "System user ID"
+msgstr "系统用户 ID"
+
+#: terminal/serializers/session.py:33
+msgid "Login from for display"
+msgstr "登录来源（显示名称）"
+
+#: terminal/serializers/session.py:35
+msgid "Can replay"
+msgstr "是否可重放"
+
+#: terminal/serializers/session.py:36
+msgid "Can join"
+msgstr "是否可加入"
+
 #: terminal/serializers/terminal.py:38 terminal/serializers/terminal.py:46
 msgid "Not found"
 msgstr "没有发现"
@@ -2667,7 +2813,7 @@ msgid ""
 "%(command)s"
 msgstr "危险命令告警: [%(name)s->%(login_from)s@%(remote_addr)s] $%(command)s"
 
-#: terminal/utils.py:83
+#: terminal/utils.py:80
 #, python-format
 msgid ""
 "\n"
@@ -3066,7 +3212,23 @@ msgstr "管理员"
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
-#: users/serializers/user.py:49 users/serializers/user.py:83
+#: users/serializers/user.py:45
+msgid "MFA level for display"
+msgstr "多因子认证等级（显示名称）"
+
+#: users/serializers/user.py:46
+msgid "Login blocked"
+msgstr "登录被阻塞"
+
+#: users/serializers/user.py:47
+msgid "Can update"
+msgstr "是否可更新"
+
+#: users/serializers/user.py:48
+msgid "Can delete"
+msgstr "是否可删除"
+
+#: users/serializers/user.py:49 users/serializers/user.py:81
 msgid "Organization role name"
 msgstr "组织角色名称"
 
@@ -3074,33 +3236,33 @@ msgstr "组织角色名称"
 msgid "Is first login"
 msgstr "首次登录"
 
-#: users/serializers/user.py:75
-msgid "Is valid"
-msgstr "账户是否有效"
-
-#: users/serializers/user.py:76
-msgid "Is expired"
-msgstr " 是否过期"
-
 #: users/serializers/user.py:77
 msgid "Avatar url"
 msgstr "头像路径"
 
-#: users/serializers/user.py:81
+#: users/serializers/user.py:79
 msgid "Groups name"
 msgstr "用户组名"
 
-#: users/serializers/user.py:82
+#: users/serializers/user.py:80
 msgid "Source name"
 msgstr "用户来源名"
 
-#: users/serializers/user.py:84
+#: users/serializers/user.py:82
 msgid "Super role name"
 msgstr "超级角色名称"
 
-#: users/serializers/user.py:85
+#: users/serializers/user.py:83
 msgid "Total role name"
 msgstr "汇总角色名称"
+
+#: users/serializers/user.py:84
+msgid "MFA enabled"
+msgstr "是否开启多因子认证"
+
+#: users/serializers/user.py:85
+msgid "MFA force enabled"
+msgstr "强制启用多因子认证"
 
 #: users/serializers/user.py:108
 msgid "Role limit to {}"
@@ -4315,6 +4477,9 @@ msgstr "旗舰版"
 msgid "Community edition"
 msgstr "社区版"
 
+#~ msgid "MFA level"
+#~ msgstr "多因子认证级别"
+
 #~ msgid "Beijing unicom"
 #~ msgstr "北京联通"
 
@@ -4811,9 +4976,6 @@ msgstr "社区版"
 #~ msgid "Update command filter rule"
 #~ msgstr "更新命令过滤器规则"
 
-#~ msgid "Update domain"
-#~ msgstr "更新网域"
-
 #~ msgid "Domain detail"
 #~ msgstr "网域详情"
 
@@ -4873,9 +5035,6 @@ msgstr "社区版"
 
 #~ msgid "Last run"
 #~ msgstr "最后运行"
-
-#~ msgid "Time delta"
-#~ msgstr "运行时间"
 
 #~ msgid "Is success "
 #~ msgstr "成功"
@@ -4993,21 +5152,6 @@ msgstr "社区版"
 #~ msgid "Validity period"
 #~ msgstr "有效期"
 
-#~ msgid "User count"
-#~ msgstr "用户数量"
-
-#~ msgid "User group count"
-#~ msgstr "用户组数量"
-
-#~ msgid "Asset count"
-#~ msgstr "资产数量"
-
-#~ msgid "Node count"
-#~ msgstr "节点数量"
-
-#~ msgid "System user count"
-#~ msgstr "系统用户数量"
-
 #~ msgid "Create permission"
 #~ msgstr "创建授权规则"
 
@@ -5038,17 +5182,11 @@ msgstr "社区版"
 #~ msgid "Select DatabaseApp"
 #~ msgstr "选择数据库应用"
 
-#~ msgid "DatabaseApp count"
-#~ msgstr "数据库应用数量"
-
 #~ msgid "Add user to permission"
 #~ msgstr "添加用户"
 
 #~ msgid "Add user group to permission"
 #~ msgstr "添加用户组"
-
-#~ msgid "RemoteApp count"
-#~ msgstr "远程应用数量"
 
 #~ msgid "RemoteApp list of "
 #~ msgstr "远程应用列表"
@@ -5484,9 +5622,6 @@ msgstr "社区版"
 #~ msgid "Replay session"
 #~ msgstr "回放会话"
 
-#~ msgid "Download replay"
-#~ msgstr "下载录像"
-
 #~ msgid "Monitor session"
 #~ msgstr "监控"
 
@@ -5730,9 +5865,6 @@ msgstr "社区版"
 
 #~ msgid "Sync success"
 #~ msgstr "同步成功"
-
-#~ msgid "New count"
-#~ msgstr "新增"
 
 #~ msgid "Unsync count"
 #~ msgstr "未同步"
