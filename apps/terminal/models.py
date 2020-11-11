@@ -268,7 +268,7 @@ class Session(OrgModelMixin):
         return [_PROTOCOL.MYSQL, _PROTOCOL.MARIADB, _PROTOCOL.ORACLE, _PROTOCOL.POSTGRESQL]
 
     @property
-    def can_termination(self):
+    def can_terminate(self):
         _PROTOCOL = self.PROTOCOL
         if self.is_finished:
             return False
