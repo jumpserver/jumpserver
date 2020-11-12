@@ -34,7 +34,7 @@ class CharPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
 class RemoteAppAttrsSerializer(serializers.Serializer):
     asset_info = serializers.SerializerMethodField()
     asset = CharPrimaryKeyRelatedField(queryset=Asset.objects, required=False, label=_("Asset"))
-    path = serializers.CharField(max_length=128, label=_('Remote App path'))
+    path = serializers.CharField(max_length=128, label=_('Application path'))
 
     @staticmethod
     def get_asset_info(obj):
@@ -55,7 +55,7 @@ class RemoteAppAttrsSerializer(serializers.Serializer):
 
 class ChromeAttrsSerializer(RemoteAppAttrsSerializer):
     REMOTE_APP_PATH = 'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe'
-    path = serializers.CharField(max_length=128, label=_('Remote App path'), default=REMOTE_APP_PATH)
+    path = serializers.CharField(max_length=128, label=_('Application path'), default=REMOTE_APP_PATH)
     chrome_target = serializers.CharField(max_length=128, allow_blank=True, required=False, label=_('Target URL'))
     chrome_username = serializers.CharField(max_length=128, allow_blank=True, required=False, label=_('Username'))
     chrome_password = serializers.CharField(max_length=128, allow_blank=True, required=False, write_only=True, label=_('Password'))
@@ -63,7 +63,7 @@ class ChromeAttrsSerializer(RemoteAppAttrsSerializer):
 
 class MySQLWorkbenchAttrsSerializer(RemoteAppAttrsSerializer):
     REMOTE_APP_PATH = 'C:\Program Files\MySQL\MySQL Workbench 8.0 CE\MySQLWorkbench.exe'
-    path = serializers.CharField(max_length=128, label=_('Remote App path'), default=REMOTE_APP_PATH)
+    path = serializers.CharField(max_length=128, label=_('Application path'), default=REMOTE_APP_PATH)
     mysql_workbench_ip = serializers.CharField(max_length=128, allow_blank=True, required=False, label=_('IP'))
     mysql_workbench_port = serializers.IntegerField(required=False, label=_('Port'))
     mysql_workbench_name = serializers.CharField(max_length=128, allow_blank=True, required=False, label=_('Database'))
@@ -73,7 +73,7 @@ class MySQLWorkbenchAttrsSerializer(RemoteAppAttrsSerializer):
 
 class VMwareClientAttrsSerializer(RemoteAppAttrsSerializer):
     REMOTE_APP_PATH = 'C:\Program Files (x86)\VMware\Infrastructure\Virtual Infrastructure Client\Launcher\VpxClient.exe'
-    path = serializers.CharField(max_length=128, label=_('Remote App path'), default=REMOTE_APP_PATH)
+    path = serializers.CharField(max_length=128, label=_('Application path'), default=REMOTE_APP_PATH)
     vmware_target = serializers.CharField(max_length=128, allow_blank=True, required=False, label=_('Target URL'))
     vmware_username = serializers.CharField(max_length=128, allow_blank=True, required=False, label=_('Username'))
     vmware_password = serializers.CharField(max_length=128, allow_blank=True, required=False, write_only=True, label=_('Password'))
