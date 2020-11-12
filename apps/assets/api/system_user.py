@@ -19,7 +19,7 @@ from ..tasks import (
 logger = get_logger(__file__)
 __all__ = [
     'SystemUserViewSet', 'SystemUserAuthInfoApi', 'SystemUserAssetAuthInfoApi',
-    'SystemUserCommandFilterRuleListApi', 'SystemUserTaskApi',
+    'SystemUserCommandFilterRuleListApi', 'SystemUserTaskApi', 'SystemUserAssetsListView',
 ]
 
 
@@ -125,3 +125,18 @@ class SystemUserCommandFilterRuleListApi(generics.ListAPIView):
         pk = self.kwargs.get('pk', None)
         system_user = get_object_or_404(SystemUser, pk=pk)
         return system_user.cmd_filter_rules
+
+
+class SystemUserAssetsListView(generics.ListAPIView):
+    permission_classes = (IsOrgAdmin,)
+    serializer_class = serializers.AssetSimpleSerializer
+    filter_fields = ("hostname", "ip")
+    search_fields = filter_fields
+
+    def get_object(self):
+        pk = self.kwargs.get('pk')
+        return get_object_or_404(SystemUser, pk=pk)
+
+    def get_queryset(self):
+        system_user = self.get_object()
+        return system_user.get_all_assets()

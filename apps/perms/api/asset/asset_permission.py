@@ -3,13 +3,13 @@
 from django.db.models import Q
 
 from common.permissions import IsOrgAdmin
-from orgs.mixins.api import OrgModelViewSet
+from orgs.mixins.api import OrgBulkModelViewSet
 from common.utils import get_object_or_none
-from ..models import AssetPermission
-from ..hands import (
+from perms.models import AssetPermission
+from perms.hands import (
     User, UserGroup, Asset, Node, SystemUser,
 )
-from .. import serializers
+from perms import serializers
 
 
 __all__ = [
@@ -17,7 +17,7 @@ __all__ = [
 ]
 
 
-class AssetPermissionViewSet(OrgModelViewSet):
+class AssetPermissionViewSet(OrgBulkModelViewSet):
     """
     资产授权列表的增删改查api
     """

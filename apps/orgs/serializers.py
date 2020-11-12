@@ -1,12 +1,13 @@
 from django.db.models import F
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
+from django.utils.translation import ugettext_lazy as _
 
 from users.models.user import User
 from common.serializers import AdaptedBulkListSerializer
 from common.drf.serializers import BulkModelSerializer
 from common.db.models import concated_display as display
-from .models import Organization, OrganizationMember
+from .models import Organization, OrganizationMember, ROLE
 
 
 class OrgSerializer(ModelSerializer):
@@ -26,12 +27,12 @@ class OrgSerializer(ModelSerializer):
         read_only_fields = ['created_by', 'date_created']
 
     def create(self, validated_data):
-        members = self._pop_memebers(validated_data)
+        members = self._pop_members(validated_data)
         instance = Organization.objects.create(**validated_data)
         OrganizationMember.objects.add_users_by_role(instance, *members)
         return instance
 
-    def _pop_memebers(self, validated_data):
+    def _pop_members(self, validated_data):
         return (
             validated_data.pop('users', None),
             validated_data.pop('admins', None),
@@ -39,7 +40,7 @@ class OrgSerializer(ModelSerializer):
         )
 
     def update(self, instance, validated_data):
-        members = self._pop_memebers(validated_data)
+        members = self._pop_members(validated_data)
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
@@ -71,6 +72,28 @@ class OrgMemberSerializer(BulkModelSerializer):
             org_display=F('org__name'),
             user_display=display('user__name', 'user__username')
         ).distinct()
+
+
+class OrgMemberAdminSerializer(BulkModelSerializer):
+    role = serializers.HiddenField(default=ROLE.ADMIN)
+    organization = serializers.PrimaryKeyRelatedField(
+        label=_('Organization'), queryset=Organization.objects.all(), required=True, source='org'
+    )
+
+    class Meta:
+        model = OrganizationMember
+        fields = ('id', 'organization', 'user', 'role')
+
+
+class OrgMemberUserSerializer(BulkModelSerializer):
+    role = serializers.HiddenField(default=ROLE.USER)
+    organization = serializers.PrimaryKeyRelatedField(
+        label=_('Organization'), queryset=Organization.objects.all(), required=True, source='org'
+    )
+
+    class Meta:
+        model = OrganizationMember
+        fields = ('id', 'organization', 'user', 'role')
 
 
 class OrgRetrieveSerializer(OrgReadSerializer):

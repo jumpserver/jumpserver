@@ -12,7 +12,7 @@ from . import models
 
 
 class FTPLogSerializer(serializers.ModelSerializer):
-    operate_display = serializers.ReadOnlyField(source='get_operate_display')
+    operate_display = serializers.ReadOnlyField(source='get_operate_display', label=_('Operate for display'))
 
     class Meta:
         model = models.FTPLog
@@ -23,9 +23,9 @@ class FTPLogSerializer(serializers.ModelSerializer):
 
 
 class UserLoginLogSerializer(serializers.ModelSerializer):
-    type_display = serializers.ReadOnlyField(source='get_type_display')
-    status_display = serializers.ReadOnlyField(source='get_status_display')
-    mfa_display = serializers.ReadOnlyField(source='get_mfa_display')
+    type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type for display'))
+    status_display = serializers.ReadOnlyField(source='get_status_display', label=_('Status for display'))
+    mfa_display = serializers.ReadOnlyField(source='get_mfa_display', label=_('MFA for display'))
 
     class Meta:
         model = models.UserLoginLog
@@ -33,6 +33,9 @@ class UserLoginLogSerializer(serializers.ModelSerializer):
             'id', 'username', 'type', 'type_display', 'ip', 'city', 'user_agent',
             'mfa', 'reason', 'status', 'status_display', 'datetime', 'mfa_display'
         )
+        extra_kwargs = {
+            "user_agent": {'label': _('User agent')}
+        }
 
 
 class OperateLogSerializer(serializers.ModelSerializer):
@@ -75,6 +78,8 @@ class CommandExecutionSerializer(serializers.ModelSerializer):
             'hosts': {'label': _('Hosts')},  # 外键，会生成 sql。不在 model 上修改
             'run_as': {'label': _('Run as')},
             'user': {'label': _('User')},
+            'run_as_display': {'label': _('Run as for display')},
+            'user_display': {'label': _('User for display')},
         }
 
     @classmethod

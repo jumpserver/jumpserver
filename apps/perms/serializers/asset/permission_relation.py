@@ -5,7 +5,7 @@ from rest_framework import serializers
 from common.mixins import BulkSerializerMixin
 from common.serializers import AdaptedBulkListSerializer
 from assets.models import Asset, Node
-from ..models import AssetPermission
+from perms.models import AssetPermission
 from users.models import User
 
 __all__ = [

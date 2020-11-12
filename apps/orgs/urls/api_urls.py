@@ -14,7 +14,12 @@ router = DefaultRouter()
 bulk_router = BulkRouter()
 
 router.register(r'orgs', api.OrgViewSet, 'org')
-bulk_router.register(r'org-memeber-relation', api.OrgMemberRelationBulkViewSet, 'org-memeber-relation')
+bulk_router.register(r'org-member-relation', api.OrgMemberRelationBulkViewSet, 'org-member-relation')
+
+router.register(r'orgs/(?P<org_id>[0-9a-zA-Z\-]{36})/membership/admins',
+                api.OrgMemberAdminRelationBulkViewSet, 'membership-admins')
+router.register(r'orgs/(?P<org_id>[0-9a-zA-Z\-]{36})/membership/users',
+                api.OrgMemberUserRelationBulkViewSet, 'membership-users'),
 
 old_version_urlpatterns = [
     re_path('(?P<resource>org)/.*', capi.redirect_plural_name_api)

@@ -32,7 +32,9 @@ class UserGroupSerializer(BulkOrgResourceModelSerializer):
             'users', 'users_amount',
         ]
         extra_kwargs = {
-            'created_by': {'label': _('Created by'), 'read_only': True}
+            'created_by': {'label': _('Created by'), 'read_only': True},
+            'users_amount': {'label': _('Users amount')},
+            'id': {'label': _('ID')},
         }
 
     def __init__(self, *args, **kwargs):

@@ -9,6 +9,7 @@ import paramiko
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from common.utils.strings import no_special_chars
 from orgs.mixins.models import OrgModelMixin
 from .base import BaseUser
 
@@ -47,7 +48,7 @@ class Gateway(BaseUser):
         (PROTOCOL_SSH, 'ssh'),
         (PROTOCOL_RDP, 'rdp'),
     )
-    ip = models.GenericIPAddressField(max_length=32, verbose_name=_('IP'), db_index=True)
+    ip = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
     port = models.IntegerField(default=22, verbose_name=_('Port'))
     protocol = models.CharField(choices=PROTOCOL_CHOICES, max_length=16, default=PROTOCOL_SSH, verbose_name=_("Protocol"))
     domain = models.ForeignKey(Domain, on_delete=models.CASCADE, verbose_name=_("Domain"))
@@ -64,8 +65,8 @@ class Gateway(BaseUser):
     def test_connective(self, local_port=None):
         if local_port is None:
             local_port = self.port
-        if self.password and not re.match(r'\w+$', self.password):
-            return False, _("Password should not contain special characters")
+        if self.password and not no_special_chars(self.password):
+            return False, _("Password should not contains special characters")
 
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())

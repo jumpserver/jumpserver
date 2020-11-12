@@ -1,25 +1,28 @@
 # -*- coding: utf-8 -*-
 #
 import time
+from django.conf import settings
 from django.utils import timezone
 from django.shortcuts import HttpResponse
 from rest_framework import viewsets
 from rest_framework import generics
 from rest_framework.fields import DateTimeField
 from rest_framework.response import Response
+from rest_framework import status
 from django.template import loader
 
-
 from orgs.utils import current_org
-from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor
+from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor, IsAppUser
 from common.utils import get_logger
+from terminal.utils import send_command_alert_mail
+from terminal.serializers import InsecureCommandAlertSerializer
 from ..backends import (
     get_command_storage, get_multi_command_storage,
     SessionCommandSerializer,
 )
 
 logger = get_logger(__name__)
-__all__ = ['CommandViewSet', 'CommandExportApi']
+__all__ = ['CommandViewSet', 'CommandExportApi', 'InsecureCommandAlertAPI']
 
 
 class CommandQueryMixin:
@@ -134,3 +137,19 @@ class CommandExportApi(CommandQueryMixin, generics.ListAPIView):
         filename = 'command-report-{}.html'.format(int(time.time()))
         response['Content-Disposition'] = 'attachment; filename="%s"' % filename
         return response
+
+
+class InsecureCommandAlertAPI(generics.CreateAPIView):
+    permission_classes = [IsAppUser]
+    serializer_class = InsecureCommandAlertSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = InsecureCommandAlertSerializer(data=request.data, many=True)
+        serializer.is_valid(raise_exception=True)
+        commands = serializer.validated_data
+        for command in commands:
+            if command['risk_level'] >= settings.SECURITY_INSECURE_COMMAND_LEVEL and \
+                    settings.SECURITY_INSECURE_COMMAND and \
+                    settings.SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER:
+                send_command_alert_mail(command)
+        return Response()

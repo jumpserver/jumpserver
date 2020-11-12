@@ -28,6 +28,11 @@ class AbstractSessionCommand(OrgModelMixin):
         abstract = True
 
     @classmethod
+    def get_risk_level_str(cls, risk_level):
+        risk_mapper = dict(cls.RISK_LEVEL_CHOICES)
+        return risk_mapper.get(risk_level)
+
+    @classmethod
     def from_dict(cls, d):
         self = cls()
         for k, v in d.items():

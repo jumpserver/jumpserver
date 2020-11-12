@@ -6,9 +6,10 @@ from rest_framework.views import set_rollback
 from rest_framework.response import Response
 
 from common.exceptions import JMSObjectDoesNotExist
-from common.utils import get_logger
+from logging import getLogger
 
-logger = get_logger(__name__)
+logger = getLogger('drf_exception')
+unexpected_exception_logger = getLogger('unexpected_exception')
 
 
 def extract_object_name(exc, index=0):
@@ -38,12 +39,14 @@ def common_exception_handler(exc, context):
         if getattr(exc, 'wait', None):
             headers['Retry-After'] = '%d' % exc.wait
 
-        if isinstance(exc.detail, (list, dict)):
-            data = exc.detail
+        if isinstance(exc.detail, str) and isinstance(exc.get_codes(), str):
+            data = {'detail': exc.detail, 'code': exc.get_codes()}
         else:
-            data = {'detail': exc.detail}
+            data = exc.detail
 
         set_rollback()
         return Response(data, status=exc.status_code, headers=headers)
+    else:
+        unexpected_exception_logger.exception('')
 
     return None

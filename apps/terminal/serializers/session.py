@@ -22,12 +22,20 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
             "user_id", "asset_id", "system_user_id",
             "login_from", "login_from_display", "remote_addr",
             "is_success",  "is_finished", "has_replay", "can_replay",
-            "can_join", "protocol", "date_start", "date_end",
+            "can_join", "can_terminate", "protocol", "date_start", "date_end",
             "terminal",
         ]
         extra_kwargs = {
             "protocol": {'label': _('Protocol')},
-            'is_finished': {'label': _('Is finished')}
+            'user_id': {'label': _('User ID')},
+            'asset_id': {'label': _('Asset ID')},
+            'system_user_id': {'label': _('System user ID')},
+            'login_from_display': {'label': _('Login from for display')},
+            'is_success': {'label': _('Is success')},
+            'can_replay': {'label': _('Can replay')},
+            'can_join': {'label': _('Can join')},
+            'terminal': {'label': _('Terminal')},
+            'is_finished': {'label': _('Is finished')},
         }
 
 

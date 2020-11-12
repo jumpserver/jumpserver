@@ -5,22 +5,21 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from django.db.models import F
 
+from orgs.utils import tmp_to_root_org
 from common.permissions import IsValidUser
 from common.utils import get_logger, get_object_or_none
 from .mixin import UserNodeGrantStatusDispatchMixin, ForUserMixin, ForAdminMixin
-from ...utils.user_asset_permission import (
-    get_user_resources_q_granted_by_permissions,
+from perms.utils.asset.user_permission import (
     get_indirect_granted_node_children, UNGROUPED_NODE_KEY, FAVORITE_NODE_KEY,
     get_user_direct_granted_assets, get_top_level_granted_nodes,
     get_user_granted_nodes_list_via_mapping_node,
     get_user_granted_all_assets, rebuild_user_tree_if_need,
-    get_user_all_assetpermission_ids,
+    get_user_all_assetpermissions_id,
 )
 
 from assets.models import Asset, FavoriteAsset
 from assets.api import SerializeToTreeNodeMixin
-from orgs.utils import tmp_to_root_org
-from ...hands import Node
+from perms.hands import Node
 
 logger = get_logger(__name__)
 
@@ -66,14 +65,14 @@ class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(ForAdminMixin, UserNode
 
     def get_data_on_node_indirect_granted(self, key):
         user = self.user
-        asset_perm_ids = get_user_all_assetpermission_ids(user)
+        asset_perms_id = get_user_all_assetpermissions_id(user)
 
         nodes = get_indirect_granted_node_children(user, key)
 
         assets = Asset.org_objects.filter(
             nodes__key=key,
         ).filter(
-            granted_by_permissions__id__in=asset_perm_ids
+            granted_by_permissions__id__in=asset_perms_id
         ).distinct()
         assets = assets.prefetch_related('platform')
         return nodes, assets
@@ -102,7 +101,6 @@ class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(ForAdminMixin, UserNode
             if node:
                 return node.key
 
-    @tmp_to_root_org()
     def list(self, request: Request, *args, **kwargs):
         key = self.request.query_params.get('key')
         if key is None:

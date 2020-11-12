@@ -2,16 +2,15 @@ import textwrap
 
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
+from rest_framework.mixins import ListModelMixin
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.request import Request
 
 from orgs.models import Organization, ROLE as ORG_ROLE
 from users.models.user import User
-from common.const.http import POST, GET
-from common.drf.api import JMSModelViewSet
+from common.const.http import POST
+from common.drf.api import JMSModelViewSet, JmsGenericViewSet
 from common.permissions import IsValidUser, IsObjectOwner
-from common.utils.django import get_object_or_none
 from common.utils.timezone import dt_parser
 from common.drf.serializers import EmptySerializer
 from perms.models.asset_permission import AssetPermission, Asset
@@ -46,18 +45,6 @@ class RequestAssetPermTicketViewSet(JMSModelViewSet):
         if instance.action == action:
             action_display = instance.ACTION.get(action)
             raise TicketActionAlready(detail=_('Ticket has %s') % action_display)
-
-    @action(detail=False, methods=[GET], permission_classes=[IsValidUser])
-    def assignees(self, request: Request, *args, **kwargs):
-        user = request.user
-        org_id = request.query_params.get('org_id', Organization.DEFAULT_ID)
-
-        q = Q(role=User.ROLE.ADMIN)
-        if org_id != Organization.DEFAULT_ID:
-            q |= Q(m2m_org_members__role=ORG_ROLE.ADMIN, orgs__id=org_id, orgs__members=user)
-        org_admins = User.objects.filter(q).distinct()
-
-        return self.get_paginated_response_with_query_set(org_admins)
 
     def _get_extra_comment(self, instance):
         meta = instance.meta
@@ -104,6 +91,9 @@ class RequestAssetPermTicketViewSet(JMSModelViewSet):
         if system_users is None:
             raise ConfirmedSystemUserChanged(detail=_('Confirmed system-users changed'))
 
+        instance.perform_action(instance.ACTION.APPROVE,
+                                request.user,
+                                self._get_extra_comment(instance))
         self._create_asset_permission(instance, assets, system_users)
         return Response({'detail': _('Succeed')})
 
@@ -116,14 +106,13 @@ class RequestAssetPermTicketViewSet(JMSModelViewSet):
 
     def _create_asset_permission(self, instance: Ticket, assets, system_users):
         meta = instance.meta
-        request = self.request
         actions = meta.get('actions', Action.CONNECT)
 
         ap_kwargs = {
             'name': _('From request ticket: {} {}').format(instance.user_display, instance.id),
             'created_by': self.request.user.username,
             'comment': _('{} request assets, approved by {}').format(instance.user_display,
-                                                                     instance.assignees_display),
+                                                                     instance.assignee_display),
             'actions': actions,
         }
         date_start = dt_parser(meta.get('date_start'))
@@ -132,12 +121,27 @@ class RequestAssetPermTicketViewSet(JMSModelViewSet):
             ap_kwargs['date_start'] = date_start
         if date_expired:
             ap_kwargs['date_expired'] = date_expired
-        instance.perform_action(instance.ACTION.APPROVE,
-                                request.user,
-                                self._get_extra_comment(instance))
+
         ap = AssetPermission.objects.create(**ap_kwargs)
         ap.system_users.add(*system_users)
         ap.assets.add(*assets)
         ap.users.add(instance.user)
 
         return ap
+
+
+class AssigneeViewSet(ListModelMixin, JmsGenericViewSet):
+    serializer_class = serializers.AssigneeSerializer
+    permission_classes = (IsValidUser,)
+    filter_fields = ('username', 'email', 'name', 'id', 'source')
+    search_fields = filter_fields
+
+    def get_queryset(self):
+        user = self.request.user
+        org_id = self.request.query_params.get('org_id', Organization.DEFAULT_ID)
+
+        q = Q(role=User.ROLE.ADMIN)
+        if org_id != Organization.DEFAULT_ID:
+            q |= Q(m2m_org_members__role=ORG_ROLE.ADMIN, orgs__id=org_id, orgs__members=user)
+        org_admins = User.objects.filter(q).distinct()
+        return org_admins

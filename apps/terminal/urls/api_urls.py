@@ -31,6 +31,7 @@ urlpatterns = [
          name='terminal-access-key'),
     path('terminals/config/', api.TerminalConfig.as_view(), name='terminal-config'),
     path('commands/export/', api.CommandExportApi.as_view(), name="command-export"),
+    path('commands/insecure-command/', api.InsecureCommandAlertAPI.as_view(), name="command-alert"),
     path('replay-storages/<uuid:pk>/test-connective/', api.ReplayStorageTestConnectiveApi.as_view(), name='replay-storage-test-connective'),
     path('command-storages/<uuid:pk>/test-connective/', api.CommandStorageTestConnectiveApi.as_view(), name='command-storage-test-connective')
     # v2: get session's replay

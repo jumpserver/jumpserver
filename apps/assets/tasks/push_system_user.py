@@ -2,7 +2,7 @@
 
 from itertools import groupby
 from celery import shared_task
-from common.db.utils import get_object_if_need, get_objects_if_need
+from common.db.utils import get_object_if_need, get_objects_if_need, get_objects
 from django.utils.translation import ugettext as _
 from django.db.models import Empty
 
@@ -36,6 +36,7 @@ def get_push_unixlike_system_user_tasks(system_user, username=None):
         username = system_user.username
     password = system_user.password
     public_key = system_user.public_key
+    comment = system_user.name
 
     groups = _split_by_comma(system_user.system_groups)
 
@@ -47,7 +48,8 @@ def get_push_unixlike_system_user_tasks(system_user, username=None):
         'shell': system_user.shell or Empty,
         'state': 'present',
         'home': system_user.home or Empty,
-        'groups': groups or Empty
+        'groups': groups or Empty,
+        'comment': comment
     }
 
     tasks = [
@@ -64,24 +66,27 @@ def get_push_unixlike_system_user_tasks(system_user, username=None):
                 'module': 'group',
                 'args': 'name={} state=present'.format(username),
             }
-        },
-        {
-            'name': 'Check home dir exists',
-            'action': {
-                'module': 'stat',
-                'args': 'path=/home/{}'.format(username)
-            },
-            'register': 'home_existed'
-        },
-        {
-            'name': "Set home dir permission",
-            'action': {
-                'module': 'file',
-                'args': "path=/home/{0} owner={0} group={0} mode=700".format(username)
-            },
-            'when': 'home_existed.stat.exists == true'
         }
     ]
+    if not system_user.home:
+        tasks.extend([
+            {
+                'name': 'Check home dir exists',
+                'action': {
+                    'module': 'stat',
+                    'args': 'path=/home/{}'.format(username)
+                },
+                'register': 'home_existed'
+            },
+            {
+                'name': "Set home dir permission",
+                'action': {
+                    'module': 'file',
+                    'args': "path=/home/{0} owner={0} group={0} mode=700".format(username)
+                },
+                'when': 'home_existed.stat.exists == true'
+            }
+        ])
     if password:
         tasks.append({
             'name': 'Set {} password'.format(username),
@@ -240,10 +245,10 @@ def push_system_user_a_asset_manual(system_user, asset, username=None):
 
 
 @shared_task(queue="ansible")
-def push_system_user_to_assets(system_user, assets, username=None):
+def push_system_user_to_assets(system_user_id, assets_id, username=None):
+    system_user = SystemUser.objects.get(id=system_user_id)
+    assets = get_objects(Asset, assets_id)
     task_name = _("Push system users to assets: {}").format(system_user.name)
-    system_user = get_object_if_need(SystemUser, system_user)
-    assets = get_objects_if_need(Asset, assets)
     return push_system_user_util(system_user, assets, task_name, username=username)
 
 # @shared_task

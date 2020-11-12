@@ -94,7 +94,6 @@ class AdminUserAssetsListView(generics.ListAPIView):
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.AssetSimpleSerializer
     filter_fields = ("hostname", "ip")
-    http_method_names = ['get']
     search_fields = filter_fields
 
     def get_object(self):

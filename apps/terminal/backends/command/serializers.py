@@ -16,11 +16,19 @@ class SessionCommandSerializer(serializers.Serializer):
     output = serializers.CharField(max_length=1024, allow_blank=True, label=_("Output"))
     session = serializers.CharField(max_length=36, label=_("Session"))
     risk_level = serializers.ChoiceField(required=False, label=_("Risk level"), choices=AbstractSessionCommand.RISK_LEVEL_CHOICES)
-    risk_level_display = serializers.SerializerMethodField()
+    risk_level_display = serializers.SerializerMethodField(label=_('Risk level for display'))
     org_id = serializers.CharField(max_length=36, required=False, default='', allow_null=True, allow_blank=True)
-    timestamp = serializers.IntegerField()
+    timestamp = serializers.IntegerField(label=_('Timestamp'))
 
     @staticmethod
     def get_risk_level_display(obj):
         risk_mapper = dict(AbstractSessionCommand.RISK_LEVEL_CHOICES)
         return risk_mapper.get(obj.risk_level)
+
+
+class InsecureCommandAlertSerializer(serializers.Serializer):
+    input = serializers.CharField()
+    asset = serializers.CharField()
+    user = serializers.CharField()
+    risk_level = serializers.IntegerField()
+    session = serializers.UUIDField()

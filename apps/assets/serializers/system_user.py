@@ -6,7 +6,6 @@ from common.serializers import AdaptedBulkListSerializer
 from common.mixins.serializers import BulkSerializerMixin
 from common.utils import ssh_pubkey_gen
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-from assets.models import Node
 from ..models import SystemUser, Asset
 from .base import AuthSerializerMixin
 
@@ -35,17 +34,18 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'auto_push', 'cmd_filters', 'sudo', 'shell', 'comment',
             'auto_generate_key', 'sftp_root', 'token',
             'assets_amount', 'date_created', 'created_by',
-            'home', 'system_groups'
+            'home', 'system_groups', 'ad_domain'
         ]
         extra_kwargs = {
             'password': {"write_only": True},
             'public_key': {"write_only": True},
             'private_key': {"write_only": True},
             'token': {"write_only": True},
-            'nodes_amount': {'label': _('Node')},
-            'assets_amount': {'label': _('Asset')},
+            'nodes_amount': {'label': _('Nodes amount')},
+            'assets_amount': {'label': _('Assets amount')},
             'login_mode_display': {'label': _('Login mode display')},
             'created_by': {'read_only': True},
+            'ad_domain': {'label': _('Ad domain')},
         }
 
     def validate_auto_push(self, value):
@@ -154,14 +154,18 @@ class SystemUserListSerializer(SystemUserSerializer):
             'priority', "username_same_with_user",
             'auto_push', 'sudo', 'shell', 'comment',
             "assets_amount", 'home', 'system_groups',
-            'auto_generate_key',
+            'auto_generate_key', 'ad_domain',
             'sftp_root',
         ]
-
         extra_kwargs = {
             'password': {"write_only": True},
             'public_key': {"write_only": True},
             'private_key': {"write_only": True},
+            'nodes_amount': {'label': _('Nodes amount')},
+            'assets_amount': {'label': _('Assets amount')},
+            'login_mode_display': {'label': _('Login mode display')},
+            'created_by': {'read_only': True},
+            'ad_domain': {'label': _('Ad domain')},
         }
 
     @classmethod
@@ -179,7 +183,8 @@ class SystemUserWithAuthInfoSerializer(SystemUserSerializer):
             'login_mode', 'login_mode_display',
             'priority', 'username_same_with_user',
             'auto_push', 'sudo', 'shell', 'comment',
-            'auto_generate_key', 'sftp_root', 'token'
+            'auto_generate_key', 'sftp_root', 'token',
+            'ad_domain',
         ]
         extra_kwargs = {
             'nodes_amount': {'label': _('Node')},

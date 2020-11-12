@@ -75,4 +75,3 @@ def send_server_performance_mail(path, usage, usages):
     send_mail_async(subject, message, recipient_list, html_message=message)
 
 
-

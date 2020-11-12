@@ -60,7 +60,7 @@ class AssetPermissionForm(OrgModelForm):
         # 过滤系统用户
         system_users_field = self.fields.get('system_users')
         system_users_field.queryset = SystemUser.objects.exclude(
-            protocol=SystemUser.PROTOCOL_MYSQL
+            protocol__in=SystemUser.application_category_protocols
         )
 
     def set_nodes_initial(self, nodes):

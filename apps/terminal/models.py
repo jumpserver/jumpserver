@@ -12,6 +12,7 @@ from django.conf import settings
 from django.core.files.storage import default_storage
 from django.core.cache import cache
 
+from assets.models import Asset
 from users.models import User
 from orgs.mixins.models import OrgModelMixin
 from common.mixins import CommonModelMixin
@@ -24,7 +25,7 @@ from . import const
 
 class Terminal(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    name = models.CharField(max_length=32, verbose_name=_('Name'))
+    name = models.CharField(max_length=128, verbose_name=_('Name'))
     remote_addr = models.CharField(max_length=128, blank=True, verbose_name=_('Remote Address'))
     ssh_port = models.IntegerField(verbose_name=_('SSH Port'), default=2222)
     http_port = models.IntegerField(verbose_name=_('HTTP Port'), default=5000)
@@ -180,6 +181,9 @@ class Session(OrgModelMixin):
         VNC = 'vnc', 'vnc'
         TELNET = 'telnet', 'telnet'
         MYSQL = 'mysql', 'mysql'
+        ORACLE = 'oracle', 'oracle'
+        MARIADB = 'mariadb', 'mariadb'
+        POSTGRESQL = 'postgresql', 'postgresql'
         K8S = 'k8s', 'kubernetes'
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
@@ -195,8 +199,8 @@ class Session(OrgModelMixin):
     is_finished = models.BooleanField(default=False, db_index=True)
     has_replay = models.BooleanField(default=False, verbose_name=_("Replay"))
     has_command = models.BooleanField(default=False, verbose_name=_("Command"))
-    terminal = models.ForeignKey(Terminal, null=True, on_delete=models.SET_NULL)
-    protocol = models.CharField(choices=PROTOCOL.choices, default='ssh', max_length=8, db_index=True)
+    terminal = models.ForeignKey(Terminal, null=True, on_delete=models.DO_NOTHING, db_constraint=False)
+    protocol = models.CharField(choices=PROTOCOL.choices, default='ssh', max_length=16, db_index=True)
     date_start = models.DateTimeField(verbose_name=_("Date start"), db_index=True, default=timezone.now)
     date_end = models.DateTimeField(verbose_name=_("Date end"), null=True)
 
@@ -225,6 +229,10 @@ class Session(OrgModelMixin):
         return local_path
 
     @property
+    def asset_obj(self):
+        return Asset.objects.get(id=self.asset_id)
+
+    @property
     def _date_start_first_has_replay_rdp_session(self):
         if self.__class__._DATE_START_FIRST_HAS_REPLAY_RDP_SESSION is None:
             instance = self.__class__.objects.filter(
@@ -249,9 +257,25 @@ class Session(OrgModelMixin):
         _PROTOCOL = self.PROTOCOL
         if self.is_finished:
             return False
-        if self.protocol not in [_PROTOCOL.SSH, _PROTOCOL.TELNET, _PROTOCOL.MYSQL, _PROTOCOL.K8S]:
+        if self.protocol in [_PROTOCOL.SSH, _PROTOCOL.TELNET, _PROTOCOL.K8S]:
+            return True
+        else:
             return False
-        return True
+
+    @property
+    def db_protocols(self):
+        _PROTOCOL = self.PROTOCOL
+        return [_PROTOCOL.MYSQL, _PROTOCOL.MARIADB, _PROTOCOL.ORACLE, _PROTOCOL.POSTGRESQL]
+
+    @property
+    def can_terminate(self):
+        _PROTOCOL = self.PROTOCOL
+        if self.is_finished:
+            return False
+        if self.protocol in self.db_protocols:
+            return False
+        else:
+            return True
 
     def save_replay_to_storage(self, f):
         local_path = self.get_local_path()

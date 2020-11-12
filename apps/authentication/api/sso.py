@@ -60,6 +60,7 @@ class SSOViewSet(AuthMixin, JmsGenericViewSet):
         此接口违反了 `Restful` 的规范
         `GET` 应该是安全的方法，但此接口是不安全的
         """
+        request.META['HTTP_X_JMS_LOGIN_TYPE'] = 'W'
         authkey = request.query_params.get(AUTH_KEY)
         next_url = request.query_params.get(NEXT_URL)
         if not next_url or not next_url.startswith('/'):

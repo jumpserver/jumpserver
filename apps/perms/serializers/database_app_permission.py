@@ -2,8 +2,8 @@
 #
 from django.db.models import Count
 from rest_framework import serializers
+from django.utils.translation import ugettext_lazy as _
 
-from common.fields import StringManyToManyField
 from common.serializers import AdaptedBulkListSerializer
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from .. import models
@@ -39,6 +39,13 @@ class DatabaseAppPermissionSerializer(AmountMixin, BulkOrgResourceModelSerialize
             'created_by', 'date_created', 'users_amount', 'user_groups_amount',
             'database_apps_amount', 'system_users_amount',
         ]
+        extra_kwargs = {
+            'is_valid': {'label': _('Is valid')},
+            'users_amount': {'label': _('Users amount')},
+            'user_groups_amount': {'label': _('User groups amount')},
+            'system_users_amount': {'label': _('System users amount')},
+            'database_apps_amount': {'label': _('Database apps amount')},
+        }
 
 
 class DatabaseAppPermissionListSerializer(AmountMixin, BulkOrgResourceModelSerializer):
@@ -51,3 +58,10 @@ class DatabaseAppPermissionListSerializer(AmountMixin, BulkOrgResourceModelSeria
             'date_start', 'date_expired', 'is_valid', 'database_apps_amount', 'system_users_amount',
             'created_by', 'date_created', 'is_expired'
         ]
+        extra_kwargs = {
+            'is_valid': {'label': _('Is valid')},
+            'users_amount': {'label': _('Users amount')},
+            'user_groups_amount': {'label': _('User groups amount')},
+            'system_users_amount': {'label': _('System users amount')},
+            'database_apps_amount': {'label': _('Database apps amount')},
+        }

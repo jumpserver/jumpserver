@@ -3,10 +3,6 @@
 //此函数用于checkbox的全选和反选
 var checked = false;
 
-function gettext(s) {
-    return s
-}
-
 function check_all(form) {
     var checkboxes = document.getElementById(form);
     if (checked === false) {

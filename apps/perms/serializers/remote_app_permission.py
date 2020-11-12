@@ -2,6 +2,7 @@
 #
 from rest_framework import serializers
 from django.db.models import Count
+from django.utils.translation import ugettext_lazy as _
 
 from common.serializers import AdaptedBulkListSerializer
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
@@ -31,6 +32,13 @@ class RemoteAppPermissionSerializer(BulkOrgResourceModelSerializer):
         ]
         fields = small_fields + m2m_fields
         read_only_fields = ['created_by', 'date_created']
+        extra_kwargs = {
+            'is_valid': {'label': _('Is valid')},
+            'users_amount': {'label': _('Users amount')},
+            'user_groups_amount': {'label': _('User groups amount')},
+            'system_users_amount': {'label': _('System users amount')},
+            'remote_apps_amount': {'label': _('Remote apps amount')},
+        }
 
     @classmethod
     def setup_eager_loading(cls, queryset):

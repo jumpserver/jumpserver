@@ -25,3 +25,16 @@ def get_objects_if_need(model, pks):
             logger.error(f'DoesNotExist: <{model.__name__}: {not_found_pks}>')
         return objs
     return pks
+
+
+def get_objects(model, pks):
+    if not pks:
+        return pks
+
+    objs = list(model.objects.filter(id__in=pks))
+    if len(objs) != len(pks):
+        pks = set(pks)
+        exists_pks = {o.id for o in objs}
+        not_found_pks = ','.join(pks - exists_pks)
+        logger.error(f'DoesNotExist: <{model.__name__}: {not_found_pks}>')
+    return objs

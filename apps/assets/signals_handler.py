@@ -58,7 +58,8 @@ def on_asset_created_or_update(sender, instance=None, created=False, **kwargs):
 
 
 @receiver(post_save, sender=SystemUser, dispatch_uid="jms")
-def on_system_user_update(sender, instance=None, created=True, **kwargs):
+@on_transaction_commit
+def on_system_user_update(instance: SystemUser, created, **kwargs):
     """
     当系统用户更新时，可能更新了秘钥，用户名等，这时要自动推送系统用户到资产上,
     其实应该当 用户名，密码，秘钥 sudo等更新时再推送，这里偷个懒,
@@ -68,26 +69,25 @@ def on_system_user_update(sender, instance=None, created=True, **kwargs):
     if instance and not created:
         logger.info("System user update signal recv: {}".format(instance))
         assets = instance.assets.all().valid()
-        push_system_user_to_assets.delay(instance, assets)
+        push_system_user_to_assets.delay(instance.id, [_asset.id for _asset in assets])
 
 
 @receiver(m2m_changed, sender=SystemUser.assets.through)
-def on_system_user_assets_change(sender, instance=None, action='', model=None, pk_set=None, **kwargs):
+def on_system_user_assets_change(instance, action, model, pk_set, **kwargs):
     """
     当系统用户和资产关系发生变化时，应该重新推送系统用户到新添加的资产中
     """
     if action != POST_ADD:
         return
     logger.debug("System user assets change signal recv: {}".format(instance))
-    queryset = model.objects.filter(pk__in=pk_set)
     if model == Asset:
-        system_users = [instance]
-        assets = queryset
+        system_users_id = [instance.id]
+        assets_id = pk_set
     else:
-        system_users = queryset
-        assets = [instance]
-    for system_user in system_users:
-        push_system_user_to_assets.delay(system_user, assets)
+        system_users_id = pk_set
+        assets_id = [instance.id]
+    for system_user_id in system_users_id:
+        push_system_user_to_assets.delay(system_user_id, assets_id)
 
 
 @receiver(m2m_changed, sender=SystemUser.users.through)
@@ -140,7 +140,7 @@ def on_system_user_groups_change(instance, action, pk_set, reverse, **kwargs):
     logger.info("System user groups update signal recv: {}".format(instance))
 
     users = User.objects.filter(groups__id__in=pk_set).distinct()
-    instance.users.add(users)
+    instance.users.add(*users)
 
 
 @receiver(m2m_changed, sender=Asset.nodes.through)

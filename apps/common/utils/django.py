@@ -10,13 +10,15 @@ UUID_PATTERN = re.compile(r'[0-9a-zA-Z\-]{36}')
 
 
 def reverse(view_name, urlconf=None, args=None, kwargs=None,
-            current_app=None, external=False):
+            current_app=None, external=False, api_to_ui=False):
     url = dj_reverse(view_name, urlconf=urlconf, args=args,
                      kwargs=kwargs, current_app=current_app)
 
     if external:
         site_url = settings.SITE_URL
         url = site_url.strip('/') + url
+    if api_to_ui:
+        url = url.replace('api/v1', 'ui/#').rstrip('/')
     return url
 
 
@@ -48,3 +50,11 @@ def union_queryset(*args, base_queryset=None):
         base_queryset = args[0].model.objects
     queryset = base_queryset.filter(id__in=queryset_id)
     return queryset
+
+
+def get_log_keep_day(s, defaults=200):
+    try:
+        days = int(getattr(settings, s))
+    except ValueError:
+        days = defaults
+    return days
