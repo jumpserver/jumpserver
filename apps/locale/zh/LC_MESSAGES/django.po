@@ -221,8 +221,8 @@ msgstr "类型（显示名称）"
 #: applications/serializers/remote_app.py:58
 #: applications/serializers/remote_app.py:66
 #: applications/serializers/remote_app.py:76
-msgid "Remote App path"
-msgstr "远程应用列表"
+msgid "Application path"
+msgstr "应用路径"
 
 #: applications/serializers/remote_app.py:59
 #: applications/serializers/remote_app.py:77
