@@ -33,7 +33,7 @@ class CharPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
 
 class RemoteAppAttrsSerializer(serializers.Serializer):
     asset_info = serializers.SerializerMethodField()
-    asset = CharPrimaryKeyRelatedField(queryset=Asset.objects, required=False, label=_("Assets"))
+    asset = CharPrimaryKeyRelatedField(queryset=Asset.objects, required=False, label=_("Asset"))
     path = serializers.CharField(max_length=128, label=_('Remote App path'))
 
     @staticmethod
