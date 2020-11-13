@@ -134,6 +134,7 @@ def get_push_windows_system_user_tasks(system_user, username=None):
 
     tasks = []
     if not password:
+        logger.error("Error: no password found")
         return tasks
     task = {
         'name': 'Add user {}'.format(username),
@@ -209,14 +210,15 @@ def push_system_user_util(system_user, assets, task_name, username=None):
         print(_("Start push system user for platform: [{}]").format(platform))
         print(_("Hosts count: {}").format(len(_hosts)))
 
-        if not system_user.has_special_auth():
+        # 如果没有特殊密码设置，就不需要单独推送某台机器了
+        if not system_user.has_special_auth(username=username):
             logger.debug("System user not has special auth")
             tasks = get_push_system_user_tasks(system_user, platform, username=username)
             run_task(tasks, _hosts)
             continue
 
         for _host in _hosts:
-            system_user.load_asset_special_auth(_host)
+            system_user.load_asset_special_auth(_host, username=username)
             tasks = get_push_system_user_tasks(system_user, platform, username=username)
             run_task(tasks, [_host])
 
