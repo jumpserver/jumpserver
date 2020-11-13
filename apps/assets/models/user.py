@@ -160,6 +160,11 @@ class SystemUser(BaseUser):
     def is_need_test_asset_connective(self):
         return self.protocol not in [self.PROTOCOL_MYSQL]
 
+    def has_special_auth(self, asset=None, username=None):
+        if username is None and self.username_same_with_user:
+            raise TypeError('System user is dynamic, username should be pass')
+        return super().has_special_auth(asset=asset, username=username)
+
     @property
     def can_perm_to_asset(self):
         return self.protocol not in [self.PROTOCOL_MYSQL]
