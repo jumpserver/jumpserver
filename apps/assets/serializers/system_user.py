@@ -45,7 +45,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'assets_amount': {'label': _('Assets amount')},
             'login_mode_display': {'label': _('Login mode display')},
             'created_by': {'read_only': True},
-            'ad_domain': {'label': _('Ad domain')},
+            'ad_domain': {'required': False, 'allow_blank': True, 'label': _('Ad domain')},
         }
 
     def validate_auto_push(self, value):
