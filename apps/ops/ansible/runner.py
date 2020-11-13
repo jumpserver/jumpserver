@@ -182,6 +182,13 @@ class AdHocRunner:
             _options.update(options)
         return _options
 
+    def set_control_master_if_need(self, cleaned_tasks):
+        modules = [task.get('action', {}).get('module') for task in cleaned_tasks]
+        if {'ping', 'win_ping'} & set(modules):
+            self.results_callback.context = {
+                'ssh_args': '-C -o ControlMaster=no'
+            }
+
     def run(self, tasks, pattern, play_name='Ansible Ad-hoc', gather_facts='no'):
         """
         :param tasks: [{'action': {'module': 'shell', 'args': 'ls'}, ...}, ]
@@ -193,6 +200,7 @@ class AdHocRunner:
         self.check_pattern(pattern)
         self.results_callback = self.get_result_callback()
         cleaned_tasks = self.clean_tasks(tasks)
+        self.set_control_master_if_need(cleaned_tasks)
         context.CLIARGS = ImmutableDict(self.options)
 
         play_source = dict(
