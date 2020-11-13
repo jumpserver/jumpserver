@@ -158,9 +158,11 @@ class AuthMixin:
         if update_fields:
             self.save(update_fields=update_fields)
 
-    def has_special_auth(self, asset=None):
+    def has_special_auth(self, asset=None, username=None):
         from .authbook import AuthBook
-        queryset = AuthBook.objects.filter(username=self.username)
+        if username is None:
+            username = self.username
+        queryset = AuthBook.objects.filter(username=username)
         if asset:
             queryset = queryset.filter(asset=asset)
         return queryset.exists()
