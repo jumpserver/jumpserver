@@ -407,7 +407,7 @@ class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
 
     class Meta:
         verbose_name = _("Node")
-        ordering = ['key']
+        ordering = ['value']
 
     def __str__(self):
         return self.full_value
