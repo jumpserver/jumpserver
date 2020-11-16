@@ -184,7 +184,7 @@ class AdHoc(OrgModelMixin):
             hid = str(uuid.uuid4())
         execution = AdHocExecution(
             id=hid, adhoc=self, task=self.task,
-            task_display=str(self.task),
+            task_display=str(self.task)[:128],
             date_start=timezone.now(),
             hosts_amount=self.hosts.count(),
         )
