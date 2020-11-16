@@ -78,7 +78,7 @@ class CommandExecution(OrgModelMixin):
             runner = CommandRunner(self.inventory)
             try:
                 host = self.hosts.first()
-                if host.is_windows():
+                if host and host.is_windows():
                     shell = 'win_shell'
                 else:
                     shell = 'shell'
