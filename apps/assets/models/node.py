@@ -210,6 +210,7 @@ class FamilyMixin:
         if not full_value:
             return []
         nodes_family = full_value.split('/')
+        nodes_family = [v for v in nodes_family if v]
         org_root = cls.org_root()
         if nodes_family[0] == org_root.value:
             nodes_family = nodes_family[1:]
@@ -217,6 +218,7 @@ class FamilyMixin:
 
     @classmethod
     def create_nodes_recurse(cls, values, parent=None):
+        values = [v for v in values if v]
         if not values:
             return None
         if parent is None:
