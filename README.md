@@ -205,7 +205,7 @@ v2.1.0 是 v2.0.0 之后的功能版本。
     <td>命令方式</td>
   </tr>
   <tr>
-    <td>Web UI方式 (X-PACk)</td>
+    <td>Web UI方式 (X-PACK)</td>
   </tr>
 
   <tr>
