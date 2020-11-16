@@ -25,7 +25,8 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 - 无插件: 仅需浏览器，极致的 Web Terminal 使用体验；
 - 多云支持: 一套系统，同时管理不同云上面的资产；
 - 云端存储: 审计录像云端存储，永不丢失；
-- 多租户: 一套系统，多个子公司和部门同时使用。
+- 多租户: 一套系统，多个子公司和部门同时使用；
+- 多应用支持: 数据库，Windows远程应用，Kubernetes。
 
 ## 版本说明
 
@@ -198,6 +199,54 @@ v2.1.0 是 v2.0.0 之后的功能版本。
     <td>文件传输</td>
     <td>可对文件的上传、下载记录进行审计</td>
   </tr>
+  <tr>
+    <td rowspan="20">数据库审计<br>Database</td>
+    <td rowspan="2">连接方式</td>
+    <td>命令方式</td>
+  </tr>
+  <tr>
+    <td>Web UI方式 (X-PACk)</td>
+  </tr>
+
+  <tr>
+    <td rowspan="4">支持的数据库</td>
+    <td>MySQL</td>
+  </tr>
+  <tr>
+    <td>Oracle (X-PACK)</td>
+  </tr>
+  <tr>
+    <td>MariaDB (X-PACK)</td>
+  </tr>
+  <tr>
+    <td>PostgreSQL (X-PACK)</td>
+  </tr>
+  <tr>
+    <td rowspan="6">功能亮点</td>
+    <td>语法高亮</td>
+  </tr>
+  <tr>
+    <td>SQL格式化</td>
+  </tr>
+  <tr>
+    <td>支持快捷键</td>
+  </tr>
+  <tr>
+    <td>支持选中执行</td>
+  </tr>
+  <tr>
+    <td>SQL历史查询</td>
+  </tr>
+  <tr>
+    <td>支持页面创建 DB, TABLE</td>
+  </tr>
+  <tr>
+    <td rowspan="2">会话审计</td>
+    <td>命令记录</td>
+  </tr>
+  <tr>
+    <td>录像回放</td>
+  </tr>
 </table>
 
 ## 快速开始
@@ -211,6 +260,11 @@ v2.1.0 是 v2.0.0 之后的功能版本。
 - [Luna](https://github.com/jumpserver/luna) JumpServer Web Terminal 项目
 - [Koko](https://github.com/jumpserver/koko) JumpServer 字符协议 Connector 项目，替代原来 Python 版本的 [Coco](https://github.com/jumpserver/coco)
 - [Guacamole](https://github.com/jumpserver/docker-guacamole) JumpServer 图形协议 Connector 项目，依赖 [Apache Guacamole](https://guacamole.apache.org/)
+
+## 致谢
+- [Apache Guacamole](https://guacamole.apache.org/) Web页面连接 RDP, SSH, VNC协议设备，JumpServer 图形化连接依赖
+- [OmniDB](https://omnidb.org/) Web页面连接使用数据库，JumpServer Web数据库依赖
+
 
 ## JumpServer 企业版 
 - [申请企业版试用](https://jinshuju.net/f/kyOYpi)
