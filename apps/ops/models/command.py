@@ -37,7 +37,7 @@ class CommandExecution(OrgModelMixin):
             username = self.user.username
         else:
             username = self.run_as.username
-        inv = JMSInventory(self.hosts.all(), run_as=username)
+        inv = JMSInventory(self.hosts.all(), run_as=username, system_user=self.run_as)
         return inv
 
     @lazyproperty
@@ -78,7 +78,7 @@ class CommandExecution(OrgModelMixin):
             runner = CommandRunner(self.inventory)
             try:
                 host = self.hosts.first()
-                if host.is_windows():
+                if host and host.is_windows():
                     shell = 'win_shell'
                 else:
                     shell = 'shell'

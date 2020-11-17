@@ -401,7 +401,7 @@ class CommandStorage(CommonModelMixin):
     TYPE_DEFAULTS = dict(const.REPLAY_STORAGE_TYPE_CHOICES_DEFAULT).keys()
     TYPE_SERVER = const.COMMAND_STORAGE_TYPE_SERVER
 
-    name = models.CharField(max_length=32, verbose_name=_("Name"), unique=True)
+    name = models.CharField(max_length=128, verbose_name=_("Name"), unique=True)
     type = models.CharField(
         max_length=16, choices=TYPE_CHOICES, verbose_name=_('Type'),
         default=TYPE_SERVER
@@ -438,7 +438,7 @@ class ReplayStorage(CommonModelMixin):
     TYPE_SERVER = const.REPLAY_STORAGE_TYPE_SERVER
     TYPE_DEFAULTS = dict(const.REPLAY_STORAGE_TYPE_CHOICES_DEFAULT).keys()
 
-    name = models.CharField(max_length=32, verbose_name=_("Name"), unique=True)
+    name = models.CharField(max_length=128, verbose_name=_("Name"), unique=True)
     type = models.CharField(
         max_length=16, choices=TYPE_CHOICES, verbose_name=_('Type'),
         default=TYPE_SERVER

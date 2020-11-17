@@ -69,9 +69,9 @@ urlpatterns = [
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
             + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
-js_i18n_patterns = i18n_patterns(
-    path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
-)
+js_i18n_patterns = [
+    path('core/jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
+]
 urlpatterns += js_i18n_patterns
 
 handler404 = 'jumpserver.views.handler404'
