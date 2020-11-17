@@ -37,7 +37,7 @@ class CommandExecution(OrgModelMixin):
             username = self.user.username
         else:
             username = self.run_as.username
-        inv = JMSInventory(self.hosts.all(), run_as=username)
+        inv = JMSInventory(self.hosts.all(), run_as=username, system_user=self.run_as)
         return inv
 
     @lazyproperty
