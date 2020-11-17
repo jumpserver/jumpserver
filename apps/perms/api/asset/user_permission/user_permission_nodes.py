@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 import abc
+from django.conf import settings
 from rest_framework.generics import (
     ListAPIView
 )
@@ -16,7 +17,8 @@ from perms.utils.asset.user_permission import (
     get_indirect_granted_node_children,
     get_user_granted_nodes_list_via_mapping_node,
     get_top_level_granted_nodes,
-    rebuild_user_tree_if_need,
+    rebuild_user_tree_if_need, get_favorite_node,
+    get_ungrouped_node
 )
 
 
@@ -113,7 +115,12 @@ class UserGrantedNodesMixin:
     user: User
 
     def get_nodes(self):
-        return get_user_granted_nodes_list_via_mapping_node(self.user)
+        nodes = []
+        if settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
+            nodes.append(get_ungrouped_node(self.user))
+        nodes.append(get_favorite_node(self.user))
+        nodes.extend(get_user_granted_nodes_list_via_mapping_node(self.user))
+        return nodes
 
 
 # ------------------------------------------
