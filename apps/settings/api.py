@@ -279,6 +279,7 @@ class PublicSettingApi(generics.RetrieveAPIView):
                 "SECURITY_MFA_VERIFY_TTL": settings.SECURITY_MFA_VERIFY_TTL,
                 "SECURITY_COMMAND_EXECUTION": settings.SECURITY_COMMAND_EXECUTION,
                 "LOGIN_TITLE": settings.XPACK_INTERFACE_LOGIN_TITLE,
+                "SECURITY_PASSWORD_EXPIRATION_TIME": settings.SECURITY_PASSWORD_EXPIRATION_TIME,
                 "LOGO_URLS": settings.LOGO_URLS,
                 "TICKETS_ENABLED": settings.TICKETS_ENABLED,
                 "PASSWORD_RULE": {
