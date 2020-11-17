@@ -49,16 +49,26 @@ class RequestAssetPermTicketViewSet(JMSModelViewSet):
     def _get_extra_comment(self, instance):
         meta = instance.meta
         ips = ', '.join(meta.get('ips', []))
-        confirmed_assets = ', '.join(meta.get('confirmed_assets', []))
-        confirmed_system_users = ', '.join(meta.get('confirmed_system_users', []))
+        confirmed_assets_id = meta.get('confirmed_assets', [])
+        confirmed_system_users_id = meta.get('confirmed_system_users', [])
+        confirmed_assets = Asset.objects.filter(id__in=confirmed_assets_id)
+        confirmed_system_users = SystemUser.objects.filter(id__in=confirmed_system_users_id)
+        confirmed_assets_display = ', '.join([str(i) for i in confirmed_assets])
+        confirmed_system_users_display = ', '.join([str(i) for i in confirmed_system_users])
 
-        return textwrap.dedent(f'''\
-            {_('IP group')}: {ips}
-            {_('Hostname')}: {meta.get('hostname', '')}
-            {_('System user')}: {meta.get('system_user', '')}
-            {_('Confirmed assets')}: {confirmed_assets}
-            {_('Confirmed system users')}: {confirmed_system_users}
-        ''')
+        return textwrap.dedent('''
+            {}: {}
+            {}: {}
+            {}: {}
+            {}: {}
+            {}: {}
+        '''.format(
+            _('IP group'), ips,
+            _('Hostname'), meta.get('hostname', ''),
+            _('System user'), meta.get('system_user', ''),
+            _('Confirmed assets'), confirmed_assets_display,
+            _('Confirmed system users'), confirmed_system_users_display
+        ))
 
     @action(detail=True, methods=[POST], permission_classes=[IsAssignee, IsValidUser])
     def reject(self, request, *args, **kwargs):
