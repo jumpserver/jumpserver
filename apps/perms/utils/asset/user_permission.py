@@ -311,8 +311,12 @@ def get_user_granted_nodes_list_via_mapping_node(user):
     return all_nodes
 
 
-def get_user_granted_all_assets(user, via_mapping_node=True):
-    asset_perms_id = get_user_all_assetpermissions_id(user)
+def get_user_granted_all_assets(
+        user, via_mapping_node=True,
+        include_direct_granted_assets=True, asset_perms_id=None):
+    if asset_perms_id is None:
+        asset_perms_id = get_user_all_assetpermissions_id(user)
+
     if via_mapping_node:
         granted_node_keys = UserGrantedMappingNode.objects.filter(
             user=user, granted=True,
@@ -328,10 +332,16 @@ def get_user_granted_all_assets(user, via_mapping_node=True):
         granted_node_q |= Q(nodes__key__startswith=f'{_key}:')
         granted_node_q |= Q(nodes__key=_key)
 
-    assets__id = get_user_direct_granted_assets(user, asset_perms_id).values_list('id', flat=True)
+    if include_direct_granted_assets:
+        assets__id = get_user_direct_granted_assets(user, asset_perms_id).values_list('id', flat=True)
+        q = granted_node_q | Q(id__in=list(assets__id))
+    else:
+        q = granted_node_q
 
-    q = granted_node_q | Q(id__in=list(assets__id))
-    return Asset.org_objects.filter(q).distinct()
+    if q:
+        return Asset.org_objects.filter(q).distinct()
+    else:
+        return Asset.org_objects.none()
 
 
 def get_node_all_granted_assets(user: User, key):
@@ -484,13 +494,15 @@ def get_user_direct_granted_assets(user, asset_perms_id=None):
     return assets
 
 
-def count_user_direct_granted_assets(user):
-    count = get_user_direct_granted_assets(user).values_list('id').count()
+def count_user_direct_granted_assets(user, asset_perms_id=None):
+    count = get_user_direct_granted_assets(
+        user, asset_perms_id=asset_perms_id
+    ).values_list('id').count()
     return count
 
 
-def get_ungrouped_node(user):
-    assets_amount = count_user_direct_granted_assets(user)
+def get_ungrouped_node(user, asset_perms_id=None):
+    assets_amount = count_user_direct_granted_assets(user, asset_perms_id)
     return Node(
         id=UNGROUPED_NODE_KEY,
         key=UNGROUPED_NODE_KEY,
@@ -499,10 +511,10 @@ def get_ungrouped_node(user):
     )
 
 
-def get_favorite_node(user):
-    assets_amount = FavoriteAsset.get_user_favorite_assets(user)\
-        .values_list('id')\
-        .count()
+def get_favorite_node(user, asset_perms_id=None):
+    assets_amount = FavoriteAsset.get_user_favorite_assets(
+        user, asset_perms_id=asset_perms_id
+    ).values_list('id').count()
     return Node(
         id=FAVORITE_NODE_KEY,
         key=FAVORITE_NODE_KEY,
