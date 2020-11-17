@@ -186,9 +186,15 @@ class AuthMixin:
         if not asset:
             return self
 
-        instance = self.get_asset_user(asset, username=username)
+        instance = None
+        try:
+            instance = self.get_asset_user(asset, username=username)
+        except:
+            pass
+
         if instance:
             self._merge_auth(instance)
+        return self
 
     def _merge_auth(self, other):
         if other.password:
