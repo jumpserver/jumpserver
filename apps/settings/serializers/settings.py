@@ -83,7 +83,7 @@ class SecuritySettingSerializer(serializers.Serializer):
     SECURITY_PASSWORD_NUMBER = serializers.BooleanField(required=False)
     SECURITY_PASSWORD_SPECIAL_CHAR = serializers.BooleanField(required=False)
     SECURITY_INSECURE_COMMAND = serializers.BooleanField(required=False)
-    SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER = serializers.CharField(max_length=8192, required=False)
+    SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER = serializers.CharField(max_length=8192, required=False, allow_blank=True)
 
 
 class SettingsSerializer(serializers.Serializer):
