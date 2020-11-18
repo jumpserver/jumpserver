@@ -131,6 +131,7 @@ class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
         if system_user_id:
             self.add_node_filtered_by_system_user(data, user, asset_perms_id)
         else:
+            rebuild_user_tree_if_need(request, user)
             all_nodes = get_user_granted_nodes_list_via_mapping_node(user)
             data.extend(self.serialize_nodes(all_nodes, with_asset_amount=True))
 
