@@ -352,7 +352,9 @@ class SomeNodesMixin:
 
     @classmethod
     def org_root(cls):
-        root = cls.objects.filter(parent_key='').exclude(key__startswith='-')
+        root = cls.objects.filter(parent_key='')\
+            .filter(key__regex=r'^[0-9]+$')\
+            .exclude(key__startswith='-')
         if root:
             return root[0]
         else:
