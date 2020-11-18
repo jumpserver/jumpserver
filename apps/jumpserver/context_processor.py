@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.templatetags.static import static
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 

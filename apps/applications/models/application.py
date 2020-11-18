@@ -123,7 +123,7 @@ class Application(CommonModelMixin, OrgModelMixin):
     domain = models.ForeignKey('assets.Domain', null=True, blank=True, related_name='applications', verbose_name=_("Domain"), on_delete=models.SET_NULL)
     category = models.CharField(max_length=16, choices=Category.choices, verbose_name=_('Category'))
     type = models.CharField(max_length=16, choices=Category.get_all_type_choices(), verbose_name=_('Type'))
-    attrs = JSONField()
+    attrs = models.JSONField()
     comment = models.TextField(
         max_length=128, default='', blank=True, verbose_name=_('Comment')
     )

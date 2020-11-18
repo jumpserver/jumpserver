@@ -3,7 +3,7 @@
 import json
 
 from django import forms
-from django.utils import six
+import six
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
 from ..utils import signer
