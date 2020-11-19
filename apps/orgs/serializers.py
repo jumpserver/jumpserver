@@ -74,26 +74,29 @@ class OrgMemberSerializer(BulkModelSerializer):
         ).distinct()
 
 
-class OrgMemberAdminSerializer(BulkModelSerializer):
+class OrgMemberOldBaseSerializer(BulkModelSerializer):
+    organization = serializers.PrimaryKeyRelatedField(
+        label=_('Organization'), queryset=Organization.objects.all(), required=True, source='org'
+    )
+
+    def to_internal_value(self, data):
+        view = self.context['view']
+        org_id = view.kwargs.get('org_id')
+        if org_id:
+            data['organization'] = org_id
+        return super().to_internal_value(data)
+
+    class Meta:
+        model = OrganizationMember
+        fields = ('id', 'organization', 'user', 'role')
+
+
+class OrgMemberAdminSerializer(OrgMemberOldBaseSerializer):
     role = serializers.HiddenField(default=ROLE.ADMIN)
-    organization = serializers.PrimaryKeyRelatedField(
-        label=_('Organization'), queryset=Organization.objects.all(), required=True, source='org'
-    )
-
-    class Meta:
-        model = OrganizationMember
-        fields = ('id', 'organization', 'user', 'role')
 
 
-class OrgMemberUserSerializer(BulkModelSerializer):
+class OrgMemberUserSerializer(OrgMemberOldBaseSerializer):
     role = serializers.HiddenField(default=ROLE.USER)
-    organization = serializers.PrimaryKeyRelatedField(
-        label=_('Organization'), queryset=Organization.objects.all(), required=True, source='org'
-    )
-
-    class Meta:
-        model = OrganizationMember
-        fields = ('id', 'organization', 'user', 'role')
 
 
 class OrgRetrieveSerializer(OrgReadSerializer):
