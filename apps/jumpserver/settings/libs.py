@@ -11,7 +11,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
+        # 'rest_framework.renderers.BrowsableAPIRenderer',
         'common.drf.renders.JMSCSVRender',
     ),
     'DEFAULT_PARSER_CLASSES': (
