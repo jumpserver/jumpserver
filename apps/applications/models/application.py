@@ -2,7 +2,6 @@ from itertools import chain
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django_mysql.models import JSONField, QuerySet
 
 from orgs.mixins.models import OrgModelMixin
 from common.mixins import CommonModelMixin
