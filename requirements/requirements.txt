@@ -12,7 +12,7 @@ chardet==3.0.4
 configparser==3.5.0
 coreapi==2.3.3
 coreschema==0.0.4
-cryptography==2.8
+cryptography==3.2
 decorator==4.1.2
 Django==3.1
 django-auth-ldap==2.2.0
