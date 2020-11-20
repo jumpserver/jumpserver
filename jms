@@ -158,7 +158,7 @@ def parse_service(s):
     web_services = ['gunicorn', 'flower', 'daphne']
     celery_services = [
         "celery_ansible", "celery_default", "celery_node_tree",
-        "celery_check_asset_perm_expired", "celery_node_assets_amount"
+        "celery_check_asset_perm_expired", "celery_heavy_tasks"
     ]
     task_services = celery_services + ['beat']
     all_services = web_services + task_services
@@ -228,9 +228,9 @@ def get_start_celery_node_tree_kwargs():
     return get_start_worker_kwargs('node_tree', 2)
 
 
-def get_start_celery_node_assets_amount_kwargs():
-    print("\n- Start Celery as Distributed Task Queue: NodeAssetsAmount")
-    return get_start_worker_kwargs('celery_node_assets_amount', 1)
+def get_start_celery_heavy_tasks_kwargs():
+    print("\n- Start Celery as Distributed Task Queue: HeavyTasks")
+    return get_start_worker_kwargs('celery_heavy_tasks', 1)
 
 
 def get_start_celery_check_asset_perm_expired_kwargs():
@@ -374,7 +374,7 @@ def start_service(s):
         "celery_ansible": get_start_celery_ansible_kwargs,
         "celery_default": get_start_celery_default_kwargs,
         "celery_node_tree": get_start_celery_node_tree_kwargs,
-        "celery_node_assets_amount": get_start_celery_node_assets_amount_kwargs,
+        "celery_heavy_tasks": get_start_celery_heavy_tasks_kwargs,
         "celery_check_asset_perm_expired": get_start_celery_check_asset_perm_expired_kwargs,
         "beat": get_start_beat_kwargs,
         "flower": get_start_flower_kwargs,
