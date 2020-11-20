@@ -5,10 +5,12 @@ from datetime import timedelta
 from django.db import transaction
 from django.db.models import Q
 from django.db.transaction import atomic
+from django.conf import settings
 from celery import shared_task
 from common.utils import get_logger
 from common.utils.timezone import now, dt_formater, dt_parser
 from users.models import User
+from ops.celery.decorator import register_as_period_task
 from assets.models import Node
 from perms.models import RebuildUserTreeTask, AssetPermission
 from perms.utils.asset.user_permission import rebuild_user_mapping_nodes_if_need_with_lock, lock
@@ -33,7 +35,8 @@ def dispatch_mapping_node_tasks():
         rebuild_user_mapping_nodes_celery_task.delay(id)
 
 
-@shared_task(queue='check_asset_perm_expired')
+@register_as_period_task(interval=settings.PERM_EXPIRED_CHECK_PERIODIC)
+@shared_task(queue='celery_check_asset_perm_expired')
 @atomic()
 def check_asset_permission_expired():
     """
