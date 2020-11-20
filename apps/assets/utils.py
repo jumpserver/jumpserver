@@ -25,7 +25,7 @@ def check_node_assets_amount():
             node.assets_amount = assets_amount
             node.save()
         # 防止自检程序给数据库的压力太大
-        time.sleep(2)
+        time.sleep(0.1)
 
 
 def is_asset_exists_in_node(asset_pk, node_key):
