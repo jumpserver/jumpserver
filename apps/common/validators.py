@@ -14,9 +14,9 @@ alphanumeric = RegexValidator(r'^[0-9a-zA-Z_@\-\.]*$', _('Special char not allow
 
 
 class ProjectUniqueValidator(UniqueTogetherValidator):
-    def __call__(self, attrs):
+    def __call__(self, attrs, serializer):
         try:
-            super().__call__(attrs)
+            super().__call__(attrs, serializer)
         except ValidationError as e:
             errors = {}
             for field in self.fields:
