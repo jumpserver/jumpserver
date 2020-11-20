@@ -3,6 +3,7 @@
 from perms.api.asset.user_permission.mixin import UserNodeGrantStatusDispatchMixin
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
+from rest_framework.request import Request
 from django.conf import settings
 
 from assets.api.mixin import SerializeToTreeNodeMixin
@@ -55,8 +56,12 @@ class AssetsAsTreeMixin(SerializeToTreeNodeMixin):
     """
     将 资产 序列化成树的结构返回
     """
-    def list(self, request, *args, **kwargs):
+    def list(self, request: Request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
+        if request.query_params.get('search'):
+            # 如果用户搜索的条件不精准，会导致返回大量的无意义数据。
+            # 这里限制一下返回数据的最大条数
+            queryset = queryset[:999]
         data = self.serialize_assets(queryset, None)
         return Response(data=data)
 
