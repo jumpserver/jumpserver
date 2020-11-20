@@ -63,7 +63,8 @@ urlpatterns = [
     # External apps url
     path('core/auth/captcha/', include('captcha.urls')),
     path('core/', include(app_view_patterns)),
-    path('ui/', views.UIView.as_view())
+    path('ui/', views.UIView.as_view()),
+    path('prometheus/', include('django_prometheus.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
