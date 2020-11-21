@@ -35,27 +35,6 @@ TMP_GRANTED_ASSETS_AMOUNT_FIELD = '_granted_assets_amount'
 
 
 # 使用场景
-# Asset.objects.filter(get_user_resources_q_granted_by_permissions(user))
-def get_user_resources_q_granted_by_permissions(user: User):
-    """
-    获取用户关联的 asset permission 或者 用户组关联的 asset permission 获取规则,
-    前提 AssetPermission 对象中的 related_name 为 granted_by_permissions
-    :param user:
-    :return:
-    """
-    _now = now()
-    return reduce(and_, (
-        Q(granted_by_permissions__date_start__lt=_now),
-        Q(granted_by_permissions__date_expired__gt=_now),
-        Q(granted_by_permissions__is_active=True),
-        (
-            Q(granted_by_permissions__users=user) |
-            Q(granted_by_permissions__user_groups__users=user)
-        )
-    ))
-
-
-# 使用场景
 # `Node.objects.annotate(**node_annotate_mapping_node)`
 node_annotate_mapping_node = {
     TMP_GRANTED_FIELD: F('mapping_nodes__granted'),
@@ -385,7 +364,8 @@ def get_node_all_granted_assets(user: User, key):
 
     if only_asset_granted_nodes_qs:
         only_asset_granted_nodes_q = reduce(or_, only_asset_granted_nodes_qs)
-        only_asset_granted_nodes_q &= get_user_resources_q_granted_by_permissions(user)
+        asset_perms_id = get_user_all_assetpermissions_id(user)
+        only_asset_granted_nodes_q &= Q(granted_by_permissions__id__in=list(asset_perms_id))
         q.append(only_asset_granted_nodes_q)
 
     if q:
