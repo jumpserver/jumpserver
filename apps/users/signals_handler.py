@@ -10,12 +10,44 @@ from django_cas_ng.signals import cas_user_authenticated
 from jms_oidc_rp.signals import openid_create_or_update_user
 
 from perms.tasks import create_rebuild_user_tree_task
+from assets.models import SystemUser
 from common.utils import get_logger
+from common.const.signals import POST_ADD
 from .signals import post_user_create
 from .models import User
 
 
 logger = get_logger(__file__)
+
+
+def rebuild_user_tree(instance, action, reverse, pk_set, **kwargs):
+    if action.startswith('post'):
+        if reverse:
+            create_rebuild_user_tree_task(pk_set)
+        else:
+            create_rebuild_user_tree_task([instance.id])
+
+
+def bind_groups_systemuser(instance, action, reverse, pk_set, **kwargs):
+    """
+    UserGroup 增加 User 时，增加的 User 需要与 UserGroup 关联的动态系统用户相关联
+    """
+    user: User
+
+    if action != POST_ADD:
+        return
+
+    if not reverse:
+        # 一个用户添加了多个用户组
+        users_id = [instance.id]
+        system_users = SystemUser.objects.filter(groups__id__in=pk_set).distinct()
+    else:
+        # 一个用户组添加了多个用户
+        users_id = pk_set
+        system_users = SystemUser.objects.filter(groups__id=instance.pk).distinct()
+
+    for system_user in system_users:
+        system_user.users.add(*users_id)
 
 
 @receiver(post_user_create)
@@ -28,12 +60,9 @@ def on_user_create(sender, user=None, **kwargs):
 
 
 @receiver(m2m_changed, sender=User.groups.through)
-def on_user_groups_change(instance, action, reverse, pk_set, **kwargs):
-    if action.startswith('post'):
-        if reverse:
-            create_rebuild_user_tree_task(pk_set)
-        else:
-            create_rebuild_user_tree_task([instance.id])
+def on_user_groups_change(**kwargs):
+    rebuild_user_tree(**kwargs)
+    bind_groups_systemuser(**kwargs)
 
 
 @receiver(cas_user_authenticated)
