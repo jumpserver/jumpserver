@@ -6,10 +6,11 @@ from django.dispatch import receiver
 from perms.tasks import create_rebuild_user_tree_task, \
     create_rebuild_user_tree_task_by_related_nodes_or_assets
 from users.models import User, UserGroup
-from assets.models import Asset
+from assets.models import Asset, SystemUser
 from common.utils import get_logger
 from common.exceptions import M2MReverseNotAllowed
 from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR
+from common.db.models import bulk_create_relations
 from .models import AssetPermission, RemoteAppPermission
 
 
@@ -208,3 +209,24 @@ def on_node_asset_change(action, instance, reverse, pk_set, **kwargs):
         node_pk_set = pk_set
 
     create_rebuild_user_tree_task_by_related_nodes_or_assets.delay(node_pk_set, asset_pk_set)
+
+
+@receiver(m2m_changed, sender=User.groups.through)
+def on_user_groups_change(instance, action, reverse, pk_set, model, **kwargs):
+    """
+    UserGroup 增加 User 时，增加的 User 需要与 UserGroup 关联的动态系统用户相关联
+    """
+    user: User
+
+    if action != POST_ADD:
+        return
+
+    if not reverse:
+        # 一个用户添加了多个用户组
+        user = instance
+        system_users = SystemUser.objects.filter(groups__id__in=pk_set).distinct()
+        user.systemuser_set.add(system_users)
+    else:
+        # 一个用户组添加了多个用户
+        system_users = SystemUser.objects.filter(groups__id=instance.pk).distinct()
+        bulk_create_relations(SystemUser, User, 'users', system_users, pk_set)

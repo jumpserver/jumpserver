@@ -10,10 +10,17 @@
 """
 
 import uuid
+from functools import partial
 
 from django.db.models import *
+from django.db import router, transaction
+from django.db.models.signals import m2m_changed
 from django.db.models.functions import Concat
 from django.utils.translation import ugettext_lazy as _
+from django.db.models.fields.related_descriptors import ManyToManyDescriptor
+from django.db.models.fields.related import ManyToManyField
+
+from common.const.signals import POST_ADD, PRE_ADD
 
 
 class Choice(str):
@@ -82,3 +89,56 @@ class JMSModel(JMSBaseModel):
 
 def concated_display(name1, name2):
     return Concat(F(name1), Value('('), F(name2), Value(')'))
+
+
+def bulk_create_relations(
+        model, related_model, m2m_field_name, objs, related_pks,
+        batch_size=None, ignore_conflicts=False
+):
+    """
+    本函数相当于：
+    ```
+        for obj in objs:
+            obj.m2m_field_name.add(*related_pks)
+    ```
+    但不会每个 obj 都执行一条数据库插入
+    """
+
+    # 类型声明
+    m2m_desc: ManyToManyDescriptor
+    m2m_field: ManyToManyField
+
+    m2m_desc = getattr(model, m2m_field_name)
+    reverse = m2m_desc.reverse
+    m2m_field = m2m_desc.field
+    through = m2m_desc.through
+    db = router.db_for_write(through, instance=objs[0])
+
+    if not reverse:
+        model_attname = m2m_field.m2m_column_name()
+        to_add_attname = m2m_field.m2m_reverse_name()
+    else:
+        to_add_attname = m2m_field.m2m_column_name()
+        model_attname = m2m_field.m2m_reverse_name()
+
+    sender = partial(
+        m2m_changed.send,
+        sender=through,
+        reverse=reverse,
+        model=related_model,
+        pk_set=related_pks,
+        using=db
+    )
+
+    to_create = []
+    for obj in objs:
+        for to_add_pk in related_pks:
+            data = {model_attname: obj.pk, to_add_attname: to_add_pk}
+            to_create.append(through(**data))
+
+    with transaction.atomic(using=db, savepoint=False):
+        [sender(instance=obj, action=PRE_ADD) for obj in objs]
+        through.objects.bulk_create(
+            to_create, batch_size=batch_size, ignore_conflicts=ignore_conflicts
+        )
+        [sender(instance=obj, action=POST_ADD) for obj in objs]
