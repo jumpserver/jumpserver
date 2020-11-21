@@ -173,7 +173,7 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
             return []
         assets = self.instance.get_assets().only(
             "id", "hostname", "ip", "os",
-            "org_id", "protocols",
+            "org_id", "protocols", "is_active"
         )
         return self.serialize_assets(assets, self.instance.key)
 
