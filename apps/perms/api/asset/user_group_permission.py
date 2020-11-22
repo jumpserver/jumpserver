@@ -32,9 +32,6 @@ class UserGroupMixin:
 
 
 class UserGroupGrantedAssetsApi(ListAPIView):
-    """
-    获取用户组直接授权的资产
-    """
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.AssetGrantedSerializer
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
@@ -44,11 +41,27 @@ class UserGroupGrantedAssetsApi(ListAPIView):
     def get_queryset(self):
         user_group_id = self.kwargs.get('pk', '')
 
-        return Asset.objects.filter(
-            Q(granted_by_permissions__user_groups__id=user_group_id)
+        asset_perms_id = list(AssetPermission.objects.valid().filter(
+            user_groups__id=user_group_id
+        ).distinct().values_list('id', flat=True))
+
+        granted_node_keys = Node.objects.filter(
+            granted_by_permissions__id__in=asset_perms_id,
+        ).distinct().values_list('key', flat=True)
+
+        granted_q = Q()
+        for _key in granted_node_keys:
+            granted_q |= Q(nodes__key__startswith=f'{_key}:')
+            granted_q |= Q(nodes__key=_key)
+
+        granted_q |= Q(granted_by_permissions__id__in=asset_perms_id)
+
+        assets = Asset.objects.filter(
+            granted_q
         ).distinct().only(
             *self.only_fields
         )
+        return assets
 
 
 class UserGroupGrantedNodeAssetsApi(ListAPIView):
@@ -66,7 +79,7 @@ class UserGroupGrantedNodeAssetsApi(ListAPIView):
         granted = AssetPermission.objects.filter(
             user_groups__id=user_group_id,
             nodes__id=node_id
-        ).exists()
+        ).valid().exists()
         if granted:
             assets = Asset.objects.filter(
                 Q(nodes__key__startswith=f'{node.key}:') |
@@ -74,8 +87,12 @@ class UserGroupGrantedNodeAssetsApi(ListAPIView):
             )
             return assets
         else:
+            asset_perms_id = list(AssetPermission.objects.valid().filter(
+                user_groups__id=user_group_id
+            ).distinct().values_list('id', flat=True))
+
             granted_node_keys = Node.objects.filter(
-                granted_by_permissions__user_groups__id=user_group_id,
+                granted_by_permissions__id__in=asset_perms_id,
                 key__startswith=f'{node.key}:'
             ).distinct().values_list('key', flat=True)
 
@@ -85,7 +102,7 @@ class UserGroupGrantedNodeAssetsApi(ListAPIView):
                 granted_node_q |= Q(nodes__key=_key)
 
             granted_asset_q = (
-                Q(granted_by_permissions__user_groups__id=user_group_id) &
+                Q(granted_by_permissions__id__in=asset_perms_id) &
                 (
                     Q(nodes__key__startswith=f'{node.key}:') |
                     Q(nodes__key=node.key)
@@ -129,12 +146,16 @@ class UserGroupGrantedNodeChildrenAsTreeApi(SerializeToTreeNodeMixin, ListAPIVie
         group_id = self.kwargs.get('pk')
         node_key = self.request.query_params.get('key', None)
 
+        asset_perms_id = list(AssetPermission.objects.valid().filter(
+            user_groups__id=group_id
+        ).distinct().values_list('id', flat=True))
+
         granted_keys = Node.objects.filter(
-            granted_by_permissions__user_groups__id=group_id
+            granted_by_permissions__id__in=asset_perms_id
         ).values_list('key', flat=True)
 
         asset_granted_keys = Node.objects.filter(
-            assets__granted_by_permissions__user_groups__id=group_id
+            assets__granted_by_permissions__id__in=asset_perms_id
         ).values_list('key', flat=True)
 
         if node_key is None:
