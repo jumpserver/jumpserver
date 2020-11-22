@@ -21,7 +21,7 @@ user_permission_urlpatterns = [
     # ---------------------------------------------------------
     # 以 serializer 格式返回
     path('<uuid:pk>/assets/', api.UserAllGrantedAssetsApi.as_view(), name='user-assets'),
-    path('assets/', api.MyAllAssetsAsTreeApi.as_view(), name='my-assets'),
+    path('assets/', api.MyAllGrantedAssetsApi.as_view(), name='my-assets'),
 
     # Tree Node 的数据格式返回
     path('<uuid:pk>/assets/tree/', api.UserDirectGrantedAssetsAsTreeForAdminApi.as_view(), name='user-assets-as-tree'),
