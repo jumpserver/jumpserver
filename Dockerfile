@@ -11,6 +11,8 @@ RUN cd utils && bash -ixeu build.sh
 FROM registry.fit2cloud.com/public/python:v3
 ARG PIP_MIRROR=https://pypi.douban.com/simple
 ENV PIP_MIRROR=$PIP_MIRROR
+ARG PIP_JMS_MIRROR=https://pypi.douban.com/simple
+ENV PIP_JMS_MIRROR=$PIP_JMS_MIRROR
 ARG MYSQL_MIRROR=https://mirrors.tuna.tsinghua.edu.cn/mysql/yum/mysql57-community-el6/
 ENV MYSQL_MIRROR=$MYSQL_MIRROR
 
@@ -24,7 +26,7 @@ RUN yum -y install epel-release && \
 RUN yum -y install $(cat requirements/rpm_requirements.txt)
 RUN pip install --upgrade pip setuptools==49.6.0 wheel -i ${PIP_MIRROR} && \
     pip config set global.index-url ${PIP_MIRROR}
-RUN pip install $(grep 'jms' requirements/requirements.txt) -i https://pypi.org/simple
+RUN pip install $(grep 'jms' requirements/requirements.txt) -i ${PIP_JMS_MIRROR}
 RUN pip install -r requirements/requirements.txt
 
 COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/jumpserver
