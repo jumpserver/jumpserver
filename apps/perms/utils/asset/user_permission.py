@@ -465,6 +465,9 @@ def get_user_all_assetpermissions_id(user: User):
     asset_perms_id = AssetPermission.objects.valid().filter(
         Q(users=user) | Q(user_groups__users=user)
     ).distinct().values_list('id', flat=True)
+
+    # !!! 这个很重要，必须转换成 list，避免 Django 生成嵌套子查询
+    asset_perms_id = list(asset_perms_id)
     return asset_perms_id
 
 
