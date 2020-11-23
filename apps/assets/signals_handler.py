@@ -4,7 +4,7 @@ from operator import add, sub
 
 from assets.utils import is_asset_exists_in_node
 from django.db.models.signals import (
-    post_save, m2m_changed, pre_delete, post_delete
+    post_save, m2m_changed, pre_delete, post_delete, pre_save
 )
 from django.db.models import Q, F
 from django.dispatch import receiver
@@ -35,6 +35,11 @@ def update_asset_hardware_info_on_created(asset):
 def test_asset_conn_on_created(asset):
     logger.debug("Test asset `{}` connectivity".format(asset))
     test_asset_connectivity_util.delay([asset])
+
+
+@receiver(pre_save, sender=Node)
+def on_node_pre_save(sender, instance: Node, **kwargs):
+    instance.parent_key = instance.compute_parent_key()
 
 
 @receiver(post_save, sender=Asset)
