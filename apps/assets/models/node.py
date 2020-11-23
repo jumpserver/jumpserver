@@ -103,7 +103,7 @@ class FamilyMixin:
             if value is None:
                 value = child_key
             child = self.__class__.objects.create(
-                id=_id, key=child_key, value=value, parent_key=self.key,
+                id=_id, key=child_key, value=value
             )
             return child
 
