@@ -92,6 +92,7 @@ class OrgMemberAdminRelationBulkViewSet(JMSBulkRelationModelViewSet):
     serializer_class = OrgMemberAdminSerializer
     filterset_class = OrgMemberRelationFilterSet
     search_fields = ('user__name', 'user__username', 'org__name')
+    lookup_field = 'user_id'
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -116,6 +117,7 @@ class OrgMemberUserRelationBulkViewSet(JMSBulkRelationModelViewSet):
     serializer_class = OrgMemberUserSerializer
     filterset_class = OrgMemberRelationFilterSet
     search_fields = ('user__name', 'user__username', 'org__name')
+    lookup_field = 'user_id'
 
     def get_queryset(self):
         queryset = super().get_queryset()
