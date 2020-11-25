@@ -11,11 +11,18 @@ class Stat(models.Model):
         guacamole = 'guacamole', 'Guacamole'
         omnidb = 'omnidb', 'OmniDB'
 
+    class Keys(models.TextChoices):
+        cpu = 'cpu', 'CPU'
+        memory = 'memory', _('Memory')
+        disk = 'disk', _('Disk')
+        session_active = 'session_active', _('Session active')
+        session_processed = 'session_processed', _('Session processed')
+
     node = models.CharField(max_length=128)
-    ip = models.IPAddressField()
-    component = models.CharField(choices=Components.choices)
-    key = models.CharField(db_index=True, verbose_name=_('Item key'))
-    value = models.IntegerField()
+    ip = models.GenericIPAddressField()
+    component = models.CharField(choices=Components.choices, max_length=16)
+    key = models.CharField(db_index=True, max_length=16, verbose_name=_('Item key'))
+    value = models.FloatField()
     datetime = models.DateTimeField()
 
     def __str__(self):
@@ -45,7 +52,8 @@ class Stat(models.Model):
                 'component': 'core'
             }
         ]
-        items_physical_type = ['uptime', 'cpu', 'memory', 'disk', 'thread', 'goroutine']
+        items_system_type = ['cpu', 'memory', 'disk']
+        items_process_type = ['thread', 'goroutine', 'replay_upload_health', 'command_upload_health']
         items_session_type = ['session_active', 'session_processed', 'session_failed', 'session_succeeded']
         items = [
             {

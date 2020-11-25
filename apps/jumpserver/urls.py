@@ -23,6 +23,7 @@ api_v1 = [
     path('common/', include('common.urls.api_urls', namespace='api-common')),
     path('applications/', include('applications.urls.api_urls', namespace='api-applications')),
     path('tickets/', include('tickets.urls.api_urls', namespace='api-tickets')),
+    path('system/', include('system.urls', namespace='api-system')),
 ]
 
 api_v2 = [
@@ -64,7 +65,6 @@ urlpatterns = [
     path('core/auth/captcha/', include('captcha.urls')),
     path('core/', include(app_view_patterns)),
     path('ui/', views.UIView.as_view()),
-    path('prometheus/', include('django_prometheus.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
