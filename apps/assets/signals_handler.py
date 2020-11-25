@@ -91,22 +91,24 @@ def on_system_user_assets_change(instance, action, model, pk_set, **kwargs):
 
 
 @receiver(m2m_changed, sender=SystemUser.users.through)
-def on_system_user_users_change(sender, instance=None, action='', model=None, pk_set=None, **kwargs):
+def on_system_user_users_change(sender, instance: SystemUser, action, model, pk_set, reverse, **kwargs):
     """
     当系统用户和用户关系发生变化时，应该重新推送系统用户资产中
     """
     if action != POST_ADD:
         return
+
+    if reverse:
+        raise M2MReverseNotAllowed
+
     if not instance.username_same_with_user:
         return
+
     logger.debug("System user users change signal recv: {}".format(instance))
-    queryset = model.objects.filter(pk__in=pk_set)
-    if model == SystemUser:
-        system_users = queryset
-    else:
-        system_users = [instance]
-    for s in system_users:
-        push_system_user_to_assets_manual.delay(s)
+    usernames = model.objects.filter(pk__in=pk_set).values_list('username', flat=True)
+
+    for username in usernames:
+        push_system_user_to_assets_manual.delay(instance, username)
 
 
 @receiver(m2m_changed, sender=SystemUser.nodes.through)
