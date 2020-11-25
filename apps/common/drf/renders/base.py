@@ -46,8 +46,11 @@ class JMSBaseRenderer(BaseRenderer):
         ]
 
     def process_data(self, data):
-        # TODO: 获取资源详情导出又是会怎么样
         results = data['results'] if 'results' in data else data
+
+        if isinstance(results, dict):
+            results = [results]
+
         if self.template == 'import':
             results = [results[0] if results else results]
         else:
