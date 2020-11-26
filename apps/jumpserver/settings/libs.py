@@ -21,6 +21,7 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.FormParser',
         'rest_framework.parsers.MultiPartParser',
         'common.drf.parsers.JMSCSVParser',
+        'common.drf.parsers.JMSExcelParser',
         'rest_framework.parsers.FileUploadParser',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
