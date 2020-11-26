@@ -78,6 +78,7 @@ def on_system_user_update(instance: SystemUser, created, **kwargs):
 
 
 @receiver(m2m_changed, sender=SystemUser.assets.through)
+@on_transaction_commit
 def on_system_user_assets_change(instance, action, model, pk_set, **kwargs):
     """
     当系统用户和资产关系发生变化时，应该重新推送系统用户到新添加的资产中
@@ -96,6 +97,7 @@ def on_system_user_assets_change(instance, action, model, pk_set, **kwargs):
 
 
 @receiver(m2m_changed, sender=SystemUser.users.through)
+@on_transaction_commit
 def on_system_user_users_change(sender, instance: SystemUser, action, model, pk_set, reverse, **kwargs):
     """
     当系统用户和用户关系发生变化时，应该重新推送系统用户资产中
@@ -117,6 +119,7 @@ def on_system_user_users_change(sender, instance: SystemUser, action, model, pk_
 
 
 @receiver(m2m_changed, sender=SystemUser.nodes.through)
+@on_transaction_commit
 def on_system_user_nodes_change(sender, instance=None, action=None, model=None, pk_set=None, **kwargs):
     """
     当系统用户和节点关系发生变化时，应该将节点下资产关联到新的系统用户上
