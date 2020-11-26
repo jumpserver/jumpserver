@@ -112,8 +112,9 @@ def on_system_user_users_change(sender, instance: SystemUser, action, model, pk_
     logger.debug("System user users change signal recv: {}".format(instance))
     usernames = model.objects.filter(pk__in=pk_set).values_list('username', flat=True)
 
+    delay = on_transaction_commit(push_system_user_to_assets_manual.delay)
     for username in usernames:
-        push_system_user_to_assets_manual.delay(instance, username)
+        delay(instance, username)
 
 
 @receiver(m2m_changed, sender=SystemUser.nodes.through)
