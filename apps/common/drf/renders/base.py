@@ -124,6 +124,6 @@ class JMSBaseRenderer(BaseRenderer):
             value = self.get_rendered_value()
         except Exception as e:
             logger.debug(e, exc_info=True)
-            value = 'CSV parse error!'.encode('utf-8')
+            value = 'Render error! ({})'.format(self.media_type).encode('utf-8')
 
         return value

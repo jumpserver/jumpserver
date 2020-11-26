@@ -129,5 +129,5 @@ class JMSBaseParser(BaseParser):
             return data
         except Exception as e:
             logger.error(e, exc_info=True)
-            raise ParseError('CSV parse error!')
+            raise ParseError('Parse error! ({})'.format(self.media_type))
 
