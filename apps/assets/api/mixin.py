@@ -69,6 +69,7 @@ class SerializeToTreeNodeMixin:
                         'ip': asset.ip,
                         'protocols': asset.protocols_as_list,
                         'platform': asset.platform_base,
+                        'org_name': asset.org_name
                     },
                 }
             }
