@@ -106,3 +106,4 @@ adal==1.2.5
 openpyxl==3.0.5
 pyexcel==0.6.6
 pyexcel-io==0.6.4
+pyexcel-xlsx==0.6.0
