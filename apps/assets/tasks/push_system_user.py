@@ -2,13 +2,13 @@
 
 from itertools import groupby
 from celery import shared_task
-from common.db.utils import get_object_if_need, get_objects_if_need, get_objects
+from common.db.utils import get_object_if_need, get_objects
 from django.utils.translation import ugettext as _
 from django.db.models import Empty
 
 from common.utils import encrypt_password, get_logger
 from assets.models import SystemUser, Asset
-from orgs.utils import org_aware_func
+from orgs.utils import org_aware_func, tmp_to_root_org
 from . import const
 from .utils import clean_ansible_task_hosts, group_asset_by_platform
 
@@ -229,7 +229,11 @@ def push_system_user_util(system_user, assets, task_name, username=None):
 
 
 @shared_task(queue="ansible")
+@tmp_to_root_org()
 def push_system_user_to_assets_manual(system_user, username=None):
+    """
+    将系统用户推送到与它关联的所有资产上
+    """
     system_user = get_object_if_need(SystemUser, system_user)
     assets = system_user.get_related_assets()
     task_name = _("Push system users to assets: {}").format(system_user.name)
@@ -237,7 +241,11 @@ def push_system_user_to_assets_manual(system_user, username=None):
 
 
 @shared_task(queue="ansible")
+@tmp_to_root_org()
 def push_system_user_a_asset_manual(system_user, asset, username=None):
+    """
+    将系统用户推送到一个资产上
+    """
     if username is None:
         username = system_user.username
     task_name = _("Push system users to asset: {}({}) => {}").format(
@@ -247,7 +255,11 @@ def push_system_user_a_asset_manual(system_user, asset, username=None):
 
 
 @shared_task(queue="ansible")
+@tmp_to_root_org()
 def push_system_user_to_assets(system_user_id, assets_id, username=None):
+    """
+    推送系统用户到指定的若干资产上
+    """
     system_user = SystemUser.objects.get(id=system_user_id)
     assets = get_objects(Asset, assets_id)
     task_name = _("Push system users to assets: {}").format(system_user.name)
