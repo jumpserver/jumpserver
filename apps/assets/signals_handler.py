@@ -96,6 +96,7 @@ def on_system_user_assets_change(instance, action, model, pk_set, **kwargs):
 
 
 @receiver(m2m_changed, sender=SystemUser.users.through)
+@on_transaction_commit
 def on_system_user_users_change(sender, instance: SystemUser, action, model, pk_set, reverse, **kwargs):
     """
     当系统用户和用户关系发生变化时，应该重新推送系统用户资产中
