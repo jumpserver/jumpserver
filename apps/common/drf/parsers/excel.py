@@ -1,6 +1,4 @@
-import codecs
 import pyexcel
-
 from .base import JMSBaseParser
 
 

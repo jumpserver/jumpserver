@@ -1,9 +1,6 @@
 import abc
 import json
-import chardet
 import codecs
-import openpyxl
-import pyexcel
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.parsers import BaseParser
 from rest_framework import status
