@@ -170,22 +170,14 @@ class RoleMixin:
         from orgs.models import ROLE as ORG_ROLE
 
         if not current_org.is_real():
+            # 不是真实的组织，取 User 本身的角色
             if self.is_superuser:
                 return [ORG_ROLE.ADMIN]
             else:
                 return [ORG_ROLE.USER]
 
-        if hasattr(self, 'gc_m2m_org_members__role'):
-            names = self.gc_m2m_org_members__role
-            if isinstance(names, str):
-                roles = set(self.gc_m2m_org_members__role.split(','))
-            else:
-                roles = set()
-        else:
-            roles = set(self.m2m_org_members.filter(
-                org_id=current_org.id
-            ).values_list('role', flat=True))
-        roles = list(roles)
+        # 是真实组织，取 OrganizationMember 中的角色
+        roles = [org_member.role for org_member in self.m2m_org_members.all()]
         roles.sort()
         return roles
 
