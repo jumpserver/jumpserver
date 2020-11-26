@@ -3,6 +3,10 @@ from datetime import datetime
 from rest_framework.renderers import BaseRenderer
 from rest_framework.utils import encoders, json
 
+from common.utils import get_logger
+
+logger = get_logger(__file__)
+
 
 class JMSBaseRenderer(BaseRenderer):
     # 渲染模版标识, 导入、导出、更新模版: ['import', 'update', 'export']
@@ -96,20 +100,30 @@ class JMSBaseRenderer(BaseRenderer):
         if not self._check_validation_data(data):
             return self._json_format_response(data)
 
-        request = renderer_context['request']
-        response = renderer_context['response']
-        view = renderer_context['view']
-        self.template = request.query_params.get('template', 'export')
-        self.serializer = view.get_serializer()
-        self.set_response_disposition(response)
+        try:
+            renderer_context = renderer_context or {}
+            request = renderer_context['request']
+            response = renderer_context['response']
+            view = renderer_context['view']
+            self.template = request.query_params.get('template', 'export')
+            self.serializer = view.get_serializer()
+            self.set_response_disposition(response)
+        except Exception as e:
+            logger.debug(e, exc_info=True)
+            value = 'The resource not support export!'.encode('utf-8')
+            return value
 
-        rendered_fields = self.get_rendered_fields()
-        column_titles = self.get_column_titles(rendered_fields)
-        data = self.process_data(data)
-        rows = self.generate_rows(data, rendered_fields)
+        try:
+            rendered_fields = self.get_rendered_fields()
+            column_titles = self.get_column_titles(rendered_fields)
+            data = self.process_data(data)
+            rows = self.generate_rows(data, rendered_fields)
+            self.initial_writer()
+            self.write_column_titles(column_titles)
+            self.write_rows(rows)
+            value = self.get_rendered_value()
+        except Exception as e:
+            logger.debug(e, exc_info=True)
+            value = 'CSV parse error!'.encode('utf-8')
 
-        self.initial_writer()
-        self.write_column_titles(column_titles)
-        self.write_rows(rows)
-        value = self.get_rendered_value()
         return value
