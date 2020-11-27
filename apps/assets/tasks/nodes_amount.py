@@ -8,6 +8,6 @@ logger = get_logger(__file__)
 
 
 @register_as_period_task(crontab='0 2 * * *')
-@shared_task(queue='node_assets_amount')
+@shared_task(queue='celery_heavy_tasks')
 def check_node_assets_amount_celery_task():
     check_node_assets_amount()
