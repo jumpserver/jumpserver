@@ -304,8 +304,32 @@ class SomeNodesMixin:
     empty_value = _("empty")
 
     @classmethod
+    def modify_old_default_node_key_if_need(cls):
+        # 将修改原来Default节点的key从0修改为1
+        # 1.4.3 版本中Default节点的key为0
+        old_default_key = '0'
+        old_default_node = cls.objects.filter(value=cls.default_value, key=old_default_key).first()
+        if not old_default_node:
+            return
+        # 修改key为0的Default节点及其子节点的key为1
+        new_default_key = cls.default_key
+        all_children = old_default_node.get_all_children()
+        for child in all_children:
+            old_key = child.key
+            key_list = old_key.split(':')
+            key_list[0] = new_default_key
+            new_key = ':'.join(key_list)
+            child.key = new_key
+            child.save()
+            logger.info('Modify key ( {} > {} )'.format(old_key, new_key))
+        old_default_node.key = new_default_key
+        old_default_node.save()
+        logger.info('Modify key ( {} > {} )'.format(old_default_key, new_default_key))
+
+    @classmethod
     def default_node(cls):
         with tmp_to_org(Organization.default()):
+            cls.modify_old_default_node_key_if_need()
             defaults = {'value': cls.default_value}
             try:
                 obj, created = cls.objects.get_or_create(
@@ -354,7 +378,8 @@ class SomeNodesMixin:
     def org_root(cls):
         root = cls.objects.filter(parent_key='')\
             .filter(key__regex=r'^[0-9]+$')\
-            .exclude(key__startswith='-')
+            .exclude(key__startswith='-')\
+            .order_by('key')
         if root:
             return root[0]
         else:
