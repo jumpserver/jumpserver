@@ -308,11 +308,25 @@ class SomeNodesMixin:
         # 将修改原来Default节点的key从0修改为1
         # 1.4.3 版本中Default节点的key为0
         old_default_key = '0'
-        old_default_node = cls.objects.filter(value=cls.default_value, key=old_default_key).first()
+        old_default_node = cls.objects.filter(key=old_default_key).first()
         if not old_default_node:
             return
-        # 修改key为0的Default节点及其子节点的key为1
+        # 检验是否存在key为1的节点
         new_default_key = cls.default_key
+        new_default_node = cls.objects.filter(key=new_default_key).first()
+        if new_default_node:
+            logger.info(f'Check Default node `key={new_default_key}` exists')
+            if new_default_node.get_all_assets():
+                logger.info(f'Check Default node has assets')
+                return
+            if new_default_node.get_all_children():
+                logger.info(f'Check Default node has children nodes')
+                return
+            logger.info(f'Check Default node not has assets and children nodes, delete it.')
+            new_default_node.delete()
+
+        # 修改key为0的Default节点及其子节点的key为1
+        logger.info(f'Modify old default node key from `{old_default_key}` to `{new_default_key}`')
         all_children = old_default_node.get_all_children()
         for child in all_children:
             old_key = child.key
@@ -320,8 +334,11 @@ class SomeNodesMixin:
             key_list[0] = new_default_key
             new_key = ':'.join(key_list)
             child.key = new_key
-            child.save()
-            logger.info('Modify key ( {} > {} )'.format(old_key, new_key))
+            # child.save()
+            logger.info('Set key ( {} > {} )'.format(old_key, new_key))
+        cls.objects.bulk_update(all_children, ['key'])
+        logger.info('Bulk modify key')
+
         old_default_node.key = new_default_key
         old_default_node.save()
         logger.info('Modify key ( {} > {} )'.format(old_default_key, new_default_key))
