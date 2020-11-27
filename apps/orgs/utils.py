@@ -71,7 +71,9 @@ def construct_org_mapper():
     default_org = Organization.default()
     org_mapper.update({
         '': default_org,
-        Organization.DEFAULT_ID: default_org
+        Organization.DEFAULT_ID: default_org,
+        Organization.ROOT_ID: Organization.root(),
+        Organization.SYSTEM_ID: Organization.system()
     })
     return org_mapper
 
@@ -92,9 +94,11 @@ def get_org_name_by_id(org_id):
     org_id = str(org_id)
     org_mapper = get_org_mapper()
     org = org_mapper.get(org_id)
-    if not org:
-        org = Organization.objects.filter(id=org_id).first()
-    return org.name
+    if org:
+        org_name = org.name
+    else:
+        org_name = 'Not Found'
+    return org_name
 
 
 def get_current_org_id_for_serializer():
