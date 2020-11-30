@@ -305,7 +305,7 @@ class SomeNodesMixin:
 
     @classmethod
     def modify_old_default_node_key_if_need(cls):
-        # 将修改原来Default节点的key从0修改为1
+        """ 将修改原来Default节点的key从0修改为1 """
         # 1.4.3 版本中Default节点的key为0
         old_default_key = '0'
         old_default_node = cls.objects.filter(key=old_default_key).first()
@@ -330,14 +330,13 @@ class SomeNodesMixin:
         all_children = old_default_node.get_all_children()
         for child in all_children:
             old_key = child.key
-            key_list = old_key.split(':')
+            key_list = old_key.split(':', maxsplit=1)
             key_list[0] = new_default_key
             new_key = ':'.join(key_list)
             child.key = new_key
-            # child.save()
+            # 考虑到还有parent_key设置，所以选择单个save
+            child.save()
             logger.info('Set key ( {} > {} )'.format(old_key, new_key))
-        cls.objects.bulk_update(all_children, ['key'])
-        logger.info('Bulk modify key')
 
         old_default_node.key = new_default_key
         old_default_node.save()
@@ -346,7 +345,6 @@ class SomeNodesMixin:
     @classmethod
     def default_node(cls):
         with tmp_to_org(Organization.default()):
-            cls.modify_old_default_node_key_if_need()
             defaults = {'value': cls.default_value}
             try:
                 obj, created = cls.objects.get_or_create(
@@ -404,6 +402,7 @@ class SomeNodesMixin:
 
     @classmethod
     def initial_some_nodes(cls):
+        cls.modify_old_default_node_key_if_need()
         cls.default_node()
 
     @classmethod
