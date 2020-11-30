@@ -3,6 +3,7 @@
 import uuid
 import re
 
+from common.utils import timeit
 from django.db import models, transaction
 from django.db.models import Q
 from django.db.utils import IntegrityError
@@ -304,6 +305,7 @@ class SomeNodesMixin:
     empty_value = _("empty")
 
     @classmethod
+    @timeit
     def modify_old_default_node_key_if_need(cls):
         """ 将修改原来Default节点的key从0修改为1 """
         # 1.4.3 版本中Default节点的key为0
@@ -327,20 +329,17 @@ class SomeNodesMixin:
 
         # 修改key为0的Default节点及其子节点的key为1
         logger.info(f'Modify old default node key from `{old_default_key}` to `{new_default_key}`')
-        all_children = old_default_node.get_all_children()
+        all_children = list(old_default_node.get_all_children())
+        all_children.append(old_default_node)
         for child in all_children:
             old_key = child.key
             key_list = old_key.split(':', maxsplit=1)
             key_list[0] = new_default_key
             new_key = ':'.join(key_list)
             child.key = new_key
-            # 考虑到还有parent_key设置，所以选择单个save
-            child.save()
-            logger.info('Set key ( {} > {} )'.format(old_key, new_key))
-
-        old_default_node.key = new_default_key
-        old_default_node.save()
-        logger.info('Modify key ( {} > {} )'.format(old_default_key, new_default_key))
+            child.parent_key = child.compute_parent_key()
+        cls.objects.bulk_update(all_children, ['key', 'parent_key'])
+        logger.info('Bulk update key and parent_key')
 
     @classmethod
     def default_node(cls):
@@ -534,7 +533,7 @@ class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
         for node in nodes_sorted:
             parent = nodes_mapper.get(node.parent_key)
             if not parent:
-                logger.error(f'Node parent node in mapper: {node.parent_key} {node.value}')
+                # logger.error(f'Node parent node in mapper: {node.parent_key} {node.value}')
                 continue
             node.full_value = parent.full_value + '/' + node.value
         self.__class__.objects.bulk_update(nodes, ['full_value'])
