@@ -1,7 +1,10 @@
+import time
+
 from django.db import models
+import psutil
+from django.utils import timezone
 
 from django.utils.translation import ugettext_lazy as _
-from django.utils import timezone
 
 
 class Stat(models.Model):
@@ -12,9 +15,9 @@ class Stat(models.Model):
         omnidb = 'omnidb', 'OmniDB'
 
     class Keys(models.TextChoices):
-        cpu = 'cpu', 'CPU'
-        memory = 'memory', _('Memory')
-        disk = 'disk', _('Disk')
+        cpu_load_1 = 'cpu_load', 'CPU load'
+        memory_used_percent = 'memory_used_percent', _('Memory used percent')
+        disk_used_percent = 'disk_used_percent', _('Disk used percent')
         session_active = 'session_active', _('Session active')
         session_processed = 'session_processed', _('Session processed')
 
@@ -28,39 +31,38 @@ class Stat(models.Model):
     def __str__(self):
         return f'{self.key}:{self.value}'
 
+    @staticmethod
+    def collect_local_stats():
+        memory_percent = psutil.virtual_memory().percent
+        cpu_load = psutil.getloadavg()
+        cpu_load_1 = round(cpu_load[0], 2)
+        cpu_load_5 = round(cpu_load[1], 2)
+        cpu_load_15 = round(cpu_load[2], 2)
+        cpu_percent = psutil.cpu_percent()
+        stats = dict(
+            memory_percent=memory_percent,
+            cpu_load_1=cpu_load_1,
+            cpu_load_5=cpu_load_5,
+            cpu_load_15=cpu_load_15,
+            cpu_load=cpu_load_1,
+            cpu_percent=cpu_percent
+        )
+        return stats
+
     @classmethod
-    def generate_fake(cls):
-        nodes = [
-            {
-                'node': 'guacamole-01',
-                'ip': '192.168.1.1',
-                'component': 'guacamole'
-            },
-            {
-                'node': 'koko-01',
-                'ip': '192.168.1.2',
-                'component': 'koko'
-            },
-            {
-                'node': 'omnidb-01',
-                'ip': '192.168.1.3',
-                'component': 'omnidb'
-            },
-            {
-                'node': 'core-01',
-                'ip': '192.168.1.4',
-                'component': 'core'
-            }
-        ]
-        items_system_type = ['cpu', 'memory', 'disk']
-        items_process_type = ['thread', 'goroutine', 'replay_upload_health', 'command_upload_health']
-        items_session_type = ['session_active', 'session_processed', 'session_failed', 'session_succeeded']
-        items = [
-            {
-                'node': 'guacamole-01',
-                'ip': '192.168.1.1',
-                'key': 'cpu',
-                'value': 1.1,
-                'datetime': timezone
-            }
-        ]
+    def keep_collect_local_stats(cls):
+        data = {
+            'node': 'core-01',
+            'ip': '192.168.1.1',
+            'component': 'core'
+        }
+        while True:
+            stats = cls.collect_local_stats()
+            data['datetime'] = timezone.now()
+            items = []
+            for k, v in stats.items():
+                data['key'] = k
+                data['value'] = v
+                items.append(cls(**data))
+            cls.objects.bulk_create(items, ignore_conflicts=True)
+            time.sleep(60)
