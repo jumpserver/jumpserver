@@ -26,8 +26,8 @@ RUN yum -y install epel-release && \
 RUN yum -y install $(cat requirements/rpm_requirements.txt)
 RUN pip install --upgrade pip==20.2.4 setuptools==49.6.0 wheel -i ${PIP_MIRROR} && \
     pip config set global.index-url ${PIP_MIRROR}
-RUN pip install $(grep 'jms' requirements/requirements.txt) -i ${PIP_JMS_MIRROR}
-RUN pip install -r requirements/requirements.txt
+RUN pip install --no-cache-dir $(grep 'jms' requirements/requirements.txt) -i ${PIP_JMS_MIRROR}
+RUN pip install --no-cache-dir -r requirements/requirements.txt
 
 COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/jumpserver
 RUN mkdir -p /root/.ssh/ && echo -e "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null" > /root/.ssh/config
