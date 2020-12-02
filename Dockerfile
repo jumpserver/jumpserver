@@ -24,7 +24,7 @@ RUN wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Cen
 RUN yum -y install epel-release && \
       echo -e "[mysql]\nname=mysql\nbaseurl=${MYSQL_MIRROR}\ngpgcheck=0\nenabled=1" > /etc/yum.repos.d/mysql.repo
 RUN yum -y install $(cat requirements/rpm_requirements.txt)
-RUN pip install --upgrade pip==20.2.4 setuptools==49.6.0 wheel -i ${PIP_MIRROR} && \
+RUN pip install --upgrade pip==20.2.4 setuptools==49.6.0 wheel==0.34.2 -i ${PIP_MIRROR} && \
     pip config set global.index-url ${PIP_MIRROR}
 RUN pip install --no-cache-dir $(grep 'jms' requirements/requirements.txt) -i ${PIP_JMS_MIRROR}
 RUN pip install --no-cache-dir -r requirements/requirements.txt
