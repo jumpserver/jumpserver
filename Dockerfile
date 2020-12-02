@@ -24,10 +24,10 @@ RUN wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Cen
 RUN yum -y install epel-release && \
       echo -e "[mysql]\nname=mysql\nbaseurl=${MYSQL_MIRROR}\ngpgcheck=0\nenabled=1" > /etc/yum.repos.d/mysql.repo
 RUN yum -y install $(cat requirements/rpm_requirements.txt)
-RUN pip install --upgrade pip setuptools==49.6.0 wheel -i ${PIP_MIRROR} && \
+RUN pip install --upgrade pip==20.2.4 setuptools==49.6.0 wheel -i ${PIP_MIRROR} && \
     pip config set global.index-url ${PIP_MIRROR}
-RUN pip install $(grep 'jms' requirements/requirements.txt) -i ${PIP_JMS_MIRROR}
-RUN pip install -r requirements/requirements.txt
+RUN pip install --no-cache-dir $(grep 'jms' requirements/requirements.txt) -i ${PIP_JMS_MIRROR}
+RUN pip install --no-cache-dir -r requirements/requirements.txt
 
 COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/jumpserver
 RUN mkdir -p /root/.ssh/ && echo -e "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null" > /root/.ssh/config
