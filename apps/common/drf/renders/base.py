@@ -8,7 +8,7 @@ from common.utils import get_logger
 logger = get_logger(__file__)
 
 
-class JMSBaseRenderer(BaseRenderer):
+class BaseFileRenderer(BaseRenderer):
     # 渲染模版标识, 导入、导出、更新模版: ['import', 'update', 'export']
     template = 'export'
     serializer = None

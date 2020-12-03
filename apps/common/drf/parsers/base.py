@@ -10,24 +10,24 @@ from common.utils import get_logger
 logger = get_logger(__file__)
 
 
-class CsvDataTooBig(APIException):
+class FileContentOverflowedException(APIException):
     status_code = status.HTTP_400_BAD_REQUEST
-    default_code = 'csv_data_too_big'
-    default_detail = _('The max size of CSV is %d bytes')
+    default_code = 'file_content_overflowed'
+    default_detail = _('The file content overflowed (The maximum length `{}` bytes)')
 
 
-class JMSBaseParser(BaseParser):
+class BaseFileParser(BaseParser):
 
-    CSV_UPLOAD_MAX_SIZE = 1024 * 1024 * 10
+    FILE_CONTENT_MAX_LENGTH = 1024 * 1024 * 10
 
     serializer_cls = None
 
     def check_content_length(self, meta):
         content_length = int(meta.get('CONTENT_LENGTH', meta.get('HTTP_CONTENT_LENGTH', 0)))
-        if content_length > self.CSV_UPLOAD_MAX_SIZE:
-            msg = CsvDataTooBig.default_detail % self.CSV_UPLOAD_MAX_SIZE
+        if content_length > self.FILE_CONTENT_MAX_LENGTH:
+            msg = FileContentOverflowedException.default_detail.format(self.FILE_CONTENT_MAX_LENGTH)
             logger.error(msg)
-            raise CsvDataTooBig(msg)
+            raise FileContentOverflowedException(msg)
 
     @staticmethod
     def get_stream_data(stream):
@@ -54,7 +54,7 @@ class JMSBaseParser(BaseParser):
         return field_names
 
     @staticmethod
-    def _replace_chinese_quot(str_):
+    def _replace_chinese_quote(s):
         trans_table = str.maketrans({
             '“': '"',
             '”': '"',
@@ -62,38 +62,37 @@ class JMSBaseParser(BaseParser):
             '’': '"',
             '\'': '"'
         })
-        return str_.translate(trans_table)
+        return s.translate(trans_table)
 
     @classmethod
     def process_row(cls, row):
         """
         构建json数据前的行处理
         """
-        _row = []
-
+        new_row = []
         for col in row:
-            # 列表转换
-            if isinstance(col, str) and col.startswith('[') and col.endswith(']'):
-                col = cls._replace_chinese_quot(col)
+            # 转换中文引号
+            col = cls._replace_chinese_quote(col)
+            # 列表/字典转换
+            if isinstance(col, str) and (
+                    (col.startswith('[') and col.endswith(']'))
+                    or
+                    (col.startswith("{") and col.endswith("}"))
+            ):
                 col = json.loads(col)
-            # 字典转换
-            if isinstance(col, str) and col.startswith("{") and col.endswith("}"):
-                col = cls._replace_chinese_quot(col)
-                col = json.loads(col)
-            _row.append(col)
-        return _row
+            new_row.append(col)
+        return new_row
 
     @staticmethod
     def process_row_data(row_data):
         """
         构建json数据后的行数据处理
         """
-        _row_data = {}
+        new_row_data = {}
         for k, v in row_data.items():
-            if isinstance(v, list) or isinstance(v, dict)\
-                    or isinstance(v, str) and k.strip() and v.strip():
-                _row_data[k] = v
-        return _row_data
+            if isinstance(v, list) or isinstance(v, dict) or isinstance(v, str) and k.strip() and v.strip():
+                new_row_data[k] = v
+        return new_row_data
 
     def generate_data(self, fields_name, rows):
         data = []

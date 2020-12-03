@@ -5,10 +5,10 @@ import codecs
 import unicodecsv
 from six import BytesIO
 
-from .base import JMSBaseRenderer
+from .base import BaseFileRenderer
 
 
-class JMSCSVRenderer(JMSBaseRenderer):
+class CSVFileRenderer(BaseFileRenderer):
     media_type = 'text/csv'
     format = 'csv'
 

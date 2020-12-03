@@ -1,10 +1,10 @@
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
 
-from .base import JMSBaseRenderer
+from .base import BaseFileRenderer
 
 
-class JMSExcelRenderer(JMSBaseRenderer):
+class ExcelFileRenderer(BaseFileRenderer):
     media_type = "application/xlsx"
     format = "xlsx"
 

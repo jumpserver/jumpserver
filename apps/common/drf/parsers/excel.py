@@ -1,8 +1,8 @@
 import pyexcel
-from .base import JMSBaseParser
+from .base import BaseFileParser
 
 
-class JMSExcelParser(JMSBaseParser):
+class ExcelFileParser(BaseFileParser):
 
     media_type = 'text/xlsx'
 

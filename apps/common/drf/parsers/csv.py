@@ -4,10 +4,10 @@
 import chardet
 import unicodecsv
 
-from .base import JMSBaseParser
+from .base import BaseFileParser
 
 
-class JMSCSVParser(JMSBaseParser):
+class CSVFileParser(BaseFileParser):
 
     media_type = 'text/csv'
 
