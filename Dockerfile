@@ -25,7 +25,7 @@ RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
 RUN grep -v '^#' ./requirements/deb_buster_requirements.txt | xargs apt -y install
 
 COPY ./requirements/requirements.txt ./requirements/requirements.txt
-RUN pip install --upgrade pip==20.2.4 setuptools==49.6.0 wheel -i ${PIP_MIRROR} \
+RUN pip install --upgrade pip==20.2.4 setuptools==49.6.0 wheel==0.34.2 -i ${PIP_MIRROR} \
     && pip config set global.index-url ${PIP_MIRROR} \
     && pip install --no-cache-dir $(grep 'jms' requirements/requirements.txt) -i ${PIP_JMS_MIRROR} \
     && pip install --no-cache-dir -r requirements/requirements.txt

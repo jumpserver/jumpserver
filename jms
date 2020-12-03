@@ -85,7 +85,18 @@ def check_database_connection():
     sys.exit(10)
 
 
-def make_migrations():
+def check_migrations():
+    apps_dir = os.path.join(BASE_DIR, 'apps')
+    code = subprocess.call("python manage.py showmigrations | grep '\[.\]' | grep -v '\[X\]'", shell=True, cwd=apps_dir)
+
+    if code == 1:
+        return
+    for i in range(3):
+        print("!!! Warning: Has SQL migrations not perform, 有 SQL 变更没有执行")
+        print("You should run ./PROC upgrade first, 请先运行 ./PROC upgrade, 进行表结构变更")
+
+
+def perform_db_migrate():
     logging.info("Check database structure change ...")
     os.chdir(os.path.join(BASE_DIR, 'apps'))
     logging.info("Migrate model change to database ...")
@@ -102,8 +113,7 @@ def collect_static():
 
 def prepare():
     check_database_connection()
-    make_migrations()
-    collect_static()
+    check_migrations()
 
 
 def check_pid(pid):
@@ -512,6 +522,11 @@ def show_service_status(s):
             print("{} is stopped".format(ns))
 
 
+def upgrade():
+    collect_static()
+    perform_db_migrate()
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description="""
@@ -524,7 +539,7 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         'action', type=str,
-        choices=("start", "stop", "restart", "status"),
+        choices=("start", "stop", "restart", "status", "upgrade"),
         help="Action to run"
     )
     parser.add_argument(
@@ -559,5 +574,7 @@ if __name__ == '__main__':
         stop_service(srv)
         time.sleep(5)
         start_services_and_watch(srv)
+    elif action == "upgrade":
+        upgrade()
     else:
         show_service_status(srv)
