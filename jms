@@ -96,7 +96,7 @@ def check_migrations():
         print("You should run ./PROC upgrade first, 请先运行 ./PROC upgrade, 进行表结构变更")
 
 
-def make_migrations():
+def perform_db_migrate():
     logging.info("Check database structure change ...")
     os.chdir(os.path.join(BASE_DIR, 'apps'))
     logging.info("Migrate model change to database ...")
@@ -524,7 +524,7 @@ def show_service_status(s):
 
 def upgrade():
     collect_static()
-    make_migrations()
+    perform_db_migrate()
 
 
 if __name__ == '__main__':
