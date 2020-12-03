@@ -41,7 +41,7 @@ def timesince(dt, since='', default="just now"):
     3 days, 5 hours.
     """
 
-    if since is '':
+    if not since:
         since = datetime.datetime.utcnow()
 
     if since is None:
