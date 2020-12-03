@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from common.utils import get_logger
 from ..utils import (
     set_current_org, get_current_org, current_org,
-    filter_org_queryset
+    filter_org_queryset, get_org_name_by_id
 )
 from ..models import Organization
 
@@ -76,7 +76,7 @@ class OrgModelMixin(models.Model):
 
     @property
     def org_name(self):
-        return self.org.name
+        return get_org_name_by_id(self.org_id)
 
     @property
     def fullname(self, attr=None):
