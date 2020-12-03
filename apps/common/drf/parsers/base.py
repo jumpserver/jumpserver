@@ -10,7 +10,7 @@ from common.utils import get_logger
 logger = get_logger(__file__)
 
 
-class FileContentOverflowedException(APIException):
+class FileContentOverflowedError(APIException):
     status_code = status.HTTP_400_BAD_REQUEST
     default_code = 'file_content_overflowed'
     default_detail = _('The file content overflowed (The maximum length `{}` bytes)')
@@ -25,9 +25,9 @@ class BaseFileParser(BaseParser):
     def check_content_length(self, meta):
         content_length = int(meta.get('CONTENT_LENGTH', meta.get('HTTP_CONTENT_LENGTH', 0)))
         if content_length > self.FILE_CONTENT_MAX_LENGTH:
-            msg = FileContentOverflowedException.default_detail.format(self.FILE_CONTENT_MAX_LENGTH)
+            msg = FileContentOverflowedError.default_detail.format(self.FILE_CONTENT_MAX_LENGTH)
             logger.error(msg)
-            raise FileContentOverflowedException(msg)
+            raise FileContentOverflowedError(msg)
 
     @staticmethod
     def get_stream_data(stream):
