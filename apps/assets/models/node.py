@@ -354,7 +354,8 @@ class SomeNodesMixin:
     def org_root(cls):
         root = cls.objects.filter(parent_key='')\
             .filter(key__regex=r'^[0-9]+$')\
-            .exclude(key__startswith='-')
+            .exclude(key__startswith='-')\
+            .order_by('key')
         if root:
             return root[0]
         else:
@@ -411,7 +412,7 @@ class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
 
     class Meta:
         verbose_name = _("Node")
-        ordering = ['value']
+        ordering = ['parent_key', 'value']
 
     def __str__(self):
         return self.full_value
