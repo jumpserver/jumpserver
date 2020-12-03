@@ -38,14 +38,14 @@ def migrate_default_node_key(apps, schema_editor):
         if all_assets:
             print(f'Check new default node has assets (count: {len(all_assets)})')
             return
-        all_children = Node.objects.filter(Q(key__startswith=f'{new_default_node_key}:'))
+        all_children = Node.objects.filter(key__startswith=f'{new_default_node_key}:')
         if all_children:
             print(f'Check new default node has children nodes (count: {len(all_children)})')
             return
         print(f'Check new default node not has assets and children nodes, delete it.')
         new_default_node.delete()
     # 执行修改
-    print(f'Modify old default node key from `{old_default_node_key}` to `{new_default_node_key}`')
+    print(f'Modify old default node `key` from `{old_default_node_key}` to `{new_default_node_key}`')
     nodes = Node.objects.filter(
         Q(key__istartswith=f'{old_default_node_key}:') | Q(key=old_default_node_key)
     )
@@ -57,8 +57,8 @@ def migrate_default_node_key(apps, schema_editor):
         node.key = new_key
         node.parent_key = compute_parent_key(node.key)
     # 批量更新
+    print(f'Bulk update nodes `key` and `parent_key`, (count: {len(nodes)})')
     Node.objects.bulk_update(nodes, ['key', 'parent_key'])
-    print('Bulk update key and parent_key')
 
 
 class Migration(migrations.Migration):
