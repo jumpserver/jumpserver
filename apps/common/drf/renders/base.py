@@ -56,7 +56,8 @@ class BaseFileRenderer(BaseRenderer):
             results = [results]
 
         if self.template == 'import':
-            results = [results[0] if results else results]
+            results = [results[0]] if results else results
+
         else:
             # 限制数据数量
             results = results[:10000]
