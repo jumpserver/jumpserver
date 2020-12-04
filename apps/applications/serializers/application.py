@@ -27,6 +27,7 @@ class ApplicationSerializer(BulkOrgResourceModelSerializer):
         ]
 
     def create(self, validated_data):
+        validated_data['attrs'] = validated_data.pop('attrs', {})
         instance = super().create(validated_data)
         return instance
 
