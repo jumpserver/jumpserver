@@ -1,6 +1,10 @@
 # common
 gcc
 cmake
+curl
+wget
+vim
+locales
 
 # mysql-client
 default-libmysqlclient-dev
