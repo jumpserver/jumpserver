@@ -81,7 +81,7 @@ def check_database_connection():
             logging.info("Database connect success")
             return
         time.sleep(1)
-    logging.info("Connection database failed, exist")
+    logging.error("Connection database failed, exist")
     sys.exit(10)
 
 
@@ -93,7 +93,8 @@ def check_migrations():
         return
     for i in range(3):
         print("!!! Warning: Has SQL migrations not perform, 有 SQL 变更没有执行")
-        print("You should run ./PROC upgrade first, 请先运行 ./PROC upgrade, 进行表结构变更")
+        print("You should run `./PROC upgrade_db` first, 请先运行 ./PROC upgrade_db, 进行表结构变更")
+    sys.exit(1)
 
 
 def perform_db_migrate():
@@ -522,7 +523,7 @@ def show_service_status(s):
             print("{} is stopped".format(ns))
 
 
-def upgrade():
+def upgrade_db():
     collect_static()
     perform_db_migrate()
 
@@ -539,7 +540,7 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         'action', type=str,
-        choices=("start", "stop", "restart", "status", "upgrade"),
+        choices=("start", "stop", "restart", "status", "upgrade_db"),
         help="Action to run"
     )
     parser.add_argument(
@@ -574,7 +575,7 @@ if __name__ == '__main__':
         stop_service(srv)
         time.sleep(5)
         start_services_and_watch(srv)
-    elif action == "upgrade":
-        upgrade()
+    elif action == "upgrade_db":
+        upgrade_db()
     else:
         show_service_status(srv)
