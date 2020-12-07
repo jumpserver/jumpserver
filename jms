@@ -91,10 +91,10 @@ def check_migrations():
 
     if code == 1:
         return
-    for i in range(3):
-        print("!!! Warning: Has SQL migrations not perform, 有 SQL 变更没有执行")
-        print("You should run `./PROC upgrade_db` first, 请先运行 ./PROC upgrade_db, 进行表结构变更")
-    sys.exit(1)
+    # for i in range(3):
+    #     print("!!! Warning: Has SQL migrations not perform, 有 SQL 变更没有执行")
+    #     print("You should run `./PROC upgrade_db` first, 请先运行 ./PROC upgrade_db, 进行表结构变更")
+    # sys.exit(1)
 
 
 def perform_db_migrate():
@@ -115,6 +115,7 @@ def collect_static():
 def prepare():
     check_database_connection()
     check_migrations()
+    upgrade_db()
 
 
 def check_pid(pid):
