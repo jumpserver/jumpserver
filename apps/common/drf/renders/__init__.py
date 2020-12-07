@@ -1,6 +1,7 @@
 from rest_framework import renderers
 
 from .csv import *
+from .excel import *
 
 
 class PassthroughRenderer(renderers.BaseRenderer):
