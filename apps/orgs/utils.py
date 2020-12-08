@@ -90,10 +90,15 @@ def get_org_mapper():
     return org_mapper
 
 
-def get_org_name_by_id(org_id):
+def get_org_by_id(org_id):
     org_id = str(org_id)
     org_mapper = get_org_mapper()
     org = org_mapper.get(org_id)
+    return org
+
+
+def get_org_name_by_id(org_id):
+    org = get_org_by_id(org_id)
     if org:
         org_name = org.name
     else:
