@@ -11,7 +11,7 @@ __all__ = ['StatViewSet']
 
 class StatViewSet(JMSBulkModelViewSet):
     queryset = Stat.objects.all()
-    filter_fields = ('id', 'key', 'value', 'component')
+    filter_fields = ('id', 'node', 'ip', 'key', 'value', 'component')
     search_fields = filter_fields
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.StatSerializer
