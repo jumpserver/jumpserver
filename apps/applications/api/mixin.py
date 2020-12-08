@@ -88,6 +88,9 @@ class SerializeApplicationToTreeNodeMixin:
     def _serialize(self, application):
         method_name = f'_serialize_{application.category}'
         data = getattr(self, method_name)(application)
+        data.update({
+            'org_name': application.org_name
+        })
         return data
 
     def serialize_applications(self, applications):
