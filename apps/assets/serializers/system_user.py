@@ -257,4 +257,8 @@ class SystemUserTaskSerializer(serializers.Serializer):
     asset = serializers.PrimaryKeyRelatedField(
         queryset=Asset.objects, allow_null=True, required=False, write_only=True
     )
+    assets = serializers.PrimaryKeyRelatedField(
+        queryset=Asset.objects, allow_null=True, required=False, write_only=True,
+        many=True
+    )
     task = serializers.CharField(read_only=True)
