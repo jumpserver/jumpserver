@@ -38,8 +38,7 @@ RUN echo > config.yml
 VOLUME /opt/jumpserver/data
 VOLUME /opt/jumpserver/logs
 
-ENV LANG=zh_CN.UTF-8
-ENV LC_ALL=zh_CN.UTF-8
+ENV LANG=en_US.UTF-8
 
 EXPOSE 8070
 EXPOSE 8080
