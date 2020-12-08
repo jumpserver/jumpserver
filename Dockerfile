@@ -21,8 +21,10 @@ WORKDIR /opt/jumpserver
 COPY ./requirements/deb_buster_requirements.txt ./requirements/deb_buster_requirements.txt
 RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
     && sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
-    && apt update
-RUN grep -v '^#' ./requirements/deb_buster_requirements.txt | xargs apt -y install
+    && apt update \
+    && grep -v '^#' ./requirements/deb_buster_requirements.txt | xargs apt -y install \
+    && localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8 \
+    && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 COPY ./requirements/requirements.txt ./requirements/requirements.txt
 RUN pip install --upgrade pip==20.2.4 setuptools==49.6.0 wheel==0.34.2 -i ${PIP_MIRROR} \
@@ -39,7 +41,6 @@ VOLUME /opt/jumpserver/data
 VOLUME /opt/jumpserver/logs
 
 ENV LANG=zh_CN.UTF-8
-ENV LC_ALL=zh_CN.UTF-8
 
 EXPOSE 8070
 EXPOSE 8080
