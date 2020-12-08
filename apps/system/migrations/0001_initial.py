@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
                 ('node', models.CharField(max_length=128)),
                 ('ip', models.GenericIPAddressField()),
                 ('component', models.CharField(choices=[('core', 'Core'), ('koko', 'KoKo'), ('guacamole', 'Guacamole'), ('omnidb', 'OmniDB')], max_length=16)),
-                ('key', models.CharField(db_index=True, max_length=16, verbose_name='Item key')),
+                ('key', models.CharField(db_index=True, max_length=64, verbose_name='Item key')),
                 ('value', models.FloatField()),
                 ('datetime', models.DateTimeField()),
             ],

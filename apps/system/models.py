@@ -24,7 +24,7 @@ class Stat(models.Model):
     node = models.CharField(max_length=128)
     ip = models.GenericIPAddressField()
     component = models.CharField(choices=Components.choices, max_length=16)
-    key = models.CharField(db_index=True, max_length=16, verbose_name=_('Item key'))
+    key = models.CharField(db_index=True, max_length=64, verbose_name=_('Item key'))
     value = models.FloatField()
     datetime = models.DateTimeField()
 
