@@ -13,7 +13,7 @@ from rest_framework.permissions import AllowAny
 from common.drf.api import JMSBulkModelViewSet
 from common.utils import get_object_or_none
 from common.permissions import IsAppUser, IsOrgAdminOrAppUser, IsSuperUser
-from ..models import Terminal, Status, Session
+from ..models import Terminal, Session
 from .. import serializers
 from .. import exceptions
 
@@ -96,12 +96,15 @@ class TerminalTokenApi(APIView):
         return Response(data, status=200)
 
 
-class StatusViewSet(viewsets.ModelViewSet):
-    queryset = Status.objects.all()
+class StatusViewSet(viewsets.GenericViewSet):
     serializer_class = serializers.StatusSerializer
     permission_classes = (IsOrgAdminOrAppUser,)
-    session_serializer_class = serializers.SessionSerializer
     task_serializer_class = serializers.TaskSerializer
+
+    def get_permissions(self):
+        if self.action == "create":
+            self.permission_classes = (IsAppUser,)
+        return super().get_permissions()
 
     def create(self, request, *args, **kwargs):
         self.handle_status(request)
@@ -121,22 +124,6 @@ class StatusViewSet(viewsets.ModelViewSet):
             sessions_id = sessions_id[1:-1].split(',')
             sessions_id = [sid.strip() for sid in sessions_id if sid.strip()]
         Session.set_sessions_active(sessions_id)
-
-    def get_queryset(self):
-        terminal_id = self.kwargs.get("terminal", None)
-        if terminal_id:
-            terminal = get_object_or_404(Terminal, id=terminal_id)
-            self.queryset = terminal.status_set.all()
-        return self.queryset
-
-    def perform_create(self, serializer):
-        serializer.validated_data["terminal"] = self.request.user.terminal
-        return super().perform_create(serializer)
-
-    def get_permissions(self):
-        if self.action == "create":
-            self.permission_classes = (IsAppUser,)
-        return super().get_permissions()
 
 
 class TerminalConfig(APIView):

@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from common.drf.serializers import BulkModelSerializer, AdaptedBulkListSerializer
 from common.utils import is_uuid
 from ..models import (
-    Terminal, Status, Session, Task, CommandStorage, ReplayStorage
+    Terminal, Session, Task, CommandStorage, ReplayStorage
 )
 
 
@@ -51,9 +51,7 @@ class TerminalSerializer(BulkModelSerializer):
 
 
 class StatusSerializer(serializers.ModelSerializer):
-    class Meta:
-        fields = ['id', 'terminal']
-        model = Status
+    pass
 
 
 class TaskSerializer(BulkModelSerializer):

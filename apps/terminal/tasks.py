@@ -14,7 +14,7 @@ from common.utils import get_log_keep_day
 from ops.celery.decorator import (
     register_as_period_task, after_app_ready_start, after_app_shutdown_clean_periodic
 )
-from .models import Status, Session, Command
+from .models import Session, Command
 from .backends import server_replay_storage
 from .utils import find_session_replay_local
 
@@ -22,15 +22,6 @@ from .utils import find_session_replay_local
 CACHE_REFRESH_INTERVAL = 10
 RUNNING = False
 logger = get_task_logger(__name__)
-
-
-@shared_task
-@register_as_period_task(interval=3600)
-@after_app_ready_start
-@after_app_shutdown_clean_periodic
-def delete_terminal_status_period():
-    yesterday = timezone.now() - datetime.timedelta(days=1)
-    Status.objects.filter(date_created__lt=yesterday).delete()
 
 
 @shared_task
