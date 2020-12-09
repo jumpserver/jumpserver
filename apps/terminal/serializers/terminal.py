@@ -1,15 +1,15 @@
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
+from django.db.models import TextChoices
 
 from common.drf.serializers import BulkModelSerializer, AdaptedBulkListSerializer
-from common.drf.fields import CharPrimaryKeyRelatedField
 from common.utils import is_uuid
 from ..models import (
     Terminal, Session, Task, CommandStorage, ReplayStorage
 )
 
 
-class StatusSerializer(serializers.Serializer):
+class StateSerializer(serializers.Serializer):
     # system
     system_cpu_load_1 = serializers.FloatField(
         required=True, label=_("System cpu load 1 minutes")
@@ -36,12 +36,16 @@ class StatusSerializer(serializers.Serializer):
     session_count_succeeded = serializers.IntegerField(
         required=True, label=_('Session succeeded count')
     )
+    # status
+    status = serializers.CharField(read_only=True)
+    status_display = serializers.CharField(read_only=True)
 
 
 class TerminalSerializer(BulkModelSerializer):
     session_online = serializers.SerializerMethodField()
     is_alive = serializers.BooleanField(read_only=True)
-    status = StatusSerializer(read_only=True)
+    status = serializers.CharField(read_only=True, label=_("Status"))
+    state = StateSerializer(read_only=True)
 
     class Meta:
         model = Terminal
@@ -49,7 +53,7 @@ class TerminalSerializer(BulkModelSerializer):
             'id', 'name', 'remote_addr', 'http_port', 'ssh_port',
             'comment', 'is_accepted', "is_active", 'session_online',
             'date_created', 'command_storage', 'replay_storage',
-            'is_alive', 'status'
+            'is_alive', 'status', 'state'
         ]
 
     @staticmethod

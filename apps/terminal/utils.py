@@ -4,6 +4,7 @@ import os
 import uuid
 
 from django.core.cache import cache
+from django.db.models import TextChoices
 from django.conf import settings
 from django.core.files.storage import default_storage
 from django.utils.translation import ugettext as _
@@ -105,9 +106,14 @@ def send_command_alert_mail(command):
     send_mail_async.delay(subject, message, recipient_list, html_message=message)
 
 
-class TerminalStatusUtil(object):
+class TerminalStateUtil(object):
 
-    CACHE_KEY_DATA = "CACHE_KEY_TERMINAL_STATUS_DATA_{}"
+    class StatusChoices(TextChoices):
+        abnormal = 'abnormal', _('Abnormal')
+        busy = 'busy', _('Busy')
+        normal = 'normal', _('Normal')
+
+    CACHE_KEY_DATA = "CACHE_KEY_TERMINAL_STATE_DATA_{}"
     CACHE_TIMEOUT = 60
 
     def __init__(self, terminals_id):
@@ -125,8 +131,54 @@ class TerminalStatusUtil(object):
             sessions_id = [sid.strip() for sid in sessions_id if sid.strip()]
         Session.set_sessions_active(sessions_id)
 
+    # status
+    def _compute_system_status(self, value, thresholds):
+        if thresholds[0] <= value <= thresholds[1]:
+            return self.StatusChoices.normal.value
+        elif thresholds[1] < value <= thresholds[2]:
+            return self.StatusChoices.busy.value
+        else:
+            return self.StatusChoices.abnormal.value
+
+    def _compute_system_cpu_load_1_status(self, value):
+        thresholds = [0, 5, 20]
+        return self._compute_system_status(value, thresholds)
+
+    def _compute_system_memory_used_percent_status(self, value):
+        thresholds = [0, 85, 95]
+        return self._compute_system_status(value, thresholds)
+
+    def _compute_system_disk_used_percent_status(self, value):
+        thresholds = [0, 80, 99]
+        return self._compute_system_status(value, thresholds)
+
+    def compute_system_state_status(self, data):
+        state_status_value = []
+        compute_state_keys = [
+            'system_cpu_load_1', 'system_memory_used_percent', 'system_disk_used_percent'
+        ]
+        for state_key in compute_state_keys:
+            state_value = data[state_key]
+            method_name = f'_compute_{state_key}_status'
+            status_value = getattr(self, method_name)(state_value)
+            state_status_value.append(status_value)
+        return state_status_value
+
+    def compute_status(self, data):
+        state_status = self.compute_system_state_status(data)
+
+        for status_value, status_label in self.StatusChoices.choices:
+            if status_value in state_status:
+                return status_value
+
     # data
     def _set_data_to_cache(self, data):
+        status = self.compute_status(data)
+        status_display = getattr(self.StatusChoices, status).label
+        data.update({
+            'status': status,
+            'status_display': status_display
+        })
         many_data = {cache_key: data for cache_key in self.cache_keys}
         cache.set_many(many_data, self.CACHE_TIMEOUT)
 
@@ -134,7 +186,7 @@ class TerminalStatusUtil(object):
         return cache.get_many(self.cache_keys)
 
     def handle_data(self, data):
-        sessions = data.get('sessions_active', [])
+        sessions = data.pop('sessions_active', [])
         self._handle_active_sessions(sessions)
         self._set_data_to_cache(data)
 
@@ -146,7 +198,5 @@ class TerminalStatusUtil(object):
     def get_data(self):
         data = self.get_many_data()
         if len(data) > 0:
-            data = data[0]
-        else:
-            data = None
-        return data
+            return data[0]
+        return None

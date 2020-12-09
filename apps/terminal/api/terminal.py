@@ -16,10 +16,10 @@ from common.permissions import IsAppUser, IsOrgAdminOrAppUser, IsSuperUser
 from ..models import Terminal, Session
 from .. import serializers
 from .. import exceptions
-from ..utils import TerminalStatusUtil
+from ..utils import TerminalStateUtil
 
 __all__ = [
-    'TerminalViewSet', 'TerminalTokenApi', 'StatusViewSet', 'TerminalConfig',
+    'TerminalViewSet', 'TerminalTokenApi', 'StateViewSet', 'TerminalConfig',
 ]
 logger = logging.getLogger(__file__)
 
@@ -97,9 +97,9 @@ class TerminalTokenApi(APIView):
         return Response(data, status=200)
 
 
-class StatusViewSet(viewsets.GenericViewSet):
+class StateViewSet(viewsets.GenericViewSet):
     permission_classes = (IsSuperUser,)
-    serializer_class = serializers.StatusSerializer
+    serializer_class = serializers.StateSerializer
     task_serializer_class = serializers.TaskSerializer
 
     def get_permissions(self):
@@ -113,7 +113,7 @@ class StatusViewSet(viewsets.GenericViewSet):
 
     @staticmethod
     def initial_util(terminals_id):
-        return TerminalStatusUtil(terminals_id)
+        return TerminalStateUtil(terminals_id)
 
     def handle_data(self, data):
         util = self.initial_util(self.terminal.id)
@@ -139,7 +139,7 @@ class StatusViewSet(viewsets.GenericViewSet):
         if not terminals_id:
             return Response([], status=200)
         util = self.initial_util(list(terminals_id))
-        data = util.get_data()
+        data = util.get_many_data()
         return Response(data, status=200)
 
 

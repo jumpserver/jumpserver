@@ -19,6 +19,7 @@ from orgs.mixins.models import OrgModelMixin
 from common.mixins import CommonModelMixin
 from common.fields.model import EncryptJsonDictTextField
 from common.db.models import ChoiceSet
+from common.utils import lazyproperty
 from .backends import get_multi_command_storage
 from .backends.command.models import AbstractSessionCommand
 from . import const
@@ -45,16 +46,21 @@ class Terminal(models.Model):
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
     STATUS_KEY_PREFIX = 'terminal_status_'
 
-    @property
-    def status(self):
-        from .utils import TerminalStatusUtil
-        util = TerminalStatusUtil(terminals_id=self.id)
+    @lazyproperty
+    def state(self):
+        from .utils import TerminalStateUtil
+        util = TerminalStateUtil(terminals_id=self.id)
         data = util.get_data()
         return data
 
     @property
+    def status(self):
+        state = self.state or {}
+        return state.get('status_display')
+
+    @property
     def is_alive(self):
-        return bool(self.status)
+        return bool(self.state)
 
     @property
     def is_active(self):
