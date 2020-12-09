@@ -333,7 +333,7 @@ class LDAPImportUtil(object):
     def update_or_create(self, user):
         user['email'] = self.get_user_email(user)
         if user['username'] not in ['admin']:
-            user['source'] = User.SOURCE_LDAP
+            user['source'] = User.Source.ldap.value
         obj, created = User.objects.update_or_create(
             username=user['username'], defaults=user
         )

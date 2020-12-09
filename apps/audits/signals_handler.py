@@ -5,6 +5,8 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.db import transaction
 from django.utils import timezone
+from django.contrib.auth import BACKEND_SESSION_KEY
+from django.utils.translation import ugettext_lazy as _
 from rest_framework.renderers import JSONRenderer
 from rest_framework.request import Request
 
@@ -30,6 +32,19 @@ MODELS_NEED_RECORD = (
     'Platform', 'ChangeAuthPlan', 'GatherUserTask',
     'RemoteApp', 'RemoteAppPermission', 'DatabaseApp', 'DatabaseAppPermission',
 )
+
+
+LOGIN_BACKEND = {
+    'PublicKeyAuthBackend': _('SSH Key'),
+    'RadiusBackend': User.Source.radius.label,
+    'RadiusRealmBackend': User.Source.radius.label,
+    'LDAPAuthorizationBackend': User.Source.ldap.label,
+    'ModelBackend': _('Password'),
+    'SSOAuthentication': _('SSO'),
+    'CASBackend': User.Source.cas.label,
+    'OIDCAuthCodeBackend': User.Source.openid.label,
+    'OIDCAuthPasswordBackend': User.Source.openid.label,
+}
 
 
 def create_operate_log(action, sender, resource):
@@ -109,6 +124,12 @@ def on_audits_log_create(sender, instance=None, **kwargs):
     sys_logger.info(msg)
 
 
+def get_login_backend(request):
+    backend = request.session.get(BACKEND_SESSION_KEY, '')
+    backend = backend.rsplit('.', maxsplit=1)[-1]
+    return LOGIN_BACKEND.get(backend, '')
+
+
 def generate_data(username, request):
     user_agent = request.META.get('HTTP_USER_AGENT', '')
     login_ip = get_request_ip(request) or '0.0.0.0'
@@ -122,7 +143,8 @@ def generate_data(username, request):
         'ip': login_ip,
         'type': login_type,
         'user_agent': user_agent,
-        'datetime': timezone.now()
+        'datetime': timezone.now(),
+        'backend': get_login_backend(request)
     }
     return data
 

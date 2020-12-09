@@ -105,6 +105,7 @@ class UserLoginLog(models.Model):
     reason = models.CharField(default='', max_length=128, blank=True, verbose_name=_('Reason'))
     status = models.BooleanField(max_length=2, default=True, choices=STATUS_CHOICE, verbose_name=_('Status'))
     datetime = models.DateTimeField(default=timezone.now, verbose_name=_('Date login'))
+    backend = models.CharField(max_length=32, default='', verbose_name=_('Login backend'))
 
     @classmethod
     def get_login_logs(cls, date_from=None, date_to=None, user=None, keyword=None):

@@ -28,7 +28,7 @@ def on_user_create(sender, user=None, **kwargs):
 @receiver(cas_user_authenticated)
 def on_cas_user_authenticated(sender, user, created, **kwargs):
     if created:
-        user.source = user.SOURCE_CAS
+        user.source = user.Source.cas.value
         user.save()
 
 
@@ -37,7 +37,7 @@ def on_ldap_create_user(sender, user, ldap_user, **kwargs):
     if user and user.username not in ['admin']:
         exists = User.objects.filter(username=user.username).exists()
         if not exists:
-            user.source = user.SOURCE_LDAP
+            user.source = user.Source.ldap.value
             user.save()
 
 
@@ -46,9 +46,9 @@ def on_openid_create_or_update_user(sender, request, user, created, name, userna
     if created:
         logger.debug(
             "Receive OpenID user created signal: {}, "
-            "Set user source is: {}".format(user, User.SOURCE_OPENID)
+            "Set user source is: {}".format(user, User.Source.openid.value)
         )
-        user.source = User.SOURCE_OPENID
+        user.source = User.Source.openid.value
         user.save()
     elif not created and settings.AUTH_OPENID_ALWAYS_UPDATE_USER:
         logger.debug(
