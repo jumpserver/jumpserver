@@ -12,7 +12,8 @@ from .. import models
 class DBAttrsSerializer(serializers.Serializer):
     host = serializers.CharField(max_length=128, label=_('Host'))
     port = serializers.IntegerField(label=_('Port'))
-    database = serializers.CharField(max_length=128, required=True, label=_('Database'))
+    # 添加allow_null=True，兼容之前数据库中database字段为None的情况
+    database = serializers.CharField(max_length=128, required=True, allow_null=True, label=_('Database'))
 
 
 class MySQLAttrsSerializer(DBAttrsSerializer):
