@@ -362,18 +362,17 @@ def get_current_org_members(exclude=()):
 
 def get_source_choices():
     from .models import User
-    choices_all = dict(User.SOURCE_CHOICES)
     choices = [
-        (User.SOURCE_LOCAL, choices_all[User.SOURCE_LOCAL]),
+        (User.Source.local.value, User.Source.local.label),
     ]
     if settings.AUTH_LDAP:
-        choices.append((User.SOURCE_LDAP, choices_all[User.SOURCE_LDAP]))
+        choices.append((User.Source.ldap.value, User.Source.ldap.label))
     if settings.AUTH_OPENID:
-        choices.append((User.SOURCE_OPENID, choices_all[User.SOURCE_OPENID]))
+        choices.append((User.Source.openid.value, User.Source.openid.label))
     if settings.AUTH_RADIUS:
-        choices.append((User.SOURCE_RADIUS, choices_all[User.SOURCE_RADIUS]))
+        choices.append((User.Source.radius.value, User.Source.radius.label))
     if settings.AUTH_CAS:
-        choices.append((User.SOURCE_CAS, choices_all[User.SOURCE_CAS]))
+        choices.append((User.Source.cas.value, User.Source.cas.label))
     return choices
 
 

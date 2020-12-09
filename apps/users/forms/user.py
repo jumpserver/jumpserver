@@ -28,7 +28,7 @@ class UserCreateUpdateFormMixin(OrgModelForm):
     )
     source = forms.ChoiceField(
         choices=get_source_choices, required=True,
-        initial=User.SOURCE_LOCAL, label=_("Source")
+        initial=User.Source.local.value, label=_("Source")
     )
     public_key = forms.CharField(
         label=_('ssh public key'), max_length=5000, required=False,
