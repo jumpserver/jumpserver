@@ -6,6 +6,7 @@ import jms_storage
 
 from django.db import models
 from django.db.models.signals import post_save
+from django.db.models import TextChoices
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.conf import settings
@@ -24,11 +25,17 @@ from . import const
 
 
 class Terminal(models.Model):
+    class TypeChoices(TextChoices):
+        koko = 'koko', 'KoKo'
+        guacamole = 'guacamole', 'Guacamole'
+        omnidb = 'omnidb', 'OmniDB'
+
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     remote_addr = models.CharField(max_length=128, blank=True, verbose_name=_('Remote Address'))
     ssh_port = models.IntegerField(verbose_name=_('SSH Port'), default=2222)
     http_port = models.IntegerField(verbose_name=_('HTTP Port'), default=5000)
+    type = models.CharField(choices=TypeChoices.choices, max_length=64, verbose_name=_('Login type'))
     command_storage = models.CharField(max_length=128, verbose_name=_("Command storage"), default='default')
     replay_storage = models.CharField(max_length=128, verbose_name=_("Replay storage"), default='default')
     user = models.OneToOneField(User, related_name='terminal', verbose_name='Application User', null=True, on_delete=models.CASCADE)
@@ -39,10 +46,15 @@ class Terminal(models.Model):
     STATUS_KEY_PREFIX = 'terminal_status_'
 
     @property
-    def is_alive(self):
+    def status(self):
         from .utils import TerminalStatusUtil
-        util = TerminalStatusUtil(terminal_id=str(self.id))
-        return util.terminal_is_alive
+        util = TerminalStatusUtil(terminals_id=self.id)
+        data = util.get_data()
+        return data
+
+    @property
+    def is_alive(self):
+        return bool(self.status)
 
     @property
     def is_active(self):

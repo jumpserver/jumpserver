@@ -107,32 +107,39 @@ class StatusViewSet(viewsets.GenericViewSet):
             self.permission_classes = (IsAppUser,)
         return super().get_permissions()
 
-    @staticmethod
-    def init_util(terminal_id=None):
-        return TerminalStatusUtil(terminal_id=terminal_id)
+    @property
+    def terminal(self):
+        return self.request.user.terminal
 
-    def handle_terminal_status_data(self, data):
-        terminal_id = data['terminal_id']
-        util = self.init_util(terminal_id)
+    @staticmethod
+    def initial_util(terminals_id):
+        return TerminalStatusUtil(terminals_id)
+
+    def handle_data(self, data):
+        util = self.initial_util(self.terminal.id)
         util.handle_data(data)
 
     def get_response(self):
-        tasks = self.request.user.terminal.task_set.filter(is_finished=False)
+        tasks = self.terminal.task_set.filter(is_finished=False)
         serializer = self.task_serializer_class(tasks, many=True)
         return Response(serializer.data, status=201)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        self.handle_terminal_status_data(serializer.data)
+        self.handle_data(serializer.data)
         response = self.get_response()
         return response
 
     def list(self, request, *args, **kwargs):
-        terminal_id = request.query_params.get('terminal_id')
         terminal_type = request.query_params.get('terminal_type')
-        util = self.init_util(terminal_id)
-        data = util.get_data(terminal_type)
+        if not terminal_type:
+            return Response([], status=200)
+        terminals_id = Terminal.objects.filter(type=terminal_type).values_list('id', flat=True)
+        if not terminals_id:
+            return Response([], status=200)
+        util = self.initial_util(list(terminals_id))
+        data = util.get_data()
         return Response(data, status=200)
 
 

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 import os
+import uuid
 
 from django.core.cache import cache
 from django.conf import settings
@@ -109,9 +110,10 @@ class TerminalStatusUtil(object):
     CACHE_KEY_DATA = "CACHE_KEY_TERMINAL_STATUS_DATA_{}"
     CACHE_TIMEOUT = 60
 
-    def __init__(self, terminal_id=None):
-        self.terminal_id = terminal_id or '*'
-        self.cache_key_data = self.CACHE_KEY_DATA.format(self.terminal_id)
+    def __init__(self, terminals_id):
+        if isinstance(terminals_id, (str, uuid.UUID)):
+            terminals_id = [str(terminals_id)]
+        self.cache_keys = [self.CACHE_KEY_DATA.format(tid) for tid in terminals_id]
 
     # sessions
     @staticmethod
@@ -123,35 +125,28 @@ class TerminalStatusUtil(object):
             sessions_id = [sid.strip() for sid in sessions_id if sid.strip()]
         Session.set_sessions_active(sessions_id)
 
+    # data
     def _set_data_to_cache(self, data):
-        cache.set(self.cache_key_data, data, self.CACHE_TIMEOUT)
+        many_data = {cache_key: data for cache_key in self.cache_keys}
+        cache.set_many(many_data, self.CACHE_TIMEOUT)
 
     def _get_many_data_from_cache(self):
-        keys = cache.keys(self.cache_key_data)
-        return cache.get_many(keys)
-
-    def _get_data(self):
-        data = self._get_many_data_from_cache()
-        data = list(data.values())
-        return data
+        return cache.get_many(self.cache_keys)
 
     def handle_data(self, data):
         sessions = data.get('sessions_active', [])
         self._handle_active_sessions(sessions)
         self._set_data_to_cache(data)
 
-    def filter_data(self, data, terminal_type=None):
-        if not terminal_type:
-            return data
-        filter_data = [d for d in data if d['terminal_type'] == terminal_type]
-        return filter_data
-
-    def get_data(self, terminal_type=None):
-        data = self._get_data()
-        data = self.filter_data(data, terminal_type)
+    def get_many_data(self):
+        data = self._get_many_data_from_cache()
+        data = list(data.values())
         return data
 
-    @property
-    def terminal_is_alive(self):
-        data = self._get_data()
-        return bool(data)
+    def get_data(self):
+        data = self.get_many_data()
+        if len(data) > 0:
+            data = data[0]
+        else:
+            data = None
+        return data

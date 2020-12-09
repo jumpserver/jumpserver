@@ -9,16 +9,47 @@ from ..models import (
 )
 
 
+class StatusSerializer(serializers.Serializer):
+    # system
+    system_cpu_load_1 = serializers.FloatField(
+        required=True, label=_("System cpu load 1 minutes")
+    )
+    system_memory_used_percent = serializers.FloatField(
+        required=True, label=_('System memory used percent')
+    )
+    system_disk_used_percent = serializers.FloatField(
+        required=True, label=_('System disk used percent')
+    )
+    # sessions
+    sessions_active = serializers.ListField(
+        required=False, label=_("Session active")
+    )
+    session_count_active = serializers.IntegerField(
+        required=True, label=_("Session active count")
+    )
+    session_count_processed = serializers.IntegerField(
+        required=True, label=_("Session processed count")
+    )
+    session_count_failed = serializers.IntegerField(
+        required=True, label=_('Session failed count')
+    )
+    session_count_succeeded = serializers.IntegerField(
+        required=True, label=_('Session succeeded count')
+    )
+
+
 class TerminalSerializer(BulkModelSerializer):
     session_online = serializers.SerializerMethodField()
     is_alive = serializers.BooleanField(read_only=True)
+    status = StatusSerializer(read_only=True)
 
     class Meta:
         model = Terminal
         fields = [
             'id', 'name', 'remote_addr', 'http_port', 'ssh_port',
             'comment', 'is_accepted', "is_active", 'session_online',
-            'is_alive', 'date_created', 'command_storage', 'replay_storage'
+            'date_created', 'command_storage', 'replay_storage',
+            'is_alive', 'status'
         ]
 
     @staticmethod
@@ -49,60 +80,6 @@ class TerminalSerializer(BulkModelSerializer):
     @staticmethod
     def get_session_online(obj):
         return Session.objects.filter(terminal=obj, is_finished=False).count()
-
-
-class StatusSerializer(serializers.Serializer):
-    # terminal
-    TERMINAL_TYPE_CHOICES = (
-        ('core', 'Core'),
-        ('koko', 'KoKo'),
-        ('guacamole', 'Guacamole'),
-        ('omnidb', 'OmniDB')
-    )
-    terminal_id = CharPrimaryKeyRelatedField(
-        queryset=Terminal.objects, required=True, label=_("Terminal ID")
-    )
-    terminal_name = serializers.CharField(
-        max_length=128, required=True, label=_("Terminal name")
-    )
-    terminal_type = serializers.ChoiceField(
-        required=True, choices=TERMINAL_TYPE_CHOICES
-    )
-    terminal_is_alive = serializers.BooleanField(
-        read_only=True, default=True, label=_("Alive")
-    )
-    # system
-    system_cpu_load_1 = serializers.FloatField(
-        required=True, label=_("System cpu load 1 minutes")
-    )
-    system_cpu_load_5 = serializers.FloatField(
-        required=True, label=_("System cpu load 5 minutes")
-    )
-    system_cpu_load_15 = serializers.FloatField(
-        required=True, label=_("System cpu load 15 minutes")
-    )
-    system_memory_used_percent = serializers.FloatField(
-        required=True, label=_('System memory used percent')
-    )
-    system_disk_used_percent = serializers.FloatField(
-        required=True, label=_('System disk used percent')
-    )
-    # sessions
-    sessions_active = serializers.ListField(
-        required=False, label=_("Session active")
-    )
-    session_count_active = serializers.IntegerField(
-        required=True, label=_("Session active count")
-    )
-    session_count_processed = serializers.IntegerField(
-        required=True, label=_("Session processed count")
-    )
-    session_count_failed = serializers.IntegerField(
-        required=True, label=_('Session failed count')
-    )
-    session_count_succeeded = serializers.IntegerField(
-        required=True, label=_('Session succeeded count')
-    )
 
 
 class TaskSerializer(BulkModelSerializer):
