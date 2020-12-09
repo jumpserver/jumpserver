@@ -3,6 +3,8 @@
 import json
 import os
 
+import redis_lock
+import redis
 from django.conf import settings
 from django.utils.timezone import get_current_timezone
 from django.db.utils import ProgrammingError, OperationalError
@@ -105,3 +107,27 @@ def get_celery_task_log_path(task_id):
     path = os.path.join(settings.CELERY_LOG_DIR, rel_path)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     return path
+
+
+def get_celery_status():
+    from . import app
+    i = app.control.inspect()
+    ping_data = i.ping() or {}
+    active_nodes = [k for k, v in ping_data.items() if v.get('ok') == 'pong']
+    active_queue_worker = set([n.split('@')[0] for n in active_nodes if n])
+    if len(active_queue_worker) < 5:
+        print("Not all celery worker worked")
+        return False
+    else:
+        return True
+
+
+def get_beat_status():
+    CONFIG = settings.CONFIG
+    r = redis.Redis(host=CONFIG.REDIS_HOST, port=CONFIG.REDIS_PORT, password=CONFIG.REDIS_PASSWORD)
+    lock = redis_lock.Lock(r, name="beat-distribute-start-lock")
+    try:
+        locked = lock.locked()
+        return locked
+    except redis.ConnectionError:
+        return False
