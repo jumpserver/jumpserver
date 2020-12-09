@@ -31,7 +31,8 @@ class UserLoginLogSerializer(serializers.ModelSerializer):
         model = models.UserLoginLog
         fields = (
             'id', 'username', 'type', 'type_display', 'ip', 'city', 'user_agent',
-            'mfa', 'reason', 'status', 'status_display', 'datetime', 'mfa_display'
+            'mfa', 'reason', 'status', 'status_display', 'datetime', 'mfa_display',
+            'backend'
         )
         extra_kwargs = {
             "user_agent": {'label': _('User agent')}

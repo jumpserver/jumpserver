@@ -1,11 +1,9 @@
 import uuid
-from functools import partial
 
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _, ugettext as __
 from rest_framework.authtoken.models import Token
 from django.conf import settings
-from django.utils.crypto import get_random_string
 
 from common.db import models
 from common.mixins.models import CommonModelMixin

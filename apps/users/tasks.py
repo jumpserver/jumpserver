@@ -22,7 +22,7 @@ logger = get_logger(__file__)
 
 @shared_task
 def check_password_expired():
-    users = User.objects.filter(source=User.SOURCE_LOCAL).exclude(role=User.ROLE.APP)
+    users = User.objects.filter(source=User.Source.local.value).exclude(role=User.ROLE.APP)
     for user in users:
         if not user.is_valid:
             continue
