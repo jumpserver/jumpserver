@@ -40,13 +40,9 @@ class Terminal(models.Model):
 
     @property
     def is_alive(self):
-        key = self.STATUS_KEY_PREFIX + str(self.id)
-        return bool(cache.get(key))
-
-    @is_alive.setter
-    def is_alive(self, value):
-        key = self.STATUS_KEY_PREFIX + str(self.id)
-        cache.set(key, value, 60)
+        from .utils import TerminalStatusUtil
+        util = TerminalStatusUtil(terminal_id=str(self.id))
+        return util.terminal_is_alive
 
     @property
     def is_active(self):

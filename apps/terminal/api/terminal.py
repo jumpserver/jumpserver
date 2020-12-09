@@ -16,6 +16,7 @@ from common.permissions import IsAppUser, IsOrgAdminOrAppUser, IsSuperUser
 from ..models import Terminal, Session
 from .. import serializers
 from .. import exceptions
+from ..utils import TerminalStatusUtil
 
 __all__ = [
     'TerminalViewSet', 'TerminalTokenApi', 'StatusViewSet', 'TerminalConfig',
@@ -97,8 +98,8 @@ class TerminalTokenApi(APIView):
 
 
 class StatusViewSet(viewsets.GenericViewSet):
+    permission_classes = (IsSuperUser,)
     serializer_class = serializers.StatusSerializer
-    permission_classes = (IsOrgAdminOrAppUser,)
     task_serializer_class = serializers.TaskSerializer
 
     def get_permissions(self):
@@ -106,24 +107,33 @@ class StatusViewSet(viewsets.GenericViewSet):
             self.permission_classes = (IsAppUser,)
         return super().get_permissions()
 
-    def create(self, request, *args, **kwargs):
-        self.handle_status(request)
-        self.handle_sessions()
+    @staticmethod
+    def init_util(terminal_id=None):
+        return TerminalStatusUtil(terminal_id=terminal_id)
+
+    def handle_terminal_status_data(self, data):
+        terminal_id = data['terminal_id']
+        util = self.init_util(terminal_id)
+        util.handle_data(data)
+
+    def get_response(self):
         tasks = self.request.user.terminal.task_set.filter(is_finished=False)
         serializer = self.task_serializer_class(tasks, many=True)
         return Response(serializer.data, status=201)
 
-    def handle_status(self, request):
-        request.user.terminal.is_alive = True
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.handle_terminal_status_data(serializer.data)
+        response = self.get_response()
+        return response
 
-    def handle_sessions(self):
-        sessions_id = self.request.data.get('sessions', [])
-        # guacamole 上报的 session 是字符串
-        # "[53cd3e47-210f-41d8-b3c6-a184f3, 53cd3e47-210f-41d8-b3c6-a184f4]"
-        if isinstance(sessions_id, str):
-            sessions_id = sessions_id[1:-1].split(',')
-            sessions_id = [sid.strip() for sid in sessions_id if sid.strip()]
-        Session.set_sessions_active(sessions_id)
+    def list(self, request, *args, **kwargs):
+        terminal_id = request.query_params.get('terminal_id')
+        terminal_type = request.query_params.get('terminal_type')
+        util = self.init_util(terminal_id)
+        data = util.get_data(terminal_type)
+        return Response(data, status=200)
 
 
 class TerminalConfig(APIView):

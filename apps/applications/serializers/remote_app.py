@@ -9,6 +9,7 @@ from rest_framework import serializers
 from common.serializers import AdaptedBulkListSerializer
 from common.fields.serializer import CustomMetaDictField
 from common.utils import get_logger
+from common.drf.fields import CharPrimaryKeyRelatedField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from assets.models import Asset
 
@@ -16,19 +17,6 @@ from .. import const
 from ..models import RemoteApp, Category, Application
 
 logger = get_logger(__file__)
-
-
-class CharPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
-
-    def to_internal_value(self, data):
-        instance = super().to_internal_value(data)
-        return str(instance.id)
-
-    def to_representation(self, value):
-        # value is instance.id
-        if self.pk_field is not None:
-            return self.pk_field.to_representation(value)
-        return value
 
 
 class RemoteAppAttrsSerializer(serializers.Serializer):

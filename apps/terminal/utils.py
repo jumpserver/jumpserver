@@ -2,6 +2,7 @@
 #
 import os
 
+from django.core.cache import cache
 from django.conf import settings
 from django.core.files.storage import default_storage
 from django.utils.translation import ugettext as _
@@ -101,3 +102,56 @@ def send_command_alert_mail(command):
     logger.debug(message)
 
     send_mail_async.delay(subject, message, recipient_list, html_message=message)
+
+
+class TerminalStatusUtil(object):
+
+    CACHE_KEY_DATA = "CACHE_KEY_TERMINAL_STATUS_DATA_{}"
+    CACHE_TIMEOUT = 60
+
+    def __init__(self, terminal_id=None):
+        self.terminal_id = terminal_id or '*'
+        self.cache_key_data = self.CACHE_KEY_DATA.format(self.terminal_id)
+
+    # sessions
+    @staticmethod
+    def _handle_active_sessions(sessions_id):
+        if isinstance(sessions_id, str):
+            # guacamole 上报的 session 是字符串
+            # "[53cd3e47-210f-41d8-b3c6-a184f3, 53cd3e47-210f-41d8-b3c6-a184f4]"
+            sessions_id = sessions_id[1:-1].split(',')
+            sessions_id = [sid.strip() for sid in sessions_id if sid.strip()]
+        Session.set_sessions_active(sessions_id)
+
+    def _set_data_to_cache(self, data):
+        cache.set(self.cache_key_data, data, self.CACHE_TIMEOUT)
+
+    def _get_many_data_from_cache(self):
+        keys = cache.keys(self.cache_key_data)
+        return cache.get_many(keys)
+
+    def _get_data(self):
+        data = self._get_many_data_from_cache()
+        data = list(data.values())
+        return data
+
+    def handle_data(self, data):
+        sessions = data.get('sessions_active', [])
+        self._handle_active_sessions(sessions)
+        self._set_data_to_cache(data)
+
+    def filter_data(self, data, terminal_type=None):
+        if not terminal_type:
+            return data
+        filter_data = [d for d in data if d['terminal_type'] == terminal_type]
+        return filter_data
+
+    def get_data(self, terminal_type=None):
+        data = self._get_data()
+        data = self.filter_data(data, terminal_type)
+        return data
+
+    @property
+    def terminal_is_alive(self):
+        data = self._get_data()
+        return bool(data)

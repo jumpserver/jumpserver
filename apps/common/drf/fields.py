@@ -41,3 +41,17 @@ class GroupConcatedPrimaryKeyRelatedField(PrimaryKeyRelatedField):
             return value.pk
         else:
             return value
+
+
+class CharPrimaryKeyRelatedField(PrimaryKeyRelatedField):
+    """ 外键序列化为字符串 """
+
+    def to_internal_value(self, data):
+        instance = super().to_internal_value(data)
+        return str(instance.id)
+
+    def to_representation(self, value):
+        # value is instance.id
+        if self.pk_field is not None:
+            return self.pk_field.to_representation(value)
+        return value
