@@ -9,7 +9,7 @@ class SessionCommandSerializer(serializers.Serializer):
     """使用这个类作为基础Command Log Serializer类, 用来序列化"""
 
     id = serializers.UUIDField(read_only=True)
-    user = serializers.CharField(max_length=64, label=_("User"))
+    user = serializers.CharField(max_length=258, label=_("User"))
     asset = serializers.CharField(max_length=128, label=_("Asset"))
     system_user = serializers.CharField(max_length=64, label=_("System user"))
     input = serializers.CharField(max_length=128, label=_("Command"))
@@ -19,6 +19,9 @@ class SessionCommandSerializer(serializers.Serializer):
     risk_level_display = serializers.SerializerMethodField(label=_('Risk level for display'))
     org_id = serializers.CharField(max_length=36, required=False, default='', allow_null=True, allow_blank=True)
     timestamp = serializers.IntegerField(label=_('Timestamp'))
+
+    def validate_user(self, value):
+        return value[:64]
 
     @staticmethod
     def get_risk_level_display(obj):
