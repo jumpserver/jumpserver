@@ -1,0 +1,29 @@
+{% load i18n %}
+{% spaceless %}
+    <img src="{{ image }}" alt="captcha" class="captcha" />
+    <div class="row" style="padding-bottom: 10px">
+        <div class="col-sm-6">
+            <div class="input-group-prepend">
+                {% if audio %}
+                    <a title="{% trans "Play CAPTCHA as audio file" %}" href="{{ audio }}">
+                {% endif %}
+            </div>
+            {% include "django/forms/widgets/multiwidget.html" %}
+         </div>
+    </div>
+    <script>
+        var placeholder = '{% trans "Captcha" %}'
+        function refresh_captcha() {
+            $.getJSON("{% url "captcha-refresh" %}",
+                function (result) {
+                    $('.captcha').attr('src', result['image_url']);
+                    $('#id_captcha_0').val(result['key'])
+                })
+        }
+        $(document).ready(function () {
+            $('.captcha').click(refresh_captcha)
+            $('#id_captcha_1').addClass('form-control').attr('placeholder', placeholder)
+        })
+    </script>
+
+{% endspaceless %}

@@ -4,7 +4,7 @@
 from django import forms
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from captcha.fields import CaptchaField
+from captcha.fields import CaptchaField, CaptchaTextInput
 
 
 class UserLoginForm(forms.Form):
@@ -26,8 +26,12 @@ class UserCheckOtpCodeForm(forms.Form):
     otp_code = forms.CharField(label=_('MFA code'), max_length=6)
 
 
+class CustomCaptchaTextInput(CaptchaTextInput):
+    template_name = 'authentication/_captcha_field.html'
+
+
 class CaptchaMixin(forms.Form):
-    captcha = CaptchaField()
+    captcha = CaptchaField(widget=CustomCaptchaTextInput)
 
 
 class ChallengeMixin(forms.Form):
