@@ -8,7 +8,6 @@ from django.core.cache import cache
 
 from users.models import User
 from .. import const
-from .storage import CommandStorage, ReplayStorage
 
 
 class ComputeStatusMixin:
@@ -156,6 +155,7 @@ class Terminal(TerminalStatusMixin, models.Model):
             self.user.save()
 
     def get_command_storage(self):
+        from .storage import CommandStorage
         storage = CommandStorage.objects.filter(name=self.command_storage).first()
         return storage
 
@@ -172,6 +172,7 @@ class Terminal(TerminalStatusMixin, models.Model):
         return {"TERMINAL_COMMAND_STORAGE": config}
 
     def get_replay_storage(self):
+        from .storage import ReplayStorage
         storage = ReplayStorage.objects.filter(name=self.replay_storage).first()
         return storage
 

@@ -125,5 +125,8 @@ class TerminalTypeChoices(TextChoices):
     omnidb = 'omnidb', 'OmniDB'
 
 
-class ComponentTypeChoices(TerminalTypeChoices):
+class ComponentTypeChoices(TextChoices):
+    koko = 'koko', 'KoKo'
+    guacamole = 'guacamole', 'Guacamole'
+    omnidb = 'omnidb', 'OmniDB'
     core = 'core', 'Core'

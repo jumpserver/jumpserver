@@ -14,6 +14,7 @@ from assets.models import Asset
 from orgs.mixins.models import OrgModelMixin
 from common.db.models import ChoiceSet
 from ..backends import get_multi_command_storage
+from .terminal import Terminal
 
 
 class Session(OrgModelMixin):
