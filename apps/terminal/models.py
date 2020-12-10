@@ -23,9 +23,127 @@ from .backends.command.models import AbstractSessionCommand
 from . import const
 
 
-class Terminal(models.Model):
+class ComputeStatusMixin:
+
+    # system status
+    @staticmethod
+    def _common_compute_system_status(value, thresholds):
+        if thresholds[0] <= value <= thresholds[1]:
+            return const.ComponentStatusChoices.normal.value
+        elif thresholds[1] < value <= thresholds[2]:
+            return const.ComponentStatusChoices.busy.value
+        else:
+            return const.ComponentStatusChoices.abnormal.value
+
+    def _compute_system_cpu_load_1_status(self, value):
+        thresholds = [0, 5, 20]
+        return self._common_compute_system_status(value, thresholds)
+
+    def _compute_system_memory_used_percent_status(self, value):
+        thresholds = [0, 85, 95]
+        return self._common_compute_system_status(value, thresholds)
+
+    def _compute_system_disk_used_percent_status(self, value):
+        thresholds = [0, 80, 99]
+        return self._common_compute_system_status(value, thresholds)
+
+    def _compute_system_status(self, state):
+        system_status_keys = [
+            'system_cpu_load_1', 'system_memory_used_percent', 'system_disk_used_percent'
+        ]
+        system_status = []
+        for system_status_key in system_status_keys:
+            state_value = state[system_status_key]
+            status = getattr(self, f'_compute_{system_status_key}_status')(state_value)
+            system_status.append(status)
+        return system_status
+
+    def _compute_component_status(self, state):
+        system_status = self._compute_system_status(state)
+        if const.ComponentStatusChoices.abnormal in system_status:
+            return const.ComponentStatusChoices.abnormal
+        elif const.ComponentStatusChoices.busy in system_status:
+            return const.ComponentStatusChoices.busy
+        else:
+            return const.ComponentStatusChoices.normal
+
+    @staticmethod
+    def _compute_component_status_display(status):
+        return getattr(const.ComponentStatusChoices, status).label
+
+
+class TerminalStateMixin(ComputeStatusMixin):
+    CACHE_KEY_COMPONENT_STATE = 'CACHE_KEY_COMPONENT_STATE__TERMINAL_{}'
+    CACHE_TIMEOUT = 30
+
+    @property
+    def cache_key(self):
+        return self.CACHE_KEY_COMPONENT_STATE.format(str(self.id))
+
+    # get
+    def _get_from_cache(self):
+        return cache.get(self.cache_key)
+
+    def _set_to_cache(self, state):
+        cache.set(self.cache_key, state, self.CACHE_TIMEOUT)
+
+    # set
+    def _add_status(self, state):
+        status = self._compute_component_status(state)
+        status_display = self._compute_component_status_display(status)
+        state.update({
+            'status': status,
+            'status_display': status_display
+        })
+
+    @property
+    def state(self):
+        return self._get_from_cache()
+
+    @state.setter
+    def state(self, state):
+        self._add_status(state)
+        self._set_to_cache(state)
+
+
+class TerminalStatusMixin(TerminalStateMixin):
+
+    # alive
+    @property
+    def is_alive(self):
+        return bool(self.state)
+
+    # status
+    @property
+    def is_normal(self):
+        return self.is_alive and self.state['status'] == const.ComponentStatusChoices.normal.value
+
+    @property
+    def is_busy(self):
+        return self.is_alive and self.state['status'] == const.ComponentStatusChoices.busy.value
+
+    @property
+    def is_abnormal(self):
+        if not self.is_alive:
+            return True
+        return self.is_alive and self.state['status'] == const.ComponentStatusChoices.abnormal.value
+
+    @property
+    def status(self):
+        if self.is_alive:
+            return self.state['status']
+        else:
+            return const.ComponentStatusChoices.abnormal.value
+
+    @property
+    def status_display(self):
+        return self._compute_component_status_display(self.status)
+
+
+class Terminal(TerminalStatusMixin, models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
+    type = models.CharField(choices=const.TerminalTypeChoices.choices, max_length=64, verbose_name=_('type'))
     remote_addr = models.CharField(max_length=128, blank=True, verbose_name=_('Remote Address'))
     ssh_port = models.IntegerField(verbose_name=_('SSH Port'), default=2222)
     http_port = models.IntegerField(verbose_name=_('HTTP Port'), default=5000)
@@ -36,17 +154,6 @@ class Terminal(models.Model):
     is_deleted = models.BooleanField(default=False)
     date_created = models.DateTimeField(auto_now_add=True)
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
-    STATUS_KEY_PREFIX = 'terminal_status_'
-
-    @property
-    def is_alive(self):
-        key = self.STATUS_KEY_PREFIX + str(self.id)
-        return bool(cache.get(key))
-
-    @is_alive.setter
-    def is_alive(self, value):
-        key = self.STATUS_KEY_PREFIX + str(self.id)
-        cache.set(key, value, 60)
 
     @property
     def is_active(self):

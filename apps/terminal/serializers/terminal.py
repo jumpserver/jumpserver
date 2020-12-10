@@ -6,18 +6,23 @@ from common.utils import is_uuid
 from ..models import (
     Terminal, Status, Session, Task, CommandStorage, ReplayStorage
 )
+from .components import ComponentsStateSerializer
 
 
 class TerminalSerializer(BulkModelSerializer):
     session_online = serializers.SerializerMethodField()
     is_alive = serializers.BooleanField(read_only=True)
+    status = serializers.CharField(read_only=True)
+    status_display = serializers.CharField(read_only=True)
+    state = ComponentsStateSerializer(read_only=True)
 
     class Meta:
         model = Terminal
         fields = [
             'id', 'name', 'remote_addr', 'http_port', 'ssh_port',
             'comment', 'is_accepted', "is_active", 'session_online',
-            'is_alive', 'date_created', 'command_storage', 'replay_storage'
+            'is_alive', 'date_created', 'command_storage', 'replay_storage',
+            'status', 'status_display', 'state'
         ]
 
     @staticmethod

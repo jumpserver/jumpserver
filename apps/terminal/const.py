@@ -108,3 +108,18 @@ COMMAND_STORAGE_TYPE_CHOICES_EXTENDS = [
 COMMAND_STORAGE_TYPE_CHOICES = COMMAND_STORAGE_TYPE_CHOICES_DEFAULT + \
                                COMMAND_STORAGE_TYPE_CHOICES_EXTENDS
 
+
+from django.db.models import TextChoices
+from django.utils.translation import ugettext_lazy as _
+
+
+class ComponentStatusChoices(TextChoices):
+    abnormal = 'abnormal', _('Abnormal')
+    busy = 'busy', _('Busy')
+    normal = 'normal', _('Normal')
+
+
+class TerminalTypeChoices(TextChoices):
+    koko = 'koko', 'KoKo'
+    guacamole = 'guacamole', 'Guacamole'
+    omnidb = 'omnidb', 'OmniDB'

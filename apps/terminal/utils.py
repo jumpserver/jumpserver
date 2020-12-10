@@ -11,6 +11,7 @@ import jms_storage
 from common.tasks import send_mail_async
 from common.utils import get_logger, reverse
 from settings.models import Setting
+from . import const
 
 from .models import ReplayStorage, Session, Command
 
@@ -101,3 +102,42 @@ def send_command_alert_mail(command):
     logger.debug(message)
 
     send_mail_async.delay(subject, message, recipient_list, html_message=message)
+
+
+class ComponentsMetricsUtil(object):
+
+    def __init__(self, component_type):
+        self.type = component_type
+        self.components = []
+        self.initial_components()
+
+    def initial_components(self):
+        from .models import Terminal
+        if self.type in list(dict(const.TerminalTypeChoices.choices).keys()):
+            components = list(Terminal.objects.filter(type=self.type))
+        else:
+            # core
+            components = []
+        self.components = components
+
+    def get_metrics(self):
+        total_count = normal_count = busy_count = abnormal_count = 0
+        for component in self.components:
+            total_count += 1
+            if not component.is_alive:
+                abnormal_count += 1
+                continue
+            if component.is_normal:
+                normal_count += 1
+            elif component.is_busy:
+                busy_count += 1
+            else:
+                abnormal_count += 1
+        metrics = {
+            'total_count': total_count,
+            'normal_count': normal_count,
+            'busy_count': busy_count,
+            'abnormal_count': abnormal_count
+        }
+        return metrics
+
