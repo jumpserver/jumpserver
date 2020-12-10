@@ -16,7 +16,7 @@ import json
 import yaml
 from importlib import import_module
 from django.urls import reverse_lazy
-from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.templatetags.static import static
 from urllib.parse import urljoin, urlparse
 from django.utils.translation import ugettext_lazy as _
 

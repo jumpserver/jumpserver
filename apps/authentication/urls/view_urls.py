@@ -22,6 +22,7 @@ urlpatterns = [
          name='forgot-password-sendmail-success'),
     path('password/reset/', users_view.UserResetPasswordView.as_view(), name='reset-password'),
     path('password/too-simple-flash-msg/', views.FlashPasswdTooSimpleMsgView.as_view(), name='passwd-too-simple-flash-msg'),
+    path('password/has-expired-msg/', views.FlashPasswdHasExpiredMsgView.as_view(), name='passwd-has-expired-flash-msg'),
     path('password/reset/success/', users_view.UserResetPasswordSuccessView.as_view(), name='reset-password-success'),
     path('password/verify/', users_view.UserVerifyPasswordView.as_view(), name='user-verify-password'),
 

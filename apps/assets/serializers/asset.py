@@ -98,9 +98,6 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
         fields_as = list(annotates_fields.keys())
         fields = fields_small + fields_fk + fields_m2m + fields_as
         read_only_fields = [
-            'vendor', 'model', 'sn', 'cpu_model', 'cpu_count',
-            'cpu_cores', 'cpu_vcpus', 'memory', 'disk_total', 'disk_info',
-            'os', 'os_version', 'os_arch', 'hostname_raw',
             'created_by', 'date_created',
         ] + fields_as
 

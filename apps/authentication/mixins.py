@@ -110,9 +110,8 @@ class AuthMixin:
             raise CredentialError(error=errors.reason_user_inactive)
         elif not user.is_active:
             raise CredentialError(error=errors.reason_user_inactive)
-        elif user.password_has_expired:
-            raise CredentialError(error=errors.reason_password_expired)
 
+        self._check_password_require_reset_or_not(user)
         self._check_passwd_is_too_simple(user, password)
 
         clean_failed_count(username, ip)
@@ -123,20 +122,34 @@ class AuthMixin:
         return user
 
     @classmethod
-    def _check_passwd_is_too_simple(cls, user, password):
+    def generate_reset_password_url_with_flash_msg(cls, user: User, flash_view_name):
+        reset_passwd_url = reverse('authentication:reset-password')
+        query_str = urlencode({
+            'token': user.generate_reset_token()
+        })
+        reset_passwd_url = f'{reset_passwd_url}?{query_str}'
+
+        flash_page_url = reverse(flash_view_name)
+        query_str = urlencode({
+            'redirect_url': reset_passwd_url
+        })
+        return f'{flash_page_url}?{query_str}'
+
+    @classmethod
+    def _check_passwd_is_too_simple(cls, user: User, password):
         if user.is_superuser and password == 'admin':
-            reset_passwd_url = reverse('authentication:reset-password')
-            query_str = urlencode({
-                'token': user.generate_reset_token()
-            })
-            reset_passwd_url = f'{reset_passwd_url}?{query_str}'
+            url = cls.generate_reset_password_url_with_flash_msg(
+                user, 'authentication:passwd-too-simple-flash-msg'
+            )
+            raise errors.PasswdTooSimple(url)
 
-            flash_page_url = reverse('authentication:passwd-too-simple-flash-msg')
-            query_str = urlencode({
-                'redirect_url': reset_passwd_url
-            })
-
-            raise errors.PasswdTooSimple(f'{flash_page_url}?{query_str}')
+    @classmethod
+    def _check_password_require_reset_or_not(cls, user: User):
+        if user.password_has_expired:
+            url = cls.generate_reset_password_url_with_flash_msg(
+                user, 'authentication:passwd-has-expired-flash-msg'
+            )
+            raise errors.PasswordRequireResetError(url)
 
     def check_user_auth_if_need(self, decrypt_passwd=False):
         request = self.request

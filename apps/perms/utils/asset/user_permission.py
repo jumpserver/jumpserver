@@ -35,27 +35,6 @@ TMP_GRANTED_ASSETS_AMOUNT_FIELD = '_granted_assets_amount'
 
 
 # 使用场景
-# Asset.objects.filter(get_user_resources_q_granted_by_permissions(user))
-def get_user_resources_q_granted_by_permissions(user: User):
-    """
-    获取用户关联的 asset permission 或者 用户组关联的 asset permission 获取规则,
-    前提 AssetPermission 对象中的 related_name 为 granted_by_permissions
-    :param user:
-    :return:
-    """
-    _now = now()
-    return reduce(and_, (
-        Q(granted_by_permissions__date_start__lt=_now),
-        Q(granted_by_permissions__date_expired__gt=_now),
-        Q(granted_by_permissions__is_active=True),
-        (
-            Q(granted_by_permissions__users=user) |
-            Q(granted_by_permissions__user_groups__users=user)
-        )
-    ))
-
-
-# 使用场景
 # `Node.objects.annotate(**node_annotate_mapping_node)`
 node_annotate_mapping_node = {
     TMP_GRANTED_FIELD: F('mapping_nodes__granted'),
@@ -215,7 +194,7 @@ def compute_tmp_mapping_node_from_perm(user: User, asset_perms_id=None):
     return [*leaf_nodes, *ancestors]
 
 
-def create_mapping_nodes(user, nodes, clear=True):
+def create_mapping_nodes(user, nodes):
     to_create = []
     for node in nodes:
         _granted = getattr(node, TMP_GRANTED_FIELD, False)
@@ -231,8 +210,6 @@ def create_mapping_nodes(user, nodes, clear=True):
             assets_amount=_granted_assets_amount,
         ))
 
-    if clear:
-        UserGrantedMappingNode.objects.filter(user=user).delete()
     UserGrantedMappingNode.objects.bulk_create(to_create)
 
 
@@ -254,6 +231,9 @@ def set_node_granted_assets_amount(user, node, asset_perms_id=None):
 @tmp_to_root_org()
 def rebuild_user_mapping_nodes(user):
     logger.info(f'>>> {dt_formater(now())} start rebuild {user} mapping nodes')
+
+    # 先删除旧的授权树🌲
+    UserGrantedMappingNode.objects.filter(user=user).delete()
     asset_perms_id = get_user_all_assetpermissions_id(user)
     if not asset_perms_id:
         # 没有授权直接返回
@@ -384,7 +364,8 @@ def get_node_all_granted_assets(user: User, key):
 
     if only_asset_granted_nodes_qs:
         only_asset_granted_nodes_q = reduce(or_, only_asset_granted_nodes_qs)
-        only_asset_granted_nodes_q &= get_user_resources_q_granted_by_permissions(user)
+        asset_perms_id = get_user_all_assetpermissions_id(user)
+        only_asset_granted_nodes_q &= Q(granted_by_permissions__id__in=list(asset_perms_id))
         q.append(only_asset_granted_nodes_q)
 
     if q:
@@ -484,6 +465,9 @@ def get_user_all_assetpermissions_id(user: User):
     asset_perms_id = AssetPermission.objects.valid().filter(
         Q(users=user) | Q(user_groups__users=user)
     ).distinct().values_list('id', flat=True)
+
+    # !!! 这个很重要，必须转换成 list，避免 Django 生成嵌套子查询
+    asset_perms_id = list(asset_perms_id)
     return asset_perms_id
 
 

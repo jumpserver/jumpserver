@@ -21,7 +21,7 @@ user_permission_urlpatterns = [
     # ---------------------------------------------------------
     # 以 serializer 格式返回
     path('<uuid:pk>/assets/', api.UserAllGrantedAssetsApi.as_view(), name='user-assets'),
-    path('assets/', api.MyAllAssetsAsTreeApi.as_view(), name='my-assets'),
+    path('assets/', api.MyAllGrantedAssetsApi.as_view(), name='my-assets'),
 
     # Tree Node 的数据格式返回
     path('<uuid:pk>/assets/tree/', api.UserDirectGrantedAssetsAsTreeForAdminApi.as_view(), name='user-assets-as-tree'),
@@ -56,7 +56,7 @@ user_permission_urlpatterns = [
     path('nodes-with-assets/tree/', api.MyGrantedNodesWithAssetsAsTreeApi.as_view(), name='my-nodes-with-assets-as-tree'),
 
     # 主要用于 luna 页面，带资产的节点树
-    path('<uuid:pk>/nodes/children-with-assets/tree/', api.UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi.as_view(), name='user-nodes-children-with-assets-as-tree'),
+    path('<uuid:pk>/nodes/children-with-assets/tree/', api.UserGrantedNodeChildrenWithAssetsAsTreeApi.as_view(), name='user-nodes-children-with-assets-as-tree'),
     path('nodes/children-with-assets/tree/', api.MyGrantedNodeChildrenWithAssetsAsTreeApi.as_view(), name='my-nodes-children-with-assets-as-tree'),
 
     # 查询授权树上某个节点的所有资产

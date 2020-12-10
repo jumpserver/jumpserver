@@ -81,11 +81,23 @@ def check_database_connection():
             logging.info("Database connect success")
             return
         time.sleep(1)
-    logging.info("Connection database failed, exist")
+    logging.error("Connection database failed, exist")
     sys.exit(10)
 
 
-def make_migrations():
+def check_migrations():
+    apps_dir = os.path.join(BASE_DIR, 'apps')
+    code = subprocess.call("python manage.py showmigrations | grep '\[.\]' | grep -v '\[X\]'", shell=True, cwd=apps_dir)
+
+    if code == 1:
+        return
+    # for i in range(3):
+    #     print("!!! Warning: Has SQL migrations not perform, 有 SQL 变更没有执行")
+    #     print("You should run `./PROC upgrade_db` first, 请先运行 ./PROC upgrade_db, 进行表结构变更")
+    # sys.exit(1)
+
+
+def perform_db_migrate():
     logging.info("Check database structure change ...")
     os.chdir(os.path.join(BASE_DIR, 'apps'))
     logging.info("Migrate model change to database ...")
@@ -102,8 +114,8 @@ def collect_static():
 
 def prepare():
     check_database_connection()
-    make_migrations()
-    collect_static()
+    check_migrations()
+    upgrade_db()
 
 
 def check_pid(pid):
@@ -156,7 +168,10 @@ def is_running(s, unlink=True):
 
 def parse_service(s):
     web_services = ['gunicorn', 'flower', 'daphne']
-    celery_services = ["celery_ansible", "celery_default", "celery_node_tree", "check_asset_perm_expired"]
+    celery_services = [
+        "celery_ansible", "celery_default", "celery_node_tree",
+        "celery_check_asset_perm_expired", "celery_heavy_tasks"
+    ]
     task_services = celery_services + ['beat']
     all_services = web_services + task_services
     if s == 'all':
@@ -225,9 +240,14 @@ def get_start_celery_node_tree_kwargs():
     return get_start_worker_kwargs('node_tree', 2)
 
 
+def get_start_celery_heavy_tasks_kwargs():
+    print("\n- Start Celery as Distributed Task Queue: HeavyTasks")
+    return get_start_worker_kwargs('celery_heavy_tasks', 1)
+
+
 def get_start_celery_check_asset_perm_expired_kwargs():
     print("\n- Start Celery as Distributed Task Queue: CheckAseetPermissionExpired")
-    return get_start_worker_kwargs('check_asset_perm_expired', 1)
+    return get_start_worker_kwargs('celery_check_asset_perm_expired', 1)
 
 
 def get_start_worker_kwargs(queue, num):
@@ -366,7 +386,8 @@ def start_service(s):
         "celery_ansible": get_start_celery_ansible_kwargs,
         "celery_default": get_start_celery_default_kwargs,
         "celery_node_tree": get_start_celery_node_tree_kwargs,
-        "check_asset_perm_expired": get_start_celery_check_asset_perm_expired_kwargs,
+        "celery_heavy_tasks": get_start_celery_heavy_tasks_kwargs,
+        "celery_check_asset_perm_expired": get_start_celery_check_asset_perm_expired_kwargs,
         "beat": get_start_beat_kwargs,
         "flower": get_start_flower_kwargs,
         "daphne": get_start_daphne_kwargs,
@@ -503,6 +524,11 @@ def show_service_status(s):
             print("{} is stopped".format(ns))
 
 
+def upgrade_db():
+    collect_static()
+    perform_db_migrate()
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description="""
@@ -515,7 +541,7 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         'action', type=str,
-        choices=("start", "stop", "restart", "status"),
+        choices=("start", "stop", "restart", "status", "upgrade_db"),
         help="Action to run"
     )
     parser.add_argument(
@@ -550,5 +576,7 @@ if __name__ == '__main__':
         stop_service(srv)
         time.sleep(5)
         start_services_and_watch(srv)
+    elif action == "upgrade_db":
+        upgrade_db()
     else:
         show_service_status(srv)

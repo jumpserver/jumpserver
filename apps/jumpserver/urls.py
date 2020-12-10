@@ -23,13 +23,13 @@ api_v1 = [
     path('common/', include('common.urls.api_urls', namespace='api-common')),
     path('applications/', include('applications.urls.api_urls', namespace='api-applications')),
     path('tickets/', include('tickets.urls.api_urls', namespace='api-tickets')),
+    path('prometheus/metrics/', api.PrometheusMetricsApi.as_view())
 ]
 
 api_v2 = [
     path('terminal/', include('terminal.urls.api_urls_v2', namespace='api-terminal-v2')),
     path('users/', include('users.urls.api_urls_v2', namespace='api-users-v2')),
 ]
-
 
 app_view_patterns = [
     path('auth/', include('authentication.urls.view_urls'), name='auth'),
@@ -63,7 +63,7 @@ urlpatterns = [
     # External apps url
     path('core/auth/captcha/', include('captcha.urls')),
     path('core/', include(app_view_patterns)),
-    path('ui/', views.UIView.as_view())
+    path('ui/', views.UIView.as_view()),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \

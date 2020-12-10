@@ -31,7 +31,7 @@ class JsonMixin:
     def json_encode(data):
         return json.dumps(data)
 
-    def from_db_value(self, value, expression, connection, context):
+    def from_db_value(self, value, expression, connection, context=None):
         if value is None:
             return value
         return self.json_decode(value)
@@ -54,7 +54,7 @@ class JsonMixin:
 class JsonTypeMixin(JsonMixin):
     tp = dict
 
-    def from_db_value(self, value, expression, connection, context):
+    def from_db_value(self, value, expression, connection, context=None):
         value = super().from_db_value(value, expression, connection, context)
         if not isinstance(value, self.tp):
             value = self.tp()
@@ -116,7 +116,7 @@ class EncryptMixin:
     def decrypt_from_signer(self, value):
         return signer.unsign(value) or ''
 
-    def from_db_value(self, value, expression, connection, context):
+    def from_db_value(self, value, expression, connection, context=None):
         if value is None:
             return value
         value = force_text(value)

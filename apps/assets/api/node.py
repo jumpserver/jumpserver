@@ -5,11 +5,13 @@ from collections import namedtuple, defaultdict
 from rest_framework import status
 from rest_framework.serializers import ValidationError
 from rest_framework.response import Response
+from rest_framework.decorators import action
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404, Http404
 from django.utils.decorators import method_decorator
 from django.db.models.signals import m2m_changed
 
+from common.const.http import POST
 from common.exceptions import SomeoneIsDoingThis
 from common.const.signals import PRE_REMOVE, POST_REMOVE
 from assets.models import Asset
@@ -19,6 +21,8 @@ from common.const.distributed_lock_key import UPDATE_NODE_TREE_LOCK_KEY
 from orgs.mixins.api import OrgModelViewSet
 from orgs.mixins import generics
 from orgs.lock import org_level_transaction_lock
+from orgs.utils import current_org
+from assets.tasks import check_node_assets_amount_task
 from ..hands import IsOrgAdmin
 from ..models import Node
 from ..tasks import (
@@ -46,6 +50,11 @@ class NodeViewSet(OrgModelViewSet):
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.NodeSerializer
 
+    @action(methods=[POST], detail=False, url_name='launch-check-assets-amount-task')
+    def launch_check_assets_amount_task(self, request):
+        task = check_node_assets_amount_task.delay(current_org.id)
+        return Response(data={'task': task.id})
+
     # 仅支持根节点指直接创建，子节点下的节点需要通过children接口创建
     def perform_create(self, serializer):
         child_key = Node.org_root().get_next_child_key()
@@ -61,6 +70,9 @@ class NodeViewSet(OrgModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         node = self.get_object()
+        if node.is_org_root():
+            error = _("You can't delete the root node ({})".format(node.value))
+            return Response(data={'error': error}, status=status.HTTP_403_FORBIDDEN)
         if node.has_children_or_has_assets():
             error = _("Deletion failed and the node contains children or assets")
             return Response(data={'error': error}, status=status.HTTP_403_FORBIDDEN)
@@ -173,7 +185,7 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
             return []
         assets = self.instance.get_assets().only(
             "id", "hostname", "ip", "os",
-            "org_id", "protocols",
+            "org_id", "protocols", "is_active"
         )
         return self.serialize_assets(assets, self.instance.key)
 
@@ -201,10 +213,8 @@ class NodeAddChildrenApi(generics.UpdateAPIView):
     def put(self, request, *args, **kwargs):
         instance = self.get_object()
         nodes_id = request.data.get("nodes")
-        children = [get_object_or_none(Node, id=pk) for pk in nodes_id]
+        children = Node.objects.filter(id__in=nodes_id)
         for node in children:
-            if not node:
-                continue
             node.parent = instance
         return Response("OK")
 

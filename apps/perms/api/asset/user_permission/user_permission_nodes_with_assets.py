@@ -139,11 +139,13 @@ class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
         return Response(data=data)
 
 
-class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(ForAdminMixin, UserNodeGrantStatusDispatchMixin,
-                                                         SerializeToTreeNodeMixin, ListAPIView):
+class GrantedNodeChildrenWithAssetsAsTreeApiMixin(UserNodeGrantStatusDispatchMixin,
+                                                  SerializeToTreeNodeMixin,
+                                                  ListAPIView):
     """
     带资产的授权树
     """
+    user: None
 
     def get_data_on_node_direct_granted(self, key):
         nodes = Node.objects.filter(parent_key=key)
@@ -203,5 +205,9 @@ class UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi(ForAdminMixin, UserNode
         return Response(data=[*tree_nodes, *tree_assets])
 
 
-class MyGrantedNodeChildrenWithAssetsAsTreeApi(ForUserMixin, UserGrantedNodeChildrenWithAssetsAsTreeForAdminApi):
+class UserGrantedNodeChildrenWithAssetsAsTreeApi(ForAdminMixin, GrantedNodeChildrenWithAssetsAsTreeApiMixin):
+    pass
+
+
+class MyGrantedNodeChildrenWithAssetsAsTreeApi(ForUserMixin, GrantedNodeChildrenWithAssetsAsTreeApiMixin):
     pass

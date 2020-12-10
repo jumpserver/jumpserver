@@ -1,0 +1,37 @@
+# common
+gcc
+cmake
+curl
+wget
+vim
+locales
+
+# mysql-client
+default-libmysqlclient-dev
+
+# Pillow
+# libffi-dev
+# libfreetype6-dev
+# libfribidi-dev
+# libharfbuzz-dev
+# libjpeg-turbo-progs
+# libjpeg62-turbo-dev
+# liblcms2-dev
+# libopenjp2-7-dev
+# libtiff5-dev
+# libwebp-dev
+# python3-tk
+# zlib1g-dev
+
+
+# ldap
+openssl
+libssl-dev
+libldap2-dev
+libsasl2-dev
+libkrb5-dev
+sqlite
+
+# ansible
+sshpass
+

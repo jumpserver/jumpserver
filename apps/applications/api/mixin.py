@@ -1,4 +1,5 @@
 from common.exceptions import JMSException
+from orgs.models import Organization
 from .. import models
 
 
@@ -85,11 +86,46 @@ class SerializeApplicationToTreeNodeMixin:
             'meta': {'type': 'k8s_app'}
         }
 
-    def _serialize(self, application):
+    def _serialize_application(self, application):
         method_name = f'_serialize_{application.category}'
         data = getattr(self, method_name)(application)
+        data.update({
+            'pId': application.org.id,
+            'org_name': application.org_name
+        })
         return data
 
     def serialize_applications(self, applications):
-        data = [self._serialize(application) for application in applications]
+        data = [self._serialize_application(application) for application in applications]
+        return data
+
+    @staticmethod
+    def _serialize_organization(org):
+        return {
+            'id': org.id,
+            'name': org.name,
+            'title': org.name,
+            'pId': '',
+            'open': True,
+            'isParent': True,
+            'meta': {
+                'type': 'node'
+            }
+        }
+
+    def serialize_organizations(self, organizations):
+        data = [self._serialize_organization(org) for org in organizations]
+        return data
+
+    @staticmethod
+    def filter_organizations(applications):
+        organizations_id = set(applications.values_list('org_id', flat=True))
+        organizations = [Organization.get_instance(org_id) for org_id in organizations_id]
+        return organizations
+
+    def serialize_applications_with_org(self, applications):
+        organizations = self.filter_organizations(applications)
+        data_organizations = self.serialize_organizations(organizations)
+        data_applications = self.serialize_applications(applications)
+        data = data_organizations + data_applications
         return data

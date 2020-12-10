@@ -218,5 +218,14 @@ class PasswdTooSimple(JMSException):
     default_detail = _('Your password is too simple, please change it for security')
 
     def __init__(self, url, *args, **kwargs):
-        super(PasswdTooSimple, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
+        self.url = url
+
+
+class PasswordRequireResetError(JMSException):
+    default_code = 'passwd_has_expired'
+    default_detail = _('Your password has expired, please reset before logging in')
+
+    def __init__(self, url, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.url = url

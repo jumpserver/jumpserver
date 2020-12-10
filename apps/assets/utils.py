@@ -1,8 +1,11 @@
 # ~*~ coding: utf-8 ~*~
 #
+import time
+
 from django.db.models import Q
 
 from common.utils import get_logger, dict_get_any, is_uuid, get_object_or_none
+from common.utils.lock import DistributedLock
 from common.http import is_true
 from .models import Asset, Node
 
@@ -10,17 +13,21 @@ from .models import Asset, Node
 logger = get_logger(__file__)
 
 
+@DistributedLock(name="assets.node.check_node_assets_amount", blocking=False)
 def check_node_assets_amount():
     for node in Node.objects.all():
+        logger.info(f'Check node assets amount: {node}')
         assets_amount = Asset.objects.filter(
             Q(nodes__key__istartswith=f'{node.key}:') | Q(nodes=node)
         ).distinct().count()
 
         if node.assets_amount != assets_amount:
-            print(f'>>> <Node:{node.key}> wrong assets amount '
-                  f'{node.assets_amount} right is {assets_amount}')
+            logger.warn(f'Node wrong assets amount <Node:{node.key}> '
+                        f'{node.assets_amount} right is {assets_amount}')
             node.assets_amount = assets_amount
             node.save()
+        # 防止自检程序给数据库的压力太大
+        time.sleep(0.1)
 
 
 def is_asset_exists_in_node(asset_pk, node_key):

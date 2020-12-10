@@ -7,10 +7,10 @@ import string
 import random
 
 from django.conf import settings
-from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractUser
 from django.core.cache import cache
 from django.db import models
+from django.db.models import TextChoices
 
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -170,22 +170,18 @@ class RoleMixin:
         from orgs.models import ROLE as ORG_ROLE
 
         if not current_org.is_real():
+            # 不是真实的组织，取 User 本身的角色
             if self.is_superuser:
                 return [ORG_ROLE.ADMIN]
             else:
                 return [ORG_ROLE.USER]
 
-        if hasattr(self, 'gc_m2m_org_members__role'):
-            names = self.gc_m2m_org_members__role
-            if isinstance(names, str):
-                roles = set(self.gc_m2m_org_members__role.split(','))
-            else:
-                roles = set()
-        else:
-            roles = set(self.m2m_org_members.filter(
-                org_id=current_org.id
-            ).values_list('role', flat=True))
-        roles = list(roles)
+        # 是真实组织，取 OrganizationMember 中的角色
+        roles = [
+            org_member.role
+            for org_member in self.m2m_org_members.all()
+            if org_member.org_id == current_org.id
+        ]
         roles.sort()
         return roles
 
@@ -485,18 +481,12 @@ class MFAMixin:
 
 
 class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
-    SOURCE_LOCAL = 'local'
-    SOURCE_LDAP = 'ldap'
-    SOURCE_OPENID = 'openid'
-    SOURCE_RADIUS = 'radius'
-    SOURCE_CAS = 'cas'
-    SOURCE_CHOICES = (
-        (SOURCE_LOCAL, _('Local')),
-        (SOURCE_LDAP, 'LDAP/AD'),
-        (SOURCE_OPENID, 'OpenID'),
-        (SOURCE_RADIUS, 'Radius'),
-        (SOURCE_CAS, 'CAS'),
-    )
+    class Source(TextChoices):
+        local = 'local', _('Local')
+        ldap = 'ldap', 'LDAP/AD'
+        openid = 'openid', 'OpenID'
+        radius = 'radius', 'Radius'
+        cas = 'cas', 'CAS'
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     username = models.CharField(
@@ -546,7 +536,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         max_length=30, default='', blank=True, verbose_name=_('Created by')
     )
     source = models.CharField(
-        max_length=30, default=SOURCE_LOCAL, choices=SOURCE_CHOICES,
+        max_length=30, default=Source.local.value, choices=Source.choices,
         verbose_name=_('Source')
     )
     date_password_last_updated = models.DateTimeField(
@@ -597,7 +587,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
 
     @property
     def is_local(self):
-        return self.source == self.SOURCE_LOCAL
+        return self.source == self.Source.local.value
 
     def set_unprovide_attr_if_need(self):
         if not self.name:
@@ -667,6 +657,6 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         user.groups.add(UserGroup.initial())
 
     def can_send_created_mail(self):
-        if self.email and self.source == self.SOURCE_LOCAL:
+        if self.email and self.source == self.Source.local.value:
             return True
         return False

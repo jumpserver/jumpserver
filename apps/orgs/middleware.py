@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 
-from .models import Organization
 from .utils import get_org_from_request, set_current_org
 
 

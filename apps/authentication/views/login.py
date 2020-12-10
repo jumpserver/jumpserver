@@ -32,7 +32,7 @@ from ..forms import get_user_login_form_cls
 __all__ = [
     'UserLoginView', 'UserLogoutView',
     'UserLoginGuardView', 'UserLoginWaitConfirmView',
-    'FlashPasswdTooSimpleMsgView',
+    'FlashPasswdTooSimpleMsgView', 'FlashPasswdHasExpiredMsgView'
 ]
 
 
@@ -96,7 +96,7 @@ class UserLoginView(mixins.AuthMixin, FormView):
             new_form._errors = form.errors
             context = self.get_context_data(form=new_form)
             return self.render_to_response(context)
-        except errors.PasswdTooSimple as e:
+        except (errors.PasswdTooSimple, errors.PasswordRequireResetError) as e:
             return redirect(e.url)
         self.clear_rsa_key()
         return self.redirect_to_guard_view()
@@ -245,6 +245,21 @@ class FlashPasswdTooSimpleMsgView(TemplateView):
         context = {
             'title': _('Please change your password'),
             'messages': _('Your password is too simple, please change it for security'),
+            'interval': 5,
+            'redirect_url': request.GET.get('redirect_url'),
+            'auto_redirect': True,
+        }
+        return self.render_to_response(context)
+
+
+@method_decorator(never_cache, name='dispatch')
+class FlashPasswdHasExpiredMsgView(TemplateView):
+    template_name = 'flash_message_standalone.html'
+
+    def get(self, request, *args, **kwargs):
+        context = {
+            'title': _('Please change your password'),
+            'messages': _('Your password has expired, please reset before logging in'),
             'interval': 5,
             'redirect_url': request.GET.get('redirect_url'),
             'auto_redirect': True,

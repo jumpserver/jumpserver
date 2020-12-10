@@ -6,7 +6,7 @@ import time
 
 from django.core.cache import cache
 from django.utils.translation import ugettext as _
-from django.utils.six import text_type
+from six import text_type
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 from rest_framework import HTTP_HEADER_ENCODING

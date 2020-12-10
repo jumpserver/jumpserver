@@ -48,7 +48,7 @@ class ApplicationsAsTreeMixin(SerializeApplicationToTreeNodeMixin):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        data = self.serialize_applications(queryset)
+        data = self.serialize_applications_with_org(queryset)
         return Response(data=data)
 
 

@@ -4,7 +4,7 @@ from operator import add, sub
 
 from assets.utils import is_asset_exists_in_node
 from django.db.models.signals import (
-    post_save, m2m_changed, pre_delete, post_delete
+    post_save, m2m_changed, pre_delete, post_delete, pre_save
 )
 from django.db.models import Q, F
 from django.dispatch import receiver
@@ -35,6 +35,11 @@ def update_asset_hardware_info_on_created(asset):
 def test_asset_conn_on_created(asset):
     logger.debug("Test asset `{}` connectivity".format(asset))
     test_asset_connectivity_util.delay([asset])
+
+
+@receiver(pre_save, sender=Node)
+def on_node_pre_save(sender, instance: Node, **kwargs):
+    instance.parent_key = instance.compute_parent_key()
 
 
 @receiver(post_save, sender=Asset)
@@ -73,6 +78,7 @@ def on_system_user_update(instance: SystemUser, created, **kwargs):
 
 
 @receiver(m2m_changed, sender=SystemUser.assets.through)
+@on_transaction_commit
 def on_system_user_assets_change(instance, action, model, pk_set, **kwargs):
     """
     当系统用户和资产关系发生变化时，应该重新推送系统用户到新添加的资产中
@@ -91,25 +97,29 @@ def on_system_user_assets_change(instance, action, model, pk_set, **kwargs):
 
 
 @receiver(m2m_changed, sender=SystemUser.users.through)
-def on_system_user_users_change(sender, instance=None, action='', model=None, pk_set=None, **kwargs):
+@on_transaction_commit
+def on_system_user_users_change(sender, instance: SystemUser, action, model, pk_set, reverse, **kwargs):
     """
     当系统用户和用户关系发生变化时，应该重新推送系统用户资产中
     """
     if action != POST_ADD:
         return
+
+    if reverse:
+        raise M2MReverseNotAllowed
+
     if not instance.username_same_with_user:
         return
+
     logger.debug("System user users change signal recv: {}".format(instance))
-    queryset = model.objects.filter(pk__in=pk_set)
-    if model == SystemUser:
-        system_users = queryset
-    else:
-        system_users = [instance]
-    for s in system_users:
-        push_system_user_to_assets_manual.delay(s)
+    usernames = model.objects.filter(pk__in=pk_set).values_list('username', flat=True)
+
+    for username in usernames:
+        push_system_user_to_assets_manual.delay(instance, username)
 
 
 @receiver(m2m_changed, sender=SystemUser.nodes.through)
+@on_transaction_commit
 def on_system_user_nodes_change(sender, instance=None, action=None, model=None, pk_set=None, **kwargs):
     """
     当系统用户和节点关系发生变化时，应该将节点下资产关联到新的系统用户上

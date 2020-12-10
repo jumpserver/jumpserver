@@ -47,7 +47,7 @@ class UserGenerator(FakeDataGenerator):
     def do_generate(self, batch, batch_size):
         users = []
         for i in batch:
-            username = forgery_py.internet.user_name(True)
+            username = forgery_py.internet.user_name(True) + '-' + str(i)
             email = forgery_py.internet.email_address()
             u = User(
                 username=username,

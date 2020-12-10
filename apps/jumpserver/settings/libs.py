@@ -11,14 +11,17 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
-        'common.drf.renders.JMSCSVRender',
+        # 'rest_framework.renderers.BrowsableAPIRenderer',
+        'common.drf.renders.CSVFileRenderer',
+        'common.drf.renders.ExcelFileRenderer',
+
     ),
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework.parsers.JSONParser',
         'rest_framework.parsers.FormParser',
         'rest_framework.parsers.MultiPartParser',
-        'common.drf.parsers.JMSCSVParser',
+        'common.drf.parsers.CSVFileParser',
+        'common.drf.parsers.ExcelFileParser',
         'rest_framework.parsers.FileUploadParser',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -61,10 +64,10 @@ SWAGGER_SETTINGS = {
 
 
 # Captcha settings, more see https://django-simple-captcha.readthedocs.io/en/latest/advanced.html
-CAPTCHA_IMAGE_SIZE = (80, 33)
+CAPTCHA_IMAGE_SIZE = (140, 34)
 CAPTCHA_FOREGROUND_COLOR = '#001100'
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots',)
-CAPTCHA_TEST_MODE = CONFIG.CAPTCHA_TEST_MODE
+CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
 
 # Django bootstrap3 setting, more see http://django-bootstrap3.readthedocs.io/en/latest/settings.html
 BOOTSTRAP3 = {
