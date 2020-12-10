@@ -115,29 +115,30 @@ class ComponentsMetricsUtil(object):
         from .models import Terminal
         if self.type in list(dict(const.TerminalTypeChoices.choices).keys()):
             components = list(Terminal.objects.filter(type=self.type))
+        elif self.type == const.ComponentTypeChoices.core.value:
+            components = []
         else:
-            # core
             components = []
         self.components = components
 
     def get_metrics(self):
-        total_count = normal_count = busy_count = abnormal_count = 0
+        total_count = normal_count = high_count = critical_count = 0
         for component in self.components:
             total_count += 1
             if not component.is_alive:
-                abnormal_count += 1
+                critical_count += 1
                 continue
             if component.is_normal:
                 normal_count += 1
-            elif component.is_busy:
-                busy_count += 1
+            elif component.is_high:
+                high_count += 1
             else:
-                abnormal_count += 1
+                critical_count += 1
         metrics = {
             'total_count': total_count,
             'normal_count': normal_count,
-            'busy_count': busy_count,
-            'abnormal_count': abnormal_count
+            'high_count': high_count,
+            'critical_count': critical_count
         }
         return metrics
 

@@ -31,9 +31,9 @@ class ComputeStatusMixin:
         if thresholds[0] <= value <= thresholds[1]:
             return const.ComponentStatusChoices.normal.value
         elif thresholds[1] < value <= thresholds[2]:
-            return const.ComponentStatusChoices.busy.value
+            return const.ComponentStatusChoices.high.value
         else:
-            return const.ComponentStatusChoices.abnormal.value
+            return const.ComponentStatusChoices.critical.value
 
     def _compute_system_cpu_load_1_status(self, value):
         thresholds = [0, 5, 20]
@@ -60,10 +60,10 @@ class ComputeStatusMixin:
 
     def _compute_component_status(self, state):
         system_status = self._compute_system_status(state)
-        if const.ComponentStatusChoices.abnormal in system_status:
-            return const.ComponentStatusChoices.abnormal
-        elif const.ComponentStatusChoices.busy in system_status:
-            return const.ComponentStatusChoices.busy
+        if const.ComponentStatusChoices.critical in system_status:
+            return const.ComponentStatusChoices.critical
+        elif const.ComponentStatusChoices.high in system_status:
+            return const.ComponentStatusChoices.high
         else:
             return const.ComponentStatusChoices.normal
 
@@ -119,21 +119,21 @@ class TerminalStatusMixin(TerminalStateMixin):
         return self.is_alive and self.state['status'] == const.ComponentStatusChoices.normal.value
 
     @property
-    def is_busy(self):
-        return self.is_alive and self.state['status'] == const.ComponentStatusChoices.busy.value
+    def is_high(self):
+        return self.is_alive and self.state['status'] == const.ComponentStatusChoices.high.value
 
     @property
-    def is_abnormal(self):
+    def is_critical(self):
         if not self.is_alive:
             return True
-        return self.is_alive and self.state['status'] == const.ComponentStatusChoices.abnormal.value
+        return self.is_alive and self.state['status'] == const.ComponentStatusChoices.critical.value
 
     @property
     def status(self):
         if self.is_alive:
             return self.state['status']
         else:
-            return const.ComponentStatusChoices.abnormal.value
+            return const.ComponentStatusChoices.critical.value
 
     @property
     def status_display(self):

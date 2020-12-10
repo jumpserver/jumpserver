@@ -114,8 +114,8 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class ComponentStatusChoices(TextChoices):
-    abnormal = 'abnormal', _('Abnormal')
-    busy = 'busy', _('Busy')
+    critical = 'critical', _('Critical')
+    high = 'high', _('High')
     normal = 'normal', _('Normal')
 
 
@@ -123,3 +123,7 @@ class TerminalTypeChoices(TextChoices):
     koko = 'koko', 'KoKo'
     guacamole = 'guacamole', 'Guacamole'
     omnidb = 'omnidb', 'OmniDB'
+
+
+class ComponentTypeChoices(TerminalTypeChoices):
+    core = 'core', 'Core'
