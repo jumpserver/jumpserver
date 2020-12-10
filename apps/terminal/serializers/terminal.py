@@ -19,7 +19,7 @@ class TerminalSerializer(BulkModelSerializer):
     class Meta:
         model = Terminal
         fields = [
-            'id', 'name', 'remote_addr', 'http_port', 'ssh_port',
+            'id', 'name', 'type', 'remote_addr', 'http_port', 'ssh_port',
             'comment', 'is_accepted', "is_active", 'session_online',
             'is_alive', 'date_created', 'command_storage', 'replay_storage',
             'status', 'status_display', 'state'
