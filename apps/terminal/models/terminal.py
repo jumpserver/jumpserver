@@ -60,8 +60,8 @@ class ComputeStatusMixin:
 
 
 class TerminalStateMixin(ComputeStatusMixin):
-    CACHE_KEY_COMPONENT_STATE = 'CACHE_KEY_COMPONENT_STATE__TERMINAL_{}'
-    CACHE_TIMEOUT = 30
+    CACHE_KEY_COMPONENT_STATE = 'CACHE_KEY_COMPONENT_STATE_TERMINAL_{}'
+    CACHE_TIMEOUT = 120
 
     @property
     def cache_key(self):
@@ -102,20 +102,6 @@ class TerminalStatusMixin(TerminalStateMixin):
 
     # status
     @property
-    def is_normal(self):
-        return self.is_alive and self.state['status'] == const.ComponentStatusChoices.normal.value
-
-    @property
-    def is_high(self):
-        return self.is_alive and self.state['status'] == const.ComponentStatusChoices.high.value
-
-    @property
-    def is_critical(self):
-        if not self.is_alive:
-            return True
-        return self.is_alive and self.state['status'] == const.ComponentStatusChoices.critical.value
-
-    @property
     def status(self):
         if self.is_alive:
             return self.state['status']
@@ -125,6 +111,18 @@ class TerminalStatusMixin(TerminalStateMixin):
     @property
     def status_display(self):
         return self._compute_component_status_display(self.status)
+
+    @property
+    def is_normal(self):
+        return self.status == const.ComponentStatusChoices.normal.value
+
+    @property
+    def is_high(self):
+        return self.status == const.ComponentStatusChoices.high.value
+
+    @property
+    def is_critical(self):
+        return self.status == const.ComponentStatusChoices.critical.value
 
 
 class Terminal(TerminalStatusMixin, models.Model):
