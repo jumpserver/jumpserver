@@ -2,13 +2,14 @@ from django.core.cache import cache
 from django.utils import timezone
 from django.utils.timesince import timesince
 from django.db.models import Count, Max
-from django.http.response import JsonResponse
+from django.http.response import JsonResponse, HttpResponse
 from rest_framework.views import APIView
 from collections import Counter
 
 from users.models import User
 from assets.models import Asset
 from terminal.models import Session
+from terminal.utils import ComponentsPrometheusMetricsUtil
 from orgs.utils import current_org
 from common.permissions import IsOrgAdmin, IsOrgAuditor
 from common.utils import lazyproperty
@@ -304,4 +305,12 @@ class IndexApi(TotalCountMixin, DatesLoginMetricMixin, APIView):
 
         return JsonResponse(data, status=200)
 
+
+class PrometheusMetricsApi(APIView):
+    permission_classes = ()
+
+    def get(self, request, *args, **kwargs):
+        util = ComponentsPrometheusMetricsUtil()
+        metrics_text = util.get_prometheus_metrics_text()
+        return HttpResponse(metrics_text, content_type='text/plain; version=0.0.4; charset=utf-8')
 
