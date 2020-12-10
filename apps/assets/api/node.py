@@ -5,11 +5,13 @@ from collections import namedtuple, defaultdict
 from rest_framework import status
 from rest_framework.serializers import ValidationError
 from rest_framework.response import Response
+from rest_framework.decorators import action
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404, Http404
 from django.utils.decorators import method_decorator
 from django.db.models.signals import m2m_changed
 
+from common.const.http import POST
 from common.exceptions import SomeoneIsDoingThis
 from common.const.signals import PRE_REMOVE, POST_REMOVE
 from assets.models import Asset
@@ -19,6 +21,7 @@ from common.const.distributed_lock_key import UPDATE_NODE_TREE_LOCK_KEY
 from orgs.mixins.api import OrgModelViewSet
 from orgs.mixins import generics
 from orgs.lock import org_level_transaction_lock
+from assets.tasks import check_node_assets_amount_period_task
 from ..hands import IsOrgAdmin
 from ..models import Node
 from ..tasks import (
@@ -45,6 +48,11 @@ class NodeViewSet(OrgModelViewSet):
     search_fields = ('value', )
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.NodeSerializer
+
+    @action(methods=[POST], detail=False, url_name='launch-check-assets-amount-task')
+    def launch_check_assets_amount_task(self, request):
+        task = check_node_assets_amount_period_task.delay()
+        return Response(data={'task': task.id})
 
     # 仅支持根节点指直接创建，子节点下的节点需要通过children接口创建
     def perform_create(self, serializer):
