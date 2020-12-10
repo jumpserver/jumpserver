@@ -21,15 +21,15 @@ class ComponentsStateSerializer(serializers.Serializer):
     sessions_active_count = serializers.IntegerField(
         required=True, label=_("Session active count")
     )
-    sessions_processed_count = serializers.IntegerField(
-        required=True, label=_("Session processed count")
-    )
-    sessions_failed_count = serializers.IntegerField(
-        required=True, label=_('Session failed count')
-    )
-    sessions_succeeded_count = serializers.IntegerField(
-        required=True, label=_('Session succeeded count')
-    )
+    # sessions_processed_count = serializers.IntegerField(
+    #     required=True, label=_("Session processed count")
+    # )
+    # sessions_failed_count = serializers.IntegerField(
+    #     required=True, label=_('Session failed count')
+    # )
+    # sessions_succeeded_count = serializers.IntegerField(
+    #     required=True, label=_('Session succeeded count')
+    # )
     
     def save(self, **kwargs):
         request = self.context['request']
