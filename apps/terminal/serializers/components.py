@@ -15,7 +15,7 @@ class ComponentsStateSerializer(serializers.Serializer):
         required=False, default=0, label=_('System disk used percent')
     )
     # sessions
-    sessions_active_count = serializers.IntegerField(
+    session_active_count = serializers.IntegerField(
         required=False, default=0, label=_("Session active count")
     )
 

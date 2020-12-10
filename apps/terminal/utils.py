@@ -113,18 +113,19 @@ class ComponentsMetricsUtil(object):
 
     def initial_components(self):
         from .models import Terminal
-        terminals = Terminal.objects.all()
+        terminals = Terminal.objects.all().order_by('type')
         if self.type:
             terminals = terminals.filter(type=self.type)
         self.components = list(terminals)
 
     def get_metrics(self):
-        total_count = normal_count = high_count = critical_count = 0
+        total_count = normal_count = high_count = critical_count = session_active_total = 0
         for component in self.components:
             total_count += 1
             if not component.is_alive:
                 critical_count += 1
                 continue
+            session_active_total += component.state.get('session_active_count', 0)
             if component.is_normal:
                 normal_count += 1
             elif component.is_high:
@@ -135,34 +136,67 @@ class ComponentsMetricsUtil(object):
             'total': total_count,
             'normal': normal_count,
             'high': high_count,
-            'critical': critical_count
+            'critical': critical_count,
+            'session_active': session_active_total
         }
         return metrics
 
 
 class ComponentsPrometheusMetricsUtil(ComponentsMetricsUtil):
 
+    @staticmethod
+    def get_status_metrics(metrics):
+        return {
+            'any': metrics['total'],
+            'normal': metrics['normal'],
+            'high': metrics['high'],
+            'critical': metrics['critical']
+        }
+
     def get_prometheus_metrics_text(self):
         prometheus_metrics = []
-        system_states_name = [
-            'system_cpu_load_1', 'system_memory_used_percent',
-            'system_disk_used_percent', 'sessions_active_count'
-        ]
+        prometheus_metrics.append('# JumpServer 各组件状态个数汇总')
         base_status_metric_text = 'jumpserver_components_status_total{component_type="%s", status="%s"} %s'
-        base_system_state_metric_text = 'jumpserver_components_%s{component_type="%s", component="%s"} %s'
         for component in self.components:
             component_type = component.type
-            metrics = self.get_metrics()
-            for status, value in metrics.items():
+            base_metrics = self.get_metrics()
+
+            prometheus_metrics.append(f'## 组件: {component_type}')
+            status_metrics = self.get_status_metrics(base_metrics)
+            for status, value in status_metrics.items():
                 metric_text = base_status_metric_text % (component_type, status, value)
                 prometheus_metrics.append(metric_text)
 
-            if not component.is_alive:
-                continue
+        prometheus_metrics.append('\n')
+        prometheus_metrics.append('# JumpServer 各组件在线会话数汇总')
+        base_session_active_metric_text = 'jumpserver_components_session_active_total{component_type="%s"} %s'
+        for component in self.components:
+            component_type = component.type
+            prometheus_metrics.append(f'## 组件: {component_type}')
+            base_metrics = self.get_metrics()
+            metric_text = base_session_active_metric_text % (
+                component_type,
+                base_metrics['session_active']
+            )
+            prometheus_metrics.append(metric_text)
 
-            for system_state_name in system_states_name:
+        prometheus_metrics.append('\n')
+        prometheus_metrics.append('# JumpServer 各组件节点一些指标')
+        base_system_state_metric_text = 'jumpserver_components_%s{component_type="%s", component="%s"} %s'
+        system_states_name = [
+            'system_cpu_load_1', 'system_memory_used_percent',
+            'system_disk_used_percent', 'session_active_count'
+        ]
+        for system_state_name in system_states_name:
+            prometheus_metrics.append(f'## 指标: {system_state_name}')
+            for component in self.components:
+                if not component.is_alive:
+                    continue
+                component_type = component.type
                 metric_text = base_system_state_metric_text % (
-                    system_state_name, component_type, component.name,
+                    system_state_name,
+                    component_type,
+                    component.name,
                     component.state.get(system_state_name)
                 )
                 prometheus_metrics.append(metric_text)
