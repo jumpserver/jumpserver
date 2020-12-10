@@ -106,7 +106,7 @@ def send_command_alert_mail(command):
 
 class ComponentsMetricsUtil(object):
 
-    def __init__(self, component_type):
+    def __init__(self, component_type=None):
         self.type = component_type
         self.components = []
         self.initial_components()
@@ -132,10 +132,40 @@ class ComponentsMetricsUtil(object):
             else:
                 critical_count += 1
         metrics = {
-            'total_count': total_count,
-            'normal_count': normal_count,
-            'high_count': high_count,
-            'critical_count': critical_count
+            'total': total_count,
+            'normal': normal_count,
+            'high': high_count,
+            'critical': critical_count
         }
         return metrics
 
+
+class ComponentsPrometheusMetricsUtil(ComponentsMetricsUtil):
+
+    def get_prometheus_metrics_text(self):
+        prometheus_metrics = []
+        system_states_name = [
+            'system_cpu_load_1', 'system_memory_used_percent',
+            'system_disk_used_percent', 'sessions_active_count'
+        ]
+        base_status_metric_text = 'jumpserver_components_status_total{component_type="%s", status="%s"} %s'
+        base_system_state_metric_text = 'jumpserver_components_%s{component_type="%s", component="%s"} %s'
+        for component in self.components:
+            component_type = component.type
+            metrics = self.get_metrics()
+            for status, value in metrics.items():
+                metric_text = base_status_metric_text % (component_type, status, value)
+                prometheus_metrics.append(metric_text)
+
+            if not component.is_alive:
+                continue
+
+            for system_state_name in system_states_name:
+                metric_text = base_system_state_metric_text % (
+                    system_state_name, component_type, component.name,
+                    component.state.get(system_state_name)
+                )
+                prometheus_metrics.append(metric_text)
+
+        prometheus_metrics_text = '\n'.join(prometheus_metrics)
+        return prometheus_metrics_text

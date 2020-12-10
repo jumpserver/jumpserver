@@ -13,7 +13,7 @@ logger = logging.getLogger(__file__)
 
 
 __all__ = [
-    'ComponentsStateAPIView', 'ComponentsMetricsAPIView'
+    'ComponentsStateAPIView', 'ComponentsMetricsAPIView',
 ]
 
 

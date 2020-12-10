@@ -118,8 +118,17 @@ class ComponentStatusChoices(TextChoices):
     high = 'high', _('High')
     normal = 'normal', _('Normal')
 
+    @classmethod
+    def status(cls):
+        return set(dict(cls.choices).keys())
+
 
 class TerminalTypeChoices(TextChoices):
     koko = 'koko', 'KoKo'
     guacamole = 'guacamole', 'Guacamole'
     omnidb = 'omnidb', 'OmniDB'
+
+    @classmethod
+    def types(cls):
+        return set(dict(cls.choices).keys())
+

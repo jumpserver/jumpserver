@@ -5,4 +5,4 @@ from .session import *
 from .command import *
 from .task import *
 from .storage import *
-from .components import *
+from .component import *
