@@ -85,7 +85,8 @@ class TerminalStateMixin(ComputeStatusMixin):
 
     @property
     def state(self):
-        return self._get_from_cache()
+        state = self._get_from_cache()
+        return state or {}
 
     @state.setter
     def state(self, state):

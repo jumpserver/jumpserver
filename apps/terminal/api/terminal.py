@@ -27,7 +27,7 @@ class TerminalViewSet(JMSBulkModelViewSet):
     queryset = Terminal.objects.filter(is_deleted=False)
     serializer_class = serializers.TerminalSerializer
     permission_classes = (IsSuperUser,)
-    filter_fields = ['name', 'remote_addr']
+    filter_fields = ['name', 'remote_addr', 'type']
 
     def create(self, request, *args, **kwargs):
         if isinstance(request.data, list):
@@ -59,6 +59,15 @@ class TerminalViewSet(JMSBulkModelViewSet):
             data = serializer.errors
             logger.error("Register terminal error: {}".format(data))
             return Response(data, status=400)
+
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+        status = self.request.query_params.get('status')
+        if not status:
+            return queryset
+        filtered_queryset_id = [str(q.id) for q in queryset if q.status == status]
+        queryset = queryset.filter(id__in=filtered_queryset_id)
+        return queryset
 
     def get_permissions(self):
         if self.action == "create":

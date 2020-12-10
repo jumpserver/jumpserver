@@ -6,31 +6,19 @@ from django.utils.translation import ugettext_lazy as _
 class ComponentsStateSerializer(serializers.Serializer):
     # system
     system_cpu_load_1 = serializers.FloatField(
-        required=True, label=_("System cpu load 1 minutes")
+        required=False, default=0, label=_("System cpu load 1 minutes")
     )
     system_memory_used_percent = serializers.FloatField(
-        required=True, label=_('System memory used percent')
+        required=False, default=0, label=_('System memory used percent')
     )
     system_disk_used_percent = serializers.FloatField(
-        required=True, label=_('System disk used percent')
+        required=False, default=0, label=_('System disk used percent')
     )
     # sessions
-    sessions_active = serializers.ListField(
-        required=False, label=_("Session active")
-    )
     sessions_active_count = serializers.IntegerField(
-        required=True, label=_("Session active count")
+        required=False, default=0, label=_("Session active count")
     )
-    # sessions_processed_count = serializers.IntegerField(
-    #     required=True, label=_("Session processed count")
-    # )
-    # sessions_failed_count = serializers.IntegerField(
-    #     required=True, label=_('Session failed count')
-    # )
-    # sessions_succeeded_count = serializers.IntegerField(
-    #     required=True, label=_('Session succeeded count')
-    # )
-    
+
     def save(self, **kwargs):
         request = self.context['request']
         terminal = request.user.terminal
