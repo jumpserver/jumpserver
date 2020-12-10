@@ -24,6 +24,7 @@ class TerminalSerializer(BulkModelSerializer):
             'is_alive', 'date_created', 'command_storage', 'replay_storage',
             'status', 'status_display', 'state'
         ]
+        read_only_fields = ['type', 'date_created']
 
     @staticmethod
     def get_kwargs_may_be_uuid(value):
