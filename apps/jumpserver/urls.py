@@ -30,7 +30,6 @@ api_v2 = [
     path('users/', include('users.urls.api_urls_v2', namespace='api-users-v2')),
 ]
 
-
 app_view_patterns = [
     path('auth/', include('authentication.urls.view_urls'), name='auth'),
     path('ops/', include('ops.urls.view_urls'), name='ops'),

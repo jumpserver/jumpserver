@@ -64,10 +64,10 @@ SWAGGER_SETTINGS = {
 
 
 # Captcha settings, more see https://django-simple-captcha.readthedocs.io/en/latest/advanced.html
-CAPTCHA_IMAGE_SIZE = (80, 33)
+CAPTCHA_IMAGE_SIZE = (140, 30)
 CAPTCHA_FOREGROUND_COLOR = '#001100'
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots',)
-CAPTCHA_TEST_MODE = CONFIG.CAPTCHA_TEST_MODE
+CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
 
 # Django bootstrap3 setting, more see http://django-bootstrap3.readthedocs.io/en/latest/settings.html
 BOOTSTRAP3 = {
