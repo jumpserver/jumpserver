@@ -113,13 +113,10 @@ class ComponentsMetricsUtil(object):
 
     def initial_components(self):
         from .models import Terminal
-        if self.type in list(dict(const.TerminalTypeChoices.choices).keys()):
-            components = list(Terminal.objects.filter(type=self.type))
-        elif self.type == const.ComponentTypeChoices.core.value:
-            components = []
-        else:
-            components = []
-        self.components = components
+        terminals = Terminal.objects.all()
+        if self.type:
+            terminals = terminals.filter(type=self.type)
+        self.components = list(terminals)
 
     def get_metrics(self):
         total_count = normal_count = high_count = critical_count = 0

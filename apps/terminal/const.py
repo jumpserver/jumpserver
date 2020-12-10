@@ -123,10 +123,3 @@ class TerminalTypeChoices(TextChoices):
     koko = 'koko', 'KoKo'
     guacamole = 'guacamole', 'Guacamole'
     omnidb = 'omnidb', 'OmniDB'
-
-
-class ComponentTypeChoices(TextChoices):
-    koko = 'koko', 'KoKo'
-    guacamole = 'guacamole', 'Guacamole'
-    omnidb = 'omnidb', 'OmniDB'
-    core = 'core', 'Core'

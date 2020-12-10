@@ -11,19 +11,10 @@ from common.permissions import IsAppUser, IsSuperUser
 
 logger = logging.getLogger(__file__)
 
-# generics.CreateAPIView
 
 __all__ = [
-    'ComponentsListAPIView', 'ComponentsStateAPIView', 'ComponentsMetricsAPIView'
+    'ComponentsStateAPIView', 'ComponentsMetricsAPIView'
 ]
-
-
-class ComponentsListAPIView(generics.ListAPIView):
-    """ 返回 core 服务状态列表，类似于 terminal 列表"""
-    permission_classes = (IsSuperUser,)
-
-    def list(self, request, *args, **kwargs):
-        return Response()
 
 
 class ComponentsStateAPIView(generics.CreateAPIView):
