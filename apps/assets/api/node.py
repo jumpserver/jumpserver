@@ -21,7 +21,8 @@ from common.const.distributed_lock_key import UPDATE_NODE_TREE_LOCK_KEY
 from orgs.mixins.api import OrgModelViewSet
 from orgs.mixins import generics
 from orgs.lock import org_level_transaction_lock
-from assets.tasks import check_node_assets_amount_period_task
+from orgs.utils import current_org
+from assets.tasks import check_node_assets_amount_task
 from ..hands import IsOrgAdmin
 from ..models import Node
 from ..tasks import (
@@ -51,7 +52,7 @@ class NodeViewSet(OrgModelViewSet):
 
     @action(methods=[POST], detail=False, url_name='launch-check-assets-amount-task')
     def launch_check_assets_amount_task(self, request):
-        task = check_node_assets_amount_period_task.delay()
+        task = check_node_assets_amount_task.delay(current_org.id)
         return Response(data={'task': task.id})
 
     # 仅支持根节点指直接创建，子节点下的节点需要通过children接口创建
