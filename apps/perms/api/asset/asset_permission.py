@@ -22,6 +22,9 @@ class AssetPermissionViewSet(BasePermissionViewSet):
     model = AssetPermission
     serializer_class = serializers.AssetPermissionSerializer
     filter_fields = ['name']
+    custom_filter_fields = BasePermissionViewSet.custom_filter_fields + [
+        'node_id', 'node', 'asset_id', 'hostname', 'ip'
+    ]
 
     def get_queryset(self):
         queryset = super().get_queryset().prefetch_related(
