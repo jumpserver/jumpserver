@@ -1162,8 +1162,8 @@ msgid "Date login"
 msgstr "登录日期"
 
 #: audits/models.py:108
-msgid "Login backend"
-msgstr "登录引擎"
+msgid "Authentication backend"
+msgstr "认证方式"
 
 #: audits/serializers.py:15
 msgid "Operate for display"
