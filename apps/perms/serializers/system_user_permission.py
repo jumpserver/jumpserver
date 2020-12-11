@@ -16,3 +16,4 @@ class SystemUserSerializer(serializers.ModelSerializer):
             'auto_push', 'cmd_filters', 'sudo', 'shell', 'comment',
             'sftp_root', 'date_created', 'created_by'
         ]
+        ref_name = 'PermedSystemUserSerializer'

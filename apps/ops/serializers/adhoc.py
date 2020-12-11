@@ -128,6 +128,7 @@ class CommandExecutionSerializer(serializers.ModelSerializer):
             'result', 'is_finished', 'log_url', 'date_created',
             'date_finished'
         ]
+        ref_name = 'OpsCommandExecution'
 
     @staticmethod
     def get_log_url(obj):
