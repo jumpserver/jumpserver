@@ -145,6 +145,17 @@ class LDAPServerUtil(object):
             paged_cookie=paged_cookie
         )
 
+    @staticmethod
+    def distinct_user_entries(user_entries):
+        distinct_user_entries = list()
+        distinct_user_entries_dn = set()
+        for user_entry in user_entries:
+            if user_entry.entry_dn in distinct_user_entries_dn:
+                continue
+            distinct_user_entries_dn.add(user_entry.entry_dn)
+            distinct_user_entries.append(user_entry)
+        return distinct_user_entries
+
     @timeit
     def search_user_entries(self, search_users=None, search_value=None):
         logger.info("Search user entries")
@@ -159,6 +170,7 @@ class LDAPServerUtil(object):
             while self.paged_cookie():
                 self.search_user_entries_ou(search_ou, self.paged_cookie())
                 user_entries.extend(self.connection.entries)
+        user_entries = self.distinct_user_entries(user_entries)
         return user_entries
 
     def user_entry_to_dict(self, entry):
