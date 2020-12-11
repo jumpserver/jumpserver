@@ -55,41 +55,7 @@ apps = [
 ]
 
 
-def test_metric(request):
-    import random
-    data = ""
-    components = ['koko', 'guacamole', 'omnidb']
-    status = ['normal', 'high', 'critical', 'total']
-
-    data += "# JumpServer 各组件状态个数汇总\n"
-    for com in components:
-        data += f"## 组件: {com}\n"
-        for s in status:
-            key = 'jumpserver_components_status_total{component_type="%s", status="%s"}' % (com, s)
-            value = round(10 * random.random() * 10, 2)
-            data += f"{key} {value}\n"
-
-    data += "\n# JumpServer 各组件在线会话数汇总\n"
-    for com in components:
-        for item in ['session_active']:
-            key = 'jumpserver_components_%s_total{component_type="%s"}' % (item, com)
-            value = round(40 * random.random() * 10, 2)
-            data += f"{key} {value}\n"
-
-    data += "\n# JumpServer 各组件节点一些指标\n"
-    for item in ['cpu1_load', 'memory_used_percent', 'disk_used_percent', 'session_active']:
-        data += f"## 指标: {item}\n"
-        for com in components:
-            for instance in ['node1', 'node2', 'node3']:
-                key = 'jumpserver_components_%s{component_type="%s", component="%s"}' % (item, com, instance)
-                value = round(20 * random.random() * 10, 2)
-                data += f"{key} {value}\n"
-    return HttpResponse(data, content_type='text/plain; version=0.0.4; charset=utf-8')
-
-
 urlpatterns = [
-    # path('prometheus/', include('django_prometheus.urls')),
-    path('prometheus/metrics', test_metric),
     path('', views.IndexView.as_view(), name='index'),
     path('api/v1/', include(api_v1)),
     path('api/v2/', include(api_v2)),

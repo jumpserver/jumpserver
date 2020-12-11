@@ -57,7 +57,6 @@ INSTALLED_APPS = [
     'django_filters',
     'bootstrap3',
     'captcha',
-    'django_prometheus',
     'django_celery_beat',
     'django.contrib.auth',
     'django.contrib.admin',
@@ -70,7 +69,6 @@ INSTALLED_APPS = [
 
 
 MIDDLEWARE = [
-    'django_prometheus.middleware.PrometheusBeforeMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -86,7 +84,6 @@ MIDDLEWARE = [
     'orgs.middleware.OrgMiddleware',
     'authentication.backends.oidc.middleware.OIDCRefreshIDTokenMiddleware',
     'authentication.backends.cas.middleware.CASMiddleware',
-    'django_prometheus.middleware.PrometheusAfterMiddleware',
 ]
 
 
