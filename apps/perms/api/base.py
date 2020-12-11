@@ -14,6 +14,10 @@ __all__ = [
 
 
 class BasePermissionViewSet(OrgBulkModelViewSet):
+    custom_filter_fields = [
+        'user_id', 'username', 'search', 'system_user_id', 'system_user',
+        'user_group_id', 'user_group'
+    ]
     permission_classes = (IsOrgAdmin,)
 
     def filter_valid(self, queryset):

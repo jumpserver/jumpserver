@@ -14,6 +14,9 @@ class ApplicationPermissionViewSet(BasePermissionViewSet):
     serializer_class = serializers.ApplicationPermissionSerializer
     filter_fields = ['name', 'category', 'type']
     search_fields = filter_fields
+    custom_filter_fields = BasePermissionViewSet.custom_filter_fields + [
+        'application_id', 'application'
+    ]
 
     def get_queryset(self):
         queryset = super().get_queryset().prefetch_related(
