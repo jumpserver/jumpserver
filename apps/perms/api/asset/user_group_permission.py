@@ -72,6 +72,8 @@ class UserGroupGrantedNodeAssetsApi(ListAPIView):
     search_fields = ['hostname', 'ip', 'comment']
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Asset.objects.none()
         user_group_id = self.kwargs.get('pk', '')
         node_id = self.kwargs.get("node_id")
         node = Node.objects.get(id=node_id)

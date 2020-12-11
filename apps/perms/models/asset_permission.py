@@ -62,6 +62,8 @@ class Action:
 
     @classmethod
     def value_to_choices(cls, value):
+        if isinstance(value, list):
+            return value
         value = int(value)
         choices = [cls.NAME_MAP[i] for i, j in cls.DB_CHOICES if value & i == i]
         return choices

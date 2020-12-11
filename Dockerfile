@@ -34,7 +34,7 @@ RUN pip install --upgrade pip==20.2.4 setuptools==49.6.0 wheel==0.34.2 -i ${PIP_
 
 COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/jumpserver
 RUN mkdir -p /root/.ssh/ \
-    && echo -e "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null" > /root/.ssh/config
+    && echo "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null" > /root/.ssh/config
 
 RUN echo > config.yml
 VOLUME /opt/jumpserver/data

@@ -145,9 +145,22 @@ class LDAPServerUtil(object):
             paged_cookie=paged_cookie
         )
 
+    @staticmethod
+    def distinct_user_entries(user_entries):
+        distinct_user_entries = list()
+        distinct_user_entries_dn = set()
+        for user_entry in user_entries:
+            if user_entry.entry_dn in distinct_user_entries_dn:
+                continue
+            distinct_user_entries_dn.add(user_entry.entry_dn)
+            distinct_user_entries.append(user_entry)
+        return distinct_user_entries
+
     @timeit
-    def search_user_entries(self):
+    def search_user_entries(self, search_users=None, search_value=None):
         logger.info("Search user entries")
+        self.search_users = search_users
+        self.search_value = search_value
         user_entries = list()
         search_ous = str(self.config.search_ou).split('|')
         for search_ou in search_ous:
@@ -157,6 +170,7 @@ class LDAPServerUtil(object):
             while self.paged_cookie():
                 self.search_user_entries_ou(search_ou, self.paged_cookie())
                 user_entries.extend(self.connection.entries)
+        user_entries = self.distinct_user_entries(user_entries)
         return user_entries
 
     def user_entry_to_dict(self, entry):
@@ -181,11 +195,21 @@ class LDAPServerUtil(object):
         return users
 
     @timeit
+    def search_for_user_dn(self, username):
+        user_entries = self.search_user_entries(search_users=[username])
+        if len(user_entries) == 1:
+            user_entry = user_entries[0]
+            user_dn = user_entry.entry_dn
+        else:
+            user_dn = None
+        return user_dn
+
+    @timeit
     def search(self, search_users=None, search_value=None):
         logger.info("Search ldap users")
-        self.search_users = search_users
-        self.search_value = search_value
-        user_entries = self.search_user_entries()
+        user_entries = self.search_user_entries(
+            search_users=search_users, search_value=search_value
+        )
         users = self.user_entries_to_dict(user_entries)
         return users
 

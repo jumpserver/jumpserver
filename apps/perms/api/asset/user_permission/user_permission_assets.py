@@ -31,6 +31,8 @@ class UserDirectGrantedAssetsApi(ListAPIView):
     search_fields = ['hostname', 'ip', 'comment']
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Asset.objects.none()
         user = self.user
         assets = get_user_direct_granted_assets(user)\
             .prefetch_related('platform')\
@@ -45,6 +47,8 @@ class UserFavoriteGrantedAssetsApi(ListAPIView):
     search_fields = ['hostname', 'ip', 'comment']
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Asset.objects.none()
         user = self.user
         assets = FavoriteAsset.get_user_favorite_assets(user)\
             .prefetch_related('platform')\
@@ -101,6 +105,8 @@ class UserAllGrantedAssetsApi(ForAdminMixin, ListAPIView):
     search_fields = ['hostname', 'ip', 'comment']
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Asset.objects.none()
         queryset = get_user_granted_all_assets(self.user)
         queryset = queryset.prefetch_related('platform')
         return queryset.only(*self.only_fields)
@@ -123,6 +129,8 @@ class UserGrantedNodeAssetsApi(UserNodeGrantStatusDispatchMixin, ListAPIView):
     pagination_node: Node
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Asset.objects.none()
         node_id = self.kwargs.get("node_id")
         node = Node.objects.get(id=node_id)
         self.pagination_node = node
