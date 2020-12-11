@@ -115,7 +115,6 @@ class AssetTaskCreateApi(generics.CreateAPIView):
 class AssetGatewayListApi(generics.ListAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.GatewayWithAuthSerializer
-    model = Asset
 
     def get_queryset(self):
         asset_id = self.kwargs.get('pk')
