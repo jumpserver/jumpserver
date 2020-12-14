@@ -493,8 +493,9 @@ class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
         nodes_mapper = {n.key: n for n in nodes_sorted}
         for node in nodes_sorted:
             parent = nodes_mapper.get(node.parent_key)
-            if not parent and node.parent_key:
-                logger.error(f'Node parent node in mapper: {node.parent_key} {node.value}')
+            if not parent:
+                if node.parent_key:
+                    logger.error(f'Node parent node in mapper: {node.parent_key} {node.value}')
                 continue
             node.full_value = parent.full_value + '/' + node.value
         self.__class__.objects.bulk_update(nodes, ['full_value'])
