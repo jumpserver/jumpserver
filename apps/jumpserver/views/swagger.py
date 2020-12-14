@@ -76,9 +76,8 @@ def get_swagger_view(version='v1'):
         patterns = api_v1_patterns
     schema_view = get_schema_view(
         api_info,
-        public=True,
         patterns=patterns,
-        permission_classes=(permissions.AllowAny,),
+        permission_classes=(permissions.IsAuthenticated,),
     )
     return schema_view
 
