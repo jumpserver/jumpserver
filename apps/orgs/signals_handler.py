@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 #
+from collections import defaultdict
+from functools import partial
 
 from django.db.models.signals import m2m_changed
 from django.db.models.signals import post_save
@@ -7,10 +9,11 @@ from django.dispatch import receiver
 
 from orgs.utils import tmp_to_org
 from .models import Organization, OrganizationMember
-from .hands import set_current_org, current_org, Node, get_current_org
+from .hands import set_current_org, Node, get_current_org
 from perms.models import (AssetPermission, DatabaseAppPermission,
                           K8sAppPermission, RemoteAppPermission)
-from users.models import UserGroup
+from users.models import UserGroup, User
+from common.const.signals import PRE_REMOVE, POST_REMOVE
 
 
 @receiver(post_save, sender=Organization)
@@ -34,11 +37,44 @@ def _remove_users(model, users, org):
             users = (users, )
 
         m2m_model = model.users.through
-        if model.users.reverse:
+        reverse = model.users.reverse
+        if reverse:
             m2m_field_name = model.users.field.m2m_reverse_field_name()
         else:
             m2m_field_name = model.users.field.m2m_field_name()
-        m2m_model.objects.filter(**{'user__in': users, f'{m2m_field_name}__org_id': org.id}).delete()
+        relations = m2m_model.objects.filter(**{
+            'user__in': users,
+            f'{m2m_field_name}__org_id': org.id
+        })
+
+        object_id_users_id_map = defaultdict(set)
+
+        m2m_field_attr_name = f'{m2m_field_name}_id'
+        for relation in relations:
+            object_id = getattr(relation, m2m_field_attr_name)
+            object_id_users_id_map[object_id].add(relation.user_id)
+
+        objects = model.objects.filter(id__in=object_id_users_id_map.keys())
+        send_m2m_change_signal = partial(
+            m2m_changed.send,
+            sender=m2m_model, reverse=reverse, model=User, using=model.objects.db
+        )
+
+        for obj in objects:
+            send_m2m_change_signal(
+                instance=obj,
+                pk_set=object_id_users_id_map[obj.id],
+                action=PRE_REMOVE
+            )
+
+        relations.delete()
+
+        for obj in objects:
+            send_m2m_change_signal(
+                instance=obj,
+                pk_set=object_id_users_id_map[obj.id],
+                action=POST_REMOVE
+            )
 
 
 def _clear_users_from_org(org, users):
