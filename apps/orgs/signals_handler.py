@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+from collections import defaultdict
 
 from django.db.models.signals import m2m_changed
 from django.db.models.signals import post_save
@@ -7,10 +8,11 @@ from django.dispatch import receiver
 
 from orgs.utils import tmp_to_org
 from .models import Organization, OrganizationMember
-from .hands import set_current_org, current_org, Node, get_current_org
+from .hands import set_current_org, Node, get_current_org
 from perms.models import (AssetPermission, DatabaseAppPermission,
                           K8sAppPermission, RemoteAppPermission)
-from users.models import UserGroup
+from users.models import UserGroup, User
+from common.const.signals import PRE_REMOVE, POST_REMOVE
 
 
 @receiver(post_save, sender=Organization)
@@ -34,11 +36,34 @@ def _remove_users(model, users, org):
             users = (users, )
 
         m2m_model = model.users.through
-        if model.users.reverse:
+        reverse = model.users.reverse
+        if reverse:
             m2m_field_name = model.users.field.m2m_reverse_field_name()
         else:
             m2m_field_name = model.users.field.m2m_field_name()
-        m2m_model.objects.filter(**{'user__in': users, f'{m2m_field_name}__org_id': org.id}).delete()
+        relations = m2m_model.objects.filter(**{
+            'user__in': users, f'{m2m_field_name}__org_id': org.id
+        })
+
+        objs_id_users_id_map = defaultdict(set)
+
+        for relation in relations:
+            objs_id_users_id_map[getattr(relation, f'{m2m_field_name}_id')].add(relation.user_id)
+
+        objs = model.objects.filter(id__in=objs_id_users_id_map.keys())
+        for obj in objs:
+            m2m_changed.send(
+                sender=m2m_model, instance=obj, reverse=reverse, model=User,
+                pk_set=objs_id_users_id_map[obj.id], using=model.objects.db, action=PRE_REMOVE
+            )
+
+        relations.delete()
+
+        for obj in objs:
+            m2m_changed.send(
+                sender=m2m_model, instance=obj, reverse=reverse, model=User,
+                pk_set=objs_id_users_id_map[obj.id], using=model.objects.db, action=POST_REMOVE
+            )
 
 
 def _clear_users_from_org(org, users):
