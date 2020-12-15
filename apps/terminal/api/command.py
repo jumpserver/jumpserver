@@ -29,7 +29,7 @@ class CommandQueryMixin:
     command_store = get_command_storage()
     permission_classes = [IsOrgAdminOrAppUser | IsOrgAuditor]
     filter_fields = [
-        "asset", "system_user", "user", "session_id", "risk_level",
+        "asset", "system_user", "user", "session", "risk_level",
         "input"
     ]
     default_days_ago = 5
@@ -60,7 +60,7 @@ class CommandQueryMixin:
         queryset = multi_command_storage.filter(
             date_from=date_from, date_to=date_to,
             user=q.get("user"), asset=q.get("asset"), system_user=q.get("system_user"),
-            input=q.get("input"), session=q.get("session_id"),
+            input=q.get("input"), session=q.get("session_id", q.get('session')),
             risk_level=self.get_query_risk_level(), org_id=self.get_org_id(),
         )
         return queryset
