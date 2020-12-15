@@ -7,10 +7,11 @@ from perms.tasks import create_rebuild_user_tree_task, \
     create_rebuild_user_tree_task_by_related_nodes_or_assets
 from users.models import User, UserGroup
 from assets.models import Asset, SystemUser
+from applications.models import Application
 from common.utils import get_logger
 from common.exceptions import M2MReverseNotAllowed
 from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR
-from .models import AssetPermission, RemoteAppPermission
+from .models import AssetPermission, RemoteAppPermission, ApplicationPermission
 
 
 logger = get_logger(__file__)
@@ -244,3 +245,84 @@ def on_node_asset_change(action, instance, reverse, pk_set, **kwargs):
         node_pk_set = pk_set
 
     create_rebuild_user_tree_task_by_related_nodes_or_assets.delay(node_pk_set, asset_pk_set)
+
+
+@receiver(m2m_changed, sender=ApplicationPermission.system_users.through)
+def on_remote_app_permission_system_users_changed(sender, instance: ApplicationPermission, action, reverse, pk_set, **kwargs):
+    if reverse:
+        raise M2MReverseNotAllowed
+
+    if action != POST_ADD:
+        return
+
+    system_users = SystemUser.objects.filter(pk__in=pk_set)
+    logger.debug("Application permission system_users change signal received")
+    attrs = instance.applications.all().values_list('attrs', flat=True)
+    assets_id = []
+    for attr in attrs:
+        asset_id = attr.get('asset')
+        if asset_id:
+            assets_id.append(asset_id)
+
+    for system_user in system_users:
+        system_user.assets.add(*assets_id)
+        if system_user.username_same_with_user:
+            users_id = instance.users.all().values_list('id', flat=True)
+            groups_id = instance.user_groups.all().values_list('id', flat=True)
+            system_user.groups.add(*users_id)
+            system_user.users.add(*groups_id)
+
+
+@receiver(m2m_changed, sender=ApplicationPermission.users.through)
+def on_remoteapps_permission_users_changed(sender, instance, action, reverse, pk_set, **kwargs):
+    if reverse:
+        raise M2MReverseNotAllowed
+
+    if action != POST_ADD:
+        return
+
+    logger.debug("Application permission users change signal received")
+    users_id = User.objects.filter(pk__in=pk_set).values_list('id', flat=True)
+    system_users = instance.system_users.all()
+
+    for system_user in system_users:
+        if system_user.username_same_with_user:
+            system_user.users.add(*users_id)
+
+
+@receiver(m2m_changed, sender=ApplicationPermission.user_groups.through)
+def on_remoteapps_permission_user_groups_changed(sender, instance, action, reverse, pk_set, **kwargs):
+    if reverse:
+        raise M2MReverseNotAllowed
+
+    if action != POST_ADD:
+        return
+
+    logger.debug("Application permission user groups change signal received")
+    groups_id = UserGroup.objects.filter(pk__in=pk_set).values_list('id', flat=True)
+    system_users = instance.system_users.all()
+
+    for system_user in system_users:
+        if system_user.username_same_with_user:
+            system_user.groups.add(*groups_id)
+
+
+@receiver(m2m_changed, sender=ApplicationPermission.applications.through)
+def on_remoteapps_permission_user_groups_changed(sender, instance, action, reverse, pk_set, **kwargs):
+    if reverse:
+        raise M2MReverseNotAllowed
+
+    if action != POST_ADD:
+        return
+
+    attrs = Application.objects.filter(id__in=pk_set).values_list('attrs', flat=True)
+    assets_id = []
+    for attr in attrs:
+        asset_id = attr.get('asset')
+        if asset_id:
+            assets_id.append(asset_id)
+
+    system_users = instance.system_users.all()
+
+    for system_user in system_users:
+        system_user.assets.add(*assets_id)
