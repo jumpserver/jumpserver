@@ -106,46 +106,43 @@ def send_command_alert_mail(command):
 
 class ComponentsMetricsUtil(object):
 
-    def __init__(self, component_type=None):
-        self.type = component_type
-        self.components = []
-        self.initial_components()
-
-    def initial_components(self):
+    @staticmethod
+    def get_components(tp=None):
         from .models import Terminal
-        terminals = Terminal.objects.all().order_by('type')
-        if self.type:
-            terminals = terminals.filter(type=self.type)
-        self.components = list(terminals)
+        components = Terminal.objects.all().order_by('type')
+        if tp:
+            components = components.filter(type=tp)
+        return components
 
-    def get_metrics(self):
+    def get_metrics(self, tp=None):
+        components = self.get_components(tp)
         total_count = normal_count = high_count = critical_count = session_active_total = 0
-        for component in self.components:
+        for component in components:
             total_count += 1
-            if not component.is_alive:
-                critical_count += 1
-                continue
-            session_active_total += component.state.get('session_active_count', 0)
-            if component.is_normal:
-                normal_count += 1
-            elif component.is_high:
-                high_count += 1
+            if component.is_alive:
+                if component.is_normal:
+                    normal_count += 1
+                elif component.is_high:
+                    high_count += 1
+                else:
+                    # critical
+                    critical_count += 1
+                session_active_total += component.state.get('session_active_count', 0)
             else:
                 critical_count += 1
-        metrics = {
+        return {
             'total': total_count,
             'normal': normal_count,
             'high': high_count,
             'critical': critical_count,
             'session_active': session_active_total
         }
-        return metrics
 
 
 class ComponentsPrometheusMetricsUtil(ComponentsMetricsUtil):
 
     @staticmethod
-    def get_status_metrics(metrics):
+    def convert_status_metrics(metrics):
         return {
             'any': metrics['total'],
             'normal': metrics['normal'],
@@ -154,50 +151,47 @@ class ComponentsPrometheusMetricsUtil(ComponentsMetricsUtil):
         }
 
     def get_prometheus_metrics_text(self):
-        prometheus_metrics = []
-        prometheus_metrics.append('# JumpServer 各组件状态个数汇总')
-        base_status_metric_text = 'jumpserver_components_status_total{component_type="%s", status="%s"} %s'
-        for component in self.components:
-            component_type = component.type
-            base_metrics = self.get_metrics()
+        prometheus_metrics = list()
 
-            prometheus_metrics.append(f'## 组件: {component_type}')
-            status_metrics = self.get_status_metrics(base_metrics)
+        # 各组件状态个数汇总
+        prometheus_metrics.append('# JumpServer 各组件状态个数汇总')
+        status_metric_text = 'jumpserver_components_status_total{component_type="%s", status="%s"} %s'
+        for tp in const.TerminalTypeChoices.types():
+            prometheus_metrics.append(f'## 组件: {tp}')
+            metrics_tp = self.get_metrics(tp)
+            status_metrics = self.convert_status_metrics(metrics_tp)
             for status, value in status_metrics.items():
-                metric_text = base_status_metric_text % (component_type, status, value)
+                metric_text = status_metric_text % (tp, status, value)
                 prometheus_metrics.append(metric_text)
 
         prometheus_metrics.append('\n')
+
+        # 各组件在线会话数汇总
         prometheus_metrics.append('# JumpServer 各组件在线会话数汇总')
-        base_session_active_metric_text = 'jumpserver_components_session_active_total{component_type="%s"} %s'
-        for component in self.components:
-            component_type = component.type
-            prometheus_metrics.append(f'## 组件: {component_type}')
-            base_metrics = self.get_metrics()
-            metric_text = base_session_active_metric_text % (
-                component_type,
-                base_metrics['session_active']
-            )
+        session_active_metric_text = 'jumpserver_components_session_active_total{component_type="%s"} %s'
+        for tp in const.TerminalTypeChoices.types():
+            prometheus_metrics.append(f'## 组件: {tp}')
+            metrics_tp = self.get_metrics(tp)
+            metric_text = session_active_metric_text % (tp, metrics_tp['session_active'])
             prometheus_metrics.append(metric_text)
 
         prometheus_metrics.append('\n')
-        prometheus_metrics.append('# JumpServer 各组件节点一些指标')
-        base_system_state_metric_text = 'jumpserver_components_%s{component_type="%s", component="%s"} %s'
-        system_states_name = [
+
+        # 各组件节点指标
+        prometheus_metrics.append('# JumpServer 各组件一些指标')
+        state_metric_text = 'jumpserver_components_%s{component_type="%s", component="%s"} %s'
+        states = [
             'system_cpu_load_1', 'system_memory_used_percent',
             'system_disk_used_percent', 'session_active_count'
         ]
-        for system_state_name in system_states_name:
-            prometheus_metrics.append(f'## 指标: {system_state_name}')
-            for component in self.components:
+        for state in states:
+            prometheus_metrics.append(f'## 指标: {state}')
+            components = self.get_components()
+            for component in components:
                 if not component.is_alive:
                     continue
-                component_type = component.type
-                metric_text = base_system_state_metric_text % (
-                    system_state_name,
-                    component_type,
-                    component.name,
-                    component.state.get(system_state_name)
+                metric_text = state_metric_text % (
+                    state, component.type, component.name, component.state.get(state)
                 )
                 prometheus_metrics.append(metric_text)
 
