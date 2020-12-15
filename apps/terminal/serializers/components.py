@@ -6,17 +6,17 @@ from django.utils.translation import ugettext_lazy as _
 class ComponentsStateSerializer(serializers.Serializer):
     # system
     system_cpu_load_1 = serializers.FloatField(
-        required=False, default=0, label=_("System cpu load (1 minutes)")
+        required=False, label=_("System cpu load (1 minutes)")
     )
     system_memory_used_percent = serializers.FloatField(
-        required=False, default=0, label=_('System memory used percent')
+        required=False, label=_('System memory used percent')
     )
     system_disk_used_percent = serializers.FloatField(
-        required=False, default=0, label=_('System disk used percent')
+        required=False, label=_('System disk used percent')
     )
     # sessions
     session_active_count = serializers.IntegerField(
-        required=False, default=0, label=_("Session active count")
+        required=False, label=_("Session active count")
     )
 
     def save(self, **kwargs):
