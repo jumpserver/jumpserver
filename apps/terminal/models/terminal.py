@@ -129,7 +129,10 @@ class TerminalStatusMixin(TerminalStateMixin):
 class Terminal(TerminalStatusMixin, models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
-    type = models.CharField(choices=const.TerminalTypeChoices.choices, max_length=64, verbose_name=_('type'))
+    type = models.CharField(
+        choices=const.TerminalTypeChoices.choices, default=const.TerminalTypeChoices.koko.value,
+        max_length=64, verbose_name=_('type')
+    )
     remote_addr = models.CharField(max_length=128, blank=True, verbose_name=_('Remote Address'))
     ssh_port = models.IntegerField(verbose_name=_('SSH Port'), default=2222)
     http_port = models.IntegerField(verbose_name=_('HTTP Port'), default=5000)

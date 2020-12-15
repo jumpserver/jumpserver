@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='userloginlog',
             name='backend',
-            field=models.CharField(default='', max_length=32, verbose_name='Login backend'),
+            field=models.CharField(default='', max_length=32, verbose_name='Authentication backend'),
         ),
     ]
