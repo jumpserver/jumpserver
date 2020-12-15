@@ -18,7 +18,7 @@ class TerminalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Terminal
         fields = [
-            'id', 'name', 'remote_addr', 'command_storage',
+            'id', 'name', 'type', 'remote_addr', 'command_storage',
             'replay_storage', 'user', 'is_accepted', 'is_deleted',
             'date_created', 'comment'
         ]
@@ -55,5 +55,6 @@ class TerminalSerializer(serializers.ModelSerializer):
 
 class TerminalRegistrationSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=128)
-    comment = serializers.CharField(max_length=128, )
+    comment = serializers.CharField(max_length=128)
+    type = serializers.CharField(max_length=64)
     service_account = ServiceAccountSerializer(read_only=True)

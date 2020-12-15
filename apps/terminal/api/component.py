@@ -28,7 +28,7 @@ class ComponentsMetricsAPIView(generics.GenericAPIView):
     permission_classes = (IsSuperUser,)
 
     def get(self, request, *args, **kwargs):
-        component_type = request.query_params.get('type')
-        util = ComponentsMetricsUtil(component_type)
-        metrics = util.get_metrics()
+        tp = request.query_params.get('type')
+        util = ComponentsMetricsUtil()
+        metrics = util.get_metrics(tp)
         return Response(metrics, status=status.HTTP_200_OK)
