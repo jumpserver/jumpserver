@@ -116,7 +116,8 @@ class ComponentsMetricsUtil(object):
 
     def get_metrics(self, tp=None):
         components = self.get_components(tp)
-        total_count = normal_count = high_count = critical_count = session_active_total = 0
+        total_count = normal_count = high_count = critical_count = offline_count = \
+            session_active_total = 0
         for component in components:
             total_count += 1
             if component.is_alive:
@@ -129,12 +130,13 @@ class ComponentsMetricsUtil(object):
                     critical_count += 1
                 session_active_total += component.state.get('session_active_count', 0)
             else:
-                critical_count += 1
+                offline_count += 1
         return {
             'total': total_count,
             'normal': normal_count,
             'high': high_count,
             'critical': critical_count,
+            'offline': offline_count,
             'session_active': session_active_total
         }
 
@@ -147,7 +149,8 @@ class ComponentsPrometheusMetricsUtil(ComponentsMetricsUtil):
             'any': metrics['total'],
             'normal': metrics['normal'],
             'high': metrics['high'],
-            'critical': metrics['critical']
+            'critical': metrics['critical'],
+            'offline': metrics['offline']
         }
 
     def get_prometheus_metrics_text(self):

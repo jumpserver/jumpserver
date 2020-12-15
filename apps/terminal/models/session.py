@@ -132,7 +132,7 @@ class Session(OrgModelMixin):
             return None, e
 
         if settings.SERVER_REPLAY_STORAGE:
-            from .tasks import upload_session_replay_to_external_storage
+            from ..tasks import upload_session_replay_to_external_storage
             upload_session_replay_to_external_storage.delay(str(self.id))
         return name, None
 
@@ -146,10 +146,8 @@ class Session(OrgModelMixin):
         return cls.objects.filter(is_finished=False)
 
     def is_active(self):
-        if self.protocol in ['ssh', 'telnet', 'rdp', 'mysql']:
-            key = self.ACTIVE_CACHE_KEY_PREFIX.format(self.id)
-            return bool(cache.get(key))
-        return True
+        key = self.ACTIVE_CACHE_KEY_PREFIX.format(self.id)
+        return bool(cache.get(key))
 
     @property
     def command_amount(self):

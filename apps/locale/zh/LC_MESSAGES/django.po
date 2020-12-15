@@ -1015,7 +1015,7 @@ msgstr "没有匹配到资产，结束任务"
 #: users/templates/users/user_list.html:98
 #: users/templates/users/user_remote_app_permission.html:111
 msgid "Delete"
-msgstr "删除文件"
+msgstr "删除"
 
 #: audits/models.py:27
 msgid "Upload"
