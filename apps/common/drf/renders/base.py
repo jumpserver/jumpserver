@@ -27,11 +27,13 @@ class BaseFileRenderer(BaseRenderer):
     def set_response_disposition(self, response):
         serializer = self.serializer
         if response and hasattr(serializer, 'Meta') and hasattr(serializer.Meta, "model"):
-            model_name = serializer.Meta.model.__name__.lower()
-            now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-            filename = "{}_{}.{}".format(model_name, now, self.format)
-            disposition = 'attachment; filename="{}"'.format(filename)
-            response['Content-Disposition'] = disposition
+            filename_prefix = serializer.Meta.model.__name__.lower()
+        else:
+            filename_prefix = 'download'
+        now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        filename = "{}_{}.{}".format(filename_prefix, now, self.format)
+        disposition = 'attachment; filename="{}"'.format(filename)
+        response['Content-Disposition'] = disposition
 
     def get_rendered_fields(self):
         fields = self.serializer.fields
