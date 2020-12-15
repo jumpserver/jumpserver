@@ -127,7 +127,11 @@ def on_audits_log_create(sender, instance=None, **kwargs):
 def get_login_backend(request):
     backend = request.session.get(BACKEND_SESSION_KEY, '')
     backend = backend.rsplit('.', maxsplit=1)[-1]
-    return LOGIN_BACKEND.get(backend, '')
+    if backend in LOGIN_BACKEND:
+        return LOGIN_BACKEND[backend]
+    else:
+        logger.warn(f'LOGIN_BACKEND_NOT_FOUND: {backend}')
+        return ''
 
 
 def generate_data(username, request):
