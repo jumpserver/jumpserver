@@ -132,7 +132,7 @@ class Session(OrgModelMixin):
             return None, e
 
         if settings.SERVER_REPLAY_STORAGE:
-            from .tasks import upload_session_replay_to_external_storage
+            from ..tasks import upload_session_replay_to_external_storage
             upload_session_replay_to_external_storage.delay(str(self.id))
         return name, None
 
