@@ -1,5 +1,3 @@
-from itertools import chain
-
 from rest_framework import serializers
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
@@ -9,7 +7,7 @@ from django.db.models import Q
 from common.utils.timezone import dt_parser, dt_formater
 from orgs.utils import tmp_to_root_org
 from orgs.models import Organization, ROLE as ORG_ROLE
-from assets.models.asset import Asset
+from assets.models import Asset, SystemUser
 from users.models.user import User
 from perms.serializers import ActionsField
 from perms.models import Action
@@ -130,12 +128,23 @@ class RequestAssetPermTicketSerializer(serializers.ModelSerializer):
             if hostname:
                 q |= Q(hostname__icontains=hostname)
 
-            data['confirmed_assets'] = list(
-                map(lambda x: str(x), chain(*Asset.objects.filter(q)[0: limit].values_list('id'))))
+            recomand_assets_id = Asset.objects.filter(q)[:limit].values_list('id', flat=True)
+            data['confirmed_assets'] = [str(i) for i in recomand_assets_id]
+
+    def _recommend_system_users(self, data, instance):
+        confirmed_system_users = data.get('confirmed_system_users')
+        if not confirmed_system_users and self._is_assignee(instance):
+            system_user = data.get('system_user')
+
+            recomand_system_users_id = SystemUser.objects.filter(
+                name__icontains=system_user
+            )[:3].values_list('id', flat=True)
+            data['confirmed_system_users'] = [str(i) for i in recomand_system_users_id]
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
         self._recommend_assets(data, instance)
+        self._recommend_system_users(data, instance)
         return data
 
     def _create_body(self, validated_data):
