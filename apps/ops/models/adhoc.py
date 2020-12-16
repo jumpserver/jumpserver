@@ -180,8 +180,10 @@ class AdHoc(OrgModelMixin):
     def run(self):
         try:
             hid = current_task.request.id
+            if AdHocExecution.objects.filter(id=hid).exists():
+                hid = uuid.uuid4()
         except AttributeError:
-            hid = str(uuid.uuid4())
+            hid = uuid.uuid4()
         execution = AdHocExecution(
             id=hid, adhoc=self, task=self.task,
             task_display=str(self.task)[:128],

@@ -491,6 +491,10 @@ class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
         sort_key_func = lambda n: [int(i) for i in n.key.split(':')]
         nodes_sorted = sorted(list(nodes), key=sort_key_func)
         nodes_mapper = {n.key: n for n in nodes_sorted}
+        if not self.is_org_root():
+            # 如果是org_root，那么parent_key为'', parent为自己，所以这种情况不处理
+            # 更新自己时，自己的parent_key获取不到
+            nodes_mapper.update({self.parent_key: self.parent})
         for node in nodes_sorted:
             parent = nodes_mapper.get(node.parent_key)
             if not parent:
