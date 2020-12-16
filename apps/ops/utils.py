@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from common.utils import get_logger, get_object_or_none
 from common.tasks import send_mail_async
-from orgs.utils import tmp_to_org, org_aware_func
+from orgs.utils import org_aware_func
 
 from .models import Task, AdHoc
 
