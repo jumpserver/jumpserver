@@ -186,7 +186,6 @@ class LDAPServerUtil(object):
             user[attr] = value
         return user
 
-    @timeit
     def user_entries_to_dict(self, user_entries):
         users = []
         for user_entry in user_entries:
@@ -194,7 +193,6 @@ class LDAPServerUtil(object):
             users.append(user)
         return users
 
-    @timeit
     def search_for_user_dn(self, username):
         user_entries = self.search_user_entries(search_users=[username])
         if len(user_entries) == 1:
