@@ -316,7 +316,7 @@ def on_application_permission_user_groups_changed(sender, instance, action, reve
 
 
 @receiver(m2m_changed, sender=ApplicationPermission.applications.through)
-def on_application_permission_user_groups_changed(sender, instance, action, reverse, pk_set, **kwargs):
+def on_application_permission_applications_changed(sender, instance, action, reverse, pk_set, **kwargs):
     if instance.category != Category.remote_app:
         return
 
