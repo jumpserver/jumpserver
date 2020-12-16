@@ -115,8 +115,12 @@ class LDAPUser(_LDAPUser):
         else:
             # 解决直接配置DC域，用户认证失败的问题(库不能从整棵树中搜索)
             user_dn = self._search_for_user_dn_from_ldap_util()
-            self._user_dn = user_dn
-            self._user_attrs = self._load_user_attrs()
+            if user_dn is None:
+                self._user_dn = None
+                self._user_attrs = None
+            else:
+                self._user_dn = user_dn
+                self._user_attrs = self._load_user_attrs()
 
         return user_dn
 
