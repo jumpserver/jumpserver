@@ -133,9 +133,9 @@ class RequestAssetPermTicketSerializer(serializers.ModelSerializer):
 
     def _recommend_system_users(self, data, instance):
         confirmed_system_users = data.get('confirmed_system_users')
-        if not confirmed_system_users and self._is_assignee(instance):
-            system_user = data.get('system_user')
+        system_user = data.get('system_user')
 
+        if all((not confirmed_system_users, self._is_assignee(instance), system_user)):
             recomand_system_users_id = SystemUser.objects.filter(
                 name__icontains=system_user
             )[:3].values_list('id', flat=True)
