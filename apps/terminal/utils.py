@@ -109,7 +109,7 @@ class ComponentsMetricsUtil(object):
     @staticmethod
     def get_components(tp=None):
         from .models import Terminal
-        components = Terminal.objects.all(is_deleted=False).order_by('type')
+        components = Terminal.objects.filter(is_deleted=False).order_by('type')
         if tp:
             components = components.filter(type=tp)
         return components
