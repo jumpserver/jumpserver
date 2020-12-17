@@ -33,3 +33,9 @@ class Timeout(JMSException):
 class M2MReverseNotAllowed(JMSException):
     status_code = status.HTTP_400_BAD_REQUEST
     default_detail = _('M2M reverse not allowed')
+
+
+class ReferencedByOthers(JMSException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_code = 'referenced_by_others'
+    default_detail = _('Is referenced by other objects and cannot be deleted')
