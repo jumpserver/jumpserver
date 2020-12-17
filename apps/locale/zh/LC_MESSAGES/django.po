@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-17 14:38+0800\n"
+"POT-Creation-Date: 2020-12-17 18:22+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -2731,7 +2731,6 @@ msgid "Output"
 msgstr "输出"
 
 #: terminal/backends/command/models.py:23
-#: terminal/backends/command/serializers.py:17
 msgid "Session"
 msgstr "会话"
 
@@ -2739,6 +2738,10 @@ msgstr "会话"
 #: terminal/backends/command/serializers.py:18
 msgid "Risk level"
 msgstr "风险等级"
+
+#: terminal/backends/command/serializers.py:17
+msgid "Session ID"
+msgstr "会话ID"
 
 #: terminal/backends/command/serializers.py:19
 msgid "Risk level for display"
