@@ -14,7 +14,7 @@ class SessionCommandSerializer(serializers.Serializer):
     system_user = serializers.CharField(max_length=64, label=_("System user"))
     input = serializers.CharField(max_length=128, label=_("Command"))
     output = serializers.CharField(max_length=1024, allow_blank=True, label=_("Output"))
-    session = serializers.CharField(max_length=36, label=_("Session"))
+    session = serializers.CharField(max_length=36, label=_("Session ID"))
     risk_level = serializers.ChoiceField(required=False, label=_("Risk level"), choices=AbstractSessionCommand.RISK_LEVEL_CHOICES)
     risk_level_display = serializers.SerializerMethodField(label=_('Risk level for display'))
     org_id = serializers.CharField(max_length=36, required=False, default='', allow_null=True, allow_blank=True)
