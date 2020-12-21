@@ -1,6 +1,7 @@
 import abc
 import json
 import codecs
+from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.parsers import BaseParser
 from rest_framework import status
@@ -83,14 +84,17 @@ class BaseFileParser(BaseParser):
             new_row.append(col)
         return new_row
 
-    @staticmethod
-    def process_row_data(row_data):
+    def process_row_data(self, row_data):
         """
         构建json数据后的行数据处理
         """
         new_row_data = {}
+        serializer_fields = self.serializer_cls().fields
         for k, v in row_data.items():
             if isinstance(v, list) or isinstance(v, dict) or isinstance(v, str) and k.strip() and v.strip():
+                # 解决类似disk_info为字符串的'{}'的问题
+                if not isinstance(v, str) and isinstance(serializer_fields[k], serializers.CharField):
+                    v = str(v)
                 new_row_data[k] = v
         return new_row_data
 
