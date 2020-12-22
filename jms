@@ -170,7 +170,6 @@ def parse_service(s):
     web_services = ['gunicorn', 'flower', 'daphne']
     celery_services = [
         "celery_ansible", "celery_default", "celery_node_tree",
-        "celery_check_asset_perm_expired", "celery_heavy_tasks"
     ]
     task_services = celery_services + ['beat']
     all_services = web_services + task_services
@@ -227,30 +226,20 @@ def get_start_daphne_kwargs():
 
 def get_start_celery_ansible_kwargs():
     print("\n- Start Celery as Distributed Task Queue: Ansible")
-    return get_start_worker_kwargs('ansible', 4)
+    return get_start_worker_kwargs('ansible', autoscale=(4, 1))
 
 
 def get_start_celery_default_kwargs():
     print("\n- Start Celery as Distributed Task Queue: Celery")
-    return get_start_worker_kwargs('celery', 4)
+    return get_start_worker_kwargs('celery', autoscale=(6, 1))
 
 
 def get_start_celery_node_tree_kwargs():
     print("\n- Start Celery as Distributed Task Queue: NodeTree")
-    return get_start_worker_kwargs('node_tree', 2)
+    return get_start_worker_kwargs('node_tree', autoscale=(4, 1))
 
 
-def get_start_celery_heavy_tasks_kwargs():
-    print("\n- Start Celery as Distributed Task Queue: HeavyTasks")
-    return get_start_worker_kwargs('celery_heavy_tasks', 1)
-
-
-def get_start_celery_check_asset_perm_expired_kwargs():
-    print("\n- Start Celery as Distributed Task Queue: CheckAseetPermissionExpired")
-    return get_start_worker_kwargs('celery_check_asset_perm_expired', 1)
-
-
-def get_start_worker_kwargs(queue, num):
+def get_start_worker_kwargs(queue, num=1, autoscale=None):
     # Todo: Must set this environment, otherwise not no ansible result return
     os.environ.setdefault('PYTHONOPTIMIZE', '1')
     os.environ.setdefault('ANSIBLE_FORCE_COLOR', 'True')
@@ -265,10 +254,13 @@ def get_start_worker_kwargs(queue, num):
         'celery', 'worker',
         '-A', 'ops',
         '-l', 'INFO',
-        '-c', str(num),
         '-Q', queue,
         '-n', '{}@{}'.format(queue, server_hostname)
     ]
+    if autoscale is None:
+        cmd.extend(('-c', str(num)))
+    else:
+        cmd.extend(('--autoscale', '{},{}'.format(*autoscale)))
     return {"cmd": cmd, "cwd": APPS_DIR}
 
 
@@ -386,8 +378,6 @@ def start_service(s):
         "celery_ansible": get_start_celery_ansible_kwargs,
         "celery_default": get_start_celery_default_kwargs,
         "celery_node_tree": get_start_celery_node_tree_kwargs,
-        "celery_heavy_tasks": get_start_celery_heavy_tasks_kwargs,
-        "celery_check_asset_perm_expired": get_start_celery_check_asset_perm_expired_kwargs,
         "beat": get_start_beat_kwargs,
         "flower": get_start_flower_kwargs,
         "daphne": get_start_daphne_kwargs,

@@ -12,7 +12,7 @@ from common.utils import get_logger
 logger = get_logger(__file__)
 
 
-@shared_task(queue='celery_heavy_tasks')
+@shared_task
 def check_node_assets_amount_task(org_id=Organization.ROOT_ID):
     try:
         with tmp_to_org(Organization.get_instance(org_id)):
@@ -22,6 +22,6 @@ def check_node_assets_amount_task(org_id=Organization.ROOT_ID):
 
 
 @register_as_period_task(crontab='0 2 * * *')
-@shared_task(queue='celery_heavy_tasks')
+@shared_task
 def check_node_assets_amount_period_task():
     check_node_assets_amount_task()

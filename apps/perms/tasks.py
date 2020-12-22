@@ -36,7 +36,7 @@ def dispatch_mapping_node_tasks():
 
 
 @register_as_period_task(interval=settings.PERM_EXPIRED_CHECK_PERIODIC)
-@shared_task(queue='celery_check_asset_perm_expired')
+@shared_task(queue='node_tree')
 @atomic()
 def check_asset_permission_expired():
     """
