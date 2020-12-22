@@ -34,6 +34,8 @@ def _dump_args(args: dict):
 def get_push_unixlike_system_user_tasks(system_user, username=None):
     if username is None:
         username = system_user.username
+    else:
+        system_user.home='/home/'+username
     password = system_user.password
     public_key = system_user.public_key
     comment = system_user.name
