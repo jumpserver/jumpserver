@@ -15,26 +15,33 @@ from ..models import Ticket
 
 
 class RequestAssetPermTicketSerializer(serializers.ModelSerializer):
-    actions = ActionsField(source='meta.actions', choices=Action.DB_CHOICES,
-                           default=Action.CONNECT)
-    ips = serializers.ListField(child=serializers.IPAddressField(), source='meta.ips',
-                                default=list, label=_('IP group'))
-    hostname = serializers.CharField(max_length=256, source='meta.hostname', default='',
-                                     allow_blank=True, label=_('Hostname'))
-    system_user = serializers.CharField(max_length=256, source='meta.system_user', default='',
-                                        allow_blank=True, label=_('System user'))
-    date_start = serializers.DateTimeField(source='meta.date_start', allow_null=True,
-                                           required=False, label=_('Date start'))
-    date_expired = serializers.DateTimeField(source='meta.date_expired', allow_null=True,
-                                             required=False, label=_('Date expired'))
-    confirmed_assets = serializers.ListField(child=serializers.UUIDField(),
-                                             source='meta.confirmed_assets',
-                                             default=list, required=False,
-                                             label=_('Confirmed assets'))
-    confirmed_system_users = serializers.ListField(child=serializers.UUIDField(),
-                                                  source='meta.confirmed_system_users',
-                                                  default=list, required=False,
-                                                  label=_('Confirmed system user'))
+    actions = ActionsField(
+        source='meta.actions', choices=Action.DB_CHOICES, default=Action.CONNECT
+    )
+    ips = serializers.ListField(
+        child=serializers.IPAddressField(), source='meta.ips', default=list, label=_('IP group')
+    )
+    hostname = serializers.CharField(
+        max_length=256, source='meta.hostname', default='', allow_blank=True, label=_('Hostname')
+    )
+    system_user = serializers.CharField(
+        max_length=256, source='meta.system_user', default='', allow_blank=True,
+        label=_('System user')
+    )
+    date_start = serializers.DateTimeField(
+        source='meta.date_start', allow_null=True, required=False, label=_('Date start')
+    )
+    date_expired = serializers.DateTimeField(
+        source='meta.date_expired', allow_null=True, required=False, label=_('Date expired')
+    )
+    confirmed_assets = serializers.ListField(
+        child=serializers.UUIDField(), source='meta.confirmed_assets', default=list, required=False,
+        label=_('Confirmed assets')
+    )
+    confirmed_system_users = serializers.ListField(
+        child=serializers.UUIDField(), source='meta.confirmed_system_users', default=list,
+        required=False, label=_('Confirmed system user')
+    )
     assets_waitlist_url = serializers.SerializerMethodField()
     system_users_waitlist_url = serializers.SerializerMethodField()
 

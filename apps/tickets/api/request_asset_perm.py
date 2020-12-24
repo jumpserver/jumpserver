@@ -21,13 +21,13 @@ from ..exceptions import (
     TicketClosed, TicketActionAlready, NotHaveConfirmedAssets,
     NotHaveConfirmedSystemUser
 )
-from .. import serializers
+from .. import serializers, const
 from ..models import Ticket
 from ..permissions import IsAssignee
 
 
 class RequestAssetPermTicketViewSet(JMSModelViewSet):
-    queryset = Ticket.origin_objects.filter(type=Ticket.TYPE.REQUEST_ASSET_PERM)
+    queryset = Ticket.origin_objects.filter(type=const.TicketTypeChoices.apply_asset.value)
     serializer_classes = {
         'default': serializers.RequestAssetPermTicketSerializer,
         'approve': EmptySerializer,

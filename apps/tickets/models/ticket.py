@@ -7,39 +7,56 @@ from django.utils.translation import ugettext_lazy as _
 
 from common.db.models import ChoiceSet
 from common.mixins.models import CommonModelMixin
-from common.fields.model import JsonDictTextField
 from orgs.mixins.models import OrgModelMixin
+from .. import const
 
 __all__ = ['Ticket', 'Comment']
 
 
-class Ticket(OrgModelMixin, CommonModelMixin):
-    class STATUS(ChoiceSet):
-        OPEN = 'open', _("Open")
-        CLOSED = 'closed', _("Closed")
-
-    class TYPE(ChoiceSet):
-        GENERAL = 'general', _("General")
-        LOGIN_CONFIRM = 'login_confirm', _("Login confirm")
-        REQUEST_ASSET_PERM = 'request_asset', _('Request asset permission')
-
-    class ACTION(ChoiceSet):
-        APPROVE = 'approve', _('Approve')
-        REJECT = 'reject', _('Reject')
-
-    user = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, related_name='%(class)s_requested', verbose_name=_("User"))
-    user_display = models.CharField(max_length=128, verbose_name=_("User display name"))
-
+class Ticket(CommonModelMixin, OrgModelMixin):
     title = models.CharField(max_length=256, verbose_name=_("Title"))
+    type = models.CharField(
+        max_length=64, choices=const.TicketTypeChoices.choices,
+        default=const.TicketTypeChoices.general.value, verbose_name=_("Type")
+    )
+    meta = models.JSONField(verbose_name=_("Meta"))
     body = models.TextField(verbose_name=_("Body"))
-    meta = JsonDictTextField(verbose_name=_("Meta"), default='{}')
-    assignee = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, related_name='%(class)s_handled', verbose_name=_("Assignee"))
-    assignee_display = models.CharField(max_length=128, blank=True, null=True, verbose_name=_("Assignee display name"), default='')
-    assignees = models.ManyToManyField('users.User', related_name='%(class)s_assigned', verbose_name=_("Assignees"))
-    assignees_display = models.CharField(max_length=128, verbose_name=_("Assignees display name"), blank=True)
-    type = models.CharField(max_length=16, choices=TYPE.choices, default=TYPE.GENERAL, verbose_name=_("Type"))
-    status = models.CharField(choices=STATUS.choices, max_length=16, default='open')
-    action = models.CharField(choices=ACTION.choices, max_length=16, default='', blank=True)
+    action = models.CharField(
+        choices=const.TicketActionChoices.choices, max_length=16, blank=True, default=''
+    )
+    status = models.CharField(
+        max_length=16, choices=const.TicketStatusChoices.choices,
+        default=const.TicketStatusChoices.open.value
+    )
+    # 申请人
+    user = models.ForeignKey(
+        'users.User', related_name='%(class)s_requested', on_delete=models.SET_NULL, null=True,
+        verbose_name=_("User")
+    )
+    user_display = models.CharField(max_length=128, verbose_name=_("User display name"))
+    applicant = models.ForeignKey(
+        'users.User', related_name='applied_tickets', on_delete=models.SET_NULL, null=True,
+        verbose_name=_("Applicant")
+    )
+    applicant_display = models.CharField(
+        max_length=128, verbose_name=_("Applicant display"), default=''
+    )
+    # 处理人
+    handler = models.ForeignKey(
+        'users.User', related_name='handled_tickets', on_delete=models.SET_NULL, null=True,
+        verbose_name=_("Assignee")
+    )
+    handler_display = models.CharField(
+        max_length=128, blank=True, null=True, verbose_name=_("Assignee name"), default=''
+    )
+    # 受理人列表
+    assignees = models.ManyToManyField(
+        'users.User', related_name='assigned_tickets', verbose_name=_("Assignees")
+    )
+    assignees_display = models.CharField(
+        max_length=128, blank=True, verbose_name=_("Assignees display")
+    )
+    # 其他
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
     origin_objects = models.Manager()

@@ -16,14 +16,12 @@ class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = [
-            'id', 'user', 'user_display', 'title', 'body',
-            'assignees', 'assignees_display', 'assignee', 'assignee_display',
-            'status', 'action', 'date_created', 'date_updated',
-            'type', 'type_display', 'action_display',
+            'id', 'title', 'type', 'type_display', 'user', 'user_display', 'body',
+            'assignee', 'assignee_display', 'assignees', 'assignees_display',
+            'status', 'action', 'action_display', 'date_created', 'date_updated',
         ]
         read_only_fields = [
-            'user_display', 'assignees_display',
-            'date_created', 'date_updated',
+            'user_display', 'assignees_display', 'date_created', 'date_updated',
         ]
         extra_kwargs = {
             'status': {'label': _('Status')},
