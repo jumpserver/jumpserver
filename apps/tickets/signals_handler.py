@@ -14,6 +14,14 @@ from .utils import (
 logger = get_logger(__name__)
 
 
+@receiver(post_save, sender=Ticket)
+def on_ticket_approve(sender, instance=None, created=False, *args, **kwargs):
+    if not instance.is_approved():
+        return
+    instance.create_relation_permission()
+    # instance.create_relation_comment()
+
+
 @receiver(m2m_changed, sender=Ticket.assignees.through)
 def on_ticket_assignees_set(sender, instance=None, action=None,
                             reverse=False, model=None,

@@ -62,7 +62,7 @@ class TicketSerializer(serializers.ModelSerializer):
         applied_attrs.update(attrs)
         applied_attrs['applicant'] = applicant
         applied_attrs['applicant_display'] = str(applicant)
-        return attrs
+        return applied_attrs
 
     def perform_close_validate(self, _=None):
         closed_attrs = {}

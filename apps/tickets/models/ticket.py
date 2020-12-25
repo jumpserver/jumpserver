@@ -5,11 +5,13 @@ import uuid
 from datetime import datetime
 from django.db import models
 from django.db.models import Q
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _,  ugettext as __
 from django.conf import settings
 
+from perms.models import AssetPermission
 from common.mixins.models import CommonModelMixin
 from orgs.mixins.models import OrgModelMixin
+from orgs.utils import tmp_to_org, tmp_to_root_org
 from .. import const
 
 __all__ = ['Ticket', 'Comment']
@@ -98,6 +100,49 @@ class Ticket(CommonModelMixin, OrgModelMixin):
 
     def is_closed(self):
         return self.status == const.TicketStatusChoices.closed.value
+    
+    def is_approved(self):
+        return self.action == const.TicketActionChoices.approve.value
+
+    def create_apply_asset_relation_permission(self):
+        with tmp_to_root_org():
+            asset_permission = AssetPermission.objects.filter(id=self.id).first()
+            if asset_permission:
+                return asset_permission
+        approve_assets_id = self.meta['approve_assets']
+        approve_system_users_id = self.meta['approve_system_users']
+        approve_actions = self.meta['approve_actions']
+        approve_date_start = self.meta['approve_date_start']
+        approve_date_expired = self.meta['approve_date_expired']
+        permission_name = __('Created by ticket ({})'.format(self.title))
+        permission_comment = __(
+            'Created by the ticket, '
+            'ticket title: {}, '
+            'ticket applicant: {}, '
+            'ticket processor: {}, '
+            'ticket ID: {}'
+            ''.format(self.title, self.applicant_display, self.processor_display, str(self.id))
+        )
+        permission_data = {
+            'id': self.id,
+            'name': permission_name,
+            'created_by': self.processor_display,
+            'comment': permission_comment,
+            'actions': approve_actions,
+            'date_start': approve_date_start,
+            'date_expired': approve_date_expired,
+        }
+        with tmp_to_org(self.org_id):
+            asset_permission = AssetPermission.objects.create(**permission_data)
+            asset_permission.users.add(self.applicant)
+            asset_permission.assets.set(approve_assets_id)
+            asset_permission.system_users.set(approve_system_users_id)
+        return asset_permission
+
+    def create_relation_permission(self):
+        create_relation_permission_method = getattr(self, f'create_{self.type}_relation_permission')
+        if create_relation_permission_method:
+            create_relation_permission_method()
 
     #: old
     def create_status_comment(self, status, user):
