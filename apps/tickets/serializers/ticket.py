@@ -35,14 +35,36 @@ class TicketSerializer(serializers.ModelSerializer):
             'assignees': {'required': False}
         }
 
+    @property
+    def view_action(self):
+        view_action = self.context['view'].action
+        return view_action
+
+    @property
+    def view_action_is_apply(self):
+        return self.view_action == 'apply'
+
+    @property
+    def view_action_is_approve(self):
+        return self.view_action == 'approve'
+
+    @property
+    def view_action_is_reject(self):
+        return self.view_action == 'reject'
+
+    @property
+    def view_action_is_close(self):
+        return self.view_action == 'close'
+
     def perform_apply_validate(self, attrs):
         applied_attrs = {}
         applicant = self.context['request'].user
+        applied_attrs.update(attrs)
         applied_attrs['applicant'] = applicant
         applied_attrs['applicant_display'] = str(applicant)
         return attrs
 
-    def perform_close_validate(self):
+    def perform_close_validate(self, _=None):
         closed_attrs = {}
         processor = self.context['request'].user
         closed_attrs['processor'] = processor
@@ -56,25 +78,19 @@ class TicketSerializer(serializers.ModelSerializer):
         approved_attrs['meta'] = attrs['meta']
         approved_attrs.update(closed_attrs)
         approved_attrs['action'] = const.TicketActionChoices.approve.value
-        return attrs
+        return approved_attrs
 
     def perform_reject_validate(self, attrs):
         rejected_attrs = {}
         closed_attrs = self.perform_close_validate()
         rejected_attrs.update(closed_attrs)
         rejected_attrs['action'] = const.TicketActionChoices.reject.value
-        return attrs
+        return rejected_attrs
 
     def validate(self, attrs):
-        view_action = self.context['view'].action
-        if view_action == 'apply':
-            attrs = self.perform_apply_validate(attrs)
-        elif view_action == 'approve':
-            attrs = self.perform_approve_validate(attrs)
-        elif view_action == 'reject':
-            attrs = self.perform_reject_validate(attrs)
-        elif view_action == 'close':
-            attrs = self.perform_close_validate()
+        perform_view_action_validate_method = getattr(self, f'perform_{self.view_action}_validate')
+        if perform_view_action_validate_method:
+            attrs = perform_view_action_validate_method(attrs)
         else:
             attrs = {}
         return attrs

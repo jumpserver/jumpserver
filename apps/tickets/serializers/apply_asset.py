@@ -51,13 +51,8 @@ class TicketApplyAssetSerializer(serializers.Serializer):
     # assets_waitlist_url = serializers.SerializerMethodField()
     # system_users_waitlist_url = serializers.SerializerMethodField()
 
-    @property
-    def view_action(self):
-        view_action = self.context['view'].action
-        return view_action
-
     def validate_approve_assets(self, approve_assets_id):
-        if self.view_action != 'approve':
+        if not self.root.view_action_is_approve:
             return approve_assets_id
         if not approve_assets_id:
             error = _('The approved assets cannot be empty')
@@ -77,7 +72,7 @@ class TicketApplyAssetSerializer(serializers.Serializer):
         return approve_assets_id
 
     def validate_approve_system_users(self, approve_system_users_id):
-        if self.view_action != 'approve':
+        if not self.root.view_action_is_approve:
             return approve_system_users_id
         if not approve_system_users_id:
             error = _('The approved system users cannot be empty')
@@ -90,7 +85,7 @@ class TicketApplyAssetSerializer(serializers.Serializer):
             exists_system_users_id = approve_system_users.values_list('id', flat=True)
             not_exists_system_users_id = set(approve_system_users_id) - set(exists_system_users_id)
             error = _(
-                'These approved assets {} do not exist in organization `{}`'
+                'These approved system users {} do not exist in organization `{}`'
                 ''.format(
                     [str(system_user_id) for system_user_id in not_exists_system_users_id],
                     org_name
@@ -116,14 +111,11 @@ class TicketApplyAssetSerializer(serializers.Serializer):
         }
 
     def validate(self, attrs):
-        if self.view_action == 'apply':
-            attrs = self.perform_apply_validate(attrs)
-        elif self.view_action == 'approve':
-            attrs = self.perform_approve_validate(attrs)
-        elif self.view_action == 'reject':
-            attrs = {}
-        elif self.view_action == 'close':
-            attrs = {}
+        perform_view_action_validate_method = getattr(
+            self, f'perform_{self.root.view_action}_validate'
+        )
+        if perform_view_action_validate_method:
+            attrs = perform_view_action_validate_method(attrs)
         else:
             attrs = {}
         return attrs
