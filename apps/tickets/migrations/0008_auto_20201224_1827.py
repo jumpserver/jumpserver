@@ -12,6 +12,14 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RemoveField(
             model_name='ticket',
+            name='user',
+        ),
+        migrations.RemoveField(
+            model_name='ticket',
+            name='user_display',
+        ),
+        migrations.RemoveField(
+            model_name='ticket',
             name='assignee',
         ),
         migrations.RemoveField(

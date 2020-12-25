@@ -12,8 +12,8 @@ def migrate_tickets_fields_name(apps, schema_editor):
     for ticket in tickets:
         ticket.applicant = ticket.user
         ticket.applicant_display = ticket.user_display
-        ticket.handler = ticket.assignee
-        ticket.handler_display = ticket.assignee_display
+        ticket.approver = ticket.assignee
+        ticket.approver_display = ticket.assignee_display
         ticket.save()
 
 
@@ -37,13 +37,13 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='ticket',
-            name='handler',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='handled_tickets', to=settings.AUTH_USER_MODEL, verbose_name='Assignee'),
+            name='approver',
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='approved_tickets', to=settings.AUTH_USER_MODEL, verbose_name='Approver'),
         ),
         migrations.AddField(
             model_name='ticket',
-            name='handler_display',
-            field=models.CharField(blank=True, default='', max_length=128, null=True, verbose_name='Assignee name'),
+            name='approver_display',
+            field=models.CharField(blank=True, default='', max_length=128, null=True, verbose_name='Approver display'),
         ),
         migrations.AlterField(
             model_name='ticket',

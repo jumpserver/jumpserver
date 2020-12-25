@@ -29,11 +29,6 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         default=const.TicketStatusChoices.open.value
     )
     # 申请人
-    user = models.ForeignKey(
-        'users.User', related_name='%(class)s_requested', on_delete=models.SET_NULL, null=True,
-        verbose_name=_("User")
-    )
-    user_display = models.CharField(max_length=128, verbose_name=_("User display name"))
     applicant = models.ForeignKey(
         'users.User', related_name='applied_tickets', on_delete=models.SET_NULL, null=True,
         verbose_name=_("Applicant")
@@ -42,12 +37,12 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         max_length=128, verbose_name=_("Applicant display"), default=''
     )
     # 处理人
-    handler = models.ForeignKey(
-        'users.User', related_name='handled_tickets', on_delete=models.SET_NULL, null=True,
-        verbose_name=_("Assignee")
+    approver = models.ForeignKey(
+        'users.User', related_name='approved_tickets', on_delete=models.SET_NULL, null=True,
+        verbose_name=_("Approver")
     )
-    handler_display = models.CharField(
-        max_length=128, blank=True, null=True, verbose_name=_("Assignee name"), default=''
+    approver_display = models.CharField(
+        max_length=128, blank=True, null=True, verbose_name=_("Approver display"), default=''
     )
     # 受理人列表
     assignees = models.ManyToManyField(
@@ -62,7 +57,7 @@ class Ticket(CommonModelMixin, OrgModelMixin):
     origin_objects = models.Manager()
 
     def __str__(self):
-        return '{}: {}'.format(self.user_display, self.title)
+        return '{}: {}'.format(self.applicant_display, self.title)
 
     @property
     def body_as_html(self):
