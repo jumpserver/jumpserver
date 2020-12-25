@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from ..exceptions import (
@@ -16,18 +15,17 @@ class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = [
-            'id', 'title', 'type', 'type_display', 'user', 'user_display', 'body',
-            'assignee', 'assignee_display', 'assignees', 'assignees_display',
-            'status', 'action', 'action_display', 'date_created', 'date_updated',
+            'id', 'title', 'type', 'type_display', 'meta', 'body',
+            'action', 'action_display', 'status',
+            'applicant', 'applicant_display',
+            'approver', 'approver_display',
+            'assignees', 'assignees_display',
+            'date_created', 'date_updated',
         ]
         read_only_fields = [
-            'user_display', 'assignees_display', 'date_created', 'date_updated',
+            'applicant_display', 'approver_display', 'assignees_display',
+            'date_created', 'date_updated',
         ]
-        extra_kwargs = {
-            'status': {'label': _('Status')},
-            'action': {'label': _('Action')},
-            'user_display': {'label': _('User')}
-        }
 
     def create(self, validated_data):
         validated_data.pop('action')

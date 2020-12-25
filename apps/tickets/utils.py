@@ -13,8 +13,8 @@ from tickets.models import Ticket
 
 
 def send_new_ticket_mail_to_assignees(ticket: Ticket, assignees):
-    recipient_list = [user.email for user in assignees]
-    user = ticket.user
+    recipient_list = [assignee.email for assignee in assignees]
+    applicant = ticket.applicant
     if not recipient_list:
         logger.error("Ticket not has assignees: {}".format(ticket.id))
         return
@@ -31,16 +31,16 @@ def send_new_ticket_mail_to_assignees(ticket: Ticket, assignees):
                 <a href={url}>click here to review</a> 
             </div>
         </div>
-    """).format(body=ticket.body, user=user, url=detail_url)
+    """).format(body=ticket.body, user=applicant, url=detail_url)
     send_mail_async.delay(subject, message, recipient_list, html_message=message)
 
 
 def send_ticket_action_mail_to_user(ticket):
-    if not ticket.user:
+    if not ticket.applicant:
         logger.error("Ticket not has user: {}".format(ticket.id))
         return
-    user = ticket.user
-    recipient_list = [user.email]
+    applicant = ticket.applicant
+    recipient_list = [applicant.email]
     subject = '{}: {}'.format(_("Ticket has been reply"), ticket.title)
     message = _("""
         <div>
@@ -48,7 +48,7 @@ def send_ticket_action_mail_to_user(ticket):
             <div>
                 <b>Title:</b> {ticket.title}
                 <br/>
-                <b>Assignee:</b> {ticket.assignee_display}
+                <b>Assignee:</b> {ticket.approver_display}
                 <br/>
                 <b>Status:</b> {ticket.status_display}
                 <br/>

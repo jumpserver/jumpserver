@@ -22,11 +22,12 @@ class Ticket(CommonModelMixin, OrgModelMixin):
     meta = models.JSONField(verbose_name=_("Meta"))
     body = models.TextField(verbose_name=_("Body"))
     action = models.CharField(
-        choices=const.TicketActionChoices.choices, max_length=16, blank=True, default=''
+        choices=const.TicketActionChoices.choices, max_length=16, blank=True, default='',
+        verbose_name=_("Action")
     )
     status = models.CharField(
         max_length=16, choices=const.TicketStatusChoices.choices,
-        default=const.TicketStatusChoices.open.value
+        default=const.TicketStatusChoices.open.value, verbose_name=_("Status")
     )
     # 申请人
     applicant = models.ForeignKey(

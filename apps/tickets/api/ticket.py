@@ -6,15 +6,16 @@ from django.shortcuts import get_object_or_404
 
 from common.permissions import IsValidUser
 from common.utils import lazyproperty
-from .. import serializers, models, mixins
+from .. import serializers, models
+from . import mixin
 
 
-class TicketViewSet(mixins.TicketMixin, viewsets.ModelViewSet):
-    serializer_class = serializers.TicketSerializer
-    queryset = models.Ticket.origin_objects.all()
+class TicketViewSet(mixin.TicketMetaSerializerViewMixin, viewsets.ModelViewSet):
     permission_classes = (IsValidUser,)
-    filter_fields = ['status', 'type', 'title', 'action', 'user_display']
-    search_fields = ['user_display', 'title']
+    queryset = models.Ticket.origin_objects.all()
+    serializer_class = serializers.TicketSerializer
+    filter_fields = ['status', 'type', 'title', 'action', 'applicant_display']
+    search_fields = ['applicant_display', 'title']
 
     def approve(self):
         pass

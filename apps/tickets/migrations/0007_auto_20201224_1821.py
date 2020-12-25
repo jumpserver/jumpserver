@@ -4,6 +4,36 @@ from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
 
+TICKET_TYPE_APPLY_ASSET = 'apply_asset'
+
+
+def migrate_field_type(tp):
+    if tp == 'request_asset':
+        return TICKET_TYPE_APPLY_ASSET
+    return tp
+
+
+def migrate_field_meta(tp, old_meta):
+    if tp != TICKET_TYPE_APPLY_ASSET or not old_meta:
+        return old_meta
+    old_meta_hostname = old_meta.get('hostname')
+    old_meta_system_user = old_meta.get('system_user')
+    new_meta = {
+        'apply_ip_group': old_meta.get('ips', []),
+        'apply_hostname_group': [old_meta_hostname] if old_meta_hostname else [],
+        'apply_system_user_group': [old_meta_system_user] if old_meta_system_user else [],
+        'apply_actions': old_meta.get('actions'),
+        'apply_date_start': old_meta.get('date_start'),
+        'apply_date_expired': old_meta.get('date_expired'),
+
+        'approve_assets': old_meta.get('confirmed_assets', []),
+        'approve_system_users': old_meta.get('confirmed_system_users', []),
+        'approve_actions': old_meta.get('actions'),
+        'approve_date_start': old_meta.get('date_start'),
+        'approve_date_expired': old_meta.get('date_expired'),
+    }
+    return new_meta
+
 
 def migrate_tickets_fields_name(apps, schema_editor):
     ticket_model = apps.get_model("tickets", "Ticket")
@@ -14,6 +44,8 @@ def migrate_tickets_fields_name(apps, schema_editor):
         ticket.applicant_display = ticket.user_display
         ticket.approver = ticket.assignee
         ticket.approver_display = ticket.assignee_display
+        ticket.type = migrate_field_type(ticket.type)
+        ticket.meta = migrate_field_meta(ticket.type, ticket.meta)
         ticket.save()
 
 

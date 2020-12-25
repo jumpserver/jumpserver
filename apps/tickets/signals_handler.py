@@ -39,9 +39,9 @@ def on_ticket_status_change(sender, instance=None, created=False, **kwargs):
 
 @receiver(pre_save, sender=Ticket)
 def on_ticket_create(sender, instance=None, **kwargs):
-    instance.user_display = str(instance.user)
-    if instance.assignee:
-        instance.assignee_display = str(instance.assignee)
+    instance.applicant_display = str(instance.applicant)
+    if instance.approver:
+        instance.approver_display = str(instance.approver)
 
 
 @receiver(pre_save, sender=Comment)
