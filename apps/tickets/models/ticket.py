@@ -1,16 +1,26 @@
 # -*- coding: utf-8 -*-
 #
-
+import json
+from datetime import datetime
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
-from common.db.models import ChoiceSet
 from common.mixins.models import CommonModelMixin
 from orgs.mixins.models import OrgModelMixin
 from .. import const
 
 __all__ = ['Ticket', 'Comment']
+
+
+class ModelJSONFieldEncoder(json.JSONEncoder):
+    """ 解决`datetime`类型的字段不能序列化的问题 """
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return obj.strftime(settings.DATETIME_DISPLAY_FORMAT)
+        else:
+            return super().default(self, obj)
 
 
 class Ticket(CommonModelMixin, OrgModelMixin):
@@ -19,7 +29,7 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         max_length=64, choices=const.TicketTypeChoices.choices,
         default=const.TicketTypeChoices.general.value, verbose_name=_("Type")
     )
-    meta = models.JSONField(verbose_name=_("Meta"))
+    meta = models.JSONField(encoder=ModelJSONFieldEncoder, verbose_name=_("Meta"))
     action = models.CharField(
         choices=const.TicketActionChoices.choices, max_length=16, blank=True, default='',
         verbose_name=_("Action")
@@ -54,10 +64,12 @@ class Ticket(CommonModelMixin, OrgModelMixin):
     # 其他
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
-    # origin_objects = models.Manager()
-
     def __str__(self):
         return '{}: {}'.format(self.applicant_display, self.title)
+
+    @property
+    def body(self):
+        return self.meta.get('body') or 'no body'
 
     @property
     def body_as_html(self):
