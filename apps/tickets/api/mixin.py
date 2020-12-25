@@ -24,5 +24,5 @@ class TicketMetaSerializerViewMixin:
         else:
             meta_class = serializers.TicketNoMetaSerializer
             meta_class_name = meta_class.__name__
-        cls = type(meta_class_name, (serializer_class,), {'meta': meta_class()})
+        cls = type(meta_class_name, (serializer_class,), {'meta': meta_class(required=False)})
         return cls

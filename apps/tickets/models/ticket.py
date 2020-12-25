@@ -47,12 +47,12 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         max_length=128, verbose_name=_("Applicant display"), default=''
     )
     # 处理人
-    approver = models.ForeignKey(
-        'users.User', related_name='approved_tickets', on_delete=models.SET_NULL, null=True,
-        verbose_name=_("Approver")
+    processor = models.ForeignKey(
+        'users.User', related_name='processed_tickets', on_delete=models.SET_NULL, null=True,
+        verbose_name=_("Processor")
     )
-    approver_display = models.CharField(
-        max_length=128, blank=True, null=True, verbose_name=_("Approver display"), default=''
+    processor_display = models.CharField(
+        max_length=128, blank=True, null=True, verbose_name=_("Processor display"), default=''
     )
     # 受理人列表
     assignees = models.ManyToManyField(

@@ -3,9 +3,12 @@
 
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
+from rest_framework.decorators import action
+from rest_framework.exceptions import MethodNotAllowed
 
-from common.permissions import IsValidUser
+from common.permissions import IsValidUser, IsOrgAdmin
 from common.utils import lazyproperty
+from common.const.http import POST, PATCH
 from .. import serializers, models
 from . import mixin
 
@@ -17,14 +20,30 @@ class TicketViewSet(mixin.TicketMetaSerializerViewMixin, viewsets.ModelViewSet):
     filter_fields = ['status', 'type', 'title', 'action', 'applicant_display']
     search_fields = ['applicant_display', 'title']
 
-    def approve(self):
-        pass
+    def create(self, request, *args, **kwargs):
+        raise MethodNotAllowed(self.action)
 
-    def reject(self):
-        pass
+    def update(self, request, *args, **kwargs):
+        raise MethodNotAllowed(self.action)
 
-    def close(self):
-        pass
+    def destroy(self, request, *args, **kwargs):
+        raise MethodNotAllowed(self.action)
+
+    @action(detail=False, methods=[POST])
+    def apply(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+    @action(detail=True, methods=[PATCH], permission_classes=[IsOrgAdmin])
+    def approve(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
+    @action(detail=True, methods=[PATCH], permission_classes=[IsOrgAdmin])
+    def reject(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
+    @action(detail=True, methods=[PATCH], permission_classes=[IsOrgAdmin])
+    def close(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
 
 
 class TicketCommentViewSet(viewsets.ModelViewSet):

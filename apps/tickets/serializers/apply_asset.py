@@ -21,7 +21,7 @@ class TicketApplyAssetSerializer(serializers.Serializer):
         child=serializers.CharField(), default=list, label=_('System user group')
     )
     apply_actions = ActionsField(
-        choices=Action.DB_CHOICES, default=Action.CONNECT
+        choices=Action.DB_CHOICES, default=Action.ALL
     )
     apply_date_start = serializers.DateTimeField(
         allow_null=True, required=False, label=_('Date start')
@@ -37,7 +37,7 @@ class TicketApplyAssetSerializer(serializers.Serializer):
         child=serializers.UUIDField(), default=list, required=False, label=_('Approve system users')
     )
     approve_actions = ActionsField(
-        choices=Action.DB_CHOICES, default=Action.CONNECT
+        choices=Action.DB_CHOICES, default=Action.NONE
     )
     approve_date_start = serializers.DateTimeField(
         allow_null=True, required=False, label=_('Date start')
@@ -48,6 +48,36 @@ class TicketApplyAssetSerializer(serializers.Serializer):
     # 辅助信息
     # assets_waitlist_url = serializers.SerializerMethodField()
     # system_users_waitlist_url = serializers.SerializerMethodField()
+
+    @staticmethod
+    def perform_apply_validate(attrs):
+        return {
+            name: value
+            for name, value in attrs.items()
+            if name.startswith('apply_')
+        }
+
+    @staticmethod
+    def perform_approve_validate(attrs):
+        return {
+            name: value
+            for name, value in attrs.items()
+            if name.startswith('approve_')
+        }
+
+    def validate(self, attrs):
+        view_action = self.context['view'].action
+        if view_action == 'apply':
+            attrs = self.perform_apply_validate(attrs)
+        elif view_action == 'approve':
+            attrs = self.perform_approve_validate(attrs)
+        elif view_action == 'reject':
+            attrs = {}
+        elif view_action == 'close':
+            attrs = {}
+        else:
+            attrs = {}
+        return attrs
 
 
 class TicketNoMetaSerializer(serializers.Serializer):

@@ -3,6 +3,7 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
+import tickets.models.ticket
 
 TICKET_TYPE_APPLY_ASSET = 'apply_asset'
 
@@ -42,8 +43,8 @@ def migrate_tickets_fields_name(apps, schema_editor):
     for ticket in tickets:
         ticket.applicant = ticket.user
         ticket.applicant_display = ticket.user_display
-        ticket.approver = ticket.assignee
-        ticket.approver_display = ticket.assignee_display
+        ticket.processor = ticket.assignee
+        ticket.processor_display = ticket.assignee_display
         ticket.type = migrate_field_type(ticket.type)
         ticket.meta = migrate_field_meta(ticket.type, ticket.meta)
         ticket.meta['body'] = ticket.body
@@ -70,13 +71,13 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='ticket',
-            name='approver',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='approved_tickets', to=settings.AUTH_USER_MODEL, verbose_name='Approver'),
+            name='processor',
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='processed_tickets', to=settings.AUTH_USER_MODEL, verbose_name='Processor'),
         ),
         migrations.AddField(
             model_name='ticket',
-            name='approver_display',
-            field=models.CharField(blank=True, default='', max_length=128, null=True, verbose_name='Approver display'),
+            name='processor_display',
+            field=models.CharField(blank=True, default='', max_length=128, null=True, verbose_name='Processor display'),
         ),
         migrations.AlterField(
             model_name='ticket',
@@ -91,7 +92,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='ticket',
             name='meta',
-            field=models.JSONField(verbose_name='Meta'),
+            field=models.JSONField(encoder=tickets.models.ticket.ModelJSONFieldEncoder, verbose_name='Meta'),
         ),
         migrations.AlterField(
             model_name='ticket',

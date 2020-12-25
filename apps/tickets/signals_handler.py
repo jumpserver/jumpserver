@@ -14,6 +14,19 @@ from .utils import (
 logger = get_logger(__name__)
 
 
+@receiver(pre_save, sender=Ticket)
+def on_ticket_pre_save(sender, instance, **kwargs):
+    if instance.applicant:
+        instance.applicant_display = str(instance.applicant)
+    if instance.processor:
+        instance.processor_display = str(instance.processor)
+
+
+@receiver(post_save, sender=Ticket)
+def on_ticket_post_save(sender, instance, **kwargs):
+    pass
+
+
 @receiver(m2m_changed, sender=Ticket.assignees.through)
 def on_ticket_assignees_set(sender, instance=None, action=None,
                             reverse=False, model=None,
@@ -35,13 +48,6 @@ def on_ticket_status_change(sender, instance=None, created=False, **kwargs):
         return
     logger.debug('Ticket changed, send mail: {}'.format(instance.id))
     send_ticket_action_mail_to_user(instance)
-
-
-@receiver(pre_save, sender=Ticket)
-def on_ticket_create(sender, instance=None, **kwargs):
-    instance.applicant_display = str(instance.applicant)
-    if instance.approver:
-        instance.approver_display = str(instance.approver)
 
 
 @receiver(pre_save, sender=Comment)

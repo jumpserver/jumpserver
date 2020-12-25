@@ -48,7 +48,7 @@ def send_ticket_action_mail_to_user(ticket):
             <div>
                 <b>Title:</b> {ticket.title}
                 <br/>
-                <b>Assignee:</b> {ticket.approver_display}
+                <b>Assignee:</b> {ticket.processor_display}
                 <br/>
                 <b>Status:</b> {ticket.status_display}
                 <br/>
