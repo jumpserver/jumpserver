@@ -42,17 +42,20 @@ def send_ticket_action_mail_to_user(ticket):
     applicant = ticket.applicant
     recipient_list = [applicant.email]
     subject = '{}: {}'.format(_("Ticket has been reply"), ticket.title)
+    ticket_title = ticket.title
+    ticket_processor_display = ticket.processor_display
+    ticket_status_display = ticket.get_status_display()
     message = _("""
         <div>
             <p>Your ticket has been replay</p>
             <div>
-                <b>Title:</b> {ticket.title}
+                <b>Title:</b> {}
                 <br/>
-                <b>Assignee:</b> {ticket.processor_display}
+                <b>Assignee:</b> {}
                 <br/>
-                <b>Status:</b> {ticket.status_display}
+                <b>Status:</b> {}
                 <br/>
             </div>
         </div>
-     """).format(ticket=ticket)
+     """).format(ticket_title, ticket_processor_display, ticket_status_display)
     send_mail_async.delay(subject, message, recipient_list, html_message=message)

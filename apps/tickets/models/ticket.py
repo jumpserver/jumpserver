@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 import json
+import uuid
 from datetime import datetime
 from django.db import models
 from django.db.models import Q
@@ -15,12 +16,14 @@ __all__ = ['Ticket', 'Comment']
 
 
 class ModelJSONFieldEncoder(json.JSONEncoder):
-    """ 解决`datetime`类型的字段不能序列化的问题 """
+    """ 解决一些类型的字段不能序列化的问题 """
     def default(self, obj):
         if isinstance(obj, datetime):
             return obj.strftime(settings.DATETIME_DISPLAY_FORMAT)
+        if isinstance(obj, uuid.UUID):
+            return str(obj)
         else:
-            return super().default(self, obj)
+            return super().default(obj)
 
 
 class Ticket(CommonModelMixin, OrgModelMixin):
@@ -65,28 +68,38 @@ class Ticket(CommonModelMixin, OrgModelMixin):
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
     def __str__(self):
-        return '{}: {}'.format(self.applicant_display, self.title)
+        return '{}({})'.format(self.title, self.applicant_display)
+
+    #: new
+    # body
+    def construct_general_body(self):
+        pass
+
+    def construct_login_confirm_body(self):
+        pass
+
+    def construct_apply_asset_body(self):
+        pass
 
     @property
     def body(self):
-        return self.meta.get('body') or 'no body'
+        old_body = self.meta.get('body')
+        if old_body:
+            return old_body
+        construct_body_method = getattr(self, f'construct_{self.type}_body')
+        if construct_body_method:
+            construct_body = construct_body_method()
+        else:
+            construct_body = 'No body'
+        return construct_body
 
-    @property
-    def body_as_html(self):
-        return self.body.replace('\n', '<br/>')
+    def has_assignee(self, assignee):
+        return self.assignees.filter(id=assignee.id).exists()
 
-    @property
-    def status_display(self):
-        return self.get_status_display()
+    def is_closed(self):
+        return self.status == const.TicketStatusChoices.closed.value
 
-    @property
-    def type_display(self):
-        return self.get_type_display()
-
-    @property
-    def action_display(self):
-        return self.get_action_display()
-
+    #: old
     def create_status_comment(self, status, user):
         if status == self.STATUS.CLOSED:
             action = _("Close")

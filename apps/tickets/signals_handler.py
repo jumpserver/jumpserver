@@ -14,19 +14,6 @@ from .utils import (
 logger = get_logger(__name__)
 
 
-@receiver(pre_save, sender=Ticket)
-def on_ticket_pre_save(sender, instance, **kwargs):
-    if instance.applicant:
-        instance.applicant_display = str(instance.applicant)
-    if instance.processor:
-        instance.processor_display = str(instance.processor)
-
-
-@receiver(post_save, sender=Ticket)
-def on_ticket_post_save(sender, instance, **kwargs):
-    pass
-
-
 @receiver(m2m_changed, sender=Ticket.assignees.through)
 def on_ticket_assignees_set(sender, instance=None, action=None,
                             reverse=False, model=None,

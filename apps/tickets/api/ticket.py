@@ -9,13 +9,15 @@ from rest_framework.exceptions import MethodNotAllowed
 from common.permissions import IsValidUser, IsOrgAdmin
 from common.utils import lazyproperty
 from common.const.http import POST, PATCH
-from .. import serializers, models
+from .. import serializers
+from ..permissions import IsAssignee, NotClosed
+from ..models import Ticket
 from . import mixin
 
 
 class TicketViewSet(mixin.TicketMetaSerializerViewMixin, viewsets.ModelViewSet):
     permission_classes = (IsValidUser,)
-    queryset = models.Ticket.objects.all()
+    queryset = Ticket.objects.all()
     serializer_class = serializers.TicketSerializer
     filter_fields = ['status', 'type', 'title', 'action', 'applicant_display']
     search_fields = ['applicant_display', 'title']
@@ -33,15 +35,15 @@ class TicketViewSet(mixin.TicketMetaSerializerViewMixin, viewsets.ModelViewSet):
     def apply(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
 
-    @action(detail=True, methods=[PATCH], permission_classes=[IsOrgAdmin])
+    @action(detail=True, methods=[PATCH], permission_classes=[IsOrgAdmin, IsAssignee, NotClosed])
     def approve(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
 
-    @action(detail=True, methods=[PATCH], permission_classes=[IsOrgAdmin])
+    @action(detail=True, methods=[PATCH], permission_classes=[IsOrgAdmin, IsAssignee, NotClosed])
     def reject(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
 
-    @action(detail=True, methods=[PATCH], permission_classes=[IsOrgAdmin])
+    @action(detail=True, methods=[PATCH], permission_classes=[IsOrgAdmin, IsAssignee, NotClosed])
     def close(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
 
@@ -65,7 +67,7 @@ class TicketCommentViewSet(viewsets.ModelViewSet):
     @lazyproperty
     def ticket(self):
         ticket_id = self.kwargs.get('ticket_id')
-        ticket = get_object_or_404(models.Ticket, pk=ticket_id)
+        ticket = get_object_or_404(Ticket, pk=ticket_id)
         return ticket
 
     def get_queryset(self):

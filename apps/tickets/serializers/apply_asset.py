@@ -2,6 +2,8 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from perms.serializers import ActionsField
 from perms.models import Action
+from assets.models import Asset, SystemUser
+from orgs.utils import tmp_to_org
 
 
 __all__ = [
@@ -49,6 +51,54 @@ class TicketApplyAssetSerializer(serializers.Serializer):
     # assets_waitlist_url = serializers.SerializerMethodField()
     # system_users_waitlist_url = serializers.SerializerMethodField()
 
+    @property
+    def view_action(self):
+        view_action = self.context['view'].action
+        return view_action
+
+    def validate_approve_assets(self, approve_assets_id):
+        if self.view_action != 'approve':
+            return approve_assets_id
+        if not approve_assets_id:
+            error = _('The approved assets cannot be empty')
+            raise serializers.ValidationError(error)
+        org_id = self.root.instance.org_id
+        org_name = self.root.instance.org_name
+        with tmp_to_org(org_id):
+            approve_assets = Asset.objects.filter(id__in=approve_assets_id)
+        if len(approve_assets) != len(approve_assets_id):
+            exists_assets_id = approve_assets.values_list('id', flat=True)
+            not_exists_assets_id = set(approve_assets_id) - set(exists_assets_id)
+            error = _(
+                'These approved assets {} do not exist in organization `{}`'
+                ''.format([str(asset_id) for asset_id in not_exists_assets_id], org_name)
+            )
+            raise serializers.ValidationError(error)
+        return approve_assets_id
+
+    def validate_approve_system_users(self, approve_system_users_id):
+        if self.view_action != 'approve':
+            return approve_system_users_id
+        if not approve_system_users_id:
+            error = _('The approved system users cannot be empty')
+            raise serializers.ValidationError(error)
+        org_id = self.root.instance.org_id
+        org_name = self.root.instance.org_name
+        with tmp_to_org(org_id):
+            approve_system_users = SystemUser.objects.filter(id__in=approve_system_users_id)
+        if len(approve_system_users) != len(approve_system_users_id):
+            exists_system_users_id = approve_system_users.values_list('id', flat=True)
+            not_exists_system_users_id = set(approve_system_users_id) - set(exists_system_users_id)
+            error = _(
+                'These approved assets {} do not exist in organization `{}`'
+                ''.format(
+                    [str(system_user_id) for system_user_id in not_exists_system_users_id],
+                    org_name
+                )
+            )
+            raise serializers.ValidationError(error)
+        return approve_system_users_id
+
     @staticmethod
     def perform_apply_validate(attrs):
         return {
@@ -66,14 +116,13 @@ class TicketApplyAssetSerializer(serializers.Serializer):
         }
 
     def validate(self, attrs):
-        view_action = self.context['view'].action
-        if view_action == 'apply':
+        if self.view_action == 'apply':
             attrs = self.perform_apply_validate(attrs)
-        elif view_action == 'approve':
+        elif self.view_action == 'approve':
             attrs = self.perform_approve_validate(attrs)
-        elif view_action == 'reject':
+        elif self.view_action == 'reject':
             attrs = {}
-        elif view_action == 'close':
+        elif self.view_action == 'close':
             attrs = {}
         else:
             attrs = {}
