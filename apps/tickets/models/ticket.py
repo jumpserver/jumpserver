@@ -51,7 +51,7 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         verbose_name=_("Applicant")
     )
     applicant_display = models.CharField(
-        max_length=128, verbose_name=_("Applicant display"), default=''
+        max_length=128, default='No', verbose_name=_("Applicant display")
     )
     # 处理人
     processor = models.ForeignKey(
@@ -59,14 +59,14 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         verbose_name=_("Processor")
     )
     processor_display = models.CharField(
-        max_length=128, blank=True, null=True, verbose_name=_("Processor display"), default=''
+        max_length=128, blank=True, null=True, default='No', verbose_name=_("Processor display")
     )
     # 受理人列表
     assignees = models.ManyToManyField(
         'users.User', related_name='assigned_tickets', verbose_name=_("Assignees")
     )
     assignees_display = models.CharField(
-        max_length=128, blank=True, verbose_name=_("Assignees display")
+        max_length=128, blank=True, default='No', verbose_name=_("Assignees display")
     )
     # 其他
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
@@ -75,39 +75,154 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         return '{}({})'.format(self.title, self.applicant_display)
 
     #: new
-    # body
-    def construct_general_body(self):
-        pass
-
-    def construct_login_confirm_body(self):
-        pass
-
-    def construct_apply_asset_body(self):
-        pass
-
-    @property
-    def body(self):
-        old_body = self.meta.get('body')
-        if old_body:
-            return old_body
-        construct_body_method = getattr(self, f'construct_{self.type}_body')
-        if construct_body_method:
-            construct_body = construct_body_method()
-        else:
-            construct_body = 'No body'
-        return construct_body
 
     def has_assignee(self, assignee):
         return self.assignees.filter(id=assignee.id).exists()
 
-    def is_closed(self):
+    def status_closed(self):
         return self.status == const.TicketStatusChoices.closed.value
-    
+
+    # action
+    def is_closed(self):
+        return self.action == const.TicketActionChoices.close.value
+
     def is_approved(self):
         return self.action == const.TicketActionChoices.approve.value
 
     def is_rejected(self):
         return self.action == const.TicketActionChoices.reject.value
+
+    # body
+    # applied body
+    def construct_login_confirm_relation_applied_body(self):
+        # TODO: 构造登录确认工单的申请内容
+        pass
+
+    def construct_apply_asset_relation_applied_body(self):
+        apply_ip_group = self.meta['apply_ip_group']
+        apply_hostname_group = self.meta['apply_hostname_group']
+        apply_system_user_group = self.meta['apply_system_user_group']
+        apply_actions = self.meta['apply_actions']
+        apply_actions_display = Action.value_to_choices_display(apply_actions)
+        apply_actions_display = [str(action_display) for action_display in apply_actions_display]
+        apply_date_start = self.meta['apply_date_start']
+        apply_date_expired = self.meta['apply_date_expired']
+        applied_body = '''{}: {},
+            {}: {},
+            {}: {},
+            {}: {},
+            {}: {}
+        '''.format(
+            __('Applied IP group'), apply_ip_group,
+            __("Applied hostname group"), apply_hostname_group,
+            __("Applied system user group"), apply_system_user_group,
+            __("Applied actions"), apply_actions_display,
+            __('Applied date start'), apply_date_start,
+            __('Applied date expired'), apply_date_expired,
+        )
+        return applied_body
+
+    def construct_relation_applied_body(self):
+        applied_body = 'No'
+        construct_relation_applied_body_method = getattr(
+            self, f'construct_{self.type}_relation_applied_body'
+        )
+        if construct_relation_applied_body_method:
+            applied_body = construct_relation_applied_body_method()
+        body = '''
+            {}:
+            {}
+        '''.format(
+            __('Ticket applied info'),
+            applied_body
+        )
+        return body
+
+    # approved body
+    def construct_apply_asset_relation_approved_body(self, dedent=False):
+        approve_assets_id = self.meta['approve_assets']
+        approve_system_users_id = self.meta['approve_system_users']
+        with tmp_to_org(self.org_id):
+            approve_assets = Asset.objects.filter(id__in=approve_assets_id)
+            approve_system_users = SystemUser.objects.filter(id__in=approve_system_users_id)
+        approve_assets_display = [str(asset) for asset in approve_assets]
+        approve_system_users_display = [str(system_user) for system_user in approve_system_users]
+        approve_actions = self.meta['approve_actions']
+        approve_actions_display = Action.value_to_choices_display(approve_actions)
+        approve_actions_display = [str(action_display) for action_display in approve_actions_display]
+        approve_date_start = self.meta['approve_date_start']
+        approve_date_expired = self.meta['approve_date_expired']
+        approved_body = '''{}: {},
+            {}: {},
+            {}: {},
+            {}: {},
+            {}: {}
+        '''.format(
+            __('Approved assets'), ', '.join(approve_assets_display),
+            __('Approved system users'), ', '.join(approve_system_users_display),
+            __('Approved actions'), ', '.join(approve_actions_display),
+            __('Approved date start'), approve_date_start,
+            __('Approved date expired'), approve_date_expired,
+        )
+        if dedent:
+            # 页面展示需要取消缩进，发送邮件不需要取消缩进
+            approved_body = textwrap.dedent(approved_body)
+        return approved_body
+
+    def construct_relation_approved_body(self, dedent=False):
+        approved_body = 'No'
+        construct_relation_approved_body_method = getattr(
+            self, f'construct_{self.type}_relation_approved_body'
+        )
+        if self.is_approved() and construct_relation_approved_body_method:
+            approved_body = construct_relation_approved_body_method(dedent=dedent)
+        body = '''
+            {}:
+            {}
+        '''.format(
+            __('Ticket approved info'),
+            approved_body
+        )
+        return body
+
+    # meta body
+    def construct_meta_body(self):
+        applied_body = self.construct_relation_applied_body()
+        approved_body = self.construct_relation_approved_body()
+        return applied_body + approved_body
+
+    # basic body
+    def construct_basic_body(self):
+        basic_body = '''
+            {}:
+            {}: {},
+            {}: {},
+            {}: {},
+            {}: {},
+            {}: {},
+            {}: {},
+            {}: {}
+        '''.format(
+            __("Ticket basic info"),
+            __('Ticket title'), self.title,
+            __('Ticket type'), self.get_type_display(),
+            __('Ticket applicant'), self.applicant_display,
+            __('Ticket assignees'), self.assignees_display,
+            __('Ticket processor'), self.processor_display,
+            __('Ticket action'), self.get_action_display(),
+            __('Ticket status'), self.get_status_display()
+        )
+        return basic_body
+
+    @property
+    def body(self):
+        old_body = self.meta.get('body')
+        if old_body:
+            # 之前版本的body
+            return old_body
+        basic_body = self.construct_basic_body()
+        meta_body = self.construct_meta_body()
+        return basic_body + meta_body
 
     # create relation permission
     def create_apply_asset_relation_permission(self):
@@ -120,7 +235,9 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         approve_actions = self.meta['approve_actions']
         approve_date_start = self.meta['approve_date_start']
         approve_date_expired = self.meta['approve_date_expired']
-        permission_name = __('Created by ticket ({})'.format(self.title))
+        permission_name = '{}({})'.format(
+            __('Created by ticket ({})'.format(self.title)), str(self.id)[:4]
+        )
         permission_comment = __(
             'Created by the ticket, '
             'ticket title: {}, '
@@ -159,41 +276,11 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         }
         return self.comments.create(**comment_data)
 
-    def construct_apply_asset_relation_approved_comment_body(self):
-        approve_assets_id = self.meta['approve_assets']
-        approve_system_users_id = self.meta['approve_system_users']
-        with tmp_to_org(self.org_id):
-            approve_assets = Asset.objects.filter(id__in=approve_assets_id)
-            approve_system_users = SystemUser.objects.filter(id__in=approve_system_users_id)
-        approve_assets_display = [str(asset) for asset in approve_assets]
-        approve_system_users_display = [str(system_user) for system_user in approve_system_users]
-        approve_actions = self.meta['approve_actions']
-        approve_actions_display = Action.value_to_choices_display(approve_actions)
-        approve_actions_display = [str(action_display) for action_display in approve_actions_display]
-        approve_date_start = self.meta['approve_date_start']
-        approve_date_expired = self.meta['approve_date_expired']
-        comment_body = textwrap.dedent('''
-            {}: {},
-            {}: {},
-            {}: {},
-            {}: {},
-            {}: {}
-        '''.format(
-            __('Approved assets'), ', '.join(approve_assets_display),
-            __('Approved system users'), ', '.join(approve_system_users_display),
-            __('Approved actions'), ', '.join(approve_actions_display),
-            __('Approved date start'), approve_date_start,
-            __('Approved date expired'), approve_date_expired,
-        ))
-        return comment_body
-
     def create_relation_approved_comment(self):
-        construct_relation_approved_comment_body_method = getattr(
-            self, f'construct_{self.type}_relation_approved_comment_body'
-        )
-        if construct_relation_approved_comment_body_method:
-            comment_body = construct_relation_approved_comment_body_method()
-            self.create_relation_comment(comment_body)
+        comment_body = self.construct_relation_approved_body(dedent=True)
+        if comment_body is None:
+            return
+        self.create_relation_comment(comment_body)
 
     def create_relation_action_comment(self):
         comment_body = __(

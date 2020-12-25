@@ -22,7 +22,8 @@ class TicketSerializer(serializers.ModelSerializer):
             'processor', 'processor_display',
             'assignees', 'assignees_display',
             'date_created', 'date_updated',
-            'org_id', 'org_name'
+            'org_id', 'org_name',
+            'body'
         ]
         read_only_fields = [
             'applicant', 'applicant_display',
