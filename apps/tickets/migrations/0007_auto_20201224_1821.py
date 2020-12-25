@@ -46,6 +46,7 @@ def migrate_tickets_fields_name(apps, schema_editor):
         ticket.approver_display = ticket.assignee_display
         ticket.type = migrate_field_type(ticket.type)
         ticket.meta = migrate_field_meta(ticket.type, ticket.meta)
+        ticket.meta['body'] = ticket.body
         ticket.save()
 
 
@@ -97,5 +98,40 @@ class Migration(migrations.Migration):
             name='type',
             field=models.CharField(choices=[('general', 'General'), ('login_confirm', 'Login confirm'), ('apply_asset', 'Apply for asset'), ('apply_application', 'Apply for application')], default='general', max_length=64, verbose_name='Type'),
         ),
-        migrations.RunPython(migrate_tickets_fields_name)
+        migrations.AlterField(
+            model_name='ticket',
+            name='action',
+            field=models.CharField(blank=True, choices=[('approve', 'Approve'), ('reject', 'Reject')], default='', max_length=16, verbose_name='Action'),
+        ),
+        migrations.AlterField(
+            model_name='ticket',
+            name='status',
+            field=models.CharField(choices=[('open', 'Open'), ('closed', 'Closed')], default='open', max_length=16, verbose_name='Status'),
+        ),
+        migrations.RunPython(migrate_tickets_fields_name),
+        migrations.RemoveField(
+            model_name='ticket',
+            name='user',
+        ),
+        migrations.RemoveField(
+            model_name='ticket',
+            name='user_display',
+        ),
+        migrations.RemoveField(
+            model_name='ticket',
+            name='assignee',
+        ),
+        migrations.RemoveField(
+            model_name='ticket',
+            name='assignee_display',
+        ),
+        migrations.RemoveField(
+            model_name='ticket',
+            name='body',
+        ),
+        migrations.AlterModelManagers(
+            name='ticket',
+            managers=[
+            ],
+        ),
     ]

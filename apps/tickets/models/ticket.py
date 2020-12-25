@@ -20,7 +20,6 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         default=const.TicketTypeChoices.general.value, verbose_name=_("Type")
     )
     meta = models.JSONField(verbose_name=_("Meta"))
-    body = models.TextField(verbose_name=_("Body"))
     action = models.CharField(
         choices=const.TicketActionChoices.choices, max_length=16, blank=True, default='',
         verbose_name=_("Action")
@@ -55,7 +54,7 @@ class Ticket(CommonModelMixin, OrgModelMixin):
     # 其他
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
-    origin_objects = models.Manager()
+    # origin_objects = models.Manager()
 
     def __str__(self):
         return '{}: {}'.format(self.applicant_display, self.title)
