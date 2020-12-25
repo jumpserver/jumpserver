@@ -42,19 +42,19 @@ class TicketSerializer(serializers.ModelSerializer):
 
     @property
     def view_action_is_apply(self):
-        return self.view_action == 'apply'
+        return self.view_action == const.TicketActionChoices.apply.value
 
     @property
     def view_action_is_approve(self):
-        return self.view_action == 'approve'
+        return self.view_action == const.TicketActionChoices.approve.value
 
     @property
     def view_action_is_reject(self):
-        return self.view_action == 'reject'
+        return self.view_action == const.TicketActionChoices.reject.value
 
     @property
     def view_action_is_close(self):
-        return self.view_action == 'close'
+        return self.view_action == const.TicketActionChoices.close.value
 
     def perform_apply_validate(self, attrs):
         applied_attrs = {}
@@ -70,13 +70,14 @@ class TicketSerializer(serializers.ModelSerializer):
         closed_attrs['processor'] = processor
         closed_attrs['processor_display'] = str(processor)
         closed_attrs['status'] = const.TicketStatusChoices.closed.value
+        closed_attrs['action'] = const.TicketActionChoices.close.value
         return closed_attrs
 
     def perform_approve_validate(self, attrs):
         approved_attrs = {}
         closed_attrs = self.perform_close_validate()
-        approved_attrs['meta'] = attrs['meta']
         approved_attrs.update(closed_attrs)
+        approved_attrs['meta'] = attrs['meta']
         approved_attrs['action'] = const.TicketActionChoices.approve.value
         return approved_attrs
 

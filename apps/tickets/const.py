@@ -14,8 +14,10 @@ class TicketTypeChoices(TextChoices):
 
 
 class TicketActionChoices(TextChoices):
+    apply = 'apply', _('Apply')
     approve = 'approve', _('Approve')
     reject = 'reject', _('Reject')
+    close = 'close', _('Close')
 
 
 class TicketStatusChoices(TextChoices):

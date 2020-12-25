@@ -36,8 +36,8 @@ class Ticket(CommonModelMixin, OrgModelMixin):
     )
     meta = models.JSONField(encoder=ModelJSONFieldEncoder, verbose_name=_("Meta"))
     action = models.CharField(
-        choices=const.TicketActionChoices.choices, max_length=16, blank=True, default='',
-        verbose_name=_("Action")
+        choices=const.TicketActionChoices.choices, max_length=16, blank=True,
+        default=const.TicketActionChoices.apply.value, verbose_name=_("Action")
     )
     status = models.CharField(
         max_length=16, choices=const.TicketStatusChoices.choices,
@@ -104,6 +104,9 @@ class Ticket(CommonModelMixin, OrgModelMixin):
     def is_approved(self):
         return self.action == const.TicketActionChoices.approve.value
 
+    def is_rejected(self):
+        return self.action == const.TicketActionChoices.reject.value
+
     def create_apply_asset_relation_permission(self):
         with tmp_to_root_org():
             asset_permission = AssetPermission.objects.filter(id=self.id).first()
@@ -143,6 +146,17 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         create_relation_permission_method = getattr(self, f'create_{self.type}_relation_permission')
         if create_relation_permission_method:
             create_relation_permission_method()
+            
+    def create_relation_action_comment(self):
+        comment_body = __(
+            'User {} {} the ticket'.format(self.processor_display, self.get_action_display())
+        )
+        comment_data = {
+            'body': comment_body,
+            'user': self.processor,
+            'user_display': self.processor_display
+        }
+        self.comments.create(**comment_data)
 
     #: old
     def create_status_comment(self, status, user):

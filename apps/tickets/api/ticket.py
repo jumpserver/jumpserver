@@ -52,10 +52,17 @@ class TicketCommentViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.CommentSerializer
     http_method_names = ['get', 'post']
 
+    @lazyproperty
+    def ticket(self):
+        ticket_id = self.kwargs.get('ticket_id')
+        ticket = get_object_or_404(Ticket, pk=ticket_id)
+        return ticket
+
     def check_permissions(self, request):
         ticket = self.ticket
-        if request.user == ticket.user or \
-                request.user in ticket.assignees.all():
+        if request.user == ticket.applicant:
+            return True
+        if ticket.has_assignee(request.user):
             return True
         return False
 
@@ -63,12 +70,6 @@ class TicketCommentViewSet(viewsets.ModelViewSet):
         context = super().get_serializer_context()
         context['ticket'] = self.ticket
         return context
-
-    @lazyproperty
-    def ticket(self):
-        ticket_id = self.kwargs.get('ticket_id')
-        ticket = get_object_or_404(Ticket, pk=ticket_id)
-        return ticket
 
     def get_queryset(self):
         queryset = self.ticket.comments.all()

@@ -15,11 +15,17 @@ logger = get_logger(__name__)
 
 
 @receiver(post_save, sender=Ticket)
-def on_ticket_approve(sender, instance=None, created=False, *args, **kwargs):
+def on_ticket_approved(sender, instance=None, **kwargs):
     if not instance.is_approved():
         return
     instance.create_relation_permission()
-    # instance.create_relation_comment()
+
+
+@receiver(post_save, sender=Ticket)
+def on_ticket_closed(sender, instance=None, **kwargs):
+    if not instance.is_closed():
+        return
+    instance.create_relation_action_comment()
 
 
 @receiver(m2m_changed, sender=Ticket.assignees.through)

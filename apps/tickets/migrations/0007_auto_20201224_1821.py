@@ -102,7 +102,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='ticket',
             name='action',
-            field=models.CharField(blank=True, choices=[('approve', 'Approve'), ('reject', 'Reject')], default='', max_length=16, verbose_name='Action'),
+            field=models.CharField(blank=True, choices=[('apply', 'Apply'), ('approve', 'Approve'), ('reject', 'Reject'), ('close', 'Close')], default='apply', max_length=16, verbose_name='Action'),
         ),
         migrations.AlterField(
             model_name='ticket',
