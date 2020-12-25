@@ -19,6 +19,7 @@ def on_ticket_approved(sender, instance=None, **kwargs):
     if not instance.is_approved():
         return
     instance.create_relation_permission()
+    instance.create_relation_approved_comment()
 
 
 @receiver(post_save, sender=Ticket)

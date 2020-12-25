@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+import textwrap
 import json
 import uuid
 from datetime import datetime
@@ -8,8 +9,9 @@ from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _,  ugettext as __
 from django.conf import settings
 
-from perms.models import AssetPermission
+from perms.models import AssetPermission, Action
 from common.mixins.models import CommonModelMixin
+from assets.models import Asset, SystemUser
 from orgs.mixins.models import OrgModelMixin
 from orgs.utils import tmp_to_org, tmp_to_root_org
 from .. import const
@@ -107,6 +109,7 @@ class Ticket(CommonModelMixin, OrgModelMixin):
     def is_rejected(self):
         return self.action == const.TicketActionChoices.reject.value
 
+    # create relation permission
     def create_apply_asset_relation_permission(self):
         with tmp_to_root_org():
             asset_permission = AssetPermission.objects.filter(id=self.id).first()
@@ -146,17 +149,57 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         create_relation_permission_method = getattr(self, f'create_{self.type}_relation_permission')
         if create_relation_permission_method:
             create_relation_permission_method()
-            
-    def create_relation_action_comment(self):
-        comment_body = __(
-            'User {} {} the ticket'.format(self.processor_display, self.get_action_display())
-        )
+
+    # create relation comment
+    def create_relation_comment(self, comment_body):
         comment_data = {
             'body': comment_body,
             'user': self.processor,
             'user_display': self.processor_display
         }
-        self.comments.create(**comment_data)
+        return self.comments.create(**comment_data)
+
+    def construct_apply_asset_relation_approved_comment_body(self):
+        approve_assets_id = self.meta['approve_assets']
+        approve_system_users_id = self.meta['approve_system_users']
+        with tmp_to_org(self.org_id):
+            approve_assets = Asset.objects.filter(id__in=approve_assets_id)
+            approve_system_users = SystemUser.objects.filter(id__in=approve_system_users_id)
+        approve_assets_display = [str(asset) for asset in approve_assets]
+        approve_system_users_display = [str(system_user) for system_user in approve_system_users]
+        approve_actions = self.meta['approve_actions']
+        approve_actions_display = Action.value_to_choices_display(approve_actions)
+        approve_actions_display = [str(action_display) for action_display in approve_actions_display]
+        approve_date_start = self.meta['approve_date_start']
+        approve_date_expired = self.meta['approve_date_expired']
+        comment_body = textwrap.dedent('''
+            {}: {},
+            {}: {},
+            {}: {},
+            {}: {},
+            {}: {}
+        '''.format(
+            __('Approved assets'), ', '.join(approve_assets_display),
+            __('Approved system users'), ', '.join(approve_system_users_display),
+            __('Approved actions'), ', '.join(approve_actions_display),
+            __('Approved date start'), approve_date_start,
+            __('Approved date expired'), approve_date_expired,
+        ))
+        return comment_body
+
+    def create_relation_approved_comment(self):
+        construct_relation_approved_comment_body_method = getattr(
+            self, f'construct_{self.type}_relation_approved_comment_body'
+        )
+        if construct_relation_approved_comment_body_method:
+            comment_body = construct_relation_approved_comment_body_method()
+            self.create_relation_comment(comment_body)
+
+    def create_relation_action_comment(self):
+        comment_body = __(
+            'User {} {} the ticket'.format(self.processor_display, self.get_action_display())
+        )
+        self.create_relation_comment(comment_body)
 
     #: old
     def create_status_comment(self, status, user):
