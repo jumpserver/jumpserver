@@ -241,8 +241,3 @@ class RequestAssetPermTicketSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         return obj.is_assignee(user)
 
-
-class AssigneeSerializer(serializers.Serializer):
-    id = serializers.UUIDField()
-    name = serializers.CharField()
-    username = serializers.CharField()

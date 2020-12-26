@@ -60,7 +60,7 @@ class TicketConstructBodyMixin:
         return applied_body
 
     def construct_applied_body(self):
-        construct_method = getattr(self, f'construct_{self.type}_applied_body')
+        construct_method = getattr(self, f'construct_{self.type}_applied_body', None)
         if construct_method:
             applied_body = construct_method()
         else:
@@ -103,7 +103,7 @@ class TicketConstructBodyMixin:
         return approved_body
 
     def construct_approved_body(self):
-        construct_method = getattr(self, f'construct_{self.type}_approved_body')
+        construct_method = getattr(self, f'construct_{self.type}_approved_body', None)
         if self.is_approved and construct_method:
             approved_body = construct_method()
         else:
@@ -199,7 +199,7 @@ class TicketCreatePermissionMixin:
         return asset_permission
 
     def create_permission(self):
-        create_method = getattr(self, f'create_{self.type}_permission')
+        create_method = getattr(self, f'create_{self.type}_permission', None)
         if create_method:
             create_method()
 

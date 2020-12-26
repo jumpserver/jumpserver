@@ -140,7 +140,7 @@ class RequestAssetPermTicketViewSet(JMSModelViewSet):
         return ap
 
 
-class AssigneeViewSet(ListModelMixin, JmsGenericViewSet):
+class OldAssigneeViewSet(ListModelMixin, JmsGenericViewSet):
     serializer_class = serializers.AssigneeSerializer
     permission_classes = (IsValidUser,)
     filter_fields = ('username', 'email', 'name', 'id', 'source')

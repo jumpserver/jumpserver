@@ -3,11 +3,14 @@
 
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
+from django.utils.translation import ugettext_lazy as _
 from rest_framework.decorators import action
 from rest_framework.exceptions import MethodNotAllowed
 
+from users.models import User
 from common.permissions import IsValidUser, IsOrgAdmin
-from common.utils import lazyproperty
+from common.exceptions import JMSException
+from common.utils import lazyproperty, is_uuid
 from common.const.http import POST, PATCH
 from .. import serializers
 from ..permissions import IsAssignee, NotClosed
@@ -19,8 +22,10 @@ class TicketViewSet(mixin.TicketMetaSerializerViewMixin, viewsets.ModelViewSet):
     permission_classes = (IsValidUser,)
     queryset = Ticket.objects.all()
     serializer_class = serializers.TicketSerializer
-    filter_fields = ['status', 'type', 'title', 'action', 'applicant_display']
-    search_fields = ['applicant_display', 'title']
+    filter_fields = [
+        'type', 'title', 'action', 'status', 'applicant', 'processor', 'assignees__id'
+    ]
+    search_fields = ['title', 'applicant_display']
 
     def create(self, request, *args, **kwargs):
         raise MethodNotAllowed(self.action)
@@ -48,14 +53,29 @@ class TicketViewSet(mixin.TicketMetaSerializerViewMixin, viewsets.ModelViewSet):
         return super().update(request, *args, **kwargs)
 
 
-class TicketCommentViewSet(viewsets.ModelViewSet):
+class AssigneeViewSet(viewsets.ReadOnlyModelViewSet):
+    # ?oid=org_id
+    serializer_class = serializers.AssigneeSerializer
+    permission_classes = (IsValidUser,)
+    filter_fields = ('id', 'name', 'username', 'email', 'source')
+    search_fields = filter_fields
+
+    def get_queryset(self):
+        queryset = User.get_super_and_org_admins()
+        return queryset
+
+
+class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.CommentSerializer
     http_method_names = ['get', 'post']
 
     @lazyproperty
     def ticket(self):
-        ticket_id = self.kwargs.get('ticket_id')
-        ticket = get_object_or_404(Ticket, pk=ticket_id)
+        ticket_id = self.request.query_params.get('ticket_id')
+        try:
+            ticket = get_object_or_404(Ticket, pk=ticket_id)
+        except Exception as e:
+            raise JMSException(str(e))
         return ticket
 
     def check_permissions(self, request):

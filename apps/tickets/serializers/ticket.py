@@ -5,7 +5,7 @@ from rest_framework import serializers
 from ..models import Ticket, Comment
 from .. import const
 
-__all__ = ['TicketSerializer', 'CommentSerializer']
+__all__ = ['TicketSerializer', 'AssigneeSerializer', 'CommentSerializer']
 
 
 class TicketSerializer(serializers.ModelSerializer):
@@ -90,7 +90,7 @@ class TicketSerializer(serializers.ModelSerializer):
         return rejected_attrs
 
     def validate(self, attrs):
-        perform_view_action_validate_method = getattr(self, f'perform_{self.view_action}_validate')
+        perform_view_action_validate_method = getattr(self, f'perform_{self.view_action}_validate', None)
         if perform_view_action_validate_method:
             attrs = perform_view_action_validate_method(attrs)
         else:
@@ -98,11 +98,18 @@ class TicketSerializer(serializers.ModelSerializer):
         return attrs
 
     def update(self, instance, validated_data):
-        meta = instance.meta
-        new_meta = validated_data['meta']
-        meta.update(new_meta)
-        validated_data['meta'] = meta
+        new_meta = validated_data.get('meta')
+        if new_meta:
+            meta = instance.meta
+            meta.update(new_meta)
+            validated_data['meta'] = meta
         return super().update(instance, validated_data)
+
+
+class AssigneeSerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    name = serializers.CharField()
+    username = serializers.CharField()
 
 
 class CurrentTicket(object):
@@ -116,18 +123,13 @@ class CurrentTicket(object):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    user = serializers.HiddenField(
-        default=serializers.CurrentUserDefault(),
-    )
-    ticket = serializers.HiddenField(
-        default=CurrentTicket()
-    )
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    ticket = serializers.HiddenField(default=CurrentTicket())
 
     class Meta:
         model = Comment
         fields = [
-            'id', 'ticket', 'body', 'user', 'user_display',
-            'date_created', 'date_updated'
+            'id', 'ticket', 'body', 'user', 'user_display', 'date_created', 'date_updated'
         ]
         read_only_fields = [
             'user_display', 'date_created', 'date_updated'
