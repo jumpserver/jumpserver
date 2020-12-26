@@ -30,67 +30,8 @@ class ModelJSONFieldEncoder(json.JSONEncoder):
             return super().default(obj)
 
 
-class Ticket(CommonModelMixin, OrgModelMixin):
-    title = models.CharField(max_length=256, verbose_name=_("Title"))
-    type = models.CharField(
-        max_length=64, choices=const.TicketTypeChoices.choices,
-        default=const.TicketTypeChoices.general.value, verbose_name=_("Type")
-    )
-    meta = models.JSONField(encoder=ModelJSONFieldEncoder, verbose_name=_("Meta"))
-    action = models.CharField(
-        choices=const.TicketActionChoices.choices, max_length=16, blank=True,
-        default=const.TicketActionChoices.apply.value, verbose_name=_("Action")
-    )
-    status = models.CharField(
-        max_length=16, choices=const.TicketStatusChoices.choices,
-        default=const.TicketStatusChoices.open.value, verbose_name=_("Status")
-    )
-    # 申请人
-    applicant = models.ForeignKey(
-        'users.User', related_name='applied_tickets', on_delete=models.SET_NULL, null=True,
-        verbose_name=_("Applicant")
-    )
-    applicant_display = models.CharField(
-        max_length=128, default='No', verbose_name=_("Applicant display")
-    )
-    # 处理人
-    processor = models.ForeignKey(
-        'users.User', related_name='processed_tickets', on_delete=models.SET_NULL, null=True,
-        verbose_name=_("Processor")
-    )
-    processor_display = models.CharField(
-        max_length=128, blank=True, null=True, default='No', verbose_name=_("Processor display")
-    )
-    # 受理人列表
-    assignees = models.ManyToManyField(
-        'users.User', related_name='assigned_tickets', verbose_name=_("Assignees")
-    )
-    assignees_display = models.CharField(
-        max_length=128, blank=True, default='No', verbose_name=_("Assignees display")
-    )
-    # 其他
-    comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
-
-    def __str__(self):
-        return '{}({})'.format(self.title, self.applicant_display)
-
-    #: new
-
-    def has_assignee(self, assignee):
-        return self.assignees.filter(id=assignee.id).exists()
-
-    def status_closed(self):
-        return self.status == const.TicketStatusChoices.closed.value
-
-    # action
-    def is_closed(self):
-        return self.action == const.TicketActionChoices.close.value
-
-    def is_approved(self):
-        return self.action == const.TicketActionChoices.approve.value
-
-    def is_rejected(self):
-        return self.action == const.TicketActionChoices.reject.value
+class TicketConstructBodyMixin:
+    meta: {}
 
     # body
     # applied body
@@ -163,7 +104,7 @@ class Ticket(CommonModelMixin, OrgModelMixin):
 
     def construct_approved_body(self):
         construct_method = getattr(self, f'construct_{self.type}_approved_body')
-        if self.is_approved() and construct_method:
+        if self.is_approved and construct_method:
             approved_body = construct_method()
         else:
             approved_body = 'No'
@@ -215,6 +156,10 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         meta_body = self.construct_meta_body()
         return basic_body + meta_body
 
+
+class TicketCreatePermissionMixin:
+    meta: dict
+
     # create permission
     def create_apply_asset_permission(self):
         with tmp_to_root_org():
@@ -258,7 +203,8 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         if create_method:
             create_method()
 
-    # create comment
+
+class TicketCreateCommentMixin:
     def create_comment(self, comment_body):
         comment_data = {
             'body': comment_body,
@@ -279,7 +225,72 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         )
         self.create_comment(comment_body)
 
-    #: old
+
+class TicketRelationMixin(TicketConstructBodyMixin,
+                          TicketCreatePermissionMixin,
+                          TicketCreateCommentMixin):
+    pass
+
+
+class Ticket(TicketRelationMixin, CommonModelMixin, OrgModelMixin):
+    title = models.CharField(max_length=256, verbose_name=_("Title"))
+    type = models.CharField(
+        max_length=64, choices=const.TicketTypeChoices.choices,
+        default=const.TicketTypeChoices.general.value, verbose_name=_("Type")
+    )
+    meta = models.JSONField(encoder=ModelJSONFieldEncoder, verbose_name=_("Meta"))
+    action = models.CharField(
+        choices=const.TicketActionChoices.choices, max_length=16, blank=True,
+        default=const.TicketActionChoices.apply.value, verbose_name=_("Action")
+    )
+    status = models.CharField(
+        max_length=16, choices=const.TicketStatusChoices.choices,
+        default=const.TicketStatusChoices.open.value, verbose_name=_("Status")
+    )
+    # 申请人
+    applicant = models.ForeignKey(
+        'users.User', related_name='applied_tickets', on_delete=models.SET_NULL, null=True,
+        verbose_name=_("Applicant")
+    )
+    applicant_display = models.CharField(
+        max_length=128, default='No', verbose_name=_("Applicant display")
+    )
+    # 处理人
+    processor = models.ForeignKey(
+        'users.User', related_name='processed_tickets', on_delete=models.SET_NULL, null=True,
+        verbose_name=_("Processor")
+    )
+    processor_display = models.CharField(
+        max_length=128, blank=True, null=True, default='No', verbose_name=_("Processor display")
+    )
+    # 受理人列表
+    assignees = models.ManyToManyField(
+        'users.User', related_name='assigned_tickets', verbose_name=_("Assignees")
+    )
+    assignees_display = models.CharField(
+        max_length=128, blank=True, default='No', verbose_name=_("Assignees display")
+    )
+    # 其他
+    comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
+
+    def __str__(self):
+        return '{}({})'.format(self.title, self.applicant_display)
+
+    #: new =================================================
+    def has_assignee(self, assignee):
+        return self.assignees.filter(id=assignee.id).exists()
+
+    # status
+    @property
+    def status_closed(self):
+        return self.status == const.TicketStatusChoices.closed.value
+
+    # action
+    @property
+    def is_approved(self):
+        return self.action == const.TicketActionChoices.approve.value
+
+    #: old =================================================
     def create_status_comment(self, status, user):
         if status == self.STATUS.CLOSED:
             action = _("Close")
@@ -289,7 +300,7 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         self.comments.create(user=user, body=body)
 
     def perform_status(self, status, user, extra_comment=None):
-        self.create_comment(
+        self.old_create_comment(
             self.STATUS.get(status),
             user,
             extra_comment
@@ -298,14 +309,14 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         self.assignee = user
         self.save()
 
-    def create_comment(self, action_display, user, extra_comment=None):
+    def old_create_comment(self, action_display, user, extra_comment=None):
         body = '{} {} {}'.format(user, action_display, _("this ticket"))
         if extra_comment is not None:
             body += extra_comment
         self.comments.create(body=body, user=user, user_display=str(user))
 
     def perform_action(self, action, user, extra_comment=None):
-        self.create_comment(
+        self.old_create_comment(
             self.ACTION.get(action),
             user,
             extra_comment
