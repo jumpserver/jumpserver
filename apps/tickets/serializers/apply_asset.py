@@ -47,9 +47,6 @@ class TicketApplyAssetSerializer(serializers.Serializer):
     approve_date_expired = serializers.DateTimeField(
         allow_null=True, required=False, label=_('Date expired')
     )
-    # 辅助信息
-    # assets_waitlist_url = serializers.SerializerMethodField()
-    # system_users_waitlist_url = serializers.SerializerMethodField()
 
     def validate_approve_assets(self, approve_assets_id):
         if not self.root.view_action_is_approve:
@@ -111,11 +108,9 @@ class TicketApplyAssetSerializer(serializers.Serializer):
         }
 
     def validate(self, attrs):
-        perform_view_action_validate_method = getattr(
-            self, f'perform_{self.root.view_action}_validate', None
-        )
-        if perform_view_action_validate_method:
-            attrs = perform_view_action_validate_method(attrs)
+        perform_validate_method = getattr(self, f'perform_{self.root.view_action}_validate', None)
+        if perform_validate_method:
+            attrs = perform_validate_method(attrs)
         else:
             attrs = {}
         return attrs

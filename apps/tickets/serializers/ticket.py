@@ -90,9 +90,9 @@ class TicketSerializer(serializers.ModelSerializer):
         return rejected_attrs
 
     def validate(self, attrs):
-        perform_view_action_validate_method = getattr(self, f'perform_{self.view_action}_validate', None)
-        if perform_view_action_validate_method:
-            attrs = perform_view_action_validate_method(attrs)
+        perform_validate_method = getattr(self, f'perform_{self.view_action}_validate', None)
+        if perform_validate_method:
+            attrs = perform_validate_method(attrs)
         else:
             attrs = {}
         return attrs
