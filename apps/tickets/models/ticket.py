@@ -94,11 +94,7 @@ class Ticket(CommonModelMixin, OrgModelMixin):
 
     # body
     # applied body
-    def construct_login_confirm_relation_applied_body(self):
-        # TODO: 构造登录确认工单的申请内容
-        pass
-
-    def construct_apply_asset_relation_applied_body(self):
+    def construct_apply_asset_applied_body(self):
         apply_ip_group = self.meta['apply_ip_group']
         apply_hostname_group = self.meta['apply_hostname_group']
         apply_system_user_group = self.meta['apply_system_user_group']
@@ -122,13 +118,12 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         )
         return applied_body
 
-    def construct_relation_applied_body(self):
-        applied_body = 'No'
-        construct_relation_applied_body_method = getattr(
-            self, f'construct_{self.type}_relation_applied_body'
-        )
-        if construct_relation_applied_body_method:
-            applied_body = construct_relation_applied_body_method()
+    def construct_applied_body(self):
+        construct_method = getattr(self, f'construct_{self.type}_applied_body')
+        if construct_method:
+            applied_body = construct_method()
+        else:
+            applied_body = 'No'
         body = '''
             {}:
             {}
@@ -139,7 +134,7 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         return body
 
     # approved body
-    def construct_apply_asset_relation_approved_body(self, dedent=False):
+    def construct_apply_asset_approved_body(self):
         approve_assets_id = self.meta['approve_assets']
         approve_system_users_id = self.meta['approve_system_users']
         with tmp_to_org(self.org_id):
@@ -164,18 +159,14 @@ class Ticket(CommonModelMixin, OrgModelMixin):
             __('Approved date start'), approve_date_start,
             __('Approved date expired'), approve_date_expired,
         )
-        if dedent:
-            # 页面展示需要取消缩进，发送邮件不需要取消缩进
-            approved_body = textwrap.dedent(approved_body)
         return approved_body
 
-    def construct_relation_approved_body(self, dedent=False):
-        approved_body = 'No'
-        construct_relation_approved_body_method = getattr(
-            self, f'construct_{self.type}_relation_approved_body'
-        )
-        if self.is_approved() and construct_relation_approved_body_method:
-            approved_body = construct_relation_approved_body_method(dedent=dedent)
+    def construct_approved_body(self):
+        construct_method = getattr(self, f'construct_{self.type}_approved_body')
+        if self.is_approved() and construct_method:
+            approved_body = construct_method()
+        else:
+            approved_body = 'No'
         body = '''
             {}:
             {}
@@ -187,8 +178,8 @@ class Ticket(CommonModelMixin, OrgModelMixin):
 
     # meta body
     def construct_meta_body(self):
-        applied_body = self.construct_relation_applied_body()
-        approved_body = self.construct_relation_approved_body()
+        applied_body = self.construct_applied_body()
+        approved_body = self.construct_approved_body()
         return applied_body + approved_body
 
     # basic body
@@ -224,8 +215,8 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         meta_body = self.construct_meta_body()
         return basic_body + meta_body
 
-    # create relation permission
-    def create_apply_asset_relation_permission(self):
+    # create permission
+    def create_apply_asset_permission(self):
         with tmp_to_root_org():
             asset_permission = AssetPermission.objects.filter(id=self.id).first()
             if asset_permission:
@@ -262,13 +253,13 @@ class Ticket(CommonModelMixin, OrgModelMixin):
             asset_permission.system_users.set(approve_system_users_id)
         return asset_permission
 
-    def create_relation_permission(self):
-        create_relation_permission_method = getattr(self, f'create_{self.type}_relation_permission')
-        if create_relation_permission_method:
-            create_relation_permission_method()
+    def create_permission(self):
+        create_method = getattr(self, f'create_{self.type}_permission')
+        if create_method:
+            create_method()
 
-    # create relation comment
-    def create_relation_comment(self, comment_body):
+    # create comment
+    def create_comment(self, comment_body):
         comment_data = {
             'body': comment_body,
             'user': self.processor,
@@ -276,17 +267,17 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         }
         return self.comments.create(**comment_data)
 
-    def create_relation_approved_comment(self):
-        comment_body = self.construct_relation_approved_body(dedent=True)
-        if comment_body is None:
-            return
-        self.create_relation_comment(comment_body)
+    def create_approved_comment(self):
+        comment_body = self.construct_approved_body()
+        # 页面展示需要取消缩进
+        comment_body = textwrap.dedent(comment_body)
+        self.create_comment(comment_body)
 
-    def create_relation_action_comment(self):
+    def create_action_comment(self):
         comment_body = __(
             'User {} {} the ticket'.format(self.processor_display, self.get_action_display())
         )
-        self.create_relation_comment(comment_body)
+        self.create_comment(comment_body)
 
     #: old
     def create_status_comment(self, status, user):
