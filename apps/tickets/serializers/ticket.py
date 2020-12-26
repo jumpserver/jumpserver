@@ -36,8 +36,7 @@ class TicketSerializer(serializers.ModelSerializer):
         ]
         extra_kwargs = {
             'title': {'required': False},
-            'assignees': {'required': False},
-            'org_id': {'required': True}
+            'assignees': {'required': False}
         }
 
     @property
@@ -62,22 +61,26 @@ class TicketSerializer(serializers.ModelSerializer):
         return self.view_action == const.TicketActionChoices.close.value
 
     def validate_assignees(self, assignees):
-        org_id = self.initial_data['org_id']
+        if not self.view_action_is_apply:
+            return assignees
+        org_id = self.initial_data.get('org_id')
         self.validate_org_id(org_id)
         org = get_org_by_id(org_id)
         admins = User.get_super_and_org_admins(org)
         invalid_assignees = set(assignees) - set(admins)
         if invalid_assignees:
             invalid_assignees_display = [str(assignee) for assignee in invalid_assignees]
-            error = _(
-                'Assignees `{}` are not super admin or organization `{}` admin'
-                ''.format(invalid_assignees_display, org.name)
-            )
+            error = _('Assignees `{}` are not super admin or organization `{}` admin'
+                      ''.format(invalid_assignees_display, org.name))
             raise serializers.ValidationError(error)
         return assignees
 
-    @staticmethod
-    def validate_org_id(org_id):
+    def validate_org_id(self, org_id):
+        if not self.view_action_is_apply:
+            return org_id
+        if org_id is None:
+            error = _('`org_id` field is required')
+            raise serializers.ValidationError(error)
         org = get_org_by_id(org_id)
         if not org:
             error = _('The organization `{}` does not exist'.format(org_id))
