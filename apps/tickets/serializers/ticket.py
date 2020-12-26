@@ -2,6 +2,8 @@
 #
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
+from orgs.utils import get_org_by_id
+from users.models import User
 from ..models import Ticket, Comment
 from .. import const
 
@@ -29,11 +31,13 @@ class TicketSerializer(serializers.ModelSerializer):
             'applicant', 'applicant_display',
             'processor', 'processor_display',
             'assignees_display',
-            'date_created', 'date_updated', 'org_name'
+            'date_created', 'date_updated',
+            'org_name'
         ]
         extra_kwargs = {
             'title': {'required': False},
-            'assignees': {'required': False}
+            'assignees': {'required': False},
+            'org_id': {'required': True}
         }
 
     @property
@@ -56,6 +60,29 @@ class TicketSerializer(serializers.ModelSerializer):
     @property
     def view_action_is_close(self):
         return self.view_action == const.TicketActionChoices.close.value
+
+    def validate_assignees(self, assignees):
+        org_id = self.initial_data['org_id']
+        self.validate_org_id(org_id)
+        org = get_org_by_id(org_id)
+        admins = User.get_super_and_org_admins(org)
+        invalid_assignees = set(assignees) - set(admins)
+        if invalid_assignees:
+            invalid_assignees_display = [str(assignee) for assignee in invalid_assignees]
+            error = _(
+                'Assignees `{}` are not super admin or organization `{}` admin'
+                ''.format(invalid_assignees_display, org.name)
+            )
+            raise serializers.ValidationError(error)
+        return assignees
+
+    @staticmethod
+    def validate_org_id(org_id):
+        org = get_org_by_id(org_id)
+        if not org:
+            error = _('The organization `{}` does not exist'.format(org_id))
+            raise serializers.ValidationError(error)
+        return org_id
 
     def perform_apply_validate(self, attrs):
         applied_attrs = {}
@@ -123,8 +150,8 @@ class CurrentTicket(object):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     ticket = serializers.HiddenField(default=CurrentTicket())
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Comment

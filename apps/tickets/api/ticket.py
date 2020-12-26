@@ -12,6 +12,7 @@ from common.permissions import IsValidUser, IsOrgAdmin
 from common.exceptions import JMSException
 from common.utils import lazyproperty, is_uuid
 from common.const.http import POST, PATCH
+from orgs.utils import get_org_by_id
 from .. import serializers
 from ..permissions import IsAssignee, NotClosed
 from ..models import Ticket
@@ -54,13 +55,13 @@ class TicketViewSet(mixin.TicketMetaSerializerViewMixin, viewsets.ModelViewSet):
 
 
 class AssigneeViewSet(viewsets.ReadOnlyModelViewSet):
-    # ?oid=org_id
     serializer_class = serializers.AssigneeSerializer
     permission_classes = (IsValidUser,)
     filter_fields = ('id', 'name', 'username', 'email', 'source')
     search_fields = filter_fields
 
     def get_queryset(self):
+        # 携带查询参数?oid=org_id
         queryset = User.get_super_and_org_admins()
         return queryset
 
@@ -74,9 +75,9 @@ class CommentViewSet(viewsets.ModelViewSet):
         ticket_id = self.request.query_params.get('ticket_id')
         try:
             ticket = get_object_or_404(Ticket, pk=ticket_id)
+            return ticket
         except Exception as e:
             raise JMSException(str(e))
-        return ticket
 
     def check_permissions(self, request):
         ticket = self.ticket
