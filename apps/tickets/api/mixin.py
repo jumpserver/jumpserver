@@ -5,14 +5,23 @@ from common.exceptions import JMSException
 class TicketMetaSerializerViewMixin:
     apply_asset_meta_serializer_classes = {
         'default': serializers.TicketMetaApplyAssetSerializer,
-        'display': serializers.TicketMetaApplyAssetDisplaySerializer,
+        'display': serializers.TicketMetaApplyAssetSerializer,
         'apply': serializers.TicketMetaApplyAssetApplySerializer,
         'approve': serializers.TicketMetaApplyAssetApproveSerializer,
-        'reject': serializers.TicketMetaApplyAssetRejectSerializer,
-        'close': serializers.TicketMetaApplyAssetCloseSerializer,
+        'reject': serializers.TicketNoMetaSerializer,
+        'close': serializers.TicketNoMetaSerializer,
+    }
+    login_confirm_meta_serializer_classes = {
+        'default': serializers.TicketMetaLoginConfirmSerializer,
+        'display': serializers.TicketMetaLoginConfirmSerializer,
+        'apply': serializers.TicketMetaLoginConfirmSerializer,
+        'approve': serializers.TicketNoMetaSerializer,
+        'reject': serializers.TicketNoMetaSerializer,
+        'close': serializers.TicketNoMetaSerializer,
     }
     meta_serializer_classes = {
-        const.TicketTypeChoices.apply_asset.value: apply_asset_meta_serializer_classes
+        const.TicketTypeChoices.login_confirm.value: login_confirm_meta_serializer_classes,
+        const.TicketTypeChoices.apply_asset.value: apply_asset_meta_serializer_classes,
     }
 
     def get_meta_class(self):

@@ -15,10 +15,10 @@ from common.const.http import POST, PUT
 from .. import serializers
 from ..permissions import IsAssignee, NotClosed
 from ..models import Ticket
-from . import mixin
+from .mixin import TicketMetaSerializerViewMixin
 
 
-class TicketViewSet(mixin.TicketMetaSerializerViewMixin, CommonApiMixin, viewsets.ModelViewSet):
+class TicketViewSet(TicketMetaSerializerViewMixin, CommonApiMixin, viewsets.ModelViewSet):
     permission_classes = (IsValidUser,)
     serializer_class = serializers.TicketSerializer
     serializer_classes = {
@@ -53,7 +53,8 @@ class TicketViewSet(mixin.TicketMetaSerializerViewMixin, CommonApiMixin, viewset
         return super().get_serializer_class()
 
     def get_queryset(self):
-        return Ticket.get_user_related_tickets(self.request.user)
+        queryset = Ticket.get_user_related_tickets(self.request.user)
+        return queryset
 
     @action(detail=False, methods=[POST])
     def apply(self, request, *args, **kwargs):

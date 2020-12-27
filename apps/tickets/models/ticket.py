@@ -81,12 +81,25 @@ class Ticket(TicketModelMixin, CommonModelMixin, OrgModelMixin):
     @property
     def status_closed(self):
         return self.status == const.TicketStatusChoices.closed.value
+    
+    @property
+    def status_open(self):
+        return self.status == const.TicketStatusChoices.open.value
 
     # action
     @property
     def is_approved(self):
         return self.action == const.TicketActionChoices.approve.value
 
+    @property
+    def is_rejected(self):
+        return self.action == const.TicketActionChoices.reject.value
+
+    @property
+    def is_closed(self):
+        return self.action == const.TicketActionChoices.close.value
+
+    # tickets
     @classmethod
     def get_all_tickets(cls):
         with tmp_to_root_org():
