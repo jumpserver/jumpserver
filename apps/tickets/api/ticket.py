@@ -8,21 +8,31 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import MethodNotAllowed
 
 from users.models import User
+from common.mixins.api import CommonApiMixin
 from common.permissions import IsValidUser, IsOrgAdmin
 from common.exceptions import JMSException
 from common.utils import lazyproperty, is_uuid
-from common.const.http import POST, PATCH
+from common.const.http import POST, PATCH, PUT
 from orgs.utils import get_org_by_id
+from orgs.mixins.api import OrgModelViewSet
 from .. import serializers
 from ..permissions import IsAssignee, NotClosed
 from ..models import Ticket
 from . import mixin
 
 
-class TicketViewSet(mixin.TicketMetaSerializerViewMixin, viewsets.ModelViewSet):
+class TicketViewSet(mixin.TicketMetaSerializerViewMixin, CommonApiMixin, viewsets.ModelViewSet):
     permission_classes = (IsValidUser,)
     queryset = Ticket.objects.all()
     serializer_class = serializers.TicketSerializer
+    serializer_classes = {
+        'default': serializers.TicketSerializer,
+        'display': serializers.TicketDisplaySerializer,
+        'apply': serializers.TicketApplySerializer,
+        'approve': serializers.TicketApproveSerializer,
+        'reject': serializers.TicketRejectSerializer,
+        'close': serializers.TicketCloseSerializer,
+    }
     filter_fields = [
         'type', 'title', 'action', 'status', 'applicant', 'processor', 'assignees__id'
     ]
@@ -37,19 +47,28 @@ class TicketViewSet(mixin.TicketMetaSerializerViewMixin, viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         raise MethodNotAllowed(self.action)
 
+    def reset_action_name_for_metadata(self):
+        if self.action.lower() in ['metadata']:
+            view_action = self.request.query_params.get('action') or 'apply'
+            setattr(self, 'action', view_action)
+
+    def get_serializer_class(self):
+        self.reset_action_name_for_metadata()
+        return super().get_serializer_class()
+
     @action(detail=False, methods=[POST])
     def apply(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
 
-    @action(detail=True, methods=[PATCH], permission_classes=[IsOrgAdmin, IsAssignee, NotClosed])
+    @action(detail=True, methods=[PUT], permission_classes=[IsOrgAdmin, IsAssignee, NotClosed])
     def approve(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
 
-    @action(detail=True, methods=[PATCH], permission_classes=[IsOrgAdmin, IsAssignee, NotClosed])
+    @action(detail=True, methods=[PUT], permission_classes=[IsOrgAdmin, IsAssignee, NotClosed])
     def reject(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
 
-    @action(detail=True, methods=[PATCH], permission_classes=[IsOrgAdmin, IsAssignee, NotClosed])
+    @action(detail=True, methods=[PUT], permission_classes=[IsOrgAdmin, IsAssignee, NotClosed])
     def close(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
 

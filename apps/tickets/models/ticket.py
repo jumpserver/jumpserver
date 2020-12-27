@@ -120,6 +120,8 @@ class TicketConstructBodyMixin:
     # meta body
     def construct_meta_body(self):
         applied_body = self.construct_applied_body()
+        if not self.is_approved:
+            return applied_body
         approved_body = self.construct_approved_body()
         return applied_body + approved_body
 

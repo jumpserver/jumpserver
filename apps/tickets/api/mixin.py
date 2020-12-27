@@ -3,26 +3,44 @@ from common.exceptions import JMSException
 
 
 class TicketMetaSerializerViewMixin:
+    apply_asset_meta_serializer_classes = {
+        'default': serializers.TicketMetaApplyAssetSerializer,
+        'display': serializers.TicketMetaApplyAssetDisplaySerializer,
+        'apply': serializers.TicketMetaApplyAssetApplySerializer,
+        'approve': serializers.TicketMetaApplyAssetApproveSerializer,
+        'reject': serializers.TicketMetaApplyAssetRejectSerializer,
+        'close': serializers.TicketMetaApplyAssetCloseSerializer,
+    }
+    meta_serializer_classes = {
+        const.TicketTypeChoices.apply_asset.value: apply_asset_meta_serializer_classes
+    }
+
+    def get_meta_class(self):
+        default_meta_class = serializers.TicketNoMetaSerializer
+
+        ticket_type = self.request.query_params.get('type')
+        if not ticket_type:
+            return default_meta_class
+
+        ticket_type_choices = const.TicketTypeChoices.types()
+        if ticket_type not in ticket_type_choices:
+            raise JMSException(
+                'Invalid query parameter `type`, select from the following options: {}'
+                ''.format(ticket_type_choices)
+            )
+
+        type_meta_classes = self.meta_serializer_classes.get(ticket_type, {})
+        meta_class = type_meta_classes.get(self.action, type_meta_classes['default'])
+        return meta_class
 
     def get_serializer_class(self):
         serializer_class = super().get_serializer_class()
         if getattr(self, 'swagger_fake_view', False):
             return serializer_class
-
-        ticket_type = self.request.query_params.get('type')
-        ticket_type_options = const.TicketTypeChoices.types()
-
-        if ticket_type and ticket_type not in ticket_type_options:
-            raise JMSException(
-                'Invalid query parameter `type`, select from the following options: {}'
-                ''.format(ticket_type_options)
-            )
-
-        if ticket_type == const.TicketTypeChoices.apply_asset.value:
-            meta_class = serializers.TicketApplyAssetSerializer
-            meta_class_name = meta_class.__name__
+        meta_class = self.get_meta_class()
+        if 'meta' in serializer_class().fields:
+            params = {'meta': meta_class(required=False)}
         else:
-            meta_class = serializers.TicketNoMetaSerializer
-            meta_class_name = meta_class.__name__
-        cls = type(meta_class_name, (serializer_class,), {'meta': meta_class(required=False)})
+            params = {}
+        cls = type(meta_class.__name__, (serializer_class,), params)
         return cls
