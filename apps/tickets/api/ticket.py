@@ -3,7 +3,6 @@
 
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
-from django.utils.translation import ugettext_lazy as _
 from rest_framework.decorators import action
 from rest_framework.exceptions import MethodNotAllowed
 
@@ -21,7 +20,6 @@ from . import mixin
 
 class TicketViewSet(mixin.TicketMetaSerializerViewMixin, CommonApiMixin, viewsets.ModelViewSet):
     permission_classes = (IsValidUser,)
-    queryset = Ticket.objects.all()
     serializer_class = serializers.TicketSerializer
     serializer_classes = {
         'default': serializers.TicketSerializer,
@@ -45,14 +43,17 @@ class TicketViewSet(mixin.TicketMetaSerializerViewMixin, CommonApiMixin, viewset
     def destroy(self, request, *args, **kwargs):
         raise MethodNotAllowed(self.action)
 
-    def reset_action_name_for_metadata(self):
+    def reset_metadata_action(self):
         if self.action.lower() in ['metadata']:
             view_action = self.request.query_params.get('action') or 'apply'
             setattr(self, 'action', view_action)
 
     def get_serializer_class(self):
-        self.reset_action_name_for_metadata()
+        self.reset_metadata_action()
         return super().get_serializer_class()
+
+    def get_queryset(self):
+        return Ticket.get_user_related_tickets(self.request.user)
 
     @action(detail=False, methods=[POST])
     def apply(self, request, *args, **kwargs):

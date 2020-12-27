@@ -11,6 +11,7 @@ from django.conf import settings
 
 from common.mixins.models import CommonModelMixin
 from orgs.mixins.models import OrgModelMixin
+from orgs.utils import tmp_to_root_org
 from .. import const
 from .mixin import TicketModelMixin
 
@@ -85,6 +86,43 @@ class Ticket(TicketModelMixin, CommonModelMixin, OrgModelMixin):
     @property
     def is_approved(self):
         return self.action == const.TicketActionChoices.approve.value
+
+    @classmethod
+    def get_all_tickets(cls):
+        with tmp_to_root_org():
+            return Ticket.objects.all()
+
+    @classmethod
+    def get_user_related_tickets(cls, user):
+        tickets = cls.get_all_tickets()
+        queries = None
+        if user.is_superuser:
+            pass
+        elif user.is_super_auditor:
+            pass
+        elif user.is_org_admin:
+            admin_orgs_id = [
+                str(org_id) for org_id in user.admin_orgs.values_list('id', flat=True)
+            ]
+            assigned_tickets_id = [
+                str(ticket_id) for ticket_id in user.assigned_tickets.values_list('id', flat=True)
+            ]
+            queries = Q(applicant=user)
+            queries |= Q(processor=user)
+            queries |= Q(org_id__in=admin_orgs_id)
+            queries |= Q(id__in=assigned_tickets_id)
+        elif user.is_org_auditor:
+            audit_orgs_id = [
+                str(org_id) for org_id in user.audit_orgs.values_list('id', flat=True)
+            ]
+            queries = Q(org_id__in=audit_orgs_id)
+        elif user.is_common_user:
+            queries = Q(applicant=user)
+        else:
+            tickets = Ticket.objects.none()
+        if queries:
+            tickets = tickets.filter(queries)
+        return tickets.distinct()
 
     #: old =================================================
     def create_status_comment(self, status, user):
