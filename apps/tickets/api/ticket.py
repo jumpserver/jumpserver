@@ -11,10 +11,8 @@ from users.models import User
 from common.mixins.api import CommonApiMixin
 from common.permissions import IsValidUser, IsOrgAdmin
 from common.exceptions import JMSException
-from common.utils import lazyproperty, is_uuid
-from common.const.http import POST, PATCH, PUT
-from orgs.utils import get_org_by_id
-from orgs.mixins.api import OrgModelViewSet
+from common.utils import lazyproperty
+from common.const.http import POST, PUT
 from .. import serializers
 from ..permissions import IsAssignee, NotClosed
 from ..models import Ticket
