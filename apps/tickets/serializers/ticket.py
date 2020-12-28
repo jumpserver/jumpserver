@@ -49,12 +49,14 @@ class TicketActionSerializer(TicketSerializer):
 
 
 class TicketApplySerializer(TicketActionSerializer):
-    org_id = serializers.UUIDField(required=True, label=_("Organization"))
+    org_id = serializers.CharField(
+        max_length=36, allow_blank=True, required=True, label=_("Organization")
+    )
     applicant = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta(TicketActionSerializer.Meta):
         fields = TicketActionSerializer.Meta.fields + [
-            'id', 'title', 'type', 'meta', 'assignees', 'org_id'
+            'id', 'title', 'type', 'applicant', 'meta', 'assignees', 'org_id'
         ]
         extra_kwargs = {
             'type': {'required': True}

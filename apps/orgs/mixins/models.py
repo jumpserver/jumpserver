@@ -59,8 +59,6 @@ class OrgModelMixin(models.Model):
     sep = '@'
 
     def save(self, *args, **kwargs):
-        if self.org:
-            return super().save(*args, **kwargs)
         org = get_current_org()
         if org is None:
             return super().save(*args, **kwargs)

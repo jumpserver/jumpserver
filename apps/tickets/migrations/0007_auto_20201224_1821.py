@@ -38,7 +38,7 @@ def migrate_field_meta(tp, old_meta):
 
 def migrate_tickets_fields_name(apps, schema_editor):
     ticket_model = apps.get_model("tickets", "Ticket")
-    tickets = ticket_model.objects.all()
+    tickets = ticket_model.origin_objects.all()
 
     for ticket in tickets:
         ticket.applicant = ticket.user

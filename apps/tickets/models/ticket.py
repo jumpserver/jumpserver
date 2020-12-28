@@ -10,7 +10,7 @@ from django.conf import settings
 
 from common.mixins.models import CommonModelMixin
 from orgs.mixins.models import OrgModelMixin
-from orgs.utils import tmp_to_root_org
+from orgs.utils import tmp_to_root_org, tmp_to_org
 from .. import const
 from .mixin import TicketModelMixin
 
@@ -151,6 +151,11 @@ class Ticket(TicketModelMixin, CommonModelMixin, OrgModelMixin):
         if queries:
             tickets = tickets.filter(queries)
         return tickets.distinct()
+
+    def save(self, *args, **kwargs):
+        with tmp_to_org(self.org_id):
+            # 确保保存的org_id的是自身的值
+            return super().save(*args, **kwargs)
 
 
 class Comment(CommonModelMixin):
