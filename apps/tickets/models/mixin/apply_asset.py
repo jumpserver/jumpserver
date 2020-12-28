@@ -64,6 +64,7 @@ class CreatePermissionMixin:
             asset_permission = AssetPermission.objects.filter(id=self.id).first()
             if asset_permission:
                 return asset_permission
+
         approve_assets_id = self.meta['approve_assets']
         approve_system_users_id = self.meta['approve_system_users']
         approve_actions = self.meta['approve_actions']
@@ -94,4 +95,5 @@ class CreatePermissionMixin:
             asset_permission.users.add(self.applicant)
             asset_permission.assets.set(approve_assets_id)
             asset_permission.system_users.set(approve_system_users_id)
+
         return asset_permission

@@ -64,39 +64,37 @@ class CreatePermissionMixin:
             if application_permission:
                 return application_permission
 
-            apply_category = self.meta['apply_category']
-            apply_type = self.meta['apply_type']
-            approved_applications_id = self.meta['approve_applications']
-            approve_system_users_id = self.meta['approve_system_users']
-            approve_date_start = self.meta['approve_date_start']
-            approve_date_expired = self.meta['approve_date_expired']
+        apply_category = self.meta['apply_category']
+        apply_type = self.meta['apply_type']
+        approved_applications_id = self.meta['approve_applications']
+        approve_system_users_id = self.meta['approve_system_users']
+        approve_date_start = self.meta['approve_date_start']
+        approve_date_expired = self.meta['approve_date_expired']
+        permission_name = '{}({})'.format(
+            __('Created by ticket ({})'.format(self.title)), str(self.id)[:4]
+        )
+        permission_comment = __(
+            'Created by the ticket, '
+            'ticket title: {}, '
+            'ticket applicant: {}, '
+            'ticket processor: {}, '
+            'ticket ID: {}'
+            ''.format(self.title, self.applicant_display, self.processor_display, str(self.id))
+        )
+        permissions_data = {
+            'id': self.id,
+            'name': permission_name,
+            'category': apply_category,
+            'type': apply_type,
+            'comment': permission_comment,
+            'created_by': self.processor_display,
+            'date_start': approve_date_start,
+            'date_expired': approve_date_expired,
+        }
+        with tmp_to_org(self.org_id):
+            application_permission = ApplicationPermission.objects.create(**permissions_data)
+            application_permission.users.add(self.applicant)
+            application_permission.applications.set(approved_applications_id)
+            application_permission.system_users.set(approve_system_users_id)
 
-            permission_name = '{}({})'.format(
-                __('Created by ticket ({})'.format(self.title)), str(self.id)[:4]
-            )
-            permission_comment = __(
-                'Created by the ticket, '
-                'ticket title: {}, '
-                'ticket applicant: {}, '
-                'ticket processor: {}, '
-                'ticket ID: {}'
-                ''.format(self.title, self.applicant_display, self.processor_display, str(self.id))
-            )
-
-            permissions_data = {
-                'id': self.id,
-                'name': permission_name,
-                'category': apply_category,
-                'type': apply_type,
-                'comment': permission_comment,
-                'created_by': self.processor_display,
-                'date_start': approve_date_start,
-                'date_expired': approve_date_expired,
-            }
-
-            with tmp_to_org(self.org_id):
-                application_permission = ApplicationPermission.objects.create(**permissions_data)
-                application_permission.users.add(self.applicant)
-                application_permission.applications.set(approved_applications_id)
-                application_permission.system_users.set(approve_system_users_id)
-            return application_permission
+        return application_permission
