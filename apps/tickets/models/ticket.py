@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-import textwrap
 import json
 import uuid
 from datetime import datetime
@@ -70,10 +69,12 @@ class Ticket(TicketModelMixin, CommonModelMixin, OrgModelMixin):
     # 其他
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
+    class Meta:
+        ordering = ('-date_created',)
+
     def __str__(self):
         return '{}({})'.format(self.title, self.applicant_display)
 
-    #: new =================================================
     def has_assignee(self, assignee):
         return self.assignees.filter(id=assignee.id).exists()
 
@@ -88,6 +89,10 @@ class Ticket(TicketModelMixin, CommonModelMixin, OrgModelMixin):
 
     # action
     @property
+    def is_applied(self):
+        return self.action == const.TicketActionChoices.apply.value
+
+    @property
     def is_approved(self):
         return self.action == const.TicketActionChoices.approve.value
 
@@ -98,6 +103,10 @@ class Ticket(TicketModelMixin, CommonModelMixin, OrgModelMixin):
     @property
     def is_closed(self):
         return self.action == const.TicketActionChoices.close.value
+
+    @property
+    def is_processed(self):
+        return not self.is_applied
 
     # perform action
     def close(self, processor):
@@ -144,74 +153,6 @@ class Ticket(TicketModelMixin, CommonModelMixin, OrgModelMixin):
         if queries:
             tickets = tickets.filter(queries)
         return tickets.distinct()
-
-    #: old =================================================
-    def create_status_comment(self, status, user):
-        if status == self.STATUS.CLOSED:
-            action = _("Close")
-        else:
-            action = _("Open")
-        body = _('{} {} this ticket').format(self.user, action)
-        self.comments.create(user=user, body=body)
-
-    def perform_status(self, status, user, extra_comment=None):
-        self.old_create_comment(
-            self.STATUS.get(status),
-            user,
-            extra_comment
-        )
-        self.status = status
-        self.assignee = user
-        self.save()
-
-    def old_create_comment(self, action_display, user, extra_comment=None):
-        body = '{} {} {}'.format(user, action_display, _("this ticket"))
-        if extra_comment is not None:
-            body += extra_comment
-        self.comments.create(body=body, user=user, user_display=str(user))
-
-    def perform_action(self, action, user, extra_comment=None):
-        self.old_create_comment(
-            self.ACTION.get(action),
-            user,
-            extra_comment
-        )
-        self.action = action
-        self.status = self.STATUS.CLOSED
-        self.assignee = user
-        self.save()
-
-    def is_assignee(self, user):
-        return self.assignees.filter(id=user.id).exists()
-
-    def is_user(self, user):
-        return self.user == user
-
-    @classmethod
-    def get_related_tickets(cls, user, queryset=None):
-        if queryset is None:
-            queryset = cls.objects.all()
-        queryset = queryset.filter(
-            Q(assignees=user) | Q(user=user)
-        ).distinct()
-        return queryset
-
-    @classmethod
-    def get_assigned_tickets(cls, user, queryset=None):
-        if queryset is None:
-            queryset = cls.objects.all()
-        queryset = queryset.filter(assignees=user)
-        return queryset
-
-    @classmethod
-    def get_my_tickets(cls, user, queryset=None):
-        if queryset is None:
-            queryset = cls.objects.all()
-        queryset = queryset.filter(user=user)
-        return queryset
-
-    class Meta:
-        ordering = ('-date_created',)
 
 
 class Comment(CommonModelMixin):

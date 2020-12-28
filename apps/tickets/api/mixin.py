@@ -1,5 +1,5 @@
-from .. import const, serializers
 from common.exceptions import JMSException
+from .. import const, serializers
 
 
 class TicketMetaSerializerViewMixin:

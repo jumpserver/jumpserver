@@ -5,14 +5,13 @@ from rest_framework import serializers
 from orgs.utils import get_org_by_id
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from users.models import User
-from ..models import Ticket, Comment
+from ..models import Ticket
 from .. import const
 
 __all__ = [
     'TicketSerializer', 'TicketDisplaySerializer',
     'TicketApplySerializer', 'TicketApproveSerializer',
     'TicketRejectSerializer', 'TicketCloseSerializer',
-    'AssigneeSerializer', 'CommentSerializer'
 ]
 
 
@@ -133,31 +132,3 @@ class TicketCloseSerializer(TicketProcessSerializer):
         return const.TicketActionChoices.close.value
 
 
-class AssigneeSerializer(serializers.Serializer):
-    id = serializers.UUIDField()
-    name = serializers.CharField()
-    username = serializers.CharField()
-
-
-class CurrentTicket(object):
-    ticket = None
-
-    def set_context(self, serializer_field):
-        self.ticket = serializer_field.context['ticket']
-
-    def __call__(self):
-        return self.ticket
-
-
-class CommentSerializer(serializers.ModelSerializer):
-    ticket = serializers.HiddenField(default=CurrentTicket())
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-
-    class Meta:
-        model = Comment
-        fields = [
-            'id', 'ticket', 'body', 'user', 'user_display', 'date_created', 'date_updated'
-        ]
-        read_only_fields = [
-            'user_display', 'date_created', 'date_updated'
-        ]
