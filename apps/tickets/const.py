@@ -1,6 +1,8 @@
 from django.db.models import TextChoices
 from django.utils.translation import ugettext_lazy as _
 
+TICKET_DETAIL_URL = '/ui/#/tickets/tickets/{id}'
+
 
 class TicketTypeChoices(TextChoices):
     general = 'general', _("General")

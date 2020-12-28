@@ -3,7 +3,6 @@
 from django.dispatch import receiver
 from django.db.models.signals import m2m_changed, post_save, pre_save
 
-from users.models import User
 from common.utils import get_logger
 from .models import Ticket, Comment
 from .utils import (
