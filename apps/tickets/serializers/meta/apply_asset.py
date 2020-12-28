@@ -26,23 +26,24 @@ class TicketMetaApplyAssetSerializer(TicketMetaSerializerMixin, serializers.Seri
         child=serializers.CharField(), allow_null=True, default=list, label=_('System user group')
     )
     apply_actions = ActionsField(
-        choices=Action.DB_CHOICES, allow_null=True, default=Action.ALL
+        choices=Action.DB_CHOICES, default=Action.ALL
     )
     apply_date_start = serializers.DateTimeField(
-        allow_null=True, required=True, label=_('Date start')
+        required=True, label=_('Date start')
     )
     apply_date_expired = serializers.DateTimeField(
-        allow_null=True, required=True, label=_('Date expired')
+        required=True, label=_('Date expired')
     )
     # 审批信息
     approve_assets = serializers.ListField(
         child=serializers.UUIDField(), required=True, allow_null=True, label=_('Approve assets')
     )
     approve_system_users = serializers.ListField(
-        child=serializers.UUIDField(), required=True, allow_null=True, label=_('Approve system users')
+        child=serializers.UUIDField(), required=True, allow_null=True,
+        label=_('Approve system users')
     )
     approve_actions = ActionsField(
-        choices=Action.DB_CHOICES, allow_null=True, default=Action.NONE
+        choices=Action.DB_CHOICES, default=Action.NONE
     )
     approve_date_start = serializers.DateTimeField(
         required=True, allow_null=True, label=_('Date start')

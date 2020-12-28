@@ -56,7 +56,7 @@ class TicketMetaSerializerViewMixin:
         if getattr(self, 'swagger_fake_view', False):
             return serializer_class
         meta_class = self.get_meta_class()
-        if 'meta' in serializer_class().fields:
+        if len(meta_class().fields):
             params = {'meta': meta_class(required=True)}
         else:
             params = {}

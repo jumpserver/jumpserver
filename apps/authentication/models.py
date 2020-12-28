@@ -74,10 +74,9 @@ class LoginConfirmSetting(CommonModelMixin):
         ticket_assignees = self.reviewers.all()
         data = {
             'title': ticket_title,
+            'type': const.TicketTypeChoices.login_confirm.value,
             'applicant': ticket_applicant,
-            'applicant_display': str(ticket_applicant),
             'meta': ticket_meta,
-            'type': const.TicketTypeChoices.login_confirm.value
         }
         ticket = Ticket.objects.create(**data)
         ticket.assignees.set(ticket_assignees)

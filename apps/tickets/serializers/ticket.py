@@ -2,6 +2,7 @@
 #
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
+from common.fields.serializer import CanReadHiddenField
 from orgs.utils import get_org_by_id
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from users.models import User
@@ -15,14 +16,17 @@ __all__ = [
 ]
 
 
-class TicketSerializer(serializers.ModelSerializer):
+class TicketSerializer(OrgResourceModelSerializerMixin):
+    type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type'))
+    status_display = serializers.ReadOnlyField(source='get_status_display', label=_('Status'))
+    action_display = serializers.ReadOnlyField(source='get_action_display', label=_('Action'))
+
     class Meta:
         model = Ticket
         fields = [
-            'id', 'title', 'type',
-            'meta', 'action', 'status',
-            'applicant', 'applicant_display',
-            'processor', 'processor_display',
+            'id', 'title', 'type', 'type_display',
+            'meta', 'action', 'action_display', 'status', 'status_display',
+            'applicant', 'applicant_display', 'processor', 'processor_display',
             'assignees', 'assignees_display',
             'date_created', 'date_updated',
             'org_id', 'org_name',
@@ -30,19 +34,17 @@ class TicketSerializer(serializers.ModelSerializer):
         ]
 
 
-class TicketDisplaySerializer(OrgResourceModelSerializerMixin):
-    type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type'))
-    status_display = serializers.ReadOnlyField(source='get_status_display', label=_('Status'))
-    action_display = serializers.ReadOnlyField(source='get_action_display', label=_('Action'))
+class TicketDisplaySerializer(TicketSerializer):
 
     class Meta(TicketSerializer.Meta):
-        fields = TicketSerializer.Meta.fields + ['type_display', 'status_display', 'action_display']
+        read_only_fields = TicketSerializer.Meta.fields
 
 
 class TicketActionSerializer(TicketSerializer):
 
     class Meta(TicketSerializer.Meta):
-        fields = ['action']
+        required_fields = ['action']
+        read_only_fields = list(set(TicketDisplaySerializer.Meta.fields) - set(required_fields))
         extra_kwargs = {
             'action': {'default': const.TicketActionChoices.apply.value}
         }
@@ -52,14 +54,16 @@ class TicketApplySerializer(TicketActionSerializer):
     org_id = serializers.CharField(
         max_length=36, allow_blank=True, required=True, label=_("Organization")
     )
-    applicant = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    applicant = CanReadHiddenField(default=serializers.CurrentUserDefault())
 
     class Meta(TicketActionSerializer.Meta):
-        fields = TicketActionSerializer.Meta.fields + [
+        required_fields = TicketActionSerializer.Meta.required_fields + [
             'id', 'title', 'type', 'applicant', 'meta', 'assignees', 'org_id'
         ]
+        read_only_fields = list(set(TicketDisplaySerializer.Meta.fields) - set(required_fields))
         extra_kwargs = {
-            'type': {'required': True}
+            'type': {'required': True},
+            'meta': {'default': {}}
         }
 
     @staticmethod
@@ -87,16 +91,18 @@ class TicketApplySerializer(TicketActionSerializer):
 
 
 class TicketProcessSerializer(TicketActionSerializer):
-    processor = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    processor = CanReadHiddenField(default=serializers.CurrentUserDefault())
 
     class Meta(TicketActionSerializer.Meta):
-        fields = TicketActionSerializer.Meta.fields + ['processor']
+        required_fields = TicketActionSerializer.Meta.required_fields + ['processor']
+        read_only_fields = list(set(TicketDisplaySerializer.Meta.fields) - set(required_fields))
 
 
 class TicketApproveSerializer(TicketProcessSerializer):
 
     class Meta(TicketProcessSerializer.Meta):
-        fields = TicketProcessSerializer.Meta.fields + ['meta']
+        required_fields = TicketProcessSerializer.Meta.required_fields + ['meta']
+        read_only_fields = list(set(TicketDisplaySerializer.Meta.fields) - set(required_fields))
 
     def validate_meta(self, meta):
         meta.update(self.instance.meta)

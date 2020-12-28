@@ -9,25 +9,23 @@ from .mixin import TicketMetaSerializerMixin, TicketMetaApproveSerializerMixin
 class TicketMetaApplyApplicationSerializer(TicketMetaSerializerMixin, serializers.Serializer):
     # 申请信息
     apply_category = serializers.ChoiceField(
-        choices=Category.choices, required=True, allow_blank=True, label=_('Category')
+        choices=Category.choices, required=True, label=_('Category')
     )
     apply_type = serializers.ChoiceField(
-        choices=Category.get_all_type_choices(), required=True, allow_blank=True,
-        label=_('Category')
+        choices=Category.get_all_type_choices(), required=True, label=_('Category')
     )
     apply_application_group = serializers.ListField(
-        child=serializers.CharField(), allow_null=True, default=list, label=_('Application group')
+        child=serializers.CharField(), default=list, label=_('Application group')
     )
     apply_system_user_group = serializers.ListField(
-        child=serializers.CharField(), allow_null=True, default=list, label=_('System user group')
+        child=serializers.CharField(), default=list, label=_('System user group')
     )
     apply_date_start = serializers.DateTimeField(
-        allow_null=True, required=True, label=_('Date start')
+        required=True, label=_('Date start')
     )
     apply_date_expired = serializers.DateTimeField(
-        allow_null=True, required=True, label=_('Date expired')
+        required=True, label=_('Date expired')
     )
-
     # 审批信息
     approve_applications = serializers.ListField(
         child=serializers.UUIDField(), required=True, allow_null=True,

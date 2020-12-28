@@ -7,7 +7,7 @@ import six
 
 __all__ = [
     'StringIDField', 'StringManyToManyField', 'ChoiceDisplayField',
-    'CustomMetaDictField'
+    'CustomMetaDictField', 'CanReadHiddenField',
 ]
 
 
@@ -42,6 +42,17 @@ class DictField(serializers.DictField):
         if not value or not isinstance(value, dict):
             value = {}
         return super().to_representation(value)
+
+
+class CanReadHiddenField(serializers.HiddenField):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.write_only = False
+
+    def to_representation(self, value):
+        if hasattr(value, 'id'):
+            return getattr(value, 'id')
+        return value
 
 
 class CustomMetaDictField(serializers.DictField):

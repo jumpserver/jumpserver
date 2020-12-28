@@ -47,13 +47,18 @@ class TicketViewSet(TicketMetaSerializerViewMixin, CommonApiMixin, viewsets.Mode
     def destroy(self, request, *args, **kwargs):
         raise MethodNotAllowed(self.action)
 
-    def reset_metadata_action(self):
+    def reset_view_action(self):
         if self.action.lower() in ['metadata']:
             view_action = self.request.query_params.get('action') or 'apply'
+        elif self.action.lower() in ['retrieve']:
+            view_action = 'display'
+        else:
+            view_action = None
+        if view_action:
             setattr(self, 'action', view_action)
 
     def get_serializer_class(self):
-        self.reset_metadata_action()
+        self.reset_view_action()
         return super().get_serializer_class()
 
     def get_queryset(self):
