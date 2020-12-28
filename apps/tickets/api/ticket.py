@@ -12,6 +12,7 @@ from common.permissions import IsValidUser, IsOrgAdmin
 from common.exceptions import JMSException
 from common.utils import lazyproperty
 from common.const.http import POST, PUT
+from orgs.utils import get_org_by_id
 from .. import serializers
 from ..permissions import IsAssignee, NotClosed
 from ..models import Ticket
@@ -82,9 +83,16 @@ class AssigneeViewSet(viewsets.ReadOnlyModelViewSet):
     filter_fields = ('id', 'name', 'username', 'email', 'source')
     search_fields = filter_fields
 
+    def get_org(self):
+        org_id = self.request.query_params.get('org_id')
+        org = get_org_by_id(org_id)
+        if not org:
+            raise JMSException('The organization `{}` does not exist'.format(org_id))
+        return org
+
     def get_queryset(self):
-        # 携带查询参数?oid=org_id
-        queryset = User.get_super_and_org_admins()
+        org = self.get_org()
+        queryset = User.get_super_and_org_admins(org=org)
         return queryset
 
 
