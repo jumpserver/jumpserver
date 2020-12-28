@@ -50,6 +50,7 @@ class TicketActionSerializer(TicketSerializer):
 
 class TicketApplySerializer(TicketActionSerializer):
     org_id = serializers.UUIDField(required=True, label=_("Organization"))
+    applicant = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta(TicketActionSerializer.Meta):
         fields = TicketActionSerializer.Meta.fields + [
@@ -84,23 +85,12 @@ class TicketApplySerializer(TicketActionSerializer):
     def validate_action():
         return const.TicketActionChoices.apply.value
 
-    def validate(self, attrs):
-        attrs = super().validate(attrs)
-        applicant = self.context['request'].user
-        attrs['applicant'] = applicant
-        attrs['applicant_display'] = str(applicant)
-        return attrs
-
 
 class TicketProcessSerializer(TicketActionSerializer):
+    processor = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
-    def validate(self, attrs):
-        attrs = super().validate(attrs)
-        processor = self.context['request'].user
-        attrs['processor'] = processor
-        attrs['processor_display'] = str(processor)
-        attrs['status'] = const.TicketStatusChoices.closed.value
-        return attrs
+    class Meta(TicketActionSerializer.Meta):
+        fields = TicketActionSerializer.Meta.fields + ['processor']
 
 
 class TicketApproveSerializer(TicketProcessSerializer):
@@ -109,8 +99,7 @@ class TicketApproveSerializer(TicketProcessSerializer):
         fields = TicketProcessSerializer.Meta.fields + ['meta']
 
     def validate_meta(self, meta):
-        old_meta = self.instance.meta
-        meta.update(old_meta)
+        meta.update(self.instance.meta)
         return meta
 
     @staticmethod

@@ -9,6 +9,7 @@ from .utils import (
     send_ticket_applied_mail_to_assignees,
     send_ticket_processed_mail_to_applicant
 )
+from . import const
 
 
 logger = get_logger(__name__)
@@ -20,6 +21,7 @@ def on_ticket_pre_save(sender, instance=None, **kwargs):
         instance.applicant_display = str(instance.applicant)
     if instance.is_processed:
         instance.processor_display = str(instance.processor)
+        instance.status = const.TicketStatusChoices.closed.value
 
 
 @receiver(post_save, sender=Ticket)

@@ -49,7 +49,7 @@ class Ticket(TicketModelMixin, CommonModelMixin, OrgModelMixin):
         verbose_name=_("Applicant")
     )
     applicant_display = models.CharField(
-        max_length=128, default='No', verbose_name=_("Applicant display")
+        max_length=256, default='No', verbose_name=_("Applicant display")
     )
     # 处理人
     processor = models.ForeignKey(
@@ -57,14 +57,14 @@ class Ticket(TicketModelMixin, CommonModelMixin, OrgModelMixin):
         verbose_name=_("Processor")
     )
     processor_display = models.CharField(
-        max_length=128, blank=True, null=True, default='No', verbose_name=_("Processor display")
+        max_length=256, blank=True, null=True, default='No', verbose_name=_("Processor display")
     )
     # 受理人列表
     assignees = models.ManyToManyField(
         'users.User', related_name='assigned_tickets', verbose_name=_("Assignees")
     )
-    assignees_display = models.CharField(
-        max_length=128, blank=True, default='No', verbose_name=_("Assignees display")
+    assignees_display = models.TextField(
+        blank=True, default='No', verbose_name=_("Assignees display")
     )
     # 其他
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
@@ -106,14 +106,12 @@ class Ticket(TicketModelMixin, CommonModelMixin, OrgModelMixin):
 
     @property
     def is_processed(self):
-        return not self.is_applied
+        return self.is_approved or self.is_rejected or self.is_closed
 
     # perform action
     def close(self, processor):
         self.processor = processor
-        self.processor_display = str(processor)
         self.action = const.TicketActionChoices.close.value
-        self.status = const.TicketStatusChoices.closed.value
         self.save()
 
     # tickets
@@ -156,9 +154,14 @@ class Ticket(TicketModelMixin, CommonModelMixin, OrgModelMixin):
 
 
 class Comment(CommonModelMixin):
-    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='comments')
-    user = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, verbose_name=_("User"), related_name='comments')
-    user_display = models.CharField(max_length=128, verbose_name=_("User display name"))
+    ticket = models.ForeignKey(
+        Ticket, on_delete=models.CASCADE, related_name='comments'
+    )
+    user = models.ForeignKey(
+        'users.User', on_delete=models.SET_NULL, null=True, related_name='comments',
+        verbose_name=_("User")
+    )
+    user_display = models.CharField(max_length=256, verbose_name=_("User display name"))
     body = models.TextField(verbose_name=_("Body"))
 
     class Meta:

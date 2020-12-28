@@ -38,7 +38,7 @@ def migrate_field_meta(tp, old_meta):
 
 def migrate_tickets_fields_name(apps, schema_editor):
     ticket_model = apps.get_model("tickets", "Ticket")
-    tickets = ticket_model.origin_objects.all()
+    tickets = ticket_model.objects.all()
 
     for ticket in tickets:
         ticket.applicant = ticket.user
@@ -59,6 +59,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # model ticket
         migrations.AddField(
             model_name='ticket',
             name='applicant',
@@ -67,7 +68,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='ticket',
             name='applicant_display',
-            field=models.CharField(default='No', max_length=128, verbose_name='Applicant display'),
+            field=models.CharField(default='No', max_length=256, verbose_name='Applicant display'),
         ),
         migrations.AddField(
             model_name='ticket',
@@ -77,7 +78,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='ticket',
             name='processor_display',
-            field=models.CharField(blank=True, default='No', max_length=128, null=True, verbose_name='Processor display'),
+            field=models.CharField(blank=True, default='No', max_length=256, null=True, verbose_name='Processor display'),
         ),
         migrations.AlterField(
             model_name='ticket',
@@ -87,7 +88,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='ticket',
             name='assignees_display',
-            field=models.CharField(blank=True, default='No', max_length=128, verbose_name='Assignees display'),
+            field=models.TextField(blank=True, default='No', verbose_name='Assignees display'),
         ),
         migrations.AlterField(
             model_name='ticket',
@@ -134,5 +135,11 @@ class Migration(migrations.Migration):
             name='ticket',
             managers=[
             ],
+        ),
+        # model comment
+        migrations.AlterField(
+            model_name='comment',
+            name='user_display',
+            field=models.CharField(max_length=256, verbose_name='User display name'),
         ),
     ]
