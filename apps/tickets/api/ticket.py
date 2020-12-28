@@ -30,9 +30,12 @@ class TicketViewSet(TicketMetaSerializerViewMixin, CommonApiMixin, viewsets.Mode
         'close': serializers.TicketCloseSerializer,
     }
     filter_fields = [
-        'type', 'title', 'action', 'status', 'applicant', 'processor', 'assignees__id'
+        'id', 'title', 'type', 'action', 'status', 'applicant', 'applicant_display', 'processor',
+        'processor_display', 'assignees__id'
     ]
-    search_fields = ['title', 'applicant_display']
+    search_fields = [
+        'title', 'action', 'type', 'status', 'applicant_display', 'processor_display'
+    ]
 
     def create(self, request, *args, **kwargs):
         raise MethodNotAllowed(self.action)

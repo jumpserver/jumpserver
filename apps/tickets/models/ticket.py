@@ -99,6 +99,14 @@ class Ticket(TicketModelMixin, CommonModelMixin, OrgModelMixin):
     def is_closed(self):
         return self.action == const.TicketActionChoices.close.value
 
+    # perform action
+    def close(self, processor):
+        self.processor = processor
+        self.processor_display = str(processor)
+        self.action = const.TicketActionChoices.close.value
+        self.status = const.TicketStatusChoices.closed.value
+        self.save()
+
     # tickets
     @classmethod
     def get_all_tickets(cls):

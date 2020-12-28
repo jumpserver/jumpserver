@@ -2,6 +2,7 @@ from django.utils.translation import ugettext as __
 
 
 class ConstructBodyMixin:
+    
     def construct_login_confirm_applied_body(self):
         apply_login_ip = self.meta['apply_login_ip']
         apply_login_city = self.meta['apply_login_city']
