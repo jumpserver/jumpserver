@@ -57,7 +57,7 @@ class TicketMetaSerializerViewMixin:
             return serializer_class
         meta_class = self.get_meta_class()
         if 'meta' in serializer_class().fields:
-            params = {'meta': meta_class(required=False)}
+            params = {'meta': meta_class(required=True)}
         else:
             params = {}
         cls = type(meta_class.__name__, (serializer_class,), params)

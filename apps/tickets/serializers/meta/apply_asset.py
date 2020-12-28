@@ -4,7 +4,7 @@ from perms.serializers import ActionsField
 from perms.models import Action
 from assets.models import Asset, SystemUser
 from orgs.utils import tmp_to_org
-from .mixin import TicketMetaSerializerMixin
+from .mixin import TicketMetaSerializerMixin, TicketMetaApproveSerializerMixin
 
 
 __all__ = [
@@ -56,27 +56,14 @@ class TicketMetaApplyAssetApplySerializer(TicketMetaApplyAssetSerializer):
     need_fields_prefix = 'apply_'
 
 
-class TicketMetaApplyAssetApproveSerializer(TicketMetaApplyAssetSerializer):
-    need_fields_prefix = 'approve_'
+class TicketMetaApplyAssetApproveSerializer(TicketMetaApproveSerializerMixin,
+                                            TicketMetaApplyAssetSerializer):
 
-    def validate_approve_assets(self, approve_assets_id):
-        org_id = self.root.instance.org_id
-        org_name = self.root.instance.org_name
-        with tmp_to_org(org_id):
-            valid_approve_assets = Asset.objects.filter(id__in=approve_assets_id)
-        if not valid_approve_assets:
-            error = _('None of the approved assets belong to Organization `{}`'.format(org_name))
-            raise serializers.ValidationError(error)
-        return valid_approve_assets
+    def validate_approve_assets(self, approve_assets):
+        assets_id = self.filter_approve_resources(resource_model=Asset, resources_id=approve_assets)
+        return assets_id
 
-    def validate_approve_system_users(self, approve_system_users_id):
-        org_id = self.root.instance.org_id
-        org_name = self.root.instance.org_name
-        with tmp_to_org(org_id):
-            valid_approve_system_users = SystemUser.objects.filter(id__in=approve_system_users_id)
-        if not valid_approve_system_users:
-            error = _(
-                'None of the approved system users belong to Organization `{}`'.format(org_name)
-            )
-            raise serializers.ValidationError(error)
-        return valid_approve_system_users
+    def validate_approve_system_users(self, approve_system_users):
+        queries = {'protocol': SystemUser.ASSET_CATEGORY_PROTOCOLS}
+        system_users_id = self.filter_approve_system_users(approve_system_users, queries)
+        return system_users_id

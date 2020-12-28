@@ -25,7 +25,7 @@ class DatabaseAppPermissionCreateUpdateForm(OrgModelForm):
         # 过滤系统用户
         system_users_field = self.fields.get('system_users')
         system_users_field.queryset = SystemUser.objects.filter(
-            protocol__in=SystemUser.application_category_protocols
+            protocol__in=SystemUser.APPLICATION_CATEGORY_DB_PROTOCOLS
         )
 
     class Meta:

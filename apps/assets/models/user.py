@@ -87,6 +87,23 @@ class SystemUser(BaseUser):
         (PROTOCOL_POSTGRESQL, 'postgresql'),
         (PROTOCOL_K8S, 'k8s'),
     )
+    ASSET_CATEGORY_PROTOCOLS = [
+        PROTOCOL_SSH, PROTOCOL_RDP, PROTOCOL_TELNET, PROTOCOL_VNC
+    ]
+    APPLICATION_CATEGORY_REMOTE_APP_PROTOCOLS = [
+        PROTOCOL_RDP
+    ]
+    APPLICATION_CATEGORY_DB_PROTOCOLS = [
+        PROTOCOL_MYSQL, PROTOCOL_ORACLE, PROTOCOL_MARIADB, PROTOCOL_POSTGRESQL
+    ]
+    APPLICATION_CATEGORY_CLOUD_PROTOCOLS = [
+        PROTOCOL_K8S
+    ]
+    APPLICATION_CATEGORY_PROTOCOLS = [
+        *APPLICATION_CATEGORY_REMOTE_APP_PROTOCOLS,
+        *APPLICATION_CATEGORY_DB_PROTOCOLS,
+        *APPLICATION_CATEGORY_CLOUD_PROTOCOLS
+    ]
 
     LOGIN_AUTO = 'auto'
     LOGIN_MANUAL = 'manual'
@@ -133,24 +150,6 @@ class SystemUser(BaseUser):
     def login_mode_display(self):
         return self.get_login_mode_display()
 
-    @property
-    def db_application_protocols(self):
-        return [
-            self.PROTOCOL_MYSQL, self.PROTOCOL_ORACLE, self.PROTOCOL_MARIADB,
-            self.PROTOCOL_POSTGRESQL
-        ]
-
-    @property
-    def cloud_application_protocols(self):
-        return [self.PROTOCOL_K8S]
-
-    @property
-    def application_category_protocols(self):
-        protocols = []
-        protocols.extend(self.db_application_protocols)
-        protocols.extend(self.cloud_application_protocols)
-        return protocols
-
     def is_need_push(self):
         if self.auto_push and self.protocol in [self.PROTOCOL_SSH, self.PROTOCOL_RDP]:
             return True
@@ -163,7 +162,7 @@ class SystemUser(BaseUser):
 
     @property
     def is_need_test_asset_connective(self):
-        return self.protocol not in self.application_category_protocols
+        return self.protocol in self.ASSET_CATEGORY_PROTOCOLS
 
     def has_special_auth(self, asset=None, username=None):
         if username is None and self.username_same_with_user:
@@ -172,7 +171,7 @@ class SystemUser(BaseUser):
 
     @property
     def can_perm_to_asset(self):
-        return self.protocol not in self.application_category_protocols
+        return self.protocol in self.ASSET_CATEGORY_PROTOCOLS
 
     def _merge_auth(self, other):
         super()._merge_auth(other)
@@ -204,6 +203,18 @@ class SystemUser(BaseUser):
         assets_ids.update(nodes_assets_ids)
         assets = Asset.objects.filter(id__in=assets_ids)
         return assets
+
+    @classmethod
+    def get_protocol_by_application_type(cls, application_type):
+        from applications.models import Category
+        remote_app_types = list(dict(Category.get_type_choices(Category.remote_app)).keys())
+        if application_type in remote_app_types:
+            return cls.PROTOCOL_RDP
+        cloud_types = list(dict(Category.get_type_choices(Category.cloud)).keys())
+        db_types = list(dict(Category.get_type_choices(Category.db)).keys())
+        other_types = [*cloud_types, *db_types]
+        if application_type in other_types:
+            return application_type
 
     class Meta:
         ordering = ['name']

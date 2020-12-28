@@ -1,8 +1,9 @@
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
-from .mixin import TicketMetaSerializerMixin
-from applications.models import Category
+from applications.models import Category, Application
+from assets.models import SystemUser
+from .mixin import TicketMetaSerializerMixin, TicketMetaApproveSerializerMixin
 
 
 class TicketMetaApplyApplicationSerializer(TicketMetaSerializerMixin, serializers.Serializer):
@@ -47,6 +48,33 @@ class TicketMetaApplyApplicationSerializer(TicketMetaSerializerMixin, serializer
 class TicketMetaApplyApplicationApplySerializer(TicketMetaApplyApplicationSerializer):
     need_fields_prefix = 'apply_'
 
+    def validate_apply_type(self, tp):
+        category = self.root.initial_data['meta'].get('apply_category')
+        if not category:
+            return tp
+        valid_type_types = list((dict(Category.get_type_choices(category)).keys()))
+        if tp not in valid_type_types:
+            error = _(
+                'Type `{}`  is not a valid choice `({}){}`'.format(tp, category, valid_type_types)
+            )
+            raise serializers.ValidationError(error)
+        return tp
 
-class TicketMetaApplyApplicationApproveSerializer(TicketMetaApplyApplicationSerializer):
-    need_fields_prefix = 'approve_'
+
+class TicketMetaApplyApplicationApproveSerializer(TicketMetaApproveSerializerMixin,
+                                                  TicketMetaApplyApplicationSerializer):
+
+    def validate_approve_applications(self, approve_applications):
+        application_type = self.root.instance.meta['apply_type']
+        queries = {'type': application_type}
+        applications_id = self.filter_approve_resources(
+            resource_model=Application, resources_id=approve_applications, queries=queries
+        )
+        return applications_id
+
+    def validate_approve_system_users(self, approve_system_users):
+        application_type = self.root.instance.meta['apply_type']
+        protocol = SystemUser.get_protocol_by_application_type(application_type)
+        queries = {'protocol': protocol}
+        system_users_id = self.filter_approve_system_users(approve_system_users, queries)
+        return system_users_id
