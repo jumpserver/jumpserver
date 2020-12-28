@@ -11,6 +11,14 @@ class TicketMetaSerializerViewMixin:
         'reject': serializers.TicketNoMetaSerializer,
         'close': serializers.TicketNoMetaSerializer,
     }
+    apply_application_meta_serializer_classes = {
+        'default': serializers.TicketMetaApplyApplicationSerializer,
+        'display': serializers.TicketMetaApplyApplicationSerializer,
+        'apply': serializers.TicketMetaApplyApplicationApplySerializer,
+        'approve': serializers.TicketMetaApplyApplicationApproveSerializer,
+        'reject': serializers.TicketNoMetaSerializer,
+        'close': serializers.TicketNoMetaSerializer,
+    }
     login_confirm_meta_serializer_classes = {
         'default': serializers.TicketMetaLoginConfirmSerializer,
         'display': serializers.TicketMetaLoginConfirmSerializer,
@@ -21,6 +29,7 @@ class TicketMetaSerializerViewMixin:
     }
     meta_serializer_classes = {
         const.TicketTypeChoices.login_confirm.value: login_confirm_meta_serializer_classes,
+        const.TicketTypeChoices.apply_application.value: apply_application_meta_serializer_classes,
         const.TicketTypeChoices.apply_asset.value: apply_asset_meta_serializer_classes,
     }
 

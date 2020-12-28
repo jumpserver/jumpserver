@@ -75,13 +75,11 @@ class TicketApplySerializer(TicketActionSerializer):
         self.validate_org_id(org_id)
         org = get_org_by_id(org_id)
         admins = User.get_super_and_org_admins(org)
-        invalid_assignees = set(assignees) - set(admins)
-        if invalid_assignees:
-            invalid_assignees_display = [str(assignee) for assignee in invalid_assignees]
-            error = _('Assignees `{}` are not super admin or organization `{}` admin'
-                      ''.format(invalid_assignees_display, org.name))
+        valid_assignees = list(set(assignees) & set(admins))
+        if not valid_assignees:
+            error = _('None of the assignees belong to Organization `{}` admins'.format(org.name))
             raise serializers.ValidationError(error)
-        return assignees
+        return valid_assignees
 
     @staticmethod
     def validate_action():
