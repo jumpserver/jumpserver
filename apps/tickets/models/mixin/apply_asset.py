@@ -83,8 +83,8 @@ class CreatePermissionMixin:
         permission_data = {
             'id': self.id,
             'name': permission_name,
-            'created_by': self.processor_display,
             'comment': permission_comment,
+            'created_by': self.processor_display,
             'actions': approve_actions,
             'date_start': approve_date_start,
             'date_expired': approve_date_expired,
