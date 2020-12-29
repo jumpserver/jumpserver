@@ -34,10 +34,12 @@ def send_ticket_applied_mail_to_assignees(ticket, assignees):
             </div>
         </div>
         """.format(
-            body=ticket.body,
+            body=ticket.body.replace('\n', '<br/>'),
             ticket_detail_url=ticket_detail_url
         )
     )
+    if settings.DEBUG:
+        logger.debug(message)
     recipient_list = [assignee.email for assignee in assignees]
     send_mail_async.delay(subject, message, recipient_list, html_message=message)
 
@@ -59,8 +61,10 @@ def send_ticket_processed_mail_to_applicant(ticket):
             </div>
         </div>
         """.format(
-            body=ticket.body,
+            body=ticket.body.replace('\n', '<br/>'),
         )
     )
+    if settings.DEBUG:
+        logger.debug(message)
     recipient_list = [ticket.applicant.email]
     send_mail_async.delay(subject, message, recipient_list, html_message=message)
