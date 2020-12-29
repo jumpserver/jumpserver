@@ -1,7 +1,7 @@
 
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
-from .mixin import BaseTicketMetaSerializer
+from .base import BaseTicketMetaSerializer
 
 __all__ = [
     'TicketMetaLoginConfirmApplySerializer',

@@ -1,5 +1,8 @@
 from common.exceptions import JMSException
-from .. import const, serializers
+from tickets import const, serializers
+
+
+__all__ = ['TicketMetaSerializerViewMixin']
 
 
 class TicketMetaSerializerViewMixin:

@@ -6,8 +6,8 @@ from common.fields.serializer import CanReadHiddenField
 from orgs.utils import get_org_by_id
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from users.models import User
-from ..models import Ticket
-from .. import const
+from tickets import const
+from tickets.models import Ticket
 
 __all__ = [
     'TicketSerializer', 'TicketDisplaySerializer',

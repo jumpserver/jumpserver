@@ -3,7 +3,7 @@ from rest_framework import serializers
 from perms.serializers import ActionsField
 from perms.models import Action
 from assets.models import Asset, SystemUser
-from .mixin import BaseTicketMetaSerializer, BaseTicketMetaApproveSerializerMixin
+from .base import BaseTicketMetaSerializer, BaseTicketMetaApproveSerializerMixin
 
 
 __all__ = [

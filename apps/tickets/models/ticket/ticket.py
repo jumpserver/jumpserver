@@ -11,10 +11,10 @@ from django.conf import settings
 from common.mixins.models import CommonModelMixin
 from orgs.mixins.models import OrgModelMixin
 from orgs.utils import tmp_to_root_org, tmp_to_org
-from .. import const
+from tickets import const
 from .mixin import TicketModelMixin
 
-__all__ = ['Ticket', 'Comment']
+__all__ = ['Ticket']
 
 
 class ModelJSONFieldEncoder(json.JSONEncoder):
@@ -156,18 +156,3 @@ class Ticket(TicketModelMixin, CommonModelMixin, OrgModelMixin):
         with tmp_to_org(self.org_id):
             # 确保保存的org_id的是自身的值
             return super().save(*args, **kwargs)
-
-
-class Comment(CommonModelMixin):
-    ticket = models.ForeignKey(
-        Ticket, on_delete=models.CASCADE, related_name='comments'
-    )
-    user = models.ForeignKey(
-        'users.User', on_delete=models.SET_NULL, null=True, related_name='comments',
-        verbose_name=_("User")
-    )
-    user_display = models.CharField(max_length=256, verbose_name=_("User display name"))
-    body = models.TextField(verbose_name=_("Body"))
-
-    class Meta:
-        ordering = ('date_created', )

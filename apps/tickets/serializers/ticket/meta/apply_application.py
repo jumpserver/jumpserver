@@ -3,10 +3,11 @@ from django.utils.translation import ugettext_lazy as _
 
 from applications.models import Category, Application
 from assets.models import SystemUser
-from .mixin import BaseTicketMetaSerializer, BaseTicketMetaApproveSerializerMixin
+from .base import BaseTicketMetaSerializer, BaseTicketMetaApproveSerializerMixin
 
 __all__ = [
-    'TicketMetaApplyApplicationApplySerializer', 'TicketMetaApplyApplicationApproveSerializer',
+    'TicketMetaApplyApplicationApplySerializer',
+    'TicketMetaApplyApplicationApproveSerializer',
 ]
 
 

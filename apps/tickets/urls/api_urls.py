@@ -11,8 +11,5 @@ router.register('tickets', api.TicketViewSet, 'ticket')
 router.register('assignees', api.AssigneeViewSet, 'assignee')
 router.register('comments', api.CommentViewSet, 'comment')
 
-
-urlpatterns = [
-]
-
+urlpatterns = []
 urlpatterns += router.urls

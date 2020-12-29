@@ -8,7 +8,7 @@ from common.utils import get_logger
 from common.tasks import send_mail_async
 from . import const
 
-logger = get_logger(__name__)
+logger = get_logger(__file__)
 
 
 def send_ticket_applied_mail_to_assignees(ticket, assignees):
@@ -28,7 +28,7 @@ def send_ticket_applied_mail_to_assignees(ticket, assignees):
             <div>
                 <b>Ticket:</b> 
                 <br/>
-                {body}
+                    {body}
                 <br/>
                 <a href={ticket_detail_url}>click here to review</a> 
             </div>
@@ -56,7 +56,7 @@ def send_ticket_processed_mail_to_applicant(ticket):
             <div>
                 <b>Ticket:</b> 
                 <br/>
-                {body}
+                    {body}
                 <br/>
             </div>
         </div>
