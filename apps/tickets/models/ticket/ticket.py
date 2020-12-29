@@ -66,7 +66,7 @@ class Ticket(TicketModelMixin, CommonModelMixin, OrgModelMixin):
     assignees_display = models.TextField(
         blank=True, default='No', verbose_name=_("Assignees display")
     )
-    # 其他
+    # 评论
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
     class Meta:
@@ -74,6 +74,7 @@ class Ticket(TicketModelMixin, CommonModelMixin, OrgModelMixin):
 
     def __str__(self):
         return '{}({})'.format(self.title, self.applicant_display)
+
 
     def has_assignee(self, assignee):
         return self.assignees.filter(id=assignee.id).exists()
@@ -116,14 +117,14 @@ class Ticket(TicketModelMixin, CommonModelMixin, OrgModelMixin):
 
     # tickets
     @classmethod
-    def get_all_tickets(cls):
+    def all(cls):
         with tmp_to_root_org():
             return Ticket.objects.all()
 
     @classmethod
     def get_user_related_tickets(cls, user):
-        tickets = cls.get_all_tickets()
         queries = None
+        tickets = cls.all()
         if user.is_superuser:
             pass
         elif user.is_super_auditor:
@@ -147,7 +148,7 @@ class Ticket(TicketModelMixin, CommonModelMixin, OrgModelMixin):
         elif user.is_common_user:
             queries = Q(applicant=user)
         else:
-            tickets = Ticket.objects.none()
+            tickets = cls.objects.none()
         if queries:
             tickets = tickets.filter(queries)
         return tickets.distinct()

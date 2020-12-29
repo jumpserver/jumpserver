@@ -2,7 +2,7 @@
 #
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
-from common.fields.serializer import CanReadHiddenField
+from common.fields.serializer import ReadableHiddenField
 from orgs.utils import get_org_by_id
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from users.models import User
@@ -41,7 +41,7 @@ class TicketDisplaySerializer(TicketSerializer):
 
 
 class TicketActionSerializer(TicketSerializer):
-    action = CanReadHiddenField(default=const.TicketActionChoices.apply.value)
+    action = ReadableHiddenField(default=const.TicketActionChoices.apply.value)
 
     class Meta(TicketSerializer.Meta):
         required_fields = ['action']
@@ -49,7 +49,7 @@ class TicketActionSerializer(TicketSerializer):
 
 
 class TicketApplySerializer(TicketActionSerializer):
-    applicant = CanReadHiddenField(default=serializers.CurrentUserDefault())
+    applicant = ReadableHiddenField(default=serializers.CurrentUserDefault())
     org_id = serializers.CharField(
         max_length=36, allow_blank=True, required=True, label=_("Organization")
     )
@@ -98,7 +98,7 @@ class TicketApplySerializer(TicketActionSerializer):
 
 
 class TicketProcessSerializer(TicketActionSerializer):
-    processor = CanReadHiddenField(default=serializers.CurrentUserDefault())
+    processor = ReadableHiddenField(default=serializers.CurrentUserDefault())
 
     class Meta(TicketActionSerializer.Meta):
         required_fields = TicketActionSerializer.Meta.required_fields + ['processor']

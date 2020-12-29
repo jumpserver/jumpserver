@@ -44,7 +44,7 @@ class TicketMetaSerializerViewMixin:
             return None
         return meta_class(required=True)
 
-    def reset_view_action(self):
+    def reset_view_metadata_action(self):
         if self.action not in ['metadata']:
             return
         view_action = self.request.query_params.get('action')
@@ -53,7 +53,7 @@ class TicketMetaSerializerViewMixin:
         setattr(self, 'action', view_action)
 
     def get_serializer_class(self):
-        self.reset_view_action()
+        self.reset_view_metadata_action()
         serializer_class = super().get_serializer_class()
         if getattr(self, 'swagger_fake_view', False):
             return serializer_class

@@ -187,7 +187,7 @@ class AuthMixin:
         if not ticket_id:
             ticket = None
         else:
-            ticket = Ticket.get_all_tickets().filter(id=ticket_id).first()
+            ticket = Ticket.all().filter(id=ticket_id).first()
         return ticket
 
     def get_ticket_or_create(self, confirm_setting):

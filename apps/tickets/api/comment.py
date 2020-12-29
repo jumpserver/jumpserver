@@ -15,12 +15,12 @@ __all__ = ['CommentViewSet']
 
 class CommentViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.CommentSerializer
-    permission_classes = (IsAssignee | IsApplicant | IsSwagger,)
+    permission_classes = (IsSwagger| IsAssignee | IsApplicant,)
 
     @lazyproperty
     def ticket(self):
         if getattr(self, 'swagger_fake_view', False):
-            return Ticket()
+            return None
         ticket_id = self.request.query_params.get('ticket_id')
         try:
             ticket = get_object_or_404(Ticket, pk=ticket_id)

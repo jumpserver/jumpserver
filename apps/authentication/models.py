@@ -55,7 +55,7 @@ class LoginConfirmSetting(CommonModelMixin):
             login_ip = get_request_ip(request)
         else:
             login_ip = ''
-        login_ip = login_ip or '127.0.0.1'
+        login_ip = login_ip or '0.0.0.0'
         login_city = get_ip_city(login_ip)
         login_datetime = timezone.now().strftime('%Y-%m-%d %H:%M:%S')
         ticket_meta = {

@@ -7,7 +7,7 @@ import six
 
 __all__ = [
     'StringIDField', 'StringManyToManyField', 'ChoiceDisplayField',
-    'CustomMetaDictField', 'CanReadHiddenField',
+    'CustomMetaDictField', 'ReadableHiddenField',
 ]
 
 
@@ -44,7 +44,7 @@ class DictField(serializers.DictField):
         return super().to_representation(value)
 
 
-class CanReadHiddenField(serializers.HiddenField):
+class ReadableHiddenField(serializers.HiddenField):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.write_only = False

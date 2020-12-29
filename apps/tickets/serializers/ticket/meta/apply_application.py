@@ -52,7 +52,8 @@ class TicketMetaApplyApplicationApplySerializer(TicketMetaApplyApplicationSerial
 
     class Meta:
         fields = [
-            'apply_category', 'apply_type', 'apply_application_group', 'apply_system_user_group',
+            'apply_category', 'apply_type',
+            'apply_application_group', 'apply_system_user_group',
             'apply_date_start', 'apply_date_expired'
         ]
 
@@ -72,8 +73,8 @@ class TicketMetaApplyApplicationApproveSerializer(BaseTicketMetaApproveSerialize
 
     class Meta:
         fields = {
-            'approve_applications', 'approve_system_users', 'approve_date_start',
-            'approve_date_expired'
+            'approve_applications', 'approve_system_users',
+            'approve_date_start', 'approve_date_expired'
         }
 
     def validate_approve_applications(self, approve_applications):

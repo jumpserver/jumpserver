@@ -54,7 +54,8 @@ class TicketMetaApplyAssetApplySerializer(TicketMetaApplyAssetSerializer):
 
     class Meta:
         fields = [
-            'apply_ip_group', 'apply_hostname_group', 'apply_system_user_group', 'apply_actions',
+            'apply_ip_group', 'apply_hostname_group',
+            'apply_system_user_group', 'apply_actions',
             'apply_date_start', 'apply_date_expired'
         ]
 
@@ -64,7 +65,8 @@ class TicketMetaApplyAssetApproveSerializer(BaseTicketMetaApproveSerializerMixin
 
     class Meta:
         fields = [
-            'approve_assets', 'approve_system_users', 'approve_actions', 'approve_date_start',
+            'approve_assets', 'approve_system_users',
+            'approve_actions', 'approve_date_start',
             'approve_date_expired'
         ]
 

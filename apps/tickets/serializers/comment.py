@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from ..models import Comment
-from common.fields.serializer import CanReadHiddenField
+from common.fields.serializer import ReadableHiddenField
 
 __all__ = ['CommentSerializer']
 
@@ -16,8 +16,8 @@ class CurrentTicket(object):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    ticket = CanReadHiddenField(default=CurrentTicket())
-    user = CanReadHiddenField(default=serializers.CurrentUserDefault())
+    ticket = ReadableHiddenField(default=CurrentTicket())
+    user = ReadableHiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Comment
