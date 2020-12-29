@@ -23,7 +23,7 @@ class TicketViewSet(TicketMetaSerializerViewMixin, CommonApiMixin, viewsets.Mode
     permission_classes = (IsValidUser,)
     serializer_class = serializers.TicketSerializer
     serializer_classes = {
-        'default': serializers.TicketSerializer,
+        'default': serializers.TicketDisplaySerializer,
         'display': serializers.TicketDisplaySerializer,
         'apply': serializers.TicketApplySerializer,
         'approve': serializers.TicketApproveSerializer,
@@ -47,20 +47,6 @@ class TicketViewSet(TicketMetaSerializerViewMixin, CommonApiMixin, viewsets.Mode
     def destroy(self, request, *args, **kwargs):
         raise MethodNotAllowed(self.action)
 
-    def reset_view_action(self):
-        if self.action.lower() in ['metadata']:
-            view_action = self.request.query_params.get('action') or 'apply'
-        elif self.action.lower() in ['retrieve']:
-            view_action = 'display'
-        else:
-            view_action = None
-        if view_action:
-            setattr(self, 'action', view_action)
-
-    def get_serializer_class(self):
-        self.reset_view_action()
-        return super().get_serializer_class()
-
     def get_queryset(self):
         queryset = Ticket.get_user_related_tickets(self.request.user)
         return queryset
@@ -69,15 +55,15 @@ class TicketViewSet(TicketMetaSerializerViewMixin, CommonApiMixin, viewsets.Mode
     def apply(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
 
-    @action(detail=True, methods=[PUT], permission_classes=[IsOrgAdmin, IsAssignee, NotClosed])
+    @action(detail=True, methods=[POST], permission_classes=[IsOrgAdmin, IsAssignee, NotClosed])
     def approve(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
 
-    @action(detail=True, methods=[PUT], permission_classes=[IsOrgAdmin, IsAssignee, NotClosed])
+    @action(detail=True, methods=[POST], permission_classes=[IsOrgAdmin, IsAssignee, NotClosed])
     def reject(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
 
-    @action(detail=True, methods=[PUT], permission_classes=[IsOrgAdmin, IsAssignee, NotClosed])
+    @action(detail=True, methods=[POST], permission_classes=[IsOrgAdmin, IsAssignee, NotClosed])
     def close(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
 

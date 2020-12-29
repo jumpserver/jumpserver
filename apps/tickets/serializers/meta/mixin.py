@@ -6,23 +6,25 @@ from orgs.utils import tmp_to_org
 from assets.models import SystemUser
 
 
-class TicketMetaSerializerMixin:
-    need_fields_prefix = None
+class BaseTicketMetaSerializer(serializers.Serializer):
 
     def get_fields(self):
         fields = super().get_fields()
-        if not self.need_fields_prefix:
+        required_fields = self.Meta.fields
+        if required_fields == '__all__':
             return fields
-        need_fields = OrderedDict({
-            field_name: field for field_name, field in fields.items()
-            if field_name.startswith(self.need_fields_prefix)
+
+        fields = OrderedDict({
+            field_name: fields.pop(field_name) for field_name in set(required_fields)
+            if field_name in fields.keys()
         })
-        return need_fields
+        return fields
+
+    class Meta:
+        fields = '__all__'
 
 
-class TicketMetaApproveSerializerMixin:
-
-    need_fields_prefix = 'approve_'
+class BaseTicketMetaApproveSerializerMixin:
 
     def _filter_approve_resources_by_org(self, model, resources_id):
         with tmp_to_org(self.root.instance.org_id):

@@ -1,9 +1,14 @@
 
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
+from .mixin import BaseTicketMetaSerializer
+
+__all__ = [
+    'TicketMetaLoginConfirmApplySerializer',
+]
 
 
-class TicketMetaLoginConfirmSerializer(serializers.Serializer):
+class TicketMetaLoginConfirmSerializer(BaseTicketMetaSerializer):
     apply_login_ip = serializers.IPAddressField(
         required=True, allow_null=True, label=_('Login ip')
     )
@@ -13,3 +18,7 @@ class TicketMetaLoginConfirmSerializer(serializers.Serializer):
     apply_login_datetime = serializers.DateTimeField(
         required=True, allow_null=True, label=_('Login datetime')
     )
+
+
+class TicketMetaLoginConfirmApplySerializer(BaseTicketMetaSerializer):
+    pass

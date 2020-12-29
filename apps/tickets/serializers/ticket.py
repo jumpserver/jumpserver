@@ -41,20 +41,18 @@ class TicketDisplaySerializer(TicketSerializer):
 
 
 class TicketActionSerializer(TicketSerializer):
+    action = CanReadHiddenField(default=const.TicketActionChoices.apply.value)
 
     class Meta(TicketSerializer.Meta):
         required_fields = ['action']
         read_only_fields = list(set(TicketDisplaySerializer.Meta.fields) - set(required_fields))
-        extra_kwargs = {
-            'action': {'default': const.TicketActionChoices.apply.value}
-        }
 
 
 class TicketApplySerializer(TicketActionSerializer):
+    applicant = CanReadHiddenField(default=serializers.CurrentUserDefault())
     org_id = serializers.CharField(
         max_length=36, allow_blank=True, required=True, label=_("Organization")
     )
-    applicant = CanReadHiddenField(default=serializers.CurrentUserDefault())
 
     class Meta(TicketActionSerializer.Meta):
         required_fields = TicketActionSerializer.Meta.required_fields + [
@@ -62,8 +60,7 @@ class TicketApplySerializer(TicketActionSerializer):
         ]
         read_only_fields = list(set(TicketDisplaySerializer.Meta.fields) - set(required_fields))
         extra_kwargs = {
-            'type': {'required': True},
-            'meta': {'default': {}}
+            'type': {'required': True}
         }
 
     @staticmethod
@@ -86,7 +83,7 @@ class TicketApplySerializer(TicketActionSerializer):
         return valid_assignees
 
     @staticmethod
-    def validate_action():
+    def validate_action(action):
         return const.TicketActionChoices.apply.value
 
 

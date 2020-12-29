@@ -3,10 +3,14 @@ from django.utils.translation import ugettext_lazy as _
 
 from applications.models import Category, Application
 from assets.models import SystemUser
-from .mixin import TicketMetaSerializerMixin, TicketMetaApproveSerializerMixin
+from .mixin import BaseTicketMetaSerializer, BaseTicketMetaApproveSerializerMixin
+
+__all__ = [
+    'TicketMetaApplyApplicationApplySerializer', 'TicketMetaApplyApplicationApproveSerializer',
+]
 
 
-class TicketMetaApplyApplicationSerializer(TicketMetaSerializerMixin, serializers.Serializer):
+class TicketMetaApplyApplicationSerializer(BaseTicketMetaSerializer):
     # 申请信息
     apply_category = serializers.ChoiceField(
         choices=Category.choices, required=True, label=_('Category')
@@ -28,39 +32,48 @@ class TicketMetaApplyApplicationSerializer(TicketMetaSerializerMixin, serializer
     )
     # 审批信息
     approve_applications = serializers.ListField(
-        child=serializers.UUIDField(), required=True, allow_null=True,
+        child=serializers.UUIDField(), required=True,
         label=_('Approve applications')
     )
     approve_system_users = serializers.ListField(
-        child=serializers.UUIDField(), required=True, allow_null=True,
+        child=serializers.UUIDField(), required=True,
         label=_('Approve system users')
     )
     approve_date_start = serializers.DateTimeField(
-        required=True, allow_null=True, label=_('Date start')
+        required=True, label=_('Date start')
     )
     approve_date_expired = serializers.DateTimeField(
-        required=True, allow_null=True, label=_('Date expired')
+        required=True, label=_('Date expired')
     )
 
 
 class TicketMetaApplyApplicationApplySerializer(TicketMetaApplyApplicationSerializer):
-    need_fields_prefix = 'apply_'
+
+    class Meta:
+        fields = [
+            'apply_category', 'apply_type', 'apply_application_group', 'apply_system_user_group',
+            'apply_date_start', 'apply_date_expired'
+        ]
 
     def validate_apply_type(self, tp):
         category = self.root.initial_data['meta'].get('apply_category')
         if not category:
             return tp
         valid_type_types = list((dict(Category.get_type_choices(category)).keys()))
-        if tp not in valid_type_types:
-            error = _(
-                'Type `{}`  is not a valid choice `({}){}`'.format(tp, category, valid_type_types)
-            )
-            raise serializers.ValidationError(error)
-        return tp
+        if tp in valid_type_types:
+            return tp
+        error = _('Type `{}`  is not a valid choice `({}){}`'.format(tp, category, valid_type_types))
+        raise serializers.ValidationError(error)
 
 
-class TicketMetaApplyApplicationApproveSerializer(TicketMetaApproveSerializerMixin,
+class TicketMetaApplyApplicationApproveSerializer(BaseTicketMetaApproveSerializerMixin,
                                                   TicketMetaApplyApplicationSerializer):
+
+    class Meta:
+        fields = {
+            'approve_applications', 'approve_system_users', 'approve_date_start',
+            'approve_date_expired'
+        }
 
     def validate_approve_applications(self, approve_applications):
         application_type = self.root.instance.meta['apply_type']

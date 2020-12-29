@@ -4,28 +4,15 @@ from .. import const, serializers
 
 class TicketMetaSerializerViewMixin:
     apply_asset_meta_serializer_classes = {
-        'default': serializers.TicketMetaApplyAssetSerializer,
-        'display': serializers.TicketMetaApplyAssetSerializer,
         'apply': serializers.TicketMetaApplyAssetApplySerializer,
         'approve': serializers.TicketMetaApplyAssetApproveSerializer,
-        'reject': serializers.TicketNoMetaSerializer,
-        'close': serializers.TicketNoMetaSerializer,
     }
     apply_application_meta_serializer_classes = {
-        'default': serializers.TicketMetaApplyApplicationSerializer,
-        'display': serializers.TicketMetaApplyApplicationSerializer,
         'apply': serializers.TicketMetaApplyApplicationApplySerializer,
         'approve': serializers.TicketMetaApplyApplicationApproveSerializer,
-        'reject': serializers.TicketNoMetaSerializer,
-        'close': serializers.TicketNoMetaSerializer,
     }
     login_confirm_meta_serializer_classes = {
-        'default': serializers.TicketMetaLoginConfirmSerializer,
-        'display': serializers.TicketMetaLoginConfirmSerializer,
-        'apply': serializers.TicketMetaLoginConfirmSerializer,
-        'approve': serializers.TicketNoMetaSerializer,
-        'reject': serializers.TicketNoMetaSerializer,
-        'close': serializers.TicketNoMetaSerializer,
+        'apply': serializers.TicketMetaLoginConfirmApplySerializer,
     }
     meta_serializer_classes = {
         const.TicketTypeChoices.login_confirm.value: login_confirm_meta_serializer_classes,
@@ -33,32 +20,45 @@ class TicketMetaSerializerViewMixin:
         const.TicketTypeChoices.apply_asset.value: apply_asset_meta_serializer_classes,
     }
 
-    def get_meta_class(self):
-        default_meta_class = serializers.TicketNoMetaSerializer
-
-        ticket_type = self.request.query_params.get('type')
-        if not ticket_type:
-            return default_meta_class
-
-        ticket_type_choices = const.TicketTypeChoices.types()
-        if ticket_type not in ticket_type_choices:
+    def get_serializer_meta_field_class(self):
+        tp = self.request.query_params.get('type')
+        if not tp:
+            return None
+        tp_choices = const.TicketTypeChoices.types()
+        if tp not in tp_choices:
             raise JMSException(
                 'Invalid query parameter `type`, select from the following options: {}'
-                ''.format(ticket_type_choices)
+                ''.format(tp_choices)
             )
-
-        type_meta_classes = self.meta_serializer_classes.get(ticket_type, {})
-        meta_class = type_meta_classes.get(self.action, type_meta_classes['default'])
+        meta_class = self.meta_serializer_classes.get(tp, {}).get(self.action)
         return meta_class
 
+    def get_serializer_meta_field(self):
+        meta_class = self.get_serializer_meta_field_class()
+        if not meta_class:
+            return None
+        if self.action in ['list', 'retrieve']:
+            return meta_class(required=False, read_only=True)
+        else:
+            return meta_class(required=True)
+
+    def reset_view_action(self):
+        if self.action not in ['metadata']:
+            return
+        view_action = self.request.query_params.get('action')
+        if not view_action:
+            raise JMSException('The `metadata` methods must carry parameter `action`')
+        setattr(self, 'action', view_action)
+
     def get_serializer_class(self):
+        self.reset_view_action()
         serializer_class = super().get_serializer_class()
         if getattr(self, 'swagger_fake_view', False):
             return serializer_class
-        meta_class = self.get_meta_class()
-        if len(meta_class().fields):
-            params = {'meta': meta_class(required=True)}
-        else:
-            params = {}
-        cls = type(meta_class.__name__, (serializer_class,), params)
-        return cls
+        meta_field = self.get_serializer_meta_field()
+        if not meta_field:
+            return serializer_class
+        serializer_class = type(
+            meta_field.__class__.__name__, (serializer_class,), {'meta': meta_field}
+        )
+        return serializer_class
