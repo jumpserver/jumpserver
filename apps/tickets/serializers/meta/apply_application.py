@@ -16,7 +16,7 @@ class TicketMetaApplyApplicationSerializer(BaseTicketMetaSerializer):
         choices=Category.choices, required=True, label=_('Category')
     )
     apply_type = serializers.ChoiceField(
-        choices=Category.get_all_type_choices(), required=True, label=_('Category')
+        choices=Category.get_all_type_choices(), required=True, label=_('Type')
     )
     apply_application_group = serializers.ListField(
         child=serializers.CharField(), default=list, label=_('Application group')

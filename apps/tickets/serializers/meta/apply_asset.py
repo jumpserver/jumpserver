@@ -34,13 +34,13 @@ class TicketMetaApplyAssetSerializer(BaseTicketMetaSerializer):
     )
     # 审批信息
     approve_assets = serializers.ListField(
-        child=serializers.UUIDField(), required=True, label=_('Approve assets')
+        required=True, child=serializers.UUIDField(), label=_('Approve assets')
     )
     approve_system_users = serializers.ListField(
-        child=serializers.UUIDField(), required=True, label=_('Approve system users')
+        required=True, child=serializers.UUIDField(), label=_('Approve system users')
     )
     approve_actions = ActionsField(
-        choices=Action.DB_CHOICES, default=Action.NONE
+        required=False, choices=Action.DB_CHOICES, default=Action.ALL
     )
     approve_date_start = serializers.DateTimeField(
         required=True, label=_('Date start')
@@ -73,6 +73,6 @@ class TicketMetaApplyAssetApproveSerializer(BaseTicketMetaApproveSerializerMixin
         return assets_id
 
     def validate_approve_system_users(self, approve_system_users):
-        queries = {'protocol': SystemUser.ASSET_CATEGORY_PROTOCOLS}
+        queries = {'protocol__in': SystemUser.ASSET_CATEGORY_PROTOCOLS}
         system_users_id = self.filter_approve_system_users(approve_system_users, queries)
         return system_users_id

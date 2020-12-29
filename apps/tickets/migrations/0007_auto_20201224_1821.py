@@ -36,6 +36,21 @@ def migrate_field_meta(tp, old_meta):
     return new_meta
 
 
+ACTION_APPLY = 'apply'
+ACTION_CLOSE = 'close'
+STATUS_OPEN = 'open'
+STATUS_CLOSED = 'closed'
+
+
+def migrate_field_action(old_action, old_status):
+    if old_action:
+        return old_action
+    if old_status == STATUS_OPEN:
+        return ACTION_APPLY
+    if old_status == STATUS_CLOSED:
+        return ACTION_CLOSE
+
+
 def migrate_tickets_fields_name(apps, schema_editor):
     ticket_model = apps.get_model("tickets", "Ticket")
     tickets = ticket_model.origin_objects.all()
@@ -45,6 +60,7 @@ def migrate_tickets_fields_name(apps, schema_editor):
         ticket.applicant_display = ticket.user_display
         ticket.processor = ticket.assignee
         ticket.processor_display = ticket.assignee_display
+        ticket.action = migrate_field_action(ticket.action, ticket.status)
         ticket.type = migrate_field_type(ticket.type)
         ticket.meta = migrate_field_meta(ticket.type, ticket.meta)
         ticket.meta['body'] = ticket.body
@@ -103,8 +119,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='ticket',
             name='action',
-            field=models.CharField(blank=True, choices=[('apply', 'Apply'), ('approve', 'Approve'), ('reject', 'Reject'), ('close', 'Close')], default='apply', max_length=16, verbose_name='Action'),
-        ),
+            field=models.CharField(choices=[('apply', 'Apply'), ('approve', 'Approve'), ('reject', 'Reject'), ('close', 'Close')], default='apply', max_length=16, verbose_name='Action')),
         migrations.AlterField(
             model_name='ticket',
             name='status',

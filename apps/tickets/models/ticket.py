@@ -36,7 +36,7 @@ class Ticket(TicketModelMixin, CommonModelMixin, OrgModelMixin):
     )
     meta = models.JSONField(encoder=ModelJSONFieldEncoder, verbose_name=_("Meta"))
     action = models.CharField(
-        choices=const.TicketActionChoices.choices, max_length=16, blank=True,
+        choices=const.TicketActionChoices.choices, max_length=16,
         default=const.TicketActionChoices.apply.value, verbose_name=_("Action")
     )
     status = models.CharField(

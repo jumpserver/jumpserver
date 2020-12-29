@@ -63,6 +63,16 @@ class TicketApplySerializer(TicketActionSerializer):
             'type': {'required': True}
         }
 
+    def validate_type(self, tp):
+        request_type = self.context['request'].query_params.get('type')
+        if tp != request_type:
+            error = _(
+                'The `type` in the submission data (`{}`) is different from the type '
+                'in the request url (`{}`)'.format(tp, request_type)
+            )
+            raise serializers.ValidationError(error)
+        return tp
+
     @staticmethod
     def validate_org_id(org_id):
         org = get_org_by_id(org_id)
@@ -100,6 +110,9 @@ class TicketApproveSerializer(TicketProcessSerializer):
     class Meta(TicketProcessSerializer.Meta):
         required_fields = TicketProcessSerializer.Meta.required_fields + ['meta']
         read_only_fields = list(set(TicketDisplaySerializer.Meta.fields) - set(required_fields))
+        extra_kwargs = {
+            'meta': {'read_only': True}
+        }
 
     def validate_meta(self, meta):
         meta.update(self.instance.meta)

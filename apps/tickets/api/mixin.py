@@ -15,9 +15,9 @@ class TicketMetaSerializerViewMixin:
         'apply': serializers.TicketMetaLoginConfirmApplySerializer,
     }
     meta_serializer_classes = {
-        const.TicketTypeChoices.login_confirm.value: login_confirm_meta_serializer_classes,
-        const.TicketTypeChoices.apply_application.value: apply_application_meta_serializer_classes,
         const.TicketTypeChoices.apply_asset.value: apply_asset_meta_serializer_classes,
+        const.TicketTypeChoices.apply_application.value: apply_application_meta_serializer_classes,
+        const.TicketTypeChoices.login_confirm.value: login_confirm_meta_serializer_classes,
     }
 
     def get_serializer_meta_field_class(self):
@@ -34,13 +34,12 @@ class TicketMetaSerializerViewMixin:
         return meta_class
 
     def get_serializer_meta_field(self):
+        if self.action not in ['apply', 'approve']:
+            return None
         meta_class = self.get_serializer_meta_field_class()
         if not meta_class:
             return None
-        if self.action in ['list', 'retrieve']:
-            return meta_class(required=False, read_only=True)
-        else:
-            return meta_class(required=True)
+        return meta_class(required=True)
 
     def reset_view_action(self):
         if self.action not in ['metadata']:

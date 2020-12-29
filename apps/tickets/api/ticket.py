@@ -55,15 +55,15 @@ class TicketViewSet(TicketMetaSerializerViewMixin, CommonApiMixin, viewsets.Mode
     def apply(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
 
-    @action(detail=True, methods=[POST], permission_classes=[IsOrgAdmin, IsAssignee, NotClosed])
+    @action(detail=True, methods=[PUT], permission_classes=[IsOrgAdmin, IsAssignee, NotClosed])
     def approve(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
 
-    @action(detail=True, methods=[POST], permission_classes=[IsOrgAdmin, IsAssignee, NotClosed])
+    @action(detail=True, methods=[PUT], permission_classes=[IsOrgAdmin, IsAssignee, NotClosed])
     def reject(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
 
-    @action(detail=True, methods=[POST], permission_classes=[IsOrgAdmin, IsAssignee, NotClosed])
+    @action(detail=True, methods=[PUT], permission_classes=[IsOrgAdmin, IsAssignee, NotClosed])
     def close(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
 
