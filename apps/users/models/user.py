@@ -329,6 +329,28 @@ class RoleMixin:
             return
         OrganizationMember.objects.remove_users(current_org, [self])
 
+    @classmethod
+    def get_super_admins(cls):
+        return cls.objects.filter(role=cls.ROLE.ADMIN)
+
+    @classmethod
+    def get_org_admins(cls, org=None):
+        from orgs.models import Organization
+        if not isinstance(org, Organization):
+            org = current_org
+        org_admins = org.admins
+        return org_admins
+
+    @classmethod
+    def get_super_and_org_admins(cls, org=None):
+        super_admins = cls.get_super_admins()
+        super_admins_id = list(super_admins.values_list('id', flat=True))
+        org_admins = cls.get_org_admins(org)
+        org_admins_id = list(org_admins.values_list('id', flat=True))
+        admins_id = set(org_admins_id + super_admins_id)
+        admins = User.objects.filter(id__in=admins_id)
+        return admins
+
 
 class TokenMixin:
     CACHE_KEY_USER_RESET_PASSWORD_PREFIX = "_KEY_USER_RESET_PASSWORD_{}"

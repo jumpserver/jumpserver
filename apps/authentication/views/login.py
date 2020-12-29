@@ -19,7 +19,6 @@ from django.conf import settings
 from django.urls import reverse_lazy
 from django.contrib.auth import BACKEND_SESSION_KEY
 
-from common.const.front_urls import TICKET_DETAIL
 from common.utils import get_request_ip, get_object_or_none
 from users.utils import (
     redirect_user_first_login_or_index
@@ -181,6 +180,7 @@ class UserLoginWaitConfirmView(TemplateView):
 
     def get_context_data(self, **kwargs):
         from tickets.models import Ticket
+        from tickets.const import TICKET_DETAIL_URL
         ticket_id = self.request.session.get("auth_ticket_id")
         if not ticket_id:
             ticket = None
@@ -189,7 +189,7 @@ class UserLoginWaitConfirmView(TemplateView):
         context = super().get_context_data(**kwargs)
         if ticket:
             timestamp_created = datetime.datetime.timestamp(ticket.date_created)
-            ticket_detail_url = TICKET_DETAIL.format(id=ticket_id)
+            ticket_detail_url = TICKET_DETAIL_URL.format(id=ticket_id)
             msg = _("""Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>
                   Don't close this page""").format(ticket.assignees_display)
         else:
