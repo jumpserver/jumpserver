@@ -106,6 +106,8 @@ class CreatePermissionMixin:
 
 class CreateCommentMixin:
     def create_comment(self, comment_body):
+        # 页面展示需要取消缩进
+        comment_body = textwrap.dedent(comment_body)
         comment_data = {
             'body': comment_body,
             'user': self.processor,
@@ -113,14 +115,20 @@ class CreateCommentMixin:
         }
         return self.comments.create(**comment_data)
 
+    def create_applied_comment(self):
+        comment_body = self.construct_applied_body()
+        self.create_comment(comment_body)
+
     def create_approved_comment(self):
         comment_body = self.construct_approved_body()
-        # 页面展示需要取消缩进
-        comment_body = textwrap.dedent(comment_body)
         self.create_comment(comment_body)
 
     def create_action_comment(self):
+        if self.has_applied:
+            user_display = self.applicant_display
+        if self.has_processed:
+            user_display = self.processor_display
         comment_body = __(
-            'User {} {} the ticket'.format(self.processor_display, self.get_action_display())
+            'User {} {} the ticket'.format(user_display, self.get_action_display())
         )
         self.create_comment(comment_body)
