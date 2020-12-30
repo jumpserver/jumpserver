@@ -41,18 +41,15 @@ def on_ticket_assignees_changed(sender, instance=None, action=None, reverse=Fals
     if action != 'post_add':
         return
     ticket = instance
-    assignees_display = [str(assignee) for assignee in ticket.assignees.all()]
-    logger.debug(
-        'Receives ticket and assignees changed signal, ticket: {}, assignees: {}'
-        ''.format(ticket.title, assignees_display)
-    )
-    ticket.assignees_display = ', '.join(assignees_display)
+    logger.debug('Receives ticket and assignees changed signal, ticket: {}'.format(ticket.title))
+    ticket.set_assignees_display()
     ticket.save()
-    logger.debug('Send applied email to assignees: {}'.format(assignees_display))
     assignees = model.objects.filter(pk__in=pk_set)
+    assignees_display = [str(assignee) for assignee in assignees]
+    logger.debug('Send applied email to assignees: {}'.format(assignees_display))
     send_ticket_applied_mail_to_assignees(ticket, assignees)
 
 
 @receiver(pre_save, sender=Comment)
 def on_comment_create(sender, instance=None, created=False, **kwargs):
-    instance.user_display = str(instance.user)
+    instance.set_display_fields()

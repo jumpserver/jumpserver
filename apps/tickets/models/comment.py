@@ -21,3 +21,6 @@ class Comment(CommonModelMixin):
 
     class Meta:
         ordering = ('date_created', )
+
+    def set_display_fields(self):
+        self.user_display = str(self.user)

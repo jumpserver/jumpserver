@@ -4,18 +4,23 @@ from django.utils.translation import ugettext as __
 
 class SetDisplayFieldMixin:
 
-    def set_meta_display(self):
-        method_name = f'construct_meta_{self.type}_{self.action}_fields_display'
-        meta_display = getattr(self, method_name, lambda: {})()
-        self.meta.update(meta_display)
-
     def set_applicant_display(self):
         if self.has_applied:
             self.applicant_display = str(self.applicant)
 
+    def set_assignees_display(self):
+        if self.has_applied:
+            assignees_display = [str(assignee) for assignee in self.assignees.all()]
+            self.assignees_display = ', '.join(assignees_display)
+
     def set_processor_display(self):
         if self.has_processed:
             self.processor_display = str(self.processor)
+
+    def set_meta_display(self):
+        method_name = f'construct_meta_{self.type}_{self.action}_fields_display'
+        meta_display = getattr(self, method_name, lambda: {})()
+        self.meta.update(meta_display)
 
     def set_display_fields(self):
         self.set_applicant_display()
