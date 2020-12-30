@@ -7,15 +7,15 @@ __all__ = ['TicketMetaSerializerViewMixin']
 
 class TicketMetaSerializerViewMixin:
     apply_asset_meta_serializer_classes = {
-        'apply': serializers.TicketMetaApplyAssetApplySerializer,
+        'open': serializers.TicketMetaApplyAssetApplySerializer,
         'approve': serializers.TicketMetaApplyAssetApproveSerializer,
     }
     apply_application_meta_serializer_classes = {
-        'apply': serializers.TicketMetaApplyApplicationApplySerializer,
+        'open': serializers.TicketMetaApplyApplicationApplySerializer,
         'approve': serializers.TicketMetaApplyApplicationApproveSerializer,
     }
     login_confirm_meta_serializer_classes = {
-        'apply': serializers.TicketMetaLoginConfirmApplySerializer,
+        'open': serializers.TicketMetaLoginConfirmApplySerializer,
     }
     meta_serializer_classes = {
         const.TicketTypeChoices.apply_asset.value: apply_asset_meta_serializer_classes,
@@ -37,7 +37,7 @@ class TicketMetaSerializerViewMixin:
         return meta_class
 
     def get_serializer_meta_field(self):
-        if self.action not in ['apply', 'approve']:
+        if self.action not in ['open', 'approve']:
             return None
         meta_class = self.get_serializer_meta_field_class()
         if not meta_class:

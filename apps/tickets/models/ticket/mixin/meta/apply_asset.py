@@ -3,6 +3,45 @@ from django.utils.translation import ugettext as __
 from perms.models import AssetPermission, Action
 from assets.models import Asset, SystemUser
 from orgs.utils import tmp_to_org, tmp_to_root_org
+from tickets.utils import convert_model_data_field_name_to_verbose_name
+
+
+class ConstructDisplayFieldMixin:
+    def construct_meta_apply_asset_open_fields_display(self):
+        meta_display_fields = ['apply_actions_display']
+
+        apply_actions = self.meta['apply_actions']
+        apply_actions_display = Action.value_to_choices_display(apply_actions)
+
+        meta_display_values = [apply_actions_display]
+        meta_display = dict(zip(meta_display_fields, meta_display_values))
+        return meta_display
+
+    def construct_meta_apply_asset_approve_fields_display(self):
+        meta_display_fields = [
+            'approve_actions_display', 'approve_assets_snapshot', 'approve_system_users_snapshot'
+        ]
+        approve_actions = self.meta['approve_actions']
+        approve_assets_id = self.meta['approve_assets']
+        approve_system_users_id = self.meta['approve_system_users']
+        approve_actions_display = Action.value_to_choices_display(approve_actions)
+        with tmp_to_org(self.org_id):
+            approve_assets_snapshot = list(
+                Asset.objects.filter(id__in=approve_assets_id).values(
+                    'hostname', 'ip', 'protocols', 'platform__name', 'public_ip'
+                )
+            )
+            approve_system_users_snapshot = list(
+                SystemUser.objects.filter(id__in=approve_system_users_id).values(
+                    'name', 'username', 'username_same_with_user', 'protocol',
+                    'auto_push', 'sudo', 'home', 'sftp_root'
+                )
+            )
+        meta_display_values = [
+            approve_actions_display, approve_assets_snapshot, approve_system_users_snapshot
+        ]
+        meta_display = dict(zip(meta_display_fields, meta_display_values))
+        return meta_display
 
 
 class ConstructBodyMixin:
@@ -10,9 +49,7 @@ class ConstructBodyMixin:
         apply_ip_group = self.meta['apply_ip_group']
         apply_hostname_group = self.meta['apply_hostname_group']
         apply_system_user_group = self.meta['apply_system_user_group']
-        apply_actions = self.meta['apply_actions']
-        apply_actions_display = Action.value_to_choices_display(apply_actions)
-        apply_actions_display = [str(action_display) for action_display in apply_actions_display]
+        apply_actions_display = self.meta['apply_actions_display']
         apply_date_start = self.meta['apply_date_start']
         apply_date_expired = self.meta['apply_date_expired']
         applied_body = '''{}: {},
@@ -31,16 +68,15 @@ class ConstructBodyMixin:
         return applied_body
 
     def construct_apply_asset_approved_body(self):
-        approve_assets_id = self.meta['approve_assets']
-        approve_system_users_id = self.meta['approve_system_users']
-        with tmp_to_org(self.org_id):
-            approve_assets = Asset.objects.filter(id__in=approve_assets_id)
-            approve_system_users = SystemUser.objects.filter(id__in=approve_system_users_id)
-        approve_assets_display = [str(asset) for asset in approve_assets]
-        approve_system_users_display = [str(system_user) for system_user in approve_system_users]
-        approve_actions = self.meta['approve_actions']
-        approve_actions_display = Action.value_to_choices_display(approve_actions)
-        approve_actions_display = [str(action_display) for action_display in approve_actions_display]
+        approve_assets_snapshot = self.meta['approve_assets_snapshot']
+        approve_assets_snapshot_display = convert_model_data_field_name_to_verbose_name(
+            Asset, approve_assets_snapshot
+        )
+        approve_system_users_snapshot = self.meta['approve_system_users_snapshot']
+        approve_system_users_snapshot_display = convert_model_data_field_name_to_verbose_name(
+            SystemUser, approve_system_users_snapshot
+        )
+        approve_actions_display = self.meta['approve_actions_display']
         approve_date_start = self.meta['approve_date_start']
         approve_date_expired = self.meta['approve_date_expired']
         approved_body = '''{}: {},
@@ -49,8 +85,8 @@ class ConstructBodyMixin:
             {}: {},
             {}: {}
         '''.format(
-            __('Approved assets'), ', '.join(approve_assets_display),
-            __('Approved system users'), ', '.join(approve_system_users_display),
+            __('Approved assets'), approve_assets_snapshot_display,
+            __('Approved system users'), approve_system_users_snapshot_display,
             __('Approved actions'), ', '.join(approve_actions_display),
             __('Approved date start'), approve_date_start,
             __('Approved date expired'), approve_date_expired,

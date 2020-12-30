@@ -24,6 +24,8 @@ class ModelJSONFieldEncoder(json.JSONEncoder):
             return obj.strftime(settings.DATETIME_DISPLAY_FORMAT)
         if isinstance(obj, uuid.UUID):
             return str(obj)
+        if isinstance(obj, type(_("ugettext_lazy"))):
+            return str(obj)
         else:
             return super().default(obj)
 
@@ -37,7 +39,7 @@ class Ticket(TicketModelMixin, CommonModelMixin, OrgModelMixin):
     meta = models.JSONField(encoder=ModelJSONFieldEncoder, verbose_name=_("Meta"))
     action = models.CharField(
         choices=const.TicketActionChoices.choices, max_length=16,
-        default=const.TicketActionChoices.apply.value, verbose_name=_("Action")
+        default=const.TicketActionChoices.open.value, verbose_name=_("Action")
     )
     status = models.CharField(
         max_length=16, choices=const.TicketStatusChoices.choices,
@@ -75,9 +77,18 @@ class Ticket(TicketModelMixin, CommonModelMixin, OrgModelMixin):
     def __str__(self):
         return '{}({})'.format(self.title, self.applicant_display)
 
+    # type
+    @property
+    def type_apply_asset(self):
+        return self.type == const.TicketTypeChoices.apply_asset.value
 
-    def has_assignee(self, assignee):
-        return self.assignees.filter(id=assignee.id).exists()
+    @property
+    def type_apply_application(self):
+        return self.type == const.TicketTypeChoices.apply_application.value
+
+    @property
+    def type_login_confirm(self):
+        return self.type == const.TicketTypeChoices.login_confirm.value
 
     # status
     @property
@@ -88,34 +99,46 @@ class Ticket(TicketModelMixin, CommonModelMixin, OrgModelMixin):
     def status_open(self):
         return self.status == const.TicketStatusChoices.open.value
 
+    def set_status_closed(self):
+        self.status = const.TicketStatusChoices.closed.value
+
     # action
     @property
-    def is_applied(self):
-        return self.action == const.TicketActionChoices.apply.value
+    def action_open(self):
+        return self.action == const.TicketActionChoices.open.value
 
     @property
-    def is_approved(self):
+    def action_approve(self):
         return self.action == const.TicketActionChoices.approve.value
 
     @property
-    def is_rejected(self):
+    def action_reject(self):
         return self.action == const.TicketActionChoices.reject.value
 
     @property
-    def is_closed(self):
+    def action_close(self):
         return self.action == const.TicketActionChoices.close.value
 
     @property
-    def is_processed(self):
-        return self.is_approved or self.is_rejected or self.is_closed
+    def has_applied(self):
+        return self.action_open
 
-    # perform action
+    @property
+    def has_processed(self):
+        return self.action_approve or self.action_reject or self.action_close
+
+    def set_action_close(self):
+        self.action = const.TicketActionChoices.close.value
+
     def close(self, processor):
         self.processor = processor
-        self.action = const.TicketActionChoices.close.value
+        self.set_action_close()
         self.save()
 
-    # tickets
+    #
+    def has_assignee(self, assignee):
+        return self.assignees.filter(id=assignee.id).exists()
+
     @classmethod
     def all(cls):
         with tmp_to_root_org():

@@ -3,15 +3,46 @@ from orgs.utils import tmp_to_org, tmp_to_root_org
 from applications.models import Application, Category
 from assets.models import SystemUser
 from perms.models import ApplicationPermission
+from tickets.utils import convert_model_data_field_name_to_verbose_name
+
+
+class ConstructDisplayFieldMixin:
+    def construct_meta_apply_application_open_fields_display(self):
+        meta_display_fields = ['apply_category_display', 'apply_type_display']
+        apply_category = self.meta['apply_category']
+        apply_category_display = dict(Category.choices)[apply_category]
+        apply_type = self.meta['apply_type']
+        apply_type_display = dict(Category.get_type_choices(apply_category))[apply_type]
+        meta_display_values = [apply_category_display, apply_type_display]
+        meta_display = dict(zip(meta_display_fields, meta_display_values))
+        return meta_display
+
+    def construct_meta_apply_application_approve_fields_display(self):
+        meta_display_fields = ['approve_applications_snapshot', 'approve_system_users_snapshot']
+        approve_applications_id = self.meta['approve_applications']
+        approve_system_users_id = self.meta['approve_system_users']
+        with tmp_to_org(self.org_id):
+            approve_applications_snapshot = list(
+                Application.objects.filter(id__in=approve_applications_id).values(
+                    'name', 'category', 'type'
+                )
+            )
+            approve_system_users_snapshot = list(
+                SystemUser.objects.filter(id__in=approve_system_users_id).values(
+                    'name', 'username', 'username_same_with_user', 'protocol',
+                    'auto_push', 'sudo', 'home', 'sftp_root'
+                )
+            )
+        meta_display_values = [approve_applications_snapshot, approve_system_users_snapshot]
+        meta_display = dict(zip(meta_display_fields, meta_display_values))
+        return meta_display
 
 
 class ConstructBodyMixin:
 
     def construct_apply_application_applied_body(self):
-        apply_category = self.meta['apply_category']
-        apply_category_display = dict(Category.choices)[apply_category]
-        apply_type = self.meta['apply_type']
-        apply_type_display = dict(Category.get_type_choices(apply_category))[apply_type]
+        apply_category_display = self.meta['apply_category_display']
+        apply_type_display = self.meta['apply_type_display']
         apply_application_group = self.meta['apply_application_group']
         apply_system_user_group = self.meta['apply_system_user_group']
         apply_date_start = self.meta['apply_date_start']
@@ -34,13 +65,14 @@ class ConstructBodyMixin:
 
     def construct_apply_application_approved_body(self):
         # 审批信息
-        approve_applications_id = self.meta['approve_applications']
-        approve_system_users_id = self.meta['approve_system_users']
-        with tmp_to_org(self.org_id):
-            approve_applications = Application.objects.filter(id__in=approve_applications_id)
-            approve_system_users = SystemUser.objects.filter(id__in=approve_system_users_id)
-        approve_applications_display = [str(application) for application in approve_applications]
-        approve_system_users_display = [str(system_user) for system_user in approve_system_users]
+        approve_applications_snapshot = self.meta['approve_applications_snapshot']
+        approve_applications_snapshot_display = convert_model_data_field_name_to_verbose_name(
+            Application, approve_applications_snapshot
+        )
+        approve_system_users_snapshot = self.meta['approve_system_users_snapshot']
+        approve_system_users_snapshot_display = convert_model_data_field_name_to_verbose_name(
+            SystemUser, approve_system_users_snapshot
+        )
         approve_date_start = self.meta['approve_date_start']
         approve_date_expired = self.meta['approve_date_expired']
         approved_body = '''{}: {},
@@ -48,8 +80,8 @@ class ConstructBodyMixin:
             {}: {},
             {}: {},
         '''.format(
-            __('Approved applications'), ', '.join(approve_applications_display),
-            __('Approved system users'), ', '.join(approve_system_users_display),
+            __('Approved applications'), approve_applications_snapshot_display,
+            __('Approved system users'), approve_system_users_snapshot_display,
             __('Approved date start'), approve_date_start,
             __('Approved date expired'), approve_date_expired
         )

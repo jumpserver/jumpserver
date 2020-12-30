@@ -17,20 +17,18 @@ logger = get_logger(__name__)
 
 @receiver(pre_save, sender=Ticket)
 def on_ticket_pre_save(sender, instance=None, **kwargs):
-    if instance.is_applied:
-        instance.applicant_display = str(instance.applicant)
-    if instance.is_processed:
-        instance.processor_display = str(instance.processor)
-        instance.status = const.TicketStatusChoices.closed.value
+    if instance.has_processed:
+        instance.set_status_closed()
+    instance.set_display_fields()
 
 
 @receiver(post_save, sender=Ticket)
-def on_ticket_processed(sender, instance=None, created=False, **kwargs):
-    if not instance.is_processed:
+def on_ticket_processed(sender, instance=None, **kwargs):
+    if not instance.has_processed:
         return
     logger.debug('Ticket is processed, send mail: {}'.format(instance.id))
     instance.create_action_comment()
-    if instance.is_approved:
+    if instance.action_approve:
         instance.create_permission()
         instance.create_approved_comment()
     send_ticket_processed_mail_to_applicant(instance)
@@ -43,18 +41,15 @@ def on_ticket_assignees_changed(sender, instance=None, action=None, reverse=Fals
     if action != 'post_add':
         return
     ticket = instance
-    assignees_display = [str(assignee) for assignee in ticket.assignees.all()]
-    logger.debug(
-        'Receives ticket and assignees changed signal, ticket: {}, assignees: {}'
-        ''.format(ticket.title, assignees_display)
-    )
-    ticket.assignees_display = ', '.join(assignees_display)
+    logger.debug('Receives ticket and assignees changed signal, ticket: {}'.format(ticket.title))
+    ticket.set_assignees_display()
     ticket.save()
-    logger.debug('Send applied email to assignees: {}'.format(assignees_display))
     assignees = model.objects.filter(pk__in=pk_set)
+    assignees_display = [str(assignee) for assignee in assignees]
+    logger.debug('Send applied email to assignees: {}'.format(assignees_display))
     send_ticket_applied_mail_to_assignees(ticket, assignees)
 
 
 @receiver(pre_save, sender=Comment)
 def on_comment_create(sender, instance=None, created=False, **kwargs):
-    instance.user_display = str(instance.user)
+    instance.set_display_fields()

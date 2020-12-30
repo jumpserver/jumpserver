@@ -41,7 +41,7 @@ class TicketDisplaySerializer(TicketSerializer):
 
 
 class TicketActionSerializer(TicketSerializer):
-    action = ReadableHiddenField(default=const.TicketActionChoices.apply.value)
+    action = ReadableHiddenField(default=const.TicketActionChoices.open.value)
 
     class Meta(TicketSerializer.Meta):
         required_fields = ['action']
@@ -94,7 +94,7 @@ class TicketApplySerializer(TicketActionSerializer):
 
     @staticmethod
     def validate_action(action):
-        return const.TicketActionChoices.apply.value
+        return const.TicketActionChoices.open.value
 
 
 class TicketProcessSerializer(TicketActionSerializer):
@@ -110,13 +110,11 @@ class TicketApproveSerializer(TicketProcessSerializer):
     class Meta(TicketProcessSerializer.Meta):
         required_fields = TicketProcessSerializer.Meta.required_fields + ['meta']
         read_only_fields = list(set(TicketDisplaySerializer.Meta.fields) - set(required_fields))
-        extra_kwargs = {
-            'meta': {'read_only': True}
-        }
 
     def validate_meta(self, meta):
-        meta.update(self.instance.meta)
-        return meta
+        instance_meta = self.instance.meta
+        instance_meta.update(meta)
+        return instance_meta
 
     @staticmethod
     def validate_action(action):

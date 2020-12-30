@@ -8,6 +8,9 @@ from assets.models import SystemUser
 
 class BaseTicketMetaSerializer(serializers.Serializer):
 
+    class Meta:
+        fields = '__all__'
+
     def get_fields(self):
         fields = super().get_fields()
         required_fields = self.Meta.fields
@@ -19,9 +22,6 @@ class BaseTicketMetaSerializer(serializers.Serializer):
             if field_name in fields.keys()
         })
         return fields
-
-    class Meta:
-        fields = '__all__'
 
 
 class BaseTicketMetaApproveSerializerMixin:

@@ -11,6 +11,32 @@ from . import const
 logger = get_logger(__file__)
 
 
+def convert_model_data_field_name_to_verbose_name(model, name_data):
+    """将Model以field_name为key的数据转换为以field_verbose_name为key的数据"""
+    if isinstance(name_data, dict):
+        name_data = [name_data]
+
+    model_fields_name_verbose_name_mapping = {
+        field.name: field.verbose_name for field in model._meta.fields
+    }
+
+    def get_verbose_name(field_name):
+        verbose_name = model_fields_name_verbose_name_mapping.get(field_name)
+        if not verbose_name:
+            other_name = field_name.split('__', 1)[0]
+            verbose_name = model_fields_name_verbose_name_mapping.get(other_name)
+        if not verbose_name:
+            verbose_name = field_name
+        return verbose_name
+
+    verbose_name_data = [
+        {get_verbose_name(name): value for name, value in d.items()}
+        for d in name_data
+    ]
+
+    return verbose_name_data
+
+
 def send_ticket_applied_mail_to_assignees(ticket, assignees):
     if not assignees:
         logger.debug("Not found assignees, ticket: {}({}), assignees: {}".format(
