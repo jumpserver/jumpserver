@@ -113,7 +113,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='ticket',
             name='meta',
-            field=models.JSONField(encoder=tickets.models.ticket.ModelJSONFieldEncoder, verbose_name='Meta'),
+            field=models.JSONField(default=dict, encoder=tickets.models.ticket.model.ModelJSONFieldEncoder, verbose_name='Meta'),
         ),
         migrations.AlterField(
             model_name='ticket',

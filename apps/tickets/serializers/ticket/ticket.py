@@ -60,7 +60,7 @@ class TicketApplySerializer(TicketActionSerializer):
         ]
         read_only_fields = list(set(TicketDisplaySerializer.Meta.fields) - set(required_fields))
         extra_kwargs = {
-            'type': {'required': True}
+            'type': {'required': True},
         }
 
     def validate_type(self, tp):

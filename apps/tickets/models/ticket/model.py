@@ -14,7 +14,7 @@ from orgs.utils import tmp_to_root_org, tmp_to_org
 from tickets import const
 from .mixin import TicketModelMixin
 
-__all__ = ['Ticket']
+__all__ = ['Ticket', 'ModelJSONFieldEncoder']
 
 
 class ModelJSONFieldEncoder(json.JSONEncoder):
@@ -36,7 +36,7 @@ class Ticket(TicketModelMixin, CommonModelMixin, OrgModelMixin):
         max_length=64, choices=const.TicketTypeChoices.choices,
         default=const.TicketTypeChoices.general.value, verbose_name=_("Type")
     )
-    meta = models.JSONField(encoder=ModelJSONFieldEncoder, verbose_name=_("Meta"))
+    meta = models.JSONField(encoder=ModelJSONFieldEncoder, default=dict, verbose_name=_("Meta"))
     action = models.CharField(
         choices=const.TicketActionChoices.choices, max_length=16,
         default=const.TicketActionChoices.open.value, verbose_name=_("Action")

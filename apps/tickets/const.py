@@ -10,10 +10,6 @@ class TicketTypeChoices(TextChoices):
     apply_asset = 'apply_asset', _('Apply for asset')
     apply_application = 'apply_application', _('Apply for application')
 
-    @classmethod
-    def types(cls):
-        return set(dict(cls.choices).keys())
-
 
 class TicketActionChoices(TextChoices):
     open = 'open', _('Open')

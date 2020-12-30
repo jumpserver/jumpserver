@@ -7,10 +7,13 @@ from collections import defaultdict
 from itertools import chain
 
 from django.db.models.signals import m2m_changed
+from django.utils.translation import ugettext_lazy as _
 from django.core.cache import cache
 from django.http import JsonResponse
+from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
+from common.exceptions import JMSException
 
 from common.drf.filters import IDSpmFilter, CustomFilter, IDInFilter
 from ..utils import lazyproperty
@@ -28,19 +31,200 @@ class JSONResponseMixin(object):
         return JsonResponse(context)
 
 
-class SerializerMixin:
-    def get_serializer_class(self):
+class GenericSerializerMixin:
+    serializer_classes = None
+
+    def get_serializer_class_by_view_action(self):
+        if not hasattr(self, 'serializer_classes'):
+            return None
+        if not isinstance(self.serializer_classes, dict):
+            return None
+        draw = self.request.query_params.get('draw')
         serializer_class = None
-        if hasattr(self, 'serializer_classes') and isinstance(self.serializer_classes, dict):
-            if self.action in ['list', 'metadata'] and self.request.query_params.get('draw'):
-                serializer_class = self.serializer_classes.get('display')
-            if serializer_class is None:
-                serializer_class = self.serializer_classes.get(
-                    self.action, self.serializer_classes.get('default')
-                )
-        if serializer_class:
+        if draw and self.action in ['list', 'metadata']:
+            serializer_class = self.serializer_classes.get('display')
+        if serializer_class is None:
+            serializer_class = self.serializer_classes.get(self.action)
+        if serializer_class is None:
+            serializer_class = self.serializer_classes.get('default')
+        return serializer_class
+
+    def get_serializer_class(self):
+        serializer_class = self.get_serializer_class_by_view_action()
+        if serializer_class is None:
+            serializer_class = super().get_serializer_class()
+        return serializer_class
+
+
+class JSONFieldsSerializerMixin:
+    """
+    作用: 获取包含 JSONField 字段的序列类
+
+    class TestSerializer(serializers.Serializer):
+        pass
+
+    json_fields_category_mapping = {
+        'json_field_1': {
+            'type': ('apply_asset', 'apply_application', 'login_confirm', ),
+        },
+        'json_field_2': {
+            'type': ('chrome', 'mysql', 'oracle', 'k8s', ),
+            'category': ('remote_app', 'db', 'cloud', ),
+        },
+    }
+    json_fields_serializer_classes = {
+        'json_field_1': {
+            'type': {
+                'apply_asset': {
+                    'get': {
+                        'class': TestSerializer,
+                        'attrs': {'required': True},
+                    },
+                    'post': {
+                        'class': TestSerializer,
+                        'attrs': {'required': True}
+                    },
+                    'open': {
+                        'class': TestSerializer,
+                        'attrs': {'required': False}
+                    },
+                    'approve': {
+                        'class': TestSerializer,
+                    },
+                },
+                'apply_application': {
+                    'get': {},
+                    'post': {},
+                    'put': {},
+                },
+                'login_confirm': {
+                    'get': {},
+                    'post': {},
+                    'put': {},
+                }
+            },
+            'category': {}
+        },
+        'json_field_2': {},
+        'json_field_3': {}
+    }
+    """
+
+    json_fields_category_mapping = {}
+    json_fields_serializer_classes = None
+
+    @lazyproperty
+    def default_json_field_serializer(self):
+        class DefaultJSONFieldSerializer(serializers.JSONField):
+            pass
+        if self.action in ['get', 'list', 'retrieve']:
+            attrs = {'readonly': False}
+        else:
+            attrs = {'readonly': True}
+        return DefaultJSONFieldSerializer(attrs)
+
+    def get_json_field_query_category(self, field, category):
+        query_category = self.request.query_params.get(category)
+        category_choices = self.json_fields_category_mapping[field][category]
+        if query_category and query_category not in category_choices:
+            error = _(
+                'Please bring the query parameter `{}`, '
+                'the value is selected from the following options: {}'
+                ''.format(query_category, category_choices)
+            )
+            raise JMSException({'query_params_error': error})
+        return query_category
+
+    def get_json_field_serializer_classes_by_query_category(self, field):
+        serializer_classes = None
+        category_collection = self.json_fields_category_mapping[field]
+        for category in category_collection:
+            query_category = self.get_json_field_query_category(field, category)
+            if not query_category:
+                continue
+            category_serializer_classes = self.json_fields_serializer_classes[field][category]
+            if query_category not in category_serializer_classes.keys():
+                continue
+            serializer_classes = category_serializer_classes[query_category]
+
+        return serializer_classes
+
+    def get_json_field_serializer_info_by_view_action(self, serializer_classes):
+        if self.action in ['metadata']:
+            action = self.request.query_params.get('action')
+            if not action:
+                raise JMSException('The `metadata` methods must carry query parameter `action`')
+        else:
+            action = self.action
+        serializer_info = serializer_classes.get(action)
+        return serializer_info
+
+    def get_json_field_serializer_info(self, field):
+        category_collection = self.json_fields_category_mapping[field]
+        if category_collection:
+            serializer_classes = self.get_json_field_serializer_classes_by_query_category(field)
+        else:
+            serializer_classes = self.json_fields_serializer_classes[field]
+
+        if not serializer_classes:
+            return None
+
+        serializer_info = self.get_json_field_serializer_info_by_view_action(serializer_classes)
+        return serializer_info
+
+    @staticmethod
+    def new_json_field_serializer(class_info):
+        serializer_class = class_info['class']
+        serializer_attrs = class_info.get('attrs', {})
+        serializer = serializer_class(serializer_attrs)
+        return serializer
+
+    def get_json_field_serializer(self, field):
+        serializer_info = self.get_json_field_serializer_info(field)
+        if not serializer_info:
+            return None
+        serializer = self.new_json_field_serializer(serializer_info)
+        return serializer
+
+    def get_json_fields_serializer_mapping(self):
+        """
+        return: {
+            'json_field_1': serializer1(),
+            'json_field_2': serializer2(),
+        }
+        """
+        fields_serializer_mapping = {}
+        fields = self.json_fields_serializer_classes.keys()
+        for field in fields:
+            serializer = self.get_json_field_serializer(field)
+            if serializer is None:
+                serializer = self.default_json_field_serializer
+            fields_serializer_mapping[field] = serializer
+        return fields_serializer_mapping
+
+    @staticmethod
+    def new_include_json_fields_serializer_class(base, attrs):
+        serializer_class_name = ''.join([
+            field_serializer.__class__.__name__ for field_serializer in attrs.values()
+        ])
+        serializer_class = type(serializer_class_name, (base,), attrs)
+        return serializer_class
+
+    def get_serializer_class(self):
+        serializer_class = super().get_serializer_class()
+        if not isinstance(self.json_fields_serializer_classes, dict):
             return serializer_class
-        return super().get_serializer_class()
+        fields_serializer_mapping = self.get_json_fields_serializer_mapping()
+        if not fields_serializer_mapping:
+            return serializer_class
+        serializer_class = self.new_include_json_fields_serializer_class(
+            base=serializer_class, attrs=fields_serializer_mapping
+        )
+        return serializer_class
+
+
+class SerializerMixin(JSONFieldsSerializerMixin, GenericSerializerMixin):
+    pass
 
 
 class ExtraFilterFieldsMixin:
