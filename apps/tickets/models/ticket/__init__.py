@@ -1,1 +1,1 @@
-from .ticket import *
+from .model import *

@@ -11,13 +11,13 @@ from common.const.http import POST, PUT
 from tickets import serializers
 from tickets.permissions.ticket import IsAssignee, NotClosed
 from tickets.models import Ticket
-from tickets.api.ticket.mixin import TicketMetaSerializerViewMixin
+from tickets.api.ticket.mixin import TicketJSONFieldsSerializerViewMixin
 
 
 __all__ = ['TicketViewSet']
 
 
-class TicketViewSet(TicketMetaSerializerViewMixin, CommonApiMixin, viewsets.ModelViewSet):
+class TicketViewSet(TicketJSONFieldsSerializerViewMixin, CommonApiMixin, viewsets.ModelViewSet):
     permission_classes = (IsValidUser,)
     serializer_class = serializers.TicketSerializer
     serializer_classes = {
