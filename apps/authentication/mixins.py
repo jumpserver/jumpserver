@@ -203,14 +203,14 @@ class AuthMixin:
             raise errors.LoginConfirmOtherError('', "Not found")
         if ticket.status_open:
             raise errors.LoginConfirmWaitError(ticket.id)
-        elif ticket.is_approved:
+        elif ticket.action_approve:
             self.request.session["auth_confirm"] = "1"
             return
-        elif ticket.is_rejected:
+        elif ticket.action_reject:
             raise errors.LoginConfirmOtherError(
                 ticket.id, ticket.get_action_display()
             )
-        elif ticket.is_closed:
+        elif ticket.action_close:
             raise errors.LoginConfirmOtherError(
                 ticket.id, ticket.get_action_display()
             )

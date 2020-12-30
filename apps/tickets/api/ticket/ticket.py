@@ -23,7 +23,7 @@ class TicketViewSet(TicketMetaSerializerViewMixin, CommonApiMixin, viewsets.Mode
     serializer_classes = {
         'default': serializers.TicketDisplaySerializer,
         'display': serializers.TicketDisplaySerializer,
-        'apply': serializers.TicketApplySerializer,
+        'open': serializers.TicketApplySerializer,
         'approve': serializers.TicketApproveSerializer,
         'reject': serializers.TicketRejectSerializer,
         'close': serializers.TicketCloseSerializer,
@@ -50,7 +50,7 @@ class TicketViewSet(TicketMetaSerializerViewMixin, CommonApiMixin, viewsets.Mode
         return queryset
 
     @action(detail=False, methods=[POST])
-    def apply(self, request, *args, **kwargs):
+    def open(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
 
     @action(detail=True, methods=[PUT], permission_classes=[IsOrgAdmin, IsAssignee, NotClosed])

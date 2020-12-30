@@ -2,6 +2,27 @@ import textwrap
 from django.utils.translation import ugettext as __
 
 
+class SetDisplayFieldMixin:
+
+    def set_meta_display(self):
+        method_name = f'construct_meta_{self.type}_{self.action}_fields_display'
+        meta_display = getattr(self, method_name, lambda: {})()
+        self.meta.update(meta_display)
+
+    def set_applicant_display(self):
+        if self.has_applied:
+            self.applicant_display = str(self.applicant)
+
+    def set_processor_display(self):
+        if self.has_processed:
+            self.processor_display = str(self.processor)
+
+    def set_display_fields(self):
+        self.set_applicant_display()
+        self.set_processor_display()
+        self.set_meta_display()
+
+
 class ConstructBodyMixin:
     # applied body
     def construct_applied_body(self):
@@ -32,7 +53,7 @@ class ConstructBodyMixin:
     # meta body
     def construct_meta_body(self):
         applied_body = self.construct_applied_body()
-        if not self.is_approved:
+        if not self.action_approve:
             return applied_body
         approved_body = self.construct_approved_body()
         return applied_body + approved_body

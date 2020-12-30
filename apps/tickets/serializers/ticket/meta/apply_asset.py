@@ -14,16 +14,24 @@ __all__ = [
 class TicketMetaApplyAssetSerializer(BaseTicketMetaSerializer):
     # 申请信息
     apply_ip_group = serializers.ListField(
-        child=serializers.IPAddressField(), default=list, label=_('IP group')
+        required=False, child=serializers.IPAddressField(), label=_('IP group'),
+        default=list,
     )
     apply_hostname_group = serializers.ListField(
-        child=serializers.CharField(), default=list, label=_('Hostname group')
+        required=False, child=serializers.CharField(), label=_('Hostname group'),
+        default=list,
     )
     apply_system_user_group = serializers.ListField(
-        child=serializers.CharField(), default=list, label=_('System user group')
+        required=False, child=serializers.CharField(), label=_('System user group'),
+        default=list,
     )
     apply_actions = ActionsField(
         required=True
+    )
+    apply_actions_display = serializers.ListField(
+        required=False, read_only=True, child=serializers.CharField(),
+        label=_('Approve assets display'),
+        default=list,
     )
     apply_date_start = serializers.DateTimeField(
         required=True, label=_('Date start')
@@ -35,11 +43,26 @@ class TicketMetaApplyAssetSerializer(BaseTicketMetaSerializer):
     approve_assets = serializers.ListField(
         required=True, child=serializers.UUIDField(), label=_('Approve assets')
     )
+    approve_assets_snapshot = serializers.ListField(
+        required=False, read_only=True, child=serializers.DictField(),
+        label=_('Approve assets display'),
+        default=list,
+    )
     approve_system_users = serializers.ListField(
         required=True, child=serializers.UUIDField(), label=_('Approve system users')
     )
+    approve_system_users_snapshot = serializers.ListField(
+        required=False, read_only=True, child=serializers.DictField(),
+        label=_('Approve assets display'),
+        default=list,
+    )
     approve_actions = ActionsField(
         required=True
+    )
+    approve_actions_display = serializers.ListField(
+        required=False, read_only=True, child=serializers.CharField(),
+        label=_('Approve assets display'),
+        default=list,
     )
     approve_date_start = serializers.DateTimeField(
         required=True, label=_('Date start')
@@ -53,9 +76,10 @@ class TicketMetaApplyAssetApplySerializer(TicketMetaApplyAssetSerializer):
 
     class Meta:
         fields = [
-            'apply_ip_group', 'apply_hostname_group',
-            'apply_system_user_group', 'apply_actions',
-            'apply_date_start', 'apply_date_expired'
+            'apply_ip_group',
+            'apply_hostname_group', 'apply_system_user_group',
+            'apply_actions', 'apply_actions_display',
+            'apply_date_start', 'apply_date_expired',
         ]
 
 
@@ -64,9 +88,10 @@ class TicketMetaApplyAssetApproveSerializer(BaseTicketMetaApproveSerializerMixin
 
     class Meta:
         fields = [
-            'approve_assets', 'approve_system_users',
-            'approve_actions', 'approve_date_start',
-            'approve_date_expired'
+            'approve_assets', 'approve_assets_snapshot',
+            'approve_system_users', 'approve_system_users_snapshot',
+            'approve_actions', 'approve_actions_display',
+            'approve_date_start', 'approve_date_expired',
         ]
 
     def validate_approve_assets(self, approve_assets):

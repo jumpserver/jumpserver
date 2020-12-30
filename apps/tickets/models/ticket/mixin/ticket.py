@@ -1,32 +1,30 @@
-from . import base, apply_asset, apply_application, login_confirm
+from . import base, meta
 
 __all__ = ['TicketModelMixin']
 
 
-class TicketConstructBodyMixin(
-    base.ConstructBodyMixin,
-    apply_asset.ConstructBodyMixin,
-    apply_application.ConstructBodyMixin,
-    login_confirm.ConstructBodyMixin
-):
+class TicketSetDisplayFieldMixin(meta.ConstructDisplayFieldMixin, base.SetDisplayFieldMixin):
+    """ 设置 ticket display 字段(只设置，不保存)"""
     pass
 
 
-class TicketCreatePermissionMixin(
-    base.CreatePermissionMixin,
-    apply_asset.CreatePermissionMixin,
-    apply_application.CreatePermissionMixin
-):
+class TicketConstructBodyMixin(meta.ConstructBodyMixin, base.ConstructBodyMixin):
+    """ 构造 ticket body 信息 """
     pass
 
 
-class TicketCreateCommentMixin(
-    base.CreateCommentMixin
-):
+class TicketCreatePermissionMixin(meta.CreatePermissionMixin, base.CreatePermissionMixin):
+    """ 创建 ticket 相关授权规则"""
+    pass
+
+
+class TicketCreateCommentMixin(base.CreateCommentMixin):
+    """ 创建 ticket 评论"""
     pass
 
 
 class TicketModelMixin(
-    TicketConstructBodyMixin, TicketCreatePermissionMixin, TicketCreateCommentMixin
+    TicketSetDisplayFieldMixin, TicketConstructBodyMixin, TicketCreatePermissionMixin,
+    TicketCreateCommentMixin
 ):
     pass

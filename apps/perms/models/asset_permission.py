@@ -71,7 +71,7 @@ class Action:
     @classmethod
     def value_to_choices_display(cls, value):
         choices = cls.value_to_choices(value)
-        return [dict(cls.choices())[i] for i in choices]
+        return [str(dict(cls.choices())[i]) for i in choices]
         
     @classmethod
     def choices_to_value(cls, value):

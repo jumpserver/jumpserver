@@ -14,16 +14,24 @@ __all__ = [
 class TicketMetaApplyApplicationSerializer(BaseTicketMetaSerializer):
     # 申请信息
     apply_category = serializers.ChoiceField(
-        choices=Category.choices, required=True, label=_('Category')
+        required=True, choices=Category.choices, label=_('Category')
+    )
+    apply_category_display = serializers.CharField(
+        read_only=True, label=_('Category display')
     )
     apply_type = serializers.ChoiceField(
-        choices=Category.get_all_type_choices(), required=True, label=_('Type')
+        required=True, choices=Category.get_all_type_choices(), label=_('Type')
+    )
+    apply_type_display = serializers.CharField(
+        required=False, read_only=True, label=_('Type display')
     )
     apply_application_group = serializers.ListField(
-        child=serializers.CharField(), default=list, label=_('Application group')
+        required=False, child=serializers.CharField(), label=_('Application group'),
+        default=list,
     )
     apply_system_user_group = serializers.ListField(
-        child=serializers.CharField(), default=list, label=_('System user group')
+        required=False, child=serializers.CharField(), label=_('System user group'),
+        default=list,
     )
     apply_date_start = serializers.DateTimeField(
         required=True, label=_('Date start')
@@ -33,12 +41,20 @@ class TicketMetaApplyApplicationSerializer(BaseTicketMetaSerializer):
     )
     # 审批信息
     approve_applications = serializers.ListField(
-        child=serializers.UUIDField(), required=True,
-        label=_('Approve applications')
+        required=True, child=serializers.UUIDField(), label=_('Approve applications')
+    )
+    approve_applications_snapshot = serializers.ListField(
+        required=False, read_only=True, child=serializers.CharField(),
+        label=_('Approve applications display'),
+        default=list
     )
     approve_system_users = serializers.ListField(
-        child=serializers.UUIDField(), required=True,
-        label=_('Approve system users')
+        required=True, child=serializers.UUIDField(), label=_('Approve system users')
+    )
+    approve_system_users_snapshot = serializers.ListField(
+        required=False, read_only=True, child=serializers.CharField(),
+        label=_('Approve system user display'),
+        default=list
     )
     approve_date_start = serializers.DateTimeField(
         required=True, label=_('Date start')
@@ -52,9 +68,10 @@ class TicketMetaApplyApplicationApplySerializer(TicketMetaApplyApplicationSerial
 
     class Meta:
         fields = [
-            'apply_category', 'apply_type',
+            'apply_category', 'apply_category_display',
+            'apply_type', 'apply_type_display',
             'apply_application_group', 'apply_system_user_group',
-            'apply_date_start', 'apply_date_expired'
+            'apply_date_start', 'apply_date_expired',
         ]
 
     def validate_apply_type(self, tp):
@@ -73,7 +90,8 @@ class TicketMetaApplyApplicationApproveSerializer(BaseTicketMetaApproveSerialize
 
     class Meta:
         fields = {
-            'approve_applications', 'approve_system_users',
+            'approve_applications', 'approve_applications_snapshot',
+            'approve_system_users', 'approve_system_users_snapshot',
             'approve_date_start', 'approve_date_expired'
         }
 

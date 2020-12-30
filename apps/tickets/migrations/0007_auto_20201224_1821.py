@@ -24,19 +24,23 @@ def migrate_field_meta(tp, old_meta):
         'apply_hostname_group': [old_meta_hostname] if old_meta_hostname else [],
         'apply_system_user_group': [old_meta_system_user] if old_meta_system_user else [],
         'apply_actions': old_meta.get('actions'),
+        'apply_actions_display': [],
         'apply_date_start': old_meta.get('date_start'),
         'apply_date_expired': old_meta.get('date_expired'),
 
         'approve_assets': old_meta.get('confirmed_assets', []),
+        'approve_assets_snapshot': [],
         'approve_system_users': old_meta.get('confirmed_system_users', []),
+        'approve_system_users_snapshot': [],
         'approve_actions': old_meta.get('actions'),
+        'approve_actions_display': [],
         'approve_date_start': old_meta.get('date_start'),
         'approve_date_expired': old_meta.get('date_expired'),
     }
     return new_meta
 
 
-ACTION_APPLY = 'apply'
+ACTION_OPEN = 'open'
 ACTION_CLOSE = 'close'
 STATUS_OPEN = 'open'
 STATUS_CLOSED = 'closed'
@@ -46,7 +50,7 @@ def migrate_field_action(old_action, old_status):
     if old_action:
         return old_action
     if old_status == STATUS_OPEN:
-        return ACTION_APPLY
+        return ACTION_OPEN
     if old_status == STATUS_CLOSED:
         return ACTION_CLOSE
 
@@ -119,7 +123,8 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='ticket',
             name='action',
-            field=models.CharField(choices=[('apply', 'Apply'), ('approve', 'Approve'), ('reject', 'Reject'), ('close', 'Close')], default='apply', max_length=16, verbose_name='Action')),
+            field=models.CharField(choices=[('open', 'Open'), ('approve', 'Approve'), ('reject', 'Reject'), ('close', 'Close')], default='open', max_length=16, verbose_name='Action'),
+        ),
         migrations.AlterField(
             model_name='ticket',
             name='status',
