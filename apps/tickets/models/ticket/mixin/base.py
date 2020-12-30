@@ -106,6 +106,8 @@ class CreatePermissionMixin:
 
 class CreateCommentMixin:
     def create_comment(self, comment_body):
+        # 页面展示需要取消缩进
+        comment_body = textwrap.dedent(comment_body)
         comment_data = {
             'body': comment_body,
             'user': self.processor,
@@ -115,14 +117,10 @@ class CreateCommentMixin:
 
     def create_applied_comment(self):
         comment_body = self.construct_applied_body()
-        # 页面展示需要取消缩进
-        comment_body = textwrap.dedent(comment_body)
         self.create_comment(comment_body)
 
     def create_approved_comment(self):
         comment_body = self.construct_approved_body()
-        # 页面展示需要取消缩进
-        comment_body = textwrap.dedent(comment_body)
         self.create_comment(comment_body)
 
     def create_action_comment(self):
