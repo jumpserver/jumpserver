@@ -23,14 +23,19 @@ def on_ticket_pre_save(sender, instance=None, **kwargs):
 
 
 @receiver(post_save, sender=Ticket)
-def on_ticket_processed(sender, instance=None, **kwargs):
-    if not instance.has_processed:
-        return
-    logger.debug('Ticket is processed, send mail: {}'.format(instance.id))
+def on_ticket_post_save(sender, instance=None, **kwargs):
     instance.create_action_comment()
+    if instance.action_open:
+        instance.create_applied_comment()
+        return
     if instance.action_approve:
         instance.create_permission()
         instance.create_approved_comment()
+    logger.debug(
+        'Ticket () has processed, send mail to applicant: {}'.format(
+            instance.title, instance.applicant_display
+        )
+    )
     send_ticket_processed_mail_to_applicant(instance)
 
 
