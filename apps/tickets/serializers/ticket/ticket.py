@@ -110,13 +110,11 @@ class TicketApproveSerializer(TicketProcessSerializer):
     class Meta(TicketProcessSerializer.Meta):
         required_fields = TicketProcessSerializer.Meta.required_fields + ['meta']
         read_only_fields = list(set(TicketDisplaySerializer.Meta.fields) - set(required_fields))
-        extra_kwargs = {
-            'meta': {'read_only': True}
-        }
 
     def validate_meta(self, meta):
-        meta.update(self.instance.meta)
-        return meta
+        instance_meta = self.instance.meta
+        instance_meta.update(meta)
+        return instance_meta
 
     @staticmethod
     def validate_action(action):

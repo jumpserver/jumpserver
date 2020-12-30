@@ -1,7 +1,6 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from perms.serializers import ActionsField
-from perms.models import Action
 from assets.models import Asset, SystemUser
 from .base import BaseTicketMetaSerializer, BaseTicketMetaApproveSerializerMixin
 
@@ -24,7 +23,7 @@ class TicketMetaApplyAssetSerializer(BaseTicketMetaSerializer):
         child=serializers.CharField(), default=list, label=_('System user group')
     )
     apply_actions = ActionsField(
-        choices=Action.DB_CHOICES, default=Action.ALL
+        required=True
     )
     apply_date_start = serializers.DateTimeField(
         required=True, label=_('Date start')
@@ -40,7 +39,7 @@ class TicketMetaApplyAssetSerializer(BaseTicketMetaSerializer):
         required=True, child=serializers.UUIDField(), label=_('Approve system users')
     )
     approve_actions = ActionsField(
-        required=False, choices=Action.DB_CHOICES, default=Action.ALL
+        required=True
     )
     approve_date_start = serializers.DateTimeField(
         required=True, label=_('Date start')

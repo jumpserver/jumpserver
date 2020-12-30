@@ -75,7 +75,6 @@ class Ticket(TicketModelMixin, CommonModelMixin, OrgModelMixin):
     def __str__(self):
         return '{}({})'.format(self.title, self.applicant_display)
 
-
     def has_assignee(self, assignee):
         return self.assignees.filter(id=assignee.id).exists()
 
