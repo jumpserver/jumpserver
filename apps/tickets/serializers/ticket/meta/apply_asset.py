@@ -2,16 +2,20 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from perms.serializers import ActionsField
 from assets.models import Asset, SystemUser
-from .base import BaseTicketMetaSerializer, BaseTicketMetaApproveSerializerMixin
+from .base import BaseTicketMetaApproveSerializerMixin
+from tickets.models import Ticket
+
+from common.fields.serializer import JSONFieldModelSerializer
 
 
 __all__ = [
+    'TicketMetaApplyAssetSerializer',
     'TicketMetaApplyAssetApplySerializer',
     'TicketMetaApplyAssetApproveSerializer',
 ]
 
 
-class TicketMetaApplyAssetSerializer(BaseTicketMetaSerializer):
+class TicketMetaApplyAssetSerializer(JSONFieldModelSerializer):
     # 申请信息
     apply_ip_group = serializers.ListField(
         required=False, child=serializers.IPAddressField(), label=_('IP group'),
@@ -71,28 +75,46 @@ class TicketMetaApplyAssetSerializer(BaseTicketMetaSerializer):
         required=True, label=_('Date expired')
     )
 
-
-class TicketMetaApplyAssetApplySerializer(TicketMetaApplyAssetSerializer):
-
     class Meta:
+        model = Ticket
+        model_field = Ticket.meta
         fields = [
             'apply_ip_group',
             'apply_hostname_group', 'apply_system_user_group',
             'apply_actions', 'apply_actions_display',
             'apply_date_start', 'apply_date_expired',
-        ]
 
-
-class TicketMetaApplyAssetApproveSerializer(BaseTicketMetaApproveSerializerMixin,
-                                            TicketMetaApplyAssetSerializer):
-
-    class Meta:
-        fields = [
             'approve_assets', 'approve_assets_snapshot',
             'approve_system_users', 'approve_system_users_snapshot',
             'approve_actions', 'approve_actions_display',
             'approve_date_start', 'approve_date_expired',
         ]
+        read_only_fields = fields
+
+
+class TicketMetaApplyAssetApplySerializer(TicketMetaApplyAssetSerializer):
+
+    class Meta(TicketMetaApplyAssetSerializer.Meta):
+        required_fields = [
+            'apply_ip_group', 'apply_hostname_group', 'apply_system_user_group',
+            'apply_actions', 'apply_date_start', 'apply_date_expired',
+        ]
+        read_only_fields = list(
+            set(TicketMetaApplyAssetSerializer.Meta.fields) - set(required_fields)
+        )
+
+
+class TicketMetaApplyAssetApproveSerializer(BaseTicketMetaApproveSerializerMixin,
+                                            TicketMetaApplyAssetSerializer):
+
+    class Meta(TicketMetaApplyAssetSerializer.Meta):
+        required_fields = [
+            'approve_assets', 'approve_system_users', 'approve_actions',
+            'approve_date_start', 'approve_date_expired',
+        ]
+        read_only_fields = list(
+            set(TicketMetaApplyAssetSerializer.Meta.fields) - set(required_fields)
+        )
 
     def validate_approve_assets(self, approve_assets):
         assets_id = self.filter_approve_resources(resource_model=Asset, resources_id=approve_assets)

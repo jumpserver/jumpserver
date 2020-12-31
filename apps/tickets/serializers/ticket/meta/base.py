@@ -1,27 +1,11 @@
+import copy
 from collections import OrderedDict
 from rest_framework import serializers
+from rest_framework.serializers import ALL_FIELDS
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.utils import tmp_to_org
 from assets.models import SystemUser
-
-
-class BaseTicketMetaSerializer(serializers.Serializer):
-
-    class Meta:
-        fields = '__all__'
-
-    def get_fields(self):
-        fields = super().get_fields()
-        required_fields = self.Meta.fields
-        if required_fields == '__all__':
-            return fields
-
-        fields = OrderedDict({
-            field_name: fields.pop(field_name) for field_name in set(required_fields)
-            if field_name in fields.keys()
-        })
-        return fields
 
 
 class BaseTicketMetaApproveSerializerMixin:

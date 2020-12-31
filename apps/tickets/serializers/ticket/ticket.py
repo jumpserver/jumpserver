@@ -92,8 +92,7 @@ class TicketApplySerializer(TicketActionSerializer):
             raise serializers.ValidationError(error)
         return valid_assignees
 
-    @staticmethod
-    def validate_action(action):
+    def validate_action(self, action):
         return const.TicketActionChoices.open.value
 
 
@@ -123,15 +122,13 @@ class TicketApproveSerializer(TicketProcessSerializer):
 
 class TicketRejectSerializer(TicketProcessSerializer):
 
-    @staticmethod
-    def validate_action(action):
+    def validate_action(self, action):
         return const.TicketActionChoices.reject.value
 
 
 class TicketCloseSerializer(TicketProcessSerializer):
 
-    @staticmethod
-    def validate_action(action):
+    def validate_action(self, action):
         return const.TicketActionChoices.close.value
 
 

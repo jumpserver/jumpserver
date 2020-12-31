@@ -1,14 +1,15 @@
 
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
-from .base import BaseTicketMetaSerializer
+from common.fields.serializer import JSONFieldModelSerializer
+from tickets.models import Ticket
 
 __all__ = [
-    'TicketMetaLoginConfirmApplySerializer',
+    'TicketMetaLoginConfirmSerializer', 'TicketMetaLoginConfirmApplySerializer',
 ]
 
 
-class TicketMetaLoginConfirmSerializer(BaseTicketMetaSerializer):
+class TicketMetaLoginConfirmSerializer(JSONFieldModelSerializer):
     apply_login_ip = serializers.IPAddressField(
         required=True, label=_('Login ip')
     )
@@ -19,6 +20,21 @@ class TicketMetaLoginConfirmSerializer(BaseTicketMetaSerializer):
         required=True, label=_('Login datetime')
     )
 
+    class Meta:
+        model = Ticket
+        model_field = Ticket.meta
+        fields = [
+            'apply_login_ip', 'apply_login_city', 'apply_login_datetime'
+        ]
+        read_only_fields = fields
+
 
 class TicketMetaLoginConfirmApplySerializer(TicketMetaLoginConfirmSerializer):
-    pass
+
+    class Meta(TicketMetaLoginConfirmSerializer.Meta):
+        required_fields = [
+            'apply_login_ip', 'apply_login_city', 'apply_login_datetime'
+        ]
+        read_only_fields = list(
+            set(TicketMetaLoginConfirmSerializer.Meta.fields) - set(required_fields)
+        )
