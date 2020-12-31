@@ -65,8 +65,8 @@ class Ticket(TicketModelMixin, CommonModelMixin, OrgModelMixin):
     assignees = models.ManyToManyField(
         'users.User', related_name='assigned_tickets', verbose_name=_("Assignees")
     )
-    assignees_display = models.TextField(
-        blank=True, default='No', verbose_name=_("Assignees display")
+    assignees_display = models.JSONField(
+        encoder=ModelJSONFieldEncoder, default=list, verbose_name=_('Assignees display')
     )
     # 评论
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))

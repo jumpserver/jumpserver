@@ -10,8 +10,7 @@ class SetDisplayFieldMixin:
 
     def set_assignees_display(self):
         if self.has_applied:
-            assignees_display = [str(assignee) for assignee in self.assignees.all()]
-            self.assignees_display = ', '.join(assignees_display)
+            self.assignees_display = [str(assignee) for assignee in self.assignees.all()]
 
     def set_processor_display(self):
         if self.has_processed:

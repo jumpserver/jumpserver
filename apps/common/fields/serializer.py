@@ -139,7 +139,7 @@ class JSONFieldModelSerializer(serializers.Serializer):
     """ Model JSONField Serializer"""
 
     def __init__(self, *args, **kwargs):
-        mode_field = getattr(self.Meta, 'model_field')
+        mode_field = getattr(self.Meta, 'model_field', None)
         if mode_field:
             kwargs['label'] = mode_field.field.verbose_name
         super().__init__(*args, **kwargs)
