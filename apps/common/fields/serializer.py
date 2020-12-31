@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 #
 
+import copy
+from collections import OrderedDict
+from rest_framework.serializers import ALL_FIELDS
 from rest_framework import serializers
 import six
 
 
 __all__ = [
     'StringIDField', 'StringManyToManyField', 'ChoiceDisplayField',
-    'CustomMetaDictField', 'ReadableHiddenField',
+    'CustomMetaDictField', 'ReadableHiddenField', 'JSONFieldModelSerializer'
 ]
 
 
@@ -130,3 +133,184 @@ class CustomMetaDictField(serializers.DictField):
         value = self.filter_value_key(dictionary, value)
         value = self.strip_value(value)
         return value
+
+
+class JSONFieldModelSerializer(serializers.Serializer):
+    """ Model JSONField Serializer"""
+
+    def __init__(self, *args, **kwargs):
+        mode_field = getattr(self.Meta, 'model_field')
+        if mode_field:
+            kwargs['label'] = mode_field.field.verbose_name
+        super().__init__(*args, **kwargs)
+
+    class Meta:
+        model = None
+        model_field = None
+        fields = None
+        exclude = None
+
+    def get_fields(self):
+        assert hasattr(self, 'Meta'), (
+            'Class {serializer_class} missing "Meta" attribute'.format(
+                serializer_class=self.__class__.__name__
+            )
+        )
+        assert hasattr(self.Meta, 'model'), (
+            'Class {serializer_class} missing "Meta.model" attribute'.format(
+                serializer_class=self.__class__.__name__
+            )
+        )
+        model_fields_mapping = {field.name: field for field in self.Meta.model._meta.fields}
+        assert hasattr(self.Meta, 'model_field'), (
+            'Class {serializer_class} missing "Meta.model_field" attribute'.format(
+                serializer_class=self.__class__.__name__
+            )
+        )
+
+        assert self.Meta.model_field.field.name in model_fields_mapping.keys(), (
+            'Class {serializer_class} "Meta.model_field" attribute not in  '
+            '"Meta.model._meta.fields"'.format(
+                serializer_class=self.__class__.__name__,
+            )
+        )
+
+        declared_fields = copy.deepcopy(self._declared_fields)
+
+        read_only_field_names = self.get_read_only_field_names()
+
+        field_names = self.get_field_names(declared_fields)
+
+        fields = OrderedDict()
+        for field_name in field_names:
+            if field_name not in declared_fields:
+                continue
+            field = declared_fields[field_name]
+            if field_name in read_only_field_names:
+                setattr(field, 'read_only', True)
+            fields[field_name] = field
+        return fields
+
+    def get_field_names(self, declared_fields):
+        """
+        Returns the list of all field names that should be created when
+        instantiating this serializer class. This is based on the default
+        set of fields, but also takes into account the `Meta.fields` or
+        `Meta.exclude` options if they have been specified.
+        """
+
+        fields = getattr(self.Meta, 'fields', None)
+        exclude = getattr(self.Meta, 'exclude', None)
+
+        if fields and fields != ALL_FIELDS and not isinstance(fields, (list, tuple)):
+            raise TypeError(
+                'The `fields` option must be a list or tuple or "__all__". '
+                'Got %s.' % type(fields).__name__
+            )
+
+        if exclude and not isinstance(exclude, (list, tuple)):
+            raise TypeError(
+                'The `exclude` option must be a list or tuple. Got %s.' %
+                type(exclude).__name__
+            )
+
+        assert not (fields and exclude), (
+            "Cannot set both 'fields' and 'exclude' options on "
+            "serializer {serializer_class}.".format(
+                serializer_class=self.__class__.__name__
+            )
+        )
+
+        assert not (fields is None and exclude is None), (
+            "Creating a ModelSerializer without either the 'fields' attribute "
+            "or the 'exclude' attribute has been deprecated since 3.3.0, "
+            "and is now disallowed. Add an explicit fields = '__all__' to the "
+            "{serializer_class} serializer.".format(
+                serializer_class=self.__class__.__name__
+            ),
+        )
+
+        if fields == ALL_FIELDS:
+            fields = None
+
+        if fields is not None:
+            # Ensure that all declared fields have also been included in the
+            # `Meta.fields` option.
+
+            # Do not require any fields that are declared in a parent class,
+            # in order to allow serializer subclasses to only include
+            # a subset of fields.
+            required_field_names = set(declared_fields)
+            for cls in self.__class__.__bases__:
+                required_field_names -= set(getattr(cls, '_declared_fields', []))
+
+            for field_name in required_field_names:
+                assert field_name in fields, (
+                    "The field '{field_name}' was declared on serializer "
+                    "{serializer_class}, but has not been included in the "
+                    "'fields' option.".format(
+                        field_name=field_name,
+                        serializer_class=self.__class__.__name__
+                    )
+                )
+            return fields
+
+        # Use the default set of field names if `Meta.fields` is not specified.
+        fields = self.get_default_field_names(declared_fields)
+
+        if exclude is not None:
+            # If `Meta.exclude` is included, then remove those fields.
+            for field_name in exclude:
+                assert field_name not in self._declared_fields, (
+                    "Cannot both declare the field '{field_name}' and include "
+                    "it in the {serializer_class} 'exclude' option. Remove the "
+                    "field or, if inherited from a parent serializer, disable "
+                    "with `{field_name} = None`."
+                    .format(
+                        field_name=field_name,
+                        serializer_class=self.__class__.__name__
+                    )
+                )
+
+                assert field_name in fields, (
+                    "The field '{field_name}' was included on serializer "
+                    "{serializer_class} in the 'exclude' option, but does "
+                    "not match any model field.".format(
+                        field_name=field_name,
+                        serializer_class=self.__class__.__name__
+                    )
+                )
+                fields.remove(field_name)
+        return fields
+
+    @staticmethod
+    def get_default_field_names(declared_fields):
+        return declared_fields
+
+    def get_read_only_field_names(self):
+        read_only_fields = getattr(self.Meta, 'read_only_fields', None)
+        if read_only_fields is not None:
+            if not isinstance(read_only_fields, (list, tuple)):
+                raise TypeError(
+                    'The `read_only_fields` option must be a list or tuple. '
+                    'Got %s.' % type(read_only_fields).__name__
+                )
+        return read_only_fields
+
+    def to_internal_value(self, data):
+        return super().to_internal_value(data)
+
+    def to_representation(self, instance):
+        if not isinstance(instance, dict):
+            return super().to_representation(instance)
+        for field_name, field in self.fields.items():
+            if field_name in instance:
+                continue
+            if field.allow_null:
+                continue
+            setattr(field, 'allow_null', True)
+        return super().to_representation(instance)
+
+
+
+

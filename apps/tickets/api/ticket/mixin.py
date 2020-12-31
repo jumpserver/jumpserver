@@ -1,11 +1,10 @@
-from common.exceptions import JMSException
 from tickets import const, serializers
 
 
-__all__ = ['TicketJSONFieldsSerializerViewMixin']
+__all__ = ['TicketJSONFieldsModelSerializerViewMixin']
 
 
-class TicketJSONFieldsSerializerViewMixin:
+class TicketJSONFieldsModelSerializerViewMixin:
     json_fields_category_mapping = {
         'meta': {
             'type': const.TicketTypeChoices.values,
@@ -15,30 +14,18 @@ class TicketJSONFieldsSerializerViewMixin:
         'meta': {
             'type': {
                 const.TicketTypeChoices.apply_asset.value: {
-                    'open': {
-                        'class': serializers.TicketMetaApplyAssetApplySerializer,
-                        'attrs': {'required': True}
-                    },
-                    'approve': {
-                        'class': serializers.TicketMetaApplyAssetApproveSerializer,
-                        'attrs': {'required': True}
-                    }
+                    'default': serializers.TicketMetaApplyAssetSerializer,
+                    'open': serializers.TicketMetaApplyAssetApplySerializer,
+                    'approve': serializers.TicketMetaApplyAssetApproveSerializer
                 },
                 const.TicketTypeChoices.apply_application.value: {
-                    'open': {
-                        'class': serializers.TicketMetaApplyApplicationApplySerializer,
-                        'attrs': {'required': True}
-                    },
-                    'approve': {
-                        'class': serializers.TicketMetaApplyApplicationApproveSerializer,
-                        'attrs': {'required': True}
-                    }
+                    'default': serializers.TicketMetaApplyApplicationSerializer,
+                    'open': serializers.TicketMetaApplyApplicationApplySerializer,
+                    'approve':  serializers.TicketMetaApplyApplicationApproveSerializer,
                 },
                 const.TicketTypeChoices.login_confirm.value: {
-                    'open': {
-                        'class': serializers.TicketMetaLoginConfirmApplySerializer,
-                        'attrs': {'required': True}
-                    }
+                    'default': serializers.TicketMetaLoginConfirmSerializer,
+                    'open': serializers.TicketMetaLoginConfirmApplySerializer
                 }
             }
         }
