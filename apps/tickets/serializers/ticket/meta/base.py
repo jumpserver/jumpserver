@@ -1,42 +1,104 @@
 import copy
-from collections import OrderedDict
 from rest_framework import serializers
-from rest_framework.serializers import ALL_FIELDS
 from django.utils.translation import ugettext_lazy as _
 
-from orgs.utils import tmp_to_org
-from assets.models import SystemUser
+from common.exceptions import JMSException
+from tickets import const
+from . import apply_asset, apply_application, login_confirm
+
+__all__ = [
+    'meta_dynamic_mapping_fields_mapping_rules',
+    'get_meta_field_mapping_rule_by_view',
+]
+
+#
+# ticket type
+# -----------
 
 
-class BaseTicketMetaApproveSerializerMixin:
+types = const.TicketTypeChoices.values
+type_apply_asset = const.TicketTypeChoices.apply_asset.value
+type_apply_application = const.TicketTypeChoices.apply_application.value
+type_login_confirm = const.TicketTypeChoices.login_confirm.value
 
-    def _filter_approve_resources_by_org(self, model, resources_id):
-        with tmp_to_org(self.root.instance.org_id):
-            org_resources = model.objects.filter(id__in=resources_id)
-        if not org_resources:
-            error = _('None of the approved `{}` belong to Organization `{}`'
-                      ''.format(model.__name__, self.root.instance.org_name))
-            raise serializers.ValidationError(error)
-        return org_resources
+#
+# ticket type
+# -----------
 
-    @staticmethod
-    def _filter_approve_resources_by_queries(model, resources, queries=None):
-        if queries:
-            resources = resources.filter(**queries)
-        if not resources:
-            error = _('None of the approved `{}` does not comply with the filtering rules `{}`'
-                      ''.format(model.__name__, queries))
-            raise serializers.ValidationError(error)
-        return resources
 
-    def filter_approve_resources(self, resource_model, resources_id, queries=None):
-        resources = self._filter_approve_resources_by_org(resource_model, resources_id)
-        resources = self._filter_approve_resources_by_queries(resource_model, resources, queries)
-        resources_id = list(resources.values_list('id', flat=True))
-        return resources_id
+actions = const.TicketActionChoices.values
+action_open = const.TicketActionChoices.open.value
+action_approve = const.TicketActionChoices.approve.value
+action_reject = const.TicketActionChoices.reject.value
+action_close = const.TicketActionChoices.close.value
 
-    def filter_approve_system_users(self, system_users_id, queries=None):
-        system_users_id = self.filter_approve_resources(
-            resource_model=SystemUser, resources_id=system_users_id, queries=queries
-        )
-        return system_users_id
+
+#
+# define meta field `DynamicMappingField` mapping_rules
+# -----------------------------------------------------
+
+
+meta_dynamic_mapping_fields_mapping_rules = {
+    'default': serializers.ReadOnlyField,
+    'type': {
+        type_apply_asset: {
+            action_open: apply_asset.ApplySerializer,
+            action_approve: apply_asset.ApproveSerializer,
+        },
+        type_apply_application: {
+            action_open: apply_application.ApplySerializer,
+            action_approve: apply_application.ApproveSerializer,
+        },
+        type_login_confirm: {
+            action_open: login_confirm.ApplySerializer,
+        }
+    }
+}
+
+
+#
+# get meta dynamic field mapping rule by view
+# -------------------------------------------
+
+
+def get_meta_field_mapping_rule_by_view(view):
+    mapping_rules = copy.deepcopy(meta_dynamic_mapping_fields_mapping_rules)
+    request = view.request
+
+    # type
+    tp = request.query_params.get('type')
+    if not tp:
+        return ['default']
+    if tp not in types:
+        error = _('Query parameter `type` ({}) not in choices: {}'.format(tp, types))
+        raise JMSException(error)
+    if tp not in mapping_rules['type']:
+        return ['default']
+
+    # action
+    action = view.action
+    if action in ['metadata']:
+        # options
+        action = request.query_params.get('action')
+        if not action:
+            error = _('Please carry query parameter `action`')
+            raise JMSException(error)
+        if action not in actions:
+            error = _('Query parameter `action` ({}) not in choices: {}'.format(action, actions))
+            raise JMSException(error)
+        if action not in mapping_rules['type'][tp]:
+            return ['default']
+
+    # display
+    if action in ['list', 'retrieve']:
+        return ['default']
+
+    if not mapping_rules['type'][tp].get(action):
+        return ['default']
+
+    return ['type', tp, action]
+
+
+
+
+

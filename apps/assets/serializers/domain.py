@@ -3,7 +3,7 @@
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
-from common.serializers import AdaptedBulkListSerializer
+from common.drf.serializers import AdaptedBulkListSerializer
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.validators import NoSpecialChars
 from ..models import Domain, Gateway

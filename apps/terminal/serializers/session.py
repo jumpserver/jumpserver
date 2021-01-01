@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from django.utils.translation import ugettext_lazy as _
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-from common.serializers import AdaptedBulkListSerializer
+from common.drf.serializers import AdaptedBulkListSerializer
 from ..models import Session
 
 __all__ = [

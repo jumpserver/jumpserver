@@ -3,7 +3,7 @@
 import copy
 from rest_framework import serializers
 
-from common.fields.serializer import CustomMetaDictField
+from common.drf.fields import CustomMetaDictField
 from ..models import ReplayStorage, CommandStorage
 from .. import const
 

@@ -55,6 +55,13 @@ def migrate_field_action(old_action, old_status):
         return ACTION_CLOSE
 
 
+def migrate_field_assignees_display(assignees_display):
+    if not assignees_display:
+        return []
+    assignees_display = assignees_display.split(', ')
+    return assignees_display
+
+
 def migrate_tickets_fields_name(apps, schema_editor):
     ticket_model = apps.get_model("tickets", "Ticket")
     tickets = ticket_model.origin_objects.all()
@@ -64,6 +71,7 @@ def migrate_tickets_fields_name(apps, schema_editor):
         ticket.applicant_display = ticket.user_display
         ticket.processor = ticket.assignee
         ticket.processor_display = ticket.assignee_display
+        ticket.assignees_display_new = migrate_field_assignees_display(ticket.assignees_display)
         ticket.action = migrate_field_action(ticket.action, ticket.status)
         ticket.type = migrate_field_type(ticket.type)
         ticket.meta = migrate_field_meta(ticket.type, ticket.meta)
@@ -100,15 +108,15 @@ class Migration(migrations.Migration):
             name='processor_display',
             field=models.CharField(blank=True, default='No', max_length=256, null=True, verbose_name='Processor display'),
         ),
+        migrations.AddField(
+            model_name='ticket',
+            name='assignees_display_new',
+            field=models.JSONField(default=list, encoder=tickets.models.ticket.model.ModelJSONFieldEncoder, verbose_name='Assignees display'),
+        ),
         migrations.AlterField(
             model_name='ticket',
             name='assignees',
             field=models.ManyToManyField(related_name='assigned_tickets', to=settings.AUTH_USER_MODEL, verbose_name='Assignees'),
-        ),
-        migrations.AlterField(
-            model_name='ticket',
-            name='assignees_display',
-            field=models.TextField(blank=True, default='No', verbose_name='Assignees display'),
         ),
         migrations.AlterField(
             model_name='ticket',
@@ -150,6 +158,15 @@ class Migration(migrations.Migration):
         migrations.RemoveField(
             model_name='ticket',
             name='body',
+        ),
+        migrations.RemoveField(
+            model_name='ticket',
+            name='assignees_display',
+        ),
+        migrations.RenameField(
+            model_name='ticket',
+            old_name='assignees_display_new',
+            new_name='assignees_display',
         ),
         migrations.AlterModelManagers(
             name='ticket',

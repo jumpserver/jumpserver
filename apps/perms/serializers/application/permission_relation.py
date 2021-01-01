@@ -3,7 +3,7 @@
 from rest_framework import serializers
 
 from common.mixins import BulkSerializerMixin
-from common.serializers import AdaptedBulkListSerializer
+from common.drf.serializers import AdaptedBulkListSerializer
 from perms.models import ApplicationPermission
 
 __all__ = [

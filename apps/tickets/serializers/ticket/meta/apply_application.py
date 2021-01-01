@@ -3,18 +3,14 @@ from django.utils.translation import ugettext_lazy as _
 
 from applications.models import Category, Application
 from assets.models import SystemUser
-from .base import BaseTicketMetaApproveSerializerMixin
-from common.fields.serializer import JSONFieldModelSerializer
-from tickets.models import Ticket
+from .mixin import BaseApproveSerializerMixin
 
 __all__ = [
-    'TicketMetaApplyApplicationSerializer',
-    'TicketMetaApplyApplicationApplySerializer',
-    'TicketMetaApplyApplicationApproveSerializer',
+    'ApplyApplicationTypeSerializer', 'ApplySerializer', 'ApproveSerializer',
 ]
 
 
-class TicketMetaApplyApplicationSerializer(JSONFieldModelSerializer):
+class ApplySerializer(serializers.Serializer):
     # 申请信息
     apply_category = serializers.ChoiceField(
         required=True, choices=Category.choices, label=_('Category')
@@ -42,6 +38,19 @@ class TicketMetaApplyApplicationSerializer(JSONFieldModelSerializer):
     apply_date_expired = serializers.DateTimeField(
         required=True, label=_('Date expired')
     )
+
+    def validate_apply_type(self, tp):
+        category = self.root.initial_data['meta'].get('apply_category')
+        if not category:
+            return tp
+        valid_type_types = list((dict(Category.get_type_choices(category)).keys()))
+        if tp in valid_type_types:
+            return tp
+        error = _('Type `{}`  is not a valid choice `({}){}`'.format(tp, category, valid_type_types))
+        raise serializers.ValidationError(error)
+
+
+class ApproveSerializer(BaseApproveSerializerMixin, serializers.Serializer):
     # 审批信息
     approve_applications = serializers.ListField(
         required=True, child=serializers.UUIDField(), label=_('Approve applications')
@@ -66,57 +75,6 @@ class TicketMetaApplyApplicationSerializer(JSONFieldModelSerializer):
         required=True, label=_('Date expired')
     )
 
-    class Meta:
-        model = Ticket
-        model_field = Ticket.meta
-        fields = [
-            'apply_category', 'apply_category_display',
-            'apply_type', 'apply_type_display',
-            'apply_application_group', 'apply_system_user_group',
-            'apply_date_start', 'apply_date_expired',
-
-            'approve_applications', 'approve_applications_snapshot',
-            'approve_system_users', 'approve_system_users_snapshot',
-            'approve_date_start', 'approve_date_expired'
-        ]
-        read_only_fields = fields
-
-
-class TicketMetaApplyApplicationApplySerializer(TicketMetaApplyApplicationSerializer):
-
-    class Meta(TicketMetaApplyApplicationSerializer.Meta):
-        required_fields = [
-            'apply_category', 'apply_type',
-            'apply_application_group', 'apply_system_user_group',
-            'apply_date_start', 'apply_date_expired',
-        ]
-        read_only_fields = list(
-            set(TicketMetaApplyApplicationSerializer.Meta.fields) - set(required_fields)
-        )
-
-    def validate_apply_type(self, tp):
-        category = self.root.initial_data['meta'].get('apply_category')
-        if not category:
-            return tp
-        valid_type_types = list((dict(Category.get_type_choices(category)).keys()))
-        if tp in valid_type_types:
-            return tp
-        error = _('Type `{}`  is not a valid choice `({}){}`'.format(tp, category, valid_type_types))
-        raise serializers.ValidationError(error)
-
-
-class TicketMetaApplyApplicationApproveSerializer(BaseTicketMetaApproveSerializerMixin,
-                                                  TicketMetaApplyApplicationSerializer):
-
-    class Meta:
-        required_fields = {
-            'approve_applications', 'approve_system_users',
-            'approve_date_start', 'approve_date_expired'
-        }
-        read_only_fields = list(
-            set(TicketMetaApplyApplicationSerializer.Meta.fields) - set(required_fields)
-        )
-
     def validate_approve_applications(self, approve_applications):
         application_type = self.root.instance.meta['apply_type']
         queries = {'type': application_type}
@@ -131,3 +89,9 @@ class TicketMetaApplyApplicationApproveSerializer(BaseTicketMetaApproveSerialize
         queries = {'protocol': protocol}
         system_users_id = self.filter_approve_system_users(approve_system_users, queries)
         return system_users_id
+
+
+class ApplyApplicationTypeSerializer(ApplySerializer, ApproveSerializer):
+    pass
+
+

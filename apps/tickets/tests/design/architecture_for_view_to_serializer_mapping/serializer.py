@@ -1,17 +1,5 @@
-import copy
+import data_tree
 from rest_framework import serializers
-from rest_framework.serializers import Serializer
-from rest_framework.serializers import ModelSerializer
-from rest_framework_bulk.serializers import BulkListSerializer
-
-from common.mixins import BulkListSerializerMixin
-from common.drf.fields import DynamicMappingField
-from common.mixins.serializers import BulkSerializerMixin
-
-__all__ = [
-    'IncludeDynamicMappingFieldSerializerMetaClass',
-    'EmptySerializer', 'BulkModelSerializer', 'AdaptedBulkListSerializer', 'CeleryTaskSerializer'
-]
 
 
 #
@@ -135,23 +123,102 @@ class IncludeDynamicMappingFieldSerializerMetaClass(serializers.SerializerMetacl
         return super().__new__(mcs, name, bases, attrs)
 
 #
-# Other Serializer
-# ----------------
+# DynamicMappingField
+# ----------------------------------
+
+class DynamicMappingField(serializers.Field):
+    """ 一个根据用户行为而动态匹配的字段 """
+
+    def __init__(self, mapping_rules, *args, **kwargs):
+
+        assert isinstance(mapping_rules, dict), (
+            '`mapping_rule` argument expect type `dict`, gut get `{}`'
+            ''.format(type(mapping_rules))
+        )
+
+        assert 'default' in mapping_rules, (
+            "mapping_rules['default'] is a required, but only get `{}`"
+            "".format(list(mapping_rules.keys()))
+        )
+
+        self.mapping_rules = mapping_rules
+
+        self.mapping_tree = self._build_mapping_tree()
+
+        super().__init__(*args, **kwargs)
+
+    def _build_mapping_tree(self):
+        tree = data_tree.Data_tree_node(arg_data=self.mapping_rules)
+        return tree
+
+    def to_internal_value(self, data):
+        """ 实际是一个虚拟字段所以不返回任何值 """
+        pass
+
+    def to_representation(self, value):
+        """ 实际是一个虚拟字段所以不返回任何值 """
+        pass
 
 
-class EmptySerializer(Serializer):
-    pass
+#
+# Test data
+# ----------------------------------
 
 
-class BulkModelSerializer(BulkSerializerMixin, ModelSerializer):
-    pass
+# ticket type
+class ApplyAssetSerializer(serializers.Serializer):
+    apply_asset = serializers.CharField(label='Apply Asset')
 
 
-class AdaptedBulkListSerializer(BulkListSerializerMixin, BulkListSerializer):
-    pass
+class ApproveAssetSerializer(serializers.Serializer):
+    approve_asset = serializers.CharField(label='Approve Asset')
 
 
-class CeleryTaskSerializer(serializers.Serializer):
-    task = serializers.CharField(read_only=True)
+class ApplyApplicationSerializer(serializers.Serializer):
+    apply_application = serializers.CharField(label='Application')
 
+
+class LoginConfirmSerializer(serializers.Serializer):
+    login_ip = serializers.IPAddressField()
+
+
+class LoginTimesSerializer(serializers.Serializer):
+    login_times = serializers.IntegerField()
+
+
+# ticket category
+class ApplySerializer(serializers.Serializer):
+    apply_datetime = serializers.DateTimeField()
+
+
+class LoginSerializer(serializers.Serializer):
+    login_datetime = serializers.DateTimeField()
+
+
+meta_mapping_rules = {
+    'default': serializers.JSONField(),
+    'type': {
+        'apply_asset': {
+            'default': serializers.CharField(label='default'),
+            'get': ApplyAssetSerializer,
+            'post': ApproveAssetSerializer,
+        },
+        'apply_application': ApplyApplicationSerializer,
+        'login_confirm': LoginConfirmSerializer,
+        'login_times': LoginTimesSerializer
+    },
+    'category': {
+        'apply': ApplySerializer,
+        'login': LoginSerializer
+    }
+}
+
+
+class TicketSerializer(serializers.Serializer):
+    title = serializers.CharField(label='Title')
+    type = serializers.ChoiceField(choices=('apply_asset', 'apply_application'), label='Type')
+    meta1 = DynamicMappingField(mapping_rules=meta_mapping_rules)
+    meta2 = DynamicMappingField(mapping_rules=meta_mapping_rules)
+    meta3 = DynamicMappingField(mapping_rules=meta_mapping_rules)
+    meta4 = DynamicMappingField(mapping_rules=meta_mapping_rules)
 

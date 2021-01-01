@@ -5,7 +5,7 @@ from rest_framework import serializers
 from django.db.models import F
 
 from common.mixins import BulkSerializerMixin
-from common.serializers import AdaptedBulkListSerializer
+from common.drf.serializers import AdaptedBulkListSerializer
 from terminal.models import Session
 from ops.models import CommandExecution
 from . import models

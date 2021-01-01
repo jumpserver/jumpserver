@@ -7,15 +7,13 @@ from collections import defaultdict
 from itertools import chain
 
 from django.db.models.signals import m2m_changed
-from django.utils.translation import ugettext_lazy as _
 from django.core.cache import cache
 from django.http import JsonResponse
-from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
-from common.exceptions import JMSException
 
 from common.drf.filters import IDSpmFilter, CustomFilter, IDInFilter
+from common.drf.serializers import IncludeDynamicMappingFieldSerializerMetaClass
 from ..utils import lazyproperty
 
 __all__ = [
@@ -31,7 +29,14 @@ class JSONResponseMixin(object):
         return JsonResponse(context)
 
 
+#
+# GenericSerializerMixin
+# ----------------------
+
+
 class GenericSerializerMixin:
+    """ 根据用户请求动作的不同，获取不同的 `serializer_class `"""
+
     serializer_classes = None
 
     def get_serializer_class_by_view_action(self):
@@ -39,12 +44,16 @@ class GenericSerializerMixin:
             return None
         if not isinstance(self.serializer_classes, dict):
             return None
-        draw = self.request.query_params.get('draw')
+        action = self.request.query_params.get('action')
+
         serializer_class = None
-        if draw and self.action in ['list', 'metadata']:
-            serializer_class = self.serializer_classes.get('display')
+        if action:
+            # metadata方法 使用 action 参数获取
+            serializer_class = self.serializer_classes.get(action)
         if serializer_class is None:
             serializer_class = self.serializer_classes.get(self.action)
+        if serializer_class is None:
+            serializer_class = self.serializer_classes.get('display')
         if serializer_class is None:
             serializer_class = self.serializer_classes.get('default')
         return serializer_class
@@ -56,156 +65,59 @@ class GenericSerializerMixin:
         return serializer_class
 
 
-class JSONFieldsModelSerializerMixin:
+#
+# IncludeDynamicMappingFieldSerializerViewMixin
+# ---------------------------------------------
+
+
+class IncludeDynamicMappingFieldSerializerViewMixin(GenericSerializerMixin):
     """
-    作用: 获取包含 JSONField 字段的序列类
+    动态创建 `view` 使用的 `serializer_class`,
 
-    class TestSerializer(serializers.Serializer):
-        pass
+    根据用户请求行为的不同, 构造出获取 `serializer_class` 中 `common.drf.fields.DynamicMappingField` 字段
+    的映射规则, 并通过 `IncludeDynamicMappingFieldSerializerMetaClass` 元类，
+    基于父类的 `serializer_class` 和 构造出的映射规则 `dynamic_mapping_fields_mapping_rule`
+    创建出满足要求的新的 `serializer_class`
 
-    json_fields_category_mapping = {
-        'json_field_1': {
-            'type': ('apply_asset', 'apply_application', 'login_confirm', ),
-        },
-        'json_field_2': {
-            'type': ('chrome', 'mysql', 'oracle', 'k8s', ),
-            'category': ('remote_app', 'db', 'cloud', ),
-        },
-    }
-    json_fields_serializer_classes = {
-        'json_field_1': {
-            'type': {
-                'apply_asset': {
-                    'get': TestSerializer,
-                    'post': TestSerializer,
-                    'open':TestSerializer,
-                    'approve': TestSerializer,
-                },
-                'apply_application': {
-                    'get': TestSerializer,
-                    'post': TestSerializer,
-                    'put': TestSerializer,
-                },
-                'login_confirm': {
-                    'get': TestSerializer,
-                    'post': TestSerializer,
-                    'put': TestSerializer,
-                }
-            },
-            'category': {}
-        },
-        'json_field_2': {},
-        'json_field_3': {}
-    }
+    * 重写 get_dynamic_mapping_fields_mapping_rule 方法:
+
+    For example,
+
+    def  get_dynamic_mapping_fields_mapping_rule(self):
+        return {'meta': ['type', 'apply_asset', 'get']
+
     """
 
-    json_fields_category_mapping = {}
-    json_fields_serializer_classes = None
-
-    # 保存当前处理的JSONField名称
-    __field = None
-    serializer_class = None
-
-    def get_json_field_query_category(self, category):
-        query_category = self.request.query_params.get(category)
-        category_choices = self.json_fields_category_mapping[self.__field][category]
-        if query_category and query_category not in category_choices:
-            error = _(
-                'Please bring the query parameter `{}`, '
-                'the value is selected from the following options: {}'
-                ''.format(query_category, category_choices)
-            )
-            raise JMSException({'query_params_error': error})
-        return query_category
-
-    def get_json_field_action_serializer_classes_by_query_category(self):
-        action_serializer_classes = None
-        category_collection = self.json_fields_category_mapping[self.__field]
-        for category in category_collection:
-            category_value = self.get_json_field_query_category(category)
-            if not category_value:
-                continue
-            category_serializer_classes = self.json_fields_serializer_classes[self.__field][category]
-            action_serializer_classes = category_serializer_classes.get(category_value)
-            if action_serializer_classes:
-                break
-        return action_serializer_classes
-
-    def get_json_field_action_serializer_classes(self):
-        category_collection = self.json_fields_category_mapping[self.__field]
-        if category_collection:
-            serializer_classes = self.get_json_field_action_serializer_classes_by_query_category()
-        else:
-            serializer_classes = self.json_fields_serializer_classes[self.__field]
-        return serializer_classes
-
-    def get_json_field_serializer_class_by_action(self, serializer_classes):
-        if serializer_classes is None:
-            return None
-        if self.action in ['metadata']:
-            action = self.request.query_params.get('action')
-            if not action:
-                raise JMSException('The `metadata` methods must carry query parameter `action`')
-        else:
-            action = self.action
-        serializer_class = serializer_classes.get(action)
-        return serializer_class
-
-    @lazyproperty
-    def default_json_field_serializer_class(self):
-        readonly_json_field_serializer_class = type(
-            'DefaultReadonlyJSONFieldSerializer', (serializers.JSONField,),
-        )
-        return readonly_json_field_serializer_class
-
-    def get_json_field_serializer(self):
-        serializer_classes = self.get_json_field_action_serializer_classes()
-        serializer_class = self.get_json_field_serializer_class_by_action(serializer_classes)
-        if serializer_class:
-            serializer = serializer_class()
-            return serializer
-        serializer_class = serializer_classes.get('default')
-        if serializer_class:
-            serializer = serializer_class(**{'read_only': True})
-            return serializer
-        return self.default_json_field_serializer_class(**{'read_only': True})
-
-    def get_json_fields_serializer_mapping(self):
+    def get_dynamic_mapping_fields_mapping_rule(self):
         """
-        return: {
-            'json_field_1': serializer1(),
-            'json_field_2': serializer2(),
+        return:
+        {
+            'meta': ['type', 'apply_asset', 'get'],
+            'meta2': 'category.login'
         }
         """
-        fields_serializer_mapping = {}
-        fields = self.json_fields_serializer_classes.keys()
-        for field in fields:
-            self.__field = field
-            serializer = self.get_json_field_serializer()
-            fields_serializer_mapping[self.__field] = serializer
-        return fields_serializer_mapping
+        return {}
 
-    def build_include_json_fields_serializer_class(self, base, attrs):
-        serializer_class_name = ''.join([
-            field_serializer.__class__.__name__ for field_serializer in attrs.values()
-        ])
-        serializer_class = type(serializer_class_name, (base,), attrs)
+    @staticmethod
+    def _create_serializer_class(base, attrs):
+        serializer_class = IncludeDynamicMappingFieldSerializerMetaClass(
+            base.__name__, (base, ), attrs
+        )
         return serializer_class
 
     def get_serializer_class(self):
         serializer_class = super().get_serializer_class()
-        if not isinstance(self.json_fields_serializer_classes, dict):
+
+        fields_mapping_rule = self.get_dynamic_mapping_fields_mapping_rule()
+        if not fields_mapping_rule:
             return serializer_class
-        fields_serializer_mapping = self.get_json_fields_serializer_mapping()
-        if not fields_serializer_mapping:
-            return serializer_class
-        serializer_class = self.build_include_json_fields_serializer_class(
-            base=serializer_class, attrs=fields_serializer_mapping
-        )
+
+        attrs = {'dynamic_mapping_fields_mapping_rule': fields_mapping_rule}
+        serializer_class = self._create_serializer_class(base=serializer_class, attrs=attrs)
         return serializer_class
 
 
-class SerializerMixin(JSONFieldsModelSerializerMixin, GenericSerializerMixin):
+class SerializerMixin(IncludeDynamicMappingFieldSerializerViewMixin):
     pass
 
 
