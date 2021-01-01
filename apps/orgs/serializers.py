@@ -4,7 +4,7 @@ from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
 from users.models.user import User
-from common.serializers import AdaptedBulkListSerializer
+from common.drf.serializers import AdaptedBulkListSerializer
 from common.drf.serializers import BulkModelSerializer
 from common.db.models import concated_display as display
 from .models import Organization, OrganizationMember, ROLE

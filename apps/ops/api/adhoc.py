@@ -7,7 +7,7 @@ from rest_framework.views import Response
 
 from common.drf.api import JMSBulkModelViewSet
 from common.permissions import IsOrgAdmin
-from common.serializers import CeleryTaskSerializer
+from common.drf.serializers import CeleryTaskSerializer
 from ..models import Task, AdHoc, AdHocExecution
 from ..serializers import (
     TaskSerializer,

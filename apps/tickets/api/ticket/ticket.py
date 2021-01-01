@@ -8,16 +8,15 @@ from rest_framework.exceptions import MethodNotAllowed
 from common.mixins.api import CommonApiMixin
 from common.permissions import IsValidUser, IsOrgAdmin
 from common.const.http import POST, PUT
-from tickets import serializers
+from tickets import serializers, const
 from tickets.permissions.ticket import IsAssignee, NotClosed
 from tickets.models import Ticket
-from tickets.api.ticket.mixin import TicketJSONFieldsModelSerializerViewMixin
 
 
 __all__ = ['TicketViewSet']
 
 
-class TicketViewSet(TicketJSONFieldsModelSerializerViewMixin, CommonApiMixin, viewsets.ModelViewSet):
+class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     permission_classes = (IsValidUser,)
     serializer_class = serializers.TicketSerializer
     serializer_classes = {
@@ -64,3 +63,9 @@ class TicketViewSet(TicketJSONFieldsModelSerializerViewMixin, CommonApiMixin, vi
     @action(detail=True, methods=[PUT], permission_classes=[IsOrgAdmin, IsAssignee, NotClosed])
     def close(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
+
+    def get_dynamic_mapping_fields_mapping_rule(self):
+        fields_mapping_rule = {
+            'meta': ['type', 'apply_asset', 'action']
+        }
+        return fields_mapping_rule

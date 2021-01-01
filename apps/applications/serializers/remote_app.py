@@ -6,8 +6,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 
-from common.serializers import AdaptedBulkListSerializer
-from common.fields.serializer import CustomMetaDictField
+from common.drf.serializers import AdaptedBulkListSerializer
+from common.drf.fields import CustomMetaDictField
 from common.utils import get_logger
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from assets.models import Asset

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from ..models import Comment
-from common.fields.serializer import ReadableHiddenField
+from common.drf.fields import ReadableHiddenField
 
 __all__ = ['CommentSerializer']
 

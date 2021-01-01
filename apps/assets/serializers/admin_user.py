@@ -3,7 +3,7 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from common.serializers import AdaptedBulkListSerializer
+from common.drf.serializers import AdaptedBulkListSerializer
 
 from ..models import Node, AdminUser
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer

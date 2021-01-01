@@ -1,8 +1,57 @@
 import data_tree
 from rest_framework import serializers
 
+#
+# MetaClass
+# -----------------------------------
+
 
 class IncludeDynamicMappingFieldSerializerMetaClass(serializers.SerializerMetaclass, type):
+    """
+    SerializerMetaClass, 用来动态创建包含 `DynamicMappingField` 字段的 `SerializerClass`
+
+    * Process only fields of type `DynamicMappingField` in `_declared_fields`
+    * 只处理 `_declared_fields` 中类型为 `DynamicMappingField` 的字段
+
+    根据 `attrs['dynamic_mapping_fields_mapping_rule']` 中指定的 `fields_mapping_rule`,
+    从 `DynamicMappingField` 中匹配出满足给定规则的字段, 并使用匹配到的字段替换自身的 `DynamicMappingField`
+
+    * 注意: 如果未能根据给定的匹配规则获取到对应的字段，先获取与给定规则同级的 `default` 字段，
+           如果仍未获取到，则再获取 `DynamicMappingField`中定义的最外层的 `default` 字段
+
+    * 说明: 如果获取到的不是 `serializers.Field` 类型, 则返回 `DynamicMappingField()`
+
+    For example, define attrs['dynamic_mapping_fields_mapping_rule']:
+
+    mapping_rules = {
+        'default': serializer.JSONField,
+        'type': {
+            'apply_asset': {
+                'default': serializer.ChoiceField(),
+                'get': serializer.CharField()
+            }
+        }
+    }
+    meta = DynamicMappingField(mapping_rules=mapping_rules)
+
+    dynamic_mapping_fields_mapping_rule = {'meta': ['type', 'apply_asset', 'get'],}
+    => Got `serializer.CharField()`
+    * or *
+    dynamic_mapping_fields_mapping_rule = {{'meta': 'type.apply_asset.get',}}
+    => Got `serializer.CharField()`
+    * or *
+    dynamic_mapping_fields_mapping_rule = {{'meta': 'type.apply_asset.',}}
+    => Got serializer.ChoiceField(),
+    * or *
+    dynamic_mapping_fields_mapping_rule = {{'meta': 'type.apply_asset.xxx',}}
+    => Got `serializer.ChoiceField()`
+    * or *
+    dynamic_mapping_fields_mapping_rule = {{'meta': 'type.apply_asset.get.xxx',}}
+    => Got `serializer.JSONField()`
+    * or *
+    dynamic_mapping_fields_mapping_rule = {{'meta': 'type.apply_asset',}}
+    => Got `{'get': {}}`, type is not `serializers.Field`, So `meta` is `DynamicMappingField()`
+    """
 
     @classmethod
     def get_dynamic_mapping_fields(mcs, bases, attrs):
@@ -38,23 +87,26 @@ class IncludeDynamicMappingFieldSerializerMetaClass(serializers.SerializerMetacl
 
             mapping_tree = dynamic_field.mapping_tree.copy()
 
+            def get_field(rule):
+                return mapping_tree.get(arg_path=rule)
+
             if isinstance(field_mapping_rule, str):
                 field_mapping_rule = field_mapping_rule.split('.')
 
-            if field_mapping_rule[-1] == '':
-                field_mapping_rule[-1] = 'default'
+            field_mapping_rule[-1] = field_mapping_rule[-1] or 'default'
 
-            field = mapping_tree.get(arg_path=field_mapping_rule)
+            field = get_field(rule=field_mapping_rule)
 
             if not field:
                 field_mapping_rule[-1] = 'default'
-                field = mapping_tree.get(arg_path=field_mapping_rule)
+                field = get_field(rule=field_mapping_rule)
 
             if field is None:
-                continue
+                field_mapping_rule = ['default']
+                field = get_field(rule=field_mapping_rule)
 
-            if isinstance(field, type):
-                field = field()
+            if not isinstance(field, serializers.Field):
+                continue
 
             fields[field_name] = field
 
@@ -66,21 +118,47 @@ class IncludeDynamicMappingFieldSerializerMetaClass(serializers.SerializerMetacl
         return super().__new__(mcs, name, bases, attrs)
 
 
-class DynamicMappingField(serializers.Serializer):
-    default_mapping_rules = {}
+#
+# DynamicMappingField
+# ----------------------------------
 
-    def build_mapping_tree(self):
+class DynamicMappingField(serializers.Field):
+    """ 一个根据用户行为而动态匹配的字段 """
+
+    def __init__(self, mapping_rules, *args, **kwargs):
+
+        assert isinstance(mapping_rules, dict), (
+            '`mapping_rule` argument expect type `dict`, gut get `{}`'
+            ''.format(type(mapping_rules))
+        )
+
+        assert 'default' in mapping_rules, (
+            "mapping_rules['default'] is a required, but only get `{}`"
+            "".format(list(mapping_rules.keys()))
+        )
+
+        self.mapping_rules = mapping_rules
+
+        self.mapping_tree = self._build_mapping_tree()
+
+        super().__init__(*args, **kwargs)
+
+    def _build_mapping_tree(self):
         tree = data_tree.Data_tree_node(arg_data=self.mapping_rules)
         return tree
 
-    def __init__(self, mapping_rules=None, *args, **kwargs):
-        self.mapping_rules = mapping_rules or self.default_mapping_rules
-        self.mapping_tree = self.build_mapping_tree()
-        super().__init__(*args, **kwargs)
+    def to_internal_value(self, data):
+        """ 实际是一个虚拟字段所以不返回任何值 """
+        pass
+
+    def to_representation(self, value):
+        """ 实际是一个虚拟字段所以不返回任何值 """
+        pass
 
 
-# ---------
+#
 # Test data
+# ----------------------------------
 
 
 # ticket type
@@ -114,6 +192,7 @@ class LoginSerializer(serializers.Serializer):
 
 
 meta_mapping_rules = {
+    'default': serializers.JSONField(),
     'type': {
         'apply_asset': {
             'default': serializers.CharField(label='default'),

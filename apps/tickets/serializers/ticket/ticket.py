@@ -2,12 +2,13 @@
 #
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
-from common.fields.serializer import ReadableHiddenField
+from common.drf.fields import ReadableHiddenField, DynamicMappingField
 from orgs.utils import get_org_by_id
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from users.models import User
 from tickets import const
 from tickets.models import Ticket
+from .meta import meta_dynamic_mapping_fields_mapping_rules
 
 __all__ = [
     'TicketSerializer', 'TicketDisplaySerializer',
@@ -18,8 +19,9 @@ __all__ = [
 
 class TicketSerializer(OrgResourceModelSerializerMixin):
     type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type'))
-    status_display = serializers.ReadOnlyField(source='get_status_display', label=_('Status'))
     action_display = serializers.ReadOnlyField(source='get_action_display', label=_('Action'))
+    status_display = serializers.ReadOnlyField(source='get_status_display', label=_('Status'))
+    meta = DynamicMappingField(mapping_rules=meta_dynamic_mapping_fields_mapping_rules)
 
     class Meta:
         model = Ticket

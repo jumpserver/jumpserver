@@ -1,14 +1,11 @@
-import copy
-from collections import OrderedDict
 from rest_framework import serializers
-from rest_framework.serializers import ALL_FIELDS
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.utils import tmp_to_org
 from assets.models import SystemUser
 
 
-class BaseTicketMetaApproveSerializerMixin:
+class BaseApproveSerializerMixin:
 
     def _filter_approve_resources_by_org(self, model, resources_id):
         with tmp_to_org(self.root.instance.org_id):
