@@ -2,61 +2,79 @@ import data_tree
 from rest_framework import serializers
 
 
-class TreeSerializerMetaClass(serializers.SerializerMetaclass, type):
+class IncludeDynamicMappingFieldSerializerMetaClass(serializers.SerializerMetaclass, type):
 
     @classmethod
-    def get_data_tree(mcs, field):
-        data_dict_to_tree = getattr(field, 'data_dict_to_tree', None)
-        if not callable(data_dict_to_tree):
-            return
-        tree = data_dict_to_tree()
-        return tree
+    def get_dynamic_mapping_fields(mcs, bases, attrs):
+        fields = {}
 
-    @classmethod
-    def get_json_fields_serializer(mcs, bases, attrs):
-        fields_serializer = {}
-        json_fields_mapping = attrs.get('json_fields_mapping')
-        if not isinstance(json_fields_mapping, dict):
-            return fields_serializer
+        fields_mapping_rules = attrs.get('dynamic_mapping_fields_mapping_rule')
+
+        assert isinstance(fields_mapping_rules, dict), (
+            '`dynamic_mapping_fields_mapping_rule` type must be `dict`, get `{}`'
+            ''.format(type(fields_mapping_rules))
+        )
 
         declared_fields = mcs._get_declared_fields(bases, attrs)
 
-        for field_name, serializer_path_list in json_fields_mapping.items():
-            if field_name not in declared_fields:
-                continue
-            field = declared_fields[field_name]
-            if not isinstance(field, TreeSerializer):
-                continue
-            field_tree = mcs.get_data_tree(field)
-            if field_tree is None:
+        for field_name, field_mapping_rule in fields_mapping_rules.items():
+
+            assert isinstance(field_mapping_rule, list), (
+                '`field_mapping_rule`- can be either a list of keys.'
+                'eg. `["type", "apply_asset", "get"]` '
+                'but, get type is `{}`, {}'
+                ''.format(type(field_mapping_rule), field_mapping_rule)
+            )
+
+            if field_name not in declared_fields.keys():
                 continue
 
-            serializer_path = '.'.join(serializer_path_list)
-            field_serializer = field_tree.get(serializer_path)
-            if not field_serializer:
+            declared_field = declared_fields[field_name]
+            if not isinstance(declared_field, DynamicMappingField):
                 continue
-            fields_serializer[field_name] = field_serializer()
 
-        return fields_serializer
+            dynamic_field = declared_field
+            mapping_tree = dynamic_field.mapping_tree.copy()
+
+            field = mapping_tree.get(arg_path=field_mapping_rule)
+
+            if not field:
+                default_mapping_rule = field_mapping_rule[:-1] + ['default']
+                field = mapping_tree.get(arg_path=default_mapping_rule)
+
+            if field is None:
+                continue
+
+            if isinstance(field, type):
+                field = field()
+
+            fields[field_name] = field
+
+        return fields
 
     def __new__(mcs, name, bases, attrs):
-        tree = mcs.get_data_tree(bases)
-        attrs['data_tree'] = tree
-        json_fields_serializer = mcs.get_json_fields_serializer(bases, attrs)
-        attrs.update(json_fields_serializer)
+        dynamic_mapping_fields = mcs.get_dynamic_mapping_fields(bases, attrs)
+        attrs.update(dynamic_mapping_fields)
         return super().__new__(mcs, name, bases, attrs)
 
 
-class TreeSerializer(serializers.Serializer):
-    data_dict = {}
+class DynamicMappingField(serializers.Serializer):
+    default_mapping_rules = {}
 
-    @classmethod
-    def data_dict_to_tree(cls):
-        tree = data_tree.Data_tree_node(arg_data=cls.data_dict)
+    def build_mapping_tree(self):
+        tree = data_tree.Data_tree_node(arg_data=self.mapping_rules)
         return tree
+
+    def __init__(self, mapping_rules=None, *args, **kwargs):
+        self.mapping_rules = mapping_rules or self.default_mapping_rules
+        self.mapping_tree = self.build_mapping_tree()
+        super().__init__(*args, **kwargs)
+
 
 
 # ---
+
+
 # ticket type
 class ApplyAssetSerializer(serializers.Serializer):
     apply_asset = serializers.CharField(label='Apply Asset')
@@ -87,27 +105,27 @@ class LoginSerializer(serializers.Serializer):
     login_datetime = serializers.DateTimeField()
 
 
-class MetaSerializer(TreeSerializer):
-    data_dict = {
-        'type': {
-            'apply_asset': {
-                'get': ApplyAssetSerializer,
-                'post': ApproveAssetSerializer,
-            },
-            'apply_application': ApplyApplicationSerializer,
-            'login_confirm': LoginConfirmSerializer,
-            'login_times': LoginTimesSerializer
+meta_mapping_rules = {
+    'type': {
+        'apply_asset': {
+            'default': serializers.CharField(label='default'),
+            'get': ApplyAssetSerializer,
+            'post': ApproveAssetSerializer,
         },
-        'category': {
-            'apply': ApplySerializer,
-            'login': LoginSerializer
-        }
+        'apply_application': ApplyApplicationSerializer,
+        'login_confirm': LoginConfirmSerializer,
+        'login_times': LoginTimesSerializer
+    },
+    'category': {
+        'apply': ApplySerializer,
+        'login': LoginSerializer
     }
+}
 
 
 class TicketSerializer(serializers.Serializer):
     title = serializers.CharField(label='Title')
     type = serializers.ChoiceField(choices=('apply_asset', 'apply_application'), label='Type')
-    meta = MetaSerializer()
-    meta2 = MetaSerializer()
+    meta1 = DynamicMappingField(mapping_rules=meta_mapping_rules)
+    meta2 = DynamicMappingField(mapping_rules=meta_mapping_rules)
 

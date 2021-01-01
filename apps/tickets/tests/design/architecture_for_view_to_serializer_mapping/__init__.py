@@ -38,13 +38,13 @@
     serializer:
         实现 DictSerializer: 在 Serializer 中定义 JSONField 字段的映射关系
         实现 TreeSerializer: 将 DictSerializer 中定义的映射关系转换为 Tree 的结构
-        实现 TreeSerializerMetaClass: 在 View 中用来动态创建 Serializer
+        实现 DictSerializerMetaClass: 在 View 中用来动态创建 Serializer
 
 实现:
     1. 重写 View 的 get_serializer_class 方法, 实现动态创建 Serializer
     2. 实现 TreeSerializer, 将 DictSerializer 中的 dict 数据结构转化为 tree 的数据结构
     3. 实现 DictSerializer, 使用 dict 类型来定义映射关系 (*注意: 继承 TreeSerializer)
-    4. 实现 TreeSerializerMetaClass, 定义如何创建包含字段类型为 TreeSerializer 的 Serializer
+    4. 实现 DictSerializerMetaClass, 定义如何创建包含字段类型为 TreeSerializer 的 Serializer
 
 """
 

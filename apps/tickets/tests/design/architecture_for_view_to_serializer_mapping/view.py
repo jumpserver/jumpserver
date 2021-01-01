@@ -1,38 +1,58 @@
 from tickets.tests.design.architecture_for_view_to_serializer_mapping.serializer import (
-    TreeSerializerMetaClass, TicketSerializer
+    IncludeDynamicMappingFieldSerializerMetaClass, TicketSerializer
 )
 
+# from rest_framework import viewsets
 
-class TicketViewSet(object):
 
-    def get_json_fields_mapping(self):
-        print(self)
-        json_fields_mapping = {
-            'meta': ['type', 'apply_asset', 'get'],
-            'meta2': ['category', 'login'],
+class IncludeDynamicMappingFieldSerializerViewMixin:
+
+    def get_dynamic_mapping_fields_mapping_rule(self):
+        """
+        return:
+        {
+            'meta': ['type', 'apply_asset', 'getX'],
+            'meta2': ['category', 'login']
         }
-        return json_fields_mapping
-
-    def get_serializer_class(self):
+        """
         print(self)
-        return TicketSerializer
+        return {
+            'meta1': ['type', 'apply_asset', 'getX'],
+            'meta2': ['category', 'login']
+        }
 
-    def build_serializer_class(self):
-        serializer_class = self.get_serializer_class()
-        json_fields_mapping = self.get_json_fields_mapping()
-        serializer_class = TreeSerializerMetaClass(
-            serializer_class.__name__, (serializer_class,),
-            {'json_fields_mapping': json_fields_mapping}
+    @staticmethod
+    def create_serializer_class(base, attrs):
+        serializer_class = IncludeDynamicMappingFieldSerializerMetaClass(
+            base.__name__, (base, ), attrs
         )
         return serializer_class
 
+    def get_serializer_class(self):
+        serializer_class = super().get_serializer_class()
+        fields_mapping_rule = self.get_dynamic_mapping_fields_mapping_rule()
+        if not fields_mapping_rule:
+            return serializer_class
+        attrs = {'dynamic_mapping_fields_mapping_rule': fields_mapping_rule}
+        serializer_class = self.create_serializer_class(base=serializer_class, attrs=attrs)
+        return serializer_class
+
+
+class GenericViewSet(object):
+
+    def get_serializer_class(self):
+        return TicketSerializer
+
+
+class TicketViewSet(IncludeDynamicMappingFieldSerializerViewMixin, GenericViewSet):
+    pass
 
 
 view = TicketViewSet()
 
-serializer_class = view.build_serializer_class()
+_serializer_class = view.get_serializer_class()
 
-serializer = serializer_class()
+_serializer = _serializer_class()
 
-print(serializer_class)
-print(serializer)
+print(_serializer_class)
+print(_serializer)
