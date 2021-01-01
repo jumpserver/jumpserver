@@ -65,7 +65,9 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
         return super().update(request, *args, **kwargs)
 
     def get_dynamic_mapping_fields_mapping_rule(self):
+        from tickets.serializers.ticket.meta import get_meta_field_rule_by_view
+        meta_field_rule = get_meta_field_rule_by_view(self)
         fields_mapping_rule = {
-            'meta': ['type', 'apply_asset', 'action']
+            'meta': meta_field_rule,
         }
         return fields_mapping_rule

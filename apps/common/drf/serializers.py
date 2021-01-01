@@ -1,11 +1,12 @@
+import copy
+from rest_framework import serializers
 from rest_framework.serializers import Serializer
 from rest_framework.serializers import ModelSerializer
-from rest_framework import serializers
 from rest_framework_bulk.serializers import BulkListSerializer
 
-from common.mixins.serializers import BulkSerializerMixin
 from common.mixins import BulkListSerializerMixin
 from common.drf.fields import DynamicMappingField
+from common.mixins.serializers import BulkSerializerMixin
 
 __all__ = [
     'IncludeDynamicMappingFieldSerializerMetaClass',
@@ -75,6 +76,8 @@ class IncludeDynamicMappingFieldSerializerMetaClass(serializers.SerializerMetacl
             ''.format(type(fields_mapping_rules))
         )
 
+        fields_mapping_rules = copy.deepcopy(fields_mapping_rules)
+
         declared_fields = mcs._get_declared_fields(bases, attrs)
 
         for field_name, field_mapping_rule in fields_mapping_rules.items():
@@ -115,6 +118,9 @@ class IncludeDynamicMappingFieldSerializerMetaClass(serializers.SerializerMetacl
             if field is None:
                 field_mapping_rule = ['default']
                 field = get_field(rule=field_mapping_rule)
+
+            if isinstance(field, type):
+                field = field()
 
             if not isinstance(field, serializers.Field):
                 continue

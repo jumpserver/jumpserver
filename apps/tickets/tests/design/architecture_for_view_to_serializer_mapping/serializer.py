@@ -1,14 +1,14 @@
 import data_tree
 from rest_framework import serializers
 
-#
-# MetaClass
-# -----------------------------------
 
+#
+# IncludeDynamicMappingFieldSerializerMetaClass
+# ---------------------------------------------
 
 class IncludeDynamicMappingFieldSerializerMetaClass(serializers.SerializerMetaclass, type):
     """
-    SerializerMetaClass, 用来动态创建包含 `DynamicMappingField` 字段的 `SerializerClass`
+    SerializerMetaClass: 动态创建包含 `common.drf.fields.DynamicMappingField` 字段的 `SerializerClass`
 
     * Process only fields of type `DynamicMappingField` in `_declared_fields`
     * 只处理 `_declared_fields` 中类型为 `DynamicMappingField` 的字段
@@ -64,6 +64,8 @@ class IncludeDynamicMappingFieldSerializerMetaClass(serializers.SerializerMetacl
             ''.format(type(fields_mapping_rules))
         )
 
+        fields_mapping_rules = copy.deepcopy(fields_mapping_rules)
+
         declared_fields = mcs._get_declared_fields(bases, attrs)
 
         for field_name, field_mapping_rule in fields_mapping_rules.items():
@@ -105,6 +107,9 @@ class IncludeDynamicMappingFieldSerializerMetaClass(serializers.SerializerMetacl
                 field_mapping_rule = ['default']
                 field = get_field(rule=field_mapping_rule)
 
+            if isinstance(field, type):
+                field = field()
+
             if not isinstance(field, serializers.Field):
                 continue
 
@@ -116,7 +121,6 @@ class IncludeDynamicMappingFieldSerializerMetaClass(serializers.SerializerMetacl
         dynamic_mapping_fields = mcs.get_dynamic_mapping_fields(bases, attrs)
         attrs.update(dynamic_mapping_fields)
         return super().__new__(mcs, name, bases, attrs)
-
 
 #
 # DynamicMappingField
