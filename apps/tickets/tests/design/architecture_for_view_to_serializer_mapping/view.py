@@ -2,8 +2,6 @@ from tickets.tests.design.architecture_for_view_to_serializer_mapping.serializer
     IncludeDynamicMappingFieldSerializerMetaClass, TicketSerializer
 )
 
-# from rest_framework import viewsets
-
 
 class IncludeDynamicMappingFieldSerializerViewMixin:
 
@@ -18,7 +16,9 @@ class IncludeDynamicMappingFieldSerializerViewMixin:
         print(self)
         return {
             'meta1': ['type', 'apply_asset', 'getX'],
-            'meta2': ['category', 'login']
+            'meta2': 'category.login',
+            'meta3': 'type.apply_asset.',
+            'meta4': 'category.apply'
         }
 
     @staticmethod
@@ -37,6 +37,9 @@ class IncludeDynamicMappingFieldSerializerViewMixin:
         serializer_class = self.create_serializer_class(base=serializer_class, attrs=attrs)
         return serializer_class
 
+
+# ---------
+# Test data
 
 class GenericViewSet(object):
 

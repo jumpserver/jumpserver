@@ -11,7 +11,7 @@ class IncludeDynamicMappingFieldSerializerMetaClass(serializers.SerializerMetacl
         fields_mapping_rules = attrs.get('dynamic_mapping_fields_mapping_rule')
 
         assert isinstance(fields_mapping_rules, dict), (
-            '`dynamic_mapping_fields_mapping_rule` type must be `dict`, get `{}`'
+            '`dynamic_mapping_fields_mapping_rule` must be `dict` type , but get `{}`'
             ''.format(type(fields_mapping_rules))
         )
 
@@ -19,10 +19,11 @@ class IncludeDynamicMappingFieldSerializerMetaClass(serializers.SerializerMetacl
 
         for field_name, field_mapping_rule in fields_mapping_rules.items():
 
-            assert isinstance(field_mapping_rule, list), (
-                '`field_mapping_rule`- can be either a list of keys.'
-                'eg. `["type", "apply_asset", "get"]` '
-                'but, get type is `{}`, {}'
+            assert isinstance(field_mapping_rule, (list, str)), (
+                '`dynamic_mapping_fields_mapping_rule.field_mapping_rule` '
+                '- can be either a list of keys, or a delimited string. '
+                'Such as:  `["type", "apply_asset", "get"]` or `type.apply_asset.get` '
+                'but, get type is `{}`, `{}`'
                 ''.format(type(field_mapping_rule), field_mapping_rule)
             )
 
@@ -34,13 +35,20 @@ class IncludeDynamicMappingFieldSerializerMetaClass(serializers.SerializerMetacl
                 continue
 
             dynamic_field = declared_field
+
             mapping_tree = dynamic_field.mapping_tree.copy()
+
+            if isinstance(field_mapping_rule, str):
+                field_mapping_rule = field_mapping_rule.split('.')
+
+            if field_mapping_rule[-1] == '':
+                field_mapping_rule[-1] = 'default'
 
             field = mapping_tree.get(arg_path=field_mapping_rule)
 
             if not field:
-                default_mapping_rule = field_mapping_rule[:-1] + ['default']
-                field = mapping_tree.get(arg_path=default_mapping_rule)
+                field_mapping_rule[-1] = 'default'
+                field = mapping_tree.get(arg_path=field_mapping_rule)
 
             if field is None:
                 continue
@@ -71,8 +79,8 @@ class DynamicMappingField(serializers.Serializer):
         super().__init__(*args, **kwargs)
 
 
-
-# ---
+# ---------
+# Test data
 
 
 # ticket type
@@ -128,4 +136,6 @@ class TicketSerializer(serializers.Serializer):
     type = serializers.ChoiceField(choices=('apply_asset', 'apply_application'), label='Type')
     meta1 = DynamicMappingField(mapping_rules=meta_mapping_rules)
     meta2 = DynamicMappingField(mapping_rules=meta_mapping_rules)
+    meta3 = DynamicMappingField(mapping_rules=meta_mapping_rules)
+    meta4 = DynamicMappingField(mapping_rules=meta_mapping_rules)
 
