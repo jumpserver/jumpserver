@@ -5,12 +5,13 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import MethodNotAllowed
 
+from common.const.http import POST, PUT
 from common.mixins.api import CommonApiMixin
 from common.permissions import IsValidUser, IsOrgAdmin
-from common.const.http import POST, PUT
-from tickets import serializers, const
-from tickets.permissions.ticket import IsAssignee, NotClosed
+
+from tickets import serializers
 from tickets.models import Ticket
+from tickets.permissions.ticket import IsAssignee, NotClosed
 
 
 __all__ = ['TicketViewSet']
@@ -67,7 +68,6 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     def get_dynamic_mapping_fields_mapping_rule(self):
         from tickets.serializers.ticket.meta import get_meta_field_mapping_rule_by_view
         meta_field_mapping_rule = get_meta_field_mapping_rule_by_view(self)
-        fields_mapping_rule = {
+        return {
             'meta': meta_field_mapping_rule,
         }
-        return fields_mapping_rule

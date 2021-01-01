@@ -135,7 +135,7 @@ class Ticket(TicketModelMixin, CommonModelMixin, OrgModelMixin):
         self.set_action_close()
         self.save()
 
-    #
+    # ticket
     def has_assignee(self, assignee):
         return self.assignees.filter(id=assignee.id).exists()
 

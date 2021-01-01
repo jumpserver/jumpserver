@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 #
-
 from rest_framework import viewsets
 
-from users.models import User
 from common.permissions import IsValidUser
 from common.exceptions import JMSException
+from users.models import User
 from orgs.utils import get_org_by_id
 from .. import serializers
 
@@ -20,7 +19,8 @@ class AssigneeViewSet(viewsets.ReadOnlyModelViewSet):
         org_id = self.request.query_params.get('org_id')
         org = get_org_by_id(org_id)
         if not org:
-            raise JMSException('The organization `{}` does not exist'.format(org_id))
+            error = ('The organization `{}` does not exist'.format(org_id))
+            raise JMSException(error)
         return org
 
     def get_queryset(self):
