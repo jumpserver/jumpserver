@@ -29,8 +29,12 @@ class Serializer(BaseSerializer):
 class SerializerMetaClass(BaseSerializerMetaClass, type):
 
     @classmethod
+    def _get_declared_x_attr_value(mcs, x_types, attr_name, attr_value):
+        pass
+
+    @classmethod
     def _get_declared_x_attrs(mcs, bases, attrs):
-        view_x_types = getattr(attrs['view'], 'x_types')
+        x_types = attrs['view'].x_types
 
         bases_attrs = {}
         for base in bases:
@@ -40,14 +44,9 @@ class SerializerMetaClass(BaseSerializerMetaClass, type):
                 v = getattr(base, k)
                 if isinstance(v, str):
                     bases_attrs[k] = v
-                elif isinstance(v, dict):
-                    if not view_x_types:
-                        bases_attrs.update(v)
-                        continue
-                    if k not in view_x_types.keys():
-                        bases_attrs.update(v)
-                        continue
-                    v = v[view_x_types[k]]
+                    continue
+                if isinstance(v, dict):
+                    v = mcs._get_declared_x_attr_value( x_types, k, v)
                     bases_attrs[k] = v
         attrs.update(bases_attrs)
         return attrs
@@ -58,9 +57,7 @@ class SerializerMetaClass(BaseSerializerMetaClass, type):
 
 
 class View(object):
-    x_types = {
-        'x_age': 'real'
-    }
+    x_types = ['x_age', 'fake']
     serializer_class = Serializer
 
     def get_serializer_class(self):
@@ -83,4 +80,48 @@ print('End!')
 #
 from rest_framework.serializers import SerializerMetaclass
 
+
+data = {
+    'meta': {
+        'type': {
+            'apply_asset': {
+                'get': 'get',
+                'post': 'post'
+            }
+        }
+    }
+}
+
+
+
+
+def get_value(key_list, data_dict):
+    if len(key_list) == 0:
+        return data_dict
+    for i, key in enumerate(key_list):
+        _keys = key_list[i+1:]
+        _data = data_dict.get(key)
+        if _data is None:
+            return data_dict
+        if not isinstance(_data, dict):
+            return _data
+        return get_value(_keys, _data)
+
+
+
+keys = ['meta', 'type', 'apply_asset', 'get']
+value = get_value(keys, data)
+print(value)
+
+keys = ['meta', 'type', 'apply_asset', 'post']
+value = get_value(keys, data)
+print(value)
+
+keys = ['meta', 'type', 'apply_asset', 'xxxxx']
+value = get_value(keys, data)
+print(value)
+
+keys = ['meta', 'type', 'apply_asset', 'post', 'xxxxxxxx']
+value = get_value(keys, data)
+print(value)
 
