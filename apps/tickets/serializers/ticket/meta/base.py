@@ -8,22 +8,34 @@ from . import apply_asset, apply_application, login_confirm
 
 __all__ = [
     'meta_dynamic_mapping_fields_mapping_rules',
-    'get_meta_field_rule_by_view',
+    'get_meta_field_mapping_rule_by_view',
 ]
 
-
+#
 # ticket type
+# -----------
+
+
 types = const.TicketTypeChoices.values
 type_apply_asset = const.TicketTypeChoices.apply_asset.value
 type_apply_application = const.TicketTypeChoices.apply_application.value
 type_login_confirm = const.TicketTypeChoices.login_confirm.value
 
-# ticket action
+#
+# ticket type
+# -----------
+
+
 actions = const.TicketActionChoices.values
 action_open = const.TicketActionChoices.open.value
 action_approve = const.TicketActionChoices.approve.value
 action_reject = const.TicketActionChoices.reject.value
 action_close = const.TicketActionChoices.close.value
+
+
+#
+# define meta field `DynamicMappingField` mapping_rules
+# -----------------------------------------------------
 
 
 meta_dynamic_mapping_fields_mapping_rules = {
@@ -44,7 +56,12 @@ meta_dynamic_mapping_fields_mapping_rules = {
 }
 
 
-def get_meta_field_rule_by_view(view):
+#
+# get meta dynamic field mapping rule by view
+# -------------------------------------------
+
+
+def get_meta_field_mapping_rule_by_view(view):
     mapping_rules = copy.deepcopy(meta_dynamic_mapping_fields_mapping_rules)
     request = view.request
 
