@@ -76,7 +76,12 @@ def migrate_tickets_fields_name(apps, schema_editor):
         ticket.type = migrate_field_type(ticket.type)
         ticket.meta = migrate_field_meta(ticket.type, ticket.meta)
         ticket.meta['body'] = ticket.body
-        ticket.save()
+
+    fields = [
+        'applicant', 'applicant_display', 'processor', 'processor_display',
+        'assignees_display_new', 'action', 'type', 'meta'
+    ]
+    ticket_model.origin_objects.bulk_update(tickets, fields)
 
 
 class Migration(migrations.Migration):
