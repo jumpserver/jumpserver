@@ -3,8 +3,9 @@
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 
+from common.mixins.api import CommonApiMixin
 from applications.api.mixin import (
-    SerializeApplicationToTreeNodeMixin, ApplicationAttrsSerializerViewMixin
+    SerializeApplicationToTreeNodeMixin, ApplicationViewMixin
 )
 from perms import serializers
 from perms.api.asset.user_permission.mixin import ForAdminMixin, ForUserMixin
@@ -21,7 +22,7 @@ __all__ = [
 ]
 
 
-class AllGrantedApplicationsMixin(ApplicationAttrsSerializerViewMixin, ListAPIView):
+class AllGrantedApplicationsMixin(ApplicationViewMixin, CommonApiMixin, ListAPIView):
     only_fields = serializers.ApplicationGrantedSerializer.Meta.only_fields
     serializer_class = serializers.ApplicationGrantedSerializer
     filter_fields = ['id', 'name', 'category', 'type', 'comment']

@@ -1,6 +1,7 @@
 from django.utils.translation import ugettext as __
 from orgs.utils import tmp_to_org, tmp_to_root_org
-from applications.models import Application, Category
+from applications.models import Application
+from applications.const import ApplicationCategoryChoices, ApplicationTypeChoices
 from assets.models import SystemUser
 from perms.models import ApplicationPermission
 from tickets.utils import convert_model_data_field_name_to_verbose_name
@@ -10,9 +11,9 @@ class ConstructDisplayFieldMixin:
     def construct_meta_apply_application_open_fields_display(self):
         meta_display_fields = ['apply_category_display', 'apply_type_display']
         apply_category = self.meta['apply_category']
-        apply_category_display = dict(Category.choices)[apply_category]
+        apply_category_display = ApplicationCategoryChoices.get_label(apply_category)
         apply_type = self.meta['apply_type']
-        apply_type_display = dict(Category.get_type_choices(apply_category))[apply_type]
+        apply_type_display = ApplicationTypeChoices.get_label(apply_type)
         meta_display_values = [apply_category_display, apply_type_display]
         meta_display = dict(zip(meta_display_fields, meta_display_values))
         return meta_display

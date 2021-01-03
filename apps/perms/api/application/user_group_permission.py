@@ -5,8 +5,9 @@ from django.db.models import Q
 from rest_framework.generics import ListAPIView
 
 from common.permissions import IsOrgAdminOrAppUser
+from common.mixins.api import CommonApiMixin
 from applications.models import Application
-from applications.api.mixin import ApplicationAttrsSerializerViewMixin
+from applications.api.mixin import ApplicationViewMixin
 from perms import serializers
 
 __all__ = [
@@ -14,9 +15,9 @@ __all__ = [
 ]
 
 
-class UserGroupGrantedApplicationsApi(ApplicationAttrsSerializerViewMixin, ListAPIView):
+class UserGroupGrantedApplicationsApi(ApplicationViewMixin, CommonApiMixin, ListAPIView):
     """
-    获取用户组直接授权的资产
+    获取用户组直接授权的应用
     """
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.ApplicationGrantedSerializer

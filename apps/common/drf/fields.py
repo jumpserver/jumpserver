@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 #
 
-import data_tree
+import copy
 from rest_framework import serializers
 
 
 __all__ = [
     'DynamicMappingField', 'ReadableHiddenField',
-    'CustomMetaDictField',
+    'CustomMetaDictField', 'IgnoreSensitiveInfoReadOnlyJSONField',
 ]
 
 
@@ -49,18 +49,12 @@ class DynamicMappingField(serializers.Field):
             ''.format(type(mapping_rules))
         )
 
-        assert 'default' in mapping_rules, (
-            "mapping_rules['default'] is a required, but only get `{}`"
-            "".format(list(mapping_rules.keys()))
-        )
-
-        self.mapping_rules = mapping_rules
-        self.mapping_tree = self._build_mapping_tree()
+        self.__mapping_rules = mapping_rules
         super().__init__(*args, **kwargs)
 
-    def _build_mapping_tree(self):
-        tree = data_tree.Data_tree_node(arg_data=self.mapping_rules)
-        return tree
+    @property
+    def mapping_rules(self):
+        return copy.deepcopy(self.__mapping_rules)
 
     def to_internal_value(self, data):
         """ 实际是一个虚拟字段所以不返回任何值 """
@@ -69,6 +63,29 @@ class DynamicMappingField(serializers.Field):
     def to_representation(self, value):
         """ 实际是一个虚拟字段所以不返回任何值 """
         pass
+
+
+# A Ignore read-only fields for sensitive information
+# ----------------------------------------------------------
+
+
+class IgnoreSensitiveInfoReadOnlyJSONField(serializers.JSONField):
+    """ A ignore read-only fields for sensitive information """
+
+    def __init__(self, **kwargs):
+        kwargs['read_only'] = True
+        super().__init__(**kwargs)
+
+    def to_representation(self, value):
+        sensitive_ignored_value = {}
+        sensitive_names = ['password']
+        for field_name, field_value in value.items():
+            for sensitive_name in sensitive_names:
+                if sensitive_name in field_name.lower():
+                    continue
+                sensitive_ignored_value[field_name] = field_value
+        return super().to_representation(sensitive_ignored_value)
+
 
 #
 # ReadableHiddenField
