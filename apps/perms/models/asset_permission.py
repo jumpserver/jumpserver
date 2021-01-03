@@ -1,4 +1,3 @@
-import uuid
 import logging
 from functools import reduce
 
@@ -6,8 +5,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from common.db import models
 from common.utils import lazyproperty
-from orgs.models import Organization
-from orgs.utils import get_current_org
 from assets.models import Asset, SystemUser, Node, FamilyMixin
 
 from .base import BasePermission
