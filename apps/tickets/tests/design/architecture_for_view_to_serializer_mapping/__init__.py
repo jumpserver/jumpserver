@@ -3,8 +3,9 @@
     View 获取 serializer_class 的架构设计
 
 问题:
-    View 所需的 Serializer 中有一个 JSONField 字段，而字段的值并不固定，是由 View 的行为 (比如action) 而决定的.
-    使用 View 默认的 get_serializer_class 方法不能解决
+    View 所需的 Serializer Class 中有一个字段，字段的类型并不固定，而是由 View 的行为 (比如 type, action) 而决定的.
+    使用 View 默认的 get_serializer_class 方法不能实现，因为序列类在被定义的时候，其字段及类型已经固定，
+    所以需要一种机制来动态修改序列类中的字段及其类型，即，MetaClass 元类
 
 
     例如:
@@ -19,33 +20,42 @@
         class Serializer(serializers.Serializer):
             meta = serializers.JSONField()
 
-        当 view 获取 serializer 时，无论action时什么获取到的 Serializer.meta 是 serializers.JSONField(),
+        当 view 获取 serializer 时，无论 action 是什么, 获取到的 Serializer.meta 字段始终是
+        serializers.JSONField() 类型
 
         但我们希望:
             当 view.action = A 时，获取到的 Serializer.meta 是 MetaASerializerMetaASerializer()
             当 view.action = B 时，获取到的 Serializer.meta 是 MetaBSerializerMetaASerializer()
 
 分析:
-    问题关键在于数据的映射
-    使用 dict 可以解决，但操作起来比较复杂
-    所以使用 tree 的结构来实现
+    问题关键在于数据的映射的定义和匹配,
+    即， 用 View 给定的规则动态去匹配 Serializer Class 中定义的规则
+
+    当然, 使用 dict 很好的解决规则定义，但直接进行匹配, 操作起来比较复杂
+    所以, 决定使用以下方案实现, 即, dict, dict-> tree, tree 搜索:
+        Serializer Class 中规则的定义使用 dict,
+        View 中指定的规则也使用 dict,
+        MetaClass 中进行规则匹配的过程使用 dict tree, 即将给定的 dic 转换为 tree 结构，再进行匹配
 
 
 方案:
     view:
-        使用元类 MetaClass: 在 View 中动态创建所需要的 Serializer
+        使用元类 MetaClass: 在 View 中动态创建所需要的 Serializer Class
 
     serializer:
-        实现 DictSerializer: 在 Serializer 中定义 JSONField 字段的映射关系
-        实现 TreeSerializer: 将 DictSerializer 中定义的映射关系转换为 Tree 的结构
-        实现 DictSerializerMetaClass: 在 View 中用来动态创建 Serializer
+        实现 DynamicMappingField: 序列类的动态映射字段, 定义字段映射规则
+        实现 IncludeDynamicMappingFieldSerializerMetaClass:
+            在 View 中用来动态创建 Serializer Class.
+            即, 用 View 中给定的规则，去匹配 Serializer Class 里每一个 DynamicMappingField 字段定义的规则,
+            基于 bases, 创建并返回新的 Serializer Class
+
+        实现 IncludeDynamicMappingFieldSerializerViewMixin:
+            实现动态创建 Serializer Class 的逻辑,
+            同时定义获取 Serializer Class 中所有 DynamicMappingField 字段匹配规则的方法
+            => def get_dynamic_mapping_fields_mapping_rule(): pass，
+            供 View 子类重写
 
 实现:
-    1. 重写 View 的 get_serializer_class 方法, 实现动态创建 Serializer
-    2. 实现 TreeSerializer, 将 DictSerializer 中的 dict 数据结构转化为 tree 的数据结构
-    3. 实现 DictSerializer, 使用 dict 类型来定义映射关系 (*注意: 继承 TreeSerializer)
-    4. 实现 DictSerializerMetaClass, 定义如何创建包含字段类型为 TreeSerializer 的 Serializer
+    请看 ./serializer.py 和 ./serializer.py
 
 """
-
-from rest_framework.serializers import Serializer
