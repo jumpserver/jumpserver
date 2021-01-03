@@ -1,5 +1,4 @@
 import copy
-from rest_framework import serializers
 from applications import const
 from common.drf.fields import IgnoreSensitiveInfoReadOnlyJSONField
 from . import category, type as application_type
@@ -36,7 +35,6 @@ type_custom = const.ApplicationTypeChoices.custom.value
 type_k8s = const.ApplicationTypeChoices.k8s.value
 
 
-#
 # define `attrs` field `DynamicMappingField` mapping_rules
 # -----------------------------------------------------
 
@@ -66,14 +64,13 @@ __ATTRS_FIELD_DYNAMIC_MAPPING_RULES = {
 
 
 # Note:
-# The dynamic mapping rules of `meta` field is obtained
-# through call method `get_meta_field_dynamic_mapping_rules`
+# The dynamic mapping rules of `attrs` field is obtained
+# through call method `get_attrs_field_dynamic_mapping_rules`
 
 def get_attrs_field_dynamic_mapping_rules():
     return copy.deepcopy(__ATTRS_FIELD_DYNAMIC_MAPPING_RULES)
 
 
-#
 # get `attrs dynamic field` mapping rule by `view object`
 # ----------------------------------------------------
 
@@ -90,9 +87,8 @@ def get_attrs_field_mapping_rule_by_view(view):
     return mapping_rule
 
 
-#
 # get `category` mapping `serializer`
-#
+# -----------------------------------
 
 def get_serializer_by_application_type(app_tp):
     return __ATTRS_FIELD_DYNAMIC_MAPPING_RULES['type'].get(app_tp)

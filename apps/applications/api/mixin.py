@@ -6,7 +6,7 @@ __all__ = ['ApplicationViewMixin', 'SerializeApplicationToTreeNodeMixin']
 
 
 class ApplicationViewMixin:
-    """ 实现 `get_dynamic_mapping_fields_mapping_rule` 供其他和 Application 相关的 View 继承使用"""
+    """ 实现 `get_dynamic_mapping_fields_mapping_rule` 方法, 供其他和 Application 相关的 View 继承使用"""
 
     def get_dynamic_mapping_fields_mapping_rule(self):
         fields_mapping_rule = get_dynamic_mapping_fields_mapping_rule_by_view(view=self)
