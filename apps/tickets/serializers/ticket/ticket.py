@@ -8,7 +8,7 @@ from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from users.models import User
 from tickets import const
 from tickets.models import Ticket
-from .meta import meta_dynamic_mapping_fields_mapping_rules
+from .meta import get_meta_field_dynamic_mapping_rules
 
 __all__ = [
     'TicketSerializer', 'TicketDisplaySerializer',
@@ -21,7 +21,7 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
     type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type'))
     action_display = serializers.ReadOnlyField(source='get_action_display', label=_('Action'))
     status_display = serializers.ReadOnlyField(source='get_status_display', label=_('Status'))
-    meta = DynamicMappingField(mapping_rules=meta_dynamic_mapping_fields_mapping_rules)
+    meta = DynamicMappingField(mapping_rules=get_meta_field_dynamic_mapping_rules())
 
     class Meta:
         model = Ticket

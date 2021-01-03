@@ -1,57 +1,16 @@
-import uuid
-
-from common.exceptions import JMSException
 from orgs.models import Organization
-from .. import models
+from ..serializers.utils import get_dynamic_mapping_fields_mapping_rule_by_view
 
 
-class ApplicationAttrsSerializerViewMixin:
+__all__ = ['ApplicationViewMixin', 'SerializeApplicationToTreeNodeMixin']
 
-    def get_serializer_class(self):
-        serializer_class = super().get_serializer_class()
-        if getattr(self, 'swagger_fake_view', False):
-            return serializer_class
-        app_type = self.request.query_params.get('type')
-        app_category = self.request.query_params.get('category')
-        type_options = list(dict(models.Category.get_all_type_serializer_mapper()).keys())
-        category_options = list(dict(models.Category.get_category_serializer_mapper()).keys())
 
-        # ListAPIView 没有 action 属性
-        # 不使用method属性，因为options请求时为method为post
-        action = getattr(self, 'action', 'list')
+class ApplicationViewMixin:
+    """ 实现 `get_dynamic_mapping_fields_mapping_rule` 方法, 供其他和 Application 相关的 View 继承使用"""
 
-        if app_type and app_type not in type_options:
-            raise JMSException(
-                'Invalid query parameter `type`, select from the following options: {}'
-                ''.format(type_options)
-            )
-        if app_category and app_category not in category_options:
-            raise JMSException(
-                'Invalid query parameter `category`, select from the following options: {}'
-                ''.format(category_options)
-            )
-
-        if action in [
-            'create', 'update', 'partial_update', 'bulk_update', 'partial_bulk_update'
-        ] and not app_type:
-            # action: create / update
-            raise JMSException(
-                'The `{}` action must take the `type` query parameter'.format(action)
-            )
-
-        if app_type:
-            # action: create / update / list / retrieve / metadata
-            attrs_cls = models.Category.get_type_serializer_cls(app_type)
-            class_name = 'ApplicationDynamicSerializer{}'.format(app_type.title())
-        elif app_category:
-            # action: list / retrieve / metadata
-            attrs_cls = models.Category.get_category_serializer_cls(app_category)
-            class_name = 'ApplicationDynamicSerializer{}'.format(app_category.title())
-        else:
-            attrs_cls = models.Category.get_no_password_serializer_cls()
-            class_name = 'ApplicationDynamicSerializer'
-        cls = type(class_name, (serializer_class,), {'attrs': attrs_cls()})
-        return cls
+    def get_dynamic_mapping_fields_mapping_rule(self):
+        fields_mapping_rule = get_dynamic_mapping_fields_mapping_rule_by_view(view=self)
+        return fields_mapping_rule
 
 
 class SerializeApplicationToTreeNodeMixin:

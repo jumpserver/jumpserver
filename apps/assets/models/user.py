@@ -205,16 +205,15 @@ class SystemUser(BaseUser):
         return assets
 
     @classmethod
-    def get_protocol_by_application_type(cls, application_type):
-        from applications.models import Category
-        remote_app_types = list(dict(Category.get_type_choices(Category.remote_app)).keys())
-        if application_type in remote_app_types:
+    def get_protocol_by_application_type(cls, app_type):
+        from applications.const import ApplicationTypeChoices
+        if app_type in ApplicationTypeChoices.remote_app_types():
             return cls.PROTOCOL_RDP
-        cloud_types = list(dict(Category.get_type_choices(Category.cloud)).keys())
-        db_types = list(dict(Category.get_type_choices(Category.db)).keys())
-        other_types = [*cloud_types, *db_types]
-        if application_type in other_types:
-            return application_type
+        protocol = None
+        other_types = [*ApplicationTypeChoices.db_types(), *ApplicationTypeChoices.cloud_types()]
+        if app_type in other_types and app_type in cls.APPLICATION_CATEGORY_PROTOCOLS:
+            protocol = app_type
+        return protocol
 
     class Meta:
         ordering = ['name']

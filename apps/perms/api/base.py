@@ -1,5 +1,3 @@
-from django.db.models import F
-from orgs.mixins.api import OrgRelationMixin
 from django.db.models import Q
 from common.permissions import IsOrgAdmin
 from common.utils import get_object_or_none
@@ -8,9 +6,7 @@ from assets.models import SystemUser
 from users.models import User, UserGroup
 
 
-__all__ = [
-    'RelationViewSet', 'BasePermissionViewSet'
-]
+__all__ = ['BasePermissionViewSet']
 
 
 class BasePermissionViewSet(OrgBulkModelViewSet):
@@ -98,11 +94,4 @@ class BasePermissionViewSet(OrgBulkModelViewSet):
         queryset = self.filter_user_group(queryset)
         queryset = self.filter_keyword(queryset)
         queryset = queryset.distinct()
-        return queryset
-
-
-class RelationViewSet(OrgRelationMixin, OrgBulkModelViewSet):
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        queryset = queryset.annotate(**{f'{self.from_field}_display': F(f'{self.from_field}__name')})
         return queryset

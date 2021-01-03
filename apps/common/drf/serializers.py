@@ -7,6 +7,7 @@ from rest_framework_bulk.serializers import BulkListSerializer
 from common.mixins import BulkListSerializerMixin
 from common.drf.fields import DynamicMappingField
 from common.mixins.serializers import BulkSerializerMixin
+from common.utils import QuickLookupDict
 
 __all__ = [
     'IncludeDynamicMappingFieldSerializerMetaClass',
@@ -69,18 +70,29 @@ class IncludeDynamicMappingFieldSerializerMetaClass(serializers.SerializerMetacl
     def get_dynamic_mapping_fields(mcs, bases, attrs):
         fields = {}
 
-        fields_mapping_rules = attrs.get('dynamic_mapping_fields_mapping_rule')
+        # get `fields mapping rule` from attrs `dynamic_mapping_fields_mapping_rule`
+        fields_mapping_rule = attrs.get('dynamic_mapping_fields_mapping_rule')
 
-        assert isinstance(fields_mapping_rules, dict), (
+        # check `fields_mapping_rule` type
+        assert isinstance(fields_mapping_rule, dict), (
             '`dynamic_mapping_fields_mapping_rule` must be `dict` type , but get `{}`'
-            ''.format(type(fields_mapping_rules))
+            ''.format(type(fields_mapping_rule))
         )
 
-        fields_mapping_rules = copy.deepcopy(fields_mapping_rules)
-
+        # get `serializer class` declared fields
         declared_fields = mcs._get_declared_fields(bases, attrs)
+        declared_fields_names = list(declared_fields.keys())
 
-        for field_name, field_mapping_rule in fields_mapping_rules.items():
+        fields_mapping_rule = copy.deepcopy(fields_mapping_rule)
+
+        for field_name, field_mapping_rule in fields_mapping_rule.items():
+
+            if field_name not in declared_fields_names:
+                continue
+
+            declared_field = declared_fields[field_name]
+            if not isinstance(declared_field, DynamicMappingField):
+                continue
 
             assert isinstance(field_mapping_rule, (list, str)), (
                 '`dynamic_mapping_fields_mapping_rule.field_mapping_rule` '
@@ -90,34 +102,21 @@ class IncludeDynamicMappingFieldSerializerMetaClass(serializers.SerializerMetacl
                 ''.format(type(field_mapping_rule), field_mapping_rule)
             )
 
-            if field_name not in declared_fields.keys():
-                continue
-
-            declared_field = declared_fields[field_name]
-            if not isinstance(declared_field, DynamicMappingField):
-                continue
-
-            dynamic_field = declared_field
-
-            mapping_tree = dynamic_field.mapping_tree.copy()
-
-            def get_field(rule):
-                return mapping_tree.get(arg_path=rule)
-
             if isinstance(field_mapping_rule, str):
                 field_mapping_rule = field_mapping_rule.split('.')
 
-            field_mapping_rule[-1] = field_mapping_rule[-1] or 'default'
+            # construct `field mapping rules` sequence list
+            field_mapping_rules = [
+                field_mapping_rule,
+                copy.deepcopy(field_mapping_rule)[:-1] + ['default'],
+                ['default']
+            ]
 
-            field = get_field(rule=field_mapping_rule)
+            dynamic_field = declared_field
 
-            if not field:
-                field_mapping_rule[-1] = 'default'
-                field = get_field(rule=field_mapping_rule)
+            field_finder = QuickLookupDict(dynamic_field.mapping_rules)
 
-            if field is None:
-                field_mapping_rule = ['default']
-                field = get_field(rule=field_mapping_rule)
+            field = field_finder.find_one(key_paths=field_mapping_rules)
 
             if isinstance(field, type):
                 field = field()
