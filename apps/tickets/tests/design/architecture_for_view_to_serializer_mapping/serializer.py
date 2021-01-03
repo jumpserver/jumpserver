@@ -1,3 +1,4 @@
+import copy
 import data_tree
 from rest_framework import serializers
 
@@ -125,6 +126,7 @@ class IncludeDynamicMappingFieldSerializerMetaClass(serializers.SerializerMetacl
 #
 # DynamicMappingField
 # ----------------------------------
+
 
 class DynamicMappingField(serializers.Field):
     """ 一个根据用户行为而动态匹配的字段 """
