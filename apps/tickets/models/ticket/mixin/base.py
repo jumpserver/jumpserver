@@ -100,7 +100,8 @@ class CreatePermissionMixin:
     # create permission
     def create_permission(self):
         create_method = getattr(self, f'create_{self.type}_permission', lambda: None)
-        create_method()
+        permission = create_method()
+        return permission
 
 
 class CreateCommentMixin:
