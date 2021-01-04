@@ -120,7 +120,7 @@ class CreatePermissionMixin:
             'category': apply_category,
             'type': apply_type,
             'comment': permission_comment,
-            'created_by': self.processor_display,
+            'created_by': '{}:{}'.format(str(self.__class__.__name__), str(self.id)),
             'date_start': approve_date_start,
             'date_expired': approve_date_expired,
         }
