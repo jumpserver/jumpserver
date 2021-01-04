@@ -108,6 +108,9 @@ class IncludeDynamicMappingFieldSerializerViewMixin(GenericSerializerMixin):
     def get_serializer_class(self):
         serializer_class = super().get_serializer_class()
 
+        if getattr(self, 'swagger_fake_view', False):
+            return serializer_class
+
         fields_mapping_rule = self.get_dynamic_mapping_fields_mapping_rule()
         if not fields_mapping_rule:
             return serializer_class
