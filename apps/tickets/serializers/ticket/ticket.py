@@ -36,14 +36,14 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
             'body'
         ]
 
-    def get_meta_mapping_rule(self, mapping_serializers):
+    def get_meta_mapping_path(self, mapping_serializers):
         view = self.context['view']
         request = self.context['request']
         query_type = request.query_params.get('type')
         query_action = request.query_params.get('action')
         action = query_action if query_action else view.action
-        mapping_rule = ['type', query_type, action]
-        return mapping_rule
+        mapping_path = ['type', query_type, action]
+        return mapping_path
 
 
 class TicketDisplaySerializer(TicketSerializer):

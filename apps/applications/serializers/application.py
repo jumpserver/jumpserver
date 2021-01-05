@@ -18,17 +18,17 @@ __all__ = [
 class IncludeDynamicMappingSerializerFieldApplicationSerializerMixin(serializers.Serializer):
     attrs = DynamicMappingSerializer(mapping_serializers=attrs_field_dynamic_mapping_serializers)
 
-    def get_attrs_mapping_rule(self, mapping_serializers):
+    def get_attrs_mapping_path(self, mapping_serializers):
         request = self.context['request']
         query_type = request.query_params.get('type')
         query_category = request.query_params.get('category')
         if query_type:
-            mapping_rule = ['type', query_type]
+            mapping_path = ['type', query_type]
         elif query_category:
-            mapping_rule = ['category', query_category]
+            mapping_path = ['category', query_category]
         else:
-            mapping_rule = ['default']
-        return mapping_rule
+            mapping_path = ['default']
+        return mapping_path
 
 
 class ApplicationSerializer(IncludeDynamicMappingSerializerFieldApplicationSerializerMixin,

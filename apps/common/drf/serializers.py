@@ -24,10 +24,10 @@ class DynamicMappingSerializer(serializers.Serializer):
     data_type_error_messages = 'Expect get instance of type `{}`, but got instance type of  `{}`'
 
     def __init__(self, mapping_serializers=None, get_mapping_serializers_method_name=None,
-                 get_mapping_rule_method_name=None, default_serializer=None, **kwargs):
+                 get_mapping_path_method_name=None, default_serializer=None, **kwargs):
         self.mapping_serializers = mapping_serializers
         self.get_mapping_serializers_method_name = get_mapping_serializers_method_name
-        self.get_mapping_rule_method_name = get_mapping_rule_method_name
+        self.get_mapping_path_method_name = get_mapping_path_method_name
         self.default_serializer = default_serializer or serializers.Serializer
         super().__init__(**kwargs)
 
@@ -37,10 +37,10 @@ class DynamicMappingSerializer(serializers.Serializer):
             method_name = 'get_{field_name}_mapping_serializers'.format(field_name=field_name)
             self.get_mapping_serializers_method_name = method_name
 
-        # The get mapping rule method name defaults to `get_{field_name}_mapping_rule`.
-        if self.get_mapping_rule_method_name is None:
-            method_name = 'get_{field_name}_mapping_rule'.format(field_name=field_name)
-            self.get_mapping_rule_method_name = method_name
+        # The get mapping rule method name defaults to `get_{field_name}_mapping_path`.
+        if self.get_mapping_path_method_name is None:
+            method_name = 'get_{field_name}_mapping_path'.format(field_name=field_name)
+            self.get_mapping_path_method_name = method_name
 
         super().bind(field_name, parent)
 
@@ -50,14 +50,14 @@ class DynamicMappingSerializer(serializers.Serializer):
         method = getattr(self.parent, self.get_mapping_serializers_method_name)
         return method()
 
-    def get_mapping_rule(self, mapping_serializers):
-        method = getattr(self.parent, self.get_mapping_rule_method_name)
+    def get_mapping_path(self, mapping_serializers):
+        method = getattr(self.parent, self.get_mapping_path_method_name)
         return method(mapping_serializers)
 
     @staticmethod
-    def mapping(mapping_serializers, mapping_rule):
+    def mapping(mapping_serializers, mapping_path):
         quick_lookup_dict = QuickLookupDict(data=mapping_serializers)
-        serializer = quick_lookup_dict.get(key_path=mapping_rule)
+        serializer = quick_lookup_dict.get(key_path=mapping_path)
         return serializer
 
     def get_mapped_serializer(self):
@@ -65,11 +65,11 @@ class DynamicMappingSerializer(serializers.Serializer):
         assert isinstance(mapping_serializers, dict), (
             self.data_type_error_messages.format('dict', type(mapping_serializers))
         )
-        mapping_rule = self.get_mapping_rule(mapping_serializers)
-        assert isinstance(mapping_rule, list), (
-            self.data_type_error_messages.format('list', type(mapping_rule))
+        mapping_path = self.get_mapping_path(mapping_serializers)
+        assert isinstance(mapping_path, list), (
+            self.data_type_error_messages.format('list', type(mapping_path))
         )
-        serializer = self.mapping(mapping_serializers, mapping_rule)
+        serializer = self.mapping(mapping_serializers, mapping_path)
         return serializer
 
     @cached_property
