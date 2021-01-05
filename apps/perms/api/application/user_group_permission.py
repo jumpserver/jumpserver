@@ -7,7 +7,6 @@ from rest_framework.generics import ListAPIView
 from common.permissions import IsOrgAdminOrAppUser
 from common.mixins.api import CommonApiMixin
 from applications.models import Application
-from applications.api.mixin import ApplicationViewMixin
 from perms import serializers
 
 __all__ = [
@@ -15,7 +14,7 @@ __all__ = [
 ]
 
 
-class UserGroupGrantedApplicationsApi(ApplicationViewMixin, CommonApiMixin, ListAPIView):
+class UserGroupGrantedApplicationsApi(CommonApiMixin, ListAPIView):
     """
     获取用户组直接授权的应用
     """

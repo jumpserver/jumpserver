@@ -6,8 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from assets.models import SystemUser
 from applications.models import Application
-from applications.serializers.attrs import get_attrs_field_dynamic_mapping_rules
-from common.drf.fields import DynamicMappingField
+from applications.serializers import IncludeDynamicMappingSerializerFieldApplicationSerializerMixin
 
 __all__ = [
     'ApplicationGrantedSerializer', 'ApplicationSystemUserSerializer'
@@ -27,13 +26,13 @@ class ApplicationSystemUserSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
-class ApplicationGrantedSerializer(serializers.ModelSerializer):
+class ApplicationGrantedSerializer(IncludeDynamicMappingSerializerFieldApplicationSerializerMixin,
+                                   serializers.ModelSerializer):
     """
     被授权应用的数据结构
     """
     category_display = serializers.ReadOnlyField(source='get_category_display', label=_('Category'))
     type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type'))
-    attrs = DynamicMappingField(mapping_rules=get_attrs_field_dynamic_mapping_rules())
 
     class Meta:
         model = Application

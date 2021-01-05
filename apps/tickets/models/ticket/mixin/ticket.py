@@ -19,7 +19,7 @@ class TicketCreatePermissionMixin(meta.CreatePermissionMixin, base.CreatePermiss
 
 
 class TicketCreateCommentMixin(base.CreateCommentMixin):
-    """ 创建 ticket 评论"""
+    """ 创建 ticket 备注"""
     pass
 
 

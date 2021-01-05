@@ -13,7 +13,6 @@ from rest_framework.response import Response
 from rest_framework.settings import api_settings
 
 from common.drf.filters import IDSpmFilter, CustomFilter, IDInFilter
-from common.drf.serializers import IncludeDynamicMappingFieldSerializerMetaClass
 from ..utils import lazyproperty
 
 __all__ = [
@@ -29,12 +28,11 @@ class JSONResponseMixin(object):
         return JsonResponse(context)
 
 
-#
-# GenericSerializerMixin
+# SerializerMixin
 # ----------------------
 
 
-class GenericSerializerMixin:
+class SerializerMixin:
     """ 根据用户请求动作的不同，获取不同的 `serializer_class `"""
 
     serializer_classes = None
@@ -63,65 +61,6 @@ class GenericSerializerMixin:
         if serializer_class is None:
             serializer_class = super().get_serializer_class()
         return serializer_class
-
-
-#
-# IncludeDynamicMappingFieldSerializerViewMixin
-# ---------------------------------------------
-
-
-class IncludeDynamicMappingFieldSerializerViewMixin(GenericSerializerMixin):
-    """
-    动态创建 `view` 使用的 `serializer_class`,
-
-    根据用户请求行为的不同, 构造出获取 `serializer_class` 中 `common.drf.fields.DynamicMappingField` 字段
-    的映射规则, 并通过 `IncludeDynamicMappingFieldSerializerMetaClass` 元类，
-    基于父类的 `serializer_class` 和 构造出的映射规则 `dynamic_mapping_fields_mapping_rule`
-    创建出满足要求的新的 `serializer_class`
-
-    * 重写 get_dynamic_mapping_fields_mapping_rule 方法:
-
-    For example,
-
-    def  get_dynamic_mapping_fields_mapping_rule(self):
-        return {'meta': ['type', 'apply_asset', 'get']
-
-    """
-
-    def get_dynamic_mapping_fields_mapping_rule(self):
-        """
-        return:
-        {
-            'meta': ['type', 'apply_asset', 'get'],
-            'meta2': 'category.login'
-        }
-        """
-        return {}
-
-    @staticmethod
-    def _create_serializer_class(base, attrs):
-        serializer_class = IncludeDynamicMappingFieldSerializerMetaClass(
-            base.__name__, (base, ), attrs
-        )
-        return serializer_class
-
-    def get_serializer_class(self):
-        serializer_class = super().get_serializer_class()
-
-        if getattr(self, 'swagger_fake_view', False):
-            return serializer_class
-
-        fields_mapping_rule = self.get_dynamic_mapping_fields_mapping_rule()
-        if not fields_mapping_rule:
-            return serializer_class
-
-        attrs = {'dynamic_mapping_fields_mapping_rule': fields_mapping_rule}
-        serializer_class = self._create_serializer_class(base=serializer_class, attrs=attrs)
-        return serializer_class
-
-
-class SerializerMixin(IncludeDynamicMappingFieldSerializerViewMixin):
-    pass
 
 
 class ExtraFilterFieldsMixin:

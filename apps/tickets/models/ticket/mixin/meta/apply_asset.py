@@ -3,7 +3,7 @@ from django.utils.translation import ugettext as __
 from perms.models import AssetPermission, Action
 from assets.models import Asset, SystemUser
 from orgs.utils import tmp_to_org, tmp_to_root_org
-from tickets.utils import convert_model_data_field_name_to_verbose_name
+from tickets.utils import convert_model_instance_data_field_name_to_verbose_name
 
 
 class ConstructDisplayFieldMixin:
@@ -69,11 +69,11 @@ class ConstructBodyMixin:
 
     def construct_apply_asset_approved_body(self):
         approve_assets_snapshot = self.meta['approve_assets_snapshot']
-        approve_assets_snapshot_display = convert_model_data_field_name_to_verbose_name(
+        approve_assets_snapshot_display = convert_model_instance_data_field_name_to_verbose_name(
             Asset, approve_assets_snapshot
         )
         approve_system_users_snapshot = self.meta['approve_system_users_snapshot']
-        approve_system_users_snapshot_display = convert_model_data_field_name_to_verbose_name(
+        approve_system_users_snapshot_display = convert_model_instance_data_field_name_to_verbose_name(
             SystemUser, approve_system_users_snapshot
         )
         approve_actions_display = self.meta['approve_actions_display']

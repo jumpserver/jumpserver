@@ -4,20 +4,37 @@
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-from common.drf.fields import DynamicMappingField
-from .attrs import get_attrs_field_dynamic_mapping_rules
+from common.drf.serializers import DynamicMappingSerializer
+from .attrs import attrs_field_dynamic_mapping_serializers
 
 from .. import models
 
 __all__ = [
     'ApplicationSerializer',
+    'IncludeDynamicMappingSerializerFieldApplicationSerializerMixin',
 ]
 
 
-class ApplicationSerializer(BulkOrgResourceModelSerializer):
+class IncludeDynamicMappingSerializerFieldApplicationSerializerMixin(serializers.Serializer):
+    attrs = DynamicMappingSerializer(mapping_serializers=attrs_field_dynamic_mapping_serializers)
+
+    def get_attrs_mapping_path(self, mapping_serializers):
+        request = self.context['request']
+        query_type = request.query_params.get('type')
+        query_category = request.query_params.get('category')
+        if query_type:
+            mapping_path = ['type', query_type]
+        elif query_category:
+            mapping_path = ['category', query_category]
+        else:
+            mapping_path = ['default']
+        return mapping_path
+
+
+class ApplicationSerializer(IncludeDynamicMappingSerializerFieldApplicationSerializerMixin,
+                            BulkOrgResourceModelSerializer):
     category_display = serializers.ReadOnlyField(source='get_category_display', label=_('Category'))
     type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type'))
-    attrs = DynamicMappingField(mapping_rules=get_attrs_field_dynamic_mapping_rules())
 
     class Meta:
         model = models.Application
@@ -33,3 +50,4 @@ class ApplicationSerializer(BulkOrgResourceModelSerializer):
         _attrs = self.instance.attrs if self.instance else {}
         _attrs.update(attrs)
         return _attrs
+

@@ -31,8 +31,8 @@ class RemoteAppConnectionInfoSerializer(serializers.ModelSerializer):
         """
         返回Guacamole需要的RemoteApp配置参数信息中的parameters参数
         """
-        from .attrs import get_serializer_by_application_type
-        serializer_class = get_serializer_by_application_type(obj.type)
+        from .attrs import get_serializer_class_by_application_type
+        serializer_class = get_serializer_class_by_application_type(obj.type)
         fields = serializer_class().get_fields()
 
         parameters = [obj.type]

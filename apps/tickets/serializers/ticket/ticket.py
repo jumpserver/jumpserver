@@ -2,13 +2,14 @@
 #
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
-from common.drf.fields import ReadableHiddenField, DynamicMappingField
+from common.drf.fields import ReadableHiddenField
+from common.drf.serializers import DynamicMappingSerializer
 from orgs.utils import get_org_by_id
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from users.models import User
 from tickets import const
 from tickets.models import Ticket
-from .meta import get_meta_field_dynamic_mapping_rules
+from .meta import meta_field_dynamic_mapping_serializers
 
 __all__ = [
     'TicketSerializer', 'TicketDisplaySerializer',
@@ -21,7 +22,7 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
     type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type'))
     action_display = serializers.ReadOnlyField(source='get_action_display', label=_('Action'))
     status_display = serializers.ReadOnlyField(source='get_status_display', label=_('Status'))
-    meta = DynamicMappingField(mapping_rules=get_meta_field_dynamic_mapping_rules())
+    meta = DynamicMappingSerializer(mapping_serializers=meta_field_dynamic_mapping_serializers)
 
     class Meta:
         model = Ticket
@@ -34,6 +35,15 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
             'org_id', 'org_name',
             'body'
         ]
+
+    def get_meta_mapping_path(self, mapping_serializers):
+        view = self.context['view']
+        request = self.context['request']
+        query_type = request.query_params.get('type')
+        query_action = request.query_params.get('action')
+        action = query_action if query_action else view.action
+        mapping_path = ['type', query_type, action]
+        return mapping_path
 
 
 class TicketDisplaySerializer(TicketSerializer):

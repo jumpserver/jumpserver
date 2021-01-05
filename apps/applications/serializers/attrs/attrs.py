@@ -1,12 +1,11 @@
-import copy
+from rest_framework import serializers
 from applications import const
-from common.drf.fields import IgnoreSensitiveInfoReadOnlyJSONField
-from . import category, type as application_type
+from . import application_category, application_type
 
 
 __all__ = [
-    'get_attrs_field_dynamic_mapping_rules', 'get_attrs_field_mapping_rule_by_view',
-    'get_serializer_by_application_type',
+    'attrs_field_dynamic_mapping_serializers',
+    'get_serializer_class_by_application_type',
 ]
 
 
@@ -35,16 +34,15 @@ type_custom = const.ApplicationTypeChoices.custom.value
 type_k8s = const.ApplicationTypeChoices.k8s.value
 
 
-# define `attrs` field `DynamicMappingField` mapping_rules
-# -----------------------------------------------------
+# define `attrs` field `dynamic mapping serializers`
+# --------------------------------------------------
 
 
-__ATTRS_FIELD_DYNAMIC_MAPPING_RULES = {
-    'default': IgnoreSensitiveInfoReadOnlyJSONField,
+attrs_field_dynamic_mapping_serializers = {
     'category': {
-        category_db: category.DBSerializer,
-        category_remote_app: category.RemoteAppSerializer,
-        category_cloud: category.CloudSerializer,
+        category_db: application_category.DBSerializer,
+        category_remote_app: application_category.RemoteAppSerializer,
+        category_cloud: application_category.CloudSerializer,
     },
     'type': {
         # db
@@ -63,32 +61,5 @@ __ATTRS_FIELD_DYNAMIC_MAPPING_RULES = {
 }
 
 
-# Note:
-# The dynamic mapping rules of `attrs` field is obtained
-# through call method `get_attrs_field_dynamic_mapping_rules`
-
-def get_attrs_field_dynamic_mapping_rules():
-    return copy.deepcopy(__ATTRS_FIELD_DYNAMIC_MAPPING_RULES)
-
-
-# get `attrs dynamic field` mapping rule by `view object`
-# ----------------------------------------------------
-
-
-def get_attrs_field_mapping_rule_by_view(view):
-    query_type = view.request.query_params.get('type')
-    query_category = view.request.query_params.get('category')
-    if query_type:
-        mapping_rule = ['type', query_type]
-    elif query_category:
-        mapping_rule = ['category', query_category]
-    else:
-        mapping_rule = ['default']
-    return mapping_rule
-
-
-# get `category` mapping `serializer`
-# -----------------------------------
-
-def get_serializer_by_application_type(app_tp):
-    return __ATTRS_FIELD_DYNAMIC_MAPPING_RULES['type'].get(app_tp)
+def get_serializer_class_by_application_type(_application_type):
+    return attrs_field_dynamic_mapping_serializers['type'].get(_application_type)
