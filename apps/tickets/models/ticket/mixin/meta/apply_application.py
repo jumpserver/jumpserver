@@ -4,7 +4,7 @@ from applications.models import Application
 from applications.const import ApplicationCategoryChoices, ApplicationTypeChoices
 from assets.models import SystemUser
 from perms.models import ApplicationPermission
-from tickets.utils import convert_model_data_field_name_to_verbose_name
+from tickets.utils import convert_model_instance_data_field_name_to_verbose_name
 
 
 class ConstructDisplayFieldMixin:
@@ -67,11 +67,11 @@ class ConstructBodyMixin:
     def construct_apply_application_approved_body(self):
         # 审批信息
         approve_applications_snapshot = self.meta['approve_applications_snapshot']
-        approve_applications_snapshot_display = convert_model_data_field_name_to_verbose_name(
+        approve_applications_snapshot_display = convert_model_instance_data_field_name_to_verbose_name(
             Application, approve_applications_snapshot
         )
         approve_system_users_snapshot = self.meta['approve_system_users_snapshot']
-        approve_system_users_snapshot_display = convert_model_data_field_name_to_verbose_name(
+        approve_system_users_snapshot_display = convert_model_instance_data_field_name_to_verbose_name(
             SystemUser, approve_system_users_snapshot
         )
         approve_date_start = self.meta['approve_date_start']

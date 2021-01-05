@@ -12,7 +12,6 @@ from common.permissions import IsValidUser, IsOrgAdmin
 from tickets import serializers
 from tickets.models import Ticket
 from tickets.permissions.ticket import IsAssignee, NotClosed
-from tickets.serializers.ticket.utils import get_dynamic_mapping_fields_mapping_rule_by_view
 
 
 __all__ = ['TicketViewSet']
@@ -66,6 +65,3 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     def close(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
 
-    def get_dynamic_mapping_fields_mapping_rule(self):
-        fields_mapping_rule = get_dynamic_mapping_fields_mapping_rule_by_view(view=self)
-        return fields_mapping_rule

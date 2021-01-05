@@ -11,30 +11,23 @@ from . import const
 logger = get_logger(__file__)
 
 
-def convert_model_data_field_name_to_verbose_name(model, name_data):
-    """将Model以field_name为key的数据转换为以field_verbose_name为key的数据"""
-    if isinstance(name_data, dict):
-        name_data = [name_data]
-
-    model_fields_name_verbose_name_mapping = {
+def get_model_field_verbose_name(model, field_name):
+    field_name_field_verbose_name_mapping = {
         field.name: field.verbose_name for field in model._meta.fields
     }
+    field_name = field_name.split('__', 1)[0]
+    field_verbose_name = field_name_field_verbose_name_mapping.get(field_name, field_name)
+    return field_verbose_name
 
-    def get_verbose_name(field_name):
-        verbose_name = model_fields_name_verbose_name_mapping.get(field_name)
-        if not verbose_name:
-            other_name = field_name.split('__', 1)[0]
-            verbose_name = model_fields_name_verbose_name_mapping.get(other_name)
-        if not verbose_name:
-            verbose_name = field_name
-        return verbose_name
 
-    verbose_name_data = [
-        {get_verbose_name(name): value for name, value in d.items()}
-        for d in name_data
+def convert_model_instance_data_field_name_to_verbose_name(model, data):
+    if isinstance(data, dict):
+        data = [data]
+    converted_data = [
+        {get_model_field_verbose_name(model, name): value for name, value in d.items()}
+        for d in data
     ]
-
-    return verbose_name_data
+    return converted_data
 
 
 def send_ticket_applied_mail_to_assignees(ticket, assignees):

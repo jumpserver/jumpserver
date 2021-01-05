@@ -2,7 +2,6 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from perms.serializers import ActionsField
 from assets.models import Asset, SystemUser
-from tickets.models import Ticket
 from .mixin import BaseApproveSerializerMixin
 
 

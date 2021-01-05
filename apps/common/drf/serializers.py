@@ -5,133 +5,98 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework_bulk.serializers import BulkListSerializer
 
 from common.mixins import BulkListSerializerMixin
-from common.drf.fields import DynamicMappingField
+from django.utils.functional import cached_property
+from rest_framework.utils.serializer_helpers import BindingDict
 from common.mixins.serializers import BulkSerializerMixin
 from common.utils import QuickLookupDict
 
 __all__ = [
-    'IncludeDynamicMappingFieldSerializerMetaClass',
+    'DynamicMappingSerializer',
     'EmptySerializer', 'BulkModelSerializer', 'AdaptedBulkListSerializer', 'CeleryTaskSerializer'
 ]
 
 
-#
-# IncludeDynamicMappingFieldSerializerMetaClass
-# ---------------------------------------------
+# DynamicMappingSerializer
+# ------------------------
 
-class IncludeDynamicMappingFieldSerializerMetaClass(serializers.SerializerMetaclass, type):
-    """
-    SerializerMetaClass: 动态创建包含 `common.drf.fields.DynamicMappingField` 字段的 `SerializerClass`
 
-    * Process only fields of type `DynamicMappingField` in `_declared_fields`
-    * 只处理 `_declared_fields` 中类型为 `DynamicMappingField` 的字段
+class DynamicMappingSerializer(serializers.Serializer):
+    data_type_error_messages = 'Expect get instance of type `{}`, but got instance type of  `{}`'
 
-    根据 `attrs['dynamic_mapping_fields_mapping_rule']` 中指定的 `fields_mapping_rule`,
-    从 `DynamicMappingField` 中匹配出满足给定规则的字段, 并使用匹配到的字段替换自身的 `DynamicMappingField`
+    def __init__(self, mapping_serializers=None, get_mapping_serializers_method_name=None,
+                 get_mapping_rule_method_name=None, default_serializer=None, **kwargs):
+        self.mapping_serializers = mapping_serializers
+        self.get_mapping_serializers_method_name = get_mapping_serializers_method_name
+        self.get_mapping_rule_method_name = get_mapping_rule_method_name
+        self.default_serializer = default_serializer or serializers.Serializer
+        super().__init__(**kwargs)
 
-    * 注意: 如果未能根据给定的匹配规则获取到对应的字段，先获取与给定规则同级的 `default` 字段，
-           如果仍未获取到，则再获取 `DynamicMappingField`中定义的最外层的 `default` 字段
+    def bind(self, field_name, parent):
+        # The get mapping serializers method name defaults to `get_{field_name}_mapping_serializers`
+        if self.get_mapping_serializers_method_name is None:
+            method_name = 'get_{field_name}_mapping_serializers'.format(field_name=field_name)
+            self.get_mapping_serializers_method_name = method_name
 
-    * 说明: 如果获取到的不是 `serializers.Field` 类型, 则返回 `DynamicMappingField()`
+        # The get mapping rule method name defaults to `get_{field_name}_mapping_rule`.
+        if self.get_mapping_rule_method_name is None:
+            method_name = 'get_{field_name}_mapping_rule'.format(field_name=field_name)
+            self.get_mapping_rule_method_name = method_name
 
-    For example, define attrs['dynamic_mapping_fields_mapping_rule']:
+        super().bind(field_name, parent)
 
-    mapping_rules = {
-        'default': serializer.JSONField,
-        'type': {
-            'apply_asset': {
-                'default': serializer.ChoiceField(),
-                'get': serializer.CharField()
-            }
-        }
-    }
-    meta = DynamicMappingField(mapping_rules=mapping_rules)
+    def get_mapping_serializers(self):
+        if self.mapping_serializers is not None:
+            return self.mapping_serializers
+        method = getattr(self.parent, self.get_mapping_serializers_method_name)
+        return method()
 
-    dynamic_mapping_fields_mapping_rule = {'meta': ['type', 'apply_asset', 'get'],}
-    => Got `serializer.CharField()`
-    * or *
-    dynamic_mapping_fields_mapping_rule = {{'meta': 'type.apply_asset.get',}}
-    => Got `serializer.CharField()`
-    * or *
-    dynamic_mapping_fields_mapping_rule = {{'meta': 'type.apply_asset.',}}
-    => Got serializer.ChoiceField(),
-    * or *
-    dynamic_mapping_fields_mapping_rule = {{'meta': 'type.apply_asset.xxx',}}
-    => Got `serializer.ChoiceField()`
-    * or *
-    dynamic_mapping_fields_mapping_rule = {{'meta': 'type.apply_asset.get.xxx',}}
-    => Got `serializer.JSONField()`
-    * or *
-    dynamic_mapping_fields_mapping_rule = {{'meta': 'type.apply_asset',}}
-    => Got `{'get': {}}`, type is not `serializers.Field`, So `meta` is `DynamicMappingField()`
-    """
+    def get_mapping_rule(self):
+        method = getattr(self.parent, self.get_mapping_rule_method_name)
+        return method()
 
-    @classmethod
-    def get_dynamic_mapping_fields(mcs, bases, attrs):
-        fields = {}
+    @staticmethod
+    def mapping(mapping_serializers, mapping_rule):
+        quick_lookup_dict = QuickLookupDict(data=mapping_serializers)
+        serializer = quick_lookup_dict.get(key_path=mapping_rule)
+        return serializer
 
-        # get `fields mapping rule` from attrs `dynamic_mapping_fields_mapping_rule`
-        fields_mapping_rule = attrs.get('dynamic_mapping_fields_mapping_rule')
-
-        # check `fields_mapping_rule` type
-        assert isinstance(fields_mapping_rule, dict), (
-            '`dynamic_mapping_fields_mapping_rule` must be `dict` type , but get `{}`'
-            ''.format(type(fields_mapping_rule))
+    def get_mapped_serializer(self):
+        mapping_serializers = self.get_mapping_serializers()
+        assert isinstance(mapping_serializers, dict), (
+            self.data_type_error_messages.format('dict', type(mapping_serializers))
         )
+        mapping_rule = self.get_mapping_rule()
+        assert isinstance(mapping_rule, list), (
+            self.data_type_error_messages.format('list', type(mapping_rule))
+        )
+        serializer = self.mapping(mapping_serializers, mapping_rule)
+        return serializer
 
-        # get `serializer class` declared fields
-        declared_fields = mcs._get_declared_fields(bases, attrs)
-        declared_fields_names = list(declared_fields.keys())
+    @cached_property
+    def mapped_serializer(self):
+        serializer = self.get_mapped_serializer()
+        if serializer is None:
+            serializer = self.default_serializer
+        if isinstance(serializer, type):
+            serializer = serializer()
+        return serializer
 
-        fields_mapping_rule = copy.deepcopy(fields_mapping_rule)
-
-        for field_name, field_mapping_rule in fields_mapping_rule.items():
-
-            if field_name not in declared_fields_names:
-                continue
-
-            declared_field = declared_fields[field_name]
-            if not isinstance(declared_field, DynamicMappingField):
-                continue
-
-            assert isinstance(field_mapping_rule, (list, str)), (
-                '`dynamic_mapping_fields_mapping_rule.field_mapping_rule` '
-                '- can be either a list of keys, or a delimited string. '
-                'Such as:  `["type", "apply_asset", "get"]` or `type.apply_asset.get` '
-                'but, get type is `{}`, `{}`'
-                ''.format(type(field_mapping_rule), field_mapping_rule)
-            )
-
-            if isinstance(field_mapping_rule, str):
-                field_mapping_rule = field_mapping_rule.split('.')
-
-            # construct `field mapping rules` sequence list
-            field_mapping_rules = [
-                field_mapping_rule,
-                copy.deepcopy(field_mapping_rule)[:-1] + ['default'],
-                ['default']
-            ]
-
-            dynamic_field = declared_field
-
-            field_finder = QuickLookupDict(dynamic_field.mapping_rules)
-
-            field = field_finder.find_one(key_paths=field_mapping_rules)
-
-            if isinstance(field, type):
-                field = field()
-
-            if not isinstance(field, serializers.Field):
-                continue
-
-            fields[field_name] = field
-
+    def get_fields(self):
+        fields = self.mapped_serializer.get_fields()
         return fields
 
-    def __new__(mcs, name, bases, attrs):
-        dynamic_mapping_fields = mcs.get_dynamic_mapping_fields(bases, attrs)
-        attrs.update(dynamic_mapping_fields)
-        return super().__new__(mcs, name, bases, attrs)
+    @cached_property
+    def fields(self):
+        """
+        重写此方法因为在 BindingDict 中要设置每一个 field 的 parent 为 `mapped_serializer`,
+        这样在调用 field.parent 时, 才会达到预期的结果，
+        比如: serializers.SerializerMethodField
+        """
+        fields = BindingDict(self.mapped_serializer)
+        for key, value in self.get_fields().items():
+            fields[key] = value
+        return fields
+
 
 #
 # Other Serializer

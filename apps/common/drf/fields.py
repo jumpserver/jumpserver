@@ -6,88 +6,10 @@ from rest_framework import serializers
 
 
 __all__ = [
-    'DynamicMappingField', 'ReadableHiddenField',
-    'CustomMetaDictField', 'IgnoreSensitiveInfoReadOnlyJSONField',
+    'ReadableHiddenField', 'CustomMetaDictField',
 ]
 
 
-#
-# DynamicMappingField
-# -------------------
-
-
-class DynamicMappingField(serializers.Field):
-    """
-    一个可以根据用户行为而动态改变的字段
-
-    For example, Define attribute `mapping_rules`
-
-    field_name = meta
-
-    mapping_rules = {
-        'default': serializers.JSONField(),
-        'type': {
-            'apply_asset': {
-                'default': serializers.CharField(label='default'),
-                'get': ApplyAssetSerializer,
-                'post': ApproveAssetSerializer,
-            },
-            'apply_application': ApplyApplicationSerializer,
-            'login_confirm': LoginConfirmSerializer,
-            'login_times': LoginTimesSerializer
-        },
-        'category': {
-            'apply': ApplySerializer,
-            'login': LoginSerializer
-        }
-    }
-    """
-
-    def __init__(self, mapping_rules, *args, **kwargs):
-        assert isinstance(mapping_rules, dict), (
-            '`mapping_rule` argument expect type `dict`, gut get `{}`'
-            ''.format(type(mapping_rules))
-        )
-
-        self.__mapping_rules = mapping_rules
-        super().__init__(*args, **kwargs)
-
-    @property
-    def mapping_rules(self):
-        return copy.deepcopy(self.__mapping_rules)
-
-    def to_internal_value(self, data):
-        """ 实际是一个虚拟字段所以不返回任何值 """
-        pass
-
-    def to_representation(self, value):
-        """ 实际是一个虚拟字段所以不返回任何值 """
-        pass
-
-
-# A Ignore read-only fields for sensitive information
-# ----------------------------------------------------------
-
-
-class IgnoreSensitiveInfoReadOnlyJSONField(serializers.JSONField):
-    """ A ignore read-only fields for sensitive information """
-
-    def __init__(self, **kwargs):
-        kwargs['read_only'] = True
-        super().__init__(**kwargs)
-
-    def to_representation(self, value):
-        sensitive_ignored_value = {}
-        sensitive_names = ['password']
-        for field_name, field_value in value.items():
-            for sensitive_name in sensitive_names:
-                if sensitive_name in field_name.lower():
-                    continue
-                sensitive_ignored_value[field_name] = field_value
-        return super().to_representation(sensitive_ignored_value)
-
-
-#
 # ReadableHiddenField
 # -------------------
 

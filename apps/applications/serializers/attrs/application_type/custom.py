@@ -2,7 +2,7 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from ..category import RemoteAppSerializer
+from ..application_category import RemoteAppSerializer
 
 
 __all__ = ['CustomSerializer']
