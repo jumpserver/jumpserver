@@ -50,9 +50,9 @@ class DynamicMappingSerializer(serializers.Serializer):
         method = getattr(self.parent, self.get_mapping_serializers_method_name)
         return method()
 
-    def get_mapping_rule(self):
+    def get_mapping_rule(self, mapping_serializers):
         method = getattr(self.parent, self.get_mapping_rule_method_name)
-        return method()
+        return method(mapping_serializers)
 
     @staticmethod
     def mapping(mapping_serializers, mapping_rule):
@@ -65,7 +65,7 @@ class DynamicMappingSerializer(serializers.Serializer):
         assert isinstance(mapping_serializers, dict), (
             self.data_type_error_messages.format('dict', type(mapping_serializers))
         )
-        mapping_rule = self.get_mapping_rule()
+        mapping_rule = self.get_mapping_rule(mapping_serializers)
         assert isinstance(mapping_rule, list), (
             self.data_type_error_messages.format('list', type(mapping_rule))
         )

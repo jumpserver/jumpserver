@@ -6,7 +6,7 @@ from .mixin import BaseApproveSerializerMixin
 
 
 __all__ = [
-    'ApplyAssetTypeSerializer', 'ApplySerializer', 'ApproveSerializer',
+    'ApplyAssetSerializer', 'ApplySerializer', 'ApproveSerializer',
 ]
 
 
@@ -83,5 +83,5 @@ class ApproveSerializer(BaseApproveSerializerMixin, serializers.Serializer):
         return system_users_id
 
 
-class ApplyAssetTypeSerializer(ApplySerializer, ApproveSerializer):
+class ApplyAssetSerializer(ApplySerializer, ApproveSerializer):
     pass

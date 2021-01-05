@@ -39,7 +39,6 @@ type_k8s = const.ApplicationTypeChoices.k8s.value
 
 
 attrs_field_dynamic_mapping_serializers = {
-    'default': serializers.Serializer,
     'category': {
         category_db: application_category.DBSerializer,
         category_remote_app: application_category.RemoteAppSerializer,
