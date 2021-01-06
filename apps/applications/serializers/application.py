@@ -10,12 +10,11 @@ from .attrs import category_serializer_classes_mapping, type_serializer_classes_
 from .. import models
 
 __all__ = [
-    'ApplicationSerializer',
-    'IncludeMethodSerializerFieldApplicationSerializerMixin',
+    'ApplicationSerializer', 'ApplicationSerializerMixin',
 ]
 
 
-class IncludeMethodSerializerFieldApplicationSerializerMixin(serializers.Serializer):
+class ApplicationSerializerMixin(serializers.Serializer):
     attrs = MethodSerializer()
 
     def get_attrs_serializer(self):
@@ -34,8 +33,7 @@ class IncludeMethodSerializerFieldApplicationSerializerMixin(serializers.Seriali
         return serializer
 
 
-class ApplicationSerializer(IncludeMethodSerializerFieldApplicationSerializerMixin,
-                            BulkOrgResourceModelSerializer):
+class ApplicationSerializer(ApplicationSerializerMixin, BulkOrgResourceModelSerializer):
     category_display = serializers.ReadOnlyField(source='get_category_display', label=_('Category'))
     type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type'))
 
