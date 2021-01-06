@@ -1,6 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 
 import os
+
 import shutil
 from collections import namedtuple
 
@@ -18,6 +19,7 @@ from .callback import (
 )
 from common.utils import get_logger
 from .exceptions import AnsibleError
+from .display import AdHocDisplay
 
 
 __all__ = ["AdHocRunner", "PlayBookRunner", "CommandRunner"]
@@ -130,8 +132,8 @@ class AdHocRunner:
             loader=self.loader, inventory=self.inventory
         )
 
-    def get_result_callback(self, file_obj=None):
-        return self.__class__.results_callback_class()
+    def get_result_callback(self, execution_id=None):
+        return self.__class__.results_callback_class(display=AdHocDisplay(execution_id))
 
     @staticmethod
     def check_module_args(module_name, module_args=''):
@@ -189,7 +191,7 @@ class AdHocRunner:
                 'ssh_args': '-C -o ControlMaster=no'
             }
 
-    def run(self, tasks, pattern, play_name='Ansible Ad-hoc', gather_facts='no'):
+    def run(self, tasks, pattern, play_name='Ansible Ad-hoc', gather_facts='no', execution_id=None):
         """
         :param tasks: [{'action': {'module': 'shell', 'args': 'ls'}, ...}, ]
         :param pattern: all, *, or others
@@ -198,7 +200,7 @@ class AdHocRunner:
         :return:
         """
         self.check_pattern(pattern)
-        self.results_callback = self.get_result_callback()
+        self.results_callback = self.get_result_callback(execution_id)
         cleaned_tasks = self.clean_tasks(tasks)
         self.set_control_master_if_need(cleaned_tasks)
         context.CLIARGS = ImmutableDict(self.options)
@@ -232,6 +234,8 @@ class AdHocRunner:
             if tqm is not None:
                 tqm.cleanup()
             shutil.rmtree(C.DEFAULT_LOCAL_TMP, True)
+
+            self.results_callback.close()
 
 
 class CommandRunner(AdHocRunner):
