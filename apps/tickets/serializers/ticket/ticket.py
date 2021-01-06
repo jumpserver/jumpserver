@@ -3,13 +3,13 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from common.drf.fields import ReadableHiddenField
-from common.drf.serializers import DynamicMappingSerializer
+from common.drf.serializers import MethodSerializer
 from orgs.utils import get_org_by_id
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from users.models import User
 from tickets import const
 from tickets.models import Ticket
-from .meta import meta_field_dynamic_mapping_serializers
+from .meta import type_serializer_classes_mapping
 
 __all__ = [
     'TicketSerializer', 'TicketDisplaySerializer',
@@ -22,7 +22,7 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
     type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type'))
     action_display = serializers.ReadOnlyField(source='get_action_display', label=_('Action'))
     status_display = serializers.ReadOnlyField(source='get_status_display', label=_('Status'))
-    meta = DynamicMappingSerializer(mapping_serializers=meta_field_dynamic_mapping_serializers)
+    meta = MethodSerializer()
 
     class Meta:
         model = Ticket
@@ -36,14 +36,21 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
             'body'
         ]
 
-    def get_meta_mapping_path(self, mapping_serializers):
-        view = self.context['view']
+    def get_meta_serializer(self):
         request = self.context['request']
+        view = self.context['view']
         query_type = request.query_params.get('type')
         query_action = request.query_params.get('action')
-        action = query_action if query_action else view.action
-        mapping_path = ['type', query_type, action]
-        return mapping_path
+        view_action = view.action
+        action = query_action if query_action else view_action
+        if query_type:
+            serializer_class = type_serializer_classes_mapping.get(query_type, {}).get(action)
+        else:
+            serializer_class = None
+        if serializer_class is None:
+            serializer_class = serializers.Serializer
+        serializer = serializer_class()
+        return serializer
 
 
 class TicketDisplaySerializer(TicketSerializer):

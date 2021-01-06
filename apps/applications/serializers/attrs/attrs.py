@@ -4,62 +4,39 @@ from . import application_category, application_type
 
 
 __all__ = [
-    'attrs_field_dynamic_mapping_serializers',
+    'category_serializer_classes_mapping',
+    'type_serializer_classes_mapping',
     'get_serializer_class_by_application_type',
 ]
 
 
-# application category
-# --------------------
+# define `attrs` field `category serializers mapping`
+# ---------------------------------------------------
 
-category_db = const.ApplicationCategoryChoices.db.value
-category_remote_app = const.ApplicationCategoryChoices.remote_app.value
-category_cloud = const.ApplicationCategoryChoices.cloud.value
+category_serializer_classes_mapping = {
+    const.ApplicationCategoryChoices.db.value: application_category.DBSerializer,
+    const.ApplicationCategoryChoices.remote_app.value: application_category.RemoteAppSerializer,
+    const.ApplicationCategoryChoices.cloud.value: application_category.CloudSerializer,
+}
 
+# define `attrs` field `type serializers mapping`
+# -----------------------------------------------
 
-# application type
-# ----------------
-
-# db
-type_mysql = const.ApplicationTypeChoices.mysql.value
-type_mariadb = const.ApplicationTypeChoices.mariadb.value
-type_oracle = const.ApplicationTypeChoices.oracle.value
-type_pgsql = const.ApplicationTypeChoices.pgsql.value
-# remote-app
-type_chrome = const.ApplicationTypeChoices.chrome.value
-type_mysql_workbench = const.ApplicationTypeChoices.mysql_workbench.value
-type_vmware_client = const.ApplicationTypeChoices.vmware_client.value
-type_custom = const.ApplicationTypeChoices.custom.value
-# cloud
-type_k8s = const.ApplicationTypeChoices.k8s.value
-
-
-# define `attrs` field `dynamic mapping serializers`
-# --------------------------------------------------
-
-
-attrs_field_dynamic_mapping_serializers = {
-    'category': {
-        category_db: application_category.DBSerializer,
-        category_remote_app: application_category.RemoteAppSerializer,
-        category_cloud: application_category.CloudSerializer,
-    },
-    'type': {
-        # db
-        type_mysql: application_type.MySQLSerializer,
-        type_mariadb: application_type.MariaDBSerializer,
-        type_oracle: application_type.OracleSerializer,
-        type_pgsql: application_type.PostgreSerializer,
-        # remote-app
-        type_chrome: application_type.ChromeSerializer,
-        type_mysql_workbench: application_type.MySQLWorkbenchSerializer,
-        type_vmware_client: application_type.VMwareClientSerializer,
-        type_custom: application_type.CustomSerializer,
-        # cloud
-        type_k8s: application_type.K8SSerializer
-    }
+type_serializer_classes_mapping = {
+    # db
+    const.ApplicationTypeChoices.mysql.value: application_type.MySQLSerializer,
+    const.ApplicationTypeChoices.mariadb.value: application_type.MariaDBSerializer,
+    const.ApplicationTypeChoices.oracle.value: application_type.OracleSerializer,
+    const.ApplicationTypeChoices.pgsql.value: application_type.PostgreSerializer,
+    # remote-app
+    const.ApplicationTypeChoices.chrome.value: application_type.ChromeSerializer,
+    const.ApplicationTypeChoices.mysql_workbench.value: application_type.MySQLWorkbenchSerializer,
+    const.ApplicationTypeChoices.vmware_client.value: application_type.VMwareClientSerializer,
+    const.ApplicationTypeChoices.custom.value: application_type.CustomSerializer,
+    # cloud
+    const.ApplicationTypeChoices.k8s.value: application_type.K8SSerializer
 }
 
 
 def get_serializer_class_by_application_type(_application_type):
-    return attrs_field_dynamic_mapping_serializers['type'].get(_application_type)
+    return type_serializer_classes_mapping.get(_application_type)
