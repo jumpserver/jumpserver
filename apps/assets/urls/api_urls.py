@@ -36,6 +36,7 @@ urlpatterns = [
     path('assets/<uuid:pk>/gateways/', api.AssetGatewayListApi.as_view(), name='asset-gateway-list'),
     path('assets/<uuid:pk>/platform/', api.AssetPlatformRetrieveApi.as_view(), name='asset-platform-detail'),
     path('assets/<uuid:pk>/tasks/', api.AssetTaskCreateApi.as_view(), name='asset-task-create'),
+    path('assets/tasks/', api.AssetsTaskCreateApi.as_view(), name='assets-task-create'),
 
     path('asset-users/tasks/', api.AssetUserTaskCreateAPI.as_view(), name='asset-user-task-create'),
 
