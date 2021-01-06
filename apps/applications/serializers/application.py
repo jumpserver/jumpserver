@@ -4,35 +4,36 @@
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-from common.drf.serializers import DynamicMappingSerializer
-from .attrs import attrs_field_dynamic_mapping_serializers
+from common.drf.serializers import MethodSerializer
+from .attrs import category_serializer_classes_mapping, type_serializer_classes_mapping
 
 from .. import models
 
 __all__ = [
-    'ApplicationSerializer',
-    'IncludeDynamicMappingSerializerFieldApplicationSerializerMixin',
+    'ApplicationSerializer', 'ApplicationSerializerMixin',
 ]
 
 
-class IncludeDynamicMappingSerializerFieldApplicationSerializerMixin(serializers.Serializer):
-    attrs = DynamicMappingSerializer(mapping_serializers=attrs_field_dynamic_mapping_serializers)
+class ApplicationSerializerMixin(serializers.Serializer):
+    attrs = MethodSerializer()
 
-    def get_attrs_mapping_path(self, mapping_serializers):
+    def get_attrs_serializer(self):
         request = self.context['request']
         query_type = request.query_params.get('type')
         query_category = request.query_params.get('category')
         if query_type:
-            mapping_path = ['type', query_type]
+            serializer_class = type_serializer_classes_mapping.get(query_type)
         elif query_category:
-            mapping_path = ['category', query_category]
+            serializer_class = category_serializer_classes_mapping.get(query_category)
         else:
-            mapping_path = ['default']
-        return mapping_path
+            serializer_class = None
+        if serializer_class is None:
+            serializer_class = serializers.Serializer
+        serializer = serializer_class()
+        return serializer
 
 
-class ApplicationSerializer(IncludeDynamicMappingSerializerFieldApplicationSerializerMixin,
-                            BulkOrgResourceModelSerializer):
+class ApplicationSerializer(ApplicationSerializerMixin, BulkOrgResourceModelSerializer):
     category_display = serializers.ReadOnlyField(source='get_category_display', label=_('Category'))
     type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type'))
 
