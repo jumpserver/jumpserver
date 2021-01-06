@@ -19,6 +19,7 @@ disk_pattern = re.compile(r'^hd|sd|xvd|vd|nv')
 __all__ = [
     'update_assets_hardware_info_util', 'update_asset_hardware_info_manual',
     'update_assets_hardware_info_period',  'update_node_assets_hardware_info_manual',
+    'update_assets_hardware_info_manual',
 ]
 
 
@@ -112,6 +113,12 @@ def update_assets_hardware_info_util(assets, task_name=None):
 def update_asset_hardware_info_manual(asset):
     task_name = _("Update asset hardware info: {}").format(asset.hostname)
     update_assets_hardware_info_util([asset], task_name=task_name)
+
+
+@shared_task(queue="ansible")
+def update_assets_hardware_info_manual(assets):
+    task_name = _("Update assets hardware info: {}").format([asset.hostname for asset in assets])
+    update_assets_hardware_info_util(assets, task_name=task_name)
 
 
 @shared_task(queue="ansible")
