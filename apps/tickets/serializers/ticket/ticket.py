@@ -30,7 +30,7 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
             'id', 'title', 'type', 'type_display',
             'meta', 'action', 'action_display', 'status', 'status_display',
             'applicant', 'applicant_display', 'processor', 'processor_display',
-            'assignees', 'assignees_display',
+            'assignees', 'assignees_display', 'comment',
             'date_created', 'date_updated',
             'org_id', 'org_name',
             'body'
@@ -75,7 +75,7 @@ class TicketApplySerializer(TicketActionSerializer):
 
     class Meta(TicketActionSerializer.Meta):
         required_fields = TicketActionSerializer.Meta.required_fields + [
-            'id', 'title', 'type', 'applicant', 'meta', 'assignees', 'org_id'
+            'id', 'title', 'type', 'applicant', 'meta', 'assignees', 'comment', 'org_id'
         ]
         read_only_fields = list(set(TicketDisplaySerializer.Meta.fields) - set(required_fields))
         extra_kwargs = {
