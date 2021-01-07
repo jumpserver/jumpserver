@@ -12,8 +12,8 @@ from .. import serializers
 class AssigneeViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsValidUser,)
     serializer_class = serializers.AssigneeSerializer
-    filter_fields = ('id', 'name', 'username', 'email', 'source')
-    search_fields = filter_fields
+    filterset_fields = ('id', 'name', 'username', 'email', 'source')
+    search_fields = filterset_fields
 
     def get_org(self):
         org_id = self.request.query_params.get('org_id')

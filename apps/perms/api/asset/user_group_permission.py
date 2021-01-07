@@ -35,7 +35,7 @@ class UserGroupGrantedAssetsApi(ListAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.AssetGrantedSerializer
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
-    filter_fields = ['hostname', 'ip', 'id', 'comment']
+    filterset_fields = ['hostname', 'ip', 'id', 'comment']
     search_fields = ['hostname', 'ip', 'comment']
 
     def get_queryset(self):
@@ -68,7 +68,7 @@ class UserGroupGrantedNodeAssetsApi(ListAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.AssetGrantedSerializer
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
-    filter_fields = ['hostname', 'ip', 'id', 'comment']
+    filterset_fields = ['hostname', 'ip', 'id', 'comment']
     search_fields = ['hostname', 'ip', 'comment']
 
     def get_queryset(self):

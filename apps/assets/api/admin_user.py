@@ -29,8 +29,8 @@ class AdminUserViewSet(OrgBulkModelViewSet):
     Admin user api set, for add,delete,update,list,retrieve resource
     """
     model = AdminUser
-    filter_fields = ("name", "username")
-    search_fields = filter_fields
+    filterset_fields = ("name", "username")
+    search_fields = filterset_fields
     serializer_class = serializers.AdminUserSerializer
     permission_classes = (IsOrgAdmin,)
 
@@ -93,8 +93,8 @@ class AdminUserTestConnectiveApi(generics.RetrieveAPIView):
 class AdminUserAssetsListView(generics.ListAPIView):
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.AssetSimpleSerializer
-    filter_fields = ("hostname", "ip")
-    search_fields = filter_fields
+    filterset_fields = ("hostname", "ip")
+    search_fields = filterset_fields
 
     def get_object(self):
         pk = self.kwargs.get('pk')

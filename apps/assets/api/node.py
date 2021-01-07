@@ -45,7 +45,7 @@ __all__ = [
 
 class NodeViewSet(OrgModelViewSet):
     model = Node
-    filter_fields = ('value', 'key', 'id')
+    filterset_fields = ('value', 'key', 'id')
     search_fields = ('value', )
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.NodeSerializer
