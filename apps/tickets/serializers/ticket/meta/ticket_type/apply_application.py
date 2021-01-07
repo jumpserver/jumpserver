@@ -7,63 +7,68 @@ from assets.models import SystemUser
 from .mixin import BaseApproveSerializerMixin
 
 __all__ = [
-    'ApplyApplicationTypeSerializer', 'ApplySerializer', 'ApproveSerializer',
+    'ApplyApplicationSerializer', 'ApplySerializer', 'ApproveSerializer',
 ]
 
 
 class ApplySerializer(serializers.Serializer):
     # 申请信息
     apply_category = serializers.ChoiceField(
-        required=True, choices=ApplicationCategoryChoices.choices, label=_('Category')
+        required=True, choices=ApplicationCategoryChoices.choices, label=_('Category'),
+        allow_null=True,
     )
     apply_category_display = serializers.CharField(
-        read_only=True, label=_('Category display')
+        read_only=True, label=_('Category display'), allow_null=True,
     )
     apply_type = serializers.ChoiceField(
-        required=True, choices=ApplicationTypeChoices.choices, label=_('Type')
+        required=True, choices=ApplicationTypeChoices.choices, label=_('Type'),
+        allow_null=True
     )
     apply_type_display = serializers.CharField(
-        required=False, read_only=True, label=_('Type display')
+        required=False, read_only=True, label=_('Type display'),
+        allow_null=True
     )
     apply_application_group = serializers.ListField(
         required=False, child=serializers.CharField(), label=_('Application group'),
-        default=list,
+        default=list, allow_null=True
     )
     apply_system_user_group = serializers.ListField(
         required=False, child=serializers.CharField(), label=_('System user group'),
-        default=list,
+        default=list, allow_null=True
     )
     apply_date_start = serializers.DateTimeField(
-        required=True, label=_('Date start')
+        required=True, label=_('Date start'), allow_null=True
     )
     apply_date_expired = serializers.DateTimeField(
-        required=True, label=_('Date expired')
+        required=True, label=_('Date expired'), allow_null=True
     )
 
 
 class ApproveSerializer(BaseApproveSerializerMixin, serializers.Serializer):
     # 审批信息
     approve_applications = serializers.ListField(
-        required=True, child=serializers.UUIDField(), label=_('Approve applications')
+        required=True, child=serializers.UUIDField(), label=_('Approve applications'),
+        allow_null=True
     )
     approve_applications_snapshot = serializers.ListField(
         required=False, read_only=True, child=serializers.CharField(),
-        label=_('Approve applications display'),
+        label=_('Approve applications display'), allow_null=True,
         default=list
     )
     approve_system_users = serializers.ListField(
-        required=True, child=serializers.UUIDField(), label=_('Approve system users')
+        required=True, child=serializers.UUIDField(), label=_('Approve system users'),
+        allow_null=True
     )
     approve_system_users_snapshot = serializers.ListField(
         required=False, read_only=True, child=serializers.CharField(),
-        label=_('Approve system user display'),
+        label=_('Approve system user display'), allow_null=True,
         default=list
     )
     approve_date_start = serializers.DateTimeField(
-        required=True, label=_('Date start')
+        required=True, label=_('Date start'), allow_null=True
     )
     approve_date_expired = serializers.DateTimeField(
-        required=True, label=_('Date expired')
+        required=True, label=_('Date expired'), allow_null=True
     )
 
     def validate_approve_applications(self, approve_applications):
@@ -82,7 +87,7 @@ class ApproveSerializer(BaseApproveSerializerMixin, serializers.Serializer):
         return system_users_id
 
 
-class ApplyApplicationTypeSerializer(ApplySerializer, ApproveSerializer):
+class ApplyApplicationSerializer(ApplySerializer, ApproveSerializer):
     pass
 
 

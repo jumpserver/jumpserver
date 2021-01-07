@@ -8,5 +8,5 @@ __all__ = ['OracleSerializer']
 
 
 class OracleSerializer(DBSerializer):
-    port = serializers.IntegerField(default=1521, label=_('Port'))
+    port = serializers.IntegerField(default=1521, label=_('Port'), allow_null=True)
 

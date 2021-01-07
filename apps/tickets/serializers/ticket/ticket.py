@@ -37,16 +37,17 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
         ]
 
     def get_meta_serializer(self):
-        request = self.context['request']
-        view = self.context['view']
-        query_type = request.query_params.get('type')
-        query_action = request.query_params.get('action')
-        view_action = view.action
-        action = query_action if query_action else view_action
-        if query_type:
-            serializer_class = type_serializer_classes_mapping.get(query_type, {}).get(action)
+        serializer_class = None
+        if isinstance(self.instance, Ticket):
+            instance_type = self.instance.type
+            serializer_class = type_serializer_classes_mapping.get(instance_type, {}).get('any')
         else:
-            serializer_class = None
+            request = self.context['request']
+            query_type = request.query_params.get('type')
+            query_action = request.query_params.get('action')
+            action = query_action if query_action else self.context['view'].action
+            if query_type:
+                serializer_class = type_serializer_classes_mapping.get(query_type, {}).get(action)
         if serializer_class is None:
             serializer_class = serializers.Serializer
         serializer = serializer_class()
@@ -130,9 +131,9 @@ class TicketApproveSerializer(TicketProcessSerializer):
         read_only_fields = list(set(TicketDisplaySerializer.Meta.fields) - set(required_fields))
 
     def validate_meta(self, meta):
-        instance_meta = self.instance.meta
-        instance_meta.update(meta)
-        return instance_meta
+        _meta = self.instance.meta if self.instance else {}
+        _meta.update(meta)
+        return _meta
 
     @staticmethod
     def validate_action(action):

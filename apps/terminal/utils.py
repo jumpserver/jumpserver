@@ -39,7 +39,7 @@ def download_session_replay(session):
     configs = {
         storage.name: storage.config
         for storage in replay_storages
-        if not storage.in_defaults()
+        if not storage.type_null_or_server
     }
     if settings.SERVER_REPLAY_STORAGE:
         configs['SERVER_REPLAY_STORAGE'] = settings.SERVER_REPLAY_STORAGE

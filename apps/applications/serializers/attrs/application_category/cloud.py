@@ -6,4 +6,4 @@ __all__ = ['CloudSerializer']
 
 
 class CloudSerializer(serializers.Serializer):
-    cluster = serializers.CharField(max_length=1024, label=_('Cluster'))
+    cluster = serializers.CharField(max_length=1024, label=_('Cluster'), allow_null=True)

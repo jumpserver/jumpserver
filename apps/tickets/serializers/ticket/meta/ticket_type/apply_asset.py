@@ -14,63 +14,64 @@ class ApplySerializer(serializers.Serializer):
     # 申请信息
     apply_ip_group = serializers.ListField(
         required=False, child=serializers.IPAddressField(), label=_('IP group'),
-        default=list,
+        default=list, allow_null=True,
     )
     apply_hostname_group = serializers.ListField(
         required=False, child=serializers.CharField(), label=_('Hostname group'),
-        default=list,
+        default=list, allow_null=True,
     )
     apply_system_user_group = serializers.ListField(
         required=False, child=serializers.CharField(), label=_('System user group'),
-        default=list,
+        default=list, allow_null=True
     )
     apply_actions = ActionsField(
-        required=True
+        required=True, allow_null=True
     )
     apply_actions_display = serializers.ListField(
         required=False, read_only=True, child=serializers.CharField(),
-        label=_('Approve assets display'),
+        label=_('Approve assets display'), allow_null=True,
         default=list,
     )
     apply_date_start = serializers.DateTimeField(
-        required=True, label=_('Date start')
+        required=True, label=_('Date start'), allow_null=True,
     )
     apply_date_expired = serializers.DateTimeField(
-        required=True, label=_('Date expired')
+        required=True, label=_('Date expired'), allow_null=True,
     )
 
 
 class ApproveSerializer(BaseApproveSerializerMixin, serializers.Serializer):
     # 审批信息
     approve_assets = serializers.ListField(
-        required=True, child=serializers.UUIDField(), label=_('Approve assets')
+        required=True, allow_null=True, child=serializers.UUIDField(), label=_('Approve assets')
     )
     approve_assets_snapshot = serializers.ListField(
         required=False, read_only=True, child=serializers.DictField(),
-        label=_('Approve assets display'),
+        label=_('Approve assets display'), allow_null=True,
         default=list,
     )
     approve_system_users = serializers.ListField(
-        required=True, child=serializers.UUIDField(), label=_('Approve system users')
+        required=True, allow_null=True, child=serializers.UUIDField(),
+        label=_('Approve system users')
     )
     approve_system_users_snapshot = serializers.ListField(
         required=False, read_only=True, child=serializers.DictField(),
-        label=_('Approve assets display'),
+        label=_('Approve assets display'), allow_null=True,
         default=list,
     )
     approve_actions = ActionsField(
-        required=True
+        required=True, allow_null=True,
     )
     approve_actions_display = serializers.ListField(
         required=False, read_only=True, child=serializers.CharField(),
-        label=_('Approve assets display'),
+        label=_('Approve assets display'), allow_null=True,
         default=list,
     )
     approve_date_start = serializers.DateTimeField(
-        required=True, label=_('Date start')
+        required=True, label=_('Date start'), allow_null=True,
     )
     approve_date_expired = serializers.DateTimeField(
-        required=True, label=_('Date expired')
+        required=True, label=_('Date expired'), allow_null=True
     )
 
     def validate_approve_assets(self, approve_assets):

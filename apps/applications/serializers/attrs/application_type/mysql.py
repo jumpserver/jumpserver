@@ -8,7 +8,7 @@ __all__ = ['MySQLSerializer']
 
 
 class MySQLSerializer(DBSerializer):
-    port = serializers.IntegerField(default=3306, label=_('Port'))
+    port = serializers.IntegerField(default=3306, label=_('Port'), allow_null=True)
 
 
 

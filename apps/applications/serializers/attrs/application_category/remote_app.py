@@ -29,8 +29,12 @@ class CharPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
 
 class RemoteAppSerializer(serializers.Serializer):
     asset_info = serializers.SerializerMethodField()
-    asset = CharPrimaryKeyRelatedField(queryset=Asset.objects, required=False, label=_("Asset"))
-    path = serializers.CharField(max_length=128, label=_('Application path'))
+    asset = CharPrimaryKeyRelatedField(
+        queryset=Asset.objects, required=False, label=_("Asset"), allow_null=True
+    )
+    path = serializers.CharField(
+        max_length=128, label=_('Application path'), allow_null=True
+    )
 
     @staticmethod
     def get_asset_info(obj):

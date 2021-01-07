@@ -18,15 +18,19 @@ class ApplicationSerializerMixin(serializers.Serializer):
     attrs = MethodSerializer()
 
     def get_attrs_serializer(self):
-        request = self.context['request']
-        query_type = request.query_params.get('type')
-        query_category = request.query_params.get('category')
-        if query_type:
-            serializer_class = type_serializer_classes_mapping.get(query_type)
-        elif query_category:
-            serializer_class = category_serializer_classes_mapping.get(query_category)
+        serializer_class = None
+        if isinstance(self.instance, models.Application):
+            instance_type = self.instance.type
+            serializer_class = type_serializer_classes_mapping.get(instance_type)
         else:
-            serializer_class = None
+            request = self.context['request']
+            query_type = request.query_params.get('type')
+            query_category = request.query_params.get('category')
+            if query_type:
+                serializer_class = type_serializer_classes_mapping.get(query_type)
+            elif query_category:
+                serializer_class = category_serializer_classes_mapping.get(query_category)
+
         if serializer_class is None:
             serializer_class = serializers.Serializer
         serializer = serializer_class()
