@@ -29,7 +29,11 @@ class SystemUserViewSet(OrgBulkModelViewSet):
     System user api set, for add,delete,update,list,retrieve resource
     """
     model = SystemUser
-    filterset_fields = ("name", "username", "protocol")
+    filterset_fields = {
+        'name': ['exact'],
+        'username': ['exact'],
+        'protocol': ['exact', 'in']
+    }
     search_fields = filterset_fields
     serializer_class = serializers.SystemUserSerializer
     serializer_classes = {

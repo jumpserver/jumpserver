@@ -32,10 +32,7 @@ __all__ = [
 
 
 class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
-    filterset_fields = {
-        'name': ['exact', 'in']
-    }
-    # filterset_fields = ('username', 'email', 'name', 'id', 'source')
+    filterset_fields = ('username', 'email', 'name', 'id', 'source')
     search_fields = filterset_fields
     permission_classes = (IsOrgAdmin, CanUpdateDeleteUser)
     serializer_classes = {
