@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
-
+from django.db.models import Q
 from applications.models import Application
 from applications.const import ApplicationCategoryChoices, ApplicationTypeChoices
 from assets.models import SystemUser
@@ -42,6 +42,37 @@ class ApplySerializer(serializers.Serializer):
     apply_date_expired = serializers.DateTimeField(
         required=True, label=_('Date expired'), allow_null=True
     )
+    # 推荐信息
+    recommend_applications = serializers.SerializerMethodField()
+    recommend_system_users = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_recommend_applications(value):
+        apply_application_group = value.get('apply_application_group', [])
+        apply_type = value.get('apply_type')
+        queries = Q()
+        for application in apply_application_group:
+            queries |= Q(name__icontains=application)
+        queries &= Q(type=apply_type)
+
+        applications_id = Application.objects.filter(queries).values_list('id', flat=True)[:5]
+        applications_id = [str(application_id) for application_id in applications_id]
+        return applications_id
+
+    @staticmethod
+    def get_recommend_system_users(value):
+        apply_type = value.get('apply_type')
+        apply_system_user_group = value.get('apply_system_user_group', [])
+        protocol = SystemUser.get_protocol_by_application_type(apply_type)
+        queries = Q()
+        for system_user in apply_system_user_group:
+            queries |= Q(username__icontains=system_user)
+            queries |= Q(name__icontains=system_user)
+        queries &= Q(protocol=protocol)
+
+        system_users_id = SystemUser.objects.filter(queries).values_list('id', flat=True)[:5]
+        system_users_id = [str(system_user_id) for system_user_id in system_users_id]
+        return system_users_id
 
 
 class ApproveSerializer(BaseApproveSerializerMixin, serializers.Serializer):

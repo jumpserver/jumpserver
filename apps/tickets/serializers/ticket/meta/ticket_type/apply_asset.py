@@ -1,4 +1,5 @@
 from django.utils.translation import ugettext_lazy as _
+from django.db.models import Q
 from rest_framework import serializers
 from perms.serializers import ActionsField
 from assets.models import Asset, SystemUser
@@ -38,6 +39,34 @@ class ApplySerializer(serializers.Serializer):
     apply_date_expired = serializers.DateTimeField(
         required=True, label=_('Date expired'), allow_null=True,
     )
+    # 推荐信息
+    recommend_assets = serializers.SerializerMethodField()
+    recommend_system_users = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_recommend_assets(value):
+        apply_ip_group = value.get('apply_ip_group', [])
+        apply_hostname_group = value.get('apply_hostname_group', [])
+        queries = Q(ip__in=apply_ip_group)
+        for hostname in apply_hostname_group:
+            queries |= Q(hostname__icontains=hostname)
+
+        assets_id = Asset.objects.filter(queries).values_list('id', flat=True)[:5]
+        assets_id = [str(asset_id) for asset_id in assets_id]
+        return assets_id
+
+    @staticmethod
+    def get_recommend_system_users(value):
+        apply_system_user_group = value.get('apply_system_user_group', [])
+        queries = Q()
+        for system_user in apply_system_user_group:
+            queries |= Q(username__icontains=system_user)
+            queries |= Q(name__icontains=system_user)
+        queries &= Q(protocol__in=SystemUser.ASSET_CATEGORY_PROTOCOLS)
+
+        system_users_id = SystemUser.objects.filter(queries).values_list('id', flat=True)[:5]
+        system_users_id = [str(system_user_id) for system_user_id in system_users_id]
+        return system_users_id
 
 
 class ApproveSerializer(BaseApproveSerializerMixin, serializers.Serializer):
