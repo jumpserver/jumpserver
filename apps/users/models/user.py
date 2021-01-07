@@ -18,7 +18,7 @@ from django.shortcuts import reverse
 
 from common.local import LOCAL_DYNAMIC_SETTINGS
 from orgs.utils import current_org
-from orgs.models import OrganizationMember
+from orgs.models import OrganizationMember, Organization
 from common.utils import date_expired_default, get_logger, lazyproperty
 from common import fields
 from common.const import choices
@@ -327,7 +327,8 @@ class RoleMixin:
     def remove(self):
         if not current_org.is_real():
             return
-        OrganizationMember.objects.remove_users(current_org, [self])
+        org = Organization.get_instance(current_org.id)
+        OrganizationMember.objects.remove_users(org, [self])
 
     @classmethod
     def get_super_admins(cls):

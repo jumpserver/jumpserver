@@ -15,6 +15,20 @@ class OrgSerializer(ModelSerializer):
     admins = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), write_only=True, required=False)
     auditors = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), write_only=True, required=False)
 
+    users_amount = serializers.IntegerField(required=False, source='resource_statistics_cache.users_amount')
+    groups_amount = serializers.IntegerField(required=False, source='resource_statistics_cache.groups_amount')
+
+    assets_amount = serializers.IntegerField(required=False, source='resource_statistics_cache.assets_amount')
+    nodes_amount = serializers.IntegerField(required=False, source='resource_statistics_cache.nodes_amount')
+    admin_users_amount = serializers.IntegerField(required=False, source='resource_statistics_cache.admin_users_amount')
+    system_users_amount = serializers.IntegerField(required=False, source='resource_statistics_cache.system_users_amount')
+    domains_amount = serializers.IntegerField(required=False, source='resource_statistics_cache.domains_amount')
+    gateways_amount = serializers.IntegerField(required=False, source='resource_statistics_cache.gateways_amount')
+
+    applications_amount = serializers.IntegerField(required=False, source='resource_statistics_cache.applications_amount')
+    asset_perms_amount = serializers.IntegerField(required=False, source='resource_statistics_cache.asset_perms_amount')
+    app_perms_amount = serializers.IntegerField(required=False, source='resource_statistics_cache.app_perms_amount')
+
     class Meta:
         model = Organization
         list_serializer_class = AdaptedBulkListSerializer
@@ -22,8 +36,13 @@ class OrgSerializer(ModelSerializer):
         fields_small = fields_mini + [
             'created_by', 'date_created', 'comment'
         ]
+        fields_cache = [
+            'users_amount', 'groups_amount', 'assets_amount', 'nodes_amount', 'admin_users_amount',
+            'system_users_amount', 'domains_amount', 'gateways_amount',
+            'applications_amount', 'asset_perms_amount', 'app_perms_amount',
+        ]
         fields_m2m = ['users', 'admins', 'auditors']
-        fields = fields_small + fields_m2m
+        fields = fields_small + fields_m2m + fields_cache
         read_only_fields = ['created_by', 'date_created']
 
     def create(self, validated_data):

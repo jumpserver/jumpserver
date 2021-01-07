@@ -1,4 +1,5 @@
 from functools import wraps
+import threading
 
 from redis_lock import Lock as RedisLock
 from redis import Redis
@@ -35,11 +36,16 @@ class DistributedLock(RedisLock):
         self._blocking = blocking
 
     def __enter__(self):
+        thread_id = threading.current_thread().ident
+        logger.debug(f'DISTRIBUTED_LOCK: <thread_id:{thread_id}> attempt to acquire <lock:{self._name}> ...')
         acquired = self.acquire(blocking=self._blocking)
         if self._blocking and not acquired:
+            logger.debug(f'DISTRIBUTED_LOCK: <thread_id:{thread_id}> was not acquired <lock:{self._name}>, but blocking=True')
             raise EnvironmentError("Lock wasn't acquired, but blocking=True")
         if not acquired:
+            logger.debug(f'DISTRIBUTED_LOCK: <thread_id:{thread_id}> acquire <lock:{self._name}> failed')
             raise AcquireFailed
+        logger.debug(f'DISTRIBUTED_LOCK: <thread_id:{thread_id}> acquire <lock:{self._name}> ok')
         return self
 
     def __exit__(self, exc_type=None, exc_value=None, traceback=None):
