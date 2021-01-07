@@ -28,7 +28,7 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
         'reject': serializers.TicketRejectSerializer,
         'close': serializers.TicketCloseSerializer,
     }
-    filter_fields = [
+    filterset_fields = [
         'id', 'title', 'type', 'action', 'status', 'applicant', 'applicant_display', 'processor',
         'processor_display', 'assignees__id'
     ]

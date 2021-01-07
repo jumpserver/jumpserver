@@ -104,12 +104,12 @@ class SimpleMetadataWithFilters(SimpleMetadata):
 
     def determine_metadata(self, request, view):
         metadata = super(SimpleMetadataWithFilters, self).determine_metadata(request, view)
-        filter_fields = self.get_filters_fields(request, view)
+        filterset_fields = self.get_filters_fields(request, view)
         order_fields = self.get_ordering_fields(request, view)
 
         meta_get = metadata.get("actions", {}).get("GET", {})
         for k, v in meta_get.items():
-            if k in filter_fields:
+            if k in filterset_fields:
                 v["filter"] = True
             if k in order_fields:
                 v["order"] = True

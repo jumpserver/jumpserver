@@ -12,7 +12,7 @@ __all__ = ['UserGroupViewSet']
 
 class UserGroupViewSet(OrgBulkModelViewSet):
     model = UserGroup
-    filter_fields = ("name",)
-    search_fields = filter_fields
+    filterset_fields = ("name",)
+    search_fields = filterset_fields
     permission_classes = (IsOrgAdmin,)
     serializer_class = UserGroupSerializer

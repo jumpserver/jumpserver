@@ -21,7 +21,7 @@ class UserGroupGrantedApplicationsApi(CommonApiMixin, ListAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.ApplicationGrantedSerializer
     only_fields = serializers.ApplicationGrantedSerializer.Meta.only_fields
-    filter_fields = ['id', 'name', 'category', 'type', 'comment']
+    filterset_fields = ['id', 'name', 'category', 'type', 'comment']
     search_fields = ['name', 'comment']
 
     def get_queryset(self):

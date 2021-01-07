@@ -25,8 +25,8 @@ class FTPLogViewSet(CreateModelMixin,
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))
     ]
-    filter_fields = ['user', 'asset', 'system_user', 'filename']
-    search_fields = filter_fields
+    filterset_fields = ['user', 'asset', 'system_user', 'filename']
+    search_fields = filterset_fields
     ordering = ['-date_start']
 
 
@@ -38,7 +38,7 @@ class UserLoginLogViewSet(ListModelMixin, CommonGenericViewSet):
     date_range_filter_fields = [
         ('datetime', ('date_from', 'date_to'))
     ]
-    filter_fields = ['username', 'ip', 'city', 'type', 'status', 'mfa']
+    filterset_fields = ['username', 'ip', 'city', 'type', 'status', 'mfa']
     search_fields =['username', 'ip', 'city']
 
     @staticmethod
@@ -62,7 +62,7 @@ class OperateLogViewSet(ListModelMixin, OrgGenericViewSet):
     date_range_filter_fields = [
         ('datetime', ('date_from', 'date_to'))
     ]
-    filter_fields = ['user', 'action', 'resource_type', 'resource', 'remote_addr']
+    filterset_fields = ['user', 'action', 'resource_type', 'resource', 'remote_addr']
     search_fields = ['resource']
     ordering = ['-datetime']
 
@@ -75,7 +75,7 @@ class PasswordChangeLogViewSet(ListModelMixin, CommonGenericViewSet):
     date_range_filter_fields = [
         ('datetime', ('date_from', 'date_to'))
     ]
-    filter_fields = ['user', 'change_by', 'remote_addr']
+    filterset_fields = ['user', 'change_by', 'remote_addr']
     ordering = ['-datetime']
 
     def get_queryset(self):
@@ -94,7 +94,7 @@ class CommandExecutionViewSet(ListModelMixin, OrgGenericViewSet):
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))
     ]
-    filter_fields = ['user__name', 'command', 'run_as__name', 'is_finished']
+    filterset_fields = ['user__name', 'command', 'run_as__name', 'is_finished']
     search_fields = ['command', 'user__name', 'run_as__name']
     ordering = ['-date_created']
 
@@ -108,7 +108,7 @@ class CommandExecutionHostRelationViewSet(OrgRelationMixin, OrgBulkModelViewSet)
     serializer_class = CommandExecutionHostsRelationSerializer
     m2m_field = CommandExecution.hosts.field
     permission_classes = [IsOrgAdmin | IsOrgAuditor]
-    filter_fields = [
+    filterset_fields = [
         'id', 'asset', 'commandexecution'
     ]
     search_fields = ('asset__hostname', )

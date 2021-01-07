@@ -25,7 +25,7 @@ __all__ = [
 class AllGrantedApplicationsMixin(CommonApiMixin, ListAPIView):
     only_fields = serializers.ApplicationGrantedSerializer.Meta.only_fields
     serializer_class = serializers.ApplicationGrantedSerializer
-    filter_fields = ['id', 'name', 'category', 'type', 'comment']
+    filterset_fields = ['id', 'name', 'category', 'type', 'comment']
     search_fields = ['name', 'comment']
     user: None
 

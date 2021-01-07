@@ -27,7 +27,7 @@ class UserDirectGrantedAssetsApi(ListAPIView):
     """
     serializer_class = serializers.AssetGrantedSerializer
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
-    filter_fields = ['hostname', 'ip', 'id', 'comment']
+    filterset_fields = ['hostname', 'ip', 'id', 'comment']
     search_fields = ['hostname', 'ip', 'comment']
 
     def get_queryset(self):
@@ -43,7 +43,7 @@ class UserDirectGrantedAssetsApi(ListAPIView):
 class UserFavoriteGrantedAssetsApi(ListAPIView):
     serializer_class = serializers.AssetGrantedSerializer
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
-    filter_fields = ['hostname', 'ip', 'id', 'comment']
+    filterset_fields = ['hostname', 'ip', 'id', 'comment']
     search_fields = ['hostname', 'ip', 'comment']
 
     def get_queryset(self):
@@ -101,7 +101,7 @@ class MyUngroupAssetsAsTreeApi(ForUserMixin, AssetsAsTreeMixin, UserDirectGrante
 class UserAllGrantedAssetsApi(ForAdminMixin, ListAPIView):
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
     serializer_class = serializers.AssetGrantedSerializer
-    filter_fields = ['hostname', 'ip', 'id', 'comment']
+    filterset_fields = ['hostname', 'ip', 'id', 'comment']
     search_fields = ['hostname', 'ip', 'comment']
 
     def get_queryset(self):
@@ -123,7 +123,7 @@ class MyAllAssetsAsTreeApi(ForUserMixin, AssetsAsTreeMixin, UserAllGrantedAssets
 class UserGrantedNodeAssetsApi(UserNodeGrantStatusDispatchMixin, ListAPIView):
     serializer_class = serializers.AssetGrantedSerializer
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
-    filter_fields = ['hostname', 'ip', 'id', 'comment']
+    filterset_fields = ['hostname', 'ip', 'id', 'comment']
     search_fields = ['hostname', 'ip', 'comment']
     pagination_class = GrantedAssetLimitOffsetPagination
     pagination_node: Node

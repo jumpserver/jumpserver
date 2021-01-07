@@ -28,7 +28,7 @@ __all__ = ['CommandViewSet', 'CommandExportApi', 'InsecureCommandAlertAPI']
 class CommandQueryMixin:
     command_store = get_command_storage()
     permission_classes = [IsOrgAdminOrAppUser | IsOrgAuditor]
-    filter_fields = [
+    filterset_fields = [
         "asset", "system_user", "user", "session", "risk_level",
         "input"
     ]

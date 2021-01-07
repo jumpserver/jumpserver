@@ -32,7 +32,7 @@ class AssetViewSet(FilterAssetByNodeMixin, OrgBulkModelViewSet):
     API endpoint that allows Asset to be viewed or edited.
     """
     model = Asset
-    filter_fields = (
+    filterset_fields = (
         "hostname", "ip", "systemuser__id", "admin_user__id", "platform__base",
         "is_active"
     )
@@ -76,7 +76,7 @@ class AssetPlatformViewSet(ModelViewSet):
     queryset = Platform.objects.all()
     permission_classes = (IsSuperUser,)
     serializer_class = serializers.PlatformSerializer
-    filter_fields = ['name', 'base']
+    filterset_fields = ['name', 'base']
     search_fields = ['name']
 
     def get_permissions(self):
