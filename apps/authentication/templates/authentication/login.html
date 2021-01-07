@@ -142,7 +142,6 @@
                                                     </a>
                                                 {% endif %}
                                                 {% if AUTH_CAS %}
-                                                    |
                                                     <a href="{% url 'authentication:cas:cas-login' %}">
                                                         <i class="fa"><img src="{{ LOGIN_CAS_LOGO_URL }}" height="13" width="13"></i> {% trans 'CAS' %}
                                                     </a>
@@ -152,7 +151,7 @@
                                         {% else %}
                                             <div class="text-center" style="display: inline-block;">
                                         {% endif %}
-                                            <a id="forgot_password" href="#">
+                                            <a id="forgot_password" href="{% url 'authentication:forgot-password' %}">
                                                 <small>{% trans 'Forgot password' %}?</small>
                                             </a>
                                         </div>
@@ -185,16 +184,7 @@
         $('#contact-form').submit();//post提交
     }
 
-    var authDB = '{{ AUTH_DB }}';
-    var forgotPasswordUrl = "{% url 'authentication:forgot-password' %}";
     $(document).ready(function () {
-    }).on('click', '#forgot_password', function () {
-        if (authDB === 'True'){
-            window.open(forgotPasswordUrl, "_blank")
-        }
-        else{
-            alert("{% trans 'You are using another authentication server, please contact your administrator' %}")
-        }
     })
 </script>
 </html>

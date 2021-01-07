@@ -104,7 +104,6 @@ class UserLoginView(mixins.AuthMixin, FormView):
             'AUTH_OPENID': settings.AUTH_OPENID,
             'AUTH_CAS': settings.AUTH_CAS,
             'rsa_public_key': rsa_public_key,
-            'AUTH_DB': settings.AUTH_DB
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

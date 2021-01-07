@@ -39,20 +39,20 @@ class UserForgotPasswordView(FormView):
     form_class = forms.UserForgotPasswordForm
 
     def form_valid(self, form):
-        request = self.request
         email = form.cleaned_data['email']
         user = get_object_or_none(User, email=email)
         if not user:
             error = _('Email address invalid, please input again')
             form.add_error('email', error)
             return self.form_invalid(form)
-        elif not user.can_update_password():
-            error = _('User auth from {}, go there change password')
+
+        if not user.is_local:
+            error = _('User from {}, go there change password')
             form.add_error('email', error.format(user.get_source_display()))
             return self.form_invalid(form)
-        else:
-            send_reset_password_mail(user)
-            return redirect('authentication:forgot-password-sendmail-success')
+
+        send_reset_password_mail(user)
+        return redirect('authentication:forgot-password-sendmail-success')
 
 
 class UserForgotPasswordSendmailSuccessView(TemplateView):
