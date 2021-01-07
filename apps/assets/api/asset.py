@@ -32,10 +32,15 @@ class AssetViewSet(FilterAssetByNodeMixin, OrgBulkModelViewSet):
     API endpoint that allows Asset to be viewed or edited.
     """
     model = Asset
-    filterset_fields = (
-        "hostname", "ip", "systemuser__id", "admin_user__id", "platform__base",
-        "is_active"
-    )
+    filterset_fields = {
+        'hostname': ['exact'],
+        'ip': ['exact'],
+        'systemuser__id': ['exact'],
+        'admin_user__id': ['exact'],
+        'platform__base': ['exact'],
+        'is_active': ['exact'],
+        'protocols': ['exact', 'icontains']
+    }
     search_fields = ("hostname", "ip")
     ordering_fields = ("hostname", "ip", "port", "cpu_cores")
     serializer_classes = {
