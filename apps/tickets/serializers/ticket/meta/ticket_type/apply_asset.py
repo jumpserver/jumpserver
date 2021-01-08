@@ -138,7 +138,7 @@ class ApplyAssetSerializer(ApplySerializer, ApproveSerializer):
             queries |= Q(name__icontains=system_user)
         queries &= Q(protocol__in=SystemUser.ASSET_CATEGORY_PROTOCOLS)
 
-        with tmp_to_org(self.instance.org_id):
+        with tmp_to_org(self.root.instance.org_id):
             system_users_id = SystemUser.objects.filter(queries).values_list('id', flat=True)[:5]
             system_users_id = [str(system_user_id) for system_user_id in system_users_id]
             return system_users_id
