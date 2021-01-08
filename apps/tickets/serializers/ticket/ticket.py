@@ -128,6 +128,7 @@ class TicketApplySerializer(TicketSerializer):
 class TicketApproveSerializer(TicketSerializer):
 
     class Meta:
+        model = Ticket
         fields = TicketSerializer.Meta.fields
         required_fields = ['processor', 'action', 'meta']
         read_only_fields = list(set(fields) - set(required_fields))
