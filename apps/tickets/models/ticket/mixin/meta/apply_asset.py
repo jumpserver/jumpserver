@@ -22,9 +22,9 @@ class ConstructDisplayFieldMixin:
             'approve_actions_display', 'approve_assets_snapshot', 'approve_system_users_snapshot'
         ]
         approve_actions = self.meta.get('approve_actions', Action.NONE)
+        approve_actions_display = Action.value_to_choices_display(approve_actions)
         approve_assets_id = self.meta.get('approve_assets', [])
         approve_system_users_id = self.meta.get('approve_system_users', [])
-        approve_actions_display = Action.value_to_choices_display(approve_actions)
         with tmp_to_org(self.org_id):
             approve_assets_snapshot = list(
                 Asset.objects.filter(id__in=approve_assets_id).values(
