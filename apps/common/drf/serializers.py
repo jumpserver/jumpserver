@@ -1,3 +1,4 @@
+import copy
 from rest_framework import serializers
 from rest_framework.serializers import Serializer
 from rest_framework.serializers import ModelSerializer
@@ -34,10 +35,10 @@ class MethodSerializer(serializers.Serializer):
     @cached_property
     def serializer(self) -> serializers.Serializer:
         method = getattr(self.parent, self.method_name)
-        return method()
-
-    def get_fields(self):
-        return self.serializer.get_fields()
+        _serializer = method()
+        # 设置serializer的parent值，否则在serializer实例中获取parent会出现断层
+        setattr(_serializer, 'parent', self.parent)
+        return _serializer
 
     @cached_property
     def fields(self):
@@ -46,10 +47,16 @@ class MethodSerializer(serializers.Serializer):
         这样在调用 field.parent 时, 才会达到预期的结果，
         比如: serializers.SerializerMethodField
         """
-        fields = BindingDict(self.serializer)
-        for key, value in self.get_fields().items():
-            fields[key] = value
-        return fields
+        return self.serializer.fields
+
+    def run_validation(self, data=serializers.empty):
+        return self.serializer.run_validation(data)
+
+    def to_representation(self, instance):
+        return self.serializer.to_representation(instance)
+
+    def get_initial(self):
+        return self.serializer.get_initial()
 
 
 # Other Serializer

@@ -37,21 +37,31 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
         ]
 
     def get_meta_serializer(self):
-        serializer_class = None
+        request = self.context['request']
+        default_serializer_class = serializers.Serializer
         if isinstance(self.instance, Ticket):
-            instance_type = self.instance.type
-            serializer_class = type_serializer_classes_mapping.get(instance_type, {}).get('any')
+            _type = self.instance.type
         else:
-            request = self.context['request']
-            query_type = request.query_params.get('type')
-            query_action = request.query_params.get('action')
-            action = query_action if query_action else self.context['view'].action
-            if query_type:
-                serializer_class = type_serializer_classes_mapping.get(query_type, {}).get(action)
-        if serializer_class is None:
-            serializer_class = serializers.Serializer
-        serializer = serializer_class()
-        return serializer
+            _type = request.query_params.get('type')
+
+        if not _type:
+            return default_serializer_class()
+
+        action_serializer_classes_mapping = type_serializer_classes_mapping.get(_type)
+        if not action_serializer_classes_mapping:
+            return default_serializer_class()
+
+        query_action = request.query_params.get('action')
+        _action = query_action if query_action else self.context['view'].action
+        serializer_class = action_serializer_classes_mapping.get(_action)
+        if serializer_class:
+            return serializer_class()
+
+        serializer_class = action_serializer_classes_mapping.get('default')
+        if serializer_class:
+            return serializer_class()
+
+        return default_serializer_class()
 
 
 class TicketDisplaySerializer(TicketSerializer):
