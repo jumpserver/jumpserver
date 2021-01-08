@@ -32,12 +32,12 @@ def on_ticket_post_save(sender, instance=None, created=False, **kwargs):
 
     if not created and instance.has_processed:
         instance.create_action_comment()
-        instance.create_permission()
-        instance.create_approved_comment()
-
-        logger.debug('Ticket () has processed, send mail to applicant: {}'
-                     ''.format(instance.title, instance.applicant_display))
+        msg = 'Ticket () has processed, send mail to applicant: {}'
+        logger.debug(msg.format(instance.title, instance.applicant_display))
         send_ticket_processed_mail_to_applicant(instance)
+        if instance.action_approve:
+            instance.create_permission()
+            instance.create_approved_comment()
 
 
 @receiver(m2m_changed, sender=Ticket.assignees.through)
