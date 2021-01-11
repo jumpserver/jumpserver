@@ -38,6 +38,7 @@ class FamilyMixin:
     __children = None
     __all_children = None
     is_node = True
+    child_mark: int
 
     @staticmethod
     def clean_children_keys(nodes_keys):
@@ -131,12 +132,10 @@ class FamilyMixin:
     def get_next_child_key(self):
         mark = self.child_mark
         key = "{}:{}".format(self.key, mark)
-        if not self.__class__.objects.filter(key=key).exists():
-            self.child_mark += 1
-        else:
+        if self.__class__.objects.filter(key=key).exists():
             mark = self.get_child_key_max() + 1
-            self.child_mark += mark + 1
             key = "{}:{}".format(self.key, mark)
+        self.child_mark = mark + 1
         self.save()
         return key
 
