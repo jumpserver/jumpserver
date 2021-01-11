@@ -15,7 +15,9 @@ from .. import const
 
 
 class ReplayStorageTypeBaseSerializer(serializers.Serializer):
-    BUCKET = serializers.CharField(required=True, max_length=1024, label=_('Bucket'))
+    BUCKET = serializers.CharField(
+        required=True, max_length=1024, label=_('Bucket'), allow_null=True
+    )
     ACCESS_KEY = serializers.CharField(
         max_length=1024, required=False, allow_blank=True, write_only=True, label=_('Access key'),
         allow_null=True,
