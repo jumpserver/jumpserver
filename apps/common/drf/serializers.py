@@ -24,6 +24,10 @@ class MethodSerializer(serializers.Serializer):
         self.method_name = method_name
         super().__init__(**kwargs)
 
+    class Meta:
+        # 生成swagger时使用
+        ref_name = None
+
     def bind(self, field_name, parent):
         if self.method_name is None:
             method_name = 'get_{field_name}_serializer'.format(field_name=field_name)
