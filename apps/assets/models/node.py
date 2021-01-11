@@ -121,11 +121,24 @@ class FamilyMixin:
             created = True
         return child, created
 
+    def get_child_key_max(self):
+        children_keys = self.get_children().values_list('key', flat=True)
+        children_keys_last = [key.split(':')[-1] for key in children_keys]
+        children_keys_last = [int(k) for k in children_keys_last if k.strip().isdigit()]
+        max_key = max(children_keys_last) if children_keys_last else 1
+        return max_key
+
     def get_next_child_key(self):
         mark = self.child_mark
-        self.child_mark += 1
+        key = "{}:{}".format(self.key, mark)
+        if not self.__class__.objects.filter(key=key).exists():
+            self.child_mark += 1
+        else:
+            mark = self.get_child_key_max() + 1
+            self.child_mark += mark + 1
+            key = "{}:{}".format(self.key, mark)
         self.save()
-        return "{}:{}".format(self.key, mark)
+        return key
 
     def get_next_child_preset_name(self):
         name = ugettext("New node")
