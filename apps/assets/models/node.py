@@ -123,8 +123,7 @@ class FamilyMixin:
         return child, created
 
     def get_valid_child_mark(self):
-        mark = self.child_mark
-        key = "{}:{}".format(self.key, mark)
+        key = "{}:{}".format(self.key, self.child_mark)
         if not self.__class__.objects.filter(key=key).exists():
             return self.child_mark
         children_keys = self.get_children().values_list('key', flat=True)
