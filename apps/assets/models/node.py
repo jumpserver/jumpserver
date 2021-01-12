@@ -122,8 +122,7 @@ class FamilyMixin:
             created = True
         return child, created
 
-    @property
-    def valid_next_child_mark(self):
+    def get_valid_child_mark(self):
         mark = self.child_mark
         key = "{}:{}".format(self.key, mark)
         if not self.__class__.objects.filter(key=key).exists():
@@ -132,13 +131,12 @@ class FamilyMixin:
         children_keys_last = [key.split(':')[-1] for key in children_keys]
         children_keys_last = [int(k) for k in children_keys_last if k.strip().isdigit()]
         max_key_last = max(children_keys_last) if children_keys_last else 1
-        self.child_mark = max_key_last + 1
-        self.save()
-        return self.child_mark
+        return max_key_last + 1
 
     def get_next_child_key(self):
-        key = "{}:{}".format(self.key, self.valid_next_child_mark)
-        self.child_mark += 1
+        child_mark = self.get_valid_child_mark()
+        key = "{}:{}".format(self.key, child_mark)
+        self.child_mark = child_mark + 1
         self.save()
         return key
 
