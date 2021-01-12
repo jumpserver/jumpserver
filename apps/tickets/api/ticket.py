@@ -19,7 +19,7 @@ __all__ = ['TicketViewSet']
 
 class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     permission_classes = (IsValidUser,)
-    serializer_class = serializers.TicketSerializer
+    serializer_class = serializers.TicketDisplaySerializer
     serializer_classes = {
         'default': serializers.TicketDisplaySerializer,
         'display': serializers.TicketDisplaySerializer,

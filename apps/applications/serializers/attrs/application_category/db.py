@@ -8,9 +8,8 @@ __all__ = ['DBSerializer']
 
 
 class DBSerializer(serializers.Serializer):
-    host = serializers.CharField(max_length=128, label=_('Host'))
-    port = serializers.IntegerField(label=_('Port'))
-    # 添加allow_null=True，兼容之前数据库中database字段为None的情况
+    host = serializers.CharField(max_length=128, label=_('Host'), allow_null=True)
+    port = serializers.IntegerField(label=_('Port'), allow_null=True)
     database = serializers.CharField(
         max_length=128, required=True, allow_null=True, label=_('Database')
     )

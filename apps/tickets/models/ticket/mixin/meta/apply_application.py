@@ -10,9 +10,9 @@ from tickets.utils import convert_model_instance_data_field_name_to_verbose_name
 class ConstructDisplayFieldMixin:
     def construct_meta_apply_application_open_fields_display(self):
         meta_display_fields = ['apply_category_display', 'apply_type_display']
-        apply_category = self.meta['apply_category']
+        apply_category = self.meta.get('apply_category')
         apply_category_display = ApplicationCategoryChoices.get_label(apply_category)
-        apply_type = self.meta['apply_type']
+        apply_type = self.meta.get('apply_type')
         apply_type_display = ApplicationTypeChoices.get_label(apply_type)
         meta_display_values = [apply_category_display, apply_type_display]
         meta_display = dict(zip(meta_display_fields, meta_display_values))
@@ -20,8 +20,8 @@ class ConstructDisplayFieldMixin:
 
     def construct_meta_apply_application_approve_fields_display(self):
         meta_display_fields = ['approve_applications_snapshot', 'approve_system_users_snapshot']
-        approve_applications_id = self.meta['approve_applications']
-        approve_system_users_id = self.meta['approve_system_users']
+        approve_applications_id = self.meta.get('approve_applications', [])
+        approve_system_users_id = self.meta.get('approve_system_users', [])
         with tmp_to_org(self.org_id):
             approve_applications_snapshot = list(
                 Application.objects.filter(id__in=approve_applications_id).values(
@@ -42,12 +42,12 @@ class ConstructDisplayFieldMixin:
 class ConstructBodyMixin:
 
     def construct_apply_application_applied_body(self):
-        apply_category_display = self.meta['apply_category_display']
-        apply_type_display = self.meta['apply_type_display']
-        apply_application_group = self.meta['apply_application_group']
-        apply_system_user_group = self.meta['apply_system_user_group']
-        apply_date_start = self.meta['apply_date_start']
-        apply_date_expired = self.meta['apply_date_expired']
+        apply_category_display = self.meta.get('apply_category_display')
+        apply_type_display = self.meta.get('apply_type_display')
+        apply_application_group = self.meta.get('apply_application_group', [])
+        apply_system_user_group = self.meta.get('apply_system_user_group', [])
+        apply_date_start = self.meta.get('apply_date_start')
+        apply_date_expired = self.meta.get('apply_date_expired')
         applied_body = '''{}: {},
             {}: {},
             {}: {},
@@ -66,16 +66,16 @@ class ConstructBodyMixin:
 
     def construct_apply_application_approved_body(self):
         # 审批信息
-        approve_applications_snapshot = self.meta['approve_applications_snapshot']
+        approve_applications_snapshot = self.meta.get('approve_applications_snapshot', [])
         approve_applications_snapshot_display = convert_model_instance_data_field_name_to_verbose_name(
             Application, approve_applications_snapshot
         )
-        approve_system_users_snapshot = self.meta['approve_system_users_snapshot']
+        approve_system_users_snapshot = self.meta.get('approve_system_users_snapshot', [])
         approve_system_users_snapshot_display = convert_model_instance_data_field_name_to_verbose_name(
             SystemUser, approve_system_users_snapshot
         )
-        approve_date_start = self.meta['approve_date_start']
-        approve_date_expired = self.meta['approve_date_expired']
+        approve_date_start = self.meta.get('approve_date_start')
+        approve_date_expired = self.meta.get('approve_date_expired')
         approved_body = '''{}: {},
             {}: {},
             {}: {},
@@ -97,12 +97,12 @@ class CreatePermissionMixin:
             if application_permission:
                 return application_permission
 
-        apply_category = self.meta['apply_category']
-        apply_type = self.meta['apply_type']
-        approved_applications_id = self.meta['approve_applications']
-        approve_system_users_id = self.meta['approve_system_users']
-        approve_date_start = self.meta['approve_date_start']
-        approve_date_expired = self.meta['approve_date_expired']
+        apply_category = self.meta.get('apply_category')
+        apply_type = self.meta.get('apply_type')
+        approved_applications_id = self.meta.get('approve_applications', [])
+        approve_system_users_id = self.meta.get('approve_system_users', [])
+        approve_date_start = self.meta.get('approve_date_start')
+        approve_date_expired = self.meta.get('approve_date_expired')
         permission_name = '{}({})'.format(
             __('Created by ticket ({})'.format(self.title)), str(self.id)[:4]
         )

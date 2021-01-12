@@ -8,5 +8,5 @@ __all__ = ['PostgreSerializer']
 
 
 class PostgreSerializer(DBSerializer):
-    port = serializers.IntegerField(default=5432, label=_('Port'))
+    port = serializers.IntegerField(default=5432, label=_('Port'), allow_null=True)
 

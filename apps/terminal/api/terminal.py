@@ -148,7 +148,5 @@ class TerminalConfig(APIView):
     permission_classes = (IsAppUser,)
 
     def get(self, request):
-        user = request.user
-        terminal = user.terminal
-        configs = terminal.config
-        return Response(configs, status=200)
+        config = request.user.terminal.config
+        return Response(config, status=200)
