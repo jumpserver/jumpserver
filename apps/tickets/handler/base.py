@@ -1,3 +1,4 @@
+import textwrap
 from django.utils.translation import ugettext as __
 from common.utils import get_logger
 from tickets.utils import send_ticket_processed_mail_to_applicant
@@ -23,16 +24,16 @@ class BaseHandler(object):
     def on_approve(self):
         meta_display = getattr(self, '_construct_meta_display_of_approve', lambda: {})()
         self.ticket.meta.update(meta_display)
-        self._on_process_action()
+        self._on_process()
         self._create_comment_on_approve()
 
     def on_reject(self):
-        self._on_process_action()
+        self._on_process()
 
     def on_close(self):
-        self._on_process_action()
+        self._on_process()
 
-    def _on_process_action(self):
+    def _on_process(self):
         self.ticket.processor_display = str(self.ticket.processor)
         self.ticket.set_status_closed()
         self.ticket.save()
@@ -55,16 +56,18 @@ class BaseHandler(object):
     # comments
 
     def _create_comment_on_open(self):
+        body = self._base_construct_meta_body_of_open()
         comment_data = {
-            'body': self._base_construct_meta_body_of_open(),
+            'body': textwrap.dedent(body),
             'user': self.ticket.applicant,
             'user_display': self.ticket.applicant_display
         }
         self._create_comment(comment_data)
 
     def _create_comment_on_approve(self):
+        body = self._base_construct_meta_body_of_approve()
         comment_data = {
-            'body': self._base_construct_meta_body_of_approve(),
+            'body': textwrap.dedent(body),
             'user': self.ticket.applicant,
             'user_display': self.ticket.applicant_display
         }

@@ -9,5 +9,4 @@ class IsAssignee(permissions.BasePermission):
 
 class NotClosed(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        return True
         return not obj.status_closed
