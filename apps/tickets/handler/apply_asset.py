@@ -13,6 +13,7 @@ class Handler(BaseHandler):
         super().on_approve()
         self._create_asset_permission()
 
+    # display
     def _construct_meta_display_of_open(self):
         meta_display_fields = ['apply_actions_display']
         apply_actions = self.ticket.meta.get('apply_actions', Action.NONE)
@@ -47,6 +48,7 @@ class Handler(BaseHandler):
         meta_display = dict(zip(meta_display_fields, meta_display_values))
         return meta_display
 
+    # body
     def _construct_meta_body_of_open(self):
         apply_ip_group = self.ticket.meta.get('apply_ip_group', [])
         apply_hostname_group = self.ticket.meta.get('apply_hostname_group', [])
@@ -95,6 +97,7 @@ class Handler(BaseHandler):
         )
         return approved_body
 
+    # permission
     def _create_asset_permission(self):
         with tmp_to_root_org():
             asset_permission = AssetPermission.objects.filter(id=self.ticket.id).first()

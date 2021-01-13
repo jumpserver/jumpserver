@@ -4,6 +4,7 @@ from .base import BaseHandler
 
 class Handler(BaseHandler):
 
+    # body
     def _construct_meta_body_of_open(self):
         apply_login_ip = self.ticket.meta.get('apply_login_ip')
         apply_login_city = self.ticket.meta.get('apply_login_city')

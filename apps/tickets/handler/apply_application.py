@@ -14,6 +14,7 @@ class Handler(BaseHandler):
         super().on_approve()
         self._create_application_permission()
 
+    # display
     def _construct_meta_display_of_open(self):
         meta_display_fields = ['apply_category_display', 'apply_type_display']
         apply_category = self.ticket.meta.get('apply_category')
@@ -44,6 +45,7 @@ class Handler(BaseHandler):
         meta_display = dict(zip(meta_display_fields, meta_display_values))
         return meta_display
 
+    # body
     def _construct_meta_body_of_open(self):
         apply_category_display = self.ticket.meta.get('apply_category_display')
         apply_type_display = self.ticket.meta.get('apply_type_display')
@@ -91,6 +93,7 @@ class Handler(BaseHandler):
         )
         return approved_body
 
+    # permission
     def _create_application_permission(self):
         with tmp_to_root_org():
             application_permission = ApplicationPermission.objects.filter(id=self.ticket.id).first()
