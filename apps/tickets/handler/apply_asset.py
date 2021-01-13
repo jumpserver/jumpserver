@@ -9,8 +9,8 @@ from tickets.utils import convert_model_data_field_name_to_verbose_name
 
 class Handler(BaseHandler):
 
-    def on_approve(self):
-        super().on_approve()
+    def _on_approve(self):
+        super()._on_approve()
         self._create_asset_permission()
 
     # display

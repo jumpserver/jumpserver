@@ -10,8 +10,8 @@ from .base import BaseHandler
 
 class Handler(BaseHandler):
 
-    def on_approve(self):
-        super().on_approve()
+    def _on_approve(self):
+        super()._on_approve()
         self._create_application_permission()
 
     # display

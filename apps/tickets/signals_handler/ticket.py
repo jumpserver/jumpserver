@@ -7,7 +7,6 @@ from common.utils import get_logger
 from tickets.models import Ticket
 from tickets.utils import send_ticket_applied_mail_to_assignees
 from ..signals import post_change_ticket_action
-from ..handler import get_ticket_handler
 
 
 logger = get_logger(__name__)
@@ -15,8 +14,7 @@ logger = get_logger(__name__)
 
 @receiver(post_change_ticket_action, sender=Ticket)
 def on_post_change_ticket_action(sender, ticket, action, **kwargs):
-    handler = get_ticket_handler(ticket)
-    handler.dispatch(action)
+    ticket.handler.dispatch(action)
 
 
 @receiver(m2m_changed, sender=Ticket.assignees.through)

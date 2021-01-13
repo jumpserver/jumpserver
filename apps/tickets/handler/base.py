@@ -12,24 +12,24 @@ class BaseHandler(object):
         self.ticket = ticket
 
     # on action
-    def on_open(self):
+    def _on_open(self):
         self.ticket.applicant_display = str(self.ticket.applicant)
         meta_display = getattr(self, '_construct_meta_display_of_open', lambda: {})()
         self.ticket.meta.update(meta_display)
         self.ticket.save()
 
-    def on_approve(self):
+    def _on_approve(self):
         meta_display = getattr(self, '_construct_meta_display_of_approve', lambda: {})()
         self.ticket.meta.update(meta_display)
-        self._on_process()
+        self.__on_process()
 
-    def on_reject(self):
-        self._on_process()
+    def _on_reject(self):
+        self.__on_process()
 
-    def on_close(self):
-        self._on_process()
+    def _on_close(self):
+        self.__on_process()
 
-    def _on_process(self):
+    def __on_process(self):
         self.ticket.processor_display = str(self.ticket.processor)
         self.ticket.set_status_closed()
         self._send_processed_mail_to_applicant()
@@ -37,7 +37,7 @@ class BaseHandler(object):
 
     def dispatch(self, action):
         self._create_comment_on_action()
-        method = getattr(self, f'on_{action}', lambda: None)
+        method = getattr(self, f'_on_{action}', lambda: None)
         return method()
 
     # email

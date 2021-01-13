@@ -188,9 +188,12 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         with tmp_to_org(self.org_id):
             return super().save(*args, **kwargs)
 
+    @property
+    def handler(self):
+        return get_ticket_handler(ticket=self)
+
     # body
     @property
     def body(self):
-        handler = get_ticket_handler(self)
-        _body = handler.get_body()
+        _body = self.handler.get_body()
         return _body
