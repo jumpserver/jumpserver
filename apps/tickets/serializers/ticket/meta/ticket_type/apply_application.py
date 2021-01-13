@@ -51,7 +51,7 @@ class ApproveSerializer(serializers.Serializer):
         required=True, child=serializers.UUIDField(), label=_('Approve applications'),
         allow_null=True
     )
-    approve_applications_snapshot = serializers.ListField(
+    approve_applications_display = serializers.ListField(
         required=False, read_only=True, child=serializers.CharField(),
         label=_('Approve applications display'), allow_null=True,
         default=list
@@ -60,7 +60,7 @@ class ApproveSerializer(serializers.Serializer):
         required=True, child=serializers.UUIDField(), label=_('Approve system users'),
         allow_null=True
     )
-    approve_system_users_snapshot = serializers.ListField(
+    approve_system_users_display = serializers.ListField(
         required=False, read_only=True, child=serializers.CharField(),
         label=_('Approve system user display'), allow_null=True,
         default=list

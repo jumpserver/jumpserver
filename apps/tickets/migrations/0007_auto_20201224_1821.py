@@ -29,9 +29,9 @@ def migrate_field_meta(tp, old_meta):
         'apply_date_expired': old_meta.get('date_expired'),
 
         'approve_assets': old_meta.get('confirmed_assets', []),
-        'approve_assets_snapshot': [],
+        'approve_assets_display': [],
         'approve_system_users': old_meta.get('confirmed_system_users', []),
-        'approve_system_users_snapshot': [],
+        'approve_system_users_display': [],
         'approve_actions': old_meta.get('actions'),
         'approve_actions_display': [],
         'approve_date_start': old_meta.get('date_start'),

@@ -47,8 +47,8 @@ class ApproveSerializer(serializers.Serializer):
     approve_assets = serializers.ListField(
         required=True, allow_null=True, child=serializers.UUIDField(), label=_('Approve assets')
     )
-    approve_assets_snapshot = serializers.ListField(
-        required=False, read_only=True, child=serializers.DictField(),
+    approve_assets_display = serializers.ListField(
+        required=False, read_only=True, child=serializers.CharField(),
         label=_('Approve assets display'), allow_null=True,
         default=list,
     )
@@ -56,8 +56,8 @@ class ApproveSerializer(serializers.Serializer):
         required=True, allow_null=True, child=serializers.UUIDField(),
         label=_('Approve system users')
     )
-    approve_system_users_snapshot = serializers.ListField(
-        required=False, read_only=True, child=serializers.DictField(),
+    approve_system_users_display = serializers.ListField(
+        required=False, read_only=True, child=serializers.CharField(),
         label=_('Approve assets display'), allow_null=True,
         default=list,
     )
