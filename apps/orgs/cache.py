@@ -7,10 +7,6 @@ from orgs.models import Organization
 
 
 class OrgRelatedCache(Cache):
-    """
-    只记录组织信息，不负责组织的切换，切换由使用者控制
-    这里的组织信息，主要给 celery 使用
-    """
 
     def __init__(self):
         super().__init__()
