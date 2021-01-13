@@ -1,12 +1,13 @@
 from django.utils.translation import ugettext as __
+from .base import BaseHandler
 
 
-class ConstructBodyMixin:
-    
-    def construct_login_confirm_applied_body(self):
-        apply_login_ip = self.meta.get('apply_login_ip')
-        apply_login_city = self.meta.get('apply_login_city')
-        apply_login_datetime = self.meta.get('apply_login_datetime')
+class Handler(BaseHandler):
+
+    def _construct_meta_body_of_open(self):
+        apply_login_ip = self.ticket.meta.get('apply_login_ip')
+        apply_login_city = self.ticket.meta.get('apply_login_city')
+        apply_login_datetime = self.ticket.meta.get('apply_login_datetime')
         applied_body = '''{}: {},
             {}: {},
             {}: {}

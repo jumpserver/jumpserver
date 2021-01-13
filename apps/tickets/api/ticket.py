@@ -4,6 +4,7 @@
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.response import Response
 
 from common.const.http import POST, PUT
 from common.mixins.api import CommonApiMixin
@@ -21,12 +22,8 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     permission_classes = (IsValidUser,)
     serializer_class = serializers.TicketDisplaySerializer
     serializer_classes = {
-        'default': serializers.TicketDisplaySerializer,
-        'display': serializers.TicketDisplaySerializer,
         'open': serializers.TicketApplySerializer,
         'approve': serializers.TicketApproveSerializer,
-        'reject': serializers.TicketRejectSerializer,
-        'close': serializers.TicketCloseSerializer,
     }
     filterset_fields = [
         'id', 'title', 'type', 'action', 'status', 'applicant', 'applicant_display', 'processor',
@@ -49,19 +46,31 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
         queryset = Ticket.get_user_related_tickets(self.request.user)
         return queryset
 
+    def perform_create(self, serializer):
+        instance = serializer.save()
+        instance.open(applicant=self.request.user)
+
     @action(detail=False, methods=[POST])
     def open(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
 
     @action(detail=True, methods=[PUT], permission_classes=[IsOrgAdmin, IsAssignee, NotClosed])
     def approve(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
+        response = super().update(request, *args, **kwargs)
+        instance = self.get_object()
+        instance.approve(processor=self.request.user)
+        return response
 
     @action(detail=True, methods=[PUT], permission_classes=[IsOrgAdmin, IsAssignee, NotClosed])
     def reject(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        instance.reject(processor=request.user)
+        return Response(serializer.data)
 
     @action(detail=True, methods=[PUT], permission_classes=[IsOrgAdmin, IsAssignee, NotClosed])
     def close(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
-
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        instance.close(processor=request.user)
+        return Response(serializer.data)

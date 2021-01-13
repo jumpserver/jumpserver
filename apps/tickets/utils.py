@@ -20,7 +20,7 @@ def get_model_field_verbose_name(model, field_name):
     return field_verbose_name
 
 
-def convert_model_instance_data_field_name_to_verbose_name(model, data):
+def convert_model_data_field_name_to_verbose_name(model, data):
     if isinstance(data, dict):
         data = [data]
     converted_data = [
