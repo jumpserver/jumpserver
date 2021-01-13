@@ -92,6 +92,13 @@ class SimpleMetadataWithFilters(SimpleMetadata):
             fields = view.get_filter_fields(request)
         elif hasattr(view, 'filter_fields'):
             fields = view.filter_fields
+        elif hasattr(view, 'filterset_fields'):
+            fields = view.filterset_fields
+        elif hasattr(view, 'get_filterset_fields'):
+            fields = view.get_filterset_fields(request)
+
+        if isinstance(fields, dict):
+            fields = list(fields.keys())
         return fields
 
     def get_ordering_fields(self, request, view):
