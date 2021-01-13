@@ -118,9 +118,13 @@ class BaseHandler(object):
         return basic_body
 
     def _construct_meta_body(self):
+        body = ''
         open_body = self._base_construct_meta_body_of_open()
-        approve_body = self._base_construct_meta_body_of_approve()
-        return open_body + approve_body
+        body += open_body
+        if self.ticket.action_approve:
+            approve_body = self._base_construct_meta_body_of_approve()
+            body += approve_body
+        return body
 
     def _base_construct_meta_body_of_open(self):
         open_body = '''

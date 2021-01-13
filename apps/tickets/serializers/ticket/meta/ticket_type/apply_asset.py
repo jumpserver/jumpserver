@@ -103,7 +103,7 @@ class ApproveSerializer(serializers.Serializer):
                 return system_users_id
 
         raise serializers.ValidationError(_(
-            'No `Asset` are found under Organization `{}`'.format(self.root.instance.org_name)
+            'No `SystemUser` are found under Organization `{}`'.format(self.root.instance.org_name)
         ))
 
 

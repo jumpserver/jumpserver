@@ -209,10 +209,11 @@ class SystemUser(BaseUser):
         from applications.const import ApplicationTypeChoices
         if app_type in ApplicationTypeChoices.remote_app_types():
             protocol = cls.PROTOCOL_RDP
-        else:
+        elif app_type in cls.APPLICATION_CATEGORY_PROTOCOLS:
             protocol = app_type
-        if protocol in cls.APPLICATION_CATEGORY_PROTOCOLS:
-            return protocol
+        else:
+            protocol = None
+        return protocol
 
     class Meta:
         ordering = ['name']

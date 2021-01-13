@@ -26,7 +26,7 @@ def on_ticket_assignees_changed(sender, instance, action, reverse, model, pk_set
     if action != 'post_add':
         return
     logger.debug('Receives ticket and assignees changed signal, ticket: {}'.format(instance.title))
-    instance.set_assignees_display()
+    instance.assignees_display = [str(assignee) for assignee in instance.assignees.all()]
     instance.save()
     assignees = model.objects.filter(pk__in=pk_set)
     assignees_display = [str(assignee) for assignee in assignees]

@@ -52,7 +52,7 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         verbose_name=_("Applicant")
     )
     applicant_display = models.CharField(
-        max_length=256, default='No', verbose_name=_("Applicant display")
+        max_length=256, default='', verbose_name=_("Applicant display")
     )
     # 处理人
     processor = models.ForeignKey(
@@ -60,7 +60,7 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         verbose_name=_("Processor")
     )
     processor_display = models.CharField(
-        max_length=256, blank=True, null=True, default='No', verbose_name=_("Processor display")
+        max_length=256, blank=True, null=True, default='', verbose_name=_("Processor display")
     )
     # 受理人列表
     assignees = models.ManyToManyField(
