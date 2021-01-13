@@ -124,9 +124,13 @@
                                             {% endif %}
                                         </div>
                                     {% endif %}
+                                    {% if form.captcha %}
                                     <div class="form-group" style="height: 50px;margin-bottom: 0;font-size: 13px">
                                         {{ form.captcha }}
                                     </div>
+                                    {% else %}
+                                    <div class="form-group" style="height: 25px;margin-bottom: 0;font-size: 13px"></div>
+                                    {% endif %}
                                     <div class="form-group" style="margin-top: 10px">
                                         <button type="submit" class="btn btn-transparent" onclick="doLogin();return false;">{% trans 'Login' %}</button>
                                     </div>
