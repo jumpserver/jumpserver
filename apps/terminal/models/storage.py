@@ -18,7 +18,7 @@ class CommandStorage(CommonModelMixin):
         default=const.CommandStorageTypeChoices.server.value, verbose_name=_('Type'),
     )
     meta = EncryptJsonDictTextField(default={})
-    comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
+    comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
     def __str__(self):
         return self.name
@@ -58,7 +58,7 @@ class ReplayStorage(CommonModelMixin):
         default=const.ReplayStorageTypeChoices.server.value, verbose_name=_('Type')
     )
     meta = EncryptJsonDictTextField(default={})
-    comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
+    comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
     def __str__(self):
         return self.name

@@ -101,7 +101,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='ticket',
             name='applicant_display',
-            field=models.CharField(default='No', max_length=256, verbose_name='Applicant display'),
+            field=models.CharField(default='', max_length=256, verbose_name='Applicant display'),
         ),
         migrations.AddField(
             model_name='ticket',
@@ -111,12 +111,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='ticket',
             name='processor_display',
-            field=models.CharField(blank=True, default='No', max_length=256, null=True, verbose_name='Processor display'),
+            field=models.CharField(blank=True, default='', max_length=256, null=True, verbose_name='Processor display'),
         ),
         migrations.AddField(
             model_name='ticket',
             name='assignees_display_new',
-            field=models.JSONField(default=list, encoder=tickets.models.ticket.model.ModelJSONFieldEncoder, verbose_name='Assignees display'),
+            field=models.JSONField(default=list, encoder=tickets.models.ticket.ModelJSONFieldEncoder, verbose_name='Assignees display'),
         ),
         migrations.AlterField(
             model_name='ticket',
@@ -126,7 +126,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='ticket',
             name='meta',
-            field=models.JSONField(default=dict, encoder=tickets.models.ticket.model.ModelJSONFieldEncoder, verbose_name='Meta'),
+            field=models.JSONField(default=dict, encoder=tickets.models.ticket.ModelJSONFieldEncoder, verbose_name='Meta'),
         ),
         migrations.AlterField(
             model_name='ticket',

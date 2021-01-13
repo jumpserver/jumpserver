@@ -2,7 +2,6 @@
 #
 
 from rest_framework import viewsets, mixins
-from django.shortcuts import get_object_or_404
 from common.exceptions import JMSException
 from common.utils import lazyproperty
 from tickets import serializers
@@ -22,11 +21,10 @@ class CommentViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
         if getattr(self, 'swagger_fake_view', False):
             return None
         ticket_id = self.request.query_params.get('ticket_id')
-        try:
-            ticket = get_object_or_404(Ticket, pk=ticket_id)
-            return ticket
-        except Exception as e:
-            raise JMSException(str(e))
+        ticket = Ticket.all().filter(pk=ticket_id).first()
+        if not ticket:
+            raise JMSException('Not found Ticket object about `id={}`'.format(ticket_id))
+        return ticket
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

@@ -207,12 +207,13 @@ class SystemUser(BaseUser):
     @classmethod
     def get_protocol_by_application_type(cls, app_type):
         from applications.const import ApplicationTypeChoices
-        if app_type in ApplicationTypeChoices.remote_app_types():
+        if app_type in cls.APPLICATION_CATEGORY_PROTOCOLS:
+            protocol = app_type
+        elif app_type in ApplicationTypeChoices.remote_app_types():
             protocol = cls.PROTOCOL_RDP
         else:
-            protocol = app_type
-        if protocol in cls.APPLICATION_CATEGORY_PROTOCOLS:
-            return protocol
+            protocol = None
+        return protocol
 
     class Meta:
         ordering = ['name']
