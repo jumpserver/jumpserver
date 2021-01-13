@@ -4,7 +4,6 @@ from applications.models import Application
 from applications.const import ApplicationCategoryChoices, ApplicationTypeChoices
 from assets.models import SystemUser
 from perms.models import ApplicationPermission
-from tickets.utils import convert_model_data_field_name_to_verbose_name
 from .base import BaseHandler
 
 
@@ -26,22 +25,15 @@ class Handler(BaseHandler):
         return meta_display
 
     def _construct_meta_display_of_approve(self):
-        meta_display_fields = ['approve_applications_snapshot', 'approve_system_users_snapshot']
+        meta_display_fields = ['approve_applications_display', 'approve_system_users_display']
         approve_applications_id = self.ticket.meta.get('approve_applications', [])
         approve_system_users_id = self.ticket.meta.get('approve_system_users', [])
         with tmp_to_org(self.ticket.org_id):
-            approve_applications_snapshot = list(
-                Application.objects.filter(id__in=approve_applications_id).values(
-                    'name', 'category', 'type'
-                )
-            )
-            approve_system_users_snapshot = list(
-                SystemUser.objects.filter(id__in=approve_system_users_id).values(
-                    'name', 'username', 'username_same_with_user', 'protocol',
-                    'auto_push', 'sudo', 'home', 'sftp_root'
-                )
-            )
-        meta_display_values = [approve_applications_snapshot, approve_system_users_snapshot]
+            approve_applications = Application.objects.filter(id__in=approve_applications_id)
+            system_users = SystemUser.objects.filter(id__in=approve_system_users_id)
+            approve_applications_display = [str(application) for application in approve_applications]
+            approve_system_users_display = [str(system_user) for system_user in system_users]
+        meta_display_values = [approve_applications_display, approve_system_users_display]
         meta_display = dict(zip(meta_display_fields, meta_display_values))
         return meta_display
 
@@ -71,14 +63,8 @@ class Handler(BaseHandler):
 
     def _construct_meta_body_of_approve(self):
         # 审批信息
-        approve_applications_snapshot = self.ticket.meta.get('approve_applications_snapshot', [])
-        approve_applications_snapshot_display = convert_model_data_field_name_to_verbose_name(
-            model=Application, data=approve_applications_snapshot
-        )
-        approve_system_users_snapshot = self.ticket.meta.get('approve_system_users_snapshot', [])
-        approve_system_users_snapshot_display = convert_model_data_field_name_to_verbose_name(
-            model=SystemUser, data=approve_system_users_snapshot
-        )
+        approve_applications_display = self.ticket.meta.get('approve_applications_display', [])
+        approve_system_users_display = self.ticket.meta.get('approve_system_users_display', [])
         approve_date_start = self.ticket.meta.get('approve_date_start')
         approve_date_expired = self.ticket.meta.get('approve_date_expired')
         approved_body = '''{}: {},
@@ -86,8 +72,8 @@ class Handler(BaseHandler):
             {}: {},
             {}: {},
         '''.format(
-            __('Approved applications'), approve_applications_snapshot_display,
-            __('Approved system users'), approve_system_users_snapshot_display,
+            __('Approved applications'), approve_applications_display,
+            __('Approved system users'), approve_system_users_display,
             __('Approved date start'), approve_date_start,
             __('Approved date expired'), approve_date_expired
         )

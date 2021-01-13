@@ -11,25 +11,6 @@ from . import const
 logger = get_logger(__file__)
 
 
-def get_model_field_verbose_name(model, field_name):
-    field_name_field_verbose_name_mapping = {
-        field.name: field.verbose_name for field in model._meta.fields
-    }
-    field_name = field_name.split('__', 1)[0]
-    field_verbose_name = field_name_field_verbose_name_mapping.get(field_name, field_name)
-    return field_verbose_name
-
-
-def convert_model_data_field_name_to_verbose_name(model, data):
-    if isinstance(data, dict):
-        data = [data]
-    converted_data = [
-        {get_model_field_verbose_name(model, name): value for name, value in d.items()}
-        for d in data
-    ]
-    return converted_data
-
-
 def send_ticket_applied_mail_to_assignees(ticket, assignees):
     if not assignees:
         logger.debug("Not found assignees, ticket: {}({}), assignees: {}".format(
