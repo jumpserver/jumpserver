@@ -12,7 +12,8 @@ from .models import Organization, OrganizationMember
 from .hands import set_current_org, Node, get_current_org
 from perms.models import (AssetPermission, ApplicationPermission)
 from users.models import UserGroup, User
-from assets.models import Asset
+from applications.models import Application
+from assets.models import Asset, AdminUser, SystemUser, Domain, Gateway
 from common.const.signals import PRE_REMOVE, POST_REMOVE, POST_PREFIX
 from .caches import OrgResourceStatisticsCache
 
@@ -159,19 +160,6 @@ def on_user_group_delete(sender, instance, **kwargs):
     org_cache.refresh_async('groups_amount')
 
 
-@receiver(post_save, sender=AssetPermission)
-def on_asset_perm_create(sender, instance, created, **kwargs):
-    if created:
-        org_cache = OrgResourceStatisticsCache(instance.org)
-        org_cache.refresh_async('asset_perms_amount')
-
-
-@receiver(pre_delete, sender=AssetPermission)
-def on_asset_perm_delete(sender, instance, **kwargs):
-    org_cache = OrgResourceStatisticsCache(instance.org)
-    org_cache.refresh_async('asset_perms_amount')
-
-
 @receiver(post_save, sender=Organization)
 def on_organization_create(sender, instance, created, **kwargs):
     if created:
@@ -183,6 +171,19 @@ def on_organization_create(sender, instance, created, **kwargs):
 def on_organization_delete(sender, instance, **kwargs):
     org_cache = OrgResourceStatisticsCache(instance)
     org_cache.delete()
+
+
+@receiver(post_save, sender=Asset)
+def on_asset_create(sender, instance, created, **kwargs):
+    if created:
+        org_cache = OrgResourceStatisticsCache(instance.org)
+        org_cache.refresh_async('assets_amount')
+
+
+@receiver(pre_delete, sender=Asset)
+def on_asset_delete(sender, instance, **kwargs):
+    org_cache = OrgResourceStatisticsCache(instance.org)
+    org_cache.refresh_async('assets_amount')
 
 
 @receiver(post_save, sender=Node)
@@ -198,14 +199,92 @@ def on_node_delete(sender, instance, **kwargs):
     org_cache.refresh_async('nodes_amount')
 
 
-@receiver(post_save, sender=Asset)
-def on_asset_create(sender, instance, created, **kwargs):
+@receiver(post_save, sender=AdminUser)
+def on_admin_user_create(sender, instance, created, **kwargs):
     if created:
         org_cache = OrgResourceStatisticsCache(instance.org)
-        org_cache.refresh_async('assets_amount')
+        org_cache.refresh_async('admin_users_amount')
 
 
-@receiver(pre_delete, sender=Asset)
-def on_asset_delete(sender, instance, **kwargs):
+@receiver(pre_delete, sender=AdminUser)
+def on_admin_user_delete(sender, instance, **kwargs):
     org_cache = OrgResourceStatisticsCache(instance.org)
-    org_cache.refresh_async('assets_amount')
+    org_cache.refresh_async('admin_users_amount')
+
+
+@receiver(post_save, sender=SystemUser)
+def on_system_user_create(sender, instance, created, **kwargs):
+    if created:
+        org_cache = OrgResourceStatisticsCache(instance.org)
+        org_cache.refresh_async('system_users_amount')
+
+
+@receiver(pre_delete, sender=SystemUser)
+def on_system_user_delete(sender, instance, **kwargs):
+    org_cache = OrgResourceStatisticsCache(instance.org)
+    org_cache.refresh_async('system_users_amount')
+
+
+@receiver(post_save, sender=Domain)
+def on_domain_create(sender, instance, created, **kwargs):
+    if created:
+        org_cache = OrgResourceStatisticsCache(instance.org)
+        org_cache.refresh_async('domains_amount')
+
+
+@receiver(pre_delete, sender=Domain)
+def on_domain_delete(sender, instance, **kwargs):
+    org_cache = OrgResourceStatisticsCache(instance.org)
+    org_cache.refresh_async('domains_amount')
+
+
+@receiver(post_save, sender=Gateway)
+def on_gateway_create(sender, instance, created, **kwargs):
+    if created:
+        org_cache = OrgResourceStatisticsCache(instance.org)
+        org_cache.refresh_async('gateways_amount')
+
+
+@receiver(pre_delete, sender=Gateway)
+def on_gateway_delete(sender, instance, **kwargs):
+    org_cache = OrgResourceStatisticsCache(instance.org)
+    org_cache.refresh_async('gateways_amount')
+
+
+@receiver(post_save, sender=Application)
+def on_application_create(sender, instance, created, **kwargs):
+    if created:
+        org_cache = OrgResourceStatisticsCache(instance.org)
+        org_cache.refresh_async('applications_amount')
+
+
+@receiver(pre_delete, sender=Application)
+def on_application_delete(sender, instance, **kwargs):
+    org_cache = OrgResourceStatisticsCache(instance.org)
+    org_cache.refresh_async('applications_amount')
+
+
+@receiver(post_save, sender=AssetPermission)
+def on_asset_perm_create(sender, instance, created, **kwargs):
+    if created:
+        org_cache = OrgResourceStatisticsCache(instance.org)
+        org_cache.refresh_async('asset_perms_amount')
+
+
+@receiver(pre_delete, sender=AssetPermission)
+def on_asset_perm_delete(sender, instance, **kwargs):
+    org_cache = OrgResourceStatisticsCache(instance.org)
+    org_cache.refresh_async('asset_perms_amount')
+
+
+@receiver(post_save, sender=ApplicationPermission)
+def on_application_permission_create(sender, instance, created, **kwargs):
+    if created:
+        org_cache = OrgResourceStatisticsCache(instance.org)
+        org_cache.refresh_async('app_perms_amount')
+
+
+@receiver(pre_delete, sender=ApplicationPermission)
+def on_application_permission_delete(sender, instance, **kwargs):
+    org_cache = OrgResourceStatisticsCache(instance.org)
+    org_cache.refresh_async('app_perms_amount')

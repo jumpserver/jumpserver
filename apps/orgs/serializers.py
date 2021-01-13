@@ -10,39 +10,39 @@ from common.db.models import concated_display as display
 from .models import Organization, OrganizationMember, ROLE
 
 
+class ResourceStatisticsSerializer(serializers.Serializer):
+    users_amount = serializers.IntegerField(required=False)
+    groups_amount = serializers.IntegerField(required=False)
+
+    assets_amount = serializers.IntegerField(required=False)
+    nodes_amount = serializers.IntegerField(required=False)
+    admin_users_amount = serializers.IntegerField(required=False)
+    system_users_amount = serializers.IntegerField(required=False)
+    domains_amount = serializers.IntegerField(required=False)
+    gateways_amount = serializers.IntegerField(required=False)
+
+    applications_amount = serializers.IntegerField(required=False)
+    asset_perms_amount = serializers.IntegerField(required=False)
+    app_perms_amount = serializers.IntegerField(required=False)
+
+
 class OrgSerializer(ModelSerializer):
     users = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), write_only=True, required=False)
     admins = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), write_only=True, required=False)
     auditors = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), write_only=True, required=False)
 
-    users_amount = serializers.IntegerField(required=False, source='resource_statistics_cache.users_amount')
-    groups_amount = serializers.IntegerField(required=False, source='resource_statistics_cache.groups_amount')
-
-    assets_amount = serializers.IntegerField(required=False, source='resource_statistics_cache.assets_amount')
-    nodes_amount = serializers.IntegerField(required=False, source='resource_statistics_cache.nodes_amount')
-    admin_users_amount = serializers.IntegerField(required=False, source='resource_statistics_cache.admin_users_amount')
-    system_users_amount = serializers.IntegerField(required=False, source='resource_statistics_cache.system_users_amount')
-    domains_amount = serializers.IntegerField(required=False, source='resource_statistics_cache.domains_amount')
-    gateways_amount = serializers.IntegerField(required=False, source='resource_statistics_cache.gateways_amount')
-
-    applications_amount = serializers.IntegerField(required=False, source='resource_statistics_cache.applications_amount')
-    asset_perms_amount = serializers.IntegerField(required=False, source='resource_statistics_cache.asset_perms_amount')
-    app_perms_amount = serializers.IntegerField(required=False, source='resource_statistics_cache.app_perms_amount')
+    resource_statistics = ResourceStatisticsSerializer(source='resource_statistics_cache')
 
     class Meta:
         model = Organization
         list_serializer_class = AdaptedBulkListSerializer
         fields_mini = ['id', 'name']
         fields_small = fields_mini + [
-            'created_by', 'date_created', 'comment'
+            'created_by', 'date_created', 'comment', 'resource_statistics'
         ]
-        fields_cache = [
-            'users_amount', 'groups_amount', 'assets_amount', 'nodes_amount', 'admin_users_amount',
-            'system_users_amount', 'domains_amount', 'gateways_amount',
-            'applications_amount', 'asset_perms_amount', 'app_perms_amount',
-        ]
+
         fields_m2m = ['users', 'admins', 'auditors']
-        fields = fields_small + fields_m2m + fields_cache
+        fields = fields_small + fields_m2m
         read_only_fields = ['created_by', 'date_created']
 
     def create(self, validated_data):
