@@ -15,7 +15,11 @@ class CeleryLogWebsocket(JsonWebsocketConsumer):
     disconnected = False
 
     def connect(self):
-        self.accept()
+        user = self.scope["user"]
+        if user.is_authenticated and user.is_org_admin:
+            self.accept()
+        else:
+            self.close()
 
     def receive(self, text_data=None, bytes_data=None, **kwargs):
         data = json.loads(text_data)
