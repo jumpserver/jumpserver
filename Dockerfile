@@ -18,6 +18,11 @@ WORKDIR /opt/jumpserver
 
 COPY ./requirements ./requirements
 RUN useradd jumpserver
+
+RUN wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-6.repo \
+    && sed -i 's@/centos/@/centos-vault/@g' /etc/yum.repos.d/CentOS-Base.repo \
+    && sed -i 's@$releasever@6.10@g' /etc/yum.repos.d/CentOS-Base.repo
+
 RUN yum -y install epel-release && \
       echo -e "[mysql]\nname=mysql\nbaseurl=${MYSQL_MIRROR}\ngpgcheck=0\nenabled=1" > /etc/yum.repos.d/mysql.repo
 RUN yum -y install $(cat requirements/rpm_requirements.txt)
