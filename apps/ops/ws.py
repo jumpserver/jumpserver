@@ -21,7 +21,11 @@ class TaskLogWebsocket(JsonWebsocketConsumer):
     }
 
     def connect(self):
-        self.accept()
+        user = self.scope["user"]
+        if user.is_authenticated and user.is_org_admin:
+            self.accept()
+        else:
+            self.close()
 
     def get_log_path(self, task_id):
         func = self.log_types.get(self.log_type)
