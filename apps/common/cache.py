@@ -17,7 +17,7 @@ class CacheFieldBase:
         self.queryset = queryset
 
 
-class StringField(CacheFieldBase):
+class CharField(CacheFieldBase):
     field_type = str
 
 

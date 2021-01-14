@@ -147,144 +147,34 @@ def on_org_user_changed(sender, action, instance, reverse, pk_set, **kwargs):
         org_cache.refresh_async('users_amount')
 
 
-@receiver(post_save, sender=UserGroup)
-def on_user_group_create(sender, instance, created, **kwargs):
+class OrgResourceStatisticsRefreshUtil:
+    model_cache_field_mapper = {
+        ApplicationPermission: 'app_perms_amount',
+        AssetPermission: 'asset_perms_amount',
+        Application: 'applications_amount',
+        Gateway: 'gateways_amount',
+        Domain: 'domains_amount',
+        SystemUser: 'system_users_amount',
+        AdminUser: 'admin_users_amount',
+        Node: 'nodes_amount',
+        Asset: 'assets_amount',
+        UserGroup: 'groups_amount',
+    }
+
+    @classmethod
+    def refresh_if_need(cls, instance):
+        cache_field_name = cls.model_cache_field_mapper.get(type(instance))
+        if cache_field_name:
+            org_cache = OrgResourceStatisticsCache(instance.org)
+            org_cache.refresh_async(cache_field_name)
+
+
+@receiver(post_save)
+def on_post_save_refresh_org_resource_statistics_cache(sender, instance, created, **kwargs):
     if created:
-        org_cache = OrgResourceStatisticsCache(instance.org)
-        org_cache.refresh_async('groups_amount')
+        OrgResourceStatisticsRefreshUtil.refresh_if_need(instance)
 
 
-@receiver(pre_delete, sender=UserGroup)
-def on_user_group_delete(sender, instance, **kwargs):
-    org_cache = OrgResourceStatisticsCache(instance.org)
-    org_cache.refresh_async('groups_amount')
-
-
-@receiver(post_save, sender=Organization)
-def on_organization_create(sender, instance, created, **kwargs):
-    if created:
-        org_cache = OrgResourceStatisticsCache(instance)
-        org_cache.refresh_async()
-
-
-@receiver(pre_delete, sender=Organization)
-def on_organization_delete(sender, instance, **kwargs):
-    org_cache = OrgResourceStatisticsCache(instance)
-    org_cache.delete()
-
-
-@receiver(post_save, sender=Asset)
-def on_asset_create(sender, instance, created, **kwargs):
-    if created:
-        org_cache = OrgResourceStatisticsCache(instance.org)
-        org_cache.refresh_async('assets_amount')
-
-
-@receiver(pre_delete, sender=Asset)
-def on_asset_delete(sender, instance, **kwargs):
-    org_cache = OrgResourceStatisticsCache(instance.org)
-    org_cache.refresh_async('assets_amount')
-
-
-@receiver(post_save, sender=Node)
-def on_node_create(sender, instance, created, **kwargs):
-    if created:
-        org_cache = OrgResourceStatisticsCache(instance.org)
-        org_cache.refresh_async('nodes_amount')
-
-
-@receiver(pre_delete, sender=Node)
-def on_node_delete(sender, instance, **kwargs):
-    org_cache = OrgResourceStatisticsCache(instance.org)
-    org_cache.refresh_async('nodes_amount')
-
-
-@receiver(post_save, sender=AdminUser)
-def on_admin_user_create(sender, instance, created, **kwargs):
-    if created:
-        org_cache = OrgResourceStatisticsCache(instance.org)
-        org_cache.refresh_async('admin_users_amount')
-
-
-@receiver(pre_delete, sender=AdminUser)
-def on_admin_user_delete(sender, instance, **kwargs):
-    org_cache = OrgResourceStatisticsCache(instance.org)
-    org_cache.refresh_async('admin_users_amount')
-
-
-@receiver(post_save, sender=SystemUser)
-def on_system_user_create(sender, instance, created, **kwargs):
-    if created:
-        org_cache = OrgResourceStatisticsCache(instance.org)
-        org_cache.refresh_async('system_users_amount')
-
-
-@receiver(pre_delete, sender=SystemUser)
-def on_system_user_delete(sender, instance, **kwargs):
-    org_cache = OrgResourceStatisticsCache(instance.org)
-    org_cache.refresh_async('system_users_amount')
-
-
-@receiver(post_save, sender=Domain)
-def on_domain_create(sender, instance, created, **kwargs):
-    if created:
-        org_cache = OrgResourceStatisticsCache(instance.org)
-        org_cache.refresh_async('domains_amount')
-
-
-@receiver(pre_delete, sender=Domain)
-def on_domain_delete(sender, instance, **kwargs):
-    org_cache = OrgResourceStatisticsCache(instance.org)
-    org_cache.refresh_async('domains_amount')
-
-
-@receiver(post_save, sender=Gateway)
-def on_gateway_create(sender, instance, created, **kwargs):
-    if created:
-        org_cache = OrgResourceStatisticsCache(instance.org)
-        org_cache.refresh_async('gateways_amount')
-
-
-@receiver(pre_delete, sender=Gateway)
-def on_gateway_delete(sender, instance, **kwargs):
-    org_cache = OrgResourceStatisticsCache(instance.org)
-    org_cache.refresh_async('gateways_amount')
-
-
-@receiver(post_save, sender=Application)
-def on_application_create(sender, instance, created, **kwargs):
-    if created:
-        org_cache = OrgResourceStatisticsCache(instance.org)
-        org_cache.refresh_async('applications_amount')
-
-
-@receiver(pre_delete, sender=Application)
-def on_application_delete(sender, instance, **kwargs):
-    org_cache = OrgResourceStatisticsCache(instance.org)
-    org_cache.refresh_async('applications_amount')
-
-
-@receiver(post_save, sender=AssetPermission)
-def on_asset_perm_create(sender, instance, created, **kwargs):
-    if created:
-        org_cache = OrgResourceStatisticsCache(instance.org)
-        org_cache.refresh_async('asset_perms_amount')
-
-
-@receiver(pre_delete, sender=AssetPermission)
-def on_asset_perm_delete(sender, instance, **kwargs):
-    org_cache = OrgResourceStatisticsCache(instance.org)
-    org_cache.refresh_async('asset_perms_amount')
-
-
-@receiver(post_save, sender=ApplicationPermission)
-def on_application_permission_create(sender, instance, created, **kwargs):
-    if created:
-        org_cache = OrgResourceStatisticsCache(instance.org)
-        org_cache.refresh_async('app_perms_amount')
-
-
-@receiver(pre_delete, sender=ApplicationPermission)
-def on_application_permission_delete(sender, instance, **kwargs):
-    org_cache = OrgResourceStatisticsCache(instance.org)
-    org_cache.refresh_async('app_perms_amount')
+@receiver(pre_delete)
+def on_pre_delete_refresh_org_resource_statistics_cache(sender, instance, **kwargs):
+    OrgResourceStatisticsRefreshUtil.refresh_if_need(instance)
