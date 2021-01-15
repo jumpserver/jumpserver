@@ -4,9 +4,84 @@
 [![Django](https://img.shields.io/badge/django-2.2-brightgreen.svg?style=plastic)](https://www.djangoproject.com/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/jumpserver/jms_all.svg)](https://hub.docker.com/u/jumpserver)
 
-|Developer Wanted|
-|------------------|
-|JumpServer 正在寻找开发者，一起为改变世界做些贡献吧，哪怕一点点，联系我 <ibuler@fit2cloud.com> |
+## 紧急BUG修复通知
+JumpServer发现远程执行漏洞，请速度修复
+
+**影响版本:**
+```
+< v2.6.2
+< v2.5.4
+< v2.4.5 
+= v1.5.9
+```
+**安全版本:**
+```
+>= v2.6.2
+>= v2.5.4
+>= v2.4.5 
+= v1.5.9 （版本号没变）
+```
+**修复方案:**
+
+将JumpServer升级至安全版本；
+
+**临时修复方案:**
+
+修改 Nginx 配置文件屏蔽漏洞接口 
+
+```
+/api/v1/authentication/connection-token/
+/api/v1/users/connection-token/
+```
+
+Nginx 配置文件位置
+```
+# 社区老版本
+/etc/nginx/conf.d/jumpserver.conf
+
+# 企业老版本
+jumpserver-release/nginx/http_server.conf
+ 
+# 新版本在 
+jumpserver-release/compose/config_static/http_server.conf
+```
+
+修改 Nginx 配置文件实例
+```
+### 保证在 /api 之前 和 / 之前
+location /api/v1/authentication/connection-token/ {
+   return 403;
+}
+ 
+location /api/v1/users/connection-token/ {
+   return 403;
+}
+### 新增以上这些
+ 
+location /api/ {
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_pass http://core:8080;
+  }
+ 
+...
+```
+
+修改完成后重启 nginx
+
+```
+docker方式: 
+docker restart jms_nginx
+
+nginx方式:
+systemctl restart nginx
+
+```
+
+
+
+JumpServer 正在寻找开发者，一起为改变世界做些贡献吧，哪怕一点点，联系我 <ibuler@fit2cloud.com> 
 
 JumpServer 是全球首款开源的堡垒机，使用 GNU GPL v2.0 开源协议，是符合 4A 规范的运维安全审计系统。
 
