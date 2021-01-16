@@ -79,7 +79,16 @@ systemctl restart nginx
 
 ```
 
+**修复验证**
 
+```
+$ wget https://github.com/jumpserver/jumpserver/releases/download/v2.6.2/jms_bug_check.sh 
+
+# 使用方法 bash jms_bug_check.sh HOST 
+$ bash jms_bug_check.sh demo.jumpserver.org
+漏洞已修复
+```
+--------------------------
 
 JumpServer 正在寻找开发者，一起为改变世界做些贡献吧，哪怕一点点，联系我 <ibuler@fit2cloud.com> 
 
