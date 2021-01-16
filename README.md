@@ -84,8 +84,9 @@ systemctl restart nginx
 ```
 $ wget https://github.com/jumpserver/jumpserver/releases/download/v2.6.2/jms_bug_check.sh 
 
-$ bash jms_bug_check.sh HOST 
-如 bash jms_bug_check.sh demo.jumpserver.org
+# 使用方法 bash jms_bug_check.sh HOST 
+$ bash jms_bug_check.sh demo.jumpserver.org
+漏洞已修复
 ```
 --------------------------
 
