@@ -31,7 +31,7 @@ class OrgSerializer(ModelSerializer):
     admins = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), write_only=True, required=False)
     auditors = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), write_only=True, required=False)
 
-    resource_statistics = ResourceStatisticsSerializer(source='resource_statistics_cache')
+    resource_statistics = ResourceStatisticsSerializer(source='resource_statistics_cache', read_only=True)
 
     class Meta:
         model = Organization
