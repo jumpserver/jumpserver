@@ -1,43 +1,25 @@
-from uuid import UUID
+# -*- coding: utf-8 -*-
+#
 
-from rest_framework.fields import get_attribute
-from rest_framework.relations import ManyRelatedField, PrimaryKeyRelatedField, MANY_RELATION_KWARGS
-
-
-class GroupConcatedManyRelatedField(ManyRelatedField):
-    def get_attribute(self, instance):
-        if hasattr(instance, 'pk') and instance.pk is None:
-            return []
-
-        attr = self.source_attrs[-1]
-
-        # `gc` 是 `GroupConcat` 的缩写
-        gc_attr = f'gc_{attr}'
-        if hasattr(instance, gc_attr):
-            gc_value = getattr(instance, gc_attr)
-            if isinstance(gc_value, str):
-                return [UUID(pk) for pk in set(gc_value.split(','))]
-            else:
-                return ''
-
-        relationship = get_attribute(instance, self.source_attrs)
-        return relationship.all() if hasattr(relationship, 'all') else relationship
+from rest_framework import serializers
 
 
-class GroupConcatedPrimaryKeyRelatedField(PrimaryKeyRelatedField):
-    @classmethod
-    def many_init(cls, *args, **kwargs):
-        list_kwargs = {'child_relation': cls(*args, **kwargs)}
-        for key in kwargs:
-            if key in MANY_RELATION_KWARGS:
-                list_kwargs[key] = kwargs[key]
-        return GroupConcatedManyRelatedField(**list_kwargs)
+__all__ = [
+    'ReadableHiddenField',
+]
+
+
+# ReadableHiddenField
+# -------------------
+
+
+class ReadableHiddenField(serializers.HiddenField):
+    """ 可读的 HiddenField """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.write_only = False
 
     def to_representation(self, value):
-        if self.pk_field is not None:
-            return self.pk_field.to_representation(value.pk)
-
-        if hasattr(value, 'pk'):
-            return value.pk
-        else:
-            return value
+        if hasattr(value, 'id'):
+            return getattr(value, 'id')
+        return value

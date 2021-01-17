@@ -179,13 +179,13 @@ class AdHoc(OrgModelMixin):
 
     def run(self):
         try:
-            hid = current_task.request.id
-            if AdHocExecution.objects.filter(id=hid).exists():
-                hid = uuid.uuid4()
+            celery_task_id = current_task.request.id
         except AttributeError:
-            hid = uuid.uuid4()
+            celery_task_id = None
+
         execution = AdHocExecution(
-            id=hid, adhoc=self, task=self.task,
+            celery_task_id=celery_task_id,
+            adhoc=self, task=self.task,
             task_display=str(self.task)[:128],
             date_start=timezone.now(),
             hosts_amount=self.hosts.count(),
@@ -237,6 +237,7 @@ class AdHocExecution(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     task = models.ForeignKey(Task, related_name='execution', on_delete=models.SET_NULL, null=True)
     task_display = models.CharField(max_length=128, blank=True, default='', verbose_name=_("Task display"))
+    celery_task_id = models.UUIDField(default=None, null=True)
     hosts_amount = models.IntegerField(default=0, verbose_name=_("Host amount"))
     adhoc = models.ForeignKey(AdHoc, related_name='execution', on_delete=models.SET_NULL, null=True)
     date_start = models.DateTimeField(auto_now_add=True, verbose_name=_('Start time'))
@@ -270,6 +271,7 @@ class AdHocExecution(OrgModelMixin):
                 self.adhoc.tasks,
                 self.adhoc.pattern,
                 self.task.name,
+                execution_id=self.id
             )
             return result.results_raw, result.results_summary
         except AnsibleError as e:

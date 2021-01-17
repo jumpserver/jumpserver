@@ -22,6 +22,8 @@ urlpatterns = [
     path('tasks/<uuid:pk>/run/', api.TaskRun.as_view(), name='task-run'),
     path('celery/task/<uuid:pk>/log/', api.CeleryTaskLogApi.as_view(), name='celery-task-log'),
     path('celery/task/<uuid:pk>/result/', api.CeleryResultApi.as_view(), name='celery-result'),
+
+    path('ansible/task/<uuid:pk>/log/', api.AnsibleTaskLogApi.as_view(), name='ansible-task-log'),
 ]
 
 urlpatterns += router.urls

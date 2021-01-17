@@ -60,6 +60,10 @@ class CallbackMixin:
         self.results_raw[t][host][task_name] = task_result
         self.clean_result(t, host, task_name, task_result)
 
+    def close(self):
+        if hasattr(self._display, 'close'):
+            self._display.close()
+
 
 class AdHocResultCallback(CallbackMixin, CallbackModule, CMDCallBackModule):
     """

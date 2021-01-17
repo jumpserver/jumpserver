@@ -18,7 +18,7 @@ from django.shortcuts import reverse
 
 from common.local import LOCAL_DYNAMIC_SETTINGS
 from orgs.utils import current_org
-from orgs.models import OrganizationMember
+from orgs.models import OrganizationMember, Organization
 from common.utils import date_expired_default, get_logger, lazyproperty
 from common import fields
 from common.const import choices
@@ -327,7 +327,30 @@ class RoleMixin:
     def remove(self):
         if not current_org.is_real():
             return
-        OrganizationMember.objects.remove_users(current_org, [self])
+        org = Organization.get_instance(current_org.id)
+        OrganizationMember.objects.remove_users(org, [self])
+
+    @classmethod
+    def get_super_admins(cls):
+        return cls.objects.filter(role=cls.ROLE.ADMIN)
+
+    @classmethod
+    def get_org_admins(cls, org=None):
+        from orgs.models import Organization
+        if not isinstance(org, Organization):
+            org = current_org
+        org_admins = org.admins
+        return org_admins
+
+    @classmethod
+    def get_super_and_org_admins(cls, org=None):
+        super_admins = cls.get_super_admins()
+        super_admins_id = list(super_admins.values_list('id', flat=True))
+        org_admins = cls.get_org_admins(org)
+        org_admins_id = list(org_admins.values_list('id', flat=True))
+        admins_id = set(org_admins_id + super_admins_id)
+        admins = User.objects.filter(id__in=admins_id)
+        return admins
 
 
 class TokenMixin:

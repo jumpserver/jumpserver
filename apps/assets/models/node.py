@@ -38,6 +38,7 @@ class FamilyMixin:
     __children = None
     __all_children = None
     is_node = True
+    child_mark: int
 
     @staticmethod
     def clean_children_keys(nodes_keys):
@@ -121,11 +122,22 @@ class FamilyMixin:
             created = True
         return child, created
 
+    def get_valid_child_mark(self):
+        key = "{}:{}".format(self.key, self.child_mark)
+        if not self.__class__.objects.filter(key=key).exists():
+            return self.child_mark
+        children_keys = self.get_children().values_list('key', flat=True)
+        children_keys_last = [key.split(':')[-1] for key in children_keys]
+        children_keys_last = [int(k) for k in children_keys_last if k.strip().isdigit()]
+        max_key_last = max(children_keys_last) if children_keys_last else 1
+        return max_key_last + 1
+
     def get_next_child_key(self):
-        mark = self.child_mark
-        self.child_mark += 1
+        child_mark = self.get_valid_child_mark()
+        key = "{}:{}".format(self.key, child_mark)
+        self.child_mark = child_mark + 1
         self.save()
-        return "{}:{}".format(self.key, mark)
+        return key
 
     def get_next_child_preset_name(self):
         name = ugettext("New node")

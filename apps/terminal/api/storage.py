@@ -20,26 +20,26 @@ class BaseStorageViewSetMixin:
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        if instance.in_defaults():
+        if instance.type_null_or_server:
             data = {'msg': _('Deleting the default storage is not allowed')}
             return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
-        if instance.is_using():
+        if instance.is_use():
             data = {'msg': _('Cannot delete storage that is being used')}
             return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
         return super().destroy(request, *args, **kwargs)
 
 
 class CommandStorageViewSet(BaseStorageViewSetMixin, viewsets.ModelViewSet):
-    filter_fields = ('name', 'type',)
-    search_fields = filter_fields
+    filterset_fields = ('name', 'type',)
+    search_fields = filterset_fields
     queryset = CommandStorage.objects.all()
     serializer_class = CommandStorageSerializer
     permission_classes = (IsSuperUser,)
 
 
 class ReplayStorageViewSet(BaseStorageViewSetMixin, viewsets.ModelViewSet):
-    filter_fields = ('name', 'type',)
-    search_fields = filter_fields
+    filterset_fields = ('name', 'type',)
+    search_fields = filterset_fields
     queryset = ReplayStorage.objects.all()
     serializer_class = ReplayStorageSerializer
     permission_classes = (IsSuperUser,)
@@ -67,11 +67,9 @@ class BaseStorageTestConnectiveMixin:
         return Response(data)
 
 
-class CommandStorageTestConnectiveApi(BaseStorageTestConnectiveMixin,
-                                      generics.RetrieveAPIView):
+class CommandStorageTestConnectiveApi(BaseStorageTestConnectiveMixin, generics.RetrieveAPIView):
     queryset = CommandStorage.objects.all()
 
 
-class ReplayStorageTestConnectiveApi(BaseStorageTestConnectiveMixin,
-                                     generics.RetrieveAPIView):
+class ReplayStorageTestConnectiveApi(BaseStorageTestConnectiveMixin, generics.RetrieveAPIView):
     queryset = ReplayStorage.objects.all()

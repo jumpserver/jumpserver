@@ -124,6 +124,22 @@ class BulkListSerializerMixin(object):
 
         return ret
 
+    def create(self, validated_data):
+        ModelClass = self.child.Meta.model
+        use_model_bulk_create = getattr(self.child.Meta, 'use_model_bulk_create', False)
+        model_bulk_create_kwargs = getattr(self.child.Meta, 'model_bulk_create_kwargs', {})
+
+        if use_model_bulk_create:
+            to_create = [
+                ModelClass(**attrs) for attrs in validated_data
+            ]
+            objs = ModelClass._default_manager.bulk_create(
+                to_create, **model_bulk_create_kwargs
+            )
+            return objs
+        else:
+            return super().create(validated_data)
+
 
 class BaseDynamicFieldsPlugin:
     def __init__(self, serializer):

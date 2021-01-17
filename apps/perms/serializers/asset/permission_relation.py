@@ -3,7 +3,7 @@
 from rest_framework import serializers
 
 from common.mixins import BulkSerializerMixin
-from common.serializers import AdaptedBulkListSerializer
+from common.drf.serializers import AdaptedBulkListSerializer
 from assets.models import Asset, Node
 from perms.models import AssetPermission
 from users.models import User

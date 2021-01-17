@@ -73,7 +73,6 @@ def clean_expired_session_period():
     logger.info("Clean session replay done")
 
 
-
 @shared_task
 def upload_session_replay_to_external_storage(session_id):
     logger.info(f'Start upload session to external storage: {session_id}')

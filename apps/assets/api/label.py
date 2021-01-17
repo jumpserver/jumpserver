@@ -28,8 +28,8 @@ __all__ = ['LabelViewSet']
 
 class LabelViewSet(OrgBulkModelViewSet):
     model = Label
-    filter_fields = ("name", "value")
-    search_fields = filter_fields
+    filterset_fields = ("name", "value")
+    search_fields = filterset_fields
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.LabelSerializer
 

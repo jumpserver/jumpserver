@@ -27,7 +27,7 @@ class TerminalViewSet(JMSBulkModelViewSet):
     queryset = Terminal.objects.filter(is_deleted=False)
     serializer_class = serializers.TerminalSerializer
     permission_classes = (IsSuperUser,)
-    filter_fields = ['name', 'remote_addr', 'type']
+    filterset_fields = ['name', 'remote_addr', 'type']
 
     def create(self, request, *args, **kwargs):
         if isinstance(request.data, list):
@@ -148,7 +148,5 @@ class TerminalConfig(APIView):
     permission_classes = (IsAppUser,)
 
     def get(self, request):
-        user = request.user
-        terminal = user.terminal
-        configs = terminal.config
-        return Response(configs, status=200)
+        config = request.user.terminal.config
+        return Response(config, status=200)

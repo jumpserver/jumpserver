@@ -29,8 +29,12 @@ class SystemUserViewSet(OrgBulkModelViewSet):
     System user api set, for add,delete,update,list,retrieve resource
     """
     model = SystemUser
-    filter_fields = ("name", "username", "protocol")
-    search_fields = filter_fields
+    filterset_fields = {
+        'name': ['exact'],
+        'username': ['exact'],
+        'protocol': ['exact', 'in']
+    }
+    search_fields = filterset_fields
     serializer_class = serializers.SystemUserSerializer
     serializer_classes = {
         'default': serializers.SystemUserSerializer,
@@ -136,8 +140,8 @@ class SystemUserCommandFilterRuleListApi(generics.ListAPIView):
 class SystemUserAssetsListView(generics.ListAPIView):
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.AssetSimpleSerializer
-    filter_fields = ("hostname", "ip")
-    search_fields = filter_fields
+    filterset_fields = ("hostname", "ip")
+    search_fields = filterset_fields
 
     def get_object(self):
         pk = self.kwargs.get('pk')

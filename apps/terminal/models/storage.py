@@ -2,34 +2,38 @@ from __future__ import unicode_literals
 
 import os
 import jms_storage
-
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
-
 from common.mixins import CommonModelMixin
 from common.fields.model import EncryptJsonDictTextField
-from .. import const
 from .terminal import Terminal
+from .. import const
 
 
 class CommandStorage(CommonModelMixin):
-    TYPE_CHOICES = const.COMMAND_STORAGE_TYPE_CHOICES
-    TYPE_DEFAULTS = dict(const.REPLAY_STORAGE_TYPE_CHOICES_DEFAULT).keys()
-    TYPE_SERVER = const.COMMAND_STORAGE_TYPE_SERVER
-
     name = models.CharField(max_length=128, verbose_name=_("Name"), unique=True)
     type = models.CharField(
-        max_length=16, choices=TYPE_CHOICES, verbose_name=_('Type'),
-        default=TYPE_SERVER
+        max_length=16, choices=const.CommandStorageTypeChoices.choices,
+        default=const.CommandStorageTypeChoices.server.value, verbose_name=_('Type'),
     )
     meta = EncryptJsonDictTextField(default={})
-    comment = models.TextField(
-        max_length=128, default='', blank=True, verbose_name=_('Comment')
-    )
+    comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
     def __str__(self):
         return self.name
+
+    @property
+    def type_null(self):
+        return self.type == const.CommandStorageTypeChoices.null.value
+
+    @property
+    def type_server(self):
+        return self.type == const.CommandStorageTypeChoices.server.value
+
+    @property
+    def type_null_or_server(self):
+        return self.type_null or self.type_server
 
     @property
     def config(self):
@@ -37,67 +41,74 @@ class CommandStorage(CommonModelMixin):
         config.update({'TYPE': self.type})
         return config
 
-    def in_defaults(self):
-        return self.type in self.TYPE_DEFAULTS
-
     def is_valid(self):
-        if self.in_defaults():
+        if self.type_null_or_server:
             return True
         storage = jms_storage.get_log_storage(self.config)
         return storage.ping()
 
-    def is_using(self):
+    def is_use(self):
         return Terminal.objects.filter(command_storage=self.name).exists()
 
 
 class ReplayStorage(CommonModelMixin):
-    TYPE_CHOICES = const.REPLAY_STORAGE_TYPE_CHOICES
-    TYPE_SERVER = const.REPLAY_STORAGE_TYPE_SERVER
-    TYPE_DEFAULTS = dict(const.REPLAY_STORAGE_TYPE_CHOICES_DEFAULT).keys()
-
     name = models.CharField(max_length=128, verbose_name=_("Name"), unique=True)
     type = models.CharField(
-        max_length=16, choices=TYPE_CHOICES, verbose_name=_('Type'),
-        default=TYPE_SERVER
+        max_length=16, choices=const.ReplayStorageTypeChoices.choices,
+        default=const.ReplayStorageTypeChoices.server.value, verbose_name=_('Type')
     )
     meta = EncryptJsonDictTextField(default={})
-    comment = models.TextField(
-        max_length=128, default='', blank=True, verbose_name=_('Comment')
-    )
+    comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
     def __str__(self):
         return self.name
 
-    def convert_type(self):
-        s3_type_list = [const.REPLAY_STORAGE_TYPE_CEPH]
-        tp = self.type
-        if tp in s3_type_list:
-            tp = const.REPLAY_STORAGE_TYPE_S3
-        return tp
+    @property
+    def type_null(self):
+        return self.type == const.ReplayStorageTypeChoices.null.value
 
-    def get_extra_config(self):
-        extra_config = {'TYPE': self.convert_type()}
-        if self.type == const.REPLAY_STORAGE_TYPE_SWIFT:
-            extra_config.update({'signer': 'S3SignerType'})
-        return extra_config
+    @property
+    def type_server(self):
+        return self.type == const.ReplayStorageTypeChoices.server.value
+
+    @property
+    def type_null_or_server(self):
+        return self.type_null or self.type_server
+
+    @property
+    def type_swift(self):
+        return self.type == const.ReplayStorageTypeChoices.swift.value
+
+    @property
+    def type_ceph(self):
+        return self.type == const.ReplayStorageTypeChoices.ceph.value
 
     @property
     def config(self):
-        config = self.meta
-        extra_config = self.get_extra_config()
-        config.update(extra_config)
-        return config
+        _config = {}
 
-    def in_defaults(self):
-        return self.type in self.TYPE_DEFAULTS
+        # add type config
+        if self.type_ceph:
+            _type = const.ReplayStorageTypeChoices.s3.value
+        else:
+            _type = self.type
+        _config.update({'TYPE': _type})
+
+        # add special config
+        if self.type_swift:
+            _config.update({'signer': 'S3SignerType'})
+
+        # add meta config
+        _config.update(self.meta)
+        return _config
 
     def is_valid(self):
-        if self.in_defaults():
+        if self.type_null_or_server:
             return True
         storage = jms_storage.get_object_storage(self.config)
         target = 'tests.py'
         src = os.path.join(settings.BASE_DIR, 'common', target)
         return storage.is_valid(src, target)
 
-    def is_using(self):
+    def is_use(self):
         return Terminal.objects.filter(replay_storage=self.name).exists()

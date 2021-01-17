@@ -49,29 +49,37 @@ class LoginConfirmSetting(CommonModelMixin):
     def get_user_confirm_setting(cls, user):
         return get_object_or_none(cls, user=user)
 
-    def create_confirm_ticket(self, request=None):
-        from tickets.models import Ticket
-        title = _('Login confirm') + ' {}'.format(self.user)
+    @staticmethod
+    def construct_confirm_ticket_meta(request=None):
         if request:
-            remote_addr = get_request_ip(request)
-            city = get_ip_city(remote_addr)
-            datetime = timezone.now().strftime('%Y-%m-%d %H:%M:%S')
-            body = __("{user_key}: {username}<br>"
-                      "IP: {ip}<br>"
-                      "{city_key}: {city}<br>"
-                      "{date_key}: {date}<br>").format(
-                user_key=__("User"), username=self.user,
-                ip=remote_addr, city_key=_("City"), city=city,
-                date_key=__("Datetime"), date=datetime
-            )
+            login_ip = get_request_ip(request)
         else:
-            body = ''
-        reviewer = self.reviewers.all()
-        ticket = Ticket.objects.create(
-            user=self.user, title=title, body=body,
-            type=Ticket.TYPE.LOGIN_CONFIRM,
-        )
-        ticket.assignees.set(reviewer)
+            login_ip = ''
+        login_ip = login_ip or '0.0.0.0'
+        login_city = get_ip_city(login_ip)
+        login_datetime = timezone.now().strftime('%Y-%m-%d %H:%M:%S')
+        ticket_meta = {
+            'apply_login_ip': login_ip,
+            'apply_login_city': login_city,
+            'apply_login_datetime': login_datetime,
+        }
+        return ticket_meta
+
+    def create_confirm_ticket(self, request=None):
+        from tickets import const
+        from tickets.models import Ticket
+        ticket_title = _('Login confirm') + ' {}'.format(self.user)
+        ticket_applicant = self.user
+        ticket_meta = self.construct_confirm_ticket_meta(request)
+        ticket_assignees = self.reviewers.all()
+        data = {
+            'title': ticket_title,
+            'type': const.TicketTypeChoices.login_confirm.value,
+            'applicant': ticket_applicant,
+            'meta': ticket_meta,
+        }
+        ticket = Ticket.objects.create(**data)
+        ticket.assignees.set(ticket_assignees)
         return ticket
 
     def __str__(self):

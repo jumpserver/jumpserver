@@ -14,7 +14,7 @@ from .utils import clean_ansible_task_hosts, group_asset_by_platform
 logger = get_logger(__file__)
 __all__ = [
     'test_asset_connectivity_util', 'test_asset_connectivity_manual',
-    'test_node_assets_connectivity_manual',
+    'test_node_assets_connectivity_manual', 'test_assets_connectivity_manual',
 ]
 
 
@@ -75,6 +75,17 @@ def test_asset_connectivity_util(assets, task_name=None):
 def test_asset_connectivity_manual(asset):
     task_name = _("Test assets connectivity: {}").format(asset)
     summary = test_asset_connectivity_util([asset], task_name=task_name)
+
+    if summary.get('dark'):
+        return False, summary['dark']
+    else:
+        return True, ""
+
+
+@shared_task(queue="ansible")
+def test_assets_connectivity_manual(assets):
+    task_name = _("Test assets connectivity: {}").format([asset.hostname for asset in assets])
+    summary = test_asset_connectivity_util(assets, task_name=task_name)
 
     if summary.get('dark'):
         return False, summary['dark']

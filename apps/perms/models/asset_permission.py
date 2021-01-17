@@ -1,4 +1,3 @@
-import uuid
 import logging
 from functools import reduce
 
@@ -6,8 +5,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from common.db import models
 from common.utils import lazyproperty
-from orgs.models import Organization
-from orgs.utils import get_current_org
 from assets.models import Asset, SystemUser, Node, FamilyMixin
 
 from .base import BasePermission
@@ -68,6 +65,11 @@ class Action:
         choices = [cls.NAME_MAP[i] for i, j in cls.DB_CHOICES if value & i == i]
         return choices
 
+    @classmethod
+    def value_to_choices_display(cls, value):
+        choices = cls.value_to_choices(value)
+        return [str(dict(cls.choices())[i]) for i in choices]
+        
     @classmethod
     def choices_to_value(cls, value):
         if not isinstance(value, list):

@@ -6,25 +6,41 @@ import json
 from common.utils import get_logger
 
 from .celery.utils import get_celery_task_log_path
+from .ansible.utils import get_ansible_task_log_path
 from channels.generic.websocket import JsonWebsocketConsumer
 
 logger = get_logger(__name__)
 
 
-class CeleryLogWebsocket(JsonWebsocketConsumer):
+class TaskLogWebsocket(JsonWebsocketConsumer):
     disconnected = False
 
+    log_types = {
+        'celery': get_celery_task_log_path,
+        'ansible': get_ansible_task_log_path
+    }
+
     def connect(self):
-        self.accept()
+        user = self.scope["user"]
+        if user.is_authenticated and user.is_org_admin:
+            self.accept()
+        else:
+            self.close()
+
+    def get_log_path(self, task_id):
+        func = self.log_types.get(self.log_type)
+        if func:
+            return func(task_id)
 
     def receive(self, text_data=None, bytes_data=None, **kwargs):
         data = json.loads(text_data)
-        task_id = data.get("task")
+        task_id = data.get('task')
+        self.log_type = data.get('type', 'celery')
         if task_id:
             self.handle_task(task_id)
 
     def wait_util_log_path_exist(self, task_id):
-        log_path = get_celery_task_log_path(task_id)
+        log_path = self.get_log_path(task_id)
         while not self.disconnected:
             if not os.path.exists(log_path):
                 self.send_json({'message': '.', 'task': task_id})
@@ -70,5 +86,3 @@ class CeleryLogWebsocket(JsonWebsocketConsumer):
     def disconnect(self, close_code):
         self.disconnected = True
         self.close()
-
-

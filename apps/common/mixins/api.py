@@ -28,19 +28,39 @@ class JSONResponseMixin(object):
         return JsonResponse(context)
 
 
+# SerializerMixin
+# ----------------------
+
+
 class SerializerMixin:
-    def get_serializer_class(self):
+    """ 根据用户请求动作的不同，获取不同的 `serializer_class `"""
+
+    serializer_classes = None
+
+    def get_serializer_class_by_view_action(self):
+        if not hasattr(self, 'serializer_classes'):
+            return None
+        if not isinstance(self.serializer_classes, dict):
+            return None
+        action = self.request.query_params.get('action')
+
         serializer_class = None
-        if hasattr(self, 'serializer_classes') and isinstance(self.serializer_classes, dict):
-            if self.action in ['list', 'metadata'] and self.request.query_params.get('draw'):
-                serializer_class = self.serializer_classes.get('display')
-            if serializer_class is None:
-                serializer_class = self.serializer_classes.get(
-                    self.action, self.serializer_classes.get('default')
-                )
-        if serializer_class:
-            return serializer_class
-        return super().get_serializer_class()
+        if action:
+            # metadata方法 使用 action 参数获取
+            serializer_class = self.serializer_classes.get(action)
+        if serializer_class is None:
+            serializer_class = self.serializer_classes.get(self.action)
+        if serializer_class is None:
+            serializer_class = self.serializer_classes.get('display')
+        if serializer_class is None:
+            serializer_class = self.serializer_classes.get('default')
+        return serializer_class
+
+    def get_serializer_class(self):
+        serializer_class = self.get_serializer_class_by_view_action()
+        if serializer_class is None:
+            serializer_class = super().get_serializer_class()
+        return serializer_class
 
 
 class ExtraFilterFieldsMixin:

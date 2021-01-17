@@ -3,8 +3,7 @@
 import re
 from rest_framework import serializers
 
-from common.fields import ChoiceDisplayField
-from common.serializers import AdaptedBulkListSerializer
+from common.drf.serializers import AdaptedBulkListSerializer
 from ..models import CommandFilter, CommandFilterRule, SystemUser
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
@@ -26,7 +25,6 @@ class CommandFilterSerializer(BulkOrgResourceModelSerializer):
 
 
 class CommandFilterRuleSerializer(BulkOrgResourceModelSerializer):
-    # serializer_choice_field = ChoiceDisplayField
     invalid_pattern = re.compile(r'[\.\*\+\[\\\?\{\}\^\$\|\(\)\#\<\>]')
     type_display = serializers.ReadOnlyField(source='get_type_display')
     action_display = serializers.ReadOnlyField(source='get_action_display')

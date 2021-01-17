@@ -102,11 +102,8 @@ def get_celery_periodic_task(task_name):
 
 
 def get_celery_task_log_path(task_id):
-    task_id = str(task_id)
-    rel_path = os.path.join(task_id[0], task_id[1], task_id + '.log')
-    path = os.path.join(settings.CELERY_LOG_DIR, rel_path)
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    return path
+    from ops.utils import get_task_log_path
+    return get_task_log_path(settings.CELERY_LOG_DIR, task_id)
 
 
 def get_celery_status():

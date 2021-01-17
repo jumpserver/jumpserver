@@ -4,7 +4,7 @@
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
-from common.serializers import AdaptedBulkListSerializer
+from common.drf.serializers import AdaptedBulkListSerializer
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import AuthBook, Asset
 from ..backends import AssetUserManager

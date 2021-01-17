@@ -40,6 +40,6 @@ def clean_ftp_log_period():
 @register_as_period_task(interval=3600*24)
 @shared_task
 def clean_audits_log_period():
-    clean_audits_log_period()
+    clean_login_log_period()
     clean_operation_log_period()
     clean_ftp_log_period()

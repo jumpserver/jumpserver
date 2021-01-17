@@ -1,141 +1,199 @@
 # -*- coding: utf-8 -*-
 #
-
+import json
+import uuid
+from datetime import datetime
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
-from common.db.models import ChoiceSet
 from common.mixins.models import CommonModelMixin
-from common.fields.model import JsonDictTextField
 from orgs.mixins.models import OrgModelMixin
+from orgs.utils import tmp_to_root_org, tmp_to_org
+from tickets.const import TicketTypeChoices, TicketActionChoices, TicketStatusChoices
+from tickets.signals import post_change_ticket_action
+from tickets.handler import get_ticket_handler
 
-__all__ = ['Ticket', 'Comment']
+__all__ = ['Ticket', 'ModelJSONFieldEncoder']
 
 
-class Ticket(OrgModelMixin, CommonModelMixin):
-    class STATUS(ChoiceSet):
-        OPEN = 'open', _("Open")
-        CLOSED = 'closed', _("Closed")
-
-    class TYPE(ChoiceSet):
-        GENERAL = 'general', _("General")
-        LOGIN_CONFIRM = 'login_confirm', _("Login confirm")
-        REQUEST_ASSET_PERM = 'request_asset', _('Request asset permission')
-
-    class ACTION(ChoiceSet):
-        APPROVE = 'approve', _('Approve')
-        REJECT = 'reject', _('Reject')
-
-    user = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, related_name='%(class)s_requested', verbose_name=_("User"))
-    user_display = models.CharField(max_length=128, verbose_name=_("User display name"))
-
-    title = models.CharField(max_length=256, verbose_name=_("Title"))
-    body = models.TextField(verbose_name=_("Body"))
-    meta = JsonDictTextField(verbose_name=_("Meta"), default='{}')
-    assignee = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, related_name='%(class)s_handled', verbose_name=_("Assignee"))
-    assignee_display = models.CharField(max_length=128, blank=True, null=True, verbose_name=_("Assignee display name"), default='')
-    assignees = models.ManyToManyField('users.User', related_name='%(class)s_assigned', verbose_name=_("Assignees"))
-    assignees_display = models.CharField(max_length=128, verbose_name=_("Assignees display name"), blank=True)
-    type = models.CharField(max_length=16, choices=TYPE.choices, default=TYPE.GENERAL, verbose_name=_("Type"))
-    status = models.CharField(choices=STATUS.choices, max_length=16, default='open')
-    action = models.CharField(choices=ACTION.choices, max_length=16, default='', blank=True)
-    comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
-
-    origin_objects = models.Manager()
-
-    def __str__(self):
-        return '{}: {}'.format(self.user_display, self.title)
-
-    @property
-    def body_as_html(self):
-        return self.body.replace('\n', '<br/>')
-
-    @property
-    def status_display(self):
-        return self.get_status_display()
-
-    @property
-    def type_display(self):
-        return self.get_type_display()
-
-    @property
-    def action_display(self):
-        return self.get_action_display()
-
-    def create_status_comment(self, status, user):
-        if status == self.STATUS.CLOSED:
-            action = _("Close")
+class ModelJSONFieldEncoder(json.JSONEncoder):
+    """ 解决一些类型的字段不能序列化的问题 """
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return obj.strftime(settings.DATETIME_DISPLAY_FORMAT)
+        if isinstance(obj, uuid.UUID):
+            return str(obj)
+        if isinstance(obj, type(_("ugettext_lazy"))):
+            return str(obj)
         else:
-            action = _("Open")
-        body = _('{} {} this ticket').format(self.user, action)
-        self.comments.create(user=user, body=body)
+            return super().default(obj)
 
-    def perform_status(self, status, user, extra_comment=None):
-        self.create_comment(
-            self.STATUS.get(status),
-            user,
-            extra_comment
-        )
-        self.status = status
-        self.assignee = user
-        self.save()
 
-    def create_comment(self, action_display, user, extra_comment=None):
-        body = '{} {} {}'.format(user, action_display, _("this ticket"))
-        if extra_comment is not None:
-            body += extra_comment
-        self.comments.create(body=body, user=user, user_display=str(user))
-
-    def perform_action(self, action, user, extra_comment=None):
-        self.create_comment(
-            self.ACTION.get(action),
-            user,
-            extra_comment
-        )
-        self.action = action
-        self.status = self.STATUS.CLOSED
-        self.assignee = user
-        self.save()
-
-    def is_assignee(self, user):
-        return self.assignees.filter(id=user.id).exists()
-
-    def is_user(self, user):
-        return self.user == user
-
-    @classmethod
-    def get_related_tickets(cls, user, queryset=None):
-        if queryset is None:
-            queryset = cls.objects.all()
-        queryset = queryset.filter(
-            Q(assignees=user) | Q(user=user)
-        ).distinct()
-        return queryset
-
-    @classmethod
-    def get_assigned_tickets(cls, user, queryset=None):
-        if queryset is None:
-            queryset = cls.objects.all()
-        queryset = queryset.filter(assignees=user)
-        return queryset
-
-    @classmethod
-    def get_my_tickets(cls, user, queryset=None):
-        if queryset is None:
-            queryset = cls.objects.all()
-        queryset = queryset.filter(user=user)
-        return queryset
+class Ticket(CommonModelMixin, OrgModelMixin):
+    title = models.CharField(max_length=256, verbose_name=_("Title"))
+    type = models.CharField(
+        max_length=64, choices=TicketTypeChoices.choices,
+        default=TicketTypeChoices.general.value, verbose_name=_("Type")
+    )
+    meta = models.JSONField(encoder=ModelJSONFieldEncoder, default=dict, verbose_name=_("Meta"))
+    action = models.CharField(
+        choices=TicketActionChoices.choices, max_length=16,
+        default=TicketActionChoices.open.value, verbose_name=_("Action")
+    )
+    status = models.CharField(
+        max_length=16, choices=TicketStatusChoices.choices,
+        default=TicketStatusChoices.open.value, verbose_name=_("Status")
+    )
+    # 申请人
+    applicant = models.ForeignKey(
+        'users.User', related_name='applied_tickets', on_delete=models.SET_NULL, null=True,
+        verbose_name=_("Applicant")
+    )
+    applicant_display = models.CharField(
+        max_length=256, default='', verbose_name=_("Applicant display")
+    )
+    # 处理人
+    processor = models.ForeignKey(
+        'users.User', related_name='processed_tickets', on_delete=models.SET_NULL, null=True,
+        verbose_name=_("Processor")
+    )
+    processor_display = models.CharField(
+        max_length=256, blank=True, null=True, default='', verbose_name=_("Processor display")
+    )
+    # 受理人列表
+    assignees = models.ManyToManyField(
+        'users.User', related_name='assigned_tickets', verbose_name=_("Assignees")
+    )
+    assignees_display = models.JSONField(
+        encoder=ModelJSONFieldEncoder, default=list, verbose_name=_('Assignees display')
+    )
+    # 评论
+    comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
     class Meta:
         ordering = ('-date_created',)
 
+    def __str__(self):
+        return '{}({})'.format(self.title, self.applicant_display)
 
-class Comment(CommonModelMixin):
-    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='comments')
-    user = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, verbose_name=_("User"), related_name='comments')
-    user_display = models.CharField(max_length=128, verbose_name=_("User display name"))
-    body = models.TextField(verbose_name=_("Body"))
+    # type
+    @property
+    def type_apply_asset(self):
+        return self.type == TicketTypeChoices.apply_asset.value
 
-    class Meta:
-        ordering = ('date_created', )
+    @property
+    def type_apply_application(self):
+        return self.type == TicketTypeChoices.apply_application.value
+
+    @property
+    def type_login_confirm(self):
+        return self.type == TicketTypeChoices.login_confirm.value
+
+    # status
+    @property
+    def status_closed(self):
+        return self.status == TicketStatusChoices.closed.value
+    
+    @property
+    def status_open(self):
+        return self.status == TicketStatusChoices.open.value
+
+    def set_status_closed(self):
+        self.status = TicketStatusChoices.closed.value
+
+    # action
+    @property
+    def action_open(self):
+        return self.action == TicketActionChoices.open.value
+
+    @property
+    def action_approve(self):
+        return self.action == TicketActionChoices.approve.value
+
+    @property
+    def action_reject(self):
+        return self.action == TicketActionChoices.reject.value
+
+    @property
+    def action_close(self):
+        return self.action == TicketActionChoices.close.value
+
+    # action changed
+    def open(self, applicant):
+        self.applicant = applicant
+        self._change_action(action=TicketActionChoices.open.value)
+
+    def approve(self, processor):
+        self.processor = processor
+        self._change_action(action=TicketActionChoices.approve.value)
+
+    def reject(self, processor):
+        self.processor = processor
+        self._change_action(action=TicketActionChoices.reject.value)
+
+    def close(self, processor):
+        self.processor = processor
+        self._change_action(action=TicketActionChoices.close.value)
+
+    def _change_action(self, action):
+        self.action = action
+        self.save()
+        post_change_ticket_action.send(sender=self.__class__, ticket=self, action=action)
+
+    # ticket
+    def has_assignee(self, assignee):
+        return self.assignees.filter(id=assignee.id).exists()
+
+    @classmethod
+    def get_user_related_tickets(cls, user):
+        queries = None
+        tickets = cls.all()
+        if user.is_superuser:
+            pass
+        elif user.is_super_auditor:
+            pass
+        elif user.is_org_admin:
+            admin_orgs_id = [
+                str(org_id) for org_id in user.admin_orgs.values_list('id', flat=True)
+            ]
+            assigned_tickets_id = [
+                str(ticket_id) for ticket_id in user.assigned_tickets.values_list('id', flat=True)
+            ]
+            queries = Q(applicant=user)
+            queries |= Q(processor=user)
+            queries |= Q(org_id__in=admin_orgs_id)
+            queries |= Q(id__in=assigned_tickets_id)
+        elif user.is_org_auditor:
+            audit_orgs_id = [
+                str(org_id) for org_id in user.audit_orgs.values_list('id', flat=True)
+            ]
+            queries = Q(org_id__in=audit_orgs_id)
+        elif user.is_common_user:
+            queries = Q(applicant=user)
+        else:
+            tickets = cls.objects.none()
+        if queries:
+            tickets = tickets.filter(queries)
+        return tickets.distinct()
+
+    @classmethod
+    def all(cls):
+        with tmp_to_root_org():
+            return Ticket.objects.all()
+
+    def save(self, *args, **kwargs):
+        """ 确保保存的org_id的是自身的值 """
+        with tmp_to_org(self.org_id):
+            return super().save(*args, **kwargs)
+
+    @property
+    def handler(self):
+        return get_ticket_handler(ticket=self)
+
+    # body
+    @property
+    def body(self):
+        _body = self.handler.get_body()
+        return _body

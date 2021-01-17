@@ -15,10 +15,14 @@ from common.api import LogTailApi
 from ..models import CeleryTask
 from ..serializers import CeleryResultSerializer, CeleryPeriodTaskSerializer
 from ..celery.utils import get_celery_task_log_path
+from ..ansible.utils import get_ansible_task_log_path
 from common.mixins.api import CommonApiMixin
 
 
-__all__ = ['CeleryTaskLogApi', 'CeleryResultApi', 'CeleryPeriodTaskViewSet']
+__all__ = [
+    'CeleryTaskLogApi', 'CeleryResultApi', 'CeleryPeriodTaskViewSet',
+    'AnsibleTaskLogApi',
+]
 
 
 class CeleryTaskLogApi(LogTailApi):
@@ -49,6 +53,21 @@ class CeleryTaskLogApi(LogTailApi):
 
     def is_file_finish_write(self):
         return self.task.ready()
+
+    def get_no_file_message(self, request):
+        if self.mark == 'undefined':
+            return '.'
+        else:
+            return _('Waiting task start')
+
+
+class AnsibleTaskLogApi(LogTailApi):
+    permission_classes = (IsValidUser,)
+
+    def get_log_path(self):
+        new_path = get_ansible_task_log_path(self.kwargs.get('pk'))
+        if new_path and os.path.isfile(new_path):
+            return new_path
 
     def get_no_file_message(self, request):
         if self.mark == 'undefined':

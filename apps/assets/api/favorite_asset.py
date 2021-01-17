@@ -13,7 +13,7 @@ __all__ = ['FavoriteAssetViewSet']
 class FavoriteAssetViewSet(BulkModelViewSet):
     serializer_class = FavoriteAssetSerializer
     permission_classes = (IsValidUser,)
-    filter_fields = ['asset']
+    filterset_fields = ['asset']
 
     def dispatch(self, request, *args, **kwargs):
         with tmp_to_root_org():

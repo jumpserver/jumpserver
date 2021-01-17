@@ -4,10 +4,26 @@ from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
 from users.models.user import User
-from common.serializers import AdaptedBulkListSerializer
+from common.drf.serializers import AdaptedBulkListSerializer
 from common.drf.serializers import BulkModelSerializer
 from common.db.models import concated_display as display
 from .models import Organization, OrganizationMember, ROLE
+
+
+class ResourceStatisticsSerializer(serializers.Serializer):
+    users_amount = serializers.IntegerField(required=False)
+    groups_amount = serializers.IntegerField(required=False)
+
+    assets_amount = serializers.IntegerField(required=False)
+    nodes_amount = serializers.IntegerField(required=False)
+    admin_users_amount = serializers.IntegerField(required=False)
+    system_users_amount = serializers.IntegerField(required=False)
+    domains_amount = serializers.IntegerField(required=False)
+    gateways_amount = serializers.IntegerField(required=False)
+
+    applications_amount = serializers.IntegerField(required=False)
+    asset_perms_amount = serializers.IntegerField(required=False)
+    app_perms_amount = serializers.IntegerField(required=False)
 
 
 class OrgSerializer(ModelSerializer):
@@ -15,13 +31,16 @@ class OrgSerializer(ModelSerializer):
     admins = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), write_only=True, required=False)
     auditors = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), write_only=True, required=False)
 
+    resource_statistics = ResourceStatisticsSerializer(source='resource_statistics_cache')
+
     class Meta:
         model = Organization
         list_serializer_class = AdaptedBulkListSerializer
         fields_mini = ['id', 'name']
         fields_small = fields_mini + [
-            'created_by', 'date_created', 'comment'
+            'created_by', 'date_created', 'comment', 'resource_statistics'
         ]
+
         fields_m2m = ['users', 'admins', 'auditors']
         fields = fields_small + fields_m2m
         read_only_fields = ['created_by', 'date_created']
@@ -60,6 +79,8 @@ class OrgMemberSerializer(BulkModelSerializer):
     class Meta:
         model = OrganizationMember
         fields = ('id', 'org', 'user', 'role', 'org_display', 'user_display', 'role_display')
+        use_model_bulk_create = True
+        model_bulk_create_kwargs = {'ignore_conflicts': True}
 
     def get_unique_together_validators(self):
         if self.parent:

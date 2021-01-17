@@ -37,7 +37,7 @@ class ApplicationPermissionUserRelationViewSet(RelationMixin):
     serializer_class = serializers.ApplicationPermissionUserRelationSerializer
     m2m_field = models.ApplicationPermission.users.field
     permission_classes = (IsOrgAdmin,)
-    filter_fields = [
+    filterset_fields = [
         'id', "user", "applicationpermission",
     ]
     search_fields = ("user__name", "user__username", "applicationpermission__name")
@@ -52,7 +52,7 @@ class ApplicationPermissionUserGroupRelationViewSet(RelationMixin):
     serializer_class = serializers.ApplicationPermissionUserGroupRelationSerializer
     m2m_field = models.ApplicationPermission.user_groups.field
     permission_classes = (IsOrgAdmin,)
-    filter_fields = [
+    filterset_fields = [
         'id', "usergroup", "applicationpermission"
     ]
     search_fields = ["usergroup__name", "applicationpermission__name"]
@@ -67,7 +67,7 @@ class ApplicationPermissionApplicationRelationViewSet(RelationMixin):
     serializer_class = serializers.ApplicationPermissionApplicationRelationSerializer
     m2m_field = models.ApplicationPermission.applications.field
     permission_classes = (IsOrgAdmin,)
-    filter_fields = [
+    filterset_fields = [
         'id', 'application', 'applicationpermission',
     ]
     search_fields = ["id", "application__name", "applicationpermission__name"]
@@ -82,7 +82,7 @@ class ApplicationPermissionSystemUserRelationViewSet(RelationMixin):
     serializer_class = serializers.ApplicationPermissionSystemUserRelationSerializer
     m2m_field = models.ApplicationPermission.system_users.field
     permission_classes = (IsOrgAdmin,)
-    filter_fields = [
+    filterset_fields = [
         'id', 'systemuser', 'applicationpermission',
     ]
     search_fields = [
@@ -103,8 +103,8 @@ class ApplicationPermissionAllApplicationListApi(generics.ListAPIView):
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.ApplicationPermissionAllApplicationSerializer
     only_fields = serializers.ApplicationPermissionAllApplicationSerializer.Meta.only_fields
-    filter_fields = ('name',)
-    search_fields = filter_fields
+    filterset_fields = ('name',)
+    search_fields = filterset_fields
 
     def get_queryset(self):
         pk = self.kwargs.get('pk')
@@ -118,8 +118,8 @@ class ApplicationPermissionAllUserListApi(generics.ListAPIView):
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.ApplicationPermissionAllUserSerializer
     only_fields = serializers.ApplicationPermissionAllUserSerializer.Meta.only_fields
-    filter_fields = ('username', 'name')
-    search_fields = filter_fields
+    filterset_fields = ('username', 'name')
+    search_fields = filterset_fields
 
     def get_queryset(self):
         pk = self.kwargs.get('pk')

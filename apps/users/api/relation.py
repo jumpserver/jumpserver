@@ -12,8 +12,8 @@ __all__ = ['UserUserGroupRelationViewSet']
 
 
 class UserUserGroupRelationViewSet(JMSBulkRelationModelViewSet):
-    filter_fields = ('user', 'usergroup')
-    search_fields = filter_fields
+    filterset_fields = ('user', 'usergroup')
+    search_fields = filterset_fields
     serializer_class = serializers.UserUserGroupRelationSerializer
     permission_classes = (IsOrgAdmin,)
     m2m_field = User.groups.field

@@ -54,12 +54,3 @@ class UserConnectionTokenApi(RootOrgViewMixin, APIView):
             return Response(value)
         else:
             return Response({'user': value['user']})
-
-    def get_permissions(self):
-        if self.request.query_params.get('user-only', None):
-            self.permission_classes = (AllowAny,)
-        return super().get_permissions()
-
-
-
-

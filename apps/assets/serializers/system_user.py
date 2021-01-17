@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Count
 
-from common.serializers import AdaptedBulkListSerializer
+from common.drf.serializers import AdaptedBulkListSerializer
 from common.mixins.serializers import BulkSerializerMixin
 from common.utils import ssh_pubkey_gen
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer

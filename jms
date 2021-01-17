@@ -197,7 +197,7 @@ def get_start_gunicorn_kwargs():
     print("\n- Start Gunicorn WSGI HTTP Server")
     prepare()
     bind = '{}:{}'.format(HTTP_HOST, HTTP_PORT)
-    log_format = '%(h)s %(t)s "%(r)s" %(s)s %(b)s '
+    log_format = '%(h)s %(t)s %(L)ss "%(r)s" %(s)s %(b)s '
 
     cmd = [
         'gunicorn', 'jumpserver.wsgi',
