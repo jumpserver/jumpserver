@@ -1,83 +1,11 @@
 # JumpServer 多云环境下更好用的堡垒机
 
-[![Python3](https://img.shields.io/badge/python-3.6-green.svg?style=plastic)](https://www.python.org/)
-[![Django](https://img.shields.io/badge/django-2.2-brightgreen.svg?style=plastic)](https://www.djangoproject.com/)
-[![Docker Pulls](https://img.shields.io/docker/pulls/jumpserver/jms_all.svg)](https://hub.docker.com/u/jumpserver)
+[![Python3](https://img.shields.io/badge/python-3.8-green.svg?style=plastic)](https://www.python.org/)
+[![Django](https://img.shields.io/badge/django-3.1-brightgreen.svg?style=plastic)](https://www.djangoproject.com/)
 
-## 紧急BUG修复通知
-JumpServer发现远程执行漏洞，请速度修复
+## 重要通知｜JumpServer 漏洞通知及修复方案
 
-**影响版本:**
-```
-< v2.6.2
-< v2.5.4
-< v2.4.5 
-= v1.5.9
-```
-**安全版本:**
-```
->= v2.6.2
->= v2.5.4
->= v2.4.5 
-= v1.5.9 （版本号没变）
-```
-**修复方案:**
-
-将JumpServer升级至安全版本；
-
-**临时修复方案:**
-
-修改 Nginx 配置文件屏蔽漏洞接口 
-
-```
-/api/v1/authentication/connection-token/
-/api/v1/users/connection-token/
-```
-
-Nginx 配置文件位置
-```
-# 社区老版本
-/etc/nginx/conf.d/jumpserver.conf
-
-# 企业老版本
-jumpserver-release/nginx/http_server.conf
- 
-# 新版本在 
-jumpserver-release/compose/config_static/http_server.conf
-```
-
-修改 Nginx 配置文件实例
-```
-### 保证在 /api 之前 和 / 之前
-location /api/v1/authentication/connection-token/ {
-   return 403;
-}
- 
-location /api/v1/users/connection-token/ {
-   return 403;
-}
-### 新增以上这些
- 
-location /api/ {
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header Host $host;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_pass http://core:8080;
-  }
- 
-...
-```
-
-修改完成后重启 nginx
-
-```
-docker方式: 
-docker restart jms_nginx
-
-nginx方式:
-systemctl restart nginx
-
-```
+详情请参见：https://blog.fit2cloud.com/?p=1761
 
 **修复验证**
 
@@ -90,17 +18,11 @@ $ bash jms_bug_check.sh demo.jumpserver.org
 ```
 --------------------------
 
-JumpServer 正在寻找开发者，一起为改变世界做些贡献吧，哪怕一点点，联系我 <ibuler@fit2cloud.com> 
-
-JumpServer 是全球首款开源的堡垒机，使用 GNU GPL v2.0 开源协议，是符合 4A 规范的运维安全审计系统。
-
-JumpServer 使用 Python / Django 为主进行开发，遵循 Web 2.0 规范，配备了业界领先的 Web Terminal 方案，交互界面美观、用户体验好。
-
-JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向扩展，无资产数量及并发限制。
+JumpServer 是全球首款开源的堡垒机，使用 GNU GPL v2.0 开源协议，是符合 4A 规范的运维安全审计系统。JumpServer 使用 Python / Django 为主进行开发，遵循 Web 2.0 规范，配备了业界领先的 Web Terminal 方案，交互界面美观、用户体验好。JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向扩展，无资产数量及并发限制。
 
 改变世界，从一点点开始。
 
-> 注: [KubeOperator](https://github.com/KubeOperator/KubeOperator) 是 JumpServer 团队在 Kubernetes 领域的的又一全新力作，欢迎关注和使用。
+> 注：JumpServer 正在寻找开发者，有兴趣者请发 JD 至 ibuler@fit2cloud.com
 
 ## 特色优势
 
@@ -340,19 +262,20 @@ v2.1.0 是 v2.0.0 之后的功能版本。
 - [演示视频](https://www.bilibili.com/video/BV1ZV41127GB)
 
 ## 组件项目
+
 - [Lina](https://github.com/jumpserver/lina) JumpServer Web UI 项目
 - [Luna](https://github.com/jumpserver/luna) JumpServer Web Terminal 项目
 - [Koko](https://github.com/jumpserver/koko) JumpServer 字符协议 Connector 项目，替代原来 Python 版本的 [Coco](https://github.com/jumpserver/coco)
 - [Guacamole](https://github.com/jumpserver/docker-guacamole) JumpServer 图形协议 Connector 项目，依赖 [Apache Guacamole](https://guacamole.apache.org/)
 
 ## 致谢
+
 - [Apache Guacamole](https://guacamole.apache.org/) Web页面连接 RDP, SSH, VNC协议设备，JumpServer 图形化连接依赖
 - [OmniDB](https://omnidb.org/) Web页面连接使用数据库，JumpServer Web数据库依赖
 
-
 ## JumpServer 企业版 
+
 - [申请企业版试用](https://jinshuju.net/f/kyOYpi)
-> 注：企业版支持离线安装，申请通过后会提供高速下载链接。
 
 ## 案例研究
 
