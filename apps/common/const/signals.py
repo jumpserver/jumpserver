@@ -12,3 +12,6 @@ PRE_REMOVE = 'pre_remove'
 POST_REMOVE = 'post_remove'
 PRE_CLEAR = 'pre_clear'
 POST_CLEAR = 'post_clear'
+
+POST_PREFIX = 'post'
+PRE_PREFIX = 'pre'

@@ -75,11 +75,6 @@ class OrgMemberRelationBulkViewSet(JMSBulkRelationModelViewSet):
     filterset_class = OrgMemberRelationFilterSet
     search_fields = ('user__name', 'user__username', 'org__name')
 
-    def perform_bulk_create(self, serializer):
-        data = serializer.validated_data
-        relations = [OrganizationMember(**i) for i in data]
-        OrganizationMember.objects.bulk_create(relations, ignore_conflicts=True)
-
     def perform_bulk_destroy(self, queryset):
         objs = list(queryset.all().prefetch_related('user', 'org'))
         queryset.delete()

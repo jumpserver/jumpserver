@@ -4,7 +4,6 @@ from celery import shared_task
 
 from .utils import get_logger
 
-
 logger = get_logger(__file__)
 
 

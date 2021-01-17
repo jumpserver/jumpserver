@@ -7,7 +7,7 @@ from django.db.models import signals
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import is_uuid
+from common.utils import is_uuid, lazyproperty
 from common.const import choices
 from common.db.models import ChoiceSet
 
@@ -214,6 +214,33 @@ class Organization(models.Model):
     def change_to(self):
         from .utils import set_current_org
         set_current_org(self)
+
+    @lazyproperty
+    def resource_statistics_cache(self):
+        from .caches import OrgResourceStatisticsCache
+        return OrgResourceStatisticsCache(self)
+
+    def get_total_resources_amount(self):
+        from django.apps import apps
+        from orgs.mixins.models import OrgModelMixin
+        summary = {'users.Members': self.members.all().count()}
+        for app_name, app_config in apps.app_configs.items():
+            models_cls = app_config.get_models()
+            for model in models_cls:
+                if not issubclass(model, OrgModelMixin):
+                    continue
+                key = '{}.{}'.format(app_name, model.__name__)
+                summary[key] = self.get_resource_amount(model)
+        return summary
+
+    def get_resource_amount(self, resource_model):
+        from .utils import tmp_to_org
+        from .mixins.models import OrgModelMixin
+
+        if not issubclass(resource_model, OrgModelMixin):
+            return 0
+        with tmp_to_org(self):
+            return resource_model.objects.all().count()
 
 
 def _convert_to_uuid_set(users):
