@@ -84,7 +84,7 @@ class Cache(metaclass=CacheBase):
         logger.info(f'CACHE: set {self.key} = {to_json}, timeout={self.timeout}')
         cache.set(self.key, to_json, timeout=self.timeout)
 
-    def _compute_data(self, *fields):
+    def compute_data(self, *fields):
         field_descs = []
         if not fields:
             field_descs = self.field_desc_mapper.values()
@@ -109,7 +109,7 @@ class Cache(metaclass=CacheBase):
             uncomputed_keys = all_keys - computed_keys
         else:
             computed_data = {}
-        data = self._compute_data(*uncomputed_keys)
+        data = self.compute_data(*uncomputed_keys)
         data.update(computed_data)
         self.set_data(data)
         return data
@@ -134,7 +134,7 @@ class Cache(metaclass=CacheBase):
             self.compute_and_set_all_data()
             return
 
-        refresh_data = self._compute_data(*fields)
+        refresh_data = self.compute_data(*fields)
         if not self.refresh_part_data_with_lock(refresh_data):
             # 刷新部分失败，缓存中没有数据，更新所有的值
             self.compute_and_set_all_data(refresh_data)

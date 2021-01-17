@@ -20,9 +20,9 @@ class OrgRelatedCache(Cache):
         """
         return self.current_org
 
-    def refresh(self, *fields):
+    def compute_data(self, *fields):
         with tmp_to_org(self.get_current_org()):
-            return super().refresh(*fields)
+            return super().compute_data(*fields)
 
     def refresh_async(self, *fields):
         """
