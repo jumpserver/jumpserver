@@ -76,7 +76,9 @@ class ReplayStorageTypeAzureSerializer(serializers.Serializer):
         china = 'core.chinacloudapi.cn', 'core.chinacloudapi.cn'
         international = 'core.windows.net', 'core.windows.net'
 
-    CONTAINER_NAME = serializers.CharField(max_length=1024, label=_('Container'), allow_null=True)
+    CONTAINER_NAME = serializers.CharField(
+        max_length=1024, label=_('Container name'), allow_null=True
+    )
     ACCOUNT_NAME = serializers.CharField(max_length=1024, label=_('Account name'), allow_null=True)
     ACCOUNT_KEY = serializers.CharField(max_length=1024, label=_('Account key'), allow_null=True)
     ENDPOINT_SUFFIX = serializers.ChoiceField(
