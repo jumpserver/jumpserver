@@ -29,6 +29,6 @@ class OrgRelatedCache(Cache):
         在事务提交之后再发送信号，防止因事务的隔离性导致未获得最新的数据
         """
         def func():
-            logger.debug(f'CACHE: Send refresh task {self}.{fields}')
+            logger.info(f'CACHE: Send refresh task {self}.{fields}')
             refresh_org_cache_task.delay(self, *fields)
         on_commit(func)
