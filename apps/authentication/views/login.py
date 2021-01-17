@@ -41,42 +41,13 @@ __all__ = [
 class UserLoginView(mixins.AuthMixin, FormView):
     key_prefix_captcha = "_LOGIN_INVALID_{}"
     redirect_field_name = 'next'
-
-    def get_template_names(self):
-        template_name = 'authentication/login.html'
-        if not settings.XPACK_ENABLED:
-            return template_name
-
-        from xpack.plugins.license.models import License
-        if not License.has_valid_license():
-            return template_name
-
-        template_name = 'authentication/xpack_login.html'
-        return template_name
-
-    def get_redirect_url_if_need(self, request):
-        redirect_url = ''
-        # show jumpserver login page if request http://{JUMP-SERVER}/?admin=1
-        if self.request.GET.get("admin", 0):
-            return None
-        if settings.AUTH_OPENID:
-            redirect_url = reverse(settings.AUTH_OPENID_AUTH_LOGIN_URL_NAME)
-        elif settings.AUTH_CAS:
-            redirect_url = reverse(settings.CAS_LOGIN_URL_NAME)
-
-        if redirect_url:
-            query_string = request.GET.urlencode()
-            redirect_url = "{}?{}".format(redirect_url, query_string)
-        return redirect_url
+    template_name = 'authentication/login.html'
 
     def get(self, request, *args, **kwargs):
         if request.user.is_staff:
             return redirect(redirect_user_first_login_or_index(
                 request, self.redirect_field_name)
             )
-        redirect_url = self.get_redirect_url_if_need(request)
-        if redirect_url:
-            return redirect(redirect_url)
         request.session.set_test_cookie()
         return super().get(request, *args, **kwargs)
 
@@ -131,8 +102,8 @@ class UserLoginView(mixins.AuthMixin, FormView):
         context = {
             'demo_mode': os.environ.get("DEMO_MODE"),
             'AUTH_OPENID': settings.AUTH_OPENID,
+            'AUTH_CAS': settings.AUTH_CAS,
             'rsa_public_key': rsa_public_key,
-            'AUTH_DB': settings.AUTH_DB
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
