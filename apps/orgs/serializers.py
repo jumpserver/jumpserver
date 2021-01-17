@@ -79,6 +79,8 @@ class OrgMemberSerializer(BulkModelSerializer):
     class Meta:
         model = OrganizationMember
         fields = ('id', 'org', 'user', 'role', 'org_display', 'user_display', 'role_display')
+        use_model_bulk_create = True
+        model_bulk_create_kwargs = {'ignore_conflicts': True}
 
     def get_unique_together_validators(self):
         if self.parent:
