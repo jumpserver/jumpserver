@@ -26,6 +26,7 @@ class Domain(OrgModelMixin):
     class Meta:
         verbose_name = _("Domain")
         unique_together = [('org_id', 'name')]
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
