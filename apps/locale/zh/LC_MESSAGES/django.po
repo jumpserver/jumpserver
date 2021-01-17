@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-17 15:37+0800\n"
+"POT-Creation-Date: 2021-01-17 16:12+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1132,7 +1132,7 @@ msgstr "是否成功"
 msgid "Result"
 msgstr "结果"
 
-#: audits/serializers.py:79 terminal/serializers/storage.py:155
+#: audits/serializers.py:79 terminal/serializers/storage.py:157
 msgid "Hosts"
 msgstr "主机"
 
@@ -2738,39 +2738,39 @@ msgstr "端点"
 msgid "Region"
 msgstr "地域"
 
-#: terminal/serializers/storage.py:79
+#: terminal/serializers/storage.py:80
 msgid "Container name"
 msgstr "容器名称"
 
-#: terminal/serializers/storage.py:80
+#: terminal/serializers/storage.py:82
 msgid "Account name"
 msgstr "账户名称"
 
-#: terminal/serializers/storage.py:81
+#: terminal/serializers/storage.py:83
 msgid "Account key"
 msgstr "账户密钥"
 
-#: terminal/serializers/storage.py:84
+#: terminal/serializers/storage.py:86
 msgid "Endpoint suffix"
 msgstr "端点后缀"
 
-#: terminal/serializers/storage.py:133
+#: terminal/serializers/storage.py:135
 msgid "The address format is incorrect"
 msgstr "地址格式不正确"
 
-#: terminal/serializers/storage.py:140
+#: terminal/serializers/storage.py:142
 msgid "Host invalid"
 msgstr "主机无效"
 
-#: terminal/serializers/storage.py:143
+#: terminal/serializers/storage.py:145
 msgid "Port invalid"
 msgstr "端口无效"
 
-#: terminal/serializers/storage.py:159
+#: terminal/serializers/storage.py:161
 msgid "Index"
 msgstr "索引"
 
-#: terminal/serializers/storage.py:162
+#: terminal/serializers/storage.py:164
 msgid "Doc type"
 msgstr "文档类型"
 
@@ -2971,6 +2971,7 @@ msgid "New Ticket: {} ({})"
 msgstr "新建工单: {} ({})"
 
 #: tickets/utils.py:26
+#, python-brace-format
 msgid ""
 "<div>\n"
 "            <p>Your has a new ticket</p>\n"
@@ -3001,6 +3002,7 @@ msgid "Ticket has processed: {} ({})"
 msgstr "工单已处理: {} ({})"
 
 #: tickets/utils.py:53
+#, python-brace-format
 msgid ""
 "\n"
 "        <div>\n"
@@ -3129,7 +3131,7 @@ msgid "Join user groups"
 msgstr "添加到用户组"
 
 #: users/forms/user.py:103 users/views/profile/password.py:59
-#: users/views/profile/reset.py:125
+#: users/views/profile/reset.py:127
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
 
@@ -3760,7 +3762,7 @@ msgstr "新的公钥已设置成功，请下载对应的私钥"
 msgid "Update user"
 msgstr "更新用户"
 
-#: users/templates/users/user_update.html:22 users/views/profile/reset.py:118
+#: users/templates/users/user_update.html:22 users/views/profile/reset.py:120
 msgid "User auth from {}, go there change password"
 msgstr "用户认证源来自 {}, 请去相应系统修改密码"
 
@@ -3868,7 +3870,7 @@ msgstr ""
 "    <br>\n"
 "    "
 
-#: users/utils.py:116 users/views/profile/reset.py:78
+#: users/utils.py:116 users/views/profile/reset.py:80
 msgid "Reset password success"
 msgstr "重置密码成功"
 
@@ -4075,24 +4077,26 @@ msgstr "密钥更新"
 msgid "Email address invalid, please input again"
 msgstr "邮箱地址错误，重新输入"
 
-#: users/views/profile/reset.py:50
-msgid "The user is from A, please go to the corresponding system to change the password"
+#: users/views/profile/reset.py:51
+msgid ""
+"The user is from A, please go to the corresponding system to change the "
+"password"
 msgstr "用户来自 {} 请去相应系统修改密码"
 
-#: users/views/profile/reset.py:64
+#: users/views/profile/reset.py:66
 msgid "Send reset password message"
 msgstr "发送重置密码邮件"
 
-#: users/views/profile/reset.py:65
+#: users/views/profile/reset.py:67
 msgid "Send reset password mail success, login your mail box and follow it "
 msgstr ""
 "发送重置邮件成功, 请登录邮箱查看, 按照提示操作 (如果没收到,请等待3-5分钟)"
 
-#: users/views/profile/reset.py:79
+#: users/views/profile/reset.py:81
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
-#: users/views/profile/reset.py:103 users/views/profile/reset.py:113
+#: users/views/profile/reset.py:105 users/views/profile/reset.py:115
 msgid "Token invalid or expired"
 msgstr "Token错误或失效"
 
