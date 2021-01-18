@@ -1,12 +1,122 @@
 ## Jumpserver 
 
-![Total visitor](https://visitor-count-badge.herokuapp.com/total.svg?repo_id=jumpserver)
-![Visitors in today](https://visitor-count-badge.herokuapp.com/today.svg?repo_id=jumpserver)
 [![Python3](https://img.shields.io/badge/python-3.6-green.svg?style=plastic)](https://www.python.org/)
-[![Django](https://img.shields.io/badge/django-2.1-brightgreen.svg?style=plastic)](https://www.djangoproject.com/)
-[![Ansible](https://img.shields.io/badge/ansible-2.4.2.0-blue.svg?style=plastic)](https://www.ansible.com/)
-[![Paramiko](https://img.shields.io/badge/paramiko-2.4.1-green.svg?style=plastic)](http://www.paramiko.org/)
+[![Django](https://img.shields.io/badge/django-2.2-brightgreen.svg?style=plastic)](https://www.djangoproject.com/)
+[![Docker Pulls](https://img.shields.io/docker/pulls/jumpserver/jms_all.svg)](https://hub.docker.com/u/jumpserver)
 
+---- 
+## CRITICAL BUG WARNING
+
+JumpServer found a critical bug for pre auth and info leak, You should fix quickly.
+
+Thanks for reactivity of Alibaba Hackerone bug bounty program report us this bug
+
+**Vulnerable version:**
+```
+< v2.6.2
+< v2.5.4
+< v2.4.5 
+= v1.5.9
+```
+
+**Safe version:**
+```
+>= v2.6.2
+>= v2.5.4
+>= v2.4.5 
+= v1.5.9 （Unstander version, so no change）
+```
+
+**Fix method:**
+Upgrade to save version
+
+
+**Quick temporary fix method:(recommend)**
+
+Modify nginx config file, disable vulnerable api
+
+```
+/api/v1/authentication/connection-token/
+/api/v1/users/connection-token/
+```
+
+Nginx config path
+
+```
+# Community old version
+/etc/nginx/conf.d/jumpserver.conf
+
+# Enterpise old version
+jumpserver-release/nginx/http_server.conf
+ 
+# New version
+jumpserver-release/compose/config_static/http_server.conf
+```
+
+Modify nginx config 
+
+```
+### On the server location top, or before of /api and /
+location /api/v1/authentication/connection-token/ {
+   return 403;
+}
+ 
+location /api/v1/users/connection-token/ {
+   return 403;
+}
+### Add two location above
+ 
+location /api/ {
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_pass http://core:8080;
+  }
+ 
+...
+```
+
+Then restart nginx
+
+```
+docker deployment: 
+docker restart jms_nginx
+
+rpm or other deployment:
+systemctl restart nginx
+
+```
+
+**Fix verify**
+
+```
+$ wget https://github.com/jumpserver/jumpserver/releases/download/v2.6.2/jms_bug_check.sh 
+
+# bash jms_bug_check.sh HOST 
+$ bash jms_bug_check.sh demo.jumpserver.org
+漏洞已修复 (fixed)
+漏洞未修复 (vulnerable)
+```
+
+
+**Attack detection**
+
+Download the check script under the directory logs than the gunicorn on 
+
+```
+$ pwd
+/opt/jumpserver/core/logs
+
+$ ls gunicorn.log
+gunicorn.log
+
+$ wget 'https://github.com/jumpserver/jumpserver/releases/download/v2.6.2/jms_check_attack.sh'
+$ bash jms_check_attack.sh
+系统未被入侵 (safe)
+系统已被入侵 (attacked)
+```
+
+--------------------------
 
 ----
 
