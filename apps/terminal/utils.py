@@ -71,12 +71,18 @@ def get_session_replay_url(session):
 
 def send_command_alert_mail(command):
     session_obj = Session.objects.get(id=command['session'])
+
+    input = command['input']
+    if isinstance(input, str):
+        input = input.replace('\r\n', ' ').replace('\r', ' ').replace('\n', ' ')
+
     subject = _("Insecure Command Alert: [%(name)s->%(login_from)s@%(remote_addr)s] $%(command)s") % {
                     'name': command['user'],
                     'login_from': session_obj.get_login_from_display(),
                     'remote_addr': session_obj.remote_addr,
-                    'command': command['input']
+                    'command': input
                  }
+
     recipient_list = settings.SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER.split(',')
     message = _("""
         Command: %(command)s
