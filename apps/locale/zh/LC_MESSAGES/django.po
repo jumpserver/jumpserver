@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-17 16:12+0800\n"
+"POT-Creation-Date: 2021-01-18 14:52+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -74,7 +74,6 @@ msgstr "种类"
 #: terminal/models/storage.py:18 terminal/models/storage.py:58
 #: tickets/models/ticket.py:38
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:25
-#: tickets/serializers/ticket/ticket.py:19
 #: users/templates/users/user_granted_database_app.html:35
 msgid "Type"
 msgstr "类型"
@@ -508,8 +507,7 @@ msgstr "每行一个命令"
 
 #: assets/models/cmd_filter.py:56 audits/models.py:57
 #: authentication/templates/authentication/_access_key_modal.html:34
-#: tickets/models/ticket.py:43 tickets/serializers/ticket/ticket.py:20
-#: users/templates/users/_granted_assets.html:29
+#: tickets/models/ticket.py:43 users/templates/users/_granted_assets.html:29
 #: users/templates/users/user_asset_permission.html:44
 #: users/templates/users/user_asset_permission.html:79
 #: users/templates/users/user_database_app_permission.html:42
@@ -1093,8 +1091,7 @@ msgid "Reason"
 msgstr "原因"
 
 #: audits/models.py:106 tickets/models/ticket.py:47
-#: tickets/serializers/ticket/ticket.py:21 xpack/plugins/cloud/models.py:224
-#: xpack/plugins/cloud/models.py:282
+#: xpack/plugins/cloud/models.py:224 xpack/plugins/cloud/models.py:282
 msgid "Status"
 msgstr "状态"
 
@@ -1804,7 +1801,7 @@ msgstr "当前组织不能被删除"
 
 #: orgs/mixins/models.py:56 orgs/mixins/serializers.py:25 orgs/models.py:41
 #: orgs/models.py:422 orgs/serializers.py:100
-#: tickets/serializers/ticket/ticket.py:74
+#: tickets/serializers/ticket/ticket.py:78
 msgid "Organization"
 msgstr "组织"
 
@@ -2864,7 +2861,7 @@ msgstr "申请人"
 
 #: tickets/models/ticket.py:55
 msgid "Applicant display"
-msgstr "申请人"
+msgstr "申请人 (显示名称)"
 
 #: tickets/models/ticket.py:60
 msgid "Processor"
@@ -2872,7 +2869,7 @@ msgstr "处理人"
 
 #: tickets/models/ticket.py:63
 msgid "Processor display"
-msgstr "处理人"
+msgstr "处理人 (显示名称)"
 
 #: tickets/models/ticket.py:67
 msgid "Assignees"
@@ -2880,15 +2877,16 @@ msgstr "受理人"
 
 #: tickets/models/ticket.py:70
 msgid "Assignees display"
-msgstr "受理人"
+msgstr "受理人 (显示名称)"
 
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:22
 msgid "Category display"
-msgstr "种类"
+msgstr "种类 (显示名称)"
 
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:29
+#: tickets/serializers/ticket/ticket.py:19
 msgid "Type display"
-msgstr "类型"
+msgstr "类型 (显示名称)"
 
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:33
 msgid "Application group"
@@ -2905,7 +2903,7 @@ msgstr "批准的应用"
 
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:56
 msgid "Approve applications display"
-msgstr "批准的应用"
+msgstr "批准的应用 (显示名称)"
 
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:60
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:57
@@ -2914,7 +2912,7 @@ msgstr "批准的系统用户"
 
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:65
 msgid "Approve system user display"
-msgstr "批准的系统用户"
+msgstr "批准的系统用户 (显示名称)"
 
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:89
 msgid "No `Application` are found under Organization `{}`"
@@ -2938,7 +2936,7 @@ msgstr "主机名组"
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:61
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:69
 msgid "Approve assets display"
-msgstr "批准的资产"
+msgstr "批准的资产 (显示名称)"
 
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:48
 msgid "Approve assets"
@@ -2952,17 +2950,25 @@ msgstr "在组织 `{}` 下没有发现 `资产`"
 msgid "Login datetime"
 msgstr "登录日期"
 
-#: tickets/serializers/ticket/ticket.py:92
+#: tickets/serializers/ticket/ticket.py:21
+msgid "Action display"
+msgstr "动作 (显示名称)"
+
+#: tickets/serializers/ticket/ticket.py:24
+msgid "Status display"
+msgstr "状态（显示名称）"
+
+#: tickets/serializers/ticket/ticket.py:96
 msgid ""
 "The `type` in the submission data (`{}`) is different from the type in the "
 "request url (`{}`)"
 msgstr "提交数据中的类型 (`{}`) 与请求URL地址中的类型 (`{}`) 不一致"
 
-#: tickets/serializers/ticket/ticket.py:102
+#: tickets/serializers/ticket/ticket.py:106
 msgid "The organization `{}` does not exist"
 msgstr "组织 `{}` 不存在"
 
-#: tickets/serializers/ticket/ticket.py:113
+#: tickets/serializers/ticket/ticket.py:117
 msgid "None of the assignees belong to Organization `{}` admins"
 msgstr "所有受理人都不属于组织 `{}` 下的管理员"
 
