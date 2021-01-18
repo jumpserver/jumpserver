@@ -120,7 +120,7 @@ $ bash jms_check_attack.sh
 
 ----
 
-- [中文版](https://github.com/jumpserver/jumpserver/blob/master/README_EN.md)
+- [中文版](https://github.com/jumpserver/jumpserver/blob/master/README.md)
 
 Jumpserver is the first fully open source bastion in the world, based on the GNU GPL v2.0 open source protocol. Jumpserver is a  professional operation and maintenance audit system conforms to 4A specifications.
 
