@@ -7,9 +7,9 @@
 ---- 
 ## CRITICAL BUG WARNING
 
-JumpServer found a critical bug for pre auth and info leak, You should fix quickly.
+Recently we have found a critical bug for remote execution vulnerability which leads to pre-auth and info leak, please fix it as soon as possible.
 
-Thanks for **reactivity of Alibaba Hackerone bug bounty program** report us this bug
+Thanks for **reactivity from Alibaba Hackerone bug bounty program** report us this bug
 
 **Vulnerable version:**
 ```
@@ -17,46 +17,48 @@ Thanks for **reactivity of Alibaba Hackerone bug bounty program** report us this
 < v2.5.4
 < v2.4.5 
 = v1.5.9
+>= v1.5.3
 ```
 
-**Safe version:**
+**Safe and Stable version:**
 ```
 >= v2.6.2
 >= v2.5.4
 >= v2.4.5 
-= v1.5.9 （Unstander version, so no change）
+= v1.5.9 （version tag didn't change）
+< v1.5.3
 ```
 
-**Fix method:**
-Upgrade to save version
+**Bug Fix Solution:**
+Upgrade to the latest version or the version mentioned above
 
 
-**Quick temporary fix method:(recommend)**
+**Temporary Solution (upgrade asap):**
 
-Modify nginx config file, disable vulnerable api
+Modify the Nginx config file and disable the vulnerable api listed below
 
 ```
 /api/v1/authentication/connection-token/
 /api/v1/users/connection-token/
 ```
 
-Nginx config path
+Path to Nginx config file
 
 ```
-# Community old version
+# Previous Community version
 /etc/nginx/conf.d/jumpserver.conf
 
-# Enterpise old version
+# Previous Enterprise version
 jumpserver-release/nginx/http_server.conf
  
-# New version
+# Latest version
 jumpserver-release/compose/config_static/http_server.conf
 ```
 
-Modify nginx config 
+Changes in Nginx config file
 
 ```
-### On the server location top, or before of /api and /
+### Put the following code on top of location server, or before /api and /
 location /api/v1/authentication/connection-token/ {
    return 403;
 }
@@ -64,7 +66,7 @@ location /api/v1/authentication/connection-token/ {
 location /api/v1/users/connection-token/ {
    return 403;
 }
-### Add two location above
+### End right here
  
 location /api/ {
     proxy_set_header X-Real-IP $remote_addr;
@@ -76,7 +78,7 @@ location /api/ {
 ...
 ```
 
-Then restart nginx
+Save the file and restart Nginx
 
 ```
 docker deployment: 
@@ -87,21 +89,22 @@ $ systemctl restart nginx
 
 ```
 
-**Fix verify**
+**Bug Fix Verification**
 
 ```
+# Download the following script to check if it is fixed
 $ wget https://github.com/jumpserver/jumpserver/releases/download/v2.6.2/jms_bug_check.sh 
 
-# bash jms_bug_check.sh HOST 
+# Run the code to verify it
 $ bash jms_bug_check.sh demo.jumpserver.org
-漏洞已修复 (fixed)
-漏洞未修复 (vulnerable)
+漏洞已修复 (It means the bug is fixed)
+漏洞未修复 (It means the bug is not fixed and the system is still vulnerable)
 ```
 
 
-**Attack detection**
+**Attack Simulation**
 
-Download the check script under the directory logs than the gunicorn on 
+Go to the logs directory which should contain gunicorn.log file. Then download the "attack" script and execute it
 
 ```
 $ pwd
@@ -112,8 +115,8 @@ gunicorn.log
 
 $ wget 'https://github.com/jumpserver/jumpserver/releases/download/v2.6.2/jms_check_attack.sh'
 $ bash jms_check_attack.sh
-系统未被入侵 (safe)
-系统已被入侵 (attacked)
+系统未被入侵 (It means the system is safe)
+系统已被入侵 (It means the system is being attacked)
 ```
 
 --------------------------
@@ -122,11 +125,11 @@ $ bash jms_check_attack.sh
 
 - [中文版](https://github.com/jumpserver/jumpserver/blob/master/README.md)
 
-Jumpserver is the first fully open source bastion in the world, based on the GNU GPL v2.0 open source protocol. Jumpserver is a  professional operation and maintenance audit system conforms to 4A specifications.
+Jumpserver is the world's first open-source PAM (Privileged Access Management System) and is licensed under the GNU GPL v2.0. It is a 4A-compliant professional operation and maintenance security audit system.
 
-Jumpserver is developed using Python / Django, conforms to the Web 2.0 specification, and is equipped with the industry-leading Web Terminal solution which have beautiful interface and great user experience.
+Jumpserver uses Python / Django for development, follows Web 2.0 specifications, and is equipped with an industry-leading Web Terminal solution that provides a beautiful user interface and great user experience
 
-Jumpserver adopts a distributed architecture to support multi-branch deployment across multiple areas. The central node provides APIs, and login nodes are deployed in each branch. It can be scaled horizontally without concurrency restrictions.
+Jumpserver adopts a distributed architecture to support multi-branch deployment across multiple cross-regional areas. The central node provides APIs, and login nodes are deployed in each branch. It can be scaled horizontally without concurrency restrictions.
 
 Change the world, starting from little things.
 
@@ -157,7 +160,7 @@ We provide online demo, demo video and screenshots to get you started quickly.
 We provide the SDK for your other systems to quickly interact with the Jumpserver API.
 
 - [Python](https://github.com/jumpserver/jumpserver-python-sdk) Jumpserver other components use this SDK to complete the interaction.
-- [Java](https://github.com/KaiJunYan/jumpserver-java-sdk.git) 恺珺同学提供的Java版本的SDK thanks to 恺珺 for provide Java SDK
+- [Java](https://github.com/KaiJunYan/jumpserver-java-sdk.git) Thanks to 恺珺 for providing his Java SDK vesrion.
 
 
 ### License & Copyright
