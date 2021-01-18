@@ -1,5 +1,5 @@
 from .base import BaseHandler
-from django.utils.translation import ugettext as __
+from django.utils.translation import ugettext as _
 
 from perms.models import AssetPermission, Action
 from assets.models import Asset, SystemUser
@@ -54,12 +54,12 @@ class Handler(BaseHandler):
             {}: {},
             {}: {}
         '''.format(
-            __('Applied IP group'), apply_ip_group,
-            __("Applied hostname group"), apply_hostname_group,
-            __("Applied system user group"), apply_system_user_group,
-            __("Applied actions"), apply_actions_display,
-            __('Applied date start'), apply_date_start,
-            __('Applied date expired'), apply_date_expired,
+            _('Applied IP group'), apply_ip_group,
+            _("Applied hostname group"), apply_hostname_group,
+            _("Applied system user group"), apply_system_user_group,
+            _("Applied actions"), apply_actions_display,
+            _('Applied date start'), apply_date_start,
+            _('Applied date expired'), apply_date_expired,
         )
         return applied_body
 
@@ -75,11 +75,11 @@ class Handler(BaseHandler):
             {}: {},
             {}: {}
         '''.format(
-            __('Approved assets'), approve_assets_display,
-            __('Approved system users'), approve_system_users_display,
-            __('Approved actions'), ', '.join(approve_actions_display),
-            __('Approved date start'), approve_date_start,
-            __('Approved date expired'), approve_date_expired,
+            _('Approved assets'), approve_assets_display,
+            _('Approved system users'), approve_system_users_display,
+            _('Approved actions'), ', '.join(approve_actions_display),
+            _('Approved date start'), approve_date_start,
+            _('Approved date expired'), approve_date_expired,
         )
         return approved_body
 
@@ -95,23 +95,25 @@ class Handler(BaseHandler):
         approve_actions = self.ticket.meta.get('approve_actions', Action.NONE)
         approve_date_start = self.ticket.meta.get('approve_date_start')
         approve_date_expired = self.ticket.meta.get('approve_date_expired')
-        permission_name = '{}({})'.format(
-            __('Created by ticket ({})'.format(self.ticket.title)), str(self.ticket.id)[:4]
+        permission_name = _('Created by ticket ({}) ({})'.format(
+            self.ticket.title, str(self.ticket.id)[:4])
         )
-        permission_comment = __(
+        permission_comment = _(
             'Created by the ticket, '
             'ticket title: {}, '
             'ticket applicant: {}, '
             'ticket processor: {}, '
             'ticket ID: {}'
             ''.format(
-                self.ticket.title, self.ticket.applicant_display, self.ticket.processor_display,
+                self.ticket.title,
+                self.ticket.applicant_display,
+                self.ticket.processor_display,
                 str(self.ticket.id)
             )
         )
         permission_data = {
             'id': self.ticket.id,
-            'name': permission_name,
+            'name': str(permission_name),
             'comment': permission_comment,
             'created_by': '{}:{}'.format(str(self.__class__.__name__), str(self.ticket.id)),
             'actions': approve_actions,

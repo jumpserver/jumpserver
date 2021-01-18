@@ -1,4 +1,4 @@
-from django.utils.translation import ugettext as __
+from django.utils.translation import ugettext as _
 from .base import BaseHandler
 
 
@@ -13,8 +13,8 @@ class Handler(BaseHandler):
             {}: {},
             {}: {}
         '''.format(
-            __("Applied login IP"), apply_login_ip,
-            __("Applied login city"), apply_login_city,
-            __("Applied login datetime"), apply_login_datetime,
+            _("Applied login IP"), apply_login_ip,
+            _("Applied login city"), apply_login_city,
+            _("Applied login datetime"), apply_login_datetime,
         )
         return applied_body

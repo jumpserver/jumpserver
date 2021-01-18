@@ -1,4 +1,4 @@
-from django.utils.translation import ugettext as __
+from django.utils.translation import ugettext as _
 from orgs.utils import tmp_to_org, tmp_to_root_org
 from applications.models import Application
 from applications.const import ApplicationCategoryChoices, ApplicationTypeChoices
@@ -52,12 +52,12 @@ class Handler(BaseHandler):
             {}: {},
             {}: {},
         '''.format(
-            __('Applied category'), apply_category_display,
-            __('Applied type'), apply_type_display,
-            __('Applied application group'), apply_application_group,
-            __('Applied system user group'), apply_system_user_group,
-            __('Applied date start'), apply_date_start,
-            __('Applied date expired'), apply_date_expired,
+            _('Applied category'), apply_category_display,
+            _('Applied type'), apply_type_display,
+            _('Applied application group'), apply_application_group,
+            _('Applied system user group'), apply_system_user_group,
+            _('Applied date start'), apply_date_start,
+            _('Applied date expired'), apply_date_expired,
         )
         return applied_body
 
@@ -72,10 +72,10 @@ class Handler(BaseHandler):
             {}: {},
             {}: {},
         '''.format(
-            __('Approved applications'), approve_applications_display,
-            __('Approved system users'), approve_system_users_display,
-            __('Approved date start'), approve_date_start,
-            __('Approved date expired'), approve_date_expired
+            _('Approved applications'), approve_applications_display,
+            _('Approved system users'), approve_system_users_display,
+            _('Approved date start'), approve_date_start,
+            _('Approved date expired'), approve_date_expired
         )
         return approved_body
 
@@ -92,10 +92,10 @@ class Handler(BaseHandler):
         approve_system_users_id = self.ticket.meta.get('approve_system_users', [])
         approve_date_start = self.ticket.meta.get('approve_date_start')
         approve_date_expired = self.ticket.meta.get('approve_date_expired')
-        permission_name = '{}({})'.format(
-            __('Created by ticket ({})'.format(self.ticket.title)), str(self.ticket.id)[:4]
+        permission_name = _('Created by ticket ({}) ({})'.format(
+            self.ticket.title, str(self.ticket.id)[:4])
         )
-        permission_comment = __(
+        permission_comment = _(
             'Created by the ticket, '
             'ticket title: {}, '
             'ticket applicant: {}, '
@@ -108,10 +108,10 @@ class Handler(BaseHandler):
         )
         permissions_data = {
             'id': self.ticket.id,
-            'name': permission_name,
+            'name': str(permission_name),
             'category': apply_category,
             'type': apply_type,
-            'comment': permission_comment,
+            'comment': str(permission_comment),
             'created_by': '{}:{}'.format(str(self.__class__.__name__), str(self.ticket.id)),
             'date_start': approve_date_start,
             'date_expired': approve_date_expired,
