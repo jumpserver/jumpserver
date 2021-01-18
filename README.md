@@ -4,6 +4,8 @@
 [![Django](https://img.shields.io/badge/django-2.2-brightgreen.svg?style=plastic)](https://www.djangoproject.com/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/jumpserver/jms_all.svg)](https://hub.docker.com/u/jumpserver)
 
+- [ENGLISH](https://github.com/jumpserver/jumpserver/blob/master/README_EN.md)
+
 ## 紧急BUG修复通知
 JumpServer发现远程执行漏洞，请速度修复
 
