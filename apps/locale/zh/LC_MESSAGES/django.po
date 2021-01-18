@@ -4085,7 +4085,7 @@ msgstr "邮箱地址错误，重新输入"
 
 #: users/views/profile/reset.py:51
 msgid ""
-"The user is from A, please go to the corresponding system to change the "
+"The user is from {}, please go to the corresponding system to change the "
 "password"
 msgstr "用户来自 {} 请去相应系统修改密码"
 
