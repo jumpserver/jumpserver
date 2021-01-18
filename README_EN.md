@@ -9,7 +9,7 @@
 
 JumpServer found a critical bug for pre auth and info leak, You should fix quickly.
 
-Thanks for reactivity of Alibaba Hackerone bug bounty program report us this bug
+Thanks for **reactivity of Alibaba Hackerone bug bounty program** report us this bug
 
 **Vulnerable version:**
 ```

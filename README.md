@@ -9,6 +9,8 @@
 ## 紧急BUG修复通知
 JumpServer发现远程执行漏洞，请速度修复
 
+非常感谢  **reactivity of Alibaba Hackerone bug bounty program**(瑞典) 向我们报告了此 BUG
+
 **影响版本:**
 ```
 < v2.6.2
