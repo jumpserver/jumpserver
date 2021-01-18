@@ -11,10 +11,10 @@ from . import const
 logger = get_logger(__file__)
 
 
-def send_ticket_applied_mail_to_assignees(ticket, assignees):
-    if not assignees:
+def send_ticket_applied_mail_to_assignees(ticket):
+    if not ticket.assignees:
         logger.debug("Not found assignees, ticket: {}({}), assignees: {}".format(
-            ticket, str(ticket.id), assignees)
+            ticket, str(ticket.id), ticket.assignees)
         )
         return
 
@@ -22,25 +22,22 @@ def send_ticket_applied_mail_to_assignees(ticket, assignees):
     ticket_detail_url = urljoin(
         settings.SITE_URL, const.TICKET_DETAIL_URL.format(id=str(ticket.id))
     )
-    message = _(
-        """<div>
-            <p>Your has a new ticket</p>
+    message = """
+        <div>
+            <p>{title} <a href={ticket_detail_url}>{ticket_detail_url_description}</a></p>
             <div>
-                <b>Ticket:</b> 
-                <br/>
-                    {body}
-                <br/>
-                <a href={ticket_detail_url}>click here to review</a> 
+                {body}
             </div>
         </div>
         """.format(
+            title=_('Your has a new ticket, from applicant - {}').format(str(ticket.applicant)),
+            ticket_detail_url=ticket_detail_url,
+            ticket_detail_url_description=_('click here to review'),
             body=ticket.body.replace('\n', '<br/>'),
-            ticket_detail_url=ticket_detail_url
-        )
     )
     if settings.DEBUG:
         logger.debug(message)
-    recipient_list = [assignee.email for assignee in assignees]
+    recipient_list = [assignee.email for assignee in ticket.assignees.all()]
     send_mail_async.delay(subject, message, recipient_list, html_message=message)
 
 
@@ -48,22 +45,18 @@ def send_ticket_processed_mail_to_applicant(ticket):
     if not ticket.applicant:
         logger.error("Not found applicant: {}({})".format(ticket.title, ticket.id))
         return
-    subject = _('Ticket has processed: {} ({})').format(ticket.title, ticket.get_type_display())
-    message = _(
-        """
+    subject = _('Ticket has processed: {} ({})').format(ticket.title, ticket.processor_display)
+    message = """
         <div>
-            <p>Your ticket has been processed</p>
+            <p>{title}</p>
             <div>
-                <b>Ticket:</b> 
-                <br/>
-                    {body}
-                <br/>
+                {body}
             </div>
         </div>
         """.format(
+            title=_('Your ticket has been ({}) processed').format(ticket.processor_display),
             body=ticket.body.replace('\n', '<br/>'),
         )
-    )
     if settings.DEBUG:
         logger.debug(message)
     recipient_list = [ticket.applicant.email]
