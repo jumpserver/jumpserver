@@ -13,6 +13,7 @@ JumpServer发现远程执行漏洞，请速度修复
 < v2.5.4
 < v2.4.5 
 = v1.5.9
+>= v1.5.3
 ```
 **安全版本:**
 ```
@@ -20,7 +21,9 @@ JumpServer发现远程执行漏洞，请速度修复
 >= v2.5.4
 >= v2.4.5 
 = v1.5.9 （版本号没变）
+< v1.5.3
 ```
+
 **修复方案:**
 
 将JumpServer升级至安全版本；
@@ -88,6 +91,23 @@ $ wget https://github.com/jumpserver/jumpserver/releases/download/v2.6.2/jms_bug
 $ bash jms_bug_check.sh demo.jumpserver.org
 漏洞已修复
 ```
+
+**入侵检测**
+
+下载脚本到 jumpserver 日志目录，这个目录中存在 gunicorn.log，然后执行
+
+```
+$ pwd
+/opt/jumpserver/core/logs
+
+$ ls gunicorn.log 
+gunicorn.log
+
+$ wget 'https://github.com/jumpserver/jumpserver/releases/download/v2.6.2/jms_check_attack.sh'
+$ bash jms_check_attack.sh
+系统未被入侵
+```
+
 --------------------------
 
 JumpServer 正在寻找开发者，一起为改变世界做些贡献吧，哪怕一点点，联系我 <ibuler@fit2cloud.com> 
