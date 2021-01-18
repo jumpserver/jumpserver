@@ -80,10 +80,10 @@ Then restart nginx
 
 ```
 docker deployment: 
-docker restart jms_nginx
+$ docker restart jms_nginx
 
 rpm or other deployment:
-systemctl restart nginx
+$ systemctl restart nginx
 
 ```
 
