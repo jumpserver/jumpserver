@@ -28,7 +28,7 @@ logger = get_logger(__name__)
 class AssetUserFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         kwargs = {}
-        for field in view.filter_fields:
+        for field in view.filterset_fields:
             value = request.GET.get(field)
             if not value:
                 continue
