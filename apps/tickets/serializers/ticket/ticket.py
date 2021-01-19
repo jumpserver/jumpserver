@@ -38,31 +38,34 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
         ]
 
     def get_meta_serializer(self):
-        request = self.context['request']
-        default_serializer_class = serializers.Serializer
+        default_serializer = serializers.Serializer(read_only=True)
         if isinstance(self.instance, Ticket):
             _type = self.instance.type
         else:
-            _type = request.query_params.get('type')
+            _type = self.context['request'].query_params.get('type')
 
-        if not _type:
-            return default_serializer_class()
+        if _type:
+            action_serializer_classes_mapping = type_serializer_classes_mapping.get(_type)
+            if action_serializer_classes_mapping:
+                query_action = self.context['request'].query_params.get('action')
+                action = query_action if query_action else self.context['view'].action
+                serializer_class = action_serializer_classes_mapping.get(action)
+                if not serializer_class:
+                    serializer_class = action_serializer_classes_mapping.get('default')
+            else:
+                serializer_class = default_serializer
+        else:
+            serializer_class = default_serializer
 
-        action_serializer_classes_mapping = type_serializer_classes_mapping.get(_type)
-        if not action_serializer_classes_mapping:
-            return default_serializer_class()
+        if not serializer_class:
+            serializer_class = default_serializer
 
-        query_action = request.query_params.get('action')
-        _action = query_action if query_action else self.context['view'].action
-        serializer_class = action_serializer_classes_mapping.get(_action)
-        if serializer_class:
-            return serializer_class()
+        if isinstance(serializer_class, type):
+            serializer = serializer_class()
+        else:
+            serializer = serializer_class
 
-        serializer_class = action_serializer_classes_mapping.get('default')
-        if serializer_class:
-            return serializer_class()
-
-        return default_serializer_class()
+        return serializer
 
 
 class TicketDisplaySerializer(TicketSerializer):

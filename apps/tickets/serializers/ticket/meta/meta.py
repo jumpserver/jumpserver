@@ -29,5 +29,6 @@ type_serializer_classes_mapping = {
     const.TicketTypeChoices.login_confirm.value: {
         'default': login_confirm.LoginConfirmSerializer,
         action_open: login_confirm.ApplySerializer,
+        action_approve: login_confirm.LoginConfirmSerializer(read_only=True),
     }
 }

@@ -113,16 +113,25 @@ class ReplayStorageSerializer(serializers.ModelSerializer):
         return _meta
 
     def get_meta_serializer(self):
-        serializer_class = None
-        query_type = self.context['request'].query_params.get('type')
-        if query_type:
-            serializer_class = replay_storage_type_serializer_classes_mapping.get(query_type)
+        default_serializer = serializers.Serializer(read_only=True)
+
         if isinstance(self.instance, ReplayStorage):
-            instance_type = self.instance.type
-            serializer_class = replay_storage_type_serializer_classes_mapping.get(instance_type)
-        if serializer_class is None:
-            serializer_class = serializers.Serializer
-        serializer = serializer_class()
+            _type = self.instance.type
+        else:
+            _type = self.context['request'].query_params.get('type')
+
+        if _type:
+            serializer_class = replay_storage_type_serializer_classes_mapping.get(_type)
+        else:
+            serializer_class = default_serializer
+
+        if not serializer_class:
+            serializer_class = default_serializer
+
+        if isinstance(serializer_class, type):
+            serializer = serializer_class()
+        else:
+            serializer = serializer_class
         return serializer
 
 
@@ -187,14 +196,23 @@ class CommandStorageSerializer(serializers.ModelSerializer):
         return _meta
 
     def get_meta_serializer(self):
-        serializer_class = None
-        query_type = self.context['request'].query_params.get('type')
-        if query_type:
-            serializer_class = command_storage_type_serializer_classes_mapping.get(query_type)
+        default_serializer = serializers.Serializer(read_only=True)
+
         if isinstance(self.instance, CommandStorage):
-            instance_type = self.instance.type
-            serializer_class = command_storage_type_serializer_classes_mapping.get(instance_type)
-        if serializer_class is None:
-            serializer_class = serializers.Serializer
-        serializer = serializer_class()
+            _type = self.instance.type
+        else:
+            _type = self.context['request'].query_params.get('type')
+
+        if _type:
+            serializer_class = command_storage_type_serializer_classes_mapping.get(_type)
+        else:
+            serializer_class = default_serializer
+
+        if not serializer_class:
+            serializer_class = default_serializer
+
+        if isinstance(serializer_class, type):
+            serializer = serializer_class()
+        else:
+            serializer = serializer_class
         return serializer

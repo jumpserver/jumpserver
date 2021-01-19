@@ -86,17 +86,17 @@ class BaseHandler(object):
             {}: {},
             {}: {},
             {}: {},
-            {}: {},
             {}: {}
         '''.format(
             _('Ticket title'), self.ticket.title,
             _('Ticket type'), self.ticket.get_type_display(),
+            _('Ticket status'), self.ticket.get_status_display(),
+            _('Ticket action'), self.ticket.get_action_display(),
             _('Ticket applicant'), self.ticket.applicant_display,
             _('Ticket assignees'), self.ticket.assignees_display,
-            _('Ticket processor'), self.ticket.processor_display or _('No'),
-            _('Ticket action'), self.ticket.get_action_display(),
-            _('Ticket status'), self.ticket.get_status_display()
         )
+        if self.ticket.status_closed:
+            basic_body += '''{}: {}'''.format(_('Ticket processor'), self.ticket.processor_display)
         body = self.body_html_format.format(_("Ticket basic info"), basic_body)
         return body
 
