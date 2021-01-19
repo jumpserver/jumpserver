@@ -22,7 +22,7 @@ class TaskLogWebsocket(JsonWebsocketConsumer):
 
     def connect(self):
         user = self.scope["user"]
-        if user.is_authenticated and user.is_org_admin:
+        if user.is_authenticated:
             self.accept()
         else:
             self.close()
