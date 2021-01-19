@@ -122,18 +122,18 @@ def refresh_user_amount_on_user_create_or_delete(user_id):
 
 
 @receiver(post_save, sender=User)
-def on_user_create(sender, instance, created, **kwargs):
+def on_user_create_refresh_cache(sender, instance, created, **kwargs):
     if created:
         refresh_user_amount_on_user_create_or_delete(instance.id)
 
 
 @receiver(pre_delete, sender=User)
-def on_user_delete(sender, instance, **kwargs):
+def on_user_delete_refresh_cache(sender, instance, **kwargs):
     refresh_user_amount_on_user_create_or_delete(instance.id)
 
 
 @receiver(m2m_changed, sender=OrganizationMember)
-def on_org_user_changed(sender, action, instance, reverse, pk_set, **kwargs):
+def on_org_user_changed_refresh_cache(sender, action, instance, reverse, pk_set, **kwargs):
     if not action.startswith(POST_PREFIX):
         return
 

@@ -48,7 +48,7 @@ class UserForgotPasswordView(FormView):
 
         if not user.is_local:
             error = _(
-                'The user is from A, please go to the corresponding system to change the password'
+                'The user is from {}, please go to the corresponding system to change the password'
                 ''.format(user.get_source_display())
             )
             form.add_error('email', error)

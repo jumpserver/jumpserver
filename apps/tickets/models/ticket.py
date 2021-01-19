@@ -148,35 +148,9 @@ class Ticket(CommonModelMixin, OrgModelMixin):
 
     @classmethod
     def get_user_related_tickets(cls, user):
-        queries = None
-        tickets = cls.all()
-        if user.is_superuser:
-            pass
-        elif user.is_super_auditor:
-            pass
-        elif user.is_org_admin:
-            admin_orgs_id = [
-                str(org_id) for org_id in user.admin_orgs.values_list('id', flat=True)
-            ]
-            assigned_tickets_id = [
-                str(ticket_id) for ticket_id in user.assigned_tickets.values_list('id', flat=True)
-            ]
-            queries = Q(applicant=user)
-            queries |= Q(processor=user)
-            queries |= Q(org_id__in=admin_orgs_id)
-            queries |= Q(id__in=assigned_tickets_id)
-        elif user.is_org_auditor:
-            audit_orgs_id = [
-                str(org_id) for org_id in user.audit_orgs.values_list('id', flat=True)
-            ]
-            queries = Q(org_id__in=audit_orgs_id)
-        elif user.is_common_user:
-            queries = Q(applicant=user)
-        else:
-            tickets = cls.objects.none()
-        if queries:
-            tickets = tickets.filter(queries)
-        return tickets.distinct()
+        queries = Q(applicant=user) | Q(assignees=user)
+        tickets = cls.all().filter(queries).distinct()
+        return tickets
 
     @classmethod
     def all(cls):

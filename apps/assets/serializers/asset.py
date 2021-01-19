@@ -2,7 +2,7 @@
 #
 from rest_framework import serializers
 from django.db.models import F
-
+from django.core.validators import RegexValidator
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
@@ -176,6 +176,14 @@ class AssetDisplaySerializer(AssetSerializer):
 
 class PlatformSerializer(serializers.ModelSerializer):
     meta = serializers.DictField(required=False, allow_null=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # TODO 修复 drf SlugField RegexValidator bug，之后记得删除
+        validators = self.fields['name'].validators
+        if isinstance(validators[-1], RegexValidator):
+            validators.pop()
 
     class Meta:
         model = Platform

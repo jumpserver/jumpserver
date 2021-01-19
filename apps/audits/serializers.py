@@ -86,8 +86,7 @@ class CommandExecutionSerializer(serializers.ModelSerializer):
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.annotate(user_display=F('user__name'))\
-            .annotate(run_as_display=F('run_as__name'))
+        queryset = queryset.prefetch_related('user', 'run_as', 'hosts')
         return queryset
 
 

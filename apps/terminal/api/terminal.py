@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-from collections import OrderedDict
 import logging
 import uuid
 
@@ -8,7 +7,6 @@ from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.views import APIView, Response
-from rest_framework.permissions import AllowAny
 
 from common.drf.api import JMSBulkModelViewSet
 from common.utils import get_object_or_none
@@ -18,7 +16,7 @@ from .. import serializers
 from .. import exceptions
 
 __all__ = [
-    'TerminalViewSet', 'TerminalTokenApi', 'StatusViewSet', 'TerminalConfig',
+    'TerminalViewSet',  'StatusViewSet', 'TerminalConfig',
 ]
 logger = logging.getLogger(__file__)
 
@@ -68,41 +66,6 @@ class TerminalViewSet(JMSBulkModelViewSet):
         filtered_queryset_id = [str(q.id) for q in queryset if q.status == status]
         queryset = queryset.filter(id__in=filtered_queryset_id)
         return queryset
-
-    def get_permissions(self):
-        if self.action == "create":
-            self.permission_classes = (AllowAny,)
-        return super().get_permissions()
-
-
-class TerminalTokenApi(APIView):
-    permission_classes = (AllowAny,)
-    queryset = Terminal.objects.filter(is_deleted=False)
-
-    def get(self, request, *args, **kwargs):
-        try:
-            terminal = self.queryset.get(id=kwargs.get('terminal'))
-        except Terminal.DoesNotExist:
-            terminal = None
-
-        token = request.query_params.get("token")
-
-        if terminal is None:
-            return Response('May be reject by administrator', status=401)
-
-        if token is None or cache.get(token, "") != str(terminal.id):
-            return Response('Token is not valid', status=401)
-
-        if not terminal.is_accepted:
-            return Response("Terminal was not accepted yet", status=400)
-
-        if not terminal.user or not terminal.user.access_key:
-            return Response("No access key generate", status=401)
-
-        access_key = terminal.user.access_key()
-        data = OrderedDict()
-        data['access_key'] = {'id': access_key.id, 'secret': access_key.secret}
-        return Response(data, status=200)
 
 
 class StatusViewSet(viewsets.ModelViewSet):

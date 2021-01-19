@@ -12,7 +12,7 @@ from common.permissions import IsValidUser, IsOrgAdmin
 
 from tickets import serializers
 from tickets.models import Ticket
-from tickets.permissions.ticket import IsAssignee, NotClosed
+from tickets.permissions.ticket import IsAssignee, IsAssigneeOrApplicant, NotClosed
 
 
 __all__ = ['TicketViewSet']
@@ -50,7 +50,7 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
         instance = serializer.save()
         instance.open(applicant=self.request.user)
 
-    @action(detail=False, methods=[POST])
+    @action(detail=False, methods=[POST], permission_classes=[IsValidUser, ])
     def open(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
 
@@ -68,7 +68,7 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
         instance.reject(processor=request.user)
         return Response(serializer.data)
 
-    @action(detail=True, methods=[PUT], permission_classes=[IsOrgAdmin, IsAssignee, NotClosed])
+    @action(detail=True, methods=[PUT], permission_classes=[IsAssigneeOrApplicant, NotClosed])
     def close(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)

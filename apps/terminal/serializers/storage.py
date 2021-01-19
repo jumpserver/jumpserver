@@ -14,6 +14,13 @@ from .. import const
 # --------------------------
 
 
+def replay_storage_endpoint_format_validator(endpoint):
+    h = urlparse(endpoint)
+    if h.path:
+        raise serializers.ValidationError(_('Endpoint invalid: remove path `{}`').format(h.path))
+    return endpoint
+
+
 class ReplayStorageTypeBaseSerializer(serializers.Serializer):
     BUCKET = serializers.CharField(
         required=True, max_length=1024, label=_('Bucket'), allow_null=True
@@ -27,6 +34,7 @@ class ReplayStorageTypeBaseSerializer(serializers.Serializer):
         allow_null=True,
     )
     ENDPOINT = serializers.CharField(
+        validators=[replay_storage_endpoint_format_validator],
         required=True, max_length=1024, label=_('Endpoint'), allow_null=True,
     )
 
@@ -38,6 +46,7 @@ class ReplayStorageTypeS3Serializer(ReplayStorageTypeBaseSerializer):
         Such as: http://s3.cn-north-1.amazonaws.com.cn
     '''
     ENDPOINT = serializers.CharField(
+        validators=[replay_storage_endpoint_format_validator],
         required=True, max_length=1024, label=_('Endpoint'), help_text=_(endpoint_help_text),
         allow_null=True,
     )
@@ -67,6 +76,7 @@ class ReplayStorageTypeOSSSerializer(ReplayStorageTypeBaseSerializer):
         Such as: http://oss-cn-hangzhou.aliyuncs.com
     '''
     ENDPOINT = serializers.CharField(
+        validators=[replay_storage_endpoint_format_validator],
         max_length=1024, label=_('Endpoint'), help_text=_(endpoint_help_text), allow_null=True,
     )
 
@@ -113,16 +123,25 @@ class ReplayStorageSerializer(serializers.ModelSerializer):
         return _meta
 
     def get_meta_serializer(self):
-        serializer_class = None
-        query_type = self.context['request'].query_params.get('type')
-        if query_type:
-            serializer_class = replay_storage_type_serializer_classes_mapping.get(query_type)
+        default_serializer = serializers.Serializer(read_only=True)
+
         if isinstance(self.instance, ReplayStorage):
-            instance_type = self.instance.type
-            serializer_class = replay_storage_type_serializer_classes_mapping.get(instance_type)
-        if serializer_class is None:
-            serializer_class = serializers.Serializer
-        serializer = serializer_class()
+            _type = self.instance.type
+        else:
+            _type = self.context['request'].query_params.get('type')
+
+        if _type:
+            serializer_class = replay_storage_type_serializer_classes_mapping.get(_type)
+        else:
+            serializer_class = default_serializer
+
+        if not serializer_class:
+            serializer_class = default_serializer
+
+        if isinstance(serializer_class, type):
+            serializer = serializer_class()
+        else:
+            serializer = serializer_class
         return serializer
 
 
@@ -130,7 +149,7 @@ class ReplayStorageSerializer(serializers.ModelSerializer):
 # ---------------------------
 
 
-def es_host_format_validator(host):
+def command_storage_es_host_format_validator(host):
     h = urlparse(host)
     default_error_msg = _('The address format is incorrect')
     if h.scheme not in ['http', 'https']:
@@ -154,8 +173,8 @@ class CommandStorageTypeESSerializer(serializers.Serializer):
         (eg: http://www.jumpserver.a.com, http://www.jumpserver.b.com)
     '''
     HOSTS = serializers.ListField(
-        child=serializers.CharField(validators=[es_host_format_validator]), label=_('Hosts'),
-        help_text=_(hosts_help_text), allow_null=True
+        child=serializers.CharField(validators=[command_storage_es_host_format_validator]),
+        label=_('Hosts'), help_text=_(hosts_help_text), allow_null=True
     )
     INDEX = serializers.CharField(
         max_length=1024, default='jumpserver', label=_('Index'), allow_null=True
@@ -187,14 +206,23 @@ class CommandStorageSerializer(serializers.ModelSerializer):
         return _meta
 
     def get_meta_serializer(self):
-        serializer_class = None
-        query_type = self.context['request'].query_params.get('type')
-        if query_type:
-            serializer_class = command_storage_type_serializer_classes_mapping.get(query_type)
+        default_serializer = serializers.Serializer(read_only=True)
+
         if isinstance(self.instance, CommandStorage):
-            instance_type = self.instance.type
-            serializer_class = command_storage_type_serializer_classes_mapping.get(instance_type)
-        if serializer_class is None:
-            serializer_class = serializers.Serializer
-        serializer = serializer_class()
+            _type = self.instance.type
+        else:
+            _type = self.context['request'].query_params.get('type')
+
+        if _type:
+            serializer_class = command_storage_type_serializer_classes_mapping.get(_type)
+        else:
+            serializer_class = default_serializer
+
+        if not serializer_class:
+            serializer_class = default_serializer
+
+        if isinstance(serializer_class, type):
+            serializer = serializer_class()
+        else:
+            serializer = serializer_class
         return serializer
