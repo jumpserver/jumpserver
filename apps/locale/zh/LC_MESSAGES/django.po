@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-18 16:42+0800\n"
+"POT-Creation-Date: 2021-01-19 20:03+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -58,22 +58,22 @@ msgid "Name"
 msgstr "名称"
 
 #: applications/models/application.py:12
-#: applications/serializers/application.py:41 assets/models/label.py:21
+#: applications/serializers/application.py:47 assets/models/label.py:21
 #: perms/models/application_permission.py:20
 #: perms/serializers/application/permission.py:16
 #: perms/serializers/application/user_permission.py:33
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:18
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:20
 msgid "Category"
 msgstr "种类"
 
 #: applications/models/application.py:15
-#: applications/serializers/application.py:42 assets/models/cmd_filter.py:52
+#: applications/serializers/application.py:48 assets/models/cmd_filter.py:52
 #: perms/models/application_permission.py:23
 #: perms/serializers/application/permission.py:17
 #: perms/serializers/application/user_permission.py:34
 #: terminal/models/storage.py:18 terminal/models/storage.py:58
 #: tickets/models/ticket.py:38
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:25
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:27
 #: users/templates/users/user_granted_database_app.html:35
 msgid "Type"
 msgstr "类型"
@@ -268,7 +268,7 @@ msgstr "主机名"
 
 #: assets/models/asset.py:194 assets/models/domain.py:54
 #: assets/models/user.py:120 terminal/serializers/session.py:29
-#: terminal/serializers/storage.py:59
+#: terminal/serializers/storage.py:68
 msgid "Protocol"
 msgstr "协议"
 
@@ -292,7 +292,7 @@ msgstr "激活"
 
 #: assets/models/asset.py:203 assets/models/cluster.py:19
 #: assets/models/user.py:66 templates/_nav.html:44
-#: xpack/plugins/cloud/models.py:143 xpack/plugins/cloud/serializers.py:126
+#: xpack/plugins/cloud/models.py:143 xpack/plugins/cloud/serializers.py:137
 msgid "Admin user"
 msgstr "管理用户"
 
@@ -602,7 +602,7 @@ msgstr "ssh私钥"
 #: users/templates/users/user_asset_permission.html:41
 #: users/templates/users/user_asset_permission.html:73
 #: users/templates/users/user_asset_permission.html:158
-#: xpack/plugins/cloud/models.py:139 xpack/plugins/cloud/serializers.py:127
+#: xpack/plugins/cloud/models.py:139 xpack/plugins/cloud/serializers.py:138
 msgid "Node"
 msgstr "节点"
 
@@ -994,10 +994,10 @@ msgstr "成功"
 
 #: audits/models.py:43 ops/models/command.py:28 perms/models/base.py:52
 #: terminal/models/session.py:51
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:41
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:69
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:38
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:73
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:43
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:74
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:40
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:78
 #: xpack/plugins/change_auth_plan/models.py:177
 #: xpack/plugins/change_auth_plan/models.py:307
 #: xpack/plugins/gathered_user/models.py:76
@@ -1129,7 +1129,7 @@ msgstr "是否成功"
 msgid "Result"
 msgstr "结果"
 
-#: audits/serializers.py:79 terminal/serializers/storage.py:157
+#: audits/serializers.py:79 terminal/serializers/storage.py:177
 msgid "Hosts"
 msgstr "主机"
 
@@ -1783,11 +1783,11 @@ msgstr "定期清除Celery日志"
 msgid "Task log"
 msgstr "任务列表"
 
-#: ops/utils.py:62
+#: ops/utils.py:64
 msgid "Update task content: {}"
 msgstr "更新任务内容: {}"
 
-#: ops/utils.py:72
+#: ops/utils.py:74
 msgid "Disk used more than 80%: {} => {}"
 msgstr "磁盘使用率超过 80%: {} => {}"
 
@@ -1801,7 +1801,7 @@ msgstr "当前组织不能被删除"
 
 #: orgs/mixins/models.py:56 orgs/mixins/serializers.py:25 orgs/models.py:41
 #: orgs/models.py:422 orgs/serializers.py:100
-#: tickets/serializers/ticket/ticket.py:78
+#: tickets/serializers/ticket/ticket.py:81
 msgid "Organization"
 msgstr "组织"
 
@@ -1901,10 +1901,10 @@ msgid "User group"
 msgstr "用户组"
 
 #: perms/models/base.py:53
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:44
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:72
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:41
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:76
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:46
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:77
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:43
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:81
 #: users/models/user.py:556 users/templates/users/user_detail.html:93
 #: users/templates/users/user_profile.html:120
 msgid "Date expired"
@@ -2714,60 +2714,64 @@ msgstr "是否可重放"
 msgid "Can join"
 msgstr "是否可加入"
 
-#: terminal/serializers/storage.py:19
+#: terminal/serializers/storage.py:20
+msgid "Endpoint invalid: remove path `{}`"
+msgstr "端点无效: 移除路径 `{}`"
+
+#: terminal/serializers/storage.py:26
 msgid "Bucket"
 msgstr "桶名称"
 
-#: terminal/serializers/storage.py:22
+#: terminal/serializers/storage.py:29
 msgid "Access key"
 msgstr ""
 
-#: terminal/serializers/storage.py:26
+#: terminal/serializers/storage.py:33
 msgid "Secret key"
 msgstr ""
 
-#: terminal/serializers/storage.py:30 terminal/serializers/storage.py:41
-#: terminal/serializers/storage.py:70
+#: terminal/serializers/storage.py:38 terminal/serializers/storage.py:50
+#: terminal/serializers/storage.py:80
 msgid "Endpoint"
 msgstr "端点"
 
-#: terminal/serializers/storage.py:56 xpack/plugins/cloud/models.py:276
+#: terminal/serializers/storage.py:65 xpack/plugins/cloud/models.py:276
 msgid "Region"
 msgstr "地域"
 
-#: terminal/serializers/storage.py:80
+#: terminal/serializers/storage.py:90
 msgid "Container name"
 msgstr "容器名称"
 
-#: terminal/serializers/storage.py:82
+#: terminal/serializers/storage.py:92
 msgid "Account name"
 msgstr "账户名称"
 
-#: terminal/serializers/storage.py:83
+#: terminal/serializers/storage.py:93
 msgid "Account key"
 msgstr "账户密钥"
 
-#: terminal/serializers/storage.py:86
+#: terminal/serializers/storage.py:96
 msgid "Endpoint suffix"
 msgstr "端点后缀"
 
-#: terminal/serializers/storage.py:135
+#: terminal/serializers/storage.py:154
 msgid "The address format is incorrect"
 msgstr "地址格式不正确"
 
-#: terminal/serializers/storage.py:142
+#: terminal/serializers/storage.py:161
 msgid "Host invalid"
 msgstr "主机无效"
 
-#: terminal/serializers/storage.py:145
+#: terminal/serializers/storage.py:164
 msgid "Port invalid"
 msgstr "端口无效"
 
-#: terminal/serializers/storage.py:161
+#: terminal/serializers/storage.py:180
 msgid "Index"
 msgstr "索引"
 
-#: terminal/serializers/storage.py:164
+#: terminal/serializers/storage.py:183
 msgid "Doc type"
 msgstr "文档类型"
 
@@ -2775,14 +2779,14 @@ msgstr "文档类型"
 msgid "Not found"
 msgstr "没有发现"
 
-#: terminal/utils.py:74
+#: terminal/utils.py:79
 #, python-format
 msgid ""
 "Insecure Command Alert: [%(name)s->%(login_from)s@%(remote_addr)s] $"
 "%(command)s"
 msgstr "危险命令告警: [%(name)s->%(login_from)s@%(remote_addr)s] $%(command)s"
 
-#: terminal/utils.py:81
+#: terminal/utils.py:87
 #, python-format
 msgid ""
 "\n"
@@ -2879,11 +2883,7 @@ msgstr "批准的开始日期"
 msgid "Approved date expired"
 msgstr "批准的失效日期"
 
-#: tickets/handler/apply_application.py:95 tickets/handler/apply_asset.py:98
-msgid "Created by ticket ({}) ({})"
-msgstr "通过工单创建 ({}) ({})"
-
-#: tickets/handler/apply_application.py:99 tickets/handler/apply_asset.py:102
+#: tickets/handler/apply_application.py:100 tickets/handler/apply_asset.py:103
 msgid ""
 "Created by the ticket, ticket title: {}, ticket applicant: {}, ticket "
 "processor: {}, ticket ID: {}"
@@ -2914,47 +2914,43 @@ msgstr "批准的动作"
 msgid "User {} {} the ticket"
 msgstr "用户 {} {} 这个工单"
 
-#: tickets/handler/base.py:89
-msgid "Ticket basic info"
-msgstr "工单基本信息"
-
-#: tickets/handler/base.py:90
+#: tickets/handler/base.py:91
 msgid "Ticket title"
 msgstr "工单标题"
 
-#: tickets/handler/base.py:91
+#: tickets/handler/base.py:92
 msgid "Ticket type"
 msgstr "工单类型"
 
-#: tickets/handler/base.py:92
-msgid "Ticket applicant"
-msgstr "工单申请人"
-
 #: tickets/handler/base.py:93
-msgid "Ticket assignees"
-msgstr "工单受理人"
+msgid "Ticket status"
+msgstr "工单状态"
 
 #: tickets/handler/base.py:94
-msgid "Ticket processor"
-msgstr "工单处理人"
-
-#: tickets/handler/base.py:94
-msgid "No"
-msgstr "无"
-
-#: tickets/handler/base.py:95
 msgid "Ticket action"
 msgstr "工单动作"
 
+#: tickets/handler/base.py:95
+msgid "Ticket applicant"
+msgstr "工单申请人"
+
 #: tickets/handler/base.py:96
-msgid "Ticket status"
-msgstr "工单状态"
+msgid "Ticket assignees"
+msgstr "工单受理人"
+
+#: tickets/handler/base.py:99
+msgid "Ticket processor"
+msgstr "工单处理人"
+
+#: tickets/handler/base.py:100
+msgid "Ticket basic info"
+msgstr "工单基本信息"
 
 #: tickets/handler/base.py:114
 msgid "Ticket applied info"
 msgstr "工单申请信息"
 
-#: tickets/handler/base.py:124
+#: tickets/handler/base.py:119
 msgid "Ticket approved info"
 msgstr "工单批准信息"
 
@@ -3010,72 +3006,86 @@ msgstr "受理人"
 msgid "Assignees display"
 msgstr "受理人 (显示名称)"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:22
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:24
 msgid "Category display"
 msgstr "种类 (显示名称)"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:29
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:31
 #: tickets/serializers/ticket/ticket.py:19
 msgid "Type display"
 msgstr "类型 (显示名称)"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:33
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:35
 msgid "Application group"
 msgstr "应用组"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:37
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:26
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:39
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:28
 msgid "System user group"
 msgstr "系统用户组"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:51
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:53
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:50
+msgid "Permission name"
+msgstr "授权名称"
+
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:56
 msgid "Approve applications"
 msgstr "批准的应用"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:56
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:61
 msgid "Approve applications display"
 msgstr "批准的应用 (显示名称)"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:60
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:57
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:65
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:62
 msgid "Approve system users"
 msgstr "批准的系统用户"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:65
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:70
 msgid "Approve system user display"
 msgstr "批准的系统用户 (显示名称)"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:89
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:90
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:94
+msgid "Permission named `{}` already exists"
+msgstr "授权名称 `{}` 已存在"
+
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:107
 msgid "No `Application` are found under Organization `{}`"
 msgstr "在组织 `{}` 下没有发现 `应用`"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:107
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:106
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:125
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:124
 msgid "No `SystemUser` are found under Organization `{}`"
 msgstr "在组织 `{}` 下没有发现 `系统用户`"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:18
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:20
 msgid "IP group"
 msgstr "IP组"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:22
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:24
 msgid "Hostname group"
 msgstr "主机名组"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:34
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:52
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:61
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:69
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:36
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:57
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:66
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:74
 msgid "Approve assets display"
 msgstr "批准的资产 (显示名称)"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:48
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:53
 msgid "Approve assets"
 msgstr "批准的资产"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:90
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:108
 msgid "No `Asset` are found under Organization `{}`"
 msgstr "在组织 `{}` 下没有发现 `资产`"
+
+#: tickets/serializers/ticket/meta/ticket_type/common.py:11
+msgid "Created by ticket ({}-{})"
+msgstr "通过工单创建 ({}-{})"
 
 #: tickets/serializers/ticket/meta/ticket_type/login_confirm.py:20
 msgid "Login datetime"
@@ -3089,39 +3099,39 @@ msgstr "动作 (显示名称)"
 msgid "Status display"
 msgstr "状态（显示名称）"
 
-#: tickets/serializers/ticket/ticket.py:96
+#: tickets/serializers/ticket/ticket.py:99
 msgid ""
 "The `type` in the submission data (`{}`) is different from the type in the "
 "request url (`{}`)"
 msgstr "提交数据中的类型 (`{}`) 与请求URL地址中的类型 (`{}`) 不一致"
 
-#: tickets/serializers/ticket/ticket.py:106
+#: tickets/serializers/ticket/ticket.py:109
 msgid "The organization `{}` does not exist"
 msgstr "组织 `{}` 不存在"
 
-#: tickets/serializers/ticket/ticket.py:117
+#: tickets/serializers/ticket/ticket.py:120
 msgid "None of the assignees belong to Organization `{}` admins"
 msgstr "所有受理人都不属于组织 `{}` 下的管理员"
 
-#: tickets/utils.py:21
-msgid "New Ticket: {} ({})"
-msgstr "新工单: {} ({})"
+#: tickets/utils.py:36
+msgid "New Ticket - {} ({})"
+msgstr "新工单 - {} ({})"
 
-#: tickets/utils.py:33
-msgid "Your has a new ticket, from applicant - {}"
-msgstr "你有一个新的工单, 来自申请人 - {}"
+#: tickets/utils.py:38
+msgid "Your has a new ticket, applicant - {}"
+msgstr "你有一个新的工单, 申请人 - {}"
 
-#: tickets/utils.py:35
+#: tickets/utils.py:40 tickets/utils.py:59
 msgid "click here to review"
 msgstr "点击查看"
 
-#: tickets/utils.py:48
-msgid "Ticket has processed: {} ({})"
-msgstr "工单已处理: {} ({})"
+#: tickets/utils.py:55
+msgid "Ticket has processed - {} ({})"
+msgstr "工单已处理 - {} ({})"
 
 #: tickets/utils.py:57
-msgid "Your ticket has been ({}) processed"
-msgstr "你的工单已被 ({}) 处理"
+msgid "Your ticket has been processed, processor - {}"
+msgstr "你的工单已被处理, 处理人 - {}"
 
 #: users/api/user.py:199
 msgid "Could not reset self otp, use profile reset instead"
@@ -3358,7 +3368,7 @@ msgstr "安全令牌验证"
 
 #: users/templates/users/_base_otp.html:14 users/templates/users/_user.html:13
 #: users/templates/users/user_profile_update.html:55
-#: xpack/plugins/cloud/models.py:125 xpack/plugins/cloud/serializers.py:125
+#: xpack/plugins/cloud/models.py:125 xpack/plugins/cloud/serializers.py:136
 msgid "Account"
 msgstr "账户"
 
@@ -4322,7 +4332,7 @@ msgstr "实例名称"
 msgid "Instance name and Partial IP"
 msgstr "实例名称和部分IP"
 
-#: xpack/plugins/cloud/models.py:128 xpack/plugins/cloud/serializers.py:101
+#: xpack/plugins/cloud/models.py:128 xpack/plugins/cloud/serializers.py:112
 msgid "Regions"
 msgstr "地域"
 
@@ -4334,7 +4344,7 @@ msgstr "实例"
 msgid "Hostname strategy"
 msgstr "主机名策略"
 
-#: xpack/plugins/cloud/models.py:147 xpack/plugins/cloud/serializers.py:129
+#: xpack/plugins/cloud/models.py:147 xpack/plugins/cloud/serializers.py:140
 msgid "Always update"
 msgstr "总是更新"
 
@@ -4466,15 +4476,15 @@ msgstr "租户ID"
 msgid "Subscription ID"
 msgstr "订阅ID"
 
-#: xpack/plugins/cloud/serializers.py:99
+#: xpack/plugins/cloud/serializers.py:110
 msgid "History count"
 msgstr "执行次数"
 
-#: xpack/plugins/cloud/serializers.py:100
+#: xpack/plugins/cloud/serializers.py:111
 msgid "Instance count"
 msgstr "实例个数"
 
-#: xpack/plugins/cloud/serializers.py:128
+#: xpack/plugins/cloud/serializers.py:139
 #: xpack/plugins/gathered_user/serializers.py:20
 msgid "Periodic display"
 msgstr "定时执行"
@@ -4566,3 +4576,6 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "No"
+#~ msgstr "无"
