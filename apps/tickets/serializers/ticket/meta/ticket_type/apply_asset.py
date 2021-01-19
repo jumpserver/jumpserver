@@ -136,10 +136,13 @@ class ApplyAssetSerializer(ApplySerializer, ApproveSerializer):
 
         apply_ip_group = value.get('apply_ip_group', [])
         apply_hostname_group = value.get('apply_hostname_group', [])
-        queries = Q(ip__in=apply_ip_group)
+        queries = Q()
+        if apply_ip_group:
+            queries |= Q(ip__in=apply_ip_group)
         for hostname in apply_hostname_group:
             queries |= Q(hostname__icontains=hostname)
-
+        if not queries:
+            return []
         with tmp_to_org(self.root.instance.org_id):
             assets_id = Asset.objects.filter(queries).values_list('id', flat=True)[:5]
             assets_id = [str(asset_id) for asset_id in assets_id]
@@ -150,6 +153,9 @@ class ApplyAssetSerializer(ApplySerializer, ApproveSerializer):
             return []
 
         apply_system_user_group = value.get('apply_system_user_group', [])
+        if not apply_system_user_group:
+            return []
+
         queries = Q()
         for system_user in apply_system_user_group:
             queries |= Q(username__icontains=system_user)

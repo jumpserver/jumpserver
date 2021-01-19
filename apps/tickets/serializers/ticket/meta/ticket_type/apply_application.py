@@ -136,6 +136,9 @@ class ApplyApplicationSerializer(ApplySerializer, ApproveSerializer):
             return []
 
         apply_application_group = value.get('apply_application_group', [])
+        if not apply_application_group:
+            return []
+
         apply_type = value.get('apply_type')
         queries = Q()
         for application in apply_application_group:
@@ -151,8 +154,11 @@ class ApplyApplicationSerializer(ApplySerializer, ApproveSerializer):
         if not isinstance(self.root.instance, Ticket):
             return []
 
-        apply_type = value.get('apply_type')
         apply_system_user_group = value.get('apply_system_user_group', [])
+        if not apply_system_user_group:
+            return []
+
+        apply_type = value.get('apply_type')
         protocol = SystemUser.get_protocol_by_application_type(apply_type)
         queries = Q()
         for system_user in apply_system_user_group:
