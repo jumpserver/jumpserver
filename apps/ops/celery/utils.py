@@ -2,6 +2,7 @@
 #
 import json
 import os
+import uuid
 
 from django.conf import settings
 from django.utils.timezone import get_current_timezone
@@ -101,6 +102,10 @@ def get_celery_periodic_task(task_name):
 
 def get_celery_task_log_path(task_id):
     task_id = str(task_id)
+    try:
+        uuid.UUID(task_id)
+    except:
+        return
     rel_path = os.path.join(task_id[0], task_id[1], task_id + '.log')
     path = os.path.join(settings.CELERY_LOG_DIR, rel_path)
     os.makedirs(os.path.dirname(path), exist_ok=True)
