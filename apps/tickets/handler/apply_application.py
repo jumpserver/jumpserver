@@ -88,12 +88,13 @@ class Handler(BaseHandler):
 
         apply_category = self.ticket.meta.get('apply_category')
         apply_type = self.ticket.meta.get('apply_type')
+        approve_permission_name = self.ticket.meta.get('approve_permission_name', '')
         approved_applications_id = self.ticket.meta.get('approve_applications', [])
         approve_system_users_id = self.ticket.meta.get('approve_system_users', [])
         approve_date_start = self.ticket.meta.get('approve_date_start')
         approve_date_expired = self.ticket.meta.get('approve_date_expired')
-        permission_name = _('Created by ticket ({}) ({})'.format(
-            self.ticket.title, str(self.ticket.id)[:4])
+        permission_created_by = '{}:{}'.format(
+            str(self.ticket.__class__.__name__), str(self.ticket.id)
         )
         permission_comment = _(
             'Created by the ticket, '
@@ -101,18 +102,19 @@ class Handler(BaseHandler):
             'ticket applicant: {}, '
             'ticket processor: {}, '
             'ticket ID: {}'
-            ''.format(
-                self.ticket.title, self.ticket.applicant_display,
-                self.ticket.processor_display, str(self.ticket.id)
-            )
+        ).format(
+            self.ticket.title,
+            self.ticket.applicant_display,
+            self.ticket.processor_display,
+            str(self.ticket.id)
         )
         permissions_data = {
             'id': self.ticket.id,
-            'name': str(permission_name),
+            'name': approve_permission_name,
             'category': apply_category,
             'type': apply_type,
             'comment': str(permission_comment),
-            'created_by': '{}:{}'.format(str(self.__class__.__name__), str(self.ticket.id)),
+            'created_by': permission_created_by,
             'date_start': approve_date_start,
             'date_expired': approve_date_expired,
         }

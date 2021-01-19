@@ -90,13 +90,14 @@ class Handler(BaseHandler):
             if asset_permission:
                 return asset_permission
 
+        approve_permission_name = self.ticket.meta.get('approve_permission_name', )
         approve_assets_id = self.ticket.meta.get('approve_assets', [])
         approve_system_users_id = self.ticket.meta.get('approve_system_users', [])
         approve_actions = self.ticket.meta.get('approve_actions', Action.NONE)
         approve_date_start = self.ticket.meta.get('approve_date_start')
         approve_date_expired = self.ticket.meta.get('approve_date_expired')
-        permission_name = _('Created by ticket ({}) ({})'.format(
-            self.ticket.title, str(self.ticket.id)[:4])
+        permission_created_by = '{}:{}'.format(
+            str(self.ticket.__class__.__name__), str(self.ticket.id)
         )
         permission_comment = _(
             'Created by the ticket, '
@@ -104,18 +105,18 @@ class Handler(BaseHandler):
             'ticket applicant: {}, '
             'ticket processor: {}, '
             'ticket ID: {}'
-            ''.format(
-                self.ticket.title,
-                self.ticket.applicant_display,
-                self.ticket.processor_display,
-                str(self.ticket.id)
-            )
+        ).format(
+            self.ticket.title,
+            self.ticket.applicant_display,
+            self.ticket.processor_display,
+            str(self.ticket.id)
         )
+
         permission_data = {
             'id': self.ticket.id,
-            'name': str(permission_name),
-            'comment': permission_comment,
-            'created_by': '{}:{}'.format(str(self.__class__.__name__), str(self.ticket.id)),
+            'name': approve_permission_name,
+            'comment': str(permission_comment),
+            'created_by': permission_created_by,
             'actions': approve_actions,
             'date_start': approve_date_start,
             'date_expired': approve_date_expired,

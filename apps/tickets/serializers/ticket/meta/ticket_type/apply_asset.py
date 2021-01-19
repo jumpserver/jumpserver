@@ -2,9 +2,11 @@ from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
 from rest_framework import serializers
 from perms.serializers import ActionsField
+from perms.models import AssetPermission
 from assets.models import Asset, SystemUser
 from orgs.utils import tmp_to_org
 from tickets.models import Ticket
+from .common import DefaultPermissionName
 
 
 __all__ = [
@@ -44,6 +46,9 @@ class ApplySerializer(serializers.Serializer):
 
 class ApproveSerializer(serializers.Serializer):
     # 审批信息
+    approve_permission_name = serializers.CharField(
+        max_length=128, default=DefaultPermissionName(), label=_('Permission name')
+    )
     approve_assets = serializers.ListField(
         required=True, allow_null=True, child=serializers.UUIDField(), label=_('Approve assets')
     )
@@ -75,6 +80,19 @@ class ApproveSerializer(serializers.Serializer):
     approve_date_expired = serializers.DateTimeField(
         required=True, label=_('Date expired'), allow_null=True
     )
+
+    def validate_approve_permission_name(self, permission_name):
+        if not isinstance(self.root.instance, Ticket):
+            return permission_name
+
+        with tmp_to_org(self.root.instance.org_id):
+            already_exists = AssetPermission.objects.filter(name=permission_name).exists()
+            if not already_exists:
+                return permission_name
+
+        raise serializers.ValidationError(_(
+            'Permission named `{}` already exists'.format(permission_name)
+        ))
 
     def validate_approve_assets(self, approve_assets):
         if not isinstance(self.root.instance, Ticket):

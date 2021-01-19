@@ -1,11 +1,13 @@
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
+from perms.models import ApplicationPermission
 from applications.models import Application
 from applications.const import ApplicationCategoryChoices, ApplicationTypeChoices
 from assets.models import SystemUser
 from orgs.utils import tmp_to_org
 from tickets.models import Ticket
+from .common import DefaultPermissionName
 
 __all__ = [
     'ApplyApplicationSerializer', 'ApplySerializer', 'ApproveSerializer',
@@ -47,6 +49,9 @@ class ApplySerializer(serializers.Serializer):
 
 class ApproveSerializer(serializers.Serializer):
     # 审批信息
+    approve_permission_name = serializers.CharField(
+        max_length=128, default=DefaultPermissionName(), label=_('Permission name')
+    )
     approve_applications = serializers.ListField(
         required=True, child=serializers.UUIDField(), label=_('Approve applications'),
         allow_null=True
@@ -71,6 +76,19 @@ class ApproveSerializer(serializers.Serializer):
     approve_date_expired = serializers.DateTimeField(
         required=True, label=_('Date expired'), allow_null=True
     )
+
+    def validate_approve_permission_name(self, permission_name):
+        if not isinstance(self.root.instance, Ticket):
+            return permission_name
+
+        with tmp_to_org(self.root.instance.org_id):
+            already_exists = ApplicationPermission.objects.filter(name=permission_name).exists()
+            if not already_exists:
+                return permission_name
+
+        raise serializers.ValidationError(_(
+            'Permission named `{}` already exists'.format(permission_name)
+        ))
 
     def validate_approve_applications(self, approve_applications):
         if not isinstance(self.root.instance, Ticket):
