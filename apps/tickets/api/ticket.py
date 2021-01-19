@@ -50,7 +50,7 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
         instance = serializer.save()
         instance.open(applicant=self.request.user)
 
-    @action(detail=False, methods=[POST])
+    @action(detail=False, methods=[POST], permission_classes=[IsValidUser, ])
     def open(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
 
