@@ -254,3 +254,22 @@ def get_disk_usage():
     mount_points = [p.mountpoint for p in partitions]
     usages = {p: psutil.disk_usage(p) for p in mount_points}
     return usages
+
+
+class Time:
+    def __init__(self):
+        self._timestamps = []
+        self._msgs = []
+
+    def begin(self):
+        self._timestamps.append(time.time())
+
+    def time(self, msg):
+        self._timestamps.append(time.time())
+        self._msgs.append(msg)
+
+    def print(self):
+        last, *timestamps = self._timestamps
+        for timestamp, msg in zip(timestamps, self._msgs):
+            logger.debug(f'TIME_IT: {msg} {timestamp-last}')
+            last = timestamp

@@ -1,5 +1,6 @@
 from typing import List
 
+from common.utils.common import timeit
 from assets.models import Node, Asset
 from assets.pagination import AssetLimitOffsetPagination
 from common.utils import lazyproperty
@@ -7,10 +8,12 @@ from assets.utils import get_node, is_query_node_all_assets
 
 
 class SerializeToTreeNodeMixin:
+
+    @timeit
     def serialize_nodes(self, nodes: List[Node], with_asset_amount=False):
         if with_asset_amount:
             def _name(node: Node):
-                return '{} ({})'.format(node.value, node._assets_amount)
+                return '{} ({})'.format(node.value, node.assets_amount)
         else:
             def _name(node: Node):
                 return node.value
@@ -43,6 +46,7 @@ class SerializeToTreeNodeMixin:
             return platform
         return default
 
+    @timeit
     def serialize_assets(self, assets, node_key=None):
         if node_key is None:
             get_pid = lambda asset: getattr(asset, 'parent_key', '')

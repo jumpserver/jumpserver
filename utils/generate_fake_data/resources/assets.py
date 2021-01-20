@@ -5,7 +5,6 @@ import forgery_py
 from .base import FakeDataGenerator
 
 from assets.models import *
-from assets.utils import check_node_assets_amount
 
 
 class AdminUsersGenerator(FakeDataGenerator):
@@ -93,4 +92,4 @@ class AssetsGenerator(FakeDataGenerator):
         self.set_assets_nodes(creates)
 
     def after_generate(self):
-        check_node_assets_amount()
+        pass
