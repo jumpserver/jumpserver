@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-19 20:03+0800\n"
+"POT-Creation-Date: 2021-01-20 11:35+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -268,7 +268,7 @@ msgstr "主机名"
 
 #: assets/models/asset.py:194 assets/models/domain.py:54
 #: assets/models/user.py:120 terminal/serializers/session.py:29
-#: terminal/serializers/storage.py:68
+#: terminal/serializers/storage.py:69
 msgid "Protocol"
 msgstr "协议"
 
@@ -726,7 +726,7 @@ msgstr "硬件信息"
 msgid "Org name"
 msgstr "组织名称"
 
-#: assets/serializers/asset.py:162 assets/serializers/asset.py:193
+#: assets/serializers/asset.py:162 assets/serializers/asset.py:201
 msgid "Connectivity"
 msgstr "连接"
 
@@ -1129,7 +1129,7 @@ msgstr "是否成功"
 msgid "Result"
 msgstr "结果"
 
-#: audits/serializers.py:79 terminal/serializers/storage.py:177
+#: audits/serializers.py:79 terminal/serializers/storage.py:178
 msgid "Hosts"
 msgstr "主机"
 
@@ -2714,60 +2714,60 @@ msgstr "是否可重放"
 msgid "Can join"
 msgstr "是否可加入"
 
-#: terminal/serializers/storage.py:20
+#: terminal/serializers/storage.py:21
 msgid "Endpoint invalid: remove path `{}`"
 msgstr "端点无效: 移除路径 `{}`"
 
-#: terminal/serializers/storage.py:26
+#: terminal/serializers/storage.py:27
 msgid "Bucket"
 msgstr "桶名称"
 
-#: terminal/serializers/storage.py:29
+#: terminal/serializers/storage.py:30
 msgid "Access key"
 msgstr ""
 
-#: terminal/serializers/storage.py:33
+#: terminal/serializers/storage.py:34
 msgid "Secret key"
 msgstr ""
 
-#: terminal/serializers/storage.py:38 terminal/serializers/storage.py:50
-#: terminal/serializers/storage.py:80
+#: terminal/serializers/storage.py:39 terminal/serializers/storage.py:51
+#: terminal/serializers/storage.py:81
 msgid "Endpoint"
 msgstr "端点"
 
-#: terminal/serializers/storage.py:65 xpack/plugins/cloud/models.py:276
+#: terminal/serializers/storage.py:66 xpack/plugins/cloud/models.py:276
 msgid "Region"
 msgstr "地域"
 
-#: terminal/serializers/storage.py:90
+#: terminal/serializers/storage.py:91
 msgid "Container name"
 msgstr "容器名称"
 
-#: terminal/serializers/storage.py:92
+#: terminal/serializers/storage.py:93
 msgid "Account name"
 msgstr "账户名称"
 
-#: terminal/serializers/storage.py:93
+#: terminal/serializers/storage.py:94
 msgid "Account key"
 msgstr "账户密钥"
 
-#: terminal/serializers/storage.py:96
+#: terminal/serializers/storage.py:97
 msgid "Endpoint suffix"
 msgstr "端点后缀"
 
-#: terminal/serializers/storage.py:154
+#: terminal/serializers/storage.py:155
 msgid "The address format is incorrect"
 msgstr "地址格式不正确"
 
-#: terminal/serializers/storage.py:161
+#: terminal/serializers/storage.py:162
 msgid "Host invalid"
 msgstr "主机无效"
 
-#: terminal/serializers/storage.py:164
+#: terminal/serializers/storage.py:165
 msgid "Port invalid"
 msgstr "端口无效"
 
-#: terminal/serializers/storage.py:180
+#: terminal/serializers/storage.py:181
 msgid "Index"
 msgstr "索引"
 
@@ -3236,7 +3236,7 @@ msgid "Join user groups"
 msgstr "添加到用户组"
 
 #: users/forms/user.py:103 users/views/profile/password.py:59
-#: users/views/profile/reset.py:127
+#: users/views/profile/reset.py:126
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
 
@@ -3867,7 +3867,7 @@ msgstr "新的公钥已设置成功，请下载对应的私钥"
 msgid "Update user"
 msgstr "更新用户"
 
-#: users/templates/users/user_update.html:22 users/views/profile/reset.py:120
+#: users/templates/users/user_update.html:22 users/views/profile/reset.py:119
 msgid "User auth from {}, go there change password"
 msgstr "用户认证源来自 {}, 请去相应系统修改密码"
 
@@ -3975,7 +3975,7 @@ msgstr ""
 "    <br>\n"
 "    "
 
-#: users/utils.py:116 users/views/profile/reset.py:80
+#: users/utils.py:116 users/views/profile/reset.py:79
 msgid "Reset password success"
 msgstr "重置密码成功"
 
@@ -4188,20 +4188,20 @@ msgid ""
 "password"
 msgstr "用户来自 {} 请去相应系统修改密码"
 
-#: users/views/profile/reset.py:66
+#: users/views/profile/reset.py:65
 msgid "Send reset password message"
 msgstr "发送重置密码邮件"
 
-#: users/views/profile/reset.py:67
+#: users/views/profile/reset.py:66
 msgid "Send reset password mail success, login your mail box and follow it "
 msgstr ""
 "发送重置邮件成功, 请登录邮箱查看, 按照提示操作 (如果没收到,请等待3-5分钟)"
 
-#: users/views/profile/reset.py:81
+#: users/views/profile/reset.py:80
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
-#: users/views/profile/reset.py:105 users/views/profile/reset.py:115
+#: users/views/profile/reset.py:104 users/views/profile/reset.py:114
 msgid "Token invalid or expired"
 msgstr "Token错误或失效"
 
