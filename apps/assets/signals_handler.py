@@ -3,6 +3,7 @@
 import os
 import threading
 from operator import add, sub
+from itertools import chain
 
 from assets.utils import is_asset_exists_in_node
 from django.db.models.signals import (
@@ -18,7 +19,7 @@ from common.exceptions import M2MReverseNotAllowed
 from common.const.signals import PRE_ADD, POST_ADD, POST_REMOVE, PRE_CLEAR, PRE_REMOVE
 from common.utils import get_logger
 from common.decorator import on_transaction_commit
-from .models import Asset, SystemUser, Node, compute_parent_key
+from .models import Asset, SystemUser, Node, compute_parent_key, NodeAssetRelatedRecord
 from users.models import User
 from .tasks import (
     update_assets_hardware_info_util,
