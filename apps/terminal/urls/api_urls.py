@@ -22,6 +22,7 @@ router.register(r'replay-storages', api.ReplayStorageViewSet, 'replay-storage')
 router.register(r'command-storages', api.CommandStorageViewSet, 'command-storage')
 
 urlpatterns = [
+    path('terminal-registrations/', api.TerminalRegistrationApi.as_view(), name='terminal-registration'),
     path('sessions/join/validate/', api.SessionJoinValidateAPI.as_view(), name='join-session-validate'),
     path('sessions/<uuid:pk>/replay/',
          api.SessionReplayViewSet.as_view({'get': 'retrieve', 'post': 'create'}),

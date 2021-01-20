@@ -3,7 +3,7 @@
 from rest_framework import viewsets
 
 from common.permissions import WithBootstrapToken
-from .. import serializers_v2 as serializers
+from .. import serializers
 
 
 class ServiceAccountRegistrationViewSet(viewsets.ModelViewSet):
