@@ -59,7 +59,7 @@ class BaseHandler(object):
         user_display = str(user)
         action_display = self.ticket.get_action_display()
         data = {
-            'body': _('User {} {} the ticket').format(user_display, action_display),
+            'body': _('{} {} the ticket').format(user_display, action_display),
             'user': user,
             'user_display': user_display
         }

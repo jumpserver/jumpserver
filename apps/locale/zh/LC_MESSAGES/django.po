@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-20 11:35+0800\n"
+"POT-Creation-Date: 2021-01-20 16:09+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -555,7 +555,7 @@ msgstr "默认资产组"
 
 #: assets/models/label.py:15 audits/models.py:36 audits/models.py:56
 #: audits/models.py:69 audits/serializers.py:81 authentication/models.py:44
-#: authentication/models.py:96 orgs/models.py:18 orgs/models.py:423
+#: authentication/models.py:95 orgs/models.py:18 orgs/models.py:423
 #: perms/models/asset_permission.py:173 perms/models/base.py:49
 #: templates/index.html:78 terminal/backends/command/models.py:18
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:37
@@ -653,7 +653,7 @@ msgstr "登录模式"
 msgid "SFTP Root"
 msgstr "SFTP根路径"
 
-#: assets/models/user.py:127 authentication/models.py:94
+#: assets/models/user.py:127 authentication/models.py:93
 msgid "Token"
 msgstr ""
 
@@ -1324,7 +1324,7 @@ msgstr "审批人"
 msgid "Login confirm"
 msgstr "登录复核"
 
-#: authentication/models.py:95
+#: authentication/models.py:94
 msgid "Expired"
 msgstr "过期时间"
 
@@ -2911,8 +2911,8 @@ msgid "Approved actions"
 msgstr "批准的动作"
 
 #: tickets/handler/base.py:62
-msgid "User {} {} the ticket"
-msgstr "用户 {} {} 这个工单"
+msgid "{} {} the ticket"
+msgstr "{} {}工单"
 
 #: tickets/handler/base.py:91
 msgid "Ticket title"
