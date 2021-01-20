@@ -2912,7 +2912,7 @@ msgstr "批准的动作"
 
 #: tickets/handler/base.py:62
 msgid "{} {} the ticket"
-msgstr "{} {}这个工单"
+msgstr "{} {}工单"
 
 #: tickets/handler/base.py:91
 msgid "Ticket title"
