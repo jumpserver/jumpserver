@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from operator import add, sub
+from itertools import chain
 
 from assets.utils import is_asset_exists_in_node
 from django.db.models.signals import (
@@ -13,7 +14,7 @@ from common.exceptions import M2MReverseNotAllowed
 from common.const.signals import PRE_ADD, POST_ADD, POST_REMOVE, PRE_CLEAR, PRE_REMOVE
 from common.utils import get_logger
 from common.decorator import on_transaction_commit
-from .models import Asset, SystemUser, Node, compute_parent_key
+from .models import Asset, SystemUser, Node, compute_parent_key, NodeAssetRelatedRecord
 from users.models import User
 from .tasks import (
     update_assets_hardware_info_util,
@@ -353,3 +354,51 @@ def on_asset_post_delete(instance: Asset, using, **kwargs):
             sender=Asset.nodes.through, instance=instance, reverse=False,
             model=Node, pk_set=node_ids, using=using, action=POST_REMOVE
         )
+
+
+@receiver(m2m_changed, sender=Asset.nodes.through)
+def update_nodes_assets_related_record(sender, action, instance, reverse, pk_set, **kwargs):
+    if reverse:
+        node_ids = [instance.id]
+        asset_ids = pk_set
+    else:
+        asset_ids = [instance.id]
+        node_ids = pk_set
+
+    if action == POST_ADD:
+        record_related(asset_ids, node_ids, add)
+    elif action == POST_REMOVE:
+        record_related(asset_ids, node_ids, sub)
+
+
+def record_related(asset_ids, node_ids, operator):
+    nodes = Node.objects.filter(id__in=node_ids)
+    node_keys = [n.key for n in nodes]
+
+    ancestor_keys = []
+    for key in node_keys:
+        keys = Node.get_node_ancestor_keys(key)
+        ancestor_keys.extend(keys)
+
+    key_id_mapper = dict(Node.objects.filter(key__in=ancestor_keys).values_list('key', 'id'))
+    key_id_mapper.update({n.key: n.id for n in nodes})
+
+    records = NodeAssetRelatedRecord.objects.filter(asset_id__in=asset_ids, node_id__in=key_id_mapper.values())
+    to_create_records = []
+
+    records_mapper = {(r.asset_id, r.node_id): r for r in records}
+
+    delta = len(asset_ids)
+    for key in chain(node_keys, ancestor_keys):
+        node_id = key_id_mapper[key]
+        for asset_id in asset_ids:
+            record = records_mapper.get((asset_id, node_id))
+            if record:
+                record.related_count = operator(record.related_count, delta)
+            else:
+                record = NodeAssetRelatedRecord(node_id=node_id, asset_id=asset_id, related_count=operator(0, delta))
+                to_create_records.append(record)
+                records_mapper[(asset_id, node_id)] = record
+
+    NodeAssetRelatedRecord.objects.bulk_create(to_create_records)
+    NodeAssetRelatedRecord.objects.bulk_update(records, fields=('related_count', ))

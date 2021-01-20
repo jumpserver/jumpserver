@@ -17,7 +17,7 @@ from orgs.utils import get_current_org, tmp_to_org
 from orgs.models import Organization
 
 
-__all__ = ['Node', 'FamilyMixin', 'compute_parent_key']
+__all__ = ['Node', 'FamilyMixin', 'compute_parent_key', 'NodeAssetRelatedRecord']
 logger = get_logger(__name__)
 
 
@@ -521,3 +521,9 @@ class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
         instance = super().save(*args, **kwargs)
         self.update_child_full_value()
         return instance
+
+
+class NodeAssetRelatedRecord(models.Model):
+    asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, related_name='nodes_related_records')
+    node = models.ForeignKey('assets.Node', on_delete=models.CASCADE, related_name='assets_related_records')
+    related_count = models.IntegerField(default=0)
