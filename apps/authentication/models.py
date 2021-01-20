@@ -69,17 +69,16 @@ class LoginConfirmSetting(CommonModelMixin):
         from tickets import const
         from tickets.models import Ticket
         ticket_title = _('Login confirm') + ' {}'.format(self.user)
-        ticket_applicant = self.user
         ticket_meta = self.construct_confirm_ticket_meta(request)
         ticket_assignees = self.reviewers.all()
         data = {
             'title': ticket_title,
             'type': const.TicketTypeChoices.login_confirm.value,
-            'applicant': ticket_applicant,
             'meta': ticket_meta,
         }
         ticket = Ticket.objects.create(**data)
         ticket.assignees.set(ticket_assignees)
+        ticket.open(self.user)
         return ticket
 
     def __str__(self):

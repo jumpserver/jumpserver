@@ -6,6 +6,7 @@ from urllib.parse import urlparse
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import TextChoices
 from common.drf.serializers import MethodSerializer
+from common.drf.fields import ReadableHiddenField
 from ..models import ReplayStorage, CommandStorage
 from .. import const
 
@@ -170,7 +171,7 @@ class CommandStorageTypeESSerializer(serializers.Serializer):
 
     hosts_help_text = '''
         Tip: If there are multiple hosts, use a comma (,) to separate them. 
-        (eg: http://www.jumpserver.a.com, http://www.jumpserver.b.com)
+        (eg: http://www.jumpserver.a.com:9100, http://www.jumpserver.b.com:9100)
     '''
     HOSTS = serializers.ListField(
         child=serializers.CharField(validators=[command_storage_es_host_format_validator]),
@@ -179,9 +180,8 @@ class CommandStorageTypeESSerializer(serializers.Serializer):
     INDEX = serializers.CharField(
         max_length=1024, default='jumpserver', label=_('Index'), allow_null=True
     )
-    DOC_TYPE = serializers.CharField(
-        max_length=1024, read_only=True, default='command', label=_('Doc type'), allow_null=True
-    )
+    DOC_TYPE = ReadableHiddenField(default='command', label=_('Doc type'), allow_null=True)
+
 
 # mapping
 
