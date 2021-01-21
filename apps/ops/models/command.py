@@ -9,6 +9,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 from django.db import models
 
+from terminal.models import Command
+from terminal.utils import send_command_execution_alert_mail
 from common.utils import lazyproperty
 from orgs.models import Organization
 from orgs.mixins.models import OrgModelMixin
@@ -93,6 +95,12 @@ class CommandExecution(OrgModelMixin):
         else:
             msg = _("Command `{}` is forbidden ........").format(self.command)
             print('\033[31m' + msg + '\033[0m')
+            send_command_execution_alert_mail({
+                'input': self.command,
+                'assets': self.hosts.all(),
+                'user': str(self.user),
+                'risk_level': 5,
+            })
             self.result = {"error":  msg}
         self.org_id = self.run_as.org_id
         self.is_finished = True
