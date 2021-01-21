@@ -2,54 +2,59 @@
 #
 import uuid
 
+from django.conf import settings
 from django.core.cache import cache
-from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework.generics import CreateAPIView
 
 from common.utils import get_logger
-from common.permissions import IsOrgAdminOrAppUser
+from common.permissions import IsSuperUserOrAppUser
 from orgs.mixins.api import RootOrgViewMixin
-from users.models import User
-from assets.models import Asset, SystemUser
+
+from ..serializers import ConnectionTokenSerializer
 
 logger = get_logger(__name__)
-__all__ = [
-    'UserConnectionTokenApi',
-]
+__all__ = ['UserConnectionTokenApi']
 
 
-class UserConnectionTokenApi(RootOrgViewMixin, APIView):
-    permission_classes = (IsOrgAdminOrAppUser,)
+class UserConnectionTokenApi(RootOrgViewMixin, CreateAPIView):
+    permission_classes = (IsSuperUserOrAppUser,)
+    serializer_class = ConnectionTokenSerializer
 
-    def post(self, request):
-        user_id = request.data.get('user', '')
-        asset_id = request.data.get('asset', '')
-        system_user_id = request.data.get('system_user', '')
+    def perform_create(self, serializer):
+        user = serializer.validated_data['user']
+        asset = serializer.validated_data['asset']
+        system_user = serializer.validated_data['system_user']
         token = str(uuid.uuid4())
-        user = get_object_or_404(User, id=user_id)
-        asset = get_object_or_404(Asset, id=asset_id)
-        system_user = get_object_or_404(SystemUser, id=system_user_id)
         value = {
-            'user': user_id,
+            'user': str(user.id),
             'username': user.username,
-            'asset': asset_id,
+            'asset': str(asset.id),
             'hostname': asset.hostname,
-            'system_user': system_user_id,
+            'system_user': str(system_user.id),
             'system_user_name': system_user.name
         }
         cache.set(token, value, timeout=20)
+        return token
+
+    def create(self, request, *args, **kwargs):
+        if not settings.CONNECTION_TOKEN_ENABLED:
+            data = {'error': 'Connection token disabled'}
+            return Response(data, status=400)
+
+        if not request.user.is_superuser:
+            data = {'error': 'Only super user can create token'}
+            return Response(data, status=403)
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        token = self.perform_create(serializer)
         return Response({"token": token}, status=201)
 
     def get(self, request):
         token = request.query_params.get('token')
-        user_only = request.query_params.get('user-only', None)
         value = cache.get(token, None)
 
         if not value:
             return Response('', status=404)
-
-        if not user_only:
-            return Response(value)
-        else:
-            return Response({'user': value['user']})
+        return Response(value)

@@ -280,7 +280,8 @@ class Config(dict):
         'SESSION_COOKIE_SECURE': False,
         'CSRF_COOKIE_SECURE': False,
         'REFERER_CHECK_ENABLED': False,
-        'SERVER_REPLAY_STORAGE': {}
+        'SERVER_REPLAY_STORAGE': {},
+        'CONNECTION_TOKEN_ENABLED': False,
     }
 
     def compatible_auth_openid_of_key(self):
