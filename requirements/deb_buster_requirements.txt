@@ -5,8 +5,10 @@ curl
 wget
 vim
 locales
+iputils-ping
 
 # mysql-client
+default-mysql-client
 default-libmysqlclient-dev
 
 # Pillow
