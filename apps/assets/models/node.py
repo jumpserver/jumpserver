@@ -417,6 +417,7 @@ class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
     parent_key = models.CharField(max_length=64, verbose_name=_("Parent key"),
                                   db_index=True, default='')
     assets_amount = models.IntegerField(default=0)
+    all_assets = models.ManyToManyField('assets.Asset', through='assets.NodeAssetRelatedRecord', related_name='all_nodes')
 
     objects = OrgManager.from_queryset(NodeQuerySet)()
     is_node = True
@@ -524,6 +525,6 @@ class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
 
 
 class NodeAssetRelatedRecord(models.Model):
-    asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, related_name='nodes_related_records')
-    node = models.ForeignKey('assets.Node', on_delete=models.CASCADE, related_name='assets_related_records')
-    related_count = models.IntegerField(default=0)
+    asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, related_name='nodes_related_records', null=False)
+    node = models.ForeignKey('assets.Node', on_delete=models.CASCADE, related_name='assets_related_records', null=False)
+    related_count = models.IntegerField(default=0, db_index=True)

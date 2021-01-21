@@ -3,17 +3,22 @@ from operator import or_, and_
 from uuid import uuid4
 import threading
 import inspect
+from collections import defaultdict, namedtuple
+from itertools import chain
+from typing import List
 
 from django.conf import settings
 from django.db.models import F, Q, Value, BooleanField
 from django.utils.translation import ugettext_lazy as _
 
+from common.struct import Stack
+from common.utils import timeit
 from common.http import is_true
 from common.utils import get_logger
 from common.const.distributed_lock_key import UPDATE_MAPPING_NODE_TASK_LOCK_KEY
 from orgs.utils import tmp_to_root_org
 from common.utils.timezone import dt_formater, now
-from assets.models import Node, Asset, FavoriteAsset
+from assets.models import Node, Asset, FavoriteAsset, NodeAssetRelatedRecord
 from django.db.transaction import atomic
 from orgs import lock
 from perms.models import UserGrantedMappingNode, RebuildUserTreeTask, AssetPermission
@@ -127,6 +132,7 @@ def rebuild_user_mapping_nodes_with_lock(user: User):
     rebuild_user_mapping_nodes(user)
 
 
+@timeit
 def compute_tmp_mapping_node_from_perm(user: User, asset_perms_id=None):
     node_only_fields = ('id', 'key', 'parent_key', 'assets_amount')
 
@@ -137,6 +143,8 @@ def compute_tmp_mapping_node_from_perm(user: User, asset_perms_id=None):
     nodes = Node.objects.filter(
         granted_by_permissions__id__in=asset_perms_id
     ).distinct().only(*node_only_fields)
+
+    # 授权的节点 key 集合
     granted_key_set = {_node.key for _node in nodes}
 
     def _has_ancestor_granted(node):
@@ -160,7 +168,7 @@ def compute_tmp_mapping_node_from_perm(user: User, asset_perms_id=None):
     # 查询授权资产关联的节点设置
     def process_direct_granted_assets():
         # 查询直接授权资产
-        asset_ids = Asset.objects.filter(
+        asset_ids = Asset.org_objects.filter(
             granted_by_permissions__id__in=asset_perms_id
         ).distinct().values_list('id', flat=True)
         # 查询授权资产关联的节点设置
@@ -228,6 +236,114 @@ def set_node_granted_assets_amount(user, node, asset_perms_id=None):
     setattr(node, TMP_GRANTED_ASSETS_AMOUNT_FIELD, assets_amount)
 
 
+def compute_node_assets_amount(tmp_nodes: List[Node], asset_perms_id):
+    """
+    granted_node_ids
+    asset_granted_node_ids
+
+    asset_granted_ids -> AssetPermission.assets.through asset_perms_id
+
+    都能查出节点与资产的 pairs
+
+    node_id --> asset_ids
+    """
+    TreeNode = namedtuple('TreeNode', field_names=('id', 'children', 'assets_amount', 'parent_key'))
+
+    tree = {}
+
+    granted_node_ids = []
+    asset_granted_node_ids = []
+
+    not_found_parent_node = []
+    header = []
+
+    for node in tmp_nodes:
+        """
+        该循环做了两件事：
+        1. 给节点分类
+        2. 构造用来计算的节点树
+        """
+        node: Node
+
+        # 给节点分类，以两种方式获取节点与资产的关系
+        if is_direct_granted_by_annotate(node):
+            granted_node_ids.append(node.id)
+        elif is_asset_granted(node):
+            asset_granted_node_ids.append(node.id)
+
+        # 创建用来计算的节点树
+        tree_node = TreeNode(node.id, [], 0, node.parent_key)
+
+        # 把节点树的节点以 key -> tree_node 的形式映射
+        tree[node.key] = tree_node
+
+        # 将节点添加到父节点的 children
+        if node.parent_key in tree:
+            tree[node.parent_key].children.append(tree_node)
+        else:
+            # 如果没有找到父节点，先保存起来
+            not_found_parent_node.append(tree_node)
+
+    # 给没有找到父节点的节点重新寻找父节点
+    for node in not_found_parent_node:
+        if node.parent_key in tree:
+            tree[node.parent_key].children.append(node)
+        else:
+            header.append(node)
+
+    # 剩下一个 header 节点，如果大于1 说明树有问题
+    if len(header) != 1:
+        raise ValueError
+
+    # 直接授权节点，取它与它自己所有资产的关系
+    node_asset_pairs_1 = NodeAssetRelatedRecord.objects.filter(node_id__in=granted_node_ids).values_list('node_id', 'asset_id')
+
+    # 根据资产授权，取出所有直接授权的资产
+    direct_granted_asset_ids = set(AssetPermission.assets.through.objects.filter(assetpermission_id__in=asset_perms_id).values_list('asset_id', flat=True))
+
+    # 直接授权资产，取它与它的节点的关系
+    node_asset_pairs_2 = Asset.nodes.through.objects.filter(asset_id__in=direct_granted_asset_ids).values_list('node_id', 'asset_id')
+
+    # 节点与它下面所有资产的映射
+    node_assets_mapper = defaultdict(set)
+    for node_id, asset_id in chain(node_asset_pairs_1, node_asset_pairs_2):
+        node_assets_mapper[node_id].add(asset_id)
+
+    wait_stack = Stack()
+    unprocess_stack = Stack()
+
+    unprocess_stack.push(header[0])
+
+    while unprocess_stack:
+        node = unprocess_stack.pop()
+        children = node.children
+        if children:
+            wait_stack.push(node)
+            for n in children:
+                unprocess_stack.push(n)
+                continue
+        else:
+            while node:
+                node.assets_amount = len(node_assets_mapper[node.id])
+                if unprocess_stack.top.parent_key == node.parent_key:
+                    node = None
+                else:
+                    if not wait_stack:
+                        node = None
+                    node = wait_stack.pop()
+                    node: TreeNode
+                    parent_asset_ids_set = set()
+                    for child in node.children:
+                        child_asset_ids_set = node_assets_mapper.pop(child.id)
+                        parent_asset_ids_set.update(child_asset_ids_set)
+                        del child_asset_ids_set
+                    node_assets_mapper[node.id] = parent_asset_ids_set
+
+    for node in tmp_nodes:
+        assets_amount = tree[node.key].assets_amount
+        setattr(node, TMP_GRANTED_ASSETS_AMOUNT_FIELD, assets_amount)
+
+
 @tmp_to_root_org()
 def rebuild_user_mapping_nodes(user):
     logger.info(f'>>> {dt_formater(now())} start rebuild {user} mapping nodes')
@@ -239,8 +355,7 @@ def rebuild_user_mapping_nodes(user):
         # 没有授权直接返回
         return
     tmp_nodes = compute_tmp_mapping_node_from_perm(user, asset_perms_id=asset_perms_id)
-    for _node in tmp_nodes:
-        set_node_granted_assets_amount(user, _node, asset_perms_id)
+    compute_node_assets_amount(tmp_nodes, asset_perms_id)
     create_mapping_nodes(user, tmp_nodes)
     logger.info(f'>>> {dt_formater(now())} end rebuild {user} mapping nodes')
 
