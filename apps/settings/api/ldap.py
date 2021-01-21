@@ -10,16 +10,15 @@ from rest_framework.views import Response, APIView
 from django.conf import settings
 from django.core.mail import send_mail, get_connection
 from django.utils.translation import ugettext_lazy as _
-from rest_framework import serializers
 
-from .utils import (
+from ..utils import (
     LDAPServerUtil, LDAPCacheUtil, LDAPImportUtil, LDAPSyncUtil,
     LDAP_USE_CACHE_FLAGS, LDAPTestUtil, ObjectDict
 )
-from .tasks import sync_ldap_user
+from ..tasks import sync_ldap_user
 from common.permissions import IsOrgAdmin, IsSuperUser
 from common.utils import get_logger
-from .serializers import (
+from ..serializers import (
     MailTestSerializer, LDAPTestConfigSerializer, LDAPUserSerializer,
     PublicSettingSerializer, LDAPTestLoginSerializer, SettingsSerializer
 )
@@ -262,59 +261,3 @@ class LDAPCacheRefreshAPI(generics.RetrieveAPIView):
             return Response(data={'msg': str(e)}, status=400)
         return Response(data={'msg': 'success'})
 
-
-class PublicSettingApi(generics.RetrieveAPIView):
-    permission_classes = ()
-    serializer_class = PublicSettingSerializer
-
-    def get_object(self):
-        instance = {
-            "data": {
-                "WINDOWS_SKIP_ALL_MANUAL_PASSWORD": settings.WINDOWS_SKIP_ALL_MANUAL_PASSWORD,
-                "SECURITY_MAX_IDLE_TIME": settings.SECURITY_MAX_IDLE_TIME,
-                "XPACK_ENABLED": settings.XPACK_ENABLED,
-                "XPACK_LICENSE_IS_VALID": settings.XPACK_LICENSE_IS_VALID,
-                "LOGIN_CONFIRM_ENABLE": settings.LOGIN_CONFIRM_ENABLE,
-                "SECURITY_VIEW_AUTH_NEED_MFA": settings.SECURITY_VIEW_AUTH_NEED_MFA,
-                "SECURITY_MFA_VERIFY_TTL": settings.SECURITY_MFA_VERIFY_TTL,
-                "SECURITY_COMMAND_EXECUTION": settings.SECURITY_COMMAND_EXECUTION,
-                "LOGIN_TITLE": settings.XPACK_INTERFACE_LOGIN_TITLE,
-                "SECURITY_PASSWORD_EXPIRATION_TIME": settings.SECURITY_PASSWORD_EXPIRATION_TIME,
-                "LOGO_URLS": settings.LOGO_URLS,
-                "TICKETS_ENABLED": settings.TICKETS_ENABLED,
-                "PASSWORD_RULE": {
-                    'SECURITY_PASSWORD_MIN_LENGTH': settings.SECURITY_PASSWORD_MIN_LENGTH,
-                    'SECURITY_PASSWORD_UPPER_CASE': settings.SECURITY_PASSWORD_UPPER_CASE,
-                    'SECURITY_PASSWORD_LOWER_CASE': settings.SECURITY_PASSWORD_LOWER_CASE,
-                    'SECURITY_PASSWORD_NUMBER': settings.SECURITY_PASSWORD_NUMBER,
-                    'SECURITY_PASSWORD_SPECIAL_CHAR': settings.SECURITY_PASSWORD_SPECIAL_CHAR,
-                }
-            }
-        }
-        return instance
-
-
-class SettingsApi(generics.RetrieveUpdateAPIView):
-    permission_classes = (IsSuperUser,)
-    serializer_class = SettingsSerializer
-
-    def get_object(self):
-        instance = {category: self._get_setting_fields_obj(list(category_serializer.get_fields()))
-                    for category, category_serializer in self.serializer_class().get_fields().items()
-                    if isinstance(category_serializer, serializers.Serializer)}
-        return ObjectDict(instance)
-
-    def perform_update(self, serializer):
-        serializer.save()
-
-    def _get_setting_fields_obj(self, category_fields):
-        if isinstance(category_fields, Iterable):
-            fields_data = {field_name: getattr(settings, field_name)
-                           for field_name in category_fields}
-            return ObjectDict(fields_data)
-
-        if isinstance(category_fields, str):
-            fields_data = {category_fields: getattr(settings, category_fields)}
-            return ObjectDict(fields_data)
-
-        return ObjectDict()

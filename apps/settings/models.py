@@ -3,9 +3,11 @@ import json
 from django.db import models
 from django.db.utils import ProgrammingError, OperationalError
 from django.utils.translation import ugettext_lazy as _
-from django.core.cache import cache
+from django.conf import settings
 
-from common.utils import signer
+from common.utils import signer, get_logger
+
+logger = get_logger(__name__)
 
 
 class SettingQuerySet(models.QuerySet):
@@ -36,24 +38,6 @@ class Setting(models.Model):
 
     def __str__(self):
         return self.name
-
-    @classmethod
-    def get(cls, item):
-        cached = cls.get_from_cache(item)
-        if cached is not None:
-            return cached
-        instances = cls.objects.filter(name=item)
-        if len(instances) == 1:
-            s = instances[0]
-            s.refresh_setting()
-            return s.cleaned_value
-        return None
-
-    @classmethod
-    def get_from_cache(cls, item):
-        key = cls.cache_key_prefix + item
-        cached = cache.get(key)
-        return cached
 
     @property
     def cleaned_value(self):
@@ -87,9 +71,30 @@ class Setting(models.Model):
         except (ProgrammingError, OperationalError):
             pass
 
+    @classmethod
+    def refresh_item(cls, name):
+        item = cls.objects.filter(name=name).first()
+        if not item:
+            return
+        item.refresh_setting()
+
     def refresh_setting(self):
-        key = self.cache_key_prefix + self.name
-        cache.set(key, self.cleaned_value, None)
+        logger.info(f"Refresh setting: {self.name}")
+        if hasattr(self, f'refresh_{self.name}'):
+            getattr(self, f'refresh_{self.name}')()
+        else:
+            setattr(settings, self.name, self.cleaned_value)
+
+    def refresh_AUTH_LDAP(self):
+        ldap_backend = 'authentication.backends.ldap.LDAPAuthorizationBackend'
+        backends = settings.AUTHENTICATION_BACKENDS
+        has = ldap_backend in backends
+        if self.cleaned_value and not has:
+            settings.AUTHENTICATION_BACKENDS.insert(0, ldap_backend)
+
+        if not self.cleaned_value and has:
+            index = backends.index(ldap_backend)
+            backends.pop(index)
 
     class Meta:
         db_table = "settings_setting"

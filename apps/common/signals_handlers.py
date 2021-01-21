@@ -5,16 +5,12 @@ import os
 import logging
 from collections import defaultdict
 from django.conf import settings
-from django.dispatch import receiver
 from django.core.signals import request_finished
 from django.db import connection
-from django.conf import LazySettings
-from django.db.utils import ProgrammingError, OperationalError
 
 from jumpserver.utils import get_current_request
 
 from .local import thread_local
-from .signals import django_ready
 
 pattern = re.compile(r'FROM `(\w+)`')
 logger = logging.getLogger("jumpserver.common")
@@ -74,17 +70,3 @@ if settings.DEBUG and DEBUG_DB:
     request_finished.connect(on_request_finished_logging_db_query)
 else:
     request_finished.connect(on_request_finished_release_local)
-
-
-@receiver(django_ready)
-def monkey_patch_settings(sender, **kwargs):
-    def monkey_patch_getattr(self, name):
-        val = getattr(self._wrapped, name)
-        if callable(val):
-            val = val()
-        return val
-
-    try:
-        LazySettings.__getattr__ = monkey_patch_getattr
-    except (ProgrammingError, OperationalError):
-        pass

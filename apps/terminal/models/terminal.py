@@ -211,6 +211,7 @@ class Terminal(TerminalStatusMixin, models.Model):
         configs.update({
             'SECURITY_MAX_IDLE_TIME': settings.SECURITY_MAX_IDLE_TIME
         })
+        print(configs)
         return configs
 
     @property

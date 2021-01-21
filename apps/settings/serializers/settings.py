@@ -5,7 +5,11 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from ..models import Setting
 
-__all__ = ['SettingsSerializer']
+__all__ = [
+    'BasicSettingSerializer', 'EmailSettingSerializer', 'EmailContentSettingSerializer',
+    'LdapSettingSerializer', 'TerminalSettingSerializer', 'SecuritySettingSerializer',
+    'SettingsSerializer'
+]
 
 
 class BasicSettingSerializer(serializers.Serializer):
@@ -20,7 +24,7 @@ class EmailSettingSerializer(serializers.Serializer):
     EMAIL_HOST = serializers.CharField(max_length=1024, required=True)
     EMAIL_PORT = serializers.CharField(max_length=5, required=True)
     EMAIL_HOST_USER = serializers.CharField(max_length=128, required=True)
-    EMAIL_HOST_PASSWORD = serializers.CharField(max_length=1024, write_only=True, required=False, )
+    EMAIL_HOST_PASSWORD = serializers.CharField(max_length=1024, write_only=True, required=False)
     EMAIL_FROM = serializers.CharField(max_length=128, allow_blank=True, required=False)
     EMAIL_RECIPIENT = serializers.CharField(max_length=128, allow_blank=True, required=False)
     EMAIL_USE_SSL = serializers.BooleanField(required=False)
@@ -86,20 +90,21 @@ class SecuritySettingSerializer(serializers.Serializer):
     SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER = serializers.CharField(max_length=8192, required=False, allow_blank=True)
 
 
-class SettingsSerializer(serializers.Serializer):
-    basic = BasicSettingSerializer(required=False)
-    email = EmailSettingSerializer(required=False)
-    email_content = EmailContentSettingSerializer(required=False)
-    ldap = LdapSettingSerializer(required=False)
-    terminal = TerminalSettingSerializer(required=False)
-    security = SecuritySettingSerializer(required=False)
+class SettingsSerializer(
+    BasicSettingSerializer,
+    EmailSettingSerializer,
+    EmailContentSettingSerializer,
+    LdapSettingSerializer,
+    TerminalSettingSerializer,
+    SecuritySettingSerializer
+):
 
     encrypt_fields = ["EMAIL_HOST_PASSWORD", "AUTH_LDAP_BIND_PASSWORD"]
 
     def create(self, validated_data):
         pass
 
-    def update(self, instance, validated_data):
+    def _update(self, instance, validated_data):
         for category, category_data in validated_data.items():
             if not category_data:
                 continue
