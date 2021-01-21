@@ -11,6 +11,7 @@ from .models import AccessKey, LoginConfirmSetting, SSOToken
 __all__ = [
     'AccessKeySerializer', 'OtpVerifySerializer', 'BearerTokenSerializer',
     'MFAChallengeSerializer', 'LoginConfirmSettingSerializer', 'SSOTokenSerializer',
+    'ConnectionTokenSerializer',
 ]
 
 
@@ -82,3 +83,33 @@ class SSOTokenSerializer(serializers.Serializer):
     username = serializers.CharField(write_only=True)
     login_url = serializers.CharField(read_only=True)
     next = serializers.CharField(write_only=True, allow_blank=True, required=False, allow_null=True)
+
+
+class ConnectionTokenSerializer(serializers.Serializer):
+    user = serializers.CharField(max_length=128, required=True)
+    system_user = serializers.CharField(max_length=128, required=True)
+    asset = serializers.CharField(max_length=128, required=True)
+
+    @staticmethod
+    def validate_user(user_id):
+        from users.models import User
+        user = User.objects.filter(id=user_id).first()
+        if user is None:
+            raise serializers.ValidationError('user id not exist')
+        return user
+
+    @staticmethod
+    def validate_system_user(system_user_id):
+        from assets.models import SystemUser
+        system_user = SystemUser.objects.filter(id=system_user_id).first()
+        if system_user is None:
+            raise serializers.ValidationError('system_user id not exist')
+        return system_user
+
+    @staticmethod
+    def validate_asset(asset_id):
+        from assets.models import Asset
+        asset = Asset.objects.filter(id=asset_id).first()
+        if asset is None:
+            raise serializers.ValidationError('asset id not exist')
+        return asset
