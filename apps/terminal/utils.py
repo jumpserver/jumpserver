@@ -110,6 +110,37 @@ def send_command_alert_mail(command):
     send_mail_async.delay(subject, message, recipient_list, html_message=message)
 
 
+def send_command_execution_alert_mail(command):
+    subject = _("Insecure Web Command Execution Alert: [%(name)s]") % {
+                    'name': command['user'],
+                 }
+    input = command['input']
+    input = input.replace('\n', '<br>')
+    recipient_list = settings.SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER.split(',')
+
+    assets = ', '.join([str(asset) for asset in command['assets']])
+    message = _("""
+        <br>
+        Assets: %(assets)s
+        <br>
+        User: %(user)s
+        <br>
+        Level: %(risk_level)s
+        <br>
+
+        ----------------- Commands ---------------- <br>
+        %(command)s <br>
+        ----------------- Commands ---------------- <br>
+        """) % {
+            'command': input,
+            'assets': assets,
+            'user': command['user'],
+            'risk_level': Command.get_risk_level_str(command['risk_level']),
+        }
+
+    send_mail_async.delay(subject, message, recipient_list, html_message=message)
+
+
 class ComponentsMetricsUtil(object):
 
     @staticmethod
