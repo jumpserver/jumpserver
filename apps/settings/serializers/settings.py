@@ -130,7 +130,7 @@ class SecuritySettingSerializer(serializers.Serializer):
         help_text=_('All user enable MFA')
     )
     SECURITY_COMMAND_EXECUTION = serializers.BooleanField(
-        required=False, label=_('Enable batch command execution'),
+        required=False, label=_('Batch command execution'),
         help_text=_('Allow user run batch command or not using ansible')
     )
     SECURITY_SERVICE_ACCOUNT_REGISTRATION = serializers.BooleanField(
@@ -153,7 +153,7 @@ class SecuritySettingSerializer(serializers.Serializer):
     )
     SECURITY_PASSWORD_EXPIRATION_TIME = serializers.IntegerField(
         min_value=1, max_value=99999, required=True,
-        label=_('User password expiration time'),
+        label=_('User password expiration'),
         help_text=_('Tip: (unit: day) If the user does not update the password during the time, the user password will expire failure;The password expiration reminder mail will be automatic sent to the user by system within 5 days (daily) before the password expires')
     )
     SECURITY_PASSWORD_MIN_LENGTH = serializers.IntegerField(
@@ -161,11 +161,11 @@ class SecuritySettingSerializer(serializers.Serializer):
         label=_('Password minimum length')
     )
     SECURITY_PASSWORD_UPPER_CASE = serializers.BooleanField(
-        required=False, label=_('Must contain capital letters')
+        required=False, label=_('Must contain capital')
     )
-    SECURITY_PASSWORD_LOWER_CASE = serializers.BooleanField(required=False, label=_('Must contain lowercase letters'))
-    SECURITY_PASSWORD_NUMBER = serializers.BooleanField(required=False, label=_('Must contain numeric characters'))
-    SECURITY_PASSWORD_SPECIAL_CHAR = serializers.BooleanField(required=False, label=_('Must contain special characters'))
+    SECURITY_PASSWORD_LOWER_CASE = serializers.BooleanField(required=False, label=_('Must contain lowercase'))
+    SECURITY_PASSWORD_NUMBER = serializers.BooleanField(required=False, label=_('Must contain numeric'))
+    SECURITY_PASSWORD_SPECIAL_CHAR = serializers.BooleanField(required=False, label=_('Must contain special'))
     SECURITY_INSECURE_COMMAND = serializers.BooleanField(required=False, label=_('Insecure command alert'))
     SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER = serializers.CharField(
         max_length=8192, required=False, allow_blank=True, label=_('Email recipient'),

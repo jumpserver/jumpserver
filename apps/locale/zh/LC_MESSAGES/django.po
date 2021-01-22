@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-22 19:49+0800\n"
+"POT-Creation-Date: 2021-01-22 20:01+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -2158,7 +2158,7 @@ msgid "All user enable MFA"
 msgstr "强制每个启用多因子认证"
 
 #: settings/serializers/settings.py:133
-msgid "Enable batch command execution"
+msgid "Batch command execution"
 msgstr "批量命令执行"
 
 #: settings/serializers/settings.py:134
@@ -2199,7 +2199,7 @@ msgid "If idle time more than it, disconnect connection Unit: minute"
 msgstr "提示：如果超过该配置没有操作，连接会被断开 （单位：分）"
 
 #: settings/serializers/settings.py:156
-msgid "User password expiration time"
+msgid "User password expiration"
 msgstr "用户密码过期时间"
 
 #: settings/serializers/settings.py:157
@@ -2217,19 +2217,19 @@ msgid "Password minimum length"
 msgstr "密码最小长度"
 
 #: settings/serializers/settings.py:164
-msgid "Must contain capital letters"
+msgid "Must contain capital"
 msgstr "必须包含大写字符"
 
 #: settings/serializers/settings.py:166
-msgid "Must contain lowercase letters"
+msgid "Must contain lowercase"
 msgstr "必须包含小写字符"
 
 #: settings/serializers/settings.py:167
-msgid "Must contain numeric characters"
+msgid "Must contain numeric"
 msgstr "必须包含数字"
 
 #: settings/serializers/settings.py:168
-msgid "Must contain special characters"
+msgid "Must contain special"
 msgstr "必须包含特殊字符"
 
 #: settings/serializers/settings.py:169
