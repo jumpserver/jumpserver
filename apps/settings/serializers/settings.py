@@ -113,30 +113,64 @@ class TerminalSettingSerializer(serializers.Serializer):
         ('25', '25'),
         ('50', '50'),
     )
-    TERMINAL_PASSWORD_AUTH = serializers.BooleanField(required=False)
-    TERMINAL_PUBLIC_KEY_AUTH = serializers.BooleanField(required=False)
-    TERMINAL_HEARTBEAT_INTERVAL = serializers.IntegerField(min_value=5, max_value=99999, required=False)
-    TERMINAL_ASSET_LIST_SORT_BY = serializers.ChoiceField(SORT_BY_CHOICES, required=False)
-    TERMINAL_ASSET_LIST_PAGE_SIZE = serializers.ChoiceField(PAGE_SIZE_CHOICES, required=False)
-    TERMINAL_SESSION_KEEP_DURATION = serializers.IntegerField(min_value=1, max_value=99999, required=True)
-    TERMINAL_TELNET_REGEX = serializers.CharField(allow_blank=True, required=False)
+    TERMINAL_PASSWORD_AUTH = serializers.BooleanField(required=False, label=_('Password auth'))
+    TERMINAL_PUBLIC_KEY_AUTH = serializers.BooleanField(required=False, label=_('Public key auth'))
+    TERMINAL_ASSET_LIST_SORT_BY = serializers.ChoiceField(SORT_BY_CHOICES, required=False, label=_('List sort by'))
+    TERMINAL_ASSET_LIST_PAGE_SIZE = serializers.ChoiceField(PAGE_SIZE_CHOICES, required=False, label=_('List page size'))
+    TERMINAL_SESSION_KEEP_DURATION = serializers.IntegerField(
+        min_value=1, max_value=99999, required=True, label=_('Session keep duration'),
+        help_text=_('Units: days, Session, record, command will be delete if more than duration, only in database')
+    )
+    TERMINAL_TELNET_REGEX = serializers.CharField(allow_blank=True, max_length=1024, required=False, label=_('Telnet login regex'))
 
 
 class SecuritySettingSerializer(serializers.Serializer):
-    SECURITY_MFA_AUTH = serializers.BooleanField(required=False)
-    SECURITY_COMMAND_EXECUTION = serializers.BooleanField(required=False)
-    SECURITY_SERVICE_ACCOUNT_REGISTRATION = serializers.BooleanField(required=True)
-    SECURITY_LOGIN_LIMIT_COUNT = serializers.IntegerField(min_value=3, max_value=99999, required=True)
-    SECURITY_LOGIN_LIMIT_TIME = serializers.IntegerField(min_value=5, max_value=99999, required=True)
-    SECURITY_MAX_IDLE_TIME = serializers.IntegerField(min_value=1, max_value=99999, required=False)
-    SECURITY_PASSWORD_EXPIRATION_TIME = serializers.IntegerField(min_value=1, max_value=99999, required=True)
-    SECURITY_PASSWORD_MIN_LENGTH = serializers.IntegerField(min_value=6, max_value=30, required=True)
-    SECURITY_PASSWORD_UPPER_CASE = serializers.BooleanField(required=False)
-    SECURITY_PASSWORD_LOWER_CASE = serializers.BooleanField(required=False)
-    SECURITY_PASSWORD_NUMBER = serializers.BooleanField(required=False)
-    SECURITY_PASSWORD_SPECIAL_CHAR = serializers.BooleanField(required=False)
-    SECURITY_INSECURE_COMMAND = serializers.BooleanField(required=False)
-    SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER = serializers.CharField(max_length=8192, required=False, allow_blank=True)
+    SECURITY_MFA_AUTH = serializers.BooleanField(
+        required=False, label=_("Global MFA auth"),
+        help_text=_('All user enable MFA')
+    )
+    SECURITY_COMMAND_EXECUTION = serializers.BooleanField(
+        required=False, label=_('Enable batch command execution'),
+        help_text=_('Allow user run batch command or not using ansible')
+    )
+    SECURITY_SERVICE_ACCOUNT_REGISTRATION = serializers.BooleanField(
+        required=True, label=_('Enable terminal register'),
+        help_text=_("Allow terminal register, after all terminal setup, you should disable this for security")
+    )
+    SECURITY_LOGIN_LIMIT_COUNT = serializers.IntegerField(
+        min_value=3, max_value=99999,
+        label=_('Limit the number of login failures')
+    )
+    SECURITY_LOGIN_LIMIT_TIME = serializers.IntegerField(
+        min_value=5, max_value=99999, required=True,
+        label=_('Block logon interval'),
+        help_text=_('Tip: (unit/minute) if the user has failed to log in for a limited number of times, no login is allowed during this time interval.')
+    )
+    SECURITY_MAX_IDLE_TIME = serializers.IntegerField(
+        min_value=1, max_value=99999, required=False,
+        label=_('Connection max idle time'),
+        help_text=_('If idle time more than it, disconnect connection Unit: minute')
+    )
+    SECURITY_PASSWORD_EXPIRATION_TIME = serializers.IntegerField(
+        min_value=1, max_value=99999, required=True,
+        label=_('User password expiration time'),
+        help_text=_('Tip: (unit: day) If the user does not update the password during the time, the user password will expire failure;The password expiration reminder mail will be automatic sent to the user by system within 5 days (daily) before the password expires')
+    )
+    SECURITY_PASSWORD_MIN_LENGTH = serializers.IntegerField(
+        min_value=6, max_value=30, required=True,
+        label=_('Password minimum length')
+    )
+    SECURITY_PASSWORD_UPPER_CASE = serializers.BooleanField(
+        required=False, label=_('Must contain capital letters')
+    )
+    SECURITY_PASSWORD_LOWER_CASE = serializers.BooleanField(required=False, label=_('Must contain lowercase letters'))
+    SECURITY_PASSWORD_NUMBER = serializers.BooleanField(required=False, label=_('Must contain numeric characters'))
+    SECURITY_PASSWORD_SPECIAL_CHAR = serializers.BooleanField(required=False, label=_('Must contain special characters'))
+    SECURITY_INSECURE_COMMAND = serializers.BooleanField(required=False, label=_('Insecure command alert'))
+    SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER = serializers.CharField(
+        max_length=8192, required=False, allow_blank=True, label=_('Email recipient'),
+        help_text=_('Multiple user using , split')
+    )
 
 
 class SettingsSerializer(

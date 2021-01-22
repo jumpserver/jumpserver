@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-22 18:46+0800\n"
+"POT-Creation-Date: 2021-01-22 19:49+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -181,7 +181,7 @@ msgstr "用户名"
 #: assets/models/base.py:236 assets/serializers/asset_user.py:71
 #: audits/signals_handler.py:42 authentication/forms.py:13
 #: authentication/templates/authentication/login.html:109
-#: settings/serializers/settings.py:84 users/forms/user.py:22
+#: settings/serializers/settings.py:86 users/forms/user.py:22
 #: users/forms/user.py:193
 #: users/templates/users/user_otp_check_password.html:13
 #: users/templates/users/user_password_update.html:43
@@ -205,7 +205,7 @@ msgstr "目标URL"
 
 #: applications/serializers/attrs/application_type/mysql_workbench.py:18
 #: assets/models/asset.py:190 assets/models/domain.py:52
-#: assets/serializers/asset_user.py:46 settings/serializers/settings.py:103
+#: assets/serializers/asset_user.py:46 settings/serializers/settings.py:105
 #: users/templates/users/_granted_assets.html:26
 #: users/templates/users/user_asset_permission.html:156
 msgid "IP"
@@ -261,7 +261,7 @@ msgid "Platform"
 msgstr "系统平台"
 
 #: assets/models/asset.py:191 assets/serializers/asset_user.py:45
-#: assets/serializers/gathered_user.py:20 settings/serializers/settings.py:102
+#: assets/serializers/gathered_user.py:20 settings/serializers/settings.py:104
 #: users/templates/users/_granted_assets.html:25
 #: users/templates/users/user_asset_permission.html:157
 msgid "Hostname"
@@ -1846,7 +1846,7 @@ msgstr "应用程序"
 msgid "Application permission"
 msgstr "应用管理"
 
-#: perms/models/asset_permission.py:34 settings/serializers/settings.py:107
+#: perms/models/asset_permission.py:34 settings/serializers/settings.py:109
 msgid "All"
 msgstr "全部"
 
@@ -2068,48 +2068,181 @@ msgstr "署名"
 msgid "Tips: Email signature (eg:jumpserver)"
 msgstr "邮件署名 (如:jumpserver)"
 
-#: settings/serializers/settings.py:82
+#: settings/serializers/settings.py:83
 msgid "LDAP server"
 msgstr "LDAP 地址"
 
 #: settings/serializers/settings.py:83
+msgid "eg: ldap://localhost:389"
+msgstr ""
+
+#: settings/serializers/settings.py:85
 msgid "Bind DN"
 msgstr "绑定 DN"
 
-#: settings/serializers/settings.py:86
+#: settings/serializers/settings.py:88
 msgid "User OU"
 msgstr "用户 OU"
 
-#: settings/serializers/settings.py:87
+#: settings/serializers/settings.py:89
 msgid "Use | split multi OUs"
 msgstr "多个 OU 使用 | 分割"
 
-#: settings/serializers/settings.py:90
+#: settings/serializers/settings.py:92
 msgid "User search filter"
 msgstr "用户过滤器"
 
-#: settings/serializers/settings.py:91
+#: settings/serializers/settings.py:93
 #, python-format
 msgid "Choice may be (cn|uid|sAMAccountName)=%(user)s)"
 msgstr "可能的选项是(cn或uid或sAMAccountName=%(user)s)"
 
-#: settings/serializers/settings.py:94
+#: settings/serializers/settings.py:96
 msgid "User attr map"
 msgstr "用户属性映射"
 
-#: settings/serializers/settings.py:95
+#: settings/serializers/settings.py:97
 msgid ""
 "User attr map present how to map LDAP user attr to jumpserver, username,name,"
 "email is jumpserver attr"
-msgstr "用户属性映射代表怎样将LDAP中用户属性映射到jumpserver用户上，username, name,email 是jumpserver的属性"
+msgstr ""
+"用户属性映射代表怎样将LDAP中用户属性映射到jumpserver用户上，username, name,"
+"email 是jumpserver的属性"
 
-#: settings/serializers/settings.py:97
+#: settings/serializers/settings.py:99
 msgid "Enable LDAP auth"
 msgstr "启用 LDAP 认证"
 
-#: settings/serializers/settings.py:108
+#: settings/serializers/settings.py:110
 msgid "Auto"
 msgstr "自动"
+
+#: settings/serializers/settings.py:116
+msgid "Password auth"
+msgstr "密码认证"
+
+#: settings/serializers/settings.py:117
+msgid "Public key auth"
+msgstr "密钥认证"
+
+#: settings/serializers/settings.py:118
+msgid "List sort by"
+msgstr "资产列表排序"
+
+#: settings/serializers/settings.py:119
+msgid "List page size"
+msgstr "资产列表每页数量"
+
+#: settings/serializers/settings.py:121
+msgid "Session keep duration"
+msgstr "会话日志保存时间"
+
+#: settings/serializers/settings.py:122
+msgid ""
+"Units: days, Session, record, command will be delete if more than duration, "
+"only in database"
+msgstr ""
+"单位：天。 会话、录像、命令记录超过该时长将会被删除(仅影响数据库存储, oss等不"
+"受影响)"
+
+#: settings/serializers/settings.py:124
+msgid "Telnet login regex"
+msgstr "Telnet 成功正则表达式"
+
+#: settings/serializers/settings.py:129
+msgid "Global MFA auth"
+msgstr "全局启用 MFA 认证"
+
+#: settings/serializers/settings.py:130
+msgid "All user enable MFA"
+msgstr "强制每个启用多因子认证"
+
+#: settings/serializers/settings.py:133
+msgid "Enable batch command execution"
+msgstr "批量命令执行"
+
+#: settings/serializers/settings.py:134
+msgid "Allow user run batch command or not using ansible"
+msgstr "是否允许用户使用 ansible 执行批量命令"
+
+#: settings/serializers/settings.py:137
+msgid "Enable terminal register"
+msgstr "终端注册"
+
+#: settings/serializers/settings.py:138
+msgid ""
+"Allow terminal register, after all terminal setup, you should disable this "
+"for security"
+msgstr "是否允许终端注册，当所有终端启动后，为了安全应该关闭"
+
+#: settings/serializers/settings.py:142
+msgid "Limit the number of login failures"
+msgstr "限制登录失败次数"
+
+#: settings/serializers/settings.py:146
+msgid "Block logon interval"
+msgstr "禁止登录时间间隔"
+
+#: settings/serializers/settings.py:147
+msgid ""
+"Tip: (unit/minute) if the user has failed to log in for a limited number of "
+"times, no login is allowed during this time interval."
+msgstr ""
+"提示：（单位：分）当用户登录失败次数达到限制后，那么在此时间间隔内禁止登录"
+
+#: settings/serializers/settings.py:151
+msgid "Connection max idle time"
+msgstr "连接最大空闲时间"
+
+#: settings/serializers/settings.py:152
+msgid "If idle time more than it, disconnect connection Unit: minute"
+msgstr "提示：如果超过该配置没有操作，连接会被断开 （单位：分）"
+
+#: settings/serializers/settings.py:156
+msgid "User password expiration time"
+msgstr "用户密码过期时间"
+
+#: settings/serializers/settings.py:157
+msgid ""
+"Tip: (unit: day) If the user does not update the password during the time, "
+"the user password will expire failure;The password expiration reminder mail "
+"will be automatic sent to the user by system within 5 days (daily) before "
+"the password expires"
+msgstr ""
+"提示：（单位：天）如果用户在此期间没有更新密码，用户密码将过期失效； 密码过期"
+"提醒邮件将在密码过期前5天内由系统（每天）自动发送给用户"
+
+#: settings/serializers/settings.py:161
+msgid "Password minimum length"
+msgstr "密码最小长度"
+
+#: settings/serializers/settings.py:164
+msgid "Must contain capital letters"
+msgstr "必须包含大写字符"
+
+#: settings/serializers/settings.py:166
+msgid "Must contain lowercase letters"
+msgstr "必须包含小写字符"
+
+#: settings/serializers/settings.py:167
+msgid "Must contain numeric characters"
+msgstr "必须包含数字"
+
+#: settings/serializers/settings.py:168
+msgid "Must contain special characters"
+msgstr "必须包含特殊字符"
+
+#: settings/serializers/settings.py:169
+msgid "Insecure command alert"
+msgstr "危险命令告警"
+
+#: settings/serializers/settings.py:171
+msgid "Email recipient"
+msgstr "邮件收件人"
+
+#: settings/serializers/settings.py:172
+msgid "Multiple user using , split"
+msgstr "多个用户，使用 , 分割"
 
 #: settings/utils/ldap.py:411
 msgid "Host or port is disconnected: {}"
