@@ -8,6 +8,7 @@ from django.db.models.signals import post_save, pre_save
 from django.utils.functional import LazyObject
 
 from jumpserver.utils import current_request
+from common.decorator import on_transaction_commit
 from common.utils import get_logger, ssh_key_gen
 from common.utils.connection import RedisPubSub
 from common.signals import django_ready
@@ -28,7 +29,8 @@ class SettingSubPub(LazyObject):
 setting_pub_sub = SettingSubPub()
 
 
-@receiver(post_save, sender=Setting, dispatch_uid="my_unique_identifier")
+@receiver(post_save, sender=Setting)
+@on_transaction_commit
 def refresh_settings_on_changed(sender, instance=None, **kwargs):
     if instance:
         setting_pub_sub.publish(instance.name)
@@ -36,7 +38,7 @@ def refresh_settings_on_changed(sender, instance=None, **kwargs):
 
 @receiver(django_ready)
 def on_django_ready_add_db_config(sender, **kwargs):
-    pass
+    Setting.refresh_all_settings()
 
 
 @receiver(django_ready)
@@ -66,12 +68,15 @@ def on_create_set_created_by(sender, instance=None, **kwargs):
 
 @receiver(django_ready)
 def subscribe_settings_change(sender, **kwargs):
+    logger.debug("Start subscribe setting change")
+
     def keep_subscribe():
         sub = setting_pub_sub.subscribe()
         for msg in sub.listen():
             if msg["type"] != "message":
                 continue
             item = msg['data'].decode()
+            logger.debug("Found setting change: {}".format(str(item)))
             Setting.refresh_item(item)
     t = threading.Thread(target=keep_subscribe)
     t.daemon = True

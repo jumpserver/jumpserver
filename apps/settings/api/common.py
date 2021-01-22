@@ -130,9 +130,25 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         items = self.get_fields().keys()
         return {item: getattr(settings, item) for item in items}
 
-    def perform_update(self, serializer):
-        data = serializer.validated_data
+    def parse_serializer_data(self, serializer):
+        data = []
         fields = self.get_fields()
-        encrypted_items = [name for name, field in fields if field.write_only]
+        encrypted_items = [name for name, field in fields.items() if field.write_only]
+        category = self.request.query_params.get('category', '')
+        for name, value in serializer.validated_data.items():
+            encrypted = name in encrypted_items
+            data.append({
+                'name': name, 'value': value,
+                'encrypted': encrypted, 'category': category
+            })
+        return data
 
-
+    def perform_update(self, serializer):
+        settings_items = self.parse_serializer_data(serializer)
+        serializer_data = getattr(serializer, 'data', {})
+        for item in settings_items:
+            changed, setting = Setting.update_or_create(**item)
+            if not changed:
+                continue
+            serializer_data[setting.name] = setting.cleaned_value
+        setattr(serializer, '_data', serializer_data)

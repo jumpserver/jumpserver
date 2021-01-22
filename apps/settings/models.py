@@ -79,7 +79,7 @@ class Setting(models.Model):
         item.refresh_setting()
 
     def refresh_setting(self):
-        logger.info(f"Refresh setting: {self.name}")
+        logger.debug(f"Refresh setting: {self.name}")
         if hasattr(self, f'refresh_{self.name}'):
             getattr(self, f'refresh_{self.name}')()
         else:
@@ -95,6 +95,23 @@ class Setting(models.Model):
         if not self.cleaned_value and has:
             index = backends.index(ldap_backend)
             backends.pop(index)
+
+    @classmethod
+    def update_or_create(cls, name='', value='', encrypted=False, category=''):
+        """
+        不能使用 Model 提供的，update_or_create 因为这里有 encrypted 和 cleaned_value
+        :return: (changed, instance)
+        """
+        setting = cls.objects.filter(name=name).first()
+        changed = False
+        if not setting:
+            setting = Setting(name=name, encrypted=encrypted, category=category)
+        if setting.cleaned_value != value:
+            setting.encrypted = encrypted
+            setting.cleaned_value = value
+            setting.save()
+            changed = True
+        return changed, setting
 
     class Meta:
         db_table = "settings_setting"
