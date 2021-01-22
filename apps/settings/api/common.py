@@ -112,8 +112,8 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'basic': serializers.BasicSettingSerializer,
         'terminal': serializers.TerminalSettingSerializer,
         'security': serializers.SecuritySettingSerializer,
-        'ldap': serializers.LdapSettingSerializer,
-        'smtp': serializers.EmailSettingSerializer,
+        'ldap': serializers.LDAPSettingSerializer,
+        'email': serializers.EmailSettingSerializer,
         'email_content': serializers.EmailContentSettingSerializer,
     }
 

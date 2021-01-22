@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-20 16:09+0800\n"
+"POT-Creation-Date: 2021-01-22 18:46+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -36,7 +36,7 @@ msgstr "自定义"
 #: assets/models/base.py:234 assets/models/cluster.py:18
 #: assets/models/cmd_filter.py:21 assets/models/domain.py:21
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
-#: orgs/models.py:23 perms/models/base.py:48 settings/models.py:27
+#: orgs/models.py:23 perms/models/base.py:48 settings/models.py:29
 #: terminal/models/storage.py:15 terminal/models/storage.py:55
 #: terminal/models/task.py:16 terminal/models/terminal.py:131
 #: users/forms/profile.py:20 users/models/group.py:15 users/models/user.py:518
@@ -95,7 +95,7 @@ msgstr ""
 #: assets/models/cmd_filter.py:57 assets/models/domain.py:22
 #: assets/models/domain.py:56 assets/models/group.py:23
 #: assets/models/label.py:23 ops/models/adhoc.py:37 orgs/models.py:26
-#: perms/models/base.py:56 settings/models.py:32 terminal/models/storage.py:21
+#: perms/models/base.py:56 settings/models.py:34 terminal/models/storage.py:21
 #: terminal/models/storage.py:61 terminal/models/terminal.py:145
 #: tickets/models/ticket.py:73 users/models/group.py:16
 #: users/models/user.py:551 users/templates/users/user_detail.html:115
@@ -181,7 +181,8 @@ msgstr "用户名"
 #: assets/models/base.py:236 assets/serializers/asset_user.py:71
 #: audits/signals_handler.py:42 authentication/forms.py:13
 #: authentication/templates/authentication/login.html:109
-#: users/forms/user.py:22 users/forms/user.py:193
+#: settings/serializers/settings.py:84 users/forms/user.py:22
+#: users/forms/user.py:193
 #: users/templates/users/user_otp_check_password.html:13
 #: users/templates/users/user_password_update.html:43
 #: users/templates/users/user_password_verify.html:18
@@ -204,7 +205,7 @@ msgstr "目标URL"
 
 #: applications/serializers/attrs/application_type/mysql_workbench.py:18
 #: assets/models/asset.py:190 assets/models/domain.py:52
-#: assets/serializers/asset_user.py:46 settings/serializers/settings.py:52
+#: assets/serializers/asset_user.py:46 settings/serializers/settings.py:103
 #: users/templates/users/_granted_assets.html:26
 #: users/templates/users/user_asset_permission.html:156
 msgid "IP"
@@ -260,7 +261,7 @@ msgid "Platform"
 msgstr "系统平台"
 
 #: assets/models/asset.py:191 assets/serializers/asset_user.py:45
-#: assets/serializers/gathered_user.py:20 settings/serializers/settings.py:51
+#: assets/serializers/gathered_user.py:20 settings/serializers/settings.py:102
 #: users/templates/users/_granted_assets.html:25
 #: users/templates/users/user_asset_permission.html:157
 msgid "Hostname"
@@ -574,7 +575,7 @@ msgstr "默认资产组"
 msgid "User"
 msgstr "用户"
 
-#: assets/models/label.py:19 assets/models/node.py:413 settings/models.py:28
+#: assets/models/label.py:19 assets/models/node.py:413 settings/models.py:30
 msgid "Value"
 msgstr "值"
 
@@ -1045,7 +1046,7 @@ msgstr "修改者"
 msgid "Disabled"
 msgstr "禁用"
 
-#: audits/models.py:90 settings/models.py:31
+#: audits/models.py:90 settings/models.py:33
 #: users/templates/users/user_detail.html:82
 msgid "Enabled"
 msgstr "启用"
@@ -1845,7 +1846,7 @@ msgstr "应用程序"
 msgid "Application permission"
 msgstr "应用管理"
 
-#: perms/models/asset_permission.py:34 settings/serializers/settings.py:56
+#: perms/models/asset_permission.py:34 settings/serializers/settings.py:107
 msgid "All"
 msgstr "全部"
 
@@ -1944,24 +1945,169 @@ msgstr "收藏夹"
 msgid "Please wait while your data is being initialized"
 msgstr "数据正在初始化，请稍等"
 
-#: settings/api.py:34
+#: settings/api/common.py:23 settings/api/ldap.py:33
 msgid "Test mail sent to {}, please check"
 msgstr "邮件已经发送{}, 请检查"
 
-#: settings/api.py:244
+#: settings/api/ldap.py:243
 msgid "Get ldap users is None"
 msgstr "获取 LDAP 用户为 None"
 
-#: settings/api.py:251
+#: settings/api/ldap.py:250
 msgid "Imported {} users successfully"
 msgstr "导入 {} 个用户成功"
 
-#: settings/models.py:96 users/templates/users/reset_password.html:29
+#: settings/models.py:118 users/templates/users/reset_password.html:29
 #: users/templates/users/user_profile.html:20
 msgid "Setting"
 msgstr "设置"
 
-#: settings/serializers/settings.py:57
+#: settings/serializers/settings.py:17
+msgid "Site url"
+msgstr "当前站点URL"
+
+#: settings/serializers/settings.py:18
+msgid "eg: http://demo.jumpserver.org:8080"
+msgstr "如: http://demo.jumpserver.org:8080"
+
+#: settings/serializers/settings.py:21
+msgid "User guide url"
+msgstr "用户向导URL"
+
+#: settings/serializers/settings.py:22
+msgid "User first login update profile done redirect to it"
+msgstr "用户第一次登录，修改profile后重定向到地址, 可以是 wiki 或 其他说明文档"
+
+#: settings/serializers/settings.py:29
+msgid "SMTP host"
+msgstr "SMTP 主机"
+
+#: settings/serializers/settings.py:30
+msgid "SMTP port"
+msgstr "SMTP 端口"
+
+#: settings/serializers/settings.py:31
+msgid "SMTP account"
+msgstr "SMTP 账号"
+
+#: settings/serializers/settings.py:33
+msgid "SMTP password"
+msgstr "SMTP 密码"
+
+#: settings/serializers/settings.py:34
+msgid "Tips: Some provider use token except password"
+msgstr "提示：一些邮件提供商需要输入的是授权码"
+
+#: settings/serializers/settings.py:37
+msgid "Send user"
+msgstr "发件人"
+
+#: settings/serializers/settings.py:38
+msgid "Tips: Send mail account, default SMTP account as the send account"
+msgstr "提示：发送邮件账号，默认使用 SMTP 账号作为发送账号"
+
+#: settings/serializers/settings.py:41
+msgid "Test recipient"
+msgstr "测试收件人"
+
+#: settings/serializers/settings.py:42
+msgid "Tips: Used only as a test mail recipient"
+msgstr "提示：仅用来作为测试邮件收件人"
+
+#: settings/serializers/settings.py:45
+msgid "Use SSL"
+msgstr "使用 SSL"
+
+#: settings/serializers/settings.py:46
+msgid "If SMTP port is 465, may be select"
+msgstr "如果SMTP端口是465，通常需要启用 SSL"
+
+#: settings/serializers/settings.py:49
+msgid "Use TLS"
+msgstr "使用 TLS"
+
+#: settings/serializers/settings.py:50
+msgid "If SMTP port is 587, may be select"
+msgstr "如果SMTP端口是587，通常需要启用 TLS"
+
+#: settings/serializers/settings.py:53
+msgid "Subject prefix"
+msgstr "主题前缀"
+
+#: settings/serializers/settings.py:60
+msgid "Create user email subject"
+msgstr "邮件主题"
+
+#: settings/serializers/settings.py:61
+msgid ""
+"Tips: When creating a user, send the subject of the email (eg:Create account "
+"successfully)"
+msgstr "提示: 创建用户时，发送设置密码邮件的主题 (例如: 创建用户成功)"
+
+#: settings/serializers/settings.py:65
+msgid "Create user honorific"
+msgstr "邮件的敬语"
+
+#: settings/serializers/settings.py:66
+msgid "Tips: When creating a user, send the honorific of the email (eg:Hello)"
+msgstr "提示: 创建用户时，发送设置密码邮件的敬语 (例如: 您好)"
+
+#: settings/serializers/settings.py:70
+msgid "Create user email content"
+msgstr "邮件的内容"
+
+#: settings/serializers/settings.py:71
+msgid "Tips:When creating a user, send the content of the email"
+msgstr "提示: 创建用户时，发送设置密码邮件的内容"
+
+#: settings/serializers/settings.py:74
+msgid "Signature"
+msgstr "署名"
+
+#: settings/serializers/settings.py:75
+msgid "Tips: Email signature (eg:jumpserver)"
+msgstr "邮件署名 (如:jumpserver)"
+
+#: settings/serializers/settings.py:82
+msgid "LDAP server"
+msgstr "LDAP 地址"
+
+#: settings/serializers/settings.py:83
+msgid "Bind DN"
+msgstr "绑定 DN"
+
+#: settings/serializers/settings.py:86
+msgid "User OU"
+msgstr "用户 OU"
+
+#: settings/serializers/settings.py:87
+msgid "Use | split multi OUs"
+msgstr "多个 OU 使用 | 分割"
+
+#: settings/serializers/settings.py:90
+msgid "User search filter"
+msgstr "用户过滤器"
+
+#: settings/serializers/settings.py:91
+#, python-format
+msgid "Choice may be (cn|uid|sAMAccountName)=%(user)s)"
+msgstr "可能的选项是(cn或uid或sAMAccountName=%(user)s)"
+
+#: settings/serializers/settings.py:94
+msgid "User attr map"
+msgstr "用户属性映射"
+
+#: settings/serializers/settings.py:95
+msgid ""
+"User attr map present how to map LDAP user attr to jumpserver, username,name,"
+"email is jumpserver attr"
+msgstr "用户属性映射代表怎样将LDAP中用户属性映射到jumpserver用户上，username, name,email 是jumpserver的属性"
+
+#: settings/serializers/settings.py:97
+msgid "Enable LDAP auth"
+msgstr "启用 LDAP 认证"
+
+#: settings/serializers/settings.py:108
 msgid "Auto"
 msgstr "自动"
 

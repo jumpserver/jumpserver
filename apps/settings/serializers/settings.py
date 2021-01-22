@@ -7,47 +7,96 @@ from ..models import Setting
 
 __all__ = [
     'BasicSettingSerializer', 'EmailSettingSerializer', 'EmailContentSettingSerializer',
-    'LdapSettingSerializer', 'TerminalSettingSerializer', 'SecuritySettingSerializer',
+    'LDAPSettingSerializer', 'TerminalSettingSerializer', 'SecuritySettingSerializer',
     'SettingsSerializer'
 ]
 
 
 class BasicSettingSerializer(serializers.Serializer):
-    SITE_URL = serializers.URLField(required=True)
-    USER_GUIDE_URL = serializers.URLField(required=False, allow_blank=True, )
-    EMAIL_SUBJECT_PREFIX = serializers.CharField(max_length=1024, required=True)
+    SITE_URL = serializers.URLField(
+        required=True, label=_("Site url"),
+        help_text=_('eg: http://demo.jumpserver.org:8080')
+    )
+    USER_GUIDE_URL = serializers.URLField(
+        required=False, allow_blank=True, label=_("User guide url"),
+        help_text=_('User first login update profile done redirect to it')
+    )
 
 
 class EmailSettingSerializer(serializers.Serializer):
     encrypt_fields = ["EMAIL_HOST_PASSWORD", ]
 
-    EMAIL_HOST = serializers.CharField(max_length=1024, required=True)
-    EMAIL_PORT = serializers.CharField(max_length=5, required=True)
-    EMAIL_HOST_USER = serializers.CharField(max_length=128, required=True)
-    EMAIL_HOST_PASSWORD = serializers.CharField(max_length=1024, write_only=True, required=False)
-    EMAIL_FROM = serializers.CharField(max_length=128, allow_blank=True, required=False)
-    EMAIL_RECIPIENT = serializers.CharField(max_length=128, allow_blank=True, required=False)
-    EMAIL_USE_SSL = serializers.BooleanField(required=False)
-    EMAIL_USE_TLS = serializers.BooleanField(required=False)
+    EMAIL_HOST = serializers.CharField(max_length=1024, required=True, label=_("SMTP host"))
+    EMAIL_PORT = serializers.CharField(max_length=5, required=True, label=_("SMTP port"))
+    EMAIL_HOST_USER = serializers.CharField(max_length=128, required=True, label=_("SMTP account"))
+    EMAIL_HOST_PASSWORD = serializers.CharField(
+        max_length=1024, write_only=True, required=False, label=_("SMTP password"),
+        help_text=_("Tips: Some provider use token except password")
+    )
+    EMAIL_FROM = serializers.CharField(
+        max_length=128, allow_blank=True, required=False, label=_('Send user'),
+        help_text=_('Tips: Send mail account, default SMTP account as the send account')
+    )
+    EMAIL_RECIPIENT = serializers.CharField(
+        max_length=128, allow_blank=True, required=False, label=_('Test recipient'),
+        help_text=_('Tips: Used only as a test mail recipient')
+    )
+    EMAIL_USE_SSL = serializers.BooleanField(
+        required=False,  label=_('Use SSL'),
+        help_text=_('If SMTP port is 465, may be select')
+    )
+    EMAIL_USE_TLS = serializers.BooleanField(
+        required=False, label=_("Use TLS"),
+        help_text=_('If SMTP port is 587, may be select')
+    )
+    EMAIL_SUBJECT_PREFIX = serializers.CharField(
+        max_length=1024, required=True, label=_('Subject prefix')
+    )
 
 
 class EmailContentSettingSerializer(serializers.Serializer):
-    EMAIL_CUSTOM_USER_CREATED_SUBJECT = serializers.CharField(max_length=1024, allow_blank=True, required=False, )
-    EMAIL_CUSTOM_USER_CREATED_HONORIFIC = serializers.CharField(max_length=1024, allow_blank=True, required=False, )
-    EMAIL_CUSTOM_USER_CREATED_BODY = serializers.CharField(max_length=4096, allow_blank=True, required=False)
-    EMAIL_CUSTOM_USER_CREATED_SIGNATURE = serializers.CharField(max_length=512, allow_blank=True, required=False)
+    EMAIL_CUSTOM_USER_CREATED_SUBJECT = serializers.CharField(
+        max_length=1024, allow_blank=True, required=False,
+        label=_('Create user email subject'),
+        help_text=_('Tips: When creating a user, send the subject of the email (eg:Create account successfully)')
+    )
+    EMAIL_CUSTOM_USER_CREATED_HONORIFIC = serializers.CharField(
+        max_length=1024, allow_blank=True, required=False,
+        label=_('Create user honorific'),
+        help_text=_('Tips: When creating a user, send the honorific of the email (eg:Hello)')
+    )
+    EMAIL_CUSTOM_USER_CREATED_BODY = serializers.CharField(
+        max_length=4096, allow_blank=True, required=False,
+        label=_('Create user email content'),
+        help_text=_('Tips:When creating a user, send the content of the email')
+    )
+    EMAIL_CUSTOM_USER_CREATED_SIGNATURE = serializers.CharField(
+        max_length=512, allow_blank=True, required=False, label=_('Signature'),
+        help_text=_('Tips: Email signature (eg:jumpserver)')
+    )
 
 
-class LdapSettingSerializer(serializers.Serializer):
+class LDAPSettingSerializer(serializers.Serializer):
     encrypt_fields = ["AUTH_LDAP_BIND_PASSWORD", ]
 
-    AUTH_LDAP_SERVER_URI = serializers.CharField(required=True)
-    AUTH_LDAP_BIND_DN = serializers.CharField(required=False)
-    AUTH_LDAP_BIND_PASSWORD = serializers.CharField(max_length=1024, write_only=True, required=False)
-    AUTH_LDAP_SEARCH_OU = serializers.CharField(max_length=1024, allow_blank=True, required=False)
-    AUTH_LDAP_SEARCH_FILTER = serializers.CharField(max_length=1024, required=True)
-    AUTH_LDAP_USER_ATTR_MAP = serializers.DictField(required=True)
-    AUTH_LDAP = serializers.BooleanField(required=False)
+    AUTH_LDAP_SERVER_URI = serializers.CharField(
+        required=True, max_length=1024, label=_('LDAP server'), help_text=_('eg: ldap://localhost:389')
+    )
+    AUTH_LDAP_BIND_DN = serializers.CharField(required=False, max_length=1024, label=_('Bind DN'))
+    AUTH_LDAP_BIND_PASSWORD = serializers.CharField(max_length=1024, write_only=True, required=False, label=_('Password'))
+    AUTH_LDAP_SEARCH_OU = serializers.CharField(
+        max_length=1024, allow_blank=True, required=False, label=_('User OU'),
+        help_text=_('Use | split multi OUs')
+    )
+    AUTH_LDAP_SEARCH_FILTER = serializers.CharField(
+        max_length=1024, required=True, label=_('User search filter'),
+        help_text=_('Choice may be (cn|uid|sAMAccountName)=%(user)s)')
+    )
+    AUTH_LDAP_USER_ATTR_MAP = serializers.DictField(
+        required=True, label=_('User attr map'),
+        help_text=_('User attr map present how to map LDAP user attr to jumpserver, username,name,email is jumpserver attr')
+    )
+    AUTH_LDAP = serializers.BooleanField(required=False, label=_('Enable LDAP auth'))
 
 
 class TerminalSettingSerializer(serializers.Serializer):
@@ -94,7 +143,7 @@ class SettingsSerializer(
     BasicSettingSerializer,
     EmailSettingSerializer,
     EmailContentSettingSerializer,
-    LdapSettingSerializer,
+    LDAPSettingSerializer,
     TerminalSettingSerializer,
     SecuritySettingSerializer
 ):
