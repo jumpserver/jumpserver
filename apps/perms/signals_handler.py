@@ -5,9 +5,11 @@ from django.dispatch import receiver
 
 from perms.tasks import create_rebuild_user_tree_task, \
     create_rebuild_user_tree_task_by_related_nodes_or_assets
+from perms.utils.asset.user_permission import UserPermTreeRefreshController
 from users.models import User, UserGroup
 from assets.models import Asset, SystemUser
 from applications.models import Application
+from orgs.utils import current_org
 from common.utils import get_logger
 from common.exceptions import M2MReverseNotAllowed
 from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR
@@ -20,9 +22,12 @@ logger = get_logger(__file__)
 def handle_rebuild_user_tree(instance, action, reverse, pk_set, **kwargs):
     if action.startswith('post'):
         if reverse:
-            create_rebuild_user_tree_task(pk_set)
+            user_ids = pk_set
         else:
-            create_rebuild_user_tree_task([instance.id])
+            user_ids = [instance.id]
+
+        org_ids = [current_org.id]
+        UserPermTreeRefreshController.add_need_refresh_orgs_for_users(org_ids, user_ids)
 
 
 def handle_bind_groups_systemuser(instance, action, reverse, pk_set, **kwargs):
@@ -71,15 +76,22 @@ def on_asset_permission_delete(instance, **kwargs):
 
 def create_rebuild_user_tree_task_by_asset_perm(asset_perm: AssetPermission):
     user_ids = set()
-    user_ids.update(
-        UserGroup.objects.filter(
-            assetpermissions=asset_perm, users__id__isnull=False
-        ).distinct().values_list('users__id', flat=True)
+
+    user_ids.update(AssetPermission.users.through.objects.filter(
+        assetpermission_id=asset_perm.id
+    ).values_list('user_id', flat=True).distinct())
+
+    group_ids = list(AssetPermission.user_groups.through.objects.filter(
+        assetpermission_id=asset_perm.id
+    ).values_list('usergroup_id', flat=True).distinct())
+
+    user_ids.update(User.groups.through.objects.filter(
+        usergroup_id__in=group_ids
+    ).values_list('user_id', flat=True).distinct())
+
+    UserPermTreeRefreshController.add_need_refresh_orgs_for_users(
+        [current_org.id], user_ids
     )
-    user_ids.update(
-        User.objects.filter(assetpermissions=asset_perm).distinct().values_list('id', flat=True)
-    )
-    create_rebuild_user_tree_task(user_ids)
 
 
 def need_rebuild_mapping_node(action):
@@ -189,7 +201,6 @@ def on_asset_permission_user_groups_changed(instance, action, pk_set, model,
 
 @receiver(m2m_changed, sender=Asset.nodes.through)
 def on_node_asset_change(action, instance, reverse, pk_set, **kwargs):
-    return
     if not need_rebuild_mapping_node(action):
         return
 

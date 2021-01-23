@@ -2,7 +2,6 @@
 from __future__ import absolute_import, unicode_literals
 from datetime import timedelta
 
-from django.db import transaction
 from django.db.models import Q
 from django.db.transaction import atomic
 from django.conf import settings
@@ -11,9 +10,11 @@ from common.utils import get_logger
 from common.utils.timezone import now, dt_formater, dt_parser
 from users.models import User
 from ops.celery.decorator import register_as_period_task
+from orgs.utils import current_org
 from assets.models import Node
 from perms.models import RebuildUserTreeTask, AssetPermission
 from perms.utils.asset.user_permission import rebuild_user_mapping_nodes_if_need_with_lock, lock
+from perms.utils.asset.user_permission import UserPermTreeRefreshController
 
 logger = get_logger(__file__)
 
@@ -81,10 +82,9 @@ def dispatch_process_expired_asset_permission(asset_perms_id):
 
 
 def create_rebuild_user_tree_task(user_ids):
-    RebuildUserTreeTask.objects.bulk_create(
-        [RebuildUserTreeTask(user_id=i) for i in user_ids]
+    UserPermTreeRefreshController.add_need_refresh_orgs_for_users(
+        [current_org.id], user_ids
     )
-    transaction.on_commit(dispatch_mapping_node_tasks.delay)
 
 
 @shared_task(queue='node_tree')

@@ -55,6 +55,7 @@ def on_asset_created_or_update(sender, instance=None, created=False, **kwargs):
     当资产创建时，更新硬件信息，更新可连接性
     确保资产必须属于一个节点
     """
+    return
     if created:
         logger.info("Asset create signal recv: {}".format(instance))
 
@@ -167,6 +168,7 @@ def on_asset_nodes_add(instance, action, reverse, pk_set, **kwargs):
     当资产的节点发生变化时，或者 当节点的资产关系发生变化时，
     节点下新增的资产，添加到节点关联的系统用户中
     """
+    return
     if action != POST_ADD:
         return
     logger.debug("Assets node add signal recv: {}".format(action))
