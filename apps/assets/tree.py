@@ -67,19 +67,7 @@ class NodeAssetTree(object):
         )
         return paths
 
-    def paths_of_tree(self):
-        """ 获取树的所有路径 """
-        paths = self._paths_of_data_tree_node(self._root)
-        return paths
-
-    def paths_of_node(self, node_key):
-        """ 获取节点的所有路径 """
-
-        data_tree_node = self._root.get_node_child_at_path(node_key)
-        paths = self._paths_of_data_tree_node(data_tree_node=data_tree_node)
-        return paths
-
-    def _paths_of_node_children(self, node_key, immediate):
+    def _paths_of_node_children(self, node_key=None, immediate=False):
         """ 获取节点下的子节点路径 """
         def arg_callable_filter(arg_iterable_path, arg_node):
             if '.' in arg_iterable_path:
@@ -91,7 +79,11 @@ class NodeAssetTree(object):
         else:
             _arg_bool_search_sub_tree = True
 
-        data_tree_node = self._root.get_node_child_at_path(node_key)
+        if node_key is None:
+            data_tree_node = self._root
+        else:
+            data_tree_node = self._root.get_node_child_at_path(node_key)
+
         paths = self._paths_of_data_tree_node(
             data_tree_node=data_tree_node,
             arg_bool_search_sub_tree=_arg_bool_search_sub_tree,
@@ -99,7 +91,13 @@ class NodeAssetTree(object):
         )
         return paths
 
-    def paths_of_node_children(self, node_key, immediate=False):
+    @timeit
+    def paths_of_nodes(self):
+        """ 获取所有节点的路径 """
+        paths = self._paths_of_node_children(node_key=None)
+        return paths
+
+    def paths_of_node_children(self, node_key, immediate):
         """
         return: 返回节点的子节点的路径
         arg: node_key - 节点key
@@ -173,6 +171,6 @@ class NodeAssetTree(object):
 
     @timeit
     def count_paris_of_node_assets_for_tree(self, immediate=False):
-        tree_nodes_key = dict(self._nodes).values()
-        count_pairs = self.count_pairs_of_node_assets(nodes_key=tree_nodes_key, immediate=immediate)
+        nodes_key = self.paths_of_nodes()
+        count_pairs = self.count_pairs_of_node_assets(nodes_key=nodes_key, immediate=immediate)
         return count_pairs
