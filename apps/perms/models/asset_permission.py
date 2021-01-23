@@ -141,7 +141,6 @@ class AssetPermission(BasePermission):
         return assets
 
 
-
 class UserGrantedMappingNode(FamilyMixin, models.JMSBaseModel):
     node = models.ForeignKey('assets.Node', default=None, on_delete=models.CASCADE,
                              db_constraint=False, null=True, related_name='mapping_nodes')
