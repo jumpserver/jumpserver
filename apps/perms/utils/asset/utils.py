@@ -1,6 +1,7 @@
 from collections import defaultdict
 import copy
 
+from assets.models import Node, Asset
 from common.struct import Stack
 from common.utils.common import timeit
 from assets.models import Node
@@ -136,12 +137,19 @@ class Tree:
                     tree_node.assets = assets
 
 
+def get_current_org_full_tree():
+    nodes = list(Node.objects.exclude(key__startswith='-').only('id', 'key', 'parent_key'))
+    node_asset_id_pairs = Asset.nodes.through.objects.all().values_list('node_id', 'asset_id')
+    tree = Tree(nodes, node_asset_id_pairs)
+    tree.build_tree()
+    return tree
+
+
 def test():
     from orgs.models import Organization
     from assets.models import Node, Asset
     import time
-
-    Organization.default().change_to()
+    Organization.objects.get(id='1863cf22-f666-474e-94aa-935fe175203c').change_to()
 
     t1 = time.time()
     nodes = list(Node.objects.exclude(key__startswith='-').only('id', 'key', 'parent_key'))
