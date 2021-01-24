@@ -166,7 +166,3 @@ class UserGrantedMappingNode(FamilyMixin, models.JMSBaseModel):
         if any(list(has_granted)):
             return cls.GRANTED_DIRECT
         return cls.GRANTED_INDIRECT
-
-
-class RebuildUserTreeTask(models.JMSBaseModel):
-    user = models.ForeignKey('users.User', on_delete=models.CASCADE, verbose_name=_('User'))
