@@ -21,6 +21,8 @@ from perms.utils.asset.user_permission import (
     get_ungrouped_node
 )
 
+from perms.utils.asset.user_permission import UserGrantedNodesQueryUtils
+
 
 logger = get_logger(__name__)
 
@@ -83,29 +85,15 @@ class BaseNodeChildrenAsTreeApi(NodeChildrenMixin, BaseGrantedNodeAsTreeApi, met
     pass
 
 
-class UserGrantedNodeChildrenMixin(UserNodeGrantStatusDispatchMixin):
+class UserGrantedNodeChildrenMixin:
     user: User
     request: Request
 
     def get_children(self):
         user = self.user
         key = self.request.query_params.get('key')
-
-        if not key:
-            nodes = list(get_top_level_granted_nodes(user))
-        else:
-            nodes = self.dispatch_get_data(key, user)
+        nodes = UserGrantedNodesQueryUtils(user).get_node_children(key)
         return nodes
-
-    def get_data_on_node_direct_granted(self, key):
-        return Node.objects.filter(parent_key=key)
-
-    def get_data_on_node_indirect_granted(self, key):
-        nodes = get_indirect_granted_node_children(self.user, key)
-        return nodes
-
-    def get_data_on_node_not_granted(self, key):
-        return Node.objects.none()
 
 
 class UserGrantedNodesMixin:
@@ -115,11 +103,9 @@ class UserGrantedNodesMixin:
     user: User
 
     def get_nodes(self):
-        nodes = []
-        if settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
-            nodes.append(get_ungrouped_node(self.user))
-        nodes.append(get_favorite_node(self.user))
-        nodes.extend(get_user_granted_nodes_list_via_mapping_node(self.user))
+        utils = UserGrantedNodesQueryUtils(self.user)
+        nodes = utils.get_special_nodes()
+        nodes.extend(utils.get_user_all_nodes())
         return nodes
 
 
