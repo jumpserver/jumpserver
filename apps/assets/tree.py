@@ -6,8 +6,10 @@ django.setup()
 
 import abc
 import time
+import copy
 from data_tree import Data_tree_node
 from assets.models import Asset, Node
+from perms.models import AssetPermission
 from common.utils import lazyproperty, timeit
 from collections import defaultdict
 from orgs.utils import tmp_to_org
@@ -29,6 +31,10 @@ class BaseNodeAssetTree(object):
         arg_node = kwargs.get('arg_node')
         data_tree_node_of_path = date_tree_node.append_path(arg_path=arg_path, arg_node=arg_node)
         return data_tree_node_of_path
+
+    def _get_data_tree_node_at_path(self, arg_path) -> Data_tree_node:
+        data_tree_node = self._root.get_node_child_at_path(arg_path=arg_path)
+        return data_tree_node
 
     @staticmethod
     def _paths_of_data_tree_node(data_tree_node: Data_tree_node, **kwargs):
@@ -74,6 +80,8 @@ class BaseNodeAssetTree(object):
             _arg_callable_formatter = arg_callable_formatter_of_node_key
         else:
             data_tree_node = self._root.get_node_child_at_path(node_key)
+            if data_tree_node is None:
+                return []
             _arg_callable_formatter = arg_callable_formatter_of_node_key_relative_path
 
         if level is None:
@@ -103,6 +111,10 @@ class BaseNodeAssetTree(object):
     def get_nodes_key(self, level=None):
         nodes_key = self.get_node_children_key(node_key=None, level=level)
         return nodes_key
+
+    def get_node(self, node_key):
+        node = self._get_data_tree_node_at_path(arg_path=node_key)
+        return node
 
     def paths_of_node_assets(self, node_key, immediate, only_asset_id=False):
         """
@@ -153,6 +165,8 @@ class BaseNodeAssetTree(object):
             _arg_callable_formatter = arg_callable_formatter_of_asset_id_relative_path
 
         data_tree_node = self._root.get_node_child_at_path(_data_tree_node_path)
+        if data_tree_node is None:
+            return []
         paths = self._paths_of_data_tree_node(
             data_tree_node=data_tree_node,
             arg_bool_search_sub_tree=_arg_bool_search_sub_tree,
@@ -192,8 +206,8 @@ class OrgNodeAssetTree(BaseNodeAssetTree):
         t2 = time.time()
 
         for node_id, node_key in nodes:
-            keys_of_node = [node_key, delimiter_for_key_of_asset]
-            path_of_node = delimiter_for_path.join(keys_of_node)
+            path_keys_of_node = [node_key, delimiter_for_key_of_asset]
+            path_of_node = delimiter_for_path.join(path_keys_of_node)
             data_tree_node = self._append_path_of_data_tree_node(self._root, arg_path=path_of_node)
             for asset_id in nodes_assets_id_mapping[str(node_id)]:
                 self._append_path_of_data_tree_node(data_tree_node, arg_path=asset_id)
@@ -202,8 +216,54 @@ class OrgNodeAssetTree(BaseNodeAssetTree):
         print('t1-t2: {}, t2-t3: {}'.format(t2-t1, t3-t2))
 
 
-t = OrgNodeAssetTree('')
-t.initial()
-_nodes_key = t.get_nodes_key(level=2)
-print(_nodes_key)
+# tree = OrgNodeAssetTree(org_id='')
+# tree.initial()
+# _nodes_key = tree.get_nodes_key(level=2)
+# print(_nodes_key)
 
+
+class NodeAssetTree(BaseNodeAssetTree):
+
+    def __init__(self, base_tree: OrgNodeAssetTree, nodes, assets, *args, **kwargs):
+        self._base_tree = base_tree
+        self._nodes = nodes
+        self._assets = assets
+        super().__init__(*args, **kwargs)
+
+    @timeit
+    def initial(self, *args, **kwargs):
+        nodes_key = list(self._nodes.values_list('key'))
+        for node_key in nodes_key:
+            arg_node = self._base_tree.get_node(node_key=node_key)
+            arg_node = Data_tree_node(arg_data=arg_node)
+            self._append_path_of_data_tree_node(self._root, arg_path=node_key, arg_node=arg_node)
+
+        assets_id = list(self._assets.values_list('id'))
+        assets_id_nodes_key = Node.assets.through.objects.filter(asset_id__in=assets_id).values_list(
+            'asset_id', 'node__key'
+        )
+        for asset_id, node_key in assets_id_nodes_key:
+            path_keys_of_asset = [node_key, str(asset_id)]
+            path_of_asset = delimiter_for_path.join(path_keys_of_asset)
+            self._append_path_of_data_tree_node(date_tree_node=self._root, arg_path=path_of_asset)
+
+
+def get_org_node_asset_tree(org_id):
+    org_tree = OrgNodeAssetTree(org_id=org_id)
+    org_tree.initial()
+    return org_tree
+
+
+org_id = ''
+
+with tmp_to_org(org_id):
+    permission = AssetPermission.objects.get(name='x')
+
+t = get_org_node_asset_tree(org_id=org_id)
+
+node_asset_tree = NodeAssetTree(
+    base_tree=t, nodes=permission.nodes.all(), assets=permission.assets.all()
+)
+node_asset_tree.initial()
+_nodes_key = node_asset_tree.get_nodes_key()
+print(_nodes_key)
