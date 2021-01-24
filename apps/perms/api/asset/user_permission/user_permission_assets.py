@@ -11,6 +11,7 @@ from common.utils import get_logger
 from perms.pagination import GrantedAssetLimitOffsetPagination
 from assets.models import Asset, Node, FavoriteAsset
 from perms import serializers
+from perms.utils.asset.user_permission import UserGrantedAssetsQueryUtils
 from perms.utils.asset.user_permission import (
     get_node_all_granted_assets, get_user_direct_granted_assets,
     get_user_granted_all_assets
@@ -21,30 +22,34 @@ from .mixin import ForAdminMixin, ForUserMixin
 logger = get_logger(__name__)
 
 
-class UserDirectGrantedAssetsApi(ListAPIView):
-    """
-    用户直接授权的资产的列表，也就是授权规则上直接授权的资产，并非是来自节点的
-    """
-    serializer_class = serializers.AssetGrantedSerializer
+class UserDirectGrantedAssetsMixin:
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
-    filterset_fields = ['hostname', 'ip', 'id', 'comment']
-    search_fields = ['hostname', 'ip', 'comment']
 
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return Asset.objects.none()
         user = self.user
-        assets = get_user_direct_granted_assets(user)\
+        assets = UserGrantedAssetsQueryUtils(user)\
+            .get_direct_granted_assets()\
             .prefetch_related('platform')\
             .only(*self.only_fields)
         return assets
 
 
-class UserFavoriteGrantedAssetsApi(ListAPIView):
-    serializer_class = serializers.AssetGrantedSerializer
+class UserAllGrantedAssetsMixin:
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
-    filterset_fields = ['hostname', 'ip', 'id', 'comment']
-    search_fields = ['hostname', 'ip', 'comment']
+
+    def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Asset.objects.none()
+        queryset = UserGrantedAssetsQueryUtils(self.user)\
+            .get_all_granted_assets()\
+            .prefetch_related('platform')\
+            .only(*self.only_fields)
+        return queryset
+
+
+class UserFavoriteGrantedAssetsMixin:
 
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
@@ -56,7 +61,17 @@ class UserFavoriteGrantedAssetsApi(ListAPIView):
         return assets
 
 
-class AssetsAsTreeMixin(SerializeToTreeNodeMixin):
+class AssetsSerializerFormatMixin:
+    """
+    用户直接授权的资产的列表，也就是授权规则上直接授权的资产，并非是来自节点的
+    """
+    serializer_class = serializers.AssetGrantedSerializer
+    only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
+    filterset_fields = ['hostname', 'ip', 'id', 'comment']
+    search_fields = ['hostname', 'ip', 'comment']
+
+
+class AssetsTreeFormatMixin(SerializeToTreeNodeMixin):
     """
     将 资产 序列化成树的结构返回
     """
@@ -70,27 +85,45 @@ class AssetsAsTreeMixin(SerializeToTreeNodeMixin):
         return Response(data=data)
 
 
-class UserDirectGrantedAssetsForAdminApi(ForAdminMixin, UserDirectGrantedAssetsApi):
+class UserDirectGrantedAssetsForAdminApi(UserDirectGrantedAssetsMixin,
+                                         ForAdminMixin,
+                                         AssetsSerializerFormatMixin,
+                                         ListAPIView):
     pass
 
 
-class MyDirectGrantedAssetsApi(ForUserMixin, UserDirectGrantedAssetsApi):
+class MyDirectGrantedAssetsApi(UserDirectGrantedAssetsMixin,
+                               ForUserMixin,
+                               AssetsSerializerFormatMixin,
+                               ListAPIView):
     pass
 
 
-class UserFavoriteGrantedAssetsForAdminApi(ForAdminMixin, UserFavoriteGrantedAssetsApi):
+class UserFavoriteGrantedAssetsForAdminApi(UserFavoriteGrantedAssetsMixin,
+                                           ForAdminMixin,
+                                           AssetsSerializerFormatMixin,
+                                           ListAPIView):
     pass
 
 
-class MyFavoriteGrantedAssetsApi(ForUserMixin, UserFavoriteGrantedAssetsApi):
+class MyFavoriteGrantedAssetsApi(UserFavoriteGrantedAssetsMixin,
+                                 ForUserMixin,
+                                 AssetsSerializerFormatMixin,
+                                 ListAPIView):
     pass
 
 
-class UserDirectGrantedAssetsAsTreeForAdminApi(ForAdminMixin, AssetsAsTreeMixin, UserDirectGrantedAssetsApi):
+class UserDirectGrantedAssetsAsTreeForAdminApi(UserDirectGrantedAssetsMixin,
+                                               ForAdminMixin,
+                                               AssetsTreeFormatMixin,
+                                               ListAPIView):
     pass
 
 
-class MyUngroupAssetsAsTreeApi(ForUserMixin, AssetsAsTreeMixin, UserDirectGrantedAssetsApi):
+class MyUngroupAssetsAsTreeApi(UserDirectGrantedAssetsMixin,
+                               ForUserMixin,
+                               AssetsTreeFormatMixin,
+                               ListAPIView):
     def get_queryset(self):
         queryset = super().get_queryset()
         if not settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
@@ -98,25 +131,24 @@ class MyUngroupAssetsAsTreeApi(ForUserMixin, AssetsAsTreeMixin, UserDirectGrante
         return queryset
 
 
-class UserAllGrantedAssetsApi(ForAdminMixin, ListAPIView):
-    only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
-    serializer_class = serializers.AssetGrantedSerializer
-    filterset_fields = ['hostname', 'ip', 'id', 'comment']
-    search_fields = ['hostname', 'ip', 'comment']
-
-    def get_queryset(self):
-        if getattr(self, 'swagger_fake_view', False):
-            return Asset.objects.none()
-        queryset = get_user_granted_all_assets(self.user)
-        queryset = queryset.prefetch_related('platform')
-        return queryset.only(*self.only_fields)
-
-
-class MyAllGrantedAssetsApi(ForUserMixin, UserAllGrantedAssetsApi):
+class UserAllGrantedAssetsApi(UserAllGrantedAssetsMixin,
+                              ForAdminMixin,
+                              AssetsSerializerFormatMixin,
+                              ListAPIView):
     pass
 
 
-class MyAllAssetsAsTreeApi(ForUserMixin, AssetsAsTreeMixin, UserAllGrantedAssetsApi):
+class MyAllGrantedAssetsApi(UserAllGrantedAssetsMixin,
+                            ForUserMixin,
+                            AssetsSerializerFormatMixin,
+                            ListAPIView):
+    pass
+
+
+class MyAllAssetsAsTreeApi(UserAllGrantedAssetsMixin,
+                           ForUserMixin,
+                           AssetsTreeFormatMixin,
+                           ListAPIView):
     search_fields = ['hostname', 'ip']
 
 
