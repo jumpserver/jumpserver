@@ -2,6 +2,8 @@ import logging
 from functools import reduce
 
 from django.utils.translation import ugettext_lazy as _
+from django.db.models import F
+from django.conf import settings
 
 from common.db import models
 from common.utils import lazyproperty
@@ -11,7 +13,7 @@ from .base import BasePermission
 
 
 __all__ = [
-    'AssetPermission', 'Action', 'UserGrantedMappingNode', 'RebuildUserTreeTask',
+    'AssetPermission', 'Action', 'UserGrantedMappingNode', 'PermNode',
 ]
 
 # 使用场景
@@ -165,4 +167,109 @@ class UserGrantedMappingNode(FamilyMixin, models.JMSBaseModel):
             return cls.GRANTED_NONE
         if any(list(has_granted)):
             return cls.GRANTED_DIRECT
+        return cls.GRANTED_INDIRECT
+
+
+class PermNode(Node):
+    class Meta:
+        proxy = True
+
+    UNGROUPED_NODE_KEY = 'ungrouped'
+    UNGROUPED_NODE_VALUE = _('Ungrouped')
+    FAVORITE_NODE_KEY = 'favorite'
+    FAVORITE_NODE_VALUE = _('Favorite')
+
+    GRANTED_DIRECT = 1
+    GRANTED_INDIRECT = 2
+    GRANTED_NONE = 0
+
+    MAPPING_GRANTED_FIELD = '_granted'
+    MAPPING_ASSET_GRANTED_FIELD = '_asset_granted'
+    MAPPING_GRANTED_ASSETS_AMOUNT_FIELD = '_granted_assets_amount'
+
+    node_annotate_mapping_node = {
+        MAPPING_GRANTED_FIELD: F('mapping_nodes__granted'),
+        MAPPING_ASSET_GRANTED_FIELD: F('mapping_nodes__asset_granted'),
+        MAPPING_GRANTED_ASSETS_AMOUNT_FIELD: F('mapping_nodes__assets_amount')
+    }
+
+    @classmethod
+    def get_ungrouped_node(cls, assets_amount):
+        return cls(
+            id=cls.UNGROUPED_NODE_KEY,
+            key=cls.UNGROUPED_NODE_KEY,
+            value=cls.UNGROUPED_NODE_VALUE,
+            assets_amount=assets_amount
+        )
+
+    @classmethod
+    def get_favorite_node(cls, assets_amount):
+        return cls(
+            id=cls.FAVORITE_NODE_KEY,
+            key=cls.FAVORITE_NODE_KEY,
+            value=cls.FAVORITE_NODE_VALUE,
+            assets_amount=assets_amount
+        )
+
+    @classmethod
+    def get_node_with_mapping_info(cls, id):
+        queryset = cls.objects.filter(id=id).annotate(**cls.node_annotate_mapping_node)
+        num = len(queryset)
+        if num == 1:
+            return queryset[0]
+        if not num:
+            raise cls.DoesNotExist(
+                "%s matching query does not exist." %
+                cls._meta.object_name
+            )
+        raise cls.MultipleObjectsReturned(
+            'get() returned more than one %s -- it returned %s!' % (
+                cls._meta.object_name,
+                num,
+            )
+        )
+
+    @property
+    def is_granted(self):
+        return getattr(self, self.MAPPING_GRANTED_FIELD, False)
+
+    @property
+    def is_asset_granted(self):
+        return getattr(self, self.MAPPING_ASSET_GRANTED_FIELD, False)
+
+    @is_granted.setter
+    def is_granted(self, value):
+        setattr(self, self.MAPPING_GRANTED_FIELD, value)
+
+    @is_asset_granted.setter
+    def is_asset_granted(self, value):
+        setattr(self, self.MAPPING_ASSET_GRANTED_FIELD, value)
+
+    @property
+    def granted_assets_amount(self):
+        return getattr(self, self.MAPPING_GRANTED_ASSETS_AMOUNT_FIELD, 0)
+
+    @granted_assets_amount.setter
+    def granted_assets_amount(self, value):
+        setattr(self, self.MAPPING_GRANTED_ASSETS_AMOUNT_FIELD, value)
+
+    def use_mapping_assets_amount(self):
+        self.assets_amount = self.granted_assets_amount
+
+    @classmethod
+    def get_node_granted_status(cls, user, key):
+        ancestor_keys = set(cls.get_node_ancestor_keys(key, with_self=True))
+        ancestor_mapping_nodes = UserGrantedMappingNode.objects.filter(
+            user=user,
+            key__in=ancestor_keys
+        ).only('key', 'granted')
+
+        ancestor_mapping_nodes_keys = set()
+        for mapping_node in ancestor_mapping_nodes:
+            if mapping_node.granted:
+                return cls.GRANTED_DIRECT
+            ancestor_mapping_nodes_keys.add(mapping_node.key)
+
+        if ancestor_keys != ancestor_mapping_nodes_keys:
+            return cls.GRANTED_NONE
         return cls.GRANTED_INDIRECT
