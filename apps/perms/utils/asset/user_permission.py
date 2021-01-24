@@ -11,6 +11,7 @@ from django.conf import settings
 from django.db.models import F, Q, Value, BooleanField
 from django.utils.translation import ugettext_lazy as _
 
+from common.utils.common import lazyproperty
 from .utils import Tree
 from common.utils import timeit
 from common.http import is_true
@@ -589,3 +590,43 @@ def rebuild_user_tree_if_need(request, user):
                 detail=_('Please wait while your data is being initialized'),
                 code='rebuild_tree_conflict'
             )
+
+
+class UserGrantedUtilsBase:
+    user: User
+
+    @lazyproperty
+    def asset_perm_ids(self):
+        user = self.user
+        group_ids = user.groups.through.objects.filter(user_id=user.id).distinct().values_list('usergroup_id',
+                                                                                               flat=True)
+        asset_perm_ids = set()
+        asset_perm_ids.update(
+            AssetPermission.users.through.objects.filter(
+                user_id=user.id).distinct().values_list('assetpermission_id', flat=True))
+        asset_perm_ids.update(
+            AssetPermission.user_groups.through.objects.filter(
+                usergroup_id__in=group_ids).distinct().values_list('assetpermission_id', flat=True))
+        return asset_perm_ids
+
+
+class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
+    def __init__(self, user):
+        self.user = user
+
+    def get_direct_granted_assets(self):
+        assets = Asset.org_objects.filter(
+            granted_by_permissions__id__in=self.asset_perm_ids
+        ).distinct()
+        return assets
+
+    def get_all_granted_assets(self):
+        granted_node_ids = UserGrantedMappingNode.objects.filter(
+            user=self.user, granted=True,
+        ).values_list('id', flat=True).distinct()
+
+        queryset = Asset.org_objects.filter(
+            nodes_related_records__node_id__in=granted_node_ids
+        ) | self.get_direct_granted_assets()
+
+        return queryset
