@@ -12,6 +12,7 @@ from perms.models import AssetPermission
 from common.utils import lazyproperty, timeit
 from collections import defaultdict
 from orgs.utils import tmp_to_org
+from django.db.models import Q
 
 delimiter_for_path = ':'
 delimiter_for_key_of_asset = '.'
@@ -19,7 +20,8 @@ delimiter_for_key_of_asset = '.'
 
 class BaseTree(object):
     """ 基本的资产节点树 """
-    def __init__(self, *args, **kwargs):
+    def __init__(self, org_id, *args, **kwargs):
+        self._org_id = org_id
         self._root = Data_tree_node(arg_string_delimiter_for_path=delimiter_for_path)
 
     @abc.abstractmethod
@@ -194,10 +196,6 @@ class BaseTree(object):
 class AssetTree(BaseTree):
     """ 资产树 """
 
-    def __init__(self, org_id, *args, **kwargs):
-        self._org_id = org_id
-        super().__init__(*args, **kwargs)
-
     @timeit
     def initial(self):
         t1 = time.time()
@@ -223,18 +221,24 @@ class AssetTree(BaseTree):
         print('t1-t2: {}, t2-t3: {}'.format(t2-t1, t3-t2))
 
 
-class AssetSearchTree(BaseTree):
-    """ 资产搜索树 """
-
-    def initial(self, node_key, assets, *args, **kwargs):
-        pass
+asset_tree = AssetTree(org_id='')
 
 
 class AssetPermissionTree(BaseTree):
     """ 资产授权树 """
 
     def initial(self, permissions, *args, **kwargs):
-        pass
+        permissions_id = list(permissions.values_list('id'))
+        queries = Q(assetpermission_id__in=permissions_id)
+        permissions_nodes_id = AssetPermission.nodes.filter(queries).values_list(
+            'assetpermission_id', 'node_id'
+        )
+        permissions_assets_id = AssetPermission.assets.filter(queries).values_list(
+            'assetpermission_id', 'asset_id'
+        )
+        permissions_system_users_id = AssetPermission.system_users.filter(queries).values_list(
+            'assetpermission_id', 'systemuser_id'
+        )
 
 
 class NodeAssetTree(BaseTree):
@@ -261,3 +265,14 @@ class NodeAssetTree(BaseTree):
             path_keys_of_asset = [node_key, str(asset_id)]
             path_of_asset = delimiter_for_path.join(path_keys_of_asset)
             self._append_path_of_data_tree_node(date_tree_node=self._root, arg_path=path_of_asset)
+
+
+class AssetSearchTree(BaseTree):
+    """ 资产搜索树 """
+
+    @property
+    def asset_tree(self):
+        return asset_tree
+
+    def initial(self, node_key, assets, *args, **kwargs):
+        pass
