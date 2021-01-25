@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 #
-from itertools import chain
-
 from rest_framework.generics import ListAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
-from django.db.models import F, Value, CharField, Q
+from django.db.models import F, Value, CharField
 from django.conf import settings
 
 from orgs.utils import tmp_to_root_org
@@ -13,9 +11,8 @@ from common.permissions import IsValidUser
 from common.utils import get_logger, get_object_or_none
 from .mixin import ForUserMixin, ForAdminMixin
 from perms.utils.asset.user_permission import (
-    rebuild_user_tree_if_need,
-    UserGrantedTreeBuildUtils,
-    get_user_all_asset_perm_ids, UserGrantedNodesQueryUtils, UserGrantedAssetsQueryUtils
+    UserGrantedTreeBuildUtils, get_user_all_asset_perm_ids,
+    UserGrantedNodesQueryUtils, UserGrantedAssetsQueryUtils
 )
 from perms.models import AssetPermission, PermNode
 from assets.models import Asset
@@ -97,7 +94,6 @@ class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
             # 有系统用户筛选的需要重新计算树结构
             self.add_node_filtered_by_system_user(data, user, asset_perms_id)
         else:
-            rebuild_user_tree_if_need(request, user)
             all_nodes = nodes_query_utils.get_whole_tree_nodes(with_special=False)
             data.extend(self.serialize_nodes(all_nodes, with_asset_amount=True))
 
@@ -145,7 +141,6 @@ class GrantedNodeChildrenWithAssetsAsTreeApiMixin(SerializeToTreeNodeMixin,
         assets = assets.prefetch_related('platform')
 
         user = self.user
-        rebuild_user_tree_if_need(request, user)
 
         tree_nodes = self.serialize_nodes(nodes, with_asset_amount=True)
         tree_assets = self.serialize_assets(assets, key)

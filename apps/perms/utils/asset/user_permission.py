@@ -31,22 +31,6 @@ def rebuild_user_mapping_nodes_with_lock(user: User):
     pass
 
 
-def rebuild_user_tree_if_need(request, user):
-    """
-    升级授权树策略后，用户的数据可能还未初始化，为防止用户显示没有数据
-    先检查 MappingNode 如果没有数据，同步创建用户授权树
-    """
-    if is_true(request.query_params.get('rebuild_tree')) or \
-            not UserGrantedMappingNode.objects.filter(user=user).exists():
-        try:
-            rebuild_user_mapping_nodes_with_lock(user)
-        except lock.SomeoneIsDoingThis:
-            # 您的数据正在初始化，请稍等
-            raise lock.SomeoneIsDoingThis(
-                detail=_('Please wait while your data is being initialized'),
-                code='rebuild_tree_conflict'
-            )
-
 # TODO 要删除的 -----------------------------------------------
 
 
@@ -103,7 +87,9 @@ class UserGrantedTreeRefreshController:
 
     def refresh_if_need(self, force=False):
         user = self.user
-        if force:
+        exists = UserGrantedMappingNode.objects.filter(user=user).exists()
+
+        if force or not exists:
             orgs = [user.orgs, Organization.default()]
         else:
             org_ids = self.get_and_delete_need_refresh_org_ids()
