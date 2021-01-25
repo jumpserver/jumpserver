@@ -12,7 +12,7 @@ from users.models import User
 from ops.celery.decorator import register_as_period_task
 from orgs.utils import current_org
 from assets.models import Node
-from perms.models import RebuildUserTreeTask, AssetPermission
+from perms.models import AssetPermission
 from perms.utils.asset.user_permission import rebuild_user_mapping_nodes_if_need_with_lock, lock
 from perms.utils.asset.user_permission import UserPermTreeRefreshController
 
@@ -30,10 +30,11 @@ def rebuild_user_mapping_nodes_celery_task(user_id):
 
 @shared_task(queue='node_tree')
 def dispatch_mapping_node_tasks():
-    user_ids = RebuildUserTreeTask.objects.all().values_list('user_id', flat=True).distinct()
-    logger.info(f'>>> dispatch_mapping_node_tasks for users {list(user_ids)}')
-    for id in user_ids:
-        rebuild_user_mapping_nodes_celery_task.delay(id)
+    pass
+    # user_ids = RebuildUserTreeTask.objects.all().values_list('user_id', flat=True).distinct()
+    # logger.info(f'>>> dispatch_mapping_node_tasks for users {list(user_ids)}')
+    # for id in user_ids:
+    #     rebuild_user_mapping_nodes_celery_task.delay(id)
 
 
 @register_as_period_task(interval=settings.PERM_EXPIRED_CHECK_PERIODIC)

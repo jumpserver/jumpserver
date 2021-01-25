@@ -174,24 +174,30 @@ class PermNode(Node):
     class Meta:
         proxy = True
 
+    # 特殊节点
     UNGROUPED_NODE_KEY = 'ungrouped'
     UNGROUPED_NODE_VALUE = _('Ungrouped')
     FAVORITE_NODE_KEY = 'favorite'
     FAVORITE_NODE_VALUE = _('Favorite')
 
+    # 节点授权状态
     GRANTED_DIRECT = 1
     GRANTED_INDIRECT = 2
     GRANTED_NONE = 0
 
-    MAPPING_GRANTED_FIELD = '_granted'
-    MAPPING_ASSET_GRANTED_FIELD = '_asset_granted'
-    MAPPING_GRANTED_ASSETS_AMOUNT_FIELD = '_granted_assets_amount'
+    # 与 UserGrantedMappingNode 对应的字段，常用于 annotate
+    is_granted = False
+    is_asset_granted = False
+    granted_assets_amount = 0
 
-    node_annotate_mapping_node = {
-        MAPPING_GRANTED_FIELD: F('mapping_nodes__granted'),
-        MAPPING_ASSET_GRANTED_FIELD: F('mapping_nodes__asset_granted'),
-        MAPPING_GRANTED_ASSETS_AMOUNT_FIELD: F('mapping_nodes__assets_amount')
+    annotate_mapping_node_fields = {
+        'is_granted': F('mapping_nodes__granted'),
+        'is_asset_granted': F('mapping_nodes__asset_granted'),
+        'granted_assets_amount': F('mapping_nodes__assets_amount')
     }
+
+    def use_mapping_assets_amount(self):
+        self.assets_amount = self.granted_assets_amount
 
     @classmethod
     def get_ungrouped_node(cls, assets_amount):
@@ -212,8 +218,11 @@ class PermNode(Node):
         )
 
     @classmethod
-    def get_node_with_mapping_info(cls, id):
-        queryset = cls.objects.filter(id=id).annotate(**cls.node_annotate_mapping_node)
+    def get_node_with_mapping_info(cls, user, id):
+        queryset = cls.objects.filter(
+            id=id,
+            mapping_nodes__user=user
+        ).annotate(**cls.annotate_mapping_node_fields)
         num = len(queryset)
         if num == 1:
             return queryset[0]
@@ -228,33 +237,6 @@ class PermNode(Node):
                 num,
             )
         )
-
-    @property
-    def is_granted(self):
-        return getattr(self, self.MAPPING_GRANTED_FIELD, False)
-
-    @property
-    def is_asset_granted(self):
-        return getattr(self, self.MAPPING_ASSET_GRANTED_FIELD, False)
-
-    @is_granted.setter
-    def is_granted(self, value):
-        setattr(self, self.MAPPING_GRANTED_FIELD, value)
-
-    @is_asset_granted.setter
-    def is_asset_granted(self, value):
-        setattr(self, self.MAPPING_ASSET_GRANTED_FIELD, value)
-
-    @property
-    def granted_assets_amount(self):
-        return getattr(self, self.MAPPING_GRANTED_ASSETS_AMOUNT_FIELD, 0)
-
-    @granted_assets_amount.setter
-    def granted_assets_amount(self, value):
-        setattr(self, self.MAPPING_GRANTED_ASSETS_AMOUNT_FIELD, value)
-
-    def use_mapping_assets_amount(self):
-        self.assets_amount = self.granted_assets_amount
 
     @classmethod
     def get_node_granted_status(cls, user, key):
@@ -273,3 +255,7 @@ class PermNode(Node):
         if ancestor_keys != ancestor_mapping_nodes_keys:
             return cls.GRANTED_NONE
         return cls.GRANTED_INDIRECT
+
+    def save(self):
+        # 这是个只读 Model
+        raise NotImplementedError
