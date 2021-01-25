@@ -6,14 +6,15 @@ from django.conf import settings
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
+from common.utils.lock import DistributedLock
 from common.utils.common import lazyproperty
 from assets.tree import Tree
 from common.http import is_true
 from common.utils import get_logger
-from orgs.utils import tmp_to_org
-from common.utils.timezone import dt_formater, now
+from orgs.utils import tmp_to_org, current_org
 from assets.models import Node, Asset, FavoriteAsset, NodeAssetRelatedRecord
 from orgs import lock
+from orgs.models import Organization
 from perms.models import UserGrantedMappingNode, AssetPermission, PermNode
 from users.models import User
 
@@ -62,24 +63,36 @@ def get_user_all_asset_perm_ids(user):
     return asset_perm_ids
 
 
-class UserPermTreeRefreshController:
-    key_template = 'perms.tree.user.{user_id}'
+class UserGrantedTreeRefreshController:
+    key_template = 'perms.user.asset.node.tree.need_refresh_orgs.<user_id:{user_id}>'
 
     def __init__(self, user):
         self.user = user
         self.key = self.key_template.format({'user_id': user.id})
-        self.client = cache.client.get_client(write=True)
+        self.client = self.get_redis_client()
+
+    @classmethod
+    def get_redis_client(cls):
+        return cache.client.get_client(write=True)
 
     def get_need_refresh_org_ids(self):
         org_ids = self.client.smembers(self.key)
         return {org_id.decode() for org_id in org_ids}
+
+    def get_and_delete_need_refresh_org_ids(self):
+        with self.client.pipeline(transaction=False) as p:
+            p.smembers(self.key)
+            p.delete(self.key)
+            ret = p.execute()
+            org_ids = ret[0] or ()
+            return {org_id.decode() for org_id in org_ids}
 
     def add_need_refresh_org_ids(self, *org_ids):
         self.client.sadd(self.key, *org_ids)
 
     @classmethod
     def add_need_refresh_orgs_for_users(cls, org_ids, user_ids):
-        client = cache.client.get_client(write=True)
+        client = cls.get_redis_client()
 
         with client.pipeline(transaction=False) as p:
             for user_id in user_ids:
@@ -87,6 +100,19 @@ class UserPermTreeRefreshController:
                 p.sadd(key, *org_ids)
 
             p.execute()
+
+    def refresh_if_need(self, force=False):
+        user = self.user
+        if force:
+            orgs = [user.orgs, Organization.default()]
+        else:
+            org_ids = self.get_and_delete_need_refresh_org_ids()
+            orgs = [Organization.get_instance(org_id) for org_id in org_ids]
+
+        for org in orgs:
+            with tmp_to_org(org):
+                granted_tree_utils = UserGrantedTreeBuildUtils(user)
+                granted_tree_utils.rebuild_user_granted_tree()
 
 
 class UserGrantedUtilsBase:
@@ -105,7 +131,7 @@ class UserGrantedUtilsBase:
         return asset_perm_ids
 
 
-class UserGrantedNodeTreeUtils(UserGrantedUtilsBase):
+class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
     node_only_fields = ('id', 'key', 'parent_key', 'assets_amount')
 
     @lazyproperty
@@ -122,6 +148,28 @@ class UserGrantedNodeTreeUtils(UserGrantedUtilsBase):
             granted_by_permissions__id__in=self.asset_perm_ids
         ).distinct().values_list('id', flat=True)
         return asset_ids
+
+    def rebuild_user_granted_tree(self):
+        if current_org.is_root():
+            raise ValueError('Can not rebuild granted tree in root org')
+
+        user = self.user
+        org_id = current_org.id
+
+        with DistributedLock(name=f'perms.user.asset.node.tree.rebuid.<org_id:{org_id}>.<user_id:{user.id}>'):
+            # 先删除旧的授权树🌲
+            UserGrantedMappingNode.objects.filter(
+                user=user,
+                node__org_id=org_id
+            ).delete()
+
+            if not self.asset_perm_ids:
+                # 没有授权直接返回
+                return
+
+            nodes = self.compute_perm_nodes_tree()
+            self.compute_node_assets_amount(nodes)
+            self.create_mapping_nodes(nodes)
 
     def compute_perm_nodes_tree(self):
         node_only_fields = ('id', 'key', 'parent_key', 'assets_amount')
@@ -251,25 +299,6 @@ class UserGrantedNodeTreeUtils(UserGrantedUtilsBase):
             descendant_nodes = Node.objects.none()
         nodes.extend(descendant_nodes)
         return nodes
-
-
-def rebuild_user_mapping_nodes(user, org):
-    logger.info(f'>>> {dt_formater(now())} start rebuild {user} mapping nodes')
-
-    with tmp_to_org(org):
-        # 先删除旧的授权树🌲
-        UserGrantedMappingNode.objects.filter(
-            user=user,
-            node__org_id=org.id
-        ).delete()
-        asset_perms_id = get_user_all_asset_perm_ids(user)
-        if not asset_perms_id:
-            # 没有授权直接返回
-            return
-        # tmp_nodes = compute_tmp_mapping_node_from_perm(user, asset_perms_id=asset_perms_id)
-        # compute_node_assets_amount(tmp_nodes, asset_perms_id)
-        # create_mapping_nodes(user, tmp_nodes)
-    logger.info(f'>>> {dt_formater(now())} end rebuild {user} mapping nodes')
 
 
 class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):

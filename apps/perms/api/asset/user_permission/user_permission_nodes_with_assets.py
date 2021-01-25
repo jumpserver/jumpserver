@@ -14,7 +14,7 @@ from common.utils import get_logger, get_object_or_none
 from .mixin import ForUserMixin, ForAdminMixin
 from perms.utils.asset.user_permission import (
     rebuild_user_tree_if_need,
-    UserGrantedNodeTreeUtils,
+    UserGrantedTreeBuildUtils,
     get_user_all_asset_perm_ids, UserGrantedNodesQueryUtils, UserGrantedAssetsQueryUtils
 )
 from perms.models import AssetPermission, PermNode
@@ -50,7 +50,7 @@ class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
         data.extend(self.serialize_assets(favorite_assets))
 
     def add_node_filtered_by_system_user(self, data: list, user, asset_perms_id):
-        utils = UserGrantedNodeTreeUtils(user, asset_perms_id)
+        utils = UserGrantedTreeBuildUtils(user, asset_perms_id)
         nodes = utils.get_whole_tree_nodes()
         data.extend(self.serialize_nodes(nodes, with_asset_amount=True))
 
