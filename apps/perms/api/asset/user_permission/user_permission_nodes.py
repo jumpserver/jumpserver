@@ -14,11 +14,9 @@ from .mixin import ForAdminMixin, ForUserMixin, UserNodeGrantStatusDispatchMixin
 from perms.hands import Node, User
 from perms import serializers
 from perms.utils.asset.user_permission import (
-    get_indirect_granted_node_children,
-    get_user_granted_nodes_list_via_mapping_node,
-    get_top_level_granted_nodes,
-    rebuild_user_tree_if_need, get_favorite_node,
-    get_ungrouped_node
+
+    rebuild_user_tree_if_need,
+
 )
 
 from perms.utils.asset.user_permission import UserGrantedNodesQueryUtils
@@ -104,8 +102,7 @@ class UserGrantedNodesMixin:
 
     def get_nodes(self):
         utils = UserGrantedNodesQueryUtils(self.user)
-        nodes = utils.get_special_nodes()
-        nodes.extend(utils.get_user_all_nodes())
+        nodes = utils.get_whole_tree_nodes()
         return nodes
 
 

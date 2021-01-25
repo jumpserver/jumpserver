@@ -51,7 +51,8 @@ class UserFavoriteGrantedAssetsMixin:
         if getattr(self, 'swagger_fake_view', False):
             return Asset.objects.none()
         user = self.user
-        assets = FavoriteAsset.get_user_favorite_assets(user) \
+        utils = UserGrantedAssetsQueryUtils(user)
+        assets = utils.get_favorite_assets() \
             .prefetch_related('platform') \
             .only(*self.only_fields)
         return assets
