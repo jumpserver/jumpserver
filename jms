@@ -169,8 +169,7 @@ def is_running(s, unlink=True):
 def parse_service(s):
     web_services = ['gunicorn', 'flower', 'daphne']
     celery_services = [
-        "celery_ansible", "celery_default", "celery_node_tree",
-        "celery_check_asset_perm_expired", "celery_heavy_tasks"
+        "celery_ansible", "celery_default"
     ]
     task_services = celery_services + ['beat']
     all_services = web_services + task_services
@@ -227,27 +226,12 @@ def get_start_daphne_kwargs():
 
 def get_start_celery_ansible_kwargs():
     print("\n- Start Celery as Distributed Task Queue: Ansible")
-    return get_start_worker_kwargs('ansible', 4)
+    return get_start_worker_kwargs('ansible', 10)
 
 
 def get_start_celery_default_kwargs():
     print("\n- Start Celery as Distributed Task Queue: Celery")
-    return get_start_worker_kwargs('celery', 4)
-
-
-def get_start_celery_node_tree_kwargs():
-    print("\n- Start Celery as Distributed Task Queue: NodeTree")
-    return get_start_worker_kwargs('node_tree', 2)
-
-
-def get_start_celery_heavy_tasks_kwargs():
-    print("\n- Start Celery as Distributed Task Queue: HeavyTasks")
-    return get_start_worker_kwargs('celery_heavy_tasks', 1)
-
-
-def get_start_celery_check_asset_perm_expired_kwargs():
-    print("\n- Start Celery as Distributed Task Queue: CheckAseetPermissionExpired")
-    return get_start_worker_kwargs('celery_check_asset_perm_expired', 1)
+    return get_start_worker_kwargs('celery', 10)
 
 
 def get_start_worker_kwargs(queue, num):
@@ -263,6 +247,7 @@ def get_start_worker_kwargs(queue, num):
 
     cmd = [
         'celery', 'worker',
+        '-P', 'threads',
         '-A', 'ops',
         '-l', 'INFO',
         '-c', str(num),
@@ -385,9 +370,6 @@ def start_service(s):
         "gunicorn": get_start_gunicorn_kwargs,
         "celery_ansible": get_start_celery_ansible_kwargs,
         "celery_default": get_start_celery_default_kwargs,
-        "celery_node_tree": get_start_celery_node_tree_kwargs,
-        "celery_heavy_tasks": get_start_celery_heavy_tasks_kwargs,
-        "celery_check_asset_perm_expired": get_start_celery_check_asset_perm_expired_kwargs,
         "beat": get_start_beat_kwargs,
         "flower": get_start_flower_kwargs,
         "daphne": get_start_daphne_kwargs,
