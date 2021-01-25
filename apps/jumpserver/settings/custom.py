@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-from ..const import CONFIG, DYNAMIC
+from ..const import CONFIG
 
 # Storage settings
 COMMAND_STORAGE = {
