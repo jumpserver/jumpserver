@@ -30,6 +30,8 @@ logger = get_logger(__name__)
 ADD = 'add'
 REMOVE = 'remove'
 
+# TODO 要删除的 -------------------------------------------
+
 UNGROUPED_NODE_KEY = 'ungrouped'
 UNGROUPED_NODE_VALUE = _('Ungrouped')
 FAVORITE_NODE_KEY = 'favorite'
@@ -89,33 +91,6 @@ def _generate_value(stage=lock.DOING):
         now=dt_formater(now()),
         rand_str=uuid4()
     )
-
-
-class UserPermTreeRefreshController:
-    key_template = 'perms.tree.user.{user_id}'
-
-    def __init__(self, user):
-        self.user = user
-        self.key = self.key_template.format({'user_id': user.id})
-        self.client = cache.client.get_client(write=True)
-
-    def get_need_refresh_org_ids(self):
-        org_ids = self.client.smembers(self.key)
-        return {org_id.decode() for org_id in org_ids}
-
-    def add_need_refresh_org_ids(self, *org_ids):
-        self.client.sadd(self.key, *org_ids)
-
-    @classmethod
-    def add_need_refresh_orgs_for_users(cls, org_ids, user_ids):
-        client = cache.client.get_client(write=True)
-
-        with client.pipeline(transaction=False) as p:
-            for user_id in user_ids:
-                key = cls.key_template.format({'user_id': user_id})
-                p.sadd(key, *org_ids)
-
-            p.execute()
 
 
 def build_user_mapping_node_lock(func):
@@ -229,94 +204,6 @@ def compute_tmp_mapping_node_from_perm(user: User, asset_perms_id=None):
     # 查出祖先节点
     ancestors = Node.objects.filter(key__in=ancestor_keys).only(*node_only_fields)
     return [*leaf_nodes, *ancestors]
-
-
-def create_mapping_nodes(user, nodes):
-    to_create = []
-    for node in nodes:
-        _granted = getattr(node, TMP_GRANTED_FIELD, False)
-        _asset_granted = getattr(node, TMP_ASSET_GRANTED_FIELD, False)
-        _granted_assets_amount = getattr(node, TMP_GRANTED_ASSETS_AMOUNT_FIELD, 0)
-        to_create.append(UserGrantedMappingNode(
-            user=user,
-            node=node,
-            key=node.key,
-            parent_key=node.parent_key,
-            granted=_granted,
-            asset_granted=_asset_granted,
-            assets_amount=_granted_assets_amount,
-        ))
-
-    UserGrantedMappingNode.objects.bulk_create(to_create)
-
-
-def set_node_granted_assets_amount(user, node, asset_perms_id=None):
-    """
-    不依赖`UserGrantedMappingNode`直接查询授权计算资产数量
-    """
-    _granted = getattr(node, TMP_GRANTED_FIELD, False)
-    if _granted:
-        assets_amount = node.assets_amount
-    else:
-        if settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
-            assets_amount = count_direct_granted_node_assets(user, node.key, asset_perms_id)
-        else:
-            assets_amount = count_node_all_granted_assets(user, node.key, asset_perms_id)
-    setattr(node, TMP_GRANTED_ASSETS_AMOUNT_FIELD, assets_amount)
-
-
-def compute_node_assets_amount(tmp_nodes: List[Node], asset_perm_ids):
-    """
-    这里计算的是一个组织的
-    """
-    if len(tmp_nodes) == 1:
-        tmp_node = tmp_nodes[0]
-        if is_direct_granted(tmp_node) and tmp_node.key.isdigit():
-            # 直接授权了跟节点
-            setattr(tmp_node, TMP_GRANTED_ASSETS_AMOUNT_FIELD, tmp_node.assets_amount)
-            return
-
-    direct_granted_node_ids = [
-        node.id for node in tmp_nodes
-        if is_direct_granted(node)
-    ]
-
-    # 根据资产授权，取出所有直接授权的资产
-    direct_granted_asset_ids = set(
-        AssetPermission.assets.through.objects.filter(
-            assetpermission_id__in=asset_perm_ids).values_list('asset_id', flat=True)
-    )
-
-    # 直接授权资产，取它与它的节点的关系
-    node_asset_pairs_1 = Asset.nodes.through.objects.filter(asset_id__in=direct_granted_asset_ids).values_list('node_id', 'asset_id')
-    node_asset_pairs_2 = NodeAssetRelatedRecord.objects.filter(node_id__in=direct_granted_node_ids).values_list('node_id', 'asset_id')
-
-    tree = Tree(tmp_nodes, chain(node_asset_pairs_1, node_asset_pairs_2))
-    tree.build_tree()
-    tree.compute_tree_node_assets_amount()
-
-    for node in tmp_nodes:
-        assets_amount = tree.key_tree_node_mapper[node.key].assets_amount
-        setattr(node, TMP_GRANTED_ASSETS_AMOUNT_FIELD, assets_amount)
-
-
-def rebuild_user_mapping_nodes(user, org):
-    logger.info(f'>>> {dt_formater(now())} start rebuild {user} mapping nodes')
-
-    with tmp_to_org(org):
-        # 先删除旧的授权树🌲
-        UserGrantedMappingNode.objects.filter(
-            user=user,
-            node__org_id=org.id
-        ).delete()
-        asset_perms_id = get_user_all_assetpermissions_id(user)
-        if not asset_perms_id:
-            # 没有授权直接返回
-            return
-        tmp_nodes = compute_tmp_mapping_node_from_perm(user, asset_perms_id=asset_perms_id)
-        compute_node_assets_amount(tmp_nodes, asset_perms_id)
-        create_mapping_nodes(user, tmp_nodes)
-    logger.info(f'>>> {dt_formater(now())} end rebuild {user} mapping nodes')
 
 
 def get_user_granted_nodes_list_via_mapping_node(user):
@@ -544,6 +431,90 @@ def rebuild_user_tree_if_need(request, user):
             )
 
 
+def create_mapping_nodes(user, nodes):
+    to_create = []
+    for node in nodes:
+        _granted = getattr(node, TMP_GRANTED_FIELD, False)
+        _asset_granted = getattr(node, TMP_ASSET_GRANTED_FIELD, False)
+        _granted_assets_amount = getattr(node, TMP_GRANTED_ASSETS_AMOUNT_FIELD, 0)
+        to_create.append(UserGrantedMappingNode(
+            user=user,
+            node=node,
+            key=node.key,
+            parent_key=node.parent_key,
+            granted=_granted,
+            asset_granted=_asset_granted,
+            assets_amount=_granted_assets_amount,
+        ))
+
+    UserGrantedMappingNode.objects.bulk_create(to_create)
+
+
+def compute_node_assets_amount(tmp_nodes: List[Node], asset_perm_ids):
+    """
+    这里计算的是一个组织的
+    """
+    if len(tmp_nodes) == 1:
+        tmp_node = tmp_nodes[0]
+        if is_direct_granted(tmp_node) and tmp_node.key.isdigit():
+            # 直接授权了跟节点
+            setattr(tmp_node, TMP_GRANTED_ASSETS_AMOUNT_FIELD, tmp_node.assets_amount)
+            return
+
+    direct_granted_node_ids = [
+        node.id for node in tmp_nodes
+        if is_direct_granted(node)
+    ]
+
+    # 根据资产授权，取出所有直接授权的资产
+    direct_granted_asset_ids = set(
+        AssetPermission.assets.through.objects.filter(
+            assetpermission_id__in=asset_perm_ids).values_list('asset_id', flat=True)
+    )
+
+    # 直接授权资产，取它与它的节点的关系
+    node_asset_pairs_1 = Asset.nodes.through.objects.filter(asset_id__in=direct_granted_asset_ids).values_list('node_id', 'asset_id')
+    node_asset_pairs_2 = NodeAssetRelatedRecord.objects.filter(node_id__in=direct_granted_node_ids).values_list('node_id', 'asset_id')
+
+    tree = Tree(tmp_nodes, chain(node_asset_pairs_1, node_asset_pairs_2))
+    tree.build_tree()
+    tree.compute_tree_node_assets_amount()
+
+    for node in tmp_nodes:
+        assets_amount = tree.key_tree_node_mapper[node.key].assets_amount
+        setattr(node, TMP_GRANTED_ASSETS_AMOUNT_FIELD, assets_amount)
+
+
+# TODO 要删除的 -----------------------------------------------
+
+
+class UserPermTreeRefreshController:
+    key_template = 'perms.tree.user.{user_id}'
+
+    def __init__(self, user):
+        self.user = user
+        self.key = self.key_template.format({'user_id': user.id})
+        self.client = cache.client.get_client(write=True)
+
+    def get_need_refresh_org_ids(self):
+        org_ids = self.client.smembers(self.key)
+        return {org_id.decode() for org_id in org_ids}
+
+    def add_need_refresh_org_ids(self, *org_ids):
+        self.client.sadd(self.key, *org_ids)
+
+    @classmethod
+    def add_need_refresh_orgs_for_users(cls, org_ids, user_ids):
+        client = cache.client.get_client(write=True)
+
+        with client.pipeline(transaction=False) as p:
+            for user_id in user_ids:
+                key = cls.key_template.format({'user_id': user_id})
+                p.sadd(key, *org_ids)
+
+            p.execute()
+
+
 class UserGrantedUtilsBase:
     user: User
 
@@ -563,6 +534,145 @@ class UserGrantedUtilsBase:
             AssetPermission.user_groups.through.objects.filter(
                 usergroup_id__in=group_ids).distinct().values_list('assetpermission_id', flat=True))
         return asset_perm_ids
+
+
+class UserGrantedNodeTreeUtils(UserGrantedUtilsBase):
+    @classmethod
+    def compute_perm_nodes_tree(cls, asset_perm_ids):
+        node_only_fields = ('id', 'key', 'parent_key', 'assets_amount')
+
+        # 查询直接授权节点
+        nodes = PermNode.objects.filter(
+            granted_by_permissions__id__in=asset_perm_ids
+        ).distinct().only(*node_only_fields)
+
+        # 授权的节点 key 集合
+        granted_key_set = {_node.key for _node in nodes}
+
+        def _has_ancestor_granted(node: PermNode):
+            """
+            判断一个节点是否有授权过的祖先节点
+            """
+            ancestor_keys = set(node.get_ancestor_keys(with_self=True))
+            return ancestor_keys & granted_key_set
+
+        key2leaf_nodes_mapper = {}
+
+        # 给授权节点设置 is_granted 标识，同时去重
+        for node in nodes:
+            if _has_ancestor_granted(node):
+                continue
+
+            node.is_granted = True
+            key2leaf_nodes_mapper[node.key] = node
+
+        # 查询授权资产关联的节点设置
+        def process_direct_granted_assets():
+            # 查询直接授权资产
+            asset_ids = Asset.org_objects.filter(
+                granted_by_permissions__id__in=asset_perm_ids
+            ).distinct().values_list('id', flat=True)
+            # 查询授权资产关联的节点设置
+            granted_asset_nodes = Node.objects.filter(
+                assets__id__in=asset_ids
+            ).distinct().only(*node_only_fields)
+
+            # 给资产授权关联的节点设置 is_asset_granted 标识，同时去重
+            for node in granted_asset_nodes:
+                if _has_ancestor_granted(node):
+                    continue
+                node.is_asset_granted = True
+                key2leaf_nodes_mapper[node.key] = node
+
+        if not settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
+            process_direct_granted_assets()
+
+        leaf_nodes = key2leaf_nodes_mapper.values()
+
+        # 计算所有祖先节点
+        ancestor_keys = set()
+        for node in leaf_nodes:
+            ancestor_keys.update(node.get_ancestor_keys())
+
+        # 从祖先节点 key 中去掉同时也是叶子节点的 key
+        ancestor_keys -= key2leaf_nodes_mapper.keys()
+        # 查出祖先节点
+        ancestors = Node.objects.filter(key__in=ancestor_keys).only(*node_only_fields)
+        return [*leaf_nodes, *ancestors]
+
+    def create_mapping_nodes(self, nodes):
+        user = self.user
+        to_create = []
+        for node in nodes:
+            to_create.append(UserGrantedMappingNode(
+                user=user,
+                node=node,
+                key=node.key,
+                parent_key=node.parent_key,
+                granted=node.is_granted,
+                asset_granted=node.is_asset_granted,
+                assets_amount=node.granted_assets_amount,
+            ))
+
+        UserGrantedMappingNode.objects.bulk_create(to_create)
+
+    def compute_node_assets_amount(self, nodes: List[PermNode]):
+        """
+        这里计算的是一个组织的
+        """
+        if len(nodes) == 1:
+            node = nodes[0]
+            if node.is_granted and node.key.isdigit():
+                # 直接授权了跟节点
+                node.granted_assets_amount = node.assets_amount
+                return
+
+        asset_perm_ids = self.asset_perm_ids
+
+        direct_granted_node_ids = [
+            node.id for node in nodes
+            if node.is_granted
+        ]
+
+        # 根据资产授权，取出所有直接授权的资产
+        direct_granted_asset_ids = set(
+            AssetPermission.assets.through.objects.filter(
+                assetpermission_id__in=asset_perm_ids).values_list('asset_id', flat=True)
+        )
+
+        # 直接授权资产，取节点与资产的关系
+        node_asset_pairs_1 = Asset.nodes.through.objects.filter(asset_id__in=direct_granted_asset_ids).values_list(
+            'node_id', 'asset_id')
+        # 直接授权的节点，取节点与资产的关系
+        node_asset_pairs_2 = NodeAssetRelatedRecord.objects.filter(node_id__in=direct_granted_node_ids).values_list(
+            'node_id', 'asset_id')
+
+        tree = Tree(nodes, chain(node_asset_pairs_1, node_asset_pairs_2))
+        tree.build_tree()
+        tree.compute_tree_node_assets_amount()
+
+        for node in nodes:
+            assets_amount = tree.key_tree_node_mapper[node.key].assets_amount
+            node.granted_assets_amount = assets_amount
+
+
+def rebuild_user_mapping_nodes(user, org):
+    logger.info(f'>>> {dt_formater(now())} start rebuild {user} mapping nodes')
+
+    with tmp_to_org(org):
+        # 先删除旧的授权树🌲
+        UserGrantedMappingNode.objects.filter(
+            user=user,
+            node__org_id=org.id
+        ).delete()
+        asset_perms_id = get_user_all_assetpermissions_id(user)
+        if not asset_perms_id:
+            # 没有授权直接返回
+            return
+        tmp_nodes = compute_tmp_mapping_node_from_perm(user, asset_perms_id=asset_perms_id)
+        compute_node_assets_amount(tmp_nodes, asset_perms_id)
+        create_mapping_nodes(user, tmp_nodes)
+    logger.info(f'>>> {dt_formater(now())} end rebuild {user} mapping nodes')
 
 
 class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
@@ -585,7 +695,7 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
         return queryset
 
     def get_node_all_assets(self, id):
-        node = PermNode.get_node_with_mapping_info(id)
+        node = PermNode.get_node_with_mapping_info(self.user, id)
         granted_status = PermNode.get_node_granted_status(self.user, node.key)
         if granted_status == PermNode.GRANTED_DIRECT:
             assets = Asset.objects.filter(nodes_related_records__node_id=node.id)
@@ -652,7 +762,7 @@ class UserGrantedNodesQueryUtils(UserGrantedUtilsBase):
             mapping_nodes__user=user,
             parent_key=key
         ).annotate(
-            **PermNode.node_annotate_mapping_node
+            **PermNode.annotate_mapping_node_fields
         ).distinct()
 
         # 设置节点授权资产数量
@@ -696,7 +806,7 @@ class UserGrantedNodesQueryUtils(UserGrantedUtilsBase):
         nodes = PermNode.objects.filter(
             mapping_nodes__user=self.user,
         ).annotate(
-            **PermNode.node_annotate_mapping_node
+            **PermNode.annotate_mapping_node_fields
         ).distinct()
 
         key_to_node_mapper = {}
