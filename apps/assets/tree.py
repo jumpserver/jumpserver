@@ -122,7 +122,7 @@ class BaseTree(object):
         nodes_children_key = set()
         for node_key in nodes_key:
             node_children_key = self.get_node_children_key(node_key=node_key)
-            nodes_children_key.add(node_children_key)
+            nodes_children_key.update(node_children_key)
         return list(nodes_children_key)
 
     def get_node_children_key(self, node_key, level=None):
@@ -315,7 +315,7 @@ class AssetTree(BaseTree):
             nodes = list(Node.objects.all().values_list('id', 'key'))
 
             nodes_id = [str(node_id) for node_id, node_key in nodes]
-            nodes_assets_id = Node.assets.through.objects.filter(node_id__in=nodes_id).values_list(
+            nodes_assets_id = Asset.nodes.through.objects.filter(node_id__in=nodes_id).values_list(
                 'node_id', 'asset_id'
             )
             nodes_assets_id_mapping = defaultdict(set)
@@ -720,32 +720,6 @@ asset_permission_tree = AssetPermissionTree(org_id='', permissions=asset_permiss
 print(asset_permission_tree.count_assets_of_node('1'))
 print(asset_permission_tree.paths_of_nodes_about_immediate_granted())
 print(asset_permission_tree.paths_of_assets_about_immediate_granted())
-
-
-class NodeAssetTree(BaseTree):
-
-    def __init__(self, base_tree: BaseTree, nodes, assets, *args, **kwargs):
-        self._base_tree = base_tree
-        self._nodes = nodes
-        self._assets = assets
-        super().__init__(*args, **kwargs)
-
-    @timeit
-    def initial(self, *args, **kwargs):
-        nodes_key = list(self._nodes.values_list('key', flat=True))
-        for node_key in nodes_key:
-            arg_node = self._base_tree.get_data_tree_node(node_key=node_key)
-            arg_node = Data_tree_node(arg_data=arg_node)
-            self._append_path_to_data_tree_node(self._root, arg_path=node_key, arg_node=arg_node)
-
-        assets_id = list(self._assets.values_list('id'))
-        assets_id_nodes_key = Node.assets.through.objects.filter(asset_id__in=assets_id).values_list(
-            'asset_id', 'node__key'
-        )
-        for asset_id, node_key in assets_id_nodes_key:
-            path_keys_of_asset = [node_key, str(asset_id)]
-            path_of_asset = delimiter_for_path.join(path_keys_of_asset)
-            self._append_path_to_data_tree_node(data_tree_node=self._root, arg_path=path_of_asset)
 
 
 class AssetSearchTree(BaseTree):
