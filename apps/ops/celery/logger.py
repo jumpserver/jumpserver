@@ -189,12 +189,12 @@ class CeleryTaskFileHandler(CeleryTaskLoggerHandler):
 
 class CeleryThreadTaskFileHandler(CeleryThreadingLoggerHandler):
     def __init__(self, *args, **kwargs):
-        self.fs = {}
+        self.thread_id_fd_mapper = {}
         self.task_id_thread_id_mapper = {}
         super().__init__(*args, **kwargs)
 
     def write_thread_task_log(self, thread_id, record):
-        f = self.fs.get(thread_id, None)
+        f = self.thread_id_fd_mapper.get(thread_id, None)
         if not f:
             raise ValueError('Not found thread task file')
         msg = self.format(record)
@@ -203,18 +203,19 @@ class CeleryThreadTaskFileHandler(CeleryThreadingLoggerHandler):
         f.flush()
 
     def flush(self):
-        for f in self.fs.values():
+        for f in self.thread_id_fd_mapper.values():
             f.flush()
 
     def handle_task_start(self, task_id):
         log_path = get_celery_task_log_path(task_id)
-        ident_id = self.get_current_thread_id()
-        self.task_id_thread_id_mapper[task_id] = ident_id
+        thread_id = self.get_current_thread_id()
+        self.task_id_thread_id_mapper[task_id] = thread_id
         f = open(log_path, 'a')
-        self.fs[ident_id] = f
+        self.thread_id_fd_mapper[thread_id] = f
 
     def handle_task_end(self, task_id):
-        f = self.fs.pop(task_id, None)
+        ident_id = self.task_id_thread_id_mapper.get(task_id, '')
+        f = self.thread_id_fd_mapper.pop(ident_id, None)
         if f and not f.closed:
             f.close()
         self.task_id_thread_id_mapper.pop(task_id, None)
