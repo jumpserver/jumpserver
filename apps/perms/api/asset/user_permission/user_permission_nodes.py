@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 import abc
-from django.conf import settings
 from rest_framework.generics import (
     ListAPIView
 )
@@ -10,14 +9,9 @@ from rest_framework.request import Request
 
 from assets.api.mixin import SerializeToTreeNodeMixin
 from common.utils import get_logger
-from .mixin import ForAdminMixin, ForUserMixin, UserNodeGrantStatusDispatchMixin
-from perms.hands import Node, User
+from .mixin import ForAdminMixin, ForUserMixin
+from perms.hands import User
 from perms import serializers
-from perms.utils.asset.user_permission import (
-
-    rebuild_user_tree_if_need,
-
-)
 
 from perms.utils.asset.user_permission import UserGrantedNodesQueryUtils
 
@@ -61,7 +55,6 @@ class BaseGrantedNodeApi(_GrantedNodeStructApi, metaclass=abc.ABCMeta):
     serializer_class = serializers.NodeGrantedSerializer
 
     def list(self, request, *args, **kwargs):
-        rebuild_user_tree_if_need(request, self.user)
         nodes = self.get_nodes()
         serializer = self.get_serializer(nodes, many=True)
         return Response(serializer.data)
@@ -73,7 +66,6 @@ class BaseNodeChildrenApi(NodeChildrenMixin, BaseGrantedNodeApi, metaclass=abc.A
 
 class BaseGrantedNodeAsTreeApi(SerializeToTreeNodeMixin, _GrantedNodeStructApi, metaclass=abc.ABCMeta):
     def list(self, request: Request, *args, **kwargs):
-        rebuild_user_tree_if_need(request, self.user)
         nodes = self.get_nodes()
         nodes = self.serialize_nodes(nodes, with_asset_amount=True)
         return Response(data=nodes)

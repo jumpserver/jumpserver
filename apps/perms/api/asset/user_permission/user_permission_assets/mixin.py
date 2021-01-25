@@ -5,7 +5,7 @@ from users.models import User
 from assets.api.mixin import SerializeToTreeNodeMixin
 from common.utils import get_logger
 from perms.pagination import GrantedAssetLimitOffsetPagination
-from assets.models import Asset, Node, FavoriteAsset
+from assets.models import Asset, Node
 from perms import serializers
 from perms.utils.asset.user_permission import UserGrantedAssetsQueryUtils
 
