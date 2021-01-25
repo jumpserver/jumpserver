@@ -6,7 +6,6 @@ django.setup()
 
 import abc
 import time
-import copy
 from data_tree import Data_tree_node
 from assets.models import Asset, Node
 from perms.models import AssetPermission
@@ -18,21 +17,25 @@ delimiter_for_path = ':'
 delimiter_for_key_of_asset = '.'
 
 
-class BaseNodeAssetTree(object):
+class BaseTree(object):
+    """ 基本的资产节点树 """
     def __init__(self, *args, **kwargs):
         self._root = Data_tree_node(arg_string_delimiter_for_path=delimiter_for_path)
 
     @abc.abstractmethod
     def initial(self, *args, **kwargs):
+        """ 初始化树 """
         raise NotImplemented
 
     @staticmethod
     def _append_path_of_data_tree_node(date_tree_node: Data_tree_node, arg_path, **kwargs):
+        """ 给 Data_tree_node 节点添加路径 """
         arg_node = kwargs.get('arg_node')
         data_tree_node_of_path = date_tree_node.append_path(arg_path=arg_path, arg_node=arg_node)
         return data_tree_node_of_path
 
     def _get_data_tree_node_at_path(self, arg_path) -> Data_tree_node:
+        """ 获取 Data_tree_node 根据路径"""
         data_tree_node = self._root.get_node_child_at_path(arg_path=arg_path)
         return data_tree_node
 
@@ -105,14 +108,17 @@ class BaseNodeAssetTree(object):
         return paths
 
     def get_node_children_key(self, node_key, level=None):
+        """ 获取子孙节点的key """
         nodes_key = self.paths_of_node_children(node_key, level=level)
         return nodes_key
 
     def get_nodes_key(self, level=None):
+        """ 获取所有节点的key """
         nodes_key = self.get_node_children_key(node_key=None, level=level)
         return nodes_key
 
-    def get_node(self, node_key):
+    def get_data_tree_node(self, node_key):
+        """ 获取 Data_tree_node 节点 """
         node = self._get_data_tree_node_at_path(arg_path=node_key)
         return node
 
@@ -185,7 +191,8 @@ class BaseNodeAssetTree(object):
         return len(assets_id)
 
 
-class OrgNodeAssetTree(BaseNodeAssetTree):
+class AssetTree(BaseTree):
+    """ 资产树 """
 
     def __init__(self, org_id, *args, **kwargs):
         self._org_id = org_id
@@ -196,6 +203,7 @@ class OrgNodeAssetTree(BaseNodeAssetTree):
         t1 = time.time()
         with tmp_to_org(self._org_id):
             nodes = list(Node.objects.all().values_list('id', 'key'))
+
             nodes_id = [str(node_id) for node_id, node_key in nodes]
             nodes_assets_id = Node.assets.through.objects.filter(node_id__in=nodes_id).values_list(
                 'node_id', 'asset_id'
@@ -206,8 +214,7 @@ class OrgNodeAssetTree(BaseNodeAssetTree):
         t2 = time.time()
 
         for node_id, node_key in nodes:
-            path_keys_of_node = [node_key, delimiter_for_key_of_asset]
-            path_of_node = delimiter_for_path.join(path_keys_of_node)
+            path_of_node = delimiter_for_path.join([node_key, delimiter_for_key_of_asset])
             data_tree_node = self._append_path_of_data_tree_node(self._root, arg_path=path_of_node)
             for asset_id in nodes_assets_id_mapping[str(node_id)]:
                 self._append_path_of_data_tree_node(data_tree_node, arg_path=asset_id)
@@ -216,15 +223,23 @@ class OrgNodeAssetTree(BaseNodeAssetTree):
         print('t1-t2: {}, t2-t3: {}'.format(t2-t1, t3-t2))
 
 
-# tree = OrgNodeAssetTree(org_id='')
-# tree.initial()
-# _nodes_key = tree.get_nodes_key(level=2)
-# print(_nodes_key)
+class AssetSearchTree(BaseTree):
+    """ 资产搜索树 """
+
+    def initial(self, node_key, assets, *args, **kwargs):
+        pass
 
 
-class NodeAssetTree(BaseNodeAssetTree):
+class AssetPermissionTree(BaseTree):
+    """ 资产授权树 """
 
-    def __init__(self, base_tree: OrgNodeAssetTree, nodes, assets, *args, **kwargs):
+    def initial(self, permissions, *args, **kwargs):
+        pass
+
+
+class NodeAssetTree(BaseTree):
+
+    def __init__(self, base_tree: BaseTree, nodes, assets, *args, **kwargs):
         self._base_tree = base_tree
         self._nodes = nodes
         self._assets = assets
@@ -234,7 +249,7 @@ class NodeAssetTree(BaseNodeAssetTree):
     def initial(self, *args, **kwargs):
         nodes_key = list(self._nodes.values_list('key'))
         for node_key in nodes_key:
-            arg_node = self._base_tree.get_node(node_key=node_key)
+            arg_node = self._base_tree.get_data_tree_node(node_key=node_key)
             arg_node = Data_tree_node(arg_data=arg_node)
             self._append_path_of_data_tree_node(self._root, arg_path=node_key, arg_node=arg_node)
 
@@ -246,24 +261,3 @@ class NodeAssetTree(BaseNodeAssetTree):
             path_keys_of_asset = [node_key, str(asset_id)]
             path_of_asset = delimiter_for_path.join(path_keys_of_asset)
             self._append_path_of_data_tree_node(date_tree_node=self._root, arg_path=path_of_asset)
-
-
-def get_org_node_asset_tree(org_id):
-    org_tree = OrgNodeAssetTree(org_id=org_id)
-    org_tree.initial()
-    return org_tree
-
-
-org_id = ''
-
-with tmp_to_org(org_id):
-    permission = AssetPermission.objects.get(name='x')
-
-t = get_org_node_asset_tree(org_id=org_id)
-
-node_asset_tree = NodeAssetTree(
-    base_tree=t, nodes=permission.nodes.all(), assets=permission.assets.all()
-)
-node_asset_tree.initial()
-_nodes_key = node_asset_tree.get_nodes_key()
-print(_nodes_key)
