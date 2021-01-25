@@ -7,7 +7,7 @@ from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils.common import lazyproperty
-from .utils import Tree
+from assets.tree import Tree
 from common.http import is_true
 from common.utils import get_logger
 from orgs.utils import tmp_to_org
@@ -266,7 +266,7 @@ def rebuild_user_mapping_nodes(user, org):
         if not asset_perms_id:
             # 没有授权直接返回
             return
-        tmp_nodes = compute_tmp_mapping_node_from_perm(user, asset_perms_id=asset_perms_id)
+        # tmp_nodes = compute_tmp_mapping_node_from_perm(user, asset_perms_id=asset_perms_id)
         # compute_node_assets_amount(tmp_nodes, asset_perms_id)
         # create_mapping_nodes(user, tmp_nodes)
     logger.info(f'>>> {dt_formater(now())} end rebuild {user} mapping nodes')
