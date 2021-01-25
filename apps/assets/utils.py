@@ -1,33 +1,41 @@
 # ~*~ coding: utf-8 ~*~
 #
-import time
-
 from django.db.models import Q
-
+from assets.tree import Tree
 from common.utils import get_logger, dict_get_any, is_uuid, get_object_or_none
 from common.utils.lock import DistributedLock
+from common.utils.common import random_string
 from common.http import is_true
+from orgs.utils import current_org
 from .models import Asset, Node
 
 
 logger = get_logger(__file__)
 
 
-@DistributedLock(name="assets.node.check_node_assets_amount", blocking=False)
 def check_node_assets_amount():
-    for node in Node.objects.all():
-        logger.info(f'Check node assets amount: {node}')
-        assets_amount = Asset.objects.filter(
-            Q(nodes__key__istartswith=f'{node.key}:') | Q(nodes=node)
-        ).distinct().count()
+    if current_org.is_root():
+        logger.error(f'Can not run check_node_assets_amount in root org')
+        return
 
-        if node.assets_amount != assets_amount:
-            logger.warn(f'Node wrong assets amount <Node:{node.key}> '
-                        f'{node.assets_amount} right is {assets_amount}')
-            node.assets_amount = assets_amount
-            node.save()
-        # 防止自检程序给数据库的压力太大
-        time.sleep(0.1)
+    with DistributedLock(name=f"assets.nodes.tree.update.{current_org.id}", blocking=False):
+        ident = random_string(6)
+        logger.info(f'[{ident}] Begin check node assets amount in {current_org}')
+        nodes = list(Node.objects.exclude(key__startswith='-').only('id', 'key', 'parent_key'))
+        node_asset_id_pairs = Asset.nodes.through.objects.all().values_list('node_id', 'asset_id')
+        tree = Tree(nodes, node_asset_id_pairs)
+        tree.build_tree()
+        tree.compute_tree_node_assets_amount()
+        logger.info(f'[{ident}] Prepared data completed, check nodes one by one ...')
+
+        for node in nodes:
+            tree_node = tree.key_tree_node_mapper[node.key]
+            if tree_node.assets_amount != node.assets_amount:
+                logger.warn(f'[{ident}] Node wrong assets amount <Node:{node.key}> '
+                            f'{node.assets_amount} right is {tree_node.assets_amount}')
+                node.assets_amount = tree_node.assets_amount
+                node.save()
+        logger.info(f'[{ident}] Finish check node assets amount in {current_org}')
 
 
 def is_asset_exists_in_node(asset_pk, node_key):
