@@ -17,7 +17,7 @@ from orgs.mixins.models import OrgModelMixin, OrgManager
 from .base import ConnectivityMixin
 from .utils import Connectivity
 
-__all__ = ['Asset', 'ProtocolsMixin', 'Platform']
+__all__ = ['Asset', 'ProtocolsMixin', 'Platform', 'AssetQuerySet']
 logger = logging.getLogger(__name__)
 
 

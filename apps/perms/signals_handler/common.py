@@ -1,18 +1,15 @@
 # -*- coding: utf-8 -*-
 #
-from django.db.models.signals import m2m_changed, pre_delete, pre_save
+from django.db.models.signals import m2m_changed
 from django.dispatch import receiver
 
-from perms.tasks import create_rebuild_user_tree_task, \
-    create_rebuild_user_tree_task_by_related_nodes_or_assets
 from users.models import User, UserGroup
-from assets.models import Asset, SystemUser
+from assets.models import SystemUser
 from applications.models import Application
-from orgs.utils import current_org
 from common.utils import get_logger
 from common.exceptions import M2MReverseNotAllowed
-from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR
-from .models import AssetPermission, ApplicationPermission
+from common.const.signals import POST_ADD
+from perms.models import AssetPermission, ApplicationPermission
 
 
 logger = get_logger(__file__)
