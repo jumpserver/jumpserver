@@ -11,13 +11,12 @@ from django.utils.translation import ugettext
 from django.db.transaction import atomic
 
 from common.utils import get_logger
-from common.utils.common import lazyproperty
 from orgs.mixins.models import OrgModelMixin, OrgManager
 from orgs.utils import get_current_org, tmp_to_org
 from orgs.models import Organization
 
 
-__all__ = ['Node', 'FamilyMixin', 'compute_parent_key', 'NodeAssetRelatedRecord']
+__all__ = ['Node', 'FamilyMixin', 'compute_parent_key', 'NodeAssetRelatedRecord', 'NodeQuerySet']
 logger = get_logger(__name__)
 
 
