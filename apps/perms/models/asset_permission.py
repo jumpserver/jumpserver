@@ -154,6 +154,10 @@ class UserGrantedMappingNode(FamilyMixin, models.JMSBaseModel):
     assets_amount = models.IntegerField(default=0)
 
 
+class RebuildUserTreeTask(models.JMSBaseModel):
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE, verbose_name=_('User'))
+
+
 class PermNode(Node):
     class Meta:
         proxy = True
