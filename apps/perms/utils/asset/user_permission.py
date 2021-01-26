@@ -18,6 +18,7 @@ from assets.models import (
 from orgs.models import Organization
 from perms.models import UserGrantedMappingNode, AssetPermission, PermNode
 from users.models import User
+from perms.locks import UserGrantedTreeRebuildLock
 
 logger = get_logger(__name__)
 
@@ -25,20 +26,6 @@ logger = get_logger(__name__)
 def ensure_not_in_root_org():
     if current_org.is_root():
         raise ValueError('Can not call in root org')
-
-
-# TODO 要删除的 -------------------------------------------
-
-
-def rebuild_user_mapping_nodes_if_need_with_lock(user: User):
-    pass
-
-
-def rebuild_user_mapping_nodes_with_lock(user: User):
-    pass
-
-
-# TODO 要删除的 -----------------------------------------------
 
 
 def get_user_all_asset_perm_ids(user) -> set:
@@ -119,12 +106,12 @@ class UserGrantedTreeRefreshController:
         )
 
         asset_perm_ids.update(
-            AssetPermission.nodes.through.objects.filter(node_id__in=node_ids).values_list('assetpermission_id',
-                                                                                           flat=True)
+            AssetPermission.nodes.through.objects.filter(
+                node_id__in=node_ids).values_list('assetpermission_id', flat=True)
         )
         asset_perm_ids.update(
-            AssetPermission.assets.through.objects.filter(asset_id__in=asset_ids).values_list('assetpermission_id',
-                                                                                              flat=True)
+            AssetPermission.assets.through.objects.filter(
+                asset_id__in=asset_ids).values_list('assetpermission_id', flat=True)
         )
         cls.add_need_refresh_by_asset_perm_ids(asset_perm_ids)
 
@@ -206,7 +193,7 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
         user = self.user
         org_id = current_org.id
 
-        with DistributedLock(name=f'perms.user.asset.node.tree.rebuid.<org_id:{org_id}>.<user_id:{user.id}>'):
+        with UserGrantedTreeRebuildLock(org_id, user.id):
             # 先删除旧的授权树🌲
             UserGrantedMappingNode.objects.filter(
                 user=user,
