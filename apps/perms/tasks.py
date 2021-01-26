@@ -91,12 +91,12 @@ def create_rebuild_user_tree_task(user_ids):
 @shared_task(queue='node_tree')
 def create_rebuild_user_tree_task_by_related_nodes_or_assets(node_ids, asset_ids):
     node_ids = set(node_ids)
-    node_keys = set()
+    ancestor_node_keys = set()
     nodes = Node.objects.filter(id__in=node_ids)
-    for _node in nodes:
-        node_keys.update(_node.get_ancestor_keys())
+    for node in nodes:
+        ancestor_node_keys.update(node.get_ancestor_keys())
     node_ids.update(
-        Node.objects.filter(key__in=node_keys).values_list('id', flat=True)
+        Node.objects.filter(key__in=ancestor_node_keys).values_list('id', flat=True)
     )
 
     asset_perms_id = set()
