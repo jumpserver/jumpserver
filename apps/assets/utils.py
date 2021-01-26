@@ -1,14 +1,12 @@
 # ~*~ coding: utf-8 ~*~
 #
-from django.db.models import Q
 from assets.tree import Tree
 from common.utils import get_logger, dict_get_any, is_uuid, get_object_or_none
-from common.utils.lock import DistributedLock
 from common.utils.common import random_string
 from common.http import is_true
 from orgs.utils import current_org
-from .models import Asset, Node
-
+from .models import Asset, Node, NodeAssetRelatedRecord
+from assets.locks import NodeTreeUpdateLock
 
 logger = get_logger(__file__)
 
@@ -18,7 +16,7 @@ def check_node_assets_amount():
         logger.error(f'Can not run check_node_assets_amount in root org')
         return
 
-    with DistributedLock(name=f"assets.nodes.tree.update.{current_org.id}", blocking=False):
+    with NodeTreeUpdateLock():
         ident = random_string(6)
         logger.info(f'[{ident}] Begin check node assets amount in {current_org}')
         nodes = list(Node.objects.exclude(key__startswith='-').only('id', 'key', 'parent_key'))
@@ -39,11 +37,9 @@ def check_node_assets_amount():
 
 
 def is_asset_exists_in_node(asset_pk, node_key):
-    return Asset.objects.filter(
-        id=asset_pk
-    ).filter(
-        Q(nodes__key__istartswith=f'{node_key}:') | Q(nodes__key=node_key)
-    ).exists()
+    node = Node.objects.only('id').get(key=node_key)
+    exists = NodeAssetRelatedRecord.objects.filter(asset_id=asset_pk, node_id=node.id).exists()
+    return exists
 
 
 def is_query_node_all_assets(request):
