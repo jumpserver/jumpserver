@@ -4,6 +4,7 @@
 from smtplib import SMTPSenderRefused
 from rest_framework import generics
 from rest_framework.views import Response, APIView
+from rest_framework.permissions import AllowAny
 from django.conf import settings
 from django.core.mail import send_mail, get_connection
 from django.utils.translation import ugettext_lazy as _
@@ -24,56 +25,93 @@ class MailTestingAPI(APIView):
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            email_host = serializer.validated_data['EMAIL_HOST']
-            email_port = serializer.validated_data['EMAIL_PORT']
-            email_host_user = serializer.validated_data["EMAIL_HOST_USER"]
-            email_host_password = serializer.validated_data['EMAIL_HOST_PASSWORD']
-            email_from = serializer.validated_data["EMAIL_FROM"]
-            email_recipient = serializer.validated_data["EMAIL_RECIPIENT"]
-            email_use_ssl = serializer.validated_data['EMAIL_USE_SSL']
-            email_use_tls = serializer.validated_data['EMAIL_USE_TLS']
+        serializer.is_valid(raise_exception=True)
 
-            # 设置 settings 的值，会导致动态配置在当前进程失效
-            # for k, v in serializer.validated_data.items():
-            #     if k.startswith('EMAIL'):
-            #         setattr(settings, k, v)
-            try:
-                subject = "Test"
-                message = "Test smtp setting"
-                email_from = email_from or email_host_user
-                email_recipient = email_recipient or email_from
-                connection = get_connection(
-                    host=email_host, port=email_port,
-                    username=email_host_user, password=email_host_password,
-                    use_tls=email_use_tls, use_ssl=email_use_ssl,
-                )
-                send_mail(
-                    subject, message, email_from, [email_recipient],
-                    connection=connection
-                )
-            except SMTPSenderRefused as e:
-                resp = e.smtp_error
-                if isinstance(resp, bytes):
-                    for coding in ('gbk', 'utf8'):
-                        try:
-                            resp = resp.decode(coding)
-                        except UnicodeDecodeError:
-                            continue
-                        else:
-                            break
-                return Response({"error": str(resp)}, status=400)
-            except Exception as e:
-                print(e)
-                return Response({"error": str(e)}, status=400)
-            return Response({"msg": self.success_message.format(email_recipient)})
-        else:
-            return Response({"error": str(serializer.errors)}, status=400)
+        email_host = serializer.validated_data['EMAIL_HOST']
+        email_port = serializer.validated_data['EMAIL_PORT']
+        email_host_user = serializer.validated_data["EMAIL_HOST_USER"]
+        email_host_password = serializer.validated_data['EMAIL_HOST_PASSWORD']
+        email_from = serializer.validated_data["EMAIL_FROM"]
+        email_recipient = serializer.validated_data["EMAIL_RECIPIENT"]
+        email_use_ssl = serializer.validated_data['EMAIL_USE_SSL']
+        email_use_tls = serializer.validated_data['EMAIL_USE_TLS']
+
+        # 设置 settings 的值，会导致动态配置在当前进程失效
+        # for k, v in serializer.validated_data.items():
+        #     if k.startswith('EMAIL'):
+        #         setattr(settings, k, v)
+        try:
+            subject = "Test"
+            message = "Test smtp setting"
+            email_from = email_from or email_host_user
+            email_recipient = email_recipient or email_from
+            connection = get_connection(
+                host=email_host, port=email_port,
+                username=email_host_user, password=email_host_password,
+                use_tls=email_use_tls, use_ssl=email_use_ssl,
+            )
+            send_mail(
+                subject, message, email_from, [email_recipient],
+                connection=connection
+            )
+        except SMTPSenderRefused as e:
+            error = e.smtp_error
+            if isinstance(error, bytes):
+                for coding in ('gbk', 'utf8'):
+                    try:
+                        error = error.decode(coding)
+                    except UnicodeDecodeError:
+                        continue
+                    else:
+                        break
+            return Response({"error": str(error)}, status=400)
+        except Exception as e:
+            logger.error(e)
+            return Response({"error": str(e)}, status=400)
+        return Response({"msg": self.success_message.format(email_recipient)})
 
 
 class PublicSettingApi(generics.RetrieveAPIView):
-    permission_classes = ()
+    permission_classes = (AllowAny,)
     serializer_class = serializers.PublicSettingSerializer
+
+    @staticmethod
+    def get_logo_urls():
+        logo_urls = {
+            'logo_logout': static('img/logo.png'),
+            'logo_index': static('img/logo_text.png'),
+            'login_image': static('img/login_image.png'),
+            'favicon': static('img/facio.ico')
+        }
+        if not settings.XPACK_ENABLED:
+            return logo_urls
+        from xpack.plugins.interface.models import Interface
+        obj = Interface.interface()
+        if not obj:
+            return logo_urls
+        for attr in ['logo_logout', 'logo_index', 'login_image', 'favicon']:
+            if getattr(obj, attr, '') and getattr(obj, attr).url:
+                logo_urls.update({attr: getattr(obj, attr).url})
+        return logo_urls
+
+    @staticmethod
+    def get_xpack_license_is_valid():
+        if not settings.XPACK_ENABLED:
+            return False
+        try:
+            from xpack.plugins.license.models import License
+            return License.has_valid_license()
+        except Exception as e:
+            logger.error(e)
+            return False
+
+    @staticmethod
+    def get_login_title():
+        default_title = _('Welcome to the JumpServer open source fortress')
+        if not settings.XPACK_ENABLED:
+            return default_title
+        from xpack.plugins.interface.models import Interface
+        return Interface.get_login_title()
 
     def get_object(self):
         instance = {
@@ -81,17 +119,14 @@ class PublicSettingApi(generics.RetrieveAPIView):
                 "WINDOWS_SKIP_ALL_MANUAL_PASSWORD": settings.WINDOWS_SKIP_ALL_MANUAL_PASSWORD,
                 "SECURITY_MAX_IDLE_TIME": settings.SECURITY_MAX_IDLE_TIME,
                 "XPACK_ENABLED": settings.XPACK_ENABLED,
-                "XPACK_LICENSE_IS_VALID": settings.XPACK_LICENSE_IS_VALID,
                 "LOGIN_CONFIRM_ENABLE": settings.LOGIN_CONFIRM_ENABLE,
                 "SECURITY_VIEW_AUTH_NEED_MFA": settings.SECURITY_VIEW_AUTH_NEED_MFA,
                 "SECURITY_MFA_VERIFY_TTL": settings.SECURITY_MFA_VERIFY_TTL,
                 "SECURITY_COMMAND_EXECUTION": settings.SECURITY_COMMAND_EXECUTION,
-                "LOGIN_TITLE": settings.XPACK_INTERFACE_LOGIN_TITLE,
                 "SECURITY_PASSWORD_EXPIRATION_TIME": settings.SECURITY_PASSWORD_EXPIRATION_TIME,
-                "LOGO_URLS": {'logo_logout': static('img/logo.png'),
-                              'logo_index': static('img/logo_text.png'),
-                              'login_image': static('img/login_image.png'),
-                              'favicon': static('img/facio.ico')},
+                "XPACK_LICENSE_IS_VALID": self.get_xpack_license_is_valid(),
+                "LOGIN_TITLE": self.get_login_title(),
+                "LOGO_URLS": self.get_logo_urls(),
                 "TICKETS_ENABLED": settings.TICKETS_ENABLED,
                 "PASSWORD_RULE": {
                     'SECURITY_PASSWORD_MIN_LENGTH': settings.SECURITY_PASSWORD_MIN_LENGTH,

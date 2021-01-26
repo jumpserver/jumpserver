@@ -2107,7 +2107,7 @@ msgid ""
 "email is jumpserver attr"
 msgstr ""
 "用户属性映射代表怎样将LDAP中用户属性映射到jumpserver用户上，username, name,"
-"email 是jumpserver的属性"
+"email 是jumpserver的用户需要属性"
 
 #: settings/serializers/settings.py:99
 msgid "Enable LDAP auth"

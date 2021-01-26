@@ -1,9 +1,7 @@
 # coding: utf-8
 
-from django.db import transaction
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
-from ..models import Setting
 
 __all__ = [
     'BasicSettingSerializer', 'EmailSettingSerializer', 'EmailContentSettingSerializer',
@@ -24,7 +22,7 @@ class BasicSettingSerializer(serializers.Serializer):
 
 
 class EmailSettingSerializer(serializers.Serializer):
-    encrypt_fields = ["EMAIL_HOST_PASSWORD", ]
+    # encrypt_fields 现在使用 write_only 来判断了
 
     EMAIL_HOST = serializers.CharField(max_length=1024, required=True, label=_("SMTP host"))
     EMAIL_PORT = serializers.CharField(max_length=5, required=True, label=_("SMTP port"))
@@ -77,7 +75,7 @@ class EmailContentSettingSerializer(serializers.Serializer):
 
 
 class LDAPSettingSerializer(serializers.Serializer):
-    encrypt_fields = ["AUTH_LDAP_BIND_PASSWORD", ]
+    # encrypt_fields 现在使用 write_only 来判断了
 
     AUTH_LDAP_SERVER_URI = serializers.CharField(
         required=True, max_length=1024, label=_('LDAP server'), help_text=_('eg: ldap://localhost:389')
@@ -182,33 +180,6 @@ class SettingsSerializer(
     SecuritySettingSerializer
 ):
 
-    encrypt_fields = ["EMAIL_HOST_PASSWORD", "AUTH_LDAP_BIND_PASSWORD"]
+    # encrypt_fields 现在使用 write_only 来判断了
+    pass
 
-    def create(self, validated_data):
-        pass
-
-    def _update(self, instance, validated_data):
-        for category, category_data in validated_data.items():
-            if not category_data:
-                continue
-            self.update_validated_settings(category_data)
-            for field_name, field_value in category_data.items():
-                setattr(getattr(instance, category), field_name, field_value)
-
-        return instance
-
-    def update_validated_settings(self, validated_data, category='default'):
-        if not validated_data:
-            return
-        with transaction.atomic():
-            for field_name, field_value in validated_data.items():
-                try:
-                    setting = Setting.objects.get(name=field_name)
-                except Setting.DoesNotExist:
-                    setting = Setting()
-                encrypted = True if field_name in self.encrypt_fields else False
-                setting.name = field_name
-                setting.category = category
-                setting.encrypted = encrypted
-                setting.cleaned_value = field_value
-                setting.save()
