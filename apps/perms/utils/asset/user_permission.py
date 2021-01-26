@@ -21,6 +21,12 @@ from users.models import User
 
 logger = get_logger(__name__)
 
+
+def ensure_not_in_root_org():
+    if current_org.is_root():
+        raise ValueError('Can not call in root org')
+
+
 # TODO 要删除的 -------------------------------------------
 
 
@@ -91,6 +97,56 @@ class UserGrantedTreeRefreshController:
 
             p.execute()
         logger.info(f'Mark <user_ids:{user_ids}> in <org_ids:{org_ids}> need refresh')
+
+    @classmethod
+    def add_need_refresh_on_nodes_assets_relate_change(cls, node_ids, asset_ids):
+        """
+        1，计算与这些资产有关的授权
+        2，计算与这些节点以及祖先节点有关的授权
+        """
+        ensure_not_in_root_org()
+
+        node_ids = set(node_ids)
+        ancestor_node_keys = set()
+
+        asset_perm_ids = set()
+
+        nodes = Node.objects.filter(id__in=node_ids).only('id', 'key')
+        for node in nodes:
+            ancestor_node_keys.update(node.get_ancestor_keys())
+        node_ids.update(
+            Node.objects.filter(key__in=ancestor_node_keys).values_list('id', flat=True)
+        )
+
+        asset_perm_ids.update(
+            AssetPermission.nodes.through.objects.filter(node_id__in=node_ids).values_list('assetpermission_id',
+                                                                                           flat=True)
+        )
+        asset_perm_ids.update(
+            AssetPermission.assets.through.objects.filter(asset_id__in=asset_ids).values_list('assetpermission_id',
+                                                                                              flat=True)
+        )
+        cls.add_need_refresh_by_asset_perm_ids(asset_perm_ids)
+
+    @classmethod
+    def add_need_refresh_by_asset_perm_ids(cls, asset_perm_ids):
+        ensure_not_in_root_org()
+
+        group_ids = AssetPermission.user_groups.through.objects.filter(
+            assetpermission_id__in=asset_perm_ids).values_list('usergroup_id', flat=True)
+
+        user_ids = set()
+        user_ids.update(
+            AssetPermission.users.through.objects.filter(
+                assetpermission_id__in=asset_perm_ids).values_list('user_id', flat=True)
+        )
+        user_ids.update(
+            User.groups.through.objects.filter(usergroup_id__in=group_ids).values_list('user_id', flat=True)
+        )
+
+        cls.add_need_refresh_orgs_for_users(
+            [current_org.id], user_ids
+        )
 
     def refresh_if_need(self, force=False):
         user = self.user
