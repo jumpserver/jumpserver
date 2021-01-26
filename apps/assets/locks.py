@@ -1,4 +1,4 @@
-from orgs.utils import current_org, ensure_not_in_root_org
+from orgs.utils import current_org, ensure_not_in_root_org, Organization
 from babel.support import LazyProxy
 from common.utils.lock import DistributedLock
 
@@ -8,11 +8,12 @@ class NodeTreeUpdateLock(DistributedLock):
 
     def get_name(self):
         ensure_not_in_root_org()
+        org = current_org or Organization.default()
         name = self.name_template.format(
-            org_id=current_org.id
+            org_id=org.id
         )
         return name
 
     def __init__(self, blocking=True):
         name = LazyProxy(self.get_name, enable_cache=False)
-        super().__init__(name=name, blocking=blocking)
+        super().__init__(name=name, blocking=blocking, release_lock_on_transaction_commit=True)
