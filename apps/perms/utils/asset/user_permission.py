@@ -5,12 +5,11 @@ from django.core.cache import cache
 from django.conf import settings
 from django.db.models import Q
 
-from common.utils.lock import DistributedLock
 from common.utils.common import lazyproperty
 from assets.tree import Tree
 from common.utils import get_logger
 from common.decorator import on_transaction_commit
-from orgs.utils import tmp_to_org, current_org
+from orgs.utils import tmp_to_org, current_org, ensure_not_in_root_org
 from assets.models import (
     Node, Asset, FavoriteAsset, NodeAssetRelatedRecord,
     AssetQuerySet, NodeQuerySet
@@ -21,11 +20,6 @@ from users.models import User
 from perms.locks import UserGrantedTreeRebuildLock
 
 logger = get_logger(__name__)
-
-
-def ensure_not_in_root_org():
-    if current_org.is_root():
-        raise ValueError('Can not call in root org')
 
 
 def get_user_all_asset_perm_ids(user) -> set:
@@ -187,8 +181,7 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
         return asset_ids
 
     def rebuild_user_granted_tree(self):
-        if current_org.is_root():
-            raise ValueError('Can not rebuild granted tree in root org')
+        ensure_not_in_root_org()
 
         user = self.user
         org_id = current_org.id
