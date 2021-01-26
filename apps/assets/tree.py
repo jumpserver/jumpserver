@@ -31,38 +31,36 @@ class BaseTree(object):
         raise NotImplemented
 
     @staticmethod
-    def _append_path_to_data_tree_node(data_tree_node, arg_path, **kwargs) -> Data_tree_node:
-        """ 给 Data_tree_node 节点添加路径 """
-        assert isinstance(data_tree_node, Data_tree_node), (
-            '`data_tree_node` must be an instance of `Data_tree_node`'
-        )
-        arg_node = kwargs.get('arg_node')
-        data_tree_node_of_path = data_tree_node.append_path(arg_path=arg_path, arg_node=arg_node)
-        return data_tree_node_of_path
+    def _append_path_to_tree_node(tree_node, arg_path, arg_node=None) -> Data_tree_node:
+        """
+        添加路径到 tree_node
+        arg - tree_node: instance of Data_tree_node
+        arg - arg_path: str
+        arg - arg_node: None or instance of Data_tree_node
+        """
+        tree_node_at_path = tree_node.append_path(arg_path=arg_path, arg_node=arg_node)
+        return tree_node_at_path
 
     @staticmethod
-    def _get_data_tree_node_at_path(data_tree_node, arg_path) -> Data_tree_node:
-        """ 获取 Data_tree_node 根据路径"""
-        assert isinstance(data_tree_node, Data_tree_node), (
-            '`data_tree_node` must be an instance of `Data_tree_node`'
-        )
-        data_tree_node_of_path = data_tree_node.get_node_child_at_path(arg_path=arg_path)
-        return data_tree_node_of_path
+    def _get_tree_node_at_path(tree_node: Data_tree_node, arg_path) -> Data_tree_node:
+        """ 根据路径获取 tree_node """
+        tree_node_at_path = tree_node.get_node_child_at_path(arg_path=arg_path)
+        return tree_node_at_path
 
     @staticmethod
-    def _get_data_tree_node_parent(data_tree_node: Data_tree_node) -> Data_tree_node:
-        return data_tree_node.get_node_parent()
+    def _get_tree_node_parent(tree_node: Data_tree_node) -> Data_tree_node:
+        """ 获取 tree_node 的父节点 """
+        return tree_node.get_node_parent()
 
     @staticmethod
-    def _paths_of_data_tree_node(data_tree_node: Data_tree_node, **kwargs) -> list:
-        """ 获取 Data_tree_node 节点的路径 """
-
+    def _paths_of_tree_node(tree_node: Data_tree_node, **kwargs) -> list:
+        """ 获取 tree_node 节点下的路径 """
         _arg_bool_search_sub_tree = kwargs.get('arg_bool_search_sub_tree', True)
         _arg_bool_search_entire_tree = kwargs.get('arg_bool_search_entire_tree', False)
         _arg_callable_filter = kwargs.get('arg_callable_filter')
         _arg_callable_formatter = kwargs.get('arg_callable_formatter')
 
-        paths = data_tree_node.get_list_of_pairs_paths_and_node_children(
+        paths = tree_node.get_list_of_pairs_paths_and_node_children(
             arg_bool_search_sub_tree=_arg_bool_search_sub_tree,
             arg_bool_search_entire_tree=_arg_bool_search_entire_tree,
             arg_callable_filter=_arg_callable_filter,
@@ -72,6 +70,7 @@ class BaseTree(object):
 
     @staticmethod
     def compute_ancestor_node_key(node_key):
+        """ 计算 node 的祖先节点 key """
         ancestor_key = []
         while len(node_key) > 1:
             parent_key = node_key.rsplit(sep=delimiter_for_path, maxsplit=1)[0]
@@ -80,15 +79,22 @@ class BaseTree(object):
         return ancestor_key
 
     def count_assets(self):
+        """ 计算所有的资产数量 """
         assets_id = self.get_assets_id()
         return len(assets_id)
 
     def count_assets_of_node(self, node_key, immediate=False):
-        """ 计算节点下资产数量 """
+        """
+        计算节点下的资产数量
+
+        arg - node_key:
+        arg - immediate: if True: 只计算节点的直接资产; else: 计算节点下的所有资产;
+        """
         assets_id = self.get_assets_id_of_node(node_key=node_key, immediate=immediate)
         return len(set(assets_id))
 
     def count_nodes(self, level=None):
+        """ 计算所有节点的数量 """
         nodes_key = self.get_nodes_key(level=level)
         return len(nodes_key)
 
@@ -158,13 +164,13 @@ class BaseTree(object):
             return delimiter_for_path.join(arg_iterable_path)
 
         if node_key is None:
-            _data_tree_node = self._root
+            _tree_node = self._root
             _arg_callable_formatter = arg_callable_formatter_of_node_path
         else:
-            _data_tree_node = self._get_data_tree_node_at_path(
-                data_tree_node=self._root, arg_path=node_key
+            _tree_node = self._get_tree_node_at_path(
+                tree_node=self._root, arg_path=node_key
             )
-            if _data_tree_node is None:
+            if _tree_node is None:
                 return []
             _arg_callable_formatter = arg_callable_formatter_of_node_absolute_path
 
@@ -180,8 +186,8 @@ class BaseTree(object):
                 _arg_bool_search_sub_tree = True
                 _arg_callable_filter = arg_callable_filter_of_node_key_level
 
-        paths = self._paths_of_data_tree_node(
-            data_tree_node=_data_tree_node,
+        paths = self._paths_of_tree_node(
+            tree_node=_tree_node,
             arg_bool_search_sub_tree=_arg_bool_search_sub_tree,
             arg_callable_filter=_arg_callable_filter,
             arg_callable_formatter=_arg_callable_formatter
@@ -230,25 +236,25 @@ class BaseTree(object):
             return path
 
         if node_key is None:
-            _data_tree_node = self._root
+            _tree_node = self._root
             _arg_bool_search_sub_tree = True
             _arg_callable_filter = arg_callable_filter_of_asset
         else:
             if immediate:
                 # Such as: node_key:.
-                _data_tree_node_keys = [node_key, delimiter_for_asset]
-                _data_tree_node_path = delimiter_for_path.join(_data_tree_node_keys)
+                _tree_node_keys = [node_key, delimiter_for_asset]
+                _tree_node_path = delimiter_for_path.join(_tree_node_keys)
                 _arg_bool_search_sub_tree = False
                 _arg_callable_filter = None
             else:
-                _data_tree_node_path = node_key
+                _tree_node_path = node_key
                 _arg_bool_search_sub_tree = True
                 _arg_callable_filter = arg_callable_filter_of_asset
 
-            _data_tree_node = self._get_data_tree_node_at_path(
-                data_tree_node=self._root, arg_path=_data_tree_node_path
+            _tree_node = self._get_tree_node_at_path(
+                tree_node=self._root, arg_path=_tree_node_path
             )
-            if _data_tree_node is None:
+            if _tree_node is None:
                 return []
 
         if asset_id_as_path:
@@ -256,8 +262,8 @@ class BaseTree(object):
         else:
             _arg_callable_formatter = arg_callable_formatter_of_asset_absolute_path
 
-        paths = self._paths_of_data_tree_node(
-            data_tree_node=_data_tree_node,
+        paths = self._paths_of_tree_node(
+            tree_node=_tree_node,
             arg_bool_search_sub_tree=_arg_bool_search_sub_tree,
             arg_callable_filter=_arg_callable_filter,
             arg_callable_formatter=_arg_callable_formatter
@@ -297,8 +303,8 @@ class BaseTree(object):
 
         _arg_callable_filter = arg_callable_filter_of_in_assets_id
 
-        paths = self._paths_of_data_tree_node(
-            data_tree_node=self._root,
+        paths = self._paths_of_tree_node(
+            tree_node=self._root,
             arg_callable_filter=_arg_callable_filter,
             arg_callable_formatter=_arg_callable_formatter
         )
@@ -326,9 +332,9 @@ class AssetTree(BaseTree):
 
         for node_id, node_key in nodes:
             path_of_node = delimiter_for_path.join([node_key, delimiter_for_asset])
-            data_tree_node = self._append_path_to_data_tree_node(self._root, arg_path=path_of_node)
+            tree_node = self._append_path_to_tree_node(self._root, arg_path=path_of_node)
             for asset_id in nodes_assets_id_mapping[str(node_id)]:
-                self._append_path_to_data_tree_node(data_tree_node, arg_path=asset_id)
+                self._append_path_to_tree_node(tree_node, arg_path=asset_id)
 
         t3 = time.time()
 
@@ -380,41 +386,41 @@ class AssetPermissionTree(BaseTree):
             path_of_flag_about_immediate_granted_node = delimiter_for_path.join([
                 node_key, delimiter_for_immediate_granted_flag
             ])
-            data_tree_node_of_flag_about_immediate_granted_node = self._get_data_tree_node_at_path(
-                data_tree_node=self._root, arg_path=path_of_flag_about_immediate_granted_node
+            tree_node_of_flag_about_immediate_granted_node = self._get_tree_node_at_path(
+                tree_node=self._root, arg_path=path_of_flag_about_immediate_granted_node
             )
-            if data_tree_node_of_flag_about_immediate_granted_node is None:
+            if tree_node_of_flag_about_immediate_granted_node is None:
                 # 添加授权的节点
-                arg_node = self.asset_tree._get_data_tree_node_at_path(
-                    data_tree_node=self.asset_tree._root, arg_path=node_key
+                arg_node = self.asset_tree._get_tree_node_at_path(
+                    tree_node=self.asset_tree._root, arg_path=node_key
                 )
                 arg_node = Data_tree_node(arg_data=arg_node)
-                data_tree_node = self._append_path_to_data_tree_node(
-                    data_tree_node=self._root, arg_path=node_key, arg_node=arg_node
+                tree_node = self._append_path_to_tree_node(
+                    tree_node=self._root, arg_path=node_key, arg_node=arg_node
                 )
 
                 # 添加直接授权的标志路径
-                self._append_path_to_data_tree_node(
-                    data_tree_node=data_tree_node, arg_path=delimiter_for_immediate_granted_flag
+                self._append_path_to_tree_node(
+                    tree_node=tree_node, arg_path=delimiter_for_immediate_granted_flag
                 )
 
                 # 添加授权的系统用户容器路径
-                data_tree_node_of_system_users = self._append_path_to_data_tree_node(
-                    data_tree_node=data_tree_node, arg_path=delimiter_for_system_user
+                tree_node_of_system_users = self._append_path_to_tree_node(
+                    tree_node=tree_node, arg_path=delimiter_for_system_user
                 )
             else:
                 # 之前的授权规则已经添加过
-                data_tree_node = self._get_data_tree_node_parent(
-                    data_tree_node=data_tree_node_of_flag_about_immediate_granted_node
+                tree_node = self._get_tree_node_parent(
+                    tree_node=tree_node_of_flag_about_immediate_granted_node
                 )
-                data_tree_node_of_system_users = self._get_data_tree_node_at_path(
-                    data_tree_node=data_tree_node, arg_path=delimiter_for_system_user
+                tree_node_of_system_users = self._get_tree_node_at_path(
+                    tree_node=tree_node, arg_path=delimiter_for_system_user
                 )
 
             # 添加授权的系统用户
             for system_user_id in system_users_id:
-                self._append_path_to_data_tree_node(
-                    data_tree_node=data_tree_node_of_system_users, arg_path=system_user_id
+                self._append_path_to_tree_node(
+                    tree_node=tree_node_of_system_users, arg_path=system_user_id
                 )
 
         # 添加直接授权的资产以及系统用户
@@ -423,37 +429,37 @@ class AssetPermissionTree(BaseTree):
             path_of_flag_about_immediate_granted_asset = delimiter_for_path.join([
                 path_of_asset, delimiter_for_immediate_granted_flag
             ])
-            data_tree_node_of_flag_immediate_granted_asset = self._get_data_tree_node_at_path(
-                data_tree_node=self._root, arg_path=path_of_flag_about_immediate_granted_asset
+            tree_node_of_flag_immediate_granted_asset = self._get_tree_node_at_path(
+                tree_node=self._root, arg_path=path_of_flag_about_immediate_granted_asset
             )
-            if data_tree_node_of_flag_immediate_granted_asset is None:
+            if tree_node_of_flag_immediate_granted_asset is None:
                 # 添加授权的资产
-                data_tree_node_of_asset = self._append_path_to_data_tree_node(
-                    data_tree_node=self._root, arg_path=path_of_asset
+                tree_node_of_asset = self._append_path_to_tree_node(
+                    tree_node=self._root, arg_path=path_of_asset
                 )
                 # 添加直接授权的标志路径
-                self._append_path_to_data_tree_node(
-                    data_tree_node=data_tree_node_of_asset,
+                self._append_path_to_tree_node(
+                    tree_node=tree_node_of_asset,
                     arg_path=delimiter_for_immediate_granted_flag
                 )
                 # 添加授权的系统用户容器路径
-                data_tree_node_of_asset_system_users = self._append_path_to_data_tree_node(
-                    data_tree_node=data_tree_node_of_asset,
+                tree_node_of_asset_system_users = self._append_path_to_tree_node(
+                    tree_node=tree_node_of_asset,
                     arg_path=delimiter_for_system_user
                 )
             else:
                 # 之前的授权规则已经添加过
-                data_tree_node_of_asset = self._get_data_tree_node_parent(
-                    data_tree_node=data_tree_node_of_flag_immediate_granted_asset
+                tree_node_of_asset = self._get_tree_node_parent(
+                    tree_node=tree_node_of_flag_immediate_granted_asset
                 )
-                data_tree_node_of_asset_system_users = self._get_data_tree_node_at_path(
-                    data_tree_node=data_tree_node_of_asset, arg_path=delimiter_for_system_user
+                tree_node_of_asset_system_users = self._get_tree_node_at_path(
+                    tree_node=tree_node_of_asset, arg_path=delimiter_for_system_user
                 )
 
             # 添加授权的系统用户
             for system_user_id in system_users_id:
-                self._append_path_to_data_tree_node(
-                    data_tree_node=data_tree_node_of_asset_system_users, arg_path=system_user_id
+                self._append_path_to_tree_node(
+                    tree_node=tree_node_of_asset_system_users, arg_path=system_user_id
                 )
 
     def count_assets_of_granted(self):
@@ -534,8 +540,8 @@ class AssetPermissionTree(BaseTree):
 
         _arg_callable_filter = arg_callable_filter_of_asset_about_immediate_granted
 
-        paths = self._paths_of_data_tree_node(
-            data_tree_node=self._root,
+        paths = self._paths_of_tree_node(
+            tree_node=self._root,
             arg_callable_filter=_arg_callable_filter,
             arg_callable_formatter=_arg_callable_formatter
         )
@@ -565,8 +571,8 @@ class AssetPermissionTree(BaseTree):
         _arg_callable_filter = arg_callable_filter_of_node_about_immediate_granted
         _arg_callable_formatter = arg_callable_formatter_of_node_path
 
-        paths = self._paths_of_data_tree_node(
-            data_tree_node=self._root,
+        paths = self._paths_of_tree_node(
+            tree_node=self._root,
             arg_callable_filter=_arg_callable_filter,
             arg_callable_formatter=_arg_callable_formatter
         )
@@ -707,8 +713,8 @@ class AssetPermissionTree(BaseTree):
         else:
             _arg_callable_formatter = arg_callable_formatter_of_system_user_path
 
-        paths = self._paths_of_data_tree_node(
-            data_tree_node=self._root,
+        paths = self._paths_of_tree_node(
+            tree_node=self._root,
             arg_callable_filter=_arg_callable_filter,
             arg_callable_formatter=_arg_callable_formatter
         )
