@@ -10,76 +10,21 @@ from rest_framework.views import Response, APIView
 from django.conf import settings
 from django.core.mail import send_mail, get_connection
 from django.utils.translation import ugettext_lazy as _
-from rest_framework import serializers
 
-from .utils import (
+from ..utils import (
     LDAPServerUtil, LDAPCacheUtil, LDAPImportUtil, LDAPSyncUtil,
     LDAP_USE_CACHE_FLAGS, LDAPTestUtil, ObjectDict
 )
-from .tasks import sync_ldap_user
+from ..tasks import sync_ldap_user
 from common.permissions import IsOrgAdmin, IsSuperUser
 from common.utils import get_logger
-from .serializers import (
+from ..serializers import (
     MailTestSerializer, LDAPTestConfigSerializer, LDAPUserSerializer,
     PublicSettingSerializer, LDAPTestLoginSerializer, SettingsSerializer
 )
 from users.models import User
 
 logger = get_logger(__file__)
-
-
-class MailTestingAPI(APIView):
-    permission_classes = (IsSuperUser,)
-    serializer_class = MailTestSerializer
-    success_message = _("Test mail sent to {}, please check")
-
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            email_host = serializer.validated_data['EMAIL_HOST']
-            email_port = serializer.validated_data['EMAIL_PORT']
-            email_host_user = serializer.validated_data["EMAIL_HOST_USER"]
-            email_host_password = serializer.validated_data['EMAIL_HOST_PASSWORD']
-            email_from = serializer.validated_data["EMAIL_FROM"]
-            email_recipient = serializer.validated_data["EMAIL_RECIPIENT"]
-            email_use_ssl = serializer.validated_data['EMAIL_USE_SSL']
-            email_use_tls = serializer.validated_data['EMAIL_USE_TLS']
-
-            # 设置 settings 的值，会导致动态配置在当前进程失效
-            # for k, v in serializer.validated_data.items():
-            #     if k.startswith('EMAIL'):
-            #         setattr(settings, k, v)
-            try:
-                subject = "Test"
-                message = "Test smtp setting"
-                email_from = email_from or email_host_user
-                email_recipient = email_recipient or email_from
-                connection = get_connection(
-                    host=email_host, port=email_port,
-                    username=email_host_user, password=email_host_password,
-                    use_tls=email_use_tls, use_ssl=email_use_ssl,
-                )
-                send_mail(
-                    subject, message, email_from, [email_recipient],
-                    connection=connection
-                )
-            except SMTPSenderRefused as e:
-                resp = e.smtp_error
-                if isinstance(resp, bytes):
-                    for coding in ('gbk', 'utf8'):
-                        try:
-                            resp = resp.decode(coding)
-                        except UnicodeDecodeError:
-                            continue
-                        else:
-                            break
-                return Response({"error": str(resp)}, status=400)
-            except Exception as e:
-                print(e)
-                return Response({"error": str(e)}, status=400)
-            return Response({"msg": self.success_message.format(email_recipient)})
-        else:
-            return Response({"error": str(serializer.errors)}, status=400)
 
 
 class LDAPTestingConfigAPI(APIView):
@@ -262,59 +207,3 @@ class LDAPCacheRefreshAPI(generics.RetrieveAPIView):
             return Response(data={'msg': str(e)}, status=400)
         return Response(data={'msg': 'success'})
 
-
-class PublicSettingApi(generics.RetrieveAPIView):
-    permission_classes = ()
-    serializer_class = PublicSettingSerializer
-
-    def get_object(self):
-        instance = {
-            "data": {
-                "WINDOWS_SKIP_ALL_MANUAL_PASSWORD": settings.WINDOWS_SKIP_ALL_MANUAL_PASSWORD,
-                "SECURITY_MAX_IDLE_TIME": settings.SECURITY_MAX_IDLE_TIME,
-                "XPACK_ENABLED": settings.XPACK_ENABLED,
-                "XPACK_LICENSE_IS_VALID": settings.XPACK_LICENSE_IS_VALID,
-                "LOGIN_CONFIRM_ENABLE": settings.LOGIN_CONFIRM_ENABLE,
-                "SECURITY_VIEW_AUTH_NEED_MFA": settings.SECURITY_VIEW_AUTH_NEED_MFA,
-                "SECURITY_MFA_VERIFY_TTL": settings.SECURITY_MFA_VERIFY_TTL,
-                "SECURITY_COMMAND_EXECUTION": settings.SECURITY_COMMAND_EXECUTION,
-                "LOGIN_TITLE": settings.XPACK_INTERFACE_LOGIN_TITLE,
-                "SECURITY_PASSWORD_EXPIRATION_TIME": settings.SECURITY_PASSWORD_EXPIRATION_TIME,
-                "LOGO_URLS": settings.LOGO_URLS,
-                "TICKETS_ENABLED": settings.TICKETS_ENABLED,
-                "PASSWORD_RULE": {
-                    'SECURITY_PASSWORD_MIN_LENGTH': settings.SECURITY_PASSWORD_MIN_LENGTH,
-                    'SECURITY_PASSWORD_UPPER_CASE': settings.SECURITY_PASSWORD_UPPER_CASE,
-                    'SECURITY_PASSWORD_LOWER_CASE': settings.SECURITY_PASSWORD_LOWER_CASE,
-                    'SECURITY_PASSWORD_NUMBER': settings.SECURITY_PASSWORD_NUMBER,
-                    'SECURITY_PASSWORD_SPECIAL_CHAR': settings.SECURITY_PASSWORD_SPECIAL_CHAR,
-                }
-            }
-        }
-        return instance
-
-
-class SettingsApi(generics.RetrieveUpdateAPIView):
-    permission_classes = (IsSuperUser,)
-    serializer_class = SettingsSerializer
-
-    def get_object(self):
-        instance = {category: self._get_setting_fields_obj(list(category_serializer.get_fields()))
-                    for category, category_serializer in self.serializer_class().get_fields().items()
-                    if isinstance(category_serializer, serializers.Serializer)}
-        return ObjectDict(instance)
-
-    def perform_update(self, serializer):
-        serializer.save()
-
-    def _get_setting_fields_obj(self, category_fields):
-        if isinstance(category_fields, Iterable):
-            fields_data = {field_name: getattr(settings, field_name)
-                           for field_name in category_fields}
-            return ObjectDict(fields_data)
-
-        if isinstance(category_fields, str):
-            fields_data = {category_fields: getattr(settings, category_fields)}
-            return ObjectDict(fields_data)
-
-        return ObjectDict()
