@@ -3,8 +3,6 @@
 from django.db.models.signals import m2m_changed, pre_delete
 from django.dispatch import receiver
 
-from perms.tasks import create_rebuild_user_tree_task, \
-    create_rebuild_user_tree_task_by_related_nodes_or_assets
 from users.models import User
 from assets.models import Asset
 from orgs.utils import current_org
@@ -37,27 +35,7 @@ def on_user_groups_change(sender, instance, action, reverse, pk_set, **kwargs):
 @receiver([pre_delete], sender=AssetPermission)
 def on_asset_permission_delete(sender, instance, **kwargs):
     # 授权删除之前，查出所有相关用户
-    create_rebuild_user_tree_task_by_asset_perm(instance)
-
-
-def create_rebuild_user_tree_task_by_asset_perm(asset_perm: AssetPermission):
-    user_ids = set()
-
-    user_ids.update(AssetPermission.users.through.objects.filter(
-        assetpermission_id=asset_perm.id
-    ).values_list('user_id', flat=True).distinct())
-
-    group_ids = list(AssetPermission.user_groups.through.objects.filter(
-        assetpermission_id=asset_perm.id
-    ).values_list('usergroup_id', flat=True).distinct())
-
-    user_ids.update(User.groups.through.objects.filter(
-        usergroup_id__in=group_ids
-    ).values_list('user_id', flat=True).distinct())
-
-    UserGrantedTreeRefreshController.add_need_refresh_orgs_for_users(
-        [current_org.id], user_ids
-    )
+    UserGrantedTreeRefreshController.add_need_refresh_by_asset_perm_ids([instance.id])
 
 
 def need_rebuild_mapping_node(action):
@@ -70,7 +48,7 @@ def on_permission_nodes_changed(sender, instance, action, reverse, pk_set, model
         raise M2MReverseNotAllowed
 
     if need_rebuild_mapping_node(action):
-        create_rebuild_user_tree_task_by_asset_perm(instance)
+        UserGrantedTreeRefreshController.add_need_refresh_by_asset_perm_ids([instance.id])
 
 
 @receiver(m2m_changed, sender=AssetPermission.assets.through)
@@ -79,7 +57,7 @@ def on_permission_assets_changed(sender, instance, action, reverse, pk_set, mode
         raise M2MReverseNotAllowed
 
     if need_rebuild_mapping_node(action):
-        create_rebuild_user_tree_task_by_asset_perm(instance)
+        UserGrantedTreeRefreshController.add_need_refresh_by_asset_perm_ids([instance.id])
 
 
 @receiver(m2m_changed, sender=AssetPermission.users.through)
@@ -118,4 +96,4 @@ def on_node_asset_change(action, instance, reverse, pk_set, **kwargs):
         asset_pk_set = [instance.id]
         node_pk_set = pk_set
 
-    create_rebuild_user_tree_task_by_related_nodes_or_assets.delay(node_pk_set, asset_pk_set)
+    UserGrantedTreeRefreshController.add_need_refresh_on_nodes_assets_relate_change(node_pk_set, asset_pk_set)

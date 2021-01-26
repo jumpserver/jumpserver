@@ -155,9 +155,15 @@ def test():
     nodes = list(Node.objects.exclude(key__startswith='-').only('id', 'key', 'parent_key'))
     node_asset_id_pairs = Asset.nodes.through.objects.all().values_list('node_id', 'asset_id')
     t2 = time.time()
-
-    tree = Tree(nodes, node_asset_id_pairs)
+    node_asset_id_pairs = list(node_asset_id_pairs)
+    tree = Tree(nodes,  node_asset_id_pairs)
     tree.build_tree()
+    tree.nodes = None
+    tree.node_asset_id_pairs = None
+    import pickle
+    d = pickle.dumps(tree)
+    print('------------', len(d))
+    return tree
     tree.compute_tree_node_assets_amount()
 
     print(f'校对算法准确性 ......')
