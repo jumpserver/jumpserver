@@ -80,21 +80,26 @@ class Setting(models.Model):
 
     def refresh_setting(self):
         logger.debug(f"Refresh setting: {self.name}")
-        if hasattr(self, f'refresh_{self.name}'):
-            getattr(self, f'refresh_{self.name}')()
+        if hasattr(self.__class__, f'refresh_{self.name}'):
+            getattr(self.__class__, f'refresh_{self.name}')()
         else:
             setattr(settings, self.name, self.cleaned_value)
 
-    def refresh_AUTH_LDAP(self):
+    @classmethod
+    def refresh_AUTH_LDAP(cls):
+        setting = cls.objects.filter(name='AUTH_LDAP').first()
+        if not setting:
+            return
         ldap_backend = 'authentication.backends.ldap.LDAPAuthorizationBackend'
         backends = settings.AUTHENTICATION_BACKENDS
         has = ldap_backend in backends
-        if self.cleaned_value and not has:
+        if setting.cleaned_value and not has:
             settings.AUTHENTICATION_BACKENDS.insert(0, ldap_backend)
 
-        if not self.cleaned_value and has:
+        if not setting.cleaned_value and has:
             index = backends.index(ldap_backend)
             backends.pop(index)
+        settings.AUTH_LDAP = setting.cleaned_value
 
     @classmethod
     def update_or_create(cls, name='', value='', encrypted=False, category=''):
