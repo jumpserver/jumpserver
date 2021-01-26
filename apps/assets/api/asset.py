@@ -3,10 +3,10 @@
 from assets.api import FilterAssetByNodeMixin
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import RetrieveAPIView
-from rest_framework.response import Response
-from rest_framework import status
 from django.shortcuts import get_object_or_404
+from django.utils.decorators import method_decorator
 
+from assets.locks import NodeTreeUpdateLock
 from common.utils import get_logger, get_object_or_none
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, IsSuperUser
 from orgs.mixins.api import OrgBulkModelViewSet
@@ -27,6 +27,9 @@ __all__ = [
 ]
 
 
+@method_decorator(NodeTreeUpdateLock(), name='create')
+@method_decorator(NodeTreeUpdateLock(), name='destroy')
+@method_decorator(NodeTreeUpdateLock(), name='bulk_destroy')
 class AssetViewSet(FilterAssetByNodeMixin, OrgBulkModelViewSet):
     """
     API endpoint that allows Asset to be viewed or edited.

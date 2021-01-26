@@ -3,6 +3,7 @@ import threading
 
 from redis_lock import Lock as RedisLock
 from redis import Redis
+from django.db import transaction
 
 from common.utils import get_logger
 from common.utils.inspect import copy_function_args
@@ -16,7 +17,7 @@ class AcquireFailed(RuntimeError):
 
 
 class DistributedLock(RedisLock):
-    def __init__(self, name, blocking=True, expire=60*2, auto_renewal=True):
+    def __init__(self, name, blocking=True, expire=60*2, auto_renewal=True, release_lock_on_transaction_commit=False):
         """
         使用 redis 构造的分布式锁
 
@@ -34,6 +35,7 @@ class DistributedLock(RedisLock):
         redis = Redis(host=CONFIG.REDIS_HOST, port=CONFIG.REDIS_PORT, password=CONFIG.REDIS_PASSWORD)
         super().__init__(redis_client=redis, name=name, expire=expire, auto_renewal=auto_renewal)
         self._blocking = blocking
+        self._release_lock_on_transaction_commit = release_lock_on_transaction_commit
 
     def __enter__(self):
         thread_id = threading.current_thread().ident
@@ -49,7 +51,10 @@ class DistributedLock(RedisLock):
         return self
 
     def __exit__(self, exc_type=None, exc_value=None, traceback=None):
-        self.release()
+        if self._release_lock_on_transaction_commit:
+            transaction.on_commit(self.release)
+        else:
+            self.release()
 
     def __call__(self, func):
         @wraps(func)

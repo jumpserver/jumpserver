@@ -187,5 +187,5 @@ current_org = LocalProxy(get_current_org)
 
 
 def ensure_not_in_root_org():
-    if current_org.is_root():
+    if current_org and current_org.is_root():
         raise ValueError('Can not call in root org')
