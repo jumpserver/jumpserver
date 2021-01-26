@@ -426,35 +426,6 @@ class Config(dict):
         return self.get(item)
 
 
-class DynamicConfig:
-    def __init__(self, static_config):
-        self.static_config = static_config
-        self.db_setting = None
-
-    def __getitem__(self, item):
-        return self.dynamic(item)
-
-    def __getattr__(self, item):
-        return self.dynamic(item)
-
-    def dynamic(self, item):
-        return lambda: self.get(item)
-
-    def get_from_db(self, item):
-        if self.db_setting is not None:
-            value = self.db_setting.get(item)
-            if value is not None:
-                return value
-        return None
-
-    def get(self, item):
-        # 先从数据库中获取
-        value = self.get_from_db(item)
-        if value is not None:
-            return value
-        return self.static_config.get(item)
-
-
 class ConfigManager:
     config_class = Config
 
@@ -631,7 +602,3 @@ class ConfigManager:
         # 对config进行兼容处理
         config.compatible()
         return config
-
-    @classmethod
-    def get_dynamic_config(cls, config):
-        return DynamicConfig(config)
