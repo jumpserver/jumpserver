@@ -184,3 +184,8 @@ def org_aware_func(org_arg_name):
 
 
 current_org = LocalProxy(get_current_org)
+
+
+def ensure_not_in_root_org():
+    if current_org.is_root():
+        raise ValueError('Can not call in root org')
