@@ -5,7 +5,6 @@ import threading
 from operator import add, sub
 from itertools import chain
 
-from assets.utils import is_asset_exists_in_node
 from django.db.models.signals import (
     post_save, m2m_changed, pre_delete, post_delete, pre_save
 )
@@ -211,15 +210,16 @@ def on_asset_nodes_add(instance, action, reverse, pk_set, **kwargs):
     m2m_model.objects.bulk_create(to_create)
 
 
-def _remove_ancestor_keys(ancestor_key, tree_set):
-    # 这里判断 `ancestor_key` 不能是空，防止数据错误导致的死循环
-    # 判断是否在集合里，来区分是否已被处理过
-    while ancestor_key and ancestor_key in tree_set:
-        tree_set.remove(ancestor_key)
-        ancestor_key = compute_parent_key(ancestor_key)
-
 
 class MaintainNodesAssetsTree:
+
+    @classmethod
+    def remove_ancestor_keys(cls, ancestor_key, tree_set):
+        # 这里判断 `ancestor_key` 不能是空，防止数据错误导致的死循环
+        # 判断是否在集合里，来区分是否已被处理过
+        while ancestor_key and ancestor_key in tree_set:
+            tree_set.remove(ancestor_key)
+            ancestor_key = compute_parent_key(ancestor_key)
 
     @classmethod
     def do_node_assets_amount(cls, sender, action, instance, reverse, pk_set, **kwargs):
@@ -304,6 +304,12 @@ class MaintainNodesAssetsTree:
         NodeAssetRelatedRecord.objects.filter(related_count__lt=1).delete()
 
     @classmethod
+    def _is_asset_exists_in_node(cls, asset_pk, node_key):
+        node = Node.objects.only('id').get(key=node_key)
+        exists = NodeAssetRelatedRecord.objects.filter(asset_id=asset_pk, node_id=node.id).exists()
+        return exists
+
+    @classmethod
     def update_nodes_asset_amount(cls, node_keys, asset_pk, operator):
         """
         一个资产与多个节点关系变化时，更新计数
@@ -325,12 +331,12 @@ class MaintainNodesAssetsTree:
         for key in node_keys:
             # 遍历相关节点，处理它及其祖先节点
             # 查询该节点是否包含待处理资产
-            exists = is_asset_exists_in_node(asset_pk, key)
+            exists = cls._is_asset_exists_in_node(asset_pk, key)
             parent_key = compute_parent_key(key)
 
             if exists:
                 # 如果资产在该节点，那么他及其祖先节点都不用处理
-                _remove_ancestor_keys(parent_key, ancestor_keys)
+                cls.remove_ancestor_keys(parent_key, ancestor_keys)
                 continue
             else:
                 # 不存在，要更新本节点
@@ -338,9 +344,9 @@ class MaintainNodesAssetsTree:
                 # 这里判断 `parent_key` 不能是空，防止数据错误导致的死循环
                 # 判断是否在集合里，来区分是否已被处理过
                 while parent_key and parent_key in ancestor_keys:
-                    exists = is_asset_exists_in_node(asset_pk, parent_key)
+                    exists = cls._is_asset_exists_in_node(asset_pk, parent_key)
                     if exists:
-                        _remove_ancestor_keys(parent_key, ancestor_keys)
+                        cls.remove_ancestor_keys(parent_key, ancestor_keys)
                         break
                     else:
                         to_update_keys.append(parent_key)
