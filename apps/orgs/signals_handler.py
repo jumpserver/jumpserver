@@ -171,12 +171,10 @@ class OrgResourceStatisticsRefreshUtil:
 
 @receiver(post_save)
 def on_post_save_refresh_org_resource_statistics_cache(sender, instance, created, **kwargs):
-    return
     if created:
         OrgResourceStatisticsRefreshUtil.refresh_if_need(instance)
 
 
 @receiver(pre_delete)
 def on_pre_delete_refresh_org_resource_statistics_cache(sender, instance, **kwargs):
-    return
     OrgResourceStatisticsRefreshUtil.refresh_if_need(instance)
