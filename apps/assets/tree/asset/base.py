@@ -28,10 +28,12 @@ def contains_path_key_for_asset(arg_iterable_path, arg_node):
 
 
 def is_node_path(arg_iterable_path):
+    """ 是否是节点路径 """
     return ''.join(arg_iterable_path).isdigit()
 
 
 def iterable_path_as_string(iterable_path):
+    """ 可迭代路径转化为string """
     return delimiter_for_path.join(iterable_path)
 
 
