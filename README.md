@@ -369,6 +369,16 @@ v2.1.0 是 v2.0.0 之后的功能版本。
 - [Koko](https://github.com/jumpserver/koko) JumpServer 字符协议 Connector 项目，替代原来 Python 版本的 [Coco](https://github.com/jumpserver/coco)
 - [Guacamole](https://github.com/jumpserver/docker-guacamole) JumpServer 图形协议 Connector 项目，依赖 [Apache Guacamole](https://guacamole.apache.org/)
 
+## 贡献
+如果有你好的想法创意，或者帮助我们修复了 Bug, 欢迎提交 Pull Request
+
+感谢以下贡献者，让 JumpServer 更加完善
+
+<a href="https://github.com/jumpserver/jumpserver/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=jumpserver/jumpserver" />
+</a>
+
+
 ## 致谢
 - [Apache Guacamole](https://guacamole.apache.org/) Web页面连接 RDP, SSH, VNC协议设备，JumpServer 图形化连接依赖
 - [OmniDB](https://omnidb.org/) Web页面连接使用数据库，JumpServer Web数据库依赖
