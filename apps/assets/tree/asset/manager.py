@@ -25,6 +25,9 @@ class AssetTreeManager(object):
         return _tree
 
     def refresh_tree(self, org_id):
+        return self.__refresh_tree(org_id=org_id)
+
+    def __refresh_tree(self, org_id):
         self.__destroy_tree(org_id)
         _tree = self.__initial_tree(org_id)
         self.__set_tree(_tree, org_id)
