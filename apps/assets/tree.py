@@ -23,7 +23,6 @@ class BaseTree(object):
     def __init__(self, org_id, *args, **kwargs):
         self._root = Data_tree_node(arg_string_delimiter_for_path=delimiter_for_path)
         self._org_id = org_id
-        self.initial()
 
     @abc.abstractmethod
     def initial(self):
@@ -224,6 +223,10 @@ class BaseTree(object):
             return asset_id
 
         def arg_callable_formatter_of_asset_absolute_path(arg_iterable_path, arg_node):
+            # TODO: Perf
+            if node_key is None:
+                return delimiter_for_path.join(arg_iterable_path)
+
             if delimiter_for_asset not in arg_iterable_path:
                 arg_iterable_path.insert(0, delimiter_for_asset)
 
@@ -341,9 +344,6 @@ class AssetTree(BaseTree):
         print('t1-t2: {}, t2-t3: {}'.format(t2-t1, t3-t2))
 
 
-asset_tree = AssetTree(org_id='')
-
-
 delimiter_for_system_user = '$'
 delimiter_for_immediate_granted_flag = '@'
 
@@ -351,13 +351,10 @@ delimiter_for_immediate_granted_flag = '@'
 class AssetPermissionTree(BaseTree):
     """ 资产授权树 """
 
-    def __init__(self, permissions, *args, **kwargs):
+    def __init__(self, asset_tree: AssetTree, permissions, *args, **kwargs):
+        self._asset_tree = asset_tree
         self._permissions = permissions
         super().__init__(*args, **kwargs)
-
-    @property
-    def asset_tree(self) -> AssetTree:
-        return asset_tree
 
     def initial(self, *args, **kwargs):
         """ 初始化树 """
@@ -391,8 +388,8 @@ class AssetPermissionTree(BaseTree):
             )
             if tree_node_of_flag_about_immediate_granted_node is None:
                 # 添加授权的节点
-                arg_node = self.asset_tree._get_tree_node_at_path(
-                    tree_node=self.asset_tree._root, arg_path=node_key
+                arg_node = self._asset_tree._get_tree_node_at_path(
+                    tree_node=self._asset_tree._root, arg_path=node_key
                 )
                 arg_node = Data_tree_node(arg_data=arg_node)
                 tree_node = self._append_path_to_tree_node(
@@ -424,7 +421,7 @@ class AssetPermissionTree(BaseTree):
                 )
 
         # 添加直接授权的资产以及系统用户
-        path_of_assets = self.asset_tree.paths_of_assets_for_assets_id(assets_id=assets_id)
+        path_of_assets = self._asset_tree.paths_of_assets_for_assets_id(assets_id=assets_id)
         for path_of_asset in path_of_assets:
             path_of_flag_about_immediate_granted_asset = delimiter_for_path.join([
                 path_of_asset, delimiter_for_immediate_granted_flag
@@ -719,21 +716,3 @@ class AssetPermissionTree(BaseTree):
             arg_callable_formatter=_arg_callable_formatter
         )
         return paths
-
-
-asset_permissions = AssetPermission.objects.filter(name='x')
-asset_permission_tree = AssetPermissionTree(org_id='', permissions=asset_permissions)
-print(asset_permission_tree.count_assets_of_node('1'))
-print(asset_permission_tree.paths_of_nodes_about_immediate_granted())
-print(asset_permission_tree.paths_of_assets_about_immediate_granted())
-
-
-class AssetSearchTree(BaseTree):
-    """ 资产搜索树 """
-
-    @property
-    def asset_tree(self):
-        return asset_tree
-
-    def initial(self):
-        pass
