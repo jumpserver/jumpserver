@@ -60,7 +60,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
     <td>RADIUS 二次认证</td>
   </tr>
   <tr>
-    <td>登录复核X</td>
+    <td>登录复核:rose:</td>
     <td>用户登录行为受管理员的监管与控制</td>
   </tr>
   <tr>
@@ -85,22 +85,22 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
     <td>密码过期设置</td>
   </tr>
   <tr>
-    <td rowspan="2">批量改密X</td>
+    <td rowspan="2">批量改密:rose:</td>
     <td>定期批量改密</td>
   </tr>
   <tr>
     <td>多种密码策略</td>
   </tr>
   <tr>
-    <td>多云纳管X </td>
+    <td>多云纳管:rose: </td>
     <td>对私有云、公有云资产自动统一纳管</td>
   </tr>
   <tr>
-    <td>收集用户X </td>
+    <td>收集用户:rose: </td>
     <td>自定义任务定期收集主机用户</td>
   </tr>
   <tr>
-    <td>密码匣子X </td>
+    <td>密码匣子:rose: </td>
     <td>统一对资产主机的用户密码进行查看、更新、测试操作</td>
   </tr>
   <tr>
@@ -126,7 +126,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
     <td>实现更细粒度的应用级授权</td>
   </tr>
   <tr>
-    <td>MySQL 数据库应用、RemoteApp 远程应用X </td>
+    <td>MySQL 数据库应用、RemoteApp 远程应用:rose: </td>
   </tr>
   <tr>
     <td>动作授权</td>
@@ -153,11 +153,11 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
     <td>实现 Web SFTP 文件管理</td>
   </tr>
   <tr>
-    <td>工单管理X</td>
+    <td>工单管理:rose:</td>
     <td>支持对用户登录请求行为进行控制</td>
   </tr>
   <tr>
-    <td>组织管理X</td>
+    <td>组织管理:rose:</td>
     <td>实现多租户管理与权限隔离</td>
   </tr>
   <tr>
@@ -177,7 +177,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
     <td>支持对 Linux、Windows 等资产操作的录像进行回放审计</td>
   </tr>
   <tr>
-    <td>支持对 RemoteAppX、MySQL 等应用操作的录像进行回放审计</td>
+    <td>支持对 RemoteApp:rose:、MySQL 等应用操作的录像进行回放审计</td>
   </tr>
   <tr>
     <td>指令审计</td>
@@ -193,7 +193,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
     <td>命令方式</td>
   </tr>
   <tr>
-    <td>Web UI方式 (X-PACK)</td>
+    <td>Web UI方式 :rose:</td>
   </tr>
 
   <tr>
@@ -201,13 +201,13 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
     <td>MySQL</td>
   </tr>
   <tr>
-    <td>Oracle (X-PACK)</td>
+    <td>Oracle :rose:</td>
   </tr>
   <tr>
-    <td>MariaDB (X-PACK)</td>
+    <td>MariaDB :rose:</td>
   </tr>
   <tr>
-    <td>PostgreSQL (X-PACK)</td>
+    <td>PostgreSQL :rose:</td>
   </tr>
   <tr>
     <td rowspan="6">功能亮点</td>
@@ -237,7 +237,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
   </tr>
 </table>
 
-**说明**: 带 X 后缀的是 X-PACK 插件有的功能
+**说明**: 带 :rose: 后缀的是 X-PACK 插件有的功能
 
 ## 快速开始
 
