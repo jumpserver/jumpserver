@@ -1,21 +1,65 @@
 import abc
 from data_tree import Data_tree_node
 
-__all__ = ['TreeNode', 'BaseAssetTree']
+
+__all__ = [
+    'delimiter_for_path',
+    'path_key_of_asset',
+    'arg_callable_filter_for_node_path',
+    'arg_callable_filter_for_asset_path',
+    'arg_callable_formatter_for_path_as_string',
+    'arg_callable_formatter_for_path_as_iterable',
+    'arg_callable_formatter_for_asset_id_as_path',
+    'TreeNode',
+    'BaseAssetTree'
+]
 
 
 delimiter_for_path = ':'
 path_key_of_asset = '.'
 
 
+def arg_callable_filter_for_node_path(arg_iterable_path, arg_node):
+    """ 过滤出节点路径 """
+    return ''.join(arg_iterable_path).isdigit()
+
+
+def arg_callable_filter_for_asset_path(arg_iterable_path, arg_node):
+    """ 过滤出资产路径 """
+    if path_key_of_asset not in arg_iterable_path:
+        return False
+    index_for_path_key_of_asset = arg_iterable_path.index(path_key_of_asset)
+    index_for_asset_id = index_for_path_key_of_asset + 1
+    return len(arg_iterable_path) == index_for_asset_id + 1
+
+
+def arg_callable_formatter_for_path_as_string(arg_iterable_path, arg_node):
+    """ 格式化为字符串路径 """
+    return delimiter_for_path.join(arg_iterable_path)
+
+
+def arg_callable_formatter_for_path_as_iterable(arg_iterable_path, arg_node):
+    """ 格式化为可迭代路径 """
+    return arg_iterable_path
+
+
+def arg_callable_formatter_for_asset_id_as_path(arg_iterable_path, arg_node):
+    """ 资产ID作为路径的格式化器 """
+    index_of_path_key_of_asset = arg_iterable_path.index(path_key_of_asset)
+    index_of_asset_id = index_of_path_key_of_asset + 1
+    asset_id = arg_iterable_path[index_of_asset_id]
+    return asset_id
+
+
 class TreeNode(Data_tree_node):
+    """ 树节点 """
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
 
 class BaseAssetTree(object):
-    """ 基本的资产节点树 """
+    """ 基本的资产树 """
     def __init__(self, **kwargs):
         self._root = TreeNode(arg_string_delimiter_for_path=delimiter_for_path)
 
@@ -33,6 +77,19 @@ class BaseAssetTree(object):
         arg - arg_node: None or instance of TreeNode
         """
         _tree_node = tree_node.append_path(arg_path=arg_path, arg_node=arg_node)
+        return _tree_node
+
+    def clone_tree_node_at_path(self, arg_path) -> TreeNode:
+        _tree_node = self.get_tree_node_at_path(arg_path=arg_path)
+        _cloned_tree_node = self.clone_tree_node(tree_node=_tree_node)
+        return _cloned_tree_node
+
+    @staticmethod
+    def clone_tree_node(tree_node: TreeNode) -> TreeNode:
+        if isinstance(tree_node, TreeNode):
+            _tree_node = TreeNode(arg_data=tree_node)
+        else:
+            _tree_node = None
         return _tree_node
 
     def get_tree_node_at_path(self, arg_path) -> TreeNode:
@@ -121,8 +178,8 @@ class BaseAssetTree(object):
         if _tree_node is None:
             return []
 
-        _arg_callable_filter = self.__arg_callable_filter_for_node_path
-        _arg_callable_formatter = self.__arg_callable_formatter_for_path_as_iterable
+        _arg_callable_filter = arg_callable_filter_for_node_path
+        _arg_callable_formatter = arg_callable_formatter_for_path_as_iterable
 
         paths = self.paths_of_tree_node(
             tree_node=_tree_node,
@@ -145,7 +202,7 @@ class BaseAssetTree(object):
             _is_absolute_path = False
 
         if not _is_absolute_path:
-            paths = [self._iterable_path_as_string([node_key, path]) for path in paths]
+            paths = [self.iterable_path_as_string([node_key, path]) for path in paths]
 
         return paths
 
@@ -175,11 +232,11 @@ class BaseAssetTree(object):
             _arg_bool_search_sub_tree = False
 
         if asset_id_as_path:
-            _arg_callable_formatter = self.__arg_callable_formatter_for_asset_id_as_path
+            _arg_callable_formatter = arg_callable_formatter_for_asset_id_as_path
         else:
-            _arg_callable_formatter = self.__arg_callable_formatter_for_path_as_string
+            _arg_callable_formatter = arg_callable_formatter_for_path_as_string
 
-        _arg_callable_filter = self.__arg_callable_filter_for_asset_path
+        _arg_callable_filter = arg_callable_filter_for_asset_path
 
         paths = self.paths_of_tree_node(
             tree_node=_tree_node,
@@ -206,8 +263,8 @@ class BaseAssetTree(object):
     def paths_assets_of_assets_id(self, assets_id):
         """ 获取多个资产的所有路径 """
 
-        _arg_callable_filter = self.__arg_callable_filter_for_asset_path
-        _arg_callable_formatter = self.__arg_callable_formatter_for_path_as_iterable
+        _arg_callable_filter = arg_callable_filter_for_asset_path
+        _arg_callable_formatter = arg_callable_formatter_for_path_as_iterable
 
         paths_assets = self.paths_of_tree_node(
             tree_node=self._root,
@@ -215,12 +272,13 @@ class BaseAssetTree(object):
             arg_callable_formatter=_arg_callable_formatter
         )
         paths_assets = [asset_path for asset_path in paths_assets if asset_path[-1] in assets_id]
-        paths = [self._iterable_path_as_string(iterable_path=path) for path in paths_assets]
+        paths = [self.iterable_path_as_string(iterable_path=path) for path in paths_assets]
         return paths
 
-    def paths_of_tree_node(self, tree_node: TreeNode, **kwargs) -> list:
+    @staticmethod
+    def paths_of_tree_node(tree_node: TreeNode, **kwargs) -> list:
         """ 获取 tree_node 节点下的路径 """
-        _default_arg_callable_formatter = self.__arg_callable_formatter_for_path_as_string
+        _default_arg_callable_formatter = arg_callable_formatter_for_path_as_string
 
         _arg_bool_search_sub_tree = kwargs.get('arg_bool_search_sub_tree', True)
         _arg_callable_filter = kwargs.get('arg_callable_filter')
@@ -235,32 +293,5 @@ class BaseAssetTree(object):
         return paths
 
     @staticmethod
-    def _iterable_path_as_string(iterable_path):
+    def iterable_path_as_string(iterable_path):
         return delimiter_for_path.join(iterable_path)
-
-    @staticmethod
-    def __arg_callable_filter_for_node_path(arg_iterable_path, arg_node):
-        return ''.join(arg_iterable_path).isdigit()
-
-    @staticmethod
-    def __arg_callable_filter_for_asset_path(arg_iterable_path, arg_node):
-        if path_key_of_asset not in arg_iterable_path:
-            return False
-        index_for_path_key_of_asset = arg_iterable_path.index(path_key_of_asset)
-        index_for_asset_id = index_for_path_key_of_asset + 1
-        return len(arg_iterable_path) == index_for_asset_id + 1
-
-    @staticmethod
-    def __arg_callable_formatter_for_path_as_string(arg_iterable_path, arg_node):
-        return delimiter_for_path.join(arg_iterable_path)
-
-    @staticmethod
-    def __arg_callable_formatter_for_path_as_iterable(arg_iterable_path, arg_node):
-        return arg_iterable_path
-
-    @staticmethod
-    def __arg_callable_formatter_for_asset_id_as_path(arg_iterable_path, arg_node):
-        index_of_path_key_of_asset = arg_iterable_path.index(path_key_of_asset)
-        index_of_asset_id = index_of_path_key_of_asset + 1
-        asset_id = arg_iterable_path[index_of_asset_id]
-        return asset_id
