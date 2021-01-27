@@ -8,6 +8,8 @@ from django.db import transaction
 from common.utils import get_logger
 from common.utils.inspect import copy_function_args
 from apps.jumpserver.const import CONFIG
+from orgs.utils import current_org
+from common.local import thread_local
 
 logger = get_logger(__file__)
 
@@ -17,7 +19,8 @@ class AcquireFailed(RuntimeError):
 
 
 class DistributedLock(RedisLock):
-    def __init__(self, name, blocking=True, expire=60*2, auto_renewal=True, release_lock_on_transaction_commit=False):
+    def __init__(self, name, blocking=True, expire=60*2, auto_renewal=True,
+                 release_lock_on_transaction_commit=False, current_thread_reentrant=False):
         """
         使用 redis 构造的分布式锁
 
@@ -36,25 +39,91 @@ class DistributedLock(RedisLock):
         super().__init__(redis_client=redis, name=name, expire=expire, auto_renewal=auto_renewal)
         self._blocking = blocking
         self._release_lock_on_transaction_commit = release_lock_on_transaction_commit
+        self._current_thread_reentrant = current_thread_reentrant
 
     def __enter__(self):
-        thread_id = threading.current_thread().ident
-        logger.debug(f'DISTRIBUTED_LOCK: <thread_id:{thread_id}> attempt to acquire <lock:{self._name}> ...')
         acquired = self.acquire(blocking=self._blocking)
         if self._blocking and not acquired:
-            logger.debug(f'DISTRIBUTED_LOCK: <thread_id:{thread_id}> was not acquired <lock:{self._name}>, but blocking=True')
             raise EnvironmentError("Lock wasn't acquired, but blocking=True")
         if not acquired:
-            logger.debug(f'DISTRIBUTED_LOCK: <thread_id:{thread_id}> acquire <lock:{self._name}> failed')
             raise AcquireFailed
-        logger.debug(f'DISTRIBUTED_LOCK: <thread_id:{thread_id}> acquire <lock:{self._name}> ok')
         return self
 
     def __exit__(self, exc_type=None, exc_value=None, traceback=None):
-        if self._release_lock_on_transaction_commit:
-            transaction.on_commit(self.release)
+        self.release()
+
+    def locked_by_me(self):
+        if self.locked():
+            if self.get_owner_id() == self.id:
+                return True
+        return False
+
+    def locked_by_current_thread(self):
+        if self.locked():
+            id = getattr(thread_local, self.name, '')
+            if id:
+                return True
+        return False
+
+    def acquire(self, blocking=True, timeout=None):
+        thread_id = threading.current_thread().ident
+        if self._current_thread_reentrant:
+            if self.locked_by_current_thread():
+                logger.debug(f'I[{self.id}] acquire current thread reentrant lock[{self.name}], already locked by current thread[{thread_id}] lock[{self.get_owner_id()}].')
+                return True
+
+            logger.debug(f'I[{self.id}] attempt acquire current thread[{thread_id}] reentrant lock[{self.name}].')
+            acquired = super().acquire(blocking=blocking, timeout=timeout)
+            if acquired:
+                logger.debug(f'I[{self.id}] acquired current thread[{thread_id}] reentrant lock[{self.name}] now.')
+                setattr(thread_local, self.name, self.id)
+            else:
+                logger.debug(f'I[{self.id}] acquired current thread[{thread_id}] reentrant lock[{self.name}] failed.')
+            return acquired
         else:
-            self.release()
+            logger.debug(f'I[{self.id}] attempt acquire lock[{self.name}] in thread[{thread_id}].')
+            acquired = super().acquire(blocking=blocking, timeout=timeout)
+            logger.debug(f'I[{self.id}] acquired lock[{self.name}] in thread[{thread_id}] {acquired}.')
+            return acquired
+
+    def _release_on_current_thread_reentrant(self):
+        thread_id = threading.current_thread().ident
+        logger.debug(f'I[{self.id}] release current thread[{thread_id}] reentrant lock[{self.name}]')
+        id = getattr(thread_local, self.name, '')
+        if id != self.id:
+            raise ValueError(f'I[{self.id}] acquired a current thread[{thread_id}] reentrant lock[{self.name}], but `owner[{id}]` in thread_local is not me, i can release it')
+        try:
+            delattr(thread_local, self.name)
+        except AttributeError:
+            pass
+        self._release()
+
+    def _release(self):
+        thread_id = threading.current_thread().ident
+        logger.debug(f'I[{self.id}] release lock[{self.name}] in thread[{thread_id}]')
+        super().release()
+
+    def release(self):
+        _release = self._release
+
+        # 处理可重入锁
+        if self._current_thread_reentrant:
+            if self.locked_by_me():
+                _release = self._release_on_current_thread_reentrant
+            else:
+                logger.debug(f'Release current thread reentrant lock[{self.name}], locked by current thread lock[{self.get_owner_id()}], i[{self.id}] pass')
+                return
+
+        # 处理是否在事务提交时才释放锁
+        if self._release_lock_on_transaction_commit:
+            logger.debug(f'Release lock[{self.name}] by me[{self.id}] on transaction commit, wait transaction...')
+            transaction.on_commit(_release)
+        else:
+            _release()
+
+    @property
+    def name(self):
+        return self._name
 
     def __call__(self, func):
         @wraps(func)

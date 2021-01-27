@@ -18,4 +18,5 @@ class NodeTreeUpdateLock(DistributedLock):
 
     def __init__(self, blocking=True):
         name = LazyProxy(self.get_name, enable_cache=False)
-        super().__init__(name=name, blocking=blocking, release_lock_on_transaction_commit=True)
+        super().__init__(name=name, blocking=blocking,
+                         release_lock_on_transaction_commit=True, current_thread_reentrant=True)

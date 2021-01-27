@@ -6,13 +6,13 @@ from django.core.cache import cache
 from django.conf import settings
 from django.db.models import Q
 
-from common.utils.common import lazyproperty
+from common.utils.common import lazyproperty, timeit
 from assets.tree import Tree
 from common.utils import get_logger
 from common.decorator import on_transaction_commit
 from orgs.utils import tmp_to_org, current_org, ensure_in_real_or_default_org
 from assets.models import (
-    Node, Asset, FavoriteAsset, NodeAssetRelatedRecord,
+    Asset, FavoriteAsset, NodeAssetRelatedRecord,
     AssetQuerySet, NodeQuerySet
 )
 from orgs.models import Organization
@@ -41,7 +41,7 @@ class UserGrantedTreeRefreshController:
 
     def __init__(self, user):
         self.user = user
-        self.key = self.key_template.format({'user_id': user.id})
+        self.key = self.key_template.format(user_id = user.id)
         self.client = self.get_redis_client()
 
     @classmethod
@@ -71,6 +71,7 @@ class UserGrantedTreeRefreshController:
     @on_transaction_commit
     def add_need_refresh_orgs_for_users(cls, org_ids, user_ids):
         client = cls.get_redis_client()
+        org_ids = [str(org_id) for org_id in org_ids]
 
         with client.pipeline(transaction=False) as p:
             for user_id in user_ids:
@@ -93,11 +94,11 @@ class UserGrantedTreeRefreshController:
 
         asset_perm_ids = set()
 
-        nodes = Node.objects.filter(id__in=node_ids).only('id', 'key')
+        nodes = PermNode.objects.filter(id__in=node_ids).only('id', 'key')
         for node in nodes:
             ancestor_node_keys.update(node.get_ancestor_keys())
         node_ids.update(
-            Node.objects.filter(key__in=ancestor_node_keys).values_list('id', flat=True)
+            PermNode.objects.filter(key__in=ancestor_node_keys).values_list('id', flat=True)
         )
 
         asset_perm_ids.update(
@@ -140,12 +141,13 @@ class UserGrantedTreeRefreshController:
             [current_org.id], user_ids
         )
 
+    @timeit
     def refresh_if_need(self, force=False):
         user = self.user
         exists = UserGrantedMappingNode.objects.filter(user=user).exists()
 
         if force or not exists:
-            orgs = [user.orgs, Organization.default()]
+            orgs = [*user.orgs.all(), Organization.default()]
         else:
             org_ids = self.get_and_delete_need_refresh_org_ids()
             orgs = [Organization.get_instance(org_id) for org_id in org_ids]
@@ -191,6 +193,7 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
         asset_ids = list(asset_ids)
         return asset_ids
 
+    @timeit
     def rebuild_user_granted_tree(self):
         ensure_in_real_or_default_org()
 
@@ -209,6 +212,8 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
                 return
 
             nodes = self.compute_perm_nodes_tree()
+            if not nodes:
+                return
             self.compute_node_assets_amount(nodes)
             self.create_mapping_nodes(nodes)
 
@@ -225,7 +230,7 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
             """
             判断一个节点是否有授权过的祖先节点
             """
-            ancestor_keys = set(node.get_ancestor_keys(with_self=True))
+            ancestor_keys = set(node.get_ancestor_keys())
             return ancestor_keys & granted_key_set
 
         key2leaf_nodes_mapper = {}
@@ -243,7 +248,7 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
             # 查询直接授权资产
             asset_ids = self.direct_granted_asset_ids
             # 查询授权资产关联的节点设置
-            granted_asset_nodes = Node.objects.filter(
+            granted_asset_nodes = PermNode.objects.filter(
                 assets__id__in=asset_ids
             ).distinct().only(*node_only_fields)
 
@@ -251,8 +256,10 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
             for node in granted_asset_nodes:
                 if _has_ancestor_granted(node):
                     continue
+                if node.key not in key2leaf_nodes_mapper:
+                    key2leaf_nodes_mapper[node.key] = node
                 node.is_asset_granted = True
-                key2leaf_nodes_mapper[node.key] = node
+                key2leaf_nodes_mapper[node.key].is_asset_granted = True
 
         if not settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
             process_direct_granted_assets()
@@ -267,7 +274,7 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
         # 从祖先节点 key 中去掉同时也是叶子节点的 key
         ancestor_keys -= key2leaf_nodes_mapper.keys()
         # 查出祖先节点
-        ancestors = Node.objects.filter(key__in=ancestor_keys).only(*node_only_fields)
+        ancestors = PermNode.objects.filter(key__in=ancestor_keys).only(*node_only_fields)
         return [*leaf_nodes, *ancestors]
 
     def create_mapping_nodes(self, nodes):
@@ -335,9 +342,9 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
             q |= Q(key__startswith=f'{node.key}:')
 
         if q:
-            descendant_nodes = Node.objects.filter(q).distinct()
+            descendant_nodes = PermNode.objects.filter(q).distinct()
         else:
-            descendant_nodes = Node.objects.none()
+            descendant_nodes = PermNode.objects.none()
         nodes.extend(descendant_nodes)
         return nodes
 
@@ -366,7 +373,7 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
         ).values_list('node_id', flat=True).distinct()
         queryset = Asset.org_objects.filter(
             nodes_related_records__node_id__in=granted_node_ids
-        )
+        ).distinct()
         return queryset
 
     def get_all_granted_assets(self) -> AssetQuerySet:
