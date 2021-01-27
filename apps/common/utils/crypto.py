@@ -1,7 +1,7 @@
 import base64
-from Crypto.Cipher import AES
-from Crypto.Util.Padding import pad
-from Crypto.Random import get_random_bytes
+from Cryptodome.Cipher import AES
+from Cryptodome.Util.Padding import pad
+from Cryptodome.Random import get_random_bytes
 from gmssl.sm4 import CryptSM4, SM4_ENCRYPT, SM4_DECRYPT
 
 from django.conf import settings
