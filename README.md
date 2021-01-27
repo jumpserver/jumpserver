@@ -268,7 +268,6 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 
 ## JumpServer 企业版 
 - [申请企业版试用](https://jinshuju.net/f/kyOYpi)
-> 注：企业版支持离线安装，申请通过后会提供高速下载链接。
 
 ## 案例研究
 
