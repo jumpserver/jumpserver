@@ -119,9 +119,9 @@ class BaseAssetTree(object):
         assets_id = self.get_assets_id()
         return len(assets_id)
 
-    def count_assets_of_node(self, node_key):
+    def count_assets_of_node(self, node_key, immediate=False):
         """ 计算节点下的资产数量 """
-        assets_id = self.get_assets_id_of_node(node_key=node_key)
+        assets_id = self.get_assets_id_of_node(node_key=node_key, immediate=immediate)
         return len(set(assets_id))
 
     def count_nodes(self, level=None):
@@ -138,9 +138,9 @@ class BaseAssetTree(object):
         assets_id = self.paths_assets(asset_id_as_path=True)
         return list(set(assets_id))
 
-    def get_assets_id_of_node(self, node_key):
+    def get_assets_id_of_node(self, node_key, immediate=False):
         """ 获取节点下的资产id """
-        assets_id = self.paths_assets_of_node(node_key=node_key, asset_id_as_path=True)
+        assets_id = self.paths_assets_of_node(node_key, immediate=immediate, asset_id_as_path=True)
         return list(set(assets_id))
 
     def get_nodes_key(self, level=None):
@@ -221,14 +221,17 @@ class BaseAssetTree(object):
 
     def paths_assets(self, asset_id_as_path=False):
         """ 所有资产的路径 """
-        return self.paths_assets_of_node(asset_id_as_path=asset_id_as_path)
+        return self.paths_assets_of_node(node_key=None, asset_id_as_path=asset_id_as_path)
 
-    def paths_assets_of_node(self, node_key=None, asset_id_as_path=False):
+    def paths_assets_of_node(self, node_key=None, immediate=False, asset_id_as_path=False):
         """
-        return: 返回节点下的资产的路径
+        return: 返回节点下所有资产的路径
         arg: node_key - 节点 key
         arg: only_asset_id - 是否只返回资产id
         """
+
+        if immediate:
+            return self.paths_assets_of_node_immediate(node_key, asset_id_as_path=asset_id_as_path)
 
         if node_key is None:
             _tree_node = self._root
@@ -265,6 +268,34 @@ class BaseAssetTree(object):
 
         if _to_absolute_path and not _is_absolute_path:
             paths = [iterable_path_as_string([node_key, path]) for path in paths]
+
+        return paths
+
+    def paths_assets_of_node_immediate(self, node_key=None, asset_id_as_path=False):
+        """ 获取节点下直接资产的路径 """
+        if node_key is None:
+            _tree_nodes_paths = self.paths_nodes(level=1)
+        else:
+            _tree_nodes_paths = [node_key]
+
+        paths = []
+
+        _tree_node_paths = [
+            iterable_path_as_string([_tree_node_path, path_key_for_asset])
+            for _tree_node_path in _tree_nodes_paths
+        ]
+
+        for _tree_node_path in _tree_node_paths:
+            _tree_node = self.get_tree_node_at_path(arg_path=_tree_node_path)
+            _assets_id = self.paths_of_tree_node(tree_node=_tree_node)
+            if asset_id_as_path:
+                paths.extend(_assets_id)
+                continue
+
+            assets_paths = [
+                iterable_path_as_string([_tree_node_path, _asset_id]) for _asset_id in _assets_id
+            ]
+            paths.extend(assets_paths)
 
         return paths
 
