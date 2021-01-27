@@ -60,8 +60,8 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
     <td>RADIUS 二次认证</td>
   </tr>
   <tr>
-    <td>登录复核:small_orange_diamond:</td>
-    <td>用户登录行为受管理员的监管与控制</td>
+    <td>登录复核</td>
+    <td>用户登录行为受管理员的监管与控制:small_orange_diamond:</td>
   </tr>
   <tr>
     <td rowspan="11">账号管理<br>Account</td>
