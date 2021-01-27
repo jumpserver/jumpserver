@@ -1,22 +1,19 @@
-from django.dispatch import receiver
-from common.signals import django_ready
+from django.db.models import TextChoices
+from common.decorator import singleton
 from .tree import AssetTree
+from assets.signals import org_asset_tree_change
 
 
-def singleton(cls):
-    _instance = {}
-
-    def _singleton(*args, **kwargs):
-        if cls not in _instance:
-            _instance[cls] = cls(*args, **kwargs)
-        return _instance[cls]
-
-    return _singleton
+__all__ = ['AssetTreeManager']
 
 
 @singleton
 class AssetTreeManager(object):
     """ 资产树管理器 """
+
+    class ActionChoices(TextChoices):
+        initial = 'initial', 'Initial tree'
+        refresh = 'refresh', 'Refresh tree'
 
     def __init__(self):
         self._org_tree_mapping = {}
@@ -24,8 +21,14 @@ class AssetTreeManager(object):
     def get_tree(self, org_id):
         _tree = self.__get_tree(org_id=org_id)
         if _tree is None:
-            _tree = self.__create_tree(org_id=org_id)
+            _tree = self.__initial_tree(org_id=org_id)
             self.__set_tree(org_id=org_id, tree=_tree)
+        return _tree
+
+    def refresh_tree(self, org_id):
+        self.__destroy_tree(org_id)
+        _tree = self.__initial_tree(org_id)
+        self.__set_tree(_tree, org_id)
         return _tree
 
     def __set_tree(self, org_id, tree):
@@ -34,12 +37,18 @@ class AssetTreeManager(object):
     def __get_tree(self, org_id):
         return self._org_tree_mapping.get(org_id)
 
-    @staticmethod
-    def __create_tree(org_id):
+    def __initial_tree(self, org_id):
         _tree = AssetTree(org_id=org_id)
         _tree.initial()
+        org_asset_tree_change.send(action=self.ActionChoices, org_id=org_id)
         return _tree
 
     def __destroy_tree(self, org_id):
         return self._org_tree_mapping.pop(org_id, None)
+
+    def processor_tree(self, action, org_id):
+        method_name = '__{}_tree'.format(action)
+        method = getattr(self, method_name, None)
+        if callable(method):
+            return method(org_id=org_id)
 

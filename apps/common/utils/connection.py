@@ -22,6 +22,6 @@ class RedisPubSub:
         ps.subscribe(self.ch)
         return ps
 
-    def publish(self, data):
+    def publish(self, data, *args, **kwargs):
         self.redis.publish(self.ch, data)
         return True
