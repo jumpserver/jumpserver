@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from django.db.models import F, Value, CharField
 from django.conf import settings
 
+from common.utils.common import timeit
 from orgs.utils import tmp_to_root_org
 from common.permissions import IsValidUser
 from common.utils import get_logger, get_object_or_none
@@ -25,6 +26,7 @@ logger = get_logger(__name__)
 class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
     permission_classes = (IsValidUser,)
 
+    @timeit
     def add_ungrouped_resource(self, data: list, nodes_query_utils, assets_query_utils):
         if not settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
             return
@@ -37,6 +39,7 @@ class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
         data.extend(self.serialize_nodes([ungrouped_node], with_asset_amount=True))
         data.extend(self.serialize_assets(direct_granted_assets))
 
+    @timeit
     def add_favorite_resource(self, data: list, nodes_query_utils, assets_query_utils):
         favorite_node = nodes_query_utils.get_favorite_node()
         favorite_assets = assets_query_utils.get_favorite_assets().annotate(
@@ -46,6 +49,7 @@ class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
         data.extend(self.serialize_nodes([favorite_node], with_asset_amount=True))
         data.extend(self.serialize_assets(favorite_assets))
 
+    @timeit
     def add_node_filtered_by_system_user(self, data: list, user, asset_perms_id):
         utils = UserGrantedTreeBuildUtils(user, asset_perms_id)
         nodes = utils.get_whole_tree_nodes()
