@@ -9,7 +9,7 @@ from common.utils.common import lazyproperty
 from assets.tree import Tree
 from common.utils import get_logger
 from common.decorator import on_transaction_commit
-from orgs.utils import tmp_to_org, current_org, ensure_not_in_root_org
+from orgs.utils import tmp_to_org, current_org, ensure_in_real_or_default_org
 from assets.models import (
     Node, Asset, FavoriteAsset, NodeAssetRelatedRecord,
     AssetQuerySet, NodeQuerySet
@@ -73,7 +73,7 @@ class UserGrantedTreeRefreshController:
 
         with client.pipeline(transaction=False) as p:
             for user_id in user_ids:
-                key = cls.key_template.format({'user_id': user_id})
+                key = cls.key_template.format(user_id=user_id)
                 p.sadd(key, *org_ids)
 
             p.execute()
@@ -85,7 +85,7 @@ class UserGrantedTreeRefreshController:
         1，计算与这些资产有关的授权
         2，计算与这些节点以及祖先节点有关的授权
         """
-        ensure_not_in_root_org()
+        ensure_in_real_or_default_org()
 
         node_ids = set(node_ids)
         ancestor_node_keys = set()
@@ -111,7 +111,7 @@ class UserGrantedTreeRefreshController:
 
     @classmethod
     def add_need_refresh_by_asset_perm_ids(cls, asset_perm_ids):
-        ensure_not_in_root_org()
+        ensure_in_real_or_default_org()
 
         group_ids = AssetPermission.user_groups.through.objects.filter(
             assetpermission_id__in=asset_perm_ids).values_list('usergroup_id', flat=True)
@@ -181,7 +181,7 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
         return asset_ids
 
     def rebuild_user_granted_tree(self):
-        ensure_not_in_root_org()
+        ensure_in_real_or_default_org()
 
         user = self.user
         org_id = current_org.id
