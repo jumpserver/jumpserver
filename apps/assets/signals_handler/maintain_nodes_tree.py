@@ -27,7 +27,7 @@ logger = get_logger(__file__)
 class MaintainNodesAssetsTree:
 
     @classmethod
-    def remove_ancestor_keys(cls, ancestor_key, tree_set):
+    def _remove_ancestor_keys(cls, ancestor_key, tree_set):
         # 这里判断 `ancestor_key` 不能是空，防止数据错误导致的死循环
         # 判断是否在集合里，来区分是否已被处理过
         while ancestor_key and ancestor_key in tree_set:
@@ -84,6 +84,10 @@ class MaintainNodesAssetsTree:
 
     @classmethod
     def record_related(cls, asset_ids, node_ids, operator):
+        """
+        asset_ids 加到或者离开 node_ids
+        """
+
         nodes = Node.objects.filter(id__in=node_ids)
         node_keys = [n.key for n in nodes]
 
@@ -100,16 +104,15 @@ class MaintainNodesAssetsTree:
 
         records_mapper = {(r.asset_id, r.node_id): r for r in records}
 
-        delta = len(asset_ids)
         for key in chain(node_keys, ancestor_keys):
             node_id = key_id_mapper[key]
             for asset_id in asset_ids:
                 record = records_mapper.get((asset_id, node_id))
                 if record:
-                    record.related_count = operator(record.related_count, delta)
+                    record.related_count = operator(record.related_count, 1)
                 else:
                     record = NodeAssetRelatedRecord(node_id=node_id, asset_id=asset_id,
-                                                    related_count=operator(0, delta))
+                                                    related_count=operator(0, 1))
                     to_create_records.append(record)
                     records_mapper[(asset_id, node_id)] = record
 
@@ -150,7 +153,7 @@ class MaintainNodesAssetsTree:
 
             if exists:
                 # 如果资产在该节点，那么他及其祖先节点都不用处理
-                cls.remove_ancestor_keys(parent_key, ancestor_keys)
+                cls._remove_ancestor_keys(parent_key, ancestor_keys)
                 continue
             else:
                 # 不存在，要更新本节点
@@ -160,7 +163,7 @@ class MaintainNodesAssetsTree:
                 while parent_key and parent_key in ancestor_keys:
                     exists = cls._is_asset_exists_in_node(asset_pk, parent_key)
                     if exists:
-                        cls.remove_ancestor_keys(parent_key, ancestor_keys)
+                        cls._remove_ancestor_keys(parent_key, ancestor_keys)
                         break
                     else:
                         to_update_keys.append(parent_key)
