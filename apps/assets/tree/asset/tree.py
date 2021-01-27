@@ -18,6 +18,7 @@ class AssetTree(BaseAssetTree):
 
     @timeit
     def initial(self):
+        # TODO: perf 使用线程
         t1 = time.time()
         with tmp_to_org(self._org_id):
             nodes = list(Node.objects.all().values_list('id', 'key'))

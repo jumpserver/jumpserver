@@ -4,51 +4,66 @@ from data_tree import Data_tree_node
 
 __all__ = [
     'delimiter_for_path',
-    'path_key_of_asset',
-    'arg_callable_filter_for_node_path',
-    'arg_callable_filter_for_asset_path',
-    'arg_callable_formatter_for_path_as_string',
-    'arg_callable_formatter_for_path_as_iterable',
-    'arg_callable_formatter_for_asset_id_as_path',
+    'path_key_for_asset',
+    'contains_path_key_for_asset',
+    'is_node_path',
+    'iterable_path_as_string',
+    'arg_callable_filter_path_for_node',
+    'arg_callable_filter_path_for_asset',
+    'arg_callable_formatter_path_for_path_as_string',
+    'arg_callable_formatter_path_for_path_as_iterable',
+    'arg_callable_formatter_path_for_asset_id_as_path',
     'TreeNode',
     'BaseAssetTree'
 ]
 
 
 delimiter_for_path = ':'
-path_key_of_asset = '.'
+path_key_for_asset = '.'
 
 
-def arg_callable_filter_for_node_path(arg_iterable_path, arg_node):
-    """ 过滤出节点路径 """
+def contains_path_key_for_asset(arg_iterable_path, arg_node):
+    """ 路径中是否包含`标示资产的路径key` """
+    return path_key_for_asset in arg_iterable_path
+
+
+def is_node_path(arg_iterable_path):
     return ''.join(arg_iterable_path).isdigit()
 
 
-def arg_callable_filter_for_asset_path(arg_iterable_path, arg_node):
-    """ 过滤出资产路径 """
-    if path_key_of_asset not in arg_iterable_path:
+def iterable_path_as_string(iterable_path):
+    return delimiter_for_path.join(iterable_path)
+
+
+def arg_callable_filter_path_for_node(arg_iterable_path, arg_node):
+    """ 过滤出节点的路径 """
+    return is_node_path(arg_iterable_path=arg_iterable_path)
+
+
+def arg_callable_filter_path_for_asset(arg_iterable_path, arg_node):
+    """ 过滤出资产的路径 """
+    if not contains_path_key_for_asset(arg_iterable_path, arg_node):
         return False
-    index_for_path_key_of_asset = arg_iterable_path.index(path_key_of_asset)
-    index_for_asset_id = index_for_path_key_of_asset + 1
+    index_for_path_key_for_asset = arg_iterable_path.index(path_key_for_asset)
+    index_for_asset_id = index_for_path_key_for_asset + 1
     return len(arg_iterable_path) == index_for_asset_id + 1
 
 
-def arg_callable_formatter_for_path_as_string(arg_iterable_path, arg_node):
+def arg_callable_formatter_path_for_path_as_string(arg_iterable_path, arg_node):
     """ 格式化为字符串路径 """
-    return delimiter_for_path.join(arg_iterable_path)
+    return iterable_path_as_string(iterable_path=arg_iterable_path)
 
 
-def arg_callable_formatter_for_path_as_iterable(arg_iterable_path, arg_node):
+def arg_callable_formatter_path_for_path_as_iterable(arg_iterable_path, arg_node):
     """ 格式化为可迭代路径 """
     return arg_iterable_path
 
 
-def arg_callable_formatter_for_asset_id_as_path(arg_iterable_path, arg_node):
+def arg_callable_formatter_path_for_asset_id_as_path(arg_iterable_path, arg_node):
     """ 资产ID作为路径的格式化器 """
-    index_of_path_key_of_asset = arg_iterable_path.index(path_key_of_asset)
-    index_of_asset_id = index_of_path_key_of_asset + 1
-    asset_id = arg_iterable_path[index_of_asset_id]
-    return asset_id
+    index_for_path_key_for_asset = arg_iterable_path.index(path_key_for_asset)
+    index_for_asset_id = index_for_path_key_for_asset + 1
+    return arg_iterable_path[index_for_asset_id]
 
 
 class TreeNode(Data_tree_node):
@@ -178,8 +193,8 @@ class BaseAssetTree(object):
         if _tree_node is None:
             return []
 
-        _arg_callable_filter = arg_callable_filter_for_node_path
-        _arg_callable_formatter = arg_callable_formatter_for_path_as_iterable
+        _arg_callable_filter = arg_callable_filter_path_for_node
+        _arg_callable_formatter = arg_callable_formatter_path_for_path_as_iterable
 
         paths = self.paths_of_tree_node(
             tree_node=_tree_node,
@@ -232,11 +247,11 @@ class BaseAssetTree(object):
             _arg_bool_search_sub_tree = False
 
         if asset_id_as_path:
-            _arg_callable_formatter = arg_callable_formatter_for_asset_id_as_path
+            _arg_callable_formatter = arg_callable_formatter_path_for_asset_id_as_path
         else:
-            _arg_callable_formatter = arg_callable_formatter_for_path_as_string
+            _arg_callable_formatter = arg_callable_formatter_path_for_path_as_string
 
-        _arg_callable_filter = arg_callable_filter_for_asset_path
+        _arg_callable_filter = arg_callable_filter_path_for_asset
 
         paths = self.paths_of_tree_node(
             tree_node=_tree_node,
@@ -263,8 +278,8 @@ class BaseAssetTree(object):
     def paths_assets_of_assets_id(self, assets_id):
         """ 获取多个资产的所有路径 """
 
-        _arg_callable_filter = arg_callable_filter_for_asset_path
-        _arg_callable_formatter = arg_callable_formatter_for_path_as_iterable
+        _arg_callable_filter = arg_callable_filter_path_for_asset
+        _arg_callable_formatter = arg_callable_formatter_path_for_path_as_iterable
 
         paths_assets = self.paths_of_tree_node(
             tree_node=self._root,
@@ -278,7 +293,7 @@ class BaseAssetTree(object):
     @staticmethod
     def paths_of_tree_node(tree_node: TreeNode, **kwargs) -> list:
         """ 获取 tree_node 节点下的路径 """
-        _default_arg_callable_formatter = arg_callable_formatter_for_path_as_string
+        _default_arg_callable_formatter = arg_callable_formatter_path_for_path_as_string
 
         _arg_bool_search_sub_tree = kwargs.get('arg_bool_search_sub_tree', True)
         _arg_callable_filter = kwargs.get('arg_callable_filter')
