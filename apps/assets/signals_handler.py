@@ -364,7 +364,7 @@ def on_asset_post_delete(instance: Asset, using, **kwargs):
 
 @singleton
 class AssetTreeSubPub(RedisPubSub):
-    action_choices = AssetTreeManager.ActionChoices
+    action_choices = AssetTreeManager().ActionChoices
 
     def __init__(self, **kwargs):
         self._delimiter_for_data = '@'
@@ -374,8 +374,8 @@ class AssetTreeSubPub(RedisPubSub):
     def publish(self, *args, **kwargs):
         action = kwargs.get('action')
         org_id = kwargs.get('org_id')
-        pid = os.getpgid()
-        assert action and org_id, 'org_id and action are required'
+        pid = os.getpid()
+        assert action is not None and org_id is not None, 'org_id and action are required'
         assert action in self.action_choices.names, (
             'The action is invalid, choices: {}'.format(self.action_choices.names)
         )
@@ -384,7 +384,7 @@ class AssetTreeSubPub(RedisPubSub):
         return super().publish(data=data)
 
     def construct_data(self, action, org_id, pid):
-        return self._delimiter_for_data.join([action, org_id, pid])
+        return self._delimiter_for_data.join([action, org_id, str(pid)])
 
     def parse_data(self, data):
         action, org_id, pid = data.split(self._delimiter_for_data)
@@ -404,14 +404,14 @@ def on_node_post_save(sender, instance: Node, created, **kwargs):
 
     if _send_org_asset_tree_change_signal:
         org_asset_tree_change.send(
-            action=AssetTreeManager.ActionChoices.destroy, org_id=current_org.id
+            sender=None, action=AssetTreeManager.ActionChoices.destroy, org_id=current_org.id
         )
 
 
 @receiver(m2m_changed, sender=Asset.nodes.through)
-def on_asset_node_relation_change():
+def on_asset_node_relation_change(sender, **kwargs):
     org_asset_tree_change.send(
-        action=AssetTreeManager.ActionChoices.destroy, org_id=current_org.org_id
+        sender=None, action=AssetTreeManager.ActionChoices.destroy, org_id=current_org.org_id
     )
 
 
@@ -438,7 +438,7 @@ def subscribe_asset_tree_change(sender, **kwargs):
             action, org_id, pid = asset_tree_sub_pub.parse_data(data)
             logger.debug("found org asset tree change: action={}, org_id={}".format(action, org_id))
 
-            if os.getpid() == pid and action == AssetTreeManager.ActionChoices.refresh:
+            if os.getpid() == pid and action == AssetTreeManager().ActionChoices.refresh:
                 _to_process = False
             else:
                 _to_process = True
@@ -453,4 +453,3 @@ def subscribe_asset_tree_change(sender, **kwargs):
 
     thread = threading.Thread(target=keep_subscribe, daemon=True)
     thread.start()
-

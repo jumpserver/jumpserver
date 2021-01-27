@@ -31,7 +31,9 @@ class AssetTreeManager(object):
         self.__destroy_tree(org_id)
         _tree = self.__initial_tree(org_id)
         self.__set_tree(_tree, org_id)
-        org_asset_tree_change.send(action=self.ActionChoices.refresh, org_id=org_id)
+        org_asset_tree_change.send(
+            sender=self.__class__, action=self.ActionChoices.refresh, org_id=org_id
+        )
         return _tree
 
     def __set_tree(self, org_id, tree):
