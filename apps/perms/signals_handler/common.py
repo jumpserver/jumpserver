@@ -15,7 +15,8 @@ from perms.models import AssetPermission, ApplicationPermission
 logger = get_logger(__file__)
 
 
-def handle_bind_groups_systemuser(instance, action, reverse, pk_set, **kwargs):
+@receiver(m2m_changed, sender=User.groups.through)
+def on_user_groups_change(sender, instance, action, reverse, pk_set, **kwargs):
     """
     UserGroup 增加 User 时，增加的 User 需要与 UserGroup 关联的动态系统用户相关联
     """
@@ -35,11 +36,6 @@ def handle_bind_groups_systemuser(instance, action, reverse, pk_set, **kwargs):
 
     for system_user in system_users:
         system_user.users.add(*users_id)
-
-
-@receiver(m2m_changed, sender=User.groups.through)
-def on_user_groups_change(**kwargs):
-    handle_bind_groups_systemuser(**kwargs)
 
 
 @receiver(m2m_changed, sender=AssetPermission.nodes.through)
