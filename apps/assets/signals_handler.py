@@ -9,6 +9,7 @@ from django.db.models.signals import (
 from django.db.models import Q, F
 from django.dispatch import receiver
 
+from orgs.utils import ensure_in_real_or_default_org
 from common.exceptions import M2MReverseNotAllowed
 from common.const.signals import PRE_ADD, POST_ADD, POST_REMOVE, PRE_CLEAR, PRE_REMOVE
 from common.utils import get_logger
@@ -205,7 +206,6 @@ def on_asset_nodes_add(instance, action, reverse, pk_set, **kwargs):
     m2m_model.objects.bulk_create(to_create)
 
 
-
 class MaintainNodesAssetsTree:
 
     @classmethod
@@ -259,6 +259,7 @@ class MaintainNodesAssetsTree:
 
     @classmethod
     def do(cls, **kwargs):
+        ensure_in_real_or_default_org()
         with NodeTreeUpdateLock():
             cls.do_node_assets_amount(**kwargs)
             cls.do_related_record(**kwargs)
@@ -420,3 +421,8 @@ def on_asset_post_delete(instance: Asset, using, **kwargs):
             sender=Asset.nodes.through, instance=instance, reverse=False,
             model=Node, pk_set=node_ids, using=using, action=POST_REMOVE
         )
+
+
+@receiver(m2m_changed, sender=Asset.nodes.through)
+def maintain_nodes_assets_tree(**kwargs):
+    MaintainNodesAssetsTree.do(**kwargs)

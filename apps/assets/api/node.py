@@ -218,8 +218,6 @@ class NodeAddChildrenApi(generics.UpdateAPIView):
         return Response("OK")
 
 
-@method_decorator(NodeTreeUpdateLock(), name='patch')
-@method_decorator(NodeTreeUpdateLock(), name='put')
 class NodeAddAssetsApi(generics.UpdateAPIView):
     model = Node
     serializer_class = serializers.NodeAssetsSerializer
@@ -232,8 +230,6 @@ class NodeAddAssetsApi(generics.UpdateAPIView):
         instance.assets.add(*tuple(assets))
 
 
-@method_decorator(NodeTreeUpdateLock(), name='patch')
-@method_decorator(NodeTreeUpdateLock(), name='put')
 class NodeRemoveAssetsApi(generics.UpdateAPIView):
     model = Node
     serializer_class = serializers.NodeAssetsSerializer
@@ -250,8 +246,6 @@ class NodeRemoveAssetsApi(generics.UpdateAPIView):
         Node.org_root().assets.add(*orphan_assets)
 
 
-@method_decorator(NodeTreeUpdateLock(), name='patch')
-@method_decorator(NodeTreeUpdateLock(), name='put')
 class MoveAssetsToNodeApi(generics.UpdateAPIView):
     model = Node
     serializer_class = serializers.NodeAssetsSerializer
