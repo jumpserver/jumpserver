@@ -27,9 +27,6 @@ __all__ = [
 ]
 
 
-@method_decorator(NodeTreeUpdateLock(), name='create')
-@method_decorator(NodeTreeUpdateLock(), name='destroy')
-@method_decorator(NodeTreeUpdateLock(), name='bulk_destroy')
 class AssetViewSet(FilterAssetByNodeMixin, OrgBulkModelViewSet):
     """
     API endpoint that allows Asset to be viewed or edited.
