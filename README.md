@@ -6,115 +6,12 @@
 
 - [ENGLISH](https://github.com/jumpserver/jumpserver/blob/master/README_EN.md)
 
-## 紧急BUG修复通知
-JumpServer发现远程执行漏洞，请速度修复
+|![notification](https://raw.githubusercontent.com/goharbor/website/master/docs/img/readme/bell-outline-badged.svg)安全通知|
+|------------------|
+|2021年1月15日 JumpServer 发现远程执行漏洞，请速度修复 [详见](https://github.com/jumpserver/jumpserver/issues/5533)， 非常感谢  **reactivity of Alibaba Hackerone bug bounty program**(瑞典) 向我们报告了此 BUG|
 
-非常感谢  **reactivity of Alibaba Hackerone bug bounty program**(瑞典) 向我们报告了此 BUG
-
-**影响版本:**
-```
-< v2.6.2
-< v2.5.4
-< v2.4.5 
-= v1.5.9
->= v1.5.3
-```
-**安全版本:**
-```
->= v2.6.2
->= v2.5.4
->= v2.4.5 
-= v1.5.9 （版本号没变）
-< v1.5.3
-```
-
-**修复方案:**
-
-将JumpServer升级至安全版本；
-
-**临时修复方案:**
-
-修改 Nginx 配置文件屏蔽漏洞接口 
-
-```
-/api/v1/authentication/connection-token/
-/api/v1/users/connection-token/
-```
-
-Nginx 配置文件位置
-```
-# 社区老版本
-/etc/nginx/conf.d/jumpserver.conf
-
-# 企业老版本
-jumpserver-release/nginx/http_server.conf
- 
-# 新版本在 
-jumpserver-release/compose/config_static/http_server.conf
-```
-
-修改 Nginx 配置文件实例
-```
-### 保证在 /api 之前 和 / 之前
-location /api/v1/authentication/connection-token/ {
-   return 403;
-}
- 
-location /api/v1/users/connection-token/ {
-   return 403;
-}
-### 新增以上这些
- 
-location /api/ {
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header Host $host;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_pass http://core:8080;
-  }
- 
-...
-```
-
-修改完成后重启 nginx
-
-```
-docker方式: 
-docker restart jms_nginx
-
-nginx方式:
-systemctl restart nginx
-
-```
-
-**修复验证**
-
-```
-$ wget https://github.com/jumpserver/jumpserver/releases/download/v2.6.2/jms_bug_check.sh 
-
-# 使用方法 bash jms_bug_check.sh HOST 
-$ bash jms_bug_check.sh demo.jumpserver.org
-漏洞已修复
-```
-
-**入侵检测**
-
-下载脚本到 jumpserver 日志目录，这个目录中存在 gunicorn.log，然后执行
-
-```
-$ pwd
-/opt/jumpserver/core/logs
-
-$ ls gunicorn.log 
-gunicorn.log
-
-$ wget 'https://github.com/jumpserver/jumpserver/releases/download/v2.6.2/jms_check_attack.sh'
-$ bash jms_check_attack.sh
-系统未被入侵
-```
-
+</br> </br>
 --------------------------
-
-JumpServer 正在寻找开发者，一起为改变世界做些贡献吧，哪怕一点点，联系我 <ibuler@fit2cloud.com> 
 
 JumpServer 是全球首款开源的堡垒机，使用 GNU GPL v2.0 开源协议，是符合 4A 规范的运维安全审计系统。
 
@@ -124,7 +21,6 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 
 改变世界，从一点点开始。
 
-> 注: [KubeOperator](https://github.com/KubeOperator/KubeOperator) 是 JumpServer 团队在 Kubernetes 领域的的又一全新力作，欢迎关注和使用。
 
 ## 特色优势
 
@@ -136,21 +32,6 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 - 多租户: 一套系统，多个子公司和部门同时使用；
 - 多应用支持: 数据库，Windows远程应用，Kubernetes。
 
-## 版本说明
-
-自 v2.0.0 发布后， JumpServer 版本号命名将变更为：v大版本.功能版本.Bug修复版本。比如：
-
-```
-v2.0.1 是 v2.0.0 之后的Bug修复版本；
-v2.1.0 是 v2.0.0 之后的功能版本。
-```
-
-像其它优秀开源项目一样，JumpServer 每个月会发布一个功能版本，并同时维护 3 个功能版本。比如：
-
-```
-在 v2.4 发布前，我们会同时维护 v2.1、v2.2、v2.3；
-在 v2.4 发布后，我们会同时维护 v2.2、v2.3、v2.4；v2.1 会停止维护。
-```
 
 ## 功能列表
 
@@ -366,7 +247,7 @@ v2.1.0 是 v2.0.0 之后的功能版本。
 ## 组件项目
 - [Lina](https://github.com/jumpserver/lina) JumpServer Web UI 项目
 - [Luna](https://github.com/jumpserver/luna) JumpServer Web Terminal 项目
-- [Koko](https://github.com/jumpserver/koko) JumpServer 字符协议 Connector 项目，替代原来 Python 版本的 [Coco](https://github.com/jumpserver/coco)
+- [KoKo](https://github.com/jumpserver/koko) JumpServer 字符协议 Connector 项目，替代原来 Python 版本的 [Coco](https://github.com/jumpserver/coco)
 - [Guacamole](https://github.com/jumpserver/docker-guacamole) JumpServer 图形协议 Connector 项目，依赖 [Apache Guacamole](https://guacamole.apache.org/)
 
 ## 贡献
