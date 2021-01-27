@@ -156,8 +156,7 @@ class PermissionAssetTree(BaseAssetTree):
         granted_assets = AssetPermission.assets.through.objects\
             .prefetch_related('asset__org_id')\
             .filter(queries)\
-            .values_list('asset_id', 'asset__org_id')
-        granted_assets = set([str(asset_id) for asset_id in granted_assets])
+            .values_list('asset__org_id', 'asset_id')
 
         org_id_nodes_key_mapping = defaultdict(set)
         for node__org_id, node_key in granted_nodes:
@@ -176,10 +175,12 @@ class PermissionAssetTree(BaseAssetTree):
 
         for org_id, nodes_key_assets_id in org_id_nodes_key_assets_id_mapping.items():
             org_asset_tree = self.__get_asset_tree_of_org(org_id=org_id)
-            nodes_key = nodes_key_assets_id['nodes_key']
-            assets_id = nodes_key_assets_id['assets_id']
-            self.initial_granted_nodes(asset_tree=org_asset_tree, nodes_key=nodes_key)
-            self.initial_granted_assets(asset_tree=org_asset_tree, assets_id=assets_id)
+            nodes_key = nodes_key_assets_id.get('nodes_key')
+            assets_id = nodes_key_assets_id.get('assets_id')
+            if nodes_key:
+                self.initial_granted_nodes(asset_tree=org_asset_tree, nodes_key=nodes_key)
+            if assets_id:
+                self.initial_granted_assets(asset_tree=org_asset_tree, assets_id=assets_id)
 
     def initial_granted_nodes(self, asset_tree: AssetTree, nodes_key):
         """ 初始化授权的节点 """

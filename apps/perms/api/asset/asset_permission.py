@@ -27,6 +27,8 @@ class AssetPermissionViewSet(BasePermissionViewSet):
     ]
 
     def get_queryset(self):
+        from perms.tree.asset.tree import PermissionAssetTree
+        PermissionAssetTree(user=self.request.user).initial()
         queryset = super().get_queryset().prefetch_related(
             "nodes", "assets", "users", "user_groups", "system_users"
         )

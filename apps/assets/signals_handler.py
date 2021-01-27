@@ -404,14 +404,14 @@ def on_node_post_save(sender, instance: Node, created, **kwargs):
 
     if _send_org_asset_tree_change_signal:
         org_asset_tree_change.send(
-            sender=None, action=AssetTreeManager.ActionChoices.destroy, org_id=current_org.id
+            sender=None, action=AssetTreeManager().ActionChoices.destroy, org_id=current_org.id
         )
 
 
 @receiver(m2m_changed, sender=Asset.nodes.through)
 def on_asset_node_relation_change(sender, **kwargs):
     org_asset_tree_change.send(
-        sender=None, action=AssetTreeManager.ActionChoices.destroy, org_id=current_org.org_id
+        sender=None, action=AssetTreeManager().ActionChoices.destroy, org_id=current_org.org_id
     )
 
 
@@ -436,7 +436,8 @@ def subscribe_asset_tree_change(sender, **kwargs):
                 continue
             data = message['data'].decode()
             action, org_id, pid = asset_tree_sub_pub.parse_data(data)
-            logger.debug("found org asset tree change: action={}, org_id={}".format(action, org_id))
+            logger.debug("found org asset tree change: action={}, org_id={}, pid={}"
+                         "".format(action, org_id, pid))
 
             if os.getpid() == pid and action == AssetTreeManager().ActionChoices.refresh:
                 _to_process = False
@@ -449,7 +450,8 @@ def subscribe_asset_tree_change(sender, **kwargs):
 
             asset_tree_manager = AssetTreeManager()
             asset_tree_manager.processor_tree(action=action, org_id=org_id)
-            logger.debug("org asset tree has processed: action={}, org_id={}".format(action, org_id))
+            logger.debug("org asset tree has processed: action={}, org_id={}, pid={}"
+                         "".format(action, org_id, pid))
 
     thread = threading.Thread(target=keep_subscribe, daemon=True)
     thread.start()
