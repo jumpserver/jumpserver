@@ -36,12 +36,6 @@ def check_node_assets_amount():
         logger.info(f'[{ident}] Finish check node assets amount in {current_org}')
 
 
-def is_asset_exists_in_node(asset_pk, node_key):
-    node = Node.objects.only('id').get(key=node_key)
-    exists = NodeAssetRelatedRecord.objects.filter(asset_id=asset_pk, node_id=node.id).exists()
-    return exists
-
-
 def is_query_node_all_assets(request):
     request = request
     query_all_arg = request.query_params.get('all', 'true')
