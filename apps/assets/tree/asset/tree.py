@@ -33,10 +33,10 @@ class AssetTree(BaseAssetTree):
         t2 = time.time()
 
         for node_id, node_key in nodes:
-            tree_node = self._append_path_to_tree_node(self._root, arg_path=node_key)
-            tee_node_of_asset = self._append_path_to_tree_node(tree_node, self._flag_for_asset)
+            tree_node = self.append_path_to_tree_node(self._root, arg_path=node_key)
+            tee_node_of_asset = self.append_path_to_tree_node(tree_node, self._flag_for_asset)
             for asset_id in nodes_assets_id_mapping[str(node_id)]:
-                self._append_path_to_tree_node(tee_node_of_asset, arg_path=asset_id)
+                self.append_path_to_tree_node(tee_node_of_asset, arg_path=asset_id)
 
         t3 = time.time()
 

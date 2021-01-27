@@ -57,3 +57,13 @@ def get_node(request):
     else:
         node = get_object_or_none(Node, key=node_id)
     return node
+
+
+def compute_ancestor_node_key(node_key):
+    """ 计算 node 的祖先节点 key """
+    ancestor_key = []
+    while len(node_key) > 1:
+        parent_key = node_key.rsplit(sep=':', maxsplit=1)[0]
+        ancestor_key.insert(0, parent_key)
+        node_key = parent_key
+    return ancestor_key

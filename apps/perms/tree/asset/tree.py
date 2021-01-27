@@ -12,7 +12,7 @@ class PermissionAssetTree(BaseAssetTree):
     def __init__(self, asset_tree: AssetTree, permissions, **kwargs):
         self._asset_tree = asset_tree
         self._permissions = permissions
-        self._flag_for_immediate_granted = '@'
+        self._path_flag_key_of_immediate_granted = '@'
         super().__init__(**kwargs)
 
     def count_assets_of_granted(self):
@@ -67,21 +67,21 @@ class PermissionAssetTree(BaseAssetTree):
         """
 
         def arg_callable_filter_of_immediate_granted_asset(arg_iterable_path, arg_node):
-            if self._flag_for_immediate_granted not in arg_iterable_path:
+            if self._path_flag_key_of_immediate_granted not in arg_iterable_path:
                 return False
-            if self._flag_for_asset not in arg_iterable_path:
+            if self._path_key_of_asset not in arg_iterable_path:
                 return False
             return True
 
         def arg_callable_formatter_of_asset_id_as_path(arg_iterable_path, arg_node):
-            index_of_flag_for_asset = arg_iterable_path.index(self._flag_for_asset)
-            index_of_asset_id = index_of_flag_for_asset + 1
+            index_of_path_key_of_asset = arg_iterable_path.index(self._path_key_of_asset)
+            index_of_asset_id = index_of_path_key_of_asset + 1
             asset_id = arg_iterable_path[index_of_asset_id]
             return asset_id
 
         def arg_callable_formatter_of_asset_path(arg_iterable_path, arg_node):
-            index_of_flag_for_asset = arg_iterable_path.index(self._flag_for_asset)
-            index_of_asset_id = index_of_flag_for_asset + 1
+            index_of_path_key_of_asset = arg_iterable_path.index(self._path_key_of_asset)
+            index_of_asset_id = index_of_path_key_of_asset + 1
             path_of_asset = arg_iterable_path[:index_of_asset_id+1]
             path = self._delimiter_for_path.join(path_of_asset)
             return path
@@ -93,7 +93,7 @@ class PermissionAssetTree(BaseAssetTree):
 
         _arg_callable_filter = arg_callable_filter_of_immediate_granted_asset
 
-        paths = self._paths_of_tree_node(
+        paths = self.paths_of_tree_node(
             tree_node=self._root,
             arg_callable_filter=_arg_callable_filter,
             arg_callable_formatter=_arg_callable_formatter
@@ -104,10 +104,10 @@ class PermissionAssetTree(BaseAssetTree):
         """返回直接授权的节点 """
 
         def arg_callable_filter_of_immediate_granted_node(arg_iterable_path, arg_node):
-            if self._flag_for_immediate_granted not in arg_iterable_path:
+            if self._path_flag_key_of_immediate_granted not in arg_iterable_path:
                 return False
             index_of_flag_immediate_granted = arg_iterable_path.index(
-                self._flag_for_immediate_granted
+                self._path_flag_key_of_immediate_granted
             )
             path_of_before_immediate_granted_flag = \
                 arg_iterable_path[:index_of_flag_immediate_granted]
@@ -116,7 +116,7 @@ class PermissionAssetTree(BaseAssetTree):
 
         def arg_callable_formatter_of_node_path(arg_iterable_path, arg_node):
             index_of_flag_immediate_granted = arg_iterable_path.index(
-                self._flag_for_immediate_granted
+                self._path_flag_key_of_immediate_granted
             )
             path_of_node = arg_iterable_path[:index_of_flag_immediate_granted]
             return self._delimiter_for_path.join(path_of_node)
@@ -124,7 +124,7 @@ class PermissionAssetTree(BaseAssetTree):
         _arg_callable_filter = arg_callable_filter_of_immediate_granted_node
         _arg_callable_formatter = arg_callable_formatter_of_node_path
 
-        paths = self._paths_of_tree_node(
+        paths = self.paths_of_tree_node(
             tree_node=self._root,
             arg_callable_filter=_arg_callable_filter,
             arg_callable_formatter=_arg_callable_formatter
@@ -150,24 +150,22 @@ class PermissionAssetTree(BaseAssetTree):
         for node_key in nodes_key:
             # TODO: perf
             # 从 asset_tree 上获取的节点
-            tree_node_of_asset_tree = self._asset_tree._get_tree_node_at_path(
-                tree_node=self._asset_tree._root, arg_path=node_key
-            )
+            tree_node_of_asset_tree = self._asset_tree.get_tree_node_at_path(arg_path=node_key)
             tree_node_of_granted = TreeNode(arg_data=tree_node_of_asset_tree)
             # 添加授权的节点
-            tree_node_of_granted = self._append_path_to_tree_node(
+            tree_node_of_granted = self.append_path_to_tree_node(
                 tree_node=self._root, arg_path=node_key, arg_node=tree_node_of_granted
             )
             # 添加直接授权节点的标志路径
-            self._append_path_to_tree_node(
-                tree_node=tree_node_of_granted, arg_path=self._flag_for_immediate_granted
+            self.append_path_to_tree_node(
+                tree_node=tree_node_of_granted, arg_path=self._path_flag_key_of_immediate_granted
             )
 
         # 添加直接授权的资产
-        path_assets = self._asset_tree.paths_of_assets_for_assets_id(assets_id=assets_id)
+        path_assets = self._asset_tree.paths_assets_of_assets_id(assets_id=assets_id)
         for path_asset in path_assets:
             # 添加直接授权的标志路径
             path_asset_of_immediate_granted = self._delimiter_for_path.join([
-                path_asset, self._flag_for_immediate_granted
+                path_asset, self._path_flag_key_of_immediate_granted
             ])
-            self._append_path_to_tree_node(self._root, arg_path=path_asset_of_immediate_granted)
+            self.append_path_to_tree_node(self._root, arg_path=path_asset_of_immediate_granted)
