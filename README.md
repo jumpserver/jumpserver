@@ -60,7 +60,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
     <td>RADIUS 二次认证</td>
   </tr>
   <tr>
-    <td>登录复核:seedling:</td>
+    <td>登录复核:small_orange_diamond:</td>
     <td>用户登录行为受管理员的监管与控制</td>
   </tr>
   <tr>
@@ -85,22 +85,22 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
     <td>密码过期设置</td>
   </tr>
   <tr>
-    <td rowspan="2">批量改密:seedling:</td>
+    <td rowspan="2">批量改密:small_orange_diamond:</td>
     <td>定期批量改密</td>
   </tr>
   <tr>
     <td>多种密码策略</td>
   </tr>
   <tr>
-    <td>多云纳管:seedling: </td>
+    <td>多云纳管:small_orange_diamond: </td>
     <td>对私有云、公有云资产自动统一纳管</td>
   </tr>
   <tr>
-    <td>收集用户:seedling: </td>
+    <td>收集用户:small_orange_diamond: </td>
     <td>自定义任务定期收集主机用户</td>
   </tr>
   <tr>
-    <td>密码匣子:seedling: </td>
+    <td>密码匣子:small_orange_diamond: </td>
     <td>统一对资产主机的用户密码进行查看、更新、测试操作</td>
   </tr>
   <tr>
@@ -126,7 +126,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
     <td>实现更细粒度的应用级授权</td>
   </tr>
   <tr>
-    <td>MySQL 数据库应用、RemoteApp 远程应用:seedling: </td>
+    <td>MySQL 数据库应用、RemoteApp 远程应用:small_orange_diamond: </td>
   </tr>
   <tr>
     <td>动作授权</td>
@@ -153,11 +153,11 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
     <td>实现 Web SFTP 文件管理</td>
   </tr>
   <tr>
-    <td>工单管理:seedling:</td>
+    <td>工单管理:small_orange_diamond:</td>
     <td>支持对用户登录请求行为进行控制</td>
   </tr>
   <tr>
-    <td>组织管理:seedling:</td>
+    <td>组织管理:small_orange_diamond:</td>
     <td>实现多租户管理与权限隔离</td>
   </tr>
   <tr>
@@ -177,7 +177,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
     <td>支持对 Linux、Windows 等资产操作的录像进行回放审计</td>
   </tr>
   <tr>
-    <td>支持对 RemoteApp:seedling:、MySQL 等应用操作的录像进行回放审计</td>
+    <td>支持对 RemoteApp:small_orange_diamond:、MySQL 等应用操作的录像进行回放审计</td>
   </tr>
   <tr>
     <td>指令审计</td>
@@ -193,7 +193,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
     <td>命令方式</td>
   </tr>
   <tr>
-    <td>Web UI方式 :seedling:</td>
+    <td>Web UI方式 :small_orange_diamond:</td>
   </tr>
 
   <tr>
@@ -201,13 +201,13 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
     <td>MySQL</td>
   </tr>
   <tr>
-    <td>Oracle :seedling:</td>
+    <td>Oracle :small_orange_diamond:</td>
   </tr>
   <tr>
-    <td>MariaDB :seedling:</td>
+    <td>MariaDB :small_orange_diamond:</td>
   </tr>
   <tr>
-    <td>PostgreSQL :seedling:</td>
+    <td>PostgreSQL :small_orange_diamond:</td>
   </tr>
   <tr>
     <td rowspan="6">功能亮点</td>
@@ -237,7 +237,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
   </tr>
 </table>
 
-**说明**: 带 :seedling: 后缀的是 X-PACK 插件有的功能
+**说明**: 带 :small_orange_diamond: 后缀的是 X-PACK 插件有的功能
 
 ## 快速开始
 
