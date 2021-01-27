@@ -193,7 +193,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
     <td>命令方式</td>
   </tr>
   <tr>
-    <td>Web UI方式X</td>
+    <td>Web UI方式 (X-PACK)</td>
   </tr>
 
   <tr>
