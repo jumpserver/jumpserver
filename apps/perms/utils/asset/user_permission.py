@@ -141,8 +141,8 @@ class UserGrantedTreeRefreshController:
 
         for org in orgs:
             with tmp_to_org(org):
-                granted_tree_utils = UserGrantedTreeBuildUtils(user)
-                granted_tree_utils.rebuild_user_granted_tree()
+                utils = UserGrantedTreeBuildUtils(user)
+                utils.rebuild_user_granted_tree()
 
 
 class UserGrantedUtilsBase:
