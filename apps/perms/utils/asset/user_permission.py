@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import List, Tuple
 from itertools import chain
 
@@ -108,6 +109,16 @@ class UserGrantedTreeRefreshController:
                 asset_id__in=asset_ids).values_list('assetpermission_id', flat=True)
         )
         cls.add_need_refresh_by_asset_perm_ids(asset_perm_ids)
+
+    @classmethod
+    def add_need_refresh_by_asset_perm_ids_cross_orgs(cls, asset_perm_ids):
+        org_id_perm_ids_mapper = defaultdict(set)
+        pairs = AssetPermission.objects.filter(id__in=asset_perm_ids).values_list('org_id', 'id')
+        for org_id, perm_id in pairs:
+            org_id_perm_ids_mapper[org_id].add(perm_id)
+        for org_id, perm_ids in org_id_perm_ids_mapper.items():
+            with tmp_to_org(org_id):
+                cls.add_need_refresh_by_asset_perm_ids(perm_ids)
 
     @classmethod
     def add_need_refresh_by_asset_perm_ids(cls, asset_perm_ids):
