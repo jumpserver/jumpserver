@@ -357,7 +357,7 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
         favorite_asset_ids = list(favorite_asset_ids)
         assets = self.get_all_granted_assets().filter(id__in=favorite_asset_ids)
         return assets
-    
+
     def get_ungroup_assets(self) -> AssetQuerySet:
         return self.get_direct_granted_assets()
 
@@ -371,6 +371,7 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
         granted_node_ids = AssetPermission.nodes.through.objects.filter(
             assetpermission_id__in=self.asset_perm_ids
         ).values_list('node_id', flat=True).distinct()
+        granted_node_ids = list(granted_node_ids)
         queryset = Asset.org_objects.filter(
             nodes_related_records__node_id__in=granted_node_ids
         ).distinct()
@@ -378,6 +379,8 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
 
     def get_all_granted_assets(self) -> AssetQuerySet:
         queryset = self.get_direct_granted_nodes_assets() | self.get_direct_granted_assets()
+        # 清空 order_by 提高查询速度
+        queryset = queryset.order_by()
         return queryset
 
     def get_node_all_assets(self, id) -> Tuple[PermNode, AssetQuerySet]:
@@ -497,6 +500,7 @@ class UserGrantedNodesQueryUtils(UserGrantedUtilsBase):
         nodes.append(favorite_node)
         return nodes
 
+    @timeit
     def get_whole_tree_nodes(self, with_special=True):
         """
         这里的 granted nodes, 是整棵树需要的node，推算出来的也算
