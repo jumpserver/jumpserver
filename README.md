@@ -10,7 +10,6 @@
 |------------------|
 |2021年1月15日 JumpServer 发现远程执行漏洞，请速度修复 [详见](https://github.com/jumpserver/jumpserver/issues/5533)， 非常感谢  **reactivity of Alibaba Hackerone bug bounty program**(瑞典) 向我们报告了此 BUG|
 
-</br> </br>
 --------------------------
 
 JumpServer 是全球首款开源的堡垒机，使用 GNU GPL v2.0 开源协议，是符合 4A 规范的运维安全审计系统。
