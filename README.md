@@ -60,7 +60,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
     <td>RADIUS 二次认证</td>
   </tr>
   <tr>
-    <td>登录复核:high_brightness:</td>
+    <td>登录复核:coffee:</td>
     <td>用户登录行为受管理员的监管与控制</td>
   </tr>
   <tr>
@@ -85,23 +85,23 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
     <td>密码过期设置</td>
   </tr>
   <tr>
-    <td rowspan="2">批量改密:high_brightness:</td>
-    <td>定期批量改密</td>
+    <td rowspan="2">批量改密</td>
+    <td>定期批量改密:coffee:</td>
   </tr>
   <tr>
-    <td>多种密码策略</td>
+    <td>多种密码策略:coffee:</td>
   </tr>
   <tr>
-    <td>多云纳管:high_brightness: </td>
-    <td>对私有云、公有云资产自动统一纳管</td>
+    <td>多云纳管 </td>
+    <td>对私有云、公有云资产自动统一纳管:coffee:</td>
   </tr>
   <tr>
-    <td>收集用户:high_brightness: </td>
-    <td>自定义任务定期收集主机用户</td>
+    <td>收集用户 </td>
+    <td>自定义任务定期收集主机用户:coffee:</td>
   </tr>
   <tr>
-    <td>密码匣子:high_brightness: </td>
-    <td>统一对资产主机的用户密码进行查看、更新、测试操作</td>
+    <td>密码匣子 </td>
+    <td>统一对资产主机的用户密码进行查看、更新、测试操作:coffee:</td>
   </tr>
   <tr>
     <td rowspan="15">授权控制<br>Authorization</td>
@@ -126,7 +126,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
     <td>实现更细粒度的应用级授权</td>
   </tr>
   <tr>
-    <td>MySQL 数据库应用、RemoteApp 远程应用:high_brightness: </td>
+    <td>MySQL 数据库应用、RemoteApp 远程应用:coffee: </td>
   </tr>
   <tr>
     <td>动作授权</td>
@@ -153,12 +153,12 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
     <td>实现 Web SFTP 文件管理</td>
   </tr>
   <tr>
-    <td>工单管理:high_brightness:</td>
-    <td>支持对用户登录请求行为进行控制</td>
+    <td>工单管理</td>
+    <td>支持对用户登录请求行为进行控制:coffee:</td>
   </tr>
   <tr>
-    <td>组织管理:high_brightness:</td>
-    <td>实现多租户管理与权限隔离</td>
+    <td>组织管理</td>
+    <td>实现多租户管理与权限隔离:coffee:</td>
   </tr>
   <tr>
     <td rowspan="7">安全审计<br>Audit</td>
@@ -177,7 +177,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
     <td>支持对 Linux、Windows 等资产操作的录像进行回放审计</td>
   </tr>
   <tr>
-    <td>支持对 RemoteApp:high_brightness:、MySQL 等应用操作的录像进行回放审计</td>
+    <td>支持对 RemoteApp:coffee:、MySQL 等应用操作的录像进行回放审计</td>
   </tr>
   <tr>
     <td>指令审计</td>
@@ -193,7 +193,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
     <td>命令方式</td>
   </tr>
   <tr>
-    <td>Web UI方式 :high_brightness:</td>
+    <td>Web UI方式 :coffee:</td>
   </tr>
 
   <tr>
@@ -201,13 +201,13 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
     <td>MySQL</td>
   </tr>
   <tr>
-    <td>Oracle :high_brightness:</td>
+    <td>Oracle :coffee:</td>
   </tr>
   <tr>
-    <td>MariaDB :high_brightness:</td>
+    <td>MariaDB :coffee:</td>
   </tr>
   <tr>
-    <td>PostgreSQL :high_brightness:</td>
+    <td>PostgreSQL :coffee:</td>
   </tr>
   <tr>
     <td rowspan="6">功能亮点</td>
@@ -237,7 +237,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
   </tr>
 </table>
 
-**说明**: 带 :high_brightness: 后缀的是 X-PACK 插件有的功能
+**说明**: 带 :coffee: 后缀的是 X-PACK 插件有的功能
 
 ## 快速开始
 
