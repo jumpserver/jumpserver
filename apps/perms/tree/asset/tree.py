@@ -1,8 +1,13 @@
+from collections import defaultdict
 from django.db.models import Q
+from users.models import User
+from django.core.cache import cache
 from perms.models import AssetPermission
+from perms.utils.asset import get_user_all_assetpermissions_id
 from assets.tree.asset import (
     BaseAssetTree,
     AssetTree,
+    AssetTreeManager,
     contains_path_key_for_asset,
     is_node_path,
     iterable_path_as_string,
@@ -56,9 +61,8 @@ def arg_callable_formatter_path_for_immediate_granted_node(arg_iterable_path, ar
 class PermissionAssetTree(BaseAssetTree):
     """ 授权资产树 """
 
-    def __init__(self, asset_tree: AssetTree, permissions, **kwargs):
-        self.asset_tree = asset_tree
-        self._permissions = permissions
+    def __init__(self, user: User, **kwargs):
+        self._user = user
         super().__init__(**kwargs)
 
     def count_assets_of_granted(self):
@@ -139,34 +143,67 @@ class PermissionAssetTree(BaseAssetTree):
 
     def initial(self):
         """ 初始化授权资产树 """
-        queries = Q(assetpermission_id__in=self._permissions.values_list('id', flat=True))
+        permissions_id = get_user_all_assetpermissions_id(user=self._user)
 
-        granted_nodes_key = AssetPermission.nodes.through.objects\
-            .filter(queries).prefetch_related('node__key').values_list('node__key', flat=True)
-        granted_nodes_key = set(granted_nodes_key)
+        queries = Q(assetpermission_id__in=permissions_id)
 
-        granted_assets_id = AssetPermission.assets.through.objects\
-            .filter(queries).values_list('asset_id', flat=True)
-        granted_assets_id = set([str(asset_id) for asset_id in granted_assets_id])
+        granted_nodes = AssetPermission.nodes.through.objects\
+            .filter(queries)\
+            .prefetch_related('node__key', 'node__org_id')\
+            .values_list('node__org_id', 'node__key')
+        granted_nodes = set(granted_nodes)
 
-        for node_key in granted_nodes_key:
-            self.initial_granted_node(node_path=node_key)
+        granted_assets = AssetPermission.assets.through.objects\
+            .prefetch_related('asset__org_id')\
+            .filter(queries)\
+            .values_list('asset_id', 'asset__org_id')
+        granted_assets = set([str(asset_id) for asset_id in granted_assets])
 
-        paths_of_granted_assets = self.asset_tree.paths_assets_of_assets_id(granted_assets_id)
-        for asset_path in paths_of_granted_assets:
-            self.initial_granted_asset(asset_path=asset_path)
+        org_id_nodes_key_mapping = defaultdict(set)
+        for node__org_id, node_key in granted_nodes:
+            org_id_nodes_key_mapping[str(node__org_id)].add(node_key)
 
-    def initial_granted_node(self, node_path):
+        org_id_assets_id_mapping = defaultdict(set)
+        for asset__org_id, asset_id in granted_assets:
+            org_id_assets_id_mapping[str(asset__org_id)].add(str(asset_id))
+
+        org_id_nodes_key_assets_id_mapping = defaultdict(dict)
+        for org_id, nodes_key in org_id_nodes_key_mapping.items():
+            org_id_nodes_key_assets_id_mapping[org_id]['nodes_key'] = nodes_key
+
+        for org_id, assets_id in org_id_assets_id_mapping.items():
+            org_id_nodes_key_assets_id_mapping[org_id]['assets_id'] = assets_id
+
+        for org_id, nodes_key_assets_id in org_id_nodes_key_assets_id_mapping.items():
+            org_asset_tree = self.__get_asset_tree_of_org(org_id=org_id)
+            nodes_key = nodes_key_assets_id['nodes_key']
+            assets_id = nodes_key_assets_id['assets_id']
+            self.initial_granted_nodes(asset_tree=org_asset_tree, nodes_key=nodes_key)
+            self.initial_granted_assets(asset_tree=org_asset_tree, assets_id=assets_id)
+
+    def initial_granted_nodes(self, asset_tree: AssetTree, nodes_key):
         """ 初始化授权的节点 """
-        cloned_tree_node = self.asset_tree.clone_tree_node_at_path(arg_path=node_path)
-        tree_node = self.append_path_to_tree_node(self._root, node_path, arg_node=cloned_tree_node)
-        self.append_path_to_tree_node(tree_node, arg_path=path_key_for_mark_immediate_granted)
+        for node_key in nodes_key:
+            cloned_tree_node = asset_tree.clone_tree_node_at_path(arg_path=node_key)
+            tree_node = self.append_path_to_tree_node(
+                tree_node=self._root, arg_path=node_key, arg_node=cloned_tree_node
+            )
+            self.append_path_to_tree_node(tree_node, arg_path=path_key_for_mark_immediate_granted)
 
-    def initial_granted_asset(self, asset_path):
+    def initial_granted_assets(self, asset_tree: AssetTree, assets_id):
         """
         初始化授权的资产
 
         Note: 直接添加包含直接授权标志的资产路径, 提升初始化性能
         """
-        asset_path = self.iterable_path_as_string([asset_path, path_key_for_mark_immediate_granted])
-        self.append_path_to_tree_node(self._root, arg_path=asset_path)
+        paths_of_granted_assets = asset_tree.paths_assets_of_assets_id(assets_id)
+        for asset_path in paths_of_granted_assets:
+            asset_path = self.iterable_path_as_string([
+                asset_path, path_key_for_mark_immediate_granted
+            ])
+            self.append_path_to_tree_node(self._root, arg_path=asset_path)
+
+    @staticmethod
+    def __get_asset_tree_of_org(org_id) -> AssetTree:
+        asset_tree_manager = AssetTreeManager()
+        return asset_tree_manager.get_tree(org_id=org_id)
