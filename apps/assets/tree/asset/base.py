@@ -117,14 +117,9 @@ class BaseAssetTree(object):
         assets_id = self.get_assets_id()
         return len(assets_id)
 
-    def count_assets_of_node(self, node_key, immediate=False):
-        """
-        计算节点下的资产数量
-
-        arg - node_key:
-        arg - immediate: if True: 只计算节点的直接资产; else: 计算节点下的所有资产;
-        """
-        assets_id = self.get_assets_id_of_node(node_key=node_key, immediate=immediate)
+    def count_assets_of_node(self, node_key):
+        """ 计算节点下的资产数量 """
+        assets_id = self.get_assets_id_of_node(node_key=node_key)
         return len(set(assets_id))
 
     def count_nodes(self, level=None):
@@ -141,18 +136,18 @@ class BaseAssetTree(object):
         assets_id = self.paths_assets(asset_id_as_path=True)
         return list(set(assets_id))
 
-    def get_assets_id_of_node(self, node_key, immediate=False):
+    def get_assets_id_of_node(self, node_key):
         """ 获取节点下的资产id """
-        assets_id = self.paths_assets_of_node(
-            node_key=node_key, immediate=immediate, asset_id_as_path=True
-        )
+        assets_id = self.paths_assets_of_node(node_key=node_key, asset_id_as_path=True)
         return list(set(assets_id))
 
     def get_nodes_key(self, level=None):
+        """ 获取所有节点的key """
         nodes_key = self.paths_nodes(level=level)
         return nodes_key
 
     def get_nodes_children_key(self, nodes_key):
+        """ 获取节点子孙节点的key """
         nodes_children_key = set()
         for node_key in nodes_key:
             node_children_key = self.get_node_children_key(node_key=node_key)
@@ -172,7 +167,6 @@ class BaseAssetTree(object):
         """
         return: 返回节点的子节点的路径
         arg: node_key - 节点key
-        arg: immediate - 是否是直接子节点
         """
 
         assert level is None or isinstance(level, int), '`level` should be of type int or None'
@@ -183,7 +177,7 @@ class BaseAssetTree(object):
         if level == 1:
             _arg_bool_search_sub_tree = False
         else:
-            _arg_bool_search_sub_tree = False
+            _arg_bool_search_sub_tree = True
 
         if node_key is None:
             _tree_node = self._root
@@ -216,7 +210,9 @@ class BaseAssetTree(object):
         else:
             _is_absolute_path = False
 
-        if not _is_absolute_path:
+        if _is_absolute_path:
+            paths = [self.iterable_path_as_string(path) for path in paths]
+        else:
             paths = [self.iterable_path_as_string([node_key, path]) for path in paths]
 
         return paths
@@ -225,11 +221,10 @@ class BaseAssetTree(object):
         """ 所有资产的路径 """
         return self.paths_assets_of_node(asset_id_as_path=asset_id_as_path)
 
-    def paths_assets_of_node(self, node_key=None, immediate=False, asset_id_as_path=False):
+    def paths_assets_of_node(self, node_key=None, asset_id_as_path=False):
         """
         return: 返回节点下的资产的路径
         arg: node_key - 节点 key
-        arg: immediate - 是否是直接资产
         arg: only_asset_id - 是否只返回资产id
         """
 
@@ -241,16 +236,12 @@ class BaseAssetTree(object):
         if _tree_node is None:
             return []
 
-        if immediate:
-            _arg_bool_search_sub_tree = True
-        else:
-            _arg_bool_search_sub_tree = False
-
         if asset_id_as_path:
             _arg_callable_formatter = arg_callable_formatter_path_for_asset_id_as_path
         else:
             _arg_callable_formatter = arg_callable_formatter_path_for_path_as_string
 
+        _arg_bool_search_sub_tree = True
         _arg_callable_filter = arg_callable_filter_path_for_asset
 
         paths = self.paths_of_tree_node(
@@ -271,7 +262,7 @@ class BaseAssetTree(object):
             _is_absolute_path = False
 
         if _to_absolute_path and not _is_absolute_path:
-            paths = [delimiter_for_path.join([node_key, path]) for path in paths]
+            paths = [iterable_path_as_string([node_key, path]) for path in paths]
 
         return paths
 
@@ -309,4 +300,5 @@ class BaseAssetTree(object):
 
     @staticmethod
     def iterable_path_as_string(iterable_path):
+        """ 可迭代路径转化为string """
         return delimiter_for_path.join(iterable_path)
