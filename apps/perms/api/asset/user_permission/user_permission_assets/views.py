@@ -5,7 +5,7 @@ from common.utils import get_logger
 from ..mixin import ForAdminMixin, ForUserMixin
 from .mixin import (
     UserAllGrantedAssetsMixin, UserDirectGrantedAssetsMixin, UserFavoriteGrantedAssetsMixin,
-    UserGrantedNodeAssetsMixin, AssetsSerializerFormatMixin, AssetsTreeFormatMixin
+    UserGrantedNodeAssetsMixin, AssetsSerializerFormatMixin, AssetsTreeFormatMixin,
 )
 
 __all__ = [
@@ -94,6 +94,6 @@ class UserGrantedNodeAssetsForAdminApi(UserGrantedNodeAssetsMixin,
 
 class MyGrantedNodeAssetsApi(UserGrantedNodeAssetsMixin,
                              ForUserMixin,
-                             AssetsTreeFormatMixin,
+                             AssetsSerializerFormatMixin,
                              ListAPIView):
     pass
