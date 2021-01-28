@@ -212,14 +212,19 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
     def list(self, request, *args, **kwargs):
         import time
         t1 = time.time()
+
         node_level = self.request.query_params.get('node_level', 2)
         nodes = self.tree.get_nodes(level=int(node_level))
+
         t2 = time.time()
+
         data = self.serialize_nodes(nodes=nodes, with_asset_amount=True)
+
         t3 = time.time()
         t2_t1 = (t2-t1) * 1000
         t3_t2 = (t3-t2) * 1000
         print('>>>>>>>>> process request: t2-t1: {:.1f}ms, t3-t2: {:.1f}ms'.format(t2_t1, t3_t2))
+
         return Response(data=data)
 
     # def list_back(self, request, *args, **kwargs):
