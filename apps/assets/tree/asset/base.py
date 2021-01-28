@@ -114,6 +114,21 @@ class BaseAssetTree(object):
         _tree_node = self._root.get_node_child_at_path(arg_path=arg_path)
         return _tree_node
 
+    def get_object_at_path(self, arg_path):
+        return self._root.get_object_at_path(arg_path=arg_path, arg_bool_path_is_absolute=True)
+
+    @staticmethod
+    def set_node_object_to_tree_node(tree_node: TreeNode, node):
+        return tree_node.set_object_stored_in_node(
+            arg_path=None, arg_object=node, arg_bool_path_is_absolute=False
+        )
+
+    @staticmethod
+    def set_asset_object_to_tree_node(tree_node: TreeNode, asset):
+        return tree_node.set_object_stored_in_node(
+            arg_path=None, arg_object=asset, arg_bool_path_is_absolute=False
+        )
+
     def count_assets(self):
         """ 计算所有的资产数量 """
         assets_id = self.get_assets_id()
@@ -121,8 +136,13 @@ class BaseAssetTree(object):
 
     def count_assets_of_node(self, node_key, immediate=False):
         """ 计算节点下的资产数量 """
+        node = self.get_node(node_key=node_key)
+        if hasattr(node, 'count_of_assets'):
+            return getattr(node, 'count_of_assets')
         assets_id = self.get_assets_id_of_node(node_key=node_key, immediate=immediate)
-        return len(set(assets_id))
+        count_assets = len(set(assets_id))
+        setattr(node, 'count_of_assets', count_assets)
+        return count_assets
 
     def count_nodes(self, level=None):
         """ 计算所有节点的数量 """
@@ -142,6 +162,17 @@ class BaseAssetTree(object):
         """ 获取节点下的资产id """
         assets_id = self.paths_assets_of_node(node_key, immediate=immediate, asset_id_as_path=True)
         return list(set(assets_id))
+
+    def get_nodes(self, level=None):
+        nodes_key = self.get_nodes_key(level=level)
+        nodes = [self.get_node(node_key=node_key) for node_key in nodes_key]
+        return nodes
+
+    def get_asset(self, asset_path):
+        return self.get_object_at_path(arg_path=asset_path)
+
+    def get_node(self, node_key):
+        return self.get_object_at_path(arg_path=node_key)
 
     def get_nodes_key(self, level=None):
         """ 获取所有节点的key """
