@@ -4,4 +4,4 @@
 from django.dispatch import Signal
 
 
-org_asset_tree_change = Signal(providing_args=['action', 'org_id'])
+tree_destroy_signal = Signal(providing_args=['org_id'])

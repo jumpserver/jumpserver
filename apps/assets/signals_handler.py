@@ -28,7 +28,7 @@ from .tasks import (
     add_nodes_assets_to_system_users
 )
 from .tree.asset import AssetTreeManager
-from .signals import org_asset_tree_change
+from .signals import tree_destroy_signal
 
 
 logger = get_logger(__file__)
@@ -364,64 +364,35 @@ def on_asset_post_delete(instance: Asset, using, **kwargs):
 
 @singleton
 class AssetTreeSubPub(RedisPubSub):
-    action_choices = AssetTreeManager().ActionChoices
 
     def __init__(self, **kwargs):
-        self._delimiter_for_data = '@'
         channel = 'fm.org_asset_tree_change'
         super().__init__(ch=channel, **kwargs)
-
-    def publish(self, *args, **kwargs):
-        action = kwargs.get('action')
-        org_id = kwargs.get('org_id')
-        pid = os.getpid()
-        assert action is not None and org_id is not None, 'org_id and action are required'
-        assert action in self.action_choices.names, (
-            'The action is invalid, choices: {}'.format(self.action_choices.names)
-        )
-
-        data = self.construct_data(action, org_id, pid)
-        return super().publish(data=data)
-
-    def construct_data(self, action, org_id, pid):
-        return self._delimiter_for_data.join([action, org_id, str(pid)])
-
-    def parse_data(self, data):
-        action, org_id, pid = data.split(self._delimiter_for_data)
-        return action, org_id, int(pid)
 
 
 @receiver(post_save, sender=None)
 def on_node_post_save(sender, instance: Node, created, **kwargs):
     if created:
-        _send_org_asset_tree_change_signal = True
+        _destroy_tree = True
     else:
         update_fields = kwargs.get('update_fields')
         if update_fields is not None and 'key' in update_fields:
-            _send_org_asset_tree_change_signal = True
+            _destroy_tree = True
         else:
-            _send_org_asset_tree_change_signal = False
-
-    if _send_org_asset_tree_change_signal:
-        org_asset_tree_change.send(
-            sender=None, action=AssetTreeManager().ActionChoices.destroy, org_id=current_org.id
-        )
+            _destroy_tree = False
+    if _destroy_tree:
+        tree_destroy_signal.send(sender=None, org_id=current_org.org_id)
 
 
 @receiver(m2m_changed, sender=Asset.nodes.through)
 def on_asset_node_relation_change(sender, **kwargs):
-    org_asset_tree_change.send(
-        sender=None, action=AssetTreeManager().ActionChoices.destroy, org_id=current_org.org_id
-    )
+    tree_destroy_signal.send(sender=None, org_id=current_org.org_id)
 
 
-@receiver(org_asset_tree_change)
-def on_org_asset_tree_change(sender, action, org_id, **kwargs):
-    logger.debug(
-        'receive signal for org asset tree change: action={}, org_id={}'.format(action, org_id)
-    )
-    asset_tree_sub_pub = AssetTreeSubPub()
-    asset_tree_sub_pub.publish(action=action, org_id=org_id)
+@receiver(tree_destroy_signal)
+def on_tree_destroy(sender, org_id, **kwargs):
+    logger.debug('receive signal for org asset tree destroy: org_id={}'.format(org_id))
+    AssetTreeSubPub().publish(data=org_id)
 
 
 @receiver(django_ready)
@@ -434,24 +405,10 @@ def subscribe_asset_tree_change(sender, **kwargs):
         for message in subscribe.listen():
             if message['type'] != 'message':
                 continue
-            data = message['data'].decode()
-            action, org_id, pid = asset_tree_sub_pub.parse_data(data)
-            logger.debug("found org asset tree change: action={}, org_id={}, pid={}"
-                         "".format(action, org_id, pid))
-
-            if os.getpid() == pid and action == AssetTreeManager().ActionChoices.refresh:
-                _to_process = False
-            else:
-                _to_process = True
-
-            if not _to_process:
-                logger.debug('current process does not process')
-                continue
-
+            org_id = message['data'].decode()
+            logger.debug("found org asset tree destroy: org_id={}, pid={}".format(org_id, os.getpid()))
             asset_tree_manager = AssetTreeManager()
-            asset_tree_manager.processor_tree(action=action, org_id=org_id)
-            logger.debug("org asset tree has processed: action={}, org_id={}, pid={}"
-                         "".format(action, org_id, pid))
+            asset_tree_manager.destroy_tree(org_id=org_id)
 
     thread = threading.Thread(target=keep_subscribe, daemon=True)
     thread.start()
