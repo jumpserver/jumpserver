@@ -113,7 +113,6 @@ class PermissionAssetTree(BaseAssetTree):
         return: 返回直接授权的资产
         arg - only_asset_id: 是否只返回资产id
         """
-
         _arg_callable_filter = arg_callable_filter_path_for_immediate_granted_asset
 
         if asset_id_as_path:
@@ -130,7 +129,6 @@ class PermissionAssetTree(BaseAssetTree):
 
     def paths_nodes_of_immediate_granted(self):
         """返回直接授权的节点 """
-
         _arg_callable_filter = arg_callable_filter_path_for_immediate_granted_node
         _arg_callable_formatter = arg_callable_formatter_path_for_immediate_granted_node
 
@@ -174,7 +172,7 @@ class PermissionAssetTree(BaseAssetTree):
             org_id_nodes_key_assets_id_mapping[org_id]['assets_id'] = assets_id
 
         for org_id, nodes_key_assets_id in org_id_nodes_key_assets_id_mapping.items():
-            org_asset_tree = self.__get_asset_tree_of_org(org_id=org_id)
+            org_asset_tree = self.get_asset_tree_of_org(org_id=org_id)
             nodes_key = nodes_key_assets_id.get('nodes_key')
             assets_id = nodes_key_assets_id.get('assets_id')
             if nodes_key:
@@ -205,6 +203,6 @@ class PermissionAssetTree(BaseAssetTree):
             self.append_path_to_tree_node(self._root, arg_path=asset_path)
 
     @staticmethod
-    def __get_asset_tree_of_org(org_id) -> AssetTree:
-        asset_tree_manager = AssetTreeManager()
-        return asset_tree_manager.get_tree(org_id=org_id)
+    def get_asset_tree_of_org(org_id) -> AssetTree:
+        tree_manager = AssetTreeManager()
+        return tree_manager.get_tree(org_id=org_id)

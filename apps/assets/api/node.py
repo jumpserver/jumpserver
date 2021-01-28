@@ -12,6 +12,7 @@ from django.utils.decorators import method_decorator
 from django.db.models.signals import m2m_changed
 
 from common.const.http import POST
+from common.utils import lazyproperty
 from common.exceptions import SomeoneIsDoingThis
 from common.const.signals import PRE_REMOVE, POST_REMOVE
 from assets.models import Asset
@@ -31,6 +32,7 @@ from ..tasks import (
 )
 from .. import serializers
 from .mixin import SerializeToTreeNodeMixin
+from assets.tree.asset import AssetTreeManager, AssetTree
 
 
 logger = get_logger(__file__)
@@ -172,22 +174,70 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
     """
     model = Node
 
+    @lazyproperty
+    def tree(self) -> AssetTree:
+        _tree = AssetTreeManager().get_tree(org_id=current_org.id)
+        return _tree
+
+    def serialize_nodes(self, nodes, with_asset_amount=False):
+
+        if with_asset_amount:
+            def _name(node: Node):
+                count_assets = self.tree.count_assets_of_node(node_key=node.key)
+                return '{} ({})'.format(node.value, count_assets)
+        else:
+            def _name(node: Node):
+                return node.value
+        data = [
+            {
+                'id': node.key,
+                'name': _name(node),
+                'title': _name(node),
+                'pId': node.parent_key,
+                'isParent': True,
+                'open': node.is_org_root(),
+                'meta': {
+                    'node': {
+                        "id": node.id,
+                        "key": node.key,
+                        "value": node.value,
+                    },
+                    'type': 'node'
+                }
+            }
+            for node in nodes
+        ]
+        return data
+
     def list(self, request, *args, **kwargs):
-        nodes = self.get_queryset().order_by('value')
-        nodes = self.serialize_nodes(nodes, with_asset_amount=True)
-        assets = self.get_assets()
-        data = [*nodes, *assets]
+        import time
+        t1 = time.time()
+        tree = AssetTreeManager().get_tree(org_id=current_org.id)
+        node_level = self.request.query_params.get('node_level', 2)
+        nodes_key = tree.get_nodes_key(level=int(node_level))
+        t2 = time.time()
+        nodes = Node.objects.filter(key__in=nodes_key)
+        data = self.serialize_nodes(nodes=nodes, with_asset_amount=True)
+        t3 = time.time()
+        print('>>>>>>>>> process request: ', t2 - t1, t3-t2)
         return Response(data=data)
 
-    def get_assets(self):
-        include_assets = self.request.query_params.get('assets', '0') == '1'
-        if not include_assets:
-            return []
-        assets = self.instance.get_assets().only(
-            "id", "hostname", "ip", "os",
-            "org_id", "protocols", "is_active"
-        )
-        return self.serialize_assets(assets, self.instance.key)
+    # def list_back(self, request, *args, **kwargs):
+    #     nodes = self.get_queryset().order_by('value')
+    #     nodes = self.serialize_nodes(nodes, with_asset_amount=True)
+    #     assets = self.get_assets()
+    #     data = [*nodes, *assets]
+    #     return Response(data=data)
+    #
+    # def get_assets(self):
+    #     include_assets = self.request.query_params.get('assets', '0') == '1'
+    #     if not include_assets:
+    #         return []
+    #     assets = self.instance.get_assets().only(
+    #         "id", "hostname", "ip", "os",
+    #         "org_id", "protocols", "is_active"
+    #     )
+    #     return self.serialize_assets(assets, self.instance.key)
 
 
 class NodeAssetsApi(generics.ListAPIView):

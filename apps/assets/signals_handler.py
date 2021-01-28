@@ -364,13 +364,12 @@ def on_asset_post_delete(instance: Asset, using, **kwargs):
 
 @singleton
 class AssetTreeSubPub(RedisPubSub):
-
     def __init__(self, **kwargs):
         channel = 'fm.org_asset_tree_change'
         super().__init__(ch=channel, **kwargs)
 
 
-@receiver(post_save, sender=None)
+@receiver(post_save, sender=Node)
 def on_node_post_save(sender, instance: Node, created, **kwargs):
     if created:
         _destroy_tree = True
