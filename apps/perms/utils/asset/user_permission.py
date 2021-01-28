@@ -1,10 +1,10 @@
-from collections import defaultdict
+from collections import defaultdict, namedtuple
 from typing import List, Tuple
 from itertools import chain
 
 from django.core.cache import cache
 from django.conf import settings
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 
 from common.utils.common import lazyproperty, timeit
 from assets.tree import Tree
@@ -26,6 +26,7 @@ logger = get_logger(__name__)
 def get_user_all_asset_perm_ids(user) -> set:
     group_ids = user.groups.through.objects.filter(user_id=user.id) \
         .distinct().values_list('usergroup_id', flat=True)
+    group_ids = list(group_ids)
     asset_perm_ids = set()
     asset_perm_ids.update(
         AssetPermission.users.through.objects.filter(
@@ -34,6 +35,78 @@ def get_user_all_asset_perm_ids(user) -> set:
         AssetPermission.user_groups.through.objects.filter(
             usergroup_id__in=group_ids).distinct().values_list('assetpermission_id', flat=True))
     return asset_perm_ids
+
+
+class QuerySetStage:
+    def __init__(self):
+        self._prefetch_related = set()
+        self._only = ()
+        self._filters = []
+        self._querysets_and = []
+        self._querysets_or = []
+        self._order_by = None
+
+    def prefetch_related(self, *lookups):
+        self._prefetch_related.update(lookups)
+        return self
+
+    def only(self, *fields):
+        self._only = fields
+        return self
+
+    def order_by(self, *field_names):
+        self._order_by = field_names
+        return self
+
+    def filter(self, *args, **kwargs):
+        self._filters.append((args, kwargs))
+        return self
+
+    def and_with_queryset(self, qs: QuerySet):
+        assert isinstance(qs, QuerySet), f'Must be `QuerySet`'
+        self._order_by = qs.query.order_by
+        self._querysets_and.append(qs.order_by())
+        return self
+
+    def or_with_queryset(self, qs: QuerySet):
+        assert isinstance(qs, QuerySet), f'Must be `QuerySet`'
+        self._order_by = qs.query.order_by
+        self._querysets_or.append(qs.order_by())
+        return self
+
+    def merge_many_before_union(self, *querysets):
+        ret = []
+        for qs in querysets:
+            qs = self.merge_before_union(qs)
+            ret.append(qs)
+        return ret
+
+    def merge_before_union(self, qs: QuerySet) -> QuerySet:
+        assert isinstance(qs, QuerySet), f'Must be `QuerySet`'
+        if self._only:
+            qs = qs.only(*self._only)
+        if self._filters:
+            for args, kwargs in self._filters:
+                qs = qs.filter(*args, **kwargs)
+        if self._querysets_and:
+            for qs_and in self._querysets_and:
+                qs &= qs_and
+        if self._querysets_or:
+            for qs_or in self._querysets_or:
+                qs |= qs_or
+        if self._prefetch_related:
+            qs = qs.prefetch_related(*self._prefetch_related)
+        return qs
+
+    def merge_after_union(self, qs: QuerySet) -> QuerySet:
+        if self._order_by is not None:
+            qs = qs.order_by(*self._order_by)
+        return qs
+
+    def merge_all(self, qs: QuerySet) -> QuerySet:
+        qs = self.merge_before_union(qs)
+        qs = self.merge_after_union(qs)
+        return qs
 
 
 class UserGrantedTreeRefreshController:
@@ -351,18 +424,22 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
 
 class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
 
-    def get_favorite_assets(self) -> AssetQuerySet:
+    def get_favorite_assets(self, qs_stage: QuerySetStage = None) -> AssetQuerySet:
         favorite_asset_ids = FavoriteAsset.objects.filter(
             user=self.user).values_list('asset_id', flat=True)
         favorite_asset_ids = list(favorite_asset_ids)
-        assets = self.get_all_granted_assets().filter(id__in=favorite_asset_ids)
+        qs_stage = qs_stage or QuerySetStage()
+        qs_stage.filter(id__in=favorite_asset_ids)
+        qs_stage.only('id')
+        qs_stage.order_by()
+        assets = self.get_all_granted_assets(qs_stage)
         return assets
 
     def get_ungroup_assets(self) -> AssetQuerySet:
         return self.get_direct_granted_assets()
 
     def get_direct_granted_assets(self) -> AssetQuerySet:
-        queryset = Asset.org_objects.filter(
+        queryset = Asset.org_objects.order_by().filter(
             granted_by_permissions__id__in=self.asset_perm_ids
         ).distinct()
         return queryset
@@ -372,26 +449,33 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
             assetpermission_id__in=self.asset_perm_ids
         ).values_list('node_id', flat=True).distinct()
         granted_node_ids = list(granted_node_ids)
-        queryset = Asset.org_objects.filter(
+        queryset = Asset.org_objects.order_by().filter(
             nodes_related_records__node_id__in=granted_node_ids
         ).distinct()
         return queryset
 
-    def get_all_granted_assets(self) -> AssetQuerySet:
-        queryset = self.get_direct_granted_nodes_assets() | self.get_direct_granted_assets()
-        # 清空 order_by 提高查询速度
-        queryset = queryset.order_by()
+    def get_all_granted_assets(self, qs_stage: QuerySetStage = None) -> AssetQuerySet:
+        direct_granted_nodes_assets = self.get_direct_granted_nodes_assets()
+        direct_granted_assets = self.get_direct_granted_assets()
+
+        direct_granted_nodes_assets, direct_granted_assets = qs_stage.merge_many_before_union(
+            direct_granted_nodes_assets, direct_granted_assets)
+        queryset = direct_granted_nodes_assets.union(direct_granted_assets)
+        queryset = qs_stage.merge_after_union(queryset)
         return queryset
 
-    def get_node_all_assets(self, id) -> Tuple[PermNode, AssetQuerySet]:
-        node = PermNode.get_node_with_mapping_info(self.user, id)
+    def get_node_all_assets(self, id, qs_stage: QuerySetStage = None) -> Tuple[PermNode, AssetQuerySet]:
+        node = PermNode.get_node_with_granted_info(self.user, id)
         granted_status = PermNode.get_node_granted_status(self.user, node.key)
         if granted_status == PermNode.GRANTED_DIRECT:
-            assets = Asset.org_objects.filter(nodes_related_records__node_id=node.id)
+            assets = Asset.org_objects.distinct().order_by().filter(nodes_related_records__node_id=node.id)
+            if qs_stage:
+                assets = qs_stage.merge_all(assets)
             return node, assets
         elif granted_status == PermNode.GRANTED_INDIRECT:
             node.use_mapping_assets_amount()
-            return node, self._get_indirect_granted_node_all_assets(node.key)
+            assets = self._get_indirect_granted_node_all_assets(node.key, qs_stage=qs_stage)
+            return node, assets
         else:
             node.assets_amount = 0
             return node, Asset.org_objects.none()
@@ -401,7 +485,7 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
         granted_status = PermNode.get_node_granted_status(self.user, node.key)
 
         if granted_status == PermNode.GRANTED_DIRECT:
-            assets = Asset.org_objects.filter(nodes_id=node.id)
+            assets = Asset.org_objects.order_by().filter(nodes_id=node.id)
             return assets
         elif granted_status == PermNode.GRANTED_INDIRECT:
             return self._get_indirect_granted_node_assets(node.id)
@@ -409,10 +493,10 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
             return Asset.org_objects.none()
 
     def _get_indirect_granted_node_assets(self, id) -> AssetQuerySet:
-        assets = Asset.org_objects.filter(nodes_id=id) & self.get_direct_granted_assets()
+        assets = Asset.org_objects.order_by().filter(nodes_id=id) & self.get_direct_granted_assets()
         return assets
 
-    def _get_indirect_granted_node_all_assets(self, key) -> AssetQuerySet:
+    def _get_indirect_granted_node_all_assets(self, key, qs_stage: QuerySetStage = None) -> AssetQuerySet:
         """
         此算法依据 `UserGrantedMappingNode` 的数据查询
         1. 查询该节点下的直接授权节点
@@ -426,8 +510,9 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
         ).filter(
             Q(key__startswith=f'{key}:') | Q(key=key)
         ).values_list('node_id', flat=True)
-
-        granted_node_assets = Asset.org_objects.filter(nodes_related_records__node_id__in=granted_node_ids)
+        granted_node_ids = list(granted_node_ids)
+        direct_granted_node_assets = Asset.org_objects.distinct().order_by().filter(
+            nodes_related_records__node_id__in=granted_node_ids)
 
         # 查询该节点下的资产授权节点
         only_asset_granted_node_ids = UserGrantedMappingNode.objects.filter(
@@ -435,13 +520,18 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
             asset_granted=True,
             granted=False,
         ).filter(Q(key__startswith=f'{key}:') | Q(key=key)).values_list('node_id', flat=True)
+        only_asset_granted_node_ids = list(only_asset_granted_node_ids)
 
-        direct_granted_assets = Asset.org_objects.filter(
+        direct_granted_assets = Asset.org_objects.distinct().order_by().filter(
             nodes__id__in=only_asset_granted_node_ids,
             granted_by_permissions__id__in=self.asset_perm_ids
         )
-
-        return granted_node_assets | direct_granted_assets
+        if qs_stage:
+            direct_granted_node_assets, direct_granted_assets = qs_stage.merge_many_before_union(
+                direct_granted_node_assets, direct_granted_assets)
+        granted_assets = direct_granted_node_assets.union(direct_granted_assets)
+        granted_assets = qs_stage.merge_after_union(granted_assets)
+        return granted_assets
 
 
 class UserGrantedNodesQueryUtils(UserGrantedUtilsBase):

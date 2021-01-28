@@ -206,11 +206,11 @@ class PermNode(Node):
         )
 
     @classmethod
-    def get_node_with_mapping_info(cls, user, id):
+    def get_node_with_granted_info(cls, user, id):
         queryset = cls.objects.filter(
             id=id,
             mapping_nodes__user=user
-        ).annotate(**cls.annotate_mapping_node_fields)
+        ).distinct().annotate(**cls.annotate_mapping_node_fields)
         num = len(queryset)
         if num == 1:
             return queryset[0]
