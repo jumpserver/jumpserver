@@ -141,6 +141,16 @@ class AssetPermission(BasePermission):
         return assets
 
 
+class UserAssetGrantedTreeNodeRelation(models.Model):
+    user = ''
+
+    node = ''
+    node_id = ''
+    node_key = ''
+    node_parent_key = ''
+    node_from = 'granted | child | asset'
+    node_assets_amount = ''
+
 
 class UserGrantedMappingNode(FamilyMixin, models.JMSBaseModel):
     node = models.ForeignKey('assets.Node', default=None, on_delete=models.CASCADE,
