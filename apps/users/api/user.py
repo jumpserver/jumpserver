@@ -44,6 +44,10 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
     extra_filter_backends = [OrgRoleUserFilterBackend]
 
     def get_queryset(self):
+        from assets.tree.asset.tree import AssetTree
+        t = AssetTree(org_id='')
+        t.initial()
+
         queryset = super().get_queryset().prefetch_related(
             'groups'
         )
