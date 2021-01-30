@@ -527,3 +527,13 @@ class NodeAssetRelatedRecord(models.Model):
     asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, related_name='nodes_related_records', null=False)
     node = models.ForeignKey('assets.Node', on_delete=models.CASCADE, related_name='assets_related_records', null=False)
     related_count = models.IntegerField(default=0, db_index=True)
+
+
+class NodeAssetRelatedRecordProxy(models.Model):
+    asset_id = models.CharField(max_length=64)
+    node_id = models.CharField(max_length=64)
+    related_count = models.IntegerField(default=0, db_index=True)
+
+    class Meta:
+        managed = False
+        db_table = 'assets_nodeassetrelatedrecord'
