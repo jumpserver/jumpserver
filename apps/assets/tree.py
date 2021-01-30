@@ -25,28 +25,36 @@ class TreeNode:
 
 
 class Tree:
-    def __init__(self, nodes, node_asset_id_pairs):
+    def __init__(self, nodes, node_asset_id_pairs=None):
         self.nodes = nodes
         # [(node_id, asset_id)]
         self.node_asset_id_pairs = node_asset_id_pairs
         # node_id --> set(asset_id1, asset_id2)
         self.node_assets_id_mapper = defaultdict(set)
         self.header = None
+        self.headers = []
         self.key_tree_node_mapper = {}
 
     @timeit
     def build_tree(self, replace_keys=None, replace_source_tree=None, deepcopy=False):
         key_tree_node_mapper = self.key_tree_node_mapper
 
-        # 构建节点资产关系
-        node_assets_id_mapper = self.node_assets_id_mapper
-        for node_id, asset_id in self.node_asset_id_pairs:
-            node_assets_id_mapper[node_id].add(asset_id)
+        if self.node_asset_id_pairs:
+            # 构建节点资产关系
+            node_assets_id_mapper = self.node_assets_id_mapper
+            for node_id, asset_id in self.node_asset_id_pairs:
+                node_assets_id_mapper[node_id].add(asset_id)
+
+            def _get_node_direct_assets(node):
+                return node_assets_id_mapper.pop(node.id, set())
+        else:
+            def _get_node_direct_assets(node):
+                return None
 
         # 构建 TreeNode
         for node in self.nodes:
             node: Node
-            assets = node_assets_id_mapper.pop(node.id, set())
+            assets = _get_node_direct_assets(node)
             tree_node = TreeNode(node.id, node.parent_key, 0, [], assets)
             key_tree_node_mapper[node.key] = tree_node
 
@@ -72,17 +80,13 @@ class Tree:
             else:
                 headers.append(tree_node)
 
-        if len(headers) != 1:
-            raise ValueError(f'Tree get header error: {headers}')
+        self.headers = headers
 
-        self.header = headers[0]
-
-    @timeit
-    def compute_tree_node_assets_amount(self):
+    def compute_a_tree_node_assets_amount(self, header):
         wait_stack = Stack()
         un_process_stack = Stack()
         # print(f'header {headers[0]}')
-        un_process_stack.push(self.header)
+        un_process_stack.push(header)
 
         while un_process_stack:
             # print(f'un_process_stack {un_process_stack}')
@@ -135,6 +139,11 @@ class Tree:
                             assets = child_node.assets
 
                     tree_node.assets = assets
+
+    @timeit
+    def compute_tree_node_assets_amount(self):
+        for header in self.headers:
+            self.compute_a_tree_node_assets_amount(header)
 
 
 def get_current_org_full_tree():

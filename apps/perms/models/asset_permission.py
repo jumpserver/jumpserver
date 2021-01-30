@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.db.models import F
 from django.conf import settings
 
+from orgs.mixins.models import OrgModelMixin
 from common.db import models
 from common.utils import lazyproperty
 from assets.models import Asset, SystemUser, Node, FamilyMixin
@@ -144,6 +145,7 @@ class AssetPermission(BasePermission):
 
 
 class UserGrantedMappingNode(FamilyMixin, models.JMSBaseModel):
+    org = models.ForeignKey('orgs.Organization', on_delete=models.CASCADE, default='', db_constraint=False, db_index=True)
     node = models.ForeignKey('assets.Node', default=None, on_delete=models.CASCADE,
                              db_constraint=False, null=True, related_name='mapping_nodes')
     key = models.CharField(max_length=64, verbose_name=_("Key"), db_index=True)  # '1:1:1:1'
