@@ -1,6 +1,6 @@
 from collections import defaultdict, namedtuple
 from typing import List, Tuple
-from itertools import chain
+from itertools import chain, groupby
 
 from django.core.cache import cache
 from django.conf import settings
@@ -8,6 +8,7 @@ from django.db.models import Q, QuerySet
 
 from common.utils.common import lazyproperty, timeit
 from assets.tree import Tree
+from perms.tree import GrantedTree
 from common.utils import get_logger
 from common.decorator import on_transaction_commit
 from orgs.utils import tmp_to_org, current_org, ensure_in_real_or_default_org
@@ -74,7 +75,7 @@ class QuerySetStage:
         self._querysets_or.append(qs.order_by())
         return self
 
-    def merge_many_before_union(self, *querysets):
+    def merge_multi_before_union(self, *querysets):
         ret = []
         for qs in querysets:
             qs = self.merge_before_union(qs)
@@ -103,7 +104,7 @@ class QuerySetStage:
             qs = qs.order_by(*self._order_by)
         return qs
 
-    def merge_all(self, qs: QuerySet) -> QuerySet:
+    def merge(self, qs: QuerySet) -> QuerySet:
         qs = self.merge_before_union(qs)
         qs = self.merge_after_union(qs)
         return qs
@@ -231,6 +232,23 @@ class UserGrantedTreeRefreshController:
                 utils.rebuild_user_granted_tree()
 
 
+from django.db import models
+
+class PermAsset(models.Model):
+    assetpermission = models.ForeignKey('perms.AssetPermission', on_delete=models.CASCADE)
+    asset_id = models.UUIDField(primary_key=True)
+    class Meta:
+        db_table = 'perms_assetpermission_assets'
+        managed = False
+
+class NodeAsset(models.Model):
+    node = models.ForeignKey('assets.Node', on_delete=models.CASCADE)
+    asset = models.ForeignKey(PermAsset, on_delete=models.CASCADE, to_field='asset_id')
+    class Meta:
+        db_table = 'assets_asset_nodes'
+        managed = False
+
+
 class UserGrantedUtilsBase:
     user: User
 
@@ -287,8 +305,8 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
             nodes = self.compute_perm_nodes_tree()
             if not nodes:
                 return
-            self.compute_node_assets_amount(nodes)
             self.create_mapping_nodes(nodes)
+            self.compute_node_assets_amount_v2()
 
     def compute_perm_nodes_tree(self) -> list:
         node_only_fields = ('id', 'key', 'parent_key', 'assets_amount')
@@ -350,9 +368,18 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
         ancestors = PermNode.objects.filter(key__in=ancestor_keys).only(*node_only_fields)
         return [*leaf_nodes, *ancestors]
 
-    def create_mapping_nodes(self, nodes):
+    def create_mapping_nodes(self, nodes, with_assets_amount=False):
         user = self.user
         to_create = []
+
+        if with_assets_amount:
+            def get_assets_amount(node):
+                return node.assets_amount
+        else:
+            def get_assets_amount(node):
+                return -1
+
+        org_id = current_org.id
         for node in nodes:
             to_create.append(UserGrantedMappingNode(
                 user=user,
@@ -361,11 +388,51 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
                 parent_key=node.parent_key,
                 granted=node.is_granted,
                 asset_granted=node.is_asset_granted,
-                assets_amount=node.assets_amount,
+                assets_amount=get_assets_amount(node),
+                org_id=org_id
             ))
 
         UserGrantedMappingNode.objects.bulk_create(to_create)
 
+    @timeit
+    def compute_node_assets_amount_v2(self):
+        mnodes = UserGrantedMappingNode.objects.filter(user=self.user)
+        id_mnode_mapper = {n.id: n for n in mnodes}
+        tree = GrantedTree(mnodes)
+        tree.build_tree()
+
+        for mnode in mnodes:
+            mnode: UserGrantedMappingNode
+            if mnode.granted:
+                continue
+            else:
+                granted_node, asset_granted_node = tree.get_node_descendant(mnode.key, id_mnode_mapper)
+
+                direct_ids = [n.node_id for n in granted_node]
+                indirect_ids = [n.node_id for n in asset_granted_node]
+
+                q = Q()
+                for _mnode in granted_node:
+                    q |= Q(key__istartswith=f'{_mnode.key}:')
+
+                if q:
+                    des_node_ids = PermNode.objects.order_by().filter(q).values_list('id', flat=True).distinct()
+                    direct_ids.extend(des_node_ids)
+
+                qs = NodeAsset.objects.filter(
+                    node_id__in=indirect_ids,
+                    asset__assetpermission_id__in=self.asset_perm_ids
+                ).values_list('asset_id')
+                q3 = Asset.nodes.through.objects.filter(node_id__in=direct_ids).values_list('asset_id').distinct()
+                qs = qs.union(q3)
+                assets_amount = qs.values_list('asset_id').distinct().count()
+                if assets_amount == 0:
+                    print('error -------------------', assets_amount)
+                mnode.assets_amount = assets_amount
+        print('=============================', len(mnodes))
+        UserGrantedMappingNode.objects.bulk_update(mnodes, fields=('assets_amount',))
+
+    @timeit
     def compute_node_assets_amount(self, nodes: List[PermNode]):
         """
         这里计算的是一个组织的
@@ -429,9 +496,7 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
             user=self.user).values_list('asset_id', flat=True)
         favorite_asset_ids = list(favorite_asset_ids)
         qs_stage = qs_stage or QuerySetStage()
-        qs_stage.filter(id__in=favorite_asset_ids)
-        qs_stage.only('id')
-        qs_stage.order_by()
+        qs_stage.filter(id__in=favorite_asset_ids).only('id')
         assets = self.get_all_granted_assets(qs_stage)
         return assets
 
@@ -455,12 +520,11 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
         return queryset
 
     def get_all_granted_assets(self, qs_stage: QuerySetStage = None) -> AssetQuerySet:
-        direct_granted_nodes_assets = self.get_direct_granted_nodes_assets()
-        direct_granted_assets = self.get_direct_granted_assets()
+        nodes_assets = self.get_direct_granted_nodes_assets()
+        assets = self.get_direct_granted_assets()
 
-        direct_granted_nodes_assets, direct_granted_assets = qs_stage.merge_many_before_union(
-            direct_granted_nodes_assets, direct_granted_assets)
-        queryset = direct_granted_nodes_assets.union(direct_granted_assets)
+        nodes_assets, assets = qs_stage.merge_multi_before_union(nodes_assets, assets)
+        queryset = nodes_assets.union(assets)
         queryset = qs_stage.merge_after_union(queryset)
         return queryset
 
@@ -470,7 +534,7 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
         if granted_status == PermNode.GRANTED_DIRECT:
             assets = Asset.org_objects.distinct().order_by().filter(nodes_related_records__node_id=node.id)
             if qs_stage:
-                assets = qs_stage.merge_all(assets)
+                assets = qs_stage.merge(assets)
             return node, assets
         elif granted_status == PermNode.GRANTED_INDIRECT:
             node.use_mapping_assets_amount()
@@ -511,7 +575,7 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
             Q(key__startswith=f'{key}:') | Q(key=key)
         ).values_list('node_id', flat=True)
         granted_node_ids = list(granted_node_ids)
-        direct_granted_node_assets = Asset.org_objects.distinct().order_by().filter(
+        node_assets = Asset.org_objects.distinct().order_by().filter(
             nodes_related_records__node_id__in=granted_node_ids)
 
         # 查询该节点下的资产授权节点
@@ -522,14 +586,13 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
         ).filter(Q(key__startswith=f'{key}:') | Q(key=key)).values_list('node_id', flat=True)
         only_asset_granted_node_ids = list(only_asset_granted_node_ids)
 
-        direct_granted_assets = Asset.org_objects.distinct().order_by().filter(
+        assets = Asset.org_objects.distinct().order_by().filter(
             nodes__id__in=only_asset_granted_node_ids,
             granted_by_permissions__id__in=self.asset_perm_ids
         )
         if qs_stage:
-            direct_granted_node_assets, direct_granted_assets = qs_stage.merge_many_before_union(
-                direct_granted_node_assets, direct_granted_assets)
-        granted_assets = direct_granted_node_assets.union(direct_granted_assets)
+            node_assets, assets = qs_stage.merge_multi_before_union(node_assets, assets)
+        granted_assets = node_assets.union(assets)
         granted_assets = qs_stage.merge_after_union(granted_assets)
         return granted_assets
 

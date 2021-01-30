@@ -20,7 +20,7 @@ class GrantedAssetLimitOffsetPagination(LimitOffsetPagination):
                 logger.warn(f'Not hit node.assets_amount because find a unknow query_param `{k}` -> {self._request.get_full_path()}')
                 return super().get_count(queryset)
         node = getattr(self._view, 'pagination_node', None)
-        if node:
+        if node and node.assets_amount != -1:
             logger.debug(f'Hit node.assets_amount[{node.assets_amount}] -> {self._request.get_full_path()}')
             return node.assets_amount
         else:
