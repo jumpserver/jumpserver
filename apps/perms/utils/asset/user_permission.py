@@ -1,6 +1,6 @@
-from collections import defaultdict, namedtuple
+from collections import defaultdict
 from typing import List, Tuple
-from itertools import chain, groupby
+from itertools import chain
 
 from django.core.cache import cache
 from django.conf import settings
@@ -17,9 +17,14 @@ from assets.models import (
     AssetQuerySet, NodeQuerySet
 )
 from orgs.models import Organization
-from perms.models import UserGrantedMappingNode, AssetPermission, PermNode
+from perms.models import (
+    UserGrantedMappingNode, AssetPermission, PermNode, UserAssetGrantedTreeNodeRelation,
+    PermAssetThrouth, NodeAssetThrouth,
+)
 from users.models import User
 from perms.locks import UserGrantedTreeRebuildLock
+
+NodeFrom = UserAssetGrantedTreeNodeRelation.NodeFrom
 
 logger = get_logger(__name__)
 
@@ -232,23 +237,6 @@ class UserGrantedTreeRefreshController:
                 utils.rebuild_user_granted_tree()
 
 
-from django.db import models
-
-class PermAsset(models.Model):
-    assetpermission = models.ForeignKey('perms.AssetPermission', on_delete=models.CASCADE)
-    asset_id = models.UUIDField(primary_key=True)
-    class Meta:
-        db_table = 'perms_assetpermission_assets'
-        managed = False
-
-class NodeAsset(models.Model):
-    node = models.ForeignKey('assets.Node', on_delete=models.CASCADE)
-    asset = models.ForeignKey(PermAsset, on_delete=models.CASCADE, to_field='asset_id')
-    class Meta:
-        db_table = 'assets_asset_nodes'
-        managed = False
-
-
 class UserGrantedUtilsBase:
     user: User
 
@@ -293,9 +281,8 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
 
         with UserGrantedTreeRebuildLock(org_id, user.id):
             # 先删除旧的授权树🌲
-            UserGrantedMappingNode.objects.filter(
-                user=user,
-                node__org_id=org_id
+            UserAssetGrantedTreeNodeRelation.objects.filter(
+                user=user
             ).delete()
 
             if not self.asset_perm_ids:
@@ -328,10 +315,10 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
 
         # 给授权节点设置 is_granted 标识，同时去重
         for node in nodes:
+            node: PermNode
             if _has_ancestor_granted(node):
                 continue
-
-            node.is_granted = True
+            node.node_from = NodeFrom.granted
             key2leaf_nodes_mapper[node.key] = node
 
         # 查询授权资产关联的节点设置
@@ -347,10 +334,10 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
             for node in granted_asset_nodes:
                 if _has_ancestor_granted(node):
                     continue
-                if node.key not in key2leaf_nodes_mapper:
-                    key2leaf_nodes_mapper[node.key] = node
-                node.is_asset_granted = True
-                key2leaf_nodes_mapper[node.key].is_asset_granted = True
+                if node.key in key2leaf_nodes_mapper:
+                    continue
+                node.node_from = NodeFrom.asset
+                key2leaf_nodes_mapper[node.key] = node
 
         if not settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
             process_direct_granted_assets()
@@ -366,6 +353,8 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
         ancestor_keys -= key2leaf_nodes_mapper.keys()
         # 查出祖先节点
         ancestors = PermNode.objects.filter(key__in=ancestor_keys).only(*node_only_fields)
+        for node in ancestors:
+            node.node_from = NodeFrom.child
         return [*leaf_nodes, *ancestors]
 
     def create_mapping_nodes(self, nodes, with_assets_amount=False):
@@ -379,58 +368,61 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
             def get_assets_amount(node):
                 return -1
 
-        org_id = current_org.id
         for node in nodes:
-            to_create.append(UserGrantedMappingNode(
+            to_create.append(UserAssetGrantedTreeNodeRelation(
                 user=user,
                 node=node,
-                key=node.key,
-                parent_key=node.parent_key,
-                granted=node.is_granted,
-                asset_granted=node.is_asset_granted,
+                node_key=node.key,
+                node_parent_key=node.parent_key,
+                node_from=node.node_from,
                 assets_amount=get_assets_amount(node),
-                org_id=org_id
+                org_id=node.org_id
             ))
 
-        UserGrantedMappingNode.objects.bulk_create(to_create)
+        UserAssetGrantedTreeNodeRelation.objects.bulk_create(to_create)
 
     @timeit
     def compute_node_assets_amount_v2(self):
-        mnodes = UserGrantedMappingNode.objects.filter(user=self.user)
-        id_mnode_mapper = {n.id: n for n in mnodes}
-        tree = GrantedTree(mnodes)
+        """
+        可跨组织计算节点资产数量
+        """
+        granted_rel_nodes = UserAssetGrantedTreeNodeRelation.objects.filter(user=self.user)
+        id_granted_rel_node_mapper = {n.id: n for n in granted_rel_nodes}
+
+        tree = GrantedTree(granted_rel_nodes)
         tree.build_tree()
 
-        for mnode in mnodes:
-            mnode: UserGrantedMappingNode
-            if mnode.granted:
+        for granted_rel_node in granted_rel_nodes:
+            granted_rel_node: UserAssetGrantedTreeNodeRelation
+            if granted_rel_node.node_from == NodeFrom.granted:
                 continue
             else:
-                granted_node, asset_granted_node = tree.get_node_descendant(mnode.key, id_mnode_mapper)
+                granted_node, asset_granted_node = tree.get_node_descendant(
+                    granted_rel_node.node_key, id_granted_rel_node_mapper
+                )
 
                 direct_ids = [n.node_id for n in granted_node]
                 indirect_ids = [n.node_id for n in asset_granted_node]
 
+                # 获取直接授权节点的所有子孙节点
                 q = Q()
-                for _mnode in granted_node:
-                    q |= Q(key__istartswith=f'{_mnode.key}:')
+                for node in granted_node:
+                    q |= Q(key__istartswith=f'{node.key}:')
 
                 if q:
-                    des_node_ids = PermNode.objects.order_by().filter(q).values_list('id', flat=True).distinct()
-                    direct_ids.extend(des_node_ids)
+                    descendant_node_ids = PermNode.objects.order_by().filter(q).values_list('id', flat=True).distinct()
+                    direct_ids.extend(descendant_node_ids)
 
-                qs = NodeAsset.objects.filter(
+                direct_granted_assets_qs = NodeAssetThrouth.objects.filter(
                     node_id__in=indirect_ids,
                     asset__assetpermission_id__in=self.asset_perm_ids
                 ).values_list('asset_id')
-                q3 = Asset.nodes.through.objects.filter(node_id__in=direct_ids).values_list('asset_id').distinct()
-                qs = qs.union(q3)
-                assets_amount = qs.values_list('asset_id').distinct().count()
-                if assets_amount == 0:
-                    print('error -------------------', assets_amount)
-                mnode.assets_amount = assets_amount
-        print('=============================', len(mnodes))
-        UserGrantedMappingNode.objects.bulk_update(mnodes, fields=('assets_amount',))
+                direct_granted_node_assets_qs = Asset.nodes.through.objects.filter(
+                    node_id__in=direct_ids).values_list('asset_id').distinct()
+                assets_qs = direct_granted_assets_qs.union(direct_granted_node_assets_qs)
+                assets_amount = assets_qs.values_list('asset_id').distinct().count()
+                granted_rel_node.node_assets_amount = assets_amount
+        UserGrantedMappingNode.objects.bulk_update(granted_rel_nodes, fields=('node_assets_amount',))
 
     @timeit
     def compute_node_assets_amount(self, nodes: List[PermNode]):
