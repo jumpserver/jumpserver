@@ -375,7 +375,7 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
                 node_key=node.key,
                 node_parent_key=node.parent_key,
                 node_from=node.node_from,
-                assets_amount=get_assets_amount(node),
+                node_assets_amount=get_assets_amount(node),
                 org_id=node.org_id
             ))
 
@@ -422,7 +422,7 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
                 assets_qs = direct_granted_assets_qs.union(direct_granted_node_assets_qs)
                 assets_amount = assets_qs.values_list('asset_id').distinct().count()
                 granted_rel_node.node_assets_amount = assets_amount
-        UserGrantedMappingNode.objects.bulk_update(granted_rel_nodes, fields=('node_assets_amount',))
+        UserAssetGrantedTreeNodeRelation.objects.bulk_update(granted_rel_nodes, fields=('node_assets_amount',))
 
     @timeit
     def compute_node_assets_amount(self, nodes: List[PermNode]):

@@ -165,11 +165,23 @@ class UserAssetGrantedTreeNodeRelation(OrgModelMixin, models.JMSBaseModel):
 
     user = models.ForeignKey('users.User', db_constraint=False, on_delete=models.CASCADE)
     node = models.ForeignKey('assets.Node', default=None, on_delete=models.CASCADE,
-                             db_constraint=False, null=True)
+                             db_constraint=False, null=False, primary_key=True)
     node_key = models.CharField(max_length=64, verbose_name=_("Key"), db_index=True)
     node_parent_key = models.CharField(max_length=64, default='', verbose_name=_('Parent key'), db_index=True)
     node_from = models.CharField(choices=NodeFrom.choices, max_length=16)
     node_assets_amount = models.IntegerField(default=0)
+
+    @property
+    def key(self):
+        return self.node_key
+
+    @property
+    def parent_key(self):
+        return self.node_parent_key
+
+    @property
+    def id(self):
+        return self.node_id
 
 
 class RebuildUserTreeTask(models.JMSBaseModel):
