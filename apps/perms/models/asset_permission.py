@@ -3,8 +3,8 @@ from functools import reduce
 
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import F
-from django.conf import settings
 
+from common.db.models import ChoiceSet
 from orgs.mixins.models import OrgModelMixin
 from common.db import models
 from common.utils import lazyproperty
@@ -15,6 +15,7 @@ from .base import BasePermission
 
 __all__ = [
     'AssetPermission', 'Action', 'UserGrantedMappingNode', 'PermNode',
+    'UserAssetGrantedTreeNodeRelation', 'PermAssetThrouth', 'NodeAssetThrouth'
 ]
 
 # 使用场景
@@ -156,6 +157,21 @@ class UserGrantedMappingNode(FamilyMixin, models.JMSBaseModel):
     assets_amount = models.IntegerField(default=0)
 
 
+class UserAssetGrantedTreeNodeRelation(OrgModelMixin, models.JMSBaseModel):
+    class NodeFrom(ChoiceSet):
+        granted = 'granted', 'Direct node granted'
+        child = 'child', 'Have children node'
+        asset = 'asset', 'Direct asset granted'
+
+    user = models.ForeignKey('users.User', db_constraint=False, on_delete=models.CASCADE)
+    node = models.ForeignKey('assets.Node', default=None, on_delete=models.CASCADE,
+                             db_constraint=False, null=True)
+    node_key = models.CharField(max_length=64, verbose_name=_("Key"), db_index=True)
+    node_parent_key = models.CharField(max_length=64, default='', verbose_name=_('Parent key'), db_index=True)
+    node_from = models.CharField(choices=NodeFrom.choices, max_length=16)
+    node_assets_amount = models.IntegerField(default=0)
+
+
 class RebuildUserTreeTask(models.JMSBaseModel):
     user = models.ForeignKey('users.User', on_delete=models.CASCADE, verbose_name=_('User'))
 
@@ -163,12 +179,15 @@ class RebuildUserTreeTask(models.JMSBaseModel):
 class PermNode(Node):
     class Meta:
         proxy = True
+        ordering = []
 
     # 特殊节点
     UNGROUPED_NODE_KEY = 'ungrouped'
     UNGROUPED_NODE_VALUE = _('Ungrouped')
     FAVORITE_NODE_KEY = 'favorite'
     FAVORITE_NODE_VALUE = _('Favorite')
+
+    node_from = ''
 
     # 节点授权状态
     GRANTED_DIRECT = 1
@@ -249,3 +268,21 @@ class PermNode(Node):
     def save(self):
         # 这是个只读 Model
         raise NotImplementedError
+
+
+# 为了连表查询定义的 --------------------------
+
+class PermAssetThrouth(models.Model):
+    assetpermission = models.ForeignKey('perms.AssetPermission', on_delete=models.CASCADE)
+    asset_id = models.UUIDField(primary_key=True)
+    class Meta:
+        db_table = 'perms_assetpermission_assets'
+        managed = False
+
+
+class NodeAssetThrouth(models.Model):
+    node = models.ForeignKey('assets.Node', on_delete=models.CASCADE)
+    asset = models.ForeignKey(PermAssetThrouth, on_delete=models.CASCADE, to_field='asset_id')
+    class Meta:
+        db_table = 'assets_asset_nodes'
+        managed = False
