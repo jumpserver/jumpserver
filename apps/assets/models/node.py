@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 #
-import uuid
 import re
+import uuid
+import time
 
 from django.db import models, transaction
 from django.db.models import Q
@@ -9,6 +10,8 @@ from django.db.utils import IntegrityError
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 from django.db.transaction import atomic
+from django.core.cache import cache
+from collections import defaultdict
 
 from common.utils import get_logger
 from common.utils.common import lazyproperty
@@ -248,6 +251,7 @@ class FamilyMixin:
 
 
 class NodeAssetsMixin:
+    org_id: str
     key = ''
     id = None
 
@@ -306,6 +310,90 @@ class NodeAssetsMixin:
             return Asset.org_objects.filter(q).distinct()
         else:
             return Asset.objects.none()
+
+    #
+    # Use a new plan
+
+    # 保存所有组织下node_key和node下所有资产id的映射关系到内存中 (节省内存空间)
+    org_mapping_to_node_key_all_assets_id_mapping = defaultdict(dict)
+
+    def get_all_assets_id(self):
+        _mapping = self.get_node_key_all_assets_id_mapping(org_id=self.org_id)
+        _assets_id = _mapping.get(self.key, [])
+        return _assets_id
+
+    @classmethod
+    def get_node_key_all_assets_id_mapping(cls, org_id):
+        _mapping = cls.org_mapping_to_node_key_all_assets_id_mapping[org_id]
+        if not _mapping:
+            _mapping = cls.get_node_key_all_assets_id_mapping_from_cache(org_id)
+            cls.org_mapping_to_node_key_all_assets_id_mapping[org_id] = _mapping
+        return _mapping
+
+    @classmethod
+    def clean_node_key_all_assets_id_mapping(cls, org_id):
+        cls.org_mapping_to_node_key_all_assets_id_mapping.pop(org_id, None)
+
+    @classmethod
+    def get_node_key_all_assets_id_mapping_from_cache(cls, org_id):
+        _mapping = cls._get_node_key_all_assets_id_mapping_from_cache(org_id)
+        if not _mapping:
+            _mapping = cls._generate_node_key_all_assets_id_mapping(org_id)
+            cls.set_cache_for_node_key_all_assets_id_mapping(org_id=org_id, mapping=_mapping)
+        return _mapping
+
+    @classmethod
+    def _generate_node_key_all_assets_id_mapping(cls, org_id):
+        from assets.tree import AssetTree
+        # TODO: 添加分布式锁 (解决并发操作下多进程生成的问题)
+
+        lock_key = f'KEY_LOCK_generate_org_{org_id}_node_key_all_assets_id_mapping'
+        # 如果60s未生成，那么其他生成同一组织下数据的进程进来，也会生成, 锁机制将失去意义
+        lock = cache.lock(lock_key, expire=60)
+        acquired = lock.acquire(timeout=10)
+        if acquired:
+            # 一般大规模生成数据30+s
+            tree = AssetTree(org_id=org_id)
+            _mapping = tree.get_node_key_with_all_assets_id_mapping()
+            if lock.locked():
+                lock.release()
+        else:
+            _mapping = cls._get_node_key_all_assets_id_mapping_from_cache(org_id=org_id, timeout=30)
+
+        return _mapping
+
+    @classmethod
+    def _get_node_key_all_assets_id_mapping_from_cache(cls, org_id, timeout=None):
+        cache_key = cls._get_cache_key_for_node_key_all_assets_id_mapping(org_id)
+
+        if not isinstance(timeout, int):
+            _mapping = cache.get(cache_key, {})
+            return _mapping
+
+        # 每秒从cache中获取一次
+        _mapping = {}
+        wait_for_seconds = timeout
+        for i in range(wait_for_seconds):
+            _mapping = cache.get(cache_key)
+            if _mapping:
+                break
+            time.sleep(1)
+        return _mapping
+
+    @classmethod
+    def set_cache_for_node_key_all_assets_id_mapping(cls, org_id, mapping):
+        cache_key = cls._get_cache_key_for_node_key_all_assets_id_mapping(org_id)
+        cache.set(cache_key, mapping)
+
+    @classmethod
+    def expire_cache_for_node_key_all_assets_id_mapping(cls, org_id):
+        cache_key = cls._get_cache_key_for_node_key_all_assets_id_mapping(org_id)
+        cache.delete(cache_key)
+
+    @classmethod
+    def _get_cache_key_for_node_key_all_assets_id_mapping(cls, org_id):
+        cache_key = f'CACHE_KEY_{org_id}_NODE_KEY_ALL_ASSETS_ID_MAPPING'
+        return cache_key
 
 
 class SomeNodesMixin:
