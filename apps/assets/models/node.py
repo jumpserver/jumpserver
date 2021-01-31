@@ -347,7 +347,7 @@ class NodeAssetsMixin:
         from assets.tree import AssetTree
         # TODO: 添加分布式锁 (解决并发操作下多进程生成的问题)
 
-        lock_key = f'KEY_LOCK_generate_org_{org_id}_node_key_all_assets_id_mapping'
+        lock_key = f'KEY_LOCK_GENERATE_ORG_{org_id}_NODE_KEY_ALL_ASSETS_ID_MAPPING'
         # 如果60s未生成，那么其他生成同一组织下数据的进程进来，也会生成, 锁机制将失去意义
         lock = cache.lock(lock_key, expire=60)
         acquired = lock.acquire(timeout=10)
