@@ -157,7 +157,7 @@ class UserGrantedMappingNode(FamilyMixin, models.JMSBaseModel):
     assets_amount = models.IntegerField(default=0)
 
 
-class UserAssetGrantedTreeNodeRelation(OrgModelMixin, models.JMSBaseModel):
+class UserAssetGrantedTreeNodeRelation(OrgModelMixin, FamilyMixin, models.JMSBaseModel):
     class NodeFrom(ChoiceSet):
         granted = 'granted', 'Direct node granted'
         child = 'child', 'Have children node'
@@ -165,10 +165,10 @@ class UserAssetGrantedTreeNodeRelation(OrgModelMixin, models.JMSBaseModel):
 
     user = models.ForeignKey('users.User', db_constraint=False, on_delete=models.CASCADE)
     node = models.ForeignKey('assets.Node', default=None, on_delete=models.CASCADE,
-                             db_constraint=False, null=False, primary_key=True)
+                             db_constraint=False, null=False, primary_key=True, related_name='granted_node_rels')
     node_key = models.CharField(max_length=64, verbose_name=_("Key"), db_index=True)
     node_parent_key = models.CharField(max_length=64, default='', verbose_name=_('Parent key'), db_index=True)
-    node_from = models.CharField(choices=NodeFrom.choices, max_length=16)
+    node_from = models.CharField(choices=NodeFrom.choices, max_length=16, db_index=True)
     node_assets_amount = models.IntegerField(default=0)
 
     @property
@@ -182,6 +182,18 @@ class UserAssetGrantedTreeNodeRelation(OrgModelMixin, models.JMSBaseModel):
     @property
     def id(self):
         return self.node_id
+
+    @classmethod
+    def get_node_granted_status(cls, user, key):
+        ancestor_keys = set(cls.get_node_ancestor_keys(key, with_self=True))
+        ancestor_rel_nodes = cls.objects.filter(user=user, node_key__in=ancestor_keys)
+
+        for rel_node in ancestor_rel_nodes:
+            if rel_node.key == key:
+                return rel_node.node_from, rel_node
+            if rel_node.node_from == cls.NodeFrom.granted:
+                return cls.NodeFrom.granted, None
+        return '', None
 
 
 class RebuildUserTreeTask(models.JMSBaseModel):
@@ -200,24 +212,14 @@ class PermNode(Node):
     FAVORITE_NODE_VALUE = _('Favorite')
 
     node_from = ''
-
-    # 节点授权状态
-    GRANTED_DIRECT = 1
-    GRANTED_INDIRECT = 2
-    GRANTED_NONE = 0
-
-    # 与 UserGrantedMappingNode 对应的字段，常用于 annotate
-    is_granted = False
-    is_asset_granted = False
     granted_assets_amount = 0
 
-    annotate_mapping_node_fields = {
-        'is_granted': F('mapping_nodes__granted'),
-        'is_asset_granted': F('mapping_nodes__asset_granted'),
-        'granted_assets_amount': F('mapping_nodes__assets_amount')
+    annotate_granted_node_rel_fields = {
+        'granted_assets_amount': F('granted_node_rels__node_assets_amount'),
+        'node_from': F('granted_node_rels__node_from')
     }
 
-    def use_mapping_assets_amount(self):
+    def use_granted_assets_amount(self):
         self.assets_amount = self.granted_assets_amount
 
     @classmethod
@@ -238,44 +240,12 @@ class PermNode(Node):
             assets_amount=assets_amount
         )
 
-    @classmethod
-    def get_node_with_granted_info(cls, user, id):
-        queryset = cls.objects.filter(
-            id=id,
-            mapping_nodes__user=user
-        ).distinct().annotate(**cls.annotate_mapping_node_fields)
-        num = len(queryset)
-        if num == 1:
-            return queryset[0]
-        if not num:
-            raise cls.DoesNotExist(
-                "%s matching query does not exist." %
-                cls._meta.object_name
-            )
-        raise cls.MultipleObjectsReturned(
-            'get() returned more than one %s -- it returned %s!' % (
-                cls._meta.object_name,
-                num,
-            )
-        )
-
-    @classmethod
-    def get_node_granted_status(cls, user, key):
-        ancestor_keys = set(cls.get_node_ancestor_keys(key, with_self=True))
-        ancestor_mapping_nodes = UserGrantedMappingNode.objects.filter(
-            user=user,
-            key__in=ancestor_keys
-        ).only('key', 'granted')
-
-        ancestor_mapping_nodes_keys = set()
-        for mapping_node in ancestor_mapping_nodes:
-            if mapping_node.granted:
-                return cls.GRANTED_DIRECT
-            ancestor_mapping_nodes_keys.add(mapping_node.key)
-
-        if ancestor_keys != ancestor_mapping_nodes_keys:
-            return cls.GRANTED_NONE
-        return cls.GRANTED_INDIRECT
+    def get_granted_status(self, user):
+        status, rel_node = UserAssetGrantedTreeNodeRelation.get_node_granted_status(user, self.key)
+        self.node_from = status
+        if rel_node:
+            self.granted_assets_amount = rel_node.node_assets_amount
+        return status
 
     def save(self):
         # 这是个只读 Model
@@ -287,6 +257,7 @@ class PermNode(Node):
 class PermAssetThrouth(models.Model):
     assetpermission = models.ForeignKey('perms.AssetPermission', on_delete=models.CASCADE)
     asset_id = models.UUIDField(primary_key=True)
+
     class Meta:
         db_table = 'perms_assetpermission_assets'
         managed = False
@@ -295,6 +266,7 @@ class PermAssetThrouth(models.Model):
 class NodeAssetThrouth(models.Model):
     node = models.ForeignKey('assets.Node', on_delete=models.CASCADE)
     asset = models.ForeignKey(PermAssetThrouth, on_delete=models.CASCADE, to_field='asset_id')
+
     class Meta:
         db_table = 'assets_asset_nodes'
         managed = False

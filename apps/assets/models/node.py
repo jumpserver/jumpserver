@@ -287,6 +287,20 @@ class NodeAssetsMixin:
         return assets_ids
 
     @classmethod
+    def get_nodes_all_assets_v2(cls, *nodes):
+        from .asset import Asset
+        node_ids = set()
+        descendant_node_query = Q()
+        for n in nodes:
+            node_ids.add(n.id)
+            descendant_node_query |= Q(key__istartswith=f'{n.key}:')
+        if descendant_node_query:
+            node_ids.update(
+                Node.objects.order_by().filter(descendant_node_query).values_list('id', flat=True)
+            )
+        return Asset.org_objects.order_by().filter(nodes__id__in=node_ids).distinct()
+
+    @classmethod
     def get_nodes_all_assets(cls, nodes_keys, extra_assets_ids=None):
         from .asset import Asset
         nodes_keys = cls.clean_children_keys(nodes_keys)
