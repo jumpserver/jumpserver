@@ -18,8 +18,8 @@ from assets.models import (
 )
 from orgs.models import Organization
 from perms.models import (
-    UserGrantedMappingNode, AssetPermission, PermNode, UserAssetGrantedTreeNodeRelation,
-    PermAssetThrouth, NodeAssetThrouth,
+    AssetPermission, PermNode, UserAssetGrantedTreeNodeRelation,
+    NodeAssetThrouth,
 )
 from users.models import User
 from perms.locks import UserGrantedTreeRebuildLock
@@ -223,7 +223,7 @@ class UserGrantedTreeRefreshController:
     @timeit
     def refresh_if_need(self, force=False):
         user = self.user
-        exists = UserGrantedMappingNode.objects.filter(user=user).exists()
+        exists = UserAssetGrantedTreeNodeRelation.objects.filter(user=user).exists()
 
         if force or not exists:
             orgs = [*user.orgs.all(), Organization.default()]
@@ -505,10 +505,8 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
         granted_node_ids = AssetPermission.nodes.through.objects.filter(
             assetpermission_id__in=self.asset_perm_ids
         ).values_list('node_id', flat=True).distinct()
-        granted_node_ids = list(granted_node_ids)
-        queryset = Asset.org_objects.order_by().filter(
-            nodes_related_records__node_id__in=granted_node_ids
-        ).distinct()
+        granted_nodes = PermNode.objects.filter(id__in=granted_node_ids).only('id', 'key')
+        queryset = PermNode.get_nodes_all_assets_v2(*granted_nodes)
         return queryset
 
     def get_all_granted_assets(self, qs_stage: QuerySetStage = None) -> AssetQuerySet:
@@ -521,16 +519,16 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
         return queryset
 
     def get_node_all_assets(self, id, qs_stage: QuerySetStage = None) -> Tuple[PermNode, AssetQuerySet]:
-        node = PermNode.get_node_with_granted_info(self.user, id)
-        granted_status = PermNode.get_node_granted_status(self.user, node.key)
-        if granted_status == PermNode.GRANTED_DIRECT:
-            assets = Asset.org_objects.distinct().order_by().filter(nodes_related_records__node_id=node.id)
+        node = PermNode.objects.get(id=id)
+        granted_status = node.get_granted_status(self.user)
+        if granted_status == NodeFrom.granted:
+            assets = PermNode.get_nodes_all_assets_v2(node)
             if qs_stage:
                 assets = qs_stage.merge(assets)
             return node, assets
-        elif granted_status == PermNode.GRANTED_INDIRECT:
-            node.use_mapping_assets_amount()
-            assets = self._get_indirect_granted_node_all_assets(node.key, qs_stage=qs_stage)
+        elif granted_status in (NodeFrom.asset, NodeFrom.child):
+            node.use_granted_assets_amount()
+            assets = self._get_indirect_granted_node_all_assets(node, qs_stage=qs_stage)
             return node, assets
         else:
             node.assets_amount = 0
@@ -538,12 +536,12 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
 
     def get_node_assets(self, key) -> AssetQuerySet:
         node = PermNode.objects.get(key=key)
-        granted_status = PermNode.get_node_granted_status(self.user, node.key)
+        granted_status = node.get_granted_status(self.user)
 
-        if granted_status == PermNode.GRANTED_DIRECT:
+        if granted_status == NodeFrom.granted:
             assets = Asset.org_objects.order_by().filter(nodes_id=node.id)
             return assets
-        elif granted_status == PermNode.GRANTED_INDIRECT:
+        elif granted_status == NodeFrom.asset:
             return self._get_indirect_granted_node_assets(node.id)
         else:
             return Asset.org_objects.none()
@@ -552,7 +550,7 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
         assets = Asset.org_objects.order_by().filter(nodes_id=id) & self.get_direct_granted_assets()
         return assets
 
-    def _get_indirect_granted_node_all_assets(self, key, qs_stage: QuerySetStage = None) -> AssetQuerySet:
+    def _get_indirect_granted_node_all_assets(self, node, qs_stage: QuerySetStage = None) -> AssetQuerySet:
         """
         此算法依据 `UserGrantedMappingNode` 的数据查询
         1. 查询该节点下的直接授权节点
@@ -561,22 +559,21 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
         user = self.user
 
         # 查询该节点下的授权节点
-        granted_node_ids = UserGrantedMappingNode.objects.filter(
-            user=user, granted=True,
+        granted_nodes = UserAssetGrantedTreeNodeRelation.objects.filter(
+            user=user, node_from=NodeFrom.granted
         ).filter(
-            Q(key__startswith=f'{key}:') | Q(key=key)
-        ).values_list('node_id', flat=True)
-        granted_node_ids = list(granted_node_ids)
-        node_assets = Asset.org_objects.distinct().order_by().filter(
-            nodes_related_records__node_id__in=granted_node_ids)
+            Q(node_key__startswith=f'{node.key}:')
+        ).only('node_id', 'node_key')
+        node_assets = PermNode.get_nodes_all_assets_v2(*granted_nodes)
 
         # 查询该节点下的资产授权节点
-        only_asset_granted_node_ids = UserGrantedMappingNode.objects.filter(
-            user=user,
-            asset_granted=True,
-            granted=False,
-        ).filter(Q(key__startswith=f'{key}:') | Q(key=key)).values_list('node_id', flat=True)
+        only_asset_granted_node_ids = UserAssetGrantedTreeNodeRelation.objects.filter(
+            user=user, node_from=NodeFrom.asset
+        ).filter(Q(node_key__startswith=f'{node.key}:')).values_list('node_id', flat=True)
+
         only_asset_granted_node_ids = list(only_asset_granted_node_ids)
+        if node.node_from == NodeFrom.asset:
+            only_asset_granted_node_ids.append(node.id)
 
         assets = Asset.org_objects.distinct().order_by().filter(
             nodes__id__in=only_asset_granted_node_ids,
@@ -594,10 +591,11 @@ class UserGrantedNodesQueryUtils(UserGrantedUtilsBase):
         if not key:
             return self.get_top_level_nodes()
 
-        granted_status = PermNode.get_node_granted_status(self.user, key)
-        if granted_status == PermNode.GRANTED_DIRECT:
+        node = PermNode.objects.get(key=key)
+        granted_status = node.get_granted_status(self.user)
+        if granted_status == NodeFrom.granted:
             return PermNode.objects.filter(parent_key=key)
-        elif granted_status == PermNode.GRANTED_INDIRECT:
+        elif granted_status in (NodeFrom.asset, NodeFrom.child):
             return self.get_indirect_granted_node_children(key)
         else:
             return PermNode.objects.none()
@@ -609,16 +607,16 @@ class UserGrantedNodesQueryUtils(UserGrantedUtilsBase):
         """
         user = self.user
         nodes = PermNode.objects.filter(
-            mapping_nodes__user=user,
+            granted_node_rels__user=user,
             parent_key=key
         ).annotate(
-            **PermNode.annotate_mapping_node_fields
+            **PermNode.annotate_granted_node_rel_fields
         ).distinct()
 
         # 设置节点授权资产数量
         for node in nodes:
-            if not node.is_granted:
-                node.use_mapping_assets_amount()
+            if not node.node_from == NodeFrom.granted:
+                node.use_granted_assets_amount()
         return nodes
 
     def get_top_level_nodes(self):
@@ -656,7 +654,7 @@ class UserGrantedNodesQueryUtils(UserGrantedUtilsBase):
         nodes = PermNode.objects.filter(
             mapping_nodes__user=self.user,
         ).annotate(
-            **PermNode.annotate_mapping_node_fields
+            **PermNode.annotate_granted_node_rel_fields
         ).distinct()
 
         key_to_node_mapper = {}
@@ -665,7 +663,7 @@ class UserGrantedNodesQueryUtils(UserGrantedUtilsBase):
         for node in nodes:
             if not node.is_granted:
                 # 未授权的节点资产数量设置为 `UserGrantedMappingNode` 中的数量
-                node.use_mapping_assets_amount()
+                node.use_granted_assets_amount()
             else:
                 # 直接授权的节点
                 # 增加查询后代节点的过滤条件
