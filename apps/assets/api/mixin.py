@@ -12,7 +12,7 @@ class SerializeToTreeNodeMixin:
     def serialize_nodes(self, nodes: List[Node], with_asset_amount=False):
         if with_asset_amount:
             def _name(node: Node):
-                return '{} ({})'.format(node.value, node.assets_amount)
+                return '{} ({})'.format(node.value, node._assets_amount)
         else:
             def _name(node: Node):
                 return node.value
