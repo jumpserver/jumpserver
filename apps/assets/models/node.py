@@ -2,6 +2,7 @@
 #
 import uuid
 import re
+import time
 
 from collections import defaultdict
 from django.db import models, transaction
@@ -10,6 +11,7 @@ from django.db.utils import IntegrityError
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 from django.db.transaction import atomic
+from django.core.cache import cache
 
 from common.utils import get_logger
 from common.utils.common import lazyproperty
@@ -315,7 +317,7 @@ class NodeAssetsMixin:
 
     # Use a new plan
 
-    # { org_id: { node_key: [ asset_id, asset_id ] } }
+    # { org_id: { node_key: [ asset1_id, asset2_id ] } }
     org_mapping_to_node_all_assets_id_mapping = defaultdict(dict)
 
     @property
@@ -333,13 +335,22 @@ class NodeAssetsMixin:
         _assets_id = _mapping.get(node_key, [])
         return set(_assets_id)
 
+    # get order: from memory -> (from cache -> to generate)
+
     @classmethod
     def get_node_all_assets_id_mapping(cls, org_id):
         _mapping = cls.get_node_all_assets_id_mapping_from_memory(org_id)
-        if not _mapping:
-            _mapping = cls.generate_node_all_assets_id_mapping(org_id)
+        if _mapping:
+            return _mapping
+
+        _mapping = cls.get_node_all_assets_id_mapping_from_cache(org_id)
+        if _mapping:
             cls.set_node_all_assets_id_mapping_to_memory(org_id, mapping=_mapping)
-        return _mapping
+            return _mapping
+
+        return {}
+
+    # from memory
 
     @classmethod
     def get_node_all_assets_id_mapping_from_memory(cls, org_id):
@@ -351,12 +362,82 @@ class NodeAssetsMixin:
         cls.org_mapping_to_node_all_assets_id_mapping[org_id] = mapping
 
     @classmethod
-    def clear_node_all_assets_id_mapping_from_memory(cls, org_id):
+    def expire_node_all_assets_id_mapping_from_memory(cls, org_id):
         cls.org_mapping_to_node_all_assets_id_mapping.pop(org_id, None)
 
+    # from cache
+
     @classmethod
-    def generate_node_all_assets_id_mapping(cls, org_id):
-        import time
+    def get_node_all_assets_id_mapping_from_cache(cls, org_id):
+        _mapping = cls._get_node_all_assets_id_mapping_from_cache(org_id)
+        if _mapping:
+            return _mapping
+
+        _mapping = cls.generate_node_all_assets_id_mapping_with_lock(org_id)
+        if _mapping:
+            cls._set_node_all_assets_id_mapping_to_cache(org_id=org_id, mapping=_mapping)
+            return _mapping
+
+        # not need to generate, wait for get from cache
+        _mapping = cls._get_node_all_assets_id_mapping_from_cache(org_id, timeout=10)
+        if _mapping:
+            return _mapping
+
+        return {}
+
+    @classmethod
+    def _get_node_all_assets_id_mapping_from_cache(cls, org_id, timeout=None):
+        cache_key = cls._get_cache_key_for_node_all_assets_id_mapping(org_id)
+        if timeout is None:
+            _mapping = cache.get(cache_key)
+            return _mapping
+
+        assert isinstance(timeout, int), 'Expected `timeout` int, got type {}'.format(type(timeout))
+
+        # 每秒从cache中获取一次
+        _mapping = {}
+        wait_for_seconds = timeout + 1
+        for i in range(wait_for_seconds):
+            _mapping = cache.get(cache_key)
+            if _mapping:
+                break
+            time.sleep(1)
+        return _mapping
+
+    @classmethod
+    def _set_node_all_assets_id_mapping_to_cache(cls, org_id, mapping):
+        cache_key = cls._get_cache_key_for_node_all_assets_id_mapping(org_id)
+        cache.set(cache_key, mapping, timeout=None)
+
+    @classmethod
+    def expire_node_all_assets_id_mapping_from_cache(cls, org_id):
+        cache_key = cls._get_cache_key_for_node_all_assets_id_mapping(org_id)
+        cache.delete(cache_key)
+
+    @staticmethod
+    def _get_cache_key_for_node_all_assets_id_mapping(org_id):
+        return 'CACHE_KEY_FOR_ORG_{}_NODE_ALL_ASSETS_ID_MAPPING_OF_ORG'.format(org_id)
+
+    # to generate
+
+    @classmethod
+    def generate_node_all_assets_id_mapping_with_lock(cls, org_id):
+        _mapping = {}
+
+        # 如果10s未生成，那么其他生成同一组织下数据的进程进来，也会生成, 锁机制将失去意义
+        lock_key = f'KEY_LOCK_GENERATE_ORG_{org_id}_NODE_ALL_ASSETS_ID_MAPPING'
+        lock = cache.lock(lock_key, expire=10)
+        if not lock.acquire(timeout=1):
+            # 其他线程正在生成, 直接返回空
+            return _mapping
+
+        _mapping = cls._generate_node_all_assets_id_mapping(org_id)
+        if lock.locked():
+            lock.release()
+        return _mapping
+
+    @classmethod
+    def _generate_node_all_assets_id_mapping(cls, org_id):
         from .asset import Asset
 
         t1 = time.time()
