@@ -343,7 +343,7 @@ class NodeAssetsMixin:
         if _mapping:
             return _mapping
 
-        _mapping = cls.get_node_all_assets_id_mapping_from_cache(org_id)
+        _mapping = cls.get_node_all_assets_id_mapping_from_cache_or_generate_to_cache(org_id)
         if _mapping:
             cls.set_node_all_assets_id_mapping_to_memory(org_id, mapping=_mapping)
             return _mapping
@@ -368,25 +368,25 @@ class NodeAssetsMixin:
     # from cache
 
     @classmethod
-    def get_node_all_assets_id_mapping_from_cache(cls, org_id):
-        _mapping = cls._get_node_all_assets_id_mapping_from_cache(org_id)
+    def get_node_all_assets_id_mapping_from_cache_or_generate_to_cache(cls, org_id):
+        _mapping = cls.get_node_all_assets_id_mapping_from_cache(org_id)
         if _mapping:
             return _mapping
 
         _mapping = cls.generate_node_all_assets_id_mapping_with_lock(org_id)
         if _mapping:
-            cls._set_node_all_assets_id_mapping_to_cache(org_id=org_id, mapping=_mapping)
+            cls.set_node_all_assets_id_mapping_to_cache(org_id=org_id, mapping=_mapping)
             return _mapping
 
         # not need to generate, wait for get from cache
-        _mapping = cls._get_node_all_assets_id_mapping_from_cache(org_id, timeout=10)
+        _mapping = cls.get_node_all_assets_id_mapping_from_cache(org_id, timeout=10)
         if _mapping:
             return _mapping
 
         return {}
 
     @classmethod
-    def _get_node_all_assets_id_mapping_from_cache(cls, org_id, timeout=None):
+    def get_node_all_assets_id_mapping_from_cache(cls, org_id, timeout=None):
         cache_key = cls._get_cache_key_for_node_all_assets_id_mapping(org_id)
         if timeout is None:
             _mapping = cache.get(cache_key)
@@ -405,7 +405,7 @@ class NodeAssetsMixin:
         return _mapping
 
     @classmethod
-    def _set_node_all_assets_id_mapping_to_cache(cls, org_id, mapping):
+    def set_node_all_assets_id_mapping_to_cache(cls, org_id, mapping):
         cache_key = cls._get_cache_key_for_node_all_assets_id_mapping(org_id)
         cache.set(cache_key, mapping, timeout=None)
 
@@ -459,7 +459,7 @@ class NodeAssetsMixin:
         }
 
         # 测试(DB Query)时间
-        # nodes_assets_id = list(nodes_assets_id)
+        nodes_assets_id = list(nodes_assets_id)
 
         t2 = time.time()
 
