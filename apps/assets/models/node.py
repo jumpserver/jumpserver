@@ -3,8 +3,9 @@
 import uuid
 import re
 
+from collections import defaultdict
 from django.db import models, transaction
-from django.db.models import Q
+from django.db.models import Q, F, ExpressionWrapper, CharField
 from django.db.utils import IntegrityError
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
@@ -19,6 +20,10 @@ from orgs.models import Organization
 
 __all__ = ['Node', 'FamilyMixin', 'compute_parent_key']
 logger = get_logger(__name__)
+
+
+def expression_wrapper_to_char_field(field_name):
+    return ExpressionWrapper(F(field_name), output_field=CharField())
 
 
 def compute_parent_key(key):
@@ -248,6 +253,7 @@ class FamilyMixin:
 
 
 class NodeAssetsMixin:
+    org_id: str
     key = ''
     id = None
 
@@ -306,6 +312,88 @@ class NodeAssetsMixin:
             return Asset.org_objects.filter(q).distinct()
         else:
             return Asset.objects.none()
+
+    # Use a new plan
+
+    # { org_id: { node_key: [ asset_id, asset_id ] } }
+    org_mapping_to_node_all_assets_id_mapping = defaultdict(dict)
+
+    @property
+    def _assets_amount(self):
+        _assets_id = self.get_all_assets_id()
+        return len(_assets_id)
+
+    def get_all_assets_id(self):
+        _assets_id = self.get_all_assets_id_by_node_key(org_id=self.org_id, node_key=self.key)
+        return set(_assets_id)
+
+    @classmethod
+    def get_all_assets_id_by_node_key(cls, org_id, node_key):
+        _mapping = cls.get_node_all_assets_id_mapping(org_id)
+        _assets_id = _mapping.get(node_key, [])
+        return set(_assets_id)
+
+    @classmethod
+    def get_node_all_assets_id_mapping(cls, org_id):
+        _mapping = cls.get_node_all_assets_id_mapping_from_memory(org_id)
+        if not _mapping:
+            _mapping = cls.generate_node_all_assets_id_mapping(org_id)
+            cls.set_node_all_assets_id_mapping_to_memory(org_id, mapping=_mapping)
+        return _mapping
+
+    @classmethod
+    def get_node_all_assets_id_mapping_from_memory(cls, org_id):
+        _mapping = cls.org_mapping_to_node_all_assets_id_mapping[org_id]
+        return _mapping
+
+    @classmethod
+    def set_node_all_assets_id_mapping_to_memory(cls, org_id, mapping):
+        cls.org_mapping_to_node_all_assets_id_mapping[org_id] = mapping
+
+    @classmethod
+    def clear_node_all_assets_id_mapping_from_memory(cls, org_id):
+        cls.org_mapping_to_node_all_assets_id_mapping.pop(org_id, None)
+
+    @classmethod
+    def generate_node_all_assets_id_mapping(cls, org_id):
+        import time
+        from .asset import Asset
+
+        t1 = time.time()
+
+        nodes_id_key = Node.objects.filter(org_id=org_id)\
+            .annotate(char_id=expression_wrapper_to_char_field('id'))\
+            .values_list('char_id', 'key')
+
+        # * 直接取出全部. filter(node__org_id=org_id)(大规模下会更慢)
+        nodes_assets_id = Asset.nodes.through.objects\
+            .all()\
+            .annotate(char_node_id=expression_wrapper_to_char_field('node_id')) \
+            .annotate(char_asset_id=expression_wrapper_to_char_field('asset_id'))\
+            .values_list('char_node_id', 'char_asset_id')
+
+        node_id_ancestor_keys_mapping = {
+            node_id: cls.get_node_ancestor_keys(node_key, with_self=True)
+            for node_id, node_key in nodes_id_key
+        }
+
+        # 测试(DB Query)时间
+        # nodes_assets_id = list(nodes_assets_id)
+
+        t2 = time.time()
+
+        _mapping = defaultdict(set)
+        for node_id, asset_id in nodes_assets_id:
+            if node_id not in node_id_ancestor_keys_mapping:
+                continue
+            node_ancestor_keys = node_id_ancestor_keys_mapping[node_id]
+            for ancestor_key in node_ancestor_keys:
+                _mapping[ancestor_key].add(asset_id)
+
+        t3 = time.time()
+
+        print('t1-t2(DB Query): {} s, t3-t2(Generate mapping): {} s'.format(t2-t1, t3-t2))
+        return _mapping
 
 
 class SomeNodesMixin:
