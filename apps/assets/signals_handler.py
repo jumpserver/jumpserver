@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 #
+import os
+import threading
 from operator import add, sub
 
 from assets.utils import is_asset_exists_in_node
@@ -8,7 +10,10 @@ from django.db.models.signals import (
 )
 from django.db.models import Q, F
 from django.dispatch import receiver
+from django.utils.functional import LazyObject
 
+from common.signals import django_ready
+from common.utils.connection import RedisPubSub
 from common.exceptions import M2MReverseNotAllowed
 from common.const.signals import PRE_ADD, POST_ADD, POST_REMOVE, PRE_CLEAR, PRE_REMOVE
 from common.utils import get_logger
@@ -353,3 +358,72 @@ def on_asset_post_delete(instance: Asset, using, **kwargs):
             sender=Asset.nodes.through, instance=instance, reverse=False,
             model=Node, pk_set=node_ids, using=using, action=POST_REMOVE
         )
+
+
+# clear node assets mapping for memory
+# ------------------------------------
+
+def get_node_assets_mapping_for_memory_pub_sub():
+    return RedisPubSub('fm.node_all_assets_id_memory_mapping')
+
+
+class NodeAssetsMappingForMemoryPubSub(LazyObject):
+    def _setup(self):
+        self._wrapped = get_node_assets_mapping_for_memory_pub_sub()
+
+
+node_assets_mapping_for_memory_pub_sub = NodeAssetsMappingForMemoryPubSub()
+
+
+def expire_node_assets_mapping_for_memory(org_id):
+    # 所有进程清除(自己的 memory 数据)
+    node_assets_mapping_for_memory_pub_sub.publish(org_id)
+    # 当前进程清除(cache 数据)
+    logger.debug(
+        "Expire node assets id mapping from cache of org={}, pid={}"
+        "".format(str(org_id), os.getpid())
+    )
+    Node.expire_node_all_assets_id_mapping_from_cache(org_id)
+
+
+@receiver(post_save, sender=Node)
+def on_node_post_create(sender, instance, created, update_fields, **kwargs):
+    if created:
+        _to_expire = True
+    elif update_fields and 'key' in update_fields:
+        _to_expire = True
+    else:
+        _to_expire = False
+
+    if _to_expire:
+        expire_node_assets_mapping_for_memory(instance.org_id)
+
+
+@receiver(post_delete, sender=Node)
+def on_node_post_delete(sender, instance, **kwargs):
+    expire_node_assets_mapping_for_memory(instance.org_id)
+
+
+@receiver(m2m_changed, sender=Asset.nodes.through)
+def on_node_asset_change(sender, instance, **kwargs):
+    expire_node_assets_mapping_for_memory(instance.org_id)
+
+
+@receiver(django_ready)
+def subscribe_settings_change(sender, **kwargs):
+    logger.debug("Start subscribe for expire node assets id mapping from memory")
+
+    def keep_subscribe():
+        subscribe = node_assets_mapping_for_memory_pub_sub.subscribe()
+        for message in subscribe.listen():
+            if message["type"] != "message":
+                continue
+            org_id = message['data'].decode()
+            Node.expire_node_all_assets_id_mapping_from_memory(org_id)
+            logger.debug(
+                "Expire node assets id mapping from memory of org={}, pid={}"
+                "".format(str(org_id), os.getpid())
+            )
+    t = threading.Thread(target=keep_subscribe)
+    t.daemon = True
+    t.start()
