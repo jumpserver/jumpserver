@@ -57,6 +57,7 @@ class GetUserAssetPermissionActionsApi(RetrieveAPIView):
         return {"actions": actions}
 
 
+@method_decorator(tmp_to_root_org(), name='get')
 class ValidateUserAssetPermissionApi(APIView):
     permission_classes = (IsOrgAdminOrAppUser,)
 
