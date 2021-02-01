@@ -1,10 +1,10 @@
 from rest_framework import generics
-from django.db.models import Q
 from django.utils.decorators import method_decorator
 
 from assets.models import SystemUser
 from common.permissions import IsValidUser
 from orgs.utils import tmp_to_root_org
+from perms.utils.asset.user_permission import get_user_all_asset_perm_ids
 from .. import serializers
 
 
@@ -16,9 +16,9 @@ class SystemUserPermission(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
 
+        asset_perms_id = get_user_all_asset_perm_ids(user)
         queryset = SystemUser.objects.filter(
-            Q(granted_by_permissions__users=user) |
-            Q(granted_by_permissions__user_groups__users=user)
+            granted_by_permissions__id__in=asset_perms_id
         ).distinct()
 
         return queryset
