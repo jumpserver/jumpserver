@@ -8,14 +8,15 @@ from assets.models import Node
 
 
 class TreeNode:
-    __slots__ = ('id', 'parent_key', 'assets_amount', 'children', 'assets')
+    __slots__ = ('id', 'parent_key', 'key', 'assets_amount', 'children', 'assets')
 
-    def __init__(self, id, parent_key, assets_amount, children, assets):
+    def __init__(self, id, parent_key, key, assets_amount, children, assets):
         self.id = id
         self.parent_key = parent_key
         self.assets_amount = assets_amount
         self.children = children
         self.assets = assets
+        self.key = key
 
     def __str__(self):
         return f'id: {self.id}, parent_key: {self.parent_key}'
@@ -25,28 +26,24 @@ class TreeNode:
 
 
 class Tree:
-    def __init__(self, nodes, node_asset_id_pairs=None):
+    def __init__(self, nodes, node_key_assets_id_mapper=None):
         self.nodes = nodes
-        # [(node_id, asset_id)]
-        self.node_asset_id_pairs = node_asset_id_pairs
         # node_id --> set(asset_id1, asset_id2)
-        self.node_assets_id_mapper = defaultdict(set)
+        self.node_key_assets_id_mapper = node_key_assets_id_mapper
         self.header = None
         self.headers = []
         self.key_tree_node_mapper = {}
 
+    def __getitem__(self, item):
+        return self.key_tree_node_mapper[item]
+
     @timeit
-    def build_tree(self, replace_keys=None, replace_source_tree=None, deepcopy=False):
+    def build_tree(self):
         key_tree_node_mapper = self.key_tree_node_mapper
 
-        if self.node_asset_id_pairs:
-            # 构建节点资产关系
-            node_assets_id_mapper = self.node_assets_id_mapper
-            for node_id, asset_id in self.node_asset_id_pairs:
-                node_assets_id_mapper[node_id].add(asset_id)
-
+        if self.node_key_assets_id_mapper:
             def _get_node_direct_assets(node):
-                return node_assets_id_mapper.pop(node.id, set())
+                return self.node_key_assets_id_mapper.get(node.key, set())
         else:
             def _get_node_direct_assets(node):
                 return None
@@ -55,22 +52,8 @@ class Tree:
         for node in self.nodes:
             node: Node
             assets = _get_node_direct_assets(node)
-            tree_node = TreeNode(node.id, node.parent_key, 0, [], assets)
+            tree_node = TreeNode(node.id, node.parent_key, node.key, 0, [], assets)
             key_tree_node_mapper[node.key] = tree_node
-
-        # 替换节点
-        if replace_keys and replace_source_tree:
-            replace_source_tree: Tree
-
-            source_key_tree_node_mapper = replace_source_tree.key_tree_node_mapper
-            if deepcopy:
-                copy_tree_node = lambda x: x
-            else:
-                copy_tree_node = copy.deepcopy
-
-            for key in replace_keys:
-                tree_node = source_key_tree_node_mapper[key]
-                key_tree_node_mapper[key] = copy_tree_node(tree_node)
 
         # 构建 Tree
         headers = []

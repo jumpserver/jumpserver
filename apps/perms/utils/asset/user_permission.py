@@ -6,6 +6,7 @@ from django.core.cache import cache
 from django.conf import settings
 from django.db.models import Q, QuerySet
 
+from assets.models.node import expression_wrapper_to_char_field
 from common.utils.common import lazyproperty, timeit
 from assets.tree import Tree
 from perms.tree import GrantedTree
@@ -25,12 +26,12 @@ from users.models import User
 from perms.locks import UserGrantedTreeRebuildLock
 
 NodeFrom = UserAssetGrantedTreeNodeRelation.NodeFrom
-NODE_ONLY_FIELDS = ('id', 'key', 'parent_key', 'assets_amount')
+NODE_ONLY_FIELDS = ('id', 'key', 'parent_key', 'assets_amount', 'org_id')
 
 logger = get_logger(__name__)
 
 
-def get_user_all_asset_perm_ids(user) -> set:
+def get_user_all_asset_perm_ids(user, only_current_org=False) -> set:
     group_ids = user.groups.through.objects.filter(user_id=user.id) \
         .distinct().values_list('usergroup_id', flat=True)
     group_ids = list(group_ids)
@@ -41,6 +42,8 @@ def get_user_all_asset_perm_ids(user) -> set:
     asset_perm_ids.update(
         AssetPermission.user_groups.through.objects.filter(
             usergroup_id__in=group_ids).distinct().values_list('assetpermission_id', flat=True))
+    if only_current_org:
+        asset_perm_ids = AssetPermission.objects.filter(id__in=asset_perm_ids).values_list('id', flat=True)
     return asset_perm_ids
 
 
@@ -165,7 +168,7 @@ class UserGrantedTreeRefreshController:
 
     def __init__(self, user):
         self.user = user
-        self.key = self.key_template.format(user_id = user.id)
+        self.key = self.key_template.format(user_id=user.id)
         self.client = self.get_redis_client()
 
     @classmethod
@@ -278,23 +281,27 @@ class UserGrantedTreeRefreshController:
 
         for org in orgs:
             with tmp_to_org(org):
-                utils = UserGrantedTreeBuildUtils(user)
+                utils = UserGrantedTreeBuildUtils(user, only_current_org=True)
                 utils.rebuild_user_granted_tree()
 
 
 class UserGrantedUtilsBase:
     user: User
 
-    def __init__(self, user, asset_perm_ids=None):
+    def __init__(self, user, asset_perm_ids=None, only_current_org=False):
         self.user = user
         self._asset_perm_ids = asset_perm_ids
+        self._only_current_org = only_current_org
 
     @lazyproperty
     def asset_perm_ids(self) -> set:
         if self._asset_perm_ids:
             return self._asset_perm_ids
 
-        asset_perm_ids = get_user_all_asset_perm_ids(self.user)
+        asset_perm_ids = get_user_all_asset_perm_ids(
+            self.user,
+            only_current_org=self._only_current_org
+        )
         return asset_perm_ids
 
 
@@ -307,7 +314,7 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
         ).distinct().only(*node_only_fields)
         return nodes
 
-    @property
+    @lazyproperty
     def direct_granted_asset_ids(self) -> list:
         asset_ids = Asset.org_objects.filter(
             granted_by_permissions__id__in=self.asset_perm_ids
@@ -333,10 +340,10 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
                 return
 
             nodes = self.compute_perm_nodes_tree()
+            self.compute_node_assets_amount(nodes)
             if not nodes:
                 return
-            self.create_mapping_nodes(nodes)
-            self.compute_node_assets_amount_v2()
+            self.create_mapping_nodes(nodes, with_assets_amount=True)
 
     def compute_perm_nodes_tree(self, node_only_fields=NODE_ONLY_FIELDS) -> list:
 
@@ -467,6 +474,13 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
         UserAssetGrantedTreeNodeRelation.objects.bulk_update(granted_rel_nodes, fields=('node_assets_amount',))
 
     @timeit
+    def _fill_direct_granted_node_assets_id_from_mem(self, nodes_key, mapper):
+        org_id = current_org.id
+        for key in nodes_key:
+            assets_id = PermNode.get_all_assets_id_by_node_key(org_id, key)
+            mapper[key].update(assets_id)
+
+    @timeit
     def compute_node_assets_amount(self, nodes: List[PermNode]):
         """
         这里计算的是一个组织的
@@ -475,35 +489,49 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
             node = nodes[0]
             if node.node_from == NodeFrom.granted and node.key.isdigit():
                 # 直接授权了跟节点
-                node.granted_assets_amount = node.assets_amount
+                node.granted_assets_amount = len(node.get_all_assets_id())
                 return
 
         asset_perm_ids = self.asset_perm_ids
 
-        direct_granted_node_ids = [
-            node.id for node in nodes
-            if node.node_from == NodeFrom.granted
-        ]
+        direct_granted_nodes_key = []
+        node_id_key_mapper = {}
 
-        # 根据资产授权，取出所有直接授权的资产
+        for node in nodes:
+            if node.node_from == NodeFrom.granted:
+                direct_granted_nodes_key.append(node.key)
+            node_id_key_mapper[node.id] = node.key
+
+        node_key_assets_id_mapper = defaultdict(set)
+
+        self._fill_direct_granted_node_assets_id_from_mem(
+            direct_granted_nodes_key, node_key_assets_id_mapper
+        )
+
+        # 处理直接授权资产
+        # 根据资产授权，取出所有直接授权的资产 id
         direct_granted_asset_ids = set(
             AssetPermission.assets.through.objects.filter(
                 assetpermission_id__in=asset_perm_ids).values_list('asset_id', flat=True)
         )
 
         # 直接授权资产，取节点与资产的关系
-        node_asset_pairs_1 = Asset.nodes.through.objects.filter(asset_id__in=direct_granted_asset_ids).values_list(
-            'node_id', 'asset_id')
-        # 直接授权的节点，取节点与资产的关系
-        node_asset_pairs_2 = NodeAssetRelatedRecord.objects.filter(node_id__in=direct_granted_node_ids).values_list(
-            'node_id', 'asset_id')
+        node_asset_pairs = Asset.nodes.through.objects.filter(
+            asset_id__in=direct_granted_asset_ids
+        ).annotate(asset_id_str=expression_wrapper_to_char_field('asset_id')).values_list(
+            'node_id', 'asset_id_str'
+        )
 
-        tree = Tree(nodes, chain(node_asset_pairs_1, node_asset_pairs_2))
+        for node_id, asset_id in node_asset_pairs:
+            nkey = node_id_key_mapper[node_id]
+            node_key_assets_id_mapper[nkey].add(asset_id)
+
+        tree = Tree(nodes, node_key_assets_id_mapper)
         tree.build_tree()
         tree.compute_tree_node_assets_amount()
 
         for node in nodes:
-            assets_amount = tree.key_tree_node_mapper[node.key].assets_amount
+            assets_amount = tree[node.key].assets_amount
             node.assets_amount = assets_amount
 
     def get_whole_tree_nodes(self) -> list:
