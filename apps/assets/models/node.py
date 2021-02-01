@@ -317,6 +317,10 @@ class NodeAssetsMixin:
     # 保存所有组织下node_key和node下所有资产id的映射关系到内存中 (节省内存空间)
     org_mapping_to_node_key_all_assets_id_mapping = defaultdict(dict)
 
+    def _assets_amount(self):
+        _assets_id = self.get_all_assets_id()
+        return len(_assets_id)
+
     def get_all_assets_id(self):
         _mapping = self.get_node_key_all_assets_id_mapping(org_id=self.org_id)
         _assets_id = _mapping.get(self.key, [])

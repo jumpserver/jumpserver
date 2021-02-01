@@ -2,9 +2,11 @@ import logging
 from functools import reduce
 
 from django.utils.translation import ugettext_lazy as _
+from django.db.models import TextChoices
 
 from common.db import models
 from common.utils import lazyproperty
+from common.mixins import CommonModelMixin
 from assets.models import Asset, SystemUser, Node, FamilyMixin
 
 from .base import BasePermission
@@ -140,6 +142,37 @@ class AssetPermission(BasePermission):
         assets = Asset.objects.filter(id__in=assets_ids)
         return assets
 
+
+class UserAssetGrantedTreeNodeRelation(CommonModelMixin, models.Model):
+    class NodeFromChoices(TextChoices):
+        granted = 'granted', 'Granted'
+        asset = 'asset', 'Asset'
+        child = 'child', 'Child'
+
+    user = models.ForeignKey(
+        'users.User', on_delete=models.CASCADE
+    )
+
+    node = models.ForeignKey(
+        'assets.Node', on_delete=models.CASCADE
+    )
+    node_id = models.CharField(
+        max_length=36, db_index=True
+    )
+    node_key = models.CharField(
+        unique=True, max_length=64, verbose_name=_('Node key'), db_index=True
+    )
+    node_parent_key = models.CharField(
+        max_length=64, verbose_name=_('Node Parent key'), db_index=True
+    )
+    node_from = models.CharField(
+        choices=NodeFromChoices.choices, verbose_name=_('Node from')
+    )
+    node_assets_amount = models.IntegerField(default=0)
+
+    org_id = models.CharField(
+        max_length=36, blank=True, default='', verbose_name=_("Organization"), db_index=True
+    )
 
 
 class UserGrantedMappingNode(FamilyMixin, models.JMSBaseModel):
