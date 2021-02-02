@@ -14,8 +14,7 @@ from common.utils import get_logger
 from common.decorator import on_transaction_commit
 from orgs.utils import tmp_to_org, current_org, ensure_in_real_or_default_org
 from assets.models import (
-    Asset, FavoriteAsset, NodeAssetRelatedRecord,
-    AssetQuerySet, NodeQuerySet
+    Asset, FavoriteAsset, AssetQuerySet, NodeQuerySet
 )
 from orgs.models import Organization
 from perms.models import (
@@ -26,7 +25,7 @@ from users.models import User
 from perms.locks import UserGrantedTreeRebuildLock
 
 NodeFrom = UserAssetGrantedTreeNodeRelation.NodeFrom
-NODE_ONLY_FIELDS = ('id', 'key', 'parent_key', 'assets_amount', 'org_id')
+NODE_ONLY_FIELDS = ('id', 'key', 'parent_key', 'org_id')
 
 logger = get_logger(__name__)
 
@@ -307,11 +306,11 @@ class UserGrantedUtilsBase:
 
 class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
 
-    def get_direct_granted_nodes(self, node_only_fields=NODE_ONLY_FIELDS) -> NodeQuerySet:
+    def get_direct_granted_nodes(self) -> NodeQuerySet:
         # 查询直接授权节点
         nodes = PermNode.objects.filter(
             granted_by_permissions__id__in=self.asset_perm_ids
-        ).distinct().only(*node_only_fields)
+        ).distinct()
         return nodes
 
     @lazyproperty
@@ -343,12 +342,12 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
             self.compute_node_assets_amount(nodes)
             if not nodes:
                 return
-            self.create_mapping_nodes(nodes, with_assets_amount=True)
+            self.create_mapping_nodes(nodes)
 
     def compute_perm_nodes_tree(self, node_only_fields=NODE_ONLY_FIELDS) -> list:
 
         # 查询直接授权节点
-        nodes = self.get_direct_granted_nodes(node_only_fields=node_only_fields)
+        nodes = self.get_direct_granted_nodes().only(*node_only_fields)
 
         # 授权的节点 key 集合
         granted_key_set = {_node.key for _node in nodes}
@@ -406,16 +405,9 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
             node.node_from = NodeFrom.child
         return [*leaf_nodes, *ancestors]
 
-    def create_mapping_nodes(self, nodes, with_assets_amount=False):
+    def create_mapping_nodes(self, nodes):
         user = self.user
         to_create = []
-
-        if with_assets_amount:
-            def get_assets_amount(node):
-                return node.assets_amount
-        else:
-            def get_assets_amount(node):
-                return -1
 
         for node in nodes:
             to_create.append(UserAssetGrantedTreeNodeRelation(
@@ -424,7 +416,7 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
                 node_key=node.key,
                 node_parent_key=node.parent_key,
                 node_from=node.node_from,
-                node_assets_amount=get_assets_amount(node),
+                node_assets_amount=node.granted_assets_amount,
                 org_id=node.org_id
             ))
 
@@ -532,7 +524,7 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
 
         for node in nodes:
             assets_amount = tree[node.key].assets_amount
-            node.assets_amount = assets_amount
+            node.granted_assets_amount = assets_amount
 
     def get_whole_tree_nodes(self) -> list:
         node_only_fields = NODE_ONLY_FIELDS + ('value', 'full_value')
@@ -541,7 +533,7 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
 
         # 查询直接授权节点的子节点
         q = Q()
-        for node in self.get_direct_granted_nodes(node_only_fields=('key', )):
+        for node in self.get_direct_granted_nodes().only('key'):
             q |= Q(key__startswith=f'{node.key}:')
 
         if q:

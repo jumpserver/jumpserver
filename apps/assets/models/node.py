@@ -20,7 +20,7 @@ from orgs.utils import get_current_org, tmp_to_org
 from orgs.models import Organization
 
 
-__all__ = ['Node', 'FamilyMixin', 'compute_parent_key', 'NodeAssetRelatedRecord', 'NodeQuerySet']
+__all__ = ['Node', 'FamilyMixin', 'compute_parent_key', 'NodeQuerySet']
 logger = get_logger(__name__)
 
 
@@ -335,7 +335,7 @@ class NodeAssetsMixin:
     org_mapping_to_node_all_assets_id_mapping = defaultdict(dict)
 
     @property
-    def _assets_amount(self):
+    def assets_amount(self):
         _assets_id = self.get_all_assets_id()
         return len(_assets_id)
 
@@ -600,8 +600,6 @@ class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
     date_create = models.DateTimeField(auto_now_add=True)
     parent_key = models.CharField(max_length=64, verbose_name=_("Parent key"),
                                   db_index=True, default='')
-    assets_amount = models.IntegerField(default=0)
-    all_assets = models.ManyToManyField('assets.Asset', through='assets.NodeAssetRelatedRecord', related_name='all_nodes')
 
     objects = OrgManager.from_queryset(NodeQuerySet)()
     is_node = True
@@ -706,19 +704,3 @@ class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
         instance = super().save(*args, **kwargs)
         self.update_child_full_value()
         return instance
-
-
-class NodeAssetRelatedRecord(models.Model):
-    asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, related_name='nodes_related_records', null=False)
-    node = models.ForeignKey('assets.Node', on_delete=models.CASCADE, related_name='assets_related_records', null=False)
-    related_count = models.IntegerField(default=0, db_index=True)
-
-
-class NodeAssetRelatedRecordProxy(models.Model):
-    asset_id = models.CharField(max_length=64)
-    node_id = models.CharField(max_length=64)
-    related_count = models.IntegerField(default=0, db_index=True)
-
-    class Meta:
-        managed = False
-        db_table = 'assets_nodeassetrelatedrecord'
