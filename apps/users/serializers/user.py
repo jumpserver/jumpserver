@@ -54,7 +54,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         ]
 
         read_only_fields = [
-            'date_joined', 'last_login', 'created_by', 'is_first_login', 'source'
+            'date_joined', 'last_login', 'created_by', 'is_first_login',
         ]
 
         extra_kwargs = {
