@@ -14,11 +14,6 @@ from perms.utils.asset.user_permission import UserGrantedTreeRefreshController
 logger = get_logger(__file__)
 
 
-def dispatch_mapping_node_tasks():
-    # 这哥们没用了，但是迁移脚本里引用了它，所以给他保留个尸体吧
-    pass
-
-
 @register_as_period_task(interval=settings.PERM_EXPIRED_CHECK_PERIODIC)
 @shared_task(queue='celery_check_asset_perm_expired')
 @atomic()

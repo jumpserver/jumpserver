@@ -5,7 +5,7 @@ from common.utils import get_logger, dict_get_any, is_uuid, get_object_or_none
 from common.utils.common import random_string
 from common.http import is_true
 from orgs.utils import current_org
-from .models import Asset, Node, NodeAssetRelatedRecord
+from .models import Asset, Node
 from assets.locks import NodeTreeUpdateLock
 
 logger = get_logger(__file__)

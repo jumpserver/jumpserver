@@ -14,8 +14,8 @@ from .base import BasePermission
 
 
 __all__ = [
-    'AssetPermission', 'Action', 'UserGrantedMappingNode', 'PermNode',
-    'UserAssetGrantedTreeNodeRelation', 'PermAssetThrouth', 'NodeAssetThrouth'
+    'AssetPermission', 'Action', 'PermNode', 'UserAssetGrantedTreeNodeRelation',
+    'PermAssetThrouth', 'NodeAssetThrouth'
 ]
 
 # 使用场景
@@ -145,18 +145,6 @@ class AssetPermission(BasePermission):
         return assets
 
 
-class UserGrantedMappingNode(FamilyMixin, models.JMSBaseModel):
-    org = models.ForeignKey('orgs.Organization', on_delete=models.CASCADE, default='', db_constraint=False, db_index=True)
-    node = models.ForeignKey('assets.Node', default=None, on_delete=models.CASCADE,
-                             db_constraint=False, null=True, related_name='mapping_nodes')
-    key = models.CharField(max_length=64, verbose_name=_("Key"), db_index=True)  # '1:1:1:1'
-    user = models.ForeignKey('users.User', db_constraint=False, on_delete=models.CASCADE)
-    granted = models.BooleanField(default=False, db_index=True)
-    asset_granted = models.BooleanField(default=False, db_index=True)
-    parent_key = models.CharField(max_length=64, default='', verbose_name=_('Parent key'), db_index=True)  # '1:1:1:1'
-    assets_amount = models.IntegerField(default=0)
-
-
 class UserAssetGrantedTreeNodeRelation(OrgModelMixin, FamilyMixin, models.JMSBaseModel):
     class NodeFrom(ChoiceSet):
         granted = 'granted', 'Direct node granted'
@@ -196,10 +184,6 @@ class UserAssetGrantedTreeNodeRelation(OrgModelMixin, FamilyMixin, models.JMSBas
         return '', None
 
 
-class RebuildUserTreeTask(models.JMSBaseModel):
-    user = models.ForeignKey('users.User', on_delete=models.CASCADE, verbose_name=_('User'))
-
-
 class PermNode(Node):
     class Meta:
         proxy = True
@@ -214,13 +198,23 @@ class PermNode(Node):
     node_from = ''
     granted_assets_amount = 0
 
+    # 提供可以设置 资产数量的字段
+    _assets_amount = None
+
     annotate_granted_node_rel_fields = {
         'granted_assets_amount': F('granted_node_rels__node_assets_amount'),
         'node_from': F('granted_node_rels__node_from')
     }
 
+    @property
+    def assets_amount(self):
+        _assets_amount = getattr(self, '_assets_amount')
+        if isinstance(_assets_amount, int):
+            return _assets_amount
+        return super().assets_amount
+
     def use_granted_assets_amount(self):
-        self.assets_amount = self.granted_assets_amount
+        self._assets_amount = self.granted_assets_amount
 
     @classmethod
     def get_ungrouped_node(cls, assets_amount):
@@ -233,12 +227,13 @@ class PermNode(Node):
 
     @classmethod
     def get_favorite_node(cls, assets_amount):
-        return cls(
+        node = cls(
             id=cls.FAVORITE_NODE_KEY,
             key=cls.FAVORITE_NODE_KEY,
             value=cls.FAVORITE_NODE_VALUE,
-            assets_amount=assets_amount
         )
+        node._assets_amount = assets_amount
+        return node
 
     def get_granted_status(self, user):
         status, rel_node = UserAssetGrantedTreeNodeRelation.get_node_granted_status(user, self.key)
