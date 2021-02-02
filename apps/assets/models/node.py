@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 #
-import uuid
 import re
+import os
 import time
+import uuid
 
 from collections import defaultdict
 from django.db import models, transaction
@@ -428,6 +429,7 @@ class NodeAssetsMixin:
         lock_key = f'KEY_LOCK_GENERATE_ORG_{org_id}_NODE_ALL_ASSETS_ID_MAPPING'
         lock = cache.lock(lock_key, expire=10)
         if not lock.acquire(timeout=1):
+            logger.debug('No acquire lock for `{}` -> pid={}'.format(lock_key, os.getpid()))
             # 其他线程正在生成, 直接返回空
             return _mapping
 
