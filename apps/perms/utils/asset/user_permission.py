@@ -1,6 +1,5 @@
 from collections import defaultdict
 from typing import List, Tuple
-import time
 
 from django.core.cache import cache
 from django.conf import settings
@@ -11,7 +10,7 @@ from common.utils.common import lazyproperty, timeit, Time
 from assets.tree import Tree
 from common.utils import get_logger
 from common.decorator import on_transaction_commit
-from orgs.utils import tmp_to_org, current_org, ensure_in_real_or_default_org
+from orgs.utils import tmp_to_org, current_org, ensure_in_real_or_default_org, tmp_to_root_org
 from assets.models import (
     Asset, FavoriteAsset, AssetQuerySet, NodeQuerySet
 )
@@ -29,28 +28,32 @@ logger = get_logger(__name__)
 
 
 def get_user_all_asset_perm_ids(user, only_current_org=False) -> set:
-    asset_perm_ids = set()
-    user_perm_id = AssetPermission.users.through.objects\
-        .filter(user_id=user.id) \
-        .values_list('assetpermission_id', flat=True) \
-        .distinct()
-    asset_perm_ids.update(user_perm_id)
-
-    group_ids = user.groups.through.objects \
-        .filter(user_id=user.id) \
-        .values_list('usergroup_id', flat=True) \
-        .distinct()
-    group_ids = list(group_ids)
-    groups_perm_id = AssetPermission.user_groups.through.objects\
-        .filter(usergroup_id__in=group_ids)\
-        .values_list('assetpermission_id', flat=True) \
-        .distinct()
-    asset_perm_ids.update(groups_perm_id)
-
     if only_current_org:
-        asset_perm_ids = AssetPermission.objects\
-            .filter(id__in=asset_perm_ids)\
-            .values_list('id', flat=True)
+        org = current_org
+    else:
+        org = Organization.root()
+
+    with tmp_to_org(org):
+        asset_perm_ids = set()
+        user_perm_id = AssetPermission.users.through.objects\
+            .filter(user_id=user.id) \
+            .values_list('assetpermission_id', flat=True) \
+            .distinct()
+        asset_perm_ids.update(user_perm_id)
+
+        group_ids = user.groups.through.objects \
+            .filter(user_id=user.id) \
+            .values_list('usergroup_id', flat=True) \
+            .distinct()
+        group_ids = list(group_ids)
+        groups_perm_id = AssetPermission.user_groups.through.objects\
+            .filter(usergroup_id__in=group_ids)\
+            .values_list('assetpermission_id', flat=True) \
+            .distinct()
+        asset_perm_ids.update(groups_perm_id)
+
+        asset_perm_ids = AssetPermission.objects.filter(
+            id__in=asset_perm_ids).valid().values_list('id', flat=True)
     return asset_perm_ids
 
 
@@ -187,10 +190,11 @@ class UserGrantedTreeRefreshController:
         return {org_id.decode() for org_id in org_ids}
 
     def set_all_orgs_as_builed(self):
-        self.client.sadd(self.key, *self.orgs_id)
+        orgs_id = [str(org_id) for org_id in self.orgs_id]
+        self.client.sadd(self.key, *orgs_id)
 
     def get_need_refresh_orgs_and_fill_up(self):
-        orgs_id = self.orgs_id
+        orgs_id = set(str(org_id) for org_id in self.orgs_id)
 
         with self.client.pipeline(transaction=False) as p:
             p.smembers(self.key)
@@ -216,6 +220,10 @@ class UserGrantedTreeRefreshController:
                 p.srem(key, *org_ids)
             p.execute()
         logger.info(f'Remove orgs from users builded tree, users:{users_id} orgs:{orgs_id}')
+
+    @classmethod
+    def add_need_refresh_orgs_for_users(cls, orgs_id, users_id):
+        cls.remove_builed_orgs_from_users(orgs_id, users_id)
 
     @classmethod
     def add_need_refresh_on_nodes_assets_relate_change(cls, node_ids, asset_ids):
