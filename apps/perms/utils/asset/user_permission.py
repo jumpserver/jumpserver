@@ -9,7 +9,6 @@ from django.db.models import Q, QuerySet
 from assets.models.node import expression_wrapper_to_char_field
 from common.utils.common import lazyproperty, timeit, Time
 from assets.tree import Tree
-from perms.tree import GrantedTree
 from common.utils import get_logger
 from common.decorator import on_transaction_commit
 from orgs.utils import tmp_to_org, current_org, ensure_in_real_or_default_org
@@ -430,49 +429,6 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
             ))
 
         UserAssetGrantedTreeNodeRelation.objects.bulk_create(to_create)
-
-    @timeit
-    def compute_node_assets_amount_v2(self):
-        """
-        可跨组织计算节点资产数量
-        """
-        granted_rel_nodes = UserAssetGrantedTreeNodeRelation.objects.filter(user=self.user)
-        id_granted_rel_node_mapper = {n.id: n for n in granted_rel_nodes}
-
-        tree = GrantedTree(granted_rel_nodes)
-        tree.build_tree()
-
-        for granted_rel_node in granted_rel_nodes:
-            granted_rel_node: UserAssetGrantedTreeNodeRelation
-            if granted_rel_node.node_from == NodeFrom.granted:
-                continue
-            else:
-                granted_node, asset_granted_node = tree.get_node_descendant(
-                    granted_rel_node.node_key, id_granted_rel_node_mapper
-                )
-
-                direct_ids = [n.node_id for n in granted_node]
-                indirect_ids = [n.node_id for n in asset_granted_node]
-
-                # 获取直接授权节点的所有子孙节点
-                q = Q()
-                for node in granted_node:
-                    q |= Q(key__istartswith=f'{node.key}:')
-
-                if q:
-                    descendant_node_ids = PermNode.objects.order_by().filter(q).values_list('id', flat=True).distinct()
-                    direct_ids.extend(descendant_node_ids)
-
-                direct_granted_assets_qs = NodeAssetThrouth.objects.filter(
-                    node_id__in=indirect_ids,
-                    asset__assetpermission_id__in=self.asset_perm_ids
-                ).values_list('asset_id')
-                direct_granted_node_assets_qs = Asset.nodes.through.objects.filter(
-                    node_id__in=direct_ids).values_list('asset_id').distinct()
-                assets_qs = direct_granted_assets_qs.union(direct_granted_node_assets_qs)
-                assets_amount = assets_qs.values_list('asset_id').distinct().count()
-                granted_rel_node.node_assets_amount = assets_amount
-        UserAssetGrantedTreeNodeRelation.objects.bulk_update(granted_rel_nodes, fields=('node_assets_amount',))
 
     @timeit
     def _fill_direct_granted_node_assets_id_from_mem(self, nodes_key, mapper):
