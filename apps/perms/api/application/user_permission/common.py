@@ -2,11 +2,13 @@
 #
 import uuid
 from django.shortcuts import get_object_or_404
+from django.utils.decorators import method_decorator
 from rest_framework.views import APIView, Response
 from rest_framework.generics import (
     ListAPIView, get_object_or_404
 )
 
+from orgs.utils import tmp_to_root_org
 from applications.models import Application
 from perms.utils.application.permission import (
     get_application_system_users_id
@@ -49,6 +51,7 @@ class MyGrantedApplicationSystemUsersApi(ForUserMixin, GrantedApplicationSystemU
     pass
 
 
+@method_decorator(tmp_to_root_org(), name='get')
 class ValidateUserApplicationPermissionApi(APIView):
     permission_classes = (IsOrgAdminOrAppUser,)
 
