@@ -4,8 +4,7 @@ from rest_framework.request import Request
 from users.models import User
 from assets.api.mixin import SerializeToTreeNodeMixin
 from common.utils import get_logger
-from common.drf.serializers import EmptySerializer
-from perms.pagination import GrantedAssetLimitOffsetPagination
+from perms.pagination import NodeGrantedAssetPagination, AllGrantedAssetPagination
 from assets.models import Asset, Node
 from perms import serializers
 from perms.utils.asset.user_permission import UserGrantedAssetsQueryUtils, QuerySetStage
@@ -32,6 +31,7 @@ class UserDirectGrantedAssetsMixin:
 
 class UserAllGrantedAssetsMixin:
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
+    pagination_class = AllGrantedAssetPagination
     user: User
 
     def get_union_queryset(self, qs_stage: QuerySetStage):
@@ -59,7 +59,7 @@ class UserFavoriteGrantedAssetsMixin:
 
 class UserGrantedNodeAssetsMixin:
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
-    pagination_class = GrantedAssetLimitOffsetPagination
+    pagination_class = NodeGrantedAssetPagination
     pagination_node: Node
     user: User
 

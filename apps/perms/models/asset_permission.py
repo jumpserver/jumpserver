@@ -213,8 +213,12 @@ class PermNode(Node):
             return _assets_amount
         return super().assets_amount
 
+    @assets_amount.setter
+    def assets_amount(self, value):
+        self._assets_amount = value
+
     def use_granted_assets_amount(self):
-        self._assets_amount = self.granted_assets_amount
+        self.assets_amount = self.granted_assets_amount
 
     @classmethod
     def get_ungrouped_node(cls, assets_amount):
@@ -232,7 +236,7 @@ class PermNode(Node):
             key=cls.FAVORITE_NODE_KEY,
             value=cls.FAVORITE_NODE_VALUE,
         )
-        node._assets_amount = assets_amount
+        node.assets_amount = assets_amount
         return node
 
     def get_granted_status(self, user):

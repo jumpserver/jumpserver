@@ -307,7 +307,7 @@ class NodeAssetsMixin:
             node_ids.update(
                 Node.objects.order_by().filter(descendant_node_query).values_list('id', flat=True)
             )
-        return Asset.org_objects.order_by().filter(nodes__id__in=node_ids).distinct()
+        return Asset.objects.order_by().filter(nodes__id__in=node_ids).distinct()
 
     @classmethod
     def get_nodes_all_assets(cls, nodes_keys, extra_assets_ids=None):
@@ -325,7 +325,7 @@ class NodeAssetsMixin:
         if extra_assets_ids:
             q |= Q(id__in=extra_assets_ids)
         if q:
-            return Asset.org_objects.filter(q).distinct()
+            return Asset.objects.filter(q).distinct()
         else:
             return Asset.objects.none()
 
