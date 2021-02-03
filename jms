@@ -227,17 +227,17 @@ def get_start_daphne_kwargs():
 
 def get_start_celery_ansible_kwargs():
     print("\n- Start Celery as Distributed Task Queue: Ansible")
-    return get_start_worker_kwargs('ansible', 4)
+    return get_start_worker_kwargs('ansible', 2)
 
 
 def get_start_celery_default_kwargs():
     print("\n- Start Celery as Distributed Task Queue: Celery")
-    return get_start_worker_kwargs('celery', 4)
+    return get_start_worker_kwargs('celery', 2)
 
 
 def get_start_celery_node_tree_kwargs():
     print("\n- Start Celery as Distributed Task Queue: NodeTree")
-    return get_start_worker_kwargs('node_tree', 2)
+    return get_start_worker_kwargs('node_tree', 1)
 
 
 def get_start_celery_heavy_tasks_kwargs():
