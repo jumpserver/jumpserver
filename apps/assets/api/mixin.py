@@ -2,13 +2,11 @@ from typing import List
 
 from assets.models import Node, Asset
 from assets.pagination import AssetLimitOffsetPagination
-from common.utils import lazyproperty, dict_get_any, is_uuid, get_object_or_none
+from common.utils import lazyproperty
 from assets.utils import get_node, is_query_node_all_assets
 
 
 class SerializeToTreeNodeMixin:
-    permission_classes = ()
-
     def serialize_nodes(self, nodes: List[Node], with_asset_amount=False):
         if with_asset_amount:
             def _name(node: Node):

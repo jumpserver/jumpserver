@@ -9,6 +9,7 @@ from django.views.generic import View
 from django.shortcuts import redirect
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 
@@ -64,7 +65,7 @@ def redirect_old_apps_view(request, *args, **kwargs):
 
 
 class HealthCheckView(APIView):
-    permission_classes = ()
+    permission_classes = (AllowAny,)
 
     def get(self, request):
         return JsonResponse({"status": 1, "time": int(time.time())})

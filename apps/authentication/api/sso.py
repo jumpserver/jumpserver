@@ -7,6 +7,7 @@ from django.http.response import HttpResponseRedirect
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.request import Request
+from rest_framework.permissions import AllowAny
 
 from common.utils.timezone import utcnow
 from common.const.http import POST, GET
@@ -31,6 +32,7 @@ class SSOViewSet(AuthMixin, JmsGenericViewSet):
         'login_url': SSOTokenSerializer,
         'login': EmptySerializer
     }
+    permission_classes = (IsSuperUser,)
 
     @action(methods=[POST], detail=False, permission_classes=[IsSuperUser], url_path='login-url')
     def login_url(self, request, *args, **kwargs):
@@ -54,7 +56,7 @@ class SSOViewSet(AuthMixin, JmsGenericViewSet):
         login_url = '%s?%s' % (reverse('api-auth:sso-login', external=True), urlencode(query))
         return Response(data={'login_url': login_url})
 
-    @action(methods=[GET], detail=False, filter_backends=[AuthKeyQueryDeclaration], permission_classes=[])
+    @action(methods=[GET], detail=False, filter_backends=[AuthKeyQueryDeclaration], permission_classes=[AllowAny])
     def login(self, request: Request, *args, **kwargs):
         """
         此接口违反了 `Restful` 的规范
