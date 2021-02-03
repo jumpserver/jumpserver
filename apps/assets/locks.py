@@ -1,5 +1,4 @@
-from orgs.utils import current_org, Organization
-from babel.support import LazyProxy
+from orgs.utils import current_org
 from common.utils.lock import DistributedLock
 
 
@@ -17,6 +16,6 @@ class NodeTreeUpdateLock(DistributedLock):
         return name
 
     def __init__(self, blocking=True):
-        name = LazyProxy(self.get_name, enable_cache=False)
+        name = self.get_name()
         super().__init__(name=name, blocking=blocking,
-                         release_lock_on_transaction_commit=True, current_thread_reentrant=True)
+                         release_lock_on_transaction_commit=True)
