@@ -693,8 +693,7 @@ class UserGrantedNodesQueryUtils(UserGrantedUtilsBase):
 
         # 设置节点授权资产数量
         for node in nodes:
-            if not node.node_from == NodeFrom.granted:
-                node.use_granted_assets_amount()
+            node.use_granted_assets_amount()
         return nodes
 
     def get_top_level_nodes(self):
