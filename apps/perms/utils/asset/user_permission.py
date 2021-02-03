@@ -727,7 +727,6 @@ class UserGrantedNodesQueryUtils(UserGrantedUtilsBase):
         :param user:
         :return:
         """
-        # 获取 `UserGrantedMappingNode` 中对应的 `Node`
         nodes = PermNode.objects.filter(
             granted_node_rels__user=self.user
         ).annotate(
@@ -738,14 +737,13 @@ class UserGrantedNodesQueryUtils(UserGrantedUtilsBase):
         nodes_descendant_q = Q()
 
         for node in nodes:
-            if not node.is_granted:
-                # 未授权的节点资产数量设置为 `UserGrantedMappingNode` 中的数量
-                node.use_granted_assets_amount()
-            else:
+            node.use_granted_assets_amount()
+
+            if node.node_from == NodeFrom.granted:
                 # 直接授权的节点
                 # 增加查询后代节点的过滤条件
                 nodes_descendant_q |= Q(key__startswith=f'{node.key}:')
-            key_to_node_mapper[node.key] = node
+                key_to_node_mapper[node.key] = node
 
         if nodes_descendant_q:
             descendant_nodes = PermNode.objects.filter(
