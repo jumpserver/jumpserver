@@ -1,13 +1,13 @@
 from collections import defaultdict
 from typing import List, Tuple
-from itertools import chain
+import time
 
 from django.core.cache import cache
 from django.conf import settings
 from django.db.models import Q, QuerySet
 
 from assets.models.node import expression_wrapper_to_char_field
-from common.utils.common import lazyproperty, timeit
+from common.utils.common import lazyproperty, timeit, Time
 from assets.tree import Tree
 from perms.tree import GrantedTree
 from common.utils import get_logger
@@ -315,9 +315,10 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
 
     @lazyproperty
     def direct_granted_asset_ids(self) -> list:
-        asset_ids = Asset.org_objects.filter(
+        # 3.15
+        asset_ids = Asset.objects.filter(
             granted_by_permissions__id__in=self.asset_perm_ids
-        ).distinct().values_list('id', flat=True)
+        ).annotate(id_str=expression_wrapper_to_char_field('id')).distinct().values_list('id_str', flat=True)
         asset_ids = list(asset_ids)
         return asset_ids
 
@@ -344,10 +345,12 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
                 return
             self.create_mapping_nodes(nodes)
 
+    @timeit
     def compute_perm_nodes_tree(self, node_only_fields=NODE_ONLY_FIELDS) -> list:
 
         # 查询直接授权节点
         nodes = self.get_direct_granted_nodes().only(*node_only_fields)
+        nodes = list(nodes)
 
         # 授权的节点 key 集合
         granted_key_set = {_node.key for _node in nodes}
@@ -373,10 +376,13 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
         def process_direct_granted_assets():
             # 查询直接授权资产
             asset_ids = self.direct_granted_asset_ids
-            # 查询授权资产关联的节点设置
+
+            nodes_id = {node_id_str for node_id_str, _ in self.direct_granted_asset_id_node_id_str_pairs}
+            # 查询授权资产关联的节点设置 2.80
             granted_asset_nodes = PermNode.objects.filter(
-                assets__id__in=asset_ids
+                id__in=nodes_id
             ).distinct().only(*node_only_fields)
+            granted_asset_nodes = list(granted_asset_nodes)
 
             # 给资产授权关联的节点设置 is_asset_granted 标识，同时去重
             for node in granted_asset_nodes:
@@ -401,10 +407,13 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
         ancestor_keys -= key2leaf_nodes_mapper.keys()
         # 查出祖先节点
         ancestors = PermNode.objects.filter(key__in=ancestor_keys).only(*node_only_fields)
+        ancestors = list(ancestors)
         for node in ancestors:
             node.node_from = NodeFrom.child
-        return [*leaf_nodes, *ancestors]
+        result = [*leaf_nodes, *ancestors]
+        return result
 
+    @timeit
     def create_mapping_nodes(self, nodes):
         user = self.user
         to_create = []
@@ -472,6 +481,17 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
             assets_id = PermNode.get_all_assets_id_by_node_key(org_id, key)
             mapper[key].update(assets_id)
 
+    @lazyproperty
+    def direct_granted_asset_id_node_id_str_pairs(self):
+        node_asset_pairs = Asset.nodes.through.objects.filter(
+            asset_id__in=self.direct_granted_asset_ids
+        ).annotate(asset_id_str=expression_wrapper_to_char_field('asset_id'),
+                   node_id_str=expression_wrapper_to_char_field('node_id')).values_list(
+            'node_id_str', 'asset_id_str'
+        )
+        node_asset_pairs = list(node_asset_pairs)
+        return node_asset_pairs
+
     @timeit
     def compute_node_assets_amount(self, nodes: List[PermNode]):
         """
@@ -484,15 +504,13 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
                 node.granted_assets_amount = len(node.get_all_assets_id())
                 return
 
-        asset_perm_ids = self.asset_perm_ids
-
         direct_granted_nodes_key = []
         node_id_key_mapper = {}
 
         for node in nodes:
             if node.node_from == NodeFrom.granted:
                 direct_granted_nodes_key.append(node.key)
-            node_id_key_mapper[node.id] = node.key
+            node_id_key_mapper[node.id.hex] = node.key
 
         node_key_assets_id_mapper = defaultdict(set)
 
@@ -501,18 +519,9 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
         )
 
         # 处理直接授权资产
-        # 根据资产授权，取出所有直接授权的资产 id
-        direct_granted_asset_ids = set(
-            AssetPermission.assets.through.objects.filter(
-                assetpermission_id__in=asset_perm_ids).values_list('asset_id', flat=True)
-        )
-
         # 直接授权资产，取节点与资产的关系
-        node_asset_pairs = Asset.nodes.through.objects.filter(
-            asset_id__in=direct_granted_asset_ids
-        ).annotate(asset_id_str=expression_wrapper_to_char_field('asset_id')).values_list(
-            'node_id', 'asset_id_str'
-        )
+        node_asset_pairs = self.direct_granted_asset_id_node_id_str_pairs
+        node_asset_pairs = list(node_asset_pairs)
 
         for node_id, asset_id in node_asset_pairs:
             nkey = node_id_key_mapper[node_id]
@@ -560,7 +569,7 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
         return self.get_direct_granted_assets()
 
     def get_direct_granted_assets(self) -> AssetQuerySet:
-        queryset = Asset.org_objects.order_by().filter(
+        queryset = Asset.objects.order_by().filter(
             granted_by_permissions__id__in=self.asset_perm_ids
         ).distinct()
         return queryset
@@ -601,22 +610,22 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
             return node, assets
         else:
             node.assets_amount = 0
-            return node, Asset.org_objects.none()
+            return node, Asset.objects.none()
 
     def get_node_assets(self, key) -> AssetQuerySet:
         node = PermNode.objects.get(key=key)
         granted_status = node.get_granted_status(self.user)
 
         if granted_status == NodeFrom.granted:
-            assets = Asset.org_objects.order_by().filter(nodes_id=node.id)
+            assets = Asset.objects.order_by().filter(nodes_id=node.id)
             return assets
         elif granted_status == NodeFrom.asset:
             return self._get_indirect_granted_node_assets(node.id)
         else:
-            return Asset.org_objects.none()
+            return Asset.objects.none()
 
     def _get_indirect_granted_node_assets(self, id) -> AssetQuerySet:
-        assets = Asset.org_objects.order_by().filter(nodes_id=id) & self.get_direct_granted_assets()
+        assets = Asset.objects.order_by().filter(nodes_id=id) & self.get_direct_granted_assets()
         return assets
 
     def _get_indirect_granted_node_all_assets(self, node, qs_stage: QuerySetStage = None) -> AssetQuerySet:
@@ -644,7 +653,7 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
         if node.node_from == NodeFrom.asset:
             only_asset_granted_node_ids.append(node.id)
 
-        assets = Asset.org_objects.distinct().order_by().filter(
+        assets = Asset.objects.distinct().order_by().filter(
             nodes__id__in=only_asset_granted_node_ids,
             granted_by_permissions__id__in=self.asset_perm_ids
         )
