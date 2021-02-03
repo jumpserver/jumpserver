@@ -425,7 +425,7 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
                 node_key=node.key,
                 node_parent_key=node.parent_key,
                 node_from=node.node_from,
-                node_assets_amount=node.granted_assets_amount,
+                node_assets_amount=node.assets_amount,
                 org_id=node.org_id
             ))
 
@@ -533,7 +533,7 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
 
         for node in nodes:
             assets_amount = tree[node.key].assets_amount
-            node.granted_assets_amount = assets_amount
+            node.assets_amount = assets_amount
 
     def get_whole_tree_nodes(self) -> list:
         node_only_fields = NODE_ONLY_FIELDS + ('value', 'full_value')
