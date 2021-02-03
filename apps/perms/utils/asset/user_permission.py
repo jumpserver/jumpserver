@@ -162,7 +162,7 @@ class QuerySetStage:
 
 
 class UserGrantedTreeRefreshController:
-    key_template = 'perms.user.asset.node.tree.need_refresh_orgs.<user_id:{user_id}>'
+    key_template = 'perms.user.node_tree.builded_orgs.user_id:{user_id}'
 
     def __init__(self, user):
         self.user = user
@@ -265,6 +265,15 @@ class UserGrantedTreeRefreshController:
         cls.add_need_refresh_orgs_for_users(
             [current_org.id], user_ids
         )
+
+    @lazyproperty
+    def orgs_id(self):
+        self.orgs
+
+    @lazyproperty
+    def orgs(self):
+        orgs = [*self.user.orgs.all(), Organization.default()]
+        return orgs
 
     @timeit
     def refresh_if_need(self, force=False):
