@@ -42,10 +42,10 @@ class SessionViewSet(OrgBulkModelViewSet):
         'display': serializers.SessionDisplaySerializer,
     }
     permission_classes = (IsOrgAdminOrAppUser, )
-    filterset_fields = [
-        "user", "asset", "system_user", "remote_addr",
-        "protocol", "terminal", "is_finished", 'login_from',
+    search_fields = [
+        "user", "asset", "system_user", "remote_addr", "protocol", "is_finished", 'login_from',
     ]
+    filterset_fields = search_fields + ['terminal']
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))
     ]
