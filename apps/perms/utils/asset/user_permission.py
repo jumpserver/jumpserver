@@ -6,7 +6,7 @@ from django.core.cache import cache
 from django.conf import settings
 from django.db.models import Q, QuerySet
 
-from assets.models.node import expression_wrapper_to_char_field
+from assets.models.node import output_as_string
 from common.utils.common import lazyproperty, timeit, Time
 from assets.tree import Tree
 from common.utils import get_logger
@@ -18,7 +18,6 @@ from assets.models import (
 from orgs.models import Organization
 from perms.models import (
     AssetPermission, PermNode, UserAssetGrantedTreeNodeRelation,
-    NodeAssetThrouth,
 )
 from users.models import User
 from perms.locks import UserGrantedTreeRebuildLock
@@ -30,18 +29,28 @@ logger = get_logger(__name__)
 
 
 def get_user_all_asset_perm_ids(user, only_current_org=False) -> set:
-    group_ids = user.groups.through.objects.filter(user_id=user.id) \
-        .distinct().values_list('usergroup_id', flat=True)
-    group_ids = list(group_ids)
     asset_perm_ids = set()
-    asset_perm_ids.update(
-        AssetPermission.users.through.objects.filter(
-            user_id=user.id).distinct().values_list('assetpermission_id', flat=True))
-    asset_perm_ids.update(
-        AssetPermission.user_groups.through.objects.filter(
-            usergroup_id__in=group_ids).distinct().values_list('assetpermission_id', flat=True))
+    user_perm_id = AssetPermission.users.through.objects\
+        .filter(user_id=user.id) \
+        .values_list('assetpermission_id', flat=True) \
+        .distinct()
+    asset_perm_ids.update(user_perm_id)
+
+    group_ids = user.groups.through.objects \
+        .filter(user_id=user.id) \
+        .values_list('usergroup_id', flat=True) \
+        .distinct()
+    group_ids = list(group_ids)
+    groups_perm_id = AssetPermission.user_groups.through.objects\
+        .filter(usergroup_id__in=group_ids)\
+        .values_list('assetpermission_id', flat=True) \
+        .distinct()
+    asset_perm_ids.update(groups_perm_id)
+
     if only_current_org:
-        asset_perm_ids = AssetPermission.objects.filter(id__in=asset_perm_ids).values_list('id', flat=True)
+        asset_perm_ids = AssetPermission.objects\
+            .filter(id__in=asset_perm_ids)\
+            .values_list('id', flat=True)
     return asset_perm_ids
 
 
@@ -177,34 +186,36 @@ class UserGrantedTreeRefreshController:
         org_ids = self.client.smembers(self.key)
         return {org_id.decode() for org_id in org_ids}
 
-    def get_and_delete_need_refresh_org_ids(self):
+    def set_all_orgs_as_builed(self):
+        self.client.sadd(self.key, *self.orgs_id)
+
+    def get_need_refresh_orgs_and_fill_up(self):
+        orgs_id = self.orgs_id
+
         with self.client.pipeline(transaction=False) as p:
             p.smembers(self.key)
-            p.delete(self.key)
+            p.sadd(self.key, *orgs_id)
             ret = p.execute()
-            org_ids = ret[0] or ()
-            org_ids = {org_id.decode() for org_id in org_ids}
-            logger.info(f'Get and delete <user_id:{self.user.id}> in <org_ids:{org_ids}> need refresh mark')
-            return org_ids
-
-    @on_transaction_commit
-    def add_need_refresh_org_ids(self, *org_ids):
-        self.client.sadd(self.key, *org_ids)
-        logger.info(f'Mark <user_id:{self.user.id}> in <org_ids:{org_ids}> need refresh')
+            builded_orgs_id = {org_id.decode() for org_id in ret[0]}
+            ids = orgs_id - builded_orgs_id
+            orgs = list(Organization.objects.filter(id__in=ids))
+            if Organization.DEFAULT_ID in ids:
+                orgs.append(Organization.default())
+            logger.info(f'Get builed orgs are {ret[0]}, all orgs are {orgs_id}, need rebuild orgs are {orgs}')
+            return orgs
 
     @classmethod
     @on_transaction_commit
-    def add_need_refresh_orgs_for_users(cls, org_ids, user_ids):
+    def remove_builed_orgs_from_users(cls, orgs_id, users_id):
         client = cls.get_redis_client()
-        org_ids = [str(org_id) for org_id in org_ids]
+        org_ids = [str(org_id) for org_id in orgs_id]
 
-        with client.pipeline(transaction=False) as p:
-            for user_id in user_ids:
+        with client.pipeline() as p:
+            for user_id in users_id:
                 key = cls.key_template.format(user_id=user_id)
-                p.sadd(key, *org_ids)
-
+                p.srem(key, *org_ids)
             p.execute()
-        logger.info(f'Mark <user_ids:{user_ids}> in <org_ids:{org_ids}> need refresh')
+        logger.info(f'Remove orgs from users builded tree, users:{users_id} orgs:{orgs_id}')
 
     @classmethod
     def add_need_refresh_on_nodes_assets_relate_change(cls, node_ids, asset_ids):
@@ -216,24 +227,25 @@ class UserGrantedTreeRefreshController:
 
         node_ids = set(node_ids)
         ancestor_node_keys = set()
-
         asset_perm_ids = set()
 
         nodes = PermNode.objects.filter(id__in=node_ids).only('id', 'key')
         for node in nodes:
             ancestor_node_keys.update(node.get_ancestor_keys())
-        node_ids.update(
-            PermNode.objects.filter(key__in=ancestor_node_keys).values_list('id', flat=True)
-        )
 
-        asset_perm_ids.update(
-            AssetPermission.nodes.through.objects.filter(
-                node_id__in=node_ids).values_list('assetpermission_id', flat=True)
-        )
-        asset_perm_ids.update(
-            AssetPermission.assets.through.objects.filter(
-                asset_id__in=asset_ids).values_list('assetpermission_id', flat=True)
-        )
+        ancestor_id = PermNode.objects.filter(key__in=ancestor_node_keys).values_list('id', flat=True)
+        node_ids.update(ancestor_id)
+
+        assets_related_perms_id = AssetPermission.nodes.through.objects.filter(
+            node_id__in=node_ids
+        ).values_list('assetpermission_id', flat=True)
+        asset_perm_ids.update(assets_related_perms_id)
+
+        nodes_related_perms_id = AssetPermission.assets.through.objects.filter(
+            asset_id__in=asset_ids
+        ).values_list('assetpermission_id', flat=True)
+        asset_perm_ids.update(nodes_related_perms_id)
+
         cls.add_need_refresh_by_asset_perm_ids(asset_perm_ids)
 
     @classmethod
@@ -251,24 +263,28 @@ class UserGrantedTreeRefreshController:
         ensure_in_real_or_default_org()
 
         group_ids = AssetPermission.user_groups.through.objects.filter(
-            assetpermission_id__in=asset_perm_ids).values_list('usergroup_id', flat=True)
+            assetpermission_id__in=asset_perm_ids
+        ).values_list('usergroup_id', flat=True)
 
         user_ids = set()
-        user_ids.update(
-            AssetPermission.users.through.objects.filter(
-                assetpermission_id__in=asset_perm_ids).values_list('user_id', flat=True)
-        )
-        user_ids.update(
-            User.groups.through.objects.filter(usergroup_id__in=group_ids).values_list('user_id', flat=True)
-        )
+        direct_user_id = AssetPermission.users.through.objects.filter(
+            assetpermission_id__in=asset_perm_ids
+        ).values_list('user_id', flat=True)
+        user_ids.update(direct_user_id)
 
-        cls.add_need_refresh_orgs_for_users(
+        group_user_ids = User.groups.through.objects.filter(
+            usergroup_id__in=group_ids
+        ).values_list('user_id', flat=True)
+        user_ids.update(group_user_ids)
+
+        cls.remove_builed_orgs_from_users(
             [current_org.id], user_ids
         )
 
     @lazyproperty
     def orgs_id(self):
-        self.orgs
+        ret = [org.id for org in self.orgs]
+        return ret
 
     @lazyproperty
     def orgs(self):
@@ -281,10 +297,10 @@ class UserGrantedTreeRefreshController:
         exists = UserAssetGrantedTreeNodeRelation.objects.filter(user=user).exists()
 
         if force or not exists:
-            orgs = [*user.orgs.all(), Organization.default()]
+            orgs = self.orgs
+            self.set_all_orgs_as_builed()
         else:
-            org_ids = self.get_and_delete_need_refresh_org_ids()
-            orgs = [Organization.get_instance(org_id) for org_id in org_ids]
+            orgs = self.get_need_refresh_orgs_and_fill_up()
 
         for org in orgs:
             with tmp_to_org(org):
@@ -326,7 +342,9 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
         # 3.15
         asset_ids = Asset.objects.filter(
             granted_by_permissions__id__in=self.asset_perm_ids
-        ).annotate(id_str=expression_wrapper_to_char_field('id')).distinct().values_list('id_str', flat=True)
+        ).annotate(id_str=output_as_string('id'))\
+            .distinct()\
+            .values_list('id_str', flat=True)
         asset_ids = list(asset_ids)
         return asset_ids
 
@@ -339,9 +357,7 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
 
         with UserGrantedTreeRebuildLock(org_id, user.id):
             # 先删除旧的授权树🌲
-            UserAssetGrantedTreeNodeRelation.objects.filter(
-                user=user
-            ).delete()
+            UserAssetGrantedTreeNodeRelation.objects.filter(user=user).delete()
 
             if not self.asset_perm_ids:
                 # 没有授权直接返回
@@ -450,8 +466,10 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
     def direct_granted_asset_id_node_id_str_pairs(self):
         node_asset_pairs = Asset.nodes.through.objects.filter(
             asset_id__in=self.direct_granted_asset_ids
-        ).annotate(asset_id_str=expression_wrapper_to_char_field('asset_id'),
-                   node_id_str=expression_wrapper_to_char_field('node_id')).values_list(
+        ).annotate(
+            asset_id_str=output_as_string('asset_id'),
+            node_id_str=output_as_string('node_id')
+        ).values_list(
             'node_id_str', 'asset_id_str'
         )
         node_asset_pairs = list(node_asset_pairs)
@@ -523,7 +541,8 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
 
     def get_favorite_assets(self, qs_stage: QuerySetStage = None, only=('id', )) -> AssetQuerySet:
         favorite_asset_ids = FavoriteAsset.objects.filter(
-            user=self.user).values_list('asset_id', flat=True)
+            user=self.user
+        ).values_list('asset_id', flat=True)
         favorite_asset_ids = list(favorite_asset_ids)
         qs_stage = qs_stage or QuerySetStage()
         qs_stage.filter(id__in=favorite_asset_ids).only(*only)
@@ -593,7 +612,7 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
         assets = Asset.objects.order_by().filter(nodes_id=id) & self.get_direct_granted_assets()
         return assets
 
-    def _get_indirect_granted_node_all_assets(self, node, qs_stage: QuerySetStage = None) -> AssetQuerySet:
+    def _get_indirect_granted_node_all_assets(self, node, qs_stage: QuerySetStage = None) -> QuerySet:
         """
         此算法依据 `UserGrantedMappingNode` 的数据查询
         1. 查询该节点下的直接授权节点
@@ -612,16 +631,18 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
         # 查询该节点下的资产授权节点
         only_asset_granted_node_ids = UserAssetGrantedTreeNodeRelation.objects.filter(
             user=user, node_from=NodeFrom.asset
-        ).filter(Q(node_key__startswith=f'{node.key}:')).values_list('node_id', flat=True)
+        ).filter(
+            Q(node_key__startswith=f'{node.key}:')
+        ).values_list('node_id', flat=True)
 
         only_asset_granted_node_ids = list(only_asset_granted_node_ids)
         if node.node_from == NodeFrom.asset:
             only_asset_granted_node_ids.append(node.id)
 
-        assets = Asset.objects.distinct().order_by().filter(
+        assets = Asset.objects.filter(
             nodes__id__in=only_asset_granted_node_ids,
             granted_by_permissions__id__in=self.asset_perm_ids
-        )
+        ).distinct().order_by()
         if qs_stage:
             node_assets, assets = qs_stage.merge_multi_before_union(node_assets, assets)
         granted_assets = node_assets.union(assets)

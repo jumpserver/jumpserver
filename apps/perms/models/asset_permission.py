@@ -15,7 +15,7 @@ from .base import BasePermission
 
 __all__ = [
     'AssetPermission', 'Action', 'PermNode', 'UserAssetGrantedTreeNodeRelation',
-    'PermAssetThrouth', 'NodeAssetThrouth'
+    'PermAssetThrough', 'NodeAssetThrough'
 ]
 
 # 使用场景
@@ -253,7 +253,7 @@ class PermNode(Node):
 
 # 为了连表查询定义的 --------------------------
 
-class PermAssetThrouth(models.Model):
+class PermAssetThrough(models.Model):
     assetpermission = models.ForeignKey('perms.AssetPermission', on_delete=models.CASCADE)
     asset_id = models.UUIDField(primary_key=True)
 
@@ -262,9 +262,9 @@ class PermAssetThrouth(models.Model):
         managed = False
 
 
-class NodeAssetThrouth(models.Model):
+class NodeAssetThrough(models.Model):
     node = models.ForeignKey('assets.Node', on_delete=models.CASCADE)
-    asset = models.ForeignKey(PermAssetThrouth, on_delete=models.CASCADE, to_field='asset_id')
+    asset = models.ForeignKey(PermAssetThrough, on_delete=models.CASCADE, to_field='asset_id')
 
     class Meta:
         db_table = 'assets_asset_nodes'

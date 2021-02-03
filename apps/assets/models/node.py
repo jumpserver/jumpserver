@@ -24,7 +24,7 @@ __all__ = ['Node', 'FamilyMixin', 'compute_parent_key', 'NodeQuerySet']
 logger = get_logger(__name__)
 
 
-def expression_wrapper_to_char_field(field_name):
+def output_as_string(field_name):
     return ExpressionWrapper(F(field_name), output_field=CharField())
 
 
@@ -458,14 +458,14 @@ class NodeAssetsMixin:
         t1 = time.time()
 
         nodes_id_key = Node.objects.filter(org_id=org_id)\
-            .annotate(char_id=expression_wrapper_to_char_field('id'))\
+            .annotate(char_id=output_as_string('id'))\
             .values_list('char_id', 'key')
 
         # * 直接取出全部. filter(node__org_id=org_id)(大规模下会更慢)
         nodes_assets_id = Asset.nodes.through.objects\
             .all()\
-            .annotate(char_node_id=expression_wrapper_to_char_field('node_id')) \
-            .annotate(char_asset_id=expression_wrapper_to_char_field('asset_id'))\
+            .annotate(char_node_id=output_as_string('node_id')) \
+            .annotate(char_asset_id=output_as_string('asset_id'))\
             .values_list('char_node_id', 'char_asset_id')
 
         node_id_ancestor_keys_mapping = {
