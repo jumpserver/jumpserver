@@ -255,7 +255,7 @@ class FamilyMixin:
         return [*tuple(ancestors), self, *tuple(children)]
 
 
-class NodeAllAssetMappingMixin:
+class NodeAllAssetsMappingMixin:
     # Use a new plan
 
     # { org_id: { node_key: [ asset1_id, asset2_id ] } }
@@ -397,7 +397,7 @@ class NodeAllAssetMappingMixin:
         return mapping
 
 
-class NodeAssetsMixin(NodeAllAssetMappingMixin):
+class NodeAssetsMixin(NodeAllAssetsMappingMixin):
     org_id: str
     key = ''
     id = None
