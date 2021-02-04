@@ -292,7 +292,7 @@ class NodeAssetsMixin:
         return self.get_all_assets().valid()
 
     @classmethod
-    def get_nodes_all_assets_ids(cls, nodes_keys):
+    def get_nodes_all_assets_id(cls, nodes_keys):
         nodes = Node.objects.filter(key__in=nodes_keys)
         assets_ids = cls.get_nodes_all_assets(*nodes).values_list('id', flat=True)
         return assets_ids
