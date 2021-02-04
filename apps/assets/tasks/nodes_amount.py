@@ -19,10 +19,3 @@ def check_node_assets_amount_task(org_id):
             check_node_assets_amount()
     except AcquireFailed:
         logger.error(_('The task of self-checking is already running and cannot be started repeatedly'))
-
-
-@register_as_period_task(crontab='0 2 * * *')
-def check_node_assets_amount_period_task():
-    orgs = Organization.objects.all()
-    for org in orgs:
-        check_node_assets_amount_task(org.id)
