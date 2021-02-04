@@ -153,7 +153,7 @@ class UserAssetGrantedTreeNodeRelation(OrgModelMixin, FamilyMixin, models.JMSBas
 
     user = models.ForeignKey('users.User', db_constraint=False, on_delete=models.CASCADE)
     node = models.ForeignKey('assets.Node', default=None, on_delete=models.CASCADE,
-                             db_constraint=False, null=False, primary_key=True, related_name='granted_node_rels')
+                             db_constraint=False, null=False, related_name='granted_node_rels')
     node_key = models.CharField(max_length=64, verbose_name=_("Key"), db_index=True)
     node_parent_key = models.CharField(max_length=64, default='', verbose_name=_('Parent key'), db_index=True)
     node_from = models.CharField(choices=NodeFrom.choices, max_length=16, db_index=True)
@@ -166,10 +166,6 @@ class UserAssetGrantedTreeNodeRelation(OrgModelMixin, FamilyMixin, models.JMSBas
     @property
     def parent_key(self):
         return self.node_parent_key
-
-    @property
-    def id(self):
-        return self.node_id
 
     @classmethod
     def get_node_granted_status(cls, user, key):

@@ -27,33 +27,27 @@ NODE_ONLY_FIELDS = ('id', 'key', 'parent_key', 'org_id')
 logger = get_logger(__name__)
 
 
-def get_user_all_asset_perm_ids(user, only_current_org=False) -> set:
-    if only_current_org:
-        org = current_org
-    else:
-        org = Organization.root()
+def get_user_all_asset_perm_ids(user) -> set:
+    asset_perm_ids = set()
+    user_perm_id = AssetPermission.users.through.objects\
+        .filter(user_id=user.id) \
+        .values_list('assetpermission_id', flat=True) \
+        .distinct()
+    asset_perm_ids.update(user_perm_id)
 
-    with tmp_to_org(org):
-        asset_perm_ids = set()
-        user_perm_id = AssetPermission.users.through.objects\
-            .filter(user_id=user.id) \
-            .values_list('assetpermission_id', flat=True) \
-            .distinct()
-        asset_perm_ids.update(user_perm_id)
+    group_ids = user.groups.through.objects \
+        .filter(user_id=user.id) \
+        .values_list('usergroup_id', flat=True) \
+        .distinct()
+    group_ids = list(group_ids)
+    groups_perm_id = AssetPermission.user_groups.through.objects\
+        .filter(usergroup_id__in=group_ids)\
+        .values_list('assetpermission_id', flat=True) \
+        .distinct()
+    asset_perm_ids.update(groups_perm_id)
 
-        group_ids = user.groups.through.objects \
-            .filter(user_id=user.id) \
-            .values_list('usergroup_id', flat=True) \
-            .distinct()
-        group_ids = list(group_ids)
-        groups_perm_id = AssetPermission.user_groups.through.objects\
-            .filter(usergroup_id__in=group_ids)\
-            .values_list('assetpermission_id', flat=True) \
-            .distinct()
-        asset_perm_ids.update(groups_perm_id)
-
-        asset_perm_ids = AssetPermission.objects.filter(
-            id__in=asset_perm_ids).valid().values_list('id', flat=True)
+    asset_perm_ids = AssetPermission.objects.filter(
+        id__in=asset_perm_ids).valid().values_list('id', flat=True)
     return asset_perm_ids
 
 
@@ -312,27 +306,23 @@ class UserGrantedTreeRefreshController:
 
         for org in orgs:
             with tmp_to_org(org):
-                utils = UserGrantedTreeBuildUtils(user, only_current_org=True)
+                utils = UserGrantedTreeBuildUtils(user)
                 utils.rebuild_user_granted_tree()
 
 
 class UserGrantedUtilsBase:
     user: User
 
-    def __init__(self, user, asset_perm_ids=None, only_current_org=False):
+    def __init__(self, user, asset_perm_ids=None):
         self.user = user
         self._asset_perm_ids = asset_perm_ids
-        self._only_current_org = only_current_org
 
     @lazyproperty
     def asset_perm_ids(self) -> set:
         if self._asset_perm_ids:
             return self._asset_perm_ids
 
-        asset_perm_ids = get_user_all_asset_perm_ids(
-            self.user,
-            only_current_org=self._only_current_org
-        )
+        asset_perm_ids = get_user_all_asset_perm_ids(self.user)
         return asset_perm_ids
 
 
@@ -359,6 +349,7 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
     @timeit
     def rebuild_user_granted_tree(self):
         ensure_in_real_or_default_org()
+        logger.info(f'Rebuild user:{self.user} tree in org:{current_org}')
 
         user = self.user
         org_id = current_org.id

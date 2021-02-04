@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-from django.db.models.signals import m2m_changed, pre_delete
+from django.db.models.signals import m2m_changed, pre_delete, pre_save
 from django.dispatch import receiver
 
 from users.models import User
@@ -38,12 +38,20 @@ def on_asset_permission_delete(sender, instance, **kwargs):
     UserGrantedTreeRefreshController.add_need_refresh_by_asset_perm_ids([instance.id])
 
 
+@receiver([pre_save], sender=AssetPermission)
+def on_asset_permission_delete(sender, instance, **kwargs):
+    old = AssetPermission.objects.get(id=instance.id)
+
+    if old.is_valid != instance.is_valid:
+        UserGrantedTreeRefreshController.add_need_refresh_by_asset_perm_ids([instance.id])
+
+
 def need_rebuild_mapping_node(action):
     return action in (POST_REMOVE, POST_ADD, POST_CLEAR)
 
 
 @receiver(m2m_changed, sender=AssetPermission.nodes.through)
-def on_permission_nodes_changed(sender, instance, action, reverse, pk_set, model, **kwargs):
+def on_permission_nodes_changed(sender, instance, action, reverse, **kwargs):
     if reverse:
         raise M2MReverseNotAllowed
 
@@ -72,8 +80,7 @@ def on_asset_permission_users_changed(sender, action, reverse, pk_set, **kwargs)
 
 
 @receiver(m2m_changed, sender=AssetPermission.user_groups.through)
-def on_asset_permission_user_groups_changed(instance, action, pk_set, model,
-                                            reverse, **kwargs):
+def on_asset_permission_user_groups_changed(sender, action, pk_set, reverse, **kwargs):
     if reverse:
         raise M2MReverseNotAllowed
 
