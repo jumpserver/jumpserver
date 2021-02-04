@@ -199,7 +199,7 @@ class UserGrantedTreeRefreshController:
             orgs = list(Organization.objects.filter(id__in=ids))
             if Organization.DEFAULT_ID in ids:
                 orgs.append(Organization.default())
-            logger.info(f'Get builed orgs are {ret[0]}, all orgs are {orgs_id}, need rebuild orgs are {orgs}')
+            logger.info(f'Need rebuild orgs are {orgs}, builed orgs are {ret[0]}, all orgs are {orgs_id}')
             return orgs
 
     @classmethod

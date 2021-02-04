@@ -245,23 +245,3 @@ class PermNode(Node):
     def save(self):
         # 这是个只读 Model
         raise NotImplementedError
-
-
-# 为了连表查询定义的 --------------------------
-
-class PermAssetThrough(models.Model):
-    assetpermission = models.ForeignKey('perms.AssetPermission', on_delete=models.CASCADE)
-    asset_id = models.UUIDField(primary_key=True)
-
-    class Meta:
-        db_table = 'perms_assetpermission_assets'
-        managed = False
-
-
-class NodeAssetThrough(models.Model):
-    node = models.ForeignKey('assets.Node', on_delete=models.CASCADE)
-    asset = models.ForeignKey(PermAssetThrough, on_delete=models.CASCADE, to_field='asset_id')
-
-    class Meta:
-        db_table = 'assets_asset_nodes'
-        managed = False

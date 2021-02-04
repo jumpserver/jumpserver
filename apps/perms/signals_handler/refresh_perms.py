@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-from django.db.models.signals import m2m_changed, pre_delete, pre_save
+from django.db.models.signals import m2m_changed, pre_delete, pre_save, post_save
 from django.dispatch import receiver
 
 from users.models import User
@@ -33,16 +33,25 @@ def on_user_groups_change(sender, instance, action, reverse, pk_set, **kwargs):
 
 
 @receiver([pre_delete], sender=AssetPermission)
-def on_asset_permission_delete(sender, instance, **kwargs):
+def on_asset_perm_pre_delete(sender, instance, **kwargs):
     # 授权删除之前，查出所有相关用户
     UserGrantedTreeRefreshController.add_need_refresh_by_asset_perm_ids([instance.id])
 
 
 @receiver([pre_save], sender=AssetPermission)
-def on_asset_permission_delete(sender, instance, **kwargs):
-    old = AssetPermission.objects.get(id=instance.id)
+def on_asset_perm_pre_save(sender, instance, **kwargs):
+    try:
+        old = AssetPermission.objects.get(id=instance.id)
 
-    if old.is_valid != instance.is_valid:
+        if old.is_valid != instance.is_valid:
+            UserGrantedTreeRefreshController.add_need_refresh_by_asset_perm_ids([instance.id])
+    except AssetPermission.DoesNotExist:
+        pass
+
+
+@receiver([post_save], sender=AssetPermission)
+def on_asset_perm_post_save(sender, instance, created, **kwargs):
+    if created:
         UserGrantedTreeRefreshController.add_need_refresh_by_asset_perm_ids([instance.id])
 
 
