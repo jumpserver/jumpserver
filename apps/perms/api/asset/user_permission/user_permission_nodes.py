@@ -9,7 +9,7 @@ from rest_framework.request import Request
 
 from assets.api.mixin import SerializeToTreeNodeMixin
 from common.utils import get_logger
-from .mixin import ForAdminMixin, ForUserMixin
+from .mixin import RoleAdminMixin, RoleUserMixin
 from perms.hands import User
 from perms import serializers
 
@@ -100,31 +100,31 @@ class UserGrantedNodesMixin:
 
 # ------------------------------------------
 # 最终的 api
-class UserGrantedNodeChildrenForAdminApi(ForAdminMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenApi):
+class UserGrantedNodeChildrenForAdminApi(RoleAdminMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenApi):
     pass
 
 
-class MyGrantedNodeChildrenApi(ForUserMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenApi):
+class MyGrantedNodeChildrenApi(RoleUserMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenApi):
     pass
 
 
-class UserGrantedNodeChildrenAsTreeForAdminApi(ForAdminMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenAsTreeApi):
+class UserGrantedNodeChildrenAsTreeForAdminApi(RoleAdminMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenAsTreeApi):
     pass
 
 
-class MyGrantedNodeChildrenAsTreeApi(ForUserMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenAsTreeApi):
+class MyGrantedNodeChildrenAsTreeApi(RoleUserMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenAsTreeApi):
     pass
 
 
-class UserGrantedNodesForAdminApi(ForAdminMixin, UserGrantedNodesMixin, BaseGrantedNodeApi):
+class UserGrantedNodesForAdminApi(RoleAdminMixin, UserGrantedNodesMixin, BaseGrantedNodeApi):
     pass
 
 
-class MyGrantedNodesApi(ForUserMixin, UserGrantedNodesMixin, BaseGrantedNodeApi):
+class MyGrantedNodesApi(RoleUserMixin, UserGrantedNodesMixin, BaseGrantedNodeApi):
     pass
 
 
-class MyGrantedNodesAsTreeApi(ForUserMixin, UserGrantedNodesMixin, BaseGrantedNodeAsTreeApi):
+class MyGrantedNodesAsTreeApi(RoleUserMixin, UserGrantedNodesMixin, BaseGrantedNodeAsTreeApi):
     pass
 
 # ------------------------------------------

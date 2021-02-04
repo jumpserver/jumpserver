@@ -20,7 +20,7 @@ class PermBaseMixin:
         return super().get(request, *args, **kwargs)
 
 
-class ForAdminMixin(PermBaseMixin):
+class RoleAdminMixin(PermBaseMixin):
     permission_classes = (IsOrgAdminOrAppUser,)
     kwargs: dict
 
@@ -30,7 +30,7 @@ class ForAdminMixin(PermBaseMixin):
         return User.objects.get(id=user_id)
 
 
-class ForUserMixin(PermBaseMixin):
+class RoleUserMixin(PermBaseMixin):
     permission_classes = (IsValidUser,)
     request: Request
 

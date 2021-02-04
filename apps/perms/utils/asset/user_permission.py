@@ -580,7 +580,7 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
             queryset = qs_stage.merge_after_union(queryset)
         return queryset
 
-    def get_node_all_assets(self, id, qs_stage: QuerySetStage = None) -> Tuple[PermNode, AssetQuerySet]:
+    def get_node_all_assets(self, id, qs_stage: QuerySetStage = None) -> Tuple[PermNode, QuerySet]:
         node = PermNode.objects.get(id=id)
         granted_status = node.get_granted_status(self.user)
         if granted_status == NodeFrom.granted:

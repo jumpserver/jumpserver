@@ -14,7 +14,7 @@ logger = get_logger(__name__)
 
 # 获取数据的 ------------------------------------------------------------
 
-class UserDirectGrantedAssetsMixin:
+class UserDirectGrantedAssetsQuerysetMixin:
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
     user: User
 
@@ -29,7 +29,7 @@ class UserDirectGrantedAssetsMixin:
         return assets
 
 
-class UserAllGrantedAssetsMixin:
+class UserAllGrantedAssetsQuerysetMixin:
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
     pagination_class = AllGrantedAssetPagination
     user: User
@@ -77,7 +77,7 @@ class UserGrantedNodeAssetsMixin:
 
 # 控制格式的 ----------------------------------------------------
 
-class AssetsUnionQueryMixin:
+class AssetsUnionQuerysetMixin:
     def get_queryset_union_prefer(self):
         if hasattr(self, 'get_union_queryset'):
             # 为了支持 union 查询
@@ -91,10 +91,7 @@ class AssetsUnionQueryMixin:
         return queryset
 
 
-class AssetsSerializerFormatMixin(AssetsUnionQueryMixin):
-    """
-    用户直接授权的资产的列表，也就是授权规则上直接授权的资产，并非是来自节点的
-    """
+class AssetsSerializerFormatMixin(AssetsUnionQuerysetMixin):
     serializer_class = serializers.AssetGrantedSerializer
     filterset_fields = ['hostname', 'ip', 'id', 'comment']
     search_fields = ['hostname', 'ip', 'comment']
@@ -111,7 +108,7 @@ class AssetsSerializerFormatMixin(AssetsUnionQueryMixin):
         return Response(serializer.data)
 
 
-class AssetsTreeFormatMixin(AssetsUnionQueryMixin, SerializeToTreeNodeMixin):
+class AssetsTreeFormatMixin(AssetsUnionQuerysetMixin, SerializeToTreeNodeMixin):
     """
     将 资产 序列化成树的结构返回
     """

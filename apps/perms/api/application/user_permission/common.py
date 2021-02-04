@@ -11,7 +11,7 @@ from applications.models import Application
 from perms.utils.application.permission import (
     get_application_system_users_id
 )
-from perms.api.asset.user_permission.mixin import ForAdminMixin, ForUserMixin
+from perms.api.asset.user_permission.mixin import RoleAdminMixin, RoleUserMixin
 from common.permissions import IsOrgAdminOrAppUser
 from perms.hands import User, SystemUser
 from perms import serializers
@@ -41,11 +41,11 @@ class GrantedApplicationSystemUsersMixin(ListAPIView):
         return system_users
 
 
-class UserGrantedApplicationSystemUsersApi(ForAdminMixin, GrantedApplicationSystemUsersMixin):
+class UserGrantedApplicationSystemUsersApi(RoleAdminMixin, GrantedApplicationSystemUsersMixin):
     pass
 
 
-class MyGrantedApplicationSystemUsersApi(ForUserMixin, GrantedApplicationSystemUsersMixin):
+class MyGrantedApplicationSystemUsersApi(RoleUserMixin, GrantedApplicationSystemUsersMixin):
     pass
 
 
