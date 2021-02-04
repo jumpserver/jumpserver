@@ -138,7 +138,7 @@ class AssetPermission(BasePermission):
         from assets.models import Node
         nodes_keys = self.nodes.all().values_list('key', flat=True)
         assets_ids = set(self.assets.all().values_list('id', flat=True))
-        nodes_assets_ids = Node.get_nodes_all_assets_ids(nodes_keys)
+        nodes_assets_ids = Node.get_nodes_all_assets_id(nodes_keys)
         assets_ids.update(nodes_assets_ids)
         assets = Asset.objects.filter(id__in=assets_ids)
         return assets
