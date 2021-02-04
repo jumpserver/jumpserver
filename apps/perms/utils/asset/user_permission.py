@@ -563,7 +563,7 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
         ).values_list('node_id', flat=True).distinct()
         granted_node_ids = list(granted_node_ids)
         granted_nodes = PermNode.objects.filter(id__in=granted_node_ids).only('id', 'key')
-        queryset = PermNode.get_nodes_all_assets_v2(*granted_nodes)
+        queryset = PermNode.get_nodes_all_assets(*granted_nodes)
         if qs_stage:
             queryset = qs_stage.merge(queryset)
         return queryset
@@ -583,7 +583,7 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
         node = PermNode.objects.get(id=id)
         granted_status = node.get_granted_status(self.user)
         if granted_status == NodeFrom.granted:
-            assets = PermNode.get_nodes_all_assets_v2(node)
+            assets = PermNode.get_nodes_all_assets(node)
             if qs_stage:
                 assets = qs_stage.merge(assets)
             return node, assets
@@ -625,7 +625,7 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
         ).filter(
             Q(node_key__startswith=f'{node.key}:')
         ).only('node_id', 'node_key')
-        node_assets = PermNode.get_nodes_all_assets_v2(*granted_nodes)
+        node_assets = PermNode.get_nodes_all_assets(*granted_nodes)
 
         # 查询该节点下的资产授权节点
         only_asset_granted_node_ids = UserAssetGrantedTreeNodeRelation.objects.filter(

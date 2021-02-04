@@ -293,11 +293,12 @@ class NodeAssetsMixin:
 
     @classmethod
     def get_nodes_all_assets_ids(cls, nodes_keys):
-        assets_ids = cls.get_nodes_all_assets(nodes_keys).values_list('id', flat=True)
+        nodes = Node.objects.filter(key__in=nodes_keys)
+        assets_ids = cls.get_nodes_all_assets(*nodes).values_list('id', flat=True)
         return assets_ids
 
     @classmethod
-    def get_nodes_all_assets_v2(cls, *nodes):
+    def get_nodes_all_assets(cls, *nodes):
         from .asset import Asset
         node_ids = set()
         descendant_node_query = Q()
@@ -305,30 +306,9 @@ class NodeAssetsMixin:
             node_ids.add(n.id)
             descendant_node_query |= Q(key__istartswith=f'{n.key}:')
         if descendant_node_query:
-            node_ids.update(
-                Node.objects.order_by().filter(descendant_node_query).values_list('id', flat=True)
-            )
+            _ids = Node.objects.order_by().filter(descendant_node_query).values_list('id', flat=True)
+            node_ids.update(_ids)
         return Asset.objects.order_by().filter(nodes__id__in=node_ids).distinct()
-
-    @classmethod
-    def get_nodes_all_assets(cls, nodes_keys, extra_assets_ids=None):
-        from .asset import Asset
-        nodes_keys = cls.clean_children_keys(nodes_keys)
-        q = Q()
-        node_ids = ()
-        for key in nodes_keys:
-            q |= Q(key__startswith=f'{key}:')
-            q |= Q(key=key)
-        if q:
-            node_ids = Node.objects.filter(q).distinct().values_list('id', flat=True)
-
-        q = Q(nodes__id__in=list(node_ids))
-        if extra_assets_ids:
-            q |= Q(id__in=extra_assets_ids)
-        if q:
-            return Asset.objects.filter(q).distinct()
-        else:
-            return Asset.objects.none()
 
     # Use a new plan
 
