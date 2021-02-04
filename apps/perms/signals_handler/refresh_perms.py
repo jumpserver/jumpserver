@@ -94,7 +94,7 @@ def on_asset_permission_user_groups_changed(sender, action, pk_set, reverse, **k
         raise M2MReverseNotAllowed
 
     if need_rebuild_mapping_node(action):
-        user_ids = User.groups.through.filter(usergroup_id__in=pk_set).distinct().values_list('user_id', flat=True)
+        user_ids = User.groups.through.objects.filter(usergroup_id__in=pk_set).distinct().values_list('user_id', flat=True)
         UserGrantedTreeRefreshController.add_need_refresh_orgs_for_users(
             [current_org.id], user_ids
         )

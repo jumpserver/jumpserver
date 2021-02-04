@@ -10,7 +10,7 @@ from common.utils.common import lazyproperty, timeit, Time
 from assets.tree import Tree
 from common.utils import get_logger
 from common.decorator import on_transaction_commit
-from orgs.utils import tmp_to_org, current_org, ensure_in_real_or_default_org, tmp_to_root_org
+from orgs.utils import tmp_to_org, current_org, ensure_in_real_or_default_org
 from assets.models import (
     Asset, FavoriteAsset, AssetQuerySet, NodeQuerySet
 )
@@ -338,11 +338,14 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
     @lazyproperty
     def direct_granted_asset_ids(self) -> list:
         # 3.15
-        asset_ids = Asset.objects.filter(
-            granted_by_permissions__id__in=self.asset_perm_ids
-        ).annotate(id_str=output_as_string('id'))\
-            .distinct()\
-            .values_list('id_str', flat=True)
+        asset_ids = AssetPermission.assets.through.objects.filter(
+            assetpermission_id__in=self.asset_perm_ids
+        ).annotate(
+            asset_id_str=output_as_string('asset_id')
+        ).values_list(
+            'asset_id_str', flat=True
+        ).distinct()
+
         asset_ids = list(asset_ids)
         return asset_ids
 
@@ -387,7 +390,7 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
 
         key2leaf_nodes_mapper = {}
 
-        # 给授权节点设置 is_granted 标识，同时去重
+        # 给授权节点设置 granted 标识，同时去重
         for node in nodes:
             node: PermNode
             if _has_ancestor_granted(node):
@@ -398,8 +401,6 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
         # 查询授权资产关联的节点设置
         def process_direct_granted_assets():
             # 查询直接授权资产
-            asset_ids = self.direct_granted_asset_ids
-
             nodes_id = {node_id_str for node_id_str, _ in self.direct_granted_asset_id_node_id_str_pairs}
             # 查询授权资产关联的节点设置 2.80
             granted_asset_nodes = PermNode.objects.filter(
@@ -613,7 +614,7 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
 
     def _get_indirect_granted_node_all_assets(self, node, qs_stage: QuerySetStage = None) -> QuerySet:
         """
-        此算法依据 `UserGrantedMappingNode` 的数据查询
+        此算法依据 `UserAssetGrantedTreeNodeRelation` 的数据查询
         1. 查询该节点下的直接授权节点
         2. 查询该节点下授权资产关联的节点
         """
@@ -666,7 +667,7 @@ class UserGrantedNodesQueryUtils(UserGrantedUtilsBase):
     def get_indirect_granted_node_children(self, key):
         """
         获取用户授权树中未授权节点的子节点
-        只匹配在 `UserGrantedMappingNode` 中存在的节点
+        只匹配在 `UserAssetGrantedTreeNodeRelation` 中存在的节点
         """
         user = self.user
         nodes = PermNode.objects.filter(
