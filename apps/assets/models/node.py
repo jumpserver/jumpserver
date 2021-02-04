@@ -14,6 +14,7 @@ from django.utils.translation import ugettext
 from django.db.transaction import atomic
 from django.core.cache import cache
 
+from common.utils.common import timeit
 from common.utils import get_logger
 from orgs.mixins.models import OrgModelMixin, OrgManager
 from orgs.utils import get_current_org, tmp_to_org
@@ -292,11 +293,12 @@ class NodeAssetsMixin:
 
     @classmethod
     def get_nodes_all_assets_ids(cls, nodes_keys):
-        assets_ids = cls.get_nodes_all_assets(nodes_keys).values_list('id', flat=True)
+        nodes = Node.objects.filter(key__in=nodes_keys)
+        assets_ids = cls.get_nodes_all_assets(*nodes).values_list('id', flat=True)
         return assets_ids
 
     @classmethod
-    def get_nodes_all_assets_v2(cls, *nodes):
+    def get_nodes_all_assets(cls, *nodes):
         from .asset import Asset
         node_ids = set()
         descendant_node_query = Q()
@@ -304,30 +306,9 @@ class NodeAssetsMixin:
             node_ids.add(n.id)
             descendant_node_query |= Q(key__istartswith=f'{n.key}:')
         if descendant_node_query:
-            node_ids.update(
-                Node.objects.order_by().filter(descendant_node_query).values_list('id', flat=True)
-            )
+            _ids = Node.objects.order_by().filter(descendant_node_query).values_list('id', flat=True)
+            node_ids.update(_ids)
         return Asset.objects.order_by().filter(nodes__id__in=node_ids).distinct()
-
-    @classmethod
-    def get_nodes_all_assets(cls, nodes_keys, extra_assets_ids=None):
-        from .asset import Asset
-        nodes_keys = cls.clean_children_keys(nodes_keys)
-        q = Q()
-        node_ids = ()
-        for key in nodes_keys:
-            q |= Q(key__startswith=f'{key}:')
-            q |= Q(key=key)
-        if q:
-            node_ids = Node.objects.filter(q).distinct().values_list('id', flat=True)
-
-        q = Q(nodes__id__in=list(node_ids))
-        if extra_assets_ids:
-            q |= Q(id__in=extra_assets_ids)
-        if q:
-            return Asset.objects.filter(q).distinct()
-        else:
-            return Asset.objects.none()
 
     # Use a new plan
 
@@ -335,18 +316,21 @@ class NodeAssetsMixin:
     org_mapping_to_node_all_assets_id_mapping = defaultdict(dict)
 
     @property
+    @timeit
     def assets_amount(self):
         _assets_id = self.get_all_assets_id()
         return len(_assets_id)
 
+    @timeit
     def get_all_assets_id(self):
         _assets_id = self.get_all_assets_id_by_node_key(org_id=self.org_id, node_key=self.key)
         return set(_assets_id)
 
     @classmethod
     def get_all_assets_id_by_node_key(cls, org_id, node_key):
-        _mapping = cls.get_node_all_assets_id_mapping(org_id)
-        _assets_id = _mapping.get(node_key, [])
+        org_id = str(org_id)
+        nodekey_assetsid_mapping = cls.get_node_all_assets_id_mapping(org_id)
+        _assets_id = nodekey_assetsid_mapping.get(node_key, [])
         return set(_assets_id)
 
     # get order: from memory -> (from cache -> to generate)
@@ -368,7 +352,7 @@ class NodeAssetsMixin:
 
     @classmethod
     def get_node_all_assets_id_mapping_from_memory(cls, org_id):
-        _mapping = cls.org_mapping_to_node_all_assets_id_mapping[org_id]
+        _mapping = cls.org_mapping_to_node_all_assets_id_mapping.get(org_id, {})
         return _mapping
 
     @classmethod
@@ -377,6 +361,7 @@ class NodeAssetsMixin:
 
     @classmethod
     def expire_node_all_assets_id_mapping_from_memory(cls, org_id):
+        org_id = str(org_id)
         cls.org_mapping_to_node_all_assets_id_mapping.pop(org_id, None)
 
     # from cache
@@ -430,7 +415,7 @@ class NodeAssetsMixin:
 
     @staticmethod
     def _get_cache_key_for_node_all_assets_id_mapping(org_id):
-        return 'CACHE_KEY_FOR_ORG_{}_NODE_ALL_ASSETS_ID_MAPPING_OF_ORG'.format(org_id)
+        return 'ASSETS_ORG_NODE_ALL_ASSETS_ID_MAPPING_{}'.format(org_id)
 
     # to generate
 
@@ -456,35 +441,36 @@ class NodeAssetsMixin:
         from .asset import Asset
 
         t1 = time.time()
+        # TODO: with tmp_to_org(org_id):
+        with tmp_to_org(org_id):
+            nodes_id_key = Node.objects.filter(org_id=org_id)\
+                .annotate(char_id=output_as_string('id'))\
+                .values_list('char_id', 'key')
 
-        nodes_id_key = Node.objects.filter(org_id=org_id)\
-            .annotate(char_id=output_as_string('id'))\
-            .values_list('char_id', 'key')
+            # * 直接取出全部. filter(node__org_id=org_id)(大规模下会更慢)
+            nodes_assets_id = Asset.nodes.through.objects\
+                .all()\
+                .annotate(char_node_id=output_as_string('node_id')) \
+                .annotate(char_asset_id=output_as_string('asset_id'))\
+                .values_list('char_node_id', 'char_asset_id')
 
-        # * 直接取出全部. filter(node__org_id=org_id)(大规模下会更慢)
-        nodes_assets_id = Asset.nodes.through.objects\
-            .all()\
-            .annotate(char_node_id=output_as_string('node_id')) \
-            .annotate(char_asset_id=output_as_string('asset_id'))\
-            .values_list('char_node_id', 'char_asset_id')
+            node_id_ancestor_keys_mapping = {
+                node_id: cls.get_node_ancestor_keys(node_key, with_self=True)
+                for node_id, node_key in nodes_id_key
+            }
 
-        node_id_ancestor_keys_mapping = {
-            node_id: cls.get_node_ancestor_keys(node_key, with_self=True)
-            for node_id, node_key in nodes_id_key
-        }
-
-        # 测试(DB Query)时间
-        nodes_assets_id = list(nodes_assets_id)
+            nodes_assets_id_mapping = defaultdict(set)
+            for node_id, asset_id in nodes_assets_id:
+                nodes_assets_id_mapping[node_id].add(asset_id)
 
         t2 = time.time()
 
         _mapping = defaultdict(set)
-        for node_id, asset_id in nodes_assets_id:
-            if node_id not in node_id_ancestor_keys_mapping:
-                continue
+        for node_id, node_key in nodes_id_key:
+            assets_id = nodes_assets_id_mapping[node_id]
             node_ancestor_keys = node_id_ancestor_keys_mapping[node_id]
             for ancestor_key in node_ancestor_keys:
-                _mapping[ancestor_key].add(asset_id)
+                _mapping[ancestor_key].update(assets_id)
 
         t3 = time.time()
 

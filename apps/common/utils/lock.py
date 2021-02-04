@@ -39,15 +39,15 @@ class DistributedLock(RedisLock):
 
     def __enter__(self):
         thread_id = threading.current_thread().ident
-        logger.debug(f'DISTRIBUTED_LOCK: <thread_id:{thread_id}> attempt to acquire <lock:{self._name}> ...')
+        logger.debug(f'Attempt to acquire global lock: thread {thread_id} lock {self._name}')
         acquired = self.acquire(blocking=self._blocking)
         if self._blocking and not acquired:
-            logger.debug(f'DISTRIBUTED_LOCK: <thread_id:{thread_id}> was not acquired <lock:{self._name}>, but blocking=True')
+            logger.debug(f'Not acquired lock, but blocking=True, thread {thread_id} lock {self._name}')
             raise EnvironmentError("Lock wasn't acquired, but blocking=True")
         if not acquired:
-            logger.debug(f'DISTRIBUTED_LOCK: <thread_id:{thread_id}> acquire <lock:{self._name}> failed')
+            logger.debug(f'Not acquired the lock, thread {thread_id} lock {self._name}')
             raise AcquireFailed
-        logger.debug(f'DISTRIBUTED_LOCK: <thread_id:{thread_id}> acquire <lock:{self._name}> ok')
+        logger.debug(f'Acquire lock success, thread {thread_id} lock {self._name}')
         return self
 
     def __exit__(self, exc_type=None, exc_value=None, traceback=None):
@@ -62,5 +62,4 @@ class DistributedLock(RedisLock):
             # 要创建一个新的锁对象
             with self.__class__(**self.kwargs_copy):
                 return func(*args, **kwds)
-
         return inner

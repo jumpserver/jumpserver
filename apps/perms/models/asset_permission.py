@@ -15,7 +15,6 @@ from .base import BasePermission
 
 __all__ = [
     'AssetPermission', 'Action', 'PermNode', 'UserAssetGrantedTreeNodeRelation',
-    'PermAssetThrouth', 'NodeAssetThrouth'
 ]
 
 # 使用场景
@@ -153,7 +152,7 @@ class UserAssetGrantedTreeNodeRelation(OrgModelMixin, FamilyMixin, models.JMSBas
 
     user = models.ForeignKey('users.User', db_constraint=False, on_delete=models.CASCADE)
     node = models.ForeignKey('assets.Node', default=None, on_delete=models.CASCADE,
-                             db_constraint=False, null=False, primary_key=True, related_name='granted_node_rels')
+                             db_constraint=False, null=False, related_name='granted_node_rels')
     node_key = models.CharField(max_length=64, verbose_name=_("Key"), db_index=True)
     node_parent_key = models.CharField(max_length=64, default='', verbose_name=_('Parent key'), db_index=True)
     node_from = models.CharField(choices=NodeFrom.choices, max_length=16, db_index=True)
@@ -166,10 +165,6 @@ class UserAssetGrantedTreeNodeRelation(OrgModelMixin, FamilyMixin, models.JMSBas
     @property
     def parent_key(self):
         return self.node_parent_key
-
-    @property
-    def id(self):
-        return self.node_id
 
     @classmethod
     def get_node_granted_status(cls, user, key):
@@ -249,23 +244,3 @@ class PermNode(Node):
     def save(self):
         # 这是个只读 Model
         raise NotImplementedError
-
-
-# 为了连表查询定义的 --------------------------
-
-class PermAssetThrouth(models.Model):
-    assetpermission = models.ForeignKey('perms.AssetPermission', on_delete=models.CASCADE)
-    asset_id = models.UUIDField(primary_key=True)
-
-    class Meta:
-        db_table = 'perms_assetpermission_assets'
-        managed = False
-
-
-class NodeAssetThrouth(models.Model):
-    node = models.ForeignKey('assets.Node', on_delete=models.CASCADE)
-    asset = models.ForeignKey(PermAssetThrouth, on_delete=models.CASCADE, to_field='asset_id')
-
-    class Meta:
-        db_table = 'assets_asset_nodes'
-        managed = False

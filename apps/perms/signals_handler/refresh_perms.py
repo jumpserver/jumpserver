@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-from django.db.models.signals import m2m_changed, pre_delete
+from django.db.models.signals import m2m_changed, pre_delete, pre_save, post_save
 from django.dispatch import receiver
 
 from users.models import User
@@ -33,9 +33,26 @@ def on_user_groups_change(sender, instance, action, reverse, pk_set, **kwargs):
 
 
 @receiver([pre_delete], sender=AssetPermission)
-def on_asset_permission_delete(sender, instance, **kwargs):
+def on_asset_perm_pre_delete(sender, instance, **kwargs):
     # 授权删除之前，查出所有相关用户
     UserGrantedTreeRefreshController.add_need_refresh_by_asset_perm_ids([instance.id])
+
+
+@receiver([pre_save], sender=AssetPermission)
+def on_asset_perm_pre_save(sender, instance, **kwargs):
+    try:
+        old = AssetPermission.objects.get(id=instance.id)
+
+        if old.is_valid != instance.is_valid:
+            UserGrantedTreeRefreshController.add_need_refresh_by_asset_perm_ids([instance.id])
+    except AssetPermission.DoesNotExist:
+        pass
+
+
+@receiver([post_save], sender=AssetPermission)
+def on_asset_perm_post_save(sender, instance, created, **kwargs):
+    if created:
+        UserGrantedTreeRefreshController.add_need_refresh_by_asset_perm_ids([instance.id])
 
 
 def need_rebuild_mapping_node(action):
@@ -43,7 +60,7 @@ def need_rebuild_mapping_node(action):
 
 
 @receiver(m2m_changed, sender=AssetPermission.nodes.through)
-def on_permission_nodes_changed(sender, instance, action, reverse, pk_set, model, **kwargs):
+def on_permission_nodes_changed(sender, instance, action, reverse, **kwargs):
     if reverse:
         raise M2MReverseNotAllowed
 
@@ -72,13 +89,12 @@ def on_asset_permission_users_changed(sender, action, reverse, pk_set, **kwargs)
 
 
 @receiver(m2m_changed, sender=AssetPermission.user_groups.through)
-def on_asset_permission_user_groups_changed(instance, action, pk_set, model,
-                                            reverse, **kwargs):
+def on_asset_permission_user_groups_changed(sender, action, pk_set, reverse, **kwargs):
     if reverse:
         raise M2MReverseNotAllowed
 
     if need_rebuild_mapping_node(action):
-        user_ids = User.groups.through.filter(usergroup_id__in=pk_set).distinct().values_list('user_id', flat=True)
+        user_ids = User.groups.through.objects.filter(usergroup_id__in=pk_set).distinct().values_list('user_id', flat=True)
         UserGrantedTreeRefreshController.add_need_refresh_orgs_for_users(
             [current_org.id], user_ids
         )
