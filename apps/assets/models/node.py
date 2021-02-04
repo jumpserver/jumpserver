@@ -345,7 +345,7 @@ class NodeAllAssetsMappingMixin:
         mapping = {}
 
         # 如果10s未生成，那么其他生成同一组织下数据的进程进来，也会生成, 锁机制将失去意义
-        lock_key = f'KEY_LOCK_GENERATE_ORG_{org_id}_NODE_ALL_ASSETS_ID_MAPPING'
+        lock_key = f'ASSETS_GENERATE_ORG_NODE_ALL_ASSETS_ID_MAPPING_KEY_{org_id}'
         lock = cache.lock(lock_key, expire=10)
         if not lock.acquire(timeout=1):
             logger.debug('No acquire lock for `{}` -> pid={}'.format(lock_key, os.getpid()))
@@ -368,8 +368,7 @@ class NodeAllAssetsMappingMixin:
                 .values_list('char_id', 'key')
 
             # * 直接取出全部. filter(node__org_id=org_id)(大规模下会更慢)
-            nodes_assets_id = Asset.nodes.through.objects \
-                .all() \
+            nodes_assets_id = Asset.nodes.through.objects.all() \
                 .annotate(char_node_id=output_as_string('node_id')) \
                 .annotate(char_asset_id=output_as_string('asset_id')) \
                 .values_list('char_node_id', 'char_asset_id')
