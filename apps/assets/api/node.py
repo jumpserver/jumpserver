@@ -20,7 +20,6 @@ from common.tree import TreeNodeSerializer
 from orgs.mixins.api import OrgModelViewSet
 from orgs.mixins import generics
 from orgs.utils import current_org
-from assets.tasks import check_node_assets_amount_task
 from ..hands import IsOrgAdmin
 from ..models import Node
 from ..tasks import (
@@ -48,11 +47,6 @@ class NodeViewSet(OrgModelViewSet):
     search_fields = ('value', )
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.NodeSerializer
-
-    @action(methods=[POST], detail=False, url_name='launch-check-assets-amount-task')
-    def launch_check_assets_amount_task(self, request):
-        task = check_node_assets_amount_task.delay(current_org.id)
-        return Response(data={'task': task.id})
 
     # 仅支持根节点指直接创建，子节点下的节点需要通过children接口创建
     def perform_create(self, serializer):

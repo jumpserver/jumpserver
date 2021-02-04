@@ -378,15 +378,15 @@ class NodeAllAssetsMappingMixin:
                 for node_id, node_key in nodes_id_key
             }
 
-            nodes_assets_id_mapping = defaultdict(set)
+            nodeid_assetsid_mapping = defaultdict(set)
             for node_id, asset_id in nodes_assets_id:
-                nodes_assets_id_mapping[node_id].add(asset_id)
+                nodeid_assetsid_mapping[node_id].add(asset_id)
 
         t2 = time.time()
 
         mapping = defaultdict(set)
         for node_id, node_key in nodes_id_key:
-            assets_id = nodes_assets_id_mapping[node_id]
+            assets_id = nodeid_assetsid_mapping[node_id]
             node_ancestor_keys = node_id_ancestor_keys_mapping[node_id]
             for ancestor_key in node_ancestor_keys:
                 mapping[ancestor_key].update(assets_id)
@@ -414,8 +414,7 @@ class NodeAssetsMixin(NodeAllAssetsMappingMixin):
         #   可是 startswith 会导致表关联时 Asset 索引失效
         from .asset import Asset
         node_ids = cls.objects.filter(
-            Q(key__startswith=f'{key}:') |
-            Q(key=key)
+            Q(key__startswith=f'{key}:') | Q(key=key)
         ).values_list('id', flat=True).distinct()
         assets = Asset.objects.filter(
             nodes__id__in=list(node_ids)
