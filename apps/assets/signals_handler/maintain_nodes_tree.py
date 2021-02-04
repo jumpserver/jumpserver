@@ -48,13 +48,13 @@ def expire_node_assets_mapping_for_memory(org_id):
 @receiver(post_save, sender=Node)
 def on_node_post_create(sender, instance, created, update_fields, **kwargs):
     if created:
-        _to_expire = True
+        need_expire = True
     elif update_fields and 'key' in update_fields:
-        _to_expire = True
+        need_expire = True
     else:
-        _to_expire = False
+        need_expire = False
 
-    if _to_expire:
+    if need_expire:
         expire_node_assets_mapping_for_memory(instance.org_id)
 
 
@@ -69,7 +69,7 @@ def on_node_asset_change(sender, instance, **kwargs):
 
 
 @receiver(django_ready)
-def subscribe_settings_change(sender, **kwargs):
+def subscribe_node_assets_mapping_expire(sender, **kwargs):
     logger.debug("Start subscribe for expire node assets id mapping from memory")
 
     def keep_subscribe():
