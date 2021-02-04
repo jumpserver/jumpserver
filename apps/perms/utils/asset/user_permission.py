@@ -190,7 +190,7 @@ class UserGrantedTreeRefreshController:
     def get_need_refresh_orgs_and_fill_up(self):
         orgs_id = set(str(org_id) for org_id in self.orgs_id)
 
-        with self.client.pipeline(transaction=False) as p:
+        with self.client.pipeline() as p:
             p.smembers(self.key)
             p.sadd(self.key, *orgs_id)
             ret = p.execute()

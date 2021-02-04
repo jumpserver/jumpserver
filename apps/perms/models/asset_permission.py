@@ -15,7 +15,6 @@ from .base import BasePermission
 
 __all__ = [
     'AssetPermission', 'Action', 'PermNode', 'UserAssetGrantedTreeNodeRelation',
-    'PermAssetThrough', 'NodeAssetThrough'
 ]
 
 # 使用场景
