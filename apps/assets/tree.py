@@ -34,23 +34,6 @@ class Tree:
         self.roots = []
         self.key_treenode_mapper = {}
 
-    @classmethod
-    def start_test(cls):
-        nodes = Node.objects.all()
-        mapper = defaultdict(set)
-        node_asset_rel = Asset.nodes.through.objects.all()\
-            .values_list('node__key', 'asset_id')
-        for key, asset_id in node_asset_rel:
-            mapper[key].add(str(asset_id))
-        tree = cls(nodes, mapper)
-        # tree.build_tree()
-        # tree.compute_tree_node_assets_amount()
-        tree.build_tree_v2()
-        print(tree.key_treenode_mapper['2'].assets_amount)
-        print(tree.key_treenode_mapper['2:1'].assets_amount)
-        print(tree.key_treenode_mapper['2:1:1'].assets_amount)
-        return tree
-
     def __getitem__(self, item):
         return self.key_treenode_mapper[item]
 
@@ -73,33 +56,19 @@ class Tree:
             tree_nodes.append(tree_node)
 
         tree_nodes = sorted(tree_nodes, key=sorted_by)
+        # 这个守卫需要添加一下，避免最后一个无法出栈
         guarder = TreeNode('', '', '', 0, [], set())
         tree_nodes.append(guarder)
-        # f = open('/tmp/abc.log', 'w')
         for node in tree_nodes:
+            # 如果栈顶的不是这个节点的父祖节点，那么可以出栈了，可以计算资产数量了
             while stack.top and not node.key.startswith(f'{stack.top.key}:'):
                 _node = stack.pop()
                 _node.assets_amount = len(_node.assets)
-                # msg = "出栈: {} 栈顶: {}".format(_node.key, stack.top.key if stack.top else None)
-                # print(msg)
-                # f.write(msg + '\n')
                 self.key_treenode_mapper[_node.key] = _node
                 if not stack.top:
                     continue
-                # origin_assets_amount = len(stack.top.assets)
                 stack.top.assets.update(_node.assets)
-                # current_assets_amount = len(stack.top.assets)
-                # msg = "节点数量改变: {} {} => {}".format(stack.top.key, origin_assets_amount, current_assets_amount)
-                # print(msg)
-                # f.write(msg + '\n')
-                # time.sleep(1)
-                # _node.assets = set()
-
-            # print("入栈: {}".format(node.key))
-            # f.write("入栈: {}".format(node.key) + '\n')
             stack.push(node)
-            # time.sleep(1)
-        # print("剩余: {}".format(', '.join([n.key for n in stack])))
 
     @timeit
     def build_tree(self):
