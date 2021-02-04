@@ -1,4 +1,5 @@
 from collections import defaultdict
+import time
 import copy
 
 from assets.models import Node, Asset
@@ -26,62 +27,87 @@ class TreeNode:
 
 
 class Tree:
-    def __init__(self, nodes, node_key_assets_id_mapper=None):
+    def __init__(self, nodes, nodekey_assetsid_mapper=None):
         self.nodes = nodes
         # node_id --> set(asset_id1, asset_id2)
-        self.node_key_assets_id_mapper = node_key_assets_id_mapper
-        self.header = None
-        self.headers = []
-        self.key_tree_node_mapper = {}
+        self.nodekey_assetsid_mapper = nodekey_assetsid_mapper
+        self.roots = []
+        self.key_treenode_mapper = {}
 
     def __getitem__(self, item):
-        return self.key_tree_node_mapper[item]
+        return self.key_treenode_mapper[item]
+
+    @timeit
+    def build_tree_v2(self):
+        if self.nodekey_assetsid_mapper:
+            def _get_node_direct_assets(n):
+                return self.nodekey_assetsid_mapper.get(n.key, set())
+        else:
+            def _get_node_direct_assets(n):
+                return None
+        sorted_by = lambda node: [int(i) for i in node.key.split(':')]
+        tree_nodes = []
+        stack = Stack()
+
+        # 构建 TreeNode
+        for node in self.nodes:
+            assets = _get_node_direct_assets(node)
+            tree_node = TreeNode(node.id, node.parent_key, node.key, 0, [], assets)
+            tree_nodes.append(tree_node)
+
+        tree_nodes = sorted(tree_nodes, key=sorted_by)
+        # 这个守卫需要添加一下，避免最后一个无法出栈
+        guarder = TreeNode('', '', '', 0, [], set())
+        tree_nodes.append(guarder)
+        for node in tree_nodes:
+            # 如果栈顶的不是这个节点的父祖节点，那么可以出栈了，可以计算资产数量了
+            while stack.top and not node.key.startswith(f'{stack.top.key}:'):
+                _node = stack.pop()
+                _node.assets_amount = len(_node.assets)
+                self.key_treenode_mapper[_node.key] = _node
+                if not stack.top:
+                    continue
+                stack.top.assets.update(_node.assets)
+            stack.push(node)
 
     @timeit
     def build_tree(self):
-        key_tree_node_mapper = self.key_tree_node_mapper
-
-        if self.node_key_assets_id_mapper:
-            def _get_node_direct_assets(node):
-                return self.node_key_assets_id_mapper.get(node.key, set())
+        if self.nodekey_assetsid_mapper:
+            def _get_node_direct_assets(n):
+                return self.nodekey_assetsid_mapper.get(n.key, set())
         else:
-            def _get_node_direct_assets(node):
+            def _get_node_direct_assets(n):
                 return None
 
         # 构建 TreeNode
         for node in self.nodes:
-            node: Node
             assets = _get_node_direct_assets(node)
             tree_node = TreeNode(node.id, node.parent_key, node.key, 0, [], assets)
-            key_tree_node_mapper[node.key] = tree_node
+            self.key_treenode_mapper[node.key] = tree_node
 
         # 构建 Tree
-        headers = []
-        for tree_node in key_tree_node_mapper.values():
-            if tree_node.parent_key in key_tree_node_mapper:
-                key_tree_node_mapper[tree_node.parent_key].children.append(tree_node)
+        for tree_node in self.key_treenode_mapper.values():
+            if tree_node.parent_key in self.key_treenode_mapper:
+                self.key_treenode_mapper[tree_node.parent_key].children.append(tree_node)
             else:
-                headers.append(tree_node)
+                self.roots.append(tree_node)
 
-        self.headers = headers
+        self.compute_tree_node_assets_amount()
 
-    def compute_a_tree_node_assets_amount(self, header):
+    @staticmethod
+    def compute_a_tree_node_assets_amount(root):
         wait_stack = Stack()
-        un_process_stack = Stack()
-        # print(f'header {headers[0]}')
-        un_process_stack.push(header)
+        unprocessed_stack = Stack()
+        unprocessed_stack.push(root)
 
-        while un_process_stack:
-            # print(f'un_process_stack {un_process_stack}')
-            tree_node = un_process_stack.pop()
-            # print(f'un_process {tree_node}')
-            tree_node: TreeNode
+        while unprocessed_stack:
+            tree_node = unprocessed_stack.pop()
             if tree_node.children:
-                # print(f'un_process {tree_node} has children')
+                # 父节点压入等待栈
                 wait_stack.push(tree_node)
-                # print(f'{tree_node} push to wait_stack')
-                for tree_node in tree_node.children:
-                    un_process_stack.push(tree_node)
+                for node in tree_node.children:
+                    # 子节点压入待处理栈，那么必然开始处理子节点
+                    unprocessed_stack.push(node)
                     continue
             else:
                 while True:
@@ -89,8 +115,8 @@ class Tree:
                     tree_node.assets_amount = len(tree_node.assets)
 
                     # 判断还有没有兄弟节点
-                    if un_process_stack and tree_node.parent_key == un_process_stack.top.parent_key:
-                        # print(f'{tree_node} has brother {un_process_stack.top}')
+                    if unprocessed_stack and tree_node.parent_key == unprocessed_stack.top.parent_key:
+                        # print(f'{tree_node} has brother {unprocessed_stack.top}')
                         # 有兄弟节点返回到上一层
                         break
 
@@ -125,8 +151,8 @@ class Tree:
 
     @timeit
     def compute_tree_node_assets_amount(self):
-        for header in self.headers:
-            self.compute_a_tree_node_assets_amount(header)
+        for node in self.roots:
+            self.compute_a_tree_node_assets_amount(node)
 
 
 def get_current_org_full_tree():
