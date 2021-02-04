@@ -329,8 +329,8 @@ class NodeAssetsMixin:
     @classmethod
     def get_all_assets_id_by_node_key(cls, org_id, node_key):
         org_id = str(org_id)
-        _mapping = cls.get_node_all_assets_id_mapping(org_id)
-        _assets_id = _mapping.get(node_key, [])
+        nodekey_assetsid_mapping = cls.get_node_all_assets_id_mapping(org_id)
+        _assets_id = nodekey_assetsid_mapping.get(node_key, [])
         return set(_assets_id)
 
     # get order: from memory -> (from cache -> to generate)
@@ -352,7 +352,7 @@ class NodeAssetsMixin:
 
     @classmethod
     def get_node_all_assets_id_mapping_from_memory(cls, org_id):
-        _mapping = cls.org_mapping_to_node_all_assets_id_mapping[org_id]
+        _mapping = cls.org_mapping_to_node_all_assets_id_mapping.get(org_id, {})
         return _mapping
 
     @classmethod
@@ -415,7 +415,7 @@ class NodeAssetsMixin:
 
     @staticmethod
     def _get_cache_key_for_node_all_assets_id_mapping(org_id):
-        return 'CACHE_KEY_FOR_ORG_{}_NODE_ALL_ASSETS_ID_MAPPING_OF_ORG'.format(org_id)
+        return 'ASSETS_ORG_NODE_ALL_ASSETS_ID_MAPPING_{}'.format(org_id)
 
     # to generate
 
