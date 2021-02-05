@@ -1,52 +1,37 @@
-from collections import defaultdict
-import time
-import copy
-
-from assets.models import Node, Asset
 from common.struct import Stack
 from common.utils.common import timeit
-from assets.models import Node
 
 
 class TreeNode:
-    __slots__ = ('id', 'parent_key', 'key', 'assets_amount', 'children', 'assets')
+    __slots__ = ('key', 'assets_amount', 'assets')
 
-    def __init__(self, id, parent_key, key, assets_amount, children, assets):
-        self.id = id
-        self.parent_key = parent_key
+    def __init__(self, key, assets_amount, assets):
         self.assets_amount = assets_amount
-        self.children = children
         self.assets = assets
         self.key = key
 
     def __str__(self):
-        return f'id: {self.id}, parent_key: {self.parent_key}'
-
-    def __repr__(self):
-        return self.__str__()
+        return self.key
 
 
 class Tree:
     def __init__(self, nodes, nodekey_assetsid_mapper):
+        """
+        :param nodes: 节点
+        :param nodekey_assetsid_mapper:  节点直接资产id的映射 {"key1": set(), "key2": set()}
+        """
         self.nodes = nodes
         # node_id --> set(asset_id1, asset_id2)
         self.nodekey_assetsid_mapper = nodekey_assetsid_mapper
         self.tree_nodes = []
         self.key_treenode_mapper = {}
 
-    def __getitem__(self, item):
-        return self.key_treenode_mapper[item]
-
     @timeit
     def build_tree(self):
         # 构建 TreeNode
         for node in self.nodes:
             assets = self.nodekey_assetsid_mapper.get(node.key, set())
-            tree_node = TreeNode(
-                id=node.id, parent_key=node.parent_key,
-                key=node.key, assets_amount=0, children=[],
-                assets=assets
-            )
+            tree_node = TreeNode(key=node.key, assets_amount=0, assets=assets)
             self.key_treenode_mapper[tree_node.key] = tree_node
             self.tree_nodes.append(tree_node)
 
