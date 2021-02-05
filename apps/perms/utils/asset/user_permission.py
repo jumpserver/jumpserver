@@ -51,6 +51,72 @@ def get_user_all_asset_perm_ids(user) -> set:
     return asset_perm_ids
 
 
+class UnionQuertSet(QuerySet):
+    def __init__(self, *querysets):
+        self._querysets = querysets
+        self._order_bys = []
+        super().__init__()
+
+    def _clone(self):
+        clone = self.__class__(*self._querysets)
+        clone._order_bys = self._order_bys.copy()
+        return clone
+
+    def count(self):
+        return self._union_qs().count
+
+    @lazyproperty
+    def union_qs(self):
+        return self._union_qs()
+
+    def _union_qs(self):
+        qs, *others = self._querysets
+        qs = qs.union(*others)
+        for order_by in self._order_bys:
+            qs = qs.order_by(*order_by)
+        return qs
+
+    def order_by(self, *field_names):
+        clone = self._clone()
+        clone._order_bys.append(field_names)
+        return clone
+
+    def __getattribute__(self, item):
+        if item.startswith('__') or item in UnionQuertSet.__dict__ \
+                  or item in self.__dict__:
+            print('__getattribute__ from self-->', item)
+            return object.__getattribute__(self, item)
+
+        print('__getattribute__ from qs-->', item)
+        if callable(getattr(self._querysets[0], item)):
+            def wrapper(*args, **kwargs):
+                new_querysets = []
+                for qs in self._querysets:
+                    new_qs = getattr(qs, item)(*args, **kwargs)
+                    new_querysets.append(new_qs)
+                clone = self._clone()
+                clone._querysets = new_querysets
+                return clone
+            return wrapper
+        else:
+            return getattr(self._union_qs(), item)
+
+    def __repr__(self):
+        return self.union_qs.__repr__()
+
+    def __len__(self):
+        return self.union_qs.__len__()
+
+    def __iter__(self):
+        return self.union_qs.__iter__()
+
+    def __bool__(self):
+        return self.union_qs.__bool__()
+
+    def __getitem__(self, k):
+        return self.union_qs.__getitem__(k)
+
+
 class QuerySetStage:
     def __init__(self):
         self._prefetch_related = set()
