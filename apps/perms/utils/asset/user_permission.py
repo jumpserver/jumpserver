@@ -63,6 +63,8 @@ class UnionQuerySet(QuerySet):
     _querysets = []
     _order_bys = []
 
+    end_methods = {'count'}
+
     def __init__(self, *querysets):
         if len(querysets) < 2:
             raise ValueError(f'Must have more than 1 queryset !!!')
@@ -74,9 +76,6 @@ class UnionQuerySet(QuerySet):
         clone = self.__class__(*self._querysets)
         clone._order_bys = self._order_bys.copy()
         return clone
-
-    def count(self):
-        return self._union_qs().count()
 
     @lazyproperty
     def union_qs(self):
@@ -95,11 +94,15 @@ class UnionQuerySet(QuerySet):
         return clone
 
     def __getattribute__(self, item):
+        if item in UnionQuerySet.end_methods:
+            def wrapper(*args, **kwargs):
+                handler = getattr(self._union_qs(), item)
+                return handler(*args, **kwargs)
+            return wrapper
+
         if item.startswith('__') or item in UnionQuerySet.__dict__:
-            print('__getattribute__ from self-->', item)
             return object.__getattribute__(self, item)
 
-        print('__getattribute__ from qs-->', item)
         if isinstance(getattr(self._querysets[0], item), method):
             def wrapper(*args, **kwargs):
                 new_querysets = []
