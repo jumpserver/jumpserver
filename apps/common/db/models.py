@@ -89,7 +89,7 @@ def output_as_string(field_name):
     return ExpressionWrapper(F(field_name), output_field=CharField())
 
 
-class UnionQueryset:
+class UnionQuerySet:
     after_union = ['order_by']
     not_return_qs = [
         'query', 'get', 'create', 'get_or_create',
