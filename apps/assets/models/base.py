@@ -11,6 +11,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
+from common.utils.common import timeit
 from common.utils import (
     ssh_key_string_to_obj, ssh_key_gen, get_logger, lazyproperty
 )

@@ -184,3 +184,8 @@ def org_aware_func(org_arg_name):
 
 
 current_org = LocalProxy(get_current_org)
+
+
+def ensure_in_real_or_default_org():
+    if not current_org or current_org.is_root():
+        raise ValueError('You must in a real or default org!')

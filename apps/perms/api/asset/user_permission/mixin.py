@@ -4,37 +4,23 @@ from rest_framework.request import Request
 
 from common.permissions import IsOrgAdminOrAppUser, IsValidUser
 from common.utils import lazyproperty
+from common.http import is_true
 from orgs.utils import tmp_to_root_org
 from users.models import User
-from perms.models import UserGrantedMappingNode
+from perms.utils.asset.user_permission import UserGrantedTreeRefreshController
 
 
-class UserNodeGrantStatusDispatchMixin:
+class PermBaseMixin:
+    user: User
 
-    @staticmethod
-    def get_mapping_node_by_key(key, user):
-        return UserGrantedMappingNode.objects.get(key=key, user=user)
-
-    def dispatch_get_data(self, key, user):
-        status = UserGrantedMappingNode.get_node_granted_status(key, user)
-        if status == UserGrantedMappingNode.GRANTED_DIRECT:
-            return self.get_data_on_node_direct_granted(key)
-        elif status == UserGrantedMappingNode.GRANTED_INDIRECT:
-            return self.get_data_on_node_indirect_granted(key)
-        else:
-            return self.get_data_on_node_not_granted(key)
-
-    def get_data_on_node_direct_granted(self, key):
-        raise NotImplementedError
-
-    def get_data_on_node_indirect_granted(self, key):
-        raise NotImplementedError
-
-    def get_data_on_node_not_granted(self, key):
-        raise NotImplementedError
+    def get(self, request, *args, **kwargs):
+        force = is_true(request.query_params.get('rebuild_tree'))
+        controller = UserGrantedTreeRefreshController(self.user)
+        controller.refresh_if_need(force)
+        return super().get(request, *args, **kwargs)
 
 
-class ForAdminMixin:
+class RoleAdminMixin(PermBaseMixin):
     permission_classes = (IsOrgAdminOrAppUser,)
     kwargs: dict
 
@@ -44,7 +30,7 @@ class ForAdminMixin:
         return User.objects.get(id=user_id)
 
 
-class ForUserMixin:
+class RoleUserMixin(PermBaseMixin):
     permission_classes = (IsValidUser,)
     request: Request
 

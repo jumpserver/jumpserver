@@ -141,7 +141,8 @@ def gather_asset_users(assets, task_name=None):
 
 @shared_task(queue="ansible")
 def gather_nodes_asset_users(nodes_key):
-    assets = Node.get_nodes_all_assets(nodes_key)
+    nodes = Node.objects.filter(key__in=nodes_key)
+    assets = Node.get_nodes_all_assets(*nodes)
     assets_groups_by_100 = [assets[i:i+100] for i in range(0, len(assets), 100)]
     for _assets in assets_groups_by_100:
         gather_asset_users(_assets)

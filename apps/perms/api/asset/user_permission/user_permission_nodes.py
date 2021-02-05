@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 import abc
-from django.conf import settings
 from rest_framework.generics import (
     ListAPIView
 )
@@ -10,16 +9,11 @@ from rest_framework.request import Request
 
 from assets.api.mixin import SerializeToTreeNodeMixin
 from common.utils import get_logger
-from .mixin import ForAdminMixin, ForUserMixin, UserNodeGrantStatusDispatchMixin
-from perms.hands import Node, User
+from .mixin import RoleAdminMixin, RoleUserMixin
+from perms.hands import User
 from perms import serializers
-from perms.utils.asset.user_permission import (
-    get_indirect_granted_node_children,
-    get_user_granted_nodes_list_via_mapping_node,
-    get_top_level_granted_nodes,
-    rebuild_user_tree_if_need, get_favorite_node,
-    get_ungrouped_node
-)
+
+from perms.utils.asset.user_permission import UserGrantedNodesQueryUtils
 
 
 logger = get_logger(__name__)
@@ -61,7 +55,6 @@ class BaseGrantedNodeApi(_GrantedNodeStructApi, metaclass=abc.ABCMeta):
     serializer_class = serializers.NodeGrantedSerializer
 
     def list(self, request, *args, **kwargs):
-        rebuild_user_tree_if_need(request, self.user)
         nodes = self.get_nodes()
         serializer = self.get_serializer(nodes, many=True)
         return Response(serializer.data)
@@ -73,7 +66,6 @@ class BaseNodeChildrenApi(NodeChildrenMixin, BaseGrantedNodeApi, metaclass=abc.A
 
 class BaseGrantedNodeAsTreeApi(SerializeToTreeNodeMixin, _GrantedNodeStructApi, metaclass=abc.ABCMeta):
     def list(self, request: Request, *args, **kwargs):
-        rebuild_user_tree_if_need(request, self.user)
         nodes = self.get_nodes()
         nodes = self.serialize_nodes(nodes, with_asset_amount=True)
         return Response(data=nodes)
@@ -83,29 +75,15 @@ class BaseNodeChildrenAsTreeApi(NodeChildrenMixin, BaseGrantedNodeAsTreeApi, met
     pass
 
 
-class UserGrantedNodeChildrenMixin(UserNodeGrantStatusDispatchMixin):
+class UserGrantedNodeChildrenMixin:
     user: User
     request: Request
 
     def get_children(self):
         user = self.user
         key = self.request.query_params.get('key')
-
-        if not key:
-            nodes = list(get_top_level_granted_nodes(user))
-        else:
-            nodes = self.dispatch_get_data(key, user)
+        nodes = UserGrantedNodesQueryUtils(user).get_node_children(key)
         return nodes
-
-    def get_data_on_node_direct_granted(self, key):
-        return Node.objects.filter(parent_key=key)
-
-    def get_data_on_node_indirect_granted(self, key):
-        nodes = get_indirect_granted_node_children(self.user, key)
-        return nodes
-
-    def get_data_on_node_not_granted(self, key):
-        return Node.objects.none()
 
 
 class UserGrantedNodesMixin:
@@ -115,41 +93,38 @@ class UserGrantedNodesMixin:
     user: User
 
     def get_nodes(self):
-        nodes = []
-        if settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
-            nodes.append(get_ungrouped_node(self.user))
-        nodes.append(get_favorite_node(self.user))
-        nodes.extend(get_user_granted_nodes_list_via_mapping_node(self.user))
+        utils = UserGrantedNodesQueryUtils(self.user)
+        nodes = utils.get_whole_tree_nodes()
         return nodes
 
 
 # ------------------------------------------
 # 最终的 api
-class UserGrantedNodeChildrenForAdminApi(ForAdminMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenApi):
+class UserGrantedNodeChildrenForAdminApi(RoleAdminMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenApi):
     pass
 
 
-class MyGrantedNodeChildrenApi(ForUserMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenApi):
+class MyGrantedNodeChildrenApi(RoleUserMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenApi):
     pass
 
 
-class UserGrantedNodeChildrenAsTreeForAdminApi(ForAdminMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenAsTreeApi):
+class UserGrantedNodeChildrenAsTreeForAdminApi(RoleAdminMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenAsTreeApi):
     pass
 
 
-class MyGrantedNodeChildrenAsTreeApi(ForUserMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenAsTreeApi):
+class MyGrantedNodeChildrenAsTreeApi(RoleUserMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenAsTreeApi):
     pass
 
 
-class UserGrantedNodesForAdminApi(ForAdminMixin, UserGrantedNodesMixin, BaseGrantedNodeApi):
+class UserGrantedNodesForAdminApi(RoleAdminMixin, UserGrantedNodesMixin, BaseGrantedNodeApi):
     pass
 
 
-class MyGrantedNodesApi(ForUserMixin, UserGrantedNodesMixin, BaseGrantedNodeApi):
+class MyGrantedNodesApi(RoleUserMixin, UserGrantedNodesMixin, BaseGrantedNodeApi):
     pass
 
 
-class MyGrantedNodesAsTreeApi(ForUserMixin, UserGrantedNodesMixin, BaseGrantedNodeAsTreeApi):
+class MyGrantedNodesAsTreeApi(RoleUserMixin, UserGrantedNodesMixin, BaseGrantedNodeAsTreeApi):
     pass
 
 # ------------------------------------------

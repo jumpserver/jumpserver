@@ -111,7 +111,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.select_related('admin_user', 'domain', 'platform')
+        queryset = queryset.prefetch_related('admin_user', 'domain', 'platform')
         queryset = queryset.prefetch_related('nodes', 'labels')
         return queryset
 
@@ -165,13 +165,6 @@ class AssetDisplaySerializer(AssetSerializer):
         fields = AssetSerializer.Meta.fields + [
             'connectivity',
         ]
-
-    @classmethod
-    def setup_eager_loading(cls, queryset):
-        queryset = super().setup_eager_loading(queryset)
-        queryset = queryset\
-            .annotate(admin_user_username=F('admin_user__username'))
-        return queryset
 
 
 class PlatformSerializer(serializers.ModelSerializer):
