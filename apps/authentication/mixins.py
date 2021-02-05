@@ -9,7 +9,7 @@ from django.contrib.auth import authenticate
 from django.shortcuts import reverse
 from django.contrib.auth import BACKEND_SESSION_KEY
 
-from common.utils import get_object_or_none, get_request_ip, get_logger
+from common.utils import get_object_or_none, get_request_ip, get_logger, bulk_get
 from users.models import User
 from users.utils import (
     is_block_login, clean_failed_count
@@ -86,10 +86,10 @@ class AuthMixin:
             data = request.data
         else:
             data = request.POST
-        username = data.get('username', '')
-        password = data.get('password', '')
-        challenge = data.get('challenge', '')
-        public_key = data.get('public_key', '')
+
+        items = ['username', 'password', 'challenge', 'public_key']
+        username, password, challenge, public_key = bulk_get(data, *items,  default='')
+        password = password + challenge.strip()
         ip = self.get_request_ip()
 
         CredentialError = partial(errors.CredentialError, username=username, ip=ip, request=request)
@@ -99,10 +99,7 @@ class AuthMixin:
             if not password:
                 raise CredentialError(error=errors.reason_password_decrypt_failed)
 
-        user = authenticate(request,
-                            username=username,
-                            password=password + challenge.strip(),
-                            public_key=public_key)
+        user = authenticate(request, username=username, password=password, public_key=public_key)
 
         if not user:
             raise CredentialError(error=errors.reason_password_failed)

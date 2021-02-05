@@ -2,6 +2,7 @@
 #
 import os
 import ldap
+from django.utils.translation import ugettext_lazy as _
 
 from ..const import CONFIG, PROJECT_DIR
 
@@ -105,17 +106,40 @@ TOKEN_EXPIRATION = CONFIG.TOKEN_EXPIRATION
 LOGIN_CONFIRM_ENABLE = CONFIG.LOGIN_CONFIRM_ENABLE
 OTP_IN_RADIUS = CONFIG.OTP_IN_RADIUS
 
-AUTHENTICATION_BACKENDS = [
-    'authentication.backends.pubkey.PublicKeyAuthBackend',
-    'django.contrib.auth.backends.ModelBackend',
-]
+
+AUTHENTICATION_SOURCES_CHOICES = (
+    ('local', _('Local')),
+    ('ldap', 'LDAP/AD'),
+    ('openid', 'OpenID'),
+    ('radius', 'Radius'),
+    ('cas', 'CAS')
+)
+
+AUTHENTICATION_SOURCES_NAME_MAPPING = dict(AUTHENTICATION_SOURCES_CHOICES)
+
+AUTH_BACKEND_MAPPING = {
+    'local': [
+        'django.contrib.auth.backends.ModelBackend',
+        'authentication.backends.pubkey.PublicKeyAuthBackend',
+    ],
+    'ldap': 'authentication.backends.ldap.LDAPAuthorizationBackend',
+    'openid': [
+        'jms_oidc_rp.backends.OIDCAuthPasswordBackend',
+        'jms_oidc_rp.backends.OIDCAuthCodeBackend',
+    ],
+    'radius': 'authentication.backends.radius.RadiusBackend',
+    'cas': 'authentication.backends.cas.CASBackend',
+    'sso': 'authentication.backends.api.SSOAuthentication'
+}
+
+AUTHENTICATION_BACKENDS = AUTH_BACKEND_MAPPING['local']
 
 if AUTH_CAS:
-    AUTHENTICATION_BACKENDS.insert(0, 'authentication.backends.cas.CASBackend')
+    AUTHENTICATION_BACKENDS.insert(0, AUTH_BACKEND_MAPPING['cas'])
 if AUTH_OPENID:
-    AUTHENTICATION_BACKENDS.insert(0, 'jms_oidc_rp.backends.OIDCAuthPasswordBackend')
-    AUTHENTICATION_BACKENDS.insert(0, 'jms_oidc_rp.backends.OIDCAuthCodeBackend')
+    AUTHENTICATION_BACKENDS.insert(0, AUTH_BACKEND_MAPPING['openid'][0])
+    AUTHENTICATION_BACKENDS.insert(0, AUTH_BACKEND_MAPPING['openid'][1])
 if AUTH_RADIUS:
-    AUTHENTICATION_BACKENDS.insert(0, 'authentication.backends.radius.RadiusBackend')
+    AUTHENTICATION_BACKENDS.insert(0, AUTH_BACKEND_MAPPING['radius'])
 if AUTH_SSO:
-    AUTHENTICATION_BACKENDS.insert(0, 'authentication.backends.api.SSOAuthentication')
+    AUTHENTICATION_BACKENDS.insert(0, AUTH_BACKEND_MAPPING['sso'])

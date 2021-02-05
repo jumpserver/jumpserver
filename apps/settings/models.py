@@ -90,7 +90,7 @@ class Setting(models.Model):
         setting = cls.objects.filter(name='AUTH_LDAP').first()
         if not setting:
             return
-        ldap_backend = 'authentication.backends.ldap.LDAPAuthorizationBackend'
+        ldap_backend = settings.AUTH_BACKEND_MAPPING['ldap']
         backends = settings.AUTHENTICATION_BACKENDS
         has = ldap_backend in backends
         if setting.cleaned_value and not has:

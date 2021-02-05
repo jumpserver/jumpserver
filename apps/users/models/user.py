@@ -558,15 +558,14 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         max_length=30, default='', blank=True, verbose_name=_('Created by')
     )
     source = models.CharField(
-        max_length=30, default=Source.local.value, choices=Source.choices,
+        max_length=30, default='local',
+        choices=settings.AUTHENTICATION_SOURCES_CHOICES,
         verbose_name=_('Source')
     )
     date_password_last_updated = models.DateTimeField(
         auto_now_add=True, blank=True, null=True,
         verbose_name=_('Date password last updated')
     )
-
-    user_cache_key_prefix = '_User_{}'
 
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
