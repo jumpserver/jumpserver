@@ -5,9 +5,9 @@ from django.core.cache import cache
 from django.conf import settings
 from django.db.models import Q, QuerySet
 
-from assets.models.node import output_as_string
+from common.db.models import output_as_string
 from common.utils.common import lazyproperty, timeit, Time
-from assets.tree import Tree
+from assets.utils import NodeAssetsUtil
 from common.utils import get_logger
 from common.decorator import on_transaction_commit
 from orgs.utils import tmp_to_org, current_org, ensure_in_real_or_default_org
@@ -482,25 +482,26 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
         """
         这里计算的是一个组织的
         """
+        # 直接授权了根节点，直接计算
         if len(nodes) == 1:
             node = nodes[0]
             if node.node_from == NodeFrom.granted and node.key.isdigit():
-                # 直接授权了跟节点
-                node.granted_assets_amount = len(node.get_all_assets_id())
-                return
+                with tmp_to_org(node.org):
+                    node.granted_assets_amount = len(node.get_all_assets_id())
+                    return
 
         direct_granted_nodes_key = []
         node_id_key_mapper = {}
-
         for node in nodes:
             if node.node_from == NodeFrom.granted:
                 direct_granted_nodes_key.append(node.key)
             node_id_key_mapper[node.id.hex] = node.key
 
-        node_key_assets_id_mapper = defaultdict(set)
-
+        # 授权的节点和直接资产的映射
+        nodekey_assetsid_mapper = defaultdict(set)
+        # 直接授权的节点，资产从完整树过来
         self._fill_direct_granted_node_assets_id_from_mem(
-            direct_granted_nodes_key, node_key_assets_id_mapper
+            direct_granted_nodes_key, nodekey_assetsid_mapper
         )
 
         # 处理直接授权资产
@@ -510,14 +511,13 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
 
         for node_id, asset_id in node_asset_pairs:
             nkey = node_id_key_mapper[node_id]
-            node_key_assets_id_mapper[nkey].add(asset_id)
+            nodekey_assetsid_mapper[nkey].add(asset_id)
 
-        tree = Tree(nodes, node_key_assets_id_mapper)
-        tree.build_tree()
-        tree.compute_tree_node_assets_amount()
+        util = NodeAssetsUtil(nodes, nodekey_assetsid_mapper)
+        util.generate()
 
         for node in nodes:
-            assets_amount = tree[node.key].assets_amount
+            assets_amount = util.get_assets_amount(node.key)
             node.assets_amount = assets_amount
 
     def get_whole_tree_nodes(self) -> list:

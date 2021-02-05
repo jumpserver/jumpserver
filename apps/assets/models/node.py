@@ -4,10 +4,13 @@ import re
 import time
 import uuid
 import threading
+import os
+import time
+import uuid
 
 from collections import defaultdict
 from django.db import models, transaction
-from django.db.models import Q, F, ExpressionWrapper, CharField, Manager
+from django.db.models import Q, Manager
 from django.db.utils import IntegrityError
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
@@ -16,6 +19,7 @@ from django.core.cache import cache
 
 from common.utils.lock import DistributedLock
 from common.utils.common import timeit
+from common.db.models import output_as_string
 from common.utils import get_logger
 from orgs.mixins.models import OrgModelMixin, OrgManager
 from orgs.utils import get_current_org, tmp_to_org
@@ -24,10 +28,6 @@ from orgs.models import Organization
 
 __all__ = ['Node', 'FamilyMixin', 'compute_parent_key', 'NodeQuerySet']
 logger = get_logger(__name__)
-
-
-def output_as_string(field_name):
-    return ExpressionWrapper(F(field_name), output_field=CharField())
 
 
 def compute_parent_key(key):
@@ -426,12 +426,10 @@ class NodeAssetsMixin(NodeAllAssetsMappingMixin):
         return Asset.objects.order_by().filter(nodes__id__in=node_ids).distinct()
 
     @property
-    @timeit
     def assets_amount(self):
         assets_id = self.get_all_assets_id()
         return len(assets_id)
 
-    @timeit
     def get_all_assets_id(self):
         assets_id = self.get_all_assets_id_by_node_key(org_id=self.org_id, node_key=self.key)
         return set(assets_id)
