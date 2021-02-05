@@ -196,9 +196,11 @@ class UserGrantedTreeRefreshController:
             ret = p.execute()
             builded_orgs_id = {org_id.decode() for org_id in ret[0]}
             ids = orgs_id - builded_orgs_id
-            orgs = list(Organization.objects.filter(id__in=ids))
+            orgs = []
             if Organization.DEFAULT_ID in ids:
+                ids.remove(Organization.DEFAULT_ID)
                 orgs.append(Organization.default())
+            orgs.extend(Organization.objects.filter(id__in=ids))
             logger.info(f'Need rebuild orgs are {orgs}, builed orgs are {ret[0]}, all orgs are {orgs_id}')
             return orgs
 
@@ -358,7 +360,7 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
         org_id = current_org.id
 
         with UserGrantedTreeRebuildLock(org_id, user.id):
-            # 先删除旧的授权树
+            # 先删除旧的授权树🌲
             UserAssetGrantedTreeNodeRelation.objects.filter(user=user).delete()
 
             if not self.asset_perm_ids:

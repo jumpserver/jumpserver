@@ -1,7 +1,7 @@
 from functools import wraps
 import threading
 
-from redis_lock import Lock as RedisLock
+from redis_lock import Lock as RedisLock, NotAcquired
 from redis import Redis
 from django.db import transaction
 
@@ -17,7 +17,8 @@ class AcquireFailed(RuntimeError):
 
 
 class DistributedLock(RedisLock):
-    def __init__(self, name, blocking=True, expire=60*2, auto_renewal=True, release_lock_on_transaction_commit=False):
+    def __init__(self, name, blocking=True, expire=None, release_lock_on_transaction_commit=False,
+                 release_raise_exc=False, auto_renewal_seconds=60*2):
         """
         使用 redis 构造的分布式锁
 
@@ -26,16 +27,27 @@ class DistributedLock(RedisLock):
         :param blocking:
             该参数只在锁作为装饰器或者 `with` 时有效。
         :param expire:
-            锁的过期时间，注意不一定是锁到这个时间就释放了，分两种情况
-            当 `auto_renewal=False` 时，锁会释放
-            当 `auto_renewal=True` 时，如果过期之前程序还没释放锁，我们会延长锁的存活时间。
-            这里的作用是防止程序意外终止没有释放锁，导致死锁。
+            锁的过期时间
+        :param release_lock_on_transaction_commit:
+            是否在当前事务结束后再释放锁
+        :param release_raise_exc:
+            释放锁时，如果没有持有锁是否抛异常或静默
+        :param auto_renewal_seconds:
+            当持有一个无限期锁的时候，刷新锁的时间，具体参考 `redis_lock.Lock#auto_renewal`
         """
         self.kwargs_copy = copy_function_args(self.__init__, locals())
         redis = Redis(host=CONFIG.REDIS_HOST, port=CONFIG.REDIS_PORT, password=CONFIG.REDIS_PASSWORD)
+
+        if expire is None:
+            expire = auto_renewal_seconds
+            auto_renewal = True
+        else:
+            auto_renewal = False
+
         super().__init__(redis_client=redis, name=name, expire=expire, auto_renewal=auto_renewal)
         self._blocking = blocking
         self._release_lock_on_transaction_commit = release_lock_on_transaction_commit
+        self._release_raise_exc = release_raise_exc
 
     def __enter__(self):
         thread_id = threading.current_thread().ident
@@ -63,3 +75,16 @@ class DistributedLock(RedisLock):
             with self.__class__(**self.kwargs_copy):
                 return func(*args, **kwds)
         return inner
+
+    def locked_by_me(self):
+        if self.locked():
+            if self.get_owner_id() == self.id:
+                return True
+        return False
+
+    def release(self):
+        try:
+            super().release()
+        except AcquireFailed as e:
+            if self._release_raise_exc:
+                raise e

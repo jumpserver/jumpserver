@@ -8,7 +8,6 @@ from assets.utils import get_node, is_query_node_all_assets
 
 
 class SerializeToTreeNodeMixin:
-    permission_classes = ()
 
     @timeit
     def serialize_nodes(self, nodes: List[Node], with_asset_amount=False):

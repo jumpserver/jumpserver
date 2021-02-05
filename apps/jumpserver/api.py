@@ -4,6 +4,7 @@ from django.utils.timesince import timesince
 from django.db.models import Count, Max
 from django.http.response import JsonResponse, HttpResponse
 from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
 from collections import Counter
 
 from users.models import User
@@ -307,7 +308,7 @@ class IndexApi(TotalCountMixin, DatesLoginMetricMixin, APIView):
 
 
 class PrometheusMetricsApi(APIView):
-    permission_classes = ()
+    permission_classes = (AllowAny,)
 
     def get(self, request, *args, **kwargs):
         util = ComponentsPrometheusMetricsUtil()

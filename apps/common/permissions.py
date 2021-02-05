@@ -97,7 +97,7 @@ class WithBootstrapToken(permissions.BasePermission):
 
 
 class PermissionsMixin(UserPassesTestMixin):
-    permission_classes = []
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_permissions(self):
         return self.permission_classes

@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 #
 import re
+import time
+import uuid
+import threading
 import os
 import time
 import uuid
@@ -14,6 +17,7 @@ from django.utils.translation import ugettext
 from django.db.transaction import atomic
 from django.core.cache import cache
 
+from common.utils.lock import DistributedLock
 from common.utils.common import timeit
 from common.db.models import output_as_string
 from common.utils import get_logger
@@ -260,15 +264,13 @@ class NodeAllAssetsMappingMixin:
 
     @classmethod
     def get_node_all_assets_id_mapping(cls, org_id):
-        mapping = cls.get_node_all_assets_id_mapping_from_memory(org_id)
-        if mapping:
-            return mapping
+        _mapping = cls.get_node_all_assets_id_mapping_from_memory(org_id)
+        if _mapping:
+            return _mapping
 
-        mapping = cls.get_node_all_assets_id_mapping_from_cache_or_generate_to_cache(org_id)
-        if mapping:
-            cls.set_node_all_assets_id_mapping_to_memory(org_id, mapping=mapping)
-            return mapping
-        return {}
+        _mapping = cls.get_node_all_assets_id_mapping_from_cache_or_generate_to_cache(org_id)
+        cls.set_node_all_assets_id_mapping_to_memory(org_id, mapping=_mapping)
+        return _mapping
 
     # from memory
     @classmethod
@@ -292,35 +294,27 @@ class NodeAllAssetsMappingMixin:
         if mapping:
             return mapping
 
-        mapping = cls.generate_node_all_assets_id_mapping_with_lock(org_id)
-        if mapping:
-            cls.set_node_all_assets_id_mapping_to_cache(org_id=org_id, mapping=mapping)
-            return mapping
+        lock_key = f'KEY_LOCK_GENERATE_ORG_{org_id}_NODE_ALL_ASSETS_ID_MAPPING'
+        logger.info(f'Thread[{threading.get_ident()}] acquiring lock[{lock_key}] ...')
+        with DistributedLock(lock_key):
+            logger.info(f'Thread[{threading.get_ident()}] acquire lock[{lock_key}] ok')
+            # 这里使用无限期锁，原因是如果这里卡住了，就卡在数据库了，说明
+            # 数据库繁忙，所以不应该再有线程执行这个操作，使数据库忙上加忙
 
-        # not need to generate, wait for get from cache
-        mapping = cls.get_node_all_assets_id_mapping_from_cache(org_id, timeout=10)
-        if mapping:
-            return mapping
+            # 这里最好先判断内存中有没有，防止同一进程的多个线程重复从 cache 中获取数据，
+            # 但逻辑过于繁琐，直接判断 cache 吧
+            _mapping = cls.get_node_all_assets_id_mapping_from_cache(org_id)
+            if _mapping:
+                return _mapping
 
-        return {}
+            _mapping = cls.generate_node_all_assets_id_mapping(org_id)
+            cls.set_node_all_assets_id_mapping_to_cache(org_id=org_id, mapping=_mapping)
+            return _mapping
 
     @classmethod
-    def get_node_all_assets_id_mapping_from_cache(cls, org_id, timeout=None):
+    def get_node_all_assets_id_mapping_from_cache(cls, org_id):
         cache_key = cls._get_cache_key_for_node_all_assets_id_mapping(org_id)
-        if timeout is None:
-            mapping = cache.get(cache_key)
-            return mapping
-
-        assert isinstance(timeout, int), 'Expected `timeout` int, got type {}'.format(type(timeout))
-
-        # 每秒从cache中获取一次
-        mapping = {}
-        wait_for_seconds = timeout + 1
-        for i in range(wait_for_seconds):
-            mapping = cache.get(cache_key)
-            if mapping:
-                break
-            time.sleep(1)
+        mapping = cache.get(cache_key)
         return mapping
 
     @classmethod
@@ -338,24 +332,7 @@ class NodeAllAssetsMappingMixin:
         return 'ASSETS_ORG_NODE_ALL_ASSETS_ID_MAPPING_{}'.format(org_id)
 
     @classmethod
-    def generate_node_all_assets_id_mapping_with_lock(cls, org_id):
-        mapping = {}
-
-        # 如果10s未生成，那么其他生成同一组织下数据的进程进来，也会生成, 锁机制将失去意义
-        lock_key = f'ASSETS_GENERATE_ORG_NODE_ALL_ASSETS_ID_MAPPING_KEY_{org_id}'
-        lock = cache.lock(lock_key, expire=10)
-        if not lock.acquire(timeout=1):
-            logger.debug('No acquire lock for `{}` -> pid={}'.format(lock_key, os.getpid()))
-            # 其他线程正在生成, 直接返回空
-            return mapping
-
-        mapping = cls._generate_node_all_assets_id_mapping(org_id)
-        if lock.locked():
-            lock.release()
-        return mapping
-
-    @classmethod
-    def _generate_node_all_assets_id_mapping(cls, org_id):
+    def generate_node_all_assets_id_mapping(cls, org_id):
         from .asset import Asset
 
         t1 = time.time()
@@ -449,12 +426,10 @@ class NodeAssetsMixin(NodeAllAssetsMappingMixin):
         return Asset.objects.order_by().filter(nodes__id__in=node_ids).distinct()
 
     @property
-    @timeit
     def assets_amount(self):
         assets_id = self.get_all_assets_id()
         return len(assets_id)
 
-    @timeit
     def get_all_assets_id(self):
         assets_id = self.get_all_assets_id_by_node_key(org_id=self.org_id, node_key=self.key)
         return set(assets_id)
