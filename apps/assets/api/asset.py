@@ -50,14 +50,6 @@ class AssetViewSet(FilterAssetByNodeMixin, OrgBulkModelViewSet):
     permission_classes = (IsOrgAdminOrAppUser,)
     extra_filter_backends = [FilterAssetByNodeFilterBackend, LabelFilterBackend, IpInFilterBackend]
 
-    def get_queryset(self):
-        from assets.models import Asset
-        from common.db.models import UnionQuerySet
-        assets1 = Asset.objects.filter(hostname__startswith='a').prefetch_related('platform', 'admin_user', 'nodes', 'labels')
-        assets2 = Asset.objects.filter(hostname__startswith='b').prefetch_related('platform', 'admin_user', 'nodes', 'labels')
-        qs = UnionQuerySet(assets1, assets2)
-        return qs
-
     def set_assets_node(self, assets):
         if not isinstance(assets, list):
             assets = [assets]
