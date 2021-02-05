@@ -90,14 +90,6 @@ def output_as_string(field_name):
     return ExpressionWrapper(F(field_name), output_field=CharField())
 
 
-class Demo:
-    def demo(self):
-        pass
-
-
-demo = Demo()
-
-
 class UnionQuerySet(QuerySet):
     after_union = ['order_by']
     not_return_qs = [
