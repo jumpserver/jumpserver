@@ -103,7 +103,7 @@ class UnionQueryset:
         self.after_union_items = []
         self.before_union_items = []
 
-    def output(self):
+    def __execute(self):
         queryset_list = []
         for qs in self.queryset_list:
             for attr, args, kwargs in self.before_union_items:
@@ -130,7 +130,7 @@ class UnionQueryset:
 
     def __getattr__(self, item):
         if item in self.not_return_qs:
-            return getattr(self.output(), item)
+            return getattr(self.__execute(), item)
         if item in self.after_union:
             attr = partial(self.after_union_perform, item)
         else:
@@ -140,10 +140,10 @@ class UnionQueryset:
         return attr
 
     def __getitem__(self, item):
-        return self.output()[item]
+        return self.__execute()[item]
 
     def __next__(self):
-        return next(self.output())
+        return next(self.__execute())
 
     @classmethod
     def test_it(cls):
