@@ -91,7 +91,12 @@ def output_as_string(field_name):
 
 class UnionQueryset:
     after_union = ['order_by']
-    not_return_qs = ['count', 'query']
+    not_return_qs = [
+        'query', 'get', 'create', 'get_or_create',
+        'update_or_create', 'bulk_create', 'count',
+        'latest', 'earliest', 'first', 'last', 'aggregate',
+        'exists', 'update', 'delete', 'as_manager', 'explain'
+    ]
 
     def __init__(self, *queryset_list):
         self.queryset_list = queryset_list
