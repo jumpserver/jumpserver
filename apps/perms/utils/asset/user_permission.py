@@ -1,5 +1,6 @@
 from collections import defaultdict
 from typing import List, Tuple
+from functools import reduce, partial, wraps
 
 from django.core.cache import cache
 from django.conf import settings
@@ -51,8 +52,20 @@ def get_user_all_asset_perm_ids(user) -> set:
     return asset_perm_ids
 
 
-class UnionQuertSet(QuerySet):
+class A():
+    def a(self):
+        pass
+
+method = type(A().a)
+
+
+class UnionQuerySet(QuerySet):
+    _querysets = []
+    _order_bys = []
+
     def __init__(self, *querysets):
+        if len(querysets) < 2:
+            raise ValueError(f'Must have more than 1 queryset !!!')
         self._querysets = querysets
         self._order_bys = []
         super().__init__()
@@ -63,7 +76,7 @@ class UnionQuertSet(QuerySet):
         return clone
 
     def count(self):
-        return self._union_qs().count
+        return self._union_qs().count()
 
     @lazyproperty
     def union_qs(self):
@@ -82,13 +95,12 @@ class UnionQuertSet(QuerySet):
         return clone
 
     def __getattribute__(self, item):
-        if item.startswith('__') or item in UnionQuertSet.__dict__ \
-                  or item in self.__dict__:
+        if item.startswith('__') or item in UnionQuerySet.__dict__:
             print('__getattribute__ from self-->', item)
             return object.__getattribute__(self, item)
 
         print('__getattribute__ from qs-->', item)
-        if callable(getattr(self._querysets[0], item)):
+        if isinstance(getattr(self._querysets[0], item), method):
             def wrapper(*args, **kwargs):
                 new_querysets = []
                 for qs in self._querysets:
@@ -115,6 +127,74 @@ class UnionQuertSet(QuerySet):
 
     def __getitem__(self, k):
         return self.union_qs.__getitem__(k)
+
+
+'''
+class UnionQuerySet():
+    after_union = ['order_by']
+    not_return_qs = [
+        'query', 'get', 'create', 'get_or_create',
+        'update_or_create', 'bulk_create', 'count',
+        'latest', 'earliest', 'first', 'last', 'aggregate',
+        'exists', 'update', 'delete', 'as_manager', 'explain'
+    ]
+
+    def __init__(self, *queryset_list):
+        self.queryset_list = queryset_list
+        self.after_union_items = []
+        self.before_union_items = []
+
+    def __execute(self):
+        queryset_list = []
+        for qs in self.queryset_list:
+            for attr, args, kwargs in self.before_union_items:
+                qs = getattr(qs, attr)(*args, **kwargs)
+            queryset_list.append(qs)
+        union_qs = reduce(lambda x, y: x.union(y), queryset_list)
+        for attr, args, kwargs in self.after_union_items:
+            union_qs = getattr(union_qs, attr)(*args, **kwargs)
+        return union_qs
+
+    def before_union_perform(self, item, *args, **kwargs):
+        self.before_union_items.append((item, args, kwargs))
+        return self._clone(*self.queryset_list)
+
+    def after_union_perform(self, item, *args, **kwargs):
+        self.after_union_items.append((item, args, kwargs))
+        return self._clone(*self.queryset_list)
+
+    def _clone(self, *queryset_list):
+        uqs = self.__class__(*queryset_list)
+        uqs.after_union_items = self.after_union_items
+        uqs.before_union_items = self.before_union_items
+        return uqs
+
+    def __getattr__(self, item):
+        if item in self.not_return_qs:
+            return getattr(self.__execute(), item)
+        if item in self.after_union:
+            attr = partial(self.after_union_perform, item)
+        else:
+            attr = partial(self.before_union_perform, item)
+        origin_attr = getattr(self.queryset_list[0], item)
+        attr = wraps(origin_attr)(attr)
+        return attr
+
+    def __getitem__(self, item):
+        return self.__execute()[item]
+
+    def __next__(self):
+        return next(self.__execute())
+
+    @classmethod
+    def test_it(cls):
+        from assets.models import Asset
+        assets1 = Asset.objects.filter(hostname__startswith='a')
+        assets2 = Asset.objects.filter(hostname__startswith='b')
+
+        qs = cls(assets1, assets2)
+        return qs
+'''
 
 
 class QuerySetStage:
@@ -607,14 +687,13 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
 
 class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
 
-    def get_favorite_assets(self, qs_stage: QuerySetStage = None, only=('id', )) -> AssetQuerySet:
+    def get_favorite_assets(self, only=('id', )) -> QuerySet:
         favorite_asset_ids = FavoriteAsset.objects.filter(
             user=self.user
         ).values_list('asset_id', flat=True)
         favorite_asset_ids = list(favorite_asset_ids)
-        qs_stage = qs_stage or QuerySetStage()
-        qs_stage.filter(id__in=favorite_asset_ids).only(*only)
-        assets = self.get_all_granted_assets(qs_stage)
+        assets = self.get_all_granted_assets()
+        assets = assets.filter(id__in=favorite_asset_ids).only(*only)
         return assets
 
     def get_ungroup_assets(self) -> AssetQuerySet:
@@ -626,39 +705,30 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
         ).distinct()
         return queryset
 
-    def get_direct_granted_nodes_assets(self, qs_stage: QuerySetStage = None) -> AssetQuerySet:
+    def get_direct_granted_nodes_assets(self) -> AssetQuerySet:
         granted_node_ids = AssetPermission.nodes.through.objects.filter(
             assetpermission_id__in=self.asset_perm_ids
         ).values_list('node_id', flat=True).distinct()
         granted_node_ids = list(granted_node_ids)
         granted_nodes = PermNode.objects.filter(id__in=granted_node_ids).only('id', 'key')
         queryset = PermNode.get_nodes_all_assets(*granted_nodes)
-        if qs_stage:
-            queryset = qs_stage.merge(queryset)
         return queryset
 
-    def get_all_granted_assets(self, qs_stage: QuerySetStage = None) -> AssetQuerySet:
+    def get_all_granted_assets(self) -> QuerySet:
         nodes_assets = self.get_direct_granted_nodes_assets()
         assets = self.get_direct_granted_assets()
-
-        if qs_stage:
-            nodes_assets, assets = qs_stage.merge_multi_before_union(nodes_assets, assets)
-        queryset = nodes_assets.union(assets)
-        if qs_stage:
-            queryset = qs_stage.merge_after_union(queryset)
+        queryset = UnionQuerySet(nodes_assets, assets)
         return queryset
 
-    def get_node_all_assets(self, id, qs_stage: QuerySetStage = None) -> Tuple[PermNode, QuerySet]:
+    def get_node_all_assets(self, id) -> Tuple[PermNode, QuerySet]:
         node = PermNode.objects.get(id=id)
         granted_status = node.get_granted_status(self.user)
         if granted_status == NodeFrom.granted:
             assets = PermNode.get_nodes_all_assets(node)
-            if qs_stage:
-                assets = qs_stage.merge(assets)
             return node, assets
         elif granted_status in (NodeFrom.asset, NodeFrom.child):
             node.use_granted_assets_amount()
-            assets = self._get_indirect_granted_node_all_assets(node, qs_stage=qs_stage)
+            assets = self._get_indirect_granted_node_all_assets(node)
             return node, assets
         else:
             node.assets_amount = 0
@@ -680,7 +750,7 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
         assets = Asset.objects.order_by().filter(nodes_id=id) & self.get_direct_granted_assets()
         return assets
 
-    def _get_indirect_granted_node_all_assets(self, node, qs_stage: QuerySetStage = None) -> QuerySet:
+    def _get_indirect_granted_node_all_assets(self, node) -> QuerySet:
         """
         此算法依据 `UserAssetGrantedTreeNodeRelation` 的数据查询
         1. 查询该节点下的直接授权节点
@@ -711,10 +781,7 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
             nodes__id__in=only_asset_granted_node_ids,
             granted_by_permissions__id__in=self.asset_perm_ids
         ).distinct().order_by()
-        if qs_stage:
-            node_assets, assets = qs_stage.merge_multi_before_union(node_assets, assets)
-        granted_assets = node_assets.union(assets)
-        granted_assets = qs_stage.merge_after_union(granted_assets)
+        granted_assets = UnionQuerySet(node_assets, assets)
         return granted_assets
 
 
