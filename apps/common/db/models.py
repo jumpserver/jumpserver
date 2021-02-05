@@ -89,14 +89,27 @@ def output_as_string(field_name):
     return ExpressionWrapper(F(field_name), output_field=CharField())
 
 
-class UnionQuerySet:
+class A:
+    def a(self):
+        pass
+
+a = A()
+method = type(a.a)
+
+
+class UnionQuerySet(QuerySet):
     after_union = ['order_by']
     not_return_qs = [
         'query', 'get', 'create', 'get_or_create',
         'update_or_create', 'bulk_create', 'count',
         'latest', 'earliest', 'first', 'last', 'aggregate',
-        'exists', 'update', 'delete', 'as_manager', 'explain'
+        'exists', 'update', 'delete', 'as_manager', 'explain',
+        'model'
     ]
+
+    @classmethod
+    def get_self_attr(cls, self, item):
+        return object.__getattribute__(self, item)
 
     def __init__(self, *queryset_list):
         self.queryset_list = queryset_list
@@ -104,40 +117,57 @@ class UnionQuerySet:
         self.before_union_items = []
 
     def __execute(self):
+        origin_query_list = UnionQuerySet.get_self_attr(self, 'queryset_list')
+        before_union_items = UnionQuerySet.get_self_attr(self, 'before_union_items')
+        after_union_items = UnionQuerySet.get_self_attr(self, 'after_union_items')
         queryset_list = []
-        for qs in self.queryset_list:
-            for attr, args, kwargs in self.before_union_items:
+        for qs in origin_query_list:
+            for attr, args, kwargs in before_union_items:
                 qs = getattr(qs, attr)(*args, **kwargs)
             queryset_list.append(qs)
         union_qs = reduce(lambda x, y: x.union(y), queryset_list)
-        for attr, args, kwargs in self.after_union_items:
+        for attr, args, kwargs in after_union_items:
             union_qs = getattr(union_qs, attr)(*args, **kwargs)
         return union_qs
 
-    def before_union_perform(self, item, *args, **kwargs):
-        self.before_union_items.append((item, args, kwargs))
-        return self._clone(*self.queryset_list)
+    def __before_union_perform(self, item, *args, **kwargs):
+        query_list = UnionQuerySet.get_self_attr(self, 'queryset_list')
+        before_union_items = UnionQuerySet.get_self_attr(self, 'before_union_items')
+        before_union_items.append((item, args, kwargs))
+        return self.__clone(*query_list)
 
-    def after_union_perform(self, item, *args, **kwargs):
-        self.after_union_items.append((item, args, kwargs))
-        return self._clone(*self.queryset_list)
+    def __after_union_perform(self, item, *args, **kwargs):
+        query_list = UnionQuerySet.get_self_attr(self, 'queryset_list')
+        after_union_items = UnionQuerySet.get_self_attr(self, 'after_union_items')
+        after_union_items.append((item, args, kwargs))
+        return self.__clone(*query_list)
 
-    def _clone(self, *queryset_list):
-        uqs = self.__class__(*queryset_list)
-        uqs.after_union_items = self.after_union_items
-        uqs.before_union_items = self.before_union_items
+    def __clone(self, *queryset_list):
+        before_union_items = UnionQuerySet.get_self_attr(self, 'before_union_items')
+        after_union_items = UnionQuerySet.get_self_attr(self, 'after_union_items')
+        uqs = UnionQuerySet(*queryset_list)
+        uqs.after_union_items = after_union_items
+        uqs.before_union_items = before_union_items
         return uqs
 
-    def __getattr__(self, item):
-        if item in self.not_return_qs:
+    def __getattribute__(self, item):
+        if item.startswith('__') or item in UnionQuerySet.__dict__:
+            print('__getattribute__ from self-->', item)
+            return object.__getattribute__(self, item)
+        origin_item = object.__getattribute__(self, 'queryset_list')[0]
+
+        if item in UnionQuerySet.not_return_qs:
             return getattr(self.__execute(), item)
-        if item in self.after_union:
-            attr = partial(self.after_union_perform, item)
+
+        if not callable(getattr(origin_item, item)):
+            return getattr(self.__execute(), item)
+
+        if item in UnionQuerySet.after_union:
+            attr = partial(self.__after_union_perform, item)
         else:
-            attr = partial(self.before_union_perform, item)
-        origin_attr = getattr(self.queryset_list[0], item)
-        attr = wraps(origin_attr)(attr)
+            attr = partial(self.__before_union_perform, item)
         return attr
+        # return attr
 
     def __getitem__(self, item):
         return self.__execute()[item]
