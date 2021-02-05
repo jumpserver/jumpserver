@@ -1,6 +1,7 @@
 from collections import defaultdict
 from typing import List, Tuple
-from functools import reduce, partial, wraps
+from functools import reduce, partial
+from common.utils import isinstance_method
 
 from django.core.cache import cache
 from django.conf import settings
@@ -52,94 +53,13 @@ def get_user_all_asset_perm_ids(user) -> set:
     return asset_perm_ids
 
 
-class A():
-    def a(self):
-        pass
-
-method = type(A().a)
-
-
 class UnionQuerySet(QuerySet):
-    _querysets = []
-    _order_bys = []
-
-    end_methods = {'count'}
-
-    def __init__(self, *querysets):
-        if len(querysets) < 2:
-            raise ValueError(f'Must have more than 1 queryset !!!')
-        self._querysets = querysets
-        self._order_bys = []
-        super().__init__()
-
-    def _clone(self):
-        clone = self.__class__(*self._querysets)
-        clone._order_bys = self._order_bys.copy()
-        return clone
-
-    @lazyproperty
-    def union_qs(self):
-        return self._union_qs()
-
-    def _union_qs(self):
-        qs, *others = self._querysets
-        qs = qs.union(*others)
-        for order_by in self._order_bys:
-            qs = qs.order_by(*order_by)
-        return qs
-
-    def order_by(self, *field_names):
-        clone = self._clone()
-        clone._order_bys.append(field_names)
-        return clone
-
-    def __getattribute__(self, item):
-        if item in UnionQuerySet.end_methods:
-            def wrapper(*args, **kwargs):
-                handler = getattr(self._union_qs(), item)
-                return handler(*args, **kwargs)
-            return wrapper
-
-        if item.startswith('__') or item in UnionQuerySet.__dict__:
-            return object.__getattribute__(self, item)
-
-        if isinstance(getattr(self._querysets[0], item), method):
-            def wrapper(*args, **kwargs):
-                new_querysets = []
-                for qs in self._querysets:
-                    new_qs = getattr(qs, item)(*args, **kwargs)
-                    new_querysets.append(new_qs)
-                clone = self._clone()
-                clone._querysets = new_querysets
-                return clone
-            return wrapper
-        else:
-            return getattr(self._union_qs(), item)
-
-    def __repr__(self):
-        return self.union_qs.__repr__()
-
-    def __len__(self):
-        return self.union_qs.__len__()
-
-    def __iter__(self):
-        return self.union_qs.__iter__()
-
-    def __bool__(self):
-        return self.union_qs.__bool__()
-
-    def __getitem__(self, k):
-        return self.union_qs.__getitem__(k)
-
-
-'''
-class UnionQuerySet():
     after_union = ['order_by']
     not_return_qs = [
         'query', 'get', 'create', 'get_or_create',
         'update_or_create', 'bulk_create', 'count',
         'latest', 'earliest', 'first', 'last', 'aggregate',
-        'exists', 'update', 'delete', 'as_manager', 'explain'
+        'exists', 'update', 'delete', 'as_manager', 'explain',
     ]
 
     def __init__(self, *queryset_list):
@@ -158,29 +78,38 @@ class UnionQuerySet():
             union_qs = getattr(union_qs, attr)(*args, **kwargs)
         return union_qs
 
-    def before_union_perform(self, item, *args, **kwargs):
+    def __before_union_perform(self, item, *args, **kwargs):
         self.before_union_items.append((item, args, kwargs))
-        return self._clone(*self.queryset_list)
+        return self.__clone(*self.queryset_list)
 
-    def after_union_perform(self, item, *args, **kwargs):
+    def __after_union_perform(self, item, *args, **kwargs):
         self.after_union_items.append((item, args, kwargs))
-        return self._clone(*self.queryset_list)
+        return self.__clone(*self.queryset_list)
 
-    def _clone(self, *queryset_list):
-        uqs = self.__class__(*queryset_list)
+    def __clone(self, *queryset_list):
+        uqs = UnionQuerySet(*queryset_list)
         uqs.after_union_items = self.after_union_items
         uqs.before_union_items = self.before_union_items
         return uqs
 
-    def __getattr__(self, item):
-        if item in self.not_return_qs:
+    def __getattribute__(self, item):
+        if item.startswith('__') or item in UnionQuerySet.__dict__ or item in [
+            'queryset_list', 'after_union_items', 'before_union_items'
+        ]:
+            return object.__getattribute__(self, item)
+
+        if item in UnionQuerySet.not_return_qs:
             return getattr(self.__execute(), item)
-        if item in self.after_union:
-            attr = partial(self.after_union_perform, item)
+
+        origin_item = object.__getattribute__(self, 'queryset_list')[0]
+        origin_attr = getattr(origin_item, item, None)
+        if not isinstance_method(origin_attr):
+            return getattr(self.__execute(), item)
+
+        if item in UnionQuerySet.after_union:
+            attr = partial(self.__after_union_perform, item)
         else:
-            attr = partial(self.before_union_perform, item)
-        origin_attr = getattr(self.queryset_list[0], item)
-        attr = wraps(origin_attr)(attr)
+            attr = partial(self.__before_union_perform, item)
         return attr
 
     def __getitem__(self, item):
@@ -197,7 +126,6 @@ class UnionQuerySet():
 
         qs = cls(assets1, assets2)
         return qs
-'''
 
 
 class QuerySetStage:
