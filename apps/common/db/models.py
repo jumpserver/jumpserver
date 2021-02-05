@@ -10,6 +10,7 @@
 """
 
 import uuid
+from functools import reduce, partial, wraps
 
 from django.db.models import *
 from django.db.models.functions import Concat
@@ -86,3 +87,64 @@ def concated_display(name1, name2):
 
 def output_as_string(field_name):
     return ExpressionWrapper(F(field_name), output_field=CharField())
+
+
+class UnionQueryset:
+    after_union = ['order_by']
+    not_return_qs = ['count', 'query']
+
+    def __init__(self, *queryset_list):
+        self.queryset_list = queryset_list
+        self.after_union_items = []
+        self.before_union_items = []
+
+    def output(self):
+        queryset_list = []
+        for qs in self.queryset_list:
+            for attr, args, kwargs in self.before_union_items:
+                qs = getattr(qs, attr)(*args, **kwargs)
+            queryset_list.append(qs)
+        union_qs = reduce(lambda x, y: x.union(y), queryset_list)
+        for attr, args, kwargs in self.after_union_items:
+            union_qs = getattr(union_qs, attr)(*args, **kwargs)
+        return union_qs
+
+    def before_union_perform(self, item, *args, **kwargs):
+        self.before_union_items.append((item, args, kwargs))
+        return self._clone(*self.queryset_list)
+
+    def after_union_perform(self, item, *args, **kwargs):
+        self.after_union_items.append((item, args, kwargs))
+        return self._clone(*self.queryset_list)
+
+    def _clone(self, *queryset_list):
+        uqs = self.__class__(*queryset_list)
+        uqs.after_union_items = self.after_union_items
+        uqs.before_union_items = self.before_union_items
+        return uqs
+
+    def __getattr__(self, item):
+        if item in self.not_return_qs:
+            return getattr(self.output(), item)
+        if item in self.after_union:
+            attr = partial(self.after_union_perform, item)
+        else:
+            attr = partial(self.before_union_perform, item)
+        origin_attr = getattr(self.queryset_list[0], item)
+        attr = wraps(origin_attr)(attr)
+        return attr
+
+    def __getitem__(self, item):
+        return self.output()[item]
+
+    def __next__(self):
+        return next(self.output())
+
+    @classmethod
+    def test_it(cls):
+        from assets.models import Asset
+        assets1 = Asset.objects.filter(hostname__startswith='a')
+        assets2 = Asset.objects.filter(hostname__startswith='b')
+
+        qs = cls(assets1, assets2)
+        return qs
