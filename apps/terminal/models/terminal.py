@@ -6,8 +6,12 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.core.cache import cache
 
+from common.utils import get_logger
 from users.models import User
 from .. import const
+
+
+logger = get_logger(__file__)
 
 
 class ComputeStatusMixin:
@@ -40,7 +44,11 @@ class ComputeStatusMixin:
         ]
         system_status = []
         for system_status_key in system_status_keys:
-            state_value = state[system_status_key]
+            state_value = state.get(system_status_key)
+            if state_value is None:
+                msg = 'state: {}, state_key: {}, state_value: {}'
+                logger.debug(msg.format(state, system_status_key, state_value))
+                state_value = 0
             status = getattr(self, f'_compute_{system_status_key}_status')(state_value)
             system_status.append(status)
         return system_status
