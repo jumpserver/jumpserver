@@ -282,6 +282,8 @@ class Config(dict):
         'REFERER_CHECK_ENABLED': False,
         'SERVER_REPLAY_STORAGE': {},
         'CONNECTION_TOKEN_ENABLED': False,
+        'ONLY_ALLOW_EXIST_USER_AUTH': False,
+        'ONLY_ALLOW_AUTH_FROM_SOURCE': True,
     }
 
     def compatible_auth_openid_of_key(self):

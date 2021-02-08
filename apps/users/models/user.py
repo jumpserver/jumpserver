@@ -510,6 +510,14 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         radius = 'radius', 'Radius'
         cas = 'cas', 'CAS'
 
+    SOURCE_BACKEND_MAPPING = {
+        Source.local: [settings.AUTH_BACKEND_MODEL, settings.AUTH_BACKEND_PUBKEY],
+        Source.ldap: [settings.AUTH_BACKEND_LDAP],
+        Source.openid: [settings.AUTH_BACKEND_OIDC_PASSWORD, settings.AUTH_BACKEND_OIDC_CODE],
+        Source.radius: [settings.AUTH_BACKEND_RADIUS],
+        Source.cas: [settings.AUTH_BACKEND_CAS],
+    }
+
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     username = models.CharField(
         max_length=128, unique=True, verbose_name=_('Username')
@@ -558,8 +566,8 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         max_length=30, default='', blank=True, verbose_name=_('Created by')
     )
     source = models.CharField(
-        max_length=30, default='local',
-        choices=settings.AUTHENTICATION_SOURCES_CHOICES,
+        max_length=30, default=Source.local,
+        choices=Source.choices,
         verbose_name=_('Source')
     )
     date_password_last_updated = models.DateTimeField(

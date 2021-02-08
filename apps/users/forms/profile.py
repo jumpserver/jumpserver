@@ -12,7 +12,19 @@ __all__ = [
     'UserProfileForm', 'UserMFAForm', 'UserFirstLoginFinishForm',
     'UserPasswordForm', 'UserPublicKeyForm', 'FileForm',
     'UserTokenResetPasswordForm', 'UserForgotPasswordForm',
+    'UserCheckPasswordForm', 'UserCheckOtpCodeForm'
 ]
+
+
+class UserCheckPasswordForm(forms.Form):
+    password = forms.CharField(
+        label=_('Password'), widget=forms.PasswordInput,
+        max_length=128, strip=False
+    )
+
+
+class UserCheckOtpCodeForm(forms.Form):
+    otp_code = forms.CharField(label=_('MFA code'), max_length=6)
 
 
 class UserProfileForm(forms.ModelForm):
