@@ -4,9 +4,7 @@ from assets.api import FilterAssetByNodeMixin
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import RetrieveAPIView
 from django.shortcuts import get_object_or_404
-from django.utils.decorators import method_decorator
 
-from assets.locks import NodeTreeUpdateLock
 from common.utils import get_logger, get_object_or_none
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, IsSuperUser
 from orgs.mixins.api import OrgBulkModelViewSet

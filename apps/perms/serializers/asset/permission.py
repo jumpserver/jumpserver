@@ -3,9 +3,12 @@
 
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
+from django.db.models import Prefetch
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from perms.models import AssetPermission, Action
+from assets.models import Asset, Node, SystemUser
+from users.models import User, UserGroup
 
 __all__ = [
     'AssetPermissionSerializer',
@@ -68,5 +71,11 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('users', 'user_groups', 'assets', 'nodes', 'system_users')
+        queryset = queryset.prefetch_related(
+            Prefetch('system_users', queryset=SystemUser.objects.only('id')),
+            Prefetch('user_groups', queryset=UserGroup.objects.only('id')),
+            Prefetch('users', queryset=User.objects.only('id')),
+            Prefetch('assets', queryset=Asset.objects.only('id')),
+            Prefetch('nodes', queryset=Node.objects.only('id'))
+        )
         return queryset

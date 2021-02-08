@@ -353,4 +353,4 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     class Meta:
         unique_together = [('org_id', 'hostname')]
         verbose_name = _("Asset")
-        ordering = ["hostname", "ip"]
+        ordering = ["hostname", ]

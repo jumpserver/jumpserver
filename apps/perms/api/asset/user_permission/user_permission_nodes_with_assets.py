@@ -14,7 +14,6 @@ from .mixin import RoleUserMixin, RoleAdminMixin
 from perms.utils.asset.user_permission import (
     UserGrantedTreeBuildUtils, get_user_all_asset_perm_ids,
     UserGrantedNodesQueryUtils, UserGrantedAssetsQueryUtils,
-    QuerySetStage,
 )
 from perms.models import AssetPermission, PermNode
 from assets.models import Asset
@@ -44,10 +43,10 @@ class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
     def add_favorite_resource(self, data: list, nodes_query_utils, assets_query_utils):
         favorite_node = nodes_query_utils.get_favorite_node()
 
-        qs_state = QuerySetStage().annotate(
+        favorite_assets = assets_query_utils.get_favorite_assets()
+        favorite_assets = favorite_assets.annotate(
             parent_key=Value(favorite_node.key, output_field=CharField())
         ).prefetch_related('platform')
-        favorite_assets = assets_query_utils.get_favorite_assets(qs_stage=qs_state, only=())
 
         data.extend(self.serialize_nodes([favorite_node], with_asset_amount=True))
         data.extend(self.serialize_assets(favorite_assets))
@@ -59,13 +58,11 @@ class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
         data.extend(self.serialize_nodes(nodes, with_asset_amount=True))
 
     def add_assets(self, data: list, assets_query_utils: UserGrantedAssetsQueryUtils):
-        qs_stage = QuerySetStage().annotate(parent_key=F('nodes__key')).prefetch_related('platform')
-
         if settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
-            all_assets = assets_query_utils.get_direct_granted_nodes_assets(qs_stage=qs_stage)
+            all_assets = assets_query_utils.get_direct_granted_nodes_assets()
         else:
-            all_assets = assets_query_utils.get_all_granted_assets(qs_stage=qs_stage)
-
+            all_assets = assets_query_utils.get_all_granted_assets()
+        all_assets = all_assets.annotate(parent_key=F('nodes__key')).prefetch_related('platform')
         data.extend(self.serialize_assets(all_assets))
 
     @tmp_to_root_org()
@@ -143,8 +140,6 @@ class GrantedNodeChildrenWithAssetsAsTreeApiMixin(SerializeToTreeNodeMixin,
             nodes = nodes_query_utils.get_node_children(key)
             assets = assets_query_utils.get_node_assets(key)
         assets = assets.prefetch_related('platform')
-
-        user = self.user
 
         tree_nodes = self.serialize_nodes(nodes, with_asset_amount=True)
         tree_assets = self.serialize_assets(assets, key)
