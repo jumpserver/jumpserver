@@ -24,7 +24,7 @@ logger = get_logger(__name__)
 
 class AuthMixin:
     request = None
-    partial_credential_error = errors.CredentialError()
+    partial_credential_error = None
 
     def get_user_from_session(self):
         if self.request.session.is_empty():
