@@ -425,11 +425,6 @@ class NodeAssetsMixin(NodeAllAssetsMappingMixin):
             node_ids.update(_ids)
         return Asset.objects.order_by().filter(nodes__id__in=node_ids).distinct()
 
-    @property
-    def assets_amount(self):
-        assets_id = self.get_all_assets_id()
-        return len(assets_id)
-
     def get_all_assets_id(self):
         assets_id = self.get_all_assets_id_by_node_key(org_id=self.org_id, node_key=self.key)
         return set(assets_id)
@@ -550,6 +545,7 @@ class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
     date_create = models.DateTimeField(auto_now_add=True)
     parent_key = models.CharField(max_length=64, verbose_name=_("Parent key"),
                                   db_index=True, default='')
+    assets_amount = models.IntegerField(default=0)
 
     objects = OrgManager.from_queryset(NodeQuerySet)()
     is_node = True

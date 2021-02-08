@@ -115,8 +115,8 @@ class UnionQuerySet(QuerySet):
     def __getitem__(self, item):
         return self.__execute()[item]
 
-    def __next__(self):
-        return next(self.__execute())
+    def __iter__(self):
+        return iter(self.__execute())
 
     @classmethod
     def test_it(cls):
@@ -299,12 +299,12 @@ class UserGrantedTreeRefreshController:
         cls.remove_builed_orgs_from_users(orgs_id, users_id)
 
     @classmethod
+    @ensure_in_real_or_default_org
     def add_need_refresh_on_nodes_assets_relate_change(cls, node_ids, asset_ids):
         """
         1，计算与这些资产有关的授权
         2，计算与这些节点以及祖先节点有关的授权
         """
-        ensure_in_real_or_default_org()
 
         node_ids = set(node_ids)
         ancestor_node_keys = set()
@@ -340,8 +340,8 @@ class UserGrantedTreeRefreshController:
                 cls.add_need_refresh_by_asset_perm_ids(perm_ids)
 
     @classmethod
+    @ensure_in_real_or_default_org
     def add_need_refresh_by_asset_perm_ids(cls, asset_perm_ids):
-        ensure_in_real_or_default_org()
 
         group_ids = AssetPermission.user_groups.through.objects.filter(
             assetpermission_id__in=asset_perm_ids
@@ -429,8 +429,8 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
         return asset_ids
 
     @timeit
+    @ensure_in_real_or_default_org
     def rebuild_user_granted_tree(self):
-        ensure_in_real_or_default_org()
         logger.info(f'Rebuild user:{self.user} tree in org:{current_org}')
 
         user = self.user
@@ -618,13 +618,13 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
 
 class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
 
-    def get_favorite_assets(self, only=('id', )) -> QuerySet:
+    def get_favorite_assets(self) -> QuerySet:
         favorite_asset_ids = FavoriteAsset.objects.filter(
             user=self.user
         ).values_list('asset_id', flat=True)
         favorite_asset_ids = list(favorite_asset_ids)
         assets = self.get_all_granted_assets()
-        assets = assets.filter(id__in=favorite_asset_ids).only(*only)
+        assets = assets.filter(id__in=favorite_asset_ids)
         return assets
 
     def get_ungroup_assets(self) -> AssetQuerySet:
@@ -670,7 +670,7 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
         granted_status = node.get_granted_status(self.user)
 
         if granted_status == NodeFrom.granted:
-            assets = Asset.objects.order_by().filter(nodes_id=node.id)
+            assets = Asset.objects.order_by().filter(nodes__id=node.id)
             return assets
         elif granted_status == NodeFrom.asset:
             return self._get_indirect_granted_node_assets(node.id)
@@ -678,7 +678,7 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
             return Asset.objects.none()
 
     def _get_indirect_granted_node_assets(self, id) -> AssetQuerySet:
-        assets = Asset.objects.order_by().filter(nodes_id=id) & self.get_direct_granted_assets()
+        assets = Asset.objects.order_by().filter(nodes__id=id).distinct() & self.get_direct_granted_assets()
         return assets
 
     def _get_indirect_granted_node_all_assets(self, node) -> QuerySet:
