@@ -282,6 +282,7 @@ class Config(dict):
         'REFERER_CHECK_ENABLED': False,
         'SERVER_REPLAY_STORAGE': {},
         'CONNECTION_TOKEN_ENABLED': False,
+        'DISK_CHECK_ENABLED': True,
     }
 
     def compatible_auth_openid_of_key(self):
