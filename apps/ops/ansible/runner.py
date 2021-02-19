@@ -6,6 +6,7 @@ import shutil
 from collections import namedtuple
 
 from ansible import context
+from ansible.playbook import Playbook
 from ansible.module_utils.common.collections import ImmutableDict
 from ansible.executor.task_queue_manager import TaskQueueManager
 from ansible.vars.manager import VariableManager
@@ -217,6 +218,11 @@ class AdHocRunner:
             variable_manager=self.variable_manager,
             loader=self.loader,
         )
+        loader = DataLoader()
+        # used in start callback
+        playbook = Playbook(loader)
+        playbook._entries.append(play)
+        playbook._file_name = '__adhoc_playbook__'
 
         tqm = TaskQueueManager(
             inventory=self.inventory,
@@ -226,7 +232,9 @@ class AdHocRunner:
             passwords={"conn_pass": self.options.get("password", "")}
         )
         try:
+            tqm.send_callback('v2_playbook_on_start', playbook)
             tqm.run(play)
+            tqm.send_callback('v2_playbook_on_stats', tqm._stats)
             return self.results_callback
         except Exception as e:
             raise AnsibleError(e)
