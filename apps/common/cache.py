@@ -72,7 +72,7 @@ class Cache(metaclass=CacheBase):
 
     def get_data(self) -> dict:
         data = cache.get(self.key)
-        logger.debug(f'CACHE: get {self.key} = {data}')
+        logger.debug(f'Get data from cache: key={self.key} data={data}')
         if data is not None:
             data = json.loads(data)
             self._data = data
@@ -81,7 +81,7 @@ class Cache(metaclass=CacheBase):
     def set_data(self, data):
         self._data = data
         to_json = json.dumps(data)
-        logger.info(f'CACHE: set {self.key} = {to_json}, timeout={self.timeout}')
+        logger.info(f'Set data to cache: key={self.key} data={to_json} timeout={self.timeout}')
         cache.set(self.key, to_json, timeout=self.timeout)
 
     def compute_data(self, *fields):
@@ -122,6 +122,16 @@ class Cache(metaclass=CacheBase):
                 self.set_data(data)
                 return data
 
+    def expire_fields_with_lock(self, *fields):
+        with DistributedLock(name=f'{self.key}.refresh'):
+            data = self.get_data()
+            if data is not None:
+                logger.info(f'Expire cached fields: key={self.key} fields={fields}')
+                for f in fields:
+                    data.pop(f)
+                self.set_data(data)
+                return data
+
     def refresh(self, *fields):
         if not fields:
             # 没有指定 field 要刷新所有的值
@@ -146,10 +156,13 @@ class Cache(metaclass=CacheBase):
     def reload(self):
         self._data = None
 
-    def delete(self):
-        self._data = None
-        logger.info(f'CACHE: delete {self.key}')
-        cache.delete(self.key)
+    def expire(self, *fields):
+        if not fields:
+            self._data = None
+            logger.info(f'Delete cached key: key={self.key}')
+            cache.delete(self.key)
+        else:
+            self.expire_fields_with_lock(*fields)
 
 
 class CacheValueDesc:
@@ -167,7 +180,8 @@ class CacheValueDesc:
             return self
         if self.field_name not in instance.data:
             instance.refresh(self.field_name)
-        value = instance.data[self.field_name]
+        # 防止边界情况没有值，报错
+        value = instance.data.get(self.field_name)
         return value
 
     def compute_value(self, instance: Cache):
@@ -183,5 +197,5 @@ class CacheValueDesc:
             new_value = compute_func()
 
         new_value = self.field_type.field_type(new_value)
-        logger.info(f'CACHE: compute {instance.key}.{self.field_name} = {new_value}')
+        logger.info(f'Compute cache field value: key={instance.key} field={self.field_name} value={new_value}')
         return new_value
