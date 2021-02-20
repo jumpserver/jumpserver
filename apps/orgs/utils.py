@@ -68,12 +68,8 @@ def get_current_org_id():
 def construct_org_mapper():
     orgs = Organization.objects.all()
     org_mapper = {str(org.id): org for org in orgs}
-    default_org = Organization.default()
     org_mapper.update({
-        '': default_org,
-        Organization.DEFAULT_ID: default_org,
         Organization.ROOT_ID: Organization.root(),
-        Organization.SYSTEM_ID: Organization.system()
     })
     return org_mapper
 
@@ -137,11 +133,9 @@ def get_org_filters():
     _current_org = get_current_org()
     if _current_org is None:
         return kwargs
-
-    if _current_org.is_real():
-        kwargs['org_id'] = _current_org.id
-    elif _current_org.is_default():
-        kwargs["org_id"] = ''
+    if _current_org.is_root():
+        return kwargs
+    kwargs['org_id'] = _current_org.id
     return kwargs
 
 

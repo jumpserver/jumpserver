@@ -168,7 +168,7 @@ class Session(OrgModelMixin):
         from common.utils.random import random_datetime, random_ip
 
         org = get_current_org()
-        if not org or not org.is_real():
+        if not org or org.is_root():
             Organization.default().change_to()
         i = 0
         users = User.objects.all()[:100]

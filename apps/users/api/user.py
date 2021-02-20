@@ -47,7 +47,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         queryset = super().get_queryset().prefetch_related(
             'groups'
         )
-        if current_org.is_real():
+        if not current_org.is_root():
             # 为在列表中计算用户在真实组织里的角色
             queryset = queryset.prefetch_related(
                 Prefetch(
@@ -66,7 +66,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
     @staticmethod
     def set_users_to_org(users, org_roles, update=False):
         # 只有真实存在的组织才真正关联用户
-        if not current_org or not current_org.is_real():
+        if not current_org or current_org.is_root():
             return
         for user, roles in zip(users, org_roles):
             if update and roles is None:
@@ -93,7 +93,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         return super().get_permissions()
 
     def perform_destroy(self, instance):
-        if current_org.is_real():
+        if not current_org.is_root():
             instance.remove()
         else:
             return super().perform_destroy(instance)
@@ -149,7 +149,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         data = request.data
         if not isinstance(data, list):
             data = [request.data]
-        if not current_org or not current_org.is_real():
+        if not current_org or current_org.is_root():
             error = {"error": "Not a valid org"}
             return Response(error, status=400)
 

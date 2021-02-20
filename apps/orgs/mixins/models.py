@@ -23,14 +23,11 @@ class OrgManager(models.Manager):
     def all_group_by_org(self):
         from ..models import Organization
         orgs = list(Organization.objects.all())
-        orgs.append(Organization.default())
         querysets = {}
         for org in orgs:
-            if org.is_real():
-                org_id = org.id
-            else:
-                org_id = ''
-            querysets[org] = super(OrgManager, self).get_queryset().filter(org_id=org_id)
+            org_id = org.id
+            queryset = super(OrgManager, self).get_queryset().filter(org_id=org_id)
+            querysets[org] = queryset
         return querysets
 
     def get_queryset(self):
@@ -60,12 +57,10 @@ class OrgModelMixin(models.Model):
 
     def save(self, *args, **kwargs):
         org = get_current_org()
-        if org is None:
-            return super().save(*args, **kwargs)
-        if org.is_real() or org.is_system():
+        if org.is_root() and not self.org_id:
+            raise ValidationError('Please save in a organization')
+        if not org.is_root():
             self.org_id = org.id
-        elif org.is_default():
-            self.org_id = ''
         return super().save(*args, **kwargs)
 
     @property
@@ -85,10 +80,7 @@ class OrgModelMixin(models.Model):
             name = self.name
         elif hasattr(self, 'hostname'):
             name = self.hostname
-        if self.org.is_real():
-            return name + self.sep + self.org_name
-        else:
-            return name
+        return name + self.sep + self.org_name
 
     def validate_unique(self, exclude=None):
         """
@@ -96,7 +88,7 @@ class OrgModelMixin(models.Model):
         failed.
         Form 提交时会使用这个检验
         """
-        self.org_id = current_org.id if current_org.is_real() else ''
+        self.org_id = current_org.id
         if exclude and 'org_id' in exclude:
             exclude.remove('org_id')
         unique_checks, date_checks = self._get_unique_checks(exclude=exclude)

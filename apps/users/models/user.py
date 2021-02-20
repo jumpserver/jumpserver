@@ -168,7 +168,7 @@ class RoleMixin:
     def org_roles(self):
         from orgs.models import ROLE as ORG_ROLE
 
-        if not current_org.is_real():
+        if not current_org.is_root():
             # 不是真实的组织，取 User 本身的角色
             if self.is_superuser:
                 return [ORG_ROLE.ADMIN]
@@ -201,7 +201,7 @@ class RoleMixin:
 
     def current_org_roles(self):
         from orgs.models import OrganizationMember, ROLE as ORG_ROLE
-        if not current_org.is_real():
+        if current_org.is_root():
             if self.is_superuser:
                 return [ORG_ROLE.ADMIN]
             else:
@@ -324,7 +324,7 @@ class RoleMixin:
         return app, access_key
 
     def remove(self):
-        if not current_org.is_real():
+        if current_org.is_root():
             return
         org = Organization.get_instance(current_org.id)
         OrganizationMember.objects.remove_users(org, [self])
