@@ -157,7 +157,14 @@ def command_storage_es_host_format_validator(host):
         raise serializers.ValidationError(default_error_msg)
     if ':' not in h.netloc:
         raise serializers.ValidationError(default_error_msg)
-    _host, _port = h.netloc.split(':')
+
+    if '@' in h.netloc:
+        _auth_info, _netloc = h.netloc.split('@')
+        assert _auth_info
+        _host, _port = _netloc.split(':')
+    else:
+        _host, _port = h.netloc.split(':')
+
     if not _host:
         error_msg = _('Host invalid')
         raise serializers.ValidationError(error_msg)
