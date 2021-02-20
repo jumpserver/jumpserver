@@ -158,6 +158,7 @@ class DistributedLock(RedisLock):
     def _release(self):
         try:
             self._release_redis_lock()
+            logger.debug(f'I[{self.id}] released lock[{self.name}]')
         except NotAcquired as e:
             logger.error(f'I[{self.id}] release lock[{self.name}] failed {e}')
             self._raise_exc(e)
