@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 import re
-import data_tree
 from collections import OrderedDict
 from itertools import chain
 import logging
@@ -11,8 +10,6 @@ from functools import wraps
 import time
 import ipaddress
 import psutil
-from django.utils.translation import ugettext_lazy as _
-from ..exceptions import JMSException
 
 
 UUID_PATTERN = re.compile(r'\w{8}(-\w{4}){3}-\w{12}')
