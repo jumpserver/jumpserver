@@ -7,7 +7,7 @@ from common.utils import get_logger
 from perms.pagination import NodeGrantedAssetPagination, AllGrantedAssetPagination
 from assets.models import Asset, Node
 from perms import serializers
-from perms.utils.asset.user_permission import UserGrantedAssetsQueryUtils, QuerySetStage
+from perms.utils.asset.user_permission import UserGrantedAssetsQueryUtils
 
 logger = get_logger(__name__)
 
