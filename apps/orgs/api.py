@@ -5,8 +5,9 @@ from django.utils.translation import ugettext as _
 from rest_framework import status
 from rest_framework.views import Response
 from rest_framework_bulk import BulkModelViewSet
+from rest_framework.generics import RetrieveAPIView
 
-from common.permissions import IsSuperUserOrAppUser
+from common.permissions import IsSuperUserOrAppUser, IsValidUser
 from common.drf.api import JMSBulkRelationModelViewSet
 from .models import Organization, ROLE
 from .serializers import (
@@ -129,3 +130,11 @@ class OrgMemberUserRelationBulkViewSet(JMSBulkRelationModelViewSet):
         objs = list(queryset.all().prefetch_related('user', 'org'))
         queryset.delete()
         self.send_m2m_changed_signal(objs, action='post_remove')
+
+
+class CurrentOrgDetailApi(RetrieveAPIView):
+    serializer_class = OrgSerializer
+    permission_classes = (IsValidUser,)
+
+    def get_object(self):
+        return current_org

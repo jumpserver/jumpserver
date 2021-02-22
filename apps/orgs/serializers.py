@@ -38,7 +38,8 @@ class OrgSerializer(ModelSerializer):
         list_serializer_class = AdaptedBulkListSerializer
         fields_mini = ['id', 'name']
         fields_small = fields_mini + [
-            'created_by', 'date_created', 'comment', 'resource_statistics'
+            'is_default', 'is_root', 'comment',
+            'created_by', 'date_created', 'resource_statistics'
         ]
 
         fields_m2m = ['users', 'admins', 'auditors']
