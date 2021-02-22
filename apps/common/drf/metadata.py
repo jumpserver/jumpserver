@@ -97,6 +97,8 @@ class SimpleMetadataWithFilters(SimpleMetadata):
             fields = view.filterset_fields
         elif hasattr(view, 'get_filterset_fields'):
             fields = view.get_filterset_fields(request)
+        elif hasattr(view, 'filterset_class'):
+            fields = view.filterset_class.Meta.fields
 
         if isinstance(fields, dict):
             fields = list(fields.keys())
