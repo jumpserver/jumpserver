@@ -27,31 +27,5 @@ class RemoteAppConnectionInfoSerializer(serializers.ModelSerializer):
         return obj.attrs.get('asset')
 
     @staticmethod
-    def get_parameters(obj):
-        """
-        返回Guacamole需要的RemoteApp配置参数信息中的parameters参数
-        """
-        from .attrs import get_serializer_class_by_application_type
-        serializer_class = get_serializer_class_by_application_type(obj.type)
-        fields = serializer_class().get_fields()
-
-        parameters = [obj.type]
-        for field_name in list(fields.keys()):
-            if field_name in ['asset']:
-                continue
-            value = obj.attrs.get(field_name)
-            if not value:
-                continue
-            if field_name == 'path':
-                value = '\"%s\"' % value
-            parameters.append(str(value))
-
-        parameters = ' '.join(parameters)
-        return parameters
-
-    def get_parameter_remote_app(self, obj):
-        return {
-            'program': '||jmservisor',
-            'working_directory': '',
-            'parameters': self.get_parameters(obj)
-        }
+    def get_parameter_remote_app(obj):
+        return obj.get_rdp_remote_app_setting()
