@@ -71,7 +71,7 @@ class BulkListSerializerMixin(object):
         """
         List of dicts of native values <- List of dicts of primitive datatypes.
         """
-        if not self.instance:
+        if self.instance is None:
             return super().to_internal_value(data)
 
         if html.is_html_input(data):
@@ -106,7 +106,7 @@ class BulkListSerializerMixin(object):
                     pk = item["pk"]
                 else:
                     raise ValidationError("id or pk not in data")
-                child = self.instance.get(id=pk) if self.instance else None
+                child = self.instance.get(id=pk)
                 self.child.instance = child
                 self.child.initial_data = item
                 # raw
