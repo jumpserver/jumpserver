@@ -22,6 +22,7 @@ from common.utils import date_expired_default, get_logger, lazyproperty
 from common import fields
 from common.const import choices
 from common.db.models import ChoiceSet
+from users.exceptions import MFANotEnabled
 from ..signals import post_user_change_password
 
 
@@ -489,6 +490,9 @@ class MFAMixin:
         return check_otp_code(self.otp_secret_key, code)
 
     def check_mfa(self, code):
+        if not self.mfa_enabled:
+            raise MFANotEnabled
+
         if settings.OTP_IN_RADIUS:
             return self.check_radius(code)
         else:
