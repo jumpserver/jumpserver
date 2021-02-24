@@ -3,12 +3,11 @@
 from django.conf import settings
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404
-from rest_framework.serializers import ValidationError
 from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.decorators import action
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.exceptions import PermissionDenied
 
 from common.utils import get_logger, random_string
 from common.drf.api import SerializerMixin2
@@ -16,7 +15,10 @@ from common.permissions import IsSuperUserOrAppUser, IsValidUser, IsSuperUser
 
 from orgs.mixins.api import RootOrgViewMixin
 
-from ..serializers import ConnectionTokenSerializer, ConnectionTokenSecretSerializer
+from ..serializers import (
+    ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
+    RDPFileSerializer
+)
 
 logger = get_logger(__name__)
 __all__ = ['UserConnectionTokenViewSet']
@@ -26,7 +28,8 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
     permission_classes = (IsSuperUserOrAppUser,)
     serializer_classes = {
         'default': ConnectionTokenSerializer,
-        'get_secret_detail': ConnectionTokenSecretSerializer
+        'get_secret_detail': ConnectionTokenSecretSerializer,
+        'get_rdp_file': RDPFileSerializer
     }
     CACHE_KEY_PREFIX = 'CONNECTION_TOKEN_{}'
 
@@ -45,6 +48,12 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
         return True
 
     def create_token(self, user, asset, application, system_user):
+        if not settings.CONNECTION_TOKEN_ENABLED:
+            raise PermissionDenied('Connection token disabled')
+        if not user:
+            user = self.request.user
+        if not self.request.user.is_superuser and user != self.request.user:
+            raise PermissionDenied('Only super user can create user token')
         self.check_resource_permission(user, asset, application, system_user)
         token = random_string(36)
         value = {
@@ -71,26 +80,15 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
         cache.set(key, value, timeout=20)
         return token
 
-    def create_token_by_data(self, data):
-        if not settings.CONNECTION_TOKEN_ENABLED:
-            raise PermissionDenied('Connection token disabled')
-        serializer = ConnectionTokenSerializer(data=data)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
-        user = serializer.validated_data.get('user', None)
-        if not self.request.user.is_superuser and user:
-            raise PermissionDenied('Only super user can create user token')
-        if not self.request.user.is_superuser:
-            user = self.request.user
 
         asset = serializer.validated_data.get('asset')
         application = serializer.validated_data.get('application')
         system_user = serializer.validated_data['system_user']
+        user = serializer.validated_data.get('user')
         token = self.create_token(user, asset, application, system_user)
-        return token, user, asset, application, system_user,
-
-    def create(self, request, *args, **kwargs):
-        token = self.create_token_by_data(request.data)
         return Response({"token": token}, status=201)
 
     @action(methods=['POST', 'GET'], detail=False, url_path='rdp/file')
@@ -128,12 +126,23 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
             data = self.request.query_params
         else:
             data = request.data
-        token, user, asset, *args = self.create_token_by_data(data)
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+
+        asset = serializer.validated_data.get('asset')
+        application = serializer.validated_data.get('application')
+        system_user = serializer.validated_data['system_user']
+        user = serializer.validated_data.get('user')
+        height = serializer.validated_data.get('height')
+        width = serializer.validated_data.get('width')
+        token = self.create_token(user, asset, application, system_user)
 
         # Todo: 上线后地址是 JumpServerAddr:3389
         address = self.request.query_params.get('address') or '1.1.1.1'
         options['full address:s'] = address
         options['username:s'] = '{}@{}'.format(user.username, token)
+        options['desktopwidth:i'] = width
+        options['desktopheight:i'] = height
         data = ''
         for k, v in options.items():
             data += f'{k}:{v}\n'

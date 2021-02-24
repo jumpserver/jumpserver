@@ -14,7 +14,7 @@ from .models import AccessKey, LoginConfirmSetting, SSOToken
 __all__ = [
     'AccessKeySerializer', 'OtpVerifySerializer', 'BearerTokenSerializer',
     'MFAChallengeSerializer', 'LoginConfirmSettingSerializer', 'SSOTokenSerializer',
-    'ConnectionTokenSerializer', 'ConnectionTokenSecretSerializer'
+    'ConnectionTokenSerializer', 'ConnectionTokenSecretSerializer', 'RDPFileSerializer'
 ]
 
 
@@ -184,4 +184,5 @@ class ConnectionTokenSecretSerializer(serializers.Serializer):
 
 
 class RDPFileSerializer(ConnectionTokenSerializer):
-    pass
+    width = serializers.IntegerField(default=1280)
+    height = serializers.IntegerField(default=800)
