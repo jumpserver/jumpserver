@@ -128,12 +128,10 @@ def on_asset_permission_user_groups_changed(instance, action, pk_set, model,
 
 @receiver(m2m_changed, sender=ApplicationPermission.system_users.through)
 def on_application_permission_system_users_changed(sender, instance: ApplicationPermission, action, reverse, pk_set, **kwargs):
-    if not instance.category_remote_app:
-        return
-
     if reverse:
         raise M2MReverseNotAllowed
-
+    if not instance.category_remote_app:
+        return
     if action != POST_ADD:
         return
 
@@ -156,11 +154,11 @@ def on_application_permission_system_users_changed(sender, instance: Application
 
 @receiver(m2m_changed, sender=ApplicationPermission.users.through)
 def on_application_permission_users_changed(sender, instance, action, reverse, pk_set, **kwargs):
-    if not instance.category_remote_app:
-        return
-
     if reverse:
         raise M2MReverseNotAllowed
+
+    if not instance.category_remote_app:
+        return
 
     if action != POST_ADD:
         return
@@ -176,12 +174,10 @@ def on_application_permission_users_changed(sender, instance, action, reverse, p
 
 @receiver(m2m_changed, sender=ApplicationPermission.user_groups.through)
 def on_application_permission_user_groups_changed(sender, instance, action, reverse, pk_set, **kwargs):
-    if not instance.category_remote_app:
-        return
-
     if reverse:
         raise M2MReverseNotAllowed
-
+    if not instance.category_remote_app:
+        return
     if action != POST_ADD:
         return
 
@@ -196,11 +192,11 @@ def on_application_permission_user_groups_changed(sender, instance, action, reve
 
 @receiver(m2m_changed, sender=ApplicationPermission.applications.through)
 def on_application_permission_applications_changed(sender, instance, action, reverse, pk_set, **kwargs):
-    if not instance.category_remote_app:
-        return
-
     if reverse:
         raise M2MReverseNotAllowed
+
+    if not instance.category_remote_app:
+        return
 
     if action != POST_ADD:
         return

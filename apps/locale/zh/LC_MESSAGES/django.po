@@ -64,7 +64,7 @@ msgstr "名称"
 #: perms/serializers/application/user_permission.py:33
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:20
 msgid "Category"
-msgstr "种类"
+msgstr "类别"
 
 #: applications/models/application.py:15
 #: applications/serializers/application.py:48 assets/models/cmd_filter.py:52
@@ -3156,7 +3156,7 @@ msgstr "关闭"
 
 #: tickets/handler/apply_application.py:55
 msgid "Applied category"
-msgstr "申请的种类"
+msgstr "申请的类别"
 
 #: tickets/handler/apply_application.py:56
 msgid "Applied type"
@@ -3319,7 +3319,7 @@ msgstr "受理人 (显示名称)"
 
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:24
 msgid "Category display"
-msgstr "种类 (显示名称)"
+msgstr "类别 (显示名称)"
 
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:31
 #: tickets/serializers/ticket/ticket.py:19

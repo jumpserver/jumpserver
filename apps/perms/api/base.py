@@ -45,7 +45,7 @@ class BasePermissionViewSet(OrgBulkModelViewSet):
         if not self.is_query_all():
             queryset = queryset.filter(users=user)
             return queryset
-        groups = user.groups.all()
+        groups = list(user.groups.all().values_list('id', flat=True))
         queryset = queryset.filter(
             Q(users=user) | Q(user_groups__in=groups)
         ).distinct()
