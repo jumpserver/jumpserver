@@ -93,7 +93,7 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
         token = self.create_token_by_data(request.data)
         return Response({"token": token}, status=201)
 
-    @action(methods=['POST', 'GET'], detail=False, permission_classes=[IsSuperUserOrAppUser], url_path='rdp/file')
+    @action(methods=['POST', 'GET'], detail=False, url_path='rdp/file')
     def get_rdp_file(self, request, *args, **kwargs):
         options = {
             'full address:s': '',
@@ -130,6 +130,7 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
             data = request.data
         token, user, asset, *args = self.create_token_by_data(data)
 
+        # Todo: 上线后地址是 JumpServerAddr:3389
         address = self.request.query_params.get('address') or '1.1.1.1'
         options['full address:s'] = address
         options['username:s'] = '{}@{}'.format(user.username, token)
