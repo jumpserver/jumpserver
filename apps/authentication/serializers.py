@@ -181,3 +181,7 @@ class ConnectionTokenSecretSerializer(serializers.Serializer):
     system_user = ConnectionTokenSystemUserSerializer(read_only=True)
     gateway = ConnectionTokenGatewaySerializer(read_only=True)
     actions = ActionsField()
+
+
+class RDPFileSerializer(ConnectionTokenSerializer):
+    pass

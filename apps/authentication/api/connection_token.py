@@ -4,10 +4,11 @@ from django.conf import settings
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 from rest_framework.serializers import ValidationError
+from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.decorators import action
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from common.utils import get_logger, random_string
 from common.drf.api import SerializerMixin2
@@ -70,26 +71,75 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
         cache.set(key, value, timeout=20)
         return token
 
-    def create(self, request, *args, **kwargs):
+    def create_token_by_data(self, data):
         if not settings.CONNECTION_TOKEN_ENABLED:
-            data = {'error': 'Connection token disabled'}
-            return Response(data, status=400)
-
-        serializer = self.get_serializer(data=request.data)
+            raise PermissionDenied('Connection token disabled')
+        serializer = ConnectionTokenSerializer(data=data)
         serializer.is_valid(raise_exception=True)
 
         user = serializer.validated_data.get('user', None)
-        if not request.user.is_superuser and user:
+        if not self.request.user.is_superuser and user:
             raise PermissionDenied('Only super user can create user token')
-        if not request.user.is_superuser:
+        if not self.request.user.is_superuser:
             user = self.request.user
 
         asset = serializer.validated_data.get('asset')
         application = serializer.validated_data.get('application')
         system_user = serializer.validated_data['system_user']
-
         token = self.create_token(user, asset, application, system_user)
+        return token, user, asset, application, system_user,
+
+    def create(self, request, *args, **kwargs):
+        token = self.create_token_by_data(request.data)
         return Response({"token": token}, status=201)
+
+    @action(methods=['POST', 'GET'], detail=False, permission_classes=[IsSuperUserOrAppUser], url_path='rdp/file')
+    def get_rdp_file(self, request, *args, **kwargs):
+        options = {
+            'full address:s': '',
+            'username:s': '',
+            'screen mode id:i': '0',
+            'desktopwidth:i': '1280',
+            'desktopheight:i': '800',
+            'use multimon:i': '1',
+            'session bpp:i': '24',
+            'audiomode:i': '0',
+            'disable wallpaper:i': '0',
+            'disable full window drag:i': '0',
+            'disable menu anims:i': '0',
+            'disable themes:i': '0',
+            'alternate shell:s': '',
+            'shell working directory:s': '',
+            'authentication level:i': '2',
+            'connect to console:i': '0',
+            'disable cursor setting:i': '0',
+            'allow font smoothing:i': '1',
+            'allow desktop composition:i': '1',
+            'redirectprinters:i': '0',
+            'prompt for credentials on client:i': '0',
+            'autoreconnection enabled:i': '1',
+            'bookmarktype:i': '3',
+            'use redirection server name:i': '0',
+            # 'alternate shell:s:': '||MySQLWorkbench',
+            # 'remoteapplicationname:s': 'Firefox',
+            # 'remoteapplicationcmdline:s': '',
+        }
+        if self.request.method == 'GET':
+            data = self.request.query_params
+        else:
+            data = request.data
+        token, user, asset, *args = self.create_token_by_data(data)
+
+        address = self.request.query_params.get('address') or '1.1.1.1'
+        options['full address:s'] = address
+        options['username:s'] = '{}@{}'.format(user.username, token)
+        data = ''
+        for k, v in options.items():
+            data += f'{k}:{v}\n'
+        response = HttpResponse(data, content_type='text/plain')
+        filename = "{}-{}-jumpserver.rdp".format(user.username, asset.hostname)
+        response['Content-Disposition'] = 'attachment; filename={}'.format(filename)
+        return response
 
     @staticmethod
     def _get_application_secret_detail(value):
@@ -165,7 +215,7 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
         return Response(data=serializer.data, status=200)
 
     def get_permissions(self):
-        if self.action == "create":
+        if self.action in ["create", "get_rdp_file"]:
             if self.request.data.get('user', None):
                 self.permission_classes = (IsSuperUser,)
             else:
