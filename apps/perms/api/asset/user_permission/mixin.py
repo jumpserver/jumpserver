@@ -13,7 +13,7 @@ from perms.utils.asset.user_permission import UserGrantedTreeRefreshController
 class PermBaseMixin:
     user: User
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request: Request, *args, **kwargs):
         force = is_true(request.query_params.get('rebuild_tree'))
         controller = UserGrantedTreeRefreshController(self.user)
         controller.refresh_if_need(force)

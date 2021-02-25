@@ -13,6 +13,7 @@ from orgs.utils import current_org
 from common.permissions import IsOrgAdmin
 from perms import serializers
 from perms import models
+from perms.utils.asset.user_permission import UserGrantedAssetsQueryUtils
 
 __all__ = [
     'AssetPermissionUserRelationViewSet', 'AssetPermissionUserGroupRelationViewSet',
@@ -103,15 +104,8 @@ class AssetPermissionAllAssetListApi(generics.ListAPIView):
 
     def get_queryset(self):
         pk = self.kwargs.get("pk")
-        perm = get_object_or_404(models.AssetPermission, pk=pk)
-
-        asset_q = Q(granted_by_permissions=perm)
-        granted_node_keys = Node.objects.filter(granted_by_permissions=perm).distinct().values_list('key', flat=True)
-        for key in granted_node_keys:
-            asset_q |= Q(nodes__key__startswith=f'{key}:')
-            asset_q |= Q(nodes__key=key)
-
-        assets = Asset.objects.filter(asset_q).only(*self.serializer_class.Meta.only_fields).distinct()
+        query_utils = UserGrantedAssetsQueryUtils(None, asset_perm_ids=[pk])
+        assets = query_utils.get_all_granted_assets()
         return assets
 
 

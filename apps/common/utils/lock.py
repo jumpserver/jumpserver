@@ -93,21 +93,21 @@ class DistributedLock(RedisLock):
             if self.locked_by_current_thread():
                 self._acquired_reentrant_lock = True
                 logger.debug(
-                    f'I[{self.id}] reentry lock[{self.name}] in thread[{self._thread_id}].')
+                    f'Reentry lock ok: lock_id={self.id} owner_id={self.get_owner_id()} lock={self.name} thread={self._thread_id}')
                 return True
 
-            logger.debug(f'I[{self.id}] attempt acquire reentrant-lock[{self.name}].')
+            logger.debug(f'Attempt acquire reentrant-lock: lock_id={self.id} lock={self.name} thread={self._thread_id}')
             acquired = super().acquire(blocking=blocking, timeout=timeout)
             if acquired:
-                logger.debug(f'I[{self.id}] acquired reentrant-lock[{self.name}] now.')
+                logger.debug(f'Acquired reentrant-lock ok: lock_id={self.id} lock={self.name} thread={self._thread_id}')
                 setattr(thread_local, self.name, self.id)
             else:
-                logger.debug(f'I[{self.id}] acquired reentrant-lock[{self.name}] failed.')
+                logger.debug(f'Acquired reentrant-lock failed: lock_id={self.id} lock={self.name} thread={self._thread_id}')
             return acquired
         else:
-            logger.debug(f'I[{self.id}] attempt acquire lock[{self.name}].')
+            logger.debug(f'Attempt acquire lock: lock_id={self.id} lock={self.name} thread={self._thread_id}')
             acquired = super().acquire(blocking=blocking, timeout=timeout)
-            logger.debug(f'I[{self.id}] acquired lock[{self.name}] {acquired}.')
+            logger.debug(f'Acquired lock: ok={acquired} lock_id={self.id} lock={self.name} thread={self._thread_id}')
             return acquired
 
     @property
@@ -126,17 +126,17 @@ class DistributedLock(RedisLock):
     def _release_on_reentrant_locked_by_brother(self):
         if self._acquired_reentrant_lock:
             self._acquired_reentrant_lock = False
-            logger.debug(f'I[{self.id}] released reentrant-lock[{self.name}] owner[{self.get_owner_id()}] in thread[{self._thread_id}]')
+            logger.debug(f'Released reentrant-lock: lock_id={self.id} owner_id={self.get_owner_id()} lock={self.name} thread={self._thread_id}')
             return
         else:
-            self._raise_exc_with_log(f'Reentrant-lock[{self.name}] is not acquired by me[{self.id}].')
+            self._raise_exc_with_log(f'Reentrant-lock is not acquired: lock_id={self.id} owner_id={self.get_owner_id()} lock={self.name} thread={self._thread_id}')
 
     def _release_on_reentrant_locked_by_me(self):
-        logger.debug(f'I[{self.id}] release reentrant-lock[{self.name}] in thread[{self._thread_id}]')
+        logger.debug(f'Release reentrant-lock locked by me: lock_id={self.id} lock={self.name} thread={self._thread_id}')
 
         id = getattr(thread_local, self.name, None)
         if id != self.id:
-            raise PermissionError(f'Reentrant-lock[{self.name}] is not locked by me[{self.id}], owner[{id}]')
+            raise PermissionError(f'Reentrant-lock is not locked by me: lock_id={self.id} owner_id={self.get_owner_id()} lock={self.name} thread={self._thread_id}')
         try:
             # 这里要保证先删除 thread_local 的标记，
             delattr(thread_local, self.name)
@@ -158,9 +158,9 @@ class DistributedLock(RedisLock):
     def _release(self):
         try:
             self._release_redis_lock()
-            logger.debug(f'I[{self.id}] released lock[{self.name}]')
+            logger.debug(f'Released lock: lock_id={self.id} lock={self.name} thread={self._thread_id}')
         except NotAcquired as e:
-            logger.error(f'I[{self.id}] release lock[{self.name}] failed {e}')
+            logger.error(f'Release lock failed: lock_id={self.id} lock={self.name} thread={self._thread_id} error: {e}')
             self._raise_exc(e)
 
     def release(self):
@@ -174,11 +174,11 @@ class DistributedLock(RedisLock):
                 else:
                     _release = self._release_on_reentrant_locked_by_brother
             else:
-                self._raise_exc_with_log(f'Reentrant-lock[{self.name}] is not acquired in current-thread[{self._thread_id}]')
+                self._raise_exc_with_log(f'Reentrant-lock is not acquired: lock_id={self.id} lock={self.name} thread={self._thread_id}')
 
         # 处理是否在事务提交时才释放锁
         if self._release_on_transaction_commit:
-            logger.debug(f'I[{self.id}] release lock[{self.name}] on transaction commit ...')
+            logger.debug(f'Release lock on transaction commit ... :lock_id={self.id} lock={self.name} thread={self._thread_id}')
             transaction.on_commit(_release)
         else:
             _release()

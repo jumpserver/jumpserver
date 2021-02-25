@@ -1,18 +1,16 @@
 from collections import defaultdict
 from typing import List, Tuple
-from functools import reduce, partial
-from common.utils import isinstance_method
 
 from django.core.cache import cache
 from django.conf import settings
 from django.db.models import Q, QuerySet
 
-from common.db.models import output_as_string
-from common.utils.common import lazyproperty, timeit, Time
+from common.db.models import output_as_string, UnionQuerySet
+from common.utils.common import lazyproperty, timeit
 from assets.utils import NodeAssetsUtil
 from common.utils import get_logger
 from common.decorator import on_transaction_commit
-from orgs.utils import tmp_to_org, current_org, ensure_in_real_or_default_org
+from orgs.utils import tmp_to_org, current_org, ensure_in_real_or_default_org, tmp_to_root_org
 from assets.models import (
     Asset, FavoriteAsset, AssetQuerySet, NodeQuerySet
 )
@@ -50,82 +48,8 @@ def get_user_all_asset_perm_ids(user) -> set:
 
     asset_perm_ids = AssetPermission.objects.filter(
         id__in=asset_perm_ids).valid().values_list('id', flat=True)
+    asset_perm_ids = set(asset_perm_ids)
     return asset_perm_ids
-
-
-class UnionQuerySet(QuerySet):
-    after_union = ['order_by']
-    not_return_qs = [
-        'query', 'get', 'create', 'get_or_create',
-        'update_or_create', 'bulk_create', 'count',
-        'latest', 'earliest', 'first', 'last', 'aggregate',
-        'exists', 'update', 'delete', 'as_manager', 'explain',
-    ]
-
-    def __init__(self, *queryset_list):
-        self.queryset_list = queryset_list
-        self.after_union_items = []
-        self.before_union_items = []
-
-    def __execute(self):
-        queryset_list = []
-        for qs in self.queryset_list:
-            for attr, args, kwargs in self.before_union_items:
-                qs = getattr(qs, attr)(*args, **kwargs)
-            queryset_list.append(qs)
-        union_qs = reduce(lambda x, y: x.union(y), queryset_list)
-        for attr, args, kwargs in self.after_union_items:
-            union_qs = getattr(union_qs, attr)(*args, **kwargs)
-        return union_qs
-
-    def __before_union_perform(self, item, *args, **kwargs):
-        self.before_union_items.append((item, args, kwargs))
-        return self.__clone(*self.queryset_list)
-
-    def __after_union_perform(self, item, *args, **kwargs):
-        self.after_union_items.append((item, args, kwargs))
-        return self.__clone(*self.queryset_list)
-
-    def __clone(self, *queryset_list):
-        uqs = UnionQuerySet(*queryset_list)
-        uqs.after_union_items = self.after_union_items
-        uqs.before_union_items = self.before_union_items
-        return uqs
-
-    def __getattribute__(self, item):
-        if item.startswith('__') or item in UnionQuerySet.__dict__ or item in [
-            'queryset_list', 'after_union_items', 'before_union_items'
-        ]:
-            return object.__getattribute__(self, item)
-
-        if item in UnionQuerySet.not_return_qs:
-            return getattr(self.__execute(), item)
-
-        origin_item = object.__getattribute__(self, 'queryset_list')[0]
-        origin_attr = getattr(origin_item, item, None)
-        if not isinstance_method(origin_attr):
-            return getattr(self.__execute(), item)
-
-        if item in UnionQuerySet.after_union:
-            attr = partial(self.__after_union_perform, item)
-        else:
-            attr = partial(self.__before_union_perform, item)
-        return attr
-
-    def __getitem__(self, item):
-        return self.__execute()[item]
-
-    def __iter__(self):
-        return iter(self.__execute())
-
-    @classmethod
-    def test_it(cls):
-        from assets.models import Asset
-        assets1 = Asset.objects.filter(hostname__startswith='a')
-        assets2 = Asset.objects.filter(hostname__startswith='b')
-
-        qs = cls(assets1, assets2)
-        return qs
 
 
 class QuerySetStage:
@@ -273,11 +197,11 @@ class UserGrantedTreeRefreshController:
             ret = p.execute()
             builded_orgs_id = {org_id.decode() for org_id in ret[0]}
             ids = orgs_id - builded_orgs_id
-            orgs = []
+            orgs = set()
             if Organization.DEFAULT_ID in ids:
                 ids.remove(Organization.DEFAULT_ID)
-                orgs.append(Organization.default())
-            orgs.extend(Organization.objects.filter(id__in=ids))
+                orgs.add(Organization.default())
+            orgs.update(Organization.objects.filter(id__in=ids))
             logger.info(f'Need rebuild orgs are {orgs}, builed orgs are {ret[0]}, all orgs are {orgs_id}')
             return orgs
 
@@ -292,7 +216,7 @@ class UserGrantedTreeRefreshController:
                 key = cls.key_template.format(user_id=user_id)
                 p.srem(key, *org_ids)
             p.execute()
-        logger.info(f'Remove orgs from users builded tree, users:{users_id} orgs:{orgs_id}')
+        logger.info(f'Remove orgs from users builded tree: users:{users_id} orgs:{orgs_id}')
 
     @classmethod
     def add_need_refresh_orgs_for_users(cls, orgs_id, users_id):
@@ -364,29 +288,37 @@ class UserGrantedTreeRefreshController:
 
     @lazyproperty
     def orgs_id(self):
-        ret = [org.id for org in self.orgs]
+        ret = {org.id for org in self.orgs}
         return ret
 
     @lazyproperty
     def orgs(self):
-        orgs = [*self.user.orgs.all(), Organization.default()]
+        orgs = {*self.user.orgs.all().distinct(), Organization.default()}
         return orgs
 
     @timeit
     def refresh_if_need(self, force=False):
         user = self.user
-        exists = UserAssetGrantedTreeNodeRelation.objects.filter(user=user).exists()
 
-        if force or not exists:
-            orgs = self.orgs
-            self.set_all_orgs_as_builed()
-        else:
-            orgs = self.get_need_refresh_orgs_and_fill_up()
+        with UserGrantedTreeRebuildLock(user_id=user.id):
+            with tmp_to_root_org():
+                orgids = self.orgs_id.copy()
+                orgids.remove(Organization.default().id)
+                orgids.add('')  # 添加 default
 
-        for org in orgs:
-            with tmp_to_org(org):
-                utils = UserGrantedTreeBuildUtils(user)
-                utils.rebuild_user_granted_tree()
+                UserAssetGrantedTreeNodeRelation.objects.filter(user=user).exclude(org_id__in=orgids).delete()
+                exists = UserAssetGrantedTreeNodeRelation.objects.filter(user=user).exists()
+
+            if force or not exists:
+                orgs = self.orgs
+                self.set_all_orgs_as_builed()
+            else:
+                orgs = self.get_need_refresh_orgs_and_fill_up()
+
+            for org in orgs:
+                with tmp_to_org(org):
+                    utils = UserGrantedTreeBuildUtils(user)
+                    utils.rebuild_user_granted_tree()
 
 
 class UserGrantedUtilsBase:
@@ -394,7 +326,7 @@ class UserGrantedUtilsBase:
 
     def __init__(self, user, asset_perm_ids=None):
         self.user = user
-        self._asset_perm_ids = asset_perm_ids
+        self._asset_perm_ids = asset_perm_ids and set(asset_perm_ids)
 
     @lazyproperty
     def asset_perm_ids(self) -> set:
@@ -431,24 +363,26 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
     @timeit
     @ensure_in_real_or_default_org
     def rebuild_user_granted_tree(self):
-        logger.info(f'Rebuild user:{self.user} tree in org:{current_org}')
+        """
+        注意：调用该方法一定要被 `UserGrantedTreeRebuildLock` 锁住
+        """
+
+        logger.info(f'Rebuild user tree: user={self.user} org={current_org}')
 
         user = self.user
-        org_id = current_org.id
 
-        with UserGrantedTreeRebuildLock(org_id, user.id):
-            # 先删除旧的授权树🌲
-            UserAssetGrantedTreeNodeRelation.objects.filter(user=user).delete()
+        # 先删除旧的授权树🌲
+        UserAssetGrantedTreeNodeRelation.objects.filter(user=user).delete()
 
-            if not self.asset_perm_ids:
-                # 没有授权直接返回
-                return
+        if not self.asset_perm_ids:
+            # 没有授权直接返回
+            return
 
-            nodes = self.compute_perm_nodes_tree()
-            self.compute_node_assets_amount(nodes)
-            if not nodes:
-                return
-            self.create_mapping_nodes(nodes)
+        nodes = self.compute_perm_nodes_tree()
+        self.compute_node_assets_amount(nodes)
+        if not nodes:
+            return
+        self.create_mapping_nodes(nodes)
 
     @timeit
     def compute_perm_nodes_tree(self, node_only_fields=NODE_ONLY_FIELDS) -> list:
@@ -587,6 +521,8 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
         node_asset_pairs = list(node_asset_pairs)
 
         for node_id, asset_id in node_asset_pairs:
+            if node_id not in node_id_key_mapper:
+                continue
             nkey = node_id_key_mapper[node_id]
             nodekey_assetsid_mapper[nkey].add(asset_id)
 
@@ -695,6 +631,10 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
         ).filter(
             Q(node_key__startswith=f'{node.key}:')
         ).only('node_id', 'node_key')
+
+        for n in granted_nodes:
+            n.id = n.node_id
+
         node_assets = PermNode.get_nodes_all_assets(*granted_nodes)
 
         # 查询该节点下的资产授权节点
