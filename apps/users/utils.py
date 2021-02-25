@@ -235,6 +235,28 @@ def send_reset_ssh_key_mail(user):
     send_mail_async.delay(subject, message, recipient_list, html_message=message)
 
 
+def send_reset_mfa_mail(user):
+    subject = _('MFA Reset')
+    recipient_list = [user.email]
+    message = _("""
+    Hello %(name)s:
+    <br>
+    Your MFA has been reset by site administrator.
+    Please login and reset your MFA.
+    <br>
+    <a href="%(login_url)s">Login direct</a>
+
+    <br>
+    """) % {
+        'name': user.name,
+        'login_url': reverse('authentication:login', external=True),
+    }
+    if settings.DEBUG:
+        logger.debug(message)
+
+    send_mail_async.delay(subject, message, recipient_list, html_message=message)
+
+
 def get_user_or_pre_auth_user(request):
     user = request.user
     if user.is_authenticated:
