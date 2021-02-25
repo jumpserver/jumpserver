@@ -127,9 +127,13 @@ class NodeChildrenApi(generics.ListCreateAPIView):
     def get_object(self):
         pk = self.kwargs.get('pk') or self.request.query_params.get('id')
         key = self.request.query_params.get("key")
+
         if not pk and not key:
-            node = Node.org_root()
             self.is_initial = True
+            if current_org.is_root():
+                node = None
+            else:
+                node = Node.org_root()
             return node
         if pk:
             node = get_object_or_404(Node, pk=pk)
@@ -137,15 +141,25 @@ class NodeChildrenApi(generics.ListCreateAPIView):
             node = get_object_or_404(Node, key=key)
         return node
 
+    def get_org_root_queryset(self, query_all):
+        if query_all:
+            return Node.objects.all()
+        else:
+            return Node.org_root_nodes()
+
     def get_queryset(self):
         query_all = self.request.query_params.get("all", "0") == "all"
-        if not self.instance:
-            return Node.objects.none()
+
+        if self.is_initial and current_org.is_root():
+            return self.get_org_root_queryset(query_all)
 
         if self.is_initial:
             with_self = True
         else:
             with_self = False
+
+        if not self.instance:
+            return Node.objects.none()
 
         if query_all:
             queryset = self.instance.get_all_children(with_self=with_self)
@@ -240,7 +254,10 @@ class NodeRemoveAssetsApi(generics.UpdateAPIView):
         node.assets.remove(*assets)
 
         # 把孤儿资产添加到 root 节点
-        orphan_assets = Asset.objects.filter(id__in=[a.id for a in assets], nodes__isnull=True).distinct()
+        orphan_assets = Asset.objects.filter(
+            id__in=[a.id for a in assets],
+            nodes__isnull=True
+        ).distinct()
         Node.org_root().assets.add(*orphan_assets)
 
 

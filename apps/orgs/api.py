@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.views import Response
 from rest_framework_bulk import BulkModelViewSet
 from rest_framework.generics import RetrieveAPIView
+from rest_framework.exceptions import PermissionDenied
 
 from common.permissions import IsSuperUserOrAppUser, IsValidUser
 from common.drf.api import JMSBulkRelationModelViewSet
@@ -13,7 +14,8 @@ from .models import Organization, ROLE
 from .serializers import (
     OrgSerializer, OrgReadSerializer,
     OrgRetrieveSerializer, OrgMemberSerializer,
-    OrgMemberAdminSerializer, OrgMemberUserSerializer
+    OrgMemberAdminSerializer, OrgMemberUserSerializer,
+    CurrentOrgSerializer
 )
 from users.models import User, UserGroup
 from assets.models import Asset, Domain, AdminUser, SystemUser, Label
@@ -133,8 +135,13 @@ class OrgMemberUserRelationBulkViewSet(JMSBulkRelationModelViewSet):
 
 
 class CurrentOrgDetailApi(RetrieveAPIView):
-    serializer_class = OrgSerializer
+    serializer_class = CurrentOrgSerializer
     permission_classes = (IsValidUser,)
 
     def get_object(self):
         return current_org
+
+    def get_permissions(self):
+        if not current_org.can_use_by(self.request.user):
+            raise PermissionDenied('Not has current org permission')
+        return super().get_permissions()

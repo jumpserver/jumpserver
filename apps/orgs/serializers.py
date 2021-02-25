@@ -128,3 +128,9 @@ class OrgRetrieveSerializer(OrgReadSerializer):
 
     class Meta(OrgReadSerializer.Meta):
         pass
+
+
+class CurrentOrgSerializer(ModelSerializer):
+    class Meta:
+        model = Organization
+        fields = ['id', 'name', 'is_default', 'is_root', 'comment']

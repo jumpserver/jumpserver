@@ -33,8 +33,8 @@ class OrgResourceStatisticsCache(OrgRelatedCache):
         return self.org
 
     def compute_users_amount(self):
-        if self.org.is_root() or self.org.is_default():
-            users_amount = User.objects.all().distinct().count()
+        if self.org.is_root():
+            users_amount = User.objects.all().count()
         else:
             users_amount = OrganizationMember.objects.values(
                 'user_id'

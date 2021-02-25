@@ -40,7 +40,7 @@ def compute_parent_key(key):
 class NodeQuerySet(models.QuerySet):
     def delete(self):
         raise NotImplementedError
-
+#
 
 class FamilyMixin:
     __parents = None
@@ -491,6 +491,14 @@ class SomeNodesMixin:
             key = cls.get_next_org_root_node_key()
             root = cls.objects.create(key=key, value=ori_org.name)
             return root
+
+    @classmethod
+    def org_root_nodes(cls):
+        nodes = cls.objects.filter(parent_key='') \
+            .filter(key__regex=r'^[0-9]+$') \
+            .exclude(key__startswith='-') \
+            .order_by('key')
+        return nodes
 
     @classmethod
     def org_root(cls):

@@ -116,13 +116,15 @@ class Organization(models.Model):
         return False
 
     def can_audit_by(self, user):
-        if user.is_super_auditor:
+        if user.is_superuser or user.is_super_auditor:
             return True
         if self.auditors.filter(id=user.id).exists():
             return True
         return False
 
-    def can_user_by(self, user):
+    def can_use_by(self, user):
+        if user.is_superuser or user.is_super_auditor:
+            return True
         if self.users.filter(id=user.id).exists():
             return True
         return False
@@ -188,10 +190,10 @@ class Organization(models.Model):
         return cls(id=cls.ROOT_ID, name=cls.ROOT_NAME)
 
     def is_root(self):
-        return self.id is self.ROOT_ID
+        return self.id == self.ROOT_ID
 
     def is_default(self):
-        return self.id is self.DEFAULT_ID
+        return str(self.id) == self.DEFAULT_ID
 
     def change_to(self):
         from .utils import set_current_org

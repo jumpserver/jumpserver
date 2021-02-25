@@ -296,7 +296,7 @@ class RoleMixin:
 
     @lazyproperty
     def can_user_current_org(self):
-        return current_org.can_user_by(self)
+        return current_org.can_use_by(self)
 
     @lazyproperty
     def can_admin_or_audit_current_org(self):
