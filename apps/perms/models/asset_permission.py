@@ -193,24 +193,10 @@ class PermNode(Node):
     node_from = ''
     granted_assets_amount = 0
 
-    # 提供可以设置 资产数量的字段
-    _assets_amount = None
-
     annotate_granted_node_rel_fields = {
         'granted_assets_amount': F('granted_node_rels__node_assets_amount'),
         'node_from': F('granted_node_rels__node_from')
     }
-
-    @property
-    def assets_amount(self):
-        _assets_amount = getattr(self, '_assets_amount')
-        if isinstance(_assets_amount, int):
-            return _assets_amount
-        return super().assets_amount
-
-    @assets_amount.setter
-    def assets_amount(self, value):
-        self._assets_amount = value
 
     def use_granted_assets_amount(self):
         self.assets_amount = self.granted_assets_amount

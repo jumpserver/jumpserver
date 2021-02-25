@@ -337,9 +337,9 @@ class NodeAllAssetsMappingMixin:
 
         t1 = time.time()
         with tmp_to_org(org_id):
-            nodes_id_key = Node.objects.filter(org_id=org_id) \
-                .annotate(char_id=output_as_string('id')) \
-                .values_list('char_id', 'key')
+            nodes_id_key = Node.objects.annotate(
+                char_id=output_as_string('id')
+            ).values_list('char_id', 'key')
 
             # * 直接取出全部. filter(node__org_id=org_id)(大规模下会更慢)
             nodes_assets_id = Asset.nodes.through.objects.all() \
