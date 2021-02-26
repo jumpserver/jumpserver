@@ -16,6 +16,7 @@ from common.mixins import CommonApiMixin
 from common.utils import get_logger
 from orgs.utils import current_org
 from orgs.models import ROLE as ORG_ROLE, OrganizationMember
+from users.utils import send_reset_mfa_mail
 from .. import serializers
 from ..serializers import UserSerializer, UserRetrieveSerializer, MiniUserSerializer, InviteSerializer
 from .mixins import UserQuerysetMixin
@@ -201,4 +202,5 @@ class UserResetOTPApi(UserQuerysetMixin, generics.RetrieveAPIView):
         if user.mfa_enabled:
             user.reset_mfa()
             user.save()
+            send_reset_mfa_mail(user)
         return Response({"msg": "success"})

@@ -6,11 +6,22 @@ from rest_framework.serializers import ValidationError
 from rest_framework.compat import coreapi, coreschema
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
+from django_filters import rest_framework as drf_filters
 import logging
 
 from common import const
 
 __all__ = ["DatetimeRangeFilter", "IDSpmFilter", 'IDInFilter', "CustomFilter"]
+
+
+class BaseFilterSet(drf_filters.FilterSet):
+    def do_nothing(self, queryset, name, value):
+        return queryset
+
+    def get_query_param(self, k, default=None):
+        if k in self.form.data:
+            return self.form.cleaned_data[k]
+        return default
 
 
 class DatetimeRangeFilter(filters.BaseFilterBackend):

@@ -284,6 +284,7 @@ class Config(dict):
         'CONNECTION_TOKEN_ENABLED': False,
         'ONLY_ALLOW_EXIST_USER_AUTH': False,
         'ONLY_ALLOW_AUTH_FROM_SOURCE': True,
+        'DISK_CHECK_ENABLED': True,
     }
 
     def compatible_auth_openid_of_key(self):
