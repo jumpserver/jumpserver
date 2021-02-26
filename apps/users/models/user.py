@@ -18,7 +18,7 @@ from django.shortcuts import reverse
 
 from orgs.utils import current_org
 from orgs.models import OrganizationMember, Organization
-from common.utils import date_expired_default, get_logger, lazyproperty
+from common.utils import date_expired_default, get_logger, lazyproperty, random_string
 from common import fields
 from common.const import choices
 from common.db.models import ChoiceSet
@@ -387,7 +387,7 @@ class TokenMixin:
         cache_key = '%s_%s' % (self.id, remote_addr)
         token = cache.get(cache_key)
         if not token:
-            token = uuid.uuid4().hex
+            token = random_string(36)
         cache.set(token, self.id, expiration)
         cache.set('%s_%s' % (self.id, remote_addr), token, expiration)
         date_expired = timezone.now() + timezone.timedelta(seconds=expiration)

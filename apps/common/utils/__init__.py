@@ -7,3 +7,4 @@ from .encode import *
 from .http import *
 from .ipip import *
 from .crypto import *
+from .random import *
