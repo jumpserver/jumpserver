@@ -382,22 +382,6 @@ def get_current_org_members(exclude=()):
     return current_org.get_members(exclude=exclude)
 
 
-def get_source_choices():
-    from .models import User
-    choices = [
-        (User.Source.local.value, User.Source.local.label),
-    ]
-    if settings.AUTH_LDAP:
-        choices.append((User.Source.ldap.value, User.Source.ldap.label))
-    if settings.AUTH_OPENID:
-        choices.append((User.Source.openid.value, User.Source.openid.label))
-    if settings.AUTH_RADIUS:
-        choices.append((User.Source.radius.value, User.Source.radius.label))
-    if settings.AUTH_CAS:
-        choices.append((User.Source.cas.value, User.Source.cas.label))
-    return choices
-
-
 def is_auth_time_valid(session, key):
     return True if session.get(key, 0) > time.time() else False
 

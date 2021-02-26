@@ -45,9 +45,10 @@ class UserLoginView(mixins.AuthMixin, FormView):
 
     def get(self, request, *args, **kwargs):
         if request.user.is_staff:
-            return redirect(redirect_user_first_login_or_index(
-                request, self.redirect_field_name)
+            first_login_url = redirect_user_first_login_or_index(
+                request, self.redirect_field_name
             )
+            return redirect(first_login_url)
         request.session.set_test_cookie()
         return super().get(request, *args, **kwargs)
 

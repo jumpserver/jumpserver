@@ -2,7 +2,7 @@
 #
 import traceback
 
-from django.contrib.auth import get_user_model, authenticate
+from django.contrib.auth import get_user_model
 from radiusauth.backends import RADIUSBackend, RADIUSRealmBackend
 from django.conf import settings
 

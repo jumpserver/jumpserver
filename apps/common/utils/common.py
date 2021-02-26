@@ -272,5 +272,12 @@ class Time:
             last = timestamp
 
 
+def bulk_get(d, *keys, default=None):
+    values = []
+    for key in keys:
+        values.append(d.get(key, default))
+    return values
+
+
 def isinstance_method(attr):
     return isinstance(attr, type(Time().time))

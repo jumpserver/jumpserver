@@ -24,7 +24,7 @@ def on_user_auth_login_success(sender, user, request, **kwargs):
 
 
 @receiver(openid_user_login_success)
-def on_oidc_user_login_success(sender, request, user, **kwargs):
+def on_oidc_user_login_success(sender, request, user, create=False, **kwargs):
     request.session[BACKEND_SESSION_KEY] = 'OIDCAuthCodeBackend'
     post_auth_success.send(sender, user=user, request=request)
 

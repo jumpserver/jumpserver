@@ -9,7 +9,7 @@ from django.contrib.auth import authenticate
 from django.shortcuts import reverse
 from django.contrib.auth import BACKEND_SESSION_KEY
 
-from common.utils import get_object_or_none, get_request_ip, get_logger
+from common.utils import get_object_or_none, get_request_ip, get_logger, bulk_get
 from users.models import User
 from users.utils import (
     is_block_login, clean_failed_count
@@ -24,6 +24,7 @@ logger = get_logger(__name__)
 
 class AuthMixin:
     request = None
+    partial_credential_error = None
 
     def get_user_from_session(self):
         if self.request.session.is_empty():
@@ -75,49 +76,75 @@ class AuthMixin:
                 return rsa_decrypt(raw_passwd, rsa_private_key)
             except Exception as e:
                 logger.error(e, exc_info=True)
-                logger.error(f'Decrypt password faild: password[{raw_passwd}] rsa_private_key[{rsa_private_key}]')
+                logger.error(f'Decrypt password failed: password[{raw_passwd}] '
+                             f'rsa_private_key[{rsa_private_key}]')
                 return None
         return raw_passwd
 
-    def check_user_auth(self, decrypt_passwd=False):
-        self.check_is_block()
+    def raise_credential_error(self, error):
+        raise self.partial_credential_error(error=errors.reason_password_decrypt_failed)
+
+    def get_auth_data(self, decrypt_passwd=False):
         request = self.request
         if hasattr(request, 'data'):
             data = request.data
         else:
             data = request.POST
-        username = data.get('username', '')
-        password = data.get('password', '')
-        challenge = data.get('challenge', '')
-        public_key = data.get('public_key', '')
-        ip = self.get_request_ip()
 
-        CredentialError = partial(errors.CredentialError, username=username, ip=ip, request=request)
+        items = ['username', 'password', 'challenge', 'public_key']
+        username, password, challenge, public_key = bulk_get(data, *items,  default='')
+        password = password + challenge.strip()
+        ip = self.get_request_ip()
+        self.partial_credential_error = partial(errors.CredentialError, username=username, ip=ip, request=request)
 
         if decrypt_passwd:
             password = self.decrypt_passwd(password)
             if not password:
-                raise CredentialError(error=errors.reason_password_decrypt_failed)
+                self.raise_credential_error(errors.reason_password_decrypt_failed)
+        return username, password, public_key, ip
 
-        user = authenticate(request,
-                            username=username,
-                            password=password + challenge.strip(),
-                            public_key=public_key)
+    def _check_only_allow_exists_user_auth(self, username):
+        # 仅允许预先存在的用户认证
+        if settings.ONLY_ALLOW_EXIST_USER_AUTH:
+            exist = User.objects.filter(username=username).exists()
+            if not exist:
+                logger.error(f"Only allow exist user auth, login failed: {username}")
+                self.raise_credential_error(errors.reason_user_not_exist)
 
+    def _check_auth_user_is_valid(self, username, password, public_key):
+        user = authenticate(self.request, username=username, password=password, public_key=public_key)
         if not user:
-            raise CredentialError(error=errors.reason_password_failed)
+            self.raise_credential_error(errors.reason_password_failed)
         elif user.is_expired:
-            raise CredentialError(error=errors.reason_user_inactive)
+            self.raise_credential_error(errors.reason_user_inactive)
         elif not user.is_active:
-            raise CredentialError(error=errors.reason_user_inactive)
+            self.raise_credential_error(errors.reason_user_inactive)
+        return user
 
+    def _check_auth_source_is_valid(self, user, auth_backend):
+        # 限制只能从认证来源登录
+        if settings.ONLY_ALLOW_AUTH_FROM_SOURCE:
+            auth_backends_allowed = user.SOURCE_BACKEND_MAPPING.get(user.source)
+            if auth_backend not in auth_backends_allowed:
+                self.raise_credential_error(error=errors.reason_backend_not_match)
+
+    def check_user_auth(self, decrypt_passwd=False):
+        self.check_is_block()
+        request = self.request
+        username, password, public_key, ip = self.get_auth_data(decrypt_passwd=decrypt_passwd)
+
+        self._check_only_allow_exists_user_auth(username)
+        user = self._check_auth_user_is_valid(username, password, public_key)
+        # 限制只能从认证来源登录
+
+        auth_backend = getattr(user, 'backend', 'django.contrib.auth.backends.ModelBackend')
+        self._check_auth_source_is_valid(user, auth_backend)
         self._check_password_require_reset_or_not(user)
         self._check_passwd_is_too_simple(user, password)
 
         clean_failed_count(username, ip)
         request.session['auth_password'] = 1
         request.session['user_id'] = str(user.id)
-        auth_backend = getattr(user, 'backend', 'django.contrib.auth.backends.ModelBackend')
         request.session['auth_backend'] = auth_backend
         return user
 

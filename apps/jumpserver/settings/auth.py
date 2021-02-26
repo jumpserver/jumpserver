@@ -2,6 +2,7 @@
 #
 import os
 import ldap
+from django.utils.translation import ugettext_lazy as _
 
 from ..const import CONFIG, PROJECT_DIR
 
@@ -94,7 +95,7 @@ CAS_IGNORE_REFERER = True
 CAS_LOGOUT_COMPLETELY = CONFIG.CAS_LOGOUT_COMPLETELY
 CAS_VERSION = CONFIG.CAS_VERSION
 CAS_ROOT_PROXIED_AS = CONFIG.CAS_ROOT_PROXIED_AS
-CAS_CHECK_NEXT = lambda: lambda _next_page: True
+CAS_CHECK_NEXT = lambda _next_page: True
 
 # SSO Auth
 AUTH_SSO = CONFIG.AUTH_SSO
@@ -105,17 +106,29 @@ TOKEN_EXPIRATION = CONFIG.TOKEN_EXPIRATION
 LOGIN_CONFIRM_ENABLE = CONFIG.LOGIN_CONFIRM_ENABLE
 OTP_IN_RADIUS = CONFIG.OTP_IN_RADIUS
 
-AUTHENTICATION_BACKENDS = [
-    'authentication.backends.pubkey.PublicKeyAuthBackend',
-    'django.contrib.auth.backends.ModelBackend',
-]
+
+AUTH_BACKEND_MODEL = 'django.contrib.auth.backends.ModelBackend'
+AUTH_BACKEND_PUBKEY = 'authentication.backends.pubkey.PublicKeyAuthBackend'
+AUTH_BACKEND_LDAP = 'authentication.backends.ldap.LDAPAuthorizationBackend'
+AUTH_BACKEND_OIDC_PASSWORD = 'jms_oidc_rp.backends.OIDCAuthPasswordBackend'
+AUTH_BACKEND_OIDC_CODE = 'jms_oidc_rp.backends.OIDCAuthCodeBackend'
+AUTH_BACKEND_RADIUS = 'authentication.backends.radius.RadiusBackend'
+AUTH_BACKEND_CAS = 'authentication.backends.cas.CASBackend'
+AUTH_BACKEND_SSO = 'authentication.backends.api.SSOAuthentication'
+
+
+AUTHENTICATION_BACKENDS = [AUTH_BACKEND_MODEL, AUTH_BACKEND_PUBKEY]
 
 if AUTH_CAS:
-    AUTHENTICATION_BACKENDS.insert(0, 'authentication.backends.cas.CASBackend')
+    AUTHENTICATION_BACKENDS.insert(0, AUTH_BACKEND_CAS)
 if AUTH_OPENID:
-    AUTHENTICATION_BACKENDS.insert(0, 'jms_oidc_rp.backends.OIDCAuthPasswordBackend')
-    AUTHENTICATION_BACKENDS.insert(0, 'jms_oidc_rp.backends.OIDCAuthCodeBackend')
+    AUTHENTICATION_BACKENDS.insert(0, AUTH_BACKEND_OIDC_PASSWORD)
+    AUTHENTICATION_BACKENDS.insert(0, AUTH_BACKEND_OIDC_CODE)
 if AUTH_RADIUS:
-    AUTHENTICATION_BACKENDS.insert(0, 'authentication.backends.radius.RadiusBackend')
+    AUTHENTICATION_BACKENDS.insert(0, AUTH_BACKEND_RADIUS)
 if AUTH_SSO:
-    AUTHENTICATION_BACKENDS.insert(0, 'authentication.backends.api.SSOAuthentication')
+    AUTHENTICATION_BACKENDS.insert(0, AUTH_BACKEND_SSO)
+
+
+ONLY_ALLOW_EXIST_USER_AUTH = CONFIG.ONLY_ALLOW_EXIST_USER_AUTH
+ONLY_ALLOW_AUTH_FROM_SOURCE = CONFIG.ONLY_ALLOW_AUTH_FROM_SOURCE
