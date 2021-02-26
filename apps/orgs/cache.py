@@ -32,3 +32,8 @@ class OrgRelatedCache(Cache):
             logger.info(f'CACHE: Send refresh task {self}.{fields}')
             refresh_org_cache_task.delay(self, *fields)
         on_commit(func)
+
+    def expire(self, *fields):
+        def func():
+            super(OrgRelatedCache, self).expire(*fields)
+        on_commit(func)

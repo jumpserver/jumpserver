@@ -11,6 +11,7 @@ from rest_framework.generics import (
 from orgs.utils import tmp_to_root_org
 from applications.models import Application
 from perms.utils.application.permission import (
+    has_application_system_permission,
     get_application_system_users_id
 )
 from perms.api.asset.user_permission.mixin import RoleAdminMixin, RoleUserMixin
@@ -71,8 +72,7 @@ class ValidateUserApplicationPermissionApi(APIView):
         application = get_object_or_404(Application, id=application_id)
         system_user = get_object_or_404(SystemUser, id=system_user_id)
 
-        system_users_id = get_application_system_users_id(user, application)
-        if system_user.id in system_users_id:
+        if has_application_system_permission(user, application, system_user):
             return Response({'msg': True}, status=200)
 
         return Response({'msg': False}, status=403)

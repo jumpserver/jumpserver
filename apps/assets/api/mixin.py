@@ -2,7 +2,7 @@ from typing import List
 
 from common.utils.common import timeit
 from assets.models import Node, Asset
-from assets.pagination import AssetLimitOffsetPagination
+from assets.pagination import NodeAssetTreePagination
 from common.utils import lazyproperty
 from assets.utils import get_node, is_query_node_all_assets
 
@@ -81,7 +81,7 @@ class SerializeToTreeNodeMixin:
 
 
 class FilterAssetByNodeMixin:
-    pagination_class = AssetLimitOffsetPagination
+    pagination_class = NodeAssetTreePagination
 
     @lazyproperty
     def is_query_node_all_assets(self):

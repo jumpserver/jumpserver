@@ -8,7 +8,6 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404, Http404
-from django.utils.decorators import method_decorator
 from django.db.models.signals import m2m_changed
 
 from common.const.http import POST
@@ -25,10 +24,10 @@ from ..models import Node
 from ..tasks import (
     update_node_assets_hardware_info_manual,
     test_node_assets_connectivity_manual,
+    check_node_assets_amount_task
 )
 from .. import serializers
 from .mixin import SerializeToTreeNodeMixin
-from assets.locks import NodeTreeUpdateLock
 
 
 logger = get_logger(__file__)
@@ -53,6 +52,11 @@ class NodeViewSet(OrgModelViewSet):
         child_key = Node.org_root().get_next_child_key()
         serializer.validated_data["key"] = child_key
         serializer.save()
+
+    @action(methods=[POST], detail=False, url_path='check_assets_amount_task')
+    def check_assets_amount_task(self, request):
+        task = check_node_assets_amount_task.delay(current_org.id)
+        return Response(data={'task': task.id})
 
     def perform_update(self, serializer):
         node = self.get_object()

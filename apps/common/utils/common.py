@@ -277,3 +277,7 @@ def bulk_get(d, *keys, default=None):
     for key in keys:
         values.append(d.get(key, default))
     return values
+
+
+def isinstance_method(attr):
+    return isinstance(attr, type(Time().time))
