@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'authentication.apps.AuthenticationConfig',  # authentication
     'applications.apps.ApplicationsConfig',
     'tickets.apps.TicketsConfig',
+    'acls.apps.AclsConfig',
     'jms_oidc_rp',
     'rest_framework',
     'rest_framework_swagger',
@@ -67,7 +68,6 @@ INSTALLED_APPS = [
     'django.forms',
 ]
 
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -85,7 +85,6 @@ MIDDLEWARE = [
     'authentication.backends.oidc.middleware.OIDCRefreshIDTokenMiddleware',
     'authentication.backends.cas.middleware.CASMiddleware',
 ]
-
 
 ROOT_URLCONF = 'jumpserver.urls'
 
@@ -155,7 +154,6 @@ if CONFIG.DB_ENGINE.lower() == 'mysql':
     if os.path.isfile(DB_CA_PATH):
         DB_OPTIONS['ssl'] = {'ca': DB_CA_PATH}
 
-
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
 #
@@ -224,7 +222,6 @@ EMAIL_FROM = CONFIG.EMAIL_FROM
 EMAIL_RECIPIENT = CONFIG.EMAIL_RECIPIENT
 EMAIL_USE_SSL = CONFIG.EMAIL_USE_SSL
 EMAIL_USE_TLS = CONFIG.EMAIL_USE_TLS
-
 
 # Custom User Auth model
 AUTH_USER_MODEL = 'users.User'

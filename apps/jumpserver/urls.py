@@ -22,7 +22,8 @@ api_v1 = [
     path('common/', include('common.urls.api_urls', namespace='api-common')),
     path('applications/', include('applications.urls.api_urls', namespace='api-applications')),
     path('tickets/', include('tickets.urls.api_urls', namespace='api-tickets')),
-    path('prometheus/metrics/', api.PrometheusMetricsApi.as_view())
+    path('prometheus/metrics/', api.PrometheusMetricsApi.as_view()),
+    path('acls/', include('acls.urls.api_urls', namespace='api-acls'))
 ]
 
 app_view_patterns = [
@@ -35,7 +36,6 @@ if settings.XPACK_ENABLED:
     api_v1.append(
         path('xpack/', include('xpack.urls.api_urls', namespace='api-xpack'))
     )
-
 
 apps = [
     'users', 'assets', 'perms', 'terminal', 'ops', 'audits', 'orgs', 'auth',
@@ -56,7 +56,7 @@ urlpatterns = [
 
 # 静态文件处理路由
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
-            + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+               + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # js i18n 路由文件
 urlpatterns += [
@@ -71,12 +71,10 @@ urlpatterns += [
     re_path('api/redoc/?', views.get_swagger_view().with_ui('redoc', cache_timeout=1), name='redoc'),
 ]
 
-
 # 兼容之前的
 old_app_pattern = '|'.join(apps)
 old_app_pattern = r'^{}'.format(old_app_pattern)
 urlpatterns += [re_path(old_app_pattern, views.redirect_old_apps_view)]
-
 
 handler404 = 'jumpserver.views.handler404'
 handler500 = 'jumpserver.views.handler500'
