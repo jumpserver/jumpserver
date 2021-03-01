@@ -7,6 +7,9 @@ import string
 import secrets
 
 
+string_punctuation = '!#$%&()*+,-.:;<=>?@[]^_{}~'
+
+
 def random_datetime(date_start, date_end):
     random_delta = (date_end - date_start) * random.random()
     return date_start + random_delta
@@ -22,7 +25,7 @@ def random_string(length, lower=True, upper=True, digit=True, special_char=False
         chars += string.digits
 
     while True:
-        password = ''.join(random.choice(chars) for i in range(length))
+        password = list(random.choice(chars) for i in range(length))
         if upper and not any(c.upper() for c in password):
             continue
         if lower and not any(c.lower() for c in password):
@@ -32,9 +35,11 @@ def random_string(length, lower=True, upper=True, digit=True, special_char=False
         break
 
     if special_char:
-        spc = random.choice(string.punctuation)
+        spc = random.choice(string_punctuation)
         i = random.choice(range(len(password)))
-        password = password[:i] + spc + password[i+1:]
+        password[i] = spc
+
+    password = ''.join(password)
     return password
 
 
