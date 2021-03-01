@@ -7,6 +7,8 @@ import logging
 import datetime
 import uuid
 from functools import wraps
+import string
+import random
 import time
 import ipaddress
 import psutil
@@ -189,14 +191,6 @@ def with_cache(func):
         cache[key] = res
         return res
     return wrapper
-
-
-def random_string(length):
-    import string
-    import random
-    charset = string.ascii_letters + string.digits
-    s = [random.choice(charset) for i in range(length)]
-    return ''.join(s)
 
 
 logger = get_logger(__name__)

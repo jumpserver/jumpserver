@@ -11,7 +11,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-from common.utils.common import timeit
+from common.utils import random_string
 from common.utils import (
     ssh_key_string_to_obj, ssh_key_gen, get_logger, lazyproperty
 )
@@ -205,8 +205,8 @@ class AuthMixin:
         self.save()
 
     @staticmethod
-    def gen_password():
-        return str(uuid.uuid4())
+    def gen_password(length=36):
+        return random_string(length, special_char=True)
 
     @staticmethod
     def gen_key(username):
