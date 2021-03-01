@@ -78,8 +78,11 @@ class Organization(models.Model):
             else:
                 org = cls.objects.get(name=id_or_name)
             org.set_to_cache()
-        except cls.DoesNotExist:
-            org = cls.default() if default else None
+        except cls.DoesNotExist as e:
+            if default:
+                return cls.default()
+            else:
+                raise e
         return org
 
     def get_org_members_by_role(self, role):

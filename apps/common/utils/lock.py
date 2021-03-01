@@ -7,7 +7,7 @@ from django.db import transaction
 
 from common.utils import get_logger
 from common.utils.inspect import copy_function_args
-from apps.jumpserver.const import CONFIG
+from jumpserver.const import CONFIG
 from common.local import thread_local
 
 logger = get_logger(__file__)
