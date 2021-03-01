@@ -84,16 +84,26 @@ def set_org_mapper(org_mapper):
 
 def get_org_mapper():
     org_mapper = _find('org_mapper')
-    if org_mapper is None:
-        org_mapper = construct_org_mapper()
-        set_org_mapper(org_mapper)
+    return org_mapper
+
+
+def update_org_mapper():
+    org_mapper = construct_org_mapper()
+    set_org_mapper(org_mapper)
     return org_mapper
 
 
 def get_org_by_id(org_id):
     org_id = str(org_id)
     org_mapper = get_org_mapper()
+    if not org_mapper:
+        org_mapper = update_org_mapper()
+
     org = org_mapper.get(org_id)
+    if not org:
+        # 解决celery缓存org_mapper问题
+        org_mapper = update_org_mapper()
+        org = org_mapper.get(org_id)
     return org
 
 
