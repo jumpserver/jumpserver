@@ -11,7 +11,10 @@ import logging
 
 from common import const
 
-__all__ = ["DatetimeRangeFilter", "IDSpmFilter", 'IDInFilter', "CustomFilter"]
+__all__ = [
+    "DatetimeRangeFilter", "IDSpmFilter", 'IDInFilter', "CustomFilter",
+    "BaseFilterSet"
+]
 
 
 class BaseFilterSet(drf_filters.FilterSet):

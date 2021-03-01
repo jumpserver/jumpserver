@@ -37,13 +37,6 @@ class OrgManager(models.Manager):
         queryset = super(OrgManager, self).get_queryset()
         return filter_org_queryset(queryset)
 
-    def all(self):
-        if not current_org:
-            msg = 'You can `objects.set_current_org(org).all()` then run it'
-            return self
-        else:
-            return super(OrgManager, self).all()
-
     def set_current_org(self, org):
         if isinstance(org, str):
             org = Organization.get_instance(org)
