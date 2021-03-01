@@ -41,6 +41,7 @@ class TerminalTypeChoices(TextChoices):
     koko = 'koko', 'KoKo'
     guacamole = 'guacamole', 'Guacamole'
     omnidb = 'omnidb', 'OmniDB'
+    xrdp = 'xrdp', 'xrdp'
 
     @classmethod
     def types(cls):
