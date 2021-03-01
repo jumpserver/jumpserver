@@ -6,20 +6,19 @@ from common.utils import get_logger
 from perms.models import AssetPermission
 from perms.hands import Asset, User, UserGroup, SystemUser
 from perms.models.base import BasePermissionQuerySet
+from perms.utils.asset.user_permission import get_user_all_asset_perm_ids
 
 logger = get_logger(__file__)
 
 
-def get_asset_system_users_id_with_actions(asset_perm_queryset: BasePermissionQuerySet, asset: Asset):
-    asset_perms_id = set(asset_perm_queryset.values_list('id', flat=True))
-
+def get_asset_system_users_id_with_actions(asset_perm_ids, asset: Asset):
     nodes = asset.get_nodes()
     node_keys = set()
     for node in nodes:
         ancestor_keys = node.get_ancestor_keys(with_self=True)
         node_keys.update(ancestor_keys)
 
-    queryset = AssetPermission.objects.filter(id__in=asset_perms_id)\
+    queryset = AssetPermission.objects.filter(id__in=asset_perm_ids)\
         .filter(Q(assets=asset) | Q(nodes__key__in=node_keys))
 
     asset_protocols = asset.protocols_as_dict.keys()
@@ -36,10 +35,8 @@ def get_asset_system_users_id_with_actions(asset_perm_queryset: BasePermissionQu
 
 
 def get_asset_system_users_id_with_actions_by_user(user: User, asset: Asset):
-    queryset = AssetPermission.objects.filter(
-        Q(users=user) | Q(user_groups__users=user)
-    ).valid()
-    return get_asset_system_users_id_with_actions(queryset, asset)
+    asset_perm_ids = get_user_all_asset_perm_ids(user)
+    return get_asset_system_users_id_with_actions(asset_perm_ids, asset)
 
 
 def has_asset_system_permission(user: User, asset: Asset, system_user: SystemUser):
@@ -51,5 +48,7 @@ def has_asset_system_permission(user: User, asset: Asset, system_user: SystemUse
 
 
 def get_asset_system_users_id_with_actions_by_group(group: UserGroup, asset: Asset):
-    queryset = AssetPermission.objects.filter(user_groups=group).valid()
-    return get_asset_system_users_id_with_actions(queryset, asset)
+    asset_perm_ids = AssetPermission.objects.filter(
+        user_groups=group
+    ).valid().values_list('id', flat=True).distinct()
+    return get_asset_system_users_id_with_actions(asset_perm_ids, asset)
