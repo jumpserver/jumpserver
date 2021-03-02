@@ -2,7 +2,7 @@
 #
 from collections import Iterable
 
-from django.db.models import Prefetch, F
+from django.db.models import Prefetch, F, NOT_PROVIDED
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.utils import html
 from rest_framework.settings import api_settings
@@ -228,7 +228,43 @@ class SizedModelFieldsMixin(BaseDynamicFieldsPlugin):
         return fields_to_drop
 
 
+class DefaultValueFieldsMixin:
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.set_fields_default_value()
+
+    def set_fields_default_value(self):
+        if not hasattr(self, 'Meta'):
+            return
+        if not hasattr(self.Meta, 'model'):
+            return
+        model = self.Meta.model
+        for name, serializer_field in self.fields.items():
+            if serializer_field.default != empty or serializer_field.required:
+                continue
+            model_field = getattr(model, name, None)
+            if model_field is None:
+                continue
+            if not hasattr(model_field, 'field') \
+                    or not hasattr(model_field.field, 'default') \
+                    or model_field.field.default == NOT_PROVIDED:
+                continue
+            if name == 'id':
+                continue
+            default = model_field.field.default
+
+            if callable(default):
+                default = default()
+            if default == '':
+                continue
+            # print(f"Set default value: {name}: {default}")
+            serializer_field.default = default
+
+
 class DynamicFieldsMixin:
+    """
+    可以控制显示不同的字段，mini 最少，small 不包含关系
+    """
     dynamic_fields_plugins = [QueryFieldsMixin, SizedModelFieldsMixin]
 
     def __init__(self, *args, **kwargs):
@@ -256,7 +292,7 @@ class EagerLoadQuerySetFields:
         return queryset
 
 
-class CommonSerializerMixin(DynamicFieldsMixin):
+class CommonSerializerMixin(DynamicFieldsMixin, DefaultValueFieldsMixin):
     pass
 
 
