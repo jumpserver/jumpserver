@@ -13,18 +13,20 @@ logger = get_logger(__file__)
 
 
 @shared_task
-def check_node_assets_amount_task(orgid=None):
-    if orgid is None:
-        orgs = [*Organization.objects.all(), Organization.default()]
+def check_node_assets_amount_task(org_id=None):
+    if org_id is None:
+        orgs = Organization.objects.all()
     else:
-        orgs = [Organization.get_instance(orgid)]
+        orgs = [Organization.get_instance(org_id)]
 
     for org in orgs:
         try:
             with tmp_to_org(org):
                 check_node_assets_amount()
         except AcquireFailed:
-            logger.error(_('The task of self-checking is already running and cannot be started repeatedly'))
+            error = _('The task of self-checking is already running '
+                      'and cannot be started repeatedly')
+            logger.error(error)
 
 
 @register_as_period_task(crontab='0 2 * * *')

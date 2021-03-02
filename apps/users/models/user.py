@@ -169,20 +169,21 @@ class RoleMixin:
     def org_roles(self):
         from orgs.models import ROLE as ORG_ROLE
 
-        if not current_org.is_real():
-            # 不是真实的组织，取 User 本身的角色
+        if current_org.is_root():
+            # root 组织, 取 User 本身的角色
             if self.is_superuser:
-                return [ORG_ROLE.ADMIN]
+                roles = [ORG_ROLE.ADMIN]
+            elif self.is_super_auditor:
+                roles = [ORG_ROLE.AUDITOR]
             else:
-                return [ORG_ROLE.USER]
-
-        # 是真实组织，取 OrganizationMember 中的角色
-        roles = [
-            org_member.role
-            for org_member in self.m2m_org_members.all()
-            if org_member.org_id == current_org.id
-        ]
-        roles.sort()
+                roles = [ORG_ROLE.USER]
+        else:
+            # 是真实组织, 取 OrganizationMember 中的角色
+            roles = [
+                org_member.role for org_member in self.m2m_org_members.all()
+                if org_member.org_id == current_org.id
+            ]
+            roles.sort()
         return roles
 
     @lazyproperty
@@ -202,7 +203,7 @@ class RoleMixin:
 
     def current_org_roles(self):
         from orgs.models import OrganizationMember, ROLE as ORG_ROLE
-        if not current_org.is_real():
+        if current_org.is_root():
             if self.is_superuser:
                 return [ORG_ROLE.ADMIN]
             else:
@@ -297,7 +298,7 @@ class RoleMixin:
 
     @lazyproperty
     def can_user_current_org(self):
-        return current_org.can_user_by(self)
+        return current_org.can_use_by(self)
 
     @lazyproperty
     def can_admin_or_audit_current_org(self):
@@ -325,7 +326,7 @@ class RoleMixin:
         return app, access_key
 
     def remove(self):
-        if not current_org.is_real():
+        if current_org.is_root():
             return
         org = Organization.get_instance(current_org.id)
         OrganizationMember.objects.remove_users(org, [self])
