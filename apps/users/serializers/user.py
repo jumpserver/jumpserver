@@ -24,15 +24,17 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         (1, CUSTOM_PASSWORD)
     )
     password_strategy = serializers.ChoiceField(
-        choices=PASSWORD_STRATEGY_CHOICES, required=False, initial=0,
-        label=_('Password strategy'), write_only=True
+        choices=PASSWORD_STRATEGY_CHOICES, required=False,
+        label=_('Password strategy'), write_only=True, default=0
     )
     mfa_level_display = serializers.ReadOnlyField(source='get_mfa_level_display', label=_('MFA level for display'))
     login_blocked = serializers.SerializerMethodField(label=_('Login blocked'))
     can_update = serializers.SerializerMethodField(label=_('Can update'))
     can_delete = serializers.SerializerMethodField(label=_('Can delete'))
-    org_roles = serializers.ListField(label=_('Organization role name'), allow_null=True, required=False,
-                                      child=serializers.ChoiceField(choices=ORG_ROLE.choices))
+    org_roles = serializers.ListField(
+        label=_('Organization role name'), allow_null=True, required=False,
+        child=serializers.ChoiceField(choices=ORG_ROLE.choices), default=["User"]
+    )
     key_prefix_block = "_LOGIN_BLOCK_{}"
 
     class Meta:
@@ -72,6 +74,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
             'total_role_display': {'label': _('Total role name')},
             'mfa_enabled': {'label': _('MFA enabled')},
             'mfa_force_enabled': {'label': _('MFA force enabled')},
+            'role': {'default': "User"},
         }
 
     def __init__(self, *args, **kwargs):
