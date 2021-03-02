@@ -110,12 +110,17 @@ class PermissionsMixin(UserPassesTestMixin):
         return True
 
 
-class UserCanUpdatePassword:
+class UserCanUseCurrentOrg(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return current_org.can_use_by(request.user)
+
+
+class UserCanUpdatePassword(permissions.BasePermission):
     def has_permission(self, request, view):
         return request.user.can_update_password()
 
 
-class UserCanUpdateSSHKey:
+class UserCanUpdateSSHKey(permissions.BasePermission):
     def has_permission(self, request, view):
         return request.user.can_update_ssh_key()
 
