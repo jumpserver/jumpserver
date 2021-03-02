@@ -198,9 +198,6 @@ class UserGrantedTreeRefreshController:
             builded_orgs_id = {org_id.decode() for org_id in ret[0]}
             ids = orgs_id - builded_orgs_id
             orgs = set()
-            if Organization.DEFAULT_ID in ids:
-                ids.remove(Organization.DEFAULT_ID)
-                orgs.add(Organization.default())
             orgs.update(Organization.objects.filter(id__in=ids))
             logger.info(f'Need rebuild orgs are {orgs}, builed orgs are {ret[0]}, all orgs are {orgs_id}')
             return orgs
@@ -293,7 +290,7 @@ class UserGrantedTreeRefreshController:
 
     @lazyproperty
     def orgs(self):
-        orgs = {*self.user.orgs.all().distinct(), Organization.default()}
+        orgs = {*self.user.orgs.all().distinct()}
         return orgs
 
     @timeit
@@ -302,11 +299,7 @@ class UserGrantedTreeRefreshController:
 
         with UserGrantedTreeRebuildLock(user_id=user.id):
             with tmp_to_root_org():
-                orgids = self.orgs_id.copy()
-                orgids.remove(Organization.default().id)
-                orgids.add('')  # 添加 default
-
-                UserAssetGrantedTreeNodeRelation.objects.filter(user=user).exclude(org_id__in=orgids).delete()
+                UserAssetGrantedTreeNodeRelation.objects.filter(user=user).exclude(org_id__in=self.orgs_id).delete()
                 exists = UserAssetGrantedTreeNodeRelation.objects.filter(user=user).exists()
 
             if force or not exists:
