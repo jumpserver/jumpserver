@@ -483,11 +483,8 @@ class SomeNodesMixin:
 
     @classmethod
     def create_org_root_node(cls):
-        # 如果使用current_org 在set_current_org时会死循环
         ori_org = get_current_org()
         with transaction.atomic():
-            if ori_org.is_default():
-                return cls.default_node()
             key = cls.get_next_org_root_node_key()
             root = cls.objects.create(key=key, value=ori_org.name)
             return root
@@ -502,14 +499,18 @@ class SomeNodesMixin:
 
     @classmethod
     def org_root(cls):
-        root = cls.objects.filter(parent_key='')\
-            .filter(key__regex=r'^[0-9]+$')\
-            .exclude(key__startswith='-')\
-            .order_by('key')
-        if root:
-            return root[0]
+        org_roots = cls.org_root_nodes()
+        if org_roots:
+            return org_roots[0]
+        ori_org = get_current_org()
+        # 如果使用current_org 在set_current_org时会死循环
+        if ori_org.is_root():
+            root = cls.default_node()
+        elif ori_org.is_default():
+            root = cls.default_node()
         else:
-            return cls.create_org_root_node()
+            root = cls.create_org_root_node()
+        return root
 
     @classmethod
     def initial_some_nodes(cls):

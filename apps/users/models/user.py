@@ -168,20 +168,21 @@ class RoleMixin:
     def org_roles(self):
         from orgs.models import ROLE as ORG_ROLE
 
-        if not current_org.is_root():
-            # 不是真实的组织，取 User 本身的角色
+        if current_org.is_root():
+            # root 组织, 取 User 本身的角色
             if self.is_superuser:
-                return [ORG_ROLE.ADMIN]
+                roles = [ORG_ROLE.ADMIN]
+            elif self.is_super_auditor:
+                roles = [ORG_ROLE.AUDITOR]
             else:
-                return [ORG_ROLE.USER]
-
-        # 是真实组织，取 OrganizationMember 中的角色
-        roles = [
-            org_member.role
-            for org_member in self.m2m_org_members.all()
-            if org_member.org_id == current_org.id
-        ]
-        roles.sort()
+                roles = [ORG_ROLE.USER]
+        else:
+            # 是真实组织, 取 OrganizationMember 中的角色
+            roles = [
+                org_member.role for org_member in self.m2m_org_members.all()
+                if org_member.org_id == current_org.id
+            ]
+            roles.sort()
         return roles
 
     @lazyproperty
