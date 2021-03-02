@@ -7,6 +7,8 @@ app_name = 'acls'
 router = BulkRouter()
 router.register(r'asset', api.AssetACLViewSet, 'asset')
 
-urlpatterns = []
+urlpatterns = [
+    path(r'asset/login-confirm/', api.ValidateAssetLoginConfirmApi.as_view(), name='validate-asset-login-confirm')
+]
 
 urlpatterns += router.urls

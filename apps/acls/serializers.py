@@ -28,3 +28,15 @@ class AssetACLPolicySerializer(OrgResourceModelSerializerMixin):
             'id', 'name', 'user', 'ip', 'port', 'system_user', 'is_active',
             'reviewers',
         ]
+
+
+class ValidateAssetACLSerializer(serializers.Serializer):
+    user_id = serializers.UUIDField()
+    asset_id = serializers.UUIDField()
+    system_user_id = serializers.UUIDField()
+    system_username = serializers.CharField()
+
+
+class ValidateCancelConfirmSerializer(serializers.Serializer):
+    user_id = serializers.UUIDField()
+    ticket_id = serializers.UUIDField()

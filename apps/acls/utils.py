@@ -5,12 +5,11 @@ from users.models import User
 from .models import AssetACLPolicy, PolicyTypeChoices, PolicyActionChoices
 
 
-def get_acl_policies_by_user_asset_sys(user: User, asset: Asset, sys_user: SystemUser) -> QuerySet:
+def get_acl_policies_by_user_asset_sys(user: User, asset: Asset, sys_user: SystemUser,
+                                       system_username: str) -> QuerySet:
     jms_user = user.username
     asset_ip = asset.ip
     protocol_port = asset.protocols_as_dict.get(sys_user.protocol, 22)
-    system_username = sys_user.username
-
     policies = AssetACLPolicy.objects.filter(
         is_active=True,
         policy_type=PolicyTypeChoices.asset.value,

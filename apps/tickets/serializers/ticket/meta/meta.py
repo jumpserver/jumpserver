@@ -1,5 +1,5 @@
 from tickets import const
-from .ticket_type import apply_asset, apply_application, login_confirm
+from .ticket_type import apply_asset, apply_application, login_confirm, asset_login_confirm
 
 __all__ = [
     'type_serializer_classes_mapping',
@@ -10,7 +10,6 @@ __all__ = [
 
 action_open = const.TicketActionChoices.open.value
 action_approve = const.TicketActionChoices.approve.value
-
 
 # defines `meta` field dynamic mapping serializers
 # ------------------------------------------------
@@ -30,5 +29,10 @@ type_serializer_classes_mapping = {
         'default': login_confirm.LoginConfirmSerializer,
         action_open: login_confirm.ApplySerializer,
         action_approve: login_confirm.LoginConfirmSerializer(read_only=True),
+    },
+    const.TicketTypeChoices.asset_login_confirm.value: {
+        'default': asset_login_confirm.AssetLoginConfirmSerializer,
+        action_open: asset_login_confirm.ApplySerializer,
+        action_approve: asset_login_confirm.AssetLoginConfirmSerializer(read_only=True),
     }
 }
