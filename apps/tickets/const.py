@@ -9,6 +9,7 @@ class TicketTypeChoices(TextChoices):
     login_confirm = 'login_confirm', _("Login confirm")
     apply_asset = 'apply_asset', _('Apply for asset')
     apply_application = 'apply_application', _('Apply for application')
+    asset_login_acl = 'asset_login_acl', _('Asset Login ACL')
 
 
 class TicketActionChoices(TextChoices):
