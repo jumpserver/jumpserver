@@ -19,7 +19,10 @@ def extract_object_name(exc, index=0):
     `No User matches the given query.`
     提取 `User`，`index=1`
     """
-    (msg, *_) = exc.args
+    if exc.args:
+        (msg, *_) = exc.args
+    else:
+        return gettext('Object')
     return gettext(msg.split(sep=' ', maxsplit=index + 1)[index])
 
 

@@ -155,7 +155,7 @@
                                         {% else %}
                                             <div class="text-center" style="display: inline-block;">
                                         {% endif %}
-                                            <a id="forgot_password" href="{% url 'authentication:forgot-password' %}">
+                                            <a id="forgot_password" href="{{ forgot_password_url }}">
                                                 <small>{% trans 'Forgot password' %}?</small>
                                             </a>
                                         </div>
