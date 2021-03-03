@@ -113,17 +113,6 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
             raise serializers.ValidationError(msg)
         return password
 
-    def validate_groups(self, groups):
-        """
-        审计员不能加入到组中
-        """
-        role = self.initial_data.get('role')
-        if self.instance:
-            role = role or self.instance.role
-        if role == User.ROLE.AUDITOR:
-            return []
-        return groups
-
     @staticmethod
     def change_password_to_raw(attrs):
         password = attrs.pop('password', None)
