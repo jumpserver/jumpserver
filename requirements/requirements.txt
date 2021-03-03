@@ -52,8 +52,8 @@ passlib==1.7.1
 Pillow==7.1.0
 pyasn1==0.4.8
 pycparser==2.19
-pycrypto==2.6.1
-pycryptodomex==3.9.9
+pycryptodome==3.10.1
+pycryptodomex==3.10.1
 pyotp==2.2.6
 PyNaCl==1.2.1
 python-dateutil==2.6.1
