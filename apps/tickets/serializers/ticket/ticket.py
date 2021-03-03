@@ -3,8 +3,8 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from common.drf.serializers import MethodSerializer
-from orgs.utils import get_org_by_id
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
+from orgs.models import Organization
 from users.models import User
 from tickets.models import Ticket
 from .meta import type_serializer_classes_mapping
@@ -104,7 +104,7 @@ class TicketApplySerializer(TicketSerializer):
 
     @staticmethod
     def validate_org_id(org_id):
-        org = get_org_by_id(org_id)
+        org = Organization.get_instance(org_id)
         if not org:
             error = _('The organization `{}` does not exist'.format(org_id))
             raise serializers.ValidationError(error)
@@ -113,7 +113,7 @@ class TicketApplySerializer(TicketSerializer):
     def validate_assignees(self, assignees):
         org_id = self.initial_data.get('org_id')
         self.validate_org_id(org_id)
-        org = get_org_by_id(org_id)
+        org = Organization.get_instance(org_id)
         admins = User.get_super_and_org_admins(org)
         valid_assignees = list(set(assignees) & set(admins))
         if not valid_assignees:

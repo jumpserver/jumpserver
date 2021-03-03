@@ -24,62 +24,52 @@ class Organization(models.Model):
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
-    members = models.ManyToManyField('users.User', related_name='orgs', through='orgs.OrganizationMember',
-                                     through_fields=('org', 'user'))
+    members = models.ManyToManyField('users.User', related_name='orgs', through='orgs.OrganizationMember', through_fields=('org', 'user'))
 
-    orgs = None
-    CACHE_PREFIX = 'JMS_ORG_{}'
     ROOT_ID = '00000000-0000-0000-0000-000000000000'
     ROOT_NAME = _('GLOBAL')
     DEFAULT_ID = '00000000-0000-0000-0000-000000000001'
     DEFAULT_NAME = 'DEFAULT'
-    _user_admin_orgs = None
+    orgs_mapping = None
 
     class Meta:
         verbose_name = _("Organization")
 
     def __str__(self):
-        return self.name
-
-    def set_to_cache(self):
-        if self.__class__.orgs is None:
-            self.__class__.orgs = {}
-        self.__class__.orgs[str(self.id)] = self
-
-    def expire_cache(self):
-        self.__class__.orgs.pop(str(self.id), None)
+        return str(self.name)
 
     @classmethod
-    def get_instance_from_cache(cls, oid):
-        if not cls.orgs or not isinstance(cls.orgs, dict):
-            return None
-        return cls.orgs.get(str(oid))
-
-    @classmethod
-    def get_instance(cls, id_or_name, default=False):
-        cached = cls.get_instance_from_cache(id_or_name)
-        if cached:
-            return cached
-
-        if id_or_name is None:
-            return cls.default() if default else None
-        elif id_or_name in [cls.DEFAULT_ID, cls.DEFAULT_NAME, '']:
-            return cls.default()
-        elif id_or_name in [cls.ROOT_ID, cls.ROOT_NAME]:
-            return cls.root()
-
-        try:
-            if is_uuid(id_or_name):
-                org = cls.objects.get(id=id_or_name)
-            else:
-                org = cls.objects.get(name=id_or_name)
-            org.set_to_cache()
-        except cls.DoesNotExist as e:
-            if default:
-                return cls.default()
-            else:
-                raise e
+    def get_instance(cls, id_or_name, default=None):
+        assert default is None or isinstance(default, cls), (
+            '`default` must be None or `Organization` instance'
+        )
+        org = cls.get_instance_from_memory(id_or_name)
+        org = org or default
         return org
+
+    @classmethod
+    def get_instance_from_memory(cls, id_or_name):
+        if not isinstance(cls.orgs_mapping, dict):
+            cls.orgs_mapping = cls.construct_orgs_mapping()
+        return cls.orgs_mapping.get(str(id_or_name))
+
+    @classmethod
+    def construct_orgs_mapping(cls):
+        orgs_mapping = {}
+        for org in cls.objects.all():
+            orgs_mapping[str(org.id)] = org
+            orgs_mapping[str(org.name)] = org
+        root_org = cls.root()
+        orgs_mapping.update({
+            root_org.id: root_org,
+            'GLOBAL': root_org,
+            '全局组织': root_org
+        })
+        return orgs_mapping
+
+    @classmethod
+    def expire_orgs_mapping(cls):
+        cls.orgs_mapping = None
 
     def get_org_members_by_role(self, role):
         from users.models import User
@@ -184,7 +174,7 @@ class Organization(models.Model):
 
     @classmethod
     def default(cls):
-        defaults = dict(name=cls.DEFAULT_NAME, id=cls.DEFAULT_ID)
+        defaults = dict(id=cls.DEFAULT_ID, name=cls.DEFAULT_NAME)
         obj, created = cls.objects.get_or_create(defaults=defaults, id=cls.DEFAULT_ID)
         return obj
 
@@ -411,7 +401,7 @@ class OrganizationMember(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     org = models.ForeignKey(Organization, related_name='m2m_org_members', on_delete=models.CASCADE, verbose_name=_('Organization'))
     user = models.ForeignKey('users.User', related_name='m2m_org_members', on_delete=models.CASCADE, verbose_name=_('User'))
-    role = models.CharField(db_index=True, max_length=16, choices=ROLE.choices, default=ROLE.USER, verbose_name=_("Role"))
+    role = models.CharField(max_length=16, choices=ROLE.choices, default=ROLE.USER, verbose_name=_("Role"))
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
     created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
