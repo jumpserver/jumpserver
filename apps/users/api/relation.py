@@ -28,12 +28,3 @@ class UserUserGroupRelationViewSet(JMSBulkRelationModelViewSet):
             return False
         else:
             return True
-
-    def perform_create(self, serializer):
-        validated_data = []
-        for item in serializer.validated_data:
-            if item['user'].role == User.ROLE.AUDITOR:
-                continue
-            validated_data.append(item)
-        serializer._validated_data = validated_data
-        return super().perform_create(serializer)

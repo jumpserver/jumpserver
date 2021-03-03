@@ -53,7 +53,3 @@ class UserGroupSerializer(BulkOrgResourceModelSerializer):
             Prefetch('users', queryset=User.objects.only('id'))
         ).annotate(users_amount=Count('users'))
         return queryset
-
-    def validate_users(self, users):
-        users = [user for user in users if user.role != User.ROLE.AUDITOR]
-        return users
