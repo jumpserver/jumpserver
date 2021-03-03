@@ -29,8 +29,12 @@ class AllGrantedAssetPagination(GrantedAssetPaginationBase):
     def get_count_from_nodes(self, queryset):
         if settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
             return None
-        assets_amount = sum(UserAssetGrantedTreeNodeRelation.objects.filter(
+        values = UserAssetGrantedTreeNodeRelation.objects.filter(
             user=self._user, node_parent_key=''
-        ).values_list('node_assets_amount', flat=True))
+        ).values_list('node_assets_amount', flat=True)
+        if not values:
+            return None
+
+        assets_amount = sum(values)
         logger.debug(f'Hit all assets amount {assets_amount} -> {self._request.get_full_path()}')
         return assets_amount

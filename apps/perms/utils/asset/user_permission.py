@@ -1,5 +1,6 @@
 from collections import defaultdict
 from typing import List, Tuple
+import time
 
 from django.core.cache import cache
 from django.conf import settings
@@ -185,11 +186,16 @@ class UserGrantedTreeRefreshController:
         return {org_id.decode() for org_id in org_ids}
 
     def set_all_orgs_as_builed(self):
-        orgs_id = [str(org_id) for org_id in self.orgs_id]
-        self.client.sadd(self.key, *orgs_id)
+        self.client.sadd(self.key, *self.orgs_id)
+
+    def have_need_refresh_orgs(self):
+        builded_org_ids = self.client.smembers(self.key)
+        builded_org_ids = {org_id.decode() for org_id in builded_org_ids}
+        have = self.orgs_id - builded_org_ids
+        return have
 
     def get_need_refresh_orgs_and_fill_up(self):
-        orgs_id = set(str(org_id) for org_id in self.orgs_id)
+        orgs_id = self.orgs_id
 
         with self.client.pipeline() as p:
             p.smembers(self.key)
@@ -197,8 +203,7 @@ class UserGrantedTreeRefreshController:
             ret = p.execute()
             builded_orgs_id = {org_id.decode() for org_id in ret[0]}
             ids = orgs_id - builded_orgs_id
-            orgs = set()
-            orgs.update(Organization.objects.filter(id__in=ids))
+            orgs = {*Organization.objects.filter(id__in=ids)}
             logger.info(f'Need rebuild orgs are {orgs}, builed orgs are {ret[0]}, all orgs are {orgs_id}')
             return orgs
 
@@ -285,7 +290,7 @@ class UserGrantedTreeRefreshController:
 
     @lazyproperty
     def orgs_id(self):
-        ret = {org.id for org in self.orgs}
+        ret = {str(org.id) for org in self.orgs}
         return ret
 
     @lazyproperty
@@ -297,21 +302,24 @@ class UserGrantedTreeRefreshController:
     def refresh_if_need(self, force=False):
         user = self.user
 
-        with UserGrantedTreeRebuildLock(user_id=user.id):
-            with tmp_to_root_org():
-                UserAssetGrantedTreeNodeRelation.objects.filter(user=user).exclude(org_id__in=self.orgs_id).delete()
-                exists = UserAssetGrantedTreeNodeRelation.objects.filter(user=user).exists()
+        with tmp_to_root_org():
+            UserAssetGrantedTreeNodeRelation.objects.filter(user=user).exclude(org_id__in=self.orgs_id).delete()
 
-            if force or not exists:
-                orgs = self.orgs
-                self.set_all_orgs_as_builed()
-            else:
-                orgs = self.get_need_refresh_orgs_and_fill_up()
+        if force or self.have_need_refresh_orgs():
+            with UserGrantedTreeRebuildLock(user_id=user.id):
+                if force:
+                    orgs = self.orgs
+                    self.set_all_orgs_as_builed()
+                else:
+                    orgs = self.get_need_refresh_orgs_and_fill_up()
 
-            for org in orgs:
-                with tmp_to_org(org):
-                    utils = UserGrantedTreeBuildUtils(user)
-                    utils.rebuild_user_granted_tree()
+                for org in orgs:
+                    with tmp_to_org(org):
+                        t_start = time.time()
+                        logger.info(f'Rebuild user tree: user={self.user} org={current_org}')
+                        utils = UserGrantedTreeBuildUtils(user)
+                        utils.rebuild_user_granted_tree()
+                        logger.info(f'Rebuild user tree ok: cost={time.time() - t_start} user={self.user} org={current_org}')
 
 
 class UserGrantedUtilsBase:
@@ -353,15 +361,11 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
         asset_ids = list(asset_ids)
         return asset_ids
 
-    @timeit
     @ensure_in_real_or_default_org
     def rebuild_user_granted_tree(self):
         """
         注意：调用该方法一定要被 `UserGrantedTreeRebuildLock` 锁住
         """
-
-        logger.info(f'Rebuild user tree: user={self.user} org={current_org}')
-
         user = self.user
 
         # 先删除旧的授权树🌲
