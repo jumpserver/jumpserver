@@ -30,7 +30,7 @@ def get_org_from_request(request):
         oid = Organization.DEFAULT_ID
     elif oid.lower() == "root":
         oid = Organization.ROOT_ID
-    org = Organization.get_instance(oid, True)
+    org = Organization.get_instance(oid, default=Organization.default())
     return org
 
 
@@ -54,52 +54,13 @@ def _find(attr):
 
 def get_current_org():
     org_id = get_current_org_id()
-    if org_id is None:
-        return Organization.root()
-    org = Organization.get_instance(org_id)
+    org = Organization.get_instance(org_id, default=Organization.root())
     return org
 
 
 def get_current_org_id():
     org_id = _find('current_org_id')
     return org_id
-
-
-def construct_org_mapper():
-    orgs = Organization.objects.all()
-    org_mapper = {str(org.id): org for org in orgs}
-    org_mapper.update({
-        Organization.ROOT_ID: Organization.root(),
-    })
-    return org_mapper
-
-
-def set_org_mapper(org_mapper):
-    setattr(thread_local, 'org_mapper', org_mapper)
-
-
-def get_org_mapper():
-    org_mapper = _find('org_mapper')
-    if org_mapper is None:
-        org_mapper = construct_org_mapper()
-        set_org_mapper(org_mapper)
-    return org_mapper
-
-
-def get_org_by_id(org_id):
-    org_id = str(org_id)
-    org_mapper = get_org_mapper()
-    org = org_mapper.get(org_id)
-    return org
-
-
-def get_org_name_by_id(org_id):
-    org = get_org_by_id(org_id)
-    if org:
-        org_name = org.name
-    else:
-        org_name = 'Not Found'
-    return org_name
 
 
 def get_current_org_id_for_serializer():

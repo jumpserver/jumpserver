@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 #
+import threading
 from collections import defaultdict
 from functools import partial
 
-from django.db.models.signals import m2m_changed
-from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils.functional import LazyObject
+from django.db.models.signals import m2m_changed
+from django.db.models.signals import post_save, post_delete
 
 from orgs.utils import tmp_to_org
 from orgs.models import Organization, OrganizationMember
@@ -13,10 +15,51 @@ from orgs.hands import set_current_org, Node, get_current_org
 from perms.models import (AssetPermission, ApplicationPermission)
 from users.models import UserGroup, User
 from common.const.signals import PRE_REMOVE, POST_REMOVE
+from common.signals import django_ready
+from common.utils import get_logger
+from common.utils.connection import RedisPubSub
+
+
+logger = get_logger(__file__)
+
+
+def get_orgs_mapping_for_memory_pub_sub():
+    return RedisPubSub('fm.orgs_mapping')
+
+
+class OrgsMappingForMemoryPubSub(LazyObject):
+    def _setup(self):
+        self._wrapped = get_orgs_mapping_for_memory_pub_sub()
+
+
+orgs_mapping_for_memory_pub_sub = OrgsMappingForMemoryPubSub()
+
+
+def expire_orgs_mapping_for_memory():
+    orgs_mapping_for_memory_pub_sub.publish('expire_orgs_mapping')
+
+
+@receiver(django_ready)
+def subscribe_orgs_mapping_expire(sender, **kwargs):
+    logger.debug("Start subscribe for expire orgs mapping from memory")
+
+    def keep_subscribe():
+        subscribe = orgs_mapping_for_memory_pub_sub.subscribe()
+        for message in subscribe.listen():
+            if message['type'] != 'message':
+                continue
+            Organization.expire_orgs_mapping()
+            logger.debug('Expire orgs mapping')
+
+    t = threading.Thread(target=keep_subscribe)
+    t.daemon = True
+    t.start()
 
 
 @receiver(post_save, sender=Organization)
 def on_org_create_or_update(sender, instance=None, created=False, **kwargs):
+    # 必须放到最开始, 因为下面调用Node.save方法时会获取当前组织的org_id(即instance.org_id), 如果不过期会找不到
+    expire_orgs_mapping_for_memory()
     if instance:
         old_org = get_current_org()
         set_current_org(instance)
@@ -26,8 +69,10 @@ def on_org_create_or_update(sender, instance=None, created=False, **kwargs):
             node_root.save()
         set_current_org(old_org)
 
-    if instance and not created:
-        instance.expire_cache()
+
+@receiver(post_delete, sender=Organization)
+def on_org_delete(sender, **kwargs):
+    expire_orgs_mapping_for_memory()
 
 
 def _remove_users(model, users, org):
