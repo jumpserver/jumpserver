@@ -529,6 +529,10 @@ class SomeNodesMixin:
             if not node_key1:
                 logger.info("Not found node that `key` = 1")
                 return
+            if node_key1.org_id == '':
+                node_key1.org_id = str(Organization.default().id)
+                node_key1.save()
+                return
 
         with transaction.atomic():
             with tmp_to_org(node_key1.org):
