@@ -128,7 +128,7 @@ class Cache(metaclass=CacheBase):
             if data is not None:
                 logger.info(f'Expire cached fields: key={self.key} fields={fields}')
                 for f in fields:
-                    data.pop(f)
+                    data.pop(f, None)
                 self.set_data(data)
                 return data
 
