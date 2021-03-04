@@ -32,11 +32,19 @@ def _dump_args(args: dict):
 
 
 def get_push_unixlike_system_user_tasks(system_user, username=None):
+    comment = system_user.name
+
     if username is None:
         username = system_user.username
+
+    if system_user.username_same_with_user:
+        from users.models import User
+        user = User.objects.filter(username=username).only('name', 'username').first()
+        if user:
+            comment = f'{system_user.name}[{str(user)}]'
+
     password = system_user.password
     public_key = system_user.public_key
-    comment = system_user.name
 
     groups = _split_by_comma(system_user.system_groups)
 
