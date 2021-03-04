@@ -29,11 +29,6 @@ def migrate_default_org_id(apps, schema_editor):
         ('terminal', ['Session', 'Command']),
         ('tickets', ['Ticket']),
         ('users', ['UserGroup']),
-        ('xpack', [
-            'Account', 'SyncInstanceDetail', 'SyncInstanceTask', 'SyncInstanceTaskExecution',
-            'ChangeAuthPlan', 'ChangeAuthPlanExecution', 'ChangeAuthPlanTask',
-            'GatherUserTask', 'GatherUserTaskExecution',
-        ]),
     ]
     print("")
     for app, models_name in org_app_models:
