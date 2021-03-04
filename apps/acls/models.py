@@ -34,8 +34,8 @@ class BaseACLPolicy(OrgModelMixin):
 
 class AssetACLPolicy(BaseACLPolicy):
     ip = models.CharField(max_length=128, verbose_name=_('IP'), validators=[ip_network])
-    ip_start = models.GenericIPAddressField(verbose_name=_('IP Start'))
-    ip_end = models.GenericIPAddressField(verbose_name=_('IP End'))
+    ip_start = models.DecimalField(max_digits=39, decimal_places=0, verbose_name=_('IP Start'))
+    ip_end = models.DecimalField(max_digits=39, decimal_places=0, verbose_name=_('IP End'))
     port = models.IntegerField(default=22, verbose_name=_('Port'))
     # * 代表所有系统用户
     system_user = models.CharField(max_length=128, verbose_name=_('System User'))
@@ -43,9 +43,10 @@ class AssetACLPolicy(BaseACLPolicy):
     reviewers = models.ManyToManyField('users.User', verbose_name=_("Reviewers"), related_name='%(class)ss')
 
     def save(self, *args, **kwargs):
+        # 自动计算 ip 值的取值范围
         ip_net = ip_network(self.ip)
-        self.ip_start = str(ip_net[0])
-        self.ip_end = str(ip_net[-1])
+        self.ip_start = int(ip_net[0])
+        self.ip_end = int(ip_net[-1])
         super(AssetACLPolicy, self).save(args, kwargs)
 
     def __str__(self):
