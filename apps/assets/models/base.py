@@ -11,10 +11,12 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
+from common.db.models import ChoiceSet
 from common.utils import random_string
 from common.utils import (
     ssh_key_string_to_obj, ssh_key_gen, get_logger, lazyproperty
 )
+from common.utils.encode import ssh_pubkey_gen
 from common.validators import alphanumeric
 from common import fields
 from orgs.mixins.models import OrgModelMixin
@@ -105,6 +107,19 @@ class AuthMixin:
     public_key = ''
     username = ''
     _prefer = 'system_user'
+
+    @property
+    def ssh_key_fingerprint(self):
+        if self.public_key:
+            public_key = self.public_key
+        elif self.private_key:
+            public_key = ssh_pubkey_gen(self.private_key, self.password)
+        else:
+            return ''
+
+        public_key_obj = sshpubkeys.SSHKey(public_key)
+        fingerprint = public_key_obj.hash_md5()
+        return fingerprint
 
     @property
     def private_key_obj(self):

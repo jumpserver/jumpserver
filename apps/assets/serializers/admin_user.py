@@ -3,8 +3,6 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from common.drf.serializers import AdaptedBulkListSerializer
-
 from ..models import Node, AdminUser
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
@@ -17,7 +15,6 @@ class AdminUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     """
 
     class Meta:
-        list_serializer_class = AdaptedBulkListSerializer
         model = AdminUser
         fields = [
             'id', 'name', 'username', 'password', 'private_key', 'public_key',
@@ -31,6 +28,11 @@ class AdminUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'public_key': {"write_only": True},
             'assets_amount': {'label': _('Asset')},
         }
+
+
+class AdminUserDetailSerializer(AdminUserSerializer):
+    class Meta(AdminUserSerializer.Meta):
+        fields = AdminUserSerializer.Meta.fields + ['ssh_key_fingerprint']
 
 
 class AdminUserAuthSerializer(AuthSerializer):
