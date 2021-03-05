@@ -66,6 +66,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('orgs', '0009_auto_20201023_1628'),
+        ('perms', '0018_auto_20210208_1515'),
     ]
 
     operations = [
