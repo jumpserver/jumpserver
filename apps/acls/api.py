@@ -14,7 +14,9 @@ from .models import AssetACLPolicy
 from .utils import get_acl_policies_by_user_asset_sys
 from .serializers import (AssetACLPolicySerializer,
                           ValidateAssetACLSerializer,
-                          ValidateCancelConfirmSerializer)
+                          ValidateCancelConfirmSerializer,
+                          ValidateTicketSerializer,
+                          TicketStatusSerializer)
 
 
 class AssetACLViewSet(OrgModelViewSet):
@@ -46,6 +48,7 @@ class ValidateAssetLoginConfirmApi(APIView):
             'title': ticket_title,
             'type': const.TicketTypeChoices.asset_login_confirm.value,
             'meta': ticket_meta,
+            'org_id': asset.org_id
         }
         ticket = Ticket.objects.create(**data)
         ticket.assignees.set(reviewers)
@@ -88,3 +91,18 @@ class ValidateAssetLoginConfirmApi(APIView):
             'apply_login_datetime': login_datetime,
         }
         return ticket_meta
+
+
+class TicketStatusApi(APIView):
+    permission_classes = (IsOrgAdminOrAppUser,)
+
+    def get(self, request, *args, **kwargs):
+        serializer = ValidateTicketSerializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+        ticket = self.get_ticket(serializer.validated_data)
+        data = TicketStatusSerializer(instance=ticket).data
+        return Response(data, status=200)
+
+    def get_ticket(self, validated_data) -> Ticket:
+        ticket_id = validated_data.get("ticket_id")
+        return get_object_or_404(Ticket, id=ticket_id)

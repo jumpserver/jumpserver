@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from .models import AssetACLPolicy
+from tickets.models import Ticket
 
 
 def is_cidr_ip(value):
@@ -40,3 +41,17 @@ class ValidateAssetACLSerializer(serializers.Serializer):
 class ValidateCancelConfirmSerializer(serializers.Serializer):
     user_id = serializers.UUIDField()
     ticket_id = serializers.UUIDField()
+
+
+class ValidateTicketSerializer(serializers.Serializer):
+    ticket_id = serializers.UUIDField()
+
+
+class TicketStatusSerializer(OrgResourceModelSerializerMixin):
+    class Meta:
+        model = Ticket
+        fields = [
+            'id', 'title', 'type',
+            'meta', 'action', 'status',
+            'org_id', 'org_name',
+        ]
