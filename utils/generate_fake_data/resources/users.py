@@ -21,11 +21,11 @@ class UserGroupGenerator(FakeDataGenerator):
 class UserGenerator(FakeDataGenerator):
     resource = 'user'
     roles: list
-    groups_id: list
+    group_ids: list
 
     def pre_generate(self):
         self.roles = list(dict(User.ROLE.choices).keys())
-        self.groups_id = list(UserGroup.objects.all().values_list('id', flat=True))
+        self.group_ids = list(UserGroup.objects.all().values_list('id', flat=True))
 
     def set_org(self, users):
         relations = []
@@ -39,7 +39,7 @@ class UserGenerator(FakeDataGenerator):
     def set_groups(self, users):
         relations = []
         for i in users:
-            groups_to_join = sample(self.groups_id, 3)
+            groups_to_join = sample(self.group_ids, 3)
             _relations = [User.groups.through(user_id=i.id, usergroup_id=gid) for gid in groups_to_join]
             relations.extend(_relations)
         User.groups.through.objects.bulk_create(relations, ignore_conflicts=True)

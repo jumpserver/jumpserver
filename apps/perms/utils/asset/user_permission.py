@@ -186,43 +186,43 @@ class UserGrantedTreeRefreshController:
         return {org_id.decode() for org_id in org_ids}
 
     def set_all_orgs_as_builed(self):
-        self.client.sadd(self.key, *self.orgs_id)
+        self.client.sadd(self.key, *self.org_ids)
 
     def have_need_refresh_orgs(self):
         builded_org_ids = self.client.smembers(self.key)
         builded_org_ids = {org_id.decode() for org_id in builded_org_ids}
-        have = self.orgs_id - builded_org_ids
+        have = self.org_ids - builded_org_ids
         return have
 
     def get_need_refresh_orgs_and_fill_up(self):
-        orgs_id = self.orgs_id
+        org_ids = self.org_ids
 
         with self.client.pipeline() as p:
             p.smembers(self.key)
-            p.sadd(self.key, *orgs_id)
+            p.sadd(self.key, *org_ids)
             ret = p.execute()
-            builded_orgs_id = {org_id.decode() for org_id in ret[0]}
-            ids = orgs_id - builded_orgs_id
+            builded_org_ids = {org_id.decode() for org_id in ret[0]}
+            ids = org_ids - builded_org_ids
             orgs = {*Organization.objects.filter(id__in=ids)}
-            logger.info(f'Need rebuild orgs are {orgs}, builed orgs are {ret[0]}, all orgs are {orgs_id}')
+            logger.info(f'Need rebuild orgs are {orgs}, builed orgs are {ret[0]}, all orgs are {org_ids}')
             return orgs
 
     @classmethod
     @on_transaction_commit
-    def remove_builed_orgs_from_users(cls, orgs_id, users_id):
+    def remove_builed_orgs_from_users(cls, org_ids, user_ids):
         client = cls.get_redis_client()
-        org_ids = [str(org_id) for org_id in orgs_id]
+        org_ids = [str(org_id) for org_id in org_ids]
 
         with client.pipeline() as p:
-            for user_id in users_id:
+            for user_id in user_ids:
                 key = cls.key_template.format(user_id=user_id)
                 p.srem(key, *org_ids)
             p.execute()
-        logger.info(f'Remove orgs from users builded tree: users:{users_id} orgs:{orgs_id}')
+        logger.info(f'Remove orgs from users builded tree: users:{user_ids} orgs:{org_ids}')
 
     @classmethod
-    def add_need_refresh_orgs_for_users(cls, orgs_id, users_id):
-        cls.remove_builed_orgs_from_users(orgs_id, users_id)
+    def add_need_refresh_orgs_for_users(cls, org_ids, user_ids):
+        cls.remove_builed_orgs_from_users(org_ids, user_ids)
 
     @classmethod
     @ensure_in_real_or_default_org
@@ -243,15 +243,15 @@ class UserGrantedTreeRefreshController:
         ancestor_id = PermNode.objects.filter(key__in=ancestor_node_keys).values_list('id', flat=True)
         node_ids.update(ancestor_id)
 
-        assets_related_perms_id = AssetPermission.nodes.through.objects.filter(
+        assets_related_perm_ids = AssetPermission.nodes.through.objects.filter(
             node_id__in=node_ids
         ).values_list('assetpermission_id', flat=True)
-        asset_perm_ids.update(assets_related_perms_id)
+        asset_perm_ids.update(assets_related_perm_ids)
 
-        nodes_related_perms_id = AssetPermission.assets.through.objects.filter(
+        nodes_related_perm_ids = AssetPermission.assets.through.objects.filter(
             asset_id__in=asset_ids
         ).values_list('assetpermission_id', flat=True)
-        asset_perm_ids.update(nodes_related_perms_id)
+        asset_perm_ids.update(nodes_related_perm_ids)
 
         cls.add_need_refresh_by_asset_perm_ids(asset_perm_ids)
 
@@ -289,7 +289,7 @@ class UserGrantedTreeRefreshController:
         )
 
     @lazyproperty
-    def orgs_id(self):
+    def org_ids(self):
         ret = {str(org.id) for org in self.orgs}
         return ret
 
@@ -303,7 +303,7 @@ class UserGrantedTreeRefreshController:
         user = self.user
 
         with tmp_to_root_org():
-            UserAssetGrantedTreeNodeRelation.objects.filter(user=user).exclude(org_id__in=self.orgs_id).delete()
+            UserAssetGrantedTreeNodeRelation.objects.filter(user=user).exclude(org_id__in=self.org_ids).delete()
 
         if force or self.have_need_refresh_orgs():
             with UserGrantedTreeRebuildLock(user_id=user.id):
@@ -411,10 +411,10 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
         # 查询授权资产关联的节点设置
         def process_direct_granted_assets():
             # 查询直接授权资产
-            nodes_id = {node_id_str for node_id_str, _ in self.direct_granted_asset_id_node_id_str_pairs}
+            node_ids = {node_id_str for node_id_str, _ in self.direct_granted_asset_id_node_id_str_pairs}
             # 查询授权资产关联的节点设置 2.80
             granted_asset_nodes = PermNode.objects.filter(
-                id__in=nodes_id
+                id__in=node_ids
             ).distinct().only(*node_only_fields)
             granted_asset_nodes = list(granted_asset_nodes)
 
@@ -466,11 +466,11 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
         UserAssetGrantedTreeNodeRelation.objects.bulk_create(to_create)
 
     @timeit
-    def _fill_direct_granted_node_assets_id_from_mem(self, nodes_key, mapper):
+    def _fill_direct_granted_node_asset_ids_from_mem(self, nodes_key, mapper):
         org_id = current_org.id
         for key in nodes_key:
-            assets_id = PermNode.get_all_assets_id_by_node_key(org_id, key)
-            mapper[key].update(assets_id)
+            asset_ids = PermNode.get_all_asset_ids_by_node_key(org_id, key)
+            mapper[key].update(asset_ids)
 
     @lazyproperty
     def direct_granted_asset_id_node_id_str_pairs(self):
@@ -495,7 +495,7 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
             node = nodes[0]
             if node.node_from == NodeFrom.granted and node.key.isdigit():
                 with tmp_to_org(node.org):
-                    node.granted_assets_amount = len(node.get_all_assets_id())
+                    node.granted_assets_amount = len(node.get_all_asset_ids())
                     return
 
         direct_granted_nodes_key = []
@@ -508,7 +508,7 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
         # 授权的节点和直接资产的映射
         nodekey_assetsid_mapper = defaultdict(set)
         # 直接授权的节点，资产从完整树过来
-        self._fill_direct_granted_node_assets_id_from_mem(
+        self._fill_direct_granted_node_asset_ids_from_mem(
             direct_granted_nodes_key, nodekey_assetsid_mapper
         )
 

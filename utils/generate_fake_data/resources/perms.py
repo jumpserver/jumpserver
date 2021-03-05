@@ -10,46 +10,46 @@ from perms.models import *
 
 class AssetPermissionGenerator(FakeDataGenerator):
     resource = 'asset_permission'
-    users_id: list
-    user_groups_id: list
-    assets_id: list
-    nodes_id: list
-    system_users_id: list
+    user_ids: list
+    user_group_ids: list
+    asset_ids: list
+    node_ids: list
+    system_user_ids: list
 
     def pre_generate(self):
-        self.nodes_id = list(Node.objects.all().values_list('id', flat=True))
-        self.assets_id = list(Asset.objects.all().values_list('id', flat=True))
-        self.system_users_id = list(SystemUser.objects.all().values_list('id', flat=True))
-        self.users_id = list(User.objects.all().values_list('id', flat=True))
-        self.user_groups_id = list(UserGroup.objects.all().values_list('id', flat=True))
+        self.node_ids = list(Node.objects.all().values_list('id', flat=True))
+        self.asset_ids = list(Asset.objects.all().values_list('id', flat=True))
+        self.system_user_ids = list(SystemUser.objects.all().values_list('id', flat=True))
+        self.user_ids = list(User.objects.all().values_list('id', flat=True))
+        self.user_group_ids = list(UserGroup.objects.all().values_list('id', flat=True))
 
     def set_users(self, perms):
         through = AssetPermission.users.through
-        choices = self.users_id
+        choices = self.user_ids
         relation_name = 'user_id'
         self.set_relations(perms, through, relation_name, choices)
 
     def set_user_groups(self, perms):
         through = AssetPermission.user_groups.through
-        choices = self.user_groups_id
+        choices = self.user_group_ids
         relation_name = 'usergroup_id'
         self.set_relations(perms, through, relation_name, choices)
 
     def set_assets(self, perms):
         through = AssetPermission.assets.through
-        choices = self.assets_id
+        choices = self.asset_ids
         relation_name = 'asset_id'
         self.set_relations(perms, through, relation_name, choices)
 
     def set_nodes(self, perms):
         through = AssetPermission.nodes.through
-        choices = self.nodes_id
+        choices = self.node_ids
         relation_name = 'node_id'
         self.set_relations(perms, through, relation_name, choices)
 
     def set_system_users(self, perms):
         through = AssetPermission.system_users.through
-        choices = self.system_users_id
+        choices = self.system_user_ids
         relation_name = 'systemuser_id'
         self.set_relations(perms, through, relation_name, choices)
 
@@ -59,8 +59,8 @@ class AssetPermissionGenerator(FakeDataGenerator):
         for perm in perms:
             if choice_count is None:
                 choice_count = choice(range(8))
-            resources_id = sample(choices, choice_count)
-            for rid in resources_id:
+            resource_ids = sample(choices, choice_count)
+            for rid in resource_ids:
                 data = {'assetpermission_id': perm.id}
                 data[relation_name] = rid
                 relations.append(through(**data))

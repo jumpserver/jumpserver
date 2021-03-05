@@ -233,18 +233,18 @@ def push_system_user_util(system_user, assets, task_name, username=None):
         print(_("Hosts count: {}").format(len(_assets)))
 
         id_asset_map = {_asset.id: _asset for _asset in _assets}
-        assets_id = id_asset_map.keys()
+        asset_ids = id_asset_map.keys()
         no_special_auth = []
         special_auth_set = set()
 
-        auth_books = AuthBook.objects.filter(username__in=usernames, asset_id__in=assets_id)
+        auth_books = AuthBook.objects.filter(username__in=usernames, asset_id__in=asset_ids)
 
         for auth_book in auth_books:
             special_auth_set.add((auth_book.username, auth_book.asset_id))
 
         for _username in usernames:
             no_special_assets = []
-            for asset_id in assets_id:
+            for asset_id in asset_ids:
                 if (_username, asset_id) not in special_auth_set:
                     no_special_assets.append(id_asset_map[asset_id])
             if no_special_assets:
@@ -289,12 +289,12 @@ def push_system_user_a_asset_manual(system_user, asset, username=None):
 
 @shared_task(queue="ansible")
 @tmp_to_root_org()
-def push_system_user_to_assets(system_user_id, assets_id, username=None):
+def push_system_user_to_assets(system_user_id, asset_ids, username=None):
     """
     推送系统用户到指定的若干资产上
     """
     system_user = SystemUser.objects.get(id=system_user_id)
-    assets = get_objects(Asset, assets_id)
+    assets = get_objects(Asset, asset_ids)
     task_name = _("Push system users to assets: {}").format(system_user.name)
 
     return push_system_user_util(system_user, assets, task_name, username=username)

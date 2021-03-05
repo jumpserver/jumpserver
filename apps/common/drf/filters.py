@@ -108,11 +108,11 @@ class IDSpmFilter(filters.BaseFilterBackend):
         spm = request.query_params.get('spm')
         if not spm:
             return queryset
-        cache_key = const.KEY_CACHE_RESOURCES_ID.format(spm)
-        resources_id = cache.get(cache_key)
-        if resources_id is None or not isinstance(resources_id, list):
+        cache_key = const.KEY_CACHE_RESOURCE_IDS.format(spm)
+        resource_ids = cache.get(cache_key)
+        if resource_ids is None or not isinstance(resource_ids, list):
             return queryset
-        queryset = queryset.filter(id__in=resources_id)
+        queryset = queryset.filter(id__in=resource_ids)
         return queryset
 
 

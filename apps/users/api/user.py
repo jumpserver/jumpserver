@@ -123,10 +123,10 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
 
     def perform_bulk_update(self, serializer):
         # TODO: 需要测试
-        users_ids = [
+        user_ids = [
             d.get("id") or d.get("pk") for d in serializer.validated_data
         ]
-        users = current_org.get_members().filter(id__in=users_ids)
+        users = current_org.get_members().filter(id__in=user_ids)
         for user in users:
             self.check_object_permissions(self.request, user)
         return super().perform_bulk_update(serializer)
