@@ -58,12 +58,19 @@ class PermissionBaseFilter(BaseFilterSet):
             return queryset
         if not user:
             return queryset.none()
-        if is_query_all:
+
+        if not is_query_all:
             queryset = queryset.filter(users=user)
             return queryset
         groups = list(user.groups.all().values_list('id', flat=True))
+
+        user_asset_perm_ids = AssetPermission.objects.filter(users=user).distinct().values_list('id', flat=True)
+        group_asset_perm_ids = AssetPermission.objects.filter(user_groups__in=groups).distinct().values_list('id', flat=True)
+
+        asset_perm_ids = {*user_asset_perm_ids, *group_asset_perm_ids}
+
         queryset = queryset.filter(
-            Q(users=user) | Q(user_groups__in=groups)
+            id__in=asset_perm_ids
         ).distinct()
         return queryset
 
