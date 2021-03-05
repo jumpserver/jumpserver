@@ -65,13 +65,9 @@ class AssetsGenerator(FakeDataGenerator):
         self.nodes_id = list(Node.objects.all().values_list('id', flat=True))
 
     def set_assets_nodes(self, assets):
-        assets_id = [asset.id for asset in assets]
-        objs = []
-        for asset_id in assets_id:
+        for asset in assets:
             nodes_id_add_to = random.sample(self.nodes_id, 3)
-            objs_add = [Asset.nodes.through(asset_id=asset_id, node_id=nid) for nid in nodes_id_add_to]
-            objs.extend(objs_add)
-        Asset.nodes.through.objects.bulk_create(objs, ignore_conflicts=True)
+            asset.nodes.add(*nodes_id_add_to)
 
     def do_generate(self, batch, batch_size):
         assets = []
