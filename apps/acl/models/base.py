@@ -18,5 +18,6 @@ class BaseACL(CommonModelMixin):
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
 
     class Meta:
+        ordering = ('priority', 'name')
         abstract = True
 
