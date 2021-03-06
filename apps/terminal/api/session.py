@@ -76,8 +76,7 @@ class SessionViewSet(OrgBulkModelViewSet):
         session = self.get_object()
         local_path, url = utils.get_session_replay_url(session)
         if local_path is None:
-            error = url
-            return HttpResponse(error)
+            return Response({"error": url}, status=404)
         file = self.prepare_offline_file(session, local_path)
 
         response = FileResponse(file)
@@ -167,7 +166,7 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
         if not local_path:
             local_path, url = download_session_replay(session)
             if not local_path:
-                return Response({"error": url})
+                return Response({"error": url}, status=404)
         data = self.get_replay_data(session, url)
         return Response(data)
 
