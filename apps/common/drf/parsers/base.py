@@ -112,11 +112,13 @@ class BaseFileParser(BaseParser):
         return data
 
     def parse(self, stream, media_type=None, parser_context=None):
-        parser_context = parser_context or {}
+        assert parser_context is not None, '`parser_context` should not be `None`'
+
+        view = parser_context['view']
+        request = view.request
 
         try:
-            view = parser_context['view']
-            meta = view.request.META
+            meta = request.META
             self.serializer_cls = view.get_serializer_class()
             self.serializer_fields = self.serializer_cls().fields
         except Exception as e:
@@ -130,6 +132,13 @@ class BaseFileParser(BaseParser):
             rows = self.generate_rows(stream_data)
             column_titles = self.get_column_titles(rows)
             field_names = self.convert_to_field_names(column_titles)
+
+            # 给 `common.mixins.api.RenderToJsonMixin` 提供，暂时只能耦合
+            column_title_field_pairs = list(zip(column_titles, field_names))
+            if not hasattr(request, 'jms_context'):
+                request.jms_context = {}
+            request.jms_context['column_title_field_pairs'] = column_title_field_pairs
+
             data = self.generate_data(field_names, rows)
             return data
         except Exception as e:
