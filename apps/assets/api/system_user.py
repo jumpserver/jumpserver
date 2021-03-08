@@ -87,13 +87,13 @@ class SystemUserTaskApi(generics.CreateAPIView):
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.SystemUserTaskSerializer
 
-    def do_push(self, system_user, assets_id=None):
-        if assets_id is None:
+    def do_push(self, system_user, asset_ids=None):
+        if asset_ids is None:
             task = push_system_user_to_assets_manual.delay(system_user)
         else:
             username = self.request.query_params.get('username')
             task = push_system_user_to_assets.delay(
-                system_user.id, assets_id, username=username
+                system_user.id, asset_ids, username=username
             )
         return task
 
@@ -114,9 +114,9 @@ class SystemUserTaskApi(generics.CreateAPIView):
         system_user = self.get_object()
         if action == 'push':
             assets = [asset] if asset else assets
-            assets_id = [asset.id for asset in assets]
-            assets_id = assets_id if assets_id else None
-            task = self.do_push(system_user, assets_id)
+            asset_ids = [asset.id for asset in assets]
+            asset_ids = asset_ids if asset_ids else None
+            task = self.do_push(system_user, asset_ids)
         else:
             task = self.do_test(system_user)
         data = getattr(serializer, '_data', {})

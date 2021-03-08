@@ -15,7 +15,7 @@ class FakeDataGenerator:
         seed()
 
     def switch_org(self, org_id):
-        o = Organization.get_instance(org_id, default=True)
+        o = Organization.get_instance(org_id, default=Organization.default())
         if o:
             o.change_to()
         print('Current org is: {}'.format(o))

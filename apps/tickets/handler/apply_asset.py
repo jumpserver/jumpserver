@@ -27,11 +27,11 @@ class Handler(BaseHandler):
         ]
         approve_actions = self.ticket.meta.get('approve_actions', Action.NONE)
         approve_actions_display = Action.value_to_choices_display(approve_actions)
-        approve_assets_id = self.ticket.meta.get('approve_assets', [])
-        approve_system_users_id = self.ticket.meta.get('approve_system_users', [])
+        approve_asset_ids = self.ticket.meta.get('approve_assets', [])
+        approve_system_user_ids = self.ticket.meta.get('approve_system_users', [])
         with tmp_to_org(self.ticket.org_id):
-            assets = Asset.objects.filter(id__in=approve_assets_id)
-            system_users = SystemUser.objects.filter(id__in=approve_system_users_id)
+            assets = Asset.objects.filter(id__in=approve_asset_ids)
+            system_users = SystemUser.objects.filter(id__in=approve_system_user_ids)
             approve_assets_display = [str(asset) for asset in assets]
             approve_system_users_display = [str(system_user) for system_user in system_users]
         meta_display_values = [
@@ -91,8 +91,8 @@ class Handler(BaseHandler):
                 return asset_permission
 
         approve_permission_name = self.ticket.meta.get('approve_permission_name', )
-        approve_assets_id = self.ticket.meta.get('approve_assets', [])
-        approve_system_users_id = self.ticket.meta.get('approve_system_users', [])
+        approve_asset_ids = self.ticket.meta.get('approve_assets', [])
+        approve_system_user_ids = self.ticket.meta.get('approve_system_users', [])
         approve_actions = self.ticket.meta.get('approve_actions', Action.NONE)
         approve_date_start = self.ticket.meta.get('approve_date_start')
         approve_date_expired = self.ticket.meta.get('approve_date_expired')
@@ -124,7 +124,7 @@ class Handler(BaseHandler):
         with tmp_to_org(self.ticket.org_id):
             asset_permission = AssetPermission.objects.create(**permission_data)
             asset_permission.users.add(self.ticket.applicant)
-            asset_permission.assets.set(approve_assets_id)
-            asset_permission.system_users.set(approve_system_users_id)
+            asset_permission.assets.set(approve_asset_ids)
+            asset_permission.system_users.set(approve_system_user_ids)
 
         return asset_permission

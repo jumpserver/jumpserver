@@ -91,14 +91,14 @@ def _remove_users(model, users, org):
             f'{m2m_field_name}__org_id': org.id
         })
 
-        object_id_users_id_map = defaultdict(set)
+        object_id_user_ids_map = defaultdict(set)
 
         m2m_field_attr_name = f'{m2m_field_name}_id'
         for relation in relations:
             object_id = getattr(relation, m2m_field_attr_name)
-            object_id_users_id_map[object_id].add(relation.user_id)
+            object_id_user_ids_map[object_id].add(relation.user_id)
 
-        objects = model.objects.filter(id__in=object_id_users_id_map.keys())
+        objects = model.objects.filter(id__in=object_id_user_ids_map.keys())
         send_m2m_change_signal = partial(
             m2m_changed.send,
             sender=m2m_model, reverse=reverse, model=User, using=model.objects.db
@@ -107,7 +107,7 @@ def _remove_users(model, users, org):
         for obj in objects:
             send_m2m_change_signal(
                 instance=obj,
-                pk_set=object_id_users_id_map[obj.id],
+                pk_set=object_id_user_ids_map[obj.id],
                 action=PRE_REMOVE
             )
 
@@ -116,7 +116,7 @@ def _remove_users(model, users, org):
         for obj in objects:
             send_m2m_change_signal(
                 instance=obj,
-                pk_set=object_id_users_id_map[obj.id],
+                pk_set=object_id_user_ids_map[obj.id],
                 action=POST_REMOVE
             )
 

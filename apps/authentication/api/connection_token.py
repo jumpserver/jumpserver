@@ -183,9 +183,9 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
     @staticmethod
     def _get_asset_secret_detail(value, user, system_user):
         from assets.models import Asset
-        from perms.utils.asset import get_asset_system_users_id_with_actions_by_user
+        from perms.utils.asset import get_asset_system_user_ids_with_actions_by_user
         asset = get_object_or_404(Asset, id=value.get('asset'))
-        systemuserid_actions_mapper = get_asset_system_users_id_with_actions_by_user(user, asset)
+        systemuserid_actions_mapper = get_asset_system_user_ids_with_actions_by_user(user, asset)
         actions = systemuserid_actions_mapper.get(system_user.id, [])
         gateway = None
         if asset and asset.domain and asset.domain.has_gateway():

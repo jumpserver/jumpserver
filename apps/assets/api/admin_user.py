@@ -33,6 +33,10 @@ class AdminUserViewSet(OrgBulkModelViewSet):
     search_fields = filterset_fields
     serializer_class = serializers.AdminUserSerializer
     permission_classes = (IsOrgAdmin,)
+    serializer_classes = {
+        'default': serializers.AdminUserSerializer,
+        'retrieve': serializers.AdminUserDetailSerializer,
+    }
 
     def get_queryset(self):
         queryset = super().get_queryset()

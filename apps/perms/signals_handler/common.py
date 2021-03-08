@@ -27,15 +27,15 @@ def on_user_groups_change(sender, instance, action, reverse, pk_set, **kwargs):
 
     if not reverse:
         # 一个用户添加了多个用户组
-        users_id = [instance.id]
+        user_ids = [instance.id]
         system_users = SystemUser.objects.filter(groups__id__in=pk_set).distinct()
     else:
         # 一个用户组添加了多个用户
-        users_id = pk_set
+        user_ids = pk_set
         system_users = SystemUser.objects.filter(groups__id=instance.pk).distinct()
 
     for system_user in system_users:
-        system_user.users.add(*users_id)
+        system_user.users.add(*user_ids)
 
 
 @receiver(m2m_changed, sender=AssetPermission.nodes.through)
@@ -139,17 +139,17 @@ def on_application_permission_system_users_changed(sender, instance: Application
     logger.debug("Application permission system_users change signal received")
     attrs = instance.applications.all().values_list('attrs', flat=True)
 
-    assets_id = [attr['asset'] for attr in attrs if attr.get('asset')]
-    if not assets_id:
+    asset_ids = [attr['asset'] for attr in attrs if attr.get('asset')]
+    if not asset_ids:
         return
 
     for system_user in system_users:
-        system_user.assets.add(*assets_id)
+        system_user.assets.add(*asset_ids)
         if system_user.username_same_with_user:
-            users_id = instance.users.all().values_list('id', flat=True)
-            groups_id = instance.user_groups.all().values_list('id', flat=True)
-            system_user.groups.add(*groups_id)
-            system_user.users.add(*users_id)
+            user_ids = instance.users.all().values_list('id', flat=True)
+            group_ids = instance.user_groups.all().values_list('id', flat=True)
+            system_user.groups.add(*group_ids)
+            system_user.users.add(*user_ids)
 
 
 @receiver(m2m_changed, sender=ApplicationPermission.users.through)
@@ -164,12 +164,12 @@ def on_application_permission_users_changed(sender, instance, action, reverse, p
         return
 
     logger.debug("Application permission users change signal received")
-    users_id = User.objects.filter(pk__in=pk_set).values_list('id', flat=True)
+    user_ids = User.objects.filter(pk__in=pk_set).values_list('id', flat=True)
     system_users = instance.system_users.all()
 
     for system_user in system_users:
         if system_user.username_same_with_user:
-            system_user.users.add(*users_id)
+            system_user.users.add(*user_ids)
 
 
 @receiver(m2m_changed, sender=ApplicationPermission.user_groups.through)
@@ -182,12 +182,12 @@ def on_application_permission_user_groups_changed(sender, instance, action, reve
         return
 
     logger.debug("Application permission user groups change signal received")
-    groups_id = UserGroup.objects.filter(pk__in=pk_set).values_list('id', flat=True)
+    group_ids = UserGroup.objects.filter(pk__in=pk_set).values_list('id', flat=True)
     system_users = instance.system_users.all()
 
     for system_user in system_users:
         if system_user.username_same_with_user:
-            system_user.groups.add(*groups_id)
+            system_user.groups.add(*group_ids)
 
 
 @receiver(m2m_changed, sender=ApplicationPermission.applications.through)
@@ -202,11 +202,11 @@ def on_application_permission_applications_changed(sender, instance, action, rev
         return
 
     attrs = Application.objects.filter(id__in=pk_set).values_list('attrs', flat=True)
-    assets_id = [attr['asset'] for attr in attrs if attr.get('asset')]
-    if not assets_id:
+    asset_ids = [attr['asset'] for attr in attrs if attr.get('asset')]
+    if not asset_ids:
         return
 
     system_users = instance.system_users.all()
 
     for system_user in system_users:
-        system_user.assets.add(*assets_id)
+        system_user.assets.add(*asset_ids)

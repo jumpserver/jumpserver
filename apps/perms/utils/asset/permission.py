@@ -5,13 +5,12 @@ from django.db.models import Q
 from common.utils import get_logger
 from perms.models import AssetPermission
 from perms.hands import Asset, User, UserGroup, SystemUser
-from perms.models.base import BasePermissionQuerySet
 from perms.utils.asset.user_permission import get_user_all_asset_perm_ids
 
 logger = get_logger(__file__)
 
 
-def get_asset_system_users_id_with_actions(asset_perm_ids, asset: Asset):
+def get_asset_system_user_ids_with_actions(asset_perm_ids, asset: Asset):
     nodes = asset.get_nodes()
     node_keys = set()
     for node in nodes:
@@ -34,21 +33,21 @@ def get_asset_system_users_id_with_actions(asset_perm_ids, asset: Asset):
     return system_users_actions
 
 
-def get_asset_system_users_id_with_actions_by_user(user: User, asset: Asset):
+def get_asset_system_user_ids_with_actions_by_user(user: User, asset: Asset):
     asset_perm_ids = get_user_all_asset_perm_ids(user)
-    return get_asset_system_users_id_with_actions(asset_perm_ids, asset)
+    return get_asset_system_user_ids_with_actions(asset_perm_ids, asset)
 
 
 def has_asset_system_permission(user: User, asset: Asset, system_user: SystemUser):
-    systemuser_actions_mapper = get_asset_system_users_id_with_actions_by_user(user, asset)
+    systemuser_actions_mapper = get_asset_system_user_ids_with_actions_by_user(user, asset)
     actions = systemuser_actions_mapper.get(system_user.id, [])
     if actions:
         return True
     return False
 
 
-def get_asset_system_users_id_with_actions_by_group(group: UserGroup, asset: Asset):
+def get_asset_system_user_ids_with_actions_by_group(group: UserGroup, asset: Asset):
     asset_perm_ids = AssetPermission.objects.filter(
         user_groups=group
     ).valid().values_list('id', flat=True).distinct()
-    return get_asset_system_users_id_with_actions(asset_perm_ids, asset)
+    return get_asset_system_user_ids_with_actions(asset_perm_ids, asset)

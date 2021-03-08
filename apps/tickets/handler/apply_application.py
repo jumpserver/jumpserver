@@ -26,11 +26,11 @@ class Handler(BaseHandler):
 
     def _construct_meta_display_of_approve(self):
         meta_display_fields = ['approve_applications_display', 'approve_system_users_display']
-        approve_applications_id = self.ticket.meta.get('approve_applications', [])
-        approve_system_users_id = self.ticket.meta.get('approve_system_users', [])
+        approve_application_ids = self.ticket.meta.get('approve_applications', [])
+        approve_system_user_ids = self.ticket.meta.get('approve_system_users', [])
         with tmp_to_org(self.ticket.org_id):
-            approve_applications = Application.objects.filter(id__in=approve_applications_id)
-            system_users = SystemUser.objects.filter(id__in=approve_system_users_id)
+            approve_applications = Application.objects.filter(id__in=approve_application_ids)
+            system_users = SystemUser.objects.filter(id__in=approve_system_user_ids)
             approve_applications_display = [str(application) for application in approve_applications]
             approve_system_users_display = [str(system_user) for system_user in system_users]
         meta_display_values = [approve_applications_display, approve_system_users_display]
@@ -89,8 +89,8 @@ class Handler(BaseHandler):
         apply_category = self.ticket.meta.get('apply_category')
         apply_type = self.ticket.meta.get('apply_type')
         approve_permission_name = self.ticket.meta.get('approve_permission_name', '')
-        approved_applications_id = self.ticket.meta.get('approve_applications', [])
-        approve_system_users_id = self.ticket.meta.get('approve_system_users', [])
+        approved_application_ids = self.ticket.meta.get('approve_applications', [])
+        approve_system_user_ids = self.ticket.meta.get('approve_system_users', [])
         approve_date_start = self.ticket.meta.get('approve_date_start')
         approve_date_expired = self.ticket.meta.get('approve_date_expired')
         permission_created_by = '{}:{}'.format(
@@ -121,7 +121,7 @@ class Handler(BaseHandler):
         with tmp_to_org(self.ticket.org_id):
             application_permission = ApplicationPermission.objects.create(**permissions_data)
             application_permission.users.add(self.ticket.applicant)
-            application_permission.applications.set(approved_applications_id)
-            application_permission.system_users.set(approve_system_users_id)
+            application_permission.applications.set(approved_application_ids)
+            application_permission.system_users.set(approve_system_user_ids)
 
         return application_permission
