@@ -20,7 +20,7 @@ from ..utils import lazyproperty
 
 __all__ = [
     'JSONResponseMixin', 'CommonApiMixin', 'AsyncApiMixin', 'RelationMixin',
-    'SerializerMixin2', 'QuerySetMixin', 'ExtraFilterFieldsMixin', 'ParseToJsonMixin',
+    'SerializerMixin2', 'QuerySetMixin', 'ExtraFilterFieldsMixin', 'RenderToJsonMixin',
 ]
 
 
@@ -35,10 +35,19 @@ class JSONResponseMixin(object):
 # ----------------------
 
 
-class ParseToJsonMixin:
+class RenderToJsonMixin:
     @action(methods=[POST], detail=False, url_path='render-to-json')
     def render_to_json(self, request: Request):
-        return Response(data=request.data)
+        data = {
+            'title': (),
+            'data': request.data,
+        }
+
+        jms_context = getattr(request, 'jms_context', {})
+        column_title_field_pairs = jms_context.get('column_title_field_pairs', ())
+        data['title'] = column_title_field_pairs
+
+        return Response(data=data)
 
 
 class SerializerMixin:
@@ -107,7 +116,7 @@ class PaginatedResponseMixin:
         return Response(serializer.data)
 
 
-class CommonApiMixin(SerializerMixin, ExtraFilterFieldsMixin, ParseToJsonMixin):
+class CommonApiMixin(SerializerMixin, ExtraFilterFieldsMixin, RenderToJsonMixin):
     pass
 
 
