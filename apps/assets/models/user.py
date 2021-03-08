@@ -198,10 +198,10 @@ class SystemUser(BaseUser):
     def get_all_assets(self):
         from assets.models import Node
         nodes_keys = self.nodes.all().values_list('key', flat=True)
-        assets_ids = set(self.assets.all().values_list('id', flat=True))
-        nodes_assets_ids = Node.get_nodes_all_assets_ids_by_keys(nodes_keys)
-        assets_ids.update(nodes_assets_ids)
-        assets = Asset.objects.filter(id__in=assets_ids)
+        asset_ids = set(self.assets.all().values_list('id', flat=True))
+        nodes_asset_ids = Node.get_nodes_all_asset_ids_by_keys(nodes_keys)
+        asset_ids.update(nodes_asset_ids)
+        assets = Asset.objects.filter(id__in=asset_ids)
         return assets
 
     @classmethod

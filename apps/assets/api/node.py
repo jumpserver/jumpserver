@@ -223,8 +223,8 @@ class NodeAddChildrenApi(generics.UpdateAPIView):
 
     def put(self, request, *args, **kwargs):
         instance = self.get_object()
-        nodes_id = request.data.get("nodes")
-        children = Node.objects.filter(id__in=nodes_id)
+        node_ids = request.data.get("nodes")
+        children = Node.objects.filter(id__in=node_ids)
         for node in children:
             node.parent = instance
         return Response("OK")

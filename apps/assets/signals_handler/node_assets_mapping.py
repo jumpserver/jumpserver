@@ -22,7 +22,7 @@ logger = get_logger(__file__)
 
 
 def get_node_assets_mapping_for_memory_pub_sub():
-    return RedisPubSub('fm.node_all_assets_id_memory_mapping')
+    return RedisPubSub('fm.node_all_asset_ids_memory_mapping')
 
 
 class NodeAssetsMappingForMemoryPubSub(LazyObject):
@@ -42,7 +42,7 @@ def expire_node_assets_mapping_for_memory(org_id):
         "Expire node assets id mapping from cache of org={}, pid={}"
         "".format(org_id, os.getpid())
     )
-    Node.expire_node_all_assets_id_mapping_from_cache(org_id)
+    Node.expire_node_all_asset_ids_mapping_from_cache(org_id)
 
 
 @receiver(post_save, sender=Node)
@@ -78,7 +78,7 @@ def subscribe_node_assets_mapping_expire(sender, **kwargs):
             if message["type"] != "message":
                 continue
             org_id = message['data'].decode()
-            Node.expire_node_all_assets_id_mapping_from_memory(org_id)
+            Node.expire_node_all_asset_ids_mapping_from_memory(org_id)
             logger.debug(
                 "Expire node assets id mapping from memory of org={}, pid={}"
                 "".format(str(org_id), os.getpid())

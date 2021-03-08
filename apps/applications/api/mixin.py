@@ -77,8 +77,8 @@ class SerializeApplicationToTreeNodeMixin:
 
     @staticmethod
     def filter_organizations(applications):
-        organizations_id = set(applications.values_list('org_id', flat=True))
-        organizations = [Organization.get_instance(org_id) for org_id in organizations_id]
+        organization_ids = set(applications.values_list('org_id', flat=True))
+        organizations = [Organization.get_instance(org_id) for org_id in organization_ids]
         return organizations
 
     def serialize_applications_with_org(self, applications):

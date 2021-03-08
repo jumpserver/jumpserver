@@ -8,11 +8,14 @@ from rest_framework import viewsets
 from rest_framework import generics
 from rest_framework.fields import DateTimeField
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework.decorators import action
 from django.template import loader
 
+from terminal.models import CommandStorage
+from terminal.filters import CommandFilter
 from orgs.utils import current_org
 from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor, IsAppUser
+from common.const.http import GET
 from common.utils import get_logger
 from terminal.utils import send_command_alert_mail
 from terminal.serializers import InsecureCommandAlertSerializer
@@ -89,7 +92,7 @@ class CommandQueryMixin:
         return date_from_st, date_to_st
 
 
-class CommandViewSet(CommandQueryMixin, viewsets.ModelViewSet):
+class CommandViewSet(viewsets.ModelViewSet):
     """接受app发送来的command log, 格式如下
     {
         "user": "admin",
@@ -103,7 +106,16 @@ class CommandViewSet(CommandQueryMixin, viewsets.ModelViewSet):
 
     """
     command_store = get_command_storage()
+    permission_classes = [IsOrgAdminOrAppUser | IsOrgAuditor]
     serializer_class = SessionCommandSerializer
+    filterset_class = CommandFilter
+    ordering_fields = ('timestamp', )
+
+    def get_queryset(self):
+        command_storage_id = self.request.query_params.get('command_storage_id')
+        storage = CommandStorage.objects.get(id=command_storage_id)
+        qs = storage.get_command_queryset()
+        return qs
 
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data, many=True)

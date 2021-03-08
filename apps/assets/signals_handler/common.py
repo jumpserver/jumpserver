@@ -82,13 +82,13 @@ def on_system_user_assets_change(instance, action, model, pk_set, **kwargs):
         return
     logger.debug("System user assets change signal recv: {}".format(instance))
     if model == Asset:
-        system_users_id = [instance.id]
-        assets_id = pk_set
+        system_user_ids = [instance.id]
+        asset_ids = pk_set
     else:
-        system_users_id = pk_set
-        assets_id = [instance.id]
-    for system_user_id in system_users_id:
-        push_system_user_to_assets.delay(system_user_id, assets_id)
+        system_user_ids = pk_set
+        asset_ids = [instance.id]
+    for system_user_id in system_user_ids:
+        push_system_user_to_assets.delay(system_user_id, asset_ids)
 
 
 @receiver(m2m_changed, sender=SystemUser.users.through)

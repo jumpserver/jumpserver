@@ -1,14 +1,22 @@
 from __future__ import unicode_literals
 
 import os
+from importlib import import_module
+
 import jms_storage
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from common.mixins import CommonModelMixin
+from common.utils import get_logger
 from common.fields.model import EncryptJsonDictTextField
+from terminal.backends import TYPE_ENGINE_MAPPING
 from .terminal import Terminal
+from .command import Command
 from .. import const
+
+
+logger = get_logger(__file__)
 
 
 class CommandStorage(CommonModelMixin):
@@ -49,6 +57,18 @@ class CommandStorage(CommonModelMixin):
 
     def is_use(self):
         return Terminal.objects.filter(command_storage=self.name).exists()
+
+    def get_command_queryset(self):
+        if self.type_server:
+            qs = Command.objects.all()
+        else:
+            if self.type not in TYPE_ENGINE_MAPPING:
+                logger.error(f'Command storage `{self.type}` not support')
+                return Command.objects.none()
+            engine_mod = import_module(TYPE_ENGINE_MAPPING[self.type])
+            qs = engine_mod.QuerySet(self.config)
+            qs.model = Command
+        return qs
 
 
 class ReplayStorage(CommonModelMixin):

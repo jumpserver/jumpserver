@@ -346,11 +346,11 @@ class RoleMixin:
     @classmethod
     def get_super_and_org_admins(cls, org=None):
         super_admins = cls.get_super_admins()
-        super_admins_id = list(super_admins.values_list('id', flat=True))
+        super_admin_ids = list(super_admins.values_list('id', flat=True))
         org_admins = cls.get_org_admins(org)
-        org_admins_id = list(org_admins.values_list('id', flat=True))
-        admins_id = set(org_admins_id + super_admins_id)
-        admins = User.objects.filter(id__in=admins_id)
+        org_admin_ids = list(org_admins.values_list('id', flat=True))
+        admin_ids = set(org_admin_ids + super_admin_ids)
+        admins = User.objects.filter(id__in=admin_ids)
         return admins
 
 
