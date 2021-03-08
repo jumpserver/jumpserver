@@ -57,16 +57,16 @@ class NodesGenerator(FakeDataGenerator):
 
 class AssetsGenerator(FakeDataGenerator):
     resource = 'asset'
-    admin_users_id: list
-    nodes_id: list
+    admin_user_ids: list
+    node_ids: list
 
     def pre_generate(self):
-        self.admin_users_id = list(AdminUser.objects.all().values_list('id', flat=True))
-        self.nodes_id = list(Node.objects.all().values_list('id', flat=True))
+        self.admin_user_ids = list(AdminUser.objects.all().values_list('id', flat=True))
+        self.node_ids = list(Node.objects.all().values_list('id', flat=True))
 
     def set_assets_nodes(self, assets):
         for asset in assets:
-            nodes_id_add_to = random.sample(self.nodes_id, 3)
+            nodes_id_add_to = random.sample(self.node_ids, 3)
             asset.nodes.add(*nodes_id_add_to)
 
     def do_generate(self, batch, batch_size):
@@ -79,7 +79,7 @@ class AssetsGenerator(FakeDataGenerator):
             data = dict(
                 ip=ip,
                 hostname=hostname,
-                admin_user_id=choice(self.admin_users_id),
+                admin_user_id=choice(self.admin_user_ids),
                 created_by='Fake',
                 org_id=self.org.id
             )

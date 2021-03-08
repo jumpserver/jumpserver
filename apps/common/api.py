@@ -13,7 +13,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from common.permissions import IsValidUser
 from .http import HttpResponseTemporaryRedirect
-from .const import KEY_CACHE_RESOURCES_ID
+from .const import KEY_CACHE_RESOURCE_IDS
 from .utils import get_logger
 from .mixins import CommonApiMixin
 
@@ -93,7 +93,7 @@ class ResourcesIDCacheApi(APIView):
         spm = str(uuid.uuid4())
         resources = request.data.get('resources')
         if resources is not None:
-            cache_key = KEY_CACHE_RESOURCES_ID.format(spm)
+            cache_key = KEY_CACHE_RESOURCE_IDS.format(spm)
             cache.set(cache_key, resources, 300)
         return Response({'spm': spm})
 

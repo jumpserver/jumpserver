@@ -12,7 +12,7 @@ from orgs.utils import tmp_to_root_org
 from applications.models import Application
 from perms.utils.application.permission import (
     has_application_system_permission,
-    get_application_system_users_id
+    get_application_system_user_ids
 )
 from perms.api.asset.user_permission.mixin import RoleAdminMixin, RoleUserMixin
 from common.permissions import IsOrgAdminOrAppUser
@@ -32,14 +32,14 @@ class GrantedApplicationSystemUsersMixin(ListAPIView):
     only_fields = serializers.ApplicationSystemUserSerializer.Meta.only_fields
     user: None
 
-    def get_application_system_users_id(self, application):
-        return get_application_system_users_id(self.user, application)
+    def get_application_system_user_ids(self, application):
+        return get_application_system_user_ids(self.user, application)
 
     def get_queryset(self):
         application_id = self.kwargs.get('application_id')
         application = get_object_or_404(Application, id=application_id)
-        system_users_id = self.get_application_system_users_id(application)
-        system_users = SystemUser.objects.filter(id__in=system_users_id)\
+        system_user_ids = self.get_application_system_user_ids(application)
+        system_users = SystemUser.objects.filter(id__in=system_user_ids)\
             .only(*self.only_fields).order_by('priority')
         return system_users
 

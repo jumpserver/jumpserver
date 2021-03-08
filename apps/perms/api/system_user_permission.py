@@ -16,9 +16,9 @@ class SystemUserPermission(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
 
-        asset_perms_id = get_user_all_asset_perm_ids(user)
+        asset_perm_ids = get_user_all_asset_perm_ids(user)
         queryset = SystemUser.objects.filter(
-            granted_by_permissions__id__in=asset_perms_id
+            granted_by_permissions__id__in=asset_perm_ids
         ).distinct()
 
         return queryset

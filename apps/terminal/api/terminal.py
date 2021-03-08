@@ -86,13 +86,13 @@ class StatusViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=201)
 
     def handle_sessions(self):
-        sessions_id = self.request.data.get('sessions', [])
+        session_ids = self.request.data.get('sessions', [])
         # guacamole 上报的 session 是字符串
         # "[53cd3e47-210f-41d8-b3c6-a184f3, 53cd3e47-210f-41d8-b3c6-a184f4]"
-        if isinstance(sessions_id, str):
-            sessions_id = sessions_id[1:-1].split(',')
-            sessions_id = [sid.strip() for sid in sessions_id if sid.strip()]
-        Session.set_sessions_active(sessions_id)
+        if isinstance(session_ids, str):
+            session_ids = session_ids[1:-1].split(',')
+            session_ids = [sid.strip() for sid in session_ids if sid.strip()]
+        Session.set_sessions_active(session_ids)
 
     def get_queryset(self):
         terminal_id = self.kwargs.get("terminal", None)

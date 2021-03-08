@@ -137,8 +137,8 @@ class Session(OrgModelMixin):
         return name, None
 
     @classmethod
-    def set_sessions_active(cls, sessions_id):
-        data = {cls.ACTIVE_CACHE_KEY_PREFIX.format(i): i for i in sessions_id}
+    def set_sessions_active(cls, session_ids):
+        data = {cls.ACTIVE_CACHE_KEY_PREFIX.format(i): i for i in session_ids}
         cache.set_many(data, timeout=5*60)
 
     @classmethod

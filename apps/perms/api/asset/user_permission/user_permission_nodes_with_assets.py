@@ -52,8 +52,8 @@ class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
         data.extend(self.serialize_assets(favorite_assets))
 
     @timeit
-    def add_node_filtered_by_system_user(self, data: list, user, asset_perms_id):
-        utils = UserGrantedTreeBuildUtils(user, asset_perms_id)
+    def add_node_filtered_by_system_user(self, data: list, user, asset_perm_ids):
+        utils = UserGrantedTreeBuildUtils(user, asset_perm_ids)
         nodes = utils.get_whole_tree_nodes()
         data.extend(self.serialize_nodes(nodes, with_asset_amount=True))
 
@@ -77,23 +77,23 @@ class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
 
         user = request.user
         data = []
-        asset_perms_id = get_user_all_asset_perm_ids(user)
+        asset_perm_ids = get_user_all_asset_perm_ids(user)
 
         system_user_id = request.query_params.get('system_user')
         if system_user_id:
-            asset_perms_id = list(AssetPermission.objects.valid().filter(
-                id__in=asset_perms_id, system_users__id=system_user_id, actions__gt=0
+            asset_perm_ids = list(AssetPermission.objects.valid().filter(
+                id__in=asset_perm_ids, system_users__id=system_user_id, actions__gt=0
             ).values_list('id', flat=True).distinct())
 
-        nodes_query_utils = UserGrantedNodesQueryUtils(user, asset_perms_id)
-        assets_query_utils = UserGrantedAssetsQueryUtils(user, asset_perms_id)
+        nodes_query_utils = UserGrantedNodesQueryUtils(user, asset_perm_ids)
+        assets_query_utils = UserGrantedAssetsQueryUtils(user, asset_perm_ids)
 
         self.add_ungrouped_resource(data, nodes_query_utils, assets_query_utils)
         self.add_favorite_resource(data, nodes_query_utils, assets_query_utils)
 
         if system_user_id:
             # 有系统用户筛选的需要重新计算树结构
-            self.add_node_filtered_by_system_user(data, user, asset_perms_id)
+            self.add_node_filtered_by_system_user(data, user, asset_perm_ids)
         else:
             all_nodes = nodes_query_utils.get_whole_tree_nodes(with_special=False)
             data.extend(self.serialize_nodes(all_nodes, with_asset_amount=True))

@@ -99,14 +99,14 @@ class BasePermission(OrgModelMixin):
 
     def get_all_users(self):
         from users.models import User
-        users_id = self.users.all().values_list('id', flat=True)
-        groups_id = self.user_groups.all().values_list('id', flat=True)
+        user_ids = self.users.all().values_list('id', flat=True)
+        group_ids = self.user_groups.all().values_list('id', flat=True)
 
-        users_id = list(users_id)
-        groups_id = list(groups_id)
+        user_ids = list(user_ids)
+        group_ids = list(group_ids)
 
-        qs1 = User.objects.filter(id__in=users_id).distinct()
-        qs2 = User.objects.filter(groups__id__in=groups_id).distinct()
+        qs1 = User.objects.filter(id__in=user_ids).distinct()
+        qs2 = User.objects.filter(groups__id__in=group_ids).distinct()
 
         qs = UnionQuerySet(qs1, qs2)
         return qs

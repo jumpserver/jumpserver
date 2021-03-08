@@ -16,5 +16,5 @@ class FavoriteAsset(CommonModelMixin):
         unique_together = ('user', 'asset')
 
     @classmethod
-    def get_user_favorite_assets_id(cls, user):
+    def get_user_favorite_asset_ids(cls, user):
         return cls.objects.filter(user=user).values_list('asset', flat=True)

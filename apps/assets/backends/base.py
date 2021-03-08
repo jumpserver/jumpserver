@@ -40,7 +40,7 @@ class BaseBackend:
         return values
 
     @staticmethod
-    def make_assets_as_id(assets):
+    def make_assets_as_ids(assets):
         if not assets:
             return []
         if isinstance(assets[0], Asset):
