@@ -1,17 +1,15 @@
 # -*- coding: utf-8 -*-
 #
-from django.shortcuts import get_object_or_404
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework_bulk import BulkModelViewSet
 from common.mixins import CommonApiMixin, RelationMixin
 from orgs.utils import current_org
 
 from ..utils import set_to_root_org
-from ..models import Organization
 
 __all__ = [
-    'RootOrgViewMixin', 'OrgMembershipModelViewSetMixin', 'OrgModelViewSet',
-    'OrgBulkModelViewSet', 'OrgQuerySetMixin', 'OrgGenericViewSet', 'OrgRelationMixin'
+    'RootOrgViewMixin', 'OrgModelViewSet', 'OrgBulkModelViewSet', 'OrgQuerySetMixin',
+    'OrgGenericViewSet', 'OrgRelationMixin'
 ]
 
 
@@ -60,27 +58,6 @@ class OrgBulkModelViewSet(CommonApiMixin, OrgQuerySetMixin, BulkModelViewSet):
         if self.request.query_params.get('spm', ''):
             return True
         return False
-
-
-class OrgMembershipModelViewSetMixin:
-    org = None
-    membership_class = None
-    lookup_field = 'user'
-    lookup_url_kwarg = 'user_id'
-    http_method_names = ['get', 'post', 'delete', 'head', 'options']
-
-    def dispatch(self, request, *args, **kwargs):
-        self.org = get_object_or_404(Organization, pk=kwargs.get('org_id'))
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context['org'] = self.org
-        return context
-
-    def get_queryset(self):
-        queryset = self.membership_class.objects.filter(organization=self.org)
-        return queryset
 
 
 class OrgRelationMixin(RelationMixin):
