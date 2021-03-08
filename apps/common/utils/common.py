@@ -142,7 +142,7 @@ def is_uuid(seq):
     elif isinstance(seq, str) and UUID_PATTERN.match(seq):
         return True
     elif isinstance(seq, (list, tuple)):
-        all([is_uuid(x) for x in seq])
+        return all([is_uuid(x) for x in seq])
     return False
 
 

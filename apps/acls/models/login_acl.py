@@ -17,3 +17,7 @@ class LoginACL(BaseACL):
     )
     # 关联
     users = models.ManyToManyField('users.User', related_name='login_acl', verbose_name=_('User'))
+
+    class Meta:
+        ordering = ('priority', 'name')
+

@@ -15,9 +15,8 @@ class BaseACL(CommonModelMixin):
         help_text=_("1-100, the higher will be match first"),
         validators=[MinValueValidator(1), MaxValueValidator(100)]
     )
+    is_active = models.BooleanField(default=True, verbose_name=_("Active"))
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
 
     class Meta:
-        ordering = ('priority', 'name')
         abstract = True
-
