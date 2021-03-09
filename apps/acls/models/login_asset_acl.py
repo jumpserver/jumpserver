@@ -33,8 +33,8 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
         ordering = ('priority', '-date_updated', 'name')
 
     @classmethod
-    def filter(cls, user, asset, system_user, action=ActionChoices.login_confirm):
-        queryset = cls.objects.filter(action=action, org_id=asset.org_id)
+    def filter(cls, user, asset, system_user, org_id, action=ActionChoices.login_confirm):
+        queryset = cls.objects.filter(action=action, org_id=org_id)
         queryset = cls.filter_user(user, queryset)
         queryset = cls.filter_asset(asset, queryset)
         queryset = cls.filter_system_user(system_user, queryset)
@@ -73,7 +73,7 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
         return queryset
 
     @classmethod
-    def create_login_asset_confirm_ticket(cls, user, asset, system_user, assignees):
+    def create_login_asset_confirm_ticket(cls, user, asset, system_user, assignees, org_id):
         from tickets.const import TicketTypeChoices
         from tickets.models import Ticket
         data = {
@@ -84,7 +84,7 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
                 'apply_login_asset': str(asset),
                 'apply_login_system_user': str(system_user),
             },
-            'org_id': asset.org_id,
+            'org_id': org_id,
         }
         ticket = Ticket.objects.create(**data)
         ticket.assignees.set(assignees)

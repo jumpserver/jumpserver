@@ -14,7 +14,7 @@ __all__ = ['LoginAssetCheckAPI', 'LoginAssetConfirmStatusAPI']
 
 
 class LoginAssetCheckAPI(CreateAPIView):
-    # permission_classes = (IsAppUser, )
+    permission_classes = (IsAppUser, )
     serializer_class = serializers.LoginAssetCheckSerializer
 
     @lazyproperty
@@ -28,9 +28,10 @@ class LoginAssetCheckAPI(CreateAPIView):
         return Response(data=data, status=200)
 
     def check_confirm(self):
-        acl = LoginAssetACL\
-            .filter(self.serializer.user, self.serializer.asset, self.serializer.system_user)\
-            .first()
+        acl = LoginAssetACL.filter(
+            self.serializer.user, self.serializer.asset, self.serializer.system_user,
+            self.serializer.org.id
+        ).first()
 
         if not acl:
             need = False
@@ -40,8 +41,8 @@ class LoginAssetCheckAPI(CreateAPIView):
         need = True
         reviewers = acl.reviewers.all()
         ticket = LoginAssetACL.create_login_asset_confirm_ticket(
-            self.serializer.user, self.serializer.asset, self.serializer.system_user,
-            assignees=reviewers
+            self.serializer.user, self.serializer.asset, self.serializer.system_user, reviewers,
+            self.serializer.org.id
         )
         confirm_status_url = reverse(
             'acls:login-asset-confirm-status', kwargs={'pk': str(ticket.id)}
@@ -62,7 +63,7 @@ class LoginAssetCheckAPI(CreateAPIView):
 
 
 class LoginAssetConfirmStatusAPI(RetrieveDestroyAPIView):
-    # permission_classes = (IsAppUser, )
+    permission_classes = (IsAppUser, )
 
     def get_ticket(self):
         with tmp_to_root_org():
