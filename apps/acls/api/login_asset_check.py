@@ -28,9 +28,10 @@ class LoginAssetCheckAPI(CreateAPIView):
         return Response(data=data, status=200)
 
     def check_confirm(self):
-        acl = LoginAssetACL.filter(
-            self.serializer.user, self.serializer.asset, self.serializer.system_user
-        ).first()
+        acl = LoginAssetACL\
+            .filter(self.serializer.user, self.serializer.asset, self.serializer.system_user)\
+            .first()
+
         if acl:
             need = False
             data = {'need_confirm': False}

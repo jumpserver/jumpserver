@@ -21,7 +21,7 @@ class LoginACL(BaseACL):
     users = models.ManyToManyField('users.User', related_name='login_acls', verbose_name=_('User'))
 
     class Meta:
-        ordering = ('priority', 'name')
+        ordering = ('priority', '-date_updated', 'name')
 
     @classmethod
     def get_user_login_reject_acl(cls, user):

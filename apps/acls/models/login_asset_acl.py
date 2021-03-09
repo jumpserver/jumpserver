@@ -30,7 +30,7 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
 
     class Meta:
         unique_together = ('name', 'org_id')
-        ordering = ('priority', 'name')
+        ordering = ('priority', '-date_updated', 'name')
 
     @classmethod
     def filter(cls, user, asset, system_user, action=ActionChoices.login_confirm):
