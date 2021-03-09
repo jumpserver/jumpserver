@@ -11,13 +11,16 @@ from django.core.cache import cache
 from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
+from rest_framework.decorators import action
+from rest_framework.request import Request
 
+from common.const.http import POST
 from common.drf.filters import IDSpmFilter, CustomFilter, IDInFilter
 from ..utils import lazyproperty
 
 __all__ = [
     'JSONResponseMixin', 'CommonApiMixin', 'AsyncApiMixin', 'RelationMixin',
-    'SerializerMixin2', 'QuerySetMixin', 'ExtraFilterFieldsMixin'
+    'SerializerMixin2', 'QuerySetMixin', 'ExtraFilterFieldsMixin', 'ParseToJsonMixin',
 ]
 
 
@@ -30,6 +33,12 @@ class JSONResponseMixin(object):
 
 # SerializerMixin
 # ----------------------
+
+
+class ParseToJsonMixin:
+    @action(methods=[POST], detail=False, url_path='render-to-json')
+    def render_to_json(self, request: Request):
+        return Response(data=request.data)
 
 
 class SerializerMixin:
@@ -98,7 +107,7 @@ class PaginatedResponseMixin:
         return Response(serializer.data)
 
 
-class CommonApiMixin(SerializerMixin, ExtraFilterFieldsMixin):
+class CommonApiMixin(SerializerMixin, ExtraFilterFieldsMixin, ParseToJsonMixin):
     pass
 
 
