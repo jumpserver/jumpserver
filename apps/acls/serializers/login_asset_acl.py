@@ -3,6 +3,8 @@ from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from acls import models
+from orgs.models import Organization
+from users.models import User
 
 
 __all__ = ['LoginAssetACLSerializer']
@@ -47,3 +49,25 @@ class LoginAssetACLSerializer(BulkOrgResourceModelSerializer):
             'id', 'name', 'priority', 'users', 'system_users', 'assets', 'action', 'comment',
             'reviewers', 'created_by', 'date_created', 'date_updated', 'org_id',
         ]
+        extra_kwargs = {
+            "reviewers": {'allow_null': False, 'required': True}
+        }
+
+    @staticmethod
+    def validate_org_id(org_id):
+        org = Organization.get_instance(org_id)
+        if not org:
+            error = _('The organization `{}` does not exist'.format(org_id))
+            raise serializers.ValidationError(error)
+        return org_id
+
+    def validate_reviewers(self, reviewers):
+        org_id = self.initial_data.get('org_id')
+        self.validate_org_id(org_id)
+        org = Organization.get_instance(org_id)
+        users = org.get_members()
+        valid_reviewers = list(set(reviewers) & set(users))
+        if not valid_reviewers:
+            error = _('None of the reviewers belong to Organization `{}`'.format(org.name))
+            raise serializers.ValidationError(error)
+        return valid_reviewers

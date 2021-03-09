@@ -32,7 +32,7 @@ class LoginAssetCheckAPI(CreateAPIView):
             .filter(self.serializer.user, self.serializer.asset, self.serializer.system_user)\
             .first()
 
-        if acl:
+        if not acl:
             need = False
             data = {'need_confirm': False}
             return need, data
