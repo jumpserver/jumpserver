@@ -66,12 +66,6 @@ class UserProfileApi(generics.RetrieveUpdateAPIView):
     def get_object(self):
         return self.request.user
 
-    def retrieve(self, request, *args, **kwargs):
-        if not settings.SESSION_EXPIRE_AT_BROWSER_CLOSE:
-            age = request.session.get_expiry_age()
-            request.session.set_expiry(age)
-        return super().retrieve(request, *args, **kwargs)
-
 
 class UserPasswordApi(generics.RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
