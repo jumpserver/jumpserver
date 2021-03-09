@@ -34,6 +34,7 @@ class LoginAssetConfirmCheckAPI(CreateAPIView):
             'api-tickets:ticket-detail', kwargs={'pk': str(ticket.id)}, external=True,
             api_to_ui=True
         )
+        ticket_detail_url = '{url}?type={type}'.format(url=ticket_detail_url, type=ticket.type)
         data = {
             'need_confirm': True,
             'check_confirm_status': {'method': 'GET', 'url': confirm_status_url},
