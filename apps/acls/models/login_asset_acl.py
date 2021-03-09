@@ -11,6 +11,7 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
     class ActionChoices(models.TextChoices):
         login_confirm = 'login_confirm', _('Login confirm')
 
+    name = models.CharField(max_length=128, verbose_name=_('Name'))
     # 条件
     users = models.JSONField(verbose_name=_('User'))
     system_users = models.JSONField(verbose_name=_('System User'))
@@ -23,7 +24,7 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
     # 动作: 附加字段
     # - login_confirm
     reviewers = models.ManyToManyField(
-        'users.User', related_name='review_login_asset_confirm_acl', blank=True,
+        'users.User', related_name='review_login_asset_acls', blank=True,
         verbose_name=_("Reviewers")
     )
 
@@ -70,13 +71,6 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
             Q(system_users__protocol_group__contains='*')
         )
         return queryset
-
-    @classmethod
-    def get_reviewers(cls, queryset):
-        reviewers = set()
-        for q in queryset:
-            reviewers.update(list(q.reviewers.all()))
-        return list(reviewers)
 
     @classmethod
     def create_login_asset_confirm_ticket(cls, user, asset, system_user, assignees):

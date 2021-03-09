@@ -3,30 +3,45 @@ from rest_framework.response import Response
 from rest_framework.generics import CreateAPIView, RetrieveDestroyAPIView
 
 from common.permissions import IsAppUser
-from common.utils import reverse
+from common.utils import reverse, lazyproperty
 from tickets.models import Ticket
 from orgs.utils import tmp_to_root_org
 from ..models import LoginAssetACL
 from .. import serializers
 
 
-__all__ = ['LoginAssetConfirmCheckAPI', 'LoginAssetConfirmStatusAPI']
+__all__ = ['LoginAssetCheckAPI', 'LoginAssetConfirmStatusAPI']
 
 
-class LoginAssetConfirmCheckAPI(CreateAPIView):
+class LoginAssetCheckAPI(CreateAPIView):
     # permission_classes = (IsAppUser, )
-    serializer_class = serializers.LoginAssetConfirmCheckSerializer
+    serializer_class = serializers.LoginAssetCheckSerializer
+
+    @lazyproperty
+    def serializer(self):
+        serializer = self.get_serializer(data=self.request.data)
+        serializer.is_valid(raise_exception=True)
+        return serializer
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        queryset = self.get_acl_queryset(serializer)
-        if not queryset:
-            data = {'need_confirm': False}
-            return Response(data=data, status=200)
+        need, data = self.check_confirm()
+        return Response(data=data, status=200)
 
-        reviewers = LoginAssetACL.get_reviewers(queryset)
-        ticket = self.create_ticket(serializer, reviewers)
+    def check_confirm(self):
+        acl = LoginAssetACL.filter(
+            self.serializer.user, self.serializer.asset, self.serializer.system_user
+        ).first()
+        if acl:
+            need = False
+            data = {'need_confirm': False}
+            return need, data
+
+        need = True
+        reviewers = acl.reviewers.all()
+        ticket = LoginAssetACL.create_login_asset_confirm_ticket(
+            self.serializer.user, self.serializer.asset, self.serializer.system_user,
+            assignees=reviewers
+        )
         confirm_status_url = reverse(
             'acls:login-asset-confirm-status', kwargs={'pk': str(ticket.id)}
         )
@@ -42,19 +57,7 @@ class LoginAssetConfirmCheckAPI(CreateAPIView):
             'ticket_detail_url': ticket_detail_url,
             'reviewers': [str(user) for user in ticket.assignees.all()],
         }
-        return Response(data=data, status=200)
-
-    @staticmethod
-    def get_acl_queryset(serializer):
-        queryset = LoginAssetACL.filter(serializer.user, serializer.asset, serializer.system_user)
-        return queryset
-
-    @staticmethod
-    def create_ticket(serializer, reviewers):
-        ticket = LoginAssetACL.create_login_asset_confirm_ticket(
-            serializer.user, serializer.asset, serializer.system_user, assignees=reviewers
-        )
-        return ticket
+        return need, data
 
 
 class LoginAssetConfirmStatusAPI(RetrieveDestroyAPIView):

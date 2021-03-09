@@ -128,6 +128,13 @@ class AuthMixin:
             if auth_backend not in auth_backends_allowed:
                 self.raise_credential_error(error=errors.reason_backend_not_match)
 
+    def _check_login_acl(self, user, ip):
+        from acls.models import LoginACL
+        from acls.utils import contains_ip
+        reject_login_acl = LoginACL.get_user_login_reject_acl(user)
+        if contains_ip(ip, reject_login_acl.ip_group):
+            raise self.raise_credential_error(error=errors.reason_acl_not_allow)
+
     def check_user_auth(self, decrypt_passwd=False):
         self.check_is_block()
         request = self.request
@@ -135,8 +142,9 @@ class AuthMixin:
 
         self._check_only_allow_exists_user_auth(username)
         user = self._check_auth_user_is_valid(username, password, public_key)
+        # 校验login-acl规则
+        self._check_login_acl(user, ip)
         # 限制只能从认证来源登录
-
         auth_backend = getattr(user, 'backend', 'django.contrib.auth.backends.ModelBackend')
         self._check_auth_source_is_valid(user, auth_backend)
         self._check_password_require_reset_or_not(user)

@@ -6,7 +6,7 @@ from users.models import User
 from assets.models import Asset, SystemUser
 
 
-class LoginAssetConfirmCheckSerializer(serializers.Serializer):
+class LoginAssetCheckSerializer(serializers.Serializer):
     user_id = serializers.UUIDField(required=True, allow_null=False)
     asset_id = serializers.UUIDField(required=True, allow_null=False)
     system_user_id = serializers.UUIDField(required=True, allow_null=False)
@@ -86,7 +86,3 @@ class LoginAssetConfirmCheckSerializer(serializers.Serializer):
             return self.validated_data['system_user_username']
         else:
             return system_user.username
-
-
-class LoginAssetConfirmStatusSerializer(serializers.Serializer):
-    pass

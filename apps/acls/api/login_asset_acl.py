@@ -1,7 +1,7 @@
 
 from orgs.mixins.api import OrgBulkModelViewSet
-from acls import models, serializers
 from common.permissions import IsOrgAdmin
+from .. import models, serializers
 
 
 __all__ = ['LoginAssetACLViewSet']
