@@ -83,12 +83,12 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
         from tickets.const import TicketTypeChoices
         from tickets.models import Ticket
         data = {
-            'title': _('Login asset confirm') + ' {}'.format(user),
+            'title': _('Login asset confirm') + ' ({})'.format(user),
             'type': TicketTypeChoices.login_asset_confirm,
             'meta': {
-                'user': str(user),
-                'asset': str(asset),
-                'system_user': str(system_user),
+                'apply_login_user': str(user),
+                'apply_login_asset': str(asset),
+                'apply_login_system_user': str(system_user),
             },
             'org_id': asset.org_id,
         }
