@@ -285,7 +285,9 @@ class Config(dict):
         'ONLY_ALLOW_EXIST_USER_AUTH': False,
         'ONLY_ALLOW_AUTH_FROM_SOURCE': True,
         'DISK_CHECK_ENABLED': True,
-        'FORGOT_PASSWORD_URL': ''
+        'SESSION_SAVE_EVERY_REQUEST': True,
+        'SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE': False,
+        'FORGOT_PASSWORD_URL': '',
     }
 
     def compatible_auth_openid_of_key(self):

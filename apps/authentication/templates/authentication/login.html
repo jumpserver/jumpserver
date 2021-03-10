@@ -1,12 +1,11 @@
-{% load static %}
 {% load i18n %}
+{% load bootstrap3 %}
+{% load static %}
 <!DOCTYPE html>
 <html>
-<!--/*@thymesVar id="LoginConstants" type="com.fit2cloud.support.common.constants.LoginConstants"*/-->
-<!--/*@thymesVar id="message" type="java.lang.String"*/-->
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link rel="shortcut icon" href="{{ FAVICON_URL }}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{ FAVICON_URL }}" type="image/x-icon">
     <title>
         {{ JMS_TITLE }}
     </title>
@@ -16,6 +15,8 @@
     <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
     <link href="{% static 'css/bootstrap-style.css' %}" rel="stylesheet">
     <link href="{% static 'css/login-style.css' %}" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <link href="{% static 'css/jumpserver.css' %}" rel="stylesheet">
 
     <!-- scripts -->
     <script src="{% static 'js/jquery-3.1.1.min.js' %}"></script>
@@ -24,26 +25,54 @@
     <script src="{% static 'js/plugins/datatables/datatables.min.js' %}"></script>
 
     <style>
+        .login-content {
+            box-shadow: 0 5px 5px -3px rgb(0 0 0 / 20%), 0 8px 10px 1px rgb(0 0 0 / 14%), 0 3px 14px 2px rgb(0 0 0 / 12%);
+        }
 
-        .box-1{
+        .help-block {
+            margin: 0;
+            text-align: left;
+        }
+
+        form label {
+            color: #737373;
+            font-size: 13px;
+            font-weight: normal;
+        }
+
+        .hr-line-dashed {
+            border-top: 1px dashed #e7eaec;
+            color: #ffffff;
+            background-color: #ffffff;
+            height: 1px;
+            margin: 20px 0;
+        }
+
+        .login-content {
             height: 472px;
             width: 984px;
             margin-right: auto;
             margin-left: auto;
-            margin-top: calc((100vh - 470px)/2);
-
+            margin-top: calc((100vh - 470px) / 3);
         }
-        .box-2{
+        body {
+            background-color: #f2f2f2;
+            height: calc(100vh - (100vh - 470px) / 3);
+        }
+
+        .right-image-box {
             height: 100%;
             width: 50%;
             float: right;
         }
-        .box-3{
+
+        .left-form-box {
             text-align: center;
             background-color: white;
             height: 100%;
             width: 50%;
         }
+
         .captcha {
             float: right;
         }
@@ -56,136 +85,137 @@
             text-align: left;
         }
 
+        .form-group.has-error {
+            margin-bottom: 0;
+        }
+
+        .captch-field .has-error .help-block {
+            margin-top: -8px !important;
+        }
+
+        .no-captcha-challenge .form-group {
+            margin-bottom: 20px;
+        }
+
+        .jms-title {
+            padding: 40px 10px 10px;
+        }
+
+        .no-captcha-challenge .jms-title {
+            padding: 60px 10px 10px;
+        }
+
+        .no-captcha-challenge .welcome-message {
+            padding-top: 10px;
+        }
+
+        .radio, .checkbox {
+            margin: 0;
+        }
+
     </style>
 </head>
 
-<body style="height: 100%;font-size: 13px">
-    <div>
-        <div class="box-1">
-            <div class="box-2">
-                <img src="{{ LOGIN_IMAGE_URL }}" style="height: 100%; width: 100%"/>
+<body>
+<div class="login-content ">
+    <div class="right-image-box">
+        <img src="{{ LOGIN_IMAGE_URL }}" style="height: 100%; width: 100%"/>
+    </div>
+    <div class="left-form-box {% if not form.challenge and not form.captcha %} no-captcha-challenge {% endif %}">
+        <div style="background-color: white">
+            <div class="jms-title">
+                <span style="font-size: 21px;font-weight:400;color: #151515;letter-spacing: 0;">{{ JMS_TITLE }}</span>
             </div>
-            <div class="box-3">
-                <div style="background-color: white">
-                    {% if form.challenge %}
-                        <div style="margin-top: 20px;padding-top: 30px;padding-left: 20px;padding-right: 20px;height: 60px">
+            <div class="contact-form col-md-10 col-md-offset-1">
+                <form id="login-form" action="" method="post" role="form" novalidate="novalidate">
+                    {% csrf_token %}
+                    <div style="line-height: 17px;margin-bottom: 20px;color: #999999;">
+                    {% if form.errors %}
+                        <p class="red-fonts" style="color: red">
+                            {% if form.non_field_errors %}
+                                {{ form.non_field_errors.as_text }}
+                            {% endif %}
+                        </p>
                     {% else %}
-                        <div style="margin-top: 20px;padding-top: 40px;padding-left: 20px;padding-right: 20px;height: 80px">
+                        <p class="welcome-message">
+                            {% trans 'Welcome back, please enter username and password to login' %}
+                        </p>
                     {% endif %}
-                            <span style="font-size: 21px;font-weight:400;color: #151515;letter-spacing: 0;">{{ JMS_TITLE }}</span>
-                        </div>
-                    <div style="font-size: 12px;color: #999999;letter-spacing: 0;line-height: 18px;margin-top: 18px">
-                        {% trans 'Welcome back, please enter username and password to login' %}
                     </div>
-                    <div style="margin-bottom: 0px">
-                        <div>
-                            <div class="col-md-1"></div>
-                            <div class="contact-form col-md-10" style="margin-top: 0px;height: 35px">
-                                <form id="contact-form" action="" method="post" role="form" novalidate="novalidate">
-                                    {% csrf_token %}
-                                    {% if form.non_field_errors %}
-                                        {% if form.challenge %}
-                                            <div style="height: 50px;color: red;line-height: 17px;">
-                                        {% else %}
-                                            <div style="height: 70px;color: red;line-height: 17px;">
-                                        {% endif %}
-                                            <p class="red-fonts">{{ form.non_field_errors.as_text }}</p>
-                                        </div>
-                                    {% elif form.errors.captcha %}
-                                        <p class="red-fonts">{% trans 'Captcha invalid' %}</p>
-                                    {% else %}
-                                        <div style="height: 50px"></div>
-                                    {% endif %}
 
-                                    <div class="form-group">
-                                        <input type="text" class="form-control" name="{{ form.username.html_name }}" placeholder="{% trans 'Username' %}" required="" value="{% if form.username.value %}{{ form.username.value }}{% endif %}" style="height: 35px">
-                                        {% if form.errors.username %}
-                                            <div class="help-block field-error">
-                                                <p class="red-fonts">{{ form.errors.username.as_text }}</p>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                    <div class="form-group">
-                                        <input type="password" class="form-control" id="password" placeholder="{% trans 'Password' %}" required="">
-                                        <input id="password-hidden" type="text" style="display:none" name="{{ form.password.html_name }}">
-                                        {% if form.errors.password %}
-                                            <div class="help-block field-error">
-                                                <p class="red-fonts">{{ form.errors.password.as_text }}</p>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                    {% if form.challenge %}
-                                        <div class="form-group">
-                                            <input type="challenge" class="form-control" id="challenge" name="{{ form.challenge.html_name }}" placeholder="{% trans 'MFA code' %}" >
-                                            {% if form.errors.challenge %}
-                                                <div class="help-block field-error">
-                                                    <p class="red-fonts">{{ form.errors.challenge.as_text }}</p>
-                                                </div>
-                                            {% endif %}
-                                        </div>
-                                    {% endif %}
-                                    {% if form.captcha %}
-                                    <div class="form-group" style="height: 50px;margin-bottom: 0;font-size: 13px">
-                                        {{ form.captcha }}
-                                    </div>
-                                    {% else %}
-                                    <div class="form-group" style="height: 25px;margin-bottom: 0;font-size: 13px"></div>
-                                    {% endif %}
-                                    <div class="form-group" style="margin-top: 10px">
-                                        <button type="submit" class="btn btn-transparent" onclick="doLogin();return false;">{% trans 'Login' %}</button>
-                                    </div>
-
-                                    <div>
-                                        {% if AUTH_OPENID or AUTH_CAS %}
-                                            <div class="hr-line-dashed"></div>
-                                            <div style="display: inline-block; float: left">
-                                                <b class="text-muted text-left" style="margin-right: 10px">{% trans "More login options" %}</b>
-                                                {% if AUTH_OPENID %}
-                                                    <a href="{% url 'authentication:openid:login' %}">
-                                                        <i class="fa fa-openid"></i> {% trans 'OpenID' %}
-                                                    </a>
-                                                {% endif %}
-                                                {% if AUTH_CAS %}
-                                                    <a href="{% url 'authentication:cas:cas-login' %}">
-                                                        <i class="fa"><img src="{{ LOGIN_CAS_LOGO_URL }}" height="13" width="13"></i> {% trans 'CAS' %}
-                                                    </a>
-                                                {% endif %}
-                                            </div>
-                                            <div class="text-center" style="display: inline-block; float: right">
-                                        {% else %}
-                                            <div class="text-center" style="display: inline-block;">
-                                        {% endif %}
-                                            <a id="forgot_password" href="{{ forgot_password_url }}">
-                                                <small>{% trans 'Forgot password' %}?</small>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </form>
+                    {% bootstrap_field form.username show_label=False %}
+                    <div class="form-group">
+                        <input type="password" class="form-control" id="password" placeholder="{% trans 'Password' %}" required="">
+                        <input id="password-hidden" type="text" style="display:none" name="{{ form.password.html_name }}">
+                    </div>
+                    {% if form.challenge %}
+                        {% bootstrap_field form.challenge show_label=False %}
+                    {% elif form.captcha %}
+                        <div class="captch-field">
+                            {% bootstrap_field form.captcha show_label=False %}
+                        </div>
+                    {% endif %}
+                    <div class="form-group" style="padding-top: 5px; margin-bottom: 10px">
+                        <div class="row">
+                            <div class="col-md-6" style="text-align: left">
+                                {% if form.auto_login %}
+                                    {% bootstrap_field form.auto_login form_group_class='' %}
+                                {% endif %}
                             </div>
-                            <div class="col-md-1"></div>
+                            <div class="col-md-6">
+                                <a id="forgot_password" href="{{ forgot_password_url }}" style="float: right">
+                                    <small>{% trans 'Forgot password' %}?</small>
+                                </a>
+                            </div>
                         </div>
                     </div>
-                </div>
+
+                    <div class="form-group" style="">
+                        <button type="submit" class="btn btn-transparent" onclick="doLogin();return false;">{% trans 'Login' %}</button>
+                    </div>
+
+                    <div>
+                        {% if AUTH_OPENID or AUTH_CAS %}
+                            <div class="hr-line-dashed"></div>
+                            <div style="display: inline-block; float: left">
+                                <b class="text-muted text-left" style="margin-right: 10px">{% trans "More login options" %}</b>
+                                {% if AUTH_OPENID %}
+                                    <a href="{% url 'authentication:openid:login' %}" class="more-login-item">
+                                        <i class="fa fa-openid"></i> {% trans 'OpenID' %}
+                                    </a>
+                                {% endif %}
+                                {% if AUTH_CAS %}
+                                    <a href="{% url 'authentication:cas:cas-login' %}" class="more-login-item">
+                                        <i class="fa"><img src="{{ LOGIN_CAS_LOGO_URL }}" height="13" width="13"></i> {% trans 'CAS' %}
+                                    </a>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <div class="text-center" style="display: inline-block;">
+                        {% endif %}
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-    </div>
-
+</div>
 </body>
 <script type="text/javascript" src="/static/js/plugins/jsencrypt/jsencrypt.min.js"></script>
 <script>
-    function encryptLoginPassword(password, rsaPublicKey){
+    function encryptLoginPassword(password, rsaPublicKey) {
         var jsencrypt = new JSEncrypt(); //加密对象
         jsencrypt.setPublicKey(rsaPublicKey); // 设置密钥
         return jsencrypt.encrypt(password); //加密
     }
+
     function doLogin() {
         //公钥加密
         var rsaPublicKey = "{{ rsa_public_key }}"
-        var password =$('#password').val(); //明文密码
+        var password = $('#password').val(); //明文密码
         var passwordEncrypted = encryptLoginPassword(password, rsaPublicKey)
         $('#password-hidden').val(passwordEncrypted); //返回给密码输入input
-        $('#contact-form').submit();//post提交
+        $('#login-form').submit();//post提交
     }
 
     $(document).ready(function () {

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-08 11:54+0800\n"
+"POT-Creation-Date: 2021-03-10 11:16+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -164,8 +164,7 @@ msgstr "目标URL"
 #: applications/serializers/attrs/application_type/mysql_workbench.py:30
 #: applications/serializers/attrs/application_type/vmware_client.py:26
 #: assets/models/base.py:251 assets/models/gathered_user.py:15
-#: audits/models.py:99 authentication/forms.py:11
-#: authentication/templates/authentication/login.html:101
+#: audits/models.py:99 authentication/forms.py:15 authentication/forms.py:17
 #: ops/models/adhoc.py:148 users/forms/profile.py:31 users/models/user.py:528
 #: users/templates/users/_select_user_modal.html:14
 #: users/templates/users/user_detail.html:53
@@ -182,8 +181,8 @@ msgstr "用户名"
 #: applications/serializers/attrs/application_type/mysql_workbench.py:34
 #: applications/serializers/attrs/application_type/vmware_client.py:30
 #: assets/models/base.py:252 assets/serializers/asset_user.py:71
-#: audits/signals_handler.py:46 authentication/forms.py:13
-#: authentication/templates/authentication/login.html:109
+#: audits/signals_handler.py:46 authentication/forms.py:22
+#: authentication/templates/authentication/login.html:148
 #: settings/serializers/settings.py:89 users/forms/profile.py:21
 #: users/templates/users/user_otp_check_password.html:13
 #: users/templates/users/user_password_update.html:43
@@ -1287,17 +1286,20 @@ msgstr "登录复核 {}"
 msgid "SSO auth closed"
 msgstr "SSO 认证关闭了"
 
-#: authentication/errors.py:220 authentication/views/login.py:225
+#: authentication/errors.py:220 authentication/views/login.py:232
 msgid "Your password is too simple, please change it for security"
 msgstr "你的密码过于简单，为了安全，请修改"
 
-#: authentication/errors.py:229 authentication/views/login.py:240
+#: authentication/errors.py:229 authentication/views/login.py:247
 msgid "Your password has expired, please reset before logging in"
 msgstr "您的密码已过期，先修改再登录"
 
-#: authentication/forms.py:26 authentication/forms.py:38
-#: authentication/templates/authentication/login.html:119
-#: users/forms/profile.py:27
+#: authentication/forms.py:26
+msgid "{} days auto login"
+msgstr "{} 天内自动登录"
+
+#: authentication/forms.py:41 authentication/forms.py:54
+#: authentication/forms.py:56 users/forms/profile.py:27
 msgid "MFA code"
 msgstr "多因子认证验证码"
 
@@ -1410,36 +1412,32 @@ msgstr "确认"
 msgid "Code error"
 msgstr "代码错误"
 
-#: authentication/templates/authentication/login.html:78
+#: authentication/templates/authentication/login.html:141
 msgid "Welcome back, please enter username and password to login"
 msgstr "欢迎回来，请输入用户名和密码登录"
 
-#: authentication/templates/authentication/login.html:95
-msgid "Captcha invalid"
-msgstr "验证码错误"
+#: authentication/templates/authentication/login.html:167
+#: users/templates/users/forgot_password.html:15
+#: users/templates/users/forgot_password.html:16
+msgid "Forgot password"
+msgstr "忘记密码"
 
-#: authentication/templates/authentication/login.html:135
+#: authentication/templates/authentication/login.html:174
 #: templates/_header_bar.html:83
 msgid "Login"
 msgstr "登录"
 
-#: authentication/templates/authentication/login.html:142
+#: authentication/templates/authentication/login.html:181
 msgid "More login options"
 msgstr "更多登录方式"
 
-#: authentication/templates/authentication/login.html:145
+#: authentication/templates/authentication/login.html:184
 msgid "OpenID"
 msgstr "OpenID"
 
-#: authentication/templates/authentication/login.html:150
+#: authentication/templates/authentication/login.html:189
 msgid "CAS"
 msgstr ""
-
-#: authentication/templates/authentication/login.html:159
-#: users/templates/users/forgot_password.html:7
-#: users/templates/users/forgot_password.html:8
-msgid "Forgot password"
-msgstr "忘记密码"
 
 #: authentication/templates/authentication/login_otp.html:17
 msgid "One-time password"
@@ -1483,7 +1481,7 @@ msgstr "复制成功"
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: authentication/views/login.py:171
+#: authentication/views/login.py:178
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -1491,19 +1489,19 @@ msgstr ""
 "等待 <b>{}</b> 确认, 你也可以复制链接发给他/她 <br/>\n"
 "                  不要关闭本页面"
 
-#: authentication/views/login.py:176
+#: authentication/views/login.py:183
 msgid "No ticket found"
 msgstr "没有发现工单"
 
-#: authentication/views/login.py:208
+#: authentication/views/login.py:215
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: authentication/views/login.py:209
+#: authentication/views/login.py:216
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
-#: authentication/views/login.py:224 authentication/views/login.py:239
+#: authentication/views/login.py:231 authentication/views/login.py:246
 msgid "Please change your password"
 msgstr "请修改密码"
 
@@ -1601,6 +1599,10 @@ msgstr "字段必须唯一"
 #: common/validators.py:33
 msgid "Should not contains special characters"
 msgstr "不能包含特殊字符"
+
+#: jumpserver/context_processor.py:17
+msgid "JumpServer Open Source Bastion Host"
+msgstr "JumpServer 开源堡垒机"
 
 #: jumpserver/views/celery_flower.py:23
 msgid "<h1>Flow service unavailable, check it</h1>"
@@ -1947,7 +1949,7 @@ msgstr "邮件已经发送{}, 请检查"
 
 #: settings/api/common.py:110 xpack/plugins/interface/api.py:18
 #: xpack/plugins/interface/models.py:36
-msgid "Welcome to the JumpServer open source fortress"
+msgid "Welcome to the JumpServer open source Bastion Host"
 msgstr "欢迎使用JumpServer开源堡垒机"
 
 #: settings/api/ldap.py:189
@@ -3471,7 +3473,7 @@ msgstr "不能在该页面重置多因子认证, 请去个人信息页面重置"
 
 #: users/exceptions.py:10
 msgid "MFA not enabled"
-msgstr "MFA没有启用"
+msgstr "MFA没有开启"
 
 #: users/forms/profile.py:49
 msgid ""
@@ -3724,7 +3726,7 @@ msgid "Reset"
 msgstr "重置"
 
 #: users/templates/users/_user.html:52
-#: users/templates/users/forgot_password.html:24
+#: users/templates/users/forgot_password.html:32
 #: users/templates/users/user_bulk_update.html:24
 #: users/templates/users/user_list.html:40
 #: users/templates/users/user_password_update.html:75
@@ -3784,7 +3786,7 @@ msgstr "向导"
 msgid " for more information"
 msgstr "获取更多信息"
 
-#: users/templates/users/forgot_password.html:15
+#: users/templates/users/forgot_password.html:23
 msgid "Input your email, that will send a mail to your"
 msgstr "输入您的邮箱, 将会发一封重置邮件到您的邮箱中"
 
@@ -4471,7 +4473,7 @@ msgstr ""
 
 #: users/utils.py:239
 msgid "MFA Reset"
-msgstr "重置MFA"
+msgstr "重置 MFA"
 
 #: users/utils.py:241
 #, python-format
@@ -4490,10 +4492,10 @@ msgstr ""
 "\n"
 "    你好 %(name)s:\n"
 "    <br>\n"
-"    您的密钥已被管理员重置,\n"
-"    请登录并重新设置您的密钥.\n"
+"    您的 MFA 已被管理员重置,\n"
+"    请登录并重新设置您的 MFA.\n"
 "    <br>\n"
-"    <a href=\"%(login_url)s\">Login direct</a>\n"
+"    <a href=\"%(login_url)s\">登录</a>\n"
 "\n"
 "    <br>\n"
 "    "
@@ -4910,11 +4912,11 @@ msgstr ""
 
 #: xpack/plugins/cloud/serializers.py:28
 msgid "Client ID"
-msgstr "客户端ID"
+msgstr "Client ID"
 
 #: xpack/plugins/cloud/serializers.py:31
 msgid "Client Secret"
-msgstr "客户端Secret"
+msgstr "Client Secret"
 
 #: xpack/plugins/cloud/serializers.py:34
 msgid "Tenant ID"
@@ -5024,6 +5026,9 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Captcha invalid"
+#~ msgstr "验证码错误"
 
 #~ msgid ""
 #~ "Not support openssh format key, using ssh-keygen -t rsa -m pem to generate"

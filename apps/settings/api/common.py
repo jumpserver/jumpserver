@@ -107,7 +107,7 @@ class PublicSettingApi(generics.RetrieveAPIView):
 
     @staticmethod
     def get_login_title():
-        default_title = _('Welcome to the JumpServer open source fortress')
+        default_title = _('Welcome to the JumpServer open source Bastion Host')
         if not settings.XPACK_ENABLED:
             return default_title
         from xpack.plugins.interface.models import Interface
