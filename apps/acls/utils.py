@@ -38,6 +38,7 @@ def is_ip_segment(ip, only_ipv4=False):
 
 
 def in_ip_segment(ip, ip_segment):
+    ip1, ip2 = ip_segment.split('-')
     ip_1, ip_2 = ip_segment.split('-')
     ip_1_bits = ip_1.split('.')
     ip_2_bits = ip_2.split('.')

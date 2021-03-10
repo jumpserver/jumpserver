@@ -41,13 +41,13 @@ class LoginAssetACLSystemUsersSerializer(serializers.Serializer):
     protocol_group = serializers.ListField(
         default=['*'], child=serializers.CharField(max_length=16), label=_('Protocol'),
         help_text=const.common_help_text + _('Protocol options: {}').format(
-            ', '.join(SystemUser.ASSET_CATEGORY_PROTOCOLS + ['*'])
+            ', '.join(SystemUser.ASSET_CATEGORY_PROTOCOLS)
         )
     )
 
     @staticmethod
     def validate_protocol_group(protocol_group):
-        unsupported_protocols = set(protocol_group) - set(SystemUser.ASSET_CATEGORY_PROTOCOLS)
+        unsupported_protocols = set(protocol_group) - set(SystemUser.ASSET_CATEGORY_PROTOCOLS + ['*'])
         if unsupported_protocols:
             raise serializers.ValidationError(_(f'Unsupported protocols: {unsupported_protocols}'))
         return protocol_group
