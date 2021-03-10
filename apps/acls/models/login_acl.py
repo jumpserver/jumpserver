@@ -24,5 +24,5 @@ class LoginACL(BaseACL):
         ordering = ('priority', '-date_updated', 'name')
 
     @classmethod
-    def get_user_login_reject_acl(cls, user):
-        return user.login_acls.filter(action=cls.ActionChoices.reject).first()
+    def get_user_acl(cls, user, action):
+        return user.login_acls.filter(action=action).first()

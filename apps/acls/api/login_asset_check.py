@@ -5,7 +5,7 @@ from rest_framework.generics import CreateAPIView, RetrieveDestroyAPIView
 from common.permissions import IsAppUser
 from common.utils import reverse, lazyproperty
 from tickets.models import Ticket
-from orgs.utils import tmp_to_root_org
+from orgs.utils import tmp_to_root_org, tmp_to_org
 from ..models import LoginAssetACL
 from .. import serializers
 
@@ -28,10 +28,13 @@ class LoginAssetCheckAPI(CreateAPIView):
         return Response(data=data, status=200)
 
     def check_confirm(self):
-        acl = LoginAssetACL.filter(
-            self.serializer.user, self.serializer.asset, self.serializer.system_user,
-            self.serializer.org.id
-        ).first()
+        with tmp_to_org(self.serializer.org):
+            quires = {
+                'user': self.serializer.user, 'asset': self.serializer.asset,
+                'system_user': self.serializer.system_user,
+                'action': LoginAssetACL.ActionChoices.login_confirm
+            }
+            acl = LoginAssetACL.filter(**quires).first()
 
         if not acl:
             need = False
@@ -86,7 +89,8 @@ class LoginAssetConfirmStatusAPI(RetrieveDestroyAPIView):
 
     def destroy(self, request, *args, **kwargs):
         ticket = self.get_ticket()
-        ticket.close(processor=ticket.applicant)
+        if ticket.status_open:
+            ticket.close(processor=ticket.applicant)
         data = {
             'action': ticket.action,
             'status': ticket.status,

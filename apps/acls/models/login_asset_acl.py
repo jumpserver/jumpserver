@@ -1,8 +1,8 @@
-
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from orgs.mixins.models import OrgModelMixin
+from orgs.utils import tmp_to_root_org
 from .base import BaseACL
 from ..utils import contains_ip
 
@@ -33,8 +33,8 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
         ordering = ('priority', '-date_updated', 'name')
 
     @classmethod
-    def filter(cls, user, asset, system_user, org_id, action=ActionChoices.login_confirm):
-        queryset = cls.objects.filter(action=action, org_id=org_id)
+    def filter(cls, user, asset, system_user, action):
+        queryset = cls.objects.filter(action=action)
         queryset = cls.filter_user(user, queryset)
         queryset = cls.filter_asset(asset, queryset)
         queryset = cls.filter_system_user(system_user, queryset)
