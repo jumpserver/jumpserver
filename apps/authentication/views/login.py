@@ -122,6 +122,13 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
             url = "%s?%s" % (url, args)
         return url
 
+    def login_it(self, user):
+        auth_login(self.request, user)
+        # 如果设置了自动登录，那需要设置 session_id cookie 的有效期
+        if self.request.session.get('auto_login'):
+            age = self.request.session.get_expiry_age()
+            self.request.session.set_expiry(age)
+
     def get_redirect_url(self, *args, **kwargs):
         try:
             user = self.check_user_auth_if_need()
@@ -138,7 +145,7 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
         except errors.PasswdTooSimple as e:
             return e.url
         else:
-            auth_login(self.request, user)
+            self.login_it(user)
             self.send_auth_signal(success=True, user=user)
             self.clear_auth_mark()
             url = redirect_user_first_login_or_index(

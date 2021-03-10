@@ -82,7 +82,7 @@ class AuthMixin:
         return raw_passwd
 
     def raise_credential_error(self, error):
-        raise self.partial_credential_error(error=errors.reason_password_decrypt_failed)
+        raise self.partial_credential_error(error=error)
 
     def get_auth_data(self, decrypt_passwd=False):
         request = self.request
@@ -91,8 +91,8 @@ class AuthMixin:
         else:
             data = request.POST
 
-        items = ['username', 'password', 'challenge', 'public_key']
-        username, password, challenge, public_key = bulk_get(data, *items,  default='')
+        items = ['username', 'password', 'challenge', 'public_key', 'auto_login']
+        username, password, challenge, public_key, auto_login = bulk_get(data, *items,  default='')
         password = password + challenge.strip()
         ip = self.get_request_ip()
         self.partial_credential_error = partial(errors.CredentialError, username=username, ip=ip, request=request)
@@ -101,7 +101,7 @@ class AuthMixin:
             password = self.decrypt_passwd(password)
             if not password:
                 self.raise_credential_error(errors.reason_password_decrypt_failed)
-        return username, password, public_key, ip
+        return username, password, public_key, ip, auto_login
 
     def _check_only_allow_exists_user_auth(self, username):
         # 仅允许预先存在的用户认证
@@ -138,7 +138,7 @@ class AuthMixin:
     def check_user_auth(self, decrypt_passwd=False):
         self.check_is_block()
         request = self.request
-        username, password, public_key, ip = self.get_auth_data(decrypt_passwd=decrypt_passwd)
+        username, password, public_key, ip, auto_login = self.get_auth_data(decrypt_passwd=decrypt_passwd)
 
         self._check_only_allow_exists_user_auth(username)
         user = self._check_auth_user_is_valid(username, password, public_key)
@@ -153,6 +153,7 @@ class AuthMixin:
         clean_failed_count(username, ip)
         request.session['auth_password'] = 1
         request.session['user_id'] = str(user.id)
+        request.session['auto_login'] = auto_login
         request.session['auth_backend'] = auth_backend
         return user
 
