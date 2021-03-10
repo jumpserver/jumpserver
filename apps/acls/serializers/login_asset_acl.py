@@ -41,7 +41,7 @@ class LoginAssetACLSystemUsersSerializer(serializers.Serializer):
     protocol_group = serializers.ListField(
         default=['*'], child=serializers.CharField(max_length=16), label=_('Protocol'),
         help_text=const.common_help_text + _('Protocol options: {}').format(
-            ', '.join(SystemUser.ASSET_CATEGORY_PROTOCOLS)
+            ', '.join(SystemUser.ASSET_CATEGORY_PROTOCOLS + ['*'])
         )
     )
 
@@ -68,18 +68,11 @@ class LoginAssetACLSerializer(BulkOrgResourceModelSerializer):
             "reviewers": {'allow_null': False, 'required': True}
         }
 
-    @staticmethod
-    def validate_org_id(org_id):
-        org = Organization.get_instance(org_id)
-        if not org:
-            error = _('The organization `{}` does not exist'.format(org_id))
-            raise serializers.ValidationError(error)
-        return org_id
-
     def validate_reviewers(self, reviewers):
-        org_id = self.initial_data.get('org_id')
-        self.validate_org_id(org_id)
-        org = Organization.get_instance(org_id)
+        org = self.fields['org_id'].default()
+        if not org:
+            error = _('The current organization is None')
+            raise serializers.ValidationError(error)
         users = org.get_members()
         valid_reviewers = list(set(reviewers) & set(users))
         if not valid_reviewers:
