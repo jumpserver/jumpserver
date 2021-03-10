@@ -37,6 +37,19 @@ def is_ip_segment(ip, only_ipv4=False):
     return is_ip_address(ip_address1, only_ipv4) and is_ip_address(ip_address2, only_ipv4)
 
 
+def in_ip_segment(ip, ip_segment):
+    ip_1, ip_2 = ip_segment.split('-')
+    ip_1_bits = ip_1.split('.')
+    ip_2_bits = ip_2.split('.')
+    ip_bits = ip.split('.')
+    ip_bits_range = zip(ip_bits, ip_1_bits, ip_2_bits)
+    for ip_bit_range in ip_bits_range:
+        bit_range = range(min(ip_bit_range[1:]), max(ip_bit_range[1:]) + 1)
+        if ip_bit_range[0] not in bit_range:
+            return False
+    return True
+
+
 def contains_ip(ip, ip_group):
     """
     ip_group:
@@ -55,15 +68,8 @@ def contains_ip(ip, ip_group):
             if ip_address(ip) in ip_network(_ip):
                 return True
         elif is_ip_segment(_ip, only_ipv4=True):
-            ip_1, ip_2 = _ip.split('-')
-            ip_bits = ip.split('.')
-            ip_1_bits = ip_1.split('.')
-            ip_2_bits = ip_2.split('.')
-            ip_bits_range = zip(ip_bits, ip_1_bits, ip_2_bits)
-            for ip_bit_range in ip_bits_range:
-                bit_range = range(min(ip_bit_range[1:]), max(ip_bit_range[1:])+1)
-                if ip_bit_range[0] not in bit_range:
-                    break
+            if in_ip_segment(ip, _ip):
+                return True
         else:
             # is domain name
             if ip == _ip:
