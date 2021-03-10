@@ -1,9 +1,9 @@
-from django.utils.translation import ugettext_lazy as _
 from django.db.models.functions import Concat
 from django.db.models import F, Value
 from rest_framework import serializers
 from common.drf.serializers import BulkModelSerializer
 from ..models import LoginACL
+from .. import const
 
 
 __all__ = ['LoginACLSerializer', 'LoginACLUserRelationSerializer']
@@ -17,9 +17,7 @@ class LoginACLSerializer(BulkModelSerializer):
             'date_created', 'date_updated'
         ]
         extra_kwargs = {
-            'priority': {'label': _('')},
-            'ip_group': {'label': _('')},
-            'users': {'label': _('')}
+            'ip_group': {'help_text': const.ip_group_help_text},
         }
 
 

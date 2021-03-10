@@ -26,7 +26,7 @@ class LoginAssetCheckAPI(CreateAPIView):
             'action': LoginAssetACL.ActionChoices.login_confirm
         }
         with tmp_to_org(self.serializer.org):
-            acl = LoginAssetACL.filter(**quires).first()
+            acl = LoginAssetACL.filter(**quires).valid().first()
 
         if not acl:
             is_need_confirm = False

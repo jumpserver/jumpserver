@@ -1,10 +1,15 @@
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
-from orgs.mixins.models import OrgModelMixin
-from orgs.utils import tmp_to_root_org
-from .base import BaseACL
+from orgs.mixins.models import OrgModelMixin, OrgManager
+from .base import BaseACL, BaseACLQuerySet
 from ..utils import contains_ip
+
+
+class ACLManager(OrgManager):
+
+    def valid(self):
+        return self.get_queryset().valid()
 
 
 class LoginAssetACL(BaseACL, OrgModelMixin):
@@ -27,6 +32,8 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
         'users.User', related_name='review_login_asset_acls', blank=True,
         verbose_name=_("Reviewers")
     )
+
+    objects = ACLManager.from_queryset(BaseACLQuerySet)()
 
     class Meta:
         unique_together = ('name', 'org_id')

@@ -1,10 +1,10 @@
-
 from rest_framework import serializers
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
+from assets.models import SystemUser
 from acls import models
 from orgs.models import Organization
-from users.models import User
+from .. import const
 
 
 __all__ = ['LoginAssetACLSerializer']
@@ -13,29 +13,43 @@ __all__ = ['LoginAssetACLSerializer']
 class LoginAssetACLUsersSerializer(serializers.Serializer):
     username_group = serializers.ListField(
         default=['*'], child=serializers.CharField(max_length=128), label=_('Username'),
-        help_text=_('')
+        help_text=const.common_help_text
     )
 
 
 class LoginAssetACLAssestsSerializer(serializers.Serializer):
     ip_group = serializers.ListField(
-        default=['*'], child=serializers.CharField(max_length=1024), label=_('IP')
+        default=['*'], child=serializers.CharField(max_length=1024), label=_('IP'),
+        help_text=const.ip_group_help_text + _('Domain name support.')
     )
     hostname_group = serializers.ListField(
-        default=['*'], child=serializers.CharField(max_length=128), label=_('Hostname')
+        default=['*'], child=serializers.CharField(max_length=128), label=_('Hostname'),
+        help_text=const.common_help_text
     )
 
 
 class LoginAssetACLSystemUsersSerializer(serializers.Serializer):
     name_group = serializers.ListField(
-        default=['*'], child=serializers.CharField(max_length=128), label=_('Name')
+        default=['*'], child=serializers.CharField(max_length=128), label=_('Name'),
+        help_text=const.common_help_text
     )
     username_group = serializers.ListField(
-        default=['*'], child=serializers.CharField(max_length=128), label=_('Username')
+        default=['*'], child=serializers.CharField(max_length=128), label=_('Username'),
+        help_text=const.common_help_text
     )
     protocol_group = serializers.ListField(
-        default=['*'], child=serializers.CharField(max_length=16), label=_('Protocol')
+        default=['*'], child=serializers.CharField(max_length=16), label=_('Protocol'),
+        help_text=const.common_help_text + _('Protocol options: {}').format(
+            ', '.join(SystemUser.ASSET_CATEGORY_PROTOCOLS)
+        )
     )
+
+    @staticmethod
+    def validate_protocol_group(protocol_group):
+        unsupported_protocols = set(protocol_group) - set(SystemUser.ASSET_CATEGORY_PROTOCOLS)
+        if unsupported_protocols:
+            raise serializers.ValidationError(_(f'Unsupported protocols: {unsupported_protocols}'))
+        return protocol_group
 
 
 class LoginAssetACLSerializer(BulkOrgResourceModelSerializer):

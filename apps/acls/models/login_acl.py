@@ -1,8 +1,13 @@
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from .base import BaseACL
-from ..utils import contains_ip
+from .base import BaseACL, BaseACLQuerySet
+
+
+class ACLManager(models.Manager):
+
+    def valid(self):
+        return self.get_queryset().valid()
 
 
 class LoginACL(BaseACL):
@@ -20,9 +25,11 @@ class LoginACL(BaseACL):
     # 关联
     users = models.ManyToManyField('users.User', related_name='login_acls', verbose_name=_('User'))
 
+    objects = ACLManager.from_queryset(BaseACLQuerySet)()
+
     class Meta:
         ordering = ('priority', '-date_updated', 'name')
 
     @classmethod
     def get_user_acl(cls, user, action):
-        return user.login_acls.filter(action=action).first()
+        return user.login_acls.filter(action=action).valid().first()

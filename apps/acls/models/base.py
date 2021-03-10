@@ -4,7 +4,21 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from common.mixins import CommonModelMixin
 
 
-__all__ = ['BaseACL']
+__all__ = ['BaseACL', 'BaseACLQuerySet']
+
+
+class BaseACLQuerySet(models.QuerySet):
+    def active(self):
+        return self.filter(is_active=True)
+
+    def inactive(self):
+        return self.filter(is_active=False)
+
+    def valid(self):
+        return self.active()
+
+    def invalid(self):
+        return self.inactive()
 
 
 class BaseACL(CommonModelMixin):
