@@ -3,39 +3,35 @@ from rest_framework_bulk import BulkModelViewSet
 
 from ..mixins.api import (
     SerializerMixin2, QuerySetMixin, ExtraFilterFieldsMixin, PaginatedResponseMixin,
-    RelationMixin, AllowBulkDestoryMixin
+    RelationMixin, AllowBulkDestoryMixin, RenderToJsonMixin,
 )
 
 
-class JmsGenericViewSet(SerializerMixin2,
-                        QuerySetMixin,
-                        ExtraFilterFieldsMixin,
-                        PaginatedResponseMixin,
+class CommonMixin(SerializerMixin2,
+                  QuerySetMixin,
+                  ExtraFilterFieldsMixin,
+                  PaginatedResponseMixin,
+                  RenderToJsonMixin):
+    pass
+
+
+class JmsGenericViewSet(CommonMixin,
                         GenericViewSet):
     pass
 
 
-class JMSModelViewSet(SerializerMixin2,
-                      QuerySetMixin,
-                      ExtraFilterFieldsMixin,
-                      PaginatedResponseMixin,
+class JMSModelViewSet(CommonMixin,
                       ModelViewSet):
     pass
 
 
-class JMSBulkModelViewSet(SerializerMixin2,
-                          QuerySetMixin,
-                          ExtraFilterFieldsMixin,
-                          PaginatedResponseMixin,
+class JMSBulkModelViewSet(CommonMixin,
                           AllowBulkDestoryMixin,
                           BulkModelViewSet):
     pass
 
 
-class JMSBulkRelationModelViewSet(SerializerMixin2,
-                                  QuerySetMixin,
-                                  ExtraFilterFieldsMixin,
-                                  PaginatedResponseMixin,
+class JMSBulkRelationModelViewSet(CommonMixin,
                                   RelationMixin,
                                   AllowBulkDestoryMixin,
                                   BulkModelViewSet):
