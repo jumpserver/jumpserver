@@ -287,6 +287,7 @@ class Config(dict):
         'DISK_CHECK_ENABLED': True,
         'SESSION_SAVE_EVERY_REQUEST': True,
         'SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE': False,
+        'FORGOT_PASSWORD_URL': '',
     }
 
     def compatible_auth_openid_of_key(self):

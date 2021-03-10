@@ -163,7 +163,7 @@
                                 {% endif %}
                             </div>
                             <div class="col-md-6">
-                                <a id="forgot_password" href="{% url 'authentication:forgot-password' %}" style="float: right">
+                                <a id="forgot_password" href="{{ forgot_password_url }}" style="float: right">
                                     <small>{% trans 'Forgot password' %}?</small>
                                 </a>
                             </div>
