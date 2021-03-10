@@ -127,6 +127,7 @@ class AssetPermissionFilter(PermissionBaseFilter):
         qs = self.filter_effective(qs)
         qs = self.filter_asset(qs)
         qs = self.filter_node(qs)
+        qs = qs.distinct()
         return qs
 
     def filter_node(self, queryset: QuerySet):
