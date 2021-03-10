@@ -100,11 +100,17 @@ class UserLoginView(mixins.AuthMixin, FormView):
             self.request.session[RSA_PRIVATE_KEY] = rsa_private_key
             self.request.session[RSA_PUBLIC_KEY] = rsa_public_key
 
+        forgot_password_url = reverse('authentication:forgot-password')
+        has_other_auth_backend = settings.AUTHENTICATION_BACKENDS[0] != settings.AUTH_BACKEND_MODEL
+        if has_other_auth_backend and settings.FORGOT_PASSWORD_URL:
+            forgot_password_url = settings.FORGOT_PASSWORD_URL
+
         context = {
             'demo_mode': os.environ.get("DEMO_MODE"),
             'AUTH_OPENID': settings.AUTH_OPENID,
             'AUTH_CAS': settings.AUTH_CAS,
             'rsa_public_key': rsa_public_key,
+            'forgot_password_url': forgot_password_url
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
