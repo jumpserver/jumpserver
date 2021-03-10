@@ -1,3 +1,4 @@
+from django.utils.translation import ugettext_lazy as _
 from django.db.models.functions import Concat
 from django.db.models import F, Value
 from rest_framework import serializers
@@ -15,6 +16,11 @@ class LoginACLSerializer(BulkModelSerializer):
             'id', 'name', 'priority', 'ip_group', 'users', 'action', 'comment', 'created_by',
             'date_created', 'date_updated'
         ]
+        extra_kwargs = {
+            'priority': {'label': _('')},
+            'ip_group': {'label': _('')},
+            'users': {'label': _('')}
+        }
 
 
 class LoginACLUserRelationSerializer(BulkModelSerializer):

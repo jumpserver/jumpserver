@@ -10,7 +10,7 @@ __all__ = ['BaseACL']
 class BaseACL(CommonModelMixin):
     priority = models.IntegerField(
         default=50, verbose_name=_("Priority"),
-        help_text=_("1-100, the higher will be match first"),
+        help_text=_("1-100, the lower the value will be match first"),
         validators=[MinValueValidator(1), MaxValueValidator(100)]
     )
     is_active = models.BooleanField(default=True, verbose_name=_("Active"))
