@@ -1,3 +1,4 @@
+from django.utils.translation import ugettext as _
 from django.db.models.functions import Concat
 from django.db.models import F, Value
 from rest_framework import serializers
@@ -10,15 +11,17 @@ __all__ = ['LoginACLSerializer', 'LoginACLUserRelationSerializer']
 
 
 class LoginACLSerializer(BulkModelSerializer):
+    ip_group = serializers.ListField(
+        default=['*'], child=serializers.CharField(max_length=1024), label=_('IP'),
+        help_text=const.ip_group_help_text + _('Domain name support.')
+    )
+
     class Meta:
         model = LoginACL
         fields = [
             'id', 'name', 'priority', 'ip_group', 'users', 'action', 'comment', 'created_by',
             'date_created', 'date_updated'
         ]
-        extra_kwargs = {
-            'ip_group': {'help_text': const.ip_group_help_text},
-        }
 
 
 class LoginACLUserRelationSerializer(BulkModelSerializer):
