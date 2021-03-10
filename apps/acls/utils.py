@@ -1,24 +1,14 @@
 from ipaddress import ip_network, ip_address, IPv4Address, AddressValueError, NetmaskValueError
 
 
-def is_ip_address(address, only_ipv4=False):
+def is_ip_address(address):
     """ 192.168.10.1 """
-
-    if only_ipv4:
-        try:
-            IPv4Address(address)
-        except (AddressValueError, NetmaskValueError):
-            return False
-            pass
-        else:
-            return True
+    try:
+        ip_address(address)
+    except ValueError:
+        return False
     else:
-        try:
-            ip_address(address)
-        except ValueError:
-            return False
-        else:
-            return True
+        return True
 
 
 def is_ip_network(ip):
@@ -31,24 +21,18 @@ def is_ip_network(ip):
         return True
 
 
-def is_ip_segment(ip, only_ipv4=False):
+def is_ip_segment(ip):
     """ 10.1.1.1-10.1.1.20 """
     ip_address1, ip_address2 = ip.split('-')
-    return is_ip_address(ip_address1, only_ipv4) and is_ip_address(ip_address2, only_ipv4)
+    return is_ip_address(ip_address1) and is_ip_address(ip_address2)
 
 
 def in_ip_segment(ip, ip_segment):
     ip1, ip2 = ip_segment.split('-')
-    ip_1, ip_2 = ip_segment.split('-')
-    ip_1_bits = ip_1.split('.')
-    ip_2_bits = ip_2.split('.')
-    ip_bits = ip.split('.')
-    ip_bits_range = zip(ip_bits, ip_1_bits, ip_2_bits)
-    for ip_bit_range in ip_bits_range:
-        bit_range = range(min(ip_bit_range[1:]), max(ip_bit_range[1:]) + 1)
-        if ip_bit_range[0] not in bit_range:
-            return False
-    return True
+    ip1 = int(ip_address(ip1))
+    ip2 = int(ip_address(ip2))
+    ip = int(ip_address(ip))
+    return min(ip1, ip2) <= ip <= max(ip1, ip2)
 
 
 def contains_ip(ip, ip_group):
@@ -68,11 +52,12 @@ def contains_ip(ip, ip_group):
         elif is_ip_network(_ip) and is_ip_address(ip):
             if ip_address(ip) in ip_network(_ip):
                 return True
-        elif is_ip_segment(_ip, only_ipv4=True):
+        elif is_ip_segment(_ip) and is_ip_address(ip):
             if in_ip_segment(ip, _ip):
                 return True
         else:
             # is domain name
             if ip == _ip:
                 return True
+
     return False
