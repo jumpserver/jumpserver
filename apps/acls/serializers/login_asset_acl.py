@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.utils.translation import ugettext as _
+from common.drf.fields import ReadableHiddenField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from assets.models import SystemUser
 from acls import models
