@@ -69,9 +69,10 @@ class LoginAssetACLSerializer(BulkOrgResourceModelSerializer):
         }
 
     def validate_reviewers(self, reviewers):
-        org = self.fields['org_id'].default()
+        org_id = self.fields['org_id'].default()
+        org = Organization.get_instance(org_id)
         if not org:
-            error = _('The current organization is None')
+            error = _('The current organization `{}` is None'.format(org_id))
             raise serializers.ValidationError(error)
         users = org.get_members()
         valid_reviewers = list(set(reviewers) & set(users))
