@@ -1,9 +1,11 @@
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.generics import CreateAPIView, RetrieveDestroyAPIView
 
 from common.permissions import IsAppUser
 from common.utils import reverse, lazyproperty
-from orgs.utils import tmp_to_org
+from orgs.utils import tmp_to_org, tmp_to_root_org
+from tickets.models import Ticket
 from ..models import LoginAssetACL
 from .. import serializers
 
@@ -98,8 +100,6 @@ class LoginAssetConfirmStatusAPI(RetrieveDestroyAPIView):
         return Response(data=data, status=200)
 
     @lazyproperty
-    def serializer(self):
-        serializer = self.get_serializer(data=self.request.data)
-        serializer.is_valid(raise_exception=True)
-        return serializer
-
+    def ticket(self):
+        with tmp_to_root_org():
+            return get_object_or_404(Ticket, pk=self.kwargs['pk'])
