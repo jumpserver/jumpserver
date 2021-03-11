@@ -9,25 +9,8 @@ from django.db import migrations
 default_id = '00000000-0000-0000-0000-000000000001'
 
 
-def add_default_org(apps, schema_editor):
-    org_cls = apps.get_model('orgs', 'Organization')
-    defaults = {'name': 'DEFAULT', 'id': default_id}
-    org_cls.objects.get_or_create(defaults=defaults, id=default_id)
-
-
 def migrate_default_org_id(apps, schema_editor):
     org_app_models = [
-        ('applications', ['Application']),
-        ('assets', [
-            'AdminUser', 'Asset', 'AuthBook', 'CommandFilter',
-            'CommandFilterRule', 'Domain', 'Gateway', 'GatheredUser',
-            'Label', 'Node', 'SystemUser'
-        ]),
-        ('audits', ['FTPLog', 'OperateLog']),
-        ('ops', ['AdHoc', 'AdHocExecution', 'CommandExecution', 'Task']),
-        ('perms', ['ApplicationPermission', 'AssetPermission', 'UserAssetGrantedTreeNodeRelation']),
-        ('terminal', ['Session', 'Command']),
-        ('tickets', ['Ticket']),
         ('users', ['UserGroup']),
     ]
     print("")
@@ -65,12 +48,11 @@ def add_all_user_to_default_org(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('orgs', '0009_auto_20201023_1628'),
-        ('perms', '0018_auto_20210208_1515'),
+        ('users', '0031_auto_20201118_1801'),
+        ('orgs', '0010_migrate_default_org_id'),
     ]
 
     operations = [
-        migrations.RunPython(add_default_org),
         migrations.RunPython(migrate_default_org_id),
         migrations.RunPython(add_all_user_to_default_org)
     ]
