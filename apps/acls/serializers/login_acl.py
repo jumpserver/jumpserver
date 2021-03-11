@@ -23,10 +23,8 @@ def ip_group_child_validator(ip_group_child):
 
 class LoginACLSerializer(BulkModelSerializer):
     ip_group = serializers.ListField(
-        default=['*'],
-        child=serializers.CharField(max_length=1024, validators=[ip_group_child_validator]),
-        label=_('IP'),
-        help_text=const.ip_group_help_text + _('Domain name support.')
+        default=['*'], label=_('IP'), help_text=const.ip_group_help_text,
+        child=serializers.CharField(max_length=1024, validators=[ip_group_child_validator])
     )
     users_amount = serializers.IntegerField(read_only=True, source='users.count')
 

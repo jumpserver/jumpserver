@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-11 14:33+0800\n"
+"POT-Creation-Date: 2021-03-11 14:42+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -182,7 +182,7 @@ msgstr "登录资产复核"
 msgid "IP address invalid: `{}`"
 msgstr "IP 地址无效: `{}`"
 
-#: acls/serializers/login_acl.py:28 acls/serializers/login_asset_acl.py:22
+#: acls/serializers/login_acl.py:26 acls/serializers/login_asset_acl.py:22
 #: applications/serializers/attrs/application_type/mysql_workbench.py:18
 #: assets/models/asset.py:183 assets/models/domain.py:52
 #: assets/serializers/asset_user.py:46 settings/serializers/settings.py:108
@@ -190,10 +190,6 @@ msgstr "IP 地址无效: `{}`"
 #: users/templates/users/user_asset_permission.html:156
 msgid "IP"
 msgstr "IP"
-
-#: acls/serializers/login_acl.py:29 acls/serializers/login_asset_acl.py:23
-msgid "Domain name support."
-msgstr "支持域名."
 
 #: acls/serializers/login_asset_acl.py:15
 #: acls/serializers/login_asset_acl.py:37
@@ -213,6 +209,10 @@ msgstr "支持域名."
 #: xpack/plugins/cloud/serializers.py:44
 msgid "Username"
 msgstr "用户名"
+
+#: acls/serializers/login_asset_acl.py:23
+msgid "(Domain name support)"
+msgstr "(支持域名)"
 
 #: acls/serializers/login_asset_acl.py:26 assets/models/asset.py:184
 #: assets/serializers/asset_user.py:45 assets/serializers/gathered_user.py:20

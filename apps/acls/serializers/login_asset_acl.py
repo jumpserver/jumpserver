@@ -20,7 +20,7 @@ class LoginAssetACLUsersSerializer(serializers.Serializer):
 class LoginAssetACLAssestsSerializer(serializers.Serializer):
     ip_group = serializers.ListField(
         default=['*'], child=serializers.CharField(max_length=1024), label=_('IP'),
-        help_text=const.ip_group_help_text + _('Domain name support.')
+        help_text=const.ip_group_help_text + _('(Domain name support)')
     )
     hostname_group = serializers.ListField(
         default=['*'], child=serializers.CharField(max_length=128), label=_('Hostname'),
