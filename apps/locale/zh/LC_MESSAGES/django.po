@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-11 14:42+0800\n"
+"POT-Creation-Date: 2021-03-11 15:44+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -18,16 +18,16 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: acls/const.py:4
-msgid "Format for comma-delimited string, with `*` indicating a match all. "
-msgstr "格式为逗号分隔的字符串, `*` 表示匹配所有"
+msgid "Format for comma-delimited string, with * indicating a match all. "
+msgstr "格式为逗号分隔的字符串, * 表示匹配所有. "
 
 #: acls/const.py:7
 msgid ""
-"IP range. Such as: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:"
-"db8:2de::e13, 2001:db8:1a:1110::/64 "
+"Such as: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::"
+"e13, 2001:db8:1a:1110::/64 "
 msgstr ""
-"IP范围. 例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:"
-"db8:2de::e13, 2001:db8:1a:1110::/64"
+"例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, "
+"2001:db8:1a:1110::/64"
 
 #: acls/models/base.py:26 assets/models/cmd_filter.py:53
 #: assets/models/user.py:119
@@ -110,6 +110,7 @@ msgid "Login IP"
 msgstr "登录IP"
 
 #: acls/models/login_acl.py:26 acls/models/login_asset_acl.py:27
+#: acls/serializers/login_acl.py:30 acls/serializers/login_asset_acl.py:61
 #: assets/models/cmd_filter.py:56 audits/models.py:57
 #: authentication/templates/authentication/_access_key_modal.html:34
 #: tickets/models/ticket.py:43 users/templates/users/_granted_assets.html:29
@@ -236,12 +237,12 @@ msgstr "协议选项: {}"
 msgid "Unsupported protocols: {}"
 msgstr "不支持的协议: {}"
 
-#: acls/serializers/login_asset_acl.py:76
+#: acls/serializers/login_asset_acl.py:78
 #: tickets/serializers/ticket/ticket.py:109
 msgid "The organization `{}` does not exist"
 msgstr "组织 `{}` 不存在"
 
-#: acls/serializers/login_asset_acl.py:81
+#: acls/serializers/login_asset_acl.py:83
 msgid "None of the reviewers belong to Organization `{}`"
 msgstr "所有复核人都不属于组织 `{}`"
 
