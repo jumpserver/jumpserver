@@ -35,7 +35,8 @@ class LoginACLSerializer(BulkModelSerializer):
             'action_display', 'is_active', 'comment', 'created_by', 'date_created', 'date_updated'
         ]
         extra_kwargs = {
-            'priority': {'default': 50}
+            'priority': {'default': 50},
+            'is_active': {'default': True},
         }
 
     @staticmethod
