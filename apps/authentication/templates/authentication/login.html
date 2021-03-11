@@ -113,13 +113,20 @@
             margin: 0;
         }
 
+        #github_star {
+            float: right;
+            margin: 10px 10px 0 0;
+        }
+
     </style>
 </head>
 
 <body>
 <div class="login-content ">
     <div class="right-image-box">
-        <img src="{{ LOGIN_IMAGE_URL }}" style="height: 100%; width: 100%"/>
+        <a href="{% if not XPACK_ENABLED %}https://github.com/jumpserver/jumpserver{% endif %}">
+            <img src="{{ LOGIN_IMAGE_URL }}" style="height: 100%; width: 100%"/>
+        </a>
     </div>
     <div class="left-form-box {% if not form.challenge and not form.captcha %} no-captcha-challenge {% endif %}">
         <div style="background-color: white">
