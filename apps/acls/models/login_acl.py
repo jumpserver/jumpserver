@@ -43,7 +43,7 @@ class LoginACL(BaseACL):
 
     @staticmethod
     def allow_user_to_login(user, ip):
-        acl = user.login_acls.first()
+        acl = user.login_acls.valid().first()
         if not acl:
             return True
         is_contained = contains_ip(ip, acl.ip_group)
