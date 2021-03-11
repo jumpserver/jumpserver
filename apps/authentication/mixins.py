@@ -129,6 +129,7 @@ class AuthMixin:
                 self.raise_credential_error(error=errors.reason_backend_not_match)
 
     def _check_login_acl(self, user, ip):
+        # ACL 限制用户登录
         from acls.models import LoginACL
         is_allowed = LoginACL.allow_user_to_login(user, ip)
         if not is_allowed:
