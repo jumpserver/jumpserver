@@ -130,9 +130,8 @@ class AuthMixin:
 
     def _check_login_acl(self, user, ip):
         from acls.models import LoginACL
-        from acls.utils import contains_ip
-        acl = LoginACL.get_user_acl(user, action=LoginACL.ActionChoices.reject)
-        if acl and contains_ip(ip, acl.ip_group):
+        is_allowed = LoginACL.allow_user_to_login(user, ip)
+        if not is_allowed:
             raise self.raise_credential_error(error=errors.reason_acl_not_allow)
 
     def check_user_auth(self, decrypt_passwd=False):

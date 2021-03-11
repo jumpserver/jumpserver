@@ -2,6 +2,8 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from .base import BaseACL, BaseACLQuerySet
+from ..utils import contains_ip
+
 
 
 class ACLManager(models.Manager):
@@ -31,6 +33,22 @@ class LoginACL(BaseACL):
     class Meta:
         ordering = ('priority', '-date_updated', 'name')
 
-    @classmethod
-    def get_user_acl(cls, user, action):
-        return user.login_acls.filter(action=action).valid().first()
+    @property
+    def action_reject(self):
+        return self.action == self.ActionChoices.reject
+
+    @property
+    def action_allow(self):
+        return self.action == self.ActionChoices.allow
+
+    @staticmethod
+    def allow_user_to_login(user, ip):
+        acl = user.login_acls.first()
+        if not acl:
+            return True
+        is_contained = contains_ip(ip, acl.ip_group)
+        if acl.action_allow and is_contained:
+            return True
+        if acl.action_reject and not is_contained:
+            return True
+        return False
