@@ -27,12 +27,13 @@ class LoginACLSerializer(BulkModelSerializer):
         child=serializers.CharField(max_length=1024, validators=[ip_group_child_validator])
     )
     users_amount = serializers.IntegerField(read_only=True, source='users.count')
+    action_display = serializers.ReadOnlyField(source='get_action_display', label=_('Action'))
 
     class Meta:
         model = LoginACL
         fields = [
-            'id', 'name', 'priority', 'ip_group', 'users', 'users_amount', 'action', 'comment',
-            'created_by', 'date_created', 'date_updated'
+            'id', 'name', 'priority', 'ip_group', 'users', 'users_amount', 'action',
+            'action_display', 'comment', 'created_by', 'date_created', 'date_updated'
         ]
 
 
