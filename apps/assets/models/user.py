@@ -116,7 +116,7 @@ class SystemUser(BaseUser):
     assets = models.ManyToManyField('assets.Asset', blank=True, verbose_name=_("Assets"))
     users = models.ManyToManyField('users.User', blank=True, verbose_name=_("Users"))
     groups = models.ManyToManyField('users.UserGroup', blank=True, verbose_name=_("User groups"))
-    priority = models.IntegerField(default=20, verbose_name=_("Priority"), validators=[MinValueValidator(1), MaxValueValidator(100)])
+    priority = models.IntegerField(default=20, verbose_name=_("Priority"), help_text=_("1-100, the lower the value will be match first"), validators=[MinValueValidator(1), MaxValueValidator(100)])
     protocol = models.CharField(max_length=16, choices=PROTOCOL_CHOICES, default='ssh', verbose_name=_('Protocol'))
     auto_push = models.BooleanField(default=True, verbose_name=_('Auto push'))
     sudo = models.TextField(default='/bin/whoami', verbose_name=_('Sudo'))

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 import time
-
 from rest_framework import permissions
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.conf import settings
@@ -193,3 +192,12 @@ class IsObjectOwner(IsValidUser):
     def has_object_permission(self, request, view, obj):
         return (super().has_object_permission(request, view, obj) and
                 request.user == getattr(obj, 'user', None))
+
+
+class HasQueryParamsUserAndIsCurrentOrgMember(permissions.BasePermission):
+    def has_permission(self, request, view):
+        query_user_id = request.query_params.get('user')
+        if not query_user_id:
+            return False
+        query_user = current_org.get_members().filter(id=query_user_id).first()
+        return bool(query_user)
