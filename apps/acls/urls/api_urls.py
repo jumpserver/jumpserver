@@ -9,7 +9,6 @@ app_name = 'acls'
 router = BulkRouter()
 router.register(r'login-acls', api.LoginACLViewSet, 'login-acl')
 router.register(r'login-asset-acls', api.LoginAssetACLViewSet, 'login-asset-acl')
-router.register(r'login-acls-users-relations', api.LoginACLUserRelationViewSet, 'login-acls-users-relation')
 
 urlpatterns = [
     path('login-asset/check/', api.LoginAssetCheckAPI.as_view(), name='login-asset-check'),

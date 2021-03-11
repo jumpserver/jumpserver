@@ -16,7 +16,6 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
     class ActionChoices(models.TextChoices):
         login_confirm = 'login_confirm', _('Login confirm')
 
-    name = models.CharField(max_length=128, verbose_name=_('Name'))
     # 条件
     users = models.JSONField(verbose_name=_('User'))
     system_users = models.JSONField(verbose_name=_('System User'))

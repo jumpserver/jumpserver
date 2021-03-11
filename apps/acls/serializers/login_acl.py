@@ -1,14 +1,13 @@
 from django.utils.translation import ugettext as _
-from django.db.models.functions import Concat
-from django.db.models import F, Value
 from rest_framework import serializers
 from common.drf.serializers import BulkModelSerializer
+from orgs.utils import current_org
 from ..models import LoginACL
 from ..utils import is_ip_address, is_ip_network,  is_ip_segment
 from .. import const
 
 
-__all__ = ['LoginACLSerializer', 'LoginACLUserRelationSerializer']
+__all__ = ['LoginACLSerializer', ]
 
 
 def ip_group_child_validator(ip_group_child):
@@ -26,30 +25,21 @@ class LoginACLSerializer(BulkModelSerializer):
         default=['*'], label=_('IP'), help_text=const.ip_group_help_text,
         child=serializers.CharField(max_length=1024, validators=[ip_group_child_validator])
     )
-    users_amount = serializers.IntegerField(read_only=True, source='users.count')
+    user_display = serializers.ReadOnlyField(source='user.name', label=_('User'))
     action_display = serializers.ReadOnlyField(source='get_action_display', label=_('Action'))
 
     class Meta:
         model = LoginACL
         fields = [
-            'id', 'name', 'priority', 'ip_group', 'users', 'users_amount', 'action',
+            'id', 'name', 'priority', 'ip_group', 'user', 'user_display', 'action',
             'action_display', 'comment', 'created_by', 'date_created', 'date_updated'
         ]
 
-
-class LoginACLUserRelationSerializer(BulkModelSerializer):
-    loginacl_display = serializers.ReadOnlyField(source='loginacl.name')
-    user_display = serializers.ReadOnlyField()
-
-    class Meta:
-        model = LoginACL.users.through
-        fields = [
-            'id', 'loginacl', 'user', 'loginacl_display', 'user_display'
-        ]
-
     @staticmethod
-    def setup_eager_loading(queryset):
-        queryset = queryset.prefetch_related('user').annotate(
-            user_display=Concat(F('user__name'), Value('('), F('user__username'), Value(')')),
-        )
-        return queryset
+    def validate_user(user):
+        if user not in current_org.get_members():
+            error = _('The user `{}` is not in the current organization: `{}`').format(
+                user, current_org
+            )
+            raise serializers.ValidationError(error)
+        return user

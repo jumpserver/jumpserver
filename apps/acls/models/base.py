@@ -22,6 +22,7 @@ class BaseACLQuerySet(models.QuerySet):
 
 
 class BaseACL(CommonModelMixin):
+    name = models.CharField(max_length=128, verbose_name=_('Name'))
     priority = models.IntegerField(
         default=50, verbose_name=_("Priority"),
         help_text=_("1-100, the lower the value will be match first"),

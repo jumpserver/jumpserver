@@ -5,7 +5,6 @@ from .base import BaseACL, BaseACLQuerySet
 from ..utils import contains_ip
 
 
-
 class ACLManager(models.Manager):
 
     def valid(self):
@@ -17,7 +16,6 @@ class LoginACL(BaseACL):
         reject = 'reject', _('Reject')
         allow = 'allow', _('Allow')
 
-    name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
     # 条件
     ip_group = models.JSONField(default=list, verbose_name=_('Login IP'))
     # 动作
@@ -26,7 +24,7 @@ class LoginACL(BaseACL):
         verbose_name=_('Action')
     )
     # 关联
-    users = models.ManyToManyField('users.User', related_name='login_acls', verbose_name=_('User'))
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='login_acls')
 
     objects = ACLManager.from_queryset(BaseACLQuerySet)()
 
