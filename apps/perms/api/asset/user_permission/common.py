@@ -121,7 +121,7 @@ class UserGrantedAssetSystemUsersForAdminApi(ListAPIView):
         system_user_ids = system_users_with_actions.keys()
         system_users = SystemUser.objects.filter(id__in=system_user_ids)\
             .only(*self.serializer_class.Meta.only_fields) \
-            .order_by('priority')
+            .order_by('name')
         system_users = list(system_users)
         for system_user in system_users:
             actions = system_users_with_actions.get(system_user.id, 0)
