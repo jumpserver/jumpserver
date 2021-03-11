@@ -6,11 +6,25 @@ from rest_framework.serializers import ValidationError
 from rest_framework.compat import coreapi, coreschema
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
+from django_filters import rest_framework as drf_filters
 import logging
 
 from common import const
 
-__all__ = ["DatetimeRangeFilter", "IDSpmFilter", 'IDInFilter', "CustomFilter"]
+__all__ = [
+    "DatetimeRangeFilter", "IDSpmFilter", 'IDInFilter', "CustomFilter",
+    "BaseFilterSet"
+]
+
+
+class BaseFilterSet(drf_filters.FilterSet):
+    def do_nothing(self, queryset, name, value):
+        return queryset
+
+    def get_query_param(self, k, default=None):
+        if k in self.form.data:
+            return self.form.cleaned_data[k]
+        return default
 
 
 class DatetimeRangeFilter(filters.BaseFilterBackend):
@@ -94,11 +108,11 @@ class IDSpmFilter(filters.BaseFilterBackend):
         spm = request.query_params.get('spm')
         if not spm:
             return queryset
-        cache_key = const.KEY_CACHE_RESOURCES_ID.format(spm)
-        resources_id = cache.get(cache_key)
-        if resources_id is None or not isinstance(resources_id, list):
+        cache_key = const.KEY_CACHE_RESOURCE_IDS.format(spm)
+        resource_ids = cache.get(cache_key)
+        if resource_ids is None or not isinstance(resource_ids, list):
             return queryset
-        queryset = queryset.filter(id__in=resources_id)
+        queryset = queryset.filter(id__in=resource_ids)
         return queryset
 
 

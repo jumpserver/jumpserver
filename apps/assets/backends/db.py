@@ -69,9 +69,9 @@ class DBBackend(BaseBackend):
         self.queryset = self.queryset.filter(union_id=union_id)
 
     def _filter_assets(self, assets):
-        assets_id = self.make_assets_as_id(assets)
-        if assets_id:
-            self.queryset = self.queryset.filter(asset_id__in=assets_id)
+        asset_ids = self.make_assets_as_ids(assets)
+        if asset_ids:
+            self.queryset = self.queryset.filter(asset_id__in=asset_ids)
 
     def _filter_node(self, node):
         pass

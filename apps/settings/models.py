@@ -3,9 +3,11 @@ import json
 from django.db import models
 from django.db.utils import ProgrammingError, OperationalError
 from django.utils.translation import ugettext_lazy as _
-from django.core.cache import cache
+from django.conf import settings
 
-from common.utils import signer
+from common.utils import signer, get_logger
+
+logger = get_logger(__name__)
 
 
 class SettingQuerySet(models.QuerySet):
@@ -36,24 +38,6 @@ class Setting(models.Model):
 
     def __str__(self):
         return self.name
-
-    @classmethod
-    def get(cls, item):
-        cached = cls.get_from_cache(item)
-        if cached is not None:
-            return cached
-        instances = cls.objects.filter(name=item)
-        if len(instances) == 1:
-            s = instances[0]
-            s.refresh_setting()
-            return s.cleaned_value
-        return None
-
-    @classmethod
-    def get_from_cache(cls, item):
-        key = cls.cache_key_prefix + item
-        cached = cache.get(key)
-        return cached
 
     @property
     def cleaned_value(self):
@@ -87,9 +71,52 @@ class Setting(models.Model):
         except (ProgrammingError, OperationalError):
             pass
 
+    @classmethod
+    def refresh_item(cls, name):
+        item = cls.objects.filter(name=name).first()
+        if not item:
+            return
+        item.refresh_setting()
+
     def refresh_setting(self):
-        key = self.cache_key_prefix + self.name
-        cache.set(key, self.cleaned_value, None)
+        logger.debug(f"Refresh setting: {self.name}")
+        if hasattr(self.__class__, f'refresh_{self.name}'):
+            getattr(self.__class__, f'refresh_{self.name}')()
+        else:
+            setattr(settings, self.name, self.cleaned_value)
+
+    @classmethod
+    def refresh_AUTH_LDAP(cls):
+        setting = cls.objects.filter(name='AUTH_LDAP').first()
+        if not setting:
+            return
+        ldap_backend = settings.AUTH_BACKEND_LDAP
+        backends = settings.AUTHENTICATION_BACKENDS
+        has = ldap_backend in backends
+        if setting.cleaned_value and not has:
+            settings.AUTHENTICATION_BACKENDS.insert(0, ldap_backend)
+
+        if not setting.cleaned_value and has:
+            index = backends.index(ldap_backend)
+            backends.pop(index)
+        settings.AUTH_LDAP = setting.cleaned_value
+
+    @classmethod
+    def update_or_create(cls, name='', value='', encrypted=False, category=''):
+        """
+        不能使用 Model 提供的，update_or_create 因为这里有 encrypted 和 cleaned_value
+        :return: (changed, instance)
+        """
+        setting = cls.objects.filter(name=name).first()
+        changed = False
+        if not setting:
+            setting = Setting(name=name, encrypted=encrypted, category=category)
+        if setting.cleaned_value != value:
+            setting.encrypted = encrypted
+            setting.cleaned_value = value
+            setting.save()
+            changed = True
+        return changed, setting
 
     class Meta:
         db_table = "settings_setting"

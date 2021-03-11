@@ -17,7 +17,7 @@ from orgs.mixins.models import OrgModelMixin, OrgManager
 from .base import ConnectivityMixin
 from .utils import Connectivity
 
-__all__ = ['Asset', 'ProtocolsMixin', 'Platform']
+__all__ = ['Asset', 'ProtocolsMixin', 'Platform', 'AssetQuerySet']
 logger = logging.getLogger(__name__)
 
 
@@ -41,13 +41,6 @@ def default_node():
 
 
 class AssetManager(OrgManager):
-    def get_queryset(self):
-        return super().get_queryset().annotate(
-            platform_base=models.F('platform__base')
-        )
-
-
-class AssetOrgManager(OrgManager):
     pass
 
 
@@ -230,7 +223,6 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
     objects = AssetManager.from_queryset(AssetQuerySet)()
-    org_objects = AssetOrgManager.from_queryset(AssetQuerySet)()
     _connectivity = None
 
     def __str__(self):
@@ -361,4 +353,4 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     class Meta:
         unique_together = [('org_id', 'hostname')]
         verbose_name = _("Asset")
-        ordering = ["hostname", "ip"]
+        ordering = ["hostname", ]

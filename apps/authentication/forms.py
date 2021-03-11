@@ -8,10 +8,25 @@ from captcha.fields import CaptchaField, CaptchaTextInput
 
 
 class UserLoginForm(forms.Form):
-    username = forms.CharField(label=_('Username'), max_length=100)
+    days_auto_login = int(settings.SESSION_COOKIE_AGE / 3600 / 24)
+    disable_days_auto_login = settings.SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE or days_auto_login < 1
+
+    username = forms.CharField(
+        label=_('Username'), max_length=100,
+        widget=forms.TextInput(attrs={
+            'placeholder': _("Username"),
+            'autofocus': 'autofocus'
+        })
+    )
     password = forms.CharField(
         label=_('Password'), widget=forms.PasswordInput,
         max_length=1024, strip=False
+    )
+    auto_login = forms.BooleanField(
+        label=_("{} days auto login").format(days_auto_login or 1),
+        required=False, initial=False, widget=forms.CheckboxInput(
+            attrs={'disabled': disable_days_auto_login}
+        )
     )
 
     def confirm_login_allowed(self, user):
@@ -35,8 +50,13 @@ class CaptchaMixin(forms.Form):
 
 
 class ChallengeMixin(forms.Form):
-    challenge = forms.CharField(label=_('MFA code'), max_length=6,
-                                required=False)
+    challenge = forms.CharField(
+        label=_('MFA code'), max_length=6, required=False,
+        widget=forms.TextInput(attrs={
+            'placeholder': _("MFA code"),
+            'style': 'width: 50%'
+        })
+    )
 
 
 def get_user_login_form_cls(*, captcha=False):

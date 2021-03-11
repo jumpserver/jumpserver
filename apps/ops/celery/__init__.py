@@ -4,7 +4,6 @@ import os
 
 from kombu import Exchange, Queue
 from celery import Celery
-from celery.schedules import crontab
 
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'jumpserver.settings')
@@ -20,11 +19,7 @@ configs = {k: v for k, v in settings.__dict__.items() if k.startswith('CELERY')}
 configs["CELERY_QUEUES"] = [
     Queue("celery", Exchange("celery"), routing_key="celery"),
     Queue("ansible", Exchange("ansible"), routing_key="ansible"),
-    Queue("celery_node_tree", Exchange("celery_node_tree"), routing_key="celery_node_tree")
 ]
-configs["CELERY_ROUTES"] = {
-    "ops.tasks.run_ansible_task": {'exchange': 'ansible', 'routing_key': 'ansible'},
-}
 
 app.namespace = 'CELERY'
 app.conf.update(configs)

@@ -45,9 +45,10 @@ class UserLoginView(mixins.AuthMixin, FormView):
 
     def get(self, request, *args, **kwargs):
         if request.user.is_staff:
-            return redirect(redirect_user_first_login_or_index(
-                request, self.redirect_field_name)
+            first_login_url = redirect_user_first_login_or_index(
+                request, self.redirect_field_name
             )
+            return redirect(first_login_url)
         request.session.set_test_cookie()
         return super().get(request, *args, **kwargs)
 
@@ -99,11 +100,17 @@ class UserLoginView(mixins.AuthMixin, FormView):
             self.request.session[RSA_PRIVATE_KEY] = rsa_private_key
             self.request.session[RSA_PUBLIC_KEY] = rsa_public_key
 
+        forgot_password_url = reverse('authentication:forgot-password')
+        has_other_auth_backend = settings.AUTHENTICATION_BACKENDS[0] != settings.AUTH_BACKEND_MODEL
+        if has_other_auth_backend and settings.FORGOT_PASSWORD_URL:
+            forgot_password_url = settings.FORGOT_PASSWORD_URL
+
         context = {
             'demo_mode': os.environ.get("DEMO_MODE"),
             'AUTH_OPENID': settings.AUTH_OPENID,
             'AUTH_CAS': settings.AUTH_CAS,
             'rsa_public_key': rsa_public_key,
+            'forgot_password_url': forgot_password_url
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -121,6 +128,13 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
             url = "%s?%s" % (url, args)
         return url
 
+    def login_it(self, user):
+        auth_login(self.request, user)
+        # 如果设置了自动登录，那需要设置 session_id cookie 的有效期
+        if self.request.session.get('auto_login'):
+            age = self.request.session.get_expiry_age()
+            self.request.session.set_expiry(age)
+
     def get_redirect_url(self, *args, **kwargs):
         try:
             user = self.check_user_auth_if_need()
@@ -137,7 +151,7 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
         except errors.PasswdTooSimple as e:
             return e.url
         else:
-            auth_login(self.request, user)
+            self.login_it(user)
             self.send_auth_signal(success=True, user=user)
             self.clear_auth_mark()
             url = redirect_user_first_login_or_index(

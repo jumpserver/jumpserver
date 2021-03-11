@@ -51,6 +51,9 @@ class UserOtpEnableInstallAppView(TemplateView):
         return super().get_context_data(**kwargs)
 
 
+
+
+
 class UserOtpEnableBindView(AuthMixin, TemplateView, FormView):
     template_name = 'users/user_otp_enable_bind.html'
     form_class = forms.UserCheckOtpCodeForm

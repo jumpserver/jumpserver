@@ -235,6 +235,28 @@ def send_reset_ssh_key_mail(user):
     send_mail_async.delay(subject, message, recipient_list, html_message=message)
 
 
+def send_reset_mfa_mail(user):
+    subject = _('MFA Reset')
+    recipient_list = [user.email]
+    message = _("""
+    Hello %(name)s:
+    <br>
+    Your MFA has been reset by site administrator.
+    Please login and reset your MFA.
+    <br>
+    <a href="%(login_url)s">Login direct</a>
+
+    <br>
+    """) % {
+        'name': user.name,
+        'login_url': reverse('authentication:login', external=True),
+    }
+    if settings.DEBUG:
+        logger.debug(message)
+
+    send_mail_async.delay(subject, message, recipient_list, html_message=message)
+
+
 def get_user_or_pre_auth_user(request):
     user = request.user
     if user.is_authenticated:
@@ -358,22 +380,6 @@ def construct_user_email(username, email):
 def get_current_org_members(exclude=()):
     from orgs.utils import current_org
     return current_org.get_members(exclude=exclude)
-
-
-def get_source_choices():
-    from .models import User
-    choices = [
-        (User.Source.local.value, User.Source.local.label),
-    ]
-    if settings.AUTH_LDAP:
-        choices.append((User.Source.ldap.value, User.Source.ldap.label))
-    if settings.AUTH_OPENID:
-        choices.append((User.Source.openid.value, User.Source.openid.label))
-    if settings.AUTH_RADIUS:
-        choices.append((User.Source.radius.value, User.Source.radius.label))
-    if settings.AUTH_CAS:
-        choices.append((User.Source.cas.value, User.Source.cas.label))
-    return choices
 
 
 def is_auth_time_valid(session, key):

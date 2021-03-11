@@ -4,8 +4,6 @@ from __future__ import unicode_literals
 from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
-from django.conf.urls.i18n import i18n_patterns
-from django.http import HttpResponse
 from django.views.i18n import JavaScriptCatalog
 
 from . import views, api
@@ -24,12 +22,8 @@ api_v1 = [
     path('common/', include('common.urls.api_urls', namespace='api-common')),
     path('applications/', include('applications.urls.api_urls', namespace='api-applications')),
     path('tickets/', include('tickets.urls.api_urls', namespace='api-tickets')),
+    path('acls/', include('acls.urls.api_urls', namespace='api-acls')),
     path('prometheus/metrics/', api.PrometheusMetricsApi.as_view())
-]
-
-api_v2 = [
-    path('terminal/', include('terminal.urls.api_urls_v2', namespace='api-terminal-v2')),
-    path('users/', include('users.urls.api_urls_v2', namespace='api-users-v2')),
 ]
 
 app_view_patterns = [
@@ -46,14 +40,13 @@ if settings.XPACK_ENABLED:
 
 apps = [
     'users', 'assets', 'perms', 'terminal', 'ops', 'audits', 'orgs', 'auth',
-    'applications', 'tickets', 'settings', 'xpack'
+    'applications', 'tickets', 'settings', 'xpack',
     'flower', 'luna', 'koko', 'ws', 'docs', 'redocs',
 ]
 
 urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
     path('api/v1/', include(api_v1)),
-    path('api/v2/', include(api_v2)),
     re_path('api/(?P<app>\w+)/(?P<version>v\d)/.*', views.redirect_format_api),
     path('api/health/', views.HealthCheckView.as_view(), name="health"),
     # External apps url
@@ -77,11 +70,6 @@ urlpatterns += [
             views.get_swagger_view().without_ui(cache_timeout=1), name='schema-json'),
     re_path('api/docs/?', views.get_swagger_view().with_ui('swagger', cache_timeout=1), name="docs"),
     re_path('api/redoc/?', views.get_swagger_view().with_ui('redoc', cache_timeout=1), name='redoc'),
-
-    re_path('^api/v2/swagger(?P<format>\.json|\.yaml)$',
-            views.get_swagger_view().without_ui(cache_timeout=1), name='schema-json'),
-    path('api/docs/v2/', views.get_swagger_view("v2").with_ui('swagger', cache_timeout=1), name="docs"),
-    path('api/redoc/v2/', views.get_swagger_view("v2").with_ui('redoc', cache_timeout=1), name='redoc'),
 ]
 
 

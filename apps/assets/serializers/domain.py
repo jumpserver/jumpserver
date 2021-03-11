@@ -77,8 +77,6 @@ class GatewayWithAuthSerializer(GatewaySerializer):
         return fields
 
 
-
-
 class DomainWithGatewaySerializer(BulkOrgResourceModelSerializer):
     gateways = GatewayWithAuthSerializer(many=True, read_only=True)
 

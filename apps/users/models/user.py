@@ -16,13 +16,13 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.shortcuts import reverse
 
-from common.local import LOCAL_DYNAMIC_SETTINGS
 from orgs.utils import current_org
 from orgs.models import OrganizationMember, Organization
-from common.utils import date_expired_default, get_logger, lazyproperty
+from common.utils import date_expired_default, get_logger, lazyproperty, random_string
 from common import fields
 from common.const import choices
 from common.db.models import ChoiceSet
+from users.exceptions import MFANotEnabled
 from ..signals import post_user_change_password
 
 
@@ -169,20 +169,21 @@ class RoleMixin:
     def org_roles(self):
         from orgs.models import ROLE as ORG_ROLE
 
-        if not current_org.is_real():
-            # 不是真实的组织，取 User 本身的角色
+        if current_org.is_root():
+            # root 组织, 取 User 本身的角色
             if self.is_superuser:
-                return [ORG_ROLE.ADMIN]
+                roles = [ORG_ROLE.ADMIN]
+            elif self.is_super_auditor:
+                roles = [ORG_ROLE.AUDITOR]
             else:
-                return [ORG_ROLE.USER]
-
-        # 是真实组织，取 OrganizationMember 中的角色
-        roles = [
-            org_member.role
-            for org_member in self.m2m_org_members.all()
-            if org_member.org_id == current_org.id
-        ]
-        roles.sort()
+                roles = [ORG_ROLE.USER]
+        else:
+            # 是真实组织, 取 OrganizationMember 中的角色
+            roles = [
+                org_member.role for org_member in self.m2m_org_members.all()
+                if org_member.org_id == current_org.id
+            ]
+            roles.sort()
         return roles
 
     @lazyproperty
@@ -202,7 +203,7 @@ class RoleMixin:
 
     def current_org_roles(self):
         from orgs.models import OrganizationMember, ROLE as ORG_ROLE
-        if not current_org.is_real():
+        if current_org.is_root():
             if self.is_superuser:
                 return [ORG_ROLE.ADMIN]
             else:
@@ -297,7 +298,7 @@ class RoleMixin:
 
     @lazyproperty
     def can_user_current_org(self):
-        return current_org.can_user_by(self)
+        return current_org.can_use_by(self)
 
     @lazyproperty
     def can_admin_or_audit_current_org(self):
@@ -325,7 +326,7 @@ class RoleMixin:
         return app, access_key
 
     def remove(self):
-        if not current_org.is_real():
+        if current_org.is_root():
             return
         org = Organization.get_instance(current_org.id)
         OrganizationMember.objects.remove_users(org, [self])
@@ -345,11 +346,11 @@ class RoleMixin:
     @classmethod
     def get_super_and_org_admins(cls, org=None):
         super_admins = cls.get_super_admins()
-        super_admins_id = list(super_admins.values_list('id', flat=True))
+        super_admin_ids = list(super_admins.values_list('id', flat=True))
         org_admins = cls.get_org_admins(org)
-        org_admins_id = list(org_admins.values_list('id', flat=True))
-        admins_id = set(org_admins_id + super_admins_id)
-        admins = User.objects.filter(id__in=admins_id)
+        org_admin_ids = list(org_admins.values_list('id', flat=True))
+        admin_ids = set(org_admin_ids + super_admin_ids)
+        admins = User.objects.filter(id__in=admin_ids)
         return admins
 
 
@@ -387,7 +388,7 @@ class TokenMixin:
         cache_key = '%s_%s' % (self.id, remote_addr)
         token = cache.get(cache_key)
         if not token:
-            token = uuid.uuid4().hex
+            token = random_string(36)
         cache.set(token, self.id, expiration)
         cache.set('%s_%s' % (self.id, remote_addr), token, expiration)
         date_expired = timezone.now() + timezone.timedelta(seconds=expiration)
@@ -452,7 +453,7 @@ class MFAMixin:
 
     @property
     def mfa_force_enabled(self):
-        if LOCAL_DYNAMIC_SETTINGS.SECURITY_MFA_AUTH:
+        if settings.SECURITY_MFA_AUTH:
             return True
         return self.mfa_level == 2
 
@@ -490,6 +491,9 @@ class MFAMixin:
         return check_otp_code(self.otp_secret_key, code)
 
     def check_mfa(self, code):
+        if not self.mfa_enabled:
+            raise MFANotEnabled
+
         if settings.OTP_IN_RADIUS:
             return self.check_radius(code)
         else:
@@ -510,6 +514,14 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         openid = 'openid', 'OpenID'
         radius = 'radius', 'Radius'
         cas = 'cas', 'CAS'
+
+    SOURCE_BACKEND_MAPPING = {
+        Source.local: [settings.AUTH_BACKEND_MODEL, settings.AUTH_BACKEND_PUBKEY],
+        Source.ldap: [settings.AUTH_BACKEND_LDAP],
+        Source.openid: [settings.AUTH_BACKEND_OIDC_PASSWORD, settings.AUTH_BACKEND_OIDC_CODE],
+        Source.radius: [settings.AUTH_BACKEND_RADIUS],
+        Source.cas: [settings.AUTH_BACKEND_CAS],
+    }
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     username = models.CharField(
@@ -559,15 +571,14 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         max_length=30, default='', blank=True, verbose_name=_('Created by')
     )
     source = models.CharField(
-        max_length=30, default=Source.local.value, choices=Source.choices,
+        max_length=30, default=Source.local,
+        choices=Source.choices,
         verbose_name=_('Source')
     )
     date_password_last_updated = models.DateTimeField(
         auto_now_add=True, blank=True, null=True,
         verbose_name=_('Date password last updated')
     )
-
-    user_cache_key_prefix = '_User_{}'
 
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
@@ -655,6 +666,13 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
             return admin_default
         else:
             return user_default
+
+    @property
+    def login_blocked(self):
+        key_prefix_block = "_LOGIN_BLOCK_{}"
+        key_block = key_prefix_block.format(self.username)
+        blocked = bool(cache.get(key_block))
+        return blocked
 
     def delete(self, using=None, keep_parents=False):
         if self.pk == 1 or self.username == 'admin':

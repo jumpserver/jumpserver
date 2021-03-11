@@ -16,6 +16,7 @@ from common.mixins import CommonApiMixin
 from common.utils import get_logger
 from orgs.utils import current_org
 from orgs.models import ROLE as ORG_ROLE, OrganizationMember
+from users.utils import send_reset_mfa_mail
 from .. import serializers
 from ..serializers import UserSerializer, UserRetrieveSerializer, MiniUserSerializer, InviteSerializer
 from .mixins import UserQuerysetMixin
@@ -47,7 +48,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         queryset = super().get_queryset().prefetch_related(
             'groups'
         )
-        if current_org.is_real():
+        if not current_org.is_root():
             # 为在列表中计算用户在真实组织里的角色
             queryset = queryset.prefetch_related(
                 Prefetch(
@@ -66,7 +67,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
     @staticmethod
     def set_users_to_org(users, org_roles, update=False):
         # 只有真实存在的组织才真正关联用户
-        if not current_org or not current_org.is_real():
+        if not current_org or current_org.is_root():
             return
         for user, roles in zip(users, org_roles):
             if update and roles is None:
@@ -93,7 +94,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         return super().get_permissions()
 
     def perform_destroy(self, instance):
-        if current_org.is_real():
+        if not current_org.is_root():
             instance.remove()
         else:
             return super().perform_destroy(instance)
@@ -122,10 +123,10 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
 
     def perform_bulk_update(self, serializer):
         # TODO: 需要测试
-        users_ids = [
+        user_ids = [
             d.get("id") or d.get("pk") for d in serializer.validated_data
         ]
-        users = current_org.get_members().filter(id__in=users_ids)
+        users = current_org.get_members().filter(id__in=user_ids)
         for user in users:
             self.check_object_permissions(self.request, user)
         return super().perform_bulk_update(serializer)
@@ -149,7 +150,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         data = request.data
         if not isinstance(data, list):
             data = [request.data]
-        if not current_org or not current_org.is_real():
+        if not current_org or current_org.is_root():
             error = {"error": "Not a valid org"}
             return Response(error, status=400)
 
@@ -201,4 +202,5 @@ class UserResetOTPApi(UserQuerysetMixin, generics.RetrieveAPIView):
         if user.mfa_enabled:
             user.reset_mfa()
             user.save()
+            send_reset_mfa_mail(user)
         return Response({"msg": "success"})

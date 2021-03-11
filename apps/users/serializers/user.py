@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 #
 from django.core.cache import cache
-from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from common.utils import validate_ssh_public_key
 from common.mixins import CommonBulkSerializerMixin
 from common.permissions import CanUpdateDeleteUser
 from orgs.models import ROLE as ORG_ROLE
@@ -13,22 +11,9 @@ from ..models import User
 
 
 __all__ = [
-    'UserSerializer', 'UserPKUpdateSerializer',
-    'ChangeUserPasswordSerializer', 'ResetOTPSerializer',
-    'UserProfileSerializer', 'UserOrgSerializer',
-    'UserUpdatePasswordSerializer', 'UserUpdatePublicKeySerializer',
-    'UserRetrieveSerializer', 'MiniUserSerializer', 'InviteSerializer'
+    'UserSerializer', 'UserRetrieveSerializer', 'MiniUserSerializer',
+    'InviteSerializer', 'ServiceAccountSerializer',
 ]
-
-
-class UserOrgSerializer(serializers.Serializer):
-    id = serializers.CharField()
-    name = serializers.CharField()
-
-
-class UserOrgLabelSerializer(serializers.Serializer):
-    value = serializers.CharField(source='id')
-    label = serializers.CharField(source='name')
 
 
 class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
@@ -39,16 +24,20 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         (1, CUSTOM_PASSWORD)
     )
     password_strategy = serializers.ChoiceField(
-        choices=PASSWORD_STRATEGY_CHOICES, required=False, initial=0,
-        label=_('Password strategy'), write_only=True
+        choices=PASSWORD_STRATEGY_CHOICES, required=False,
+        label=_('Password strategy'), write_only=True, default=0
     )
+    mfa_enabled = serializers.BooleanField(read_only=True, label=_('MFA enabled'))
+    mfa_force_enabled = serializers.BooleanField(read_only=True, label=_('MFA force enabled'))
     mfa_level_display = serializers.ReadOnlyField(source='get_mfa_level_display', label=_('MFA level for display'))
-    login_blocked = serializers.SerializerMethodField(label=_('Login blocked'))
+    login_blocked = serializers.BooleanField(read_only=True, label=_('Login blocked'))
+    is_expired = serializers.BooleanField(read_only=True, label=_('Is expired'))
     can_update = serializers.SerializerMethodField(label=_('Can update'))
     can_delete = serializers.SerializerMethodField(label=_('Can delete'))
-    org_roles = serializers.ListField(label=_('Organization role name'), allow_null=True, required=False,
-                                      child=serializers.ChoiceField(choices=ORG_ROLE.choices))
-    key_prefix_block = "_LOGIN_BLOCK_{}"
+    org_roles = serializers.ListField(
+        label=_('Organization role name'), allow_null=True, required=False,
+        child=serializers.ChoiceField(choices=ORG_ROLE.choices), default=["User"]
+    )
 
     class Meta:
         model = User
@@ -69,7 +58,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         ]
 
         read_only_fields = [
-            'date_joined', 'last_login', 'created_by', 'is_first_login', 'source'
+            'date_joined', 'last_login', 'created_by', 'is_first_login',
         ]
 
         extra_kwargs = {
@@ -85,8 +74,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
             'org_role_display': {'label': _('Organization role name')},
             'role_display': {'label': _('Super role name')},
             'total_role_display': {'label': _('Total role name')},
-            'mfa_enabled': {'label': _('MFA enabled')},
-            'mfa_force_enabled': {'label': _('MFA force enabled')},
+            'role': {'default': "User"},
         }
 
     def __init__(self, *args, **kwargs):
@@ -125,17 +113,6 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
             raise serializers.ValidationError(msg)
         return password
 
-    def validate_groups(self, groups):
-        """
-        审计员不能加入到组中
-        """
-        role = self.initial_data.get('role')
-        if self.instance:
-            role = role or self.instance.role
-        if role == User.ROLE.AUDITOR:
-            return []
-        return groups
-
     @staticmethod
     def change_password_to_raw(attrs):
         password = attrs.pop('password', None)
@@ -167,11 +144,6 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
             self.context['request'], self.context['view'], obj
         )
 
-    def get_login_blocked(self, obj):
-        key_block = self.key_prefix_block.format(obj.username)
-        blocked = bool(cache.get(key_block))
-        return blocked
-
 
 class UserRetrieveSerializer(UserSerializer):
     login_confirm_settings = serializers.PrimaryKeyRelatedField(read_only=True,
@@ -179,166 +151,6 @@ class UserRetrieveSerializer(UserSerializer):
 
     class Meta(UserSerializer.Meta):
         fields = UserSerializer.Meta.fields + ['login_confirm_settings']
-
-
-class UserPKUpdateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id', 'public_key']
-
-    @staticmethod
-    def validate_public_key(value):
-        if not validate_ssh_public_key(value):
-            raise serializers.ValidationError(_('Not a valid ssh public key'))
-        return value
-
-
-class ChangeUserPasswordSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = User
-        fields = ['password']
-
-
-class ResetOTPSerializer(serializers.Serializer):
-    msg = serializers.CharField(read_only=True)
-
-    def create(self, validated_data):
-        pass
-
-    def update(self, instance, validated_data):
-        pass
-
-
-class UserRoleSerializer(serializers.Serializer):
-    name = serializers.CharField(max_length=24)
-    display = serializers.CharField(max_length=64)
-
-
-class UserProfileSerializer(UserSerializer):
-    admin_or_audit_orgs = UserOrgSerializer(many=True, read_only=True)
-    user_all_orgs = UserOrgLabelSerializer(many=True, read_only=True)
-    current_org_roles = serializers.ListField(read_only=True)
-    public_key_comment = serializers.CharField(
-        source='get_public_key_comment', required=False, read_only=True, max_length=128
-    )
-    public_key_hash_md5 = serializers.CharField(
-        source='get_public_key_hash_md5', required=False, read_only=True, max_length=128
-    )
-    MFA_LEVEL_CHOICES = (
-        (0, _('Disable')),
-        (1, _('Enable')),
-    )
-    mfa_level = serializers.ChoiceField(choices=MFA_LEVEL_CHOICES, label=_('MFA'), required=False)
-    guide_url = serializers.SerializerMethodField()
-
-    class Meta(UserSerializer.Meta):
-        fields = UserSerializer.Meta.fields + [
-            'public_key_comment', 'public_key_hash_md5', 'admin_or_audit_orgs', 'current_org_roles',
-            'guide_url', 'user_all_orgs'
-        ]
-        read_only_fields = [
-            'date_joined', 'last_login', 'created_by', 'source'
-        ]
-        extra_kwargs = dict(UserSerializer.Meta.extra_kwargs)
-        extra_kwargs.update({
-            'name': {'read_only': True, 'max_length': 128},
-            'username': {'read_only': True, 'max_length': 128},
-            'email': {'read_only': True},
-            'is_first_login': {'label': _('Is first login'), 'read_only': False},
-            'source': {'read_only': True},
-            'is_valid': {'read_only': True},
-            'is_active': {'read_only': True},
-            'groups': {'read_only': True},
-            'roles': {'read_only': True},
-            'password_strategy': {'read_only': True},
-            'date_expired': {'read_only': True},
-            'date_joined': {'read_only': True},
-            'last_login': {'read_only': True},
-            'role': {'read_only': True},
-        })
-
-        if 'password' in fields:
-            fields.remove('password')
-            extra_kwargs.pop('password', None)
-
-    @staticmethod
-    def get_guide_url(obj):
-        return settings.USER_GUIDE_URL
-
-    def validate_mfa_level(self, mfa_level):
-        if self.instance and self.instance.mfa_force_enabled:
-            return 2
-        return mfa_level
-
-    def validate_public_key(self, public_key):
-        if self.instance and self.instance.can_update_ssh_key():
-            if not validate_ssh_public_key(public_key):
-                raise serializers.ValidationError(_('Not a valid ssh public key'))
-            return public_key
-        return None
-
-
-class UserUpdatePasswordSerializer(serializers.ModelSerializer):
-    old_password = serializers.CharField(required=True, max_length=128, write_only=True)
-    new_password = serializers.CharField(required=True, max_length=128, write_only=True)
-    new_password_again = serializers.CharField(required=True, max_length=128, write_only=True)
-
-    class Meta:
-        model = User
-        fields = ['old_password', 'new_password', 'new_password_again']
-
-    def validate_old_password(self, value):
-        if not self.instance.check_password(value):
-            msg = _('The old password is incorrect')
-            raise serializers.ValidationError(msg)
-        return value
-
-    @staticmethod
-    def validate_new_password(value):
-        from ..utils import check_password_rules
-        if not check_password_rules(value):
-            msg = _('Password does not match security rules')
-            raise serializers.ValidationError(msg)
-        return value
-
-    def validate_new_password_again(self, value):
-        if value != self.initial_data.get('new_password', ''):
-            msg = _('The newly set password is inconsistent')
-            raise serializers.ValidationError(msg)
-        return value
-
-    def update(self, instance, validated_data):
-        new_password = self.validated_data.get('new_password')
-        instance.reset_password(new_password)
-        return instance
-
-
-class UserUpdatePublicKeySerializer(serializers.ModelSerializer):
-    public_key_comment = serializers.CharField(
-        source='get_public_key_comment', required=False, read_only=True, max_length=128
-    )
-    public_key_hash_md5 = serializers.CharField(
-        source='get_public_key_hash_md5', required=False, read_only=True, max_length=128
-    )
-
-    class Meta:
-        model = User
-        fields = ['public_key_comment', 'public_key_hash_md5', 'public_key']
-        extra_kwargs = {
-            'public_key': {'required': True, 'write_only': True, 'max_length': 2048}
-        }
-
-    @staticmethod
-    def validate_public_key(value):
-        if not validate_ssh_public_key(value):
-            raise serializers.ValidationError(_('Not a valid ssh public key'))
-        return value
-
-    def update(self, instance, validated_data):
-        new_public_key = self.validated_data.get('public_key')
-        instance.set_public_key(new_public_key)
-        return instance
 
 
 class MiniUserSerializer(serializers.ModelSerializer):
@@ -352,3 +164,46 @@ class InviteSerializer(serializers.Serializer):
         queryset=User.objects.exclude(role=User.ROLE.APP)
     )
     role = serializers.ChoiceField(choices=ORG_ROLE.choices)
+
+
+class ServiceAccountSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['id', 'name', 'access_key']
+        read_only_fields = ['access_key']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from authentication.serializers import AccessKeySerializer
+        self.fields['access_key'] = AccessKeySerializer(read_only=True)
+
+    def get_username(self):
+        return self.initial_data.get('name')
+
+    def get_email(self):
+        name = self.initial_data.get('name')
+        return '{}@serviceaccount.local'.format(name)
+
+    def validate_name(self, name):
+        email = self.get_email()
+        username = self.get_username()
+        if self.instance:
+            users = User.objects.exclude(id=self.instance.id)
+        else:
+            users = User.objects.all()
+        if users.filter(email=email) or \
+                users.filter(username=username):
+            raise serializers.ValidationError(_('name not unique'), code='unique')
+        return name
+
+    def save(self, **kwargs):
+        self.validated_data['email'] = self.get_email()
+        self.validated_data['username'] = self.get_username()
+        self.validated_data['role'] = User.ROLE.APP
+        return super().save(**kwargs)
+
+    def create(self, validated_data):
+        instance = super().create(validated_data)
+        instance.create_access_key()
+        return instance

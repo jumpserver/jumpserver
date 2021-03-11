@@ -22,6 +22,7 @@ class BaseFileParser(BaseParser):
     FILE_CONTENT_MAX_LENGTH = 1024 * 1024 * 10
 
     serializer_cls = None
+    serializer_fields = None
 
     def check_content_length(self, meta):
         content_length = int(meta.get('CONTENT_LENGTH', meta.get('HTTP_CONTENT_LENGTH', 0)))
@@ -45,7 +46,7 @@ class BaseFileParser(BaseParser):
 
     def convert_to_field_names(self, column_titles):
         fields_map = {}
-        fields = self.serializer_cls().fields
+        fields = self.serializer_fields
         fields_map.update({v.label: k for k, v in fields.items()})
         fields_map.update({k: k for k, _ in fields.items()})
         field_names = [
@@ -89,7 +90,7 @@ class BaseFileParser(BaseParser):
         构建json数据后的行数据处理
         """
         new_row_data = {}
-        serializer_fields = self.serializer_cls().fields
+        serializer_fields = self.serializer_fields
         for k, v in row_data.items():
             if isinstance(v, list) or isinstance(v, dict) or isinstance(v, str) and k.strip() and v.strip():
                 # 解决类似disk_info为字符串的'{}'的问题
@@ -111,12 +112,15 @@ class BaseFileParser(BaseParser):
         return data
 
     def parse(self, stream, media_type=None, parser_context=None):
-        parser_context = parser_context or {}
+        assert parser_context is not None, '`parser_context` should not be `None`'
+
+        view = parser_context['view']
+        request = view.request
 
         try:
-            view = parser_context['view']
-            meta = view.request.META
+            meta = request.META
             self.serializer_cls = view.get_serializer_class()
+            self.serializer_fields = self.serializer_cls().fields
         except Exception as e:
             logger.debug(e, exc_info=True)
             raise ParseError('The resource does not support imports!')
@@ -128,6 +132,13 @@ class BaseFileParser(BaseParser):
             rows = self.generate_rows(stream_data)
             column_titles = self.get_column_titles(rows)
             field_names = self.convert_to_field_names(column_titles)
+
+            # 给 `common.mixins.api.RenderToJsonMixin` 提供，暂时只能耦合
+            column_title_field_pairs = list(zip(column_titles, field_names))
+            if not hasattr(request, 'jms_context'):
+                request.jms_context = {}
+            request.jms_context['column_title_field_pairs'] = column_title_field_pairs
+
             data = self.generate_data(field_names, rows)
             return data
         except Exception as e:

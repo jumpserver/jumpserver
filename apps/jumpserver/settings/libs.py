@@ -7,7 +7,7 @@ REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': (
-        'common.permissions.IsOrgAdmin',
+        'common.permissions.IsSuperUser',
     ),
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
@@ -127,3 +127,8 @@ CELERY_WORKER_REDIRECT_STDOUTS_LEVEL = "INFO"
 CELERY_TASK_SOFT_TIME_LIMIT = 3600
 
 ANSIBLE_LOG_DIR = os.path.join(PROJECT_DIR, 'data', 'ansible')
+
+#
+REDIS_HOST = CONFIG.REDIS_HOST
+REDIS_PORT = CONFIG.REDIS_PORT
+REDIS_PASSWORD = CONFIG.REDIS_PASSWORD

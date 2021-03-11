@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 from collections import OrderedDict
+import datetime
 
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
@@ -21,7 +22,7 @@ class SimpleMetadataWithFilters(SimpleMetadata):
     attrs = [
         'read_only', 'label', 'help_text',
         'min_length', 'max_length',
-        'min_value', 'max_value', "write_only"
+        'min_value', 'max_value', "write_only",
     ]
 
     def determine_actions(self, request, view):
@@ -59,9 +60,10 @@ class SimpleMetadataWithFilters(SimpleMetadata):
         field_info['type'] = self.label_lookup[field]
         field_info['required'] = getattr(field, 'required', False)
 
-        default = getattr(field, 'default', False)
-        if default and isinstance(default, (str, int)):
-            field_info['default'] = default
+        default = getattr(field, 'default', None)
+        if default is not None and default != empty:
+            if isinstance(default, (str, int, bool, datetime.datetime, list)):
+                field_info['default'] = default
 
         for attr in self.attrs:
             value = getattr(field, attr, None)
@@ -95,6 +97,8 @@ class SimpleMetadataWithFilters(SimpleMetadata):
             fields = view.filterset_fields
         elif hasattr(view, 'get_filterset_fields'):
             fields = view.get_filterset_fields(request)
+        elif hasattr(view, 'filterset_class'):
+            fields = view.filterset_class.Meta.fields
 
         if isinstance(fields, dict):
             fields = list(fields.keys())

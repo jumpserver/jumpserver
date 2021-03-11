@@ -280,7 +280,14 @@ class Config(dict):
         'SESSION_COOKIE_SECURE': False,
         'CSRF_COOKIE_SECURE': False,
         'REFERER_CHECK_ENABLED': False,
-        'SERVER_REPLAY_STORAGE': {}
+        'SERVER_REPLAY_STORAGE': {},
+        'CONNECTION_TOKEN_ENABLED': False,
+        'ONLY_ALLOW_EXIST_USER_AUTH': False,
+        'ONLY_ALLOW_AUTH_FROM_SOURCE': True,
+        'DISK_CHECK_ENABLED': True,
+        'SESSION_SAVE_EVERY_REQUEST': True,
+        'SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE': False,
+        'FORGOT_PASSWORD_URL': '',
     }
 
     def compatible_auth_openid_of_key(self):
@@ -424,98 +431,6 @@ class Config(dict):
 
     def __getattr__(self, item):
         return self.get(item)
-
-
-class DynamicConfig:
-    def __init__(self, static_config):
-        self.static_config = static_config
-        self.db_setting = None
-
-    def __getitem__(self, item):
-        return self.dynamic(item)
-
-    def __getattr__(self, item):
-        return self.dynamic(item)
-
-    def dynamic(self, item):
-        return lambda: self.get(item)
-
-    def LOGIN_URL(self):
-        return self.get('LOGIN_URL')
-
-    def AUTHENTICATION_BACKENDS(self):
-        backends = [
-            'authentication.backends.pubkey.PublicKeyAuthBackend',
-            'django.contrib.auth.backends.ModelBackend',
-        ]
-        if self.get('AUTH_LDAP'):
-            backends.insert(0, 'authentication.backends.ldap.LDAPAuthorizationBackend')
-        if self.static_config.get('AUTH_CAS'):
-            backends.insert(0, 'authentication.backends.cas.CASBackend')
-        if self.static_config.get('AUTH_OPENID'):
-            backends.insert(0, 'jms_oidc_rp.backends.OIDCAuthPasswordBackend')
-            backends.insert(0, 'jms_oidc_rp.backends.OIDCAuthCodeBackend')
-        if self.static_config.get('AUTH_RADIUS'):
-            backends.insert(0, 'authentication.backends.radius.RadiusBackend')
-        if self.static_config.get('AUTH_SSO'):
-            backends.insert(0, 'authentication.backends.api.SSOAuthentication')
-        return backends
-
-    def XPACK_LICENSE_IS_VALID(self):
-        if not HAS_XPACK:
-            return False
-        try:
-            from xpack.plugins.license.models import License
-            return License.has_valid_license()
-        except:
-            return False
-
-    def XPACK_INTERFACE_LOGIN_TITLE(self):
-        default_title = _('Welcome to the JumpServer open source fortress')
-        if not HAS_XPACK:
-            return default_title
-        try:
-            from xpack.plugins.interface.models import Interface
-            return Interface.get_login_title()
-        except:
-            return default_title
-
-    def LOGO_URLS(self):
-        logo_urls = {'logo_logout': static('img/logo.png'),
-                     'logo_index': static('img/logo_text.png'),
-                     'login_image': static('img/login_image.png'),
-                     'favicon': static('img/facio.ico')}
-        if not HAS_XPACK:
-            return logo_urls
-        try:
-            from xpack.plugins.interface.models import Interface
-            obj = Interface.interface()
-            if obj:
-                if obj.logo_logout:
-                    logo_urls.update({'logo_logout': obj.logo_logout.url})
-                if obj.logo_index:
-                    logo_urls.update({'logo_index': obj.logo_index.url})
-                if obj.login_image:
-                    logo_urls.update({'login_image': obj.login_image.url})
-                if obj.favicon:
-                    logo_urls.update({'favicon': obj.favicon.url})
-        except:
-            pass
-        return logo_urls
-
-    def get_from_db(self, item):
-        if self.db_setting is not None:
-            value = self.db_setting.get(item)
-            if value is not None:
-                return value
-        return None
-
-    def get(self, item):
-        # 先从数据库中获取
-        value = self.get_from_db(item)
-        if value is not None:
-            return value
-        return self.static_config.get(item)
 
 
 class ConfigManager:
@@ -694,7 +609,3 @@ class ConfigManager:
         # 对config进行兼容处理
         config.compatible()
         return config
-
-    @classmethod
-    def get_dynamic_config(cls, config):
-        return DynamicConfig(config)

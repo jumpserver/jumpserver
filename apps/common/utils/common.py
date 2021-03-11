@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
 #
 import re
-import data_tree
 from collections import OrderedDict
 from itertools import chain
 import logging
 import datetime
 import uuid
 from functools import wraps
+import string
+import random
 import time
 import ipaddress
 import psutil
-from django.utils.translation import ugettext_lazy as _
-from ..exceptions import JMSException
 
 
 UUID_PATTERN = re.compile(r'\w{8}(-\w{4}){3}-\w{12}')
@@ -143,7 +142,7 @@ def is_uuid(seq):
     elif isinstance(seq, str) and UUID_PATTERN.match(seq):
         return True
     elif isinstance(seq, (list, tuple)):
-        all([is_uuid(x) for x in seq])
+        return all([is_uuid(x) for x in seq])
     return False
 
 
@@ -194,23 +193,17 @@ def with_cache(func):
     return wrapper
 
 
-def random_string(length):
-    import string
-    import random
-    charset = string.ascii_letters + string.digits
-    s = [random.choice(charset) for i in range(length)]
-    return ''.join(s)
-
-
 logger = get_logger(__name__)
 
 
 def timeit(func):
     def wrapper(*args, **kwargs):
-        if hasattr(func, '__name__'):
-            name = func.__name__
-        else:
-            name = func
+        name = func
+        for attr in ('__qualname__', '__name__'):
+            if hasattr(func, attr):
+                name = getattr(func, attr)
+                break
+
         logger.debug("Start call: {}".format(name))
         now = time.time()
         result = func(*args, **kwargs)
@@ -254,3 +247,29 @@ def get_disk_usage():
     mount_points = [p.mountpoint for p in partitions]
     usages = {p: psutil.disk_usage(p) for p in mount_points}
     return usages
+
+
+class Time:
+    def __init__(self):
+        self._timestamps = []
+        self._msgs = []
+
+    def begin(self):
+        self._timestamps.append(time.time())
+
+    def time(self, msg):
+        self._timestamps.append(time.time())
+        self._msgs.append(msg)
+
+    def print(self):
+        last, *timestamps = self._timestamps
+        for timestamp, msg in zip(timestamps, self._msgs):
+            logger.debug(f'TIME_IT: {msg} {timestamp-last}')
+            last = timestamp
+
+
+def bulk_get(d, *keys, default=None):
+    values = []
+    for key in keys:
+        values.append(d.get(key, default))
+    return values

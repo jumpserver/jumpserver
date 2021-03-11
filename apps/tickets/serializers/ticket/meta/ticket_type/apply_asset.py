@@ -99,10 +99,10 @@ class ApproveSerializer(serializers.Serializer):
             return []
 
         with tmp_to_org(self.root.instance.org_id):
-            assets_id = Asset.objects.filter(id__in=approve_assets).values_list('id', flat=True)
-            assets_id = [str(asset_id) for asset_id in assets_id]
-            if assets_id:
-                return assets_id
+            asset_ids = Asset.objects.filter(id__in=approve_assets).values_list('id', flat=True)
+            asset_ids = [str(asset_id) for asset_id in asset_ids]
+            if asset_ids:
+                return asset_ids
 
         raise serializers.ValidationError(_(
             'No `Asset` are found under Organization `{}`'.format(self.root.instance.org_name)
@@ -115,10 +115,10 @@ class ApproveSerializer(serializers.Serializer):
         with tmp_to_org(self.root.instance.org_id):
             queries = Q(protocol__in=SystemUser.ASSET_CATEGORY_PROTOCOLS)
             queries &= Q(id__in=approve_system_users)
-            system_users_id = SystemUser.objects.filter(queries).values_list('id', flat=True)
-            system_users_id = [str(system_user_id) for system_user_id in system_users_id]
-            if system_users_id:
-                return system_users_id
+            system_user_ids = SystemUser.objects.filter(queries).values_list('id', flat=True)
+            system_user_ids = [str(system_user_id) for system_user_id in system_user_ids]
+            if system_user_ids:
+                return system_user_ids
 
         raise serializers.ValidationError(_(
             'No `SystemUser` are found under Organization `{}`'.format(self.root.instance.org_name)
@@ -144,9 +144,9 @@ class ApplyAssetSerializer(ApplySerializer, ApproveSerializer):
         if not queries:
             return []
         with tmp_to_org(self.root.instance.org_id):
-            assets_id = Asset.objects.filter(queries).values_list('id', flat=True)[:5]
-            assets_id = [str(asset_id) for asset_id in assets_id]
-            return assets_id
+            asset_ids = Asset.objects.filter(queries).values_list('id', flat=True)[:5]
+            asset_ids = [str(asset_id) for asset_id in asset_ids]
+            return asset_ids
 
     def get_recommend_system_users(self, value):
         if not isinstance(self.root.instance, Ticket):
@@ -163,6 +163,6 @@ class ApplyAssetSerializer(ApplySerializer, ApproveSerializer):
         queries &= Q(protocol__in=SystemUser.ASSET_CATEGORY_PROTOCOLS)
 
         with tmp_to_org(self.root.instance.org_id):
-            system_users_id = SystemUser.objects.filter(queries).values_list('id', flat=True)[:5]
-            system_users_id = [str(system_user_id) for system_user_id in system_users_id]
-            return system_users_id
+            system_user_ids = SystemUser.objects.filter(queries).values_list('id', flat=True)[:5]
+            system_user_ids = [str(system_user_id) for system_user_id in system_user_ids]
+            return system_user_ids

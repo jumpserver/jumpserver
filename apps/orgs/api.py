@@ -5,14 +5,17 @@ from django.utils.translation import ugettext as _
 from rest_framework import status
 from rest_framework.views import Response
 from rest_framework_bulk import BulkModelViewSet
+from rest_framework.generics import RetrieveAPIView
+from rest_framework.exceptions import PermissionDenied
 
-from common.permissions import IsSuperUserOrAppUser
+from common.permissions import IsSuperUserOrAppUser, IsValidUser, UserCanUseCurrentOrg
 from common.drf.api import JMSBulkRelationModelViewSet
 from .models import Organization, ROLE
 from .serializers import (
     OrgSerializer, OrgReadSerializer,
     OrgRetrieveSerializer, OrgMemberSerializer,
-    OrgMemberAdminSerializer, OrgMemberUserSerializer
+    OrgMemberAdminSerializer, OrgMemberUserSerializer,
+    CurrentOrgSerializer
 )
 from users.models import User, UserGroup
 from assets.models import Asset, Domain, AdminUser, SystemUser, Label
@@ -129,3 +132,11 @@ class OrgMemberUserRelationBulkViewSet(JMSBulkRelationModelViewSet):
         objs = list(queryset.all().prefetch_related('user', 'org'))
         queryset.delete()
         self.send_m2m_changed_signal(objs, action='post_remove')
+
+
+class CurrentOrgDetailApi(RetrieveAPIView):
+    serializer_class = CurrentOrgSerializer
+    permission_classes = (IsValidUser, UserCanUseCurrentOrg)
+
+    def get_object(self):
+        return current_org

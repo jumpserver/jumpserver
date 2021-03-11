@@ -8,7 +8,6 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404, Http404
-from django.utils.decorators import method_decorator
 from django.db.models.signals import m2m_changed
 
 from common.const.http import POST
@@ -17,17 +16,15 @@ from common.const.signals import PRE_REMOVE, POST_REMOVE
 from assets.models import Asset
 from common.utils import get_logger, get_object_or_none
 from common.tree import TreeNodeSerializer
-from common.const.distributed_lock_key import UPDATE_NODE_TREE_LOCK_KEY
 from orgs.mixins.api import OrgModelViewSet
 from orgs.mixins import generics
-from orgs.lock import org_level_transaction_lock
 from orgs.utils import current_org
-from assets.tasks import check_node_assets_amount_task
 from ..hands import IsOrgAdmin
 from ..models import Node
 from ..tasks import (
     update_node_assets_hardware_info_manual,
     test_node_assets_connectivity_manual,
+    check_node_assets_amount_task
 )
 from .. import serializers
 from .mixin import SerializeToTreeNodeMixin
@@ -50,16 +47,16 @@ class NodeViewSet(OrgModelViewSet):
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.NodeSerializer
 
-    @action(methods=[POST], detail=False, url_name='launch-check-assets-amount-task')
-    def launch_check_assets_amount_task(self, request):
-        task = check_node_assets_amount_task.delay(current_org.id)
-        return Response(data={'task': task.id})
-
     # 仅支持根节点指直接创建，子节点下的节点需要通过children接口创建
     def perform_create(self, serializer):
         child_key = Node.org_root().get_next_child_key()
         serializer.validated_data["key"] = child_key
         serializer.save()
+
+    @action(methods=[POST], detail=False, url_path='check_assets_amount_task')
+    def check_assets_amount_task(self, request):
+        task = check_node_assets_amount_task.delay(current_org.id)
+        return Response(data={'task': task.id})
 
     def perform_update(self, serializer):
         node = self.get_object()
@@ -130,9 +127,13 @@ class NodeChildrenApi(generics.ListCreateAPIView):
     def get_object(self):
         pk = self.kwargs.get('pk') or self.request.query_params.get('id')
         key = self.request.query_params.get("key")
+
         if not pk and not key:
-            node = Node.org_root()
             self.is_initial = True
+            if current_org.is_root():
+                node = None
+            else:
+                node = Node.org_root()
             return node
         if pk:
             node = get_object_or_404(Node, pk=pk)
@@ -140,15 +141,25 @@ class NodeChildrenApi(generics.ListCreateAPIView):
             node = get_object_or_404(Node, key=key)
         return node
 
+    def get_org_root_queryset(self, query_all):
+        if query_all:
+            return Node.objects.all()
+        else:
+            return Node.org_root_nodes()
+
     def get_queryset(self):
         query_all = self.request.query_params.get("all", "0") == "all"
-        if not self.instance:
-            return Node.objects.none()
+
+        if self.is_initial and current_org.is_root():
+            return self.get_org_root_queryset(query_all)
 
         if self.is_initial:
             with_self = True
         else:
             with_self = False
+
+        if not self.instance:
+            return Node.objects.none()
 
         if query_all:
             queryset = self.instance.get_all_children(with_self=with_self)
@@ -181,12 +192,12 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
 
     def get_assets(self):
         include_assets = self.request.query_params.get('assets', '0') == '1'
-        if not include_assets:
+        if not self.instance or not include_assets:
             return []
         assets = self.instance.get_assets().only(
-            "id", "hostname", "ip", "os",
-            "org_id", "protocols", "is_active"
-        )
+            "id", "hostname", "ip", "os", "platform_id",
+            "org_id", "protocols", "is_active",
+        ).prefetch_related('platform')
         return self.serialize_assets(assets, self.instance.key)
 
 
@@ -212,15 +223,13 @@ class NodeAddChildrenApi(generics.UpdateAPIView):
 
     def put(self, request, *args, **kwargs):
         instance = self.get_object()
-        nodes_id = request.data.get("nodes")
-        children = Node.objects.filter(id__in=nodes_id)
+        node_ids = request.data.get("nodes")
+        children = Node.objects.filter(id__in=node_ids)
         for node in children:
             node.parent = instance
         return Response("OK")
 
 
-@method_decorator(org_level_transaction_lock(UPDATE_NODE_TREE_LOCK_KEY), name='patch')
-@method_decorator(org_level_transaction_lock(UPDATE_NODE_TREE_LOCK_KEY), name='put')
 class NodeAddAssetsApi(generics.UpdateAPIView):
     model = Node
     serializer_class = serializers.NodeAssetsSerializer
@@ -233,8 +242,6 @@ class NodeAddAssetsApi(generics.UpdateAPIView):
         instance.assets.add(*tuple(assets))
 
 
-@method_decorator(org_level_transaction_lock(UPDATE_NODE_TREE_LOCK_KEY), name='patch')
-@method_decorator(org_level_transaction_lock(UPDATE_NODE_TREE_LOCK_KEY), name='put')
 class NodeRemoveAssetsApi(generics.UpdateAPIView):
     model = Node
     serializer_class = serializers.NodeAssetsSerializer
@@ -247,12 +254,13 @@ class NodeRemoveAssetsApi(generics.UpdateAPIView):
         node.assets.remove(*assets)
 
         # 把孤儿资产添加到 root 节点
-        orphan_assets = Asset.objects.filter(id__in=[a.id for a in assets], nodes__isnull=True).distinct()
+        orphan_assets = Asset.objects.filter(
+            id__in=[a.id for a in assets],
+            nodes__isnull=True
+        ).distinct()
         Node.org_root().assets.add(*orphan_assets)
 
 
-@method_decorator(org_level_transaction_lock(UPDATE_NODE_TREE_LOCK_KEY), name='patch')
-@method_decorator(org_level_transaction_lock(UPDATE_NODE_TREE_LOCK_KEY), name='put')
 class MoveAssetsToNodeApi(generics.UpdateAPIView):
     model = Node
     serializer_class = serializers.NodeAssetsSerializer

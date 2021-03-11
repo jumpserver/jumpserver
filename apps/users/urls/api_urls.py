@@ -15,11 +15,11 @@ router = BulkRouter()
 router.register(r'users', api.UserViewSet, 'user')
 router.register(r'groups', api.UserGroupViewSet, 'user-group')
 router.register(r'users-groups-relations', api.UserUserGroupRelationViewSet, 'users-groups-relation')
+router.register(r'service-account-registrations', api.ServiceAccountRegistrationViewSet, 'service-account-registration')
+router.register(r'connection-token', auth_api.UserConnectionTokenViewSet, 'connection-token')
 
 
 urlpatterns = [
-    path('connection-token/', auth_api.UserConnectionTokenApi.as_view(),
-         name='connection-token'),
     path('profile/', api.UserProfileApi.as_view(), name='user-profile'),
     path('profile/password/', api.UserPasswordApi.as_view(), name='user-password'),
     path('profile/public-key/', api.UserPublicKeyApi.as_view(), name='user-public-key'),

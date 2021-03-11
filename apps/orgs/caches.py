@@ -1,9 +1,51 @@
-from .cache import OrgRelatedCache, IntegerField
+from django.db.transaction import on_commit
+from orgs.models import Organization
+from orgs.tasks import refresh_org_cache_task
+from orgs.utils import current_org, tmp_to_org
+
+from common.cache import Cache, IntegerField
+from common.utils import get_logger
 from users.models import UserGroup, User
 from assets.models import Node, AdminUser, SystemUser, Domain, Gateway
 from applications.models import Application
 from perms.models import AssetPermission, ApplicationPermission
 from .models import OrganizationMember
+
+
+logger = get_logger(__file__)
+
+
+class OrgRelatedCache(Cache):
+
+    def __init__(self):
+        super().__init__()
+        self.current_org = Organization.get_instance(current_org.id)
+
+    def get_current_org(self):
+        """
+        暴露给子类控制组织的回调
+        1. 在交互式环境下能控制组织
+        2. 在 celery 任务下能控制组织
+        """
+        return self.current_org
+
+    def compute_values(self, *fields):
+        with tmp_to_org(self.get_current_org()):
+            return super().compute_values(*fields)
+
+    def refresh_async(self, *fields):
+        """
+        在事务提交之后再发送信号，防止因事务的隔离性导致未获得最新的数据
+        """
+        def func():
+            logger.info(f'CACHE: Send refresh task {self}.{fields}')
+            refresh_org_cache_task.delay(self, *fields)
+        on_commit(func)
+
+    def expire(self, *fields):
+        def func():
+            super(OrgRelatedCache, self).expire(*fields)
+        on_commit(func)
 
 
 class OrgResourceStatisticsCache(OrgRelatedCache):
@@ -33,12 +75,12 @@ class OrgResourceStatisticsCache(OrgRelatedCache):
         return self.org
 
     def compute_users_amount(self):
-        if self.org.is_real():
+        if self.org.is_root():
+            users_amount = User.objects.all().count()
+        else:
             users_amount = OrganizationMember.objects.values(
                 'user_id'
             ).filter(org_id=self.org.id).distinct().count()
-        else:
-            users_amount = User.objects.all().distinct().count()
         return users_amount
 
     def compute_assets_amount(self):

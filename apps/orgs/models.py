@@ -24,67 +24,56 @@ class Organization(models.Model):
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
-    members = models.ManyToManyField('users.User', related_name='orgs', through='orgs.OrganizationMember',
-                                     through_fields=('org', 'user'))
+    members = models.ManyToManyField('users.User', related_name='orgs', through='orgs.OrganizationMember', through_fields=('org', 'user'))
 
-    orgs = None
-    CACHE_PREFIX = 'JMS_ORG_{}'
     ROOT_ID = '00000000-0000-0000-0000-000000000000'
-    ROOT_NAME = 'ROOT'
-    DEFAULT_ID = 'DEFAULT'
+    ROOT_NAME = _('GLOBAL')
+    DEFAULT_ID = '00000000-0000-0000-0000-000000000001'
     DEFAULT_NAME = 'DEFAULT'
-    SYSTEM_ID = '00000000-0000-0000-0000-000000000002'
-    SYSTEM_NAME = 'SYSTEM'
-    _user_admin_orgs = None
+    orgs_mapping = None
 
     class Meta:
         verbose_name = _("Organization")
 
     def __str__(self):
-        return self.name
-
-    def set_to_cache(self):
-        if self.__class__.orgs is None:
-            self.__class__.orgs = {}
-        self.__class__.orgs[str(self.id)] = self
-
-    def expire_cache(self):
-        self.__class__.orgs.pop(str(self.id), None)
+        return str(self.name)
 
     @classmethod
-    def get_instance_from_cache(cls, oid):
-        if not cls.orgs or not isinstance(cls.orgs, dict):
-            return None
-        return cls.orgs.get(str(oid))
-
-    @classmethod
-    def get_instance(cls, id_or_name, default=False):
-        cached = cls.get_instance_from_cache(id_or_name)
-        if cached:
-            return cached
-
-        if id_or_name is None:
-            return cls.default() if default else None
-        elif id_or_name in [cls.DEFAULT_ID, cls.DEFAULT_NAME, '']:
-            return cls.default()
-        elif id_or_name in [cls.ROOT_ID, cls.ROOT_NAME]:
-            return cls.root()
-        elif id_or_name in [cls.SYSTEM_ID, cls.SYSTEM_NAME]:
-            return cls.system()
-
-        try:
-            if is_uuid(id_or_name):
-                org = cls.objects.get(id=id_or_name)
-            else:
-                org = cls.objects.get(name=id_or_name)
-            org.set_to_cache()
-        except cls.DoesNotExist:
-            org = cls.default() if default else None
+    def get_instance(cls, id_or_name, default=None):
+        assert default is None or isinstance(default, cls), (
+            '`default` must be None or `Organization` instance'
+        )
+        org = cls.get_instance_from_memory(id_or_name)
+        org = org or default
         return org
+
+    @classmethod
+    def get_instance_from_memory(cls, id_or_name):
+        if not isinstance(cls.orgs_mapping, dict):
+            cls.orgs_mapping = cls.construct_orgs_mapping()
+        return cls.orgs_mapping.get(str(id_or_name))
+
+    @classmethod
+    def construct_orgs_mapping(cls):
+        orgs_mapping = {}
+        for org in cls.objects.all():
+            orgs_mapping[str(org.id)] = org
+            orgs_mapping[str(org.name)] = org
+        root_org = cls.root()
+        orgs_mapping.update({
+            root_org.id: root_org,
+            'GLOBAL': root_org,
+            '全局组织': root_org
+        })
+        return orgs_mapping
+
+    @classmethod
+    def expire_orgs_mapping(cls):
+        cls.orgs_mapping = None
 
     def get_org_members_by_role(self, role):
         from users.models import User
-        if self.is_real():
+        if not self.is_root():
             return self.members.filter(m2m_org_members__role=role)
         users = User.objects.filter(role=role)
         return users
@@ -102,20 +91,14 @@ class Organization(models.Model):
         return self.get_org_members_by_role(ROLE.AUDITOR)
 
     def org_id(self):
-        if self.is_real():
-            return self.id
-        elif self.is_root():
-            return self.ROOT_ID
-        else:
-            return ''
+        return self.id
 
     def get_members(self, exclude=()):
         from users.models import User
-        if self.is_real():
-            members = self.members.exclude(m2m_org_members__role__in=exclude)
-        else:
+        if self.is_root():
             members = User.objects.exclude(role__in=exclude)
-
+        else:
+            members = self.members.exclude(m2m_org_members__role__in=exclude)
         return members.exclude(role=User.ROLE.APP).distinct()
 
     def can_admin_by(self, user):
@@ -126,19 +109,18 @@ class Organization(models.Model):
         return False
 
     def can_audit_by(self, user):
-        if user.is_super_auditor:
+        if user.is_superuser or user.is_super_auditor:
             return True
         if self.auditors.filter(id=user.id).exists():
             return True
         return False
 
-    def can_user_by(self, user):
+    def can_use_by(self, user):
+        if user.is_superuser or user.is_super_auditor:
+            return True
         if self.users.filter(id=user.id).exists():
             return True
         return False
-
-    def is_real(self):
-        return self.id not in (self.DEFAULT_NAME, self.ROOT_ID, self.SYSTEM_ID)
 
     @classmethod
     def get_user_orgs_by_role(cls, user, role):
@@ -162,7 +144,7 @@ class Organization(models.Model):
         if user.is_anonymous:
             return cls.objects.none()
         if user.is_superuser:
-            return [*cls.objects.all(), cls.default()]
+            return [cls.root(), *cls.objects.all()]
         return cls.get_user_orgs_by_role(user, ROLE.ADMIN)
 
     @classmethod
@@ -179,7 +161,7 @@ class Organization(models.Model):
         if user.is_anonymous:
             return cls.objects.none()
         if user.is_super_auditor:
-            return [*cls.objects.all(), cls.default()]
+            return [cls.root(), *cls.objects.all()]
         return cls.get_user_orgs_by_role(user, ROLE.AUDITOR)
 
     @classmethod
@@ -187,29 +169,24 @@ class Organization(models.Model):
         if user.is_anonymous:
             return cls.objects.none()
         if user.is_superuser or user.is_super_auditor:
-            return [*cls.objects.all(), cls.default()]
+            return [cls.root(), *cls.objects.all()]
         return cls.get_user_orgs_by_role(user, (ROLE.AUDITOR, ROLE.ADMIN))
 
     @classmethod
     def default(cls):
-        return cls(id=cls.DEFAULT_ID, name=cls.DEFAULT_NAME)
+        defaults = dict(id=cls.DEFAULT_ID, name=cls.DEFAULT_NAME)
+        obj, created = cls.objects.get_or_create(defaults=defaults, id=cls.DEFAULT_ID)
+        return obj
 
     @classmethod
     def root(cls):
         return cls(id=cls.ROOT_ID, name=cls.ROOT_NAME)
 
-    @classmethod
-    def system(cls):
-        return cls(id=cls.SYSTEM_ID, name=cls.SYSTEM_NAME)
-
     def is_root(self):
-        return self.id is self.ROOT_ID
+        return self.id == self.ROOT_ID
 
     def is_default(self):
-        return self.id is self.DEFAULT_ID
-
-    def is_system(self):
-        return self.id is self.SYSTEM_ID
+        return str(self.id) == self.DEFAULT_ID
 
     def change_to(self):
         from .utils import set_current_org
@@ -279,7 +256,7 @@ class UserRoleMapper(dict):
         self[ROLE.AUDITOR] = self.auditors
 
 
-class OrgMemeberManager(models.Manager):
+class OrgMemberManager(models.Manager):
 
     def remove_users(self, org, users):
         from users.models import User
@@ -334,8 +311,11 @@ class OrgMemeberManager(models.Manager):
                     _user = _user.id
                 oms_add.append(self.model(org_id=org.id, user_id=_user, role=_role))
 
-        send = partial(signals.m2m_changed.send, sender=self.model, instance=org, reverse=False,
-                       model=User, pk_set=_users2pks_if_need(users, admins, auditors), using=self.db)
+        pk_set = _users2pks_if_need(users, admins, auditors)
+        send = partial(
+            signals.m2m_changed.send, sender=self.model, instance=org, reverse=False,
+            model=User, pk_set=pk_set, using=self.db
+        )
 
         send(action='pre_add')
         self.bulk_create(oms_add, ignore_conflicts=True)
@@ -426,7 +406,7 @@ class OrganizationMember(models.Model):
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
     created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
 
-    objects = OrgMemeberManager()
+    objects = OrgMemberManager()
 
     class Meta:
         unique_together = [('org', 'user', 'role')]

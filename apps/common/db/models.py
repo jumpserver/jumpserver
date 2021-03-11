@@ -10,8 +10,11 @@
 """
 
 import uuid
+from functools import reduce, partial
+import inspect
 
 from django.db.models import *
+from django.db.models import QuerySet
 from django.db.models.functions import Concat
 from django.utils.translation import ugettext_lazy as _
 
@@ -82,3 +85,88 @@ class JMSModel(JMSBaseModel):
 
 def concated_display(name1, name2):
     return Concat(F(name1), Value('('), F(name2), Value(')'))
+
+
+def output_as_string(field_name):
+    return ExpressionWrapper(F(field_name), output_field=CharField())
+
+
+class UnionQuerySet(QuerySet):
+    after_union = ['order_by']
+    not_return_qs = [
+        'query', 'get', 'create', 'get_or_create',
+        'update_or_create', 'bulk_create', 'count',
+        'latest', 'earliest', 'first', 'last', 'aggregate',
+        'exists', 'update', 'delete', 'as_manager', 'explain',
+    ]
+
+    def __init__(self, *queryset_list):
+        self.queryset_list = queryset_list
+        self.after_union_items = []
+        self.before_union_items = []
+
+    def __execute(self):
+        queryset_list = []
+        for qs in self.queryset_list:
+            for attr, args, kwargs in self.before_union_items:
+                qs = getattr(qs, attr)(*args, **kwargs)
+            queryset_list.append(qs)
+        union_qs = reduce(lambda x, y: x.union(y), queryset_list)
+        for attr, args, kwargs in self.after_union_items:
+            union_qs = getattr(union_qs, attr)(*args, **kwargs)
+        return union_qs
+
+    def __before_union_perform(self, item, *args, **kwargs):
+        self.before_union_items.append((item, args, kwargs))
+        return self.__clone(*self.queryset_list)
+
+    def __after_union_perform(self, item, *args, **kwargs):
+        self.after_union_items.append((item, args, kwargs))
+        return self.__clone(*self.queryset_list)
+
+    def __clone(self, *queryset_list):
+        uqs = UnionQuerySet(*queryset_list)
+        uqs.after_union_items = self.after_union_items
+        uqs.before_union_items = self.before_union_items
+        return uqs
+
+    def __getattribute__(self, item):
+        if item.startswith('__') or item in UnionQuerySet.__dict__ or item in [
+            'queryset_list', 'after_union_items', 'before_union_items'
+        ]:
+            return object.__getattribute__(self, item)
+
+        if item in UnionQuerySet.not_return_qs:
+            return getattr(self.__execute(), item)
+
+        origin_item = object.__getattribute__(self, 'queryset_list')[0]
+        origin_attr = getattr(origin_item, item, None)
+        if not inspect.ismethod(origin_attr):
+            return getattr(self.__execute(), item)
+
+        if item in UnionQuerySet.after_union:
+            attr = partial(self.__after_union_perform, item)
+        else:
+            attr = partial(self.__before_union_perform, item)
+        return attr
+
+    def __getitem__(self, item):
+        return self.__execute()[item]
+
+    def __iter__(self):
+        return iter(self.__execute())
+
+    def __str__(self):
+        return str(self.__execute())
+
+    def __repr__(self):
+        return repr(self.__execute())
+
+    @classmethod
+    def test_it(cls):
+        from assets.models import Asset
+        assets1 = Asset.objects.filter(hostname__startswith='a')
+        assets2 = Asset.objects.filter(hostname__startswith='b')
+
+        qs = cls(assets1, assets2)
+        return qs

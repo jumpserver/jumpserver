@@ -5,18 +5,22 @@ import uuid
 
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
+from rest_framework import viewsets, generics
 from rest_framework.views import APIView, Response
+from rest_framework import status
+from django.conf import settings
+
 
 from common.drf.api import JMSBulkModelViewSet
 from common.utils import get_object_or_none
-from common.permissions import IsAppUser, IsOrgAdminOrAppUser, IsSuperUser
+from common.permissions import IsAppUser, IsOrgAdminOrAppUser, IsSuperUser, WithBootstrapToken
 from ..models import Terminal, Status, Session
 from .. import serializers
 from .. import exceptions
 
 __all__ = [
     'TerminalViewSet',  'StatusViewSet', 'TerminalConfig',
+    'TerminalRegistrationApi',
 ]
 logger = logging.getLogger(__file__)
 
@@ -82,13 +86,13 @@ class StatusViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=201)
 
     def handle_sessions(self):
-        sessions_id = self.request.data.get('sessions', [])
+        session_ids = self.request.data.get('sessions', [])
         # guacamole 上报的 session 是字符串
         # "[53cd3e47-210f-41d8-b3c6-a184f3, 53cd3e47-210f-41d8-b3c6-a184f4]"
-        if isinstance(sessions_id, str):
-            sessions_id = sessions_id[1:-1].split(',')
-            sessions_id = [sid.strip() for sid in sessions_id if sid.strip()]
-        Session.set_sessions_active(sessions_id)
+        if isinstance(session_ids, str):
+            session_ids = session_ids[1:-1].split(',')
+            session_ids = [sid.strip() for sid in session_ids if sid.strip()]
+        Session.set_sessions_active(session_ids)
 
     def get_queryset(self):
         terminal_id = self.kwargs.get("terminal", None)
@@ -113,3 +117,15 @@ class TerminalConfig(APIView):
     def get(self, request):
         config = request.user.terminal.config
         return Response(config, status=200)
+
+
+class TerminalRegistrationApi(generics.CreateAPIView):
+    serializer_class = serializers.TerminalRegistrationSerializer
+    permission_classes = [WithBootstrapToken]
+    http_method_names = ['post']
+
+    def create(self, request, *args, **kwargs):
+        if not settings.SECURITY_SERVICE_ACCOUNT_REGISTRATION:
+            data = {"error": "service account registration disabled"}
+            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+        return super().create(request, *args, **kwargs)

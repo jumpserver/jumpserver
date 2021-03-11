@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 #
 import base64
-from Crypto.PublicKey import RSA
-from Crypto.Cipher import PKCS1_v1_5
-from Crypto import Random
+from Cryptodome.PublicKey import RSA
+from Cryptodome.Cipher import PKCS1_v1_5
+from Cryptodome import Random
 
 from common.utils import get_logger
 

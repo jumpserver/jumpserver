@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from rest_framework import serializers
+from django.utils.translation import ugettext_lazy as _
 
 from common.drf.serializers import AdaptedBulkListSerializer
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
@@ -9,16 +10,17 @@ from ..models import Label
 
 
 class LabelSerializer(BulkOrgResourceModelSerializer):
-    asset_count = serializers.SerializerMethodField()
+    asset_count = serializers.SerializerMethodField(label=_("Assets amount"))
+    category_display = serializers.ReadOnlyField(source='get_category_display', label=_('Category display'))
 
     class Meta:
         model = Label
         fields = [
             'id', 'name', 'value', 'category', 'is_active', 'comment',
-            'date_created', 'asset_count', 'assets', 'get_category_display'
+            'date_created', 'asset_count', 'assets', 'category_display'
         ]
         read_only_fields = (
-            'category', 'date_created', 'asset_count', 'get_category_display'
+            'category', 'date_created', 'asset_count',
         )
         extra_kwargs = {
             'assets': {'required': False}

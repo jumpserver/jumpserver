@@ -98,10 +98,10 @@ class ApproveSerializer(serializers.Serializer):
             apply_type = self.root.instance.meta.get('apply_type')
             queries = Q(type=apply_type)
             queries &= Q(id__in=approve_applications)
-            applications_id = Application.objects.filter(queries).values_list('id', flat=True)
-            applications_id = [str(application_id) for application_id in applications_id]
-            if applications_id:
-                return applications_id
+            application_ids = Application.objects.filter(queries).values_list('id', flat=True)
+            application_ids = [str(application_id) for application_id in application_ids]
+            if application_ids:
+                return application_ids
 
         raise serializers.ValidationError(_(
             'No `Application` are found under Organization `{}`'.format(self.root.instance.org_name)
@@ -116,10 +116,10 @@ class ApproveSerializer(serializers.Serializer):
             protocol = SystemUser.get_protocol_by_application_type(apply_type)
             queries = Q(protocol=protocol)
             queries &= Q(id__in=approve_system_users)
-            system_users_id = SystemUser.objects.filter(queries).values_list('id', flat=True)
-            system_users_id = [str(system_user_id) for system_user_id in system_users_id]
-            if system_users_id:
-                return system_users_id
+            system_user_ids = SystemUser.objects.filter(queries).values_list('id', flat=True)
+            system_user_ids = [str(system_user_id) for system_user_id in system_user_ids]
+            if system_user_ids:
+                return system_user_ids
 
         raise serializers.ValidationError(_(
             'No `SystemUser` are found under Organization `{}`'.format(self.root.instance.org_name)
@@ -146,9 +146,9 @@ class ApplyApplicationSerializer(ApplySerializer, ApproveSerializer):
         queries &= Q(type=apply_type)
 
         with tmp_to_org(self.root.instance.org_id):
-            applications_id = Application.objects.filter(queries).values_list('id', flat=True)[:5]
-            applications_id = [str(application_id) for application_id in applications_id]
-            return applications_id
+            application_ids = Application.objects.filter(queries).values_list('id', flat=True)[:5]
+            application_ids = [str(application_id) for application_id in application_ids]
+            return application_ids
 
     def get_recommend_system_users(self, value):
         if not isinstance(self.root.instance, Ticket):
@@ -167,6 +167,6 @@ class ApplyApplicationSerializer(ApplySerializer, ApproveSerializer):
         queries &= Q(protocol=protocol)
 
         with tmp_to_org(self.root.instance.org_id):
-            system_users_id = SystemUser.objects.filter(queries).values_list('id', flat=True)[:5]
-            system_users_id = [str(system_user_id) for system_user_id in system_users_id]
-            return system_users_id
+            system_user_ids = SystemUser.objects.filter(queries).values_list('id', flat=True)[:5]
+            system_user_ids = [str(system_user_id) for system_user_id in system_user_ids]
+            return system_user_ids

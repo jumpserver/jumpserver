@@ -2,6 +2,7 @@
 import uuid
 
 from rest_framework import generics
+from common.permissions import IsOrgAdmin
 from rest_framework.permissions import IsAuthenticated
 from django.conf import settings
 
@@ -23,7 +24,7 @@ __all__ = [
 class UserResetPasswordApi(UserQuerysetMixin, generics.UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsOrgAdmin,)
 
     def perform_update(self, serializer):
         # Note: we are not updating the user object here.
@@ -37,7 +38,7 @@ class UserResetPasswordApi(UserQuerysetMixin, generics.UpdateAPIView):
 
 class UserResetPKApi(UserQuerysetMixin, generics.UpdateAPIView):
     serializer_class = serializers.UserSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsOrgAdmin,)
 
     def perform_update(self, serializer):
         from ..utils import send_reset_ssh_key_mail
@@ -64,12 +65,6 @@ class UserProfileApi(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
-
-    def retrieve(self, request, *args, **kwargs):
-        if not settings.SESSION_EXPIRE_AT_BROWSER_CLOSE:
-            age = request.session.get_expiry_age()
-            request.session.set_expiry(age)
-        return super().retrieve(request, *args, **kwargs)
 
 
 class UserPasswordApi(generics.RetrieveUpdateAPIView):

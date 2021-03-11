@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 #
-
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
+from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
+from django.utils.functional import LazyObject
 from django.contrib.auth import BACKEND_SESSION_KEY
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.renderers import JSONRenderer
@@ -34,17 +35,22 @@ MODELS_NEED_RECORD = (
 )
 
 
-LOGIN_BACKEND = {
-    'PublicKeyAuthBackend': _('SSH Key'),
-    'RadiusBackend': User.Source.radius.label,
-    'RadiusRealmBackend': User.Source.radius.label,
-    'LDAPAuthorizationBackend': User.Source.ldap.label,
-    'ModelBackend': _('Password'),
-    'SSOAuthentication': _('SSO'),
-    'CASBackend': User.Source.cas.label,
-    'OIDCAuthCodeBackend': User.Source.openid.label,
-    'OIDCAuthPasswordBackend': User.Source.openid.label,
-}
+class AuthBackendLabelMapping(LazyObject):
+    @staticmethod
+    def get_login_backends():
+        backend_label_mapping = {}
+        for source, backends in User.SOURCE_BACKEND_MAPPING.items():
+            for backend in backends:
+                backend_label_mapping[backend] = source.label
+        backend_label_mapping[settings.AUTH_BACKEND_PUBKEY] = _('SSH Key')
+        backend_label_mapping[settings.AUTH_BACKEND_MODEL] = _('Password')
+        return backend_label_mapping
+
+    def _setup(self):
+        self._wrapped = self.get_login_backends()
+
+
+AUTH_BACKEND_LABEL_MAPPING = AuthBackendLabelMapping()
 
 
 def create_operate_log(action, sender, resource):
@@ -70,6 +76,7 @@ def create_operate_log(action, sender, resource):
 
 @receiver(post_save)
 def on_object_created_or_update(sender, instance=None, created=False, update_fields=None, **kwargs):
+    # last_login 改变是最后登录日期, 每次登录都会改变
     if instance._meta.object_name == 'User' and \
             update_fields and 'last_login' in update_fields:
         return
@@ -125,14 +132,13 @@ def on_audits_log_create(sender, instance=None, **kwargs):
 
 
 def get_login_backend(request):
-    backend = request.session.get('auth_backend', '') or request.session.get(BACKEND_SESSION_KEY, '')
+    backend = request.session.get('auth_backend', '') or \
+              request.session.get(BACKEND_SESSION_KEY, '')
 
-    backend = backend.rsplit('.', maxsplit=1)[-1]
-    if backend in LOGIN_BACKEND:
-        return LOGIN_BACKEND[backend]
-    else:
-        logger.warn(f'LOGIN_BACKEND_NOT_FOUND: {backend}')
-        return ''
+    backend_label = AUTH_BACKEND_LABEL_MAPPING.get(backend, None)
+    if backend_label is None:
+        backend_label = ''
+    return backend_label
 
 
 def generate_data(username, request):

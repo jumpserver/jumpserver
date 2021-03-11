@@ -12,7 +12,7 @@ from perms.models import AssetPermission
 from assets.models import Asset, Node
 from perms.api.asset import user_permission as uapi
 from perms import serializers
-from perms.utils.asset.permission import get_asset_system_users_id_with_actions_by_group
+from perms.utils.asset.permission import get_asset_system_user_ids_with_actions_by_group
 from assets.api.mixin import SerializeToTreeNodeMixin
 from users.models import UserGroup
 
@@ -41,12 +41,12 @@ class UserGroupGrantedAssetsApi(ListAPIView):
     def get_queryset(self):
         user_group_id = self.kwargs.get('pk', '')
 
-        asset_perms_id = list(AssetPermission.objects.valid().filter(
+        asset_perm_ids = list(AssetPermission.objects.valid().filter(
             user_groups__id=user_group_id
         ).distinct().values_list('id', flat=True))
 
         granted_node_keys = Node.objects.filter(
-            granted_by_permissions__id__in=asset_perms_id,
+            granted_by_permissions__id__in=asset_perm_ids,
         ).distinct().values_list('key', flat=True)
 
         granted_q = Q()
@@ -54,7 +54,7 @@ class UserGroupGrantedAssetsApi(ListAPIView):
             granted_q |= Q(nodes__key__startswith=f'{_key}:')
             granted_q |= Q(nodes__key=_key)
 
-        granted_q |= Q(granted_by_permissions__id__in=asset_perms_id)
+        granted_q |= Q(granted_by_permissions__id__in=asset_perm_ids)
 
         assets = Asset.objects.filter(
             granted_q
@@ -89,12 +89,12 @@ class UserGroupGrantedNodeAssetsApi(ListAPIView):
             )
             return assets
         else:
-            asset_perms_id = list(AssetPermission.objects.valid().filter(
+            asset_perm_ids = list(AssetPermission.objects.valid().filter(
                 user_groups__id=user_group_id
             ).distinct().values_list('id', flat=True))
 
             granted_node_keys = Node.objects.filter(
-                granted_by_permissions__id__in=asset_perms_id,
+                granted_by_permissions__id__in=asset_perm_ids,
                 key__startswith=f'{node.key}:'
             ).distinct().values_list('key', flat=True)
 
@@ -104,7 +104,7 @@ class UserGroupGrantedNodeAssetsApi(ListAPIView):
                 granted_node_q |= Q(nodes__key=_key)
 
             granted_asset_q = (
-                Q(granted_by_permissions__id__in=asset_perms_id) &
+                Q(granted_by_permissions__id__in=asset_perm_ids) &
                 (
                     Q(nodes__key__startswith=f'{node.key}:') |
                     Q(nodes__key=node.key)
@@ -148,16 +148,16 @@ class UserGroupGrantedNodeChildrenAsTreeApi(SerializeToTreeNodeMixin, ListAPIVie
         group_id = self.kwargs.get('pk')
         node_key = self.request.query_params.get('key', None)
 
-        asset_perms_id = list(AssetPermission.objects.valid().filter(
+        asset_perm_ids = list(AssetPermission.objects.valid().filter(
             user_groups__id=group_id
         ).distinct().values_list('id', flat=True))
 
         granted_keys = Node.objects.filter(
-            granted_by_permissions__id__in=asset_perms_id
+            granted_by_permissions__id__in=asset_perm_ids
         ).values_list('key', flat=True)
 
         asset_granted_keys = Node.objects.filter(
-            assets__granted_by_permissions__id__in=asset_perms_id
+            assets__granted_by_permissions__id__in=asset_perm_ids
         ).values_list('key', flat=True)
 
         if node_key is None:
@@ -188,5 +188,5 @@ class UserGroupGrantedNodeChildrenAsTreeApi(SerializeToTreeNodeMixin, ListAPIVie
 
 
 class UserGroupGrantedAssetSystemUsersApi(UserGroupMixin, uapi.UserGrantedAssetSystemUsersForAdminApi):
-    def get_asset_system_users_id_with_actions(self, asset):
-        return get_asset_system_users_id_with_actions_by_group(self.group, asset)
+    def get_asset_system_user_ids_with_actions(self, asset):
+        return get_asset_system_user_ids_with_actions_by_group(self.group, asset)

@@ -132,6 +132,8 @@ def create_or_update_registered_periodic_tasks():
 @shared_task
 @register_as_period_task(interval=3600)
 def check_server_performance_period():
+    if not settings.DISK_CHECK_ENABLED:
+        return
     usages = get_disk_usage()
     uncheck_paths = ['/etc', '/boot']
 
