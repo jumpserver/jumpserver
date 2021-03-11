@@ -76,6 +76,7 @@ def migrate_replay_storage(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
+        ('settings', '0001_initial'),
         ('terminal', '0016_commandstorage_replaystorage'),
     ]
 
