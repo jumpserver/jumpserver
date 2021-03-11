@@ -56,7 +56,7 @@ class CommandStorage(CommonModelMixin):
         return storage.ping()
 
     def is_use(self):
-        return Terminal.objects.filter(command_storage=self.name).exists()
+        return Terminal.objects.filter(command_storage=self.name, is_deleted=False).exists()
 
     def get_command_queryset(self):
         if self.type_server:

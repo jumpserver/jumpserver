@@ -54,14 +54,14 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     def open(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
 
-    @action(detail=True, methods=[PUT], permission_classes=[IsOrgAdmin, IsAssignee, NotClosed])
+    @action(detail=True, methods=[PUT], permission_classes=[IsAssignee, NotClosed])
     def approve(self, request, *args, **kwargs):
         response = super().update(request, *args, **kwargs)
         instance = self.get_object()
         instance.approve(processor=self.request.user)
         return response
 
-    @action(detail=True, methods=[PUT], permission_classes=[IsOrgAdmin, IsAssignee, NotClosed])
+    @action(detail=True, methods=[PUT], permission_classes=[IsAssignee, NotClosed])
     def reject(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)

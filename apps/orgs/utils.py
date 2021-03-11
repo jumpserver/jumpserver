@@ -67,8 +67,6 @@ def get_current_org_id():
 
 def get_current_org_id_for_serializer():
     org_id = get_current_org_id()
-    if org_id == Organization.DEFAULT_ID:
-        org_id = ''
     return org_id
 
 

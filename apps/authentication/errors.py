@@ -19,6 +19,7 @@ reason_password_expired = 'password_expired'
 reason_user_invalid = 'user_invalid'
 reason_user_inactive = 'user_inactive'
 reason_backend_not_match = 'backend_not_match'
+reason_acl_not_allow = 'acl_not_allow'
 
 reason_choices = {
     reason_password_failed: _('Username/password check failed'),
@@ -29,7 +30,8 @@ reason_choices = {
     reason_password_expired: _("Password expired"),
     reason_user_invalid: _('Disabled or expired'),
     reason_user_inactive: _("This account is inactive."),
-    reason_backend_not_match: _("Auth backend not match")
+    reason_backend_not_match: _("Auth backend not match"),
+    reason_acl_not_allow: _("ACL is not allowed")
 }
 old_reason_choices = {
     '0': '-',
