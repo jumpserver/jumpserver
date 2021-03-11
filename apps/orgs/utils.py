@@ -6,8 +6,13 @@ from functools import wraps
 from werkzeug.local import LocalProxy
 from contextlib import contextmanager
 
+from django.db.utils import ProgrammingError
+
+from common.utils import get_logger
 from common.local import thread_local
 from .models import Organization
+
+logger = get_logger(__file__)
 
 
 def get_org_from_request(request):
@@ -54,7 +59,11 @@ def _find(attr):
 
 def get_current_org():
     org_id = get_current_org_id()
-    org = Organization.get_instance(org_id, default=Organization.root())
+    try:
+        org = Organization.get_instance(org_id, default=Organization.root())
+    except ProgrammingError as e:
+        logger.error(f'This should only be in migrate stage {e}')
+        return Organization.root()
     return org
 
 
