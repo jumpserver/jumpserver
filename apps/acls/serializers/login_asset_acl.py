@@ -68,7 +68,8 @@ class LoginAssetACLSerializer(BulkOrgResourceModelSerializer):
             'date_updated', 'org_id'
         ]
         extra_kwargs = {
-            "reviewers": {'allow_null': False, 'required': True}
+            "reviewers": {'allow_null': False, 'required': True},
+            'priority': {'default': 50}
         }
 
     def validate_reviewers(self, reviewers):

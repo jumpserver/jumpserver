@@ -34,6 +34,9 @@ class LoginACLSerializer(BulkModelSerializer):
             'id', 'name', 'priority', 'ip_group', 'user', 'user_display', 'action',
             'action_display', 'is_active', 'comment', 'created_by', 'date_created', 'date_updated'
         ]
+        extra_kwargs = {
+            'priority': {'default': 50}
+        }
 
     @staticmethod
     def validate_user(user):
