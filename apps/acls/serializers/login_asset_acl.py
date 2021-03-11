@@ -57,12 +57,13 @@ class LoginAssetACLSerializer(BulkOrgResourceModelSerializer):
     users = LoginAssetACLUsersSerializer()
     assets = LoginAssetACLAssestsSerializer()
     system_users = LoginAssetACLSystemUsersSerializer()
+    reviewers_amount = serializers.IntegerField(read_only=True, source='reviewers.count')
 
     class Meta:
         model = models.LoginAssetACL
         fields = [
             'id', 'name', 'priority', 'users', 'system_users', 'assets', 'action', 'comment',
-            'reviewers', 'created_by', 'date_created', 'date_updated', 'org_id',
+            'reviewers', 'reviewers_amount', 'created_by', 'date_created', 'date_updated', 'org_id'
         ]
         extra_kwargs = {
             "reviewers": {'allow_null': False, 'required': True}
