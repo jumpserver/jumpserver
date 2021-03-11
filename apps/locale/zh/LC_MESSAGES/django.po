@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-11 15:44+0800\n"
+"POT-Creation-Date: 2021-03-11 17:54+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -29,17 +29,43 @@ msgstr ""
 "例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, "
 "2001:db8:1a:1110::/64"
 
-#: acls/models/base.py:26 assets/models/cmd_filter.py:53
+#: acls/models/base.py:25 acls/serializers/login_asset_acl.py:33
+#: applications/models/application.py:11 assets/models/asset.py:142
+#: assets/models/base.py:250 assets/models/cluster.py:18
+#: assets/models/cmd_filter.py:21 assets/models/domain.py:21
+#: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
+#: orgs/models.py:23 perms/models/base.py:49 settings/models.py:29
+#: terminal/models/storage.py:23 terminal/models/storage.py:75
+#: terminal/models/task.py:16 terminal/models/terminal.py:139
+#: users/forms/profile.py:32 users/models/group.py:15 users/models/user.py:530
+#: users/templates/users/_select_user_modal.html:13
+#: users/templates/users/user_asset_permission.html:37
+#: users/templates/users/user_asset_permission.html:154
+#: users/templates/users/user_database_app_permission.html:36
+#: users/templates/users/user_detail.html:49
+#: users/templates/users/user_granted_database_app.html:34
+#: users/templates/users/user_granted_remote_app.html:34
+#: users/templates/users/user_group_detail.html:50
+#: users/templates/users/user_group_list.html:14
+#: users/templates/users/user_list.html:14
+#: users/templates/users/user_profile.html:51
+#: users/templates/users/user_pubkey_update.html:57
+#: users/templates/users/user_remote_app_permission.html:36
+#: xpack/plugins/cloud/models.py:28
+msgid "Name"
+msgstr "名称"
+
+#: acls/models/base.py:27 assets/models/cmd_filter.py:53
 #: assets/models/user.py:119
 msgid "Priority"
 msgstr "优先级"
 
-#: acls/models/base.py:27 assets/models/cmd_filter.py:53
+#: acls/models/base.py:28 assets/models/cmd_filter.py:53
 #: assets/models/user.py:119
 msgid "1-100, the lower the value will be match first"
 msgstr "优先级可选范围为 1-100 (数值越小越优先)"
 
-#: acls/models/base.py:30 authentication/models.py:20
+#: acls/models/base.py:31 authentication/models.py:20
 #: authentication/templates/authentication/_access_key_modal.html:32
 #: perms/models/base.py:52 users/templates/users/_select_user_modal.html:18
 #: users/templates/users/user_detail.html:132
@@ -49,7 +75,7 @@ msgstr "激活中"
 
 # msgid "Date created"
 # msgstr "创建日期"
-#: acls/models/base.py:31 applications/models/application.py:24
+#: acls/models/base.py:32 applications/models/application.py:24
 #: assets/models/asset.py:147 assets/models/asset.py:223
 #: assets/models/base.py:255 assets/models/cluster.py:29
 #: assets/models/cmd_filter.py:23 assets/models/cmd_filter.py:57
@@ -70,47 +96,20 @@ msgstr "激活中"
 msgid "Comment"
 msgstr "备注"
 
-#: acls/models/login_acl.py:17 tickets/const.py:18
+#: acls/models/login_acl.py:16 tickets/const.py:18
 msgid "Reject"
 msgstr "拒绝"
 
-#: acls/models/login_acl.py:18 assets/models/cmd_filter.py:47
+#: acls/models/login_acl.py:17 assets/models/cmd_filter.py:47
 msgid "Allow"
 msgstr "允许"
 
-#: acls/models/login_acl.py:20 acls/models/login_asset_acl.py:19
-#: acls/serializers/login_asset_acl.py:33 applications/models/application.py:11
-#: assets/models/asset.py:142 assets/models/base.py:250
-#: assets/models/cluster.py:18 assets/models/cmd_filter.py:21
-#: assets/models/domain.py:21 assets/models/group.py:20
-#: assets/models/label.py:18 ops/mixin.py:24 orgs/models.py:23
-#: perms/models/base.py:49 settings/models.py:29 terminal/models/storage.py:23
-#: terminal/models/storage.py:75 terminal/models/task.py:16
-#: terminal/models/terminal.py:139 users/forms/profile.py:32
-#: users/models/group.py:15 users/models/user.py:530
-#: users/templates/users/_select_user_modal.html:13
-#: users/templates/users/user_asset_permission.html:37
-#: users/templates/users/user_asset_permission.html:154
-#: users/templates/users/user_database_app_permission.html:36
-#: users/templates/users/user_detail.html:49
-#: users/templates/users/user_granted_database_app.html:34
-#: users/templates/users/user_granted_remote_app.html:34
-#: users/templates/users/user_group_detail.html:50
-#: users/templates/users/user_group_list.html:14
-#: users/templates/users/user_list.html:14
-#: users/templates/users/user_profile.html:51
-#: users/templates/users/user_pubkey_update.html:57
-#: users/templates/users/user_remote_app_permission.html:36
-#: xpack/plugins/cloud/models.py:28
-msgid "Name"
-msgstr "名称"
-
-#: acls/models/login_acl.py:22
+#: acls/models/login_acl.py:20
 msgid "Login IP"
 msgstr "登录IP"
 
-#: acls/models/login_acl.py:26 acls/models/login_asset_acl.py:27
-#: acls/serializers/login_acl.py:30 acls/serializers/login_asset_acl.py:61
+#: acls/models/login_acl.py:24 acls/models/login_asset_acl.py:26
+#: acls/serializers/login_acl.py:29 acls/serializers/login_asset_acl.py:61
 #: assets/models/cmd_filter.py:56 audits/models.py:57
 #: authentication/templates/authentication/_access_key_modal.html:34
 #: tickets/models/ticket.py:43 users/templates/users/_granted_assets.html:29
@@ -123,9 +122,10 @@ msgstr "登录IP"
 msgid "Action"
 msgstr "动作"
 
-#: acls/models/login_acl.py:29 acls/models/login_asset_acl.py:21
-#: assets/models/label.py:15 audits/models.py:36 audits/models.py:56
-#: audits/models.py:69 audits/serializers.py:81 authentication/models.py:44
+#: acls/models/login_acl.py:28 acls/models/login_asset_acl.py:20
+#: acls/serializers/login_acl.py:28 assets/models/label.py:15
+#: audits/models.py:36 audits/models.py:56 audits/models.py:69
+#: audits/serializers.py:81 authentication/models.py:44
 #: authentication/models.py:95 orgs/models.py:18 orgs/models.py:403
 #: perms/models/base.py:50 templates/index.html:78
 #: terminal/backends/command/models.py:18
@@ -149,11 +149,11 @@ msgstr "用户"
 msgid "Login confirm"
 msgstr "登录复核"
 
-#: acls/models/login_asset_acl.py:22
+#: acls/models/login_asset_acl.py:21
 msgid "System User"
 msgstr "系统用户"
 
-#: acls/models/login_asset_acl.py:23
+#: acls/models/login_asset_acl.py:22
 #: applications/serializers/attrs/application_category/remote_app.py:33
 #: assets/models/asset.py:355 assets/models/authbook.py:26
 #: assets/models/gathered_user.py:14 assets/serializers/admin_user.py:29
@@ -170,20 +170,20 @@ msgstr "系统用户"
 msgid "Asset"
 msgstr "资产"
 
-#: acls/models/login_asset_acl.py:33 authentication/models.py:45
+#: acls/models/login_asset_acl.py:32 authentication/models.py:45
 #: users/templates/users/user_detail.html:258
 msgid "Reviewers"
 msgstr "审批人"
 
-#: acls/models/login_asset_acl.py:87 tickets/const.py:12
+#: acls/models/login_asset_acl.py:86 tickets/const.py:12
 msgid "Login asset confirm"
 msgstr "登录资产复核"
 
-#: acls/serializers/login_acl.py:20
+#: acls/serializers/login_acl.py:19
 msgid "IP address invalid: `{}`"
 msgstr "IP 地址无效: `{}`"
 
-#: acls/serializers/login_acl.py:26 acls/serializers/login_asset_acl.py:22
+#: acls/serializers/login_acl.py:25 acls/serializers/login_asset_acl.py:22
 #: applications/serializers/attrs/application_type/mysql_workbench.py:18
 #: assets/models/asset.py:183 assets/models/domain.py:52
 #: assets/serializers/asset_user.py:46 settings/serializers/settings.py:108
@@ -191,6 +191,10 @@ msgstr "IP 地址无效: `{}`"
 #: users/templates/users/user_asset_permission.html:156
 msgid "IP"
 msgstr "IP"
+
+#: acls/serializers/login_acl.py:41
+msgid "The user `{}` is not in the current organization: `{}`"
+msgstr "用户 `{}` 不在当前组织: `{}`"
 
 #: acls/serializers/login_asset_acl.py:15
 #: acls/serializers/login_asset_acl.py:37

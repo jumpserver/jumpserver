@@ -1,6 +1,5 @@
 from common.permissions import IsOrgAdmin, HasQueryParamsUserAndIsCurrentOrgMember
 from common.drf.api import JMSBulkModelViewSet
-from orgs.utils import current_org
 from ..models import LoginACL
 from .. import serializers
 

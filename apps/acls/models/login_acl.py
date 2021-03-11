@@ -24,7 +24,9 @@ class LoginACL(BaseACL):
         verbose_name=_('Action')
     )
     # 关联
-    user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='login_acls')
+    user = models.ForeignKey(
+        'users.User', on_delete=models.CASCADE, related_name='login_acls', verbose_name=_('User')
+    )
 
     objects = ACLManager.from_queryset(BaseACLQuerySet)()
 
