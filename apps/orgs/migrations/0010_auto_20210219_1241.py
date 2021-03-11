@@ -65,8 +65,15 @@ def add_all_user_to_default_org(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('orgs', '0009_auto_20201023_1628'),
+        ('tickets', '0007_auto_20201224_1821'),
+        ('audits', '0011_userloginlog_backend'),
+        ('ops', '0019_adhocexecution_celery_task_id'),
         ('perms', '0018_auto_20210208_1515'),
+        ('applications', '0008_auto_20210104_0435'),
+        ('terminal', '0031_auto_20210113_1356'),
+        ('users', '0031_auto_20201118_1801'),
+        ('assets', '0066_auto_20210208_1802'),
+        ('orgs', '0009_auto_20201023_1628'),
     ]
 
     operations = [
