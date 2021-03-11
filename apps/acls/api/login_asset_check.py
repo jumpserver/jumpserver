@@ -22,13 +22,13 @@ class LoginAssetCheckAPI(CreateAPIView):
         return Response(data=response_data, status=200)
 
     def check_if_need_confirm(self):
-        quires = {
+        queries = {
             'user': self.serializer.user, 'asset': self.serializer.asset,
             'system_user': self.serializer.system_user,
             'action': LoginAssetACL.ActionChoices.login_confirm
         }
         with tmp_to_org(self.serializer.org):
-            acl = LoginAssetACL.filter(**quires).valid().first()
+            acl = LoginAssetACL.filter(**queries).valid().first()
 
         if not acl:
             is_need_confirm = False
