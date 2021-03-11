@@ -27,11 +27,11 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         choices=PASSWORD_STRATEGY_CHOICES, required=False,
         label=_('Password strategy'), write_only=True, default=0
     )
-    mfa_enabled = serializers.BooleanField(label=_('MFA enabled'))
-    mfa_force_enabled = serializers.BooleanField(label=_('MFA force enabled'))
+    mfa_enabled = serializers.BooleanField(read_only=True, label=_('MFA enabled'))
+    mfa_force_enabled = serializers.BooleanField(read_only=True, label=_('MFA force enabled'))
     mfa_level_display = serializers.ReadOnlyField(source='get_mfa_level_display', label=_('MFA level for display'))
-    login_blocked = serializers.BooleanField(label=_('Login blocked'))
-    is_expired = serializers.BooleanField(label=_('Is expired'))
+    login_blocked = serializers.BooleanField(read_only=True, label=_('Login blocked'))
+    is_expired = serializers.BooleanField(read_only=True, label=_('Is expired'))
     can_update = serializers.SerializerMethodField(label=_('Can update'))
     can_delete = serializers.SerializerMethodField(label=_('Can delete'))
     org_roles = serializers.ListField(
