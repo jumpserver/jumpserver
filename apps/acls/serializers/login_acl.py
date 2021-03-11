@@ -17,7 +17,7 @@ def ip_group_child_validator(ip_group_child):
                or is_ip_network(ip_group_child) \
                or is_ip_segment(ip_group_child)
     if not is_valid:
-        error = _('Ip address invalid: `{}`').format(ip_group_child)
+        error = _('IP address invalid: `{}`').format(ip_group_child)
         raise serializers.ValidationError(error)
 
 

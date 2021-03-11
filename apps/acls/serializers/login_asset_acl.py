@@ -48,7 +48,8 @@ class LoginAssetACLSystemUsersSerializer(serializers.Serializer):
     def validate_protocol_group(protocol_group):
         unsupported_protocols = set(protocol_group) - set(SystemUser.ASSET_CATEGORY_PROTOCOLS + ['*'])
         if unsupported_protocols:
-            raise serializers.ValidationError(_(f'Unsupported protocols: {unsupported_protocols}'))
+            error = _('Unsupported protocols: {}').format(unsupported_protocols)
+            raise serializers.ValidationError(error)
         return protocol_group
 
 
@@ -72,7 +73,7 @@ class LoginAssetACLSerializer(BulkOrgResourceModelSerializer):
         org_id = self.fields['org_id'].default()
         org = Organization.get_instance(org_id)
         if not org:
-            error = _('The current organization `{}` is None'.format(org_id))
+            error = _('The organization `{}` does not exist'.format(org_id))
             raise serializers.ValidationError(error)
         users = org.get_members()
         valid_reviewers = list(set(reviewers) & set(users))
