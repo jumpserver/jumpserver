@@ -34,15 +34,16 @@ def on_node_asset_change(sender, action, instance, reverse, pk_set, **kwargs):
 
     operator = mapper[action]
 
-    if reverse:
-        node: Node = instance
-        asset_pk_set = set(pk_set)
-        NodeAssetsAmountUtils.update_node_assets_amount(node, asset_pk_set, operator)
-    else:
-        asset_pk = instance.id
-        # 与资产直接关联的节点
-        node_keys = set(Node.objects.filter(id__in=pk_set).values_list('key', flat=True))
-        NodeAssetsAmountUtils.update_nodes_asset_amount(node_keys, asset_pk, operator)
+    with NodeTreeUpdateLock():
+        if reverse:
+            node: Node = instance
+            asset_pk_set = set(pk_set)
+            NodeAssetsAmountUtils.update_node_assets_amount(node, asset_pk_set, operator)
+        else:
+            asset_pk = instance.id
+            # 与资产直接关联的节点
+            node_keys = set(Node.objects.filter(id__in=pk_set).values_list('key', flat=True))
+            NodeAssetsAmountUtils.update_nodes_asset_amount(node_keys, asset_pk, operator)
 
 
 class NodeAssetsAmountUtils:
@@ -64,7 +65,6 @@ class NodeAssetsAmountUtils:
 
     @classmethod
     @ensure_in_real_or_default_org
-    @NodeTreeUpdateLock()
     def update_nodes_asset_amount(cls, node_keys, asset_pk, operator):
         """
         一个资产与多个节点关系变化时，更新计数
@@ -114,7 +114,6 @@ class NodeAssetsAmountUtils:
 
     @classmethod
     @ensure_in_real_or_default_org
-    @NodeTreeUpdateLock()
     def update_node_assets_amount(cls, node: Node, asset_pk_set: set, operator=add):
         """
         一个节点与多个资产关系变化时，更新计数

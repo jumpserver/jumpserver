@@ -18,3 +18,6 @@ class NodeTreeUpdateLock(DistributedLock):
     def __init__(self):
         name = self.get_name()
         super().__init__(name=name, release_on_transaction_commit=True, reentrant=True)
+
+    def __call__(self, *args, **kwargs):
+        raise NotImplementedError('Can not use as decorator')
