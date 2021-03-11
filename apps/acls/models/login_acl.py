@@ -13,6 +13,7 @@ class ACLManager(models.Manager):
 class LoginACL(BaseACL):
     class ActionChoices(models.TextChoices):
         reject = 'reject', _('Reject')
+        allow = 'allow', _('Allow')
 
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
     # 条件
