@@ -46,6 +46,7 @@ class NodeAssetTreePagination(AssetPaginationBase):
             node = self._view.node
             if not node:
                 node = Node.org_root()
-            logger.debug(f'Hit node.assets_amount[{node.assets_amount}] -> {self._request.get_full_path()}')
-            return node.assets_amount
+            if node:
+                logger.debug(f'Hit node.assets_amount[{node.assets_amount}] -> {self._request.get_full_path()}')
+                return node.assets_amount
         return None

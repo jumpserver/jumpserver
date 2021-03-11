@@ -168,7 +168,7 @@ class AssetDisplaySerializer(AssetSerializer):
 
 
 class PlatformSerializer(serializers.ModelSerializer):
-    meta = serializers.DictField(required=False, allow_null=True)
+    meta = serializers.DictField(required=False, allow_null=True, label=_('Meta'))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

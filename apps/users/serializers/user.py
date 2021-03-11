@@ -27,15 +27,17 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         choices=PASSWORD_STRATEGY_CHOICES, required=False,
         label=_('Password strategy'), write_only=True, default=0
     )
+    mfa_enabled = serializers.BooleanField(label=_('MFA enabled'))
+    mfa_force_enabled = serializers.BooleanField(label=_('MFA force enabled'))
     mfa_level_display = serializers.ReadOnlyField(source='get_mfa_level_display', label=_('MFA level for display'))
-    login_blocked = serializers.SerializerMethodField(label=_('Login blocked'))
+    login_blocked = serializers.BooleanField(label=_('Login blocked'))
+    is_expired = serializers.BooleanField(label=_('Is expired'))
     can_update = serializers.SerializerMethodField(label=_('Can update'))
     can_delete = serializers.SerializerMethodField(label=_('Can delete'))
     org_roles = serializers.ListField(
         label=_('Organization role name'), allow_null=True, required=False,
         child=serializers.ChoiceField(choices=ORG_ROLE.choices), default=["User"]
     )
-    key_prefix_block = "_LOGIN_BLOCK_{}"
 
     class Meta:
         model = User
@@ -72,8 +74,6 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
             'org_role_display': {'label': _('Organization role name')},
             'role_display': {'label': _('Super role name')},
             'total_role_display': {'label': _('Total role name')},
-            'mfa_enabled': {'label': _('MFA enabled')},
-            'mfa_force_enabled': {'label': _('MFA force enabled')},
             'role': {'default': "User"},
         }
 
@@ -143,11 +143,6 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         return CanUpdateDeleteUser.has_delete_object_permission(
             self.context['request'], self.context['view'], obj
         )
-
-    def get_login_blocked(self, obj):
-        key_block = self.key_prefix_block.format(obj.username)
-        blocked = bool(cache.get(key_block))
-        return blocked
 
 
 class UserRetrieveSerializer(UserSerializer):

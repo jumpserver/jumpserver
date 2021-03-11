@@ -521,18 +521,24 @@ class SomeNodesMixin:
 
     @classmethod
     def org_root(cls):
-        org_roots = cls.org_root_nodes()
-        if org_roots:
-            return org_roots[0]
-        ori_org = get_current_org()
         # 如果使用current_org 在set_current_org时会死循环
-        if ori_org.is_root():
-            root = cls.default_node()
-        elif ori_org.is_default():
-            root = cls.default_node()
-        else:
+        ori_org = get_current_org()
+
+        if ori_org and ori_org.is_default():
+            return cls.default_node()
+        if ori_org and ori_org.is_root():
+            return None
+
+        org_roots = cls.org_root_nodes()
+        org_roots_length = len(org_roots)
+
+        if org_roots_length == 1:
+            return org_roots[0]
+        elif org_roots_length == 0:
             root = cls.create_org_root_node()
-        return root
+            return root
+        else:
+            raise ValueError('Current org root node not 1, get {}'.format(org_roots_length))
 
     @classmethod
     def initial_some_nodes(cls):
