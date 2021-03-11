@@ -198,10 +198,12 @@ logger = get_logger(__name__)
 
 def timeit(func):
     def wrapper(*args, **kwargs):
-        if hasattr(func, '__name__'):
-            name = func.__name__
-        else:
-            name = func
+        name = func
+        for attr in ('__qualname__', '__name__'):
+            if hasattr(func, attr):
+                name = getattr(func, attr)
+                break
+
         logger.debug("Start call: {}".format(name))
         now = time.time()
         result = func(*args, **kwargs)

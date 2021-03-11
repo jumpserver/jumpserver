@@ -54,6 +54,8 @@ def _find(attr):
 
 def get_current_org():
     org_id = get_current_org_id()
+    if not org_id or org_id == Organization.ROOT_ID:
+        return Organization.root()
     org = Organization.get_instance(org_id, default=Organization.root())
     return org
 
