@@ -47,17 +47,18 @@ def add_all_user_to_default_org(apps, schema_editor):
     User = apps.get_model('users', 'User')
     Organization = apps.get_model('orgs', 'Organization')
 
-    users = User.objects.all()
+    users_qs = User.objects.all()
     default_org = Organization.objects.get(id=default_id)
 
     t_start = time.time()
-    count = users.count()
-    print(f'{count} users to add')
+    count = users_qs.count()
+    print(f'Will add users to default org: {count}')
 
     batch_size = 1000
     for i in range(0, count, batch_size):
-        default_org.members.add(*users[i:i+batch_size])
-        print(f'Add {i+1}-{i+batch_size} users')
+        users = list(users_qs[i:i + batch_size])
+        default_org.members.add(*users)
+        print(f'Add users to default org: {i+1}-{i+len(users)}')
     interval = round((time.time() - t_start) * 1000, 2)
     print(f'done, use {interval} ms')
 
