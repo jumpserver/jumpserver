@@ -23,6 +23,7 @@ RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
     && sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
     && apt update \
     && grep -v '^#' ./requirements/deb_buster_requirements.txt | xargs apt -y install \
+    && rm -rf /var/lib/apt/lists/* \  # https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#run
     && localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8 \
     && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
