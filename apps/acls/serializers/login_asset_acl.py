@@ -64,7 +64,7 @@ class LoginAssetACLSerializer(BulkOrgResourceModelSerializer):
         model = models.LoginAssetACL
         fields = [
             'id', 'name', 'priority', 'users', 'system_users', 'assets', 'action', 'action_display',
-            'comment', 'reviewers', 'reviewers_amount', 'created_by', 'date_created',
+            'is_active', 'comment', 'reviewers', 'reviewers_amount', 'created_by', 'date_created',
             'date_updated', 'org_id'
         ]
         extra_kwargs = {

@@ -32,7 +32,7 @@ class LoginACLSerializer(BulkModelSerializer):
         model = LoginACL
         fields = [
             'id', 'name', 'priority', 'ip_group', 'user', 'user_display', 'action',
-            'action_display', 'comment', 'created_by', 'date_created', 'date_updated'
+            'action_display', 'is_active', 'comment', 'created_by', 'date_created', 'date_updated'
         ]
 
     @staticmethod
