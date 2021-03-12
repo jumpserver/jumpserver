@@ -611,12 +611,12 @@ class UserGrantedNodesQueryUtils(UserGrantedUtilsBase):
 
         for node in nodes:
             node.use_granted_assets_amount()
+            key_to_node_mapper[node.key] = node
 
             if node.node_from == NodeFrom.granted:
                 # 直接授权的节点
                 # 增加查询后代节点的过滤条件
                 nodes_descendant_q |= Q(key__startswith=f'{node.key}:')
-                key_to_node_mapper[node.key] = node
 
         if nodes_descendant_q:
             descendant_nodes = PermNode.objects.filter(
