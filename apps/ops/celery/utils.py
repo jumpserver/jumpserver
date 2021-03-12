@@ -112,7 +112,8 @@ def get_celery_status():
     ping_data = i.ping() or {}
     active_nodes = [k for k, v in ping_data.items() if v.get('ok') == 'pong']
     active_queue_worker = set([n.split('@')[0] for n in active_nodes if n])
-    if len(active_queue_worker) < 5:
+    # Celery Worker 数量: 2
+    if len(active_queue_worker) < 2:
         print("Not all celery worker worked")
         return False
     else:
