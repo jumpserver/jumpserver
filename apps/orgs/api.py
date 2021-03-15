@@ -18,15 +18,28 @@ from .serializers import (
     CurrentOrgSerializer
 )
 from users.models import User, UserGroup
-from assets.models import Asset, Domain, AdminUser, SystemUser, Label
-from perms.models import AssetPermission
-from orgs.utils import current_org
+from assets.models import (
+    Asset, Domain, AdminUser, SystemUser, Label, Node, Gateway,
+    CommandFilter, CommandFilterRule, GatheredUser
+)
+from applications.models import Application
+from perms.models import AssetPermission, ApplicationPermission
+from orgs.utils import current_org, tmp_to_root_org
 from common.utils import get_logger
 from .filters import OrgMemberRelationFilterSet
 from .models import OrganizationMember
 
 
 logger = get_logger(__file__)
+
+
+# 部分 org 相关的 model，需要清空这些数据之后才能删除该组织
+org_related_models = [
+    User, UserGroup, Asset, Label, Domain, Gateway, Node, AdminUser, SystemUser, Label,
+    CommandFilter, CommandFilterRule, GatheredUser,
+    AssetPermission, ApplicationPermission,
+    Application,
+]
 
 
 class OrgViewSet(BulkModelViewSet):
@@ -44,24 +57,23 @@ class OrgViewSet(BulkModelViewSet):
         }
         return mapper.get(self.action, super().get_serializer_class())
 
+    @tmp_to_root_org()
     def get_data_from_model(self, model):
         if model == User:
             data = model.objects.filter(orgs__id=self.org.id, m2m_org_members__role=ROLE.USER)
+        elif model == Node:
+            # 跟节点不能手动删除，所以排除检查
+            data = model.objects.filter(org_id=self.org.id).exclude(parent_key='', key__regex=r'^[0-9]+$')
         else:
             data = model.objects.filter(org_id=self.org.id)
         return data
 
     def destroy(self, request, *args, **kwargs):
         self.org = self.get_object()
-        models = [
-            User, UserGroup,
-            Asset, Domain, AdminUser, SystemUser, Label,
-            AssetPermission,
-        ]
-        for model in models:
+        for model in org_related_models:
             data = self.get_data_from_model(model)
             if data:
-                msg = _('Organization contains undeleted resources')
+                msg = _(f'Have `{model._meta.verbose_name}` exists, Please delete')
                 return Response(data={'error': msg}, status=status.HTTP_403_FORBIDDEN)
         else:
             if str(current_org) == str(self.org):
