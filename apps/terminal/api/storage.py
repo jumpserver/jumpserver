@@ -10,7 +10,7 @@ from django_filters import utils
 
 from terminal import const
 from common.const.http import GET
-from common.permissions import IsSuperUser
+from common.permissions import IsSuperUser, IsOrgAuditor
 from terminal.filters import CommandStorageFilter, CommandFilter, CommandFilterForStorageTree
 from ..models import CommandStorage, ReplayStorage
 from ..serializers import CommandStorageSerializer, ReplayStorageSerializer
@@ -42,7 +42,7 @@ class CommandStorageViewSet(BaseStorageViewSetMixin, viewsets.ModelViewSet):
     permission_classes = (IsSuperUser,)
     filterset_class = CommandStorageFilter
 
-    @action(methods=[GET], detail=False, filterset_class=CommandFilterForStorageTree)
+    @action(methods=[GET], detail=False, permission_classes=(IsOrgAuditor, ), filterset_class=CommandFilterForStorageTree)
     def tree(self, request: Request):
         storage_qs = self.get_queryset().exclude(name='null')
         storages_with_count = []
