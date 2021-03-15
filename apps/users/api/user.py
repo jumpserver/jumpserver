@@ -2,7 +2,7 @@
 from django.core.cache import cache
 from django.utils.translation import ugettext as _
 from rest_framework.decorators import action
-
+from django.conf import settings
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
@@ -88,16 +88,13 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
 
     def get_permissions(self):
         if self.action in ["retrieve", "list"]:
-            self.permission_classes = (IsOrgAdminOrAppUser,)
-        if self.request.query_params.get('all'):
+            if self.request.query_params.get('all'):
+                self.permission_classes = (IsSuperUser,)
+            else:
+                self.permission_classes = (IsOrgAdminOrAppUser,)
+        elif self.action in ['destroy']:
             self.permission_classes = (IsSuperUser,)
         return super().get_permissions()
-
-    def perform_destroy(self, instance):
-        if not current_org.is_root():
-            instance.remove()
-        else:
-            return super().perform_destroy(instance)
 
     def perform_bulk_destroy(self, objects):
         for obj in objects:
@@ -163,6 +160,21 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         relations = [OrganizationMember(**i) for i in validated_data]
         OrganizationMember.objects.bulk_create(relations, ignore_conflicts=True)
         return Response(serializer.data, status=201)
+
+    @action(methods=['post'], detail=True, permission_classes=(IsOrgAdmin,))
+    def remove(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.remove()
+        return Response(status=204)
+
+    @action(methods=['post'], detail=False, permission_classes=(IsOrgAdmin,), url_path='remove')
+    def bulk_remove(self, request, *args, **kwargs):
+        qs = self.get_queryset()
+        filtered = self.filter_queryset(qs)
+
+        for instance in filtered:
+            instance.remove()
+        return Response(status=204)
 
 
 class UserChangePasswordApi(UserQuerysetMixin, generics.RetrieveUpdateAPIView):

@@ -8,7 +8,7 @@ from rest_framework_bulk import BulkModelViewSet
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.exceptions import PermissionDenied
 
-from common.permissions import IsSuperUserOrAppUser, IsValidUser, UserCanUseCurrentOrg
+from common.permissions import IsSuperUserOrAppUser, IsValidUser, UserCanAnyPermCurrentOrg
 from common.drf.api import JMSBulkRelationModelViewSet
 from .models import Organization, ROLE
 from .serializers import (
@@ -136,7 +136,7 @@ class OrgMemberUserRelationBulkViewSet(JMSBulkRelationModelViewSet):
 
 class CurrentOrgDetailApi(RetrieveAPIView):
     serializer_class = CurrentOrgSerializer
-    permission_classes = (IsValidUser, UserCanUseCurrentOrg)
+    permission_classes = (IsValidUser, UserCanAnyPermCurrentOrg)
 
     def get_object(self):
         return current_org
