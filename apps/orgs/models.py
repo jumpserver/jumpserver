@@ -51,7 +51,14 @@ class Organization(models.Model):
     def get_instance_from_memory(cls, id_or_name):
         if not isinstance(cls.orgs_mapping, dict):
             cls.orgs_mapping = cls.construct_orgs_mapping()
-        return cls.orgs_mapping.get(str(id_or_name))
+
+        org = cls.orgs_mapping.get(str(id_or_name))
+        if not org:
+            # 内存失效速度慢于读取速度(on_org_create_or_update)
+            cls.orgs_mapping = cls.construct_orgs_mapping()
+
+        org = cls.orgs_mapping.get(str(id_or_name))
+        return org
 
     @classmethod
     def construct_orgs_mapping(cls):
