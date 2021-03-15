@@ -1,6 +1,5 @@
 from importlib import import_module
 
-from django.contrib.auth import BACKEND_SESSION_KEY
 from django.conf import settings
 from django.contrib.auth import user_logged_in
 from django.core.cache import cache
@@ -25,17 +24,17 @@ def on_user_auth_login_success(sender, user, request, **kwargs):
 
 @receiver(openid_user_login_success)
 def on_oidc_user_login_success(sender, request, user, create=False, **kwargs):
-    request.session[BACKEND_SESSION_KEY] = 'OIDCAuthCodeBackend'
+    request.session['auth_backend'] = settings.AUTH_BACKEND_OIDC_CODE
     post_auth_success.send(sender, user=user, request=request)
 
 
 @receiver(openid_user_login_failed)
 def on_oidc_user_login_failed(sender, username, request, reason, **kwargs):
-    request.session[BACKEND_SESSION_KEY] = 'OIDCAuthCodeBackend'
+    request.session['auth_backend'] = settings.AUTH_BACKEND_OIDC_CODE
     post_auth_failed.send(sender, username=username, request=request, reason=reason)
 
 
 @receiver(cas_user_authenticated)
 def on_cas_user_login_success(sender, request, user, **kwargs):
-    request.session[BACKEND_SESSION_KEY] = 'CASBackend'
+    request.session['auth_backend'] = settings.AUTH_BACKEND_CAS
     post_auth_success.send(sender, user=user, request=request)
