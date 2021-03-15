@@ -98,12 +98,9 @@ class PublicSettingApi(generics.RetrieveAPIView):
     def get_xpack_license_is_valid():
         if not settings.XPACK_ENABLED:
             return False
-        try:
-            from xpack.plugins.license.models import License
-            return License.has_valid_license()
-        except Exception as e:
-            logger.error(e)
-            return False
+
+        from xpack.plugins.license.models import License
+        return License.has_valid_license()
 
     @staticmethod
     def get_login_title():

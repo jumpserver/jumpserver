@@ -22,7 +22,7 @@ from common.utils.common import timeit
 from common.db.models import output_as_string
 from common.utils import get_logger
 from orgs.mixins.models import OrgModelMixin, OrgManager
-from orgs.utils import get_current_org, tmp_to_org
+from orgs.utils import get_current_org, tmp_to_org, tmp_to_root_org
 from orgs.models import Organization
 
 
@@ -462,25 +462,45 @@ class NodeAssetsMixin(NodeAllAssetsMappingMixin):
 class SomeNodesMixin:
     key = ''
     default_key = '1'
-    default_value = 'Default'
     empty_key = '-11'
     empty_value = _("empty")
 
     @classmethod
+    def correct_default_node_if_need(cls):
+        with tmp_to_root_org():
+            wrong_default_org = cls.objects.filter(key='1', value='Default').first()
+            if not wrong_default_org:
+                return
+
+            if wrong_default_org.has_children_or_has_assets():
+                return
+
+            default_org = Organization.default()
+            right_default_org = cls.objects.filter(value=default_org.name).first()
+            if not right_default_org:
+                return
+
+            if right_default_org.date_create > wrong_default_org.date_create:
+                return
+
+            with atomic():
+                logger.warn(f'Correct default node: '
+                            f'old={wrong_default_org.value}-{wrong_default_org.key} '
+                            f'new={right_default_org.value}-{right_default_org.key}')
+                wrong_default_org.delete()
+                right_default_org.key = '1'
+                right_default_org.save()
+
+    @classmethod
     def default_node(cls):
+        cls.correct_default_node_if_need()
+
         default_org = Organization.default()
         with tmp_to_org(default_org):
             defaults = {'value': default_org.name}
-            try:
-                obj, created = cls.objects.get_or_create(
-                    defaults=defaults, key=cls.default_key,
-                )
-            except IntegrityError as e:
-                logger.error("Create default node failed: {}".format(e))
-                cls.modify_other_org_root_node_key()
-                obj, created = cls.objects.get_or_create(
-                    defaults=defaults, key=cls.default_key,
-                )
+            obj, created = cls.objects.get_or_create(
+                defaults=defaults, key=cls.default_key,
+            )
             return obj
 
     def is_default_node(self):
@@ -500,7 +520,7 @@ class SomeNodesMixin:
             if not org_nodes_roots_keys:
                 org_nodes_roots_keys = ['1']
             max_key = max([int(k) for k in org_nodes_roots_keys])
-            key = str(max_key + 1) if max_key != 0 else '2'
+            key = str(max_key + 1) if max_key > 0 else '2'
             return key
 
     @classmethod

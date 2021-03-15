@@ -23,6 +23,7 @@ class AdminUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         read_only_fields = ['date_created', 'date_updated', 'created_by', 'assets_amount']
 
         extra_kwargs = {
+            'username': {"required": True},
             'password': {"write_only": True},
             'private_key': {"write_only": True},
             'public_key': {"write_only": True},
