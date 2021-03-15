@@ -11,6 +11,8 @@ from .user import UserSerializer
 class UserOrgSerializer(serializers.Serializer):
     id = serializers.CharField()
     name = serializers.CharField()
+    is_default = serializers.BooleanField(read_only=True)
+    is_root = serializers.BooleanField(read_only=True)
 
 
 class UserOrgLabelSerializer(serializers.Serializer):
