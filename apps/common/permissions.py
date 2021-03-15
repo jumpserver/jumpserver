@@ -111,7 +111,7 @@ class PermissionsMixin(UserPassesTestMixin):
 
 class UserCanUseCurrentOrg(permissions.BasePermission):
     def has_permission(self, request, view):
-        return current_org.can_use_by(request.user)
+        return current_org.has_member(request.user)
 
 
 class UserCanUpdatePassword(permissions.BasePermission):
