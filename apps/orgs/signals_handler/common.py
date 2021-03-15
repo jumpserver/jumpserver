@@ -7,7 +7,8 @@ from functools import partial
 from django.dispatch import receiver
 from django.utils.functional import LazyObject
 from django.db.models.signals import m2m_changed
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete, pre_delete
+from django.utils.translation import ugettext as _
 
 from orgs.utils import tmp_to_org
 from orgs.models import Organization, OrganizationMember
@@ -18,6 +19,7 @@ from common.const.signals import PRE_REMOVE, POST_REMOVE
 from common.signals import django_ready
 from common.utils import get_logger
 from common.utils.connection import RedisPubSub
+from common.exceptions import JMSException
 
 
 logger = get_logger(__file__)
@@ -73,6 +75,15 @@ def on_org_create_or_update(sender, instance=None, created=False, **kwargs):
 @receiver(post_delete, sender=Organization)
 def on_org_delete(sender, **kwargs):
     expire_orgs_mapping_for_memory()
+
+
+@receiver(pre_delete, sender=Organization)
+def on_org_delete(sender, instance, **kwargs):
+    # 删除该组织下所有 节点
+    with tmp_to_org(instance):
+        root_node = Node.org_root()
+        if root_node:
+            root_node.delete()
 
 
 def _remove_users(model, users, org):
