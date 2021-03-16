@@ -6,7 +6,7 @@ import sys
 from django.db import migrations
 
 
-default_id = '00000000-0000-0000-0000-000000000001'
+default_id = '00000000-0000-0000-0000-000000000002'
 
 
 def add_default_org(apps, schema_editor):

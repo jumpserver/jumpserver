@@ -465,44 +465,6 @@ class SomeNodesMixin:
     empty_key = '-11'
     empty_value = _("empty")
 
-    @classmethod
-    def correct_default_node_if_need(cls):
-        with tmp_to_root_org():
-            wrong_default_org = cls.objects.filter(key='1', value='Default').first()
-            if not wrong_default_org:
-                return
-
-            if wrong_default_org.has_children_or_has_assets():
-                return
-
-            default_org = Organization.default()
-            right_default_org = cls.objects.filter(value=default_org.name).first()
-            if not right_default_org:
-                return
-
-            if right_default_org.date_create > wrong_default_org.date_create:
-                return
-
-            with atomic():
-                logger.warn(f'Correct default node: '
-                            f'old={wrong_default_org.value}-{wrong_default_org.key} '
-                            f'new={right_default_org.value}-{right_default_org.key}')
-                wrong_default_org.delete()
-                right_default_org.key = '1'
-                right_default_org.save()
-
-    @classmethod
-    def default_node(cls):
-        cls.correct_default_node_if_need()
-
-        default_org = Organization.default()
-        with tmp_to_org(default_org):
-            defaults = {'value': default_org.name}
-            obj, created = cls.objects.get_or_create(
-                defaults=defaults, key=cls.default_key,
-            )
-            return obj
-
     def is_default_node(self):
         return self.key == self.default_key
 
@@ -513,15 +475,36 @@ class SomeNodesMixin:
             return False
 
     @classmethod
-    def get_next_org_root_node_key(cls):
-        with tmp_to_org(Organization.root()):
-            org_nodes_roots = cls.objects.filter(key__regex=r'^[0-9]+$')
-            org_nodes_roots_keys = org_nodes_roots.values_list('key', flat=True)
-            if not org_nodes_roots_keys:
-                org_nodes_roots_keys = ['1']
-            max_key = max([int(k) for k in org_nodes_roots_keys])
-            key = str(max_key + 1) if max_key > 0 else '2'
-            return key
+    def org_root(cls):
+        # 如果使用current_org 在set_current_org时会死循环
+        ori_org = get_current_org()
+
+        if ori_org and ori_org.is_default():
+            return cls.default_node()
+
+        if ori_org and ori_org.is_root():
+            return None
+
+        org_roots = cls.org_root_nodes()
+        org_roots_length = len(org_roots)
+
+        if org_roots_length == 1:
+            root = org_roots[0]
+            return root
+        elif org_roots_length == 0:
+            root = cls.create_org_root_node()
+            return root
+        else:
+            error = 'Current org {} root node not 1, get {}'.format(ori_org, org_roots_length)
+            raise ValueError(error)
+
+    @classmethod
+    def default_node(cls):
+        default_org = Organization.default()
+        with tmp_to_org(default_org):
+            defaults = {'value': default_org.name}
+            obj, created = cls.objects.get_or_create(defaults=defaults, key=cls.default_key)
+            return obj
 
     @classmethod
     def create_org_root_node(cls):
@@ -532,67 +515,21 @@ class SomeNodesMixin:
             return root
 
     @classmethod
+    def get_next_org_root_node_key(cls):
+        with tmp_to_root_org():
+            org_nodes_roots = cls.org_root_nodes()
+            org_nodes_roots_keys = org_nodes_roots.values_list('key', flat=True)
+            if not org_nodes_roots_keys:
+                org_nodes_roots_keys = ['1']
+            max_key = max([int(k) for k in org_nodes_roots_keys])
+            key = str(max_key + 1) if max_key > 0 else '2'
+            return key
+
+    @classmethod
     def org_root_nodes(cls):
-        nodes = cls.objects.filter(parent_key='') \
-            .filter(key__regex=r'^[0-9]+$') \
-            .exclude(key__startswith='-') \
-            .order_by('key')
-        return nodes
-
-    @classmethod
-    def org_root(cls):
-        # 如果使用current_org 在set_current_org时会死循环
-        ori_org = get_current_org()
-
-        if ori_org and ori_org.is_default():
-            return cls.default_node()
-        if ori_org and ori_org.is_root():
-            return None
-
-        org_roots = cls.org_root_nodes()
-        org_roots_length = len(org_roots)
-
-        if org_roots_length == 1:
-            return org_roots[0]
-        elif org_roots_length == 0:
-            root = cls.create_org_root_node()
-            return root
-        else:
-            raise ValueError('Current org root node not 1, get {}'.format(org_roots_length))
-
-    @classmethod
-    def initial_some_nodes(cls):
-        cls.default_node()
-
-    @classmethod
-    def modify_other_org_root_node_key(cls):
-        """
-        解决创建 default 节点失败的问题，
-        因为在其他组织下存在 default 节点，故在 DEFAULT 组织下 get 不到 create 失败
-        """
-        logger.info("Modify other org root node key")
-
-        with tmp_to_org(Organization.root()):
-            node_key1 = cls.objects.filter(key='1').first()
-            if not node_key1:
-                logger.info("Not found node that `key` = 1")
-                return
-            if node_key1.org_id == '':
-                node_key1.org_id = str(Organization.default().id)
-                node_key1.save()
-                return
-
-        with transaction.atomic():
-            with tmp_to_org(node_key1.org):
-                org_root_node_new_key = cls.get_next_org_root_node_key()
-                for n in cls.objects.all():
-                    old_key = n.key
-                    key_list = n.key.split(':')
-                    key_list[0] = org_root_node_new_key
-                    new_key = ':'.join(key_list)
-                    n.key = new_key
-                    n.save()
-                    logger.info('Modify key ( {} > {} )'.format(old_key, new_key))
+        root_nodes = cls.objects.filter(parent_key='', key__regex=r'^[0-9]+$') \
+            .exclude(key__startswith='-').order_by('key')
+        return root_nodes
 
 
 class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
