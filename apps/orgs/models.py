@@ -363,18 +363,19 @@ class OrgMemberManager(models.Manager):
             if role in to_add:
                 to_add[role].add(user)
 
-        self.remove_users_by_role(
-            org,
-            to_remove.users,
-            to_remove.admins,
-            to_remove.auditors
-        )
-
+        # 先添加再移除 (防止用户角色由组织用户->组织管理员时从组织清除用户)
         self.add_users_by_role(
             org,
             to_add.users,
             to_add.admins,
             to_add.auditors
+        )
+
+        self.remove_users_by_role(
+            org,
+            to_remove.users,
+            to_remove.admins,
+            to_remove.auditors
         )
 
     def set_users_by_role(self, org, users=None, admins=None, auditors=None):
