@@ -150,10 +150,7 @@ class Organization(models.Model):
 
     @classmethod
     def get_user_all_orgs(cls, user):
-        return [
-            *cls.objects.filter(members=user).distinct(),
-            cls.default()
-        ]
+        return cls.objects.filter(members=user).distinct()
 
     @classmethod
     def get_user_admin_orgs(cls, user):
