@@ -117,11 +117,21 @@ class CommandStore():
             timestamp_range['lte'] = timestamp__lte
 
         # 处理组织
-        must_not = []
+        should = []
         org_id = match.get('org_id')
-        if org_id == '':
+
+        real_default_org_id = '00000000-0000-0000-0000-000000000002'
+        if org_id in (real_default_org_id, ''):
             match.pop('org_id')
-            must_not.append({'wildcard': {'org_id': '*'}})
+            should.append({
+                'bool':{
+                    'must_not': [
+                        {
+                            'wildcard': {'org_id': '*'}
+                        }
+                    ]}
+            })
+            should.append({'match': {'org_id': real_default_org_id}})
 
         # 构建 body
         body = {
@@ -130,7 +140,7 @@ class CommandStore():
                     'must': [
                         {'match': {k: v}} for k, v in match.items()
                     ],
-                    'must_not': must_not,
+                    'should': should,
                     'filter': [
                         {
                             'term': {k: v}

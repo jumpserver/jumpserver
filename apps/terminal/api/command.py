@@ -111,6 +111,33 @@ class CommandViewSet(viewsets.ModelViewSet):
     filterset_class = CommandFilter
     ordering_fields = ('timestamp', )
 
+    def merge_all_storage_list(self, request, *args, **kwargs):
+        merged_commands = []
+
+        storages = CommandStorage.objects.all()
+        for storage in storages:
+            qs = storage.get_command_queryset()
+            commands = self.filter_queryset(qs)
+            merged_commands.extend(commands)
+
+        merged_commands.sort(key=lambda command: command.timestamp, reverse=True)
+        page = self.paginate_queryset(merged_commands)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def list(self, request, *args, **kwargs):
+        command_storage_id = self.request.query_params.get('command_storage_id')
+        session_id = self.request.query_params.get('session_id')
+
+        if session_id and not command_storage_id:
+            # 会话里的命令列表肯定会提供 session_id，这里防止 merge 的时候取全量的数据
+            return self.merge_all_storage_list(request, *args, **kwargs)
+        return super().list(request, *args, **kwargs)
+
     def get_queryset(self):
         command_storage_id = self.request.query_params.get('command_storage_id')
         storage = CommandStorage.objects.get(id=command_storage_id)
