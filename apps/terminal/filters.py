@@ -48,10 +48,7 @@ class CommandFilter(filters.FilterSet):
 
     @staticmethod
     def get_org_id():
-        if current_org.is_default():
-            org_id = ''
-        else:
-            org_id = current_org.id
+        org_id = current_org.id
         return org_id
 
 

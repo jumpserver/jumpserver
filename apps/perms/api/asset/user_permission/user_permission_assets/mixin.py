@@ -89,6 +89,8 @@ class AssetsTreeFormatMixin(SerializeToTreeNodeMixin):
     """
     将 资产 序列化成树的结构返回
     """
+    filterset_fields = ['hostname', 'ip', 'id', 'comment']
+    search_fields = ['hostname', 'ip', 'comment']
 
     def list(self, request: Request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
@@ -99,6 +101,3 @@ class AssetsTreeFormatMixin(SerializeToTreeNodeMixin):
             queryset = queryset[:999]
         data = self.serialize_assets(queryset, None)
         return Response(data=data)
-
-    # def get_serializer_class(self):
-    #     return EmptySerializer
