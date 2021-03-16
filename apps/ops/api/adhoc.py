@@ -17,14 +17,16 @@ from ..serializers import (
     AdHocDetailSerializer,
 )
 from ..tasks import run_ansible_task
+from orgs.mixins.api import OrgBulkModelViewSet
+from orgs.utils import current_org
 
 __all__ = [
     'TaskViewSet', 'TaskRun', 'AdHocViewSet', 'AdHocRunHistoryViewSet'
 ]
 
 
-class TaskViewSet(JMSBulkModelViewSet):
-    queryset = Task.objects.all()
+class TaskViewSet(OrgBulkModelViewSet):
+    model = Task
     filterset_fields = ("name",)
     search_fields = filterset_fields
     serializer_class = TaskSerializer
