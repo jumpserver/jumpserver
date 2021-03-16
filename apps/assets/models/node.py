@@ -491,6 +491,19 @@ class SomeNodesMixin:
                 right_default_org.key = '1'
                 right_default_org.save()
 
+                with tmp_to_org(default_org):
+                    for n in cls.objects.all():
+                        if n.key == '1':
+                            continue
+
+                        old_key = n.key
+                        key_list = n.key.split(':')
+                        key_list[0] = '1'
+                        new_key = ':'.join(key_list)
+                        n.key = new_key
+                        n.save()
+                        logger.warn('Modify key ( {} > {} )'.format(old_key, new_key))
+
     @classmethod
     def default_node(cls):
         cls.correct_default_node_if_need()
