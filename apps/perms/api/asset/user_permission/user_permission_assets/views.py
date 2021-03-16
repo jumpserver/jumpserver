@@ -82,7 +82,7 @@ class MyAllAssetsAsTreeApi(UserAllGrantedAssetsQuerysetMixin,
                            RoleUserMixin,
                            AssetsTreeFormatMixin,
                            ListAPIView):
-    search_fields = ['hostname', 'ip']
+    pass
 
 
 class UserGrantedNodeAssetsForAdminApi(UserGrantedNodeAssetsMixin,
