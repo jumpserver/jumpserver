@@ -11,11 +11,8 @@ from .user import UserSerializer
 class UserOrgSerializer(serializers.Serializer):
     id = serializers.CharField()
     name = serializers.CharField()
-
-
-class UserOrgLabelSerializer(serializers.Serializer):
-    value = serializers.CharField(source='id')
-    label = serializers.CharField(source='name')
+    is_default = serializers.BooleanField(read_only=True)
+    is_root = serializers.BooleanField(read_only=True)
 
 
 class UserUpdatePasswordSerializer(serializers.ModelSerializer):
@@ -87,7 +84,7 @@ class UserRoleSerializer(serializers.Serializer):
 
 class UserProfileSerializer(UserSerializer):
     admin_or_audit_orgs = UserOrgSerializer(many=True, read_only=True)
-    user_all_orgs = UserOrgLabelSerializer(many=True, read_only=True)
+    user_all_orgs = UserOrgSerializer(many=True, read_only=True)
     current_org_roles = serializers.ListField(read_only=True)
     public_key_comment = serializers.CharField(
         source='get_public_key_comment', required=False, read_only=True, max_length=128

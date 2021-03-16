@@ -118,6 +118,8 @@ class Organization(models.Model):
     def can_audit_by(self, user):
         if user.is_superuser or user.is_super_auditor:
             return True
+        if self.can_admin_by(user):
+            return True
         if self.auditors.filter(id=user.id).exists():
             return True
         return False
@@ -125,9 +127,16 @@ class Organization(models.Model):
     def can_use_by(self, user):
         if user.is_superuser or user.is_super_auditor:
             return True
+        if self.can_audit_by(user):
+            return True
         if self.users.filter(id=user.id).exists():
             return True
         return False
+
+    def can_any_by(self, user):
+        if user.is_superuser or user.is_super_auditor:
+            return True
+        return self.members.filter(id=user.id).exists()
 
     @classmethod
     def get_user_orgs_by_role(cls, user, role):
@@ -141,10 +150,7 @@ class Organization(models.Model):
 
     @classmethod
     def get_user_all_orgs(cls, user):
-        return [
-            *cls.objects.filter(members=user).distinct(),
-            cls.default()
-        ]
+        return cls.objects.filter(members=user).distinct()
 
     @classmethod
     def get_user_admin_orgs(cls, user):
