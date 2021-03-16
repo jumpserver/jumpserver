@@ -15,11 +15,6 @@ class UserOrgSerializer(serializers.Serializer):
     is_root = serializers.BooleanField(read_only=True)
 
 
-class UserOrgLabelSerializer(serializers.Serializer):
-    value = serializers.CharField(source='id')
-    label = serializers.CharField(source='name')
-
-
 class UserUpdatePasswordSerializer(serializers.ModelSerializer):
     old_password = serializers.CharField(required=True, max_length=128, write_only=True)
     new_password = serializers.CharField(required=True, max_length=128, write_only=True)
@@ -89,7 +84,7 @@ class UserRoleSerializer(serializers.Serializer):
 
 class UserProfileSerializer(UserSerializer):
     admin_or_audit_orgs = UserOrgSerializer(many=True, read_only=True)
-    user_all_orgs = UserOrgLabelSerializer(many=True, read_only=True)
+    user_all_orgs = UserOrgSerializer(many=True, read_only=True)
     current_org_roles = serializers.ListField(read_only=True)
     public_key_comment = serializers.CharField(
         source='get_public_key_comment', required=False, read_only=True, max_length=128
