@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.template import loader
 
-from terminal.models import CommandStorage
+from terminal.models import CommandStorage, Command
 from terminal.filters import CommandFilter
 from orgs.utils import current_org
 from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor, IsAppUser
@@ -19,6 +19,7 @@ from common.const.http import GET
 from common.utils import get_logger
 from terminal.utils import send_command_alert_mail
 from terminal.serializers import InsecureCommandAlertSerializer
+from terminal.exceptions import StorageInvalid
 from ..backends import (
     get_command_storage, get_multi_command_storage,
     SessionCommandSerializer,
@@ -116,9 +117,12 @@ class CommandViewSet(viewsets.ModelViewSet):
 
         storages = CommandStorage.objects.all()
         for storage in storages:
+            if not storage.is_valid():
+                continue
+
             qs = storage.get_command_queryset()
             commands = self.filter_queryset(qs)
-            merged_commands.extend(commands)
+            merged_commands.extend(commands[:])  # ES 默认只取 10 条数据
 
         merged_commands.sort(key=lambda command: command.timestamp, reverse=True)
         page = self.paginate_queryset(merged_commands)
@@ -126,7 +130,7 @@ class CommandViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
-        serializer = self.get_serializer(queryset, many=True)
+        serializer = self.get_serializer(merged_commands, many=True)
         return Response(serializer.data)
 
     def list(self, request, *args, **kwargs):
@@ -141,7 +145,10 @@ class CommandViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         command_storage_id = self.request.query_params.get('command_storage_id')
         storage = CommandStorage.objects.get(id=command_storage_id)
-        qs = storage.get_command_queryset()
+        if not storage.is_valid():
+            raise StorageInvalid
+        else:
+            qs = storage.get_command_queryset()
         return qs
 
     def create(self, request, *args, **kwargs):

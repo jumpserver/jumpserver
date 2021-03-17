@@ -46,7 +46,13 @@ class CommandStorageViewSet(BaseStorageViewSetMixin, viewsets.ModelViewSet):
     def tree(self, request: Request):
         storage_qs = self.get_queryset().exclude(name='null')
         storages_with_count = []
+        invalid_storages = []
+
         for storage in storage_qs:
+            if not storage.is_valid():
+                invalid_storages.append(storage)
+                continue
+
             command_qs = storage.get_command_queryset()
             filterset = CommandFilter(
                 data=request.query_params, queryset=command_qs,
@@ -70,6 +76,7 @@ class CommandStorageViewSet(BaseStorageViewSetMixin, viewsets.ModelViewSet):
             'open': True,
         }
 
+        invalid = _('Invalid')
         nodes = [
             {
                 'id': storage.id,
@@ -78,7 +85,18 @@ class CommandStorageViewSet(BaseStorageViewSetMixin, viewsets.ModelViewSet):
                 'pId': 'root',
                 'isParent': False,
                 'open': False,
+                'valid': True,
             } for storage, command_count in storages_with_count
+        ] + [
+            {
+                'id': storage.id,
+                'name': f'{storage.name}({storage.type}) *{invalid}',
+                'title': f'{storage.name}({storage.type})',
+                'pId': 'root',
+                'isParent': False,
+                'open': False,
+                'valid': False,
+            } for storage in invalid_storages
         ]
         nodes.append(root)
         return Response(data=nodes)
