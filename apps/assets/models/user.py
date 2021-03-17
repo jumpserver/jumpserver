@@ -87,6 +87,9 @@ class SystemUser(BaseUser):
         (PROTOCOL_POSTGRESQL, 'postgresql'),
         (PROTOCOL_K8S, 'k8s'),
     )
+
+    SUPPORT_PUSH_PROTOCOLS = [PROTOCOL_SSH, PROTOCOL_RDP]
+
     ASSET_CATEGORY_PROTOCOLS = [
         PROTOCOL_SSH, PROTOCOL_RDP, PROTOCOL_TELNET, PROTOCOL_VNC
     ]
@@ -151,10 +154,14 @@ class SystemUser(BaseUser):
         return self.get_login_mode_display()
 
     def is_need_push(self):
-        if self.auto_push and self.protocol in [self.PROTOCOL_SSH, self.PROTOCOL_RDP]:
+        if self.auto_push and self.is_protocol_support_push:
             return True
         else:
             return False
+
+    @property
+    def is_protocol_support_push(self):
+        return self.protocol in self.SUPPORT_PUSH_PROTOCOLS
 
     @property
     def is_need_cmd_filter(self):

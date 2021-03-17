@@ -193,7 +193,8 @@ def on_asset_nodes_add(instance, action, reverse, pk_set, **kwargs):
                 systemuser_id=system_user_id,
                 asset_id=asset_id
             ))
-        push_system_user_to_assets.delay(system_user_id, asset_ids_to_push)
+        if asset_ids_to_push:
+            push_system_user_to_assets.delay(system_user_id, asset_ids_to_push)
     m2m_model.objects.bulk_create(to_create)
 
 
