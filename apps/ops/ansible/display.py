@@ -53,7 +53,7 @@ class AdHocDisplay(Display, metaclass=UnSingleton):
         # 这里先不 flush，log 文件不需要那么及时。
         self.log_file.write(msg)
 
-    def display(self, msg, color=None, stderr=False, screen_only=False, log_only=False):
+    def display(self,  msg, color=None, stderr=False, screen_only=False, log_only=False, newline=True):
         if color:
             msg = stringc(msg, color)
 
@@ -62,5 +62,7 @@ class AdHocDisplay(Display, metaclass=UnSingleton):
         else:
             msg2 = msg
 
-        self._write_to_screen(msg2, stderr)
-        self._write_to_log_file(msg2)
+        if log_only:
+            self._write_to_log_file(msg2)
+        else:
+            self._write_to_screen(msg2, stderr)
