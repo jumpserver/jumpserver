@@ -10,6 +10,7 @@ from django.core.mail import send_mail, get_connection
 from django.utils.translation import ugettext_lazy as _
 from django.templatetags.static import static
 
+from jumpserver.utils import has_valid_xpack_license
 from common.permissions import IsSuperUser
 from common.utils import get_logger
 from .. import serializers
@@ -95,14 +96,6 @@ class PublicSettingApi(generics.RetrieveAPIView):
         return logo_urls
 
     @staticmethod
-    def get_xpack_license_is_valid():
-        if not settings.XPACK_ENABLED:
-            return False
-
-        from xpack.plugins.license.models import License
-        return License.has_valid_license()
-
-    @staticmethod
     def get_login_title():
         default_title = _('Welcome to the JumpServer open source Bastion Host')
         if not settings.XPACK_ENABLED:
@@ -121,7 +114,7 @@ class PublicSettingApi(generics.RetrieveAPIView):
                 "SECURITY_MFA_VERIFY_TTL": settings.SECURITY_MFA_VERIFY_TTL,
                 "SECURITY_COMMAND_EXECUTION": settings.SECURITY_COMMAND_EXECUTION,
                 "SECURITY_PASSWORD_EXPIRATION_TIME": settings.SECURITY_PASSWORD_EXPIRATION_TIME,
-                "XPACK_LICENSE_IS_VALID": self.get_xpack_license_is_valid(),
+                "XPACK_LICENSE_IS_VALID": has_valid_xpack_license(),
                 "LOGIN_TITLE": self.get_login_title(),
                 "LOGO_URLS": self.get_logo_urls(),
                 "TICKETS_ENABLED": settings.TICKETS_ENABLED,
