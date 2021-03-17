@@ -118,6 +118,8 @@ class CommandViewSet(viewsets.ModelViewSet):
         for storage in storages:
             qs = storage.get_command_queryset()
             commands = self.filter_queryset(qs)
+            if hasattr(commands, 'max_result_window'):
+                commands = commands[:qs.max_result_window]
             merged_commands.extend(commands)
 
         merged_commands.sort(key=lambda command: command.timestamp, reverse=True)
