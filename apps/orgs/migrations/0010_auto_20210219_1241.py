@@ -11,7 +11,7 @@ default_id = '00000000-0000-0000-0000-000000000002'
 
 def add_default_org(apps, schema_editor):
     org_cls = apps.get_model('orgs', 'Organization')
-    defaults = {'name': 'DEFAULT', 'id': default_id}
+    defaults = {'name': 'Default', 'id': default_id}
     org_cls.objects.get_or_create(defaults=defaults, id=default_id)
 
 
