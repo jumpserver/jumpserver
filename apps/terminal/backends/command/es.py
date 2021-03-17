@@ -121,7 +121,11 @@ class CommandStore():
         org_id = match.get('org_id')
 
         real_default_org_id = '00000000-0000-0000-0000-000000000002'
-        if org_id in (real_default_org_id, ''):
+        root_org_id = '00000000-0000-0000-0000-000000000000'
+
+        if org_id == root_org_id:
+            match.pop('org_id')
+        elif org_id in (real_default_org_id, ''):
             match.pop('org_id')
             should.append({
                 'bool':{
