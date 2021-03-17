@@ -7,7 +7,7 @@ from django.db.models.signals import (
     m2m_changed
 )
 
-from orgs.utils import ensure_in_real_or_default_org
+from orgs.utils import ensure_in_real_or_default_org, tmp_to_org
 from common.const.signals import PRE_ADD, POST_REMOVE, PRE_CLEAR
 from common.utils import get_logger
 from assets.models import Asset, Node, compute_parent_key
@@ -34,15 +34,16 @@ def on_node_asset_change(sender, action, instance, reverse, pk_set, **kwargs):
 
     operator = mapper[action]
 
-    if reverse:
-        node: Node = instance
-        asset_pk_set = set(pk_set)
-        NodeAssetsAmountUtils.update_node_assets_amount(node, asset_pk_set, operator)
-    else:
-        asset_pk = instance.id
-        # 与资产直接关联的节点
-        node_keys = set(Node.objects.filter(id__in=pk_set).values_list('key', flat=True))
-        NodeAssetsAmountUtils.update_nodes_asset_amount(node_keys, asset_pk, operator)
+    with tmp_to_org(instance.org):
+        if reverse:
+            node: Node = instance
+            asset_pk_set = set(pk_set)
+            NodeAssetsAmountUtils.update_node_assets_amount(node, asset_pk_set, operator)
+        else:
+            asset_pk = instance.id
+            # 与资产直接关联的节点
+            node_keys = set(Node.objects.filter(id__in=pk_set).values_list('key', flat=True))
+            NodeAssetsAmountUtils.update_nodes_asset_amount(node_keys, asset_pk, operator)
 
 
 class NodeAssetsAmountUtils:
