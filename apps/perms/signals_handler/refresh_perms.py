@@ -5,7 +5,7 @@ from django.dispatch import receiver
 
 from users.models import User
 from assets.models import Asset
-from orgs.utils import current_org
+from orgs.utils import current_org, tmp_to_org
 from common.utils import get_logger
 from common.exceptions import M2MReverseNotAllowed
 from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR
@@ -18,24 +18,28 @@ logger = get_logger(__file__)
 
 @receiver(m2m_changed, sender=User.groups.through)
 def on_user_groups_change(sender, instance, action, reverse, pk_set, **kwargs):
-    if action.startswith('post'):
-        if reverse:
-            group_ids = [instance.id]
-            user_ids = pk_set
-        else:
-            group_ids = pk_set
-            user_ids = [instance.id]
+    if not action.startswith('post'):
+        return
+    if reverse:
+        group_ids = [instance.id]
+        user_ids = pk_set
+    else:
+        group_ids = pk_set
+        user_ids = [instance.id]
 
-        exists = AssetPermission.user_groups.through.objects.filter(usergroup_id__in=group_ids).exists()
-        if exists:
-            org_ids = [current_org.id]
-            UserGrantedTreeRefreshController.add_need_refresh_orgs_for_users(org_ids, user_ids)
+    exists = AssetPermission.user_groups.through.objects.filter(usergroup_id__in=group_ids).exists()
+    if not exists:
+        return
+    with tmp_to_org(instance.org):
+        org_ids = [current_org.id]
+        UserGrantedTreeRefreshController.add_need_refresh_orgs_for_users(org_ids, user_ids)
 
 
 @receiver([pre_delete], sender=AssetPermission)
 def on_asset_perm_pre_delete(sender, instance, **kwargs):
     # 授权删除之前，查出所有相关用户
-    UserGrantedTreeRefreshController.add_need_refresh_by_asset_perm_ids([instance.id])
+    with tmp_to_org(instance.org):
+        UserGrantedTreeRefreshController.add_need_refresh_by_asset_perm_ids([instance.id])
 
 
 @receiver([pre_save], sender=AssetPermission)
@@ -44,14 +48,17 @@ def on_asset_perm_pre_save(sender, instance, **kwargs):
         old = AssetPermission.objects.get(id=instance.id)
 
         if old.is_valid != instance.is_valid:
-            UserGrantedTreeRefreshController.add_need_refresh_by_asset_perm_ids([instance.id])
+            with tmp_to_org(instance.org):
+                UserGrantedTreeRefreshController.add_need_refresh_by_asset_perm_ids([instance.id])
     except AssetPermission.DoesNotExist:
         pass
 
 
 @receiver([post_save], sender=AssetPermission)
 def on_asset_perm_post_save(sender, instance, created, **kwargs):
-    if created:
+    if not created:
+        return
+    with tmp_to_org(instance.org):
         UserGrantedTreeRefreshController.add_need_refresh_by_asset_perm_ids([instance.id])
 
 
@@ -64,7 +71,10 @@ def on_permission_nodes_changed(sender, instance, action, reverse, **kwargs):
     if reverse:
         raise M2MReverseNotAllowed
 
-    if need_rebuild_mapping_node(action):
+    if not need_rebuild_mapping_node(action):
+        return
+
+    with tmp_to_org(instance.org):
         UserGrantedTreeRefreshController.add_need_refresh_by_asset_perm_ids([instance.id])
 
 
@@ -73,28 +83,38 @@ def on_permission_assets_changed(sender, instance, action, reverse, pk_set, mode
     if reverse:
         raise M2MReverseNotAllowed
 
-    if need_rebuild_mapping_node(action):
+    if not need_rebuild_mapping_node(action):
+        return
+    with tmp_to_org(instance.org):
         UserGrantedTreeRefreshController.add_need_refresh_by_asset_perm_ids([instance.id])
 
 
 @receiver(m2m_changed, sender=AssetPermission.users.through)
-def on_asset_permission_users_changed(sender, action, reverse, pk_set, **kwargs):
+def on_asset_permission_users_changed(sender, action, reverse, instance, pk_set, **kwargs):
     if reverse:
         raise M2MReverseNotAllowed
 
-    if need_rebuild_mapping_node(action):
+    if not need_rebuild_mapping_node(action):
+        return
+
+    with tmp_to_org(instance.org):
         UserGrantedTreeRefreshController.add_need_refresh_orgs_for_users(
             [current_org.id], pk_set
         )
 
 
 @receiver(m2m_changed, sender=AssetPermission.user_groups.through)
-def on_asset_permission_user_groups_changed(sender, action, pk_set, reverse, **kwargs):
+def on_asset_permission_user_groups_changed(sender, instance, action, pk_set, reverse, **kwargs):
     if reverse:
         raise M2MReverseNotAllowed
 
-    if need_rebuild_mapping_node(action):
-        user_ids = User.groups.through.objects.filter(usergroup_id__in=pk_set).distinct().values_list('user_id', flat=True)
+    if not need_rebuild_mapping_node(action):
+        return
+
+    user_ids = User.groups.through.objects.filter(usergroup_id__in=pk_set) \
+        .values_list('user_id', flat=True) \
+        .distinct()
+    with tmp_to_org(instance.org):
         UserGrantedTreeRefreshController.add_need_refresh_orgs_for_users(
             [current_org.id], user_ids
         )
@@ -112,4 +132,5 @@ def on_node_asset_change(action, instance, reverse, pk_set, **kwargs):
         asset_pk_set = [instance.id]
         node_pk_set = pk_set
 
-    UserGrantedTreeRefreshController.add_need_refresh_on_nodes_assets_relate_change(node_pk_set, asset_pk_set)
+    with tmp_to_org(instance.org):
+        UserGrantedTreeRefreshController.add_need_refresh_on_nodes_assets_relate_change(node_pk_set, asset_pk_set)

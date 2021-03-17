@@ -2,6 +2,9 @@
 #
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework_bulk import BulkModelViewSet
+from rest_framework.exceptions import MethodNotAllowed
+from django.utils.translation import ugettext_lazy as _
+
 from common.mixins import CommonApiMixin, RelationMixin
 from orgs.utils import current_org
 
@@ -39,15 +42,29 @@ class OrgQuerySetMixin:
         return queryset
 
 
-class OrgModelViewSet(CommonApiMixin, OrgQuerySetMixin, ModelViewSet):
+class OrgViewSetMixin(OrgQuerySetMixin):
+    root_org_readonly_msg = _("Root organization only allow view and delete")
+
+    def update(self, request, *args, **kwargs):
+        if current_org.is_root():
+            raise MethodNotAllowed('put', self.root_org_readonly_msg)
+        return super().update(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        if current_org.is_root():
+            raise MethodNotAllowed('post', self.root_org_readonly_msg)
+        return super().update(request, *args, **kwargs)
+
+
+class OrgModelViewSet(CommonApiMixin, OrgViewSetMixin, ModelViewSet):
     pass
 
 
-class OrgGenericViewSet(CommonApiMixin, OrgQuerySetMixin, GenericViewSet):
+class OrgGenericViewSet(CommonApiMixin, OrgViewSetMixin, GenericViewSet):
     pass
 
 
-class OrgBulkModelViewSet(CommonApiMixin, OrgQuerySetMixin, BulkModelViewSet):
+class OrgBulkModelViewSet(CommonApiMixin, OrgViewSetMixin, BulkModelViewSet):
     def allow_bulk_destroy(self, qs, filtered):
         qs_count = qs.count()
         filtered_count = filtered.count()

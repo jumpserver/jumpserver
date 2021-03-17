@@ -25,7 +25,7 @@ class CommandStore():
         kwargs = config.get("OTHER", {})
         self.index = config.get("INDEX") or 'jumpserver'
         self.doc_type = config.get("DOC_TYPE") or 'command_store'
-        self.es = Elasticsearch(hosts=hosts, **kwargs)
+        self.es = Elasticsearch(hosts=hosts, max_retries=0, **kwargs)
 
     @staticmethod
     def make_data(command):
@@ -81,9 +81,9 @@ class CommandStore():
         """返回所有数据"""
         raise NotImplementedError("Not support")
 
-    def ping(self):
+    def ping(self, timeout=None):
         try:
-            return self.es.ping()
+            return self.es.ping(request_timeout=timeout)
         except Exception:
             return False
 
@@ -121,7 +121,11 @@ class CommandStore():
         org_id = match.get('org_id')
 
         real_default_org_id = '00000000-0000-0000-0000-000000000002'
-        if org_id in (real_default_org_id, ''):
+        root_org_id = '00000000-0000-0000-0000-000000000000'
+
+        if org_id == root_org_id:
+            match.pop('org_id')
+        elif org_id in (real_default_org_id, ''):
             match.pop('org_id')
             should.append({
                 'bool':{
@@ -256,7 +260,7 @@ class QuerySet(DJQuerySet):
                 clone = self.__clone()
                 from_ = item.start or 0
                 if item.stop is None:
-                    size = 10
+                    size = self.max_result_window - from_
                 else:
                     size = item.stop - from_
 

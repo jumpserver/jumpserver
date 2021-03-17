@@ -52,8 +52,14 @@ class CommandStorage(CommonModelMixin):
     def is_valid(self):
         if self.type_null_or_server:
             return True
-        storage = jms_storage.get_log_storage(self.config)
-        return storage.ping()
+
+        if self.type not in TYPE_ENGINE_MAPPING:
+            logger.error(f'Command storage `{self.type}` not support')
+            return False
+
+        engine_mod = import_module(TYPE_ENGINE_MAPPING[self.type])
+        store = engine_mod.CommandStore(self.config)
+        return store.ping(timeout=3)
 
     def is_use(self):
         return Terminal.objects.filter(command_storage=self.name, is_deleted=False).exists()
