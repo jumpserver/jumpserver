@@ -64,7 +64,9 @@ class SessionAuditSerializer(serializers.ModelSerializer):
 
 class CommandExecutionSerializer(serializers.ModelSerializer):
     is_success = serializers.BooleanField(read_only=True, label=_('Is success'))
-    hosts_display = serializers.ListSerializer(child=serializers.CharField(), source='hosts', read_only=True)
+    hosts_display = serializers.ListSerializer(
+        child=serializers.CharField(), source='hosts', read_only=True, label=_('Hosts for display')
+    )
 
     class Meta:
         model = CommandExecution
