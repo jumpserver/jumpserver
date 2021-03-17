@@ -170,7 +170,7 @@ class UserLoginWaitConfirmView(TemplateView):
         if not ticket_id:
             ticket = None
         else:
-            ticket = get_object_or_none(Ticket, pk=ticket_id)
+            ticket = Ticket.all().filter(pk=ticket_id).first()
         context = super().get_context_data(**kwargs)
         if ticket:
             timestamp_created = datetime.datetime.timestamp(ticket.date_created)
