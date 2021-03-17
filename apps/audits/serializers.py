@@ -64,6 +64,7 @@ class SessionAuditSerializer(serializers.ModelSerializer):
 
 class CommandExecutionSerializer(serializers.ModelSerializer):
     is_success = serializers.BooleanField(read_only=True, label=_('Is success'))
+    hosts_display = serializers.ListSerializer(child=serializers.CharField(), source='hosts', read_only=True)
 
     class Meta:
         model = CommandExecution
@@ -72,7 +73,7 @@ class CommandExecutionSerializer(serializers.ModelSerializer):
             'run_as', 'command', 'user', 'is_finished',
             'date_start', 'result', 'is_success', 'org_id'
         ]
-        fields = fields_small + ['hosts', 'run_as_display', 'user_display']
+        fields = fields_small + ['hosts', 'hosts_display', 'run_as_display', 'user_display']
         extra_kwargs = {
             'result': {'label': _('Result')},  # model 上的方法，只能在这修改
             'is_success': {'label': _('Is success')},
