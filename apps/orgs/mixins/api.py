@@ -43,17 +43,7 @@ class OrgQuerySetMixin:
 
 
 class OrgViewSetMixin(OrgQuerySetMixin):
-    root_org_readonly_msg = _("Root organization only allow view and delete")
-
-    def update(self, request, *args, **kwargs):
-        if current_org.is_root():
-            raise MethodNotAllowed('put', self.root_org_readonly_msg)
-        return super().update(request, *args, **kwargs)
-
-    def create(self, request, *args, **kwargs):
-        if current_org.is_root():
-            raise MethodNotAllowed('post', self.root_org_readonly_msg)
-        return super().update(request, *args, **kwargs)
+    pass
 
 
 class OrgModelViewSet(CommonApiMixin, OrgViewSetMixin, ModelViewSet):
