@@ -128,6 +128,10 @@ LOGGING = {
             'handlers': ['syslog'],
             'level': 'INFO'
         },
+        'azure': {
+            'handlers': ['null'],
+            'level': 'ERROR'
+        }
 
     }
 }
