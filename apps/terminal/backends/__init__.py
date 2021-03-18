@@ -2,8 +2,11 @@ from importlib import import_module
 from django.conf import settings
 from django.utils.functional import LazyObject
 
+from common.utils import get_logger
 from .command.serializers import SessionCommandSerializer
 
+
+logger = get_logger(__file__)
 
 TYPE_ENGINE_MAPPING = {
     'elasticsearch': 'terminal.backends.command.es',
@@ -29,6 +32,10 @@ def get_terminal_command_storages():
     from ..models import CommandStorage
     storage_list = {}
     for s in CommandStorage.objects.all():
+        if not s.is_valid():
+            logger.warn(f'Command storage invalid: storage={s}')
+            continue
+
         if s.type_server:
             storage = get_command_storage()
         else:
