@@ -19,9 +19,10 @@ __all__ = [
 class RelationMixin:
     def get_queryset(self):
         queryset = self.model.objects.all()
-        org_id = current_org.org_id()
-        if org_id is not None:
+        if not current_org.is_root():
+            org_id = current_org.org_id()
             queryset = queryset.filter(systemuser__org_id=org_id)
+
         queryset = queryset.annotate(systemuser_display=Concat(
             F('systemuser__name'), Value('('), F('systemuser__username'),
             Value(')')

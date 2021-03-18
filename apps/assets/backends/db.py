@@ -165,7 +165,7 @@ class SystemUserBackend(DBBackend):
         kwargs = self.get_annotate()
         filters = self.get_filter()
         qs = self.model.objects.all().annotate(**kwargs)
-        if current_org.org_id() is not None:
+        if not current_org.is_root():
             filters['org_id'] = current_org.org_id()
         qs = qs.filter(**filters)
         qs = self.qs_to_values(qs)
