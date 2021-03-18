@@ -110,3 +110,5 @@ pyexcel-xlsx==0.6.0
 data-tree==0.0.1
 pyvmomi==7.0.1
 termcolor==1.1.0
+azure-identity==1.5.0
+azure-mgmt-subscription==1.0.0
