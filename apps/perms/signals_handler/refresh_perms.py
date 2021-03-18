@@ -3,7 +3,7 @@
 from django.db.models.signals import m2m_changed, pre_delete, pre_save, post_save
 from django.dispatch import receiver
 
-from users.models import User
+from users.models import User, UserGroup
 from assets.models import Asset
 from orgs.utils import current_org, tmp_to_org
 from common.utils import get_logger
@@ -23,16 +23,20 @@ def on_user_groups_change(sender, instance, action, reverse, pk_set, **kwargs):
     if reverse:
         group_ids = [instance.id]
         user_ids = pk_set
+        org_id = instance.org_id
     else:
         group_ids = pk_set
         user_ids = [instance.id]
 
+        group = UserGroup.objects.get(id=group_ids[0])
+        org_id = group.org_id
+
     exists = AssetPermission.user_groups.through.objects.filter(usergroup_id__in=group_ids).exists()
     if not exists:
         return
-    with tmp_to_org(instance.org):
-        org_ids = [current_org.id]
-        UserGrantedTreeRefreshController.add_need_refresh_orgs_for_users(org_ids, user_ids)
+
+    org_ids = [org_id]
+    UserGrantedTreeRefreshController.add_need_refresh_orgs_for_users(org_ids, user_ids)
 
 
 @receiver([pre_delete], sender=AssetPermission)
