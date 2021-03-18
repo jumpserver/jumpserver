@@ -70,7 +70,7 @@ class OrgBulkModelViewSet(CommonApiMixin, OrgViewSetMixin, BulkModelViewSet):
 class OrgRelationMixin(RelationMixin):
     def get_queryset(self):
         queryset = super().get_queryset()
-        org_id = current_org.org_id()
-        if org_id is not None:
+        if not current_org.is_root():
+            org_id = current_org.org_id()
             queryset = queryset.filter(**{f'{self.from_field}__org_id': org_id})
         return queryset
