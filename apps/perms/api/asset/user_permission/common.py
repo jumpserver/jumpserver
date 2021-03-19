@@ -81,7 +81,7 @@ class ValidateUserAssetPermissionApi(APIView):
         except ValueError:
             return Response({'msg': False}, status=403)
 
-        asset = get_object_or_404(Asset, id=asset_id)
+        asset = get_object_or_404(Asset, id=asset_id, is_active=True)
         system_user = get_object_or_404(SystemUser, id=system_id)
 
         system_users_actions = get_asset_system_user_ids_with_actions_by_user(self.get_user(), asset)
@@ -116,7 +116,7 @@ class UserGrantedAssetSystemUsersForAdminApi(ListAPIView):
 
     def get_queryset(self):
         asset_id = self.kwargs.get('asset_id')
-        asset = get_object_or_404(Asset, id=asset_id)
+        asset = get_object_or_404(Asset, id=asset_id, is_active=True)
         system_users_with_actions = self.get_asset_system_user_ids_with_actions(asset)
         system_user_ids = system_users_with_actions.keys()
         system_users = SystemUser.objects.filter(id__in=system_user_ids)\
