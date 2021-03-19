@@ -27,6 +27,39 @@ class LDAPAuthorizationBackend(LDAPBackend):
         is_valid = getattr(user, 'is_valid', None)
         return is_valid or is_valid is None
 
+    def get_or_build_user(self, username, ldap_user):
+        """
+                This must return a (User, built) 2-tuple for the given LDAP user.
+
+                username is the Django-friendly username of the user. ldap_user.dn is
+                the user's DN and ldap_user.attrs contains all of their LDAP
+                attributes.
+
+                The returned User object may be an unsaved model instance.
+
+                """
+        model = self.get_user_model()
+
+        if self.settings.USER_QUERY_FIELD:
+            query_field = self.settings.USER_QUERY_FIELD
+            query_value = ldap_user.attrs[self.settings.USER_ATTR_MAP[query_field]][0]
+            query_value = query_value.strip()
+            lookup = query_field
+        else:
+            query_field = model.USERNAME_FIELD
+            query_value = username.lower()
+            lookup = "{}__iexact".format(query_field)
+
+        try:
+            user = model.objects.get(**{lookup: query_value})
+        except model.DoesNotExist:
+            user = model(**{query_field: query_value})
+            built = True
+        else:
+            built = False
+
+        return (user, built)
+
     def pre_check(self, username, password):
         if not settings.AUTH_LDAP:
             error = 'Not enabled auth ldap'
@@ -128,6 +161,7 @@ class LDAPUser(_LDAPUser):
         for field, attr in self.settings.USER_ATTR_MAP.items():
             try:
                 value = self.attrs[attr][0]
+                value = value.strip()
                 if attr.lower() == 'useraccountcontrol' \
                         and field == 'is_active' and value:
                     value = int(value) & LDAP_AD_ACCOUNT_DISABLE \
