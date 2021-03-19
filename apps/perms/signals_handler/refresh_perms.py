@@ -27,8 +27,7 @@ def on_user_groups_change(sender, instance, action, reverse, pk_set, **kwargs):
     else:
         group_ids = pk_set
         user_ids = [instance.id]
-
-        group = UserGroup.objects.get(id=group_ids[0])
+        group = UserGroup.objects.get(id=list(group_ids)[0])
         org_id = group.org_id
 
     exists = AssetPermission.user_groups.through.objects.filter(usergroup_id__in=group_ids).exists()
