@@ -31,7 +31,7 @@ reason_choices = {
     reason_user_invalid: _('Disabled or expired'),
     reason_user_inactive: _("This account is inactive."),
     reason_backend_not_match: _("Auth backend not match"),
-    reason_acl_not_allow: _("ACL is not allowed")
+    reason_acl_not_allow: _("Login IP is not allowed")
 }
 old_reason_choices = {
     '0': '-',
