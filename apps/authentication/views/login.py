@@ -55,6 +55,9 @@ class UserLoginView(mixins.AuthMixin, FormView):
     def form_valid(self, form):
         if not self.request.session.test_cookie_worked():
             return HttpResponse(_("Please enable cookies and try again."))
+        # https://docs.djangoproject.com/en/3.1/topics/http/sessions/#setting-test-cookies
+        self.request.session.delete_test_cookie()
+
         try:
             self.check_user_auth(decrypt_passwd=True)
         except errors.AuthFailedError as e:
