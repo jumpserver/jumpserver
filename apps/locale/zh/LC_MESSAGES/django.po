@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-19 14:34+0800\n"
+"POT-Creation-Date: 2021-03-22 11:29+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -428,7 +428,7 @@ msgstr "激活"
 
 #: assets/models/asset.py:196 assets/models/cluster.py:19
 #: assets/models/user.py:66 templates/_nav.html:44
-#: xpack/plugins/cloud/models.py:92 xpack/plugins/cloud/serializers.py:138
+#: xpack/plugins/cloud/models.py:92 xpack/plugins/cloud/serializers.py:137
 msgid "Admin user"
 msgstr "管理用户"
 
@@ -693,7 +693,7 @@ msgstr "ssh私钥"
 #: users/templates/users/user_asset_permission.html:41
 #: users/templates/users/user_asset_permission.html:73
 #: users/templates/users/user_asset_permission.html:158
-#: xpack/plugins/cloud/models.py:89 xpack/plugins/cloud/serializers.py:139
+#: xpack/plugins/cloud/models.py:89 xpack/plugins/cloud/serializers.py:138
 msgid "Node"
 msgstr "节点"
 
@@ -1140,7 +1140,7 @@ msgstr "启用"
 msgid "-"
 msgstr ""
 
-#: audits/models.py:96 xpack/plugins/cloud/const.py:24
+#: audits/models.py:96 xpack/plugins/cloud/const.py:23
 msgid "Failed"
 msgstr "失败"
 
@@ -1379,15 +1379,19 @@ msgstr "等待登录复核处理"
 msgid "Login confirm ticket was {}"
 msgstr "登录复核 {}"
 
-#: authentication/errors.py:217
+#: authentication/errors.py:206
+msgid "IP is not allowed"
+msgstr "来源 IP 不被允许登录"
+
+#: authentication/errors.py:239
 msgid "SSO auth closed"
 msgstr "SSO 认证关闭了"
 
-#: authentication/errors.py:222 authentication/views/login.py:232
+#: authentication/errors.py:244 authentication/views/login.py:232
 msgid "Your password is too simple, please change it for security"
 msgstr "你的密码过于简单，为了安全，请修改"
 
-#: authentication/errors.py:231 authentication/views/login.py:247
+#: authentication/errors.py:253 authentication/views/login.py:247
 msgid "Your password has expired, please reset before logging in"
 msgstr "您的密码已过期，先修改再登录"
 
@@ -2249,7 +2253,7 @@ msgstr "全局启用 MFA 认证"
 
 #: settings/serializers/settings.py:133
 msgid "All user enable MFA"
-msgstr "强制每个启用多因子认证"
+msgstr "强制所有用户启用多因子认证"
 
 #: settings/serializers/settings.py:136
 msgid "Batch command execution"
@@ -3784,7 +3788,7 @@ msgstr "安全令牌验证"
 
 #: users/templates/users/_base_otp.html:14 users/templates/users/_user.html:13
 #: users/templates/users/user_profile_update.html:55
-#: xpack/plugins/cloud/models.py:78 xpack/plugins/cloud/serializers.py:137
+#: xpack/plugins/cloud/models.py:78 xpack/plugins/cloud/serializers.py:136
 msgid "Account"
 msgstr "账户"
 
@@ -4774,46 +4778,42 @@ msgid "Azure (China)"
 msgstr "Azure (中国)"
 
 #: xpack/plugins/cloud/const.py:12
-msgid "Azure (International)"
-msgstr "Azure (国际)"
-
-#: xpack/plugins/cloud/const.py:13
 msgid "Huawei Cloud"
 msgstr "华为云"
 
-#: xpack/plugins/cloud/const.py:14
+#: xpack/plugins/cloud/const.py:13
 msgid "Tencent Cloud"
 msgstr "腾讯云"
 
-#: xpack/plugins/cloud/const.py:15
+#: xpack/plugins/cloud/const.py:14
 msgid "VMware"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:19
+#: xpack/plugins/cloud/const.py:18
 msgid "Instance name"
 msgstr "实例名称"
 
-#: xpack/plugins/cloud/const.py:20
+#: xpack/plugins/cloud/const.py:19
 msgid "Instance name and Partial IP"
 msgstr "实例名称和部分IP"
 
-#: xpack/plugins/cloud/const.py:25
+#: xpack/plugins/cloud/const.py:24
 msgid "Succeed"
 msgstr "成功"
 
-#: xpack/plugins/cloud/const.py:29
+#: xpack/plugins/cloud/const.py:28
 msgid "Unsync"
 msgstr "未同步"
 
-#: xpack/plugins/cloud/const.py:30
+#: xpack/plugins/cloud/const.py:29
 msgid "New Sync"
 msgstr "新同步"
 
-#: xpack/plugins/cloud/const.py:31
+#: xpack/plugins/cloud/const.py:30
 msgid "Synced"
 msgstr "已同步"
 
-#: xpack/plugins/cloud/const.py:32
+#: xpack/plugins/cloud/const.py:31
 msgid "Released"
 msgstr "已释放"
 
@@ -4829,7 +4829,7 @@ msgstr "云服务商"
 msgid "Cloud account"
 msgstr "云账号"
 
-#: xpack/plugins/cloud/models.py:81 xpack/plugins/cloud/serializers.py:118
+#: xpack/plugins/cloud/models.py:81 xpack/plugins/cloud/serializers.py:117
 msgid "Regions"
 msgstr "地域"
 
@@ -4837,7 +4837,7 @@ msgstr "地域"
 msgid "Hostname strategy"
 msgstr "主机名策略"
 
-#: xpack/plugins/cloud/models.py:95 xpack/plugins/cloud/serializers.py:141
+#: xpack/plugins/cloud/models.py:95 xpack/plugins/cloud/serializers.py:140
 msgid "Always update"
 msgstr "总是更新"
 
@@ -5029,15 +5029,15 @@ msgstr ""
 msgid "Subscription ID"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers.py:116
+#: xpack/plugins/cloud/serializers.py:115
 msgid "History count"
 msgstr "执行次数"
 
-#: xpack/plugins/cloud/serializers.py:117
+#: xpack/plugins/cloud/serializers.py:116
 msgid "Instance count"
 msgstr "实例个数"
 
-#: xpack/plugins/cloud/serializers.py:140
+#: xpack/plugins/cloud/serializers.py:139
 #: xpack/plugins/gathered_user/serializers.py:20
 msgid "Periodic display"
 msgstr "定时执行"
@@ -5129,6 +5129,9 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Azure (International)"
+#~ msgstr "Azure (国际)"
 
 #~ msgid "Root organization only allow view and delete"
 #~ msgstr "全局组织仅支持 查看和删除"
