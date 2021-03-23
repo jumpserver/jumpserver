@@ -20,6 +20,7 @@ from .terminal import Terminal
 class Session(OrgModelMixin):
     class LOGIN_FROM(ChoiceSet):
         ST = 'ST', 'SSH Terminal'
+        RT = 'RT', 'RDP Terminal'
         WT = 'WT', 'Web Terminal'
 
     class PROTOCOL(ChoiceSet):
