@@ -12,9 +12,9 @@ chardet==3.0.4
 configparser==3.5.0
 coreapi==2.3.3
 coreschema==0.0.4
-cryptography==3.2
+cryptography==3.3.2
 decorator==4.1.2
-Django==3.1
+Django==3.1.6
 django-auth-ldap==2.2.0
 django-bootstrap3==14.2.0
 django-celery-beat==2.0
@@ -39,7 +39,7 @@ gunicorn==19.9.0
 idna==2.6
 itsdangerous==0.24
 itypes==1.1.0
-Jinja2==2.10.1
+Jinja2==2.11.3
 jmespath==0.9.3
 kombu==4.6.8
 ldap3==2.4
@@ -49,7 +49,7 @@ olefile==0.44
 openapi-codec==1.3.2
 paramiko==2.7.2
 passlib==1.7.1
-Pillow==7.1.0
+Pillow==8.1.1
 pyasn1==0.4.8
 pycparser==2.19
 pycryptodome==3.10.1
