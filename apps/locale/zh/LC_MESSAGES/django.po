@@ -2249,7 +2249,7 @@ msgstr "全局启用 MFA 认证"
 
 #: settings/serializers/settings.py:133
 msgid "All user enable MFA"
-msgstr "强制每个启用多因子认证"
+msgstr "强制所有用户启用多因子认证"
 
 #: settings/serializers/settings.py:136
 msgid "Batch command execution"
