@@ -1,10 +1,12 @@
 from __future__ import unicode_literals
 
+from django.utils.translation import gettext_lazy as _
 from django.apps import AppConfig
 
 
 class OpsConfig(AppConfig):
     name = 'ops'
+    verbose_name = _('Operations')
 
     def ready(self):
         from orgs.models import Organization

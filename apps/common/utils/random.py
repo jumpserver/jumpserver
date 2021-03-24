@@ -4,7 +4,6 @@ import struct
 import random
 import socket
 import string
-import secrets
 
 
 string_punctuation = '!#$%&()*+,-.:;<=>?@[]^_{}~'
