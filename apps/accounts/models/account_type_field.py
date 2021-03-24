@@ -7,13 +7,14 @@ __all__ = ['Field']
 
 
 class Field(CommonModelMixin, models.Model):
+    """ 字段: 账号类型关联的其他附加字段, 用来动态构造创建/更新/查看账号所需的序列类 """
     class TypeChoices(models.TextChoices):
         int_field = 'int', 'Integer Field'
         char_field = 'char', 'Char Field'
         ip_field = 'ip', 'IPAddress Field'
 
     display_name = models.CharField(
-        max_length=128, verbose_name=_('Display name')
+        max_length=1024, verbose_name=_('Display name')
     )
     # 只能是字母、下划线的组合
     name = models.CharField(
