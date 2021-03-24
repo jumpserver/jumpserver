@@ -26,17 +26,18 @@ class AccountType(CommonModelMixin, models.Model):
 
     display_name = models.CharField(max_length=1024, verbose_name=_('Display name'))
     name = models.CharField(max_length=128, verbose_name=_('Name'))
-    parent = models.ForeignKey(
-        'AccountType', on_delete=models.PROTECT, default=None, null=True, verbose_name=_('Base')
-    )
     category = models.CharField(
         default=CategoryChoices.os, choices=CategoryChoices.choices, verbose_name=_('Category')
     )
+    protocol = models.CharField(
+        max_length=128, verbose_name=_('Protocol')
+    )
     secret_type = models.CharField(
         default=SecretTypeChoices.password, choices=SecretTypeChoices.choices,
-        verbose_name=_('Secret typ')
+        verbose_name=_('Secret type')
     )
-    fields = models.ManyToManyField('Field', related_name='account_type', verbose_name=_('Fields'))
+    fields = models.JSONField(default=list)
+
     comment = models.TextField(null=True, blank=True, verbose_name=_('Comment'))
 
     def __str__(self):
