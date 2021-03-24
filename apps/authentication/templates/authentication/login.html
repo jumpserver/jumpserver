@@ -182,7 +182,7 @@
                     </div>
 
                     <div>
-                        {% if AUTH_OPENID or AUTH_CAS %}
+                        {% if AUTH_OPENID or AUTH_CAS or AUTH_WECOM%}
                             <div class="hr-line-dashed"></div>
                             <div style="display: inline-block; float: left">
                                 <b class="text-muted text-left" style="margin-right: 10px">{% trans "More login options" %}</b>
@@ -194,6 +194,11 @@
                                 {% if AUTH_CAS %}
                                     <a href="{% url 'authentication:cas:cas-login' %}" class="more-login-item">
                                         <i class="fa"><img src="{{ LOGIN_CAS_LOGO_URL }}" height="13" width="13"></i> {% trans 'CAS' %}
+                                    </a>
+                                {% endif %}
+                                {% if AUTH_WECOM %}
+                                    <a href="{% url 'authentication:wecom-qr-login' %}" class="more-login-item">
+                                        <i class="fa"><img src="{{ LOGIN_WECOM_LOGO_URL }}" height="13" width="13"></i> {% trans 'WeCom' %}
                                     </a>
                                 {% endif %}
                             </div>

@@ -70,6 +70,7 @@ INSTALLED_APPS = [
 
 
 MIDDLEWARE = [
+    # 'common.request_log.RequestLogMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',

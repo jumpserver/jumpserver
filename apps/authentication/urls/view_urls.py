@@ -26,6 +26,14 @@ urlpatterns = [
     path('password/reset/success/', users_view.UserResetPasswordSuccessView.as_view(), name='reset-password-success'),
     path('password/verify/', users_view.UserVerifyPasswordView.as_view(), name='user-verify-password'),
 
+    path('wecom/bind/success-flash-msg/', views.FlashWeComBindSucceedMsgView.as_view(), name='wecom-bind-success-flash-msg'),
+    path('wecom/bind/failed-flash-msg/', views.FlashWeComBindFailedMsgView.as_view(), name='wecom-bind-failed-flash-msg'),
+    path('wecom/bind/start/', views.WeComEnableStartView.as_view(), name='wecom-bind-start'),
+    path('wecom/qr/bind/', views.WeComQRBindView.as_view(), name='wecom-qr-bind'),
+    path('wecom/qr/login/', views.WeComQRLoginView.as_view(), name='wecom-qr-login'),
+    path('wecom/qr/bind/<uuid:user_id>/callback/', views.WeComQRBindCallbackView.as_view(), name='wecom-qr-bind-callback'),
+    path('wecom/qr/login/callback/', views.WeComQRLoginCallbackView.as_view(), name='wecom-qr-login-callback'),
+
     # Profile
     path('profile/pubkey/generate/', users_view.UserPublicKeyGenerateView.as_view(), name='user-pubkey-generate'),
     path('profile/otp/enable/start/', users_view.UserOtpEnableStartView.as_view(), name='user-otp-enable-start'),
