@@ -14,6 +14,8 @@ def jumpserver_processor(request):
         'LOGIN_IMAGE_URL': static('img/login_image.png'),
         'FAVICON_URL': static('img/facio.ico'),
         'LOGIN_CAS_LOGO_URL': static('img/login_cas_logo.png'),
+        'LOGIN_WECOM_LOGO_URL': static('img/login_wecom_log.png'),
+        'LOGIN_DINGTALK_LOGO_URL': static('img/login_dingtalk_log.png'),
         'JMS_TITLE': _('JumpServer Open Source Bastion Host'),
         'VERSION': settings.VERSION,
         'COPYRIGHT': 'FIT2CLOUD 飞致云' + ' © 2014-2021',

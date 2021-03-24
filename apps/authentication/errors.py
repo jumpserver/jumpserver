@@ -19,6 +19,7 @@ reason_user_inactive = 'user_inactive'
 reason_user_expired = 'user_expired'
 reason_backend_not_match = 'backend_not_match'
 reason_acl_not_allow = 'acl_not_allow'
+only_local_users_are_allowed = 'only_local_users_are_allowed'
 
 reason_choices = {
     reason_password_failed: _('Username/password check failed'),
@@ -32,6 +33,7 @@ reason_choices = {
     reason_user_expired: _("This account is expired"),
     reason_backend_not_match: _("Auth backend not match"),
     reason_acl_not_allow: _("ACL is not allowed"),
+    only_local_users_are_allowed: _("Only local users are allowed")
 }
 old_reason_choices = {
     '0': '-',
@@ -291,3 +293,28 @@ class PasswordRequireResetError(JMSException):
     def __init__(self, url, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.url = url
+
+
+class WeComCodeInvalid(JMSException):
+    default_code = 'wecom_code_invalid'
+    default_detail = 'Code invalid, can not get user info'
+
+
+class WeComBindAlready(JMSException):
+    default_code = 'wecom_bind_already'
+    default_detail = 'WeCom already binded'
+
+
+class WeComNotBound(JMSException):
+    default_code = 'wecom_not_bound'
+    default_detail = 'WeCom is not bound'
+
+
+class DingTalkNotBound(JMSException):
+    default_code = 'dingtalk_not_bound'
+    default_detail = 'DingTalk is not bound'
+
+
+class PasswdInvalid(JMSException):
+    default_code = 'passwd_invalid'
+    default_detail = _('Your password is invalid')

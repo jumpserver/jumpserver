@@ -5,6 +5,7 @@ from urllib.parse import urlencode
 from functools import partial
 import time
 
+from django.core.cache import cache
 from django.conf import settings
 from django.contrib import auth
 from django.utils.translation import ugettext as _
@@ -12,7 +13,7 @@ from django.contrib.auth import (
     BACKEND_SESSION_KEY, _get_backends,
     PermissionDenied, user_login_failed, _clean_credentials
 )
-from django.shortcuts import reverse
+from django.shortcuts import reverse, redirect
 
 from common.utils import get_object_or_none, get_request_ip, get_logger, bulk_get, FlashMessageUtil
 from users.models import User
@@ -82,6 +83,8 @@ class AuthMixin:
     request = None
     partial_credential_error = None
 
+    key_prefix_captcha = "_LOGIN_INVALID_{}"
+
     def get_user_from_session(self):
         if self.request.session.is_empty():
             raise errors.SessionEmptyError()
@@ -110,11 +113,7 @@ class AuthMixin:
         ip = ip or get_request_ip(self.request)
         return ip
 
-    def check_is_block(self, raise_exception=True):
-        if hasattr(self.request, 'data'):
-            username = self.request.data.get("username")
-        else:
-            username = self.request.POST.get("username")
+    def _check_is_block(self, username, raise_exception=True):
         ip = self.get_request_ip()
         if LoginBlockUtil(username, ip).is_block():
             logger.warn('Ip was blocked' + ': ' + username + ':' + ip)
@@ -123,6 +122,13 @@ class AuthMixin:
                 raise errors.BlockLoginError(username=username, ip=ip)
             else:
                 return exception
+
+    def check_is_block(self, raise_exception=True):
+        if hasattr(self.request, 'data'):
+            username = self.request.data.get("username")
+        else:
+            username = self.request.POST.get("username")
+        self._check_is_block(username, raise_exception)
 
     def decrypt_passwd(self, raw_passwd):
         # 获取解密密钥，对密码进行解密
@@ -140,6 +146,9 @@ class AuthMixin:
     def raise_credential_error(self, error):
         raise self.partial_credential_error(error=error)
 
+    def _set_partial_credential_error(self, username, ip, request):
+        self.partial_credential_error = partial(errors.CredentialError, username=username, ip=ip, request=request)
+
     def get_auth_data(self, decrypt_passwd=False):
         request = self.request
         if hasattr(request, 'data'):
@@ -151,7 +160,7 @@ class AuthMixin:
         username, password, challenge, public_key, auto_login = bulk_get(data, *items,  default='')
         password = password + challenge.strip()
         ip = self.get_request_ip()
-        self.partial_credential_error = partial(errors.CredentialError, username=username, ip=ip, request=request)
+        self._set_partial_credential_error(username=username, ip=ip, request=request)
 
         if decrypt_passwd:
             password = self.decrypt_passwd(password)
@@ -184,6 +193,21 @@ class AuthMixin:
         if not is_allowed:
             raise errors.LoginIPNotAllowed(username=user.username, request=self.request)
 
+    def set_login_failed_mark(self):
+        ip = self.get_request_ip()
+        cache.set(self.key_prefix_captcha.format(ip), 1, 3600)
+
+    def set_passwd_verify_on_session(self, user: User):
+        self.request.session['user_id'] = str(user.id)
+        self.request.session['auth_password'] = 1
+        self.request.session['auth_password_expired_at'] = time.time() + settings.AUTH_EXPIRED_SECONDS
+
+    def check_is_need_captcha(self):
+        # 最近有登录失败时需要填写验证码
+        ip = get_request_ip(self.request)
+        need = cache.get(self.key_prefix_captcha.format(ip))
+        return need
+
     def check_user_auth(self, decrypt_passwd=False):
         self.check_is_block()
         request = self.request
@@ -202,6 +226,27 @@ class AuthMixin:
         request.session['user_id'] = str(user.id)
         request.session['auto_login'] = auto_login
         request.session['auth_backend'] = getattr(user, 'backend', settings.AUTH_BACKEND_MODEL)
+        return user
+
+    def _check_is_local_user(self, user: User):
+        if user.source != User.Source.local:
+            raise self.raise_credential_error(error=errors.only_local_users_are_allowed)
+
+    def check_oauth2_auth(self, user: User, auth_backend):
+        ip = self.get_request_ip()
+        request = self.request
+
+        self._set_partial_credential_error(user.username, ip, request)
+        self._check_is_local_user(user)
+        self._check_is_block(user.username)
+        self._check_login_acl(user, ip)
+
+        LoginBlockUtil(user.username, ip).clean_failed_count()
+        MFABlockUtils(user.username, ip).clean_failed_count()
+
+        request.session['auth_password'] = 1
+        request.session['user_id'] = str(user.id)
+        request.session['auth_backend'] = auth_backend
         return user
 
     @classmethod
@@ -354,3 +399,10 @@ class AuthMixin:
                 sender=self.__class__, username=username,
                 request=self.request, reason=reason
             )
+
+    def redirect_to_guard_view(self):
+        guard_url = reverse('authentication:login-guard')
+        args = self.request.META.get('QUERY_STRING', '')
+        if args:
+            guard_url = "%s?%s" % (guard_url, args)
+        return redirect(guard_url)

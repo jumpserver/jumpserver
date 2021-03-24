@@ -541,7 +541,10 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         cas = 'cas', 'CAS'
 
     SOURCE_BACKEND_MAPPING = {
-        Source.local: [settings.AUTH_BACKEND_MODEL, settings.AUTH_BACKEND_PUBKEY],
+        Source.local: [
+            settings.AUTH_BACKEND_MODEL, settings.AUTH_BACKEND_PUBKEY,
+            settings.AUTH_BACKEND_WECOM, settings.AUTH_BACKEND_DINGTALK,
+        ],
         Source.ldap: [settings.AUTH_BACKEND_LDAP],
         Source.openid: [settings.AUTH_BACKEND_OIDC_PASSWORD, settings.AUTH_BACKEND_OIDC_CODE],
         Source.radius: [settings.AUTH_BACKEND_RADIUS],
@@ -605,9 +608,19 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         verbose_name=_('Date password last updated')
     )
     need_update_password = models.BooleanField(default=False)
+    wecom_id = models.CharField(null=True, default=None, unique=True, max_length=128)
+    dingtalk_id = models.CharField(null=True, default=None, unique=True, max_length=128)
 
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
+
+    @property
+    def is_wecom_bound(self):
+        return bool(self.wecom_id)
+
+    @property
+    def is_dingtalk_bound(self):
+        return bool(self.dingtalk_id)
 
     def get_absolute_url(self):
         return reverse('users:user-detail', args=(self.id,))

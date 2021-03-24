@@ -55,6 +55,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
             'mfa_enabled', 'is_valid', 'is_expired', 'is_active',  # 布尔字段
             'date_expired', 'date_joined', 'last_login',  # 日期字段
             'created_by', 'comment',  # 通用字段
+            'is_wecom_bound', 'is_dingtalk_bound',
         ]
         # 包含不太常用的字段，可以没有
         fields_verbose = fields_small + [
