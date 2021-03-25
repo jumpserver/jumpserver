@@ -24,7 +24,6 @@ class AccountType(CommonModelMixin, models.Model):
         token = 'token', 'Token'
         text = 'text', 'Text'
 
-    display_name = models.CharField(max_length=1024, verbose_name=_('Display name'))
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     category = models.CharField(
         default=CategoryChoices.os, choices=CategoryChoices.choices, verbose_name=_('Category')
@@ -35,7 +34,7 @@ class AccountType(CommonModelMixin, models.Model):
         verbose_name=_('Secret type')
     )
     # [{'name': '', 'read_only': '', 'label': '', ...}, {}, {}]
-    fields = models.JSONField(default=list)
+    fields_definition = models.JSONField(default=list)
     comment = models.TextField(null=True, blank=True, verbose_name=_('Comment'))
 
     def __str__(self):

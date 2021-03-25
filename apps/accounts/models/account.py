@@ -2,12 +2,13 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from common.mixins.models import CommonModelMixin
+from orgs.mixins.models import OrgModelMixin
 
 
 __all__ = ['Account']
 
 
-class Account(CommonModelMixin, models.Model):
+class Account(CommonModelMixin, OrgModelMixin):
     """ 账号: 可以直接使用的最小单元 """
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     username = models.CharField(max_length=2048, verbose_name=_('Username'))
