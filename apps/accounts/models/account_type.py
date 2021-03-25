@@ -35,6 +35,7 @@ class AccountType(CommonModelMixin, models.Model):
     )
     # [{'name': '', 'read_only': '', 'label': '', ...}, {}, {}]
     fields_definition = models.JSONField(default=list)
+    is_builtin = models.BooleanField(default=False, verbose_name=_('Built-in'))
     comment = models.TextField(null=True, blank=True, verbose_name=_('Comment'))
 
     def __str__(self):

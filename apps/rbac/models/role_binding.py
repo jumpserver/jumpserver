@@ -6,6 +6,7 @@ __all__ = ['SystemRoleBinding', 'OrgRoleBinding', 'SafeRoleBiding']
 
 
 class SystemRoleBinding(models.Model):
+    """ 用户-系统角色绑定 """
     user = models.ForeignKey('users.User', on_delete=models.CASCADE, verbose_name=_('User'))
     # only system-role
     role = models.ForeignKey('rbac.Role', on_delete=models.PROTECT, verbose_name=_('Role'))
@@ -15,6 +16,7 @@ class SystemRoleBinding(models.Model):
 
 
 class OrgRoleBinding(models.Model):
+    """ 用户-组织角色绑定 """
     user = models.ForeignKey('users.User', on_delete=models.CASCADE, verbose_name=_('User'))
     # only org-role
     role = models.ForeignKey('rbac.Role', on_delete=models.PROTECT, verbose_name=_('Role'))
@@ -27,6 +29,7 @@ class OrgRoleBinding(models.Model):
 
 
 class SafeRoleBiding(models.Model):
+    """ 用户-Safe(保险箱)角色绑定 """
     user = models.ForeignKey('users.User', on_delete=models.CASCADE, verbose_name=_('User'))
     role = models.ForeignKey('rbac.Role', on_delete=models.PROTECT, verbose_name=_('Role'))
     # only safe-role

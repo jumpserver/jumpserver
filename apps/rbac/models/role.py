@@ -3,6 +3,9 @@ from django.utils.translation import ugettext_lazy as _
 from common.mixins.models import CommonModelMixin
 
 
+__all__ = ['Role']
+
+
 class Role(CommonModelMixin):
     """ 角色: 相当于权限的集合 """
     class TypeChoices(models.TextChoices):
