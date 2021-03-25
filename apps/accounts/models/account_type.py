@@ -34,6 +34,7 @@ class AccountType(CommonModelMixin, models.Model):
         default=SecretTypeChoices.password, choices=SecretTypeChoices.choices,
         verbose_name=_('Secret type')
     )
+    # [{'name': '', 'read_only': '', 'label': '', ...}, {}, {}]
     fields = models.JSONField(default=list)
     comment = models.TextField(null=True, blank=True, verbose_name=_('Comment'))
 
