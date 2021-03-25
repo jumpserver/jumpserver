@@ -29,15 +29,12 @@ class AccountType(CommonModelMixin, models.Model):
     category = models.CharField(
         default=CategoryChoices.os, choices=CategoryChoices.choices, verbose_name=_('Category')
     )
-    protocol = models.CharField(
-        max_length=128, verbose_name=_('Protocol')
-    )
+    protocol = models.CharField(max_length=128, verbose_name=_('Protocol'))
     secret_type = models.CharField(
         default=SecretTypeChoices.password, choices=SecretTypeChoices.choices,
         verbose_name=_('Secret type')
     )
     fields = models.JSONField(default=list)
-
     comment = models.TextField(null=True, blank=True, verbose_name=_('Comment'))
 
     def __str__(self):
