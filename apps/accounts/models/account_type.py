@@ -8,7 +8,7 @@ __all__ = ['AccountType']
 
 
 class AccountType(CommonModelMixin, models.Model):
-    """ 账号类型: 用来标识此类型账号所需要的其他附加字段 """
+    """ 账号类型: 用来标识此类型账号所需要的其他附加字段 (全局通用) """
     class CategoryChoices(models.TextChoices):
         os = 'operating_system', 'Operating System'
         cloud = 'cloud_service', 'Cloud Service'
@@ -20,7 +20,7 @@ class AccountType(CommonModelMixin, models.Model):
     class SecretTypeChoices(models.TextChoices):
         ssh_key = 'ssh_key', 'SSH Key'
         password = 'password', 'Password'
-        cert = 'cert', 'Cert'
+        cert = 'cert', 'Certificate'
         token = 'token', 'Token'
         text = 'text', 'Text'
 
