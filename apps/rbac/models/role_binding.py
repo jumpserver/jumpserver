@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 
-__all__ = ['SystemRoleBinding', 'OrgRoleBinding', 'SafeRoleBiding']
+__all__ = ['SystemRoleBinding', 'OrgRoleBinding', 'SafeRoleBinding']
 
 
 class SystemRoleBinding(models.Model):
@@ -28,7 +28,7 @@ class OrgRoleBinding(models.Model):
         unique_together = ('user', 'role', 'org')
 
 
-class SafeRoleBiding(models.Model):
+class SafeRoleBinding(models.Model):
     """ 用户-Safe(保险箱)角色绑定 """
     user = models.ForeignKey('users.User', on_delete=models.CASCADE, verbose_name=_('User'))
     role = models.ForeignKey('rbac.Role', on_delete=models.PROTECT, verbose_name=_('Role'))

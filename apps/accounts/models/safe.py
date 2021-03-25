@@ -9,7 +9,7 @@ __all__ = ['Safe']
 
 
 class Safe(CommonModelMixin, OrgModelMixin):
-    """ 保险库: 用来存放账号的容器 """
+    """ 保险库: 账号的集合 (方便将账号与用户进行关联) """
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     comment = models.TextField(blank=True, null=True, verbose_name=_("Comment"))
 
