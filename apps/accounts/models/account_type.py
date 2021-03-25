@@ -24,7 +24,7 @@ class AccountType(CommonModelMixin, models.Model):
         token = 'token', 'Token'
         text = 'text', 'Text'
 
-    name = models.CharField(max_length=128, verbose_name=_('Name'))
+    name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
     category = models.CharField(
         default=CategoryChoices.os, choices=CategoryChoices.choices, verbose_name=_('Category')
     )
