@@ -35,7 +35,6 @@ urlpatterns = [
     path('command-storages/<uuid:pk>/test-connective/', api.CommandStorageTestConnectiveApi.as_view(), name='command-storage-test-connective'),
     # components
     path('components/metrics/', api.ComponentsMetricsAPIView.as_view(), name='components-metrics'),
-    path('components/state/', api.ComponentsStateAPIView.as_view(), name='components-state'),
     # v2: get session's replay
     # path('v2/sessions/<uuid:pk>/replay/',
     #     api.SessionReplayV2ViewSet.as_view({'get': 'retrieve'}),
