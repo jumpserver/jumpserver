@@ -9,8 +9,6 @@ __all__ = ['Role']
 class Role(CommonModelMixin):
     """ 角色: 相当于权限的集合 """
     class TypeChoices(models.TextChoices):
-        system = 'system', _('System')
-        org = 'org', _('Organization')
         safe = 'safe', _('Safe')
 
     # 内置角色:
@@ -18,9 +16,14 @@ class Role(CommonModelMixin):
     display_name = models.CharField(max_length=256, verbose_name=_('Display name'))
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
     # 角色类型: system / org / safe
-    type = models.CharField(max_length=128, verbose_name=_('Type'))
+    type = models.CharField(
+        choices=TypeChoices.choices, default=TypeChoices.safe, max_length=128,
+        verbose_name=_('Type')
+    )
     # 权限项
-    permissions = models.ManyToManyField('auth.Permission', verbose_name=_('Permission'))
+    permissions = models.ManyToManyField(
+        'auth.Permission', null=True, blank=True, verbose_name=_('Permission'),
+    )
     is_builtin = models.BooleanField(default=False, verbose_name=_('Built-in'))
     comment = models.TextField(null=True, blank=True, verbose_name=_('Comment'))
 

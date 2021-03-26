@@ -23,7 +23,8 @@ api_v1 = [
     path('applications/', include('applications.urls.api_urls', namespace='api-applications')),
     path('tickets/', include('tickets.urls.api_urls', namespace='api-tickets')),
     path('acls/', include('acls.urls.api_urls', namespace='api-acls')),
-    path('prometheus/metrics/', api.PrometheusMetricsApi.as_view())
+    path('prometheus/metrics/', api.PrometheusMetricsApi.as_view()),
+    path('rbac/', include('rbac.urls.api_urls', namespace='api-rbac')),
 ]
 
 app_view_patterns = [
