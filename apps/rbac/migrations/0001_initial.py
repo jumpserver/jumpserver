@@ -16,7 +16,7 @@ def add_default_builtin_role(apps, schema_editor):
             app_label='accounts', model__in=['account', 'safe']
         ).values_list('id', flat=True)
     )
-    print('contenttype_ids: {}'.format(contenttypes_ids))
+    print('content_type_ids: {}'.format(contenttypes_ids))
 
     auth_permissions = auth_permissions_model.objects.using(db_alias).filter(
         content_type__in=contenttypes_ids

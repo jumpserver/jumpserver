@@ -8,6 +8,8 @@ router = BulkRouter()
 
 
 router.register(r'roles', api.RoleViewSet, basename='role')
+router.register(r'role-permissions', api.RolePermissionsViewSet, basename='role-permission')
+
 # router.register(r'role-binding/', '', basename='role-binding')
 
 urlpatterns = router.urls
