@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from common.mixins.models import CommonModelMixin
+from django.contrib.auth.models import Permission
 
 
 __all__ = ['Role']
@@ -12,7 +13,7 @@ class Role(CommonModelMixin):
         safe = 'safe', _('Safe')
 
     # 内置角色:
-    # - 账号(Safe)管理员
+    # - 账号(Safe)管理员: 拥有所有safe相关的权限
     display_name = models.CharField(max_length=256, verbose_name=_('Display name'))
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
     # 角色类型: system / org / safe
@@ -32,3 +33,7 @@ class Role(CommonModelMixin):
 
     def __str__(self):
         return self.name
+
+    def get_permissions_display(self):
+        permissions = list(self.permissions.all().values_list('name', flat=True))
+        return permissions
