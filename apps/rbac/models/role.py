@@ -65,3 +65,24 @@ class Role(CommonModelMixin):
     def get_permissions_display(self):
         permissions = list(self.permissions.all().values_list('name', flat=True))
         return permissions
+
+    @classmethod
+    def initial_builtin_role(cls):
+        """ 初始化内建角色 """
+        # safe_admin
+        safe_admin_role_name = 'safe_admin'
+        safe_admin_role_data = {
+            'display_name': 'Safe Admin Role',
+            'name': safe_admin_role_name,
+            'type': RoleTypeChoices.safe,
+            'is_builtin': True,
+            'comment': 'Safe Admin Role',
+            'created_by': 'System',
+        }
+        permissions = RoleTypeChoices.get_permissions(tp=RoleTypeChoices.safe)
+        safe_admin_role, created = cls.objects.get_or_create(
+            defaults=safe_admin_role_data, name=safe_admin_role_name,
+        )
+        print('created: {}, safe_admin_role: {}'.format(created, safe_admin_role))
+        safe_admin_role.permissions.set(permissions)
+        return safe_admin_role
