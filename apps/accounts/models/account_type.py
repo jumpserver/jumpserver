@@ -26,11 +26,12 @@ class AccountType(CommonModelMixin, models.Model):
 
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
     category = models.CharField(
-        default=CategoryChoices.os, choices=CategoryChoices.choices, verbose_name=_('Category')
+        max_length=128, default=CategoryChoices.os, choices=CategoryChoices.choices,
+        verbose_name=_('Category')
     )
     protocol = models.CharField(max_length=128, verbose_name=_('Protocol'))
     secret_type = models.CharField(
-        default=SecretTypeChoices.password, choices=SecretTypeChoices.choices,
+        max_length=128, default=SecretTypeChoices.password, choices=SecretTypeChoices.choices,
         verbose_name=_('Secret type')
     )
     # [{'name': '', 'read_only': '', 'label': '', ...}, {}, {}]
