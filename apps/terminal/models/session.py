@@ -14,7 +14,6 @@ from assets.models import Asset
 from orgs.mixins.models import OrgModelMixin
 from common.db.models import ChoiceSet
 from ..backends import get_multi_command_storage
-from .terminal import Terminal
 
 
 class Session(OrgModelMixin):
@@ -47,7 +46,7 @@ class Session(OrgModelMixin):
     is_finished = models.BooleanField(default=False, db_index=True)
     has_replay = models.BooleanField(default=False, verbose_name=_("Replay"))
     has_command = models.BooleanField(default=False, verbose_name=_("Command"))
-    terminal = models.ForeignKey(Terminal, null=True, on_delete=models.DO_NOTHING, db_constraint=False)
+    terminal = models.ForeignKey('terminal.Terminal', null=True, on_delete=models.DO_NOTHING, db_constraint=False)
     protocol = models.CharField(choices=PROTOCOL.choices, default='ssh', max_length=16, db_index=True)
     date_start = models.DateTimeField(verbose_name=_("Date start"), db_index=True, default=timezone.now)
     date_end = models.DateTimeField(verbose_name=_("Date end"), null=True)
