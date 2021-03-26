@@ -13,7 +13,18 @@ class Role(CommonModelMixin):
         org = 'org', _('Organization')
         safe = 'safe', _('Safe')
 
-    name = models.CharField(max_length=128, verbose_name=_('Name'))
+    # 超级管理员角色
+    # 组织管理员角色
+    # 超级审计员
+    # 组织审计员
+    # 普通用户
+    #
+    # 账号(Safe)管理员:
+    # 账号用户
+    #
+
+    display_name = models.CharField(max_length=256, verbose_name=_('Display name'))
+    name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
     # 角色类型: system / org / safe
     type = models.CharField(max_length=128, verbose_name=_('Type'))
     # 权限项
