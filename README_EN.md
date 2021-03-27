@@ -1,4 +1,4 @@
-## Jumpserver - The PAM for Multi-Cloud Environment
+## Jumpserver - The Bastion Host for Multi-Cloud Environment
 
 [![Python3](https://img.shields.io/badge/python-3.6-green.svg?style=plastic)](https://www.python.org/)
 [![Django](https://img.shields.io/badge/django-2.2-brightgreen.svg?style=plastic)](https://www.djangoproject.com/)
@@ -123,7 +123,7 @@ $ bash jms_check_attack.sh
 
 ----
 
-- [Chinese Vesrion of README](https://github.com/jumpserver/jumpserver/blob/master/README.md)
+- [中文版](https://github.com/jumpserver/jumpserver/blob/master/README.md)
 
 Jumpserver is the world's first open-source PAM (Privileged Access Management System) and is licensed under the GNU GPL v2.0. It is a 4A-compliant professional operation and maintenance security audit system.
 
