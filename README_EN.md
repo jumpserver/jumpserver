@@ -125,7 +125,7 @@ $ bash jms_check_attack.sh
 
 - [中文版](https://github.com/jumpserver/jumpserver/blob/master/README.md)
 
-Jumpserver is the world's first open-source PAM (Privileged Access Management System) and is licensed under the GNU GPL v2.0. It is a 4A-compliant professional operation and maintenance security audit system.
+Jumpserver is the world's first open-source Bastion Host and is licensed under the GNU GPL v2.0. It is a 4A-compliant professional operation and maintenance security audit system.
 
 Jumpserver uses Python / Django for development, follows Web 2.0 specifications, and is equipped with an industry-leading Web Terminal solution that provides a beautiful user interface and great user experience
 
