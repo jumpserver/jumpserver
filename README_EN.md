@@ -1,129 +1,16 @@
-## Jumpserver - The Bastion Host for Multi-Cloud Environment
+# Jumpserver - The Bastion Host for Multi-Cloud Environment
 
 [![Python3](https://img.shields.io/badge/python-3.6-green.svg?style=plastic)](https://www.python.org/)
 [![Django](https://img.shields.io/badge/django-2.2-brightgreen.svg?style=plastic)](https://www.djangoproject.com/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/jumpserver/jms_all.svg)](https://hub.docker.com/u/jumpserver)
 
----- 
-## CRITICAL BUG WARNING
+- [中文版](https://github.com/jumpserver/jumpserver/blob/master/README.md)
 
-Recently we have found a critical bug for remote execution vulnerability which leads to pre-auth and info leak, please fix it as soon as possible.
-
-Thanks for **reactivity from Alibaba Hackerone bug bounty program** report us this bug
-
-**Vulnerable version:**
-```
-< v2.6.2
-< v2.5.4
-< v2.4.5 
-= v1.5.9
->= v1.5.3
-```
-
-**Safe and Stable version:**
-```
->= v2.6.2
->= v2.5.4
->= v2.4.5 
-= v1.5.9 （version tag didn't change）
-< v1.5.3
-```
-
-**Bug Fix Solution:**
-Upgrade to the latest version or the version mentioned above
-
-
-**Temporary Solution (upgrade asap):**
-
-Modify the Nginx config file and disable the vulnerable api listed below
-
-```
-/api/v1/authentication/connection-token/
-/api/v1/users/connection-token/
-```
-
-Path to Nginx config file
-
-```
-# Previous Community version
-/etc/nginx/conf.d/jumpserver.conf
-
-# Previous Enterprise version
-jumpserver-release/nginx/http_server.conf
- 
-# Latest version
-jumpserver-release/compose/config_static/http_server.conf
-```
-
-Changes in Nginx config file
-
-```
-### Put the following code on top of location server, or before /api and /
-location /api/v1/authentication/connection-token/ {
-   return 403;
-}
- 
-location /api/v1/users/connection-token/ {
-   return 403;
-}
-### End right here
- 
-location /api/ {
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header Host $host;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_pass http://core:8080;
-  }
- 
-...
-```
-
-Save the file and restart Nginx
-
-```
-docker deployment: 
-$ docker restart jms_nginx
-
-rpm or other deployment:
-$ systemctl restart nginx
-
-```
-
-**Bug Fix Verification**
-
-```
-# Download the following script to check if it is fixed
-$ wget https://github.com/jumpserver/jumpserver/releases/download/v2.6.2/jms_bug_check.sh 
-
-# Run the code to verify it
-$ bash jms_bug_check.sh demo.jumpserver.org
-漏洞已修复 (It means the bug is fixed)
-漏洞未修复 (It means the bug is not fixed and the system is still vulnerable)
-```
-
-
-**Attack Simulation**
-
-Go to the logs directory which should contain gunicorn.log file. Then download the "attack" script and execute it
-
-```
-$ pwd
-/opt/jumpserver/core/logs
-
-$ ls gunicorn.log
-gunicorn.log
-
-$ wget 'https://github.com/jumpserver/jumpserver/releases/download/v2.6.2/jms_check_attack.sh'
-$ bash jms_check_attack.sh
-系统未被入侵 (It means the system is safe)
-系统已被入侵 (It means the system is being attacked)
-```
+|![notification](https://raw.githubusercontent.com/goharbor/website/master/docs/img/readme/bell-outline-badged.svg)Security Notice|
+|------------------|
+|On 15th January 2021, JumpServer found a critical bug for remote execution vulnerability. Please fix it asap! [For more detail](https://github.com/jumpserver/jumpserver/issues/5533) Thanks for **reactivity of Alibaba Hackerone bug bounty program** report use the bug|
 
 --------------------------
-
-----
-
-- [中文版](https://github.com/jumpserver/jumpserver/blob/master/README.md)
 
 Jumpserver is the world's first open-source Bastion Host and is licensed under the GNU GPL v2.0. It is a 4A-compliant professional operation and maintenance security audit system.
 
