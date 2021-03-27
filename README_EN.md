@@ -352,7 +352,7 @@ Change the world by taking every little step
   </tr>
 </table>
 
-**Note**: Rows with :small_orange_diamond: at the end of the sentence means that it is X-PACK features exclusive ([Apply for X-PACK Trial](https://jinshuju.net/f/kyOYpi)
+**Note**: Rows with :small_orange_diamond: at the end of the sentence means that it is X-PACK features exclusive ([Apply for X-PACK Trial](https://jinshuju.net/f/kyOYpi))
 
 ### Start 
 
