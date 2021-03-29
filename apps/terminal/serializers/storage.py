@@ -181,7 +181,10 @@ class CommandStorageTypeESSerializer(serializers.Serializer):
         max_length=1024, default='jumpserver', label=_('Index'), allow_null=True
     )
     DOC_TYPE = ReadableHiddenField(default='command', label=_('Doc type'), allow_null=True)
-
+    ignore_verify_certs = serializers.BooleanField(
+        default=False, label=_('Ignore Certificate Verification'),
+        source='OTHER.ignore_verify_certs', allow_null=True,
+    )
 
 # mapping
 
