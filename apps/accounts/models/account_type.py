@@ -18,7 +18,7 @@ class AccountType(CommonModelMixin, models.Model):
         network_device = 'network_device', 'Network Device'
 
     class SecretTypeChoices(models.TextChoices):
-        ssh_key = 'ssh_key', 'SSH Key'
+        ssh_keys = 'ssh_keys', 'SSH Keys'
         password = 'password', 'Password'
         cert = 'cert', 'Certificate'
         token = 'token', 'Token'
@@ -29,15 +29,31 @@ class AccountType(CommonModelMixin, models.Model):
         max_length=128, default=CategoryChoices.os, choices=CategoryChoices.choices,
         verbose_name=_('Category')
     )
+    # ssh / rdp / telnet / vnc
+    # https / http
+    # mysql
     protocol = models.CharField(max_length=128, verbose_name=_('Protocol'))
     secret_type = models.CharField(
         max_length=128, default=SecretTypeChoices.password, choices=SecretTypeChoices.choices,
         verbose_name=_('Secret type')
     )
-    # [{'name': '', 'read_only': '', 'label': '', ...}, {}, {}]
+    # [{'name': '', 'type': '', 'read_only': '', 'label': '', ...}, {}, {}]
     fields_definition = models.JSONField(default=list)
     is_builtin = models.BooleanField(default=False, verbose_name=_('Built-in'))
     comment = models.TextField(null=True, blank=True, verbose_name=_('Comment'))
 
     def __str__(self):
         return self.name
+
+    @classmethod
+    def initial_builtin_type(cls):
+        fields = [
+            'name', 'category', 'protocol', 'secret_type', 'fields_definition', 'is_builtin',
+            'comment', 'created_by'
+        ]
+        values = [
+            [
+                'Unix Via SSH Keys', cls.CategoryChoices.os, 'ssh', cls.SecretTypeChoices.ssh_keys,
+                [], True, '', 'System'
+            ]
+        ]

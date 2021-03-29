@@ -1,4 +1,3 @@
-from rest_framework_bulk import BulkModelViewSet
 from common.permissions import IsOrgAdmin
 from orgs.mixins.api import OrgBulkModelViewSet
 from ..serializers import SafeSerializer
