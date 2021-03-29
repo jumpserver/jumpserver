@@ -44,14 +44,14 @@ class Role(CommonModelMixin):
     # - 账号(Safe)管理员: 拥有所有safe相关的权限
     display_name = models.CharField(max_length=256, verbose_name=_('Display name'))
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
-    # 角色类型: system / org / safe
+    # 角色类型: safe
     type = models.CharField(
         choices=RoleTypeChoices.choices, default=RoleTypeChoices.safe, max_length=128,
         verbose_name=_('Type')
     )
     # 权限项
     permissions = models.ManyToManyField(
-        'auth.Permission', null=True, blank=True, verbose_name=_('Permission'),
+        'auth.Permission', blank=True, verbose_name=_('Permission'),
     )
     is_builtin = models.BooleanField(default=False, verbose_name=_('Built-in'))
     comment = models.TextField(null=True, blank=True, verbose_name=_('Comment'))
