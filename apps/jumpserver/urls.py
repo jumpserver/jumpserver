@@ -25,6 +25,7 @@ api_v1 = [
     path('acls/', include('acls.urls.api_urls', namespace='api-acls')),
     path('prometheus/metrics/', api.PrometheusMetricsApi.as_view()),
     path('rbac/', include('rbac.urls.api_urls', namespace='api-rbac')),
+    path('accounts/', include('accounts.urls.api_urls', namespace='api-accounts'))
 ]
 
 app_view_patterns = [
