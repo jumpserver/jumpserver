@@ -1,3 +1,4 @@
+import copy
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -45,15 +46,22 @@ class AccountType(CommonModelMixin, models.Model):
     def __str__(self):
         return self.name
 
+    def get_fields_definition_serializer(self):
+        from rest_framework import serializers
+        from ..const import FieldDefinitionTypeChoices
+        serializer_fields = {}
+        fields_definition = copy.deepcopy(self.fields_definition)
+        for field_definition in fields_definition:
+            field_name = field_definition.pop('name')
+            required = field_definition.pop('required', False)
+            if required:
+                field_definition.pop('default')
+            tp = field_definition.pop('type')
+            serializer_field_class = FieldDefinitionTypeChoices.get_serializer_field_class(tp)
+            serializer_fields[field_name] = serializer_field_class(**field_definition)
+        cls_name = 'AccountTypeFieldsDefinitionSerializer'
+        return type(cls_name, (serializers.Serializer, ), serializer_fields)()
+
     @classmethod
     def initial_builtin_type(cls):
-        fields = [
-            'name', 'category', 'protocol', 'secret_type', 'fields_definition', 'is_builtin',
-            'comment', 'created_by'
-        ]
-        values = [
-            [
-                'Unix Via SSH Keys', cls.CategoryChoices.os, 'ssh', cls.SecretTypeChoices.ssh_keys,
-                [], True, '', 'System'
-            ]
-        ]
+        pass
