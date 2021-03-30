@@ -9,11 +9,13 @@ __all__ = ['AccountTypeSerializer']
 
 class FieldDefinitionSerializer(serializers.Serializer):
     name = serializers.SlugField(max_length=128, required=True, label=_('Name'))
-    required = serializers.BooleanField(default=False, label=_('Required'))
     type = serializers.ChoiceField(
         choices=FieldDefinitionTypeChoices.choices, default=FieldDefinitionTypeChoices.char,
         label=_('Type')
     )
+    required = serializers.BooleanField(default=False, label=_('Required'))
+    read_only = serializers.BooleanField(default=False, label=_('Read only'))
+    write_only = serializers.BooleanField(default=False, label=_('Write only'))
     default = serializers.CharField(max_length=256, required=False, label=_('Default'))
     label = serializers.CharField(max_length=256, required=True, label=_('Label'))
     help_text = serializers.CharField(max_length=2048, required=False, label=_('Help text'))

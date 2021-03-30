@@ -46,21 +46,32 @@ class AccountType(CommonModelMixin, models.Model):
     def __str__(self):
         return self.name
 
-    def get_fields_definition_serializer(self):
+    def construct_serializer_cls_by_fields_definition(self):
         from rest_framework import serializers
         from ..const import FieldDefinitionTypeChoices
-        serializer_fields = {}
         fields_definition = copy.deepcopy(self.fields_definition)
-        for field_definition in fields_definition:
-            field_name = field_definition.pop('name')
-            required = field_definition.pop('required', False)
-            if required:
-                field_definition.pop('default')
-            tp = field_definition.pop('type')
-            serializer_field_class = FieldDefinitionTypeChoices.get_serializer_field_class(tp)
-            serializer_fields[field_name] = serializer_field_class(**field_definition)
+
+        serializer_fields = {}
+        for field_kwargs in fields_definition:
+            field_type = field_kwargs.pop('type', None)
+            # default
+            field_default = field_kwargs.get('default', '')
+            if field_type == FieldDefinitionTypeChoices.integer:
+                if field_default and field_default.isdigit():
+                    field_kwargs['default'] = int(field_default)
+            # Some combinations of keyword arguments do not make sense.
+            if field_kwargs.get('write_only', False):
+                field_kwargs.pop('read_only', None)
+            if field_kwargs.get('read_only', False):
+                field_kwargs.pop('required', None)
+            if field_kwargs.get('required', False):
+                field_kwargs.pop('default', None)
+            field_class = FieldDefinitionTypeChoices.get_serializer_field_class(field_type)
+            field_name = field_kwargs.pop('name')
+            serializer_fields[field_name] = field_class(**field_kwargs)
         cls_name = 'AccountTypeFieldsDefinitionSerializer'
-        return type(cls_name, (serializers.Serializer, ), serializer_fields)()
+        serializer_class = type(cls_name, (serializers.Serializer, ), serializer_fields)
+        return serializer_class
 
     @classmethod
     def initial_builtin_type(cls):
