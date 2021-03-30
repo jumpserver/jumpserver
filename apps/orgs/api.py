@@ -90,11 +90,6 @@ class OrgMemberRelationBulkViewSet(JMSBulkRelationModelViewSet):
     filterset_class = OrgMemberRelationFilterSet
     search_fields = ('user__name', 'user__username', 'org__name')
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        queryset = queryset.exclude(user__role=User.ROLE.APP)
-        return queryset
-
     def perform_bulk_destroy(self, queryset):
         objs = list(queryset.all().prefetch_related('user', 'org'))
         queryset.delete()
