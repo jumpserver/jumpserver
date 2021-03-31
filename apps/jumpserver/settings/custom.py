@@ -120,3 +120,12 @@ CONNECTION_TOKEN_ENABLED = CONFIG.CONNECTION_TOKEN_ENABLED
 DISK_CHECK_ENABLED = CONFIG.DISK_CHECK_ENABLED
 FORGOT_PASSWORD_URL = CONFIG.FORGOT_PASSWORD_URL
 
+# Account storage backend
+ACCOUNT_STORAGE_BACKEND = {
+    'ENGINE': 'accounts.backends.vault.VaultBackend',
+    'CONFIG': {
+        'url': CONFIG.VAULT_URL,
+        'token': CONFIG.VAULT_TOKEN,
+        'secrets_engine_path': CONFIG.VAULT_ENGINE_PATH,
+    }
+}
