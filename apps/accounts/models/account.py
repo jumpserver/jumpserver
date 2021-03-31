@@ -26,3 +26,7 @@ class Account(CommonModelMixin, OrgModelMixin):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        self.secret = ''
+        return super().save(*args, **kwargs)

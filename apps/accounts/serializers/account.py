@@ -25,7 +25,7 @@ class AccountSerializer(BulkOrgResourceModelSerializer):
             'is_privileged', 'comment', 'safe', 'safe_display',
         ]
         extra_kwargs = {
-            'secret': {'read_only': True}
+            'secret': {'write_only': True}
         }
 
     def get_attrs_serializer(self):
