@@ -95,3 +95,6 @@ class UserVerifyPasswordView(FormView):
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
+
+
+# gaileyixie
