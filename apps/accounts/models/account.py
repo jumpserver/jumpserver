@@ -28,5 +28,21 @@ class Account(CommonModelMixin, OrgModelMixin):
         return self.name
 
     def save(self, *args, **kwargs):
-        self.secret = ''
-        return super().save(*args, **kwargs)
+        secret, self.secret = self.secret, ''
+        super().save(*args, **kwargs)
+        self._save_secret(secret)
+
+    def _save_secret(self, secret):
+        if not secret:
+            return
+        from ..backends import storage
+        secret_data = {'secret': secret}
+        storage.update_or_create(account=self, secret_data=secret_data)
+
+    def delete(self, using=None, keep_parents=False):
+        super().delete(using=using, keep_parents=keep_parents)
+        self._delete_secret()
+
+    def _delete_secret(self):
+        from ..backends import storage
+        storage.delete_secret(account=self)

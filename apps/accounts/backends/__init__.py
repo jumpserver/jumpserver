@@ -4,7 +4,8 @@ from django.conf import settings
 from django.utils.functional import LazyObject
 
 
-def get_account_storage_backend():
+def get_storage_backend():
+    """ 获取账号存储 backend """
     config = settings.ACCOUNT_STORAGE_BACKEND
     engine_module = config.get('ENGINE')
     engine_config = config.get('CONFIG')
@@ -16,7 +17,7 @@ def get_account_storage_backend():
 @singleton
 class StorageBackend(LazyObject):
     def _setup(self):
-        self._wrapped = get_account_storage_backend()
+        self._wrapped = get_storage_backend()
 
 
-storage_backend = StorageBackend()
+storage = StorageBackend()

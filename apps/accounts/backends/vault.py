@@ -38,15 +38,18 @@ class VaultBackend(BaseBackends):
             mount_point=self.secrets_engine_path
         )
 
+    def update_secret(self, account, secret_data: dict):
+        return self.create_secret(account, secret_data)
+
+    def update_or_create(self, account, secret_data: dict):
+        return self.create_secret(account, secret_data)
+
     def create_secret(self, account, secret_data: dict):
         path = self.construct_path_of_account(account)
         response = self.client.secrets.kv.v2.create_or_update_secret(
             path=path, secret=secret_data, mount_point=self.secrets_engine_path
         )
         return response
-
-    def update_secret(self, account, secret_data: dict):
-        return self.create_secret(account, secret_data)
 
     def delete_secret(self, account):
         path = self.construct_path_of_account(account)
@@ -56,6 +59,7 @@ class VaultBackend(BaseBackends):
         )
 
     def undelete_secret(self, account):
+        """ The reserved interface """
         path = self.construct_path_of_account(account)
         versions = self.get_secret_versions(account)
         self.client.secrets.kv.v2.undelete_secret_versions(
