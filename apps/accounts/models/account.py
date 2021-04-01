@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -27,6 +28,22 @@ class Account(CommonModelMixin, OrgModelMixin):
     def __str__(self):
         return self.name
 
+    def delete(self, using=None, keep_parents=False):
+        # 提前保存ID值
+        _id = uuid.UUID(str(self.id))
+        super().delete(using=using, keep_parents=keep_parents)
+
+        self.id = _id
+        self._delete_secret()
+
+    def _delete_secret(self):
+        from ..backends import storage
+        storage.delete_secret(account=self)
+
+    def _undelete_secret(self, account_id):
+        from ..backends import storage
+        storage.undelete_secret(account=self)
+
     def save(self, *args, **kwargs):
         secret, self.secret = self.secret, ''
         super().save(*args, **kwargs)
@@ -36,13 +53,32 @@ class Account(CommonModelMixin, OrgModelMixin):
         if not secret:
             return
         from ..backends import storage
-        secret_data = {'secret': secret}
+        secret_data = self._package_secret(secret)
         storage.update_or_create(account=self, secret_data=secret_data)
 
-    def delete(self, using=None, keep_parents=False):
-        super().delete(using=using, keep_parents=keep_parents)
-        self._delete_secret()
-
-    def _delete_secret(self):
+    def read_secret(self, version=None):
         from ..backends import storage
-        storage.delete_secret(account=self)
+        secret_data = storage.read_secret(account=self, version=version)
+        secret = self._unpack_secret_data(secret_data)
+        return secret
+
+    def get_secret_versions(self):
+        from ..backends import storage
+        versions = storage.get_secret_versions(account=self)
+        return versions
+
+    storage_key_of_secret_field = 'secret'
+
+    def _package_secret(self, secret):
+        """ 打包 secret """
+        secret_data = {
+            self.storage_key_of_secret_field: secret
+        }
+        return secret_data
+
+    def _unpack_secret_data(self, secret_data: dict):
+        """ 解包 secret_data """
+        secret = secret_data.get(self.storage_key_of_secret_field)
+        return secret
+
+

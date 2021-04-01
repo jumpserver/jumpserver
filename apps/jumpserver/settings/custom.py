@@ -126,6 +126,7 @@ ACCOUNT_STORAGE_BACKEND = {
     'CONFIG': {
         'url': CONFIG.VAULT_URL,
         'token': CONFIG.VAULT_TOKEN,
-        'secrets_engine_path': CONFIG.VAULT_ENGINE_PATH,
+        'secrets_engine_path': CONFIG.VAULT_SECRETS_ENGINE_PATH,
+        'secrets_max_versions': CONFIG.VAULT_SECRETS_MAX_VERSIONS,
     }
 }
