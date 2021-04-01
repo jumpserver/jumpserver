@@ -43,3 +43,6 @@ urlpatterns = [
     path('openid/', include(('jms_oidc_rp.urls', 'authentication'), namespace='openid')),
     path('captcha/', include('captcha.urls')),
 ]
+
+#   sdsfd
+# sdfdsfd
