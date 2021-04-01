@@ -221,7 +221,8 @@ class NodeAddChildrenApi(generics.UpdateAPIView):
     serializer_class = serializers.NodeAddChildrenSerializer
     instance = None
 
-    def put(self, request, *args, **kwargs):
+    def update(self, request, *args, **kwargs):
+        """ 同时支持 put 和 patch 方法"""
         instance = self.get_object()
         node_ids = request.data.get("nodes")
         children = Node.objects.filter(id__in=node_ids)
