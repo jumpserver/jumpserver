@@ -36,7 +36,7 @@ class AccountSerializer(BulkOrgResourceModelSerializer):
             account_type = get_object_or_none(AccountType, name=tp)
 
         if account_type:
-            serializer_class = account_type.construct_serializer_cls_by_fields_definition()
+            serializer_class = account_type.construct_serializer_class_for_fields_definition()
             serializer = serializer_class()
         else:
             serializer = serializers.JSONField()

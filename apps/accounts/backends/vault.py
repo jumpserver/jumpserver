@@ -64,20 +64,20 @@ class VaultBackend(BaseBackends):
         return response
 
     def delete_secret(self, account):
-        path = self.construct_path_of_account(account)
         versions = self.get_secret_versions(account)
         if not versions:
             return
+        path = self.construct_path_of_account(account)
         self.client.secrets.kv.v2.delete_secret_versions(
             path=path, versions=versions, mount_point=self.secrets_engine_path,
         )
 
     def undelete_secret(self, account):
         """ The reserved interface """
-        path = self.construct_path_of_account(account)
         versions = self.get_secret_versions(account)
         if not versions:
             return
+        path = self.construct_path_of_account(account)
         self.client.secrets.kv.v2.undelete_secret_versions(
             path=path, versions=versions, mount_point=self.secrets_engine_path,
         )
@@ -88,10 +88,10 @@ class VaultBackend(BaseBackends):
             response = self.client.secrets.kv.v2.read_secret_version(
                 path=path, version=version, mount_point=self.secrets_engine_path,
             )
+            secret_data = response.get('data', {}).get('data', {})
         except exceptions.InvalidPath as e:
             logger.error('Read secret error: {}'.format(str(e)))
-            return {}
-        secret_data = response.get('data', {}).get('data', {})
+            secret_data = {}
         return secret_data
 
     def get_secret_versions(self, account):
@@ -117,9 +117,7 @@ class VaultBackend(BaseBackends):
     @staticmethod
     def construct_path_of_account(account: Account):
         path_of_list = [
-            'organization_{}'.format(str(account.org_id)),
-            'safe_{}'.format(str(account.safe_id)),
-            'account_{}'.format(str(account.id))
+            f'organization_{account.org_id}', f'safe_{account.safe_id}', f'account_{account.id}'
         ]
         path = '/'.join(path_of_list)
         return path

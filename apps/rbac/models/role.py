@@ -67,7 +67,7 @@ class Role(CommonModelMixin):
         return permissions
 
     @classmethod
-    def initial_builtin_role(cls):
+    def test_initial_builtin_role(cls):
         """ 初始化内建角色 """
         # safe_admin
         safe_admin_role_name = 'safe_admin'

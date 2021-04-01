@@ -46,32 +46,36 @@ class AccountType(CommonModelMixin, models.Model):
     def __str__(self):
         return self.name
 
-    def construct_serializer_cls_by_fields_definition(self):
+    def construct_serializer_class_for_fields_definition(self):
         from rest_framework import serializers
-        from ..const import FieldDefinitionTypeChoices
-        fields_definition = copy.deepcopy(self.fields_definition)
-
-        serializer_fields = {}
-        for field_kwargs in fields_definition:
-            field_type = field_kwargs.pop('type', None)
-            # default
-            field_default = field_kwargs.get('default', '')
-            if field_type == FieldDefinitionTypeChoices.integer:
-                if field_default and field_default.isdigit():
-                    field_kwargs['default'] = int(field_default)
-            # Some combinations of keyword arguments do not make sense.
-            if field_kwargs.get('write_only', False):
-                field_kwargs.pop('read_only', None)
-            if field_kwargs.get('read_only', False):
-                field_kwargs.pop('required', None)
-            if field_kwargs.get('required', False):
-                field_kwargs.pop('default', None)
-            field_class = FieldDefinitionTypeChoices.get_serializer_field_class(field_type)
-            field_name = field_kwargs.pop('name')
-            serializer_fields[field_name] = field_class(**field_kwargs)
-        cls_name = 'AccountTypeFieldsDefinitionSerializer'
-        serializer_class = type(cls_name, (serializers.Serializer, ), serializer_fields)
+        fields = self._construct_serializer_class_fields()
+        serializer_class = type(
+            'AccountTypeFieldsDefinitionSerializer', (serializers.Serializer, ), fields
+        )
         return serializer_class
+
+    def _construct_serializer_class_fields(self):
+        from ..const import FieldDefinitionTypeChoices
+        fields = {}
+        for field_definition in copy.deepcopy(self.fields_definition):
+            name = field_definition.pop('name')
+            tp = field_definition.pop('type')
+            field_class = FieldDefinitionTypeChoices.get_serializer_field_class(tp=tp)
+            # Integer type
+            if tp == FieldDefinitionTypeChoices.integer:
+                default = field_definition.get('default')
+                if isinstance(default, str) and default.isdigit():
+                    field_definition['default'] = int(default)
+            # Some combinations of keyword arguments do not make sense.
+            if field_definition.get('write_only', False):
+                field_definition.pop('read_only', None)
+            if field_definition.get('read_only', False):
+                field_definition.pop('required', None)
+            if field_definition.get('required', False):
+                field_definition.pop('default', None)
+
+            fields[name] = field_class(**field_definition)
+        return fields
 
     @classmethod
     def initial_builtin_type(cls):

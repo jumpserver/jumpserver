@@ -11,16 +11,14 @@ def add_default_builtin_role(apps, schema_editor):
     contenttypes_model = apps.get_model('contenttypes', 'ContentType')
     db_alias = schema_editor.connection.alias
 
-    contenttypes_ids = list(
-        contenttypes_model.objects.using(db_alias).filter(
-            app_label='accounts', model__in=['account', 'safe']
-        ).values_list('id', flat=True)
-    )
+    contenttypes_ids = contenttypes_model.objects.using(db_alias)\
+        .filter(app_label='accounts', model__in=['account', 'safe'])\
+        .values_list('id', flat=True)
+    contenttypes_ids = list(contenttypes_ids)
     print('content_type_ids: {}'.format(contenttypes_ids))
 
-    auth_permissions = auth_permissions_model.objects.using(db_alias).filter(
-        content_type__in=contenttypes_ids
-    )
+    auth_permissions = auth_permissions_model.objects.using(db_alias)\
+        .filter(content_type__in=contenttypes_ids)
     print('auth_permissions: {}'.format(auth_permissions.values_list('codename', flat=True)))
 
     role_model = apps.get_model('rbac', 'Role')
