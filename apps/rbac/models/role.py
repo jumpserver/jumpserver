@@ -15,7 +15,7 @@ class RoleTypeChoices(models.TextChoices):
     @classmethod
     def get_apps_models_mapping_for_safe(cls):
         return {
-            'accounts': ['safe', 'account']
+            'accounts': ['account']
         }
 
     @classmethod
