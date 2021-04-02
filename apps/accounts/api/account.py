@@ -10,6 +10,7 @@ __all__ = ['AccountViewSet']
 
 class SafeViewSetMixin(object):
     model = None
+    permission_classes = (SafeRolePermission, )
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -63,7 +64,6 @@ class SafeViewSetMixin(object):
 
 
 class AccountViewSet(SafeViewSetMixin, OrgBulkModelViewSet):
-    permission_classes = (SafeRolePermission, )
     serializer_class = serializers.AccountSerializer
     model = Account
     filterset_fields = {
