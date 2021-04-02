@@ -50,7 +50,7 @@ def get_model_content_type(view):
     return content_type
 
 
-def construct_request_permission_codename(request, view):
+def construct_request_permission_codename(view):
     action = convert_action(view.action)
     model = get_model_name(view)
     codename = f'{action}_{model}'
@@ -59,7 +59,23 @@ def construct_request_permission_codename(request, view):
 
 class SafeRolePermission(permissions.IsAuthenticated, permissions.BasePermission):
 
-    def has_permission_for_safe(self, request, view, safe: Safe):
+    def has_permission(self, request, view):
+        safe_id = request.data.get('safe')
+        if not safe_id:
+            safe_id = request.META.get("HTTP_X_JMS_SAFE")
+        if not safe_id:
+            safe_id = request.query_params.get('safe')
+        if not safe_id:
+            return False
+        safe = get_object_or_404(Safe, id=safe_id)
+        return self.has_permission_for_safe(request, view, safe)
+
+    def has_object_permission(self, request, view, obj):
+        assert hasattr(obj, 'safe'), f'{obj} object does not have `safe` attribute'
+        return self.has_permission_for_safe(request, view, obj.safe)
+
+    @staticmethod
+    def has_permission_for_safe(request, view, safe: Safe):
         safe_role_bindings = SafeRoleBinding.objects.filter(user=request.user, safe=safe)
         roles_ids = set(list(safe_role_bindings.values_list('role_id', flat=True)))
         if not roles_ids:
@@ -70,7 +86,7 @@ class SafeRolePermission(permissions.IsAuthenticated, permissions.BasePermission
         if not permissions_ids:
             return False
 
-        codename = construct_request_permission_codename(request, view)
+        codename = construct_request_permission_codename(view)
         content_type = get_model_content_type(view)
         has_permission = Permission.objects \
             .filter(id__in=permissions_ids, codename=codename, content_type=content_type) \
@@ -79,23 +95,3 @@ class SafeRolePermission(permissions.IsAuthenticated, permissions.BasePermission
             return False
 
         return True
-
-    def has_permission(self, request, view):
-        # create
-        action = convert_action(view.action)
-        if action == 'add':
-            safe_id = request.data.get('safe')
-        elif action == 'view':
-            safe_id = request.query_params.get('safe')
-        else:
-            return True
-
-        safe = get_object_or_404(Safe, id=safe_id)
-        return self.has_permission_for_safe(request, view, safe)
-
-    def has_object_permission(self, request, view, obj):
-        assert hasattr(obj, 'safe'), f'{obj} object does not have `safe` attribute'
-        return self.has_permission_for_safe(request, view, obj.safe)
-
-
-
