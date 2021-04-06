@@ -18,6 +18,7 @@ from django.shortcuts import reverse
 
 from orgs.utils import current_org
 from orgs.models import OrganizationMember, Organization
+from rbac.models import SafeRoleBinding
 from common.utils import date_expired_default, get_logger, lazyproperty, random_string
 from common import fields
 from common.const import choices
