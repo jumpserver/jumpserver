@@ -113,7 +113,7 @@ class AuthMixin:
         if self.public_key:
             public_key = self.public_key
         elif self.private_key:
-            public_key = ssh_pubkey_gen(self.private_key, self.password)
+            public_key = ssh_pubkey_gen(private_key=self.private_key, password=self.password)
         else:
             return ''
 
