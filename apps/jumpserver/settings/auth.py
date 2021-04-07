@@ -107,7 +107,7 @@ LOGIN_CONFIRM_ENABLE = CONFIG.LOGIN_CONFIRM_ENABLE
 OTP_IN_RADIUS = CONFIG.OTP_IN_RADIUS
 
 
-AUTH_BACKEND_MODEL = 'authentication.backends.django.ModelBackend'
+AUTH_BACKEND_MODEL = 'django.contrib.auth.backends.ModelBackend'
 AUTH_BACKEND_PUBKEY = 'authentication.backends.pubkey.PublicKeyAuthBackend'
 AUTH_BACKEND_RBAC = 'rbac.backends.RBACBackends'
 AUTH_BACKEND_LDAP = 'authentication.backends.ldap.LDAPAuthorizationBackend'
