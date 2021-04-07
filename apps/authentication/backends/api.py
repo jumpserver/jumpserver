@@ -15,7 +15,6 @@ from common.auth import signature
 
 from common.utils import get_object_or_none, make_signature, http_to_unixtime
 from ..models import AccessKey, PrivateToken
-from .mixins import ModelBackendMixin
 
 
 def get_request_date_header(request):
@@ -199,7 +198,7 @@ class SignatureAuthentication(signature.SignatureAuthentication):
             return None, None
 
 
-class SSOAuthentication(ModelBackendMixin, ModelBackend):
+class SSOAuthentication(ModelBackend):
     """
     什么也不做呀😺
     """

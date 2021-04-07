@@ -1,4 +1,5 @@
 import json
+from django.core.exceptions import PermissionDenied
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import Permission
 from django.contrib.auth.backends import ModelBackend
@@ -20,25 +21,28 @@ class RBACBackends(ModelBackend):
         if safe_id:
             role_bindings = SafeRoleBinding.objects.filter(user=user_obj, safe_id=safe_id)
         elif org_id:
-            return False  # OrgRoleBinding
+            raise PermissionDenied  # TODO: OrgRoleBinding
         else:
-            return False  # SystemRoleBinding
+            raise PermissionDenied  # TODO: SystemRoleBinding
 
         roles_ids = set(list(role_bindings.values_list('role_id', flat=True)))
         if not roles_ids:
-            return False
+            raise PermissionDenied
 
         roles_permissions = Role.permissions.through.objects.filter(role_id__in=roles_ids)
         permissions_ids = set(list(roles_permissions.values_list('permission_id', flat=True)))
         if not permissions_ids:
-            return False
+            raise PermissionDenied
 
         codename = '{}_{}'.format(action, model_name)
         content_type = ContentType.objects.get(app_label=app_label, model=model_name)
         has_permission = Permission.objects.filter(
             id__in=permissions_ids, codename=codename, content_type=content_type
         ).exists()
-        return has_permission
+        if not has_permission:
+            raise PermissionDenied
+
+        return True
 
     def has_module_perms(self, user_obj, app_label):
         return True
