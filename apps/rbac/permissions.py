@@ -1,10 +1,11 @@
 import json
+from django.utils.translation import ugettext_lazy as _
 from rest_framework.permissions import IsAuthenticated, BasePermission
 from .utils import convert_action
 
 
 class IsNotBuiltIn(BasePermission):
-    message = 'Cannot update/delete built-in objects'
+    message = _('Cannot update/delete built-in objects')
 
     def has_object_permission(self, request, view, obj):
         return not obj.is_builtin

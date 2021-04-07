@@ -1,7 +1,5 @@
-from django.utils.translation import ugettext_lazy as _
 from common.drf.api import JMSBulkModelViewSet
 from common.permissions import IsSuperUser
-from common.exceptions import JMSException
 from ..permissions import IsNotBuiltIn
 from .. import serializers
 from ..models import Role
