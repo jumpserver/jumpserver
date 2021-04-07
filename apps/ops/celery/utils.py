@@ -72,6 +72,7 @@ def create_or_update_celery_periodic_tasks(tasks):
             crontab=crontab,
             name=name,
             task=detail['task'],
+            enabled=detail.get('enabled', True),
             args=json.dumps(detail.get('args', [])),
             kwargs=json.dumps(detail.get('kwargs', {})),
             description=detail.get('description') or ''
