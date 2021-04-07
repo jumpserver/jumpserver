@@ -12,6 +12,8 @@ class UserPermissionApi(UserQuerysetMixin, generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         data = {
             'safe': self.get_safe_permissions(),
+            # 'org': self.get_org_permissions(),
+            # 'system': self.get_system_permissions(),
         }
         return Response(data)
 
