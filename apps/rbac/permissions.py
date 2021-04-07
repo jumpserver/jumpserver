@@ -1,7 +1,5 @@
-from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
+import json
 from rest_framework.permissions import IsAuthenticated, BasePermission
-from .models import Role, SafeRoleBinding
 
 
 class SafeRolePermission(IsAuthenticated, BasePermission):
@@ -14,10 +12,6 @@ class SafeRolePermission(IsAuthenticated, BasePermission):
 
     @classmethod
     def check_user_permission(cls, user, safe, model, view_action):
-        # action + model -> codename
-        # app + model -> content_type
-        # User + Safe -> RoleBinding -> Role -> Permission
-        # codename + content_type -> permission
         def convert_action():
             if view_action in ['create']:
                 return 'add'
@@ -28,23 +22,9 @@ class SafeRolePermission(IsAuthenticated, BasePermission):
             if view_action in ['destroy', 'bulk_destroy']:
                 return 'delete'
             return view_action
-
-        role_bindings = SafeRoleBinding.objects.filter(user=user, safe=safe)
-        roles_ids = set(list(role_bindings.values_list('role_id', flat=True)))
-        if not roles_ids:
-            return False
-
-        permissions = Role.permissions.through.objects.filter(role_id__in=roles_ids)
-        permissions_ids = set(list(permissions.values_list('permission_id', flat=True)))
-        if not permissions_ids:
-            return False
-
-        action = convert_action()
-        codename = '{}_{}'.format(action, model._meta.model_name)
-        content_type = ContentType.objects.get(
-            app_label=model._meta.app_label, model=model._meta.model_name
-        )
-        has_permission = Permission.objects.filter(
-            id__in=permissions_ids, codename=codename, content_type=content_type
-        ).exists()
-        return has_permission
+        perm_dict = {
+            'safe': str(safe.id), 'app_label': model._meta.app_label, 'action': convert_action(),
+            'model_name': model._meta.model_name,
+        }
+        perm = json.dumps(perm_dict)
+        return user.has_perm(perm)

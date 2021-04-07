@@ -63,8 +63,9 @@ class Role(CommonModelMixin):
         return self.name
 
     def get_permissions_display(self):
-        permissions = list(self.permissions.all().values_list('name', flat=True))
-        return permissions
+        perms = self.permissions.all().values_list('content_type__app_label', 'codename')
+        perms = ['{}.{}'.format(perm[0], perm[1]) for perm in perms.order_by()]
+        return perms
 
     @classmethod
     def test_initial_builtin_role(cls):

@@ -508,7 +508,11 @@ class MFAMixin:
         return False, None
 
 
-class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
+class PermissionsMixin:
+    pass
+
+
+class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, PermissionsMixin, AbstractUser):
     class Source(TextChoices):
         local = 'local', _('Local')
         ldap = 'ldap', 'LDAP/AD'
