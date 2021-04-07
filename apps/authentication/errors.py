@@ -31,7 +31,7 @@ reason_choices = {
     reason_user_invalid: _('Disabled or expired'),
     reason_user_inactive: _("This account is inactive."),
     reason_backend_not_match: _("Auth backend not match"),
-    reason_acl_not_allow: _("ACL is not allowed")
+    reason_acl_not_allow: _("ACL is not allowed"),
 }
 old_reason_choices = {
     '0': '-',
@@ -182,6 +182,28 @@ class MFARequiredError(NeedMoreInfoError):
                 'url': reverse('api-auth:mfa-challenge')
             }
         }
+
+
+class ACLError(AuthFailedNeedLogMixin, AuthFailedError):
+    msg = reason_acl_not_allow
+    error = 'acl_error'
+
+    def __init__(self, msg, **kwargs):
+        self.msg = msg
+        super().__init__(**kwargs)
+
+    def as_data(self):
+        return {
+            "error": reason_acl_not_allow,
+            "msg": self.msg
+        }
+
+
+class LoginIPNotAllowed(ACLError):
+    def __init__(self, username, request, **kwargs):
+        self.username = username
+        self.request = request
+        super().__init__(_("IP is not allowed"), **kwargs)
 
 
 class LoginConfirmBaseError(NeedMoreInfoError):

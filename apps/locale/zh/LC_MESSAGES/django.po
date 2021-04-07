@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-07 11:14+0800\n"
+"POT-Creation-Date: 2021-04-07 18:15+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -36,7 +36,7 @@ msgstr ""
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
 #: orgs/models.py:23 perms/models/base.py:49 settings/models.py:29
 #: terminal/models/storage.py:23 terminal/models/storage.py:81
-#: terminal/models/task.py:16 terminal/models/terminal.py:139
+#: terminal/models/task.py:16 terminal/models/terminal.py:99
 #: users/forms/profile.py:32 users/models/group.py:15 users/models/user.py:530
 #: users/templates/users/_select_user_modal.html:13
 #: users/templates/users/user_asset_permission.html:37
@@ -83,7 +83,7 @@ msgstr "激活中"
 #: assets/models/group.py:23 assets/models/label.py:23 ops/models/adhoc.py:37
 #: orgs/models.py:26 perms/models/base.py:57 settings/models.py:34
 #: terminal/models/storage.py:29 terminal/models/storage.py:87
-#: terminal/models/terminal.py:153 tickets/models/ticket.py:73
+#: terminal/models/terminal.py:113 tickets/models/ticket.py:73
 #: users/models/group.py:16 users/models/user.py:563
 #: users/templates/users/user_detail.html:115
 #: users/templates/users/user_granted_database_app.html:38
@@ -366,15 +366,15 @@ msgstr "删除失败，存在关联资产"
 msgid "Number required"
 msgstr "需要为数字"
 
-#: assets/api/node.py:64
+#: assets/api/node.py:65
 msgid "You can't update the root node name"
 msgstr "不能修改根节点名称"
 
-#: assets/api/node.py:71
+#: assets/api/node.py:72
 msgid "You can't delete the root node ({})"
 msgstr "不能删除根节点 ({})"
 
-#: assets/api/node.py:74
+#: assets/api/node.py:75
 msgid "Deletion failed and the node contains children or assets"
 msgstr "删除失败，节点包含子节点或资产"
 
@@ -1380,15 +1380,19 @@ msgstr "等待登录复核处理"
 msgid "Login confirm ticket was {}"
 msgstr "登录复核 {}"
 
-#: authentication/errors.py:217
+#: authentication/errors.py:206
+msgid "IP is not allowed"
+msgstr "来源 IP 不被允许登录"
+
+#: authentication/errors.py:239
 msgid "SSO auth closed"
 msgstr "SSO 认证关闭了"
 
-#: authentication/errors.py:222 authentication/views/login.py:235
+#: authentication/errors.py:244 authentication/views/login.py:235
 msgid "Your password is too simple, please change it for security"
 msgstr "你的密码过于简单，为了安全，请修改"
 
-#: authentication/errors.py:231 authentication/views/login.py:250
+#: authentication/errors.py:253 authentication/views/login.py:250
 msgid "Your password has expired, please reset before logging in"
 msgstr "您的密码已过期，先修改再登录"
 
@@ -2258,7 +2262,7 @@ msgstr "全局启用 MFA 认证"
 
 #: settings/serializers/settings.py:133
 msgid "All user enable MFA"
-msgstr "强制每个启用多因子认证"
+msgstr "强制所有用户启用多因子认证"
 
 #: settings/serializers/settings.py:136
 msgid "Batch command execution"
@@ -2996,6 +3000,10 @@ msgstr "较高"
 msgid "Normal"
 msgstr "正常"
 
+#: terminal/const.py:34
+msgid "Offline"
+msgstr ""
+
 #: terminal/exceptions.py:8
 msgid "Bulk create not support"
 msgstr "不支持批量创建"
@@ -3016,27 +3024,31 @@ msgstr "回放"
 msgid "Date end"
 msgstr "结束日期"
 
-#: terminal/models/status.py:13
+#: terminal/models/status.py:18
 msgid "Session Online"
 msgstr "在线会话"
 
-#: terminal/models/status.py:14
-msgid "CPU Usage"
-msgstr "CPU使用"
+#: terminal/models/status.py:19
+msgid "CPU Load"
+msgstr "CPU负载"
 
-#: terminal/models/status.py:15
+#: terminal/models/status.py:20
 msgid "Memory Used"
 msgstr "内存使用"
 
-#: terminal/models/status.py:16
+#: terminal/models/status.py:21
+msgid "Disk Used"
+msgstr "磁盘使用"
+
+#: terminal/models/status.py:22
 msgid "Connections"
 msgstr "连接数"
 
-#: terminal/models/status.py:17
+#: terminal/models/status.py:23
 msgid "Threads"
 msgstr "线程数"
 
-#: terminal/models/status.py:18
+#: terminal/models/status.py:24
 msgid "Boot Time"
 msgstr "运行时间"
 
@@ -3044,45 +3056,29 @@ msgstr "运行时间"
 msgid "Args"
 msgstr "参数"
 
-#: terminal/models/terminal.py:142
+#: terminal/models/terminal.py:102
 msgid "type"
 msgstr "类型"
 
-#: terminal/models/terminal.py:144
+#: terminal/models/terminal.py:104
 msgid "Remote Address"
 msgstr "远端地址"
 
-#: terminal/models/terminal.py:145
+#: terminal/models/terminal.py:105
 msgid "SSH Port"
 msgstr "SSH端口"
 
-#: terminal/models/terminal.py:146
+#: terminal/models/terminal.py:106
 msgid "HTTP Port"
 msgstr "HTTP端口"
 
-#: terminal/models/terminal.py:147
+#: terminal/models/terminal.py:107
 msgid "Command storage"
 msgstr "命令存储"
 
-#: terminal/models/terminal.py:148
+#: terminal/models/terminal.py:108
 msgid "Replay storage"
 msgstr "录像存储"
-
-#: terminal/serializers/components.py:9
-msgid "System cpu load (1 minutes)"
-msgstr "系统CPU负载 (1分钟)"
-
-#: terminal/serializers/components.py:12
-msgid "System memory used percent"
-msgstr "系统内存使用百分比"
-
-#: terminal/serializers/components.py:15
-msgid "System disk used percent"
-msgstr "系统磁盘使用百分比"
-
-#: terminal/serializers/components.py:19
-msgid "Session active count"
-msgstr "活跃会话数量"
 
 #: terminal/serializers/session.py:30
 msgid "User ID"
@@ -3169,18 +3165,22 @@ msgstr "索引"
 msgid "Doc type"
 msgstr "文档类型"
 
-#: terminal/serializers/terminal.py:47 terminal/serializers/terminal.py:55
+#: terminal/serializers/storage.py:185
+msgid "Ignore Certificate Verification"
+msgstr ""
+
+#: terminal/serializers/terminal.py:66 terminal/serializers/terminal.py:74
 msgid "Not found"
 msgstr "没有发现"
 
-#: terminal/utils.py:79
+#: terminal/utils.py:78
 #, python-format
 msgid ""
 "Insecure Command Alert: [%(name)s->%(login_from)s@%(remote_addr)s] $"
 "%(command)s"
 msgstr "危险命令告警: [%(name)s->%(login_from)s@%(remote_addr)s] $%(command)s"
 
-#: terminal/utils.py:87
+#: terminal/utils.py:86
 #, python-format
 msgid ""
 "\n"
@@ -3209,12 +3209,12 @@ msgstr ""
 "        <br>\n"
 "        "
 
-#: terminal/utils.py:114
+#: terminal/utils.py:113
 #, python-format
 msgid "Insecure Web Command Execution Alert: [%(name)s]"
 msgstr "Web页面-> 命令执行 告警: [%(name)s]"
 
-#: terminal/utils.py:122
+#: terminal/utils.py:121
 #, python-format
 msgid ""
 "\n"
@@ -5142,6 +5142,21 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "CPU Usage"
+#~ msgstr "CPU使用"
+
+#~ msgid "System cpu load (1 minutes)"
+#~ msgstr "系统CPU负载 (1分钟)"
+
+#~ msgid "System memory used percent"
+#~ msgstr "系统内存使用百分比"
+
+#~ msgid "System disk used percent"
+#~ msgstr "系统磁盘使用百分比"
+
+#~ msgid "Session active count"
+#~ msgstr "活跃会话数量"
 
 #~ msgid "Root organization only allow view and delete"
 #~ msgstr "全局组织仅支持 查看和删除"
