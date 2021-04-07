@@ -11,10 +11,12 @@ from django_auth_ldap.config import _LDAPConfig, LDAPSearch, LDAPSearchUnion
 from users.utils import construct_user_email
 from common.const import LDAP_AD_ACCOUNT_DISABLE
 
+from .mixins import ModelBackendMixin
+
 logger = _LDAPConfig.get_logger()
 
 
-class LDAPAuthorizationBackend(LDAPBackend):
+class LDAPAuthorizationBackend(ModelBackendMixin, LDAPBackend):
     """
     Override this class to override _LDAPUser to LDAPUser
     """

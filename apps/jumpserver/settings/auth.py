@@ -107,17 +107,18 @@ LOGIN_CONFIRM_ENABLE = CONFIG.LOGIN_CONFIRM_ENABLE
 OTP_IN_RADIUS = CONFIG.OTP_IN_RADIUS
 
 
-AUTH_BACKEND_MODEL = 'django.contrib.auth.backends.ModelBackend'
+AUTH_BACKEND_MODEL = 'authentication.backends.django.ModelBackend'
 AUTH_BACKEND_PUBKEY = 'authentication.backends.pubkey.PublicKeyAuthBackend'
+AUTH_BACKEND_RBAC = 'rbac.backends.RBACBackends'
 AUTH_BACKEND_LDAP = 'authentication.backends.ldap.LDAPAuthorizationBackend'
-AUTH_BACKEND_OIDC_PASSWORD = 'jms_oidc_rp.backends.OIDCAuthPasswordBackend'
-AUTH_BACKEND_OIDC_CODE = 'jms_oidc_rp.backends.OIDCAuthCodeBackend'
+AUTH_BACKEND_OIDC_PASSWORD = 'authentication.backends.OIDCAuthPasswordBackend'
+AUTH_BACKEND_OIDC_CODE = 'authentication.backends.OIDCAuthCodeBackend'
 AUTH_BACKEND_RADIUS = 'authentication.backends.radius.RadiusBackend'
 AUTH_BACKEND_CAS = 'authentication.backends.cas.CASBackend'
 AUTH_BACKEND_SSO = 'authentication.backends.api.SSOAuthentication'
 
 
-AUTHENTICATION_BACKENDS = [AUTH_BACKEND_MODEL, AUTH_BACKEND_PUBKEY]
+AUTHENTICATION_BACKENDS = [AUTH_BACKEND_MODEL, AUTH_BACKEND_PUBKEY, AUTH_BACKEND_RBAC]
 
 if AUTH_CAS:
     AUTHENTICATION_BACKENDS.insert(0, AUTH_BACKEND_CAS)
