@@ -230,6 +230,7 @@ class Config(dict):
         'TERMINAL_COMMAND_STORAGE': {},
 
         'SECURITY_MFA_AUTH': False,
+        'SOURCE_WITHOUT_SECURITY_MFA_AUTH': 'notSelect',
         'SECURITY_COMMAND_EXECUTION': True,
         'SECURITY_SERVICE_ACCOUNT_REGISTRATION': True,
         'SECURITY_VIEW_AUTH_NEED_MFA': True,

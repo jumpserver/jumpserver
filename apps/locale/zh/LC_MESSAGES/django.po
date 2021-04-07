@@ -2247,60 +2247,72 @@ msgstr ""
 msgid "Telnet login regex"
 msgstr "Telnet 成功正则表达式"
 
-#: settings/serializers/settings.py:132
+#: settings/serializers/settings.py:133
+msgid "Not Select"
+msgstr "不选择"
+
+#: settings/serializers/settings.py:141
 msgid "Global MFA auth"
 msgstr "全局启用 MFA 认证"
 
-#: settings/serializers/settings.py:133
+#: settings/serializers/settings.py:142
 msgid "All user enable MFA"
 msgstr "强制所有用户启用多因子认证"
 
-#: settings/serializers/settings.py:136
+#: settings/serializers/settings.py:147
+msgid "Source disable MFA"
+msgstr "不强制启用 MFA 认证的用户源"
+
+#: settings/serializers/settings.py:148
+msgid "Disable MFA for users of selected source when Global MFA auth checked"
+msgstr "当全局启用 MFA 认证时，所选用户源的用户不强制启用 MFA"
+
+#: settings/serializers/settings.py:151
 msgid "Batch command execution"
 msgstr "批量命令执行"
 
-#: settings/serializers/settings.py:137
+#: settings/serializers/settings.py:152
 msgid "Allow user run batch command or not using ansible"
 msgstr "是否允许用户使用 ansible 执行批量命令"
 
-#: settings/serializers/settings.py:140
+#: settings/serializers/settings.py:155
 msgid "Enable terminal register"
 msgstr "终端注册"
 
-#: settings/serializers/settings.py:141
+#: settings/serializers/settings.py:156
 msgid ""
 "Allow terminal register, after all terminal setup, you should disable this "
 "for security"
 msgstr "是否允许终端注册，当所有终端启动后，为了安全应该关闭"
 
-#: settings/serializers/settings.py:145
+#: settings/serializers/settings.py:160
 msgid "Limit the number of login failures"
 msgstr "限制登录失败次数"
 
-#: settings/serializers/settings.py:149
+#: settings/serializers/settings.py:164
 msgid "Block logon interval"
 msgstr "禁止登录时间间隔"
 
-#: settings/serializers/settings.py:150
+#: settings/serializers/settings.py:165
 msgid ""
 "Tip: (unit/minute) if the user has failed to log in for a limited number of "
 "times, no login is allowed during this time interval."
 msgstr ""
 "提示：（单位：分）当用户登录失败次数达到限制后，那么在此时间间隔内禁止登录"
 
-#: settings/serializers/settings.py:154
+#: settings/serializers/settings.py:169
 msgid "Connection max idle time"
 msgstr "连接最大空闲时间"
 
-#: settings/serializers/settings.py:155
+#: settings/serializers/settings.py:170
 msgid "If idle time more than it, disconnect connection Unit: minute"
 msgstr "提示：如果超过该配置没有操作，连接会被断开 （单位：分）"
 
-#: settings/serializers/settings.py:159
+#: settings/serializers/settings.py:174
 msgid "User password expiration"
 msgstr "用户密码过期时间"
 
-#: settings/serializers/settings.py:160
+#: settings/serializers/settings.py:175
 msgid ""
 "Tip: (unit: day) If the user does not update the password during the time, "
 "the user password will expire failure;The password expiration reminder mail "
@@ -2310,35 +2322,35 @@ msgstr ""
 "提示：（单位：天）如果用户在此期间没有更新密码，用户密码将过期失效； 密码过期"
 "提醒邮件将在密码过期前5天内由系统（每天）自动发送给用户"
 
-#: settings/serializers/settings.py:164
+#: settings/serializers/settings.py:179
 msgid "Password minimum length"
 msgstr "密码最小长度"
 
-#: settings/serializers/settings.py:167
+#: settings/serializers/settings.py:182
 msgid "Must contain capital"
 msgstr "必须包含大写字符"
 
-#: settings/serializers/settings.py:169
+#: settings/serializers/settings.py:184
 msgid "Must contain lowercase"
 msgstr "必须包含小写字符"
 
-#: settings/serializers/settings.py:170
+#: settings/serializers/settings.py:185
 msgid "Must contain numeric"
 msgstr "必须包含数字"
 
-#: settings/serializers/settings.py:171
+#: settings/serializers/settings.py:186
 msgid "Must contain special"
 msgstr "必须包含特殊字符"
 
-#: settings/serializers/settings.py:172
+#: settings/serializers/settings.py:187
 msgid "Insecure command alert"
 msgstr "危险命令告警"
 
-#: settings/serializers/settings.py:174
+#: settings/serializers/settings.py:189
 msgid "Email recipient"
 msgstr "邮件收件人"
 
-#: settings/serializers/settings.py:175
+#: settings/serializers/settings.py:190
 msgid "Multiple user using , split"
 msgstr "多个用户，使用 , 分割"
 

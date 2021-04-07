@@ -1,5 +1,5 @@
 # coding: utf-8
-
+from django.db.models import TextChoices
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
@@ -128,9 +128,24 @@ class TerminalSettingSerializer(serializers.Serializer):
 
 
 class SecuritySettingSerializer(serializers.Serializer):
+
+    class SourceChoices(TextChoices):
+        noSelect = 'notSelect', _('Not Select')
+        local = 'local', _('Local')
+        ldap = 'ldap', 'LDAP/AD'
+        openid = 'openid', 'OpenID'
+        radius = 'radius', 'Radius'
+        cas = 'cas', 'CAS'
+
     SECURITY_MFA_AUTH = serializers.BooleanField(
         required=False, label=_("Global MFA auth"),
         help_text=_('All user enable MFA')
+    )
+    SOURCE_WITHOUT_SECURITY_MFA_AUTH = serializers.ChoiceField(
+        SourceChoices.choices,
+        required=False,
+        label=_("Source disable MFA"),
+        help_text=_("Disable MFA for users of selected source when Global MFA auth checked")
     )
     SECURITY_COMMAND_EXECUTION = serializers.BooleanField(
         required=False, label=_('Batch command execution'),

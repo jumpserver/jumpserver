@@ -453,7 +453,7 @@ class MFAMixin:
 
     @property
     def mfa_force_enabled(self):
-        if settings.SECURITY_MFA_AUTH:
+        if settings.SECURITY_MFA_AUTH and self.source != settings.SOURCE_WITHOUT_SECURITY_MFA_AUTH:
             return True
         return self.mfa_level == 2
 
