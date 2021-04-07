@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+from django.utils import timezone
 from rest_framework import serializers
 
 from common.utils import get_object_or_none
@@ -44,6 +45,10 @@ class BearerTokenSerializer(serializers.Serializer):
     def get_keyword(obj):
         return 'Bearer'
 
+    def update_last_login(self, user):
+        user.last_login = timezone.now()
+        user.save(update_fields=['last_login'])
+
     def create(self, validated_data):
         request = self.context.get('request')
         if request.user and not request.user.is_anonymous:
@@ -56,6 +61,8 @@ class BearerTokenSerializer(serializers.Serializer):
                     "user id {} not exist".format(user_id)
                 )
         token, date_expired = user.create_bearer_token(request)
+        self.update_last_login(user)
+
         instance = {
             "token": token,
             "date_expired": date_expired,
