@@ -1,6 +1,7 @@
 import copy
 from rest_framework import serializers
 from rest_framework.serializers import Serializer
+from rest_framework import serializers as s
 from rest_framework.serializers import ModelSerializer
 from rest_framework_bulk.serializers import BulkListSerializer
 
@@ -82,4 +83,37 @@ class AdaptedBulkListSerializer(BulkListSerializerMixin, BulkListSerializer):
 class CeleryTaskSerializer(serializers.Serializer):
     task = serializers.CharField(read_only=True)
 
+
+class DataSerializerGenerator:
+    type_field_mapper = {
+        'str': s.CharField,
+        'int': s.IntegerField,
+        'float': s.FloatField,
+        'list': s.ListSerializer,
+        'dict': s.DictField,
+        'bool': s.BooleanField,
+    }
+
+    @classmethod
+    def generate_field(cls, field_data):
+        """
+        :param field_data: {'type': 'str', **kwargs }
+        :return:
+        """
+        tp = field_data.get('type', 'str')
+        hidden = field_data.get('hidden')
+        if hidden:
+            serializer_field_cls = s.HiddenField
+        else:
+            serializer_field_cls = cls.type_field_mapper.get(tp, s.CharField)
+
+        valid_data = {
+            k: v for k, v in field_data.items()
+            if k not in ['type', 'hidden']
+        }
+        field = serializer_field_cls(**valid_data)
+        return field
+
+    def generate_serializer_class(self, cls_name, fields_data):
+        pass
 

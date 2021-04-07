@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 #
 """
 配置分类：
@@ -15,15 +16,12 @@ import errno
 import json
 import yaml
 from importlib import import_module
-from django.urls import reverse_lazy
-from django.templatetags.static import static
 from urllib.parse import urljoin, urlparse
-from django.utils.translation import ugettext_lazy as _
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PROJECT_DIR = os.path.dirname(BASE_DIR)
-XPACK_DIR = os.path.join(BASE_DIR, 'xpack')
-HAS_XPACK = os.path.isdir(XPACK_DIR)
+from rest_framework import serializers as s
+
+from .fieldset import FIELDSET
+from .fields import FIELDS, PROJECT_DIR
 
 
 def import_string(dotted_path):
@@ -78,6 +76,26 @@ class DoesNotExist(Exception):
     pass
 
 
+class ConfigFieldSerializerUtil:
+    type_serializer_field_mapper = {
+        'str': s.CharField,
+        'int': s.IntegerField,
+        'float': s.FloatField,
+        'list': s.ListSerializer,
+        'dict': s.DictField,
+        'bool': s.BooleanField,
+        'hidden': s.HiddenField,
+    }
+
+    @classmethod
+    def to_field(cls, field_meta):
+        tp = field_meta.get('type', 'str')
+        meta = {k: v for k, v in field_meta.items() if k != 'type'}
+        serializer_field_cls = cls.type_serializer_field_mapper.get(tp, s.CharField)
+        field = serializer_field_cls(**meta)
+        return field
+
+
 class Config(dict):
     """Works exactly like a dict but provides ways to fill it from files
     or special dictionaries.  There are two common patterns to populate the
@@ -121,174 +139,9 @@ class Config(dict):
                       the application's :attr:`~flask.Flask.root_path`.
     :param defaults: an optional dictionary of default values
     """
-    defaults = {
-        # Django Config, Must set before start
-        'SECRET_KEY': '',
-        'BOOTSTRAP_TOKEN': '',
-        'DEBUG': False,
-        'LOG_LEVEL': 'DEBUG',
-        'LOG_DIR': os.path.join(PROJECT_DIR, 'logs'),
-        'DB_ENGINE': 'mysql',
-        'DB_NAME': 'jumpserver',
-        'DB_HOST': '127.0.0.1',
-        'DB_PORT': 3306,
-        'DB_USER': 'root',
-        'DB_PASSWORD': '',
-        'REDIS_HOST': '127.0.0.1',
-        'REDIS_PORT': 6379,
-        'REDIS_PASSWORD': '',
-        # Default value
-        'REDIS_DB_CELERY': 3,
-        'REDIS_DB_CACHE': 4,
-        'REDIS_DB_SESSION': 5,
-        'REDIS_DB_WS': 6,
-
-        'SITE_URL': 'http://localhost:8080',
-        'CAPTCHA_TEST_MODE': None,
-        'TOKEN_EXPIRATION': 3600 * 24,
-        'DISPLAY_PER_PAGE': 25,
-        'DEFAULT_EXPIRED_YEARS': 70,
-        'SESSION_COOKIE_DOMAIN': None,
-        'CSRF_COOKIE_DOMAIN': None,
-        'SESSION_COOKIE_AGE': 3600 * 24,
-        'SESSION_EXPIRE_AT_BROWSER_CLOSE': False,
-        'LOGIN_URL': reverse_lazy('authentication:login'),
-
-        # Custom Config
-        # Auth LDAP settings
-        'AUTH_LDAP': False,
-        'AUTH_LDAP_SERVER_URI': 'ldap://localhost:389',
-        'AUTH_LDAP_BIND_DN': 'cn=admin,dc=jumpserver,dc=org',
-        'AUTH_LDAP_BIND_PASSWORD': '',
-        'AUTH_LDAP_SEARCH_OU': 'ou=tech,dc=jumpserver,dc=org',
-        'AUTH_LDAP_SEARCH_FILTER': '(cn=%(user)s)',
-        'AUTH_LDAP_START_TLS': False,
-        'AUTH_LDAP_USER_ATTR_MAP': {"username": "cn", "name": "sn", "email": "mail"},
-        'AUTH_LDAP_CONNECT_TIMEOUT': 10,
-        'AUTH_LDAP_SEARCH_PAGED_SIZE': 1000,
-        'AUTH_LDAP_SYNC_IS_PERIODIC': False,
-        'AUTH_LDAP_SYNC_INTERVAL': None,
-        'AUTH_LDAP_SYNC_CRONTAB': None,
-        'AUTH_LDAP_USER_LOGIN_ONLY_IN_USERS': False,
-        'AUTH_LDAP_OPTIONS_OPT_REFERRALS': -1,
-
-        # OpenID 配置参数
-        # OpenID 公有配置参数 (version <= 1.5.8 或 version >= 1.5.8)
-        'AUTH_OPENID': False,
-        'BASE_SITE_URL': None,
-        'AUTH_OPENID_CLIENT_ID': 'client-id',
-        'AUTH_OPENID_CLIENT_SECRET': 'client-secret',
-        'AUTH_OPENID_SHARE_SESSION': True,
-        'AUTH_OPENID_IGNORE_SSL_VERIFICATION': True,
-        # OpenID 新配置参数 (version >= 1.5.9)
-        'AUTH_OPENID_PROVIDER_ENDPOINT': 'https://op-example.com/',
-        'AUTH_OPENID_PROVIDER_AUTHORIZATION_ENDPOINT': 'https://op-example.com/authorize',
-        'AUTH_OPENID_PROVIDER_TOKEN_ENDPOINT': 'https://op-example.com/token',
-        'AUTH_OPENID_PROVIDER_JWKS_ENDPOINT': 'https://op-example.com/jwks',
-        'AUTH_OPENID_PROVIDER_USERINFO_ENDPOINT': 'https://op-example.com/userinfo',
-        'AUTH_OPENID_PROVIDER_END_SESSION_ENDPOINT': 'https://op-example.com/logout',
-        'AUTH_OPENID_PROVIDER_SIGNATURE_ALG': 'HS256',
-        'AUTH_OPENID_PROVIDER_SIGNATURE_KEY': None,
-        'AUTH_OPENID_SCOPES': 'openid profile email',
-        'AUTH_OPENID_ID_TOKEN_MAX_AGE': 60,
-        'AUTH_OPENID_ID_TOKEN_INCLUDE_CLAIMS': True,
-        'AUTH_OPENID_USE_STATE': True,
-        'AUTH_OPENID_USE_NONCE': True,
-        'AUTH_OPENID_ALWAYS_UPDATE_USER': True,
-        # OpenID 旧配置参数 (version <= 1.5.8 (discarded))
-        'AUTH_OPENID_SERVER_URL': 'http://openid',
-        'AUTH_OPENID_REALM_NAME': None,
-
-        'AUTH_RADIUS': False,
-        'RADIUS_SERVER': 'localhost',
-        'RADIUS_PORT': 1812,
-        'RADIUS_SECRET': '',
-        'RADIUS_ENCRYPT_PASSWORD': True,
-        'OTP_IN_RADIUS': False,
-
-        'AUTH_CAS': False,
-        'CAS_SERVER_URL': "http://host/cas/",
-        'CAS_ROOT_PROXIED_AS': '',
-        'CAS_LOGOUT_COMPLETELY': True,
-        'CAS_VERSION': 3,
-
-        'AUTH_SSO': False,
-        'AUTH_SSO_AUTHKEY_TTL': 60 * 15,
-
-        'OTP_VALID_WINDOW': 2,
-        'OTP_ISSUER_NAME': 'JumpServer',
-        'EMAIL_SUFFIX': 'jumpserver.org',
-
-        'TERMINAL_PASSWORD_AUTH': True,
-        'TERMINAL_PUBLIC_KEY_AUTH': True,
-        'TERMINAL_HEARTBEAT_INTERVAL': 20,
-        'TERMINAL_ASSET_LIST_SORT_BY': 'hostname',
-        'TERMINAL_ASSET_LIST_PAGE_SIZE': 'auto',
-        'TERMINAL_SESSION_KEEP_DURATION': 200,
-        'TERMINAL_HOST_KEY': '',
-        'TERMINAL_TELNET_REGEX': '',
-        'TERMINAL_COMMAND_STORAGE': {},
-
-        'SECURITY_MFA_AUTH': False,
-        'SECURITY_COMMAND_EXECUTION': True,
-        'SECURITY_SERVICE_ACCOUNT_REGISTRATION': True,
-        'SECURITY_VIEW_AUTH_NEED_MFA': True,
-        'SECURITY_LOGIN_LIMIT_COUNT': 7,
-        'SECURITY_LOGIN_LIMIT_TIME': 30,
-        'SECURITY_MAX_IDLE_TIME': 30,
-        'SECURITY_PASSWORD_EXPIRATION_TIME': 9999,
-        'SECURITY_PASSWORD_MIN_LENGTH': 6,
-        'SECURITY_PASSWORD_UPPER_CASE': False,
-        'SECURITY_PASSWORD_LOWER_CASE': False,
-        'SECURITY_PASSWORD_NUMBER': False,
-        'SECURITY_PASSWORD_SPECIAL_CHAR': False,
-        'SECURITY_LOGIN_CHALLENGE_ENABLED': False,
-        'SECURITY_LOGIN_CAPTCHA_ENABLED': True,
-        'SECURITY_DATA_CRYPTO_ALGO': 'aes',
-        'SECURITY_INSECURE_COMMAND': False,
-        'SECURITY_INSECURE_COMMAND_LEVEL': 5,
-        'SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER': '',
-
-        'HTTP_BIND_HOST': '0.0.0.0',
-        'HTTP_LISTEN_PORT': 8080,
-        'WS_LISTEN_PORT': 8070,
-        'LOGIN_LOG_KEEP_DAYS': 200,
-        'TASK_LOG_KEEP_DAYS': 90,
-        'OPERATE_LOG_KEEP_DAYS': 200,
-        'FTP_LOG_KEEP_DAYS': 200,
-        'ASSETS_PERM_CACHE_TIME': 3600 * 24,
-        'SECURITY_MFA_VERIFY_TTL': 3600,
-        'ASSETS_PERM_CACHE_ENABLE': HAS_XPACK,
-        'SYSLOG_ADDR': '',  # '192.168.0.1:514'
-        'SYSLOG_FACILITY': 'user',
-        'SYSLOG_SOCKTYPE': 2,
-        'PERM_SINGLE_ASSET_TO_UNGROUP_NODE': False,
-        'PERM_EXPIRED_CHECK_PERIODIC': 60 * 60,
-        'WINDOWS_SSH_DEFAULT_SHELL': 'cmd',
-        'FLOWER_URL': "127.0.0.1:5555",
-        'DEFAULT_ORG_SHOW_ALL_USERS': True,
-        'PERIOD_TASK_ENABLE': True,
-        'FORCE_SCRIPT_NAME': '',
-        'LOGIN_CONFIRM_ENABLE': False,
-        'WINDOWS_SKIP_ALL_MANUAL_PASSWORD': False,
-        'ORG_CHANGE_TO_URL': '',
-        'LANGUAGE_CODE': 'zh',
-        'TIME_ZONE': 'Asia/Shanghai',
-        'CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED': True,
-        'USER_LOGIN_SINGLE_MACHINE_ENABLED': False,
-        'TICKETS_ENABLED': True,
-        'SESSION_COOKIE_SECURE': False,
-        'CSRF_COOKIE_SECURE': False,
-        'REFERER_CHECK_ENABLED': False,
-        'SERVER_REPLAY_STORAGE': {},
-        'CONNECTION_TOKEN_ENABLED': False,
-        'ONLY_ALLOW_EXIST_USER_AUTH': False,
-        'ONLY_ALLOW_AUTH_FROM_SOURCE': False,
-        'DISK_CHECK_ENABLED': True,
-        'SESSION_SAVE_EVERY_REQUEST': True,
-        'SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE': False,
-        'FORGOT_PASSWORD_URL': '',
-    }
+    defaults = {}
+    fieldsets = FIELDSET
+    fields = FIELDS
 
     def compatible_auth_openid_of_key(self):
         """
@@ -372,6 +225,25 @@ class Config(dict):
                 if method is not None:
                     method()
 
+    @classmethod
+    def get_field_meta(cls, name):
+        field = cls.fields.get(name)
+
+        if isinstance(field, dict) and field.get('type'):
+            return field
+        elif isinstance(field, (bool, str, int, float, dict, list, tuple)):
+            if isinstance(field, tuple):
+                field = list(field)
+            return {
+                'type': type(field).__name__,
+                'default': field
+            }
+        else:
+            return {
+                'type': 'str',
+                'default': field
+            }
+
     def convert_type(self, k, v):
         default_value = self.defaults.get(k)
         if default_value is None:
@@ -424,7 +296,8 @@ class Config(dict):
         value = self.get_from_env(item)
         if value is not None:
             return value
-        return self.defaults.get(item)
+        field_meta = self.get_field_meta(item)
+        return field_meta.get('default')
 
     def __getitem__(self, item):
         return self.get(item)
