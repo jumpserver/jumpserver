@@ -8,9 +8,10 @@ from django.views.generic.edit import UpdateView
 
 from common.utils import get_logger, ssh_key_gen
 from common.permissions import (
-    PermissionsMixin, IsValidUser,
+    IsValidUser,
     UserCanUpdateSSHKey,
 )
+from common.mixins.views import PermissionsMixin
 from ... import forms
 from ...models import User
 
