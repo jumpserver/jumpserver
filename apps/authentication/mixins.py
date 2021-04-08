@@ -15,9 +15,7 @@ from django.shortcuts import reverse
 
 from common.utils import get_object_or_none, get_request_ip, get_logger, bulk_get
 from users.models import User
-from users.utils import (
-    is_block_login, clean_failed_count
-)
+from users.utils import LoginBlockUtil, MFABlockUtils
 from . import errors
 from .utils import rsa_decrypt
 from .signals import post_auth_success, post_auth_failed
@@ -117,7 +115,7 @@ class AuthMixin:
         else:
             username = self.request.POST.get("username")
         ip = self.get_request_ip()
-        if is_block_login(username, ip):
+        if LoginBlockUtil(username, ip).is_block():
             logger.warn('Ip was blocked' + ': ' + username + ':' + ip)
             exception = errors.BlockLoginError(username=username, ip=ip)
             if raise_exception:
@@ -197,7 +195,7 @@ class AuthMixin:
         self._check_password_require_reset_or_not(user)
         self._check_passwd_is_too_simple(user, password)
 
-        clean_failed_count(username, ip)
+        LoginBlockUtil(username, ip).clean_failed_count()
         request.session['auth_password'] = 1
         request.session['user_id'] = str(user.id)
         request.session['auto_login'] = auto_login
@@ -253,15 +251,34 @@ class AuthMixin:
             raise errors.MFAUnsetError(user, self.request, url)
         raise errors.MFARequiredError()
 
+    def mark_mfa_ok(self):
+        self.request.session['auth_mfa'] = 1
+        self.request.session['auth_mfa_time'] = time.time()
+        self.request.session['auth_mfa_type'] = 'otp'
+
+    def check_mfa_is_block(self, username, ip, raise_exception=True):
+        if MFABlockUtils(username, ip).is_block():
+            logger.warn('Ip was blocked' + ': ' + username + ':' + ip)
+            exception = errors.BlockMFAError(username=username, request=self.request, ip=ip)
+            if raise_exception:
+                raise exception
+            else:
+                return exception
+
     def check_user_mfa(self, code):
         user = self.get_user_from_session()
+        ip = self.get_request_ip()
+        self.check_mfa_is_block(user.username, ip)
         ok = user.check_mfa(code)
         if ok:
-            self.request.session['auth_mfa'] = 1
-            self.request.session['auth_mfa_time'] = time.time()
-            self.request.session['auth_mfa_type'] = 'otp'
+            self.mark_mfa_ok()
             return
-        raise errors.MFAFailedError(username=user.username, request=self.request)
+
+        raise errors.MFAFailedError(
+            username=user.username,
+            request=self.request,
+            ip=ip
+        )
 
     def get_ticket(self):
         from tickets.models import Ticket
