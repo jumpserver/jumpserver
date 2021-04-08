@@ -2077,6 +2077,14 @@ msgstr "用户第一次登录，修改profile后重定向到地址, 可以是 wi
 msgid "Forgot password url"
 msgstr "忘记密码URL"
 
+#: settings/serializers/settings.py:23
+msgid "Global organization name"
+msgstr "全局组织名"
+
+#: settings/serializers/settings.py:23
+msgid "The name of global organization to display"
+msgstr "全局组织的显示名称，默认为 全局组织"
+
 #: settings/serializers/settings.py:24
 msgid ""
 "The forgot password url on login page, If you use ldap or cas external "
