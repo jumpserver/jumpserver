@@ -2,7 +2,6 @@
 #
 import time
 from rest_framework import permissions
-from django.contrib.auth.mixins import UserPassesTestMixin
 from django.conf import settings
 
 from orgs.utils import current_org
@@ -93,20 +92,6 @@ class WithBootstrapToken(permissions.BasePermission):
             return False
         request_bootstrap_token = authorization.split()[-1]
         return settings.BOOTSTRAP_TOKEN == request_bootstrap_token
-
-
-class PermissionsMixin(UserPassesTestMixin):
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_permissions(self):
-        return self.permission_classes
-
-    def test_func(self):
-        permission_classes = self.get_permissions()
-        for permission_class in permission_classes:
-            if not permission_class().has_permission(self.request, self):
-                return False
-        return True
 
 
 class UserCanAnyPermCurrentOrg(permissions.BasePermission):
