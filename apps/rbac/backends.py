@@ -6,7 +6,7 @@ from django.contrib.auth.backends import ModelBackend
 from .models import Role, SafeRoleBinding
 
 
-class RBACBackends(ModelBackend):
+class RBACBackend(ModelBackend):
 
     def has_perm(self, user_obj, perm, obj=None):
         """
@@ -16,8 +16,8 @@ class RBACBackends(ModelBackend):
         org_id = perm_dict.get('org')
         safe_id = perm_dict.get('safe')
         app_label = perm_dict.get('app_label')
-        action = perm_dict.get('action')
         model_name = perm_dict.get('model_name')
+        codename = perm_dict.get('codename')
         if safe_id:
             role_bindings = SafeRoleBinding.objects.filter(user=user_obj, safe_id=safe_id)
         elif org_id:
@@ -34,10 +34,9 @@ class RBACBackends(ModelBackend):
         if not permissions_ids:
             raise PermissionDenied
 
-        codename = '{}_{}'.format(action, model_name)
         content_type = ContentType.objects.get(app_label=app_label, model=model_name)
         has_permission = Permission.objects.filter(
-            id__in=permissions_ids, codename=codename, content_type=content_type
+            id__in=permissions_ids, content_type=content_type, codename=codename,
         ).exists()
         if not has_permission:
             raise PermissionDenied

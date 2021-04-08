@@ -23,6 +23,10 @@ class Account(CommonModelMixin, OrgModelMixin):
     safe = models.ForeignKey('accounts.Safe', on_delete=models.PROTECT, verbose_name=_('Safe'))
 
     class Meta:
+        permissions = [
+            # ('codename', 'name')
+            ("view_account_secret", "Can view the secret of account"),
+        ]
         unique_together = ('name', 'safe')
 
     def __str__(self):

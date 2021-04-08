@@ -6,7 +6,7 @@ from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import Account, AccountType
 
 
-__all__ = ['AccountSerializer']
+__all__ = ['AccountSerializer', 'AccountSecretSerializer']
 
 
 class AccountSerializer(BulkOrgResourceModelSerializer):
@@ -19,6 +19,7 @@ class AccountSerializer(BulkOrgResourceModelSerializer):
     attrs = MethodSerializer()
 
     class Meta:
+        ref_name = None  # 与 xpack.cloud.AccountSerializer 名称冲突
         model = Account
         fields = [
             'id', 'name', 'username', 'secret', 'address', 'type', 'type_display', 'attrs',
@@ -39,6 +40,18 @@ class AccountSerializer(BulkOrgResourceModelSerializer):
             serializer_class = account_type.construct_serializer_class_for_fields_definition()
             serializer = serializer_class()
         else:
-            serializer = serializers.JSONField()
+            serializer = serializers.Serializer()
 
         return serializer
+
+
+class AccountSecretSerializer(serializers.ModelSerializer):
+    secret_type = serializers.CharField(
+        source='type.secret_type', read_only=True, label=_('Secret type')
+    )
+    secret = serializers.CharField(source='read_secret', read_only=True, label=_('Secret'))
+
+    class Meta:
+        model = Account
+        fields = ['id', 'secret_type', 'secret']
+

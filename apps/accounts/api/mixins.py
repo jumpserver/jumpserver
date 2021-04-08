@@ -4,6 +4,7 @@ from rbac.models import SafeRoleBinding
 
 class ViewSetMixin:
     model = None
+    extra_action_permission_mapping = {}
 
     def perform_create(self, serializer):
         objs = self.get_to_create_objects(serializer)
@@ -42,7 +43,6 @@ class ViewSetMixin:
 
 
 class SafeViewSetMixin(ViewSetMixin):
-    model = None
     permission_classes = (SafeRolePermission, )
 
     def get_queryset(self):
@@ -60,7 +60,7 @@ class SafeViewSetMixin(ViewSetMixin):
         safes = SafeRoleBinding.get_user_safes(user=self.request.user)
         for safe in safes:
             has_permission = SafeRolePermission.check_user_permission(
-                self.request.user, safe, model=self.model, view_action=self.action
+                self.request.user, safe, self.model, view=self
             )
             if not has_permission:
                 continue
