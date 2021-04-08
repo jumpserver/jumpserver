@@ -6,9 +6,7 @@ from django.conf import settings
 
 from common.exceptions import JMSException
 from .signals import post_auth_failed
-from users.utils import (
-    increase_login_failed_count, get_login_failed_count
-)
+from users.utils import LoginBlockUtil, MFABlockUtils
 
 reason_password_failed = 'password_failed'
 reason_password_decrypt_failed = 'password_decrypt_failed'
@@ -52,7 +50,15 @@ block_login_msg = _(
     "The account has been locked "
     "(please contact admin to unlock it or try again after {} minutes)"
 )
-mfa_failed_msg = _("MFA code invalid, or ntp sync server time")
+block_mfa_msg = _(
+    "The account has been locked "
+    "(please contact admin to unlock it or try again after {} minutes)"
+)
+mfa_failed_msg = _(
+    "MFA code invalid, or ntp sync server time, "
+    "You can also try {times_try} times "
+    "(The account will be temporarily locked for {block_time} minutes)"
+)
 
 mfa_required_msg = _("MFA required")
 mfa_unset_msg = _("MFA not set, please set it first")
@@ -80,7 +86,7 @@ class AuthFailedNeedBlockMixin:
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        increase_login_failed_count(self.username, self.ip)
+        LoginBlockUtil(self.username, self.ip).incr_failed_count()
 
 
 class AuthFailedError(Exception):
@@ -107,13 +113,12 @@ class AuthFailedError(Exception):
 class CredentialError(AuthFailedNeedLogMixin, AuthFailedNeedBlockMixin, AuthFailedError):
     def __init__(self, error, username, ip, request):
         super().__init__(error=error, username=username, ip=ip, request=request)
-        times_up = settings.SECURITY_LOGIN_LIMIT_COUNT
-        times_failed = get_login_failed_count(username, ip)
-        times_try = int(times_up) - int(times_failed)
+        util = LoginBlockUtil(username, ip)
+        times_remainder = util.get_remainder_times()
         block_time = settings.SECURITY_LOGIN_LIMIT_TIME
 
         default_msg = invalid_login_msg.format(
-            times_try=times_try, block_time=block_time
+            times_try=times_remainder, block_time=block_time
         )
         if error == reason_password_failed:
             self.msg = default_msg
@@ -123,10 +128,30 @@ class CredentialError(AuthFailedNeedLogMixin, AuthFailedNeedBlockMixin, AuthFail
 
 class MFAFailedError(AuthFailedNeedLogMixin, AuthFailedError):
     error = reason_mfa_failed
-    msg = mfa_failed_msg
+    msg: str
 
-    def __init__(self, username, request):
+    def __init__(self, username, request, ip):
+        util = MFABlockUtils(username, ip)
+        util.incr_failed_count()
+
+        times_remainder = util.get_remainder_times()
+        block_time = settings.SECURITY_LOGIN_LIMIT_TIME
+
+        if times_remainder:
+            self.msg = mfa_failed_msg.format(
+                times_try=times_remainder, block_time=block_time
+            )
+        else:
+            self.msg = block_mfa_msg.format(settings.SECURITY_LOGIN_LIMIT_TIME)
         super().__init__(username=username, request=request)
+
+
+class BlockMFAError(AuthFailedNeedLogMixin, AuthFailedError):
+    error = 'block_mfa'
+
+    def __init__(self, username, request, ip):
+        self.msg = block_mfa_msg.format(settings.SECURITY_LOGIN_LIMIT_TIME)
+        super().__init__(username=username, request=request, ip=ip)
 
 
 class MFAUnsetError(AuthFailedNeedLogMixin, AuthFailedError):

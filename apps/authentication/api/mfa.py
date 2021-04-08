@@ -29,7 +29,7 @@ class MFAChallengeApi(AuthMixin, CreateAPIView):
             if not valid:
                 self.request.session['auth_mfa'] = ''
                 raise errors.MFAFailedError(
-                    username=user.username, request=self.request
+                    username=user.username, request=self.request, ip=self.get_request_ip()
                 )
             else:
                 self.request.session['auth_mfa'] = '1'
