@@ -1,3 +1,4 @@
 from .role import *
 from .role_binding import *
-from .role_permissions import *
+from .permissions import *
+from .content_type import *
