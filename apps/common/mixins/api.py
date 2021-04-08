@@ -9,6 +9,7 @@ from itertools import chain
 from django.db.models.signals import m2m_changed
 from django.core.cache import cache
 from django.http import JsonResponse
+from django.utils.translation import ugettext as _
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 from rest_framework.decorators import action
@@ -47,6 +48,9 @@ class RenderToJsonMixin:
         column_title_field_pairs = jms_context.get('column_title_field_pairs', ())
         data['title'] = column_title_field_pairs
 
+        if isinstance(request.data, (list, tuple)) and not any(request.data):
+            error = _("Request file format may be wrong")
+            return Response(data={"error": error}, status=400)
         return Response(data=data)
 
 

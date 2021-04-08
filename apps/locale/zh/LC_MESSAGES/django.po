@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-22 11:29+0800\n"
+"POT-Creation-Date: 2021-04-07 18:15+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -36,7 +36,7 @@ msgstr ""
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
 #: orgs/models.py:23 perms/models/base.py:49 settings/models.py:29
 #: terminal/models/storage.py:23 terminal/models/storage.py:81
-#: terminal/models/task.py:16 terminal/models/terminal.py:139
+#: terminal/models/task.py:16 terminal/models/terminal.py:99
 #: users/forms/profile.py:32 users/models/group.py:15 users/models/user.py:530
 #: users/templates/users/_select_user_modal.html:13
 #: users/templates/users/user_asset_permission.html:37
@@ -83,7 +83,7 @@ msgstr "激活中"
 #: assets/models/group.py:23 assets/models/label.py:23 ops/models/adhoc.py:37
 #: orgs/models.py:26 perms/models/base.py:57 settings/models.py:34
 #: terminal/models/storage.py:29 terminal/models/storage.py:87
-#: terminal/models/terminal.py:153 tickets/models/ticket.py:73
+#: terminal/models/terminal.py:113 tickets/models/ticket.py:73
 #: users/models/group.py:16 users/models/user.py:563
 #: users/templates/users/user_detail.html:115
 #: users/templates/users/user_granted_database_app.html:38
@@ -211,7 +211,7 @@ msgstr "用户 `{}` 不在当前组织: `{}`"
 #: users/templates/users/user_profile.html:47
 #: xpack/plugins/change_auth_plan/models.py:47
 #: xpack/plugins/change_auth_plan/models.py:278
-#: xpack/plugins/cloud/serializers.py:44
+#: xpack/plugins/cloud/serializers.py:51
 msgid "Username"
 msgstr "用户名"
 
@@ -303,7 +303,7 @@ msgstr "集群"
 #: applications/serializers/attrs/application_category/db.py:11
 #: ops/models/adhoc.py:146
 #: users/templates/users/user_granted_database_app.html:36
-#: xpack/plugins/cloud/serializers.py:42
+#: xpack/plugins/cloud/serializers.py:49
 msgid "Host"
 msgstr "主机"
 
@@ -313,7 +313,7 @@ msgstr "主机"
 #: applications/serializers/attrs/application_type/oracle.py:11
 #: applications/serializers/attrs/application_type/pgsql.py:11
 #: assets/models/asset.py:188 assets/models/domain.py:53
-#: xpack/plugins/cloud/serializers.py:43
+#: xpack/plugins/cloud/serializers.py:50
 msgid "Port"
 msgstr "端口"
 
@@ -346,7 +346,7 @@ msgstr "目标URL"
 #: xpack/plugins/change_auth_plan/models.py:68
 #: xpack/plugins/change_auth_plan/models.py:190
 #: xpack/plugins/change_auth_plan/models.py:285
-#: xpack/plugins/cloud/serializers.py:46
+#: xpack/plugins/cloud/serializers.py:53
 msgid "Password"
 msgstr "密码"
 
@@ -366,15 +366,15 @@ msgstr "删除失败，存在关联资产"
 msgid "Number required"
 msgstr "需要为数字"
 
-#: assets/api/node.py:64
+#: assets/api/node.py:65
 msgid "You can't update the root node name"
 msgstr "不能修改根节点名称"
 
-#: assets/api/node.py:71
+#: assets/api/node.py:72
 msgid "You can't delete the root node ({})"
 msgstr "不能删除根节点 ({})"
 
-#: assets/api/node.py:74
+#: assets/api/node.py:75
 msgid "Deletion failed and the node contains children or assets"
 msgstr "删除失败，节点包含子节点或资产"
 
@@ -428,7 +428,7 @@ msgstr "激活"
 
 #: assets/models/asset.py:196 assets/models/cluster.py:19
 #: assets/models/user.py:66 templates/_nav.html:44
-#: xpack/plugins/cloud/models.py:92 xpack/plugins/cloud/serializers.py:137
+#: xpack/plugins/cloud/models.py:92 xpack/plugins/cloud/serializers.py:146
 msgid "Admin user"
 msgstr "管理用户"
 
@@ -588,6 +588,7 @@ msgid "Operator"
 msgstr "运营商"
 
 #: assets/models/cluster.py:36 assets/models/group.py:34
+#: xpack/plugins/cloud/providers/nutanix.py:30
 msgid "Default"
 msgstr "默认"
 
@@ -693,7 +694,7 @@ msgstr "ssh私钥"
 #: users/templates/users/user_asset_permission.html:41
 #: users/templates/users/user_asset_permission.html:73
 #: users/templates/users/user_asset_permission.html:158
-#: xpack/plugins/cloud/models.py:89 xpack/plugins/cloud/serializers.py:138
+#: xpack/plugins/cloud/models.py:89 xpack/plugins/cloud/serializers.py:147
 msgid "Node"
 msgstr "节点"
 
@@ -1140,7 +1141,7 @@ msgstr "启用"
 msgid "-"
 msgstr ""
 
-#: audits/models.py:96 xpack/plugins/cloud/const.py:23
+#: audits/models.py:96 xpack/plugins/cloud/const.py:25
 msgid "Failed"
 msgstr "失败"
 
@@ -1387,11 +1388,11 @@ msgstr "来源 IP 不被允许登录"
 msgid "SSO auth closed"
 msgstr "SSO 认证关闭了"
 
-#: authentication/errors.py:244 authentication/views/login.py:232
+#: authentication/errors.py:244 authentication/views/login.py:235
 msgid "Your password is too simple, please change it for security"
 msgstr "你的密码过于简单，为了安全，请修改"
 
-#: authentication/errors.py:253 authentication/views/login.py:247
+#: authentication/errors.py:253 authentication/views/login.py:250
 msgid "Your password has expired, please reset before logging in"
 msgstr "您的密码已过期，先修改再登录"
 
@@ -1565,7 +1566,7 @@ msgstr "复制成功"
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: authentication/views/login.py:178
+#: authentication/views/login.py:181
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -1573,19 +1574,19 @@ msgstr ""
 "等待 <b>{}</b> 确认, 你也可以复制链接发给他/她 <br/>\n"
 "                  不要关闭本页面"
 
-#: authentication/views/login.py:183
+#: authentication/views/login.py:186
 msgid "No ticket found"
 msgstr "没有发现工单"
 
-#: authentication/views/login.py:215
+#: authentication/views/login.py:218
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: authentication/views/login.py:216
+#: authentication/views/login.py:219
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
-#: authentication/views/login.py:231 authentication/views/login.py:246
+#: authentication/views/login.py:234 authentication/views/login.py:249
 msgid "Please change your password"
 msgstr "请修改密码"
 
@@ -1609,7 +1610,11 @@ msgstr "对象"
 
 #: common/drf/parsers/base.py:17
 msgid "The file content overflowed (The maximum length `{}` bytes)"
-msgstr "文件内容益处 (最大长度 `{}` 字节)"
+msgstr "文件内容太大 (最大长度 `{}` 字节)"
+
+#: common/drf/parsers/base.py:146
+msgid "Parse file error: {}"
+msgstr "解析文件错误: {}"
 
 #: common/exceptions.py:15
 #, python-format
@@ -1659,6 +1664,10 @@ msgstr ""
 #: common/fields/model.py:150
 msgid "Encrypt field using Secret Key"
 msgstr ""
+
+#: common/mixins/api.py:52
+msgid "Request file format may be wrong"
+msgstr "上传的文件格式错误 或 其它类型资源的文件"
 
 #: common/mixins/models.py:33
 msgid "is discard"
@@ -2991,6 +3000,10 @@ msgstr "较高"
 msgid "Normal"
 msgstr "正常"
 
+#: terminal/const.py:34
+msgid "Offline"
+msgstr ""
+
 #: terminal/exceptions.py:8
 msgid "Bulk create not support"
 msgstr "不支持批量创建"
@@ -3011,27 +3024,31 @@ msgstr "回放"
 msgid "Date end"
 msgstr "结束日期"
 
-#: terminal/models/status.py:13
+#: terminal/models/status.py:18
 msgid "Session Online"
 msgstr "在线会话"
 
-#: terminal/models/status.py:14
-msgid "CPU Usage"
-msgstr "CPU使用"
+#: terminal/models/status.py:19
+msgid "CPU Load"
+msgstr "CPU负载"
 
-#: terminal/models/status.py:15
+#: terminal/models/status.py:20
 msgid "Memory Used"
 msgstr "内存使用"
 
-#: terminal/models/status.py:16
+#: terminal/models/status.py:21
+msgid "Disk Used"
+msgstr "磁盘使用"
+
+#: terminal/models/status.py:22
 msgid "Connections"
 msgstr "连接数"
 
-#: terminal/models/status.py:17
+#: terminal/models/status.py:23
 msgid "Threads"
 msgstr "线程数"
 
-#: terminal/models/status.py:18
+#: terminal/models/status.py:24
 msgid "Boot Time"
 msgstr "运行时间"
 
@@ -3039,45 +3056,29 @@ msgstr "运行时间"
 msgid "Args"
 msgstr "参数"
 
-#: terminal/models/terminal.py:142
+#: terminal/models/terminal.py:102
 msgid "type"
 msgstr "类型"
 
-#: terminal/models/terminal.py:144
+#: terminal/models/terminal.py:104
 msgid "Remote Address"
 msgstr "远端地址"
 
-#: terminal/models/terminal.py:145
+#: terminal/models/terminal.py:105
 msgid "SSH Port"
 msgstr "SSH端口"
 
-#: terminal/models/terminal.py:146
+#: terminal/models/terminal.py:106
 msgid "HTTP Port"
 msgstr "HTTP端口"
 
-#: terminal/models/terminal.py:147
+#: terminal/models/terminal.py:107
 msgid "Command storage"
 msgstr "命令存储"
 
-#: terminal/models/terminal.py:148
+#: terminal/models/terminal.py:108
 msgid "Replay storage"
 msgstr "录像存储"
-
-#: terminal/serializers/components.py:9
-msgid "System cpu load (1 minutes)"
-msgstr "系统CPU负载 (1分钟)"
-
-#: terminal/serializers/components.py:12
-msgid "System memory used percent"
-msgstr "系统内存使用百分比"
-
-#: terminal/serializers/components.py:15
-msgid "System disk used percent"
-msgstr "系统磁盘使用百分比"
-
-#: terminal/serializers/components.py:19
-msgid "Session active count"
-msgstr "活跃会话数量"
 
 #: terminal/serializers/session.py:30
 msgid "User ID"
@@ -3164,18 +3165,22 @@ msgstr "索引"
 msgid "Doc type"
 msgstr "文档类型"
 
-#: terminal/serializers/terminal.py:47 terminal/serializers/terminal.py:55
+#: terminal/serializers/storage.py:185
+msgid "Ignore Certificate Verification"
+msgstr ""
+
+#: terminal/serializers/terminal.py:66 terminal/serializers/terminal.py:74
 msgid "Not found"
 msgstr "没有发现"
 
-#: terminal/utils.py:79
+#: terminal/utils.py:78
 #, python-format
 msgid ""
 "Insecure Command Alert: [%(name)s->%(login_from)s@%(remote_addr)s] $"
 "%(command)s"
 msgstr "危险命令告警: [%(name)s->%(login_from)s@%(remote_addr)s] $%(command)s"
 
-#: terminal/utils.py:87
+#: terminal/utils.py:86
 #, python-format
 msgid ""
 "\n"
@@ -3204,12 +3209,12 @@ msgstr ""
 "        <br>\n"
 "        "
 
-#: terminal/utils.py:114
+#: terminal/utils.py:113
 #, python-format
 msgid "Insecure Web Command Execution Alert: [%(name)s]"
 msgstr "Web页面-> 命令执行 告警: [%(name)s]"
 
-#: terminal/utils.py:122
+#: terminal/utils.py:121
 #, python-format
 msgid ""
 "\n"
@@ -3788,7 +3793,7 @@ msgstr "安全令牌验证"
 
 #: users/templates/users/_base_otp.html:14 users/templates/users/_user.html:13
 #: users/templates/users/user_profile_update.html:55
-#: xpack/plugins/cloud/models.py:78 xpack/plugins/cloud/serializers.py:136
+#: xpack/plugins/cloud/models.py:78 xpack/plugins/cloud/serializers.py:145
 msgid "Account"
 msgstr "账户"
 
@@ -4778,42 +4783,50 @@ msgid "Azure (China)"
 msgstr "Azure (中国)"
 
 #: xpack/plugins/cloud/const.py:12
+msgid "Azure (International)"
+msgstr "Azure (国际)"
+
+#: xpack/plugins/cloud/const.py:13
 msgid "Huawei Cloud"
 msgstr "华为云"
 
-#: xpack/plugins/cloud/const.py:13
+#: xpack/plugins/cloud/const.py:14
 msgid "Tencent Cloud"
 msgstr "腾讯云"
 
-#: xpack/plugins/cloud/const.py:14
+#: xpack/plugins/cloud/const.py:15
 msgid "VMware"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:18
+#: xpack/plugins/cloud/const.py:16 xpack/plugins/cloud/providers/nutanix.py:13
+msgid "Nutanix"
+msgstr ""
+
+#: xpack/plugins/cloud/const.py:20
 msgid "Instance name"
 msgstr "实例名称"
 
-#: xpack/plugins/cloud/const.py:19
+#: xpack/plugins/cloud/const.py:21
 msgid "Instance name and Partial IP"
 msgstr "实例名称和部分IP"
 
-#: xpack/plugins/cloud/const.py:24
+#: xpack/plugins/cloud/const.py:26
 msgid "Succeed"
 msgstr "成功"
 
-#: xpack/plugins/cloud/const.py:28
+#: xpack/plugins/cloud/const.py:30
 msgid "Unsync"
 msgstr "未同步"
 
-#: xpack/plugins/cloud/const.py:29
+#: xpack/plugins/cloud/const.py:31
 msgid "New Sync"
 msgstr "新同步"
 
-#: xpack/plugins/cloud/const.py:30
+#: xpack/plugins/cloud/const.py:32
 msgid "Synced"
 msgstr "已同步"
 
-#: xpack/plugins/cloud/const.py:31
+#: xpack/plugins/cloud/const.py:33
 msgid "Released"
 msgstr "已释放"
 
@@ -4829,7 +4842,7 @@ msgstr "云服务商"
 msgid "Cloud account"
 msgstr "云账号"
 
-#: xpack/plugins/cloud/models.py:81 xpack/plugins/cloud/serializers.py:117
+#: xpack/plugins/cloud/models.py:81 xpack/plugins/cloud/serializers.py:126
 msgid "Regions"
 msgstr "地域"
 
@@ -4837,7 +4850,7 @@ msgstr "地域"
 msgid "Hostname strategy"
 msgstr "主机名策略"
 
-#: xpack/plugins/cloud/models.py:95 xpack/plugins/cloud/serializers.py:140
+#: xpack/plugins/cloud/models.py:95 xpack/plugins/cloud/serializers.py:149
 msgid "Always update"
 msgstr "总是更新"
 
@@ -5029,15 +5042,15 @@ msgstr ""
 msgid "Subscription ID"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers.py:115
+#: xpack/plugins/cloud/serializers.py:124
 msgid "History count"
 msgstr "执行次数"
 
-#: xpack/plugins/cloud/serializers.py:116
+#: xpack/plugins/cloud/serializers.py:125
 msgid "Instance count"
 msgstr "实例个数"
 
-#: xpack/plugins/cloud/serializers.py:139
+#: xpack/plugins/cloud/serializers.py:148
 #: xpack/plugins/gathered_user/serializers.py:20
 msgid "Periodic display"
 msgstr "定时执行"
@@ -5130,8 +5143,20 @@ msgstr "旗舰版"
 msgid "Community edition"
 msgstr "社区版"
 
-#~ msgid "Azure (International)"
-#~ msgstr "Azure (国际)"
+#~ msgid "CPU Usage"
+#~ msgstr "CPU使用"
+
+#~ msgid "System cpu load (1 minutes)"
+#~ msgstr "系统CPU负载 (1分钟)"
+
+#~ msgid "System memory used percent"
+#~ msgstr "系统内存使用百分比"
+
+#~ msgid "System disk used percent"
+#~ msgstr "系统磁盘使用百分比"
+
+#~ msgid "Session active count"
+#~ msgstr "活跃会话数量"
 
 #~ msgid "Root organization only allow view and delete"
 #~ msgstr "全局组织仅支持 查看和删除"
