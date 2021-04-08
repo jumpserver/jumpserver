@@ -143,5 +143,5 @@ class BaseFileParser(BaseParser):
             return data
         except Exception as e:
             logger.error(e, exc_info=True)
-            raise ParseError('Parse error! ({})'.format(self.media_type))
+            raise ParseError(_('Parse file error: {}').format(e))
 
