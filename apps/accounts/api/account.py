@@ -34,7 +34,7 @@ class AccountViewSet(SafeViewSetMixin, OrgBulkModelViewSet):
         'view_secret': 'view_account_secret'
     }
 
-    @action(methods=['get'], detail=True, url_path='view-secret')
+    @action(methods=['get'], detail=True, url_path='secret')
     def view_secret(self, request, *args, **kwargs):
         obj = self.get_object()
         serializer_class = self.get_serializer_class()
