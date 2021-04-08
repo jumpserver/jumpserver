@@ -13,7 +13,7 @@ from ..models import (
 
 class StatusSerializer(serializers.ModelSerializer):
     sessions = serializers.ListSerializer(
-        child=serializers.CharField(max_length=35), write_only=True
+        child=serializers.CharField(max_length=36), write_only=True
     )
 
     class Meta:
