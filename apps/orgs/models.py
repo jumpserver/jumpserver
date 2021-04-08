@@ -193,7 +193,8 @@ class Organization(models.Model):
 
     @classmethod
     def root(cls):
-        return cls(id=cls.ROOT_ID, name=settings.GLOBAL_ORG_DISPLAY_NAME if settings.GLOBAL_ORG_DISPLAY_NAME else cls.ROOT_NAME)
+        name = settings.GLOBAL_ORG_DISPLAY_NAME or cls.ROOT_NAME
+        return cls(id=cls.ROOT_ID, name=name)
 
     def is_root(self):
         return self.id == self.ROOT_ID
