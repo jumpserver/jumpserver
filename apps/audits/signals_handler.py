@@ -153,7 +153,7 @@ def generate_data(username, request):
         'username': username,
         'ip': login_ip,
         'type': login_type,
-        'user_agent': user_agent,
+        'user_agent': user_agent[0:254],
         'datetime': timezone.now(),
         'backend': get_login_backend(request)
     }
