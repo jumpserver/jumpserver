@@ -69,6 +69,7 @@ class UserLoginView(mixins.AuthMixin, FormView):
             new_form = form_cls(data=form.data)
             new_form._errors = form.errors
             context = self.get_context_data(form=new_form)
+            self.request.session.set_test_cookie()
             return self.render_to_response(context)
         except (errors.PasswdTooSimple, errors.PasswordRequireResetError) as e:
             return redirect(e.url)
