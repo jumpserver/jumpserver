@@ -171,7 +171,7 @@ class AuthMixin:
         if not user:
             self.raise_credential_error(errors.reason_password_failed)
         elif user.is_expired:
-            self.raise_credential_error(errors.reason_user_inactive)
+            self.raise_credential_error(errors.reason_user_expired)
         elif not user.is_active:
             self.raise_credential_error(errors.reason_user_inactive)
         return user
