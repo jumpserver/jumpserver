@@ -123,7 +123,7 @@ def to_parameters(*exclude_fields):
     return wrapper
 
 
-class Requests(WeComMixin):
+class WeComRequests(WeComMixin):
     """
     处理系统级错误，抛出 API 异常，直接生成 HTTP 响应，业务代码无需关心这些错误
     - 确保 status_code == 200
@@ -172,27 +172,33 @@ class Requests(WeComMixin):
             raise WeComError
 
     @to_parameters()
-    def get(self, url, params=None, with_token=True, **kwargs):
+    def get(self, url, params=None, with_token=True, with_agentid=False, **kwargs):
         data = self.request('get', **kwargs['parameters'])
         return data
 
     @to_parameters()
-    def post(self, url, data=None, json=None, params=None, with_token=True, **kwargs):
+    def post(self, url, data=None, json=None, params=None,
+             with_token=True, with_agentid=False, **kwargs):
         data = self.request('post', **kwargs['parameters'])
         return data
 
     def request(self, method,
                 params: dict = None,
                 with_token=True,
+                with_agentid=False,
                 **kwargs):
         for i in range(3):
             # 循环为了防止 access_token 失效
             # https://open.work.weixin.qq.com/api/doc/90000/90135/91039
             try:
+                if not isinstance(params, dict):
+                    params = {}
+
                 if with_token:
-                    if not isinstance(params, dict):
-                        params = {}
                     params['access_token'] = self._access_token
+
+                if with_agentid:
+                    params['agentid'] = self._agentid
 
                 set_default(kwargs, self._request_kwargs)
                 kwargs['params'] = params
@@ -225,43 +231,12 @@ class WeCom(WeComMixin):
         self._corpsecret = corpsecret
         self._agentid = agentid
 
-        self._requests = Requests(timeout=timeout)
-        self._set_access_token()
-
-    def _check_http_is_200(self, response):
-        if response.status_code != 200:
-            # 正常情况下不会返回非 200 响应码
-            logger.error(f'Request WeCom error: '
-                         f'status_code={response.status_code} '
-                         f'\ncontent={response.content}')
-            raise WeComError
-
-    def _set_access_token(self):
-        self._access_token_cache_key = digest(self._corpid, self._corpsecret)
-
-        access_token = cache.get(self._access_token_cache_key)
-        if access_token:
-            self._access_token = access_token
-            return
-
-        self._init_access_token()
-
-    def _init_access_token(self):
-        # 缓存中没有 access_token ，去企业微信请求
-        params = {'corpid': self._corpid, 'corpsecret': self._corpsecret}
-        data = self._requests.get(url=URL.GET_TOKEN, params=params)
-
-        self._check_errcode_is_0(data)
-
-        # 请求成功了
-        access_token = data['access_token']
-        expires_in = data['expires_in']
-
-        cache.set(self._access_token_cache_key, access_token, expires_in)
-        self._access_token = access_token
-
-    def test_connectivity(self):
-        self._init_access_token()
+        self._requests = WeComRequests(
+            corpid=corpid,
+            corpsecret=corpsecret,
+            agentid=agentid,
+            timeout=timeout
+        )
 
     def send_text(self, users: Iterable, msg: AnyStr, **kwargs):
         """
