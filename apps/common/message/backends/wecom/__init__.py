@@ -1,4 +1,6 @@
 from typing import Iterable, AnyStr
+import inspect
+from inspect import Parameter
 
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import APIException
@@ -82,15 +84,84 @@ class DictWrapper:
         return item in self._dict
 
 
-class Requests:
+class WeComMixin:
+    def _check_errcode_is_0(self, data: DictWrapper):
+        errcode = data['errcode']
+        if errcode != 0:
+            # 如果代码写的对，配置没问题，这里不该出错，系统性错误，直接抛异常
+            errmsg = data['errmsg']
+            logger.error(f'WeCom response 200 but errcode wrong: '
+                         f'errcode={errcode} '
+                         f'errmsg={errmsg} ')
+            raise WeComError
+
+
+def to_parameters(*exclude_fields):
+    def wrapper(func):
+        def inner(*args, **kwargs):
+            signature = inspect.signature(func)
+            bound_args = signature.bind(*args, **kwargs)
+            bound_args.apply_defaults()
+            if 'parameters' in kwargs:
+                raise ValueError('You can not assign `parameters`')
+
+            arguments = bound_args.arguments
+            parameters = {}
+            for k, v in signature.parameters.items():
+                if k == 'self':
+                    continue
+                if k in exclude_fields:
+                    continue
+                if v.kind is Parameter.VAR_KEYWORD:
+                    parameters.update(arguments[k])
+                    continue
+                parameters[k] = arguments[k]
+
+            kwargs['parameters'] = parameters
+            return func(*args, **kwargs)
+        return inner
+    return wrapper
+
+
+class Requests(WeComMixin):
     """
     处理系统级错误，抛出 API 异常，直接生成 HTTP 响应，业务代码无需关心这些错误
+    - 确保 status_code == 200
+    - 确保 access_token 无效时重试
     """
 
-    def __init__(self, timeout=None):
+    def __init__(self, corpid, corpsecret, agentid, timeout=None):
         self._request_kwargs = {
             'timeout': timeout
         }
+        self._corpid = corpid
+        self._corpsecret = corpsecret
+        self._agentid = agentid
+        self._set_access_token()
+
+    def _set_access_token(self):
+        self._access_token_cache_key = digest(self._corpid, self._corpsecret)
+
+        access_token = cache.get(self._access_token_cache_key)
+        if access_token:
+            self._access_token = access_token
+            return
+
+        self._init_access_token()
+
+    def _init_access_token(self):
+        # 缓存中没有 access_token ，去企业微信请求
+        params = {'corpid': self._corpid, 'corpsecret': self._corpsecret}
+        data = self.get(url=URL.GET_TOKEN, params=params)
+
+        self._check_errcode_is_0(data)
+
+        # 请求成功了
+        access_token = data['access_token']
+        expires_in = data['expires_in']
+
+        cache.set(self._access_token_cache_key, access_token, expires_in)
+        self._access_token = access_token
 
     def _check_http_is_200(self, response):
         if response.status_code != 200:
@@ -100,30 +171,51 @@ class Requests:
                          f'\ncontent={response.content}')
             raise WeComError
 
-    def get(self, url, params=None, **kwargs):
-        kwargs['params'] = params
-        data = self.request('get', url, **kwargs)
+    @to_parameters()
+    def get(self, url, params=None, with_token=True, **kwargs):
+        data = self.request('get', **kwargs['parameters'])
         return data
 
-    def request(self, method, url, **kwargs):
-        try:
-            set_default(kwargs, self._request_kwargs)
-            response = getattr(requests, method)(url, **kwargs)
-            self._check_http_is_200(response)
-            data = response.json()
-            return DictWrapper(data)
-        except ReadTimeout as e:
-            logger.exception(e)
-            raise NetError
-
-    def post(self, url, data=None, json=None, **kwargs):
-        kwargs['data'] = data
-        kwargs['json'] = json
-        data = self.request('get', url, **kwargs)
+    @to_parameters()
+    def post(self, url, data=None, json=None, params=None, with_token=True, **kwargs):
+        data = self.request('post', **kwargs['parameters'])
         return data
 
+    def request(self, method,
+                params: dict = None,
+                with_token=True,
+                **kwargs):
+        for i in range(3):
+            # 循环为了防止 access_token 失效
+            # https://open.work.weixin.qq.com/api/doc/90000/90135/91039
+            try:
+                if with_token:
+                    if not isinstance(params, dict):
+                        params = {}
+                    params['access_token'] = self._access_token
 
-class WeCom:
+                set_default(kwargs, self._request_kwargs)
+                kwargs['params'] = params
+
+                response = getattr(requests, method)(**kwargs)
+                self._check_http_is_200(response)
+                data = response.json()
+                data = DictWrapper(data)
+
+                errcode = data['errcode']
+                if errcode == ErrorCode.INVALID_TOKEN:
+                    self._init_access_token()
+                    continue
+                return data
+            except ReadTimeout as e:
+                logger.exception(e)
+                raise NetError
+
+        logger.error(f'WeCom access_token retry 3 times failed, check your config')
+        raise WeComError
+
+
+class WeCom(WeComMixin):
     """
     非业务数据导致的错误直接抛异常，说明是系统配置错误，业务代码不用理会
     """
@@ -142,16 +234,6 @@ class WeCom:
             logger.error(f'Request WeCom error: '
                          f'status_code={response.status_code} '
                          f'\ncontent={response.content}')
-            raise WeComError
-
-    def _check_errcode_is_0(self, data: DictWrapper):
-        errcode = data['errcode']
-        if errcode != 0:
-            # 如果代码写的对，配置没问题，这里不该出错，系统性错误，直接抛异常
-            errmsg = data['errmsg']
-            logger.error(f'WeCom response 200 but errcode wrong: '
-                         f'errcode={errcode} '
-                         f'errmsg={errmsg} ')
             raise WeComError
 
     def _set_access_token(self):
