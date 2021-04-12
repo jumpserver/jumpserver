@@ -307,6 +307,15 @@ class NodeAllAssetsMappingMixin:
         org_id = str(org_id)
         cls.orgid_nodekey_assetsid_mapping.pop(org_id, None)
 
+    @classmethod
+    def expire_all_orgs_node_all_asset_ids_mapping_from_memory(cls):
+        orgs = Organization.objects.all()
+        org_ids = [str(org.id) for org in orgs]
+        org_ids.append(Organization.ROOT_ID)
+
+        for id in org_ids:
+            cls.expire_node_all_asset_ids_mapping_from_memory(id)
+
     # get order: from memory -> (from cache -> to generate)
     @classmethod
     def get_node_all_asset_ids_mapping_from_cache_or_generate_to_cache(cls, org_id):
