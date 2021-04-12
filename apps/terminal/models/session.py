@@ -124,10 +124,10 @@ class Session(OrgModelMixin):
         else:
             return True
 
-    def save_replay_to_storage(self, f):
+    def save_replay_to_storage(self, file):
         local_path = self.get_local_path()
         try:
-            name = default_storage.save(local_path, f)
+            name = default_storage.save(local_path, file)
         except OSError as e:
             return None, e
 

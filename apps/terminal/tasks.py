@@ -59,6 +59,7 @@ def clean_expired_session_period():
     timestamp = expire_date.timestamp()
     expired_commands = Command.objects.filter(timestamp__lt=timestamp)
     replay_dir = os.path.join(default_storage.base_location, 'replay')
+    file_store_dir = os.path.join(default_storage.base_location, 'file_store')
 
     expired_sessions.delete()
     logger.info("Clean session item done")
@@ -71,6 +72,13 @@ def clean_expired_session_period():
     command = "find %s -type d -empty -delete;" % replay_dir
     subprocess.call(command, shell=True)
     logger.info("Clean session replay done")
+    command = "find %s -mtime +%s -name '*.gz' -exec rm -f {} \\;" % (
+        file_store_dir, days
+    )
+    subprocess.call(command, shell=True)
+    command = "find %s -type d -empty -delete;" % file_store_dir
+    subprocess.call(command, shell=True)
+    logger.info("Clean session file done")
 
 
 @shared_task

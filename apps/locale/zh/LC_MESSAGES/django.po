@@ -1045,6 +1045,10 @@ msgstr "上传文件"
 msgid "Download"
 msgstr "下载文件"
 
+#: audits/models.py:28
+msgid "File Recorded"
+msgstr "文件记录"
+
 #: audits/models.py:29
 msgid "Rmdir"
 msgstr "删除目录"

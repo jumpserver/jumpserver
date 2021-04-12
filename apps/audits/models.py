@@ -5,12 +5,17 @@ from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
+from common.utils import get_logger
 from orgs.mixins.models import OrgModelMixin
 from orgs.utils import current_org
 
 __all__ = [
     'FTPLog', 'OperateLog', 'PasswordChangeLog', 'UserLoginLog',
 ]
+
+from terminal.models import os, default_storage, settings
+
+logger = get_logger(__name__)
 
 
 class FTPLog(OrgModelMixin):
@@ -41,6 +46,30 @@ class FTPLog(OrgModelMixin):
     filename = models.CharField(max_length=1024, verbose_name=_("Filename"))
     is_success = models.BooleanField(default=True, verbose_name=_("Success"))
     date_start = models.DateTimeField(auto_now_add=True, verbose_name=_('Date start'))
+    has_file_record = models.BooleanField(default=False, verbose_name=_("File Recorded"))
+
+    file_local_upload_to = 'file_store'
+    file_remote_upload_to = 'FILE_STORE'
+
+    def get_file_local_path(self, file_name):
+        local_path = os.path.join(self.file_local_upload_to, self.date_start.strftime('%Y-%m-%d'), file_name)
+        return local_path
+
+    def get_file_remote_path(self, file_name):
+        local_path = os.path.join(self.file_remote_upload_to, self.date_start.strftime('%Y-%m-%d'), file_name)
+        return local_path
+
+    def save_file_to_storage(self, file):
+        local_path = self.get_file_local_path(file.name)
+        try:
+            name = default_storage.save(local_path, file)
+        except OSError as e:
+            return None, e
+
+        if settings.SERVER_REPLAY_STORAGE:
+            from .tasks import upload_ftp_log_file_to_external_storage
+            upload_ftp_log_file_to_external_storage(str(self.id), file.name)
+        return name, None
 
 
 class OperateLog(OrgModelMixin):

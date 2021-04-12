@@ -18,7 +18,7 @@ class FTPLogSerializer(serializers.ModelSerializer):
         model = models.FTPLog
         fields = (
             'id', 'user', 'remote_addr', 'asset', 'system_user', 'org_id',
-            'operate', 'filename', 'is_success', 'date_start', 'operate_display'
+            'operate', 'filename', 'is_success', 'date_start', 'operate_display', 'has_file_record'
         )
 
 
@@ -103,3 +103,7 @@ class CommandExecutionHostsRelationSerializer(BulkSerializerMixin, serializers.M
         fields = [
             'id', 'asset', 'asset_display', 'commandexecution', 'commandexecution_display'
         ]
+
+
+class FileSerializer(serializers.Serializer):
+    file = serializers.FileField(allow_empty_file=True)
