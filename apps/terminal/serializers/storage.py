@@ -82,6 +82,16 @@ class ReplayStorageTypeOSSSerializer(ReplayStorageTypeBaseSerializer):
     )
 
 
+class ReplayStorageTypeOBSSerializer(ReplayStorageTypeBaseSerializer):
+    endpoint_help_text = '''
+        OBS format: obs.{REGION_NAME}.myhuaweicloud.com
+        Such as: obs.cn-north-4.myhuaweicloud.com
+    '''
+    ENDPOINT = serializers.CharField(
+        max_length=1024, label=_('Endpoint'), help_text=_(endpoint_help_text), allow_null=True,
+    )
+
+
 class ReplayStorageTypeAzureSerializer(serializers.Serializer):
     class EndpointSuffixChoices(TextChoices):
         china = 'core.chinacloudapi.cn', 'core.chinacloudapi.cn'
@@ -105,7 +115,8 @@ replay_storage_type_serializer_classes_mapping = {
     const.ReplayStorageTypeChoices.ceph.value: ReplayStorageTypeCephSerializer,
     const.ReplayStorageTypeChoices.swift.value: ReplayStorageTypeSwiftSerializer,
     const.ReplayStorageTypeChoices.oss.value: ReplayStorageTypeOSSSerializer,
-    const.ReplayStorageTypeChoices.azure.value: ReplayStorageTypeAzureSerializer
+    const.ReplayStorageTypeChoices.azure.value: ReplayStorageTypeAzureSerializer,
+    const.ReplayStorageTypeChoices.obs.value: ReplayStorageTypeOBSSerializer
 }
 
 # ReplayStorageSerializer
