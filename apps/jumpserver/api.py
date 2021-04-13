@@ -1,3 +1,5 @@
+import time
+
 from django.core.cache import cache
 from django.utils import timezone
 from django.utils.timesince import timesince
@@ -6,6 +8,8 @@ from django.http.response import JsonResponse, HttpResponse
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from collections import Counter
+from django.conf import settings
+from rest_framework.response import Response
 
 from users.models import User
 from assets.models import Asset
@@ -307,7 +311,68 @@ class IndexApi(TotalCountMixin, DatesLoginMetricMixin, APIView):
         return JsonResponse(data, status=200)
 
 
-class PrometheusMetricsApi(APIView):
+class HealthApiMixin(APIView):
+    def is_token_right(self):
+        token = self.request.query_params.get('token')
+        ok_token = settings.HEALTH_CHECK_TOKEN
+        if ok_token and token != ok_token:
+            return False
+        return True
+
+    def check_permissions(self, request):
+        if not self.is_token_right():
+            msg = 'Health check token error, ' \
+                  'Please set query param in url and same with setting HEALTH_CHECK_TOKEN. ' \
+                  'eg: $PATH/?token=$HEALTH_CHECK_TOKEN'
+            self.permission_denied(request, message={'error': msg}, code=403)
+
+
+class HealthCheckView(HealthApiMixin):
+    permission_classes = (AllowAny,)
+
+    @staticmethod
+    def get_db_status():
+        t1 = time.time()
+        try:
+            User.objects.first()
+            t2 = time.time()
+            return True, t2 - t1
+        except:
+            t2 = time.time()
+            return False, t2 - t1
+
+    def get_redis_status(self):
+        key = 'HEALTH_CHECK'
+
+        t1 = time.time()
+        try:
+            value = '1'
+            cache.set(key, '1', 10)
+            got = cache.get(key)
+            t2 = time.time()
+            if value == got:
+                return True, t2 -t1
+            return False, t2 -t1
+        except:
+            t2 = time.time()
+            return False, t2 - t1
+
+    def get(self, request):
+        redis_status, redis_time = self.get_redis_status()
+        db_status, db_time = self.get_db_status()
+        status = all([redis_status, db_status])
+        data = {
+            'status': status,
+            'db_status': db_status,
+            'db_time': db_time,
+            'redis_status': redis_status,
+            'redis_time': redis_time,
+            'time': int(time.time())
+        }
+        return Response(data)
+
+
+class PrometheusMetricsApi(HealthApiMixin):
     permission_classes = (AllowAny,)
 
     def get(self, request, *args, **kwargs):

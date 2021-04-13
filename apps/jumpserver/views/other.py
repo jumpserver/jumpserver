@@ -17,7 +17,7 @@ from common.http import HttpResponseTemporaryRedirect
 
 
 __all__ = [
-    'LunaView', 'I18NView', 'KokoView', 'WsView', 'HealthCheckView',
+    'LunaView', 'I18NView', 'KokoView', 'WsView',
     'redirect_format_api', 'redirect_old_apps_view', 'UIView'
 ]
 
@@ -62,13 +62,6 @@ def redirect_old_apps_view(request, *args, **kwargs):
         return redirect('/api/docs/')
     new_path = '/core{}'.format(path)
     return HttpResponseTemporaryRedirect(new_path)
-
-
-class HealthCheckView(APIView):
-    permission_classes = (AllowAny,)
-
-    def get(self, request):
-        return JsonResponse({"status": 1, "time": int(time.time())})
 
 
 class WsView(APIView):
