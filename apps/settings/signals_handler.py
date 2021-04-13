@@ -71,13 +71,19 @@ def subscribe_settings_change(sender, **kwargs):
     logger.debug("Start subscribe setting change")
 
     def keep_subscribe():
-        sub = setting_pub_sub.subscribe()
-        for msg in sub.listen():
-            if msg["type"] != "message":
-                continue
-            item = msg['data'].decode()
-            logger.debug("Found setting change: {}".format(str(item)))
-            Setting.refresh_item(item)
+        while True:
+            try:
+                sub = setting_pub_sub.subscribe()
+                for msg in sub.listen():
+                    if msg["type"] != "message":
+                        continue
+                    item = msg['data'].decode()
+                    logger.debug("Found setting change: {}".format(str(item)))
+                    Setting.refresh_item(item)
+            except Exception as e:
+                logger.exception(f'subscribe_settings_change: {e}')
+                Setting.refresh_all_settings()
+
     t = threading.Thread(target=keep_subscribe)
     t.daemon = True
     t.start()

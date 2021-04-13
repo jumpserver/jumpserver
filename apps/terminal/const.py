@@ -31,6 +31,7 @@ class ComponentStatusChoices(TextChoices):
     critical = 'critical', _('Critical')
     high = 'high', _('High')
     normal = 'normal', _('Normal')
+    offline = 'offline', _('Offline')
 
     @classmethod
     def status(cls):

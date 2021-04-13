@@ -11,9 +11,10 @@ from django.contrib.auth import logout as auth_logout
 
 from common.utils import get_logger
 from common.permissions import (
-    PermissionsMixin, IsValidUser,
+    IsValidUser,
     UserCanUpdatePassword
 )
+from common.mixins.views import PermissionsMixin
 from ... import forms
 from ...models import User
 from ...utils import (

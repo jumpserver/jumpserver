@@ -16,7 +16,7 @@ from common.mixins import CommonApiMixin
 from common.utils import get_logger
 from orgs.utils import current_org
 from orgs.models import ROLE as ORG_ROLE, OrganizationMember
-from users.utils import send_reset_mfa_mail
+from users.utils import send_reset_mfa_mail, LoginBlockUtil, MFABlockUtils
 from .. import serializers
 from ..serializers import UserSerializer, UserRetrieveSerializer, MiniUserSerializer, InviteSerializer
 from .mixins import UserQuerysetMixin
@@ -190,16 +190,12 @@ class UserChangePasswordApi(UserQuerysetMixin, generics.RetrieveUpdateAPIView):
 class UserUnblockPKApi(UserQuerysetMixin, generics.UpdateAPIView):
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.UserSerializer
-    key_prefix_limit = "_LOGIN_LIMIT_{}_{}"
-    key_prefix_block = "_LOGIN_BLOCK_{}"
 
     def perform_update(self, serializer):
         user = self.get_object()
         username = user.username if user else ''
-        key_limit = self.key_prefix_limit.format(username, '*')
-        key_block = self.key_prefix_block.format(username)
-        cache.delete_pattern(key_limit)
-        cache.delete(key_block)
+        LoginBlockUtil.unblock_user(username)
+        MFABlockUtils.unblock_user(username)
 
 
 class UserResetOTPApi(UserQuerysetMixin, generics.RetrieveAPIView):

@@ -9,15 +9,34 @@ from common.utils import get_request_ip
 from ..models import (
     Terminal, Status, Session, Task, CommandStorage, ReplayStorage
 )
-from .components import ComponentsStateSerializer
+
+
+class StatusSerializer(serializers.ModelSerializer):
+    sessions = serializers.ListSerializer(
+        child=serializers.CharField(max_length=36), write_only=True
+    )
+
+    class Meta:
+        fields = [
+            'id',
+            'cpu_load', 'memory_used', 'disk_used',
+            'session_online', 'sessions',
+            'terminal', 'date_created',
+        ]
+        extra_kwargs = {
+            "cpu_load": {'default': 0},
+            "memory_used": {'default': 0},
+            "disk_used": {'default': 0},
+        }
+        model = Status
 
 
 class TerminalSerializer(BulkModelSerializer):
     session_online = serializers.SerializerMethodField()
     is_alive = serializers.BooleanField(read_only=True)
-    status = serializers.CharField(read_only=True)
-    status_display = serializers.CharField(read_only=True)
-    state = ComponentsStateSerializer(read_only=True)
+    status = serializers.CharField(read_only=True, source='latest_status')
+    status_display = serializers.CharField(read_only=True, source='latest_status_display')
+    stat = StatusSerializer(read_only=True, source='latest_stat')
 
     class Meta:
         model = Terminal
@@ -25,7 +44,7 @@ class TerminalSerializer(BulkModelSerializer):
             'id', 'name', 'type', 'remote_addr', 'http_port', 'ssh_port',
             'comment', 'is_accepted', "is_active", 'session_online',
             'is_alive', 'date_created', 'command_storage', 'replay_storage',
-            'status', 'status_display', 'state'
+            'status', 'status_display', 'stat'
         ]
         read_only_fields = ['type', 'date_created']
 
@@ -57,12 +76,6 @@ class TerminalSerializer(BulkModelSerializer):
     @staticmethod
     def get_session_online(obj):
         return Session.objects.filter(terminal=obj, is_finished=False).count()
-
-
-class StatusSerializer(serializers.ModelSerializer):
-    class Meta:
-        fields = ['id', 'terminal']
-        model = Status
 
 
 class TaskSerializer(BulkModelSerializer):

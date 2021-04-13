@@ -13,7 +13,8 @@ from formtools.wizard.views import SessionWizardView
 from django.views.generic import FormView
 
 from common.utils import get_object_or_none
-from common.permissions import PermissionsMixin, IsValidUser
+from common.permissions import IsValidUser
+from common.mixins.views import PermissionsMixin
 from ...models import User
 from ...utils import (
     send_reset_password_mail, get_password_check_rules, check_password_rules,

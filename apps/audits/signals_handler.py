@@ -44,6 +44,7 @@ class AuthBackendLabelMapping(LazyObject):
                 backend_label_mapping[backend] = source.label
         backend_label_mapping[settings.AUTH_BACKEND_PUBKEY] = _('SSH Key')
         backend_label_mapping[settings.AUTH_BACKEND_MODEL] = _('Password')
+        backend_label_mapping[settings.AUTH_BACKEND_SSO] = _('SSO')
         return backend_label_mapping
 
     def _setup(self):
@@ -153,7 +154,7 @@ def generate_data(username, request):
         'username': username,
         'ip': login_ip,
         'type': login_type,
-        'user_agent': user_agent,
+        'user_agent': user_agent[0:254],
         'datetime': timezone.now(),
         'backend': get_login_backend(request)
     }

@@ -24,6 +24,10 @@ class BasicSettingSerializer(serializers.Serializer):
         help_text=_('The forgot password url on login page, If you use '
                     'ldap or cas external authentication, you can set it')
     )
+    GLOBAL_ORG_DISPLAY_NAME = serializers.CharField(
+        required=False, max_length=1024, allow_blank=True, allow_null=True, label=_("Global organization name"),
+        help_text=_('The name of global organization to display')
+    )
 
 
 class EmailSettingSerializer(serializers.Serializer):

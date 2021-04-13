@@ -143,6 +143,7 @@ class Config(dict):
         'REDIS_DB_SESSION': 5,
         'REDIS_DB_WS': 6,
 
+        'GLOBAL_ORG_DISPLAY_NAME': '',
         'SITE_URL': 'http://localhost:8080',
         'CAPTCHA_TEST_MODE': None,
         'TOKEN_EXPIRATION': 3600 * 24,

@@ -7,7 +7,7 @@ from django.db.models import signals
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import is_uuid, lazyproperty
+from common.utils import lazyproperty, settings
 from common.const import choices
 from common.db.models import ChoiceSet
 
@@ -193,7 +193,8 @@ class Organization(models.Model):
 
     @classmethod
     def root(cls):
-        return cls(id=cls.ROOT_ID, name=cls.ROOT_NAME)
+        name = settings.GLOBAL_ORG_DISPLAY_NAME or cls.ROOT_NAME
+        return cls(id=cls.ROOT_ID, name=name)
 
     def is_root(self):
         return self.id == self.ROOT_ID

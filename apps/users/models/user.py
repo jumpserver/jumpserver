@@ -667,12 +667,20 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         else:
             return user_default
 
+    def unblock_login(self):
+        from users.utils import LoginBlockUtil, MFABlockUtils
+        LoginBlockUtil.unblock_user(self.username)
+        MFABlockUtils.unblock_user(self.username)
+
     @property
     def login_blocked(self):
-        key_prefix_block = "_LOGIN_BLOCK_{}"
-        key_block = key_prefix_block.format(self.username)
-        blocked = bool(cache.get(key_block))
-        return blocked
+        from users.utils import LoginBlockUtil, MFABlockUtils
+        if LoginBlockUtil.is_user_block(self.username):
+            return True
+        if MFABlockUtils.is_user_block(self.username):
+            return True
+
+        return False
 
     def delete(self, using=None, keep_parents=False):
         if self.pk == 1 or self.username == 'admin':

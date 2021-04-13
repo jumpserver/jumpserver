@@ -3,8 +3,8 @@
 from django.views.generic import TemplateView
 from django.conf import settings
 
-from common.permissions import PermissionsMixin, IsOrgAdmin, IsOrgAuditor
-
+from common.permissions import IsOrgAdmin, IsOrgAuditor
+from common.mixins.views import PermissionsMixin
 
 __all__ = ['CeleryTaskLogView']
 
