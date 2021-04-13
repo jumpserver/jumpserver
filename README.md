@@ -1,12 +1,16 @@
 # JumpServer 多云环境下更好用的堡垒机
 
-[![Python3](https://img.shields.io/badge/python-3.6-green.svg?style=plastic)](https://www.python.org/)
-[![Django](https://img.shields.io/badge/django-2.2-brightgreen.svg?style=plastic)](https://www.djangoproject.com/)
+[![License](https://shields.io/github/license/jumpserver/jumpserver)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
+[![Release Downloads](https://shields.io/github/downloads/jumpserver/jumpserver/total)](https://github.com/jumpserver/jumpserver/releases)
 [![Docker Pulls](https://img.shields.io/docker/pulls/jumpserver/jms_all.svg)](https://hub.docker.com/u/jumpserver)
 
-|Developer Wanted|
+- [ENGLISH](https://github.com/jumpserver/jumpserver/blob/master/README_EN.md)
+
+|![notification](https://raw.githubusercontent.com/goharbor/website/master/docs/img/readme/bell-outline-badged.svg)安全通知|
 |------------------|
-|JumpServer 正在寻找开发者，一起为改变世界做些贡献吧，哪怕一点点，联系我 <ibuler@fit2cloud.com> |
+|2021年1月15日 JumpServer 发现远程执行漏洞，请速度修复 [详见](https://github.com/jumpserver/jumpserver/issues/5533)， 非常感谢  **reactivity of Alibaba Hackerone bug bounty program**(瑞典) 向我们报告了此 BUG|
+
+--------------------------
 
 JumpServer 是全球首款开源的堡垒机，使用 GNU GPL v2.0 开源协议，是符合 4A 规范的运维安全审计系统。
 
@@ -16,7 +20,6 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 
 改变世界，从一点点开始。
 
-> 注: [KubeOperator](https://github.com/KubeOperator/KubeOperator) 是 JumpServer 团队在 Kubernetes 领域的的又一全新力作，欢迎关注和使用。
 
 ## 特色优势
 
@@ -28,21 +31,6 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 - 多租户: 一套系统，多个子公司和部门同时使用；
 - 多应用支持: 数据库，Windows远程应用，Kubernetes。
 
-## 版本说明
-
-自 v2.0.0 发布后， JumpServer 版本号命名将变更为：v大版本.功能版本.Bug修复版本。比如：
-
-```
-v2.0.1 是 v2.0.0 之后的Bug修复版本；
-v2.1.0 是 v2.0.0 之后的功能版本。
-```
-
-像其它优秀开源项目一样，JumpServer 每个月会发布一个功能版本，并同时维护 3 个功能版本。比如：
-
-```
-在 v2.4 发布前，我们会同时维护 v2.1、v2.2、v2.3；
-在 v2.4 发布后，我们会同时维护 v2.2、v2.3、v2.4；v2.1 会停止维护。
-```
 
 ## 功能列表
 
@@ -72,8 +60,8 @@ v2.1.0 是 v2.0.0 之后的功能版本。
     <td>RADIUS 二次认证</td>
   </tr>
   <tr>
-    <td>登录复核（X-PACK）</td>
-    <td>用户登录行为受管理员的监管与控制</td>
+    <td>登录复核</td>
+    <td>用户登录行为受管理员的监管与控制:small_orange_diamond:</td>
   </tr>
   <tr>
     <td rowspan="11">账号管理<br>Account</td>
@@ -97,23 +85,23 @@ v2.1.0 是 v2.0.0 之后的功能版本。
     <td>密码过期设置</td>
   </tr>
   <tr>
-    <td rowspan="2">批量改密（X-PACK）</td>
-    <td>定期批量改密</td>
+    <td rowspan="2">批量改密</td>
+    <td>定期批量改密:small_orange_diamond:</td>
   </tr>
   <tr>
-    <td>多种密码策略</td>
+    <td>多种密码策略:small_orange_diamond:</td>
   </tr>
   <tr>
-    <td>多云纳管（X-PACK）</td>
-    <td>对私有云、公有云资产自动统一纳管</td>
+    <td>多云纳管 </td>
+    <td>对私有云、公有云资产自动统一纳管:small_orange_diamond:</td>
   </tr>
   <tr>
-    <td>收集用户（X-PACK）</td>
-    <td>自定义任务定期收集主机用户</td>
+    <td>收集用户 </td>
+    <td>自定义任务定期收集主机用户:small_orange_diamond:</td>
   </tr>
   <tr>
-    <td>密码匣子（X-PACK）</td>
-    <td>统一对资产主机的用户密码进行查看、更新、测试操作</td>
+    <td>密码匣子 </td>
+    <td>统一对资产主机的用户密码进行查看、更新、测试操作:small_orange_diamond:</td>
   </tr>
   <tr>
     <td rowspan="15">授权控制<br>Authorization</td>
@@ -138,7 +126,7 @@ v2.1.0 是 v2.0.0 之后的功能版本。
     <td>实现更细粒度的应用级授权</td>
   </tr>
   <tr>
-    <td>MySQL 数据库应用、RemoteApp 远程应用（X-PACK）</td>
+    <td>MySQL 数据库应用、RemoteApp 远程应用:small_orange_diamond: </td>
   </tr>
   <tr>
     <td>动作授权</td>
@@ -165,12 +153,12 @@ v2.1.0 是 v2.0.0 之后的功能版本。
     <td>实现 Web SFTP 文件管理</td>
   </tr>
   <tr>
-    <td>工单管理（X-PACK）</td>
-    <td>支持对用户登录请求行为进行控制</td>
+    <td>工单管理</td>
+    <td>支持对用户登录请求行为进行控制:small_orange_diamond:</td>
   </tr>
   <tr>
-    <td>组织管理（X-PACK）</td>
-    <td>实现多租户管理与权限隔离</td>
+    <td>组织管理</td>
+    <td>实现多租户管理与权限隔离:small_orange_diamond:</td>
   </tr>
   <tr>
     <td rowspan="7">安全审计<br>Audit</td>
@@ -189,7 +177,7 @@ v2.1.0 是 v2.0.0 之后的功能版本。
     <td>支持对 Linux、Windows 等资产操作的录像进行回放审计</td>
   </tr>
   <tr>
-    <td>支持对 RemoteApp（X-PACK）、MySQL 等应用操作的录像进行回放审计</td>
+    <td>支持对 RemoteApp:small_orange_diamond:、MySQL 等应用操作的录像进行回放审计</td>
   </tr>
   <tr>
     <td>指令审计</td>
@@ -205,7 +193,7 @@ v2.1.0 是 v2.0.0 之后的功能版本。
     <td>命令方式</td>
   </tr>
   <tr>
-    <td>Web UI方式 (X-PACK)</td>
+    <td>Web UI方式 :small_orange_diamond:</td>
   </tr>
 
   <tr>
@@ -213,13 +201,13 @@ v2.1.0 是 v2.0.0 之后的功能版本。
     <td>MySQL</td>
   </tr>
   <tr>
-    <td>Oracle (X-PACK)</td>
+    <td>Oracle :small_orange_diamond:</td>
   </tr>
   <tr>
-    <td>MariaDB (X-PACK)</td>
+    <td>MariaDB :small_orange_diamond:</td>
   </tr>
   <tr>
-    <td>PostgreSQL (X-PACK)</td>
+    <td>PostgreSQL :small_orange_diamond:</td>
   </tr>
   <tr>
     <td rowspan="6">功能亮点</td>
@@ -249,6 +237,8 @@ v2.1.0 是 v2.0.0 之后的功能版本。
   </tr>
 </table>
 
+**说明**: 带 :small_orange_diamond: 后缀的是 X-PACK 插件有的功能
+
 ## 快速开始
 
 - [极速安装](https://docs.jumpserver.org/zh/master/install/setup_by_fast/)
@@ -258,8 +248,18 @@ v2.1.0 是 v2.0.0 之后的功能版本。
 ## 组件项目
 - [Lina](https://github.com/jumpserver/lina) JumpServer Web UI 项目
 - [Luna](https://github.com/jumpserver/luna) JumpServer Web Terminal 项目
-- [Koko](https://github.com/jumpserver/koko) JumpServer 字符协议 Connector 项目，替代原来 Python 版本的 [Coco](https://github.com/jumpserver/coco)
+- [KoKo](https://github.com/jumpserver/koko) JumpServer 字符协议 Connector 项目，替代原来 Python 版本的 [Coco](https://github.com/jumpserver/coco)
 - [Guacamole](https://github.com/jumpserver/docker-guacamole) JumpServer 图形协议 Connector 项目，依赖 [Apache Guacamole](https://guacamole.apache.org/)
+
+## 贡献
+如果有你好的想法创意，或者帮助我们修复了 Bug, 欢迎提交 Pull Request
+
+感谢以下贡献者，让 JumpServer 更加完善
+
+<a href="https://github.com/jumpserver/jumpserver/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=jumpserver/jumpserver" />
+</a>
+
 
 ## 致谢
 - [Apache Guacamole](https://guacamole.apache.org/) Web页面连接 RDP, SSH, VNC协议设备，JumpServer 图形化连接依赖
@@ -268,7 +268,6 @@ v2.1.0 是 v2.0.0 之后的功能版本。
 
 ## JumpServer 企业版 
 - [申请企业版试用](https://jinshuju.net/f/kyOYpi)
-> 注：企业版支持离线安装，申请通过后会提供高速下载链接。
 
 ## 案例研究
 
