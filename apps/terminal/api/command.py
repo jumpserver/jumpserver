@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.template import loader
 
+from common.http import is_true
 from terminal.models import CommandStorage, Command
 from terminal.filters import CommandFilter
 from orgs.utils import current_org
@@ -140,7 +141,21 @@ class CommandViewSet(viewsets.ModelViewSet):
         if session_id and not command_storage_id:
             # 会话里的命令列表肯定会提供 session_id，这里防止 merge 的时候取全量的数据
             return self.merge_all_storage_list(request, *args, **kwargs)
-        return super().list(request, *args, **kwargs)
+
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        query_all = self.request.query_params.get('all', False)
+        if is_true(query_all):
+            # 适配像 ES 这种没有指定分页只返回少量数据的情况
+            queryset = queryset[:]
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     def get_queryset(self):
         command_storage_id = self.request.query_params.get('command_storage_id')
