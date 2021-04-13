@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import os
 from importlib import import_module
+from elasticsearch.exceptions import RequestError
 
 import jms_storage
 from django.db import models
@@ -75,6 +76,22 @@ class CommandStorage(CommonModelMixin):
             qs = engine_mod.QuerySet(self.config)
             qs.model = Command
         return qs
+
+    def ensure_es_index_exists(self):
+        qs = self.get_command_queryset()
+        es = qs._storage.es
+        index = self.meta['INDEX']
+        try:
+            es.indices.create(index)
+        except RequestError:
+            pass
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        super(CommandStorage, self).save()
+
+        if self.type == const.CommandStorageTypeChoices.es:
+            self.ensure_es_index_exists()
 
 
 class ReplayStorage(CommonModelMixin):
