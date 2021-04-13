@@ -76,6 +76,15 @@ class CommandStorage(CommonModelMixin):
             qs.model = Command
         return qs
 
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        super().save()
+
+        if self.type in TYPE_ENGINE_MAPPING:
+            engine_mod = import_module(TYPE_ENGINE_MAPPING[self.type])
+            backend = engine_mod.CommandStore(self.config)
+            backend.pre_use_check()
+
 
 class ReplayStorage(CommonModelMixin):
     name = models.CharField(max_length=128, verbose_name=_("Name"), unique=True)
