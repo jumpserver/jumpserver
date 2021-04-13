@@ -48,7 +48,8 @@ urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
     path('api/v1/', include(api_v1)),
     re_path('api/(?P<app>\w+)/(?P<version>v\d)/.*', views.redirect_format_api),
-    path('api/health/', views.HealthCheckView.as_view(), name="health"),
+    path('api/health/', api.HealthCheckView.as_view(), name="health"),
+    path('api/v1/health/', api.HealthCheckView.as_view(), name="health_v1"),
     # External apps url
     path('core/auth/captcha/', include('captcha.urls')),
     path('core/', include(app_view_patterns)),

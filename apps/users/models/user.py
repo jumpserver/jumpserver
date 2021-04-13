@@ -667,6 +667,11 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         else:
             return user_default
 
+    def unblock_login(self):
+        from users.utils import LoginBlockUtil, MFABlockUtils
+        LoginBlockUtil.unblock_user(self.username)
+        MFABlockUtils.unblock_user(self.username)
+
     @property
     def login_blocked(self):
         from users.utils import LoginBlockUtil, MFABlockUtils

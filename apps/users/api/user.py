@@ -1,8 +1,8 @@
 # ~*~ coding: utf-8 ~*~
-from django.core.cache import cache
+from collections import defaultdict
+
 from django.utils.translation import ugettext as _
 from rest_framework.decorators import action
-from django.conf import settings
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
@@ -155,10 +155,17 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         serializer = serializer_cls(data=data, many=True)
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data
+
+        users_by_role = defaultdict(list)
         for i in validated_data:
-            i['org_id'] = current_org.org_id()
-        relations = [OrganizationMember(**i) for i in validated_data]
-        OrganizationMember.objects.bulk_create(relations, ignore_conflicts=True)
+            users_by_role[i['role']].append(i['user'])
+
+        OrganizationMember.objects.add_users_by_role(
+            current_org,
+            users=users_by_role[ORG_ROLE.USER],
+            admins=users_by_role[ORG_ROLE.ADMIN],
+            auditors=users_by_role[ORG_ROLE.AUDITOR]
+        )
         return Response(serializer.data, status=201)
 
     @action(methods=['post'], detail=True, permission_classes=(IsOrgAdmin,))
