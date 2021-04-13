@@ -7,6 +7,7 @@ from django.conf import settings
 
 from common.utils import get_logger
 from users.models import User
+from orgs.utils import tmp_to_root_org
 from .status import Status
 from .. import const
 from ..const import ComponentStatusChoices as StatusChoice
@@ -112,7 +113,6 @@ class Terminal(StorageMixin, TerminalStatusMixin, models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
 
-
     @property
     def is_active(self):
         if self.user and self.user.is_active:
@@ -126,7 +126,8 @@ class Terminal(StorageMixin, TerminalStatusMixin, models.Model):
             self.user.save()
 
     def get_online_sessions(self):
-        return Session.objects.filter(terminal=self, is_finished=False)
+        with tmp_to_root_org():
+            return Session.objects.filter(terminal=self, is_finished=False)
 
     def get_online_session_count(self):
         return self.get_online_sessions().count()
