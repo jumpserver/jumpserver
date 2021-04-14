@@ -295,6 +295,7 @@ class Config(dict):
         'SESSION_SAVE_EVERY_REQUEST': True,
         'SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE': False,
         'FORGOT_PASSWORD_URL': '',
+        'HEALTH_CHECK_TOKEN': ''
     }
 
     def compatible_auth_openid_of_key(self):

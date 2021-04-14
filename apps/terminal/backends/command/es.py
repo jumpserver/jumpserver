@@ -10,6 +10,7 @@ import inspect
 from django.db.models import QuerySet as DJQuerySet
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
+from elasticsearch.exceptions import RequestError
 
 from common.utils.common import lazyproperty
 from common.utils import get_logger
@@ -30,6 +31,15 @@ class CommandStore():
         if ignore_verify_certs:
             kwargs['verify_certs'] = None
         self.es = Elasticsearch(hosts=hosts, max_retries=0, **kwargs)
+
+    def pre_use_check(self):
+        self._ensure_index_exists()
+
+    def _ensure_index_exists(self):
+        try:
+            self.es.indices.create(self.index)
+        except RequestError:
+            pass
 
     @staticmethod
     def make_data(command):
@@ -234,6 +244,7 @@ class QuerySet(DJQuerySet):
         uqs = QuerySet(self._command_store_config)
         uqs._method_calls = self._method_calls.copy()
         uqs._slice = self._slice
+        uqs.model = self.model
         return uqs
 
     def count(self, limit_to_max_result_window=True):
