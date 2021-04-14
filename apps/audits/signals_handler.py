@@ -146,7 +146,7 @@ def generate_data(username, request):
     user_agent = request.META.get('HTTP_USER_AGENT', '')
     login_ip = get_request_ip(request) or '0.0.0.0'
     if isinstance(request, Request):
-        login_type = request.META.get('HTTP_X_JMS_LOGIN_TYPE', '')
+        login_type = request.META.get('HTTP_X_JMS_LOGIN_TYPE', 'U')
     else:
         login_type = 'W'
 
