@@ -62,7 +62,7 @@ class AccountType(CommonModelMixin, models.Model):
             tp = field_definition.pop('type')
             field_class = FieldDefinitionTypeChoices.get_serializer_field_class(tp=tp)
             # Integer type
-            if tp == FieldDefinitionTypeChoices.integer:
+            if tp == FieldDefinitionTypeChoices.int:
                 default = field_definition.get('default')
                 if isinstance(default, str) and default.isdigit():
                     field_definition['default'] = int(default)

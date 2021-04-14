@@ -10,7 +10,7 @@ __all__ = ['AccountTypeSerializer']
 class FieldDefinitionSerializer(serializers.Serializer):
     name = serializers.SlugField(max_length=128, required=True, label=_('Name'))
     type = serializers.ChoiceField(
-        choices=FieldDefinitionTypeChoices.choices, default=FieldDefinitionTypeChoices.char,
+        choices=FieldDefinitionTypeChoices.choices, default=FieldDefinitionTypeChoices.str,
         label=_('Type')
     )
     required = serializers.BooleanField(default=False, label=_('Required'))
