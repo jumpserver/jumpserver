@@ -85,7 +85,7 @@ class DictWrapper:
 
 
 class WeComMixin:
-    def _check_errcode_is_0(self, data: DictWrapper):
+    def check_errcode_is_0(self, data: DictWrapper):
         errcode = data['errcode']
         if errcode != 0:
             # 如果代码写的对，配置没问题，这里不该出错，系统性错误，直接抛异常
@@ -123,6 +123,30 @@ def to_parameters(*exclude_fields):
     return wrapper
 
 
+def request(func):
+    def inner(*args, **kwargs):
+        signature = inspect.signature(func)
+        bound_args = signature.bind(*args, **kwargs)
+        bound_args.apply_defaults()
+
+        arguments = bound_args.arguments
+        self = arguments['self']
+        request_method = func.__name__
+
+        parameters = {}
+        for k, v in signature.parameters.items():
+            if k == 'self':
+                continue
+            if v.kind is Parameter.VAR_KEYWORD:
+                parameters.update(arguments[k])
+                continue
+            parameters[k] = arguments[k]
+
+        response = self.request(request_method, **parameters)
+        return response
+    return inner
+
+
 class WeComRequests(WeComMixin):
     """
     处理系统级错误，抛出 API 异常，直接生成 HTTP 响应，业务代码无需关心这些错误
@@ -154,7 +178,7 @@ class WeComRequests(WeComMixin):
         params = {'corpid': self._corpid, 'corpsecret': self._corpsecret}
         data = self.get(url=URL.GET_TOKEN, params=params)
 
-        self._check_errcode_is_0(data)
+        self.check_errcode_is_0(data)
 
         # 请求成功了
         access_token = data['access_token']
@@ -171,21 +195,22 @@ class WeComRequests(WeComMixin):
                          f'\ncontent={response.content}')
             raise WeComError
 
-    @to_parameters()
-    def get(self, url, params=None, with_token=True, with_agentid=False, **kwargs):
-        data = self.request('get', **kwargs['parameters'])
-        return data
+    @request
+    def get(self, url, params=None, with_token=True, with_agentid=False,
+            check_errcode_is_0=True, **kwargs):
+        pass
 
-    @to_parameters()
+    @request
     def post(self, url, data=None, json=None, params=None,
-             with_token=True, with_agentid=False, **kwargs):
-        data = self.request('post', **kwargs['parameters'])
-        return data
+             with_token=True, with_agentid=False, check_errcode_is_0=True,
+             **kwargs):
+        pass
 
     def request(self, method,
                 params: dict = None,
                 with_token=True,
                 with_agentid=False,
+                check_errcode_is_0=True,
                 **kwargs):
         for i in range(3):
             # 循环为了防止 access_token 失效
@@ -212,6 +237,10 @@ class WeComRequests(WeComMixin):
                 if errcode == ErrorCode.INVALID_TOKEN:
                     self._init_access_token()
                     continue
+
+                if check_errcode_is_0:
+                    self.check_errcode_is_0(data)
+
                 return data
             except ReadTimeout as e:
                 logger.exception(e)
@@ -272,7 +301,7 @@ class WeCom(WeComMixin):
         if errcode == ErrorCode.RECIPIENTS_INVALID:
             # 全部接收人无权限或不存在
             return users
-        self._check_errcode_is_0(data)
+        self.check_errcode_is_0(data)
 
         invaliduser = data['invaliduser']
         if not invaliduser:
@@ -285,33 +314,20 @@ class WeCom(WeComMixin):
         invalid_users = invaliduser.split('|')
         return invalid_users
 
-    def request_get(self, url, params: dict = None):
-        for i in range(3):
-            params = params or {}
-            params['access_token'] = self._access_token
-            data = self._requests.get(URL.GET_USER_ID_BY_CODE, params)
-            errcode = data['errcode']
-            if errcode == ErrorCode.INVALID_TOKEN:
-                self._init_access_token()
-                continue
-            return data
-        logger.error(f'WeCom access_token retry 3 times failed, check your config')
-        raise WeComError
-
     def get_user_id_by_code(self, code):
         # # https://open.work.weixin.qq.com/api/doc/90000/90135/91437
 
         params = {
             'code': code,
         }
-        data = self.request_get(URL.GET_USER_ID_BY_CODE, params=params)
+        data = self._requests.get(URL.GET_USER_ID_BY_CODE, params=params, check_errcode_is_0=False)
 
         errcode = data['errcode']
         if errcode == ErrorCode.INVALID_CODE:
             logger.warn(f'WeCom get_user_id_by_code invalid code: code={code}')
             return None, None
 
-        self._check_errcode_is_0(data)
+        self.check_errcode_is_0(data)
 
         USER_ID = 'UserId'
         OPEN_ID = 'OpenId'
@@ -331,5 +347,5 @@ class WeCom(WeComMixin):
             'userid': id,
         }
 
-        data = self.request_get(URL.GET_USER_DETAIL, params)
+        data = self._requests.get(URL.GET_USER_DETAIL, params)
         return data
