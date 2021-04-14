@@ -239,7 +239,8 @@ class AuthMixin:
         self._check_is_block(user.username)
         self._check_login_acl(user, ip)
 
-        clean_failed_count(user.username, ip)
+        LoginBlockUtil(user.username, ip).clean_failed_count()
+        MFABlockUtils(user.username, ip).clean_failed_count()
 
         request.session['auth_password'] = 1
         request.session['user_id'] = str(user.id)

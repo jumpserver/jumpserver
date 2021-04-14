@@ -195,12 +195,14 @@ class WeComRequests(WeComMixin):
     @request
     def get(self, url, params=None, with_token=True, with_agentid=False,
             check_errcode_is_0=True, **kwargs):
+        # self.request ...
         pass
 
     @request
     def post(self, url, data=None, json=None, params=None,
              with_token=True, with_agentid=False, check_errcode_is_0=True,
              **kwargs):
+        # self.request ...
         pass
 
     def request(self, method,
