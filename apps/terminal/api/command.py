@@ -149,10 +149,8 @@ class CommandViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
-        query_all = self.request.query_params.get('all', False)
-        if is_true(query_all):
-            # 适配像 ES 这种没有指定分页只返回少量数据的情况
-            queryset = queryset[:]
+        # 适配像 ES 这种没有指定分页只返回少量数据的情况
+        queryset = queryset[:]
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)

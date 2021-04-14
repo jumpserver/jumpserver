@@ -1,45 +1,59 @@
 from rest_framework import serializers
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from assets.models import SystemUser
 from acls import models
 from orgs.models import Organization
-from .. import const
 
 
 __all__ = ['LoginAssetACLSerializer']
 
 
+common_help_text = _('Format for comma-delimited string, with * indicating a match all. ')
+
+
 class LoginAssetACLUsersSerializer(serializers.Serializer):
     username_group = serializers.ListField(
         default=['*'], child=serializers.CharField(max_length=128), label=_('Username'),
-        help_text=const.common_help_text
+        help_text=common_help_text
     )
 
 
 class LoginAssetACLAssestsSerializer(serializers.Serializer):
+    ip_group_help_text = _(
+        'Format for comma-delimited string, with * indicating a match all. '
+        'Such as: '
+        '192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 '
+        '(Domain name support)'
+    )
+
     ip_group = serializers.ListField(
         default=['*'], child=serializers.CharField(max_length=1024), label=_('IP'),
-        help_text=const.ip_group_help_text + _('(Domain name support)')
+        help_text=ip_group_help_text
     )
     hostname_group = serializers.ListField(
         default=['*'], child=serializers.CharField(max_length=128), label=_('Hostname'),
-        help_text=const.common_help_text
+        help_text=common_help_text
     )
 
 
 class LoginAssetACLSystemUsersSerializer(serializers.Serializer):
+    protocol_group_help_text = _(
+        'Format for comma-delimited string, with * indicating a match all. '
+        'Protocol options: {}'
+    )
+
     name_group = serializers.ListField(
         default=['*'], child=serializers.CharField(max_length=128), label=_('Name'),
-        help_text=const.common_help_text
+        help_text=common_help_text
     )
     username_group = serializers.ListField(
         default=['*'], child=serializers.CharField(max_length=128), label=_('Username'),
-        help_text=const.common_help_text
+        help_text=common_help_text
     )
     protocol_group = serializers.ListField(
         default=['*'], child=serializers.CharField(max_length=16), label=_('Protocol'),
-        help_text=const.common_help_text + _('Protocol options: {}').format(
+        help_text=protocol_group_help_text.format(
             ', '.join(SystemUser.ASSET_CATEGORY_PROTOCOLS)
         )
     )
