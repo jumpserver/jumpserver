@@ -44,8 +44,8 @@ class ApplicationSerializerMixin(serializers.Serializer):
 
 
 class ApplicationSerializer(ApplicationSerializerMixin, BulkOrgResourceModelSerializer):
-    category_display = serializers.ReadOnlyField(source='get_category_display', label=_('Category'))
-    type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type'))
+    category_display = serializers.ReadOnlyField(source='get_category_display', label=_('Category(Display)'))
+    type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type(Dispaly)'))
 
     class Meta:
         model = models.Application
