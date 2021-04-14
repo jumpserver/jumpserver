@@ -178,9 +178,6 @@ class WeComRequests(WeComMixin):
         params = {'corpid': self._corpid, 'corpsecret': self._corpsecret}
         data = self.get(url=URL.GET_TOKEN, params=params, with_token=False)
 
-        self.check_errcode_is_0(data)
-
-        # 请求成功了
         access_token = data['access_token']
         expires_in = data['expires_in']
 
@@ -293,10 +290,8 @@ class WeCom(WeComMixin):
            **extra_params
         }
         params = {'access_token': self._access_token}
-        response = self._requests.post(URL.SEND_MESSAGE, params=params, json=body)
-        self._check_http_is_200(response)
+        data = self._requests.post(URL.SEND_MESSAGE, params=params, json=body, check_errcode_is_0=False)
 
-        data = DictWrapper(response.json())
         errcode = data['errcode']
         if errcode == ErrorCode.RECIPIENTS_INVALID:
             # 全部接收人无权限或不存在
