@@ -176,7 +176,7 @@ class WeComRequests(WeComMixin):
     def _init_access_token(self):
         # 缓存中没有 access_token ，去企业微信请求
         params = {'corpid': self._corpid, 'corpsecret': self._corpsecret}
-        data = self.get(url=URL.GET_TOKEN, params=params)
+        data = self.get(url=URL.GET_TOKEN, params=params, with_token=False)
 
         self.check_errcode_is_0(data)
 
