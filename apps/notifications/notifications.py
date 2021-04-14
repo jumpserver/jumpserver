@@ -54,23 +54,25 @@ class UserUtils:
         return self.get_accounts_on_model_fields('email')
 
 
-messages = defaultdict(list)
+class Messages(defaultdict):
+    def __init__(self):
+        super().__init__(list)
+
+messages = Messages()
 
 
 class MessageType(type):
     def __new__(cls, name, bases, attrs: dict):
-        if 'app_name' in attrs and 'message' in attrs:
-            app_name = attrs['app_name']
+        if 'message' in attrs:
             message = attrs['message']
-            messages[app_name].append(message)
+            messages[message.app_name].append(message)
         clz = type.__new__(cls, name, bases, attrs)
         return clz
 
 
 class Message(metaclass=MessageType):
 
-    app_name: str
-    message: str
+    message: TextChoices
 
     def publish(self, data: dict):
         backend_user_mapper = defaultdict(list)
