@@ -79,6 +79,7 @@ class UserLoginLog(models.Model):
     LOGIN_TYPE_CHOICE = (
         ('W', 'Web'),
         ('T', 'Terminal'),
+        ('U', 'Unknown'),
     )
 
     MFA_DISABLED = 0
