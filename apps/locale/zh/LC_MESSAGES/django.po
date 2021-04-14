@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-14 16:04+0800\n"
+"POT-Creation-Date: 2021-04-14 17:52+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -177,8 +177,8 @@ msgid ""
 "192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:"
 "db8:1a:1110::/64 "
 msgstr ""
-"格式为逗号分隔的字符串, * 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, "
-"2001:db8:1a:1110::/64"
+"格式为逗号分隔的字符串, * 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, "
+"10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64"
 
 #: acls/serializers/login_acl.py:30 acls/serializers/login_asset_acl.py:31
 #: applications/serializers/attrs/application_type/mysql_workbench.py:18
@@ -204,7 +204,7 @@ msgstr "格式为逗号分隔的字符串, * 表示匹配所有. "
 #: applications/serializers/attrs/application_type/mysql_workbench.py:30
 #: applications/serializers/attrs/application_type/vmware_client.py:26
 #: assets/models/base.py:251 assets/models/gathered_user.py:15
-#: audits/models.py:99 authentication/forms.py:15 authentication/forms.py:17
+#: audits/models.py:100 authentication/forms.py:15 authentication/forms.py:17
 #: ops/models/adhoc.py:148 users/forms/profile.py:31 users/models/user.py:528
 #: users/templates/users/_select_user_modal.html:14
 #: users/templates/users/user_detail.html:53
@@ -222,8 +222,8 @@ msgid ""
 "192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:"
 "db8:1a:1110::/64 (Domain name support)"
 msgstr ""
-"格式为逗号分隔的字符串, * 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, "
-"2001:db8:1a:1110::/64 （支持网域）"
+"格式为逗号分隔的字符串, * 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, "
+"10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 （支持网域）"
 
 #: acls/serializers/login_asset_acl.py:35 assets/models/asset.py:184
 #: assets/serializers/asset_user.py:45 assets/serializers/gathered_user.py:20
@@ -273,8 +273,7 @@ msgstr "远程应用"
 msgid "Custom"
 msgstr "自定义"
 
-#: applications/models/application.py:13
-#: applications/serializers/application.py:47 assets/models/label.py:21
+#: applications/models/application.py:13 assets/models/label.py:21
 #: perms/models/application_permission.py:20
 #: perms/serializers/application/permission.py:16
 #: perms/serializers/application/user_permission.py:33
@@ -282,8 +281,7 @@ msgstr "自定义"
 msgid "Category"
 msgstr "类别"
 
-#: applications/models/application.py:16
-#: applications/serializers/application.py:48 assets/models/cmd_filter.py:52
+#: applications/models/application.py:16 assets/models/cmd_filter.py:52
 #: perms/models/application_permission.py:23
 #: perms/serializers/application/permission.py:17
 #: perms/serializers/application/user_permission.py:34
@@ -302,6 +300,14 @@ msgstr "网域"
 #: applications/models/application.py:22 xpack/plugins/cloud/models.py:33
 msgid "Attrs"
 msgstr ""
+
+#: applications/serializers/application.py:47
+msgid "Category(Display)"
+msgstr "类别 (显示名称)"
+
+#: applications/serializers/application.py:48
+msgid "Type(Dispaly)"
+msgstr "类型 (显示名称)"
 
 #: applications/serializers/attrs/application_category/cloud.py:9
 #: assets/models/cluster.py:40
@@ -1082,7 +1088,7 @@ msgstr "操作"
 msgid "Filename"
 msgstr "文件名"
 
-#: audits/models.py:42 audits/models.py:95
+#: audits/models.py:42 audits/models.py:96
 #: users/templates/users/user_detail.html:487
 msgid "Success"
 msgstr "成功"
@@ -1136,42 +1142,42 @@ msgstr "日期"
 msgid "Change by"
 msgstr "修改者"
 
-#: audits/models.py:89 users/templates/users/user_detail.html:84
+#: audits/models.py:90 users/templates/users/user_detail.html:84
 msgid "Disabled"
 msgstr "禁用"
 
-#: audits/models.py:90 settings/models.py:33
+#: audits/models.py:91 settings/models.py:33
 #: users/templates/users/user_detail.html:82
 msgid "Enabled"
 msgstr "启用"
 
-#: audits/models.py:91
+#: audits/models.py:92
 msgid "-"
 msgstr ""
 
-#: audits/models.py:96 xpack/plugins/cloud/const.py:25
+#: audits/models.py:97 xpack/plugins/cloud/const.py:25
 msgid "Failed"
 msgstr "失败"
 
-#: audits/models.py:100
+#: audits/models.py:101
 msgid "Login type"
 msgstr "登录方式"
 
-#: audits/models.py:101
+#: audits/models.py:102
 #: tickets/serializers/ticket/meta/ticket_type/login_confirm.py:14
 msgid "Login ip"
 msgstr "登录IP"
 
-#: audits/models.py:102
+#: audits/models.py:103
 #: tickets/serializers/ticket/meta/ticket_type/login_confirm.py:17
 msgid "Login city"
 msgstr "登录城市"
 
-#: audits/models.py:103 audits/serializers.py:38
+#: audits/models.py:104 audits/serializers.py:38
 msgid "User agent"
 msgstr "用户代理"
 
-#: audits/models.py:104
+#: audits/models.py:105
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
 #: authentication/templates/authentication/login_otp.html:6
 #: users/forms/profile.py:64 users/models/user.py:552
@@ -1180,21 +1186,21 @@ msgstr "用户代理"
 msgid "MFA"
 msgstr "多因子认证"
 
-#: audits/models.py:105 xpack/plugins/change_auth_plan/models.py:303
+#: audits/models.py:106 xpack/plugins/change_auth_plan/models.py:303
 #: xpack/plugins/cloud/models.py:161
 msgid "Reason"
 msgstr "原因"
 
-#: audits/models.py:106 tickets/models/ticket.py:47
+#: audits/models.py:107 tickets/models/ticket.py:47
 #: xpack/plugins/cloud/models.py:157 xpack/plugins/cloud/models.py:206
 msgid "Status"
 msgstr "状态"
 
-#: audits/models.py:107
+#: audits/models.py:108
 msgid "Date login"
 msgstr "登录日期"
 
-#: audits/models.py:108
+#: audits/models.py:109
 msgid "Authentication backend"
 msgstr "认证方式"
 
@@ -1372,12 +1378,13 @@ msgid ""
 msgstr "账号已被锁定（请联系管理员解锁 或 {}分钟后重试）"
 
 #: authentication/errors.py:60
+#, python-brace-format
 msgid ""
 "MFA code invalid, or ntp sync server time, You can also try {times_try} "
 "times (The account will be temporarily locked for {block_time} minutes)"
 msgstr ""
-"MFA验证码不正确，或者服务器端时间不对。 您还可以尝试 {times_try} 次（账号将"
-"被临时 锁定 {block_time} 分钟）"
+"MFA验证码不正确，或者服务器端时间不对。 您还可以尝试 {times_try} 次（账号将被"
+"临时 锁定 {block_time} 分钟）"
 
 #: authentication/errors.py:65
 msgid "MFA required"
