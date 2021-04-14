@@ -1,14 +1,16 @@
 from django.db.models import TextChoices
 from rest_framework import serializers
 
+from rest_framework import serializers
+
 
 class FieldDefinitionTypeChoices(TextChoices):
-    char = 'char', 'CharField'
-    integer = 'integer', 'IntegerField'
-    boolean = 'boolean', 'BooleanField'
+    str = 'str', 'CharField'
+    int = 'int', 'IntegerField'
+    bool = 'boo', 'BooleanField'
+    list = 'list', 'ListField'
+    ip = 'ip', 'IPAddressField'
     datetime = 'datetime', 'DateTimeField'
-    ip_address = 'ip_address', 'IPAddressField'
-    array = 'array', 'ListField'
 
     @classmethod
     def get_serializer_field_class(cls, tp):
