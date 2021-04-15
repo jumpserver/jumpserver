@@ -3,10 +3,11 @@ from collections import defaultdict
 
 from django.db.models import TextChoices
 from django.utils.translation import gettext_lazy as _
+from django.utils.functional import Promise
 
 from .backends.wecom import WeCom
 from .backends.email import Email
-from .models import Subscription
+from .models import Subscription, Message
 
 
 class Backends(TextChoices):
@@ -54,25 +55,33 @@ class UserUtils:
         return self.get_accounts_on_model_fields('email')
 
 
-class Messages(defaultdict):
-    def __init__(self):
-        super().__init__(list)
-
-messages = Messages()
+qualmsg_label_mapper = {}
 
 
 class MessageType(type):
     def __new__(cls, name, bases, attrs: dict):
-        if 'message' in attrs:
+        if 'app_name' in attrs and 'message' in attrs and 'message_label' in attrs:
+            app_name = attrs['app_name']
             message = attrs['message']
-            messages[message.app_name].append(message)
+            message_label = attrs['message_label']
+
+            if isinstance(message_label, Promise):
+                message_label = message_label._proxy____args[0]
+
+            qualmsg = app_name, message
+            if qualmsg in qualmsg_label_mapper:
+                raise ValueError(f'Notification duplicated {qualmsg}')
+
+            qualmsg_label_mapper[qualmsg] = message_label
+
         clz = type.__new__(cls, name, bases, attrs)
         return clz
 
 
 class Message(metaclass=MessageType):
-
-    message: TextChoices
+    app_name: str
+    message: str
+    message_label: str
 
     def publish(self, data: dict):
         backend_user_mapper = defaultdict(list)
