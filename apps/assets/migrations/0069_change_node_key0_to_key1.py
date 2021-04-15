@@ -42,7 +42,9 @@ def change_key0_to_key1(apps, schema_editor):
             key_list = n.key.split(':')
             key_list[0] = '1'
             new_key = ':'.join(key_list)
+            new_parent_key = ':'.join(key_list[:-1])
             n.key = new_key
+            n.parent_key = new_parent_key
             n.save()
             print('--> Modify key ( {} > {} )'.format(old_key, new_key))
 
