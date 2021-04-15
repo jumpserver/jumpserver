@@ -17,6 +17,7 @@ from terminal.filters import CommandFilter
 from orgs.utils import current_org
 from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor, IsAppUser
 from common.const.http import GET
+from common.drf.api import JMSBulkModelViewSet
 from common.utils import get_logger
 from terminal.utils import send_command_alert_mail
 from terminal.serializers import InsecureCommandAlertSerializer
@@ -94,7 +95,7 @@ class CommandQueryMixin:
         return date_from_st, date_to_st
 
 
-class CommandViewSet(viewsets.ModelViewSet):
+class CommandViewSet(JMSBulkModelViewSet):
     """接受app发送来的command log, 格式如下
     {
         "user": "admin",
