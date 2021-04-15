@@ -55,32 +55,7 @@ class UserUtils:
         return self.get_accounts_on_model_fields('email')
 
 
-qualmsg_label_mapper = {}
-
-
-class MessageType(type):
-    def __new__(cls, name, bases, attrs: dict):
-        if 'app_name' in attrs and 'message' in attrs and 'message_label' in attrs:
-            app_name = attrs['app_name']
-            message = attrs['message']
-            message_label = attrs['message_label']
-
-            if isinstance(message_label, Promise):
-                message_label = message_label._proxy____args[0]
-
-            qualmsg = app_name, message
-            if qualmsg in qualmsg_label_mapper:
-                raise ValueError(f'Notification duplicated {qualmsg}')
-
-            qualmsg_label_mapper[qualmsg] = message_label
-
-        clz = type.__new__(cls, name, bases, attrs)
-        return clz
-
-
-class Message(metaclass=MessageType):
-    app_name: str
-    message: str
+class MessageBase:
     message_label: str
 
     def publish(self, data: dict):

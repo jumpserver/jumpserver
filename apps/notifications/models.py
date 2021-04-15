@@ -1,19 +1,38 @@
+from importlib import import_module
+
+from django.utils.translation import gettext_lazy as _
+from django.apps import apps
 from django.db import models
 
 from orgs.mixins.models import OrgModelMixin
 
 
-class Backend(OrgModelMixin, models.Model):
-    name = models.CharField(max_length=64, default='', db_index=True)
+class Backend(models.Model):
+    class BACKEND(models.TextChoices):
+        wecom = 'wecom', _('WeCom')
+        email = 'email', _('Email')
+
+    name = models.CharField(max_length=64, choices=BACKEND.choices, default='', db_index=True)
 
 
-class Message(OrgModelMixin, models.Model):
-    app_name = models.CharField(max_length=64, default='', db_index=True)
+class Message(models.Model):
+    app = models.CharField(max_length=64, default='', db_index=True)
     message = models.CharField(max_length=128, default='', db_index=True)
-    message_label = models.CharField(max_length=128, default='')
+
+    @property
+    def message_label(self):
+        app_config = apps.get_app_config(self.app)
+        modules = import_module('.notifications', app_config.module.__package__)
+        MsgCls = getattr(modules, self.message)
+        return MsgCls.message_label
+
+    @property
+    def app_label(self):
+        app_config = apps.get_app_config(self.app)
+        return app_config.verbose_name
 
 
-class Subscription(OrgModelMixin, models.Model):
+class Subscription(models.Model):
     users = models.ManyToManyField('users.User', related_name='subscriptions')
     groups = models.ManyToManyField('users.UserGroup', related_name='subscriptions')
     messages = models.ManyToManyField(Message, related_name='subscriptions')
