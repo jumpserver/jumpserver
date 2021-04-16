@@ -10,7 +10,7 @@ from .serializers import (
 
 
 class SubscriptionViewSet(JMSBulkModelViewSet):
-    model = Subscription
+    queryset = Subscription.objects
     serializer_class = SubscriptionSerializer
 
 
@@ -35,10 +35,10 @@ class SubscriptionMessageRelationViewSet(JMSBulkRelationModelViewSet):
 
 
 class BackendViewSet(ListModelMixin, JmsGenericViewSet):
-    model = Backend
+    queryset = Backend.objects
     serializer_class = BackendSerializer
 
 
 class MessageViewSet(ListModelMixin, JmsGenericViewSet):
-    model = Message
+    queryset = Message.objects
     serializer_class = MessageSerializer

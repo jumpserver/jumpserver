@@ -4,13 +4,25 @@ from django.utils.translation import gettext_lazy as _
 from django.apps import apps
 from django.db import models
 
+from .backends.wecom import WeCom
+from .backends.email import Email
 from orgs.mixins.models import OrgModelMixin
 
 
 class Backend(models.Model):
     class BACKEND(models.TextChoices):
-        wecom = 'wecom', _('WeCom')
-        email = 'email', _('Email')
+        WECOM = 'wecom', _('WeCom')
+        EMAIL = 'email', _('Email')
+
+        client_mapper = {
+            WECOM: WeCom,
+            EMAIL: Email
+        }
+
+        @property
+        def client(self):
+            client = self.client_mapper[self]
+            return client
 
     name = models.CharField(max_length=64, choices=BACKEND.choices, default='', db_index=True)
 

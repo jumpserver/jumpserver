@@ -1,31 +1,12 @@
 from typing import Iterable
 from collections import defaultdict
 
-from django.db.models import TextChoices
-from django.utils.translation import gettext_lazy as _
-from django.utils.functional import Promise
+from .models import Subscription, Backend
 
-from .backends.wecom import WeCom
-from .backends.email import Email
-from .models import Subscription, Message
+BACKEND = Backend.BACKEND
 
 
-class Backends(TextChoices):
-    WECOM = 'wecom', _('WeCom')
-    EMAIL = 'email', _('Email')
-
-    client_mapper = {
-        WECOM: WeCom,
-        EMAIL: Email
-    }
-
-    @property
-    def client(self):
-        client = self.client_mapper[self]
-        return client
-
-
-class UserUtils:
+class UserAccountUtils:
     def __init__(self, users):
         self._users = users
 
@@ -56,29 +37,36 @@ class UserUtils:
 
 
 class MessageBase:
+    app_label: str
     message_label: str
+
+    @property
+    def message(self):
+        return self.__class__.__name__
 
     def publish(self, data: dict):
         backend_user_mapper = defaultdict(list)
         subscriptions = Subscription.objects.filter(
-            app_name=self.app_name,
-            message=self.message
-        ).prefetch_related('users', 'groups__users')
+            messages__app=self.app_label,
+            messages__message=self.message,
+        ).prefetch_related('users', 'groups__users', 'receive_backends')
 
         for subscription in subscriptions:
-            for backend in subscription.receive_backends:
-                backend_user_mapper[backend].extend(subscription.users.all())
-                backend_user_mapper[backend].extend(subscription.groups.all())
+            for backend in subscription.receive_backends.all():
+                backend_user_mapper[backend.name].extend(subscription.users.all())
+
+                for group in subscription.groups.all():
+                    backend_user_mapper[backend.name].extend(group.users.all())
 
         for backend, users in backend_user_mapper.items():
             self.send_msg(data, users, [backend])
 
-    def send_msg(self, data: dict, users: Iterable, backends: Iterable = Backends):
-        user_utils = UserUtils(users)
+    def send_msg(self, data: dict, users: Iterable, backends: Iterable = BACKEND):
+        user_utils = UserAccountUtils(users)
         failed_users_mapper = defaultdict(list)
 
         for backend in backends:
-            backend = Backends(backend)
+            backend = BACKEND(backend)
 
             user_accounts, invalid_users, account_user_mapper = user_utils.get_users(backend)
             get_msg_method_name = f'get_{backend}_msg'
