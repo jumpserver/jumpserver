@@ -291,8 +291,7 @@ class WeCom(WeComMixin):
            },
            **extra_params
         }
-        params = {'access_token': self._access_token}
-        data = self._requests.post(URL.SEND_MESSAGE, params=params, json=body, check_errcode_is_0=False)
+        data = self._requests.post(URL.SEND_MESSAGE, json=body, check_errcode_is_0=False)
 
         errcode = data['errcode']
         if errcode == ErrorCode.RECIPIENTS_INVALID:

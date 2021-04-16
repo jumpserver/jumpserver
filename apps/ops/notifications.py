@@ -4,4 +4,10 @@ from notifications.notification import MessageBase
 
 
 class ServerPerformance(MessageBase):
+    app_label = 'ops'
     message_label = _('Server performance')
+
+    def get_common_msg(self, path, usage):
+        msg = _("Disk used more than 80%: {} => {}").format(path, usage.percent)
+        return msg
+

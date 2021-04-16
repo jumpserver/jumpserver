@@ -31,7 +31,7 @@ def create_notifications_type(app_config, **kwargs):
             if issubclass(obj, MessageBase):
                 if obj.app_label != app_label:
                     raise ValueError(f'{obj.__name__}.app_label must be {app_label}')
-                searched_msgs.add(obj.__name__)
+                searched_msgs.add(obj.message)
 
         msgs = searched_msgs - all_msgs
         msgs = [Message(app=app_label, message=m) for m in msgs]

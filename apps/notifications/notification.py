@@ -44,7 +44,7 @@ class MessageBase:
     def message(self):
         return self.__class__.__name__
 
-    def publish(self, data: dict):
+    def publish(self, **data):
         backend_user_mapper = defaultdict(list)
         subscriptions = Subscription.objects.filter(
             messages__app=self.app_label,
@@ -71,9 +71,13 @@ class MessageBase:
             user_accounts, invalid_users, account_user_mapper = user_utils.get_users(backend)
             get_msg_method_name = f'get_{backend}_msg'
             get_msg_method = getattr(self, get_msg_method_name, self.get_default_msg)
-            msg = get_msg_method(data)
+            msg = get_msg_method(**data)
             client = backend.client()
-            failed_users = client.send_msg(user_accounts, **msg)
+
+            if isinstance(msg, dict):
+                failed_users = client.send_msg(user_accounts, **msg)
+            else:
+                failed_users = client.send_msg(user_accounts, msg)
 
             for u in failed_users:
                 invalid_users.append(account_user_mapper[u])
@@ -82,11 +86,15 @@ class MessageBase:
 
         return failed_users_mapper
 
-    def get_default_msg(self, data):
-        pass
-
-    def get_wecom_msg(self, data):
+    def get_common_msg(self, **data):
         raise NotImplementedError
 
-    def get_email_msg(self, data):
-        raise NotImplementedError
+    def get_wecom_msg(self, **data):
+        return self.get_default_msg()
+
+    def get_email_msg(self, **data):
+        msg = self.get_default_msg(**data)
+        return {
+            'subject': msg,
+            'message': msg
+        }
