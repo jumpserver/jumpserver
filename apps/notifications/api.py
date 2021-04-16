@@ -1,8 +1,44 @@
-from orgs.mixins.api import OrgGenericViewSet, OrgBulkModelViewSet, OrgRelationMixin
-from .models import Subscription
-from .serializers import SubscriptionSerializer
+from rest_framework.mixins import ListModelMixin
+
+from common.drf.api import JMSBulkModelViewSet, JmsGenericViewSet, JMSBulkRelationModelViewSet
+from .models import Subscription, Backend, Message
+from .serializers import (
+    SubscriptionSerializer, BackendSerializer, MessageSerializer,
+    SubscriptionUserRelationSerializer, SubscriptionGroupRelationSerializer,
+    SubscriptionBackendRelationSerializer, SubscriptionMessageRelationSerializer,
+)
 
 
-class SubscriptionViewSet(OrgBulkModelViewSet):
+class SubscriptionViewSet(JMSBulkModelViewSet):
     model = Subscription
     serializer_class = SubscriptionSerializer
+
+
+class SubscriptionUserRelationViewSet(JMSBulkRelationModelViewSet):
+    serializer_class = SubscriptionUserRelationSerializer
+    m2m_field = Subscription.users.field
+
+
+class SubscriptionGroupRelationViewSet(JMSBulkRelationModelViewSet):
+    serializer_class = SubscriptionGroupRelationSerializer
+    m2m_field = Subscription.groups.field
+
+
+class SubscriptionBackendRelationViewSet(JMSBulkRelationModelViewSet):
+    serializer_class = SubscriptionBackendRelationSerializer
+    m2m_field = Subscription.receive_backends.field
+
+
+class SubscriptionMessageRelationViewSet(JMSBulkRelationModelViewSet):
+    serializer_class = SubscriptionMessageRelationSerializer
+    m2m_field = Subscription.messages.field
+
+
+class BackendViewSet(ListModelMixin, JmsGenericViewSet):
+    model = Backend
+    serializer_class = BackendSerializer
+
+
+class MessageViewSet(ListModelMixin, JmsGenericViewSet):
+    model = Message
+    serializer_class = MessageSerializer
