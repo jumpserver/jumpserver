@@ -10,4 +10,3 @@ class ServerPerformance(MessageBase):
     def get_common_msg(self, path, usage):
         msg = _("Disk used more than 80%: {} => {}").format(path, usage.percent)
         return msg
-

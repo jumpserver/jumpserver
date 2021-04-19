@@ -1,14 +1,17 @@
-from rest_framework import serializers
-
 from common.drf.serializers import BulkModelSerializer
 from .models import Subscription, Backend, Message
-
+from rest_framework import serializers
 
 class SubscriptionSerializer(BulkModelSerializer):
+    serializers.CharField(required=False, )
 
     class Meta:
         model = Subscription
         fields = ('id', 'users', 'groups', 'messages', 'receive_backends')
+        extra_kwargs = {
+            'groups': {'required': False, 'allow_empty': True},
+            'users': {'required': False, 'allow_empty': True}
+        }
 
 
 class SubscriptionUserRelationSerializer(BulkModelSerializer):

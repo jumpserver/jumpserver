@@ -1,6 +1,8 @@
 from typing import Iterable
 from collections import defaultdict
 
+from celery import shared_task
+
 from .models import Subscription, Backend
 
 BACKEND = Backend.BACKEND
@@ -36,6 +38,11 @@ class UserAccountUtils:
         return self.get_accounts_on_model_fields('email')
 
 
+@shared_task
+def publish_task(message, **data):
+    message.publish_sync(**data)
+
+
 class MessageBase:
     app_label: str
     message_label: str
@@ -44,12 +51,17 @@ class MessageBase:
     def message(self):
         return self.__class__.__name__
 
-    def publish(self, **data):
+    @classmethod
+    def publish(cls, **data):
+        msg = cls()
+        publish_task.delay(msg, **data)
+
+    def publish_sync(self, **data):
         backend_user_mapper = defaultdict(list)
         subscriptions = Subscription.objects.filter(
             messages__app=self.app_label,
             messages__message=self.message,
-        ).prefetch_related('users', 'groups__users', 'receive_backends')
+        ).distinct().prefetch_related('users', 'groups__users', 'receive_backends')
 
         for subscription in subscriptions:
             for backend in subscription.receive_backends.all():
@@ -70,7 +82,7 @@ class MessageBase:
 
             user_accounts, invalid_users, account_user_mapper = user_utils.get_users(backend)
             get_msg_method_name = f'get_{backend}_msg'
-            get_msg_method = getattr(self, get_msg_method_name, self.get_default_msg)
+            get_msg_method = getattr(self, get_msg_method_name)
             msg = get_msg_method(**data)
             client = backend.client()
 
@@ -90,10 +102,10 @@ class MessageBase:
         raise NotImplementedError
 
     def get_wecom_msg(self, **data):
-        return self.get_default_msg()
+        return self.get_common_msg(**data)
 
     def get_email_msg(self, **data):
-        msg = self.get_default_msg(**data)
+        msg = self.get_common_msg(**data)
         return {
             'subject': msg,
             'message': msg

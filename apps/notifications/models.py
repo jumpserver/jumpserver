@@ -14,14 +14,12 @@ class Backend(models.Model):
         WECOM = 'wecom', _('WeCom')
         EMAIL = 'email', _('Email')
 
-        client_mapper = {
-            WECOM: WeCom,
-            EMAIL: Email
-        }
-
         @property
         def client(self):
-            client = self.client_mapper[self]
+            client = {
+                self.WECOM: WeCom,
+                self.EMAIL: Email
+            }[self]
             return client
 
     name = models.CharField(max_length=64, choices=BACKEND.choices, default='', db_index=True)
