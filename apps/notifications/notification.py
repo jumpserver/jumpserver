@@ -39,11 +39,11 @@ class UserAccountUtils:
 
 
 @shared_task
-def publish_task(message, **data):
-    message.publish_sync(**data)
+def publish_task(note, data):
+    note.publish(**data)
 
 
-class MessageBase:
+class NoteBase:
     app_label: str
     message_label: str
 
@@ -52,15 +52,15 @@ class MessageBase:
         return self.__class__.__name__
 
     @classmethod
-    def publish(cls, **data):
-        msg = cls()
-        publish_task.delay(msg, **data)
+    def publish_async(cls, **data):
+        publish_task.delay(cls, data)
 
-    def publish_sync(self, **data):
+    @classmethod
+    def publish(cls, **data):
         backend_user_mapper = defaultdict(list)
         subscriptions = Subscription.objects.filter(
-            messages__app=self.app_label,
-            messages__message=self.message,
+            messages__app=cls.app_label,
+            messages__message=cls.message,
         ).distinct().prefetch_related('users', 'groups__users', 'receive_backends')
 
         for subscription in subscriptions:
@@ -70,8 +70,9 @@ class MessageBase:
                 for group in subscription.groups.all():
                     backend_user_mapper[backend.name].extend(group.users.all())
 
+        client = cls()
         for backend, users in backend_user_mapper.items():
-            self.send_msg(data, users, [backend])
+            client.send_msg(data, users, [backend])
 
     def send_msg(self, data: dict, users: Iterable, backends: Iterable = BACKEND):
         user_utils = UserAccountUtils(users)

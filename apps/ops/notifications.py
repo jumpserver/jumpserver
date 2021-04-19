@@ -1,9 +1,9 @@
 from django.utils.translation import gettext_lazy as _
 
-from notifications.notification import MessageBase
+from notifications.notification import NoteBase
 
 
-class ServerPerformance(MessageBase):
+class ServerPerformanceNote(NoteBase):
     app_label = 'ops'
     message_label = _('Server performance')
 
