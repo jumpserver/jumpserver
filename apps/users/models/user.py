@@ -580,6 +580,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         verbose_name=_('Date password last updated')
     )
     wecom_id = models.CharField(null=True, default=None, unique=True, max_length=128)
+    dingtalk_id = models.CharField(null=True, default=None, unique=True, max_length=128)
 
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
@@ -587,6 +588,10 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     @property
     def is_wecom_bound(self):
         return bool(self.wecom_id)
+
+    @property
+    def is_dingtalk_bound(self):
+        return bool(self.dingtalk_id)
 
     def get_absolute_url(self):
         return reverse('users:user-detail', args=(self.id,))

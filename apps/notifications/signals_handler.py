@@ -1,4 +1,5 @@
 from importlib import import_module
+import inspect
 
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
@@ -24,13 +25,15 @@ def create_notifications_type(app_config, **kwargs):
                 continue
 
             obj = getattr(notifications_module, attr)
+            if not inspect.isclass(obj):
+                continue
 
             if obj is NoteBase:
                 continue
 
             if issubclass(obj, NoteBase):
                 if obj.app_label != app_label:
-                    raise ValueError(f'{obj.__name__}.app_label must be {app_label}')
+                    raise ValueError(f'{obj.__module__}.{obj.__name__}.app_label must be {app_label}')
                 searched_msgs.add(obj.message)
 
         msgs = searched_msgs - all_msgs

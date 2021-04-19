@@ -8,6 +8,9 @@ logger = get_logger(__name__)
 
 
 class CommandAlertNote(NoteBase):
+    app_label = 'terminal'
+    message_label = 'Command Alert'
+
     def get_common_msg(self, command):
         session_obj = Session.objects.get(id=command['session'])
 

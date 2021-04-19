@@ -34,6 +34,14 @@ urlpatterns = [
     path('wecom/qr/bind/<uuid:user_id>/callback/', views.WeComQRBindCallbackView.as_view(), name='wecom-qr-bind-callback'),
     path('wecom/qr/login/callback/', views.WeComQRLoginCallbackView.as_view(), name='wecom-qr-login-callback'),
 
+    path('dingtalk/bind/success-flash-msg/', views.FlashDingTalkBindSucceedMsgView.as_view(), name='dingtalk-bind-success-flash-msg'),
+    path('dingtalk/bind/failed-flash-msg/', views.FlashDingTalkBindFailedMsgView.as_view(), name='dingtalk-bind-failed-flash-msg'),
+    path('dingtalk/bind/start/', views.DingTalkEnableStartView.as_view(), name='dingtalk-bind-start'),
+    path('dingtalk/qr/bind/', views.DingTalkQRBindView.as_view(), name='dingtalk-qr-bind'),
+    path('dingtalk/qr/login/', views.DingTalkQRLoginView.as_view(), name='dingtalk-qr-login'),
+    path('dingtalk/qr/bind/<uuid:user_id>/callback/', views.DingTalkQRBindCallbackView.as_view(), name='dingtalk-qr-bind-callback'),
+    path('dingtalk/qr/login/callback/', views.DingTalkQRLoginCallbackView.as_view(), name='dingtalk-qr-login-callback'),
+
     # Profile
     path('profile/pubkey/generate/', users_view.UserPublicKeyGenerateView.as_view(), name='user-pubkey-generate'),
     path('profile/otp/enable/start/', users_view.UserOtpEnableStartView.as_view(), name='user-otp-enable-start'),

@@ -217,6 +217,7 @@ class Config(dict):
         'AUTH_SSO_AUTHKEY_TTL': 60 * 15,
 
         'AUTH_WECOM': True,
+        'AUTH_DINGTALK': True,
 
         'OTP_VALID_WINDOW': 2,
         'OTP_ISSUER_NAME': 'JumpServer',
