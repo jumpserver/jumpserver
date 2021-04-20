@@ -26,11 +26,23 @@ json_render = JSONRenderer()
 
 
 MODELS_NEED_RECORD = (
-    'User', 'UserGroup', 'Asset', 'Node', 'AdminUser', 'SystemUser',
-    'Domain', 'Gateway', 'Organization', 'AssetPermission', 'CommandFilter',
-    'CommandFilterRule', 'License', 'Setting', 'Account', 'SyncInstanceTask',
-    'Platform', 'ChangeAuthPlan', 'GatherUserTask',
-    'RemoteApp', 'RemoteAppPermission', 'DatabaseApp', 'DatabaseAppPermission',
+    # users
+    'User', 'UserGroup',
+    # acls
+    'LoginACL', 'LoginAssetACL',
+    # assets
+    'Asset', 'Node', 'AdminUser', 'SystemUser', 'Domain', 'Gateway', 'CommandFilterRule',
+    'CommandFilter', 'Platform',
+    # applications
+    'Application',
+    # orgs
+    'Organization',
+    # settings
+    'Setting',
+    # perms
+    'AssetPermission', 'ApplicationPermission',
+    # xpack
+    'License', 'Account', 'SyncInstanceTask', 'ChangeAuthPlan', 'GatherUserTask',
 )
 
 
