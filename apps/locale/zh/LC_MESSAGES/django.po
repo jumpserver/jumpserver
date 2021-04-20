@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-14 17:52+0800\n"
+"POT-Creation-Date: 2021-04-20 11:56+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -984,25 +984,25 @@ msgid ""
 "The task of self-checking is already running and cannot be started repeatedly"
 msgstr "自检程序已经在运行，不能重复启动"
 
-#: assets/tasks/push_system_user.py:192
+#: assets/tasks/push_system_user.py:193
 #: assets/tasks/system_user_connectivity.py:89
 msgid "System user is dynamic: {}"
 msgstr "系统用户是动态的: {}"
 
-#: assets/tasks/push_system_user.py:232
+#: assets/tasks/push_system_user.py:233
 msgid "Start push system user for platform: [{}]"
 msgstr "推送系统用户到平台: [{}]"
 
-#: assets/tasks/push_system_user.py:233
+#: assets/tasks/push_system_user.py:234
 #: assets/tasks/system_user_connectivity.py:81
 msgid "Hosts count: {}"
 msgstr "主机数量: {}"
 
-#: assets/tasks/push_system_user.py:272 assets/tasks/push_system_user.py:298
+#: assets/tasks/push_system_user.py:273 assets/tasks/push_system_user.py:299
 msgid "Push system users to assets: {}"
 msgstr "推送系统用户到入资产: {}"
 
-#: assets/tasks/push_system_user.py:284
+#: assets/tasks/push_system_user.py:285
 msgid "Push system users to asset: {}({}) => {}"
 msgstr "推送系统用户到入资产: {}({}) => {}"
 
@@ -3036,7 +3036,7 @@ msgstr "正常"
 
 #: terminal/const.py:34
 msgid "Offline"
-msgstr ""
+msgstr "离线"
 
 #: terminal/exceptions.py:8
 msgid "Bulk create not support"
