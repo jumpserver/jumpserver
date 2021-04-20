@@ -28,8 +28,6 @@ json_render = JSONRenderer()
 MODELS_NEED_RECORD = (
     # users
     'User', 'UserGroup',
-    # acls
-    'LoginACL', 'LoginAssetACL',
     # assets
     'Asset', 'Node', 'AdminUser', 'SystemUser', 'Domain', 'Gateway', 'CommandFilterRule',
     'CommandFilter', 'Platform',
