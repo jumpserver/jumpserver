@@ -20,6 +20,7 @@ from common.message.backends.dingtalk import URL
 from common.mixins.views import PermissionsMixin
 from authentication import errors
 from authentication.mixins import AuthMixin
+from common.message.backends.dingtalk import DingTalk
 
 logger = get_logger(__file__)
 
@@ -113,23 +114,23 @@ class DingTalkQRBindCallbackView(DingTalkQRMixin, View):
             response = self.get_failed_reponse(redirect_url, msg, msg)
             return response
 
-        if user.DingTalk_id:
+        if user.dingtalk_id:
             response = self.get_already_bound_response(redirect_url)
             return response
 
-        DingTalk = DingTalk(
-            corpid=settings.DingTalk_CORPID,
-            corpsecret=settings.DingTalk_CORPSECRET,
-            agentid=settings.DingTalk_AGENTID
+        dingtalk = DingTalk(
+            appid=settings.DINGTALK_APPKEY,
+            appsecret=settings.DINGTALK_APPSECRET
         )
-        DingTalk_userid, __ = DingTalk.get_user_id_by_code(code)
-        if not DingTalk_userid:
-            msg = _('DingTalk query user failed')
-            response = self.get_failed_reponse(redirect_url, msg, msg)
-            return response
+        data = dingtalk.get_user_info_by_code(code)
 
-        user.DingTalk_id = DingTalk_userid
-        user.save()
+        # if not DingTalk_userid:
+        #     msg = _('DingTalk query user failed')
+        #     response = self.get_failed_reponse(redirect_url, msg, msg)
+        #     return response
+        #
+        # user.DingTalk_id = DingTalk_userid
+        # user.save()
 
         msg = _('Binding DingTalk successfully')
         response = self.get_success_reponse(redirect_url, msg, msg)
