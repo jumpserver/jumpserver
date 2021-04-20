@@ -38,6 +38,9 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
         unique_together = ('name', 'org_id')
         ordering = ('priority', '-date_updated', 'name')
 
+    def __str__(self):
+        return self.name
+
     @classmethod
     def filter(cls, user, asset, system_user, action):
         queryset = cls.objects.filter(action=action)

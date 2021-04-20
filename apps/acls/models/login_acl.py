@@ -33,6 +33,9 @@ class LoginACL(BaseACL):
     class Meta:
         ordering = ('priority', '-date_updated', 'name')
 
+    def __str__(self):
+        return self.name
+
     @property
     def action_reject(self):
         return self.action == self.ActionChoices.reject
