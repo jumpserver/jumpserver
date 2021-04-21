@@ -1,23 +1,13 @@
 import time
 import hmac
 import base64
-from hashlib import sha256
-import requests
-import urllib
-
-from django.core.cache import cache
 
 from common.message.backends.utils import request
 from common.message.backends.utils import digest
+from common.message.backends.mixin import BaseRequest
 
 
 def sign(secret, data):
-    # secret = secret.encode('utf8')
-    # data = data.encode('utf8')
-    # t = hmac.new(secret, data, digestmod=sha256).digest()
-    # t1 = hmac.new(secret, data, digestmod=sha256).hexdigest().encode('utf8')
-    # signature = base64.b64encode(t1)
-    # signature = urllib.parse.quote(signature, safe='')
 
     digest = hmac.HMAC(
         key=secret.encode('utf8'),
@@ -29,55 +19,44 @@ def sign(secret, data):
     return signature
 
 
+class ErrorCode:
+    INVALID_TOKEN = 88
+
+
 class URL:
     QR_CONNECT = 'https://oapi.dingtalk.com/connect/qrconnect'
     GET_USER_INFO_BY_CODE = 'https://oapi.dingtalk.com/sns/getuserinfo_bycode'
     GET_TOKEN = 'https://oapi.dingtalk.com/gettoken'
 
 
-class DingTalkRequests:
-    """
-    处理系统级错误，抛出 API 异常，直接生成 HTTP 响应，业务代码无需关心这些错误
-    - 确保 status_code == 200
-    - 确保 access_token 无效时重试
-    """
+class DingTalkRequests(BaseRequest):
+    invalid_token_errcode = ErrorCode.INVALID_TOKEN
 
-    def __init__(self, appid, appsecret, agentid=None, timeout=None):
-        self._request_kwargs = {
-            'timeout': timeout
-        }
+    def __init__(self, appid, appsecret, agentid, timeout=None):
         self._appid = appid
         self._appsecret = appsecret
         self._agentid = agentid
-        self._set_access_token()
 
-    def _set_access_token(self):
-        self._access_token_cache_key = digest(self._appid, self._appsecret)
+        super().__init__(timeout=timeout)
 
-        access_token = cache.get(self._access_token_cache_key)
-        if access_token:
-            self._access_token = access_token
-            return
+    def get_access_token_cache_key(self):
+        return digest(self._appid, self._appsecret)
 
-        self._init_access_token()
-
-    def _init_access_token(self):
-        # 缓存中没有 access_token ，去企业微信请求
+    def request_access_token(self):
+        # https://developers.dingtalk.com/document/app/obtain-orgapp-token?spm=ding_open_doc.document.0.0.3a256573JEWqIL#topic-1936350
         params = {'appkey': self._appid, 'appsecret': self._appsecret}
-        data = self.get(url=URL.GET_TOKEN, params=params)
+        data = self.raw_request('get', url=URL.GET_TOKEN, params=params)
 
         access_token = data['access_token']
         expires_in = data['expires_in']
-
-        cache.set(self._access_token_cache_key, access_token, expires_in)
-        self._access_token = access_token
+        return access_token, expires_in
 
     @request
     def get(self, url, params=None, with_token=False, with_sign=False, **kwargs):
         pass
 
     @request
-    def post(self, url, data=None, json=None, params=None, with_token=False, with_sign=False, **kwargs):
+    def post(self, url, json=None, params=None, with_token=False, with_sign=False, **kwargs):
         pass
 
     def _add_sign(self, params: dict):
@@ -91,25 +70,26 @@ class DingTalkRequests:
 
     def request(self, method, url, params=None,
                 with_token=False, with_sign=False,
+                check_errcode_is_0=True,
                 **kwargs):
         if not isinstance(params, dict):
             params = {}
 
+        if with_token:
+            params['access_token'] = self.access_token
+
         if with_sign:
             self._add_sign(params)
 
-        if with_token:
-            pass
+        data = self.raw_request(method, url, params=params, **kwargs)
+        if check_errcode_is_0:
+            self.check_errcode_is_0(data)
 
-        kwargs['params'] = params
-        kwargs['url'] = url
-
-        response = getattr(requests, method)(**kwargs)
-        return response.json()
+        return data
 
 
 class DingTalk:
-    def __init__(self, appid, appsecret, agentid=None, timeout=None):
+    def __init__(self, appid, appsecret, agentid, timeout=None):
         self._appid = appid
         self._appsecret = appsecret
         self._agentid = agentid
@@ -119,15 +99,15 @@ class DingTalk:
             timeout=timeout
         )
 
-    def get_user_info_by_code(self, code):
+    def get_userinfo_bycode(self, code):
         # https://developers.dingtalk.com/document/app/obtain-the-user-information-based-on-the-sns-temporary-authorization?spm=ding_open_doc.document.0.0.3a256573y8Y7yg#topic-1995619
         body = {
             "tmp_auth_code": code
         }
 
-        data = self._request.post(URL.GET_USER_INFO_BY_CODE, json=body)
+        data = self._request.post(URL.GET_USER_INFO_BY_CODE, json=body, with_sign=True)
 
-        return data
+        return data['user_info']['openid']
 
 
 def test():

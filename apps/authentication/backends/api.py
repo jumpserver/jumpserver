@@ -212,5 +212,14 @@ class WeComAuthentication(ModelBackend):
     什么也不做呀😺
     """
 
-    def authenticate(self, request, sso_token=None, **kwargs):
+    def authenticate(self, request, **kwargs):
+        pass
+
+
+class DingTalkAuthentication(ModelBackend):
+    """
+    什么也不做呀😺
+    """
+
+    def authenticate(self, request, **kwargs):
         pass

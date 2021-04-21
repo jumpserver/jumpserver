@@ -195,7 +195,7 @@ class WeComQRLoginCallbackView(AuthMixin, WeComQRMixin, View):
             return response
 
         try:
-            self.check_wecom_auth(user)
+            self.check_oauth2_auth(user, settings.AUTH_BACKEND_WECOM)
         except errors.AuthFailedError as e:
             self.set_login_failed_mark()
             msg = e.msg

@@ -120,17 +120,17 @@ class DingTalkQRBindCallbackView(DingTalkQRMixin, View):
 
         dingtalk = DingTalk(
             appid=settings.DINGTALK_APPKEY,
-            appsecret=settings.DINGTALK_APPSECRET
+            appsecret=settings.DINGTALK_APPSECRET,
+            agentid=settings.DINGTALK_AGENTID
         )
-        data = dingtalk.get_user_info_by_code(code)
+        dingtalk_userid = dingtalk.get_userinfo_bycode(code)
+        if not dingtalk_userid:
+            msg = _('DingTalk query user failed')
+            response = self.get_failed_reponse(redirect_url, msg, msg)
+            return response
 
-        # if not DingTalk_userid:
-        #     msg = _('DingTalk query user failed')
-        #     response = self.get_failed_reponse(redirect_url, msg, msg)
-        #     return response
-        #
-        # user.DingTalk_id = DingTalk_userid
-        # user.save()
+        user.dingtalk_id = dingtalk_userid
+        user.save()
 
         msg = _('Binding DingTalk successfully')
         response = self.get_success_reponse(redirect_url, msg, msg)
@@ -176,19 +176,19 @@ class DingTalkQRLoginCallbackView(AuthMixin, DingTalkQRMixin, View):
         if not self.verify_state():
             return self.get_verify_state_failed_response(redirect_url)
 
-        DingTalk = DingTalk(
-            corpid=settings.DingTalk_CORPID,
-            corpsecret=settings.DingTalk_CORPSECRET,
-            agentid=settings.DingTalk_AGENTID
+        dingtalk = DingTalk(
+            appid=settings.DINGTALK_APPKEY,
+            appsecret=settings.DINGTALK_APPSECRET,
+            agentid=settings.DINGTALK_AGENTID
         )
-        DingTalk_userid, __ = DingTalk.get_user_id_by_code(code)
-        if not DingTalk_userid:
+        dingtalk_userid = dingtalk.get_userinfo_bycode(code)
+        if not dingtalk_userid:
             # 正常流程不会出这个错误，hack 行为
             msg = _('Failed to get user from DingTalk')
             response = self.get_failed_reponse(login_url, title=msg, msg=msg)
             return response
 
-        user = get_object_or_none(User, DingTalk_id=DingTalk_userid)
+        user = get_object_or_none(User, dingtalk_id=dingtalk_userid)
         if user is None:
             title = _('DingTalk is not bound')
             msg = _('Please login with a password and then bind the WoCom')
@@ -196,7 +196,7 @@ class DingTalkQRLoginCallbackView(AuthMixin, DingTalkQRMixin, View):
             return response
 
         try:
-            self.check_DingTalk_auth(user)
+            self.check_oauth2_auth(user, settings.AUTH_BACKEND_DINGTALK)
         except errors.AuthFailedError as e:
             self.set_login_failed_mark()
             msg = e.msg

@@ -128,6 +128,7 @@ AUTH_BACKEND_RADIUS = 'authentication.backends.radius.RadiusBackend'
 AUTH_BACKEND_CAS = 'authentication.backends.cas.CASBackend'
 AUTH_BACKEND_SSO = 'authentication.backends.api.SSOAuthentication'
 AUTH_BACKEND_WECOM = 'authentication.backends.api.WeComAuthentication'
+AUTH_BACKEND_DINGTALK = 'authentication.backends.api.DingTalkAuthentication'
 
 
 AUTHENTICATION_BACKENDS = [AUTH_BACKEND_MODEL, AUTH_BACKEND_PUBKEY]
@@ -143,6 +144,8 @@ if AUTH_SSO:
     AUTHENTICATION_BACKENDS.append(AUTH_BACKEND_SSO)
 if AUTH_WECOM:
     AUTHENTICATION_BACKENDS.append(AUTH_BACKEND_WECOM)
+if AUTH_DINGTALK:
+    AUTHENTICATION_BACKENDS.append(AUTH_BACKEND_DINGTALK)
 
 
 ONLY_ALLOW_EXIST_USER_AUTH = CONFIG.ONLY_ALLOW_EXIST_USER_AUTH

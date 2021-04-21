@@ -230,7 +230,7 @@ class AuthMixin:
         if user.source != User.Source.local:
             raise self.raise_credential_error(error=errors.reason_wecom_login_only_for_local_user)
 
-    def check_wecom_auth(self, user: User):
+    def check_oauth2_auth(self, user: User, auth_backend):
         ip = self.get_request_ip()
         request = self.request
 
@@ -244,7 +244,8 @@ class AuthMixin:
 
         request.session['auth_password'] = 1
         request.session['user_id'] = str(user.id)
-        request.session['auth_backend'] = 'authentication.backends.api.WeComAuthentication'
+        request.session['auth_backend'] = auth_backend
+        # request.session['auth_backend'] = 'authentication.backends.api.WeComAuthentication'
         return user
 
     @classmethod

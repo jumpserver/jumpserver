@@ -3,6 +3,7 @@ import inspect
 from inspect import Parameter
 
 from common.utils.common import get_logger
+from common.message.backends import exceptions as exce
 
 logger = get_logger(__name__)
 
@@ -32,12 +33,13 @@ class DictWrapper:
         self._dict = data
 
     def __getitem__(self, item):
-        # 企业微信返回的数据，不能完全信任，所以字典操作包在异常里
+        # 网络请求返回的数据，不能完全信任，所以字典操作包在异常里
         try:
             return self._dict[item]
         except KeyError as e:
-            logger.error(f'WeCom response 200 but get field from json error: error={e}')
-            raise
+            msg = f'Response 200 but get field from json error: error={e} data={self._dict}'
+            logger.error(msg)
+            raise exce.ResponseDataKeyError(detail=msg)
 
     def __getattr__(self, item):
         return getattr(self._dict, item)

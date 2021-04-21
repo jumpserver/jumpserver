@@ -1,6 +1,4 @@
 from typing import Iterable, AnyStr
-import inspect
-from inspect import Parameter
 
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import APIException
@@ -11,14 +9,9 @@ from django.core.cache import cache
 from common.utils.common import get_logger
 from common.message.backends.utils import digest, DictWrapper, update_values, set_default
 from common.message.backends.utils import request
-
+from common.message.backends.mixin import RequestMixin, BaseRequest
 
 logger = get_logger(__name__)
-
-
-class NetError(APIException):
-    default_code = 'net_error'
-    default_detail = _('Network error, please contact system administrator')
 
 
 class WeComError(APIException):
@@ -46,121 +39,64 @@ class ErrorCode:
     INVALID_TOKEN = 40014  # 无效的 access_token
 
 
-class WeComMixin:
-    def check_errcode_is_0(self, data: DictWrapper):
-        errcode = data['errcode']
-        if errcode != 0:
-            # 如果代码写的对，配置没问题，这里不该出错，系统性错误，直接抛异常
-            errmsg = data['errmsg']
-            logger.error(f'WeCom response 200 but errcode wrong: '
-                         f'errcode={errcode} '
-                         f'errmsg={errmsg} ')
-            raise WeComError
-
-
-class WeComRequests(WeComMixin):
+class WeComRequests(BaseRequest):
     """
     处理系统级错误，抛出 API 异常，直接生成 HTTP 响应，业务代码无需关心这些错误
     - 确保 status_code == 200
     - 确保 access_token 无效时重试
     """
+    invalid_token_errcode = ErrorCode.INVALID_TOKEN
 
     def __init__(self, corpid, corpsecret, agentid, timeout=None):
-        self._request_kwargs = {
-            'timeout': timeout
-        }
         self._corpid = corpid
         self._corpsecret = corpsecret
         self._agentid = agentid
-        self._set_access_token()
 
-    def _set_access_token(self):
-        self._access_token_cache_key = digest(self._corpid, self._corpsecret)
+        super().__init__(timeout=timeout)
 
-        access_token = cache.get(self._access_token_cache_key)
-        if access_token:
-            self._access_token = access_token
-            return
+    def get_access_token_cache_key(self):
+        return digest(self._corpid, self._corpsecret)
 
-        self._init_access_token()
-
-    def _init_access_token(self):
-        # 缓存中没有 access_token ，去企业微信请求
+    def request_access_token(self):
         params = {'corpid': self._corpid, 'corpsecret': self._corpsecret}
-        data = self.get(url=URL.GET_TOKEN, params=params, with_token=False)
+        data = self.raw_request('get', url=URL.GET_TOKEN, params=params)
 
         access_token = data['access_token']
         expires_in = data['expires_in']
-
-        cache.set(self._access_token_cache_key, access_token, expires_in)
-        self._access_token = access_token
-
-    def _check_http_is_200(self, response):
-        if response.status_code != 200:
-            # 正常情况下不会返回非 200 响应码
-            logger.error(f'Request WeCom error: '
-                         f'status_code={response.status_code} '
-                         f'\ncontent={response.content}')
-            raise WeComError
+        return access_token, expires_in
 
     @request
-    def get(self, url, params=None, with_token=True, with_agentid=False,
+    def get(self, url, params=None, with_token=True,
             check_errcode_is_0=True, **kwargs):
         # self.request ...
         pass
 
     @request
-    def post(self, url, data=None, json=None, params=None,
-             with_token=True, with_agentid=False, check_errcode_is_0=True,
+    def post(self, url, params=None, json=None,
+             with_token=True, check_errcode_is_0=True,
              **kwargs):
         # self.request ...
         pass
 
-    def request(self, method,
-                params: dict = None,
+    def request(self, method, url,
+                params=None,
                 with_token=True,
-                with_agentid=False,
                 check_errcode_is_0=True,
                 **kwargs):
-        for i in range(3):
-            # 循环为了防止 access_token 失效
-            # https://open.work.weixin.qq.com/api/doc/90000/90135/91039
-            try:
-                if not isinstance(params, dict):
-                    params = {}
 
-                if with_token:
-                    params['access_token'] = self._access_token
+        if not isinstance(params, dict):
+            params = {}
 
-                if with_agentid:
-                    params['agentid'] = self._agentid
+        if with_token:
+            params['access_token'] = self.access_token
 
-                set_default(kwargs, self._request_kwargs)
-                kwargs['params'] = params
-
-                response = getattr(requests, method)(**kwargs)
-                self._check_http_is_200(response)
-                data = response.json()
-                data = DictWrapper(data)
-
-                errcode = data['errcode']
-                if errcode == ErrorCode.INVALID_TOKEN:
-                    self._init_access_token()
-                    continue
-
-                if check_errcode_is_0:
-                    self.check_errcode_is_0(data)
-
-                return data
-            except ReadTimeout as e:
-                logger.exception(e)
-                raise NetError
-
-        logger.error(f'WeCom access_token retry 3 times failed, check your config')
-        raise WeComError
+        data = self.raw_request(method, url, params=params, **kwargs)
+        if check_errcode_is_0:
+            self.check_errcode_is_0(data)
+        return data
 
 
-class WeCom(WeComMixin):
+class WeCom(RequestMixin):
     """
     非业务数据导致的错误直接抛异常，说明是系统配置错误，业务代码不用理会
     """

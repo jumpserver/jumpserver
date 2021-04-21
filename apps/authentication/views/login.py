@@ -102,6 +102,7 @@ class UserLoginView(mixins.AuthMixin, FormView):
             'AUTH_OPENID': settings.AUTH_OPENID,
             'AUTH_CAS': settings.AUTH_CAS,
             'AUTH_WECOM': settings.AUTH_WECOM,
+            'AUTH_DINGTALK': settings.AUTH_DINGTALK,
             'rsa_public_key': rsa_public_key,
             'forgot_password_url': forgot_password_url
         }
