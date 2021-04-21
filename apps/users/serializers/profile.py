@@ -30,11 +30,13 @@ class UserUpdatePasswordSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(msg)
         return value
 
-    @staticmethod
-    def validate_new_password(value):
+    def validate_new_password(self, value):
         from ..utils import check_password_rules
         if not check_password_rules(value):
             msg = _('Password does not match security rules')
+            raise serializers.ValidationError(msg)
+        if self.instance.is_old_password(value):
+            msg = _('The new password cannot be the one that has been set before')
             raise serializers.ValidationError(msg)
         return value
 

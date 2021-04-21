@@ -6,8 +6,11 @@ import base64
 import string
 import random
 
+from functools import partial
+
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.hashers import check_password, make_password
 from django.core.cache import cache
 from django.db import models
 from django.db.models import TextChoices
@@ -18,6 +21,7 @@ from django.shortcuts import reverse
 
 from orgs.utils import current_org
 from orgs.models import OrganizationMember, Organization
+from settings.models import Setting
 from common.utils import date_expired_default, get_logger, lazyproperty, random_string
 from common import fields
 from common.const import choices
@@ -64,6 +68,27 @@ class AuthMixin:
 
     def can_use_ssh_key_login(self):
         return self.is_local and settings.TERMINAL_PUBLIC_KEY_AUTH
+
+    def is_old_password(self, password):
+        old_pwd_count = Setting.objects.filter(name='OLD_PASSWORD_HISTORY_LIMIT_COUNT').first()
+        allow_history_password_count = int(old_pwd_count.value) if old_pwd_count \
+            else settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT
+        old_passwords = self.old_passwords.all().order_by('-date_updated')
+        pre_handle = partial(check_password, password)
+
+        for rank, old_password in enumerate(old_passwords):
+            if pre_handle(old_password.password):
+                if allow_history_password_count < rank + 1:
+                    old_password.date_updated = timezone.now()
+                    old_password.save()
+                    return False
+                else:
+                    return True
+        else:
+            UserOldPassword.objects.create(
+                user=self, password=make_password(password), date_created=self.date_password_last_updated
+            )
+            return False
 
     def is_public_key_valid(self):
         """
@@ -724,3 +749,12 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         if self.email and self.source == self.Source.local.value:
             return True
         return False
+
+
+class UserOldPassword(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    password = models.CharField(max_length=128)
+    user = models.ForeignKey("users.User", related_name='old_passwords',
+                             on_delete=models.CASCADE, verbose_name=_('User'))
+    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
+    date_updated = models.DateTimeField(auto_now_add=True, verbose_name=_("Date updated"))

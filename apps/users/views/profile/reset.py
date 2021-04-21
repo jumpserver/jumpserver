@@ -128,6 +128,11 @@ class UserResetPasswordView(FormView):
             form.add_error('new_password', error)
             return self.form_invalid(form)
 
+        if user.is_old_password(password):
+            error = _('* The new password cannot be the one that has been set before')
+            form.add_error('new_password', error)
+            return self.form_invalid(form)
+
         user.reset_password(password)
         User.expired_reset_password_token(token)
         send_reset_password_success_mail(self.request, user)
