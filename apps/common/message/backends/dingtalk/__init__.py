@@ -27,6 +27,7 @@ class URL:
     QR_CONNECT = 'https://oapi.dingtalk.com/connect/qrconnect'
     GET_USER_INFO_BY_CODE = 'https://oapi.dingtalk.com/sns/getuserinfo_bycode'
     GET_TOKEN = 'https://oapi.dingtalk.com/gettoken'
+    SEND_MESSAGE_BY_TEMPLATE = 'https://oapi.dingtalk.com/topapi/message/corpconversation/sendbytemplate'
 
 
 class DingTalkRequests(BaseRequest):
@@ -52,11 +53,17 @@ class DingTalkRequests(BaseRequest):
         return access_token, expires_in
 
     @request
-    def get(self, url, params=None, with_token=False, with_sign=False, **kwargs):
+    def get(self, url, params=None,
+            with_token=False, with_sign=False,
+            check_errcode_is_0=True,
+            **kwargs):
         pass
 
     @request
-    def post(self, url, json=None, params=None, with_token=False, with_sign=False, **kwargs):
+    def post(self, url, json=None, params=None,
+             with_token=False, with_sign=False,
+             check_errcode_is_0=True,
+             **kwargs):
         pass
 
     def _add_sign(self, params: dict):
@@ -108,6 +115,17 @@ class DingTalk:
         data = self._request.post(URL.GET_USER_INFO_BY_CODE, json=body, with_sign=True)
 
         return data['user_info']['openid']
+
+    def send_by_template(self, template_id, user_ids, dept_ids, data):
+        body = {
+            'agent_id': self._agentid,
+            'template_id': template_id,
+            'userid_list': ','.join(user_ids),
+            'dept_id_list': ','.join(dept_ids),
+            'data': data
+        }
+        data = self._request.post(URL.SEND_MESSAGE_BY_TEMPLATE, json=body, with_token=True)
+
 
 
 def test():

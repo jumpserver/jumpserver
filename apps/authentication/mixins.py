@@ -245,7 +245,6 @@ class AuthMixin:
         request.session['auth_password'] = 1
         request.session['user_id'] = str(user.id)
         request.session['auth_backend'] = auth_backend
-        # request.session['auth_backend'] = 'authentication.backends.api.WeComAuthentication'
         return user
 
     @classmethod
