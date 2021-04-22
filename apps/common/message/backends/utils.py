@@ -30,22 +30,28 @@ def set_default(data: dict, default: dict):
 
 class DictWrapper:
     def __init__(self, data:dict):
-        self._dict = data
+        self.raw_data = data
 
     def __getitem__(self, item):
         # 网络请求返回的数据，不能完全信任，所以字典操作包在异常里
         try:
-            return self._dict[item]
+            return self.raw_data[item]
         except KeyError as e:
-            msg = f'Response 200 but get field from json error: error={e} data={self._dict}'
+            msg = f'Response 200 but get field from json error: error={e} data={self.raw_data}'
             logger.error(msg)
             raise exce.ResponseDataKeyError(detail=msg)
 
     def __getattr__(self, item):
-        return getattr(self._dict, item)
+        return getattr(self.raw_data, item)
 
     def __contains__(self, item):
-        return item in self._dict
+        return item in self.raw_data
+
+    def __str__(self):
+        return str(self.raw_data)
+
+    def __repr__(self):
+        return str(self.raw_data)
 
 
 def request(func):

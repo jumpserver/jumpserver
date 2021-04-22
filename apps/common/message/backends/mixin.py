@@ -1,5 +1,6 @@
 import requests
 from requests import exceptions as req_exce
+from rest_framework.exceptions import PermissionDenied
 from django.core.cache import cache
 
 from .utils import DictWrapper
@@ -21,7 +22,7 @@ class RequestMixin:
             logger.error(f'Response 200 but errcode is not 0: '
                          f'errcode={errcode} '
                          f'errmsg={errmsg} ')
-            raise exce.ErrCodeNot0(detail=errmsg)
+            raise exce.ErrCodeNot0(detail=str(data.raw_data))
 
     def check_http_is_200(self, response):
         if response.status_code != 200:
@@ -72,14 +73,14 @@ class BaseRequest(RequestMixin):
 
     def raw_request(self, method, url, **kwargs):
         set_default(kwargs, self._request_kwargs)
-
+        raw_data = ''
         for i in range(3):
             # 循环为了防止 access_token 失效
             try:
                 response = getattr(requests, method)(url, **kwargs)
                 self.check_http_is_200(response)
-                data = response.json()
-                data = DictWrapper(data)
+                raw_data = response.json()
+                data = DictWrapper(raw_data)
 
                 if self.is_token_invalid(data):
                     self.refresh_access_token()
@@ -89,5 +90,5 @@ class BaseRequest(RequestMixin):
             except req_exce.ReadTimeout as e:
                 logger.exception(e)
                 raise exce.NetError
-        logger.error(f'Get access_token error, check config: url={url}')
-        raise exce.AccessTokenError
+        logger.error(f'Get access_token error, check config: url={url} data={raw_data}')
+        raise PermissionDenied(raw_data)

@@ -28,6 +28,8 @@ class URL:
     GET_USER_INFO_BY_CODE = 'https://oapi.dingtalk.com/sns/getuserinfo_bycode'
     GET_TOKEN = 'https://oapi.dingtalk.com/gettoken'
     SEND_MESSAGE_BY_TEMPLATE = 'https://oapi.dingtalk.com/topapi/message/corpconversation/sendbytemplate'
+    SEND_MESSAGE = 'https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2'
+    GET_SEND_MSG_PROGRESS = 'https://oapi.dingtalk.com/topapi/message/corpconversation/getsendprogress'
 
 
 class DingTalkRequests(BaseRequest):
@@ -113,7 +115,6 @@ class DingTalk:
         }
 
         data = self._request.post(URL.GET_USER_INFO_BY_CODE, json=body, with_sign=True)
-
         return data['user_info']['openid']
 
     def send_by_template(self, template_id, user_ids, dept_ids, data):
@@ -126,6 +127,30 @@ class DingTalk:
         }
         data = self._request.post(URL.SEND_MESSAGE_BY_TEMPLATE, json=body, with_token=True)
 
+    def send_text(self, user_ids, msg):
+        body = {
+            'agent_id': self._agentid,
+            'userid_list': ','.join(user_ids),
+            # 'dept_id_list': '',
+            'to_all_user': False,
+            'msg': {
+                'msgtype': 'text',
+                'text': {
+                    'content': msg
+                }
+            }
+        }
+        data = self._request.post(URL.SEND_MESSAGE, json=body, with_token=True)
+        return data
+
+    def get_send_msg_progress(self, task_id):
+        body = {
+            'agent_id': self._agentid,
+            'task_id': task_id
+        }
+
+        data = self._request.post(URL.GET_SEND_MSG_PROGRESS, json=body, with_token=True)
+        return data
 
 
 def test():
