@@ -1,5 +1,6 @@
 from typing import Iterable
 from collections import defaultdict
+import traceback
 
 from celery import shared_task
 
@@ -8,42 +9,12 @@ from .models import Subscription, Backend
 BACKEND = Backend.BACKEND
 
 
-class UserAccountUtils:
-    def __init__(self, users):
-        self._users = users
-
-    def get_users(self, backend_name):
-        method_name = f'get_{backend_name}_accounts'
-        method = getattr(self, method_name)
-        return method()
-
-    def get_wecom_accounts(self):
-        return self.get_accounts_on_model_fields('wecom_id')
-
-    def get_accounts_on_model_fields(self, field_name):
-        accounts = []
-        unbound_users = []
-        account_user_mapper = {}
-
-        for user in self._users:
-            account = getattr(user, field_name, None)
-            if account:
-                account_user_mapper[account] = user
-                accounts.append(account)
-            else:
-                unbound_users.append(user)
-        return accounts, unbound_users, account_user_mapper
-
-    def get_email_accounts(self):
-        return self.get_accounts_on_model_fields('email')
-
-
 @shared_task
 def publish_task(note, data):
     note.publish(**data)
 
 
-class NoteBase:
+class MessageBase:
     app_label: str
     message_label: str
 
@@ -60,7 +31,7 @@ class NoteBase:
         backend_user_mapper = defaultdict(list)
         subscriptions = Subscription.objects.filter(
             messages__app=cls.app_label,
-            messages__message=cls.message,
+            messages__message=cls.__name__,
         ).distinct().prefetch_related('users', 'groups__users', 'receive_backends')
 
         for subscription in subscriptions:
@@ -72,37 +43,32 @@ class NoteBase:
 
         client = cls()
         for backend, users in backend_user_mapper.items():
-            client.send_msg(data, users, [backend])
+            try:
+                client.send_msg(data, users, [backend])
+            except Exception:
+                traceback.print_exc()
 
     def send_msg(self, data: dict, users: Iterable, backends: Iterable = BACKEND):
-        user_utils = UserAccountUtils(users)
-        failed_users_mapper = defaultdict(list)
-
         for backend in backends:
             backend = BACKEND(backend)
 
-            user_accounts, invalid_users, account_user_mapper = user_utils.get_users(backend)
             get_msg_method_name = f'get_{backend}_msg'
             get_msg_method = getattr(self, get_msg_method_name)
             msg = get_msg_method(**data)
             client = backend.client()
 
             if isinstance(msg, dict):
-                failed_users = client.send_msg(user_accounts, **msg)
+                client.send_msg(users, **msg)
             else:
-                failed_users = client.send_msg(user_accounts, msg)
-
-            for u in failed_users:
-                invalid_users.append(account_user_mapper[u])
-
-            failed_users_mapper[backend] = invalid_users
-
-        return failed_users_mapper
+                client.send_msg(users, msg)
 
     def get_common_msg(self, **data):
         raise NotImplementedError
 
     def get_wecom_msg(self, **data):
+        return self.get_common_msg(**data)
+
+    def get_dingtalk_msg(self, **data):
         return self.get_common_msg(**data)
 
     def get_email_msg(self, **data):

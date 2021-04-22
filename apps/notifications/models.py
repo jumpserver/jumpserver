@@ -6,6 +6,7 @@ from django.db import models
 
 from .backends.wecom import WeCom
 from .backends.email import Email
+from .backends.dingtalk import DingTalk
 from orgs.mixins.models import OrgModelMixin
 
 
@@ -13,12 +14,14 @@ class Backend(models.Model):
     class BACKEND(models.TextChoices):
         WECOM = 'wecom', _('WeCom')
         EMAIL = 'email', _('Email')
+        DINGTALK = 'dingtalk', _('DingTalk')
 
         @property
         def client(self):
             client = {
                 self.WECOM: WeCom,
-                self.EMAIL: Email
+                self.EMAIL: Email,
+                self.DINGTALK: DingTalk
             }[self]
             return client
 

@@ -1,13 +1,13 @@
 from django.utils.translation import gettext_lazy as _
 
 from common.utils import get_logger, reverse
-from notifications.notification import NoteBase
+from notifications.notification import MessageBase
 from terminal.models import Session, Command
 
 logger = get_logger(__name__)
 
 
-class CommandAlertNote(NoteBase):
+class CommandAlertMessage(MessageBase):
     app_label = 'terminal'
     message_label = 'Command Alert'
 

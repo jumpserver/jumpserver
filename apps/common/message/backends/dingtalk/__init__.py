@@ -30,6 +30,7 @@ class URL:
     SEND_MESSAGE_BY_TEMPLATE = 'https://oapi.dingtalk.com/topapi/message/corpconversation/sendbytemplate'
     SEND_MESSAGE = 'https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2'
     GET_SEND_MSG_PROGRESS = 'https://oapi.dingtalk.com/topapi/message/corpconversation/getsendprogress'
+    GET_USERID_BY_UNIONID = 'https://oapi.dingtalk.com/topapi/user/getbyunionid'
 
 
 class DingTalkRequests(BaseRequest):
@@ -115,7 +116,21 @@ class DingTalk:
         }
 
         data = self._request.post(URL.GET_USER_INFO_BY_CODE, json=body, with_sign=True)
-        return data['user_info']['openid']
+        return data['user_info']
+
+    def get_userid_by_code(self, code):
+        user_info = self.get_userinfo_bycode(code)
+        unionid = user_info['unionid']
+        userid = self.get_userid_by_unionid(unionid)
+        return userid
+
+    def get_userid_by_unionid(self, unionid):
+        body = {
+            'unionid': unionid
+        }
+        data = self._request.post(URL.GET_USERID_BY_UNIONID, json=body, with_token=True)
+        userid = data['result']['userid']
+        return userid
 
     def send_by_template(self, template_id, user_ids, dept_ids, data):
         body = {
