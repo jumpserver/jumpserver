@@ -41,3 +41,6 @@ class AccountTypeSerializer(serializers.ModelSerializer):
             'id', 'name', 'category', 'protocol', 'secret_type', 'fields_definition', 'is_builtin',
             'comment', 'created_by', 'date_created', 'date_updated',
         ]
+        extra_kwargs = {
+            'category': {'default': AccountType.CategoryChoices.os}
+        }
