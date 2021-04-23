@@ -4,6 +4,7 @@ from common.drf.serializers import MethodSerializer
 from common.utils import get_object_or_none
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import Account, AccountType
+from common.utils import is_uuid
 
 
 __all__ = ['AccountSerializer', 'AccountSecretSerializer']
@@ -34,7 +35,11 @@ class AccountSerializer(BulkOrgResourceModelSerializer):
             account_type = self.instance.type
         else:
             tp = self.context['request'].query_params.get('account_type')
-            account_type = get_object_or_none(AccountType, name=tp)
+            if is_uuid(tp):
+                queries = {'id': tp}
+            else:
+                queries = {'name': tp}
+            account_type = get_object_or_none(AccountType, **queries)
 
         if account_type:
             serializer_class = account_type.construct_serializer_class_for_fields_definition()
