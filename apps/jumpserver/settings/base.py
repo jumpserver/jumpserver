@@ -74,17 +74,17 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'jumpserver.middleware.TimezoneMiddleware',
     'jumpserver.middleware.DemoMiddleware',
     'jumpserver.middleware.RequestMiddleware',
-    'jumpserver.middleware.RefererCheckMiddleware',
+    # 'jumpserver.middleware.RefererCheckMiddleware',
     'orgs.middleware.OrgMiddleware',
-    'authentication.backends.oidc.middleware.OIDCRefreshIDTokenMiddleware',
-    'authentication.backends.cas.middleware.CASMiddleware',
+    # 'authentication.backends.oidc.middleware.OIDCRefreshIDTokenMiddleware',
+    # 'authentication.backends.cas.middleware.CASMiddleware',
 ]
 
 

@@ -20,7 +20,8 @@ from orgs.mixins.api import OrgBulkModelViewSet
 from ..hands import IsOrgAdmin
 from ..models import Label
 from .. import serializers
-
+from rest_framework.response import Response
+from django.utils.safestring import mark_safe
 
 logger = get_logger(__file__)
 __all__ = ['LabelViewSet']
@@ -37,6 +38,19 @@ class LabelViewSet(OrgBulkModelViewSet):
         if request.query_params.get("distinct"):
             self.serializer_class = serializers.LabelDistinctSerializer
             self.queryset = self.queryset.values("name").distinct()
+
+        if request.query_params.get('type'):
+            queryset = Label.objects.all()
+            for label in queryset:
+                label.name = "{}:{}".format(label.name, label.value)
+                # label.name = "<span style='color:red'>{}:{}</span>".format(label.name, label.value)
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+
         return super().list(request, *args, **kwargs)
 
     def get_queryset(self):
