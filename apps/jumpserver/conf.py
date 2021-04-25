@@ -222,6 +222,7 @@ class Config(dict):
 
         'TERMINAL_PASSWORD_AUTH': True,
         'TERMINAL_PUBLIC_KEY_AUTH': True,
+        'TERMINAL_ONLY_SOURCE_LOCAL_CAN_PUBLIC_KEY_AUTH': True,
         'TERMINAL_HEARTBEAT_INTERVAL': 20,
         'TERMINAL_ASSET_LIST_SORT_BY': 'hostname',
         'TERMINAL_ASSET_LIST_PAGE_SIZE': 'auto',

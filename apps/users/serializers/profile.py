@@ -101,7 +101,8 @@ class UserProfileSerializer(UserSerializer):
 
     class Meta(UserSerializer.Meta):
         fields = UserSerializer.Meta.fields + [
-            'public_key_comment', 'public_key_hash_md5', 'admin_or_audit_orgs', 'current_org_roles',
+            'public_key_comment', 'public_key_hash_md5',
+            'admin_or_audit_orgs', 'current_org_roles',
             'guide_url', 'user_all_orgs'
         ]
         read_only_fields = [
@@ -163,6 +164,7 @@ class ChangeUserPasswordSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['password']
+
 
 class ResetOTPSerializer(serializers.Serializer):
     msg = serializers.CharField(read_only=True)
