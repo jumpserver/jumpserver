@@ -7,7 +7,7 @@ from rest_framework import serializers
 class FieldDefinitionTypeChoices(TextChoices):
     str = 'str', 'CharField'
     int = 'int', 'IntegerField'
-    bool = 'boo', 'BooleanField'
+    bool = 'bool', 'BooleanField'
     list = 'list', 'ListField'
     ip = 'ip', 'IPAddressField'
     datetime = 'datetime', 'DateTimeField'

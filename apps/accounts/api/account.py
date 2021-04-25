@@ -23,8 +23,7 @@ class AccountViewSet(SafeViewSetMixin, OrgBulkModelViewSet):
         'safe__name': ['exact']
     }
     search_fields = (
-        'id', 'name', 'username', 'type', 'type__name', 'address', 'is_privileged', 'safe',
-        'safe__name'
+        'id', 'name', 'username', 'type__name', 'address', 'is_privileged', 'safe__name'
     )
     serializer_classes = {
         'default': serializers.AccountSerializer,

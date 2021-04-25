@@ -60,12 +60,17 @@ class AccountType(CommonModelMixin, models.Model):
         for field_definition in copy.deepcopy(self.fields_definition):
             name = field_definition.pop('name')
             tp = field_definition.pop('type')
+            default = field_definition.get('default')
             field_class = FieldDefinitionTypeChoices.get_serializer_field_class(tp=tp)
-            # Integer type
+            # int type
             if tp == FieldDefinitionTypeChoices.int:
-                default = field_definition.get('default')
                 if isinstance(default, str) and default.isdigit():
                     field_definition['default'] = int(default)
+            # str type
+            if tp == FieldDefinitionTypeChoices.str:
+                field_definition['max_length'] = 1024
+            if tp == FieldDefinitionTypeChoices.bool:
+                field_definition['default'] = default in ['true', True, '1']
             # Some combinations of keyword arguments do not make sense.
             if field_definition.get('write_only', False):
                 field_definition.pop('read_only', None)

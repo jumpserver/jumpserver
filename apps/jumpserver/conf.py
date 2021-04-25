@@ -252,7 +252,7 @@ class Config(dict):
 
         # accounts: Vault config
         'VAULT_URL': 'http://127.0.0.1:8200',
-        'VAULT_TOKEN': 's.HqkSwKUJgvB2YReBRtQBseQa',
+        'VAULT_TOKEN': 's.0ysyIGuj8I4Dd5nqPKRWX7OA',
         'VAULT_SECRETS_ENGINE_PATH': 'JumpServer',
         'VAULT_SECRETS_MAX_VERSIONS': 20,
 
