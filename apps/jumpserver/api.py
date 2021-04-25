@@ -99,7 +99,7 @@ class DatesLoginMetricMixin:
         if count is not None:
             return count
         ds, de = self.get_date_start_2_end(date)
-        count = len(set(Session.objects.filter(date_start__range=(ds, de)).values_list('user', flat=True)))
+        count = len(set(Session.objects.filter(date_start__range=(ds, de)).values_list('user_id', flat=True)))
         self.__set_data_to_cache(date, tp, count)
         return count
 
@@ -129,7 +129,7 @@ class DatesLoginMetricMixin:
 
     @lazyproperty
     def dates_total_count_active_users(self):
-        count = len(set(self.sessions_queryset.values_list('user', flat=True)))
+        count = len(set(self.sessions_queryset.values_list('user_id', flat=True)))
         return count
 
     @lazyproperty
@@ -161,10 +161,10 @@ class DatesLoginMetricMixin:
     @lazyproperty
     def dates_total_count_disabled_assets(self):
         return Asset.objects.filter(is_active=False).count()
-    
+
     # 以下是从week中而来
     def get_dates_login_times_top5_users(self):
-        users = self.sessions_queryset.values_list('user', flat=True)
+        users = self.sessions_queryset.values_list('user_id', flat=True)
         users = [
             {'user': user, 'total': total}
             for user, total in Counter(users).most_common(5)
@@ -172,7 +172,7 @@ class DatesLoginMetricMixin:
         return users
 
     def get_dates_total_count_login_users(self):
-        return len(set(self.sessions_queryset.values_list('user', flat=True)))
+        return len(set(self.sessions_queryset.values_list('user_id', flat=True)))
 
     def get_dates_total_count_login_times(self):
         return self.sessions_queryset.count()
@@ -186,8 +186,8 @@ class DatesLoginMetricMixin:
         return list(assets)
 
     def get_dates_login_times_top10_users(self):
-        users = self.sessions_queryset.values("user") \
-                    .annotate(total=Count("user")) \
+        users = self.sessions_queryset.values("user_id") \
+                    .annotate(total=Count("user_id")) \
                     .annotate(last=Max("date_start")).order_by("-total")[:10]
         for user in users:
             user['last'] = str(user['last'])
@@ -221,7 +221,7 @@ class TotalCountMixin:
 
     @staticmethod
     def get_total_count_online_users():
-        count = len(set(Session.objects.filter(is_finished=False).values_list('user', flat=True)))
+        count = len(set(Session.objects.filter(is_finished=False).values_list('user_id', flat=True)))
         return count
 
     @staticmethod
