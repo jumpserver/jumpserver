@@ -1,5 +1,5 @@
 from tickets import const
-from .ticket_type import apply_asset, apply_application, login_confirm, login_asset_confirm
+from .ticket_type import apply_asset, apply_application, login_confirm, login_asset_confirm, enhance_asset
 
 __all__ = [
     'type_serializer_classes_mapping',
@@ -25,6 +25,11 @@ type_serializer_classes_mapping = {
         'default': apply_application.ApplyApplicationSerializer,
         action_open: apply_application.ApplySerializer,
         action_approve: apply_application.ApproveSerializer,
+    },
+    const.TicketTypeChoices.enhance_asset.value: {
+        'default': enhance_asset.ApplyAssetSerializer,
+        action_open: enhance_asset.ApplySerializer,
+        action_approve: enhance_asset.ApproveSerializer,
     },
     const.TicketTypeChoices.login_confirm.value: {
         'default': login_confirm.LoginConfirmSerializer,
