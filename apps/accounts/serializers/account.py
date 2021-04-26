@@ -24,10 +24,10 @@ class AccountSerializer(BulkOrgResourceModelSerializer):
         model = Account
         fields = [
             'id', 'name', 'username', 'secret', 'address', 'type', 'type_display', 'attrs',
-            'is_privileged', 'comment', 'safe', 'safe_display',
+            'is_privileged', 'comment', 'safe', 'safe_display', 'date_created', 'date_updated',
         ]
         extra_kwargs = {
-            'secret': {'write_only': True}
+            'secret': {'write_only': True, 'required': False}
         }
 
     def get_attrs_serializer(self):
