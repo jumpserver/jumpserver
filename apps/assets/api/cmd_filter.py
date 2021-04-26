@@ -46,8 +46,7 @@ class CommandFilterRuleViewSet(OrgBulkModelViewSet):
 
 
 class CommandConfirmAPI(CreateAPIView):
-    permission_classes = ()
-    # permission_classes = (IsAppUser, )
+    permission_classes = (IsAppUser, )
     serializer_class = serializers.CommandConfirmSerializer
 
     def create(self, request, *args, **kwargs):
@@ -91,6 +90,5 @@ class CommandConfirmAPI(CreateAPIView):
 
 
 class CommandConfirmStatusAPI(GenericTicketStatusRetrieveCloseAPI):
-    permission_classes = ()
     pass
 
