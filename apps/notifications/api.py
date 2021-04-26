@@ -35,10 +35,10 @@ class SubscriptionMessageRelationViewSet(JMSBulkRelationModelViewSet):
 
 
 class BackendViewSet(ListModelMixin, JmsGenericViewSet):
-    queryset = Backend.objects
+    queryset = Backend.objects.all()
     serializer_class = BackendSerializer
 
 
 class MessageViewSet(ListModelMixin, JmsGenericViewSet):
-    queryset = Message.objects
+    queryset = Message.objects.all()
     serializer_class = MessageSerializer
