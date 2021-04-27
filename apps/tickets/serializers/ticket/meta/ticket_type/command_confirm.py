@@ -19,6 +19,7 @@ class ApplySerializer(serializers.Serializer):
     apply_from_cmd_filter_rule_id = serializers.UUIDField(
         required=False, label=_('From cmd filter rule')
     )
+    apply_from_cmd_filter_id = serializers.UUIDField(required=False, label=_('From cmd filter'))
 
 
 class CommandConfirmSerializer(ApplySerializer):
