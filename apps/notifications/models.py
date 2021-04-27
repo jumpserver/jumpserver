@@ -50,3 +50,19 @@ class Subscription(models.Model):
     groups = models.ManyToManyField('users.UserGroup', related_name='subscriptions')
     messages = models.ManyToManyField(Message, related_name='subscriptions')
     receive_backends = models.ManyToManyField(Backend, related_name='subscriptions')
+
+    @property
+    def users_amount(self):
+        return self.users.count()
+
+    @property
+    def groups_amount(self):
+        return self.groups.count()
+
+    @property
+    def messages_amount(self):
+        return self.messages.count()
+
+    @property
+    def receive_backends_amount(self):
+        return self.receive_backends.count()

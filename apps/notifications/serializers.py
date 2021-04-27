@@ -2,8 +2,8 @@ from common.drf.serializers import BulkModelSerializer
 from .models import Subscription, Backend, Message
 from rest_framework import serializers
 
+
 class SubscriptionSerializer(BulkModelSerializer):
-    serializers.CharField(required=False, )
 
     class Meta:
         model = Subscription
@@ -12,6 +12,13 @@ class SubscriptionSerializer(BulkModelSerializer):
             'groups': {'required': False, 'allow_empty': True},
             'users': {'required': False, 'allow_empty': True}
         }
+
+
+class SubscriptionListSerializer(BulkModelSerializer):
+
+    class Meta:
+        model = Subscription
+        fields = ('id', 'users_amount', 'groups_amount', 'messages_amount', 'receive_backends_amount')
 
 
 class SubscriptionUserRelationSerializer(BulkModelSerializer):

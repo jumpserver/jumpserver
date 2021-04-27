@@ -6,12 +6,17 @@ from .serializers import (
     SubscriptionSerializer, BackendSerializer, MessageSerializer,
     SubscriptionUserRelationSerializer, SubscriptionGroupRelationSerializer,
     SubscriptionBackendRelationSerializer, SubscriptionMessageRelationSerializer,
+    SubscriptionListSerializer,
 )
 
 
 class SubscriptionViewSet(JMSBulkModelViewSet):
-    queryset = Subscription.objects
+    queryset = Subscription.objects.all()
     serializer_class = SubscriptionSerializer
+    serializer_classes = {
+        'default': SubscriptionSerializer,
+        'list': SubscriptionListSerializer
+    }
 
 
 class SubscriptionUserRelationViewSet(JMSBulkRelationModelViewSet):
