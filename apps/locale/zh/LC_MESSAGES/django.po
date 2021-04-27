@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-26 10:14+0800\n"
+"POT-Creation-Date: 2021-04-27 18:00+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -34,12 +34,12 @@ msgstr ""
 msgid "Name"
 msgstr "名称"
 
-#: acls/models/base.py:27 assets/models/cmd_filter.py:53
+#: acls/models/base.py:27 assets/models/cmd_filter.py:54
 #: assets/models/user.py:122
 msgid "Priority"
 msgstr "优先级"
 
-#: acls/models/base.py:28 assets/models/cmd_filter.py:53
+#: acls/models/base.py:28 assets/models/cmd_filter.py:54
 #: assets/models/user.py:122
 msgid "1-100, the lower the value will be match first"
 msgstr "优先级可选范围为 1-100 (数值越小越优先)"
@@ -55,7 +55,7 @@ msgstr "激活中"
 #: acls/models/base.py:32 applications/models/application.py:24
 #: assets/models/asset.py:147 assets/models/asset.py:223
 #: assets/models/base.py:255 assets/models/cluster.py:29
-#: assets/models/cmd_filter.py:23 assets/models/cmd_filter.py:57
+#: assets/models/cmd_filter.py:23 assets/models/cmd_filter.py:64
 #: assets/models/domain.py:22 assets/models/domain.py:56
 #: assets/models/group.py:23 assets/models/label.py:23 ops/models/adhoc.py:37
 #: orgs/models.py:26 perms/models/base.py:57 settings/models.py:34
@@ -67,11 +67,11 @@ msgstr "激活中"
 msgid "Comment"
 msgstr "备注"
 
-#: acls/models/login_acl.py:16 tickets/const.py:18
+#: acls/models/login_acl.py:16 tickets/const.py:19
 msgid "Reject"
 msgstr "拒绝"
 
-#: acls/models/login_acl.py:17 assets/models/cmd_filter.py:47
+#: acls/models/login_acl.py:17 assets/models/cmd_filter.py:48
 msgid "Allow"
 msgstr "允许"
 
@@ -81,7 +81,7 @@ msgstr "登录IP"
 
 #: acls/models/login_acl.py:24 acls/models/login_asset_acl.py:26
 #: acls/serializers/login_acl.py:34 acls/serializers/login_asset_acl.py:75
-#: assets/models/cmd_filter.py:56 audits/models.py:57
+#: assets/models/cmd_filter.py:57 audits/models.py:57
 #: authentication/templates/authentication/_access_key_modal.html:34
 #: tickets/models/ticket.py:43 users/templates/users/_granted_assets.html:29
 #: users/templates/users/user_asset_permission.html:44
@@ -97,7 +97,7 @@ msgstr "动作"
 #: authentication/models.py:97 orgs/models.py:18 orgs/models.py:418
 #: perms/models/base.py:50 templates/index.html:78
 #: terminal/backends/command/models.py:18
-#: terminal/backends/command/serializers.py:12 terminal/models/session.py:37
+#: terminal/backends/command/serializers.py:12 terminal/models/session.py:38
 #: tickets/models/comment.py:17 users/models/user.py:164
 #: users/models/user.py:712 users/serializers/group.py:20
 #: users/templates/users/user_asset_permission.html:38
@@ -124,7 +124,7 @@ msgstr "系统用户"
 #: assets/serializers/system_user.py:192 audits/models.py:38
 #: perms/models/asset_permission.py:99 templates/index.html:82
 #: terminal/backends/command/models.py:19
-#: terminal/backends/command/serializers.py:13 terminal/models/session.py:39
+#: terminal/backends/command/serializers.py:13 terminal/models/session.py:40
 #: users/templates/users/user_asset_permission.html:40
 #: users/templates/users/user_asset_permission.html:70
 #: xpack/plugins/change_auth_plan/models.py:282
@@ -132,7 +132,8 @@ msgstr "系统用户"
 msgid "Asset"
 msgstr "资产"
 
-#: acls/models/login_asset_acl.py:32 authentication/models.py:45
+#: acls/models/login_asset_acl.py:32 assets/models/cmd_filter.py:62
+#: authentication/models.py:45
 msgid "Reviewers"
 msgstr "审批人"
 
@@ -250,7 +251,7 @@ msgstr "自定义"
 msgid "Category"
 msgstr "类别"
 
-#: applications/models/application.py:16 assets/models/cmd_filter.py:52
+#: applications/models/application.py:16 assets/models/cmd_filter.py:53
 #: perms/models/application_permission.py:23
 #: perms/serializers/application/permission.py:17
 #: perms/serializers/application/user_permission.py:34
@@ -320,7 +321,6 @@ msgstr "目标URL"
 #: users/templates/users/user_otp_check_password.html:13
 #: users/templates/users/user_password_update.html:43
 #: users/templates/users/user_password_verify.html:18
-#: users/templates/users/user_update.html:20
 #: xpack/plugins/change_auth_plan/models.py:68
 #: xpack/plugins/change_auth_plan/models.py:190
 #: xpack/plugins/change_auth_plan/models.py:285
@@ -480,7 +480,7 @@ msgstr "标签管理"
 
 #: assets/models/asset.py:221 assets/models/base.py:258
 #: assets/models/cluster.py:28 assets/models/cmd_filter.py:26
-#: assets/models/cmd_filter.py:60 assets/models/group.py:21
+#: assets/models/cmd_filter.py:67 assets/models/group.py:21
 #: common/db/models.py:70 common/mixins/models.py:49 orgs/models.py:24
 #: orgs/models.py:422 perms/models/base.py:55 users/models/user.py:576
 #: users/serializers/group.py:35 xpack/plugins/change_auth_plan/models.py:81
@@ -585,29 +585,37 @@ msgid "Regex"
 msgstr "正则表达式"
 
 #: assets/models/cmd_filter.py:41 ops/models/command.py:25
-#: terminal/backends/command/serializers.py:15 terminal/models/session.py:48
+#: terminal/backends/command/serializers.py:15 terminal/models/session.py:49
 msgid "Command"
 msgstr "命令"
 
-#: assets/models/cmd_filter.py:46
+#: assets/models/cmd_filter.py:47
 msgid "Deny"
 msgstr "拒绝"
 
-#: assets/models/cmd_filter.py:51
+#: assets/models/cmd_filter.py:49
+msgid "Reconfirm"
+msgstr "复核"
+
+#: assets/models/cmd_filter.py:52
 msgid "Filter"
 msgstr "过滤器"
 
-#: assets/models/cmd_filter.py:55 xpack/plugins/license/models.py:29
+#: assets/models/cmd_filter.py:56 xpack/plugins/license/models.py:29
 msgid "Content"
 msgstr "内容"
 
-#: assets/models/cmd_filter.py:55
+#: assets/models/cmd_filter.py:56
 msgid "One line one command"
 msgstr "每行一个命令"
 
-#: assets/models/cmd_filter.py:64
+#: assets/models/cmd_filter.py:71
 msgid "Command filter rule"
 msgstr "命令过滤规则"
+
+#: assets/models/cmd_filter.py:111 tickets/const.py:13
+msgid "Command confirm"
+msgstr "命令复核"
 
 #: assets/models/domain.py:64
 msgid "Gateway"
@@ -735,7 +743,7 @@ msgstr "用户组"
 #: perms/models/application_permission.py:31
 #: perms/models/asset_permission.py:101 templates/_nav.html:45
 #: terminal/backends/command/models.py:20
-#: terminal/backends/command/serializers.py:14 terminal/models/session.py:41
+#: terminal/backends/command/serializers.py:14 terminal/models/session.py:42
 #: users/templates/users/_granted_assets.html:27
 #: users/templates/users/user_asset_permission.html:42
 #: users/templates/users/user_asset_permission.html:76
@@ -1025,7 +1033,7 @@ msgid "Symlink"
 msgstr "建立软链接"
 
 #: audits/models.py:37 audits/models.py:60 audits/models.py:71
-#: terminal/models/session.py:44
+#: terminal/models/session.py:45
 msgid "Remote addr"
 msgstr "远端地址"
 
@@ -1042,7 +1050,7 @@ msgid "Success"
 msgstr "成功"
 
 #: audits/models.py:43 ops/models/command.py:30 perms/models/base.py:53
-#: terminal/models/session.py:51
+#: terminal/models/session.py:52
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:43
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:74
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:40
@@ -1418,7 +1426,7 @@ msgstr "删除成功"
 
 #: authentication/templates/authentication/_access_key_modal.html:155
 #: authentication/templates/authentication/_mfa_confirm_modal.html:53
-#: templates/_modal.html:22 tickets/const.py:19
+#: templates/_modal.html:22 tickets/const.py:20
 msgid "Close"
 msgstr "关闭"
 
@@ -2944,13 +2952,12 @@ msgstr "较高"
 
 #: terminal/const.py:33 users/templates/users/reset_password.html:50
 #: users/templates/users/user_password_update.html:104
-#: users/templates/users/user_update.html:57
 msgid "Normal"
 msgstr "正常"
 
 #: terminal/const.py:34
 msgid "Offline"
-msgstr ""
+msgstr "离线"
 
 #: terminal/exceptions.py:8
 msgid "Bulk create not support"
@@ -2960,15 +2967,15 @@ msgstr "不支持批量创建"
 msgid "Storage is invalid"
 msgstr "存储无效"
 
-#: terminal/models/session.py:43
+#: terminal/models/session.py:44
 msgid "Login from"
 msgstr "登录来源"
 
-#: terminal/models/session.py:47
+#: terminal/models/session.py:48
 msgid "Replay"
 msgstr "回放"
 
-#: terminal/models/session.py:52
+#: terminal/models/session.py:53
 msgid "Date end"
 msgstr "结束日期"
 
@@ -3115,7 +3122,7 @@ msgstr "文档类型"
 
 #: terminal/serializers/storage.py:185
 msgid "Ignore Certificate Verification"
-msgstr ""
+msgstr "忽略证书认证"
 
 #: terminal/serializers/terminal.py:66 terminal/serializers/terminal.py:74
 msgid "Not found"
@@ -3205,15 +3212,15 @@ msgstr "申请资产"
 msgid "Apply for application"
 msgstr "申请应用"
 
-#: tickets/const.py:16 tickets/const.py:23
+#: tickets/const.py:17 tickets/const.py:24
 msgid "Open"
 msgstr "打开"
 
-#: tickets/const.py:17
+#: tickets/const.py:18
 msgid "Approve"
 msgstr "同意"
 
-#: tickets/const.py:24
+#: tickets/const.py:25
 msgid "Closed"
 msgstr "关闭"
 
@@ -3327,6 +3334,36 @@ msgstr "工单申请信息"
 #: tickets/handler/base.py:119
 msgid "Ticket approved info"
 msgstr "工单批准信息"
+
+#: tickets/handler/command_confirm.py:24
+msgid "Applied run user"
+msgstr "申请运行的用户"
+
+#: tickets/handler/command_confirm.py:25
+msgid "Applied run asset"
+msgstr "申请运行的资产"
+
+#: tickets/handler/command_confirm.py:26
+msgid "Applied run system user"
+msgstr "申请运行的系统用户"
+
+#: tickets/handler/command_confirm.py:27
+msgid "Applied run command"
+msgstr "申请运行的命令"
+
+#: tickets/handler/command_confirm.py:28
+msgid "Applied from session"
+msgstr "申请来自会话"
+
+#: tickets/handler/command_confirm.py:29
+msgid "Applied from command filter rules"
+msgstr "申请来自命令过滤规则"
+
+#: tickets/handler/command_confirm.py:30
+#, fuzzy
+#| msgid "Applied from command filter rules"
+msgid "Applied from command filter"
+msgstr "申请来自命令过滤规则"
 
 #: tickets/handler/login_asset_confirm.py:16
 msgid "Applied login user"
@@ -3465,6 +3502,36 @@ msgstr "批准的资产"
 msgid "No `Asset` are found under Organization `{}`"
 msgstr "在组织 `{}` 下没有发现 `资产`"
 
+#: tickets/serializers/ticket/meta/ticket_type/command_confirm.py:12
+msgid "Run user"
+msgstr "运行的用户"
+
+#: tickets/serializers/ticket/meta/ticket_type/command_confirm.py:13
+msgid "Run asset"
+msgstr "运行的资产"
+
+#: tickets/serializers/ticket/meta/ticket_type/command_confirm.py:15
+msgid "Run system user"
+msgstr "运行的系统用户"
+
+#: tickets/serializers/ticket/meta/ticket_type/command_confirm.py:17
+msgid "Run command"
+msgstr "运行的命令"
+
+#: tickets/serializers/ticket/meta/ticket_type/command_confirm.py:18
+msgid "From session"
+msgstr "来自会话"
+
+#: tickets/serializers/ticket/meta/ticket_type/command_confirm.py:20
+msgid "From cmd filter rule"
+msgstr "来自命令过滤规则"
+
+#: tickets/serializers/ticket/meta/ticket_type/command_confirm.py:22
+#, fuzzy
+#| msgid "From cmd filter rule"
+msgid "From cmd filter"
+msgstr "来自命令过滤规则"
+
 #: tickets/serializers/ticket/meta/ticket_type/common.py:11
 msgid "Created by ticket ({}-{})"
 msgstr "通过工单创建 ({}-{})"
@@ -3585,7 +3652,7 @@ msgstr "原来密码错误"
 msgid "Automatically configure and download the SSH key"
 msgstr "自动配置并下载SSH密钥"
 
-#: users/forms/profile.py:130 users/templates/users/user_update.html:30
+#: users/forms/profile.py:130
 msgid "ssh public key"
 msgstr "SSH公钥"
 
@@ -3821,43 +3888,36 @@ msgstr "重置密码"
 
 #: users/templates/users/reset_password.html:23
 #: users/templates/users/user_password_update.html:64
-#: users/templates/users/user_update.html:13
 msgid "Your password must satisfy"
 msgstr "您的密码必须满足："
 
 #: users/templates/users/reset_password.html:24
 #: users/templates/users/user_password_update.html:65
-#: users/templates/users/user_update.html:14
 msgid "Password strength"
 msgstr "密码强度："
 
 #: users/templates/users/reset_password.html:48
 #: users/templates/users/user_password_update.html:102
-#: users/templates/users/user_update.html:55
 msgid "Very weak"
 msgstr "很弱"
 
 #: users/templates/users/reset_password.html:49
 #: users/templates/users/user_password_update.html:103
-#: users/templates/users/user_update.html:56
 msgid "Weak"
 msgstr "弱"
 
 #: users/templates/users/reset_password.html:51
 #: users/templates/users/user_password_update.html:105
-#: users/templates/users/user_update.html:58
 msgid "Medium"
 msgstr "一般"
 
 #: users/templates/users/reset_password.html:52
 #: users/templates/users/user_password_update.html:106
-#: users/templates/users/user_update.html:59
 msgid "Strong"
 msgstr "强"
 
 #: users/templates/users/reset_password.html:53
 #: users/templates/users/user_password_update.html:107
-#: users/templates/users/user_update.html:60
 msgid "Very strong"
 msgstr "很强"
 
@@ -3932,18 +3992,6 @@ msgstr "重置"
 #: users/templates/users/user_password_verify.html:9
 msgid "Verify password"
 msgstr "校验密码"
-
-#: users/templates/users/user_update.html:4
-msgid "Update user"
-msgstr "更新用户"
-
-#: users/templates/users/user_update.html:22 users/views/profile/reset.py:120
-msgid "User auth from {}, go there change password"
-msgstr "用户认证源来自 {}, 请去相应系统修改密码"
-
-#: users/templates/users/user_update.html:32
-msgid "User auth from {}, ssh key login is not supported"
-msgstr "用户认证源来自 {}, 不支持使用 SSH Key 登录"
 
 #: users/templates/users/user_verify_mfa.html:11
 msgid ""
@@ -4312,6 +4360,10 @@ msgstr "重置密码成功，返回到登录页面"
 #: users/views/profile/reset.py:105 users/views/profile/reset.py:115
 msgid "Token invalid or expired"
 msgstr "Token错误或失效"
+
+#: users/views/profile/reset.py:120
+msgid "User auth from {}, go there change password"
+msgstr "用户认证源来自 {}, 请去相应系统修改密码"
 
 #: xpack/plugins/change_auth_plan/meta.py:9
 #: xpack/plugins/change_auth_plan/models.py:89
@@ -4984,6 +5036,12 @@ msgstr "社区版"
 #~ "The new public key has been set successfully, Please download the "
 #~ "corresponding private key."
 #~ msgstr "新的公钥已设置成功，请下载对应的私钥"
+
+#~ msgid "Update user"
+#~ msgstr "更新用户"
+
+#~ msgid "User auth from {}, ssh key login is not supported"
+#~ msgstr "用户认证源来自 {}, 不支持使用 SSH Key 登录"
 
 #~ msgid "(Domain name support)"
 #~ msgstr "(支持域名)"
