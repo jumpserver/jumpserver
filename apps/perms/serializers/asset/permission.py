@@ -3,7 +3,8 @@
 
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
+from rest_framework.response import Response
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from perms.models import AssetPermission, Action
@@ -44,18 +45,18 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
 
     class Meta:
         model = AssetPermission
-        mini_fields = ['id', 'name']
-        small_fields = mini_fields + [
+        fields_mini = ['id', 'name']
+        fields_small = fields_mini + [
             'is_active', 'is_expired', 'is_valid', 'actions',
             'created_by', 'date_created', 'date_expired',
             'date_start', 'comment'
         ]
-        m2m_fields = [
+        fields_m2m = [
             'users', 'user_groups', 'assets', 'nodes', 'system_users',
             'users_amount', 'user_groups_amount', 'assets_amount',
             'nodes_amount', 'system_users_amount',
         ]
-        fields = small_fields + m2m_fields
+        fields = fields_small + fields_m2m
         read_only_fields = ['created_by', 'date_created']
         extra_kwargs = {
             'is_expired': {'label': _('Is expired')},
@@ -79,3 +80,34 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
             Prefetch('nodes', queryset=Node.objects.only('id'))
         )
         return queryset
+
+    def to_internal_value(self, data):
+        print(data)
+        # 将用户名、用户姓名、id统一为 id
+        for i in range(len(data['users'])):
+            user = User.objects.filter(name=data['users'][i]).first()
+            user1 = User.objects.filter(username=data['users'][i]).first()
+            if user:
+                data['users'][i] = user.id
+            elif user1:
+                data['users'][i] = user1.id
+        # 将资产 主机名、ip、id统一为 id
+        for i in range(len(data['assets'])):
+            asset = Asset.objects.filter(ip=data['assets'][i]).first()
+            asset1 = Asset.objects.filter(hostname=data['assets'][i]).first()
+            if asset:
+                data['assets'][i] = asset.id
+            elif asset1:
+                data['assets'][i] = asset1.id
+        # 将系统用户名、id 统一为 id
+        for i in range(len(data['system_users'])):
+            system_user = SystemUser.objects.filter(name=data['system_users'][i]).first()
+            if system_user:
+                data['system_users'][i] = system_user.id
+        # 将用户组名、id 统一为 id
+        for i in range(len(data['user_groups'])):
+            user_group = UserGroup.objects.filter(name=data['user_groups'][i]).first()
+            if user_group:
+                data['user_groups'][i] = user_group.id
+        print(data)
+        return super().to_internal_value(data)
