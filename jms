@@ -97,6 +97,14 @@ def check_migrations():
     # sys.exit(1)
 
 
+def expire_caches():
+    apps_dir = os.path.join(BASE_DIR, 'apps')
+    code = subprocess.call("python manage.py expire_caches", shell=True, cwd=apps_dir)
+
+    if code == 1:
+        return
+
+
 def perform_db_migrate():
     logging.info("Check database structure change ...")
     os.chdir(os.path.join(BASE_DIR, 'apps'))
@@ -116,6 +124,7 @@ def prepare():
     check_database_connection()
     check_migrations()
     upgrade_db()
+    expire_caches()
 
 
 def check_pid(pid):
