@@ -26,12 +26,12 @@ class Handler(BaseHandler):
 
     # display
     def _construct_meta_display_of_open(self):
-        meta_display_fields = ['apply_actions_display', 'enchance_host_display', 'enchange_system_users_display']
+        meta_display_fields = ['apply_actions_display', 'enchance_host_display', 'enchance_system_users_display']
         apply_actions = self.ticket.meta.get('apply_actions', Action.NONE)
         apply_actions_display = Action.value_to_choices_display(apply_actions)
         enchance_host_display = self._get_asset_ip()
-        enchange_system_users_display = self._get_systemusers()
-        meta_display_values = [apply_actions_display, enchance_host_display, enchange_system_users_display]
+        enchance_system_users_display = self._get_systemusers()
+        meta_display_values = [apply_actions_display, enchance_host_display, enchance_system_users_display]
         meta_display = dict(zip(meta_display_fields, meta_display_values))
         return meta_display
 
@@ -57,7 +57,7 @@ class Handler(BaseHandler):
     # body
     def _construct_meta_body_of_open(self):
         apply_host = self.ticket.meta.get('enchance_host_display', '')
-        apply_system_users = self.ticket.meta.get('enchange_system_users_display', [])
+        apply_system_users = self.ticket.meta.get('enchance_system_users_display', [])
         apply_actions_display = self.ticket.meta.get('apply_actions_display', [])
         apply_date_start = self.ticket.meta.get('apply_date_start')
         apply_date_expired = self.ticket.meta.get('apply_date_expired')
@@ -77,7 +77,7 @@ class Handler(BaseHandler):
 
     def _construct_meta_body_of_approve(self):
         approve_host = self.ticket.meta.get('enchance_host_display', '')
-        approve_system_users = self.ticket.meta.get('enchange_system_users_display', [])
+        approve_system_users = self.ticket.meta.get('enchance_system_users_display', [])
         approve_actions_display = self.ticket.meta.get('approve_actions_display', [])
         approve_date_start = self.ticket.meta.get('approve_date_start')
         approve_date_expired = self.ticket.meta.get('approve_date_expired')

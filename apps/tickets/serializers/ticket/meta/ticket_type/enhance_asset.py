@@ -22,7 +22,7 @@ class ApplySerializer(serializers.Serializer):
         required=False, child=serializers.CharField(), label=_('System user'),
         default=list, allow_null=True, write_only=True
     )
-    enchange_system_users_display = serializers.ListField(
+    enchance_system_users_display = serializers.ListField(
         required=False, child=serializers.CharField(),
         default=list, allow_null=True, read_only=True
     )
