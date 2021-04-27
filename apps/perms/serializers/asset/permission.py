@@ -3,7 +3,8 @@
 
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
+from rest_framework.response import Response
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from perms.models import AssetPermission, Action
@@ -13,6 +14,7 @@ from users.models import User, UserGroup
 __all__ = [
     'AssetPermissionSerializer',
     'ActionsField',
+    'AssetPermissionDisplaySerializer'
 ]
 
 
@@ -80,33 +82,20 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
         )
         return queryset
 
-    def to_internal_value(self, data):
-        print(data)
-        # 将用户名、用户姓名、id统一为 id
-        for i in range(len(data['users'])):
-            user = User.objects.filter(name=data['users'][i]).first()
-            user1 = User.objects.filter(username=data['users'][i]).first()
-            if user:
-                data['users'][i] = user.id
-            elif user1:
-                data['users'][i] = user1.id
-        # 将资产 主机名、ip、id统一为 id
-        for i in range(len(data['assets'])):
-            asset = Asset.objects.filter(ip=data['assets'][i]).first()
-            asset1 = Asset.objects.filter(hostname=data['assets'][i]).first()
-            if asset:
-                data['assets'][i] = asset.id
-            elif asset1:
-                data['assets'][i] = asset1.id
-        # 将系统用户名、id 统一为 id
-        for i in range(len(data['system_users'])):
-            system_user = SystemUser.objects.filter(name=data['system_users'][i]).first()
-            if system_user:
-                data['system_users'][i] = system_user.id
-        # 将用户组名、id 统一为 id
-        for i in range(len(data['user_groups'])):
-            user_group = UserGroup.objects.filter(name=data['user_groups'][i]).first()
-            if user_group:
-                data['user_groups'][i] = user_group.id
-        print(data)
-        return super().to_internal_value(data)
+class AssetPermissionDisplaySerializer(AssetPermissionSerializer):
+    users_display = serializers.ListSerializer(child=serializers.CharField(), source='users', label=_('Users name'),
+                                               required=False)
+    user_groups_display = serializers.ListSerializer(child=serializers.CharField(), source='user_groups',
+                                                     label=_('User groups name'), required=False)
+    assets_display = serializers.ListSerializer(child=serializers.CharField(), source='assets',
+                                                label=_('Assets name'), required=False)
+    nodes_display = serializers.ListSerializer(child=serializers.CharField(), source='nodes', label=_('Nodes name'),
+                                               required=False)
+    system_users_display = serializers.ListSerializer(child=serializers.CharField(), source='system_users',
+                                                      label=_('System users name'), required=False)
+
+    class Meta(AssetPermissionSerializer.Meta):
+        fields = AssetPermissionSerializer.Meta.fields + [
+            'users_display', 'user_groups_display', 'assets_display', 'nodes_display', 'system_users_display'
+        ]
+
