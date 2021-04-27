@@ -12,6 +12,7 @@ class Handler(BaseHandler):
         apply_run_command = self.ticket.meta.get('apply_run_command')
         apply_from_session_id = self.ticket.meta.get('apply_from_session_id')
         apply_from_cmd_filter_rule_id = self.ticket.meta.get('apply_from_cmd_filter_rule_id')
+        apply_from_cmd_filter_id = self.ticket.meta.get('apply_from_cmd_filter_id')
 
         applied_body = '''{}: {},
             {}: {},
@@ -26,5 +27,6 @@ class Handler(BaseHandler):
             _("Applied run command"), apply_run_command,
             _("Applied from session"), apply_from_session_id,
             _("Applied from command filter rules"), apply_from_cmd_filter_rule_id,
+            _("Applied from command filter"), apply_from_cmd_filter_id,
         )
         return applied_body
