@@ -3,8 +3,7 @@
 
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
-from django.db.models import Prefetch, Q
-from rest_framework.response import Response
+from django.db.models import Prefetch
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from perms.models import AssetPermission, Action
