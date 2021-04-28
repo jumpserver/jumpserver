@@ -18,10 +18,6 @@ class AssetPermissionViewSet(OrgBulkModelViewSet):
     """
     permission_classes = (IsOrgAdmin,)
     model = AssetPermission
-    serializer_classes = {
-        'default': serializers.AssetPermissionSerializer,
-        'display': serializers.AssetPermissionDisplaySerializer,
-        'create': serializers.AssetPermissionSerializer
-    }
+    serializer_class = serializers.AssetPermissionSerializer
     filterset_class = AssetPermissionFilter
     search_fields = ('name',)

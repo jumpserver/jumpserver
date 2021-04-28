@@ -4,7 +4,6 @@
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Prefetch, Q
-from rest_framework.response import Response
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from perms.models import AssetPermission, Action
@@ -14,7 +13,6 @@ from users.models import User, UserGroup
 __all__ = [
     'AssetPermissionSerializer',
     'ActionsField',
-    'AssetPermissionDisplaySerializer'
 ]
 
 
@@ -43,6 +41,11 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
     actions = ActionsField(required=False, allow_null=True)
     is_valid = serializers.BooleanField(read_only=True)
     is_expired = serializers.BooleanField(read_only=True, label=_('Is expired'))
+    users_display = serializers.ListField(child=serializers.CharField(), label=_('Users name'), required=False)
+    user_groups_display = serializers.ListField(child=serializers.CharField(), label=_('User groups name'), required=False)
+    assets_display = serializers.ListField(child=serializers.CharField(), label=_('Assets name'), required=False)
+    nodes_display = serializers.ListField(child=serializers.CharField(), label=_('Nodes name'), required=False)
+    system_users_display = serializers.ListField(child=serializers.CharField(), label=_('System users name'), required=False)
 
     class Meta:
         model = AssetPermission
@@ -53,7 +56,8 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
             'date_start', 'comment'
         ]
         fields_m2m = [
-            'users', 'user_groups', 'assets', 'nodes', 'system_users',
+            'users', 'users_display', 'user_groups', 'user_groups_display', 'assets', 'assets_display',
+            'nodes', 'nodes_display', 'system_users', 'system_users_display',
             'users_amount', 'user_groups_amount', 'assets_amount',
             'nodes_amount', 'system_users_amount',
         ]
@@ -82,20 +86,54 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
         )
         return queryset
 
-class AssetPermissionDisplaySerializer(AssetPermissionSerializer):
-    users_display = serializers.ListSerializer(child=serializers.CharField(), source='users', label=_('Users name'),
-                                               required=False)
-    user_groups_display = serializers.ListSerializer(child=serializers.CharField(), source='user_groups',
-                                                     label=_('User groups name'), required=False)
-    assets_display = serializers.ListSerializer(child=serializers.CharField(), source='assets',
-                                                label=_('Assets name'), required=False)
-    nodes_display = serializers.ListSerializer(child=serializers.CharField(), source='nodes', label=_('Nodes name'),
-                                               required=False)
-    system_users_display = serializers.ListSerializer(child=serializers.CharField(), source='system_users',
-                                                      label=_('System users name'), required=False)
+    def to_internal_value(self, data):
+        # 系统用户是必填项
+        for i in range(len(data['system_users_display'])):
+            system_user = SystemUser.objects.filter(name=data['system_users_display'][i]).first()
+            if system_user and system_user.id not in data['system_users']:
+                data['system_users'].append(system_user.id)
+        return super().to_internal_value(data)
 
-    class Meta(AssetPermissionSerializer.Meta):
-        fields = AssetPermissionSerializer.Meta.fields + [
-            'users_display', 'user_groups_display', 'assets_display', 'nodes_display', 'system_users_display'
-        ]
 
+    def perform_display_create(self, instance, users_display, user_groups_display, assets_display, nodes_display):
+        # 用户
+        users_to_set = []
+        for name in users_display:
+            user = User.objects.filter(Q(name=name) | Q(username=name)).first()
+            if user:
+                users_to_set.append(user)
+        instance.users.set(users_to_set)
+        # 用户组
+        user_groups_to_set = []
+        for name in user_groups_display:
+            user_group = UserGroup.objects.filter(name=name).first()
+            if user_group:
+                user_groups_to_set.append(user_group)
+        instance.user_groups.set(user_groups_to_set)
+        # 资产
+        assets_to_set = []
+        for name in assets_display:
+            asset = Asset.objects.filter(Q(ip=name) | Q(hostname=name)).first()
+            if asset:
+                assets_to_set.append(asset)
+        instance.assets.set(assets_to_set)
+        # 节点
+        nodes_to_set = []
+        for full_value in nodes_display:
+            node = Node.objects.filter(full_value=full_value).first()
+            if node:
+                nodes_to_set.append(node)
+            else:
+                node = Node.create_node_by_full_value(full_value)
+            nodes_to_set.append(node)
+        instance.nodes.set(nodes_to_set)
+
+    def create(self, validated_data):
+        users_display = validated_data.pop('users_display', '')
+        user_groups_display = validated_data.pop('user_groups_display', '')
+        assets_display = validated_data.pop('assets_display', '')
+        nodes_display = validated_data.pop('nodes_display', '')
+        system_users_display = validated_data.pop('system_users_display', '')
+        instance = super().create(validated_data)
+        self.perform_display_create(instance, users_display, user_groups_display, assets_display, nodes_display)
+        return instance
