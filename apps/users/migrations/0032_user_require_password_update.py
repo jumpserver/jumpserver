@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='user',
-            name='require_password_update',
+            name='need_password_update',
             field=models.BooleanField(default=False),
         ),
     ]
