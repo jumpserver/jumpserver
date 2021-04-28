@@ -88,52 +88,35 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
 
     def to_internal_value(self, data):
         # 系统用户是必填项
-        for i in range(len(data['system_users_display'])):
-            system_user = SystemUser.objects.filter(name=data['system_users_display'][i]).first()
+        system_users_display = data.pop('system_users_display', '')
+        for i in range(len(system_users_display)):
+            system_user = SystemUser.objects.filter(name=system_users_display[i]).first()
             if system_user and system_user.id not in data['system_users']:
                 data['system_users'].append(system_user.id)
         return super().to_internal_value(data)
 
 
-    def perform_display_create(self, instance, users_display, user_groups_display, assets_display, nodes_display):
+    def perform_display_create(self, instance, **kwargs):
         # 用户
-        users_to_set = []
-        for name in users_display:
-            user = User.objects.filter(Q(name=name) | Q(username=name)).first()
-            if user:
-                users_to_set.append(user)
+        users_to_set = User.objects.filter(Q(name__in=kwargs.get('users_display')) | Q(username__in=kwargs.get('users_display'))).distinct()
         instance.users.set(users_to_set)
         # 用户组
-        user_groups_to_set = []
-        for name in user_groups_display:
-            user_group = UserGroup.objects.filter(name=name).first()
-            if user_group:
-                user_groups_to_set.append(user_group)
+        user_groups_to_set = UserGroup.objects.filter(name__in=kwargs.get('user_groups_display')).distinct()
         instance.user_groups.set(user_groups_to_set)
         # 资产
-        assets_to_set = []
-        for name in assets_display:
-            asset = Asset.objects.filter(Q(ip=name) | Q(hostname=name)).first()
-            if asset:
-                assets_to_set.append(asset)
+        assets_to_set = Asset.objects.filter(Q(ip__in=kwargs.get('assets_display')) | Q(hostname__in=kwargs.get('assets_display'))).distinct()
         instance.assets.set(assets_to_set)
         # 节点
-        nodes_to_set = []
-        for full_value in nodes_display:
-            node = Node.objects.filter(full_value=full_value).first()
-            if node:
-                nodes_to_set.append(node)
-            else:
-                node = Node.create_node_by_full_value(full_value)
-            nodes_to_set.append(node)
+        nodes_to_set = Node.objects.filter(full_value__in=kwargs.get('nodes_display')).distinct()
         instance.nodes.set(nodes_to_set)
 
     def create(self, validated_data):
-        users_display = validated_data.pop('users_display', '')
-        user_groups_display = validated_data.pop('user_groups_display', '')
-        assets_display = validated_data.pop('assets_display', '')
-        nodes_display = validated_data.pop('nodes_display', '')
-        system_users_display = validated_data.pop('system_users_display', '')
+        display = {
+            'users_display' : validated_data.pop('users_display', ''),
+            'user_groups_display' : validated_data.pop('user_groups_display', ''),
+            'assets_display' : validated_data.pop('assets_display', ''),
+            'nodes_display' : validated_data.pop('nodes_display', '')
+        }
         instance = super().create(validated_data)
-        self.perform_display_create(instance, users_display, user_groups_display, assets_display, nodes_display)
+        self.perform_display_create(instance, **display)
         return instance
