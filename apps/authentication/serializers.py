@@ -9,13 +9,14 @@ from assets.models import Asset, SystemUser, Gateway
 from applications.models import Application
 from users.serializers import UserProfileSerializer
 from perms.serializers.asset.permission import ActionsField
-from .models import AccessKey, LoginConfirmSetting, SSOToken
+from .models import AccessKey, LoginConfirmSetting
 
 
 __all__ = [
     'AccessKeySerializer', 'OtpVerifySerializer', 'BearerTokenSerializer',
     'MFAChallengeSerializer', 'LoginConfirmSettingSerializer', 'SSOTokenSerializer',
-    'ConnectionTokenSerializer', 'ConnectionTokenSecretSerializer', 'RDPFileSerializer'
+    'ConnectionTokenSerializer', 'ConnectionTokenSecretSerializer', 'RDPFileSerializer',
+    'PasswordVerifySerializer',
 ]
 
 
@@ -28,6 +29,10 @@ class AccessKeySerializer(serializers.ModelSerializer):
 
 class OtpVerifySerializer(serializers.Serializer):
     code = serializers.CharField(max_length=6, min_length=6)
+
+
+class PasswordVerifySerializer(serializers.Serializer):
+    password = serializers.CharField()
 
 
 class BearerTokenSerializer(serializers.Serializer):

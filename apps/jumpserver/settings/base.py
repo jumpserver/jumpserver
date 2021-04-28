@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'applications.apps.ApplicationsConfig',
     'tickets.apps.TicketsConfig',
     'acls.apps.AclsConfig',
+    'notifications.apps.NotificationsConfig',
     'common.apps.CommonConfig',
     'jms_oidc_rp',
     'rest_framework',
@@ -70,6 +71,7 @@ INSTALLED_APPS = [
 
 
 MIDDLEWARE = [
+    # 'common.request_log.RequestLogMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',

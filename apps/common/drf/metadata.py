@@ -45,6 +45,10 @@ class SimpleMetadataWithFilters(SimpleMetadata):
             else:
                 # If user has appropriate permissions for the view, include
                 # appropriate metadata about the fields that should be supplied.
+
+                action = view.action_map.get(method.lower(), 'metadata')
+                view.action = action
+
                 serializer = view.get_serializer()
                 actions[method] = self.get_serializer_info(serializer)
             finally:

@@ -6,7 +6,7 @@ from rest_framework import serializers
 __all__ = [
     'BasicSettingSerializer', 'EmailSettingSerializer', 'EmailContentSettingSerializer',
     'LDAPSettingSerializer', 'TerminalSettingSerializer', 'SecuritySettingSerializer',
-    'SettingsSerializer'
+    'SettingsSerializer', 'WeComSettingSerializer', 'DingTalkSettingSerializer',
 ]
 
 
@@ -184,13 +184,27 @@ class SecuritySettingSerializer(serializers.Serializer):
     )
 
 
+class WeComSettingSerializer(serializers.Serializer):
+    WECOM_CORPID = serializers.CharField(max_length=256, required=True, label=_('Corporation ID'))
+    WECOM_AGENTID = serializers.CharField(max_length=256, required=True, label=_("Agent ID"))
+    WECOM_CORPSECRET = serializers.CharField(max_length=256, required=True, label=_("Corporation secret"), write_only=True)
+
+
+class DingTalkSettingSerializer(serializers.Serializer):
+    DINGTALK_APPKEY = serializers.CharField(max_length=256, required=True, label=_('APP key'))
+    DINGTALK_AGENTID = serializers.CharField(max_length=256, required=True, label=_("Agent id"))
+    DINGTALK_APPSECRET = serializers.CharField(max_length=256, required=True, label=_("APP secret"), write_only=True)
+
+
 class SettingsSerializer(
     BasicSettingSerializer,
     EmailSettingSerializer,
     EmailContentSettingSerializer,
     LDAPSettingSerializer,
     TerminalSettingSerializer,
-    SecuritySettingSerializer
+    SecuritySettingSerializer,
+    WeComSettingSerializer,
+    DingTalkSettingSerializer,
 ):
 
     # encrypt_fields 现在使用 write_only 来判断了

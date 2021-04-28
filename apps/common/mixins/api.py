@@ -6,6 +6,7 @@ from threading import Thread
 from collections import defaultdict
 from itertools import chain
 
+from django.conf import settings
 from django.db.models.signals import m2m_changed
 from django.core.cache import cache
 from django.http import JsonResponse
@@ -23,6 +24,9 @@ __all__ = [
     'JSONResponseMixin', 'CommonApiMixin', 'AsyncApiMixin', 'RelationMixin',
     'SerializerMixin2', 'QuerySetMixin', 'ExtraFilterFieldsMixin', 'RenderToJsonMixin',
 ]
+
+
+UserModel = settings.AUTH_USER_MODEL
 
 
 class JSONResponseMixin(object):
@@ -332,3 +336,21 @@ class AllowBulkDestoryMixin:
         """
         query = str(filtered.query)
         return '`id` IN (' in query or '`id` =' in query
+
+
+class RoleAdminMixin:
+    kwargs: dict
+    user_id_url_kwarg = 'pk'
+
+    @lazyproperty
+    def user(self):
+        user_id = self.kwargs.get(self.user_id_url_kwarg)
+        return UserModel.objects.get(id=user_id)
+
+
+class RoleUserMixin:
+    request: Request
+
+    @lazyproperty
+    def user(self):
+        return self.request.user

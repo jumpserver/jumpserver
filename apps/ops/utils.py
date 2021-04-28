@@ -69,16 +69,6 @@ def update_or_create_ansible_task(
     return task, created
 
 
-def send_server_performance_mail(path, usage, usages):
-    from users.models import User
-    subject = _("Disk used more than 80%: {} => {}").format(path, usage.percent)
-    message = subject
-    admins = User.objects.filter(role=User.ROLE.ADMIN)
-    recipient_list = [u.email for u in admins if u.email]
-    logger.info(subject)
-    send_mail_async(subject, message, recipient_list, html_message=message)
-
-
 def get_task_log_path(base_path, task_id, level=2):
     task_id = str(task_id)
     try:
