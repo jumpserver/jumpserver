@@ -259,6 +259,7 @@ class Config(dict):
         'FTP_LOG_KEEP_DAYS': 200,
         'ASSETS_PERM_CACHE_TIME': 3600 * 24,
         'SECURITY_MFA_VERIFY_TTL': 3600,
+        'OLD_PASSWORD_HISTORY_LIMIT_COUNT': 5,
         'ASSETS_PERM_CACHE_ENABLE': HAS_XPACK,
         'SYSLOG_ADDR': '',  # '192.168.0.1:514'
         'SYSLOG_FACILITY': 'user',
