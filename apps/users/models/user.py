@@ -50,14 +50,11 @@ class AuthMixin:
     #: user.set_password('password')
     @password_raw.setter
     def password_raw(self, password_raw_):
-        self.set_password(password_raw_, flag=False)
+        self.set_password(password_raw_)
 
-    def set_password(self, raw_password, flag=True):
-        # flag; Whether to reset need_password_update field
+    def set_password(self, raw_password):
         if self.can_update_password():
             self.date_password_last_updated = timezone.now()
-            if flag:
-                self.need_password_update = False
             post_user_change_password.send(self.__class__, user=self)
             super().set_password(raw_password)
 
@@ -128,6 +125,7 @@ class AuthMixin:
 
     def reset_password(self, new_password):
         self.set_password(new_password)
+        self.need_password_update = False
         self.save()
 
     @property
