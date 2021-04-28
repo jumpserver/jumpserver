@@ -4673,10 +4673,6 @@ msgstr "Token错误或失效"
 msgid "* The new password cannot be the last {} passwords"
 msgstr "* 新密码不能是最近 {} 次的密码"
 
-#: users/views/profile/reset.py:120
-msgid "User auth from {}, go there change password"
-msgstr "用户认证源来自 {}, 请去相应系统修改密码"
-
 #: xpack/plugins/change_auth_plan/meta.py:9
 #: xpack/plugins/change_auth_plan/models.py:89
 #: xpack/plugins/change_auth_plan/models.py:184
