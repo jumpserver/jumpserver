@@ -144,23 +144,23 @@ class AssetPermission(BasePermission):
         return assets
 
     def users_display(self):
-        names = self.users.all().values_list('username', flat=True)
+        names = [user.username for user in self.users.all()]
         return names
 
     def user_groups_display(self):
-        names = self.user_groups.all().values_list('name', flat=True)
+        names = [group.name for group in self.user_groups.all()]
         return names
 
     def assets_display(self):
-        names = self.assets.all().values_list('hostname', flat=True)
+        names = [asset.hostname for asset in self.assets.all()]
         return names
 
     def system_users_display(self):
-        names = self.system_users.all().values_list('name', flat=True)
+        names = [system_user.name for system_user in self.system_users.all()]
         return names
 
     def nodes_display(self):
-        names = self.nodes.all().values_list('full_value', flat=True)
+        names = [node.full_value for node in self.nodes.all()]
         return names
 
 

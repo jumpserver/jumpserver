@@ -77,13 +77,7 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related(
-            Prefetch('system_users', queryset=SystemUser.objects.only('id')),
-            Prefetch('user_groups', queryset=UserGroup.objects.only('id')),
-            Prefetch('users', queryset=User.objects.only('id')),
-            Prefetch('assets', queryset=Asset.objects.only('id')),
-            Prefetch('nodes', queryset=Node.objects.only('id'))
-        )
+        queryset = queryset.prefetch_related('users', 'user_groups', 'assets', 'nodes', 'system_users')
         return queryset
 
     def to_internal_value(self, data):
@@ -98,13 +92,17 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
 
     def perform_display_create(self, instance, **kwargs):
         # 用户
-        users_to_set = User.objects.filter(Q(name__in=kwargs.get('users_display')) | Q(username__in=kwargs.get('users_display'))).distinct()
+        users_to_set = User.objects.filter(
+            Q(name__in=kwargs.get('users_display')) | Q(username__in=kwargs.get('users_display'))
+        ).distinct()
         instance.users.set(users_to_set)
         # 用户组
         user_groups_to_set = UserGroup.objects.filter(name__in=kwargs.get('user_groups_display')).distinct()
         instance.user_groups.set(user_groups_to_set)
         # 资产
-        assets_to_set = Asset.objects.filter(Q(ip__in=kwargs.get('assets_display')) | Q(hostname__in=kwargs.get('assets_display'))).distinct()
+        assets_to_set = Asset.objects.filter(
+            Q(ip__in=kwargs.get('assets_display')) | Q(hostname__in=kwargs.get('assets_display'))
+        ).distinct()
         instance.assets.set(assets_to_set)
         # 节点
         nodes_to_set = Node.objects.filter(full_value__in=kwargs.get('nodes_display')).distinct()
