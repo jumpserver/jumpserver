@@ -125,7 +125,7 @@ class AuthMixin:
 
     def reset_password(self, new_password):
         self.set_password(new_password)
-        self.need_password_update = False
+        self.need_update_password = False
         self.save()
 
     @property
@@ -604,7 +604,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         auto_now_add=True, blank=True, null=True,
         verbose_name=_('Date password last updated')
     )
-    need_password_update = models.BooleanField(default=False)
+    need_update_password = models.BooleanField(default=False)
 
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
