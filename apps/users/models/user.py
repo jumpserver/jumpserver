@@ -79,8 +79,10 @@ class AuthMixin:
             return False
 
     def save_history_password(self, password):
-        UserPasswordHistory.objects.create(user=self, password=make_password(password),
-                                           date_created=self.date_password_last_updated)
+        UserPasswordHistory.objects.create(
+            user=self, password=make_password(password),
+            date_created=self.date_password_last_updated
+        )
 
     def is_public_key_valid(self):
         """

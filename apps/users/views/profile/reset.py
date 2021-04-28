@@ -129,7 +129,8 @@ class UserResetPasswordView(FormView):
             return self.form_invalid(form)
 
         if user.is_history_password(password):
-            error = _('* The new password cannot be the one that has been set before')
+            limit_count = settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT
+            error = _('* The new password cannot be the last {} passwords').format(limit_count)
             form.add_error('new_password', error)
             return self.form_invalid(form)
         else:

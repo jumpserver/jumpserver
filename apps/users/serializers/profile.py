@@ -36,7 +36,8 @@ class UserUpdatePasswordSerializer(serializers.ModelSerializer):
             msg = _('Password does not match security rules')
             raise serializers.ValidationError(msg)
         if self.instance.is_history_password(value):
-            msg = _('The new password cannot be the one that has been set before')
+            limit_count = settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT
+            msg = _('The new password cannot be the last {} passwords').format(limit_count)
             raise serializers.ValidationError(msg)
         else:
             self.instance.save_history_password(value)
@@ -167,6 +168,7 @@ class ChangeUserPasswordSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['password']
+
 
 class ResetOTPSerializer(serializers.Serializer):
     msg = serializers.CharField(read_only=True)
