@@ -5,6 +5,7 @@ import uuid
 import base64
 import string
 import random
+import datetime
 
 from functools import partial
 
@@ -35,6 +36,9 @@ logger = get_logger(__file__)
 
 
 class AuthMixin:
+    date_password_last_updated: datetime.datetime
+    is_local: bool
+
     @property
     def password_raw(self):
         raise AttributeError('Password raw is not a readable attribute')
@@ -65,8 +69,9 @@ class AuthMixin:
     def can_update_ssh_key(self):
         return self.can_use_ssh_key_login()
 
-    def can_use_ssh_key_login(self):
-        return self.is_local and settings.TERMINAL_PUBLIC_KEY_AUTH
+    @staticmethod
+    def can_use_ssh_key_login():
+        return settings.TERMINAL_PUBLIC_KEY_AUTH
 
     def is_history_password(self, password):
         allow_history_password_count = settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT
