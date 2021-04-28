@@ -196,9 +196,9 @@ class SystemUser(BaseUser):
     def is_command_can_run(self, command):
         for rule in self.cmd_filter_rules:
             action, matched_cmd = rule.match(command)
-            if action == rule.ACTION_ALLOW:
+            if action == rule.ActionChoices.allow:
                 return True, None
-            elif action == rule.ACTION_DENY:
+            elif action == rule.ActionChoices.deny:
                 return False, matched_cmd
         return True, None
 

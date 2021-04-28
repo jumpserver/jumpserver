@@ -34,6 +34,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
     is_expired = serializers.BooleanField(read_only=True, label=_('Is expired'))
     can_update = serializers.SerializerMethodField(label=_('Can update'))
     can_delete = serializers.SerializerMethodField(label=_('Can delete'))
+    can_public_key_auth = serializers.ReadOnlyField(source='can_use_ssh_key_login')
     org_roles = serializers.ListField(
         label=_('Organization role name'), allow_null=True, required=False,
         child=serializers.ChoiceField(choices=ORG_ROLE.choices), default=["User"]
@@ -48,7 +49,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
             'password', 'email', 'public_key', 'wechat', 'phone', 'mfa_level', 'mfa_enabled',
             'mfa_level_display', 'mfa_force_enabled', 'role_display', 'org_role_display',
             'total_role_display', 'comment', 'source', 'is_valid', 'is_expired',
-            'is_active', 'created_by', 'is_first_login',
+            'is_active', 'created_by', 'is_first_login', 'can_public_key_auth',
             'password_strategy', 'date_password_last_updated', 'date_expired',
             'avatar_url', 'source_display', 'date_joined', 'last_login', 'need_password_update'
         ]
