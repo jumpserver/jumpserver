@@ -137,7 +137,7 @@ msgstr "资产"
 msgid "Reviewers"
 msgstr "审批人"
 
-#: acls/models/login_asset_acl.py:89 tickets/const.py:12
+#: acls/models/login_asset_acl.py:86 tickets/const.py:12
 msgid "Login asset confirm"
 msgstr "登录资产复核"
 
@@ -315,7 +315,7 @@ msgstr "目标URL"
 #: applications/serializers/attrs/application_type/mysql_workbench.py:34
 #: applications/serializers/attrs/application_type/vmware_client.py:30
 #: assets/models/base.py:252 assets/serializers/asset_user.py:71
-#: audits/signals_handler.py:58 authentication/forms.py:22
+#: audits/signals_handler.py:46 authentication/forms.py:22
 #: authentication/templates/authentication/login.html:155
 #: settings/serializers/settings.py:93 users/forms/profile.py:21
 #: users/templates/users/user_otp_check_password.html:13
@@ -1195,11 +1195,11 @@ msgstr "运行用户（显示名称）"
 msgid "User for display"
 msgstr "用户（显示名称）"
 
-#: audits/signals_handler.py:57
+#: audits/signals_handler.py:45
 msgid "SSH Key"
 msgstr "SSH 密钥"
 
-#: audits/signals_handler.py:59
+#: audits/signals_handler.py:47
 msgid "SSO"
 msgstr ""
 
@@ -1364,6 +1364,10 @@ msgid "Your password is too simple, please change it for security"
 msgstr "你的密码过于简单，为了安全，请修改"
 
 #: authentication/errors.py:280 authentication/views/login.py:251
+msgid "The administrator require you to change your password this time"
+msgstr "管理员要求您本次修改密码"
+
+#: authentication/errors.py:289 authentication/views/login.py:266
 msgid "Your password has expired, please reset before logging in"
 msgstr "您的密码已过期，先修改再登录"
 
@@ -3838,6 +3842,14 @@ msgstr "选择用户"
 msgid "Asset num"
 msgstr "资产数量"
 
+#: users/templates/users/_user.html:21
+msgid "Auth"
+msgstr "认证"
+
+#: users/templates/users/_user.html:27
+msgid "Security and Role"
+msgstr "角色安全"
+
 #: users/templates/users/_user_detail_nav_header.html:11
 msgid "User detail"
 msgstr "用户详情"
@@ -3955,6 +3967,229 @@ msgstr "包含"
 msgid "Exclude"
 msgstr "不包含"
 
+#: users/templates/users/user_bulk_update.html:8
+msgid "Select properties that need to be modified"
+msgstr "选择需要修改属性"
+
+#: users/templates/users/user_bulk_update.html:10
+msgid "Select all"
+msgstr "全选"
+
+#: users/templates/users/user_create.html:4
+#: users/templates/users/user_list.html:7
+msgid "Create user"
+msgstr "创建用户"
+
+#: users/templates/users/user_detail.html:80
+msgid "Force enabled"
+msgstr "强制启用"
+
+#: users/templates/users/user_detail.html:101
+#: users/templates/users/user_profile.html:106
+msgid "Date joined"
+msgstr "创建日期"
+
+#: users/templates/users/user_detail.html:105
+#: users/templates/users/user_profile.html:110
+msgid "Last login"
+msgstr "最后登录"
+
+#: users/templates/users/user_detail.html:110
+#: users/templates/users/user_profile.html:115
+msgid "Last password updated"
+msgstr "最后更新密码"
+
+#: users/templates/users/user_detail.html:126
+#: users/templates/users/user_profile.html:150
+msgid "Quick modify"
+msgstr "快速修改"
+
+#: users/templates/users/user_detail.html:148
+msgid "Force enabled MFA"
+msgstr "强制启用多因子认证"
+
+#: users/templates/users/user_detail.html:165
+msgid "Reset MFA"
+msgstr "重置多因子认证"
+
+#: users/templates/users/user_detail.html:174
+msgid "Send reset password mail"
+msgstr "发送重置密码邮件"
+
+#: users/templates/users/user_detail.html:177
+#: users/templates/users/user_detail.html:187
+msgid "Send"
+msgstr "发送"
+
+#: users/templates/users/user_detail.html:184
+msgid "Send reset ssh key mail"
+msgstr "发送重置密钥邮件"
+
+#: users/templates/users/user_detail.html:193
+#: users/templates/users/user_detail.html:490
+msgid "Unblock user"
+msgstr "解除登录限制"
+
+#: users/templates/users/user_detail.html:196
+msgid "Unblock"
+msgstr "解除"
+
+#: users/templates/users/user_detail.html:217
+msgid "Join user groups"
+msgstr "添加到用户组"
+
+#: users/templates/users/user_detail.html:226
+msgid "Join"
+msgstr "加入"
+
+#: users/templates/users/user_detail.html:356
+#: users/templates/users/user_detail.html:383
+msgid "Update successfully!"
+msgstr "更新成功"
+
+#: users/templates/users/user_detail.html:365
+msgid "Goto profile page enable MFA"
+msgstr "请去个人信息页面启用自己的多因子认证"
+
+#: users/templates/users/user_detail.html:401
+msgid "An e-mail has been sent to the user`s mailbox."
+msgstr "已发送邮件到用户邮箱"
+
+#: users/templates/users/user_detail.html:411
+#: users/templates/users/user_detail.html:437
+#: users/templates/users/user_detail.html:505
+#: users/templates/users/user_list.html:178
+msgid "Are you sure?"
+msgstr "你确认吗?"
+
+#: users/templates/users/user_detail.html:412
+msgid "This will reset the user password and send a reset mail"
+msgstr "将失效用户当前密码，并发送重设密码邮件到用户邮箱"
+
+#: users/templates/users/user_detail.html:415
+#: users/templates/users/user_detail.html:441
+#: users/templates/users/user_detail.html:509
+#: users/templates/users/user_list.html:182
+msgid "Cancel"
+msgstr "取消"
+
+#: users/templates/users/user_detail.html:427
+msgid ""
+"The reset-ssh-public-key E-mail has been sent successfully. Please inform "
+"the user to update his new ssh public key."
+msgstr "重设密钥邮件将会发送到用户邮箱"
+
+#: users/templates/users/user_detail.html:428
+msgid "Reset SSH public key"
+msgstr "重置SSH密钥"
+
+#: users/templates/users/user_detail.html:438
+msgid "This will reset the user public key and send a reset mail"
+msgstr "将会失效用户当前密钥，并发送重置邮件到用户邮箱"
+
+#: users/templates/users/user_detail.html:456
+msgid "Successfully updated the SSH public key."
+msgstr "更新SSH密钥成功"
+
+#: users/templates/users/user_detail.html:457
+#: users/templates/users/user_detail.html:461
+msgid "User SSH public key update"
+msgstr "SSH密钥"
+
+#: users/templates/users/user_detail.html:506
+msgid "After unlocking the user, the user can log in normally."
+msgstr "解除用户登录限制后，此用户即可正常登录"
+
+#: users/templates/users/user_detail.html:520
+msgid "Reset user MFA success"
+msgstr "重置用户多因子认证成功"
+
+#: users/templates/users/user_granted_remote_app.html:35
+msgid "App type"
+msgstr "应用类型"
+
+#: users/templates/users/user_group_detail.html:17
+#: users/templates/users/user_group_granted_asset.html:18
+msgid "User group detail"
+msgstr "用户组详情"
+
+#: users/templates/users/user_group_detail.html:81
+msgid "Add user"
+msgstr "添加用户"
+
+#: users/templates/users/user_group_detail.html:87
+msgid "Add"
+msgstr "添加"
+
+#: users/templates/users/user_group_list.html:7
+msgid "Create user group"
+msgstr "创建用户组"
+
+#: users/templates/users/user_list.html:30
+msgid "Delete selected"
+msgstr "批量删除"
+
+#: users/templates/users/user_list.html:32
+msgid "Remove selected"
+msgstr "批量移除"
+
+#: users/templates/users/user_list.html:34
+msgid "Update selected"
+msgstr "批量更新"
+
+#: users/templates/users/user_list.html:35
+msgid "Deactive selected"
+msgstr "禁用所选"
+
+#: users/templates/users/user_list.html:36
+msgid "Active selected"
+msgstr "激活所选"
+
+#: users/templates/users/user_list.html:106
+#: users/templates/users/user_list.html:110
+msgid "Remove"
+msgstr "移除"
+
+#: users/templates/users/user_list.html:179
+msgid "This will delete the selected users !!!"
+msgstr "删除选中用户 !!!"
+
+#: users/templates/users/user_list.html:190
+msgid "User Deleting failed."
+msgstr "用户删除失败"
+
+#: users/templates/users/user_list.html:191
+msgid "User Delete"
+msgstr "删除"
+
+#: users/templates/users/user_list.html:213
+msgid "This will remove the selected users !!"
+msgstr "移除选中用户 !!!"
+
+#: users/templates/users/user_list.html:215
+msgid "User Removing failed."
+msgstr "用户移除失败"
+
+#: users/templates/users/user_list.html:216
+msgid "User Remove"
+msgstr "移除"
+
+#: users/templates/users/user_list.html:265
+msgid "Are you sure about removing it?"
+msgstr "您确定移除吗?"
+
+#: users/templates/users/user_list.html:266
+msgid "Remove the success"
+msgstr "移除成功"
+
+#: users/templates/users/user_list.html:271
+msgid "User is expired"
+msgstr "用户已失效"
+
+#: users/templates/users/user_list.html:274
+msgid "User is inactive"
+msgstr "用户已禁用"
+
 #: users/templates/users/user_otp_check_password.html:6
 #: users/templates/users/user_verify_mfa.html:6
 msgid "Authenticate"
@@ -4007,6 +4242,64 @@ msgstr "重置"
 #: users/templates/users/user_password_verify.html:9
 msgid "Verify password"
 msgstr "校验密码"
+
+#: users/templates/users/user_profile.html:97
+msgid "Administrator Settings force MFA login"
+msgstr "管理员设置强制使用多因子认证"
+
+#: users/templates/users/user_profile.html:156
+msgid "Set MFA"
+msgstr "设置多因子认证"
+
+#: users/templates/users/user_profile.html:178
+msgid "Update MFA"
+msgstr "更改多因子认证"
+
+#: users/templates/users/user_profile.html:188
+msgid "Update password"
+msgstr "更改密码"
+
+#: users/templates/users/user_profile.html:198
+msgid "Update SSH public key"
+msgstr "更改SSH密钥"
+
+#: users/templates/users/user_profile.html:206
+msgid "Reset public key and download"
+msgstr "重置并下载SSH密钥"
+
+#: users/templates/users/user_pubkey_update.html:55
+msgid "Old public key"
+msgstr "原来SSH密钥"
+
+#: users/templates/users/user_pubkey_update.html:63
+msgid "Fingerprint"
+msgstr "指纹"
+
+#: users/templates/users/user_pubkey_update.html:69
+msgid "Update public key"
+msgstr "更新密钥"
+
+#: users/templates/users/user_pubkey_update.html:72
+msgid "Or reset by server"
+msgstr "或者重置并下载密钥"
+
+#: users/templates/users/user_pubkey_update.html:98
+msgid ""
+"The new public key has been set successfully, Please download the "
+"corresponding private key."
+msgstr "新的公钥已设置成功，请下载对应的私钥"
+
+#: users/templates/users/user_update.html:4
+msgid "Update user"
+msgstr "更新用户"
+
+#: users/templates/users/user_update.html:22 users/views/profile/reset.py:120
+msgid "User auth from {}, go there change password"
+msgstr "用户认证源来自 {}, 请去相应系统修改密码"
+
+#: users/templates/users/user_update.html:32
+msgid "User auth from {}, ssh key login is not supported"
+msgstr "用户认证源来自 {}, 不支持使用 SSH Key 登录"
 
 #: users/templates/users/user_verify_mfa.html:11
 msgid ""
@@ -4379,10 +4672,6 @@ msgstr "Token错误或失效"
 #: users/views/profile/reset.py:133
 msgid "* The new password cannot be the last {} passwords"
 msgstr "* 新密码不能是最近 {} 次的密码"
-
-#: users/views/profile/reset.py:120
-msgid "User auth from {}, go there change password"
-msgstr "用户认证源来自 {}, 请去相应系统修改密码"
 
 #: xpack/plugins/change_auth_plan/meta.py:9
 #: xpack/plugins/change_auth_plan/models.py:89
@@ -4859,208 +5148,6 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
-
-#~ msgid "Auth"
-#~ msgstr "认证"
-
-#~ msgid "Security and Role"
-#~ msgstr "角色安全"
-
-#~ msgid "Select properties that need to be modified"
-#~ msgstr "选择需要修改属性"
-
-#~ msgid "Select all"
-#~ msgstr "全选"
-
-#~ msgid "Create user"
-#~ msgstr "创建用户"
-
-#~ msgid "Force enabled"
-#~ msgstr "强制启用"
-
-#~ msgid "Date joined"
-#~ msgstr "创建日期"
-
-#~ msgid "Last login"
-#~ msgstr "最后登录"
-
-#~ msgid "Last password updated"
-#~ msgstr "最后更新密码"
-
-#~ msgid "Quick modify"
-#~ msgstr "快速修改"
-
-#~ msgid "Force enabled MFA"
-#~ msgstr "强制启用多因子认证"
-
-#~ msgid "Reset MFA"
-#~ msgstr "重置多因子认证"
-
-#~ msgid "Send reset password mail"
-#~ msgstr "发送重置密码邮件"
-
-#~ msgid "Send"
-#~ msgstr "发送"
-
-#~ msgid "Send reset ssh key mail"
-#~ msgstr "发送重置密钥邮件"
-
-#~ msgid "Unblock user"
-#~ msgstr "解除登录限制"
-
-#~ msgid "Unblock"
-#~ msgstr "解除"
-
-#~ msgid "Join user groups"
-#~ msgstr "添加到用户组"
-
-#~ msgid "Join"
-#~ msgstr "加入"
-
-#~ msgid "Update successfully!"
-#~ msgstr "更新成功"
-
-#~ msgid "Goto profile page enable MFA"
-#~ msgstr "请去个人信息页面启用自己的多因子认证"
-
-#~ msgid "An e-mail has been sent to the user`s mailbox."
-#~ msgstr "已发送邮件到用户邮箱"
-
-#~ msgid "Are you sure?"
-#~ msgstr "你确认吗?"
-
-#~ msgid "This will reset the user password and send a reset mail"
-#~ msgstr "将失效用户当前密码，并发送重设密码邮件到用户邮箱"
-
-#~ msgid "Cancel"
-#~ msgstr "取消"
-
-#~ msgid ""
-#~ "The reset-ssh-public-key E-mail has been sent successfully. Please inform "
-#~ "the user to update his new ssh public key."
-#~ msgstr "重设密钥邮件将会发送到用户邮箱"
-
-#~ msgid "Reset SSH public key"
-#~ msgstr "重置SSH密钥"
-
-#~ msgid "This will reset the user public key and send a reset mail"
-#~ msgstr "将会失效用户当前密钥，并发送重置邮件到用户邮箱"
-
-#~ msgid "Successfully updated the SSH public key."
-#~ msgstr "更新SSH密钥成功"
-
-#~ msgid "User SSH public key update"
-#~ msgstr "SSH密钥"
-
-#~ msgid "After unlocking the user, the user can log in normally."
-#~ msgstr "解除用户登录限制后，此用户即可正常登录"
-
-#~ msgid "Reset user MFA success"
-#~ msgstr "重置用户多因子认证成功"
-
-#~ msgid "App type"
-#~ msgstr "应用类型"
-
-#~ msgid "User group detail"
-#~ msgstr "用户组详情"
-
-#~ msgid "Add user"
-#~ msgstr "添加用户"
-
-#~ msgid "Add"
-#~ msgstr "添加"
-
-#~ msgid "Create user group"
-#~ msgstr "创建用户组"
-
-#~ msgid "Delete selected"
-#~ msgstr "批量删除"
-
-#~ msgid "Remove selected"
-#~ msgstr "批量移除"
-
-#~ msgid "Update selected"
-#~ msgstr "批量更新"
-
-#~ msgid "Deactive selected"
-#~ msgstr "禁用所选"
-
-#~ msgid "Active selected"
-#~ msgstr "激活所选"
-
-#~ msgid "Remove"
-#~ msgstr "移除"
-
-#~ msgid "This will delete the selected users !!!"
-#~ msgstr "删除选中用户 !!!"
-
-#~ msgid "User Deleting failed."
-#~ msgstr "用户删除失败"
-
-#~ msgid "User Delete"
-#~ msgstr "删除"
-
-#~ msgid "This will remove the selected users !!"
-#~ msgstr "移除选中用户 !!!"
-
-#~ msgid "User Removing failed."
-#~ msgstr "用户移除失败"
-
-#~ msgid "User Remove"
-#~ msgstr "移除"
-
-#~ msgid "Are you sure about removing it?"
-#~ msgstr "您确定移除吗?"
-
-#~ msgid "Remove the success"
-#~ msgstr "移除成功"
-
-#~ msgid "User is expired"
-#~ msgstr "用户已失效"
-
-#~ msgid "User is inactive"
-#~ msgstr "用户已禁用"
-
-#~ msgid "Administrator Settings force MFA login"
-#~ msgstr "管理员设置强制使用多因子认证"
-
-#~ msgid "Set MFA"
-#~ msgstr "设置多因子认证"
-
-#~ msgid "Update MFA"
-#~ msgstr "更改多因子认证"
-
-#~ msgid "Update password"
-#~ msgstr "更改密码"
-
-#~ msgid "Update SSH public key"
-#~ msgstr "更改SSH密钥"
-
-#~ msgid "Reset public key and download"
-#~ msgstr "重置并下载SSH密钥"
-
-#~ msgid "Old public key"
-#~ msgstr "原来SSH密钥"
-
-#~ msgid "Fingerprint"
-#~ msgstr "指纹"
-
-#~ msgid "Update public key"
-#~ msgstr "更新密钥"
-
-#~ msgid "Or reset by server"
-#~ msgstr "或者重置并下载密钥"
-
-#~ msgid ""
-#~ "The new public key has been set successfully, Please download the "
-#~ "corresponding private key."
-#~ msgstr "新的公钥已设置成功，请下载对应的私钥"
-
-#~ msgid "Update user"
-#~ msgstr "更新用户"
-
-#~ msgid "User auth from {}, ssh key login is not supported"
-#~ msgstr "用户认证源来自 {}, 不支持使用 SSH Key 登录"
 
 #~ msgid "(Domain name support)"
 #~ msgstr "(支持域名)"
