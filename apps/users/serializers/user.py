@@ -50,7 +50,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
             'total_role_display', 'comment', 'source', 'is_valid', 'is_expired',
             'is_active', 'created_by', 'is_first_login',
             'password_strategy', 'date_password_last_updated', 'date_expired',
-            'avatar_url', 'source_display', 'date_joined', 'last_login', 'is_update_password'
+            'avatar_url', 'source_display', 'date_joined', 'last_login', 'require_password_update'
         ]
         fields = fields_small + [
             'groups', 'role', 'groups_display', 'role_display',

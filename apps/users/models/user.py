@@ -43,12 +43,14 @@ class AuthMixin:
     #: user.set_password('password')
     @password_raw.setter
     def password_raw(self, password_raw_):
-        self.set_password(password_raw_)
+        self.set_password(password_raw_, flag=False)
 
-    def set_password(self, raw_password):
+    def set_password(self, raw_password, flag=True):
+        # flag; Whether to reset require_password_update field
         if self.can_update_password():
             self.date_password_last_updated = timezone.now()
-            self.is_update_password = False
+            if flag:
+                self.require_password_update  = False
             post_user_change_password.send(self.__class__, user=self)
             super().set_password(raw_password)
 
@@ -580,7 +582,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         auto_now_add=True, blank=True, null=True,
         verbose_name=_('Date password last updated')
     )
-    is_update_password = models.BooleanField(default=False)
+    require_password_update = models.BooleanField(default=False)
 
     def __str__(self):
         return '{0.name}({0.username})'.format(self)

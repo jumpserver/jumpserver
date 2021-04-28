@@ -227,7 +227,7 @@ class AuthMixin:
 
     @classmethod
     def _check_passwd_is_update(cls, user: User):
-        if user.is_update_password:
+        if user.require_password_update :
             url = cls.generate_reset_password_url_with_flash_msg(
                 user, 'authentication:passwd-need-update-flash-msg'
             )
