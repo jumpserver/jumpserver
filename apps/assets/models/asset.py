@@ -35,7 +35,7 @@ def default_node():
     try:
         from .node import Node
         root = Node.org_root()
-        return root
+        return Node.objects.filter(id=root.id)
     except:
         return None
 
