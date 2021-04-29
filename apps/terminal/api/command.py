@@ -17,6 +17,7 @@ from terminal.filters import CommandFilter
 from orgs.utils import current_org
 from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor, IsAppUser
 from common.const.http import GET
+from common.drf.api import JMSBulkModelViewSet
 from common.utils import get_logger
 from terminal.utils import send_command_alert_mail
 from terminal.serializers import InsecureCommandAlertSerializer
@@ -94,7 +95,7 @@ class CommandQueryMixin:
         return date_from_st, date_to_st
 
 
-class CommandViewSet(viewsets.ModelViewSet):
+class CommandViewSet(JMSBulkModelViewSet):
     """接受app发送来的command log, 格式如下
     {
         "user": "admin",
@@ -149,10 +150,8 @@ class CommandViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
-        query_all = self.request.query_params.get('all', False)
-        if is_true(query_all):
-            # 适配像 ES 这种没有指定分页只返回少量数据的情况
-            queryset = queryset[:]
+        # 适配像 ES 这种没有指定分页只返回少量数据的情况
+        queryset = queryset[:]
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)

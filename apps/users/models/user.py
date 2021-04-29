@@ -5,9 +5,13 @@ import uuid
 import base64
 import string
 import random
+import datetime
+
+from functools import partial
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.hashers import check_password, make_password
 from django.core.cache import cache
 from django.db import models
 from django.db.models import TextChoices
@@ -32,6 +36,9 @@ logger = get_logger(__file__)
 
 
 class AuthMixin:
+    date_password_last_updated: datetime.datetime
+    is_local: bool
+
     @property
     def password_raw(self):
         raise AttributeError('Password raw is not a readable attribute')
@@ -62,8 +69,25 @@ class AuthMixin:
     def can_update_ssh_key(self):
         return self.can_use_ssh_key_login()
 
-    def can_use_ssh_key_login(self):
-        return self.is_local and settings.TERMINAL_PUBLIC_KEY_AUTH
+    @staticmethod
+    def can_use_ssh_key_login():
+        return settings.TERMINAL_PUBLIC_KEY_AUTH
+
+    def is_history_password(self, password):
+        allow_history_password_count = settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT
+        history_passwords = self.history_passwords.all().order_by('-date_created')[:int(allow_history_password_count)]
+
+        for history_password in history_passwords:
+            if check_password(password, history_password.password):
+                return True
+        else:
+            return False
+
+    def save_history_password(self, password):
+        UserPasswordHistory.objects.create(
+            user=self, password=make_password(password),
+            date_created=self.date_password_last_updated
+        )
 
     def is_public_key_valid(self):
         """
@@ -101,6 +125,7 @@ class AuthMixin:
 
     def reset_password(self, new_password):
         self.set_password(new_password)
+        self.need_update_password = False
         self.save()
 
     @property
@@ -579,6 +604,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         auto_now_add=True, blank=True, null=True,
         verbose_name=_('Date password last updated')
     )
+    need_update_password = models.BooleanField(default=False)
 
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
@@ -724,3 +750,11 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         if self.email and self.source == self.Source.local.value:
             return True
         return False
+
+
+class UserPasswordHistory(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    password = models.CharField(max_length=128)
+    user = models.ForeignKey("users.User", related_name='history_passwords',
+                             on_delete=models.CASCADE, verbose_name=_('User'))
+    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))

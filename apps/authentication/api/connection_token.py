@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 #
+import urllib.parse
+
 from django.conf import settings
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404
@@ -140,15 +142,16 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
         # Todo: 上线后地址是 JumpServerAddr:3389
         address = self.request.query_params.get('address') or '1.1.1.1'
         options['full address:s'] = address
-        options['username:s'] = '{}@{}'.format(user.username, token)
+        options['username:s'] = '{}|{}'.format(user.username, token)
         options['desktopwidth:i'] = width
         options['desktopheight:i'] = height
         data = ''
         for k, v in options.items():
             data += f'{k}:{v}\n'
-        response = HttpResponse(data, content_type='text/plain')
+        response = HttpResponse(data, content_type='application/octet-stream')
         filename = "{}-{}-jumpserver.rdp".format(user.username, asset.hostname)
-        response['Content-Disposition'] = 'attachment; filename={}'.format(filename)
+        filename = urllib.parse.quote(filename)
+        response['Content-Disposition'] = 'attachment; filename*=UTF-8\'\'%s' % filename
         return response
 
     @staticmethod

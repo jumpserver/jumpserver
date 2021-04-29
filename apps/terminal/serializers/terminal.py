@@ -32,7 +32,7 @@ class StatusSerializer(serializers.ModelSerializer):
 
 
 class TerminalSerializer(BulkModelSerializer):
-    session_online = serializers.SerializerMethodField()
+    session_online = serializers.ReadOnlyField(source='get_online_session_count')
     is_alive = serializers.BooleanField(read_only=True)
     status = serializers.CharField(read_only=True, source='latest_status')
     status_display = serializers.CharField(read_only=True, source='latest_status_display')
@@ -72,10 +72,6 @@ class TerminalSerializer(BulkModelSerializer):
             return storage.name
         else:
             raise serializers.ValidationError(_('Not found'))
-
-    @staticmethod
-    def get_session_online(obj):
-        return Session.objects.filter(terminal=obj, is_finished=False).count()
 
 
 class TaskSerializer(BulkModelSerializer):

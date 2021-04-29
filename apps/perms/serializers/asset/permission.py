@@ -3,7 +3,7 @@
 
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from perms.models import AssetPermission, Action
@@ -41,21 +41,27 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
     actions = ActionsField(required=False, allow_null=True)
     is_valid = serializers.BooleanField(read_only=True)
     is_expired = serializers.BooleanField(read_only=True, label=_('Is expired'))
+    users_display = serializers.ListField(child=serializers.CharField(), label=_('Users name'), required=False)
+    user_groups_display = serializers.ListField(child=serializers.CharField(), label=_('User groups name'), required=False)
+    assets_display = serializers.ListField(child=serializers.CharField(), label=_('Assets name'), required=False)
+    nodes_display = serializers.ListField(child=serializers.CharField(), label=_('Nodes name'), required=False)
+    system_users_display = serializers.ListField(child=serializers.CharField(), label=_('System users name'), required=False)
 
     class Meta:
         model = AssetPermission
-        mini_fields = ['id', 'name']
-        small_fields = mini_fields + [
+        fields_mini = ['id', 'name']
+        fields_small = fields_mini + [
             'is_active', 'is_expired', 'is_valid', 'actions',
             'created_by', 'date_created', 'date_expired',
             'date_start', 'comment'
         ]
-        m2m_fields = [
-            'users', 'user_groups', 'assets', 'nodes', 'system_users',
+        fields_m2m = [
+            'users', 'users_display', 'user_groups', 'user_groups_display', 'assets', 'assets_display',
+            'nodes', 'nodes_display', 'system_users', 'system_users_display',
             'users_amount', 'user_groups_amount', 'assets_amount',
             'nodes_amount', 'system_users_amount',
         ]
-        fields = small_fields + m2m_fields
+        fields = fields_small + fields_m2m
         read_only_fields = ['created_by', 'date_created']
         extra_kwargs = {
             'is_expired': {'label': _('Is expired')},
@@ -71,11 +77,44 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related(
-            Prefetch('system_users', queryset=SystemUser.objects.only('id')),
-            Prefetch('user_groups', queryset=UserGroup.objects.only('id')),
-            Prefetch('users', queryset=User.objects.only('id')),
-            Prefetch('assets', queryset=Asset.objects.only('id')),
-            Prefetch('nodes', queryset=Node.objects.only('id'))
-        )
+        queryset = queryset.prefetch_related('users', 'user_groups', 'assets', 'nodes', 'system_users')
         return queryset
+
+    def to_internal_value(self, data):
+        # 系统用户是必填项
+        system_users_display = data.pop('system_users_display', '')
+        for i in range(len(system_users_display)):
+            system_user = SystemUser.objects.filter(name=system_users_display[i]).first()
+            if system_user and system_user.id not in data['system_users']:
+                data['system_users'].append(system_user.id)
+        return super().to_internal_value(data)
+
+
+    def perform_display_create(self, instance, **kwargs):
+        # 用户
+        users_to_set = User.objects.filter(
+            Q(name__in=kwargs.get('users_display')) | Q(username__in=kwargs.get('users_display'))
+        ).distinct()
+        instance.users.set(users_to_set)
+        # 用户组
+        user_groups_to_set = UserGroup.objects.filter(name__in=kwargs.get('user_groups_display')).distinct()
+        instance.user_groups.set(user_groups_to_set)
+        # 资产
+        assets_to_set = Asset.objects.filter(
+            Q(ip__in=kwargs.get('assets_display')) | Q(hostname__in=kwargs.get('assets_display'))
+        ).distinct()
+        instance.assets.set(assets_to_set)
+        # 节点
+        nodes_to_set = Node.objects.filter(full_value__in=kwargs.get('nodes_display')).distinct()
+        instance.nodes.set(nodes_to_set)
+
+    def create(self, validated_data):
+        display = {
+            'users_display' : validated_data.pop('users_display', ''),
+            'user_groups_display' : validated_data.pop('user_groups_display', ''),
+            'assets_display' : validated_data.pop('assets_display', ''),
+            'nodes_display' : validated_data.pop('nodes_display', '')
+        }
+        instance = super().create(validated_data)
+        self.perform_display_create(instance, **display)
+        return instance

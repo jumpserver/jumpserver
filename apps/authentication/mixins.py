@@ -194,6 +194,7 @@ class AuthMixin:
         self._check_login_acl(user, ip)
         self._check_password_require_reset_or_not(user)
         self._check_passwd_is_too_simple(user, password)
+        self._check_passwd_need_update(user)
 
         LoginBlockUtil(username, ip).clean_failed_count()
         request.session['auth_password'] = 1
@@ -223,6 +224,14 @@ class AuthMixin:
                 user, 'authentication:passwd-too-simple-flash-msg'
             )
             raise errors.PasswdTooSimple(url)
+
+    @classmethod
+    def _check_passwd_need_update(cls, user: User):
+        if user.need_update_password:
+            url = cls.generate_reset_password_url_with_flash_msg(
+                user, 'authentication:passwd-need-update-flash-msg'
+            )
+            raise errors.PasswdNeedUpdate(url)
 
     @classmethod
     def _check_password_require_reset_or_not(cls, user: User):

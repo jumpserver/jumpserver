@@ -31,7 +31,8 @@ from ..forms import get_user_login_form_cls
 __all__ = [
     'UserLoginView', 'UserLogoutView',
     'UserLoginGuardView', 'UserLoginWaitConfirmView',
-    'FlashPasswdTooSimpleMsgView', 'FlashPasswdHasExpiredMsgView'
+    'FlashPasswdTooSimpleMsgView', 'FlashPasswdHasExpiredMsgView',
+    'FlashPasswdNeedUpdateMsgView'
 ]
 
 
@@ -71,7 +72,7 @@ class UserLoginView(mixins.AuthMixin, FormView):
             context = self.get_context_data(form=new_form)
             self.request.session.set_test_cookie()
             return self.render_to_response(context)
-        except (errors.PasswdTooSimple, errors.PasswordRequireResetError) as e:
+        except (errors.PasswdTooSimple, errors.PasswordRequireResetError, errors.PasswdNeedUpdate) as e:
             return redirect(e.url)
         self.clear_rsa_key()
         return self.redirect_to_guard_view()
@@ -218,7 +219,7 @@ class UserLogoutView(TemplateView):
         context = {
             'title': _('Logout success'),
             'messages': _('Logout success, return login page'),
-            'interval': 1,
+            'interval': 3,
             'redirect_url': reverse('authentication:login'),
             'auto_redirect': True,
         }
@@ -234,9 +235,25 @@ class FlashPasswdTooSimpleMsgView(TemplateView):
         context = {
             'title': _('Please change your password'),
             'messages': _('Your password is too simple, please change it for security'),
-            'interval': 5,
+            'interval': 3,
             'redirect_url': request.GET.get('redirect_url'),
             'auto_redirect': True,
+        }
+        return self.render_to_response(context)
+
+
+@method_decorator(never_cache, name='dispatch')
+class FlashPasswdNeedUpdateMsgView(TemplateView):
+    template_name = 'flash_message_standalone.html'
+
+    def get(self, request, *args, **kwargs):
+        context = {
+            'title': _('Please change your password'),
+            'messages': _('You should to change your password before login'),
+            'interval': 3,
+            'redirect_url': request.GET.get('redirect_url'),
+            'auto_redirect': True,
+            'confirm_button': _('Confirm')
         }
         return self.render_to_response(context)
 
@@ -249,8 +266,9 @@ class FlashPasswdHasExpiredMsgView(TemplateView):
         context = {
             'title': _('Please change your password'),
             'messages': _('Your password has expired, please reset before logging in'),
-            'interval': 5,
+            'interval': 3,
             'redirect_url': request.GET.get('redirect_url'),
             'auto_redirect': True,
+            'confirm_button': _('Confirm')
         }
         return self.render_to_response(context)

@@ -30,12 +30,17 @@ class UserUpdatePasswordSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(msg)
         return value
 
-    @staticmethod
-    def validate_new_password(value):
+    def validate_new_password(self, value):
         from ..utils import check_password_rules
         if not check_password_rules(value):
             msg = _('Password does not match security rules')
             raise serializers.ValidationError(msg)
+        if self.instance.is_history_password(value):
+            limit_count = settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT
+            msg = _('The new password cannot be the last {} passwords').format(limit_count)
+            raise serializers.ValidationError(msg)
+        else:
+            self.instance.save_history_password(value)
         return value
 
     def validate_new_password_again(self, value):
@@ -101,7 +106,8 @@ class UserProfileSerializer(UserSerializer):
 
     class Meta(UserSerializer.Meta):
         fields = UserSerializer.Meta.fields + [
-            'public_key_comment', 'public_key_hash_md5', 'admin_or_audit_orgs', 'current_org_roles',
+            'public_key_comment', 'public_key_hash_md5',
+            'admin_or_audit_orgs', 'current_org_roles',
             'guide_url', 'user_all_orgs'
         ]
         read_only_fields = [
@@ -163,6 +169,7 @@ class ChangeUserPasswordSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['password']
+
 
 class ResetOTPSerializer(serializers.Serializer):
     msg = serializers.CharField(read_only=True)

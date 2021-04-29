@@ -72,7 +72,7 @@ class Action:
     def value_to_choices_display(cls, value):
         choices = cls.value_to_choices(value)
         return [str(dict(cls.choices())[i]) for i in choices]
-        
+
     @classmethod
     def choices_to_value(cls, value):
         if not isinstance(value, list):
@@ -142,6 +142,26 @@ class AssetPermission(BasePermission):
         asset_ids.update(nodes_asset_ids)
         assets = Asset.objects.filter(id__in=asset_ids)
         return assets
+
+    def users_display(self):
+        names = [user.username for user in self.users.all()]
+        return names
+
+    def user_groups_display(self):
+        names = [group.name for group in self.user_groups.all()]
+        return names
+
+    def assets_display(self):
+        names = [asset.hostname for asset in self.assets.all()]
+        return names
+
+    def system_users_display(self):
+        names = [system_user.name for system_user in self.system_users.all()]
+        return names
+
+    def nodes_display(self):
+        names = [node.full_value for node in self.nodes.all()]
+        return names
 
 
 class UserAssetGrantedTreeNodeRelation(OrgModelMixin, FamilyMixin, models.JMSBaseModel):

@@ -121,7 +121,11 @@ class TerminalSettingSerializer(serializers.Serializer):
         ('50', '50'),
     )
     TERMINAL_PASSWORD_AUTH = serializers.BooleanField(required=False, label=_('Password auth'))
-    TERMINAL_PUBLIC_KEY_AUTH = serializers.BooleanField(required=False, label=_('Public key auth'))
+    TERMINAL_PUBLIC_KEY_AUTH = serializers.BooleanField(
+        required=False, label=_('Public key auth'),
+        help_text=_('Tips: If use other auth method, like AD/LDAP, you should disable this to '
+                    'avoid being able to log in after deleting')
+    )
     TERMINAL_ASSET_LIST_SORT_BY = serializers.ChoiceField(SORT_BY_CHOICES, required=False, label=_('List sort by'))
     TERMINAL_ASSET_LIST_PAGE_SIZE = serializers.ChoiceField(PAGE_SIZE_CHOICES, required=False, label=_('List page size'))
     TERMINAL_SESSION_KEEP_DURATION = serializers.IntegerField(
@@ -162,6 +166,11 @@ class SecuritySettingSerializer(serializers.Serializer):
         min_value=1, max_value=99999, required=True,
         label=_('User password expiration'),
         help_text=_('Tip: (unit: day) If the user does not update the password during the time, the user password will expire failure;The password expiration reminder mail will be automatic sent to the user by system within 5 days (daily) before the password expires')
+    )
+    OLD_PASSWORD_HISTORY_LIMIT_COUNT = serializers.IntegerField(
+        min_value=0, max_value=99999, required=True,
+        label=_('Number of repeated historical passwords'),
+        help_text=_('Tip: When the user resets the password, it cannot be the previous n historical passwords of the user (the value of n here is the value filled in the input box)')
     )
     SECURITY_PASSWORD_MIN_LENGTH = serializers.IntegerField(
         min_value=6, max_value=30, required=True,
