@@ -19,7 +19,7 @@ from django.conf import settings
 from django.urls import reverse_lazy
 from django.contrib.auth import BACKEND_SESSION_KEY
 
-from common.utils import get_request_ip, get_object_or_none
+from common.utils import get_request_ip, FlashMessageUtil
 from users.utils import (
     redirect_user_first_login_or_index
 )
@@ -31,8 +31,6 @@ from ..forms import get_user_login_form_cls
 __all__ = [
     'UserLoginView', 'UserLogoutView',
     'UserLoginGuardView', 'UserLoginWaitConfirmView',
-    'FlashPasswdTooSimpleMsgView', 'FlashPasswdHasExpiredMsgView',
-    'FlashPasswdNeedUpdateMsgView'
 ]
 
 
@@ -44,12 +42,42 @@ class UserLoginView(mixins.AuthMixin, FormView):
     redirect_field_name = 'next'
     template_name = 'authentication/login.html'
 
+    def redirect_third_party_auth_if_need(self, request):
+        # show jumpserver login page if request http://{JUMP-SERVER}/?admin=1
+        if self.request.GET.get("admin", 0):
+            return None
+        auth_type = ''
+        auth_url = ''
+        if settings.AUTH_OPENID:
+            auth_type = 'OIDC'
+            auth_url = reverse(settings.AUTH_OPENID_AUTH_LOGIN_URL_NAME)
+        elif settings.AUTH_CAS:
+            auth_type = 'CAS'
+            auth_url = reverse(settings.CAS_LOGIN_URL_NAME)
+        if not auth_url:
+            return None
+
+        message_data = {
+            'title': _('Redirecting'),
+            'message': _("Redirecting to {} authentication").format(auth_type),
+            'redirect_url': auth_url,
+            'has_cancel': True,
+            'cancel_url': reverse('authentication:login') + '?admin=1'
+        }
+        redirect_url = FlashMessageUtil.gen_message_url(message_data)
+        query_string = request.GET.urlencode()
+        redirect_url = "{}&{}".format(redirect_url, query_string)
+        return redirect_url
+
     def get(self, request, *args, **kwargs):
         if request.user.is_staff:
             first_login_url = redirect_user_first_login_or_index(
                 request, self.redirect_field_name
             )
             return redirect(first_login_url)
+        redirect_url = self.redirect_third_party_auth_if_need(request)
+        if redirect_url:
+            return redirect(redirect_url)
         request.session.set_test_cookie()
         return super().get(request, *args, **kwargs)
 
@@ -225,50 +253,3 @@ class UserLogoutView(TemplateView):
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
-
-
-@method_decorator(never_cache, name='dispatch')
-class FlashPasswdTooSimpleMsgView(TemplateView):
-    template_name = 'flash_message_standalone.html'
-
-    def get(self, request, *args, **kwargs):
-        context = {
-            'title': _('Please change your password'),
-            'messages': _('Your password is too simple, please change it for security'),
-            'interval': 3,
-            'redirect_url': request.GET.get('redirect_url'),
-            'auto_redirect': True,
-        }
-        return self.render_to_response(context)
-
-
-@method_decorator(never_cache, name='dispatch')
-class FlashPasswdNeedUpdateMsgView(TemplateView):
-    template_name = 'flash_message_standalone.html'
-
-    def get(self, request, *args, **kwargs):
-        context = {
-            'title': _('Please change your password'),
-            'messages': _('You should to change your password before login'),
-            'interval': 3,
-            'redirect_url': request.GET.get('redirect_url'),
-            'auto_redirect': True,
-            'confirm_button': _('Confirm')
-        }
-        return self.render_to_response(context)
-
-
-@method_decorator(never_cache, name='dispatch')
-class FlashPasswdHasExpiredMsgView(TemplateView):
-    template_name = 'flash_message_standalone.html'
-
-    def get(self, request, *args, **kwargs):
-        context = {
-            'title': _('Please change your password'),
-            'messages': _('Your password has expired, please reset before logging in'),
-            'interval': 3,
-            'redirect_url': request.GET.get('redirect_url'),
-            'auto_redirect': True,
-            'confirm_button': _('Confirm')
-        }
-        return self.render_to_response(context)
