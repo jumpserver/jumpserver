@@ -14,11 +14,15 @@ class AdHocExecutionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AdHocExecution
-        fields = [
-            'id', 'task', 'task_display', 'hosts_amount', 'adhoc', 'date_start', 'stat',
-            'date_finished', 'timedelta', 'is_finished', 'is_success', 'result', 'summary',
-            'short_id', 'adhoc_short_id', 'last_success', 'last_failure'
+        fields_mini = ['id']
+        fields_small = fields_mini + [
+            'hosts_amount', 'timedelta', 'result', 'summary', 'short_id',
+            'is_finished', 'is_success',
+            'date_start', 'date_finished',
         ]
+        fields_fk = ['task', 'task_display', 'adhoc', 'adhoc_short_id',]
+        fields_custom = ['stat', 'last_success', 'last_failure']
+        fields = fields_small + fields_fk + fields_custom
 
     @staticmethod
     def get_task(obj):
@@ -52,11 +56,16 @@ class TaskSerializer(BulkOrgResourceModelSerializer):
 
     class Meta:
         model = Task
-        fields = [
-            'id', 'name', 'interval', 'crontab', 'is_periodic',
-            'is_deleted', 'comment', 'date_created',
-            'date_updated', 'latest_execution', 'summary',
+        fields_mini = ['id', 'name']
+        fields_small = fields_mini + [
+            'interval', 'crontab',
+            'is_periodic', 'is_deleted',
+            'date_created', 'date_updated',
+            'comment',
         ]
+        fields_fk = ['latest_execution']
+        fields_custom = ['summary']
+        fields = fields_small + fields_fk + fields_custom
         read_only_fields = [
             'is_deleted', 'date_created', 'date_updated',
             'latest_adhoc', 'latest_execution', 'total_run_amount',
@@ -77,12 +86,16 @@ class AdHocSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AdHoc
-        fields = [
-            "id", "task", 'tasks', "pattern", "options",
-            "hosts", "run_as_admin", "run_as", "become",
-            "date_created", "short_id",
-            "become_display",
+        fields_mini = ['id']
+        fields_small = fields_mini + [
+            'tasks', "pattern", "options", "run_as",
+            "become", "become_display", "short_id",
+            "run_as_admin",
+            "date_created",
         ]
+        fields_fk = ["task"]
+        fields_m2m = ["hosts"]
+        fields = fields_small + fields_fk + fields_m2m
         read_only_fields = [
             'date_created'
         ]
@@ -99,8 +112,8 @@ class AdHocExecutionNestSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdHocExecution
         fields = (
-            'last_success', 'last_failure', 'last_run', 'timedelta', 'is_finished',
-            'is_success'
+            'last_success', 'last_failure', 'last_run', 'timedelta',
+            'is_finished', 'is_success'
         )
 
 
@@ -120,10 +133,15 @@ class CommandExecutionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CommandExecution
-        fields = [
-            'id', 'hosts', 'run_as', 'command', 'result', 'log_url',
-            'is_finished', 'date_created', 'date_finished'
+        fields_mini = ['id']
+        fields_small = fields_mini + [
+            'command', 'result', 'log_url',
+            'is_finished',
+            'date_created', 'date_finished'
         ]
+        fields_fk = ['run_as']
+        fields_m2m = ['hosts']
+        fields = fields_small + fields_fk + fields_m2m
         read_only_fields = [
             'result', 'is_finished', 'log_url', 'date_created',
             'date_finished'

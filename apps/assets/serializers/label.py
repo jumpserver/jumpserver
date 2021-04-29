@@ -15,10 +15,15 @@ class LabelSerializer(BulkOrgResourceModelSerializer):
 
     class Meta:
         model = Label
-        fields = [
-            'id', 'name', 'value', 'category', 'is_active', 'comment',
-            'date_created', 'asset_count', 'assets', 'category_display'
+        fields_mini = ['id', 'name']
+        fields_small = fields_mini + [
+            'value', 'category', 'category_display',
+            'is_active',
+            'date_created',
+            'comment',
         ]
+        fields_m2m = ['asset_count', 'assets']
+        fields = fields_small + fields_m2m
         read_only_fields = (
             'category', 'date_created', 'asset_count',
         )

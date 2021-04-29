@@ -16,10 +16,14 @@ class FTPLogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.FTPLog
-        fields = (
-            'id', 'user', 'remote_addr', 'asset', 'system_user', 'org_id',
-            'operate', 'filename', 'is_success', 'date_start', 'operate_display'
-        )
+        fields_mini = ['id']
+        fields_small = fields_mini + [
+            'user', 'remote_addr', 'asset', 'system_user', 'org_id',
+            'operate', 'filename', 'operate_display',
+            'is_success',
+            'date_start',
+        ]
+        fields = fields_small
 
 
 class UserLoginLogSerializer(serializers.ModelSerializer):
@@ -29,11 +33,14 @@ class UserLoginLogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.UserLoginLog
-        fields = (
-            'id', 'username', 'type', 'type_display', 'ip', 'city', 'user_agent',
-            'mfa', 'reason', 'status', 'status_display', 'datetime', 'mfa_display',
-            'backend'
-        )
+        fields_mini = ['id']
+        fields_small = fields_mini + [
+            'username', 'type', 'type_display', 'ip', 'city', 'user_agent',
+            'mfa', 'mfa_display', 'reason', 'backend',
+            'status', 'status_display',
+            'datetime',
+        ]
+        fields = fields_small
         extra_kwargs = {
             "user_agent": {'label': _('User agent')}
         }
@@ -42,10 +49,13 @@ class UserLoginLogSerializer(serializers.ModelSerializer):
 class OperateLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.OperateLog
-        fields = (
-            'id', 'user', 'action', 'resource_type', 'resource',
-            'remote_addr', 'datetime', 'org_id'
-        )
+        fields_mini = ['id']
+        fields_small = fields_mini + [
+            'user', 'action', 'resource_type', 'resource', 'remote_addr',
+            'datetime',
+            'org_id'
+        ]
+        fields = fields_small
 
 
 class PasswordChangeLogSerializer(serializers.ModelSerializer):

@@ -16,11 +16,16 @@ class CommandFilterSerializer(BulkOrgResourceModelSerializer):
     class Meta:
         model = CommandFilter
         list_serializer_class = AdaptedBulkListSerializer
-        fields = [
-            'id', 'name', 'org_id', 'org_name', 'is_active', 'comment',
-            'created_by', 'date_created', 'date_updated', 'rules', 'system_users'
+        fields_mini = ['id', 'name']
+        fields_small = fields_mini + [
+            'org_id', 'org_name',
+            'is_active',
+            'date_created', 'date_updated',
+            'comment', 'created_by',
         ]
-
+        fields_fk = ['rules']
+        fields_m2m = ['system_users']
+        fields = fields_small + fields_fk + fields_m2m
         extra_kwargs = {
             'rules': {'read_only': True},
             'system_users': {'required': False},
@@ -38,7 +43,8 @@ class CommandFilterRuleSerializer(BulkOrgResourceModelSerializer):
         fields_small = fields_mini + [
            'type', 'type_display', 'content', 'priority',
            'action', 'action_display', 'reviewers',
-           'comment', 'created_by', 'date_created', 'date_updated'
+           'date_created', 'date_updated',
+           'comment', 'created_by',
         ]
         fields_fk = ['filter']
         fields = '__all__'

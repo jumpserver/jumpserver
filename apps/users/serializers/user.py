@@ -44,24 +44,35 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         model = User
         # mini 是指能识别对象的最小单元
         fields_mini = ['id', 'name', 'username']
+        # 只能写的字段, 这个虽然无法在框架上生效，但是更多对我们是提醒
+        fields_write_only = [
+            'password', 'public_key',
+        ]
         # small 指的是 不需要计算的直接能从一张表中获取到的数据
-        fields_small = fields_mini + [
-            'password', 'email', 'public_key', 'wechat', 'phone', 'mfa_level', 'mfa_enabled',
-            'mfa_level_display', 'mfa_force_enabled', 'role_display', 'org_role_display',
-            'total_role_display', 'comment', 'source', 'is_valid', 'is_expired',
-            'is_active', 'created_by', 'is_first_login', 'can_public_key_auth',
-            'password_strategy', 'date_password_last_updated', 'date_expired',
-            'avatar_url', 'source_display', 'date_joined', 'last_login', 'need_update_password'
+        fields_small = fields_mini + fields_write_only + [
+            'email', 'wechat', 'phone', 'mfa_level',
+            'source', 'source_display',
+            'mfa_enabled', 'is_valid', 'is_expired', 'is_active',  # 布尔字段
+            'date_expired', 'date_joined', 'last_login',  # 日期字段
+            'created_by', 'comment',  # 通用字段
         ]
-        fields = fields_small + [
-            'groups', 'role', 'groups_display', 'role_display',
-            'can_update', 'can_delete', 'login_blocked', 'org_roles'
+        # 包含不太常用的字段，可以没有
+        fields_verbose = fields_small + [
+            'total_role_display', 'org_role_display',
+            'mfa_level_display', 'mfa_force_enabled', 'is_first_login',
+            'date_password_last_updated', 'avatar_url',
         ]
+        # 外键的字段
+        fields_fk = ['role', 'role_display']
+        # 多对多字段
+        fields_m2m = ['groups', 'groups_display', 'org_roles']
+        # 在serializer 上定义的字段
+        fields_custom = ['can_update', 'can_delete', 'login_blocked', 'password_strategy']
+        fields = fields_verbose + fields_fk + fields_m2m + fields_custom
 
         read_only_fields = [
             'date_joined', 'last_login', 'created_by', 'is_first_login',
         ]
-
         extra_kwargs = {
             'password': {'write_only': True, 'required': False, 'allow_null': True, 'allow_blank': True},
             'public_key': {'write_only': True},

@@ -48,11 +48,18 @@ class GatewaySerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     class Meta:
         model = Gateway
         list_serializer_class = AdaptedBulkListSerializer
-        fields = [
-            'id', 'name', 'ip', 'port', 'protocol', 'username', 'password',
-            'private_key', 'public_key', 'domain', 'is_active', 'date_created',
-            'date_updated', 'created_by', 'comment',
+        fields_mini = ['id', 'name']
+        fields_write_only = [
+            'password', 'private_key', 'public_key',
         ]
+        fields_small = fields_mini + fields_write_only + [
+            'username', 'ip', 'port', 'protocol',
+            'is_active',
+            'date_created', 'date_updated',
+            'created_by', 'comment',
+        ]
+        fields_fk = ['domain']
+        fields = fields_small +  fields_fk
         extra_kwargs = {
             'password': {'validators': [NoSpecialChars()]}
         }

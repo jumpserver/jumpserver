@@ -21,9 +21,13 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = [
-            'id', 'ticket', 'body', 'user', 'user_display', 'date_created', 'date_updated'
+        fields_mini = ['id']
+        fields_small = fields_mini + [
+            'body',  'user_display',
+            'date_created', 'date_updated'
         ]
+        fields_fk = ['ticket', 'user',]
+        fields = fields_small + fields_fk
         read_only_fields = [
             'user_display', 'date_created', 'date_updated'
         ]

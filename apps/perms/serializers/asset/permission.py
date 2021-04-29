@@ -3,7 +3,9 @@
 
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
+
 from django.db.models import Prefetch, Q
+
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from perms.models import AssetPermission, Action
@@ -95,18 +97,18 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
         users_to_set = User.objects.filter(
             Q(name__in=kwargs.get('users_display')) | Q(username__in=kwargs.get('users_display'))
         ).distinct()
-        instance.users.set(users_to_set)
+        instance.users.add(users_to_set)
         # 用户组
         user_groups_to_set = UserGroup.objects.filter(name__in=kwargs.get('user_groups_display')).distinct()
-        instance.user_groups.set(user_groups_to_set)
+        instance.user_groups.add(user_groups_to_set)
         # 资产
         assets_to_set = Asset.objects.filter(
             Q(ip__in=kwargs.get('assets_display')) | Q(hostname__in=kwargs.get('assets_display'))
         ).distinct()
-        instance.assets.set(assets_to_set)
+        instance.assets.add(assets_to_set)
         # 节点
         nodes_to_set = Node.objects.filter(full_value__in=kwargs.get('nodes_display')).distinct()
-        instance.nodes.set(nodes_to_set)
+        instance.nodes.add(nodes_to_set)
 
     def create(self, validated_data):
         display = {
@@ -118,3 +120,4 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
         instance = super().create(validated_data)
         self.perform_display_create(instance, **display)
         return instance
+
