@@ -79,7 +79,7 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
             })
 
         key = self.CACHE_KEY_PREFIX.format(token)
-        cache.set(key, value, timeout=20)
+        cache.set(key, value, timeout=30*60)
         return token
 
     def create(self, request, *args, **kwargs):
@@ -102,7 +102,7 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
             'desktopwidth:i': '1280',
             'desktopheight:i': '800',
             'use multimon:i': '1',
-            'session bpp:i': '24',
+            'session bpp:i': '32',
             'audiomode:i': '0',
             'disable wallpaper:i': '0',
             'disable full window drag:i': '0',
