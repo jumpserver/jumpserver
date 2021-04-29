@@ -74,7 +74,7 @@ class UserVerifyPasswordView(FormView):
         if not user:
             form.add_error("password", _("Password invalid"))
             return self.form_invalid(form)
-        if not user.mfa_is_otp():
+        if not user.mfa_is_otp() and not settings.ADMIN_USER_SECURITY_MFA_AUTH:
             user.enable_mfa()
             user.save()
         self.request.session['user_id'] = str(user.id)
