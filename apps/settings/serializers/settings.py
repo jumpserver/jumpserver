@@ -140,6 +140,10 @@ class SecuritySettingSerializer(serializers.Serializer):
         required=False, label=_("Global MFA auth"),
         help_text=_('All user enable MFA')
     )
+    ADMIN_USER_SECURITY_MFA_AUTH = serializers.BooleanField(
+        required=False, label=_("Admin user MFA auth"),
+        help_text=_('Admin user enable MFA')
+    )
     SECURITY_COMMAND_EXECUTION = serializers.BooleanField(
         required=False, label=_('Batch command execution'),
         help_text=_('Allow user run batch command or not using ansible')
@@ -175,6 +179,10 @@ class SecuritySettingSerializer(serializers.Serializer):
     SECURITY_PASSWORD_MIN_LENGTH = serializers.IntegerField(
         min_value=6, max_value=30, required=True,
         label=_('Password minimum length')
+    )
+    ADMIN_USER_SECURITY_PASSWORD_MIN_LENGTH = serializers.IntegerField(
+        min_value=6, max_value=30, required=True,
+        label=_('Admin user password minimum length')
     )
     SECURITY_PASSWORD_UPPER_CASE = serializers.BooleanField(
         required=False, label=_('Must contain capital')

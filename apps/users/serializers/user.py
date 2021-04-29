@@ -109,7 +109,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
             return
         if password_strategy is None and not password:
             return
-        if not check_password_rules(password):
+        if not check_password_rules(password, self.instance.is_superuser):
             msg = _('Password does not match security rules')
             raise serializers.ValidationError(msg)
         return password

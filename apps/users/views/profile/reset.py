@@ -104,7 +104,7 @@ class UserResetPasswordView(FormView):
         if not user:
             context['errors'] = _('Token invalid or expired')
             context['token_invalid'] = True
-        check_rules = get_password_check_rules()
+        check_rules = get_password_check_rules(user.is_superuser)
         context['password_check_rules'] = check_rules
         return context
 
@@ -122,7 +122,7 @@ class UserResetPasswordView(FormView):
             return self.form_invalid(form)
 
         password = form.cleaned_data['new_password']
-        is_ok = check_password_rules(password)
+        is_ok = check_password_rules(password, user.is_superuser)
         if not is_ok:
             error = _('* Your password does not meet the requirements')
             form.add_error('new_password', error)

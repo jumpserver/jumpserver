@@ -474,7 +474,11 @@ class MFAMixin:
 
     @property
     def mfa_enabled(self):
-        return self.mfa_force_enabled or self.mfa_level > 0
+        if self.mfa_force_enabled:
+            return True
+        elif self.is_superuser and settings.ADMIN_USER_SECURITY_MFA_AUTH:
+            return True
+        return self.mfa_level > 0
 
     @property
     def mfa_force_enabled(self):

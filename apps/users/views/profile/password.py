@@ -53,7 +53,7 @@ class UserPasswordUpdateView(PermissionsMixin, UpdateView):
 
     def form_valid(self, form):
         password = form.cleaned_data.get('new_password')
-        is_ok = check_password_rules(password)
+        is_ok = check_password_rules(password, self.request.user.is_superuser)
         if not is_ok:
             form.add_error(
                 "new_password",
