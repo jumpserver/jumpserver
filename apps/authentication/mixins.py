@@ -7,13 +7,14 @@ import time
 
 from django.conf import settings
 from django.contrib import auth
+from django.utils.translation import ugettext as _
 from django.contrib.auth import (
     BACKEND_SESSION_KEY, _get_backends,
     PermissionDenied, user_login_failed, _clean_credentials
 )
 from django.shortcuts import reverse
 
-from common.utils import get_object_or_none, get_request_ip, get_logger, bulk_get
+from common.utils import get_object_or_none, get_request_ip, get_logger, bulk_get, FlashMessageUtil
 from users.models import User
 from users.utils import LoginBlockUtil, MFABlockUtils
 from . import errors
@@ -204,41 +205,40 @@ class AuthMixin:
         return user
 
     @classmethod
-    def generate_reset_password_url_with_flash_msg(cls, user: User, flash_view_name):
+    def generate_reset_password_url_with_flash_msg(cls, user, message):
         reset_passwd_url = reverse('authentication:reset-password')
         query_str = urlencode({
             'token': user.generate_reset_token()
         })
         reset_passwd_url = f'{reset_passwd_url}?{query_str}'
 
-        flash_page_url = reverse(flash_view_name)
-        query_str = urlencode({
-            'redirect_url': reset_passwd_url
-        })
-        return f'{flash_page_url}?{query_str}'
+        message_data = {
+            'title': _('Please change your password'),
+            'message': message,
+            'interval': 3,
+            'redirect_url': reset_passwd_url,
+        }
+        return FlashMessageUtil.gen_message_url(message_data)
 
     @classmethod
     def _check_passwd_is_too_simple(cls, user: User, password):
         if user.is_superuser and password == 'admin':
-            url = cls.generate_reset_password_url_with_flash_msg(
-                user, 'authentication:passwd-too-simple-flash-msg'
-            )
+            message = _('Your password is too simple, please change it for security')
+            url = cls.generate_reset_password_url_with_flash_msg(user, message=message)
             raise errors.PasswdTooSimple(url)
 
     @classmethod
     def _check_passwd_need_update(cls, user: User):
         if user.need_update_password:
-            url = cls.generate_reset_password_url_with_flash_msg(
-                user, 'authentication:passwd-need-update-flash-msg'
-            )
+            message = _('You should to change your password before login')
+            url = cls.generate_reset_password_url_with_flash_msg(user, message)
             raise errors.PasswdNeedUpdate(url)
 
     @classmethod
     def _check_password_require_reset_or_not(cls, user: User):
         if user.password_has_expired:
-            url = cls.generate_reset_password_url_with_flash_msg(
-                user, 'authentication:passwd-has-expired-flash-msg'
-            )
+            message = _('Your password has expired, please reset before logging in')
+            url = cls.generate_reset_password_url_with_flash_msg(user, message)
             raise errors.PasswordRequireResetError(url)
 
     def check_user_auth_if_need(self, decrypt_passwd=False):

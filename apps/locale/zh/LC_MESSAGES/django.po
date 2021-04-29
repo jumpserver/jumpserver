@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-29 12:17+0800\n"
+"POT-Creation-Date: 2021-04-29 16:20+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -354,7 +354,9 @@ msgid "You can't delete the root node ({})"
 msgstr "不能删除根节点 ({})"
 
 #: assets/api/node.py:75
-msgid "Deletion failed and the node contains children or assets"
+#, fuzzy
+#| msgid "Deletion failed and the node contains children or assets"
+msgid "Deletion failed and the node contains assets"
 msgstr "删除失败，节点包含子节点或资产"
 
 #: assets/backends/db.py:244
@@ -650,31 +652,31 @@ msgstr "资产组"
 msgid "Default asset group"
 msgstr "默认资产组"
 
-#: assets/models/label.py:19 assets/models/node.py:547 settings/models.py:30
+#: assets/models/label.py:19 assets/models/node.py:546 settings/models.py:30
 msgid "Value"
 msgstr "值"
 
-#: assets/models/node.py:152
+#: assets/models/node.py:151
 msgid "New node"
 msgstr "新节点"
 
-#: assets/models/node.py:475 users/templates/users/_granted_assets.html:130
+#: assets/models/node.py:474 users/templates/users/_granted_assets.html:130
 msgid "empty"
 msgstr "空"
 
-#: assets/models/node.py:546 perms/models/asset_permission.py:176
+#: assets/models/node.py:545 perms/models/asset_permission.py:176
 msgid "Key"
 msgstr "键"
 
-#: assets/models/node.py:548
+#: assets/models/node.py:547
 msgid "Full value"
 msgstr "全称"
 
-#: assets/models/node.py:551 perms/models/asset_permission.py:177
+#: assets/models/node.py:550 perms/models/asset_permission.py:177
 msgid "Parent key"
 msgstr "ssh私钥"
 
-#: assets/models/node.py:560 assets/serializers/system_user.py:191
+#: assets/models/node.py:559 assets/serializers/system_user.py:191
 #: users/templates/users/user_asset_permission.html:41
 #: users/templates/users/user_asset_permission.html:73
 #: users/templates/users/user_asset_permission.html:158
@@ -1360,15 +1362,15 @@ msgstr "来源 IP 不被允许登录"
 msgid "SSO auth closed"
 msgstr "SSO 认证关闭了"
 
-#: authentication/errors.py:271 authentication/views/login.py:237
+#: authentication/errors.py:271 authentication/views/login.py:267
 msgid "Your password is too simple, please change it for security"
 msgstr "你的密码过于简单，为了安全，请修改"
 
-#: authentication/errors.py:280 authentication/views/login.py:252
+#: authentication/errors.py:280 authentication/views/login.py:282
 msgid "You should to change your password before login"
 msgstr "登录完成前，请先修改密码"
 
-#: authentication/errors.py:289 authentication/views/login.py:268
+#: authentication/errors.py:289 authentication/views/login.py:298
 msgid "Your password has expired, please reset before logging in"
 msgstr "您的密码已过期，先修改再登录"
 
@@ -1453,8 +1455,9 @@ msgid "Need MFA for view auth"
 msgstr "需要多因子认证来查看账号信息"
 
 #: authentication/templates/authentication/_mfa_confirm_modal.html:20
-#: authentication/views/login.py:256 authentication/views/login.py:272
-#: templates/_modal.html:23 users/templates/users/user_password_verify.html:20
+#: authentication/views/login.py:286 authentication/views/login.py:302
+#: authentication/views/login.py:318 templates/_modal.html:23
+#: users/templates/users/user_password_verify.html:20
 msgid "Confirm"
 msgstr "确认"
 
@@ -1519,7 +1522,6 @@ msgid "Copy link"
 msgstr "复制链接"
 
 #: authentication/templates/authentication/login_wait_confirm.html:51
-#: templates/flash_message_standalone.html:38
 msgid "Return"
 msgstr "返回"
 
@@ -1527,11 +1529,19 @@ msgstr "返回"
 msgid "Copy success"
 msgstr "复制成功"
 
-#: authentication/views/login.py:58
+#: authentication/views/login.py:63 authentication/views/login.py:313
+msgid "Redirecting"
+msgstr "跳转中"
+
+#: authentication/views/login.py:64
+msgid "Redirecting to {} authentication"
+msgstr "正在跳转到 {} 认证"
+
+#: authentication/views/login.py:88
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: authentication/views/login.py:183
+#: authentication/views/login.py:213
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -1539,22 +1549,26 @@ msgstr ""
 "等待 <b>{}</b> 确认, 你也可以复制链接发给他/她 <br/>\n"
 "                  不要关闭本页面"
 
-#: authentication/views/login.py:188
+#: authentication/views/login.py:218
 msgid "No ticket found"
 msgstr "没有发现工单"
 
-#: authentication/views/login.py:220
+#: authentication/views/login.py:250
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: authentication/views/login.py:221
+#: authentication/views/login.py:251
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
-#: authentication/views/login.py:236 authentication/views/login.py:251
-#: authentication/views/login.py:267
+#: authentication/views/login.py:266 authentication/views/login.py:281
+#: authentication/views/login.py:297
 msgid "Please change your password"
 msgstr "请修改密码"
+
+#: authentication/views/login.py:314
+msgid "Redirect to third party auth"
+msgstr ""
 
 #: common/const/__init__.py:6
 #, python-format
@@ -1671,7 +1685,7 @@ msgstr "JumpServer 开源堡垒机"
 msgid "<h1>Flow service unavailable, check it</h1>"
 msgstr ""
 
-#: jumpserver/views/other.py:27
+#: jumpserver/views/other.py:25
 msgid ""
 "<div>Luna is a separately deployed program, you need to deploy Luna, koko, "
 "configure nginx for url distribution,</div> </div>If you see this page, "
@@ -1680,11 +1694,11 @@ msgstr ""
 "<div>Luna是单独部署的一个程序，你需要部署luna，koko, </div><div>如果你看到了"
 "这个页面，证明你访问的不是nginx监听的端口，祝你好运</div>"
 
-#: jumpserver/views/other.py:71
+#: jumpserver/views/other.py:69
 msgid "Websocket server run on port: {}, you should proxy it on nginx"
 msgstr "Websocket 服务运行在端口: {}, 请检查nginx是否代理是否设置"
 
-#: jumpserver/views/other.py:85
+#: jumpserver/views/other.py:83
 msgid ""
 "<div>Koko is a separately deployed program, you need to deploy Koko, "
 "configure nginx for url distribution,</div> </div>If you see this page, "
@@ -2759,6 +2773,14 @@ msgstr "确认删除"
 #: templates/delete_confirm.html:11
 msgid "Are you sure delete"
 msgstr "您确定删除吗?"
+
+#: templates/flash_message_standalone.html:28
+msgid "Cancel"
+msgstr "取消"
+
+#: templates/flash_message_standalone.html:37
+msgid "Go"
+msgstr "跳转"
 
 #: templates/index.html:11
 msgid "Total users"
@@ -4977,9 +4999,6 @@ msgstr "社区版"
 
 #~ msgid "This will reset the user password and send a reset mail"
 #~ msgstr "将失效用户当前密码，并发送重设密码邮件到用户邮箱"
-
-#~ msgid "Cancel"
-#~ msgstr "取消"
 
 #~ msgid ""
 #~ "The reset-ssh-public-key E-mail has been sent successfully. Please inform "
