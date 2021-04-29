@@ -4,7 +4,7 @@ from rest_framework import serializers
 from rest_framework import serializers
 
 
-class FieldDefinitionTypeChoices(TextChoices):
+class PropertyTypeChoices(TextChoices):
     str = 'str', 'CharField'
     int = 'int', 'IntegerField'
     bool = 'bool', 'BooleanField'

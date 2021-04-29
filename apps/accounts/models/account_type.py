@@ -39,47 +39,47 @@ class AccountType(CommonModelMixin, models.Model):
         verbose_name=_('Secret type')
     )
     # [{'name': '', 'type': '', 'read_only': '', 'label': '', ...}, {}, {}]
-    fields_definition = models.JSONField(default=list)
+    properties = models.JSONField(default=list)
     is_builtin = models.BooleanField(default=False, verbose_name=_('Built-in'))
     comment = models.TextField(null=True, blank=True, verbose_name=_('Comment'))
 
     def __str__(self):
         return self.name
 
-    def construct_serializer_class_for_fields_definition(self):
+    def construct_serializer_class_for_properties(self):
         from rest_framework import serializers
         fields = self._construct_serializer_class_fields()
         serializer_class = type(
-            'AccountTypeFieldsDefinitionSerializer', (serializers.Serializer, ), fields
+            'AccountTypePropertiesSerializer', (serializers.Serializer, ), fields
         )
         return serializer_class
 
     def _construct_serializer_class_fields(self):
-        from ..const import FieldDefinitionTypeChoices
+        from ..const import PropertyTypeChoices
         fields = {}
-        for field_definition in copy.deepcopy(self.fields_definition):
-            name = field_definition.pop('name')
-            tp = field_definition.pop('type')
-            default = field_definition.get('default')
-            field_class = FieldDefinitionTypeChoices.get_serializer_field_class(tp=tp)
+        for _property in copy.deepcopy(self.properties):
+            name = _property.pop('name')
+            tp = _property.pop('type')
+            default = _property.get('default')
+            field_class = PropertyTypeChoices.get_serializer_field_class(tp=tp)
             # int type
-            if tp == FieldDefinitionTypeChoices.int:
+            if tp == PropertyTypeChoices.int:
                 if isinstance(default, str) and default.isdigit():
-                    field_definition['default'] = int(default)
+                    _property['default'] = int(default)
             # str type
-            if tp == FieldDefinitionTypeChoices.str:
-                field_definition['max_length'] = 1024
-            if tp == FieldDefinitionTypeChoices.bool:
-                field_definition['default'] = default in ['true', True, '1']
+            if tp == PropertyTypeChoices.str:
+                _property['max_length'] = 1024
+            if tp == PropertyTypeChoices.bool:
+                _property['default'] = default in ['true', True, '1']
             # Some combinations of keyword arguments do not make sense.
-            if field_definition.get('write_only', False):
-                field_definition.pop('read_only', None)
-            if field_definition.get('read_only', False):
-                field_definition.pop('required', None)
-            if field_definition.get('required', False):
-                field_definition.pop('default', None)
+            if _property.get('write_only', False):
+                _property.pop('read_only', None)
+            if _property.get('read_only', False):
+                _property.pop('required', None)
+            if _property.get('required', False):
+                _property.pop('default', None)
 
-            fields[name] = field_class(**field_definition)
+            fields[name] = field_class(**_property)
         return fields
 
     @classmethod

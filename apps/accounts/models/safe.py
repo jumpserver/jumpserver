@@ -15,6 +15,7 @@ class Safe(CommonModelMixin, OrgModelMixin):
 
     class Meta:
         unique_together = ('name', 'org_id')
+        ordering = ('name', )
 
     def __str__(self):
         return self.name
