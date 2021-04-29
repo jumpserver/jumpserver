@@ -26,16 +26,18 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     class Meta:
         model = SystemUser
         list_serializer_class = AdaptedBulkListSerializer
-        fields = [
-            'id', 'name', 'username', 'protocol',
-            'password', 'public_key', 'private_key',
-            'login_mode', 'login_mode_display',
-            'priority', 'username_same_with_user',
-            'auto_push', 'cmd_filters', 'sudo', 'shell', 'comment',
-            'auto_generate_key', 'sftp_root', 'token',
-            'assets_amount', 'date_created', 'date_updated', 'created_by',
-            'home', 'system_groups', 'ad_domain'
+        fields_mini = ['id', 'name', 'username']
+        fields_write_only = ['password', 'public_key', 'private_key']
+        fields_small = fields_mini + fields_write_only + [
+            'protocol', 'login_mode', 'login_mode_display', 'priority',
+            'sudo', 'shell', 'sftp_root', 'token',
+            'home', 'system_groups', 'ad_domain',
+            'username_same_with_user', 'auto_push', 'auto_generate_key',
+            'date_created', 'date_updated',
+            'comment', 'created_by',
         ]
+        fields_m2m = [ 'cmd_filters', 'assets_amount']
+        fields = fields_small + fields_m2m
         extra_kwargs = {
             'password': {"write_only": True},
             'public_key': {"write_only": True},
@@ -147,17 +149,18 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
 class SystemUserListSerializer(SystemUserSerializer):
 
     class Meta(SystemUserSerializer.Meta):
-        fields = [
-            'id', 'name', 'username', 'protocol',
-            'password', 'public_key', 'private_key',
-            'login_mode', 'login_mode_display',
-            'priority', "username_same_with_user",
-            'auto_push', 'sudo', 'shell', 'comment',
-            "assets_amount", 'home', 'system_groups',
-            'auto_generate_key', 'ad_domain',
-            'sftp_root', 'created_by', 'date_created',
-            'date_updated',
+        fields_mini = ['id', 'name', 'username']
+        fields_write_only = ['password', 'public_key', 'private_key']
+        fields_small = fields_mini + fields_write_only + [
+            'protocol', 'login_mode', 'login_mode_display', 'priority',
+            'sudo', 'shell', 'home', 'system_groups',
+            'ad_domain', 'sftp_root',
+            "username_same_with_user", 'auto_push', 'auto_generate_key',
+            'date_created', 'date_updated',
+            'comment', 'created_by',
         ]
+        fields_m2m = ["assets_amount",]
+        fields = fields_small + fields_m2m
         extra_kwargs = {
             'password': {"write_only": True},
             'public_key': {"write_only": True},
@@ -178,15 +181,15 @@ class SystemUserListSerializer(SystemUserSerializer):
 
 class SystemUserWithAuthInfoSerializer(SystemUserSerializer):
     class Meta(SystemUserSerializer.Meta):
-        fields = [
-            'id', 'name', 'username', 'protocol',
-            'password', 'public_key', 'private_key',
-            'login_mode', 'login_mode_display',
-            'priority', 'username_same_with_user',
-            'auto_push', 'sudo', 'shell', 'comment',
-            'auto_generate_key', 'sftp_root', 'token',
-            'ad_domain',
+        fields_mini = ['id', 'name', 'username']
+        fields_write_only = ['password', 'public_key', 'private_key']
+        fields_small = fields_mini + fields_write_only + [
+            'protocol', 'login_mode', 'login_mode_display', 'priority',
+            'sudo', 'shell', 'ad_domain', 'sftp_root', 'token',
+            "username_same_with_user", 'auto_push', 'auto_generate_key',
+            'comment',
         ]
+        fields = fields_small
         extra_kwargs = {
             'nodes_amount': {'label': _('Node')},
             'assets_amount': {'label': _('Asset')},

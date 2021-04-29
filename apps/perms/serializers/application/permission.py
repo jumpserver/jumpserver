@@ -20,16 +20,16 @@ class ApplicationPermissionSerializer(BulkOrgResourceModelSerializer):
 
     class Meta:
         model = ApplicationPermission
-        mini_fields = ['id', 'name']
-        small_fields = mini_fields + [
+        fields_mini = ['id', 'name']
+        fields_small = fields_mini + [
             'category', 'category_display', 'type', 'type_display', 'is_active', 'is_expired',
             'is_valid', 'created_by', 'date_created', 'date_expired', 'date_start', 'comment'
         ]
-        m2m_fields = [
+        fields_m2m = [
             'users', 'user_groups', 'applications', 'system_users',
             'users_amount', 'user_groups_amount', 'applications_amount', 'system_users_amount',
         ]
-        fields = small_fields + m2m_fields
+        fields = fields_small + fields_m2m
         read_only_fields = ['created_by', 'date_created']
 
     @classmethod

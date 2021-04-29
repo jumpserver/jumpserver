@@ -49,10 +49,14 @@ class ApplicationSerializer(ApplicationSerializerMixin, BulkOrgResourceModelSeri
 
     class Meta:
         model = models.Application
-        fields = [
-            'id', 'name', 'category', 'category_display', 'type', 'type_display', 'attrs',
-            'domain', 'created_by', 'date_created', 'date_updated', 'comment'
+        fields_mini = ['id', 'name']
+        fields_small = fields_mini + [
+            'category', 'category_display', 'type', 'type_display', 'attrs',
+            'date_created', 'date_updated',
+            'created_by', 'comment'
         ]
+        fields_fk = ['domain']
+        fields = fields_small + fields_fk
         read_only_fields = [
             'created_by', 'date_created', 'date_updated', 'get_type_display',
         ]

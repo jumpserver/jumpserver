@@ -22,10 +22,11 @@ class AssetUserWriteSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializ
     class Meta:
         model = AuthBook
         list_serializer_class = AdaptedBulkListSerializer
-        fields = [
-            'id', 'username', 'password', 'private_key', "public_key",
-            'asset', 'comment',
-        ]
+        fields_mini = ['id', 'username']
+        fields_write_only = ['password', 'private_key', "public_key"]
+        fields_small = fields_mini + fields_write_only + ['comment']
+        fields_fk = ['asset']
+        fields = fields_small + fields_fk
         extra_kwargs = {
             'username': {'required': True},
             'password': {'write_only': True},
@@ -52,11 +53,15 @@ class AssetUserReadSerializer(AssetUserWriteSerializer):
             'date_created', 'date_updated',
             'created_by', 'version',
         )
-        fields = [
-            'id', 'username', 'password', 'private_key', "public_key",
-            'asset', 'hostname', 'ip', 'backend', 'version',
-            'date_created', "date_updated", 'comment',
+        fields_mini = ['id', 'username']
+        fields_write_only = ['password', 'private_key', "public_key"]
+        fields_small = fields_mini + fields_write_only + [
+            'backend', 'version',
+            'date_created', "date_updated",
+            'comment'
         ]
+        fields_fk = ['asset', 'hostname', 'ip']
+        fields = fields_small + fields_fk
         extra_kwargs = {
             'username': {'required': True},
             'password': {'write_only': True},
