@@ -31,7 +31,8 @@ from ..forms import get_user_login_form_cls
 __all__ = [
     'UserLoginView', 'UserLogoutView',
     'UserLoginGuardView', 'UserLoginWaitConfirmView',
-    'FlashPasswdTooSimpleMsgView', 'FlashPasswdHasExpiredMsgView', 'FlashPasswdNeedUpdateMsgView'
+    'FlashPasswdTooSimpleMsgView', 'FlashPasswdHasExpiredMsgView',
+    'FlashPasswdNeedUpdateMsgView'
 ]
 
 
@@ -218,7 +219,7 @@ class UserLogoutView(TemplateView):
         context = {
             'title': _('Logout success'),
             'messages': _('Logout success, return login page'),
-            'interval': 1,
+            'interval': 3,
             'redirect_url': reverse('authentication:login'),
             'auto_redirect': True,
         }
@@ -234,7 +235,7 @@ class FlashPasswdTooSimpleMsgView(TemplateView):
         context = {
             'title': _('Please change your password'),
             'messages': _('Your password is too simple, please change it for security'),
-            'interval': 5,
+            'interval': 3,
             'redirect_url': request.GET.get('redirect_url'),
             'auto_redirect': True,
         }
@@ -248,10 +249,11 @@ class FlashPasswdNeedUpdateMsgView(TemplateView):
     def get(self, request, *args, **kwargs):
         context = {
             'title': _('Please change your password'),
-            'messages': _('The administrator require you to change your password this time'),
-            'interval': 8,
+            'messages': _('You should to change your password before login'),
+            'interval': 3,
             'redirect_url': request.GET.get('redirect_url'),
             'auto_redirect': True,
+            'confirm_button': _('Confirm')
         }
         return self.render_to_response(context)
 
@@ -264,8 +266,9 @@ class FlashPasswdHasExpiredMsgView(TemplateView):
         context = {
             'title': _('Please change your password'),
             'messages': _('Your password has expired, please reset before logging in'),
-            'interval': 5,
+            'interval': 3,
             'redirect_url': request.GET.get('redirect_url'),
             'auto_redirect': True,
+            'confirm_button': _('Confirm')
         }
         return self.render_to_response(context)

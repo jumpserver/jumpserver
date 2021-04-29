@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-27 18:00+0800\n"
+"POT-Creation-Date: 2021-04-29 12:17+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -25,7 +25,7 @@ msgstr ""
 #: orgs/models.py:23 perms/models/base.py:49 settings/models.py:29
 #: terminal/models/storage.py:23 terminal/models/storage.py:90
 #: terminal/models/task.py:16 terminal/models/terminal.py:100
-#: users/forms/profile.py:32 users/models/group.py:15 users/models/user.py:535
+#: users/forms/profile.py:32 users/models/group.py:15 users/models/user.py:555
 #: users/templates/users/_select_user_modal.html:13
 #: users/templates/users/user_asset_permission.html:37
 #: users/templates/users/user_asset_permission.html:154
@@ -61,7 +61,7 @@ msgstr "激活中"
 #: orgs/models.py:26 perms/models/base.py:57 settings/models.py:34
 #: terminal/models/storage.py:29 terminal/models/storage.py:96
 #: terminal/models/terminal.py:114 tickets/models/ticket.py:73
-#: users/models/group.py:16 users/models/user.py:568
+#: users/models/group.py:16 users/models/user.py:588
 #: xpack/plugins/change_auth_plan/models.py:77 xpack/plugins/cloud/models.py:35
 #: xpack/plugins/cloud/models.py:98 xpack/plugins/gathered_user/models.py:26
 msgid "Comment"
@@ -98,8 +98,9 @@ msgstr "动作"
 #: perms/models/base.py:50 templates/index.html:78
 #: terminal/backends/command/models.py:18
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:38
-#: tickets/models/comment.py:17 users/models/user.py:164
-#: users/models/user.py:712 users/serializers/group.py:20
+#: tickets/models/comment.py:17 users/models/user.py:184
+#: users/models/user.py:733 users/models/user.py:759
+#: users/serializers/group.py:20
 #: users/templates/users/user_asset_permission.html:38
 #: users/templates/users/user_asset_permission.html:64
 #: users/templates/users/user_database_app_permission.html:37
@@ -137,7 +138,7 @@ msgstr "资产"
 msgid "Reviewers"
 msgstr "审批人"
 
-#: acls/models/login_asset_acl.py:86 tickets/const.py:12
+#: acls/models/login_asset_acl.py:89 tickets/const.py:12
 msgid "Login asset confirm"
 msgstr "登录资产复核"
 
@@ -179,7 +180,7 @@ msgstr "格式为逗号分隔的字符串, * 表示匹配所有. "
 #: applications/serializers/attrs/application_type/vmware_client.py:26
 #: assets/models/base.py:251 assets/models/gathered_user.py:15
 #: audits/models.py:100 authentication/forms.py:15 authentication/forms.py:17
-#: ops/models/adhoc.py:148 users/forms/profile.py:31 users/models/user.py:533
+#: ops/models/adhoc.py:148 users/forms/profile.py:31 users/models/user.py:553
 #: users/templates/users/_select_user_modal.html:14
 #: xpack/plugins/change_auth_plan/models.py:47
 #: xpack/plugins/change_auth_plan/models.py:278
@@ -315,7 +316,7 @@ msgstr "目标URL"
 #: applications/serializers/attrs/application_type/mysql_workbench.py:34
 #: applications/serializers/attrs/application_type/vmware_client.py:30
 #: assets/models/base.py:252 assets/serializers/asset_user.py:71
-#: audits/signals_handler.py:46 authentication/forms.py:22
+#: audits/signals_handler.py:58 authentication/forms.py:22
 #: authentication/templates/authentication/login.html:155
 #: settings/serializers/settings.py:93 users/forms/profile.py:21
 #: users/templates/users/user_otp_check_password.html:13
@@ -482,7 +483,7 @@ msgstr "标签管理"
 #: assets/models/cluster.py:28 assets/models/cmd_filter.py:26
 #: assets/models/cmd_filter.py:67 assets/models/group.py:21
 #: common/db/models.py:70 common/mixins/models.py:49 orgs/models.py:24
-#: orgs/models.py:422 perms/models/base.py:55 users/models/user.py:576
+#: orgs/models.py:422 perms/models/base.py:55 users/models/user.py:596
 #: users/serializers/group.py:35 xpack/plugins/change_auth_plan/models.py:81
 #: xpack/plugins/cloud/models.py:104 xpack/plugins/gathered_user/models.py:30
 msgid "Created by"
@@ -496,7 +497,7 @@ msgstr "创建者"
 #: assets/models/label.py:25 common/db/models.py:72 common/mixins/models.py:50
 #: ops/models/adhoc.py:38 ops/models/command.py:29 orgs/models.py:25
 #: orgs/models.py:420 perms/models/base.py:56 users/models/group.py:18
-#: xpack/plugins/cloud/models.py:107
+#: users/models/user.py:760 xpack/plugins/cloud/models.py:107
 msgid "Date created"
 msgstr "创建日期"
 
@@ -542,7 +543,7 @@ msgstr "带宽"
 msgid "Contact"
 msgstr "联系人"
 
-#: assets/models/cluster.py:22 users/models/user.py:554
+#: assets/models/cluster.py:22 users/models/user.py:574
 msgid "Phone"
 msgstr "手机"
 
@@ -568,7 +569,7 @@ msgid "Default"
 msgstr "默认"
 
 #: assets/models/cluster.py:36 assets/models/label.py:14
-#: users/models/user.py:724
+#: users/models/user.py:745
 msgid "System"
 msgstr "系统"
 
@@ -661,7 +662,7 @@ msgstr "新节点"
 msgid "empty"
 msgstr "空"
 
-#: assets/models/node.py:546 perms/models/asset_permission.py:156
+#: assets/models/node.py:546 perms/models/asset_permission.py:176
 msgid "Key"
 msgstr "键"
 
@@ -669,7 +670,7 @@ msgstr "键"
 msgid "Full value"
 msgstr "全称"
 
-#: assets/models/node.py:551 perms/models/asset_permission.py:157
+#: assets/models/node.py:551 perms/models/asset_permission.py:177
 msgid "Parent key"
 msgstr "ssh私钥"
 
@@ -786,7 +787,7 @@ msgstr "网域名称"
 msgid "Admin user name"
 msgstr "管理用户名称"
 
-#: assets/serializers/asset.py:71
+#: assets/serializers/asset.py:71 perms/serializers/asset/permission.py:47
 msgid "Nodes name"
 msgstr "节点名称"
 
@@ -813,11 +814,11 @@ msgid "Backend"
 msgstr "后端"
 
 #: assets/serializers/asset_user.py:75 users/forms/profile.py:160
-#: users/models/user.py:565 users/templates/users/user_password_update.html:48
+#: users/models/user.py:585 users/templates/users/user_password_update.html:48
 msgid "Public key"
 msgstr "SSH公钥"
 
-#: assets/serializers/asset_user.py:79 users/models/user.py:562
+#: assets/serializers/asset_user.py:79 users/models/user.py:582
 msgid "Private key"
 msgstr "ssh私钥"
 
@@ -839,7 +840,7 @@ msgstr "网关数量"
 
 #: assets/serializers/label.py:13 assets/serializers/system_user.py:45
 #: assets/serializers/system_user.py:166
-#: perms/serializers/asset/permission.py:66
+#: perms/serializers/asset/permission.py:72
 msgid "Assets amount"
 msgstr "资产数量"
 
@@ -861,7 +862,7 @@ msgid "The same level node name cannot be the same"
 msgstr "同级别节点名字不能重复"
 
 #: assets/serializers/system_user.py:44 assets/serializers/system_user.py:165
-#: perms/serializers/asset/permission.py:67
+#: perms/serializers/asset/permission.py:73
 msgid "Nodes amount"
 msgstr "节点数量"
 
@@ -1126,8 +1127,8 @@ msgstr "用户代理"
 #: audits/models.py:105
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
 #: authentication/templates/authentication/login_otp.html:6
-#: users/forms/profile.py:64 users/models/user.py:557
-#: users/serializers/profile.py:99
+#: users/forms/profile.py:64 users/models/user.py:577
+#: users/serializers/profile.py:104
 msgid "MFA"
 msgstr "多因子认证"
 
@@ -1195,11 +1196,11 @@ msgstr "运行用户（显示名称）"
 msgid "User for display"
 msgstr "用户（显示名称）"
 
-#: audits/signals_handler.py:45
+#: audits/signals_handler.py:57
 msgid "SSH Key"
 msgstr "SSH 密钥"
 
-#: audits/signals_handler.py:47
+#: audits/signals_handler.py:59
 msgid "SSO"
 msgstr ""
 
@@ -1359,15 +1360,15 @@ msgstr "来源 IP 不被允许登录"
 msgid "SSO auth closed"
 msgstr "SSO 认证关闭了"
 
-#: authentication/errors.py:271 authentication/views/login.py:236
+#: authentication/errors.py:271 authentication/views/login.py:237
 msgid "Your password is too simple, please change it for security"
 msgstr "你的密码过于简单，为了安全，请修改"
 
-#: authentication/errors.py:280 authentication/views/login.py:251
-msgid "The administrator require you to change your password this time"
-msgstr "管理员要求您本次修改密码"
+#: authentication/errors.py:280 authentication/views/login.py:252
+msgid "You should to change your password before login"
+msgstr "登录完成前，请先修改密码"
 
-#: authentication/errors.py:289 authentication/views/login.py:266
+#: authentication/errors.py:289 authentication/views/login.py:268
 msgid "Your password has expired, please reset before logging in"
 msgstr "您的密码已过期，先修改再登录"
 
@@ -1414,13 +1415,13 @@ msgid "Show"
 msgstr "显示"
 
 #: authentication/templates/authentication/_access_key_modal.html:66
-#: users/models/user.py:450 users/serializers/profile.py:96
+#: users/models/user.py:470 users/serializers/profile.py:101
 #: users/templates/users/user_verify_mfa.html:32
 msgid "Disable"
 msgstr "禁用"
 
 #: authentication/templates/authentication/_access_key_modal.html:67
-#: users/models/user.py:451 users/serializers/profile.py:97
+#: users/models/user.py:471 users/serializers/profile.py:102
 msgid "Enable"
 msgstr "启用"
 
@@ -1452,6 +1453,7 @@ msgid "Need MFA for view auth"
 msgstr "需要多因子认证来查看账号信息"
 
 #: authentication/templates/authentication/_mfa_confirm_modal.html:20
+#: authentication/views/login.py:256 authentication/views/login.py:272
 #: templates/_modal.html:23 users/templates/users/user_password_verify.html:20
 msgid "Confirm"
 msgstr "确认"
@@ -1517,7 +1519,7 @@ msgid "Copy link"
 msgstr "复制链接"
 
 #: authentication/templates/authentication/login_wait_confirm.html:51
-#: templates/flash_message_standalone.html:34
+#: templates/flash_message_standalone.html:38
 msgid "Return"
 msgstr "返回"
 
@@ -1525,11 +1527,11 @@ msgstr "返回"
 msgid "Copy success"
 msgstr "复制成功"
 
-#: authentication/views/login.py:57
+#: authentication/views/login.py:58
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: authentication/views/login.py:182
+#: authentication/views/login.py:183
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -1537,19 +1539,20 @@ msgstr ""
 "等待 <b>{}</b> 确认, 你也可以复制链接发给他/她 <br/>\n"
 "                  不要关闭本页面"
 
-#: authentication/views/login.py:187
+#: authentication/views/login.py:188
 msgid "No ticket found"
 msgstr "没有发现工单"
 
-#: authentication/views/login.py:219
+#: authentication/views/login.py:220
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: authentication/views/login.py:220
+#: authentication/views/login.py:221
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
-#: authentication/views/login.py:235 authentication/views/login.py:250
+#: authentication/views/login.py:236 authentication/views/login.py:251
+#: authentication/views/login.py:267
 msgid "Please change your password"
 msgstr "请修改密码"
 
@@ -1599,6 +1602,10 @@ msgstr ""
 #: common/exceptions.py:41
 msgid "Is referenced by other objects and cannot be deleted"
 msgstr "被其他对象关联，不能删除"
+
+#: common/exceptions.py:47
+msgid "This action require verify your MFA"
+msgstr ""
 
 #: common/fields/model.py:80
 msgid "Marshal dict data to char field"
@@ -1873,7 +1880,7 @@ msgstr "组织审计员"
 msgid "GLOBAL"
 msgstr "全局组织"
 
-#: orgs/models.py:419 users/models/user.py:545
+#: orgs/models.py:419 users/models/user.py:565
 #: users/templates/users/_select_user_modal.html:15
 msgid "Role"
 msgstr "角色"
@@ -1886,7 +1893,7 @@ msgstr "管理员正在修改授权，请稍等"
 msgid "The authorization cannot be revoked for the time being"
 msgstr "该授权暂时不能撤销"
 
-#: perms/models/application_permission.py:27 users/models/user.py:165
+#: perms/models/application_permission.py:27 users/models/user.py:185
 msgid "Application"
 msgstr "应用程序"
 
@@ -1927,7 +1934,7 @@ msgid "Clipboard copy paste"
 msgstr "剪贴板复制粘贴"
 
 #: perms/models/asset_permission.py:102
-#: perms/serializers/asset/permission.py:63
+#: perms/serializers/asset/permission.py:69
 msgid "Actions"
 msgstr "动作"
 
@@ -1936,16 +1943,16 @@ msgstr "动作"
 msgid "Asset permission"
 msgstr "资产授权"
 
-#: perms/models/asset_permission.py:189
+#: perms/models/asset_permission.py:209
 msgid "Ungrouped"
 msgstr "未分组"
 
-#: perms/models/asset_permission.py:191
+#: perms/models/asset_permission.py:211
 msgid "Favorite"
 msgstr "收藏夹"
 
 #: perms/models/base.py:51 templates/_nav.html:21 users/models/group.py:31
-#: users/models/user.py:541 users/templates/users/_select_user_modal.html:16
+#: users/models/user.py:561 users/templates/users/_select_user_modal.html:16
 #: users/templates/users/user_asset_permission.html:39
 #: users/templates/users/user_asset_permission.html:67
 #: users/templates/users/user_database_app_permission.html:38
@@ -1958,7 +1965,7 @@ msgstr "用户组"
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:77
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:43
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:81
-#: users/models/user.py:573
+#: users/models/user.py:593
 msgid "Date expired"
 msgstr "失效日期"
 
@@ -1969,24 +1976,48 @@ msgid ""
 msgstr "应用列表中包含与授权类型不同的应用。({})"
 
 #: perms/serializers/asset/permission.py:43
-#: perms/serializers/asset/permission.py:61 users/serializers/user.py:34
+#: perms/serializers/asset/permission.py:67 users/serializers/user.py:34
 #: users/serializers/user.py:70
 msgid "Is expired"
 msgstr "是否过期"
 
-#: perms/serializers/asset/permission.py:62 users/serializers/user.py:69
+#: perms/serializers/asset/permission.py:44
+#, fuzzy
+#| msgid "Username"
+msgid "Users name"
+msgstr "用户名"
+
+#: perms/serializers/asset/permission.py:45
+#, fuzzy
+#| msgid "User groups amount"
+msgid "User groups name"
+msgstr "用户组数量"
+
+#: perms/serializers/asset/permission.py:46
+#, fuzzy
+#| msgid "Asset num"
+msgid "Assets name"
+msgstr "资产数量"
+
+#: perms/serializers/asset/permission.py:48
+#, fuzzy
+#| msgid "System users amount"
+msgid "System users name"
+msgstr "系统用户数量"
+
+#: perms/serializers/asset/permission.py:68 users/serializers/user.py:69
 msgid "Is valid"
 msgstr "账户是否有效"
 
-#: perms/serializers/asset/permission.py:64 users/serializers/group.py:36
+#: perms/serializers/asset/permission.py:70 users/serializers/group.py:36
 msgid "Users amount"
 msgstr "用户数量"
 
-#: perms/serializers/asset/permission.py:65
+#: perms/serializers/asset/permission.py:71
 msgid "User groups amount"
 msgstr "用户组数量"
 
-#: perms/serializers/asset/permission.py:68
+#: perms/serializers/asset/permission.py:74
 msgid "System users amount"
 msgstr "系统用户数量"
 
@@ -2198,7 +2229,9 @@ msgstr "密钥认证"
 msgid ""
 "Tips: If use other auth method, like AD/LDAP, you should disable this to "
 "avoid being able to log in after deleting"
-msgstr "提示：如果你使用其它认证方式，如 AD/LDAP，你应该禁用此项，以避免第三方系统删除后，还可以登录"
+msgstr ""
+"提示：如果你使用其它认证方式，如 AD/LDAP，你应该禁用此项，以避免第三方系统删"
+"除后，还可以登录"
 
 #: settings/serializers/settings.py:129
 msgid "List sort by"
@@ -2287,46 +2320,48 @@ msgstr ""
 "提示：（单位：天）如果用户在此期间没有更新密码，用户密码将过期失效； 密码过期"
 "提醒邮件将在密码过期前5天内由系统（每天）自动发送给用户"
 
-#: settings/serializers/settings.py:168
+#: settings/serializers/settings.py:172
 msgid "Number of repeated historical passwords"
 msgstr "历史密码可重复次数"
 
-#: settings/serializers/settings.py:169
+#: settings/serializers/settings.py:173
 msgid ""
 "Tip: When the user resets the password, it cannot be the previous n "
 "historical passwords of the user (the value of n here is the value filled in "
 "the input box)"
-msgstr "提示：用户重置密码时，不能为该用户前n次历史密码 (此处的n值即为输入框中填写的值)"
+msgstr ""
+"提示：用户重置密码时，不能为该用户前n次历史密码 (此处的n值即为输入框中填写的"
+"值)"
 
-#: settings/serializers/settings.py:173
+#: settings/serializers/settings.py:177
 msgid "Password minimum length"
 msgstr "密码最小长度"
 
-#: settings/serializers/settings.py:176
+#: settings/serializers/settings.py:180
 msgid "Must contain capital"
 msgstr "必须包含大写字符"
 
-#: settings/serializers/settings.py:178
+#: settings/serializers/settings.py:182
 msgid "Must contain lowercase"
 msgstr "必须包含小写字符"
 
-#: settings/serializers/settings.py:179
+#: settings/serializers/settings.py:183
 msgid "Must contain numeric"
 msgstr "必须包含数字"
 
-#: settings/serializers/settings.py:180
+#: settings/serializers/settings.py:184
 msgid "Must contain special"
 msgstr "必须包含特殊字符"
 
-#: settings/serializers/settings.py:181
+#: settings/serializers/settings.py:185
 msgid "Insecure command alert"
 msgstr "危险命令告警"
 
-#: settings/serializers/settings.py:183
+#: settings/serializers/settings.py:187
 msgid "Email recipient"
 msgstr "邮件收件人"
 
-#: settings/serializers/settings.py:184
+#: settings/serializers/settings.py:188
 msgid "Multiple user using , split"
 msgstr "多个用户，使用 , 分割"
 
@@ -2918,6 +2953,10 @@ msgstr "测试成功"
 #: terminal/api/storage.py:127
 msgid "Test failure: Account invalid"
 msgstr "测试失败: 账户无效"
+
+#: terminal/backends/command/es.py:27
+msgid "Invalid elasticsearch config"
+msgstr ""
 
 #: terminal/backends/command/models.py:14
 msgid "Ordinary"
@@ -3651,7 +3690,7 @@ msgstr "确认密码"
 msgid "Password does not match"
 msgstr "密码不一致"
 
-#: users/forms/profile.py:101 users/models/user.py:537
+#: users/forms/profile.py:101 users/models/user.py:557
 msgid "Email"
 msgstr "邮件"
 
@@ -3683,48 +3722,48 @@ msgstr "复制你的公钥到这里"
 msgid "Public key should not be the same as your old one."
 msgstr "不能和原来的密钥相同"
 
-#: users/forms/profile.py:149 users/serializers/profile.py:71
-#: users/serializers/profile.py:145 users/serializers/profile.py:158
+#: users/forms/profile.py:149 users/serializers/profile.py:76
+#: users/serializers/profile.py:150 users/serializers/profile.py:163
 msgid "Not a valid ssh public key"
 msgstr "SSH密钥不合法"
 
-#: users/models/user.py:162
+#: users/models/user.py:182
 msgid "System administrator"
 msgstr "系统管理员"
 
-#: users/models/user.py:163
+#: users/models/user.py:183
 msgid "System auditor"
 msgstr "系统审计员"
 
-#: users/models/user.py:452
+#: users/models/user.py:472
 msgid "Force enable"
 msgstr "强制启用"
 
-#: users/models/user.py:517
+#: users/models/user.py:537
 msgid "Local"
 msgstr "数据库"
 
-#: users/models/user.py:548
+#: users/models/user.py:568
 msgid "Avatar"
 msgstr "头像"
 
-#: users/models/user.py:551
+#: users/models/user.py:571
 msgid "Wechat"
 msgstr "微信"
 
-#: users/models/user.py:581
+#: users/models/user.py:601
 msgid "Source"
 msgstr "用户来源"
 
-#: users/models/user.py:585
+#: users/models/user.py:605
 msgid "Date password last updated"
 msgstr "最后更新密码日期"
 
-#: users/models/user.py:720
+#: users/models/user.py:741
 msgid "Administrator"
 msgstr "管理员"
 
-#: users/models/user.py:723
+#: users/models/user.py:744
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
@@ -3732,7 +3771,7 @@ msgstr "Administrator是初始的超级管理员"
 msgid "The old password is incorrect"
 msgstr "旧密码错误"
 
-#: users/serializers/profile.py:37 users/serializers/user.py:113
+#: users/serializers/profile.py:36 users/serializers/user.py:113
 msgid "Password does not match security rules"
 msgstr "密码不满足安全规则"
 
@@ -3744,7 +3783,7 @@ msgstr "新密码不能是最近 {} 次的密码"
 msgid "The newly set password is inconsistent"
 msgstr "两次密码不一致"
 
-#: users/serializers/profile.py:116 users/serializers/user.py:68
+#: users/serializers/profile.py:121 users/serializers/user.py:68
 msgid "Is first login"
 msgstr "首次登录"
 
@@ -3841,14 +3880,6 @@ msgstr "选择用户"
 #: users/templates/users/_select_user_modal.html:17
 msgid "Asset num"
 msgstr "资产数量"
-
-#: users/templates/users/_user.html:21
-msgid "Auth"
-msgstr "认证"
-
-#: users/templates/users/_user.html:27
-msgid "Security and Role"
-msgstr "角色安全"
 
 #: users/templates/users/_user_detail_nav_header.html:11
 msgid "User detail"
@@ -3967,229 +3998,6 @@ msgstr "包含"
 msgid "Exclude"
 msgstr "不包含"
 
-#: users/templates/users/user_bulk_update.html:8
-msgid "Select properties that need to be modified"
-msgstr "选择需要修改属性"
-
-#: users/templates/users/user_bulk_update.html:10
-msgid "Select all"
-msgstr "全选"
-
-#: users/templates/users/user_create.html:4
-#: users/templates/users/user_list.html:7
-msgid "Create user"
-msgstr "创建用户"
-
-#: users/templates/users/user_detail.html:80
-msgid "Force enabled"
-msgstr "强制启用"
-
-#: users/templates/users/user_detail.html:101
-#: users/templates/users/user_profile.html:106
-msgid "Date joined"
-msgstr "创建日期"
-
-#: users/templates/users/user_detail.html:105
-#: users/templates/users/user_profile.html:110
-msgid "Last login"
-msgstr "最后登录"
-
-#: users/templates/users/user_detail.html:110
-#: users/templates/users/user_profile.html:115
-msgid "Last password updated"
-msgstr "最后更新密码"
-
-#: users/templates/users/user_detail.html:126
-#: users/templates/users/user_profile.html:150
-msgid "Quick modify"
-msgstr "快速修改"
-
-#: users/templates/users/user_detail.html:148
-msgid "Force enabled MFA"
-msgstr "强制启用多因子认证"
-
-#: users/templates/users/user_detail.html:165
-msgid "Reset MFA"
-msgstr "重置多因子认证"
-
-#: users/templates/users/user_detail.html:174
-msgid "Send reset password mail"
-msgstr "发送重置密码邮件"
-
-#: users/templates/users/user_detail.html:177
-#: users/templates/users/user_detail.html:187
-msgid "Send"
-msgstr "发送"
-
-#: users/templates/users/user_detail.html:184
-msgid "Send reset ssh key mail"
-msgstr "发送重置密钥邮件"
-
-#: users/templates/users/user_detail.html:193
-#: users/templates/users/user_detail.html:490
-msgid "Unblock user"
-msgstr "解除登录限制"
-
-#: users/templates/users/user_detail.html:196
-msgid "Unblock"
-msgstr "解除"
-
-#: users/templates/users/user_detail.html:217
-msgid "Join user groups"
-msgstr "添加到用户组"
-
-#: users/templates/users/user_detail.html:226
-msgid "Join"
-msgstr "加入"
-
-#: users/templates/users/user_detail.html:356
-#: users/templates/users/user_detail.html:383
-msgid "Update successfully!"
-msgstr "更新成功"
-
-#: users/templates/users/user_detail.html:365
-msgid "Goto profile page enable MFA"
-msgstr "请去个人信息页面启用自己的多因子认证"
-
-#: users/templates/users/user_detail.html:401
-msgid "An e-mail has been sent to the user`s mailbox."
-msgstr "已发送邮件到用户邮箱"
-
-#: users/templates/users/user_detail.html:411
-#: users/templates/users/user_detail.html:437
-#: users/templates/users/user_detail.html:505
-#: users/templates/users/user_list.html:178
-msgid "Are you sure?"
-msgstr "你确认吗?"
-
-#: users/templates/users/user_detail.html:412
-msgid "This will reset the user password and send a reset mail"
-msgstr "将失效用户当前密码，并发送重设密码邮件到用户邮箱"
-
-#: users/templates/users/user_detail.html:415
-#: users/templates/users/user_detail.html:441
-#: users/templates/users/user_detail.html:509
-#: users/templates/users/user_list.html:182
-msgid "Cancel"
-msgstr "取消"
-
-#: users/templates/users/user_detail.html:427
-msgid ""
-"The reset-ssh-public-key E-mail has been sent successfully. Please inform "
-"the user to update his new ssh public key."
-msgstr "重设密钥邮件将会发送到用户邮箱"
-
-#: users/templates/users/user_detail.html:428
-msgid "Reset SSH public key"
-msgstr "重置SSH密钥"
-
-#: users/templates/users/user_detail.html:438
-msgid "This will reset the user public key and send a reset mail"
-msgstr "将会失效用户当前密钥，并发送重置邮件到用户邮箱"
-
-#: users/templates/users/user_detail.html:456
-msgid "Successfully updated the SSH public key."
-msgstr "更新SSH密钥成功"
-
-#: users/templates/users/user_detail.html:457
-#: users/templates/users/user_detail.html:461
-msgid "User SSH public key update"
-msgstr "SSH密钥"
-
-#: users/templates/users/user_detail.html:506
-msgid "After unlocking the user, the user can log in normally."
-msgstr "解除用户登录限制后，此用户即可正常登录"
-
-#: users/templates/users/user_detail.html:520
-msgid "Reset user MFA success"
-msgstr "重置用户多因子认证成功"
-
-#: users/templates/users/user_granted_remote_app.html:35
-msgid "App type"
-msgstr "应用类型"
-
-#: users/templates/users/user_group_detail.html:17
-#: users/templates/users/user_group_granted_asset.html:18
-msgid "User group detail"
-msgstr "用户组详情"
-
-#: users/templates/users/user_group_detail.html:81
-msgid "Add user"
-msgstr "添加用户"
-
-#: users/templates/users/user_group_detail.html:87
-msgid "Add"
-msgstr "添加"
-
-#: users/templates/users/user_group_list.html:7
-msgid "Create user group"
-msgstr "创建用户组"
-
-#: users/templates/users/user_list.html:30
-msgid "Delete selected"
-msgstr "批量删除"
-
-#: users/templates/users/user_list.html:32
-msgid "Remove selected"
-msgstr "批量移除"
-
-#: users/templates/users/user_list.html:34
-msgid "Update selected"
-msgstr "批量更新"
-
-#: users/templates/users/user_list.html:35
-msgid "Deactive selected"
-msgstr "禁用所选"
-
-#: users/templates/users/user_list.html:36
-msgid "Active selected"
-msgstr "激活所选"
-
-#: users/templates/users/user_list.html:106
-#: users/templates/users/user_list.html:110
-msgid "Remove"
-msgstr "移除"
-
-#: users/templates/users/user_list.html:179
-msgid "This will delete the selected users !!!"
-msgstr "删除选中用户 !!!"
-
-#: users/templates/users/user_list.html:190
-msgid "User Deleting failed."
-msgstr "用户删除失败"
-
-#: users/templates/users/user_list.html:191
-msgid "User Delete"
-msgstr "删除"
-
-#: users/templates/users/user_list.html:213
-msgid "This will remove the selected users !!"
-msgstr "移除选中用户 !!!"
-
-#: users/templates/users/user_list.html:215
-msgid "User Removing failed."
-msgstr "用户移除失败"
-
-#: users/templates/users/user_list.html:216
-msgid "User Remove"
-msgstr "移除"
-
-#: users/templates/users/user_list.html:265
-msgid "Are you sure about removing it?"
-msgstr "您确定移除吗?"
-
-#: users/templates/users/user_list.html:266
-msgid "Remove the success"
-msgstr "移除成功"
-
-#: users/templates/users/user_list.html:271
-msgid "User is expired"
-msgstr "用户已失效"
-
-#: users/templates/users/user_list.html:274
-msgid "User is inactive"
-msgstr "用户已禁用"
-
 #: users/templates/users/user_otp_check_password.html:6
 #: users/templates/users/user_verify_mfa.html:6
 msgid "Authenticate"
@@ -4242,64 +4050,6 @@ msgstr "重置"
 #: users/templates/users/user_password_verify.html:9
 msgid "Verify password"
 msgstr "校验密码"
-
-#: users/templates/users/user_profile.html:97
-msgid "Administrator Settings force MFA login"
-msgstr "管理员设置强制使用多因子认证"
-
-#: users/templates/users/user_profile.html:156
-msgid "Set MFA"
-msgstr "设置多因子认证"
-
-#: users/templates/users/user_profile.html:178
-msgid "Update MFA"
-msgstr "更改多因子认证"
-
-#: users/templates/users/user_profile.html:188
-msgid "Update password"
-msgstr "更改密码"
-
-#: users/templates/users/user_profile.html:198
-msgid "Update SSH public key"
-msgstr "更改SSH密钥"
-
-#: users/templates/users/user_profile.html:206
-msgid "Reset public key and download"
-msgstr "重置并下载SSH密钥"
-
-#: users/templates/users/user_pubkey_update.html:55
-msgid "Old public key"
-msgstr "原来SSH密钥"
-
-#: users/templates/users/user_pubkey_update.html:63
-msgid "Fingerprint"
-msgstr "指纹"
-
-#: users/templates/users/user_pubkey_update.html:69
-msgid "Update public key"
-msgstr "更新密钥"
-
-#: users/templates/users/user_pubkey_update.html:72
-msgid "Or reset by server"
-msgstr "或者重置并下载密钥"
-
-#: users/templates/users/user_pubkey_update.html:98
-msgid ""
-"The new public key has been set successfully, Please download the "
-"corresponding private key."
-msgstr "新的公钥已设置成功，请下载对应的私钥"
-
-#: users/templates/users/user_update.html:4
-msgid "Update user"
-msgstr "更新用户"
-
-#: users/templates/users/user_update.html:22 users/views/profile/reset.py:120
-msgid "User auth from {}, go there change password"
-msgstr "用户认证源来自 {}, 请去相应系统修改密码"
-
-#: users/templates/users/user_update.html:32
-msgid "User auth from {}, ssh key login is not supported"
-msgstr "用户认证源来自 {}, 不支持使用 SSH Key 登录"
 
 #: users/templates/users/user_verify_mfa.html:11
 msgid ""
@@ -4668,6 +4418,10 @@ msgstr "重置密码成功，返回到登录页面"
 #: users/views/profile/reset.py:105 users/views/profile/reset.py:115
 msgid "Token invalid or expired"
 msgstr "Token错误或失效"
+
+#: users/views/profile/reset.py:120
+msgid "User auth from {}, go there change password"
+msgstr "用户认证源来自 {}, 请去相应系统修改密码"
 
 #: users/views/profile/reset.py:133
 msgid "* The new password cannot be the last {} passwords"
@@ -5148,6 +4902,211 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "The administrator require you to change your password this time"
+#~ msgstr "管理员要求您本次修改密码"
+
+#~ msgid "Auth"
+#~ msgstr "认证"
+
+#~ msgid "Security and Role"
+#~ msgstr "角色安全"
+
+#~ msgid "Select properties that need to be modified"
+#~ msgstr "选择需要修改属性"
+
+#~ msgid "Select all"
+#~ msgstr "全选"
+
+#~ msgid "Create user"
+#~ msgstr "创建用户"
+
+#~ msgid "Force enabled"
+#~ msgstr "强制启用"
+
+#~ msgid "Date joined"
+#~ msgstr "创建日期"
+
+#~ msgid "Last login"
+#~ msgstr "最后登录"
+
+#~ msgid "Last password updated"
+#~ msgstr "最后更新密码"
+
+#~ msgid "Quick modify"
+#~ msgstr "快速修改"
+
+#~ msgid "Force enabled MFA"
+#~ msgstr "强制启用多因子认证"
+
+#~ msgid "Reset MFA"
+#~ msgstr "重置多因子认证"
+
+#~ msgid "Send reset password mail"
+#~ msgstr "发送重置密码邮件"
+
+#~ msgid "Send"
+#~ msgstr "发送"
+
+#~ msgid "Send reset ssh key mail"
+#~ msgstr "发送重置密钥邮件"
+
+#~ msgid "Unblock user"
+#~ msgstr "解除登录限制"
+
+#~ msgid "Unblock"
+#~ msgstr "解除"
+
+#~ msgid "Join user groups"
+#~ msgstr "添加到用户组"
+
+#~ msgid "Join"
+#~ msgstr "加入"
+
+#~ msgid "Update successfully!"
+#~ msgstr "更新成功"
+
+#~ msgid "Goto profile page enable MFA"
+#~ msgstr "请去个人信息页面启用自己的多因子认证"
+
+#~ msgid "An e-mail has been sent to the user`s mailbox."
+#~ msgstr "已发送邮件到用户邮箱"
+
+#~ msgid "Are you sure?"
+#~ msgstr "你确认吗?"
+
+#~ msgid "This will reset the user password and send a reset mail"
+#~ msgstr "将失效用户当前密码，并发送重设密码邮件到用户邮箱"
+
+#~ msgid "Cancel"
+#~ msgstr "取消"
+
+#~ msgid ""
+#~ "The reset-ssh-public-key E-mail has been sent successfully. Please inform "
+#~ "the user to update his new ssh public key."
+#~ msgstr "重设密钥邮件将会发送到用户邮箱"
+
+#~ msgid "Reset SSH public key"
+#~ msgstr "重置SSH密钥"
+
+#~ msgid "This will reset the user public key and send a reset mail"
+#~ msgstr "将会失效用户当前密钥，并发送重置邮件到用户邮箱"
+
+#~ msgid "Successfully updated the SSH public key."
+#~ msgstr "更新SSH密钥成功"
+
+#~ msgid "User SSH public key update"
+#~ msgstr "SSH密钥"
+
+#~ msgid "After unlocking the user, the user can log in normally."
+#~ msgstr "解除用户登录限制后，此用户即可正常登录"
+
+#~ msgid "Reset user MFA success"
+#~ msgstr "重置用户多因子认证成功"
+
+#~ msgid "App type"
+#~ msgstr "应用类型"
+
+#~ msgid "User group detail"
+#~ msgstr "用户组详情"
+
+#~ msgid "Add user"
+#~ msgstr "添加用户"
+
+#~ msgid "Add"
+#~ msgstr "添加"
+
+#~ msgid "Create user group"
+#~ msgstr "创建用户组"
+
+#~ msgid "Delete selected"
+#~ msgstr "批量删除"
+
+#~ msgid "Remove selected"
+#~ msgstr "批量移除"
+
+#~ msgid "Update selected"
+#~ msgstr "批量更新"
+
+#~ msgid "Deactive selected"
+#~ msgstr "禁用所选"
+
+#~ msgid "Active selected"
+#~ msgstr "激活所选"
+
+#~ msgid "Remove"
+#~ msgstr "移除"
+
+#~ msgid "This will delete the selected users !!!"
+#~ msgstr "删除选中用户 !!!"
+
+#~ msgid "User Deleting failed."
+#~ msgstr "用户删除失败"
+
+#~ msgid "User Delete"
+#~ msgstr "删除"
+
+#~ msgid "This will remove the selected users !!"
+#~ msgstr "移除选中用户 !!!"
+
+#~ msgid "User Removing failed."
+#~ msgstr "用户移除失败"
+
+#~ msgid "User Remove"
+#~ msgstr "移除"
+
+#~ msgid "Are you sure about removing it?"
+#~ msgstr "您确定移除吗?"
+
+#~ msgid "Remove the success"
+#~ msgstr "移除成功"
+
+#~ msgid "User is expired"
+#~ msgstr "用户已失效"
+
+#~ msgid "User is inactive"
+#~ msgstr "用户已禁用"
+
+#~ msgid "Administrator Settings force MFA login"
+#~ msgstr "管理员设置强制使用多因子认证"
+
+#~ msgid "Set MFA"
+#~ msgstr "设置多因子认证"
+
+#~ msgid "Update MFA"
+#~ msgstr "更改多因子认证"
+
+#~ msgid "Update password"
+#~ msgstr "更改密码"
+
+#~ msgid "Update SSH public key"
+#~ msgstr "更改SSH密钥"
+
+#~ msgid "Reset public key and download"
+#~ msgstr "重置并下载SSH密钥"
+
+#~ msgid "Old public key"
+#~ msgstr "原来SSH密钥"
+
+#~ msgid "Fingerprint"
+#~ msgstr "指纹"
+
+#~ msgid "Update public key"
+#~ msgstr "更新密钥"
+
+#~ msgid "Or reset by server"
+#~ msgstr "或者重置并下载密钥"
+
+#~ msgid ""
+#~ "The new public key has been set successfully, Please download the "
+#~ "corresponding private key."
+#~ msgstr "新的公钥已设置成功，请下载对应的私钥"
+
+#~ msgid "Update user"
+#~ msgstr "更新用户"
+
+#~ msgid "User auth from {}, ssh key login is not supported"
+#~ msgstr "用户认证源来自 {}, 不支持使用 SSH Key 登录"
 
 #~ msgid "(Domain name support)"
 #~ msgstr "(支持域名)"

@@ -233,7 +233,6 @@ class AuthMixin:
             )
             raise errors.PasswdNeedUpdate(url)
 
-
     @classmethod
     def _check_password_require_reset_or_not(cls, user: User):
         if user.password_has_expired:
