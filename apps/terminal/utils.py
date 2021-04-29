@@ -34,6 +34,10 @@ def find_session_replay_local(session):
 def download_session_replay(session):
     session_path = session.get_rel_replay_path()  # 存在外部存储上的路径
     local_path = session.get_local_path()
+    return download_file(session_path, local_path)
+
+
+def download_file(remote_path, local_path):
     replay_storages = ReplayStorage.objects.all()
     configs = {
         storage.name: storage.config
@@ -52,9 +56,9 @@ def download_session_replay(session):
     if not os.path.isdir(target_dir):
         os.makedirs(target_dir, exist_ok=True)
     storage = jms_storage.get_multi_object_storage(configs)
-    ok, err = storage.download(session_path, target_path)
+    ok, err = storage.download(remote_path, target_path)
     if not ok:
-        msg = "Failed download replay file: {}".format(err)
+        msg = "Failed download file from {} to {}: {}".format(remote_path, target_path, err)
         logger.error(msg)
         return None, msg
     url = default_storage.url(local_path)
