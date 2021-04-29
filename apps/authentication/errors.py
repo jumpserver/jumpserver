@@ -277,7 +277,7 @@ class PasswdTooSimple(JMSException):
 
 class PasswdNeedUpdate(JMSException):
     default_code = 'passwd_need_update'
-    default_detail = _('The administrator require you to change your password this time')
+    default_detail = _('You should to change your password before login')
 
     def __init__(self, url, *args, **kwargs):
         super().__init__(*args, **kwargs)
