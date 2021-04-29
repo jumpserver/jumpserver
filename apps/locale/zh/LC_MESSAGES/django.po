@@ -2344,6 +2344,10 @@ msgstr ""
 msgid "Password minimum length"
 msgstr "密码最小长度"
 
+#: settings/serializers/settings.py:178
+msgid "Admin user password minimum length"
+msgstr "系统管理员密码最小长度"
+
 #: settings/serializers/settings.py:180
 msgid "Must contain capital"
 msgstr "必须包含大写字符"
