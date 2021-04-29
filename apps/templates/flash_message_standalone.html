@@ -31,7 +31,13 @@
         {% endif %}
         <div class="row">
             <div class="col-lg-3">
-                <a href="{{ redirect_url }}" class="btn btn-primary block full-width m-b">{% trans 'Return' %}</a>
+                <a href="{{ redirect_url }}" class="btn btn-primary block full-width m-b">
+                    {% if confirm_button %}
+                        {{ confirm_button }}
+                    {% else %}
+                        {% trans 'Return' %}
+                    {% endif %}
+                </a>
             </div>
         </div>
     </div>
