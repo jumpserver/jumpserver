@@ -8,6 +8,7 @@ from users.models import User
 from assets.models import Asset, SystemUser, Gateway
 from applications.models import Application
 from users.serializers import UserProfileSerializer
+from assets.serializers import ProtocolsField
 from perms.serializers.asset.permission import ActionsField
 from .models import AccessKey, LoginConfirmSetting, SSOToken
 
@@ -150,9 +151,11 @@ class ConnectionTokenUserSerializer(serializers.ModelSerializer):
 
 
 class ConnectionTokenAssetSerializer(serializers.ModelSerializer):
+    protocols = ProtocolsField(label='Protocols', read_only=True)
+
     class Meta:
         model = Asset
-        fields = ['id', 'hostname', 'ip', 'port', 'org_id']
+        fields = ['id', 'hostname', 'ip', 'protocols', 'org_id']
 
 
 class ConnectionTokenSystemUserSerializer(serializers.ModelSerializer):
