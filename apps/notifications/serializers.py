@@ -7,10 +7,11 @@ class SubscriptionSerializer(BulkModelSerializer):
 
     class Meta:
         model = Subscription
-        fields = ('id', 'users', 'groups', 'messages', 'receive_backends')
+        fields = ('id', 'users', 'groups', 'messages', 'receive_backends', 'receivers')
         extra_kwargs = {
             'groups': {'required': False, 'allow_empty': True},
-            'users': {'required': False, 'allow_empty': True}
+            'users': {'required': False, 'allow_empty': True},
+            'receive_backends': {'required': True, 'allow_empty': True},
         }
 
 
@@ -54,9 +55,11 @@ class SubscriptionBackendRelationSerializer(BulkModelSerializer):
 
 
 class BackendSerializer(BulkModelSerializer):
+    name_display = serializers.CharField(source='get_name_display')
+
     class Meta:
         model = Backend
-        fields = ('id', 'name',)
+        fields = ('id', 'name', 'name_display')
 
 
 class MessageSerializer(BulkModelSerializer):

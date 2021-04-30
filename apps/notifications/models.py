@@ -66,3 +66,12 @@ class Subscription(models.Model):
     @property
     def receive_backends_amount(self):
         return self.receive_backends.count()
+
+    @property
+    def receivers(self):
+        receivers = [str(user) for user in self.users.all()]
+
+        for group in self.groups.all():
+            for user in group.users.all():
+                receivers.append(str(user))
+        return receivers

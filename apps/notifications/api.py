@@ -15,7 +15,6 @@ class SubscriptionViewSet(JMSBulkModelViewSet):
     serializer_class = SubscriptionSerializer
     serializer_classes = {
         'default': SubscriptionSerializer,
-        'list': SubscriptionListSerializer
     }
 
 

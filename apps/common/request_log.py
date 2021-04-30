@@ -9,9 +9,7 @@ class RequestLogMiddleware:
         self.get_response = get_response
 
     def __call__(self, request: HttpRequest):
-        # print(f'guohao request {request.method} --> ', request.get_raw_uri(), request.body)
-        print(f'guohao request {request.method} --> ', request.get_raw_uri())
+        print(f'Request {request.method} --> ', request.get_raw_uri())
         response: HttpResponse = self.get_response(request)
-        # print(f'guohao response {current_org.name} {request.method} {response.status_code} --> ', request.get_raw_uri(), response.content)
-        print(f'guohao response {current_org.name} {request.method} {response.status_code} --> ', request.get_raw_uri())
+        print(f'Response {current_org.name} {request.method} {response.status_code} --> ', request.get_raw_uri())
         return response
