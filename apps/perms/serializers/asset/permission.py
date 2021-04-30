@@ -91,24 +91,23 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
                 data['system_users'].append(system_user.id)
         return super().to_internal_value(data)
 
-
     def perform_display_create(self, instance, **kwargs):
         # 用户
         users_to_set = User.objects.filter(
             Q(name__in=kwargs.get('users_display')) | Q(username__in=kwargs.get('users_display'))
         ).distinct()
-        instance.users.add(users_to_set)
+        instance.users.add(*users_to_set)
         # 用户组
         user_groups_to_set = UserGroup.objects.filter(name__in=kwargs.get('user_groups_display')).distinct()
-        instance.user_groups.add(user_groups_to_set)
+        instance.user_groups.add(*user_groups_to_set)
         # 资产
         assets_to_set = Asset.objects.filter(
             Q(ip__in=kwargs.get('assets_display')) | Q(hostname__in=kwargs.get('assets_display'))
         ).distinct()
-        instance.assets.add(assets_to_set)
+        instance.assets.add(*assets_to_set)
         # 节点
         nodes_to_set = Node.objects.filter(full_value__in=kwargs.get('nodes_display')).distinct()
-        instance.nodes.add(nodes_to_set)
+        instance.nodes.add(*nodes_to_set)
 
     def create(self, validated_data):
         display = {
