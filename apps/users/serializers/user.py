@@ -51,7 +51,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         # small 指的是 不需要计算的直接能从一张表中获取到的数据
         fields_small = fields_mini + fields_write_only + [
             'email', 'wechat', 'phone', 'mfa_level',
-            'source', 'source_display',
+            'source', 'source_display', 'can_public_key_auth', 'need_update_password',
             'mfa_enabled', 'is_valid', 'is_expired', 'is_active',  # 布尔字段
             'date_expired', 'date_joined', 'last_login',  # 日期字段
             'created_by', 'comment',  # 通用字段
