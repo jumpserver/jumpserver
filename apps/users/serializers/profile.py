@@ -32,7 +32,7 @@ class UserUpdatePasswordSerializer(serializers.ModelSerializer):
 
     def validate_new_password(self, value):
         from ..utils import check_password_rules
-        if not check_password_rules(value):
+        if not check_password_rules(value, self.instance.is_superuser):
             msg = _('Password does not match security rules')
             raise serializers.ValidationError(msg)
         if self.instance.is_history_password(value):
