@@ -8,20 +8,18 @@ from rest_framework import viewsets
 from rest_framework import generics
 from rest_framework.fields import DateTimeField
 from rest_framework.response import Response
-from rest_framework.decorators import action
 from django.template import loader
 
-from common.http import is_true
-from terminal.models import CommandStorage, Command
+from terminal.models import CommandStorage
 from terminal.filters import CommandFilter
 from orgs.utils import current_org
 from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor, IsAppUser
-from common.const.http import GET
 from common.drf.api import JMSBulkModelViewSet
 from common.utils import get_logger
 from terminal.utils import send_command_alert_mail
 from terminal.serializers import InsecureCommandAlertSerializer
 from terminal.exceptions import StorageInvalid
+from terminal.notifications import CommandAlertMessage
 from ..backends import (
     get_command_storage, get_multi_command_storage,
     SessionCommandSerializer,
@@ -212,4 +210,5 @@ class InsecureCommandAlertAPI(generics.CreateAPIView):
                     settings.SECURITY_INSECURE_COMMAND and \
                     settings.SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER:
                 send_command_alert_mail(command)
+                CommandAlertMessage.publish_async(command=command)
         return Response()

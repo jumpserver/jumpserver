@@ -125,7 +125,9 @@ class PublicSettingApi(generics.RetrieveAPIView):
                     'SECURITY_PASSWORD_LOWER_CASE': settings.SECURITY_PASSWORD_LOWER_CASE,
                     'SECURITY_PASSWORD_NUMBER': settings.SECURITY_PASSWORD_NUMBER,
                     'SECURITY_PASSWORD_SPECIAL_CHAR': settings.SECURITY_PASSWORD_SPECIAL_CHAR,
-                }
+                },
+                "AUTH_WECOM": settings.AUTH_WECOM,
+                "AUTH_DINGTALK": settings.AUTH_DINGTALK,
             }
         }
         return instance
@@ -141,6 +143,8 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'ldap': serializers.LDAPSettingSerializer,
         'email': serializers.EmailSettingSerializer,
         'email_content': serializers.EmailContentSettingSerializer,
+        'wecom': serializers.WeComSettingSerializer,
+        'dingtalk': serializers.DingTalkSettingSerializer,
     }
 
     def get_serializer_class(self):
