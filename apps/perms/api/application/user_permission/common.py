@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 #
-import uuid
+import time
+
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from rest_framework.views import APIView, Response
+from rest_framework import status
 from rest_framework.generics import (
     ListAPIView, get_object_or_404
 )
@@ -12,7 +14,8 @@ from orgs.utils import tmp_to_root_org
 from applications.models import Application
 from perms.utils.application.permission import (
     has_application_system_permission,
-    get_application_system_user_ids
+    get_application_system_user_ids,
+    validate_permission,
 )
 from perms.api.asset.user_permission.mixin import RoleAdminMixin, RoleUserMixin
 from common.permissions import IsOrgAdminOrAppUser
@@ -61,18 +64,13 @@ class ValidateUserApplicationPermissionApi(APIView):
         application_id = request.query_params.get('application_id', '')
         system_user_id = request.query_params.get('system_user_id', '')
 
-        try:
-            user_id = uuid.UUID(user_id)
-            application_id = uuid.UUID(application_id)
-            system_user_id = uuid.UUID(system_user_id)
-        except ValueError:
-            return Response({'msg': False}, status=403)
+        if not all((user_id, application_id, system_user_id)):
+            return Response({'has_permission': False, 'expire_at': int(time.time())})
 
-        user = get_object_or_404(User, id=user_id)
-        application = get_object_or_404(Application, id=application_id)
-        system_user = get_object_or_404(SystemUser, id=system_user_id)
+        user = User.objects.get(id=user_id)
+        application = Application.objects.get(id=application_id)
+        system_user = SystemUser.objects.get(id=system_user_id)
 
-        if has_application_system_permission(user, application, system_user):
-            return Response({'msg': True}, status=200)
-
-        return Response({'msg': False}, status=403)
+        has_permission, expire_at = validate_permission(user, application, system_user)
+        status_code = status.HTTP_200_OK if has_permission else status.HTTP_403_FORBIDDEN
+        return Response({'has_permission': has_permission, 'expire_at': int(expire_at)}, status=status_code)
