@@ -10,16 +10,16 @@ __all__ = ['AccountTypeSerializer']
 
 class PropertiesSerializer(serializers.Serializer):
     name = serializers.SlugField(max_length=128, required=True, label=_('Name'))
+    label = serializers.CharField(max_length=256, required=True, label=_('Label'))
     type = serializers.ChoiceField(
         choices=PropertyTypeChoices.choices, default=PropertyTypeChoices.str,
         label=_('Type')
     )
+    default = serializers.CharField(max_length=256, required=False, label=_('Default'))
+    help_text = serializers.CharField(max_length=2048, required=False, label=_('Help text'))
     required = serializers.BooleanField(default=False, label=_('Required'))
     read_only = serializers.BooleanField(default=False, label=_('Read only'))
     write_only = serializers.BooleanField(default=False, label=_('Write only'))
-    default = serializers.CharField(max_length=256, required=False, label=_('Default'))
-    label = serializers.CharField(max_length=256, required=True, label=_('Label'))
-    help_text = serializers.CharField(max_length=2048, required=False, label=_('Help text'))
 
 
 class AccountTypeSerializer(serializers.ModelSerializer):
