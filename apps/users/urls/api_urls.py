@@ -30,6 +30,7 @@ urlpatterns = [
     path('users/<uuid:pk>/pubkey/reset/', api.UserResetPKApi.as_view(), name='user-public-key-reset'),
     path('users/<uuid:pk>/pubkey/update/', api.UserUpdatePKApi.as_view(), name='user-public-key-update'),
     path('users/<uuid:pk>/unblock/', api.UserUnblockPKApi.as_view(), name='user-unblock'),
+    path('users/<uuid:pk>/permissions/', api.UserPermissionApi.as_view(), name='user-permissions'),
 ]
 urlpatterns += router.urls
 

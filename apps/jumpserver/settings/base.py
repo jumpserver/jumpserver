@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     'applications.apps.ApplicationsConfig',
     'tickets.apps.TicketsConfig',
     'acls.apps.AclsConfig',
+    'accounts.apps.AccountsConfig',
+    'rbac.apps.RbacConfig',
     'common.apps.CommonConfig',
     'jms_oidc_rp',
     'rest_framework',

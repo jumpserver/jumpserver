@@ -109,6 +109,7 @@ OTP_IN_RADIUS = CONFIG.OTP_IN_RADIUS
 
 AUTH_BACKEND_MODEL = 'django.contrib.auth.backends.ModelBackend'
 AUTH_BACKEND_PUBKEY = 'authentication.backends.pubkey.PublicKeyAuthBackend'
+AUTH_BACKEND_RBAC = 'rbac.backends.RBACBackend'
 AUTH_BACKEND_LDAP = 'authentication.backends.ldap.LDAPAuthorizationBackend'
 AUTH_BACKEND_OIDC_PASSWORD = 'jms_oidc_rp.backends.OIDCAuthPasswordBackend'
 AUTH_BACKEND_OIDC_CODE = 'jms_oidc_rp.backends.OIDCAuthCodeBackend'
@@ -128,6 +129,8 @@ if AUTH_RADIUS:
     AUTHENTICATION_BACKENDS.insert(0, AUTH_BACKEND_RADIUS)
 if AUTH_SSO:
     AUTHENTICATION_BACKENDS.append(AUTH_BACKEND_SSO)
+
+AUTHENTICATION_BACKENDS.insert(0, AUTH_BACKEND_RBAC)
 
 
 ONLY_ALLOW_EXIST_USER_AUTH = CONFIG.ONLY_ALLOW_EXIST_USER_AUTH

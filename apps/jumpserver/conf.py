@@ -250,6 +250,12 @@ class Config(dict):
         'SECURITY_INSECURE_COMMAND_LEVEL': 5,
         'SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER': '',
 
+        # accounts: Vault config
+        'VAULT_URL': 'http://127.0.0.1:8200',
+        'VAULT_TOKEN': 's.bFqwOo3zhLgdo3tBPz1xz4rI',
+        'VAULT_SECRETS_ENGINE_PATH': 'JumpServer',
+        'VAULT_SECRETS_MAX_VERSIONS': 20,
+
         'HTTP_BIND_HOST': '0.0.0.0',
         'HTTP_LISTEN_PORT': 8080,
         'WS_LISTEN_PORT': 8070,
