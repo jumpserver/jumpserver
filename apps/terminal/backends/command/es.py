@@ -34,7 +34,7 @@ class CommandStore():
         self.index = config.get("INDEX") or 'jumpserver'
         self.doc_type = config.get("DOC_TYPE") or 'command_store'
 
-        ignore_verify_certs = kwargs.pop('ignore_verify_certs', False)
+        ignore_verify_certs = kwargs.pop('IGNORE_VERIFY_CERTS', False)
         if ignore_verify_certs:
             kwargs['verify_certs'] = None
         self.es = Elasticsearch(hosts=hosts, max_retries=0, **kwargs)
