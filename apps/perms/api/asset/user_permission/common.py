@@ -1,22 +1,23 @@
 # -*- coding: utf-8 -*-
 #
 import uuid
+import time
 
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from rest_framework.views import APIView, Response
+from rest_framework import status
 from rest_framework.generics import (
     ListAPIView, get_object_or_404, RetrieveAPIView, DestroyAPIView
 )
 
 from orgs.utils import tmp_to_root_org
-from perms.utils.asset.permission import get_asset_system_user_ids_with_actions_by_user
+from perms.utils.asset.permission import get_asset_system_user_ids_with_actions_by_user, validate_permission
 from common.permissions import IsOrgAdminOrAppUser, IsOrgAdmin, IsValidUser
 from common.utils import get_logger, lazyproperty
 
 from perms.hands import User, Asset, SystemUser
 from perms import serializers
-from perms.models import Action
 
 logger = get_logger(__name__)
 
@@ -65,32 +66,22 @@ class ValidateUserAssetPermissionApi(APIView):
     def get_cache_policy(self):
         return 0
 
-    def get_user(self):
-        user_id = self.request.query_params.get('user_id', '')
-        user = get_object_or_404(User, id=user_id)
-        return user
-
     def get(self, request, *args, **kwargs):
+        user_id = self.request.query_params.get('user_id', '')
         asset_id = request.query_params.get('asset_id', '')
         system_id = request.query_params.get('system_user_id', '')
         action_name = request.query_params.get('action_name', '')
 
-        try:
-            asset_id = uuid.UUID(asset_id)
-            system_id = uuid.UUID(system_id)
-        except ValueError:
-            return Response({'msg': False}, status=403)
+        if not all((user_id, asset_id, system_id, action_name)):
+            return Response({'has_permission': False, 'expire_at': int(time.time())})
 
-        asset = get_object_or_404(Asset, id=asset_id, is_active=True)
-        system_user = get_object_or_404(SystemUser, id=system_id)
+        user = User.objects.get(id=user_id)
+        asset = Asset.objects.valid().get(id=asset_id)
+        system_user = SystemUser.objects.get(id=system_id)
 
-        system_users_actions = get_asset_system_user_ids_with_actions_by_user(self.get_user(), asset)
-        actions = system_users_actions.get(system_user.id)
-        if actions is None:
-            return Response({'msg': False}, status=403)
-        if action_name in Action.value_to_choices(actions):
-            return Response({'msg': True}, status=200)
-        return Response({'msg': False}, status=403)
+        has_permission, expire_at = validate_permission(user, asset, system_user, action_name)
+        status_code = status.HTTP_200_OK if has_permission else status.HTTP_403_FORBIDDEN
+        return Response({'has_permission': has_permission, 'expire_at': int(expire_at)}, status=status_code)
 
 
 # TODO 删除
