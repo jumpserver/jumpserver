@@ -216,8 +216,15 @@ class Config(dict):
         'AUTH_SSO': False,
         'AUTH_SSO_AUTHKEY_TTL': 60 * 15,
 
-        'AUTH_WECOM': True,
-        'AUTH_DINGTALK': True,
+        'AUTH_WECOM': False,
+        'WECOM_CORPID': '',
+        'WECOM_AGENTID': '',
+        'WECOM_CORPSECRET': '',
+
+        'AUTH_DINGTALK': False,
+        'DINGTALK_AGENTID': '',
+        'DINGTALK_APPKEY': '',
+        'DINGTALK_APPSECRET': '',
 
         'OTP_VALID_WINDOW': 2,
         'OTP_ISSUER_NAME': 'JumpServer',

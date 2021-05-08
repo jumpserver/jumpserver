@@ -117,6 +117,15 @@
             float: right;
             margin: 10px 10px 0 0;
         }
+        .more-login-item {
+            border-right: 1px dashed #dedede;
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+
+        .more-login-item:last-child {
+            border: none;
+        }
 
     </style>
 </head>
@@ -185,7 +194,7 @@
                         {% if AUTH_OPENID or AUTH_CAS or AUTH_WECOM or AUTH_DINGTALK %}
                             <div class="hr-line-dashed"></div>
                             <div style="display: inline-block; float: left">
-                                <b class="text-muted text-left" style="margin-right: 10px">{% trans "More login options" %}</b>
+                                <b class="text-muted text-left" >{% trans "More login options" %}</b>
                                 {% if AUTH_OPENID %}
                                     <a href="{% url 'authentication:openid:login' %}" class="more-login-item">
                                         <i class="fa fa-openid"></i> {% trans 'OpenID' %}
