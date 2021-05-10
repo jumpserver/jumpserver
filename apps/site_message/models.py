@@ -13,7 +13,7 @@ class SiteMessage(JMSBaseModel):
 
 
 class SiteMessageUsers(JMSBaseModel):
-    sitemessage = models.ForeignKey('site_message.SiteMessage', on_delete=models.CASCADE, db_constraint=False)
-    user = models.ForeignKey('users.User', on_delete=models.CASCADE, db_constraint=False)
+    sitemessage = models.ForeignKey('site_message.SiteMessage', on_delete=models.CASCADE, db_constraint=False, related_name='m2m_sitemessageusers')
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE, db_constraint=False, related_name='m2m_sitemessageusers')
     has_read = models.BooleanField(default=False)
     read_at = models.DateTimeField(default=datetime.min)
