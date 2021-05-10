@@ -1,5 +1,5 @@
 from django.db.models.signals import m2m_changed
-from django.db.models.signals import post_save, pre_delete
+from django.db.models.signals import post_save, pre_delete, pre_save
 from django.dispatch import receiver
 
 from orgs.models import Organization, OrganizationMember
@@ -7,6 +7,7 @@ from assets.models import Node
 from perms.models import (AssetPermission, ApplicationPermission)
 from users.models import UserGroup, User
 from applications.models import Application
+from terminal.models import Session
 from assets.models import Asset, AdminUser, SystemUser, Domain, Gateway
 from common.const.signals import POST_PREFIX
 from orgs.caches import OrgResourceStatisticsCache
@@ -47,16 +48,17 @@ def on_org_user_changed_refresh_cache(sender, action, instance, reverse, pk_set,
 
 class OrgResourceStatisticsRefreshUtil:
     model_cache_field_mapper = {
-        ApplicationPermission: 'app_perms_amount',
-        AssetPermission: 'asset_perms_amount',
-        Application: 'applications_amount',
-        Gateway: 'gateways_amount',
-        Domain: 'domains_amount',
-        SystemUser: 'system_users_amount',
-        AdminUser: 'admin_users_amount',
-        Node: 'nodes_amount',
-        Asset: 'assets_amount',
-        UserGroup: 'groups_amount',
+        ApplicationPermission: ['app_perms_amount'],
+        AssetPermission: ['asset_perms_amount'],
+        Application: ['applications_amount'],
+        Gateway: ['gateways_amount'],
+        Domain: ['domains_amount'],
+        SystemUser: ['system_users_amount'],
+        AdminUser: ['admin_users_amount'],
+        Node: ['nodes_amount'],
+        Asset: ['assets_amount'],
+        UserGroup: ['groups_amount'],
+        Session: ['total_count_online_users', 'total_count_online_sessions']
     }
 
     @classmethod
@@ -64,13 +66,12 @@ class OrgResourceStatisticsRefreshUtil:
         cache_field_name = cls.model_cache_field_mapper.get(type(instance))
         if cache_field_name:
             org_cache = OrgResourceStatisticsCache(instance.org)
-            org_cache.expire(cache_field_name)
+            org_cache.expire(*cache_field_name)
 
 
-@receiver(post_save)
-def on_post_save_refresh_org_resource_statistics_cache(sender, instance, created, **kwargs):
-    if created:
-        OrgResourceStatisticsRefreshUtil.refresh_if_need(instance)
+@receiver(pre_save)
+def on_post_save_refresh_org_resource_statistics_cache(sender, instance, **kwargs):
+    OrgResourceStatisticsRefreshUtil.refresh_if_need(instance)
 
 
 @receiver(pre_delete)

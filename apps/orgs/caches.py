@@ -6,11 +6,11 @@ from orgs.utils import current_org, tmp_to_org
 from common.cache import Cache, IntegerField
 from common.utils import get_logger
 from users.models import UserGroup, User
-from assets.models import Node, AdminUser, SystemUser, Domain, Gateway
+from assets.models import Node, AdminUser, SystemUser, Domain, Gateway, Asset
+from terminal.models import Session
 from applications.models import Application
 from perms.models import AssetPermission, ApplicationPermission
 from .models import OrganizationMember
-
 
 logger = get_logger(__file__)
 
@@ -64,6 +64,9 @@ class OrgResourceStatisticsCache(OrgRelatedCache):
     asset_perms_amount = IntegerField(queryset=AssetPermission.objects)
     app_perms_amount = IntegerField(queryset=ApplicationPermission.objects)
 
+    total_count_online_users = IntegerField()
+    total_count_online_sessions = IntegerField()
+
     def __init__(self, org):
         super().__init__()
         self.org = org
@@ -86,3 +89,9 @@ class OrgResourceStatisticsCache(OrgRelatedCache):
     def compute_assets_amount(self):
         node = Node.org_root()
         return node.assets_amount
+
+    def compute_total_count_online_users(self):
+        return len(set(Session.objects.filter(is_finished=False).values_list('user_id', flat=True)))
+
+    def compute_total_count_online_sessions(self):
+        return Session.objects.filter(is_finished=False).count()

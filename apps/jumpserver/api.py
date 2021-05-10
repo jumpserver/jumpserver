@@ -18,6 +18,7 @@ from terminal.utils import ComponentsPrometheusMetricsUtil
 from orgs.utils import current_org
 from common.permissions import IsOrgAdmin, IsOrgAuditor
 from common.utils import lazyproperty
+from orgs.caches import OrgResourceStatisticsCache
 
 __all__ = ['IndexApi']
 
@@ -210,26 +211,7 @@ class DatesLoginMetricMixin:
         return sessions
 
 
-class TotalCountMixin:
-    @staticmethod
-    def get_total_count_users():
-        return current_org.get_members().count()
-
-    @staticmethod
-    def get_total_count_assets():
-        return Asset.objects.all().count()
-
-    @staticmethod
-    def get_total_count_online_users():
-        count = len(set(Session.objects.filter(is_finished=False).values_list('user_id', flat=True)))
-        return count
-
-    @staticmethod
-    def get_total_count_online_sessions():
-        return Session.objects.filter(is_finished=False).count()
-
-
-class IndexApi(TotalCountMixin, DatesLoginMetricMixin, APIView):
+class IndexApi(DatesLoginMetricMixin, APIView):
     permission_classes = (IsOrgAdmin | IsOrgAuditor,)
     http_method_names = ['get']
 
@@ -238,26 +220,28 @@ class IndexApi(TotalCountMixin, DatesLoginMetricMixin, APIView):
 
         query_params = self.request.query_params
 
+        caches = OrgResourceStatisticsCache(self.request.user.user_orgs[0])
+
         _all = query_params.get('all')
 
         if _all or query_params.get('total_count') or query_params.get('total_count_users'):
             data.update({
-                'total_count_users': self.get_total_count_users(),
+                'total_count_users': caches.users_amount,
             })
 
         if _all or query_params.get('total_count') or query_params.get('total_count_assets'):
             data.update({
-                'total_count_assets': self.get_total_count_assets(),
+                'total_count_assets': caches.assets_amount,
             })
 
         if _all or query_params.get('total_count') or query_params.get('total_count_online_users'):
             data.update({
-                'total_count_online_users': self.get_total_count_online_users(),
+                'total_count_online_users': caches.total_count_online_users,
             })
 
         if _all or query_params.get('total_count') or query_params.get('total_count_online_sessions'):
             data.update({
-                'total_count_online_sessions': self.get_total_count_online_sessions(),
+                'total_count_online_sessions': caches.total_count_online_sessions,
             })
 
         if _all or query_params.get('dates_metrics'):
