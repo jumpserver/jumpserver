@@ -85,7 +85,7 @@ def get_user_unread_msgs_count(user_id):
     return site_msgs_count
 
 
-def read_msg(user_id, msg_id):
+def mark_msg_as_read(user_id, msg_id):
     _associate_msgs(user_id)
 
     sitemsg_user = SiteMessageUsers.objects.filter(user_id=user_id, sitemessage_id=msg_id).first()
@@ -97,6 +97,3 @@ def read_msg(user_id, msg_id):
         sitemsg_user.has_read = True
         sitemsg_user.read_at = now()
         sitemsg_user.save()
-
-
-
