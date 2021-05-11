@@ -6,9 +6,9 @@
 
 - [ENGLISH](https://github.com/jumpserver/jumpserver/blob/master/README_EN.md)
 
-|![notification](https://raw.githubusercontent.com/goharbor/website/master/docs/img/readme/bell-outline-badged.svg)安全通知|
+|《新一代堡垒机建设指南》开发下载|
 |------------------|
-|2021年1月15日 JumpServer 发现远程执行漏洞，请速度修复 [详见](https://github.com/jumpserver/jumpserver/issues/5533)， 非常感谢  **reactivity of Alibaba Hackerone bug bounty program**(瑞典) 向我们报告了此 BUG|
+|本白皮书由JumpServer开源项目组编著而成。编写团队从企业实践和技术演进的双重视角出发，结合自身在身份与访问安全领域长期研发及落地经验组织撰写，同时积极听取行业内专家的意见和建议，在此基础上完成了本白皮书的编写任务。下载链接：https://jinshuju.net/f/E0qAl8|
 
 --------------------------
 
