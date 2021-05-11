@@ -1,4 +1,3 @@
-from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.decorators import action
@@ -6,7 +5,6 @@ from rest_framework.decorators import action
 from common.permissions import IsValidUser
 from common.const.http import GET
 from common.drf.api import JmsGenericViewSet
-from .models import SiteMessage
 from .serializers import SiteMessageListSerializer, SiteMessageRetrieveSerializer
 from . import message
 
@@ -29,12 +27,6 @@ class SiteMessageViewSet(ListModelMixin, RetrieveModelMixin, JmsGenericViewSet):
         user = request.user
         msgs = message.get_user_unread_msgs(user.id)
         msgs = self.filter_queryset(msgs)
-        return self.get_paginated_response_with_query_set(msgs)
-
-    @action(methods=[GET], detail=False)
-    def all(self, request, **kwargs):
-        user = request.user
-        msgs = message.get_user_all_msgs(user.id)
         return self.get_paginated_response_with_query_set(msgs)
 
     @action(methods=[GET], detail=True)
