@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-12 12:00+0800\n"
+"POT-Creation-Date: 2021-05-13 15:51+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -25,7 +25,7 @@ msgstr ""
 #: orgs/models.py:23 perms/models/base.py:49 settings/models.py:29
 #: terminal/models/storage.py:23 terminal/models/storage.py:90
 #: terminal/models/task.py:16 terminal/models/terminal.py:100
-#: users/forms/profile.py:32 users/models/group.py:15 users/models/user.py:555
+#: users/forms/profile.py:32 users/models/group.py:15 users/models/user.py:558
 #: users/templates/users/_select_user_modal.html:13
 #: users/templates/users/user_asset_permission.html:37
 #: users/templates/users/user_asset_permission.html:154
@@ -61,7 +61,7 @@ msgstr "激活中"
 #: orgs/models.py:26 perms/models/base.py:57 settings/models.py:34
 #: terminal/models/storage.py:29 terminal/models/storage.py:96
 #: terminal/models/terminal.py:114 tickets/models/ticket.py:73
-#: users/models/group.py:16 users/models/user.py:588
+#: users/models/group.py:16 users/models/user.py:591
 #: xpack/plugins/change_auth_plan/models.py:77 xpack/plugins/cloud/models.py:35
 #: xpack/plugins/cloud/models.py:98 xpack/plugins/gathered_user/models.py:26
 msgid "Comment"
@@ -99,7 +99,7 @@ msgstr "动作"
 #: terminal/backends/command/models.py:18
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:38
 #: tickets/models/comment.py:17 users/models/user.py:184
-#: users/models/user.py:743 users/models/user.py:769
+#: users/models/user.py:746 users/models/user.py:772
 #: users/serializers/group.py:20
 #: users/templates/users/user_asset_permission.html:38
 #: users/templates/users/user_asset_permission.html:64
@@ -180,7 +180,7 @@ msgstr "格式为逗号分隔的字符串, * 表示匹配所有. "
 #: applications/serializers/attrs/application_type/vmware_client.py:26
 #: assets/models/base.py:251 assets/models/gathered_user.py:15
 #: audits/models.py:100 authentication/forms.py:15 authentication/forms.py:17
-#: ops/models/adhoc.py:148 users/forms/profile.py:31 users/models/user.py:553
+#: ops/models/adhoc.py:148 users/forms/profile.py:31 users/models/user.py:556
 #: users/templates/users/_select_user_modal.html:14
 #: xpack/plugins/change_auth_plan/models.py:47
 #: xpack/plugins/change_auth_plan/models.py:278
@@ -483,7 +483,7 @@ msgstr "标签管理"
 #: assets/models/cluster.py:28 assets/models/cmd_filter.py:26
 #: assets/models/cmd_filter.py:67 assets/models/group.py:21
 #: common/db/models.py:70 common/mixins/models.py:49 orgs/models.py:24
-#: orgs/models.py:422 perms/models/base.py:55 users/models/user.py:596
+#: orgs/models.py:422 perms/models/base.py:55 users/models/user.py:599
 #: users/serializers/group.py:35 xpack/plugins/change_auth_plan/models.py:81
 #: xpack/plugins/cloud/models.py:104 xpack/plugins/gathered_user/models.py:30
 msgid "Created by"
@@ -497,7 +497,7 @@ msgstr "创建者"
 #: assets/models/label.py:25 common/db/models.py:72 common/mixins/models.py:50
 #: ops/models/adhoc.py:38 ops/models/command.py:29 orgs/models.py:25
 #: orgs/models.py:420 perms/models/base.py:56 users/models/group.py:18
-#: users/models/user.py:770 xpack/plugins/cloud/models.py:107
+#: users/models/user.py:773 xpack/plugins/cloud/models.py:107
 msgid "Date created"
 msgstr "创建日期"
 
@@ -543,7 +543,7 @@ msgstr "带宽"
 msgid "Contact"
 msgstr "联系人"
 
-#: assets/models/cluster.py:22 users/models/user.py:574
+#: assets/models/cluster.py:22 users/models/user.py:577
 msgid "Phone"
 msgstr "手机"
 
@@ -569,7 +569,7 @@ msgid "Default"
 msgstr "默认"
 
 #: assets/models/cluster.py:36 assets/models/label.py:14
-#: users/models/user.py:755
+#: users/models/user.py:758
 msgid "System"
 msgstr "系统"
 
@@ -814,11 +814,11 @@ msgid "Backend"
 msgstr "后端"
 
 #: assets/serializers/asset_user.py:80 users/forms/profile.py:160
-#: users/models/user.py:585 users/templates/users/user_password_update.html:48
+#: users/models/user.py:588 users/templates/users/user_password_update.html:48
 msgid "Public key"
 msgstr "SSH公钥"
 
-#: assets/serializers/asset_user.py:84 users/models/user.py:582
+#: assets/serializers/asset_user.py:84 users/models/user.py:585
 msgid "Private key"
 msgstr "ssh私钥"
 
@@ -1127,7 +1127,7 @@ msgstr "用户代理"
 #: audits/models.py:105
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
 #: authentication/templates/authentication/login_otp.html:6
-#: users/forms/profile.py:64 users/models/user.py:577
+#: users/forms/profile.py:64 users/models/user.py:580
 #: users/serializers/profile.py:104
 msgid "MFA"
 msgstr "多因子认证"
@@ -1206,9 +1206,13 @@ msgstr ""
 
 #: audits/signals_handler.py:60
 #: authentication/templates/authentication/login.html:210
-#: notifications/models.py:16
 msgid "WeCom"
 msgstr "企业微信"
+
+#: audits/signals_handler.py:61
+#: authentication/templates/authentication/login.html:215
+msgid "DingTalk"
+msgstr "钉钉"
 
 #: authentication/api/mfa.py:60
 msgid "Code is invalid"
@@ -1310,7 +1314,7 @@ msgid "ACL is not allowed"
 msgstr "ACL 不被允许"
 
 #: authentication/errors.py:36
-msgid "Wecom login only for local user"
+msgid "Only local users are allowed"
 msgstr ""
 
 #: authentication/errors.py:46
@@ -1370,15 +1374,15 @@ msgstr "来源 IP 不被允许登录"
 msgid "SSO auth closed"
 msgstr "SSO 认证关闭了"
 
-#: authentication/errors.py:273 authentication/views/login.py:227
+#: authentication/errors.py:273 authentication/mixins.py:271
 msgid "Your password is too simple, please change it for security"
 msgstr "你的密码过于简单，为了安全，请修改"
 
-#: authentication/errors.py:282 authentication/views/login.py:242
+#: authentication/errors.py:282 authentication/mixins.py:278
 msgid "You should to change your password before login"
 msgstr "登录完成前，请先修改密码"
 
-#: authentication/errors.py:291 authentication/views/login.py:258
+#: authentication/errors.py:291 authentication/mixins.py:285
 msgid "Your password has expired, please reset before logging in"
 msgstr "您的密码已过期，先修改再登录"
 
@@ -1394,6 +1398,10 @@ msgstr "{} 天内自动登录"
 #: authentication/forms.py:56 users/forms/profile.py:27
 msgid "MFA code"
 msgstr "多因子认证验证码"
+
+#: authentication/mixins.py:261
+msgid "Please change your password"
+msgstr "请修改密码"
 
 #: authentication/models.py:40
 msgid "Private Token"
@@ -1417,7 +1425,7 @@ msgstr "文档"
 
 #: authentication/templates/authentication/_access_key_modal.html:31
 msgid "Secret"
-msgstr "密文"
+msgstr "秘钥"
 
 #: authentication/templates/authentication/_access_key_modal.html:33
 msgid "Date"
@@ -1467,7 +1475,6 @@ msgid "Need MFA for view auth"
 msgstr "需要多因子认证来查看账号信息"
 
 #: authentication/templates/authentication/_mfa_confirm_modal.html:20
-#: authentication/views/login.py:246 authentication/views/login.py:262
 #: templates/_modal.html:23 users/templates/users/user_password_verify.html:20
 msgid "Confirm"
 msgstr "确认"
@@ -1503,11 +1510,6 @@ msgstr "OpenID"
 msgid "CAS"
 msgstr ""
 
-#: authentication/templates/authentication/login.html:215
-#: notifications/models.py:18
-msgid "DingTalk"
-msgstr "钉钉"
-
 #: authentication/templates/authentication/login_otp.html:17
 msgid "One-time password"
 msgstr "一次性密码"
@@ -1538,7 +1540,6 @@ msgid "Copy link"
 msgstr "复制链接"
 
 #: authentication/templates/authentication/login_wait_confirm.html:51
-#: templates/flash_message_standalone.html:38
 msgid "Return"
 msgstr "返回"
 
@@ -1587,11 +1588,19 @@ msgstr ""
 msgid "Binding DingTalk failed"
 msgstr ""
 
-#: authentication/views/login.py:55
+#: authentication/views/login.py:59
+msgid "Redirecting"
+msgstr ""
+
+#: authentication/views/login.py:60
+msgid "Redirecting to {} authentication"
+msgstr ""
+
+#: authentication/views/login.py:84
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: authentication/views/login.py:173
+#: authentication/views/login.py:202
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -1599,22 +1608,17 @@ msgstr ""
 "等待 <b>{}</b> 确认, 你也可以复制链接发给他/她 <br/>\n"
 "                  不要关闭本页面"
 
-#: authentication/views/login.py:178
+#: authentication/views/login.py:207
 msgid "No ticket found"
 msgstr "没有发现工单"
 
-#: authentication/views/login.py:210
+#: authentication/views/login.py:239
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: authentication/views/login.py:211
+#: authentication/views/login.py:240
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
-
-#: authentication/views/login.py:226 authentication/views/login.py:241
-#: authentication/views/login.py:257
-msgid "Please change your password"
-msgstr "请修改密码"
 
 #: authentication/views/wecom.py:75
 msgid "WeCom is already bound"
@@ -1764,7 +1768,7 @@ msgstr "JumpServer 开源堡垒机"
 msgid "<h1>Flow service unavailable, check it</h1>"
 msgstr ""
 
-#: jumpserver/views/other.py:27
+#: jumpserver/views/other.py:25
 msgid ""
 "<div>Luna is a separately deployed program, you need to deploy Luna, koko, "
 "configure nginx for url distribution,</div> </div>If you see this page, "
@@ -1773,11 +1777,11 @@ msgstr ""
 "<div>Luna是单独部署的一个程序，你需要部署luna，koko, </div><div>如果你看到了"
 "这个页面，证明你访问的不是nginx监听的端口，祝你好运</div>"
 
-#: jumpserver/views/other.py:71
+#: jumpserver/views/other.py:69
 msgid "Websocket server run on port: {}, you should proxy it on nginx"
 msgstr "Websocket 服务运行在端口: {}, 请检查nginx是否代理是否设置"
 
-#: jumpserver/views/other.py:85
+#: jumpserver/views/other.py:83
 msgid ""
 "<div>Koko is a separately deployed program, you need to deploy Koko, "
 "configure nginx for url distribution,</div> </div>If you see this page, "
@@ -1787,20 +1791,6 @@ msgstr ""
 "div><div>如果你看到了这个页面，证明你访问的不是nginx监听的端口，祝你好运</"
 "div>"
 
-#: notifications/models.py:17 users/forms/profile.py:101
-#: users/models/user.py:557
-msgid "Email"
-msgstr "邮件"
-
-#: notifications/models.py:67 templates/_nav.html:110 terminal/apps.py:9
-#: terminal/serializers/session.py:40
-msgid "Terminal"
-msgstr "终端"
-
-#: notifications/models.py:68 ops/apps.py:9
-msgid "Operations"
-msgstr "运维"
-
 #: ops/api/celery.py:61 ops/api/celery.py:76
 msgid "Waiting task start"
 msgstr "等待任务开始"
@@ -1808,6 +1798,10 @@ msgstr "等待任务开始"
 #: ops/api/command.py:61
 msgid "Not has host {} permission"
 msgstr "没有该主机 {} 权限"
+
+#: ops/apps.py:9
+msgid "Operations"
+msgstr "运维"
 
 #: ops/mixin.py:29 ops/mixin.py:92 ops/mixin.py:160
 msgid "Cycle perform"
@@ -1936,17 +1930,9 @@ msgstr "任务开始"
 msgid "Command `{}` is forbidden ........"
 msgstr "命令 `{}` 不允许被执行 ......."
 
-#: ops/models/command.py:115
+#: ops/models/command.py:113
 msgid "Task end"
 msgstr "任务结束"
-
-#: ops/notifications.py:10
-msgid "Server performance"
-msgstr "服务器性能"
-
-#: ops/notifications.py:17
-msgid "Disk used more than 80%: {} => {}"
-msgstr "磁盘使用率超过 80%: {} => {}"
 
 #: ops/tasks.py:71
 msgid "Clean task history period"
@@ -1963,6 +1949,10 @@ msgstr "任务列表"
 #: ops/utils.py:64
 msgid "Update task content: {}"
 msgstr "更新任务内容: {}"
+
+#: ops/utils.py:74
+msgid "Disk used more than 80%: {} => {}"
+msgstr "磁盘使用率超过 80%: {} => {}"
 
 #: orgs/api.py:76
 #, python-brace-format
@@ -1991,7 +1981,7 @@ msgstr "组织审计员"
 msgid "GLOBAL"
 msgstr "全局组织"
 
-#: orgs/models.py:419 users/models/user.py:565
+#: orgs/models.py:419 users/models/user.py:568
 #: users/templates/users/_select_user_modal.html:15
 msgid "Role"
 msgstr "角色"
@@ -2063,7 +2053,7 @@ msgid "Favorite"
 msgstr "收藏夹"
 
 #: perms/models/base.py:51 templates/_nav.html:21 users/models/group.py:31
-#: users/models/user.py:561 users/templates/users/_select_user_modal.html:16
+#: users/models/user.py:564 users/templates/users/_select_user_modal.html:16
 #: users/templates/users/user_asset_permission.html:39
 #: users/templates/users/user_asset_permission.html:67
 #: users/templates/users/user_database_app_permission.html:38
@@ -2076,7 +2066,7 @@ msgstr "用户组"
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:77
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:43
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:81
-#: users/models/user.py:593
+#: users/models/user.py:596
 msgid "Date expired"
 msgstr "失效日期"
 
@@ -2473,16 +2463,16 @@ msgid "Multiple user using , split"
 msgstr "多个用户，使用 , 分割"
 
 #: settings/serializers/settings.py:193
-msgid "Corporation ID"
+msgid "Corporation ID(corpid)"
 msgstr "企业 ID(CorpId)"
 
 #: settings/serializers/settings.py:194
-msgid "Agent ID"
+msgid "Agent ID(agentid)"
 msgstr "应用 ID(AgentId)"
 
 #: settings/serializers/settings.py:195
-msgid "Corporation Secret"
-msgstr "凭证密钥(Secret)"
+msgid "Secret(secret)"
+msgstr "秘钥(secret)"
 
 #: settings/serializers/settings.py:196
 msgid "Enable WeCom Auth"
@@ -2810,6 +2800,11 @@ msgstr "Web终端"
 msgid "File manager"
 msgstr "文件管理"
 
+#: templates/_nav.html:110 terminal/apps.py:9
+#: terminal/serializers/session.py:40
+msgid "Terminal"
+msgstr "终端"
+
 #: templates/_nav.html:121
 msgid "Job Center"
 msgstr "作业中心"
@@ -2894,6 +2889,14 @@ msgstr "确认删除"
 #: templates/delete_confirm.html:11
 msgid "Are you sure delete"
 msgstr "您确定删除吗?"
+
+#: templates/flash_message_standalone.html:28
+msgid "Cancel"
+msgstr "取消"
+
+#: templates/flash_message_standalone.html:37
+msgid "Go"
+msgstr ""
 
 #: templates/index.html:11
 msgid "Total users"
@@ -3224,89 +3227,6 @@ msgstr "命令存储"
 msgid "Replay storage"
 msgstr "录像存储"
 
-#: terminal/notifications.py:29
-msgid "Terminal command alert"
-msgstr "终端命令告警"
-
-#: terminal/notifications.py:38
-#, python-format
-msgid ""
-"\n"
-"                        Command: %(command)s\n"
-"                        <br>\n"
-"                        Asset: %(host_name)s (%(host_ip)s)\n"
-"                        <br>\n"
-"                        User: %(user)s\n"
-"                        <br>\n"
-"                        Level: %(risk_level)s\n"
-"                        <br>\n"
-"                        Session: <a href=\"%(session_detail_url)s\">session "
-"detail</a>\n"
-"                        <br>\n"
-"                        "
-msgstr ""
-"\n"
-"        命令: %(command)s\n"
-"        <br>\n"
-"        资产: %(host_name)s (%(host_ip)s)\n"
-"        <br>\n"
-"        用户: %(user)s\n"
-"        <br>\n"
-"        等级: %(risk_level)s\n"
-"        <br>\n"
-"        会话: <a href=\"%(session_detail_url)s\">会话详情</a>\n"
-"        <br>\n"
-"        "
-
-#: terminal/notifications.py:73
-#, python-format
-msgid ""
-"Insecure Command Alert: [%(name)s->%(login_from)s@%(remote_addr)s] $"
-"%(command)s"
-msgstr "危险命令告警: [%(name)s->%(login_from)s@%(remote_addr)s] $%(command)s"
-
-#: terminal/notifications.py:90
-msgid "Batch command alert"
-msgstr "批量命令告警"
-
-#: terminal/notifications.py:101
-#, python-format
-msgid ""
-"\n"
-"                            <br>\n"
-"                            Assets: %(assets)s\n"
-"                            <br>\n"
-"                            User: %(user)s\n"
-"                            <br>\n"
-"                            Level: %(risk_level)s\n"
-"                            <br>\n"
-"\n"
-"                            ----------------- Commands ---------------- "
-"<br>\n"
-"                            %(command)s <br>\n"
-"                            ----------------- Commands ---------------- "
-"<br>\n"
-"                            "
-msgstr ""
-"\n"
-"        <br>\n"
-"        资产: %(assets)s\n"
-"        <br>\n"
-"        用户: %(user)s\n"
-"        <br>\n"
-"        等级: %(risk_level)s\n"
-"        <br>\n"
-"\n"
-"        ----------------- 命令 ---------------- <br>\n"
-"        %(command)s <br>\n"
-"        ----------------- 命令 ---------------- <br>\n"
-"        "
-
-#: terminal/notifications.py:127
-#, python-format
-msgid "Insecure Web Command Execution Alert: [%(name)s]"
-msgstr "Web页面-> 命令执行 告警: [%(name)s]"
-
 #: terminal/serializers/session.py:33
 msgid "User ID"
 msgstr "用户 ID"
@@ -3399,6 +3319,78 @@ msgstr "忽略证书认证"
 #: terminal/serializers/terminal.py:73 terminal/serializers/terminal.py:81
 msgid "Not found"
 msgstr "没有发现"
+
+#: terminal/utils.py:78
+#, python-format
+msgid ""
+"Insecure Command Alert: [%(name)s->%(login_from)s@%(remote_addr)s] $"
+"%(command)s"
+msgstr "危险命令告警: [%(name)s->%(login_from)s@%(remote_addr)s] $%(command)s"
+
+#: terminal/utils.py:86
+#, python-format
+msgid ""
+"\n"
+"        Command: %(command)s\n"
+"        <br>\n"
+"        Asset: %(host_name)s (%(host_ip)s)\n"
+"        <br>\n"
+"        User: %(user)s\n"
+"        <br>\n"
+"        Level: %(risk_level)s\n"
+"        <br>\n"
+"        Session: <a href=\"%(session_detail_url)s\">session detail</a>\n"
+"        <br>\n"
+"        "
+msgstr ""
+"\n"
+"        命令: %(command)s\n"
+"        <br>\n"
+"        资产: %(host_name)s (%(host_ip)s)\n"
+"        <br>\n"
+"        用户: %(user)s\n"
+"        <br>\n"
+"        等级: %(risk_level)s\n"
+"        <br>\n"
+"        会话: <a href=\"%(session_detail_url)s\">会话详情</a>\n"
+"        <br>\n"
+"        "
+
+#: terminal/utils.py:113
+#, python-format
+msgid "Insecure Web Command Execution Alert: [%(name)s]"
+msgstr "Web页面-> 命令执行 告警: [%(name)s]"
+
+#: terminal/utils.py:121
+#, python-format
+msgid ""
+"\n"
+"        <br>\n"
+"        Assets: %(assets)s\n"
+"        <br>\n"
+"        User: %(user)s\n"
+"        <br>\n"
+"        Level: %(risk_level)s\n"
+"        <br>\n"
+"\n"
+"        ----------------- Commands ---------------- <br>\n"
+"        %(command)s <br>\n"
+"        ----------------- Commands ---------------- <br>\n"
+"        "
+msgstr ""
+"\n"
+"        <br>\n"
+"        资产: %(assets)s\n"
+"        <br>\n"
+"        用户: %(user)s\n"
+"        <br>\n"
+"        等级: %(risk_level)s\n"
+"        <br>\n"
+"\n"
+"        ----------------- 命令 ---------------- <br>\n"
+"        %(command)s <br>\n"
+"        ----------------- 命令 ---------------- <br>\n"
+"        "
 
 #: tickets/const.py:8
 msgid "General"
@@ -3560,8 +3552,6 @@ msgid "Applied from command filter rules"
 msgstr "申请来自命令过滤规则"
 
 #: tickets/handler/command_confirm.py:30
-#, fuzzy
-#| msgid "Applied from command filter rules"
 msgid "Applied from command filter"
 msgstr "申请来自命令过滤规则"
 
@@ -3727,8 +3717,6 @@ msgid "From cmd filter rule"
 msgstr "来自命令过滤规则"
 
 #: tickets/serializers/ticket/meta/ticket_type/command_confirm.py:22
-#, fuzzy
-#| msgid "From cmd filter rule"
 msgid "From cmd filter"
 msgstr "来自命令过滤规则"
 
@@ -3836,6 +3824,10 @@ msgstr "确认密码"
 msgid "Password does not match"
 msgstr "密码不一致"
 
+#: users/forms/profile.py:101 users/models/user.py:560
+msgid "Email"
+msgstr "邮件"
+
 #: users/forms/profile.py:108
 msgid "Old password"
 msgstr "原来密码"
@@ -3885,27 +3877,27 @@ msgstr "强制启用"
 msgid "Local"
 msgstr "数据库"
 
-#: users/models/user.py:568
+#: users/models/user.py:571
 msgid "Avatar"
 msgstr "头像"
 
-#: users/models/user.py:571
+#: users/models/user.py:574
 msgid "Wechat"
 msgstr "微信"
 
-#: users/models/user.py:601
+#: users/models/user.py:604
 msgid "Source"
 msgstr "用户来源"
 
-#: users/models/user.py:605
+#: users/models/user.py:608
 msgid "Date password last updated"
 msgstr "最后更新密码日期"
 
-#: users/models/user.py:751
+#: users/models/user.py:754
 msgid "Administrator"
 msgstr "管理员"
 
-#: users/models/user.py:754
+#: users/models/user.py:757
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
@@ -4293,7 +4285,7 @@ msgstr ""
 "    <br>\n"
 "    "
 
-#: users/utils.py:116 users/views/profile/reset.py:80
+#: users/utils.py:116 users/views/profile/reset.py:126
 msgid "Reset password success"
 msgstr "重置密码成功"
 
@@ -4522,7 +4514,7 @@ msgstr "多因子认证禁用成功，返回登录页面"
 msgid "Password update"
 msgstr "密码更新"
 
-#: users/views/profile/password.py:60 users/views/profile/reset.py:127
+#: users/views/profile/password.py:60 users/views/profile/reset.py:105
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
 
@@ -4534,40 +4526,40 @@ msgstr "用户名或密码无效"
 msgid "Public key update"
 msgstr "密钥更新"
 
-#: users/views/profile/reset.py:46
+#: users/views/profile/reset.py:40
+msgid "Send reset password message"
+msgstr "发送重置密码邮件"
+
+#: users/views/profile/reset.py:41
+msgid "Send reset password mail success, login your mail box and follow it "
+msgstr ""
+"发送重置邮件成功, 请登录邮箱查看, 按照提示操作 (如果没收到,请等待3-5分钟)"
+
+#: users/views/profile/reset.py:52
 msgid "Email address invalid, please input again"
 msgstr "邮箱地址错误，重新输入"
 
-#: users/views/profile/reset.py:52
+#: users/views/profile/reset.py:58
 msgid ""
 "The user is from {}, please go to the corresponding system to change the "
 "password"
 msgstr "用户来自 {} 请去相应系统修改密码"
 
-#: users/views/profile/reset.py:66
-msgid "Send reset password message"
-msgstr "发送重置密码邮件"
-
-#: users/views/profile/reset.py:67
-msgid "Send reset password mail success, login your mail box and follow it "
-msgstr ""
-"发送重置邮件成功, 请登录邮箱查看, 按照提示操作 (如果没收到,请等待3-5分钟)"
-
-#: users/views/profile/reset.py:81
-msgid "Reset password success, return to login page"
-msgstr "重置密码成功，返回到登录页面"
-
-#: users/views/profile/reset.py:105 users/views/profile/reset.py:115
+#: users/views/profile/reset.py:83 users/views/profile/reset.py:93
 msgid "Token invalid or expired"
 msgstr "Token错误或失效"
 
-#: users/views/profile/reset.py:120
+#: users/views/profile/reset.py:98
 msgid "User auth from {}, go there change password"
 msgstr "用户认证源来自 {}, 请去相应系统修改密码"
 
-#: users/views/profile/reset.py:133
+#: users/views/profile/reset.py:111
 msgid "* The new password cannot be the last {} passwords"
 msgstr "* 新密码不能是最近 {} 次的密码"
+
+#: users/views/profile/reset.py:127
+msgid "Reset password success, return to login page"
+msgstr "重置密码成功，返回到登录页面"
 
 #: xpack/plugins/change_auth_plan/meta.py:9
 #: xpack/plugins/change_auth_plan/models.py:89
@@ -5045,20 +5037,35 @@ msgstr "旗舰版"
 msgid "Community edition"
 msgstr "社区版"
 
+#, fuzzy
+#~| msgid "Agent Secret"
+#~ msgid "WeCom Secret"
+#~ msgstr "凭证密钥(secret)"
+
+#~ msgid "Server performance"
+#~ msgstr "服务器性能"
+
+#~ msgid "Corporation Secret"
+#~ msgstr "凭证密钥(Secret)"
+
+#~ msgid "Terminal command alert"
+#~ msgstr "终端命令告警"
+
 #, python-format
 #~ msgid ""
 #~ "\n"
-#~ "        Command: %(command)s\n"
-#~ "        <br>\n"
-#~ "        Asset: %(host_name)s (%(host_ip)s)\n"
-#~ "        <br>\n"
-#~ "        User: %(user)s\n"
-#~ "        <br>\n"
-#~ "        Level: %(risk_level)s\n"
-#~ "        <br>\n"
-#~ "        Session: <a href=\"%(session_detail_url)s\">session detail</a>\n"
-#~ "        <br>\n"
-#~ "        "
+#~ "                        Command: %(command)s\n"
+#~ "                        <br>\n"
+#~ "                        Asset: %(host_name)s (%(host_ip)s)\n"
+#~ "                        <br>\n"
+#~ "                        User: %(user)s\n"
+#~ "                        <br>\n"
+#~ "                        Level: %(risk_level)s\n"
+#~ "                        <br>\n"
+#~ "                        Session: <a href=\"%(session_detail_url)s"
+#~ "\">session detail</a>\n"
+#~ "                        <br>\n"
+#~ "                        "
 #~ msgstr ""
 #~ "\n"
 #~ "        命令: %(command)s\n"
@@ -5073,21 +5080,26 @@ msgstr "社区版"
 #~ "        <br>\n"
 #~ "        "
 
+#~ msgid "Batch command alert"
+#~ msgstr "批量命令告警"
+
 #, python-format
 #~ msgid ""
 #~ "\n"
-#~ "        <br>\n"
-#~ "        Assets: %(assets)s\n"
-#~ "        <br>\n"
-#~ "        User: %(user)s\n"
-#~ "        <br>\n"
-#~ "        Level: %(risk_level)s\n"
-#~ "        <br>\n"
+#~ "                            <br>\n"
+#~ "                            Assets: %(assets)s\n"
+#~ "                            <br>\n"
+#~ "                            User: %(user)s\n"
+#~ "                            <br>\n"
+#~ "                            Level: %(risk_level)s\n"
+#~ "                            <br>\n"
 #~ "\n"
-#~ "        ----------------- Commands ---------------- <br>\n"
-#~ "        %(command)s <br>\n"
-#~ "        ----------------- Commands ---------------- <br>\n"
-#~ "        "
+#~ "                            ----------------- Commands ---------------- "
+#~ "<br>\n"
+#~ "                            %(command)s <br>\n"
+#~ "                            ----------------- Commands ---------------- "
+#~ "<br>\n"
+#~ "                            "
 #~ msgstr ""
 #~ "\n"
 #~ "        <br>\n"
@@ -5108,9 +5120,6 @@ msgstr "社区版"
 
 #~ msgid "Command Alert"
 #~ msgstr "命令告警"
-
-#~ msgid "Agent Secret"
-#~ msgstr "凭证密钥(secret)"
 
 #~ msgid "APP key"
 #~ msgstr "APPKEY"
@@ -5189,9 +5198,6 @@ msgstr "社区版"
 
 #~ msgid "This will reset the user password and send a reset mail"
 #~ msgstr "将失效用户当前密码，并发送重设密码邮件到用户邮箱"
-
-#~ msgid "Cancel"
-#~ msgstr "取消"
 
 #~ msgid ""
 #~ "The reset-ssh-public-key E-mail has been sent successfully. Please inform "

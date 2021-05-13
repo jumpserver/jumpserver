@@ -190,9 +190,9 @@ class SecuritySettingSerializer(serializers.Serializer):
 
 
 class WeComSettingSerializer(serializers.Serializer):
-    WECOM_CORPID = serializers.CharField(max_length=256, required=True, label=_('Corporation ID'))
-    WECOM_AGENTID = serializers.CharField(max_length=256, required=True, label=_("Agent ID"))
-    WECOM_CORPSECRET = serializers.CharField(max_length=256, required=False, label=_("Corporation Secret"), write_only=True)
+    WECOM_CORPID = serializers.CharField(max_length=256, required=True, label=_('Corporation ID(corpid)'))
+    WECOM_AGENTID = serializers.CharField(max_length=256, required=True, label=_("Agent ID(agentid)"))
+    WECOM_SECRET = serializers.CharField(max_length=256, required=True, label=_("Secret(secret)"), write_only=True)
     AUTH_WECOM = serializers.BooleanField(default=False, label=_('Enable WeCom Auth'))
 
 

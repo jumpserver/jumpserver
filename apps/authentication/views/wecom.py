@@ -119,7 +119,7 @@ class WeComQRBindCallbackView(WeComQRMixin, View):
 
         wecom = WeCom(
             corpid=settings.WECOM_CORPID,
-            corpsecret=settings.WECOM_CORPSECRET,
+            corpsecret=settings.WECOM_SECRET,
             agentid=settings.WECOM_AGENTID
         )
         wecom_userid, __ = wecom.get_user_id_by_code(code)
@@ -177,7 +177,7 @@ class WeComQRLoginCallbackView(AuthMixin, WeComQRMixin, View):
 
         wecom = WeCom(
             corpid=settings.WECOM_CORPID,
-            corpsecret=settings.WECOM_CORPSECRET,
+            corpsecret=settings.WECOM_SECRET,
             agentid=settings.WECOM_AGENTID
         )
         wecom_userid, __ = wecom.get_user_id_by_code(code)
