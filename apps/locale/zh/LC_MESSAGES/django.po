@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-13 15:51+0800\n"
+"POT-Creation-Date: 2021-05-13 19:30+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1315,7 +1315,7 @@ msgstr "ACL 不被允许"
 
 #: authentication/errors.py:36
 msgid "Only local users are allowed"
-msgstr ""
+msgstr "仅允许本地用户"
 
 #: authentication/errors.py:46
 msgid "No session found, check your cookie"
@@ -1549,11 +1549,11 @@ msgstr "复制成功"
 
 #: authentication/views/dingtalk.py:40 authentication/views/wecom.py:40
 msgid "You've been hacked"
-msgstr ""
+msgstr "你被攻击了"
 
 #: authentication/views/dingtalk.py:76
 msgid "DingTalk is already bound"
-msgstr ""
+msgstr "钉钉已经绑定"
 
 #: authentication/views/dingtalk.py:89 authentication/views/wecom.py:88
 msgid "Please verify your password first"
@@ -1565,7 +1565,7 @@ msgstr "无效的 user_id"
 
 #: authentication/views/dingtalk.py:129
 msgid "DingTalk query user failed"
-msgstr ""
+msgstr "钉钉查询用户失败"
 
 #: authentication/views/dingtalk.py:136 authentication/views/dingtalk.py:219
 #: authentication/views/dingtalk.py:220
@@ -1574,27 +1574,27 @@ msgstr "绑定 钉钉 成功"
 
 #: authentication/views/dingtalk.py:188
 msgid "Failed to get user from DingTalk"
-msgstr ""
+msgstr "从钉钉获取用户失败"
 
 #: authentication/views/dingtalk.py:194
 msgid "DingTalk is not bound"
-msgstr ""
+msgstr "钉钉没有绑定"
 
 #: authentication/views/dingtalk.py:195 authentication/views/wecom.py:193
-msgid "Please login with a password and then bind the WoCom"
-msgstr ""
+msgid "Please login with a password and then bind the WeCom"
+msgstr "请使用密码登录，然后绑定企业微信"
 
 #: authentication/views/dingtalk.py:237 authentication/views/dingtalk.py:238
 msgid "Binding DingTalk failed"
-msgstr ""
+msgstr "绑定钉钉失败"
 
 #: authentication/views/login.py:59
 msgid "Redirecting"
-msgstr ""
+msgstr "跳转中"
 
 #: authentication/views/login.py:60
 msgid "Redirecting to {} authentication"
-msgstr ""
+msgstr "正在跳转到 {} 认证"
 
 #: authentication/views/login.py:84
 msgid "Please enable cookies and try again."
@@ -1622,11 +1622,11 @@ msgstr "退出登录成功，返回到登录页面"
 
 #: authentication/views/wecom.py:75
 msgid "WeCom is already bound"
-msgstr ""
+msgstr "企业微信已经绑定"
 
 #: authentication/views/wecom.py:127
 msgid "WeCom query user failed"
-msgstr ""
+msgstr "企业微信查询用户失败"
 
 #: authentication/views/wecom.py:134 authentication/views/wecom.py:217
 #: authentication/views/wecom.py:218
@@ -1635,7 +1635,7 @@ msgstr "绑定 企业微信 成功"
 
 #: authentication/views/wecom.py:186
 msgid "Failed to get user from WeCom"
-msgstr ""
+msgstr "从企业微信获取用户失败"
 
 #: authentication/views/wecom.py:192
 msgid "WeCom is not bound"
@@ -5037,326 +5037,3 @@ msgstr "旗舰版"
 msgid "Community edition"
 msgstr "社区版"
 
-#, fuzzy
-#~| msgid "Agent Secret"
-#~ msgid "WeCom Secret"
-#~ msgstr "凭证密钥(secret)"
-
-#~ msgid "Server performance"
-#~ msgstr "服务器性能"
-
-#~ msgid "Corporation Secret"
-#~ msgstr "凭证密钥(Secret)"
-
-#~ msgid "Terminal command alert"
-#~ msgstr "终端命令告警"
-
-#, python-format
-#~ msgid ""
-#~ "\n"
-#~ "                        Command: %(command)s\n"
-#~ "                        <br>\n"
-#~ "                        Asset: %(host_name)s (%(host_ip)s)\n"
-#~ "                        <br>\n"
-#~ "                        User: %(user)s\n"
-#~ "                        <br>\n"
-#~ "                        Level: %(risk_level)s\n"
-#~ "                        <br>\n"
-#~ "                        Session: <a href=\"%(session_detail_url)s"
-#~ "\">session detail</a>\n"
-#~ "                        <br>\n"
-#~ "                        "
-#~ msgstr ""
-#~ "\n"
-#~ "        命令: %(command)s\n"
-#~ "        <br>\n"
-#~ "        资产: %(host_name)s (%(host_ip)s)\n"
-#~ "        <br>\n"
-#~ "        用户: %(user)s\n"
-#~ "        <br>\n"
-#~ "        等级: %(risk_level)s\n"
-#~ "        <br>\n"
-#~ "        会话: <a href=\"%(session_detail_url)s\">会话详情</a>\n"
-#~ "        <br>\n"
-#~ "        "
-
-#~ msgid "Batch command alert"
-#~ msgstr "批量命令告警"
-
-#, python-format
-#~ msgid ""
-#~ "\n"
-#~ "                            <br>\n"
-#~ "                            Assets: %(assets)s\n"
-#~ "                            <br>\n"
-#~ "                            User: %(user)s\n"
-#~ "                            <br>\n"
-#~ "                            Level: %(risk_level)s\n"
-#~ "                            <br>\n"
-#~ "\n"
-#~ "                            ----------------- Commands ---------------- "
-#~ "<br>\n"
-#~ "                            %(command)s <br>\n"
-#~ "                            ----------------- Commands ---------------- "
-#~ "<br>\n"
-#~ "                            "
-#~ msgstr ""
-#~ "\n"
-#~ "        <br>\n"
-#~ "        资产: %(assets)s\n"
-#~ "        <br>\n"
-#~ "        用户: %(user)s\n"
-#~ "        <br>\n"
-#~ "        等级: %(risk_level)s\n"
-#~ "        <br>\n"
-#~ "\n"
-#~ "        ----------------- 命令 ---------------- <br>\n"
-#~ "        %(command)s <br>\n"
-#~ "        ----------------- 命令 ---------------- <br>\n"
-#~ "        "
-
-#~ msgid "Ops"
-#~ msgstr "选项"
-
-#~ msgid "Command Alert"
-#~ msgstr "命令告警"
-
-#~ msgid "APP key"
-#~ msgstr "APPKEY"
-
-#~ msgid "APP secret"
-#~ msgstr "LDAP 地址"
-
-#~ msgid "Auth"
-#~ msgstr "认证"
-
-#~ msgid "The administrator require you to change your password this time"
-#~ msgstr "管理员要求您本次修改密码"
-
-#~ msgid "Security and Role"
-#~ msgstr "角色安全"
-
-#~ msgid "Select properties that need to be modified"
-#~ msgstr "选择需要修改属性"
-
-#~ msgid "Select all"
-#~ msgstr "全选"
-
-#~ msgid "Create user"
-#~ msgstr "创建用户"
-
-#~ msgid "Force enabled"
-#~ msgstr "强制启用"
-
-#~ msgid "Date joined"
-#~ msgstr "创建日期"
-
-#~ msgid "Last login"
-#~ msgstr "最后登录"
-
-#~ msgid "Last password updated"
-#~ msgstr "最后更新密码"
-
-#~ msgid "Quick modify"
-#~ msgstr "快速修改"
-
-#~ msgid "Force enabled MFA"
-#~ msgstr "强制启用多因子认证"
-
-#~ msgid "Reset MFA"
-#~ msgstr "重置多因子认证"
-
-#~ msgid "Send reset password mail"
-#~ msgstr "发送重置密码邮件"
-
-#~ msgid "Send"
-#~ msgstr "发送"
-
-#~ msgid "Send reset ssh key mail"
-#~ msgstr "发送重置密钥邮件"
-
-#~ msgid "Unblock user"
-#~ msgstr "解除登录限制"
-
-#~ msgid "Unblock"
-#~ msgstr "解除"
-
-#~ msgid "Join user groups"
-#~ msgstr "添加到用户组"
-
-#~ msgid "Join"
-#~ msgstr "加入"
-
-#~ msgid "Goto profile page enable MFA"
-#~ msgstr "请去个人信息页面启用自己的多因子认证"
-
-#~ msgid "An e-mail has been sent to the user`s mailbox."
-#~ msgstr "已发送邮件到用户邮箱"
-
-#~ msgid "Are you sure?"
-#~ msgstr "你确认吗?"
-
-#~ msgid "This will reset the user password and send a reset mail"
-#~ msgstr "将失效用户当前密码，并发送重设密码邮件到用户邮箱"
-
-#~ msgid ""
-#~ "The reset-ssh-public-key E-mail has been sent successfully. Please inform "
-#~ "the user to update his new ssh public key."
-#~ msgstr "重设密钥邮件将会发送到用户邮箱"
-
-#~ msgid "Reset SSH public key"
-#~ msgstr "重置SSH密钥"
-
-#~ msgid "This will reset the user public key and send a reset mail"
-#~ msgstr "将会失效用户当前密钥，并发送重置邮件到用户邮箱"
-
-#~ msgid "Successfully updated the SSH public key."
-#~ msgstr "更新SSH密钥成功"
-
-#~ msgid "User SSH public key update"
-#~ msgstr "SSH密钥"
-
-#~ msgid "After unlocking the user, the user can log in normally."
-#~ msgstr "解除用户登录限制后，此用户即可正常登录"
-
-#~ msgid "Reset user MFA success"
-#~ msgstr "重置用户多因子认证成功"
-
-#~ msgid "App type"
-#~ msgstr "应用类型"
-
-#~ msgid "User group detail"
-#~ msgstr "用户组详情"
-
-#~ msgid "Add user"
-#~ msgstr "添加用户"
-
-#~ msgid "Add"
-#~ msgstr "添加"
-
-#~ msgid "Create user group"
-#~ msgstr "创建用户组"
-
-#~ msgid "Delete selected"
-#~ msgstr "批量删除"
-
-#~ msgid "Remove selected"
-#~ msgstr "批量移除"
-
-#~ msgid "Update selected"
-#~ msgstr "批量更新"
-
-#~ msgid "Deactive selected"
-#~ msgstr "禁用所选"
-
-#~ msgid "Active selected"
-#~ msgstr "激活所选"
-
-#~ msgid "Remove"
-#~ msgstr "移除"
-
-#~ msgid "This will delete the selected users !!!"
-#~ msgstr "删除选中用户 !!!"
-
-#~ msgid "User Deleting failed."
-#~ msgstr "用户删除失败"
-
-#~ msgid "User Delete"
-#~ msgstr "删除"
-
-#~ msgid "This will remove the selected users !!"
-#~ msgstr "移除选中用户 !!!"
-
-#~ msgid "User Removing failed."
-#~ msgstr "用户移除失败"
-
-#~ msgid "User Remove"
-#~ msgstr "移除"
-
-#~ msgid "Are you sure about removing it?"
-#~ msgstr "您确定移除吗?"
-
-#~ msgid "Remove the success"
-#~ msgstr "移除成功"
-
-#~ msgid "User is expired"
-#~ msgstr "用户已失效"
-
-#~ msgid "User is inactive"
-#~ msgstr "用户已禁用"
-
-#~ msgid "Administrator Settings force MFA login"
-#~ msgstr "管理员设置强制使用多因子认证"
-
-#~ msgid "Set MFA"
-#~ msgstr "设置多因子认证"
-
-#~ msgid "Update MFA"
-#~ msgstr "更改多因子认证"
-
-#~ msgid "Update password"
-#~ msgstr "更改密码"
-
-#~ msgid "Update SSH public key"
-#~ msgstr "更改SSH密钥"
-
-#~ msgid "Reset public key and download"
-#~ msgstr "重置并下载SSH密钥"
-
-#~ msgid "Old public key"
-#~ msgstr "原来SSH密钥"
-
-#~ msgid "Fingerprint"
-#~ msgstr "指纹"
-
-#~ msgid "Update public key"
-#~ msgstr "更新密钥"
-
-#~ msgid "Or reset by server"
-#~ msgstr "或者重置并下载密钥"
-
-#~ msgid ""
-#~ "The new public key has been set successfully, Please download the "
-#~ "corresponding private key."
-#~ msgstr "新的公钥已设置成功，请下载对应的私钥"
-
-#~ msgid "Update user"
-#~ msgstr "更新用户"
-
-#~ msgid "User auth from {}, ssh key login is not supported"
-#~ msgstr "用户认证源来自 {}, 不支持使用 SSH Key 登录"
-
-#~ msgid "(Domain name support)"
-#~ msgstr "(支持域名)"
-
-#~ msgid "Protocol options: {}"
-#~ msgstr "协议选项: {}"
-
-#~ msgid "CPU Usage"
-#~ msgstr "CPU使用"
-
-#~ msgid "System cpu load (1 minutes)"
-#~ msgstr "系统CPU负载 (1分钟)"
-
-#~ msgid "System memory used percent"
-#~ msgstr "系统内存使用百分比"
-
-#~ msgid "System disk used percent"
-#~ msgstr "系统磁盘使用百分比"
-
-#~ msgid "Session active count"
-#~ msgstr "活跃会话数量"
-
-#~ msgid "Root organization only allow view and delete"
-#~ msgstr "全局组织仅支持 查看和删除"
-
-#~ msgid ""
-#~ "Push system user task skip, auto push not enable or protocol is not ssh "
-#~ "or rdp: {}"
-#~ msgstr "推送系统用户任务跳过，自动推送没有打开，或协议不是ssh或rdp: {}"
-
-#~ msgid "Empty"
-#~ msgstr "空"
-
-#~ msgid "Organization contains undeleted resources"
-#~ msgstr "组织包含未删除的资源"
