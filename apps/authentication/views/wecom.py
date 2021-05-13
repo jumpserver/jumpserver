@@ -190,7 +190,7 @@ class WeComQRLoginCallbackView(AuthMixin, WeComQRMixin, View):
         user = get_object_or_none(User, wecom_id=wecom_userid)
         if user is None:
             title = _('WeCom is not bound')
-            msg = _('Please login with a password and then bind the WoCom')
+            msg = _('Please login with a password and then bind the WeCom')
             response = self.get_failed_reponse(login_url, title=title, msg=msg)
             return response
 
