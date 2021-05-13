@@ -20,7 +20,7 @@ class WeComTestingAPI(GenericAPIView):
 
         wecom_corpid = serializer.validated_data['WECOM_CORPID']
         wecom_agentid = serializer.validated_data['WECOM_AGENTID']
-        wecom_corpsecret = serializer.validated_data['WECOM_CORPSECRET']
+        wecom_corpsecret = serializer.validated_data['WECOM_SECRET']
 
         try:
             params = {'corpid': wecom_corpid, 'corpsecret': wecom_corpsecret}

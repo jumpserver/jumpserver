@@ -219,7 +219,7 @@ class Config(dict):
         'AUTH_WECOM': False,
         'WECOM_CORPID': '',
         'WECOM_AGENTID': '',
-        'WECOM_CORPSECRET': '',
+        'WECOM_SECRET': '',
 
         'AUTH_DINGTALK': False,
         'DINGTALK_AGENTID': '',
