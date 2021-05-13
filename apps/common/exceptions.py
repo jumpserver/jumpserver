@@ -39,3 +39,9 @@ class ReferencedByOthers(JMSException):
     status_code = status.HTTP_400_BAD_REQUEST
     default_code = 'referenced_by_others'
     default_detail = _('Is referenced by other objects and cannot be deleted')
+
+
+class MFAVerifyRequired(JMSException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_code = 'mfa_verify_required'
+    default_detail = _('This action require verify your MFA')

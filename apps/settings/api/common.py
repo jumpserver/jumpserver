@@ -112,6 +112,7 @@ class PublicSettingApi(generics.RetrieveAPIView):
                 "LOGIN_CONFIRM_ENABLE": settings.LOGIN_CONFIRM_ENABLE,
                 "SECURITY_VIEW_AUTH_NEED_MFA": settings.SECURITY_VIEW_AUTH_NEED_MFA,
                 "SECURITY_MFA_VERIFY_TTL": settings.SECURITY_MFA_VERIFY_TTL,
+                "OLD_PASSWORD_HISTORY_LIMIT_COUNT": settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT,
                 "SECURITY_COMMAND_EXECUTION": settings.SECURITY_COMMAND_EXECUTION,
                 "SECURITY_PASSWORD_EXPIRATION_TIME": settings.SECURITY_PASSWORD_EXPIRATION_TIME,
                 "XPACK_LICENSE_IS_VALID": has_valid_xpack_license(),
@@ -124,7 +125,9 @@ class PublicSettingApi(generics.RetrieveAPIView):
                     'SECURITY_PASSWORD_LOWER_CASE': settings.SECURITY_PASSWORD_LOWER_CASE,
                     'SECURITY_PASSWORD_NUMBER': settings.SECURITY_PASSWORD_NUMBER,
                     'SECURITY_PASSWORD_SPECIAL_CHAR': settings.SECURITY_PASSWORD_SPECIAL_CHAR,
-                }
+                },
+                "AUTH_WECOM": settings.AUTH_WECOM,
+                "AUTH_DINGTALK": settings.AUTH_DINGTALK,
             }
         }
         return instance
@@ -140,6 +143,8 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'ldap': serializers.LDAPSettingSerializer,
         'email': serializers.EmailSettingSerializer,
         'email_content': serializers.EmailContentSettingSerializer,
+        'wecom': serializers.WeComSettingSerializer,
+        'dingtalk': serializers.DingTalkSettingSerializer,
     }
 
     def get_serializer_class(self):
@@ -162,6 +167,8 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         category = self.request.query_params.get('category', '')
         for name, value in serializer.validated_data.items():
             encrypted = name in encrypted_items
+            if encrypted and value in ['', None]:
+                continue
             data.append({
                 'name': name, 'value': value,
                 'encrypted': encrypted, 'category': category

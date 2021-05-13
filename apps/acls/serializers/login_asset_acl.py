@@ -54,7 +54,7 @@ class LoginAssetACLSystemUsersSerializer(serializers.Serializer):
     protocol_group = serializers.ListField(
         default=['*'], child=serializers.CharField(max_length=16), label=_('Protocol'),
         help_text=protocol_group_help_text.format(
-            ', '.join(SystemUser.ASSET_CATEGORY_PROTOCOLS)
+            ', '.join([SystemUser.PROTOCOL_SSH, SystemUser.PROTOCOL_TELNET])
         )
     )
 
@@ -76,11 +76,15 @@ class LoginAssetACLSerializer(BulkOrgResourceModelSerializer):
 
     class Meta:
         model = models.LoginAssetACL
-        fields = [
-            'id', 'name', 'priority', 'users', 'system_users', 'assets', 'action', 'action_display',
-            'is_active', 'comment', 'reviewers', 'reviewers_amount', 'created_by', 'date_created',
-            'date_updated', 'org_id'
+        fields_mini = ['id', 'name']
+        fields_small = fields_mini + [
+            'users', 'system_users', 'assets',
+            'is_active',
+            'date_created', 'date_updated',
+            'priority', 'action', 'action_display', 'comment', 'created_by', 'org_id'
         ]
+        fields_m2m = ['reviewers', 'reviewers_amount']
+        fields = fields_small + fields_m2m
         extra_kwargs = {
             "reviewers": {'allow_null': False, 'required': True},
             'priority': {'default': 50},

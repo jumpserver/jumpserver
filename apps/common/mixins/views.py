@@ -5,7 +5,7 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.utils import timezone
 
 
-__all__ = ["DatetimeSearchMixin"]
+__all__ = ["DatetimeSearchMixin", "PermissionsMixin"]
 
 from rest_framework import permissions
 

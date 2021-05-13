@@ -3,6 +3,7 @@
 import time
 from rest_framework import permissions
 from django.conf import settings
+from common.exceptions import MFAVerifyRequired
 
 from orgs.utils import current_org
 
@@ -114,7 +115,7 @@ class NeedMFAVerify(permissions.BasePermission):
         mfa_verify_time = request.session.get('MFA_VERIFY_TIME', 0)
         if time.time() - mfa_verify_time < settings.SECURITY_MFA_VERIFY_TTL:
             return True
-        return False
+        raise MFAVerifyRequired()
 
 
 class CanUpdateDeleteUser(permissions.BasePermission):

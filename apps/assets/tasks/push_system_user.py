@@ -56,8 +56,8 @@ def get_push_unixlike_system_user_tasks(system_user, username=None):
         'shell': system_user.shell or Empty,
         'state': 'present',
         'home': system_user.home or Empty,
+        'expires': -1,
         'groups': groups or Empty,
-        'expires': 99999,
         'comment': comment
     }
 

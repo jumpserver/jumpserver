@@ -23,12 +23,13 @@ api_v1 = [
     path('applications/', include('applications.urls.api_urls', namespace='api-applications')),
     path('tickets/', include('tickets.urls.api_urls', namespace='api-tickets')),
     path('acls/', include('acls.urls.api_urls', namespace='api-acls')),
-    path('prometheus/metrics/', api.PrometheusMetricsApi.as_view())
+    path('prometheus/metrics/', api.PrometheusMetricsApi.as_view()),
 ]
 
 app_view_patterns = [
     path('auth/', include('authentication.urls.view_urls'), name='auth'),
     path('ops/', include('ops.urls.view_urls'), name='ops'),
+    path('common/', include('common.urls.view_urls'), name='common'),
     re_path(r'flower/(?P<path>.*)', views.celery_flower_view, name='flower-view'),
 ]
 

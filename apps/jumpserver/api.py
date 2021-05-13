@@ -18,6 +18,7 @@ from terminal.utils import ComponentsPrometheusMetricsUtil
 from orgs.utils import current_org
 from common.permissions import IsOrgAdmin, IsOrgAuditor
 from common.utils import lazyproperty
+from orgs.caches import OrgResourceStatisticsCache
 
 __all__ = ['IndexApi']
 
@@ -99,7 +100,7 @@ class DatesLoginMetricMixin:
         if count is not None:
             return count
         ds, de = self.get_date_start_2_end(date)
-        count = len(set(Session.objects.filter(date_start__range=(ds, de)).values_list('user', flat=True)))
+        count = len(set(Session.objects.filter(date_start__range=(ds, de)).values_list('user_id', flat=True)))
         self.__set_data_to_cache(date, tp, count)
         return count
 
@@ -129,7 +130,7 @@ class DatesLoginMetricMixin:
 
     @lazyproperty
     def dates_total_count_active_users(self):
-        count = len(set(self.sessions_queryset.values_list('user', flat=True)))
+        count = len(set(self.sessions_queryset.values_list('user_id', flat=True)))
         return count
 
     @lazyproperty
@@ -161,10 +162,10 @@ class DatesLoginMetricMixin:
     @lazyproperty
     def dates_total_count_disabled_assets(self):
         return Asset.objects.filter(is_active=False).count()
-    
+
     # 以下是从week中而来
     def get_dates_login_times_top5_users(self):
-        users = self.sessions_queryset.values_list('user', flat=True)
+        users = self.sessions_queryset.values_list('user_id', flat=True)
         users = [
             {'user': user, 'total': total}
             for user, total in Counter(users).most_common(5)
@@ -172,7 +173,7 @@ class DatesLoginMetricMixin:
         return users
 
     def get_dates_total_count_login_users(self):
-        return len(set(self.sessions_queryset.values_list('user', flat=True)))
+        return len(set(self.sessions_queryset.values_list('user_id', flat=True)))
 
     def get_dates_total_count_login_times(self):
         return self.sessions_queryset.count()
@@ -186,8 +187,8 @@ class DatesLoginMetricMixin:
         return list(assets)
 
     def get_dates_login_times_top10_users(self):
-        users = self.sessions_queryset.values("user") \
-                    .annotate(total=Count("user")) \
+        users = self.sessions_queryset.values("user_id") \
+                    .annotate(total=Count("user_id")) \
                     .annotate(last=Max("date_start")).order_by("-total")[:10]
         for user in users:
             user['last'] = str(user['last'])
@@ -210,26 +211,7 @@ class DatesLoginMetricMixin:
         return sessions
 
 
-class TotalCountMixin:
-    @staticmethod
-    def get_total_count_users():
-        return current_org.get_members().count()
-
-    @staticmethod
-    def get_total_count_assets():
-        return Asset.objects.all().count()
-
-    @staticmethod
-    def get_total_count_online_users():
-        count = len(set(Session.objects.filter(is_finished=False).values_list('user', flat=True)))
-        return count
-
-    @staticmethod
-    def get_total_count_online_sessions():
-        return Session.objects.filter(is_finished=False).count()
-
-
-class IndexApi(TotalCountMixin, DatesLoginMetricMixin, APIView):
+class IndexApi(DatesLoginMetricMixin, APIView):
     permission_classes = (IsOrgAdmin | IsOrgAuditor,)
     http_method_names = ['get']
 
@@ -238,26 +220,28 @@ class IndexApi(TotalCountMixin, DatesLoginMetricMixin, APIView):
 
         query_params = self.request.query_params
 
+        caches = OrgResourceStatisticsCache(self.request.user.user_orgs[0])
+
         _all = query_params.get('all')
 
         if _all or query_params.get('total_count') or query_params.get('total_count_users'):
             data.update({
-                'total_count_users': self.get_total_count_users(),
+                'total_count_users': caches.users_amount,
             })
 
         if _all or query_params.get('total_count') or query_params.get('total_count_assets'):
             data.update({
-                'total_count_assets': self.get_total_count_assets(),
+                'total_count_assets': caches.assets_amount,
             })
 
         if _all or query_params.get('total_count') or query_params.get('total_count_online_users'):
             data.update({
-                'total_count_online_users': self.get_total_count_online_users(),
+                'total_count_online_users': caches.total_count_online_users,
             })
 
         if _all or query_params.get('total_count') or query_params.get('total_count_online_sessions'):
             data.update({
-                'total_count_online_sessions': self.get_total_count_online_sessions(),
+                'total_count_online_sessions': caches.total_count_online_sessions,
             })
 
         if _all or query_params.get('dates_metrics'):

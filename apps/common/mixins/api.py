@@ -6,10 +6,12 @@ from threading import Thread
 from collections import defaultdict
 from itertools import chain
 
+from django.conf import settings
 from django.db.models.signals import m2m_changed
 from django.core.cache import cache
 from django.http import JsonResponse
 from django.utils.translation import ugettext as _
+from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 from rest_framework.decorators import action
@@ -23,6 +25,9 @@ __all__ = [
     'JSONResponseMixin', 'CommonApiMixin', 'AsyncApiMixin', 'RelationMixin',
     'SerializerMixin2', 'QuerySetMixin', 'ExtraFilterFieldsMixin', 'RenderToJsonMixin',
 ]
+
+
+UserModel = get_user_model()
 
 
 class JSONResponseMixin(object):
@@ -332,3 +337,21 @@ class AllowBulkDestoryMixin:
         """
         query = str(filtered.query)
         return '`id` IN (' in query or '`id` =' in query
+
+
+class RoleAdminMixin:
+    kwargs: dict
+    user_id_url_kwarg = 'pk'
+
+    @lazyproperty
+    def user(self):
+        user_id = self.kwargs.get(self.user_id_url_kwarg)
+        return UserModel.objects.get(id=user_id)
+
+
+class RoleUserMixin:
+    request: Request
+
+    @lazyproperty
+    def user(self):
+        return self.request.user

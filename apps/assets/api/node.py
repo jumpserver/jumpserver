@@ -71,8 +71,8 @@ class NodeViewSet(OrgModelViewSet):
         if node.is_org_root():
             error = _("You can't delete the root node ({})".format(node.value))
             return Response(data={'error': error}, status=status.HTTP_403_FORBIDDEN)
-        if node.has_children_or_has_assets():
-            error = _("Deletion failed and the node contains children or assets")
+        if node.has_offspring_assets():
+            error = _("Deletion failed and the node contains assets")
             return Response(data={'error': error}, status=status.HTTP_403_FORBIDDEN)
         return super().destroy(request, *args, **kwargs)
 

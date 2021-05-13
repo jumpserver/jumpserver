@@ -5,7 +5,7 @@ from rest_framework.generics import CreateAPIView, RetrieveDestroyAPIView
 from common.permissions import IsAppUser
 from common.utils import reverse, lazyproperty
 from orgs.utils import tmp_to_org, tmp_to_root_org
-from tickets.models import Ticket
+from tickets.api import GenericTicketStatusRetrieveCloseAPI
 from ..models import LoginAssetACL
 from .. import serializers
 
@@ -48,7 +48,7 @@ class LoginAssetCheckAPI(CreateAPIView):
             org_id=self.serializer.org.id
         )
         confirm_status_url = reverse(
-            view_name='acls:login-asset-confirm-status',
+            view_name='api-acls:login-asset-confirm-status',
             kwargs={'pk': str(ticket.id)}
         )
         ticket_detail_url = reverse(
@@ -72,34 +72,6 @@ class LoginAssetCheckAPI(CreateAPIView):
         return serializer
 
 
-class LoginAssetConfirmStatusAPI(RetrieveDestroyAPIView):
-    permission_classes = (IsAppUser, )
+class LoginAssetConfirmStatusAPI(GenericTicketStatusRetrieveCloseAPI):
+    pass
 
-    def retrieve(self, request, *args, **kwargs):
-        if self.ticket.action_open:
-            status = 'await'
-        elif self.ticket.action_approve:
-            status = 'approve'
-        else:
-            status = 'reject'
-        data = {
-            'status': status,
-            'action': self.ticket.action,
-            'processor': self.ticket.processor_display
-        }
-        return Response(data=data, status=200)
-
-    def destroy(self, request, *args, **kwargs):
-        if self.ticket.status_open:
-            self.ticket.close(processor=self.ticket.applicant)
-        data = {
-            'action': self.ticket.action,
-            'status': self.ticket.status,
-            'processor': self.ticket.processor_display
-        }
-        return Response(data=data, status=200)
-
-    @lazyproperty
-    def ticket(self):
-        with tmp_to_root_org():
-            return get_object_or_404(Ticket, pk=self.kwargs['pk'])

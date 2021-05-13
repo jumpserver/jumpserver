@@ -11,6 +11,7 @@ from django.core.files.storage import default_storage
 from django.core.cache import cache
 
 from assets.models import Asset
+from users.models import User
 from orgs.mixins.models import OrgModelMixin
 from common.db.models import ChoiceSet
 from ..backends import get_multi_command_storage
@@ -78,6 +79,10 @@ class Session(OrgModelMixin):
     @property
     def asset_obj(self):
         return Asset.objects.get(id=self.asset_id)
+
+    @property
+    def user_obj(self):
+        return User.objects.get(id=self.user_id)
 
     @property
     def _date_start_first_has_replay_rdp_session(self):

@@ -65,7 +65,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     platform = serializers.SlugRelatedField(
         slug_field='name', queryset=Platform.objects.all(), label=_("Platform")
     )
-    protocols = ProtocolsField(label=_('Protocols'), required=False)
+    protocols = ProtocolsField(label=_('Protocols'), required=False, default=['ssh/22'])
     domain_display = serializers.ReadOnlyField(source='domain.name', label=_('Domain name'))
     admin_user_display = serializers.ReadOnlyField(source='admin_user.name', label=_('Admin user name'))
     nodes_display = serializers.ListField(child=serializers.CharField(), label=_('Nodes name'), required=False)

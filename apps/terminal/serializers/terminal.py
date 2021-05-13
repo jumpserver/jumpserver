@@ -17,12 +17,15 @@ class StatusSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = [
-            'id',
+        fields_mini = ['id']
+        fields_write_only = ['sessions',]
+        fields_small = fields_mini + fields_write_only + [
             'cpu_load', 'memory_used', 'disk_used',
-            'session_online', 'sessions',
-            'terminal', 'date_created',
+            'session_online',
+            'date_created'
         ]
+        fields_fk = ['terminal']
+        fields = fields_small + fields_fk
         extra_kwargs = {
             "cpu_load": {'default': 0},
             "memory_used": {'default': 0},
@@ -40,12 +43,16 @@ class TerminalSerializer(BulkModelSerializer):
 
     class Meta:
         model = Terminal
-        fields = [
-            'id', 'name', 'type', 'remote_addr', 'http_port', 'ssh_port',
-            'comment', 'is_accepted', "is_active", 'session_online',
-            'is_alive', 'date_created', 'command_storage', 'replay_storage',
-            'status', 'status_display', 'stat'
+        fields_mini = ['id', 'name']
+        fields_small = fields_mini + [
+            'type', 'remote_addr', 'http_port', 'ssh_port',
+            'session_online', 'command_storage', 'replay_storage',
+            'is_accepted', "is_active", 'is_alive',
+            'date_created',
+            'comment',
         ]
+        fields_fk = ['status', 'status_display', 'stat']
+        fields = fields_small + fields_fk
         read_only_fields = ['type', 'date_created']
 
     @staticmethod

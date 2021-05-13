@@ -38,8 +38,7 @@ def compute_parent_key(key):
 
 
 class NodeQuerySet(models.QuerySet):
-    def delete(self):
-        raise NotImplementedError
+    pass
 
 
 class FamilyMixin:
@@ -622,14 +621,14 @@ class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
         tree_node = TreeNode(**data)
         return tree_node
 
-    def has_children_or_has_assets(self):
-        if self.children or self.get_assets().exists():
-            return True
-        return False
+    def has_offspring_assets(self):
+        # 拥有后代资产
+        return self.get_all_assets().exists()
 
     def delete(self, using=None, keep_parents=False):
-        if self.has_children_or_has_assets():
+        if self.has_offspring_assets():
             return
+        self.all_children.delete()
         return super().delete(using=using, keep_parents=keep_parents)
 
     def update_child_full_value(self):

@@ -216,6 +216,16 @@ class Config(dict):
         'AUTH_SSO': False,
         'AUTH_SSO_AUTHKEY_TTL': 60 * 15,
 
+        'AUTH_WECOM': False,
+        'WECOM_CORPID': '',
+        'WECOM_AGENTID': '',
+        'WECOM_SECRET': '',
+
+        'AUTH_DINGTALK': False,
+        'DINGTALK_AGENTID': '',
+        'DINGTALK_APPKEY': '',
+        'DINGTALK_APPSECRET': '',
+
         'OTP_VALID_WINDOW': 2,
         'OTP_ISSUER_NAME': 'JumpServer',
         'EMAIL_SUFFIX': 'jumpserver.org',
@@ -259,6 +269,7 @@ class Config(dict):
         'FTP_LOG_KEEP_DAYS': 200,
         'ASSETS_PERM_CACHE_TIME': 3600 * 24,
         'SECURITY_MFA_VERIFY_TTL': 3600,
+        'OLD_PASSWORD_HISTORY_LIMIT_COUNT': 5,
         'ASSETS_PERM_CACHE_ENABLE': HAS_XPACK,
         'SYSLOG_ADDR': '',  # '192.168.0.1:514'
         'SYSLOG_FACILITY': 'user',

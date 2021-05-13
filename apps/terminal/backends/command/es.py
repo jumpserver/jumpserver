@@ -7,6 +7,7 @@ import pytz
 from uuid import UUID
 import inspect
 
+from django.utils.translation import gettext_lazy as _
 from django.db.models import QuerySet as DJQuerySet
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
@@ -14,10 +15,16 @@ from elasticsearch.exceptions import RequestError
 
 from common.utils.common import lazyproperty
 from common.utils import get_logger
+from common.exceptions import JMSException
 from .models import AbstractSessionCommand
 
 
 logger = get_logger(__file__)
+
+
+class InvalidElasticsearch(JMSException):
+    default_code = 'invalid_elasticsearch'
+    default_detail = _('Invalid elasticsearch config')
 
 
 class CommandStore():
@@ -27,12 +34,14 @@ class CommandStore():
         self.index = config.get("INDEX") or 'jumpserver'
         self.doc_type = config.get("DOC_TYPE") or 'command_store'
 
-        ignore_verify_certs = kwargs.pop('ignore_verify_certs', False)
+        ignore_verify_certs = kwargs.pop('IGNORE_VERIFY_CERTS', False)
         if ignore_verify_certs:
             kwargs['verify_certs'] = None
         self.es = Elasticsearch(hosts=hosts, max_retries=0, **kwargs)
 
     def pre_use_check(self):
+        if not self.ping(timeout=3):
+            raise InvalidElasticsearch
         self._ensure_index_exists()
 
     def _ensure_index_exists(self):

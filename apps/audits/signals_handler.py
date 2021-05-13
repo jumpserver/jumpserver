@@ -27,11 +27,23 @@ json_render = JSONRenderer()
 
 
 MODELS_NEED_RECORD = (
-    'User', 'UserGroup', 'Asset', 'Node', 'AdminUser', 'SystemUser',
-    'Domain', 'Gateway', 'Organization', 'AssetPermission', 'CommandFilter',
-    'CommandFilterRule', 'License', 'Setting', 'Account', 'SyncInstanceTask',
-    'Platform', 'ChangeAuthPlan', 'GatherUserTask',
-    'RemoteApp', 'RemoteAppPermission', 'DatabaseApp', 'DatabaseAppPermission',
+    # users
+    'User', 'UserGroup',
+    # acls
+    'LoginACL', 'LoginAssetACL',
+    # assets
+    'Asset', 'Node', 'AdminUser', 'SystemUser', 'Domain', 'Gateway', 'CommandFilterRule',
+    'CommandFilter', 'Platform',
+    # applications
+    'Application',
+    # orgs
+    'Organization',
+    # settings
+    'Setting',
+    # perms
+    'AssetPermission', 'ApplicationPermission',
+    # xpack
+    'License', 'Account', 'SyncInstanceTask', 'ChangeAuthPlan', 'GatherUserTask',
 )
 
 
@@ -45,6 +57,8 @@ class AuthBackendLabelMapping(LazyObject):
         backend_label_mapping[settings.AUTH_BACKEND_PUBKEY] = _('SSH Key')
         backend_label_mapping[settings.AUTH_BACKEND_MODEL] = _('Password')
         backend_label_mapping[settings.AUTH_BACKEND_SSO] = _('SSO')
+        backend_label_mapping[settings.AUTH_BACKEND_WECOM] = _('WeCom')
+        backend_label_mapping[settings.AUTH_BACKEND_DINGTALK] = _('DingTalk')
         return backend_label_mapping
 
     def _setup(self):

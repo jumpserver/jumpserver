@@ -6,7 +6,7 @@ from rest_framework import serializers
 __all__ = [
     'BasicSettingSerializer', 'EmailSettingSerializer', 'EmailContentSettingSerializer',
     'LDAPSettingSerializer', 'TerminalSettingSerializer', 'SecuritySettingSerializer',
-    'SettingsSerializer'
+    'SettingsSerializer', 'WeComSettingSerializer', 'DingTalkSettingSerializer',
 ]
 
 
@@ -121,7 +121,11 @@ class TerminalSettingSerializer(serializers.Serializer):
         ('50', '50'),
     )
     TERMINAL_PASSWORD_AUTH = serializers.BooleanField(required=False, label=_('Password auth'))
-    TERMINAL_PUBLIC_KEY_AUTH = serializers.BooleanField(required=False, label=_('Public key auth'))
+    TERMINAL_PUBLIC_KEY_AUTH = serializers.BooleanField(
+        required=False, label=_('Public key auth'),
+        help_text=_('Tips: If use other auth method, like AD/LDAP, you should disable this to '
+                    'avoid being able to log in after deleting')
+    )
     TERMINAL_ASSET_LIST_SORT_BY = serializers.ChoiceField(SORT_BY_CHOICES, required=False, label=_('List sort by'))
     TERMINAL_ASSET_LIST_PAGE_SIZE = serializers.ChoiceField(PAGE_SIZE_CHOICES, required=False, label=_('List page size'))
     TERMINAL_SESSION_KEEP_DURATION = serializers.IntegerField(
@@ -163,6 +167,11 @@ class SecuritySettingSerializer(serializers.Serializer):
         label=_('User password expiration'),
         help_text=_('Tip: (unit: day) If the user does not update the password during the time, the user password will expire failure;The password expiration reminder mail will be automatic sent to the user by system within 5 days (daily) before the password expires')
     )
+    OLD_PASSWORD_HISTORY_LIMIT_COUNT = serializers.IntegerField(
+        min_value=0, max_value=99999, required=True,
+        label=_('Number of repeated historical passwords'),
+        help_text=_('Tip: When the user resets the password, it cannot be the previous n historical passwords of the user (the value of n here is the value filled in the input box)')
+    )
     SECURITY_PASSWORD_MIN_LENGTH = serializers.IntegerField(
         min_value=6, max_value=30, required=True,
         label=_('Password minimum length')
@@ -180,13 +189,29 @@ class SecuritySettingSerializer(serializers.Serializer):
     )
 
 
+class WeComSettingSerializer(serializers.Serializer):
+    WECOM_CORPID = serializers.CharField(max_length=256, required=True, label=_('Corporation ID(corpid)'))
+    WECOM_AGENTID = serializers.CharField(max_length=256, required=True, label=_("Agent ID(agentid)"))
+    WECOM_SECRET = serializers.CharField(max_length=256, required=True, label=_("Secret(secret)"), write_only=True)
+    AUTH_WECOM = serializers.BooleanField(default=False, label=_('Enable WeCom Auth'))
+
+
+class DingTalkSettingSerializer(serializers.Serializer):
+    DINGTALK_AGENTID = serializers.CharField(max_length=256, required=True, label=_("AgentId"))
+    DINGTALK_APPKEY = serializers.CharField(max_length=256, required=True, label=_("AppKey"))
+    DINGTALK_APPSECRET = serializers.CharField(max_length=256, required=False, label=_("AppSecret"), write_only=True)
+    AUTH_DINGTALK = serializers.BooleanField(default=False, label=_('Enable DingTalk Auth'))
+
+
 class SettingsSerializer(
     BasicSettingSerializer,
     EmailSettingSerializer,
     EmailContentSettingSerializer,
     LDAPSettingSerializer,
     TerminalSettingSerializer,
-    SecuritySettingSerializer
+    SecuritySettingSerializer,
+    WeComSettingSerializer,
+    DingTalkSettingSerializer,
 ):
 
     # encrypt_fields 现在使用 write_only 来判断了
