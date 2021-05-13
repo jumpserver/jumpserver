@@ -75,11 +75,16 @@ def ssh_key_string_to_obj(text, password=None):
         key = paramiko.RSAKey.from_private_key(StringIO(text), password=password)
     except paramiko.SSHException:
         pass
+    else:
+        return key
 
     try:
         key = paramiko.DSSKey.from_private_key(StringIO(text), password=password)
     except paramiko.SSHException:
         pass
+    else:
+        return key
+
     return key
 
 
