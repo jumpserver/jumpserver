@@ -103,6 +103,12 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             raise serializers.ValidationError(msg)
         return username
 
+    def validate_home(self, home):
+        username_same_with_user = self.initial_data.get("username_same_with_user")
+        if username_same_with_user:
+            return ''
+        return home
+
     def validate_sftp_root(self, value):
         if value in ['home', 'tmp']:
             return value
