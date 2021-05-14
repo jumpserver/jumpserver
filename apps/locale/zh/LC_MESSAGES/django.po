@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-13 19:30+0800\n"
+"POT-Creation-Date: 2021-05-14 16:12+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -122,7 +122,7 @@ msgstr "系统用户"
 #: assets/models/asset.py:355 assets/models/authbook.py:26
 #: assets/models/gathered_user.py:14 assets/serializers/admin_user.py:34
 #: assets/serializers/asset_user.py:48 assets/serializers/asset_user.py:89
-#: assets/serializers/system_user.py:195 audits/models.py:38
+#: assets/serializers/system_user.py:201 audits/models.py:38
 #: perms/models/asset_permission.py:99 templates/index.html:82
 #: terminal/backends/command/models.py:19
 #: terminal/backends/command/serializers.py:13 terminal/models/session.py:40
@@ -674,7 +674,7 @@ msgstr "全称"
 msgid "Parent key"
 msgstr "ssh私钥"
 
-#: assets/models/node.py:559 assets/serializers/system_user.py:194
+#: assets/models/node.py:559 assets/serializers/system_user.py:200
 #: users/templates/users/user_asset_permission.html:41
 #: users/templates/users/user_asset_permission.html:73
 #: users/templates/users/user_asset_permission.html:158
@@ -839,7 +839,7 @@ msgid "Gateways count"
 msgstr "网关数量"
 
 #: assets/serializers/label.py:13 assets/serializers/system_user.py:47
-#: assets/serializers/system_user.py:169
+#: assets/serializers/system_user.py:175
 #: perms/serializers/asset/permission.py:74
 msgid "Assets amount"
 msgstr "资产数量"
@@ -861,17 +861,17 @@ msgstr "不能包含: /"
 msgid "The same level node name cannot be the same"
 msgstr "同级别节点名字不能重复"
 
-#: assets/serializers/system_user.py:46 assets/serializers/system_user.py:168
+#: assets/serializers/system_user.py:46 assets/serializers/system_user.py:174
 #: perms/serializers/asset/permission.py:75
 msgid "Nodes amount"
 msgstr "节点数量"
 
-#: assets/serializers/system_user.py:48 assets/serializers/system_user.py:170
-#: assets/serializers/system_user.py:196
+#: assets/serializers/system_user.py:48 assets/serializers/system_user.py:176
+#: assets/serializers/system_user.py:202
 msgid "Login mode display"
 msgstr "登录模式（显示名称）"
 
-#: assets/serializers/system_user.py:50 assets/serializers/system_user.py:172
+#: assets/serializers/system_user.py:50 assets/serializers/system_user.py:178
 msgid "Ad domain"
 msgstr "Ad 网域"
 
@@ -883,11 +883,11 @@ msgstr "用户名和用户相同的一种协议只允许存在一个"
 msgid "* Automatic login mode must fill in the username."
 msgstr "自动登录模式，必须填写用户名"
 
-#: assets/serializers/system_user.py:110
+#: assets/serializers/system_user.py:116
 msgid "Path should starts with /"
 msgstr "路径应该以 / 开头"
 
-#: assets/serializers/system_user.py:121
+#: assets/serializers/system_user.py:127
 msgid "Password or private key required"
 msgstr "密码或密钥密码需要一个"
 
@@ -3519,11 +3519,15 @@ msgstr "工单处理人"
 msgid "Ticket basic info"
 msgstr "工单基本信息"
 
-#: tickets/handler/base.py:114
+#: tickets/handler/base.py:114 tickets/handler/base.py:121
+msgid "No content"
+msgstr "无内容"
+
+#: tickets/handler/base.py:116
 msgid "Ticket applied info"
 msgstr "工单申请信息"
 
-#: tickets/handler/base.py:119
+#: tickets/handler/base.py:123
 msgid "Ticket approved info"
 msgstr "工单批准信息"
 
@@ -4949,7 +4953,7 @@ msgstr "实例个数"
 msgid "Periodic display"
 msgstr "定时执行"
 
-#: xpack/plugins/cloud/utils.py:64
+#: xpack/plugins/cloud/utils.py:65
 msgid "Account unavailable"
 msgstr "账户无效"
 
@@ -5037,3 +5041,5 @@ msgstr "旗舰版"
 msgid "Community edition"
 msgstr "社区版"
 
+#~ msgid "No"
+#~ msgstr "无"
