@@ -83,6 +83,16 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
         return queryset
 
     def to_internal_value(self, data):
+        if not data['assets']:
+            data['assets'] = []
+        if not data['system_users']:
+            data['system_users'] = []
+        if not data['users']:
+            data['users'] = []
+        if not data['user_groups']:
+            data['user_groups'] = []
+        if not data['nodes']:
+            data['nodes'] = []
         # 系统用户是必填项
         system_users_display = data.pop('system_users_display', '')
         for i in range(len(system_users_display)):
