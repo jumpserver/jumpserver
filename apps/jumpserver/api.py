@@ -220,7 +220,7 @@ class IndexApi(DatesLoginMetricMixin, APIView):
 
         query_params = self.request.query_params
 
-        caches = OrgResourceStatisticsCache(self.request.user.user_orgs[0])
+        caches = OrgResourceStatisticsCache(current_org)
 
         _all = query_params.get('all')
 
