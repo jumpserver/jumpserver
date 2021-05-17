@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-14 16:12+0800\n"
+"POT-Creation-Date: 2021-05-17 18:56+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1803,36 +1803,36 @@ msgstr "没有该主机 {} 权限"
 msgid "Operations"
 msgstr "运维"
 
-#: ops/mixin.py:29 ops/mixin.py:92 ops/mixin.py:160
+#: ops/mixin.py:29 ops/mixin.py:92 ops/mixin.py:162
 msgid "Cycle perform"
 msgstr "周期执行"
 
-#: ops/mixin.py:33 ops/mixin.py:90 ops/mixin.py:109 ops/mixin.py:148
+#: ops/mixin.py:33 ops/mixin.py:90 ops/mixin.py:109 ops/mixin.py:150
 msgid "Regularly perform"
 msgstr "定期执行"
 
-#: ops/mixin.py:106 ops/mixin.py:145
+#: ops/mixin.py:106 ops/mixin.py:147
 #: xpack/plugins/change_auth_plan/serializers.py:53
 msgid "Periodic perform"
 msgstr "定时执行"
 
-#: ops/mixin.py:111
+#: ops/mixin.py:112
 msgid "Interval"
 msgstr "间隔"
 
-#: ops/mixin.py:120
+#: ops/mixin.py:122
 msgid "* Please enter a valid crontab expression"
 msgstr "* 请输入有效的 crontab 表达式"
 
-#: ops/mixin.py:127
+#: ops/mixin.py:129
 msgid "Range {} to {}"
 msgstr "输入在 {} - {} 范围之间"
 
-#: ops/mixin.py:138
+#: ops/mixin.py:140
 msgid "Require periodic or regularly perform setting"
 msgstr "需要周期或定期设置"
 
-#: ops/mixin.py:149
+#: ops/mixin.py:151
 msgid ""
 "eg: Every Sunday 03:05 run <5 3 * * 0> <br> Tips: Using 5 digits linux "
 "crontab expressions <min hour day month week> (<a href='https://tool.lu/"
@@ -1843,7 +1843,7 @@ msgstr ""
 "分 时 日 月 星期> （<a href='https://tool.lu/crontab/' target='_blank'>在线工"
 "具</a>） <br>注意： 如果同时设置了定期执行和周期执行，优先使用定期执行"
 
-#: ops/mixin.py:160
+#: ops/mixin.py:162
 msgid "Tips: (Units: hour)"
 msgstr "提示：（单位： 时）"
 
@@ -1954,12 +1954,11 @@ msgstr "更新任务内容: {}"
 msgid "Disk used more than 80%: {} => {}"
 msgstr "磁盘使用率超过 80%: {} => {}"
 
-#: orgs/api.py:76
-#, python-brace-format
-msgid "Have `{model._meta.verbose_name}` exists, Please delete"
-msgstr "`{model._meta.verbose_name}` 存在数据, 请先删除"
+#: orgs/api.py:79
+msgid "Have {} exists, Please delete"
+msgstr "{} 存在数据, 请先删除"
 
-#: orgs/api.py:80
+#: orgs/api.py:83
 msgid "The current organization cannot be deleted"
 msgstr "当前组织不能被删除"
 
@@ -3048,19 +3047,19 @@ msgstr "登录了"
 msgid "Filters"
 msgstr "过滤"
 
-#: terminal/api/session.py:189
+#: terminal/api/session.py:185
 msgid "Session does not exist: {}"
 msgstr "会话不存在: {}"
 
-#: terminal/api/session.py:192
+#: terminal/api/session.py:188
 msgid "Session is finished or the protocol not supported"
 msgstr "会话已经完成或协议不支持"
 
-#: terminal/api/session.py:197
+#: terminal/api/session.py:193
 msgid "User does not exist: {}"
 msgstr "用户不存在: {}"
 
-#: terminal/api/session.py:201
+#: terminal/api/session.py:197
 msgid "User does not have permission"
 msgstr "用户没有权限"
 
