@@ -39,14 +39,14 @@ class RemoteAppSerializer(serializers.Serializer):
     @staticmethod
     def get_asset_info(obj):
         asset_id = obj.get('asset')
-        if not asset_id or is_uuid(asset_id):
+        if not asset_id or not is_uuid(asset_id):
             return {}
         try:
-            asset = Asset.objects.filter(id=str(asset_id)).values_list('id', 'hostname')
+            asset = Asset.objects.get(id=str(asset_id))
         except ObjectDoesNotExist as e:
             logger.error(e)
             return {}
         if not asset:
             return {}
-        asset_info = {'id': str(asset[0]), 'hostname': asset[1]}
+        asset_info = {'id': str(asset.id), 'hostname': asset.hostname}
         return asset_info
