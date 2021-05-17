@@ -87,6 +87,8 @@ class OrgResourceStatisticsCache(OrgRelatedCache):
         return users_amount
 
     def compute_assets_amount(self):
+        if self.org.is_root():
+            return Asset.objects.all().count()
         node = Node.org_root()
         return node.assets_amount
 

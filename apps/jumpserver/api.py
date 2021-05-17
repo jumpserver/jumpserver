@@ -221,6 +221,8 @@ class IndexApi(DatesLoginMetricMixin, APIView):
         query_params = self.request.query_params
 
         caches = OrgResourceStatisticsCache(current_org)
+        if current_org.is_root():
+            caches.refresh()
 
         _all = query_params.get('all')
 
