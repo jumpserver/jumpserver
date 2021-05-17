@@ -18,6 +18,7 @@ def refresh_user_amount_on_user_create_or_delete(user_id):
     for org in orgs:
         org_cache = OrgResourceStatisticsCache(org)
         org_cache.expire('users_amount')
+    OrgResourceStatisticsCache(Organization.root()).expire('users_amount')
 
 
 @receiver(post_save, sender=User)
@@ -44,6 +45,7 @@ def on_org_user_changed_refresh_cache(sender, action, instance, reverse, pk_set,
     for org in orgs:
         org_cache = OrgResourceStatisticsCache(org)
         org_cache.expire('users_amount')
+    OrgResourceStatisticsCache(Organization.root()).expire('users_amount')
 
 
 class OrgResourceStatisticsRefreshUtil:
@@ -67,6 +69,7 @@ class OrgResourceStatisticsRefreshUtil:
         if cache_field_name:
             org_cache = OrgResourceStatisticsCache(instance.org)
             org_cache.expire(*cache_field_name)
+            OrgResourceStatisticsCache(Organization.root()).expire(*cache_field_name)
 
 
 @receiver(pre_save)
