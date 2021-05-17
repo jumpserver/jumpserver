@@ -39,7 +39,7 @@ class DictWrapper:
         except KeyError as e:
             msg = f'Response 200 but get field from json error: error={e} data={self.raw_data}'
             logger.error(msg)
-            raise exce.ResponseDataKeyError(detail=msg)
+            raise exce.ResponseDataKeyError(detail=self.raw_data)
 
     def __getattr__(self, item):
         return getattr(self.raw_data, item)
