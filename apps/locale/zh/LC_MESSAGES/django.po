@@ -3086,7 +3086,7 @@ msgstr "测试失败: 账户无效"
 
 #: terminal/backends/command/es.py:27
 msgid "Invalid elasticsearch config"
-msgstr ""
+msgstr "无效的 Elasticsearch 配置"
 
 #: terminal/backends/command/models.py:14
 msgid "Ordinary"
