@@ -33,6 +33,9 @@ class ErrorCode:
     # https://open.work.weixin.qq.com/api/doc/90000/90139/90313#%E9%94%99%E8%AF%AF%E7%A0%81%EF%BC%9A81013
     RECIPIENTS_INVALID = 81013  # UserID、部门ID、标签ID全部非法或无权限。
 
+    # https: // open.work.weixin.qq.com / devtool / query?e = 82001
+    RECIPIENTS_EMPTY = 82001  # 指定的成员/部门/标签全部为空
+
     # https://open.work.weixin.qq.com/api/doc/90000/90135/91437
     INVALID_CODE = 40029
 
@@ -141,7 +144,7 @@ class WeCom(RequestMixin):
         data = self._requests.post(URL.SEND_MESSAGE, json=body, check_errcode_is_0=False)
 
         errcode = data['errcode']
-        if errcode == ErrorCode.RECIPIENTS_INVALID:
+        if errcode in (ErrorCode.RECIPIENTS_INVALID, ErrorCode.RECIPIENTS_EMPTY):
             # 全部接收人无权限或不存在
             return users
         self.check_errcode_is_0(data)
