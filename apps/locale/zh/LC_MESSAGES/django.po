@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-17 19:04+0800\n"
+"POT-Creation-Date: 2021-05-17 16:17+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1547,44 +1547,48 @@ msgstr "返回"
 msgid "Copy success"
 msgstr "复制成功"
 
-#: authentication/views/dingtalk.py:40 authentication/views/wecom.py:40
+#: authentication/views/dingtalk.py:41 authentication/views/wecom.py:41
 msgid "You've been hacked"
 msgstr "你被攻击了"
 
-#: authentication/views/dingtalk.py:76
+#: authentication/views/dingtalk.py:77
 msgid "DingTalk is already bound"
 msgstr "钉钉已经绑定"
 
-#: authentication/views/dingtalk.py:89 authentication/views/wecom.py:88
+#: authentication/views/dingtalk.py:90 authentication/views/wecom.py:89
 msgid "Please verify your password first"
 msgstr "请检查密码"
 
-#: authentication/views/dingtalk.py:113 authentication/views/wecom.py:112
+#: authentication/views/dingtalk.py:114 authentication/views/wecom.py:113
 msgid "Invalid user_id"
 msgstr "无效的 user_id"
 
-#: authentication/views/dingtalk.py:129
+#: authentication/views/dingtalk.py:130
 msgid "DingTalk query user failed"
 msgstr "钉钉查询用户失败"
 
-#: authentication/views/dingtalk.py:136 authentication/views/dingtalk.py:219
-#: authentication/views/dingtalk.py:220
+#: authentication/views/dingtalk.py:139
+msgid "The DingTalk is already bound to another user"
+msgstr "该钉钉已经绑定其他用户"
+
+#: authentication/views/dingtalk.py:144 authentication/views/dingtalk.py:227
+#: authentication/views/dingtalk.py:228
 msgid "Binding DingTalk successfully"
 msgstr "绑定 钉钉 成功"
 
-#: authentication/views/dingtalk.py:188
+#: authentication/views/dingtalk.py:196
 msgid "Failed to get user from DingTalk"
 msgstr "从钉钉获取用户失败"
 
-#: authentication/views/dingtalk.py:194
+#: authentication/views/dingtalk.py:202
 msgid "DingTalk is not bound"
 msgstr "钉钉没有绑定"
 
-#: authentication/views/dingtalk.py:195 authentication/views/wecom.py:193
+#: authentication/views/dingtalk.py:203 authentication/views/wecom.py:201
 msgid "Please login with a password and then bind the WeCom"
 msgstr "请使用密码登录，然后绑定企业微信"
 
-#: authentication/views/dingtalk.py:237 authentication/views/dingtalk.py:238
+#: authentication/views/dingtalk.py:245 authentication/views/dingtalk.py:246
 msgid "Binding DingTalk failed"
 msgstr "绑定钉钉失败"
 
@@ -1620,28 +1624,32 @@ msgstr "退出登录成功"
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
-#: authentication/views/wecom.py:75
+#: authentication/views/wecom.py:76
 msgid "WeCom is already bound"
 msgstr "企业微信已经绑定"
 
-#: authentication/views/wecom.py:127
+#: authentication/views/wecom.py:128
 msgid "WeCom query user failed"
 msgstr "企业微信查询用户失败"
 
-#: authentication/views/wecom.py:134 authentication/views/wecom.py:217
-#: authentication/views/wecom.py:218
+#: authentication/views/wecom.py:137
+msgid "The WeCom is already bound to another user"
+msgstr "该企业微信已经绑定其他用户"
+
+#: authentication/views/wecom.py:142 authentication/views/wecom.py:225
+#: authentication/views/wecom.py:226
 msgid "Binding WeCom successfully"
 msgstr "绑定 企业微信 成功"
 
-#: authentication/views/wecom.py:186
+#: authentication/views/wecom.py:194
 msgid "Failed to get user from WeCom"
 msgstr "从企业微信获取用户失败"
 
-#: authentication/views/wecom.py:192
+#: authentication/views/wecom.py:200
 msgid "WeCom is not bound"
 msgstr "没有绑定企业微信"
 
-#: authentication/views/wecom.py:235 authentication/views/wecom.py:236
+#: authentication/views/wecom.py:243 authentication/views/wecom.py:244
 msgid "Binding WeCom failed"
 msgstr "绑定企业微信失败"
 
@@ -1667,7 +1675,7 @@ msgstr "对象"
 msgid "The file content overflowed (The maximum length `{}` bytes)"
 msgstr "文件内容太大 (最大长度 `{}` 字节)"
 
-#: common/drf/parsers/base.py:148
+#: common/drf/parsers/base.py:146
 msgid "Parse file error: {}"
 msgstr "解析文件错误: {}"
 
@@ -2123,7 +2131,11 @@ msgstr "邮件已经发送{}, 请检查"
 msgid "Welcome to the JumpServer open source Bastion Host"
 msgstr "欢迎使用JumpServer开源堡垒机"
 
-#: settings/api/dingtalk.py:36 settings/api/wecom.py:36
+#: settings/api/dingtalk.py:29
+msgid "AppSecret is required"
+msgstr "AppSecret 是必须的"
+
+#: settings/api/dingtalk.py:35 settings/api/wecom.py:35
 msgid "OK"
 msgstr ""
 
@@ -2134,6 +2146,10 @@ msgstr "获取 LDAP 用户为 None"
 #: settings/api/ldap.py:196
 msgid "Imported {} users successfully"
 msgstr "导入 {} 个用户成功"
+
+#: settings/api/wecom.py:29
+msgid "Secret is required"
+msgstr "Secret 是必须的"
 
 #: settings/models.py:123 users/templates/users/reset_password.html:29
 msgid "Setting"
@@ -2459,33 +2475,9 @@ msgstr "邮件收件人"
 msgid "Multiple user using , split"
 msgstr "多个用户，使用 , 分割"
 
-#: settings/serializers/settings.py:193
-msgid "Corporation ID(corpid)"
-msgstr "企业 ID(CorpId)"
-
-#: settings/serializers/settings.py:194
-msgid "Agent ID(agentid)"
-msgstr "应用 ID(AgentId)"
-
-#: settings/serializers/settings.py:195
-msgid "Secret(secret)"
-msgstr "秘钥(secret)"
-
 #: settings/serializers/settings.py:196
 msgid "Enable WeCom Auth"
 msgstr "启用企业微信认证"
-
-#: settings/serializers/settings.py:200
-msgid "AgentId"
-msgstr "应用 ID(AgentId)"
-
-#: settings/serializers/settings.py:201
-msgid "AppKey"
-msgstr "应用 Key(AppKey)"
-
-#: settings/serializers/settings.py:202
-msgid "AppSecret"
-msgstr "应用密文(AppSecret)"
 
 #: settings/serializers/settings.py:203
 msgid "Enable DingTalk Auth"
@@ -3045,19 +3037,19 @@ msgstr "登录了"
 msgid "Filters"
 msgstr "过滤"
 
-#: terminal/api/session.py:185
+#: terminal/api/session.py:189
 msgid "Session does not exist: {}"
 msgstr "会话不存在: {}"
 
-#: terminal/api/session.py:188
+#: terminal/api/session.py:192
 msgid "Session is finished or the protocol not supported"
 msgstr "会话已经完成或协议不支持"
 
-#: terminal/api/session.py:193
+#: terminal/api/session.py:197
 msgid "User does not exist: {}"
 msgstr "用户不存在: {}"
 
-#: terminal/api/session.py:197
+#: terminal/api/session.py:201
 msgid "User does not have permission"
 msgstr "用户没有权限"
 
@@ -3091,7 +3083,7 @@ msgstr "测试失败: 账户无效"
 
 #: terminal/backends/command/es.py:27
 msgid "Invalid elasticsearch config"
-msgstr ""
+msgstr "无效的 Elasticsearch 配置"
 
 #: terminal/backends/command/models.py:14
 msgid "Ordinary"
@@ -5037,6 +5029,24 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Corporation ID(corpid)"
+#~ msgstr "企业 ID(CorpId)"
+
+#~ msgid "Agent ID(agentid)"
+#~ msgstr "应用 ID(AgentId)"
+
+#~ msgid "Secret(secret)"
+#~ msgstr "秘钥(secret)"
+
+#~ msgid "AgentId"
+#~ msgstr "应用 ID(AgentId)"
+
+#~ msgid "AppKey"
+#~ msgstr "应用 Key(AppKey)"
+
+#~ msgid "AppSecret"
+#~ msgstr "应用密文(AppSecret)"
 
 #~ msgid "No"
 #~ msgstr "无"

@@ -22,7 +22,7 @@ class RequestMixin:
             logger.error(f'Response 200 but errcode is not 0: '
                          f'errcode={errcode} '
                          f'errmsg={errmsg} ')
-            raise exce.ErrCodeNot0(detail=str(data.raw_data))
+            raise exce.ErrCodeNot0(detail=data.raw_data)
 
     def check_http_is_200(self, response):
         if response.status_code != 200:
@@ -31,7 +31,7 @@ class RequestMixin:
                          f'status_code={response.status_code} '
                          f'url={response.url}'
                          f'\ncontent={response.content}')
-            raise exce.HTTPNot200
+            raise exce.HTTPNot200(detail=response.json())
 
 
 class BaseRequest(RequestMixin):

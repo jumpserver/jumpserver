@@ -190,16 +190,16 @@ class SecuritySettingSerializer(serializers.Serializer):
 
 
 class WeComSettingSerializer(serializers.Serializer):
-    WECOM_CORPID = serializers.CharField(max_length=256, required=True, label=_('Corporation ID(corpid)'))
-    WECOM_AGENTID = serializers.CharField(max_length=256, required=True, label=_("Agent ID(agentid)"))
-    WECOM_SECRET = serializers.CharField(max_length=256, required=True, label=_("Secret(secret)"), write_only=True)
+    WECOM_CORPID = serializers.CharField(max_length=256, required=True, label='corpid')
+    WECOM_AGENTID = serializers.CharField(max_length=256, required=True, label='agentid')
+    WECOM_SECRET = serializers.CharField(max_length=256, required=False, label='secret', write_only=True)
     AUTH_WECOM = serializers.BooleanField(default=False, label=_('Enable WeCom Auth'))
 
 
 class DingTalkSettingSerializer(serializers.Serializer):
-    DINGTALK_AGENTID = serializers.CharField(max_length=256, required=True, label=_("AgentId"))
-    DINGTALK_APPKEY = serializers.CharField(max_length=256, required=True, label=_("AppKey"))
-    DINGTALK_APPSECRET = serializers.CharField(max_length=256, required=False, label=_("AppSecret"), write_only=True)
+    DINGTALK_AGENTID = serializers.CharField(max_length=256, required=True, label='AgentId')
+    DINGTALK_APPKEY = serializers.CharField(max_length=256, required=True, label='AppKey')
+    DINGTALK_APPSECRET = serializers.CharField(max_length=256, required=False, label='AppSecret', write_only=True)
     AUTH_DINGTALK = serializers.BooleanField(default=False, label=_('Enable DingTalk Auth'))
 
 
