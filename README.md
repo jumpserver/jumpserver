@@ -2,7 +2,7 @@
 
 [![License](https://shields.io/github/license/jumpserver/jumpserver)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
 [![Release Downloads](https://shields.io/github/downloads/jumpserver/jumpserver/total)](https://github.com/jumpserver/jumpserver/releases)
-[![Docker Pulls](https://img.shields.io/docker/pulls/jumpserver/jms_all.svg)](https://hub.docker.com/u/jumpserver)
+[![Docker Pulls](https://img.shields.io/docker/pulls/jumpserver/core)](https://hub.docker.com/u/jumpserver)
 
 - [ENGLISH](https://github.com/jumpserver/jumpserver/blob/master/README_EN.md)
 
