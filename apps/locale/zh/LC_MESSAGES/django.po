@@ -2435,16 +2435,13 @@ msgstr ""
 
 #: settings/serializers/settings.py:172
 msgid "Number of repeated historical passwords"
-msgstr "历史密码可重复次数"
+msgstr "不能设置近几次密码"
 
 #: settings/serializers/settings.py:173
 msgid ""
 "Tip: When the user resets the password, it cannot be the previous n "
-"historical passwords of the user (the value of n here is the value filled in "
-"the input box)"
-msgstr ""
-"提示：用户重置密码时，不能为该用户前n次历史密码 (此处的n值即为输入框中填写的"
-"值)"
+"historical passwords of the user"
+msgstr "提示：用户重置密码时，不能为该用户前几次使用过的密码"
 
 #: settings/serializers/settings.py:177
 msgid "Password minimum length"
