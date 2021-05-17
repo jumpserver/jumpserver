@@ -90,7 +90,7 @@ class SessionViewSet(OrgBulkModelViewSet):
 
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
-        # 解决guacamole更新session时并发导致幽灵会话的问题
+        # 解决guacamole更新session时并发导致幽灵会话的问题，暂不处理
         if self.request.method in ('PATCH',):
             queryset = queryset.select_for_update()
         return queryset
@@ -98,11 +98,6 @@ class SessionViewSet(OrgBulkModelViewSet):
     def perform_create(self, serializer):
         if hasattr(self.request.user, 'terminal'):
             serializer.validated_data["terminal"] = self.request.user.terminal
-        sid = serializer.validated_data["system_user"]
-        # guacamole提交的是id
-        if is_uuid(sid):
-            _system_user = get_object_or_404(SystemUser, id=sid)
-            serializer.validated_data["system_user"] = _system_user.name
         return super().perform_create(serializer)
 
     def get_permissions(self):
@@ -140,6 +135,7 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
     def get_replay_data(session, url):
         tp = 'json'
         if session.protocol in ('rdp', 'vnc'):
+            # 需要考虑录像播放和离线播放器的约定，暂时不处理
             tp = 'guacamole'
 
         download_url = reverse('api-terminal:session-replay-download', kwargs={'pk': session.id})
