@@ -109,7 +109,9 @@ class Session(OrgModelMixin):
         _PROTOCOL = self.PROTOCOL
         if self.is_finished:
             return False
-        if self.protocol in [_PROTOCOL.SSH, _PROTOCOL.TELNET, _PROTOCOL.K8S]:
+        if self.protocol in [
+            _PROTOCOL.SSH, _PROTOCOL.VNC, _PROTOCOL.RDP, _PROTOCOL.TELNET, _PROTOCOL.K8S
+        ]:
             return True
         else:
             return False
