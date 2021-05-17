@@ -2896,7 +2896,7 @@ msgstr "取消"
 
 #: templates/flash_message_standalone.html:37
 msgid "Go"
-msgstr ""
+msgstr "立即"
 
 #: templates/index.html:11
 msgid "Total users"
