@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-14 16:12+0800\n"
+"POT-Creation-Date: 2021-05-17 19:04+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1667,7 +1667,7 @@ msgstr "对象"
 msgid "The file content overflowed (The maximum length `{}` bytes)"
 msgstr "文件内容太大 (最大长度 `{}` 字节)"
 
-#: common/drf/parsers/base.py:146
+#: common/drf/parsers/base.py:148
 msgid "Parse file error: {}"
 msgstr "解析文件错误: {}"
 
@@ -2419,16 +2419,13 @@ msgstr ""
 
 #: settings/serializers/settings.py:172
 msgid "Number of repeated historical passwords"
-msgstr "历史密码可重复次数"
+msgstr "不能设置近几次密码"
 
 #: settings/serializers/settings.py:173
 msgid ""
 "Tip: When the user resets the password, it cannot be the previous n "
-"historical passwords of the user (the value of n here is the value filled in "
-"the input box)"
-msgstr ""
-"提示：用户重置密码时，不能为该用户前n次历史密码 (此处的n值即为输入框中填写的"
-"值)"
+"historical passwords of the user"
+msgstr "提示：用户重置密码时，不能为该用户前几次使用过的密码"
 
 #: settings/serializers/settings.py:177
 msgid "Password minimum length"
@@ -3048,19 +3045,19 @@ msgstr "登录了"
 msgid "Filters"
 msgstr "过滤"
 
-#: terminal/api/session.py:189
+#: terminal/api/session.py:185
 msgid "Session does not exist: {}"
 msgstr "会话不存在: {}"
 
-#: terminal/api/session.py:192
+#: terminal/api/session.py:188
 msgid "Session is finished or the protocol not supported"
 msgstr "会话已经完成或协议不支持"
 
-#: terminal/api/session.py:197
+#: terminal/api/session.py:193
 msgid "User does not exist: {}"
 msgstr "用户不存在: {}"
 
-#: terminal/api/session.py:201
+#: terminal/api/session.py:197
 msgid "User does not have permission"
 msgstr "用户没有权限"
 
@@ -4953,7 +4950,7 @@ msgstr "实例个数"
 msgid "Periodic display"
 msgstr "定时执行"
 
-#: xpack/plugins/cloud/utils.py:65
+#: xpack/plugins/cloud/utils.py:64
 msgid "Account unavailable"
 msgstr "账户无效"
 

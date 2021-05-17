@@ -170,7 +170,7 @@ class SecuritySettingSerializer(serializers.Serializer):
     OLD_PASSWORD_HISTORY_LIMIT_COUNT = serializers.IntegerField(
         min_value=0, max_value=99999, required=True,
         label=_('Number of repeated historical passwords'),
-        help_text=_('Tip: When the user resets the password, it cannot be the previous n historical passwords of the user (the value of n here is the value filled in the input box)')
+        help_text=_('Tip: When the user resets the password, it cannot be the previous n historical passwords of the user')
     )
     SECURITY_PASSWORD_MIN_LENGTH = serializers.IntegerField(
         min_value=6, max_value=30, required=True,
