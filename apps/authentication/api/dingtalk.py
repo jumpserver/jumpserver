@@ -21,7 +21,7 @@ class DingTalkQRUnBindBase(APIView):
         if not user.dingtalk_id:
             raise errors.DingTalkNotBound
 
-        user.dingtalk_id = ''
+        user.dingtalk_id = None
         user.save()
         return Response()
 
