@@ -16,7 +16,7 @@ PROJECT_DIR = const.PROJECT_DIR
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = CONFIG.SECRET_KEY
 
-# SECURITY WARNING: keep the token secret, remove it if all coco, guacamole ok
+# SECURITY WARNING: keep the token secret, remove it if all koko, lion ok
 BOOTSTRAP_TOKEN = CONFIG.BOOTSTRAP_TOKEN
 
 # SECURITY WARNING: don't run with debug turned on in production!

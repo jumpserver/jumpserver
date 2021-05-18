@@ -57,6 +57,8 @@ class BaseFileParser(BaseParser):
 
     @staticmethod
     def _replace_chinese_quote(s):
+        if not isinstance(s, str):
+            return s
         trans_table = str.maketrans({
             '“': '"',
             '”': '"',

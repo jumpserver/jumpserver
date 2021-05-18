@@ -39,8 +39,6 @@ class UserUpdatePasswordSerializer(serializers.ModelSerializer):
             limit_count = settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT
             msg = _('The new password cannot be the last {} passwords').format(limit_count)
             raise serializers.ValidationError(msg)
-        else:
-            self.instance.save_history_password(value)
         return value
 
     def validate_new_password_again(self, value):

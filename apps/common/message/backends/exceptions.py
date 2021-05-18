@@ -21,8 +21,3 @@ class ResponseDataKeyError(APIException):
 class NetError(APIException):
     default_code = 'net_error'
     default_detail = _('Network error, please contact system administrator')
-
-
-class AccessTokenError(APIException):
-    default_code = 'access_token_error'
-    default_detail = 'Access token error, check config'

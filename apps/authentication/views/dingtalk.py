@@ -8,7 +8,9 @@ from django.views.generic import TemplateView
 from django.views import View
 from django.conf import settings
 from django.http.request import HttpRequest
+from django.db.utils import IntegrityError
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.exceptions import APIException
 
 from users.views import UserVerifyPasswordView
 from users.utils import is_auth_password_time_valid
@@ -29,6 +31,20 @@ DINGTALK_STATE_SESSION_KEY = '_dingtalk_state'
 
 
 class DingTalkQRMixin(PermissionsMixin, View):
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            return super().dispatch(request, *args, **kwargs)
+        except APIException as e:
+            try:
+                msg = e.detail['errmsg']
+            except Exception:
+                msg = _('DingTalk Error, Please contact your system administrator')
+            return self.get_failed_reponse(
+                '/',
+                _('DingTalk Error'),
+                msg
+            )
+
     def verify_state(self):
         state = self.request.GET.get('state')
         session_state = self.request.session.get(DINGTALK_STATE_SESSION_KEY)
@@ -130,8 +146,15 @@ class DingTalkQRBindCallbackView(DingTalkQRMixin, View):
             response = self.get_failed_reponse(redirect_url, msg, msg)
             return response
 
-        user.dingtalk_id = userid
-        user.save()
+        try:
+            user.dingtalk_id = userid
+            user.save()
+        except IntegrityError as e:
+            if e.args[0] == 1062:
+                msg = _('The DingTalk is already bound to another user')
+                response = self.get_failed_reponse(redirect_url, msg, msg)
+                return response
+            raise e
 
         msg = _('Binding DingTalk successfully')
         response = self.get_success_reponse(redirect_url, msg, msg)

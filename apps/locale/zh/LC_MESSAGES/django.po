@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-14 16:12+0800\n"
+"POT-Creation-Date: 2021-05-17 18:56+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1547,44 +1547,48 @@ msgstr "返回"
 msgid "Copy success"
 msgstr "复制成功"
 
-#: authentication/views/dingtalk.py:40 authentication/views/wecom.py:40
+#: authentication/views/dingtalk.py:41 authentication/views/wecom.py:41
 msgid "You've been hacked"
 msgstr "你被攻击了"
 
-#: authentication/views/dingtalk.py:76
+#: authentication/views/dingtalk.py:77
 msgid "DingTalk is already bound"
 msgstr "钉钉已经绑定"
 
-#: authentication/views/dingtalk.py:89 authentication/views/wecom.py:88
+#: authentication/views/dingtalk.py:90 authentication/views/wecom.py:89
 msgid "Please verify your password first"
 msgstr "请检查密码"
 
-#: authentication/views/dingtalk.py:113 authentication/views/wecom.py:112
+#: authentication/views/dingtalk.py:114 authentication/views/wecom.py:113
 msgid "Invalid user_id"
 msgstr "无效的 user_id"
 
-#: authentication/views/dingtalk.py:129
+#: authentication/views/dingtalk.py:130
 msgid "DingTalk query user failed"
 msgstr "钉钉查询用户失败"
 
-#: authentication/views/dingtalk.py:136 authentication/views/dingtalk.py:219
-#: authentication/views/dingtalk.py:220
+#: authentication/views/dingtalk.py:139
+msgid "The DingTalk is already bound to another user"
+msgstr "该钉钉已经绑定其他用户"
+
+#: authentication/views/dingtalk.py:144 authentication/views/dingtalk.py:227
+#: authentication/views/dingtalk.py:228
 msgid "Binding DingTalk successfully"
 msgstr "绑定 钉钉 成功"
 
-#: authentication/views/dingtalk.py:188
+#: authentication/views/dingtalk.py:196
 msgid "Failed to get user from DingTalk"
 msgstr "从钉钉获取用户失败"
 
-#: authentication/views/dingtalk.py:194
+#: authentication/views/dingtalk.py:202
 msgid "DingTalk is not bound"
 msgstr "钉钉没有绑定"
 
-#: authentication/views/dingtalk.py:195 authentication/views/wecom.py:193
+#: authentication/views/dingtalk.py:203 authentication/views/wecom.py:201
 msgid "Please login with a password and then bind the WeCom"
 msgstr "请使用密码登录，然后绑定企业微信"
 
-#: authentication/views/dingtalk.py:237 authentication/views/dingtalk.py:238
+#: authentication/views/dingtalk.py:245 authentication/views/dingtalk.py:246
 msgid "Binding DingTalk failed"
 msgstr "绑定钉钉失败"
 
@@ -1620,28 +1624,32 @@ msgstr "退出登录成功"
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
-#: authentication/views/wecom.py:75
+#: authentication/views/wecom.py:76
 msgid "WeCom is already bound"
 msgstr "企业微信已经绑定"
 
-#: authentication/views/wecom.py:127
+#: authentication/views/wecom.py:128
 msgid "WeCom query user failed"
 msgstr "企业微信查询用户失败"
 
-#: authentication/views/wecom.py:134 authentication/views/wecom.py:217
-#: authentication/views/wecom.py:218
+#: authentication/views/wecom.py:137
+msgid "The WeCom is already bound to another user"
+msgstr "该企业微信已经绑定其他用户"
+
+#: authentication/views/wecom.py:142 authentication/views/wecom.py:225
+#: authentication/views/wecom.py:226
 msgid "Binding WeCom successfully"
 msgstr "绑定 企业微信 成功"
 
-#: authentication/views/wecom.py:186
+#: authentication/views/wecom.py:194
 msgid "Failed to get user from WeCom"
 msgstr "从企业微信获取用户失败"
 
-#: authentication/views/wecom.py:192
+#: authentication/views/wecom.py:200
 msgid "WeCom is not bound"
 msgstr "没有绑定企业微信"
 
-#: authentication/views/wecom.py:235 authentication/views/wecom.py:236
+#: authentication/views/wecom.py:243 authentication/views/wecom.py:244
 msgid "Binding WeCom failed"
 msgstr "绑定企业微信失败"
 
@@ -1803,36 +1811,36 @@ msgstr "没有该主机 {} 权限"
 msgid "Operations"
 msgstr "运维"
 
-#: ops/mixin.py:29 ops/mixin.py:92 ops/mixin.py:160
+#: ops/mixin.py:29 ops/mixin.py:92 ops/mixin.py:162
 msgid "Cycle perform"
 msgstr "周期执行"
 
-#: ops/mixin.py:33 ops/mixin.py:90 ops/mixin.py:109 ops/mixin.py:148
+#: ops/mixin.py:33 ops/mixin.py:90 ops/mixin.py:109 ops/mixin.py:150
 msgid "Regularly perform"
 msgstr "定期执行"
 
-#: ops/mixin.py:106 ops/mixin.py:145
+#: ops/mixin.py:106 ops/mixin.py:147
 #: xpack/plugins/change_auth_plan/serializers.py:53
 msgid "Periodic perform"
 msgstr "定时执行"
 
-#: ops/mixin.py:111
+#: ops/mixin.py:112
 msgid "Interval"
 msgstr "间隔"
 
-#: ops/mixin.py:120
+#: ops/mixin.py:122
 msgid "* Please enter a valid crontab expression"
 msgstr "* 请输入有效的 crontab 表达式"
 
-#: ops/mixin.py:127
+#: ops/mixin.py:129
 msgid "Range {} to {}"
 msgstr "输入在 {} - {} 范围之间"
 
-#: ops/mixin.py:138
+#: ops/mixin.py:140
 msgid "Require periodic or regularly perform setting"
 msgstr "需要周期或定期设置"
 
-#: ops/mixin.py:149
+#: ops/mixin.py:151
 msgid ""
 "eg: Every Sunday 03:05 run <5 3 * * 0> <br> Tips: Using 5 digits linux "
 "crontab expressions <min hour day month week> (<a href='https://tool.lu/"
@@ -1843,7 +1851,7 @@ msgstr ""
 "分 时 日 月 星期> （<a href='https://tool.lu/crontab/' target='_blank'>在线工"
 "具</a>） <br>注意： 如果同时设置了定期执行和周期执行，优先使用定期执行"
 
-#: ops/mixin.py:160
+#: ops/mixin.py:162
 msgid "Tips: (Units: hour)"
 msgstr "提示：（单位： 时）"
 
@@ -1954,12 +1962,11 @@ msgstr "更新任务内容: {}"
 msgid "Disk used more than 80%: {} => {}"
 msgstr "磁盘使用率超过 80%: {} => {}"
 
-#: orgs/api.py:76
-#, python-brace-format
-msgid "Have `{model._meta.verbose_name}` exists, Please delete"
-msgstr "`{model._meta.verbose_name}` 存在数据, 请先删除"
+#: orgs/api.py:79
+msgid "Have {} exists, Please delete"
+msgstr "{} 存在数据, 请先删除"
 
-#: orgs/api.py:80
+#: orgs/api.py:83
 msgid "The current organization cannot be deleted"
 msgstr "当前组织不能被删除"
 
@@ -2123,7 +2130,11 @@ msgstr "邮件已经发送{}, 请检查"
 msgid "Welcome to the JumpServer open source Bastion Host"
 msgstr "欢迎使用JumpServer开源堡垒机"
 
-#: settings/api/dingtalk.py:36 settings/api/wecom.py:36
+#: settings/api/dingtalk.py:29
+msgid "AppSecret is required"
+msgstr "AppSecret 是必须的"
+
+#: settings/api/dingtalk.py:35 settings/api/wecom.py:35
 msgid "OK"
 msgstr ""
 
@@ -2134,6 +2145,10 @@ msgstr "获取 LDAP 用户为 None"
 #: settings/api/ldap.py:196
 msgid "Imported {} users successfully"
 msgstr "导入 {} 个用户成功"
+
+#: settings/api/wecom.py:29
+msgid "Secret is required"
+msgstr "Secret 是必须的"
 
 #: settings/models.py:123 users/templates/users/reset_password.html:29
 msgid "Setting"
@@ -2419,16 +2434,13 @@ msgstr ""
 
 #: settings/serializers/settings.py:172
 msgid "Number of repeated historical passwords"
-msgstr "历史密码可重复次数"
+msgstr "不能设置近几次密码"
 
 #: settings/serializers/settings.py:173
 msgid ""
 "Tip: When the user resets the password, it cannot be the previous n "
-"historical passwords of the user (the value of n here is the value filled in "
-"the input box)"
-msgstr ""
-"提示：用户重置密码时，不能为该用户前n次历史密码 (此处的n值即为输入框中填写的"
-"值)"
+"historical passwords of the user"
+msgstr "提示：用户重置密码时，不能为该用户前几次使用过的密码"
 
 #: settings/serializers/settings.py:177
 msgid "Password minimum length"
@@ -2462,33 +2474,9 @@ msgstr "邮件收件人"
 msgid "Multiple user using , split"
 msgstr "多个用户，使用 , 分割"
 
-#: settings/serializers/settings.py:193
-msgid "Corporation ID(corpid)"
-msgstr "企业 ID(CorpId)"
-
-#: settings/serializers/settings.py:194
-msgid "Agent ID(agentid)"
-msgstr "应用 ID(AgentId)"
-
-#: settings/serializers/settings.py:195
-msgid "Secret(secret)"
-msgstr "秘钥(secret)"
-
 #: settings/serializers/settings.py:196
 msgid "Enable WeCom Auth"
 msgstr "启用企业微信认证"
-
-#: settings/serializers/settings.py:200
-msgid "AgentId"
-msgstr "应用 ID(AgentId)"
-
-#: settings/serializers/settings.py:201
-msgid "AppKey"
-msgstr "应用 Key(AppKey)"
-
-#: settings/serializers/settings.py:202
-msgid "AppSecret"
-msgstr "应用密文(AppSecret)"
 
 #: settings/serializers/settings.py:203
 msgid "Enable DingTalk Auth"
@@ -2896,7 +2884,7 @@ msgstr "取消"
 
 #: templates/flash_message_standalone.html:37
 msgid "Go"
-msgstr ""
+msgstr "立即"
 
 #: templates/index.html:11
 msgid "Total users"
@@ -3048,19 +3036,19 @@ msgstr "登录了"
 msgid "Filters"
 msgstr "过滤"
 
-#: terminal/api/session.py:189
+#: terminal/api/session.py:185
 msgid "Session does not exist: {}"
 msgstr "会话不存在: {}"
 
-#: terminal/api/session.py:192
+#: terminal/api/session.py:188
 msgid "Session is finished or the protocol not supported"
 msgstr "会话已经完成或协议不支持"
 
-#: terminal/api/session.py:197
+#: terminal/api/session.py:193
 msgid "User does not exist: {}"
 msgstr "用户不存在: {}"
 
-#: terminal/api/session.py:201
+#: terminal/api/session.py:197
 msgid "User does not have permission"
 msgstr "用户没有权限"
 
@@ -3094,7 +3082,7 @@ msgstr "测试失败: 账户无效"
 
 #: terminal/backends/command/es.py:27
 msgid "Invalid elasticsearch config"
-msgstr ""
+msgstr "无效的 Elasticsearch 配置"
 
 #: terminal/backends/command/models.py:14
 msgid "Ordinary"
@@ -4953,7 +4941,7 @@ msgstr "实例个数"
 msgid "Periodic display"
 msgstr "定时执行"
 
-#: xpack/plugins/cloud/utils.py:65
+#: xpack/plugins/cloud/utils.py:64
 msgid "Account unavailable"
 msgstr "账户无效"
 
@@ -5040,6 +5028,24 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Corporation ID(corpid)"
+#~ msgstr "企业 ID(CorpId)"
+
+#~ msgid "Agent ID(agentid)"
+#~ msgstr "应用 ID(AgentId)"
+
+#~ msgid "Secret(secret)"
+#~ msgstr "秘钥(secret)"
+
+#~ msgid "AgentId"
+#~ msgstr "应用 ID(AgentId)"
+
+#~ msgid "AppKey"
+#~ msgstr "应用 Key(AppKey)"
+
+#~ msgid "AppSecret"
+#~ msgstr "应用密文(AppSecret)"
 
 #~ msgid "No"
 #~ msgstr "无"
