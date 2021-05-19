@@ -1,4 +1,4 @@
-# SOME DESCRIPTIVE TITLE.
+﻿# SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
@@ -789,7 +789,7 @@ msgstr "管理用户名称"
 
 #: assets/serializers/asset.py:71 perms/serializers/asset/permission.py:49
 msgid "Nodes name"
-msgstr "节点名称"
+msgstr "节点名"
 
 #: assets/serializers/asset.py:107
 msgid "Hardware info"
@@ -2111,15 +2111,15 @@ msgstr "用户名"
 
 #: perms/serializers/asset/permission.py:47
 msgid "User groups name"
-msgstr "用户组数量"
+msgstr "用户组名"
 
 #: perms/serializers/asset/permission.py:48
 msgid "Assets name"
-msgstr "资产名字"
+msgstr "资产名"
 
 #: perms/serializers/asset/permission.py:50
 msgid "System users name"
-msgstr "系统用户名字"
+msgstr "系统用户名"
 
 #: perms/serializers/asset/permission.py:70 users/serializers/user.py:81
 msgid "Is valid"
