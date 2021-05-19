@@ -98,8 +98,8 @@ class SystemUserTaskApi(generics.CreateAPIView):
         return task
 
     @staticmethod
-    def do_test(system_user):
-        task = test_system_user_connectivity_manual.delay(system_user)
+    def do_test(system_user, asset_ids):
+        task = test_system_user_connectivity_manual.delay(system_user, asset_ids)
         return task
 
     def get_object(self):
@@ -109,16 +109,20 @@ class SystemUserTaskApi(generics.CreateAPIView):
     def perform_create(self, serializer):
         action = serializer.validated_data["action"]
         asset = serializer.validated_data.get('asset')
-        assets = serializer.validated_data.get('assets') or []
+
+        if asset:
+            assets = [asset]
+        else:
+            assets = serializer.validated_data.get('assets') or []
+
+        asset_ids = [asset.id for asset in assets]
+        asset_ids = asset_ids if asset_ids else None
 
         system_user = self.get_object()
         if action == 'push':
-            assets = [asset] if asset else assets
-            asset_ids = [asset.id for asset in assets]
-            asset_ids = asset_ids if asset_ids else None
             task = self.do_push(system_user, asset_ids)
         else:
-            task = self.do_test(system_user)
+            task = self.do_test(system_user, asset_ids)
         data = getattr(serializer, '_data', {})
         data["task"] = task.id
         setattr(serializer, '_data', data)
