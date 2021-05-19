@@ -187,7 +187,7 @@ class DatesLoginMetricMixin:
         return list(assets)
 
     def get_dates_login_times_top10_users(self):
-        users = self.sessions_queryset.values("user_id") \
+        users = self.sessions_queryset.values("user") \
                     .annotate(total=Count("user_id")) \
                     .annotate(last=Max("date_start")).order_by("-total")[:10]
         for user in users:
