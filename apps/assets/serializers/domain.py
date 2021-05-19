@@ -61,7 +61,9 @@ class GatewaySerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         fields_fk = ['domain']
         fields = fields_small +  fields_fk
         extra_kwargs = {
-            'password': {'validators': [NoSpecialChars()]}
+            'password': {'write_only': True, 'validators': [NoSpecialChars()]},
+            'private_key': {"write_only": True},
+            'public_key': {"write_only": True},
         }
 
     def __init__(self, *args, **kwargs):
