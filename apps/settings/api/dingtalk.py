@@ -25,13 +25,18 @@ class DingTalkTestingAPI(GenericAPIView):
 
         if not dingtalk_appsecret:
             secret = Setting.objects.filter(name='DINGTALK_APPSECRET').first()
-            if not secret:
-                return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': _('AppSecret is required')})
-            dingtalk_appsecret = secret.cleaned_value
+            if secret:
+                dingtalk_appsecret = secret.cleaned_value
+
+        dingtalk_appsecret = dingtalk_appsecret or ''
 
         try:
             dingtalk = DingTalk(appid=dingtalk_appkey, appsecret=dingtalk_appsecret, agentid=dingtalk_agentid)
             dingtalk.send_text(['test'], 'test')
-            return Response(status=status.HTTP_200_OK, data={'msg': _('OK')})
+            return Response(status=status.HTTP_200_OK, data={'msg': _('Test success')})
         except APIException as e:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': e.detail})
+            try:
+                error = e.detail['errmsg']
+            except:
+                error = e.detail
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': error})

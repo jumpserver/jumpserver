@@ -8,8 +8,9 @@ from rest_framework import generics
 from rest_framework.views import APIView, Response
 from rest_framework import status
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 
-
+from common.exceptions import JMSException
 from common.drf.api import JMSBulkModelViewSet
 from common.utils import get_object_or_none
 from common.permissions import IsAppUser, IsSuperUser, WithBootstrapToken
@@ -29,6 +30,17 @@ class TerminalViewSet(JMSBulkModelViewSet):
     serializer_class = serializers.TerminalSerializer
     permission_classes = (IsSuperUser,)
     filterset_fields = ['name', 'remote_addr', 'type']
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.get_online_session_count() > 0:
+            raise JMSException(
+                code='have_online_session',
+                detail=_('Have online sessions')
+            )
+
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     def create(self, request, *args, **kwargs):
         if isinstance(request.data, list):

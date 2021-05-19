@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-17 18:56+0800\n"
+"POT-Creation-Date: 2021-05-19 16:27+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -25,7 +25,7 @@ msgstr ""
 #: orgs/models.py:23 perms/models/base.py:49 settings/models.py:29
 #: terminal/models/storage.py:23 terminal/models/storage.py:90
 #: terminal/models/task.py:16 terminal/models/terminal.py:100
-#: users/forms/profile.py:32 users/models/group.py:15 users/models/user.py:558
+#: users/forms/profile.py:32 users/models/group.py:15 users/models/user.py:550
 #: users/templates/users/_select_user_modal.html:13
 #: users/templates/users/user_asset_permission.html:37
 #: users/templates/users/user_asset_permission.html:154
@@ -61,7 +61,7 @@ msgstr "激活中"
 #: orgs/models.py:26 perms/models/base.py:57 settings/models.py:34
 #: terminal/models/storage.py:29 terminal/models/storage.py:96
 #: terminal/models/terminal.py:114 tickets/models/ticket.py:73
-#: users/models/group.py:16 users/models/user.py:591
+#: users/models/group.py:16 users/models/user.py:583
 #: xpack/plugins/change_auth_plan/models.py:77 xpack/plugins/cloud/models.py:35
 #: xpack/plugins/cloud/models.py:98 xpack/plugins/gathered_user/models.py:26
 msgid "Comment"
@@ -98,8 +98,8 @@ msgstr "动作"
 #: perms/models/base.py:50 templates/index.html:78
 #: terminal/backends/command/models.py:18
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:38
-#: tickets/models/comment.py:17 users/models/user.py:184
-#: users/models/user.py:746 users/models/user.py:772
+#: tickets/models/comment.py:17 users/models/user.py:176
+#: users/models/user.py:738 users/models/user.py:764
 #: users/serializers/group.py:20
 #: users/templates/users/user_asset_permission.html:38
 #: users/templates/users/user_asset_permission.html:64
@@ -180,7 +180,7 @@ msgstr "格式为逗号分隔的字符串, * 表示匹配所有. "
 #: applications/serializers/attrs/application_type/vmware_client.py:26
 #: assets/models/base.py:251 assets/models/gathered_user.py:15
 #: audits/models.py:100 authentication/forms.py:15 authentication/forms.py:17
-#: ops/models/adhoc.py:148 users/forms/profile.py:31 users/models/user.py:556
+#: ops/models/adhoc.py:148 users/forms/profile.py:31 users/models/user.py:548
 #: users/templates/users/_select_user_modal.html:14
 #: xpack/plugins/change_auth_plan/models.py:47
 #: xpack/plugins/change_auth_plan/models.py:278
@@ -483,7 +483,7 @@ msgstr "标签管理"
 #: assets/models/cluster.py:28 assets/models/cmd_filter.py:26
 #: assets/models/cmd_filter.py:67 assets/models/group.py:21
 #: common/db/models.py:70 common/mixins/models.py:49 orgs/models.py:24
-#: orgs/models.py:422 perms/models/base.py:55 users/models/user.py:599
+#: orgs/models.py:422 perms/models/base.py:55 users/models/user.py:591
 #: users/serializers/group.py:35 xpack/plugins/change_auth_plan/models.py:81
 #: xpack/plugins/cloud/models.py:104 xpack/plugins/gathered_user/models.py:30
 msgid "Created by"
@@ -497,7 +497,7 @@ msgstr "创建者"
 #: assets/models/label.py:25 common/db/models.py:72 common/mixins/models.py:50
 #: ops/models/adhoc.py:38 ops/models/command.py:29 orgs/models.py:25
 #: orgs/models.py:420 perms/models/base.py:56 users/models/group.py:18
-#: users/models/user.py:773 xpack/plugins/cloud/models.py:107
+#: users/models/user.py:765 xpack/plugins/cloud/models.py:107
 msgid "Date created"
 msgstr "创建日期"
 
@@ -543,7 +543,7 @@ msgstr "带宽"
 msgid "Contact"
 msgstr "联系人"
 
-#: assets/models/cluster.py:22 users/models/user.py:577
+#: assets/models/cluster.py:22 users/models/user.py:569
 msgid "Phone"
 msgstr "手机"
 
@@ -569,7 +569,7 @@ msgid "Default"
 msgstr "默认"
 
 #: assets/models/cluster.py:36 assets/models/label.py:14
-#: users/models/user.py:758
+#: users/models/user.py:750
 msgid "System"
 msgstr "系统"
 
@@ -814,11 +814,11 @@ msgid "Backend"
 msgstr "后端"
 
 #: assets/serializers/asset_user.py:80 users/forms/profile.py:160
-#: users/models/user.py:588 users/templates/users/user_password_update.html:48
+#: users/models/user.py:580 users/templates/users/user_password_update.html:48
 msgid "Public key"
 msgstr "SSH公钥"
 
-#: assets/serializers/asset_user.py:84 users/models/user.py:585
+#: assets/serializers/asset_user.py:84 users/models/user.py:577
 msgid "Private key"
 msgstr "ssh私钥"
 
@@ -1127,8 +1127,8 @@ msgstr "用户代理"
 #: audits/models.py:105
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
 #: authentication/templates/authentication/login_otp.html:6
-#: users/forms/profile.py:64 users/models/user.py:580
-#: users/serializers/profile.py:104
+#: users/forms/profile.py:64 users/models/user.py:572
+#: users/serializers/profile.py:102
 msgid "MFA"
 msgstr "多因子认证"
 
@@ -1218,54 +1218,54 @@ msgstr "钉钉"
 msgid "Code is invalid"
 msgstr "Code无效"
 
-#: authentication/backends/api.py:52
+#: authentication/backends/api.py:57
 msgid "Invalid signature header. No credentials provided."
 msgstr ""
 
-#: authentication/backends/api.py:55
+#: authentication/backends/api.py:60
 msgid "Invalid signature header. Signature string should not contain spaces."
 msgstr ""
 
-#: authentication/backends/api.py:62
+#: authentication/backends/api.py:67
 msgid "Invalid signature header. Format like AccessKeyId:Signature"
 msgstr ""
 
-#: authentication/backends/api.py:66
+#: authentication/backends/api.py:71
 msgid ""
 "Invalid signature header. Signature string should not contain invalid "
 "characters."
 msgstr ""
 
-#: authentication/backends/api.py:86 authentication/backends/api.py:102
+#: authentication/backends/api.py:91 authentication/backends/api.py:107
 msgid "Invalid signature."
 msgstr ""
 
-#: authentication/backends/api.py:93
+#: authentication/backends/api.py:98
 msgid "HTTP header: Date not provide or not %a, %d %b %Y %H:%M:%S GMT"
 msgstr ""
 
-#: authentication/backends/api.py:98
+#: authentication/backends/api.py:103
 msgid "Expired, more than 15 minutes"
 msgstr ""
 
-#: authentication/backends/api.py:105
+#: authentication/backends/api.py:110
 msgid "User disabled."
 msgstr "用户已禁用"
 
-#: authentication/backends/api.py:123
+#: authentication/backends/api.py:128
 msgid "Invalid token header. No credentials provided."
 msgstr ""
 
-#: authentication/backends/api.py:126
+#: authentication/backends/api.py:131
 msgid "Invalid token header. Sign string should not contain spaces."
 msgstr ""
 
-#: authentication/backends/api.py:133
+#: authentication/backends/api.py:138
 msgid ""
 "Invalid token header. Sign string should not contain invalid characters."
 msgstr ""
 
-#: authentication/backends/api.py:144
+#: authentication/backends/api.py:149
 msgid "Invalid token or cache refreshed."
 msgstr ""
 
@@ -1437,13 +1437,13 @@ msgid "Show"
 msgstr "显示"
 
 #: authentication/templates/authentication/_access_key_modal.html:66
-#: users/models/user.py:470 users/serializers/profile.py:101
+#: users/models/user.py:462 users/serializers/profile.py:99
 #: users/templates/users/user_verify_mfa.html:32
 msgid "Disable"
 msgstr "禁用"
 
 #: authentication/templates/authentication/_access_key_modal.html:67
-#: users/models/user.py:471 users/serializers/profile.py:102
+#: users/models/user.py:463 users/serializers/profile.py:100
 msgid "Enable"
 msgstr "启用"
 
@@ -1547,48 +1547,56 @@ msgstr "返回"
 msgid "Copy success"
 msgstr "复制成功"
 
-#: authentication/views/dingtalk.py:41 authentication/views/wecom.py:41
+#: authentication/views/dingtalk.py:41
+msgid "DingTalk Error, Please contact your system administrator"
+msgstr "钉钉错误，请联系系统管理员"
+
+#: authentication/views/dingtalk.py:44
+msgid "DingTalk Error"
+msgstr "钉钉错误"
+
+#: authentication/views/dingtalk.py:56 authentication/views/wecom.py:56
 msgid "You've been hacked"
 msgstr "你被攻击了"
 
-#: authentication/views/dingtalk.py:77
+#: authentication/views/dingtalk.py:92
 msgid "DingTalk is already bound"
 msgstr "钉钉已经绑定"
 
-#: authentication/views/dingtalk.py:90 authentication/views/wecom.py:89
+#: authentication/views/dingtalk.py:105 authentication/views/wecom.py:104
 msgid "Please verify your password first"
 msgstr "请检查密码"
 
-#: authentication/views/dingtalk.py:114 authentication/views/wecom.py:113
+#: authentication/views/dingtalk.py:129 authentication/views/wecom.py:128
 msgid "Invalid user_id"
 msgstr "无效的 user_id"
 
-#: authentication/views/dingtalk.py:130
+#: authentication/views/dingtalk.py:145
 msgid "DingTalk query user failed"
 msgstr "钉钉查询用户失败"
 
-#: authentication/views/dingtalk.py:139
+#: authentication/views/dingtalk.py:154
 msgid "The DingTalk is already bound to another user"
 msgstr "该钉钉已经绑定其他用户"
 
-#: authentication/views/dingtalk.py:144 authentication/views/dingtalk.py:227
-#: authentication/views/dingtalk.py:228
+#: authentication/views/dingtalk.py:159 authentication/views/dingtalk.py:242
+#: authentication/views/dingtalk.py:243
 msgid "Binding DingTalk successfully"
 msgstr "绑定 钉钉 成功"
 
-#: authentication/views/dingtalk.py:196
+#: authentication/views/dingtalk.py:211
 msgid "Failed to get user from DingTalk"
 msgstr "从钉钉获取用户失败"
 
-#: authentication/views/dingtalk.py:202
+#: authentication/views/dingtalk.py:217
 msgid "DingTalk is not bound"
 msgstr "钉钉没有绑定"
 
-#: authentication/views/dingtalk.py:203 authentication/views/wecom.py:201
+#: authentication/views/dingtalk.py:218 authentication/views/wecom.py:216
 msgid "Please login with a password and then bind the WeCom"
 msgstr "请使用密码登录，然后绑定企业微信"
 
-#: authentication/views/dingtalk.py:245 authentication/views/dingtalk.py:246
+#: authentication/views/dingtalk.py:260 authentication/views/dingtalk.py:261
 msgid "Binding DingTalk failed"
 msgstr "绑定钉钉失败"
 
@@ -1624,32 +1632,40 @@ msgstr "退出登录成功"
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
-#: authentication/views/wecom.py:76
+#: authentication/views/wecom.py:41
+msgid "WeCom Error, Please contact your system administrator"
+msgstr "企业微信错误，请联系系统管理员"
+
+#: authentication/views/wecom.py:44
+msgid "WeCom Error"
+msgstr "企业微信错误"
+
+#: authentication/views/wecom.py:91
 msgid "WeCom is already bound"
 msgstr "企业微信已经绑定"
 
-#: authentication/views/wecom.py:128
+#: authentication/views/wecom.py:143
 msgid "WeCom query user failed"
 msgstr "企业微信查询用户失败"
 
-#: authentication/views/wecom.py:137
+#: authentication/views/wecom.py:152
 msgid "The WeCom is already bound to another user"
 msgstr "该企业微信已经绑定其他用户"
 
-#: authentication/views/wecom.py:142 authentication/views/wecom.py:225
-#: authentication/views/wecom.py:226
+#: authentication/views/wecom.py:157 authentication/views/wecom.py:240
+#: authentication/views/wecom.py:241
 msgid "Binding WeCom successfully"
 msgstr "绑定 企业微信 成功"
 
-#: authentication/views/wecom.py:194
+#: authentication/views/wecom.py:209
 msgid "Failed to get user from WeCom"
 msgstr "从企业微信获取用户失败"
 
-#: authentication/views/wecom.py:200
+#: authentication/views/wecom.py:215
 msgid "WeCom is not bound"
 msgstr "没有绑定企业微信"
 
-#: authentication/views/wecom.py:243 authentication/views/wecom.py:244
+#: authentication/views/wecom.py:258 authentication/views/wecom.py:259
 msgid "Binding WeCom failed"
 msgstr "绑定企业微信失败"
 
@@ -1675,7 +1691,7 @@ msgstr "对象"
 msgid "The file content overflowed (The maximum length `{}` bytes)"
 msgstr "文件内容太大 (最大长度 `{}` 字节)"
 
-#: common/drf/parsers/base.py:146
+#: common/drf/parsers/base.py:148
 msgid "Parse file error: {}"
 msgstr "解析文件错误: {}"
 
@@ -1988,7 +2004,7 @@ msgstr "组织审计员"
 msgid "GLOBAL"
 msgstr "全局组织"
 
-#: orgs/models.py:419 users/models/user.py:568
+#: orgs/models.py:419 users/models/user.py:560
 #: users/templates/users/_select_user_modal.html:15
 msgid "Role"
 msgstr "角色"
@@ -2001,7 +2017,7 @@ msgstr "管理员正在修改授权，请稍等"
 msgid "The authorization cannot be revoked for the time being"
 msgstr "该授权暂时不能撤销"
 
-#: perms/models/application_permission.py:27 users/models/user.py:185
+#: perms/models/application_permission.py:27 users/models/user.py:177
 msgid "Application"
 msgstr "应用程序"
 
@@ -2060,7 +2076,7 @@ msgid "Favorite"
 msgstr "收藏夹"
 
 #: perms/models/base.py:51 templates/_nav.html:21 users/models/group.py:31
-#: users/models/user.py:564 users/templates/users/_select_user_modal.html:16
+#: users/models/user.py:556 users/templates/users/_select_user_modal.html:16
 #: users/templates/users/user_asset_permission.html:39
 #: users/templates/users/user_asset_permission.html:67
 #: users/templates/users/user_database_app_permission.html:38
@@ -2073,7 +2089,7 @@ msgstr "用户组"
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:77
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:43
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:81
-#: users/models/user.py:596
+#: users/models/user.py:588
 msgid "Date expired"
 msgstr "失效日期"
 
@@ -2130,13 +2146,9 @@ msgstr "邮件已经发送{}, 请检查"
 msgid "Welcome to the JumpServer open source Bastion Host"
 msgstr "欢迎使用JumpServer开源堡垒机"
 
-#: settings/api/dingtalk.py:29
-msgid "AppSecret is required"
-msgstr "AppSecret 是必须的"
-
-#: settings/api/dingtalk.py:35 settings/api/wecom.py:35
-msgid "OK"
-msgstr ""
+#: settings/api/dingtalk.py:36 settings/api/wecom.py:36
+msgid "Test success"
+msgstr "测试成功"
 
 #: settings/api/ldap.py:189
 msgid "Get ldap users is None"
@@ -2145,10 +2157,6 @@ msgstr "获取 LDAP 用户为 None"
 #: settings/api/ldap.py:196
 msgid "Imported {} users successfully"
 msgstr "导入 {} 个用户成功"
-
-#: settings/api/wecom.py:29
-msgid "Secret is required"
-msgstr "Secret 是必须的"
 
 #: settings/models.py:123 users/templates/users/reset_password.html:29
 msgid "Setting"
@@ -3080,6 +3088,10 @@ msgstr "测试成功"
 msgid "Test failure: Account invalid"
 msgstr "测试失败: 账户无效"
 
+#: terminal/api/terminal.py:39
+msgid "Have online sessions"
+msgstr "有在线会话"
+
 #: terminal/backends/command/es.py:27
 msgid "Invalid elasticsearch config"
 msgstr "无效的 Elasticsearch 配置"
@@ -3816,7 +3828,7 @@ msgstr "确认密码"
 msgid "Password does not match"
 msgstr "密码不一致"
 
-#: users/forms/profile.py:101 users/models/user.py:560
+#: users/forms/profile.py:101 users/models/user.py:552
 msgid "Email"
 msgstr "邮件"
 
@@ -3848,48 +3860,48 @@ msgstr "复制你的公钥到这里"
 msgid "Public key should not be the same as your old one."
 msgstr "不能和原来的密钥相同"
 
-#: users/forms/profile.py:149 users/serializers/profile.py:76
-#: users/serializers/profile.py:150 users/serializers/profile.py:163
+#: users/forms/profile.py:149 users/serializers/profile.py:74
+#: users/serializers/profile.py:148 users/serializers/profile.py:161
 msgid "Not a valid ssh public key"
 msgstr "SSH密钥不合法"
 
-#: users/models/user.py:182
+#: users/models/user.py:174
 msgid "System administrator"
 msgstr "系统管理员"
 
-#: users/models/user.py:183
+#: users/models/user.py:175
 msgid "System auditor"
 msgstr "系统审计员"
 
-#: users/models/user.py:472
+#: users/models/user.py:464
 msgid "Force enable"
 msgstr "强制启用"
 
-#: users/models/user.py:537
+#: users/models/user.py:529
 msgid "Local"
 msgstr "数据库"
 
-#: users/models/user.py:571
+#: users/models/user.py:563
 msgid "Avatar"
 msgstr "头像"
 
-#: users/models/user.py:574
+#: users/models/user.py:566
 msgid "Wechat"
 msgstr "微信"
 
-#: users/models/user.py:604
+#: users/models/user.py:596
 msgid "Source"
 msgstr "用户来源"
 
-#: users/models/user.py:608
+#: users/models/user.py:600
 msgid "Date password last updated"
 msgstr "最后更新密码日期"
 
-#: users/models/user.py:754
+#: users/models/user.py:746
 msgid "Administrator"
 msgstr "管理员"
 
-#: users/models/user.py:757
+#: users/models/user.py:749
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
@@ -3905,11 +3917,11 @@ msgstr "密码不满足安全规则"
 msgid "The new password cannot be the last {} passwords"
 msgstr "新密码不能是最近 {} 次的密码"
 
-#: users/serializers/profile.py:48
+#: users/serializers/profile.py:46
 msgid "The newly set password is inconsistent"
 msgstr "两次密码不一致"
 
-#: users/serializers/profile.py:121 users/serializers/user.py:80
+#: users/serializers/profile.py:119 users/serializers/user.py:80
 msgid "Is first login"
 msgstr "首次登录"
 
@@ -4277,7 +4289,7 @@ msgstr ""
 "    <br>\n"
 "    "
 
-#: users/utils.py:116 users/views/profile/reset.py:126
+#: users/utils.py:116 users/views/profile/reset.py:124
 msgid "Reset password success"
 msgstr "重置密码成功"
 
@@ -4549,7 +4561,7 @@ msgstr "用户认证源来自 {}, 请去相应系统修改密码"
 msgid "* The new password cannot be the last {} passwords"
 msgstr "* 新密码不能是最近 {} 次的密码"
 
-#: users/views/profile/reset.py:127
+#: users/views/profile/reset.py:125
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
@@ -5028,6 +5040,12 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "AppSecret is required"
+#~ msgstr "AppSecret 是必须的"
+
+#~ msgid "Secret is required"
+#~ msgstr "Secret 是必须的"
 
 #~ msgid "Corporation ID(corpid)"
 #~ msgstr "企业 ID(CorpId)"

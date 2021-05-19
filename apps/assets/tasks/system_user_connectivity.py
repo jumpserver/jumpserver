@@ -5,6 +5,7 @@ from collections import defaultdict
 from celery import shared_task
 from django.utils.translation import ugettext as _
 
+from assets.models import Asset
 from common.utils import get_logger
 from orgs.utils import tmp_to_org, org_aware_func
 from ..models import SystemUser
@@ -96,9 +97,12 @@ def test_system_user_connectivity_util(system_user, assets, task_name):
 
 @shared_task(queue="ansible")
 @org_aware_func("system_user")
-def test_system_user_connectivity_manual(system_user):
+def test_system_user_connectivity_manual(system_user, asset_ids=None):
     task_name = _("Test system user connectivity: {}").format(system_user)
-    assets = system_user.get_related_assets()
+    if asset_ids:
+        assets = Asset.objects.filter(id__in=asset_ids)
+    else:
+        assets = system_user.get_related_assets()
     test_system_user_connectivity_util(system_user, assets, task_name)
 
 
