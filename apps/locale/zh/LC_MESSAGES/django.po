@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-19 14:48+0800\n"
+"POT-Creation-Date: 2021-05-19 16:27+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -2146,13 +2146,9 @@ msgstr "邮件已经发送{}, 请检查"
 msgid "Welcome to the JumpServer open source Bastion Host"
 msgstr "欢迎使用JumpServer开源堡垒机"
 
-#: settings/api/dingtalk.py:29
-msgid "AppSecret is required"
-msgstr "AppSecret 是必须的"
-
-#: settings/api/dingtalk.py:35 settings/api/wecom.py:35
-msgid "OK"
-msgstr ""
+#: settings/api/dingtalk.py:36 settings/api/wecom.py:36
+msgid "Test success"
+msgstr "测试成功"
 
 #: settings/api/ldap.py:189
 msgid "Get ldap users is None"
@@ -2161,10 +2157,6 @@ msgstr "获取 LDAP 用户为 None"
 #: settings/api/ldap.py:196
 msgid "Imported {} users successfully"
 msgstr "导入 {} 个用户成功"
-
-#: settings/api/wecom.py:29
-msgid "Secret is required"
-msgstr "Secret 是必须的"
 
 #: settings/models.py:123 users/templates/users/reset_password.html:29
 msgid "Setting"
@@ -3096,7 +3088,7 @@ msgstr "测试成功"
 msgid "Test failure: Account invalid"
 msgstr "测试失败: 账户无效"
 
-#: terminal/api/terminal.py:38 terminal/api/terminal.py:43
+#: terminal/api/terminal.py:39
 msgid "Have online sessions"
 msgstr "有在线会话"
 
@@ -5048,6 +5040,12 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "AppSecret is required"
+#~ msgstr "AppSecret 是必须的"
+
+#~ msgid "Secret is required"
+#~ msgstr "Secret 是必须的"
 
 #~ msgid "Corporation ID(corpid)"
 #~ msgstr "企业 ID(CorpId)"

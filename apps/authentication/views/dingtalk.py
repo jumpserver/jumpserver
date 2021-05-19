@@ -2,7 +2,7 @@ import urllib
 
 from django.http.response import HttpResponseRedirect
 from django.utils.decorators import method_decorator
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.cache import never_cache
 from django.views.generic import TemplateView
 from django.views import View

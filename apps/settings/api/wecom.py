@@ -25,13 +25,18 @@ class WeComTestingAPI(GenericAPIView):
 
         if not wecom_corpsecret:
             secret = Setting.objects.filter(name='WECOM_SECRET').first()
-            if not secret:
-                return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': _('Secret is required')})
-            wecom_corpsecret = secret.cleaned_value
+            if secret:
+                wecom_corpsecret = secret.cleaned_value
+
+        wecom_corpsecret = wecom_corpsecret or ''
 
         try:
             wecom = WeCom(corpid=wecom_corpid, corpsecret=wecom_corpsecret, agentid=wecom_agentid)
             wecom.send_text(['test'], 'test')
-            return Response(status=status.HTTP_200_OK, data={'msg': _('OK')})
+            return Response(status=status.HTTP_200_OK, data={'msg': _('Test success')})
         except APIException as e:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': e.detail})
+            try:
+                error = e.detail['errmsg']
+            except:
+                error = e.detail
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': error})
