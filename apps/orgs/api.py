@@ -60,7 +60,10 @@ class OrgViewSet(BulkModelViewSet):
     @tmp_to_root_org()
     def get_data_from_model(self, model):
         if model == User:
-            data = model.objects.filter(orgs__id=self.org.id, m2m_org_members__role=ROLE.USER)
+            data = model.objects.filter(
+                orgs__id=self.org.id,
+                m2m_org_members__role__in=[ROLE.USER, ROLE.ADMIN, ROLE.AUDITOR]
+            )
         elif model == Node:
             # 跟节点不能手动删除，所以排除检查
             data = model.objects.filter(org_id=self.org.id).exclude(parent_key='', key__regex=r'^[0-9]+$')
@@ -73,7 +76,7 @@ class OrgViewSet(BulkModelViewSet):
         for model in org_related_models:
             data = self.get_data_from_model(model)
             if data:
-                msg = _(f'Have `{model._meta.verbose_name}` exists, Please delete')
+                msg = _('Have {} exists, Please delete').format(model._meta.verbose_name)
                 return Response(data={'error': msg}, status=status.HTTP_403_FORBIDDEN)
         else:
             if str(current_org) == str(self.org):

@@ -21,7 +21,7 @@ class WeComQRUnBindBase(APIView):
         if not user.wecom_id:
             raise errors.WeComNotBound
 
-        user.wecom_id = ''
+        user.wecom_id = None
         user.save()
         return Response()
 

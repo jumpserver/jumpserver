@@ -8,7 +8,7 @@ from django.core.cache import cache
 from django.utils.translation import ugettext as _
 from six import text_type
 from django.contrib.auth import get_user_model
-from django.contrib.auth.backends import ModelBackend
+from django.contrib.auth.backends import ModelBackend as DJModelBackend
 from rest_framework import HTTP_HEADER_ENCODING
 from rest_framework import authentication, exceptions
 from common.auth import signature
@@ -23,6 +23,11 @@ def get_request_date_header(request):
         # Work around django test client oddness
         date = date.encode(HTTP_HEADER_ENCODING)
     return date
+
+
+class ModelBackend(DJModelBackend):
+    def user_can_authenticate(self, user):
+        return user.is_valid
 
 
 class AccessKeyAuthentication(authentication.BaseAuthentication):

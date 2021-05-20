@@ -7,8 +7,6 @@ import string
 import random
 import datetime
 
-from functools import partial
-
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.hashers import check_password, make_password
@@ -30,7 +28,7 @@ from users.exceptions import MFANotEnabled
 from ..signals import post_user_change_password
 
 
-__all__ = ['User']
+__all__ = ['User', 'UserPasswordHistory']
 
 logger = get_logger(__file__)
 
@@ -82,12 +80,6 @@ class AuthMixin:
                 return True
         else:
             return False
-
-    def save_history_password(self, password):
-        UserPasswordHistory.objects.create(
-            user=self, password=make_password(password),
-            date_created=self.date_password_last_updated
-        )
 
     def is_public_key_valid(self):
         """
@@ -771,3 +763,9 @@ class UserPasswordHistory(models.Model):
     user = models.ForeignKey("users.User", related_name='history_passwords',
                              on_delete=models.CASCADE, verbose_name=_('User'))
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
+
+    def __str__(self):
+        return f'{self.user} set at {self.date_created}'
+
+    def __repr__(self):
+        return self.__str__()
