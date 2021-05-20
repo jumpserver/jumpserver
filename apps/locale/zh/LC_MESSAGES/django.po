@@ -3,19 +3,19 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-19 16:27+0800\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.4.3\n"
 
 #: acls/models/base.py:25 acls/serializers/login_asset_acl.py:47
 #: applications/models/application.py:11 assets/models/asset.py:142
@@ -2111,15 +2111,15 @@ msgstr "用户名"
 
 #: perms/serializers/asset/permission.py:47
 msgid "User groups name"
-msgstr "用户组数量"
+msgstr "用户组名称"
 
 #: perms/serializers/asset/permission.py:48
 msgid "Assets name"
-msgstr "资产名字"
+msgstr "资产名称"
 
 #: perms/serializers/asset/permission.py:50
 msgid "System users name"
-msgstr "系统用户名字"
+msgstr "系统用户名称"
 
 #: perms/serializers/asset/permission.py:70 users/serializers/user.py:81
 msgid "Is valid"
