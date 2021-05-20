@@ -250,7 +250,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 - [Lina](https://github.com/jumpserver/lina) JumpServer Web UI 项目
 - [Luna](https://github.com/jumpserver/luna) JumpServer Web Terminal 项目
 - [KoKo](https://github.com/jumpserver/koko) JumpServer 字符协议 Connector 项目，替代原来 Python 版本的 [Coco](https://github.com/jumpserver/coco)
-- [Guacamole](https://github.com/jumpserver/docker-guacamole) JumpServer 图形协议 Connector 项目，依赖 [Apache Guacamole](https://guacamole.apache.org/)
+- [Lion](https://github.com/jumpserver/lion-release) JumpServer 图形协议 Connector 项目，依赖 [Apache Guacamole](https://guacamole.apache.org/)
 
 ## 贡献
 如果有你好的想法创意，或者帮助我们修复了 Bug, 欢迎提交 Pull Request
@@ -263,7 +263,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 
 
 ## 致谢
-- [Apache Guacamole](https://guacamole.apache.org/) Web页面连接 RDP, SSH, VNC协议设备，JumpServer 图形化连接依赖
+- [Apache Guacamole](https://guacamole.apache.org/) Web页面连接 RDP, SSH, VNC协议设备，JumpServer 图形化组件 Lion 依赖 
 - [OmniDB](https://omnidb.org/) Web页面连接使用数据库，JumpServer Web数据库依赖
 
 
