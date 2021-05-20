@@ -263,7 +263,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 
 
 ## 致谢
-- [Apache Guacamole](https://guacamole.apache.org/) Web页面连接 RDP, SSH, VNC协议设备，JumpServer 图形化连接依赖
+- [Apache Guacamole](https://guacamole.apache.org/) Web页面连接 RDP, SSH, VNC协议设备，JumpServer 图形化组件 Lion 依赖 
 - [OmniDB](https://omnidb.org/) Web页面连接使用数据库，JumpServer Web数据库依赖
 
 
