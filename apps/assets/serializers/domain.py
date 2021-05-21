@@ -59,7 +59,7 @@ class GatewaySerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'created_by', 'comment',
         ]
         fields_fk = ['domain']
-        fields = fields_small +  fields_fk
+        fields = fields_small + fields_fk
         extra_kwargs = {
             'password': {'write_only': True, 'validators': [NoSpecialChars()]},
             'private_key': {"write_only": True},
@@ -78,12 +78,12 @@ class GatewaySerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
 
 
 class GatewayWithAuthSerializer(GatewaySerializer):
-    def get_field_names(self, declared_fields, info):
-        fields = super().get_field_names(declared_fields, info)
-        fields.extend(
-            ['password', 'private_key']
-        )
-        return fields
+    class Meta(GatewaySerializer.Meta):
+        extra_kwargs = {
+            'password': {'write_only': False, 'validators': [NoSpecialChars()]},
+            'private_key': {"write_only": False},
+            'public_key': {"write_only": False},
+        }
 
 
 class DomainWithGatewaySerializer(BulkOrgResourceModelSerializer):
