@@ -78,12 +78,12 @@ class OrgResourceStatisticsCache(OrgRelatedCache):
         return self.org
 
     def compute_users_amount(self):
-        if self.org.is_root():
-            users_amount = User.objects.exclude(role='App').count()
-        else:
-            users_amount = OrganizationMember.objects.values(
-                'user_id'
-            ).filter(org_id=self.org.id).distinct().count()
+        users = User.objects.exclude(role='App')
+
+        if not self.org.is_root():
+            users = users.filter(m2m_org_members__org_id=self.org.id)
+
+        users_amount = users.values('id').distinct().count()
         return users_amount
 
     def compute_assets_amount(self):
