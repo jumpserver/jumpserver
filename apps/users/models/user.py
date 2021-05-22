@@ -599,7 +599,9 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         auto_now_add=True, blank=True, null=True,
         verbose_name=_('Date password last updated')
     )
-    need_update_password = models.BooleanField(default=False)
+    need_update_password = models.BooleanField(
+        default=False, verbose_name=_('Need update password')
+    )
     wecom_id = models.CharField(null=True, default=None, unique=True, max_length=128)
     dingtalk_id = models.CharField(null=True, default=None, unique=True, max_length=128)
 
