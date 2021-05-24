@@ -169,7 +169,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
   </tr>
   <tr>
     <td rowspan="2">访问控制</td>
-    <td>登录资产复核（目前仅支持 Linux 资产）:small_orange_diamond:</td>
+    <td>登录资产复核（通过 SSH/Telnet 协议登录资产）:small_orange_diamond:</td>
   </tr>
   <tr>
     <td>命令执行复核:small_orange_diamond:</td>
@@ -185,7 +185,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
   </tr>
   <tr>
     <td rowspan="3">会话审计</td>
-    <td>在线会话监控（支持 Linux、Windows 资产）</td>
+    <td>在线会话监控（支持通过 SSH/RDP/Telnet/VNC/Kubernetes 等协议建立的会话）</td>
   </tr>
   <tr>
     <td>在线会话内容审计</td>
