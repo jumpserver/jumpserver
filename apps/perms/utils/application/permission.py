@@ -72,3 +72,7 @@ def get_application_system_user_ids(user, application):
 def has_application_system_permission(user, application, system_user):
     system_user_ids = get_application_system_user_ids(user, application)
     return system_user.id in system_user_ids
+
+
+def get_application_system_users_ids(application):
+    return system_users_id
