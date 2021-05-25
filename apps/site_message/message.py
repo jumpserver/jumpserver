@@ -1,3 +1,5 @@
+from django.db.models import F
+
 from common.utils.timezone import now
 from users.models import User
 from .models import SiteMessage, SiteMessageUsers
@@ -34,8 +36,8 @@ class Message:
         site_msgs = SiteMessage.objects.filter(
             m2m_sitemessageusers__user_id=user_id
         ).distinct().annotate(
-            has_read='m2m_sitemessageusers__has_read',
-            read_at='m2m_sitemessageusers__read_at'
+            has_read=F('m2m_sitemessageusers__has_read'),
+            read_at=F('m2m_sitemessageusers__read_at')
         ).order_by('-date_created')
 
         return site_msgs
@@ -53,8 +55,8 @@ class Message:
             m2m_sitemessageusers__user_id=user_id,
             m2m_sitemessageusers__has_read=False
         ).distinct().annotate(
-            has_read='m2m_sitemessageusers__has_read',
-            read_at='m2m_sitemessageusers__read_at'
+            has_read=F('m2m_sitemessageusers__has_read'),
+            read_at=F('m2m_sitemessageusers__read_at')
         ).order_by('-date_created')
 
         return site_msgs

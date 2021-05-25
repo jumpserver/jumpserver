@@ -8,10 +8,18 @@ from common.db.models import JMSBaseModel
 class SiteMessage(JMSBaseModel):
     subject = models.CharField(max_length=1024)
     message = models.TextField()
-    users = models.ManyToManyField('users.User', through='site_message.SiteMessageUsers')
+    users = models.ManyToManyField(
+        'users.User', through='site_message.SiteMessageUsers', related_name='recv_site_messages'
+    )
     groups = models.ManyToManyField('users.UserGroup')
     is_broadcast = models.BooleanField(default=False)
-    sender = models.ForeignKey('users.User', db_constraint=False, on_delete=models.DO_NOTHING, null=True, default=None)
+    sender = models.ForeignKey(
+        'users.User', db_constraint=False, on_delete=models.DO_NOTHING, null=True, default=None,
+        related_name='send_site_message'
+    )
+
+    has_read = False
+    read_at = datetime.min
 
 
 class SiteMessageUsers(JMSBaseModel):
