@@ -1,11 +1,9 @@
-from datetime import datetime
-
 from django.db import models
 
-from common.db.models import JMSBaseModel
+from common.db.models import JMSModel
 
 
-class SiteMessage(JMSBaseModel):
+class SiteMessage(JMSModel):
     subject = models.CharField(max_length=1024)
     message = models.TextField()
     users = models.ManyToManyField(
@@ -19,11 +17,11 @@ class SiteMessage(JMSBaseModel):
     )
 
     has_read = False
-    read_at = datetime.min
+    read_at = None
 
 
-class SiteMessageUsers(JMSBaseModel):
+class SiteMessageUsers(JMSModel):
     sitemessage = models.ForeignKey('site_message.SiteMessage', on_delete=models.CASCADE, db_constraint=False, related_name='m2m_sitemessageusers')
     user = models.ForeignKey('users.User', on_delete=models.CASCADE, db_constraint=False, related_name='m2m_sitemessageusers')
     has_read = models.BooleanField(default=False)
-    read_at = models.DateTimeField(default=datetime.min)
+    read_at = models.DateTimeField(default=None, null=True)
