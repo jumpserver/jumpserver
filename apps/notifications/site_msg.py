@@ -5,7 +5,7 @@ from users.models import User
 from .models import SiteMessage, SiteMessageUsers
 
 
-class Message:
+class SiteMessage:
 
     @classmethod
     def send_msg(cls, subject, message, user_ids=(), group_ids=(), sender=None, is_broadcast=False):

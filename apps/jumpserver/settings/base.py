@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'applications.apps.ApplicationsConfig',
     'tickets.apps.TicketsConfig',
     'acls.apps.AclsConfig',
-    'site_message.apps.SiteMessageConfig',
+    'notifications',
     'common.apps.CommonConfig',
     'jms_oidc_rp',
     'rest_framework',
