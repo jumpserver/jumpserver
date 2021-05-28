@@ -6,6 +6,7 @@ from .base import BackendBase
 
 class Email(BackendBase):
     account_field = 'email'
+    is_enable_field_in_settings = 'EMAIL_HOST_USER'
 
     def send_msg(self, users, subject, message):
         from_email = settings.EMAIL_FROM or settings.EMAIL_HOST_USER

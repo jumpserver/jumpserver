@@ -6,6 +6,7 @@ from .base import BackendBase
 
 class DingTalk(BackendBase):
     account_field = 'dingtalk_id'
+    is_enable_field_in_settings = 'AUTH_DINGTALK'
 
     def __init__(self):
         self.dingtalk = Client(

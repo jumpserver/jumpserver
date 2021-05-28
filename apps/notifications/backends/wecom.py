@@ -6,6 +6,7 @@ from .base import BackendBase
 
 class WeCom(BackendBase):
     account_field = 'wecom_id'
+    is_enable_field_in_settings = 'AUTH_WECOM'
 
     def __init__(self):
         self.wecom = Client(

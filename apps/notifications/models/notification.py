@@ -2,7 +2,6 @@ from django.db import models
 
 from common.db.models import JMSModel
 from common.fields.model import JsonListCharField
-from notifications.backends import BACKEND
 
 __all__ = ('SystemMsgSubscription', 'UserMsgSubscription')
 
@@ -32,6 +31,8 @@ class SystemMsgSubscription(JMSModel):
 
     @property
     def receivers(self):
+        from notifications.backends import BACKEND
+
         users = [user for user in self.users.all()]
 
         for group in self.groups.all():
@@ -44,7 +45,7 @@ class SystemMsgSubscription(JMSModel):
         for user in users:
             recevier = {'name': str(user), 'id': user.id}
             for backend in receive_backends:
-                recevier[backend] = bool(BACKEND.get_backend_user_id(user, backend))
+                recevier[backend] = bool(BACKEND(backend).get_account(user))
             receviers.append(recevier)
 
         return receviers

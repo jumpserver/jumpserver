@@ -81,6 +81,9 @@ class Message(metaclass=MessageType):
     def get_email_msg(self) -> dict:
         raise NotImplementedError
 
+    def get_site_msg_msg(self) -> dict:
+        raise NotImplementedError
+
 
 class SystemMessage(Message):
     def publish(self):

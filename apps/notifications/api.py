@@ -17,11 +17,11 @@ class BackendListView(APIView):
     def get(self, request):
         data = [
             {
-                'name': name,
-                'name_display': name_display
+                'name': backend,
+                'name_display': backend.label
             }
-            for name, name_display in BACKEND.choices
-            if BACKEND.is_backend_enable(name)
+            for backend in BACKEND
+            if backend.is_enable
         ]
         return Response(data=data)
 

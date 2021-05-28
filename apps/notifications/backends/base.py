@@ -5,6 +5,7 @@ class BackendBase:
     # User 表中的字段
     account_field = None
 
+    # Django setting 中的字段名
     is_enable_field_in_settings = None
 
     def get_accounts(self, users):

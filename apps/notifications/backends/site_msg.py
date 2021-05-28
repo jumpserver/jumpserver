@@ -9,4 +9,6 @@ class SiteMessage(BackendBase):
         accounts, __, __ = self.get_accounts(users)
         Client.send_msg(subject, message, user_ids=accounts)
 
-
+    @classmethod
+    def is_enable(cls):
+        return True

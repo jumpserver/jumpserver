@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 
@@ -24,31 +23,14 @@ class BACKEND(models.TextChoices):
         }[self]
         return client
 
-    @classmethod
-    def get_backend_user_id(cls, user, backend):
-        id_field = {
-            cls.WECOM: 'wecom_id',
-            cls.DINGTALK: 'dingtalk_id',
-            cls.EMAIL: 'email',
-            cls.SITE_MSG: 'id',
-        }[backend]
+    def get_account(self, user):
+        return self.client.get_account(user)
 
-        return cls(backend).client().get_backend_user_id(user)
-
-    @classmethod
-    def is_backend_enable(cls, backend):
-        if backend in (cls.SITE_MSG,):
-            return True
-
-        config_field = {
-            cls.WECOM: 'AUTH_WECOM',
-            cls.DINGTALK: 'AUTH_DINGTALK',
-            cls.EMAIL: 'EMAIL_HOST_USER',
-        }[backend]
-        enable = getattr(settings, config_field)
-        return bool(enable)
+    @property
+    def is_enable(self):
+        return self.client.is_enable()
 
     @classmethod
     def filter_enable_backends(cls, backends):
-        enable_backends = [b for b in backends if cls.is_backend_enable(b)]
+        enable_backends = [b for b in backends if cls(b).is_enable]
         return enable_backends
