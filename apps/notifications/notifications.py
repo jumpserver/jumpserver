@@ -1,14 +1,12 @@
 from typing import Iterable
-from collections import defaultdict
 import traceback
 from itertools import chain
 
 from django.db.models import TextChoices
 from django.utils.translation import gettext_lazy as _
 
-from .backends.wecom import WeCom
-from .backends.email import Email
-from .models import BACKEND, SystemMsgSubscription, UserMsgSubscription
+from notifications.backends import BACKEND
+from .models import SystemMsgSubscription
 
 
 class CATEGORY(TextChoices):
@@ -16,8 +14,8 @@ class CATEGORY(TextChoices):
     OPERATIONS = 'Operations', _('Operations')
 
 
-system_msgs = {}
-user_msgs = {}
+system_msgs = []
+user_msgs = []
 
 
 class MessageType(type):
@@ -32,10 +30,10 @@ class MessageType(type):
                 'message_type_label': attrs['message_type_label'],
                 'category': attrs['category']
             }
-            if issubclass(clz, SystemMsgSubscription):
-                system_msgs[message_type] = msg
-            elif issubclass(clz, UserMsgSubscription):
-                user_msgs[message_type] = msg
+            if issubclass(clz, SystemMessage):
+                system_msgs.append(msg)
+            elif issubclass(clz, UserMessage):
+                user_msgs.append(msg)
 
         return clz
 
@@ -104,3 +102,8 @@ class SystemMessage(Message):
 
 class UserMessage(Message):
     pass
+
+
+class Test(SystemMessage):
+    message_type_label = 'Hello world'
+    category = CATEGORY.TERMINAL

@@ -10,7 +10,7 @@ class SystemMsgSubscriptionSerializer(BulkModelSerializer):
     class Meta:
         model = SystemMsgSubscription
         fields = (
-            'id', 'message_type', 'message_type_label',
+            'message_type', 'message_type_label',
             'users', 'groups', 'receive_backends', 'receivers'
         )
         read_only_fields = (
@@ -18,6 +18,7 @@ class SystemMsgSubscriptionSerializer(BulkModelSerializer):
         )
         extra_kwargs = {
             'users': {'allow_empty': True},
+            'groups': {'allow_empty': True},
         }
 
 

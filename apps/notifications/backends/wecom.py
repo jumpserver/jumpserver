@@ -1,10 +1,12 @@
 from django.conf import settings
 
 from common.message.backends.wecom import WeCom as Client
-from ..base import BackendBase
+from .base import BackendBase
 
 
 class WeCom(BackendBase):
+    account_field = 'wecom_id'
+
     def __init__(self):
         self.wecom = Client(
             corpid=settings.WECOM_CORPID,
@@ -13,5 +15,5 @@ class WeCom(BackendBase):
         )
 
     def send_msg(self, users, msg):
-        accounts, __, __ = self.get_accounts_on_model_fields(users, 'wecom_id')
+        accounts, __, __ = self.get_accounts(users)
         return self.wecom.send_text(accounts, msg)

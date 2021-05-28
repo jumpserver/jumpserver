@@ -1,16 +1,31 @@
+from django.conf import settings
 
 
 class BackendBase:
-    def get_accounts_on_model_fields(self, users, field_name):
+    # User 表中的字段
+    account_field = None
+
+    is_enable_field_in_settings = None
+
+    def get_accounts(self, users):
         accounts = []
         unbound_users = []
         account_user_mapper = {}
 
         for user in users:
-            account = getattr(user, field_name, None)
+            account = getattr(user, self.account_field, None)
             if account:
                 account_user_mapper[account] = user
                 accounts.append(account)
             else:
                 unbound_users.append(user)
         return accounts, unbound_users, account_user_mapper
+
+    @classmethod
+    def get_account(cls, user):
+        return getattr(user, cls.account_field)
+
+    @classmethod
+    def is_enable(cls):
+        enable = getattr(settings, cls.is_enable_field_in_settings)
+        return bool(enable)
