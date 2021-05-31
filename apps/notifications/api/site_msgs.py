@@ -36,6 +36,12 @@ class SiteMessageViewSet(ListModelMixin, RetrieveModelMixin, JmsGenericViewSet):
         msgs = self.filter_queryset(msgs)
         return self.get_paginated_response_with_query_set(msgs)
 
+    @action(methods=[GET], detail=False, url_path='unread-total')
+    def unread_total(self, request, **kwargs):
+        user = request.user
+        msgs = SiteMessage.get_user_unread_msgs(user.id)
+        return Response(data={'total': msgs.count()})
+
     @action(methods=[PATCH], detail=False)
     def mark_as_read(self, request, **kwargs):
         user = request.user
