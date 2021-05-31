@@ -1,7 +1,6 @@
 from django.db import models
 
 from common.db.models import JMSModel
-from common.fields.model import JsonListCharField
 
 __all__ = ('SystemMsgSubscription', 'UserMsgSubscription')
 
@@ -9,7 +8,7 @@ __all__ = ('SystemMsgSubscription', 'UserMsgSubscription')
 class UserMsgSubscription(JMSModel):
     message_type = models.CharField(max_length=128)
     user = models.ForeignKey('users.User', related_name='user_msg_subscriptions', on_delete=models.CASCADE)
-    receive_backends = JsonListCharField(max_length=256)
+    receive_backends = models.JSONField(default=list)
 
     def __str__(self):
         return f'{self.message_type}'
@@ -19,7 +18,7 @@ class SystemMsgSubscription(JMSModel):
     message_type = models.CharField(max_length=128, unique=True)
     users = models.ManyToManyField('users.User', related_name='system_msg_subscriptions')
     groups = models.ManyToManyField('users.UserGroup', related_name='system_msg_subscriptions')
-    receive_backends = JsonListCharField(max_length=256)
+    receive_backends = models.JSONField(default=list)
 
     message_type_label = ''
 

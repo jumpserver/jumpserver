@@ -8,16 +8,16 @@ from .wecom import WeCom
 
 
 class BACKEND(models.TextChoices):
-    WECOM = 'wecom', _('WeCom')
     EMAIL = 'email', _('Email')
+    WECOM = 'wecom', _('WeCom')
     DINGTALK = 'dingtalk', _('DingTalk')
     SITE_MSG = 'site_msg', _('Site message')
 
     @property
     def client(self):
         client = {
-            self.WECOM: WeCom,
             self.EMAIL: Email,
+            self.WECOM: WeCom,
             self.DINGTALK: DingTalk,
             self.SITE_MSG: SiteMessage
         }[self]
