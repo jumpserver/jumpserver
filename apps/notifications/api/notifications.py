@@ -39,15 +39,6 @@ class SystemMsgSubscriptionViewSet(ListModelMixin,
         'partial_update': SystemMsgSubscriptionSerializer
     }
 
-    def update(self, request, *args, **kwargs):
-        try:
-            return super().update(request, *args, **kwargs)
-        except Http404:
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save(message_type=self.kwargs['message_type'])
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
     def list(self, request, *args, **kwargs):
         data = []
         category_children_mapper = {}
