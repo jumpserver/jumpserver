@@ -9,6 +9,8 @@ from notifications.models import SystemMsgSubscription
 
 logger = get_logger(__name__)
 
+__all__ = ('CommandAlertMessage', 'CommandExecutionAlert')
+
 CATEGORY = 'terminal'
 CATEGORY_LABEL = _('Terminal')
 
