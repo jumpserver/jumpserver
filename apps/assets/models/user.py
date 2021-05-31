@@ -7,9 +7,10 @@ import logging
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.cache import cache
 
-from common.utils import signer
-from common.fields.model import JsonListCharField
+from common.utils import signer, get_object_or_none
+from common.exceptions import JMSException
 from .base import BaseUser
 from .asset import Asset
 
@@ -184,6 +185,81 @@ class SystemUser(BaseUser):
         super()._merge_auth(other)
         if self.username_same_with_user:
             self.username = other.username
+
+    def set_temp_auth(self, asset_or_app_id, user_id, auth, ttl=300):
+        if not auth:
+            raise ValueError('Auth not set')
+        key = 'TEMP_PASSWORD_{}_{}_{}'.format(self.id, asset_or_app_id, user_id)
+        logger.debug(f'Set system user temp auth: {key}')
+        cache.set(key, auth, ttl)
+
+    def get_temp_auth(self, asset_or_app_id, user_id):
+        key = 'TEMP_PASSWORD_{}_{}_{}'.format(self.id, asset_or_app_id, user_id)
+        logger.debug(f'Get system user temp auth: {key}')
+        password = cache.get(key)
+        return password
+
+    def load_tmp_auth_if_has(self, asset_or_app_id, user):
+        if not asset_or_app_id or not user:
+            return
+        if self.login_mode != self.LOGIN_MANUAL:
+            pass
+
+        auth = self.get_temp_auth(asset_or_app_id, user)
+        if not auth:
+            return
+        username = auth.get('username')
+        password = auth.get('password')
+
+        if username:
+            self.username = username
+        if password:
+            self.password = password
+
+    def load_app_more_auth(self, app_id=None, user_id=None):
+        from users.models import User
+
+        if self.login_mode == self.LOGIN_MANUAL:
+            self.password = ''
+            self.private_key = ''
+        if not user_id:
+            return
+        user = get_object_or_none(User, pk=user_id)
+        if not user:
+            return
+        self.load_tmp_auth_if_has(app_id, user)
+
+    def load_asset_more_auth(self, asset_id=None, username=None, user_id=None):
+        from users.models import User
+
+        if self.login_mode == self.LOGIN_MANUAL:
+            self.password = ''
+            self.private_key = ''
+
+        asset = None
+        if asset_id:
+            asset = get_object_or_none(Asset, pk=asset_id)
+        # 没有资产就没有必要继续了
+        if not asset:
+            logger.debug('Asset not found, pass')
+            return
+
+        user = None
+        if user_id:
+            user = get_object_or_none(User, pk=user_id)
+
+        if self.username_same_with_user:
+            if user and not username:
+                username = user.username
+
+        # 加载某个资产的特殊配置认证信息
+        try:
+            self.load_asset_special_auth(asset, username)
+        except Exception as e:
+            logger.error('Load special auth Error: ', e)
+            pass
+
+        self.load_tmp_auth_if_has(asset_id, user)
 
     @property
     def cmd_filter_rules(self):

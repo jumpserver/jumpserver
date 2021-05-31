@@ -13,7 +13,12 @@ __all__ = [
 class BasicSettingSerializer(serializers.Serializer):
     SITE_URL = serializers.URLField(
         required=True, label=_("Site url"),
-        help_text=_('eg: http://demo.jumpserver.org:8080')
+        help_text=_('eg: http://dev.jumpserver.org:8080')
+    )
+    RDP_ADDR = serializers.CharField(
+        required=True, label=_("RDP address"),
+        max_length=1024,
+        help_text=_('RDP visit address, eg: dev.jumpserver.org:3389')
     )
     USER_GUIDE_URL = serializers.URLField(
         required=False, allow_blank=True, allow_null=True, label=_("User guide url"),
