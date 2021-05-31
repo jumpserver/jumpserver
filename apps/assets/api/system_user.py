@@ -1,16 +1,15 @@
 # ~*~ coding: utf-8 ~*~
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 
 from common.utils import get_logger
-from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
-from common.drf.filters import CustomFilter
+from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, IsValidUser
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
-from orgs.utils import tmp_to_org
 from ..models import SystemUser, Asset
 from .. import serializers
-from ..serializers import SystemUserWithAuthInfoSerializer
+from ..serializers import SystemUserWithAuthInfoSerializer, SystemUserTempAuthSerializer
 from ..tasks import (
     push_system_user_to_assets_manual, test_system_user_connectivity_manual,
     push_system_user_to_assets
@@ -21,6 +20,7 @@ logger = get_logger(__file__)
 __all__ = [
     'SystemUserViewSet', 'SystemUserAuthInfoApi', 'SystemUserAssetAuthInfoApi',
     'SystemUserCommandFilterRuleListApi', 'SystemUserTaskApi', 'SystemUserAssetsListView',
+    'SystemUserTempAuthInfoApi', 'SystemUserAppAuthInfoApi',
 ]
 
 
@@ -57,6 +57,23 @@ class SystemUserAuthInfoApi(generics.RetrieveUpdateDestroyAPIView):
         return Response(status=204)
 
 
+class SystemUserTempAuthInfoApi(generics.CreateAPIView):
+    model = SystemUser
+    permission_classes = (IsValidUser,)
+    serializer_class = SystemUserTempAuthSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = super().get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        pk = kwargs.get('pk')
+        instance = get_object_or_404(SystemUser, pk=pk)
+        data = serializer.validated_data
+        user = self.request.user
+        instance_id = data.get('instance_id')
+        instance.set_temp_auth(instance_id, user, data)
+        return Response(serializer.data, status=201)
+
+
 class SystemUserAssetAuthInfoApi(generics.RetrieveAPIView):
     """
     Get system user with asset auth info
@@ -65,22 +82,30 @@ class SystemUserAssetAuthInfoApi(generics.RetrieveAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = SystemUserWithAuthInfoSerializer
 
-    def get_exception_handler(self):
-        def handler(e, context):
-            return Response({"error": str(e)}, status=400)
-        return handler
+    def get_object(self):
+        instance = super().get_object()
+        asset_id = self.kwargs.get('asset_id')
+        user_id = self.request.query_params.get("user_id")
+        username = self.request.query_params.get("username")
+        instance.load_asset_more_auth(asset_id=asset_id, user_id=user_id, username=username)
+        return instance
+
+
+class SystemUserAppAuthInfoApi(generics.RetrieveAPIView):
+    """
+    Get system user with asset auth info
+    """
+    model = SystemUser
+    permission_classes = (IsOrgAdminOrAppUser,)
+    serializer_class = SystemUserWithAuthInfoSerializer
 
     def get_object(self):
         instance = super().get_object()
-        username = instance.username
-        if instance.username_same_with_user:
-            username = self.request.query_params.get("username")
-        asset_id = self.kwargs.get('aid')
-        asset = get_object_or_404(Asset, pk=asset_id)
-
-        with tmp_to_org(asset.org_id):
-            instance.load_asset_special_auth(asset=asset, username=username)
-            return instance
+        app_id = self.kwargs.get('app_id')
+        user_id = self.request.query_params.get("user_id")
+        if user_id:
+            instance.load_app_more_auth(app_id, user_id)
+        return instance
 
 
 class SystemUserTaskApi(generics.CreateAPIView):
