@@ -2,7 +2,7 @@ from django.db.models import F
 
 from common.utils.timezone import now
 from users.models import User
-from .models import SiteMessage, SiteMessageUsers
+from .models import SiteMessage as SiteMessageModel, SiteMessageUsers
 
 
 class SiteMessage:
@@ -12,7 +12,7 @@ class SiteMessage:
         if not any((user_ids, group_ids, is_broadcast)):
             raise ValueError('No recipient is specified')
 
-        site_msg = SiteMessage.objects.create(
+        site_msg = SiteMessageModel.objects.create(
             subject=subject, message=message,
             is_broadcast=is_broadcast, sender=sender
         )
@@ -33,7 +33,7 @@ class SiteMessage:
 
     @classmethod
     def get_user_all_msgs(cls, user_id):
-        site_msgs = SiteMessage.objects.filter(
+        site_msgs = SiteMessageModel.objects.filter(
             m2m_sitemessageusers__user_id=user_id
         ).distinct().annotate(
             has_read=F('m2m_sitemessageusers__has_read'),
@@ -44,14 +44,14 @@ class SiteMessage:
 
     @classmethod
     def get_user_all_msgs_count(cls, user_id):
-        site_msgs_count = SiteMessage.objects.filter(
+        site_msgs_count = SiteMessageModel.objects.filter(
             m2m_sitemessageusers__user_id=user_id
         ).distinct().count()
         return site_msgs_count
 
     @classmethod
     def get_user_unread_msgs(cls, user_id):
-        site_msgs = SiteMessage.objects.filter(
+        site_msgs = SiteMessageModel.objects.filter(
             m2m_sitemessageusers__user_id=user_id,
             m2m_sitemessageusers__has_read=False
         ).distinct().annotate(
@@ -63,7 +63,7 @@ class SiteMessage:
 
     @classmethod
     def get_user_unread_msgs_count(cls, user_id):
-        site_msgs_count = SiteMessage.objects.filter(
+        site_msgs_count = SiteMessageModel.objects.filter(
             m2m_sitemessageusers__user_id=user_id,
             m2m_sitemessageusers__has_read=False
         ).distinct().count()

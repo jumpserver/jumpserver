@@ -5,12 +5,14 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from common.drf.api import JmsGenericViewSet
-from .notifications import system_msgs, CATEGORY
-from .models import SystemMsgSubscription
+from notifications.notifications import system_msgs
+from notifications.models import SystemMsgSubscription
 from notifications.backends import BACKEND
-from .serializers import (
+from notifications.serializers import (
     SystemMsgSubscriptionSerializer, SystemMsgSubscriptionByCategorySerializer
 )
+
+__all__ = ('BackendListView', 'SystemMsgSubscriptionViewSet')
 
 
 class BackendListView(APIView):
@@ -33,7 +35,8 @@ class SystemMsgSubscriptionViewSet(ListModelMixin,
     queryset = SystemMsgSubscription.objects.all()
     serializer_classes = {
         'list': SystemMsgSubscriptionByCategorySerializer,
-        'update': SystemMsgSubscriptionSerializer
+        'update': SystemMsgSubscriptionSerializer,
+        'partial_update': SystemMsgSubscriptionSerializer
     }
 
     def update(self, request, *args, **kwargs):
@@ -49,16 +52,6 @@ class SystemMsgSubscriptionViewSet(ListModelMixin,
         data = []
         category_children_mapper = {}
 
-        for category in CATEGORY:
-            children = []
-
-            data.append({
-                'category': category,
-                'category_label': category.label,
-                'children': children
-            })
-            category_children_mapper[category] = children
-
         subscriptions = self.get_queryset()
         msgtype_sub_mapper = {}
         for sub in subscriptions:
@@ -68,19 +61,20 @@ class SystemMsgSubscriptionViewSet(ListModelMixin,
             message_type = msg['message_type']
             message_type_label = msg['message_type_label']
             category = msg['category']
+            category_label = msg['category_label']
 
-            if message_type not in msgtype_sub_mapper:
-                sub = {
-                    'message_type': message_type,
-                    'message_type_label': message_type_label,
-                    'users': [],
-                    'groups': [],
-                    'receive_backends': []
-                }
-            else:
-                sub = msgtype_sub_mapper[message_type]
-                sub.message_type_label = message_type_label
+            if category not in category_children_mapper:
+                children = []
 
+                data.append({
+                    'category': category,
+                    'category_label': category_label,
+                    'children': children
+                })
+                category_children_mapper[category] = children
+
+            sub = msgtype_sub_mapper[message_type]
+            sub.message_type_label = message_type_label
             category_children_mapper[category].append(sub)
 
         serializer = self.get_serializer(data, many=True)

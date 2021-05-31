@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from common.drf.serializers import BulkModelSerializer
-from .models import SystemMsgSubscription
+from notifications.models import SystemMsgSubscription
 
 
 class SystemMsgSubscriptionSerializer(BulkModelSerializer):
@@ -19,6 +19,7 @@ class SystemMsgSubscriptionSerializer(BulkModelSerializer):
         extra_kwargs = {
             'users': {'allow_empty': True},
             'groups': {'allow_empty': True},
+            'receive_backends': {'required': True}
         }
 
 

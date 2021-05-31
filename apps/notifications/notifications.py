@@ -2,16 +2,12 @@ from typing import Iterable
 import traceback
 from itertools import chain
 
-from django.db.models import TextChoices
-from django.utils.translation import gettext_lazy as _
+from celery import shared_task
 
 from notifications.backends import BACKEND
 from .models import SystemMsgSubscription
 
-
-class CATEGORY(TextChoices):
-    TERMINAL = 'terminal', _('Terminal')
-    OPERATIONS = 'Operations', _('Operations')
+__all__ = ('SystemMessage', 'UserMessage')
 
 
 system_msgs = []
@@ -22,20 +18,31 @@ class MessageType(type):
     def __new__(cls, name, bases, attrs: dict):
         clz = type.__new__(cls, name, bases, attrs)
 
-        if 'message_type_label' in attrs and 'category' in attrs:
+        if 'message_type_label' in attrs \
+                and 'category' in attrs \
+                and 'category_label' in attrs:
             message_type = clz.get_message_type()
 
             msg = {
                 'message_type': message_type,
                 'message_type_label': attrs['message_type_label'],
-                'category': attrs['category']
+                'category': attrs['category'],
+                'category_label': attrs['category_label'],
             }
             if issubclass(clz, SystemMessage):
                 system_msgs.append(msg)
+                if not SystemMsgSubscription.objects.filter(message_type=message_type).exists():
+                    sub = SystemMsgSubscription.objects.create(message_type=message_type)
+                    clz.post_insert_to_db(sub)
             elif issubclass(clz, UserMessage):
                 user_msgs.append(msg)
 
         return clz
+
+
+@shared_task
+def publish_task(msg):
+    msg.publish()
 
 
 class Message(metaclass=MessageType):
@@ -47,11 +54,15 @@ class Message(metaclass=MessageType):
     """
 
     message_type_label: str
-    category: CATEGORY
+    category: str
+    category_label: str
 
     @classmethod
     def get_message_type(cls):
         return cls.__name__
+
+    def publish_async(self):
+        return publish_task.delay(self)
 
     def publish(self):
         raise NotImplementedError
@@ -61,7 +72,7 @@ class Message(metaclass=MessageType):
             try:
                 backend = BACKEND(backend)
 
-                get_msg_method = getattr(self, f'get_{backend}_msg', self.get_default_msg)
+                get_msg_method = getattr(self, f'get_{backend}_msg', self.get_common_msg)
                 msg = get_msg_method()
                 client = backend.client()
 
@@ -72,17 +83,28 @@ class Message(metaclass=MessageType):
             except:
                 traceback.print_exc()
 
-    def get_default_msg(self) -> str:
-        pass
+    def get_common_msg(self):
+        raise NotImplementedError
+
+    def get_dingtalk_msg(self):
+        return self.get_common_msg()
 
     def get_wecom_msg(self) -> str:
-        raise NotImplementedError
+        return self.get_common_msg()
 
-    def get_email_msg(self) -> dict:
-        raise NotImplementedError
+    def get_email_msg(self):
+        msg = self.get_common_msg()
+        return {
+            'subject': msg,
+            'message': msg
+        }
 
     def get_site_msg_msg(self) -> dict:
-        raise NotImplementedError
+        msg = self.get_common_msg()
+        return {
+            'subject': msg,
+            'message': msg
+        }
 
 
 class SystemMessage(Message):
@@ -102,11 +124,10 @@ class SystemMessage(Message):
 
         self.send_msg(users, receive_backends)
 
+    @classmethod
+    def post_insert_to_db(cls, subscription: SystemMsgSubscription):
+        pass
+
 
 class UserMessage(Message):
     pass
-
-
-class Test(SystemMessage):
-    message_type_label = 'Hello world'
-    category = CATEGORY.TERMINAL
