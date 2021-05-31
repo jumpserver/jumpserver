@@ -91,16 +91,16 @@ class Message(metaclass=MessageType):
             except:
                 traceback.print_exc()
 
-    def get_common_msg(self):
+    def get_common_msg(self) -> str:
         raise NotImplementedError
 
-    def get_dingtalk_msg(self):
+    def get_dingtalk_msg(self) -> str:
         return self.get_common_msg()
 
     def get_wecom_msg(self) -> str:
         return self.get_common_msg()
 
-    def get_email_msg(self):
+    def get_email_msg(self) -> dict:
         msg = self.get_common_msg()
         return {
             'subject': msg,
