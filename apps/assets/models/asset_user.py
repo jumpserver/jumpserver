@@ -7,6 +7,7 @@ class AssetUser(AuthBook):
     hostname = ""
     ip = ""
     backend = ""
+    backend_display = ""
     union_id = ""
     asset_username = ""
 
