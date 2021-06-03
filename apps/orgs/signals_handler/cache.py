@@ -72,11 +72,17 @@ class OrgResourceStatisticsRefreshUtil:
             OrgResourceStatisticsCache(Organization.root()).expire(*cache_field_name)
 
 
-@receiver(pre_save)
-def on_post_save_refresh_org_resource_statistics_cache(sender, instance, **kwargs):
-    OrgResourceStatisticsRefreshUtil.refresh_if_need(instance)
+@receiver(post_save)
+def on_post_save_refresh_org_resource_statistics_cache(sender, instance, created, **kwargs):
+    if created:
+        OrgResourceStatisticsRefreshUtil.refresh_if_need(instance)
 
 
 @receiver(pre_delete)
 def on_pre_delete_refresh_org_resource_statistics_cache(sender, instance, **kwargs):
+    OrgResourceStatisticsRefreshUtil.refresh_if_need(instance)
+
+
+@receiver(pre_save, sender=Session)
+def on_session_changed_refresh_org_resource_statistics_cache(sender, instance, **kwargs):
     OrgResourceStatisticsRefreshUtil.refresh_if_need(instance)
