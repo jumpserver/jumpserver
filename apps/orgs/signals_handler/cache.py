@@ -1,5 +1,5 @@
 from django.db.models.signals import m2m_changed
-from django.db.models.signals import post_save, pre_delete, pre_save
+from django.db.models.signals import post_save, pre_delete, pre_save, post_delete
 from django.dispatch import receiver
 
 from orgs.models import Organization, OrganizationMember
@@ -60,7 +60,6 @@ class OrgResourceStatisticsRefreshUtil:
         Node: ['nodes_amount'],
         Asset: ['assets_amount'],
         UserGroup: ['groups_amount'],
-        Session: ['total_count_online_users', 'total_count_online_sessions']
     }
 
     @classmethod
@@ -78,11 +77,34 @@ def on_post_save_refresh_org_resource_statistics_cache(sender, instance, created
         OrgResourceStatisticsRefreshUtil.refresh_if_need(instance)
 
 
-@receiver(pre_delete)
-def on_pre_delete_refresh_org_resource_statistics_cache(sender, instance, **kwargs):
+@receiver(post_delete)
+def on_post_delete_refresh_org_resource_statistics_cache(sender, instance, **kwargs):
     OrgResourceStatisticsRefreshUtil.refresh_if_need(instance)
+
+
+def _refresh_session_org_resource_statistics_cache(instance: Session):
+    cache_field_name = ['total_count_online_users', 'total_count_online_sessions']
+
+    org_cache = OrgResourceStatisticsCache(instance.org)
+    org_cache.expire(*cache_field_name)
+    OrgResourceStatisticsCache(Organization.root()).expire(*cache_field_name)
 
 
 @receiver(pre_save, sender=Session)
-def on_session_changed_refresh_org_resource_statistics_cache(sender, instance, **kwargs):
-    OrgResourceStatisticsRefreshUtil.refresh_if_need(instance)
+def on_session_pre_save(sender, instance: Session, **kwargs):
+    old = Session.objects.filter(id=instance.id).values_list('is_finished', flat=True)
+    if old:
+        instance._signal_old_is_finished = old[0]
+    else:
+        instance._signal_old_is_finished = None
+
+
+@receiver(post_save, sender=Session)
+def on_session_changed_refresh_org_resource_statistics_cache(sender, instance, created, **kwargs):
+    if created or instance.is_finished != instance._signal_old_is_finished:
+        _refresh_session_org_resource_statistics_cache(instance)
+
+
+@receiver(post_delete, sender=Session)
+def on_session_deleted_refresh_org_resource_statistics_cache(sender, instance, **kwargs):
+    _refresh_session_org_resource_statistics_cache(instance)
