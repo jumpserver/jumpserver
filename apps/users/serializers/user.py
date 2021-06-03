@@ -2,6 +2,7 @@
 #
 from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _
+from django.db.models import TextChoices
 from rest_framework import serializers
 
 from common.mixins import CommonBulkSerializerMixin
@@ -17,15 +18,13 @@ __all__ = [
 
 
 class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
-    EMAIL_SET_PASSWORD = _('Reset link will be generated and sent to the user')
-    CUSTOM_PASSWORD = _('Set password')
-    PASSWORD_STRATEGY_CHOICES = (
-        (0, EMAIL_SET_PASSWORD),
-        (1, CUSTOM_PASSWORD)
-    )
+    class PasswordStrategy(TextChoices):
+        email = 'email', _('Reset link will be generated and sent to the user')
+        custom = 'custom', _('Set password')
+
     password_strategy = serializers.ChoiceField(
-        choices=PASSWORD_STRATEGY_CHOICES, required=False,
-        label=_('Password strategy'), write_only=True, default=0
+        choices=PasswordStrategy.choices, default=PasswordStrategy.email, required=False,
+        write_only=True, label=_('Password strategy')
     )
     mfa_enabled = serializers.BooleanField(read_only=True, label=_('MFA enabled'))
     mfa_force_enabled = serializers.BooleanField(read_only=True, label=_('MFA force enabled'))
@@ -117,9 +116,11 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
     def validate_password(self, password):
         from ..utils import check_password_rules
         password_strategy = self.initial_data.get('password_strategy')
-        if password_strategy == '0':
+        if self.instance is None and password_strategy != self.PasswordStrategy.custom:
+            # 创建用户，使用邮件设置密码
             return
-        if password_strategy is None and not password:
+        if self.instance and not password:
+            # 更新用户, 未设置密码
             return
         if not check_password_rules(password):
             msg = _('Password does not match security rules')

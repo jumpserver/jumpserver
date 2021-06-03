@@ -20,7 +20,7 @@ from .celery.utils import (
     disable_celery_periodic_task, delete_celery_periodic_task
 )
 from .models import Task, CommandExecution, CeleryTask
-from .utils import send_server_performance_mail
+from .notifications import ServerPerformanceMessage
 
 logger = get_logger(__file__)
 
@@ -143,7 +143,7 @@ def check_server_performance_period():
             if path.startswith(uncheck_path):
                 need_check = False
         if need_check and usage.percent > 80:
-            send_server_performance_mail(path, usage, usages)
+            ServerPerformanceMessage(path=path, usage=usage).publish()
 
 
 @shared_task(queue="ansible")

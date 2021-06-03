@@ -245,6 +245,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 - [极速安装](https://docs.jumpserver.org/zh/master/install/setup_by_fast/)
 - [完整文档](https://docs.jumpserver.org)
 - [演示视频](https://www.bilibili.com/video/BV1ZV41127GB)
+- [手动安装](https://github.com/jumpserver/installer)
 
 ## 组件项目
 - [Lina](https://github.com/jumpserver/lina) JumpServer Web UI 项目

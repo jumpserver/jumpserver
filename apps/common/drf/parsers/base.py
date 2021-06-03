@@ -94,7 +94,7 @@ class BaseFileParser(BaseParser):
         new_row_data = {}
         serializer_fields = self.serializer_fields
         for k, v in row_data.items():
-            if isinstance(v, list) or isinstance(v, dict) or isinstance(v, str) and k.strip() and v.strip():
+            if type(v) in [list, dict, int] or (isinstance(v, str) and k.strip() and v.strip()):
                 # 解决类似disk_info为字符串的'{}'的问题
                 if not isinstance(v, str) and isinstance(serializer_fields[k], serializers.CharField):
                     v = str(v)

@@ -109,8 +109,11 @@ class Session(OrgModelMixin):
         _PROTOCOL = self.PROTOCOL
         if self.is_finished:
             return False
+        if self.login_from == self.LOGIN_FROM.RT:
+            return False
         if self.protocol in [
-            _PROTOCOL.SSH, _PROTOCOL.VNC, _PROTOCOL.RDP, _PROTOCOL.TELNET, _PROTOCOL.K8S
+            _PROTOCOL.SSH, _PROTOCOL.VNC, _PROTOCOL.RDP,
+            _PROTOCOL.TELNET, _PROTOCOL.K8S
         ]:
             return True
         else:
