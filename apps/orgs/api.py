@@ -48,7 +48,6 @@ class OrgViewSet(BulkModelViewSet):
     queryset = Organization.objects.all()
     serializer_class = OrgSerializer
     permission_classes = (IsSuperUserOrAppUser,)
-    org = None
 
     def get_serializer_class(self):
         mapper = {
@@ -58,32 +57,36 @@ class OrgViewSet(BulkModelViewSet):
         return mapper.get(self.action, super().get_serializer_class())
 
     @tmp_to_root_org()
-    def get_data_from_model(self, model):
+    def get_data_from_model(self, org, model):
         if model == User:
             data = model.objects.filter(
-                orgs__id=self.org.id,
-                m2m_org_members__role__in=[ROLE.USER, ROLE.ADMIN, ROLE.AUDITOR]
+                orgs__id=org.id, m2m_org_members__role__in=[ROLE.USER, ROLE.ADMIN, ROLE.AUDITOR]
             )
         elif model == Node:
-            # 跟节点不能手动删除，所以排除检查
-            data = model.objects.filter(org_id=self.org.id).exclude(parent_key='', key__regex=r'^[0-9]+$')
+            # 根节点不能手动删除，所以排除检查
+            data = model.objects.filter(org_id=org.id).exclude(parent_key='', key__regex=r'^[0-9]+$')
         else:
-            data = model.objects.filter(org_id=self.org.id)
+            data = model.objects.filter(org_id=org.id)
         return data
 
-    def destroy(self, request, *args, **kwargs):
-        self.org = self.get_object()
+    def allow_bulk_destroy(self, qs, filtered):
+        return False
+
+    def perform_destroy(self, instance):
+        if str(current_org) == str(instance):
+            msg = _('The current organization ({}) cannot be deleted'.format(current_org))
+            raise PermissionDenied(detail=msg)
+
         for model in org_related_models:
-            data = self.get_data_from_model(model)
-            if data:
-                msg = _('Have {} exists, Please delete').format(model._meta.verbose_name)
-                return Response(data={'error': msg}, status=status.HTTP_403_FORBIDDEN)
-        else:
-            if str(current_org) == str(self.org):
-                msg = _('The current organization cannot be deleted')
-                return Response(data={'error': msg}, status=status.HTTP_403_FORBIDDEN)
-            self.org.delete()
-            return Response({'msg': True}, status=status.HTTP_200_OK)
+            data = self.get_data_from_model(instance, model)
+            if not data:
+                continue
+            msg = _(
+                'The organization have resource ({}) cannot be deleted'
+            ).format(model._meta.verbose_name)
+            raise PermissionDenied(detail=msg)
+
+        super().perform_destroy(instance)
 
 
 class OrgMemberRelationBulkViewSet(JMSBulkRelationModelViewSet):
