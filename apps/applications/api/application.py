@@ -42,8 +42,6 @@ class ApplicationUserListApi(generics.ListAPIView):
         application = self.get_application()
         if not application:
             return queryset
-        # if application.category == ApplicationCategoryChoices.remote_app:
-        #     return queryset
         system_user_ids = ApplicationPermission.objects.filter(applications=application)\
             .values_list('system_users', flat=True)
         if not system_user_ids:
