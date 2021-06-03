@@ -16,6 +16,7 @@ class ReplayStorageTypeChoices(TextChoices):
     swift = 'swift', 'Swift'
     oss = 'oss', 'OSS'
     azure = 'azure', 'Azure'
+    obs = 'obs', 'OBS'
 
 
 class CommandStorageTypeChoices(TextChoices):

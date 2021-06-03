@@ -93,7 +93,7 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
         token = self.create_token(user, asset, application, system_user)
         return Response({"token": token}, status=201)
 
-    @action(methods=['POST', 'GET'], detail=False, url_path='rdp/file')
+    @action(methods=['POST', 'GET'], detail=False, url_path='rdp/file', permission_classes=[IsValidUser])
     def get_rdp_file(self, request, *args, **kwargs):
         options = {
             'full address:s': '',
@@ -134,13 +134,15 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
         asset = serializer.validated_data.get('asset')
         application = serializer.validated_data.get('application')
         system_user = serializer.validated_data['system_user']
-        user = serializer.validated_data.get('user')
         height = serializer.validated_data.get('height')
         width = serializer.validated_data.get('width')
+        user = request.user
         token = self.create_token(user, asset, application, system_user)
 
         # Todo: 上线后地址是 JumpServerAddr:3389
-        address = self.request.query_params.get('address') or '1.1.1.1'
+        address = settings.RDP_ADDR
+        if address == 'localhost:3389':
+            address = request.get_host().split(':')[0] + ':3389'
         options['full address:s'] = address
         options['username:s'] = '{}|{}'.format(user.username, token)
         options['desktopwidth:i'] = width
@@ -217,10 +219,16 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
 
         if value.get('type') == 'asset':
             asset_detail = self._get_asset_secret_detail(value, user=user, system_user=system_user)
+            asset = asset_detail.get('asset')
+            if asset:
+                system_user.load_asset_more_auth(asset.id, user.username, user.id)
             data['type'] = 'asset'
             data.update(asset_detail)
         else:
             app_detail = self._get_application_secret_detail(value)
+            app = app_detail.get("application")
+            if app:
+                system_user.load_app_more_auth(app.id, user.id)
             data['type'] = 'application'
             data.update(app_detail)
 

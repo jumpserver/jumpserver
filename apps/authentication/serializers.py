@@ -199,5 +199,5 @@ class ConnectionTokenSecretSerializer(serializers.Serializer):
 
 
 class RDPFileSerializer(ConnectionTokenSerializer):
-    width = serializers.IntegerField(default=1280)
-    height = serializers.IntegerField(default=800)
+    width = serializers.IntegerField(default=1600)
+    height = serializers.IntegerField(default=900)
