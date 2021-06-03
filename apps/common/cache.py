@@ -126,7 +126,7 @@ class Cache(metaclass=CacheType):
         return data
 
     def save_data_to_db(self, data):
-        logger.info(f'Set data to cache: key={self.key} data={data}')
+        logger.debug(f'Set data to cache: key={self.key} data={data}')
         self.redis.hset(self.key, mapping=data)
         self.load_data_from_db()
 
@@ -143,10 +143,10 @@ class Cache(metaclass=CacheType):
 
     def init_all_values(self):
         t_start = time.time()
-        logger.info(f'Start init cache: key={self.key}')
+        logger.debug(f'Start init cache: key={self.key}')
         data = self.compute_values(*self.field_names)
         self.save_data_to_db(data)
-        logger.info(f'End init cache: cost={time.time()-t_start} key={self.key}')
+        logger.debug(f'End init cache: cost={time.time()-t_start} key={self.key}')
         return data
 
     def refresh(self, *fields):
@@ -173,11 +173,11 @@ class Cache(metaclass=CacheType):
     def expire(self, *fields):
         self._data = None
         if not fields:
-            logger.info(f'Delete cached key: key={self.key}')
+            logger.debug(f'Delete cached key: key={self.key}')
             self.redis.delete(self.key)
         else:
             self.redis.hdel(self.key, *fields)
-            logger.info(f'Expire cached fields: key={self.key} fields={fields}')
+            logger.debug(f'Expire cached fields: key={self.key} fields={fields}')
 
 
 class CacheValueDesc:
@@ -201,7 +201,7 @@ class CacheValueDesc:
 
     def compute_value(self, instance: Cache):
         t_start = time.time()
-        logger.info(f'Start compute cache field: field={self.field_name} key={instance.key}')
+        logger.debug(f'Start compute cache field: field={self.field_name} key={instance.key}')
         if self.field_type.queryset is not None:
             new_value = self.field_type.queryset.count()
         else:
@@ -214,7 +214,7 @@ class CacheValueDesc:
             new_value = compute_func()
 
         new_value = self.field_type.field_type(new_value)
-        logger.info(f'End compute cache field: cost={time.time()-t_start} field={self.field_name} value={new_value} key={instance.key}')
+        logger.debug(f'End compute cache field: cost={time.time()-t_start} field={self.field_name} value={new_value} key={instance.key}')
         return new_value
 
     def to_internal_value(self, value):
