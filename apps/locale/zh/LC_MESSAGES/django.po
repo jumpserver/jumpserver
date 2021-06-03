@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-22 16:56+0800\n"
+"POT-Creation-Date: 2021-06-03 11:34+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -184,7 +184,7 @@ msgstr "格式为逗号分隔的字符串, * 表示匹配所有. "
 #: users/templates/users/_select_user_modal.html:14
 #: xpack/plugins/change_auth_plan/models.py:47
 #: xpack/plugins/change_auth_plan/models.py:278
-#: xpack/plugins/cloud/serializers.py:51
+#: xpack/plugins/cloud/serializers.py:65
 msgid "Username"
 msgstr "用户名"
 
@@ -285,7 +285,7 @@ msgid "Cluster"
 msgstr "集群"
 
 #: applications/serializers/attrs/application_category/db.py:11
-#: ops/models/adhoc.py:146 xpack/plugins/cloud/serializers.py:49
+#: ops/models/adhoc.py:146 xpack/plugins/cloud/serializers.py:63
 msgid "Host"
 msgstr "主机"
 
@@ -295,7 +295,7 @@ msgstr "主机"
 #: applications/serializers/attrs/application_type/oracle.py:11
 #: applications/serializers/attrs/application_type/pgsql.py:11
 #: assets/models/asset.py:188 assets/models/domain.py:53
-#: xpack/plugins/cloud/serializers.py:50
+#: xpack/plugins/cloud/serializers.py:64
 msgid "Port"
 msgstr "端口"
 
@@ -325,7 +325,7 @@ msgstr "目标URL"
 #: xpack/plugins/change_auth_plan/models.py:68
 #: xpack/plugins/change_auth_plan/models.py:190
 #: xpack/plugins/change_auth_plan/models.py:285
-#: xpack/plugins/cloud/serializers.py:53
+#: xpack/plugins/cloud/serializers.py:67
 msgid "Password"
 msgstr "密码"
 
@@ -407,7 +407,7 @@ msgstr "激活"
 
 #: assets/models/asset.py:196 assets/models/cluster.py:19
 #: assets/models/user.py:66 templates/_nav.html:44
-#: xpack/plugins/cloud/models.py:92 xpack/plugins/cloud/serializers.py:146
+#: xpack/plugins/cloud/models.py:92 xpack/plugins/cloud/serializers.py:160
 msgid "Admin user"
 msgstr "管理用户"
 
@@ -678,7 +678,7 @@ msgstr "ssh私钥"
 #: users/templates/users/user_asset_permission.html:41
 #: users/templates/users/user_asset_permission.html:73
 #: users/templates/users/user_asset_permission.html:158
-#: xpack/plugins/cloud/models.py:89 xpack/plugins/cloud/serializers.py:147
+#: xpack/plugins/cloud/models.py:89 xpack/plugins/cloud/serializers.py:161
 msgid "Node"
 msgstr "节点"
 
@@ -1978,13 +1978,13 @@ msgstr "更新任务内容: {}"
 msgid "Disk used more than 80%: {} => {}"
 msgstr "磁盘使用率超过 80%: {} => {}"
 
-#: orgs/api.py:79
-msgid "Have {} exists, Please delete"
-msgstr "{} 存在数据, 请先删除"
+#: orgs/api.py:77
+msgid "The current organization ({}) cannot be deleted"
+msgstr "当前组织 ({}) 不能被删除"
 
-#: orgs/api.py:83
-msgid "The current organization cannot be deleted"
-msgstr "当前组织不能被删除"
+#: orgs/api.py:85
+msgid "The organization have resource ({}) cannot be deleted"
+msgstr "组织有资源 ({}) 不能被删除"
 
 #: orgs/mixins/models.py:45 orgs/mixins/serializers.py:25 orgs/models.py:36
 #: orgs/models.py:417 orgs/serializers.py:108
@@ -4003,7 +4003,7 @@ msgid "Security token validation"
 msgstr "安全令牌验证"
 
 #: users/templates/users/_base_otp.html:14 xpack/plugins/cloud/models.py:78
-#: xpack/plugins/cloud/serializers.py:145
+#: xpack/plugins/cloud/serializers.py:159
 msgid "Account"
 msgstr "账户"
 
@@ -4744,7 +4744,7 @@ msgstr "云服务商"
 msgid "Cloud account"
 msgstr "云账号"
 
-#: xpack/plugins/cloud/models.py:81 xpack/plugins/cloud/serializers.py:126
+#: xpack/plugins/cloud/models.py:81 xpack/plugins/cloud/serializers.py:140
 msgid "Regions"
 msgstr "地域"
 
@@ -4752,7 +4752,7 @@ msgstr "地域"
 msgid "Hostname strategy"
 msgstr "主机名策略"
 
-#: xpack/plugins/cloud/models.py:95 xpack/plugins/cloud/serializers.py:149
+#: xpack/plugins/cloud/models.py:95 xpack/plugins/cloud/serializers.py:163
 msgid "Always update"
 msgstr "总是更新"
 
@@ -4944,20 +4944,24 @@ msgstr ""
 msgid "Subscription ID"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers.py:124
+#: xpack/plugins/cloud/serializers.py:49
+msgid "This field is required"
+msgstr "这个字段是必填项"
+
+#: xpack/plugins/cloud/serializers.py:138
 msgid "History count"
 msgstr "执行次数"
 
-#: xpack/plugins/cloud/serializers.py:125
+#: xpack/plugins/cloud/serializers.py:139
 msgid "Instance count"
 msgstr "实例个数"
 
-#: xpack/plugins/cloud/serializers.py:148
+#: xpack/plugins/cloud/serializers.py:162
 #: xpack/plugins/gathered_user/serializers.py:20
 msgid "Periodic display"
 msgstr "定时执行"
 
-#: xpack/plugins/cloud/utils.py:64
+#: xpack/plugins/cloud/utils.py:65
 msgid "Account unavailable"
 msgstr "账户无效"
 
@@ -5045,8 +5049,8 @@ msgstr "旗舰版"
 msgid "Community edition"
 msgstr "社区版"
 
-#~ msgid "This field is required"
-#~ msgstr "这个字段是必填项"
+#~ msgid "Have {} exists, Please delete"
+#~ msgstr "{} 存在数据, 请先删除"
 
 #~ msgid "{} is required"
 #~ msgstr "{} 字段是必填项"
