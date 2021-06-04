@@ -180,7 +180,7 @@ class SecuritySettingSerializer(serializers.Serializer):
         min_value=6, max_value=30, required=True,
         label=_('Password minimum length')
     )
-    ADMIN_USER_SECURITY_PASSWORD_MIN_LENGTH = serializers.IntegerField(
+    SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH = serializers.IntegerField(
         min_value=6, max_value=30, required=True,
         label=_('Admin user password minimum length')
     )

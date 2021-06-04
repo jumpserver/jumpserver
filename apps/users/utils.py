@@ -300,7 +300,7 @@ def get_password_check_rules(is_superuser=False):
     for rule in settings.SECURITY_PASSWORD_RULES:
         key = "id_{}".format(rule.lower())
         if is_superuser and rule == 'SECURITY_PASSWORD_MIN_LENGTH':
-            rule = 'ADMIN_USER_SECURITY_PASSWORD_MIN_LENGTH'
+            rule = 'SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH'
         value = getattr(settings, rule)
         if not value:
             continue
@@ -320,7 +320,7 @@ def check_password_rules(password, is_superuser=False):
         pattern += '(?=.*[`~!@#\$%\^&\*\(\)-=_\+\[\]\{\}\|;:\'\",\.<>\/\?])'
     pattern += '[a-zA-Z\d`~!@#\$%\^&\*\(\)-=_\+\[\]\{\}\|;:\'\",\.<>\/\?]'
     if is_superuser:
-        pattern += '.{' + str(settings.ADMIN_USER_SECURITY_PASSWORD_MIN_LENGTH-1) + ',}$'
+        pattern += '.{' + str(settings.SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH-1) + ',}$'
     else:
         pattern += '.{' + str(settings.SECURITY_PASSWORD_MIN_LENGTH-1) + ',}$'
     match_obj = re.match(pattern, password)
