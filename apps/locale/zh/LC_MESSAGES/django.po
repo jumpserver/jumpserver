@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-02 16:58+0800\n"
+"POT-Creation-Date: 2021-06-04 11:11+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -819,8 +819,8 @@ msgid "Backend"
 msgstr "后端"
 
 #: assets/serializers/asset_user.py:50
-msgid "Backend (Display)"
-msgstr "后端 (显示名称)"
+msgid "Source"
+msgstr "来源"
 
 #: assets/serializers/asset_user.py:81 users/forms/profile.py:160
 #: users/models/user.py:580 users/templates/users/user_password_update.html:48
@@ -3899,7 +3899,7 @@ msgid "Wechat"
 msgstr "微信"
 
 #: users/models/user.py:596
-msgid "Source"
+msgid "User source"
 msgstr "用户来源"
 
 #: users/models/user.py:600
@@ -5057,30 +5057,3 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
-
-#~ msgid "{} is required"
-#~ msgstr "{} 字段是必填项"
-
-#~ msgid "AppSecret is required"
-#~ msgstr "AppSecret 是必须的"
-
-#~ msgid "Corporation ID(corpid)"
-#~ msgstr "企业 ID(CorpId)"
-
-#~ msgid "Agent ID(agentid)"
-#~ msgstr "应用 ID(AgentId)"
-
-#~ msgid "Secret(secret)"
-#~ msgstr "秘钥(secret)"
-
-#~ msgid "AgentId"
-#~ msgstr "应用 ID(AgentId)"
-
-#~ msgid "AppKey"
-#~ msgstr "应用 Key(AppKey)"
-
-#~ msgid "AppSecret"
-#~ msgstr "应用密文(AppSecret)"
-
-#~ msgid "No"
-#~ msgstr "无"
