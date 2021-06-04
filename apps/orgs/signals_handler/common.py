@@ -167,10 +167,3 @@ def on_org_user_changed(action, instance, reverse, pk_set, **kwargs):
 
             leaved_users = set(pk_set) - set(org.members.filter(id__in=user_pk_set).values_list('id', flat=True))
             _clear_users_from_org(org, leaved_users)
-
-
-@receiver(post_save, sender=User)
-def on_user_create_refresh_cache(sender, instance, created, **kwargs):
-    if created:
-        default_org = Organization.default()
-        default_org.members.add(instance)
