@@ -14,6 +14,7 @@ router.register(r'applications', api.ApplicationViewSet, 'application')
 
 urlpatterns = [
     path('remote-apps/<uuid:pk>/connection-info/', api.RemoteAppConnectionInfoApi.as_view(), name='remote-app-connection-info'),
+    path('application-users/', api.ApplicationUserListApi.as_view(), name='application-user')
 ]
 
 

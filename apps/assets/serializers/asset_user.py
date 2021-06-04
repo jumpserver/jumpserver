@@ -47,16 +47,17 @@ class AssetUserReadSerializer(AssetUserWriteSerializer):
     ip = serializers.CharField(read_only=True, label=_("IP"))
     asset = serializers.CharField(source='asset_id', label=_('Asset'))
     backend = serializers.CharField(read_only=True, label=_("Backend"))
+    backend_display = serializers.CharField(read_only=True, label=_("Source"))
 
     class Meta(AssetUserWriteSerializer.Meta):
         read_only_fields = (
             'date_created', 'date_updated',
             'created_by', 'version',
         )
-        fields_mini = ['id', 'username']
+        fields_mini = ['id', 'name', 'username']
         fields_write_only = ['password', 'private_key', "public_key"]
         fields_small = fields_mini + fields_write_only + [
-            'backend', 'version',
+            'backend', 'backend_display', 'version',
             'date_created', "date_updated",
             'comment'
         ]

@@ -106,6 +106,7 @@ class DBBackend(BaseBackend):
 class SystemUserBackend(DBBackend):
     model = SystemUser.assets.through
     backend = 'system_user'
+    backend_display = _('System user')
     prefer = backend
     base_score = 0
     union_id_length = 2
@@ -138,6 +139,7 @@ class SystemUserBackend(DBBackend):
         kwargs = dict(
             hostname=F("asset__hostname"),
             ip=F("asset__ip"),
+            name=F("systemuser__name"),
             username=F("systemuser__username"),
             password=F("systemuser__password"),
             private_key=F("systemuser__private_key"),
@@ -152,7 +154,8 @@ class SystemUserBackend(DBBackend):
             union_id=Concat(F("systemuser_id"), Value("_"), F("asset_id"),
                             output_field=CharField()),
             org_id=F("asset__org_id"),
-            backend=Value(self.backend, CharField())
+            backend=Value(self.backend, CharField()),
+            backend_display=Value(self.backend_display, CharField()),
         )
         return kwargs
 
@@ -174,12 +177,17 @@ class SystemUserBackend(DBBackend):
 
 class DynamicSystemUserBackend(SystemUserBackend):
     backend = 'system_user_dynamic'
+    backend_display = _('System user(Dynamic)')
     prefer = 'system_user'
     union_id_length = 3
 
     def get_annotate(self):
         kwargs = super().get_annotate()
         kwargs.update(dict(
+            name=Concat(
+                F("systemuser__users__name"), Value('('), F("systemuser__name"), Value(')'),
+                output_field=CharField()
+            ),
             username=F("systemuser__users__username"),
             asset_username=Concat(
                 F("asset__id"), Value("_"),
@@ -221,6 +229,7 @@ class DynamicSystemUserBackend(SystemUserBackend):
 class AdminUserBackend(DBBackend):
     model = Asset
     backend = 'admin_user'
+    backend_display = _('Admin user')
     prefer = backend
     base_score = 200
 
@@ -246,6 +255,7 @@ class AdminUserBackend(DBBackend):
     def all(self):
         qs = self.model.objects.all().annotate(
             asset_id=F("id"),
+            name=F("admin_user__name"),
             username=F("admin_user__username"),
             password=F("admin_user__password"),
             private_key=F("admin_user__private_key"),
@@ -256,6 +266,7 @@ class AdminUserBackend(DBBackend):
             asset_username=Concat(F("id"), Value("_"), F("admin_user__username"), output_field=CharField()),
             union_id=Concat(F("admin_user_id"), Value("_"), F("id"), output_field=CharField()),
             backend=Value(self.backend, CharField()),
+            backend_display=Value(self.backend_display, CharField()),
         )
         qs = self.qs_to_values(qs)
         return qs
@@ -264,6 +275,7 @@ class AdminUserBackend(DBBackend):
 class AuthbookBackend(DBBackend):
     model = AuthBook
     backend = 'db'
+    backend_display = _('Database')
     prefer = backend
     base_score = 400
 
@@ -313,6 +325,7 @@ class AuthbookBackend(DBBackend):
             asset_username=Concat(F("asset__id"), Value("_"), F("username"), output_field=CharField()),
             union_id=Concat(F("id"), Value("_"), F("asset_id"), output_field=CharField()),
             backend=Value(self.backend, CharField()),
+            backend_display=Value(self.backend_display, CharField()),
         )
         qs = self.qs_to_values(qs)
         return qs
