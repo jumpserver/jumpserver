@@ -10,6 +10,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.cache import cache
 
 from common.utils import signer, get_object_or_none
+from common.db.models import ChoiceSet
 from common.exceptions import JMSException
 from .base import BaseUser
 from .asset import Asset
@@ -67,7 +68,9 @@ class AdminUser(BaseUser):
         verbose_name = _("Admin user")
 
 
-class SystemUser(BaseUser):
+class ProtocolMixin:
+    protocol: str
+
     PROTOCOL_SSH = 'ssh'
     PROTOCOL_RDP = 'rdp'
     PROTOCOL_TELNET = 'telnet'
@@ -109,68 +112,32 @@ class SystemUser(BaseUser):
         *APPLICATION_CATEGORY_CLOUD_PROTOCOLS
     ]
 
-    LOGIN_AUTO = 'auto'
-    LOGIN_MANUAL = 'manual'
-    LOGIN_MODE_CHOICES = (
-        (LOGIN_AUTO, _('Automatic login')),
-        (LOGIN_MANUAL, _('Manually login'))
-    )
-    username_same_with_user = models.BooleanField(default=False, verbose_name=_("Username same with user"))
-    nodes = models.ManyToManyField('assets.Node', blank=True, verbose_name=_("Nodes"))
-    assets = models.ManyToManyField('assets.Asset', blank=True, verbose_name=_("Assets"))
-    users = models.ManyToManyField('users.User', blank=True, verbose_name=_("Users"))
-    groups = models.ManyToManyField('users.UserGroup', blank=True, verbose_name=_("User groups"))
-    priority = models.IntegerField(default=81, verbose_name=_("Priority"), help_text=_("1-100, the lower the value will be match first"), validators=[MinValueValidator(1), MaxValueValidator(100)])
-    protocol = models.CharField(max_length=16, choices=PROTOCOL_CHOICES, default='ssh', verbose_name=_('Protocol'))
-    auto_push = models.BooleanField(default=True, verbose_name=_('Auto push'))
-    sudo = models.TextField(default='/bin/whoami', verbose_name=_('Sudo'))
-    shell = models.CharField(max_length=64,  default='/bin/bash', verbose_name=_('Shell'))
-    login_mode = models.CharField(choices=LOGIN_MODE_CHOICES, default=LOGIN_AUTO, max_length=10, verbose_name=_('Login mode'))
-    cmd_filters = models.ManyToManyField('CommandFilter', related_name='system_users', verbose_name=_("Command filter"), blank=True)
-    sftp_root = models.CharField(default='tmp', max_length=128, verbose_name=_("SFTP Root"))
-    token = models.TextField(default='', verbose_name=_('Token'))
-    home = models.CharField(max_length=4096, default='', verbose_name=_('Home'), blank=True)
-    system_groups = models.CharField(default='', max_length=4096, verbose_name=_('System groups'), blank=True)
-    ad_domain = models.CharField(default='', max_length=256)
-    _prefer = 'system_user'
-
-    def __str__(self):
-        username = self.username
-        if self.username_same_with_user:
-            username = 'dynamic'
-        return '{0.name}({1})'.format(self, username)
-
-    def get_username(self):
-        if self.username_same_with_user:
-            return list(self.users.values_list('username', flat=True))
-        else:
-            return self.username
-
-    @property
-    def nodes_amount(self):
-        return self.nodes.all().count()
-
-    @property
-    def login_mode_display(self):
-        return self.get_login_mode_display()
-
-    def is_need_push(self):
-        if self.auto_push and self.is_protocol_support_push:
-            return True
-        else:
-            return False
-
     @property
     def is_protocol_support_push(self):
         return self.protocol in self.SUPPORT_PUSH_PROTOCOLS
 
-    @property
-    def is_need_cmd_filter(self):
-        return self.protocol not in [self.PROTOCOL_RDP, self.PROTOCOL_VNC]
+    @classmethod
+    def get_protocol_by_application_type(cls, app_type):
+        from applications.const import ApplicationTypeChoices
+        if app_type in cls.APPLICATION_CATEGORY_PROTOCOLS:
+            protocol = app_type
+        elif app_type in ApplicationTypeChoices.remote_app_types():
+            protocol = cls.PROTOCOL_RDP
+        else:
+            protocol = None
+        return protocol
 
-    @property
-    def is_need_test_asset_connective(self):
-        return self.protocol in self.ASSET_CATEGORY_PROTOCOLS
+
+class AuthMixin:
+    username_same_with_user: bool
+    protocol: str
+    ASSET_CATEGORY_PROTOCOLS: list
+    login_mode: str
+    LOGIN_MANUAL: str
+    id: str
+    username: str
+    password: str
+    private_key: str
 
     def has_special_auth(self, asset=None, username=None):
         if username is None and self.username_same_with_user:
@@ -261,6 +228,75 @@ class SystemUser(BaseUser):
 
         self.load_tmp_auth_if_has(asset_id, user)
 
+
+class SystemUser(ProtocolMixin, BaseUser):
+    LOGIN_AUTO = 'auto'
+    LOGIN_MANUAL = 'manual'
+    LOGIN_MODE_CHOICES = (
+        (LOGIN_AUTO, _('Automatic login')),
+        (LOGIN_MANUAL, _('Manually login'))
+    )
+
+    class Type(ChoiceSet):
+        admin = 'admin', _('Admin user')
+        devops = 'devops', _('Devops user')
+        common = 'common', _('Common user')
+
+    username_same_with_user = models.BooleanField(default=False, verbose_name=_("Username same with user"))
+    nodes = models.ManyToManyField('assets.Node', blank=True, verbose_name=_("Nodes"))
+    assets = models.ManyToManyField('assets.Asset', blank=True, verbose_name=_("Assets"))
+    users = models.ManyToManyField('users.User', blank=True, verbose_name=_("Users"))
+    groups = models.ManyToManyField('users.UserGroup', blank=True, verbose_name=_("User groups"))
+    type = models.CharField(max_length=16, choices=Type.choices, default=Type.common, verbose_name=_('Type'))
+    priority = models.IntegerField(default=81, verbose_name=_("Priority"), help_text=_("1-100, the lower the value will be match first"), validators=[MinValueValidator(1), MaxValueValidator(100)])
+    protocol = models.CharField(max_length=16, choices=ProtocolMixin.PROTOCOL_CHOICES, default='ssh', verbose_name=_('Protocol'))
+    auto_push = models.BooleanField(default=True, verbose_name=_('Auto push'))
+    sudo = models.TextField(default='/bin/whoami', verbose_name=_('Sudo'))
+    shell = models.CharField(max_length=64,  default='/bin/bash', verbose_name=_('Shell'))
+    login_mode = models.CharField(choices=LOGIN_MODE_CHOICES, default=LOGIN_AUTO, max_length=10, verbose_name=_('Login mode'))
+    cmd_filters = models.ManyToManyField('CommandFilter', related_name='system_users', verbose_name=_("Command filter"), blank=True)
+    sftp_root = models.CharField(default='tmp', max_length=128, verbose_name=_("SFTP Root"))
+    token = models.TextField(default='', verbose_name=_('Token'))
+    home = models.CharField(max_length=4096, default='', verbose_name=_('Home'), blank=True)
+    system_groups = models.CharField(default='', max_length=4096, verbose_name=_('System groups'), blank=True)
+    ad_domain = models.CharField(default='', max_length=256)
+    _prefer = 'system_user'
+
+    def __str__(self):
+        username = self.username
+        if self.username_same_with_user:
+            username = 'dynamic'
+        return '{0.name}({1})'.format(self, username)
+
+    # todo: 返回的数据结构不一样
+    def get_username(self):
+        if self.username_same_with_user:
+            return list(self.users.values_list('username', flat=True))
+        else:
+            return self.username
+
+    @property
+    def nodes_amount(self):
+        return self.nodes.all().count()
+
+    @property
+    def login_mode_display(self):
+        return self.get_login_mode_display()
+
+    def is_need_push(self):
+        if self.auto_push and self.is_protocol_support_push:
+            return True
+        else:
+            return False
+
+    @property
+    def is_need_cmd_filter(self):
+        return self.protocol not in [self.PROTOCOL_RDP, self.PROTOCOL_VNC]
+
+    @property
+    def is_need_test_asset_connective(self):
+        return self.protocol in self.ASSET_CATEGORY_PROTOCOLS
+
     @property
     def cmd_filter_rules(self):
         from .cmd_filter import CommandFilterRule
@@ -286,17 +322,6 @@ class SystemUser(BaseUser):
         asset_ids.update(nodes_asset_ids)
         assets = Asset.objects.filter(id__in=asset_ids)
         return assets
-
-    @classmethod
-    def get_protocol_by_application_type(cls, app_type):
-        from applications.const import ApplicationTypeChoices
-        if app_type in cls.APPLICATION_CATEGORY_PROTOCOLS:
-            protocol = app_type
-        elif app_type in ApplicationTypeChoices.remote_app_types():
-            protocol = cls.PROTOCOL_RDP
-        else:
-            protocol = None
-        return protocol
 
     class Meta:
         ordering = ['name']

@@ -193,7 +193,7 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
 
     # Auth
-    admin_user = models.ForeignKey('assets.AdminUser', on_delete=models.PROTECT, null=True, verbose_name=_("Admin user"), related_name='assets')
+    # admin_user = models.ForeignKey('assets.AdminUser', on_delete=models.PROTECT, null=True, verbose_name=_("Admin user"), related_name='assets')
 
     # Some information
     public_ip = models.CharField(max_length=128, blank=True, null=True, verbose_name=_('Public IP'))
@@ -227,6 +227,14 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
 
     def __str__(self):
         return '{0.hostname}({0.ip})'.format(self)
+
+    @property
+    def admin_user(self):
+        return self.systemuser_set.all().filter(type='admin').first()
+
+    @admin_user.setter
+    def admin_user(self, value):
+        pass
 
     @property
     def is_valid(self):

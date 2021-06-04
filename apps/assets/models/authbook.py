@@ -4,7 +4,9 @@
 from django.db import models, transaction
 from django.db.models import Max
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
 
+from simple_history.models import HistoricalRecords
 from orgs.mixins.models import OrgManager
 from .base import BaseUser
 
@@ -13,19 +15,39 @@ __all__ = ['AuthBook']
 
 class AuthBookQuerySet(models.QuerySet):
     def delete(self):
-        if self.count() > 1:
-            raise PermissionError(_("Bulk delete deny"))
-        return super().delete()
+        for instance in self:
+            instance.delete()
 
 
 class AuthBookManager(OrgManager):
     pass
 
 
-class AuthBook(BaseUser):
+class BaseAuthBook(BaseUser):
     asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, verbose_name=_('Asset'))
-    is_latest = models.BooleanField(default=False, verbose_name=_('Latest version'))
+    system_user = models.ForeignKey('assets.SystemUser', on_delete=models.DO_NOTHING, db_constraint=False, null=True)
     version = models.IntegerField(default=1, verbose_name=_('Version'))
+
+    class Meta:
+        abstract = True
+
+
+class AuthBookHistory(BaseAuthBook):
+    authbook = models.ForeignKey('assets.AuthBook', db_constraint=False, on_delete=models.DO_NOTHING)
+    date_joined = models.DateTimeField(auto_now_add=True, null=True, verbose_name=_("Date joined"))
+
+    @classmethod
+    def create_history(cls, authbook):
+        history = cls()
+        for attr in authbook.__dict__:
+            setattr(history, attr, getattr(authbook, attr))
+        history.authbook = authbook
+        history.date_joined = timezone.now()
+        history.save()
+
+
+class AuthBook(BaseAuthBook):
+    is_latest = models.BooleanField(default=False, verbose_name=_('Latest version'))
 
     objects = AuthBookManager.from_queryset(AuthBookQuerySet)()
     backend = "db"
@@ -51,24 +73,34 @@ class AuthBook(BaseUser):
 
     @classmethod
     def create(cls, **kwargs):
-        """
-        使用并发锁机制创建AuthBook对象, (主要针对并发创建 username, asset 相同的对象时)
-        并更新其他对象的 is_latest=False (其他对象: 与当前对象的 username, asset 相同)
-        同时设置自己的 is_latest=True, version=max_version + 1
-        """
-        username = kwargs['username']
-        asset = kwargs.get('asset') or kwargs.get('asset_id')
+        instance = cls(**kwargs)
+        instance.save()
+        return instance
+
+    def save(self):
+        username = self.username
+        asset = self.asset
+
         with transaction.atomic():
             # 使用select_for_update限制并发创建相同的username、asset条目
-            instances = cls.objects.select_for_update().filter(username=username, asset=asset)
-            instances.filter(is_latest=True).update(is_latest=False)
-            max_version = cls.get_max_version(username, asset)
-            kwargs.update({
-                'version': max_version + 1,
-                'is_latest': True
-            })
-            obj = cls.objects.create(**kwargs)
-            return obj
+            instances = AuthBook.objects.select_for_update().filter(username=username, asset=asset)
+            history_versions = AuthBookHistory.objects.filter(username=username, asset=asset).values_list('version', flat=True)
+            instance_versions = list(instances.values_list('version', flat=True))
+            instance_versions.extend(history_versions)
+            instance_versions.append(1)
+            max_version = max(instance_versions)
+
+            for instance in instances:
+                AuthBookHistory.create_history(instance)
+                instance.delete()
+
+            self.version = max_version + 1
+            return super().save()
+
+    def delete(self, using=None, keep_parents=False):
+        with transaction.atomic():
+            AuthBookHistory.create_history(self)
+            return super().delete(using=using, keep_parents=keep_parents)
 
     @property
     def connectivity(self):
