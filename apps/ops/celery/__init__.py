@@ -21,6 +21,10 @@ configs["CELERY_QUEUES"] = [
     Queue("ansible", Exchange("ansible"), routing_key="ansible"),
 ]
 
+configs['worker_pool'] = 'threads'
+configs['worker_redirect_stdouts_level'] = 'INFO'
+
+
 app.namespace = 'CELERY'
 app.conf.update(configs)
 app.autodiscover_tasks(lambda: [app_config.split('.')[0] for app_config in settings.INSTALLED_APPS])
