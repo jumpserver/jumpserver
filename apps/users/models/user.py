@@ -593,7 +593,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     source = models.CharField(
         max_length=30, default=Source.local,
         choices=Source.choices,
-        verbose_name=_('User source')
+        verbose_name=_('Source')
     )
     date_password_last_updated = models.DateTimeField(
         auto_now_add=True, blank=True, null=True,
