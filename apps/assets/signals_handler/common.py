@@ -9,8 +9,9 @@ from common.exceptions import M2MReverseNotAllowed
 from common.const.signals import POST_ADD, POST_REMOVE, PRE_REMOVE
 from common.utils import get_logger
 from common.decorator import on_transaction_commit
-from assets.models import Asset, SystemUser, Node
+from assets.models import Asset, SystemUser, Node, AuthBook
 from users.models import User
+from orgs.utils import get_current_org, tmp_to_root_org
 from assets.tasks import (
     update_assets_hardware_info_util,
     test_asset_connectivity_util,
@@ -78,8 +79,10 @@ def on_system_user_assets_change(instance, action, model, pk_set, **kwargs):
     """
     当系统用户和资产关系发生变化时，应该重新推送系统用户到新添加的资产中
     """
+    print("system User asset changed")
     if action != POST_ADD:
         return
+
     logger.debug("System user assets change signal recv: {}".format(instance))
     if model == Asset:
         system_user_ids = [instance.id]
@@ -87,6 +90,10 @@ def on_system_user_assets_change(instance, action, model, pk_set, **kwargs):
     else:
         system_user_ids = pk_set
         asset_ids = [instance.id]
+
+    with tmp_to_root_org():
+        authbooks = AuthBook.objects.filter(asset_id__in=asset_ids, system_user_id__in=system_user_ids)
+        authbooks.update(org_id=get_current_org().id)
     for system_user_id in system_user_ids:
         push_system_user_to_assets.delay(system_user_id, asset_ids)
 
@@ -221,3 +228,14 @@ def on_asset_post_delete(instance: Asset, using, **kwargs):
             sender=Asset.nodes.through, instance=instance, reverse=False,
             model=Node, pk_set=node_ids, using=using, action=POST_REMOVE
         )
+
+
+@receiver(post_save, sender=SystemUser.assets.through)
+def on_authbook_create(sender, instance=None, created=True, **kwargs):
+    # if not created:
+    #     return
+    print("Auth book created")
+    if not instance.org_id:
+        print("Auth book not org id")
+        instance.org_id = get_current_org().id
+        instance.save()

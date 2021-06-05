@@ -244,7 +244,9 @@ class SystemUser(ProtocolMixin, BaseUser):
 
     username_same_with_user = models.BooleanField(default=False, verbose_name=_("Username same with user"))
     nodes = models.ManyToManyField('assets.Node', blank=True, verbose_name=_("Nodes"))
-    assets = models.ManyToManyField('assets.Asset', blank=True, verbose_name=_("Assets"))
+    assets = models.ManyToManyField('assets.Asset', blank=True, verbose_name=_("Assets"),
+                                    through='assets.AuthBook', through_fields=['system_user', 'asset']
+                                    )
     users = models.ManyToManyField('users.User', blank=True, verbose_name=_("Users"))
     groups = models.ManyToManyField('users.UserGroup', blank=True, verbose_name=_("User groups"))
     type = models.CharField(max_length=16, choices=Type.choices, default=Type.common, verbose_name=_('Type'))
@@ -322,6 +324,11 @@ class SystemUser(ProtocolMixin, BaseUser):
         asset_ids.update(nodes_asset_ids)
         assets = Asset.objects.filter(id__in=asset_ids)
         return assets
+
+    def save(self, *args, **kwargs):
+        if self.username_same_with_user:
+            self.username = '*'
+        return super().save(*args, **kwargs)
 
     class Meta:
         ordering = ['name']
