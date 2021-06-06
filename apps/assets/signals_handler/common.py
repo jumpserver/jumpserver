@@ -75,11 +75,10 @@ def on_system_user_update(instance: SystemUser, created, **kwargs):
 
 @receiver(m2m_changed, sender=SystemUser.assets.through)
 @on_transaction_commit
-def on_system_user_assets_change(instance, action, model, pk_set, **kwargs):
+def on_system_user_assets_change(instance: SystemUser, action, model, pk_set, **kwargs):
     """
     当系统用户和资产关系发生变化时，应该重新推送系统用户到新添加的资产中
     """
-    print("system User asset changed")
     if action != POST_ADD:
         return
 
@@ -91,6 +90,7 @@ def on_system_user_assets_change(instance, action, model, pk_set, **kwargs):
         system_user_ids = pk_set
         asset_ids = [instance.id]
 
+    # 通过 through 创建的没有 org_id
     with tmp_to_root_org():
         authbooks = AuthBook.objects.filter(asset_id__in=asset_ids, system_user_id__in=system_user_ids)
         authbooks.update(org_id=get_current_org().id)
