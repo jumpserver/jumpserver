@@ -20,8 +20,14 @@ class SiteMessageListSerializer(SenderMixin, ModelSerializer):
         model = SiteMessage
         fields = [
             'id', 'subject', 'has_read', 'read_at',
-            'date_created', 'date_updated', 'sender'
+            'date_created', 'date_updated', 'sender',
+            'type_display'
         ]
+        extra_kwargs = {
+            'type_display': {
+                'source': 'get_type_display'
+            }
+        }
 
 
 class SiteMessageRetrieveSerializer(SenderMixin, ModelSerializer):
@@ -29,8 +35,13 @@ class SiteMessageRetrieveSerializer(SenderMixin, ModelSerializer):
         model = SiteMessage
         fields = [
             'id', 'subject', 'message', 'has_read', 'read_at',
-            'date_created', 'date_updated', 'sender'
+            'date_created', 'date_updated', 'sender', 'type_display'
         ]
+        extra_kwargs = {
+            'type_display': {
+                'source': 'get_type_display'
+            }
+        }
 
 
 class SiteMessageIdsSerializer(serializers.Serializer):
