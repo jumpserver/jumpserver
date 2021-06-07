@@ -10,6 +10,7 @@ from ..serializers import (
     SiteMessageSendSerializer,
 )
 from ..site_msg import SiteMessage
+from ..filters import SiteMsgFilter
 
 __all__ = ('SiteMessageViewSet', )
 
@@ -23,18 +24,12 @@ class SiteMessageViewSet(ListModelMixin, RetrieveModelMixin, JmsGenericViewSet):
         'mark_as_read': SiteMessageIdsSerializer,
         'send': SiteMessageSendSerializer,
     }
+    filterset_class = SiteMsgFilter
 
     def get_queryset(self):
         user = self.request.user
         msgs = SiteMessage.get_user_all_msgs(user.id)
         return msgs
-
-    @action(methods=[GET], detail=False)
-    def unread(self, request, **kwargs):
-        user = request.user
-        msgs = SiteMessage.get_user_unread_msgs(user.id)
-        msgs = self.filter_queryset(msgs)
-        return self.get_paginated_response_with_query_set(msgs)
 
     @action(methods=[GET], detail=False, url_path='unread-total')
     def unread_total(self, request, **kwargs):
