@@ -5,21 +5,17 @@ from users.models import User
 from .models import SiteMessage as SiteMessageModel, SiteMessageUsers
 
 
-SITE_MSG_TYPE = SiteMessageModel.TYPE
-
-
 class SiteMessage:
 
     @classmethod
     def send_msg(cls, subject, message, user_ids=(), group_ids=(),
-                 sender=None, type=SiteMessageModel.TYPE.USER, is_broadcast=False):
+                 sender=None, is_broadcast=False):
         if not any((user_ids, group_ids, is_broadcast)):
             raise ValueError('No recipient is specified')
 
         site_msg = SiteMessageModel.objects.create(
             subject=subject, message=message,
             is_broadcast=is_broadcast, sender=sender,
-            type=type
         )
 
         if is_broadcast:
