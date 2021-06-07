@@ -13,16 +13,10 @@ from .base import BaseUser
 __all__ = ['AuthBook']
 
 
-class BaseAuthBook(BaseUser):
+class AuthBook(BaseUser):
     asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, verbose_name=_('Asset'))
     system_user = models.ForeignKey('assets.SystemUser', on_delete=models.CASCADE, null=True, verbose_name=_("System user"))
     version = models.IntegerField(default=1, verbose_name=_('Version'))
-
-    class Meta:
-        abstract = True
-
-
-class AuthBook(BaseAuthBook):
     is_latest = models.BooleanField(default=False, verbose_name=_('Latest version'))
     history = HistoricalRecords()
 
@@ -47,20 +41,6 @@ class AuthBook(BaseAuthBook):
             .aggregate(Max('version'))
         version_max = version_max['version__max'] or 0
         return version_max
-
-    # def save(self):
-    #     username = self.username
-    #     asset = self.asset
-    #
-    #     with transaction.atomic():
-    #         # 使用select_for_update限制并发创建相同的username、asset条目
-    #         instances = AuthBook.objects.filter(username=username, asset=asset).select_for_update()
-    #         versions = list(instances.values_list('version', flat=True))
-    #         versions.append(1)
-    #         max_version = max(versions)
-    #         self.version = max_version + 1
-    #         instances.delete()
-    #         return super().save()
 
     @property
     def connectivity(self):

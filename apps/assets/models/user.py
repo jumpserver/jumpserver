@@ -5,21 +5,23 @@
 import logging
 
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.cache import cache
 
 from common.utils import signer, get_object_or_none
 from common.db.models import ChoiceSet
-from common.exceptions import JMSException
 from .base import BaseUser
 from .asset import Asset
+from .authbook import AuthBook
 
 
 __all__ = ['AdminUser', 'SystemUser']
 logger = logging.getLogger(__name__)
 
 
+# Todo: 准备废弃
 class AdminUser(BaseUser):
     """
     A privileged user that ansible can use it to push system user and so on
@@ -127,6 +129,10 @@ class ProtocolMixin:
             protocol = None
         return protocol
 
+    @property
+    def can_perm_to_asset(self):
+        return self.protocol in self.ASSET_CATEGORY_PROTOCOLS
+
 
 class AuthMixin:
     username_same_with_user: bool
@@ -138,20 +144,7 @@ class AuthMixin:
     username: str
     password: str
     private_key: str
-
-    def has_special_auth(self, asset=None, username=None):
-        if username is None and self.username_same_with_user:
-            raise TypeError('System user is dynamic, username should be pass')
-        return super().has_special_auth(asset=asset, username=username)
-
-    @property
-    def can_perm_to_asset(self):
-        return self.protocol in self.ASSET_CATEGORY_PROTOCOLS
-
-    def _merge_auth(self, other):
-        super()._merge_auth(other)
-        if self.username_same_with_user:
-            self.username = other.username
+    public_key: str
 
     def set_temp_auth(self, asset_or_app_id, user_id, auth, ttl=300):
         if not auth:
@@ -196,6 +189,50 @@ class AuthMixin:
             return
         self.load_tmp_auth_if_has(app_id, user)
 
+    def load_asset_special_auth(self, asset, username=''):
+        """
+        有用户名，代表手动设置过密码，给 4分
+        有资产: 代表为某个资产设置过，给 2分
+        有系统用户: 给 1分
+        """
+        system_user = self
+        # 1: 优先匹配，有用户名, 有系统用户，有资产的，得分 7
+        q1 = Q(asset=asset, system_user=system_user, username=username)
+        # 2: 第二优先级, 有资产，有用户名的, 这个是可能从修改密码过来的，或者单独设置的, 得分 6
+        q2 = Q(asset=asset, username=username)
+        # 3: 这个可能是动态系统用户，为某个用户单独设置的密码, 得分 5
+        q3 = Q(username=username, system_user=system_user)
+        # 4: 系统用户自己的默认账号密码, 得分 3
+        q4 = Q(asset=asset, system_user=system_user),
+
+        def sort_auth(authbook):
+            score = 0
+            if authbook.password or authbook.private_key:
+                score += 4
+            if authbook.asset:
+                score += 2
+            if authbook.system_user:
+                score += 1
+            return score
+        authbooks = list(AuthBook.objects.filter(q1 | q2 | q3 | q4))
+        authbooks = sorted(authbooks, key=sort_auth, reverse=True)
+        if len(authbooks) == 0:
+            return None
+
+        if username:
+            self.username = username
+
+        password_set, key_set = False
+        for auth in authbooks:
+            if auth.password and not password_set:
+                self.password = auth.password
+                password_set = True
+            if auth.private_key and not key_set:
+                self.private_key = auth.private_key
+                self.public_key = auth.public_key
+            if password_set and key_set:
+                break
+
     def load_asset_more_auth(self, asset_id=None, username=None, user_id=None):
         from users.models import User
 
@@ -239,14 +276,14 @@ class SystemUser(ProtocolMixin, BaseUser):
 
     class Type(ChoiceSet):
         admin = 'admin', _('Admin user')
-        devops = 'devops', _('Devops user')
         common = 'common', _('Common user')
 
     username_same_with_user = models.BooleanField(default=False, verbose_name=_("Username same with user"))
     nodes = models.ManyToManyField('assets.Node', blank=True, verbose_name=_("Nodes"))
-    assets = models.ManyToManyField('assets.Asset', blank=True, verbose_name=_("Assets"),
-                                    through='assets.AuthBook', through_fields=['system_user', 'asset']
-                                    )
+    assets = models.ManyToManyField(
+        'assets.Asset', blank=True, verbose_name=_("Assets"),
+        through='assets.AuthBook', through_fields=['system_user', 'asset']
+    )
     users = models.ManyToManyField('users.User', blank=True, verbose_name=_("Users"))
     groups = models.ManyToManyField('users.UserGroup', blank=True, verbose_name=_("User groups"))
     type = models.CharField(max_length=16, choices=Type.choices, default=Type.common, verbose_name=_('Type'))
