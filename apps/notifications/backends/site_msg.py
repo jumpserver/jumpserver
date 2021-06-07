@@ -1,4 +1,4 @@
-from notifications.site_msg import SiteMessage as Client, SITE_MSG_TYPE
+from notifications.site_msg import SiteMessage as Client
 from .base import BackendBase
 
 
@@ -7,7 +7,7 @@ class SiteMessage(BackendBase):
 
     def send_msg(self, users, subject, message):
         accounts, __, __ = self.get_accounts(users)
-        Client.send_msg(subject, message, user_ids=accounts, type=SITE_MSG_TYPE.SYSTEM)
+        Client.send_msg(subject, message, user_ids=accounts)
 
     @classmethod
     def is_enable(cls):

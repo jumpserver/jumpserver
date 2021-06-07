@@ -15,22 +15,7 @@ class SenderMixin(ModelSerializer):
             return ''
 
 
-class SiteMessageListSerializer(SenderMixin, ModelSerializer):
-    class Meta:
-        model = SiteMessage
-        fields = [
-            'id', 'subject', 'has_read', 'read_at',
-            'date_created', 'date_updated', 'sender',
-            'type_display'
-        ]
-        extra_kwargs = {
-            'type_display': {
-                'source': 'get_type_display'
-            }
-        }
-
-
-class SiteMessageRetrieveSerializer(SenderMixin, ModelSerializer):
+class SiteMessageDetailSerializer(SenderMixin, ModelSerializer):
     class Meta:
         model = SiteMessage
         fields = [

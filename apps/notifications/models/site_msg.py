@@ -14,10 +14,6 @@ class SiteMessageUsers(JMSModel):
 
 
 class SiteMessage(JMSModel):
-    class TYPE(models.TextChoices):
-        USER = 'user', _('User message')
-        SYSTEM = 'system', _('Sysem message')
-
     subject = models.CharField(max_length=1024)
     message = models.TextField()
     users = models.ManyToManyField(
@@ -29,7 +25,6 @@ class SiteMessage(JMSModel):
         'users.User', db_constraint=False, on_delete=models.DO_NOTHING, null=True, default=None,
         related_name='send_site_message'
     )
-    type = models.CharField(max_length=64, choices=TYPE.choices, default=TYPE.USER)
 
     has_read = False
     read_at = None
