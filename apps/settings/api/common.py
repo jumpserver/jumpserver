@@ -115,6 +115,7 @@ class PublicSettingApi(generics.RetrieveAPIView):
                 "OLD_PASSWORD_HISTORY_LIMIT_COUNT": settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT,
                 "SECURITY_COMMAND_EXECUTION": settings.SECURITY_COMMAND_EXECUTION,
                 "SECURITY_PASSWORD_EXPIRATION_TIME": settings.SECURITY_PASSWORD_EXPIRATION_TIME,
+                "SECURITY_LUNA_REMEMBER_AUTH": settings.SECURITY_LUNA_REMEMBER_AUTH,
                 "XPACK_LICENSE_IS_VALID": has_valid_xpack_license(),
                 "LOGIN_TITLE": self.get_login_title(),
                 "LOGO_URLS": self.get_logo_urls(),
