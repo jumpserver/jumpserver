@@ -141,8 +141,8 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
         token = self.create_token(user, asset, application, system_user)
 
         # Todo: 上线后地址是 JumpServerAddr:3389
-        address = settings.RDP_ADDR
-        if address == 'localhost:3389':
+        address = settings.TERMINAL_RDP_ADDR
+        if not address or address == 'localhost:3389':
             address = request.get_host().split(':')[0] + ':3389'
         options['full address:s'] = address
         options['username:s'] = '{}|{}'.format(user.username, token)
