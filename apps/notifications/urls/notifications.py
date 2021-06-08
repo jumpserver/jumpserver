@@ -2,7 +2,7 @@
 from rest_framework_bulk.routes import BulkRouter
 from django.urls import path
 
-from . import api
+from notifications import api
 
 app_name = 'notifications'
 

@@ -99,8 +99,8 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
             'full address:s': '',
             'username:s': '',
             'screen mode id:i': '0',
-            'desktopwidth:i': '1280',
-            'desktopheight:i': '800',
+            # 'desktopwidth:i': '1280',
+            # 'desktopheight:i': '800',
             'use multimon:i': '1',
             'session bpp:i': '32',
             'audiomode:i': '0',
@@ -120,6 +120,7 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
             'autoreconnection enabled:i': '1',
             'bookmarktype:i': '3',
             'use redirection server name:i': '0',
+            'smart sizing:i': '0'
             # 'alternate shell:s:': '||MySQLWorkbench',
             # 'remoteapplicationname:s': 'Firefox',
             # 'remoteapplicationcmdline:s': '',
@@ -145,8 +146,11 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
             address = request.get_host().split(':')[0] + ':3389'
         options['full address:s'] = address
         options['username:s'] = '{}|{}'.format(user.username, token)
-        options['desktopwidth:i'] = width
-        options['desktopheight:i'] = height
+        if width and height:
+            options['desktopwidth:i'] = width
+            options['desktopheight:i'] = height
+        else:
+            options['smart sizing:i'] = '1'
         data = ''
         for k, v in options.items():
             data += f'{k}:{v}\n'

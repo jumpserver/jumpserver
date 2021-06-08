@@ -4,16 +4,24 @@ from rest_framework import serializers
 from ..models import SiteMessage
 
 
-class SiteMessageListSerializer(ModelSerializer):
-    class Meta:
-        model = SiteMessage
-        fields = ['id', 'subject', 'has_read', 'read_at']
+class SenderMixin(ModelSerializer):
+    sender = serializers.SerializerMethodField()
+
+    def get_sender(self, site_msg):
+        sender = site_msg.sender
+        if sender:
+            return str(sender)
+        else:
+            return ''
 
 
-class SiteMessageRetrieveSerializer(ModelSerializer):
+class SiteMessageDetailSerializer(SenderMixin, ModelSerializer):
     class Meta:
         model = SiteMessage
-        fields = ['id', 'subject', 'message', 'has_read', 'read_at']
+        fields = [
+            'id', 'subject', 'message', 'has_read', 'read_at',
+            'date_created', 'date_updated', 'sender',
+        ]
 
 
 class SiteMessageIdsSerializer(serializers.Serializer):
