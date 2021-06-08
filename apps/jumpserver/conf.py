@@ -302,7 +302,7 @@ class Config(dict):
         'FORGOT_PASSWORD_URL': '',
         'HEALTH_CHECK_TOKEN': '',
 
-        'RDP_ADDR': 'localhost:3389'
+        'TERMINAL_RDP_ADDR': ''
     }
 
     def compatible_auth_openid_of_key(self):
