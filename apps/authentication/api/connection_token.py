@@ -220,7 +220,7 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
             raise serializers.ValidationError('Token not found')
 
         user = get_object_or_404(User, id=value.get('user'))
-        if user.is_valid:
+        if not user.is_valid:
             raise serializers.ValidationError("User not valid, disabled or expired")
 
         system_user = get_object_or_404(SystemUser, id=value.get('system_user'))
