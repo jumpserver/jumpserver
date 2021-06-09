@@ -50,7 +50,7 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
             raise PermissionDenied(error)
         return True
 
-    def create_token(self, user, asset, application, system_user):
+    def create_token(self, user, asset, application, system_user, ttl=5*60):
         if not settings.CONNECTION_TOKEN_ENABLED:
             raise PermissionDenied('Connection token disabled')
         if not user:
@@ -80,7 +80,7 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
             })
 
         key = self.CACHE_KEY_PREFIX.format(token)
-        cache.set(key, value, timeout=30*60)
+        cache.set(key, value, timeout=ttl)
         return token
 
     def create(self, request, *args, **kwargs):
@@ -165,7 +165,6 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
 
     @staticmethod
     def _get_application_secret_detail(application):
-        from applications.models import Application
         from perms.models import Action
         gateway = None
 
@@ -224,8 +223,6 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
             raise serializers.ValidationError("User not valid, disabled or expired")
 
         system_user = get_object_or_404(SystemUser, id=value.get('system_user'))
-        if system_user.ad_domain:
-            system_user.username = '{0.username}@{0.ad_domain}'.format(system_user)
 
         asset = None
         app = None
