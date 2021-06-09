@@ -2,6 +2,7 @@ from rest_framework.response import Response
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.decorators import action
 
+from common.http import is_true
 from common.permissions import IsValidUser
 from common.const.http import GET, PATCH, POST
 from common.drf.api import JmsGenericViewSet
@@ -26,13 +27,18 @@ class SiteMessageViewSet(ListModelMixin, RetrieveModelMixin, JmsGenericViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        msgs = SiteMessage.get_user_all_msgs(user.id)
+        has_read = self.request.query_params.get('has_read')
+
+        if has_read is None:
+            msgs = SiteMessage.get_user_all_msgs(user.id)
+        else:
+            msgs = SiteMessage.filter_user_msgs(user.id, has_read=is_true(has_read))
         return msgs
 
     @action(methods=[GET], detail=False, url_path='unread-total')
     def unread_total(self, request, **kwargs):
         user = request.user
-        msgs = SiteMessage.get_user_unread_msgs(user.id)
+        msgs = SiteMessage.filter_user_msgs(user.id, has_read=False)
         return Response(data={'total': msgs.count()})
 
     @action(methods=[PATCH], detail=False, url_path='mark-as-read')
