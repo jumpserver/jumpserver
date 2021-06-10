@@ -14,6 +14,7 @@ __all__ = [
     'SystemUserSimpleSerializer', 'SystemUserAssetRelationSerializer',
     'SystemUserNodeRelationSerializer', 'SystemUserTaskSerializer',
     'SystemUserUserRelationSerializer', 'SystemUserWithAuthInfoSerializer',
+    'SystemUserTempAuthSerializer',
 ]
 
 
@@ -272,3 +273,10 @@ class SystemUserTaskSerializer(serializers.Serializer):
         many=True
     )
     task = serializers.CharField(read_only=True)
+
+
+class SystemUserTempAuthSerializer(SystemUserSerializer):
+    instance_id = serializers.CharField()
+
+    class Meta(SystemUserSerializer.Meta):
+        fields = ['instance_id', 'username', 'password']

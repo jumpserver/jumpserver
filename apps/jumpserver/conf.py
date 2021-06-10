@@ -259,6 +259,7 @@ class Config(dict):
         'SECURITY_INSECURE_COMMAND': False,
         'SECURITY_INSECURE_COMMAND_LEVEL': 5,
         'SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER': '',
+        'SECURITY_LUNA_REMEMBER_AUTH': True,
 
         'HTTP_BIND_HOST': '0.0.0.0',
         'HTTP_LISTEN_PORT': 8080,
@@ -300,7 +301,9 @@ class Config(dict):
         'SESSION_SAVE_EVERY_REQUEST': True,
         'SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE': False,
         'FORGOT_PASSWORD_URL': '',
-        'HEALTH_CHECK_TOKEN': ''
+        'HEALTH_CHECK_TOKEN': '',
+
+        'TERMINAL_RDP_ADDR': ''
     }
 
     def compatible_auth_openid_of_key(self):

@@ -599,12 +599,20 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         auto_now_add=True, blank=True, null=True,
         verbose_name=_('Date password last updated')
     )
-    need_update_password = models.BooleanField(default=False)
+    need_update_password = models.BooleanField(
+        default=False, verbose_name=_('Need update password')
+    )
     wecom_id = models.CharField(null=True, default=None, unique=True, max_length=128)
     dingtalk_id = models.CharField(null=True, default=None, unique=True, max_length=128)
 
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
+
+    @classmethod
+    def get_group_ids_by_user_id(cls, user_id):
+        group_ids = cls.groups.through.objects.filter(user_id=user_id).distinct().values_list('usergroup_id', flat=True)
+        group_ids = list(group_ids)
+        return group_ids
 
     @property
     def is_wecom_bound(self):
