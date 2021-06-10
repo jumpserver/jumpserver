@@ -34,7 +34,6 @@ class AssetViewSet(FilterAssetByNodeMixin, OrgBulkModelViewSet):
         'hostname': ['exact'],
         'ip': ['exact'],
         'systemuser__id': ['exact'],
-        'admin_user__id': ['exact'],
         'platform__base': ['exact'],
         'is_active': ['exact'],
         'protocols': ['exact', 'icontains']

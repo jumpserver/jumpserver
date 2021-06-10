@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 from rest_framework import serializers
-from django.db.models import F
 from django.core.validators import RegexValidator
 from django.utils.translation import ugettext_lazy as _
 
@@ -67,7 +66,6 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     )
     protocols = ProtocolsField(label=_('Protocols'), required=False, default=['ssh/22'])
     domain_display = serializers.ReadOnlyField(source='domain.name', label=_('Domain name'))
-    admin_user_display = serializers.ReadOnlyField(source='admin_user.name', label=_('Admin user name'))
     nodes_display = serializers.ListField(child=serializers.CharField(), label=_('Nodes name'), required=False)
 
     """
@@ -84,7 +82,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'created_by', 'date_created', 'hardware_info',
         ]
         fields_fk = [
-            'admin_user', 'admin_user_display', 'domain', 'domain_display', 'platform'
+            'domain', 'domain_display', 'platform'
         ]
         fk_only_fields = {
             'platform': ['name']
@@ -93,7 +91,6 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'nodes', 'nodes_display', 'labels',
         ]
         annotates_fields = {
-            # 'admin_user_display': 'admin_user__name'
         }
         fields_as = list(annotates_fields.keys())
         fields = fields_small + fields_fk + fields_m2m + fields_as
@@ -111,7 +108,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('admin_user', 'domain', 'platform')
+        queryset = queryset.prefetch_related('domain', 'platform')
         queryset = queryset.prefetch_related('nodes', 'labels')
         return queryset
 

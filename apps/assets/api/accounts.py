@@ -1,6 +1,5 @@
 
 from orgs.mixins.api import OrgBulkModelViewSet
-from orgs.mixins import generics
 from common.permissions import IsOrgAdmin
 
 from ..models import AuthBook

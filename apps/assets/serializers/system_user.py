@@ -30,8 +30,8 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         fields_mini = ['id', 'name', 'username']
         fields_write_only = ['password', 'public_key', 'private_key']
         fields_small = fields_mini + fields_write_only + [
-            'protocol', 'login_mode', 'login_mode_display', 'priority',
-            'sudo', 'shell', 'sftp_root', 'token',
+            'type', 'protocol', 'login_mode', 'login_mode_display',
+            'priority', 'sudo', 'shell', 'sftp_root', 'token',
             'home', 'system_groups', 'ad_domain',
             'username_same_with_user', 'auto_push', 'auto_generate_key',
             'date_created', 'date_updated',

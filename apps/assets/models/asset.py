@@ -4,7 +4,6 @@
 
 import uuid
 import logging
-import random
 from functools import reduce
 from collections import OrderedDict
 

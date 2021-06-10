@@ -274,8 +274,9 @@ class SystemUser(ProtocolMixin, BaseUser):
     )
 
     class Type(ChoiceSet):
-        admin = 'admin', _('Admin user')
         common = 'common', _('Common user')
+        dynamic = 'dynamic', _('Dynamic user')
+        admin = 'admin', _('Admin user')
 
     username_same_with_user = models.BooleanField(default=False, verbose_name=_("Username same with user"))
     nodes = models.ManyToManyField('assets.Node', blank=True, verbose_name=_("Nodes"))

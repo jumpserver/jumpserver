@@ -26,7 +26,7 @@ class AuthBook(BaseUser):
 
     class Meta:
         verbose_name = _('AuthBook')
-        unique_together = [('asset', 'system_user')]
+        unique_together = [('username', 'asset', 'system_user')]
 
     @property
     def connectivity(self):
