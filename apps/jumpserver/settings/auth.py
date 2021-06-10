@@ -130,10 +130,12 @@ AUTH_BACKEND_CAS = 'authentication.backends.cas.CASBackend'
 AUTH_BACKEND_SSO = 'authentication.backends.api.SSOAuthentication'
 AUTH_BACKEND_WECOM = 'authentication.backends.api.WeComAuthentication'
 AUTH_BACKEND_DINGTALK = 'authentication.backends.api.DingTalkAuthentication'
+AUTH_BACKEND_AUTH_TOKEN = 'authentication.backends.api.AuthorizationTokenAuthentication'
 
 
 AUTHENTICATION_BACKENDS = [
-    AUTH_BACKEND_MODEL, AUTH_BACKEND_PUBKEY, AUTH_BACKEND_WECOM, AUTH_BACKEND_DINGTALK
+    AUTH_BACKEND_MODEL, AUTH_BACKEND_PUBKEY, AUTH_BACKEND_WECOM,
+    AUTH_BACKEND_DINGTALK, AUTH_BACKEND_AUTH_TOKEN
 ]
 
 if AUTH_CAS:
