@@ -252,9 +252,8 @@ class AuthMixin:
         if user_id:
             user = get_object_or_none(User, pk=user_id)
 
-        if self.username_same_with_user:
-            if user and not username:
-                username = user.username
+        if self.username_same_with_user and not username and user:
+            username = user.username
 
         # 加载某个资产的特殊配置认证信息
         try:
@@ -306,13 +305,6 @@ class SystemUser(ProtocolMixin, BaseUser):
         if self.username_same_with_user:
             username = 'dynamic'
         return '{0.name}({1})'.format(self, username)
-
-    # todo: 返回的数据结构不一样
-    def get_username(self):
-        if self.username_same_with_user:
-            return list(self.users.values_list('username', flat=True))
-        else:
-            return self.username
 
     @property
     def nodes_amount(self):

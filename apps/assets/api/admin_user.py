@@ -1,5 +1,3 @@
-
-
 from django.db import transaction
 from django.db.models import Count
 from django.shortcuts import get_object_or_404

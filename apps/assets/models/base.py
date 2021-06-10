@@ -105,7 +105,6 @@ class AuthMixin:
     password = ''
     public_key = ''
     username = ''
-    _prefer = 'system_user'
 
     @property
     def ssh_key_fingerprint(self):
@@ -173,38 +172,6 @@ class AuthMixin:
         if update_fields:
             self.save(update_fields=update_fields)
 
-    def has_special_auth(self, asset=None, username=None):
-        from .authbook import AuthBook
-        if username is None:
-            username = self.username
-        queryset = AuthBook.objects.filter(username=username)
-        if asset:
-            queryset = queryset.filter(asset=asset)
-        return queryset.exists()
-
-    def get_asset_user(self, asset, username=None):
-        from ..backends import AssetUserManager
-        if username is None:
-            username = self.username
-        try:
-            manager = AssetUserManager()
-            other = manager.get_latest(
-                username=username, asset=asset,
-                prefer_id=self.id, prefer=self._prefer,
-            )
-            return other
-        except Exception as e:
-            logger.error(e, exc_info=True)
-            return None
-
-    def load_asset_special_auth(self, asset=None, username=None):
-        if not asset:
-            return self
-
-        instance = self.get_asset_user(asset, username=username)
-        if instance:
-            self._merge_auth(instance)
-
     def _merge_auth(self, other):
         if other.password:
             self.password = other.password
@@ -258,8 +225,6 @@ class BaseUser(OrgModelMixin, AuthMixin, ConnectivityMixin):
 
     ASSETS_AMOUNT_CACHE_KEY = "ASSET_USER_{}_ASSETS_AMOUNT"
     ASSET_USER_CACHE_TIME = 600
-
-    _prefer = "system_user"
 
     def get_related_assets(self):
         assets = self.assets.filter(org_id=self.org_id)

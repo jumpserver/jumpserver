@@ -2,7 +2,6 @@
 #
 
 from django.db import models
-from django.db.models import Max
 from django.utils.translation import ugettext_lazy as _
 
 from simple_history.models import HistoricalRecords
@@ -16,11 +15,11 @@ __all__ = ['AuthBook']
 class AuthBook(BaseUser):
     asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, verbose_name=_('Asset'))
     system_user = models.ForeignKey('assets.SystemUser', on_delete=models.CASCADE, null=True, verbose_name=_("System user"))
+    # Todo: 移除
     version = models.IntegerField(default=1, verbose_name=_('Version'))
     is_latest = models.BooleanField(default=False, verbose_name=_('Latest version'))
     history = HistoricalRecords()
 
-    backend = "db"
     # 用于system user和admin_user的动态设置
     _connectivity = None
     CONN_CACHE_KEY = "ASSET_USER_CONN_{}"
@@ -29,35 +28,24 @@ class AuthBook(BaseUser):
         verbose_name = _('AuthBook')
         unique_together = [('asset', 'system_user')]
 
-    def get_related_assets(self):
-        return [self.asset]
-
-    def generate_id_with_asset(self, asset):
-        return self.id
-
-    @classmethod
-    def get_max_version(cls, username, asset):
-        version_max = cls.objects.filter(username=username, asset=asset) \
-            .aggregate(Max('version'))
-        version_max = version_max['version__max'] or 0
-        return version_max
-
     @property
     def connectivity(self):
         return self.get_asset_connectivity(self.asset)
 
-    @property
-    def keyword(self):
-        return '{}_#_{}'.format(self.username, str(self.asset.id))
+    def smart_name(self):
+        if self.username:
+            username = self.username
+        elif self.system_user:
+            username = self.system_user.username
+        else:
+            username = '*'
 
-    @property
-    def hostname(self):
-        return self.asset.hostname
-
-    @property
-    def ip(self):
-        return self.asset.ip
+        if self.asset:
+            asset = str(self.asset)
+        else:
+            asset = '*'
+        return '{}@{}'.format(username, asset)
 
     def __str__(self):
-        return '{}@{}'.format(self.username, self.asset)
+        return self.smart_name
 

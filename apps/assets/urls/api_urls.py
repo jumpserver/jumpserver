@@ -19,8 +19,8 @@ router.register(r'nodes', api.NodeViewSet, 'node')
 router.register(r'domains', api.DomainViewSet, 'domain')
 router.register(r'gateways', api.GatewayViewSet, 'gateway')
 router.register(r'cmd-filters', api.CommandFilterViewSet, 'cmd-filter')
-router.register(r'asset-users', api.AssetUserViewSet, 'asset-user')
-router.register(r'asset-user-auth-infos', api.AssetUserAuthInfoViewSet, 'asset-user-auth-info')
+# router.register(r'asset-users', api.AssetUserViewSet, 'asset-user')
+# router.register(r'asset-user-auth-infos', api.AssetUserAuthInfoViewSet, 'asset-user-auth-info')
 router.register(r'gathered-users', api.GatheredUserViewSet, 'gathered-user')
 router.register(r'favorite-assets', api.FavoriteAssetViewSet, 'favorite-asset')
 router.register(r'system-users-assets-relations', api.SystemUserAssetRelationViewSet, 'system-users-assets-relation')
@@ -37,7 +37,7 @@ urlpatterns = [
     path('assets/<uuid:pk>/tasks/', api.AssetTaskCreateApi.as_view(), name='asset-task-create'),
     path('assets/tasks/', api.AssetsTaskCreateApi.as_view(), name='assets-task-create'),
 
-    path('asset-users/tasks/', api.AssetUserTaskCreateAPI.as_view(), name='asset-user-task-create'),
+    # path('asset-users/tasks/', api.AssetUserTaskCreateAPI.as_view(), name='asset-user-task-create'),
 
     path('admin-users/<uuid:pk>/nodes/', api.ReplaceNodesAdminUserApi.as_view(), name='replace-nodes-admin-user'),
     path('admin-users/<uuid:pk>/auth/', api.AdminUserAuthApi.as_view(), name='admin-user-auth'),
