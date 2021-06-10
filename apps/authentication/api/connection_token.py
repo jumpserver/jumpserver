@@ -6,11 +6,14 @@ from django.conf import settings
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
+from django.utils.translation import ugettext as _
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
+from rest_framework import serializers
 
+from authentication.signals import post_auth_failed, post_auth_success
 from common.utils import get_logger, random_string
 from common.drf.api import SerializerMixin2
 from common.permissions import IsSuperUserOrAppUser, IsValidUser, IsSuperUser
@@ -49,11 +52,7 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
             raise PermissionDenied(error)
         return True
 
-    def create_token(self, user, asset, application, system_user):
-        if not settings.CONNECTION_TOKEN_ENABLED:
-            raise PermissionDenied('Connection token disabled')
-        if not user:
-            user = self.request.user
+    def create_token(self, user, asset, application, system_user, ttl=5*60):
         if not self.request.user.is_superuser and user != self.request.user:
             raise PermissionDenied('Only super user can create user token')
         self.check_resource_permission(user, asset, application, system_user)
@@ -79,7 +78,7 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
             })
 
         key = self.CACHE_KEY_PREFIX.format(token)
-        cache.set(key, value, timeout=30*60)
+        cache.set(key, value, timeout=ttl)
         return token
 
     def create(self, request, *args, **kwargs):
@@ -99,8 +98,8 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
             'full address:s': '',
             'username:s': '',
             'screen mode id:i': '0',
-            'desktopwidth:i': '1280',
-            'desktopheight:i': '800',
+            # 'desktopwidth:i': '1280',
+            # 'desktopheight:i': '800',
             'use multimon:i': '1',
             'session bpp:i': '32',
             'audiomode:i': '0',
@@ -120,6 +119,8 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
             'autoreconnection enabled:i': '1',
             'bookmarktype:i': '3',
             'use redirection server name:i': '0',
+            'smart sizing:i': '0',
+            # 'domain:s': ''
             # 'alternate shell:s:': '||MySQLWorkbench',
             # 'remoteapplicationname:s': 'Firefox',
             # 'remoteapplicationcmdline:s': '',
@@ -139,14 +140,18 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
         user = request.user
         token = self.create_token(user, asset, application, system_user)
 
-        # Todo: 上线后地址是 JumpServerAddr:3389
-        address = settings.RDP_ADDR
-        if address == 'localhost:3389':
+        address = settings.TERMINAL_RDP_ADDR
+        if not address or address == 'localhost:3389':
             address = request.get_host().split(':')[0] + ':3389'
         options['full address:s'] = address
         options['username:s'] = '{}|{}'.format(user.username, token)
-        options['desktopwidth:i'] = width
-        options['desktopheight:i'] = height
+        if system_user.ad_domain:
+            options['domain:s'] = system_user.ad_domain
+        if width and height:
+            options['desktopwidth:i'] = width
+            options['desktopheight:i'] = height
+        else:
+            options['smart sizing:i'] = '1'
         data = ''
         for k, v in options.items():
             data += f'{k}:{v}\n'
@@ -157,10 +162,8 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
         return response
 
     @staticmethod
-    def _get_application_secret_detail(value):
-        from applications.models import Application
+    def _get_application_secret_detail(application):
         from perms.models import Action
-        application = get_object_or_404(Application, id=value.get('application'))
         gateway = None
 
         if not application.category_remote_app:
@@ -186,15 +189,15 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
         }
 
     @staticmethod
-    def _get_asset_secret_detail(value, user, system_user):
-        from assets.models import Asset
+    def _get_asset_secret_detail(asset, user, system_user):
         from perms.utils.asset import get_asset_system_user_ids_with_actions_by_user
-        asset = get_object_or_404(Asset, id=value.get('asset'))
         systemuserid_actions_mapper = get_asset_system_user_ids_with_actions_by_user(user, asset)
         actions = systemuserid_actions_mapper.get(system_user.id, [])
+
         gateway = None
         if asset and asset.domain and asset.domain.has_gateway():
             gateway = asset.domain.random_gateway()
+
         return {
             'asset': asset,
             'application': None,
@@ -203,34 +206,64 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
             'actions': actions,
         }
 
-    @action(methods=['POST'], detail=False, permission_classes=[IsSuperUserOrAppUser], url_path='secret-info/detail')
-    def get_secret_detail(self, request, *args, **kwargs):
+    def valid_token(self, token):
         from users.models import User
-        from assets.models import SystemUser
+        from assets.models import SystemUser, Asset
+        from applications.models import Application
 
-        token = request.data.get('token', '')
         key = self.CACHE_KEY_PREFIX.format(token)
         value = cache.get(key, None)
         if not value:
-            return Response(status=404)
-        user = get_object_or_404(User, id=value.get('user'))
-        system_user = get_object_or_404(SystemUser, id=value.get('system_user'))
-        data = dict(user=user, system_user=system_user)
+            raise serializers.ValidationError('Token not found')
 
+        user = get_object_or_404(User, id=value.get('user'))
+        if not user.is_valid:
+            raise serializers.ValidationError("User not valid, disabled or expired")
+
+        system_user = get_object_or_404(SystemUser, id=value.get('system_user'))
+
+        asset = None
+        app = None
         if value.get('type') == 'asset':
-            asset_detail = self._get_asset_secret_detail(value, user=user, system_user=system_user)
-            asset = asset_detail.get('asset')
-            if asset:
-                system_user.load_asset_more_auth(asset.id, user.username, user.id)
+            asset = get_object_or_404(Asset, id=value.get('asset'))
+        else:
+            app = get_object_or_404(Application, id=value.get('application'))
+
+        if asset and not asset.is_active:
+            raise serializers.ValidationError("Asset disabled")
+
+        try:
+            self.check_resource_permission(user, asset, app, system_user)
+        except PermissionDenied:
+            raise serializers.ValidationError('Permission expired or invalid')
+        return value, user, system_user, asset, app
+
+    @action(methods=['POST'], detail=False, permission_classes=[IsSuperUserOrAppUser], url_path='secret-info/detail')
+    def get_secret_detail(self, request, *args, **kwargs):
+        token = request.data.get('token', '')
+        try:
+            value, user, system_user, asset, app = self.valid_token(token)
+        except serializers.ValidationError as e:
+            post_auth_failed.send(
+                sender=self.__class__, username='', request=self.request,
+                reason=_('Invalid token')
+            )
+            raise e
+
+        data = dict(user=user, system_user=system_user)
+        if asset:
+            asset_detail = self._get_asset_secret_detail(asset, user=user, system_user=system_user)
+            system_user.load_asset_more_auth(asset.id, user.username, user.id)
             data['type'] = 'asset'
             data.update(asset_detail)
         else:
-            app_detail = self._get_application_secret_detail(value)
-            app = app_detail.get("application")
-            if app:
-                system_user.load_app_more_auth(app.id, user.id)
+            app_detail = self._get_application_secret_detail(app)
+            system_user.load_app_more_auth(app.id, user.id)
             data['type'] = 'application'
             data.update(app_detail)
+
+        self.request.session['auth_backend'] = settings.AUTH_BACKEND_AUTH_TOKEN
+        post_auth_success.send(sender=self.__class__, user=user, request=self.request, login_type='T')
 
         serializer = self.get_serializer(data)
         return Response(data=serializer.data, status=200)

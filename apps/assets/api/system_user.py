@@ -1,12 +1,12 @@
 # ~*~ coding: utf-8 ~*~
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
-from rest_framework.exceptions import ValidationError
 
 from common.utils import get_logger
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, IsValidUser
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
+from orgs.utils import tmp_to_root_org
 from ..models import SystemUser, Asset
 from .. import serializers
 from ..serializers import SystemUserWithAuthInfoSerializer, SystemUserTempAuthSerializer
@@ -66,11 +66,13 @@ class SystemUserTempAuthInfoApi(generics.CreateAPIView):
         serializer = super().get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         pk = kwargs.get('pk')
-        instance = get_object_or_404(SystemUser, pk=pk)
-        data = serializer.validated_data
         user = self.request.user
+        data = serializer.validated_data
         instance_id = data.get('instance_id')
-        instance.set_temp_auth(instance_id, user, data)
+
+        with tmp_to_root_org():
+            instance = get_object_or_404(SystemUser, pk=pk)
+            instance.set_temp_auth(instance_id, user, data)
         return Response(serializer.data, status=201)
 
 

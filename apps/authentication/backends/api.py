@@ -228,3 +228,11 @@ class DingTalkAuthentication(ModelBackend):
 
     def authenticate(self, request, **kwargs):
         pass
+
+
+class AuthorizationTokenAuthentication(ModelBackend):
+    """
+    什么也不做呀😺
+    """
+    def authenticate(self, request, **kwargs):
+        pass

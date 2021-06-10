@@ -64,6 +64,7 @@ class AssetUserReadSerializer(AssetUserWriteSerializer):
         fields_fk = ['asset', 'hostname', 'ip']
         fields = fields_small + fields_fk
         extra_kwargs = {
+            'name': {'required': False},
             'username': {'required': True},
             'password': {'write_only': True},
             'private_key': {'write_only': True},

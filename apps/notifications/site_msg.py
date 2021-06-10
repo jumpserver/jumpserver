@@ -8,13 +8,14 @@ from .models import SiteMessage as SiteMessageModel, SiteMessageUsers
 class SiteMessage:
 
     @classmethod
-    def send_msg(cls, subject, message, user_ids=(), group_ids=(), sender=None, is_broadcast=False):
+    def send_msg(cls, subject, message, user_ids=(), group_ids=(),
+                 sender=None, is_broadcast=False):
         if not any((user_ids, group_ids, is_broadcast)):
             raise ValueError('No recipient is specified')
 
         site_msg = SiteMessageModel.objects.create(
             subject=subject, message=message,
-            is_broadcast=is_broadcast, sender=sender
+            is_broadcast=is_broadcast, sender=sender,
         )
 
         if is_broadcast:
@@ -50,10 +51,10 @@ class SiteMessage:
         return site_msgs_count
 
     @classmethod
-    def get_user_unread_msgs(cls, user_id):
+    def filter_user_msgs(cls, user_id, has_read=False):
         site_msgs = SiteMessageModel.objects.filter(
             m2m_sitemessageusers__user_id=user_id,
-            m2m_sitemessageusers__has_read=False
+            m2m_sitemessageusers__has_read=has_read
         ).distinct().annotate(
             has_read=F('m2m_sitemessageusers__has_read'),
             read_at=F('m2m_sitemessageusers__read_at')
