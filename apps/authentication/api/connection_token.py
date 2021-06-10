@@ -231,6 +231,11 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
 
         if asset and not asset.is_active:
             raise serializers.ValidationError("Asset disabled")
+
+        try:
+            self.check_resource_permission(user, asset, app, system_user)
+        except PermissionDenied:
+            raise serializers.ValidationError('Permission expired or invalid')
         return value, user, system_user, asset, app
 
     @action(methods=['POST'], detail=False, permission_classes=[IsSuperUserOrAppUser], url_path='secret-info/detail')
