@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='SiteMessage',
+            name='SiteMessageUtil',
             fields=[
                 ('created_by', models.CharField(blank=True, max_length=32, null=True, verbose_name='Created by')),
                 ('updated_by', models.CharField(blank=True, max_length=32, null=True, verbose_name='Updated by')),
