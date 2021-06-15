@@ -94,8 +94,14 @@ class CommandExecutionViewSet(ListModelMixin, OrgGenericViewSet):
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))
     ]
-    filterset_fields = ['user__name', 'command', 'run_as__name', 'is_finished']
-    search_fields = ['command', 'user__name', 'run_as__name']
+    filterset_fields = [
+        'user__name', 'user__username', 'command',
+        'run_as__name', 'run_as__username', 'is_finished'
+    ]
+    search_fields = [
+        'command', 'user__name', 'user__username',
+        'run_as__name', 'run_as__username',
+    ]
     ordering = ['-date_created']
 
     def get_queryset(self):

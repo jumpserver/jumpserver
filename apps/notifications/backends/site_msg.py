@@ -1,4 +1,4 @@
-from notifications.site_msg import SiteMessage as Client
+from notifications.site_msg import SiteMessageUtil as Client
 from .base import BackendBase
 
 

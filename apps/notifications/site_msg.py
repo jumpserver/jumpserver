@@ -1,11 +1,12 @@
 from django.db.models import F
+from django.db import transaction
 
 from common.utils.timezone import now
 from users.models import User
 from .models import SiteMessage as SiteMessageModel, SiteMessageUsers
 
 
-class SiteMessage:
+class SiteMessageUtil:
 
     @classmethod
     def send_msg(cls, subject, message, user_ids=(), group_ids=(),
@@ -13,24 +14,24 @@ class SiteMessage:
         if not any((user_ids, group_ids, is_broadcast)):
             raise ValueError('No recipient is specified')
 
-        site_msg = SiteMessageModel.objects.create(
-            subject=subject, message=message,
-            is_broadcast=is_broadcast, sender=sender,
-        )
+        with transaction.atomic():
+            site_msg = SiteMessageModel.objects.create(
+                subject=subject, message=message,
+                is_broadcast=is_broadcast, sender=sender,
+            )
 
-        if is_broadcast:
-            user_ids = User.objects.all().values_list('id', flat=True)
-        else:
-            if group_ids:
-                site_msg.groups.add(*group_ids)
+            if is_broadcast:
+                user_ids = User.objects.all().values_list('id', flat=True)
+            else:
+                if group_ids:
+                    site_msg.groups.add(*group_ids)
 
-                user_ids_from_group = User.groups.through.objects.filter(
-                    usergroup_id__in=group_ids
-                ).values_list('user_id', flat=True)
+                    user_ids_from_group = User.groups.through.objects.filter(
+                        usergroup_id__in=group_ids
+                    ).values_list('user_id', flat=True)
+                    user_ids = [*user_ids, *user_ids_from_group]
 
-                user_ids = [*user_ids, *user_ids_from_group]
-
-        site_msg.users.add(*user_ids)
+            site_msg.users.add(*user_ids)
 
     @classmethod
     def get_user_all_msgs(cls, user_id):
@@ -72,14 +73,14 @@ class SiteMessage:
 
     @classmethod
     def mark_msgs_as_read(cls, user_id, msg_ids):
-        sitemsg_users = SiteMessageUsers.objects.filter(
+        site_msg_users = SiteMessageUsers.objects.filter(
             user_id=user_id, sitemessage_id__in=msg_ids,
             has_read=False
         )
 
-        for sitemsg_user in sitemsg_users:
-            sitemsg_user.has_read = True
-            sitemsg_user.read_at = now()
+        for site_msg_user in site_msg_users:
+            site_msg_user.has_read = True
+            site_msg_user.read_at = now()
 
         SiteMessageUsers.objects.bulk_update(
-            sitemsg_users, fields=('has_read', 'read_at'))
+            site_msg_users, fields=('has_read', 'read_at'))

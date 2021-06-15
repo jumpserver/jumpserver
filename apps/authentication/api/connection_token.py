@@ -6,12 +6,14 @@ from django.conf import settings
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
+from django.utils.translation import ugettext as _
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework import serializers
 
+from authentication.signals import post_auth_failed, post_auth_success
 from common.utils import get_logger, random_string
 from common.drf.api import SerializerMixin2
 from common.permissions import IsSuperUserOrAppUser, IsValidUser, IsSuperUser
@@ -51,10 +53,6 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
         return True
 
     def create_token(self, user, asset, application, system_user, ttl=5*60):
-        if not settings.CONNECTION_TOKEN_ENABLED:
-            raise PermissionDenied('Connection token disabled')
-        if not user:
-            user = self.request.user
         if not self.request.user.is_superuser and user != self.request.user:
             raise PermissionDenied('Only super user can create user token')
         self.check_resource_permission(user, asset, application, system_user)
@@ -233,12 +231,24 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
 
         if asset and not asset.is_active:
             raise serializers.ValidationError("Asset disabled")
+
+        try:
+            self.check_resource_permission(user, asset, app, system_user)
+        except PermissionDenied:
+            raise serializers.ValidationError('Permission expired or invalid')
         return value, user, system_user, asset, app
 
     @action(methods=['POST'], detail=False, permission_classes=[IsSuperUserOrAppUser], url_path='secret-info/detail')
     def get_secret_detail(self, request, *args, **kwargs):
         token = request.data.get('token', '')
-        value, user, system_user, asset, app = self.valid_token(token)
+        try:
+            value, user, system_user, asset, app = self.valid_token(token)
+        except serializers.ValidationError as e:
+            post_auth_failed.send(
+                sender=self.__class__, username='', request=self.request,
+                reason=_('Invalid token')
+            )
+            raise e
 
         data = dict(user=user, system_user=system_user)
         if asset:
@@ -251,6 +261,9 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
             system_user.load_app_more_auth(app.id, user.id)
             data['type'] = 'application'
             data.update(app_detail)
+
+        self.request.session['auth_backend'] = settings.AUTH_BACKEND_AUTH_TOKEN
+        post_auth_success.send(sender=self.__class__, user=user, request=self.request, login_type='T')
 
         serializer = self.get_serializer(data)
         return Response(data=serializer.data, status=200)
