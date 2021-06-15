@@ -83,14 +83,17 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
         return queryset
 
     def to_internal_value(self, data):
-        # 系统用户是必填项
-        system_users = data.get('system_users', [])
-        system_users_display = data.pop('system_users_display', '')
-        for i in range(len(system_users_display)):
-            system_user = SystemUser.objects.filter(name=system_users_display[i]).first()
-            if system_user and system_user.id not in system_users:
-                system_users.append(system_user.id)
-        data['system_users'] = system_users
+        if 'system_users_display' in data:
+            # system_users_display 转化为 system_users
+            system_users = data.get('system_users', [])
+            system_users_display = data.pop('system_users_display')
+
+            for name in system_users_display:
+                system_user = SystemUser.objects.filter(name=name).first()
+                if system_user and system_user.id not in system_users:
+                    system_users.append(system_user.id)
+            data['system_users'] = system_users
+
         return super().to_internal_value(data)
 
     def perform_display_create(self, instance, **kwargs):
