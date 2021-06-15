@@ -204,8 +204,6 @@ class InsecureCommandAlertAPI(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         commands = serializer.validated_data
         for command in commands:
-            if command['risk_level'] >= settings.SECURITY_INSECURE_COMMAND_LEVEL and \
-                    settings.SECURITY_INSECURE_COMMAND and \
-                    settings.SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER:
+            if command['risk_level'] >= settings.SECURITY_INSECURE_COMMAND_LEVEL:
                 CommandAlertMessage(command).publish_async()
         return Response()
