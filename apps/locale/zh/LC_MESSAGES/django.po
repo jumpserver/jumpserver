@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-11 11:06+0800\n"
+"POT-Creation-Date: 2021-06-16 13:26+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -184,7 +184,7 @@ msgstr "格式为逗号分隔的字符串, * 表示匹配所有. "
 #: users/templates/users/_select_user_modal.html:14
 #: xpack/plugins/change_auth_plan/models.py:47
 #: xpack/plugins/change_auth_plan/models.py:278
-#: xpack/plugins/cloud/serializers.py:65
+#: xpack/plugins/cloud/serializers.py:51
 msgid "Username"
 msgstr "用户名"
 
@@ -304,7 +304,7 @@ msgid "Cluster"
 msgstr "集群"
 
 #: applications/serializers/attrs/application_category/db.py:11
-#: ops/models/adhoc.py:146 xpack/plugins/cloud/serializers.py:63
+#: ops/models/adhoc.py:146 xpack/plugins/cloud/serializers.py:49
 msgid "Host"
 msgstr "主机"
 
@@ -314,7 +314,7 @@ msgstr "主机"
 #: applications/serializers/attrs/application_type/oracle.py:11
 #: applications/serializers/attrs/application_type/pgsql.py:11
 #: assets/models/asset.py:188 assets/models/domain.py:53
-#: xpack/plugins/cloud/serializers.py:64
+#: xpack/plugins/cloud/serializers.py:50
 msgid "Port"
 msgstr "端口"
 
@@ -344,7 +344,7 @@ msgstr "目标URL"
 #: xpack/plugins/change_auth_plan/models.py:68
 #: xpack/plugins/change_auth_plan/models.py:190
 #: xpack/plugins/change_auth_plan/models.py:285
-#: xpack/plugins/cloud/serializers.py:67
+#: xpack/plugins/cloud/serializers.py:53
 msgid "Password"
 msgstr "密码"
 
@@ -396,7 +396,7 @@ msgstr "系统用户(动态)"
 
 #: assets/backends/db.py:232 assets/models/asset.py:196
 #: assets/models/cluster.py:19 assets/models/user.py:67 templates/_nav.html:44
-#: xpack/plugins/cloud/models.py:92 xpack/plugins/cloud/serializers.py:160
+#: xpack/plugins/cloud/models.py:92 xpack/plugins/cloud/serializers.py:146
 msgid "Admin user"
 msgstr "管理用户"
 
@@ -715,7 +715,7 @@ msgstr "ssh私钥"
 #: users/templates/users/user_asset_permission.html:41
 #: users/templates/users/user_asset_permission.html:73
 #: users/templates/users/user_asset_permission.html:158
-#: xpack/plugins/cloud/models.py:89 xpack/plugins/cloud/serializers.py:161
+#: xpack/plugins/cloud/models.py:89 xpack/plugins/cloud/serializers.py:147
 msgid "Node"
 msgstr "节点"
 
@@ -1227,16 +1227,28 @@ msgid "SSO"
 msgstr ""
 
 #: audits/signals_handler.py:60
+#, fuzzy
+#| msgid "Private Token"
+msgid "Auth Token"
+msgstr "SSH密钥"
+
+#: audits/signals_handler.py:61
 #: authentication/templates/authentication/login.html:210
 #: notifications/backends/__init__.py:12
 msgid "WeCom"
 msgstr "企业微信"
 
-#: audits/signals_handler.py:61
+#: audits/signals_handler.py:62
 #: authentication/templates/authentication/login.html:215
 #: notifications/backends/__init__.py:13
 msgid "DingTalk"
 msgstr "钉钉"
+
+#: authentication/api/connection_token.py:249
+#, fuzzy
+#| msgid "Invalid"
+msgid "Invalid token"
+msgstr "无效"
 
 #: authentication/api/mfa.py:60
 msgid "Code is invalid"
@@ -1715,7 +1727,7 @@ msgstr "对象"
 msgid "The file content overflowed (The maximum length `{}` bytes)"
 msgstr "文件内容太大 (最大长度 `{}` 字节)"
 
-#: common/drf/parsers/base.py:148
+#: common/drf/parsers/base.py:153
 msgid "Parse file error: {}"
 msgstr "解析文件错误: {}"
 
@@ -1846,7 +1858,7 @@ msgstr "邮件"
 
 #: notifications/backends/__init__.py:14
 msgid "Site message"
-msgstr ""
+msgstr "站内信"
 
 #: ops/api/celery.py:61 ops/api/celery.py:76
 msgid "Waiting task start"
@@ -1993,7 +2005,7 @@ msgstr "任务结束"
 
 #: ops/notifications.py:13
 msgid "Server performance"
-msgstr ""
+msgstr "监控告警"
 
 #: ops/notifications.py:20
 msgid "Disk used more than 80%: {} => {}"
@@ -2535,100 +2547,100 @@ msgstr "启用企业微信认证"
 msgid "Enable DingTalk Auth"
 msgstr "启用钉钉认证"
 
-#: settings/utils/ldap.py:411
+#: settings/utils/ldap.py:417
 msgid "Host or port is disconnected: {}"
 msgstr "主机或端口不可连接: {}"
 
-#: settings/utils/ldap.py:413
+#: settings/utils/ldap.py:419
 msgid "The port is not the port of the LDAP service: {}"
 msgstr "端口不是LDAP服务端口: {}"
 
-#: settings/utils/ldap.py:415
+#: settings/utils/ldap.py:421
 msgid "Please add certificate: {}"
 msgstr "请添加证书"
 
-#: settings/utils/ldap.py:417 settings/utils/ldap.py:444
-#: settings/utils/ldap.py:474 settings/utils/ldap.py:502
+#: settings/utils/ldap.py:423 settings/utils/ldap.py:450
+#: settings/utils/ldap.py:480 settings/utils/ldap.py:508
 msgid "Unknown error: {}"
 msgstr "未知错误: {}"
 
-#: settings/utils/ldap.py:431
+#: settings/utils/ldap.py:437
 msgid "Bind DN or Password incorrect"
 msgstr "绑定DN或密码错误"
 
-#: settings/utils/ldap.py:438
+#: settings/utils/ldap.py:444
 msgid "Please enter Bind DN: {}"
 msgstr "请输入绑定DN: {}"
 
-#: settings/utils/ldap.py:440
+#: settings/utils/ldap.py:446
 msgid "Please enter Password: {}"
 msgstr "请输入密码: {}"
 
-#: settings/utils/ldap.py:442
+#: settings/utils/ldap.py:448
 msgid "Please enter correct Bind DN and Password: {}"
 msgstr "请输入正确的绑定DN和密码: {}"
 
-#: settings/utils/ldap.py:460
+#: settings/utils/ldap.py:466
 msgid "Invalid User OU or User search filter: {}"
 msgstr "不合法的用户OU或用户过滤器: {}"
 
-#: settings/utils/ldap.py:491
+#: settings/utils/ldap.py:497
 msgid "LDAP User attr map not include: {}"
 msgstr "LDAP属性映射没有包含: {}"
 
-#: settings/utils/ldap.py:498
+#: settings/utils/ldap.py:504
 msgid "LDAP User attr map is not dict"
 msgstr "LDAP属性映射不合法"
 
-#: settings/utils/ldap.py:517
+#: settings/utils/ldap.py:523
 msgid "LDAP authentication is not enabled"
 msgstr "LDAP认证没有启用"
 
-#: settings/utils/ldap.py:535
+#: settings/utils/ldap.py:541
 msgid "Error (Invalid LDAP server): {}"
 msgstr "错误 （不合法的LDAP服务器地址）: {}"
 
-#: settings/utils/ldap.py:537
+#: settings/utils/ldap.py:543
 msgid "Error (Invalid Bind DN): {}"
 msgstr "错误（不合法的绑定DN）: {}"
 
-#: settings/utils/ldap.py:539
+#: settings/utils/ldap.py:545
 msgid "Error (Invalid LDAP User attr map): {}"
 msgstr "错误（不合法的LDAP属性映射）: {}"
 
-#: settings/utils/ldap.py:541
+#: settings/utils/ldap.py:547
 msgid "Error (Invalid User OU or User search filter): {}"
 msgstr "错误（不合法的用户OU或用户过滤器）: {}"
 
-#: settings/utils/ldap.py:543
+#: settings/utils/ldap.py:549
 msgid "Error (Not enabled LDAP authentication): {}"
 msgstr "错误（没有启用LDAP认证）: {}"
 
-#: settings/utils/ldap.py:545
+#: settings/utils/ldap.py:551
 msgid "Error (Unknown): {}"
 msgstr "错误（未知）: {}"
 
-#: settings/utils/ldap.py:548
+#: settings/utils/ldap.py:554
 msgid "Succeed: Match {} s user"
 msgstr "成功匹配 {} 个用户"
 
-#: settings/utils/ldap.py:581
+#: settings/utils/ldap.py:587
 msgid "Authentication failed (configuration incorrect): {}"
 msgstr "认证失败（配置错误）: {}"
 
-#: settings/utils/ldap.py:583
+#: settings/utils/ldap.py:589
 msgid "Authentication failed (before login check failed): {}"
 msgstr "认证失败（登录前检查失败）: {}"
 
-#: settings/utils/ldap.py:585
+#: settings/utils/ldap.py:591
 msgid "Authentication failed (username or password incorrect): {}"
 msgstr "认证失败 (用户名或密码不正确): {}"
 
-#: settings/utils/ldap.py:587
+#: settings/utils/ldap.py:593
 msgid "Authentication failed (Unknown): {}"
 msgstr "认证失败: (未知): {}"
 
-#: settings/utils/ldap.py:590
+#: settings/utils/ldap.py:596
 msgid "Authentication success: {}"
 msgstr "认证成功: {}"
 
@@ -2817,7 +2829,7 @@ msgstr "数据库应用"
 msgid "Perms"
 msgstr "权限管理"
 
-#: templates/_nav.html:97
+#: templates/_nav.html:97 terminal/notifications.py:15
 msgid "Sessions"
 msgstr "会话管理"
 
@@ -2841,7 +2853,7 @@ msgstr "Web终端"
 msgid "File manager"
 msgstr "文件管理"
 
-#: templates/_nav.html:110 terminal/apps.py:9 terminal/notifications.py:15
+#: templates/_nav.html:110 terminal/apps.py:9
 #: terminal/serializers/session.py:40
 msgid "Terminal"
 msgstr "终端"
@@ -3273,8 +3285,8 @@ msgid "Replay storage"
 msgstr "录像存储"
 
 #: terminal/notifications.py:35
-msgid "Terminal command alert"
-msgstr "终端命令告警"
+msgid "Danger command alert"
+msgstr "危险命令告警"
 
 #: terminal/notifications.py:44
 #, python-format
@@ -3314,8 +3326,8 @@ msgid ""
 msgstr "危险命令告警: [%(name)s->%(login_from)s@%(remote_addr)s] $%(command)s"
 
 #: terminal/notifications.py:97
-msgid "Batch command alert"
-msgstr "批量命令告警"
+msgid "Batch danger command alert"
+msgstr "批量危险命令告警"
 
 #: terminal/notifications.py:108
 #, python-format
@@ -4051,7 +4063,7 @@ msgid "Security token validation"
 msgstr "安全令牌验证"
 
 #: users/templates/users/_base_otp.html:14 xpack/plugins/cloud/models.py:78
-#: xpack/plugins/cloud/serializers.py:159
+#: xpack/plugins/cloud/serializers.py:145
 msgid "Account"
 msgstr "账户"
 
@@ -4792,7 +4804,7 @@ msgstr "云服务商"
 msgid "Cloud account"
 msgstr "云账号"
 
-#: xpack/plugins/cloud/models.py:81 xpack/plugins/cloud/serializers.py:140
+#: xpack/plugins/cloud/models.py:81 xpack/plugins/cloud/serializers.py:126
 msgid "Regions"
 msgstr "地域"
 
@@ -4800,7 +4812,7 @@ msgstr "地域"
 msgid "Hostname strategy"
 msgstr "主机名策略"
 
-#: xpack/plugins/cloud/models.py:95 xpack/plugins/cloud/serializers.py:163
+#: xpack/plugins/cloud/models.py:95 xpack/plugins/cloud/serializers.py:149
 msgid "Always update"
 msgstr "总是更新"
 
@@ -4992,24 +5004,20 @@ msgstr ""
 msgid "Subscription ID"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers.py:49
-msgid "This field is required"
-msgstr "这个字段是必填项"
-
-#: xpack/plugins/cloud/serializers.py:138
+#: xpack/plugins/cloud/serializers.py:124
 msgid "History count"
 msgstr "执行次数"
 
-#: xpack/plugins/cloud/serializers.py:139
+#: xpack/plugins/cloud/serializers.py:125
 msgid "Instance count"
 msgstr "实例个数"
 
-#: xpack/plugins/cloud/serializers.py:162
+#: xpack/plugins/cloud/serializers.py:148
 #: xpack/plugins/gathered_user/serializers.py:20
 msgid "Periodic display"
 msgstr "定时执行"
 
-#: xpack/plugins/cloud/utils.py:65
+#: xpack/plugins/cloud/utils.py:64
 msgid "Account unavailable"
 msgstr "账户无效"
 
@@ -5096,3 +5104,9 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Terminal command alert"
+#~ msgstr "终端命令告警"
+
+#~ msgid "This field is required"
+#~ msgstr "这个字段是必填项"

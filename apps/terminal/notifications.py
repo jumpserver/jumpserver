@@ -12,7 +12,7 @@ logger = get_logger(__name__)
 __all__ = ('CommandAlertMessage', 'CommandExecutionAlert')
 
 CATEGORY = 'terminal'
-CATEGORY_LABEL = _('Terminal')
+CATEGORY_LABEL = _('Sessions')
 
 
 class CommandAlertMixin:
@@ -32,7 +32,7 @@ class CommandAlertMixin:
 class CommandAlertMessage(CommandAlertMixin, SystemMessage):
     category = CATEGORY
     category_label = CATEGORY_LABEL
-    message_type_label = _('Terminal command alert')
+    message_type_label = _('Danger command alert')
 
     def __init__(self, command):
         self.command = command
@@ -94,7 +94,7 @@ class CommandAlertMessage(CommandAlertMixin, SystemMessage):
 class CommandExecutionAlert(CommandAlertMixin, SystemMessage):
     category = CATEGORY
     category_label = CATEGORY_LABEL
-    message_type_label = _('Batch command alert')
+    message_type_label = _('Batch danger command alert')
 
     def __init__(self, command):
         self.command = command
