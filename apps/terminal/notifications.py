@@ -83,7 +83,7 @@ class CommandAlertMessage(CommandAlertMixin, SystemMessage):
             'command': input
         }
 
-        message = self._get_message(command)
+        message = self._get_message()
 
         return {
             'subject': subject,
@@ -134,7 +134,7 @@ class CommandExecutionAlert(CommandAlertMixin, SystemMessage):
         subject = _("Insecure Web Command Execution Alert: [%(name)s]") % {
             'name': command['user'],
         }
-        message = self._get_message(command)
+        message = self._get_message()
 
         return {
             'subject': subject,
