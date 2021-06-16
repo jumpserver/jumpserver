@@ -16,6 +16,11 @@ CATEGORY_LABEL = _('Sessions')
 
 
 class CommandAlertMixin:
+    def get_dingtalk_msg(self) -> str:
+        msg = self._get_message()
+        msg = msg.replace('<br>', '')
+        return msg
+
     @classmethod
     def post_insert_to_db(cls, subscription: SystemMsgSubscription):
         """
