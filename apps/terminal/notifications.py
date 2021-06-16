@@ -119,7 +119,6 @@ class CommandExecutionAlert(CommandAlertMixin, SystemMessage):
 
         assets = ', '.join([str(asset) for asset in command['assets']])
         message = _("""
-                            <br>
                             Assets: %(assets)s
                             <br>
                             User: %(user)s
