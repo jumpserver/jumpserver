@@ -26,6 +26,7 @@ from common.const import LDAP_AD_ACCOUNT_DISABLE
 from common.utils import timeit, get_logger
 from users.utils import construct_user_email
 from users.models import User
+from orgs.models import Organization
 from authentication.backends.ldap import LDAPAuthorizationBackend, LDAPUser
 
 logger = get_logger(__file__)
@@ -364,12 +365,17 @@ class LDAPImportUtil(object):
     def perform_import(self, users):
         logger.info('Start perform import ldap users, count: {}'.format(len(users)))
         errors = []
+        instances = []
         for user in users:
             try:
-                self.update_or_create(user)
+                obj, created = self.update_or_create(user)
+                if created:
+                    instances.append(user)
             except Exception as e:
                 errors.append({user['username']: str(e)})
                 logger.error(e)
+        # 默认添加用户到 Default 组织
+        Organization.default().members.add(*instances)
         logger.info('End perform import ldap users')
         return errors
 
