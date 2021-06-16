@@ -108,11 +108,7 @@ class Message(metaclass=MessageType):
         }
 
     def get_site_msg_msg(self) -> dict:
-        msg = self.get_common_msg()
-        return {
-            'subject': msg,
-            'message': msg
-        }
+        return self.get_email_msg()
 
 
 class SystemMessage(Message):
