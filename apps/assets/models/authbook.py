@@ -4,6 +4,7 @@
 from django.db import models, transaction
 from django.db.models import Max
 from django.utils.translation import ugettext_lazy as _
+from rest_framework.exceptions import PermissionDenied
 
 from orgs.mixins.models import OrgManager
 from .base import BaseUser
@@ -14,7 +15,7 @@ __all__ = ['AuthBook']
 class AuthBookQuerySet(models.QuerySet):
     def delete(self):
         if self.count() > 1:
-            raise PermissionError(_("Bulk delete deny"))
+            raise PermissionDenied(_("Bulk delete deny"))
         return super().delete()
 
 

@@ -4,6 +4,7 @@ from django.utils.translation import ugettext as _
 from functools import reduce
 from django.db.models import F, CharField, Value, IntegerField, Q, Count
 from django.db.models.functions import Concat
+from rest_framework.exceptions import PermissionDenied
 
 from common.utils import get_object_or_none
 from orgs.utils import current_org
@@ -250,7 +251,7 @@ class AdminUserBackend(DBBackend):
         )
 
     def _perform_delete_by_union_id(self, union_id_cleaned):
-        raise PermissionError(_("Could not remove asset admin user"))
+        raise PermissionDenied(_("Could not remove asset admin user"))
 
     def all(self):
         qs = self.model.objects.all().annotate(
@@ -314,7 +315,7 @@ class AuthbookBackend(DBBackend):
         authbook_id, asset_id = union_id_cleaned
         authbook = get_object_or_none(AuthBook, pk=authbook_id)
         if authbook.is_latest:
-            raise PermissionError(_("Latest version could not be delete"))
+            raise PermissionDenied(_("Latest version could not be delete"))
         AuthBook.objects.filter(id=authbook_id).delete()
 
     def all(self):
