@@ -370,7 +370,7 @@ class LDAPImportUtil(object):
             try:
                 obj, created = self.update_or_create(user)
                 if created:
-                    instances.append(user)
+                    instances.append(obj)
             except Exception as e:
                 errors.append({user['username']: str(e)})
                 logger.error(e)
