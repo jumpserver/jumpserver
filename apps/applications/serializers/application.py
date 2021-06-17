@@ -105,4 +105,4 @@ class ApplicationUserSerializer(SystemUserSerializer):
 class ApplicationUserWithAuthInfoSerializer(ApplicationUserSerializer):
 
     class Meta(ApplicationUserSerializer.Meta):
-        fields = ApplicationUserSerializer.Meta.fields + ['password']
+        fields = ApplicationUserSerializer.Meta.fields + ['password', 'token']
