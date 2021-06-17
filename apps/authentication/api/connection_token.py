@@ -155,8 +155,14 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericView
         data = ''
         for k, v in options.items():
             data += f'{k}:{v}\n'
+        if asset:
+            name = asset.hostname
+        elif application:
+            name = application.name
+        else:
+            name = '*'
         response = HttpResponse(data, content_type='application/octet-stream')
-        filename = "{}-{}-jumpserver.rdp".format(user.username, asset.hostname)
+        filename = "{}-{}-jumpserver.rdp".format(user.username, name)
         filename = urllib.parse.quote(filename)
         response['Content-Disposition'] = 'attachment; filename*=UTF-8\'\'%s' % filename
         return response
