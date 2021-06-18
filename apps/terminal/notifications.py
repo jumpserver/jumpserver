@@ -32,14 +32,16 @@ class CommandAlertMixin:
         db_setting = Setting.objects.filter(name='SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER').first()
         if db_setting:
             emails = db_setting.value
-        emails = emails or settings.SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER
+        else:
+            emails = settings.SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER
         emails = emails.split(',')
         emails = [email.strip().strip('"') for email in emails]
 
         users = User.objects.filter(email__in=emails)
-        subscription.users.add(*users)
-        subscription.receive_backends = [BACKEND.EMAIL]
-        subscription.save()
+        if users:
+            subscription.users.add(*users)
+            subscription.receive_backends = [BACKEND.EMAIL]
+            subscription.save()
 
 
 class CommandAlertMessage(CommandAlertMixin, SystemMessage):
