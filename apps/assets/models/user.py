@@ -277,6 +277,8 @@ class SystemUser(ProtocolMixin, BaseUser):
         common = 'common', _('Common user')
         admin = 'admin', _('Admin user')
         dynamic = 'dynamic', _('Dynamic user')
+        manual = 'manual', _('Manual user')
+        auto_push = 'auto_push', _('Auto pushed user')
 
     username_same_with_user = models.BooleanField(default=False, verbose_name=_("Username same with user"))
     nodes = models.ManyToManyField('assets.Node', blank=True, verbose_name=_("Nodes"))
