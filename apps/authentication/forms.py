@@ -3,7 +3,7 @@
 
 from django import forms
 from django.conf import settings
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 from captcha.fields import CaptchaField, CaptchaTextInput
 
 
@@ -23,11 +23,16 @@ class UserLoginForm(forms.Form):
         max_length=1024, strip=False
     )
     auto_login = forms.BooleanField(
-        label=_("{} days auto login").format(days_auto_login or 1),
-        required=False, initial=False, widget=forms.CheckboxInput(
+        required=False, initial=False,
+        widget=forms.CheckboxInput(
             attrs={'disabled': disable_days_auto_login}
         )
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        auto_login_field = self.fields['auto_login']
+        auto_login_field.label = _("{} days auto login").format(self.days_auto_login or 1)
 
     def confirm_login_allowed(self, user):
         if not user.is_staff:
