@@ -15,6 +15,7 @@ from orgs.hands import set_current_org, Node, get_current_org
 from perms.models import (AssetPermission, ApplicationPermission)
 from users.models import UserGroup, User
 from common.const.signals import PRE_REMOVE, POST_REMOVE
+from common.decorator import on_transaction_commit
 from common.signals import django_ready
 from common.utils import get_logger
 from common.utils.connection import RedisPubSub
@@ -167,3 +168,13 @@ def on_org_user_changed(action, instance, reverse, pk_set, **kwargs):
 
             leaved_users = set(pk_set) - set(org.members.filter(id__in=user_pk_set).values_list('id', flat=True))
             _clear_users_from_org(org, leaved_users)
+
+
+@receiver(post_save, sender=User)
+@on_transaction_commit
+def on_user_created_set_default_org(sender, instance, created, **kwargs):
+    if not created:
+        return
+    if instance.orgs.count() > 0:
+        return
+    Organization.default().members.add(instance)
