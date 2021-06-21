@@ -365,17 +365,12 @@ class LDAPImportUtil(object):
     def perform_import(self, users):
         logger.info('Start perform import ldap users, count: {}'.format(len(users)))
         errors = []
-        instances = []
         for user in users:
             try:
-                obj, created = self.update_or_create(user)
-                if created:
-                    instances.append(obj)
+                self.update_or_create(user)
             except Exception as e:
                 errors.append({user['username']: str(e)})
                 logger.error(e)
-        # 默认添加用户到 Default 组织
-        Organization.default().members.add(*instances)
         logger.info('End perform import ldap users')
         return errors
 
