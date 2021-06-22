@@ -7,8 +7,7 @@ from collections.abc import Iterable
 from smtplib import SMTPSenderRefused
 from rest_framework import generics
 from rest_framework.views import Response, APIView
-from django.conf import settings
-from django.core.mail import send_mail, get_connection
+from orgs.models import Organization
 from django.utils.translation import ugettext_lazy as _
 
 from ..utils import (
@@ -17,11 +16,12 @@ from ..utils import (
 )
 from ..tasks import sync_ldap_user
 from common.permissions import IsOrgAdmin, IsSuperUser
-from common.utils import get_logger
+from common.utils import get_logger, is_uuid
 from ..serializers import (
     MailTestSerializer, LDAPTestConfigSerializer, LDAPUserSerializer,
     PublicSettingSerializer, LDAPTestLoginSerializer, SettingsSerializer
 )
+from orgs.utils import current_org
 from users.models import User
 
 logger = get_logger(__file__)
@@ -170,6 +170,14 @@ class LDAPUserListApi(generics.ListAPIView):
 class LDAPUserImportAPI(APIView):
     permission_classes = (IsSuperUser,)
 
+    def get_org(self):
+        org_id = self.request.data.get('org_id')
+        if is_uuid(org_id):
+            org = Organization.objects.get(id=org_id)
+        else:
+            org = current_org
+        return org
+
     def get_ldap_users(self):
         username_list = self.request.data.get('username_list', [])
         cache_police = self.request.query_params.get('cache_police', True)
@@ -188,12 +196,15 @@ class LDAPUserImportAPI(APIView):
         if users is None:
             return Response({'msg': _('Get ldap users is None')}, status=400)
 
-        errors = LDAPImportUtil().perform_import(users)
+        org = self.get_org()
+        errors = LDAPImportUtil().perform_import(users, org)
         if errors:
             return Response({'errors': errors}, status=400)
 
         count = users if users is None else len(users)
-        return Response({'msg': _('Imported {} users successfully').format(count)})
+        return Response({
+            'msg': _('Imported {} users successfully (Organization: {})').format(count, org)
+        })
 
 
 class LDAPCacheRefreshAPI(generics.RetrieveAPIView):
