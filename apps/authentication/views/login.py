@@ -44,7 +44,7 @@ class UserLoginView(mixins.AuthMixin, FormView):
         # show jumpserver login page if request http://{JUMP-SERVER}/?admin=1
         if self.request.GET.get("admin", 0):
             return None
-        next_url = request.GET.get('next') or ''
+        next_url = request.GET.get('next') or '/'
         auth_type = ''
         auth_url = ''
         if settings.AUTH_OPENID:
