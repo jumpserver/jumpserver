@@ -362,15 +362,19 @@ class LDAPImportUtil(object):
         )
         return obj, created
 
-    def perform_import(self, users):
+    def perform_import(self, users, org=None):
         logger.info('Start perform import ldap users, count: {}'.format(len(users)))
         errors = []
+        objs = []
         for user in users:
             try:
-                self.update_or_create(user)
+                obj, created = self.update_or_create(user)
+                objs.append(obj)
             except Exception as e:
                 errors.append({user['username']: str(e)})
                 logger.error(e)
+        if org and not org.is_root():
+            org.members.add(*objs)
         logger.info('End perform import ldap users')
         return errors
 
