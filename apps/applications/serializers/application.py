@@ -6,11 +6,12 @@ from django.utils.translation import ugettext_lazy as _
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.drf.serializers import MethodSerializer
 from .attrs import category_serializer_classes_mapping, type_serializer_classes_mapping
-
+from assets.serializers import SystemUserSerializer
 from .. import models
 
 __all__ = [
     'ApplicationSerializer', 'ApplicationSerializerMixin',
+    'ApplicationUserSerializer', 'ApplicationUserWithAuthInfoSerializer'
 ]
 
 
@@ -66,3 +67,42 @@ class ApplicationSerializer(ApplicationSerializerMixin, BulkOrgResourceModelSeri
         _attrs.update(attrs)
         return _attrs
 
+
+class ApplicationUserSerializer(SystemUserSerializer):
+    application_name = serializers.SerializerMethodField(label=_('Application name'))
+    application_category = serializers.SerializerMethodField(label=_('Application category'))
+    application_type = serializers.SerializerMethodField(label=_('Application type'))
+
+    class Meta(SystemUserSerializer.Meta):
+        model = models.ApplicationUser
+        fields_mini = [
+            'id', 'application_name', 'application_category', 'application_type', 'name', 'username'
+        ]
+        fields_small = fields_mini + [
+            'protocol', 'login_mode', 'login_mode_display', 'priority',
+            "username_same_with_user", 'comment',
+        ]
+        fields = fields_small
+        extra_kwargs = {
+            'login_mode_display': {'label': _('Login mode display')},
+            'created_by': {'read_only': True},
+        }
+
+    @property
+    def application(self):
+        return self.context['application']
+
+    def get_application_name(self, obj):
+        return self.application.name
+
+    def get_application_category(self, obj):
+        return self.application.get_category_display()
+
+    def get_application_type(self, obj):
+        return self.application.get_type_display()
+
+
+class ApplicationUserWithAuthInfoSerializer(ApplicationUserSerializer):
+
+    class Meta(ApplicationUserSerializer.Meta):
+        fields = ApplicationUserSerializer.Meta.fields + ['password', 'token']

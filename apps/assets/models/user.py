@@ -252,12 +252,16 @@ class AuthMixin:
         if user_id:
             user = get_object_or_none(User, pk=user_id)
 
-        if self.username_same_with_user and not username and user:
-            username = user.username
+        _username = self.username
+        if self.username_same_with_user:
+            if user and not username:
+                _username = user.username
+            else:
+                _username = username
 
         # 加载某个资产的特殊配置认证信息
         try:
-            self.load_asset_special_auth(asset, username)
+            self.load_asset_special_auth(asset, _username)
         except Exception as e:
             logger.error('Load special auth Error: ', e)
             pass

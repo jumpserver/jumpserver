@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.models import OrgModelMixin
 from common.mixins import CommonModelMixin
-from assets.models import Asset
+from assets.models import Asset, SystemUser
 from .. import const
 
 
@@ -68,3 +68,8 @@ class Application(CommonModelMixin, OrgModelMixin):
             raise ValueError("Remote App not has asset attr")
         asset = Asset.objects.filter(id=asset_id).first()
         return asset
+
+
+class ApplicationUser(SystemUser):
+    class Meta:
+        proxy = True

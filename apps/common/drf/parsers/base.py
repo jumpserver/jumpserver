@@ -47,8 +47,13 @@ class BaseFileParser(BaseParser):
     def convert_to_field_names(self, column_titles):
         fields_map = {}
         fields = self.serializer_fields
-        fields_map.update({v.label: k for k, v in fields.items()})
-        fields_map.update({k: k for k, _ in fields.items()})
+        for k, v in fields.items():
+            if v.read_only:
+                continue
+            fields_map.update({
+                v.label: k,
+                k: k
+            })
         field_names = [
             fields_map.get(column_title.strip('*'), '')
             for column_title in column_titles

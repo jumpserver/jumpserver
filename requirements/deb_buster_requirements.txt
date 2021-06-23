@@ -12,7 +12,7 @@ default-mysql-client
 default-libmysqlclient-dev
 
 # Pillow
-# libffi-dev
+libffi-dev
 # libfreetype6-dev
 # libfribidi-dev
 # libharfbuzz-dev
@@ -36,4 +36,3 @@ sqlite
 
 # ansible
 sshpass
-
