@@ -24,7 +24,7 @@ def migrate_admin_user_to_system_user(apps, schema_editor):
             protocol = 'rdp'
         kwargs.update({
             'name': admin_user.name + '(admin_user_' + str(admin_user.id)[:7] + ')',
-            'type': 'devops',
+            'type': 'admin',
             'protocol': protocol,
             'auto_push': False,
         })

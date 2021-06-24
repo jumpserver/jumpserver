@@ -21,7 +21,6 @@ __all__ = ['AdminUser', 'SystemUser']
 logger = logging.getLogger(__name__)
 
 
-
 class ProtocolMixin:
     protocol: str
 
@@ -35,15 +34,15 @@ class ProtocolMixin:
     PROTOCOL_POSTGRESQL = 'postgresql'
     PROTOCOL_K8S = 'k8s'
     PROTOCOL_CHOICES = (
-        (PROTOCOL_SSH, 'ssh'),
-        (PROTOCOL_RDP, 'rdp'),
-        (PROTOCOL_TELNET, 'telnet'),
-        (PROTOCOL_VNC, 'vnc'),
-        (PROTOCOL_MYSQL, 'mysql'),
-        (PROTOCOL_ORACLE, 'oracle'),
-        (PROTOCOL_MARIADB, 'mariadb'),
-        (PROTOCOL_POSTGRESQL, 'postgresql'),
-        (PROTOCOL_K8S, 'k8s'),
+        (PROTOCOL_SSH, 'SSH'),
+        (PROTOCOL_RDP, 'RDP'),
+        (PROTOCOL_TELNET, 'Telnet'),
+        (PROTOCOL_VNC, 'VNC'),
+        (PROTOCOL_MYSQL, 'MySQL'),
+        (PROTOCOL_ORACLE, 'Oracle'),
+        (PROTOCOL_MARIADB, 'MariaDB'),
+        (PROTOCOL_POSTGRESQL, 'PostgreSQL'),
+        (PROTOCOL_K8S, 'K8S'),
     )
 
     SUPPORT_PUSH_PROTOCOLS = [PROTOCOL_SSH, PROTOCOL_RDP]

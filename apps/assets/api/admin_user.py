@@ -9,7 +9,7 @@ from orgs.mixins import generics
 
 from common.utils import get_logger
 from ..hands import IsOrgAdmin
-from ..models import AdminUser, Asset
+from ..models import SystemUser, Asset, AdminUser
 from .. import serializers
 from ..tasks import test_admin_user_connectivity_manual
 
@@ -26,7 +26,7 @@ class AdminUserViewSet(OrgBulkModelViewSet):
     """
     Admin user api set, for add,delete,update,list,retrieve resource
     """
-    model = AdminUser
+    model = SystemUser
     filterset_fields = ("name", "username")
     search_fields = filterset_fields
     serializer_class = serializers.AdminUserSerializer
@@ -37,17 +37,9 @@ class AdminUserViewSet(OrgBulkModelViewSet):
     }
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().filter(type=SystemUser.Type.admin)
         queryset = queryset.annotate(assets_amount=Count('assets'))
         return queryset
-
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        has_related_asset = instance.assets.exists()
-        if has_related_asset:
-            data = {'msg': _('Deleted failed, There are related assets')}
-            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
-        return super().destroy(request, *args, **kwargs)
 
 
 class AdminUserAuthApi(generics.UpdateAPIView):

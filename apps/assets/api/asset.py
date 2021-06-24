@@ -33,7 +33,7 @@ class AssetViewSet(FilterAssetByNodeMixin, OrgBulkModelViewSet):
     filterset_fields = {
         'hostname': ['exact'],
         'ip': ['exact'],
-        'systemuser__id': ['exact'],
+        'system_users__id': ['exact'],
         'platform__base': ['exact'],
         'is_active': ['exact'],
         'protocols': ['exact', 'icontains']
