@@ -32,7 +32,8 @@ class SystemUserViewSet(OrgBulkModelViewSet):
     filterset_fields = {
         'name': ['exact'],
         'username': ['exact'],
-        'protocol': ['exact', 'in']
+        'protocol': ['exact', 'in'],
+        'type': ['exact', 'in'],
     }
     search_fields = filterset_fields
     serializer_class = serializers.SystemUserSerializer

@@ -16,7 +16,7 @@ class AdminUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
 
     class Meta:
         model = AdminUser
-        fields_mini  = ['id', 'name', 'username']
+        fields_mini = ['id', 'name', 'username']
         fields_write_only = ['password', 'private_key', 'public_key']
         fields_small = fields_mini + fields_write_only + [
             'date_created', 'date_updated',

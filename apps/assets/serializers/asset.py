@@ -5,7 +5,7 @@ from django.core.validators import RegexValidator
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-from ..models import Asset, Node, Platform
+from ..models import Asset, Node, Platform, SystemUser
 from .base import ConnectivitySerializer
 
 __all__ = [
@@ -64,6 +64,9 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     platform = serializers.SlugRelatedField(
         slug_field='name', queryset=Platform.objects.all(), label=_("Platform")
     )
+    admin_user = serializers.PrimaryKeyRelatedField(
+        queryset=SystemUser.objects, label=_('Admin user')
+    )
     protocols = ProtocolsField(label=_('Protocols'), required=False, default=['ssh/22'])
     domain_display = serializers.ReadOnlyField(source='domain.name', label=_('Domain name'))
     nodes_display = serializers.ListField(child=serializers.CharField(), label=_('Nodes name'), required=False)
@@ -82,7 +85,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'created_by', 'date_created', 'hardware_info',
         ]
         fields_fk = [
-            'domain', 'domain_display', 'platform'
+            'domain', 'domain_display', 'platform', 'admin_user',
         ]
         fk_only_fields = {
             'platform': ['name']
@@ -104,6 +107,11 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'hardware_info': {'label': _('Hardware info')},
             'org_name': {'label': _('Org name')}
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['admin_user'].queryset = self.fields['admin_user'].queryset\
+            .filter(type=SystemUser.Type.admin)
 
     @classmethod
     def setup_eager_loading(cls, queryset):
@@ -143,15 +151,19 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     def create(self, validated_data):
         self.compatible_with_old_protocol(validated_data)
         nodes_display = validated_data.pop('nodes_display', '')
+        admin_user = validated_data.pop('admin_user', '')
         instance = super().create(validated_data)
         self.perform_nodes_display_create(instance, nodes_display)
+        instance.admin_user = admin_user
         return instance
 
     def update(self, instance, validated_data):
         nodes_display = validated_data.pop('nodes_display', '')
         self.compatible_with_old_protocol(validated_data)
+        admin_user = validated_data.pop('admin_user', '')
         instance = super().update(instance, validated_data)
         self.perform_nodes_display_create(instance, nodes_display)
+        instance.admin_user = admin_user
         return instance
 
 

@@ -9,6 +9,7 @@ from collections import OrderedDict
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from rest_framework.exceptions import ValidationError
 
 from common.fields.model import JsonDictTextField
 from common.utils import lazyproperty
@@ -229,11 +230,20 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
 
     @property
     def admin_user(self):
-        return self.systemuser_set.all().filter(type='admin').first()
+        return self.system_users.filter(type='admin').first()
 
     @admin_user.setter
-    def admin_user(self, value):
-        pass
+    def admin_user(self, system_user):
+        from .authbook import AuthBook
+        if not system_user:
+            return
+        if system_user.type != 'admin':
+            raise ValidationError('System user should be type admin')
+        AuthBook.objects.filter(asset=self, system_user__type='admin')\
+            .exclude(system_user=system_user)\
+            .delete()
+        system_user.assets.add(self)
+        # self.system_users.add(system_user)
 
     @property
     def is_valid(self):

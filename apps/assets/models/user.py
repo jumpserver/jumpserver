@@ -21,54 +21,6 @@ __all__ = ['AdminUser', 'SystemUser']
 logger = logging.getLogger(__name__)
 
 
-# Todo: 准备废弃
-class AdminUser(BaseUser):
-    """
-    A privileged user that ansible can use it to push system user and so on
-    """
-    BECOME_METHOD_CHOICES = (
-        ('sudo', 'sudo'),
-        ('su', 'su'),
-    )
-    become = models.BooleanField(default=True)
-    become_method = models.CharField(choices=BECOME_METHOD_CHOICES, default='sudo', max_length=4)
-    become_user = models.CharField(default='root', max_length=64)
-    _become_pass = models.CharField(default='', blank=True, max_length=128)
-    CONNECTIVITY_CACHE_KEY = '_ADMIN_USER_CONNECTIVE_{}'
-    _prefer = "admin_user"
-
-    def __str__(self):
-        return self.name
-
-    @property
-    def become_pass(self):
-        password = signer.unsign(self._become_pass)
-        if password:
-            return password
-        else:
-            return ""
-
-    @become_pass.setter
-    def become_pass(self, password):
-        self._become_pass = signer.sign(password)
-
-    @property
-    def become_info(self):
-        if self.become:
-            info = {
-                "method": self.become_method,
-                "user": self.become_user,
-                "pass": self.become_pass,
-            }
-        else:
-            info = None
-        return info
-
-    class Meta:
-        ordering = ['name']
-        unique_together = [('name', 'org_id')]
-        verbose_name = _("Admin user")
-
 
 class ProtocolMixin:
     protocol: str
@@ -278,17 +230,16 @@ class SystemUser(ProtocolMixin, BaseUser):
     )
 
     class Type(ChoiceSet):
-        common = 'common', _('Common user')
+        # Todo: 翻译
+        common = 'common', '普通用户'
         admin = 'admin', _('Admin user')
-        dynamic = 'dynamic', _('Dynamic user')
-        manual = 'manual', _('Manual user')
-        auto_push = 'auto_push', _('Auto pushed user')
 
     username_same_with_user = models.BooleanField(default=False, verbose_name=_("Username same with user"))
     nodes = models.ManyToManyField('assets.Node', blank=True, verbose_name=_("Nodes"))
     assets = models.ManyToManyField(
         'assets.Asset', blank=True, verbose_name=_("Assets"),
-        through='assets.AuthBook', through_fields=['system_user', 'asset']
+        through='assets.AuthBook', through_fields=['system_user', 'asset'],
+        related_name='system_users'
     )
     users = models.ManyToManyField('users.User', blank=True, verbose_name=_("Users"))
     groups = models.ManyToManyField('users.UserGroup', blank=True, verbose_name=_("User groups"))
@@ -305,7 +256,6 @@ class SystemUser(ProtocolMixin, BaseUser):
     home = models.CharField(max_length=4096, default='', verbose_name=_('Home'), blank=True)
     system_groups = models.CharField(default='', max_length=4096, verbose_name=_('System groups'), blank=True)
     ad_domain = models.CharField(default='', max_length=256)
-    _prefer = 'system_user'
 
     def __str__(self):
         username = self.username
@@ -370,3 +320,52 @@ class SystemUser(ProtocolMixin, BaseUser):
         ordering = ['name']
         unique_together = [('name', 'org_id')]
         verbose_name = _("System user")
+
+
+# Todo: 准备废弃
+class AdminUser(BaseUser):
+    """
+    A privileged user that ansible can use it to push system user and so on
+    """
+    BECOME_METHOD_CHOICES = (
+        ('sudo', 'sudo'),
+        ('su', 'su'),
+    )
+    become = models.BooleanField(default=True)
+    become_method = models.CharField(choices=BECOME_METHOD_CHOICES, default='sudo', max_length=4)
+    become_user = models.CharField(default='root', max_length=64)
+    _become_pass = models.CharField(default='', blank=True, max_length=128)
+    CONNECTIVITY_CACHE_KEY = '_ADMIN_USER_CONNECTIVE_{}'
+    _prefer = "admin_user"
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def become_pass(self):
+        password = signer.unsign(self._become_pass)
+        if password:
+            return password
+        else:
+            return ""
+
+    @become_pass.setter
+    def become_pass(self, password):
+        self._become_pass = signer.sign(password)
+
+    @property
+    def become_info(self):
+        if self.become:
+            info = {
+                "method": self.become_method,
+                "user": self.become_user,
+                "pass": self.become_pass,
+            }
+        else:
+            info = None
+        return info
+
+    class Meta:
+        ordering = ['name']
+        unique_together = [('name', 'org_id')]
+        verbose_name = _("Admin user")
