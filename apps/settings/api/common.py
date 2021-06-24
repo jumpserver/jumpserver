@@ -81,7 +81,7 @@ class PublicSettingApi(generics.RetrieveAPIView):
         logo_urls = {
             'logo_logout': static('img/logo.png'),
             'logo_index': static('img/logo_text.png'),
-            'login_image': static('img/login_image.png'),
+            'login_image': static('img/login_image.jpg'),
             'favicon': static('img/facio.ico')
         }
         if not settings.XPACK_ENABLED:
