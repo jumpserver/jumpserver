@@ -127,7 +127,7 @@ class ReplayStorageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ReplayStorage
-        fields = ['id', 'name', 'type', 'meta', 'comment']
+        fields = ['id', 'name', 'type', 'meta', 'is_default', 'comment']
 
     def validate_meta(self, meta):
         _meta = self.instance.meta if self.instance else {}
@@ -155,6 +155,12 @@ class ReplayStorageSerializer(serializers.ModelSerializer):
         else:
             serializer = serializer_class
         return serializer
+
+    def save(self, **kwargs):
+        instance = super().save(**kwargs)
+        if self.validated_data.get('is_default', False):
+            ReplayStorage.objects.exclude(id=instance.id).update(is_default=False)
+        return instance
 
 
 # Command storage serializers
@@ -212,7 +218,7 @@ class CommandStorageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CommandStorage
-        fields = ['id', 'name', 'type', 'meta', 'comment']
+        fields = ['id', 'name', 'type', 'meta', 'is_default', 'comment']
 
     def validate_meta(self, meta):
         _meta = self.instance.meta if self.instance else {}
@@ -240,3 +246,9 @@ class CommandStorageSerializer(serializers.ModelSerializer):
         else:
             serializer = serializer_class
         return serializer
+
+    def save(self, **kwargs):
+        instance = super().save(**kwargs)
+        if self.validated_data.get('is_default', False):
+            CommandStorage.objects.exclude(id=instance.id).update(is_default=False)
+        return instance
