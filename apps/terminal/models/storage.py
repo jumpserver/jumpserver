@@ -31,6 +31,14 @@ class CommonStorageModelMixin(models.Model):
     def __str__(self):
         return self.name
 
+    def set_to_default(self):
+        self.is_default = True
+        self.save()
+        self.__class__.objects.select_for_update()\
+            .filter(is_default=True)\
+            .exclude(id=self.id)\
+            .update(is_default=False)
+
     @classmethod
     def default(cls):
         objs = cls.objects.filter(is_default=True)
