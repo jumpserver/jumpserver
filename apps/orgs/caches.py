@@ -38,7 +38,7 @@ class OrgRelatedCache(Cache):
         在事务提交之后再发送信号，防止因事务的隔离性导致未获得最新的数据
         """
         def func():
-            logger.info(f'CACHE: Send refresh task {self}.{fields}')
+            logger.debug(f'CACHE: Send refresh task {self}.{fields}')
             refresh_org_cache_task.delay(self, *fields)
         on_commit(func)
 
@@ -93,7 +93,7 @@ class OrgResourceStatisticsCache(OrgRelatedCache):
         return node.assets_amount
 
     def compute_total_count_online_users(self):
-        return len(set(Session.objects.filter(is_finished=False).values_list('user_id', flat=True)))
+        return Session.objects.filter(is_finished=False).values_list('user_id').distinct().count()
 
     def compute_total_count_online_sessions(self):
         return Session.objects.filter(is_finished=False).count()
