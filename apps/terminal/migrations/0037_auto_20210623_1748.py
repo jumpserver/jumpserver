@@ -5,12 +5,12 @@ from django.db import migrations, models
 
 def set_default_storage(apps, schema_editor):
     command_storage_model = apps.get_model("terminal", "CommandStorage")
-    command_storage = command_storage_model.objects.filter(name='default').first()
+    command_storage = command_storage_model.objects.filter(name='default', type='server').first()
     if command_storage:
         command_storage.is_default = True
         command_storage.save()
     replay_storage_model = apps.get_model("terminal", "ReplayStorage")
-    replay_storage = replay_storage_model.objects.filter(name='default').first()
+    replay_storage = replay_storage_model.objects.filter(name='default', type='server').first()
     if replay_storage:
         replay_storage.is_default = True
         replay_storage.save()
@@ -26,12 +26,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='commandstorage',
             name='is_default',
-            field=models.BooleanField(default=False, verbose_name='Is default'),
+            field=models.BooleanField(default=False, verbose_name='Default storage'),
         ),
         migrations.AddField(
             model_name='replaystorage',
             name='is_default',
-            field=models.BooleanField(default=False, verbose_name='Is default'),
+            field=models.BooleanField(default=False, verbose_name='Default storage'),
         ),
         migrations.RunPython(set_default_storage)
     ]

@@ -22,7 +22,7 @@ logger = get_logger(__file__)
 class CommonStorageModelMixin(models.Model):
     name = models.CharField(max_length=128, verbose_name=_("Name"), unique=True)
     meta = EncryptJsonDictTextField(default={})
-    is_default = models.BooleanField(default=False, verbose_name=_('Is default'))
+    is_default = models.BooleanField(default=False, verbose_name=_('Default storage'))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
     class Meta:
@@ -30,6 +30,15 @@ class CommonStorageModelMixin(models.Model):
 
     def __str__(self):
         return self.name
+
+    @classmethod
+    def default(cls):
+        objs = cls.objects.filter(is_default=True)
+        if not objs:
+            objs = cls.objects.filter(name='default', type='server')
+        if not objs:
+            objs = cls.objects.all()
+        return objs.first()
 
 
 class CommandStorage(CommonStorageModelMixin, CommonModelMixin):

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-22 19:04+0800\n"
+"POT-Creation-Date: 2021-06-25 11:03+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -23,9 +23,9 @@ msgstr ""
 #: assets/models/cmd_filter.py:21 assets/models/domain.py:21
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
 #: orgs/models.py:23 perms/models/base.py:49 settings/models.py:29
-#: terminal/models/storage.py:23 terminal/models/storage.py:90
-#: terminal/models/task.py:16 terminal/models/terminal.py:100
-#: users/forms/profile.py:32 users/models/group.py:15 users/models/user.py:550
+#: terminal/models/storage.py:23 terminal/models/task.py:16
+#: terminal/models/terminal.py:100 users/forms/profile.py:32
+#: users/models/group.py:15 users/models/user.py:550
 #: users/templates/users/_select_user_modal.html:13
 #: users/templates/users/user_asset_permission.html:37
 #: users/templates/users/user_asset_permission.html:154
@@ -59,11 +59,11 @@ msgstr "激活中"
 #: assets/models/domain.py:22 assets/models/domain.py:56
 #: assets/models/group.py:23 assets/models/label.py:23 ops/models/adhoc.py:37
 #: orgs/models.py:26 perms/models/base.py:57 settings/models.py:34
-#: terminal/models/storage.py:29 terminal/models/storage.py:96
-#: terminal/models/terminal.py:114 tickets/models/ticket.py:73
-#: users/models/group.py:16 users/models/user.py:583
-#: xpack/plugins/change_auth_plan/models.py:77 xpack/plugins/cloud/models.py:35
-#: xpack/plugins/cloud/models.py:98 xpack/plugins/gathered_user/models.py:26
+#: terminal/models/storage.py:26 terminal/models/terminal.py:114
+#: tickets/models/ticket.py:73 users/models/group.py:16
+#: users/models/user.py:583 xpack/plugins/change_auth_plan/models.py:77
+#: xpack/plugins/cloud/models.py:35 xpack/plugins/cloud/models.py:98
+#: xpack/plugins/gathered_user/models.py:26
 msgid "Comment"
 msgstr "备注"
 
@@ -257,7 +257,7 @@ msgstr "类别"
 #: perms/models/application_permission.py:23
 #: perms/serializers/application/permission.py:17
 #: perms/serializers/application/user_permission.py:34
-#: terminal/models/storage.py:26 terminal/models/storage.py:93
+#: terminal/models/storage.py:38 terminal/models/storage.py:99
 #: tickets/models/ticket.py:38
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:27
 msgid "Type"
@@ -1202,7 +1202,7 @@ msgstr "主机 （显示名称）"
 msgid "Result"
 msgstr "结果"
 
-#: audits/serializers.py:92 terminal/serializers/storage.py:189
+#: audits/serializers.py:92 terminal/serializers/storage.py:195
 msgid "Hosts"
 msgstr "主机"
 
@@ -3252,6 +3252,10 @@ msgstr "线程数"
 msgid "Boot Time"
 msgstr "运行时间"
 
+#: terminal/models/storage.py:25
+msgid "Default storage"
+msgstr "默认存储"
+
 #: terminal/models/task.py:17
 msgid "Args"
 msgstr "参数"
@@ -3426,27 +3430,27 @@ msgstr "账户密钥"
 msgid "Endpoint suffix"
 msgstr "端点后缀"
 
-#: terminal/serializers/storage.py:166
+#: terminal/serializers/storage.py:172
 msgid "The address format is incorrect"
 msgstr "地址格式不正确"
 
-#: terminal/serializers/storage.py:173
+#: terminal/serializers/storage.py:179
 msgid "Host invalid"
 msgstr "主机无效"
 
-#: terminal/serializers/storage.py:176
+#: terminal/serializers/storage.py:182
 msgid "Port invalid"
 msgstr "端口无效"
 
-#: terminal/serializers/storage.py:192
+#: terminal/serializers/storage.py:198
 msgid "Index"
 msgstr "索引"
 
-#: terminal/serializers/storage.py:194
+#: terminal/serializers/storage.py:200
 msgid "Doc type"
 msgstr "文档类型"
 
-#: terminal/serializers/storage.py:196
+#: terminal/serializers/storage.py:202
 msgid "Ignore Certificate Verification"
 msgstr "忽略证书认证"
 
@@ -5115,5 +5119,3 @@ msgstr "旗舰版"
 msgid "Community edition"
 msgstr "社区版"
 
-#~ msgid "Terminal command alert"
-#~ msgstr "终端命令告警"
