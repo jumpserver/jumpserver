@@ -12,8 +12,8 @@ app_name = 'assets'
 router = BulkRouter()
 router.register(r'assets', api.AssetViewSet, 'asset')
 router.register(r'platforms', api.AssetPlatformViewSet, 'platform')
-router.register(r'admin-users', api.AdminUserViewSet, 'admin-user')
 router.register(r'system-users', api.SystemUserViewSet, 'system-user')
+router.register(r'admin-users', api.AdminUserViewSet, 'admin-user')
 router.register(r'labels', api.LabelViewSet, 'label')
 router.register(r'nodes', api.NodeViewSet, 'node')
 router.register(r'domains', api.DomainViewSet, 'domain')
@@ -36,13 +36,6 @@ urlpatterns = [
     path('assets/<uuid:pk>/platform/', api.AssetPlatformRetrieveApi.as_view(), name='asset-platform-detail'),
     path('assets/<uuid:pk>/tasks/', api.AssetTaskCreateApi.as_view(), name='asset-task-create'),
     path('assets/tasks/', api.AssetsTaskCreateApi.as_view(), name='assets-task-create'),
-
-    # path('asset-users/tasks/', api.AssetUserTaskCreateAPI.as_view(), name='asset-user-task-create'),
-
-    path('admin-users/<uuid:pk>/nodes/', api.ReplaceNodesAdminUserApi.as_view(), name='replace-nodes-admin-user'),
-    path('admin-users/<uuid:pk>/auth/', api.AdminUserAuthApi.as_view(), name='admin-user-auth'),
-    path('admin-users/<uuid:pk>/connective/', api.AdminUserTestConnectiveApi.as_view(), name='admin-user-connective'),
-    path('admin-users/<uuid:pk>/assets/', api.AdminUserAssetsListView.as_view(), name='admin-user-assets'),
 
     path('system-users/<uuid:pk>/auth-info/', api.SystemUserAuthInfoApi.as_view(), name='system-user-auth-info'),
     path('system-users/<uuid:pk>/assets/', api.SystemUserAssetsListView.as_view(), name='system-user-assets'),
