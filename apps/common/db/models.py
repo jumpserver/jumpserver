@@ -151,6 +151,9 @@ class UnionQuerySet(QuerySet):
         return attr
 
     def __getitem__(self, item):
+        if isinstance(item, slice):
+            if (item.stop - item.start) <= 0:
+                return self.model.objects.none()
         return self.__execute()[item]
 
     def __iter__(self):
