@@ -71,7 +71,7 @@ class CommandStorageFilter(filters.FilterSet):
 
     class Meta:
         model = CommandStorage
-        fields = ['real', 'name', 'type']
+        fields = ['real', 'name', 'type', 'is_default']
 
     def filter_real(self, queryset, name, value):
         if value:

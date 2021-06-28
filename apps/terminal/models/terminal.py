@@ -176,6 +176,12 @@ class Terminal(StorageMixin, TerminalStatusMixin, models.Model):
         self.save()
         return
 
+    def save(self, **kwargs):
+        from .storage import CommandStorage, ReplayStorage
+        self.command_storage = CommandStorage.default().name
+        self.replay_storage = ReplayStorage.default().name
+        return super().save(**kwargs)
+
     def __str__(self):
         status = "Active"
         if not self.is_accepted:
