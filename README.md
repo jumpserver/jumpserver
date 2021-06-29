@@ -15,11 +15,11 @@
 
 JumpServer 是全球首款开源的堡垒机，使用 GNU GPL v2.0 开源协议，是符合 4A 规范的运维安全审计系统。
 
-JumpServer 使用 Python / Django 为主进行开发，遵循 Web 2.0 规范，配备了业界领先的 Web Terminal 方案，交互界面美观、用户体验好。
+JumpServer 使用 Python 开发，遵循 Web 2.0 规范，配备了业界领先的 Web Terminal 方案，交互界面美观、用户体验好。
 
 JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向扩展，无资产数量及并发限制。
 
-改变世界，从一点点开始。
+改变世界，从一点点开始 ...
 
 
 ### 特色优势
@@ -45,6 +45,14 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 - [Luna](https://github.com/jumpserver/luna) JumpServer Web Terminal 项目
 - [KoKo](https://github.com/jumpserver/koko) JumpServer 字符协议 Connector 项目，替代原来 Python 版本的 [Coco](https://github.com/jumpserver/coco)
 - [Lion](https://github.com/jumpserver/lion-release) JumpServer 图形协议 Connector 项目，依赖 [Apache Guacamole](https://guacamole.apache.org/)
+
+### 社区
+
+如果您在使用过程中有任何疑问或对建议，欢迎提交 [GitHub Issue](https://github.com/jumpserver/jumpserver/issues/new/choose) 或加入到我们的社区当中进行进一步交流沟通。
+
+#### 微信交流群
+
+<img src="https://download.jumpserver.org/images/weixin-group.jpeg" alt="微信群二维码" width="200"/>
 
 ### 贡献
 如果有你好的想法创意，或者帮助我们修复了 Bug, 欢迎提交 Pull Request
