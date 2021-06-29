@@ -35,5 +35,6 @@ class AdminUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
 
     def create(self, validated_data):
         data = {k: v for k, v in validated_data.items()}
+        data['protocol'] = 'ssh'
         data['type'] = SystemUser.Type.admin
         return super().create(data)

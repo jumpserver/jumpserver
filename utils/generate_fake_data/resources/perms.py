@@ -50,7 +50,7 @@ class AssetPermissionGenerator(FakeDataGenerator):
     def set_system_users(self, perms):
         through = AssetPermission.system_users.through
         choices = self.system_user_ids
-        relation_name = 'systemuser_id'
+        relation_name = 'system_user_id'
         self.set_relations(perms, through, relation_name, choices)
 
     def set_relations(self, perms, through, relation_name, choices, choice_count=None):

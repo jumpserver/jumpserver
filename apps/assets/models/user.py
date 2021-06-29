@@ -224,8 +224,8 @@ class SystemUser(ProtocolMixin, BaseUser):
     LOGIN_AUTO = 'auto'
     LOGIN_MANUAL = 'manual'
     LOGIN_MODE_CHOICES = (
-        (LOGIN_AUTO, _('Automatic login')),
-        (LOGIN_MANUAL, _('Manually login'))
+        (LOGIN_AUTO, _('Automatic managed')),
+        (LOGIN_MANUAL, _('Manually input'))
     )
 
     class Type(ChoiceSet):
