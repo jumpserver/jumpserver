@@ -6,7 +6,7 @@ import socket
 import string
 
 
-string_punctuation = '!#$%&()*+,-.:;<=>?@[]^_{}~'
+string_punctuation = '!#$%&()*+,-.:;<=>?@[]^_~'
 
 
 def random_datetime(date_start, date_end):
