@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class RbacConfig(AppConfig):
+class RBACConfig(AppConfig):
     name = 'rbac'
