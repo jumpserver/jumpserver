@@ -7,13 +7,43 @@ from django.db import migrations, models
 import django.db.models.deletion
 import simple_history.models
 import uuid
+from django.utils import timezone
+from django.db import migrations, transaction
+
+
+def migrate_old_authbook_to_history(apps, schema_editor):
+    authbook_model = apps.get_model("assets", "AuthBook")
+    history_model = apps.get_model("assets", "HistoricalAuthBook")
+    db_alias = schema_editor.connection.alias
+
+    old_authbook = authbook_model.objects.using(db_alias).filter(is_latest=False)
+    print()
+
+    # Todo: 或许能优化成更新那样
+    for authbook in old_authbook:
+        history = history_model()
+
+        for attr in [
+            'id', 'username', 'password', 'private_key', 'public_key', 'version',
+            'comment', 'created_by', 'asset', 'date_created', 'date_updated'
+        ]:
+            setattr(history, attr, getattr(authbook, attr))
+        history.history_type = '-'
+        history.history_date = timezone.now()
+
+        with transaction.atomic():
+            print("Migrate old auth book to history table: {}-{}@{}".format(
+                authbook.id, authbook.username, authbook.asset.hostname
+            ))
+            history.save()
+            authbook.delete()
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('assets', '0073_auto_20210605_2346'),
+        ('assets', '0071_systemuser_type'),
     ]
 
     operations = [
@@ -47,4 +77,5 @@ class Migration(migrations.Migration):
             },
             bases=(simple_history.models.HistoricalChanges, models.Model),
         ),
+        migrations.RunPython(migrate_old_authbook_to_history)
     ]

@@ -4,10 +4,15 @@ from django.db import migrations, models
 import django.db.models.deletion
 
 
+def migrate_system_assets_to_authbook(apps, schema_editor):
+
+    pass
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0077_remove_systemuser_assets'),
+        ('assets', '0072_historicalauthbook'),
     ]
 
     operations = [
@@ -21,5 +26,9 @@ class Migration(migrations.Migration):
             name='systemuser',
             field=models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='assets.systemuser', verbose_name='System user'),
         ),
-
+        migrations.AlterUniqueTogether(
+            name='authbook',
+            unique_together={('username', 'asset', 'systemuser')},
+        ),
+        migrations.RunPython(migrate_system_assets_to_authbook)
     ]
