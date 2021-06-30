@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 import json
-import os
 
 import redis_lock
 import redis
@@ -15,6 +14,24 @@ from django_celery_beat.models import (
 from common.utils import get_logger
 
 logger = get_logger(__name__)
+
+
+def round_up_time(seconds):
+    units = (
+        (IntervalSchedule.SECONDS, 60), (IntervalSchedule.MINUTES, 60),
+        (IntervalSchedule.HOURS, 24), (IntervalSchedule.DAYS, 1)
+    )
+
+    time_ = seconds
+    unit = IntervalSchedule.SECONDS
+
+    for unit, scale in units:
+        round_up, remainder = divmod(time_, scale)
+        if remainder:
+            break
+
+        time_ = round_up
+    return time_, unit
 
 
 def create_or_update_celery_periodic_tasks(tasks):
@@ -34,17 +51,18 @@ def create_or_update_celery_periodic_tasks(tasks):
     """
     # Todo: check task valid, task and callback must be a celery task
     for name, detail in tasks.items():
-        interval = None
         crontab = None
         try:
             IntervalSchedule.objects.all().count()
         except (ProgrammingError, OperationalError):
             return None
 
-        if isinstance(detail.get("interval"), int):
+        interval = detail.get("interval")
+        if isinstance(interval, int):
+            every, period = round_up_time(interval)
             kwargs = dict(
-                every=detail['interval'],
-                period=IntervalSchedule.SECONDS,
+                every=every,
+                period=period,
             )
             # 不能使用 get_or_create，因为可能会有多个
             interval = IntervalSchedule.objects.filter(**kwargs).first()
