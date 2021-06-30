@@ -3,7 +3,6 @@
 from rest_framework import serializers
 
 from common.mixins import BulkSerializerMixin
-from common.drf.serializers import AdaptedBulkListSerializer
 from assets.models import Asset, Node
 from perms.models import AssetPermission
 from users.models import User
@@ -37,14 +36,11 @@ class RelationMixin(BulkSerializerMixin, serializers.Serializer):
         fields.extend(['assetpermission', "assetpermission_display"])
         return fields
 
-    class Meta:
-        list_serializer_class = AdaptedBulkListSerializer
-
 
 class AssetPermissionUserRelationSerializer(RelationMixin, serializers.ModelSerializer):
     user_display = serializers.ReadOnlyField()
 
-    class Meta(RelationMixin.Meta):
+    class Meta:
         model = AssetPermission.users.through
         fields = [
             'id', 'user', 'user_display',
@@ -66,7 +62,7 @@ class AssetPermissionAllUserSerializer(serializers.Serializer):
 class AssetPermissionUserGroupRelationSerializer(RelationMixin, serializers.ModelSerializer):
     usergroup_display = serializers.ReadOnlyField()
 
-    class Meta(RelationMixin.Meta):
+    class Meta:
         model = AssetPermission.user_groups.through
         fields = [
             'id', 'usergroup', "usergroup_display",
@@ -76,7 +72,7 @@ class AssetPermissionUserGroupRelationSerializer(RelationMixin, serializers.Mode
 class AssetPermissionAssetRelationSerializer(RelationMixin, serializers.ModelSerializer):
     asset_display = serializers.ReadOnlyField()
 
-    class Meta(RelationMixin.Meta):
+    class Meta:
         model = AssetPermission.assets.through
         fields = [
             'id', "asset", "asset_display",
@@ -98,7 +94,7 @@ class AssetPermissionAllAssetSerializer(serializers.Serializer):
 class AssetPermissionNodeRelationSerializer(RelationMixin, serializers.ModelSerializer):
     node_display = serializers.CharField(source='node.full_value', read_only=True)
 
-    class Meta(RelationMixin.Meta):
+    class Meta:
         model = AssetPermission.nodes.through
         fields = [
             'id', 'node', "node_display",
@@ -108,7 +104,7 @@ class AssetPermissionNodeRelationSerializer(RelationMixin, serializers.ModelSeri
 class AssetPermissionSystemUserRelationSerializer(RelationMixin, serializers.ModelSerializer):
     systemuser_display = serializers.ReadOnlyField()
 
-    class Meta(RelationMixin.Meta):
+    class Meta:
         model = AssetPermission.system_users.through
         fields = [
             'id', 'systemuser', 'systemuser_display'

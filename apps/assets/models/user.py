@@ -229,15 +229,14 @@ class SystemUser(ProtocolMixin, BaseUser):
     )
 
     class Type(ChoiceSet):
-        # Todo: 翻译
-        common = 'common', '普通用户'
+        common = 'common', _('Common user')
         admin = 'admin', _('Admin user')
 
     username_same_with_user = models.BooleanField(default=False, verbose_name=_("Username same with user"))
     nodes = models.ManyToManyField('assets.Node', blank=True, verbose_name=_("Nodes"))
     assets = models.ManyToManyField(
         'assets.Asset', blank=True, verbose_name=_("Assets"),
-        through='assets.AuthBook', through_fields=['system_user', 'asset'],
+        through='assets.AuthBook', through_fields=['systemuser', 'asset'],
         related_name='system_users'
     )
     users = models.ManyToManyField('users.User', blank=True, verbose_name=_("Users"))

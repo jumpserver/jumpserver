@@ -75,7 +75,7 @@ def on_system_user_update(instance: SystemUser, created, **kwargs):
 
 @receiver(m2m_changed, sender=SystemUser.assets.through)
 @on_transaction_commit
-def on_system_user_assets_change(instance: SystemUser, action, model, pk_set, **kwargs):
+def on_system_user_assets_change(instance, action, model, pk_set, **kwargs):
     """
     当系统用户和资产关系发生变化时，应该重新推送系统用户到新添加的资产中
     """
@@ -83,6 +83,17 @@ def on_system_user_assets_change(instance: SystemUser, action, model, pk_set, **
         return
 
     logger.debug("System user assets change signal recv: {}".format(instance))
+    if not instance:
+        logger.debug('No system user found')
+        return
+
+    print("action: ", action)
+    print("model: ")
+    print(model)
+    print("Pkset: ")
+    print(pk_set)
+    print("kwargs: ")
+    print(kwargs)
     if model == Asset:
         system_user_ids = [instance.id]
         asset_ids = pk_set
@@ -232,10 +243,9 @@ def on_asset_post_delete(instance: Asset, using, **kwargs):
 
 @receiver(post_save, sender=SystemUser.assets.through)
 def on_authbook_create(sender, instance=None, created=True, **kwargs):
-    # if not created:
-    #     return
-    print("Auth book created")
+    if not created:
+        return
+    logger.debug('Authbook instance created')
     if not instance.org_id:
-        print("Auth book not org id")
         instance.org_id = get_current_org().id
         instance.save()

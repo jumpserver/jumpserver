@@ -17,6 +17,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='authbook',
-            unique_together={('username', 'asset', 'system_user')},
+            unique_together={('username', 'asset', 'systemuser')},
         ),
     ]

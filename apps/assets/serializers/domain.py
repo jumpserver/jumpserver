@@ -3,7 +3,6 @@
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
-from common.drf.serializers import AdaptedBulkListSerializer
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.validators import NoSpecialChars
 from ..models import Domain, Gateway
@@ -29,7 +28,6 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
         extra_kwargs = {
             'assets': {'required': False, 'label': _('Assets')},
         }
-        list_serializer_class = AdaptedBulkListSerializer
 
     @staticmethod
     def get_asset_count(obj):
@@ -47,7 +45,6 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
 class GatewaySerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     class Meta:
         model = Gateway
-        list_serializer_class = AdaptedBulkListSerializer
         fields_mini = ['id', 'name']
         fields_write_only = [
             'password', 'private_key', 'public_key',

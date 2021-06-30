@@ -1,8 +1,9 @@
+from abc import ABC
+
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Count
 
-from common.drf.serializers import AdaptedBulkListSerializer
 from common.mixins.serializers import BulkSerializerMixin
 from common.utils import ssh_pubkey_gen
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
@@ -23,14 +24,14 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     系统用户
     """
     auto_generate_key = serializers.BooleanField(initial=True, required=False, write_only=True)
+    type_display = serializers.ReadOnlyField(source='get_type_display')
 
     class Meta:
         model = SystemUser
-        list_serializer_class = AdaptedBulkListSerializer
         fields_mini = ['id', 'name', 'username']
         fields_write_only = ['password', 'public_key', 'private_key']
         fields_small = fields_mini + fields_write_only + [
-            'type', 'protocol', 'login_mode', 'login_mode_display',
+            'type', 'type_display', 'protocol', 'login_mode', 'login_mode_display',
             'priority', 'sudo', 'shell', 'sftp_root', 'token',
             'home', 'system_groups', 'ad_domain',
             'username_same_with_user', 'auto_push', 'auto_generate_key',
@@ -222,24 +223,23 @@ class RelationMixin(BulkSerializerMixin, serializers.Serializer):
         fields.extend(['systemuser', "systemuser_display"])
         return fields
 
-    class Meta:
-        list_serializer_class = AdaptedBulkListSerializer
-
 
 class SystemUserAssetRelationSerializer(RelationMixin, serializers.ModelSerializer):
     asset_display = serializers.ReadOnlyField()
+    system_user = serializers.PrimaryKeyRelatedField(queryset=SystemUser.objects, required=True, allow_null=False, allow_empty=False)
+    system_user_display = serializers.ReadOnlyField()
 
-    class Meta(RelationMixin.Meta):
+    class Meta:
         model = SystemUser.assets.through
         fields = [
-            'id', "asset", "asset_display",
+            'id', "asset", "asset_display", 'system_user', 'system_user_display'
         ]
 
 
 class SystemUserNodeRelationSerializer(RelationMixin, serializers.ModelSerializer):
     node_display = serializers.SerializerMethodField()
 
-    class Meta(RelationMixin.Meta):
+    class Meta:
         model = SystemUser.nodes.through
         fields = [
             'id', 'node', "node_display",
@@ -252,7 +252,7 @@ class SystemUserNodeRelationSerializer(RelationMixin, serializers.ModelSerialize
 class SystemUserUserRelationSerializer(RelationMixin, serializers.ModelSerializer):
     user_display = serializers.ReadOnlyField()
 
-    class Meta(RelationMixin.Meta):
+    class Meta:
         model = SystemUser.users.through
         fields = [
             'id', "user", "user_display",

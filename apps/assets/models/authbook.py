@@ -15,7 +15,7 @@ __all__ = ['AuthBook']
 
 class AuthBook(BaseUser):
     asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, verbose_name=_('Asset'))
-    system_user = models.ForeignKey('assets.SystemUser', on_delete=models.CASCADE, null=True, verbose_name=_("System user"))
+    systemuser = models.ForeignKey('assets.SystemUser', on_delete=models.CASCADE, null=True, verbose_name=_("System user"))
     # Todo: 移除
     version = models.IntegerField(default=1, verbose_name=_('Version'))
     is_latest = models.BooleanField(default=False, verbose_name=_('Latest version'))
@@ -27,7 +27,7 @@ class AuthBook(BaseUser):
 
     class Meta:
         verbose_name = _('AuthBook')
-        unique_together = [('username', 'asset', 'system_user')]
+        unique_together = [('username', 'asset', 'systemuser')]
 
     @property
     def connectivity(self):
@@ -36,8 +36,8 @@ class AuthBook(BaseUser):
     def smart_name(self):
         if self.username:
             username = self.username
-        elif self.system_user:
-            username = self.system_user.username
+        elif self.systemuser:
+            username = self.systemuser.username
         else:
             username = '*'
 

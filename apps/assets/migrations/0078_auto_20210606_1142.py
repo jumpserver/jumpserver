@@ -13,12 +13,12 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='authbook',
-            name='system_user',
+            name='systemuser',
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='assets.systemuser', verbose_name='System user'),
         ),
         migrations.AddField(
             model_name='historicalauthbook',
-            name='system_user',
+            name='systemuser',
             field=models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='assets.systemuser', verbose_name='System user'),
         ),
 

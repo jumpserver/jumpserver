@@ -3,7 +3,6 @@
 import re
 from rest_framework import serializers
 
-from common.drf.serializers import AdaptedBulkListSerializer
 from ..models import CommandFilter, CommandFilterRule
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from orgs.utils import tmp_to_root_org
@@ -15,7 +14,6 @@ class CommandFilterSerializer(BulkOrgResourceModelSerializer):
 
     class Meta:
         model = CommandFilter
-        list_serializer_class = AdaptedBulkListSerializer
         fields_mini = ['id', 'name']
         fields_small = fields_mini + [
             'org_id', 'org_name',
@@ -48,7 +46,6 @@ class CommandFilterRuleSerializer(BulkOrgResourceModelSerializer):
         ]
         fields_fk = ['filter']
         fields = '__all__'
-        list_serializer_class = AdaptedBulkListSerializer
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -38,7 +38,7 @@ class RelationMixin:
 
         for i in instance:
             _id = getattr(i, object_field).id
-            system_users_objects_map[i.systemuser].append(_id)
+            system_users_objects_map[i.system_user].append(_id)
 
         sender = self.get_sender()
         for system_user, objects in system_users_objects_map.items():

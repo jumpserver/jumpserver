@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='systemuser',
             name='assets',
-            field=models.ManyToManyField(blank=True, through='assets.AuthBook', to='assets.Asset', verbose_name='Assets'),
+            field=models.ManyToManyField(blank=True, related_name='system_users', through='assets.AuthBook', to='assets.Asset', verbose_name='Assets'),
         ),
     ]
