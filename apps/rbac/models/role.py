@@ -33,3 +33,11 @@ class RoleBinding(models.Model):
     org = models.ForeignKey(
         'orgs.Organization', null=True, on_delete=models.CASCADE, verbose_name=_('Organization')
     )
+
+    class Meta:
+        verbose_name = _('Role binding')
+        unique_together = ('user', 'role', 'org')
+
+    def save(self, *args, **kwargs):
+        self.type = self.role.type
+        return super().save(*args, **kwargs)

@@ -13,8 +13,8 @@ from django.test import TestCase
 # TODO:
 #  1. 创建用户、邀请用户 (给用户添加角色)
 #  2. 创建角色 (创建角色并指定权限集)
-#  3. 获取权限集 (分类获取 scope: system、org、app)
-#  4. APIView 控制用户访问权限 (获取用户访问API行为的codename，获取用户角色-权限，判断是否包含)
+#  3. APIView 控制用户访问权限 (获取用户访问API行为的codename，获取用户角色-权限，判断是否包含)
+#  4. 获取权限集 (分类获取 scope: system、org、app)
 #  5. 修改用户Model/Serializer/API，删除旧role字段，关联新role
 #  6. 定义权限位 (整理所有权限位并分类，同时在Model中重新定义权限名称)
 #  7. 添加内置角色

@@ -22,4 +22,5 @@ class RoleBindingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RoleBinding
-        fields = ['id', 'type', 'user', 'role', 'org_id']
+        fields = ['id', 'type', 'user', 'role', 'org']
+        read_only_fields = ['type']
