@@ -744,6 +744,13 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     class Meta:
         ordering = ['username']
         verbose_name = _("User")
+        default_permissions = []
+        permissions = [
+            ('create_user', _('Create user')),
+            ('update_user', _('Update user')),
+            ('delete_user', _('Delete user')),
+            ('view_user', _('View user'))
+        ]
 
     #: Use this method initial user
     @classmethod

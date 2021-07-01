@@ -2,16 +2,13 @@ import uuid
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from common.db.models import JMSModel
+from ..const import RoleTypeChoices
 
 __all__ = ['Role', 'RoleBinding']
 
 
-class RoleTypeChoices(models.TextChoices):
-    system = 'system', _('System')
-    org = 'org', _('Organization')
-
-
 class Role(JMSModel):
+    """ 定义 角色 ｜ 角色-权限 关系 """
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
     type = models.CharField(
         max_length=128, choices=RoleTypeChoices.choices, default=RoleTypeChoices.system,
@@ -25,6 +22,7 @@ class Role(JMSModel):
 
 
 class RoleBinding(models.Model):
+    """ 定义 用户-角色 关系 """
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     type = models.CharField(
         max_length=128, choices=RoleTypeChoices.choices, default=RoleTypeChoices.system,

@@ -9,6 +9,7 @@ app_name = 'rbac'
 router = BulkRouter()
 router.register(r'roles', api.RoleViewSet, 'role')
 router.register(r'role-bindings', api.RoleBindingViewSet, 'role-binding')
+router.register(r'permissions', api.PermissionViewSet, 'permission')
 
 urlpatterns = []
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-25 17:12+0800\n"
+"POT-Creation-Date: 2021-07-01 14:02+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -22,10 +22,10 @@ msgstr ""
 #: assets/models/base.py:249 assets/models/cluster.py:18
 #: assets/models/cmd_filter.py:21 assets/models/domain.py:21
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
-#: orgs/models.py:23 perms/models/base.py:49 settings/models.py:29
-#: terminal/models/storage.py:23 terminal/models/task.py:16
-#: terminal/models/terminal.py:100 users/forms/profile.py:32
-#: users/models/group.py:15 users/models/user.py:550
+#: orgs/models.py:23 perms/models/base.py:49 rbac/models/role.py:12
+#: settings/models.py:29 terminal/models/storage.py:23
+#: terminal/models/task.py:16 terminal/models/terminal.py:100
+#: users/forms/profile.py:32 users/models/group.py:15 users/models/user.py:550
 #: users/templates/users/_select_user_modal.html:13
 #: users/templates/users/user_asset_permission.html:37
 #: users/templates/users/user_asset_permission.html:154
@@ -58,12 +58,12 @@ msgstr "激活中"
 #: assets/models/cmd_filter.py:23 assets/models/cmd_filter.py:64
 #: assets/models/domain.py:22 assets/models/domain.py:56
 #: assets/models/group.py:23 assets/models/label.py:23 ops/models/adhoc.py:37
-#: orgs/models.py:26 perms/models/base.py:57 settings/models.py:34
-#: terminal/models/storage.py:26 terminal/models/terminal.py:114
-#: tickets/models/ticket.py:73 users/models/group.py:16
-#: users/models/user.py:583 xpack/plugins/change_auth_plan/models.py:77
-#: xpack/plugins/cloud/models.py:35 xpack/plugins/cloud/models.py:98
-#: xpack/plugins/gathered_user/models.py:26
+#: orgs/models.py:26 perms/models/base.py:57 rbac/models/role.py:21
+#: settings/models.py:34 terminal/models/storage.py:26
+#: terminal/models/terminal.py:114 tickets/models/ticket.py:73
+#: users/models/group.py:16 users/models/user.py:583
+#: xpack/plugins/change_auth_plan/models.py:77 xpack/plugins/cloud/models.py:35
+#: xpack/plugins/cloud/models.py:98 xpack/plugins/gathered_user/models.py:26
 msgid "Comment"
 msgstr "备注"
 
@@ -95,11 +95,11 @@ msgstr "动作"
 #: audits/models.py:36 audits/models.py:56 audits/models.py:69
 #: audits/serializers.py:94 authentication/models.py:44
 #: authentication/models.py:97 orgs/models.py:18 orgs/models.py:418
-#: perms/models/base.py:50 templates/index.html:78
+#: perms/models/base.py:50 rbac/models/role.py:31 templates/index.html:78
 #: terminal/backends/command/models.py:18
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:38
 #: tickets/models/comment.py:17 users/models/user.py:176
-#: users/models/user.py:746 users/models/user.py:772
+#: users/models/user.py:746 users/models/user.py:779
 #: users/serializers/group.py:20
 #: users/templates/users/user_asset_permission.html:38
 #: users/templates/users/user_asset_permission.html:64
@@ -256,9 +256,9 @@ msgstr "类别"
 #: applications/models/application.py:16 assets/models/cmd_filter.py:53
 #: perms/models/application_permission.py:23
 #: perms/serializers/application/permission.py:17
-#: perms/serializers/application/user_permission.py:34
-#: terminal/models/storage.py:47 terminal/models/storage.py:108
-#: tickets/models/ticket.py:38
+#: perms/serializers/application/user_permission.py:34 rbac/models/role.py:15
+#: rbac/models/role.py:29 terminal/models/storage.py:55
+#: terminal/models/storage.py:116 tickets/models/ticket.py:38
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:27
 msgid "Type"
 msgstr "类型"
@@ -534,7 +534,7 @@ msgstr "创建者"
 #: assets/models/label.py:25 common/db/models.py:72 common/mixins/models.py:50
 #: ops/models/adhoc.py:38 ops/models/command.py:29 orgs/models.py:25
 #: orgs/models.py:420 perms/models/base.py:56 users/models/group.py:18
-#: users/models/user.py:773 xpack/plugins/cloud/models.py:107
+#: users/models/user.py:780 xpack/plugins/cloud/models.py:107
 msgid "Date created"
 msgstr "创建日期"
 
@@ -605,8 +605,8 @@ msgstr "运营商"
 msgid "Default"
 msgstr "默认"
 
-#: assets/models/cluster.py:36 assets/models/label.py:14
-#: users/models/user.py:758
+#: assets/models/cluster.py:36 assets/models/label.py:14 rbac/const.py:6
+#: users/models/user.py:765
 msgid "System"
 msgstr "系统"
 
@@ -1202,7 +1202,7 @@ msgstr "主机 （显示名称）"
 msgid "Result"
 msgstr "结果"
 
-#: audits/serializers.py:92 terminal/serializers/storage.py:195
+#: audits/serializers.py:92 terminal/serializers/storage.py:151
 msgid "Hosts"
 msgstr "主机"
 
@@ -1864,7 +1864,7 @@ msgstr "等待任务开始"
 msgid "Not has host {} permission"
 msgstr "没有该主机 {} 权限"
 
-#: ops/apps.py:9 ops/notifications.py:12
+#: ops/apps.py:9 ops/notifications.py:13
 msgid "Operations"
 msgstr "运维"
 
@@ -1999,11 +1999,11 @@ msgstr "命令 `{}` 不允许被执行 ......."
 msgid "Task end"
 msgstr "任务结束"
 
-#: ops/notifications.py:13
+#: ops/notifications.py:14
 msgid "Server performance"
 msgstr "监控告警"
 
-#: ops/notifications.py:20
+#: ops/notifications.py:21
 msgid "Disk used more than 80%: {} => {}"
 msgstr "磁盘使用率超过 80%: {} => {}"
 
@@ -2032,8 +2032,8 @@ msgid "The organization have resource ({}) cannot be deleted"
 msgstr "组织存在资源 ({}) 不能被删除"
 
 #: orgs/mixins/models.py:45 orgs/mixins/serializers.py:25 orgs/models.py:36
-#: orgs/models.py:417 orgs/serializers.py:108
-#: tickets/serializers/ticket/ticket.py:83
+#: orgs/models.py:417 orgs/serializers.py:108 rbac/const.py:7
+#: rbac/models/role.py:34 tickets/serializers/ticket/ticket.py:83
 msgid "Organization"
 msgstr "组织"
 
@@ -2049,7 +2049,7 @@ msgstr "组织审计员"
 msgid "GLOBAL"
 msgstr "全局组织"
 
-#: orgs/models.py:419 users/models/user.py:560
+#: orgs/models.py:419 rbac/models/role.py:32 users/models/user.py:560
 #: users/templates/users/_select_user_modal.html:15
 msgid "Role"
 msgstr "角色"
@@ -2062,7 +2062,8 @@ msgstr "管理员正在修改授权，请稍等"
 msgid "The authorization cannot be revoked for the time being"
 msgstr "该授权暂时不能撤销"
 
-#: perms/models/application_permission.py:27 users/models/user.py:177
+#: perms/models/application_permission.py:27 rbac/const.py:8
+#: users/models/user.py:177
 msgid "Application"
 msgstr "应用程序"
 
@@ -2181,6 +2182,18 @@ msgstr "用户组数量"
 #: perms/serializers/asset/permission.py:76
 msgid "System users amount"
 msgstr "系统用户数量"
+
+#: rbac/models/permission.py:28
+msgid "Test define extra permission bit"
+msgstr "测试定义附加权限位"
+
+#: rbac/models/role.py:18
+msgid "Permissions"
+msgstr "权限"
+
+#: rbac/models/role.py:20
+msgid "Built-in"
+msgstr "内置"
 
 #: settings/api/common.py:25
 msgid "Test mail sent to {}, please check"
@@ -3284,11 +3297,11 @@ msgstr "命令存储"
 msgid "Replay storage"
 msgstr "录像存储"
 
-#: terminal/notifications.py:48
+#: terminal/notifications.py:50
 msgid "Danger command alert"
 msgstr "危险命令告警"
 
-#: terminal/notifications.py:57
+#: terminal/notifications.py:59
 #, python-format
 msgid ""
 "\n"
@@ -3318,18 +3331,18 @@ msgstr ""
 "        <br>\n"
 "        "
 
-#: terminal/notifications.py:92
+#: terminal/notifications.py:94
 #, python-format
 msgid ""
 "Insecure Command Alert: [%(name)s->%(login_from)s@%(remote_addr)s] $"
 "%(command)s"
 msgstr "危险命令告警: [%(name)s->%(login_from)s@%(remote_addr)s] $%(command)s"
 
-#: terminal/notifications.py:110
+#: terminal/notifications.py:112
 msgid "Batch danger command alert"
 msgstr "批量危险命令告警"
 
-#: terminal/notifications.py:121
+#: terminal/notifications.py:123
 #, python-format
 msgid ""
 "\n"
@@ -3360,7 +3373,7 @@ msgstr ""
 "        ----------------- 命令 ---------------- <br>\n"
 "        "
 
-#: terminal/notifications.py:146
+#: terminal/notifications.py:148
 #, python-format
 msgid "Insecure Web Command Execution Alert: [%(name)s]"
 msgstr "批量危险命令告警: [%(name)s]"
@@ -3430,27 +3443,27 @@ msgstr "账户密钥"
 msgid "Endpoint suffix"
 msgstr "端点后缀"
 
-#: terminal/serializers/storage.py:172
+#: terminal/serializers/storage.py:128
 msgid "The address format is incorrect"
 msgstr "地址格式不正确"
 
-#: terminal/serializers/storage.py:179
+#: terminal/serializers/storage.py:135
 msgid "Host invalid"
 msgstr "主机无效"
 
-#: terminal/serializers/storage.py:182
+#: terminal/serializers/storage.py:138
 msgid "Port invalid"
 msgstr "端口无效"
 
-#: terminal/serializers/storage.py:198
+#: terminal/serializers/storage.py:154
 msgid "Index"
 msgstr "索引"
 
-#: terminal/serializers/storage.py:200
+#: terminal/serializers/storage.py:156
 msgid "Doc type"
 msgstr "文档类型"
 
-#: terminal/serializers/storage.py:202
+#: terminal/serializers/storage.py:158
 msgid "Ignore Certificate Verification"
 msgstr "忽略证书认证"
 
@@ -3959,11 +3972,27 @@ msgstr "最后更新密码日期"
 msgid "Need update password"
 msgstr "需要更新密码"
 
-#: users/models/user.py:754
+#: users/models/user.py:749
+msgid "Create user"
+msgstr "创建用户"
+
+#: users/models/user.py:750
+msgid "Update user"
+msgstr "更新用户"
+
+#: users/models/user.py:751
+msgid "Delete user"
+msgstr "删除用户"
+
+#: users/models/user.py:752
+msgid "View user"
+msgstr "查看用户"
+
+#: users/models/user.py:761
 msgid "Administrator"
 msgstr "管理员"
 
-#: users/models/user.py:757
+#: users/models/user.py:764
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
