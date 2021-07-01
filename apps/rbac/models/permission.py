@@ -14,10 +14,7 @@ class Permission(DjangoPermission):
     @classmethod
     def get_permissions(cls, scope):
         # TODO: 根据类型过滤出对应的权限位并返回
-        permissions = cls.objects.all()
-        for permission in permissions:
-            permission.name = _(permission.name)
-        return permissions
+        return cls.objects.all()
 
 
 class ExtraPermissionBit(models.Model):
