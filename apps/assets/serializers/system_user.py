@@ -1,5 +1,3 @@
-from abc import ABC
-
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Count
@@ -226,14 +224,17 @@ class RelationMixin(BulkSerializerMixin, serializers.Serializer):
 
 class SystemUserAssetRelationSerializer(RelationMixin, serializers.ModelSerializer):
     asset_display = serializers.ReadOnlyField()
-    system_user = serializers.PrimaryKeyRelatedField(queryset=SystemUser.objects, required=True, allow_null=False, allow_empty=False)
-    system_user_display = serializers.ReadOnlyField()
 
     class Meta:
         model = SystemUser.assets.through
         fields = [
-            'id', "asset", "asset_display", 'system_user', 'system_user_display'
+            "id", "asset", "asset_display",
+            'systemuser', 'systemuser_display'
         ]
+        use_model_bulk_create = True
+        model_bulk_create_kwargs = {
+            'ignore_conflicts': True
+        }
 
 
 class SystemUserNodeRelationSerializer(RelationMixin, serializers.ModelSerializer):

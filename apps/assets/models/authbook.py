@@ -48,5 +48,5 @@ class AuthBook(BaseUser):
         return '{}@{}'.format(username, asset)
 
     def __str__(self):
-        return self.smart_name
+        return self.smart_name()
 

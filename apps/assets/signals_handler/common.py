@@ -82,18 +82,12 @@ def on_system_user_assets_change(instance, action, model, pk_set, **kwargs):
     if action != POST_ADD:
         return
 
+    print("System user assets change signal recv: {}".format(instance))
     logger.debug("System user assets change signal recv: {}".format(instance))
     if not instance:
         logger.debug('No system user found')
         return
 
-    print("action: ", action)
-    print("model: ")
-    print(model)
-    print("Pkset: ")
-    print(pk_set)
-    print("kwargs: ")
-    print(kwargs)
     if model == Asset:
         system_user_ids = [instance.id]
         asset_ids = pk_set
@@ -102,9 +96,13 @@ def on_system_user_assets_change(instance, action, model, pk_set, **kwargs):
         asset_ids = [instance.id]
 
     # 通过 through 创建的没有 org_id
+    current_org_id = get_current_org().id
     with tmp_to_root_org():
-        authbooks = AuthBook.objects.filter(asset_id__in=asset_ids, system_user_id__in=system_user_ids)
-        authbooks.update(org_id=get_current_org().id)
+        authbooks = AuthBook.objects.filter(
+            asset_id__in=asset_ids,
+            systemuser_id__in=system_user_ids
+        )
+        authbooks.update(org_id=current_org_id)
     for system_user_id in system_user_ids:
         push_system_user_to_assets.delay(system_user_id, asset_ids)
 
