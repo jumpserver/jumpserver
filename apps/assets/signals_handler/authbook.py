@@ -1,6 +1,9 @@
 from django.dispatch import receiver
 from django.apps import apps
 from simple_history.signals import pre_create_historical_record
+from django.db.models.signals import post_save, pre_save
+
+from ..models import AuthBook
 
 AuthBookHistory = apps.get_model('assets', 'HistoricalAuthBook')
 
@@ -17,3 +20,8 @@ def pre_create_historical_record_callback(sender, instance=None, history_instanc
         system_user_attr_value = getattr(history_instance.systemuser, attr)
         if system_user_attr_value:
             setattr(history_instance, attr, system_user_attr_value)
+
+
+@receiver(pre_save, sender=AuthBook)
+def on_authbook_create_update_version(sender, instance, **kwargs):
+    instance.version = instance.history.all().count()

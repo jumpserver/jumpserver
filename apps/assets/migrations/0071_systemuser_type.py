@@ -32,7 +32,7 @@ def migrate_admin_user_to_system_user(apps, schema_editor):
         with transaction.atomic():
             s = system_user_model(**kwargs)
             s.save()
-            print("Migrate admin user to system user: {} => {}".format(admin_user.name, s.name))
+            print("  Migrate admin user to system user: {} => {}".format(admin_user.name, s.name))
             assets = admin_user.assets.all()
             s.assets.set(assets)
 

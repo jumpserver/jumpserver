@@ -4,6 +4,7 @@ from .asset import *
 from .label import *
 from .system_user import *
 from .system_user_relation import *
+from .accounts import *
 from .node import *
 from .domain import *
 from .cmd_filter import *

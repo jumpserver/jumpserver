@@ -21,7 +21,6 @@ class AuthBook(BaseUser):
     is_latest = models.BooleanField(default=False, verbose_name=_('Latest version'))
     history = HistoricalRecords()
 
-    # 用于system user和admin_user的动态设置
     _connectivity = None
     CONN_CACHE_KEY = "ASSET_USER_CONN_{}"
 
@@ -30,16 +29,20 @@ class AuthBook(BaseUser):
         unique_together = [('username', 'asset', 'systemuser')]
 
     @property
+    def username_display(self):
+        if self.username:
+            return self.username
+        if self.systemuser:
+            return self.systemuser.username
+        return ''
+
+    @property
     def connectivity(self):
         return self.get_asset_connectivity(self.asset)
 
+    @property
     def smart_name(self):
-        if self.username:
-            username = self.username
-        elif self.systemuser:
-            username = self.systemuser.username
-        else:
-            username = '*'
+        username = self.username_display
 
         if self.asset:
             asset = str(self.asset)
@@ -48,5 +51,5 @@ class AuthBook(BaseUser):
         return '{}@{}'.format(username, asset)
 
     def __str__(self):
-        return self.smart_name()
+        return self.smart_name
 

@@ -1,3 +1,6 @@
+from rest_framework import serializers
+from django.utils.translation import ugettext_lazy as _
+
 from assets.models import AuthBook
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
@@ -5,12 +8,16 @@ from .base import AuthSerializerMixin
 
 
 class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
+    ip = serializers.ReadOnlyField(label=_("IP"))
+    hostname = serializers.ReadOnlyField(label=_("Hostname"))
+    username_display = serializers.ReadOnlyField(label=_("Username"))
+
     class Meta:
         model = AuthBook
-        fields_mini = ['id', 'username']
+        fields_mini = ['id', 'username', 'username_display', 'ip', 'hostname', 'version']
         fields_write_only = ['password', 'private_key', "public_key"]
         fields_small = fields_mini + fields_write_only + ['comment']
-        fields_fk = ['asset', 'system_user']
+        fields_fk = ['asset', 'systemuser']
         fields = fields_small + fields_fk
         extra_kwargs = {
             'username': {'required': True},
