@@ -19,16 +19,21 @@ def migrate_system_assets_to_authbook(apps, schema_editor):
         relations_ids = []
         historys = []
         for i in systemuser_asset_relations:
-            authbooks.append(authbook_model(asset=i.asset, systemuser=i.systemuser))
+            authbooks.append(
+                authbook_model(asset=i.asset, systemuser=i.systemuser)
+            )
             relations_ids.append(i.id)
-            history = history_model(asset=i.asset, systemuser=i.systemuser)
 
+            history = history_model(
+                asset=i.asset, systemuser=i.systemuser,
+                date_created=timezone.now(), date_updated=timezone.now(),
+            )
             history.history_type = '-'
             history.history_date = timezone.now()
             historys.append(history)
 
         with transaction.atomic():
-            print(" Migrate system user assets relations: ", len(relations_ids))
+            print("  Migrate system user assets relations: {}'s".format(len(relations_ids)))
             authbook_model.objects.bulk_create(authbooks, ignore_conflicts=True)
             history_model.objects.bulk_create(historys)
             system_user_asset_model.objects.filter(id__in=relations_ids).delete()

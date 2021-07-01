@@ -24,4 +24,4 @@ def pre_create_historical_record_callback(sender, instance=None, history_instanc
 
 @receiver(pre_save, sender=AuthBook)
 def on_authbook_create_update_version(sender, instance, **kwargs):
-    instance.version = instance.history.all().count()
+    instance.version = instance.history.all().count() + 1

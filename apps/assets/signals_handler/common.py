@@ -103,6 +103,9 @@ def on_system_user_assets_change(instance, action, model, pk_set, **kwargs):
             systemuser_id__in=system_user_ids
         )
         authbooks.update(org_id=current_org_id)
+        for ab in authbooks:
+            ab.org_id = current_org_id
+            post_save.send(sender=AuthBook, instance=ab, created=True)
     for system_user_id in system_user_ids:
         push_system_user_to_assets.delay(system_user_id, asset_ids)
 
