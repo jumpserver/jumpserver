@@ -10,7 +10,7 @@ def migrate_system_assets_to_authbook(apps, schema_editor):
     authbook_model = apps.get_model('assets', 'AuthBook')
 
     while True:
-        systemuser_asset_relations = system_user_asset_model.objects.all()[:10]
+        systemuser_asset_relations = system_user_asset_model.objects.all()[:20]
         if not systemuser_asset_relations:
             break
         authbooks = []
@@ -19,6 +19,7 @@ def migrate_system_assets_to_authbook(apps, schema_editor):
             authbooks.append(authbook_model(asset=i.asset, systemuser=i.systemuser))
             relations_ids.append(i.id)
         with transaction.atomic():
+            print("  Migrate system user assets relations: ", len(relations_ids))
             authbook_model.objects.bulk_create(authbooks, ignore_conflicts=True)
             system_user_asset_model.objects.filter(id__in=relations_ids).delete()
 

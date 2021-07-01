@@ -16,27 +16,31 @@ def migrate_old_authbook_to_history(apps, schema_editor):
     history_model = apps.get_model("assets", "HistoricalAuthBook")
     db_alias = schema_editor.connection.alias
 
-    old_authbook = authbook_model.objects.using(db_alias).filter(is_latest=False)
     print()
+    while True:
+        authbooks = authbook_model.objects.using(db_alias).filter(is_latest=False)[:20]
+        if not authbooks:
+            break
+        historys = []
+        authbook_ids = []
+        # Todo: 或许能优化成更新那样
+        for authbook in authbooks:
+            authbook_ids.append(authbook.id)
+            history = history_model()
 
-    # Todo: 或许能优化成更新那样
-    for authbook in old_authbook:
-        history = history_model()
-
-        for attr in [
-            'id', 'username', 'password', 'private_key', 'public_key', 'version',
-            'comment', 'created_by', 'asset', 'date_created', 'date_updated'
-        ]:
-            setattr(history, attr, getattr(authbook, attr))
-        history.history_type = '-'
-        history.history_date = timezone.now()
+            for attr in [
+                'id', 'username', 'password', 'private_key', 'public_key', 'version',
+                'comment', 'created_by', 'asset', 'date_created', 'date_updated'
+            ]:
+                setattr(history, attr, getattr(authbook, attr))
+            history.history_type = '-'
+            history.history_date = timezone.now()
+            historys.append(history)
 
         with transaction.atomic():
-            print("Migrate old auth book to history table: {}-{}@{}".format(
-                authbook.id, authbook.username, authbook.asset.hostname
-            ))
-            history.save()
-            authbook.delete()
+            print("  Migrate old auth book to history table: ", len(authbook_ids))
+            history_model.objects.bulk_create(historys, ignore_conflicts=True)
+            authbook_model.objects.filter(id__in=authbook_ids).delete()
 
 
 class Migration(migrations.Migration):
