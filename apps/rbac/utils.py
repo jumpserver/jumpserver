@@ -1,7 +1,5 @@
 from collections import defaultdict
-from orgs.models import Organization
 from rbac.models import RoleBinding, Role, Permission
-from rbac.const import ScopeChoices
 
 
 class RBACPermissionUtil(object):
