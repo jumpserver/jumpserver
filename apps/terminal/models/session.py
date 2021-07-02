@@ -13,17 +13,17 @@ from django.core.cache import cache
 from assets.models import Asset
 from users.models import User
 from orgs.mixins.models import OrgModelMixin
-from common.db.models import ChoiceSet
+from common.db.models import TextChoices
 from ..backends import get_multi_command_storage
 
 
 class Session(OrgModelMixin):
-    class LOGIN_FROM(ChoiceSet):
+    class LOGIN_FROM(TextChoices):
         ST = 'ST', 'SSH Terminal'
         RT = 'RT', 'RDP Terminal'
         WT = 'WT', 'Web Terminal'
 
-    class PROTOCOL(ChoiceSet):
+    class PROTOCOL(TextChoices):
         SSH = 'ssh', 'ssh'
         RDP = 'rdp', 'rdp'
         VNC = 'vnc', 'vnc'

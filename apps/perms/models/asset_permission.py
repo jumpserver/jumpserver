@@ -4,7 +4,7 @@ from functools import reduce
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import F
 
-from common.db.models import ChoiceSet
+from common.db.models import TextChoices
 from orgs.mixins.models import OrgModelMixin
 from common.db import models
 from common.utils import lazyproperty
@@ -165,7 +165,7 @@ class AssetPermission(BasePermission):
 
 
 class UserAssetGrantedTreeNodeRelation(OrgModelMixin, FamilyMixin, models.JMSBaseModel):
-    class NodeFrom(ChoiceSet):
+    class NodeFrom(TextChoices):
         granted = 'granted', 'Direct node granted'
         child = 'child', 'Have children node'
         asset = 'asset', 'Direct asset granted'

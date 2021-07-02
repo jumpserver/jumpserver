@@ -11,7 +11,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.cache import cache
 
 from common.utils import signer, get_object_or_none
-from common.db.models import ChoiceSet
+from common.db.models import TextChoices
 from .base import BaseUser
 from .asset import Asset
 from .authbook import AuthBook
@@ -24,40 +24,30 @@ logger = logging.getLogger(__name__)
 class ProtocolMixin:
     protocol: str
 
-    PROTOCOL_SSH = 'ssh'
-    PROTOCOL_RDP = 'rdp'
-    PROTOCOL_TELNET = 'telnet'
-    PROTOCOL_VNC = 'vnc'
-    PROTOCOL_MYSQL = 'mysql'
-    PROTOCOL_ORACLE = 'oracle'
-    PROTOCOL_MARIADB = 'mariadb'
-    PROTOCOL_POSTGRESQL = 'postgresql'
-    PROTOCOL_K8S = 'k8s'
-    PROTOCOL_CHOICES = (
-        (PROTOCOL_SSH, 'SSH'),
-        (PROTOCOL_RDP, 'RDP'),
-        (PROTOCOL_TELNET, 'Telnet'),
-        (PROTOCOL_VNC, 'VNC'),
-        (PROTOCOL_MYSQL, 'MySQL'),
-        (PROTOCOL_ORACLE, 'Oracle'),
-        (PROTOCOL_MARIADB, 'MariaDB'),
-        (PROTOCOL_POSTGRESQL, 'PostgreSQL'),
-        (PROTOCOL_K8S, 'K8S'),
-    )
+    class Protocol(TextChoices):
+        ssh = 'ssh', 'SSH'
+        rdp = 'rdp', 'RDP'
+        telnet = 'telnet', 'Telnet'
+        vnc = 'vnc', 'VNC'
+        mysql = 'mysql', 'MySQL'
+        oracle = 'oracle', 'Oracle'
+        mariadb = 'mariadb', 'MariaDB'
+        postgresql = 'postgresql', 'PostgreSQL'
+        k8s = 'k8s', 'K8S'
 
-    SUPPORT_PUSH_PROTOCOLS = [PROTOCOL_SSH, PROTOCOL_RDP]
+    SUPPORT_PUSH_PROTOCOLS = [Protocol.ssh, Protocol.rdp]
 
     ASSET_CATEGORY_PROTOCOLS = [
-        PROTOCOL_SSH, PROTOCOL_RDP, PROTOCOL_TELNET, PROTOCOL_VNC
+        Protocol.ssh, Protocol.rdp, Protocol.telnet, Protocol.vnc
     ]
     APPLICATION_CATEGORY_REMOTE_APP_PROTOCOLS = [
-        PROTOCOL_RDP
+        Protocol.rdp
     ]
     APPLICATION_CATEGORY_DB_PROTOCOLS = [
-        PROTOCOL_MYSQL, PROTOCOL_ORACLE, PROTOCOL_MARIADB, PROTOCOL_POSTGRESQL
+        Protocol.mysql, Protocol.oracle, Protocol.mariadb, Protocol.postgresql
     ]
     APPLICATION_CATEGORY_CLOUD_PROTOCOLS = [
-        PROTOCOL_K8S
+        Protocol.k8s
     ]
     APPLICATION_CATEGORY_PROTOCOLS = [
         *APPLICATION_CATEGORY_REMOTE_APP_PROTOCOLS,
@@ -75,7 +65,7 @@ class ProtocolMixin:
         if app_type in cls.APPLICATION_CATEGORY_PROTOCOLS:
             protocol = app_type
         elif app_type in ApplicationTypeChoices.remote_app_types():
-            protocol = cls.PROTOCOL_RDP
+            protocol = cls.Protocol.rdp
         else:
             protocol = None
         return protocol
@@ -228,7 +218,7 @@ class SystemUser(ProtocolMixin, BaseUser):
         (LOGIN_MANUAL, _('Manually input'))
     )
 
-    class Type(ChoiceSet):
+    class Type(TextChoices):
         common = 'common', _('Common user')
         admin = 'admin', _('Admin user')
 
@@ -243,7 +233,7 @@ class SystemUser(ProtocolMixin, BaseUser):
     groups = models.ManyToManyField('users.UserGroup', blank=True, verbose_name=_("User groups"))
     type = models.CharField(max_length=16, choices=Type.choices, default=Type.common, verbose_name=_('Type'))
     priority = models.IntegerField(default=81, verbose_name=_("Priority"), help_text=_("1-100, the lower the value will be match first"), validators=[MinValueValidator(1), MaxValueValidator(100)])
-    protocol = models.CharField(max_length=16, choices=ProtocolMixin.PROTOCOL_CHOICES, default='ssh', verbose_name=_('Protocol'))
+    protocol = models.CharField(max_length=16, choices=ProtocolMixin.Protocol.choices, default='ssh', verbose_name=_('Protocol'))
     auto_push = models.BooleanField(default=True, verbose_name=_('Auto push'))
     sudo = models.TextField(default='/bin/whoami', verbose_name=_('Sudo'))
     shell = models.CharField(max_length=64,  default='/bin/bash', verbose_name=_('Shell'))
@@ -277,7 +267,7 @@ class SystemUser(ProtocolMixin, BaseUser):
 
     @property
     def is_need_cmd_filter(self):
-        return self.protocol not in [self.PROTOCOL_RDP, self.PROTOCOL_VNC]
+        return self.protocol not in [self.Protocol.rdp, self.Protocol.vnc]
 
     @property
     def is_need_test_asset_connective(self):

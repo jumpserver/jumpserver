@@ -54,9 +54,9 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         login_mode = self.initial_data.get("login_mode")
         protocol = self.initial_data.get("protocol")
 
-        if login_mode == SystemUser.LOGIN_MANUAL or \
-                protocol in [SystemUser.PROTOCOL_TELNET,
-                             SystemUser.PROTOCOL_VNC]:
+        if login_mode == SystemUser.LOGIN_MANUAL:
+            value = False
+        elif protocol not in SystemUser.SUPPORT_PUSH_PROTOCOLS:
             value = False
         return value
 
@@ -70,7 +70,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             value = False
         elif login_mode == SystemUser.LOGIN_MANUAL:
             value = False
-        elif protocol in [SystemUser.PROTOCOL_TELNET, SystemUser.PROTOCOL_VNC]:
+        elif protocol not in SystemUser.SUPPORT_PUSH_PROTOCOLS:
             value = False
         return value
 
@@ -79,7 +79,8 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             return username_same_with_user
         protocol = self.initial_data.get("protocol", "ssh")
         queryset = SystemUser.objects.filter(
-                protocol=protocol, username_same_with_user=True
+            protocol=protocol,
+            username_same_with_user=True
         )
         if self.instance:
             queryset = queryset.exclude(id=self.instance.id)
@@ -95,12 +96,14 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         login_mode = self.initial_data.get("login_mode")
         protocol = self.initial_data.get("protocol")
         username_same_with_user = self.initial_data.get("username_same_with_user")
-        if username_same_with_user:
-            return ''
+
         if login_mode == SystemUser.LOGIN_AUTO and \
-                protocol != SystemUser.PROTOCOL_VNC:
+                protocol != SystemUser.Protocol.vnc:
             msg = _('* Automatic login mode must fill in the username.')
             raise serializers.ValidationError(msg)
+
+        if username_same_with_user:
+            username = '*'
         return username
 
     def validate_home(self, home):
@@ -117,38 +120,55 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             raise serializers.ValidationError(error)
         return value
 
+    @staticmethod
+    def validate_admin_user(attrs):
+        tp = attrs.get('type')
+        if tp != SystemUser.Type.admin:
+            return attrs
+        attrs['protocol'] = SystemUser.Protocol.ssh
+        attrs['login_mode'] = SystemUser.LOGIN_AUTO
+        attrs['username_same_with_user'] = False
+        attrs['auto_push'] = False
+        return attrs
+
     def validate_password(self, password):
         super().validate_password(password)
         auto_gen_key = self.initial_data.get("auto_generate_key", False)
         private_key = self.initial_data.get("private_key")
         login_mode = self.initial_data.get("login_mode")
+
         if not self.instance and not auto_gen_key and not password and \
                 not private_key and login_mode == SystemUser.LOGIN_AUTO:
             raise serializers.ValidationError(_("Password or private key required"))
         return password
 
-    def validate(self, attrs):
+    def validate_gen_key(self, attrs):
         username = attrs.get("username", "manual")
         auto_gen_key = attrs.pop("auto_generate_key", False)
         protocol = attrs.get("protocol")
 
-        if protocol not in [SystemUser.PROTOCOL_RDP, SystemUser.PROTOCOL_SSH]:
+        if protocol not in SystemUser.SUPPORT_PUSH_PROTOCOLS:
             return attrs
 
-        if auto_gen_key:
+        # 自动生成
+        if auto_gen_key and not self.instance:
             password = SystemUser.gen_password()
             attrs["password"] = password
-            if protocol == SystemUser.PROTOCOL_SSH:
+            if protocol == SystemUser.Protocol.ssh:
                 private_key, public_key = SystemUser.gen_key(username)
                 attrs["private_key"] = private_key
                 attrs["public_key"] = public_key
-                # 如果设置了private key，没有设置public key则生成
+        # 如果设置了private key，没有设置public key则生成
         elif attrs.get("private_key", None):
             private_key = attrs["private_key"]
             password = attrs.get("password")
-            public_key = ssh_pubkey_gen(private_key, password=password,
-                                        username=username)
+            public_key = ssh_pubkey_gen(private_key, password=password, username=username)
             attrs["public_key"] = public_key
+        return attrs
+
+    def validate(self, attrs):
+        attrs = self.validate_admin_user(attrs)
+        attrs = self.validate_gen_key(attrs)
         return attrs
 
 

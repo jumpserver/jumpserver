@@ -8,6 +8,7 @@ from functools import reduce
 from collections import OrderedDict
 
 from django.db import models
+from common.db.models import TextChoices
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import ValidationError
 
@@ -57,16 +58,12 @@ class AssetQuerySet(models.QuerySet):
 
 class ProtocolsMixin:
     protocols = ''
-    PROTOCOL_SSH = 'ssh'
-    PROTOCOL_RDP = 'rdp'
-    PROTOCOL_TELNET = 'telnet'
-    PROTOCOL_VNC = 'vnc'
-    PROTOCOL_CHOICES = (
-        (PROTOCOL_SSH, 'ssh'),
-        (PROTOCOL_RDP, 'rdp'),
-        (PROTOCOL_TELNET, 'telnet'),
-        (PROTOCOL_VNC, 'vnc'),
-    )
+
+    class Protocol(TextChoices):
+        ssh = 'ssh', 'SSH'
+        rdp = 'rdp', 'RDP'
+        telnet = 'telnet', 'Telnet'
+        vnc = 'vnc', 'VNC'
 
     @property
     def protocols_as_list(self):
@@ -182,8 +179,8 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     ip = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
     hostname = models.CharField(max_length=128, verbose_name=_('Hostname'))
-    protocol = models.CharField(max_length=128, default=ProtocolsMixin.PROTOCOL_SSH,
-                                choices=ProtocolsMixin.PROTOCOL_CHOICES,
+    protocol = models.CharField(max_length=128, default=ProtocolsMixin.Protocol.ssh,
+                                choices=ProtocolsMixin.Protocol.choices,
                                 verbose_name=_('Protocol'))
     port = models.IntegerField(default=22, verbose_name=_('Port'))
     protocols = models.CharField(max_length=128, default='ssh/22', blank=True, verbose_name=_("Protocols"))
