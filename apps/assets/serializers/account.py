@@ -16,7 +16,8 @@ class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         model = AuthBook
         fields_mini = ['id', 'username', 'username_display', 'ip', 'hostname', 'version']
         fields_write_only = ['password', 'private_key', "public_key"]
-        fields_small = fields_mini + fields_write_only + ['comment']
+        fields_other = ['date_created', 'date_updated', 'comment']
+        fields_small = fields_mini + fields_write_only + fields_other
         fields_fk = ['asset', 'systemuser']
         fields = fields_small + fields_fk
         extra_kwargs = {

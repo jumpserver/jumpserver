@@ -9,10 +9,9 @@ from ..models import Asset, Node, Platform, SystemUser
 from .base import ConnectivitySerializer
 
 __all__ = [
-    'AssetSerializer', 'AssetSimpleSerializer',
-    'AssetDisplaySerializer',
+    'AssetSerializer', 'AssetSimpleSerializer', 'AssetVerboseSerializer',
     'ProtocolsField', 'PlatformSerializer',
-    'AssetDetailSerializer', 'AssetTaskSerializer',
+    'AssetTaskSerializer',
 ]
 
 
@@ -64,8 +63,9 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     platform = serializers.SlugRelatedField(
         slug_field='name', queryset=Platform.objects.all(), label=_("Platform")
     )
+    connectivity = ConnectivitySerializer(read_only=True, label=_("Connectivity"))
     admin_user = serializers.PrimaryKeyRelatedField(
-        queryset=SystemUser.objects, label=_('Admin user')
+        queryset=SystemUser.objects, label=_('Admin user'), write_only=True
     )
     protocols = ProtocolsField(label=_('Protocols'), required=False, default=['ssh/22'])
     domain_display = serializers.ReadOnlyField(source='domain.name', label=_('Domain name'))
@@ -82,24 +82,18 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'number', 'vendor', 'model', 'sn', 'cpu_model', 'cpu_count',
             'cpu_cores', 'cpu_vcpus', 'memory', 'disk_total', 'disk_info',
             'os', 'os_version', 'os_arch', 'hostname_raw', 'comment',
-            'created_by', 'date_created', 'hardware_info',
+            'hardware_info', 'connectivity'
         ]
         fields_fk = [
-            'domain', 'domain_display', 'platform', 'admin_user',
+            'domain', 'domain_display', 'platform', 'admin_user'
         ]
-        fk_only_fields = {
-            'platform': ['name']
-        }
         fields_m2m = [
             'nodes', 'nodes_display', 'labels',
         ]
-        annotates_fields = {
-        }
-        fields_as = list(annotates_fields.keys())
-        fields = fields_small + fields_fk + fields_m2m + fields_as
         read_only_fields = [
             'created_by', 'date_created',
-        ] + fields_as
+        ]
+        fields = fields_small + fields_fk + fields_m2m + read_only_fields
 
         extra_kwargs = {
             'protocol': {'write_only': True},
@@ -171,13 +165,10 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
         return instance
 
 
-class AssetDisplaySerializer(AssetSerializer):
-    connectivity = ConnectivitySerializer(read_only=True, label=_("Connectivity"))
-
-    class Meta(AssetSerializer.Meta):
-        fields = AssetSerializer.Meta.fields + [
-            'connectivity',
-        ]
+class AssetVerboseSerializer(AssetSerializer):
+    admin_user = serializers.PrimaryKeyRelatedField(
+        queryset=SystemUser.objects, label=_('Admin user')
+    )
 
 
 class PlatformSerializer(serializers.ModelSerializer):
@@ -197,10 +188,6 @@ class PlatformSerializer(serializers.ModelSerializer):
             'id', 'name', 'base', 'charset',
             'internal', 'meta', 'comment'
         ]
-
-
-class AssetDetailSerializer(AssetSerializer):
-    platform = PlatformSerializer(read_only=True)
 
 
 class AssetSimpleSerializer(serializers.ModelSerializer):

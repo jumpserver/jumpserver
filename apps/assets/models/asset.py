@@ -231,16 +231,15 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
 
     @admin_user.setter
     def admin_user(self, system_user):
-        from .authbook import AuthBook
         if not system_user:
             return
         if system_user.type != 'admin':
             raise ValidationError('System user should be type admin')
-        AuthBook.objects.filter(asset=self, system_user__type='admin')\
-            .exclude(system_user=system_user)\
-            .delete()
         system_user.assets.add(self)
-        # self.system_users.add(system_user)
+
+    def remove_admin_user(self):
+        from ..models import AuthBook
+        AuthBook.objects.filter(asset=self, systemuser__type='admin').delete()
 
     @property
     def is_valid(self):

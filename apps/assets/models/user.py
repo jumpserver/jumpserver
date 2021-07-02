@@ -266,6 +266,10 @@ class SystemUser(ProtocolMixin, BaseUser):
             return False
 
     @property
+    def is_admin_user(self):
+        return self.type == self.Type.admin
+
+    @property
     def is_need_cmd_filter(self):
         return self.protocol not in [self.Protocol.rdp, self.Protocol.vnc]
 

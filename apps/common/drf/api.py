@@ -2,12 +2,12 @@ from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework_bulk import BulkModelViewSet
 
 from ..mixins.api import (
-    SerializerMixin2, QuerySetMixin, ExtraFilterFieldsMixin, PaginatedResponseMixin,
-    RelationMixin, AllowBulkDestoryMixin, RenderToJsonMixin,
+    SerializerMixin, QuerySetMixin, ExtraFilterFieldsMixin, PaginatedResponseMixin,
+    RelationMixin, AllowBulkDestroyMixin, RenderToJsonMixin,
 )
 
 
-class CommonMixin(SerializerMixin2,
+class CommonMixin(SerializerMixin,
                   QuerySetMixin,
                   ExtraFilterFieldsMixin,
                   PaginatedResponseMixin,
@@ -26,13 +26,13 @@ class JMSModelViewSet(CommonMixin,
 
 
 class JMSBulkModelViewSet(CommonMixin,
-                          AllowBulkDestoryMixin,
+                          AllowBulkDestroyMixin,
                           BulkModelViewSet):
     pass
 
 
 class JMSBulkRelationModelViewSet(CommonMixin,
                                   RelationMixin,
-                                  AllowBulkDestoryMixin,
+                                  AllowBulkDestroyMixin,
                                   BulkModelViewSet):
     pass
