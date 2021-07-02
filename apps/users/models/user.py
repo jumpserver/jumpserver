@@ -772,35 +772,8 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         return False
 
     def has_perm(self, perm, obj=None):
-        # scope.app-label.action_model-name
-        # org:00000000-0000-0000-0000-000000000000.assets.add_asset
-
-        from rbac.const import RoleTypeChoices
-        from rbac.models import Role, Permission, ContentType, RoleBinding
-
-        scope, app_label, codename = perm.split('.')
-        _model_name = codename.split('_')[1]
-        _org_id = scope.split(':')[1]
-        org = Organization.get_instance(id_or_name=_org_id, default=Organization.root())
-
-        has_perm = RoleBinding.has_perms(
-            user=self, org=org, app_label=app_label, model_name=_model_name
-        )
-
-        content_type = ContentType.objects.get(app_label=app_label, model=_model_name)
-
-        roles = self.role_bindings.filter(type=RoleTypeChoices.system).values_list('role', flat=True)
-        permissions = Role.permissions.through.objects.filter(role__in=roles).values_list('permission', flat=True)
-        perms = Permission.objects.filter(id__in=permissions, content_type=content_type).values_list('codename', flat=True)
-
-        if perm in perms:
-            return True
-
-        if 'system':
-            pass
-
-        if 'org':
-            pass
+        from rbac.utils import RBACPermissionUtil
+        return RBACPermissionUtil.user_has_perm(user=self, perm=perm, obj=obj)
 
 
 class UserPasswordHistory(models.Model):

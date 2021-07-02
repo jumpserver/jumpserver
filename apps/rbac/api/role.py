@@ -9,7 +9,7 @@ __all__ = ['RoleViewSet', 'RoleBindingViewSet']
 class RoleViewSet(JMSModelViewSet):
     queryset = Role.objects.all()
     serializer_class = RoleSerializer
-    filterset_fields = ['name', 'type', 'builtin']
+    filterset_fields = ['name', 'scope', 'builtin']
     search_fields = filterset_fields
     permission_classes = (IsSuperUser, )
 
@@ -17,6 +17,6 @@ class RoleViewSet(JMSModelViewSet):
 class RoleBindingViewSet(JMSModelViewSet):
     queryset = RoleBinding.objects.all()
     serializer_class = RoleBindingSerializer
-    filterset_fields = ['type', 'user', 'role', 'org']
+    filterset_fields = ['scope', 'user', 'role', 'org']
     search_fields = filterset_fields
     permission_classes = (IsOrgAdmin, )

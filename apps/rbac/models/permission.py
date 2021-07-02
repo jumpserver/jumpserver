@@ -18,6 +18,10 @@ class Permission(DjangoPermission):
     class Meta:
         proxy = True
 
+    @property
+    def app_label_codename(self):
+        return '%s.%s' % (self.content_type.app_label, self.codename)
+
     @classmethod
     def get_permissions(cls, scope):
         # TODO: 根据类型过滤出对应的权限位并返回

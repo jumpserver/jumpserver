@@ -2,7 +2,7 @@ import uuid
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from common.db.models import JMSModel
-from ..const import RoleTypeChoices
+from ..const import ScopeChoices
 
 __all__ = ['Role', 'RoleBinding']
 
@@ -10,9 +10,9 @@ __all__ = ['Role', 'RoleBinding']
 class Role(JMSModel):
     """ 定义 角色 ｜ 角色-权限 关系 """
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
-    type = models.CharField(
-        max_length=128, choices=RoleTypeChoices.choices, default=RoleTypeChoices.system,
-        verbose_name=_('Type')
+    scope = models.CharField(
+        max_length=128, choices=ScopeChoices.choices, default=ScopeChoices.system,
+        verbose_name=_('Scope')
     )
     permissions = models.ManyToManyField(
         'rbac.Permission', related_name='roles', blank=True, verbose_name=_('Permissions')
@@ -24,9 +24,9 @@ class Role(JMSModel):
 class RoleBinding(models.Model):
     """ 定义 用户-角色 关系 """
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    type = models.CharField(
-        max_length=128, choices=RoleTypeChoices.choices, default=RoleTypeChoices.system,
-        verbose_name=_('Type')
+    scope = models.CharField(
+        max_length=128, choices=ScopeChoices.choices, default=ScopeChoices.system,
+        verbose_name=_('Scope')
     )
     user = models.ForeignKey(
         'users.User', related_name='role_bindings', on_delete=models.CASCADE, verbose_name=_('User')
@@ -35,8 +35,8 @@ class RoleBinding(models.Model):
         Role, related_name='role_bindings', on_delete=models.CASCADE, verbose_name=_('Role')
     )
     org = models.ForeignKey(
-        'orgs.Organization', related_name='role_bindings', null=True, on_delete=models.CASCADE,
-        verbose_name=_('Organization')
+        'orgs.Organization', related_name='role_bindings', blank=True, null=True,
+        on_delete=models.CASCADE, verbose_name=_('Organization')
     )
 
     class Meta:
@@ -44,5 +44,5 @@ class RoleBinding(models.Model):
         unique_together = ('user', 'role', 'org')
 
     def save(self, *args, **kwargs):
-        self.type = self.role.type
+        self.scope = self.role.scope
         return super().save(*args, **kwargs)
