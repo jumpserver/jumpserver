@@ -26,3 +26,13 @@ class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'private_key': {'write_only': True},
             'public_key': {'write_only': True},
         }
+
+
+class AccountAuthInfoSerializer(AccountSerializer):
+    class Meta(AccountSerializer.Meta):
+        extra_kwargs = {
+            'username': {'required': True},
+            'password': {'write_only': False},
+            'private_key': {'write_only': False},
+            'public_key': {'write_only': False},
+        }
