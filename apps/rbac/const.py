@@ -6,7 +6,3 @@ class RoleTypeChoices(models.TextChoices):
     system = 'system', _('System')
     org = 'org', _('Organization')
     app = 'app', _('Application')
-
-
-PermissionScopeChoices = RoleTypeChoices
-

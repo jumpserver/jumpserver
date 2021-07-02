@@ -28,10 +28,15 @@ class RoleBinding(models.Model):
         max_length=128, choices=RoleTypeChoices.choices, default=RoleTypeChoices.system,
         verbose_name=_('Type')
     )
-    user = models.ForeignKey('users.User', on_delete=models.CASCADE, verbose_name=_('User'))
-    role = models.ForeignKey(Role, on_delete=models.CASCADE, verbose_name=_('Role'))
+    user = models.ForeignKey(
+        'users.User', related_name='role_bindings', on_delete=models.CASCADE, verbose_name=_('User')
+    )
+    role = models.ForeignKey(
+        Role, related_name='role_bindings', on_delete=models.CASCADE, verbose_name=_('Role')
+    )
     org = models.ForeignKey(
-        'orgs.Organization', null=True, on_delete=models.CASCADE, verbose_name=_('Organization')
+        'orgs.Organization', related_name='role_bindings', null=True, on_delete=models.CASCADE,
+        verbose_name=_('Organization')
     )
 
     class Meta:

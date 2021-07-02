@@ -2,8 +2,15 @@ import uuid
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import Permission as DjangoPermission
+from django.contrib.auth.models import ContentType as DjangoContentType
 
-__all__ = ['Permission']
+__all__ = ['Permission', 'ContentType']
+
+
+class ContentType(DjangoContentType):
+
+    class Meta:
+        proxy = True
 
 
 class Permission(DjangoPermission):
