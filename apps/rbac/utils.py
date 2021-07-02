@@ -10,23 +10,24 @@ class RBACPermissionUtil(object):
     def get_user_permissions(cls, user):
         roles_orgs = list(RoleBinding.objects.filter(user=user).values_list('role_id', 'org_id'))
         roles_ids = [str(role_id) for role_id, org_id in roles_orgs]
-        roles = Role.objects.filter(id__in=roles_ids)
-        roles_map = {str(role.id): role for role in roles}
 
-        roles_perms = list(Role.permissions.through.objects.filter(role__in=roles_ids).values_list('role_id', 'permission_id'))
+        roles_perms = Role.permissions.through.objects.filter(role__in=roles_ids)
+        roles_perms = list(roles_perms.values_list('role_id', 'permission_id'))
+
         perms_ids = [str(perm_id) for role_id, perm_id in roles_perms]
-        perms = list(Permission.objects.filter(id__in=perms_ids))
+        perms = list(Permission.objects.filter(id__in=perms_ids).prefetch_related('content_type'))
         perms_map = {str(perm.id): perm for perm in perms}
 
         roles_perms_map = defaultdict(set)
         for role_id, perm_id in roles_perms:
-            roles_perms_map[role_id].add(perms_map[perm_id])
+            perm = perms_map[str(perm_id)]
+            roles_perms_map[str(role_id)].add(perm)
 
         perms = set()
         for role_id, org_id, in roles_orgs:
-            perms = roles_perms_map[role_id]
-            for perm in perms:
-                _perm = perm.app_label_codename
+            permissions = roles_perms_map[str(role_id)]
+            for permission in permissions:
+                _perm = permission.app_label_codename
                 if org_id:
                     _perm = f'org:{org_id}|{_perm}'
                 perms.add(_perm)
