@@ -28,7 +28,7 @@ class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         }
 
 
-class AccountAuthInfoSerializer(AccountSerializer):
+class AccountSecretSerializer(AccountSerializer):
     class Meta(AccountSerializer.Meta):
         extra_kwargs = {
             'username': {'required': True},

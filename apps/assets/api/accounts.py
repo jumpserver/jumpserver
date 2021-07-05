@@ -5,10 +5,11 @@ from rest_framework.response import Response
 
 from orgs.mixins.api import OrgBulkModelViewSet
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, NeedMFAVerify
+from ..tasks.account_connectivity import test_accounts_connectivity_manual
 from ..models import AuthBook
 from .. import serializers
 
-__all__ = ['AccountViewSet']
+__all__ = ['AccountViewSet', 'AccountSecretsViewSet']
 
 
 class AccountViewSet(OrgBulkModelViewSet):
@@ -17,15 +18,9 @@ class AccountViewSet(OrgBulkModelViewSet):
     search_fields = filterset_fields
     serializer_classes = {
         'default': serializers.AccountSerializer,
-        'retrieve_auth_info': serializers.AccountAuthInfoSerializer
+        'verify_account': serializers.AssetTaskSerializer
     }
     permission_classes = (IsOrgAdmin,)
-
-    @action(methods=['GET'], detail=True, url_path='auth-info', permission_classes=[IsOrgAdmin, NeedMFAVerify])
-    def retrieve_auth_info(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
 
     def get_queryset(self):
         queryset = super().get_queryset()\
@@ -33,10 +28,19 @@ class AccountViewSet(OrgBulkModelViewSet):
             .annotate(hostname=F('asset__hostname'))
         return queryset
 
-    def get_permissions(self):
-        if self.action != 'retrieve_auth_info':
-            return super().get_permissions()
+    @action(methods=['post'], detail=True, url_path='verify')
+    def verify_account(self, request, *args, **kwargs):
+        account = super().get_object()
+        task = test_accounts_connectivity_manual.delay([account])
+        return Response(data={'task': task.id})
 
+
+class AccountSecretsViewSet(AccountViewSet):
+    serializer_class = serializers.AccountSecretSerializer
+    permission_classes = (IsOrgAdmin, NeedMFAVerify)
+    http_method_names = ['get']
+
+    def get_permissions(self):
         if not settings.SECURITY_VIEW_AUTH_NEED_MFA:
             self.permission_classes = [IsOrgAdminOrAppUser]
         return super().get_permissions()

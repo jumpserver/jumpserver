@@ -6,7 +6,7 @@ from django.utils.translation import ugettext as _
 
 from common.utils import get_logger
 from orgs.utils import org_aware_func
-from ..models.utils import Connectivity
+from ..models import Asset, Connectivity, AuthBook
 from . import const
 from .utils import clean_ansible_task_hosts, group_asset_by_platform
 
@@ -16,6 +16,28 @@ __all__ = [
     'test_asset_connectivity_util', 'test_asset_connectivity_manual',
     'test_node_assets_connectivity_manual', 'test_assets_connectivity_manual',
 ]
+
+
+def set_assets_accounts_connectivity(assets, results_summary):
+    asset_ids_ok = set()
+    asset_ids_failed = set()
+
+    asset_hostnames_ok = results_summary.get('contacted', {}).keys()
+
+    for asset in assets:
+        if asset.hostname in asset_hostnames_ok:
+            asset_ids_ok.add(asset.id)
+        else:
+            asset_ids_failed.add(asset.id)
+
+    Asset.bulk_set_connectivity(asset_ids_ok, Connectivity.ok)
+    Asset.bulk_set_connectivity(asset_ids_failed, Connectivity.failed)
+
+    accounts_ok = AuthBook.objects.filter(asset_id__in=asset_ids_ok, systemuser__type='admin')
+    accounts_failed = AuthBook.objects.filter(asset_id__in=asset_ids_failed, systemuser__type='admin')
+
+    AuthBook.bulk_set_connectivity(accounts_ok, Connectivity.ok)
+    AuthBook.bulk_set_connectivity(accounts_failed, Connectivity.failed)
 
 
 @shared_task(queue="ansible")
@@ -60,14 +82,7 @@ def test_asset_connectivity_util(assets, task_name=None):
         results_summary['contacted'].update(contacted)
         results_summary['dark'].update(dark)
         continue
-
-    for asset in assets:
-        if asset.hostname in results_summary.get('dark', {}).keys():
-            asset.connectivity = Connectivity.unreachable()
-        elif asset.hostname in results_summary.get('contacted', {}).keys():
-            asset.connectivity = Connectivity.reachable()
-        else:
-            asset.connectivity = Connectivity.unknown()
+    set_assets_accounts_connectivity(assets, results_summary)
     return results_summary
 
 

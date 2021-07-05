@@ -6,7 +6,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import Asset, Node, Platform, SystemUser
-from .base import ConnectivitySerializer
 
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'AssetVerboseSerializer',
@@ -63,7 +62,6 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     platform = serializers.SlugRelatedField(
         slug_field='name', queryset=Platform.objects.all(), label=_("Platform")
     )
-    connectivity = ConnectivitySerializer(read_only=True, label=_("Connectivity"))
     admin_user = serializers.PrimaryKeyRelatedField(
         queryset=SystemUser.objects, label=_('Admin user'), write_only=True
     )
@@ -82,7 +80,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'number', 'vendor', 'model', 'sn', 'cpu_model', 'cpu_count',
             'cpu_cores', 'cpu_vcpus', 'memory', 'disk_total', 'disk_info',
             'os', 'os_version', 'os_arch', 'hostname_raw', 'comment',
-            'hardware_info', 'connectivity'
+            'hardware_info', 'connectivity', 'date_verified'
         ]
         fields_fk = [
             'domain', 'domain_display', 'platform', 'admin_user'
@@ -191,11 +189,10 @@ class PlatformSerializer(serializers.ModelSerializer):
 
 
 class AssetSimpleSerializer(serializers.ModelSerializer):
-    connectivity = ConnectivitySerializer(read_only=True, label=_("Connectivity"))
 
     class Meta:
         model = Asset
-        fields = ['id', 'hostname', 'ip', 'connectivity', 'port']
+        fields = ['id', 'hostname', 'ip', 'port', 'connectivity', 'date_verified']
 
 
 class AssetTaskSerializer(serializers.Serializer):

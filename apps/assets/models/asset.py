@@ -7,6 +7,7 @@ import logging
 from functools import reduce
 from collections import OrderedDict
 
+from django.utils import timezone
 from django.db import models
 from common.db.models import TextChoices
 from django.utils.translation import ugettext_lazy as _
@@ -15,8 +16,8 @@ from rest_framework.exceptions import ValidationError
 from common.fields.model import JsonDictTextField
 from common.utils import lazyproperty
 from orgs.mixins.models import OrgModelMixin, OrgManager
-from .base import ConnectivityMixin
-from .utils import Connectivity
+
+from .base import AbsConnectivity
 
 __all__ = ['Asset', 'ProtocolsMixin', 'Platform', 'AssetQuerySet']
 logger = logging.getLogger(__name__)
@@ -164,7 +165,7 @@ class Platform(models.Model):
         # ordering = ('name',)
 
 
-class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
+class Asset(AbsConnectivity, ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     # Important
     PLATFORM_CHOICES = (
         ('Linux', 'Linux'),
@@ -220,7 +221,6 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
     objects = AssetManager.from_queryset(AssetQuerySet)()
-    _connectivity = None
 
     def __str__(self):
         return '{0.hostname}({0.ip})'.format(self)
@@ -240,6 +240,7 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     def remove_admin_user(self):
         from ..models import AuthBook
         AuthBook.objects.filter(asset=self, systemuser__type='admin').delete()
+
 
     @property
     def is_valid(self):
@@ -288,23 +289,6 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
             )
         else:
             return ''
-
-    @property
-    def connectivity(self):
-        if self._connectivity:
-            return self._connectivity
-        if not self.admin_user_username:
-            return Connectivity.unknown()
-        connectivity = ConnectivityMixin.get_asset_username_connectivity(
-            self, self.admin_user_username
-        )
-        return connectivity
-
-    @connectivity.setter
-    def connectivity(self, value):
-        if not self.admin_user:
-            return
-        self.admin_user.set_asset_connectivity(self, value)
 
     def get_auth_info(self):
         if not self.admin_user:

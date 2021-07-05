@@ -103,8 +103,9 @@ class AuthMixin:
     def load_tmp_auth_if_has(self, asset_or_app_id, user):
         if not asset_or_app_id or not user:
             return
+
         if self.login_mode != self.LOGIN_MANUAL:
-            pass
+            return
 
         auth = self.get_temp_auth(asset_or_app_id, user)
         if not auth:
@@ -132,31 +133,23 @@ class AuthMixin:
 
     def load_asset_special_auth(self, asset, username=''):
         """
-        有用户名，代表手动设置过密码，给 4分
+        有密码，代表手动设置过密码，给 4分
         有资产: 代表为某个资产设置过，给 2分
         有系统用户: 给 1分
         """
         system_user = self
-        # 1: 优先匹配，有用户名, 有系统用户，有资产的，得分 7
-        q1 = Q(asset=asset, system_user=system_user, username=username)
-        # 2: 第二优先级, 有资产，有用户名的, 这个是可能从修改密码过来的，或者单独设置的, 得分 6
-        q2 = Q(asset=asset, username=username)
-        # 3: 这个可能是动态系统用户，为某个用户单独设置的密码, 得分 5
-        q3 = Q(username=username, system_user=system_user)
-        # 4: 系统用户自己的默认账号密码, 得分 3
-        q4 = Q(asset=asset, system_user=system_user),
 
         def sort_auth(authbook):
             score = 0
             if authbook.password or authbook.private_key:
-                score += 4
-            if authbook.asset:
                 score += 2
-            if authbook.system_user:
+            if authbook.username == username:
                 score += 1
             return score
-        authbooks = list(AuthBook.objects.filter(q1 | q2 | q3 | q4))
+
+        authbooks = list(AuthBook.objects.filter(asset=asset, systemuser=system_user))
         authbooks = sorted(authbooks, key=sort_auth, reverse=True)
+
         if len(authbooks) == 0:
             return None
 
@@ -164,6 +157,7 @@ class AuthMixin:
             self.username = username
 
         password_set, key_set = False
+
         for auth in authbooks:
             if auth.password and not password_set:
                 self.password = auth.password
@@ -210,7 +204,7 @@ class AuthMixin:
         self.load_tmp_auth_if_has(asset_id, user)
 
 
-class SystemUser(ProtocolMixin, BaseUser):
+class SystemUser(ProtocolMixin, AuthMixin, BaseUser):
     LOGIN_AUTO = 'auto'
     LOGIN_MANUAL = 'manual'
     LOGIN_MODE_CHOICES = (

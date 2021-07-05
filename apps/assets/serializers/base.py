@@ -29,11 +29,6 @@ class AuthSerializer(serializers.ModelSerializer):
         return self.instance
 
 
-class ConnectivitySerializer(serializers.Serializer):
-    status = serializers.IntegerField()
-    datetime = serializers.DateTimeField()
-
-
 class AuthSerializerMixin:
     def validate_password(self, password):
         return password
