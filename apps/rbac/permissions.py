@@ -13,15 +13,17 @@ class RBACPermission(permissions.DjangoModelPermissions):
         codes that the user is required to have.
         """
         # scope|app-label.action_model-name
-        # org:00000000-0000-0000-0000-000000000000|assets.add_asset
+        # org:00000000-0000-0000-0000-000000000002|assets.add_asset
         perms_map = self.get_perms_map()
 
         if method not in perms_map:
             raise exceptions.MethodNotAllowed(method)
 
-        kwargs = {
-            'scope': f'org:{current_org.id}',
-            'app_label': model_cls._meta.app_label,
-            'model_name': model_cls._meta.model_name
-        }
-        return [f'%(scope)s|{perm}' % kwargs for perm in perms_map[method]]
+        perms = []
+        for perm in perms_map[method]:
+            _perm = perm % {model_cls._meta.app_label, model_cls._meta.model_name}
+            if not current_org.is_root():
+                _perm = f'org:{current_org.org_id}|{_perm}'
+            perms.append(_perm)
+
+        return perms
