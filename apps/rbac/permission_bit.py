@@ -27,12 +27,12 @@ organization_admin_permissions_bits = {
     'add_usergroup': _('Create user group'),
     'change_usergroup': _('Update user group'),
     'delete_usergroup': _('Delete user group'),
-    'view_usergroup': _('View user group')
+    'view_usergroup': _('View user group'),
     'add_accesskey': _('Add access key'),
     'delete_accesskey': _('Delete access key'),
     'view_accesskey': _('View access key'),
     'add_privatetoken': _('Create private token'),
-    'add_ssotoken': _('Create SSO token')
+    'add_ssotoken': _('Create SSO token'),
     'add_loginacl': _('Create user login rules'),
     'change_loginacl': _('Update user login rules'),
     'delete_loginacl': _('Delete user login rules'),
@@ -44,7 +44,7 @@ organization_admin_permissions_bits = {
     'add_rolebinding': _('Create User role binding'),
     'change_rolebinding': _('Update user role binding'),
     'view_rolebinding': _('View user role binding'),
-    'delete_rolebinding': _('Delete user role binding')
+    'delete_rolebinding': _('Delete user role binding'),
     'add_organizationmember': _('Add organization member'),
     'remove_organizationmember': _('Remove organization member'),
     'view_organizationmember': _('View organization member'),
@@ -92,11 +92,11 @@ organization_admin_permissions_bits = {
     'add_platform': _('Create platform'),
     'change_platform': _('Update platform'),
     'delete_platform': _('Delete platform'),
-    'view_platform': _('View platform')
+    'view_platform': _('View platform'),
     'add_application': _('Create application'),
     'change_application': _('Update application'),
     'delete_application': _('Delete application'),
-    'view_application': _('View application')
+    'view_application': _('View application'),
     'add_assetpermission': _('Create asset permission'),
     'change_assetpermission': _('Update asset permission'),
     'delete_assetpermission': _('Delete asset permission'),
@@ -123,7 +123,7 @@ organization_admin_permissions_bits = {
     'change_replaystorage': _('Update replay storage'),
     'delete_replaystorage': _('Delete replay storage'),
     'view_replaystorage': _('View replay storage'),
-    'terminate_session': _('Terminate session')
+    'terminate_session': _('Terminate session'),
     'add_commandexecution': _('Execute batch command'),
     'add_ticket': _('Create ticket'),
     'change_ticket': _('Update ticket'),
@@ -182,4 +182,3 @@ permissions_bits_map = {
     'organization_auditor': auditor_permissions_bits,
     'user': user_permissions_bits,
 }
-
