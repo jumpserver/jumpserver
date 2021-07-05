@@ -1,6 +1,6 @@
 from django.utils.translation import ugettext_lazy as _
 
-# permission bit list
+# Permissions Bits List
 
 only_system_admin_permissions_bits = {
     'delete_user': _('Delete user'),
@@ -19,7 +19,7 @@ only_system_admin_permissions_bits = {
     'view_setting': _('View system setting'),
 }
 
-organization_admin_permissions_bits = {
+_org_admin_permissions_bits = {
     'add_user': _('Create user'),
     'change_user': _('Update user'),
     'remove_user': _('Remove user'),
@@ -169,16 +169,44 @@ user_permissions_bits = {
     'execute_batch_command': _('Execute batch command'),
 }
 
+other_only_system_admin_permissions_bits = {
+
+}
+_other_org_admin_permissions_bits = {
+
+}
+other_auditor_permissions_bits = {
+
+}
+other_user_permissions_bits = {
+
+}
+
+other_org_admin_permissions_bits = {}
+other_org_admin_permissions_bits.update(_other_org_admin_permissions_bits)
+other_org_admin_permissions_bits.update(other_auditor_permissions_bits)
+other_org_admin_permissions_bits.update(other_user_permissions_bits)
+
+org_admin_permissions_bits = {}
+org_admin_permissions_bits.update(_org_admin_permissions_bits)
+org_admin_permissions_bits.update(other_org_admin_permissions_bits)
+org_admin_permissions_bits.update(auditor_permissions_bits)
+org_admin_permissions_bits.update(user_permissions_bits)
+
+
 system_admin_permissions_bits = {}
 system_admin_permissions_bits.update(only_system_admin_permissions_bits)
-system_admin_permissions_bits.update(organization_admin_permissions_bits)
-system_admin_permissions_bits.update(auditor_permissions_bits)
-system_admin_permissions_bits.update(user_permissions_bits)
+system_admin_permissions_bits.update(other_only_system_admin_permissions_bits)
+system_admin_permissions_bits.update(org_admin_permissions_bits)
+
 
 permissions_bits_map = {
-    'system_admin': system_admin_permissions_bits,
-    'organization_admin': organization_admin_permissions_bits,
-    'system_auditor': auditor_permissions_bits,
-    'organization_auditor': auditor_permissions_bits,
-    'user': user_permissions_bits,
+    'system_admin': list(system_admin_permissions_bits.keys()),
+    'org_admin': list(org_admin_permissions_bits.keys()),
+    'system_auditor': list(auditor_permissions_bits.keys()),
+    'org_auditor': list(auditor_permissions_bits.keys()),
+    'user': list(user_permissions_bits.keys()),
 }
+
+scope_system_permissions_bits = permissions_bits_map['system_admin']
+scope_org_permissions_bits = permissions_bits_map['org_admin']
