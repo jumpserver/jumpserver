@@ -2,13 +2,17 @@ import uuid
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from common.db.models import JMSModel
-from ..const import ScopeChoices
 
 __all__ = ['Role', 'RoleBinding']
 
 
 class Role(JMSModel):
     """ 定义 角色 ｜ 角色-权限 关系 """
+
+    class ScopeChoices(models.TextChoices):
+        system = 'system', _('System')
+        org = 'org', _('Organization')
+
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     scope = models.CharField(
         max_length=128, choices=ScopeChoices.choices, default=ScopeChoices.system,
@@ -20,18 +24,27 @@ class Role(JMSModel):
     builtin = models.BooleanField(default=False, verbose_name=_('Built-in'))
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
 
-    def __str__(self):
-        return '%s (%s)' % (self.name, self.get_scope_display())
+    admin_name = 'Admin'
+    auditor_name = 'Auditor'
+    user_name = 'User'
+    app_name = 'App'
 
     class Meta:
         unique_together = ('name', 'scope')
+
+    def __str__(self):
+        return '%s (%s)' % (self.name, self.get_scope_display())
+
+    @classmethod
+    def get_builtin_role(cls, name, scope):
+        return cls.objects.filter(name=name, scope=scope, builtin=True).first()
 
 
 class RoleBinding(models.Model):
     """ 定义 用户-角色 关系 """
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     scope = models.CharField(
-        max_length=128, choices=ScopeChoices.choices, default=ScopeChoices.system,
+        max_length=128, choices=Role.ScopeChoices.choices, default=Role.ScopeChoices.system,
         verbose_name=_('Scope')
     )
     user = models.ForeignKey(

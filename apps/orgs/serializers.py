@@ -7,7 +7,7 @@ from users.models.user import User
 from common.drf.serializers import AdaptedBulkListSerializer
 from common.drf.serializers import BulkModelSerializer
 from common.db.models import concated_display as display
-from .models import Organization, OrganizationMember, ROLE
+from .models import Organization, OrganizationMember
 
 
 class ResourceStatisticsSerializer(serializers.Serializer):
@@ -118,14 +118,6 @@ class OrgMemberOldBaseSerializer(BulkModelSerializer):
     class Meta:
         model = OrganizationMember
         fields = ('id', 'organization', 'user', 'role')
-
-
-class OrgMemberAdminSerializer(OrgMemberOldBaseSerializer):
-    role = serializers.HiddenField(default=ROLE.ADMIN)
-
-
-class OrgMemberUserSerializer(OrgMemberOldBaseSerializer):
-    role = serializers.HiddenField(default=ROLE.USER)
 
 
 class OrgRetrieveSerializer(OrgReadSerializer):

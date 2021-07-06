@@ -170,163 +170,58 @@ class AuthMixin:
 
 
 class RoleMixin:
-    class ROLE(ChoiceSet):
-        ADMIN = choices.ADMIN, _('System administrator')
-        AUDITOR = choices.AUDITOR, _('System auditor')
-        USER = choices.USER, _('User')
-        APP = 'App', _('Application')
 
-    role = ROLE.USER
+    @lazyproperty
+    def roles(self):
+        from rbac.models import Role
+        roles_ids = self.role_bindings.values_list('role_id', flat=True)
+        roles = Role.objects.filter(id__in=roles_ids)
+        return roles
 
-    @property
-    def role_display(self):
-        return self.get_role_display()
+    @lazyproperty
+    def system_roles(self):
+        from rbac.models import Role
+        return self.roles.filter(scope=Role.ScopeChoices.system)
 
     @lazyproperty
     def org_roles(self):
-        from orgs.models import ROLE as ORG_ROLE
-
+        from rbac.models import Role
         if current_org.is_root():
-            # root 组织, 取 User 本身的角色
-            if self.is_superuser:
-                roles = [ORG_ROLE.ADMIN]
-            elif self.is_super_auditor:
-                roles = [ORG_ROLE.AUDITOR]
-            else:
-                roles = [ORG_ROLE.USER]
+            roles = self.system_roles
         else:
-            # 是真实组织, 取 OrganizationMember 中的角色
-            roles = [
-                org_member.role for org_member in self.m2m_org_members.all()
-                if org_member.org_id == current_org.id
-            ]
-            roles.sort()
+            roles = self.roles.filter(scope=Role.ScopeChoices.org, org=current_org)
         return roles
 
+    def _get_roles_display(self, scope=None):
+        if scope is None:
+            attr_name = 'roles'
+        else:
+            attr_name = f'{scope}_roles'
+        roles = getattr(self, attr_name, [])
+        roles_display = [str(role) for role in roles]
+        return '|'.join(roles_display)
+
     @lazyproperty
-    def org_roles_label_list(self):
-        from orgs.models import ROLE as ORG_ROLE
-        return [str(ORG_ROLE[role]) for role in self.org_roles if role in ORG_ROLE]
+    def role_display(self):
+        return self._get_roles_display()
+
+    @lazyproperty
+    def system_role_display(self):
+        return self._get_roles_display(scope='system')
 
     @lazyproperty
     def org_role_display(self):
-        return ' | '.join(self.org_roles_label_list)
-
-    @lazyproperty
-    def total_role_display(self):
-        roles = list({self.role_display, *self.org_roles_label_list})
-        roles.sort()
-        return ' | '.join(roles)
-
-    def current_org_roles(self):
-        from orgs.models import OrganizationMember, ROLE as ORG_ROLE
-        if current_org.is_root():
-            if self.is_superuser:
-                return [ORG_ROLE.ADMIN]
-            else:
-                return [ORG_ROLE.USER]
-
-        roles = list(set(OrganizationMember.objects.filter(
-            org_id=current_org.id, user=self
-        ).values_list('role', flat=True)))
-
-        return roles
+        return self._get_roles_display(scope='org')
 
     @property
     def is_superuser(self):
-        if self.role == self.ROLE.ADMIN:
-            return True
-        else:
-            return False
-
-    @is_superuser.setter
-    def is_superuser(self, value):
-        if value is True:
-            self.role = self.ROLE.ADMIN
-        else:
-            self.role = self.ROLE.USER
-
-    @property
-    def is_super_auditor(self):
-        return self.role == self.ROLE.AUDITOR
-
-    @property
-    def is_common_user(self):
-        if self.is_org_admin:
-            return False
-        if self.is_org_auditor:
-            return False
-        if self.is_app:
-            return False
-        return True
-
-    @property
-    def is_app(self):
-        return self.role == self.ROLE.APP
-
-    @lazyproperty
-    def user_all_orgs(self):
-        from orgs.models import Organization
-        return Organization.get_user_all_orgs(self)
-
-    @lazyproperty
-    def user_orgs(self):
-        from orgs.models import Organization
-        return Organization.get_user_user_orgs(self)
-
-    @lazyproperty
-    def admin_orgs(self):
-        from orgs.models import Organization
-        return Organization.get_user_admin_orgs(self)
-
-    @lazyproperty
-    def audit_orgs(self):
-        from orgs.models import Organization
-        return Organization.get_user_audit_orgs(self)
-
-    @lazyproperty
-    def admin_or_audit_orgs(self):
-        from orgs.models import Organization
-        return Organization.get_user_admin_or_audit_orgs(self)
-
-    @lazyproperty
-    def is_org_admin(self):
-        from orgs.models import ROLE as ORG_ROLE
-        if self.is_superuser or self.m2m_org_members.filter(role=ORG_ROLE.ADMIN).exists():
-            return True
-        else:
-            return False
-
-    @lazyproperty
-    def is_org_auditor(self):
-        from orgs.models import ROLE as ORG_ROLE
-        if self.is_super_auditor or self.m2m_org_members.filter(role=ORG_ROLE.AUDITOR).exists():
-            return True
-        else:
-            return False
-
-    @lazyproperty
-    def can_admin_current_org(self):
-        return current_org.can_admin_by(self)
-
-    @lazyproperty
-    def can_audit_current_org(self):
-        return current_org.can_audit_by(self)
-
-    @lazyproperty
-    def can_user_current_org(self):
-        return current_org.can_use_by(self)
-
-    @lazyproperty
-    def can_admin_or_audit_current_org(self):
-        return self.can_admin_current_org or self.can_audit_current_org
+        from rbac.models import Role
+        role = Role.get_builtin_role(name=Role.admin_name, scope=Role.ScopeChoices.system)
+        return role in self.system_roles
 
     @property
     def is_staff(self):
-        if self.is_authenticated and self.is_valid:
-            return True
-        else:
-            return False
+        return self.is_authenticated and self.is_valid
 
     @is_staff.setter
     def is_staff(self, value):
@@ -334,12 +229,15 @@ class RoleMixin:
 
     @classmethod
     def create_app_user(cls, name, comment):
+        from rbac.models import Role, RoleBinding
         app = cls.objects.create(
             username=name, name=name, email='{}@local.domain'.format(name),
-            is_active=False, role=cls.ROLE.APP, comment=comment,
-            is_first_login=False, created_by='System'
+            is_active=False, comment=comment, is_first_login=False, created_by='System'
         )
         access_key = app.create_access_key()
+        role = Role.get_builtin_role(name=Role.app_name, scope=Role.ScopeChoices.system)
+        role_binding = RoleBinding(user=app, role=role)
+        role_binding.save()
         return app, access_key
 
     def remove(self):
@@ -349,26 +247,14 @@ class RoleMixin:
         OrganizationMember.objects.remove_users(org, [self])
 
     @classmethod
-    def get_super_admins(cls):
-        return cls.objects.filter(role=cls.ROLE.ADMIN)
-
-    @classmethod
-    def get_org_admins(cls, org=None):
-        from orgs.models import Organization
-        if not isinstance(org, Organization):
-            org = current_org
-        org_admins = org.admins
-        return org_admins
-
-    @classmethod
-    def get_super_and_org_admins(cls, org=None):
-        super_admins = cls.get_super_admins()
-        super_admin_ids = list(super_admins.values_list('id', flat=True))
-        org_admins = cls.get_org_admins(org)
-        org_admin_ids = list(org_admins.values_list('id', flat=True))
-        admin_ids = set(org_admin_ids + super_admin_ids)
-        admins = User.objects.filter(id__in=admin_ids)
-        return admins
+    def get_nature_users(cls, org=None):
+        if not org:
+            org = Organization.root()
+        if isinstance(org, Organization):
+            members = org.get_members()
+        else:
+            members = cls.objects.none()
+        return members
 
 
 class TokenMixin:
@@ -555,10 +441,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         'users.UserGroup', related_name='users',
         blank=True, verbose_name=_('User group')
     )
-    role = models.CharField(
-        choices=RoleMixin.ROLE.choices, default='User', max_length=10,
-        blank=True, verbose_name=_('Role')
-    )
+    is_app = models.BooleanField(default=False)
     avatar = models.ImageField(
         upload_to="avatar", null=True, verbose_name=_('Avatar')
     )

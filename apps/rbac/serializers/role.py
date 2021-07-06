@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
 from ..models import Role, RoleBinding
-from ..const import ScopeChoices
 
 __all__ = ['RoleSerializer', 'RoleBindingSerializer']
 

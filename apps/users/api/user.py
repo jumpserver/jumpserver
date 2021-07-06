@@ -15,7 +15,7 @@ from common.permissions import (
 from common.mixins import CommonApiMixin
 from common.utils import get_logger
 from orgs.utils import current_org
-from orgs.models import ROLE as ORG_ROLE, OrganizationMember
+from orgs.models import OrganizationMember
 from users.utils import send_reset_mfa_mail, LoginBlockUtil, MFABlockUtils
 from .. import serializers
 from ..serializers import UserSerializer, UserRetrieveSerializer, MiniUserSerializer, InviteSerializer
@@ -23,6 +23,7 @@ from .mixins import UserQuerysetMixin
 from ..models import User
 from ..signals import post_user_create
 from ..filters import OrgRoleUserFilterBackend
+from rbac.models import Role, RoleBinding
 
 
 logger = get_logger(__name__)
@@ -45,9 +46,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
     extra_filter_backends = [OrgRoleUserFilterBackend]
 
     def get_queryset(self):
-        queryset = super().get_queryset().prefetch_related(
-            'groups'
-        )
+        queryset = super().get_queryset().prefetch_related('groups')
         if not current_org.is_root():
             # 为在列表中计算用户在真实组织里的角色
             queryset = queryset.prefetch_related(
@@ -58,33 +57,96 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
             )
         return queryset
 
-    def send_created_signal(self, users):
-        if not isinstance(users, list):
-            users = [users]
-        for user in users:
-            post_user_create.send(self.__class__, user=user)
+    @staticmethod
+    def get_serializer_roles(serializer):
+        roles_map = {str(role.id): role for role in Role.objects.all()}
+
+        validated_data = serializer.validated_data
+
+        if isinstance(validated_data, list):
+            system_roles_ids = [item.pop('system_roles', []) for item in validated_data]
+            org_roles_ids = [item.pop('org_roles', []) for item in validated_data]
+        else:
+            system_roles_ids = [validated_data.pop('system_roles', [])]
+            org_roles_ids = [validated_data.pop('org_roles', [])]
+
+        system_roles = []
+        for roles_ids in system_roles_ids:
+            roles = [roles_map[role_id] for role_id in roles_ids if role_id in roles_map]
+            system_roles.append(roles)
+
+        org_roles = []
+        for roles_ids in org_roles_ids:
+            roles = [roles_map[role_id] for role_id in roles_ids if role_id in roles_map]
+            org_roles.append(roles)
+
+        return system_roles, org_roles
 
     @staticmethod
-    def set_users_to_org(users, org_roles, update=False):
+    def add_users_to_org(users):
         # 只有真实存在的组织才真正关联用户
-        if not current_org or current_org.is_root():
+        if not current_org:
             return
-        for user, roles in zip(users, org_roles):
-            if update and roles is None:
-                continue
-            if not roles:
-                # 当前组织创建的用户，至少是该组织的`User`
-                roles = [ORG_ROLE.USER]
-            OrganizationMember.objects.set_user_roles(current_org, user, roles)
+        if current_org.is_root():
+            return
+        current_org.members.add(*users)
+
+    @staticmethod
+    def set_users_roles(users, system_roles=None, org_roles=None, update=False):
+        if not current_org:
+            return
+
+        if system_roles:
+            for _user, _system_roles in zip(users, system_roles):
+                if update and not _system_roles:
+                    continue
+                RoleBinding.objects.filter(user=_user, org=None).delete()
+                roles_bindings = [RoleBinding(user=_user, role=role) for role in _system_roles]
+                RoleBinding.objects.bulk_create(roles_bindings)
+
+        if current_org.is_root():
+            return
+
+        if org_roles:
+            for _user, _org_roles in zip(users, org_roles):
+                if update and not _org_roles:
+                    continue
+                RoleBinding.objects.filter(user=_user, org=current_org).delete()
+                roles_bindings = [
+                    RoleBinding(user=_user, role=role, org=current_org) for role in _org_roles
+                ]
+                RoleBinding.objects.bulk_create(roles_bindings)
 
     def perform_create(self, serializer):
-        org_roles = self.get_serializer_org_roles(serializer)
-        # 创建用户
         users = serializer.save()
+        system_roles, org_roles = self.get_serializer_roles(serializer)
         if isinstance(users, User):
             users = [users]
-        self.set_users_to_org(users, org_roles)
+        self.add_users_to_org(users)
+        self.set_users_roles(users, system_roles, org_roles)
         self.send_created_signal(users)
+
+    def perform_update(self, serializer):
+        users = serializer.save()
+        system_roles, org_roles = self.get_serializer_roles(serializer)
+        if isinstance(users, User):
+            users = [users]
+        self.add_users_to_org(users)
+        self.set_users_roles(users, system_roles, org_roles, update=True)
+
+    def perform_bulk_update(self, serializer):
+        user_ids = [
+            d.get("id") or d.get("pk") for d in serializer.validated_data
+        ]
+        users = current_org.get_members().filter(id__in=user_ids)
+        for user in users:
+            self.check_object_permissions(self.request, user)
+        return super().perform_bulk_update(serializer)
+
+    def perform_bulk_destroy(self, objects):
+        for obj in objects:
+            self.check_object_permissions(self.request, obj)
+            self.perform_destroy(obj)
 
     def get_permissions(self):
         if self.action in ["retrieve", "list"]:
@@ -96,41 +158,9 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
             self.permission_classes = (IsSuperUser,)
         return super().get_permissions()
 
-    def perform_bulk_destroy(self, objects):
-        for obj in objects:
-            self.check_object_permissions(self.request, obj)
-            self.perform_destroy(obj)
-
-    @staticmethod
-    def get_serializer_org_roles(serializer):
-        validated_data = serializer.validated_data
-        # `org_roles` 先 `pop`
-        if isinstance(validated_data, list):
-            org_roles = [item.pop('org_roles', None) for item in validated_data]
-        else:
-            org_roles = [validated_data.pop('org_roles', None)]
-        return org_roles
-
-    def perform_update(self, serializer):
-        org_roles = self.get_serializer_org_roles(serializer)
-        users = serializer.save()
-        if isinstance(users, User):
-            users = [users]
-        self.set_users_to_org(users, org_roles, update=True)
-
-    def perform_bulk_update(self, serializer):
-        # TODO: 需要测试
-        user_ids = [
-            d.get("id") or d.get("pk") for d in serializer.validated_data
-        ]
-        users = current_org.get_members().filter(id__in=user_ids)
-        for user in users:
-            self.check_object_permissions(self.request, user)
-        return super().perform_bulk_update(serializer)
-
     @action(methods=['get'], detail=False, permission_classes=(IsOrgAdmin,))
     def suggestion(self, request):
-        queryset = User.objects.exclude(role=User.ROLE.APP)
+        queryset = User.get_nature_users()
         queryset = self.filter_queryset(queryset)
         queryset = queryset[:3]
 
@@ -156,16 +186,12 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data
 
-        users_by_role = defaultdict(list)
-        for i in validated_data:
-            users_by_role[i['role']].append(i['user'])
+        users = [data['user'] for data in validated_data]
+        org_roles = self.get_serializer_roles(serializer)
 
-        OrganizationMember.objects.add_users_by_role(
-            current_org,
-            users=users_by_role[ORG_ROLE.USER],
-            admins=users_by_role[ORG_ROLE.ADMIN],
-            auditors=users_by_role[ORG_ROLE.AUDITOR]
-        )
+        self.add_users_to_org(users)
+        self.set_users_roles(users, org_roles=org_roles)
+
         return Response(serializer.data, status=201)
 
     @action(methods=['post'], detail=True, permission_classes=(IsOrgAdmin,))
@@ -182,6 +208,12 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         for instance in filtered:
             instance.remove()
         return Response(status=204)
+
+    def send_created_signal(self, users):
+        if not isinstance(users, list):
+            users = [users]
+        for user in users:
+            post_user_create.send(self.__class__, user=user)
 
 
 class UserChangePasswordApi(UserQuerysetMixin, generics.RetrieveUpdateAPIView):

@@ -116,8 +116,8 @@ class TicketApplySerializer(TicketSerializer):
         org_id = self.initial_data.get('org_id')
         self.validate_org_id(org_id)
         org = Organization.get_instance(org_id)
-        admins = User.get_super_and_org_admins(org)
-        valid_assignees = list(set(assignees) & set(admins))
+        users = User.get_nature_users(org=org)
+        valid_assignees = list(set(assignees) & set(users))
         if not valid_assignees:
             error = _('None of the assignees belong to Organization `{}` admins'.format(org.name))
             raise serializers.ValidationError(error)

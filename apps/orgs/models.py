@@ -8,14 +8,6 @@ from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import lazyproperty, settings
-from common.const import choices
-from common.db.models import ChoiceSet
-
-
-class ROLE(ChoiceSet):
-    ADMIN = choices.ADMIN, _('Organization administrator')
-    AUDITOR = choices.AUDITOR, _("Organization auditor")
-    USER = choices.USER, _('User')
 
 
 class Organization(models.Model):
@@ -78,112 +70,17 @@ class Organization(models.Model):
     def expire_orgs_mapping(cls):
         cls.orgs_mapping = None
 
-    def get_org_members_by_role(self, role):
-        from users.models import User
-        if not self.is_root():
-            return self.members.filter(m2m_org_members__role=role)
-        users = User.objects.filter(role=role)
-        return users
-
-    @property
-    def users(self):
-        return self.get_org_members_by_role(ROLE.USER)
-
-    @property
-    def admins(self):
-        return self.get_org_members_by_role(ROLE.ADMIN)
-
-    @property
-    def auditors(self):
-        return self.get_org_members_by_role(ROLE.AUDITOR)
-
     def org_id(self):
         return self.id
 
-    def get_members(self, exclude=()):
+    def get_members(self):
         from users.models import User
         if self.is_root():
-            members = User.objects.exclude(role__in=exclude)
+            members = User.objects.all()
         else:
-            members = self.members.exclude(m2m_org_members__role__in=exclude)
-        return members.exclude(role=User.ROLE.APP).distinct()
-
-    def can_admin_by(self, user):
-        if user.is_superuser:
-            return True
-        if self.admins.filter(id=user.id).exists():
-            return True
-        return False
-
-    def can_audit_by(self, user):
-        if user.is_superuser or user.is_super_auditor:
-            return True
-        if self.can_admin_by(user):
-            return True
-        if self.auditors.filter(id=user.id).exists():
-            return True
-        return False
-
-    def can_use_by(self, user):
-        if user.is_superuser or user.is_super_auditor:
-            return True
-        if self.can_audit_by(user):
-            return True
-        if self.users.filter(id=user.id).exists():
-            return True
-        return False
-
-    def can_any_by(self, user):
-        if user.is_superuser or user.is_super_auditor:
-            return True
-        return self.members.filter(id=user.id).exists()
-
-    @classmethod
-    def get_user_orgs_by_role(cls, user, role):
-        if not isinstance(role, (tuple, list)):
-            role = (role, )
-
-        return cls.objects.filter(
-            m2m_org_members__role__in=role,
-            m2m_org_members__user_id=user.id
-        ).distinct()
-
-    @classmethod
-    def get_user_all_orgs(cls, user):
-        return cls.objects.filter(members=user).distinct()
-
-    @classmethod
-    def get_user_admin_orgs(cls, user):
-        if user.is_anonymous:
-            return cls.objects.none()
-        if user.is_superuser:
-            return [cls.root(), *cls.objects.all()]
-        return cls.get_user_orgs_by_role(user, ROLE.ADMIN)
-
-    @classmethod
-    def get_user_user_orgs(cls, user):
-        if user.is_anonymous:
-            return cls.objects.none()
-        return [
-            *cls.get_user_orgs_by_role(user, ROLE.USER),
-            cls.default()
-        ]
-
-    @classmethod
-    def get_user_audit_orgs(cls, user):
-        if user.is_anonymous:
-            return cls.objects.none()
-        if user.is_super_auditor:
-            return [cls.root(), *cls.objects.all()]
-        return cls.get_user_orgs_by_role(user, ROLE.AUDITOR)
-
-    @classmethod
-    def get_user_admin_or_audit_orgs(cls, user):
-        if user.is_anonymous:
-            return cls.objects.none()
-        if user.is_superuser or user.is_super_auditor:
-            return [cls.root(), *cls.objects.all()]
-        return cls.get_user_orgs_by_role(user, (ROLE.AUDITOR, ROLE.ADMIN))
+            members_ids = self.members.all().values_list('user_id', flat=True)
+            members = User.objects.filter(id__in=members_ids)
+        return members.exclude(is_app=False)
 
     @classmethod
     def default(cls):
@@ -258,18 +155,6 @@ def _users2pks_if_need(users, admins, auditors):
     return pks
 
 
-class UserRoleMapper(dict):
-    def __init__(self, container=set):
-        super().__init__()
-        self.users = container()
-        self.admins = container()
-        self.auditors = container()
-
-        self[ROLE.USER] = self.users
-        self[ROLE.ADMIN] = self.admins
-        self[ROLE.AUDITOR] = self.auditors
-
-
 class OrgMemberManager(models.Manager):
 
     def remove_users(self, org, users):
@@ -341,7 +226,7 @@ class OrgMemberManager(models.Manager):
         new_users = _convert_to_uuid_set(new_users)
         return (old_users - new_users), (new_users - old_users)
 
-    def set_user_roles(self, org, user, roles):
+    def add_user_roles(self, org, user, roles):
         """
         设置某个用户在某个组织里的角色
         """
@@ -416,7 +301,6 @@ class OrganizationMember(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     org = models.ForeignKey(Organization, related_name='m2m_org_members', on_delete=models.CASCADE, verbose_name=_('Organization'))
     user = models.ForeignKey('users.User', related_name='m2m_org_members', on_delete=models.CASCADE, verbose_name=_('User'))
-    role = models.CharField(max_length=16, choices=ROLE.choices, default=ROLE.USER, verbose_name=_("Role"))
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
     created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))

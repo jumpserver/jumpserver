@@ -23,7 +23,10 @@ class ServerPerformanceMessage(SystemMessage):
 
     @classmethod
     def post_insert_to_db(cls, subscription: SystemMsgSubscription):
-        admins = User.objects.filter(role=User.ROLE.ADMIN)
+        from rbac.models import Role, RoleBinding
+        admin_role = Role.get_builtin_role(name=Role.admin_name, scope=Role.ScopeChoices.system)
+        admins_ids = RoleBinding.objects.filter(role=admin_role).values_list('user_id', flat=True)
+        admins = User.objects.filter(id__in=admins_ids)
         subscription.users.add(*admins)
         subscription.receive_backends = [BACKEND.EMAIL]
         subscription.save()

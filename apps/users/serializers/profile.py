@@ -86,9 +86,6 @@ class UserRoleSerializer(serializers.Serializer):
 
 
 class UserProfileSerializer(UserSerializer):
-    admin_or_audit_orgs = UserOrgSerializer(many=True, read_only=True)
-    user_all_orgs = UserOrgSerializer(many=True, read_only=True)
-    current_org_roles = serializers.ListField(read_only=True)
     public_key_comment = serializers.CharField(
         source='get_public_key_comment', required=False, read_only=True, max_length=128
     )
@@ -104,9 +101,7 @@ class UserProfileSerializer(UserSerializer):
 
     class Meta(UserSerializer.Meta):
         fields = UserSerializer.Meta.fields + [
-            'public_key_comment', 'public_key_hash_md5',
-            'admin_or_audit_orgs', 'current_org_roles',
-            'guide_url', 'user_all_orgs'
+            'public_key_comment', 'public_key_hash_md5', 'guide_url',
         ]
         read_only_fields = [
             'date_joined', 'last_login', 'created_by', 'source'
@@ -121,12 +116,12 @@ class UserProfileSerializer(UserSerializer):
             'is_valid': {'read_only': True},
             'is_active': {'read_only': True},
             'groups': {'read_only': True},
-            'roles': {'read_only': True},
             'password_strategy': {'read_only': True},
             'date_expired': {'read_only': True},
             'date_joined': {'read_only': True},
             'last_login': {'read_only': True},
-            'role': {'read_only': True},
+            'system_roles': {'read_only': True},
+            'org_roles': {'read_only': True},
         })
 
         if 'password' in fields:
