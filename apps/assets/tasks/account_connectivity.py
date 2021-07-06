@@ -3,9 +3,9 @@
 from celery import shared_task
 from django.utils.translation import ugettext as _
 
-from common.utils import get_logger, get_object_or_none
+from common.utils import get_logger
 from orgs.utils import org_aware_func
-from ..models import Asset, Connectivity
+from ..models import Connectivity
 from . import const
 from .utils import check_asset_can_run_ansible
 

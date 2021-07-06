@@ -24,13 +24,28 @@ class AuthBook(BaseUser, AbsConnectivity):
         verbose_name = _('AuthBook')
         unique_together = [('username', 'asset', 'systemuser')]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.smarty_it()
+
+    def get_or_systemuser_attr(self, attr):
+        val = getattr(self, attr, None)
+        if val:
+            return val
+        if self.systemuser:
+            return getattr(self.systemuser, attr, '')
+        return ''
+
+    def smarty_it(self, *attrs):
+        if not attrs:
+            attrs = ['username', 'password', 'private_key', 'public_key']
+        for attr in attrs:
+            value = self.get_or_systemuser_attr(attr)
+            setattr(self, attr, value)
+
     @property
     def username_display(self):
-        if self.username:
-            return self.username
-        if self.systemuser:
-            return self.systemuser.username
-        return ''
+        return self.get_or_systemuser_attr('username') or '*'
 
     @property
     def smart_name(self):
@@ -41,6 +56,22 @@ class AuthBook(BaseUser, AbsConnectivity):
         else:
             asset = '*'
         return '{}@{}'.format(username, asset)
+
+    def sync_to_system_user_account(self):
+        if self.systemuser:
+            return
+        matched = AuthBook.objects.filter(
+            asset=self.asset, systemuser__username=self.username
+        )
+        if not matched:
+            return
+
+        for i in matched:
+            i.password = self.password
+            i.private_key = self.private_key
+            i.public_key = self.public_key
+            i.comment = 'Update triggered by account {}'.format(self.id)
+            i.save(update_fields=['password', 'private_key', 'public_key'])
 
     def __str__(self):
         return self.smart_name

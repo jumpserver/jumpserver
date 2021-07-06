@@ -36,14 +36,11 @@ def on_authbook_post_create(sender, instance, **kwargs):
             ).exclude(id=instance.id).delete()
             logger.debug('Remove asset old admin user: {}'.format(deleted_count))
 
+    if not instance.systemuser:
+        instance.sync_to_system_user_account()
+
 
 @receiver(pre_save, sender=AuthBook)
 def on_authbook_pre_create(sender, instance, **kwargs):
     # 升级版本号
     instance.version = instance.history.all().count() + 1
-
-
-@receiver(post_save, sender=AuthBook)
-def on_authbook_create(sender, instance=None, created=True, **kwargs):
-    if not created:
-        return

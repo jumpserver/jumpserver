@@ -36,7 +36,9 @@ class AccountViewSet(OrgBulkModelViewSet):
 
 
 class AccountSecretsViewSet(AccountViewSet):
-    serializer_class = serializers.AccountSecretSerializer
+    serializer_classes = {
+        'default': serializers.AccountSecretSerializer
+    }
     permission_classes = (IsOrgAdmin, NeedMFAVerify)
     http_method_names = ['get']
 

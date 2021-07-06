@@ -241,7 +241,6 @@ class Asset(AbsConnectivity, ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
         from ..models import AuthBook
         AuthBook.objects.filter(asset=self, systemuser__type='admin').delete()
 
-
     @property
     def is_valid(self):
         warning = ''

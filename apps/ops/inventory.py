@@ -31,7 +31,11 @@ class JMSBaseInventory(BaseInventory):
         if run_as_admin:
             info.update(asset.get_auth_info())
             if asset.is_unixlike():
-                info["become"] = asset.admin_user.become_info
+                info["become"] = {
+                    "method": 'sudo',
+                    "user": 'root',
+                    "pass": ''
+                }
         if asset.is_windows():
             info["vars"].update({
                 "ansible_connection": "ssh",

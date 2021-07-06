@@ -10,13 +10,12 @@ from .base import AuthSerializerMixin
 class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     ip = serializers.ReadOnlyField(label=_("IP"))
     hostname = serializers.ReadOnlyField(label=_("Hostname"))
-    username_display = serializers.ReadOnlyField(label=_("Username"))
 
     class Meta:
         model = AuthBook
-        fields_mini = ['id', 'username', 'username_display', 'ip', 'hostname', 'version']
+        fields_mini = ['id', 'username', 'ip', 'hostname', 'version']
         fields_write_only = ['password', 'private_key', "public_key"]
-        fields_other = ['date_created', 'date_updated', 'comment']
+        fields_other = ['date_created', 'date_updated', 'connectivity', 'date_verified', 'comment']
         fields_small = fields_mini + fields_write_only + fields_other
         fields_fk = ['asset', 'systemuser']
         fields = fields_small + fields_fk
@@ -27,11 +26,16 @@ class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'public_key': {'write_only': True},
         }
 
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        """ Perform necessary eager loading of data. """
+        queryset = queryset.prefetch_related('systemuser', 'asset')
+        return queryset
+
 
 class AccountSecretSerializer(AccountSerializer):
     class Meta(AccountSerializer.Meta):
         extra_kwargs = {
-            'username': {'required': True},
             'password': {'write_only': False},
             'private_key': {'write_only': False},
             'public_key': {'write_only': False},

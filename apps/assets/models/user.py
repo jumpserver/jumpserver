@@ -133,40 +133,18 @@ class AuthMixin:
 
     def load_asset_special_auth(self, asset, username=''):
         """
-        有密码，代表手动设置过密码，给 4分
-        有资产: 代表为某个资产设置过，给 2分
-        有系统用户: 给 1分
         """
-        system_user = self
-
-        def sort_auth(authbook):
-            score = 0
-            if authbook.password or authbook.private_key:
-                score += 2
-            if authbook.username == username:
-                score += 1
-            return score
-
-        authbooks = list(AuthBook.objects.filter(asset=asset, systemuser=system_user))
-        authbooks = sorted(authbooks, key=sort_auth, reverse=True)
-
+        authbooks = list(AuthBook.objects.filter(asset=asset, systemuser=self))
         if len(authbooks) == 0:
             return None
-
-        if username:
-            self.username = username
-
-        password_set, key_set = False
-
-        for auth in authbooks:
-            if auth.password and not password_set:
-                self.password = auth.password
-                password_set = True
-            if auth.private_key and not key_set:
-                self.private_key = auth.private_key
-                self.public_key = auth.public_key
-            if password_set and key_set:
-                break
+        elif len(authbooks) == 1:
+            auth = authbooks[0]
+        else:
+            authbooks.sort(key=lambda x: 1 if x.username == username else 0, reverse=True)
+            auth = authbooks[0]
+        self.password = auth.password
+        self.private_key = auth.private_key
+        self.public_key = auth.public_key
 
     def load_asset_more_auth(self, asset_id=None, username=None, user_id=None):
         from users.models import User
@@ -193,14 +171,10 @@ class AuthMixin:
                 _username = user.username
             else:
                 _username = username
+            self.username = _username
 
         # 加载某个资产的特殊配置认证信息
-        try:
-            self.load_asset_special_auth(asset, _username)
-        except Exception as e:
-            logger.error('Load special auth Error: ', e)
-            pass
-
+        self.load_asset_special_auth(asset, _username)
         self.load_tmp_auth_if_has(asset_id, user)
 
 
