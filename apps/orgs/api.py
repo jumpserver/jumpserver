@@ -2,8 +2,6 @@
 #
 
 from django.utils.translation import ugettext as _
-from rest_framework import status
-from rest_framework.views import Response
 from rest_framework_bulk import BulkModelViewSet
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.exceptions import PermissionDenied
@@ -12,10 +10,7 @@ from common.permissions import IsSuperUserOrAppUser, IsValidUser, UserCanAnyPerm
 from common.drf.api import JMSBulkRelationModelViewSet
 from .models import Organization
 from .serializers import (
-    OrgSerializer, OrgReadSerializer,
-    OrgRetrieveSerializer, OrgMemberSerializer,
-    OrgMemberAdminSerializer, OrgMemberUserSerializer,
-    CurrentOrgSerializer
+    OrgSerializer, OrgMemberSerializer, CurrentOrgSerializer
 )
 from users.models import User, UserGroup
 from assets.models import (
@@ -27,7 +22,6 @@ from perms.models import AssetPermission, ApplicationPermission
 from orgs.utils import current_org, tmp_to_root_org
 from common.utils import get_logger
 from .filters import OrgMemberRelationFilterSet
-from .models import OrganizationMember
 
 
 logger = get_logger(__file__)
@@ -51,8 +45,8 @@ class OrgViewSet(BulkModelViewSet):
 
     def get_serializer_class(self):
         mapper = {
-            'list': OrgReadSerializer,
-            'retrieve': OrgRetrieveSerializer
+            'list': OrgSerializer,
+            'retrieve': OrgSerializer
         }
         return mapper.get(self.action, super().get_serializer_class())
 

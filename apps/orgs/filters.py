@@ -13,4 +13,4 @@ class OrgMemberRelationFilterSet(filterset.FilterSet):
 
     class Meta:
         model = OrganizationMember
-        fields = ('org_id', 'user_id', 'org', 'user', 'role', 'id')
+        fields = ('org_id', 'user_id', 'org', 'user', 'id')
