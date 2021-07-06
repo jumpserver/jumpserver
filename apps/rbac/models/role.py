@@ -9,7 +9,7 @@ __all__ = ['Role', 'RoleBinding']
 
 class Role(JMSModel):
     """ 定义 角色 ｜ 角色-权限 关系 """
-    name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
+    name = models.CharField(max_length=128, verbose_name=_('Name'))
     scope = models.CharField(
         max_length=128, choices=ScopeChoices.choices, default=ScopeChoices.system,
         verbose_name=_('Scope')
@@ -22,6 +22,9 @@ class Role(JMSModel):
 
     def __str__(self):
         return '%s (%s)' % (self.name, self.get_scope_display())
+
+    class Meta:
+        unique_together = ('name', 'scope')
 
 
 class RoleBinding(models.Model):
@@ -47,7 +50,10 @@ class RoleBinding(models.Model):
         unique_together = ('user', 'role', 'org')
 
     def __str__(self):
-        return '{user} - {role} | {org}'.format(user=self.user, role=self.role, org=self.org)
+        display = '{user} & {role}'.format(user=self.user, role=self.role)
+        if self.org:
+            display += ' | {org}'.format(org=self.org)
+        return display
 
     def save(self, *args, **kwargs):
         self.scope = self.role.scope
