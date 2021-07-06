@@ -22,7 +22,6 @@ from ..serializers import UserSerializer, UserRetrieveSerializer, MiniUserSerial
 from .mixins import UserQuerysetMixin
 from ..models import User
 from ..signals import post_user_create
-from ..filters import OrgRoleUserFilterBackend
 from rbac.models import Role, RoleBinding
 
 
@@ -43,7 +42,6 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         'suggestion': MiniUserSerializer,
         'invite': InviteSerializer,
     }
-    extra_filter_backends = [OrgRoleUserFilterBackend]
 
     def get_queryset(self):
         queryset = super().get_queryset().prefetch_related('groups')
