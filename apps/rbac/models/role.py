@@ -20,6 +20,9 @@ class Role(JMSModel):
     builtin = models.BooleanField(default=False, verbose_name=_('Built-in'))
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
 
+    def __str__(self):
+        return '%s (%s)' % (self.name, self.get_scope_display())
+
 
 class RoleBinding(models.Model):
     """ 定义 用户-角色 关系 """
@@ -42,6 +45,9 @@ class RoleBinding(models.Model):
     class Meta:
         verbose_name = _('Role binding')
         unique_together = ('user', 'role', 'org')
+
+    def __str__(self):
+        return '{user} - {role} | {org}'.format(user=self.user, role=self.role, org=self.org)
 
     def save(self, *args, **kwargs):
         self.scope = self.role.scope
