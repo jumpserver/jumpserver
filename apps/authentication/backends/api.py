@@ -25,9 +25,14 @@ def get_request_date_header(request):
     return date
 
 
-class ModelBackend(DJModelBackend):
+class JMSBaseModelBackend(DJModelBackend):
     def user_can_authenticate(self, user):
         return user.is_valid
+
+
+class JMSModelBackend(JMSBaseModelBackend):
+    def user_can_authenticate(self, user):
+        return True
 
 
 class AccessKeyAuthentication(authentication.BaseAuthentication):
@@ -203,7 +208,7 @@ class SignatureAuthentication(signature.SignatureAuthentication):
             return None, None
 
 
-class SSOAuthentication(ModelBackend):
+class SSOAuthentication(JMSBaseModelBackend):
     """
     什么也不做呀😺
     """
@@ -212,7 +217,7 @@ class SSOAuthentication(ModelBackend):
         pass
 
 
-class WeComAuthentication(ModelBackend):
+class WeComAuthentication(JMSBaseModelBackend):
     """
     什么也不做呀😺
     """
@@ -221,7 +226,7 @@ class WeComAuthentication(ModelBackend):
         pass
 
 
-class DingTalkAuthentication(ModelBackend):
+class DingTalkAuthentication(JMSBaseModelBackend):
     """
     什么也不做呀😺
     """
@@ -230,7 +235,7 @@ class DingTalkAuthentication(ModelBackend):
         pass
 
 
-class AuthorizationTokenAuthentication(ModelBackend):
+class AuthorizationTokenAuthentication(JMSBaseModelBackend):
     """
     什么也不做呀😺
     """
