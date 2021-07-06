@@ -46,6 +46,64 @@ def add_default_role(apps, schema_editor):
     role_model.objects.bulk_create(roles)
 
 
+def migrate_users_role_binding(apps, schema_editor):
+    user_model = apps.get_model('users', 'User')
+    users = user_model.objects.all()
+    role_model = apps.get_model('rbac', 'Role')
+    roles = role_model.objects.all()
+    role_binding_model = apps.get_model('rbac', 'RoleBinding')
+    org_member_model = apps.get_model('orgs', 'OrganizationMember')
+
+    # get builtin roles
+    roles_map = {}
+    for role in roles:
+        if role.name == 'System Admin':
+            key = 'system_admin'
+        elif role.name == 'Organization Admin':
+            key = 'org_admin'
+        elif role.name == 'System Auditor':
+            key = 'system_auditor'
+        elif role.name == 'Organization Auditor':
+            key = 'org_auditor'
+        elif role.name == 'User':
+            key = 'system_user'
+        elif role.name == 'Organization User':
+            key = 'org_user'
+        else:
+            continue
+        roles_map[key] = role
+
+    # migrate users of system scope role
+    roles_bindings_data = []
+    for user in users:
+        if user.role == 'Admin':
+            role = roles_map.get('system_admin')
+        elif user.role == 'Auditor':
+            role = roles_map.get('system_auditor')
+        elif user.role == 'User':
+            role = roles_map.get('system_user')
+        else:
+            continue
+        obj = role_binding_model(user=user, role=role, scope=role.scope)
+        roles_bindings_data.append(obj)
+
+    # migrate users of org scope role
+    orgs_members = org_member_model.objects.all()
+    for org_member in orgs_members:
+        if org_member.role == 'Admin':
+            role = roles_map.get('org_admin')
+        elif org_member.role == 'Auditor':
+            role = roles_map.get('org_auditor')
+        elif org_member.role == 'User':
+            role = roles_map.get('org_user')
+        else:
+            continue
+        obj = role_binding_model(user=org_member.user, role=role, scope=role.scope, org=org_member.org)
+        roles_bindings_data.append(obj)
+
+    role_binding_model.objects.bulk_create(roles_bindings_data)
+
+
 class Migration(migrations.Migration):
 
     initial = True
@@ -55,6 +113,7 @@ class Migration(migrations.Migration):
         ('orgs', '0010_auto_20210219_1241'),
         ('auth', '0012_alter_user_first_name_max_length'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ('users', '0037_auto_20210701_1400'),
     ]
 
     operations = [
@@ -128,5 +187,6 @@ class Migration(migrations.Migration):
                 'unique_together': {('user', 'role', 'org')},
             },
         ),
-        migrations.RunPython(add_default_role)
+        migrations.RunPython(add_default_role),
+        migrations.RunPython(migrate_users_role_binding)
     ]
