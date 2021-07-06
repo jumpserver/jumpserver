@@ -192,9 +192,5 @@ class SessionJoinValidateAPI(views.APIView):
         if not user:
             msg = _('User does not exist: {}'.format(user_id))
             return Response({'ok': False, 'msg': msg}, status=401)
-        with tmp_to_org(session.org):
-            if not user.admin_or_audit_orgs:
-                msg = _('User does not have permission')
-                return Response({'ok': False, 'msg': msg}, status=401)
-
+        # TODO: permission
         return Response({'ok': True, 'msg': ''}, status=200)

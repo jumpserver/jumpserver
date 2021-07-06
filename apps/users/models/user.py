@@ -170,26 +170,29 @@ class AuthMixin:
 
 
 class RoleMixin:
-
     @lazyproperty
     def roles(self):
         from rbac.models import Role
-        roles_ids = self.role_bindings.values_list('role_id', flat=True)
+        system_roles_ids = list(self.system_roles.values_list('id', flat=True))
+        org_roles_ids = list(self.org_roles.values_list('id', flat=True))
+        roles_ids = system_roles_ids + org_roles_ids
         roles = Role.objects.filter(id__in=roles_ids)
         return roles
 
     @lazyproperty
     def system_roles(self):
         from rbac.models import Role
-        return self.roles.filter(scope=Role.ScopeChoices.system)
+        roles_ids = self.role_bindings.filter(org=None).values_list('role_id', flat=True)
+        roles = Role.objects.filter(id__in=roles_ids, scope=Role.ScopeChoices.system)
+        return roles
 
     @lazyproperty
     def org_roles(self):
         from rbac.models import Role
         if current_org.is_root():
-            roles = self.system_roles
-        else:
-            roles = self.roles.filter(scope=Role.ScopeChoices.org, org=current_org)
+            return self.system_roles
+        roles_ids = self.role_bindings.filter(org=current_org.id).values_list('role_id', flat=True)
+        roles = Role.objects.filter(id__in=roles_ids, scope=Role.ScopeChoices.org)
         return roles
 
     def _get_roles_display(self, scope=None):
@@ -573,11 +576,6 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     def get_avatar_url(cls, username):
         user_default = settings.STATIC_URL + "img/avatar/user.png"
         return user_default
-
-    # def admin_orgs(self):
-    #     from orgs.models import Organization
-    #     orgs = Organization.get_user_admin_or_audit_orgs(self)
-    #     return orgs
 
     def avatar_url(self):
         admin_default = settings.STATIC_URL + "img/avatar/admin.png"

@@ -35,7 +35,7 @@ __all__ = [
 class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
     filterset_fields = ('username', 'email', 'name', 'id', 'source')
     search_fields = filterset_fields
-    permission_classes = (IsOrgAdmin, CanUpdateDeleteUser)
+    # permission_classes = (IsOrgAdmin, CanUpdateDeleteUser)
     serializer_classes = {
         'default': UserSerializer,
         'retrieve': UserRetrieveSerializer,
@@ -147,13 +147,13 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
             self.perform_destroy(obj)
 
     def get_permissions(self):
-        if self.action in ["retrieve", "list"]:
-            if self.request.query_params.get('all'):
-                self.permission_classes = (IsSuperUser,)
-            else:
-                self.permission_classes = (IsOrgAdminOrAppUser,)
-        elif self.action in ['destroy']:
-            self.permission_classes = (IsSuperUser,)
+        # if self.action in ["retrieve", "list"]:
+        #     if self.request.query_params.get('all'):
+        #         self.permission_classes = (IsSuperUser,)
+        #     else:
+        #         self.permission_classes = (IsOrgAdminOrAppUser,)
+        # elif self.action in ['destroy']:
+        #     self.permission_classes = (IsSuperUser,)
         return super().get_permissions()
 
     @action(methods=['get'], detail=False, permission_classes=(IsOrgAdmin,))

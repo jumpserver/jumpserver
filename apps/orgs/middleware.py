@@ -2,6 +2,7 @@
 #
 
 from .utils import get_org_from_request, set_current_org
+from rbac.models import RoleBinding
 
 
 class OrgMiddleware:
@@ -14,21 +15,18 @@ class OrgMiddleware:
             return
         if not request.user.is_authenticated:
             return
-        if request.user.is_common_user:
-            return
+
         org = get_org_from_request(request)
-        if org.can_admin_by(request.user):
+
+        search_org = None if org.is_root() else org
+        has_roles = RoleBinding.objects.filter(user=request.user, org=search_org).exists()
+        if has_roles:
             return
-        if org.can_audit_by(request.user):
-            return
-        admin_orgs = request.user.admin_orgs
-        if admin_orgs:
-            request.session['oid'] = str(admin_orgs[0].id)
-            return
-        audit_orgs = request.user.audit_orgs
-        if audit_orgs:
-            request.session['oid'] = str(audit_orgs[0].id)
-            return
+
+        roles_bindings = RoleBinding.objects.filter(user=request.user).exclude(org=None)
+        if roles_bindings:
+            org_id = str(list(roles_bindings.values_list('org_id', flat=True))[0])
+            request.session['oid'] = org_id
 
     def __call__(self, request):
         self.set_permed_org_if_need(request)

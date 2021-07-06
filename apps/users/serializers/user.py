@@ -55,9 +55,6 @@ class UserSerializer(RolesSerilaizerMixin, CommonBulkSerializerMixin, serializer
     mfa_level_display = serializers.ReadOnlyField(source='get_mfa_level_display', label=_('MFA level for display'))
     login_blocked = serializers.BooleanField(read_only=True, label=_('Login blocked'))
     is_expired = serializers.BooleanField(read_only=True, label=_('Is expired'))
-    can_update = serializers.SerializerMethodField(label=_('Can update'))
-    can_delete = serializers.SerializerMethodField(label=_('Can delete'))
-    can_public_key_auth = serializers.ReadOnlyField(source='can_use_ssh_key_login')
 
     class Meta:
         model = User
@@ -70,7 +67,7 @@ class UserSerializer(RolesSerilaizerMixin, CommonBulkSerializerMixin, serializer
         # small 指的是 不需要计算的直接能从一张表中获取到的数据
         fields_small = fields_mini + fields_write_only + [
             'email', 'wechat', 'phone', 'mfa_level',
-            'source', 'source_display', 'can_public_key_auth', 'need_update_password',
+            'source', 'source_display', 'need_update_password',
             'mfa_enabled', 'is_app', 'is_valid', 'is_expired', 'is_active',  # 布尔字段
             'date_expired', 'date_joined', 'last_login',  # 日期字段
             'created_by', 'comment',  # 通用字段
@@ -87,7 +84,7 @@ class UserSerializer(RolesSerilaizerMixin, CommonBulkSerializerMixin, serializer
         # 多对多字段
         fields_m2m = ['groups', 'groups_display', 'system_roles', 'org_roles']
         # 在serializer 上定义的字段
-        fields_custom = ['can_update', 'can_delete', 'login_blocked', 'password_strategy']
+        fields_custom = ['login_blocked', 'password_strategy']
         fields = fields_verbose + fields_fk + fields_m2m + fields_custom
 
         read_only_fields = [
@@ -145,16 +142,6 @@ class UserSerializer(RolesSerilaizerMixin, CommonBulkSerializerMixin, serializer
         attrs = self.clean_auth_fields(attrs)
         attrs.pop('password_strategy', None)
         return attrs
-
-    def get_can_update(self, obj):
-        return CanUpdateDeleteUser.has_update_object_permission(
-            self.context['request'], self.context['view'], obj
-        )
-
-    def get_can_delete(self, obj):
-        return CanUpdateDeleteUser.has_delete_object_permission(
-            self.context['request'], self.context['view'], obj
-        )
 
 
 class UserRetrieveSerializer(UserSerializer):
