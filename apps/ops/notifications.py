@@ -24,7 +24,8 @@ class ServerPerformanceMessage(SystemMessage):
     @classmethod
     def post_insert_to_db(cls, subscription: SystemMsgSubscription):
         from rbac.models import Role, RoleBinding
-        admin_role = Role.get_builtin_role(name=Role.admin_name, scope=Role.ScopeChoices.system)
+        # Todo: 需要更改这里
+        admin_role = Role.get_builtin_role(name=Role.system_admin_name, scope=Role.Scope.system)
         admins_ids = RoleBinding.objects.filter(role=admin_role).values_list('user_id', flat=True)
         admins = User.objects.filter(id__in=admins_ids)
         subscription.users.add(*admins)

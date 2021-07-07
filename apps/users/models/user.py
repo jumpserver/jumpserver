@@ -183,7 +183,7 @@ class RoleMixin:
     def system_roles(self):
         from rbac.models import Role
         roles_ids = self.role_bindings.filter(org=None).values_list('role_id', flat=True)
-        roles = Role.objects.filter(id__in=roles_ids, scope=Role.ScopeChoices.system)
+        roles = Role.objects.filter(id__in=roles_ids, scope=Role.Scope.system)
         return roles
 
     @lazyproperty
@@ -192,7 +192,7 @@ class RoleMixin:
         if current_org.is_root():
             return self.system_roles
         roles_ids = self.role_bindings.filter(org=current_org.id).values_list('role_id', flat=True)
-        roles = Role.objects.filter(id__in=roles_ids, scope=Role.ScopeChoices.org)
+        roles = Role.objects.filter(id__in=roles_ids, scope=Role.Scope.org)
         return roles
 
     def _get_roles_display(self, scope=None):
@@ -219,7 +219,7 @@ class RoleMixin:
     @property
     def is_superuser(self):
         from rbac.models import Role
-        role = Role.get_builtin_role(name=Role.admin_name, scope=Role.ScopeChoices.system)
+        role = Role.get_builtin_role(name=Role.admin_name, scope=Role.Scope.system)
         return role in self.system_roles
 
     @property
@@ -238,7 +238,7 @@ class RoleMixin:
             is_active=False, comment=comment, is_first_login=False, created_by='System'
         )
         access_key = app.create_access_key()
-        role = Role.get_builtin_role(name=Role.app_name, scope=Role.ScopeChoices.system)
+        role = Role.get_builtin_role(name=Role.app_name, scope=Role.Scope.system)
         role_binding = RoleBinding(user=app, role=role)
         role_binding.save()
         return app, access_key

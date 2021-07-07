@@ -29,14 +29,14 @@ class RolesSerilaizerMixin(serializers.Serializer):
     @staticmethod
     def validate_system_roles(value):
         from rbac.models import Role
-        roles = Role.objects.filter(id__in=value, scope=Role.ScopeChoices.system)
+        roles = Role.objects.filter(id__in=value, scope=Role.Scope.system)
         roles_ids = [str(role_id) for role_id in roles.values_list('id', flat=True)]
         return roles_ids
 
     @staticmethod
     def validate_org_roles(value):
         from rbac.models import Role
-        roles = Role.objects.filter(id__in=value, scope=Role.ScopeChoices.org)
+        roles = Role.objects.filter(id__in=value, scope=Role.Scope.org)
         roles_ids = [str(role_id) for role_id in roles.values_list('id', flat=True)]
         return roles_ids
 
