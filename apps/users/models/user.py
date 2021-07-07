@@ -622,6 +622,14 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
             return None
         return self.SOURCE_BACKEND_MAPPING.get(self.source, [])
 
+    @property
+    def belongs_orgs(self):
+        if self.is_superuser:
+            orgs = [Organization.root()] + list(Organization.objects.all())
+        else:
+            orgs = list(self.orgs.all())
+        return orgs
+
     class Meta:
         ordering = ['username']
         verbose_name = _("User")

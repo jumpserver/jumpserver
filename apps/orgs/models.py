@@ -76,8 +76,7 @@ class Organization(models.Model):
         if self.is_root():
             members = User.objects.all()
         else:
-            members_ids = self.members.all().values_list('user_id', flat=True)
-            members = User.objects.filter(id__in=members_ids)
+            members = self.members.all()
         return members.exclude(is_app=False)
 
     @classmethod
