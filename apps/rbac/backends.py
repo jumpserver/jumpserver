@@ -43,7 +43,7 @@ class RBACBackend(ModelBackend):
         ns:ns_id|org:org_id|module.action_model
         如: org:82364313-97f2-44ad-b206-17c94fa2a82c|accounts.create_account
         :param user_obj:
-        :param perm:
+        :param perm: []
         :param obj:
         :return:
         """

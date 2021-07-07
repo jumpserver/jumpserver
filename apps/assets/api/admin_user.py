@@ -14,6 +14,7 @@ from ..hands import IsOrgAdmin
 from ..models import AdminUser, Asset
 from .. import serializers
 from ..tasks import test_admin_user_connectivity_manual
+from rbac.permissions import RBACPermission
 
 
 logger = get_logger(__file__)
@@ -32,7 +33,7 @@ class AdminUserViewSet(OrgBulkModelViewSet):
     filterset_fields = ("name", "username")
     search_fields = filterset_fields
     serializer_class = serializers.AdminUserSerializer
-    permission_classes = (IsOrgAdmin,)
+    permission_classes = (RBACPermission,)
     serializer_classes = {
         'default': serializers.AdminUserSerializer,
         'retrieve': serializers.AdminUserDetailSerializer,

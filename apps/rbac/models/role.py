@@ -29,6 +29,7 @@ class Role(JMSModel):
     builtin = models.BooleanField(default=False, verbose_name=_('Built-in'))
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
 
+    admin_name = 'SystemAdmin'
     system_admin_name = 'SystemAdmin'
     org_admin_name = 'OrgAdmin'
     auditor_name = 'Auditor'

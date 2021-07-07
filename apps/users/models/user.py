@@ -660,10 +660,6 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
             return True
         return False
 
-    def has_perm(self, perm, obj=None):
-        from rbac.utils import RBACPermissionUtil
-        return RBACPermissionUtil.user_has_perm(user=self, perm=perm, obj=obj)
-
 
 class UserPasswordHistory(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)

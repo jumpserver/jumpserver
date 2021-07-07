@@ -9,6 +9,7 @@ from common.utils import get_logger, get_object_or_none
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, IsSuperUser
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
+from rbac.permissions import RBACPermission
 from ..models import Asset, Node, Platform
 from .. import serializers
 from ..tasks import (
@@ -45,7 +46,7 @@ class AssetViewSet(FilterAssetByNodeMixin, OrgBulkModelViewSet):
         'default': serializers.AssetSerializer,
         'display': serializers.AssetDisplaySerializer,
     }
-    permission_classes = (IsOrgAdminOrAppUser,)
+    permission_classes = (RBACPermission,)
     extra_filter_backends = [FilterAssetByNodeFilterBackend, LabelFilterBackend, IpInFilterBackend]
 
     def set_assets_node(self, assets):

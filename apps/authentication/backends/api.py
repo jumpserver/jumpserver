@@ -26,6 +26,9 @@ def get_request_date_header(request):
 
 
 class ModelBackend(DJModelBackend):
+    def has_perm(self, user_obj, perm, obj=None):
+        return False
+
     def user_can_authenticate(self, user):
         return user.is_valid
 

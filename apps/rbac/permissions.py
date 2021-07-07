@@ -39,9 +39,12 @@ class RBACPermission(permissions.DjangoModelPermissions):
     def format_perms(perm_temps, model_cls):
         perms = set()
         for perm_temp in perm_temps:
-            perm = perm_temp % (model_cls._meta.app_label, model_cls._meta.model_name)
+            perm = perm_temp % {
+                'app_label': model_cls._meta.app_label,
+                'model_name': model_cls._meta.model_name
+            }
             if current_org and not current_org.is_root():
-                perm = f'org:{current_org.org_id}|{perm}'
+                perm = f'org:{current_org.id}|{perm}'
             perms.add(perm)
         return perms
 
@@ -84,5 +87,7 @@ class RBACPermission(permissions.DjangoModelPermissions):
             perms = self.get_action_required_permissions(view.action, queryset.model, view)
         else:
             perms = self.get_required_permissions(request.method, queryset.model)
+
+        print("Require perms: ", perms)
         return request.user.has_perms(perms)
 
