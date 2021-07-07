@@ -44,11 +44,11 @@ class RelationMixin:
             system_users_objects_map[i.systemuser].append(_id)
 
         sender = self.get_sender()
-        for system_user, objects_id in system_users_objects_map.items():
+        for system_user, object_ids in system_users_objects_map.items():
             logger.debug('System user relation changed, send m2m_changed signals')
             m2m_changed.send(
                 sender=sender, instance=system_user, action='post_add',
-                reverse=False, model=model, pk_set=set(objects_id)
+                reverse=False, model=model, pk_set=set(object_ids)
             )
 
     def get_sender(self):
