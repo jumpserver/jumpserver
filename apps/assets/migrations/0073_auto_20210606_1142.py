@@ -12,38 +12,40 @@ def migrate_system_assets_to_authbook(apps, schema_editor):
     history_model = apps.get_model("assets", "HistoricalAuthBook")
 
     print()
-    while True:
-        systemuser_asset_relations = system_user_asset_model.objects.all()[:20]
-        if not systemuser_asset_relations:
-            break
-        authbooks = []
-        relations_ids = []
-        historys = []
-        for i in systemuser_asset_relations:
-            authbooks.append(
-                authbook_model(asset=i.asset, systemuser=i.systemuser)
-            )
-            relations_ids.append(i.id)
+    system_users = system_user_model.objects.all()
+    for s in system_users:
+        while True:
+            systemuser_asset_relations = system_user_asset_model.objects.filter(systemuser=s)[:20]
+            if not systemuser_asset_relations:
+                break
+            authbooks = []
+            relations_ids = []
+            historys = []
+            for i in systemuser_asset_relations:
+                authbook = authbook_model(asset=i.asset, systemuser=i.systemuser, org_id=s.org_id)
+                authbooks.append(authbook)
+                relations_ids.append(i.id)
 
-            history = history_model(
-                asset=i.asset, systemuser=i.systemuser,
-                date_created=timezone.now(), date_updated=timezone.now(),
-            )
-            history.history_type = '-'
-            history.history_date = timezone.now()
-            historys.append(history)
+                history = history_model(
+                    asset=i.asset, systemuser=i.systemuser,
+                    date_created=timezone.now(), date_updated=timezone.now(),
+                )
+                history.history_type = '-'
+                history.history_date = timezone.now()
+                historys.append(history)
 
-        with transaction.atomic():
-            print("  Migrate system user assets relations: {} items".format(len(relations_ids)))
-            authbook_model.objects.bulk_create(authbooks, ignore_conflicts=True)
-            history_model.objects.bulk_create(historys)
-            system_user_asset_model.objects.filter(id__in=relations_ids).delete()
+            with transaction.atomic():
+                print("  Migrate system user assets relations: {} items".format(len(relations_ids)))
+                authbook_model.objects.bulk_create(authbooks, ignore_conflicts=True)
+                history_model.objects.bulk_create(historys)
+                system_user_asset_model.objects.filter(id__in=relations_ids).delete()
 
 
 def migrate_authbook_secret_to_system_user(apps, schema_editor):
     authbook_model = apps.get_model('assets', 'AuthBook')
     history_model = apps.get_model('assets', 'HistoricalAuthBook')
 
+    print()
     authbooks_without_systemuser = authbook_model.objects.filter(systemuser__isnull=True)
     for authbook in authbooks_without_systemuser:
         matched = authbook_model.objects.filter(
@@ -63,7 +65,7 @@ def migrate_authbook_secret_to_system_user(apps, schema_editor):
             historys.append(history)
 
         with transaction.atomic():
-            print("  Migrate secret to system user assets account: {}'s".format(len(historys)))
+            print("  Migrate secret to system user assets account: {} items".format(len(historys)))
             matched.update(password=authbook.password, private_key=authbook.private_key,
                            public_key=authbook.public_key, version=authbook.version)
             history_model.objects.bulk_create(historys)
@@ -92,4 +94,12 @@ class Migration(migrations.Migration):
         ),
         migrations.RunPython(migrate_system_assets_to_authbook),
         migrations.RunPython(migrate_authbook_secret_to_system_user),
+        migrations.RemoveField(
+            model_name='authbook',
+            name='is_latest',
+        ),
+        migrations.RemoveField(
+            model_name='historicalauthbook',
+            name='is_latest',
+        ),
     ]

@@ -19,13 +19,11 @@ def migrate_admin_user_to_system_user(apps, schema_editor):
             value = getattr(admin_user, attr)
             kwargs[attr] = value
 
-        protocol = 'ssh'
-        if admin_user.username.lower() == 'administrator':
-            protocol = 'rdp'
+        name = admin_user.name + '_' + str(admin_user.id)[:5]
         kwargs.update({
-            'name': admin_user.name + '(admin_user_' + str(admin_user.id)[:7] + ')',
+            'name': name,
             'type': 'admin',
-            'protocol': protocol,
+            'protocol': 'ssh',
             'auto_push': False,
         })
 

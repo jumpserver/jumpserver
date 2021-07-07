@@ -38,7 +38,7 @@ def migrate_old_authbook_to_history(apps, schema_editor):
             historys.append(history)
 
         with transaction.atomic():
-            print("  Migrate old auth book to history table: ", len(authbook_ids))
+            print("  Migrate old auth book to history table: {} items".format(len(authbook_ids)))
             history_model.objects.bulk_create(historys, ignore_conflicts=True)
             authbook_model.objects.filter(id__in=authbook_ids).delete()
 
