@@ -293,7 +293,7 @@ msgstr "应用类型"
 #: assets/serializers/system_user.py:49 assets/serializers/system_user.py:177
 #: assets/serializers/system_user.py:203
 msgid "Login mode display"
-msgstr "登录模式（显示名称）"
+msgstr "认证方式（显示名称）"
 
 #: applications/serializers/attrs/application_category/cloud.py:9
 #: assets/models/cluster.py:40
@@ -737,7 +737,7 @@ msgstr "Shell"
 
 #: assets/models/user.py:251
 msgid "Login mode"
-msgstr "登录模式"
+msgstr "认证方式"
 
 #: assets/models/user.py:253
 msgid "SFTP Root"

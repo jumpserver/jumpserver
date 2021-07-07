@@ -36,6 +36,9 @@ class AccountViewSet(OrgBulkModelViewSet):
 
 
 class AccountSecretsViewSet(AccountViewSet):
+    """
+    因为可能要导出所有账号，所以单独建立了一个 viewset
+    """
     serializer_classes = {
         'default': serializers.AccountSecretSerializer
     }
