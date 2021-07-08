@@ -39,7 +39,7 @@ def old_perm_relation_app_to_application_permission_json(old_perm_relation_app, 
 def old_perm_relation_system_user_to_application_permission_json(old_perm_relation_system_user, data_json):
     data = common_old_perm_relation_to_application_permission_json(old_perm_relation_system_user, data_json)
     data.update({
-        'system_user_id': old_perm_relation_system_user.system_user_id,
+        'systemuser_id': old_perm_relation_system_user.systemuser_id,
     })
     return data
 
