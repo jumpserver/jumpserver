@@ -120,7 +120,7 @@ LOGIN_CONFIRM_ENABLE = CONFIG.LOGIN_CONFIRM_ENABLE
 OTP_IN_RADIUS = CONFIG.OTP_IN_RADIUS
 
 
-AUTH_BACKEND_MODEL = 'authentication.backends.api.ModelBackend'
+AUTH_BACKEND_MODEL = 'authentication.backends.api.JMSModelBackend'
 AUTH_BACKEND_PUBKEY = 'authentication.backends.pubkey.PublicKeyAuthBackend'
 AUTH_BACKEND_LDAP = 'authentication.backends.ldap.LDAPAuthorizationBackend'
 AUTH_BACKEND_OIDC_PASSWORD = 'jms_oidc_rp.backends.OIDCAuthPasswordBackend'

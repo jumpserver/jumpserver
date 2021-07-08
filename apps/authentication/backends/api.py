@@ -8,13 +8,16 @@ from django.core.cache import cache
 from django.utils.translation import ugettext as _
 from six import text_type
 from django.contrib.auth import get_user_model
-from django.contrib.auth.backends import ModelBackend as DJModelBackend
+from django.contrib.auth.backends import ModelBackend
 from rest_framework import HTTP_HEADER_ENCODING
 from rest_framework import authentication, exceptions
 from common.auth import signature
 
 from common.utils import get_object_or_none, make_signature, http_to_unixtime
 from ..models import AccessKey, PrivateToken
+
+
+UserModel = get_user_model()
 
 
 def get_request_date_header(request):
@@ -25,9 +28,16 @@ def get_request_date_header(request):
     return date
 
 
-class ModelBackend(DJModelBackend):
+class JMSModelBackend(ModelBackend):
     def user_can_authenticate(self, user):
-        return user.is_valid
+        return True
+
+    def get_user(self, user_id):
+        try:
+            user = UserModel._default_manager.get(pk=user_id)
+        except UserModel.DoesNotExist:
+            return None
+        return user if user.is_valid else None
 
 
 class AccessKeyAuthentication(authentication.BaseAuthentication):
@@ -203,7 +213,7 @@ class SignatureAuthentication(signature.SignatureAuthentication):
             return None, None
 
 
-class SSOAuthentication(ModelBackend):
+class SSOAuthentication(JMSModelBackend):
     """
     什么也不做呀😺
     """
@@ -212,7 +222,7 @@ class SSOAuthentication(ModelBackend):
         pass
 
 
-class WeComAuthentication(ModelBackend):
+class WeComAuthentication(JMSModelBackend):
     """
     什么也不做呀😺
     """
@@ -221,7 +231,7 @@ class WeComAuthentication(ModelBackend):
         pass
 
 
-class DingTalkAuthentication(ModelBackend):
+class DingTalkAuthentication(JMSModelBackend):
     """
     什么也不做呀😺
     """
@@ -230,7 +240,7 @@ class DingTalkAuthentication(ModelBackend):
         pass
 
 
-class AuthorizationTokenAuthentication(ModelBackend):
+class AuthorizationTokenAuthentication(JMSModelBackend):
     """
     什么也不做呀😺
     """

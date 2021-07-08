@@ -119,44 +119,6 @@ replay_storage_type_serializer_classes_mapping = {
     const.ReplayStorageTypeChoices.obs.value: ReplayStorageTypeOBSSerializer
 }
 
-# ReplayStorageSerializer
-
-
-class ReplayStorageSerializer(serializers.ModelSerializer):
-    meta = MethodSerializer()
-
-    class Meta:
-        model = ReplayStorage
-        fields = ['id', 'name', 'type', 'meta', 'comment']
-
-    def validate_meta(self, meta):
-        _meta = self.instance.meta if self.instance else {}
-        _meta.update(meta)
-        return _meta
-
-    def get_meta_serializer(self):
-        default_serializer = serializers.Serializer(read_only=True)
-
-        if isinstance(self.instance, ReplayStorage):
-            _type = self.instance.type
-        else:
-            _type = self.context['request'].query_params.get('type')
-
-        if _type:
-            serializer_class = replay_storage_type_serializer_classes_mapping.get(_type)
-        else:
-            serializer_class = default_serializer
-
-        if not serializer_class:
-            serializer_class = default_serializer
-
-        if isinstance(serializer_class, type):
-            serializer = serializer_class()
-        else:
-            serializer = serializer_class
-        return serializer
-
-
 # Command storage serializers
 # ---------------------------
 
@@ -204,15 +166,17 @@ command_storage_type_serializer_classes_mapping = {
     const.CommandStorageTypeChoices.es.value: CommandStorageTypeESSerializer
 }
 
-# CommandStorageSerializer
+
+# BaseStorageSerializer
 
 
-class CommandStorageSerializer(serializers.ModelSerializer):
+class BaseStorageSerializer(serializers.ModelSerializer):
+    storage_type_serializer_classes_mapping = {}
     meta = MethodSerializer()
 
     class Meta:
-        model = CommandStorage
-        fields = ['id', 'name', 'type', 'meta', 'comment']
+        model = None
+        fields = ['id', 'name', 'type', 'meta', 'is_default', 'comment']
 
     def validate_meta(self, meta):
         _meta = self.instance.meta if self.instance else {}
@@ -222,13 +186,13 @@ class CommandStorageSerializer(serializers.ModelSerializer):
     def get_meta_serializer(self):
         default_serializer = serializers.Serializer(read_only=True)
 
-        if isinstance(self.instance, CommandStorage):
+        if isinstance(self.instance, self.__class__.Meta.model):
             _type = self.instance.type
         else:
             _type = self.context['request'].query_params.get('type')
 
         if _type:
-            serializer_class = command_storage_type_serializer_classes_mapping.get(_type)
+            serializer_class = self.storage_type_serializer_classes_mapping.get(_type)
         else:
             serializer_class = default_serializer
 
@@ -240,3 +204,30 @@ class CommandStorageSerializer(serializers.ModelSerializer):
         else:
             serializer = serializer_class
         return serializer
+
+    def save(self, **kwargs):
+        instance = super().save(**kwargs)
+        if self.validated_data.get('is_default', False):
+            instance.set_to_default()
+        return instance
+
+
+# CommandStorageSerializer
+
+
+class CommandStorageSerializer(BaseStorageSerializer):
+    storage_type_serializer_classes_mapping = command_storage_type_serializer_classes_mapping
+
+    class Meta(BaseStorageSerializer.Meta):
+        model = CommandStorage
+
+
+# ReplayStorageSerializer
+
+
+class ReplayStorageSerializer(BaseStorageSerializer):
+    storage_type_serializer_classes_mapping = replay_storage_type_serializer_classes_mapping
+
+    class Meta(BaseStorageSerializer.Meta):
+        model = ReplayStorage
+

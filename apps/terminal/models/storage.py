@@ -19,17 +19,41 @@ from .. import const
 logger = get_logger(__file__)
 
 
-class CommandStorage(CommonModelMixin):
+class CommonStorageModelMixin(models.Model):
     name = models.CharField(max_length=128, verbose_name=_("Name"), unique=True)
+    meta = EncryptJsonDictTextField(default={})
+    is_default = models.BooleanField(default=False, verbose_name=_('Default storage'))
+    comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return self.name
+
+    def set_to_default(self):
+        self.is_default = True
+        self.save()
+        self.__class__.objects.select_for_update()\
+            .filter(is_default=True)\
+            .exclude(id=self.id)\
+            .update(is_default=False)
+
+    @classmethod
+    def default(cls):
+        objs = cls.objects.filter(is_default=True)
+        if not objs:
+            objs = cls.objects.filter(name='default', type='server')
+        if not objs:
+            objs = cls.objects.all()
+        return objs.first()
+
+
+class CommandStorage(CommonStorageModelMixin, CommonModelMixin):
     type = models.CharField(
         max_length=16, choices=const.CommandStorageTypeChoices.choices,
         default=const.CommandStorageTypeChoices.server.value, verbose_name=_('Type'),
     )
-    meta = EncryptJsonDictTextField(default={})
-    comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
-
-    def __str__(self):
-        return self.name
 
     @property
     def type_null(self):
@@ -86,17 +110,11 @@ class CommandStorage(CommonModelMixin):
             backend.pre_use_check()
 
 
-class ReplayStorage(CommonModelMixin):
-    name = models.CharField(max_length=128, verbose_name=_("Name"), unique=True)
+class ReplayStorage(CommonStorageModelMixin, CommonModelMixin):
     type = models.CharField(
         max_length=16, choices=const.ReplayStorageTypeChoices.choices,
         default=const.ReplayStorageTypeChoices.server.value, verbose_name=_('Type')
     )
-    meta = EncryptJsonDictTextField(default={})
-    comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
-
-    def __str__(self):
-        return self.name
 
     @property
     def type_null(self):
