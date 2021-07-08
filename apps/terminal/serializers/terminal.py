@@ -85,7 +85,6 @@ class TaskSerializer(BulkModelSerializer):
     class Meta:
         fields = '__all__'
         model = Task
-        list_serializer_class = AdaptedBulkListSerializer
         ref_name = 'TerminalTaskSerializer'
 
 
@@ -119,5 +118,7 @@ class TerminalRegistrationSerializer(serializers.ModelSerializer):
             instance.remote_addr = get_request_ip(request)
         sa = self.service_account.save()
         instance.user = sa
+        instance.command_storage = CommandStorage.default().name
+        instance.replay_storage = ReplayStorage.default().name
         instance.save()
         return instance

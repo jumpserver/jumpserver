@@ -15,6 +15,7 @@ from orgs.hands import set_current_org, Node, get_current_org
 from perms.models import (AssetPermission, ApplicationPermission)
 from users.models import UserGroup, User
 from common.const.signals import PRE_REMOVE, POST_REMOVE
+from common.decorator import on_transaction_commit
 from common.signals import django_ready
 from common.utils import get_logger
 from common.utils.connection import RedisPubSub
@@ -35,8 +36,8 @@ class OrgsMappingForMemoryPubSub(LazyObject):
 orgs_mapping_for_memory_pub_sub = OrgsMappingForMemoryPubSub()
 
 
-def expire_orgs_mapping_for_memory():
-    orgs_mapping_for_memory_pub_sub.publish('expire_orgs_mapping')
+def expire_orgs_mapping_for_memory(org_id):
+    orgs_mapping_for_memory_pub_sub.publish(str(org_id))
 
 
 @receiver(django_ready)
@@ -53,7 +54,7 @@ def subscribe_orgs_mapping_expire(sender, **kwargs):
                     if message['data'] == b'error':
                         raise ValueError
                     Organization.expire_orgs_mapping()
-                    logger.debug('Expire orgs mapping')
+                    logger.debug('Expire orgs mapping: ' + str(message['data']))
             except Exception as e:
                 logger.exception(f'subscribe_orgs_mapping_expire: {e}')
                 Organization.expire_orgs_mapping()
@@ -64,22 +65,21 @@ def subscribe_orgs_mapping_expire(sender, **kwargs):
 
 
 @receiver(post_save, sender=Organization)
-def on_org_create_or_update(sender, instance=None, created=False, **kwargs):
+def on_org_create_or_update(sender, instance, created=False, **kwargs):
     # 必须放到最开始, 因为下面调用Node.save方法时会获取当前组织的org_id(即instance.org_id), 如果不过期会找不到
-    expire_orgs_mapping_for_memory()
-    if instance:
-        old_org = get_current_org()
-        set_current_org(instance)
-        node_root = Node.org_root()
-        if node_root.value != instance.name:
-            node_root.value = instance.name
-            node_root.save()
-        set_current_org(old_org)
+    expire_orgs_mapping_for_memory(instance.id)
+    old_org = get_current_org()
+    set_current_org(instance)
+    node_root = Node.org_root()
+    if node_root.value != instance.name:
+        node_root.value = instance.name
+        node_root.save()
+    set_current_org(old_org)
 
 
-@receiver(post_delete, sender=Organization)
-def on_org_delete(sender, **kwargs):
-    expire_orgs_mapping_for_memory()
+@receiver(pre_delete, sender=Organization)
+def on_org_delete(sender, instance, **kwargs):
+    expire_orgs_mapping_for_memory(instance.id)
 
 
 @receiver(pre_delete, sender=Organization)
@@ -167,3 +167,13 @@ def on_org_user_changed(action, instance, reverse, pk_set, **kwargs):
 
             leaved_users = set(pk_set) - set(org.members.filter(id__in=user_pk_set).values_list('id', flat=True))
             _clear_users_from_org(org, leaved_users)
+
+
+@receiver(post_save, sender=User)
+@on_transaction_commit
+def on_user_created_set_default_org(sender, instance, created, **kwargs):
+    if not created:
+        return
+    if instance.orgs.count() > 0:
+        return
+    Organization.default().members.add(instance)

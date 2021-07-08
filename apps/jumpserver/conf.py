@@ -212,6 +212,10 @@ class Config(dict):
         'CAS_ROOT_PROXIED_AS': '',
         'CAS_LOGOUT_COMPLETELY': True,
         'CAS_VERSION': 3,
+        'CAS_USERNAME_ATTRIBUTE': 'uid',
+        'CAS_APPLY_ATTRIBUTES_TO_USER': False,
+        'CAS_RENAME_ATTRIBUTES': {},
+        'CAS_CREATE_USER': True,
 
         'AUTH_SSO': False,
         'AUTH_SSO_AUTHKEY_TTL': 60 * 15,

@@ -28,7 +28,7 @@ class AdminUsersGenerator(FakeDataGenerator):
 class SystemUsersGenerator(FakeDataGenerator):
     def do_generate(self, batch, batch_size):
         system_users = []
-        protocols = list(dict(SystemUser.PROTOCOL_CHOICES).keys())
+        protocols = list(dict(SystemUser.Protocol.choices).keys())
         for i in batch:
             username = forgery_py.internet.user_name(True)
             protocol = random.choice(protocols)

@@ -2,12 +2,13 @@
 #
 import time
 from django.utils.translation import ugettext as _
+from django.conf import settings
 from rest_framework.permissions import AllowAny
 from rest_framework.generics import CreateAPIView
 from rest_framework.serializers import ValidationError
 from rest_framework.response import Response
 
-from common.permissions import IsValidUser
+from common.permissions import IsValidUser, NeedMFAVerify
 from ..serializers import OtpVerifySerializer
 from .. import serializers
 from .. import errors
@@ -48,6 +49,9 @@ class UserOtpVerifyApi(CreateAPIView):
     permission_classes = (IsValidUser,)
     serializer_class = OtpVerifySerializer
 
+    def get(self, request, *args, **kwargs):
+        return Response({'code': 'valid', 'msg': 'verified'})
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -58,3 +62,8 @@ class UserOtpVerifyApi(CreateAPIView):
             return Response({"ok": "1"})
         else:
             return Response({"error": _("Code is invalid")}, status=400)
+
+    def get_permissions(self):
+        if self.request.method.lower() == 'get' and settings.SECURITY_VIEW_AUTH_NEED_MFA:
+            self.permission_classes = [NeedMFAVerify]
+        return super().get_permissions()

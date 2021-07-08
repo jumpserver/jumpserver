@@ -2,7 +2,6 @@ from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Count
 
-from common.drf.serializers import AdaptedBulkListSerializer
 from common.mixins.serializers import BulkSerializerMixin
 from common.utils import ssh_pubkey_gen
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
@@ -23,21 +22,21 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     系统用户
     """
     auto_generate_key = serializers.BooleanField(initial=True, required=False, write_only=True)
+    type_display = serializers.ReadOnlyField(source='get_type_display')
 
     class Meta:
         model = SystemUser
-        list_serializer_class = AdaptedBulkListSerializer
         fields_mini = ['id', 'name', 'username']
         fields_write_only = ['password', 'public_key', 'private_key']
         fields_small = fields_mini + fields_write_only + [
-            'protocol', 'login_mode', 'login_mode_display', 'priority',
-            'sudo', 'shell', 'sftp_root', 'token',
+            'type', 'type_display', 'protocol', 'login_mode', 'login_mode_display',
+            'priority', 'sudo', 'shell', 'sftp_root', 'token',
             'home', 'system_groups', 'ad_domain',
             'username_same_with_user', 'auto_push', 'auto_generate_key',
             'date_created', 'date_updated',
             'comment', 'created_by',
         ]
-        fields_m2m = [ 'cmd_filters', 'assets_amount']
+        fields_m2m = ['cmd_filters', 'assets_amount']
         fields = fields_small + fields_m2m
         extra_kwargs = {
             'password': {"write_only": True},
@@ -55,9 +54,9 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         login_mode = self.initial_data.get("login_mode")
         protocol = self.initial_data.get("protocol")
 
-        if login_mode == SystemUser.LOGIN_MANUAL or \
-                protocol in [SystemUser.PROTOCOL_TELNET,
-                             SystemUser.PROTOCOL_VNC]:
+        if login_mode == SystemUser.LOGIN_MANUAL:
+            value = False
+        elif protocol not in SystemUser.SUPPORT_PUSH_PROTOCOLS:
             value = False
         return value
 
@@ -71,7 +70,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             value = False
         elif login_mode == SystemUser.LOGIN_MANUAL:
             value = False
-        elif protocol in [SystemUser.PROTOCOL_TELNET, SystemUser.PROTOCOL_VNC]:
+        elif protocol not in SystemUser.SUPPORT_PUSH_PROTOCOLS:
             value = False
         return value
 
@@ -80,7 +79,8 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             return username_same_with_user
         protocol = self.initial_data.get("protocol", "ssh")
         queryset = SystemUser.objects.filter(
-                protocol=protocol, username_same_with_user=True
+            protocol=protocol,
+            username_same_with_user=True
         )
         if self.instance:
             queryset = queryset.exclude(id=self.instance.id)
@@ -96,12 +96,14 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         login_mode = self.initial_data.get("login_mode")
         protocol = self.initial_data.get("protocol")
         username_same_with_user = self.initial_data.get("username_same_with_user")
-        if username_same_with_user:
-            return ''
+
         if login_mode == SystemUser.LOGIN_AUTO and \
-                protocol != SystemUser.PROTOCOL_VNC:
+                protocol != SystemUser.Protocol.vnc:
             msg = _('* Automatic login mode must fill in the username.')
             raise serializers.ValidationError(msg)
+
+        if username_same_with_user:
+            username = '*'
         return username
 
     def validate_home(self, home):
@@ -118,38 +120,55 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             raise serializers.ValidationError(error)
         return value
 
+    @staticmethod
+    def validate_admin_user(attrs):
+        tp = attrs.get('type')
+        if tp != SystemUser.Type.admin:
+            return attrs
+        attrs['protocol'] = SystemUser.Protocol.ssh
+        attrs['login_mode'] = SystemUser.LOGIN_AUTO
+        attrs['username_same_with_user'] = False
+        attrs['auto_push'] = False
+        return attrs
+
     def validate_password(self, password):
         super().validate_password(password)
         auto_gen_key = self.initial_data.get("auto_generate_key", False)
         private_key = self.initial_data.get("private_key")
         login_mode = self.initial_data.get("login_mode")
+
         if not self.instance and not auto_gen_key and not password and \
                 not private_key and login_mode == SystemUser.LOGIN_AUTO:
             raise serializers.ValidationError(_("Password or private key required"))
         return password
 
-    def validate(self, attrs):
+    def validate_gen_key(self, attrs):
         username = attrs.get("username", "manual")
         auto_gen_key = attrs.pop("auto_generate_key", False)
         protocol = attrs.get("protocol")
 
-        if protocol not in [SystemUser.PROTOCOL_RDP, SystemUser.PROTOCOL_SSH]:
+        if protocol not in SystemUser.SUPPORT_PUSH_PROTOCOLS:
             return attrs
 
-        if auto_gen_key:
+        # 自动生成
+        if auto_gen_key and not self.instance:
             password = SystemUser.gen_password()
             attrs["password"] = password
-            if protocol == SystemUser.PROTOCOL_SSH:
+            if protocol == SystemUser.Protocol.ssh:
                 private_key, public_key = SystemUser.gen_key(username)
                 attrs["private_key"] = private_key
                 attrs["public_key"] = public_key
-                # 如果设置了private key，没有设置public key则生成
+        # 如果设置了private key，没有设置public key则生成
         elif attrs.get("private_key", None):
             private_key = attrs["private_key"]
             password = attrs.get("password")
-            public_key = ssh_pubkey_gen(private_key, password=password,
-                                        username=username)
+            public_key = ssh_pubkey_gen(private_key, password=password, username=username)
             attrs["public_key"] = public_key
+        return attrs
+
+    def validate(self, attrs):
+        attrs = self.validate_admin_user(attrs)
+        attrs = self.validate_gen_key(attrs)
         return attrs
 
 
@@ -222,24 +241,26 @@ class RelationMixin(BulkSerializerMixin, serializers.Serializer):
         fields.extend(['systemuser', "systemuser_display"])
         return fields
 
-    class Meta:
-        list_serializer_class = AdaptedBulkListSerializer
-
 
 class SystemUserAssetRelationSerializer(RelationMixin, serializers.ModelSerializer):
     asset_display = serializers.ReadOnlyField()
 
-    class Meta(RelationMixin.Meta):
+    class Meta:
         model = SystemUser.assets.through
         fields = [
-            'id', "asset", "asset_display",
+            "id", "asset", "asset_display",
+            'systemuser', 'systemuser_display'
         ]
+        use_model_bulk_create = True
+        model_bulk_create_kwargs = {
+            'ignore_conflicts': True
+        }
 
 
 class SystemUserNodeRelationSerializer(RelationMixin, serializers.ModelSerializer):
     node_display = serializers.SerializerMethodField()
 
-    class Meta(RelationMixin.Meta):
+    class Meta:
         model = SystemUser.nodes.through
         fields = [
             'id', 'node', "node_display",
@@ -252,7 +273,7 @@ class SystemUserNodeRelationSerializer(RelationMixin, serializers.ModelSerialize
 class SystemUserUserRelationSerializer(RelationMixin, serializers.ModelSerializer):
     user_display = serializers.ReadOnlyField()
 
-    class Meta(RelationMixin.Meta):
+    class Meta:
         model = SystemUser.users.through
         fields = [
             'id', "user", "user_display",

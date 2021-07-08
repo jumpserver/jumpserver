@@ -86,8 +86,10 @@ class CommandExecution(OrgModelMixin):
                 host = self.hosts.first()
                 if host and host.is_windows():
                     shell = 'win_shell'
-                else:
+                elif host and host.is_unixlike():
                     shell = 'shell'
+                else:
+                    shell = 'raw'
                 result = runner.execute(self.command, 'all', module=shell)
                 self.result = result.results_command
             except SoftTimeLimitExceeded as e:

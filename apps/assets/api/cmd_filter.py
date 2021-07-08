@@ -2,14 +2,12 @@
 #
 
 from rest_framework.response import Response
-from rest_framework.generics import CreateAPIView, RetrieveDestroyAPIView
+from rest_framework.generics import CreateAPIView
 from django.shortcuts import get_object_or_404
 
 from common.utils import reverse
 from common.utils import lazyproperty
 from orgs.mixins.api import OrgBulkModelViewSet
-from orgs.utils import tmp_to_root_org
-from tickets.models import Ticket
 from tickets.api import GenericTicketStatusRetrieveCloseAPI
 from ..hands import IsOrgAdmin, IsAppUser
 from ..models import CommandFilter, CommandFilterRule

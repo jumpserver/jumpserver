@@ -23,7 +23,7 @@ from ..utils import lazyproperty
 
 __all__ = [
     'JSONResponseMixin', 'CommonApiMixin', 'AsyncApiMixin', 'RelationMixin',
-    'SerializerMixin2', 'QuerySetMixin', 'ExtraFilterFieldsMixin', 'RenderToJsonMixin',
+    'QuerySetMixin', 'ExtraFilterFieldsMixin', 'RenderToJsonMixin',
 ]
 
 
@@ -62,21 +62,27 @@ class RenderToJsonMixin:
 class SerializerMixin:
     """ 根据用户请求动作的不同，获取不同的 `serializer_class `"""
 
+    action: str
+    request: Request
+
     serializer_classes = None
+    single_actions = ['put', 'retrieve', 'patch']
 
     def get_serializer_class_by_view_action(self):
         if not hasattr(self, 'serializer_classes'):
             return None
         if not isinstance(self.serializer_classes, dict):
             return None
-        action = self.request.query_params.get('action')
 
-        serializer_class = None
-        if action:
-            # metadata方法 使用 action 参数获取
-            serializer_class = self.serializer_classes.get(action)
+        view_action = self.request.query_params.get('action') or self.action or 'list'
+        serializer_class = self.serializer_classes.get(view_action)
+
         if serializer_class is None:
-            serializer_class = self.serializer_classes.get(self.action)
+            view_method = self.request.method.lower()
+            serializer_class = self.serializer_classes.get(view_method)
+
+        if serializer_class is None and view_action in self.single_actions:
+            serializer_class = self.serializer_classes.get('single')
         if serializer_class is None:
             serializer_class = self.serializer_classes.get('display')
         if serializer_class is None:
@@ -301,36 +307,18 @@ class RelationMixin:
         self.send_m2m_changed_signal(instance, 'post_remove')
 
 
-class SerializerMixin2:
-    serializer_classes = {}
-
-    def get_serializer_class(self):
-        if self.serializer_classes:
-            serializer_class = self.serializer_classes.get(
-                self.action, self.serializer_classes.get('default')
-            )
-
-            if isinstance(serializer_class, dict):
-                serializer_class = serializer_class.get(
-                    self.request.method.lower, serializer_class.get('default')
-                )
-
-            assert serializer_class, '`serializer_classes` config error'
-            return serializer_class
-        return super().get_serializer_class()
-
-
 class QuerySetMixin:
     def get_queryset(self):
         queryset = super().get_queryset()
         serializer_class = self.get_serializer_class()
+
         if serializer_class and hasattr(serializer_class, 'setup_eager_loading'):
             queryset = serializer_class.setup_eager_loading(queryset)
 
         return queryset
 
 
-class AllowBulkDestoryMixin:
+class AllowBulkDestroyMixin:
     def allow_bulk_destroy(self, qs, filtered):
         """
         我们规定，批量删除的情况必须用 `id` 指定要删除的数据。

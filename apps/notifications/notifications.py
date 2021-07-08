@@ -32,16 +32,6 @@ class MessageType(type):
             }
             if issubclass(clz, SystemMessage):
                 system_msgs.append(msg)
-                try:
-                    if not SystemMsgSubscription.objects.filter(message_type=message_type).exists():
-                        sub = SystemMsgSubscription.objects.create(message_type=message_type)
-                        clz.post_insert_to_db(sub)
-                except ProgrammingError as e:
-                    if e.args[0] == 1146:
-                        # 表不存在
-                        pass
-                    else:
-                        raise
             elif issubclass(clz, UserMessage):
                 user_msgs.append(msg)
 

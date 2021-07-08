@@ -3,7 +3,6 @@
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
-from common.drf.serializers import AdaptedBulkListSerializer
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
 from ..models import Label
@@ -30,7 +29,6 @@ class LabelSerializer(BulkOrgResourceModelSerializer):
         extra_kwargs = {
             'assets': {'required': False}
         }
-        list_serializer_class = AdaptedBulkListSerializer
 
     @staticmethod
     def get_asset_count(obj):
