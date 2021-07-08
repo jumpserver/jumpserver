@@ -84,8 +84,8 @@ def on_asset_nodes_add(instance, action, reverse, pk_set, **kwargs):
     # 查询所有已存在的关系
     m2m_model = SystemUser.assets.through
     exist = set(m2m_model.objects.filter(
-        system_user_id__in=system_user_ids, asset_id__in=asset_ids
-    ).values_list('system_user_id', 'asset_id'))
+        systemuser_id__in=system_user_ids, asset_id__in=asset_ids
+    ).values_list('systemuser_id', 'asset_id'))
     # TODO 优化
     to_create = []
     for system_user_id in system_user_ids:
@@ -95,7 +95,7 @@ def on_asset_nodes_add(instance, action, reverse, pk_set, **kwargs):
                 continue
             asset_ids_to_push.append(asset_id)
             to_create.append(m2m_model(
-                system_user_id=system_user_id,
+                systemuser_id=system_user_id,
                 asset_id=asset_id
             ))
         if asset_ids_to_push:
