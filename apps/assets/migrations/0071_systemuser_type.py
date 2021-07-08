@@ -19,7 +19,12 @@ def migrate_admin_user_to_system_user(apps, schema_editor):
             value = getattr(admin_user, attr)
             kwargs[attr] = value
 
-        name = admin_user.name + '_' + str(admin_user.id)[:5]
+        name = admin_user.name
+        exist = system_user_model.objects.using(db_alias).filter(
+            name=admin_user.name, org_id=admin_user.org_id
+        ).exists()
+        if exist:
+            name = admin_user.name + '_' + str(admin_user.id)[:5]
         kwargs.update({
             'name': name,
             'type': 'admin',

@@ -64,6 +64,6 @@ class UserOtpVerifyApi(CreateAPIView):
             return Response({"error": _("Code is invalid")}, status=400)
 
     def get_permissions(self):
-        if self.request.method.lower() == 'get':
+        if self.request.method.lower() == 'get' and settings.SECURITY_VIEW_AUTH_NEED_MFA:
             self.permission_classes = [NeedMFAVerify]
         return super().get_permissions()

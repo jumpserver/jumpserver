@@ -18,13 +18,16 @@ class AuthBook(BaseUser, AbsConnectivity):
     version = models.IntegerField(default=1, verbose_name=_('Version'))
     history = HistoricalRecords()
 
+    auth_attrs = ['username', 'password', 'private_key', 'public_key']
+
     class Meta:
         verbose_name = _('AuthBook')
         unique_together = [('username', 'asset', 'systemuser')]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.smarty_it()
+        self.auth_snapshot = {}
+        self.load_auth()
 
     def get_or_systemuser_attr(self, attr):
         val = getattr(self, attr, None)
@@ -34,12 +37,27 @@ class AuthBook(BaseUser, AbsConnectivity):
             return getattr(self.systemuser, attr, '')
         return ''
 
-    def smarty_it(self, *attrs):
-        if not attrs:
-            attrs = ['username', 'password', 'private_key', 'public_key']
-        for attr in attrs:
+    def load_auth(self):
+        for attr in self.auth_attrs:
             value = self.get_or_systemuser_attr(attr)
+            self.auth_snapshot[attr] = [getattr(self, attr), value]
             setattr(self, attr, value)
+
+    def unload_auth(self):
+        if not self.systemuser:
+            return
+
+        for attr, values in self.auth_snapshot.items():
+            origin_value, loaded_value = values
+            current_value = getattr(self, attr, '')
+            if current_value == loaded_value:
+                setattr(self, attr, origin_value)
+
+    def save(self, *args, **kwargs):
+        self.unload_auth()
+        instance = super().save(*args, **kwargs)
+        self.load_auth()
+        return instance
 
     @property
     def username_display(self):

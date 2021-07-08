@@ -137,13 +137,13 @@ class AuthMixin:
         if len(authbooks) == 0:
             return None
         elif len(authbooks) == 1:
-            auth = authbooks[0]
+            authbook = authbooks[0]
         else:
             authbooks.sort(key=lambda x: 1 if x.username == username else 0, reverse=True)
-            auth = authbooks[0]
-        self.password = auth.password
-        self.private_key = auth.private_key
-        self.public_key = auth.public_key
+            authbook = authbooks[0]
+        self.password = authbook.password
+        self.private_key = authbook.private_key
+        self.public_key = authbook.public_key
 
     def load_asset_more_auth(self, asset_id=None, username=None, user_id=None):
         from users.models import User
