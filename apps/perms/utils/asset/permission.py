@@ -41,7 +41,7 @@ def validate_permission(user, asset, system_user, action_name):
 
     asset_perm_ids = AssetPermission.system_users.through.objects.filter(
         assetpermission_id__in=asset_perm_ids,
-        system_user_id=system_user.id
+        systemuser_id=system_user.id
     ).values_list('assetpermission_id', flat=True)
 
     asset_perm_ids = set(asset_perm_ids)

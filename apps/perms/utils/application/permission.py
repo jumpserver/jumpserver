@@ -44,7 +44,7 @@ def validate_permission(user, application, system_user):
 
     app_perm_ids = ApplicationPermission.system_users.through.objects.filter(
         applicationpermission_id__in=app_perm_ids,
-        system_user_id=system_user.id
+        systemuser_id=system_user.id
     ).values_list('applicationpermission_id', flat=True)
 
     app_perm_ids = set(app_perm_ids)
