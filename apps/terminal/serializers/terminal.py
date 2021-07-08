@@ -85,7 +85,6 @@ class TaskSerializer(BulkModelSerializer):
     class Meta:
         fields = '__all__'
         model = Task
-        list_serializer_class = AdaptedBulkListSerializer
         ref_name = 'TerminalTaskSerializer'
 
 

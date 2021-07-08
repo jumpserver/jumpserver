@@ -3,7 +3,6 @@
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
-from common.drf.serializers import AdaptedBulkListSerializer
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.validators import NoSpecialChars
 from ..models import Domain, Gateway
@@ -29,7 +28,6 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
         extra_kwargs = {
             'assets': {'required': False, 'label': _('Assets')},
         }
-        list_serializer_class = AdaptedBulkListSerializer
 
     @staticmethod
     def get_asset_count(obj):
@@ -47,7 +45,6 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
 class GatewaySerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     class Meta:
         model = Gateway
-        list_serializer_class = AdaptedBulkListSerializer
         fields_mini = ['id', 'name']
         fields_write_only = [
             'password', 'private_key', 'public_key',
@@ -65,16 +62,6 @@ class GatewaySerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'private_key': {"write_only": True},
             'public_key': {"write_only": True},
         }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.protocol_limit_to_ssh()
-
-    def protocol_limit_to_ssh(self):
-        protocol_field = self.fields['protocol']
-        choices = protocol_field.choices
-        choices.pop('rdp')
-        protocol_field._choices = choices
 
 
 class GatewayWithAuthSerializer(GatewaySerializer):

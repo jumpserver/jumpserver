@@ -5,7 +5,6 @@ from rest_framework import serializers
 from django.db.models import F
 
 from common.mixins import BulkSerializerMixin
-from common.drf.serializers import AdaptedBulkListSerializer
 from terminal.models import Session
 from ops.models import CommandExecution
 from . import models
@@ -108,7 +107,6 @@ class CommandExecutionHostsRelationSerializer(BulkSerializerMixin, serializers.M
     commandexecution_display = serializers.ReadOnlyField()
 
     class Meta:
-        list_serializer_class = AdaptedBulkListSerializer
         model = CommandExecution.hosts.through
         fields = [
             'id', 'asset', 'asset_display', 'commandexecution', 'commandexecution_display'

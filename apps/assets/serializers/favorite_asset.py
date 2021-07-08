@@ -4,7 +4,6 @@
 from rest_framework import serializers
 
 from orgs.utils import tmp_to_root_org
-from common.drf.serializers import AdaptedBulkListSerializer
 from common.mixins import BulkSerializerMixin
 from ..models import FavoriteAsset
 
@@ -18,6 +17,5 @@ class FavoriteAssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     )
 
     class Meta:
-        list_serializer_class = AdaptedBulkListSerializer
         model = FavoriteAsset
         fields = ['user', 'asset']

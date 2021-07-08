@@ -33,8 +33,7 @@ class AssetViewSet(FilterAssetByNodeMixin, OrgBulkModelViewSet):
     filterset_fields = {
         'hostname': ['exact'],
         'ip': ['exact'],
-        'systemuser__id': ['exact'],
-        'admin_user__id': ['exact'],
+        'system_users__id': ['exact'],
         'platform__base': ['exact'],
         'is_active': ['exact'],
         'protocols': ['exact', 'icontains']
@@ -43,7 +42,7 @@ class AssetViewSet(FilterAssetByNodeMixin, OrgBulkModelViewSet):
     ordering_fields = ("hostname", "ip", "port", "cpu_cores")
     serializer_classes = {
         'default': serializers.AssetSerializer,
-        'display': serializers.AssetDisplaySerializer,
+        'single': serializers.AssetVerboseSerializer,
     }
     permission_classes = (IsOrgAdminOrAppUser,)
     extra_filter_backends = [FilterAssetByNodeFilterBackend, LabelFilterBackend, IpInFilterBackend]

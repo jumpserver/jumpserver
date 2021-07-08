@@ -4,18 +4,20 @@
 
 import uuid
 import logging
-import random
 from functools import reduce
 from collections import OrderedDict
 
+from django.utils import timezone
 from django.db import models
+from common.db.models import TextChoices
 from django.utils.translation import ugettext_lazy as _
+from rest_framework.exceptions import ValidationError
 
 from common.fields.model import JsonDictTextField
 from common.utils import lazyproperty
 from orgs.mixins.models import OrgModelMixin, OrgManager
-from .base import ConnectivityMixin
-from .utils import Connectivity
+
+from .base import AbsConnectivity
 
 __all__ = ['Asset', 'ProtocolsMixin', 'Platform', 'AssetQuerySet']
 logger = logging.getLogger(__name__)
@@ -57,16 +59,12 @@ class AssetQuerySet(models.QuerySet):
 
 class ProtocolsMixin:
     protocols = ''
-    PROTOCOL_SSH = 'ssh'
-    PROTOCOL_RDP = 'rdp'
-    PROTOCOL_TELNET = 'telnet'
-    PROTOCOL_VNC = 'vnc'
-    PROTOCOL_CHOICES = (
-        (PROTOCOL_SSH, 'ssh'),
-        (PROTOCOL_RDP, 'rdp'),
-        (PROTOCOL_TELNET, 'telnet'),
-        (PROTOCOL_VNC, 'vnc'),
-    )
+
+    class Protocol(TextChoices):
+        ssh = 'ssh', 'SSH'
+        rdp = 'rdp', 'RDP'
+        telnet = 'telnet', 'Telnet'
+        vnc = 'vnc', 'VNC'
 
     @property
     def protocols_as_list(self):
@@ -167,7 +165,7 @@ class Platform(models.Model):
         # ordering = ('name',)
 
 
-class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
+class Asset(AbsConnectivity, ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     # Important
     PLATFORM_CHOICES = (
         ('Linux', 'Linux'),
@@ -182,8 +180,8 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     ip = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
     hostname = models.CharField(max_length=128, verbose_name=_('Hostname'))
-    protocol = models.CharField(max_length=128, default=ProtocolsMixin.PROTOCOL_SSH,
-                                choices=ProtocolsMixin.PROTOCOL_CHOICES,
+    protocol = models.CharField(max_length=128, default=ProtocolsMixin.Protocol.ssh,
+                                choices=ProtocolsMixin.Protocol.choices,
                                 verbose_name=_('Protocol'))
     port = models.IntegerField(default=22, verbose_name=_('Port'))
     protocols = models.CharField(max_length=128, default='ssh/22', blank=True, verbose_name=_("Protocols"))
@@ -193,7 +191,7 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
 
     # Auth
-    admin_user = models.ForeignKey('assets.AdminUser', on_delete=models.PROTECT, null=True, verbose_name=_("Admin user"), related_name='assets')
+    _admin_user = models.ForeignKey('assets.AdminUser', on_delete=models.PROTECT, null=True, verbose_name=_("Admin user"), related_name='assets')
 
     # Some information
     public_ip = models.CharField(max_length=128, blank=True, null=True, verbose_name=_('Public IP'))
@@ -223,10 +221,25 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
     objects = AssetManager.from_queryset(AssetQuerySet)()
-    _connectivity = None
 
     def __str__(self):
         return '{0.hostname}({0.ip})'.format(self)
+
+    @property
+    def admin_user(self):
+        return self.system_users.filter(type='admin').first()
+
+    @admin_user.setter
+    def admin_user(self, system_user):
+        if not system_user:
+            return
+        if system_user.type != 'admin':
+            raise ValidationError('System user should be type admin')
+        system_user.assets.add(self)
+
+    def remove_admin_user(self):
+        from ..models import AuthBook
+        AuthBook.objects.filter(asset=self, systemuser__type='admin').delete()
 
     @property
     def is_valid(self):
@@ -275,23 +288,6 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
             )
         else:
             return ''
-
-    @property
-    def connectivity(self):
-        if self._connectivity:
-            return self._connectivity
-        if not self.admin_user_username:
-            return Connectivity.unknown()
-        connectivity = ConnectivityMixin.get_asset_username_connectivity(
-            self, self.admin_user_username
-        )
-        return connectivity
-
-    @connectivity.setter
-    def connectivity(self, value):
-        if not self.admin_user:
-            return
-        self.admin_user.set_asset_connectivity(self, value)
 
     def get_auth_info(self):
         if not self.admin_user:

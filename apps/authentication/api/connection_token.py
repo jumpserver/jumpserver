@@ -15,7 +15,7 @@ from rest_framework import serializers
 
 from authentication.signals import post_auth_failed, post_auth_success
 from common.utils import get_logger, random_string
-from common.drf.api import SerializerMixin2
+from common.drf.api import SerializerMixin
 from common.permissions import IsSuperUserOrAppUser, IsValidUser, IsSuperUser
 
 from orgs.mixins.api import RootOrgViewMixin
@@ -29,7 +29,7 @@ logger = get_logger(__name__)
 __all__ = ['UserConnectionTokenViewSet']
 
 
-class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin2, GenericViewSet):
+class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin, GenericViewSet):
     permission_classes = (IsSuperUserOrAppUser,)
     serializer_classes = {
         'default': ConnectionTokenSerializer,

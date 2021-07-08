@@ -9,10 +9,10 @@ from django.utils.translation import ugettext_lazy as _
 
 from common.utils import lazyproperty, settings
 from common.const import choices
-from common.db.models import ChoiceSet
+from common.db.models import TextChoices
 
 
-class ROLE(ChoiceSet):
+class ROLE(TextChoices):
     ADMIN = choices.ADMIN, _('Organization administrator')
     AUDITOR = choices.AUDITOR, _("Organization auditor")
     USER = choices.USER, _('User')

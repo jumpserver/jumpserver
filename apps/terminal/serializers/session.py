@@ -2,7 +2,6 @@ from rest_framework import serializers
 
 from django.utils.translation import ugettext_lazy as _
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-from common.drf.serializers import AdaptedBulkListSerializer
 from ..models import Session
 
 __all__ = [
@@ -16,7 +15,6 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
 
     class Meta:
         model = Session
-        list_serializer_class = AdaptedBulkListSerializer
         fields_mini = ["id"]
         fields_small = fields_mini + [
             "user", "asset", "system_user",

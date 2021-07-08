@@ -4,7 +4,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.db.models import Prefetch
 from rest_framework import serializers
 
-from common.drf.serializers import AdaptedBulkListSerializer
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from django.db.models import Count
 from ..models import User, UserGroup
@@ -23,7 +22,6 @@ class UserGroupSerializer(BulkOrgResourceModelSerializer):
 
     class Meta:
         model = UserGroup
-        list_serializer_class = AdaptedBulkListSerializer
         fields_mini = ['id', 'name']
         fields_small = fields_mini + [
             'comment', 'date_created', 'created_by'
