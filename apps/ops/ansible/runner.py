@@ -250,7 +250,7 @@ class CommandRunner(AdHocRunner):
     results_callback_class = CommandResultCallback
     modules_choices = ('shell', 'raw', 'command', 'script', 'win_shell')
 
-    def execute(self, cmd, pattern, module='shell'):
+    def execute(self, cmd, pattern, module='raw'):
         if module and module not in self.modules_choices:
             raise AnsibleError("Module should in {}".format(self.modules_choices))
 

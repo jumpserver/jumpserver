@@ -87,7 +87,7 @@ class CommandExecution(OrgModelMixin):
                 if host and host.is_windows():
                     shell = 'win_shell'
                 else:
-                    shell = 'shell'
+                    shell = 'raw'
                 result = runner.execute(self.command, 'all', module=shell)
                 self.result = result.results_command
             except SoftTimeLimitExceeded as e:
