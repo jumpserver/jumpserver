@@ -83,7 +83,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'hardware_info', 'connectivity', 'date_verified'
         ]
         fields_fk = [
-            'domain', 'domain_display', 'platform', 'admin_user'
+            'domain', 'domain_display', 'platform', 'admin_user', 'admin_user_display'
         ]
         fields_m2m = [
             'nodes', 'nodes_display', 'labels',

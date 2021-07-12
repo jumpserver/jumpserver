@@ -215,7 +215,7 @@ class SystemUser(ProtocolMixin, AuthMixin, BaseUser):
     def __str__(self):
         username = self.username
         if self.username_same_with_user:
-            username = 'dynamic'
+            username = '*'
         return '{0.name}({1})'.format(self, username)
 
     @property
@@ -269,11 +269,6 @@ class SystemUser(ProtocolMixin, AuthMixin, BaseUser):
         asset_ids.update(nodes_asset_ids)
         assets = Asset.objects.filter(id__in=asset_ids)
         return assets
-
-    def save(self, *args, **kwargs):
-        if self.username_same_with_user:
-            self.username = '*'
-        return super().save(*args, **kwargs)
 
     class Meta:
         ordering = ['name']
