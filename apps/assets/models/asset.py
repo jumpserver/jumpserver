@@ -237,6 +237,12 @@ class Asset(AbsConnectivity, ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
             raise ValidationError('System user should be type admin')
         system_user.assets.add(self)
 
+    @property
+    def admin_user_display(self):
+        if not self.admin_user:
+            return ''
+        return str(self.admin_user)
+
     def remove_admin_user(self):
         from ..models import AuthBook
         AuthBook.objects.filter(asset=self, systemuser__type='admin').delete()
