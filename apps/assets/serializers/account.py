@@ -17,7 +17,7 @@ class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         fields_write_only = ['password', 'private_key', "public_key"]
         fields_other = ['date_created', 'date_updated', 'connectivity', 'date_verified', 'comment']
         fields_small = fields_mini + fields_write_only + fields_other
-        fields_fk = ['asset', 'systemuser']
+        fields_fk = ['asset', 'systemuser', 'systemuser_display']
         fields = fields_small + fields_fk
         extra_kwargs = {
             'username': {'required': True},
