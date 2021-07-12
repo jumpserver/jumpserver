@@ -3,10 +3,9 @@
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
 from simple_history.models import HistoricalRecords
 
-
+from common.utils import lazyproperty
 from .base import BaseUser, AbsConnectivity
 
 __all__ = ['AuthBook']
@@ -17,6 +16,7 @@ class AuthBook(BaseUser, AbsConnectivity):
     systemuser = models.ForeignKey('assets.SystemUser', on_delete=models.CASCADE, null=True, verbose_name=_("System user"))
     version = models.IntegerField(default=1, verbose_name=_('Version'))
     history = HistoricalRecords()
+    _systemuser_display = ''
 
     auth_attrs = ['username', 'password', 'private_key', 'public_key']
 
@@ -63,8 +63,10 @@ class AuthBook(BaseUser, AbsConnectivity):
     def username_display(self):
         return self.get_or_systemuser_attr('username') or '*'
 
-    @property
+    @lazyproperty
     def systemuser_display(self):
+        if self._systemuser_display:
+            return self._systemuser_display
         if not self.systemuser:
             return ''
         return str(self.systemuser)

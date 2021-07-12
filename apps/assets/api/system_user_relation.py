@@ -75,7 +75,7 @@ class SystemUserAssetRelationViewSet(BaseRelationViewSet):
     ]
     search_fields = [
         "id", "asset__hostname", "asset__ip",
-        "systemuser__name", "systemuser__username"
+        "systemuser__name", "systemuser__username",
     ]
 
     def get_objects_attr(self):
