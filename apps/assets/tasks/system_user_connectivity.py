@@ -8,7 +8,7 @@ from django.utils.translation import ugettext as _
 from assets.models import Asset
 from common.utils import get_logger
 from orgs.utils import tmp_to_org, org_aware_func
-from ..models import SystemUser
+from ..models import SystemUser, Connectivity, AuthBook
 from . import const
 from .utils import (
     clean_ansible_task_hosts, group_asset_by_platform
@@ -19,6 +19,25 @@ __all__ = [
     'test_system_user_connectivity_util', 'test_system_user_connectivity_manual',
     'test_system_user_connectivity_period', 'test_system_user_connectivity_a_asset',
 ]
+
+
+def set_assets_accounts_connectivity(system_user, assets, results_summary):
+    asset_ids_ok = set()
+    asset_ids_failed = set()
+
+    asset_hostnames_ok = results_summary.get('contacted', {}).keys()
+
+    for asset in assets:
+        if asset.hostname in asset_hostnames_ok:
+            asset_ids_ok.add(asset.id)
+        else:
+            asset_ids_failed.add(asset.id)
+
+    accounts_ok = AuthBook.objects.filter(asset_id__in=asset_ids_ok, systemuser=system_user)
+    accounts_failed = AuthBook.objects.filter(asset_id__in=asset_ids_failed, systemuser=system_user)
+
+    AuthBook.bulk_set_connectivity(accounts_ok, Connectivity.ok)
+    AuthBook.bulk_set_connectivity(accounts_failed, Connectivity.failed)
 
 
 @org_aware_func("system_user")
@@ -32,9 +51,13 @@ def test_system_user_connectivity_util(system_user, assets, task_name):
     """
     from ops.utils import update_or_create_ansible_task
 
+    if system_user.username_same_with_user:
+        logger.error(_("Dynamic system user not support test"))
+        return
+
     # hosts = clean_ansible_task_hosts(assets, system_user=system_user)
     # TODO: 这里不传递系统用户，因为clean_ansible_task_hosts会通过system_user来判断是否可以推送，
-    #  不符合测试可连接性逻辑， 后面需要优化此逻辑
+    # 不符合测试可连接性逻辑， 后面需要优化此逻辑
     hosts = clean_ansible_task_hosts(assets)
     if not hosts:
         return {}
@@ -81,17 +104,10 @@ def test_system_user_connectivity_util(system_user, assets, task_name):
         print(_("Start test system user connectivity for platform: [{}]").format(platform))
         print(_("Hosts count: {}").format(len(_hosts)))
         # 用户名不是动态的，用户名则是一个
-        if not system_user.username_same_with_user:
-            logger.debug("System user not has special auth")
-            run_task(tasks, _hosts, system_user.username)
-        # 否则需要多个任务
-        else:
-            users = system_user.users.all().values_list('username', flat=True)
-            print(_("System user is dynamic: {}").format(list(users)))
-            for username in users:
-                run_task(tasks, _hosts, username)
+        logger.debug("System user not has special auth")
+        run_task(tasks, _hosts, system_user.username)
 
-    system_user.set_connectivity(results_summary)
+    set_assets_accounts_connectivity(system_user, hosts, results_summary)
     return results_summary
 
 

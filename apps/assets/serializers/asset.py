@@ -83,7 +83,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'hardware_info', 'connectivity', 'date_verified'
         ]
         fields_fk = [
-            'domain', 'domain_display', 'platform', 'admin_user', 'admin_user_display'
+            'domain', 'domain_display', 'platform', 'admin_user',
         ]
         fields_m2m = [
             'nodes', 'nodes_display', 'labels',
@@ -97,7 +97,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'protocol': {'write_only': True},
             'port': {'write_only': True},
             'hardware_info': {'label': _('Hardware info')},
-            'org_name': {'label': _('Org name')}
+            'org_name': {'label': _('Org name')},
         }
 
     def get_fields(self):
@@ -167,6 +167,9 @@ class AssetVerboseSerializer(AssetSerializer):
     admin_user = serializers.PrimaryKeyRelatedField(
         queryset=SystemUser.objects, label=_('Admin user')
     )
+
+    class Meta(AssetSerializer.Meta):
+        fields = AssetSerializer.Meta.fields + ['admin_user_display']
 
 
 class PlatformSerializer(serializers.ModelSerializer):
