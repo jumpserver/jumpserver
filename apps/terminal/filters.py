@@ -1,7 +1,7 @@
 from django_filters import rest_framework as filters
 from django.db.models import QuerySet
 
-from orgs.utils import current_org
+from orgs.utils import current_org, filter_org_queryset
 from terminal.models import Command, CommandStorage
 
 
@@ -26,7 +26,7 @@ class CommandFilter(filters.FilterSet):
     @property
     def qs(self):
         qs = super().qs
-        qs = qs.filter(org_id=self.get_org_id())
+        qs = filter_org_queryset(qs)
         qs = self.filter_by_timestamp(qs)
         return qs
 
@@ -45,11 +45,6 @@ class CommandFilter(filters.FilterSet):
 
         qs = qs.filter(**filters)
         return qs
-
-    @staticmethod
-    def get_org_id():
-        org_id = current_org.id
-        return org_id
 
 
 class CommandFilterForStorageTree(CommandFilter):
