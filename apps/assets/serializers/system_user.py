@@ -97,13 +97,12 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         protocol = self.initial_data.get("protocol")
         username_same_with_user = self.initial_data.get("username_same_with_user")
 
-        if login_mode == SystemUser.LOGIN_AUTO and \
-                protocol != SystemUser.Protocol.vnc:
+        if username_same_with_user:
+            return ''
+
+        if login_mode == SystemUser.LOGIN_AUTO and protocol != SystemUser.Protocol.vnc:
             msg = _('* Automatic login mode must fill in the username.')
             raise serializers.ValidationError(msg)
-
-        if username_same_with_user:
-            username = '*'
         return username
 
     def validate_home(self, home):
