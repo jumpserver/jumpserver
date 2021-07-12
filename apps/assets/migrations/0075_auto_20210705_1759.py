@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='asset',
             name='date_verified',
-            field=models.DateTimeField(null=True),
+            field=models.DateTimeField(null=True, verbose_name='Date verified'),
         ),
         migrations.AddField(
             model_name='authbook',
@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='authbook',
             name='date_verified',
-            field=models.DateTimeField(null=True),
+            field=models.DateTimeField(null=True, verbose_name='Date verified'),
         ),
         migrations.AddField(
             model_name='historicalauthbook',
@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='historicalauthbook',
             name='date_verified',
-            field=models.DateTimeField(null=True),
+            field=models.DateTimeField(null=True, verbose_name='Date verified'),
         ),
         migrations.AlterField(
             model_name='asset',
