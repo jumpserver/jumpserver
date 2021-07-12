@@ -15,7 +15,7 @@ __all__ = ['AccountViewSet', 'AccountSecretsViewSet']
 class AccountViewSet(OrgBulkModelViewSet):
     model = AuthBook
     filterset_fields = ("username", "asset", "systemuser")
-    search_fields = filterset_fields
+    search_fields = ('ip', 'hostname', 'username')
     serializer_classes = {
         'default': serializers.AccountSerializer,
         'verify_account': serializers.AssetTaskSerializer

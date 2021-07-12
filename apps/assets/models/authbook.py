@@ -64,6 +64,12 @@ class AuthBook(BaseUser, AbsConnectivity):
         return self.get_or_systemuser_attr('username') or '*'
 
     @property
+    def systemuser_display(self):
+        if not self.systemuser:
+            return ''
+        return str(self.systemuser)
+
+    @property
     def smart_name(self):
         username = self.username_display
 
