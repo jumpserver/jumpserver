@@ -1,10 +1,12 @@
-from django.db.models import F
+from django.db.models import F, Q
 from django.conf import settings
 from rest_framework.decorators import action
+from django_filters import rest_framework as filters
 from rest_framework.response import Response
 
 from orgs.mixins.api import OrgBulkModelViewSet
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, NeedMFAVerify
+from common.drf.filters import BaseFilterSet
 from ..tasks.account_connectivity import test_accounts_connectivity_manual
 from ..models import AuthBook
 from .. import serializers
@@ -12,10 +14,38 @@ from .. import serializers
 __all__ = ['AccountViewSet', 'AccountSecretsViewSet']
 
 
+class AccountFilterSet(BaseFilterSet):
+    username = filters.CharFilter(method='do_nothing')
+    ip = filters.CharFilter(field_name='ip', lookup_expr='exact')
+    hostname = filters.CharFilter(field_name='hostname', lookup_expr='exact')
+
+    @property
+    def qs(self):
+        qs = super().qs
+        qs = self.filter_username(qs)
+        return qs
+
+    def filter_username(self, qs):
+        username = self.get_query_param('username')
+        if not username:
+            return qs
+        qs = qs.filter(Q(username=username) | Q(systemuser__username=username)).distinct()
+        return qs
+
+    class Meta:
+        model = AuthBook
+        fields = [
+            'asset', 'systemuser', 'id',
+        ]
+
+from rest_framework.filters import  SearchFilter
+
+
 class AccountViewSet(OrgBulkModelViewSet):
     model = AuthBook
-    filterset_fields = ("username", "asset", "systemuser")
-    search_fields = filterset_fields
+    filterset_fields = ("username", "asset", "systemuser", 'ip', 'hostname')
+    search_fields = ('username', 'ip', 'hostname', 'systemuser__username')
+    filterset_class = AccountFilterSet
     serializer_classes = {
         'default': serializers.AccountSerializer,
         'verify_account': serializers.AssetTaskSerializer
