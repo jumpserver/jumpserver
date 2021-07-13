@@ -40,3 +40,11 @@ class AccountSecretSerializer(AccountSerializer):
             'private_key': {'write_only': False},
             'public_key': {'write_only': False},
         }
+
+
+class AccountTaskSerializer(serializers.Serializer):
+    ACTION_CHOICES = (
+        ('test', 'test'),
+    )
+    action = serializers.ChoiceField(choices=ACTION_CHOICES, write_only=True)
+    task = serializers.CharField(read_only=True)

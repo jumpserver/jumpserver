@@ -23,6 +23,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     """
     auto_generate_key = serializers.BooleanField(initial=True, required=False, write_only=True)
     type_display = serializers.ReadOnlyField(source='get_type_display')
+    ssh_key_fingerprint = serializers.ReadOnlyField(label=_('SSH key fingerprint'))
 
     class Meta:
         model = SystemUser
@@ -30,7 +31,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         fields_write_only = ['password', 'public_key', 'private_key']
         fields_small = fields_mini + fields_write_only + [
             'type', 'type_display', 'protocol', 'login_mode', 'login_mode_display',
-            'priority', 'sudo', 'shell', 'sftp_root', 'token',
+            'priority', 'sudo', 'shell', 'sftp_root', 'token', 'ssh_key_fingerprint',
             'home', 'system_groups', 'ad_domain',
             'username_same_with_user', 'auto_push', 'auto_generate_key',
             'date_created', 'date_updated',
@@ -51,8 +52,8 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         }
 
     def validate_auto_push(self, value):
-        login_mode = self.initial_data.get("login_mode")
-        protocol = self.initial_data.get("protocol")
+        login_mode = self.get_initial_value("login_mode")
+        protocol = self.get_initial_value("protocol")
 
         if login_mode == SystemUser.LOGIN_MANUAL:
             value = False
@@ -61,8 +62,8 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         return value
 
     def validate_auto_generate_key(self, value):
-        login_mode = self.initial_data.get("login_mode")
-        protocol = self.initial_data.get("protocol")
+        login_mode = self.get_initial_value("login_mode")
+        protocol = self.get_initial_value("protocol")
 
         if self.context["request"].method.lower() != "post":
             value = False
@@ -77,7 +78,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     def validate_username_same_with_user(self, username_same_with_user):
         if not username_same_with_user:
             return username_same_with_user
-        protocol = self.initial_data.get("protocol", "ssh")
+        protocol = self.get_initial_value("protocol", "ssh")
         queryset = SystemUser.objects.filter(
             protocol=protocol,
             username_same_with_user=True
@@ -93,9 +94,9 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     def validate_username(self, username):
         if username:
             return username
-        login_mode = self.initial_data.get("login_mode")
-        protocol = self.initial_data.get("protocol")
-        username_same_with_user = self.initial_data.get("username_same_with_user")
+        login_mode = self.get_initial_value("login_mode")
+        protocol = self.get_initial_value("protocol")
+        username_same_with_user = self.get_initial_value("username_same_with_user")
 
         if username_same_with_user:
             return ''
@@ -106,7 +107,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         return username
 
     def validate_home(self, home):
-        username_same_with_user = self.initial_data.get("username_same_with_user")
+        username_same_with_user = self.get_initial_value("username_same_with_user")
         if username_same_with_user:
             return ''
         return home
@@ -119,9 +120,11 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             raise serializers.ValidationError(error)
         return value
 
-    @staticmethod
-    def validate_admin_user(attrs):
-        tp = attrs.get('type')
+    def validate_admin_user(self, attrs):
+        if self.instance:
+            tp = self.instance.type
+        else:
+            tp = attrs.get('type')
         if tp != SystemUser.Type.admin:
             return attrs
         attrs['protocol'] = SystemUser.Protocol.ssh
@@ -132,9 +135,9 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
 
     def validate_password(self, password):
         super().validate_password(password)
-        auto_gen_key = self.initial_data.get("auto_generate_key", False)
-        private_key = self.initial_data.get("private_key")
-        login_mode = self.initial_data.get("login_mode")
+        auto_gen_key = self.get_initial_value("auto_generate_key", False)
+        private_key = self.get_initial_value("private_key")
+        login_mode = self.get_initial_value("login_mode")
 
         if not self.instance and not auto_gen_key and not password and \
                 not private_key and login_mode == SystemUser.LOGIN_AUTO:
@@ -179,12 +182,12 @@ class SystemUserListSerializer(SystemUserSerializer):
         fields_small = fields_mini + fields_write_only + [
             'protocol', 'login_mode', 'login_mode_display', 'priority',
             'sudo', 'shell', 'home', 'system_groups',
-            'ad_domain', 'sftp_root',
+            'ad_domain', 'sftp_root', 'ssh_key_fingerprint',
             "username_same_with_user", 'auto_push', 'auto_generate_key',
             'date_created', 'date_updated',
             'comment', 'created_by',
         ]
-        fields_m2m = ["assets_amount",]
+        fields_m2m = ["assets_amount"]
         fields = fields_small + fields_m2m
         extra_kwargs = {
             'password': {"write_only": True},
@@ -247,8 +250,8 @@ class SystemUserAssetRelationSerializer(RelationMixin, serializers.ModelSerializ
     class Meta:
         model = SystemUser.assets.through
         fields = [
-            "id", "asset", "asset_display",
-            'systemuser', 'systemuser_display'
+            "id", "asset", "asset_display", 'systemuser', 'systemuser_display',
+            "connectivity", 'date_verified', 'org_id'
         ]
         use_model_bulk_create = True
         model_bulk_create_kwargs = {

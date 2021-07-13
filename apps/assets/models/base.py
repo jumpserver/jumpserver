@@ -37,7 +37,7 @@ class AbsConnectivity(models.Model):
         choices=Connectivity.choices, default=Connectivity.unknown,
         max_length=16, verbose_name=_('Connectivity')
     )
-    date_verified = models.DateTimeField(null=True)
+    date_verified = models.DateTimeField(null=True, verbose_name=_("Date verified"))
 
     def set_connectivity(self, val):
         self.connectivity = val

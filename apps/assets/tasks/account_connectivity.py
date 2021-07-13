@@ -105,3 +105,4 @@ def test_accounts_connectivity_manual(accounts):
     for account in accounts:
         task_name = _("Test account connectivity: {}").format(account)
         test_account_connectivity_util(account, task_name)
+        print(".\n")

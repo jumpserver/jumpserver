@@ -76,6 +76,7 @@ class PasswordChangeLogViewSet(ListModelMixin, CommonGenericViewSet):
         ('datetime', ('date_from', 'date_to'))
     ]
     filterset_fields = ['user', 'change_by', 'remote_addr']
+    search_fields = filterset_fields
     ordering = ['-datetime']
 
     def get_queryset(self):
