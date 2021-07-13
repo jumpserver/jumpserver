@@ -51,8 +51,8 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         }
 
     def validate_auto_push(self, value):
-        login_mode = self.initial_data.get("login_mode")
-        protocol = self.initial_data.get("protocol")
+        login_mode = self.get_initial_value("login_mode")
+        protocol = self.get_initial_value("protocol")
 
         if login_mode == SystemUser.LOGIN_MANUAL:
             value = False
@@ -61,8 +61,8 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         return value
 
     def validate_auto_generate_key(self, value):
-        login_mode = self.initial_data.get("login_mode")
-        protocol = self.initial_data.get("protocol")
+        login_mode = self.get_initial_value("login_mode")
+        protocol = self.get_initial_value("protocol")
 
         if self.context["request"].method.lower() != "post":
             value = False
@@ -77,7 +77,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     def validate_username_same_with_user(self, username_same_with_user):
         if not username_same_with_user:
             return username_same_with_user
-        protocol = self.initial_data.get("protocol", "ssh")
+        protocol = self.get_initial_value("protocol", "ssh")
         queryset = SystemUser.objects.filter(
             protocol=protocol,
             username_same_with_user=True
@@ -93,9 +93,9 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     def validate_username(self, username):
         if username:
             return username
-        login_mode = self.initial_data.get("login_mode")
-        protocol = self.initial_data.get("protocol")
-        username_same_with_user = self.initial_data.get("username_same_with_user")
+        login_mode = self.get_initial_value("login_mode")
+        protocol = self.get_initial_value("protocol")
+        username_same_with_user = self.get_initial_value("username_same_with_user")
 
         if username_same_with_user:
             return ''
@@ -106,7 +106,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         return username
 
     def validate_home(self, home):
-        username_same_with_user = self.initial_data.get("username_same_with_user")
+        username_same_with_user = self.get_initial_value("username_same_with_user")
         if username_same_with_user:
             return ''
         return home
@@ -119,9 +119,11 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             raise serializers.ValidationError(error)
         return value
 
-    @staticmethod
-    def validate_admin_user(attrs):
-        tp = attrs.get('type')
+    def validate_admin_user(self, attrs):
+        if self.instance:
+            tp = self.instance.type
+        else:
+            tp = attrs.get('type')
         if tp != SystemUser.Type.admin:
             return attrs
         attrs['protocol'] = SystemUser.Protocol.ssh
@@ -132,9 +134,9 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
 
     def validate_password(self, password):
         super().validate_password(password)
-        auto_gen_key = self.initial_data.get("auto_generate_key", False)
-        private_key = self.initial_data.get("private_key")
-        login_mode = self.initial_data.get("login_mode")
+        auto_gen_key = self.get_initial_value("auto_generate_key", False)
+        private_key = self.get_initial_value("private_key")
+        login_mode = self.get_initial_value("login_mode")
 
         if not self.instance and not auto_gen_key and not password and \
                 not private_key and login_mode == SystemUser.LOGIN_AUTO:
