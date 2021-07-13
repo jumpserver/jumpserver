@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-13 09:28+0800\n"
+"POT-Creation-Date: 2021-07-13 16:52+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -119,9 +119,9 @@ msgstr "系统用户"
 
 #: acls/models/login_asset_acl.py:22
 #: applications/serializers/attrs/application_category/remote_app.py:33
-#: assets/models/asset.py:357 assets/models/authbook.py:16
+#: assets/models/asset.py:357 assets/models/authbook.py:15
 #: assets/models/gathered_user.py:14 assets/serializers/admin_user.py:33
-#: assets/serializers/system_user.py:221 assets/serializers/system_user.py:246
+#: assets/serializers/system_user.py:223 assets/serializers/system_user.py:248
 #: audits/models.py:38 perms/models/asset_permission.py:99
 #: templates/index.html:82 terminal/backends/command/models.py:19
 #: terminal/backends/command/serializers.py:13 terminal/models/session.py:40
@@ -291,8 +291,8 @@ msgid "Application type"
 msgstr "应用类型"
 
 #: applications/serializers/application.py:87
-#: assets/serializers/system_user.py:48 assets/serializers/system_user.py:196
-#: assets/serializers/system_user.py:222
+#: assets/serializers/system_user.py:49 assets/serializers/system_user.py:198
+#: assets/serializers/system_user.py:224
 msgid "Login mode display"
 msgstr "认证方式（显示名称）"
 
@@ -378,7 +378,7 @@ msgstr "基础"
 msgid "Charset"
 msgstr "编码"
 
-#: assets/models/asset.py:143 assets/serializers/asset.py:173
+#: assets/models/asset.py:143 assets/serializers/asset.py:176
 #: tickets/models/ticket.py:40
 msgid "Meta"
 msgstr "元数据"
@@ -411,7 +411,7 @@ msgid "Is active"
 msgstr "激活"
 
 #: assets/models/asset.py:194 assets/models/cluster.py:19
-#: assets/models/user.py:190 assets/models/user.py:330
+#: assets/models/user.py:190 assets/models/user.py:325
 #: assets/serializers/asset.py:66 assets/serializers/asset.py:168
 #: templates/_nav.html:44 xpack/plugins/cloud/models.py:92
 #: xpack/plugins/cloud/serializers.py:179
@@ -508,8 +508,8 @@ msgstr "创建者"
 msgid "Date created"
 msgstr "创建日期"
 
-#: assets/models/authbook.py:17 assets/models/user.py:281
-#: assets/serializers/system_user.py:237 audits/models.py:39
+#: assets/models/authbook.py:16 assets/models/user.py:276
+#: assets/serializers/system_user.py:239 audits/models.py:39
 #: perms/models/application_permission.py:31
 #: perms/models/asset_permission.py:101 templates/_nav.html:45
 #: terminal/backends/command/models.py:20
@@ -523,7 +523,7 @@ msgstr "创建日期"
 msgid "System user"
 msgstr "系统用户"
 
-#: assets/models/authbook.py:18
+#: assets/models/authbook.py:17
 msgid "Version"
 msgstr "版本"
 
@@ -708,7 +708,7 @@ msgstr "全称"
 msgid "Parent key"
 msgstr "ssh私钥"
 
-#: assets/models/node.py:559 assets/serializers/system_user.py:220
+#: assets/models/node.py:559 assets/serializers/system_user.py:222
 #: users/templates/users/user_asset_permission.html:41
 #: users/templates/users/user_asset_permission.html:73
 #: users/templates/users/user_asset_permission.html:158
@@ -823,8 +823,8 @@ msgstr "应用数量"
 msgid "Gateways count"
 msgstr "网关数量"
 
-#: assets/serializers/label.py:12 assets/serializers/system_user.py:47
-#: assets/serializers/system_user.py:195
+#: assets/serializers/label.py:12 assets/serializers/system_user.py:48
+#: assets/serializers/system_user.py:197
 #: perms/serializers/asset/permission.py:74
 msgid "Assets amount"
 msgstr "资产数量"
@@ -846,20 +846,24 @@ msgstr "不能包含: /"
 msgid "The same level node name cannot be the same"
 msgstr "同级别节点名字不能重复"
 
-#: assets/serializers/system_user.py:46 assets/serializers/system_user.py:194
+#: assets/serializers/system_user.py:26
+msgid "SSH key fingerprint"
+msgstr "密钥指纹"
+
+#: assets/serializers/system_user.py:47 assets/serializers/system_user.py:196
 #: perms/serializers/asset/permission.py:75
 msgid "Nodes amount"
 msgstr "节点数量"
 
-#: assets/serializers/system_user.py:50 assets/serializers/system_user.py:198
+#: assets/serializers/system_user.py:51 assets/serializers/system_user.py:200
 msgid "Ad domain"
 msgstr "Ad 网域"
 
-#: assets/serializers/system_user.py:90
+#: assets/serializers/system_user.py:91
 msgid "Username same with user with protocol {} only allow 1"
 msgstr "用户名和用户相同的一种协议只允许存在一个"
 
-#: assets/serializers/system_user.py:102
+#: assets/serializers/system_user.py:105
 msgid "* Automatic login mode must fill in the username."
 msgstr "自动登录模式，必须填写用户名"
 
@@ -867,7 +871,7 @@ msgstr "自动登录模式，必须填写用户名"
 msgid "Path should starts with /"
 msgstr "路径应该以 / 开头"
 
-#: assets/serializers/system_user.py:142
+#: assets/serializers/system_user.py:144
 msgid "Password or private key required"
 msgstr "密码或密钥密码需要一个"
 
@@ -929,7 +933,6 @@ msgid ""
 msgstr "自检程序已经在运行，不能重复启动"
 
 #: assets/tasks/push_system_user.py:193
-#: assets/tasks/system_user_connectivity.py:90
 msgid "System user is dynamic: {}"
 msgstr "系统用户是动态的: {}"
 
@@ -938,7 +941,7 @@ msgid "Start push system user for platform: [{}]"
 msgstr "推送系统用户到平台: [{}]"
 
 #: assets/tasks/push_system_user.py:234
-#: assets/tasks/system_user_connectivity.py:82
+#: assets/tasks/system_user_connectivity.py:105
 msgid "Hosts count: {}"
 msgstr "主机数量: {}"
 
@@ -950,19 +953,23 @@ msgstr "推送系统用户到入资产: {}"
 msgid "Push system users to asset: {}({}) => {}"
 msgstr "推送系统用户到入资产: {}({}) => {}"
 
-#: assets/tasks/system_user_connectivity.py:81
+#: assets/tasks/system_user_connectivity.py:55
+msgid "Dynamic system user not support test"
+msgstr ""
+
+#: assets/tasks/system_user_connectivity.py:104
 msgid "Start test system user connectivity for platform: [{}]"
 msgstr "开始测试系统用户在该系统平台的可连接性: [{}]"
 
-#: assets/tasks/system_user_connectivity.py:101
+#: assets/tasks/system_user_connectivity.py:117
 msgid "Test system user connectivity: {}"
 msgstr "测试系统用户可连接性: {}"
 
-#: assets/tasks/system_user_connectivity.py:112
+#: assets/tasks/system_user_connectivity.py:128
 msgid "Test system user connectivity: {} => {}"
 msgstr "测试系统用户可连接性: {} => {}"
 
-#: assets/tasks/system_user_connectivity.py:125
+#: assets/tasks/system_user_connectivity.py:141
 msgid "Test system user connectivity period: {}"
 msgstr "定期测试系统用户可连接性: {}"
 

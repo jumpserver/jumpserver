@@ -23,6 +23,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     """
     auto_generate_key = serializers.BooleanField(initial=True, required=False, write_only=True)
     type_display = serializers.ReadOnlyField(source='get_type_display')
+    ssh_key_fingerprint = serializers.ReadOnlyField(label=_('SSH key fingerprint'))
 
     class Meta:
         model = SystemUser
@@ -30,7 +31,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         fields_write_only = ['password', 'public_key', 'private_key']
         fields_small = fields_mini + fields_write_only + [
             'type', 'type_display', 'protocol', 'login_mode', 'login_mode_display',
-            'priority', 'sudo', 'shell', 'sftp_root', 'token',
+            'priority', 'sudo', 'shell', 'sftp_root', 'token', 'ssh_key_fingerprint',
             'home', 'system_groups', 'ad_domain',
             'username_same_with_user', 'auto_push', 'auto_generate_key',
             'date_created', 'date_updated',
@@ -181,12 +182,12 @@ class SystemUserListSerializer(SystemUserSerializer):
         fields_small = fields_mini + fields_write_only + [
             'protocol', 'login_mode', 'login_mode_display', 'priority',
             'sudo', 'shell', 'home', 'system_groups',
-            'ad_domain', 'sftp_root',
+            'ad_domain', 'sftp_root', 'ssh_key_fingerprint',
             "username_same_with_user", 'auto_push', 'auto_generate_key',
             'date_created', 'date_updated',
             'comment', 'created_by',
         ]
-        fields_m2m = ["assets_amount",]
+        fields_m2m = ["assets_amount"]
         fields = fields_small + fields_m2m
         extra_kwargs = {
             'password': {"write_only": True},
