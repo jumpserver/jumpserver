@@ -3,6 +3,7 @@ from django.conf import settings
 from rest_framework.decorators import action
 from django_filters import rest_framework as filters
 from rest_framework.response import Response
+from rest_framework.generics import CreateAPIView
 
 from orgs.mixins.api import OrgBulkModelViewSet
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, NeedMFAVerify
@@ -11,7 +12,7 @@ from ..tasks.account_connectivity import test_accounts_connectivity_manual
 from ..models import AuthBook
 from .. import serializers
 
-__all__ = ['AccountViewSet', 'AccountSecretsViewSet']
+__all__ = ['AccountViewSet', 'AccountSecretsViewSet', 'AccountTaskCreateAPI']
 
 
 class AccountFilterSet(BaseFilterSet):
@@ -37,8 +38,6 @@ class AccountFilterSet(BaseFilterSet):
         fields = [
             'asset', 'systemuser', 'id',
         ]
-
-from rest_framework.filters import  SearchFilter
 
 
 class AccountViewSet(OrgBulkModelViewSet):
@@ -79,3 +78,29 @@ class AccountSecretsViewSet(AccountViewSet):
         if not settings.SECURITY_VIEW_AUTH_NEED_MFA:
             self.permission_classes = [IsOrgAdminOrAppUser]
         return super().get_permissions()
+
+
+class AccountTaskCreateAPI(CreateAPIView):
+    permission_classes = (IsOrgAdminOrAppUser,)
+    serializer_class = serializers.AccountTaskSerializer
+    filterset_fields = AccountViewSet.filterset_fields
+    search_fields = AccountViewSet.search_fields
+    filterset_class = AccountViewSet.filterset_class
+
+    def get_accounts(self):
+        queryset = AuthBook.objects.all()
+        queryset = self.filter_queryset(queryset)
+        return queryset
+
+    def perform_create(self, serializer):
+        accounts = self.get_accounts()
+        task = test_accounts_connectivity_manual.delay(accounts)
+        data = getattr(serializer, '_data', {})
+        data["task"] = task.id
+        setattr(serializer, '_data', data)
+        return task
+
+    def get_exception_handler(self):
+        def handler(e, context):
+            return Response({"error": str(e)}, status=400)
+        return handler

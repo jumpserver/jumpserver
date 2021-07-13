@@ -45,6 +45,8 @@ urlpatterns = [
     path('system-users/<uuid:pk>/tasks/', api.SystemUserTaskApi.as_view(), name='system-user-task-create'),
     path('system-users/<uuid:pk>/cmd-filter-rules/', api.SystemUserCommandFilterRuleListApi.as_view(), name='system-user-cmd-filter-rule-list'),
 
+    path('accounts/tasks/', api.AccountTaskCreateAPI.as_view(), name='account-task-create'),
+
     path('nodes/tree/', api.NodeListAsTreeApi.as_view(), name='node-tree'),
     path('nodes/children/tree/', api.NodeChildrenAsTreeApi.as_view(), name='node-children-tree'),
     path('nodes/<uuid:pk>/children/', api.NodeChildrenApi.as_view(), name='node-children'),
