@@ -250,7 +250,7 @@ class SystemUserAssetRelationSerializer(RelationMixin, serializers.ModelSerializ
         model = SystemUser.assets.through
         fields = [
             "id", "asset", "asset_display", 'systemuser', 'systemuser_display',
-            "connectivity", 'date_verified',
+            "connectivity", 'date_verified', 'org_id'
         ]
         use_model_bulk_create = True
         model_bulk_create_kwargs = {
