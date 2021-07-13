@@ -293,7 +293,14 @@ class EagerLoadQuerySetFields:
 
 
 class CommonSerializerMixin(DynamicFieldsMixin, DefaultValueFieldsMixin):
-    pass
+    instance: None
+    initial_data: dict
+
+    def get_initial_value(self, attr, default=None):
+        if self.instance:
+            return getattr(self.instance, attr, default)
+        else:
+            return self.initial_data.get(attr)
 
 
 class CommonBulkSerializerMixin(BulkSerializerMixin, CommonSerializerMixin):
