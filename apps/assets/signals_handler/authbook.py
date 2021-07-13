@@ -18,7 +18,11 @@ def pre_create_historical_record_callback(sender, instance=None, history_instanc
     for attr in attrs_to_copy:
         if getattr(history_instance, attr):
             continue
-        if not history_instance.systemuser:
+        try:
+            system_user = history_instance.systemuser
+        except SystemUser.DoesNotExist:
+            continue
+        if not system_user:
             continue
         system_user_attr_value = getattr(history_instance.systemuser, attr)
         if system_user_attr_value:
