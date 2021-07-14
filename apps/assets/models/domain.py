@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-
+import socket
 import uuid
 import random
 import re
@@ -80,7 +80,8 @@ class Gateway(BaseUser):
         except(paramiko.AuthenticationException,
                paramiko.BadAuthenticationType,
                paramiko.SSHException,
-               paramiko.ssh_exception.NoValidConnectionsError) as e:
+               paramiko.ssh_exception.NoValidConnectionsError,
+               socket.gaierror) as e:
             return False, str(e)
 
         try:
