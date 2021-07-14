@@ -210,10 +210,11 @@ class SystemUserSimpleSerializer(serializers.ModelSerializer):
 
 class RelationMixin(BulkSerializerMixin, serializers.Serializer):
     systemuser_display = serializers.ReadOnlyField(label=_("System user name"))
+    org_name = serializers.ReadOnlyField(label=_("Org name"))
 
     def get_field_names(self, declared_fields, info):
         fields = super().get_field_names(declared_fields, info)
-        fields.extend(['systemuser', "systemuser_display"])
+        fields.extend(['systemuser', "systemuser_display", "org_name"])
         return fields
 
 
