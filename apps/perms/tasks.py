@@ -15,7 +15,7 @@ logger = get_logger(__file__)
 
 
 @register_as_period_task(interval=settings.PERM_EXPIRED_CHECK_PERIODIC)
-@shared_task(queue='celery_check_asset_perm_expired')
+@shared_task()
 @atomic()
 def check_asset_permission_expired():
     """
