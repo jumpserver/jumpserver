@@ -9,7 +9,7 @@ from ..models import SystemUser, Asset
 from .base import AuthSerializerMixin
 
 __all__ = [
-    'SystemUserSerializer', 'SystemUserListSerializer',
+    'SystemUserSerializer',
     'SystemUserSimpleSerializer', 'SystemUserAssetRelationSerializer',
     'SystemUserNodeRelationSerializer', 'SystemUserTaskSerializer',
     'SystemUserUserRelationSerializer', 'SystemUserWithAuthInfoSerializer',
@@ -22,7 +22,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     系统用户
     """
     auto_generate_key = serializers.BooleanField(initial=True, required=False, write_only=True)
-    type_display = serializers.ReadOnlyField(source='get_type_display')
+    type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type display'))
     ssh_key_fingerprint = serializers.ReadOnlyField(label=_('SSH key fingerprint'))
 
     class Meta:
@@ -172,33 +172,6 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         attrs = self.validate_admin_user(attrs)
         attrs = self.validate_gen_key(attrs)
         return attrs
-
-
-class SystemUserListSerializer(SystemUserSerializer):
-
-    class Meta(SystemUserSerializer.Meta):
-        fields_mini = ['id', 'name', 'username']
-        fields_write_only = ['password', 'public_key', 'private_key']
-        fields_small = fields_mini + fields_write_only + [
-            'protocol', 'login_mode', 'login_mode_display', 'priority',
-            'sudo', 'shell', 'home', 'system_groups',
-            'ad_domain', 'sftp_root', 'ssh_key_fingerprint',
-            "username_same_with_user", 'auto_push', 'auto_generate_key',
-            'date_created', 'date_updated',
-            'comment', 'created_by',
-        ]
-        fields_m2m = ["assets_amount"]
-        fields = fields_small + fields_m2m
-        extra_kwargs = {
-            'password': {"write_only": True},
-            'public_key': {"write_only": True},
-            'private_key': {"write_only": True},
-            'nodes_amount': {'label': _('Nodes amount')},
-            'assets_amount': {'label': _('Assets amount')},
-            'login_mode_display': {'label': _('Login mode display')},
-            'created_by': {'read_only': True},
-            'ad_domain': {'label': _('Ad domain')},
-        }
 
     @classmethod
     def setup_eager_loading(cls, queryset):
