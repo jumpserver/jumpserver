@@ -146,6 +146,7 @@ class AdHoc(OrgModelMixin):
     hosts = models.ManyToManyField('assets.Asset', verbose_name=_("Host"))
     run_as_admin = models.BooleanField(default=False, verbose_name=_('Run as admin'))
     run_as = models.CharField(max_length=64, default='', blank=True, null=True, verbose_name=_('Username'))
+    run_system_user = models.ForeignKey('assets.SystemUser', null=True, on_delete=models.CASCADE)
     become = EncryptJsonDictCharField(max_length=1024, default='', blank=True, null=True, verbose_name=_("Become"))
     created_by = models.CharField(max_length=64, default='', blank=True, null=True, verbose_name=_('Create by'))
     date_created = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -167,7 +168,7 @@ class AdHoc(OrgModelMixin):
 
         inventory = JMSInventory(
             self.hosts.all(), run_as_admin=self.run_as_admin,
-            run_as=self.run_as, become_info=become_info
+            run_as=self.run_as, become_info=become_info, system_user=self.run_system_user
         )
         return inventory
 

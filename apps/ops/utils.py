@@ -28,7 +28,7 @@ def update_or_create_ansible_task(
         task_name, hosts, tasks,
         interval=None, crontab=None, is_periodic=False,
         callback=None, pattern='all', options=None,
-        run_as_admin=False, run_as=None, become_info=None,
+        run_as_admin=False, run_as=None, system_user=None, become_info=None,
     ):
     if not hosts or not tasks or not task_name:
         return None, None
@@ -49,7 +49,7 @@ def update_or_create_ansible_task(
     adhoc = task.get_latest_adhoc()
     new_adhoc = AdHoc(task=task, pattern=pattern,
                       run_as_admin=run_as_admin,
-                      run_as=run_as)
+                      run_as=run_as, run_system_user=system_user)
     new_adhoc.tasks = tasks
     new_adhoc.options = options
     new_adhoc.become = become_info

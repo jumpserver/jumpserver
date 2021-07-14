@@ -83,7 +83,7 @@ def test_system_user_connectivity_util(system_user, assets, task_name):
         _task, created = update_or_create_ansible_task(
             task_name=_task_name, hosts=_hosts, tasks=_tasks,
             pattern='all', options=const.TASK_OPTIONS,
-            run_as=_username,
+            run_as=_username, system_user=system_user
         )
         raw, summary = _task.run()
         success = summary.get('success', False)
