@@ -39,7 +39,6 @@ class SystemUserViewSet(OrgBulkModelViewSet):
     serializer_class = serializers.SystemUserSerializer
     serializer_classes = {
         'default': serializers.SystemUserSerializer,
-        'list': serializers.SystemUserListSerializer,
     }
     permission_classes = (IsOrgAdminOrAppUser,)
 
