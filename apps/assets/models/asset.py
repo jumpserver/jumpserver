@@ -225,9 +225,14 @@ class Asset(AbsConnectivity, ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     def __str__(self):
         return '{0.hostname}({0.ip})'.format(self)
 
+    __admin_user = None
+
     @property
     def admin_user(self):
-        return self.system_users.filter(type='admin').first()
+        # 解决每次获取资产管理用户时都是最新的对象
+        if self.__admin_user is None:
+            self.__admin_user = self.system_users.filter(type='admin').first()
+        return self.__admin_user
 
     @admin_user.setter
     def admin_user(self, system_user):
