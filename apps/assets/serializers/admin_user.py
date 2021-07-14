@@ -1,40 +1,25 @@
 # -*- coding: utf-8 -*-
 #
-from django.utils.translation import ugettext_lazy as _
-
 from ..models import SystemUser
-from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-
-from .base import AuthSerializerMixin
+from .system_user import SystemUserSerializer as SuS
 
 
-class AdminUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
+class AdminUserSerializer(SuS):
     """
     管理用户
     """
 
-    class Meta:
-        model = SystemUser
-        fields_mini = ['id', 'name', 'username']
-        fields_write_only = ['password', 'private_key', 'public_key']
-        fields_small = fields_mini + fields_write_only + [
-            'date_created', 'date_updated',
-            'comment', 'created_by'
-        ]
-        fields_fk = ['assets_amount']
-        fields = fields_small + fields_fk
-        read_only_fields = ['date_created', 'date_updated', 'created_by', 'assets_amount']
+    class Meta(SuS.Meta):
+        fields = SuS.Meta.fields_mini + \
+                 SuS.Meta.fields_write_only + \
+                 SuS.Meta.fields_m2m + \
+                 [
+                     'type', 'protocol', "priority", 'sftp_root', 'ssh_key_fingerprint',
+                     'date_created', 'date_updated', 'comment', 'created_by',
+                 ]
 
-        extra_kwargs = {
-            'username': {"required": True},
-            'password': {"write_only": True},
-            'private_key': {"write_only": True},
-            'public_key': {"write_only": True},
-            'assets_amount': {'label': _('Asset')},
-        }
+    def validate_type(self, val):
+        return SystemUser.Type.admin
 
-    def create(self, validated_data):
-        data = {k: v for k, v in validated_data.items()}
-        data['protocol'] = 'ssh'
-        data['type'] = SystemUser.Type.admin
-        return super().create(data)
+    def validate_protocol(self, val):
+        return 'ssh'
