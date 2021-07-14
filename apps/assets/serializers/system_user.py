@@ -236,7 +236,7 @@ class SystemUserSimpleSerializer(serializers.ModelSerializer):
 
 
 class RelationMixin(BulkSerializerMixin, serializers.Serializer):
-    systemuser_display = serializers.ReadOnlyField(label=_("System user"))
+    systemuser_display = serializers.ReadOnlyField(label=_("System user name"))
 
     def get_field_names(self, declared_fields, info):
         fields = super().get_field_names(declared_fields, info)
@@ -245,7 +245,7 @@ class RelationMixin(BulkSerializerMixin, serializers.Serializer):
 
 
 class SystemUserAssetRelationSerializer(RelationMixin, serializers.ModelSerializer):
-    asset_display = serializers.ReadOnlyField(label=_('Asset'))
+    asset_display = serializers.ReadOnlyField(label=_('Asset hostname'))
 
     class Meta:
         model = SystemUser.assets.through
