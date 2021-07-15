@@ -27,7 +27,6 @@ class AuthBook(BaseUser, AbsConnectivity):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.auth_snapshot = {}
-        self.load_auth()
 
     def get_or_systemuser_attr(self, attr):
         val = getattr(self, attr, None)
