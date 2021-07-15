@@ -5,7 +5,6 @@ from django.db import migrations, models, transaction
 import django.db.models.deletion
 
 
-
 def migrate_system_assets_to_authbook(apps, schema_editor):
     system_user_model = apps.get_model("assets", "SystemUser")
     system_user_asset_model = system_user_model.assets.through

@@ -42,7 +42,6 @@ class AssetViewSet(FilterAssetByNodeMixin, OrgBulkModelViewSet):
     ordering_fields = ("hostname", "ip", "port", "cpu_cores")
     serializer_classes = {
         'default': serializers.AssetSerializer,
-        'single': serializers.AssetVerboseSerializer,
     }
     permission_classes = (IsOrgAdminOrAppUser,)
     extra_filter_backends = [FilterAssetByNodeFilterBackend, LabelFilterBackend, IpInFilterBackend]
