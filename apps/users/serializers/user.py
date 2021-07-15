@@ -28,7 +28,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
     )
     mfa_enabled = serializers.BooleanField(read_only=True, label=_('MFA enabled'))
     mfa_force_enabled = serializers.BooleanField(read_only=True, label=_('MFA force enabled'))
-    mfa_level_display = serializers.ReadOnlyField(source='get_mfa_level_display', label=_('MFA level for display'))
+    mfa_level_display = serializers.ReadOnlyField(source='get_mfa_level_display', label=_('MFA level display'))
     login_blocked = serializers.BooleanField(read_only=True, label=_('Login blocked'))
     is_expired = serializers.BooleanField(read_only=True, label=_('Is expired'))
     can_update = serializers.SerializerMethodField(label=_('Can update'))
