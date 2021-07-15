@@ -11,7 +11,7 @@ from . import models
 
 
 class FTPLogSerializer(serializers.ModelSerializer):
-    operate_display = serializers.ReadOnlyField(source='get_operate_display', label=_('Operate for display'))
+    operate_display = serializers.ReadOnlyField(source='get_operate_display', label=_('Operate display'))
 
     class Meta:
         model = models.FTPLog
@@ -26,9 +26,9 @@ class FTPLogSerializer(serializers.ModelSerializer):
 
 
 class UserLoginLogSerializer(serializers.ModelSerializer):
-    type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type for display'))
-    status_display = serializers.ReadOnlyField(source='get_status_display', label=_('Status for display'))
-    mfa_display = serializers.ReadOnlyField(source='get_mfa_display', label=_('MFA for display'))
+    type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type display'))
+    status_display = serializers.ReadOnlyField(source='get_status_display', label=_('Status display'))
+    mfa_display = serializers.ReadOnlyField(source='get_mfa_display', label=_('MFA display'))
 
     class Meta:
         model = models.UserLoginLog
@@ -74,7 +74,7 @@ class SessionAuditSerializer(serializers.ModelSerializer):
 class CommandExecutionSerializer(serializers.ModelSerializer):
     is_success = serializers.BooleanField(read_only=True, label=_('Is success'))
     hosts_display = serializers.ListSerializer(
-        child=serializers.CharField(), source='hosts', read_only=True, label=_('Hosts for display')
+        child=serializers.CharField(), source='hosts', read_only=True, label=_('Hosts display')
     )
 
     class Meta:
@@ -91,8 +91,8 @@ class CommandExecutionSerializer(serializers.ModelSerializer):
             'hosts': {'label': _('Hosts')},  # 外键，会生成 sql。不在 model 上修改
             'run_as': {'label': _('Run as')},
             'user': {'label': _('User')},
-            'run_as_display': {'label': _('Run as for display')},
-            'user_display': {'label': _('User for display')},
+            'run_as_display': {'label': _('Run as display')},
+            'user_display': {'label': _('User display')},
         }
 
     @classmethod
