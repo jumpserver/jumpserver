@@ -5,7 +5,6 @@ from django.db.models.signals import (
 )
 from django.dispatch import receiver
 
-from orgs.utils import ensure_in_real_or_default_org
 from common.const.signals import POST_ADD, POST_REMOVE, PRE_REMOVE
 from common.utils import get_logger
 from common.decorator import on_transaction_commit
@@ -17,12 +16,6 @@ from assets.tasks import (
 )
 
 logger = get_logger(__file__)
-
-
-@receiver(m2m_changed, sender=SystemUser.assets.through)
-@ensure_in_real_or_default_org
-def on_asset_system_user_change(sender, **kwargs):
-    pass
 
 
 def update_asset_hardware_info_on_created(asset):

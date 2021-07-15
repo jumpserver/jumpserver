@@ -11,7 +11,7 @@ from common.utils import get_logger
 from common.decorator import on_transaction_commit
 from assets.models import Asset, SystemUser, Node, AuthBook
 from users.models import User
-from orgs.utils import get_current_org, tmp_to_root_org
+from orgs.utils import tmp_to_root_org
 from assets.tasks import (
     push_system_user_to_assets_manual,
     push_system_user_to_assets,
@@ -40,30 +40,31 @@ def on_system_user_assets_change(instance, action, model, pk_set, **kwargs):
         system_user_ids = pk_set
         asset_ids = [instance.id]
 
-    # 通过 through 创建的没有 org_id
-    current_org_id = get_current_org().id
+    org_id = instance.org_id
+
     with tmp_to_root_org():
         authbooks = AuthBook.objects.filter(
             asset_id__in=asset_ids,
             systemuser_id__in=system_user_ids
         )
-        authbooks.update(org_id=current_org_id)
+        if action == POST_ADD:
+            authbooks.update(org_id=org_id)
 
-    save_action_mapper = {
-        'pre_add': pre_save,
-        'post_add': post_save,
-        'pre_remove': pre_delete,
-        'post_remove': post_delete
-    }
+        save_action_mapper = {
+            'pre_add': pre_save,
+            'post_add': post_save,
+            'pre_remove': pre_delete,
+            'post_remove': post_delete
+        }
 
-    for ab in authbooks:
-        ab.org_id = current_org_id
+        for ab in authbooks:
+            ab.org_id = org_id
 
-        post_action = save_action_mapper[action]
-        logger.debug('Send AuthBook post save signal: {} -> {}'.format(action, ab.id))
-        post_action.send(sender=AuthBook, instance=ab, created=True)
+            post_action = save_action_mapper[action]
+            logger.debug('Send AuthBook post save signal: {} -> {}'.format(action, ab.id))
+            post_action.send(sender=AuthBook, instance=ab, created=True)
 
-    if action == 'post_add':
+    if action == POST_ADD:
         for system_user_id in system_user_ids:
             push_system_user_to_assets.delay(system_user_id, asset_ids)
 
