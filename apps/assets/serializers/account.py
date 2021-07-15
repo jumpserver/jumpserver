@@ -32,6 +32,10 @@ class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         queryset = queryset.prefetch_related('systemuser', 'asset')
         return queryset
 
+    def to_representation(self, instance):
+        instance.load_auth()
+        return super().to_representation(instance)
+
 
 class AccountSecretSerializer(AccountSerializer):
     class Meta(AccountSerializer.Meta):
