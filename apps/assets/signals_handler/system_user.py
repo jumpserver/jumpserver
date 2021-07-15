@@ -42,6 +42,7 @@ def on_system_user_assets_change(instance, action, model, pk_set, **kwargs):
 
     org_id = instance.org_id
 
+    # 关联创建的 authbook 没有系统用户id
     with tmp_to_root_org():
         authbooks = AuthBook.objects.filter(
             asset_id__in=asset_ids,
@@ -50,19 +51,19 @@ def on_system_user_assets_change(instance, action, model, pk_set, **kwargs):
         if action == POST_ADD:
             authbooks.update(org_id=org_id)
 
-        save_action_mapper = {
-            'pre_add': pre_save,
-            'post_add': post_save,
-            'pre_remove': pre_delete,
-            'post_remove': post_delete
-        }
+    save_action_mapper = {
+        'pre_add': pre_save,
+        'post_add': post_save,
+        'pre_remove': pre_delete,
+        'post_remove': post_delete
+    }
 
-        for ab in authbooks:
-            ab.org_id = org_id
+    for ab in authbooks:
+        ab.org_id = org_id
 
-            post_action = save_action_mapper[action]
-            logger.debug('Send AuthBook post save signal: {} -> {}'.format(action, ab.id))
-            post_action.send(sender=AuthBook, instance=ab, created=True)
+        save_action = save_action_mapper[action]
+        logger.debug('Send AuthBook post save signal: {} -> {}'.format(action, ab.id))
+        save_action.send(sender=AuthBook, instance=ab, created=True)
 
     if action == POST_ADD:
         for system_user_id in system_user_ids:
