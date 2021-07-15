@@ -7,7 +7,6 @@ import logging
 from functools import reduce
 from collections import OrderedDict
 
-from django.utils import timezone
 from django.db import models
 from common.db.models import TextChoices
 from django.utils.translation import ugettext_lazy as _
@@ -191,7 +190,7 @@ class Asset(AbsConnectivity, ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
 
     # Auth
-    _admin_user = models.ForeignKey('assets.AdminUser', on_delete=models.PROTECT, null=True, verbose_name=_("Admin user"), related_name='assets')
+    admin_user = models.ForeignKey('assets.SystemUser', on_delete=models.SET_NULL, null=True, verbose_name=_("Admin user"), related_name='admin_assets')
 
     # Some information
     public_ip = models.CharField(max_length=128, blank=True, null=True, verbose_name=_('Public IP'))
@@ -225,32 +224,21 @@ class Asset(AbsConnectivity, ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     def __str__(self):
         return '{0.hostname}({0.ip})'.format(self)
 
-    __admin_user = None
-
-    @property
-    def admin_user(self):
-        # 解决每次获取资产管理用户时都是最新的对象
-        if self.__admin_user is None:
-            self.__admin_user = self.system_users.filter(type='admin').first()
-        return self.__admin_user
-
-    @admin_user.setter
-    def admin_user(self, system_user):
-        if not system_user:
+    def set_admin_user_relation(self):
+        from .authbook import AuthBook
+        if not self.admin_user:
             return
-        if system_user.type != 'admin':
+        if self.admin_user.type != 'admin':
             raise ValidationError('System user should be type admin')
-        system_user.assets.add(self)
+
+        defaults = {'asset': self, 'systemuser': self.admin_user, 'org_id': self.org_id}
+        AuthBook.objects.get_or_create(defaults=defaults, asset=self, systemuser=self.admin_user)
 
     @property
     def admin_user_display(self):
         if not self.admin_user:
             return ''
         return str(self.admin_user)
-
-    def remove_admin_user(self):
-        from ..models import AuthBook
-        AuthBook.objects.filter(asset=self, systemuser__type='admin').delete()
 
     @property
     def is_valid(self):

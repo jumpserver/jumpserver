@@ -8,7 +8,7 @@ from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import Asset, Node, Platform, SystemUser
 
 __all__ = [
-    'AssetSerializer', 'AssetSimpleSerializer', 'AssetVerboseSerializer',
+    'AssetSerializer', 'AssetSimpleSerializer',
     'ProtocolsField', 'PlatformSerializer',
     'AssetTaskSerializer',
 ]
@@ -62,9 +62,6 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     platform = serializers.SlugRelatedField(
         slug_field='name', queryset=Platform.objects.all(), label=_("Platform")
     )
-    admin_user = serializers.PrimaryKeyRelatedField(
-        queryset=SystemUser.objects, label=_('Admin user'), write_only=True
-    )
     protocols = ProtocolsField(label=_('Protocols'), required=False, default=['ssh/22'])
     domain_display = serializers.ReadOnlyField(source='domain.name', label=_('Domain name'))
     nodes_display = serializers.ListField(child=serializers.CharField(), label=_('Nodes name'), required=False)
@@ -83,7 +80,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'hardware_info', 'connectivity', 'date_verified'
         ]
         fields_fk = [
-            'domain', 'domain_display', 'platform', 'admin_user',
+            'domain', 'domain_display', 'platform', 'admin_user', 'admin_user_display'
         ]
         fields_m2m = [
             'nodes', 'nodes_display', 'labels',
@@ -112,7 +109,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('domain', 'platform')
+        queryset = queryset.prefetch_related('domain', 'platform', 'admin_user')
         queryset = queryset.prefetch_related('nodes', 'labels')
         return queryset
 
@@ -147,29 +144,16 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     def create(self, validated_data):
         self.compatible_with_old_protocol(validated_data)
         nodes_display = validated_data.pop('nodes_display', '')
-        admin_user = validated_data.pop('admin_user', '')
         instance = super().create(validated_data)
         self.perform_nodes_display_create(instance, nodes_display)
-        instance.admin_user = admin_user
         return instance
 
     def update(self, instance, validated_data):
         nodes_display = validated_data.pop('nodes_display', '')
         self.compatible_with_old_protocol(validated_data)
-        admin_user = validated_data.pop('admin_user', '')
         instance = super().update(instance, validated_data)
         self.perform_nodes_display_create(instance, nodes_display)
-        instance.admin_user = admin_user
         return instance
-
-
-class AssetVerboseSerializer(AssetSerializer):
-    admin_user = serializers.PrimaryKeyRelatedField(
-        queryset=SystemUser.objects, label=_('Admin user')
-    )
-
-    class Meta(AssetSerializer.Meta):
-        fields = AssetSerializer.Meta.fields + ['admin_user_display']
 
 
 class PlatformSerializer(serializers.ModelSerializer):

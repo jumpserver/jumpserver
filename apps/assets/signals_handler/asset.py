@@ -52,6 +52,8 @@ def on_asset_created_or_update(sender, instance=None, created=False, **kwargs):
         if not has_node:
             instance.nodes.add(Node.org_root())
 
+    instance.set_admin_user_relation()
+
 
 @receiver(m2m_changed, sender=Asset.nodes.through)
 def on_asset_nodes_add(instance, action, reverse, pk_set, **kwargs):
@@ -96,7 +98,8 @@ def on_asset_nodes_add(instance, action, reverse, pk_set, **kwargs):
             asset_ids_to_push.append(asset_id)
             to_create.append(m2m_model(
                 systemuser_id=system_user_id,
-                asset_id=asset_id
+                asset_id=asset_id,
+                org_id=instance.org_id
             ))
         if asset_ids_to_push:
             push_system_user_to_assets.delay(system_user_id, asset_ids_to_push)
