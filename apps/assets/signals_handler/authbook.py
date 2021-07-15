@@ -12,7 +12,7 @@ logger = get_logger(__name__)
 
 
 @receiver(pre_create_historical_record, sender=AuthBookHistory)
-def pre_create_historical_record_callback(sender, instance=None, history_instance=None, **kwargs):
+def pre_create_historical_record_callback(sender, history_instance=None, **kwargs):
     attrs_to_copy = ['username', 'password', 'private_key']
 
     for attr in attrs_to_copy:
@@ -48,3 +48,5 @@ def on_authbook_post_create(sender, instance, **kwargs):
 def on_authbook_pre_create(sender, instance, **kwargs):
     # 升级版本号
     instance.version = instance.history.all().count() + 1
+    # 即使在 root 组织也不怕
+    instance.org_id = instance.asset.org_id
