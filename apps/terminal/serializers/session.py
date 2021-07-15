@@ -31,7 +31,7 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
             'user_id': {'label': _('User ID')},
             'asset_id': {'label': _('Asset ID')},
             'system_user_id': {'label': _('System user ID')},
-            'login_from_display': {'label': _('Login from for display')},
+            'login_from_display': {'label': _('Login from display')},
             'is_success': {'label': _('Is success')},
             'can_replay': {'label': _('Can replay')},
             'can_join': {'label': _('Can join')},

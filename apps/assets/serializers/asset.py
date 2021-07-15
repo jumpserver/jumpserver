@@ -95,6 +95,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'port': {'write_only': True},
             'hardware_info': {'label': _('Hardware info')},
             'org_name': {'label': _('Org name')},
+            'admin_user_display': {'label', _('Admin user display')}
         }
 
     def get_fields(self):
