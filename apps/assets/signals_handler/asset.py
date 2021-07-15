@@ -59,6 +59,8 @@ def on_asset_created_or_update(sender, instance=None, created=False, **kwargs):
         if not has_node:
             instance.nodes.add(Node.org_root())
 
+    instance.set_admin_user_relation()
+
 
 @receiver(m2m_changed, sender=Asset.nodes.through)
 def on_asset_nodes_add(instance, action, reverse, pk_set, **kwargs):
