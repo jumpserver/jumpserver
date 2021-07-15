@@ -96,7 +96,8 @@ def on_asset_nodes_add(instance, action, reverse, pk_set, **kwargs):
             asset_ids_to_push.append(asset_id)
             to_create.append(m2m_model(
                 systemuser_id=system_user_id,
-                asset_id=asset_id
+                asset_id=asset_id,
+                org_id=instance.org_id
             ))
         if asset_ids_to_push:
             push_system_user_to_assets.delay(system_user_id, asset_ids_to_push)
