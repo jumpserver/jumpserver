@@ -8,7 +8,7 @@ from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import Asset, Node, Platform, SystemUser
 
 __all__ = [
-    'AssetSerializer', 'AssetSimpleSerializer', 'AssetVerboseSerializer',
+    'AssetSerializer', 'AssetSimpleSerializer',
     'ProtocolsField', 'PlatformSerializer',
     'AssetTaskSerializer',
 ]
@@ -80,7 +80,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'hardware_info', 'connectivity', 'date_verified'
         ]
         fields_fk = [
-            'domain', 'domain_display', 'platform', 'admin_user',
+            'domain', 'domain_display', 'platform', 'admin_user', 'admin_user_display'
         ]
         fields_m2m = [
             'nodes', 'nodes_display', 'labels',
@@ -109,7 +109,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('domain', 'platform')
+        queryset = queryset.prefetch_related('domain', 'platform', 'admin_user')
         queryset = queryset.prefetch_related('nodes', 'labels')
         return queryset
 
@@ -154,15 +154,6 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
         instance = super().update(instance, validated_data)
         self.perform_nodes_display_create(instance, nodes_display)
         return instance
-
-
-class AssetVerboseSerializer(AssetSerializer):
-    admin_user = serializers.PrimaryKeyRelatedField(
-        queryset=SystemUser.objects, label=_('Admin user')
-    )
-
-    class Meta(AssetSerializer.Meta):
-        fields = AssetSerializer.Meta.fields + ['admin_user_display']
 
 
 class PlatformSerializer(serializers.ModelSerializer):
