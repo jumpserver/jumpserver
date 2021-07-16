@@ -30,5 +30,5 @@ class NoSpecialChars:
     def __call__(self, value):
         if not no_special_chars(value):
             raise serializers.ValidationError(
-                _("Should not contains special characters")
+                _("Special characters other than !@#$%^&.*()_+-=[],.{}<>`~\\|/?;:'\" should not be included")
             )

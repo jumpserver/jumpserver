@@ -49,7 +49,8 @@ class Gateway(BaseUser):
 
     ip = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
     port = models.IntegerField(default=22, verbose_name=_('Port'))
-    protocol = models.CharField(choices=Protocol.choices, max_length=16, default=Protocol.ssh, verbose_name=_("Protocol"))
+    protocol = models.CharField(choices=Protocol.choices, max_length=16, default=Protocol.ssh,
+                                verbose_name=_("Protocol"))
     domain = models.ForeignKey(Domain, on_delete=models.CASCADE, verbose_name=_("Domain"))
     comment = models.CharField(max_length=128, blank=True, null=True, verbose_name=_("Comment"))
     is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
@@ -65,7 +66,8 @@ class Gateway(BaseUser):
         if local_port is None:
             local_port = self.port
         if self.password and not no_special_chars(self.password):
-            return False, _("Password should not contains special characters")
+            return False, _(
+                "Password Special characters other than !@#$%^&.*()_+-=[],.{}<>`~\\|/?;:'\" should not be included")
 
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
