@@ -56,14 +56,19 @@ class UserLoginView(mixins.AuthMixin, FormView):
         if not auth_url:
             return None
 
-        message_data = {
-            'title': _('Redirecting'),
-            'message': _("Redirecting to {} authentication").format(auth_type),
-            'redirect_url': auth_url,
-            'has_cancel': True,
-            'cancel_url': reverse('authentication:login') + '?admin=1'
-        }
-        redirect_url = FlashMessageUtil.gen_message_url(message_data)
+        if settings.LOGIN_REDIRECT_FLASH_MESSAGE_INTERVAL == 0:
+            redirect_url = auth_url
+        else:
+            message_data = {
+                'title': _('Redirecting'),
+                'message': _("Redirecting to {} authentication").format(auth_type),
+                'redirect_url': auth_url,
+                'interval': settings.LOGIN_REDIRECT_FLASH_MESSAGE_INTERVAL,
+                'has_cancel': True,
+                'cancel_url': reverse('authentication:login') + '?admin=1'
+            }
+            redirect_url = FlashMessageUtil.gen_message_url(message_data)
+
         query_string = request.GET.urlencode()
         redirect_url = "{}&{}".format(redirect_url, query_string)
         return redirect_url
