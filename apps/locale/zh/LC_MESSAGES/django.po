@@ -4028,17 +4028,17 @@ msgid "name not unique"
 msgstr "名称重复"
 
 #: users/templates/users/_base_otp.html:14
-msgid "Security token validation"
-msgstr "安全令牌验证"
+msgid "Please enter the password of"
+msgstr "请输入"
 
 #: users/templates/users/_base_otp.html:14 xpack/plugins/cloud/models.py:78
 #: xpack/plugins/cloud/serializers.py:178
-msgid "Account"
+msgid "account"
 msgstr "账户"
 
 #: users/templates/users/_base_otp.html:14
-msgid "Follow these steps to complete the binding operation"
-msgstr "请按照以下步骤完成绑定操作"
+msgid "to complete the binding operation"
+msgstr "的密码完成绑定操作"
 
 #: users/templates/users/_granted_assets.html:7
 msgid "Loading"
