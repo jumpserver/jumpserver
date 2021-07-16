@@ -3,6 +3,7 @@
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 
+from applications.filters import ApplicationFilter
 from common.mixins.api import CommonApiMixin
 from applications.api.mixin import (
     SerializeApplicationToTreeNodeMixin
@@ -25,7 +26,7 @@ __all__ = [
 class AllGrantedApplicationsMixin(CommonApiMixin, ListAPIView):
     only_fields = serializers.ApplicationGrantedSerializer.Meta.only_fields
     serializer_class = serializers.ApplicationGrantedSerializer
-    filterset_fields = ['id', 'name', 'category', 'type', 'comment']
+    filterset_class = ApplicationFilter
     search_fields = ['name', 'comment']
     user: None
 
