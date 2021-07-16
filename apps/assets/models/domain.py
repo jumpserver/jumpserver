@@ -65,7 +65,8 @@ class Gateway(BaseUser):
         if local_port is None:
             local_port = self.port
         if self.password and not no_special_chars(self.password):
-            return False, _("Password should not contains special characters")
+            return False, _(
+                "Password Special characters other than !@#$%^&.*()_+-=[],.{}<>`~\\|/?;:'\" should not be included")
 
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())

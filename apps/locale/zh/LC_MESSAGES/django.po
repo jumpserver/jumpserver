@@ -639,8 +639,8 @@ msgid "Gateway"
 msgstr "网关"
 
 #: assets/models/domain.py:70
-msgid "Password should not contains special characters"
-msgstr "密码不能包含特殊字符"
+msgid "Password Special characters other than !@#$%^&.*()_+-=[],.{}<>`~\\|/?;:'\" should not be included"
+msgstr "密码不能包含!@#$%^&.*()_+-=[],.{}<>`~\\|/?;:'\"以外的特殊字符"
 
 #: assets/models/gathered_user.py:16
 msgid "Present"
@@ -1770,8 +1770,8 @@ msgid "This field must be unique."
 msgstr "字段必须唯一"
 
 #: common/validators.py:33
-msgid "Should not contains special characters"
-msgstr "不能包含特殊字符"
+msgid "Special characters other than !@#$%^&.*()_+-=[],.{}<>`~\\|/?;:'\" should not be included"
+msgstr "不能包含!@#$%^&.*()_+-=[],.{}<>`~\\|/?;:'\"以外的特殊字符"
 
 #: jumpserver/context_processor.py:19
 msgid "JumpServer Open Source Bastion Host"
