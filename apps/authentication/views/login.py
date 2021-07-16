@@ -46,24 +46,39 @@ class UserLoginView(mixins.AuthMixin, FormView):
             return None
         next_url = request.GET.get('next') or '/'
         auth_type = ''
-        auth_url = ''
+
         if settings.AUTH_OPENID:
             auth_type = 'OIDC'
-            auth_url = reverse(settings.AUTH_OPENID_AUTH_LOGIN_URL_NAME) + f'?next={next_url}'
-        elif settings.AUTH_CAS:
+            openid_auth_url = reverse(settings.AUTH_OPENID_AUTH_LOGIN_URL_NAME) + f'?next={next_url}'
+        else:
+            openid_auth_url = None
+
+        if settings.AUTH_CAS:
             auth_type = 'CAS'
-            auth_url = reverse(settings.CAS_LOGIN_URL_NAME) + f'?next={next_url}'
-        if not auth_url:
+            cas_auth_url = reverse(settings.CAS_LOGIN_URL_NAME) + f'?next={next_url}'
+        else:
+            cas_auth_url = None
+
+        if not any([openid_auth_url, cas_auth_url]):
             return None
 
-        if settings.LOGIN_REDIRECT_FLASH_MESSAGE_INTERVAL == 0:
+        if settings.LOGIN_REDIRECT_TO_BACKEND == 'OPENID' and openid_auth_url:
+            auth_url = openid_auth_url
+
+        elif settings.LOGIN_REDIRECT_TO_BACKEND == 'CAS' and cas_auth_url:
+            auth_url = cas_auth_url
+
+        else:
+            auth_url = openid_auth_url or cas_auth_url
+
+        if settings.LOGIN_REDIRECT_TO_BACKEND:
             redirect_url = auth_url
         else:
             message_data = {
                 'title': _('Redirecting'),
                 'message': _("Redirecting to {} authentication").format(auth_type),
                 'redirect_url': auth_url,
-                'interval': settings.LOGIN_REDIRECT_FLASH_MESSAGE_INTERVAL,
+                'interval': 3,
                 'has_cancel': True,
                 'cancel_url': reverse('authentication:login') + '?admin=1'
             }
