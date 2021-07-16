@@ -97,10 +97,10 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin, GenericViewS
         options = {
             'full address:s': '',
             'username:s': '',
-            'screen mode id:i': '0',
+            'screen mode id:i': '1',
             # 'desktopwidth:i': '1280',
             # 'desktopheight:i': '800',
-            'use multimon:i': '1',
+            'use multimon:i': '0',
             'session bpp:i': '32',
             'audiomode:i': '0',
             'disable wallpaper:i': '0',
