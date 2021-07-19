@@ -10,7 +10,6 @@ from django.db import models
 from django.db.models import TextChoices
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils.strings import no_special_chars
 from orgs.mixins.models import OrgModelMixin
 from .base import BaseUser
 
@@ -64,8 +63,8 @@ class Gateway(BaseUser):
     def test_connective(self, local_port=None):
         if local_port is None:
             local_port = self.port
-        if self.password and not no_special_chars(self.password):
-            return False, _("Password should not contains special characters")
+        if not self.password:
+            return False, _("Password cannot be empty")
 
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
