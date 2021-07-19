@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from applications.models import Application
+from applications.filters import ApplicationFilter
 from perms.models import ApplicationPermission
 from perms import serializers
 from ..base import BasePermissionViewSet
@@ -12,8 +13,8 @@ class ApplicationPermissionViewSet(BasePermissionViewSet):
     """
     model = ApplicationPermission
     serializer_class = serializers.ApplicationPermissionSerializer
-    filterset_fields = ['name', 'category', 'type']
-    search_fields = filterset_fields
+    filterset_class = ApplicationFilter
+    search_fields = ['name', 'category', 'type']
     custom_filter_fields = BasePermissionViewSet.custom_filter_fields + [
         'application_id', 'application'
     ]

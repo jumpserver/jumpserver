@@ -307,6 +307,7 @@ class Config(dict):
         'SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE': False,
         'FORGOT_PASSWORD_URL': '',
         'HEALTH_CHECK_TOKEN': '',
+        'LOGIN_REDIRECT_TO_BACKEND':  None,  # 'OPENID / CAS
 
         'TERMINAL_RDP_ADDR': ''
     }
