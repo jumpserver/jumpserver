@@ -4,7 +4,6 @@ from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-from common.validators import NoSpecialChars
 from ..models import Domain, Gateway
 from .base import AuthSerializerMixin
 
@@ -58,7 +57,7 @@ class GatewaySerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         fields_fk = ['domain']
         fields = fields_small + fields_fk
         extra_kwargs = {
-            'password': {'write_only': True, 'validators': [NoSpecialChars()]},
+            'password': {'write_only': True},
             'private_key': {"write_only": True},
             'public_key': {"write_only": True},
         }
@@ -67,7 +66,7 @@ class GatewaySerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
 class GatewayWithAuthSerializer(GatewaySerializer):
     class Meta(GatewaySerializer.Meta):
         extra_kwargs = {
-            'password': {'write_only': False, 'validators': [NoSpecialChars()]},
+            'password': {'write_only': False},
             'private_key': {"write_only": False},
             'public_key': {"write_only": False},
         }

@@ -652,8 +652,8 @@ msgid "Gateway"
 msgstr "网关"
 
 #: assets/models/domain.py:68
-msgid "Password should not contains special characters"
-msgstr "密码不能包含特殊字符"
+msgid "Password cannot be empty"
+msgstr "密码不能为空"
 
 #: assets/models/gathered_user.py:16
 msgid "Present"
