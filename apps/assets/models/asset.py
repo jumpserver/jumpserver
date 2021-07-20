@@ -345,6 +345,13 @@ class Asset(AbsConnectivity, ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
         tree_node = TreeNode(**data)
         return tree_node
 
+    def get_all_systemusers(self):
+        from .user import SystemUser
+        system_user_ids = SystemUser.assets.through.objects.filter(asset=self)\
+            .values_list('systemuser_id', flat=True)
+        system_users = SystemUser.objects.filter(id__in=system_user_ids)
+        return system_users
+
     class Meta:
         unique_together = [('org_id', 'hostname')]
         verbose_name = _("Asset")

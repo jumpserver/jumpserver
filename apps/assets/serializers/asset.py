@@ -10,7 +10,7 @@ from ..models import Asset, Node, Platform, SystemUser
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer',
     'ProtocolsField', 'PlatformSerializer',
-    'AssetTaskSerializer',
+    'AssetTaskSerializer', 'AssetsTaskSerializer'
 ]
 
 
@@ -183,7 +183,7 @@ class AssetSimpleSerializer(serializers.ModelSerializer):
         fields = ['id', 'hostname', 'ip', 'port', 'connectivity', 'date_verified']
 
 
-class AssetTaskSerializer(serializers.Serializer):
+class AssetsTaskSerializer(serializers.Serializer):
     ACTION_CHOICES = (
         ('refresh', 'refresh'),
         ('test', 'test'),
@@ -192,4 +192,17 @@ class AssetTaskSerializer(serializers.Serializer):
     action = serializers.ChoiceField(choices=ACTION_CHOICES, write_only=True)
     assets = serializers.PrimaryKeyRelatedField(
         queryset=Asset.objects, required=False, allow_empty=True, many=True
+    )
+
+
+class AssetTaskSerializer(AssetsTaskSerializer):
+    ACTION_CHOICES = tuple(list(AssetsTaskSerializer.ACTION_CHOICES) + [
+        ('push_system_user', 'push_system_user'),
+        ('test_system_user', 'test_system_user')
+    ])
+    asset = serializers.PrimaryKeyRelatedField(
+        queryset=Asset.objects, required=False, allow_empty=True, many=False
+    )
+    system_users = serializers.PrimaryKeyRelatedField(
+        queryset=SystemUser.objects, required=False, allow_empty=True, many=True
     )
