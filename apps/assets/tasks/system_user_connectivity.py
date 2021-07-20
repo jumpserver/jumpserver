@@ -18,6 +18,7 @@ logger = get_logger(__name__)
 __all__ = [
     'test_system_user_connectivity_util', 'test_system_user_connectivity_manual',
     'test_system_user_connectivity_period', 'test_system_user_connectivity_a_asset',
+    'test_system_users_connectivity_a_asset'
 ]
 
 
@@ -129,6 +130,12 @@ def test_system_user_connectivity_a_asset(system_user, asset):
         system_user, asset
     )
     test_system_user_connectivity_util(system_user, [asset], task_name)
+
+
+@shared_task(queue="ansible")
+def test_system_users_connectivity_a_asset(system_users, asset):
+    for system_user in system_users:
+        test_system_user_connectivity_a_asset(system_user, asset)
 
 
 @shared_task(queue="ansible")
