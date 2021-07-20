@@ -146,7 +146,7 @@ class ApplyApplicationSerializer(ApplySerializer, ApproveSerializer):
         queries &= Q(type=apply_type)
 
         with tmp_to_org(self.root.instance.org_id):
-            application_ids = Application.objects.filter(queries).values_list('id', flat=True)[:5]
+            application_ids = Application.objects.filter(queries).values_list('id', flat=True)[:15]
             application_ids = [str(application_id) for application_id in application_ids]
             return application_ids
 
