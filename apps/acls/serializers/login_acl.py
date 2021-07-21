@@ -3,7 +3,7 @@ from rest_framework import serializers
 from common.drf.serializers import BulkModelSerializer
 from orgs.utils import current_org
 from ..models import LoginACL
-from ..utils import is_ip_address, is_ip_network,  is_ip_segment
+from common.utils.ip import is_ip_address, is_ip_network,  is_ip_segment
 
 
 __all__ = ['LoginACLSerializer', ]
