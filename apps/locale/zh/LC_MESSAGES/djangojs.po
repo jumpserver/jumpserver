@@ -73,7 +73,7 @@ msgid ""
 "User list、User group、Asset list、Domain list、Admin user、System user、"
 "Labels、Asset permission"
 msgstr ""
-"用户列表、用户组、资产列表、网域列表、管理用户、系统用户、标签管理、资产授权"
+"用户列表、用户组、资产列表、网域列表、特权用户、系统用户、标签管理、资产授权"
 "规则"
 
 #: static/js/jumpserver.js:416

@@ -412,7 +412,7 @@ msgstr "激活"
 #: assets/models/user.py:190 assets/models/user.py:325 templates/_nav.html:44
 #: xpack/plugins/cloud/models.py:92 xpack/plugins/cloud/serializers.py:179
 msgid "Admin user"
-msgstr "管理用户"
+msgstr "特权用户"
 
 #: assets/models/asset.py:196
 msgid "Public IP"
@@ -805,7 +805,7 @@ msgstr "组织名称"
 
 #: assets/serializers/asset.py:98
 msgid "Admin user display"
-msgstr "管理用户名称"
+msgstr "特权用户名称"
 
 #: assets/serializers/base.py:41
 msgid "private key invalid"
