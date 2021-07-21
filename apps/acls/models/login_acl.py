@@ -2,7 +2,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from .base import BaseACL, BaseACLQuerySet
-from ..utils import contains_ip
+from common.utils.ip import contains_ip
 
 
 class ACLManager(models.Manager):

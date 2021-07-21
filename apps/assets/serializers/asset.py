@@ -10,7 +10,7 @@ from ..models import Asset, Node, Platform, SystemUser
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer',
     'ProtocolsField', 'PlatformSerializer',
-    'AssetTaskSerializer', 'AssetsTaskSerializer'
+    'AssetTaskSerializer', 'AssetsTaskSerializer', 'ProtocolsField'
 ]
 
 
