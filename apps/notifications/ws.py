@@ -4,11 +4,45 @@ import json
 from channels.generic.websocket import JsonWebsocketConsumer
 
 from common.utils import get_logger
-from .models import SiteMessage
 from .site_msg import SiteMessageUtil
 from .signals_handler import new_site_msg_chan
 
 logger = get_logger(__name__)
+
+
+class UserEventWebsocket(JsonWebsocketConsumer):
+    disconnected = False
+    refresh_every_seconds = 10
+
+    def connect(self):
+        user = self.scope["user"]
+        if user.is_authenticated:
+            self.accept()
+
+            thread = threading.Thread(target=self.send_event)
+            thread.start()
+        else:
+            self.close()
+
+    def receive(self, text_data=None, bytes_data=None, **kwargs):
+        data = json.loads(text_data)
+        refresh_every_seconds = data.get('refresh_every_seconds')
+
+        try:
+            refresh_every_seconds = int(refresh_every_seconds)
+        except Exception as e:
+            logger.error(e)
+            return
+
+        if refresh_every_seconds > 0:
+            self.refresh_every_seconds = refresh_every_seconds
+
+    def send_event(self):
+        user_id = self.scope["user"].id
+
+    def disconnect(self, close_code):
+        self.disconnected = True
+        self.close()
 
 
 class SiteMsgWebsocket(JsonWebsocketConsumer):
