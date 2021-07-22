@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-26 15:48+0800\n"
+"POT-Creation-Date: 2021-07-26 17:56+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -140,7 +140,7 @@ msgstr "审批人"
 msgid "Login asset confirm"
 msgstr "登录资产复核"
 
-#: acls/serializers/login_acl.py:18 xpack/plugins/cloud/serializers.py:164
+#: acls/serializers/login_acl.py:18 xpack/plugins/cloud/serializers.py:165
 msgid "IP address invalid: `{}`"
 msgstr "IP 地址无效: `{}`"
 
@@ -330,7 +330,7 @@ msgstr "目标URL"
 #: applications/serializers/attrs/application_type/custom.py:25
 #: applications/serializers/attrs/application_type/mysql_workbench.py:34
 #: applications/serializers/attrs/application_type/vmware_client.py:30
-#: assets/models/base.py:177 audits/signals_handler.py:58
+#: assets/models/base.py:177 audits/signals_handler.py:63
 #: authentication/forms.py:22
 #: authentication/templates/authentication/login.html:164
 #: settings/serializers/settings.py:94 users/forms/profile.py:21
@@ -392,7 +392,7 @@ msgstr "系统平台"
 
 #: assets/models/asset.py:186 assets/serializers/asset.py:65
 #: perms/serializers/asset/user_permission.py:41
-#: xpack/plugins/cloud/models.py:99 xpack/plugins/cloud/serializers.py:182
+#: xpack/plugins/cloud/models.py:99 xpack/plugins/cloud/serializers.py:183
 msgid "Protocols"
 msgstr "协议组"
 
@@ -411,7 +411,7 @@ msgstr "激活"
 
 #: assets/models/asset.py:193 assets/models/cluster.py:19
 #: assets/models/user.py:191 assets/models/user.py:326 templates/_nav.html:44
-#: xpack/plugins/cloud/models.py:96 xpack/plugins/cloud/serializers.py:204
+#: xpack/plugins/cloud/models.py:96 xpack/plugins/cloud/serializers.py:205
 msgid "Admin user"
 msgstr "特权用户"
 
@@ -713,7 +713,7 @@ msgstr "ssh私钥"
 #: users/templates/users/user_asset_permission.html:41
 #: users/templates/users/user_asset_permission.html:73
 #: users/templates/users/user_asset_permission.html:158
-#: xpack/plugins/cloud/models.py:93 xpack/plugins/cloud/serializers.py:205
+#: xpack/plugins/cloud/models.py:93 xpack/plugins/cloud/serializers.py:206
 msgid "Node"
 msgstr "节点"
 
@@ -1198,29 +1198,189 @@ msgstr "运行用户"
 msgid "User display"
 msgstr "用户"
 
-#: audits/signals_handler.py:57
+#: audits/signals_handler.py:62
 msgid "SSH Key"
 msgstr "SSH 密钥"
 
-#: audits/signals_handler.py:59
+#: audits/signals_handler.py:64
 msgid "SSO"
 msgstr ""
 
-#: audits/signals_handler.py:60
+#: audits/signals_handler.py:65
 msgid "Auth Token"
 msgstr "认证令牌"
 
-#: audits/signals_handler.py:61
+#: audits/signals_handler.py:66
 #: authentication/templates/authentication/login.html:210
 #: notifications/backends/__init__.py:12
 msgid "WeCom"
 msgstr "企业微信"
 
-#: audits/signals_handler.py:62
+#: audits/signals_handler.py:67
 #: authentication/templates/authentication/login.html:215
 #: notifications/backends/__init__.py:13
 msgid "DingTalk"
 msgstr "钉钉"
+
+#: audits/signals_handler.py:100
+msgid "User and Organization"
+msgstr "用户与组织"
+
+#: audits/signals_handler.py:101
+#, python-brace-format
+msgid "{User} *JOINED* {Organization}"
+msgstr "{User} *加入了* {Organization}"
+
+#: audits/signals_handler.py:102
+msgid "{User} *LEFT* {Organization}"
+msgstr "{User} *离开了* {Organization}"
+
+#: audits/signals_handler.py:105
+msgid "User and Group"
+msgstr "用户与用户组"
+
+#: audits/signals_handler.py:106
+#, python-brace-format
+msgid "{User} *JOINED* {UserGroup}"
+msgstr "{User} *加入了* {UserGroup}"
+
+#: audits/signals_handler.py:107
+#, python-brace-format
+msgid "{User} *LEFT* {UserGroup}"
+msgstr "{User} *离开了* {UserGroup}"
+
+#: audits/signals_handler.py:110
+msgid "Node and Asset"
+msgstr "节点与资产"
+
+#: audits/signals_handler.py:111
+#, python-brace-format
+msgid "{Node} *ADD* {Asset}"
+msgstr "{Node} *添加了* {Asset}"
+
+#: audits/signals_handler.py:112
+#, python-brace-format
+msgid "{Node} *REMOVE* {Asset}"
+msgstr "{Node} *移除了* {Asset}"
+
+#: audits/signals_handler.py:115
+msgid "User asset permissions"
+msgstr "用户资产授权"
+
+#: audits/signals_handler.py:116
+msgid "{AssetPermission} *ADD* {User}"
+msgstr "{AssetPermission} *添加了* {User}"
+
+#: audits/signals_handler.py:117
+#, python-brace-format
+msgid "{AssetPermission} *REMOVE* {User}"
+msgstr "{AssetPermission} *移除了* {User}"
+
+#: audits/signals_handler.py:120
+msgid "User group asset permissions"
+msgstr "用户组资产授权"
+
+#: audits/signals_handler.py:121
+#, python-brace-format
+msgid "{AssetPermission} *ADD* {UserGroup}"
+msgstr "{AssetPermission} *添加了* {UserGroup}"
+
+#: audits/signals_handler.py:122
+#, python-brace-format
+msgid "{AssetPermission} *REMOVE* {UserGroup}"
+msgstr "{AssetPermission} *移除了* {UserGroup}"
+
+#: audits/signals_handler.py:125 perms/models/asset_permission.py:106
+#: templates/_nav.html:78 users/templates/users/_user_detail_nav_header.html:31
+msgid "Asset permission"
+msgstr "资产授权"
+
+#: audits/signals_handler.py:126
+#, python-brace-format
+msgid "{AssetPermission} *ADD* {Asset}"
+msgstr "{AssetPermission} *添加了* {Asset}"
+
+#: audits/signals_handler.py:127
+#, python-brace-format
+msgid "{AssetPermission} *REMOVE* {Asset}"
+msgstr "{AssetPermission} *移除了* {Asset}"
+
+#: audits/signals_handler.py:130
+msgid "Node permission"
+msgstr "节点授权"
+
+#: audits/signals_handler.py:131
+msgid "{AssetPermission} *ADD* {Node}"
+msgstr "{AssetPermission} *添加了* {Node}"
+
+#: audits/signals_handler.py:132
+#, python-brace-format
+msgid "{AssetPermission} *REMOVE* {Node}"
+msgstr "{AssetPermission} *移除了* {Node}"
+
+#: audits/signals_handler.py:135
+msgid "Asset permission and SystemUser"
+msgstr "资产授权与系统用户"
+
+#: audits/signals_handler.py:136
+#, python-brace-format
+msgid "{AssetPermission} *ADD* {SystemUser}"
+msgstr "{AssetPermission} *添加了* {SystemUser}"
+
+#: audits/signals_handler.py:137
+#, python-brace-format
+msgid "{AssetPermission} *REMOVE* {SystemUser}"
+msgstr "{AssetPermission} *移除了* {SystemUser}"
+
+#: audits/signals_handler.py:140
+msgid "User application permissions"
+msgstr "用户应用授权"
+
+#: audits/signals_handler.py:141
+msgid "{ApplicationPermission} *ADD* {User}"
+msgstr "{ApplicationPermission} *添加了* {User}"
+
+#: audits/signals_handler.py:142
+msgid "{ApplicationPermission} *REMOVE* {User}"
+msgstr "{ApplicationPermission} *移除了* {User}"
+
+#: audits/signals_handler.py:145
+msgid "User group application permissions"
+msgstr "用户组应用授权"
+
+#: audits/signals_handler.py:146
+msgid "{ApplicationPermission} *ADD* {UserGroup}"
+msgstr "{ApplicationPermission} *添加了* {UserGroup}"
+
+#: audits/signals_handler.py:147
+msgid "{ApplicationPermission} *REMOVE* {UserGroup}"
+msgstr "{ApplicationPermission} *移除了* {UserGroup}"
+
+#: audits/signals_handler.py:150 perms/models/application_permission.py:36
+msgid "Application permission"
+msgstr "应用管理"
+
+#: audits/signals_handler.py:151
+msgid "{ApplicationPermission} *ADD* {Application}"
+msgstr "{ApplicationPermission} *添加了* {Application}"
+
+#: audits/signals_handler.py:152
+#, python-brace-format
+msgid "{ApplicationPermission} *REMOVE* {Application}"
+msgstr "{ApplicationPermission} *移除了* {Application}"
+
+#: audits/signals_handler.py:155
+msgid "Application permission and SystemUser"
+msgstr "应用授权与系统用户"
+
+#: audits/signals_handler.py:156
+msgid "{ApplicationPermission} *ADD* {SystemUser}"
+msgstr "{ApplicationPermission} *添加了* {SystemUser}"
+
+#: audits/signals_handler.py:157
+#, python-brace-format
+msgid "{ApplicationPermission} *REMOVE* {SystemUser}"
+msgstr "{ApplicationPermission} *移除了* {SystemUser}"
 
 #: authentication/api/connection_token.py:258
 msgid "Invalid token"
@@ -2043,10 +2203,6 @@ msgstr "该授权暂时不能撤销"
 msgid "Application"
 msgstr "应用程序"
 
-#: perms/models/application_permission.py:36
-msgid "Application permission"
-msgstr "应用管理"
-
 #: perms/models/asset_permission.py:37 settings/serializers/settings.py:117
 msgid "All"
 msgstr "全部"
@@ -2083,11 +2239,6 @@ msgstr "剪贴板复制粘贴"
 #: perms/serializers/asset/permission.py:71
 msgid "Actions"
 msgstr "动作"
-
-#: perms/models/asset_permission.py:106 templates/_nav.html:78
-#: users/templates/users/_user_detail_nav_header.html:31
-msgid "Asset permission"
-msgstr "资产授权"
 
 #: perms/models/asset_permission.py:209
 msgid "Ungrouped"
@@ -4794,11 +4945,11 @@ msgstr "云服务商"
 msgid "Cloud account"
 msgstr "云账号"
 
-#: xpack/plugins/cloud/models.py:82 xpack/plugins/cloud/serializers.py:203
+#: xpack/plugins/cloud/models.py:82 xpack/plugins/cloud/serializers.py:204
 msgid "Account"
 msgstr "账户"
 
-#: xpack/plugins/cloud/models.py:85 xpack/plugins/cloud/serializers.py:178
+#: xpack/plugins/cloud/models.py:85 xpack/plugins/cloud/serializers.py:179
 msgid "Regions"
 msgstr "地域"
 
@@ -4806,11 +4957,11 @@ msgstr "地域"
 msgid "Hostname strategy"
 msgstr "主机名策略"
 
-#: xpack/plugins/cloud/models.py:102 xpack/plugins/cloud/serializers.py:185
+#: xpack/plugins/cloud/models.py:102 xpack/plugins/cloud/serializers.py:186
 msgid "IP network segment group"
 msgstr "IP网段组"
 
-#: xpack/plugins/cloud/models.py:105 xpack/plugins/cloud/serializers.py:207
+#: xpack/plugins/cloud/models.py:105 xpack/plugins/cloud/serializers.py:208
 msgid "Always update"
 msgstr "总是更新"
 
@@ -5010,7 +5161,7 @@ msgstr "这个字段是必填项"
 msgid "API Endpoint"
 msgstr "API 端点"
 
-#: xpack/plugins/cloud/serializers.py:170
+#: xpack/plugins/cloud/serializers.py:171
 msgid ""
 "The IP address that is first matched to will be used as the IP of the "
 "created asset. <br>The default * indicates a random match. <br>Format for "
@@ -5019,15 +5170,15 @@ msgstr ""
 "第一个匹配到的 IP 地址将被用作创建的资产的 IP。<br> 默认值 * 表示随机匹配。"
 "<br> 格式为以逗号分隔的字符串，例如:192.168.1.0/24,10.1.1.1-10.1.1.20"
 
-#: xpack/plugins/cloud/serializers.py:176
+#: xpack/plugins/cloud/serializers.py:177
 msgid "History count"
 msgstr "执行次数"
 
-#: xpack/plugins/cloud/serializers.py:177
+#: xpack/plugins/cloud/serializers.py:178
 msgid "Instance count"
 msgstr "实例个数"
 
-#: xpack/plugins/cloud/serializers.py:206
+#: xpack/plugins/cloud/serializers.py:207
 #: xpack/plugins/gathered_user/serializers.py:20
 msgid "Periodic display"
 msgstr "定时执行"
