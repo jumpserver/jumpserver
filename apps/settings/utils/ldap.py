@@ -406,11 +406,18 @@ class LDAPTestUtil(object):
 
     # test server uri
 
+    def _check_server_uri(self):
+        if not any([self.config.server_uri.startswith('ldap://') or
+                    self.config.server_uri.startswith('ldap://')]):
+            err = _('ldap:// or ldaps:// protocol is used.')
+            raise LDAPInvalidServerError(err)
+
     def _test_server_uri(self):
         self._test_connection_bind()
 
     def test_server_uri(self):
         try:
+            self._check_server_uri()
             self._test_server_uri()
         except LDAPSocketOpenError as e:
             error = _("Host or port is disconnected: {}").format(e)
@@ -418,6 +425,8 @@ class LDAPTestUtil(object):
             error = _('The port is not the port of the LDAP service: {}').format(e)
         except LDAPSocketReceiveError as e:
             error = _('Please add certificate: {}').format(e)
+        except LDAPInvalidServerError as e:
+            error = str(e)
         except Exception as e:
             error = _('Unknown error: {}').format(e)
         else:

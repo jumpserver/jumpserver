@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-21 16:34+0800\n"
+"POT-Creation-Date: 2021-07-23 11:14+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -62,7 +62,7 @@ msgstr "激活中"
 #: terminal/models/storage.py:26 terminal/models/terminal.py:114
 #: tickets/models/ticket.py:73 users/models/group.py:16
 #: users/models/user.py:584 xpack/plugins/change_auth_plan/models.py:77
-#: xpack/plugins/cloud/models.py:35 xpack/plugins/cloud/models.py:108
+#: xpack/plugins/cloud/models.py:35 xpack/plugins/cloud/models.py:117
 #: xpack/plugins/gathered_user/models.py:26
 msgid "Comment"
 msgstr "备注"
@@ -127,7 +127,7 @@ msgstr "系统用户"
 #: users/templates/users/user_asset_permission.html:40
 #: users/templates/users/user_asset_permission.html:70
 #: xpack/plugins/change_auth_plan/models.py:282
-#: xpack/plugins/cloud/models.py:212
+#: xpack/plugins/cloud/models.py:221
 msgid "Asset"
 msgstr "资产"
 
@@ -392,7 +392,7 @@ msgstr "系统平台"
 
 #: assets/models/asset.py:186 assets/serializers/asset.py:65
 #: perms/serializers/asset/user_permission.py:41
-#: xpack/plugins/cloud/models.py:99 xpack/plugins/cloud/serializers.py:182
+#: xpack/plugins/cloud/models.py:108 xpack/plugins/cloud/serializers.py:182
 msgid "Protocols"
 msgstr "协议组"
 
@@ -411,7 +411,7 @@ msgstr "激活"
 
 #: assets/models/asset.py:193 assets/models/cluster.py:19
 #: assets/models/user.py:191 assets/models/user.py:326 templates/_nav.html:44
-#: xpack/plugins/cloud/models.py:96 xpack/plugins/cloud/serializers.py:204
+#: xpack/plugins/cloud/models.py:97 xpack/plugins/cloud/serializers.py:204
 msgid "Admin user"
 msgstr "特权用户"
 
@@ -489,7 +489,7 @@ msgstr "标签管理"
 #: common/db/models.py:70 common/mixins/models.py:49 orgs/models.py:24
 #: orgs/models.py:422 perms/models/base.py:55 users/models/user.py:592
 #: users/serializers/group.py:33 xpack/plugins/change_auth_plan/models.py:81
-#: xpack/plugins/cloud/models.py:114 xpack/plugins/gathered_user/models.py:30
+#: xpack/plugins/cloud/models.py:123 xpack/plugins/gathered_user/models.py:30
 msgid "Created by"
 msgstr "创建者"
 
@@ -501,7 +501,7 @@ msgstr "创建者"
 #: assets/models/label.py:25 common/db/models.py:72 common/mixins/models.py:50
 #: ops/models/adhoc.py:38 ops/models/command.py:29 orgs/models.py:25
 #: orgs/models.py:420 perms/models/base.py:56 users/models/group.py:18
-#: users/models/user.py:774 xpack/plugins/cloud/models.py:117
+#: users/models/user.py:774 xpack/plugins/cloud/models.py:126
 msgid "Date created"
 msgstr "创建日期"
 
@@ -651,10 +651,6 @@ msgstr "命令复核"
 #: assets/models/domain.py:61
 msgid "Gateway"
 msgstr "网关"
-
-#: assets/models/domain.py:67
-msgid "Password cannot be empty"
-msgstr "密码不能为空"
 
 #: assets/models/gathered_user.py:16
 msgid "Present"
@@ -1130,12 +1126,12 @@ msgid "MFA"
 msgstr "多因子认证"
 
 #: audits/models.py:106 xpack/plugins/change_auth_plan/models.py:303
-#: xpack/plugins/cloud/models.py:171
+#: xpack/plugins/cloud/models.py:180
 msgid "Reason"
 msgstr "原因"
 
 #: audits/models.py:107 tickets/models/ticket.py:47
-#: xpack/plugins/cloud/models.py:167 xpack/plugins/cloud/models.py:216
+#: xpack/plugins/cloud/models.py:176 xpack/plugins/cloud/models.py:225
 msgid "Status"
 msgstr "状态"
 
@@ -1169,7 +1165,7 @@ msgid "Hosts display"
 msgstr "主机名称"
 
 #: audits/serializers.py:89 ops/models/command.py:26
-#: xpack/plugins/cloud/models.py:165
+#: xpack/plugins/cloud/models.py:174
 msgid "Result"
 msgstr "结果"
 
@@ -2163,11 +2159,11 @@ msgstr "欢迎使用JumpServer开源堡垒机"
 msgid "Test success"
 msgstr "测试成功"
 
-#: settings/api/ldap.py:197
+#: settings/api/ldap.py:194
 msgid "Get ldap users is None"
 msgstr "获取 LDAP 用户为 None"
 
-#: settings/api/ldap.py:206
+#: settings/api/ldap.py:203
 msgid "Imported {} users successfully (Organization: {})"
 msgstr "成功导入 {} 个用户 ( 组织: {} )"
 
@@ -2511,100 +2507,104 @@ msgstr "启用企业微信认证"
 msgid "Enable DingTalk Auth"
 msgstr "启用钉钉认证"
 
-#: settings/utils/ldap.py:416
+#: settings/utils/ldap.py:412
+msgid "ldap:// or ldaps:// protocol is used."
+msgstr "使用 ldap:// 或 ldaps:// 协议"
+
+#: settings/utils/ldap.py:423
 msgid "Host or port is disconnected: {}"
 msgstr "主机或端口不可连接: {}"
 
-#: settings/utils/ldap.py:418
+#: settings/utils/ldap.py:425
 msgid "The port is not the port of the LDAP service: {}"
 msgstr "端口不是LDAP服务端口: {}"
 
-#: settings/utils/ldap.py:420
+#: settings/utils/ldap.py:427
 msgid "Please add certificate: {}"
 msgstr "请添加证书"
 
-#: settings/utils/ldap.py:422 settings/utils/ldap.py:449
-#: settings/utils/ldap.py:479 settings/utils/ldap.py:507
+#: settings/utils/ldap.py:431 settings/utils/ldap.py:458
+#: settings/utils/ldap.py:488 settings/utils/ldap.py:516
 msgid "Unknown error: {}"
 msgstr "未知错误: {}"
 
-#: settings/utils/ldap.py:436
+#: settings/utils/ldap.py:445
 msgid "Bind DN or Password incorrect"
 msgstr "绑定DN或密码错误"
 
-#: settings/utils/ldap.py:443
+#: settings/utils/ldap.py:452
 msgid "Please enter Bind DN: {}"
 msgstr "请输入绑定DN: {}"
 
-#: settings/utils/ldap.py:445
+#: settings/utils/ldap.py:454
 msgid "Please enter Password: {}"
 msgstr "请输入密码: {}"
 
-#: settings/utils/ldap.py:447
+#: settings/utils/ldap.py:456
 msgid "Please enter correct Bind DN and Password: {}"
 msgstr "请输入正确的绑定DN和密码: {}"
 
-#: settings/utils/ldap.py:465
+#: settings/utils/ldap.py:474
 msgid "Invalid User OU or User search filter: {}"
 msgstr "不合法的用户OU或用户过滤器: {}"
 
-#: settings/utils/ldap.py:496
+#: settings/utils/ldap.py:505
 msgid "LDAP User attr map not include: {}"
 msgstr "LDAP属性映射没有包含: {}"
 
-#: settings/utils/ldap.py:503
+#: settings/utils/ldap.py:512
 msgid "LDAP User attr map is not dict"
 msgstr "LDAP属性映射不合法"
 
-#: settings/utils/ldap.py:522
+#: settings/utils/ldap.py:531
 msgid "LDAP authentication is not enabled"
 msgstr "LDAP认证没有启用"
 
-#: settings/utils/ldap.py:540
+#: settings/utils/ldap.py:549
 msgid "Error (Invalid LDAP server): {}"
 msgstr "错误 （不合法的LDAP服务器地址）: {}"
 
-#: settings/utils/ldap.py:542
+#: settings/utils/ldap.py:551
 msgid "Error (Invalid Bind DN): {}"
 msgstr "错误（不合法的绑定DN）: {}"
 
-#: settings/utils/ldap.py:544
+#: settings/utils/ldap.py:553
 msgid "Error (Invalid LDAP User attr map): {}"
 msgstr "错误（不合法的LDAP属性映射）: {}"
 
-#: settings/utils/ldap.py:546
+#: settings/utils/ldap.py:555
 msgid "Error (Invalid User OU or User search filter): {}"
 msgstr "错误（不合法的用户OU或用户过滤器）: {}"
 
-#: settings/utils/ldap.py:548
+#: settings/utils/ldap.py:557
 msgid "Error (Not enabled LDAP authentication): {}"
 msgstr "错误（没有启用LDAP认证）: {}"
 
-#: settings/utils/ldap.py:550
+#: settings/utils/ldap.py:559
 msgid "Error (Unknown): {}"
 msgstr "错误（未知）: {}"
 
-#: settings/utils/ldap.py:553
+#: settings/utils/ldap.py:562
 msgid "Succeed: Match {} s user"
 msgstr "成功匹配 {} 个用户"
 
-#: settings/utils/ldap.py:586
+#: settings/utils/ldap.py:595
 msgid "Authentication failed (configuration incorrect): {}"
 msgstr "认证失败（配置错误）: {}"
 
-#: settings/utils/ldap.py:588
+#: settings/utils/ldap.py:597
 msgid "Authentication failed (before login check failed): {}"
 msgstr "认证失败（登录前检查失败）: {}"
 
-#: settings/utils/ldap.py:590
+#: settings/utils/ldap.py:599
 msgid "Authentication failed (username or password incorrect): {}"
 msgstr "认证失败 (用户名或密码不正确): {}"
 
-#: settings/utils/ldap.py:592
+#: settings/utils/ldap.py:601
 msgid "Authentication failed (Unknown): {}"
 msgstr "认证失败: (未知): {}"
 
-#: settings/utils/ldap.py:595
+#: settings/utils/ldap.py:604
 msgid "Authentication success: {}"
 msgstr "认证成功: {}"
 
@@ -3378,7 +3378,7 @@ msgstr ""
 msgid "Endpoint"
 msgstr "端点"
 
-#: terminal/serializers/storage.py:66 xpack/plugins/cloud/models.py:209
+#: terminal/serializers/storage.py:66 xpack/plugins/cloud/models.py:218
 msgid "Region"
 msgstr "地域"
 
@@ -4793,35 +4793,35 @@ msgstr "地域"
 msgid "Hostname strategy"
 msgstr "主机名策略"
 
-#: xpack/plugins/cloud/models.py:102 xpack/plugins/cloud/serializers.py:185
+#: xpack/plugins/cloud/models.py:111 xpack/plugins/cloud/serializers.py:185
 msgid "IP network segment group"
 msgstr "IP网段组"
 
-#: xpack/plugins/cloud/models.py:105 xpack/plugins/cloud/serializers.py:207
+#: xpack/plugins/cloud/models.py:114 xpack/plugins/cloud/serializers.py:207
 msgid "Always update"
 msgstr "总是更新"
 
-#: xpack/plugins/cloud/models.py:111
+#: xpack/plugins/cloud/models.py:120
 msgid "Date last sync"
 msgstr "最后同步日期"
 
-#: xpack/plugins/cloud/models.py:122 xpack/plugins/cloud/models.py:163
+#: xpack/plugins/cloud/models.py:131 xpack/plugins/cloud/models.py:172
 msgid "Sync instance task"
 msgstr "同步实例任务"
 
-#: xpack/plugins/cloud/models.py:174 xpack/plugins/cloud/models.py:219
+#: xpack/plugins/cloud/models.py:183 xpack/plugins/cloud/models.py:228
 msgid "Date sync"
 msgstr "同步日期"
 
-#: xpack/plugins/cloud/models.py:199
+#: xpack/plugins/cloud/models.py:208
 msgid "Sync task"
 msgstr "同步任务"
 
-#: xpack/plugins/cloud/models.py:203
+#: xpack/plugins/cloud/models.py:212
 msgid "Sync instance task history"
 msgstr "同步实例任务历史"
 
-#: xpack/plugins/cloud/models.py:206
+#: xpack/plugins/cloud/models.py:215
 msgid "Instance"
 msgstr "实例"
 
@@ -5106,3 +5106,6 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Password cannot be empty"
+#~ msgstr "密码不能为空"
