@@ -16,18 +16,19 @@ class ApplicationTreeNodeMixin:
     category: str
 
     @classmethod
-    def create_choice_node(cls, c, pid, tp, counts=None):
-        count = counts.get(c[0], 0)
-        name = c[1]
+    def create_choice_node(cls, c, pid, tp, opened=False, counts=None):
+        count = counts.get(c.name, 0)
+        name = c.name
+        label = c.label
         if count is not None:
-            name = '{} ({})'.format(name, count)
+            label = '{} ({})'.format(label, count)
         data = {
-            'id': c[0],
-            'name': name,
-            'title': c[0],
+            'id': name,
+            'name': label,
+            'title': label,
             'pId': pid,
-            'isParent': True,
-            'open': True,
+            'isParent': bool(count),
+            'open': opened,
             'iconSkin': '',
             'meta': {
                 'type': tp,
@@ -58,16 +59,21 @@ class ApplicationTreeNodeMixin:
     @classmethod
     def create_category_tree_nodes(cls, counts=None):
         nodes = []
-        for category in const.ApplicationCategoryChoices.choices:
-            node = cls.create_choice_node(category, 'application', 'category', counts)
+        categories = const.ApplicationTypeChoices.category_types_mapper().keys()
+        for category in categories:
+            node = cls.create_choice_node(
+                category, pid='applications', tp='category', counts=counts, opened=True
+            )
             nodes.append(node)
         return nodes
 
     @classmethod
     def create_types_tree_nodes(cls, counts):
         nodes = []
-        for tp, category in const.ApplicationTypeChoices.type_category_mapper().items():
-            node = cls.create_choice_node(tp, category.name, 'type', counts)
+        type_category_mapper = const.ApplicationTypeChoices.type_category_mapper()
+        for tp in const.ApplicationTypeChoices.type_category_mapper().keys():
+            category = type_category_mapper.get(tp)
+            node = cls.create_choice_node(tp, pid=category.name, tp='type', counts=counts)
             nodes.append(node)
         return nodes
 
@@ -104,9 +110,9 @@ class ApplicationTreeNodeMixin:
             'name': self.name,
             'title': self.name,
             'pId': str(self.type),
-            'isParent': True,
+            'isParent': False,
             'open': False,
-            'iconSkin': '',
+            'iconSkin': 'file',
             'meta': {
                 'type': 'application',
                 'data': {

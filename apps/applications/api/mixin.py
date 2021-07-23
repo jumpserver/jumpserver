@@ -7,42 +7,16 @@ __all__ = ['SerializeApplicationToTreeNodeMixin']
 class SerializeApplicationToTreeNodeMixin:
 
     @staticmethod
-    def _serialize_db(db):
-        return {
-            'id': db.id,
-            'name': db.name,
-            'title': db.name,
-            'pId': '',
-            'open': False,
-            'iconSkin': 'database',
-            'meta': {'type': 'database_app'}
-        }
+    def _serialize_db(app):
+        return app.as_tree_node()
 
     @staticmethod
-    def _serialize_remote_app(remote_app):
-        return {
-            'id': remote_app.id,
-            'name': remote_app.name,
-            'title': remote_app.name,
-            'pId': '',
-            'open': False,
-            'isParent': False,
-            'iconSkin': 'chrome',
-            'meta': {'type': 'remote_app'}
-        }
+    def _serialize_remote_app(app):
+        return app.as_tree_node()
 
     @staticmethod
-    def _serialize_cloud(cloud):
-        return {
-            'id': cloud.id,
-            'name': cloud.name,
-            'title': cloud.name,
-            'pId': '',
-            'open': False,
-            'isParent': False,
-            'iconSkin': 'k8s',
-            'meta': {'type': 'k8s_app'}
-        }
+    def _serialize_cloud(app):
+        return app.as_tree_node()
 
     def _serialize_application(self, application):
         method_name = f'_serialize_{application.category}'
