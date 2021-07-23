@@ -408,7 +408,7 @@ class LDAPTestUtil(object):
 
     def _check_server_uri(self):
         if not any([self.config.server_uri.startswith('ldap://') or
-                    self.config.server_uri.startswith('ldap://')]):
+                    self.config.server_uri.startswith('ldaps://')]):
             err = _('ldap:// or ldaps:// protocol is used.')
             raise LDAPInvalidServerError(err)
 
