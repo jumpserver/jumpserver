@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 
-import json
 import threading
-from collections.abc import Iterable
-from smtplib import SMTPSenderRefused
 from rest_framework import generics
 from rest_framework.views import Response, APIView
 from orgs.models import Organization
@@ -12,14 +9,14 @@ from django.utils.translation import ugettext_lazy as _
 
 from ..utils import (
     LDAPServerUtil, LDAPCacheUtil, LDAPImportUtil, LDAPSyncUtil,
-    LDAP_USE_CACHE_FLAGS, LDAPTestUtil, ObjectDict
+    LDAP_USE_CACHE_FLAGS, LDAPTestUtil
 )
 from ..tasks import sync_ldap_user
-from common.permissions import IsOrgAdmin, IsSuperUser
+from common.permissions import IsSuperUser
 from common.utils import get_logger, is_uuid
 from ..serializers import (
-    MailTestSerializer, LDAPTestConfigSerializer, LDAPUserSerializer,
-    PublicSettingSerializer, LDAPTestLoginSerializer, SettingsSerializer
+    LDAPTestConfigSerializer, LDAPUserSerializer,
+    LDAPTestLoginSerializer
 )
 from orgs.utils import current_org
 from users.models import User
