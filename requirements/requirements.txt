@@ -1,5 +1,5 @@
 amqp==2.5.2
-ansible==2.8.8
+ansible==2.9.24
 asn1crypto==0.24.0
 bcrypt==3.1.4
 billiard==3.6.3.0
