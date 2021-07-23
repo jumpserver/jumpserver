@@ -1,13 +1,124 @@
 from django.db import models
+from django.db.models import Count
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.models import OrgModelMixin
 from common.mixins import CommonModelMixin
+from common.tree import TreeNode
 from assets.models import Asset, SystemUser
 from .. import const
 
 
-class Application(CommonModelMixin, OrgModelMixin):
+class ApplicationTreeNodeMixin:
+    id: str
+    name: str
+    type: str
+    category: str
+
+    @classmethod
+    def create_choice_node(cls, c, pid, tp, counts=None):
+        count = counts.get(c[0], 0)
+        name = c[1]
+        if count is not None:
+            name = '{} ({})'.format(name, count)
+        data = {
+            'id': c[0],
+            'name': name,
+            'title': c[0],
+            'pId': pid,
+            'isParent': True,
+            'open': True,
+            'iconSkin': '',
+            'meta': {
+                'type': tp,
+            }
+        }
+        return TreeNode(**data)
+
+    @classmethod
+    def create_root_tree_node(cls, counts=None):
+        count = counts.get("applications", 0)
+        name = _('Applications')
+        if count is not None:
+            name = '{} ({})'.format(name, count)
+        node = TreeNode(**{
+            'id': 'applications',
+            'name': name,
+            'title': name,
+            'pId': '',
+            'isParent': True,
+            'open': True,
+            'iconSkin': '',
+            'meta': {
+                'type': 'applications_root',
+            }
+        })
+        return node
+
+    @classmethod
+    def create_category_tree_nodes(cls, counts=None):
+        nodes = []
+        for category in const.ApplicationCategoryChoices.choices:
+            node = cls.create_choice_node(category, 'application', 'category', counts)
+            nodes.append(node)
+        return nodes
+
+    @classmethod
+    def create_types_tree_nodes(cls, counts):
+        nodes = []
+        for tp, category in const.ApplicationTypeChoices.type_category_mapper().items():
+            node = cls.create_choice_node(tp, category.name, 'type', counts)
+            nodes.append(node)
+        return nodes
+
+    @staticmethod
+    def get_tree_node_counts(queryset):
+        counts = {'applications': queryset.count()}
+        category_counts = queryset.values('category') \
+            .annotate(count=Count('id')) \
+            .order_by()
+        for item in category_counts:
+            counts[item['category']] = item['count']
+
+        type_counts = queryset.values('type') \
+            .annotate(count=Count('id')) \
+            .order_by()
+        for item in type_counts:
+            counts[item['type']] = item['count']
+        return counts
+
+    @classmethod
+    def create_tree_nodes(cls, queryset):
+        counts = cls.get_tree_node_counts(queryset)
+        tree_nodes = [cls.create_root_tree_node(counts)]
+        tree_nodes += [*cls.create_category_tree_nodes(counts)]
+        tree_nodes += [*cls.create_types_tree_nodes(counts)]
+
+        for app in queryset:
+            tree_nodes.append(app.as_tree_node())
+        return tree_nodes
+
+    def as_tree_node(self):
+        node = TreeNode(**{
+            'id': str(self.id),
+            'name': self.name,
+            'title': self.name,
+            'pId': str(self.type),
+            'isParent': True,
+            'open': False,
+            'iconSkin': '',
+            'meta': {
+                'type': 'application',
+                'data': {
+                    'category': self.category,
+                    'type': self.type,
+                }
+            }
+        })
+        return node
+
+
+class Application(CommonModelMixin, OrgModelMixin, ApplicationTreeNodeMixin):
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     category = models.CharField(
         max_length=16, choices=const.ApplicationCategoryChoices.choices, verbose_name=_('Category')

@@ -24,6 +24,7 @@ class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'password': {'write_only': True},
             'private_key': {'write_only': True},
             'public_key': {'write_only': True},
+            'systemuser_display': {'label': _('System user display')}
         }
 
     @classmethod
