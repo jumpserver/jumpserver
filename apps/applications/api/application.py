@@ -9,7 +9,6 @@ from common.tree import TreeNodeSerializer
 from ..hands import IsOrgAdminOrAppUser
 from .. import serializers
 from ..models import Application
-from ..filters import ApplicationFilter
 
 
 __all__ = ['ApplicationViewSet']
@@ -17,7 +16,11 @@ __all__ = ['ApplicationViewSet']
 
 class ApplicationViewSet(OrgBulkModelViewSet):
     model = Application
-    filterset_class = ApplicationFilter
+    filterset_fields = {
+        'name': ['exact'],
+        'category': ['exact'],
+        'type': ['exact', 'in'],
+    }
     search_fields = ('name', 'type', 'category')
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_classes = {
