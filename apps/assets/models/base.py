@@ -67,7 +67,10 @@ class AuthMixin:
         if self.public_key:
             public_key = self.public_key
         elif self.private_key:
-            public_key = ssh_pubkey_gen(private_key=self.private_key, password=self.password)
+            try:
+                public_key = ssh_pubkey_gen(private_key=self.private_key, password=self.password)
+            except IOError as e:
+                return str(e)
         else:
             return ''
 
