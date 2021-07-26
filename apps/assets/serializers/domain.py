@@ -42,6 +42,8 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
 
 
 class GatewaySerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
+    is_connective = serializers.BooleanField(required=False)
+
     class Meta:
         model = Gateway
         fields_mini = ['id', 'name']
@@ -50,7 +52,7 @@ class GatewaySerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         ]
         fields_small = fields_mini + fields_write_only + [
             'username', 'ip', 'port', 'protocol',
-            'is_active',
+            'is_active', 'is_connective',
             'date_created', 'date_updated',
             'created_by', 'comment',
         ]
