@@ -25,6 +25,7 @@ class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'private_key': {'write_only': True},
             'public_key': {'write_only': True},
         }
+        ref_name = 'AssetAccountSerializer'
 
     @classmethod
     def setup_eager_loading(cls, queryset):
