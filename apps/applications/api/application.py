@@ -32,5 +32,6 @@ class ApplicationViewSet(OrgBulkModelViewSet):
     def get_tree(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         tree_nodes = Application.create_tree_nodes(queryset)
+        print("Tree nodes: ", tree_nodes)
         serializer = self.get_serializer(tree_nodes, many=True)
         return Response(serializer.data)

@@ -4,9 +4,11 @@
 from rest_framework import generics
 from django_filters import rest_framework as filters
 from django.conf import settings
-from django.db.models import F
+from django.db.models import F, CharField, Value
+from django.db.models.functions import Concat
 
 from common.drf.filters import BaseFilterSet
+from common.utils import unique
 from perms.models import ApplicationPermission
 from ..hands import IsOrgAdminOrAppUser, IsOrgAdmin, NeedMFAVerify
 from .. import serializers
@@ -33,12 +35,23 @@ class ApplicationAccountListApi(generics.ListAPIView):
 
     def get_queryset(self):
         queryset = ApplicationPermission.objects.all()\
+            .annotate(uid=Concat(
+                'applications', Value('_'), 'system_users',
+                output_field=CharField(),
+             )) \
             .annotate(username=F('system_users__username')) \
             .annotate(password=F('system_users__password'))\
             .annotate(app_name=F("applications__name")) \
             .annotate(app_category=F("applications__category")) \
-            .annotate(app_type=F("applications__type"))
+            .annotate(app_type=F("applications__type"))\
+            .values('uid', 'username', 'password', 'app_name', 'app_category',
+                    'app_type', 'applications', 'system_users')
         return queryset
+
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+        queryset_list = unique(queryset, key=lambda x: x['uid'])
+        return queryset_list
 
 
 class ApplicationAccountAuthInfoListApi(ApplicationAccountListApi):

@@ -87,10 +87,10 @@ class ApplicationAccountSerializer(serializers.Serializer):
         pass
 
     def get_app_category_display(self, obj):
-        return self.category_mapper.get(obj.category)
+        return self.category_mapper.get(obj['app_category'])
 
     def get_app_type_display(self, obj):
-        return self.type_mapper.get(obj.type)
+        return self.type_mapper.get(obj['app_type'])
 
 
 class ApplicationAccountWithAuthInfoSerializer(ApplicationAccountSerializer):
