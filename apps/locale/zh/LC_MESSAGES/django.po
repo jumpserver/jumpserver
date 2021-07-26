@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-26 17:56+0800\n"
+"POT-Creation-Date: 2021-07-26 19:02+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -126,7 +126,7 @@ msgstr "系统用户"
 #: terminal/backends/command/serializers.py:13 terminal/models/session.py:40
 #: users/templates/users/user_asset_permission.html:40
 #: users/templates/users/user_asset_permission.html:70
-#: xpack/plugins/change_auth_plan/models.py:282
+#: xpack/plugins/change_auth_plan/models.py:290
 #: xpack/plugins/cloud/models.py:212
 msgid "Asset"
 msgstr "资产"
@@ -181,7 +181,7 @@ msgstr "格式为逗号分隔的字符串, * 表示匹配所有. "
 #: ops/models/adhoc.py:148 users/forms/profile.py:31 users/models/user.py:549
 #: users/templates/users/_select_user_modal.html:14
 #: xpack/plugins/change_auth_plan/models.py:47
-#: xpack/plugins/change_auth_plan/models.py:278
+#: xpack/plugins/change_auth_plan/models.py:286
 #: xpack/plugins/cloud/serializers.py:67
 msgid "Username"
 msgstr "用户名"
@@ -338,8 +338,8 @@ msgstr "目标URL"
 #: users/templates/users/user_password_update.html:43
 #: users/templates/users/user_password_verify.html:18
 #: xpack/plugins/change_auth_plan/models.py:68
-#: xpack/plugins/change_auth_plan/models.py:190
-#: xpack/plugins/change_auth_plan/models.py:285
+#: xpack/plugins/change_auth_plan/models.py:194
+#: xpack/plugins/change_auth_plan/models.py:293
 #: xpack/plugins/cloud/serializers.py:69
 msgid "Password"
 msgstr "密码"
@@ -548,14 +548,14 @@ msgid "Date verified"
 msgstr "校验日期"
 
 #: assets/models/base.py:178 xpack/plugins/change_auth_plan/models.py:72
-#: xpack/plugins/change_auth_plan/models.py:197
-#: xpack/plugins/change_auth_plan/models.py:292
+#: xpack/plugins/change_auth_plan/models.py:201
+#: xpack/plugins/change_auth_plan/models.py:300
 msgid "SSH private key"
 msgstr "SSH密钥"
 
 #: assets/models/base.py:179 xpack/plugins/change_auth_plan/models.py:75
-#: xpack/plugins/change_auth_plan/models.py:193
-#: xpack/plugins/change_auth_plan/models.py:288
+#: xpack/plugins/change_auth_plan/models.py:197
+#: xpack/plugins/change_auth_plan/models.py:296
 msgid "SSH public key"
 msgstr "SSH公钥"
 
@@ -1066,8 +1066,8 @@ msgstr "成功"
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:74
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:40
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:78
-#: xpack/plugins/change_auth_plan/models.py:177
-#: xpack/plugins/change_auth_plan/models.py:307
+#: xpack/plugins/change_auth_plan/models.py:181
+#: xpack/plugins/change_auth_plan/models.py:315
 #: xpack/plugins/gathered_user/models.py:76
 msgid "Date start"
 msgstr "开始日期"
@@ -1138,7 +1138,7 @@ msgstr "用户代理"
 msgid "MFA"
 msgstr "多因子认证"
 
-#: audits/models.py:106 xpack/plugins/change_auth_plan/models.py:303
+#: audits/models.py:106 xpack/plugins/change_auth_plan/models.py:311
 #: xpack/plugins/cloud/models.py:171
 msgid "Reason"
 msgstr "原因"
@@ -1232,6 +1232,7 @@ msgid "{User} *JOINED* {Organization}"
 msgstr "{User} *加入了* {Organization}"
 
 #: audits/signals_handler.py:102
+#, python-brace-format
 msgid "{User} *LEFT* {Organization}"
 msgstr "{User} *离开了* {Organization}"
 
@@ -1268,6 +1269,7 @@ msgid "User asset permissions"
 msgstr "用户资产授权"
 
 #: audits/signals_handler.py:116
+#, python-brace-format
 msgid "{AssetPermission} *ADD* {User}"
 msgstr "{AssetPermission} *添加了* {User}"
 
@@ -1310,6 +1312,7 @@ msgid "Node permission"
 msgstr "节点授权"
 
 #: audits/signals_handler.py:131
+#, python-brace-format
 msgid "{AssetPermission} *ADD* {Node}"
 msgstr "{AssetPermission} *添加了* {Node}"
 
@@ -1337,10 +1340,12 @@ msgid "User application permissions"
 msgstr "用户应用授权"
 
 #: audits/signals_handler.py:141
+#, python-brace-format
 msgid "{ApplicationPermission} *ADD* {User}"
 msgstr "{ApplicationPermission} *添加了* {User}"
 
 #: audits/signals_handler.py:142
+#, python-brace-format
 msgid "{ApplicationPermission} *REMOVE* {User}"
 msgstr "{ApplicationPermission} *移除了* {User}"
 
@@ -1349,10 +1354,12 @@ msgid "User group application permissions"
 msgstr "用户组应用授权"
 
 #: audits/signals_handler.py:146
+#, python-brace-format
 msgid "{ApplicationPermission} *ADD* {UserGroup}"
 msgstr "{ApplicationPermission} *添加了* {UserGroup}"
 
 #: audits/signals_handler.py:147
+#, python-brace-format
 msgid "{ApplicationPermission} *REMOVE* {UserGroup}"
 msgstr "{ApplicationPermission} *移除了* {UserGroup}"
 
@@ -1361,6 +1368,7 @@ msgid "Application permission"
 msgstr "应用管理"
 
 #: audits/signals_handler.py:151
+#, python-brace-format
 msgid "{ApplicationPermission} *ADD* {Application}"
 msgstr "{ApplicationPermission} *添加了* {Application}"
 
@@ -1374,6 +1382,7 @@ msgid "Application permission and SystemUser"
 msgstr "应用授权与系统用户"
 
 #: audits/signals_handler.py:156
+#, python-brace-format
 msgid "{ApplicationPermission} *ADD* {SystemUser}"
 msgstr "{ApplicationPermission} *添加了* {SystemUser}"
 
@@ -2101,8 +2110,8 @@ msgstr "开始时间"
 msgid "End time"
 msgstr "完成时间"
 
-#: ops/models/adhoc.py:246 xpack/plugins/change_auth_plan/models.py:180
-#: xpack/plugins/change_auth_plan/models.py:310
+#: ops/models/adhoc.py:246 xpack/plugins/change_auth_plan/models.py:184
+#: xpack/plugins/change_auth_plan/models.py:318
 #: xpack/plugins/gathered_user/models.py:79
 msgid "Time"
 msgstr "时间"
@@ -4764,7 +4773,7 @@ msgstr "重置密码成功，返回到登录页面"
 
 #: xpack/plugins/change_auth_plan/meta.py:9
 #: xpack/plugins/change_auth_plan/models.py:89
-#: xpack/plugins/change_auth_plan/models.py:184
+#: xpack/plugins/change_auth_plan/models.py:188
 msgid "Change auth plan"
 msgstr "改密计划"
 
@@ -4784,44 +4793,57 @@ msgstr "所有资产使用不同的随机密码"
 msgid "Password rules"
 msgstr "密码规则"
 
-#: xpack/plugins/change_auth_plan/models.py:187
+#: xpack/plugins/change_auth_plan/models.py:176
+msgid "Manual trigger"
+msgstr "手动触发"
+
+#: xpack/plugins/change_auth_plan/models.py:177
+msgid "Timing trigger"
+msgstr "定时触发"
+
+#: xpack/plugins/change_auth_plan/models.py:191
 msgid "Change auth plan snapshot"
 msgstr "改密计划快照"
 
-#: xpack/plugins/change_auth_plan/models.py:202
-#: xpack/plugins/change_auth_plan/models.py:296
+#: xpack/plugins/change_auth_plan/models.py:205
+#: xpack/plugins/change_auth_plan/serializers.py:132
+msgid "Trigger mode"
+msgstr "触发模式"
+
+#: xpack/plugins/change_auth_plan/models.py:210
+#: xpack/plugins/change_auth_plan/models.py:304
 msgid "Change auth plan execution"
 msgstr "改密计划执行"
 
-#: xpack/plugins/change_auth_plan/models.py:269
+#: xpack/plugins/change_auth_plan/models.py:277
 msgid "Ready"
 msgstr ""
 
-#: xpack/plugins/change_auth_plan/models.py:270
+#: xpack/plugins/change_auth_plan/models.py:278
 msgid "Preflight check"
 msgstr ""
 
-#: xpack/plugins/change_auth_plan/models.py:271
+#: xpack/plugins/change_auth_plan/models.py:279
 msgid "Change auth"
 msgstr ""
 
-#: xpack/plugins/change_auth_plan/models.py:272
+#: xpack/plugins/change_auth_plan/models.py:280
 msgid "Verify auth"
 msgstr ""
 
-#: xpack/plugins/change_auth_plan/models.py:273
+#: xpack/plugins/change_auth_plan/models.py:281
 msgid "Keep auth"
 msgstr ""
 
-#: xpack/plugins/change_auth_plan/models.py:274
+#: xpack/plugins/change_auth_plan/models.py:282
 msgid "Finished"
 msgstr "结束"
 
-#: xpack/plugins/change_auth_plan/models.py:300
+#: xpack/plugins/change_auth_plan/models.py:308
 msgid "Step"
 msgstr "步骤"
 
-#: xpack/plugins/change_auth_plan/models.py:317
+#: xpack/plugins/change_auth_plan/models.py:325
 msgid "Change auth plan task"
 msgstr "改密计划任务"
 
@@ -5270,3 +5292,6 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Trigger"
+#~ msgstr "触发"
