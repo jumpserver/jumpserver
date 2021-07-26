@@ -124,6 +124,12 @@ class ApplicationTreeNodeMixin:
         return tree_nodes
 
     def as_tree_node(self):
+        icon_skin_category_mapper = {
+            'remote_app': 'chrome',
+            'db': 'database',
+            'cloud': 'cloud'
+        }
+        icon_skin = icon_skin_category_mapper.get(self.category, 'file')
         node = TreeNode(**{
             'id': str(self.id),
             'name': self.name,
@@ -131,7 +137,7 @@ class ApplicationTreeNodeMixin:
             'pId': str(self.type),
             'isParent': False,
             'open': False,
-            'iconSkin': 'file',
+            'iconSkin': icon_skin,
             'meta': {
                 'type': 'application',
                 'data': {
