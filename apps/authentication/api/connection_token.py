@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 import urllib.parse
+import base64
 
 from django.conf import settings
 from django.core.cache import cache
@@ -52,7 +53,7 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin, GenericViewS
             raise PermissionDenied(error)
         return True
 
-    def create_token(self, user, asset, application, system_user, ttl=5*60):
+    def create_token(self, user, asset, application, system_user, ttl=5 * 60):
         if not self.request.user.is_superuser and user != self.request.user:
             raise PermissionDenied('Only super user can create user token')
         self.check_resource_permission(user, asset, application, system_user)
@@ -81,19 +82,7 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin, GenericViewS
         cache.set(key, value, timeout=ttl)
         return token
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        asset = serializer.validated_data.get('asset')
-        application = serializer.validated_data.get('application')
-        system_user = serializer.validated_data['system_user']
-        user = serializer.validated_data.get('user')
-        token = self.create_token(user, asset, application, system_user)
-        return Response({"token": token}, status=201)
-
-    @action(methods=['POST', 'GET'], detail=False, url_path='rdp/file', permission_classes=[IsValidUser])
-    def get_rdp_file(self, request, *args, **kwargs):
+    def create_rdp_file(self):
         options = {
             'full address:s': '',
             'username:s': '',
@@ -137,7 +126,7 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin, GenericViewS
         system_user = serializer.validated_data['system_user']
         height = serializer.validated_data.get('height')
         width = serializer.validated_data.get('width')
-        user = request.user
+        user = self.request.user
         token = self.create_token(user, asset, application, system_user)
 
         address = settings.TERMINAL_RDP_ADDR
@@ -152,20 +141,41 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin, GenericViewS
             options['desktopheight:i'] = height
         else:
             options['smart sizing:i'] = '1'
-        data = ''
+        content = ''
         for k, v in options.items():
-            data += f'{k}:{v}\n'
+            content += f'{k}:{v}\n'
         if asset:
             name = asset.hostname
         elif application:
             name = application.name
         else:
             name = '*'
+        return name, content
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        asset = serializer.validated_data.get('asset')
+        application = serializer.validated_data.get('application')
+        system_user = serializer.validated_data['system_user']
+        user = serializer.validated_data.get('user')
+        token = self.create_token(user, asset, application, system_user)
+        return Response({"token": token}, status=201)
+
+    @action(methods=['POST', 'GET'], detail=False, url_path='rdp/file', permission_classes=[IsValidUser])
+    def get_rdp_file(self, request, *args, **kwargs):
+        name, data = self.create_rdp_file()
         response = HttpResponse(data, content_type='application/octet-stream')
         filename = "{}-{}-jumpserver.rdp".format(user.username, name)
         filename = urllib.parse.quote(filename)
         response['Content-Disposition'] = 'attachment; filename*=UTF-8\'\'%s' % filename
         return response
+
+    @action(methods=['POST', 'GET'], detail=False, url_path='rdp/rouse', permission_classes=[IsValidUser])
+    def get_rdp_rouse(self, request, *args, **kwargs):
+        _, data = self.create_rdp_file()
+        return Response(data=dict(data=base64.b64encode(data.encode())))
 
     @staticmethod
     def _get_application_secret_detail(application):
