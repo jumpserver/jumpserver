@@ -1,3 +1,5 @@
+from django.utils.translation import ugettext as _
+
 from common.tree import TreeNode
 from orgs.models import Organization
 from ..models import Application
@@ -14,15 +16,16 @@ class SerializeApplicationToTreeNodeMixin:
 
     @staticmethod
     def create_root_node():
+        name = _('My applications')
         node = TreeNode(**{
             'id': 'applications',
-            'name': '我的资产',
-            'title': '我的资产',
+            'name': name,
+            'title': name,
             'pId': '',
             'open': True,
             'isParent': True,
             'meta': {
-                'type': 'org'
+                'type': 'root'
             }
         })
         return node
@@ -43,7 +46,7 @@ class SerializeApplicationToTreeNodeMixin:
             # 各应用节点
             apps_nodes = Application.create_tree_nodes(
                 queryset=org_applications, root_node=org_node,
-                show_empty_node=False
+                show_empty=False
             )
             tree_nodes += apps_nodes
         return tree_nodes

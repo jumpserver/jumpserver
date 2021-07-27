@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-27 14:19+0800\n"
+"POT-Creation-Date: 2021-07-27 15:51+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -228,6 +228,7 @@ msgstr "组织 `{}` 不存在"
 #: acls/serializers/login_asset_acl.py:103
 msgid "None of the reviewers belong to Organization `{}`"
 msgstr "所有复核人都不属于组织 `{}`"
+
 
 #: applications/const.py:8
 #: applications/serializers/attrs/application_category/db.py:14
@@ -2893,7 +2894,7 @@ msgid "My assets"
 msgstr "我的资产"
 
 #: templates/_nav_user.html:10
-msgid "My Applications"
+msgid "My applications"
 msgstr "我的应用"
 
 #: templates/_nav_user.html:31
