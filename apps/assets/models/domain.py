@@ -79,7 +79,13 @@ class Gateway(BaseUser):
                paramiko.SSHException,
                paramiko.ssh_exception.NoValidConnectionsError,
                socket.gaierror) as e:
-            return False, str(e)
+            err = str(e)
+            if err.startswith('[Errno None] Unable to connect to port'):
+                err = _('Unable to connect to port {port} on {ip}')
+                err = err.format(port=self.port, ip=self.ip)
+            elif err == 'Authentication failed.':
+                err = _('Authentication failed')
+            return False, err
 
         try:
             sock = proxy.get_transport().open_channel(

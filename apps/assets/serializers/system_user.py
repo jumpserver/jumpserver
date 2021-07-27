@@ -6,6 +6,7 @@ from common.mixins.serializers import BulkSerializerMixin
 from common.utils import ssh_pubkey_gen
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import SystemUser, Asset
+from .utils import validate_password_contains_left_double_curly_bracket
 from .base import AuthSerializerMixin
 
 __all__ = [
@@ -40,7 +41,10 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         fields_m2m = ['cmd_filters', 'assets_amount']
         fields = fields_small + fields_m2m
         extra_kwargs = {
-            'password': {"write_only": True},
+            'password': {
+                "write_only": True,
+                "validators": [validate_password_contains_left_double_curly_bracket]
+            },
             'public_key': {"write_only": True},
             'private_key': {"write_only": True},
             'token': {"write_only": True},
