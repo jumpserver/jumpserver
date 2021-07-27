@@ -174,7 +174,7 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin, GenericViewS
 
     @action(methods=['POST', 'GET'], detail=False, url_path='rdp/rouse', permission_classes=[IsValidUser])
     def get_rdp_rouse(self, request, *args, **kwargs):
-        _, data = self.create_rdp_file()
+        data = self.create_rdp_file()[1]
         return Response(data=dict(data=base64.b64encode(data.encode())))
 
     @staticmethod
