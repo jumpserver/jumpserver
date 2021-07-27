@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
 from perms.models import ApplicationPermission
 from applications.models import Application
-from applications.const import ApplicationCategoryChoices, ApplicationTypeChoices
+from applications.const import AppCategory, AppType
 from assets.models import SystemUser
 from orgs.utils import tmp_to_org
 from tickets.models import Ticket
@@ -17,14 +17,14 @@ __all__ = [
 class ApplySerializer(serializers.Serializer):
     # 申请信息
     apply_category = serializers.ChoiceField(
-        required=True, choices=ApplicationCategoryChoices.choices, label=_('Category'),
+        required=True, choices=AppCategory.choices, label=_('Category'),
         allow_null=True,
     )
     apply_category_display = serializers.CharField(
         read_only=True, label=_('Category display'), allow_null=True,
     )
     apply_type = serializers.ChoiceField(
-        required=True, choices=ApplicationTypeChoices.choices, label=_('Type'),
+        required=True, choices=AppType.choices, label=_('Type'),
         allow_null=True
     )
     apply_type_display = serializers.CharField(

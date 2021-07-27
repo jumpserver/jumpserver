@@ -16,13 +16,14 @@ class ApplicationTreeNodeMixin:
     category: str
 
     @classmethod
-    def create_choice_node(cls, c, pid, tp, opened=False, counts=None, show_empty_node=True):
+    def create_choice_node(cls, c, pid, tp, opened=False, counts=None,
+                           show_empty=True, show_count=True):
         count = counts.get(c.name, 0)
-        if count == 0 and not show_empty_node:
+        if count == 0 and not show_empty:
             return None
         name = c.name
         label = c.label
-        if count is not None:
+        if count is not None and show_count:
             label = '{} ({})'.format(label, count)
         data = {
             'id': name,
@@ -39,13 +40,11 @@ class ApplicationTreeNodeMixin:
         return TreeNode(**data)
 
     @classmethod
-    def create_root_tree_node(cls, queryset, root_id=None, root_name=None):
-        count = queryset.count()
-        if root_id is None:
-            root_id = 'applications'
-        if root_name is None:
-            root_name = _('Applications')
-        if count is not None:
+    def create_root_tree_node(cls, queryset, show_count=True):
+        count = queryset.count() if show_count else None
+        root_id = 'applications'
+        root_name = _('Applications')
+        if count is not None and show_count:
             root_name = '{} ({})'.format(root_name, count)
         node = TreeNode(**{
             'id': root_id,
@@ -62,13 +61,14 @@ class ApplicationTreeNodeMixin:
         return node
 
     @classmethod
-    def create_category_tree_nodes(cls, root_node, counts=None, show_empty_node=True):
+    def create_category_tree_nodes(cls, root_node, counts=None, show_empty=True, show_count=True):
         nodes = []
-        categories = const.ApplicationTypeChoices.category_types_mapper().keys()
+        categories = const.AppType.category_types_mapper().keys()
         for category in categories:
             node = cls.create_choice_node(
                 category, pid=root_node.id, tp='category',
-                counts=counts, opened=True, show_empty_node=show_empty_node
+                counts=counts, opened=True, show_empty=show_empty,
+                show_count=show_count
             )
             if not node:
                 continue
@@ -76,14 +76,14 @@ class ApplicationTreeNodeMixin:
         return nodes
 
     @classmethod
-    def create_types_tree_nodes(cls, counts, show_empty_node=True):
+    def create_types_tree_nodes(cls, counts, show_empty=True, show_count=True):
         nodes = []
-        type_category_mapper = const.ApplicationTypeChoices.type_category_mapper()
-        for tp in const.ApplicationTypeChoices.type_category_mapper().keys():
+        type_category_mapper = const.AppType.type_category_mapper()
+        for tp in const.AppType.type_category_mapper().keys():
             category = type_category_mapper.get(tp)
             node = cls.create_choice_node(
                 tp, pid=category.name, tp='type', counts=counts,
-                show_empty_node=show_empty_node
+                show_empty=show_empty, show_count=show_count
             )
             if not node:
                 continue
@@ -107,18 +107,27 @@ class ApplicationTreeNodeMixin:
         return counts
 
     @classmethod
-    def create_tree_nodes(cls, queryset, root_node=None, show_empty_node=True):
-        counts = cls.get_tree_node_counts(queryset)
+    def create_tree_nodes(cls, queryset, root_node=None, show_empty=True, show_count=True):
+        counts = cls.get_tree_node_counts(queryset) if show_count else {}
         tree_nodes = []
-        if root_node is None:
-            root_node = cls.create_root_tree_node(queryset)
-            tree_nodes.append(root_node)
-        category_nodes = cls.create_category_tree_nodes(
-            root_node, counts, show_empty_node=show_empty_node
-        )
-        tree_nodes += category_nodes
-        tree_nodes += cls.create_types_tree_nodes(counts, show_empty_node=show_empty_node)
 
+        # 根节点有可能是组织名称
+        if root_node is None:
+            root_node = cls.create_root_tree_node(queryset, show_count=show_count)
+            tree_nodes.append(root_node)
+
+        # 类别的节点
+        tree_nodes += cls.create_category_tree_nodes(
+            root_node, counts, show_empty=show_empty,
+            show_count=show_count
+        )
+
+        # 类型的节点
+        tree_nodes += cls.create_types_tree_nodes(
+            counts, show_empty=show_empty, show_count=show_count
+        )
+
+        # 应用的节点
         for app in queryset:
             tree_nodes.append(app.as_tree_node())
         return tree_nodes
@@ -152,10 +161,10 @@ class ApplicationTreeNodeMixin:
 class Application(CommonModelMixin, OrgModelMixin, ApplicationTreeNodeMixin):
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     category = models.CharField(
-        max_length=16, choices=const.ApplicationCategoryChoices.choices, verbose_name=_('Category')
+        max_length=16, choices=const.AppCategory.choices, verbose_name=_('Category')
     )
     type = models.CharField(
-        max_length=16, choices=const.ApplicationTypeChoices.choices, verbose_name=_('Type')
+        max_length=16, choices=const.AppType.choices, verbose_name=_('Type')
     )
     domain = models.ForeignKey(
         'assets.Domain', null=True, blank=True, related_name='applications',
@@ -177,7 +186,7 @@ class Application(CommonModelMixin, OrgModelMixin, ApplicationTreeNodeMixin):
 
     @property
     def category_remote_app(self):
-        return self.category == const.ApplicationCategoryChoices.remote_app.value
+        return self.category == const.AppCategory.remote_app.value
 
     def get_rdp_remote_app_setting(self):
         from applications.serializers.attrs import get_serializer_class_by_application_type

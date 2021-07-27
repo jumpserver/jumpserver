@@ -11,7 +11,7 @@ from rest_framework.permissions import AllowAny
 
 from common.utils.timezone import utcnow
 from common.const.http import POST, GET
-from common.drf.api import JmsGenericViewSet
+from common.drf.api import JMSGenericViewSet
 from common.drf.serializers import EmptySerializer
 from common.permissions import IsSuperUser
 from common.utils import reverse
@@ -26,7 +26,7 @@ NEXT_URL = 'next'
 AUTH_KEY = 'authkey'
 
 
-class SSOViewSet(AuthMixin, JmsGenericViewSet):
+class SSOViewSet(AuthMixin, JMSGenericViewSet):
     queryset = SSOToken.objects.all()
     serializer_classes = {
         'login_url': SSOTokenSerializer,

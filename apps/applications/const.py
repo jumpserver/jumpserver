@@ -1,11 +1,10 @@
 #  coding: utf-8
 #
-from collections import defaultdict
 from django.db.models import TextChoices
 from django.utils.translation import ugettext_lazy as _
 
 
-class ApplicationCategoryChoices(TextChoices):
+class AppCategory(TextChoices):
     db = 'db', _('Database')
     remote_app = 'remote_app', _('Remote app')
     cloud = 'cloud', 'Cloud'
@@ -15,10 +14,7 @@ class ApplicationCategoryChoices(TextChoices):
         return dict(cls.choices).get(category, '')
 
 
-ACC = ApplicationCategoryChoices
-
-
-class ApplicationTypeChoices(TextChoices):
+class AppType(TextChoices):
     # db category
     mysql = 'mysql', 'MySQL'
     oracle = 'oracle', 'Oracle'
@@ -37,9 +33,9 @@ class ApplicationTypeChoices(TextChoices):
     @classmethod
     def category_types_mapper(cls):
         return {
-            ACC.db: [cls.mysql, cls.oracle, cls.pgsql, cls.mariadb],
-            ACC.remote_app: [cls.chrome, cls.mysql_workbench, cls.vmware_client, cls.custom],
-            ACC.cloud: [cls.k8s]
+            AppCategory.db: [cls.mysql, cls.oracle, cls.pgsql, cls.mariadb],
+            AppCategory.remote_app: [cls.chrome, cls.mysql_workbench, cls.vmware_client, cls.custom],
+            AppCategory.cloud: [cls.k8s]
         }
 
     @classmethod
@@ -56,15 +52,15 @@ class ApplicationTypeChoices(TextChoices):
 
     @classmethod
     def db_types(cls):
-        return [tp.value for tp in cls.category_types_mapper()[ACC.db]]
+        return [tp.value for tp in cls.category_types_mapper()[AppCategory.db]]
 
     @classmethod
     def remote_app_types(cls):
-        return [tp.value for tp in cls.category_types_mapper()[ACC.remote_app]]
+        return [tp.value for tp in cls.category_types_mapper()[AppCategory.remote_app]]
 
     @classmethod
     def cloud_types(cls):
-        return [tp.value for tp in cls.category_types_mapper()[ACC.cloud]]
+        return [tp.value for tp in cls.category_types_mapper()[AppCategory.cloud]]
 
 
 

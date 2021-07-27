@@ -1,5 +1,4 @@
 from django.db.models import F, Q
-from django.conf import settings
 from rest_framework.decorators import action
 from django_filters import rest_framework as filters
 from rest_framework.response import Response
@@ -73,11 +72,6 @@ class AccountSecretsViewSet(AccountViewSet):
     }
     permission_classes = (IsOrgAdmin, NeedMFAVerify)
     http_method_names = ['get']
-
-    def get_permissions(self):
-        if not settings.SECURITY_VIEW_AUTH_NEED_MFA:
-            self.permission_classes = [IsOrgAdminOrAppUser]
-        return super().get_permissions()
 
 
 class AccountTaskCreateAPI(CreateAPIView):

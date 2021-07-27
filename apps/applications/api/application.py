@@ -30,8 +30,8 @@ class ApplicationViewSet(OrgBulkModelViewSet):
 
     @action(methods=['GET'], detail=False, url_path='tree')
     def get_tree(self, request, *args, **kwargs):
+        show_count = request.query_params.get('show_count', '1') == '1'
         queryset = self.filter_queryset(self.get_queryset())
-        tree_nodes = Application.create_tree_nodes(queryset)
-        print("Tree nodes: ", tree_nodes)
+        tree_nodes = Application.create_tree_nodes(queryset, show_count=show_count)
         serializer = self.get_serializer(tree_nodes, many=True)
         return Response(serializer.data)

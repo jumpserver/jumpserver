@@ -6,13 +6,12 @@ from django.utils.translation import ugettext_lazy as _
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.drf.serializers import MethodSerializer
 from .attrs import category_serializer_classes_mapping, type_serializer_classes_mapping
-from assets.serializers import SystemUserSerializer
 from .. import models
 from .. import const
 
 __all__ = [
     'ApplicationSerializer', 'ApplicationSerializerMixin',
-    'ApplicationAccountSerializer', 'ApplicationAccountWithAuthInfoSerializer'
+    'ApplicationAccountSerializer', 'ApplicationAccountSecretSerializer'
 ]
 
 
@@ -69,16 +68,20 @@ class ApplicationSerializer(ApplicationSerializerMixin, BulkOrgResourceModelSeri
 
 
 class ApplicationAccountSerializer(serializers.Serializer):
-    username = serializers.CharField(label=_("Username"))
+    username = serializers.ReadOnlyField(label=_("Username"))
     password = serializers.CharField(write_only=True, label=_("Password"))
-    app_name = serializers.ReadOnlyField(label=_("Application name"))
-    app_category = serializers.ChoiceField(label=_('Category'), choices=const.ApplicationCategoryChoices.choices)
+    systemuser = serializers.ReadOnlyField(label=_('System user'))
+    systemuser_display = serializers.ReadOnlyField(label=_("System user display"))
+    app = serializers.ReadOnlyField(label=_('App'))
+    uid = serializers.ReadOnlyField(label=_("Union id"))
+    app_name = serializers.ReadOnlyField(label=_("Application name"), read_only=True)
+    app_category = serializers.ChoiceField(label=_('Category'), choices=const.AppCategory.choices, read_only=True)
     app_category_display = serializers.SerializerMethodField(label=_('Category'))
-    app_type = serializers.ChoiceField(label=_('Type'), choices=const.ApplicationTypeChoices.choices)
+    app_type = serializers.ChoiceField(label=_('Type'), choices=const.AppType.choices, read_only=True)
     app_type_display = serializers.SerializerMethodField(label=_('Type'))
 
-    category_mapper = dict(const.ApplicationCategoryChoices.choices)
-    type_mapper = dict(const.ApplicationTypeChoices.choices)
+    category_mapper = dict(const.AppCategory.choices)
+    type_mapper = dict(const.AppType.choices)
 
     def create(self, validated_data):
         pass
@@ -93,7 +96,5 @@ class ApplicationAccountSerializer(serializers.Serializer):
         return self.type_mapper.get(obj['app_type'])
 
 
-class ApplicationAccountWithAuthInfoSerializer(ApplicationAccountSerializer):
+class ApplicationAccountSecretSerializer(ApplicationAccountSerializer):
     password = serializers.CharField(write_only=False, label=_("Password"))
-    # class Meta(ApplicationAccountSerializer.Meta):
-    #     fields = ApplicationAccountSerializer.Meta.fields + ['password', 'token']
