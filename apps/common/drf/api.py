@@ -1,4 +1,4 @@
-from rest_framework.viewsets import GenericViewSet, ModelViewSet
+from rest_framework.viewsets import GenericViewSet, ModelViewSet, ReadOnlyModelViewSet, ViewSet
 from rest_framework_bulk import BulkModelViewSet
 
 from ..mixins.api import (
@@ -15,19 +15,23 @@ class CommonMixin(SerializerMixin,
     pass
 
 
-class JmsGenericViewSet(CommonMixin,
-                        GenericViewSet):
+class JMSGenericViewSet(CommonMixin, GenericViewSet):
     pass
 
 
-class JMSModelViewSet(CommonMixin,
-                      ModelViewSet):
+class JMSViewSet(CommonMixin, ViewSet):
     pass
 
 
-class JMSBulkModelViewSet(CommonMixin,
-                          AllowBulkDestroyMixin,
-                          BulkModelViewSet):
+class JMSModelViewSet(CommonMixin, ModelViewSet):
+    pass
+
+
+class JMSReadOnlyModelViewSet(CommonMixin, ReadOnlyModelViewSet):
+    pass
+
+
+class JMSBulkModelViewSet(CommonMixin, AllowBulkDestroyMixin, BulkModelViewSet):
     pass
 
 

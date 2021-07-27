@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from common.drf.api import JmsGenericViewSet
+from common.drf.api import JMSGenericViewSet
 from notifications.notifications import system_msgs
 from notifications.models import SystemMsgSubscription
 from notifications.backends import BACKEND
@@ -30,7 +30,7 @@ class BackendListView(APIView):
 
 class SystemMsgSubscriptionViewSet(ListModelMixin,
                                    UpdateModelMixin,
-                                   JmsGenericViewSet):
+                                   JMSGenericViewSet):
     lookup_field = 'message_type'
     queryset = SystemMsgSubscription.objects.all()
     serializer_classes = {

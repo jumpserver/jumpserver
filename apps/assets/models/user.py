@@ -60,10 +60,10 @@ class ProtocolMixin:
 
     @classmethod
     def get_protocol_by_application_type(cls, app_type):
-        from applications.const import ApplicationTypeChoices
+        from applications.const import AppType
         if app_type in cls.APPLICATION_CATEGORY_PROTOCOLS:
             protocol = app_type
-        elif app_type in ApplicationTypeChoices.remote_app_types():
+        elif app_type in AppType.remote_app_types():
             protocol = cls.Protocol.rdp
         else:
             protocol = None

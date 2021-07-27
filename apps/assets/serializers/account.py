@@ -28,6 +28,7 @@ class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             },
             'private_key': {'write_only': True},
             'public_key': {'write_only': True},
+            'systemuser_display': {'label': _('System user display')}
         }
         ref_name = 'AssetAccountSerializer'
 
