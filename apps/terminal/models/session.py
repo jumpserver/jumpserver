@@ -129,8 +129,6 @@ class Session(OrgModelMixin):
         _PROTOCOL = self.PROTOCOL
         if self.is_finished:
             return False
-        if self.protocol in self.db_protocols:
-            return False
         else:
             return True
 
