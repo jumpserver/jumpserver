@@ -30,7 +30,7 @@ logger = get_logger(__name__)
 
 def get_user_all_asset_perm_ids(user) -> set:
     asset_perm_ids = set()
-    user_perm_id = AssetPermission.users.through.objects\
+    user_perm_id = AssetPermission.users.through.objects \
         .filter(user_id=user.id) \
         .values_list('assetpermission_id', flat=True) \
         .distinct()
@@ -41,8 +41,8 @@ def get_user_all_asset_perm_ids(user) -> set:
         .values_list('usergroup_id', flat=True) \
         .distinct()
     group_ids = list(group_ids)
-    groups_perm_id = AssetPermission.user_groups.through.objects\
-        .filter(usergroup_id__in=group_ids)\
+    groups_perm_id = AssetPermission.user_groups.through.objects \
+        .filter(usergroup_id__in=group_ids) \
         .values_list('assetpermission_id', flat=True) \
         .distinct()
     asset_perm_ids.update(groups_perm_id)
@@ -203,7 +203,8 @@ class UserGrantedTreeRefreshController:
                         logger.info(f'Rebuild user tree: user={self.user} org={current_org}')
                         utils = UserGrantedTreeBuildUtils(user)
                         utils.rebuild_user_granted_tree()
-                        logger.info(f'Rebuild user tree ok: cost={time.time() - t_start} user={self.user} org={current_org}')
+                        logger.info(
+                            f'Rebuild user tree ok: cost={time.time() - t_start} user={self.user} org={current_org}')
 
 
 class UserGrantedUtilsBase:
@@ -547,14 +548,16 @@ class UserGrantedNodesQueryUtils(UserGrantedUtilsBase):
         if not key:
             return self.get_top_level_nodes()
 
+        nodes = PermNode.objects.none()
+        if key == PermNode.FAVORITE_NODE_KEY:
+            return nodes
+
         node = PermNode.objects.get(key=key)
         granted_status = node.get_granted_status(self.user)
         if granted_status == NodeFrom.granted:
             nodes = PermNode.objects.filter(parent_key=key)
         elif granted_status in (NodeFrom.asset, NodeFrom.child):
             nodes = self.get_indirect_granted_node_children(key)
-        else:
-            nodes = PermNode.objects.none()
         nodes = self.sort(nodes)
         return nodes
 
