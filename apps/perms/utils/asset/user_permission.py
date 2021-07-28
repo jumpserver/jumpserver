@@ -549,13 +549,15 @@ class UserGrantedNodesQueryUtils(UserGrantedUtilsBase):
             return self.get_top_level_nodes()
 
         nodes = PermNode.objects.none()
-        if key != PermNode.FAVORITE_NODE_KEY:
-            node = PermNode.objects.get(key=key)
-            granted_status = node.get_granted_status(self.user)
-            if granted_status == NodeFrom.granted:
-                nodes = PermNode.objects.filter(parent_key=key)
-            elif granted_status in (NodeFrom.asset, NodeFrom.child):
-                nodes = self.get_indirect_granted_node_children(key)
+        if key == PermNode.FAVORITE_NODE_KEY:
+            return nodes
+
+        node = PermNode.objects.get(key=key)
+        granted_status = node.get_granted_status(self.user)
+        if granted_status == NodeFrom.granted:
+            nodes = PermNode.objects.filter(parent_key=key)
+        elif granted_status in (NodeFrom.asset, NodeFrom.child):
+            nodes = self.get_indirect_granted_node_children(key)
         nodes = self.sort(nodes)
         return nodes
 
