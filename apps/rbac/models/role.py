@@ -53,6 +53,11 @@ class Role(JMSModel):
             permissions = permissions.exclude(codename=code_name, content_type__app_label=app_label)
         return permissions
 
+    def get_bound_users(self):
+        from users.models import User
+        users_id = RoleBinding.objects.filter(role=self).values_list('user_id', flat=True)
+        return User.objects.filter(id__in=users_id)
+
     def __str__(self):
         return '%s (%s)' % (self.name, self.get_scope_display())
 

@@ -98,11 +98,11 @@ class UserProfileSerializer(UserSerializer):
     )
     mfa_level = serializers.ChoiceField(choices=MFA_LEVEL_CHOICES, label=_('MFA'), required=False)
     guide_url = serializers.SerializerMethodField()
-    belongs_orgs = UserOrgSerializer( many=True, read_only=True)
+    orgs = UserOrgSerializer(many=True, read_only=True)
 
     class Meta(UserSerializer.Meta):
         fields = UserSerializer.Meta.fields + [
-            'public_key_comment', 'public_key_hash_md5', 'guide_url', 'belongs_orgs'
+            'public_key_comment', 'public_key_hash_md5', 'guide_url', 'orgs'
         ]
         read_only_fields = [
             'date_joined', 'last_login', 'created_by', 'source'
@@ -134,8 +134,8 @@ class UserProfileSerializer(UserSerializer):
         return settings.USER_GUIDE_URL
 
     @staticmethod
-    def get_belongs_orgs(self):
-        return self.instance.belongs_orgs
+    def get_orgs(self):
+        return self.instance.orgs
 
     def validate_mfa_level(self, mfa_level):
         if self.instance and self.instance.mfa_force_enabled:
