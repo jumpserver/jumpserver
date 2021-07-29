@@ -15,6 +15,7 @@ class Task(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, choices=NAME_CHOICES, verbose_name=_("Name"))
     args = models.CharField(max_length=1024, verbose_name=_("Args"))
+    kwargs = models.JSONField(default=dict, verbose_name=_("Kwargs"))
     terminal = models.ForeignKey(Terminal, null=True, on_delete=models.SET_NULL)
     is_finished = models.BooleanField(default=False)
     date_created = models.DateTimeField(auto_now_add=True)
