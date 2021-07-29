@@ -11,16 +11,16 @@ app_name = 'assets'
 
 router = BulkRouter()
 router.register(r'assets', api.AssetViewSet, 'asset')
+router.register(r'accounts', api.AccountViewSet, 'account')
+router.register(r'account-secrets', api.AccountSecretsViewSet, 'account-secret')
 router.register(r'platforms', api.AssetPlatformViewSet, 'platform')
-router.register(r'admin-users', api.AdminUserViewSet, 'admin-user')
 router.register(r'system-users', api.SystemUserViewSet, 'system-user')
+router.register(r'admin-users', api.AdminUserViewSet, 'admin-user')
 router.register(r'labels', api.LabelViewSet, 'label')
 router.register(r'nodes', api.NodeViewSet, 'node')
 router.register(r'domains', api.DomainViewSet, 'domain')
 router.register(r'gateways', api.GatewayViewSet, 'gateway')
 router.register(r'cmd-filters', api.CommandFilterViewSet, 'cmd-filter')
-router.register(r'asset-users', api.AssetUserViewSet, 'asset-user')
-router.register(r'asset-user-auth-infos', api.AssetUserAuthInfoViewSet, 'asset-user-auth-info')
 router.register(r'gathered-users', api.GatheredUserViewSet, 'gathered-user')
 router.register(r'favorite-assets', api.FavoriteAssetViewSet, 'favorite-asset')
 router.register(r'system-users-assets-relations', api.SystemUserAssetRelationViewSet, 'system-users-assets-relation')
@@ -37,13 +37,6 @@ urlpatterns = [
     path('assets/<uuid:pk>/tasks/', api.AssetTaskCreateApi.as_view(), name='asset-task-create'),
     path('assets/tasks/', api.AssetsTaskCreateApi.as_view(), name='assets-task-create'),
 
-    path('asset-users/tasks/', api.AssetUserTaskCreateAPI.as_view(), name='asset-user-task-create'),
-
-    path('admin-users/<uuid:pk>/nodes/', api.ReplaceNodesAdminUserApi.as_view(), name='replace-nodes-admin-user'),
-    path('admin-users/<uuid:pk>/auth/', api.AdminUserAuthApi.as_view(), name='admin-user-auth'),
-    path('admin-users/<uuid:pk>/connective/', api.AdminUserTestConnectiveApi.as_view(), name='admin-user-connective'),
-    path('admin-users/<uuid:pk>/assets/', api.AdminUserAssetsListView.as_view(), name='admin-user-assets'),
-
     path('system-users/<uuid:pk>/auth-info/', api.SystemUserAuthInfoApi.as_view(), name='system-user-auth-info'),
     path('system-users/<uuid:pk>/assets/', api.SystemUserAssetsListView.as_view(), name='system-user-assets'),
     path('system-users/<uuid:pk>/assets/<uuid:asset_id>/auth-info/', api.SystemUserAssetAuthInfoApi.as_view(), name='system-user-asset-auth-info'),
@@ -51,6 +44,8 @@ urlpatterns = [
     path('system-users/<uuid:pk>/temp-auth/', api.SystemUserTempAuthInfoApi.as_view(), name='system-user-asset-temp-info'),
     path('system-users/<uuid:pk>/tasks/', api.SystemUserTaskApi.as_view(), name='system-user-task-create'),
     path('system-users/<uuid:pk>/cmd-filter-rules/', api.SystemUserCommandFilterRuleListApi.as_view(), name='system-user-cmd-filter-rule-list'),
+
+    path('accounts/tasks/', api.AccountTaskCreateAPI.as_view(), name='account-task-create'),
 
     path('nodes/tree/', api.NodeListAsTreeApi.as_view(), name='node-tree'),
     path('nodes/children/tree/', api.NodeChildrenAsTreeApi.as_view(), name='node-children-tree'),

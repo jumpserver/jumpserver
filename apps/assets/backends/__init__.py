@@ -1,1 +1,0 @@
-from .manager import AssetUserManager

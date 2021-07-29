@@ -54,8 +54,8 @@ class OrgResourceStatisticsCache(OrgRelatedCache):
 
     assets_amount = IntegerField()
     nodes_amount = IntegerField(queryset=Node.objects)
-    admin_users_amount = IntegerField(queryset=AdminUser.objects)
-    system_users_amount = IntegerField(queryset=SystemUser.objects)
+    admin_users_amount = IntegerField(queryset=SystemUser.objects.filter(type=SystemUser.Type.admin))
+    system_users_amount = IntegerField(queryset=SystemUser.objects.filter(type=SystemUser.Type.common))
     domains_amount = IntegerField(queryset=Domain.objects)
     gateways_amount = IntegerField(queryset=Gateway.objects)
 

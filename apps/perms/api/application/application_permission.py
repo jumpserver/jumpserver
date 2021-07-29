@@ -12,8 +12,12 @@ class ApplicationPermissionViewSet(BasePermissionViewSet):
     """
     model = ApplicationPermission
     serializer_class = serializers.ApplicationPermissionSerializer
-    filterset_fields = ['name', 'category', 'type']
-    search_fields = filterset_fields
+    filterset_fields = {
+        'name': ['exact'],
+        'category': ['exact'],
+        'type': ['exact', 'in'],
+    }
+    search_fields = ['name', 'category', 'type']
     custom_filter_fields = BasePermissionViewSet.custom_filter_fields + [
         'application_id', 'application'
     ]

@@ -126,11 +126,13 @@ class UserCanUpdateSSHKey(permissions.BasePermission):
 
 class NeedMFAVerify(permissions.BasePermission):
     def has_permission(self, request, view):
-        return True
-        # mfa_verify_time = request.session.get('MFA_VERIFY_TIME', 0)
-        # if time.time() - mfa_verify_time < settings.SECURITY_MFA_VERIFY_TTL:
-        #     return True
-        # raise MFAVerifyRequired()
+        if not settings.SECURITY_VIEW_AUTH_NEED_MFA:
+            return True
+
+        mfa_verify_time = request.session.get('MFA_VERIFY_TIME', 0)
+        if time.time() - mfa_verify_time < settings.SECURITY_MFA_VERIFY_TTL:
+            return True
+        raise MFAVerifyRequired()
 
 
 class CanUpdateDeleteUser(permissions.BasePermission):

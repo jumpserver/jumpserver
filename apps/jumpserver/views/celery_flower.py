@@ -20,7 +20,7 @@ def celery_flower_view(request, path):
     try:
         response = proxy_view(request, remote_url)
     except Exception as e:
-        msg = _("<h1>Flow service unavailable, check it</h1>") + \
+        msg = _("<h1>Flower service unavailable, check it</h1>") + \
               '<br><br> <div>{}</div>'.format(e)
         response = HttpResponse(msg)
     return response

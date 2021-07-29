@@ -36,8 +36,8 @@ class OrgsMappingForMemoryPubSub(LazyObject):
 orgs_mapping_for_memory_pub_sub = OrgsMappingForMemoryPubSub()
 
 
-def expire_orgs_mapping_for_memory():
-    orgs_mapping_for_memory_pub_sub.publish('expire_orgs_mapping')
+def expire_orgs_mapping_for_memory(org_id):
+    orgs_mapping_for_memory_pub_sub.publish(str(org_id))
 
 
 @receiver(django_ready)
@@ -54,7 +54,7 @@ def subscribe_orgs_mapping_expire(sender, **kwargs):
                     if message['data'] == b'error':
                         raise ValueError
                     Organization.expire_orgs_mapping()
-                    logger.debug('Expire orgs mapping')
+                    logger.debug('Expire orgs mapping: ' + str(message['data']))
             except Exception as e:
                 logger.exception(f'subscribe_orgs_mapping_expire: {e}')
                 Organization.expire_orgs_mapping()
@@ -65,22 +65,21 @@ def subscribe_orgs_mapping_expire(sender, **kwargs):
 
 
 @receiver(post_save, sender=Organization)
-def on_org_create_or_update(sender, instance=None, created=False, **kwargs):
+def on_org_create_or_update(sender, instance, created=False, **kwargs):
     # 必须放到最开始, 因为下面调用Node.save方法时会获取当前组织的org_id(即instance.org_id), 如果不过期会找不到
-    expire_orgs_mapping_for_memory()
-    if instance:
-        old_org = get_current_org()
-        set_current_org(instance)
-        node_root = Node.org_root()
-        if node_root.value != instance.name:
-            node_root.value = instance.name
-            node_root.save()
-        set_current_org(old_org)
+    expire_orgs_mapping_for_memory(instance.id)
+    old_org = get_current_org()
+    set_current_org(instance)
+    node_root = Node.org_root()
+    if node_root.value != instance.name:
+        node_root.value = instance.name
+        node_root.save()
+    set_current_org(old_org)
 
 
-@receiver(post_delete, sender=Organization)
-def on_org_delete(sender, **kwargs):
-    expire_orgs_mapping_for_memory()
+@receiver(pre_delete, sender=Organization)
+def on_org_delete(sender, instance, **kwargs):
+    expire_orgs_mapping_for_memory(instance.id)
 
 
 @receiver(pre_delete, sender=Organization)

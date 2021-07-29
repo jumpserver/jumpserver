@@ -31,7 +31,11 @@ class JMSBaseInventory(BaseInventory):
         if run_as_admin:
             info.update(asset.get_auth_info())
             if asset.is_unixlike():
-                info["become"] = asset.admin_user.become_info
+                info["become"] = {
+                    "method": 'sudo',
+                    "user": 'root',
+                    "pass": ''
+                }
         if asset.is_windows():
             info["vars"].update({
                 "ansible_connection": "ssh",
@@ -103,8 +107,6 @@ class JMSInventory(JMSBaseInventory):
         super().__init__(host_list=host_list)
 
     def get_run_user_info(self, host):
-        from assets.backends import AssetUserManager
-
         if not self.run_as and not self.system_user:
             return {}
 
@@ -112,17 +114,12 @@ class JMSInventory(JMSBaseInventory):
         asset = self.assets.filter(id=asset_id).first()
         if not asset:
             logger.error('Host not found: ', asset_id)
+            return {}
 
         if self.system_user:
             self.system_user.load_asset_special_auth(asset=asset, username=self.run_as)
             return self.system_user._to_secret_json()
-
-        try:
-            manager = AssetUserManager()
-            run_user = manager.get_latest(username=self.run_as, asset=asset, prefer='system_user')
-            return run_user._to_secret_json()
-        except Exception as e:
-            logger.error(e, exc_info=True)
+        else:
             return {}
 
 

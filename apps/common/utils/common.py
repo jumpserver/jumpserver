@@ -273,3 +273,17 @@ def bulk_get(d, *keys, default=None):
     for key in keys:
         values.append(d.get(key, default))
     return values
+
+
+def unique(objects, key=None):
+    seen = OrderedDict()
+
+    if key is None:
+        key = lambda item: item
+
+    for obj in objects:
+        v = key(obj)
+        if v not in seen:
+            seen[v] = obj
+    return list(seen.values())
+

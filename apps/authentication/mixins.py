@@ -237,6 +237,12 @@ class AuthMixin:
         request = self.request
 
         self._set_partial_credential_error(user.username, ip, request)
+
+        if user.is_expired:
+            self.raise_credential_error(errors.reason_user_expired)
+        elif not user.is_active:
+            self.raise_credential_error(errors.reason_user_inactive)
+
         self._check_is_local_user(user)
         self._check_is_block(user.username)
         self._check_login_acl(user, ip)

@@ -10,12 +10,14 @@ app_name = 'applications'
 
 router = BulkRouter()
 router.register(r'applications', api.ApplicationViewSet, 'application')
+router.register(r'accounts', api.ApplicationAccountViewSet, 'application-account')
+router.register(r'account-secrets', api.ApplicationAccountSecretViewSet, 'application-account-secret')
 
 
 urlpatterns = [
     path('remote-apps/<uuid:pk>/connection-info/', api.RemoteAppConnectionInfoApi.as_view(), name='remote-app-connection-info'),
-    path('application-users/', api.ApplicationUserListApi.as_view(), name='application-user'),
-    path('application-user-auth-infos/', api.ApplicationUserAuthInfoListApi.as_view(), name='application-user-auth-info')
+    # path('accounts/', api.ApplicationAccountViewSet.as_view(), name='application-account'),
+    # path('account-secrets/', api.ApplicationAccountSecretViewSet.as_view(), name='application-account-secret')
 ]
 
 

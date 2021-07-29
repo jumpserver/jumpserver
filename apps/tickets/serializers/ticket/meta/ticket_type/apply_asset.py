@@ -144,7 +144,7 @@ class ApplyAssetSerializer(ApplySerializer, ApproveSerializer):
         if not queries:
             return []
         with tmp_to_org(self.root.instance.org_id):
-            asset_ids = Asset.objects.filter(queries).values_list('id', flat=True)[:5]
+            asset_ids = Asset.objects.filter(queries).values_list('id', flat=True)[:100]
             asset_ids = [str(asset_id) for asset_id in asset_ids]
             return asset_ids
 

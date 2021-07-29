@@ -23,7 +23,7 @@ from orgs.models import OrganizationMember, Organization
 from common.utils import date_expired_default, get_logger, lazyproperty, random_string
 from common import fields
 from common.const import choices
-from common.db.models import ChoiceSet
+from common.db.models import TextChoices
 from users.exceptions import MFANotEnabled
 from ..signals import post_user_change_password
 

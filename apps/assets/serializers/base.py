@@ -5,7 +5,6 @@ from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
 from common.utils import ssh_pubkey_gen, validate_ssh_private_key
-from ..models import AssetUser
 
 
 class AuthSerializer(serializers.ModelSerializer):
@@ -27,11 +26,6 @@ class AuthSerializer(serializers.ModelSerializer):
             self.instance.set_auth(password=password, private_key=private_key,
                                    public_key=public_key)
         return self.instance
-
-
-class ConnectivitySerializer(serializers.Serializer):
-    status = serializers.IntegerField()
-    datetime = serializers.DateTimeField()
 
 
 class AuthSerializerMixin:
@@ -64,15 +58,3 @@ class AuthSerializerMixin:
     def update(self, instance, validated_data):
         self.clean_auth_fields(validated_data)
         return super().update(instance, validated_data)
-
-
-class AuthInfoSerializer(serializers.ModelSerializer):
-    private_key = serializers.ReadOnlyField(source='get_private_key')
-
-    class Meta:
-        model = AssetUser
-        fields = [
-            'username', 'password',
-            'private_key', 'public_key',
-            'date_updated',
-        ]

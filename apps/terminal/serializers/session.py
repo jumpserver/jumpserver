@@ -2,7 +2,6 @@ from rest_framework import serializers
 
 from django.utils.translation import ugettext_lazy as _
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-from common.drf.serializers import AdaptedBulkListSerializer
 from ..models import Session
 
 __all__ = [
@@ -16,7 +15,6 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
 
     class Meta:
         model = Session
-        list_serializer_class = AdaptedBulkListSerializer
         fields_mini = ["id"]
         fields_small = fields_mini + [
             "user", "asset", "system_user",
@@ -33,7 +31,7 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
             'user_id': {'label': _('User ID')},
             'asset_id': {'label': _('Asset ID')},
             'system_user_id': {'label': _('System user ID')},
-            'login_from_display': {'label': _('Login from for display')},
+            'login_from_display': {'label': _('Login from display')},
             'is_success': {'label': _('Is success')},
             'can_replay': {'label': _('Can replay')},
             'can_join': {'label': _('Can join')},

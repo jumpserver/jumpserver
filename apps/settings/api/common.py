@@ -129,6 +129,7 @@ class PublicSettingApi(generics.RetrieveAPIView):
                 },
                 "AUTH_WECOM": settings.AUTH_WECOM,
                 "AUTH_DINGTALK": settings.AUTH_DINGTALK,
+                'SECURITY_WATERMARK_ENABLED': settings.SECURITY_WATERMARK_ENABLED
             }
         }
         return instance

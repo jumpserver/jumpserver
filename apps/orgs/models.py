@@ -6,6 +6,15 @@ from django.db.models import signals
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import lazyproperty, settings
+from common.const import choices
+from common.tree import TreeNode
+from common.db.models import TextChoices
+
+
+class ROLE(TextChoices):
+    ADMIN = choices.ADMIN, _('Organization administrator')
+    AUDITOR = choices.AUDITOR, _("Organization auditor")
+    USER = choices.USER, _('User')
 
 
 class Organization(models.Model):
@@ -126,6 +135,20 @@ class Organization(models.Model):
             return 0
         with tmp_to_org(self):
             return resource_model.objects.all().count()
+
+    def as_tree_node(self, pid, opened=True):
+        node = TreeNode(**{
+            'id': self.id,
+            'name': self.name,
+            'title': self.name,
+            'pId': pid,
+            'open': opened,
+            'isParent': True,
+            'meta': {
+                'type': 'org'
+            }
+        })
+        return node
 
 
 class OrgMemberManager(models.Manager):

@@ -1,9 +1,7 @@
 from django.db.models import F
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
-from django.utils.translation import ugettext_lazy as _
 
-from common.drf.serializers import AdaptedBulkListSerializer
 from common.drf.serializers import BulkModelSerializer
 from common.db.models import concated_display as display
 from .models import Organization, OrganizationMember
@@ -30,7 +28,6 @@ class OrgSerializer(ModelSerializer):
 
     class Meta:
         model = Organization
-        list_serializer_class = AdaptedBulkListSerializer
         fields_mini = ['id', 'name']
         fields_small = fields_mini + [
             'resource_statistics',

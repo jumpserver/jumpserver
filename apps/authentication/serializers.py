@@ -196,6 +196,7 @@ class ConnectionTokenSecretSerializer(serializers.Serializer):
     system_user = ConnectionTokenSystemUserSerializer(read_only=True)
     gateway = ConnectionTokenGatewaySerializer(read_only=True)
     actions = ActionsField()
+    expired_at = serializers.IntegerField()
 
 
 class RDPFileSerializer(ConnectionTokenSerializer):

@@ -1,7 +1,7 @@
 from django.utils.translation import ugettext as _
 from orgs.utils import tmp_to_org, tmp_to_root_org
 from applications.models import Application
-from applications.const import ApplicationCategoryChoices, ApplicationTypeChoices
+from applications.const import AppCategory, AppType
 from assets.models import SystemUser
 from perms.models import ApplicationPermission
 from .base import BaseHandler
@@ -17,9 +17,9 @@ class Handler(BaseHandler):
     def _construct_meta_display_of_open(self):
         meta_display_fields = ['apply_category_display', 'apply_type_display']
         apply_category = self.ticket.meta.get('apply_category')
-        apply_category_display = ApplicationCategoryChoices.get_label(apply_category)
+        apply_category_display = AppCategory.get_label(apply_category)
         apply_type = self.ticket.meta.get('apply_type')
-        apply_type_display = ApplicationTypeChoices.get_label(apply_type)
+        apply_type_display = AppType.get_label(apply_type)
         meta_display_values = [apply_category_display, apply_type_display]
         meta_display = dict(zip(meta_display_fields, meta_display_values))
         return meta_display

@@ -6,12 +6,12 @@ from django.utils.translation import ugettext_lazy as _
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.drf.serializers import MethodSerializer
 from .attrs import category_serializer_classes_mapping, type_serializer_classes_mapping
-from assets.serializers import SystemUserSerializer
 from .. import models
+from .. import const
 
 __all__ = [
     'ApplicationSerializer', 'ApplicationSerializerMixin',
-    'ApplicationUserSerializer', 'ApplicationUserWithAuthInfoSerializer'
+    'ApplicationAccountSerializer', 'ApplicationAccountSecretSerializer'
 ]
 
 
@@ -52,9 +52,8 @@ class ApplicationSerializer(ApplicationSerializerMixin, BulkOrgResourceModelSeri
         model = models.Application
         fields_mini = ['id', 'name']
         fields_small = fields_mini + [
-            'category', 'category_display', 'type', 'type_display', 'attrs',
-            'date_created', 'date_updated',
-            'created_by', 'comment'
+            'category', 'category_display', 'type', 'type_display',
+            'attrs', 'date_created', 'date_updated', 'created_by', 'comment'
         ]
         fields_fk = ['domain']
         fields = fields_small + fields_fk
@@ -68,41 +67,34 @@ class ApplicationSerializer(ApplicationSerializerMixin, BulkOrgResourceModelSeri
         return _attrs
 
 
-class ApplicationUserSerializer(SystemUserSerializer):
-    application_name = serializers.SerializerMethodField(label=_('Application name'))
-    application_category = serializers.SerializerMethodField(label=_('Application category'))
-    application_type = serializers.SerializerMethodField(label=_('Application type'))
+class ApplicationAccountSerializer(serializers.Serializer):
+    username = serializers.ReadOnlyField(label=_("Username"))
+    password = serializers.CharField(write_only=True, label=_("Password"))
+    systemuser = serializers.ReadOnlyField(label=_('System user'))
+    systemuser_display = serializers.ReadOnlyField(label=_("System user display"))
+    app = serializers.ReadOnlyField(label=_('App'))
+    uid = serializers.ReadOnlyField(label=_("Union id"))
+    app_name = serializers.ReadOnlyField(label=_("Application name"), read_only=True)
+    app_category = serializers.ChoiceField(label=_('Category'), choices=const.AppCategory.choices, read_only=True)
+    app_category_display = serializers.SerializerMethodField(label=_('Category'))
+    app_type = serializers.ChoiceField(label=_('Type'), choices=const.AppType.choices, read_only=True)
+    app_type_display = serializers.SerializerMethodField(label=_('Type'))
 
-    class Meta(SystemUserSerializer.Meta):
-        model = models.ApplicationUser
-        fields_mini = [
-            'id', 'application_name', 'application_category', 'application_type', 'name', 'username'
-        ]
-        fields_small = fields_mini + [
-            'protocol', 'login_mode', 'login_mode_display', 'priority',
-            "username_same_with_user", 'comment',
-        ]
-        fields = fields_small
-        extra_kwargs = {
-            'login_mode_display': {'label': _('Login mode display')},
-            'created_by': {'read_only': True},
-        }
+    category_mapper = dict(const.AppCategory.choices)
+    type_mapper = dict(const.AppType.choices)
 
-    @property
-    def application(self):
-        return self.context['application']
+    def create(self, validated_data):
+        pass
 
-    def get_application_name(self, obj):
-        return self.application.name
+    def update(self, instance, validated_data):
+        pass
 
-    def get_application_category(self, obj):
-        return self.application.get_category_display()
+    def get_app_category_display(self, obj):
+        return self.category_mapper.get(obj['app_category'])
 
-    def get_application_type(self, obj):
-        return self.application.get_type_display()
+    def get_app_type_display(self, obj):
+        return self.type_mapper.get(obj['app_type'])
 
 
-class ApplicationUserWithAuthInfoSerializer(ApplicationUserSerializer):
-
-    class Meta(ApplicationUserSerializer.Meta):
-        fields = ApplicationUserSerializer.Meta.fields + ['password', 'token']
+class ApplicationAccountSecretSerializer(ApplicationAccountSerializer):
+    password = serializers.CharField(write_only=False, label=_("Password"))

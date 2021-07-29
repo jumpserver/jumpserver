@@ -54,7 +54,7 @@ class LoginAssetACLSystemUsersSerializer(serializers.Serializer):
     protocol_group = serializers.ListField(
         default=['*'], child=serializers.CharField(max_length=16), label=_('Protocol'),
         help_text=protocol_group_help_text.format(
-            ', '.join([SystemUser.PROTOCOL_SSH, SystemUser.PROTOCOL_TELNET])
+            ', '.join([SystemUser.Protocol.ssh, SystemUser.Protocol.telnet])
         )
     )
 

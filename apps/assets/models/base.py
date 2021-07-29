@@ -8,8 +8,10 @@ from hashlib import md5
 import sshpubkeys
 from django.core.cache import cache
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from django.db.models import QuerySet
 
 from common.utils import random_string, signer
 from common.utils import (
@@ -19,85 +21,39 @@ from common.utils.encode import ssh_pubkey_gen
 from common.validators import alphanumeric
 from common import fields
 from orgs.mixins.models import OrgModelMixin
-from .utils import Connectivity
 
 
 logger = get_logger(__file__)
 
 
-class ConnectivityMixin:
-    CONNECTIVITY_ASSET_CACHE_KEY = "ASSET_USER_{}_{}_ASSET_CONNECTIVITY"
-    CONNECTIVITY_AMOUNT_CACHE_KEY = "ASSET_USER_{}_{}_CONNECTIVITY_AMOUNT"
-    ASSET_USER_CACHE_TIME = 3600 * 24
-    id = ''
-    username = ''
+class Connectivity(models.TextChoices):
+    unknown = 'unknown', _('Unknown')
+    ok = 'ok', _('Ok')
+    failed = 'failed', _('Failed')
 
-    @property
-    def part_id(self):
-        i = '-'.join(str(self.id).split('-')[:3])
-        return i
 
-    def set_connectivity(self, summary):
-        unreachable = summary.get('dark', {}).keys()
-        reachable = summary.get('contacted', {}).keys()
+class AbsConnectivity(models.Model):
+    connectivity = models.CharField(
+        choices=Connectivity.choices, default=Connectivity.unknown,
+        max_length=16, verbose_name=_('Connectivity')
+    )
+    date_verified = models.DateTimeField(null=True, verbose_name=_("Date verified"))
 
-        assets = self.get_related_assets()
-        if not isinstance(assets, list):
-            assets = assets.only('id', 'hostname', 'admin_user__id')
-        for asset in assets:
-            if asset.hostname in unreachable:
-                self.set_asset_connectivity(asset, Connectivity.unreachable())
-            elif asset.hostname in reachable:
-                self.set_asset_connectivity(asset, Connectivity.reachable())
-            else:
-                self.set_asset_connectivity(asset, Connectivity.unknown())
-        cache_key = self.CONNECTIVITY_AMOUNT_CACHE_KEY.format(self.username, self.part_id)
-        cache.delete(cache_key)
-
-    @property
-    def connectivity(self):
-        assets = self.get_related_assets()
-        if not isinstance(assets, list):
-            assets = assets.only('id', 'hostname', 'admin_user__id')
-        data = {
-            'unreachable': [],
-            'reachable': [],
-            'unknown': [],
-        }
-        for asset in assets:
-            connectivity = self.get_asset_connectivity(asset)
-            if connectivity.is_reachable():
-                data["reachable"].append(asset.hostname)
-            elif connectivity.is_unreachable():
-                data["unreachable"].append(asset.hostname)
-            else:
-                data["unknown"].append(asset.hostname)
-        return data
-
-    @property
-    def connectivity_amount(self):
-        cache_key = self.CONNECTIVITY_AMOUNT_CACHE_KEY.format(self.username, self.part_id)
-        amount = cache.get(cache_key)
-        if not amount:
-            amount = {k: len(v) for k, v in self.connectivity.items()}
-            cache.set(cache_key, amount, self.ASSET_USER_CACHE_TIME)
-        return amount
+    def set_connectivity(self, val):
+        self.connectivity = val
+        self.date_verified = timezone.now()
+        self.save(update_fields=['connectivity', 'date_verified'])
 
     @classmethod
-    def get_asset_username_connectivity(cls, asset, username):
-        key = cls.CONNECTIVITY_ASSET_CACHE_KEY.format(username, asset.id)
-        return Connectivity.get(key)
+    def bulk_set_connectivity(cls, queryset_or_id, connectivity):
+        if not isinstance(queryset_or_id, QuerySet):
+            queryset = cls.objects.filter(id__in=queryset_or_id)
+        else:
+            queryset = queryset_or_id
+        queryset.update(connectivity=connectivity, date_verified=timezone.now())
 
-    def get_asset_connectivity(self, asset):
-        key = self.get_asset_connectivity_key(asset)
-        return Connectivity.get(key)
-
-    def get_asset_connectivity_key(self, asset):
-        return self.CONNECTIVITY_ASSET_CACHE_KEY.format(self.username, asset.id)
-
-    def set_asset_connectivity(self, asset, c):
-        key = self.get_asset_connectivity_key(asset)
-        Connectivity.set(key, c)
+    class Meta:
+        abstract = True
 
 
 class AuthMixin:
@@ -105,14 +61,16 @@ class AuthMixin:
     password = ''
     public_key = ''
     username = ''
-    _prefer = 'system_user'
 
     @property
     def ssh_key_fingerprint(self):
         if self.public_key:
             public_key = self.public_key
         elif self.private_key:
-            public_key = ssh_pubkey_gen(private_key=self.private_key, password=self.password)
+            try:
+                public_key = ssh_pubkey_gen(private_key=self.private_key, password=self.password)
+            except IOError as e:
+                return str(e)
         else:
             return ''
 
@@ -173,38 +131,6 @@ class AuthMixin:
         if update_fields:
             self.save(update_fields=update_fields)
 
-    def has_special_auth(self, asset=None, username=None):
-        from .authbook import AuthBook
-        if username is None:
-            username = self.username
-        queryset = AuthBook.objects.filter(username=username)
-        if asset:
-            queryset = queryset.filter(asset=asset)
-        return queryset.exists()
-
-    def get_asset_user(self, asset, username=None):
-        from ..backends import AssetUserManager
-        if username is None:
-            username = self.username
-        try:
-            manager = AssetUserManager()
-            other = manager.get_latest(
-                username=username, asset=asset,
-                prefer_id=self.id, prefer=self._prefer,
-            )
-            return other
-        except Exception as e:
-            logger.error(e, exc_info=True)
-            return None
-
-    def load_asset_special_auth(self, asset=None, username=None):
-        if not asset:
-            return self
-
-        instance = self.get_asset_user(asset, username=username)
-        if instance:
-            self._merge_auth(instance)
-
     def _merge_auth(self, other):
         if other.password:
             self.password = other.password
@@ -244,7 +170,7 @@ class AuthMixin:
         )
 
 
-class BaseUser(OrgModelMixin, AuthMixin, ConnectivityMixin):
+class BaseUser(OrgModelMixin, AuthMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     username = models.CharField(max_length=128, blank=True, verbose_name=_('Username'), validators=[alphanumeric], db_index=True)
@@ -258,8 +184,6 @@ class BaseUser(OrgModelMixin, AuthMixin, ConnectivityMixin):
 
     ASSETS_AMOUNT_CACHE_KEY = "ASSET_USER_{}_ASSETS_AMOUNT"
     ASSET_USER_CACHE_TIME = 600
-
-    _prefer = "system_user"
 
     def get_related_assets(self):
         assets = self.assets.filter(org_id=self.org_id)

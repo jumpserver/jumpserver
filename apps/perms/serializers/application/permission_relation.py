@@ -3,7 +3,6 @@
 from rest_framework import serializers
 
 from common.mixins import BulkSerializerMixin
-from common.drf.serializers import AdaptedBulkListSerializer
 from perms.models import ApplicationPermission
 
 __all__ = [
@@ -24,14 +23,11 @@ class RelationMixin(BulkSerializerMixin, serializers.Serializer):
         fields.extend(['applicationpermission', "applicationpermission_display"])
         return fields
 
-    class Meta:
-        list_serializer_class = AdaptedBulkListSerializer
-
 
 class ApplicationPermissionUserRelationSerializer(RelationMixin, serializers.ModelSerializer):
     user_display = serializers.ReadOnlyField()
 
-    class Meta(RelationMixin.Meta):
+    class Meta:
         model = ApplicationPermission.users.through
         fields = [
             'id', 'user', 'user_display',
@@ -41,7 +37,7 @@ class ApplicationPermissionUserRelationSerializer(RelationMixin, serializers.Mod
 class ApplicationPermissionUserGroupRelationSerializer(RelationMixin, serializers.ModelSerializer):
     usergroup_display = serializers.ReadOnlyField()
 
-    class Meta(RelationMixin.Meta):
+    class Meta:
         model = ApplicationPermission.user_groups.through
         fields = [
             'id', 'usergroup', "usergroup_display",
@@ -51,7 +47,7 @@ class ApplicationPermissionUserGroupRelationSerializer(RelationMixin, serializer
 class ApplicationPermissionApplicationRelationSerializer(RelationMixin, serializers.ModelSerializer):
     application_display = serializers.ReadOnlyField()
 
-    class Meta(RelationMixin.Meta):
+    class Meta:
         model = ApplicationPermission.applications.through
         fields = [
             'id', "application", "application_display",
@@ -61,7 +57,7 @@ class ApplicationPermissionApplicationRelationSerializer(RelationMixin, serializ
 class ApplicationPermissionSystemUserRelationSerializer(RelationMixin, serializers.ModelSerializer):
     systemuser_display = serializers.ReadOnlyField()
 
-    class Meta(RelationMixin.Meta):
+    class Meta:
         model = ApplicationPermission.system_users.through
         fields = [
             'id', 'systemuser', 'systemuser_display'

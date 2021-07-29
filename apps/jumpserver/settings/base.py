@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.forms',
+    'simple_history',
 ]
 
 
@@ -87,6 +88,7 @@ MIDDLEWARE = [
     'orgs.middleware.OrgMiddleware',
     'authentication.backends.oidc.middleware.OIDCRefreshIDTokenMiddleware',
     'authentication.backends.cas.middleware.CASMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware',
 ]
 
 

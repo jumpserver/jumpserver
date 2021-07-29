@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 #
-
+import socket
 import uuid
 import random
 import re
 
 import paramiko
 from django.db import models
+from django.db.models import TextChoices
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils.strings import no_special_chars
 from orgs.mixins.models import OrgModelMixin
 from .base import BaseUser
 
@@ -43,15 +43,12 @@ class Domain(OrgModelMixin):
 
 
 class Gateway(BaseUser):
-    PROTOCOL_SSH = 'ssh'
-    PROTOCOL_RDP = 'rdp'
-    PROTOCOL_CHOICES = (
-        (PROTOCOL_SSH, 'ssh'),
-        (PROTOCOL_RDP, 'rdp'),
-    )
+    class Protocol(TextChoices):
+        ssh = 'ssh', 'SSH'
+
     ip = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
     port = models.IntegerField(default=22, verbose_name=_('Port'))
-    protocol = models.CharField(choices=PROTOCOL_CHOICES, max_length=16, default=PROTOCOL_SSH, verbose_name=_("Protocol"))
+    protocol = models.CharField(choices=Protocol.choices, max_length=16, default=Protocol.ssh, verbose_name=_("Protocol"))
     domain = models.ForeignKey(Domain, on_delete=models.CASCADE, verbose_name=_("Domain"))
     comment = models.CharField(max_length=128, blank=True, null=True, verbose_name=_("Comment"))
     is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
@@ -66,8 +63,6 @@ class Gateway(BaseUser):
     def test_connective(self, local_port=None):
         if local_port is None:
             local_port = self.port
-        if self.password and not no_special_chars(self.password):
-            return False, _("Password should not contains special characters")
 
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -82,8 +77,15 @@ class Gateway(BaseUser):
         except(paramiko.AuthenticationException,
                paramiko.BadAuthenticationType,
                paramiko.SSHException,
-               paramiko.ssh_exception.NoValidConnectionsError) as e:
-            return False, str(e)
+               paramiko.ssh_exception.NoValidConnectionsError,
+               socket.gaierror) as e:
+            err = str(e)
+            if err.startswith('[Errno None] Unable to connect to port'):
+                err = _('Unable to connect to port {port} on {ip}')
+                err = err.format(port=self.port, ip=self.ip)
+            elif err == 'Authentication failed.':
+                err = _('Authentication failed')
+            return False, err
 
         try:
             sock = proxy.get_transport().open_channel(

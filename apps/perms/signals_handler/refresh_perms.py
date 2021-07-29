@@ -16,6 +16,17 @@ from perms.utils.asset.user_permission import UserGrantedTreeRefreshController
 logger = get_logger(__file__)
 
 
+@receiver(pre_delete, sender=UserGroup)
+def on_user_group_delete(sender, instance: UserGroup, using, **kwargs):
+    exists = AssetPermission.user_groups.through.objects.filter(usergroup_id=instance.id).exists()
+    if not exists:
+        return
+
+    org_id = instance.org_id
+    user_ids = UserGroup.users.through.objects.filter(usergroup_id=instance.id).values_list('user_id', flat=True)
+    UserGrantedTreeRefreshController.add_need_refresh_orgs_for_users([org_id], list(user_ids))
+
+
 @receiver(m2m_changed, sender=User.groups.through)
 def on_user_groups_change(sender, instance, action, reverse, pk_set, **kwargs):
     if not action.startswith('post'):
