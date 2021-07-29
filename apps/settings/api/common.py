@@ -161,7 +161,8 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         items = self.get_fields().keys()
-        return {item: getattr(settings, item) for item in items}
+        obj = {item: getattr(settings, item) for item in items}
+        return obj
 
     def parse_serializer_data(self, serializer):
         data = []
