@@ -106,7 +106,8 @@ class UserProfileSerializer(UserSerializer):
         fields = UserSerializer.Meta.fields + [
             'public_key_comment', 'public_key_hash_md5',
             'admin_or_audit_orgs', 'current_org_roles',
-            'guide_url', 'user_all_orgs'
+            'guide_url', 'user_all_orgs', 'is_org_admin',
+            'is_superuser'
         ]
         read_only_fields = [
             'date_joined', 'last_login', 'created_by', 'source'
