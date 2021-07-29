@@ -2,6 +2,7 @@
 import time
 
 from django.urls import reverse_lazy, reverse
+from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext as _
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
@@ -32,6 +33,16 @@ logger = get_logger(__name__)
 
 class UserOtpEnableStartView(UserVerifyPasswordView):
     template_name = 'users/user_otp_check_password.html'
+
+    def form_valid(self, form):
+        # 开启了 OTP IN RADIUS 就不用绑定了
+        resp = super().form_valid(form)
+        if settings.OTP_IN_RADIUS:
+            user_id = self.request.session.get('user_id')
+            user = get_object_or_404(User, id=user_id)
+            user.enable_mfa()
+            user.save()
+        return resp
 
     def get_success_url(self):
         if settings.OTP_IN_RADIUS:
@@ -85,7 +96,11 @@ class UserOtpEnableBindView(AuthMixin, TemplateView, FormView):
             session_user = get_object_or_none(User, pk=user_id)
 
         if session_user:
-            if all((is_auth_password_time_valid(self.request.session), session_user.mfa_enabled, not session_user.otp_secret_key)):
+            if all((
+                    is_auth_password_time_valid(self.request.session),
+                    session_user.mfa_enabled,
+                    not session_user.otp_secret_key
+            )):
                 return True
         return False
 
@@ -109,8 +124,8 @@ class UserOtpEnableBindView(AuthMixin, TemplateView, FormView):
             return self.form_invalid(form)
 
     def save_otp(self, otp_secret_key):
-        if not settings.SECURITY_ADMIN_USER_MFA_AUTH:
-            user = get_user_or_pre_auth_user(self.request)
+        user = get_user_or_pre_auth_user(self.request)
+        if not user.mfa_force_enabled:
             user.enable_mfa()
             user.otp_secret_key = otp_secret_key
             user.save()

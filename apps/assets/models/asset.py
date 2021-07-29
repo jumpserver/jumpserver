@@ -333,7 +333,7 @@ class Asset(AbsConnectivity, ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
             'iconSkin': icon_skin,
             'meta': {
                 'type': 'asset',
-                'asset': {
+                'data': {
                     'id': self.id,
                     'hostname': self.hostname,
                     'ip': self.ip,

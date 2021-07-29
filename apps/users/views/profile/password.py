@@ -74,9 +74,6 @@ class UserVerifyPasswordView(FormView):
         if not user:
             form.add_error("password", _("Password invalid"))
             return self.form_invalid(form)
-        if settings.OTP_IN_RADIUS:
-            user.enable_mfa()
-            user.save()
         self.request.session['user_id'] = str(user.id)
         self.request.session['auth_password'] = 1
         self.request.session['auth_password_expired_at'] = time.time() + settings.AUTH_EXPIRED_SECONDS

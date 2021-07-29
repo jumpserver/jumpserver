@@ -16,9 +16,7 @@ import json
 import yaml
 from importlib import import_module
 from django.urls import reverse_lazy
-from django.templatetags.static import static
 from urllib.parse import urljoin, urlparse
-from django.utils.translation import ugettext_lazy as _
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
