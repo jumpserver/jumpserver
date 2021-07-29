@@ -236,7 +236,7 @@ class Organization(models.Model):
 
     def as_tree_node(self, pid, opened=True):
         node = TreeNode(**{
-            'id': self.id,
+            'id': str(self.id),
             'name': self.name,
             'title': self.name,
             'pId': pid,
