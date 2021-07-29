@@ -33,7 +33,7 @@ class KillSessionAPI(APIView):
                 self.model.objects.create(
                     name="kill_session", args=session.id, terminal=session.terminal,
                     kwargs={
-                        'terminated_by_user': str(request.user)
+                        'terminated_by': str(request.user)
                     }
                 )
         return Response({"ok": validated_session})
