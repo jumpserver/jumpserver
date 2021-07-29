@@ -12,6 +12,7 @@ class SerializeApplicationToTreeNodeMixin:
     def filter_organizations(applications):
         organization_ids = set(applications.values_list('org_id', flat=True))
         organizations = [Organization.get_instance(org_id) for org_id in organization_ids]
+        organizations.sort(key=lambda x: x.name)
         return organizations
 
     @staticmethod
