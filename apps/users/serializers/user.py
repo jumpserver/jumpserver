@@ -122,7 +122,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         if self.instance and not password:
             # 更新用户, 未设置密码
             return
-        if not check_password_rules(password, self.instance.is_superuser):
+        if not check_password_rules(password, user=self.instance):
             msg = _('Password does not match security rules')
             raise serializers.ValidationError(msg)
         return password

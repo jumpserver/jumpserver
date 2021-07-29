@@ -308,7 +308,7 @@ def get_password_check_rules(is_superuser=False):
     return check_rules
 
 
-def check_password_rules(password, is_superuser=False):
+def check_password_rules(password, user):
     pattern = r"^"
     if settings.SECURITY_PASSWORD_UPPER_CASE:
         pattern += '(?=.*[A-Z])'
@@ -319,10 +319,11 @@ def check_password_rules(password, is_superuser=False):
     if settings.SECURITY_PASSWORD_SPECIAL_CHAR:
         pattern += '(?=.*[`~!@#\$%\^&\*\(\)-=_\+\[\]\{\}\|;:\'\",\.<>\/\?])'
     pattern += '[a-zA-Z\d`~!@#\$%\^&\*\(\)-=_\+\[\]\{\}\|;:\'\",\.<>\/\?]'
-    if is_superuser:
-        pattern += '.{' + str(settings.SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH-1) + ',}$'
+    if user.is_org_admin:
+        min_length = settings.SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH
     else:
-        pattern += '.{' + str(settings.SECURITY_PASSWORD_MIN_LENGTH-1) + ',}$'
+        min_length = settings.SECURITY_PASSWORD_MIN_LEN
+    pattern += '.{' + str(min_length-1) + ',}$'
     match_obj = re.match(pattern, password)
     return bool(match_obj)
 
