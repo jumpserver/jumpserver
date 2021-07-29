@@ -295,10 +295,12 @@ def check_otp_code(otp_secret_key, otp_code):
     return totp.verify(otp=otp_code, valid_window=otp_valid_window)
 
 
-def get_password_check_rules():
+def get_password_check_rules(is_superuser=False):
     check_rules = []
     for rule in settings.SECURITY_PASSWORD_RULES:
         key = "id_{}".format(rule.lower())
+        if is_superuser and rule == 'SECURITY_PASSWORD_MIN_LENGTH':
+            rule = 'SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH'
         value = getattr(settings, rule)
         if not value:
             continue
@@ -306,7 +308,7 @@ def get_password_check_rules():
     return check_rules
 
 
-def check_password_rules(password):
+def check_password_rules(password, is_superuser=False):
     pattern = r"^"
     if settings.SECURITY_PASSWORD_UPPER_CASE:
         pattern += '(?=.*[A-Z])'
@@ -317,7 +319,10 @@ def check_password_rules(password):
     if settings.SECURITY_PASSWORD_SPECIAL_CHAR:
         pattern += '(?=.*[`~!@#\$%\^&\*\(\)-=_\+\[\]\{\}\|;:\'\",\.<>\/\?])'
     pattern += '[a-zA-Z\d`~!@#\$%\^&\*\(\)-=_\+\[\]\{\}\|;:\'\",\.<>\/\?]'
-    pattern += '.{' + str(settings.SECURITY_PASSWORD_MIN_LENGTH-1) + ',}$'
+    if is_superuser:
+        pattern += '.{' + str(settings.SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH-1) + ',}$'
+    else:
+        pattern += '.{' + str(settings.SECURITY_PASSWORD_MIN_LENGTH-1) + ',}$'
     match_obj = re.match(pattern, password)
     return bool(match_obj)
 

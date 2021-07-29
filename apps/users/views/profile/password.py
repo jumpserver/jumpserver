@@ -53,7 +53,7 @@ class UserPasswordUpdateView(PermissionsMixin, UpdateView):
 
     def form_valid(self, form):
         password = form.cleaned_data.get('new_password')
-        is_ok = check_password_rules(password)
+        is_ok = check_password_rules(password, self.request.user.is_superuser)
         if not is_ok:
             form.add_error(
                 "new_password",
@@ -74,7 +74,7 @@ class UserVerifyPasswordView(FormView):
         if not user:
             form.add_error("password", _("Password invalid"))
             return self.form_invalid(form)
-        if not user.mfa_is_otp():
+        if settings.OTP_IN_RADIUS:
             user.enable_mfa()
             user.save()
         self.request.session['user_id'] = str(user.id)
