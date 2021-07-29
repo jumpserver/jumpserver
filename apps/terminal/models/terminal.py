@@ -184,6 +184,8 @@ class Terminal(StorageMixin, TerminalStatusMixin, models.Model):
             status = "Deleted"
         elif not self.is_active:
             status = "Disable"
+        elif not self.is_alive:
+            status = 'Offline'
         return '%s: %s' % (self.name, status)
 
     class Meta:

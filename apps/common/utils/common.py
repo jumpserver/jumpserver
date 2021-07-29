@@ -249,6 +249,18 @@ def get_disk_usage():
     return usages
 
 
+def get_cpu_load():
+    cpu_load_1, cpu_load_5, cpu_load_15 = psutil.getloadavg()
+    cpu_count = psutil.cpu_count()
+    single_cpu_load_1 = cpu_load_1 / cpu_count
+    single_cpu_load_1 = '%.2f' % single_cpu_load_1
+    return float(single_cpu_load_1)
+
+
+def get_memory_used():
+    return psutil.virtual_memory().percent
+
+
 class Time:
     def __init__(self):
         self._timestamps = []
