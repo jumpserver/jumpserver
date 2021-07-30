@@ -54,6 +54,7 @@ class Status(models.Model):
         data.pop('terminal', None)
         stat = cls(**data)
         stat.terminal = terminal
+        stat.is_alive = terminal.is_alive
         return stat
 
     def save(self, force_insert=False, force_update=False, using=None,
