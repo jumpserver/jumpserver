@@ -51,39 +51,37 @@ class ServerPerformanceCheckUtil(object):
         ServerPerformanceMessage(msg).publish()
 
     def check(self):
-        common_check_items = ['disk_usage', 'cpu_load', 'memory_usage']
+        check_items = ['disk_usage', 'cpu_load', 'memory_usage']
 
-        check_services_items_mapper = {
-            'components': ['is_alive'] + common_check_items
-        }
+        # Check local
         if settings.DISK_CHECK_ENABLED:
-            check_services_items_mapper.update({
-                'local': common_check_items
-            })
+            self.check_items(check_items)
 
-        for service, items in check_services_items_mapper.items():
-            if service == 'local':
-                for item in items:
-                    messages = getattr(self, f'check_{item}', lambda: None)()
-                    self.alarm_messages.extend(messages)
-            elif service == 'components':
-                terminals = {
-                    t: Status.get_terminal_latest_stat(t)
-                    for t in Terminal.objects.filter(is_accepted=True, is_deleted=False)
-                    if t.is_active
-                }
-                for terminal, status in terminals.items():
-                    self._terminal = terminal
-                    setattr(self._terminal, 'status', status)
-                    for item in items:
-                        messages = getattr(self, f'check_{item}', lambda: None)()
-                        self.alarm_messages.extend(messages)
-            else:
-                pass
+        # Check terminal
+        check_items += ['is_alive']
+        terminals = self.get_terminals()
+        for terminal in terminals:
+            self._terminal = terminal
+            self.check_items(check_items)
+
+    @staticmethod
+    def get_terminals():
+        terminals = []
+        for terminal in Terminal.objects.filter(is_accepted=True, is_deleted=False):
+            if not terminal.is_active:
+                continue
+            terminal.status = Status.get_terminal_latest_stat(terminal)
+            terminals.append(terminal)
+        return terminals
+
+    def check_items(self, items):
+        for item in items:
+            messages = getattr(self, f'check_{item}', lambda: None)()
+            self.alarm_messages.extend(messages)
 
     def check_is_alive(self):
         message = []
-        if self._terminal and not self._terminal.is_alive:
+        if not self._terminal and not self._terminal.is_alive:
             name = self._terminal.name
             msg = _('The terminal is offline: {}').format(name)
             message.append(msg)
@@ -100,18 +98,19 @@ class ServerPerformanceCheckUtil(object):
             disks_used = self._get_local_disk_usage()
 
         for disk, used in disks_used:
+            if used <= self.disk_usage_threshold:
+                continue
             msg = _("Disk used more than {}%: {} => {} ({})").format(self.disk_usage_threshold, disk, used, name)
             messages.append(msg)
         return messages
 
-    def _get_local_disk_usage(self):
+    @staticmethod
+    def _get_local_disk_usage():
         disks_usage = []
         usages = get_disk_usage()
         uncheck_paths = ['/etc', '/boot']
         for path, usage in usages.items():
             if len(path) > 4 and path[:4] in uncheck_paths:
-                continue
-            if usage.percent <= self.disk_usage_threshold:
                 continue
             disks_usage.append([path, usage.percent])
         return disks_usage
@@ -126,7 +125,7 @@ class ServerPerformanceCheckUtil(object):
             cpu_load = get_cpu_load()
 
         if cpu_load > self.cpu_load_threshold:
-            msg = _('CPU load more than {}: {} ({})').format(self.cpu_load_threshold, cpu_load, name)
+            msg = _('CPU load more than {}: => {} ({})').format(self.cpu_load_threshold, cpu_load, name)
             messages.append(msg)
         return messages
 
@@ -140,6 +139,6 @@ class ServerPerformanceCheckUtil(object):
             memory_usage = get_memory_used()
 
         if memory_usage > self.memory_usage_threshold:
-            msg = _('Memory used more than {}%: {} ({})').format(self.memory_usage_threshold, memory_usage, name)
+            msg = _('Memory used more than {}%: => {} ({})').format(self.memory_usage_threshold, memory_usage, name)
             messages.append(msg)
         return messages
