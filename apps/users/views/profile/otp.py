@@ -125,10 +125,9 @@ class UserOtpEnableBindView(AuthMixin, TemplateView, FormView):
 
     def save_otp(self, otp_secret_key):
         user = get_user_or_pre_auth_user(self.request)
-        if not user.mfa_force_enabled:
-            user.enable_mfa()
-            user.otp_secret_key = otp_secret_key
-            user.save()
+        user.enable_mfa()
+        user.otp_secret_key = otp_secret_key
+        user.save()
 
     def get_context_data(self, **kwargs):
         user = get_user_or_pre_auth_user(self.request)
