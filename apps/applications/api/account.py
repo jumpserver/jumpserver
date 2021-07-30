@@ -19,12 +19,10 @@ class AccountFilterSet(BaseFilterSet):
     username = filters.CharFilter(field_name='username')
     app = filters.CharFilter(field_name='applications', lookup_expr='exact')
     app_name = filters.CharFilter(field_name='app_name', lookup_expr='exact')
-    app_type = filters.CharFilter(field_name='app_type', lookup_expr='exact')
-    app_category = filters.CharFilter(field_name='app_category', lookup_expr='exact')
 
     class Meta:
         model = ApplicationPermission
-        fields = []
+        fields = ['type', 'category']
 
 
 class ApplicationAccountViewSet(JMSModelViewSet):
