@@ -82,8 +82,9 @@ class UserResetPasswordView(FormView):
         if not user:
             context['errors'] = _('Token invalid or expired')
             context['token_invalid'] = True
-        check_rules = get_password_check_rules(user)
-        context['password_check_rules'] = check_rules
+        else:
+            check_rules = get_password_check_rules(user)
+            context['password_check_rules'] = check_rules
         return context
 
     def form_valid(self, form):
