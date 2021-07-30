@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from django.db import models
 from django.db.models import Count
 from django.utils.translation import ugettext_lazy as _
@@ -67,7 +69,7 @@ class ApplicationTreeNodeMixin:
             i = root_node.id + '_' + category.value
             node = cls.create_choice_node(
                 category, i, pid=root_node.id, tp='category',
-                counts=counts, opened=True, show_empty=show_empty,
+                counts=counts, opened=False, show_empty=show_empty,
                 show_count=show_count
             )
             if not node:
@@ -84,7 +86,7 @@ class ApplicationTreeNodeMixin:
             pid = root_node.id + '_' + category.value
             i = root_node.id + '_' + tp.value
             node = cls.create_choice_node(
-                tp, i, pid, tp='type', counts=counts,
+                tp, i, pid, tp='type', counts=counts, opened=False,
                 show_empty=show_empty, show_count=show_count
             )
             if not node:
@@ -94,18 +96,13 @@ class ApplicationTreeNodeMixin:
 
     @staticmethod
     def get_tree_node_counts(queryset):
-        counts = {'applications': queryset.count()}
-        category_counts = queryset.annotate(count=Count('id'))\
-            .values('category', 'count') \
-            .order_by()
-        for item in category_counts:
-            counts[item['category']] = item['count']
-
-        type_counts = queryset.annotate(count=Count('id')) \
-            .values('type', 'count') \
-            .order_by()
-        for item in type_counts:
-            counts[item['type']] = item['count']
+        counts = defaultdict(int)
+        values = queryset.values_list('type', 'category')
+        for i in values:
+            tp = i[0]
+            category = i[1]
+            counts[tp] += 1
+            counts[category] += 1
         return counts
 
     @classmethod
