@@ -16,9 +16,7 @@ import json
 import yaml
 from importlib import import_module
 from django.urls import reverse_lazy
-from django.templatetags.static import static
 from urllib.parse import urljoin, urlparse
-from django.utils.translation import ugettext_lazy as _
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
@@ -244,7 +242,7 @@ class Config(dict):
         'TERMINAL_TELNET_REGEX': '',
         'TERMINAL_COMMAND_STORAGE': {},
 
-        'SECURITY_MFA_AUTH': False,
+        'SECURITY_MFA_AUTH': 0,  # 0 不开启 1 全局开启 2 管理员开启
         'SECURITY_COMMAND_EXECUTION': True,
         'SECURITY_SERVICE_ACCOUNT_REGISTRATION': True,
         'SECURITY_VIEW_AUTH_NEED_MFA': True,
@@ -253,6 +251,7 @@ class Config(dict):
         'SECURITY_MAX_IDLE_TIME': 30,
         'SECURITY_PASSWORD_EXPIRATION_TIME': 9999,
         'SECURITY_PASSWORD_MIN_LENGTH': 6,
+        'SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH': 6,
         'SECURITY_PASSWORD_UPPER_CASE': False,
         'SECURITY_PASSWORD_LOWER_CASE': False,
         'SECURITY_PASSWORD_NUMBER': False,

@@ -608,7 +608,7 @@ class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
             'isParent': True,
             'open': self.is_org_root(),
             'meta': {
-                'node': {
+                'data': {
                     "id": self.id,
                     "name": self.name,
                     "value": self.value,

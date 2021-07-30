@@ -464,14 +464,19 @@ class MFAMixin:
         (1, _('Enable')),
         (2, _("Force enable")),
     )
+    is_org_admin: bool
 
     @property
     def mfa_enabled(self):
-        return self.mfa_force_enabled or self.mfa_level > 0
+        if self.mfa_force_enabled:
+            return True
+        return self.mfa_level > 0
 
     @property
     def mfa_force_enabled(self):
-        if settings.SECURITY_MFA_AUTH:
+        if settings.SECURITY_MFA_AUTH in [True, 1]:
+            return True
+        if settings.SECURITY_MFA_AUTH == 2 and self.is_org_admin:
             return True
         return self.mfa_level == 2
 
