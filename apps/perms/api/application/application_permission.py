@@ -19,7 +19,7 @@ class ApplicationPermissionViewSet(BasePermissionViewSet):
     }
     search_fields = ['name', 'category', 'type']
     custom_filter_fields = BasePermissionViewSet.custom_filter_fields + [
-        'application_id', 'application'
+        'application_id', 'application', 'app', 'app_name'
     ]
 
     def get_queryset(self):
@@ -29,12 +29,15 @@ class ApplicationPermissionViewSet(BasePermissionViewSet):
         return queryset
 
     def filter_application(self, queryset):
-        application_id = self.request.query_params.get('application_id')
-        application_name = self.request.query_params.get('application')
-        if application_id:
-            applications = Application.objects.filter(pk=application_id)
-        elif application_name:
-            applications = Application.objects.filter(name=application_name)
+        app_id = self.request.query_params.get('application_id') or \
+                 self.request.query_params.get('app')
+        app_name = self.request.query_params.get('application') or \
+                   self.request.query_params.get('app_name')
+
+        if app_id:
+            applications = Application.objects.filter(pk=app_id)
+        elif app_name:
+            applications = Application.objects.filter(name=app_name)
         else:
             return queryset
         if not applications:

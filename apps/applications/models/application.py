@@ -1,7 +1,6 @@
 from collections import defaultdict
 
 from django.db import models
-from django.db.models import Count
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.models import OrgModelMixin
@@ -36,6 +35,10 @@ class ApplicationTreeNodeMixin:
             'iconSkin': '',
             'meta': {
                 'type': tp,
+                'data': {
+                    'name': c.name,
+                    'value': c.value
+                }
             }
         }
         return TreeNode(**data)
