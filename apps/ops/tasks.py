@@ -9,7 +9,7 @@ from celery.exceptions import SoftTimeLimitExceeded
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import get_logger, get_object_or_none, get_disk_usage, get_log_keep_day
+from common.utils import get_logger, get_object_or_none, get_log_keep_day
 from orgs.utils import tmp_to_root_org, tmp_to_org
 from .celery.decorator import (
     register_as_period_task, after_app_shutdown_clean_periodic,
@@ -20,7 +20,7 @@ from .celery.utils import (
     disable_celery_periodic_task, delete_celery_periodic_task
 )
 from .models import Task, CommandExecution, CeleryTask
-from .notifications import ServerPerformanceMessage
+from .notifications import ServerPerformanceCheckUtil
 
 logger = get_logger(__file__)
 
@@ -132,18 +132,7 @@ def create_or_update_registered_periodic_tasks():
 @shared_task
 @register_as_period_task(interval=3600)
 def check_server_performance_period():
-    if not settings.DISK_CHECK_ENABLED:
-        return
-    usages = get_disk_usage()
-    uncheck_paths = ['/etc', '/boot']
-
-    for path, usage in usages.items():
-        need_check = True
-        for uncheck_path in uncheck_paths:
-            if path.startswith(uncheck_path):
-                need_check = False
-        if need_check and usage.percent > 80:
-            ServerPerformanceMessage(path=path, usage=usage).publish()
+    ServerPerformanceCheckUtil().check_and_publish()
 
 
 @shared_task(queue="ansible")
