@@ -39,3 +39,4 @@ logs/*
 .vagrant/
 release/*
 releashe
+/apps/script.py

@@ -4831,6 +4831,33 @@ msgstr "所有资产使用相同的随机密码"
 msgid "All assets use different random password"
 msgstr "所有资产使用不同的随机密码"
 
+msgid "Append SSH KEY"
+msgstr "追加新密钥"
+
+msgid "Empty and append SSH KEY"
+msgstr "清空后所有密钥再追加新密钥"
+
+msgid "Empty current user and append SSH KEY"
+msgstr "清空当前账号密钥再追加新密钥"
+
+msgid "Change Password"
+msgstr "修改密码"
+
+msgid "Change SSH Key"
+msgstr "修改密钥"
+
+msgid "Require ssh key strategy or ssh key perform setting"
+msgstr "需要ssh密钥策略或ssh密钥执行设置"
+
+msgid "Require password strategy perform setting"
+msgstr "需要密码策略执行设置"
+
+msgid "Require password perform setting"
+msgstr "需要密码执行设置"
+
+msgid "Require password rule perform setting"
+msgstr "需要密码规则执行设置"
+
 #: xpack/plugins/change_auth_plan/models.py:65
 msgid "Password rules"
 msgstr "密码规则"
