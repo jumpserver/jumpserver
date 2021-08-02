@@ -3,8 +3,8 @@ ansible==2.9.24
 asn1crypto==0.24.0
 bcrypt==3.1.4
 billiard==3.6.3.0
-boto3==1.12.14
-botocore==1.15.26
+boto3==1.18.11
+botocore==1.21.11
 celery==4.4.2
 certifi==2018.1.18
 cffi==1.13.2
@@ -14,7 +14,7 @@ coreapi==2.3.3
 coreschema==0.0.4
 cryptography==3.3.2
 decorator==4.1.2
-Django==3.1.6
+Django==3.1.12
 django-auth-ldap==2.2.0
 django-bootstrap3==14.2.0
 django-celery-beat==2.0
@@ -49,7 +49,7 @@ olefile==0.44
 openapi-codec==1.3.2
 paramiko==2.7.2
 passlib==1.7.1
-Pillow==8.1.1
+Pillow==8.2.0
 pyasn1==0.4.8
 pycparser==2.19
 pycryptodome==3.10.1
@@ -61,14 +61,14 @@ python-dateutil==2.6.1
 pytz==2018.3
 PyYAML==5.1
 redis==3.5.3
-requests==2.22.0
-jms-storage==0.0.37
+requests==2.25.1
+jms-storage==0.0.38
 s3transfer==0.3.3
 simplejson==3.13.2
 six==1.11.0
 sshpubkeys==3.1.0
 uritemplate==3.0.0
-urllib3==1.25.2
+urllib3==1.26.5
 vine==1.3.0
 drf-yasg==1.20.0
 Werkzeug==0.15.3
