@@ -34,5 +34,4 @@ class Command(BaseCommand):
         parser.add_argument('service', choices=Services.all, type=str, help='Service name')
 
     def handle(self, *args, **options):
-        service_name = ''
-        pass
+        print('>>>>>>', options)
