@@ -184,7 +184,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         return Response(status=204)
 
 
-class UserChangePasswordApi(UserQuerysetMixin, generics.RetrieveUpdateAPIView):
+class UserChangePasswordApi(UserQuerysetMixin, generics.UpdateAPIView):
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.ChangeUserPasswordSerializer
 
