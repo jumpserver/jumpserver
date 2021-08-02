@@ -13,29 +13,42 @@ __all__ = [
 
 
 class ApplicationPermissionSerializer(BulkOrgResourceModelSerializer):
-    category_display = serializers.ReadOnlyField(source='get_category_display', label=_('Category'))
-    type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type'))
-    is_valid = serializers.BooleanField(read_only=True)
-    is_expired = serializers.BooleanField(read_only=True)
+    category_display = serializers.ReadOnlyField(source='get_category_display', label=_('Category display'))
+    type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type display'))
+    is_valid = serializers.BooleanField(read_only=True, label=_('Is valid'))
+    is_expired = serializers.BooleanField(read_only=True, label=_("Is expired"))
 
     class Meta:
         model = ApplicationPermission
         fields_mini = ['id', 'name']
         fields_small = fields_mini + [
-            'category', 'category_display', 'type', 'type_display', 'is_active', 'is_expired',
-            'is_valid', 'created_by', 'date_created', 'date_expired', 'date_start', 'comment'
+            'category', 'category_display', 'type', 'type_display',
+            'is_active', 'is_expired', 'is_valid',
+            'created_by', 'date_created', 'date_expired', 'date_start', 'comment'
         ]
         fields_m2m = [
             'users', 'user_groups', 'applications', 'system_users',
-            'users_amount', 'user_groups_amount', 'applications_amount', 'system_users_amount',
+            'users_amount', 'user_groups_amount', 'applications_amount',
+            'system_users_amount',
         ]
         fields = fields_small + fields_m2m
         read_only_fields = ['created_by', 'date_created']
+        extra_kwargs = {
+            'is_expired': {'label': _('Is expired')},
+            'is_valid': {'label': _('Is valid')},
+            'actions': {'label': _('Actions')},
+            'users_amount': {'label': _('Users amount')},
+            'user_groups_amount': {'label': _('User groups amount')},
+            'system_users_amount': {'label': _('System users amount')},
+            'applications_amount': {'label': _('Applications amount')},
+        }
 
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('users', 'user_groups', 'applications', 'system_users')
+        queryset = queryset.prefetch_related(
+            'users', 'user_groups', 'applications', 'system_users'
+        )
         return queryset
 
     def validate_applications(self, applications):

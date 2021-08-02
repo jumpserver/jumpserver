@@ -11,7 +11,7 @@ def migrate_security_mfa_auth(apps, schema_editor):
     if not mfa_setting:
         return
 
-    if mfa_setting.value:
+    if mfa_setting.value == 'true':
         mfa_setting.value = 1
     else:
         mfa_setting.value = 0

@@ -9,8 +9,8 @@ from .base import AuthSerializerMixin
 
 
 class DomainSerializer(BulkOrgResourceModelSerializer):
-    asset_count = serializers.SerializerMethodField(label=_('Assets count'))
-    application_count = serializers.SerializerMethodField(label=_('Applications count'))
+    asset_count = serializers.SerializerMethodField(label=_('Assets amount'))
+    application_count = serializers.SerializerMethodField(label=_('Applications amount'))
     gateway_count = serializers.SerializerMethodField(label=_('Gateways count'))
 
     class Meta:
