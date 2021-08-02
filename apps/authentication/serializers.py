@@ -198,7 +198,3 @@ class ConnectionTokenSecretSerializer(serializers.Serializer):
     actions = ActionsField()
     expired_at = serializers.IntegerField()
 
-
-class RDPFileSerializer(ConnectionTokenSerializer):
-    width = serializers.IntegerField(allow_null=True, max_value=3112, min_value=100, required=False)
-    height = serializers.IntegerField(allow_null=True, max_value=4096, min_value=100, required=False)
