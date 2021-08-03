@@ -6,13 +6,13 @@ import base64
 import string
 import random
 import datetime
+from typing import Callable
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.hashers import check_password, make_password
+from django.contrib.auth.hashers import check_password
 from django.core.cache import cache
 from django.db import models
-from django.db.models import TextChoices
 
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -22,7 +22,6 @@ from orgs.utils import current_org
 from orgs.models import OrganizationMember, Organization
 from common.utils import date_expired_default, get_logger, lazyproperty, random_string
 from common import fields
-from common.const import choices
 from common.db.models import TextChoices
 from users.exceptions import MFANotEnabled
 from ..signals import post_user_change_password
@@ -36,6 +35,9 @@ logger = get_logger(__file__)
 class AuthMixin:
     date_password_last_updated: datetime.datetime
     is_local: bool
+    set_password: Callable
+    save: Callable
+    history_passwords: models.Manager
 
     @property
     def password_raw(self):
@@ -73,7 +75,8 @@ class AuthMixin:
 
     def is_history_password(self, password):
         allow_history_password_count = settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT
-        history_passwords = self.history_passwords.all().order_by('-date_created')[:int(allow_history_password_count)]
+        history_passwords = self.history_passwords.all() \
+            .order_by('-date_created')[:int(allow_history_password_count)]
 
         for history_password in history_passwords:
             if check_password(password, history_password.password):
@@ -171,29 +174,24 @@ class AuthMixin:
 
 class RoleMixin:
     @lazyproperty
+    def perms(self):
+        from rbac.models import RoleBinding
+        return RoleBinding.get_user_perms(self)
+
+    @lazyproperty
     def roles(self):
-        from rbac.models import Role
-        system_roles_ids = list(self.system_roles.values_list('id', flat=True))
-        org_roles_ids = list(self.org_roles.values_list('id', flat=True))
-        roles_ids = system_roles_ids + org_roles_ids
-        roles = Role.objects.filter(id__in=roles_ids)
-        return roles
+        from rbac.models import RoleBinding
+        return RoleBinding.get_user_roles(self)
 
     @lazyproperty
     def system_roles(self):
-        from rbac.models import Role
-        roles_ids = self.role_bindings.filter(org=None).values_list('role_id', flat=True)
-        roles = Role.objects.filter(id__in=roles_ids, scope=Role.Scope.system)
-        return roles
+        from rbac.models import RoleBinding
+        return RoleBinding.get_user_system_roles(self)
 
     @lazyproperty
     def org_roles(self):
-        from rbac.models import Role
-        if current_org.is_root():
-            return self.system_roles
-        roles_ids = self.role_bindings.filter(org=current_org.id).values_list('role_id', flat=True)
-        roles = Role.objects.filter(id__in=roles_ids, scope=Role.Scope.org)
-        return roles
+        from rbac.models import RoleBinding
+        return RoleBinding.get_user_roles(self)
 
     def _get_roles_display(self, scope=None):
         if scope is None:
@@ -494,12 +492,6 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
 
-    @classmethod
-    def get_group_ids_by_user_id(cls, user_id):
-        group_ids = cls.groups.through.objects.filter(user_id=user_id).distinct().values_list('usergroup_id', flat=True)
-        group_ids = list(group_ids)
-        return group_ids
-
     @property
     def is_wecom_bound(self):
         return bool(self.wecom_id)
@@ -606,6 +598,11 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         if self.pk == 1 or self.username == 'admin':
             return
         return super(User, self).delete()
+
+    def has_perm(self, perm, obj=None):
+        has_perm = super().has_perm(perm, obj=obj)
+        print("has perm: {}".format(has_perm))
+        return has_perm
 
     @classmethod
     def get_user_allowed_auth_backends(cls, username):

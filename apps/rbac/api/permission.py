@@ -1,7 +1,9 @@
+from rest_framework.generics import ListAPIView
+
 from common.drf.api import JMSModelViewSet
-from common.permissions import IsOrgAdmin
-from ..models import Permission
-from ..serializers import PermissionSerializer
+from common.permissions import IsOrgAdmin, IsValidUser
+from ..models import Permission, RoleBinding
+from ..serializers import PermissionSerializer, UserPermsSerializer
 
 __all__ = ['PermissionViewSet']
 
@@ -14,3 +16,14 @@ class PermissionViewSet(JMSModelViewSet):
     def get_queryset(self):
         scope = self.request.query_params.get('scope')
         return Permission.get_permissions(scope)
+
+
+# class UserPermsApi(ListAPIView):
+#     serializer_class = UserPermsSerializer
+#     permission_classes = (IsValidUser,)
+#
+#     def list(self, request, *args, **kwargs):
+#         perms = RoleBinding.get_user_perms(request.user)
+#         serializer = super().get_serializer(data={'perms': perms})
+#         return Res
+

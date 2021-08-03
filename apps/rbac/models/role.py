@@ -2,9 +2,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 
 from common.db.models import JMSModel
-
+from orgs.utils import current_org
 from .permission import Permission
-from rbac import const
+from .. import const
 
 __all__ = ['Role', 'RoleBinding']
 
@@ -32,8 +32,10 @@ class Role(JMSModel):
     admin_name = 'SystemAdmin'
     system_admin_name = 'SystemAdmin'
     org_admin_name = 'OrgAdmin'
-    auditor_name = 'Auditor'
-    user_name = 'User'
+    system_auditor_name = 'SystemAuditor'
+    org_auditor_name = 'OrgAuditor'
+    system_user_name = 'SystemUser'
+    org_user_name = 'OrgUser'
     app_name = 'App'
 
     class Meta:
@@ -98,3 +100,45 @@ class RoleBinding(JMSModel):
     def save(self, *args, **kwargs):
         self.scope = self.role.scope
         return super().save(*args, **kwargs)
+
+    def get_perms(self):
+        perms = list(self.role.get_permissions().values_list(
+            'content_type__app_label', 'codename'
+        ))
+        return set(["%s.%s" % (ct, codename) for ct, codename in perms])
+
+    @classmethod
+    def get_binding_perms(cls, bindings):
+        perms = set()
+        for binding in bindings:
+            perms |= binding.get_perms()
+        return perms
+
+    @classmethod
+    def get_user_perms(cls, user):
+        q = models.Q(user=user, org__isnull=True, scope=cls.Scope.system)
+        if current_org and not current_org.is_root:
+            q |= models.Q(user=user, org=current_org.org_id, scope=cls.Scope.org)
+        bindings = cls.objects.filter(q)
+        perms = cls.get_binding_perms(bindings)
+        return perms
+
+    @classmethod
+    def get_user_system_roles(cls, user):
+        role_ids = cls.objects.filter(user=user, org__isnull=True, scope=cls.Scope.system)\
+            .values_list('role', flat=True)
+        roles = Role.objects.filter(id__in=role_ids)
+        return roles
+
+    @classmethod
+    def get_user_current_org_role(cls, user):
+        role_ids = cls.objects.filter(user=user, org=current_org, scope=cls.Scope.org)\
+            .values_list('role', flat=True)
+        roles = Role.objects.filter(id__in=role_ids)
+        return roles
+
+    @classmethod
+    def get_user_roles(cls, user):
+        role_ids = cls.objects.filter(user=user).values_list('role', flat=True)
+        roles = Role.objects.filter(id__in=role_ids)
+        return roles

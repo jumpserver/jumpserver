@@ -1,5 +1,4 @@
 from rest_framework import permissions, exceptions
-from orgs.utils import current_org
 
 
 class RBACPermission(permissions.DjangoModelPermissions):
@@ -43,14 +42,10 @@ class RBACPermission(permissions.DjangoModelPermissions):
                 'app_label': model_cls._meta.app_label,
                 'model_name': model_cls._meta.model_name
             }
-            if current_org and not current_org.is_root():
-                perm = f'org:{current_org.id}|{perm}'
             perms.add(perm)
         return perms
 
     def get_action_required_permissions(self, action, model_cls, view):
-        # scope|app-label.action_model-name
-        # org:00000000-0000-0000-0000-000000000002|assets.add_asset
         action_perms_map = self.get_action_perms_map(view)
 
         if action not in action_perms_map:
@@ -87,7 +82,5 @@ class RBACPermission(permissions.DjangoModelPermissions):
             perms = self.get_action_required_permissions(view.action, queryset.model, view)
         else:
             perms = self.get_required_permissions(request.method, queryset.model)
-
-        print("Require perms: ", perms)
         return request.user.has_perms(perms)
 

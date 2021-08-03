@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-from assets.api import FilterAssetByNodeMixin
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import RetrieveAPIView
 from django.shortcuts import get_object_or_404
@@ -9,7 +8,7 @@ from common.utils import get_logger, get_object_or_none
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, IsSuperUser
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
-from ..models import Asset, Node, Platform
+from assets.api import FilterAssetByNodeMixin
 from rbac.permissions import RBACPermission
 from ..models import Asset, Node, Platform
 from .. import serializers
@@ -46,7 +45,6 @@ class AssetViewSet(FilterAssetByNodeMixin, OrgBulkModelViewSet):
     serializer_classes = {
         'default': serializers.AssetSerializer,
     }
-    permission_classes = (RBACPermission,)
     extra_filter_backends = [FilterAssetByNodeFilterBackend, LabelFilterBackend, IpInFilterBackend]
 
     def set_assets_node(self, assets):

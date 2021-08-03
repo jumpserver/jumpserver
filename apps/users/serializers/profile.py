@@ -99,14 +99,17 @@ class UserProfileSerializer(UserSerializer):
     mfa_level = serializers.ChoiceField(choices=MFA_LEVEL_CHOICES, label=_('MFA'), required=False)
     guide_url = serializers.SerializerMethodField()
     orgs = UserOrgSerializer(many=True, read_only=True)
+    perms = serializers.ListField(label=_("Perms"), read_only=True)
 
     class Meta(UserSerializer.Meta):
-        fields = UserSerializer.Meta.fields + [
-            'public_key_comment', 'public_key_hash_md5', 'guide_url', 'orgs'
-        ]
         read_only_fields = [
-            'date_joined', 'last_login', 'created_by', 'source'
+            'date_joined', 'last_login', 'created_by', 'source',
         ]
+        fields = UserSerializer.Meta.fields + [
+            'public_key_comment', 'public_key_hash_md5', 'guide_url', 'orgs',
+            'perms',
+        ]
+
         extra_kwargs = dict(UserSerializer.Meta.extra_kwargs)
         extra_kwargs.update({
             'name': {'read_only': True, 'max_length': 128},
