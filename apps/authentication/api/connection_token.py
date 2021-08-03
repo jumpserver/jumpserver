@@ -22,6 +22,7 @@ from common.utils import get_logger, random_string
 from common.drf.api import SerializerMixin
 from common.permissions import IsSuperUserOrAppUser, IsValidUser, IsSuperUser
 from orgs.mixins.api import RootOrgViewMixin
+from common.http import is_true
 
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
@@ -50,7 +51,7 @@ class ClientProtocolMixin:
         options = {
             'full address:s': '',
             'username:s': '',
-            'screen mode id:i': '1',
+            # 'screen mode id:i': '1',
             # 'desktopwidth:i': '1280',
             # 'desktopheight:i': '800',
             'use multimon:i': '0',
@@ -82,8 +83,10 @@ class ClientProtocolMixin:
         asset, application, system_user, user = self.get_request_resource(serializer)
         height = self.request.query_params.get('height')
         width = self.request.query_params.get('width')
+        full_screen = is_true(self.request.query_params.get('full_screen'))
         token = self.create_token(user, asset, application, system_user)
 
+        options['screen mode id:i'] = '2' if full_screen else '1'
         address = settings.TERMINAL_RDP_ADDR
         if not address or address == 'localhost:3389':
             address = self.request.get_host().split(':')[0] + ':3389'
