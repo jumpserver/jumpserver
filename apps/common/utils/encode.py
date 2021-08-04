@@ -6,6 +6,7 @@ from six import string_types
 import base64
 import os
 import time
+from hashlib import md5
 import hashlib
 from io import StringIO
 from itertools import chain
@@ -21,7 +22,6 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models.fields.files import FileField
 
 from .http import http_date
-
 
 UUID_PATTERN = re.compile(r'[0-9a-zA-Z\-]{36}')
 
@@ -41,6 +41,7 @@ class Singleton(type):
 
 class Signer(metaclass=Singleton):
     """用来加密,解密,和基于时间戳的方式验证token"""
+
     def __init__(self, secret_key=None):
         self.secret_key = secret_key
 
@@ -86,6 +87,17 @@ def ssh_key_string_to_obj(text, password=None):
         return key
 
     return key
+
+
+def private_key_file(private_key, password=None):
+    project_dir = settings.PROJECT_DIR
+    tmp_dir = os.path.join(project_dir, 'tmp')
+    key_name = '.' + md5(private_key.encode('utf-8')).hexdigest()
+    key_path = os.path.join(tmp_dir, key_name)
+    if not os.path.exists(key_path):
+        ssh_key_string_to_obj(private_key, password=password).write_private_key_file(key_path)
+        os.chmod(key_path, 0o400)
+    return key_path
 
 
 def ssh_pubkey_gen(private_key=None, username='jumpserver', hostname='localhost', password=None):
@@ -230,4 +242,3 @@ def model_to_json(instance, sort_keys=True, indent=2, cls=None):
     if cls is None:
         cls = DjangoJSONEncoder
     return json.dumps(data, sort_keys=sort_keys, indent=indent, cls=cls)
-
