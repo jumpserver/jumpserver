@@ -49,11 +49,9 @@ class OrgModelMixin(models.Model):
 
     def save(self, *args, **kwargs):
         org = get_current_org()
-        if org.is_root():
-            if not self.org_id:
-                raise ValidationError('Please save in a organization')
-        else:
-            self.org_id = org.id
+        if org.is_root() and not self.org_id:
+            raise ValidationError('Please save in a organization')
+        self.org_id = org.id
         return super().save(*args, **kwargs)
 
     @property
