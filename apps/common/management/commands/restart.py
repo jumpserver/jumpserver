@@ -1,9 +1,10 @@
 from .services.command import ServiceBaseCommand
+import time
 
 
 class Command(ServiceBaseCommand):
-    help = 'Stop services'
+    help = 'Start services'
 
     def _handle(self):
         stop_daemon = str(self.Services.all) in self.services_names
-        self.services_util.stop(self.services, force=self.force, stop_daemon=stop_daemon)
+        self.services_util.restart(self.services, stop_daemon=stop_daemon)

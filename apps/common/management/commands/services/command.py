@@ -5,21 +5,27 @@ from .utils import ServicesUtil
 
 
 class ServiceBaseCommand(BaseCommand):
+    Services = Services
     help = 'Service Base Command'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.services_util = ServicesUtil()
+        self.services_names = []
         self.services = []
+        self.force = False
+        self.daemon = True
 
     def add_arguments(self, parser):
         parser.add_argument(
-            'services',  nargs='+', choices=Services.values, default=Services.all, help='Service'
+            'services',  nargs='+', choices=self.Services.values, default=self.Services.all,
+            help='Service'
         )
 
     def handle(self, *args, **options):
-        service_names = options.get('services')
-        services = Services.get_services(service_names)
+        services_names = options.get('services')
+        self.services_names = services_names
+        services = self.Services.get_services(services_names)
         self.services = list(services)
         self._handle()
 

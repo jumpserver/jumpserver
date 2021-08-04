@@ -2,7 +2,7 @@ from .services.command import ServiceBaseCommand
 
 
 class Command(ServiceBaseCommand):
-    help = 'Start services'
+    help = 'Show services status'
 
     def _handle(self):
-        self.services_util.start_and_watch(self.services, _daemon=self.daemon)
+        self.services_util.show_status(self.services)

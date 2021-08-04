@@ -1,4 +1,5 @@
 from ..hands import *
+import psutil
 
 
 class BaseService(object):
@@ -6,6 +7,7 @@ class BaseService(object):
     def __init__(self, name):
         self.name = name
         self.process = None
+        self.STOP_TIMEOUT = 10
 
     @property
     def is_running(self):
@@ -81,8 +83,33 @@ class BaseService(object):
         self.open_subprocess()
         self.write_pid()
 
-    def stop(self):
-        pass
+    def stop(self, force=True):
+        if not self.is_running:
+            self.show_status()
+            self.remove_pid()
+            return
+
+        print(f'Stop service: {self.name}', end='')
+
+        sig = 9 if force else 15
+        os.kill(self.pid, sig)
+
+        try:
+            self.process.wait(1)
+        except:
+            pass
+
+        for i in range(self.STOP_TIMEOUT):
+            if i == self.STOP_TIMEOUT - 1:
+                print("\033[31m Error\033[0m")
+            if not self.is_running:
+                print("\033[32m Ok\033[0m")
+                break
+            else:
+                time.sleep(1)
+                continue
+
+        self.remove_pid()
 
     def watch(self):
         pass
