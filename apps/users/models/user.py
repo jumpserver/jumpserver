@@ -217,7 +217,7 @@ class RoleMixin:
     @property
     def is_superuser(self):
         from rbac.models import Role
-        role = Role.get_builtin_role(name=Role.admin_name, scope=Role.Scope.system)
+        role = Role.get_builtin_role(name=Role.system_admin_name, scope=Role.Scope.system)
         return role in self.system_roles
 
     @property
@@ -554,7 +554,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         if self.username == 'admin':
             self.role = 'Admin'
             self.is_active = True
-        super().save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     def is_member_of(self, user_group):
         if user_group in self.groups.all():

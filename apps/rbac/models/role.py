@@ -29,7 +29,6 @@ class Role(JMSModel):
     builtin = models.BooleanField(default=False, verbose_name=_('Built-in'))
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
 
-    admin_name = 'SystemAdmin'
     system_admin_name = 'SystemAdmin'
     org_admin_name = 'OrgAdmin'
     system_auditor_name = 'SystemAuditor'
@@ -66,6 +65,19 @@ class Role(JMSModel):
     @classmethod
     def get_builtin_role(cls, name, scope):
         return cls.objects.filter(name=name, scope=scope, builtin=True).first()
+
+    @classmethod
+    def create_builtin_roles(cls):
+        scope_role_names_mapper = {
+            cls.Scope.system: [
+                cls.system_admin_name, cls.system_auditor_name, cls.system_user_name,
+                cls.app_name,
+            ],
+            cls.Scope.org: [cls.org_admin_name, cls.org_auditor_name, cls.org_user_name]
+        }
+        for scope, role_names in scope_role_names_mapper.items():
+            for name in role_names:
+                cls.objects.create(name=name, scope=scope, builtin=True)
 
 
 class RoleBinding(JMSModel):
