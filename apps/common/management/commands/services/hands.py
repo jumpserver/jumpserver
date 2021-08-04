@@ -28,6 +28,7 @@ from apps.jumpserver.const import CONFIG
 WORKERS = 4
 HTTP_HOST = CONFIG.HTTP_BIND_HOST or '127.0.0.1'
 HTTP_PORT = CONFIG.HTTP_LISTEN_PORT or 8080
+WS_PORT = CONFIG.WS_LISTEN_PORT or 8082
 DEBUG = CONFIG.DEBUG or False
 BASE_DIR = os.path.dirname(settings.BASE_DIR)
 LOG_DIR = os.path.join(BASE_DIR, 'logs')

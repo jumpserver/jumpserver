@@ -19,14 +19,12 @@ class ServiceBaseCommand(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
             'services',  nargs='+', choices=self.Services.values, default=self.Services.all,
-            help='Service'
+            help='Service',
         )
 
     def handle(self, *args, **options):
-        services_names = options.get('services')
-        self.services_names = services_names
-        services = self.Services.get_services(services_names)
-        self.services = list(services)
+        self.services_names = options.get('services')
+        self.services = self.Services.get_services(self.services_names)
         self._handle()
 
     @abc.abstractmethod

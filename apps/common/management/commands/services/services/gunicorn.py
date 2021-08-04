@@ -1,6 +1,8 @@
 from ..hands import *
 from .base import BaseService
 
+__all__ = ['GunicornService']
+
 
 class GunicornService(BaseService):
 
@@ -9,6 +11,8 @@ class GunicornService(BaseService):
 
     @property
     def cmd(self):
+        print("\n- Start Gunicorn WSGI HTTP Server")
+
         log_format = '%(h)s %(t)s %(L)ss "%(r)s" %(s)s %(b)s '
         bind = f'{HTTP_HOST}:{HTTP_PORT}'
         cmd = [

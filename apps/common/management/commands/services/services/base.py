@@ -1,8 +1,9 @@
 from ..hands import *
-import psutil
+from ..const import Services
 
 
 class BaseService(object):
+    Services = Services
 
     def __init__(self, name):
         self.name = name

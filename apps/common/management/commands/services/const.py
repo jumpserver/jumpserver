@@ -1,5 +1,4 @@
 from .hands import *
-from .services.gunicorn import GunicornService
 
 
 class Services(TextChoices):
@@ -9,17 +8,28 @@ class Services(TextChoices):
     celery_default = 'celery_default', 'celery_default'
     beat = 'beat', 'beat'
     flower = 'flower', 'flower'
+    ws = 'ws', 'ws'
     web = 'web', 'web'
     celery = 'celery', 'celery'
     task = 'task', 'task'
     all = 'all', 'all'
 
     @classmethod
-    def get_services_object(cls, name):
+    def get_service_object_class(cls, name):
+        from . import services
         services_map = {
-            cls.gunicorn.value: GunicornService
+            cls.gunicorn.value: services.GunicornService,
+            cls.daphne: services.DaphneService,
+            cls.flower: services.DaphneService,
+            cls.celery_default: services.CeleryDefaultService,
+            cls.celery_ansible: services.CeleryAnsibleService,
+            cls.beat: services.BeatService
         }
         return services_map.get(name)
+
+    @classmethod
+    def ws_services(cls):
+        return [cls.daphne]
 
     @classmethod
     def web_services(cls):
@@ -52,7 +62,7 @@ class Services(TextChoices):
 
         service_objects = []
         for s in services:
-            service_class = cls.get_services_object(s.value)
+            service_class = cls.get_service_object_class(s.value)
             if not service_class:
                 continue
             service_objects.append(service_class())
