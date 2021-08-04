@@ -33,7 +33,6 @@ class Role(JMSModel):
     org_admin_name = 'OrgAdmin'
     system_auditor_name = 'SystemAuditor'
     org_auditor_name = 'OrgAuditor'
-    system_user_name = 'SystemUser'
     org_user_name = 'OrgUser'
     app_name = 'App'
 
