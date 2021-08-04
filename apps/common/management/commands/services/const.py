@@ -55,6 +55,5 @@ class Services(TextChoices):
             service_class = cls.get_services_object(s.value)
             if not service_class:
                 continue
-            service_object = service_class()
-            service_objects.append(service_object)
+            service_objects.append(service_class())
         return service_objects

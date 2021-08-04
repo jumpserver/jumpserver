@@ -36,13 +36,13 @@ class ServicesUtil(object):
             time.sleep(2)
             self.services[service.name] = service
 
-    def stop(self):
-        for name, service in self.services.items():
+    def stop(self, services):
+        for name, service in services:
             service.stop()
 
-    def check(self):
+    def check(self, services):
         now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        for name, service in self.services.items():
+        for name, service in services.items():
             service: BaseService
             print(f"{now} Check service status: {name} -> ", end='')
             try:
