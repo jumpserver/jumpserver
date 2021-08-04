@@ -172,6 +172,10 @@ class Migration(migrations.Migration):
                 ('org', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='role_bindings', to='orgs.organization', verbose_name='Organization')),
                 ('role', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='role_bindings', to='rbac.role', verbose_name='Role')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='role_bindings', to=settings.AUTH_USER_MODEL, verbose_name='User')),
+                ('created_by', models.CharField(blank=True, max_length=32, null=True, verbose_name='Created by')),
+                ('updated_by', models.CharField(blank=True, max_length=32, null=True, verbose_name='Updated by')),
+                ('date_created', models.DateTimeField(auto_now_add=True, null=True, verbose_name='Date created')),
+                ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
             ],
             options={
                 'verbose_name': 'Role binding',
