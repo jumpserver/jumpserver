@@ -1,5 +1,6 @@
+from collections import defaultdict
+
 from django.db import models
-from django.db.models import Count
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.models import OrgModelMixin
@@ -16,17 +17,16 @@ class ApplicationTreeNodeMixin:
     category: str
 
     @classmethod
-    def create_choice_node(cls, c, pid, tp, opened=False, counts=None,
+    def create_choice_node(cls, c, id_, pid, tp, opened=False, counts=None,
                            show_empty=True, show_count=True):
-        count = counts.get(c.name, 0)
+        count = counts.get(c.value, 0)
         if count == 0 and not show_empty:
             return None
-        name = c.name
         label = c.label
         if count is not None and show_count:
             label = '{} ({})'.format(label, count)
         data = {
-            'id': name,
+            'id': id_,
             'name': label,
             'title': label,
             'pId': pid,
@@ -35,6 +35,10 @@ class ApplicationTreeNodeMixin:
             'iconSkin': '',
             'meta': {
                 'type': tp,
+                'data': {
+                    'name': c.name,
+                    'value': c.value
+                }
             }
         }
         return TreeNode(**data)
@@ -65,9 +69,10 @@ class ApplicationTreeNodeMixin:
         nodes = []
         categories = const.AppType.category_types_mapper().keys()
         for category in categories:
+            i = root_node.id + '_' + category.value
             node = cls.create_choice_node(
-                category, pid=root_node.id, tp='category',
-                counts=counts, opened=True, show_empty=show_empty,
+                category, i, pid=root_node.id, tp='category',
+                counts=counts, opened=False, show_empty=show_empty,
                 show_count=show_count
             )
             if not node:
@@ -76,13 +81,15 @@ class ApplicationTreeNodeMixin:
         return nodes
 
     @classmethod
-    def create_types_tree_nodes(cls, counts, show_empty=True, show_count=True):
+    def create_types_tree_nodes(cls, root_node, counts, show_empty=True, show_count=True):
         nodes = []
         type_category_mapper = const.AppType.type_category_mapper()
         for tp in const.AppType.type_category_mapper().keys():
             category = type_category_mapper.get(tp)
+            pid = root_node.id + '_' + category.value
+            i = root_node.id + '_' + tp.value
             node = cls.create_choice_node(
-                tp, pid=category.name, tp='type', counts=counts,
+                tp, i, pid, tp='type', counts=counts, opened=False,
                 show_empty=show_empty, show_count=show_count
             )
             if not node:
@@ -92,23 +99,18 @@ class ApplicationTreeNodeMixin:
 
     @staticmethod
     def get_tree_node_counts(queryset):
-        counts = {'applications': queryset.count()}
-        category_counts = queryset.values('category') \
-            .annotate(count=Count('id')) \
-            .order_by()
-        for item in category_counts:
-            counts[item['category']] = item['count']
-
-        type_counts = queryset.values('type') \
-            .annotate(count=Count('id')) \
-            .order_by()
-        for item in type_counts:
-            counts[item['type']] = item['count']
+        counts = defaultdict(int)
+        values = queryset.values_list('type', 'category')
+        for i in values:
+            tp = i[0]
+            category = i[1]
+            counts[tp] += 1
+            counts[category] += 1
         return counts
 
     @classmethod
     def create_tree_nodes(cls, queryset, root_node=None, show_empty=True, show_count=True):
-        counts = cls.get_tree_node_counts(queryset) if show_count else {}
+        counts = cls.get_tree_node_counts(queryset)
         tree_nodes = []
 
         # 根节点有可能是组织名称
@@ -124,15 +126,17 @@ class ApplicationTreeNodeMixin:
 
         # 类型的节点
         tree_nodes += cls.create_types_tree_nodes(
-            counts, show_empty=show_empty, show_count=show_count
+            root_node, counts, show_empty=show_empty,
+            show_count=show_count
         )
 
         # 应用的节点
         for app in queryset:
-            tree_nodes.append(app.as_tree_node())
+            pid = root_node.id + '_' + app.type
+            tree_nodes.append(app.as_tree_node(pid))
         return tree_nodes
 
-    def as_tree_node(self):
+    def as_tree_node(self, pid):
         icon_skin_category_mapper = {
             'remote_app': 'chrome',
             'db': 'database',
@@ -143,7 +147,7 @@ class ApplicationTreeNodeMixin:
             'id': str(self.id),
             'name': self.name,
             'title': self.name,
-            'pId': str(self.type),
+            'pId': pid,
             'isParent': False,
             'open': False,
             'iconSkin': icon_skin,

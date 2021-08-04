@@ -92,8 +92,9 @@ class Message(metaclass=MessageType):
 
     def get_email_msg(self) -> dict:
         msg = self.get_common_msg()
+        subject = f'{msg[:20]} ...' if len(msg) >= 20 else msg
         return {
-            'subject': msg,
+            'subject': subject,
             'message': msg
         }
 

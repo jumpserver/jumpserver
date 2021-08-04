@@ -19,19 +19,17 @@ class AccountFilterSet(BaseFilterSet):
     username = filters.CharFilter(field_name='username')
     app = filters.CharFilter(field_name='applications', lookup_expr='exact')
     app_name = filters.CharFilter(field_name='app_name', lookup_expr='exact')
-    app_type = filters.CharFilter(field_name='app_type', lookup_expr='exact')
-    app_category = filters.CharFilter(field_name='app_category', lookup_expr='exact')
 
     class Meta:
         model = ApplicationPermission
-        fields = []
+        fields = ['type', 'category']
 
 
 class ApplicationAccountViewSet(JMSModelViewSet):
     permission_classes = (IsOrgAdmin, )
     search_fields = ['username', 'app_name']
     filterset_class = AccountFilterSet
-    filterset_fields = ['username', 'app_name', 'app_type', 'app_category']
+    filterset_fields = ['username', 'app_name', 'type', 'category']
     serializer_class = serializers.ApplicationAccountSerializer
 
     http_method_names = ['get', 'put', 'patch', 'options']
@@ -47,10 +45,8 @@ class ApplicationAccountViewSet(JMSModelViewSet):
             .annotate(password=F('system_users__password')) \
             .annotate(app=F('applications')) \
             .annotate(app_name=F("applications__name")) \
-            .annotate(app_category=F("applications__category")) \
-            .annotate(app_type=F("applications__type"))\
             .values('username', 'password', 'systemuser', 'systemuser_display',
-                    'app', 'app_name', 'app_category', 'app_type', 'uid')
+                    'app', 'app_name', 'category', 'type', 'uid')
         return queryset
 
     def get_object(self):

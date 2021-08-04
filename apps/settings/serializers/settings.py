@@ -143,9 +143,13 @@ class TerminalSettingSerializer(serializers.Serializer):
 
 
 class SecuritySettingSerializer(serializers.Serializer):
-    SECURITY_MFA_AUTH = serializers.BooleanField(
-        required=False, label=_("Global MFA auth"),
-        help_text=_('All user enable MFA')
+    SECURITY_MFA_AUTH = serializers.ChoiceField(
+        choices=(
+            [0, _('Disable')],
+            [1, _('All users')],
+            [2, _('Only admin users')],
+        ),
+        required=False, label=_("Global MFA auth")
     )
     SECURITY_COMMAND_EXECUTION = serializers.BooleanField(
         required=False, label=_('Batch command execution'),
@@ -182,6 +186,10 @@ class SecuritySettingSerializer(serializers.Serializer):
     SECURITY_PASSWORD_MIN_LENGTH = serializers.IntegerField(
         min_value=6, max_value=30, required=True,
         label=_('Password minimum length')
+    )
+    SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH = serializers.IntegerField(
+        min_value=6, max_value=30, required=True,
+        label=_('Admin user password minimum length')
     )
     SECURITY_PASSWORD_UPPER_CASE = serializers.BooleanField(
         required=False, label=_('Must contain capital')

@@ -45,8 +45,8 @@ class ApplicationSerializerMixin(serializers.Serializer):
 
 
 class ApplicationSerializer(ApplicationSerializerMixin, BulkOrgResourceModelSerializer):
-    category_display = serializers.ReadOnlyField(source='get_category_display', label=_('Category(Display)'))
-    type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type(Dispaly)'))
+    category_display = serializers.ReadOnlyField(source='get_category_display', label=_('Category display'))
+    type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type display'))
 
     class Meta:
         model = models.Application
@@ -75,10 +75,10 @@ class ApplicationAccountSerializer(serializers.Serializer):
     app = serializers.ReadOnlyField(label=_('App'))
     uid = serializers.ReadOnlyField(label=_("Union id"))
     app_name = serializers.ReadOnlyField(label=_("Application name"), read_only=True)
-    app_category = serializers.ChoiceField(label=_('Category'), choices=const.AppCategory.choices, read_only=True)
-    app_category_display = serializers.SerializerMethodField(label=_('Category'))
-    app_type = serializers.ChoiceField(label=_('Type'), choices=const.AppType.choices, read_only=True)
-    app_type_display = serializers.SerializerMethodField(label=_('Type'))
+    category = serializers.ChoiceField(label=_('Category'), choices=const.AppCategory.choices, read_only=True)
+    category_display = serializers.SerializerMethodField(label=_('Category display'))
+    type = serializers.ChoiceField(label=_('Type'), choices=const.AppType.choices, read_only=True)
+    type_display = serializers.SerializerMethodField(label=_('Type display'))
 
     category_mapper = dict(const.AppCategory.choices)
     type_mapper = dict(const.AppType.choices)
@@ -89,11 +89,11 @@ class ApplicationAccountSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         pass
 
-    def get_app_category_display(self, obj):
-        return self.category_mapper.get(obj['app_category'])
+    def get_category_display(self, obj):
+        return self.category_mapper.get(obj['category'])
 
-    def get_app_type_display(self, obj):
-        return self.type_mapper.get(obj['app_type'])
+    def get_type_display(self, obj):
+        return self.type_mapper.get(obj['type'])
 
 
 class ApplicationAccountSecretSerializer(ApplicationAccountSerializer):
