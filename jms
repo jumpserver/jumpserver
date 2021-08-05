@@ -3,19 +3,11 @@
 
 import os
 import subprocess
-import threading
-import datetime
 import logging
 import logging.handlers
-import psutil
 import time
 import argparse
 import sys
-import shutil
-import signal
-from collections import defaultdict
-import daemon
-from daemon import pidfile
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, BASE_DIR)
@@ -40,28 +32,11 @@ except ImportError as e:
     sys.exit(1)
 
 os.environ["PYTHONIOENCODING"] = "UTF-8"
-APPS_DIR = os.path.join(BASE_DIR, 'apps')
-LOG_DIR = os.path.join(BASE_DIR, 'logs')
-TMP_DIR = os.path.join(BASE_DIR, 'tmp')
-HTTP_HOST = CONFIG.HTTP_BIND_HOST or '127.0.0.1'
-HTTP_PORT = CONFIG.HTTP_LISTEN_PORT or 8080
-WS_PORT = CONFIG.WS_LISTEN_PORT or 8082
-DEBUG = CONFIG.DEBUG or False
-LOG_LEVEL = CONFIG.LOG_LEVEL or 'INFO'
 
-START_TIMEOUT = 40
-WORKERS = 4
-DAEMON = False
-LOG_KEEP_DAYS = 7
 logging.basicConfig(
     format='%(asctime)s %(message)s', level=logging.INFO,
     datefmt='%Y-%m-%d %H:%M:%S'
 )
-
-EXIT_EVENT = threading.Event()
-LOCK = threading.Lock()
-files_preserve = []
-STOP_TIMEOUT = 10
 
 logger = logging.getLogger()
 
@@ -76,8 +51,8 @@ def check_database_connection():
     os.chdir(os.path.join(BASE_DIR, 'apps'))
     for i in range(60):
         logging.info("Check database connection ...")
-        code = subprocess.call("python manage.py showmigrations users ", shell=True)
-        if code == 0:
+        _code = subprocess.call("python manage.py showmigrations users ", shell=True)
+        if _code == 0:
             logging.info("Database connect success")
             return
         time.sleep(1)
@@ -86,9 +61,9 @@ def check_database_connection():
 
 
 def check_migrations():
-    apps_dir = os.path.join(BASE_DIR, 'apps')
-    cmd = "python manage.py showmigrations | grep '\[.\]' | grep -v '\[X\]'"
-    _code = subprocess.call(cmd, shell=True, cwd=apps_dir)
+    _apps_dir = os.path.join(BASE_DIR, 'apps')
+    _cmd = "python manage.py showmigrations | grep '\[.\]' | grep -v '\[X\]'"
+    _code = subprocess.call(_cmd, shell=True, cwd=_apps_dir)
 
     if _code == 1:
         return
@@ -99,8 +74,8 @@ def check_migrations():
 
 
 def expire_caches():
-    apps_dir = os.path.join(BASE_DIR, 'apps')
-    _code = subprocess.call("python manage.py expire_caches", shell=True, cwd=apps_dir)
+    _apps_dir = os.path.join(BASE_DIR, 'apps')
+    _code = subprocess.call("python manage.py expire_caches", shell=True, cwd=_apps_dir)
 
     if _code == 1:
         return
@@ -116,8 +91,8 @@ def perform_db_migrate():
 def collect_static():
     logging.info("Collect static files")
     os.chdir(os.path.join(BASE_DIR, 'apps'))
-    command = 'python3 manage.py collectstatic --no-input -c &> /dev/null '
-    subprocess.call(command, shell=True)
+    _cmd = 'python3 manage.py collectstatic --no-input -c &> /dev/null '
+    subprocess.call(_cmd, shell=True)
     logging.info("Collect static files done")
 
 
@@ -150,7 +125,10 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         "services", type=str, default="all", nargs="+",
-        choices=("all", "web", "task", "gunicorn", "celery", "beat", "celery,beat", "flower", "ws"),
+        choices=(
+            "all", "web", "task", "gunicorn", "celery", "celery_ansible", "celery_default",
+            "beat", "flower", "daphne", "ws"
+        ),
         help="The service to start",
     )
     parser.add_argument('-d', '--daemon', nargs="?", const=1)
@@ -164,18 +142,16 @@ if __name__ == '__main__':
         upgrade_db()
     else:
         services = args.services or ['all']
-        services_string = ' '.join(services)
         if action == 'start' and ({'gunicorn', 'all'} & set(services)):
             prepare()
-        start_cmd = f'python manage.py {args.action} {services_string}'
+
+        services_string = ' '.join(services)
+        cmd = f'python manage.py {args.action} {services_string}'
         if args.daemon:
-            start_cmd += ' --daemon'
+            cmd += ' --daemon'
         if args.worker:
-            start_cmd += f' --worker {args.worker}'
+            cmd += f' --worker {args.worker}'
         if args.force:
-            start_cmd += ' --force'
-        code = subprocess.call(start_cmd, shell=True)
-        # apps_dir = os.path.join(BASE_DIR, 'apps')
-        # code = subprocess.call(start_cmd, shell=True, cwd=apps_dir)
-        # if code == 1:
-        #     pass
+            cmd += ' --force'
+        apps_dir = os.path.join(BASE_DIR, 'apps')
+        code = subprocess.call(cmd, shell=True, cwd=apps_dir)
