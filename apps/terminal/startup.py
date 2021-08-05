@@ -11,8 +11,6 @@ from .models.terminal import Terminal
 
 __all__ = ['CoreTerminal', 'CeleryTerminal']
 
-logger = get_logger(__name__)
-
 
 class BaseTerminal(object):
 
@@ -24,7 +22,7 @@ class BaseTerminal(object):
         self.type = _type
 
     def start_heartbeat_thread(self):
-        logger.info(f'Start {self.name} heartbeat thread')
+        print(f'Start {self.name} heartbeat thread')
         t = threading.Thread(target=self.start_heartbeat)
         t.setDaemon(True)
         t.start()

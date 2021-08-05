@@ -57,7 +57,6 @@ class ServicesUtil(object):
                 print('Start stop services')
                 break
 
-        time.sleep(1)
         self.clean_up()
 
     def _watch(self):
