@@ -48,6 +48,22 @@ class ServicesUtil(object):
         if stop_daemon:
             self.stop_daemon()
 
+    # -- watch --
+    def watch(self):
+        while not self.EXIT_EVENT.is_set():
+            try:
+                with self.LOCK:
+                    self.__check_processes()
+                if self.stopped_services:
+                    self.__restart_for_stopped()
+                self.__rotate_log()
+                time.sleep(30)
+            except KeyboardInterrupt:
+                print("Start stop service")
+                time.sleep(1)
+                break
+        self.clean_up()
+
     def __check_processes(self):
         now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         for name, service in self.process_services.items():
@@ -77,28 +93,39 @@ class ServicesUtil(object):
             self.services_retry[name] += 1
 
     def __rotate_log(self):
-        pass
+        now = datetime.datetime.now()
+        _time = now.strftime('%H:%M')
+        if _time != '23:59':
+            return
 
-    def watch(self):
-        while not self.EXIT_EVENT.is_set():
-            try:
-                with self.LOCK:
-                    self.__check_processes()
-                if self.stopped_services:
-                    self.__restart_for_stopped()
-                self.__rotate_log()
-                time.sleep(30)
-            except KeyboardInterrupt:
-                print("Start stop service")
-                time.sleep(1)
-                break
-        self.clean_up()
+        backup_date = now.strftime('%Y-%m-%d')
+        for name, service in self.process_services.items():
+            service: BaseService
+            backup_log_dir = os.path.join(service.log_dir, backup_date)
+            if not os.path.exists(backup_log_dir):
+                os.mkdir(backup_log_dir)
+
+            backup_log_path = os.path.join(backup_log_dir, service.log_filename)
+            if os.path.isfile(service.log_filepath) and not os.path.isfile(backup_log_path):
+                logging.info(f'Rotate log file: {service.log_filepath} => {backup_log_path}')
+                shutil.copy(service.log_filepath, backup_log_path)
+                with open(service.log_filepath, 'w') as f:
+                    pass
+
+        to_delete_date = now - datetime.timedelta(days=LOG_KEEP_DAYS)
+        to_delete_dir = os.path.join(LOG_DIR, to_delete_date.strftime('%Y-%m-%d'))
+        if os.path.exists(to_delete_dir):
+            logging.info(f'Remove old log: {to_delete_dir}')
+            shutil.rmtree(to_delete_dir, ignore_errors=True)
+
+    # -- end watch --
 
     def clean_up(self):
         if not self.EXIT_EVENT.is_set():
             self.EXIT_EVENT.set()
         process_services = {name: service for name, service in self.process_services.items()}
         for name, service in process_services.items():
+            service: BaseService
             service.stop()
             service.process.wait()
             self.process_services.pop(service.name, None)

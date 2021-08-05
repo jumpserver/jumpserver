@@ -41,8 +41,16 @@ class BaseService(object):
     # -- log --
 
     @property
+    def log_filename(self):
+        return f'{self.name}.log'
+
+    @property
     def log_filepath(self):
-        return os.path.join(LOG_DIR, f'{self.name}.log')
+        return os.path.join(LOG_DIR, self.log_filename)
+
+    @property
+    def log_dir(self):
+        return os.path.dirname(self.log_filepath)
 
     # -- end log --
 
