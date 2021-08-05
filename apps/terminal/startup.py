@@ -22,7 +22,7 @@ class BaseTerminal(object):
         self.type = _type
 
     def start_heartbeat_thread(self):
-        print(f'Start {self.name} heartbeat thread')
+        print(f'-- Start {self.name} heartbeat thread')
         t = threading.Thread(target=self.start_heartbeat)
         t.setDaemon(True)
         t.start()
