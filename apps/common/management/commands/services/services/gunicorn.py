@@ -6,8 +6,9 @@ __all__ = ['GunicornService']
 
 class GunicornService(BaseService):
 
-    def __init__(self):
-        super().__init__(name='gunicorn')
+    def __init__(self, **kwargs):
+        self.worker = kwargs.get('worker') or 4
+        super().__init__(**kwargs)
 
     @property
     def cmd(self):
@@ -20,7 +21,7 @@ class GunicornService(BaseService):
             '-b', bind,
             '-k', 'gthread',
             '--threads', '10',
-            '-w', str(WORKERS),
+            '-w', str(self.worker),
             '--max-requests', '4096',
             '--access-logformat', log_format,
             '--access-logfile', '-'

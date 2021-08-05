@@ -5,8 +5,8 @@ from ..const import Services
 class BaseService(object):
     Services = Services
 
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, **kwargs):
+        self.name = kwargs['name']
         self.process = None
         self.STOP_TIMEOUT = 10
 

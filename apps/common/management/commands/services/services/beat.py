@@ -6,8 +6,8 @@ __all__ = ['BeatService']
 
 class BeatService(BaseService):
 
-    def __init__(self):
-        super().__init__(name=self.Services.beat.value)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     @property
     def cmd(self):

@@ -4,10 +4,10 @@ from .base import BaseService
 
 class CeleryBaseService(BaseService):
 
-    def __init__(self, name, num: int, queue: str):
-        super().__init__(name=name)
-        self.num = num
+    def __init__(self, queue, num=10, **kwargs):
+        super().__init__(**kwargs)
         self.queue = queue
+        self.num = num
 
     @property
     def cmd(self):

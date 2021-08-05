@@ -6,8 +6,8 @@ __all__ = ['DaphneService']
 
 class DaphneService(BaseService):
 
-    def __init__(self):
-        super().__init__(name=self.Services.daphne.value)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     @property
     def cmd(self):

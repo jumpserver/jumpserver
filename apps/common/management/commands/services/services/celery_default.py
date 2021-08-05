@@ -5,6 +5,7 @@ __all__ = ['CeleryDefaultService']
 
 class CeleryDefaultService(CeleryBaseService):
 
-    def __init__(self):
-        super().__init__(name=self.Services.celery_default.value, num=10, queue='celery')
+    def __init__(self, **kwargs):
+        kwargs['queue'] = 'celery'
+        super().__init__(**kwargs)
 

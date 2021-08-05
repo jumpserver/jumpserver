@@ -20,7 +20,7 @@ class Services(TextChoices):
         services_map = {
             cls.gunicorn.value: services.GunicornService,
             cls.daphne: services.DaphneService,
-            cls.flower: services.DaphneService,
+            cls.flower: services.FlowerService,
             cls.celery_default: services.CeleryDefaultService,
             cls.celery_ansible: services.CeleryAnsibleService,
             cls.beat: services.BeatService
@@ -48,7 +48,7 @@ class Services(TextChoices):
         return cls.web_services() + cls.task_services()
 
     @classmethod
-    def get_services(cls, names):
+    def get_services(cls, names, **kwargs):
         services = set()
         for name in names:
             method_name = f'{name}_services'
@@ -65,5 +65,9 @@ class Services(TextChoices):
             service_class = cls.get_service_object_class(s.value)
             if not service_class:
                 continue
-            service_objects.append(service_class())
+            kwargs.update({
+                'name': s.value
+            })
+            service_object = service_class(**kwargs)
+            service_objects.append(service_object)
         return service_objects
