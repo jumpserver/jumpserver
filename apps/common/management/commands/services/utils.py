@@ -6,13 +6,9 @@ from .services.base import BaseService
 class ServicesUtil(object):
 
     def __init__(self):
-        self.process_services = {}
-        self.stopped_services = {}
-        self.services_retry = defaultdict(int)
-        self.max_retry = 3
-        self.files_preserve = []
+        self.services_map = {}
+        self.files_preserve_map = {}
         self.EXIT_EVENT = threading.Event()
-        self.LOCK = threading.Lock()
 
     def restart(self, services, stop_daemon=False):
         self.stop(services=services, stop_daemon=stop_daemon)
@@ -37,8 +33,9 @@ class ServicesUtil(object):
                 service.show_status()
                 continue
             service.start()
+            self.files_preserve_map[service.name] = service.log_file
             time.sleep(2)
-            self.process_services[service.name] = service
+            self.services_map[service.name] = service
 
     def stop(self, services, force=True, stop_daemon=False):
         for service in services:
@@ -52,83 +49,34 @@ class ServicesUtil(object):
     def watch(self):
         while not self.EXIT_EVENT.is_set():
             try:
-                with self.LOCK:
-                    self.__check_processes()
-                if self.stopped_services:
-                    self.__restart_for_stopped()
-                self.__rotate_log()
+                go_on = self._watch()
+                if not go_on:
+                    break
                 time.sleep(30)
             except KeyboardInterrupt:
-                print("Start stop service")
-                time.sleep(1)
+                print('Start stop services')
                 break
+
+        time.sleep(1)
         self.clean_up()
 
-    def __check_processes(self):
-        now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        for name, service in self.process_services.items():
+    def _watch(self):
+        for name, service in self.services_map.items():
             service: BaseService
-            print(f"{now} Check service status: {service.name} -> ", end='')
-            try:
-                service.process.wait(timeout=1)  # 不wait，子进程可能无法回收
-            except subprocess.TimeoutExpired:
-                pass
-            if service.is_running:
-                print(f'running at {service.process.pid}')
-                self.stopped_services.pop(name, None)
-                self.services_retry.pop(name, None)
-            else:
-                self.stopped_services[name] = service
-                print(f'stopped with code: {service.process.returncode}({service.process.pid})')
-
-    def __restart_for_stopped(self):
-        for name, service in self.stopped_services.items():
-            retry = self.services_retry[name]
-            if retry > self.max_retry:
-                logging.info("Service start failed, exit: ", name)
+            service.watch()
+            if service.EXIT_EVENT.is_set():
                 self.EXIT_EVENT.set()
-                continue
-            service.start()
-            logging.info(f'> Find {name} stopped, retry {retry+1}, {service.process.pid}')
-            self.services_retry[name] += 1
-
-    def __rotate_log(self):
-        now = datetime.datetime.now()
-        _time = now.strftime('%H:%M')
-        if _time != '23:59':
-            return
-
-        backup_date = now.strftime('%Y-%m-%d')
-        for name, service in self.process_services.items():
-            service: BaseService
-            backup_log_dir = os.path.join(service.log_dir, backup_date)
-            if not os.path.exists(backup_log_dir):
-                os.mkdir(backup_log_dir)
-
-            backup_log_path = os.path.join(backup_log_dir, service.log_filename)
-            if os.path.isfile(service.log_filepath) and not os.path.isfile(backup_log_path):
-                logging.info(f'Rotate log file: {service.log_filepath} => {backup_log_path}')
-                shutil.copy(service.log_filepath, backup_log_path)
-                with open(service.log_filepath, 'w') as f:
-                    pass
-
-        to_delete_date = now - datetime.timedelta(days=LOG_KEEP_DAYS)
-        to_delete_dir = os.path.join(LOG_DIR, to_delete_date.strftime('%Y-%m-%d'))
-        if os.path.exists(to_delete_dir):
-            logging.info(f'Remove old log: {to_delete_dir}')
-            shutil.rmtree(to_delete_dir, ignore_errors=True)
-
+                return False
+        return True
     # -- end watch --
 
     def clean_up(self):
         if not self.EXIT_EVENT.is_set():
             self.EXIT_EVENT.set()
-        process_services = {name: service for name, service in self.process_services.items()}
-        for name, service in process_services.items():
+        for name, service in self.services_map.items():
             service: BaseService
             service.stop()
             service.process.wait()
-            self.process_services.pop(service.name, None)
 
     def show_status(self, services):
         for service in services:
@@ -184,7 +132,7 @@ class ServicesUtil(object):
             },
             stdout=daemon_log_file,
             stderr=daemon_log_file,
-            files_preserve=self.files_preserve,
+            files_preserve=list(self.files_preserve_map.values()),
             detach_process=True,
         )
         return context

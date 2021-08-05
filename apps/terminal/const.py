@@ -46,6 +46,7 @@ class TerminalTypeChoices(TextChoices):
     xrdp = 'xrdp', 'Xrdp'
     lion = 'lion', 'Lion'
     core = 'core', 'Core'
+    celery = 'celery', 'Celery'
 
     @classmethod
     def types(cls):

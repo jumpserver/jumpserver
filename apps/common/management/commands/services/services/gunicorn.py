@@ -33,3 +33,8 @@ class GunicornService(BaseService):
     @property
     def cwd(self):
         return APPS_DIR
+
+    def start_other(self):
+        from terminal.startup import CoreTerminal
+        core_terminal = CoreTerminal()
+        core_terminal.start_heartbeat_thread()

@@ -9,3 +9,8 @@ class CeleryDefaultService(CeleryBaseService):
         kwargs['queue'] = 'celery'
         super().__init__(**kwargs)
 
+    def start_other(self):
+        from terminal.startup import CeleryTerminal
+        celery_terminal = CeleryTerminal()
+        celery_terminal.start_heartbeat_thread()
+
