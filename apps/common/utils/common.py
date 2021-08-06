@@ -7,8 +7,6 @@ import logging
 import datetime
 import uuid
 from functools import wraps
-import string
-import random
 import time
 import ipaddress
 import psutil
@@ -242,11 +240,8 @@ class lazyproperty:
             return value
 
 
-def get_disk_usage():
-    partitions = psutil.disk_partitions()
-    mount_points = [p.mountpoint for p in partitions]
-    usages = {p: psutil.disk_usage(p) for p in mount_points}
-    return usages
+def get_disk_usage(path):
+    return psutil.disk_usage(path=path).percent
 
 
 def get_cpu_load():
@@ -257,7 +252,7 @@ def get_cpu_load():
     return float(single_cpu_load_1)
 
 
-def get_memory_used():
+def get_memory_usage():
     return psutil.virtual_memory().percent
 
 

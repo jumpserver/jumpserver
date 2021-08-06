@@ -301,7 +301,6 @@ class Config(dict):
         'CONNECTION_TOKEN_ENABLED': False,
         'ONLY_ALLOW_EXIST_USER_AUTH': False,
         'ONLY_ALLOW_AUTH_FROM_SOURCE': False,
-        'DISK_CHECK_ENABLED': True,
         'SESSION_SAVE_EVERY_REQUEST': True,
         'SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE': False,
         'FORGOT_PASSWORD_URL': '',

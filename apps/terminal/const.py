@@ -45,6 +45,8 @@ class TerminalTypeChoices(TextChoices):
     omnidb = 'omnidb', 'OmniDB'
     xrdp = 'xrdp', 'Xrdp'
     lion = 'lion', 'Lion'
+    core = 'core', 'Core'
+    celery = 'celery', 'Celery'
 
     @classmethod
     def types(cls):
