@@ -22,7 +22,7 @@ class BaseTerminal(object):
         self.type = _type
 
     def start_heartbeat_thread(self):
-        print(f'-- Start {self.name} heartbeat thread')
+        print(f'- Start heartbeat thread => ({self.name})')
         t = threading.Thread(target=self.start_heartbeat)
         t.setDaemon(True)
         t.start()
@@ -45,7 +45,7 @@ class BaseTerminal(object):
             time.sleep(self.interval)
 
     def get_or_register_terminal(self):
-        terminal = Terminal.objects.filter(name=self.name, type=self.type).first()
+        terminal = Terminal.objects.filter(name=self.name, type=self.type, is_deleted=False).first()
         if not terminal:
             terminal = self.register_terminal()
         return terminal

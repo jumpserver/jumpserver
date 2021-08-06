@@ -9,6 +9,7 @@ class ServicesUtil(object):
         self.services_map = {}
         self.files_preserve_map = {}
         self.EXIT_EVENT = threading.Event()
+        self.check_interval = 5
 
     def restart(self, services, stop_daemon=False):
         self.stop(services=services, stop_daemon=stop_daemon)
@@ -29,12 +30,9 @@ class ServicesUtil(object):
     def start(self, services):
         for service in services:
             service: BaseService
-            if service.is_running:
-                service.show_status()
-                continue
             service.start()
             self.files_preserve_map[service.name] = service.log_file
-            time.sleep(2)
+            time.sleep(1)
             self.services_map[service.name] = service
 
     def stop(self, services, force=True, stop_daemon=False):
@@ -52,7 +50,7 @@ class ServicesUtil(object):
                 go_on = self._watch()
                 if not go_on:
                     break
-                time.sleep(30)
+                time.sleep(self.check_interval)
             except KeyboardInterrupt:
                 print('Start stop services')
                 break
@@ -75,7 +73,6 @@ class ServicesUtil(object):
         for name, service in self.services_map.items():
             service: BaseService
             service.stop()
-            service.process.wait()
 
     def show_status(self, services):
         for service in services:

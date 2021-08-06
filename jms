@@ -131,9 +131,9 @@ if __name__ == '__main__':
         ),
         help="The service to start",
     )
-    parser.add_argument('-d', '--daemon', nargs="?", const=1)
+    parser.add_argument('-d', '--daemon', nargs="?", const=True)
     parser.add_argument('-w', '--worker', type=int, nargs="?", const=4)
-    parser.add_argument('-f', '--force', nargs="?", const=1)
+    parser.add_argument('-f', '--force', nargs="?", const=True)
 
     args = parser.parse_args()
 
@@ -154,6 +154,7 @@ if __name__ == '__main__':
         if args.force:
             cmd += ' --force'
         apps_dir = os.path.join(BASE_DIR, 'apps')
+
         try:
             # processes: main(3s) -> call(0.25s) -> service -> sub-process
             code = subprocess.run(cmd, shell=True, cwd=apps_dir)

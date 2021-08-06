@@ -22,9 +22,9 @@ class ServiceBaseCommand(BaseCommand):
             'services',  nargs='+', choices=self.Services.values, default=self.Services.all,
             help='Service',
         )
-        parser.add_argument('-d', '--daemon', nargs="?", const=1)
+        parser.add_argument('-d', '--daemon', nargs="?", const=True)
         parser.add_argument('-w', '--worker', type=int, nargs="?", const=4)
-        parser.add_argument('-f', '--force', nargs="?", const=1)
+        parser.add_argument('-f', '--force', nargs="?", const=True)
 
     def handle(self, *args, **options):
         self.daemon = options.get('daemon', False)

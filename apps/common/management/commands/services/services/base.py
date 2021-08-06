@@ -91,6 +91,9 @@ class BaseService(object):
         self.process = subprocess.Popen(self.cmd, **kwargs)
 
     def start(self):
+        if self.is_running:
+            self.show_status()
+            return
         self.remove_pid()
         self.open_subprocess()
         self.write_pid()
@@ -102,7 +105,6 @@ class BaseService(object):
     def stop(self, force=True):
         if not self.is_running:
             self.show_status()
-            self.remove_pid()
             return
 
         print(f'Stop service: {self.name}', end='')
@@ -120,12 +122,11 @@ class BaseService(object):
                 print("\033[31m Error\033[0m")
             if not self.is_running:
                 print("\033[32m Ok\033[0m")
+                self.remove_pid()
                 break
             else:
                 time.sleep(1)
                 continue
-
-        self.remove_pid()
 
     def watch(self):
         with self.LOCK:
