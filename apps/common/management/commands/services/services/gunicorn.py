@@ -28,6 +28,7 @@ class GunicornService(BaseService):
         ]
         if DEBUG:
             cmd.append('--reload')
+        print('>>>: gunicorn cmd: ',  ' '.join(cmd))
         return cmd
 
     @property

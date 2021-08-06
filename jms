@@ -125,14 +125,11 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         "services", type=str, default='all', nargs="*",
-        choices=(
-            "all", "web", "task", "gunicorn", "celery", "celery_ansible", "celery_default",
-            "beat", "flower", "daphne", "ws"
-        ),
+        choices=("all", "web", "task"),
         help="The service to start",
     )
     parser.add_argument('-d', '--daemon', nargs="?", const=True)
-    parser.add_argument('-w', '--worker', type=int, nargs="?", const=4)
+    parser.add_argument('-w', '--worker', type=int, nargs="?", default=4)
     parser.add_argument('-f', '--force', nargs="?", const=True)
 
     args = parser.parse_args()
@@ -142,8 +139,8 @@ if __name__ == '__main__':
         upgrade_db()
     else:
         services = args.services if isinstance(args.services, list) else [args.services]
-        if action == 'start' and ({'gunicorn', 'all'} & set(services)):
-            prepare()
+        # if action == 'start' and ({'gunicorn', 'all'} & set(services)):
+        #     prepare()
 
         services_string = ' '.join(services)
         cmd = f'python manage.py {args.action} {services_string}'
@@ -157,6 +154,7 @@ if __name__ == '__main__':
 
         try:
             # processes: main(3s) -> call(0.25s) -> service -> sub-process
+            # pass
             code = subprocess.run(cmd, shell=True, cwd=apps_dir)
         except KeyboardInterrupt:
             time.sleep(1)

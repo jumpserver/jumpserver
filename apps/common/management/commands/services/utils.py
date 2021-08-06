@@ -1,3 +1,8 @@
+import threading
+import signal
+import time
+import daemon
+from daemon import pidfile
 from .hands import *
 from .hands import __version__
 from .services.base import BaseService
@@ -73,7 +78,7 @@ class ServicesUtil(object):
             self.EXIT_EVENT.set()
         for service in self._services:
             service: BaseService
-            service.stop()
+            service.stop(force=self.force_stop)
 
     def show_status(self):
         for service in self._services:

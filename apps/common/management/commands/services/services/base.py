@@ -1,16 +1,21 @@
+import abc
+import time
+import shutil
+import datetime
+import threading
+import subprocess
 from ..hands import *
-from ..const import Services
 
 
 class BaseService(object):
-    Services = Services
 
     def __init__(self, **kwargs):
         self.name = kwargs['name']
         self.process = None
         self.STOP_TIMEOUT = 10
-        self.max_retry = 3
+        self.max_retry = 0
         self.retry = 0
+        self.LOG_KEEP_DAYS = 7
         self.EXIT_EVENT = threading.Event()
         self.LOCK = threading.Lock()
 
@@ -105,7 +110,7 @@ class BaseService(object):
     def stop(self, force=True):
         if not self.is_running:
             self.show_status()
-            self.remove_pid()
+            # self.remove_pid()
             return
 
         print(f'Stop service: {self.name}', end='')
@@ -113,7 +118,8 @@ class BaseService(object):
         os.kill(self.pid, sig)
 
         try:
-            self.process.wait(2)
+            pass
+            # self.process.wait(2)
         except:
             pass
 
@@ -174,7 +180,7 @@ class BaseService(object):
             with open(self.log_filepath, 'w') as f:
                 pass
 
-        to_delete_date = now - datetime.timedelta(days=LOG_KEEP_DAYS)
+        to_delete_date = now - datetime.timedelta(days=self.LOG_KEEP_DAYS)
         to_delete_dir = os.path.join(LOG_DIR, to_delete_date.strftime('%Y-%m-%d'))
         if os.path.exists(to_delete_dir):
             logging.info(f'Remove old log: {to_delete_dir}')
