@@ -2,13 +2,9 @@ from typing import Iterable, AnyStr
 
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import APIException
-from requests.exceptions import ReadTimeout
-import requests
-from django.core.cache import cache
 
 from common.utils.common import get_logger
 from common.message.backends.utils import digest, DictWrapper, update_values, set_default
-from common.message.backends.utils import request
 from common.message.backends.mixin import RequestMixin, BaseRequest
 
 logger = get_logger(__name__)
@@ -48,7 +44,7 @@ class WeComRequests(BaseRequest):
     - 确保 status_code == 200
     - 确保 access_token 无效时重试
     """
-    invalid_token_errcode = ErrorCode.INVALID_TOKEN
+    invalid_token_errcodes = (ErrorCode.INVALID_TOKEN,)
 
     def __init__(self, corpid, corpsecret, agentid, timeout=None):
         self._corpid = corpid
@@ -68,35 +64,9 @@ class WeComRequests(BaseRequest):
         expires_in = data['expires_in']
         return access_token, expires_in
 
-    @request
-    def get(self, url, params=None, with_token=True,
-            check_errcode_is_0=True, **kwargs):
-        # self.request ...
-        pass
-
-    @request
-    def post(self, url, params=None, json=None,
-             with_token=True, check_errcode_is_0=True,
-             **kwargs):
-        # self.request ...
-        pass
-
-    def request(self, method, url,
-                params=None,
-                with_token=True,
-                check_errcode_is_0=True,
-                **kwargs):
-
-        if not isinstance(params, dict):
-            params = {}
-
-        if with_token:
-            params['access_token'] = self.access_token
-
-        data = self.raw_request(method, url, params=params, **kwargs)
-        if check_errcode_is_0:
-            self.check_errcode_is_0(data)
-        return data
+    def add_token(self, kwargs: dict):
+        params = kwargs.setdefault('params', {})
+        params['access_token'] = self.access_token
 
 
 class WeCom(RequestMixin):

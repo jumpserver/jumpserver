@@ -2,8 +2,7 @@ import time
 import hmac
 import base64
 
-from common.message.backends.utils import request
-from common.message.backends.utils import digest
+from common.message.backends.utils import digest, as_request
 from common.message.backends.mixin import BaseRequest
 
 
@@ -34,7 +33,7 @@ class URL:
 
 
 class DingTalkRequests(BaseRequest):
-    invalid_token_errcode = ErrorCode.INVALID_TOKEN
+    invalid_token_errcodes = (ErrorCode.INVALID_TOKEN,)
 
     def __init__(self, appid, appsecret, agentid, timeout=None):
         self._appid = appid
@@ -55,21 +54,26 @@ class DingTalkRequests(BaseRequest):
         expires_in = data['expires_in']
         return access_token, expires_in
 
-    @request
+    def add_token(self, kwargs: dict):
+        params = kwargs.setdefault('params', {})
+        params['access_token'] = self.access_token
+
     def get(self, url, params=None,
             with_token=False, with_sign=False,
             check_errcode_is_0=True,
             **kwargs):
         pass
+    get = as_request(get)
 
-    @request
     def post(self, url, json=None, params=None,
              with_token=False, with_sign=False,
              check_errcode_is_0=True,
              **kwargs):
         pass
+    post = as_request(post)
 
-    def _add_sign(self, params: dict):
+    def _add_sign(self, kwargs: dict):
+        params = kwargs.setdefault('params', {})
         timestamp = str(int(time.time() * 1000))
         signature = sign(self._appsecret, timestamp)
         accessKey = self._appid
@@ -78,23 +82,17 @@ class DingTalkRequests(BaseRequest):
         params['signature'] = signature
         params['accessKey'] = accessKey
 
-    def request(self, method, url, params=None,
+    def request(self, method, url,
                 with_token=False, with_sign=False,
                 check_errcode_is_0=True,
                 **kwargs):
-        if not isinstance(params, dict):
-            params = {}
-
-        if with_token:
-            params['access_token'] = self.access_token
 
         if with_sign:
-            self._add_sign(params)
+            self._add_sign(kwargs)
 
-        data = self.raw_request(method, url, params=params, **kwargs)
-        if check_errcode_is_0:
-            self.check_errcode_is_0(data)
-
+        data = super().request(
+            method, url, with_token=with_token,
+            check_errcode_is_0=check_errcode_is_0, **kwargs)
         return data
 
 
