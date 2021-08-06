@@ -118,8 +118,7 @@ class BaseService(object):
         os.kill(self.pid, sig)
 
         try:
-            pass
-            # self.process.wait(2)
+            self.process.wait(2)
         except:
             pass
 
