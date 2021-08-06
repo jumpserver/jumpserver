@@ -14,7 +14,7 @@ class BaseService(object):
         self.process = None
         self.STOP_TIMEOUT = 10
         self.max_retry = 0
-        self.retry = 0
+        self.retry = 3
         self.LOG_KEEP_DAYS = 7
         self.EXIT_EVENT = threading.Event()
         self.LOCK = threading.Lock()

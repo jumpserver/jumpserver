@@ -16,7 +16,7 @@ class ServicesUtil(object):
         self.force_stop = force_stop
         self.daemon_stop = daemon_stop
         self.EXIT_EVENT = threading.Event()
-        self.check_interval = 5
+        self.check_interval = 30
         self.files_preserve_map = {}
 
     def restart(self):

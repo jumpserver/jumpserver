@@ -139,8 +139,8 @@ if __name__ == '__main__':
         upgrade_db()
     else:
         services = args.services if isinstance(args.services, list) else [args.services]
-        # if action == 'start' and ({'gunicorn', 'all'} & set(services)):
-        #     prepare()
+        if action == 'start' and ({'gunicorn', 'all'} & set(services)):
+            prepare()
 
         services_string = ' '.join(services)
         cmd = f'python manage.py {args.action} {services_string}'
