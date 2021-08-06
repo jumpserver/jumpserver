@@ -124,7 +124,7 @@ if __name__ == '__main__':
         help="Action to run"
     )
     parser.add_argument(
-        "services", type=str, default="all", nargs="+",
+        "services", type=str, default='all', nargs="*",
         choices=(
             "all", "web", "task", "gunicorn", "celery", "celery_ansible", "celery_default",
             "beat", "flower", "daphne", "ws"
@@ -141,7 +141,7 @@ if __name__ == '__main__':
     if action == "upgrade_db":
         upgrade_db()
     else:
-        services = args.services or ['all']
+        services = args.services if isinstance(args.services, list) else [args.services]
         if action == 'start' and ({'gunicorn', 'all'} & set(services)):
             prepare()
 

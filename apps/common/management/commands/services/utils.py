@@ -5,42 +5,44 @@ from .services.base import BaseService
 
 class ServicesUtil(object):
 
-    def __init__(self):
-        self.services_map = {}
-        self.files_preserve_map = {}
+    def __init__(self, services, daemon_run=False, force_stop=True, daemon_stop=False):
+        self._services = services
+        self.daemon_run = daemon_run
+        self.force_stop = force_stop
+        self.daemon_stop = daemon_stop
         self.EXIT_EVENT = threading.Event()
         self.check_interval = 5
+        self.files_preserve_map = {}
 
-    def restart(self, services, stop_daemon=False):
-        self.stop(services=services, stop_daemon=stop_daemon)
+    def restart(self):
+        self.stop()
         time.sleep(5)
-        self.start_and_watch(services, _daemon=True)
+        self.start_and_watch()
 
-    def start_and_watch(self, services, _daemon=False):
+    def start_and_watch(self):
         logging.info(time.ctime())
         logging.info(f'JumpServer version {__version__}, more see https://www.jumpserver.org')
-        self.start(services)
-        if _daemon:
-            self.show_status(services)
+        self.start()
+        if self.daemon_run:
+            self.show_status()
             with self.daemon_context:
                 self.watch()
         else:
             self.watch()
 
-    def start(self, services):
-        for service in services:
+    def start(self):
+        for service in self._services:
             service: BaseService
             service.start()
             self.files_preserve_map[service.name] = service.log_file
             time.sleep(1)
-            self.services_map[service.name] = service
 
-    def stop(self, services, force=True, stop_daemon=False):
-        for service in services:
+    def stop(self):
+        for service in self._services:
             service: BaseService
-            service.stop(force=force)
+            service.stop(force=self.force_stop)
 
-        if stop_daemon:
+        if self.daemon_stop:
             self.stop_daemon()
 
     # -- watch --
@@ -58,7 +60,7 @@ class ServicesUtil(object):
         self.clean_up()
 
     def _watch(self):
-        for name, service in self.services_map.items():
+        for service in self._services:
             service: BaseService
             service.watch()
             if service.EXIT_EVENT.is_set():
@@ -70,12 +72,12 @@ class ServicesUtil(object):
     def clean_up(self):
         if not self.EXIT_EVENT.is_set():
             self.EXIT_EVENT.set()
-        for name, service in self.services_map.items():
+        for service in self._services:
             service: BaseService
             service.stop()
 
-    def show_status(self, services):
-        for service in services:
+    def show_status(self):
+        for service in self._services:
             service: BaseService
             service.show_status()
 

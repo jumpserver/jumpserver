@@ -108,7 +108,6 @@ class BaseService(object):
             return
 
         print(f'Stop service: {self.name}', end='')
-
         sig = 9 if force else 15
         os.kill(self.pid, sig)
 
@@ -130,12 +129,12 @@ class BaseService(object):
 
     def watch(self):
         with self.LOCK:
-            self.__check()
+            self._check()
         if not self.is_running:
-            self.__restart()
-        self.__rotate_log()
+            self._restart()
+        self._rotate_log()
 
-    def __check(self):
+    def _check(self):
         now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         print(f"{now} Check service status: {self.name} -> ", end='')
         try:
@@ -147,16 +146,16 @@ class BaseService(object):
         else:
             print(f'stopped with code: {self.process.returncode}({self.process.pid})')
 
-    def __restart(self):
+    def _restart(self):
         if self.retry > self.max_retry:
             logging.info("Service start failed, exit: ", self.name)
             self.EXIT_EVENT.set()
             return
-        self.start()
         self.retry += 1
         logging.info(f'> Find {self.name} stopped, retry {self.retry}, {self.process.pid}')
+        self.start()
 
-    def __rotate_log(self):
+    def _rotate_log(self):
         now = datetime.datetime.now()
         _time = now.strftime('%H:%M')
         if _time != '23:59':

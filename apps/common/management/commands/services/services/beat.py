@@ -34,7 +34,7 @@ class BeatService(BaseService):
         if not self.lock.acquire(timeout=10):
             print('No acquired beat distribute start lock', end='')
             return
-        print("Get beat lock and start to run it", end='')
+        print("\n- Get beat lock and start to run it", end='')
         super().open_subprocess()
         if self.lock.locked():
             self.lock.release()

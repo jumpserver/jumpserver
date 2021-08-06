@@ -1,10 +1,6 @@
-from .services.command import ServiceBaseCommand
-import time
+from .services.command import ServiceBaseCommand, Action
 
 
 class Command(ServiceBaseCommand):
-    help = 'Start services'
-
-    def _handle(self):
-        stop_daemon = str(self.Services.all) in self.services_names
-        self.services_util.restart(self.services, stop_daemon=stop_daemon)
+    help = 'Restart services'
+    action = Action.restart.value

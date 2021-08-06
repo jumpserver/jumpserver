@@ -48,9 +48,9 @@ class Services(TextChoices):
         return cls.web_services() + cls.task_services()
 
     @classmethod
-    def get_services(cls, names, **kwargs):
+    def get_service_objects(cls, service_names, **kwargs):
         services = set()
-        for name in names:
+        for name in service_names:
             method_name = f'{name}_services'
             if hasattr(cls, method_name):
                 _services = getattr(cls, method_name)()

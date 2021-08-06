@@ -1,8 +1,6 @@
-from .services.command import ServiceBaseCommand
+from .services.command import ServiceBaseCommand, Action
 
 
 class Command(ServiceBaseCommand):
     help = 'Show services status'
-
-    def _handle(self):
-        self.services_util.show_status(self.services)
+    action = Action.status.value
