@@ -1,5 +1,4 @@
 import os
-import abc
 from django.core.management.base import BaseCommand
 from django.db.models import TextChoices
 from .const import Services
@@ -13,7 +12,7 @@ class Action(TextChoices):
     restart = 'restart', 'restart'
 
 
-class ServiceBaseCommand(BaseCommand):
+class BaseActionCommand(BaseCommand):
     help = 'Service Base Command'
 
     action = None
@@ -33,7 +32,7 @@ class ServiceBaseCommand(BaseCommand):
     def initial_util(self, *args, **options):
         service_names = options.get('services')
         service_kwargs = {
-            'worker_g_unicorn': options.get('worker', 4)
+            'worker_gunicorn': options.get('worker', 4)
         }
         services = Services.get_service_objects(service_names=service_names, **service_kwargs)
 
@@ -46,6 +45,7 @@ class ServiceBaseCommand(BaseCommand):
         self.util = ServicesUtil(**kwargs)
 
     def handle(self, *args, **options):
+        self.initial_util(*args, **options)
         assert self.action in Action.values, f'The action {self.action} is not in the optional list'
         _handle = getattr(self, f'_handle_{self.action}', lambda: None)
         _handle()

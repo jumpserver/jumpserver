@@ -49,14 +49,13 @@ class ServicesUtil(object):
     def watch(self):
         while not self.EXIT_EVENT.is_set():
             try:
-                go_on = self._watch()
-                if not go_on:
+                _exit = self._watch()
+                if _exit:
                     break
                 time.sleep(self.check_interval)
             except KeyboardInterrupt:
                 print('Start stop services')
                 break
-
         self.clean_up()
 
     def _watch(self):
@@ -65,8 +64,8 @@ class ServicesUtil(object):
             service.watch()
             if service.EXIT_EVENT.is_set():
                 self.EXIT_EVENT.set()
-                return False
-        return True
+                return True
+        return False
     # -- end watch --
 
     def clean_up(self):

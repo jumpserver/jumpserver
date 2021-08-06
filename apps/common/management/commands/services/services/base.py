@@ -105,6 +105,7 @@ class BaseService(object):
     def stop(self, force=True):
         if not self.is_running:
             self.show_status()
+            self.remove_pid()
             return
 
         print(f'Stop service: {self.name}', end='')

@@ -1,6 +1,6 @@
-from .services.command import ServiceBaseCommand, Action
+from .services.command import BaseActionCommand, Action
 
 
-class Command(ServiceBaseCommand):
+class Command(BaseActionCommand):
     help = 'Show services status'
     action = Action.status.value
