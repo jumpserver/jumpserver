@@ -154,7 +154,6 @@ if __name__ == '__main__':
 
         try:
             # processes: main(3s) -> call(0.25s) -> service -> sub-process
-            # pass
             code = subprocess.run(cmd, shell=True, cwd=apps_dir)
         except KeyboardInterrupt:
             time.sleep(1)

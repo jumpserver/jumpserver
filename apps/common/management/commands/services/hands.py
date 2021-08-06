@@ -24,17 +24,3 @@ BASE_DIR = os.path.dirname(settings.BASE_DIR)
 LOG_DIR = os.path.join(BASE_DIR, 'logs')
 APPS_DIR = os.path.join(BASE_DIR, 'apps')
 TMP_DIR = os.path.join(BASE_DIR, 'tmp')
-
-
-"""
-import datetime
-import threading
-import subprocess
-from daemon import pidfile
-from collections import defaultdict
-import abc
-import time
-import signal
-import daemon
-import shutil
-"""
