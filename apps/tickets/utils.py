@@ -26,9 +26,10 @@ EMAIL_TEMPLATE = '''
 
 
 def send_ticket_applied_mail_to_assignees(ticket):
-    if not ticket.assignees:
+    assignees = ticket.current_node.first().ticket_assignees.all()
+    if not assignees:
         logger.debug("Not found assignees, ticket: {}({}), assignees: {}".format(
-            ticket, str(ticket.id), ticket.assignees)
+            ticket, str(ticket.id), assignees)
         )
         return
 
@@ -42,24 +43,24 @@ def send_ticket_applied_mail_to_assignees(ticket):
     )
     if settings.DEBUG:
         logger.debug(message)
-    recipient_list = [assignee.email for assignee in ticket.assignees.all()]
+    recipient_list = [i.assignee.email for i in assignees]
     send_mail_async.delay(subject, message, recipient_list, html_message=message)
 
 
-def send_ticket_processed_mail_to_applicant(ticket):
+def send_ticket_processed_mail_to_applicant(ticket, processor):
     if not ticket.applicant:
         logger.error("Not found applicant: {}({})".format(ticket.title, ticket.id))
         return
-
+    processor_display = str(processor)
     ticket_detail_url = urljoin(settings.SITE_URL, const.TICKET_DETAIL_URL.format(id=str(ticket.id)))
-    subject = _('Ticket has processed - {} ({})').format(ticket.title, ticket.processor_display)
+    subject = _('Ticket has processed - {} ({})').format(ticket.title, processor_display)
     message = EMAIL_TEMPLATE.format(
-        title=_('Your ticket has been processed, processor - {}').format(ticket.processor_display),
+        title=_('Your ticket has been processed, processor - {}').format(processor_display),
         ticket_detail_url=ticket_detail_url,
         ticket_detail_url_description=_('click here to review'),
         body=ticket.body.replace('\n', '<br/>'),
     )
     if settings.DEBUG:
         logger.debug(message)
-    recipient_list = [ticket.applicant.email]
+    recipient_list = [ticket.applicant.email, ]
     send_mail_async.delay(subject, message, recipient_list, html_message=message)

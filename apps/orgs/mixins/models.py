@@ -19,6 +19,22 @@ __all__ = [
 
 
 class OrgManager(models.Manager):
+    __is_org_id = False
+
+    @property
+    def is_org_id(self):
+        return self.__is_org_id
+
+    @is_org_id.setter
+    def is_org_id(self, v):
+        self.__is_org_id = v
+
+    def change_is_org_id(self, query):
+        if 'org_id' in query:
+            self.is_org_id = True
+        else:
+            self.is_org_id = False
+
     def all_group_by_org(self):
         from ..models import Organization
         orgs = list(Organization.objects.all())
@@ -31,13 +47,27 @@ class OrgManager(models.Manager):
 
     def get_queryset(self):
         queryset = super(OrgManager, self).get_queryset()
-        return filter_org_queryset(queryset)
+        if not self.is_org_id:
+            return filter_org_queryset(queryset)
+        return queryset
 
     def set_current_org(self, org):
         if isinstance(org, str):
             org = Organization.get_instance(org)
         set_current_org(org)
         return self
+
+    def filter(self, *args, **kwargs):
+        self.change_is_org_id(kwargs)
+        return super(OrgManager, self).filter(*args, **kwargs)
+
+    def exclude(self, *args, **kwargs):
+        self.change_is_org_id(kwargs)
+        return super(OrgManager, self).exclude(*args, **kwargs)
+
+    def complex_filter(self, *args, **kwargs):
+        self.change_is_org_id(kwargs)
+        return super(OrgManager, self).complex_filter(*args, **kwargs)
 
 
 class OrgModelMixin(models.Model):

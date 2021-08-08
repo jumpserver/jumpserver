@@ -71,15 +71,14 @@ class LoginConfirmSetting(CommonModelMixin):
         from orgs.models import Organization
         ticket_title = _('Login confirm') + ' {}'.format(self.user)
         ticket_meta = self.construct_confirm_ticket_meta(request)
-        ticket_assignees = self.reviewers.all()
         data = {
             'title': ticket_title,
-            'type': const.TicketTypeChoices.login_confirm.value,
+            'type': const.TicketType.login_confirm.value,
             'meta': ticket_meta,
             'org_id': Organization.ROOT_ID,
         }
         ticket = Ticket.objects.create(**data)
-        ticket.assignees.set(ticket_assignees)
+        ticket.create_process_map_and_node(self.reviewers.all())
         ticket.open(self.user)
         return ticket
 
