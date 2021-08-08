@@ -2,7 +2,6 @@
 #
 
 from django_filters import rest_framework as filters
-from django.conf import settings
 from django.db.models import F, Value, CharField
 from django.db.models.functions import Concat
 from django.http import Http404

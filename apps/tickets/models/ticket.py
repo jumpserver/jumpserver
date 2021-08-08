@@ -10,16 +10,18 @@ from django.conf import settings
 
 from common.mixins.models import CommonModelMixin
 from orgs.mixins.models import OrgModelMixin
-from orgs.utils import tmp_to_root_org, tmp_to_org
-from tickets.const import TicketTypeChoices, TicketActionChoices, TicketStatusChoices
-from tickets.signals import post_change_ticket_action
+from orgs.utils import tmp_to_root_org, tmp_to_org, get_current_org
+from tickets.const import TicketTypeChoices, TicketActionChoices, TicketStatusChoices, \
+    TicketApproveLevelChoices, TicketApproveStrategyChoices
+from tickets.signals import post_change_ticket_action, post_or_update_change_template_approve
 from tickets.handler import get_ticket_handler
 
-__all__ = ['Ticket', 'ModelJSONFieldEncoder']
+__all__ = ['Ticket', 'Template', 'TemplateApprove', 'ModelJSONFieldEncoder']
 
 
 class ModelJSONFieldEncoder(json.JSONEncoder):
     """ 解决一些类型的字段不能序列化的问题 """
+
     def default(self, obj):
         if isinstance(obj, datetime):
             return obj.strftime(settings.DATETIME_DISPLAY_FORMAT)
@@ -38,39 +40,35 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         default=TicketTypeChoices.general.value, verbose_name=_("Type")
     )
     meta = models.JSONField(encoder=ModelJSONFieldEncoder, default=dict, verbose_name=_("Meta"))
+    status = models.CharField(
+        max_length=16, choices=TicketStatusChoices.choices,
+        default=TicketStatusChoices.open.value, verbose_name=_("Status")
+    )
     action = models.CharField(
         choices=TicketActionChoices.choices, max_length=16,
         default=TicketActionChoices.open.value, verbose_name=_("Action")
     )
-    status = models.CharField(
-        max_length=16, choices=TicketStatusChoices.choices,
-        default=TicketStatusChoices.open.value, verbose_name=_("Status")
+    approve_level = models.SmallIntegerField(
+        default=TicketApproveLevelChoices.one.value, verbose_name=_('Approve level')
     )
     # 申请人
     applicant = models.ForeignKey(
         'users.User', related_name='applied_tickets', on_delete=models.SET_NULL, null=True,
         verbose_name=_("Applicant")
     )
-    applicant_display = models.CharField(
-        max_length=256, default='', verbose_name=_("Applicant display")
-    )
-    # 处理人
-    processor = models.ForeignKey(
-        'users.User', related_name='processed_tickets', on_delete=models.SET_NULL, null=True,
-        verbose_name=_("Processor")
-    )
-    processor_display = models.CharField(
-        max_length=256, blank=True, null=True, default='', verbose_name=_("Processor display")
-    )
+    applicant_display = models.CharField(max_length=256, default='', verbose_name=_("Applicant display"))
     # 受理人列表
     assignees = models.ManyToManyField(
-        'users.User', related_name='assigned_tickets', verbose_name=_("Assignees")
+        'users.User', related_name='assigned_tickets', verbose_name=_("Assignees"), through='TicketAssignee'
     )
-    assignees_display = models.JSONField(
-        encoder=ModelJSONFieldEncoder, default=list, verbose_name=_('Assignees display')
-    )
+    process = models.JSONField(encoder=ModelJSONFieldEncoder, default=list, verbose_name=_("Process"))
     # 评论
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
+
+    template = models.ForeignKey(
+        'Template', related_name='templated_tickets', on_delete=models.SET_NULL, null=True,
+        verbose_name=_("Template")
+    )
 
     class Meta:
         ordering = ('-date_created',)
@@ -95,62 +93,88 @@ class Ticket(CommonModelMixin, OrgModelMixin):
     @property
     def status_closed(self):
         return self.status == TicketStatusChoices.closed.value
-    
+
     @property
     def status_open(self):
         return self.status == TicketStatusChoices.open.value
 
+    def action_open(self, action=None):
+        return action == TicketActionChoices.open.value
+
+    @property
+    def cur_assignees(self):
+        return self.m2m_ticket_users.filter(approve_level=self.approve_level)
+
+    @property
+    def processor(self):
+        level = self.approve_level
+        m2m_ticket_users = self.m2m_ticket_users.filter(approve_level=level, is_processor=True).first()
+        return m2m_ticket_users.user if m2m_ticket_users else None
+
     def set_status_closed(self):
         self.status = TicketStatusChoices.closed.value
 
-    # action
-    @property
-    def action_open(self):
-        return self.action == TicketActionChoices.open.value
+    def create_related_assignees(self):
+        template_approve = self.get_template_approve(self.approve_level)
+        ticket_assignee_list = []
+        assignees = template_approve.assignees.all()
+        ticket_assignee_model = self.assignees.through
+        for assignee in assignees:
+            ticket_assignee_list.append(ticket_assignee_model(
+                ticket=self, user=assignee, approve_level=self.approve_level))
+        ticket_assignee_model.objects.bulk_create(ticket_assignee_list)
+        return assignees
 
-    @property
-    def action_approve(self):
-        return self.action == TicketActionChoices.approve.value
+    def create_process_node_info(self, assignees):
+        return {
+            'approve_level': self.approve_level,
+            'action': TicketActionChoices.open.value,
+            'assignees': [assignee.id for assignee in assignees],
+            'assignees_display': [str(assignee) for assignee in assignees]
+        }
 
-    @property
-    def action_reject(self):
-        return self.action == TicketActionChoices.reject.value
-
-    @property
-    def action_close(self):
-        return self.action == TicketActionChoices.close.value
+    def change_action_and_processor(self, action, user):
+        cur_assignees = self.cur_assignees
+        cur_assignees.update(action=action)
+        if action != TicketActionChoices.open.value:
+            cur_assignees.filter(user=user).update(is_processor=True)
+        else:
+            self.applicant = user
 
     # action changed
     def open(self, applicant):
-        self.applicant = applicant
-        self._change_action(action=TicketActionChoices.open.value)
+        action = TicketActionChoices.open.value
+        self._change_action(action, applicant)
 
     def approve(self, processor):
-        self.processor = processor
-        self._change_action(action=TicketActionChoices.approve.value)
+        action = TicketActionChoices.approve.value
+        self._change_action(action, processor)
 
     def reject(self, processor):
-        self.processor = processor
-        self._change_action(action=TicketActionChoices.reject.value)
+        action = TicketActionChoices.reject.value
+        self._change_action(action, processor)
 
     def close(self, processor):
-        self.processor = processor
-        self._change_action(action=TicketActionChoices.close.value)
+        action = TicketActionChoices.close.value
+        self._change_action(action, processor)
 
-    def _change_action(self, action):
-        self.action = action
+    def _change_action(self, action, user):
+        self.change_action_and_processor(action, user)
         self.save()
         post_change_ticket_action.send(sender=self.__class__, ticket=self, action=action)
 
     # ticket
     def has_assignee(self, assignee):
-        return self.assignees.filter(id=assignee.id).exists()
+        return self.m2m_ticket_users.filter(user=assignee, approve_level=self.approve_level).exists()
 
     @classmethod
     def get_user_related_tickets(cls, user):
         queries = Q(applicant=user) | Q(assignees=user)
         tickets = cls.all().filter(queries).distinct()
         return tickets
+
+    def get_template_approve(self, level):
+        return self.template.templated_approves.filter(approve_level=level).first()
 
     @classmethod
     def all(cls):
@@ -171,3 +195,91 @@ class Ticket(CommonModelMixin, OrgModelMixin):
     def body(self):
         _body = self.handler.get_body()
         return _body
+
+
+class TicketAssignee(CommonModelMixin):
+    ticket = models.ForeignKey(
+        'Ticket', related_name='m2m_ticket_users', on_delete=models.CASCADE, verbose_name='Ticket'
+    )
+    user = models.ForeignKey(
+        'users.User', related_name='m2m_user_tickets', on_delete=models.CASCADE, verbose_name='User'
+    )
+    approve_level = models.SmallIntegerField(
+        default=TicketApproveLevelChoices.one.value, choices=TicketApproveLevelChoices.choices,
+        verbose_name=_('Approve level')
+    )
+    is_processor = models.BooleanField(default=False)
+    action = models.CharField(
+        choices=TicketActionChoices.choices, max_length=16,
+        default=TicketActionChoices.open.value, verbose_name=_("Action")
+    )
+
+    class Meta:
+        verbose_name = _('Ticket assignee')
+
+    def __str__(self):
+        return '{0.user.name}({0.user.username})_{0.approve_level}'.format(self)
+
+
+class Template(CommonModelMixin, OrgModelMixin):
+    title = models.CharField(max_length=256, verbose_name=_("Title"))
+    type = models.CharField(
+        max_length=64, choices=TicketTypeChoices.choices,
+        default=TicketTypeChoices.general.value, verbose_name=_("Type")
+    )
+
+    def save(self, *args, **kwargs):
+        """ 确保保存的org_id的是自身的值 """
+        with tmp_to_org(self.org_id):
+            return super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = _('Ticket template')
+
+    def __str__(self):
+        return '{}({})'.format(self.title, self.type)
+
+    @property
+    def get_level_all_count(self):
+        return self.templated_approves.count()
+
+    @classmethod
+    def get_org_related_templates(cls):
+        org = get_current_org()
+        templates = cls.objects.filter(org_id=org.id)
+        cur_template_types = templates.values_list('type', flat=True)
+        diff_global_templates = cls.objects.filter(org_id=org.ROOT_ID).exclude(type__in=cur_template_types)
+        return templates | diff_global_templates
+
+
+class TemplateApprove(CommonModelMixin):
+    approve_level = models.SmallIntegerField(
+        default=TicketApproveLevelChoices.one.value, choices=TicketApproveLevelChoices.choices,
+        verbose_name=_('Approve level')
+    )
+    approve_strategy = models.CharField(
+        max_length=64, default=TicketApproveStrategyChoices.system.value,
+        choices=TicketApproveStrategyChoices.choices,
+        verbose_name=_('Approve strategy')
+    )
+    # 受理人列表
+    assignees = models.ManyToManyField(
+        'users.User', related_name='assigned_template_approve', verbose_name=_("Assignees")
+    )
+    assignees_display = models.JSONField(
+        encoder=ModelJSONFieldEncoder, default=list, verbose_name=_('Assignees display')
+    )
+    ticket_template = models.ForeignKey(
+        Template, related_name='templated_approves', on_delete=models.CASCADE, null=True,
+        verbose_name=_("Template")
+    )
+
+    class Meta:
+        verbose_name = _('Ticket template approve level')
+
+    def __str__(self):
+        return '{}({})'.format(self.id, self.approve_level)
+
+    @classmethod
+    def change_assignees_display(cls, qs):
+        post_or_update_change_template_approve.send(sender=cls, qs=qs)

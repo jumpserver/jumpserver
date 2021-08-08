@@ -19,14 +19,10 @@ action_approve = const.TicketActionChoices.approve.value
 
 type_serializer_classes_mapping = {
     const.TicketTypeChoices.apply_asset.value: {
-        'default': apply_asset.ApplyAssetSerializer,
-        action_open: apply_asset.ApplySerializer,
-        action_approve: apply_asset.ApproveSerializer,
+        'default': apply_asset.ApplySerializer
     },
     const.TicketTypeChoices.apply_application.value: {
-        'default': apply_application.ApplyApplicationSerializer,
-        action_open: apply_application.ApplySerializer,
-        action_approve: apply_application.ApproveSerializer,
+        'default': apply_application.ApplySerializer
     },
     const.TicketTypeChoices.login_confirm.value: {
         'default': login_confirm.LoginConfirmSerializer,
