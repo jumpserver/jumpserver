@@ -2,15 +2,15 @@ from .base import BaseHandler
 from django.utils.translation import ugettext as _
 
 from perms.models import AssetPermission, Action
-from assets.models import Asset, SystemUser
 from orgs.utils import tmp_to_org, tmp_to_root_org
 
 
 class Handler(BaseHandler):
 
     def _on_approve(self):
-        super()._on_approve()
-        self._create_asset_permission()
+        is_finish = super()._on_approve()
+        if is_finish:
+            self._create_asset_permission()
 
     # display
     def _construct_meta_display_of_open(self):
@@ -18,25 +18,6 @@ class Handler(BaseHandler):
         apply_actions = self.ticket.meta.get('apply_actions', Action.NONE)
         apply_actions_display = Action.value_to_choices_display(apply_actions)
         meta_display_values = [apply_actions_display]
-        meta_display = dict(zip(meta_display_fields, meta_display_values))
-        return meta_display
-
-    def _construct_meta_display_of_approve(self):
-        meta_display_fields = [
-            'approve_actions_display', 'approve_assets_display', 'approve_system_users_display'
-        ]
-        approve_actions = self.ticket.meta.get('approve_actions', Action.NONE)
-        approve_actions_display = Action.value_to_choices_display(approve_actions)
-        approve_asset_ids = self.ticket.meta.get('approve_assets', [])
-        approve_system_user_ids = self.ticket.meta.get('approve_system_users', [])
-        with tmp_to_org(self.ticket.org_id):
-            assets = Asset.objects.filter(id__in=approve_asset_ids)
-            system_users = SystemUser.objects.filter(id__in=approve_system_user_ids)
-            approve_assets_display = [str(asset) for asset in assets]
-            approve_system_users_display = [str(system_user) for system_user in system_users]
-        meta_display_values = [
-            approve_actions_display, approve_assets_display, approve_system_users_display
-        ]
         meta_display = dict(zip(meta_display_fields, meta_display_values))
         return meta_display
 
@@ -90,12 +71,12 @@ class Handler(BaseHandler):
             if asset_permission:
                 return asset_permission
 
-        approve_permission_name = self.ticket.meta.get('approve_permission_name', )
-        approve_asset_ids = self.ticket.meta.get('approve_assets', [])
-        approve_system_user_ids = self.ticket.meta.get('approve_system_users', [])
-        approve_actions = self.ticket.meta.get('approve_actions', Action.NONE)
-        approve_date_start = self.ticket.meta.get('approve_date_start')
-        approve_date_expired = self.ticket.meta.get('approve_date_expired')
+        apply_permission_name = self.ticket.meta.get('apply_permission_name', )
+        apply_assets = self.ticket.meta.get('apply_assets', [])
+        apply_system_users = self.ticket.meta.get('apply_system_users', [])
+        apply_actions = self.ticket.meta.get('apply_actions', Action.NONE)
+        apply_date_start = self.ticket.meta.get('apply_date_start')
+        apply_date_expired = self.ticket.meta.get('apply_date_expired')
         permission_created_by = '{}:{}'.format(
             str(self.ticket.__class__.__name__), str(self.ticket.id)
         )
@@ -108,23 +89,23 @@ class Handler(BaseHandler):
         ).format(
             self.ticket.title,
             self.ticket.applicant_display,
-            self.ticket.processor_display,
+            str(self.ticket.processor),
             str(self.ticket.id)
         )
 
         permission_data = {
             'id': self.ticket.id,
-            'name': approve_permission_name,
+            'name': apply_permission_name,
             'comment': str(permission_comment),
             'created_by': permission_created_by,
-            'actions': approve_actions,
-            'date_start': approve_date_start,
-            'date_expired': approve_date_expired,
+            'actions': apply_actions,
+            'date_start': apply_date_start,
+            'date_expired': apply_date_expired,
         }
         with tmp_to_org(self.ticket.org_id):
             asset_permission = AssetPermission.objects.create(**permission_data)
             asset_permission.users.add(self.ticket.applicant)
-            asset_permission.assets.set(approve_asset_ids)
-            asset_permission.system_users.set(approve_system_user_ids)
+            asset_permission.assets.set(apply_assets)
+            asset_permission.system_users.set(apply_system_users)
 
         return asset_permission

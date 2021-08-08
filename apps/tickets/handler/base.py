@@ -4,7 +4,6 @@ from tickets.utils import (
     send_ticket_processed_mail_to_applicant, send_ticket_applied_mail_to_assignees
 )
 
-
 logger = get_logger(__name__)
 
 
@@ -16,46 +15,61 @@ class BaseHandler(object):
     # on action
     def _on_open(self):
         self.ticket.applicant_display = str(self.ticket.applicant)
-        self.ticket.assignees_display = [str(assignee) for assignee in self.ticket.assignees.all()]
         meta_display = getattr(self, '_construct_meta_display_of_open', lambda: {})()
         self.ticket.meta.update(meta_display)
         self.ticket.save()
         self._send_applied_mail_to_assignees()
 
     def _on_approve(self):
-        meta_display = getattr(self, '_construct_meta_display_of_approve', lambda: {})()
-        self.ticket.meta.update(meta_display)
-        self.__on_process()
+        is_finish = False
+        processor = self.processor
+        if self.ticket.approve_level != self.ticket.template.get_level_all_count:
+            self.ticket.approve_level += 1
+            assignees = self.ticket.create_related_assignees()
+            instance.process.append(instance.create_process_node_info(assignees))
+        else:
+            self.ticket.set_status_closed()
+            is_finish = True
+        self._send_applied_mail_to_assignees()
+        self.__on_process(processor)
+        return is_finish
 
     def _on_reject(self):
-        self.__on_process()
+        self.ticket.set_status_closed()
+        self.__on_process(self.processor)
 
     def _on_close(self):
-        self.__on_process()
-
-    def __on_process(self):
-        self.ticket.processor_display = str(self.ticket.processor)
         self.ticket.set_status_closed()
-        self._send_processed_mail_to_applicant()
+        self.__on_process(self.processor)
+
+    def __on_process(self, processor):
+        self._send_processed_mail_to_applicant(processor)
         self.ticket.save()
 
     def dispatch(self, action):
-        self._create_comment_on_action()
+        processor = self.ticket.processor
+        instance.process[self.ticket.approve_level - 1].update({
+            'action': action,
+            'processor': processor.id if processor else '',
+            'processor_display': str(processor) if processor else '',
+        })
+        self._create_comment_on_action(action)
         method = getattr(self, f'_on_{action}', lambda: None)
         return method()
 
     # email
     def _send_applied_mail_to_assignees(self):
-        logger.debug('Send applied email to assignees: {}'.format(self.ticket.assignees_display))
+        logger.debug('Send applied email to assignees: {}'.format(
+            ', '.join([set(i.user) for i in self.ticket.cur_assignees])))
         send_ticket_applied_mail_to_assignees(self.ticket)
 
-    def _send_processed_mail_to_applicant(self):
+    def _send_processed_mail_to_applicant(self, processor):
         logger.debug('Send processed mail to applicant: {}'.format(self.ticket.applicant_display))
-        send_ticket_processed_mail_to_applicant(self.ticket)
+        send_ticket_processed_mail_to_applicant(self.ticket, processor)
 
     # comments
-    def _create_comment_on_action(self):
-        user = self.ticket.applicant if self.ticket.action_open else self.ticket.processor
+    def _create_comment_on_action(self, action):
+        user = self.ticket.applicant if self.ticket.action_open(action) else self.ticket.processor
         user_display = str(user)
         action_display = self.ticket.get_action_display()
         data = {
@@ -91,12 +105,12 @@ class BaseHandler(object):
             _('Ticket title'), self.ticket.title,
             _('Ticket type'), self.ticket.get_type_display(),
             _('Ticket status'), self.ticket.get_status_display(),
-            _('Ticket action'), self.ticket.get_action_display(),
+            # _('Ticket action'), self.ticket.get_action_display(),
             _('Ticket applicant'), self.ticket.applicant_display,
-            _('Ticket assignees'), ', '.join(self.ticket.assignees_display),
+            # _('Ticket assignees'), ', '.join(self.ticket.assignees_display),
         )
-        if self.ticket.status_closed:
-            basic_body += '''{}: {}'''.format(_('Ticket processor'), self.ticket.processor_display)
+        # if self.ticket.status_closed:
+        #     basic_body += '''{}: {}'''.format(_('Ticket processor'), self.ticket.processor_display)
         body = self.body_html_format.format(_("Ticket basic info"), basic_body)
         return body
 
