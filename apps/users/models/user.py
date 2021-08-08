@@ -27,7 +27,6 @@ from common.db.models import TextChoices
 from users.exceptions import MFANotEnabled
 from ..signals import post_user_change_password
 
-
 __all__ = ['User', 'UserPasswordHistory']
 
 logger = get_logger(__file__)
@@ -354,6 +353,10 @@ class RoleMixin:
         return cls.objects.filter(role=cls.ROLE.ADMIN)
 
     @classmethod
+    def get_auditor_and_users(cls):
+        return cls.objects.filter(role__in=[cls.ROLE.USER, cls.ROLE.AUDITOR])
+
+    @classmethod
     def get_org_admins(cls, org=None):
         from orgs.models import Organization
         if not isinstance(org, Organization):
@@ -364,12 +367,9 @@ class RoleMixin:
     @classmethod
     def get_super_and_org_admins(cls, org=None):
         super_admins = cls.get_super_admins()
-        super_admin_ids = list(super_admins.values_list('id', flat=True))
-        org_admins = cls.get_org_admins(org)
-        org_admin_ids = list(org_admins.values_list('id', flat=True))
-        admin_ids = set(org_admin_ids + super_admin_ids)
-        admins = User.objects.filter(id__in=admin_ids)
-        return admins
+        org_admins = cls.get_org_admins(org=org)
+        admins = org_admins | super_admins
+        return admins.distinct()
 
 
 class TokenMixin:

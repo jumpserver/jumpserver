@@ -26,7 +26,7 @@ class CommentSerializer(serializers.ModelSerializer):
             'body',  'user_display',
             'date_created', 'date_updated'
         ]
-        fields_fk = ['ticket', 'user',]
+        fields_fk = ['ticket', 'user', ]
         fields = fields_small + fields_fk
         read_only_fields = [
             'user_display', 'date_created', 'date_updated'
