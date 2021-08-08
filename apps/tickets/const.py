@@ -1,4 +1,4 @@
-from django.db.models import TextChoices
+from django.db.models import TextChoices, IntegerChoices
 from django.utils.translation import ugettext_lazy as _
 
 TICKET_DETAIL_URL = '/ui/#/tickets/tickets/{id}'
@@ -23,3 +23,13 @@ class TicketActionChoices(TextChoices):
 class TicketStatusChoices(TextChoices):
     open = 'open', _("Open")
     closed = 'closed', _("Closed")
+
+
+class TicketApproveLevelChoices(IntegerChoices):
+    one = 1, _("One level")
+    two = 2, _("Two level")
+
+
+class TicketApproveStrategyChoices(TextChoices):
+    system = 'super_admin', _("Super admin user")
+    all = 'all_user', _("All user")
