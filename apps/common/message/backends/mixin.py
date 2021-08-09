@@ -17,25 +17,6 @@ class RequestMixin:
     code_key: str
     msg_key: str
 
-    def check_errcode_is_0(self, data: DictWrapper):
-        errcode = data[self.code_key]
-        if errcode != 0:
-            # 如果代码写的对，配置没问题，这里不该出错，系统性错误，直接抛异常
-            errmsg = data[self.msg_key]
-            logger.error(f'Response 200 but errcode is not 0: '
-                         f'errcode={errcode} '
-                         f'errmsg={errmsg} ')
-            raise exce.ErrCodeNot0(detail=data.raw_data)
-
-    def check_http_is_200(self, response):
-        if response.status_code != 200:
-            # 正常情况下不会返回非 200 响应码
-            logger.error(f'Response error: '
-                         f'status_code={response.status_code} '
-                         f'url={response.url}'
-                         f'\ncontent={response.content}')
-            raise exce.HTTPNot200(detail=response.json())
-
 
 class BaseRequest(RequestMixin):
     """
@@ -50,6 +31,27 @@ class BaseRequest(RequestMixin):
             'timeout': timeout
         }
         self.init_access_token()
+
+    @classmethod
+    def check_errcode_is_0(cls, data: DictWrapper):
+        errcode = data[cls.code_key]
+        if errcode != 0:
+            # 如果代码写的对，配置没问题，这里不该出错，系统性错误，直接抛异常
+            errmsg = data[cls.msg_key]
+            logger.error(f'Response 200 but errcode is not 0: '
+                         f'errcode={errcode} '
+                         f'errmsg={errmsg} ')
+            raise exce.ErrCodeNot0(detail=data.raw_data)
+
+    @staticmethod
+    def check_http_is_200(response):
+        if response.status_code != 200:
+            # 正常情况下不会返回非 200 响应码
+            logger.error(f'Response error: '
+                         f'status_code={response.status_code} '
+                         f'url={response.url}'
+                         f'\ncontent={response.content}')
+            raise exce.HTTPNot200(detail=response.json())
 
     def request_access_token(self):
         """

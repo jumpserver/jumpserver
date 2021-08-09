@@ -1,4 +1,4 @@
-from typing import Iterable, AnyStr
+import json
 
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import APIException
@@ -20,6 +20,8 @@ class URL:
 
     # https://open.feishu.cn/document/ukTMukTMukTM/uEDO4UjLxgDO14SM4gTN
     GET_USER_INFO_BY_CODE = 'https://open.feishu.cn/open-apis/authen/v1/access_token'
+
+    SEND_MESSAGE = 'https://open.feishu.cn/open-apis/im/v1/messages'
 
 
 class ErrorCode:
@@ -83,8 +85,8 @@ class FeiShu(RequestMixin):
         # https://open.feishu.cn/document/ukTMukTMukTM/uEDO4UjLxgDO14SM4gTN
 
         body = {
-            "grant_type": "authorization_code",
-            "code": code
+            'grant_type': 'authorization_code',
+            'code': code
         }
 
         data = self._requests.post(URL.GET_USER_INFO_BY_CODE, json=body, check_errcode_is_0=False)
@@ -92,3 +94,27 @@ class FeiShu(RequestMixin):
         self._requests.check_errcode_is_0(data)
 
         return data['data']['user_id']
+
+    def send_text(self, user_ids, msg):
+        params = {
+            'receive_id_type': 'user_id'
+        }
+
+        body = {
+            'msg_type': 'text',
+            'content': json.dumps({'text': msg})
+        }
+
+        invalid_users = []
+        for user_id in user_ids:
+            body['receive_id'] = user_id
+
+            try:
+                self._requests.post(URL.SEND_MESSAGE, params=params, json=body)
+            except APIException as e:
+                # 只处理可预知的错误
+                logger.exception(e)
+                invalid_users.append(user_id)
+        return invalid_users
+
+feishu = FeiShu(app_id='cli_a181e0f53038500d', app_secret='sE7hRvSnxVkIqBGC8XUvHfvwgh7TrDuX')

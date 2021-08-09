@@ -148,6 +148,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'email_content': serializers.EmailContentSettingSerializer,
         'wecom': serializers.WeComSettingSerializer,
         'dingtalk': serializers.DingTalkSettingSerializer,
+        'feishu': serializers.FeiShuSettingSerializer,
     }
 
     def get_serializer_class(self):

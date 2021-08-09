@@ -322,7 +322,7 @@ def check_password_rules(password, user):
     if user.is_org_admin:
         min_length = settings.SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH
     else:
-        min_length = settings.SECURITY_PASSWORD_MIN_LENGTH
+        min_length = settings.SECURITY_PASSWORD_MIN_LEN
     pattern += '.{' + str(min_length-1) + ',}$'
     match_obj = re.match(pattern, password)
     return bool(match_obj)

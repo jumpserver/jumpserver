@@ -117,7 +117,7 @@ class WeCom(RequestMixin):
         if errcode in (ErrorCode.RECIPIENTS_INVALID, ErrorCode.RECIPIENTS_EMPTY):
             # 全部接收人无权限或不存在
             return users
-        self.check_errcode_is_0(data)
+        self._requests.check_errcode_is_0(data)
 
         invaliduser = data['invaliduser']
         if not invaliduser:
@@ -143,7 +143,7 @@ class WeCom(RequestMixin):
             logger.warn(f'WeCom get_user_id_by_code invalid code: code={code}')
             return None, None
 
-        self.check_errcode_is_0(data)
+        self._requests.check_errcode_is_0(data)
 
         USER_ID = 'UserId'
         OPEN_ID = 'OpenId'
