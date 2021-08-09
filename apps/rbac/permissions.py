@@ -58,8 +58,6 @@ class RBACPermission(permissions.DjangoModelPermissions):
         Given a model and an HTTP method, return the list of permission
         codes that the user is required to have.
         """
-        # scope|app-label.action_model-name
-        # org:00000000-0000-0000-0000-000000000002|assets.add_asset
         perms_map = self.get_method_perms_map()
 
         if method not in perms_map:
@@ -73,12 +71,16 @@ class RBACPermission(permissions.DjangoModelPermissions):
         if getattr(view, '_ignore_rbac_permissions', False):
             return True
 
-        if not request.user or (
-                not request.user.is_authenticated and self.authenticated_users_only):
+        if not request.user or \
+                (not request.user.is_authenticated and self.authenticated_users_only):
             return False
 
         queryset = self._queryset(view)
-        if getattr(view, 'action', None):
+        action = getattr(view, 'action', None)
+
+        if action == 'metadata':
+            return True
+        if action:
             perms = self.get_action_required_permissions(view.action, queryset.model, view)
         else:
             perms = self.get_required_permissions(request.method, queryset.model)

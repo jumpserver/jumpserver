@@ -28,13 +28,14 @@ class Permission(DjangoPermission):
         return cls.objects.all()
 
 
-class ExtraPermissionBit(models.Model):
+class ExtraPermission(models.Model):
     """ 附加权限位类，用来定义无资源类的权限，不做实体资源 """
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
 
     class Meta:
         default_permissions = []
         permissions = [
-            # TODO: 添加附加权限位 (针对没有实体资源的操作权限)
-            ('test_define_extra_permission_bit', _('Test define extra permission bit'))
+            ('view_adminview', _('Can view admin view')),
+            ('view_auditview', _('Can view audit view')),
+            ('view_userview', _('Can view user view')),
         ]

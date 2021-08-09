@@ -109,13 +109,17 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='ExtraPermissionBit',
+            name='ExtraPermission',
             fields=[
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
             ],
             options={
-                'permissions': [('test_define_extra_permission_bit', 'Test define extra permission bit')],
                 'default_permissions': [],
+                'permissions': [
+                    ('view_adminview', 'Can view admin view'),
+                    ('view_auditview', 'Can view audit view'),
+                    ('view_userview', 'Can view user view')
+                ],
             },
         ),
         migrations.CreateModel(

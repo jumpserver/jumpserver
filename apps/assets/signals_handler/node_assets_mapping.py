@@ -40,10 +40,7 @@ def expire_node_assets_mapping_for_memory(org_id):
     root_org_id = Organization.ROOT_ID
 
     # 当前进程清除(cache 数据)
-    logger.debug(
-        "Expire node assets id mapping from cache of org={}, pid={}"
-        "".format(org_id, os.getpid())
-    )
+    logger.debug("Expire node assets id mapping cache of org={}".format(org_id))
     Node.expire_node_all_asset_ids_mapping_from_cache(org_id)
     Node.expire_node_all_asset_ids_mapping_from_cache(root_org_id)
 
@@ -87,10 +84,6 @@ def subscribe_node_assets_mapping_expire(sender, **kwargs):
                         continue
                     org_id = message['data'].decode()
                     Node.expire_node_all_asset_ids_mapping_from_memory(org_id)
-                    logger.debug(
-                        "Expire node assets id mapping from memory of org={}, pid={}"
-                        "".format(str(org_id), os.getpid())
-                    )
             except Exception as e:
                 logger.exception(f'subscribe_node_assets_mapping_expire: {e}')
                 Node.expire_all_orgs_node_all_asset_ids_mapping_from_memory()

@@ -2,6 +2,8 @@
 exclude_permissions = [
     ('assets', 'add_asset'),
     ('assets', 'view_asset'),
+
+    ('users', 'view_user'),
 ]
 
 system_scope_permissions = [
