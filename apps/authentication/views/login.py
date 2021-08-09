@@ -154,6 +154,7 @@ class UserLoginView(mixins.AuthMixin, FormView):
             'AUTH_CAS': settings.AUTH_CAS,
             'AUTH_WECOM': settings.AUTH_WECOM,
             'AUTH_DINGTALK': settings.AUTH_DINGTALK,
+            'AUTH_FEISHU': settings.AUTH_FEISHU,
             'rsa_public_key': rsa_public_key,
             'forgot_password_url': forgot_password_url
         }

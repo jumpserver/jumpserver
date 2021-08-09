@@ -211,18 +211,6 @@ class DatesLoginMetricMixin:
         ]
         return sessions
 
-from rest_framework.request import Request
-
-class FeiShu(APIView):
-    permission_classes = ()
-    def post(self, request: Request, *args, **kwargs):
-        print('-----------------------', request.data)
-        return Response(data=request.data)
-
-    def get(self, request, *args, **kwargs):
-        print('====================');
-        return Response()
-
 
 class IndexApi(DatesLoginMetricMixin, APIView):
     permission_classes = (IsOrgAdmin | IsOrgAuditor,)

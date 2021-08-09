@@ -9,7 +9,6 @@ from django.views.i18n import JavaScriptCatalog
 from . import views, api
 
 api_v1 = [
-    path('feishu/', api.FeiShu.as_view()),
     path('index/', api.IndexApi.as_view()),
     path('users/', include('users.urls.api_urls', namespace='api-users')),
     path('assets/', include('assets.urls.api_urls', namespace='api-assets')),

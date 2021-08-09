@@ -16,6 +16,8 @@ class WeComError(APIException):
 
 
 class URL:
+    AUTHEN = 'https://open.feishu.cn/open-apis/authen/v1/index'
+
     GET_TOKEN = 'https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal/'
 
     # https://open.feishu.cn/document/ukTMukTMukTM/uEDO4UjLxgDO14SM4gTN

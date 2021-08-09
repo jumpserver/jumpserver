@@ -12,20 +12,21 @@ from django.db.utils import IntegrityError
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.exceptions import APIException
 
+from users.utils import is_auth_password_time_valid
 from users.views import UserVerifyPasswordView
 from users.models import User
 from common.utils import get_logger
 from common.utils.random import random_string
 from common.utils.django import reverse, get_object_or_none
 from common.mixins.views import PermissionsMixin
-from common.message.backends.feishu import FeiShu
+from common.message.backends.feishu import FeiShu, URL
 from authentication import errors
 from authentication.mixins import AuthMixin
 
 logger = get_logger(__file__)
 
 
-FeiShu_STATE_SESSION_KEY = '_FeiShu_state'
+FEISHU_STATE_SESSION_KEY = '_feishu_state'
 
 
 class FeiShuQRMixin(PermissionsMixin, View):
@@ -45,7 +46,7 @@ class FeiShuQRMixin(PermissionsMixin, View):
 
     def verify_state(self):
         state = self.request.GET.get('state')
-        session_state = self.request.session.get(FeiShu_STATE_SESSION_KEY)
+        session_state = self.request.session.get(FEISHU_STATE_SESSION_KEY)
         if state != session_state:
             return False
         return True
@@ -56,14 +57,14 @@ class FeiShuQRMixin(PermissionsMixin, View):
 
     def get_qr_url(self, redirect_uri):
         state = random_string(16)
-        self.request.session[FeiShu_STATE_SESSION_KEY] = state
+        self.request.session[FEISHU_STATE_SESSION_KEY] = state
 
         params = {
-            'app_id': 'cli_a181e0f53038500d',
+            'app_id': settings.FEISHU_APP_ID,
             'state': state,
             'redirect_uri': redirect_uri,
         }
-        url = 'https://open.feishu.cn/open-apis/authen/v1/index' + '?' + urllib.parse.urlencode(params)
+        url =  URL.AUTHEN + '?' + urllib.parse.urlencode(params)
         return url
 
     def get_success_reponse(self, redirect_url, title, msg):
@@ -97,10 +98,10 @@ class FeiShuQRBindView(FeiShuQRMixin, View):
         user = request.user
         redirect_url = request.GET.get('redirect_url')
 
-        # if not is_auth_password_time_valid(request.session):
-        #     msg = _('Please verify your password first')
-        #     response = self.get_failed_reponse(redirect_url, msg, msg)
-        #     return response
+        if not is_auth_password_time_valid(request.session):
+            msg = _('Please verify your password first')
+            response = self.get_failed_reponse(redirect_url, msg, msg)
+            return response
 
         redirect_uri = reverse('authentication:feishu-qr-bind-callback', external=True)
         redirect_uri += '?' + urllib.parse.urlencode({'redirect_url': redirect_url})

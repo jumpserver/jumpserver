@@ -83,6 +83,7 @@ class Setting(models.Model):
         if hasattr(self.__class__, f'refresh_{self.name}'):
             getattr(self.__class__, f'refresh_{self.name}')()
         else:
+            print(f'------- {self.name} {self.cleaned_value}')
             setattr(settings, self.name, self.cleaned_value)
 
     @classmethod
