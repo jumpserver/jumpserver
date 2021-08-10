@@ -56,7 +56,7 @@ def check_database_connection():
             logging.info("Database connect success")
             return
         time.sleep(1)
-    logging.error("Connection database failed, exist")
+    logging.error("Connection database failed, exit")
     sys.exit(10)
 
 
@@ -85,7 +85,11 @@ def perform_db_migrate():
     logging.info("Check database structure change ...")
     os.chdir(os.path.join(BASE_DIR, 'apps'))
     logging.info("Migrate model change to database ...")
-    subprocess.call('python3 manage.py migrate', shell=True)
+    _code = subprocess.call('python3 manage.py migrate', shell=True)
+    if _code == 0:
+        return
+    logging.error('Perform migrate failed, exit')
+    sys.exit(11)
 
 
 def collect_static():
@@ -96,16 +100,17 @@ def collect_static():
     logging.info("Collect static files done")
 
 
+def upgrade_db():
+    collect_static()
+    perform_db_migrate()
+
+
 def prepare():
+    # installer(check) & k8s(no check)
     check_database_connection()
     check_migrations()
     upgrade_db()
     expire_caches()
-
-
-def upgrade_db():
-    collect_static()
-    perform_db_migrate()
 
 
 if __name__ == '__main__':
@@ -139,7 +144,7 @@ if __name__ == '__main__':
         upgrade_db()
     else:
         services = args.services if isinstance(args.services, list) else [args.services]
-        if action == 'start' and ({'gunicorn', 'all'} & set(services)):
+        if action == 'start' and {'all', 'web'} & set(services):
             prepare()
 
         services_string = ' '.join(services)
