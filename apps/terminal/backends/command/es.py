@@ -43,6 +43,9 @@ class CommandStore():
         self.is_new_index_type()
 
     def is_new_index_type(self):
+        if not self.ping(timeout=3):
+            return
+
         # 检测索引是不是新的类型
         data = self.es.indices.get_mapping(self.index)
         try:
