@@ -117,11 +117,6 @@ class BaseService(object):
         sig = 9 if force else 15
         os.kill(self.pid, sig)
 
-        try:
-            self.process.wait(2)
-        except:
-            pass
-
         for i in range(self.STOP_TIMEOUT):
             if i == self.STOP_TIMEOUT - 1:
                 print("\033[31m Error\033[0m")
@@ -143,14 +138,10 @@ class BaseService(object):
     def _check(self):
         now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         print(f"{now} Check service status: {self.name} -> ", end='')
-        try:
-            self.process.wait(timeout=1)  # 不wait，子进程可能无法回收
-        except subprocess.TimeoutExpired:
-            pass
         if self.is_running:
-            print(f'running at {self.process.pid}')
+            print(f'running at {self.pid}')
         else:
-            print(f'stopped with code: {self.process.returncode}({self.process.pid})')
+            print(f'stopped at {self.pid}')
 
     def _restart(self):
         if self.retry > self.max_retry:
@@ -158,7 +149,7 @@ class BaseService(object):
             self.EXIT_EVENT.set()
             return
         self.retry += 1
-        logging.info(f'> Find {self.name} stopped, retry {self.retry}, {self.process.pid}')
+        logging.info(f'> Find {self.name} stopped, retry {self.retry}, {self.pid}')
         self.start()
 
     def _rotate_log(self):
