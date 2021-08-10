@@ -33,11 +33,31 @@ class CommandStore():
         kwargs = config.get("OTHER", {})
         self.index = config.get("INDEX") or 'jumpserver'
         self.doc_type = config.get("DOC_TYPE") or 'command_store'
+        self.exact_fields = {}
+        self.match_fields = {}
 
         ignore_verify_certs = kwargs.pop('IGNORE_VERIFY_CERTS', False)
         if ignore_verify_certs:
             kwargs['verify_certs'] = None
         self.es = Elasticsearch(hosts=hosts, max_retries=0, **kwargs)
+        self.is_new_index_type()
+
+    def is_new_index_type(self):
+        # 检测索引是不是新的类型
+        data = self.es.indices.get_mapping(self.index)
+        try:
+            properties = data[self.index]['mappings']['properties']
+            if properties['session']['type'] == 'keyword' \
+                    and properties['org_id']['type'] == 'keyword':
+                self.exact_fields = {'session', 'org_id'}
+                self.match_fields = {'input', 'org_id', 'risk_level', 'user', 'asset', 'system_user'}
+                self.doc_type = '_doc'
+                return
+        except KeyError:
+            pass
+
+        self.exact_fields = {}
+        self.match_fields = {'session', 'org_id', 'input', 'org_id', 'risk_level', 'user', 'asset', 'system_user'}
 
     def pre_use_check(self):
         if not self.ping(timeout=3):
@@ -110,15 +130,14 @@ class CommandStore():
         except Exception:
             return False
 
-    @staticmethod
-    def get_query_body(**kwargs):
+    def get_query_body(self, **kwargs):
         new_kwargs = {}
         for k, v in kwargs.items():
             new_kwargs[k] = str(v) if isinstance(v, UUID) else v
         kwargs = new_kwargs
 
-        exact_fields = {}
-        match_fields = {'session', 'input', 'org_id', 'risk_level', 'user', 'asset', 'system_user'}
+        exact_fields = self.exact_fields
+        match_fields = self.match_fields
 
         match = {}
         exact = {}
