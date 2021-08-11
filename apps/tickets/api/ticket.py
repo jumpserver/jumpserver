@@ -11,10 +11,10 @@ from common.permissions import IsValidUser, IsOrgAdmin, IsSuperUser
 from common.drf.api import JMSBulkModelViewSet
 
 from tickets import serializers
-from tickets.models import Ticket, Template
+from tickets.models import Ticket, TicketFlow
 from tickets.permissions.ticket import IsAssignee, IsAssigneeOrApplicant, NotClosed
 
-__all__ = ['TicketViewSet', 'TemplateViewSet']
+__all__ = ['TicketViewSet', 'TicketFlowViewSet']
 
 
 class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
@@ -47,8 +47,8 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         instance = serializer.save()
-        assignees = instance.create_related_assignees()
-        instance.process = [instance.create_process_node_info(assignees)]
+        instance.create_related_assignees()
+        instance.process = instance.create_process_nodes()
         instance.open(applicant=self.request.user)
 
     @action(detail=False, methods=[POST], permission_classes=[IsValidUser, ])
@@ -77,18 +77,21 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class TemplateViewSet(JMSBulkModelViewSet):
+class TicketFlowViewSet(JMSBulkModelViewSet):
     permission_classes = (IsOrgAdmin, IsSuperUser)
-    serializer_class = serializers.TemplateSerializer
+    serializer_class = serializers.TicketFlowSerializer
+
+    filterset_fields = ['id', 'title', 'type']
+    search_fields = ['id', 'title', 'type']
 
     def get_queryset(self):
-        queryset = Template.get_org_related_templates()
+        queryset = TicketFlow.get_org_related_templates()
         return queryset
 
     def perform_create_or_update(self, serializer):
         instance = serializer.save()
         instance.save()
-        instance.templated_approves.model.change_assignees_display(instance.templated_approves.all())
+        instance.ticket_flow_approves.model.change_assignees_display(instance.ticket_flow_approves.all())
 
     def perform_create(self, serializer):
         self.perform_create_or_update(serializer)

@@ -9,11 +9,11 @@ from perms.models import AssetPermission
 from orgs.models import Organization
 from orgs.utils import tmp_to_org
 from users.models import User
-from tickets.models import Ticket, Template, TemplateApprove
+from tickets.models import Ticket, TicketFlow, TicketFlowApprove
 from .meta import type_serializer_classes_mapping
 
 __all__ = [
-    'TicketDisplaySerializer', 'TicketApplySerializer', 'TicketApproveSerializer', 'TemplateSerializer'
+    'TicketDisplaySerializer', 'TicketApplySerializer', 'TicketApproveSerializer', 'TicketFlowSerializer'
 ]
 
 
@@ -26,7 +26,7 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
         model = Ticket
         fields_mini = ['id', 'title']
         fields_small = fields_mini + [
-            'type', 'type_display', 'meta',
+            'type', 'type_display', 'meta', 'action',
             'status', 'status_display', 'applicant_display', 'process',
             'date_created', 'date_updated', 'comment', 'org_id', 'org_name', 'body'
         ]
@@ -109,7 +109,7 @@ class TicketApplySerializer(TicketSerializer):
     def validate(self, attrs):
         type = attrs.get('type')
         if type:
-            attrs['template'] = Template.get_org_related_templates().filter(type=type).first()
+            attrs['flow'] = TicketFlow.get_org_related_templates().filter(type=type).first()
         return attrs
 
     @atomic
@@ -132,20 +132,20 @@ class TicketApproveSerializer(TicketSerializer):
         read_only_fields = fields
 
 
-class TemplateApproveSerializer(serializers.ModelSerializer):
+class TicketFlowApproveSerializer(serializers.ModelSerializer):
     approve_level_display = serializers.ReadOnlyField(
         source='get_approve_level_display', label=_('Approve level display'))
     approve_strategy_display = serializers.ReadOnlyField(
         source='get_approve_strategy_display', label=_('Approve strategy display'))
 
     class Meta:
-        model = TemplateApprove
+        model = TicketFlowApprove
         fields_mini = ['id', ]
         fields_small = fields_mini + [
             'approve_level', 'approve_level_display', 'approve_strategy', 'approve_strategy_display',
             'assignees_display', 'date_created', 'date_updated'
         ]
-        fields_fk = ['ticket_template', ]
+        fields_fk = ['ticket_flow', ]
         fields_m2m = ['assignees']
         fields = fields_small + fields_fk + fields_m2m
         read_only_fields = ['assignees_display', 'date_created', 'date_updated']
@@ -154,18 +154,18 @@ class TemplateApproveSerializer(serializers.ModelSerializer):
         }
 
 
-class TemplateSerializer(OrgResourceModelSerializerMixin):
+class TicketFlowSerializer(OrgResourceModelSerializerMixin):
     org_id = serializers.CharField(required=True, max_length=36, allow_blank=True, label=_("Organization"))
     type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type display'))
-    templated_approves = TemplateApproveSerializer(many=True, required=True)
+    ticket_flow_approves = TicketFlowApproveSerializer(many=True, required=True)
 
     class Meta:
-        model = Template
+        model = TicketFlow
         fields_mini = ['id', 'title']
         fields_small = fields_mini + [
             'type', 'type_display', 'created_by', 'date_created', 'date_updated', 'org_id', 'org_name'
         ]
-        fields = fields_small + ['templated_approves', ]
+        fields = fields_small + ['ticket_flow_approves', ]
         read_only_fields = ['created_by', 'date_created', 'date_updated']
 
     def validate_type(self, value):
@@ -182,15 +182,15 @@ class TemplateSerializer(OrgResourceModelSerializerMixin):
             raise serializers.ValidationError(error)
         return org_id
 
-    def create_or_update(self, action, validated_data, templated_approves, assignees, instance=None):
-        childs = validated_data.pop(templated_approves, [])
+    def create_or_update(self, action, validated_data, related, assignees, instance=None):
+        childs = validated_data.pop(related, [])
         if not instance:
             instance = getattr(super(), action)(validated_data)
         else:
             instance = getattr(super(), action)(instance, validated_data)
-            getattr(instance, templated_approves).clear()
+            getattr(instance, related).clear()
 
-        fk = getattr(instance, templated_approves).field
+        fk = getattr(instance, related).field
         for data in childs:
             data_m2m = data.pop(assignees, None)
             data[fk.name] = instance
@@ -204,12 +204,12 @@ class TemplateSerializer(OrgResourceModelSerializerMixin):
 
     @atomic
     def create(self, validated_data):
-        return self.create_or_update('create', validated_data, 'templated_approves', 'assignees')
+        return self.create_or_update('create', validated_data, 'ticket_flow_approves', 'assignees')
 
     @atomic
     def update(self, instance, validated_data):
         if instance.org_id == Organization.ROOT_ID:
             instance = self.create(validated_data)
         else:
-            instance = self.create_or_update('update', validated_data, 'templated_approves', 'assignees', instance)
+            instance = self.create_or_update('update', validated_data, 'ticket_flow_approves', 'assignees', instance)
         return instance

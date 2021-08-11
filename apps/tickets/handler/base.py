@@ -1,4 +1,5 @@
 from django.utils.translation import ugettext as _
+from django.utils import timezone
 from common.utils import get_logger
 from tickets.utils import (
     send_ticket_processed_mail_to_applicant, send_ticket_applied_mail_to_assignees
@@ -25,11 +26,16 @@ class BaseHandler(object):
     def _on_approve(self):
         is_finish = False
         processor = self.ticket.processor
-        if self.ticket.approve_level != self.ticket.template.get_level_all_count:
-            self.ticket.approve_level += 1
-            assignees = self.ticket.create_related_assignees()
-            self.ticket.process.append(self.ticket.create_process_node_info(assignees))
+        # 兼容历史数据
+        if not self.ticket.flow:
+            flow_level_all_count = 1
         else:
+            flow_level_all_count = self.ticket.flow.get_level_all_count
+        if self.ticket.approve_level != flow_level_all_count:
+            self.ticket.approve_level += 1
+            self.ticket.create_related_assignees()
+        else:
+            self.ticket.set_action_approve()
             self.ticket.set_status_closed()
             is_finish = True
         self._send_applied_mail_to_assignees()
@@ -37,10 +43,12 @@ class BaseHandler(object):
         return is_finish
 
     def _on_reject(self):
+        self.ticket.set_action_reject()
         self.ticket.set_status_closed()
         self.__on_process(self.ticket.processor)
 
     def _on_close(self):
+        self.ticket.set_action_closed()
         self.ticket.set_status_closed()
         self.__on_process(self.ticket.processor)
 
@@ -51,6 +59,7 @@ class BaseHandler(object):
     def dispatch(self, action):
         processor = self.ticket.processor
         self.ticket.process[self.ticket.approve_level - 1].update({
+            'approval_date': str(timezone.now().now()),
             'action': action,
             'processor': processor.id if processor else '',
             'processor_display': str(processor) if processor else '',
