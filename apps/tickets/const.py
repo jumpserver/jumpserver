@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 TICKET_DETAIL_URL = '/ui/#/tickets/tickets/{id}'
 
 
-class TicketTypeChoices(TextChoices):
+class TicketType(TextChoices):
     general = 'general', _("General")
     login_confirm = 'login_confirm', _("Login confirm")
     apply_asset = 'apply_asset', _('Apply for asset')
@@ -13,24 +13,24 @@ class TicketTypeChoices(TextChoices):
     command_confirm = 'command_confirm', _('Command confirm')
 
 
-class TicketActionChoices(TextChoices):
+class TicketAction(TextChoices):
     open = 'open', _('Open')
     approve = 'approve', _('Approve')
     reject = 'reject', _('Reject')
     close = 'close', _('Close')
 
 
-class TicketStatusChoices(TextChoices):
+class TicketStatus(TextChoices):
     open = 'open', _("Open")
     closed = 'closed', _("Closed")
 
 
-class TicketApproveLevelChoices(IntegerChoices):
+class TicketApproveLevel(IntegerChoices):
     one = 1, _("One level")
     two = 2, _("Two level")
 
 
-class TicketApproveStrategyChoices(TextChoices):
+class TicketApproveStrategy(TextChoices):
     super = 'super', _("Super user")
     system = 'super_admin', _("Super admin user")
     all = 'all_user', _("All user")

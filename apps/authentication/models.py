@@ -74,7 +74,7 @@ class LoginConfirmSetting(CommonModelMixin):
         ticket_assignees = self.reviewers.all()
         data = {
             'title': ticket_title,
-            'type': const.TicketTypeChoices.login_confirm.value,
+            'type': const.TicketType.login_confirm.value,
             'meta': ticket_meta,
             'org_id': Organization.ROOT_ID,
         }

@@ -11,8 +11,8 @@ from django.conf import settings
 from common.mixins.models import CommonModelMixin
 from orgs.mixins.models import OrgModelMixin
 from orgs.utils import tmp_to_root_org, tmp_to_org, get_current_org
-from tickets.const import TicketTypeChoices, TicketActionChoices, TicketStatusChoices, \
-    TicketApproveLevelChoices, TicketApproveStrategyChoices
+from tickets.const import TicketType, TicketAction, TicketStatus, \
+    TicketApproveLevel, TicketApproveStrategy
 from tickets.signals import post_change_ticket_action, post_or_update_change_template_approve
 from tickets.handler import get_ticket_handler
 
@@ -36,20 +36,20 @@ class ModelJSONFieldEncoder(json.JSONEncoder):
 class Ticket(CommonModelMixin, OrgModelMixin):
     title = models.CharField(max_length=256, verbose_name=_("Title"))
     type = models.CharField(
-        max_length=64, choices=TicketTypeChoices.choices,
-        default=TicketTypeChoices.general.value, verbose_name=_("Type")
+        max_length=64, choices=TicketType.choices,
+        default=TicketType.general.value, verbose_name=_("Type")
     )
     meta = models.JSONField(encoder=ModelJSONFieldEncoder, default=dict, verbose_name=_("Meta"))
     status = models.CharField(
-        max_length=16, choices=TicketStatusChoices.choices,
-        default=TicketStatusChoices.open.value, verbose_name=_("Status")
+        max_length=16, choices=TicketStatus.choices,
+        default=TicketStatus.open.value, verbose_name=_("Status")
     )
     action = models.CharField(
-        choices=TicketActionChoices.choices, max_length=16,
-        default=TicketActionChoices.open.value, verbose_name=_("Action")
+        choices=TicketAction.choices, max_length=16,
+        default=TicketAction.open.value, verbose_name=_("Action")
     )
     approve_level = models.SmallIntegerField(
-        default=TicketApproveLevelChoices.one.value, verbose_name=_('Approve level')
+        default=TicketApproveLevel.one.value, verbose_name=_('Approve level')
     )
     # 申请人
     applicant = models.ForeignKey(
@@ -79,27 +79,27 @@ class Ticket(CommonModelMixin, OrgModelMixin):
     # type
     @property
     def type_apply_asset(self):
-        return self.type == TicketTypeChoices.apply_asset.value
+        return self.type == TicketType.apply_asset.value
 
     @property
     def type_apply_application(self):
-        return self.type == TicketTypeChoices.apply_application.value
+        return self.type == TicketType.apply_application.value
 
     @property
     def type_login_confirm(self):
-        return self.type == TicketTypeChoices.login_confirm.value
+        return self.type == TicketType.login_confirm.value
 
     # status
     @property
     def status_closed(self):
-        return self.status == TicketStatusChoices.closed.value
+        return self.status == TicketStatus.closed.value
 
     @property
     def status_open(self):
-        return self.status == TicketStatusChoices.open.value
+        return self.status == TicketStatus.open.value
 
     def action_open(self, action=None):
-        return action == TicketActionChoices.open.value
+        return action == TicketAction.open.value
 
     @property
     def cur_assignees(self):
@@ -112,16 +112,16 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         return m2m_ticket_users.user if m2m_ticket_users else None
 
     def set_action_approve(self):
-        self.action = TicketActionChoices.approve.value
+        self.action = TicketAction.approve.value
 
     def set_action_reject(self):
-        self.action = TicketActionChoices.reject.value
+        self.action = TicketAction.reject.value
 
     def set_action_closed(self):
-        self.action = TicketActionChoices.close.value
+        self.action = TicketAction.close.value
 
     def set_status_closed(self):
-        self.status = TicketStatusChoices.closed.value
+        self.status = TicketStatus.closed.value
 
     def create_related_assignees(self):
         template_approve = self.get_ticket_flow_approve(self.approve_level)
@@ -142,7 +142,7 @@ class Ticket(CommonModelMixin, OrgModelMixin):
             nodes.append(
                 {
                     'approve_level': node.approve_level,
-                    'action': TicketActionChoices.open.value,
+                    'action': TicketAction.open.value,
                     'assignees': [assignee.id for assignee in assignees],
                     'assignees_display': [str(assignee) for assignee in assignees]
                 }
@@ -152,26 +152,26 @@ class Ticket(CommonModelMixin, OrgModelMixin):
     def change_action_and_processor(self, action, user):
         cur_assignees = self.cur_assignees
         cur_assignees.update(action=action)
-        if action != TicketActionChoices.open.value:
+        if action != TicketAction.open.value:
             cur_assignees.filter(user=user).update(is_processor=True)
         else:
             self.applicant = user
 
     # action changed
     def open(self, applicant):
-        action = TicketActionChoices.open.value
+        action = TicketAction.open.value
         self._change_action(action, applicant)
 
     def approve(self, processor):
-        action = TicketActionChoices.approve.value
+        action = TicketAction.approve.value
         self._change_action(action, processor)
 
     def reject(self, processor):
-        action = TicketActionChoices.reject.value
+        action = TicketAction.reject.value
         self._change_action(action, processor)
 
     def close(self, processor):
-        action = TicketActionChoices.close.value
+        action = TicketAction.close.value
         self._change_action(action, processor)
 
     def _change_action(self, action, user):
@@ -221,13 +221,13 @@ class TicketAssignee(CommonModelMixin):
         'users.User', related_name='m2m_user_tickets', on_delete=models.CASCADE, verbose_name='User'
     )
     approve_level = models.SmallIntegerField(
-        default=TicketApproveLevelChoices.one.value, choices=TicketApproveLevelChoices.choices,
+        default=TicketApproveLevel.one, choices=TicketApproveLevel.choices,
         verbose_name=_('Approve level')
     )
     is_processor = models.BooleanField(default=False)
     action = models.CharField(
-        choices=TicketActionChoices.choices, max_length=16,
-        default=TicketActionChoices.open.value, verbose_name=_("Action")
+        choices=TicketAction.choices, max_length=16,
+        default=TicketAction.open, verbose_name=_("Action")
     )
 
     class Meta:
@@ -239,9 +239,14 @@ class TicketAssignee(CommonModelMixin):
 
 class TicketFlow(CommonModelMixin, OrgModelMixin):
     title = models.CharField(max_length=256, verbose_name=_("Title"))
+    level = models.SmallIntegerField(
+        default=TicketApproveLevel.one,
+        choices=TicketApproveLevel.choices,
+        verbose_name=_('Approve level')
+    )
     type = models.CharField(
-        max_length=64, choices=TicketTypeChoices.choices,
-        default=TicketTypeChoices.general.value, verbose_name=_("Type")
+        max_length=64, choices=TicketType.choices,
+        default=TicketType.general.value, verbose_name=_("Type")
     )
 
     def save(self, *args, **kwargs):
@@ -270,12 +275,12 @@ class TicketFlow(CommonModelMixin, OrgModelMixin):
 
 class TicketFlowApprove(CommonModelMixin):
     approve_level = models.SmallIntegerField(
-        default=TicketApproveLevelChoices.one.value, choices=TicketApproveLevelChoices.choices,
+        default=TicketApproveLevel.one.value, choices=TicketApproveLevel.choices,
         verbose_name=_('Approve level')
     )
     approve_strategy = models.CharField(
-        max_length=64, default=TicketApproveStrategyChoices.system.value,
-        choices=TicketApproveStrategyChoices.choices,
+        max_length=64, default=TicketApproveStrategy.system.value,
+        choices=TicketApproveStrategy.choices,
         verbose_name=_('Approve strategy')
     )
     # 受理人列表
