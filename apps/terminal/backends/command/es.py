@@ -11,7 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from django.db.models import QuerySet as DJQuerySet
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
-from elasticsearch.exceptions import RequestError
+from elasticsearch.exceptions import RequestError, NotFoundError
 
 from common.utils.common import lazyproperty
 from common.utils import get_logger
@@ -40,27 +40,35 @@ class CommandStore():
         if ignore_verify_certs:
             kwargs['verify_certs'] = None
         self.es = Elasticsearch(hosts=hosts, max_retries=0, **kwargs)
-        self.is_new_index_type()
+
+        self.exact_fields = set()
+        self.match_fields = {'input', 'risk_level', 'user', 'asset', 'system_user'}
+        may_exact_fields = {'session', 'org_id'}
+
+        if self.is_new_index_type():
+            self.exact_fields.update(may_exact_fields)
+            self.doc_type = '_doc'
+        else:
+            self.match_fields.update(may_exact_fields)
 
     def is_new_index_type(self):
         if not self.ping(timeout=3):
-            return
+            return False
 
-        # 检测索引是不是新的类型
-        data = self.es.indices.get_mapping(self.index)
         try:
+            # 获取索引信息，如果没有定义，直接返回
+            data = self.es.indices.get_mapping(self.index)
+        except NotFoundError:
+            return False
+
+        try:
+            # 检测索引是不是新的类型
             properties = data[self.index]['mappings']['properties']
             if properties['session']['type'] == 'keyword' \
                     and properties['org_id']['type'] == 'keyword':
-                self.exact_fields = {'session', 'org_id'}
-                self.match_fields = {'input', 'org_id', 'risk_level', 'user', 'asset', 'system_user'}
-                self.doc_type = '_doc'
-                return
+                return True
         except KeyError:
-            pass
-
-        self.exact_fields = {}
-        self.match_fields = {'session', 'org_id', 'input', 'org_id', 'risk_level', 'user', 'asset', 'system_user'}
+            return False
 
     def pre_use_check(self):
         if not self.ping(timeout=3):
