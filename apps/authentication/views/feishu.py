@@ -127,8 +127,8 @@ class FeiShuQRBindCallbackView(FeiShuQRMixin, View):
             return response
 
         feishu = FeiShu(
-            app_id='cli_a181e0f53038500d',
-            app_secret='sE7hRvSnxVkIqBGC8XUvHfvwgh7TrDuX'
+            app_id=settings.FEISHU_APP_ID,
+            app_secret=settings.FEISHU_APP_SECRET
         )
         user_id = feishu.get_user_id_by_code(code)
 
@@ -192,8 +192,8 @@ class FeiShuQRLoginCallbackView(AuthMixin, FeiShuQRMixin, View):
             return self.get_verify_state_failed_response(redirect_url)
 
         feishu = FeiShu(
-            app_id='cli_a181e0f53038500d',
-            app_secret='sE7hRvSnxVkIqBGC8XUvHfvwgh7TrDuX'
+            app_id=settings.FEISHU_APP_ID,
+            app_secret=settings.FEISHU_APP_SECRET
         )
         user_id = feishu.get_user_id_by_code(code)
         if not user_id:

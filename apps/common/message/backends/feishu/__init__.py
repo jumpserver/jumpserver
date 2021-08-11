@@ -10,11 +10,6 @@ from common.message.backends.mixin import RequestMixin, BaseRequest
 logger = get_logger(__name__)
 
 
-class WeComError(APIException):
-    default_code = 'wecom_error'
-    default_detail = _('WeCom error, please contact system administrator')
-
-
 class URL:
     AUTHEN = 'https://open.feishu.cn/open-apis/authen/v1/index'
 
@@ -118,5 +113,3 @@ class FeiShu(RequestMixin):
                 logger.exception(e)
                 invalid_users.append(user_id)
         return invalid_users
-
-feishu = FeiShu(app_id='cli_a181e0f53038500d', app_secret='sE7hRvSnxVkIqBGC8XUvHfvwgh7TrDuX')
