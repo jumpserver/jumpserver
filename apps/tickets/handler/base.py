@@ -4,7 +4,7 @@ from common.utils import get_logger
 from tickets.utils import (
     send_ticket_processed_mail_to_applicant, send_ticket_applied_mail_to_assignees
 )
-from tickets.const import TicketAction
+from tickets.const import TicketStatus
 from orgs.utils import tmp_to_org
 
 logger = get_logger(__name__)
@@ -82,7 +82,7 @@ class BaseHandler(object):
     def _create_comment_on_action(self, action):
         user = self.ticket.applicant if self.ticket.action_open(action=action) else self.ticket.processor
         user_display = str(user)
-        action_display = getattr(TicketAction, action).label
+        action_display = getattr(TicketStatus, action).label
         data = {
             'body': _('{} {} the ticket').format(user_display, action_display),
             'user': user,

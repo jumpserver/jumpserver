@@ -8,11 +8,34 @@ from common.mixins.models import CommonModelMixin
 from common.db.encoder import ModelJSONFieldEncoder
 from orgs.mixins.models import OrgModelMixin
 from orgs.utils import tmp_to_root_org, tmp_to_org
-from tickets.const import TicketType, TicketAction, TicketStatus, TicketApprovalLevel
+from tickets.const import TicketType, TicketStatus, TicketState, TicketApprovalLevel
 from tickets.signals import post_change_ticket_action
 from tickets.handler import get_ticket_handler
 
 __all__ = ['Ticket']
+
+
+class TicketProcess(CommonModelMixin):
+    ticket = models.ForeignKey(
+        'Ticket', related_name='m2m_ticket_users', on_delete=models.CASCADE, verbose_name='Ticket'
+    )
+    assignee = models.ForeignKey(
+        'users.User', related_name='m2m_user_tickets', on_delete=models.CASCADE, verbose_name='User'
+    )
+    step = models.SmallIntegerField(
+        default=TicketApprovalLevel.one, choices=TicketApprovalLevel.choices,
+        verbose_name=_('Approve level')
+    )
+    action = models.CharField(
+        choices=TicketStatus.choices, max_length=16,
+        default=TicketStatus.open, verbose_name=_("Action")
+    )
+
+    class Meta:
+        verbose_name = _('Ticket assignee')
+
+    def __str__(self):
+        return '{0.user.name}({0.user.username})_{0.approve_level}'.format(self)
 
 
 class Ticket(CommonModelMixin, OrgModelMixin):
@@ -22,16 +45,17 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         default=TicketType.general.value, verbose_name=_("Type")
     )
     meta = models.JSONField(encoder=ModelJSONFieldEncoder, default=dict, verbose_name=_("Meta"))
+    state = models.CharField(
+        max_length=16, choices=TicketState.choices,
+        default=TicketState.open, verbose_name=_("State")
+    )
     status = models.CharField(
         max_length=16, choices=TicketStatus.choices,
-        default=TicketStatus.open.value, verbose_name=_("Status")
+        default=TicketStatus.open, verbose_name=_("Status")
     )
-    action = models.CharField(
-        choices=TicketAction.choices, max_length=16,
-        default=TicketAction.open.value, verbose_name=_("Action")
-    )
-    approve_level = models.SmallIntegerField(
-        default=TicketApprovalLevel.one.value, verbose_name=_('Approve level')
+    approval_step = models.SmallIntegerField(
+        default=TicketApprovalLevel.one, choices=TicketApprovalLevel.choices,
+        verbose_name=_('Approval step')
     )
     # 申请人
     applicant = models.ForeignKey(
@@ -41,12 +65,11 @@ class Ticket(CommonModelMixin, OrgModelMixin):
     applicant_display = models.CharField(max_length=256, default='', verbose_name=_("Applicant display"))
     # 受理人列表
     assignees = models.ManyToManyField(
-        'users.User', related_name='assigned_tickets', verbose_name=_("Assignees"), through='TicketAssignee'
+        'users.User', related_name='assigned_tickets', verbose_name=_("Assignees"), through='TicketProcess'
     )
-    process = models.JSONField(encoder=ModelJSONFieldEncoder, default=list, verbose_name=_("Process"))
+    process_map = models.JSONField(encoder=ModelJSONFieldEncoder, default=list, verbose_name=_("Process"))
     # 评论
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
-
     flow = models.ForeignKey(
         'TicketFlow', related_name='ticket_flow_tickets', on_delete=models.SET_NULL, null=True,
         verbose_name=_("TicketFlow")
@@ -81,7 +104,7 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         return self.status == TicketStatus.open.value
 
     def action_open(self, action=None):
-        return action == TicketAction.open.value
+        return action == TicketStatus.open.value
 
     @property
     def cur_assignees(self):
@@ -94,13 +117,13 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         return m2m_ticket_users.user if m2m_ticket_users else None
 
     def set_action_approve(self):
-        self.action = TicketAction.approve.value
+        self.action = TicketStatus.approve.value
 
     def set_action_reject(self):
-        self.action = TicketAction.reject.value
+        self.action = TicketStatus.reject.value
 
     def set_action_closed(self):
-        self.action = TicketAction.close.value
+        self.action = TicketStatus.close.value
 
     def set_status_closed(self):
         self.status = TicketStatus.closed.value
@@ -124,7 +147,7 @@ class Ticket(CommonModelMixin, OrgModelMixin):
             nodes.append(
                 {
                     'approve_level': node.approve_level,
-                    'action': TicketAction.open.value,
+                    'action': TicketStatus.open.value,
                     'assignees': [assignee.id for assignee in assignees],
                     'assignees_display': [str(assignee) for assignee in assignees]
                 }
@@ -134,26 +157,26 @@ class Ticket(CommonModelMixin, OrgModelMixin):
     def change_action_and_processor(self, action, user):
         cur_assignees = self.cur_assignees
         cur_assignees.update(action=action)
-        if action != TicketAction.open.value:
+        if action != TicketStatus.open.value:
             cur_assignees.filter(user=user).update(is_processor=True)
         else:
             self.applicant = user
 
     # action changed
     def open(self, applicant):
-        action = TicketAction.open.value
+        action = TicketStatus.open.value
         self._change_action(action, applicant)
 
     def approve(self, processor):
-        action = TicketAction.approve.value
+        action = TicketStatus.approve.value
         self._change_action(action, processor)
 
     def reject(self, processor):
-        action = TicketAction.reject.value
+        action = TicketStatus.reject.value
         self._change_action(action, processor)
 
     def close(self, processor):
-        action = TicketAction.close.value
+        action = TicketStatus.close.value
         self._change_action(action, processor)
 
     def _change_action(self, action, user):
@@ -193,30 +216,6 @@ class Ticket(CommonModelMixin, OrgModelMixin):
     def body(self):
         _body = self.handler.get_body()
         return _body
-
-
-class TicketAssignee(CommonModelMixin):
-    ticket = models.ForeignKey(
-        'Ticket', related_name='m2m_ticket_users', on_delete=models.CASCADE, verbose_name='Ticket'
-    )
-    user = models.ForeignKey(
-        'users.User', related_name='m2m_user_tickets', on_delete=models.CASCADE, verbose_name='User'
-    )
-    approve_level = models.SmallIntegerField(
-        default=TicketApprovalLevel.one, choices=TicketApprovalLevel.choices,
-        verbose_name=_('Approve level')
-    )
-    is_processor = models.BooleanField(default=False)
-    action = models.CharField(
-        choices=TicketAction.choices, max_length=16,
-        default=TicketAction.open, verbose_name=_("Action")
-    )
-
-    class Meta:
-        verbose_name = _('Ticket assignee')
-
-    def __str__(self):
-        return '{0.user.name}({0.user.username})_{0.approve_level}'.format(self)
 
 
 

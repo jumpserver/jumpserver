@@ -10,8 +10,8 @@ __all__ = [
 # ticket action
 # -------------
 
-action_open = const.TicketAction.open.value
-action_approve = const.TicketAction.approve.value
+action_open = const.TicketStatus.open.value
+action_approve = const.TicketStatus.approve.value
 
 
 # defines `meta` field dynamic mapping serializers

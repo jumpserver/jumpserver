@@ -13,11 +13,17 @@ class TicketType(TextChoices):
     command_confirm = 'command_confirm', _('Command confirm')
 
 
-class TicketAction(TextChoices):
+class TicketState(TextChoices):
     open = 'open', _('Open')
     approve = 'approve', _('Approve')
     reject = 'reject', _('Reject')
     close = 'close', _('Close')
+
+
+class ProcessStatus(TextChoices):
+    notified = 'notified', _('Notified')
+    approved = 'approved', _('Approved')
+    rejected = 'rejected', _('Rejected')
 
 
 class TicketStatus(TextChoices):
