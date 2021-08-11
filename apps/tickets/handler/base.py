@@ -25,11 +25,17 @@ class BaseHandler(object):
     def _on_approve(self):
         is_finish = False
         processor = self.ticket.processor
-        if self.ticket.approve_level != self.ticket.template.get_level_all_count:
+        # 兼容历史数据
+        if not self.ticket.flow:
+            flow_level_all_count = 1
+        else:
+            flow_level_all_count = self.ticket.flow.get_level_all_count
+        if self.ticket.approve_level != flow_level_all_count:
             self.ticket.approve_level += 1
             assignees = self.ticket.create_related_assignees()
             self.ticket.process.append(self.ticket.create_process_node_info(assignees))
         else:
+            self.ticket.set_action_approve()
             self.ticket.set_status_closed()
             is_finish = True
         self._send_applied_mail_to_assignees()
@@ -37,10 +43,12 @@ class BaseHandler(object):
         return is_finish
 
     def _on_reject(self):
+        self.ticket.set_action_reject()
         self.ticket.set_status_closed()
         self.__on_process(self.ticket.processor)
 
     def _on_close(self):
+        self.ticket.set_action_closed()
         self.ticket.set_status_closed()
         self.__on_process(self.ticket.processor)
 

@@ -16,7 +16,7 @@ from tickets.const import TicketTypeChoices, TicketActionChoices, TicketStatusCh
 from tickets.signals import post_change_ticket_action, post_or_update_change_template_approve
 from tickets.handler import get_ticket_handler
 
-__all__ = ['Ticket', 'Template', 'TemplateApprove', 'ModelJSONFieldEncoder']
+__all__ = ['Ticket', 'TicketFlow', 'TicketFlowApprove', 'ModelJSONFieldEncoder']
 
 
 class ModelJSONFieldEncoder(json.JSONEncoder):
@@ -65,9 +65,9 @@ class Ticket(CommonModelMixin, OrgModelMixin):
     # 评论
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
-    template = models.ForeignKey(
-        'Template', related_name='templated_tickets', on_delete=models.SET_NULL, null=True,
-        verbose_name=_("Template")
+    flow = models.ForeignKey(
+        'TicketFlow', related_name='ticket_flow_tickets', on_delete=models.SET_NULL, null=True,
+        verbose_name=_("TicketFlow")
     )
 
     class Meta:
@@ -111,11 +111,20 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         m2m_ticket_users = self.m2m_ticket_users.filter(approve_level=level, is_processor=True).first()
         return m2m_ticket_users.user if m2m_ticket_users else None
 
+    def set_action_approve(self):
+        self.action = TicketActionChoices.approve.value
+
+    def set_action_reject(self):
+        self.action = TicketActionChoices.reject.value
+
+    def set_action_closed(self):
+        self.action = TicketActionChoices.close.value
+
     def set_status_closed(self):
         self.status = TicketStatusChoices.closed.value
 
     def create_related_assignees(self):
-        template_approve = self.get_template_approve(self.approve_level)
+        template_approve = self.get_ticket_flow_approve(self.approve_level)
         ticket_assignee_list = []
         assignees = template_approve.assignees.all()
         ticket_assignee_model = self.assignees.through
@@ -173,8 +182,8 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         tickets = cls.all().filter(queries).distinct()
         return tickets
 
-    def get_template_approve(self, level):
-        return self.template.templated_approves.filter(approve_level=level).first()
+    def get_ticket_flow_approve(self, level):
+        return self.flow.ticket_flow_approves.filter(approve_level=level).first()
 
     @classmethod
     def all(cls):
@@ -221,7 +230,7 @@ class TicketAssignee(CommonModelMixin):
         return '{0.user.name}({0.user.username})_{0.approve_level}'.format(self)
 
 
-class Template(CommonModelMixin, OrgModelMixin):
+class TicketFlow(CommonModelMixin, OrgModelMixin):
     title = models.CharField(max_length=256, verbose_name=_("Title"))
     type = models.CharField(
         max_length=64, choices=TicketTypeChoices.choices,
@@ -234,25 +243,25 @@ class Template(CommonModelMixin, OrgModelMixin):
             return super().save(*args, **kwargs)
 
     class Meta:
-        verbose_name = _('Ticket template')
+        verbose_name = _('Ticket flow')
 
     def __str__(self):
         return '{}({})'.format(self.title, self.type)
 
     @property
     def get_level_all_count(self):
-        return self.templated_approves.count()
+        return self.ticket_flow_approves.count()
 
     @classmethod
     def get_org_related_templates(cls):
         org = get_current_org()
-        templates = cls.objects.filter(org_id=org.id)
-        cur_template_types = templates.values_list('type', flat=True)
-        diff_global_templates = cls.objects.filter(org_id=org.ROOT_ID).exclude(type__in=cur_template_types)
-        return templates | diff_global_templates
+        flows = cls.objects.filter(org_id=org.id)
+        cur_flow_types = flows.values_list('type', flat=True)
+        diff_global_flows = cls.objects.filter(org_id=org.ROOT_ID).exclude(type__in=cur_flow_types)
+        return flows | diff_global_flows
 
 
-class TemplateApprove(CommonModelMixin):
+class TicketFlowApprove(CommonModelMixin):
     approve_level = models.SmallIntegerField(
         default=TicketApproveLevelChoices.one.value, choices=TicketApproveLevelChoices.choices,
         verbose_name=_('Approve level')
@@ -264,18 +273,18 @@ class TemplateApprove(CommonModelMixin):
     )
     # 受理人列表
     assignees = models.ManyToManyField(
-        'users.User', related_name='assigned_template_approve', verbose_name=_("Assignees")
+        'users.User', related_name='assigned_ticket_flow_approve', verbose_name=_("Assignees")
     )
     assignees_display = models.JSONField(
         encoder=ModelJSONFieldEncoder, default=list, verbose_name=_('Assignees display')
     )
-    ticket_template = models.ForeignKey(
-        Template, related_name='templated_approves', on_delete=models.CASCADE, null=True,
-        verbose_name=_("Template")
+    ticket_flow = models.ForeignKey(
+        TicketFlow, related_name='ticket_flow_approves', on_delete=models.CASCADE, null=True,
+        verbose_name=_("Ticket Flow")
     )
 
     class Meta:
-        verbose_name = _('Ticket template approve level')
+        verbose_name = _('Ticket flow approve')
 
     def __str__(self):
         return '{}({})'.format(self.id, self.approve_level)

@@ -8,7 +8,7 @@ app_name = 'tickets'
 router = BulkRouter()
 
 router.register('tickets', api.TicketViewSet, 'ticket')
-router.register('templates', api.TemplateViewSet, 'templates')
+router.register('flows', api.TicketFlowViewSet, 'flows')
 router.register('assignees', api.AssigneeViewSet, 'assignee')
 router.register('comments', api.CommentViewSet, 'comment')
 
