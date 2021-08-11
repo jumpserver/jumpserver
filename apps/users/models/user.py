@@ -629,6 +629,10 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     def is_dingtalk_bound(self):
         return bool(self.dingtalk_id)
 
+    @property
+    def is_feishu_bound(self):
+        return bool(self.feishu_id)
+
     def get_absolute_url(self):
         return reverse('users:user-detail', args=(self.id,))
 
