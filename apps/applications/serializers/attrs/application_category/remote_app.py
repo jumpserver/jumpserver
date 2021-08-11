@@ -5,7 +5,7 @@ from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ObjectDoesNotExist
 
-from common.utils import get_logger, is_uuid
+from common.utils import get_logger, is_uuid, get_object_or_none
 from assets.models import Asset
 
 logger = get_logger(__file__)
@@ -14,22 +14,26 @@ logger = get_logger(__file__)
 __all__ = ['RemoteAppSerializer']
 
 
-class CharPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
+class AssetCharPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
 
     def to_internal_value(self, data):
         instance = super().to_internal_value(data)
         return str(instance.id)
 
-    def to_representation(self, value):
-        # value is instance.id
+    def to_representation(self, _id):
+        # _id 是 instance.id
         if self.pk_field is not None:
-            return self.pk_field.to_representation(value)
-        return value
+            return self.pk_field.to_representation(_id)
+        # 解决删除资产后，远程应用更新页面会显示资产ID的问题
+        asset = get_object_or_none(Asset, id=_id)
+        if asset:
+            return None
+        return _id
 
 
 class RemoteAppSerializer(serializers.Serializer):
     asset_info = serializers.SerializerMethodField()
-    asset = CharPrimaryKeyRelatedField(
+    asset = AssetCharPrimaryKeyRelatedField(
         queryset=Asset.objects, required=False, label=_("Asset"), allow_null=True
     )
     path = serializers.CharField(
