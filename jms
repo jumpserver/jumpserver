@@ -125,7 +125,7 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         'action', type=str,
-        choices=("start", "stop", "restart", "status", "upgrade_db"),
+        choices=("start", "stop", "restart", "status", "upgrade_db", "collect_static"),
         help="Action to run"
     )
     parser.add_argument(
@@ -142,6 +142,8 @@ if __name__ == '__main__':
     action = args.action
     if action == "upgrade_db":
         upgrade_db()
+    elif action == "collect_static":
+        collect_static()
     else:
         services = args.services if isinstance(args.services, list) else [args.services]
         if action == 'start' and {'all', 'web'} & set(services):
