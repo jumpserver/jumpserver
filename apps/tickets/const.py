@@ -25,12 +25,12 @@ class TicketStatus(TextChoices):
     closed = 'closed', _("Closed")
 
 
-class TicketApproveLevel(IntegerChoices):
+class TicketApprovalLevel(IntegerChoices):
     one = 1, _("One level")
     two = 2, _("Two level")
 
 
-class TicketApproveStrategy(TextChoices):
+class TicketApprovalStrategy(TextChoices):
     super = 'super', _("Super user")
     system = 'super_admin', _("Super admin user")
     all = 'all_user', _("All user")

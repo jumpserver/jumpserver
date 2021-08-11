@@ -7,28 +7,30 @@ from common.mixins.models import CommonModelMixin
 from common.db.encoder import ModelJSONFieldEncoder
 from orgs.mixins.models import OrgModelMixin
 from orgs.utils import tmp_to_org, get_current_org
-from ..const import TicketType, TicketApproveLevel, TicketApproveStrategy
-from ..signals import post_or_update_change_template_approve
+from ..const import TicketType, TicketApprovalLevel, TicketApprovalStrategy
+from ..signals import post_or_update_change_ticket_flow_approval
 
 __all__ = ['TicketFlow', 'TicketFlowApprovalRule']
 
 
 class TicketFlowApprovalRule(CommonModelMixin):
     level = models.SmallIntegerField(
-        default=TicketApproveLevel.one, choices=TicketApproveLevel.choices,
+        default=TicketApprovalLevel.one, choices=TicketApprovalLevel.choices,
         verbose_name=_('Approve level')
     )
     strategy = models.CharField(
-        max_length=64, default=TicketApproveStrategy.system,
-        choices=TicketApproveStrategy.choices,
+        max_length=64, default=TicketApprovalStrategy.system,
+        choices=TicketApprovalStrategy.choices,
         verbose_name=_('Approve strategy')
     )
     # 受理人列表
     assignees = models.ManyToManyField(
-        'users.User', related_name='assigned_ticket_flow_approval_rule', verbose_name=_("Assignees")
+        'users.User', related_name='assigned_ticket_flow_approval_rule',
+        verbose_name=_("Assignees")
     )
     assignees_display = models.JSONField(
-        encoder=ModelJSONFieldEncoder, default=list, verbose_name=_('Assignees display')
+        encoder=ModelJSONFieldEncoder, default=list,
+        verbose_name=_('Assignees display')
     )
 
     class Meta:
@@ -39,19 +41,19 @@ class TicketFlowApprovalRule(CommonModelMixin):
 
     @classmethod
     def change_assignees_display(cls, qs):
-        post_or_update_change_template_approve.send(sender=cls, qs=qs)
+        post_or_update_change_ticket_flow_approval.send(sender=cls, qs=qs)
 
 
 class TicketFlow(CommonModelMixin, OrgModelMixin):
     title = models.CharField(max_length=256, verbose_name=_("Title"))
-    approval_level = models.SmallIntegerField(
-        default=TicketApproveLevel.one,
-        choices=TicketApproveLevel.choices,
-        verbose_name=_('Approval level')
-    )
     type = models.CharField(
         max_length=64, choices=TicketType.choices,
-        default=TicketType.general.value, verbose_name=_("Type")
+        default=TicketType.general, verbose_name=_("Type")
+    )
+    approval_level = models.SmallIntegerField(
+        default=TicketApprovalLevel.one,
+        choices=TicketApprovalLevel.choices,
+        verbose_name=_('Approval level')
     )
     rules = models.ManyToManyField(TicketFlowApprovalRule, related_name='ticket_flow')
 

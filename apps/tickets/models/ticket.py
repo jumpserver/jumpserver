@@ -8,7 +8,7 @@ from common.mixins.models import CommonModelMixin
 from common.db.encoder import ModelJSONFieldEncoder
 from orgs.mixins.models import OrgModelMixin
 from orgs.utils import tmp_to_root_org, tmp_to_org
-from tickets.const import TicketType, TicketAction, TicketStatus, TicketApproveLevel
+from tickets.const import TicketType, TicketAction, TicketStatus, TicketApprovalLevel
 from tickets.signals import post_change_ticket_action
 from tickets.handler import get_ticket_handler
 
@@ -31,7 +31,7 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         default=TicketAction.open.value, verbose_name=_("Action")
     )
     approve_level = models.SmallIntegerField(
-        default=TicketApproveLevel.one.value, verbose_name=_('Approve level')
+        default=TicketApprovalLevel.one.value, verbose_name=_('Approve level')
     )
     # 申请人
     applicant = models.ForeignKey(
@@ -203,7 +203,7 @@ class TicketAssignee(CommonModelMixin):
         'users.User', related_name='m2m_user_tickets', on_delete=models.CASCADE, verbose_name='User'
     )
     approve_level = models.SmallIntegerField(
-        default=TicketApproveLevel.one, choices=TicketApproveLevel.choices,
+        default=TicketApprovalLevel.one, choices=TicketApprovalLevel.choices,
         verbose_name=_('Approve level')
     )
     is_processor = models.BooleanField(default=False)
