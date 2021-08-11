@@ -10,10 +10,10 @@ from orgs.utils import tmp_to_org, get_current_org
 from ..const import TicketType, TicketApprovalLevel, TicketApprovalStrategy
 from ..signals import post_or_update_change_ticket_flow_approval
 
-__all__ = ['TicketFlow', 'TicketFlowApprovalRule']
+__all__ = ['TicketFlow', 'ApprovalRule']
 
 
-class TicketFlowApprovalRule(CommonModelMixin):
+class ApprovalRule(CommonModelMixin):
     level = models.SmallIntegerField(
         default=TicketApprovalLevel.one, choices=TicketApprovalLevel.choices,
         verbose_name=_('Approve level')
@@ -55,7 +55,7 @@ class TicketFlow(CommonModelMixin, OrgModelMixin):
         choices=TicketApprovalLevel.choices,
         verbose_name=_('Approval level')
     )
-    rules = models.ManyToManyField(TicketFlowApprovalRule, related_name='ticket_flow')
+    rules = models.ManyToManyField(ApprovalRule, related_name='ticket_flow')
 
     def save(self, *args, **kwargs):
         """ 确保保存的org_id的是自身的值 """

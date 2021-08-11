@@ -104,7 +104,7 @@ class Migration(migrations.Migration):
             field=models.SmallIntegerField(default=1, verbose_name='Approve level'),
         ),
         migrations.CreateModel(
-            name='TicketFlowApprovalRule',
+            name='ApprovalRule',
             fields=[
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('created_by', models.CharField(blank=True, max_length=32, null=True, verbose_name='Created by')),

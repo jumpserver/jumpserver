@@ -9,7 +9,7 @@ from perms.models import AssetPermission
 from orgs.models import Organization
 from orgs.utils import tmp_to_org
 from users.models import User
-from tickets.models import Ticket, TicketFlow, TicketFlowApprovalRule
+from tickets.models import Ticket, TicketFlow, ApprovalRule
 from .meta import type_serializer_classes_mapping
 
 __all__ = [
@@ -139,7 +139,7 @@ class TicketFlowApproveSerializer(serializers.ModelSerializer):
         source='get_approve_strategy_display', label=_('Approve strategy display'))
 
     class Meta:
-        model = TicketFlowApprovalRule
+        model = ApprovalRule
         fields_mini = ['id', ]
         fields_small = fields_mini + [
             'approve_level', 'approve_level_display', 'approve_strategy', 'approve_strategy_display',
