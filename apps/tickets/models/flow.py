@@ -15,17 +15,17 @@ __all__ = ['TicketFlow', 'TicketFlowApprovalRule']
 
 class TicketFlowApprovalRule(CommonModelMixin):
     level = models.SmallIntegerField(
-        default=TicketApproveLevel.one.value, choices=TicketApproveLevel.choices,
+        default=TicketApproveLevel.one, choices=TicketApproveLevel.choices,
         verbose_name=_('Approve level')
     )
     strategy = models.CharField(
-        max_length=64, default=TicketApproveStrategy.system.value,
+        max_length=64, default=TicketApproveStrategy.system,
         choices=TicketApproveStrategy.choices,
         verbose_name=_('Approve strategy')
     )
     # 受理人列表
     assignees = models.ManyToManyField(
-        'users.User', related_name='assigned_ticket_flow_approve', verbose_name=_("Assignees")
+        'users.User', related_name='assigned_ticket_flow_approval_rule', verbose_name=_("Assignees")
     )
     assignees_display = models.JSONField(
         encoder=ModelJSONFieldEncoder, default=list, verbose_name=_('Assignees display')
@@ -35,7 +35,7 @@ class TicketFlowApprovalRule(CommonModelMixin):
         verbose_name = _('Ticket flow approve')
 
     def __str__(self):
-        return '{}({})'.format(self.id, self.approve_level)
+        return '{}({})'.format(self.id, self.level)
 
     @classmethod
     def change_assignees_display(cls, qs):
@@ -47,7 +47,7 @@ class TicketFlow(CommonModelMixin, OrgModelMixin):
     approval_level = models.SmallIntegerField(
         default=TicketApproveLevel.one,
         choices=TicketApproveLevel.choices,
-        verbose_name=_('Approve level')
+        verbose_name=_('Approval level')
     )
     type = models.CharField(
         max_length=64, choices=TicketType.choices,
@@ -71,7 +71,7 @@ class TicketFlow(CommonModelMixin, OrgModelMixin):
         return self.ticket_flow_approves.count()
 
     @classmethod
-    def get_org_related_templates(cls):
+    def get_org_related_flows(cls):
         org = get_current_org()
         flows = cls.objects.filter(org_id=org.id)
         cur_flow_types = flows.values_list('type', flat=True)

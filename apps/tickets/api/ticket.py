@@ -85,7 +85,7 @@ class TicketFlowViewSet(JMSBulkModelViewSet):
     search_fields = ['id', 'title', 'type']
 
     def get_queryset(self):
-        queryset = TicketFlow.get_org_related_templates()
+        queryset = TicketFlow.get_org_related_flows()
         return queryset
 
     def perform_create_or_update(self, serializer):

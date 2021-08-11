@@ -109,7 +109,7 @@ class TicketApplySerializer(TicketSerializer):
     def validate(self, attrs):
         type = attrs.get('type')
         if type:
-            attrs['flow'] = TicketFlow.get_org_related_templates().filter(type=type).first()
+            attrs['flow'] = TicketFlow.get_org_related_flows().filter(type=type).first()
         return attrs
 
     @atomic
