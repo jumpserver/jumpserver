@@ -1,36 +1,18 @@
 # -*- coding: utf-8 -*-
 #
-import json
-import uuid
-from datetime import datetime
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
 
 from common.mixins.models import CommonModelMixin
+from common.db.encoder import ModelJSONFieldEncoder
 from orgs.mixins.models import OrgModelMixin
-from orgs.utils import tmp_to_root_org, tmp_to_org, get_current_org
-from tickets.const import TicketType, TicketAction, TicketStatus, \
-    TicketApproveLevel, TicketApproveStrategy
-from tickets.signals import post_change_ticket_action, post_or_update_change_template_approve
+from orgs.utils import tmp_to_root_org, tmp_to_org
+from tickets.const import TicketType, TicketAction, TicketStatus, TicketApproveLevel
+from tickets.signals import post_change_ticket_action
 from tickets.handler import get_ticket_handler
 
-__all__ = ['Ticket', 'TicketFlow', 'TicketFlowApprove', 'ModelJSONFieldEncoder']
-
-
-class ModelJSONFieldEncoder(json.JSONEncoder):
-    """ 解决一些类型的字段不能序列化的问题 """
-
-    def default(self, obj):
-        if isinstance(obj, datetime):
-            return obj.strftime(settings.DATETIME_DISPLAY_FORMAT)
-        if isinstance(obj, uuid.UUID):
-            return str(obj)
-        if isinstance(obj, type(_("ugettext_lazy"))):
-            return str(obj)
-        else:
-            return super().default(obj)
+__all__ = ['Ticket']
 
 
 class Ticket(CommonModelMixin, OrgModelMixin):
@@ -237,70 +219,4 @@ class TicketAssignee(CommonModelMixin):
         return '{0.user.name}({0.user.username})_{0.approve_level}'.format(self)
 
 
-class TicketFlow(CommonModelMixin, OrgModelMixin):
-    title = models.CharField(max_length=256, verbose_name=_("Title"))
-    level = models.SmallIntegerField(
-        default=TicketApproveLevel.one,
-        choices=TicketApproveLevel.choices,
-        verbose_name=_('Approve level')
-    )
-    type = models.CharField(
-        max_length=64, choices=TicketType.choices,
-        default=TicketType.general.value, verbose_name=_("Type")
-    )
 
-    def save(self, *args, **kwargs):
-        """ 确保保存的org_id的是自身的值 """
-        with tmp_to_org(self.org_id):
-            return super().save(*args, **kwargs)
-
-    class Meta:
-        verbose_name = _('Ticket flow')
-
-    def __str__(self):
-        return '{}({})'.format(self.title, self.type)
-
-    @property
-    def get_level_all_count(self):
-        return self.ticket_flow_approves.count()
-
-    @classmethod
-    def get_org_related_templates(cls):
-        org = get_current_org()
-        flows = cls.objects.filter(org_id=org.id)
-        cur_flow_types = flows.values_list('type', flat=True)
-        diff_global_flows = cls.objects.filter(org_id=org.ROOT_ID).exclude(type__in=cur_flow_types)
-        return flows | diff_global_flows
-
-
-class TicketFlowApprove(CommonModelMixin):
-    approve_level = models.SmallIntegerField(
-        default=TicketApproveLevel.one.value, choices=TicketApproveLevel.choices,
-        verbose_name=_('Approve level')
-    )
-    approve_strategy = models.CharField(
-        max_length=64, default=TicketApproveStrategy.system.value,
-        choices=TicketApproveStrategy.choices,
-        verbose_name=_('Approve strategy')
-    )
-    # 受理人列表
-    assignees = models.ManyToManyField(
-        'users.User', related_name='assigned_ticket_flow_approve', verbose_name=_("Assignees")
-    )
-    assignees_display = models.JSONField(
-        encoder=ModelJSONFieldEncoder, default=list, verbose_name=_('Assignees display')
-    )
-    ticket_flow = models.ForeignKey(
-        TicketFlow, related_name='ticket_flow_approves', on_delete=models.CASCADE, null=True,
-        verbose_name=_("Ticket Flow")
-    )
-
-    class Meta:
-        verbose_name = _('Ticket flow approve')
-
-    def __str__(self):
-        return '{}({})'.format(self.id, self.approve_level)
-
-    @classmethod
-    def change_assignees_display(cls, qs):
-        post_or_update_change_template_approve.send(sender=cls, qs=qs)
