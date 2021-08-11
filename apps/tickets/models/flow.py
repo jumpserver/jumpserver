@@ -32,7 +32,7 @@ class TicketFlowApprovalRule(CommonModelMixin):
     )
 
     class Meta:
-        verbose_name = _('Ticket flow approve')
+        verbose_name = _('Ticket flow approval rule')
 
     def __str__(self):
         return '{}({})'.format(self.id, self.level)
