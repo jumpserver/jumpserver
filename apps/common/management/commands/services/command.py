@@ -44,7 +44,7 @@ class Services(TextChoices):
 
     @classmethod
     def task_services(cls):
-        return cls.celery_services() + [cls.beat]
+        return cls.celery_services() + [cls.beat, cls.flower]
 
     @classmethod
     def all_services(cls):
@@ -113,9 +113,9 @@ class BaseActionCommand(BaseCommand):
 
         kwargs = {
             'services': services,
-            'daemon_run': options.get('daemon', False),
-            'daemon_stop': Services.all.value in service_names,
-            'force_stop': options.get('force', False),
+            'run_daemon': options.get('daemon', False),
+            'stop_daemon': self.action == Action.stop.value and Services.all.value in service_names,
+            'force_stop': options.get('force') or False,
         }
         self.util = ServicesUtil(**kwargs)
 

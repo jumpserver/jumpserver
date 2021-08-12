@@ -10,11 +10,11 @@ from .services.base import BaseService
 
 class ServicesUtil(object):
 
-    def __init__(self, services, daemon_run=False, force_stop=True, daemon_stop=False):
+    def __init__(self, services, run_daemon=False, force_stop=False, stop_daemon=False):
         self._services = services
-        self.daemon_run = daemon_run
+        self.run_daemon = run_daemon
         self.force_stop = force_stop
-        self.daemon_stop = daemon_stop
+        self.stop_daemon = stop_daemon
         self.EXIT_EVENT = threading.Event()
         self.check_interval = 30
         self.files_preserve_map = {}
@@ -28,7 +28,7 @@ class ServicesUtil(object):
         logging.info(time.ctime())
         logging.info(f'JumpServer version {__version__}, more see https://www.jumpserver.org')
         self.start()
-        if self.daemon_run:
+        if self.run_daemon:
             self.show_status()
             with self.daemon_context:
                 self.watch()
@@ -47,8 +47,8 @@ class ServicesUtil(object):
             service: BaseService
             service.stop(force=self.force_stop)
 
-        if self.daemon_stop:
-            self.stop_daemon()
+        if self.stop_daemon:
+            self._stop_daemon()
 
     # -- watch --
     def watch(self):
@@ -76,9 +76,8 @@ class ServicesUtil(object):
     def clean_up(self):
         if not self.EXIT_EVENT.is_set():
             self.EXIT_EVENT.set()
-        for service in self._services:
-            service: BaseService
-            service.stop(force=self.force_stop)
+
+        self.stop()
 
     def show_status(self):
         for service in self._services:
@@ -86,7 +85,7 @@ class ServicesUtil(object):
             service.show_status()
 
     # -- daemon --
-    def stop_daemon(self):
+    def _stop_daemon(self):
         if self.daemon_pid and self.daemon_is_running:
             os.kill(self.daemon_pid, 15)
         self.remove_daemon_pid()
