@@ -2,6 +2,7 @@
 #
 import os
 import sys
+import signal
 import subprocess
 
 import redis_lock
@@ -28,7 +29,24 @@ cmd = [
     '--max-interval', '60'
 ]
 
-with redis_lock.Lock(redis, name="beat-distribute-start-lock", expire=60, auto_renewal=True):
-    print("Get beat lock start to run it")
-    code = subprocess.call(cmd, cwd=APPS_DIR)
-    sys.exit(code)
+processes = []
+
+
+def stop_beat_process(sig, frame):
+    for p in processes:
+        os.kill(p.pid, 15)
+
+
+def main():
+    # 父进程结束通知子进程结束
+    signal.signal(signal.SIGTERM, stop_beat_process)
+
+    with redis_lock.Lock(redis, name="beat-distribute-start-lock", expire=60, auto_renewal=True):
+        print("Get beat lock start to run it")
+        process = subprocess.Popen(cmd, cwd=APPS_DIR)
+        processes.append(process)
+        process.wait()
+
+
+if __name__ == '__main__':
+    main()

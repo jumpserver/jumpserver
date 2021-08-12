@@ -1,6 +1,7 @@
 import abc
 import time
 import shutil
+import psutil
 import datetime
 import threading
 import subprocess
@@ -11,13 +12,12 @@ class BaseService(object):
 
     def __init__(self, **kwargs):
         self.name = kwargs['name']
-        self.process = None
+        self._process = None
         self.STOP_TIMEOUT = 10
         self.max_retry = 0
         self.retry = 3
         self.LOG_KEEP_DAYS = 7
         self.EXIT_EVENT = threading.Event()
-        self.LOCK = threading.Lock()
 
     @property
     @abc.abstractmethod
@@ -90,10 +90,22 @@ class BaseService(object):
             os.unlink(self.pid_filepath)
     # -- end pid --
 
+    # -- process --
+    @property
+    def process(self):
+        if not self._process:
+            try:
+                self._process = psutil.Process(self.pid)
+            except:
+                pass
+        return self._process
+
+    # -- end process --
+
     # -- action --
     def open_subprocess(self):
         kwargs = {'cwd': self.cwd, 'stderr': self.log_file, 'stdout': self.log_file}
-        self.process = subprocess.Popen(self.cmd, **kwargs)
+        self._process = subprocess.Popen(self.cmd, **kwargs)
 
     def start(self):
         if self.is_running:
@@ -107,7 +119,7 @@ class BaseService(object):
     def start_other(self):
         pass
 
-    def stop(self, force=True):
+    def stop(self, force=False):
         if not self.is_running:
             self.show_status()
             # self.remove_pid()
@@ -116,6 +128,14 @@ class BaseService(object):
         print(f'Stop service: {self.name}', end='')
         sig = 9 if force else 15
         os.kill(self.pid, sig)
+
+        if self.process is None:
+            print("\033[31m No process found\033[0m")
+            return
+        try:
+            self.process.wait(1)
+        except:
+            pass
 
         for i in range(self.STOP_TIMEOUT):
             if i == self.STOP_TIMEOUT - 1:
@@ -129,8 +149,7 @@ class BaseService(object):
                 continue
 
     def watch(self):
-        with self.LOCK:
-            self._check()
+        self._check()
         if not self.is_running:
             self._restart()
         self._rotate_log()
@@ -138,6 +157,12 @@ class BaseService(object):
     def _check(self):
         now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         print(f"{now} Check service status: {self.name} -> ", end='')
+        if self.process:
+            try:
+                self.process.wait(1)  # 不wait，子进程可能无法回收
+            except subprocess.TimeoutExpired:
+                pass
+
         if self.is_running:
             print(f'running at {self.pid}')
         else:
