@@ -221,7 +221,7 @@ class DingTalkSettingSerializer(serializers.Serializer):
 
 class FeiShuSettingSerializer(serializers.Serializer):
     FEISHU_APP_ID = serializers.CharField(max_length=256, required=True, label='App ID')
-    FEISHU_APP_SECRET = serializers.CharField(max_length=256, required=True, label='App Secret')
+    FEISHU_APP_SECRET = serializers.CharField(max_length=256, required=False, label='App Secret', write_only=True)
     AUTH_FEISHU = serializers.BooleanField(default=False, label=_('Enable FeiShu Auth'))
 
 

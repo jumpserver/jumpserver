@@ -76,7 +76,11 @@ class DingTalkRequests(BaseRequest):
     post = as_request(post)
 
     def _add_sign(self, kwargs: dict):
-        params = kwargs.setdefault('params', {})
+        params = kwargs.get('params')
+        if params is None:
+            params = {}
+            kwargs['params'] = params
+
         timestamp = str(int(time.time() * 1000))
         signature = sign(self._appsecret, timestamp)
         accessKey = self._appid

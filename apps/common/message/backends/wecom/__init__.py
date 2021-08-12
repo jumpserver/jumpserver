@@ -65,7 +65,11 @@ class WeComRequests(BaseRequest):
         return access_token, expires_in
 
     def add_token(self, kwargs: dict):
-        params = kwargs.setdefault('params', {})
+        params = kwargs.get('params')
+        if params is None:
+            params = {}
+            kwargs['params'] = params
+
         params['access_token'] = self.access_token
 
 
