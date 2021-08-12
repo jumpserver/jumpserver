@@ -31,6 +31,13 @@ class TicketStatus(TextChoices):
     closed = 'closed', _("Closed")
 
 
+class TicketAction(TextChoices):
+    open = 'open', _("Open")
+    close = 'close', _("Close")
+    approve = 'approve', _('Approve')
+    reject = 'reject', _('Reject')
+
+
 class TicketApprovalLevel(IntegerChoices):
     one = 1, _("One level")
     two = 2, _("Two level")
