@@ -8,28 +8,30 @@ from common.mixins.models import CommonModelMixin
 from common.db.encoder import ModelJSONFieldEncoder
 from orgs.mixins.models import OrgModelMixin
 from orgs.utils import tmp_to_root_org, tmp_to_org
-from tickets.const import TicketType, TicketStatus, TicketState, TicketApprovalLevel
+from tickets.const import TicketType, TicketStatus, TicketState, TicketApprovalLevel, ProcessStatus
 from tickets.signals import post_change_ticket_action
 from tickets.handler import get_ticket_handler
 
 __all__ = ['Ticket']
 
 
-class TicketProcess(CommonModelMixin):
+class TicketStep(CommonModelMixin):
     ticket = models.ForeignKey(
         'Ticket', related_name='m2m_ticket_users', on_delete=models.CASCADE, verbose_name='Ticket'
     )
-    assignee = models.ForeignKey(
-        'users.User', related_name='m2m_user_tickets', on_delete=models.CASCADE, verbose_name='User'
-    )
-    step = models.SmallIntegerField(
+    level = models.SmallIntegerField(
         default=TicketApprovalLevel.one, choices=TicketApprovalLevel.choices,
         verbose_name=_('Approve level')
     )
-    action = models.CharField(
-        choices=TicketStatus.choices, max_length=16,
-        default=TicketStatus.open, verbose_name=_("Action")
+    state = models.CharField(choices=ProcessStatus.choices, default=ProcessStatus.notified)
+
+
+class TicketAssignee(CommonModelMixin):
+    assignee = models.ForeignKey(
+        'users.User', related_name='m2m_user_tickets', on_delete=models.CASCADE, verbose_name='User'
     )
+    state = models.CharField(choices=ProcessStatus.choices, default=ProcessStatus.notified)
+    step = models.ForeignKey('tickets.TicketStep', on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = _('Ticket assignee')
