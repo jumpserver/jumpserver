@@ -15,9 +15,9 @@ class TicketType(TextChoices):
 
 class TicketState(TextChoices):
     open = 'open', _('Open')
-    approve = 'approve', _('Approve')
-    reject = 'reject', _('Reject')
-    close = 'close', _('Close')
+    approved = 'approved', _('Approved')
+    rejected = 'rejected', _('Rejected')
+    closed = 'closed', _('Closed')
 
 
 class ProcessStatus(TextChoices):

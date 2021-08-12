@@ -1,6 +1,7 @@
 from tickets import const
 from .ticket_type import (
-    apply_asset, apply_application, login_confirm, login_asset_confirm, command_confirm
+    apply_asset, apply_application, login_confirm,
+    login_asset_confirm, command_confirm
 )
 
 __all__ = [
@@ -11,7 +12,7 @@ __all__ = [
 # -------------
 
 action_open = const.TicketStatus.open.value
-action_approve = const.TicketStatus.approve.value
+action_approve = const.TicketState.approve.value
 
 
 # defines `meta` field dynamic mapping serializers
