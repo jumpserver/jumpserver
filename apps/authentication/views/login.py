@@ -46,24 +46,44 @@ class UserLoginView(mixins.AuthMixin, FormView):
             return None
         next_url = request.GET.get('next') or '/'
         auth_type = ''
-        auth_url = ''
+
         if settings.AUTH_OPENID:
             auth_type = 'OIDC'
-            auth_url = reverse(settings.AUTH_OPENID_AUTH_LOGIN_URL_NAME) + f'?next={next_url}'
-        elif settings.AUTH_CAS:
+            openid_auth_url = reverse(settings.AUTH_OPENID_AUTH_LOGIN_URL_NAME) + f'?next={next_url}'
+        else:
+            openid_auth_url = None
+
+        if settings.AUTH_CAS:
             auth_type = 'CAS'
-            auth_url = reverse(settings.CAS_LOGIN_URL_NAME) + f'?next={next_url}'
-        if not auth_url:
+            cas_auth_url = reverse(settings.CAS_LOGIN_URL_NAME) + f'?next={next_url}'
+        else:
+            cas_auth_url = None
+
+        if not any([openid_auth_url, cas_auth_url]):
             return None
 
-        message_data = {
-            'title': _('Redirecting'),
-            'message': _("Redirecting to {} authentication").format(auth_type),
-            'redirect_url': auth_url,
-            'has_cancel': True,
-            'cancel_url': reverse('authentication:login') + '?admin=1'
-        }
-        redirect_url = FlashMessageUtil.gen_message_url(message_data)
+        if settings.LOGIN_REDIRECT_TO_BACKEND == 'OPENID' and openid_auth_url:
+            auth_url = openid_auth_url
+
+        elif settings.LOGIN_REDIRECT_TO_BACKEND == 'CAS' and cas_auth_url:
+            auth_url = cas_auth_url
+
+        else:
+            auth_url = openid_auth_url or cas_auth_url
+
+        if settings.LOGIN_REDIRECT_TO_BACKEND:
+            redirect_url = auth_url
+        else:
+            message_data = {
+                'title': _('Redirecting'),
+                'message': _("Redirecting to {} authentication").format(auth_type),
+                'redirect_url': auth_url,
+                'interval': 3,
+                'has_cancel': True,
+                'cancel_url': reverse('authentication:login') + '?admin=1'
+            }
+            redirect_url = FlashMessageUtil.gen_message_url(message_data)
+
         query_string = request.GET.urlencode()
         redirect_url = "{}&{}".format(redirect_url, query_string)
         return redirect_url
@@ -134,6 +154,7 @@ class UserLoginView(mixins.AuthMixin, FormView):
             'AUTH_CAS': settings.AUTH_CAS,
             'AUTH_WECOM': settings.AUTH_WECOM,
             'AUTH_DINGTALK': settings.AUTH_DINGTALK,
+            'AUTH_FEISHU': settings.AUTH_FEISHU,
             'rsa_public_key': rsa_public_key,
             'forgot_password_url': forgot_password_url
         }

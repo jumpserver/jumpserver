@@ -5,6 +5,7 @@ from assets.models import AuthBook
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
 from .base import AuthSerializerMixin
+from .utils import validate_password_contains_left_double_curly_bracket
 
 
 class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
@@ -21,10 +22,15 @@ class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         fields = fields_small + fields_fk
         extra_kwargs = {
             'username': {'required': True},
-            'password': {'write_only': True},
+            'password': {
+                'write_only': True,
+                "validators": [validate_password_contains_left_double_curly_bracket]
+            },
             'private_key': {'write_only': True},
             'public_key': {'write_only': True},
+            'systemuser_display': {'label': _('System user display')}
         }
+        ref_name = 'AssetAccountSerializer'
 
     @classmethod
     def setup_eager_loading(cls, queryset):

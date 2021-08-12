@@ -9,10 +9,11 @@ from common.utils import get_logger, get_object_or_none
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, IsSuperUser
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
-from ..models import Asset, Node, Platform
+from ..models import Asset, Node, Platform, SystemUser
 from .. import serializers
 from ..tasks import (
-    update_assets_hardware_info_manual, test_assets_connectivity_manual
+    update_assets_hardware_info_manual, test_assets_connectivity_manual,
+    test_system_users_connectivity_a_asset, push_system_users_a_asset
 )
 from ..filters import FilterAssetByNodeFilterBackend, LabelFilterBackend, IpInFilterBackend
 
@@ -94,20 +95,26 @@ class AssetPlatformViewSet(ModelViewSet):
 
 
 class AssetsTaskMixin:
+
     def perform_assets_task(self, serializer):
         data = serializer.validated_data
-        assets = data['assets']
         action = data['action']
+        assets = data.get('assets', [])
         if action == "refresh":
             task = update_assets_hardware_info_manual.delay(assets)
         else:
+            # action == 'test':
             task = test_assets_connectivity_manual.delay(assets)
+        return task
+
+    def perform_create(self, serializer):
+        task = self.perform_assets_task(serializer)
+        self.set_task_to_serializer_data(serializer, task)
+
+    def set_task_to_serializer_data(self, serializer, task):
         data = getattr(serializer, '_data', {})
         data["task"] = task.id
         setattr(serializer, '_data', data)
-
-    def perform_create(self, serializer):
-        self.perform_assets_task(serializer)
 
 
 class AssetTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
@@ -117,13 +124,37 @@ class AssetTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         pk = self.kwargs.get('pk')
+        request.data['asset'] = pk
         request.data['assets'] = [pk]
         return super().create(request, *args, **kwargs)
+
+    def perform_asset_task(self, serializer):
+        data = serializer.validated_data
+        action = data['action']
+        if action not in ['push_system_user', 'test_system_user']:
+            return
+        asset = data['asset']
+        system_users = data.get('system_users')
+        if not system_users:
+            system_users = asset.get_all_systemusers()
+        if action == 'push_system_user':
+            task = push_system_users_a_asset.delay(system_users, asset=asset)
+        elif action == 'test_system_user':
+            task = test_system_users_connectivity_a_asset.delay(system_users, asset=asset)
+        else:
+            task = None
+        return task
+
+    def perform_create(self, serializer):
+        task = self.perform_asset_task(serializer)
+        if not task:
+            task = self.perform_assets_task(serializer)
+        self.set_task_to_serializer_data(serializer, task)
 
 
 class AssetsTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
     model = Asset
-    serializer_class = serializers.AssetTaskSerializer
+    serializer_class = serializers.AssetsTaskSerializer
     permission_classes = (IsOrgAdmin,)
 
 

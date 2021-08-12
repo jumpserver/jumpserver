@@ -32,7 +32,7 @@ class UserUpdatePasswordSerializer(serializers.ModelSerializer):
 
     def validate_new_password(self, value):
         from ..utils import check_password_rules
-        if not check_password_rules(value):
+        if not check_password_rules(value, user=self.instance):
             msg = _('Password does not match security rules')
             raise serializers.ValidationError(msg)
         if self.instance.is_history_password(value):
@@ -106,7 +106,8 @@ class UserProfileSerializer(UserSerializer):
         fields = UserSerializer.Meta.fields + [
             'public_key_comment', 'public_key_hash_md5',
             'admin_or_audit_orgs', 'current_org_roles',
-            'guide_url', 'user_all_orgs'
+            'guide_url', 'user_all_orgs', 'is_org_admin',
+            'is_superuser'
         ]
         read_only_fields = [
             'date_joined', 'last_login', 'created_by', 'source'

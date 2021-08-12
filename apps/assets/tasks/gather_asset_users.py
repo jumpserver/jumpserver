@@ -60,9 +60,12 @@ def parse_windows_result_to_users(result):
         task_result.pop()
 
     for line in task_result:
-        user = space.split(line)
-        if user[0]:
-            users[user[0]] = {}
+        username_list = space.split(line)
+        #  such as: ['Admini', 'appadm', 'DefaultAccount', '']
+        for username in username_list:
+            if not username:
+                continue
+            users[username] = {}
     return users
 
 

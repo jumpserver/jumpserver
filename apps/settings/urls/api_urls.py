@@ -15,6 +15,7 @@ urlpatterns = [
     path('ldap/cache/refresh/', api.LDAPCacheRefreshAPI.as_view(), name='ldap-cache-refresh'),
     path('wecom/testing/', api.WeComTestingAPI.as_view(), name='wecom-testing'),
     path('dingtalk/testing/', api.DingTalkTestingAPI.as_view(), name='dingtalk-testing'),
+    path('feishu/testing/', api.FeiShuTestingAPI.as_view(), name='feishu-testing'),
 
     path('setting/', api.SettingsApi.as_view(), name='settings-setting'),
     path('public/', api.PublicSettingApi.as_view(), name='public-setting'),

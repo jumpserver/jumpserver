@@ -4,14 +4,13 @@ from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-from common.validators import NoSpecialChars
 from ..models import Domain, Gateway
 from .base import AuthSerializerMixin
 
 
 class DomainSerializer(BulkOrgResourceModelSerializer):
-    asset_count = serializers.SerializerMethodField(label=_('Assets count'))
-    application_count = serializers.SerializerMethodField(label=_('Applications count'))
+    asset_count = serializers.SerializerMethodField(label=_('Assets amount'))
+    application_count = serializers.SerializerMethodField(label=_('Applications amount'))
     gateway_count = serializers.SerializerMethodField(label=_('Gateways count'))
 
     class Meta:
@@ -43,6 +42,8 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
 
 
 class GatewaySerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
+    is_connective = serializers.BooleanField(required=False)
+
     class Meta:
         model = Gateway
         fields_mini = ['id', 'name']
@@ -51,14 +52,14 @@ class GatewaySerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         ]
         fields_small = fields_mini + fields_write_only + [
             'username', 'ip', 'port', 'protocol',
-            'is_active',
+            'is_active', 'is_connective',
             'date_created', 'date_updated',
             'created_by', 'comment',
         ]
         fields_fk = ['domain']
         fields = fields_small + fields_fk
         extra_kwargs = {
-            'password': {'write_only': True, 'validators': [NoSpecialChars()]},
+            'password': {'write_only': True},
             'private_key': {"write_only": True},
             'public_key': {"write_only": True},
         }
@@ -67,7 +68,7 @@ class GatewaySerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
 class GatewayWithAuthSerializer(GatewaySerializer):
     class Meta(GatewaySerializer.Meta):
         extra_kwargs = {
-            'password': {'write_only': False, 'validators': [NoSpecialChars()]},
+            'password': {'write_only': False},
             'private_key': {"write_only": False},
             'public_key': {"write_only": False},
         }

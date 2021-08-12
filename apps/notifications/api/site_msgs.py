@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from common.http import is_true
 from common.permissions import IsValidUser
 from common.const.http import GET, PATCH, POST
-from common.drf.api import JmsGenericViewSet
+from common.drf.api import JMSGenericViewSet
 from ..serializers import (
     SiteMessageDetailSerializer, SiteMessageIdsSerializer,
     SiteMessageSendSerializer,
@@ -16,7 +16,7 @@ from ..filters import SiteMsgFilter
 __all__ = ('SiteMessageViewSet', )
 
 
-class SiteMessageViewSet(ListModelMixin, RetrieveModelMixin, JmsGenericViewSet):
+class SiteMessageViewSet(ListModelMixin, RetrieveModelMixin, JMSGenericViewSet):
     permission_classes = (IsValidUser,)
     serializer_classes = {
         'default': SiteMessageDetailSerializer,

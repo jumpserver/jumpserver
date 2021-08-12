@@ -16,9 +16,7 @@ import json
 import yaml
 from importlib import import_module
 from django.urls import reverse_lazy
-from django.templatetags.static import static
 from urllib.parse import urljoin, urlparse
-from django.utils.translation import ugettext_lazy as _
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
@@ -230,6 +228,10 @@ class Config(dict):
         'DINGTALK_APPKEY': '',
         'DINGTALK_APPSECRET': '',
 
+        'AUTH_FEISHU': False,
+        'FEISHU_APP_ID': '',
+        'FEISHU_APP_SECRET': '',
+
         'OTP_VALID_WINDOW': 2,
         'OTP_ISSUER_NAME': 'JumpServer',
         'EMAIL_SUFFIX': 'jumpserver.org',
@@ -244,7 +246,7 @@ class Config(dict):
         'TERMINAL_TELNET_REGEX': '',
         'TERMINAL_COMMAND_STORAGE': {},
 
-        'SECURITY_MFA_AUTH': False,
+        'SECURITY_MFA_AUTH': 0,  # 0 不开启 1 全局开启 2 管理员开启
         'SECURITY_COMMAND_EXECUTION': True,
         'SECURITY_SERVICE_ACCOUNT_REGISTRATION': True,
         'SECURITY_VIEW_AUTH_NEED_MFA': True,
@@ -253,6 +255,7 @@ class Config(dict):
         'SECURITY_MAX_IDLE_TIME': 30,
         'SECURITY_PASSWORD_EXPIRATION_TIME': 9999,
         'SECURITY_PASSWORD_MIN_LENGTH': 6,
+        'SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH': 6,
         'SECURITY_PASSWORD_UPPER_CASE': False,
         'SECURITY_PASSWORD_LOWER_CASE': False,
         'SECURITY_PASSWORD_NUMBER': False,
@@ -264,6 +267,7 @@ class Config(dict):
         'SECURITY_INSECURE_COMMAND_LEVEL': 5,
         'SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER': '',
         'SECURITY_LUNA_REMEMBER_AUTH': True,
+        'SECURITY_WATERMARK_ENABLED': False,
 
         'HTTP_BIND_HOST': '0.0.0.0',
         'HTTP_LISTEN_PORT': 8080,
@@ -301,11 +305,11 @@ class Config(dict):
         'CONNECTION_TOKEN_ENABLED': False,
         'ONLY_ALLOW_EXIST_USER_AUTH': False,
         'ONLY_ALLOW_AUTH_FROM_SOURCE': False,
-        'DISK_CHECK_ENABLED': True,
         'SESSION_SAVE_EVERY_REQUEST': True,
         'SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE': False,
         'FORGOT_PASSWORD_URL': '',
         'HEALTH_CHECK_TOKEN': '',
+        'LOGIN_REDIRECT_TO_BACKEND':  None,  # 'OPENID / CAS
 
         'TERMINAL_RDP_ADDR': ''
     }

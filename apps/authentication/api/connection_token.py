@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 #
 import urllib.parse
+import json
+import base64
+from typing import Callable
 
 from django.conf import settings
 from django.core.cache import cache
@@ -8,6 +11,7 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 from rest_framework.response import Response
+from rest_framework.request import Request
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
@@ -17,90 +21,40 @@ from authentication.signals import post_auth_failed, post_auth_success
 from common.utils import get_logger, random_string
 from common.drf.api import SerializerMixin
 from common.permissions import IsSuperUserOrAppUser, IsValidUser, IsSuperUser
-
 from orgs.mixins.api import RootOrgViewMixin
+from common.http import is_true
 
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
-    RDPFileSerializer
 )
 
 logger = get_logger(__name__)
 __all__ = ['UserConnectionTokenViewSet']
 
 
-class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin, GenericViewSet):
-    permission_classes = (IsSuperUserOrAppUser,)
-    serializer_classes = {
-        'default': ConnectionTokenSerializer,
-        'get_secret_detail': ConnectionTokenSecretSerializer,
-        'get_rdp_file': RDPFileSerializer
-    }
-    CACHE_KEY_PREFIX = 'CONNECTION_TOKEN_{}'
+class ClientProtocolMixin:
+    request: Request
+    get_serializer: Callable
+    create_token: Callable
 
-    @staticmethod
-    def check_resource_permission(user, asset, application, system_user):
-        from perms.utils.asset import has_asset_system_permission
-        from perms.utils.application import has_application_system_permission
-        if asset and not has_asset_system_permission(user, asset, system_user):
-            error = f'User not has this asset and system user permission: ' \
-                    f'user={user.id} system_user={system_user.id} asset={asset.id}'
-            raise PermissionDenied(error)
-        if application and not has_application_system_permission(user, application, system_user):
-            error = f'User not has this application and system user permission: ' \
-                    f'user={user.id} system_user={system_user.id} application={application.id}'
-            raise PermissionDenied(error)
-        return True
-
-    def create_token(self, user, asset, application, system_user, ttl=5*60):
-        if not self.request.user.is_superuser and user != self.request.user:
-            raise PermissionDenied('Only super user can create user token')
-        self.check_resource_permission(user, asset, application, system_user)
-        token = random_string(36)
-        value = {
-            'user': str(user.id),
-            'username': user.username,
-            'system_user': str(system_user.id),
-            'system_user_name': system_user.name
-        }
-
-        if asset:
-            value.update({
-                'type': 'asset',
-                'asset': str(asset.id),
-                'hostname': asset.hostname,
-            })
-        elif application:
-            value.update({
-                'type': 'application',
-                'application': application.id,
-                'application_name': str(application)
-            })
-
-        key = self.CACHE_KEY_PREFIX.format(token)
-        cache.set(key, value, timeout=ttl)
-        return token
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
+    def get_request_resource(self, serializer):
         asset = serializer.validated_data.get('asset')
         application = serializer.validated_data.get('application')
         system_user = serializer.validated_data['system_user']
-        user = serializer.validated_data.get('user')
-        token = self.create_token(user, asset, application, system_user)
-        return Response({"token": token}, status=201)
 
-    @action(methods=['POST', 'GET'], detail=False, url_path='rdp/file', permission_classes=[IsValidUser])
-    def get_rdp_file(self, request, *args, **kwargs):
+        user = serializer.validated_data.get('user')
+        if not user or not self.request.user.is_superuser:
+            user = self.request.user
+        return asset, application, system_user, user
+
+    def get_rdp_file_content(self, serializer):
         options = {
             'full address:s': '',
             'username:s': '',
-            'screen mode id:i': '0',
+            # 'screen mode id:i': '1',
             # 'desktopwidth:i': '1280',
             # 'desktopheight:i': '800',
-            'use multimon:i': '1',
+            'use multimon:i': '0',
             'session bpp:i': '32',
             'audiomode:i': '0',
             'disable wallpaper:i': '0',
@@ -125,24 +79,17 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin, GenericViewS
             # 'remoteapplicationname:s': 'Firefox',
             # 'remoteapplicationcmdline:s': '',
         }
-        if self.request.method == 'GET':
-            data = self.request.query_params
-        else:
-            data = request.data
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
 
-        asset = serializer.validated_data.get('asset')
-        application = serializer.validated_data.get('application')
-        system_user = serializer.validated_data['system_user']
-        height = serializer.validated_data.get('height')
-        width = serializer.validated_data.get('width')
-        user = request.user
+        asset, application, system_user, user = self.get_request_resource(serializer)
+        height = self.request.query_params.get('height')
+        width = self.request.query_params.get('width')
+        full_screen = is_true(self.request.query_params.get('full_screen'))
         token = self.create_token(user, asset, application, system_user)
 
+        options['screen mode id:i'] = '2' if full_screen else '1'
         address = settings.TERMINAL_RDP_ADDR
         if not address or address == 'localhost:3389':
-            address = request.get_host().split(':')[0] + ':3389'
+            address = self.request.get_host().split(':')[0] + ':3389'
         options['full address:s'] = address
         options['username:s'] = '{}|{}'.format(user.username, token)
         if system_user.ad_domain:
@@ -152,20 +99,72 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin, GenericViewS
             options['desktopheight:i'] = height
         else:
             options['smart sizing:i'] = '1'
-        data = ''
+        content = ''
         for k, v in options.items():
-            data += f'{k}:{v}\n'
+            content += f'{k}:{v}\n'
         if asset:
             name = asset.hostname
         elif application:
             name = application.name
         else:
             name = '*'
+        return name, content
+
+    @action(methods=['POST', 'GET'], detail=False, url_path='rdp/file', permission_classes=[IsValidUser])
+    def get_rdp_file(self, request, *args, **kwargs):
+        if self.request.method == 'GET':
+            data = self.request.query_params
+        else:
+            data = self.request.data
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        name, data = self.get_rdp_file_content(serializer)
         response = HttpResponse(data, content_type='application/octet-stream')
-        filename = "{}-{}-jumpserver.rdp".format(user.username, name)
+        filename = "{}-{}-jumpserver.rdp".format(self.request.user.username, name)
         filename = urllib.parse.quote(filename)
         response['Content-Disposition'] = 'attachment; filename*=UTF-8\'\'%s' % filename
         return response
+
+    def get_valid_serializer(self):
+        if self.request.method == 'GET':
+            data = self.request.query_params
+        else:
+            data = self.request.data
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        return serializer
+
+    def get_client_protocol_data(self, serializer):
+        asset, application, system_user, user = self.get_request_resource(serializer)
+        protocol = system_user.protocol
+        if protocol == 'rdp':
+            name, config = self.get_rdp_file_content(serializer)
+        elif protocol == 'vnc':
+            raise HttpResponse(status=404, data={"error": "VNC not support"})
+        else:
+            config = 'ssh://system_user@asset@user@jumpserver-ssh'
+        data = {
+            "protocol": system_user.protocol,
+            "username": user.username,
+            "config": config
+        }
+        return data
+
+    @action(methods=['POST', 'GET'], detail=False, url_path='client-url', permission_classes=[IsValidUser])
+    def get_client_protocol_url(self, request, *args, **kwargs):
+        serializer = self.get_valid_serializer()
+        protocol_data = self.get_client_protocol_data(serializer)
+        protocol_data = base64.b64encode(json.dumps(protocol_data).encode()).decode()
+        data = {
+            'url': 'jms://{}'.format(protocol_data),
+        }
+        return Response(data=data)
+
+
+class SecretDetailMixin:
+    valid_token: Callable
+    request: Request
+    get_serializer: Callable
 
     @staticmethod
     def _get_application_secret_detail(application):
@@ -212,6 +211,100 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin, GenericViewS
             'actions': actions,
         }
 
+    @action(methods=['POST'], detail=False, permission_classes=[IsSuperUserOrAppUser], url_path='secret-info/detail')
+    def get_secret_detail(self, request, *args, **kwargs):
+        token = request.data.get('token', '')
+        try:
+            value, user, system_user, asset, app, expired_at = self.valid_token(token)
+        except serializers.ValidationError as e:
+            post_auth_failed.send(
+                sender=self.__class__, username='', request=self.request,
+                reason=_('Invalid token')
+            )
+            raise e
+
+        data = dict(user=user, system_user=system_user, expired_at=expired_at)
+        if asset:
+            asset_detail = self._get_asset_secret_detail(asset, user=user, system_user=system_user)
+            system_user.load_asset_more_auth(asset.id, user.username, user.id)
+            data['type'] = 'asset'
+            data.update(asset_detail)
+        else:
+            app_detail = self._get_application_secret_detail(app)
+            system_user.load_app_more_auth(app.id, user.id)
+            data['type'] = 'application'
+            data.update(app_detail)
+
+        self.request.session['auth_backend'] = settings.AUTH_BACKEND_AUTH_TOKEN
+        post_auth_success.send(sender=self.__class__, user=user, request=self.request, login_type='T')
+
+        serializer = self.get_serializer(data)
+        return Response(data=serializer.data, status=200)
+
+
+class UserConnectionTokenViewSet(
+    RootOrgViewMixin, SerializerMixin, ClientProtocolMixin,
+    SecretDetailMixin, GenericViewSet
+):
+    permission_classes = (IsSuperUserOrAppUser,)
+    serializer_classes = {
+        'default': ConnectionTokenSerializer,
+        'get_secret_detail': ConnectionTokenSecretSerializer,
+    }
+    CACHE_KEY_PREFIX = 'CONNECTION_TOKEN_{}'
+
+    @staticmethod
+    def check_resource_permission(user, asset, application, system_user):
+        from perms.utils.asset import has_asset_system_permission
+        from perms.utils.application import has_application_system_permission
+
+        if asset and not has_asset_system_permission(user, asset, system_user):
+            error = f'User not has this asset and system user permission: ' \
+                    f'user={user.id} system_user={system_user.id} asset={asset.id}'
+            raise PermissionDenied(error)
+        if application and not has_application_system_permission(user, application, system_user):
+            error = f'User not has this application and system user permission: ' \
+                    f'user={user.id} system_user={system_user.id} application={application.id}'
+            raise PermissionDenied(error)
+        return True
+
+    def create_token(self, user, asset, application, system_user, ttl=5 * 60):
+        if not self.request.user.is_superuser and user != self.request.user:
+            raise PermissionDenied('Only super user can create user token')
+        self.check_resource_permission(user, asset, application, system_user)
+        token = random_string(36)
+        value = {
+            'user': str(user.id),
+            'username': user.username,
+            'system_user': str(system_user.id),
+            'system_user_name': system_user.name
+        }
+
+        if asset:
+            value.update({
+                'type': 'asset',
+                'asset': str(asset.id),
+                'hostname': asset.hostname,
+            })
+        elif application:
+            value.update({
+                'type': 'application',
+                'application': application.id,
+                'application_name': str(application)
+            })
+
+        key = self.CACHE_KEY_PREFIX.format(token)
+        cache.set(key, value, timeout=ttl)
+        return token
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        asset, application, system_user, user = self.get_request_resource(serializer)
+        token = self.create_token(user, asset, application, system_user)
+        return Response({"token": token}, status=201)
+
     def valid_token(self, token):
         from users.models import User
         from assets.models import SystemUser, Asset
@@ -244,38 +337,7 @@ class UserConnectionTokenViewSet(RootOrgViewMixin, SerializerMixin, GenericViewS
 
         if not has_perm:
             raise serializers.ValidationError('Permission expired or invalid')
-
         return value, user, system_user, asset, app, expired_at
-
-    @action(methods=['POST'], detail=False, permission_classes=[IsSuperUserOrAppUser], url_path='secret-info/detail')
-    def get_secret_detail(self, request, *args, **kwargs):
-        token = request.data.get('token', '')
-        try:
-            value, user, system_user, asset, app, expired_at = self.valid_token(token)
-        except serializers.ValidationError as e:
-            post_auth_failed.send(
-                sender=self.__class__, username='', request=self.request,
-                reason=_('Invalid token')
-            )
-            raise e
-
-        data = dict(user=user, system_user=system_user, expired_at=expired_at)
-        if asset:
-            asset_detail = self._get_asset_secret_detail(asset, user=user, system_user=system_user)
-            system_user.load_asset_more_auth(asset.id, user.username, user.id)
-            data['type'] = 'asset'
-            data.update(asset_detail)
-        else:
-            app_detail = self._get_application_secret_detail(app)
-            system_user.load_app_more_auth(app.id, user.id)
-            data['type'] = 'application'
-            data.update(app_detail)
-
-        self.request.session['auth_backend'] = settings.AUTH_BACKEND_AUTH_TOKEN
-        post_auth_success.send(sender=self.__class__, user=user, request=self.request, login_type='T')
-
-        serializer = self.get_serializer(data)
-        return Response(data=serializer.data, status=200)
 
     def get_permissions(self):
         if self.action in ["create", "get_rdp_file"]:

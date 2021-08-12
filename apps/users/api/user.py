@@ -24,7 +24,6 @@ from ..models import User
 from ..signals import post_user_create
 from ..filters import OrgRoleUserFilterBackend
 
-
 logger = get_logger(__name__)
 __all__ = [
     'UserViewSet', 'UserChangePasswordApi',
@@ -33,7 +32,7 @@ __all__ = [
 
 
 class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
-    filterset_fields = ('username', 'email', 'name', 'id', 'source')
+    filterset_fields = ('username', 'email', 'name', 'id', 'source', 'role')
     search_fields = filterset_fields
     permission_classes = (IsOrgAdmin, CanUpdateDeleteUser)
     serializer_classes = {
@@ -184,7 +183,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         return Response(status=204)
 
 
-class UserChangePasswordApi(UserQuerysetMixin, generics.RetrieveUpdateAPIView):
+class UserChangePasswordApi(UserQuerysetMixin, generics.UpdateAPIView):
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.ChangeUserPasswordSerializer
 

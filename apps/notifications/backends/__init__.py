@@ -5,6 +5,7 @@ from .dingtalk import DingTalk
 from .email import Email
 from .site_msg import SiteMessage
 from .wecom import WeCom
+from .feishu import FeiShu
 
 
 class BACKEND(models.TextChoices):
@@ -12,6 +13,7 @@ class BACKEND(models.TextChoices):
     WECOM = 'wecom', _('WeCom')
     DINGTALK = 'dingtalk', _('DingTalk')
     SITE_MSG = 'site_msg', _('Site message')
+    FEISHU = 'feishu', _('FeiShu')
 
     @property
     def client(self):
@@ -19,7 +21,8 @@ class BACKEND(models.TextChoices):
             self.EMAIL: Email,
             self.WECOM: WeCom,
             self.DINGTALK: DingTalk,
-            self.SITE_MSG: SiteMessage
+            self.SITE_MSG: SiteMessage,
+            self.FEISHU: FeiShu,
         }[self]
         return client
 

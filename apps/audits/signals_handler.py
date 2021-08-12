@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete, m2m_changed
 from django.dispatch import receiver
 from django.conf import settings
 from django.db import transaction
@@ -11,6 +11,8 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework.renderers import JSONRenderer
 from rest_framework.request import Request
 
+from assets.models import Asset
+from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR
 from jumpserver.utils import current_request
 from common.utils import get_request_ip, get_logger, get_syslogger
 from users.models import User
@@ -20,6 +22,9 @@ from terminal.models import Session, Command
 from common.utils.encode import model_to_json
 from .utils import write_login_log
 from . import models
+from .models import OperateLog
+from orgs.utils import current_org
+from perms.models import AssetPermission, ApplicationPermission
 
 logger = get_logger(__name__)
 sys_logger = get_syslogger(__name__)
@@ -88,6 +93,119 @@ def create_operate_log(action, sender, resource):
             models.OperateLog.objects.create(**data)
         except Exception as e:
             logger.error("Create operate log error: {}".format(e))
+
+
+M2M_NEED_RECORD = {
+    'OrganizationMember': (
+        _('User and Organization'),
+        _('{User} *JOINED* {Organization}'),
+        _('{User} *LEFT* {Organization}')
+    ),
+    User.groups.through._meta.object_name: (
+        _('User and Group'),
+        _('{User} *JOINED* {UserGroup}'),
+        _('{User} *LEFT* {UserGroup}')
+    ),
+    Asset.nodes.through._meta.object_name: (
+        _('Node and Asset'),
+        _('{Node} *ADD* {Asset}'),
+        _('{Node} *REMOVE* {Asset}')
+    ),
+    AssetPermission.users.through._meta.object_name: (
+        _('User asset permissions'),
+        _('{AssetPermission} *ADD* {User}'),
+        _('{AssetPermission} *REMOVE* {User}'),
+    ),
+    AssetPermission.user_groups.through._meta.object_name: (
+        _('User group asset permissions'),
+        _('{AssetPermission} *ADD* {UserGroup}'),
+        _('{AssetPermission} *REMOVE* {UserGroup}'),
+    ),
+    AssetPermission.assets.through._meta.object_name: (
+        _('Asset permission'),
+        _('{AssetPermission} *ADD* {Asset}'),
+        _('{AssetPermission} *REMOVE* {Asset}'),
+    ),
+    AssetPermission.nodes.through._meta.object_name: (
+        _('Node permission'),
+        _('{AssetPermission} *ADD* {Node}'),
+        _('{AssetPermission} *REMOVE* {Node}'),
+    ),
+    AssetPermission.system_users.through._meta.object_name: (
+        _('Asset permission and SystemUser'),
+        _('{AssetPermission} *ADD* {SystemUser}'),
+        _('{AssetPermission} *REMOVE* {SystemUser}'),
+    ),
+    ApplicationPermission.users.through._meta.object_name: (
+        _('User application permissions'),
+        _('{ApplicationPermission} *ADD* {User}'),
+        _('{ApplicationPermission} *REMOVE* {User}'),
+    ),
+    ApplicationPermission.user_groups.through._meta.object_name: (
+        _('User group application permissions'),
+        _('{ApplicationPermission} *ADD* {UserGroup}'),
+        _('{ApplicationPermission} *REMOVE* {UserGroup}'),
+    ),
+    ApplicationPermission.applications.through._meta.object_name: (
+        _('Application permission'),
+        _('{ApplicationPermission} *ADD* {Application}'),
+        _('{ApplicationPermission} *REMOVE* {Application}'),
+    ),
+    ApplicationPermission.system_users.through._meta.object_name: (
+        _('Application permission and SystemUser'),
+        _('{ApplicationPermission} *ADD* {SystemUser}'),
+        _('{ApplicationPermission} *REMOVE* {SystemUser}'),
+    ),
+}
+
+
+M2M_ACTION = {
+    POST_ADD: 'add',
+    POST_REMOVE: 'remove',
+    POST_CLEAR: 'remove',
+}
+
+
+@receiver(m2m_changed)
+def on_m2m_changed(sender, action, instance, reverse, model, pk_set, **kwargs):
+    if action not in M2M_ACTION:
+        return
+
+    user = current_request.user if current_request else None
+    if not user or not user.is_authenticated:
+        return
+
+    sender_name = sender._meta.object_name
+    if sender_name in M2M_NEED_RECORD:
+        action = M2M_ACTION[action]
+        org_id = current_org.id
+        remote_addr = get_request_ip(current_request)
+        user = str(user)
+        resource_type, resource_tmpl_add, resource_tmpl_remove = M2M_NEED_RECORD[sender_name]
+        if action == 'add':
+            resource_tmpl = resource_tmpl_add
+        elif action == 'remove':
+            resource_tmpl = resource_tmpl_remove
+
+        to_create = []
+        objs = model.objects.filter(pk__in=pk_set)
+
+        instance_name = instance._meta.object_name
+        instance_value = str(instance)
+
+        model_name = model._meta.object_name
+
+        for obj in objs:
+            resource = resource_tmpl.format(**{
+                instance_name: instance_value,
+                model_name: str(obj)
+            })[:128]  # `resource` 字段只有 128 个字符长 😔
+
+            to_create.append(OperateLog(
+                user=user, action=action, resource_type=resource_type,
+                resource=resource, remote_addr=remote_addr, org_id=org_id
+            ))
+        OperateLog.objects.bulk_create(to_create)
 
 
 @receiver(post_save)

@@ -18,7 +18,7 @@ class StatusSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields_mini = ['id']
-        fields_write_only = ['sessions',]
+        fields_write_only = ['sessions', ]
         fields_small = fields_mini + fields_write_only + [
             'cpu_load', 'memory_used', 'disk_used',
             'session_online',
@@ -54,6 +54,11 @@ class TerminalSerializer(BulkModelSerializer):
         fields_fk = ['status', 'status_display', 'stat']
         fields = fields_small + fields_fk
         read_only_fields = ['type', 'date_created']
+
+        extra_kwargs = {
+            'command_storage': {'required': True, },
+            'replay_storage': {'required': True, },
+        }
 
     @staticmethod
     def get_kwargs_may_be_uuid(value):

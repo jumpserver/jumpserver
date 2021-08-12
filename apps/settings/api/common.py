@@ -122,6 +122,7 @@ class PublicSettingApi(generics.RetrieveAPIView):
                 "TICKETS_ENABLED": settings.TICKETS_ENABLED,
                 "PASSWORD_RULE": {
                     'SECURITY_PASSWORD_MIN_LENGTH': settings.SECURITY_PASSWORD_MIN_LENGTH,
+                    'SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH': settings.SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH,
                     'SECURITY_PASSWORD_UPPER_CASE': settings.SECURITY_PASSWORD_UPPER_CASE,
                     'SECURITY_PASSWORD_LOWER_CASE': settings.SECURITY_PASSWORD_LOWER_CASE,
                     'SECURITY_PASSWORD_NUMBER': settings.SECURITY_PASSWORD_NUMBER,
@@ -129,6 +130,8 @@ class PublicSettingApi(generics.RetrieveAPIView):
                 },
                 "AUTH_WECOM": settings.AUTH_WECOM,
                 "AUTH_DINGTALK": settings.AUTH_DINGTALK,
+                "AUTH_FEISHU": settings.AUTH_FEISHU,
+                'SECURITY_WATERMARK_ENABLED': settings.SECURITY_WATERMARK_ENABLED
             }
         }
         return instance
@@ -146,6 +149,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'email_content': serializers.EmailContentSettingSerializer,
         'wecom': serializers.WeComSettingSerializer,
         'dingtalk': serializers.DingTalkSettingSerializer,
+        'feishu': serializers.FeiShuSettingSerializer,
     }
 
     def get_serializer_class(self):
@@ -159,7 +163,8 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         items = self.get_fields().keys()
-        return {item: getattr(settings, item) for item in items}
+        obj = {item: getattr(settings, item) for item in items}
+        return obj
 
     def parse_serializer_data(self, serializer):
         data = []

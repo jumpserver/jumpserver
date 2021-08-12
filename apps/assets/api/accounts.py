@@ -1,15 +1,15 @@
 from django.db.models import F, Q
-from django.conf import settings
 from rest_framework.decorators import action
 from django_filters import rest_framework as filters
 from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
 from rest_framework.generics import CreateAPIView
 
 from orgs.mixins.api import OrgBulkModelViewSet
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, NeedMFAVerify
 from common.drf.filters import BaseFilterSet
 from ..tasks.account_connectivity import test_accounts_connectivity_manual
-from ..models import AuthBook
+from ..models import AuthBook, Node
 from .. import serializers
 
 __all__ = ['AccountViewSet', 'AccountSecretsViewSet', 'AccountTaskCreateAPI']
@@ -19,11 +19,13 @@ class AccountFilterSet(BaseFilterSet):
     username = filters.CharFilter(method='do_nothing')
     ip = filters.CharFilter(field_name='ip', lookup_expr='exact')
     hostname = filters.CharFilter(field_name='hostname', lookup_expr='exact')
+    node = filters.CharFilter(method='do_nothing')
 
     @property
     def qs(self):
         qs = super().qs
         qs = self.filter_username(qs)
+        qs = self.filter_node(qs)
         return qs
 
     def filter_username(self, qs):
@@ -31,6 +33,16 @@ class AccountFilterSet(BaseFilterSet):
         if not username:
             return qs
         qs = qs.filter(Q(username=username) | Q(systemuser__username=username)).distinct()
+        return qs
+
+    def filter_node(self, qs):
+        node_id = self.get_query_param('node')
+        if not node_id:
+            return qs
+        node = get_object_or_404(Node, pk=node_id)
+        node_ids = node.get_children(with_self=True).values_list('id', flat=True)
+        node_ids = list(node_ids)
+        qs = qs.filter(asset__nodes__in=node_ids)
         return qs
 
     class Meta:
@@ -73,11 +85,6 @@ class AccountSecretsViewSet(AccountViewSet):
     }
     permission_classes = (IsOrgAdmin, NeedMFAVerify)
     http_method_names = ['get']
-
-    def get_permissions(self):
-        if not settings.SECURITY_VIEW_AUTH_NEED_MFA:
-            self.permission_classes = [IsOrgAdminOrAppUser]
-        return super().get_permissions()
 
 
 class AccountTaskCreateAPI(CreateAPIView):

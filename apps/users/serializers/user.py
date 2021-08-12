@@ -54,7 +54,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
             'mfa_enabled', 'is_valid', 'is_expired', 'is_active',  # 布尔字段
             'date_expired', 'date_joined', 'last_login',  # 日期字段
             'created_by', 'comment',  # 通用字段
-            'is_wecom_bound', 'is_dingtalk_bound',
+            'is_wecom_bound', 'is_dingtalk_bound', 'is_feishu_bound',
         ]
         # 包含不太常用的字段，可以没有
         fields_verbose = fields_small + [
@@ -122,7 +122,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         if self.instance and not password:
             # 更新用户, 未设置密码
             return
-        if not check_password_rules(password):
+        if not check_password_rules(password, user=self.instance):
             msg = _('Password does not match security rules')
             raise serializers.ValidationError(msg)
         return password

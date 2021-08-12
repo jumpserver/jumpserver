@@ -8,7 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 from common.utils import lazyproperty
 from .base import BasePermission
 from users.models import User
-from applications.const import ApplicationCategoryChoices, ApplicationTypeChoices
+from applications.const import AppCategory, AppType
 
 __all__ = [
     'ApplicationPermission',
@@ -17,10 +17,10 @@ __all__ = [
 
 class ApplicationPermission(BasePermission):
     category = models.CharField(
-        max_length=16, choices=ApplicationCategoryChoices.choices, verbose_name=_('Category')
+        max_length=16, choices=AppCategory.choices, verbose_name=_('Category')
     )
     type = models.CharField(
-        max_length=16, choices=ApplicationTypeChoices.choices, verbose_name=_('Type')
+        max_length=16, choices=AppType.choices, verbose_name=_('Type')
     )
     applications = models.ManyToManyField(
         'applications.Application', related_name='granted_by_permissions', blank=True,
@@ -38,15 +38,15 @@ class ApplicationPermission(BasePermission):
 
     @property
     def category_remote_app(self):
-        return self.category == ApplicationCategoryChoices.remote_app.value
+        return self.category == AppCategory.remote_app.value
 
     @property
     def category_db(self):
-        return self.category == ApplicationCategoryChoices.db.value
+        return self.category == AppCategory.db.value
 
     @property
     def category_cloud(self):
-        return self.category == ApplicationCategoryChoices.cloud.value
+        return self.category == AppCategory.cloud.value
 
     @lazyproperty
     def users_amount(self):

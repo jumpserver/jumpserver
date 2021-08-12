@@ -1,19 +1,174 @@
+from collections import defaultdict
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.models import OrgModelMixin
 from common.mixins import CommonModelMixin
+from common.tree import TreeNode
 from assets.models import Asset, SystemUser
 from .. import const
 
 
-class Application(CommonModelMixin, OrgModelMixin):
+class ApplicationTreeNodeMixin:
+    id: str
+    name: str
+    type: str
+    category: str
+
+    @classmethod
+    def create_choice_node(cls, c, id_, pid, tp, opened=False, counts=None,
+                           show_empty=True, show_count=True):
+        count = counts.get(c.value, 0)
+        if count == 0 and not show_empty:
+            return None
+        label = c.label
+        if count is not None and show_count:
+            label = '{} ({})'.format(label, count)
+        data = {
+            'id': id_,
+            'name': label,
+            'title': label,
+            'pId': pid,
+            'isParent': bool(count),
+            'open': opened,
+            'iconSkin': '',
+            'meta': {
+                'type': tp,
+                'data': {
+                    'name': c.name,
+                    'value': c.value
+                }
+            }
+        }
+        return TreeNode(**data)
+
+    @classmethod
+    def create_root_tree_node(cls, queryset, show_count=True):
+        count = queryset.count() if show_count else None
+        root_id = 'applications'
+        root_name = _('Applications')
+        if count is not None and show_count:
+            root_name = '{} ({})'.format(root_name, count)
+        node = TreeNode(**{
+            'id': root_id,
+            'name': root_name,
+            'title': root_name,
+            'pId': '',
+            'isParent': True,
+            'open': True,
+            'iconSkin': '',
+            'meta': {
+                'type': 'applications_root',
+            }
+        })
+        return node
+
+    @classmethod
+    def create_category_tree_nodes(cls, root_node, counts=None, show_empty=True, show_count=True):
+        nodes = []
+        categories = const.AppType.category_types_mapper().keys()
+        for category in categories:
+            i = root_node.id + '_' + category.value
+            node = cls.create_choice_node(
+                category, i, pid=root_node.id, tp='category',
+                counts=counts, opened=False, show_empty=show_empty,
+                show_count=show_count
+            )
+            if not node:
+                continue
+            nodes.append(node)
+        return nodes
+
+    @classmethod
+    def create_types_tree_nodes(cls, root_node, counts, show_empty=True, show_count=True):
+        nodes = []
+        type_category_mapper = const.AppType.type_category_mapper()
+        for tp in const.AppType.type_category_mapper().keys():
+            category = type_category_mapper.get(tp)
+            pid = root_node.id + '_' + category.value
+            i = root_node.id + '_' + tp.value
+            node = cls.create_choice_node(
+                tp, i, pid, tp='type', counts=counts, opened=False,
+                show_empty=show_empty, show_count=show_count
+            )
+            if not node:
+                continue
+            nodes.append(node)
+        return nodes
+
+    @staticmethod
+    def get_tree_node_counts(queryset):
+        counts = defaultdict(int)
+        values = queryset.values_list('type', 'category')
+        for i in values:
+            tp = i[0]
+            category = i[1]
+            counts[tp] += 1
+            counts[category] += 1
+        return counts
+
+    @classmethod
+    def create_tree_nodes(cls, queryset, root_node=None, show_empty=True, show_count=True):
+        counts = cls.get_tree_node_counts(queryset)
+        tree_nodes = []
+
+        # 根节点有可能是组织名称
+        if root_node is None:
+            root_node = cls.create_root_tree_node(queryset, show_count=show_count)
+            tree_nodes.append(root_node)
+
+        # 类别的节点
+        tree_nodes += cls.create_category_tree_nodes(
+            root_node, counts, show_empty=show_empty,
+            show_count=show_count
+        )
+
+        # 类型的节点
+        tree_nodes += cls.create_types_tree_nodes(
+            root_node, counts, show_empty=show_empty,
+            show_count=show_count
+        )
+
+        # 应用的节点
+        for app in queryset:
+            pid = root_node.id + '_' + app.type
+            tree_nodes.append(app.as_tree_node(pid))
+        return tree_nodes
+
+    def as_tree_node(self, pid):
+        icon_skin_category_mapper = {
+            'remote_app': 'chrome',
+            'db': 'database',
+            'cloud': 'cloud'
+        }
+        icon_skin = icon_skin_category_mapper.get(self.category, 'file')
+        node = TreeNode(**{
+            'id': str(self.id),
+            'name': self.name,
+            'title': self.name,
+            'pId': pid,
+            'isParent': False,
+            'open': False,
+            'iconSkin': icon_skin,
+            'meta': {
+                'type': 'application',
+                'data': {
+                    'category': self.category,
+                    'type': self.type,
+                }
+            }
+        })
+        return node
+
+
+class Application(CommonModelMixin, OrgModelMixin, ApplicationTreeNodeMixin):
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     category = models.CharField(
-        max_length=16, choices=const.ApplicationCategoryChoices.choices, verbose_name=_('Category')
+        max_length=16, choices=const.AppCategory.choices, verbose_name=_('Category')
     )
     type = models.CharField(
-        max_length=16, choices=const.ApplicationTypeChoices.choices, verbose_name=_('Type')
+        max_length=16, choices=const.AppType.choices, verbose_name=_('Type')
     )
     domain = models.ForeignKey(
         'assets.Domain', null=True, blank=True, related_name='applications',
@@ -35,7 +190,7 @@ class Application(CommonModelMixin, OrgModelMixin):
 
     @property
     def category_remote_app(self):
-        return self.category == const.ApplicationCategoryChoices.remote_app.value
+        return self.category == const.AppCategory.remote_app.value
 
     def get_rdp_remote_app_setting(self):
         from applications.serializers.attrs import get_serializer_class_by_application_type

@@ -191,7 +191,7 @@
                     </div>
 
                     <div>
-                        {% if AUTH_OPENID or AUTH_CAS or AUTH_WECOM or AUTH_DINGTALK %}
+                        {% if AUTH_OPENID or AUTH_CAS or AUTH_WECOM or AUTH_DINGTALK or AUTH_FEISHU %}
                             <div class="hr-line-dashed"></div>
                             <div style="display: inline-block; float: left">
                                 <b class="text-muted text-left" >{% trans "More login options" %}</b>
@@ -214,6 +214,11 @@
                                     <a href="{% url 'authentication:dingtalk-qr-login' %}" class="more-login-item">
                                         <i class="fa"><img src="{{ LOGIN_DINGTALK_LOGO_URL }}" height="13" width="13"></i> {% trans 'DingTalk' %}
                                     </a>
+                                {% endif %}
+                                {% if AUTH_FEISHU %}
+                                <a href="{% url 'authentication:feishu-qr-login' %}" class="more-login-item">
+                                    <i class="fa"><img src="{{ LOGIN_FEISHU_LOGO_URL }}" height="13" width="13"></i> {% trans 'FeiShu' %}
+                                </a>
                                 {% endif %}
 
                             </div>

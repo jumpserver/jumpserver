@@ -464,14 +464,19 @@ class MFAMixin:
         (1, _('Enable')),
         (2, _("Force enable")),
     )
+    is_org_admin: bool
 
     @property
     def mfa_enabled(self):
-        return self.mfa_force_enabled or self.mfa_level > 0
+        if self.mfa_force_enabled:
+            return True
+        return self.mfa_level > 0
 
     @property
     def mfa_force_enabled(self):
-        if settings.SECURITY_MFA_AUTH:
+        if settings.SECURITY_MFA_AUTH in [True, 1]:
+            return True
+        if settings.SECURITY_MFA_AUTH == 2 and self.is_org_admin:
             return True
         return self.mfa_level == 2
 
@@ -605,6 +610,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     )
     wecom_id = models.CharField(null=True, default=None, unique=True, max_length=128)
     dingtalk_id = models.CharField(null=True, default=None, unique=True, max_length=128)
+    feishu_id = models.CharField(null=True, default=None, unique=True, max_length=128)
 
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
@@ -622,6 +628,10 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     @property
     def is_dingtalk_bound(self):
         return bool(self.dingtalk_id)
+
+    @property
+    def is_feishu_bound(self):
+        return bool(self.feishu_id)
 
     def get_absolute_url(self):
         return reverse('users:user-detail', args=(self.id,))
