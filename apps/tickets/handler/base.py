@@ -31,8 +31,8 @@ class BaseHandler(object):
             flow_level_all_count = 1
         else:
             flow_level_all_count = self.ticket.flow.get_level_all_count
-        if self.ticket.approve_level != flow_level_all_count:
-            self.ticket.approve_level += 1
+        if self.ticket.approval_level != flow_level_all_count:
+            self.ticket.approval_level += 1
             self.ticket.create_related_assignees()
         else:
             self.ticket.set_action_approve()
@@ -58,7 +58,7 @@ class BaseHandler(object):
 
     def dispatch(self, action):
         processor = self.ticket.processor
-        self.ticket.process[self.ticket.approve_level - 1].update({
+        self.ticket.process[self.ticket.approval_level - 1].update({
             'approval_date': str(timezone.now().now()),
             'action': action,
             'processor': processor.id if processor else '',

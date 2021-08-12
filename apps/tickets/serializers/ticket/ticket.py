@@ -26,7 +26,7 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
         model = Ticket
         fields_mini = ['id', 'title']
         fields_small = fields_mini + [
-            'type', 'type_display', 'meta', 'action',
+            'type', 'type_display', 'meta', 'state',
             'status', 'status_display', 'applicant_display', 'process',
             'date_created', 'date_updated', 'comment', 'org_id', 'org_name', 'body'
         ]
@@ -133,8 +133,8 @@ class TicketApproveSerializer(TicketSerializer):
 
 
 class TicketFlowApproveSerializer(serializers.ModelSerializer):
-    approve_level_display = serializers.ReadOnlyField(
-        source='get_approve_level_display', label=_('Approve level display'))
+    approval_level_display = serializers.ReadOnlyField(
+        source='get_approval_level_display', label=_('Approve level display'))
     approve_strategy_display = serializers.ReadOnlyField(
         source='get_approve_strategy_display', label=_('Approve strategy display'))
 
@@ -142,7 +142,7 @@ class TicketFlowApproveSerializer(serializers.ModelSerializer):
         model = ApprovalRule
         fields_mini = ['id', ]
         fields_small = fields_mini + [
-            'approve_level', 'approve_level_display', 'approve_strategy', 'approve_strategy_display',
+            'approval_level', 'approval_level_display', 'approve_strategy', 'approve_strategy_display',
             'assignees_display', 'date_created', 'date_updated'
         ]
         fields_fk = ['ticket_flow', ]

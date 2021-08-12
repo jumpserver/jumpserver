@@ -35,7 +35,7 @@ class TicketProcess(CommonModelMixin):
         verbose_name = _('Ticket assignee')
 
     def __str__(self):
-        return '{0.user.name}({0.user.username})_{0.approve_level}'.format(self)
+        return '{0.assignee.name}({0.assignee.username})_{0.step}'.format(self)
 
 
 class Ticket(CommonModelMixin, OrgModelMixin):
@@ -71,7 +71,7 @@ class Ticket(CommonModelMixin, OrgModelMixin):
     # 评论
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
     flow = models.ForeignKey(
-        'TicketFlow', related_name='ticket_flow_tickets', on_delete=models.SET_NULL, null=True,
+        'TicketFlow', related_name='tickets', on_delete=models.SET_NULL, null=True,
         verbose_name=_("TicketFlow")
     )
 
@@ -108,12 +108,12 @@ class Ticket(CommonModelMixin, OrgModelMixin):
 
     @property
     def cur_assignees(self):
-        return self.m2m_ticket_users.filter(approve_level=self.approve_level)
+        return self.m2m_ticket_users.filter(approval_level=self.approval_level)
 
     @property
     def processor(self):
-        level = self.approve_level
-        m2m_ticket_users = self.m2m_ticket_users.filter(approve_level=level, is_processor=True).first()
+        level = self.approval_level
+        m2m_ticket_users = self.m2m_ticket_users.filter(approval_level=level, is_processor=True).first()
         return m2m_ticket_users.user if m2m_ticket_users else None
 
     def set_action_approve(self):
@@ -129,24 +129,24 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         self.status = TicketStatus.closed.value
 
     def create_related_assignees(self):
-        template_approve = self.get_ticket_flow_approve(self.approve_level)
+        template_approve = self.get_ticket_flow_approve(self.approval_level)
         ticket_assignee_list = []
         assignees = template_approve.assignees.all()
         ticket_assignee_model = self.assignees.through
         for assignee in assignees:
             ticket_assignee_list.append(ticket_assignee_model(
-                ticket=self, user=assignee, approve_level=self.approve_level))
+                ticket=self, user=assignee, approval_level=self.approval_level))
         ticket_assignee_model.objects.bulk_create(ticket_assignee_list)
         return assignees
 
     def create_process_nodes(self):
-        ticket_flow_approves = self.flow.ticket_flow_approves.order_by('approve_level')
+        ticket_flow_approves = self.flow.ticket_flow_approves.order_by('approval_level')
         nodes = list()
         for node in ticket_flow_approves:
             assignees = node.assignees.all()
             nodes.append(
                 {
-                    'approve_level': node.approve_level,
+                    'approval_level': node.approval_level,
                     'action': TicketStatus.open.value,
                     'assignees': [assignee.id for assignee in assignees],
                     'assignees_display': [str(assignee) for assignee in assignees]
@@ -186,7 +186,7 @@ class Ticket(CommonModelMixin, OrgModelMixin):
 
     # ticket
     def has_assignee(self, assignee):
-        return self.m2m_ticket_users.filter(user=assignee, approve_level=self.approve_level).exists()
+        return self.m2m_ticket_users.filter(user=assignee, approval_level=self.approval_level).exists()
 
     @classmethod
     def get_user_related_tickets(cls, user):
@@ -195,7 +195,7 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         return tickets
 
     def get_ticket_flow_approve(self, level):
-        return self.flow.ticket_flow_approves.filter(approve_level=level).first()
+        return self.flow.ticket_flow_approves.filter(approval_level=level).first()
 
     @classmethod
     def all(cls):

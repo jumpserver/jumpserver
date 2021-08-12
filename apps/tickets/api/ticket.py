@@ -25,8 +25,8 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
         'approve': serializers.TicketApproveSerializer,
     }
     filterset_fields = [
-        'id', 'title', 'type', 'approve_level', 'status', 'applicant', 'assignees__id', 'applicant_display',
-        'm2m_ticket_users__approve_level', 'm2m_ticket_users__is_processor', 'm2m_ticket_users__action'
+        'id', 'title', 'type', 'status', 'applicant', 'assignees__id',
+        'applicant_display',
     ]
     search_fields = [
         'title', 'action', 'type', 'status', 'applicant_display'
@@ -91,7 +91,9 @@ class TicketFlowViewSet(JMSBulkModelViewSet):
     def perform_create_or_update(self, serializer):
         instance = serializer.save()
         instance.save()
-        instance.ticket_flow_approves.model.change_assignees_display(instance.ticket_flow_approves.all())
+        instance.ticket_flow_approves.model.change_assignees_display(
+            instance.ticket_flow_approves.all()
+        )
 
     def perform_create(self, serializer):
         self.perform_create_or_update(serializer)
