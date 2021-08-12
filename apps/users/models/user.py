@@ -610,6 +610,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     )
     wecom_id = models.CharField(null=True, default=None, unique=True, max_length=128)
     dingtalk_id = models.CharField(null=True, default=None, unique=True, max_length=128)
+    feishu_id = models.CharField(null=True, default=None, unique=True, max_length=128)
 
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
@@ -627,6 +628,10 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     @property
     def is_dingtalk_bound(self):
         return bool(self.dingtalk_id)
+
+    @property
+    def is_feishu_bound(self):
+        return bool(self.feishu_id)
 
     def get_absolute_url(self):
         return reverse('users:user-detail', args=(self.id,))

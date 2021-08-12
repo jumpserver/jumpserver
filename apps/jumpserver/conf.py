@@ -228,6 +228,10 @@ class Config(dict):
         'DINGTALK_APPKEY': '',
         'DINGTALK_APPSECRET': '',
 
+        'AUTH_FEISHU': False,
+        'FEISHU_APP_ID': '',
+        'FEISHU_APP_SECRET': '',
+
         'OTP_VALID_WINDOW': 2,
         'OTP_ISSUER_NAME': 'JumpServer',
         'EMAIL_SUFFIX': 'jumpserver.org',

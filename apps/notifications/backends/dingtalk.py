@@ -1,5 +1,4 @@
 from django.conf import settings
-
 from common.message.backends.dingtalk import DingTalk as Client
 from .base import BackendBase
 

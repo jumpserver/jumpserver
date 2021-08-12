@@ -7,6 +7,7 @@ __all__ = [
     'BasicSettingSerializer', 'EmailSettingSerializer', 'EmailContentSettingSerializer',
     'LDAPSettingSerializer', 'TerminalSettingSerializer', 'SecuritySettingSerializer',
     'SettingsSerializer', 'WeComSettingSerializer', 'DingTalkSettingSerializer',
+    'FeiShuSettingSerializer',
 ]
 
 
@@ -218,6 +219,12 @@ class DingTalkSettingSerializer(serializers.Serializer):
     AUTH_DINGTALK = serializers.BooleanField(default=False, label=_('Enable DingTalk Auth'))
 
 
+class FeiShuSettingSerializer(serializers.Serializer):
+    FEISHU_APP_ID = serializers.CharField(max_length=256, required=True, label='App ID')
+    FEISHU_APP_SECRET = serializers.CharField(max_length=256, required=False, label='App Secret', write_only=True)
+    AUTH_FEISHU = serializers.BooleanField(default=False, label=_('Enable FeiShu Auth'))
+
+
 class SettingsSerializer(
     BasicSettingSerializer,
     EmailSettingSerializer,
@@ -227,6 +234,7 @@ class SettingsSerializer(
     SecuritySettingSerializer,
     WeComSettingSerializer,
     DingTalkSettingSerializer,
+    FeiShuSettingSerializer,
 ):
 
     # encrypt_fields 现在使用 write_only 来判断了

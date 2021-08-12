@@ -54,7 +54,7 @@ class DictWrapper:
         return str(self.raw_data)
 
 
-def request(func):
+def as_request(func):
     def inner(*args, **kwargs):
         signature = inspect.signature(func)
         bound_args = signature.bind(*args, **kwargs)

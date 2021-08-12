@@ -37,6 +37,14 @@ urlpatterns = [
     path('dingtalk/qr/bind/<uuid:user_id>/callback/', views.DingTalkQRBindCallbackView.as_view(), name='dingtalk-qr-bind-callback'),
     path('dingtalk/qr/login/callback/', views.DingTalkQRLoginCallbackView.as_view(), name='dingtalk-qr-login-callback'),
 
+    path('feishu/bind/success-flash-msg/', views.FlashDingTalkBindSucceedMsgView.as_view(), name='feishu-bind-success-flash-msg'),
+    path('feishu/bind/failed-flash-msg/', views.FlashDingTalkBindFailedMsgView.as_view(), name='feishu-bind-failed-flash-msg'),
+    path('feishu/bind/start/', views.FeiShuEnableStartView.as_view(), name='feishu-bind-start'),
+    path('feishu/qr/bind/', views.FeiShuQRBindView.as_view(), name='feishu-qr-bind'),
+    path('feishu/qr/login/', views.FeiShuQRLoginView.as_view(), name='feishu-qr-login'),
+    path('feishu/qr/bind/callback/', views.FeiShuQRBindCallbackView.as_view(), name='feishu-qr-bind-callback'),
+    path('feishu/qr/login/callback/', views.FeiShuQRLoginCallbackView.as_view(), name='feishu-qr-login-callback'),
+
     # Profile
     path('profile/pubkey/generate/', users_view.UserPublicKeyGenerateView.as_view(), name='user-pubkey-generate'),
     path('profile/otp/enable/start/', users_view.UserOtpEnableStartView.as_view(), name='user-otp-enable-start'),

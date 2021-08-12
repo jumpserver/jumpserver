@@ -315,6 +315,11 @@ class DingTalkNotBound(JMSException):
     default_detail = 'DingTalk is not bound'
 
 
+class FeiShuNotBound(JMSException):
+    default_code = 'feishu_not_bound'
+    default_detail = 'FeiShu is not bound'
+
+
 class PasswdInvalid(JMSException):
     default_code = 'passwd_invalid'
     default_detail = _('Your password is invalid')
