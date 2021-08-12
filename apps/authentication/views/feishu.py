@@ -34,10 +34,7 @@ class FeiShuQRMixin(PermissionsMixin, View):
         try:
             return super().dispatch(request, *args, **kwargs)
         except APIException as e:
-            try:
-                msg = e.detail['errmsg']
-            except Exception:
-                msg = _('FeiShu Error, Please contact your system administrator')
+            msg = str(e.detail)
             return self.get_failed_reponse(
                 '/',
                 _('FeiShu Error'),

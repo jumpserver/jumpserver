@@ -89,7 +89,6 @@ class FeiShu(RequestMixin):
         data = self._requests.post(URL.GET_USER_INFO_BY_CODE, json=body, check_errcode_is_0=False)
 
         self._requests.check_errcode_is_0(data)
-
         return data['data']['user_id']
 
     def send_text(self, user_ids, msg):
