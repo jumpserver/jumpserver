@@ -23,6 +23,7 @@ def update_ticket_process(apps, schema_editor):
         for instance in ticket_model.objects.all():
             instance.process = [{
                 'action': instance.action,
+                'approval_date': str(instance.date_updated),
                 'processor': instance.processor.id if instance.processor else '',
                 'processor_display': instance.processor_display if instance.processor_display else '',
                 'assignees': list(instance.assignees.values_list('id', flat=True)) if instance.assignees else [],

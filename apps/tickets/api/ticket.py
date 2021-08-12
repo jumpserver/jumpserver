@@ -84,6 +84,9 @@ class TicketFlowViewSet(JMSBulkModelViewSet):
     filterset_fields = ['id', 'title', 'type']
     search_fields = ['id', 'title', 'type']
 
+    def destroy(self, request, *args, **kwargs):
+        raise MethodNotAllowed(self.action)
+
     def get_queryset(self):
         queryset = TicketFlow.get_org_related_flows()
         return queryset
@@ -91,9 +94,7 @@ class TicketFlowViewSet(JMSBulkModelViewSet):
     def perform_create_or_update(self, serializer):
         instance = serializer.save()
         instance.save()
-        instance.ticket_flow_approves.model.change_assignees_display(
-            instance.ticket_flow_approves.all()
-        )
+        instance.rules.model.change_assignees_display(instance.rules.all())
 
     def perform_create(self, serializer):
         self.perform_create_or_update(serializer)

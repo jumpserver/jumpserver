@@ -27,11 +27,11 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
         fields_mini = ['id', 'title']
         fields_small = fields_mini + [
             'type', 'type_display', 'meta', 'state',
-            'status', 'status_display', 'applicant_display', 'process',
+            'status', 'status_display', 'applicant_display', 'process_map',
             'date_created', 'date_updated', 'comment', 'org_id', 'org_name', 'body'
         ]
         fields_fk = ['applicant', ]
-        fields_m2m = ['assignees']
+        fields_m2m = ['assignees', ]
         fields = fields_small + fields_fk + fields_m2m
 
     def get_meta_serializer(self):
@@ -133,22 +133,19 @@ class TicketApproveSerializer(TicketSerializer):
 
 
 class TicketFlowApproveSerializer(serializers.ModelSerializer):
-    approval_level_display = serializers.ReadOnlyField(
-        source='get_approval_level_display', label=_('Approve level display'))
-    approve_strategy_display = serializers.ReadOnlyField(
-        source='get_approve_strategy_display', label=_('Approve strategy display'))
+    level_display = serializers.ReadOnlyField(source='get_level_display', label=_('Approve level display'))
+    strategy_display = serializers.ReadOnlyField(source='get_strategy_display', label=_('Approve strategy display'))
 
     class Meta:
         model = ApprovalRule
         fields_mini = ['id', ]
         fields_small = fields_mini + [
-            'approval_level', 'approval_level_display', 'approve_strategy', 'approve_strategy_display',
+            'level', 'level_display', 'strategy', 'strategy_display',
             'assignees_display', 'date_created', 'date_updated'
         ]
-        fields_fk = ['ticket_flow', ]
-        fields_m2m = ['assignees']
-        fields = fields_small + fields_fk + fields_m2m
-        read_only_fields = ['assignees_display', 'date_created', 'date_updated']
+        fields_m2m = ['assignees', ]
+        fields = fields_small + fields_m2m
+        read_only_fields = ['level', 'assignees_display', 'date_created', 'date_updated']
         extra_kwargs = {
             "assignees": {'allow_null': True, 'required': False}
         }
@@ -157,15 +154,16 @@ class TicketFlowApproveSerializer(serializers.ModelSerializer):
 class TicketFlowSerializer(OrgResourceModelSerializerMixin):
     org_id = serializers.CharField(required=True, max_length=36, allow_blank=True, label=_("Organization"))
     type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type display'))
-    ticket_flow_approves = TicketFlowApproveSerializer(many=True, required=True)
+    rules = TicketFlowApproveSerializer(many=True, required=True)
 
     class Meta:
         model = TicketFlow
         fields_mini = ['id', 'title']
         fields_small = fields_mini + [
-            'type', 'type_display', 'created_by', 'date_created', 'date_updated', 'org_id', 'org_name'
+            'type', 'type_display', 'approval_level', 'created_by', 'date_created', 'date_updated',
+            'org_id', 'org_name'
         ]
-        fields = fields_small + ['ticket_flow_approves', ]
+        fields = fields_small + ['rules', ]
         read_only_fields = ['created_by', 'date_created', 'date_updated']
 
     def validate_type(self, value):
@@ -184,32 +182,34 @@ class TicketFlowSerializer(OrgResourceModelSerializerMixin):
 
     def create_or_update(self, action, validated_data, related, assignees, instance=None):
         childs = validated_data.pop(related, [])
+        instance_related = getattr(instance, related)
         if not instance:
             instance = getattr(super(), action)(validated_data)
         else:
             instance = getattr(super(), action)(instance, validated_data)
-            getattr(instance, related).clear()
-
-        fk = getattr(instance, related).field
-        for data in childs:
+            instance_related.all().delete()
+        child_instances = []
+        related_model = instance_related.model
+        for level, data in enumerate(childs, 1):
             data_m2m = data.pop(assignees, None)
-            data[fk.name] = instance
-            child_instance = fk.model.objects.create(**data)
-            if child_instance.approve_strategy == 'super':
+            child_instance = related_model.objects.create(**data, level=level)
+            if child_instance.strategy == 'super':
                 data_m2m = list(User.get_super_admins())
-            elif child_instance.approve_strategy == 'super_admin':
+            elif child_instance.strategy == 'super_admin':
                 data_m2m = list(User.get_super_and_org_admins())
             getattr(child_instance, assignees).set(data_m2m)
+            child_instances.append(child_instance)
+        instance_related.set(child_instances)
         return instance
 
     @atomic
     def create(self, validated_data):
-        return self.create_or_update('create', validated_data, 'ticket_flow_approves', 'assignees')
+        return self.create_or_update('create', validated_data, 'rules', 'assignees')
 
     @atomic
     def update(self, instance, validated_data):
         if instance.org_id == Organization.ROOT_ID:
             instance = self.create(validated_data)
         else:
-            instance = self.create_or_update('update', validated_data, 'ticket_flow_approves', 'assignees', instance)
+            instance = self.create_or_update('update', validated_data, 'rules', 'assignees', instance)
         return instance

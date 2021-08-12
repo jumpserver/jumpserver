@@ -55,7 +55,7 @@ class TicketFlow(CommonModelMixin, OrgModelMixin):
         choices=TicketApprovalLevel.choices,
         verbose_name=_('Approval level')
     )
-    rules = models.ManyToManyField(ApprovalRule, related_name='ticket_flow')
+    rules = models.ManyToManyField(ApprovalRule, related_name='ticket_flows')
 
     def save(self, *args, **kwargs):
         """ 确保保存的org_id的是自身的值 """
@@ -68,10 +68,6 @@ class TicketFlow(CommonModelMixin, OrgModelMixin):
     def __str__(self):
         return '{}({})'.format(self.title, self.type)
 
-    @property
-    def get_level_all_count(self):
-        return self.ticket_flow_approves.count()
-
     @classmethod
     def get_org_related_flows(cls):
         org = get_current_org()
@@ -79,5 +75,3 @@ class TicketFlow(CommonModelMixin, OrgModelMixin):
         cur_flow_types = flows.values_list('type', flat=True)
         diff_global_flows = cls.objects.filter(org_id=org.ROOT_ID).exclude(type__in=cur_flow_types)
         return flows | diff_global_flows
-
-

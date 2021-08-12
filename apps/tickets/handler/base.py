@@ -30,7 +30,7 @@ class BaseHandler(object):
         if not self.ticket.flow:
             flow_level_all_count = 1
         else:
-            flow_level_all_count = self.ticket.flow.get_level_all_count
+            flow_level_all_count = self.ticket.flow.approval_level
         if self.ticket.approval_level != flow_level_all_count:
             self.ticket.approval_level += 1
             self.ticket.create_related_assignees()
