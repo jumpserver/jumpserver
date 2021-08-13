@@ -1,10 +1,9 @@
 from django.utils.translation import ugettext as _
-from django.utils import timezone
 from common.utils import get_logger
 from tickets.utils import (
     send_ticket_processed_mail_to_applicant, send_ticket_applied_mail_to_assignees
 )
-from tickets.const import TicketStatus
+from tickets.const import TicketAction
 from orgs.utils import tmp_to_org
 
 logger = get_logger(__name__)
@@ -25,30 +24,31 @@ class BaseHandler(object):
 
     def _on_approve(self):
         is_finish = False
-        processor = self.ticket.processor
         # 兼容历史数据
         if not self.ticket.flow:
-            flow_level_all_count = 1
+            flow_approval_level = 1
         else:
-            flow_level_all_count = self.ticket.flow.get_level_all_count
-        if self.ticket.approval_level != flow_level_all_count:
-            self.ticket.approval_level += 1
-            self.ticket.create_related_assignees()
+            flow_approval_level = self.ticket.flow.approval_level
+        if self.ticket.approval_step != flow_approval_level:
+            self.ticket.approval_step += 1
+            self.ticket.create_related_node()
         else:
-            self.ticket.set_action_approve()
+            self.ticket.set_state_approve()
             self.ticket.set_status_closed()
             is_finish = True
+        print(self.ticket.status)
         self._send_applied_mail_to_assignees()
-        self.__on_process(processor)
+
+        self.__on_process(self.ticket.processor)
         return is_finish
 
     def _on_reject(self):
-        self.ticket.set_action_reject()
+        self.ticket.set_state_reject()
         self.ticket.set_status_closed()
         self.__on_process(self.ticket.processor)
 
     def _on_close(self):
-        self.ticket.set_action_closed()
+        self.ticket.set_state_closed()
         self.ticket.set_status_closed()
         self.__on_process(self.ticket.processor)
 
@@ -58,12 +58,14 @@ class BaseHandler(object):
 
     def dispatch(self, action):
         processor = self.ticket.processor
-        self.ticket.process[self.ticket.approval_level - 1].update({
-            'approval_date': str(timezone.now().now()),
-            'action': action,
+        current_node = self.ticket.current_node.first()
+        self.ticket.process_map[self.ticket.approval_step - 1].update({
+            'approval_date': str(current_node.date_updated),
+            'state': current_node.state,
             'processor': processor.id if processor else '',
             'processor_display': str(processor) if processor else '',
         })
+        self.ticket.save()
         self._create_comment_on_action(action)
         method = getattr(self, f'_on_{action}', lambda: None)
         return method()
@@ -71,7 +73,7 @@ class BaseHandler(object):
     # email
     def _send_applied_mail_to_assignees(self):
         logger.debug('Send applied email to assignees: {}'.format(
-            ', '.join([str(i.user) for i in self.ticket.cur_assignees])))
+            ', '.join([str(i.assignee) for i in self.ticket.current_node.first().ticket_assignees.all()])))
         send_ticket_applied_mail_to_assignees(self.ticket)
 
     def _send_processed_mail_to_applicant(self, processor):
@@ -80,9 +82,9 @@ class BaseHandler(object):
 
     # comments
     def _create_comment_on_action(self, action):
-        user = self.ticket.applicant if self.ticket.action_open(action=action) else self.ticket.processor
+        user = self.ticket.applicant if self.ticket.state_open else self.ticket.processor
         user_display = str(user)
-        action_display = getattr(TicketStatus, action).label
+        action_display = getattr(TicketAction, action).label
         data = {
             'body': _('{} {} the ticket').format(user_display, action_display),
             'user': user,

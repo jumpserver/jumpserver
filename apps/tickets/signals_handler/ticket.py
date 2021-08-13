@@ -15,7 +15,7 @@ def on_post_change_ticket_action(sender, ticket, action, **kwargs):
 
 
 @receiver(post_or_update_change_ticket_flow_approval, sender=ApprovalRule)
-def post_or_update_change_template_approve(sender, qs, **kwargs):
+def post_or_update_change_ticket_flow_approval(sender, qs, **kwargs):
     updates = []
     for instance in qs:
         instance.assignees_display = [str(assignee) for assignee in instance.assignees.all()]

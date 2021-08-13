@@ -15,16 +15,16 @@ class GenericTicketStatusRetrieveCloseAPI(RetrieveDestroyAPIView):
     permission_classes = (IsAppUser, )
 
     def retrieve(self, request, *args, **kwargs):
-        if self.ticket.action_open:
+        if self.ticket.state_open:
             status = 'await'
-        elif self.ticket.action_approve:
-            status = 'approve'
+        elif self.ticket.state_approve:
+            status = 'approved'
         else:
-            status = 'reject'
+            status = 'rejected'
         data = {
             'status': status,
-            'action': self.ticket.action,
-            'processor': self.ticket.processor_display
+            'action': self.ticket.state,
+            'processor': str(self.ticket.processor)
         }
         return Response(data=data, status=200)
 
@@ -32,9 +32,9 @@ class GenericTicketStatusRetrieveCloseAPI(RetrieveDestroyAPIView):
         if self.ticket.status_open:
             self.ticket.close(processor=self.ticket.applicant)
         data = {
-            'action': self.ticket.action,
+            'action': self.ticket.state,
             'status': self.ticket.status,
-            'processor': self.ticket.processor_display
+            'processor': str(self.ticket.processor)
         }
         return Response(data=data, status=200)
 

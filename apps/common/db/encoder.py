@@ -2,6 +2,7 @@ import json
 from datetime import datetime
 import uuid
 
+from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
 
