@@ -26,9 +26,10 @@ EMAIL_TEMPLATE = '''
 
 
 def send_ticket_applied_mail_to_assignees(ticket):
-    if not ticket.cur_assignees:
+    assignees = ticket.current_node.first().ticket_assignees.all()
+    if not assignees:
         logger.debug("Not found assignees, ticket: {}({}), assignees: {}".format(
-            ticket, str(ticket.id), ticket.assignees)
+            ticket, str(ticket.id), assignees)
         )
         return
 
@@ -42,7 +43,7 @@ def send_ticket_applied_mail_to_assignees(ticket):
     )
     if settings.DEBUG:
         logger.debug(message)
-    recipient_list = [i.user.email for i in ticket.cur_assignees]
+    recipient_list = [i.assignee.email for i in assignees]
     send_mail_async.delay(subject, message, recipient_list, html_message=message)
 
 

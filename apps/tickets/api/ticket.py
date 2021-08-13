@@ -12,6 +12,7 @@ from common.drf.api import JMSBulkModelViewSet
 
 from tickets import serializers
 from tickets.models import Ticket, TicketFlow
+from tickets.filters import TicketFilter
 from tickets.permissions.ticket import IsAssignee, IsAssigneeOrApplicant, NotClosed
 
 __all__ = ['TicketViewSet', 'TicketFlowViewSet']
@@ -24,10 +25,7 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
         'open': serializers.TicketApplySerializer,
         'approve': serializers.TicketApproveSerializer,
     }
-    filterset_fields = [
-        'id', 'title', 'type', 'status', 'applicant', 'assignees__id',
-        'applicant_display',
-    ]
+    filterset_class = TicketFilter
     search_fields = [
         'title', 'action', 'type', 'status', 'applicant_display'
     ]
@@ -47,8 +45,8 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         instance = serializer.save()
-        instance.create_related_assignees()
-        instance.process = instance.create_process_nodes()
+        instance.create_related_node()
+        instance.process_map = instance.create_process_nodes()
         instance.open(applicant=self.request.user)
 
     @action(detail=False, methods=[POST], permission_classes=[IsValidUser, ])

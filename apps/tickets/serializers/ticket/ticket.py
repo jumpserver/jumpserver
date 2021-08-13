@@ -26,13 +26,12 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
         model = Ticket
         fields_mini = ['id', 'title']
         fields_small = fields_mini + [
-            'type', 'type_display', 'meta', 'state',
+            'type', 'type_display', 'meta', 'state', 'approval_step',
             'status', 'status_display', 'applicant_display', 'process_map',
             'date_created', 'date_updated', 'comment', 'org_id', 'org_name', 'body'
         ]
         fields_fk = ['applicant', ]
-        fields_m2m = ['assignees', ]
-        fields = fields_small + fields_fk + fields_m2m
+        fields = fields_small + fields_fk
 
     def get_meta_serializer(self):
         default_serializer = serializers.Serializer(read_only=True)

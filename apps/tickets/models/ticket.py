@@ -8,7 +8,7 @@ from common.mixins.models import CommonModelMixin
 from common.db.encoder import ModelJSONFieldEncoder
 from orgs.mixins.models import OrgModelMixin
 from orgs.utils import tmp_to_root_org, tmp_to_org
-from tickets.const import TicketType, TicketStatus, TicketState, TicketApprovalLevel, ProcessStatus
+from tickets.const import TicketType, TicketStatus, TicketState, TicketApprovalLevel, ProcessStatus, TicketAction
 from tickets.signals import post_change_ticket_action
 from tickets.handler import get_ticket_handler
 
@@ -17,21 +17,21 @@ __all__ = ['Ticket']
 
 class TicketStep(CommonModelMixin):
     ticket = models.ForeignKey(
-        'Ticket', related_name='m2m_ticket_users', on_delete=models.CASCADE, verbose_name='Ticket'
+        'Ticket', related_name='ticket_steps', on_delete=models.CASCADE, verbose_name='Ticket'
     )
     level = models.SmallIntegerField(
         default=TicketApprovalLevel.one, choices=TicketApprovalLevel.choices,
         verbose_name=_('Approve level')
     )
-    state = models.CharField(choices=ProcessStatus.choices, default=ProcessStatus.notified)
+    state = models.CharField(choices=ProcessStatus.choices, max_length=64, default=ProcessStatus.notified)
 
 
 class TicketAssignee(CommonModelMixin):
     assignee = models.ForeignKey(
-        'users.User', related_name='m2m_user_tickets', on_delete=models.CASCADE, verbose_name='User'
+        'users.User', related_name='ticket_assignees', on_delete=models.CASCADE, verbose_name='Assignee'
     )
-    state = models.CharField(choices=ProcessStatus.choices, default=ProcessStatus.notified)
-    step = models.ForeignKey('tickets.TicketStep', on_delete=models.CASCADE)
+    state = models.CharField(choices=ProcessStatus.choices, max_length=64, default=ProcessStatus.notified)
+    step = models.ForeignKey('tickets.TicketStep', related_name='ticket_assignees', on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = _('Ticket assignee')
@@ -65,9 +65,6 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         verbose_name=_("Applicant")
     )
     applicant_display = models.CharField(max_length=256, default='', verbose_name=_("Applicant display"))
-    assignees = models.ManyToManyField(
-        'users.User', related_name='assigned_tickets', verbose_name=_("Assignees"), through='TicketProcess'
-    )
     process_map = models.JSONField(encoder=ModelJSONFieldEncoder, default=list, verbose_name=_("Process"))
     # 评论
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
@@ -104,97 +101,112 @@ class Ticket(CommonModelMixin, OrgModelMixin):
     def status_open(self):
         return self.status == TicketStatus.open.value
 
-    def action_open(self, action=None):
-        return action == TicketStatus.open.value
+    @property
+    def state_open(self):
+        return self.state == TicketState.open.value
 
     @property
-    def cur_assignees(self):
-        return self.m2m_ticket_users.filter(step=self.approval_step)
+    def state_approve(self):
+        return self.state == TicketState.approved.value
+
+    @property
+    def state_reject(self):
+        return self.state == TicketState.rejected.value
+
+    @property
+    def state_close(self):
+        return self.state == TicketState.closed.value
+
+    @property
+    def current_node(self):
+        return self.ticket_steps.filter(level=self.approval_step)
 
     @property
     def processor(self):
-        m2m_ticket_users = self.m2m_ticket_users.filter(
-            step=self.approval_step).exclude(action=TicketStatus.open).first()
-        return m2m_ticket_users.user if m2m_ticket_users else None
+        processor = self.current_node.first().ticket_assignees.exclude(state=ProcessStatus.notified).first()
+        return processor.assignee if processor else None
 
-    def set_action_approve(self):
-        self.action = TicketStatus.approve.value
+    def set_state_approve(self):
+        self.state = TicketState.approved
 
-    def set_action_reject(self):
-        self.action = TicketStatus.reject.value
+    def set_state_reject(self):
+        self.state = TicketState.rejected
 
-    def set_action_closed(self):
-        self.action = TicketStatus.close.value
+    def set_state_closed(self):
+        self.state = TicketState.closed
 
     def set_status_closed(self):
-        self.status = TicketStatus.closed.value
+        self.status = TicketStatus.closed
 
-    def create_related_assignees(self):
-        approval_rule = self.get_ticket_flow_approve()
+    def create_related_node(self):
+        approval_rule = self.get_current_ticket_flow_approve()
+        ticket_step = TicketStep.objects.create(ticket=self, level=self.approval_step)
         ticket_assignees = []
         assignees = approval_rule.assignees.all()
-        ticket_process_model = self.assignees.through
         for assignee in assignees:
-            ticket_assignees.append(
-                ticket_process_model(
-                    ticket=self, assignee=assignee, step=self.approval_step
-                )
-            )
-        ticket_process_model.objects.bulk_create(ticket_assignees)
-        return assignees
+            ticket_assignees.append(TicketAssignee(step=ticket_step, assignee=assignee))
+        TicketAssignee.objects.bulk_create(ticket_assignees)
 
     def create_process_nodes(self):
-        approval_rules = self.flow.rules.order_by('approval_level')
+        approval_rules = self.flow.rules.order_by('level')
         nodes = list()
         for node in approval_rules:
             nodes.append(
                 {
                     'approval_level': node.level,
-                    'action': TicketStatus.open.value,
-                    'assignees': [assignee.id for assignee in node.assignees.all()],
+                    'state': ProcessStatus.notified,
+                    'assignees': [id for id in node.assignees.values_list('id', flat=True)],
                     'assignees_display': node.assignees_display
                 }
             )
         return nodes
 
-    def change_action_and_processor(self, action, user):
-        cur_assignees = self.cur_assignees
-        cur_assignees.update(action=action)
-        if action != TicketStatus.open:
-            cur_assignees.filter(user=user).update(is_processor=True)
-        else:
-            self.applicant = user
-
     # action changed
     def open(self, applicant):
-        self._change_action(TicketState.open.value, applicant)
+        self.applicant = applicant
+        self.save()
+        self._change_action(TicketAction.open)
 
     def approve(self, processor):
-        self._change_action(TicketState.approve.value, processor)
+        approved = ProcessStatus.approved
+        current_node = self.current_node
+        self.state = approved
+        current_node.update(state=approved)
+        current_node.first().ticket_assignees.filter(assignee=processor).update(state=approved)
+        self._change_action(TicketAction.approve)
 
     def reject(self, processor):
-        self._change_action(TicketState.reject.value, processor)
+        rejected = ProcessStatus.rejected
+        current_node = self.current_node
+        self.state = rejected
+        current_node.update(state=rejected)
+        current_node.first().ticket_assignees.filter(assignee=processor).update(state=rejected)
+        self._change_action(TicketAction.reject)
 
     def close(self, processor):
-        self._change_action(TicketState.close.value, processor)
+        closed = TicketState.closed
+        current_node = self.current_node
+        self.state = closed
+        current_node.update(state=closed)
+        current_node.first().ticket_assignees.filter(assignee=processor).update(state=closed)
+        self._change_action(TicketAction.close)
 
-    def _change_action(self, action, user):
-        self.change_action_and_processor(action, user)
+    def _change_action(self, action):
         self.save()
         post_change_ticket_action.send(sender=self.__class__, ticket=self, action=action)
 
     # ticket
     def has_assignee(self, assignee):
-        return self.m2m_ticket_users.filter(assignee=assignee, step=self.approval_step).exists()
+        return self.ticket_steps.filter(ticket_assignees__assignee=assignee, level=self.approval_step).exists()
 
     @classmethod
     def get_user_related_tickets(cls, user):
-        queries = Q(applicant=user) | Q(assignees=user)
+        queries = Q(applicant=user) | Q(ticket_steps__ticket_assignees__assignee=user)
         tickets = cls.all().filter(queries).distinct()
         return tickets
 
-    def get_ticket_flow_approve(self):
-        return self.flow.rules.filter(approval_level=self.approval_step).first()
+    def get_current_ticket_flow_approve(self):
+        return self.flow.rules.filter(level=self.approval_step).first()
 
     @classmethod
     def all(cls):
