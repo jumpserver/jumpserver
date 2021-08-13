@@ -68,6 +68,7 @@ class ApplicationSerializer(ApplicationSerializerMixin, BulkOrgResourceModelSeri
 
 
 class ApplicationAccountSerializer(serializers.Serializer):
+    id = serializers.ReadOnlyField(label=_("Id"), source='uid')
     username = serializers.ReadOnlyField(label=_("Username"))
     password = serializers.CharField(write_only=True, label=_("Password"))
     systemuser = serializers.ReadOnlyField(label=_('System user'))
