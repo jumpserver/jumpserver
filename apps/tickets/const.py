@@ -43,7 +43,7 @@ class TicketApprovalLevel(IntegerChoices):
     two = 2, _("Two level")
 
 
-class TicketApprovalStrategy(TextChoices):
-    super = 'super', _("Super user")
-    system = 'super_admin', _("Super admin user")
-    all = 'all_user', _("All user")
+class TicketAssigneeStrategy(TextChoices):
+    admin = 'admin', _("Admin user")
+    org_admin = 'org_admin', _("Organization admin")
+    custom = 'custom', _("Custom")

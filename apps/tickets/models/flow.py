@@ -7,7 +7,7 @@ from common.mixins.models import CommonModelMixin
 from common.db.encoder import ModelJSONFieldEncoder
 from orgs.mixins.models import OrgModelMixin
 from orgs.utils import tmp_to_org, get_current_org
-from ..const import TicketType, TicketApprovalLevel, TicketApprovalStrategy
+from ..const import TicketType, TicketApprovalLevel, TicketAssigneeStrategy
 from ..signals import post_or_update_change_ticket_flow_approval
 
 __all__ = ['TicketFlow', 'ApprovalRule']
@@ -19,11 +19,10 @@ class ApprovalRule(CommonModelMixin):
         verbose_name=_('Approve level')
     )
     strategy = models.CharField(
-        max_length=64, default=TicketApprovalStrategy.system,
-        choices=TicketApprovalStrategy.choices,
+        max_length=64, default=TicketAssigneeStrategy.admin,
+        choices=TicketAssigneeStrategy.choices,
         verbose_name=_('Approve strategy')
     )
-    # 受理人列表
     assignees = models.ManyToManyField(
         'users.User', related_name='assigned_ticket_flow_approval_rule',
         verbose_name=_("Assignees")
