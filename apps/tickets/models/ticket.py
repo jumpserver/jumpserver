@@ -11,6 +11,7 @@ from orgs.utils import tmp_to_root_org, tmp_to_org
 from tickets.const import TicketType, TicketStatus, TicketState, TicketApprovalLevel, ProcessStatus, TicketAction
 from tickets.signals import post_change_ticket_action
 from tickets.handler import get_ticket_handler
+from tickets.errors import AlreadyClosed
 
 __all__ = ['Ticket']
 
@@ -94,12 +95,12 @@ class Ticket(CommonModelMixin, OrgModelMixin):
 
     # status
     @property
-    def status_closed(self):
-        return self.status == TicketStatus.closed.value
-
-    @property
     def status_open(self):
         return self.status == TicketStatus.open.value
+
+    @property
+    def status_closed(self):
+        return self.status == TicketStatus.closed.value
 
     @property
     def state_open(self):
@@ -179,31 +180,26 @@ class Ticket(CommonModelMixin, OrgModelMixin):
     # action changed
     def open(self, applicant):
         self.applicant = applicant
-        self.save()
         self._change_action(TicketAction.open)
 
-    def approve(self, processor):
-        approved = TicketState.approved
+    def update_current_step_state_and_assignee(self, processor, state):
+        if self.status_closed:
+            raise AlreadyClosed
+        self.state = state
         current_node = self.current_node
-        self.state = approved
-        current_node.update(state=approved)
-        current_node.first().ticket_assignees.filter(assignee=processor).update(state=approved)
+        current_node.update(state=state)
+        current_node.first().ticket_assignees.filter(assignee=processor).update(state=state)
+
+    def approve(self, processor):
+        self.update_current_step_state_and_assignee(processor, TicketState.approved)
         self._change_action(TicketAction.approve)
 
     def reject(self, processor):
-        rejected = TicketState.rejected
-        current_node = self.current_node
-        self.state = rejected
-        current_node.update(state=rejected)
-        current_node.first().ticket_assignees.filter(assignee=processor).update(state=rejected)
+        self.update_current_step_state_and_assignee(processor, TicketState.rejected)
         self._change_action(TicketAction.reject)
 
     def close(self, processor):
-        closed = TicketState.closed
-        current_node = self.current_node
-        self.state = closed
-        current_node.update(state=closed)
-        current_node.first().ticket_assignees.filter(assignee=processor).update(state=closed)
+        self.update_current_step_state_and_assignee(processor, TicketState.closed)
         self._change_action(TicketAction.close)
 
     def _change_action(self, action):

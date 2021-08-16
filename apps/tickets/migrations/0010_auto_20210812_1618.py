@@ -17,7 +17,7 @@ def get_ticket_assignee_m2m_info(apps, schema_editor):
         ticket_assignee_m2m.append((i.id, list(i.assignees.values_list('id', flat=True)), i.action, i.created_by))
 
 
-def update_ticket_process(apps, schema_editor):
+def update_ticket_process_state_status(apps, schema_editor):
     ticket_model = apps.get_model("tickets", "Ticket")
     updates = list()
     with transaction.atomic():
@@ -78,8 +78,7 @@ def create_ticket_flow_and_approval_rule(apps, schema_editor):
     assignees_display = ['{0.name}({0.username})'.format(i) for i in super_user]
     with transaction.atomic():
         for ticket_type in TicketType.values:
-            ticket_flow_instance = ticket_flow_model.objects.create(created_by='init',
-                                                                    title='global_{0}'.format(ticket_type),
+            ticket_flow_instance = ticket_flow_model.objects.create(created_by='System',
                                                                     type=ticket_type, org_id=org_id)
             approval_rule_instance = approval_rule_model.objects.create(strategy='super',
                                                                         assignees_display=assignees_display)
@@ -124,7 +123,14 @@ class Migration(migrations.Migration):
             field=models.JSONField(default=list, encoder=common.db.encoder.ModelJSONFieldEncoder,
                                    verbose_name='Process'),
         ),
-        migrations.RunPython(update_ticket_process),
+        migrations.AddField(
+            model_name='ticket',
+            name='state',
+            field=models.CharField(
+                choices=[('open', 'Open'), ('approved', 'Approved'), ('rejected', 'Rejected'), ('closed', 'Closed')],
+                default='open', max_length=16, verbose_name='State'),
+        ),
+        migrations.RunPython(update_ticket_process_state_status),
         migrations.RemoveField(
             model_name='ticket',
             name='action',
@@ -150,13 +156,6 @@ class Migration(migrations.Migration):
             name='approval_step',
             field=models.SmallIntegerField(choices=[(1, 'One level'), (2, 'Two level')], default=1,
                                            verbose_name='Approval step'),
-        ),
-        migrations.AddField(
-            model_name='ticket',
-            name='state',
-            field=models.CharField(
-                choices=[('open', 'Open'), ('approved', 'Approved'), ('rejected', 'Rejected'), ('closed', 'Closed')],
-                default='open', max_length=16, verbose_name='State'),
         ),
         migrations.CreateModel(
             name='TicketStep',
@@ -186,7 +185,6 @@ class Migration(migrations.Migration):
                 ('created_by', models.CharField(blank=True, max_length=32, null=True, verbose_name='Created by')),
                 ('date_created', models.DateTimeField(auto_now_add=True, null=True, verbose_name='Date created')),
                 ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
-                ('title', models.CharField(max_length=256, verbose_name='Title')),
                 ('type', models.CharField(choices=[('general', 'General'), ('login_confirm', 'Login confirm'),
                                                    ('apply_asset', 'Apply for asset'),
                                                    ('apply_application', 'Apply for application'),

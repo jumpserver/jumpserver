@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from common.mixins.models import CommonModelMixin
 from common.db.encoder import ModelJSONFieldEncoder
 from orgs.mixins.models import OrgModelMixin
-from orgs.utils import get_current_org
+from orgs.utils import tmp_to_root_org
 from ..const import TicketType, TicketApprovalLevel, TicketApprovalStrategy
 from ..signals import post_or_update_change_ticket_flow_approval
 
@@ -45,7 +45,6 @@ class ApprovalRule(CommonModelMixin):
 
 
 class TicketFlow(CommonModelMixin, OrgModelMixin):
-    title = models.CharField(max_length=256, verbose_name=_("Title"))
     type = models.CharField(
         max_length=64, choices=TicketType.choices,
         default=TicketType.general, verbose_name=_("Type")
@@ -61,12 +60,12 @@ class TicketFlow(CommonModelMixin, OrgModelMixin):
         verbose_name = _('Ticket flow')
 
     def __str__(self):
-        return '{}({})'.format(self.title, self.type)
+        return '{}'.format(self.type)
 
     @classmethod
     def get_org_related_flows(cls):
-        org = get_current_org()
-        flows = cls.objects.filter(org_id=org.id)
+        flows = cls.objects.all()
         cur_flow_types = flows.values_list('type', flat=True)
-        diff_global_flows = cls.objects.filter(org_id=org.ROOT_ID).exclude(type__in=cur_flow_types)
+        with tmp_to_root_org():
+            diff_global_flows = cls.objects.exclude(type__in=cur_flow_types)
         return flows | diff_global_flows

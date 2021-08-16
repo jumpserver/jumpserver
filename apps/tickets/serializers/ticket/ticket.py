@@ -164,7 +164,7 @@ class TicketFlowSerializer(OrgResourceModelSerializerMixin):
 
     class Meta:
         model = TicketFlow
-        fields_mini = ['id', 'title']
+        fields_mini = ['id', ]
         fields_small = fields_mini + [
             'type', 'type_display', 'approval_level', 'created_by', 'date_created', 'date_updated',
             'org_id', 'org_name'
