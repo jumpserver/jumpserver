@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-
+from django.utils.translation import ugettext_lazy as _
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import MethodNotAllowed
@@ -54,16 +54,20 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     def open(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
 
-    @action(detail=True, methods=[PUT], permission_classes=[IsAssignee, NotClosed])
+    @action(detail=True, methods=[PUT], permission_classes=[IsAssignee, ])
     def approve(self, request, *args, **kwargs):
-        response = super().update(request, *args, **kwargs)
         instance = self.get_object()
+        if instance.status_closed:
+            return Response(data={"error": _("Ticket already closed")}, status=400)
+        response = super().update(request, *args, **kwargs)
         instance.approve(processor=self.request.user)
         return response
 
-    @action(detail=True, methods=[PUT], permission_classes=[IsAssignee, NotClosed])
+    @action(detail=True, methods=[PUT], permission_classes=[IsAssignee, ])
     def reject(self, request, *args, **kwargs):
         instance = self.get_object()
+        if instance.status_closed:
+            return Response(data={"error": _("Ticket already closed")}, status=400)
         serializer = self.get_serializer(instance)
         instance.reject(processor=request.user)
         return Response(serializer.data)
