@@ -35,7 +35,8 @@ class ApplicationAccountViewSet(JMSModelViewSet):
     http_method_names = ['get', 'put', 'patch', 'options']
 
     def get_queryset(self):
-        queryset = ApplicationPermission.objects.all() \
+        queryset = ApplicationPermission.objects.exclude(system_users__isnull=True) \
+            .exclude(applications__isnull=True) \
             .annotate(uid=Concat(
                 'applications', Value('_'), 'system_users', output_field=CharField()
              )) \
