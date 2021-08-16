@@ -39,10 +39,12 @@ def update_ticket_process(apps, schema_editor):
                 'assignees': list(instance.assignees.values_list('id', flat=True)) if instance.assignees else [],
                 'assignees_display': instance.assignees_display if instance.assignees_display else []
             }, ]
+            instance.state = state
             if instance.status == 'open':
                 instance.status = 'closed'
+                instance.state = 'closed'
             updates.append(instance)
-        ticket_model.objects.bulk_update(updates, ['process_map', 'status'])
+        ticket_model.objects.bulk_update(updates, ['process_map', 'state', 'status'])
 
 
 def create_step_and_assignee(apps, schema_editor):
@@ -76,8 +78,11 @@ def create_ticket_flow_and_approval_rule(apps, schema_editor):
     assignees_display = ['{0.name}({0.username})'.format(i) for i in super_user]
     with transaction.atomic():
         for ticket_type in TicketType.values:
-            ticket_flow_instance = ticket_flow_model.objects.create(created_by='init', title='global_{0}'.format(ticket_type), type=ticket_type, org_id=org_id)
-            approval_rule_instance = approval_rule_model.objects.create(strategy='super', assignees_display=assignees_display)
+            ticket_flow_instance = ticket_flow_model.objects.create(created_by='init',
+                                                                    title='global_{0}'.format(ticket_type),
+                                                                    type=ticket_type, org_id=org_id)
+            approval_rule_instance = approval_rule_model.objects.create(strategy='super',
+                                                                        assignees_display=assignees_display)
             approval_rule_instance.assignees.set(list(super_user))
             ticket_flow_instance.rules.set([approval_rule_instance, ])
 
@@ -99,7 +104,8 @@ class Migration(migrations.Migration):
                 ('level', models.SmallIntegerField(choices=[(1, 'One level'), (2, 'Two level')], default=1,
                                                    verbose_name='Approve level')),
                 ('strategy', models.CharField(
-                    choices=[('super', 'Super user'), ('admin', 'Admin user'), ('super_admin', 'Super admin user'), ('custom', 'Custom user')],
+                    choices=[('super', 'Super user'), ('admin', 'Admin user'), ('super_admin', 'Super admin user'),
+                             ('custom', 'Custom user')],
                     default='super', max_length=64, verbose_name='Approve strategy')),
                 ('assignees_display', models.JSONField(default=list, encoder=common.db.encoder.ModelJSONFieldEncoder,
                                                        verbose_name='Assignees display')),

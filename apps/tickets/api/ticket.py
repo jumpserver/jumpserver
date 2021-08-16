@@ -13,7 +13,7 @@ from common.drf.api import JMSBulkModelViewSet
 from tickets import serializers
 from tickets.models import Ticket, TicketFlow
 from tickets.filters import TicketFilter
-from tickets.permissions.ticket import IsAssignee, IsAssigneeOrApplicant, NotClosed
+from tickets.permissions.ticket import IsAssignee, IsApplicant, NotClosed
 
 __all__ = ['TicketViewSet', 'TicketFlowViewSet']
 
@@ -67,7 +67,7 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
         instance.reject(processor=request.user)
         return Response(serializer.data)
 
-    @action(detail=True, methods=[PUT], permission_classes=[IsAssigneeOrApplicant, NotClosed])
+    @action(detail=True, methods=[PUT], permission_classes=[IsApplicant, NotClosed])
     def close(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
