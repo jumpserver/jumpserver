@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-16 16:27+0800\n"
+"POT-Creation-Date: 2021-08-16 17:25+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -4215,7 +4215,7 @@ msgstr "Administrator是初始的超级管理员"
 msgid "The old password is incorrect"
 msgstr "旧密码错误"
 
-#: users/serializers/profile.py:36 users/serializers/user.py:126
+#: users/serializers/profile.py:36 users/serializers/user.py:129
 msgid "Password does not match security rules"
 msgstr "密码不满足安全规则"
 
@@ -4292,11 +4292,23 @@ msgstr "超级角色名称"
 msgid "Total role name"
 msgstr "汇总角色名称"
 
-#: users/serializers/user.py:112
+#: users/serializers/user.py:90
+msgid "Is wecom bound"
+msgstr "是否绑定了企业微信"
+
+#: users/serializers/user.py:91
+msgid "Is dingtalk bound"
+msgstr "是否绑定了钉钉"
+
+#: users/serializers/user.py:92
+msgid "Is feishu bound"
+msgstr "是否绑定了飞书"
+
+#: users/serializers/user.py:115
 msgid "Role limit to {}"
 msgstr "角色只能为 {}"
 
-#: users/serializers/user.py:211
+#: users/serializers/user.py:214
 msgid "name not unique"
 msgstr "名称重复"
 
