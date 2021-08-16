@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-12 10:27+0800\n"
+"POT-Creation-Date: 2021-08-16 16:27+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -172,7 +172,7 @@ msgstr "格式为逗号分隔的字符串, * 表示匹配所有. "
 
 #: acls/serializers/login_asset_acl.py:17
 #: acls/serializers/login_asset_acl.py:51
-#: applications/serializers/application.py:71
+#: applications/serializers/application.py:72
 #: applications/serializers/attrs/application_type/chrome.py:20
 #: applications/serializers/attrs/application_type/custom.py:21
 #: applications/serializers/attrs/application_type/mysql_workbench.py:30
@@ -252,7 +252,7 @@ msgid "Applications"
 msgstr "应用管理"
 
 #: applications/models/application.py:168
-#: applications/serializers/application.py:78 assets/models/label.py:21
+#: applications/serializers/application.py:79 assets/models/label.py:21
 #: perms/models/application_permission.py:20
 #: perms/serializers/application/user_permission.py:33
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:20
@@ -260,7 +260,7 @@ msgid "Category"
 msgstr "类别"
 
 #: applications/models/application.py:171
-#: applications/serializers/application.py:80 assets/models/cmd_filter.py:53
+#: applications/serializers/application.py:81 assets/models/cmd_filter.py:53
 #: assets/models/user.py:202 perms/models/application_permission.py:23
 #: perms/serializers/application/user_permission.py:34
 #: terminal/models/storage.py:55 terminal/models/storage.py:116
@@ -279,14 +279,14 @@ msgid "Attrs"
 msgstr ""
 
 #: applications/serializers/application.py:48
-#: applications/serializers/application.py:79 assets/serializers/label.py:13
+#: applications/serializers/application.py:80 assets/serializers/label.py:13
 #: perms/serializers/application/permission.py:16
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:24
 msgid "Category display"
 msgstr "类别名称"
 
 #: applications/serializers/application.py:49
-#: applications/serializers/application.py:81
+#: applications/serializers/application.py:82
 #: assets/serializers/system_user.py:26 audits/serializers.py:29
 #: perms/serializers/application/permission.py:17
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:31
@@ -294,8 +294,12 @@ msgstr "类别名称"
 msgid "Type display"
 msgstr "类型名称"
 
-#: applications/serializers/application.py:72
-#: applications/serializers/application.py:100
+#: applications/serializers/application.py:71
+msgid "Id"
+msgstr ""
+
+#: applications/serializers/application.py:73
+#: applications/serializers/application.py:101
 #: applications/serializers/attrs/application_type/chrome.py:23
 #: applications/serializers/attrs/application_type/custom.py:25
 #: applications/serializers/attrs/application_type/mysql_workbench.py:34
@@ -314,7 +318,7 @@ msgstr "类型名称"
 msgid "Password"
 msgstr "密码"
 
-#: applications/serializers/application.py:73 assets/models/authbook.py:16
+#: applications/serializers/application.py:74 assets/models/authbook.py:16
 #: assets/models/user.py:277 audits/models.py:39
 #: perms/models/application_permission.py:31
 #: perms/models/asset_permission.py:101 templates/_nav.html:45
@@ -329,19 +333,19 @@ msgstr "密码"
 msgid "System user"
 msgstr "系统用户"
 
-#: applications/serializers/application.py:74 assets/serializers/account.py:31
+#: applications/serializers/application.py:75 assets/serializers/account.py:31
 msgid "System user display"
 msgstr "系统用户名称"
 
-#: applications/serializers/application.py:75
+#: applications/serializers/application.py:76
 msgid "App"
 msgstr "应用"
 
-#: applications/serializers/application.py:76
+#: applications/serializers/application.py:77
 msgid "Union id"
 msgstr "联合ID"
 
-#: applications/serializers/application.py:77
+#: applications/serializers/application.py:78
 msgid "Application name"
 msgstr "应用名称"
 
@@ -1711,7 +1715,7 @@ msgstr "CAS"
 #: authentication/templates/authentication/login.html:220
 #: notifications/backends/__init__.py:16
 msgid "FeiShu"
-msgstr ""
+msgstr "飞书"
 
 #: authentication/templates/authentication/login_otp.html:17
 msgid "One-time password"
@@ -1758,7 +1762,7 @@ msgstr "钉钉错误，请联系系统管理员"
 msgid "DingTalk Error"
 msgstr "钉钉错误"
 
-#: authentication/views/dingtalk.py:56 authentication/views/feishu.py:55
+#: authentication/views/dingtalk.py:56 authentication/views/feishu.py:52
 #: authentication/views/wecom.py:56
 msgid "You've been hacked"
 msgstr "你被攻击了"
@@ -1767,7 +1771,7 @@ msgstr "你被攻击了"
 msgid "DingTalk is already bound"
 msgstr "钉钉已经绑定"
 
-#: authentication/views/dingtalk.py:105 authentication/views/feishu.py:102
+#: authentication/views/dingtalk.py:105 authentication/views/feishu.py:99
 #: authentication/views/wecom.py:104
 msgid "Please verify your password first"
 msgstr "请检查密码"
@@ -1797,8 +1801,7 @@ msgstr "从钉钉获取用户失败"
 msgid "DingTalk is not bound"
 msgstr "钉钉没有绑定"
 
-#: authentication/views/dingtalk.py:218 authentication/views/feishu.py:208
-#: authentication/views/wecom.py:216
+#: authentication/views/dingtalk.py:218 authentication/views/wecom.py:216
 msgid "Please login with a password and then bind the WeCom"
 msgstr "请使用密码登录，然后绑定企业微信"
 
@@ -1807,39 +1810,39 @@ msgid "Binding DingTalk failed"
 msgstr "绑定钉钉失败"
 
 #: authentication/views/feishu.py:40
-msgid "FeiShu Error, Please contact your system administrator"
-msgstr "飞书错误，请联系系统管理员"
-
-#: authentication/views/feishu.py:43
 msgid "FeiShu Error"
 msgstr "飞书错误"
 
-#: authentication/views/feishu.py:89
+#: authentication/views/feishu.py:86
 msgid "FeiShu is already bound"
 msgstr "飞书已经绑定"
 
-#: authentication/views/feishu.py:136
+#: authentication/views/feishu.py:133
 msgid "FeiShu query user failed"
 msgstr "飞书查询用户失败"
 
-#: authentication/views/feishu.py:145
+#: authentication/views/feishu.py:142
 msgid "The FeiShu is already bound to another user"
 msgstr "该飞书已经绑定其他用户"
 
-#: authentication/views/feishu.py:150 authentication/views/feishu.py:232
-#: authentication/views/feishu.py:233
+#: authentication/views/feishu.py:147 authentication/views/feishu.py:229
+#: authentication/views/feishu.py:230
 msgid "Binding FeiShu successfully"
 msgstr "绑定 飞书 成功"
 
-#: authentication/views/feishu.py:201
+#: authentication/views/feishu.py:198
 msgid "Failed to get user from FeiShu"
 msgstr "从飞书获取用户失败"
 
-#: authentication/views/feishu.py:207
+#: authentication/views/feishu.py:204
 msgid "FeiShu is not bound"
 msgstr "没有绑定飞书"
 
-#: authentication/views/feishu.py:250 authentication/views/feishu.py:251
+#: authentication/views/feishu.py:205
+msgid "Please login with a password and then bind the FeiShu"
+msgstr "请使用密码登录，然后绑定飞书"
+
+#: authentication/views/feishu.py:247 authentication/views/feishu.py:248
 msgid "Binding FeiShu failed"
 msgstr "绑定飞书失败"
 
@@ -2212,14 +2215,17 @@ msgid "[Alive] The terminal is offline: {name}"
 msgstr ""
 
 #: ops/notifications.py:42
+#, python-brace-format
 msgid "[Disk] Disk used more than {max_threshold}%: => {value} ({name})"
 msgstr "[Disk] 硬盘使用率超过 {max_threshold}%: => {value} ({name})"
 
 #: ops/notifications.py:49
+#, python-brace-format
 msgid "[Memory] Memory used more than {max_threshold}%: => {value} ({name})"
 msgstr "[Memory] 内存使用率超过 {max_threshold}%: => {value} ({name})"
 
 #: ops/notifications.py:56
+#, python-brace-format
 msgid "[CPU] CPU load more than {max_threshold}: => {value} ({name})"
 msgstr "[CPU] CPU 使用率超过 {max_threshold}: => {value} ({name})"
 
@@ -5368,6 +5374,9 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "FeiShu Error, Please contact your system administrator"
+#~ msgstr "飞书错误，请联系系统管理员"
 
 #~ msgid "Append SSH KEY"
 #~ msgstr "追加新密钥"
