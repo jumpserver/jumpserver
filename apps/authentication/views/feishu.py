@@ -202,7 +202,7 @@ class FeiShuQRLoginCallbackView(AuthMixin, FeiShuQRMixin, View):
         user = get_object_or_none(User, feishu_id=user_id)
         if user is None:
             title = _('FeiShu is not bound')
-            msg = _('Please login with a password and then bind the WeCom')
+            msg = _('Please login with a password and then bind the FeiShu')
             response = self.get_failed_reponse(login_url, title=title, msg=msg)
             return response
 
