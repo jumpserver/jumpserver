@@ -87,6 +87,9 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
             'role_display': {'label': _('Super role name')},
             'total_role_display': {'label': _('Total role name')},
             'role': {'default': "User"},
+            'is_wecom_bound': {'label': _('Is wecom bound')},
+            'is_dingtalk_bound': {'label': _('Is dingtalk bound')},
+            'is_feishu_bound': {'label': _('Is feishu bound')},
         }
 
     def __init__(self, *args, **kwargs):
