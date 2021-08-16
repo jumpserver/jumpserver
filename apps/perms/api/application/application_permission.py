@@ -42,7 +42,7 @@ class ApplicationPermissionViewSet(BasePermissionViewSet):
             return queryset
         if not applications:
             return queryset.none()
-        queryset = queryset.filter(applications=applications)
+        queryset = queryset.filter(applications__in=applications)
         return queryset
 
     def filter_queryset(self, queryset):
