@@ -112,7 +112,10 @@ class IDSpmFilter(filters.BaseFilterBackend):
         resource_ids = cache.get(cache_key)
         if resource_ids is None or not isinstance(resource_ids, list):
             return queryset
-        queryset = queryset.filter(id__in=resource_ids)
+        if hasattr(view, 'filter_spm_queryset'):
+            queryset = view.filter_spm_queryset(resource_ids, queryset)
+        else:
+            queryset = queryset.filter(id__in=resource_ids)
         return queryset
 
 

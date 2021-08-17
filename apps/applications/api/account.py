@@ -63,6 +63,11 @@ class ApplicationAccountViewSet(JMSModelViewSet):
         queryset_list = unique(queryset, key=lambda x: (x['app'], x['systemuser']))
         return queryset_list
 
+    @staticmethod
+    def filter_spm_queryset(resource_ids, queryset):
+        queryset = queryset.filter(uid__in=resource_ids)
+        return queryset
+
 
 class ApplicationAccountSecretViewSet(ApplicationAccountViewSet):
     serializer_class = serializers.ApplicationAccountSecretSerializer
