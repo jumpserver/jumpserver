@@ -308,7 +308,7 @@ def get_password_check_rules(user):
     return check_rules
 
 
-def check_password_rules(password, user):
+def check_password_rules(password, is_org_admin=False):
     pattern = r"^"
     if settings.SECURITY_PASSWORD_UPPER_CASE:
         pattern += '(?=.*[A-Z])'
@@ -319,7 +319,7 @@ def check_password_rules(password, user):
     if settings.SECURITY_PASSWORD_SPECIAL_CHAR:
         pattern += '(?=.*[`~!@#\$%\^&\*\(\)-=_\+\[\]\{\}\|;:\'\",\.<>\/\?])'
     pattern += '[a-zA-Z\d`~!@#\$%\^&\*\(\)-=_\+\[\]\{\}\|;:\'\",\.<>\/\?]'
-    if user.is_org_admin:
+    if is_org_admin:
         min_length = settings.SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH
     else:
         min_length = settings.SECURITY_PASSWORD_MIN_LENGTH

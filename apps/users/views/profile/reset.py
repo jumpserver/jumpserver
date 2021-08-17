@@ -101,7 +101,7 @@ class UserResetPasswordView(FormView):
             return self.form_invalid(form)
 
         password = form.cleaned_data['new_password']
-        is_ok = check_password_rules(password, user)
+        is_ok = check_password_rules(password, is_org_admin=user.is_org_admin)
         if not is_ok:
             error = _('* Your password does not meet the requirements')
             form.add_error('new_password', error)
