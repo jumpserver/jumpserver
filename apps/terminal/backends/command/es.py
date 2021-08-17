@@ -76,10 +76,23 @@ class CommandStore():
         self._ensure_index_exists()
 
     def _ensure_index_exists(self):
+        mappings = {
+            "mappings": {
+                "properties": {
+                    "session": {
+                        "type": "keyword"
+                    },
+                    "org_id": {
+                        "type": "keyword"
+                    }
+                }
+            }
+        }
+
         try:
-            self.es.indices.create(self.index)
-        except RequestError:
-            pass
+            self.es.indices.create(self.index, body=mappings)
+        except RequestError as e:
+            logger.exception(e)
 
     @staticmethod
     def make_data(command):
