@@ -14,7 +14,7 @@ logger = get_logger(__file__)
 __all__ = ['RemoteAppSerializer']
 
 
-class AssetCharPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
+class ExistAssetPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
 
     def to_internal_value(self, data):
         instance = super().to_internal_value(data)
@@ -26,14 +26,14 @@ class AssetCharPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
             return self.pk_field.to_representation(_id)
         # 解决删除资产后，远程应用更新页面会显示资产ID的问题
         asset = get_object_or_none(Asset, id=_id)
-        if asset:
+        if not asset:
             return None
         return _id
 
 
 class RemoteAppSerializer(serializers.Serializer):
     asset_info = serializers.SerializerMethodField()
-    asset = AssetCharPrimaryKeyRelatedField(
+    asset = ExistAssetPrimaryKeyRelatedField(
         queryset=Asset.objects, required=False, label=_("Asset"), allow_null=True
     )
     path = serializers.CharField(
