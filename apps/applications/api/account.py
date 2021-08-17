@@ -2,7 +2,6 @@
 #
 
 from django_filters import rest_framework as filters
-from django.conf import settings
 from django.db.models import F, Value, CharField
 from django.db.models.functions import Concat
 from django.http import Http404
@@ -31,11 +30,11 @@ class ApplicationAccountViewSet(JMSModelViewSet):
     filterset_class = AccountFilterSet
     filterset_fields = ['username', 'app_name', 'type', 'category']
     serializer_class = serializers.ApplicationAccountSerializer
-
     http_method_names = ['get', 'put', 'patch', 'options']
 
     def get_queryset(self):
-        queryset = ApplicationPermission.objects.exclude(system_users__isnull=True) \
+        queryset = ApplicationPermission.objects\
+            .exclude(system_users__isnull=True) \
             .exclude(applications__isnull=True) \
             .annotate(uid=Concat(
                 'applications', Value('_'), 'system_users', output_field=CharField()
@@ -47,7 +46,7 @@ class ApplicationAccountViewSet(JMSModelViewSet):
             .annotate(app=F('applications')) \
             .annotate(app_name=F("applications__name")) \
             .values('username', 'password', 'systemuser', 'systemuser_display',
-                    'app', 'app_name', 'category', 'type', 'uid')
+                    'app', 'app_name', 'category', 'type', 'uid', 'org_id')
         return queryset
 
     def get_object(self):
@@ -62,6 +61,11 @@ class ApplicationAccountViewSet(JMSModelViewSet):
         queryset = super().filter_queryset(queryset)
         queryset_list = unique(queryset, key=lambda x: (x['app'], x['systemuser']))
         return queryset_list
+
+    @staticmethod
+    def filter_spm_queryset(resource_ids, queryset):
+        queryset = queryset.filter(uid__in=resource_ids)
+        return queryset
 
 
 class ApplicationAccountSecretViewSet(ApplicationAccountViewSet):

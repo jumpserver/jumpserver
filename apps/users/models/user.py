@@ -210,6 +210,11 @@ class RoleMixin:
         return [str(role.label) for role in self.org_roles if role in ORG_ROLE]
 
     @lazyproperty
+    def org_roles_value_list(self):
+        from orgs.models import ROLE as ORG_ROLE
+        return [str(role.value) for role in self.org_roles if role in ORG_ROLE]
+
+    @lazyproperty
     def org_role_display(self):
         return ' | '.join(self.org_roles_label_list)
 

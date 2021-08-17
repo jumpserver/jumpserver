@@ -116,6 +116,18 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
             raise serializers.ValidationError(msg)
         return value
 
+    @property
+    def is_org_admin(self):
+        roles = []
+        role = self.initial_data.get('role')
+        if role:
+            roles.append(role)
+        org_roles = self.initial_data.get('org_roles')
+        if org_roles:
+            roles.extend(org_roles)
+        is_org_admin = User.ROLE.ADMIN.value in roles
+        return is_org_admin
+
     def validate_password(self, password):
         from ..utils import check_password_rules
         password_strategy = self.initial_data.get('password_strategy')
@@ -125,7 +137,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         if self.instance and not password:
             # 更新用户, 未设置密码
             return
-        if not check_password_rules(password, user=self.instance):
+        if not check_password_rules(password, is_org_admin=self.is_org_admin):
             msg = _('Password does not match security rules')
             raise serializers.ValidationError(msg)
         return password

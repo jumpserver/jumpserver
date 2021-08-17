@@ -26,7 +26,7 @@ class SerializeToTreeNodeMixin:
                 'isParent': True,
                 'open': node.is_org_root(),
                 'meta': {
-                    'node': {
+                    'data': {
                         "id": node.id,
                         "key": node.key,
                         "value": node.value,
@@ -65,7 +65,7 @@ class SerializeToTreeNodeMixin:
                 'chkDisabled': not asset.is_active,
                 'meta': {
                     'type': 'asset',
-                    'asset': {
+                    'data': {
                         'id': asset.id,
                         'hostname': asset.hostname,
                         'ip': asset.ip,

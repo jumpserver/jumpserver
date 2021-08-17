@@ -200,6 +200,7 @@ class AssetTaskSerializer(AssetsTaskSerializer):
         ('push_system_user', 'push_system_user'),
         ('test_system_user', 'test_system_user')
     ])
+    action = serializers.ChoiceField(choices=ACTION_CHOICES, write_only=True)
     asset = serializers.PrimaryKeyRelatedField(
         queryset=Asset.objects, required=False, allow_empty=True, many=False
     )
