@@ -3,6 +3,8 @@
 
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
+
+from orgs.models import Organization
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.drf.serializers import MethodSerializer
 from .attrs import category_serializer_classes_mapping, type_serializer_classes_mapping
@@ -74,12 +76,14 @@ class ApplicationAccountSerializer(serializers.Serializer):
     systemuser = serializers.ReadOnlyField(label=_('System user'))
     systemuser_display = serializers.ReadOnlyField(label=_("System user display"))
     app = serializers.ReadOnlyField(label=_('App'))
-    uid = serializers.ReadOnlyField(label=_("Union id"))
     app_name = serializers.ReadOnlyField(label=_("Application name"), read_only=True)
     category = serializers.ChoiceField(label=_('Category'), choices=const.AppCategory.choices, read_only=True)
     category_display = serializers.SerializerMethodField(label=_('Category display'))
     type = serializers.ChoiceField(label=_('Type'), choices=const.AppType.choices, read_only=True)
     type_display = serializers.SerializerMethodField(label=_('Type display'))
+    uid = serializers.ReadOnlyField(label=_("Union id"))
+    org_id = serializers.ReadOnlyField(label=_("Organization"))
+    org_name = serializers.SerializerMethodField(label=_("Org name"))
 
     category_mapper = dict(const.AppCategory.choices)
     type_mapper = dict(const.AppType.choices)
@@ -95,6 +99,11 @@ class ApplicationAccountSerializer(serializers.Serializer):
 
     def get_type_display(self, obj):
         return self.type_mapper.get(obj['type'])
+
+    @staticmethod
+    def get_org_name(obj):
+        org = Organization.get_instance(obj['org_id'])
+        return org.name
 
 
 class ApplicationAccountSecretSerializer(ApplicationAccountSerializer):

@@ -2,7 +2,6 @@
 #
 
 from django_filters import rest_framework as filters
-from django.conf import settings
 from django.db.models import F, Value, CharField
 from django.db.models.functions import Concat
 from django.http import Http404
@@ -47,7 +46,7 @@ class ApplicationAccountViewSet(JMSModelViewSet):
             .annotate(app=F('applications')) \
             .annotate(app_name=F("applications__name")) \
             .values('username', 'password', 'systemuser', 'systemuser_display',
-                    'app', 'app_name', 'category', 'type', 'uid')
+                    'app', 'app_name', 'category', 'type', 'uid', 'org_id')
         return queryset
 
     def get_object(self):
