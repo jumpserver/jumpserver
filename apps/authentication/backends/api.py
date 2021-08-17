@@ -17,12 +17,27 @@ from common.utils import get_object_or_none, make_signature, http_to_unixtime
 from ..models import AccessKey, PrivateToken
 
 
+UserModel = get_user_model()
+
+
 def get_request_date_header(request):
     date = request.META.get('HTTP_DATE', b'')
     if isinstance(date, text_type):
         # Work around django test client oddness
         date = date.encode(HTTP_HEADER_ENCODING)
     return date
+
+
+class JMSModelBackend(ModelBackend):
+    def user_can_authenticate(self, user):
+        return True
+
+    def get_user(self, user_id):
+        try:
+            user = UserModel._default_manager.get(pk=user_id)
+        except UserModel.DoesNotExist:
+            return None
+        return user if user.is_valid else None
 
 
 class AccessKeyAuthentication(authentication.BaseAuthentication):
@@ -198,10 +213,45 @@ class SignatureAuthentication(signature.SignatureAuthentication):
             return None, None
 
 
-class SSOAuthentication(ModelBackend):
+class SSOAuthentication(JMSModelBackend):
     """
     什么也不做呀😺
     """
 
     def authenticate(self, request, sso_token=None, **kwargs):
+        pass
+
+
+class WeComAuthentication(JMSModelBackend):
+    """
+    什么也不做呀😺
+    """
+
+    def authenticate(self, request, **kwargs):
+        pass
+
+
+class DingTalkAuthentication(JMSModelBackend):
+    """
+    什么也不做呀😺
+    """
+
+    def authenticate(self, request, **kwargs):
+        pass
+
+
+class FeiShuAuthentication(JMSModelBackend):
+    """
+    什么也不做呀😺
+    """
+
+    def authenticate(self, request, **kwargs):
+        pass
+
+
+class AuthorizationTokenAuthentication(JMSModelBackend):
+    """
+    什么也不做呀😺
+    """
+    def authenticate(self, request, **kwargs):
         pass

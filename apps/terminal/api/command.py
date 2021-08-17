@@ -4,26 +4,24 @@ import time
 from django.conf import settings
 from django.utils import timezone
 from django.shortcuts import HttpResponse
-from rest_framework import viewsets
 from rest_framework import generics
 from rest_framework.fields import DateTimeField
 from rest_framework.response import Response
-from rest_framework.decorators import action
 from django.template import loader
 
-from terminal.models import CommandStorage, Command
+from terminal.models import CommandStorage
 from terminal.filters import CommandFilter
 from orgs.utils import current_org
 from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor, IsAppUser
-from common.const.http import GET
+from common.drf.api import JMSBulkModelViewSet
 from common.utils import get_logger
-from terminal.utils import send_command_alert_mail
 from terminal.serializers import InsecureCommandAlertSerializer
 from terminal.exceptions import StorageInvalid
 from ..backends import (
     get_command_storage, get_multi_command_storage,
     SessionCommandSerializer,
 )
+from ..notifications import CommandAlertMessage
 
 logger = get_logger(__name__)
 __all__ = ['CommandViewSet', 'CommandExportApi', 'InsecureCommandAlertAPI']
@@ -93,7 +91,7 @@ class CommandQueryMixin:
         return date_from_st, date_to_st
 
 
-class CommandViewSet(viewsets.ModelViewSet):
+class CommandViewSet(JMSBulkModelViewSet):
     """接受app发送来的command log, 格式如下
     {
         "user": "admin",
@@ -140,7 +138,19 @@ class CommandViewSet(viewsets.ModelViewSet):
         if session_id and not command_storage_id:
             # 会话里的命令列表肯定会提供 session_id，这里防止 merge 的时候取全量的数据
             return self.merge_all_storage_list(request, *args, **kwargs)
-        return super().list(request, *args, **kwargs)
+
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        # 适配像 ES 这种没有指定分页只返回少量数据的情况
+        queryset = queryset[:]
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     def get_queryset(self):
         command_storage_id = self.request.query_params.get('command_storage_id')
@@ -194,8 +204,6 @@ class InsecureCommandAlertAPI(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         commands = serializer.validated_data
         for command in commands:
-            if command['risk_level'] >= settings.SECURITY_INSECURE_COMMAND_LEVEL and \
-                    settings.SECURITY_INSECURE_COMMAND and \
-                    settings.SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER:
-                send_command_alert_mail(command)
+            if command['risk_level'] >= settings.SECURITY_INSECURE_COMMAND_LEVEL:
+                CommandAlertMessage(command).publish_async()
         return Response()

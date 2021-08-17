@@ -31,7 +31,9 @@ class KillSessionAPI(APIView):
             if session and not session.is_finished:
                 validated_session.append(session_id)
                 self.model.objects.create(
-                    name="kill_session", args=session.id,
-                    terminal=session.terminal,
+                    name="kill_session", args=session.id, terminal=session.terminal,
+                    kwargs={
+                        'terminated_by': str(request.user)
+                    }
                 )
         return Response({"ok": validated_session})

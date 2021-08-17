@@ -1,3 +1,5 @@
+import time
+
 from django.core.cache import cache
 from django.utils import timezone
 from django.utils.timesince import timesince
@@ -6,6 +8,8 @@ from django.http.response import JsonResponse, HttpResponse
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from collections import Counter
+from django.conf import settings
+from rest_framework.response import Response
 
 from users.models import User
 from assets.models import Asset
@@ -14,6 +18,7 @@ from terminal.utils import ComponentsPrometheusMetricsUtil
 from orgs.utils import current_org
 from common.permissions import IsOrgAdmin, IsOrgAuditor
 from common.utils import lazyproperty
+from orgs.caches import OrgResourceStatisticsCache
 
 __all__ = ['IndexApi']
 
@@ -95,7 +100,7 @@ class DatesLoginMetricMixin:
         if count is not None:
             return count
         ds, de = self.get_date_start_2_end(date)
-        count = len(set(Session.objects.filter(date_start__range=(ds, de)).values_list('user', flat=True)))
+        count = len(set(Session.objects.filter(date_start__range=(ds, de)).values_list('user_id', flat=True)))
         self.__set_data_to_cache(date, tp, count)
         return count
 
@@ -125,7 +130,7 @@ class DatesLoginMetricMixin:
 
     @lazyproperty
     def dates_total_count_active_users(self):
-        count = len(set(self.sessions_queryset.values_list('user', flat=True)))
+        count = len(set(self.sessions_queryset.values_list('user_id', flat=True)))
         return count
 
     @lazyproperty
@@ -157,10 +162,10 @@ class DatesLoginMetricMixin:
     @lazyproperty
     def dates_total_count_disabled_assets(self):
         return Asset.objects.filter(is_active=False).count()
-    
+
     # 以下是从week中而来
     def get_dates_login_times_top5_users(self):
-        users = self.sessions_queryset.values_list('user', flat=True)
+        users = self.sessions_queryset.values_list('user_id', flat=True)
         users = [
             {'user': user, 'total': total}
             for user, total in Counter(users).most_common(5)
@@ -168,7 +173,7 @@ class DatesLoginMetricMixin:
         return users
 
     def get_dates_total_count_login_users(self):
-        return len(set(self.sessions_queryset.values_list('user', flat=True)))
+        return len(set(self.sessions_queryset.values_list('user_id', flat=True)))
 
     def get_dates_total_count_login_times(self):
         return self.sessions_queryset.count()
@@ -182,8 +187,9 @@ class DatesLoginMetricMixin:
         return list(assets)
 
     def get_dates_login_times_top10_users(self):
-        users = self.sessions_queryset.values("user") \
-                    .annotate(total=Count("user")) \
+        users = self.sessions_queryset.values("user_id") \
+                    .annotate(total=Count("user_id")) \
+                    .annotate(user=Max('user')) \
                     .annotate(last=Max("date_start")).order_by("-total")[:10]
         for user in users:
             user['last'] = str(user['last'])
@@ -206,26 +212,7 @@ class DatesLoginMetricMixin:
         return sessions
 
 
-class TotalCountMixin:
-    @staticmethod
-    def get_total_count_users():
-        return current_org.get_members().count()
-
-    @staticmethod
-    def get_total_count_assets():
-        return Asset.objects.all().count()
-
-    @staticmethod
-    def get_total_count_online_users():
-        count = len(set(Session.objects.filter(is_finished=False).values_list('user', flat=True)))
-        return count
-
-    @staticmethod
-    def get_total_count_online_sessions():
-        return Session.objects.filter(is_finished=False).count()
-
-
-class IndexApi(TotalCountMixin, DatesLoginMetricMixin, APIView):
+class IndexApi(DatesLoginMetricMixin, APIView):
     permission_classes = (IsOrgAdmin | IsOrgAuditor,)
     http_method_names = ['get']
 
@@ -234,26 +221,28 @@ class IndexApi(TotalCountMixin, DatesLoginMetricMixin, APIView):
 
         query_params = self.request.query_params
 
+        caches = OrgResourceStatisticsCache(current_org)
+
         _all = query_params.get('all')
 
         if _all or query_params.get('total_count') or query_params.get('total_count_users'):
             data.update({
-                'total_count_users': self.get_total_count_users(),
+                'total_count_users': caches.users_amount,
             })
 
         if _all or query_params.get('total_count') or query_params.get('total_count_assets'):
             data.update({
-                'total_count_assets': self.get_total_count_assets(),
+                'total_count_assets': caches.assets_amount,
             })
 
         if _all or query_params.get('total_count') or query_params.get('total_count_online_users'):
             data.update({
-                'total_count_online_users': self.get_total_count_online_users(),
+                'total_count_online_users': caches.total_count_online_users,
             })
 
         if _all or query_params.get('total_count') or query_params.get('total_count_online_sessions'):
             data.update({
-                'total_count_online_sessions': self.get_total_count_online_sessions(),
+                'total_count_online_sessions': caches.total_count_online_sessions,
             })
 
         if _all or query_params.get('dates_metrics'):
@@ -307,7 +296,68 @@ class IndexApi(TotalCountMixin, DatesLoginMetricMixin, APIView):
         return JsonResponse(data, status=200)
 
 
-class PrometheusMetricsApi(APIView):
+class HealthApiMixin(APIView):
+    def is_token_right(self):
+        token = self.request.query_params.get('token')
+        ok_token = settings.HEALTH_CHECK_TOKEN
+        if ok_token and token != ok_token:
+            return False
+        return True
+
+    def check_permissions(self, request):
+        if not self.is_token_right():
+            msg = 'Health check token error, ' \
+                  'Please set query param in url and same with setting HEALTH_CHECK_TOKEN. ' \
+                  'eg: $PATH/?token=$HEALTH_CHECK_TOKEN'
+            self.permission_denied(request, message={'error': msg}, code=403)
+
+
+class HealthCheckView(HealthApiMixin):
+    permission_classes = (AllowAny,)
+
+    @staticmethod
+    def get_db_status():
+        t1 = time.time()
+        try:
+            User.objects.first()
+            t2 = time.time()
+            return True, t2 - t1
+        except:
+            t2 = time.time()
+            return False, t2 - t1
+
+    def get_redis_status(self):
+        key = 'HEALTH_CHECK'
+
+        t1 = time.time()
+        try:
+            value = '1'
+            cache.set(key, '1', 10)
+            got = cache.get(key)
+            t2 = time.time()
+            if value == got:
+                return True, t2 -t1
+            return False, t2 -t1
+        except:
+            t2 = time.time()
+            return False, t2 - t1
+
+    def get(self, request):
+        redis_status, redis_time = self.get_redis_status()
+        db_status, db_time = self.get_db_status()
+        status = all([redis_status, db_status])
+        data = {
+            'status': status,
+            'db_status': db_status,
+            'db_time': db_time,
+            'redis_status': redis_status,
+            'redis_time': redis_time,
+            'time': int(time.time())
+        }
+        return Response(data)
+
+
+class PrometheusMetricsApi(HealthApiMixin):
     permission_classes = (AllowAny,)
 
     def get(self, request, *args, **kwargs):

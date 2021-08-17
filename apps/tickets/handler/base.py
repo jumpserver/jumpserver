@@ -93,7 +93,7 @@ class BaseHandler(object):
             _('Ticket status'), self.ticket.get_status_display(),
             _('Ticket action'), self.ticket.get_action_display(),
             _('Ticket applicant'), self.ticket.applicant_display,
-            _('Ticket assignees'), self.ticket.assignees_display,
+            _('Ticket assignees'), ', '.join(self.ticket.assignees_display),
         )
         if self.ticket.status_closed:
             basic_body += '''{}: {}'''.format(_('Ticket processor'), self.ticket.processor_display)
@@ -110,11 +110,15 @@ class BaseHandler(object):
         return body
 
     def _base_construct_meta_body_of_open(self):
-        meta_body_of_open = getattr(self, '_construct_meta_body_of_open', lambda: 'No')()
+        meta_body_of_open = getattr(
+            self, '_construct_meta_body_of_open', lambda: _('No content')
+        )()
         body = self.body_html_format.format(_('Ticket applied info'), meta_body_of_open)
         return body
 
     def _base_construct_meta_body_of_approve(self):
-        meta_body_of_approve = getattr(self, '_construct_meta_body_of_approve', lambda: 'No')()
+        meta_body_of_approve = getattr(
+            self, '_construct_meta_body_of_approve', lambda: _('No content')
+        )()
         body = self.body_html_format.format(_('Ticket approved info'), meta_body_of_approve)
         return body

@@ -17,6 +17,7 @@ logger = get_logger(__file__)
 __all__ = [
     'push_system_user_util', 'push_system_user_to_assets',
     'push_system_user_to_assets_manual', 'push_system_user_a_asset_manual',
+    'push_system_users_a_asset'
 ]
 
 
@@ -56,6 +57,7 @@ def get_push_unixlike_system_user_tasks(system_user, username=None):
         'shell': system_user.shell or Empty,
         'state': 'present',
         'home': system_user.home or Empty,
+        'expires': -1,
         'groups': groups or Empty,
         'comment': comment
     }
@@ -279,12 +281,19 @@ def push_system_user_a_asset_manual(system_user, asset, username=None):
     """
     将系统用户推送到一个资产上
     """
-    if username is None:
-        username = system_user.username
+    # if username is None:
+    #     username = system_user.username
     task_name = _("Push system users to asset: {}({}) => {}").format(
         system_user.name, username, asset
     )
     return push_system_user_util(system_user, [asset], task_name=task_name, username=username)
+
+
+@shared_task(queue="ansible")
+@tmp_to_root_org()
+def push_system_users_a_asset(system_users, asset):
+    for system_user in system_users:
+        push_system_user_a_asset_manual(system_user, asset)
 
 
 @shared_task(queue="ansible")

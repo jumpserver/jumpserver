@@ -7,16 +7,24 @@ import pytz
 from uuid import UUID
 import inspect
 
+from django.utils.translation import gettext_lazy as _
 from django.db.models import QuerySet as DJQuerySet
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
+from elasticsearch.exceptions import RequestError, NotFoundError
 
 from common.utils.common import lazyproperty
 from common.utils import get_logger
+from common.exceptions import JMSException
 from .models import AbstractSessionCommand
 
 
 logger = get_logger(__file__)
+
+
+class InvalidElasticsearch(JMSException):
+    default_code = 'invalid_elasticsearch'
+    default_detail = _('Invalid elasticsearch config')
 
 
 class CommandStore():
@@ -25,7 +33,53 @@ class CommandStore():
         kwargs = config.get("OTHER", {})
         self.index = config.get("INDEX") or 'jumpserver'
         self.doc_type = config.get("DOC_TYPE") or 'command_store'
+        self.exact_fields = {}
+        self.match_fields = {}
+
+        ignore_verify_certs = kwargs.pop('IGNORE_VERIFY_CERTS', False)
+        if ignore_verify_certs:
+            kwargs['verify_certs'] = None
         self.es = Elasticsearch(hosts=hosts, max_retries=0, **kwargs)
+
+        self.exact_fields = set()
+        self.match_fields = {'input', 'risk_level', 'user', 'asset', 'system_user'}
+        may_exact_fields = {'session', 'org_id'}
+
+        if self.is_new_index_type():
+            self.exact_fields.update(may_exact_fields)
+            self.doc_type = '_doc'
+        else:
+            self.match_fields.update(may_exact_fields)
+
+    def is_new_index_type(self):
+        if not self.ping(timeout=3):
+            return False
+
+        try:
+            # 获取索引信息，如果没有定义，直接返回
+            data = self.es.indices.get_mapping(self.index)
+        except NotFoundError:
+            return False
+
+        try:
+            # 检测索引是不是新的类型
+            properties = data[self.index]['mappings']['properties']
+            if properties['session']['type'] == 'keyword' \
+                    and properties['org_id']['type'] == 'keyword':
+                return True
+        except KeyError:
+            return False
+
+    def pre_use_check(self):
+        if not self.ping(timeout=3):
+            raise InvalidElasticsearch
+        self._ensure_index_exists()
+
+    def _ensure_index_exists(self):
+        try:
+            self.es.indices.create(self.index)
+        except RequestError:
+            pass
 
     @staticmethod
     def make_data(command):
@@ -87,15 +141,14 @@ class CommandStore():
         except Exception:
             return False
 
-    @staticmethod
-    def get_query_body(**kwargs):
+    def get_query_body(self, **kwargs):
         new_kwargs = {}
         for k, v in kwargs.items():
             new_kwargs[k] = str(v) if isinstance(v, UUID) else v
         kwargs = new_kwargs
 
-        exact_fields = {}
-        match_fields = {'session', 'input', 'org_id', 'risk_level', 'user', 'asset', 'system_user'}
+        exact_fields = self.exact_fields
+        match_fields = self.match_fields
 
         match = {}
         exact = {}
@@ -230,6 +283,7 @@ class QuerySet(DJQuerySet):
         uqs = QuerySet(self._command_store_config)
         uqs._method_calls = self._method_calls.copy()
         uqs._slice = self._slice
+        uqs.model = self.model
         return uqs
 
     def count(self, limit_to_max_result_window=True):

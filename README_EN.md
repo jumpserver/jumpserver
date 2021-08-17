@@ -1,54 +1,88 @@
-## Jumpserver 
+<p align="center"><a href="https://jumpserver.org"><img src="https://download.jumpserver.org/images/jumpserver-logo.svg" alt="JumpServer" width="300" /></a></p>
+<h3 align="center">Open Source Bastion Host</h3>
 
-![Total visitor](https://visitor-count-badge.herokuapp.com/total.svg?repo_id=jumpserver)
-![Visitors in today](https://visitor-count-badge.herokuapp.com/today.svg?repo_id=jumpserver)
-[![Python3](https://img.shields.io/badge/python-3.6-green.svg?style=plastic)](https://www.python.org/)
-[![Django](https://img.shields.io/badge/django-2.1-brightgreen.svg?style=plastic)](https://www.djangoproject.com/)
-[![Ansible](https://img.shields.io/badge/ansible-2.4.2.0-blue.svg?style=plastic)](https://www.ansible.com/)
-[![Paramiko](https://img.shields.io/badge/paramiko-2.4.1-green.svg?style=plastic)](http://www.paramiko.org/)
+<p align="center">
+  <a href="https://www.gnu.org/licenses/old-licenses/gpl-2.0"><img src="https://shields.io/github/license/jumpserver/jumpserver" alt="License: GPL v2"></a>
+  <a href="https://shields.io/github/downloads/jumpserver/jumpserver/total"><img src="https://shields.io/github/downloads/jumpserver/jumpserver/total" alt=" release"></a>
+  <a href="https://hub.docker.com/u/jumpserver"><img src="https://img.shields.io/docker/pulls/jumpserver/jms_all.svg" alt="Codacy"></a>
+  <a href="https://github.com/jumpserver/jumpserver"><img src="https://img.shields.io/github/stars/jumpserver/jumpserver?color=%231890FF&style=flat-square" alt="Stars"></a>
+</p>
 
+JumpServer is the world's first open-source Bastion Host and is licensed under the GNU GPL v2.0. It is a 4A-compliant professional operation and maintenance security audit system.
 
-----
+JumpServer uses Python / Django for development, follows Web 2.0 specifications, and is equipped with an industry-leading Web Terminal solution that provides a beautiful user interface and great user experience
 
-- [中文版](https://github.com/jumpserver/jumpserver/blob/master/README_EN.md)
+JumpServer adopts a distributed architecture to support multi-branch deployment across multiple cross-regional areas. The central node provides APIs, and login nodes are deployed in each branch. It can be scaled horizontally without concurrency restrictions.
 
-Jumpserver is the first fully open source bastion in the world, based on the GNU GPL v2.0 open source protocol. Jumpserver is a  professional operation and maintenance audit system conforms to 4A specifications.
-
-Jumpserver is developed using Python / Django, conforms to the Web 2.0 specification, and is equipped with the industry-leading Web Terminal solution which have beautiful interface and great user experience.
-
-Jumpserver adopts a distributed architecture to support multi-branch deployment across multiple areas. The central node provides APIs, and login nodes are deployed in each branch. It can be scaled horizontally without concurrency restrictions.
-
-Change the world, starting from little things.
+Change the world by taking every little step
 
 ----
+### Advantages
 
-### Features
+- Open Source: huge transparency and free to access with quick installation process.
+- Distributed: support large-scale concurrent access with ease.
+- No Plugin required: all you need is a browser, the ultimate Web Terminal experience.
+- Multi-Cloud supported: a unified system to manage assets on different clouds at the same time
+- Cloud storage: audit records are stored in the cloud. Data lost no more!
+- Multi-Tenant system: multiple subsidiary companies or departments access the same system simultaneously.
+- Many applications supported: link to databases, windows remote applications, and Kubernetes cluster, etc.
 
- ![Jumpserver 功能](https://jumpserver-release.oss-cn-hangzhou.aliyuncs.com/Jumpserver148.jpeg "Jumpserver 功能")
 
-### Start 
+### JumpServer Component Projects
+- [Lina](https://github.com/jumpserver/lina) JumpServer Web UI
+- [Luna](https://github.com/jumpserver/luna) JumpServer Web Terminal
+- [KoKo](https://github.com/jumpserver/koko) JumpServer Character protocaol Connector, replace original Python Version [Coco](https://github.com/jumpserver/coco)
+- [Lion](https://github.com/jumpserver/lion-release) JumpServer Graphics protocol Connector，rely on [Apache Guacamole](https://guacamole.apache.org/)
 
-Quick start  [Docker Install](http://docs.jumpserver.org/zh/docs/dockerinstall.html)
+### Contribution
+If you have any good ideas or helping us to fix bugs, please submit a Pull Request and accept our thanks :)
 
-Step by Step deployment. [Docs](http://docs.jumpserver.org/zh/docs/step_by_step.html)
+Thanks to the following contributors for making JumpServer better everyday!
 
-Full documentation [Docs](http://docs.jumpserver.org)
+<a href="https://github.com/jumpserver/jumpserver/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=jumpserver/jumpserver" />
+</a>
 
-### Demo、Video 和 Snapshot
+<a href="https://github.com/jumpserver/koko/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=jumpserver/koko" />
+</a>
 
-We provide online demo, demo video and screenshots to get you started quickly.
+<a href="https://github.com/jumpserver/lina/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=jumpserver/lina" />
+</a>
 
-[Demo](https://demo.jumpserver.org/auth/login/?next=/)
-[Video](https://fit2cloud2-offline-installer.oss-cn-beijing.aliyuncs.com/tools/Jumpserver%20%E4%BB%8B%E7%BB%8Dv1.4.mp4)
-[Snapshot](http://docs.jumpserver.org/zh/docs/snapshot.html)
+<a href="https://github.com/jumpserver/luna/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=jumpserver/luna" />
+</a>
 
-### SDK
+### Thanks to
+- [Apache Guacamole](https://guacamole.apache.org/) Web page connection RDP, SSH, VNC protocol equipment. JumpServer graphical connection dependent.
+- [OmniDB](https://omnidb.org/) Web page connection to databases. JumpServer Web database dependent.
 
-We provide the SDK for your other systems to quickly interact with the Jumpserver API.
 
-- [Python](https://github.com/jumpserver/jumpserver-python-sdk) Jumpserver other components use this SDK to complete the interaction.
-- [Java](https://github.com/KaiJunYan/jumpserver-java-sdk.git) 恺珺同学提供的Java版本的SDK thanks to 恺珺 for provide Java SDK
+### JumpServer Enterprise Version 
+- [Apply for it](https://jinshuju.net/f/kyOYpi)
 
+### Case Study
+
+- [JumpServer 堡垒机护航顺丰科技超大规模资产安全运维](https://blog.fit2cloud.com/?p=1147)；
+- [JumpServer 堡垒机让“大智慧”的混合 IT 运维更智慧](https://blog.fit2cloud.com/?p=882)；
+- [携程 JumpServer 堡垒机部署与运营实战](https://blog.fit2cloud.com/?p=851)；
+- [小红书的JumpServer堡垒机大规模资产跨版本迁移之路](https://blog.fit2cloud.com/?p=516)；
+- [JumpServer堡垒机助力中手游提升多云环境下安全运维能力](https://blog.fit2cloud.com/?p=732)；
+- [中通快递：JumpServer主机安全运维实践](https://blog.fit2cloud.com/?p=708)；
+- [东方明珠：JumpServer高效管控异构化、分布式云端资产](https://blog.fit2cloud.com/?p=687)；
+- [江苏农信：JumpServer堡垒机助力行业云安全运维](https://blog.fit2cloud.com/?p=666)。
+
+### For safety instructions
+
+JumpServer is a security product. Please refer to [Basic Security Recommendations](https://docs.jumpserver.org/zh/master/install/install_security/) for deployment and installation.
+
+If you find a security problem, please contact us directly：
+
+- ibuler@fit2cloud.com 
+- support@fit2cloud.com 
+- 400-052-0755
 
 ### License & Copyright
 Copyright (c) 2014-2019 Beijing Duizhan Tech, Inc., All rights reserved.

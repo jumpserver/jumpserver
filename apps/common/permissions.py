@@ -2,8 +2,8 @@
 #
 import time
 from rest_framework import permissions
-from django.contrib.auth.mixins import UserPassesTestMixin
 from django.conf import settings
+from common.exceptions import MFAVerifyRequired
 
 from orgs.utils import current_org
 
@@ -95,20 +95,6 @@ class WithBootstrapToken(permissions.BasePermission):
         return settings.BOOTSTRAP_TOKEN == request_bootstrap_token
 
 
-class PermissionsMixin(UserPassesTestMixin):
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_permissions(self):
-        return self.permission_classes
-
-    def test_func(self):
-        permission_classes = self.get_permissions()
-        for permission_class in permission_classes:
-            if not permission_class().has_permission(self.request, self):
-                return False
-        return True
-
-
 class UserCanAnyPermCurrentOrg(permissions.BasePermission):
     def has_permission(self, request, view):
         return current_org.can_any_by(request.user)
@@ -126,10 +112,13 @@ class UserCanUpdateSSHKey(permissions.BasePermission):
 
 class NeedMFAVerify(permissions.BasePermission):
     def has_permission(self, request, view):
+        if not settings.SECURITY_VIEW_AUTH_NEED_MFA:
+            return True
+
         mfa_verify_time = request.session.get('MFA_VERIFY_TIME', 0)
         if time.time() - mfa_verify_time < settings.SECURITY_MFA_VERIFY_TTL:
             return True
-        return False
+        raise MFAVerifyRequired()
 
 
 class CanUpdateDeleteUser(permissions.BasePermission):

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+from django.utils import timezone
 from rest_framework import serializers
 
 from common.utils import get_object_or_none
@@ -7,14 +8,16 @@ from users.models import User
 from assets.models import Asset, SystemUser, Gateway
 from applications.models import Application
 from users.serializers import UserProfileSerializer
+from assets.serializers import ProtocolsField
 from perms.serializers.asset.permission import ActionsField
-from .models import AccessKey, LoginConfirmSetting, SSOToken
+from .models import AccessKey, LoginConfirmSetting
 
 
 __all__ = [
     'AccessKeySerializer', 'OtpVerifySerializer', 'BearerTokenSerializer',
     'MFAChallengeSerializer', 'LoginConfirmSettingSerializer', 'SSOTokenSerializer',
-    'ConnectionTokenSerializer', 'ConnectionTokenSecretSerializer', 'RDPFileSerializer'
+    'ConnectionTokenSerializer', 'ConnectionTokenSecretSerializer', 'RDPFileSerializer',
+    'PasswordVerifySerializer',
 ]
 
 
@@ -27,6 +30,10 @@ class AccessKeySerializer(serializers.ModelSerializer):
 
 class OtpVerifySerializer(serializers.Serializer):
     code = serializers.CharField(max_length=6, min_length=6)
+
+
+class PasswordVerifySerializer(serializers.Serializer):
+    password = serializers.CharField()
 
 
 class BearerTokenSerializer(serializers.Serializer):
@@ -44,6 +51,10 @@ class BearerTokenSerializer(serializers.Serializer):
     def get_keyword(obj):
         return 'Bearer'
 
+    def update_last_login(self, user):
+        user.last_login = timezone.now()
+        user.save(update_fields=['last_login'])
+
     def create(self, validated_data):
         request = self.context.get('request')
         if request.user and not request.user.is_anonymous:
@@ -56,6 +67,8 @@ class BearerTokenSerializer(serializers.Serializer):
                     "user id {} not exist".format(user_id)
                 )
         token, date_expired = user.create_bearer_token(request)
+        self.update_last_login(user)
+
         instance = {
             "token": token,
             "date_expired": date_expired,
@@ -143,9 +156,11 @@ class ConnectionTokenUserSerializer(serializers.ModelSerializer):
 
 
 class ConnectionTokenAssetSerializer(serializers.ModelSerializer):
+    protocols = ProtocolsField(label='Protocols', read_only=True)
+
     class Meta:
         model = Asset
-        fields = ['id', 'hostname', 'ip', 'port', 'org_id']
+        fields = ['id', 'hostname', 'ip', 'protocols', 'org_id']
 
 
 class ConnectionTokenSystemUserSerializer(serializers.ModelSerializer):
@@ -181,8 +196,5 @@ class ConnectionTokenSecretSerializer(serializers.Serializer):
     system_user = ConnectionTokenSystemUserSerializer(read_only=True)
     gateway = ConnectionTokenGatewaySerializer(read_only=True)
     actions = ActionsField()
+    expired_at = serializers.IntegerField()
 
-
-class RDPFileSerializer(ConnectionTokenSerializer):
-    width = serializers.IntegerField(default=1280)
-    height = serializers.IntegerField(default=800)

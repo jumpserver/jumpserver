@@ -18,7 +18,7 @@ from rest_framework.request import clone_request
 class SimpleMetadataWithFilters(SimpleMetadata):
     """Override SimpleMetadata, adding info about filters"""
 
-    methods = {"PUT", "POST", "GET"}
+    methods = {"PUT", "POST", "GET", "PATCH"}
     attrs = [
         'read_only', 'label', 'help_text',
         'min_length', 'max_length',
@@ -32,6 +32,9 @@ class SimpleMetadataWithFilters(SimpleMetadata):
         """
         actions = {}
         for method in self.methods & set(view.allowed_methods):
+            if hasattr(view, 'action_map'):
+                view.action = view.action_map.get(method.lower(), view.action)
+
             view.request = clone_request(request, method)
             try:
                 # Test global permissions

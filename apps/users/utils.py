@@ -295,10 +295,12 @@ def check_otp_code(otp_secret_key, otp_code):
     return totp.verify(otp=otp_code, valid_window=otp_valid_window)
 
 
-def get_password_check_rules():
+def get_password_check_rules(user):
     check_rules = []
     for rule in settings.SECURITY_PASSWORD_RULES:
         key = "id_{}".format(rule.lower())
+        if user.is_org_admin and rule == 'SECURITY_PASSWORD_MIN_LENGTH':
+            rule = 'SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH'
         value = getattr(settings, rule)
         if not value:
             continue
@@ -306,7 +308,7 @@ def get_password_check_rules():
     return check_rules
 
 
-def check_password_rules(password):
+def check_password_rules(password, user):
     pattern = r"^"
     if settings.SECURITY_PASSWORD_UPPER_CASE:
         pattern += '(?=.*[A-Z])'
@@ -317,55 +319,89 @@ def check_password_rules(password):
     if settings.SECURITY_PASSWORD_SPECIAL_CHAR:
         pattern += '(?=.*[`~!@#\$%\^&\*\(\)-=_\+\[\]\{\}\|;:\'\",\.<>\/\?])'
     pattern += '[a-zA-Z\d`~!@#\$%\^&\*\(\)-=_\+\[\]\{\}\|;:\'\",\.<>\/\?]'
-    pattern += '.{' + str(settings.SECURITY_PASSWORD_MIN_LENGTH-1) + ',}$'
+    if user.is_org_admin:
+        min_length = settings.SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH
+    else:
+        min_length = settings.SECURITY_PASSWORD_MIN_LENGTH
+    pattern += '.{' + str(min_length-1) + ',}$'
     match_obj = re.match(pattern, password)
     return bool(match_obj)
 
 
-key_prefix_limit = "_LOGIN_LIMIT_{}_{}"
-key_prefix_block = "_LOGIN_BLOCK_{}"
+class BlockUtil:
+    BLOCK_KEY_TMPL: str
+
+    def __init__(self, username):
+        self.block_key = self.BLOCK_KEY_TMPL.format(username)
+        self.key_ttl = int(settings.SECURITY_LOGIN_LIMIT_TIME) * 60
+
+    def block(self):
+        cache.set(self.block_key, True, self.key_ttl)
+
+    def is_block(self):
+        return bool(cache.get(self.block_key))
 
 
-# def increase_login_failed_count(key_limit, key_block):
-def increase_login_failed_count(username, ip):
-    key_limit = key_prefix_limit.format(username, ip)
-    count = cache.get(key_limit)
-    count = count + 1 if count else 1
+class BlockUtilBase:
+    LIMIT_KEY_TMPL: str
+    BLOCK_KEY_TMPL: str
 
-    limit_time = settings.SECURITY_LOGIN_LIMIT_TIME
-    cache.set(key_limit, count, int(limit_time)*60)
+    def __init__(self, username, ip):
+        self.username = username
+        self.ip = ip
+        self.limit_key = self.LIMIT_KEY_TMPL.format(username, ip)
+        self.block_key = self.BLOCK_KEY_TMPL.format(username)
+        self.key_ttl = int(settings.SECURITY_LOGIN_LIMIT_TIME) * 60
+
+    def get_remainder_times(self):
+        times_up = settings.SECURITY_LOGIN_LIMIT_COUNT
+        times_failed = self.get_failed_count()
+        times_remainder = int(times_up) - int(times_failed)
+        return times_remainder
+
+    def incr_failed_count(self):
+        limit_key = self.limit_key
+        count = cache.get(limit_key, 0)
+        count += 1
+        cache.set(limit_key, count, self.key_ttl)
+
+        limit_count = settings.SECURITY_LOGIN_LIMIT_COUNT
+        if count >= limit_count:
+            cache.set(self.block_key, True, self.key_ttl)
+
+    def get_failed_count(self):
+        count = cache.get(self.limit_key, 0)
+        return count
+
+    def clean_failed_count(self):
+        cache.delete(self.limit_key)
+        cache.delete(self.block_key)
+
+    @classmethod
+    def unblock_user(cls, username):
+        key_limit = cls.LIMIT_KEY_TMPL.format(username, '*')
+        key_block = cls.BLOCK_KEY_TMPL.format(username)
+        # Redis 尽量不要用通配
+        cache.delete_pattern(key_limit)
+        cache.delete(key_block)
+
+    @classmethod
+    def is_user_block(cls, username):
+        block_key = cls.BLOCK_KEY_TMPL.format(username)
+        return bool(cache.get(block_key))
+
+    def is_block(self):
+        return bool(cache.get(self.block_key))
 
 
-def get_login_failed_count(username, ip):
-    key_limit = key_prefix_limit.format(username, ip)
-    count = cache.get(key_limit, 0)
-    return count
+class LoginBlockUtil(BlockUtilBase):
+    LIMIT_KEY_TMPL = "_LOGIN_LIMIT_{}_{}"
+    BLOCK_KEY_TMPL = "_LOGIN_BLOCK_{}"
 
 
-def clean_failed_count(username, ip):
-    key_limit = key_prefix_limit.format(username, ip)
-    key_block = key_prefix_block.format(username)
-    cache.delete(key_limit)
-    cache.delete(key_block)
-
-
-def is_block_login(username, ip):
-    count = get_login_failed_count(username, ip)
-    key_block = key_prefix_block.format(username)
-
-    limit_count = settings.SECURITY_LOGIN_LIMIT_COUNT
-    limit_time = settings.SECURITY_LOGIN_LIMIT_TIME
-
-    if count >= limit_count:
-        cache.set(key_block, 1, int(limit_time)*60)
-    if count and count >= limit_count:
-        return True
-
-
-def is_need_unblock(key_block):
-    if not cache.get(key_block):
-        return False
-    return True
+class MFABlockUtils(BlockUtilBase):
+    LIMIT_KEY_TMPL = "_MFA_LIMIT_{}_{}"
+    BLOCK_KEY_TMPL = "_MFA_BLOCK_{}"
 
 
 def construct_user_email(username, email):

@@ -8,7 +8,6 @@ from django.dispatch import receiver
 from django.utils.functional import LazyObject
 from django.db.models.signals import m2m_changed
 from django.db.models.signals import post_save, post_delete, pre_delete
-from django.utils.translation import ugettext as _
 
 from orgs.utils import tmp_to_org
 from orgs.models import Organization, OrganizationMember
@@ -16,10 +15,10 @@ from orgs.hands import set_current_org, Node, get_current_org
 from perms.models import (AssetPermission, ApplicationPermission)
 from users.models import UserGroup, User
 from common.const.signals import PRE_REMOVE, POST_REMOVE
+from common.decorator import on_transaction_commit
 from common.signals import django_ready
 from common.utils import get_logger
 from common.utils.connection import RedisPubSub
-from common.exceptions import JMSException
 
 
 logger = get_logger(__file__)
@@ -37,8 +36,8 @@ class OrgsMappingForMemoryPubSub(LazyObject):
 orgs_mapping_for_memory_pub_sub = OrgsMappingForMemoryPubSub()
 
 
-def expire_orgs_mapping_for_memory():
-    orgs_mapping_for_memory_pub_sub.publish('expire_orgs_mapping')
+def expire_orgs_mapping_for_memory(org_id):
+    orgs_mapping_for_memory_pub_sub.publish(str(org_id))
 
 
 @receiver(django_ready)
@@ -46,12 +45,19 @@ def subscribe_orgs_mapping_expire(sender, **kwargs):
     logger.debug("Start subscribe for expire orgs mapping from memory")
 
     def keep_subscribe():
-        subscribe = orgs_mapping_for_memory_pub_sub.subscribe()
-        for message in subscribe.listen():
-            if message['type'] != 'message':
-                continue
-            Organization.expire_orgs_mapping()
-            logger.debug('Expire orgs mapping')
+        while True:
+            try:
+                subscribe = orgs_mapping_for_memory_pub_sub.subscribe()
+                for message in subscribe.listen():
+                    if message['type'] != 'message':
+                        continue
+                    if message['data'] == b'error':
+                        raise ValueError
+                    Organization.expire_orgs_mapping()
+                    logger.debug('Expire orgs mapping: ' + str(message['data']))
+            except Exception as e:
+                logger.exception(f'subscribe_orgs_mapping_expire: {e}')
+                Organization.expire_orgs_mapping()
 
     t = threading.Thread(target=keep_subscribe)
     t.daemon = True
@@ -59,22 +65,21 @@ def subscribe_orgs_mapping_expire(sender, **kwargs):
 
 
 @receiver(post_save, sender=Organization)
-def on_org_create_or_update(sender, instance=None, created=False, **kwargs):
+def on_org_create_or_update(sender, instance, created=False, **kwargs):
     # 必须放到最开始, 因为下面调用Node.save方法时会获取当前组织的org_id(即instance.org_id), 如果不过期会找不到
-    expire_orgs_mapping_for_memory()
-    if instance:
-        old_org = get_current_org()
-        set_current_org(instance)
-        node_root = Node.org_root()
-        if node_root.value != instance.name:
-            node_root.value = instance.name
-            node_root.save()
-        set_current_org(old_org)
+    expire_orgs_mapping_for_memory(instance.id)
+    old_org = get_current_org()
+    set_current_org(instance)
+    node_root = Node.org_root()
+    if node_root.value != instance.name:
+        node_root.value = instance.name
+        node_root.save()
+    set_current_org(old_org)
 
 
-@receiver(post_delete, sender=Organization)
-def on_org_delete(sender, **kwargs):
-    expire_orgs_mapping_for_memory()
+@receiver(pre_delete, sender=Organization)
+def on_org_delete(sender, instance, **kwargs):
+    expire_orgs_mapping_for_memory(instance.id)
 
 
 @receiver(pre_delete, sender=Organization)
@@ -165,7 +170,10 @@ def on_org_user_changed(action, instance, reverse, pk_set, **kwargs):
 
 
 @receiver(post_save, sender=User)
-def on_user_create_refresh_cache(sender, instance, created, **kwargs):
-    if created:
-        default_org = Organization.default()
-        default_org.members.add(instance)
+@on_transaction_commit
+def on_user_created_set_default_org(sender, instance, created, **kwargs):
+    if not created:
+        return
+    if instance.orgs.count() > 0:
+        return
+    Organization.default().members.add(instance)

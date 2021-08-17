@@ -1,91 +1,101 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.db import models, transaction
-from django.db.models import Max
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from simple_history.models import HistoricalRecords
 
-from orgs.mixins.models import OrgManager
-from .base import BaseUser
+from common.utils import lazyproperty
+from .base import BaseUser, AbsConnectivity
 
 __all__ = ['AuthBook']
 
 
-class AuthBookQuerySet(models.QuerySet):
-    def delete(self):
-        if self.count() > 1:
-            raise PermissionError(_("Bulk delete deny"))
-        return super().delete()
-
-
-class AuthBookManager(OrgManager):
-    pass
-
-
-class AuthBook(BaseUser):
+class AuthBook(BaseUser, AbsConnectivity):
     asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, verbose_name=_('Asset'))
-    is_latest = models.BooleanField(default=False, verbose_name=_('Latest version'))
+    systemuser = models.ForeignKey('assets.SystemUser', on_delete=models.CASCADE, null=True, verbose_name=_("System user"))
     version = models.IntegerField(default=1, verbose_name=_('Version'))
+    history = HistoricalRecords()
+    _systemuser_display = ''
 
-    objects = AuthBookManager.from_queryset(AuthBookQuerySet)()
-    backend = "db"
-    # 用于system user和admin_user的动态设置
-    _connectivity = None
-    CONN_CACHE_KEY = "ASSET_USER_CONN_{}"
+    auth_attrs = ['username', 'password', 'private_key', 'public_key']
 
     class Meta:
         verbose_name = _('AuthBook')
+        unique_together = [('username', 'asset', 'systemuser')]
 
-    def get_related_assets(self):
-        return [self.asset]
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.auth_snapshot = {}
 
-    def generate_id_with_asset(self, asset):
-        return self.id
+    def get_or_systemuser_attr(self, attr):
+        val = getattr(self, attr, None)
+        if val:
+            return val
+        if self.systemuser:
+            return getattr(self.systemuser, attr, '')
+        return ''
 
-    @classmethod
-    def get_max_version(cls, username, asset):
-        version_max = cls.objects.filter(username=username, asset=asset) \
-            .aggregate(Max('version'))
-        version_max = version_max['version__max'] or 0
-        return version_max
+    def load_auth(self):
+        for attr in self.auth_attrs:
+            value = self.get_or_systemuser_attr(attr)
+            self.auth_snapshot[attr] = [getattr(self, attr), value]
+            setattr(self, attr, value)
 
-    @classmethod
-    def create(cls, **kwargs):
-        """
-        使用并发锁机制创建AuthBook对象, (主要针对并发创建 username, asset 相同的对象时)
-        并更新其他对象的 is_latest=False (其他对象: 与当前对象的 username, asset 相同)
-        同时设置自己的 is_latest=True, version=max_version + 1
-        """
-        username = kwargs['username']
-        asset = kwargs.get('asset') or kwargs.get('asset_id')
-        with transaction.atomic():
-            # 使用select_for_update限制并发创建相同的username、asset条目
-            instances = cls.objects.select_for_update().filter(username=username, asset=asset)
-            instances.filter(is_latest=True).update(is_latest=False)
-            max_version = cls.get_max_version(username, asset)
-            kwargs.update({
-                'version': max_version + 1,
-                'is_latest': True
-            })
-            obj = cls.objects.create(**kwargs)
-            return obj
+    def unload_auth(self):
+        if not self.systemuser:
+            return
 
-    @property
-    def connectivity(self):
-        return self.get_asset_connectivity(self.asset)
+        for attr, values in self.auth_snapshot.items():
+            origin_value, loaded_value = values
+            current_value = getattr(self, attr, '')
+            if current_value == loaded_value:
+                setattr(self, attr, origin_value)
+
+    def save(self, *args, **kwargs):
+        self.unload_auth()
+        instance = super().save(*args, **kwargs)
+        self.load_auth()
+        return instance
 
     @property
-    def keyword(self):
-        return '{}_#_{}'.format(self.username, str(self.asset.id))
+    def username_display(self):
+        return self.get_or_systemuser_attr('username') or '*'
+
+    @lazyproperty
+    def systemuser_display(self):
+        if self._systemuser_display:
+            return self._systemuser_display
+        if not self.systemuser:
+            return ''
+        return str(self.systemuser)
 
     @property
-    def hostname(self):
-        return self.asset.hostname
+    def smart_name(self):
+        username = self.username_display
 
-    @property
-    def ip(self):
-        return self.asset.ip
+        if self.asset:
+            asset = str(self.asset)
+        else:
+            asset = '*'
+        return '{}@{}'.format(username, asset)
+
+    def sync_to_system_user_account(self):
+        if self.systemuser:
+            return
+        matched = AuthBook.objects.filter(
+            asset=self.asset, systemuser__username=self.username
+        )
+        if not matched:
+            return
+
+        for i in matched:
+            i.password = self.password
+            i.private_key = self.private_key
+            i.public_key = self.public_key
+            i.comment = 'Update triggered by account {}'.format(self.id)
+            i.save(update_fields=['password', 'private_key', 'public_key'])
 
     def __str__(self):
-        return '{}@{}'.format(self.username, self.asset)
+        return self.smart_name
 

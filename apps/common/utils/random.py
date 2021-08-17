@@ -4,10 +4,9 @@ import struct
 import random
 import socket
 import string
-import secrets
 
 
-string_punctuation = '!#$%&()*+,-.:;<=>?@[]^_{}~'
+string_punctuation = '!#$%&()*+,-.:;<=>?@[]^_~'
 
 
 def random_datetime(date_start, date_end):

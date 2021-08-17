@@ -47,8 +47,13 @@ class BaseFileParser(BaseParser):
     def convert_to_field_names(self, column_titles):
         fields_map = {}
         fields = self.serializer_fields
-        fields_map.update({v.label: k for k, v in fields.items()})
-        fields_map.update({k: k for k, _ in fields.items()})
+        for k, v in fields.items():
+            if v.read_only:
+                continue
+            fields_map.update({
+                v.label: k,
+                k: k
+            })
         field_names = [
             fields_map.get(column_title.strip('*'), '')
             for column_title in column_titles
@@ -57,6 +62,8 @@ class BaseFileParser(BaseParser):
 
     @staticmethod
     def _replace_chinese_quote(s):
+        if not isinstance(s, str):
+            return s
         trans_table = str.maketrans({
             '“': '"',
             '”': '"',
@@ -92,7 +99,7 @@ class BaseFileParser(BaseParser):
         new_row_data = {}
         serializer_fields = self.serializer_fields
         for k, v in row_data.items():
-            if isinstance(v, list) or isinstance(v, dict) or isinstance(v, str) and k.strip() and v.strip():
+            if type(v) in [list, dict, int] or (isinstance(v, str) and k.strip() and v.strip()):
                 # 解决类似disk_info为字符串的'{}'的问题
                 if not isinstance(v, str) and isinstance(serializer_fields[k], serializers.CharField):
                     v = str(v)
@@ -143,5 +150,5 @@ class BaseFileParser(BaseParser):
             return data
         except Exception as e:
             logger.error(e, exc_info=True)
-            raise ParseError('Parse error! ({})'.format(self.media_type))
+            raise ParseError(_('Parse file error: {}').format(e))
 

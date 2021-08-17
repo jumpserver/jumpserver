@@ -4,14 +4,6 @@
 {% block html_title %} {{ title }} {% endblock %}
 {% block title %} {{ title }}{% endblock %}
 
-{% block custom_head_css_js %}
-    <style>
-        .passwordBox {
-            max-width: 660px;
-        }
-    </style>
-{% endblock %}
-
 {% block content %}
     <div>
         {% if errors %}
@@ -30,8 +22,21 @@
             </p>
         {% endif %}
         <div class="row">
-            <div class="col-lg-3">
-                <a href="{{ redirect_url }}" class="btn btn-primary block full-width m-b">{% trans 'Return' %}</a>
+            {% if has_cancel %}
+            <div class="col-lg-2">
+                <a href="{{ cancel_url }}" class="btn btn-default block full-width m-b">
+                    {% trans 'Cancel' %}
+                </a>
+            </div>
+            {% endif %}
+            <div class="col-lg-2">
+                <a href="{{ redirect_url }}" class="btn btn-primary block full-width m-b">
+                    {% if confirm_button %}
+                        {{ confirm_button }}
+                    {% else %}
+                        {% trans 'Go' %}
+                    {% endif %}
+                </a>
             </div>
         </div>
     </div>

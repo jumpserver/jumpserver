@@ -28,7 +28,7 @@ def update_or_create_ansible_task(
         task_name, hosts, tasks,
         interval=None, crontab=None, is_periodic=False,
         callback=None, pattern='all', options=None,
-        run_as_admin=False, run_as=None, become_info=None,
+        run_as_admin=False, run_as=None, system_user=None, become_info=None,
     ):
     if not hosts or not tasks or not task_name:
         return None, None
@@ -49,7 +49,7 @@ def update_or_create_ansible_task(
     adhoc = task.get_latest_adhoc()
     new_adhoc = AdHoc(task=task, pattern=pattern,
                       run_as_admin=run_as_admin,
-                      run_as=run_as)
+                      run_as=run_as, run_system_user=system_user)
     new_adhoc.tasks = tasks
     new_adhoc.options = options
     new_adhoc.become = become_info
@@ -67,16 +67,6 @@ def update_or_create_ansible_task(
         task.latest_adhoc = new_adhoc
         created = True
     return task, created
-
-
-def send_server_performance_mail(path, usage, usages):
-    from users.models import User
-    subject = _("Disk used more than 80%: {} => {}").format(path, usage.percent)
-    message = subject
-    admins = User.objects.filter(role=User.ROLE.ADMIN)
-    recipient_list = [u.email for u in admins if u.email]
-    logger.info(subject)
-    send_mail_async(subject, message, recipient_list, html_message=message)
 
 
 def get_task_log_path(base_path, task_id, level=2):

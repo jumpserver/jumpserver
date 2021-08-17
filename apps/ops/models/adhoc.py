@@ -146,6 +146,7 @@ class AdHoc(OrgModelMixin):
     hosts = models.ManyToManyField('assets.Asset', verbose_name=_("Host"))
     run_as_admin = models.BooleanField(default=False, verbose_name=_('Run as admin'))
     run_as = models.CharField(max_length=64, default='', blank=True, null=True, verbose_name=_('Username'))
+    run_system_user = models.ForeignKey('assets.SystemUser', null=True, on_delete=models.CASCADE)
     become = EncryptJsonDictCharField(max_length=1024, default='', blank=True, null=True, verbose_name=_("Become"))
     created_by = models.CharField(max_length=64, default='', blank=True, null=True, verbose_name=_('Create by'))
     date_created = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -167,7 +168,7 @@ class AdHoc(OrgModelMixin):
 
         inventory = JMSInventory(
             self.hosts.all(), run_as_admin=self.run_as_admin,
-            run_as=self.run_as, become_info=become_info
+            run_as=self.run_as, become_info=become_info, system_user=self.run_system_user
         )
         return inventory
 
@@ -286,18 +287,12 @@ class AdHocExecution(OrgModelMixin):
         raw = ''
 
         try:
-            date_start_s = timezone.now().now().strftime('%Y-%m-%d %H:%M:%S')
-            print(_("{} Start task: {}").format(date_start_s, self.task.name))
             raw, summary = self.start_runner()
         except Exception as e:
             logger.error(e, exc_info=True)
             raw = {"dark": {"all": str(e)}, "contacted": []}
         finally:
             self.clean_up(summary, time_start)
-            date_end = timezone.now().now()
-            date_end_s = date_end.strftime('%Y-%m-%d %H:%M:%S')
-            print(_("{} Task finish").format(date_end_s))
-            print('.\n\n.')
             return raw, summary
 
     def clean_up(self, summary, time_start):

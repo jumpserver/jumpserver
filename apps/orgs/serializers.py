@@ -4,7 +4,6 @@ from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
 from users.models.user import User
-from common.drf.serializers import AdaptedBulkListSerializer
 from common.drf.serializers import BulkModelSerializer
 from common.db.models import concated_display as display
 from .models import Organization, OrganizationMember, ROLE
@@ -35,11 +34,12 @@ class OrgSerializer(ModelSerializer):
 
     class Meta:
         model = Organization
-        list_serializer_class = AdaptedBulkListSerializer
         fields_mini = ['id', 'name']
         fields_small = fields_mini + [
-            'is_default', 'is_root', 'comment',
-            'created_by', 'date_created', 'resource_statistics'
+            'resource_statistics',
+            'is_default', 'is_root',
+            'date_created',
+            'comment', 'created_by',
         ]
 
         fields_m2m = ['users', 'admins', 'auditors']
@@ -79,7 +79,12 @@ class OrgMemberSerializer(BulkModelSerializer):
 
     class Meta:
         model = OrganizationMember
-        fields = ('id', 'org', 'user', 'role', 'org_display', 'user_display', 'role_display')
+        fields_mini = ['id']
+        fields_small = fields_mini + [
+            'role', 'role_display'
+        ]
+        fields_fk = ['org', 'user', 'org_display', 'user_display',]
+        fields = fields_small + fields_fk
         use_model_bulk_create = True
         model_bulk_create_kwargs = {'ignore_conflicts': True}
 

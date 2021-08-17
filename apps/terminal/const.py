@@ -16,6 +16,7 @@ class ReplayStorageTypeChoices(TextChoices):
     swift = 'swift', 'Swift'
     oss = 'oss', 'OSS'
     azure = 'azure', 'Azure'
+    obs = 'obs', 'OBS'
 
 
 class CommandStorageTypeChoices(TextChoices):
@@ -31,6 +32,7 @@ class ComponentStatusChoices(TextChoices):
     critical = 'critical', _('Critical')
     high = 'high', _('High')
     normal = 'normal', _('Normal')
+    offline = 'offline', _('Offline')
 
     @classmethod
     def status(cls):
@@ -42,6 +44,9 @@ class TerminalTypeChoices(TextChoices):
     guacamole = 'guacamole', 'Guacamole'
     omnidb = 'omnidb', 'OmniDB'
     xrdp = 'xrdp', 'Xrdp'
+    lion = 'lion', 'Lion'
+    core = 'core', 'Core'
+    celery = 'celery', 'Celery'
 
     @classmethod
     def types(cls):

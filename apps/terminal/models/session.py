@@ -11,18 +11,19 @@ from django.core.files.storage import default_storage
 from django.core.cache import cache
 
 from assets.models import Asset
+from users.models import User
 from orgs.mixins.models import OrgModelMixin
-from common.db.models import ChoiceSet
+from common.db.models import TextChoices
 from ..backends import get_multi_command_storage
-from .terminal import Terminal
 
 
 class Session(OrgModelMixin):
-    class LOGIN_FROM(ChoiceSet):
+    class LOGIN_FROM(TextChoices):
         ST = 'ST', 'SSH Terminal'
+        RT = 'RT', 'RDP Terminal'
         WT = 'WT', 'Web Terminal'
 
-    class PROTOCOL(ChoiceSet):
+    class PROTOCOL(TextChoices):
         SSH = 'ssh', 'ssh'
         RDP = 'rdp', 'rdp'
         VNC = 'vnc', 'vnc'
@@ -46,7 +47,7 @@ class Session(OrgModelMixin):
     is_finished = models.BooleanField(default=False, db_index=True)
     has_replay = models.BooleanField(default=False, verbose_name=_("Replay"))
     has_command = models.BooleanField(default=False, verbose_name=_("Command"))
-    terminal = models.ForeignKey(Terminal, null=True, on_delete=models.DO_NOTHING, db_constraint=False)
+    terminal = models.ForeignKey('terminal.Terminal', null=True, on_delete=models.DO_NOTHING, db_constraint=False)
     protocol = models.CharField(choices=PROTOCOL.choices, default='ssh', max_length=16, db_index=True)
     date_start = models.DateTimeField(verbose_name=_("Date start"), db_index=True, default=timezone.now)
     date_end = models.DateTimeField(verbose_name=_("Date end"), null=True)
@@ -80,6 +81,10 @@ class Session(OrgModelMixin):
         return Asset.objects.get(id=self.asset_id)
 
     @property
+    def user_obj(self):
+        return User.objects.get(id=self.user_id)
+
+    @property
     def _date_start_first_has_replay_rdp_session(self):
         if self.__class__._DATE_START_FIRST_HAS_REPLAY_RDP_SESSION is None:
             instance = self.__class__.objects.filter(
@@ -104,7 +109,12 @@ class Session(OrgModelMixin):
         _PROTOCOL = self.PROTOCOL
         if self.is_finished:
             return False
-        if self.protocol in [_PROTOCOL.SSH, _PROTOCOL.TELNET, _PROTOCOL.K8S]:
+        if self.login_from == self.LOGIN_FROM.RT:
+            return False
+        if self.protocol in [
+            _PROTOCOL.SSH, _PROTOCOL.VNC, _PROTOCOL.RDP,
+            _PROTOCOL.TELNET, _PROTOCOL.K8S
+        ]:
             return True
         else:
             return False
@@ -118,8 +128,6 @@ class Session(OrgModelMixin):
     def can_terminate(self):
         _PROTOCOL = self.PROTOCOL
         if self.is_finished:
-            return False
-        if self.protocol in self.db_protocols:
             return False
         else:
             return True

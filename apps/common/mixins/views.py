@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 #
 # coding: utf-8
-
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.utils import timezone
 
 
-__all__ = ["DatetimeSearchMixin"]
+__all__ = ["DatetimeSearchMixin", "PermissionsMixin"]
+
+from rest_framework import permissions
 
 
 class DatetimeSearchMixin:
@@ -36,3 +38,17 @@ class DatetimeSearchMixin:
     def get(self, request, *args, **kwargs):
         self.get_date_range()
         return super().get(request, *args, **kwargs)
+
+
+class PermissionsMixin(UserPassesTestMixin):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_permissions(self):
+        return self.permission_classes
+
+    def test_func(self):
+        permission_classes = self.get_permissions()
+        for permission_class in permission_classes:
+            if not permission_class().has_permission(self.request, self):
+                return False
+        return True

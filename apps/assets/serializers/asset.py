@@ -1,24 +1,21 @@
 # -*- coding: utf-8 -*-
 #
 from rest_framework import serializers
-from django.db.models import F
 from django.core.validators import RegexValidator
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-from ..models import Asset, Node, Platform
-from .base import ConnectivitySerializer
+from ..models import Asset, Node, Platform, SystemUser
 
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer',
-    'AssetDisplaySerializer',
     'ProtocolsField', 'PlatformSerializer',
-    'AssetDetailSerializer', 'AssetTaskSerializer',
+    'AssetTaskSerializer', 'AssetsTaskSerializer', 'ProtocolsField'
 ]
 
 
 class ProtocolField(serializers.RegexField):
-    protocols = '|'.join(dict(Asset.PROTOCOL_CHOICES).keys())
+    protocols = '|'.join(dict(Asset.Protocol.choices).keys())
     default_error_messages = {
         'invalid': _('Protocol format should {}/{}'.format(protocols, '1-65535'))
     }
@@ -65,9 +62,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     platform = serializers.SlugRelatedField(
         slug_field='name', queryset=Platform.objects.all(), label=_("Platform")
     )
-    protocols = ProtocolsField(label=_('Protocols'), required=False)
+    protocols = ProtocolsField(label=_('Protocols'), required=False, default=['ssh/22'])
     domain_display = serializers.ReadOnlyField(source='domain.name', label=_('Domain name'))
-    admin_user_display = serializers.ReadOnlyField(source='admin_user.name', label=_('Admin user name'))
     nodes_display = serializers.ListField(child=serializers.CharField(), label=_('Nodes name'), required=False)
 
     """
@@ -81,37 +77,40 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'number', 'vendor', 'model', 'sn', 'cpu_model', 'cpu_count',
             'cpu_cores', 'cpu_vcpus', 'memory', 'disk_total', 'disk_info',
             'os', 'os_version', 'os_arch', 'hostname_raw', 'comment',
-            'created_by', 'date_created', 'hardware_info',
+            'hardware_info', 'connectivity', 'date_verified'
         ]
         fields_fk = [
-            'admin_user', 'admin_user_display', 'domain', 'domain_display', 'platform'
+            'domain', 'domain_display', 'platform', 'admin_user', 'admin_user_display'
         ]
-        fk_only_fields = {
-            'platform': ['name']
-        }
         fields_m2m = [
             'nodes', 'nodes_display', 'labels',
         ]
-        annotates_fields = {
-            # 'admin_user_display': 'admin_user__name'
-        }
-        fields_as = list(annotates_fields.keys())
-        fields = fields_small + fields_fk + fields_m2m + fields_as
         read_only_fields = [
             'created_by', 'date_created',
-        ] + fields_as
+        ]
+        fields = fields_small + fields_fk + fields_m2m + read_only_fields
 
         extra_kwargs = {
             'protocol': {'write_only': True},
             'port': {'write_only': True},
             'hardware_info': {'label': _('Hardware info')},
-            'org_name': {'label': _('Org name')}
+            'org_name': {'label': _('Org name')},
+            'admin_user_display': {'label': _('Admin user display')}
         }
+
+    def get_fields(self):
+        fields = super().get_fields()
+
+        admin_user_field = fields.get('admin_user')
+        # 因为 mixin 中对 fields 有处理，可能不需要返回 admin_user
+        if admin_user_field:
+            admin_user_field.queryset = SystemUser.objects.filter(type=SystemUser.Type.admin)
+        return fields
 
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('admin_user', 'domain', 'platform')
+        queryset = queryset.prefetch_related('domain', 'platform', 'admin_user')
         queryset = queryset.prefetch_related('nodes', 'labels')
         return queryset
 
@@ -158,15 +157,6 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
         return instance
 
 
-class AssetDisplaySerializer(AssetSerializer):
-    connectivity = ConnectivitySerializer(read_only=True, label=_("Connectivity"))
-
-    class Meta(AssetSerializer.Meta):
-        fields = AssetSerializer.Meta.fields + [
-            'connectivity',
-        ]
-
-
 class PlatformSerializer(serializers.ModelSerializer):
     meta = serializers.DictField(required=False, allow_null=True, label=_('Meta'))
 
@@ -186,19 +176,14 @@ class PlatformSerializer(serializers.ModelSerializer):
         ]
 
 
-class AssetDetailSerializer(AssetSerializer):
-    platform = PlatformSerializer(read_only=True)
-
-
 class AssetSimpleSerializer(serializers.ModelSerializer):
-    connectivity = ConnectivitySerializer(read_only=True, label=_("Connectivity"))
 
     class Meta:
         model = Asset
-        fields = ['id', 'hostname', 'ip', 'connectivity', 'port']
+        fields = ['id', 'hostname', 'ip', 'port', 'connectivity', 'date_verified']
 
 
-class AssetTaskSerializer(serializers.Serializer):
+class AssetsTaskSerializer(serializers.Serializer):
     ACTION_CHOICES = (
         ('refresh', 'refresh'),
         ('test', 'test'),
@@ -207,4 +192,17 @@ class AssetTaskSerializer(serializers.Serializer):
     action = serializers.ChoiceField(choices=ACTION_CHOICES, write_only=True)
     assets = serializers.PrimaryKeyRelatedField(
         queryset=Asset.objects, required=False, allow_empty=True, many=True
+    )
+
+
+class AssetTaskSerializer(AssetsTaskSerializer):
+    ACTION_CHOICES = tuple(list(AssetsTaskSerializer.ACTION_CHOICES) + [
+        ('push_system_user', 'push_system_user'),
+        ('test_system_user', 'test_system_user')
+    ])
+    asset = serializers.PrimaryKeyRelatedField(
+        queryset=Asset.objects, required=False, allow_empty=True, many=False
+    )
+    system_users = serializers.PrimaryKeyRelatedField(
+        queryset=SystemUser.objects, required=False, allow_empty=True, many=True
     )

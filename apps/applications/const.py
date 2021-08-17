@@ -1,11 +1,10 @@
 #  coding: utf-8
 #
-
 from django.db.models import TextChoices
 from django.utils.translation import ugettext_lazy as _
 
 
-class ApplicationCategoryChoices(TextChoices):
+class AppCategory(TextChoices):
     db = 'db', _('Database')
     remote_app = 'remote_app', _('Remote app')
     cloud = 'cloud', 'Cloud'
@@ -15,7 +14,7 @@ class ApplicationCategoryChoices(TextChoices):
         return dict(cls.choices).get(category, '')
 
 
-class ApplicationTypeChoices(TextChoices):
+class AppType(TextChoices):
     # db category
     mysql = 'mysql', 'MySQL'
     oracle = 'oracle', 'Oracle'
@@ -32,18 +31,37 @@ class ApplicationTypeChoices(TextChoices):
     k8s = 'k8s', 'Kubernetes'
 
     @classmethod
+    def category_types_mapper(cls):
+        return {
+            AppCategory.db: [cls.mysql, cls.oracle, cls.pgsql, cls.mariadb],
+            AppCategory.remote_app: [cls.chrome, cls.mysql_workbench, cls.vmware_client, cls.custom],
+            AppCategory.cloud: [cls.k8s]
+        }
+
+    @classmethod
+    def type_category_mapper(cls):
+        mapper = {}
+        for category, tps in cls.category_types_mapper().items():
+            for tp in tps:
+                mapper[tp] = category
+        return mapper
+
+    @classmethod
     def get_label(cls, tp):
         return dict(cls.choices).get(tp, '')
 
     @classmethod
     def db_types(cls):
-        return [cls.mysql.value, cls.oracle.value, cls.pgsql.value, cls.mariadb.value]
+        return [tp.value for tp in cls.category_types_mapper()[AppCategory.db]]
 
     @classmethod
     def remote_app_types(cls):
-        return [cls.chrome.value, cls.mysql_workbench.value, cls.vmware_client.value, cls.custom.value]
+        return [tp.value for tp in cls.category_types_mapper()[AppCategory.remote_app]]
 
     @classmethod
     def cloud_types(cls):
-        return [cls.k8s.value]
+        return [tp.value for tp in cls.category_types_mapper()[AppCategory.cloud]]
+
+
+
 

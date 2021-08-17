@@ -11,5 +11,5 @@
 """
 
 
-from common.permissions import IsAppUser, IsOrgAdmin, IsValidUser, IsOrgAdminOrAppUser
+from common.permissions import IsAppUser, IsOrgAdmin, IsValidUser, IsOrgAdminOrAppUser, NeedMFAVerify
 from users.models import User, UserGroup

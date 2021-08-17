@@ -9,7 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 from django.db import models
 
-from terminal.utils import send_command_execution_alert_mail
+from terminal.notifications import CommandExecutionAlert
 from common.utils import lazyproperty
 from orgs.models import Organization
 from orgs.mixins.models import OrgModelMixin
@@ -86,8 +86,10 @@ class CommandExecution(OrgModelMixin):
                 host = self.hosts.first()
                 if host and host.is_windows():
                     shell = 'win_shell'
-                else:
+                elif host and host.is_unixlike():
                     shell = 'shell'
+                else:
+                    shell = 'raw'
                 result = runner.execute(self.command, 'all', module=shell)
                 self.result = result.results_command
             except SoftTimeLimitExceeded as e:
@@ -99,12 +101,12 @@ class CommandExecution(OrgModelMixin):
         else:
             msg = _("Command `{}` is forbidden ........").format(self.command)
             print('\033[31m' + msg + '\033[0m')
-            send_command_execution_alert_mail({
+            CommandExecutionAlert({
                 'input': self.command,
                 'assets': self.hosts.all(),
                 'user': str(self.user),
                 'risk_level': 5,
-            })
+            }).publish_async()
             self.result = {"error":  msg}
         self.org_id = self.run_as.org_id
         self.is_finished = True

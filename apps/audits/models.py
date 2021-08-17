@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
-from orgs.mixins.models import OrgModelMixin
+from orgs.mixins.models import OrgModelMixin, Organization
 from orgs.utils import current_org
 
 __all__ = [
@@ -63,6 +63,11 @@ class OperateLog(OrgModelMixin):
     def __str__(self):
         return "<{}> {} <{}>".format(self.user, self.action, self.resource)
 
+    def save(self, *args, **kwargs):
+        if current_org.is_root() and not self.org_id:
+            self.org_id = Organization.ROOT_ID
+        return super(OperateLog, self).save(*args, **kwargs)
+
 
 class PasswordChangeLog(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
@@ -79,6 +84,7 @@ class UserLoginLog(models.Model):
     LOGIN_TYPE_CHOICE = (
         ('W', 'Web'),
         ('T', 'Terminal'),
+        ('U', 'Unknown'),
     )
 
     MFA_DISABLED = 0

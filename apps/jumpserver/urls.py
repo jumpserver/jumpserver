@@ -23,12 +23,14 @@ api_v1 = [
     path('applications/', include('applications.urls.api_urls', namespace='api-applications')),
     path('tickets/', include('tickets.urls.api_urls', namespace='api-tickets')),
     path('acls/', include('acls.urls.api_urls', namespace='api-acls')),
-    path('prometheus/metrics/', api.PrometheusMetricsApi.as_view())
+    path('notifications/', include('notifications.urls.api_urls', namespace='api-notifications')),
+    path('prometheus/metrics/', api.PrometheusMetricsApi.as_view()),
 ]
 
 app_view_patterns = [
     path('auth/', include('authentication.urls.view_urls'), name='auth'),
     path('ops/', include('ops.urls.view_urls'), name='ops'),
+    path('common/', include('common.urls.view_urls'), name='common'),
     re_path(r'flower/(?P<path>.*)', views.celery_flower_view, name='flower-view'),
 ]
 
@@ -48,7 +50,8 @@ urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
     path('api/v1/', include(api_v1)),
     re_path('api/(?P<app>\w+)/(?P<version>v\d)/.*', views.redirect_format_api),
-    path('api/health/', views.HealthCheckView.as_view(), name="health"),
+    path('api/health/', api.HealthCheckView.as_view(), name="health"),
+    path('api/v1/health/', api.HealthCheckView.as_view(), name="health_v1"),
     # External apps url
     path('core/auth/captcha/', include('captcha.urls')),
     path('core/', include(app_view_patterns)),

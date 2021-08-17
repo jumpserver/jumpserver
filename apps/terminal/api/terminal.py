@@ -4,22 +4,22 @@ import logging
 import uuid
 
 from django.core.cache import cache
-from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, generics
+from rest_framework import generics
 from rest_framework.views import APIView, Response
 from rest_framework import status
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 
-
+from common.exceptions import JMSException
 from common.drf.api import JMSBulkModelViewSet
 from common.utils import get_object_or_none
-from common.permissions import IsAppUser, IsOrgAdminOrAppUser, IsSuperUser, WithBootstrapToken
-from ..models import Terminal, Status, Session
+from common.permissions import IsAppUser, IsSuperUser, WithBootstrapToken
+from ..models import Terminal
 from .. import serializers
 from .. import exceptions
 
 __all__ = [
-    'TerminalViewSet',  'StatusViewSet', 'TerminalConfig',
+    'TerminalViewSet',  'TerminalConfig',
     'TerminalRegistrationApi',
 ]
 logger = logging.getLogger(__file__)
@@ -30,6 +30,17 @@ class TerminalViewSet(JMSBulkModelViewSet):
     serializer_class = serializers.TerminalSerializer
     permission_classes = (IsSuperUser,)
     filterset_fields = ['name', 'remote_addr', 'type']
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.get_online_session_count() > 0:
+            raise JMSException(
+                code='have_online_session',
+                detail=_('Have online sessions')
+            )
+
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     def create(self, request, *args, **kwargs):
         if isinstance(request.data, list):
@@ -70,45 +81,6 @@ class TerminalViewSet(JMSBulkModelViewSet):
         filtered_queryset_id = [str(q.id) for q in queryset if q.status == status]
         queryset = queryset.filter(id__in=filtered_queryset_id)
         return queryset
-
-
-class StatusViewSet(viewsets.ModelViewSet):
-    queryset = Status.objects.all()
-    serializer_class = serializers.StatusSerializer
-    permission_classes = (IsOrgAdminOrAppUser,)
-    session_serializer_class = serializers.SessionSerializer
-    task_serializer_class = serializers.TaskSerializer
-
-    def create(self, request, *args, **kwargs):
-        self.handle_sessions()
-        tasks = self.request.user.terminal.task_set.filter(is_finished=False)
-        serializer = self.task_serializer_class(tasks, many=True)
-        return Response(serializer.data, status=201)
-
-    def handle_sessions(self):
-        session_ids = self.request.data.get('sessions', [])
-        # guacamole 上报的 session 是字符串
-        # "[53cd3e47-210f-41d8-b3c6-a184f3, 53cd3e47-210f-41d8-b3c6-a184f4]"
-        if isinstance(session_ids, str):
-            session_ids = session_ids[1:-1].split(',')
-            session_ids = [sid.strip() for sid in session_ids if sid.strip()]
-        Session.set_sessions_active(session_ids)
-
-    def get_queryset(self):
-        terminal_id = self.kwargs.get("terminal", None)
-        if terminal_id:
-            terminal = get_object_or_404(Terminal, id=terminal_id)
-            self.queryset = terminal.status_set.all()
-        return self.queryset
-
-    def perform_create(self, serializer):
-        serializer.validated_data["terminal"] = self.request.user.terminal
-        return super().perform_create(serializer)
-
-    def get_permissions(self):
-        if self.action == "create":
-            self.permission_classes = (IsAppUser,)
-        return super().get_permissions()
 
 
 class TerminalConfig(APIView):

@@ -122,10 +122,31 @@ REDIS_PORT: 6379
 # USER_LOGIN_SINGLE_MACHINE_ENABLED: False
 #
 # 启用定时任务
-# PERIOD_TASK_ENABLE: True
+# PERIOD_TASK_ENABLED: True
 #
 # 启用二次复合认证配置
 # LOGIN_CONFIRM_ENABLE: False
 #
 # Windows 登录跳过手动输入密码
 # WINDOWS_SKIP_ALL_MANUAL_PASSWORD: False
+
+# 是否开启 Luna 水印
+# SECURITY_WATERMARK_ENABLED: False
+
+# 健康检查的token，默认是空
+# HEALTH_CHECK_TOKEN: ''
+
+# 浏览器关闭页面后，会话过期
+# SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE: False
+
+# 每次api请求，session续期
+# SESSION_SAVE_EVERY_REQUEST: True
+
+# 硬盘检查
+# DISK_CHECK_ENABLED: True
+
+# 仅允许用户从来源处登录
+# ONLY_ALLOW_AUTH_FROM_SOURCE: False
+
+# 仅允许已存在的用户登录，不允许第三方认证后，自动创建用户
+# ONLY_ALLOW_EXIST_USER_AUTH: False

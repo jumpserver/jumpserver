@@ -22,10 +22,12 @@ class UserLoginOtpView(mixins.AuthMixin, FormView):
         try:
             self.check_user_mfa(otp_code)
             return redirect_to_guard_view()
-        except errors.MFAFailedError as e:
+        except (errors.MFAFailedError, errors.BlockMFAError) as e:
             form.add_error('otp_code', e.msg)
             return super().form_invalid(form)
         except Exception as e:
             logger.error(e)
+            import traceback
+            traceback.print_exception()
             return redirect_to_guard_view()
 

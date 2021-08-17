@@ -16,7 +16,7 @@ PROJECT_DIR = const.PROJECT_DIR
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = CONFIG.SECRET_KEY
 
-# SECURITY WARNING: keep the token secret, remove it if all coco, guacamole ok
+# SECURITY WARNING: keep the token secret, remove it if all koko, lion ok
 BOOTSTRAP_TOKEN = CONFIG.BOOTSTRAP_TOKEN
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'applications.apps.ApplicationsConfig',
     'tickets.apps.TicketsConfig',
     'acls.apps.AclsConfig',
+    'notifications.apps.NotificationsConfig',
     'common.apps.CommonConfig',
     'jms_oidc_rp',
     'rest_framework',
@@ -66,6 +67,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.forms',
+    'simple_history',
 ]
 
 
@@ -85,6 +87,7 @@ MIDDLEWARE = [
     'orgs.middleware.OrgMiddleware',
     'authentication.backends.oidc.middleware.OIDCRefreshIDTokenMiddleware',
     'authentication.backends.cas.middleware.CASMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware',
 ]
 
 
@@ -125,7 +128,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # 自定义的配置，SESSION_EXPIRE_AT_BROWSER_CLOSE 始终为 True, 下面这个来控制是否强制关闭后过期 cookie
 SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE = CONFIG.SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE
 SESSION_SAVE_EVERY_REQUEST = CONFIG.SESSION_SAVE_EVERY_REQUEST
-SESSION_ENGINE = 'redis_sessions.session'
+SESSION_ENGINE = 'jumpserver.rewriting.session'
 SESSION_REDIS = {
     'host': CONFIG.REDIS_HOST,
     'port': CONFIG.REDIS_PORT,

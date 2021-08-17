@@ -82,6 +82,16 @@ class ReplayStorageTypeOSSSerializer(ReplayStorageTypeBaseSerializer):
     )
 
 
+class ReplayStorageTypeOBSSerializer(ReplayStorageTypeBaseSerializer):
+    endpoint_help_text = '''
+        OBS format: obs.{REGION_NAME}.myhuaweicloud.com
+        Such as: obs.cn-north-4.myhuaweicloud.com
+    '''
+    ENDPOINT = serializers.CharField(
+        max_length=1024, label=_('Endpoint'), help_text=_(endpoint_help_text), allow_null=True,
+    )
+
+
 class ReplayStorageTypeAzureSerializer(serializers.Serializer):
     class EndpointSuffixChoices(TextChoices):
         china = 'core.chinacloudapi.cn', 'core.chinacloudapi.cn'
@@ -105,46 +115,9 @@ replay_storage_type_serializer_classes_mapping = {
     const.ReplayStorageTypeChoices.ceph.value: ReplayStorageTypeCephSerializer,
     const.ReplayStorageTypeChoices.swift.value: ReplayStorageTypeSwiftSerializer,
     const.ReplayStorageTypeChoices.oss.value: ReplayStorageTypeOSSSerializer,
-    const.ReplayStorageTypeChoices.azure.value: ReplayStorageTypeAzureSerializer
+    const.ReplayStorageTypeChoices.azure.value: ReplayStorageTypeAzureSerializer,
+    const.ReplayStorageTypeChoices.obs.value: ReplayStorageTypeOBSSerializer
 }
-
-# ReplayStorageSerializer
-
-
-class ReplayStorageSerializer(serializers.ModelSerializer):
-    meta = MethodSerializer()
-
-    class Meta:
-        model = ReplayStorage
-        fields = ['id', 'name', 'type', 'meta', 'comment']
-
-    def validate_meta(self, meta):
-        _meta = self.instance.meta if self.instance else {}
-        _meta.update(meta)
-        return _meta
-
-    def get_meta_serializer(self):
-        default_serializer = serializers.Serializer(read_only=True)
-
-        if isinstance(self.instance, ReplayStorage):
-            _type = self.instance.type
-        else:
-            _type = self.context['request'].query_params.get('type')
-
-        if _type:
-            serializer_class = replay_storage_type_serializer_classes_mapping.get(_type)
-        else:
-            serializer_class = default_serializer
-
-        if not serializer_class:
-            serializer_class = default_serializer
-
-        if isinstance(serializer_class, type):
-            serializer = serializer_class()
-        else:
-            serializer = serializer_class
-        return serializer
-
 
 # Command storage serializers
 # ---------------------------
@@ -180,8 +153,11 @@ class CommandStorageTypeESSerializer(serializers.Serializer):
     INDEX = serializers.CharField(
         max_length=1024, default='jumpserver', label=_('Index'), allow_null=True
     )
-    DOC_TYPE = ReadableHiddenField(default='command', label=_('Doc type'), allow_null=True)
-
+    DOC_TYPE = ReadableHiddenField(default='_doc', label=_('Doc type'), allow_null=True)
+    IGNORE_VERIFY_CERTS = serializers.BooleanField(
+        default=False, label=_('Ignore Certificate Verification'),
+        source='OTHER.IGNORE_VERIFY_CERTS', allow_null=True,
+    )
 
 # mapping
 
@@ -190,15 +166,17 @@ command_storage_type_serializer_classes_mapping = {
     const.CommandStorageTypeChoices.es.value: CommandStorageTypeESSerializer
 }
 
-# CommandStorageSerializer
+
+# BaseStorageSerializer
 
 
-class CommandStorageSerializer(serializers.ModelSerializer):
+class BaseStorageSerializer(serializers.ModelSerializer):
+    storage_type_serializer_classes_mapping = {}
     meta = MethodSerializer()
 
     class Meta:
-        model = CommandStorage
-        fields = ['id', 'name', 'type', 'meta', 'comment']
+        model = None
+        fields = ['id', 'name', 'type', 'meta', 'is_default', 'comment']
 
     def validate_meta(self, meta):
         _meta = self.instance.meta if self.instance else {}
@@ -208,13 +186,13 @@ class CommandStorageSerializer(serializers.ModelSerializer):
     def get_meta_serializer(self):
         default_serializer = serializers.Serializer(read_only=True)
 
-        if isinstance(self.instance, CommandStorage):
+        if isinstance(self.instance, self.__class__.Meta.model):
             _type = self.instance.type
         else:
             _type = self.context['request'].query_params.get('type')
 
         if _type:
-            serializer_class = command_storage_type_serializer_classes_mapping.get(_type)
+            serializer_class = self.storage_type_serializer_classes_mapping.get(_type)
         else:
             serializer_class = default_serializer
 
@@ -226,3 +204,30 @@ class CommandStorageSerializer(serializers.ModelSerializer):
         else:
             serializer = serializer_class
         return serializer
+
+    def save(self, **kwargs):
+        instance = super().save(**kwargs)
+        if self.validated_data.get('is_default', False):
+            instance.set_to_default()
+        return instance
+
+
+# CommandStorageSerializer
+
+
+class CommandStorageSerializer(BaseStorageSerializer):
+    storage_type_serializer_classes_mapping = command_storage_type_serializer_classes_mapping
+
+    class Meta(BaseStorageSerializer.Meta):
+        model = CommandStorage
+
+
+# ReplayStorageSerializer
+
+
+class ReplayStorageSerializer(BaseStorageSerializer):
+    storage_type_serializer_classes_mapping = replay_storage_type_serializer_classes_mapping
+
+    class Meta(BaseStorageSerializer.Meta):
+        model = ReplayStorage
+

@@ -38,8 +38,7 @@ def compute_parent_key(key):
 
 
 class NodeQuerySet(models.QuerySet):
-    def delete(self):
-        raise NotImplementedError
+    pass
 
 
 class FamilyMixin:
@@ -306,6 +305,15 @@ class NodeAllAssetsMappingMixin:
     def expire_node_all_asset_ids_mapping_from_memory(cls, org_id):
         org_id = str(org_id)
         cls.orgid_nodekey_assetsid_mapping.pop(org_id, None)
+
+    @classmethod
+    def expire_all_orgs_node_all_asset_ids_mapping_from_memory(cls):
+        orgs = Organization.objects.all()
+        org_ids = [str(org.id) for org in orgs]
+        org_ids.append(Organization.ROOT_ID)
+
+        for id in org_ids:
+            cls.expire_node_all_asset_ids_mapping_from_memory(id)
 
     # get order: from memory -> (from cache -> to generate)
     @classmethod
@@ -600,7 +608,7 @@ class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
             'isParent': True,
             'open': self.is_org_root(),
             'meta': {
-                'node': {
+                'data': {
                     "id": self.id,
                     "name": self.name,
                     "value": self.value,
@@ -613,14 +621,14 @@ class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
         tree_node = TreeNode(**data)
         return tree_node
 
-    def has_children_or_has_assets(self):
-        if self.children or self.get_assets().exists():
-            return True
-        return False
+    def has_offspring_assets(self):
+        # 拥有后代资产
+        return self.get_all_assets().exists()
 
     def delete(self, using=None, keep_parents=False):
-        if self.has_children_or_has_assets():
+        if self.has_offspring_assets():
             return
+        self.all_children.delete()
         return super().delete(using=using, keep_parents=keep_parents)
 
     def update_child_full_value(self):

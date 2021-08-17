@@ -6,9 +6,12 @@ from threading import Thread
 from collections import defaultdict
 from itertools import chain
 
+from django.conf import settings
 from django.db.models.signals import m2m_changed
 from django.core.cache import cache
 from django.http import JsonResponse
+from django.utils.translation import ugettext as _
+from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 from rest_framework.decorators import action
@@ -20,8 +23,12 @@ from ..utils import lazyproperty
 
 __all__ = [
     'JSONResponseMixin', 'CommonApiMixin', 'AsyncApiMixin', 'RelationMixin',
-    'SerializerMixin2', 'QuerySetMixin', 'ExtraFilterFieldsMixin', 'RenderToJsonMixin',
+    'QuerySetMixin', 'ExtraFilterFieldsMixin', 'RenderToJsonMixin',
+    'SerializerMixin', 'AllowBulkDestroyMixin', 'PaginatedResponseMixin'
 ]
+
+
+UserModel = get_user_model()
 
 
 class JSONResponseMixin(object):
@@ -47,27 +54,36 @@ class RenderToJsonMixin:
         column_title_field_pairs = jms_context.get('column_title_field_pairs', ())
         data['title'] = column_title_field_pairs
 
+        if isinstance(request.data, (list, tuple)) and not any(request.data):
+            error = _("Request file format may be wrong")
+            return Response(data={"error": error}, status=400)
         return Response(data=data)
 
 
 class SerializerMixin:
     """ 根据用户请求动作的不同，获取不同的 `serializer_class `"""
 
+    action: str
+    request: Request
+
     serializer_classes = None
+    single_actions = ['put', 'retrieve', 'patch']
 
     def get_serializer_class_by_view_action(self):
         if not hasattr(self, 'serializer_classes'):
             return None
         if not isinstance(self.serializer_classes, dict):
             return None
-        action = self.request.query_params.get('action')
 
-        serializer_class = None
-        if action:
-            # metadata方法 使用 action 参数获取
-            serializer_class = self.serializer_classes.get(action)
+        view_action = self.request.query_params.get('action') or self.action or 'list'
+        serializer_class = self.serializer_classes.get(view_action)
+
         if serializer_class is None:
-            serializer_class = self.serializer_classes.get(self.action)
+            view_method = self.request.method.lower()
+            serializer_class = self.serializer_classes.get(view_method)
+
+        if serializer_class is None and view_action in self.single_actions:
+            serializer_class = self.serializer_classes.get('single')
         if serializer_class is None:
             serializer_class = self.serializer_classes.get('display')
         if serializer_class is None:
@@ -292,39 +308,39 @@ class RelationMixin:
         self.send_m2m_changed_signal(instance, 'post_remove')
 
 
-class SerializerMixin2:
-    serializer_classes = {}
-
-    def get_serializer_class(self):
-        if self.serializer_classes:
-            serializer_class = self.serializer_classes.get(
-                self.action, self.serializer_classes.get('default')
-            )
-
-            if isinstance(serializer_class, dict):
-                serializer_class = serializer_class.get(
-                    self.request.method.lower, serializer_class.get('default')
-                )
-
-            assert serializer_class, '`serializer_classes` config error'
-            return serializer_class
-        return super().get_serializer_class()
-
-
 class QuerySetMixin:
     def get_queryset(self):
         queryset = super().get_queryset()
         serializer_class = self.get_serializer_class()
+
         if serializer_class and hasattr(serializer_class, 'setup_eager_loading'):
             queryset = serializer_class.setup_eager_loading(queryset)
 
         return queryset
 
 
-class AllowBulkDestoryMixin:
+class AllowBulkDestroyMixin:
     def allow_bulk_destroy(self, qs, filtered):
         """
         我们规定，批量删除的情况必须用 `id` 指定要删除的数据。
         """
         query = str(filtered.query)
         return '`id` IN (' in query or '`id` =' in query
+
+
+class RoleAdminMixin:
+    kwargs: dict
+    user_id_url_kwarg = 'pk'
+
+    @lazyproperty
+    def user(self):
+        user_id = self.kwargs.get(self.user_id_url_kwarg)
+        return UserModel.objects.get(id=user_id)
+
+
+class RoleUserMixin:
+    request: Request
+
+    @lazyproperty
+    def user(self):
+        return self.request.user

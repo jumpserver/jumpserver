@@ -6,6 +6,7 @@ from django.db.models.signals import m2m_changed
 from django.db.models.functions import Concat
 
 from common.permissions import IsOrgAdmin
+from common.utils import get_logger
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import current_org
 from .. import models, serializers
@@ -14,6 +15,8 @@ __all__ = [
     'SystemUserAssetRelationViewSet', 'SystemUserNodeRelationViewSet',
     'SystemUserUserRelationViewSet',
 ]
+
+logger = get_logger(__name__)
 
 
 class RelationMixin:
@@ -24,8 +27,8 @@ class RelationMixin:
             queryset = queryset.filter(systemuser__org_id=org_id)
 
         queryset = queryset.annotate(systemuser_display=Concat(
-            F('systemuser__name'), Value('('), F('systemuser__username'),
-            Value(')')
+            F('systemuser__name'), Value('('),
+            F('systemuser__username'), Value(')')
         ))
         return queryset
 
@@ -41,10 +44,11 @@ class RelationMixin:
             system_users_objects_map[i.systemuser].append(_id)
 
         sender = self.get_sender()
-        for system_user, objects in system_users_objects_map.items():
+        for system_user, object_ids in system_users_objects_map.items():
+            logger.debug('System user relation changed, send m2m_changed signals')
             m2m_changed.send(
                 sender=sender, instance=system_user, action='post_add',
-                reverse=False, model=model, pk_set=objects
+                reverse=False, model=model, pk_set=set(object_ids)
             )
 
     def get_sender(self):
@@ -71,7 +75,7 @@ class SystemUserAssetRelationViewSet(BaseRelationViewSet):
     ]
     search_fields = [
         "id", "asset__hostname", "asset__ip",
-        "systemuser__name", "systemuser__username"
+        "systemuser__name", "systemuser__username",
     ]
 
     def get_objects_attr(self):

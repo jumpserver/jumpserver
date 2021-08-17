@@ -3,7 +3,6 @@
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
-from common.drf.serializers import AdaptedBulkListSerializer
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
 from ..models import Label
@@ -15,17 +14,21 @@ class LabelSerializer(BulkOrgResourceModelSerializer):
 
     class Meta:
         model = Label
-        fields = [
-            'id', 'name', 'value', 'category', 'is_active', 'comment',
-            'date_created', 'asset_count', 'assets', 'category_display'
+        fields_mini = ['id', 'name']
+        fields_small = fields_mini + [
+            'value', 'category', 'category_display',
+            'is_active',
+            'date_created',
+            'comment',
         ]
+        fields_m2m = ['asset_count', 'assets']
+        fields = fields_small + fields_m2m
         read_only_fields = (
             'category', 'date_created', 'asset_count',
         )
         extra_kwargs = {
             'assets': {'required': False}
         }
-        list_serializer_class = AdaptedBulkListSerializer
 
     @staticmethod
     def get_asset_count(obj):

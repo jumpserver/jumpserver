@@ -1,8 +1,8 @@
 # ~*~ coding: utf-8 ~*~
-from django.core.cache import cache
+from collections import defaultdict
+
 from django.utils.translation import ugettext as _
 from rest_framework.decorators import action
-from django.conf import settings
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
@@ -16,14 +16,13 @@ from common.mixins import CommonApiMixin
 from common.utils import get_logger
 from orgs.utils import current_org
 from orgs.models import ROLE as ORG_ROLE, OrganizationMember
-from users.utils import send_reset_mfa_mail
+from users.utils import send_reset_mfa_mail, LoginBlockUtil, MFABlockUtils
 from .. import serializers
 from ..serializers import UserSerializer, UserRetrieveSerializer, MiniUserSerializer, InviteSerializer
 from .mixins import UserQuerysetMixin
 from ..models import User
 from ..signals import post_user_create
 from ..filters import OrgRoleUserFilterBackend
-
 
 logger = get_logger(__name__)
 __all__ = [
@@ -33,7 +32,7 @@ __all__ = [
 
 
 class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
-    filterset_fields = ('username', 'email', 'name', 'id', 'source')
+    filterset_fields = ('username', 'email', 'name', 'id', 'source', 'role')
     search_fields = filterset_fields
     permission_classes = (IsOrgAdmin, CanUpdateDeleteUser)
     serializer_classes = {
@@ -155,10 +154,17 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         serializer = serializer_cls(data=data, many=True)
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data
+
+        users_by_role = defaultdict(list)
         for i in validated_data:
-            i['org_id'] = current_org.org_id()
-        relations = [OrganizationMember(**i) for i in validated_data]
-        OrganizationMember.objects.bulk_create(relations, ignore_conflicts=True)
+            users_by_role[i['role']].append(i['user'])
+
+        OrganizationMember.objects.add_users_by_role(
+            current_org,
+            users=users_by_role[ORG_ROLE.USER],
+            admins=users_by_role[ORG_ROLE.ADMIN],
+            auditors=users_by_role[ORG_ROLE.AUDITOR]
+        )
         return Response(serializer.data, status=201)
 
     @action(methods=['post'], detail=True, permission_classes=(IsOrgAdmin,))
@@ -177,7 +183,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         return Response(status=204)
 
 
-class UserChangePasswordApi(UserQuerysetMixin, generics.RetrieveUpdateAPIView):
+class UserChangePasswordApi(UserQuerysetMixin, generics.UpdateAPIView):
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.ChangeUserPasswordSerializer
 
@@ -190,16 +196,12 @@ class UserChangePasswordApi(UserQuerysetMixin, generics.RetrieveUpdateAPIView):
 class UserUnblockPKApi(UserQuerysetMixin, generics.UpdateAPIView):
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.UserSerializer
-    key_prefix_limit = "_LOGIN_LIMIT_{}_{}"
-    key_prefix_block = "_LOGIN_BLOCK_{}"
 
     def perform_update(self, serializer):
         user = self.get_object()
         username = user.username if user else ''
-        key_limit = self.key_prefix_limit.format(username, '*')
-        key_block = self.key_prefix_block.format(username)
-        cache.delete_pattern(key_limit)
-        cache.delete(key_block)
+        LoginBlockUtil.unblock_user(username)
+        MFABlockUtils.unblock_user(username)
 
 
 class UserResetOTPApi(UserQuerysetMixin, generics.RetrieveAPIView):

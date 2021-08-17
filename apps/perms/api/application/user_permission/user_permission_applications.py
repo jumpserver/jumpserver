@@ -4,6 +4,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 
 from common.mixins.api import CommonApiMixin
+from common.tree import TreeNodeSerializer
 from applications.api.mixin import (
     SerializeApplicationToTreeNodeMixin
 )
@@ -25,7 +26,13 @@ __all__ = [
 class AllGrantedApplicationsMixin(CommonApiMixin, ListAPIView):
     only_fields = serializers.ApplicationGrantedSerializer.Meta.only_fields
     serializer_class = serializers.ApplicationGrantedSerializer
-    filterset_fields = ['id', 'name', 'category', 'type', 'comment']
+    filterset_fields = {
+        'id': ['exact'],
+        'name': ['exact'],
+        'category': ['exact'],
+        'type': ['exact', 'in'],
+        'comment': ['exact'],
+    }
     search_fields = ['name', 'comment']
     user: None
 
@@ -46,11 +53,13 @@ class ApplicationsAsTreeMixin(SerializeApplicationToTreeNodeMixin):
     """
     将应用序列化成树的结构返回
     """
+    serializer_class = TreeNodeSerializer
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        data = self.serialize_applications_with_org(queryset)
-        return Response(data=data)
+        tree_nodes = self.serialize_applications_with_org(queryset)
+        serializer = self.get_serializer(tree_nodes, many=True)
+        return Response(data=serializer.data)
 
 
 class UserAllGrantedApplicationsAsTreeApi(ApplicationsAsTreeMixin, UserAllGrantedApplicationsApi):

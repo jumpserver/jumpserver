@@ -13,6 +13,9 @@ service="${2-all}"
 trap cleanup EXIT
 if [[ "$action" == "bash" || "$action" == "sh" ]];then
     bash
+elif [[ "$action" == "sleep" ]];then
+    echo "Sleep 365 days"
+    sleep 365d
 else
     python jms "${action}" "${service}"
 fi

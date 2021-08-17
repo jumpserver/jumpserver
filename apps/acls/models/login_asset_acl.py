@@ -3,7 +3,7 @@ from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from orgs.mixins.models import OrgModelMixin, OrgManager
 from .base import BaseACL, BaseACLQuerySet
-from ..utils import contains_ip
+from common.utils.ip import contains_ip
 
 
 class ACLManager(OrgManager):
@@ -37,6 +37,9 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
     class Meta:
         unique_together = ('name', 'org_id')
         ordering = ('priority', '-date_updated', 'name')
+
+    def __str__(self):
+        return self.name
 
     @classmethod
     def filter(cls, user, asset, system_user, action):

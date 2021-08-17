@@ -7,12 +7,13 @@ from django.db.models import signals
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import is_uuid, lazyproperty
+from common.utils import lazyproperty, settings
 from common.const import choices
-from common.db.models import ChoiceSet
+from common.tree import TreeNode
+from common.db.models import TextChoices
 
 
-class ROLE(ChoiceSet):
+class ROLE(TextChoices):
     ADMIN = choices.ADMIN, _('Organization administrator')
     AUDITOR = choices.AUDITOR, _("Organization auditor")
     USER = choices.USER, _('User')
@@ -193,7 +194,8 @@ class Organization(models.Model):
 
     @classmethod
     def root(cls):
-        return cls(id=cls.ROOT_ID, name=cls.ROOT_NAME)
+        name = settings.GLOBAL_ORG_DISPLAY_NAME or cls.ROOT_NAME
+        return cls(id=cls.ROOT_ID, name=name)
 
     def is_root(self):
         return self.id == self.ROOT_ID
@@ -231,6 +233,20 @@ class Organization(models.Model):
             return 0
         with tmp_to_org(self):
             return resource_model.objects.all().count()
+
+    def as_tree_node(self, pid, opened=True):
+        node = TreeNode(**{
+            'id': str(self.id),
+            'name': self.name,
+            'title': self.name,
+            'pId': pid,
+            'open': opened,
+            'isParent': True,
+            'meta': {
+                'type': 'org'
+            }
+        })
+        return node
 
 
 def _convert_to_uuid_set(users):

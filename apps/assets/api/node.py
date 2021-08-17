@@ -28,6 +28,7 @@ from ..tasks import (
 )
 from .. import serializers
 from .mixin import SerializeToTreeNodeMixin
+from assets.locks import NodeAddChildrenLock
 
 
 logger = get_logger(__file__)
@@ -70,8 +71,8 @@ class NodeViewSet(OrgModelViewSet):
         if node.is_org_root():
             error = _("You can't delete the root node ({})".format(node.value))
             return Response(data={'error': error}, status=status.HTTP_403_FORBIDDEN)
-        if node.has_children_or_has_assets():
-            error = _("Deletion failed and the node contains children or assets")
+        if node.has_offspring_assets():
+            error = _("Deletion failed and the node contains assets")
             return Response(data={'error': error}, status=status.HTTP_403_FORBIDDEN)
         return super().destroy(request, *args, **kwargs)
 
@@ -114,15 +115,16 @@ class NodeChildrenApi(generics.ListCreateAPIView):
         return super().initial(request, *args, **kwargs)
 
     def perform_create(self, serializer):
-        data = serializer.validated_data
-        _id = data.get("id")
-        value = data.get("value")
-        if not value:
-            value = self.instance.get_next_child_preset_name()
-        node = self.instance.create_child(value=value, _id=_id)
-        # 避免查询 full value
-        node._full_value = node.value
-        serializer.instance = node
+        with NodeAddChildrenLock(self.instance):
+            data = serializer.validated_data
+            _id = data.get("id")
+            value = data.get("value")
+            if not value:
+                value = self.instance.get_next_child_preset_name()
+            node = self.instance.create_child(value=value, _id=_id)
+            # 避免查询 full value
+            node._full_value = node.value
+            serializer.instance = node
 
     def get_object(self):
         pk = self.kwargs.get('pk') or self.request.query_params.get('id')
@@ -221,7 +223,8 @@ class NodeAddChildrenApi(generics.UpdateAPIView):
     serializer_class = serializers.NodeAddChildrenSerializer
     instance = None
 
-    def put(self, request, *args, **kwargs):
+    def update(self, request, *args, **kwargs):
+        """ 同时支持 put 和 patch 方法"""
         instance = self.get_object()
         node_ids = request.data.get("nodes")
         children = Node.objects.filter(id__in=node_ids)

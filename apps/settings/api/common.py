@@ -81,7 +81,7 @@ class PublicSettingApi(generics.RetrieveAPIView):
         logo_urls = {
             'logo_logout': static('img/logo.png'),
             'logo_index': static('img/logo_text.png'),
-            'login_image': static('img/login_image.png'),
+            'login_image': static('img/login_image.jpg'),
             'favicon': static('img/facio.ico')
         }
         if not settings.XPACK_ENABLED:
@@ -112,19 +112,26 @@ class PublicSettingApi(generics.RetrieveAPIView):
                 "LOGIN_CONFIRM_ENABLE": settings.LOGIN_CONFIRM_ENABLE,
                 "SECURITY_VIEW_AUTH_NEED_MFA": settings.SECURITY_VIEW_AUTH_NEED_MFA,
                 "SECURITY_MFA_VERIFY_TTL": settings.SECURITY_MFA_VERIFY_TTL,
+                "OLD_PASSWORD_HISTORY_LIMIT_COUNT": settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT,
                 "SECURITY_COMMAND_EXECUTION": settings.SECURITY_COMMAND_EXECUTION,
                 "SECURITY_PASSWORD_EXPIRATION_TIME": settings.SECURITY_PASSWORD_EXPIRATION_TIME,
+                "SECURITY_LUNA_REMEMBER_AUTH": settings.SECURITY_LUNA_REMEMBER_AUTH,
                 "XPACK_LICENSE_IS_VALID": has_valid_xpack_license(),
                 "LOGIN_TITLE": self.get_login_title(),
                 "LOGO_URLS": self.get_logo_urls(),
                 "TICKETS_ENABLED": settings.TICKETS_ENABLED,
                 "PASSWORD_RULE": {
                     'SECURITY_PASSWORD_MIN_LENGTH': settings.SECURITY_PASSWORD_MIN_LENGTH,
+                    'SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH': settings.SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH,
                     'SECURITY_PASSWORD_UPPER_CASE': settings.SECURITY_PASSWORD_UPPER_CASE,
                     'SECURITY_PASSWORD_LOWER_CASE': settings.SECURITY_PASSWORD_LOWER_CASE,
                     'SECURITY_PASSWORD_NUMBER': settings.SECURITY_PASSWORD_NUMBER,
                     'SECURITY_PASSWORD_SPECIAL_CHAR': settings.SECURITY_PASSWORD_SPECIAL_CHAR,
-                }
+                },
+                "AUTH_WECOM": settings.AUTH_WECOM,
+                "AUTH_DINGTALK": settings.AUTH_DINGTALK,
+                "AUTH_FEISHU": settings.AUTH_FEISHU,
+                'SECURITY_WATERMARK_ENABLED': settings.SECURITY_WATERMARK_ENABLED
             }
         }
         return instance
@@ -140,6 +147,9 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'ldap': serializers.LDAPSettingSerializer,
         'email': serializers.EmailSettingSerializer,
         'email_content': serializers.EmailContentSettingSerializer,
+        'wecom': serializers.WeComSettingSerializer,
+        'dingtalk': serializers.DingTalkSettingSerializer,
+        'feishu': serializers.FeiShuSettingSerializer,
     }
 
     def get_serializer_class(self):
@@ -153,7 +163,8 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         items = self.get_fields().keys()
-        return {item: getattr(settings, item) for item in items}
+        obj = {item: getattr(settings, item) for item in items}
+        return obj
 
     def parse_serializer_data(self, serializer):
         data = []
@@ -162,6 +173,8 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         category = self.request.query_params.get('category', '')
         for name, value in serializer.validated_data.items():
             encrypted = name in encrypted_items
+            if encrypted and value in ['', None]:
+                continue
             data.append({
                 'name': name, 'value': value,
                 'encrypted': encrypted, 'category': category

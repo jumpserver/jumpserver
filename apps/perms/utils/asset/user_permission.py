@@ -30,7 +30,7 @@ logger = get_logger(__name__)
 
 def get_user_all_asset_perm_ids(user) -> set:
     asset_perm_ids = set()
-    user_perm_id = AssetPermission.users.through.objects\
+    user_perm_id = AssetPermission.users.through.objects \
         .filter(user_id=user.id) \
         .values_list('assetpermission_id', flat=True) \
         .distinct()
@@ -41,8 +41,8 @@ def get_user_all_asset_perm_ids(user) -> set:
         .values_list('usergroup_id', flat=True) \
         .distinct()
     group_ids = list(group_ids)
-    groups_perm_id = AssetPermission.user_groups.through.objects\
-        .filter(usergroup_id__in=group_ids)\
+    groups_perm_id = AssetPermission.user_groups.through.objects \
+        .filter(usergroup_id__in=group_ids) \
         .values_list('assetpermission_id', flat=True) \
         .distinct()
     asset_perm_ids.update(groups_perm_id)
@@ -203,7 +203,8 @@ class UserGrantedTreeRefreshController:
                         logger.info(f'Rebuild user tree: user={self.user} org={current_org}')
                         utils = UserGrantedTreeBuildUtils(user)
                         utils.rebuild_user_granted_tree()
-                        logger.info(f'Rebuild user tree ok: cost={time.time() - t_start} user={self.user} org={current_org}')
+                        logger.info(
+                            f'Rebuild user tree ok: cost={time.time() - t_start} user={self.user} org={current_org}')
 
 
 class UserGrantedUtilsBase:
@@ -488,11 +489,12 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
 
         if granted_status == NodeFrom.granted:
             assets = Asset.objects.order_by().filter(nodes__id=node.id)
-            return assets
         elif granted_status == NodeFrom.asset:
-            return self._get_indirect_granted_node_assets(node.id)
+            assets = self._get_indirect_granted_node_assets(node.id)
         else:
-            return Asset.objects.none()
+            assets = Asset.objects.none()
+        assets = assets.order_by('hostname')
+        return assets
 
     def _get_indirect_granted_node_assets(self, id) -> AssetQuerySet:
         assets = Asset.objects.order_by().filter(nodes__id=id).distinct() & self.get_direct_granted_assets()
@@ -538,18 +540,26 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
 
 
 class UserGrantedNodesQueryUtils(UserGrantedUtilsBase):
+    def sort(self, nodes):
+        nodes = sorted(nodes, key=lambda x: x.value)
+        return nodes
+
     def get_node_children(self, key):
         if not key:
             return self.get_top_level_nodes()
 
+        nodes = PermNode.objects.none()
+        if key == PermNode.FAVORITE_NODE_KEY:
+            return nodes
+
         node = PermNode.objects.get(key=key)
         granted_status = node.get_granted_status(self.user)
         if granted_status == NodeFrom.granted:
-            return PermNode.objects.filter(parent_key=key)
+            nodes = PermNode.objects.filter(parent_key=key)
         elif granted_status in (NodeFrom.asset, NodeFrom.child):
-            return self.get_indirect_granted_node_children(key)
-        else:
-            return PermNode.objects.none()
+            nodes = self.get_indirect_granted_node_children(key)
+        nodes = self.sort(nodes)
+        return nodes
 
     def get_indirect_granted_node_children(self, key):
         """
@@ -571,7 +581,8 @@ class UserGrantedNodesQueryUtils(UserGrantedUtilsBase):
 
     def get_top_level_nodes(self):
         nodes = self.get_special_nodes()
-        nodes.extend(self.get_indirect_granted_node_children(''))
+        real_nodes = self.get_indirect_granted_node_children('')
+        nodes.extend(self.sort(real_nodes))
         return nodes
 
     def get_ungrouped_node(self):

@@ -6,15 +6,31 @@ from django_auth_ldap.backend import populate_user
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django_cas_ng.signals import cas_user_authenticated
+from django.db.models.signals import post_save
 
 from jms_oidc_rp.signals import openid_create_or_update_user
 
 from common.utils import get_logger
 from .signals import post_user_create
-from .models import User
+from .models import User, UserPasswordHistory
 
 
 logger = get_logger(__file__)
+
+
+@receiver(post_save, sender=User)
+def save_passwd_change(sender, instance: User, **kwargs):
+    passwds = UserPasswordHistory.objects.filter(user=instance).order_by('-date_created')\
+                  .values_list('password', flat=True)[:int(settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT)]
+
+    for p in passwds:
+        if instance.password == p:
+            break
+    else:
+        UserPasswordHistory.objects.create(
+            user=instance, password=instance.password,
+            date_created=instance.date_password_last_updated
+        )
 
 
 @receiver(post_user_create)
