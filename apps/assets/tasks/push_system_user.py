@@ -4,7 +4,7 @@ from itertools import groupby
 from celery import shared_task
 from common.db.utils import get_object_if_need, get_objects
 from django.utils.translation import ugettext as _
-from django.db.models import Empty
+from django.db.models import Empty, Q
 
 from common.utils import encrypt_password, get_logger
 from assets.models import SystemUser, Asset, AuthBook
@@ -239,9 +239,12 @@ def push_system_user_util(system_user, assets, task_name, username=None):
         no_special_auth = []
         special_auth_set = set()
 
-        auth_books = AuthBook.objects.filter(username__in=usernames, asset_id__in=asset_ids)
+        auth_books = AuthBook.objects.filter(asset_id__in=asset_ids).filter(
+            Q(username__in=usernames) | Q(systemuser__username__in=usernames)
+        ).prefetch_related('systemuser')
 
         for auth_book in auth_books:
+            auth_book.load_auth()
             special_auth_set.add((auth_book.username, auth_book.asset_id))
 
         for _username in usernames:
