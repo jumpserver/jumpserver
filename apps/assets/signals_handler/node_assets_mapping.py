@@ -48,7 +48,6 @@ def expire_node_assets_mapping_for_memory(org_id):
     Node.expire_node_all_asset_ids_mapping_from_cache(root_org_id)
 
     node_assets_mapping_for_memory_pub_sub.publish(org_id)
-    node_assets_mapping_for_memory_pub_sub.publish(root_org_id)
 
 
 @receiver(post_save, sender=Node)
@@ -86,7 +85,9 @@ def subscribe_node_assets_mapping_expire(sender, **kwargs):
                     if message["type"] != "message":
                         continue
                     org_id = message['data'].decode()
+                    root_org_id = Organization.ROOT_ID
                     Node.expire_node_all_asset_ids_mapping_from_memory(org_id)
+                    Node.expire_node_all_asset_ids_mapping_from_memory(root_org_id)
                     logger.debug(
                         "Expire node assets id mapping from memory of org={}, pid={}"
                         "".format(str(org_id), os.getpid())
