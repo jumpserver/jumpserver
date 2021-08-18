@@ -40,7 +40,7 @@ class AccountFilterSet(BaseFilterSet):
         if not node_id:
             return qs
         node = get_object_or_404(Node, pk=node_id)
-        node_ids = node.get_children(with_self=True).values_list('id', flat=True)
+        node_ids = node.get_all_children(with_self=True).values_list('id', flat=True)
         node_ids = list(node_ids)
         qs = qs.filter(asset__nodes__in=node_ids)
         return qs
