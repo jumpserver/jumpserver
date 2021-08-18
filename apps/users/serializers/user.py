@@ -2,14 +2,13 @@
 #
 from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _
-from django.db.models import TextChoices
 from rest_framework import serializers
 
 from common.mixins import CommonBulkSerializerMixin
 from common.permissions import CanUpdateDeleteUser
 from orgs.models import ROLE as ORG_ROLE
 from ..models import User
-
+from ..const import SystemOrOrgRole, PasswordStrategy
 
 __all__ = [
     'UserSerializer', 'UserRetrieveSerializer', 'MiniUserSerializer',
@@ -18,10 +17,6 @@ __all__ = [
 
 
 class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
-    class PasswordStrategy(TextChoices):
-        email = 'email', _('Reset link will be generated and sent to the user')
-        custom = 'custom', _('Set password')
-
     password_strategy = serializers.ChoiceField(
         choices=PasswordStrategy.choices, default=PasswordStrategy.email, required=False,
         write_only=True, label=_('Password strategy')
@@ -38,6 +33,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         label=_('Organization role name'), allow_null=True, required=False,
         child=serializers.ChoiceField(choices=ORG_ROLE.choices), default=["User"]
     )
+    system_or_org_role = serializers.ChoiceField(read_only=True, choices=SystemOrOrgRole.choices, label=_('Role'))
 
     class Meta:
         model = User
@@ -48,7 +44,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
             'password', 'public_key',
         ]
         # small 指的是 不需要计算的直接能从一张表中获取到的数据
-        fields_small = fields_mini + fields_write_only + [
+        fields_small = fields_mini + fields_write_only + ['system_or_org_role',
             'email', 'wechat', 'phone', 'mfa_level',
             'source', 'source_display', 'can_public_key_auth', 'need_update_password',
             'mfa_enabled', 'is_valid', 'is_expired', 'is_active',  # 布尔字段
@@ -184,7 +180,6 @@ class InviteSerializer(serializers.Serializer):
 
 
 class ServiceAccountSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
         fields = ['id', 'name', 'access_key']

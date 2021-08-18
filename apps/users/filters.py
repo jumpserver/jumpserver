@@ -5,6 +5,7 @@ from rest_framework.filters import BaseFilterBackend
 
 from common.drf.filters import BaseFilterSet
 from users.models.user import User
+from users.const import SystemOrOrgRole
 from orgs.utils import current_org
 
 
@@ -36,13 +37,26 @@ class OrgRoleUserFilterBackend(BaseFilterBackend):
 
 
 class UserFilter(BaseFilterSet):
-    role = filters.CharFilter(method='filter_role')
+    system_or_org_role = filters.ChoiceFilter(choices=SystemOrOrgRole.choices, method='filter_system_or_org_role')
 
     class Meta:
         model = User
         fields = (
-            'id', 'username', 'email', 'name', 'source', 'role'
+            'id', 'username', 'email', 'name', 'source', 'system_or_org_role'
         )
 
-    def filter_role(self, queryset, name, value):
-        return queryset.filter(Q(role=value) | Q(m2m_org_members__role=value))
+    def filter_system_or_org_role(self, queryset, name, value):
+        value = value.split('_')
+        if len(value) == 1:
+            role_type, value = None, value[0]
+        else:
+            role_type, value = value
+        system_queries = Q(role=value)
+        org_queries = Q(m2m_org_members__role=value, m2m_org_members__org_id=current_org.id)
+        if not role_type:
+            queries = system_queries | org_queries
+        elif role_type == 'system':
+            queries = system_queries
+        elif role_type == 'org':
+            queries = org_queries
+        return queryset.filter(queries)
