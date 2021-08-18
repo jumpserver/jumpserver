@@ -160,6 +160,10 @@ class SecuritySettingSerializer(serializers.Serializer):
         required=True, label=_('Enable terminal register'),
         help_text=_("Allow terminal register, after all terminal setup, you should disable this for security")
     )
+    SECURITY_WATERMARK_ENABLED = serializers.BooleanField(
+        required=True, label=_('Replay watermark'),
+        help_text=_('Enabled, the session replay contains watermark information')
+    )
     SECURITY_LOGIN_LIMIT_COUNT = serializers.IntegerField(
         min_value=3, max_value=99999,
         label=_('Limit the number of login failures')
