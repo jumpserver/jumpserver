@@ -36,7 +36,7 @@ class Services(TextChoices):
 
     @classmethod
     def web_services(cls):
-        return [cls.gunicorn, cls.daphne]
+        return [cls.gunicorn, cls.daphne, cls.flower]
 
     @classmethod
     def celery_services(cls):
@@ -44,7 +44,7 @@ class Services(TextChoices):
 
     @classmethod
     def task_services(cls):
-        return cls.celery_services() + [cls.beat, cls.flower]
+        return cls.celery_services() + [cls.beat]
 
     @classmethod
     def all_services(cls):

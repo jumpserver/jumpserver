@@ -17,7 +17,7 @@ __all__ = [
 class ProtocolField(serializers.RegexField):
     protocols = '|'.join(dict(Asset.Protocol.choices).keys())
     default_error_messages = {
-        'invalid': _('Protocol format should {}/{}'.format(protocols, '1-65535'))
+        'invalid': _('Protocol format should {}/{}').format(protocols, '1-65535')
     }
     regex = r'^(%s)/(\d{1,5})$' % protocols
 

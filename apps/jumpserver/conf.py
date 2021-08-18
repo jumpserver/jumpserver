@@ -267,7 +267,7 @@ class Config(dict):
         'SECURITY_INSECURE_COMMAND_LEVEL': 5,
         'SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER': '',
         'SECURITY_LUNA_REMEMBER_AUTH': True,
-        'SECURITY_WATERMARK_ENABLED': False,
+        'SECURITY_WATERMARK_ENABLED': True,
 
         'HTTP_BIND_HOST': '0.0.0.0',
         'HTTP_LISTEN_PORT': 8080,
@@ -310,6 +310,7 @@ class Config(dict):
         'FORGOT_PASSWORD_URL': '',
         'HEALTH_CHECK_TOKEN': '',
         'LOGIN_REDIRECT_TO_BACKEND':  None,  # 'OPENID / CAS
+        'CLOUD_SYNC_TASK_EXECUTION_KEEP_DAYS': 30,
 
         'TERMINAL_RDP_ADDR': ''
     }

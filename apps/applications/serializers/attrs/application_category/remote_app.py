@@ -40,6 +40,11 @@ class RemoteAppSerializer(serializers.Serializer):
         max_length=128, label=_('Application path'), allow_null=True
     )
 
+    def validate_asset(self, asset):
+        if not asset:
+            raise serializers.ValidationError(_('This field is required'))
+        return asset
+
     @staticmethod
     def get_asset_info(obj):
         asset_id = obj.get('asset')
