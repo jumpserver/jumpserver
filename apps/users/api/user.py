@@ -22,7 +22,7 @@ from ..serializers import UserSerializer, UserRetrieveSerializer, MiniUserSerial
 from .mixins import UserQuerysetMixin
 from ..models import User
 from ..signals import post_user_create
-from ..filters import OrgRoleUserFilterBackend
+from ..filters import OrgRoleUserFilterBackend, UserFilter
 
 logger = get_logger(__name__)
 __all__ = [
@@ -32,8 +32,8 @@ __all__ = [
 
 
 class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
-    filterset_fields = ('username', 'email', 'name', 'id', 'source', 'role')
-    search_fields = filterset_fields
+    filterset_class = UserFilter
+    search_fields = ('username', 'email', 'name', 'id', 'source', 'role')
     permission_classes = (IsOrgAdmin, CanUpdateDeleteUser)
     serializer_classes = {
         'default': UserSerializer,
