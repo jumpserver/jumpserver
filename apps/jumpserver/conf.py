@@ -310,6 +310,7 @@ class Config(dict):
         'FORGOT_PASSWORD_URL': '',
         'HEALTH_CHECK_TOKEN': '',
         'LOGIN_REDIRECT_TO_BACKEND':  None,  # 'OPENID / CAS
+        'CLOUD_SYNC_TASK_EXECUTION_KEEP_DAYS': 30,
 
         'TERMINAL_RDP_ADDR': ''
     }
