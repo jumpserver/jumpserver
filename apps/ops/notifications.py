@@ -33,7 +33,7 @@ class ServerPerformanceCheckUtil(object):
         'is_alive': {
             'default': False,
             'max_threshold': False,
-            'alarm_msg_format': _('[Alive] The terminal is offline: {name}')
+            'alarm_msg_format': _('The terminal is offline: {name}')
         },
         'disk_usage': {
             'default': 0,
