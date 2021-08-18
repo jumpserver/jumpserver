@@ -11,7 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework.renderers import JSONRenderer
 from rest_framework.request import Request
 
-from assets.models import Asset
+from assets.models import Asset, SystemUser
 from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR
 from jumpserver.utils import current_request
 from common.utils import get_request_ip, get_logger, get_syslogger
@@ -38,7 +38,7 @@ MODELS_NEED_RECORD = (
     'LoginACL', 'LoginAssetACL',
     # assets
     'Asset', 'Node', 'AdminUser', 'SystemUser', 'Domain', 'Gateway', 'CommandFilterRule',
-    'CommandFilter', 'Platform',
+    'CommandFilter', 'Platform', 'AuthBook',
     # applications
     'Application',
     # orgs
@@ -105,6 +105,11 @@ M2M_NEED_RECORD = {
         _('User and Group'),
         _('{User} *JOINED* {UserGroup}'),
         _('{User} *LEFT* {UserGroup}')
+    ),
+    SystemUser.assets.through._meta.object_name: (
+        _('Asset and SystemUser'),
+        _('{Asset} *ADD* {SystemUser}'),
+        _('{Asset} *REMOVE* {SystemUser}')
     ),
     Asset.nodes.through._meta.object_name: (
         _('Node and Asset'),
