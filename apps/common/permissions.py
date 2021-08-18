@@ -6,6 +6,7 @@ from django.conf import settings
 from common.exceptions import MFAVerifyRequired
 
 from orgs.utils import current_org
+from common.utils import is_uuid
 
 
 class IsValidUser(permissions.IsAuthenticated, permissions.BasePermission):
@@ -186,7 +187,7 @@ class IsObjectOwner(IsValidUser):
 class HasQueryParamsUserAndIsCurrentOrgMember(permissions.BasePermission):
     def has_permission(self, request, view):
         query_user_id = request.query_params.get('user')
-        if not query_user_id:
+        if not query_user_id or not is_uuid(query_user_id):
             return False
         query_user = current_org.get_members().filter(id=query_user_id).first()
         return bool(query_user)
