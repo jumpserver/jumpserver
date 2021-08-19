@@ -45,6 +45,8 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 - [Luna](https://github.com/jumpserver/luna) JumpServer Web Terminal 项目
 - [KoKo](https://github.com/jumpserver/koko) JumpServer 字符协议 Connector 项目，替代原来 Python 版本的 [Coco](https://github.com/jumpserver/coco)
 - [Lion](https://github.com/jumpserver/lion-release) JumpServer 图形协议 Connector 项目，依赖 [Apache Guacamole](https://guacamole.apache.org/)
+- [Clients](https://github.com/jumpserver/clients) JumpServer 客户端 项目
+- [Installer](https://github.com/jumpserver/installer) JumpServer 安装包 项目
 
 ### 社区
 
