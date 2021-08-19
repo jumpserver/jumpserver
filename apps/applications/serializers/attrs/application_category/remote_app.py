@@ -34,7 +34,7 @@ class ExistAssetPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
 class RemoteAppSerializer(serializers.Serializer):
     asset_info = serializers.SerializerMethodField()
     asset = ExistAssetPrimaryKeyRelatedField(
-        queryset=Asset.objects, required=False, label=_("Asset"), allow_null=True
+        queryset=Asset.objects, required=True, label=_("Asset"), allow_null=True
     )
     path = serializers.CharField(
         max_length=128, label=_('Application path'), allow_null=True
@@ -42,7 +42,7 @@ class RemoteAppSerializer(serializers.Serializer):
 
     def validate_asset(self, asset):
         if not asset:
-            raise serializers.ValidationError(_('This field is required'))
+            raise serializers.ValidationError(_('This field is required.'))
         return asset
 
     @staticmethod

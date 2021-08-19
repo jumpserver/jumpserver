@@ -389,8 +389,8 @@ msgstr "应用路径"
 
 #: applications/serializers/attrs/application_category/remote_app.py:45
 #: xpack/plugins/cloud/serializers.py:51
-msgid "This field is required"
-msgstr "这个字段是必填项"
+msgid "This field is required."
+msgstr "该字段是必填项。"
 
 #: applications/serializers/attrs/application_type/chrome.py:17
 #: applications/serializers/attrs/application_type/vmware_client.py:22
