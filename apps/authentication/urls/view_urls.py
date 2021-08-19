@@ -2,6 +2,7 @@
 #
 
 from django.urls import path, include
+from django.db.transaction import non_atomic_requests
 
 from .. import views
 from users import views as users_view
@@ -10,7 +11,7 @@ app_name = 'authentication'
 
 urlpatterns = [
     # login
-    path('login/', views.UserLoginView.as_view(), name='login'),
+    path('login/', non_atomic_requests(views.UserLoginView.as_view()), name='login'),
     path('login/otp/', views.UserLoginOtpView.as_view(), name='login-otp'),
     path('login/wait-confirm/', views.UserLoginWaitConfirmView.as_view(), name='login-wait-confirm'),
     path('login/guard/', views.UserLoginGuardView.as_view(), name='login-guard'),

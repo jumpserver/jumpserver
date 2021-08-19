@@ -4,6 +4,7 @@
 from __future__ import unicode_literals
 import os
 import datetime
+
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.http import HttpResponse
 from django.shortcuts import reverse, redirect
@@ -17,6 +18,7 @@ from django.views.generic.edit import FormView
 from django.conf import settings
 from django.urls import reverse_lazy
 from django.contrib.auth import BACKEND_SESSION_KEY
+from django.db.transaction import atomic
 
 from common.utils import get_request_ip, FlashMessageUtil
 from users.utils import (
@@ -107,7 +109,8 @@ class UserLoginView(mixins.AuthMixin, FormView):
         self.request.session.delete_test_cookie()
 
         try:
-            self.check_user_auth(decrypt_passwd=True)
+            with atomic():
+                self.check_user_auth(decrypt_passwd=True)
         except errors.AuthFailedError as e:
             form.add_error(None, e.msg)
             self.set_login_failed_mark()
