@@ -37,6 +37,6 @@ def on_authbook_post_create(sender, instance, **kwargs):
 @receiver(pre_save, sender=AuthBook)
 def on_authbook_pre_create(sender, instance, **kwargs):
     # 升级版本号
-    instance.version = instance.history.all().count() + 1
+    instance.version += 1
     # 即使在 root 组织也不怕
     instance.org_id = instance.asset.org_id
