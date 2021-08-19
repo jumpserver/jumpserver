@@ -49,6 +49,7 @@ class AccountSecretSerializer(AccountSerializer):
             'password': {'write_only': False},
             'private_key': {'write_only': False},
             'public_key': {'write_only': False},
+            'systemuser_display': {'label': _('System user display')}
         }
 
 
