@@ -127,7 +127,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
     def validate_password(self, password):
         from ..utils import check_password_rules
         password_strategy = self.initial_data.get('password_strategy')
-        if self.instance is None and password_strategy != self.PasswordStrategy.custom:
+        if self.instance is None and password_strategy != PasswordStrategy.custom:
             # 创建用户，使用邮件设置密码
             return
         if self.instance and not password:

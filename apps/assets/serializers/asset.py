@@ -71,7 +71,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     """
     class Meta:
         model = Asset
-        fields_mini = ['id', 'hostname', 'ip']
+        fields_mini = ['id', 'hostname', 'ip', 'platform', 'protocols']
         fields_small = fields_mini + [
             'protocol', 'port', 'protocols', 'is_active', 'public_ip',
             'number', 'vendor', 'model', 'sn', 'cpu_model', 'cpu_count',
