@@ -39,7 +39,4 @@ def on_authbook_pre_create(sender, instance, **kwargs):
     # 升级版本号
     instance.version += 1
     # 即使在 root 组织也不怕
-    if instance.database:
-        instance.org_id = instance.database.org_id
-    else:
-        instance.org_id = instance.asset.org_id
+    instance.org_id = instance.asset.org_id
