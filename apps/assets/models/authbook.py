@@ -12,7 +12,9 @@ __all__ = ['AuthBook']
 
 
 class AuthBook(BaseUser, AbsConnectivity):
-    asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, verbose_name=_('Asset'))
+    asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, null=True, verbose_name=_('Asset'))
+    database = models.ForeignKey('applications.Application', on_delete=models.CASCADE, null=True,
+                                 verbose_name=_('Database'))
     systemuser = models.ForeignKey('assets.SystemUser', on_delete=models.CASCADE, null=True, verbose_name=_("System user"))
     version = models.IntegerField(default=1, verbose_name=_('Version'))
     history = HistoricalRecords()
