@@ -21,6 +21,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 
 改变世界，从一点点开始 ...
 
+> 如需进一步了解 JumpServer 开源项目，推荐阅读 [JumpServer 的初心和使命](https://mp.weixin.qq.com/s/S6q_2rP_9MwaVwyqLQnXzA)
 
 ### 特色优势
 
@@ -34,9 +35,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 
 ### UI 展示
 
-![UI展示](https://download.jumpserver.org/images/UIDemo.gif)
-
-> 如需进一步了解 JumpServer 开源项目，推荐阅读 [JumpServer 的初心和使命](https://mp.weixin.qq.com/s/S6q_2rP_9MwaVwyqLQnXzA)
+![UI展示](![UI展示](https://www.jumpserver.org/images/screenshot/1.png)
 
 ### 在线体验
 
