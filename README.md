@@ -35,7 +35,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 
 ### UI 展示
 
-![UI展示](https://www.fit2cloud.com/jumpserver/images/screenshot/UIDemo.gif)
+![UI展示](https://www.jumpserver.org/images/screenshot/1.png)
 
 ### 在线体验
 
