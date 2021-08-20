@@ -32,6 +32,23 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 - 多租户: 一套系统，多个子公司和部门同时使用；
 - 多应用支持: 数据库，Windows远程应用，Kubernetes。
 
+### UI 展示
+
+![UI展示](https://download.jumpserver.org/images/UIDemo.gif)
+
+> 如需进一步了解 JumpServer 开源项目，推荐阅读 [JumpServer 的初心和使命](https://mp.weixin.qq.com/s/S6q_2rP_9MwaVwyqLQnXzA)
+
+### 在线体验
+
+-   环境地址：<https://demo.jumpserver.org/>
+-   用户名：test
+-   密码：test01
+
+| :warning: 注意                 |
+| :--------------------------- |
+| 该环境仅作体验目的使用，我们会定时清理、重置数据！    |
+| 请勿修改体验环境用户的密码！               |
+| 请勿在环境中添加业务生产环境地址、用户名密码等敏感信息！ |
 
 ### 快速开始
 
@@ -110,7 +127,7 @@ JumpServer是一款安全产品，请参考 [基本安全建议](https://docs.ju
 
 ### License & Copyright
 
-Copyright (c) 2014-2020 飞致云 FIT2CLOUD, All rights reserved.
+Copyright (c) 2014-2021 飞致云 FIT2CLOUD, All rights reserved.
 
 Licensed under The GNU General Public License version 2 (GPLv2)  (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
