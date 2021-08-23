@@ -114,3 +114,4 @@ azure-identity==1.5.0
 azure-mgmt-subscription==1.0.0
 qingcloud-sdk==1.2.12
 django-simple-history==3.0.0
+django-csp==3.7

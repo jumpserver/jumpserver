@@ -88,6 +88,7 @@ MIDDLEWARE = [
     'authentication.backends.oidc.middleware.OIDCRefreshIDTokenMiddleware',
     'authentication.backends.cas.middleware.CASMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
+    'csp.middleware.CSPMiddleware',
 ]
 
 
@@ -260,3 +261,11 @@ CACHES = {
 FORCE_SCRIPT_NAME = CONFIG.FORCE_SCRIPT_NAME
 SESSION_COOKIE_SECURE = CONFIG.SESSION_COOKIE_SECURE
 CSRF_COOKIE_SECURE = CONFIG.CSRF_COOKIE_SECURE
+SESSION_COOKIE_SECURE = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+CSP_DEFAULT_SRC = ("'self'", '127.0.0.1:9528')
+CSRF_COOKIE_HTTPONLY = True
+CSP_REPORT_URI = '/api/v1/report/'
+# CSP_SCRIPT_SRC_ELEM = ("'self'",)
+# CSP_SCRIPT_SRC_ATTR = ("'self'",)
+# CSP_SCRIPT_SRC_ELEM = ("'self'",)
