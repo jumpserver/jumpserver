@@ -1,12 +1,14 @@
 import copy
 from rest_framework import serializers
 from rest_framework.serializers import Serializer
+from rest_framework import serializers as s
 from rest_framework.serializers import ModelSerializer
 from rest_framework_bulk.serializers import BulkListSerializer
 
-from common.mixins import BulkListSerializerMixin
 from django.utils.functional import cached_property
-from rest_framework.utils.serializer_helpers import BindingDict
+
+from jumpserver.conf import Config
+from common.mixins import BulkListSerializerMixin
 from common.mixins.serializers import BulkSerializerMixin
 
 __all__ = [
@@ -83,3 +85,44 @@ class CeleryTaskSerializer(serializers.Serializer):
     task = serializers.CharField(read_only=True)
 
 
+class DataSerializerGenerator:
+    type_field_mapper = {
+        'str': s.CharField,
+        'int': s.IntegerField,
+        'float': s.FloatField,
+        'list': s.ListSerializer,
+        'dict': s.DictField,
+        'bool': s.BooleanField,
+    }
+
+    @classmethod
+    def generate_field(cls, field_data):
+        """
+        :param field_data: {'type': 'str', **kwargs }
+        :return:
+        """
+        tp = field_data['type']
+        if field_data.get('hidden'):
+            serializer_field_cls = s.HiddenField
+        elif field_data.get('choices'):
+            serializer_field_cls = s.ChoiceField
+        elif tp == 'str':
+            field_data.setdefault('max_length', 1024)
+            serializer_field_cls = s.URLField if field_data.get('url') else s.CharField
+        else:
+            serializer_field_cls = cls.type_field_mapper[tp]
+
+        valid_data = {
+            k: v for k, v in field_data.items()
+            if k not in ['type', 'hidden', 'url', 'default']
+        }
+
+        field = serializer_field_cls(**valid_data)
+        return field
+
+    @classmethod
+    def generate_serializer_class(cls, name):
+        fields_data = {}
+        for field in Config.fieldsets[name]['fields']:
+            fields_data[field] = cls.generate_field(Config.fields[field])
+        return type('{0}SettingSerializer'.format(name), (Serializer,), fields_data)

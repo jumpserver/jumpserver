@@ -8,12 +8,12 @@ from settings.models import Setting
 from common.permissions import IsSuperUser
 from common.message.backends.wecom import WeCom
 
-from .. import serializers
+from ..serializers import SettingsSerializer
 
 
 class WeComTestingAPI(GenericAPIView):
     permission_classes = (IsSuperUser,)
-    serializer_class = serializers.WeComSettingSerializer
+    serializer_class = SettingsSerializer.WecomSettingSerializer
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)

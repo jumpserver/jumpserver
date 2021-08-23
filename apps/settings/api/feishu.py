@@ -8,12 +8,12 @@ from settings.models import Setting
 from common.permissions import IsSuperUser
 from common.message.backends.feishu import FeiShu
 
-from .. import serializers
+from ..serializers import SettingsSerializer
 
 
 class FeiShuTestingAPI(GenericAPIView):
     permission_classes = (IsSuperUser,)
-    serializer_class = serializers.FeiShuSettingSerializer
+    serializer_class = SettingsSerializer.FeishuSettingSerializer
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)

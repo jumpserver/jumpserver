@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-
 from smtplib import SMTPSenderRefused
 from rest_framework import generics
 from rest_framework.views import Response, APIView
@@ -139,22 +138,10 @@ class PublicSettingApi(generics.RetrieveAPIView):
 
 class SettingsApi(generics.RetrieveUpdateAPIView):
     permission_classes = (IsSuperUser,)
-    serializer_class_mapper = {
-        'all': serializers.SettingsSerializer,
-        'basic': serializers.BasicSettingSerializer,
-        'terminal': serializers.TerminalSettingSerializer,
-        'security': serializers.SecuritySettingSerializer,
-        'ldap': serializers.LDAPSettingSerializer,
-        'email': serializers.EmailSettingSerializer,
-        'email_content': serializers.EmailContentSettingSerializer,
-        'wecom': serializers.WeComSettingSerializer,
-        'dingtalk': serializers.DingTalkSettingSerializer,
-        'feishu': serializers.FeiShuSettingSerializer,
-    }
 
     def get_serializer_class(self):
-        category = self.request.query_params.get('category', serializers.BasicSettingSerializer)
-        return self.serializer_class_mapper.get(category, serializers.BasicSettingSerializer)
+        category = self.request.query_params.get('category')
+        return getattr(serializers.SettingsSerializer, '{0}SettingSerializer'.format(category.title()))
 
     def get_fields(self):
         serializer = self.get_serializer_class()()

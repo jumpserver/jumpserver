@@ -8,12 +8,12 @@ from settings.models import Setting
 from common.permissions import IsSuperUser
 from common.message.backends.dingtalk import DingTalk
 
-from .. import serializers
+from ..serializers import SettingsSerializer
 
 
 class DingTalkTestingAPI(GenericAPIView):
     permission_classes = (IsSuperUser,)
-    serializer_class = serializers.DingTalkSettingSerializer
+    serializer_class = SettingsSerializer.DingtalkSettingSerializer
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
