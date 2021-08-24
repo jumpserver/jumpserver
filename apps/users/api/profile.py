@@ -4,14 +4,13 @@ import uuid
 from rest_framework import generics
 from common.permissions import IsOrgAdmin
 from rest_framework.permissions import IsAuthenticated
-from django.conf import settings
 
+from users.notifications import ResetPasswordMsg, ResetPasswordSuccessMsg, ResetSSHKeyMsg
 from common.permissions import (
     IsCurrentUserOrReadOnly
 )
 from .. import serializers
 from ..models import User
-from ..utils import send_reset_password_success_mail
 from .mixins import UserQuerysetMixin
 
 __all__ = [
@@ -29,11 +28,10 @@ class UserResetPasswordApi(UserQuerysetMixin, generics.UpdateAPIView):
     def perform_update(self, serializer):
         # Note: we are not updating the user object here.
         # We just do the reset-password stuff.
-        from ..utils import send_reset_password_mail
         user = self.get_object()
         user.password_raw = str(uuid.uuid4())
         user.save()
-        send_reset_password_mail(user)
+        ResetPasswordMsg(user).publish_async()
 
 
 class UserResetPKApi(UserQuerysetMixin, generics.UpdateAPIView):
@@ -41,11 +39,11 @@ class UserResetPKApi(UserQuerysetMixin, generics.UpdateAPIView):
     permission_classes = (IsOrgAdmin,)
 
     def perform_update(self, serializer):
-        from ..utils import send_reset_ssh_key_mail
         user = self.get_object()
         user.public_key = None
         user.save()
-        send_reset_ssh_key_mail(user)
+
+        ResetSSHKeyMsg(user).publish_async()
 
 
 # 废弃
@@ -84,4 +82,4 @@ class UserPublicKeyApi(generics.RetrieveUpdateAPIView):
 
     def perform_update(self, serializer):
         super().perform_update(serializer)
-        send_reset_password_success_mail(self.request, self.get_object())
+        ResetPasswordSuccessMsg(self.get_object(), self.request).publish_async()

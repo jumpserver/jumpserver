@@ -1,12 +1,14 @@
 from typing import Iterable
 import traceback
 from itertools import chain
+from collections import defaultdict
 
-from django.db.utils import ProgrammingError
 from celery import shared_task
 
+from common.utils import lazyproperty
+from users.models import User
 from notifications.backends import BACKEND
-from .models import SystemMsgSubscription
+from .models import SystemMsgSubscription, UserMsgSubscription
 
 __all__ = ('SystemMessage', 'UserMessage')
 
@@ -69,37 +71,49 @@ class Message(metaclass=MessageType):
         for backend in backends:
             try:
                 backend = BACKEND(backend)
+                if not backend.is_enable:
+                    continue
 
                 get_msg_method = getattr(self, f'get_{backend}_msg', self.get_common_msg)
-                msg = get_msg_method()
+
+                try:
+                    msg = get_msg_method()
+                except NotImplementedError:
+                    continue
+
                 client = backend.client()
 
-                if isinstance(msg, dict):
-                    client.send_msg(users, **msg)
-                else:
-                    client.send_msg(users, msg)
+                client.send_msg(users, **msg)
             except:
                 traceback.print_exc()
 
-    def get_common_msg(self) -> str:
+    def get_common_msg(self) -> dict:
         raise NotImplementedError
 
-    def get_dingtalk_msg(self) -> str:
+    @lazyproperty
+    def common_msg(self) -> dict:
         return self.get_common_msg()
 
-    def get_wecom_msg(self) -> str:
-        return self.get_common_msg()
+    # --------------------------------------------------------------
+    # 支持不同发送消息的方式定义自己的消息内容，比如有些支持 html 标签
+    def get_dingtalk_msg(self) -> dict:
+        return self.common_msg
+
+    def get_wecom_msg(self) -> dict:
+        return self.common_msg
+
+    def get_feishu_msg(self) -> dict:
+        return self.common_msg
 
     def get_email_msg(self) -> dict:
-        msg = self.get_common_msg()
-        subject = f'{msg[:80]} ...' if len(msg) >= 80 else msg
-        return {
-            'subject': subject,
-            'message': msg
-        }
+        return self.common_msg
 
     def get_site_msg_msg(self) -> dict:
-        return self.get_email_msg()
+        return self.common_msg
+
+    def get_sms_msg(self) -> dict:
+        raise NotImplementedError
+    # --------------------------------------------------------------
 
 
 class SystemMessage(Message):
@@ -125,4 +139,16 @@ class SystemMessage(Message):
 
 
 class UserMessage(Message):
-    pass
+    user: User
+
+    def __init__(self, user):
+        self.user = user
+
+    def publish(self):
+        """
+        发送消息到每个用户配置的接收方式上
+        """
+
+        sub = UserMsgSubscription.objects.get(user=self.user)
+
+        self.send_msg([self.user], sub.receive_backends)

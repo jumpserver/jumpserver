@@ -81,7 +81,12 @@ class CommandAlertMessage(CommandAlertMixin, SystemMessage):
         return message
 
     def get_common_msg(self):
-        return self._get_message()
+        msg = self._get_message()
+
+        return {
+            'subject': msg[:80],
+            'message': msg
+        }
 
     def get_email_msg(self):
         command = self.command
@@ -140,9 +145,6 @@ class CommandExecutionAlert(CommandAlertMixin, SystemMessage):
         return message
 
     def get_common_msg(self):
-        return self._get_message()
-
-    def get_email_msg(self):
         command = self.command
 
         subject = _("Insecure Web Command Execution Alert: [%(name)s]") % {

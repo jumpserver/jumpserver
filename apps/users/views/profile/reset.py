@@ -9,13 +9,13 @@ from django.conf import settings
 from django.urls import reverse_lazy
 from django.views.generic import FormView
 
+from users.notifications import ResetPasswordSuccessMsg, ResetPasswordMsg
 from common.utils import get_object_or_none, FlashMessageUtil
 from common.permissions import IsValidUser
 from common.mixins.views import PermissionsMixin
 from ...models import User
 from ...utils import (
-    send_reset_password_mail, get_password_check_rules, check_password_rules,
-    send_reset_password_success_mail
+    get_password_check_rules, check_password_rules,
 )
 from ... import forms
 
@@ -59,7 +59,8 @@ class UserForgotPasswordView(FormView):
             ).format(user.get_source_display())
             form.add_error('email', error)
             return self.form_invalid(form)
-        send_reset_password_mail(user)
+
+        ResetPasswordMsg(user).publish_async()
         url = self.get_redirect_message_url()
         return redirect(url)
 
@@ -115,7 +116,8 @@ class UserResetPasswordView(FormView):
 
         user.reset_password(password)
         User.expired_reset_password_token(token)
-        send_reset_password_success_mail(self.request, user)
+
+        ResetPasswordSuccessMsg(user, self.request).publish_async()
         url = self.get_redirect_url()
         return redirect(url)
 

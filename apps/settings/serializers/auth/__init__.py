@@ -7,3 +7,4 @@ from .feishu import *
 from .wecom import *
 from .sso import *
 from .base import *
+from .sms import *

@@ -6,14 +6,14 @@ from django.utils.functional import LazyObject
 from django.db.models.signals import post_save
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
-from django.db.utils import DEFAULT_DB_ALIAS
-from django.apps import apps as global_apps
 from django.apps import AppConfig
 
+from notifications.backends import BACKEND
+from users.models import User
 from common.utils.connection import RedisPubSub
 from common.utils import get_logger
 from common.decorator import on_transaction_commit
-from .models import SiteMessage, SystemMsgSubscription
+from .models import SiteMessage, SystemMsgSubscription, UserMsgSubscription
 from .notifications import SystemMessage
 
 
@@ -82,3 +82,13 @@ def create_system_messages(app_config: AppConfig, **kwargs):
                 logger.info(f'Create SystemMsgSubscription: package={app_config.module.__package__} type={message_type}')
     except ModuleNotFoundError:
         pass
+
+
+@receiver(post_save, sender=User)
+def on_user_post_save(sender, instance, created, **kwargs):
+    if created:
+        receive_backends = []
+        for backend in BACKEND:
+            if backend.get_account(instance):
+                receive_backends.append(backend)
+        UserMsgSubscription.objects.create(user=instance, receive_backends=receive_backends)

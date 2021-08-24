@@ -34,6 +34,8 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'sso': serializers.SSOSettingSerializer,
         'clean': serializers.CleaningSerializer,
         'other': serializers.OtherSettingSerializer,
+        'alibaba': serializers.AlibabaSMSSettingSerializer,
+        'tencent': serializers.TencentSMSSettingSerializer,
     }
 
     def get_serializer_class(self):

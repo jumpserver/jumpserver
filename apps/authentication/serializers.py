@@ -17,7 +17,7 @@ __all__ = [
     'AccessKeySerializer', 'OtpVerifySerializer', 'BearerTokenSerializer',
     'MFAChallengeSerializer', 'LoginConfirmSettingSerializer', 'SSOTokenSerializer',
     'ConnectionTokenSerializer', 'ConnectionTokenSecretSerializer',
-    'PasswordVerifySerializer',
+    'PasswordVerifySerializer', 'MFASelectTypeSerializer',
 ]
 
 
@@ -75,6 +75,10 @@ class BearerTokenSerializer(serializers.Serializer):
             "user": user
         }
         return instance
+
+
+class MFASelectTypeSerializer(serializers.Serializer):
+    type = serializers.CharField()
 
 
 class MFAChallengeSerializer(serializers.Serializer):

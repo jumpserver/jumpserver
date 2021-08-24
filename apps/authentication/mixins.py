@@ -17,7 +17,7 @@ from django.shortcuts import reverse, redirect
 from django.views.generic.edit import FormView
 
 from common.utils import get_object_or_none, get_request_ip, get_logger, bulk_get, FlashMessageUtil
-from users.models import User
+from users.models import User, MFAType
 from users.utils import LoginBlockUtil, MFABlockUtils
 from . import errors
 from .utils import rsa_decrypt, gen_key_pair
@@ -351,13 +351,13 @@ class AuthMixin(PasswordEncryptionViewMixin):
         unset, url = user.mfa_enabled_but_not_set()
         if unset:
             raise errors.MFAUnsetError(user, self.request, url)
-        raise errors.MFARequiredError()
+        raise errors.MFARequiredError(mfa_types=user.get_supported_mfa_types())
 
-    def mark_mfa_ok(self):
+    def mark_mfa_ok(self, mfa_type=MFAType.OTP):
         self.request.session['auth_mfa'] = 1
         self.request.session['auth_mfa_time'] = time.time()
-        self.request.session['auth_mfa_type'] = 'otp'
         self.request.session['auth_mfa_required'] = ''
+        self.request.session['auth_mfa_type'] = mfa_type
 
     def check_mfa_is_block(self, username, ip, raise_exception=True):
         if MFABlockUtils(username, ip).is_block():
@@ -368,11 +368,11 @@ class AuthMixin(PasswordEncryptionViewMixin):
             else:
                 return exception
 
-    def check_user_mfa(self, code):
+    def check_user_mfa(self, code, mfa_type=MFAType.OTP):
         user = self.get_user_from_session()
         ip = self.get_request_ip()
         self.check_mfa_is_block(user.username, ip)
-        ok = user.check_mfa(code)
+        ok = user.check_mfa(code, mfa_type=mfa_type)
         if ok:
             self.mark_mfa_ok()
             return
@@ -380,7 +380,7 @@ class AuthMixin(PasswordEncryptionViewMixin):
         raise errors.MFAFailedError(
             username=user.username,
             request=self.request,
-            ip=ip
+            ip=ip, mfa_type=mfa_type,
         )
 
     def get_ticket(self):
