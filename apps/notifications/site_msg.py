@@ -2,8 +2,11 @@ from django.db.models import F
 from django.db import transaction
 
 from common.utils.timezone import now
+from common.utils import get_logger
 from users.models import User
 from .models import SiteMessage as SiteMessageModel, SiteMessageUsers
+
+logger = get_logger(__file__)
 
 
 class SiteMessageUtil:
@@ -14,6 +17,11 @@ class SiteMessageUtil:
         if not any((user_ids, group_ids, is_broadcast)):
             raise ValueError('No recipient is specified')
 
+        logger.info(f'Site message send: '
+                    f'user_ids={user_ids} '
+                    f'group_ids={group_ids} '
+                    f'subject={subject} '
+                    f'message={message}')
         with transaction.atomic():
             site_msg = SiteMessageModel.objects.create(
                 subject=subject, message=message,

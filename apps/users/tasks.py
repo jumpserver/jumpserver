@@ -5,15 +5,14 @@ import sys
 from celery import shared_task
 from django.conf import settings
 
+from users.notifications import PasswordExpirationReminderMsg
 from ops.celery.utils import (
     create_or_update_celery_periodic_tasks, disable_celery_periodic_task
 )
 from ops.celery.decorator import after_app_ready_start
 from common.utils import get_logger
 from .models import User
-from .utils import (
-    send_password_expiration_reminder_mail, send_user_expiration_reminder_mail
-)
+from users.notifications import UserExpirationReminderMsg
 from settings.utils import LDAPServerUtil, LDAPImportUtil
 
 
@@ -30,7 +29,8 @@ def check_password_expired():
             continue
         msg = "The user {} password expires in {} days"
         logger.info(msg.format(user, user.password_expired_remain_days))
-        send_password_expiration_reminder_mail(user)
+
+        PasswordExpirationReminderMsg(user).publish_async()
 
 
 @shared_task
@@ -57,7 +57,8 @@ def check_user_expired():
             continue
         msg = "The user {} will expires in {} days"
         logger.info(msg.format(user, user.expired_remain_days))
-        send_user_expiration_reminder_mail(user)
+
+        UserExpirationReminderMsg(user).publish_async()
 
 
 @shared_task

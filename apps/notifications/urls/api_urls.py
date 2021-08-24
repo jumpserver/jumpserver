@@ -8,6 +8,7 @@ app_name = 'notifications'
 
 router = BulkRouter()
 router.register('system-msg-subscription', api.SystemMsgSubscriptionViewSet, 'system-msg-subscription')
+router.register('user-msg-subscription', api.UserMsgSubscriptionViewSet, 'user-msg-subscription')
 router.register('site-message', api.SiteMessageViewSet, 'site-message')
 
 urlpatterns = [

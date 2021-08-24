@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
 from django.db.models import Prefetch
 
+from users.notifications import ResetMFAMsg
 from common.permissions import (
     IsOrgAdmin, IsOrgAdminOrAppUser,
     CanUpdateDeleteUser, IsSuperUser
@@ -16,7 +17,7 @@ from common.mixins import CommonApiMixin
 from common.utils import get_logger
 from orgs.utils import current_org
 from orgs.models import ROLE as ORG_ROLE, OrganizationMember
-from users.utils import send_reset_mfa_mail, LoginBlockUtil, MFABlockUtils
+from users.utils import LoginBlockUtil, MFABlockUtils
 from .. import serializers
 from ..serializers import UserSerializer, UserRetrieveSerializer, MiniUserSerializer, InviteSerializer
 from .mixins import UserQuerysetMixin
@@ -209,5 +210,6 @@ class UserResetOTPApi(UserQuerysetMixin, generics.RetrieveAPIView):
         if user.mfa_enabled:
             user.reset_mfa()
             user.save()
-            send_reset_mfa_mail(user)
+
+            ResetMFAMsg(user).publish_async()
         return Response({"msg": "success"})

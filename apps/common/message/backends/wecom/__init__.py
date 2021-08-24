@@ -115,6 +115,7 @@ class WeCom(RequestMixin):
            },
            **extra_params
         }
+        logger.info(f'Wecom send text: users={users} msg={msg}')
         data = self._requests.post(URL.SEND_MESSAGE, json=body, check_errcode_is_0=False)
 
         errcode = data['errcode']

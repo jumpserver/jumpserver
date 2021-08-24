@@ -6,11 +6,13 @@ from .email import EmailSettingSerializer, EmailContentSettingSerializer
 from .auth import (
     LDAPSettingSerializer, OIDCSettingSerializer, KeycloakSettingSerializer,
     CASSettingSerializer, RadiusSettingSerializer, FeiShuSettingSerializer,
-    WeComSettingSerializer, DingTalkSettingSerializer
+    WeComSettingSerializer, DingTalkSettingSerializer, AlibabaSMSSettingSerializer,
+    TencentSMSSettingSerializer,
 )
 from .terminal import TerminalSettingSerializer
 from .security import SecuritySettingSerializer
 from .cleaning import CleaningSerializer
+
 
 __all__ = [
     'SettingsSerializer',
@@ -32,7 +34,9 @@ class SettingsSerializer(
     KeycloakSettingSerializer,
     CASSettingSerializer,
     RadiusSettingSerializer,
-    CleaningSerializer
+    CleaningSerializer,
+    AlibabaSMSSettingSerializer,
+    TencentSMSSettingSerializer,
 ):
     # encrypt_fields 现在使用 write_only 来判断了
     pass

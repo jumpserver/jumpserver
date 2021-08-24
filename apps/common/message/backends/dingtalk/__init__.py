@@ -2,8 +2,11 @@ import time
 import hmac
 import base64
 
+from common.utils import get_logger
 from common.message.backends.utils import digest, as_request
 from common.message.backends.mixin import BaseRequest
+
+logger = get_logger(__file__)
 
 
 def sign(secret, data):
@@ -160,6 +163,7 @@ class DingTalk:
                 }
             }
         }
+        logger.info(f'Dingtalk send text: user_ids={user_ids} msg={msg}')
         data = self._request.post(URL.SEND_MESSAGE, json=body, with_token=True)
         return data
 

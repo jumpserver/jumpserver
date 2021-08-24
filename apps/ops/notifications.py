@@ -18,7 +18,10 @@ class ServerPerformanceMessage(SystemMessage):
         self._msg = msg
 
     def get_common_msg(self):
-        return self._msg
+        return {
+            'subject': self._msg[:80],
+            'message': self._msg
+        }
 
     @classmethod
     def post_insert_to_db(cls, subscription: SystemMsgSubscription):

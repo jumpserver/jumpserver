@@ -14,6 +14,9 @@ class FeiShu(BackendBase):
             app_secret=settings.FEISHU_APP_SECRET
         )
 
-    def send_msg(self, users, msg):
+    def send_msg(self, users, message, subject=None):
         accounts, __, __ = self.get_accounts(users)
-        return self.client.send_text(accounts, msg)
+        return self.client.send_text(accounts, message)
+
+
+backend = FeiShu

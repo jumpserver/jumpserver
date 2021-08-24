@@ -191,3 +191,11 @@ class HasQueryParamsUserAndIsCurrentOrgMember(permissions.BasePermission):
             return False
         query_user = current_org.get_members().filter(id=query_user_id).first()
         return bool(query_user)
+
+
+class OnlySuperUserCanList(IsValidUser):
+    def has_permission(self, request, view):
+        user = request.user
+        if view.action == 'list' and not user.is_superuser:
+            return False
+        return True

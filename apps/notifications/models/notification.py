@@ -6,12 +6,11 @@ __all__ = ('SystemMsgSubscription', 'UserMsgSubscription')
 
 
 class UserMsgSubscription(JMSModel):
-    message_type = models.CharField(max_length=128)
-    user = models.ForeignKey('users.User', related_name='user_msg_subscriptions', on_delete=models.CASCADE)
+    user = models.ForeignKey('users.User', unique=True, related_name='user_msg_subscriptions', on_delete=models.CASCADE)
     receive_backends = models.JSONField(default=list)
 
     def __str__(self):
-        return f'{self.message_type}'
+        return f'{self.user} subscription: {self.receive_backends}'
 
 
 class SystemMsgSubscription(JMSModel):
