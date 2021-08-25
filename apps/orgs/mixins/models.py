@@ -19,6 +19,7 @@ __all__ = [
 
 
 class OrgManager(models.Manager):
+
     def all_group_by_org(self):
         from ..models import Organization
         orgs = list(Organization.objects.all())
