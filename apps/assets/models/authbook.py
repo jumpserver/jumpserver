@@ -13,7 +13,8 @@ __all__ = ['AuthBook']
 
 class AuthBook(BaseUser, AbsConnectivity):
     asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, verbose_name=_('Asset'))
-    systemuser = models.ForeignKey('assets.SystemUser', on_delete=models.CASCADE, null=True, verbose_name=_("System user"))
+    systemuser = models.ForeignKey('assets.SystemUser', on_delete=models.CASCADE, null=True,
+                                   verbose_name=_("System user"))
     version = models.IntegerField(default=1, verbose_name=_('Version'))
     history = HistoricalRecords()
     _systemuser_display = ''
@@ -98,4 +99,3 @@ class AuthBook(BaseUser, AbsConnectivity):
 
     def __str__(self):
         return self.smart_name
-
