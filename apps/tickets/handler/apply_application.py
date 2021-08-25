@@ -11,8 +11,8 @@ from .base import BaseHandler
 class Handler(BaseHandler):
 
     def _on_approve(self):
-        is_finish = super()._on_approve()
-        if is_finish:
+        is_finished = super()._on_approve()
+        if is_finished:
             self._create_application_permission()
 
     # display

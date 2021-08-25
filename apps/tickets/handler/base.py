@@ -22,18 +22,18 @@ class BaseHandler(object):
         self._send_applied_mail_to_assignees()
 
     def _on_approve(self):
-        is_finish = False
         if self.ticket.approval_step != len(self.ticket.process_map):
             self.ticket.approval_step += 1
             self.ticket.create_related_node()
+            is_finished = False
         else:
             self.ticket.set_state_approve()
             self.ticket.set_status_closed()
-            is_finish = True
+            is_finished = True
         self._send_applied_mail_to_assignees()
 
         self.__on_process(self.ticket.processor)
-        return is_finish
+        return is_finished
 
     def _on_reject(self):
         self.ticket.set_state_reject()
@@ -65,8 +65,9 @@ class BaseHandler(object):
 
     # email
     def _send_applied_mail_to_assignees(self):
-        logger.debug('Send applied email to assignees: {}'.format(
-            ', '.join([str(i.assignee) for i in self.ticket.current_node.first().ticket_assignees.all()])))
+        assignees = self.ticket.current_node.first().ticket_assignees.all()
+        assignees_display = ', '.join([str(i.assignee) for i in assignees])
+        logger.debug('Send applied email to assignees: {}'.format(assignees_display))
         send_ticket_applied_mail_to_assignees(self.ticket)
 
     def _send_processed_mail_to_applicant(self, processor):
@@ -75,7 +76,10 @@ class BaseHandler(object):
 
     # comments
     def _create_comment_on_action(self, action):
-        user = self.ticket.applicant if self.ticket.state_open or self.ticket.state_close else self.ticket.processor
+        user = self.ticket.processor
+        # 打开或关闭工单，备注显示是自己，其他是受理人
+        if self.ticket.state_open or self.ticket.state_close:
+            user = self.ticket.applicant
         user_display = str(user)
         action_display = getattr(TicketAction, action).label
         data = {

@@ -17,7 +17,7 @@ def get_ticket_assignee_m2m_info(apps, schema_editor):
         ticket_assignee_m2m.append((i.id, list(i.assignees.values_list('id', flat=True)), i.action, i.created_by))
 
 
-def update_ticket_process_state_status(apps, schema_editor):
+def update_ticket_process_meta_state_status(apps, schema_editor):
     ticket_model = apps.get_model("tickets", "Ticket")
     updates = list()
     with transaction.atomic():
@@ -40,11 +40,16 @@ def update_ticket_process_state_status(apps, schema_editor):
                 'assignees_display': instance.assignees_display if instance.assignees_display else []
             }, ]
             instance.state = state
-            if instance.status == 'open':
-                instance.status = 'closed'
-                instance.state = 'closed'
+            instance.meta['apply_assets'] = instance.meta.pop('approve_assets', [])
+            instance.meta['apply_assets_display'] = instance.meta.pop('approve_assets_display', [])
+            instance.meta['apply_actions'] = instance.meta.pop('approve_actions', 0)
+            instance.meta['apply_actions_display'] = instance.meta.pop('approve_actions_display', [])
+            instance.meta['apply_applications'] = instance.meta.pop('approve_applications', [])
+            instance.meta['apply_applications_display'] = instance.meta.pop('approve_applications_display', [])
+            instance.meta['apply_system_users'] = instance.meta.pop('approve_system_users', [])
+            instance.meta['apply_system_users_display'] = instance.meta.pop('approve_system_users_display', [])
             updates.append(instance)
-        ticket_model.objects.bulk_update(updates, ['process_map', 'state', 'status'])
+        ticket_model.objects.bulk_update(updates, ['process_map', 'state', 'meta', 'status'])
 
 
 def create_step_and_assignee(apps, schema_editor):
@@ -130,7 +135,7 @@ class Migration(migrations.Migration):
                 choices=[('open', 'Open'), ('approved', 'Approved'), ('rejected', 'Rejected'), ('closed', 'Closed')],
                 default='open', max_length=16, verbose_name='State'),
         ),
-        migrations.RunPython(update_ticket_process_state_status),
+        migrations.RunPython(update_ticket_process_meta_state_status),
         migrations.RemoveField(
             model_name='ticket',
             name='action',
