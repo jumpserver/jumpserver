@@ -315,6 +315,7 @@ class AuthMixin:
         self.request.session['auth_mfa'] = 1
         self.request.session['auth_mfa_time'] = time.time()
         self.request.session['auth_mfa_type'] = 'otp'
+        self.request.session['auth_mfa_required'] = ''
 
     def check_mfa_is_block(self, username, ip, raise_exception=True):
         if MFABlockUtils(username, ip).is_block():
@@ -391,7 +392,6 @@ class AuthMixin:
     def clear_auth_mark(self):
         self.request.session['auth_password'] = ''
         self.request.session['auth_user_id'] = ''
-        self.request.session['auth_mfa'] = ''
         self.request.session['auth_confirm'] = ''
         self.request.session['auth_ticket_id'] = ''
 
