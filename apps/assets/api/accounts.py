@@ -64,8 +64,8 @@ class AccountViewSet(OrgBulkModelViewSet):
     permission_classes = (IsOrgAdmin,)
 
     def get_queryset(self):
-        queryset = super().get_queryset()\
-            .annotate(ip=F('asset__ip'))\
+        queryset = super().get_queryset() \
+            .annotate(ip=F('asset__ip')) \
             .annotate(hostname=F('asset__hostname'))
         return queryset
 
@@ -110,4 +110,5 @@ class AccountTaskCreateAPI(CreateAPIView):
     def get_exception_handler(self):
         def handler(e, context):
             return Response({"error": str(e)}, status=400)
+
         return handler
