@@ -16,7 +16,7 @@ from .models import AccessKey, LoginConfirmSetting
 __all__ = [
     'AccessKeySerializer', 'OtpVerifySerializer', 'BearerTokenSerializer',
     'MFAChallengeSerializer', 'LoginConfirmSettingSerializer', 'SSOTokenSerializer',
-    'ConnectionTokenSerializer', 'ConnectionTokenSecretSerializer', 'RDPFileSerializer',
+    'ConnectionTokenSerializer', 'ConnectionTokenSecretSerializer',
     'PasswordVerifySerializer',
 ]
 
