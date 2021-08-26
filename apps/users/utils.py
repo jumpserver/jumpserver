@@ -16,7 +16,6 @@ from common.tasks import send_mail_async
 from common.utils import reverse, get_object_or_none, get_request_ip_or_data, get_request_user_agent
 from .models import User
 
-
 logger = logging.getLogger('jumpserver')
 
 
@@ -311,19 +310,19 @@ def get_password_check_rules(user):
 def check_password_rules(password, is_org_admin=False):
     pattern = r"^"
     if settings.SECURITY_PASSWORD_UPPER_CASE:
-        pattern += '(?=.*[A-Z])'
+        pattern += r'(?=.*[A-Z])'
     if settings.SECURITY_PASSWORD_LOWER_CASE:
-        pattern += '(?=.*[a-z])'
+        pattern += r'(?=.*[a-z])'
     if settings.SECURITY_PASSWORD_NUMBER:
-        pattern += '(?=.*\d)'
+        pattern += r'(?=.*\d)'
     if settings.SECURITY_PASSWORD_SPECIAL_CHAR:
-        pattern += '(?=.*[`~!@#\$%\^&\*\(\)-=_\+\[\]\{\}\|;:\'\",\.<>\/\?])'
-    pattern += '[a-zA-Z\d`~!@#\$%\^&\*\(\)-=_\+\[\]\{\}\|;:\'\",\.<>\/\?]'
+        pattern += r'(?=.*[`~!@#\$%\^&\*\(\)-=_\+\[\]\{\}\|;:\'\",\.<>\/\?])'
+    pattern += r'[a-zA-Z\d`~!@#\$%\^&\*\(\)-=_\+\[\]\{\}\|;:\'\",\.<>\/\?]'
     if is_org_admin:
         min_length = settings.SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH
     else:
         min_length = settings.SECURITY_PASSWORD_MIN_LENGTH
-    pattern += '.{' + str(min_length-1) + ',}$'
+    pattern += '.{' + str(min_length - 1) + ',}$'
     match_obj = re.match(pattern, password)
     return bool(match_obj)
 

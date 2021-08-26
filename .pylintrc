@@ -1,5 +1,6 @@
 [MASTER]
 
+init-hook='import sys; sys.path.append("./apps")'
 # A comma-separated list of package or module names from where C extensions may
 # be loaded. Extensions are loading into the active Python interpreter and may
 # run arbitrary code.
@@ -75,6 +76,7 @@ confidence=
 # no Warning level messages displayed, use "--disable=all --enable=classes
 # --disable=W".
 disable=print-statement,
+        unused-argument,
         missing-docstring,
         parameter-unpacking,
         unpacking-in-except,
@@ -155,6 +157,7 @@ disable=print-statement,
         exception-escape,
         comprehension-escape
 
+ignore=migrations
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
 # multiple time (only on the command line, not in the configuration file where

@@ -2,15 +2,17 @@
 from collections import defaultdict
 
 from django.utils.translation import ugettext as _
+from django.db.models import Prefetch
 from rest_framework.decorators import action
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
-from django.db.models import Prefetch
 
 from common.permissions import (
-    IsOrgAdmin, IsOrgAdminOrAppUser,
-    CanUpdateDeleteUser, IsSuperUser
+    IsOrgAdmin,
+    IsOrgAdminOrAppUser,
+    CanUpdateDeleteUser,
+    IsSuperUser,
 )
 from common.mixins import CommonApiMixin
 from common.utils import get_logger
@@ -18,7 +20,12 @@ from orgs.utils import current_org
 from orgs.models import ROLE as ORG_ROLE, OrganizationMember
 from users.utils import send_reset_mfa_mail, LoginBlockUtil, MFABlockUtils
 from .. import serializers
-from ..serializers import UserSerializer, UserRetrieveSerializer, MiniUserSerializer, InviteSerializer
+from ..serializers import (
+    UserSerializer,
+    UserRetrieveSerializer,
+    MiniUserSerializer,
+    InviteSerializer,
+)
 from .mixins import UserQuerysetMixin
 from ..models import User
 from ..signals import post_user_create
@@ -26,33 +33,33 @@ from ..filters import OrgRoleUserFilterBackend, UserFilter
 
 logger = get_logger(__name__)
 __all__ = [
-    'UserViewSet', 'UserChangePasswordApi',
-    'UserUnblockPKApi', 'UserResetOTPApi',
+    "UserViewSet",
+    "UserChangePasswordApi",
+    "UserUnblockPKApi",
+    "UserResetOTPApi",
 ]
 
 
 class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
     filterset_class = UserFilter
-    search_fields = ('username', 'email', 'name', 'id', 'source', 'role')
+    search_fields = ("username", "email", "name", "id", "source", "role")
     permission_classes = (IsOrgAdmin, CanUpdateDeleteUser)
     serializer_classes = {
-        'default': UserSerializer,
-        'retrieve': UserRetrieveSerializer,
-        'suggestion': MiniUserSerializer,
-        'invite': InviteSerializer,
+        "default": UserSerializer,
+        "retrieve": UserRetrieveSerializer,
+        "suggestion": MiniUserSerializer,
+        "invite": InviteSerializer,
     }
     extra_filter_backends = [OrgRoleUserFilterBackend]
 
     def get_queryset(self):
-        queryset = super().get_queryset().prefetch_related(
-            'groups'
-        )
+        queryset = super().get_queryset().prefetch_related("groups")
         if not current_org.is_root():
             # 为在列表中计算用户在真实组织里的角色
             queryset = queryset.prefetch_related(
                 Prefetch(
-                    'm2m_org_members',
-                    queryset=OrganizationMember.objects.filter(org__id=current_org.id)
+                    "m2m_org_members",
+                    queryset=OrganizationMember.objects.filter(org__id=current_org.id),
                 )
             )
         return queryset
@@ -87,11 +94,11 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
 
     def get_permissions(self):
         if self.action in ["retrieve", "list"]:
-            if self.request.query_params.get('all'):
+            if self.request.query_params.get("all"):
                 self.permission_classes = (IsSuperUser,)
             else:
                 self.permission_classes = (IsOrgAdminOrAppUser,)
-        elif self.action in ['destroy']:
+        elif self.action in ["destroy"]:
             self.permission_classes = (IsSuperUser,)
         return super().get_permissions()
 
@@ -105,9 +112,9 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         validated_data = serializer.validated_data
         # `org_roles` 先 `pop`
         if isinstance(validated_data, list):
-            org_roles = [item.pop('org_roles', None) for item in validated_data]
+            org_roles = [item.pop("org_roles", None) for item in validated_data]
         else:
-            org_roles = [validated_data.pop('org_roles', None)]
+            org_roles = [validated_data.pop("org_roles", None)]
         return org_roles
 
     def perform_update(self, serializer):
@@ -119,16 +126,14 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
 
     def perform_bulk_update(self, serializer):
         # TODO: 需要测试
-        user_ids = [
-            d.get("id") or d.get("pk") for d in serializer.validated_data
-        ]
+        user_ids = [d.get("id") or d.get("pk") for d in serializer.validated_data]
         users = current_org.get_members().filter(id__in=user_ids)
         for user in users:
             self.check_object_permissions(self.request, user)
         return super().perform_bulk_update(serializer)
 
-    @action(methods=['get'], detail=False, permission_classes=(IsOrgAdmin,))
-    def suggestion(self, request):
+    @action(methods=["get"], detail=False, permission_classes=(IsOrgAdmin,))
+    def suggestion(self, *args, **kwargs):
         queryset = User.objects.exclude(role=User.ROLE.APP)
         queryset = self.filter_queryset(queryset)
         queryset = queryset[:3]
@@ -141,7 +146,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    @action(methods=['post'], detail=False, permission_classes=(IsOrgAdmin,))
+    @action(methods=["post"], detail=False, permission_classes=(IsOrgAdmin,))
     def invite(self, request):
         data = request.data
         if not isinstance(data, list):
@@ -157,24 +162,29 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
 
         users_by_role = defaultdict(list)
         for i in validated_data:
-            users_by_role[i['role']].append(i['user'])
+            users_by_role[i["role"]].append(i["user"])
 
         OrganizationMember.objects.add_users_by_role(
             current_org,
             users=users_by_role[ORG_ROLE.USER],
             admins=users_by_role[ORG_ROLE.ADMIN],
-            auditors=users_by_role[ORG_ROLE.AUDITOR]
+            auditors=users_by_role[ORG_ROLE.AUDITOR],
         )
         return Response(serializer.data, status=201)
 
-    @action(methods=['post'], detail=True, permission_classes=(IsOrgAdmin,))
-    def remove(self, request, *args, **kwargs):
+    @action(methods=["post"], detail=True, permission_classes=(IsOrgAdmin,))
+    def remove(self, *args, **kwargs):
         instance = self.get_object()
         instance.remove()
         return Response(status=204)
 
-    @action(methods=['post'], detail=False, permission_classes=(IsOrgAdmin,), url_path='remove')
-    def bulk_remove(self, request, *args, **kwargs):
+    @action(
+        methods=["post"],
+        detail=False,
+        permission_classes=(IsOrgAdmin,),
+        url_path="remove",
+    )
+    def bulk_remove(self, *args, **kwargs):
         qs = self.get_queryset()
         filtered = self.filter_queryset(qs)
 
@@ -199,7 +209,7 @@ class UserUnblockPKApi(UserQuerysetMixin, generics.UpdateAPIView):
 
     def perform_update(self, serializer):
         user = self.get_object()
-        username = user.username if user else ''
+        username = user.username if user else ""
         LoginBlockUtil.unblock_user(username)
         MFABlockUtils.unblock_user(username)
 
@@ -209,7 +219,7 @@ class UserResetOTPApi(UserQuerysetMixin, generics.RetrieveAPIView):
     serializer_class = serializers.ResetOTPSerializer
 
     def retrieve(self, request, *args, **kwargs):
-        user = self.get_object() if kwargs.get('pk') else request.user
+        user = self.get_object() if kwargs.get("pk") else request.user
         if user == request.user:
             msg = _("Could not reset self otp, use profile reset instead")
             return Response({"error": msg}, status=401)
