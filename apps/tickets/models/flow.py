@@ -19,7 +19,7 @@ class ApprovalRule(CommonModelMixin):
         verbose_name=_('Approve level')
     )
     strategy = models.CharField(
-        max_length=64, default=TicketApprovalStrategy.super,
+        max_length=64, default=TicketApprovalStrategy.super_admin,
         choices=TicketApprovalStrategy.choices,
         verbose_name=_('Approve strategy')
     )
