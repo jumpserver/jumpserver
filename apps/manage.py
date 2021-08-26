@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 import os
 import sys
-import errno
 
 if __name__ == "__main__":
     try:
         os.makedirs("../logs")
-    except:
+    except Exception:
         pass
 
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "jumpserver.settings")
