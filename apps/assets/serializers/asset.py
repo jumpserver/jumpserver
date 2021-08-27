@@ -8,7 +8,7 @@ from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import Asset, Node, Platform, SystemUser
 
 __all__ = [
-    'AssetSerializer', 'AssetSimpleSerializer',
+    'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',
     'ProtocolsField', 'PlatformSerializer',
     'AssetTaskSerializer', 'AssetsTaskSerializer', 'ProtocolsField'
 ]
@@ -69,6 +69,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     """
     资产的数据结构
     """
+
     class Meta:
         model = Asset
         fields_mini = ['id', 'hostname', 'ip', 'platform', 'protocols']
@@ -157,6 +158,12 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
         return instance
 
 
+class MiniAssetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Asset
+        fields = AssetSerializer.Meta.fields_mini
+
+
 class PlatformSerializer(serializers.ModelSerializer):
     meta = serializers.DictField(required=False, allow_null=True, label=_('Meta'))
 
@@ -177,7 +184,6 @@ class PlatformSerializer(serializers.ModelSerializer):
 
 
 class AssetSimpleSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Asset
         fields = ['id', 'hostname', 'ip', 'port', 'connectivity', 'date_verified']

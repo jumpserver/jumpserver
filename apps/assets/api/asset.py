@@ -1,22 +1,23 @@
 # -*- coding: utf-8 -*-
 #
 from assets.api import FilterAssetByNodeMixin
+from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import RetrieveAPIView
+from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 
 from common.utils import get_logger, get_object_or_none
-from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, IsSuperUser
+from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, IsSuperUser, IsValidUser
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
-from ..models import Asset, Node, Platform, SystemUser
+from ..models import Asset, Node, Platform
 from .. import serializers
 from ..tasks import (
     update_assets_hardware_info_manual, test_assets_connectivity_manual,
     test_system_users_connectivity_a_asset, push_system_users_a_asset
 )
 from ..filters import FilterAssetByNodeFilterBackend, LabelFilterBackend, IpInFilterBackend
-
 
 logger = get_logger(__file__)
 __all__ = [
@@ -43,6 +44,7 @@ class AssetViewSet(FilterAssetByNodeMixin, OrgBulkModelViewSet):
     ordering_fields = ("hostname", "ip", "port", "cpu_cores")
     serializer_classes = {
         'default': serializers.AssetSerializer,
+        'suggestion': serializers.MiniAssetSerializer
     }
     permission_classes = (IsOrgAdminOrAppUser,)
     extra_filter_backends = [FilterAssetByNodeFilterBackend, LabelFilterBackend, IpInFilterBackend]
@@ -61,6 +63,12 @@ class AssetViewSet(FilterAssetByNodeMixin, OrgBulkModelViewSet):
     def perform_create(self, serializer):
         assets = serializer.save()
         self.set_assets_node(assets)
+
+    @action(methods=['get'], detail=False, permission_classes=(IsValidUser,))
+    def suggestion(self, request):
+        queryset = self.filter_queryset(self.get_queryset())[:3]
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class AssetPlatformRetrieveApi(RetrieveAPIView):
