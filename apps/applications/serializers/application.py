@@ -12,7 +12,7 @@ from .. import models
 from .. import const
 
 __all__ = [
-    'ApplicationSerializer', 'ApplicationSerializerMixin',
+    'ApplicationSerializer', 'ApplicationSerializerMixin', 'MiniApplicationSerializer',
     'ApplicationAccountSerializer', 'ApplicationAccountSecretSerializer'
 ]
 
@@ -108,3 +108,9 @@ class ApplicationAccountSerializer(serializers.Serializer):
 
 class ApplicationAccountSecretSerializer(ApplicationAccountSerializer):
     password = serializers.CharField(write_only=False, label=_("Password"))
+
+
+class MiniApplicationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Application
+        fields = ApplicationSerializer.Meta.fields_mini
