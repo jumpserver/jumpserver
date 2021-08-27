@@ -153,7 +153,7 @@ class TicketFlowApproveSerializer(serializers.ModelSerializer):
         }
 
     def get_assignees_read_only(self, obj):
-        if obj.strategy == TicketApprovalStrategy.custom:
+        if obj.strategy == TicketApprovalStrategy.custom_user:
             return obj.assignees.values_list('id', flat=True)
         return []
 
@@ -196,11 +196,11 @@ class TicketFlowSerializer(OrgResourceModelSerializerMixin):
         for level, data in enumerate(childs, 1):
             data_m2m = data.pop(assignees, None)
             child_instance = related_model.objects.create(**data, level=level)
-            if child_instance.strategy == 'super':
+            if child_instance.strategy == TicketApprovalStrategy.super_admin:
                 data_m2m = list(User.get_super_admins())
-            elif child_instance.strategy == 'admin':
+            elif child_instance.strategy == TicketApprovalStrategy.org_admin:
                 data_m2m = list(User.get_org_admins())
-            elif child_instance.strategy == 'super_admin':
+            elif child_instance.strategy == TicketApprovalStrategy.super_org_admin:
                 data_m2m = list(User.get_super_and_org_admins())
             getattr(child_instance, assignees).set(data_m2m)
             child_instances.append(child_instance)

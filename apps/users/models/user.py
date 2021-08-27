@@ -358,10 +358,6 @@ class RoleMixin:
         return cls.objects.filter(role=cls.ROLE.ADMIN)
 
     @classmethod
-    def get_auditor_and_users(cls):
-        return cls.objects.filter(role__in=[cls.ROLE.USER, cls.ROLE.AUDITOR])
-
-    @classmethod
     def get_org_admins(cls, org=None):
         from orgs.models import Organization
         if not isinstance(org, Organization):
