@@ -44,7 +44,7 @@ class TicketApprovalLevel(IntegerChoices):
 
 
 class TicketApprovalStrategy(TextChoices):
-    super_admin = 'super_admin', _("Super admin user")
-    org_admin = 'org_admin', _("Org admin user")
-    super_org_admin = 'super_org_admin', _("Super org admin user")
+    super_admin = 'super_admin', _("Super admin")
+    org_admin = 'org_admin', _("Org admin")
+    super_org_admin = 'super_org_admin', _("Super admin and org admin")
     custom_user = 'custom_user', _("Custom user")

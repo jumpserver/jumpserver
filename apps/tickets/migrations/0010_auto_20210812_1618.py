@@ -106,8 +106,8 @@ class Migration(migrations.Migration):
                 ('level', models.SmallIntegerField(choices=[(1, 'One level'), (2, 'Two level')], default=1,
                                                    verbose_name='Approve level')),
                 ('strategy', models.CharField(
-                    choices=[('super', 'Super user'), ('admin', 'Admin user'), ('super_admin', 'Super admin user'),
-                             ('custom', 'Custom user')],
+                    choices=[('super_admin', 'Super admin'), ('org_admin', 'Org admin'), ('super_org_admin', 'Super admin and org admin'),
+                             ('custom_user', 'Custom user')],
                     default='super', max_length=64, verbose_name='Approve strategy')),
                 ('assignees_display', models.JSONField(default=list, encoder=common.db.encoder.ModelJSONFieldEncoder,
                                                        verbose_name='Assignees display')),
