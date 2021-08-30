@@ -2,7 +2,7 @@
 #
 
 from django_filters import rest_framework as filters
-from django.db.models import F
+from django.db.models import F, Q
 
 from common.drf.filters import BaseFilterSet
 from common.drf.api import JMSModelViewSet
@@ -17,12 +17,29 @@ class AccountFilterSet(BaseFilterSet):
     category = filters.CharFilter(field_name='category', lookup_expr='exact')
     app_display = filters.CharFilter(field_name='app_display', lookup_expr='exact')
 
+    class Meta:
+        model = Account
+        fields = ['app', 'systemuser']
+
+    @property
+    def qs(self):
+        qs = super().qs
+        qs = self.filter_username(qs)
+        return qs
+
+    def filter_username(self, qs):
+        username = self.get_query_param('username')
+        if not username:
+            return qs
+        qs = qs.filter(Q(username=username) | Q(systemuser__username=username)).distinct()
+        return qs
+
 
 class ApplicationAccountViewSet(JMSModelViewSet):
     model = Account
-    search_fields = ['username', 'app_name']
+    search_fields = ['username', 'app_display']
     filterset_class = AccountFilterSet
-    filterset_fields = ['username', 'app_display', 'type', 'category']
+    filterset_fields = ['', 'username', 'app_display', 'type', 'category', 'app']
     serializer_class = serializers.AppAccountSerializer
     permission_classes = (IsOrgAdmin,)
     http_method_names = ['get', 'put', 'patch', 'options']
