@@ -234,9 +234,9 @@ class Organization(models.Model):
         with tmp_to_org(self):
             return resource_model.objects.all().count()
 
-    def as_tree_node(self, pid, opened=True):
+    def as_tree_node(self, oid, pid, opened=True):
         node = TreeNode(**{
-            'id': str(self.id),
+            'id': oid,
             'name': self.name,
             'title': self.name,
             'pId': pid,

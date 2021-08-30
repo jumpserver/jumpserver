@@ -13,7 +13,6 @@ from rest_framework.generics import (
 from orgs.utils import tmp_to_root_org
 from applications.models import Application
 from perms.utils.application.permission import (
-    has_application_system_permission,
     get_application_system_user_ids,
     validate_permission,
 )
