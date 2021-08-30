@@ -2,74 +2,41 @@
 #
 
 from django_filters import rest_framework as filters
-from django.db.models import F, Value, CharField
-from django.db.models.functions import Concat
-from django.http import Http404
+from django.db.models import F
 
 from common.drf.filters import BaseFilterSet
 from common.drf.api import JMSModelViewSet
-from common.utils import unique
-from perms.models import ApplicationPermission
+from ..models import Account
 from ..hands import IsOrgAdminOrAppUser, IsOrgAdmin, NeedMFAVerify
 from .. import serializers
 
 
 class AccountFilterSet(BaseFilterSet):
     username = filters.CharFilter(field_name='username')
-    app = filters.CharFilter(field_name='applications', lookup_expr='exact')
-    app_name = filters.CharFilter(field_name='app_name', lookup_expr='exact')
-
-    class Meta:
-        model = ApplicationPermission
-        fields = ['type', 'category']
+    type = filters.CharFilter(field_name='type', lookup_expr='exact')
+    category = filters.CharFilter(field_name='category', lookup_expr='exact')
+    app_display = filters.CharFilter(field_name='app_display', lookup_expr='exact')
 
 
 class ApplicationAccountViewSet(JMSModelViewSet):
-    permission_classes = (IsOrgAdmin, )
+    model = Account
     search_fields = ['username', 'app_name']
     filterset_class = AccountFilterSet
-    filterset_fields = ['username', 'app_name', 'type', 'category']
-    serializer_class = serializers.ApplicationAccountSerializer
+    filterset_fields = ['username', 'app_display', 'type', 'category']
+    serializer_class = serializers.AppAccountSerializer
+    permission_classes = (IsOrgAdmin,)
     http_method_names = ['get', 'put', 'patch', 'options']
 
     def get_queryset(self):
-        queryset = ApplicationPermission.objects\
-            .exclude(system_users__isnull=True) \
-            .exclude(applications__isnull=True) \
-            .annotate(uid=Concat(
-                'applications', Value('_'), 'system_users', output_field=CharField()
-             )) \
-            .annotate(systemuser=F('system_users')) \
-            .annotate(systemuser_display=F('system_users__name')) \
-            .annotate(username=F('system_users__username')) \
-            .annotate(password=F('system_users__password')) \
-            .annotate(app=F('applications')) \
-            .annotate(app_name=F("applications__name")) \
-            .values('username', 'password', 'systemuser', 'systemuser_display',
-                    'app', 'app_name', 'category', 'type', 'uid', 'org_id')
-        return queryset
-
-    def get_object(self):
-        obj = self.get_queryset().filter(
-            uid=self.kwargs['pk']
-        ).first()
-        if not obj:
-            raise Http404()
-        return obj
-
-    def filter_queryset(self, queryset):
-        queryset = super().filter_queryset(queryset)
-        queryset_list = unique(queryset, key=lambda x: (x['app'], x['systemuser']))
-        return queryset_list
-
-    @staticmethod
-    def filter_spm_queryset(resource_ids, queryset):
-        queryset = queryset.filter(uid__in=resource_ids)
+        queryset = Account.objects.all() \
+            .annotate(type=F('app__type')) \
+            .annotate(app_display=F('app__name')) \
+            .annotate(systemuser_display=F('systemuser__name')) \
+            .annotate(category=F('app__category'))
         return queryset
 
 
 class ApplicationAccountSecretViewSet(ApplicationAccountViewSet):
-    serializer_class = serializers.ApplicationAccountSecretSerializer
+    serializer_class = serializers.AppAccountSecretSerializer
     permission_classes = [IsOrgAdminOrAppUser, NeedMFAVerify]
     http_method_names = ['get', 'options']
-

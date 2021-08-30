@@ -19,8 +19,8 @@ class UserGroupGrantedApplicationsApi(CommonApiMixin, ListAPIView):
     获取用户组直接授权的应用
     """
     permission_classes = (IsOrgAdminOrAppUser,)
-    serializer_class = serializers.ApplicationGrantedSerializer
-    only_fields = serializers.ApplicationGrantedSerializer.Meta.only_fields
+    serializer_class = serializers.AppGrantedSerializer
+    only_fields = serializers.AppGrantedSerializer.Meta.only_fields
     filterset_fields = ['id', 'name', 'category', 'type', 'comment']
     search_fields = ['name', 'comment']
 
