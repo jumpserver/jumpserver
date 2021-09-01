@@ -11,6 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.templatetags.static import static
 
 from jumpserver.utils import has_valid_xpack_license
+from jumpserver.conf import Config
 from common.permissions import IsSuperUser
 from common.utils import get_logger
 from .. import serializers
@@ -150,6 +151,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'wecom': serializers.WeComSettingSerializer,
         'dingtalk': serializers.DingTalkSettingSerializer,
         'feishu': serializers.FeiShuSettingSerializer,
+        'senior': serializers.SeniorSettingSerializer,
     }
 
     def get_serializer_class(self):
@@ -163,7 +165,12 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         items = self.get_fields().keys()
-        obj = {item: getattr(settings, item) for item in items}
+        obj = {}
+        for item in items:
+            if hasattr(settings, item):
+                obj[item] = getattr(settings, item)
+            else:
+                obj[item] = Config.defaults[item]
         return obj
 
     def parse_serializer_data(self, serializer):
