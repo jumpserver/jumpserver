@@ -5,6 +5,7 @@ from .base import BaseHandler
 from django.utils.translation import ugettext as _
 
 from perms.models import AssetPermission, Action
+from perms.const import AuthorizationRules
 from orgs.utils import tmp_to_org, tmp_to_root_org
 
 
@@ -83,6 +84,7 @@ class Handler(BaseHandler):
         permission_data = {
             'id': self.ticket.id,
             'name': apply_permission_name,
+            'authorization_rules': AuthorizationRules.ticket,
             'comment': str(permission_comment),
             'created_by': permission_created_by,
             'actions': apply_actions,

@@ -108,7 +108,7 @@ class Migration(migrations.Migration):
                 ('strategy', models.CharField(
                     choices=[('super_admin', 'Super admin'), ('org_admin', 'Org admin'), ('super_org_admin', 'Super admin and org admin'),
                              ('custom_user', 'Custom user')],
-                    default='super', max_length=64, verbose_name='Approve strategy')),
+                    default='super_admin', max_length=64, verbose_name='Approve strategy')),
                 ('assignees_display', models.JSONField(default=list, encoder=common.db.encoder.ModelJSONFieldEncoder,
                                                        verbose_name='Assignees display')),
                 ('assignees',
