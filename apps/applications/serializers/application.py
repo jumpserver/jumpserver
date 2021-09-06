@@ -83,9 +83,6 @@ class AppAccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     category_display = serializers.SerializerMethodField(label=_('Category display'))
     type = serializers.ChoiceField(label=_('Type'), choices=const.AppType.choices, read_only=True)
     type_display = serializers.SerializerMethodField(label=_('Type display'))
-    uid = serializers.ReadOnlyField(label=_("Union id"))
-    org_id = serializers.ReadOnlyField(label=_("Organization"))
-    org_name = serializers.SerializerMethodField(label=_("Org name"))
 
     category_mapper = dict(const.AppCategory.choices)
     type_mapper = dict(const.AppType.choices)

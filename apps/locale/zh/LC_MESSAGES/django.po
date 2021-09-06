@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-08 18:00+0800\n"
+"POT-Creation-Date: 2021-09-08 18:04+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -35,12 +35,12 @@ msgid "Name"
 msgstr "名称"
 
 #: acls/models/base.py:27 assets/models/cmd_filter.py:54
-#: assets/models/user.py:203
+#: assets/models/user.py:207
 msgid "Priority"
 msgstr "优先级"
 
 #: acls/models/base.py:28 assets/models/cmd_filter.py:54
-#: assets/models/user.py:203
+#: assets/models/user.py:207
 msgid "1-100, the lower the value will be match first"
 msgstr "优先级可选范围为 1-100 (数值越小越优先)"
 
@@ -119,7 +119,7 @@ msgstr "系统用户"
 #: acls/models/login_asset_acl.py:22
 #: applications/serializers/attrs/application_category/remote_app.py:37
 #: assets/models/asset.py:357 assets/models/authbook.py:15
-#: assets/models/gathered_user.py:14 assets/serializers/system_user.py:200
+#: assets/models/gathered_user.py:14 assets/serializers/system_user.py:201
 #: audits/models.py:38 perms/models/asset_permission.py:99
 #: templates/index.html:82 terminal/backends/command/models.py:19
 #: terminal/backends/command/serializers.py:13 terminal/models/session.py:40
@@ -209,7 +209,7 @@ msgid ""
 msgstr "格式为逗号分隔的字符串, * 表示匹配所有. 可选的协议有： {}"
 
 #: acls/serializers/login_asset_acl.py:55 assets/models/asset.py:184
-#: assets/models/domain.py:63 assets/models/user.py:204
+#: assets/models/domain.py:63 assets/models/user.py:208
 #: terminal/serializers/session.py:30 terminal/serializers/storage.py:69
 msgid "Protocol"
 msgstr "协议"
@@ -248,7 +248,7 @@ msgid "Custom"
 msgstr "自定义"
 
 #: applications/models/account.py:11 assets/models/authbook.py:16
-#: assets/models/user.py:277 audits/models.py:39
+#: assets/models/user.py:281 audits/models.py:39
 #: perms/models/application_permission.py:31
 #: perms/models/asset_permission.py:101 templates/_nav.html:45
 #: terminal/backends/command/models.py:20
@@ -287,7 +287,7 @@ msgstr "类别"
 
 #: applications/models/application.py:171
 #: applications/serializers/application.py:84 assets/models/cmd_filter.py:53
-#: assets/models/user.py:202 perms/models/application_permission.py:23
+#: assets/models/user.py:206 perms/models/application_permission.py:23
 #: perms/serializers/application/user_permission.py:34
 #: terminal/models/storage.py:55 terminal/models/storage.py:116
 #: tickets/models/flow.py:50 tickets/models/ticket.py:48
@@ -323,22 +323,7 @@ msgstr "类别名称"
 msgid "Type display"
 msgstr "类型名称"
 
-#: applications/serializers/application.py:86
-msgid "Union id"
-msgstr "联合ID"
-
-#: applications/serializers/application.py:87 orgs/mixins/models.py:46
-#: orgs/mixins/serializers.py:25 orgs/models.py:37 orgs/models.py:432
-#: orgs/serializers.py:106 tickets/serializers/ticket/ticket.py:77
-msgid "Organization"
-msgstr "组织审计员"
-
-#: applications/serializers/application.py:88 assets/serializers/asset.py:98
-#: assets/serializers/system_user.py:217 orgs/mixins/serializers.py:26
-msgid "Org name"
-msgstr "用户名"
-
-#: applications/serializers/application.py:103
+#: applications/serializers/application.py:100
 msgid "Application display"
 msgstr "应用名称"
 
@@ -448,7 +433,7 @@ msgstr "系统平台"
 msgid "Protocols"
 msgstr "协议组"
 
-#: assets/models/asset.py:189 assets/models/user.py:194
+#: assets/models/asset.py:189 assets/models/user.py:198
 #: perms/models/asset_permission.py:100
 #: xpack/plugins/change_auth_plan/models/asset.py:44
 #: xpack/plugins/gathered_user/models.py:24
@@ -462,7 +447,7 @@ msgid "Is active"
 msgstr "激活"
 
 #: assets/models/asset.py:193 assets/models/cluster.py:19
-#: assets/models/user.py:191 assets/models/user.py:326 templates/_nav.html:44
+#: assets/models/user.py:195 assets/models/user.py:330 templates/_nav.html:44
 msgid "Admin user"
 msgstr "特权用户"
 
@@ -640,7 +625,7 @@ msgstr "系统"
 msgid "Default Cluster"
 msgstr "默认Cluster"
 
-#: assets/models/cmd_filter.py:33 assets/models/user.py:209
+#: assets/models/cmd_filter.py:33 assets/models/user.py:213
 msgid "Command filter"
 msgstr "命令过滤器"
 
@@ -742,7 +727,7 @@ msgstr "全称"
 msgid "Parent key"
 msgstr "ssh私钥"
 
-#: assets/models/node.py:559 assets/serializers/system_user.py:199
+#: assets/models/node.py:559 assets/serializers/system_user.py:200
 #: users/templates/users/user_asset_permission.html:41
 #: users/templates/users/user_asset_permission.html:73
 #: users/templates/users/user_asset_permission.html:158
@@ -750,65 +735,65 @@ msgstr "ssh私钥"
 msgid "Node"
 msgstr "节点"
 
-#: assets/models/user.py:185
+#: assets/models/user.py:189
 msgid "Automatic managed"
 msgstr "托管密码"
 
-#: assets/models/user.py:186
+#: assets/models/user.py:190
 msgid "Manually input"
 msgstr "手动输入"
 
-#: assets/models/user.py:190
+#: assets/models/user.py:194
 msgid "Common user"
 msgstr "普通用户"
 
-#: assets/models/user.py:193
+#: assets/models/user.py:197
 msgid "Username same with user"
 msgstr "用户名与用户相同"
 
-#: assets/models/user.py:196 assets/serializers/domain.py:28
+#: assets/models/user.py:200 assets/serializers/domain.py:28
 #: templates/_nav.html:39 xpack/plugins/change_auth_plan/models/asset.py:40
 msgid "Assets"
 msgstr "资产"
 
-#: assets/models/user.py:200 templates/_nav.html:17
+#: assets/models/user.py:204 templates/_nav.html:17
 #: users/views/profile/pubkey.py:37
 msgid "Users"
 msgstr "用户管理"
 
-#: assets/models/user.py:201
+#: assets/models/user.py:205
 msgid "User groups"
 msgstr "用户组"
 
-#: assets/models/user.py:205
+#: assets/models/user.py:209
 msgid "Auto push"
 msgstr "自动推送"
 
-#: assets/models/user.py:206
+#: assets/models/user.py:210
 msgid "Sudo"
 msgstr "Sudo"
 
-#: assets/models/user.py:207
+#: assets/models/user.py:211
 msgid "Shell"
 msgstr "Shell"
 
-#: assets/models/user.py:208
+#: assets/models/user.py:212
 msgid "Login mode"
 msgstr "认证方式"
 
-#: assets/models/user.py:210
+#: assets/models/user.py:214
 msgid "SFTP Root"
 msgstr "SFTP根路径"
 
-#: assets/models/user.py:211 authentication/models.py:94
+#: assets/models/user.py:215 authentication/models.py:94
 msgid "Token"
 msgstr ""
 
-#: assets/models/user.py:212
+#: assets/models/user.py:216
 msgid "Home"
 msgstr "家目录"
 
-#: assets/models/user.py:213
+#: assets/models/user.py:217
 msgid "System groups"
 msgstr "用户组"
 
@@ -840,6 +825,11 @@ msgstr "节点名称"
 #: assets/serializers/asset.py:97
 msgid "Hardware info"
 msgstr "硬件信息"
+
+#: assets/serializers/asset.py:98 assets/serializers/system_user.py:218
+#: orgs/mixins/serializers.py:26
+msgid "Org name"
+msgstr "用户名"
 
 #: assets/serializers/asset.py:99
 msgid "Admin user display"
@@ -885,7 +875,7 @@ msgstr "密钥指纹"
 msgid "Nodes amount"
 msgstr "节点数量"
 
-#: assets/serializers/system_user.py:53 assets/serializers/system_user.py:201
+#: assets/serializers/system_user.py:53 assets/serializers/system_user.py:202
 msgid "Login mode display"
 msgstr "认证方式名称"
 
@@ -893,27 +883,31 @@ msgstr "认证方式名称"
 msgid "Ad domain"
 msgstr "Ad 网域"
 
-#: assets/serializers/system_user.py:95
+#: assets/serializers/system_user.py:56
+msgid "Is asset protocol"
+msgstr ""
+
+#: assets/serializers/system_user.py:96
 msgid "Username same with user with protocol {} only allow 1"
 msgstr "用户名和用户相同的一种协议只允许存在一个"
 
-#: assets/serializers/system_user.py:109
+#: assets/serializers/system_user.py:110
 msgid "* Automatic login mode must fill in the username."
 msgstr "自动登录模式，必须填写用户名"
 
-#: assets/serializers/system_user.py:123
+#: assets/serializers/system_user.py:124
 msgid "Path should starts with /"
 msgstr "路径应该以 / 开头"
 
-#: assets/serializers/system_user.py:148
+#: assets/serializers/system_user.py:149
 msgid "Password or private key required"
 msgstr "密码或密钥密码需要一个"
 
-#: assets/serializers/system_user.py:216
+#: assets/serializers/system_user.py:217
 msgid "System user name"
 msgstr "系统用户名称"
 
-#: assets/serializers/system_user.py:226
+#: assets/serializers/system_user.py:227
 msgid "Asset hostname"
 msgstr "资产主机名"
 
@@ -2277,6 +2271,12 @@ msgstr "当前组织 ({}) 不能被删除"
 #: orgs/api.py:85
 msgid "The organization have resource ({}) cannot be deleted"
 msgstr "组织存在资源 ({}) 不能被删除"
+
+#: orgs/mixins/models.py:46 orgs/mixins/serializers.py:25 orgs/models.py:37
+#: orgs/models.py:432 orgs/serializers.py:106
+#: tickets/serializers/ticket/ticket.py:77
+msgid "Organization"
+msgstr "组织审计员"
 
 #: orgs/models.py:17 users/const.py:12
 msgid "Organization administrator"
@@ -5006,27 +5006,19 @@ msgstr "改密计划"
 
 #: xpack/plugins/change_auth_plan/models/app.py:41
 #: xpack/plugins/change_auth_plan/models/app.py:90
-#, fuzzy
-#| msgid "Change auth plan"
 msgid "Database Change auth plan"
 msgstr "改密计划"
 
 #: xpack/plugins/change_auth_plan/models/app.py:94
 #: xpack/plugins/change_auth_plan/models/app.py:146
-#, fuzzy
-#| msgid "Change auth plan execution"
 msgid "Database Change auth plan execution"
 msgstr "改密计划执行"
 
 #: xpack/plugins/change_auth_plan/models/app.py:142
-#, fuzzy
-#| msgid "System User"
 msgid "SystemUser"
 msgstr "系统用户"
 
 #: xpack/plugins/change_auth_plan/models/app.py:151
-#, fuzzy
-#| msgid "Change auth plan task"
 msgid "Database Change auth plan task"
 msgstr "改密计划任务"
 
@@ -5062,11 +5054,11 @@ msgstr "自定义密码"
 
 #: xpack/plugins/change_auth_plan/models/base.py:25
 msgid "All assets use the same random password"
-msgstr "所有资产使用相同的随机密码"
+msgstr "使用相同的随机密码"
 
 #: xpack/plugins/change_auth_plan/models/base.py:26
 msgid "All assets use different random password"
-msgstr "所有资产使用不同的随机密码"
+msgstr "使用不同的随机密码"
 
 #: xpack/plugins/change_auth_plan/models/base.py:36
 msgid "Password rules"
@@ -5584,6 +5576,9 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Union id"
+#~ msgstr "联合ID"
 
 #~ msgid "App"
 #~ msgstr "应用"
