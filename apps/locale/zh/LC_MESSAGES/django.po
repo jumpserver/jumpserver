@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-06 18:01+0800\n"
+"POT-Creation-Date: 2021-09-06 18:42+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -3787,26 +3787,20 @@ msgid "Two level"
 msgstr "2级审批"
 
 #: tickets/const.py:47
-#, fuzzy
-#| msgid "Super role name"
 msgid "Super admin"
-msgstr "超级角色名称"
+msgstr "超级管理员"
 
 #: tickets/const.py:48
-#, fuzzy
-#| msgid "Org name"
 msgid "Org admin"
-msgstr "组织名称"
+msgstr "组织管理员"
 
 #: tickets/const.py:49
 msgid "Super admin and org admin"
-msgstr ""
+msgstr "超级管理员和组织管理员"
 
 #: tickets/const.py:50
-#, fuzzy
-#| msgid "System user"
 msgid "Custom user"
-msgstr "系统用户"
+msgstr "自定义用户"
 
 #: tickets/errors.py:9
 msgid "Ticket already closed"
@@ -3943,7 +3937,8 @@ msgstr "用户显示名称"
 msgid "Body"
 msgstr "内容"
 
-#: tickets/models/flow.py:19 tickets/models/ticket.py:25
+#: tickets/models/flow.py:19 tickets/models/flow.py:55
+#: tickets/models/ticket.py:25
 msgid "Approve level"
 msgstr "审批等级"
 
@@ -3962,26 +3957,14 @@ msgid "Assignees display"
 msgstr "受理人名称"
 
 #: tickets/models/flow.py:37
-#, fuzzy
-#| msgid "Ticket approved info"
 msgid "Ticket flow approval rule"
 msgstr "工单批准信息"
 
-#: tickets/models/flow.py:55
-#, fuzzy
-#| msgid "Approve level"
-msgid "Approval level"
-msgstr "审批等级"
-
 #: tickets/models/flow.py:60
-#, fuzzy
-#| msgid "Ticket title"
 msgid "Ticket flow"
 msgstr "工单标题"
 
 #: tickets/models/ticket.py:38
-#, fuzzy
-#| msgid "Ticket assignees"
 msgid "Ticket assignee"
 msgstr "工单受理人"
 
@@ -3990,14 +3973,10 @@ msgid "Title"
 msgstr "标题"
 
 #: tickets/models/ticket.py:53
-#, fuzzy
-#| msgid "Status"
 msgid "State"
 msgstr "状态"
 
 #: tickets/models/ticket.py:61
-#, fuzzy
-#| msgid "Approve"
 msgid "Approval step"
 msgstr "同意"
 
@@ -4010,8 +3989,6 @@ msgid "Applicant display"
 msgstr "申请人名称"
 
 #: tickets/models/ticket.py:69
-#, fuzzy
-#| msgid "Processor"
 msgid "Process"
 msgstr "处理人"
 
@@ -4023,32 +4000,22 @@ msgstr "工单管理"
 
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:16
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:16
-#, fuzzy
-#| msgid "Application name"
 msgid "Apply name"
 msgstr "应用名称"
 
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:35
-#, fuzzy
-#| msgid "Apply for application"
 msgid "Apply applications"
 msgstr "申请应用"
 
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:40
-#, fuzzy
-#| msgid "Approve applications display"
 msgid "Apply applications display"
 msgstr "批准的应用名称"
 
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:44
-#, fuzzy
-#| msgid "Approve system users"
 msgid "Apply system users"
 msgstr "批准的系统用户"
 
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:49
-#, fuzzy
-#| msgid "Approve system user display"
 msgid "Apply system user display"
 msgstr "批准的系统用户名称"
 
@@ -4059,8 +4026,6 @@ msgid "Permission named `{}` already exists"
 msgstr "授权名称 `{}` 已存在"
 
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:20
-#, fuzzy
-#| msgid "Apply for asset"
 msgid "Apply assets"
 msgstr "申请资产"
 
@@ -4074,8 +4039,6 @@ msgstr "批准的系统用户"
 
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:33
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:41
-#, fuzzy
-#| msgid "Approve assets display"
 msgid "Apply assets display"
 msgstr "批准的资产名称"
 
@@ -4135,14 +4098,10 @@ msgid ""
 msgstr "提交数据中的类型 (`{}`) 与请求URL地址中的类型 (`{}`) 不一致"
 
 #: tickets/serializers/ticket/ticket.py:115
-#, fuzzy
-#| msgid "The organization `{}` does not exist"
 msgid "The ticket flow `{}` does not exist"
 msgstr "组织 `{}` 不存在"
 
 #: tickets/serializers/ticket/ticket.py:182
-#, fuzzy
-#| msgid "The current organization ({}) cannot be deleted"
 msgid "The current organization type already exists"
 msgstr "当前组织 ({}) 不能被删除"
 
