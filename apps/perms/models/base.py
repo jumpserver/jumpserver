@@ -11,7 +11,6 @@ from orgs.mixins.models import OrgModelMixin
 from common.db.models import UnionQuerySet
 from common.utils import date_expired_default, lazyproperty
 from orgs.mixins.models import OrgManager
-from ..const import AuthorizationRules
 
 __all__ = [
     'BasePermission', 'BasePermissionQuerySet'
@@ -52,9 +51,7 @@ class BasePermission(OrgModelMixin):
     created_by = models.CharField(max_length=128, blank=True, verbose_name=_('Created by'))
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date created'))
     comment = models.TextField(verbose_name=_('Comment'), blank=True)
-    authorization_rules = models.CharField(
-        max_length=64, default=AuthorizationRules.manual, choices=AuthorizationRules.choices,
-        verbose_name=_('Authorization rules'))
+    from_ticket = models.BooleanField(default=False, verbose_name=_('From ticket'))
 
     objects = BasePermissionManager.from_queryset(BasePermissionQuerySet)()
 
