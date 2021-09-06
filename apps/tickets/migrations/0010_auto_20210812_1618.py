@@ -195,7 +195,7 @@ class Migration(migrations.Migration):
                                                    ('command_confirm', 'Command confirm')], default='general',
                                           max_length=64, verbose_name='Type')),
                 ('approval_level', models.SmallIntegerField(choices=[(1, 'One level'), (2, 'Two level')], default=1,
-                                                            verbose_name='Approval level')),
+                                                            verbose_name='Approve level')),
                 ('rules', models.ManyToManyField(related_name='ticket_flows', to='tickets.ApprovalRule')),
             ],
             options={
