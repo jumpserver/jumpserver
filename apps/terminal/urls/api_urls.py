@@ -21,6 +21,7 @@ router.register(r'status', api.StatusViewSet, 'status')
 router.register(r'replay-storages', api.ReplayStorageViewSet, 'replay-storage')
 router.register(r'command-storages', api.CommandStorageViewSet, 'command-storage')
 router.register(r'session-sharings', api.SessionSharingViewSet, 'session-sharing')
+router.register(r'session-join-records', api.SessionJoinRecordsViewSet, 'session-sharing-record')
 
 urlpatterns = [
     path('terminal-registrations/', api.TerminalRegistrationApi.as_view(), name='terminal-registration'),

@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils import timezone
+import datetime
 from common.mixins import CommonModelMixin
 from orgs.mixins.models import OrgModelMixin
 from django.utils.translation import ugettext_lazy as _
@@ -13,6 +15,7 @@ class SessionSharing(CommonModelMixin, OrgModelMixin):
     session = models.ForeignKey(
         'terminal.Session', on_delete=models.CASCADE, verbose_name=_('Session')
     )
+    # creator / created_by
     creator = models.ForeignKey(
         'users.User', on_delete=models.SET_NULL, blank=True, null=True,
         verbose_name=_('User')
@@ -25,8 +28,22 @@ class SessionSharing(CommonModelMixin, OrgModelMixin):
         default=0, verbose_name=_('Expired time (min)'), db_index=True
     )
 
-    def is_valid(self):
-        pass
+    @property
+    def date_expired(self):
+        return self.date_created + datetime.timedelta(minutes=self.expired_time)
+
+    @property
+    def is_expired(self):
+        if timezone.now() > self.date_expired:
+            return False
+        return True
+
+    def can_join(self):
+        if not self.is_active:
+            return False, _('Link not active')
+        if not self.is_expired:
+            return False, _('Link expired')
+        return True, ''
 
 
 class SessionJoinRecord(CommonModelMixin, OrgModelMixin):
@@ -35,6 +52,7 @@ class SessionJoinRecord(CommonModelMixin, OrgModelMixin):
     session = models.ForeignKey(
         'terminal.Session', on_delete=models.CASCADE, verbose_name=_('Session')
     )
+    verify_code = models.CharField(max_length=16, verbose_name=_('Verify code'))
     sharing = models.ForeignKey(
         SessionSharing, on_delete=models.CASCADE,
         verbose_name=_('Session share')
@@ -44,7 +62,7 @@ class SessionJoinRecord(CommonModelMixin, OrgModelMixin):
         verbose_name=_('User')
     )
     date_joined = models.DateTimeField(
-        verbose_name=_("Date start"), db_index=True, default=timezone.now
+        auto_now_add=True, verbose_name=_("Date start"), db_index=True,
     )
     date_left = models.DateTimeField(
         verbose_name=_("Date end"), null=True, db_index=True
@@ -62,3 +80,25 @@ class SessionJoinRecord(CommonModelMixin, OrgModelMixin):
         max_length=1024, blank=True, null=True, verbose_name=_('Reason')
     )
     is_finished = models.BooleanField(default=False, db_index=True)
+
+    def can_join(self):
+        # sharing
+        sharing_can_join, reason = self.sharing.can_join()
+        if not sharing_can_join:
+            return False, reason
+        # self
+        if self.verify_code != self.sharing.verify_code:
+            return False, _('Verification code error')
+        return True, ''
+
+    def join_failed(self, reason):
+        self.is_success = False
+        self.reason = reason[:1024]
+        self.save()
+
+    def finished(self):
+        if self.is_finished:
+            return
+        self.date_left = timezone.now()
+        self.is_finished = True
+        self.save()
