@@ -5,7 +5,7 @@ from django_filters import rest_framework as filters
 from django.db.models import F, Q
 
 from common.drf.filters import BaseFilterSet
-from common.drf.api import JMSModelViewSet
+from common.drf.api import JMSBulkModelViewSet
 from ..models import Account
 from ..hands import IsOrgAdminOrAppUser, IsOrgAdmin, NeedMFAVerify
 from .. import serializers
@@ -35,14 +35,13 @@ class AccountFilterSet(BaseFilterSet):
         return qs
 
 
-class ApplicationAccountViewSet(JMSModelViewSet):
+class ApplicationAccountViewSet(JMSBulkModelViewSet):
     model = Account
     search_fields = ['username', 'app_display']
     filterset_class = AccountFilterSet
-    filterset_fields = ['', 'username', 'app_display', 'type', 'category', 'app']
+    filterset_fields = ['username', 'app_display', 'type', 'category', 'app']
     serializer_class = serializers.AppAccountSerializer
     permission_classes = (IsOrgAdmin,)
-    http_method_names = ['get', 'put', 'patch', 'options']
 
     def get_queryset(self):
         queryset = Account.objects.all() \

@@ -96,15 +96,14 @@ class AppAccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'type', 'type_display', 'category', 'category_display',
         ]
         extra_kwargs = {
+            'username': {'default': '', 'required': False},
             'password': {'write_only': True},
             'app_display': {'label': _('Application display')}
         }
-
-    def create(self, validated_data):
-        pass
-
-    def update(self, instance, validated_data):
-        pass
+        use_model_bulk_create = True
+        model_bulk_create_kwargs = {
+            'ignore_conflicts': True
+        }
 
     def get_category_display(self, obj):
         return self.category_mapper.get(obj.category)

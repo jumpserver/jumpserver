@@ -53,6 +53,14 @@ class Account(BaseUser):
         return instance
 
     @lazyproperty
+    def category(self):
+        return self.app.category
+
+    @lazyproperty
+    def type(self):
+        return self.app.type
+
+    @lazyproperty
     def app_display(self):
         return self.systemuser.name
 
