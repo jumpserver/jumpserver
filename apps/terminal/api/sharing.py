@@ -1,7 +1,8 @@
-from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.exceptions import MethodNotAllowed, ValidationError
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.exceptions import ValidationError
+from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
 from common.permissions import IsAppUser, IsSuperUser
 from common.const.http import PATCH
 from orgs.mixins.api import OrgModelViewSet
@@ -16,6 +17,12 @@ class SessionSharingViewSet(OrgModelViewSet):
     search_fields = ('session', 'creator', 'is_active', 'expired_time')
     filterset_fields = search_fields
     model = models.SessionSharing
+
+    def create(self, request, *args, **kwargs):
+        if not settings.SECURITY_SESSION_SHARE:
+            detail = _('Secure session sharing settings is disabled')
+            raise MethodNotAllowed(self.action, detail=detail)
+        return super().create(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         raise MethodNotAllowed(self.action)
