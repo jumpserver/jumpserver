@@ -6,7 +6,7 @@ from django.db import migrations, models, transaction
 import django.db.models.deletion
 import uuid
 
-from tickets.const import TicketType
+from tickets.const import TicketType, TicketApprovalStrategy
 
 ticket_assignee_m2m = list()
 
@@ -82,9 +82,9 @@ def create_ticket_flow_and_approval_rule(apps, schema_editor):
     super_user = user_model.objects.filter(role='Admin')
     assignees_display = ['{0.name}({0.username})'.format(i) for i in super_user]
     with transaction.atomic():
-        for ticket_type in TicketType.values:
+        for ticket_type in [TicketType.apply_asset, TicketType.apply_application]:
             ticket_flow_instance = ticket_flow_model.objects.create(created_by='System', type=ticket_type, org_id=org_id)
-            approval_rule_instance = approval_rule_model.objects.create(strategy='super', assignees_display=assignees_display)
+            approval_rule_instance = approval_rule_model.objects.create(strategy=TicketApprovalStrategy.super_admin, assignees_display=assignees_display)
             approval_rule_instance.assignees.set(list(super_user))
             ticket_flow_instance.rules.set([approval_rule_instance, ])
 
