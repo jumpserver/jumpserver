@@ -7,11 +7,12 @@ from django.utils import timezone
 from .session import Session
 
 
-class SessionShare(CommonModelMixin, OrgModelMixin):
-    verify_code = models.IntegerField(verbose_name=_('Verify code'))
+class SessionSharing(CommonModelMixin, OrgModelMixin):
+    session = models.ForeignKey('terminal.Session', on_delete=models.CASCADE, verbose_name=_('Session'))
+    creator = models.ForeignKey('users.User', on_delete=models.SET_NULL, blank=True, null=True, verbose_name=_('User'))
     link = models.CharField(max_length=1024, verbose_name=_('Share link'))
-    session = models.ForeignKey('terminal.Session', on_delete=models.SET_NULL, verbose_name=_('Session'))
-    terminal = models.ForeignKey('terminal.Terminal', on_delete=models.SET_NULL, verbose_name=_('Terminal'))
+    verify_code = models.IntegerField(verbose_name=_('Verify code'))
+    terminal = models.ForeignKey('terminal.Terminal', on_delete=models.SET_NULL, blank=True, null=True, verbose_name=_('Terminal'))
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
     expired_time = models.IntegerField(default=0, verbose_name=_('Expired time (min)'))
 
@@ -19,12 +20,12 @@ class SessionShare(CommonModelMixin, OrgModelMixin):
         pass
 
 
-class ShareJoinRecord(CommonModelMixin, OrgModelMixin):
+class SessionJoinRecord(CommonModelMixin, OrgModelMixin):
     LOGIN_FROM = Session.LOGIN_FROM
 
-    share = models.ForeignKey(SessionShare, on_delete=models.SET_NULL, verbose_name=_('Session share'))
-    session = models.ForeignKey('terminal.Session', on_delete=models.SET_NULL, verbose_name=_('Session'))
-    user = models.ForeignKey('users.User', on_delete=models.SET_NULL, verbose_name=_('User'))
+    session = models.ForeignKey('terminal.Session', on_delete=models.CASCADE, verbose_name=_('Session'))
+    sharing = models.ForeignKey(SessionSharing, on_delete=models.CASCADE, verbose_name=_('Session share'))
+    joiner = models.ForeignKey('users.User', on_delete=models.SET_NULL, blank=True, null=True, verbose_name=_('User'))
     date_joined = models.DateTimeField(verbose_name=_("Date start"), db_index=True, default=timezone.now)
     date_left = models.DateTimeField(verbose_name=_("Date end"), null=True)
     remote_addr = models.CharField(max_length=128, verbose_name=_("Remote addr"), blank=True, null=True)
@@ -32,4 +33,4 @@ class ShareJoinRecord(CommonModelMixin, OrgModelMixin):
     is_success = models.BooleanField(default=True, db_index=True)
     reason = models.CharField(max_length=1024, blank=True, null=True, verbose_name=_('Reason'))
     is_finished = models.BooleanField(default=False, db_index=True)
-    terminal = models.ForeignKey('terminal.Terminal', on_delete=models.SET_NULL, verbose_name=_('Terminal'))
+    terminal = models.ForeignKey('terminal.Terminal', on_delete=models.SET_NULL, blank=True, null=True, verbose_name=_('Terminal'))
