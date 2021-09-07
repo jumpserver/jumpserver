@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-07 17:44+0800\n"
+"POT-Creation-Date: 2021-09-07 18:57+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -2497,11 +2497,23 @@ msgstr "OIDC 认证"
 msgid "RADIUS Auth"
 msgstr "RADIUS 认证"
 
+#: settings/serializers/auth/base.py:13
+msgid "DingTalk Auth"
+msgstr "钉钉 认证"
+
+#: settings/serializers/auth/base.py:14
+msgid "FeiShu Auth"
+msgstr "飞书 认证"
+
+#: settings/serializers/auth/base.py:15
+msgid "WeCom Auth"
+msgstr "企业微信 认证"
+
 #: settings/serializers/auth/cas.py:11
 msgid "Enable CAS Auth"
 msgstr "启用 CAS 认证"
 
-#: settings/serializers/auth/cas.py:12 settings/serializers/auth/oidc.py:30
+#: settings/serializers/auth/cas.py:12 settings/serializers/auth/oidc.py:32
 msgid "Server url"
 msgstr "服务端地址"
 
@@ -2524,6 +2536,14 @@ msgstr "映射属性"
 #: settings/serializers/auth/cas.py:18
 msgid "Create user if not"
 msgstr "创建用户(如果不存在)"
+
+#: settings/serializers/auth/dingtalk.py:11
+msgid "Enable DingTalk Auth"
+msgstr "启用钉钉认证"
+
+#: settings/serializers/auth/feishu.py:10
+msgid "Enable FeiShu Auth"
+msgstr "启用飞书认证"
 
 #: settings/serializers/auth/ldap.py:39
 msgid "LDAP server"
@@ -2603,71 +2623,71 @@ msgstr "共享会话"
 msgid "Ignore ssl verification"
 msgstr "忽略 SSL 证书验证"
 
-#: settings/serializers/auth/oidc.py:28
+#: settings/serializers/auth/oidc.py:29
 msgid "Use Keycloak"
 msgstr "使用 Keycloak"
 
-#: settings/serializers/auth/oidc.py:33
+#: settings/serializers/auth/oidc.py:35
 msgid "Realm name"
 msgstr "域"
 
-#: settings/serializers/auth/oidc.py:39
+#: settings/serializers/auth/oidc.py:41
 msgid "Enable OPENID Auth"
 msgstr "启用 OIDC 认证"
 
-#: settings/serializers/auth/oidc.py:41
+#: settings/serializers/auth/oidc.py:43
 msgid "Provider endpoint"
 msgstr "端点地址"
 
-#: settings/serializers/auth/oidc.py:44
+#: settings/serializers/auth/oidc.py:46
 msgid "Provider auth endpoint"
 msgstr "授权端点地址"
 
-#: settings/serializers/auth/oidc.py:47
+#: settings/serializers/auth/oidc.py:49
 msgid "Provider token endpoint"
 msgstr "token 端点地址"
 
-#: settings/serializers/auth/oidc.py:50
+#: settings/serializers/auth/oidc.py:52
 msgid "Provider jwks endpoint"
 msgstr "jwks 端点地址"
 
-#: settings/serializers/auth/oidc.py:53
+#: settings/serializers/auth/oidc.py:55
 msgid "Provider userinfo endpoint"
 msgstr "用户信息端点地址"
 
-#: settings/serializers/auth/oidc.py:56
+#: settings/serializers/auth/oidc.py:58
 msgid "Provider end session endpoint"
 msgstr "注销会话端点地址"
 
-#: settings/serializers/auth/oidc.py:59
+#: settings/serializers/auth/oidc.py:61
 msgid "Provider sign alg"
 msgstr "签名算法"
 
-#: settings/serializers/auth/oidc.py:62
+#: settings/serializers/auth/oidc.py:64
 msgid "Provider sign key"
 msgstr "签名 Key"
 
-#: settings/serializers/auth/oidc.py:64
+#: settings/serializers/auth/oidc.py:66
 msgid "Scopes"
 msgstr "连接范围"
 
-#: settings/serializers/auth/oidc.py:66
+#: settings/serializers/auth/oidc.py:68
 msgid "Id token max age"
 msgstr "令牌有效时间"
 
-#: settings/serializers/auth/oidc.py:69
+#: settings/serializers/auth/oidc.py:71
 msgid "Id token include claims"
 msgstr "声明"
 
-#: settings/serializers/auth/oidc.py:71
+#: settings/serializers/auth/oidc.py:73
 msgid "Use state"
 msgstr "使用状态"
 
-#: settings/serializers/auth/oidc.py:72
+#: settings/serializers/auth/oidc.py:74
 msgid "Use nonce"
 msgstr "临时使用"
 
-#: settings/serializers/auth/oidc.py:74
+#: settings/serializers/auth/oidc.py:76
 msgid "Always update user"
 msgstr "总是更新用户信息"
 
@@ -2676,12 +2696,12 @@ msgid "Enable RADIUS Auth"
 msgstr "启用 RADIUS 认证"
 
 #: settings/serializers/auth/radius.py:19
-msgid "Encrypt password"
-msgstr "密码加密"
-
-#: settings/serializers/auth/radius.py:20
 msgid "OTP in radius"
 msgstr "使用 Radius OTP"
+
+#: settings/serializers/auth/wecom.py:11
+msgid "Enable WeCom Auth"
+msgstr "启用企业微信认证"
 
 #: settings/serializers/basic.py:7
 msgid "Site url"
@@ -2808,18 +2828,6 @@ msgstr "署名"
 #: settings/serializers/email.py:70
 msgid "Tips: Email signature (eg:jumpserver)"
 msgstr "邮件署名 (如:jumpserver)"
-
-#: settings/serializers/im.py:9
-msgid "Enable WeCom Auth"
-msgstr "启用企业微信认证"
-
-#: settings/serializers/im.py:16
-msgid "Enable DingTalk Auth"
-msgstr "启用钉钉认证"
-
-#: settings/serializers/im.py:22
-msgid "Enable FeiShu Auth"
-msgstr "启用飞书认证"
 
 #: settings/serializers/security.py:9
 msgid "All users"
@@ -5701,6 +5709,9 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Encrypt password"
+#~ msgstr "密码加密"
 
 #~ msgid "Create User"
 #~ msgstr "创建用户"

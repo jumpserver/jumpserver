@@ -31,7 +31,8 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'keycloak': serializers.KeycloakSettingSerializer,
         'radius': serializers.RadiusSettingSerializer,
         'cas': serializers.CASSettingSerializer,
-        'advanced': serializers.AdvancedSettingSerializer,
+        'clean': serializers.CleaningSerializer,
+        'other': serializers.OtherSettingSerializer,
     }
 
     def get_serializer_class(self):

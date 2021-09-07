@@ -1,15 +1,16 @@
 # coding: utf-8
 
 from .basic import BasicSettingSerializer
-from .advanced import AdvancedSettingSerializer
+from .other import OtherSettingSerializer
 from .email import EmailSettingSerializer, EmailContentSettingSerializer
-from .im import FeiShuSettingSerializer, WeComSettingSerializer, DingTalkSettingSerializer
 from .auth import (
     LDAPSettingSerializer, OIDCSettingSerializer, KeycloakSettingSerializer,
-    CASSettingSerializer, RadiusSettingSerializer
+    CASSettingSerializer, RadiusSettingSerializer, FeiShuSettingSerializer,
+    WeComSettingSerializer, DingTalkSettingSerializer
 )
 from .terminal import TerminalSettingSerializer
 from .security import SecuritySettingSerializer
+from .cleaning import CleaningSerializer
 
 __all__ = [
     'SettingsSerializer',
@@ -26,11 +27,12 @@ class SettingsSerializer(
     FeiShuSettingSerializer,
     EmailSettingSerializer,
     EmailContentSettingSerializer,
-    AdvancedSettingSerializer,
+    OtherSettingSerializer,
     OIDCSettingSerializer,
     KeycloakSettingSerializer,
     CASSettingSerializer,
-    RadiusSettingSerializer
+    RadiusSettingSerializer,
+    CleaningSerializer
 ):
     # encrypt_fields 现在使用 write_only 来判断了
     pass

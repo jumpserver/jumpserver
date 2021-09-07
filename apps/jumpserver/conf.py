@@ -201,6 +201,7 @@ class Config(dict):
         'AUTH_OPENID_SERVER_URL': 'https://keycloak.example.com',
         'AUTH_OPENID_REALM_NAME': None,
 
+        # Raidus 认证
         'AUTH_RADIUS': False,
         'RADIUS_SERVER': 'localhost',
         'RADIUS_PORT': 1812,
@@ -208,6 +209,7 @@ class Config(dict):
         'RADIUS_ENCRYPT_PASSWORD': True,
         'OTP_IN_RADIUS': False,
 
+        # Cas 认证
         'AUTH_CAS': False,
         'CAS_SERVER_URL': "https://example.com/cas/",
         'CAS_ROOT_PROXIED_AS': '',
@@ -221,24 +223,31 @@ class Config(dict):
         'AUTH_SSO': False,
         'AUTH_SSO_AUTHKEY_TTL': 60 * 15,
 
+        # 企业微信
         'AUTH_WECOM': False,
         'WECOM_CORPID': '',
         'WECOM_AGENTID': '',
         'WECOM_SECRET': '',
 
+        # 钉钉
         'AUTH_DINGTALK': False,
         'DINGTALK_AGENTID': '',
         'DINGTALK_APPKEY': '',
         'DINGTALK_APPSECRET': '',
 
+        # 飞书
         'AUTH_FEISHU': False,
         'FEISHU_APP_ID': '',
         'FEISHU_APP_SECRET': '',
+
+        'LOGIN_REDIRECT_TO_BACKEND':  None,  # 'OPENID / CAS
+        'LOGIN_REDIRECT_MSG_ENABLED': True,
 
         'OTP_VALID_WINDOW': 2,
         'OTP_ISSUER_NAME': 'JumpServer',
         'EMAIL_SUFFIX': 'example.com',
 
+        # Terminal配置
         'TERMINAL_PASSWORD_AUTH': True,
         'TERMINAL_PUBLIC_KEY_AUTH': True,
         'TERMINAL_HEARTBEAT_INTERVAL': 20,
@@ -248,7 +257,9 @@ class Config(dict):
         'TERMINAL_HOST_KEY': '',
         'TERMINAL_TELNET_REGEX': '',
         'TERMINAL_COMMAND_STORAGE': {},
+        'TERMINAL_RDP_ADDR': '',
 
+        # 安全配置
         'SECURITY_MFA_AUTH': 0,  # 0 不开启 1 全局开启 2 管理员开启
         'SECURITY_COMMAND_EXECUTION': True,
         'SECURITY_SERVICE_ACCOUNT_REGISTRATION': True,
@@ -271,51 +282,53 @@ class Config(dict):
         'SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER': '',
         'SECURITY_LUNA_REMEMBER_AUTH': True,
         'SECURITY_WATERMARK_ENABLED': True,
+        'SECURITY_MFA_VERIFY_TTL': 3600,
+        'OLD_PASSWORD_HISTORY_LIMIT_COUNT': 5,
+        'LOGIN_CONFIRM_ENABLE': False,
+        'CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED': True,
+        'USER_LOGIN_SINGLE_MACHINE_ENABLED': False,
+        'ONLY_ALLOW_EXIST_USER_AUTH': False,
+        'ONLY_ALLOW_AUTH_FROM_SOURCE': False,
 
+        # 启动前
         'HTTP_BIND_HOST': '0.0.0.0',
         'HTTP_LISTEN_PORT': 8080,
         'WS_LISTEN_PORT': 8070,
+        'SYSLOG_ADDR': '',  # '192.168.0.1:514'
+        'SYSLOG_FACILITY': 'user',
+        'SYSLOG_SOCKTYPE': 2,
+        'PERM_EXPIRED_CHECK_PERIODIC': 60 * 60,
+        'FLOWER_URL': "127.0.0.1:5555",
+        'LANGUAGE_CODE': 'zh',
+        'TIME_ZONE': 'Asia/Shanghai',
+        'FORCE_SCRIPT_NAME': '',
+        'SESSION_COOKIE_SECURE': False,
+        'CSRF_COOKIE_SECURE': False,
+        'REFERER_CHECK_ENABLED': False,
+        'SESSION_SAVE_EVERY_REQUEST': True,
+        'SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE': False,
+        'SERVER_REPLAY_STORAGE': {},
+
+        # 记录清理清理
         'LOGIN_LOG_KEEP_DAYS': 200,
         'TASK_LOG_KEEP_DAYS': 90,
         'OPERATE_LOG_KEEP_DAYS': 200,
         'FTP_LOG_KEEP_DAYS': 200,
-        'ASSETS_PERM_CACHE_TIME': 3600 * 24,
-        'SECURITY_MFA_VERIFY_TTL': 3600,
-        'OLD_PASSWORD_HISTORY_LIMIT_COUNT': 5,
-        'ASSETS_PERM_CACHE_ENABLE': HAS_XPACK,
-        'SYSLOG_ADDR': '',  # '192.168.0.1:514'
-        'SYSLOG_FACILITY': 'user',
-        'SYSLOG_SOCKTYPE': 2,
-        'PERM_SINGLE_ASSET_TO_UNGROUP_NODE': False,
-        'PERM_EXPIRED_CHECK_PERIODIC': 60 * 60,
-        'WINDOWS_SSH_DEFAULT_SHELL': 'cmd',
-        'FLOWER_URL': "127.0.0.1:5555",
-        'DEFAULT_ORG_SHOW_ALL_USERS': True,
-        'PERIOD_TASK_ENABLED': True,
-        'FORCE_SCRIPT_NAME': '',
-        'LOGIN_CONFIRM_ENABLE': False,
-        'WINDOWS_SKIP_ALL_MANUAL_PASSWORD': False,
-        'ORG_CHANGE_TO_URL': '',
-        'LANGUAGE_CODE': 'zh',
-        'TIME_ZONE': 'Asia/Shanghai',
-        'CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED': True,
-        'USER_LOGIN_SINGLE_MACHINE_ENABLED': False,
-        'TICKETS_ENABLED': True,
-        'SESSION_COOKIE_SECURE': False,
-        'CSRF_COOKIE_SECURE': False,
-        'REFERER_CHECK_ENABLED': False,
-        'SERVER_REPLAY_STORAGE': {},
-        'CONNECTION_TOKEN_ENABLED': False,
-        'ONLY_ALLOW_EXIST_USER_AUTH': False,
-        'ONLY_ALLOW_AUTH_FROM_SOURCE': False,
-        'SESSION_SAVE_EVERY_REQUEST': True,
-        'SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE': False,
-        'FORGOT_PASSWORD_URL': '',
-        'HEALTH_CHECK_TOKEN': '',
-        'LOGIN_REDIRECT_TO_BACKEND':  None,  # 'OPENID / CAS
         'CLOUD_SYNC_TASK_EXECUTION_KEEP_DAYS': 30,
 
-        'TERMINAL_RDP_ADDR': ''
+        # 废弃的
+        'DEFAULT_ORG_SHOW_ALL_USERS': True,
+        'ORG_CHANGE_TO_URL': '',
+        'WINDOWS_SKIP_ALL_MANUAL_PASSWORD': False,
+        'CONNECTION_TOKEN_ENABLED': False,
+
+        'PERM_SINGLE_ASSET_TO_UNGROUP_NODE': False,
+        'WINDOWS_SSH_DEFAULT_SHELL': 'cmd',
+        'PERIOD_TASK_ENABLED': True,
+
+        'TICKETS_ENABLED': True,
+        'FORGOT_PASSWORD_URL': '',
+        'HEALTH_CHECK_TOKEN': '',
     }
 
     def compatible_auth_openid_of_key(self):
