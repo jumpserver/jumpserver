@@ -179,13 +179,14 @@ class Config(dict):
         'AUTH_OPENID_CLIENT_SECRET': 'client-secret',
         'AUTH_OPENID_SHARE_SESSION': True,
         'AUTH_OPENID_IGNORE_SSL_VERIFICATION': True,
+
         # OpenID 新配置参数 (version >= 1.5.9)
-        'AUTH_OPENID_PROVIDER_ENDPOINT': 'https://op-example.com/',
-        'AUTH_OPENID_PROVIDER_AUTHORIZATION_ENDPOINT': 'https://op-example.com/authorize',
-        'AUTH_OPENID_PROVIDER_TOKEN_ENDPOINT': 'https://op-example.com/token',
-        'AUTH_OPENID_PROVIDER_JWKS_ENDPOINT': 'https://op-example.com/jwks',
-        'AUTH_OPENID_PROVIDER_USERINFO_ENDPOINT': 'https://op-example.com/userinfo',
-        'AUTH_OPENID_PROVIDER_END_SESSION_ENDPOINT': 'https://op-example.com/logout',
+        'AUTH_OPENID_PROVIDER_ENDPOINT': 'https://oidc.example.com/',
+        'AUTH_OPENID_PROVIDER_AUTHORIZATION_ENDPOINT': 'https://oidc.example.com/authorize',
+        'AUTH_OPENID_PROVIDER_TOKEN_ENDPOINT': 'https://oidc.example.com/token',
+        'AUTH_OPENID_PROVIDER_JWKS_ENDPOINT': 'https://oidc.example.com/jwks',
+        'AUTH_OPENID_PROVIDER_USERINFO_ENDPOINT': 'https://oidc.example.com/userinfo',
+        'AUTH_OPENID_PROVIDER_END_SESSION_ENDPOINT': 'https://oidc.example.com/logout',
         'AUTH_OPENID_PROVIDER_SIGNATURE_ALG': 'HS256',
         'AUTH_OPENID_PROVIDER_SIGNATURE_KEY': None,
         'AUTH_OPENID_SCOPES': 'openid profile email',
@@ -194,8 +195,10 @@ class Config(dict):
         'AUTH_OPENID_USE_STATE': True,
         'AUTH_OPENID_USE_NONCE': True,
         'AUTH_OPENID_ALWAYS_UPDATE_USER': True,
-        # OpenID 旧配置参数 (version <= 1.5.8 (discarded))
-        'AUTH_OPENID_SERVER_URL': 'http://openid',
+
+        # Keycloak 旧配置参数 (version <= 1.5.8 (discarded))
+        'AUTH_OPENID_KEYCLOAK': True,
+        'AUTH_OPENID_SERVER_URL': 'https://keycloak.example.com',
         'AUTH_OPENID_REALM_NAME': None,
 
         'AUTH_RADIUS': False,
@@ -206,7 +209,7 @@ class Config(dict):
         'OTP_IN_RADIUS': False,
 
         'AUTH_CAS': False,
-        'CAS_SERVER_URL': "http://host/cas/",
+        'CAS_SERVER_URL': "https://example.com/cas/",
         'CAS_ROOT_PROXIED_AS': '',
         'CAS_LOGOUT_COMPLETELY': True,
         'CAS_VERSION': 3,
@@ -234,7 +237,7 @@ class Config(dict):
 
         'OTP_VALID_WINDOW': 2,
         'OTP_ISSUER_NAME': 'JumpServer',
-        'EMAIL_SUFFIX': 'jumpserver.org',
+        'EMAIL_SUFFIX': 'example.com',
 
         'TERMINAL_PASSWORD_AUTH': True,
         'TERMINAL_PUBLIC_KEY_AUTH': True,
@@ -323,6 +326,9 @@ class Config(dict):
         构造出新配置中标准OpenID协议中所需的Endpoint即可
         (Keycloak说明文档参考: https://www.keycloak.org/docs/latest/securing_apps/)
         """
+        if self.AUTH_OPENID and not self.AUTH_OPENID_REALM_NAME:
+            self['AUTH_OPENID_KEYCLOAK'] = False
+
         if not self.AUTH_OPENID:
             return
 

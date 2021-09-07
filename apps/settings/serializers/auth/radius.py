@@ -16,5 +16,4 @@ class RadiusSettingSerializer(serializers.Serializer):
     RADIUS_SECRET = serializers.CharField(
         required=False, max_length=1024, allow_null=True, label=_('Secret'), write_only=True
     )
-    RADIUS_ENCRYPT_PASSWORD = serializers.BooleanField(required=False, label=_('Encrypt password'))
-    OTP_IN_RADIUS = serializers.BooleanField(required=False, label=_('Otp in radius'))
+    OTP_IN_RADIUS = serializers.BooleanField(required=False, label=_('OTP in radius'))

@@ -26,6 +26,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'wecom': serializers.WeComSettingSerializer,
         'dingtalk': serializers.DingTalkSettingSerializer,
         'feishu': serializers.FeiShuSettingSerializer,
+        'auth': serializers.AuthSettingSerializer,
         'oidc': serializers.OIDCSettingSerializer,
         'keycloak': serializers.KeycloakSettingSerializer,
         'radius': serializers.RadiusSettingSerializer,
@@ -78,3 +79,5 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
                 continue
             serializer_data[setting.name] = setting.cleaned_value
         setattr(serializer, '_data', serializer_data)
+        if hasattr(serializer, 'post_save'):
+            serializer.post_save()

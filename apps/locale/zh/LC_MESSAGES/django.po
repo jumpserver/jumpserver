@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-01 16:18+0800\n"
+"POT-Creation-Date: 2021-09-07 17:44+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -156,7 +156,7 @@ msgstr ""
 #: acls/serializers/login_acl.py:30 acls/serializers/login_asset_acl.py:31
 #: applications/serializers/attrs/application_type/mysql_workbench.py:18
 #: assets/models/asset.py:180 assets/models/domain.py:61
-#: assets/serializers/account.py:12 settings/serializers/settings.py:116
+#: assets/serializers/account.py:12 settings/serializers/terminal.py:8
 #: users/templates/users/_granted_assets.html:26
 #: users/templates/users/user_asset_permission.html:156
 msgid "IP"
@@ -198,7 +198,7 @@ msgstr ""
 
 #: acls/serializers/login_asset_acl.py:35 assets/models/asset.py:181
 #: assets/serializers/account.py:13 assets/serializers/gathered_user.py:23
-#: settings/serializers/settings.py:115
+#: settings/serializers/terminal.py:7
 #: users/templates/users/_granted_assets.html:25
 #: users/templates/users/user_asset_permission.html:157
 msgid "Hostname"
@@ -308,7 +308,7 @@ msgstr ""
 #: assets/models/base.py:177 audits/signals_handler.py:63
 #: authentication/forms.py:22
 #: authentication/templates/authentication/login.html:164
-#: settings/serializers/settings.py:96 users/forms/profile.py:21
+#: settings/serializers/auth/ldap.py:43 users/forms/profile.py:21
 #: users/templates/users/user_otp_check_password.html:13
 #: users/templates/users/user_password_update.html:43
 #: users/templates/users/user_password_verify.html:18
@@ -368,7 +368,7 @@ msgid "Cluster"
 msgstr "集群"
 
 #: applications/serializers/attrs/application_category/db.py:11
-#: ops/models/adhoc.py:146 settings/serializers/settings.py:290
+#: ops/models/adhoc.py:146 settings/serializers/auth/radius.py:14
 #: xpack/plugins/cloud/serializers.py:65
 msgid "Host"
 msgstr "主机"
@@ -379,7 +379,7 @@ msgstr "主机"
 #: applications/serializers/attrs/application_type/oracle.py:11
 #: applications/serializers/attrs/application_type/pgsql.py:11
 #: assets/models/asset.py:185 assets/models/domain.py:62
-#: settings/serializers/settings.py:291 xpack/plugins/cloud/serializers.py:66
+#: settings/serializers/auth/radius.py:15 xpack/plugins/cloud/serializers.py:66
 msgid "Port"
 msgstr "端口"
 
@@ -559,7 +559,7 @@ msgstr "创建者"
 msgid "Date created"
 msgstr "创建日期"
 
-#: assets/models/authbook.py:17 settings/serializers/settings.py:300
+#: assets/models/authbook.py:17 settings/serializers/auth/cas.py:14
 msgid "Version"
 msgstr "版本"
 
@@ -1649,9 +1649,9 @@ msgid "ID"
 msgstr "ID"
 
 #: authentication/templates/authentication/_access_key_modal.html:31
-#: settings/serializers/settings.py:293
+#: settings/serializers/auth/radius.py:17
 msgid "Secret"
-msgstr "秘钥"
+msgstr "密钥"
 
 #: authentication/templates/authentication/_access_key_modal.html:33
 msgid "Date"
@@ -1663,7 +1663,7 @@ msgid "Show"
 msgstr "显示"
 
 #: authentication/templates/authentication/_access_key_modal.html:66
-#: settings/serializers/settings.py:153 users/models/user.py:464
+#: settings/serializers/security.py:8 users/models/user.py:464
 #: users/serializers/profile.py:99
 #: users/templates/users/user_verify_mfa.html:32
 msgid "Disable"
@@ -2116,7 +2116,7 @@ msgid "Cycle perform"
 msgstr "周期执行"
 
 #: ops/mixin.py:33 ops/mixin.py:90 ops/mixin.py:109 ops/mixin.py:150
-#: settings/serializers/settings.py:246
+#: settings/serializers/auth/ldap.py:61
 msgid "Regularly perform"
 msgstr "定期执行"
 
@@ -2125,7 +2125,7 @@ msgstr "定期执行"
 msgid "Periodic perform"
 msgstr "定时执行"
 
-#: ops/mixin.py:112 settings/serializers/settings.py:244
+#: ops/mixin.py:112 settings/serializers/auth/ldap.py:58
 msgid "Interval"
 msgstr "间隔"
 
@@ -2152,7 +2152,7 @@ msgstr ""
 "分 时 日 月 星期> （<a href='https://tool.lu/crontab/' target='_blank'>在线工"
 "具</a>） <br>注意： 如果同时设置了定期执行和周期执行，优先使用定期执行"
 
-#: ops/mixin.py:162
+#: ops/mixin.py:162 settings/serializers/auth/ldap.py:58
 msgid "Tips: (Units: hour)"
 msgstr "提示：（单位： 时）"
 
@@ -2312,7 +2312,7 @@ msgstr "该授权暂时不能撤销"
 msgid "Application"
 msgstr "应用程序"
 
-#: perms/models/asset_permission.py:37 settings/serializers/settings.py:120
+#: perms/models/asset_permission.py:37 settings/serializers/terminal.py:12
 msgid "All"
 msgstr "全部"
 
@@ -2431,19 +2431,14 @@ msgstr "节点名称"
 msgid "System users display"
 msgstr "系统用户名称"
 
-#: settings/api/common.py:26
-msgid "Test mail sent to {}, please check"
-msgstr "邮件已经发送{}, 请检查"
-
-#: settings/api/common.py:101 xpack/plugins/interface/api.py:18
-#: xpack/plugins/interface/models.py:36
-msgid "Welcome to the JumpServer open source Bastion Host"
-msgstr "欢迎使用JumpServer开源堡垒机"
-
 #: settings/api/dingtalk.py:36 settings/api/feishu.py:35
 #: settings/api/wecom.py:36
 msgid "Test success"
 msgstr "测试成功"
+
+#: settings/api/email.py:21
+msgid "Test mail sent to {}, please check"
+msgstr "邮件已经发送{}, 请检查"
 
 #: settings/api/ldap.py:194
 msgid "Get ldap users is None"
@@ -2453,170 +2448,117 @@ msgstr "获取 LDAP 用户为 None"
 msgid "Imported {} users successfully (Organization: {})"
 msgstr "成功导入 {} 个用户 ( 组织: {} )"
 
+#: settings/api/public.py:41 xpack/plugins/interface/api.py:18
+#: xpack/plugins/interface/models.py:36
+msgid "Welcome to the JumpServer open source Bastion Host"
+msgstr "欢迎使用JumpServer开源堡垒机"
+
 #: settings/models.py:123 users/templates/users/reset_password.html:29
 msgid "Setting"
 msgstr "设置"
 
-#: settings/serializers/settings.py:16
-msgid "Site url"
-msgstr "当前站点URL"
+#: settings/serializers/advanced.py:9
+msgid "Enable SSO Auth"
+msgstr "启用SSO认证"
 
-#: settings/serializers/settings.py:17
-msgid "eg: http://dev.jumpserver.org:8080"
-msgstr "如: http://dev.jumpserver.org:8080"
+#: settings/serializers/advanced.py:10
+msgid "SSO authkey ttl"
+msgstr "token有效时长"
 
-#: settings/serializers/settings.py:21
-msgid "User guide url"
-msgstr "用户向导URL"
+#: settings/serializers/advanced.py:11
+msgid "OTP valid window"
+msgstr "OTP延迟有效次数"
 
-#: settings/serializers/settings.py:22
-msgid "User first login update profile done redirect to it"
-msgstr "用户第一次登录，修改profile后重定向到地址, 可以是 wiki 或 其他说明文档"
+#: settings/serializers/advanced.py:12
+msgid "OTP issuer name"
+msgstr "OTP扫描后的名称"
 
-#: settings/serializers/settings.py:25
-msgid "Forgot password url"
-msgstr "忘记密码URL"
+#: settings/serializers/advanced.py:13
+msgid "Login challenge enabled"
+msgstr "登录页面开启CHALLENGE输入框"
 
-#: settings/serializers/settings.py:26
-msgid ""
-"The forgot password url on login page, If you use ldap or cas external "
-"authentication, you can set it"
-msgstr ""
-"登录页面忘记密码URL, 如果使用了 LDAP, OPENID 等外部认证系统，可以自定义用户重"
-"置密码访问的地址"
+#: settings/serializers/advanced.py:14
+msgid "Login captcha enabled"
+msgstr "登录页面开启验证码"
 
-#: settings/serializers/settings.py:30
-msgid "Global organization name"
-msgstr "全局组织名"
+#: settings/serializers/advanced.py:15
+msgid "Insecure command level"
+msgstr "不安全命令等级"
 
-#: settings/serializers/settings.py:31
-msgid "The name of global organization to display"
-msgstr "全局组织的显示名称，默认为 全局组织"
+#: settings/serializers/auth/base.py:10
+msgid "CAS Auth"
+msgstr "CAS 认证"
 
-#: settings/serializers/settings.py:38
-msgid "SMTP host"
-msgstr "SMTP 主机"
+#: settings/serializers/auth/base.py:11
+msgid "OPENID Auth"
+msgstr "OIDC 认证"
 
-#: settings/serializers/settings.py:39
-msgid "SMTP port"
-msgstr "SMTP 端口"
+#: settings/serializers/auth/base.py:12
+msgid "RADIUS Auth"
+msgstr "RADIUS 认证"
 
-#: settings/serializers/settings.py:40
-msgid "SMTP account"
-msgstr "SMTP 账号"
+#: settings/serializers/auth/cas.py:11
+msgid "Enable CAS Auth"
+msgstr "启用 CAS 认证"
 
-#: settings/serializers/settings.py:42
-msgid "SMTP password"
-msgstr "SMTP 密码"
+#: settings/serializers/auth/cas.py:12 settings/serializers/auth/oidc.py:30
+msgid "Server url"
+msgstr "服务端地址"
 
-#: settings/serializers/settings.py:43
-msgid "Tips: Some provider use token except password"
-msgstr "提示：一些邮件提供商需要输入的是授权码"
+#: settings/serializers/auth/cas.py:13
+msgid "Logout completely"
+msgstr "同步注销"
 
-#: settings/serializers/settings.py:46
-msgid "Send user"
-msgstr "发件人"
+#: settings/serializers/auth/cas.py:15
+msgid "Username attr"
+msgstr "用户名属性"
 
-#: settings/serializers/settings.py:47
-msgid "Tips: Send mail account, default SMTP account as the send account"
-msgstr "提示：发送邮件账号，默认使用 SMTP 账号作为发送账号"
+#: settings/serializers/auth/cas.py:16
+msgid "Enable attributes map"
+msgstr "启用属性映射"
 
-#: settings/serializers/settings.py:50
-msgid "Test recipient"
-msgstr "测试收件人"
+#: settings/serializers/auth/cas.py:17
+msgid "Rename attr"
+msgstr "映射属性"
 
-#: settings/serializers/settings.py:51
-msgid "Tips: Used only as a test mail recipient"
-msgstr "提示：仅用来作为测试邮件收件人"
+#: settings/serializers/auth/cas.py:18
+msgid "Create user if not"
+msgstr "创建用户(如果不存在)"
 
-#: settings/serializers/settings.py:54
-msgid "Use SSL"
-msgstr "使用 SSL"
-
-#: settings/serializers/settings.py:55
-msgid "If SMTP port is 465, may be select"
-msgstr "如果SMTP端口是465，通常需要启用 SSL"
-
-#: settings/serializers/settings.py:58
-msgid "Use TLS"
-msgstr "使用 TLS"
-
-#: settings/serializers/settings.py:59
-msgid "If SMTP port is 587, may be select"
-msgstr "如果SMTP端口是587，通常需要启用 TLS"
-
-#: settings/serializers/settings.py:62
-msgid "Subject prefix"
-msgstr "主题前缀"
-
-#: settings/serializers/settings.py:69
-msgid "Create user email subject"
-msgstr "邮件主题"
-
-#: settings/serializers/settings.py:70
-msgid ""
-"Tips: When creating a user, send the subject of the email (eg:Create account "
-"successfully)"
-msgstr "提示: 创建用户时，发送设置密码邮件的主题 (例如: 创建用户成功)"
-
-#: settings/serializers/settings.py:74
-msgid "Create user honorific"
-msgstr "邮件的敬语"
-
-#: settings/serializers/settings.py:75
-msgid "Tips: When creating a user, send the honorific of the email (eg:Hello)"
-msgstr "提示: 创建用户时，发送设置密码邮件的敬语 (例如: 您好)"
-
-#: settings/serializers/settings.py:79
-msgid "Create user email content"
-msgstr "邮件的内容"
-
-#: settings/serializers/settings.py:80
-msgid "Tips:When creating a user, send the content of the email"
-msgstr "提示: 创建用户时，发送设置密码邮件的内容"
-
-#: settings/serializers/settings.py:83
-msgid "Signature"
-msgstr "署名"
-
-#: settings/serializers/settings.py:84
-msgid "Tips: Email signature (eg:jumpserver)"
-msgstr "邮件署名 (如:jumpserver)"
-
-#: settings/serializers/settings.py:92
+#: settings/serializers/auth/ldap.py:39
 msgid "LDAP server"
 msgstr "LDAP 地址"
 
-#: settings/serializers/settings.py:92
+#: settings/serializers/auth/ldap.py:39
 msgid "eg: ldap://localhost:389"
 msgstr "如: ldap://localhost:389"
 
-#: settings/serializers/settings.py:94
+#: settings/serializers/auth/ldap.py:41
 msgid "Bind DN"
 msgstr "绑定 DN"
 
-#: settings/serializers/settings.py:98
+#: settings/serializers/auth/ldap.py:45
 msgid "User OU"
 msgstr "用户 OU"
 
-#: settings/serializers/settings.py:99
+#: settings/serializers/auth/ldap.py:46
 msgid "Use | split multi OUs"
 msgstr "多个 OU 使用 | 分割"
 
-#: settings/serializers/settings.py:102
+#: settings/serializers/auth/ldap.py:49
 msgid "User search filter"
 msgstr "用户过滤器"
 
-#: settings/serializers/settings.py:103
+#: settings/serializers/auth/ldap.py:50
 #, python-format
 msgid "Choice may be (cn|uid|sAMAccountName)=%(user)s)"
 msgstr "可能的选项是(cn或uid或sAMAccountName=%(user)s)"
 
-#: settings/serializers/settings.py:106
+#: settings/serializers/auth/ldap.py:53
 msgid "User attr map"
 msgstr "用户属性映射"
 
-#: settings/serializers/settings.py:108
+#: settings/serializers/auth/ldap.py:54
 msgid ""
 "User attr map present how to map LDAP user attr to jumpserver, username,name,"
 "email is jumpserver attr"
@@ -2624,128 +2566,327 @@ msgstr ""
 "用户属性映射代表怎样将LDAP中用户属性映射到jumpserver用户上，username, name,"
 "email 是jumpserver的用户需要属性"
 
-#: settings/serializers/settings.py:110
+#: settings/serializers/auth/ldap.py:56 xpack/plugins/cloud/serializers.py:211
+#: xpack/plugins/gathered_user/serializers.py:20
+msgid "Periodic display"
+msgstr "定时执行"
+
+#: settings/serializers/auth/ldap.py:63
+msgid "Connect timeout"
+msgstr "连接超时时间"
+
+#: settings/serializers/auth/ldap.py:64
+msgid "Search paged size"
+msgstr "搜索分页数量"
+
+#: settings/serializers/auth/ldap.py:66
 msgid "Enable LDAP auth"
 msgstr "启用 LDAP 认证"
 
-#: settings/serializers/settings.py:121
-msgid "Auto"
-msgstr "自动"
+#: settings/serializers/auth/oidc.py:12
+msgid "Base site url"
+msgstr "JumpServer 地址"
 
-#: settings/serializers/settings.py:127
-msgid "Password auth"
-msgstr "密码认证"
+#: settings/serializers/auth/oidc.py:15
+msgid "Client Id"
+msgstr "客户端 ID"
 
-#: settings/serializers/settings.py:129
-msgid "Public key auth"
-msgstr "密钥认证"
+#: settings/serializers/auth/oidc.py:18 xpack/plugins/cloud/serializers.py:33
+msgid "Client Secret"
+msgstr "客户端密钥"
 
-#: settings/serializers/settings.py:130
+#: settings/serializers/auth/oidc.py:20
+msgid "Share session"
+msgstr "共享会话"
+
+#: settings/serializers/auth/oidc.py:22
+msgid "Ignore ssl verification"
+msgstr "忽略 SSL 证书验证"
+
+#: settings/serializers/auth/oidc.py:28
+msgid "Use Keycloak"
+msgstr "使用 Keycloak"
+
+#: settings/serializers/auth/oidc.py:33
+msgid "Realm name"
+msgstr "域"
+
+#: settings/serializers/auth/oidc.py:39
+msgid "Enable OPENID Auth"
+msgstr "启用 OIDC 认证"
+
+#: settings/serializers/auth/oidc.py:41
+msgid "Provider endpoint"
+msgstr "端点地址"
+
+#: settings/serializers/auth/oidc.py:44
+msgid "Provider auth endpoint"
+msgstr "授权端点地址"
+
+#: settings/serializers/auth/oidc.py:47
+msgid "Provider token endpoint"
+msgstr "token 端点地址"
+
+#: settings/serializers/auth/oidc.py:50
+msgid "Provider jwks endpoint"
+msgstr "jwks 端点地址"
+
+#: settings/serializers/auth/oidc.py:53
+msgid "Provider userinfo endpoint"
+msgstr "用户信息端点地址"
+
+#: settings/serializers/auth/oidc.py:56
+msgid "Provider end session endpoint"
+msgstr "注销会话端点地址"
+
+#: settings/serializers/auth/oidc.py:59
+msgid "Provider sign alg"
+msgstr "签名算法"
+
+#: settings/serializers/auth/oidc.py:62
+msgid "Provider sign key"
+msgstr "签名 Key"
+
+#: settings/serializers/auth/oidc.py:64
+msgid "Scopes"
+msgstr "连接范围"
+
+#: settings/serializers/auth/oidc.py:66
+msgid "Id token max age"
+msgstr "令牌有效时间"
+
+#: settings/serializers/auth/oidc.py:69
+msgid "Id token include claims"
+msgstr "声明"
+
+#: settings/serializers/auth/oidc.py:71
+msgid "Use state"
+msgstr "使用状态"
+
+#: settings/serializers/auth/oidc.py:72
+msgid "Use nonce"
+msgstr "临时使用"
+
+#: settings/serializers/auth/oidc.py:74
+msgid "Always update user"
+msgstr "总是更新用户信息"
+
+#: settings/serializers/auth/radius.py:13
+msgid "Enable RADIUS Auth"
+msgstr "启用 RADIUS 认证"
+
+#: settings/serializers/auth/radius.py:19
+msgid "Encrypt password"
+msgstr "密码加密"
+
+#: settings/serializers/auth/radius.py:20
+msgid "OTP in radius"
+msgstr "使用 Radius OTP"
+
+#: settings/serializers/basic.py:7
+msgid "Site url"
+msgstr "当前站点URL"
+
+#: settings/serializers/basic.py:8
+msgid "eg: http://dev.jumpserver.org:8080"
+msgstr "如: http://dev.jumpserver.org:8080"
+
+#: settings/serializers/basic.py:11
+msgid "User guide url"
+msgstr "用户向导URL"
+
+#: settings/serializers/basic.py:12
+msgid "User first login update profile done redirect to it"
+msgstr "用户第一次登录，修改profile后重定向到地址, 可以是 wiki 或 其他说明文档"
+
+#: settings/serializers/basic.py:15
+msgid "Forgot password url"
+msgstr "忘记密码URL"
+
+#: settings/serializers/basic.py:16
 msgid ""
-"Tips: If use other auth method, like AD/LDAP, you should disable this to "
-"avoid being able to log in after deleting"
+"The forgot password url on login page, If you use ldap or cas external "
+"authentication, you can set it"
 msgstr ""
-"提示：如果你使用其它认证方式，如 AD/LDAP，你应该禁用此项，以避免第三方系统删"
-"除后，还可以登录"
+"登录页面忘记密码URL, 如果使用了 LDAP, OPENID 等外部认证系统，可以自定义用户重"
+"置密码访问的地址"
 
-#: settings/serializers/settings.py:133
-msgid "List sort by"
-msgstr "资产列表排序"
+#: settings/serializers/basic.py:20
+msgid "Global organization name"
+msgstr "全局组织名"
 
-#: settings/serializers/settings.py:135
-msgid "List page size"
-msgstr "资产列表每页数量"
+#: settings/serializers/basic.py:21
+msgid "The name of global organization to display"
+msgstr "全局组织的显示名称，默认为 全局组织"
 
-#: settings/serializers/settings.py:137
-msgid "Session keep duration"
-msgstr "会话日志保存时间"
+#: settings/serializers/email.py:24
+msgid "SMTP host"
+msgstr "SMTP 主机"
 
-#: settings/serializers/settings.py:138
+#: settings/serializers/email.py:25
+msgid "SMTP port"
+msgstr "SMTP 端口"
+
+#: settings/serializers/email.py:26
+msgid "SMTP account"
+msgstr "SMTP 账号"
+
+#: settings/serializers/email.py:28
+msgid "SMTP password"
+msgstr "SMTP 密码"
+
+#: settings/serializers/email.py:29
+msgid "Tips: Some provider use token except password"
+msgstr "提示：一些邮件提供商需要输入的是授权码"
+
+#: settings/serializers/email.py:32
+msgid "Send user"
+msgstr "发件人"
+
+#: settings/serializers/email.py:33
+msgid "Tips: Send mail account, default SMTP account as the send account"
+msgstr "提示：发送邮件账号，默认使用 SMTP 账号作为发送账号"
+
+#: settings/serializers/email.py:36
+msgid "Test recipient"
+msgstr "测试收件人"
+
+#: settings/serializers/email.py:37
+msgid "Tips: Used only as a test mail recipient"
+msgstr "提示：仅用来作为测试邮件收件人"
+
+#: settings/serializers/email.py:40
+msgid "Use SSL"
+msgstr "使用 SSL"
+
+#: settings/serializers/email.py:41
+msgid "If SMTP port is 465, may be select"
+msgstr "如果SMTP端口是465，通常需要启用 SSL"
+
+#: settings/serializers/email.py:44
+msgid "Use TLS"
+msgstr "使用 TLS"
+
+#: settings/serializers/email.py:45
+msgid "If SMTP port is 587, may be select"
+msgstr "如果SMTP端口是587，通常需要启用 TLS"
+
+#: settings/serializers/email.py:48
+msgid "Subject prefix"
+msgstr "主题前缀"
+
+#: settings/serializers/email.py:55
+msgid "Create user email subject"
+msgstr "邮件主题"
+
+#: settings/serializers/email.py:56
 msgid ""
-"Units: days, Session, record, command will be delete if more than duration, "
-"only in database"
-msgstr ""
-"单位：天。 会话、录像、命令记录超过该时长将会被删除(仅影响数据库存储, oss等不"
-"受影响)"
+"Tips: When creating a user, send the subject of the email (eg:Create account "
+"successfully)"
+msgstr "提示: 创建用户时，发送设置密码邮件的主题 (例如: 创建用户成功)"
 
-#: settings/serializers/settings.py:141
-msgid "Telnet login regex"
-msgstr "Telnet 成功正则表达式"
+#: settings/serializers/email.py:60
+msgid "Create user honorific"
+msgstr "邮件的敬语"
 
-#: settings/serializers/settings.py:143
-msgid "RDP address"
-msgstr "RDP 地址"
+#: settings/serializers/email.py:61
+msgid "Tips: When creating a user, send the honorific of the email (eg:Hello)"
+msgstr "提示: 创建用户时，发送设置密码邮件的敬语 (例如: 您好)"
 
-#: settings/serializers/settings.py:146
-msgid "RDP visit address, eg: dev.jumpserver.org:3389"
-msgstr "RDP 访问地址, 如: dev.jumpserver.org:3389"
+#: settings/serializers/email.py:65
+msgid "Create user email content"
+msgstr "邮件的内容"
 
-#: settings/serializers/settings.py:154
+#: settings/serializers/email.py:66
+msgid "Tips:When creating a user, send the content of the email"
+msgstr "提示: 创建用户时，发送设置密码邮件的内容"
+
+#: settings/serializers/email.py:69
+msgid "Signature"
+msgstr "署名"
+
+#: settings/serializers/email.py:70
+msgid "Tips: Email signature (eg:jumpserver)"
+msgstr "邮件署名 (如:jumpserver)"
+
+#: settings/serializers/im.py:9
+msgid "Enable WeCom Auth"
+msgstr "启用企业微信认证"
+
+#: settings/serializers/im.py:16
+msgid "Enable DingTalk Auth"
+msgstr "启用钉钉认证"
+
+#: settings/serializers/im.py:22
+msgid "Enable FeiShu Auth"
+msgstr "启用飞书认证"
+
+#: settings/serializers/security.py:9
 msgid "All users"
 msgstr "所有用户"
 
-#: settings/serializers/settings.py:155
+#: settings/serializers/security.py:10
 msgid "Only admin users"
 msgstr "仅管理员"
 
-#: settings/serializers/settings.py:157
+#: settings/serializers/security.py:12
 msgid "Global MFA auth"
 msgstr "全局启用 MFA 认证"
 
-#: settings/serializers/settings.py:160
+#: settings/serializers/security.py:15
 msgid "Batch command execution"
 msgstr "批量命令执行"
 
-#: settings/serializers/settings.py:161
+#: settings/serializers/security.py:16
 msgid "Allow user run batch command or not using ansible"
 msgstr "是否允许用户使用 ansible 执行批量命令"
 
-#: settings/serializers/settings.py:164
+#: settings/serializers/security.py:19
 msgid "Enable terminal register"
 msgstr "终端注册"
 
-#: settings/serializers/settings.py:165
+#: settings/serializers/security.py:20
 msgid ""
 "Allow terminal register, after all terminal setup, you should disable this "
 "for security"
 msgstr "是否允许终端注册，当所有终端启动后，为了安全应该关闭"
 
-#: settings/serializers/settings.py:168
+#: settings/serializers/security.py:23
 msgid "Replay watermark"
 msgstr "录像水印"
 
-#: settings/serializers/settings.py:169
+#: settings/serializers/security.py:24
 msgid "Enabled, the session replay contains watermark information"
 msgstr "启用后，会话录像将包含水印信息"
 
-#: settings/serializers/settings.py:173
+#: settings/serializers/security.py:28
 msgid "Limit the number of login failures"
 msgstr "限制登录失败次数"
 
-#: settings/serializers/settings.py:177
+#: settings/serializers/security.py:32
 msgid "Block logon interval"
 msgstr "禁止登录时间间隔"
 
-#: settings/serializers/settings.py:179
+#: settings/serializers/security.py:34
 msgid ""
 "Tip: (unit/minute) if the user has failed to log in for a limited number of "
 "times, no login is allowed during this time interval."
 msgstr ""
 "提示：（单位：分）当用户登录失败次数达到限制后，那么在此时间间隔内禁止登录"
 
-#: settings/serializers/settings.py:183
+#: settings/serializers/security.py:38
 msgid "Connection max idle time"
 msgstr "连接最大空闲时间"
 
-#: settings/serializers/settings.py:184
+#: settings/serializers/security.py:39
 msgid "If idle time more than it, disconnect connection Unit: minute"
 msgstr "提示：如果超过该配置没有操作，连接会被断开 （单位：分）"
 
-#: settings/serializers/settings.py:188
+#: settings/serializers/security.py:43
 msgid "User password expiration"
 msgstr "用户密码过期时间"
 
-#: settings/serializers/settings.py:190
+#: settings/serializers/security.py:45
 msgid ""
 "Tip: (unit: day) If the user does not update the password during the time, "
 "the user password will expire failure;The password expiration reminder mail "
@@ -2755,234 +2896,103 @@ msgstr ""
 "提示：（单位：天）如果用户在此期间没有更新密码，用户密码将过期失效； 密码过期"
 "提醒邮件将在密码过期前5天内由系统（每天）自动发送给用户"
 
-#: settings/serializers/settings.py:194
+#: settings/serializers/security.py:49
 msgid "Number of repeated historical passwords"
 msgstr "不能设置近几次密码"
 
-#: settings/serializers/settings.py:196
+#: settings/serializers/security.py:51
 msgid ""
 "Tip: When the user resets the password, it cannot be the previous n "
 "historical passwords of the user"
 msgstr "提示：用户重置密码时，不能为该用户前几次使用过的密码"
 
-#: settings/serializers/settings.py:200
+#: settings/serializers/security.py:55
 msgid "Password minimum length"
 msgstr "密码最小长度"
 
-#: settings/serializers/settings.py:204
+#: settings/serializers/security.py:59
 msgid "Admin user password minimum length"
 msgstr "管理员密码最小长度"
 
-#: settings/serializers/settings.py:207
+#: settings/serializers/security.py:62
 msgid "Must contain capital"
 msgstr "必须包含大写字符"
 
-#: settings/serializers/settings.py:209
+#: settings/serializers/security.py:64
 msgid "Must contain lowercase"
 msgstr "必须包含小写字符"
 
-#: settings/serializers/settings.py:210
+#: settings/serializers/security.py:65
 msgid "Must contain numeric"
 msgstr "必须包含数字"
 
-#: settings/serializers/settings.py:211
+#: settings/serializers/security.py:66
 msgid "Must contain special"
 msgstr "必须包含特殊字符"
 
-#: settings/serializers/settings.py:212
+#: settings/serializers/security.py:67
 msgid "Insecure command alert"
 msgstr "危险命令告警"
 
-#: settings/serializers/settings.py:214
+#: settings/serializers/security.py:69
 msgid "Email recipient"
 msgstr "邮件收件人"
 
-#: settings/serializers/settings.py:215
+#: settings/serializers/security.py:70
 msgid "Multiple user using , split"
 msgstr "多个用户，使用 , 分割"
 
-#: settings/serializers/settings.py:223
-msgid "Enable WeCom Auth"
-msgstr "启用企业微信认证"
+#: settings/serializers/terminal.py:13
+msgid "Auto"
+msgstr "自动"
 
-#: settings/serializers/settings.py:230
-msgid "Enable DingTalk Auth"
-msgstr "启用钉钉认证"
+#: settings/serializers/terminal.py:19
+msgid "Password auth"
+msgstr "密码认证"
 
-#: settings/serializers/settings.py:236
-msgid "Enable FeiShu Auth"
-msgstr "启用飞书认证"
+#: settings/serializers/terminal.py:21
+msgid "Public key auth"
+msgstr "密钥认证"
 
-#: settings/serializers/settings.py:240
-msgid "Connect timeout"
-msgstr "超时连接"
+#: settings/serializers/terminal.py:22
+msgid ""
+"Tips: If use other auth method, like AD/LDAP, you should disable this to "
+"avoid being able to log in after deleting"
+msgstr ""
+"提示：如果你使用其它认证方式，如 AD/LDAP，你应该禁用此项，以避免第三方系统删"
+"除后，还可以登录"
 
-#: settings/serializers/settings.py:241
-msgid "Search paged size"
-msgstr "搜索分页数量"
+#: settings/serializers/terminal.py:25
+msgid "List sort by"
+msgstr "资产列表排序"
 
-#: settings/serializers/settings.py:242 xpack/plugins/cloud/serializers.py:211
-#: xpack/plugins/gathered_user/serializers.py:20
-msgid "Periodic display"
-msgstr "定时执行"
+#: settings/serializers/terminal.py:27
+msgid "List page size"
+msgstr "资产列表每页数量"
 
-#: settings/serializers/settings.py:248
-msgid "User login only in users"
-msgstr "仅在用户列表中用户认证"
+#: settings/serializers/terminal.py:29
+msgid "Session keep duration"
+msgstr "会话日志保存时间"
 
-#: settings/serializers/settings.py:251
-msgid "Enable OPENID Auth"
-msgstr "启用OPENID认证"
+#: settings/serializers/terminal.py:30
+msgid ""
+"Units: days, Session, record, command will be delete if more than duration, "
+"only in database"
+msgstr ""
+"单位：天。 会话、录像、命令记录超过该时长将会被删除(仅影响数据库存储, oss等不"
+"受影响)"
 
-#: settings/serializers/settings.py:253
-msgid "Base site url"
-msgstr "JumpServer 地址"
+#: settings/serializers/terminal.py:33
+msgid "Telnet login regex"
+msgstr "Telnet 成功正则表达式"
 
-#: settings/serializers/settings.py:254
-msgid "Client Id"
-msgstr "客户端 id"
+#: settings/serializers/terminal.py:35
+msgid "RDP address"
+msgstr "RDP 地址"
 
-#: settings/serializers/settings.py:256 xpack/plugins/cloud/serializers.py:33
-msgid "Client Secret"
-msgstr "客户端密钥"
-
-#: settings/serializers/settings.py:257
-msgid "Share session"
-msgstr "共享会话"
-
-#: settings/serializers/settings.py:259
-msgid "Ignore ssl verification"
-msgstr "忽略 SSL 验证"
-
-#: settings/serializers/settings.py:262
-msgid "Provider endpoint"
-msgstr "端点网址"
-
-#: settings/serializers/settings.py:264
-msgid "Provider auth endpoint"
-msgstr "授权端点网址"
-
-#: settings/serializers/settings.py:266
-msgid "Provider token endpoint"
-msgstr "token端点网址"
-
-#: settings/serializers/settings.py:268
-msgid "Provider jwk endpoint"
-msgstr "jwks端点网站"
-
-#: settings/serializers/settings.py:270
-msgid "Provider userinfo endpoint"
-msgstr "用户信息端点网址"
-
-#: settings/serializers/settings.py:272
-msgid "Provider end session endpoint"
-msgstr "结束会话端点网址"
-
-#: settings/serializers/settings.py:274
-msgid "Provider sign alg"
-msgstr "签名"
-
-#: settings/serializers/settings.py:276
-msgid "Provider sign key"
-msgstr "签名 key"
-
-#: settings/serializers/settings.py:277
-msgid "Scopes"
-msgstr "连接范围"
-
-#: settings/serializers/settings.py:278
-msgid "Id token max age"
-msgstr "令牌有效时间"
-
-#: settings/serializers/settings.py:280
-msgid "Id token include claims"
-msgstr "声明"
-
-#: settings/serializers/settings.py:281
-msgid "Use state"
-msgstr "使用状态"
-
-#: settings/serializers/settings.py:282
-msgid "Use nonce"
-msgstr "临时使用"
-
-#: settings/serializers/settings.py:283
-#, fuzzy
-#| msgid "Always update"
-msgid "Always update user"
-msgstr "总是更新"
-
-#: settings/serializers/settings.py:285 settings/serializers/settings.py:298
-msgid "Server url"
-msgstr "服务端网址"
-
-#: settings/serializers/settings.py:287
-msgid "Realm name"
-msgstr "域"
-
-#: settings/serializers/settings.py:289
-msgid "Enable RADIUS Auth"
-msgstr "启用RADIUS认证"
-
-#: settings/serializers/settings.py:294
-msgid "Encrypt password"
-msgstr "密码加密"
-
-#: settings/serializers/settings.py:295
-msgid "Otp in radius"
-msgstr "一次性密码"
-
-#: settings/serializers/settings.py:297
-msgid "Enable CAS Auth"
-msgstr "启用CAS认证"
-
-#: settings/serializers/settings.py:299
-msgid "Logout completely"
-msgstr "注销完成"
-
-#: settings/serializers/settings.py:301
-msgid "Username attr"
-msgstr "用户名属性"
-
-#: settings/serializers/settings.py:302
-msgid "Apply attr to use"
-msgstr "申请可用属性"
-
-#: settings/serializers/settings.py:303
-msgid "Rename attr"
-msgstr "重命名属性"
-
-#: settings/serializers/settings.py:304
-msgid "Create User"
-msgstr "创建用户"
-
-#: settings/serializers/settings.py:306
-msgid "Enable SSO Auth"
-msgstr "启用SSO认证"
-
-#: settings/serializers/settings.py:307
-msgid "SSO authkey ttl"
-msgstr "token有效时长"
-
-#: settings/serializers/settings.py:308
-msgid "OTP valid window"
-msgstr "OTP延迟有效次数"
-
-#: settings/serializers/settings.py:309
-msgid "OTP issuer name"
-msgstr "OTP扫描后的名称"
-
-#: settings/serializers/settings.py:310
-msgid "Login challenge enabled"
-msgstr "登录页面开启CHALLENGE输入框"
-
-#: settings/serializers/settings.py:311
-msgid "Login captcha enabled"
-msgstr "登录页面开启验证码"
-
-#: settings/serializers/settings.py:312
-msgid "Insecure command level"
-msgstr "不安全命令等级"
+#: settings/serializers/terminal.py:38
+msgid "RDP visit address, eg: dev.jumpserver.org:3389"
+msgstr "RDP 访问地址, 如: dev.jumpserver.org:3389"
 
 #: settings/utils/ldap.py:412
 msgid "ldap:// or ldaps:// protocol is used."
@@ -5691,6 +5701,15 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Create User"
+#~ msgstr "创建用户"
+
+#~ msgid "Apply attr to use"
+#~ msgstr "申请可用属性"
+
+#~ msgid "User login only in users"
+#~ msgstr "仅在用户列表中用户认证"
 
 #~ msgid "Approved applications"
 #~ msgstr "批准的应用"

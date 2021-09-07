@@ -55,13 +55,17 @@ class LDAPSettingSerializer(serializers.Serializer):
     )
     AUTH_LDAP_SYNC_IS_PERIODIC = serializers.BooleanField(required=False, label=_('Periodic display'))
     AUTH_LDAP_SYNC_INTERVAL = serializers.CharField(
-        required=False, max_length=1024, allow_null=True, label=_('Interval')
+        required=False, max_length=1024, allow_null=True, label=_('Interval'), help_text=_('Tips: (Units: hour)')
     )
     AUTH_LDAP_SYNC_CRONTAB = serializers.CharField(
         required=False, max_length=1024, allow_null=True, label=_('Regularly perform')
     )
     AUTH_LDAP_CONNECT_TIMEOUT = serializers.IntegerField(required=False, label=_('Connect timeout'))
     AUTH_LDAP_SEARCH_PAGED_SIZE = serializers.IntegerField(required=False, label=_('Search paged size'))
-    AUTH_LDAP_USER_LOGIN_ONLY_IN_USERS = serializers.BooleanField(required=False, label=_('User login only in users'))
 
     AUTH_LDAP = serializers.BooleanField(required=False, label=_('Enable LDAP auth'))
+
+    @staticmethod
+    def post_save():
+        from users.tasks import import_ldap_user_periodic
+        import_ldap_user_periodic()
