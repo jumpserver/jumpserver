@@ -268,6 +268,7 @@ class Config(dict):
         'SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER': '',
         'SECURITY_LUNA_REMEMBER_AUTH': True,
         'SECURITY_WATERMARK_ENABLED': True,
+        'SECURITY_SESSION_SHARE': True,
 
         'HTTP_BIND_HOST': '0.0.0.0',
         'HTTP_LISTEN_PORT': 8080,

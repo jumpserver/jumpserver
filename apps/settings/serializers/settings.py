@@ -164,6 +164,10 @@ class SecuritySettingSerializer(serializers.Serializer):
         required=True, label=_('Replay watermark'),
         help_text=_('Enabled, the session replay contains watermark information')
     )
+    SECURITY_SESSION_SHARE = serializers.BooleanField(
+        required=True, label=_('Session share'),
+        help_text=_("Enabled, Allows user active session to be shared with other users")
+    )
     SECURITY_LOGIN_LIMIT_COUNT = serializers.IntegerField(
         min_value=3, max_value=99999,
         label=_('Limit the number of login failures')
