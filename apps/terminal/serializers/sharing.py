@@ -1,3 +1,5 @@
+from rest_framework import serializers
+from django.utils.translation import ugettext_lazy as _
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from common.utils.random import random_string
 from ..models import SessionSharing, SessionJoinRecord
@@ -32,9 +34,9 @@ class SessionJoinRecordSerializer(OrgResourceModelSerializerMixin):
         model = SessionJoinRecord
         fields_mini = ['id']
         fields_small = fields_mini + [
-            'verify_code', 'date_joined', 'date_left', 'remote_addr',
-            'login_from', 'is_success', 'reason', 'is_finished', 'created_by',
-            'date_created', 'date_updated'
+            'joiner_display', 'verify_code', 'date_joined', 'date_left',
+            'remote_addr', 'login_from', 'is_success', 'reason', 'is_finished',
+            'created_by', 'date_created', 'date_updated'
         ]
         fields_fk = ['session', 'sharing', 'joiner']
         fields = fields_small + fields_fk
@@ -44,6 +46,7 @@ class SessionJoinRecordSerializer(OrgResourceModelSerializerMixin):
             'sharing': {'required': True},
             'remote_addr': {'required': True},
             'verify_code': {'required': True},
+            'joiner_display': {'label': _('Joiner')},
         }
 
     def create(self, validate_data):

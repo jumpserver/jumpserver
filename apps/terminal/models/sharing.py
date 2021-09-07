@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils import timezone
 import datetime
 from common.mixins import CommonModelMixin
 from orgs.mixins.models import OrgModelMixin
@@ -17,8 +16,8 @@ class SessionSharing(CommonModelMixin, OrgModelMixin):
     )
     # creator / created_by
     creator = models.ForeignKey(
-        'users.User', on_delete=models.SET_NULL, blank=True, null=True,
-        verbose_name=_('User')
+        'users.User', on_delete=models.CASCADE, blank=True, null=True,
+        verbose_name=_('Creator')
     )
     verify_code = models.CharField(max_length=16, verbose_name=_('Verify code'))
     is_active = models.BooleanField(
@@ -27,6 +26,12 @@ class SessionSharing(CommonModelMixin, OrgModelMixin):
     expired_time = models.IntegerField(
         default=0, verbose_name=_('Expired time (min)'), db_index=True
     )
+
+    class Meta:
+        ordering = ('-date_created', )
+
+    def __str__(self):
+        return 'Creator: {}'.format(self.creator)
 
     @property
     def date_expired(self):
@@ -55,17 +60,17 @@ class SessionJoinRecord(CommonModelMixin, OrgModelMixin):
     verify_code = models.CharField(max_length=16, verbose_name=_('Verify code'))
     sharing = models.ForeignKey(
         SessionSharing, on_delete=models.CASCADE,
-        verbose_name=_('Session share')
+        verbose_name=_('Session sharing')
     )
     joiner = models.ForeignKey(
-        'users.User', on_delete=models.SET_NULL, blank=True, null=True,
-        verbose_name=_('User')
+        'users.User', on_delete=models.CASCADE, blank=True, null=True,
+        verbose_name=_('Joiner')
     )
     date_joined = models.DateTimeField(
-        auto_now_add=True, verbose_name=_("Date start"), db_index=True,
+        auto_now_add=True, verbose_name=_("Date joined"), db_index=True,
     )
     date_left = models.DateTimeField(
-        verbose_name=_("Date end"), null=True, db_index=True
+        verbose_name=_("Date left"), null=True, db_index=True
     )
     remote_addr = models.CharField(
         max_length=128, verbose_name=_("Remote addr"), blank=True, null=True,
@@ -75,11 +80,26 @@ class SessionJoinRecord(CommonModelMixin, OrgModelMixin):
         max_length=2, choices=LOGIN_FROM.choices, default="WT",
         verbose_name=_("Login from")
     )
-    is_success = models.BooleanField(default=True, db_index=True)
-    reason = models.CharField(
-        max_length=1024, blank=True, null=True, verbose_name=_('Reason')
+    is_success = models.BooleanField(
+        default=True, db_index=True, verbose_name=_('Success')
     )
-    is_finished = models.BooleanField(default=False, db_index=True)
+    reason = models.CharField(
+        max_length=1024, default='-', blank=True, null=True,
+        verbose_name=_('Reason')
+    )
+    is_finished = models.BooleanField(
+        default=False, db_index=True, verbose_name=_('Finished')
+    )
+
+    class Meta:
+        ordering = ('-date_joined', )
+
+    def __str__(self):
+        return 'Joiner: {}'.format(self.joiner)
+
+    @property
+    def joiner_display(self):
+        return str(self.joiner)
 
     def can_join(self):
         # sharing
@@ -88,7 +108,7 @@ class SessionJoinRecord(CommonModelMixin, OrgModelMixin):
             return False, reason
         # self
         if self.verify_code != self.sharing.verify_code:
-            return False, _('Verification code error')
+            return False, _('Invalid verification code')
         return True, ''
 
     def join_failed(self, reason):
