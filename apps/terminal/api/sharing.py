@@ -18,6 +18,11 @@ class SessionSharingViewSet(OrgModelViewSet):
     filterset_fields = search_fields
     model = models.SessionSharing
 
+    def get_permissions(self):
+        if self.request.method.lower() in ['post']:
+            self.permission_classes = (IsAppUser,)
+        return super().get_permissions()
+
     def create(self, request, *args, **kwargs):
         if not settings.SECURITY_SESSION_SHARE:
             detail = _('Secure session sharing settings is disabled')
@@ -37,6 +42,11 @@ class SessionJoinRecordsViewSet(OrgModelViewSet):
     )
     filterset_fields = search_fields
     model = models.SessionJoinRecord
+
+    def get_permissions(self):
+        if self.request.method.lower() in ['post']:
+            self.permission_classes = (IsAppUser,)
+        return super().get_permissions()
 
     def create(self, request, *args, **kwargs):
         try:
