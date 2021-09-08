@@ -6,17 +6,17 @@ __all__ = ['CleaningSerializer']
 
 class CleaningSerializer(serializers.Serializer):
     LOGIN_LOG_KEEP_DAYS = serializers.IntegerField(
-        default=200, required=False, label=_("Login log keep days"), help_text=_("Units: day")
+        label=_("Login log keep days"), help_text=_("Unit: day")
     )
     TASK_LOG_KEEP_DAYS = serializers.IntegerField(
-        default=90, required=False, label=_("Task log keep days"), help_text=_("Units: day")
+        label=_("Task log keep days"), help_text=_("Unit: day")
     )
     OPERATE_LOG_KEEP_DAYS = serializers.IntegerField(
-        default=200, required=False, label=_("Operate log keep days"), help_text=_("Units: day")
+        label=_("Operate log keep days"), help_text=_("Unit: day")
     )
     FTP_LOG_KEEP_DAYS = serializers.IntegerField(
-        default=200, required=False, label=_("FTP log keep days"), help_text=_("Units: day")
+        label=_("FTP log keep days"), help_text=_("Unit: day")
     )
     CLOUD_SYNC_TASK_EXECUTION_KEEP_DAYS = serializers.IntegerField(
-        default=200, required=False, label=_("Cloud sync record keep days"), help_text=_("Units: day")
+        label=_("Cloud sync record keep days"), help_text=_("Unit: day")
     )

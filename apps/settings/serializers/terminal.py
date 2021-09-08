@@ -27,7 +27,7 @@ class TerminalSettingSerializer(serializers.Serializer):
                                                             label=_('List page size'))
     TERMINAL_SESSION_KEEP_DURATION = serializers.IntegerField(
         min_value=1, max_value=99999, required=True, label=_('Session keep duration'),
-        help_text=_('Units: days, Session, record, command will be delete if more than duration, only in database')
+        help_text=_('Unit: days, Session, record, command will be delete if more than duration, only in database')
     )
     TERMINAL_TELNET_REGEX = serializers.CharField(allow_blank=True, max_length=1024, required=False,
                                                   label=_('Telnet login regex'))

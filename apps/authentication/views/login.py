@@ -51,7 +51,8 @@ class UserLoginView(mixins.AuthMixin, FormView):
 
         if settings.AUTH_OPENID:
             auth_type = 'OIDC'
-            openid_auth_url = reverse(settings.AUTH_OPENID_AUTH_LOGIN_URL_NAME) + f'?next={next_url}'
+            openid_auth_url = reverse(settings.AUTH_OPENID_AUTH_LOGIN_URL_NAME)
+            openid_auth_url = openid_auth_url + f'?next={next_url}'
         else:
             openid_auth_url = None
 
@@ -64,14 +65,13 @@ class UserLoginView(mixins.AuthMixin, FormView):
         if not any([openid_auth_url, cas_auth_url]):
             return None
 
-        if settings.LOGIN_REDIRECT_TO_BACKEND.lower() in ['openid', 'oidc'] and openid_auth_url:
-            auth_url = openid_auth_url
-        elif settings.LOGIN_REDIRECT_TO_BACKEND == 'CAS' and cas_auth_url:
+        login_redirect = settings.LOGIN_REDIRECT_TO_BACKEND.lower()
+        if login_redirect == ['CAS', 'cas'] and cas_auth_url:
             auth_url = cas_auth_url
         else:
-            auth_url = openid_auth_url or cas_auth_url
+            auth_url = openid_auth_url
 
-        if settings.LOGIN_REDIRECT_TO_BACKEND or settings.DISABLE_LOGIN_REDIRECT_MSG:
+        if settings.LOGIN_REDIRECT_TO_BACKEND or not settings.LOGIN_REDIRECT_MSG_ENABLED:
             redirect_url = auth_url
         else:
             message_data = {

@@ -5,4 +5,5 @@ from .radius import *
 from .dingtalk import *
 from .feishu import *
 from .wecom import *
+from .sso import *
 from .base import *

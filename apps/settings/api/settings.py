@@ -31,6 +31,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'keycloak': serializers.KeycloakSettingSerializer,
         'radius': serializers.RadiusSettingSerializer,
         'cas': serializers.CASSettingSerializer,
+        'sso': serializers.SSOSettingSerializer,
         'clean': serializers.CleaningSerializer,
         'other': serializers.OtherSettingSerializer,
     }

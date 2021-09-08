@@ -240,7 +240,7 @@ class Config(dict):
         'FEISHU_APP_ID': '',
         'FEISHU_APP_SECRET': '',
 
-        'LOGIN_REDIRECT_TO_BACKEND':  None,  # 'OPENID / CAS
+        'LOGIN_REDIRECT_TO_BACKEND':  '',  # 'OPENID / CAS
         'LOGIN_REDIRECT_MSG_ENABLED': True,
 
         'OTP_VALID_WINDOW': 2,
@@ -276,7 +276,6 @@ class Config(dict):
         'SECURITY_PASSWORD_SPECIAL_CHAR': False,
         'SECURITY_LOGIN_CHALLENGE_ENABLED': False,
         'SECURITY_LOGIN_CAPTCHA_ENABLED': True,
-        'SECURITY_DATA_CRYPTO_ALGO': 'aes',
         'SECURITY_INSECURE_COMMAND': False,
         'SECURITY_INSECURE_COMMAND_LEVEL': 5,
         'SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER': '',
@@ -284,7 +283,7 @@ class Config(dict):
         'SECURITY_WATERMARK_ENABLED': True,
         'SECURITY_MFA_VERIFY_TTL': 3600,
         'OLD_PASSWORD_HISTORY_LIMIT_COUNT': 5,
-        'LOGIN_CONFIRM_ENABLE': False,
+        'LOGIN_CONFIRM_ENABLE': False,  # 准备废弃，放到 acl 中
         'CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED': True,
         'USER_LOGIN_SINGLE_MACHINE_ENABLED': False,
         'ONLY_ALLOW_EXIST_USER_AUTH': False,
@@ -308,6 +307,7 @@ class Config(dict):
         'SESSION_SAVE_EVERY_REQUEST': True,
         'SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE': False,
         'SERVER_REPLAY_STORAGE': {},
+        'SECURITY_DATA_CRYPTO_ALGO': 'aes',
 
         # 记录清理清理
         'LOGIN_LOG_KEEP_DAYS': 200,

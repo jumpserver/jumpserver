@@ -55,7 +55,7 @@ class LDAPSettingSerializer(serializers.Serializer):
     )
     AUTH_LDAP_SYNC_IS_PERIODIC = serializers.BooleanField(required=False, label=_('Periodic display'))
     AUTH_LDAP_SYNC_INTERVAL = serializers.CharField(
-        required=False, max_length=1024, allow_null=True, label=_('Interval'), help_text=_('Tips: (Units: hour)')
+        required=False, max_length=1024, allow_null=True, label=_('Interval'), help_text=_('Tips: (Unit: hour)')
     )
     AUTH_LDAP_SYNC_CRONTAB = serializers.CharField(
         required=False, max_length=1024, allow_null=True, label=_('Regularly perform')
