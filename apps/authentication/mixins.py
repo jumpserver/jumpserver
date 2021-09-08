@@ -14,14 +14,15 @@ from django.contrib.auth import (
     PermissionDenied, user_login_failed, _clean_credentials
 )
 from django.shortcuts import reverse, redirect
+from django.views.generic.edit import FormView
 
 from common.utils import get_object_or_none, get_request_ip, get_logger, bulk_get, FlashMessageUtil
 from users.models import User
 from users.utils import LoginBlockUtil, MFABlockUtils
 from . import errors
-from .utils import rsa_decrypt
+from .utils import rsa_decrypt, gen_key_pair
 from .signals import post_auth_success, post_auth_failed
-from .const import RSA_PRIVATE_KEY
+from .const import RSA_PRIVATE_KEY, RSA_PUBLIC_KEY
 
 logger = get_logger(__name__)
 
@@ -79,7 +80,68 @@ def authenticate(request=None, **credentials):
 auth.authenticate = authenticate
 
 
-class AuthMixin:
+class PasswordEncryptionViewMixin(FormView):
+    def get_decrypted_password(self, password=None, username=None):
+        request = self.request
+        if hasattr(request, 'data'):
+            data = request.data
+        else:
+            data = request.POST
+
+        username = username or data.get('username')
+        password = password or data.get('password')
+
+        password = self.decrypt_passwd(password)
+        if not password:
+            self.raise_password_decrypt_failed(username=username)
+        return password
+
+    def raise_password_decrypt_failed(self, username):
+        ip = self.get_request_ip()
+        raise errors.CredentialError(
+            error=errors.reason_password_decrypt_failed,
+            username=username, ip=ip, request=self.request
+        )
+
+    def decrypt_passwd(self, raw_passwd):
+        # 获取解密密钥，对密码进行解密
+        rsa_private_key = self.request.session.get(RSA_PRIVATE_KEY)
+        if rsa_private_key is not None:
+            try:
+                return rsa_decrypt(raw_passwd, rsa_private_key)
+            except Exception as e:
+                logger.error(e, exc_info=True)
+                logger.error(
+                    f'Decrypt password failed: password[{raw_passwd}] '
+                    f'rsa_private_key[{rsa_private_key}]'
+                )
+                return None
+        return raw_passwd
+
+    def get_request_ip(self):
+        ip = ''
+        if hasattr(self.request, 'data'):
+            ip = self.request.data.get('remote_addr', '')
+        ip = ip or get_request_ip(self.request)
+        return ip
+
+    def get_context_data(self, **kwargs):
+        # 生成加解密密钥对，public_key传递给前端，private_key存入session中供解密使用
+        rsa_public_key = self.request.session.get(RSA_PUBLIC_KEY)
+        rsa_private_key = self.request.session.get(RSA_PRIVATE_KEY)
+        if not all((rsa_private_key, rsa_public_key)):
+            rsa_private_key, rsa_public_key = gen_key_pair()
+            rsa_public_key = rsa_public_key.replace('\n', '\\n')
+            self.request.session[RSA_PRIVATE_KEY] = rsa_private_key
+            self.request.session[RSA_PUBLIC_KEY] = rsa_public_key
+
+        kwargs.update({
+            'rsa_public_key': rsa_public_key,
+        })
+        return super().get_context_data(**kwargs)
+
+
+class AuthMixin(PasswordEncryptionViewMixin):
     request = None
     partial_credential_error = None
 
@@ -106,13 +168,6 @@ class AuthMixin:
         user.backend = self.request.session.get("auth_backend")
         return user
 
-    def get_request_ip(self):
-        ip = ''
-        if hasattr(self.request, 'data'):
-            ip = self.request.data.get('remote_addr', '')
-        ip = ip or get_request_ip(self.request)
-        return ip
-
     def _check_is_block(self, username, raise_exception=True):
         ip = self.get_request_ip()
         if LoginBlockUtil(username, ip).is_block():
@@ -130,19 +185,6 @@ class AuthMixin:
             username = self.request.POST.get("username")
         self._check_is_block(username, raise_exception)
 
-    def decrypt_passwd(self, raw_passwd):
-        # 获取解密密钥，对密码进行解密
-        rsa_private_key = self.request.session.get(RSA_PRIVATE_KEY)
-        if rsa_private_key is not None:
-            try:
-                return rsa_decrypt(raw_passwd, rsa_private_key)
-            except Exception as e:
-                logger.error(e, exc_info=True)
-                logger.error(f'Decrypt password failed: password[{raw_passwd}] '
-                             f'rsa_private_key[{rsa_private_key}]')
-                return None
-        return raw_passwd
-
     def raise_credential_error(self, error):
         raise self.partial_credential_error(error=error)
 
@@ -158,14 +200,12 @@ class AuthMixin:
 
         items = ['username', 'password', 'challenge', 'public_key', 'auto_login']
         username, password, challenge, public_key, auto_login = bulk_get(data, *items,  default='')
-        password = password + challenge.strip()
         ip = self.get_request_ip()
         self._set_partial_credential_error(username=username, ip=ip, request=request)
 
+        password = password + challenge.strip()
         if decrypt_passwd:
-            password = self.decrypt_passwd(password)
-            if not password:
-                self.raise_credential_error(errors.reason_password_decrypt_failed)
+            password = self.get_decrypted_password()
         return username, password, public_key, ip, auto_login
 
     def _check_only_allow_exists_user_auth(self, username):
