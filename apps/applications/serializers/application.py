@@ -49,10 +49,10 @@ class AppSerializerMixin(serializers.Serializer):
         return serializer
 
     def create(self, validated_data):
-        pass
+        return super().create(validated_data)
 
     def update(self, instance, validated_data):
-        pass
+        return super().update(instance, validated_data)
 
 
 class AppSerializer(AppSerializerMixin, BulkOrgResourceModelSerializer):
