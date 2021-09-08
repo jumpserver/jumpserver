@@ -80,7 +80,9 @@ def authenticate(request=None, **credentials):
 auth.authenticate = authenticate
 
 
-class PasswordEncryptionViewMixin(FormView):
+class PasswordEncryptionViewMixin:
+    request = None
+
     def get_decrypted_password(self, password=None, username=None):
         request = self.request
         if hasattr(request, 'data'):
