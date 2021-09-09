@@ -15,10 +15,15 @@ __all__ = ['CoreTerminal', 'CeleryTerminal']
 class BaseTerminal(object):
 
     def __init__(self, suffix_name, _type):
-        self.server_hostname = os.environ.get('SERVER_HOSTNAME') or socket.gethostname()
-        self.name = f'[{suffix_name}] {self.server_hostname}'
+        server_hostname = os.environ.get('SERVER_HOSTNAME') or ''
+        hostname = socket.gethostname()
+        if server_hostname:
+            name = f'[{suffix_name}]-{server_hostname}'
+        else:
+            name = f'[{suffix_name}]-{hostname}'
+        self.name = name
         self.interval = 30
-        self.remote_addr = socket.gethostbyname(socket.gethostname())
+        self.remote_addr = socket.gethostbyname(hostname)
         self.type = _type
 
     def start_heartbeat_thread(self):
