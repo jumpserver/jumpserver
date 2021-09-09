@@ -99,15 +99,22 @@ class TerminalRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Terminal
         fields = ['name', 'type', 'comment', 'service_account', 'remote_addr']
-        extra_fields = {
-            'remote_addr': {'readonly': True}
+        extra_kwargs = {
+            'name': {'max_length': 1024},
+            'remote_addr': {'read_only': True}
         }
 
     def is_valid(self, raise_exception=False):
         valid = super().is_valid(raise_exception=raise_exception)
         if not valid:
             return valid
-        data = {'name': self.validated_data.get('name')}
+        name = self.validated_data.get('name')
+        if len(name) > 128:
+            self.validated_data['comment'] = name
+            name = '{}...{}'.format(name[:32], name[-32:])
+            self.validated_data['name'] = name
+
+        data = {'name': name}
         kwargs = {'data': data}
         if self.instance and self.instance.user:
             kwargs['instance'] = self.instance.user
