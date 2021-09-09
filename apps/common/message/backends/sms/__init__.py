@@ -35,7 +35,7 @@ class SMS_MESSAGE(TextChoices):
         except KeyError as e:
             raise JMSException(
                 code=f'{settings.SMS_BACKEND}_sign_and_tmpl_bad',
-                detail=_('SMS sign and template bad: {}').format(e)
+                detail=_('Invalid SMS sign and template: {}').format(e)
             )
 
 
