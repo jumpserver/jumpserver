@@ -52,7 +52,7 @@ class TicketFlow(CommonModelMixin, OrgModelMixin):
     approval_level = models.SmallIntegerField(
         default=TicketApprovalLevel.one,
         choices=TicketApprovalLevel.choices,
-        verbose_name=_('Approval level')
+        verbose_name=_('Approve level')
     )
     rules = models.ManyToManyField(ApprovalRule, related_name='ticket_flows')
 

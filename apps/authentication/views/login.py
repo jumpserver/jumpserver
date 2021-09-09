@@ -135,15 +135,6 @@ class UserLoginView(mixins.AuthMixin, FormView):
         self.request.session[RSA_PUBLIC_KEY] = None
 
     def get_context_data(self, **kwargs):
-        # 生成加解密密钥对，public_key传递给前端，private_key存入session中供解密使用
-        rsa_private_key = self.request.session.get(RSA_PRIVATE_KEY)
-        rsa_public_key = self.request.session.get(RSA_PUBLIC_KEY)
-        if not all((rsa_private_key, rsa_public_key)):
-            rsa_private_key, rsa_public_key = utils.gen_key_pair()
-            rsa_public_key = rsa_public_key.replace('\n', '\\n')
-            self.request.session[RSA_PRIVATE_KEY] = rsa_private_key
-            self.request.session[RSA_PUBLIC_KEY] = rsa_public_key
-
         forgot_password_url = reverse('authentication:forgot-password')
         has_other_auth_backend = settings.AUTHENTICATION_BACKENDS[0] != settings.AUTH_BACKEND_MODEL
         if has_other_auth_backend and settings.FORGOT_PASSWORD_URL:
@@ -156,7 +147,6 @@ class UserLoginView(mixins.AuthMixin, FormView):
             'AUTH_WECOM': settings.AUTH_WECOM,
             'AUTH_DINGTALK': settings.AUTH_DINGTALK,
             'AUTH_FEISHU': settings.AUTH_FEISHU,
-            'rsa_public_key': rsa_public_key,
             'forgot_password_url': forgot_password_url
         }
         kwargs.update(context)

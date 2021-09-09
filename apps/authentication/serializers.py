@@ -166,7 +166,7 @@ class ConnectionTokenAssetSerializer(serializers.ModelSerializer):
 class ConnectionTokenSystemUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = SystemUser
-        fields = ['id', 'name', 'username', 'password', 'private_key']
+        fields = ['id', 'name', 'username', 'password', 'private_key', 'ad_domain']
 
 
 class ConnectionTokenGatewaySerializer(serializers.ModelSerializer):

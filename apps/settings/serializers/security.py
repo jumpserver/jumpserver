@@ -77,10 +77,6 @@ class SecurityAuthSerializer(serializers.Serializer):
 
 
 class SecuritySettingSerializer(SecurityPasswordRuleSerializer, SecurityAuthSerializer):
-    SECURITY_COMMAND_EXECUTION = serializers.BooleanField(
-        required=False, label=_('Batch command execution'),
-        help_text=_('Allow user run batch command or not using ansible')
-    )
     SECURITY_SERVICE_ACCOUNT_REGISTRATION = serializers.BooleanField(
         required=True, label=_('Enable terminal register'),
         help_text=_("Allow terminal register, after all terminal setup, you should disable this for security")
@@ -107,4 +103,13 @@ class SecuritySettingSerializer(SecurityPasswordRuleSerializer, SecurityAuthSeri
         max_length=8192, required=False, allow_blank=True, label=_('Email recipient'),
         help_text=_('Multiple user using , split')
     )
+    SECURITY_COMMAND_EXECUTION = serializers.BooleanField(
+        required=False, label=_('Batch command execution'),
+        help_text=_('Allow user run batch command or not using ansible')
+    )
+    SECURITY_SESSION_SHARE = serializers.BooleanField(
+        required=True, label=_('Session share'),
+        help_text=_("Enabled, Allows user active session to be shared with other users")
+    )
+
 

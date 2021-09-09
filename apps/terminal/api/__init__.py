@@ -6,3 +6,4 @@ from .command import *
 from .task import *
 from .storage import *
 from .status import *
+from .sharing import *
