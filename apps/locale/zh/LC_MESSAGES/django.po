@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-09 18:57+0800\n"
+"POT-Creation-Date: 2021-09-09 20:13+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -25,7 +25,7 @@ msgstr ""
 #: orgs/models.py:24 perms/models/base.py:44 settings/models.py:29
 #: settings/serializers/sms.py:6 terminal/models/storage.py:23
 #: terminal/models/task.py:16 terminal/models/terminal.py:100
-#: users/forms/profile.py:32 users/models/group.py:15 users/models/user.py:596
+#: users/forms/profile.py:32 users/models/group.py:15 users/models/user.py:604
 #: users/templates/users/_select_user_modal.html:13
 #: users/templates/users/user_asset_permission.html:37
 #: users/templates/users/user_asset_permission.html:154
@@ -60,8 +60,8 @@ msgstr "激活中"
 #: orgs/models.py:27 perms/models/base.py:53 settings/models.py:34
 #: terminal/models/storage.py:26 terminal/models/terminal.py:114
 #: tickets/models/ticket.py:71 users/models/group.py:16
-#: users/models/user.py:629 xpack/plugins/change_auth_plan/models/base.py:41
-#: xpack/plugins/cloud/models.py:35 xpack/plugins/cloud/models.py:113
+#: users/models/user.py:637 xpack/plugins/change_auth_plan/models.py:77
+#: xpack/plugins/cloud/models.py:35 xpack/plugins/cloud/models.py:108
 #: xpack/plugins/gathered_user/models.py:26
 msgid "Comment"
 msgstr "备注"
@@ -98,7 +98,7 @@ msgstr "动作"
 #: terminal/backends/command/models.py:18
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:38
 #: tickets/models/comment.py:17 users/const.py:14 users/models/user.py:181
-#: users/models/user.py:797 users/models/user.py:823
+#: users/models/user.py:809 users/models/user.py:835
 #: users/serializers/group.py:19
 #: users/templates/users/user_asset_permission.html:38
 #: users/templates/users/user_asset_permission.html:64
@@ -113,8 +113,6 @@ msgid "Login confirm"
 msgstr "登录复核"
 
 #: acls/models/login_asset_acl.py:21
-#, fuzzy
-#| msgid "SystemUser"
 msgid "System User"
 msgstr "系统用户"
 
@@ -127,8 +125,8 @@ msgstr "系统用户"
 #: terminal/backends/command/serializers.py:13 terminal/models/session.py:40
 #: users/templates/users/user_asset_permission.html:40
 #: users/templates/users/user_asset_permission.html:70
-#: xpack/plugins/change_auth_plan/models/asset.py:195
-#: xpack/plugins/cloud/models.py:217
+#: xpack/plugins/change_auth_plan/models.py:282
+#: xpack/plugins/cloud/models.py:212
 msgid "Asset"
 msgstr "资产"
 
@@ -141,7 +139,7 @@ msgstr "审批人"
 msgid "Login asset confirm"
 msgstr "登录资产复核"
 
-#: acls/serializers/login_acl.py:18 xpack/plugins/cloud/serializers/task.py:23
+#: acls/serializers/login_acl.py:18 xpack/plugins/cloud/serializers.py:165
 msgid "IP address invalid: `{}`"
 msgstr "IP 地址无效: `{}`"
 
@@ -179,11 +177,11 @@ msgstr "格式为逗号分隔的字符串, * 表示匹配所有. "
 #: applications/serializers/attrs/application_type/vmware_client.py:26
 #: assets/models/base.py:176 assets/models/gathered_user.py:15
 #: audits/models.py:105 authentication/forms.py:15 authentication/forms.py:17
-#: ops/models/adhoc.py:148 users/forms/profile.py:31 users/models/user.py:594
+#: ops/models/adhoc.py:148 users/forms/profile.py:31 users/models/user.py:602
 #: users/templates/users/_select_user_modal.html:14
-#: xpack/plugins/change_auth_plan/models/asset.py:35
-#: xpack/plugins/change_auth_plan/models/asset.py:191
-#: xpack/plugins/cloud/serializers/account_attrs.py:62
+#: xpack/plugins/change_auth_plan/models.py:47
+#: xpack/plugins/change_auth_plan/models.py:278
+#: xpack/plugins/cloud/serializers.py:67
 msgid "Username"
 msgstr "用户名"
 
@@ -236,8 +234,6 @@ msgstr "我的应用"
 #: applications/const.py:8 applications/models/account.py:10
 #: applications/serializers/attrs/application_category/db.py:14
 #: applications/serializers/attrs/application_type/mysql_workbench.py:26
-#: xpack/plugins/change_auth_plan/models/app.py:32
-#: xpack/plugins/change_auth_plan/models/app.py:139
 msgid "Database"
 msgstr "数据库"
 
@@ -261,7 +257,6 @@ msgstr "自定义"
 #: users/templates/users/user_asset_permission.html:159
 #: users/templates/users/user_database_app_permission.html:40
 #: users/templates/users/user_database_app_permission.html:67
-#: xpack/plugins/change_auth_plan/models/app.py:36
 msgid "System user"
 msgstr "系统用户"
 
@@ -271,9 +266,7 @@ msgid "Version"
 msgstr "版本"
 
 #: applications/models/account.py:18 xpack/plugins/cloud/models.py:82
-#: xpack/plugins/cloud/serializers/task.py:65
-#, fuzzy
-#| msgid "account"
+#: xpack/plugins/cloud/serializers.py:204
 msgid "Account"
 msgstr "账户"
 
@@ -286,7 +279,6 @@ msgstr "应用管理"
 #: perms/models/application_permission.py:20
 #: perms/serializers/application/user_permission.py:33
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:20
-#: xpack/plugins/change_auth_plan/models/app.py:25
 msgid "Category"
 msgstr "类别"
 
@@ -297,8 +289,6 @@ msgstr "类别"
 #: terminal/models/storage.py:55 terminal/models/storage.py:116
 #: tickets/models/flow.py:50 tickets/models/ticket.py:48
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:27
-#: xpack/plugins/change_auth_plan/models/app.py:28
-#: xpack/plugins/change_auth_plan/models/app.py:148
 msgid "Type"
 msgstr "类型"
 
@@ -329,10 +319,8 @@ msgid "Type display"
 msgstr "类型名称"
 
 #: applications/serializers/application.py:101
-#, fuzzy
-#| msgid "Applicant display"
 msgid "Application display"
-msgstr "申请人名称"
+msgstr "应用名称"
 
 #: applications/serializers/attrs/application_category/cloud.py:9
 #: assets/models/cluster.py:40
@@ -341,7 +329,7 @@ msgstr "集群"
 
 #: applications/serializers/attrs/application_category/db.py:11
 #: ops/models/adhoc.py:146 settings/serializers/auth/radius.py:14
-#: xpack/plugins/cloud/serializers/account_attrs.py:60
+#: xpack/plugins/cloud/serializers.py:65
 msgid "Host"
 msgstr "主机"
 
@@ -351,8 +339,7 @@ msgstr "主机"
 #: applications/serializers/attrs/application_type/oracle.py:11
 #: applications/serializers/attrs/application_type/pgsql.py:11
 #: assets/models/asset.py:185 assets/models/domain.py:62
-#: settings/serializers/auth/radius.py:15
-#: xpack/plugins/cloud/serializers/account_attrs.py:61
+#: settings/serializers/auth/radius.py:15 xpack/plugins/cloud/serializers.py:66
 msgid "Port"
 msgstr "端口"
 
@@ -364,7 +351,6 @@ msgid "Application path"
 msgstr "应用路径"
 
 #: applications/serializers/attrs/application_category/remote_app.py:45
-#: xpack/plugins/cloud/serializers/account_attrs.py:44
 msgid "This field is required."
 msgstr "该字段是必填项。"
 
@@ -384,10 +370,10 @@ msgstr "目标URL"
 #: users/templates/users/user_otp_check_password.html:13
 #: users/templates/users/user_password_update.html:43
 #: users/templates/users/user_password_verify.html:18
-#: xpack/plugins/change_auth_plan/models/base.py:39
-#: xpack/plugins/change_auth_plan/models/base.py:114
-#: xpack/plugins/change_auth_plan/models/base.py:182
-#: xpack/plugins/cloud/serializers/account_attrs.py:64
+#: xpack/plugins/change_auth_plan/models.py:68
+#: xpack/plugins/change_auth_plan/models.py:190
+#: xpack/plugins/change_auth_plan/models.py:285
+#: xpack/plugins/cloud/serializers.py:69
 msgid "Password"
 msgstr "密码"
 
@@ -439,13 +425,13 @@ msgstr "系统平台"
 
 #: assets/models/asset.py:186 assets/serializers/asset.py:65
 #: perms/serializers/asset/user_permission.py:41
-#: xpack/plugins/cloud/models.py:104 xpack/plugins/cloud/serializers/task.py:42
+#: xpack/plugins/cloud/models.py:99 xpack/plugins/cloud/serializers.py:183
 msgid "Protocols"
 msgstr "协议组"
 
 #: assets/models/asset.py:189 assets/models/user.py:198
 #: perms/models/asset_permission.py:100
-#: xpack/plugins/change_auth_plan/models/asset.py:44
+#: xpack/plugins/change_auth_plan/models.py:56
 #: xpack/plugins/gathered_user/models.py:24
 msgid "Nodes"
 msgstr "节点"
@@ -458,6 +444,7 @@ msgstr "激活"
 
 #: assets/models/asset.py:193 assets/models/cluster.py:19
 #: assets/models/user.py:195 assets/models/user.py:330 templates/_nav.html:44
+#: xpack/plugins/cloud/models.py:96 xpack/plugins/cloud/serializers.py:205
 msgid "Admin user"
 msgstr "特权用户"
 
@@ -533,10 +520,9 @@ msgstr "标签管理"
 #: assets/models/cluster.py:28 assets/models/cmd_filter.py:26
 #: assets/models/cmd_filter.py:67 assets/models/group.py:21
 #: common/db/models.py:70 common/mixins/models.py:49 orgs/models.py:25
-#: orgs/models.py:437 perms/models/base.py:51 users/models/user.py:637
-#: users/serializers/group.py:33
-#: xpack/plugins/change_auth_plan/models/base.py:45
-#: xpack/plugins/cloud/models.py:119 xpack/plugins/gathered_user/models.py:30
+#: orgs/models.py:437 perms/models/base.py:51 users/models/user.py:645
+#: users/serializers/group.py:33 xpack/plugins/change_auth_plan/models.py:81
+#: xpack/plugins/cloud/models.py:114 xpack/plugins/gathered_user/models.py:30
 msgid "Created by"
 msgstr "创建者"
 
@@ -546,7 +532,7 @@ msgstr "创建者"
 #: assets/models/label.py:25 common/db/models.py:72 common/mixins/models.py:50
 #: ops/models/adhoc.py:38 ops/models/command.py:29 orgs/models.py:26
 #: orgs/models.py:435 perms/models/base.py:52 users/models/group.py:18
-#: users/models/user.py:824 xpack/plugins/cloud/models.py:122
+#: users/models/user.py:836 xpack/plugins/cloud/models.py:117
 msgid "Date created"
 msgstr "创建日期"
 
@@ -563,7 +549,7 @@ msgid "Ok"
 msgstr "成功"
 
 #: assets/models/base.py:32 audits/models.py:102
-#: xpack/plugins/cloud/const.py:28
+#: xpack/plugins/cloud/const.py:27
 msgid "Failed"
 msgstr "失败"
 
@@ -575,15 +561,15 @@ msgstr "可连接性"
 msgid "Date verified"
 msgstr "校验日期"
 
-#: assets/models/base.py:178 xpack/plugins/change_auth_plan/models/asset.py:54
-#: xpack/plugins/change_auth_plan/models/asset.py:126
-#: xpack/plugins/change_auth_plan/models/asset.py:202
+#: assets/models/base.py:178 xpack/plugins/change_auth_plan/models.py:72
+#: xpack/plugins/change_auth_plan/models.py:197
+#: xpack/plugins/change_auth_plan/models.py:292
 msgid "SSH private key"
 msgstr "SSH密钥"
 
-#: assets/models/base.py:179 xpack/plugins/change_auth_plan/models/asset.py:57
-#: xpack/plugins/change_auth_plan/models/asset.py:122
-#: xpack/plugins/change_auth_plan/models/asset.py:198
+#: assets/models/base.py:179 xpack/plugins/change_auth_plan/models.py:75
+#: xpack/plugins/change_auth_plan/models.py:193
+#: xpack/plugins/change_auth_plan/models.py:288
 msgid "SSH public key"
 msgstr "SSH公钥"
 
@@ -601,7 +587,7 @@ msgstr "带宽"
 msgid "Contact"
 msgstr "联系人"
 
-#: assets/models/cluster.py:22 users/models/user.py:615
+#: assets/models/cluster.py:22 users/models/user.py:623
 msgid "Phone"
 msgstr "手机"
 
@@ -627,7 +613,7 @@ msgid "Default"
 msgstr "默认"
 
 #: assets/models/cluster.py:36 assets/models/label.py:14
-#: users/models/user.py:809
+#: users/models/user.py:821
 msgid "System"
 msgstr "系统"
 
@@ -741,7 +727,7 @@ msgstr "ssh私钥"
 #: users/templates/users/user_asset_permission.html:41
 #: users/templates/users/user_asset_permission.html:73
 #: users/templates/users/user_asset_permission.html:158
-#: xpack/plugins/cloud/models.py:93 xpack/plugins/cloud/serializers/task.py:68
+#: xpack/plugins/cloud/models.py:93 xpack/plugins/cloud/serializers.py:206
 msgid "Node"
 msgstr "节点"
 
@@ -762,7 +748,7 @@ msgid "Username same with user"
 msgstr "用户名与用户相同"
 
 #: assets/models/user.py:200 assets/serializers/domain.py:28
-#: templates/_nav.html:39 xpack/plugins/change_auth_plan/models/asset.py:40
+#: templates/_nav.html:39 xpack/plugins/change_auth_plan/models.py:52
 msgid "Assets"
 msgstr "资产"
 
@@ -1091,8 +1077,8 @@ msgstr "成功"
 #: terminal/models/session.py:52
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:53
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:45
-#: xpack/plugins/change_auth_plan/models/base.py:105
-#: xpack/plugins/change_auth_plan/models/base.py:189
+#: xpack/plugins/change_auth_plan/models.py:177
+#: xpack/plugins/change_auth_plan/models.py:307
 #: xpack/plugins/gathered_user/models.py:76
 msgid "Date start"
 msgstr "开始日期"
@@ -1158,19 +1144,19 @@ msgstr "用户代理"
 #: audits/models.py:110
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
 #: authentication/templates/authentication/login_otp.html:6
-#: users/forms/profile.py:64 users/models/user.py:618
+#: users/forms/profile.py:64 users/models/user.py:626
 #: users/serializers/profile.py:102
 msgid "MFA"
 msgstr "多因子认证"
 
 #: audits/models.py:111 terminal/models/sharing.py:88
-#: xpack/plugins/change_auth_plan/models/base.py:187
-#: xpack/plugins/cloud/models.py:176
+#: xpack/plugins/change_auth_plan/models.py:303
+#: xpack/plugins/cloud/models.py:171
 msgid "Reason"
 msgstr "原因"
 
 #: audits/models.py:112 tickets/models/ticket.py:57
-#: xpack/plugins/cloud/models.py:172 xpack/plugins/cloud/models.py:221
+#: xpack/plugins/cloud/models.py:167 xpack/plugins/cloud/models.py:216
 msgid "Status"
 msgstr "状态"
 
@@ -1204,7 +1190,7 @@ msgid "Hosts display"
 msgstr "主机名称"
 
 #: audits/serializers.py:89 ops/models/command.py:26
-#: xpack/plugins/cloud/models.py:170
+#: xpack/plugins/cloud/models.py:165
 msgid "Result"
 msgstr "结果"
 
@@ -1559,40 +1545,28 @@ msgid ""
 msgstr "账号已被锁定（请联系管理员解锁 或 {}分钟后重试）"
 
 #: authentication/errors.py:64
-#, fuzzy, python-brace-format
-#| msgid ""
-#| "MFA code invalid, or ntp sync server time, You can also try {times_try} "
-#| "times (The account will be temporarily locked for {block_time} minutes)"
 msgid ""
 "One-time password invalid, or ntp sync server time, You can also try "
 "{times_try} times (The account will be temporarily locked for {block_time} "
 "minutes)"
 msgstr ""
-"MFA验证码不正确，或者服务器端时间不对。 您还可以尝试 {times_try} 次（账号将被"
+"虚拟MFA 不正确，或者服务器端时间不对。 您还可以尝试 {times_try} 次（账号将被"
 "临时 锁定 {block_time} 分钟）"
 
 #: authentication/errors.py:69
-#, fuzzy, python-brace-format
-#| msgid ""
-#| "MFA code invalid, or ntp sync server time, You can also try {times_try} "
-#| "times (The account will be temporarily locked for {block_time} minutes)"
 msgid ""
 "SMS verify code invalid,You can also try {times_try} times (The account will "
 "be temporarily locked for {block_time} minutes)"
 msgstr ""
-"MFA验证码不正确，或者服务器端时间不对。 您还可以尝试 {times_try} 次（账号将被"
+"短信验证码不正确，或者服务器端时间不对。 您还可以尝试 {times_try} 次（账号将被"
 "临时 锁定 {block_time} 分钟）"
 
 #: authentication/errors.py:74
-#, fuzzy, python-brace-format
-#| msgid ""
-#| "MFA code invalid, or ntp sync server time, You can also try {times_try} "
-#| "times (The account will be temporarily locked for {block_time} minutes)"
 msgid ""
-"The MFA type({mfa_type}) is not supportedYou can also try {times_try} times "
+"The MFA type({mfa_type}) is not supported, You can also try {times_try} times "
 "(The account will be temporarily locked for {block_time} minutes)"
 msgstr ""
-"MFA验证码不正确，或者服务器端时间不对。 您还可以尝试 {times_try} 次（账号将被"
+"该({mfa_type}) MFA 类型不支持。 您还可以尝试 {times_try} 次（账号将被"
 "临时 锁定 {block_time} 分钟）"
 
 #: authentication/errors.py:79
@@ -1648,10 +1622,8 @@ msgid "Code"
 msgstr ""
 
 #: authentication/forms.py:47
-#, fuzzy
-#| msgid "type"
 msgid "MFA type"
-msgstr "类型"
+msgstr "MFA 类型"
 
 #: authentication/forms.py:60 authentication/forms.py:62
 #: users/forms/profile.py:27
@@ -1675,10 +1647,8 @@ msgid "The verification code has expired. Please resend it"
 msgstr ""
 
 #: authentication/sms_verify_code.py:22
-#, fuzzy
-#| msgid "The old password is incorrect"
 msgid "The verification code is incorrect"
-msgstr "旧密码错误"
+msgstr "验证码错误"
 
 #: authentication/sms_verify_code.py:27
 msgid "Please wait {} seconds before sending"
@@ -1796,16 +1766,12 @@ msgid "FeiShu"
 msgstr "飞书"
 
 #: authentication/templates/authentication/login_otp.html:25
-#, fuzzy
-#| msgid "Please enter the password of"
 msgid "Please enter the verification code"
-msgstr "请输入"
+msgstr "请输入验证码"
 
 #: authentication/templates/authentication/login_otp.html:28
-#, fuzzy
-#| msgid "Invalid verification code"
 msgid "Send verification code"
-msgstr "验证码不正确"
+msgstr "发送验证码"
 
 #: authentication/templates/authentication/login_otp.html:29
 #: users/templates/users/user_otp_check_password.html:16
@@ -2096,22 +2062,16 @@ msgid "SMS sign and template bad: {}"
 msgstr ""
 
 #: common/message/backends/sms/__init__.py:43
-#, fuzzy
-#| msgid "Alibaba Cloud"
 msgid "Alibaba"
 msgstr "阿里云"
 
 #: common/message/backends/sms/__init__.py:44
-#, fuzzy
-#| msgid "Tencent Cloud"
 msgid "Tencent"
 msgstr "腾讯云"
 
 #: common/message/backends/sms/alibaba.py:56
-#, fuzzy
-#| msgid "Password does not match"
 msgid "Signature does not match"
-msgstr "密码不一致"
+msgstr "签名不匹配"
 
 #: common/message/backends/wecom/__init__.py:15
 msgid "WeCom error, please contact system administrator"
@@ -2177,7 +2137,7 @@ msgstr ""
 "div>"
 
 #: notifications/backends/__init__.py:10 users/forms/profile.py:101
-#: users/models/user.py:598
+#: users/models/user.py:606
 msgid "Email"
 msgstr "邮件"
 
@@ -2207,7 +2167,7 @@ msgid "Regularly perform"
 msgstr "定期执行"
 
 #: ops/mixin.py:106 ops/mixin.py:147
-#: xpack/plugins/change_auth_plan/serializers/base.py:42
+#: xpack/plugins/change_auth_plan/serializers.py:55
 msgid "Periodic perform"
 msgstr "定时执行"
 
@@ -2286,8 +2246,8 @@ msgstr "开始时间"
 msgid "End time"
 msgstr "完成时间"
 
-#: ops/models/adhoc.py:246 xpack/plugins/change_auth_plan/models/base.py:108
-#: xpack/plugins/change_auth_plan/models/base.py:190
+#: ops/models/adhoc.py:246 xpack/plugins/change_auth_plan/models.py:180
+#: xpack/plugins/change_auth_plan/models.py:310
 #: xpack/plugins/gathered_user/models.py:79
 msgid "Time"
 msgstr "时间"
@@ -2387,7 +2347,7 @@ msgstr "组织审计员"
 msgid "GLOBAL"
 msgstr "全局组织"
 
-#: orgs/models.py:434 users/models/user.py:606 users/serializers/user.py:36
+#: orgs/models.py:434 users/models/user.py:614 users/serializers/user.py:36
 #: users/templates/users/_select_user_modal.html:15
 msgid "Role"
 msgstr "角色"
@@ -2452,7 +2412,7 @@ msgid "Favorite"
 msgstr "收藏夹"
 
 #: perms/models/base.py:47 templates/_nav.html:21 users/models/group.py:31
-#: users/models/user.py:602 users/templates/users/_select_user_modal.html:16
+#: users/models/user.py:610 users/templates/users/_select_user_modal.html:16
 #: users/templates/users/user_asset_permission.html:39
 #: users/templates/users/user_asset_permission.html:67
 #: users/templates/users/user_database_app_permission.html:38
@@ -2463,7 +2423,7 @@ msgstr "用户组"
 #: perms/models/base.py:50
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:56
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:48
-#: users/models/user.py:634
+#: users/models/user.py:642
 msgid "Date expired"
 msgstr "失效日期"
 
@@ -2528,10 +2488,8 @@ msgid "System users display"
 msgstr "系统用户名称"
 
 #: settings/api/alibaba_sms.py:30 settings/api/tencent_sms.py:34
-#, fuzzy
-#| msgid "This field is required"
 msgid "test_phone is required"
-msgstr "该字段是必填项。"
+msgstr "测试手机号 该字段是必填项。"
 
 #: settings/api/alibaba_sms.py:52 settings/api/dingtalk.py:36
 #: settings/api/feishu.py:35 settings/api/tencent_sms.py:57
@@ -2677,8 +2635,7 @@ msgstr ""
 "用户属性映射代表怎样将LDAP中用户属性映射到jumpserver用户上，username, name,"
 "email 是jumpserver的用户需要属性"
 
-#: settings/serializers/auth/ldap.py:58
-#: xpack/plugins/cloud/serializers/task.py:69
+#: settings/serializers/auth/ldap.py:58 xpack/plugins/cloud/serializers.py:207
 #: xpack/plugins/gathered_user/serializers.py:20
 msgid "Periodic display"
 msgstr "定时执行"
@@ -2703,8 +2660,7 @@ msgstr "JumpServer 地址"
 msgid "Client Id"
 msgstr "客户端 ID"
 
-#: settings/serializers/auth/oidc.py:18
-#: xpack/plugins/cloud/serializers/account_attrs.py:26
+#: settings/serializers/auth/oidc.py:18 xpack/plugins/cloud/serializers.py:33
 msgid "Client Secret"
 msgstr "客户端密钥"
 
@@ -2793,10 +2749,8 @@ msgid "OTP in radius"
 msgstr "使用 Radius OTP"
 
 #: settings/serializers/auth/sms.py:10
-#, fuzzy
-#| msgid "Enable"
 msgid "Enable SMS"
-msgstr "启用"
+msgstr "启用 SMS"
 
 #: settings/serializers/auth/sms.py:11
 msgid "Test phone"
@@ -3185,10 +3139,8 @@ msgid "Enabled, Allows user active session to be shared with other users"
 msgstr "开启后允许用户分享已连接的资产会话给它人，协同工作"
 
 #: settings/serializers/sms.py:7
-#, fuzzy
-#| msgid "Labels"
 msgid "Label"
-msgstr "标签管理"
+msgstr "标签"
 
 #: settings/serializers/terminal.py:13
 msgid "Auto"
@@ -3244,17 +3196,13 @@ msgstr "不同设备登录成功提示不一样，所以如果 telnet 不能正�
 msgid "RDP address"
 msgstr "RDP 地址"
 
-#: settings/serializers/terminal.py:41
+#: settings/serializers/terminal.py:39
 msgid "RDP visit address, eg: dev.jumpserver.org:3389"
 msgstr "RDP 访问地址, 如: dev.jumpserver.org:3389"
 
-#: settings/serializers/terminal.py:45
+#: settings/serializers/terminal.py:42
 msgid "Enable XRDP"
 msgstr "启用 XRDP 服务"
-
-#: settings/serializers/terminal.py:45
-msgid "Enable XRDP server"
-msgstr "启用 XRDP 服务，允许 RDP 客户端"
 
 #: settings/utils/ldap.py:412
 msgid "ldap:// or ldaps:// protocol is used."
@@ -3974,8 +3922,7 @@ msgstr "加入日期"
 msgid "Date left"
 msgstr "结束日期"
 
-#: terminal/models/sharing.py:91
-#: xpack/plugins/change_auth_plan/models/base.py:178
+#: terminal/models/sharing.py:91 xpack/plugins/change_auth_plan/models.py:274
 msgid "Finished"
 msgstr "结束"
 
@@ -4173,7 +4120,7 @@ msgstr "Secret key"
 msgid "Endpoint"
 msgstr "端点"
 
-#: terminal/serializers/storage.py:66 xpack/plugins/cloud/models.py:214
+#: terminal/serializers/storage.py:66 xpack/plugins/cloud/models.py:209
 msgid "Region"
 msgstr "地域"
 
@@ -4625,16 +4572,12 @@ msgid "MFA not enabled"
 msgstr "MFA没有开启"
 
 #: users/exceptions.py:15
-#, fuzzy
-#| msgid "iPhone downloads"
 msgid "Phone not set"
-msgstr "iPhone手机下载"
+msgstr "手机号没有设置"
 
 #: users/exceptions.py:20
-#, fuzzy
-#| msgid "Bulk create not support"
 msgid "MFA method not support"
-msgstr "不支持批量创建"
+msgstr "MFA 方法不支持"
 
 #: users/forms/profile.py:49
 msgid ""
@@ -4703,58 +4646,56 @@ msgid "Public key should not be the same as your old one."
 msgstr "不能和原来的密钥相同"
 
 #: users/forms/profile.py:149 users/serializers/profile.py:74
-#: users/serializers/profile.py:149 users/serializers/profile.py:162
+#: users/serializers/profile.py:150 users/serializers/profile.py:163
 msgid "Not a valid ssh public key"
 msgstr "SSH密钥不合法"
 
-#: users/forms/profile.py:160 users/models/user.py:626
+#: users/forms/profile.py:160 users/models/user.py:634
 #: users/templates/users/user_password_update.html:48
 msgid "Public key"
 msgstr "SSH公钥"
 
 #: users/models/user.py:38
-#, fuzzy
-#| msgid "Verify code"
 msgid "SMS verify code"
-msgstr "验证码"
+msgstr "短信验证码"
 
 #: users/models/user.py:472
 msgid "Force enable"
 msgstr "强制启用"
 
-#: users/models/user.py:575
+#: users/models/user.py:583
 msgid "Local"
 msgstr "数据库"
 
-#: users/models/user.py:609
+#: users/models/user.py:617
 msgid "Avatar"
 msgstr "头像"
 
-#: users/models/user.py:612
+#: users/models/user.py:620
 msgid "Wechat"
 msgstr "微信"
 
-#: users/models/user.py:623
+#: users/models/user.py:631
 msgid "Private key"
 msgstr "ssh私钥"
 
-#: users/models/user.py:642
+#: users/models/user.py:650
 msgid "Source"
 msgstr "来源"
 
-#: users/models/user.py:646
+#: users/models/user.py:654
 msgid "Date password last updated"
 msgstr "最后更新密码日期"
 
-#: users/models/user.py:649
+#: users/models/user.py:657
 msgid "Need update password"
 msgstr "需要更新密码"
 
-#: users/models/user.py:805
+#: users/models/user.py:817
 msgid "Administrator"
 msgstr "管理员"
 
-#: users/models/user.py:808
+#: users/models/user.py:820
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
@@ -4765,28 +4706,6 @@ msgid "Reset password"
 msgstr "重置密码"
 
 #: users/notifications.py:44
-#, fuzzy, python-format
-#| msgid ""
-#| "\n"
-#| "    Hello %(name)s:\n"
-#| "    <br>\n"
-#| "    Please click the link below to reset your password, if not your "
-#| "request, concern your account security\n"
-#| "    <br>\n"
-#| "    <a href=\"%(rest_password_url)s?token=%(rest_password_token)s\">Click "
-#| "here reset password</a>\n"
-#| "    <br>\n"
-#| "    This link is valid for 1 hour. After it expires, <a href="
-#| "\"%(forget_password_url)s?email=%(email)s\">request new one</a>\n"
-#| "\n"
-#| "    <br>\n"
-#| "    ---\n"
-#| "\n"
-#| "    <br>\n"
-#| "    <a href=\"%(login_url)s\">Login direct</a>\n"
-#| "\n"
-#| "    <br>\n"
-#| "    "
 msgid ""
 "\n"
 "Hello %(name)s:\n"
@@ -4808,48 +4727,24 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"    您好 %(name)s:\n"
-"    <br>\n"
-"    请点击下面链接重置密码， 如果不是您申请的，请关注账号安全\n"
-"    <br>\n"
-"    <a href=\"%(rest_password_url)s?token=%(rest_password_token)s\">请点击这"
-"里设置密码 </a>\n"
-"    <br>\n"
-"    这个链接有效期1小时, 超过时间您可以<a href=\"%(forget_password_url)s?"
-"email=%(email)s\">重新申请</a>\n"
+"您好 %(name)s:\n"
+"请点击下面链接重置密码， 如果不是您申请的，请关注账号安全\n "
 "\n"
-"    <br>\n"
-"    ---\n"
+"请点击这里设置密码 👇\n"
+"%(rest_password_url)s?token=%(rest_password_token)s\n"
 "\n"
-"    <br>\n"
-"    <a href=\"%(login_url)s\">直接登录</a>\n"
+"这个链接有效期1小时, 超过时间您可以, \n"
 "\n"
-"    <br>\n"
-"    "
+"重新申请 👇\n"
+"%(forget_password_url)s?email=%(email)s\n"
+"\n"
+"-------------------\n"
+"\n"
+"直接登录 👇\n"
+"%(login_url)s\n"
+"\n"
 
 #: users/notifications.py:77
-#, fuzzy, python-format
-#| msgid ""
-#| "\n"
-#| "    Hello %(name)s:\n"
-#| "    <br>\n"
-#| "    Please click the link below to reset your password, if not your "
-#| "request, concern your account security\n"
-#| "    <br>\n"
-#| "    <a href=\"%(rest_password_url)s?token=%(rest_password_token)s\">Click "
-#| "here reset password</a>\n"
-#| "    <br>\n"
-#| "    This link is valid for 1 hour. After it expires, <a href="
-#| "\"%(forget_password_url)s?email=%(email)s\">request new one</a>\n"
-#| "\n"
-#| "    <br>\n"
-#| "    ---\n"
-#| "\n"
-#| "    <br>\n"
-#| "    <a href=\"%(login_url)s\">Login direct</a>\n"
-#| "\n"
-#| "    <br>\n"
-#| "    "
 msgid ""
 "\n"
 "            Hello %(name)s:\n"
@@ -4898,39 +4793,6 @@ msgid "Reset password success"
 msgstr "重置密码成功"
 
 #: users/notifications.py:117
-#, fuzzy, python-format
-#| msgid ""
-#| "\n"
-#| "    \n"
-#| "    Hi %(name)s:\n"
-#| "    <br>\n"
-#| "    \n"
-#| "    \n"
-#| "    <br>\n"
-#| "    Your JumpServer password has just been successfully updated.\n"
-#| "    <br>\n"
-#| "    \n"
-#| "    <br>\n"
-#| "    If the password update was not initiated by you, your account may "
-#| "have security issues. \n"
-#| "    It is recommended that you log on to the JumpServer immediately and "
-#| "change your password.\n"
-#| "    <br>\n"
-#| "    \n"
-#| "    <br>\n"
-#| "    If you have any questions, you can contact the administrator.\n"
-#| "    <br>\n"
-#| "    <br>\n"
-#| "    ---\n"
-#| "    <br>\n"
-#| "    <br>\n"
-#| "    IP Address: %(ip_address)s\n"
-#| "    <br>\n"
-#| "    <br>\n"
-#| "    Browser: %(browser)s\n"
-#| "    <br>\n"
-#| "    \n"
-#| "    "
 msgid ""
 "\n"
 "        \n"
@@ -4957,67 +4819,29 @@ msgid ""
 "        "
 msgstr ""
 "\n"
-"    \n"
-"    Hi %(name)s:\n"
-"    <br>\n"
-"    \n"
-"    \n"
-"    <br>\n"
-"    你的 JumpServer 密码刚刚已经成功更新。    <br>\n"
-"    \n"
-"    <br>\n"
-"    如果这次密码更新不是由你发起的，那么你的账号可能存在安全问题。\n"
-"    建议你立刻登录 JumpServer 更改密码。\n"
-"    <br>\n"
-"    \n"
-"    <br>\n"
-"    如果你有任何疑问，可以联系管理员。    <br>\n"
-"    <br>\n"
-"    ---\n"
-"    <br>\n"
-"    <br>\n"
-"    IP 地址: %(ip_address)s\n"
-"    <br>\n"
-"    <br>\n"
-"    浏览器: %(browser)s\n"
-"    <br>\n"
-"    \n"
-"    "
+"        \n"
+"Hi %(name)s:\n"
+"\n"
+"你的 JumpServer 密码刚刚已经成功更新。\n"
+"\n"
+"如果这次密码更新不是由你发起的，那么你的账号可能存在安全问题。 "
+"\n"
+"建议你立刻登录 JumpServer 更改密码。 \n"
+"\n"
+"如果你有任何疑问，可以联系管理员。\n"
+"\n"
+"-------------------\n"
+"\n"
+"\n"
+"IP 地址: %(ip_address)s\n"
+"<br>\n"
+"<br>\n"
+"浏览器: %(browser)s\n"
+"<br>\n"
+"        \n"
+"        "
 
 #: users/notifications.py:151
-#, fuzzy, python-format
-#| msgid ""
-#| "\n"
-#| "    \n"
-#| "    Hi %(name)s:\n"
-#| "    <br>\n"
-#| "    \n"
-#| "    \n"
-#| "    <br>\n"
-#| "    Your JumpServer password has just been successfully updated.\n"
-#| "    <br>\n"
-#| "    \n"
-#| "    <br>\n"
-#| "    If the password update was not initiated by you, your account may "
-#| "have security issues. \n"
-#| "    It is recommended that you log on to the JumpServer immediately and "
-#| "change your password.\n"
-#| "    <br>\n"
-#| "    \n"
-#| "    <br>\n"
-#| "    If you have any questions, you can contact the administrator.\n"
-#| "    <br>\n"
-#| "    <br>\n"
-#| "    ---\n"
-#| "    <br>\n"
-#| "    <br>\n"
-#| "    IP Address: %(ip_address)s\n"
-#| "    <br>\n"
-#| "    <br>\n"
-#| "    Browser: %(browser)s\n"
-#| "    <br>\n"
-#| "    \n"
-#| "    "
 msgid ""
 "\n"
 "        \n"
@@ -5084,31 +4908,6 @@ msgid "Security notice"
 msgstr "安全通知"
 
 #: users/notifications.py:195
-#, fuzzy, python-format
-#| msgid ""
-#| "\n"
-#| "    Hello %(name)s:\n"
-#| "    <br>\n"
-#| "    Your password will expire in %(date_password_expired)s,\n"
-#| "    <br>\n"
-#| "    For your account security, please click on the link below to update "
-#| "your password in time\n"
-#| "    <br>\n"
-#| "    <a href=\"%(update_password_url)s\">Click here update password</a>\n"
-#| "    <br>\n"
-#| "    If your password has expired, please click \n"
-#| "    <a href=\"%(forget_password_url)s?email=%(email)s\">Password expired</"
-#| "a> \n"
-#| "    to apply for a password reset email.\n"
-#| "\n"
-#| "    <br>\n"
-#| "    ---\n"
-#| "\n"
-#| "    <br>\n"
-#| "    <a href=\"%(login_url)s\">Login direct</a>\n"
-#| "\n"
-#| "    <br>\n"
-#| "    "
 msgid ""
 "\n"
 "Hello %(name)s:\n"
@@ -5133,53 +4932,27 @@ msgid ""
 "        "
 msgstr ""
 "\n"
-"    您好 %(name)s:\n"
-"    <br>\n"
-"    您的密码会在 %(date_password_expired)s 过期，\n"
-"    <br>\n"
-"    为了您的账号安全，请点击下面的链接及时更新密码\n"
-"    <br>\n"
-"    <a href=\"%(update_password_url)s\">请点击这里更新密码</a>\n"
-"    <br>\n"
-"    如果您的密码已经过期，请点击 \n"
-"    <a href=\"%(forget_password_url)s?email=%(email)s\">密码过期</a> \n"
-"    申请一份重置密码邮件。\n"
+"您好 %(name)s:\n"
 "\n"
-"    <br>\n"
-"    ---\n"
+"您的密码会在 %(date_password_expired)s 过期,\n"
 "\n"
-"    <br>\n"
-"    <a href=\"%(login_url)s\">直接登录</a>\n"
+"为了您的账号安全，请点击下面的链接及时更新密码 \n"
 "\n"
-"    <br>\n"
-"    "
+"请点击这里更新密码 👇\n"
+"%(update_password_url)s"
+"\n"
+"如果您的密码已经过期，请点击 👇 申请一份重置密码邮件。 "
+"\n"
+"%(forget_password_url)s?email=%(email)s\n"
+"\n"
+"-------------------\n"
+"\n"
+"直接登录 👇\n"
+"%(login_url)s\n"
+"\n"
+"        "
 
 #: users/notifications.py:231
-#, fuzzy, python-format
-#| msgid ""
-#| "\n"
-#| "    Hello %(name)s:\n"
-#| "    <br>\n"
-#| "    Your password will expire in %(date_password_expired)s,\n"
-#| "    <br>\n"
-#| "    For your account security, please click on the link below to update "
-#| "your password in time\n"
-#| "    <br>\n"
-#| "    <a href=\"%(update_password_url)s\">Click here update password</a>\n"
-#| "    <br>\n"
-#| "    If your password has expired, please click \n"
-#| "    <a href=\"%(forget_password_url)s?email=%(email)s\">Password expired</"
-#| "a> \n"
-#| "    to apply for a password reset email.\n"
-#| "\n"
-#| "    <br>\n"
-#| "    ---\n"
-#| "\n"
-#| "    <br>\n"
-#| "    <a href=\"%(login_url)s\">Login direct</a>\n"
-#| "\n"
-#| "    <br>\n"
-#| "    "
 msgid ""
 "\n"
 "        Hello %(name)s:\n"
@@ -5232,17 +5005,6 @@ msgid "Expiration notice"
 msgstr "过期通知"
 
 #: users/notifications.py:269
-#, fuzzy, python-format
-#| msgid ""
-#| "\n"
-#| "       Hello %(name)s:\n"
-#| "       <br>\n"
-#| "       Your account will expire in %(date_expired)s,\n"
-#| "       <br>\n"
-#| "       In order not to affect your normal work, please contact the "
-#| "administrator for confirmation.\n"
-#| "       <br>\n"
-#| "       "
 msgid ""
 "\n"
 "Hello %(name)s:\n"
@@ -5255,26 +5017,15 @@ msgid ""
 "           "
 msgstr ""
 "\n"
-"       您好 %(name)s:\n"
-"       <br>\n"
-"       您的账户会在 %(date_expired)s 过期，\n"
-"       <br>\n"
-"       为了不影响您正常工作，请联系管理员确认。\n"
-"       <br>\n"
-"       "
+"您好 %(name)s:\n"
+"\n"
+"您的账户会在 %(date_expired)s 过期,\n"
+"\n"
+"为了不影响您正常工作，请联系管理员确认。"
+"\n"
+"           "
 
 #: users/notifications.py:288
-#, fuzzy, python-format
-#| msgid ""
-#| "\n"
-#| "       Hello %(name)s:\n"
-#| "       <br>\n"
-#| "       Your account will expire in %(date_expired)s,\n"
-#| "       <br>\n"
-#| "       In order not to affect your normal work, please contact the "
-#| "administrator for confirmation.\n"
-#| "       <br>\n"
-#| "       "
 msgid ""
 "\n"
 "           Hello %(name)s:\n"
@@ -5300,18 +5051,6 @@ msgid "SSH Key Reset"
 msgstr "重置SSH密钥"
 
 #: users/notifications.py:309
-#, fuzzy, python-format
-#| msgid ""
-#| "\n"
-#| "    Hello %(name)s:\n"
-#| "    <br>\n"
-#| "    Your ssh public key has been reset by site administrator.\n"
-#| "    Please login and reset your ssh public key.\n"
-#| "    <br>\n"
-#| "    <a href=\"%(login_url)s\">Login direct</a>\n"
-#| "\n"
-#| "    <br>\n"
-#| "    "
 msgid ""
 "\n"
 "Hello %(name)s:\n"
@@ -5325,29 +5064,17 @@ msgid ""
 "        "
 msgstr ""
 "\n"
-"    你好 %(name)s:\n"
-"    <br>\n"
-"    您的密钥已被管理员重置,\n"
-"    请登录并重新设置您的密钥.\n"
-"    <br>\n"
-"    <a href=\"%(login_url)s\">Login direct</a>\n"
+"你好 %(name)s:\n"
 "\n"
-"    <br>\n"
-"    "
+"您的密钥已被管理员重置,\n"
+"请登录并重新设置您的密钥.\n"
+"\n"
+"直接登录 👇\n"
+"%(login_url)s\n"
+"\n"
+"        "
 
 #: users/notifications.py:330
-#, fuzzy, python-format
-#| msgid ""
-#| "\n"
-#| "    Hello %(name)s:\n"
-#| "    <br>\n"
-#| "    Your ssh public key has been reset by site administrator.\n"
-#| "    Please login and reset your ssh public key.\n"
-#| "    <br>\n"
-#| "    <a href=\"%(login_url)s\">Login direct</a>\n"
-#| "\n"
-#| "    <br>\n"
-#| "    "
 msgid ""
 "\n"
 "        Hello %(name)s:\n"
@@ -5366,7 +5093,7 @@ msgstr ""
 "    您的密钥已被管理员重置,\n"
 "    请登录并重新设置您的密钥.\n"
 "    <br>\n"
-"    <a href=\"%(login_url)s\">Login direct</a>\n"
+"    <a href=\"%(login_url)s\">直接登录</a>\n"
 "\n"
 "    <br>\n"
 "    "
@@ -5376,18 +5103,6 @@ msgid "MFA Reset"
 msgstr "重置 MFA"
 
 #: users/notifications.py:353
-#, fuzzy, python-format
-#| msgid ""
-#| "\n"
-#| "    Hello %(name)s:\n"
-#| "    <br>\n"
-#| "    Your MFA has been reset by site administrator.\n"
-#| "    Please login and reset your MFA.\n"
-#| "    <br>\n"
-#| "    <a href=\"%(login_url)s\">Login direct</a>\n"
-#| "\n"
-#| "    <br>\n"
-#| "    "
 msgid ""
 "\n"
 "Hello %(name)s:\n"
@@ -5401,29 +5116,17 @@ msgid ""
 "        "
 msgstr ""
 "\n"
-"    你好 %(name)s:\n"
-"    <br>\n"
-"    您的 MFA 已被管理员重置,\n"
-"    请登录并重新设置您的 MFA.\n"
-"    <br>\n"
-"    <a href=\"%(login_url)s\">登录</a>\n"
+"你好 %(name)s:\n"
 "\n"
-"    <br>\n"
-"    "
+"您的 MFA 已被管理员重置,\n"
+"请登录并重新设置您的 MFA.\n"
+"\n"
+"直接登录 👇 \n"
+"%(login_url)s\n"
+"\n"
+"        "
 
 #: users/notifications.py:373
-#, fuzzy, python-format
-#| msgid ""
-#| "\n"
-#| "    Hello %(name)s:\n"
-#| "    <br>\n"
-#| "    Your MFA has been reset by site administrator.\n"
-#| "    Please login and reset your MFA.\n"
-#| "    <br>\n"
-#| "    <a href=\"%(login_url)s\">Login direct</a>\n"
-#| "\n"
-#| "    <br>\n"
-#| "    "
 msgid ""
 "\n"
 "        Hello %(name)s:\n"
@@ -5442,7 +5145,7 @@ msgstr ""
 "    您的 MFA 已被管理员重置,\n"
 "    请登录并重新设置您的 MFA.\n"
 "    <br>\n"
-"    <a href=\"%(login_url)s\">登录</a>\n"
+"    <a href=\"%(login_url)s\">直接登录</a>\n"
 "\n"
 "    <br>\n"
 "    "
@@ -5463,13 +5166,12 @@ msgstr "新密码不能是最近 {} 次的密码"
 msgid "The newly set password is inconsistent"
 msgstr "两次密码不一致"
 
-#: users/serializers/profile.py:120 users/serializers/user.py:75
+#: users/serializers/profile.py:121 users/serializers/user.py:75
 msgid "Is first login"
 msgstr "首次登录"
 
-#: users/serializers/user.py:22
-#: xpack/plugins/change_auth_plan/models/base.py:32
-#: xpack/plugins/change_auth_plan/serializers/base.py:24
+#: users/serializers/user.py:22 xpack/plugins/change_auth_plan/models.py:61
+#: xpack/plugins/change_auth_plan/serializers.py:30
 msgid "Password strategy"
 msgstr "密码策略"
 
@@ -5858,163 +5560,90 @@ msgstr "* 新密码不能是最近 {} 次的密码"
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
-#: xpack/plugins/change_auth_plan/api/app.py:112
-#: xpack/plugins/change_auth_plan/api/asset.py:100
-msgid "The parameter 'action' must be [{}]"
-msgstr ""
-
 #: xpack/plugins/change_auth_plan/meta.py:9
-#: xpack/plugins/change_auth_plan/models/asset.py:63
-#: xpack/plugins/change_auth_plan/models/asset.py:119
+#: xpack/plugins/change_auth_plan/models.py:89
+#: xpack/plugins/change_auth_plan/models.py:184
 msgid "Change auth plan"
 msgstr "改密计划"
 
-#: xpack/plugins/change_auth_plan/models/app.py:41
-#: xpack/plugins/change_auth_plan/models/app.py:90
-msgid "Database Change auth plan"
-msgstr "改密计划"
-
-#: xpack/plugins/change_auth_plan/models/app.py:94
-#: xpack/plugins/change_auth_plan/models/app.py:146
-msgid "Database Change auth plan execution"
-msgstr "改密计划执行"
-
-#: xpack/plugins/change_auth_plan/models/app.py:142
-msgid "SystemUser"
-msgstr "系统用户"
-
-#: xpack/plugins/change_auth_plan/models/app.py:151
-msgid "Database Change auth plan task"
-msgstr "改密计划任务"
-
-#: xpack/plugins/change_auth_plan/models/asset.py:30
-msgid "Append SSH KEY"
-msgstr "追加新密钥"
-
-#: xpack/plugins/change_auth_plan/models/asset.py:31
-msgid "Empty and append SSH KEY"
-msgstr "清空所有密钥再追加新密钥"
-
-#: xpack/plugins/change_auth_plan/models/asset.py:32
-msgid "Empty current user and append SSH KEY"
-msgstr "清空当前账号密钥再追加新密钥"
-
-#: xpack/plugins/change_auth_plan/models/asset.py:50
-#: xpack/plugins/change_auth_plan/serializers/asset.py:34
-msgid "SSH Key strategy"
-msgstr "SSH Key 策略"
-
-#: xpack/plugins/change_auth_plan/models/asset.py:130
-#: xpack/plugins/change_auth_plan/models/asset.py:206
-msgid "Change auth plan execution"
-msgstr "改密计划执行"
-
-#: xpack/plugins/change_auth_plan/models/asset.py:213
-msgid "Change auth plan task"
-msgstr "改密计划任务"
-
-#: xpack/plugins/change_auth_plan/models/base.py:24
+#: xpack/plugins/change_auth_plan/models.py:41
 msgid "Custom password"
 msgstr "自定义密码"
 
-#: xpack/plugins/change_auth_plan/models/base.py:25
+#: xpack/plugins/change_auth_plan/models.py:42
 msgid "All assets use the same random password"
 msgstr "使用相同的随机密码"
 
-#: xpack/plugins/change_auth_plan/models/base.py:26
+#: xpack/plugins/change_auth_plan/models.py:43
 msgid "All assets use different random password"
 msgstr "使用不同的随机密码"
 
-#: xpack/plugins/change_auth_plan/models/base.py:36
+#: xpack/plugins/change_auth_plan/models.py:65
 msgid "Password rules"
 msgstr "密码规则"
 
-#: xpack/plugins/change_auth_plan/models/base.py:100
-msgid "Manual trigger"
-msgstr "手动触发"
-
-#: xpack/plugins/change_auth_plan/models/base.py:101
-msgid "Timing trigger"
-msgstr "定时触发"
-
-#: xpack/plugins/change_auth_plan/models/base.py:111
+#: xpack/plugins/change_auth_plan/models.py:187
 msgid "Change auth plan snapshot"
 msgstr "改密计划快照"
 
-#: xpack/plugins/change_auth_plan/models/base.py:118
-#: xpack/plugins/change_auth_plan/serializers/base.py:70
-msgid "Trigger mode"
-msgstr "触发模式"
+#: xpack/plugins/change_auth_plan/models.py:202
+#: xpack/plugins/change_auth_plan/models.py:296
+msgid "Change auth plan execution"
+msgstr "改密计划执行"
 
-#: xpack/plugins/change_auth_plan/models/base.py:173
+#: xpack/plugins/change_auth_plan/models.py:269
 msgid "Ready"
 msgstr "准备"
 
-#: xpack/plugins/change_auth_plan/models/base.py:174
+#: xpack/plugins/change_auth_plan/models.py:270
 msgid "Preflight check"
 msgstr "改密前的校验"
 
-#: xpack/plugins/change_auth_plan/models/base.py:175
+#: xpack/plugins/change_auth_plan/models.py:271
 msgid "Change auth"
 msgstr "执行改密"
 
-#: xpack/plugins/change_auth_plan/models/base.py:176
+#: xpack/plugins/change_auth_plan/models.py:272
 msgid "Verify auth"
 msgstr "验证密码/密钥"
 
-#: xpack/plugins/change_auth_plan/models/base.py:177
+#: xpack/plugins/change_auth_plan/models.py:273
 msgid "Keep auth"
 msgstr "保存密码/密钥"
 
-#: xpack/plugins/change_auth_plan/models/base.py:185
+#: xpack/plugins/change_auth_plan/models.py:300
 msgid "Step"
 msgstr "步骤"
 
-#: xpack/plugins/change_auth_plan/serializers/asset.py:31
-msgid "Change Password"
-msgstr "修改密码"
+#: xpack/plugins/change_auth_plan/models.py:317
+msgid "Change auth plan task"
+msgstr "改密计划任务"
 
-#: xpack/plugins/change_auth_plan/serializers/asset.py:32
-msgid "Change SSH Key"
-msgstr "修改密钥"
-
-#: xpack/plugins/change_auth_plan/serializers/asset.py:65
-msgid "Require password strategy perform setting"
-msgstr "需要密码策略执行设置"
-
-#: xpack/plugins/change_auth_plan/serializers/asset.py:68
-msgid "Require password perform setting"
-msgstr "需要密码执行设置"
-
-#: xpack/plugins/change_auth_plan/serializers/asset.py:71
-msgid "Require password rule perform setting"
-msgstr "需要密码规则执行设置"
-
-#: xpack/plugins/change_auth_plan/serializers/asset.py:87
-msgid "Require ssh key strategy or ssh key perform setting"
-msgstr "需要ssh密钥策略或ssh密钥执行设置"
-
-#: xpack/plugins/change_auth_plan/serializers/base.py:43
+#: xpack/plugins/change_auth_plan/serializers.py:56
 msgid "Run times"
 msgstr "执行次数"
 
-#: xpack/plugins/change_auth_plan/serializers/base.py:54
+#: xpack/plugins/change_auth_plan/serializers.py:72
+msgid "* Please enter custom password"
+msgstr "* 请输入自定义密码"
+
+#: xpack/plugins/change_auth_plan/serializers.py:82
 msgid "* Please enter the correct password length"
 msgstr "* 请输入正确的密码长度"
 
-#: xpack/plugins/change_auth_plan/serializers/base.py:57
+#: xpack/plugins/change_auth_plan/serializers.py:85
 msgid "* Password length range 6-30 bits"
 msgstr "* 密码长度范围 6-30 位"
 
-#: xpack/plugins/change_auth_plan/task_handlers/base/handler.py:248
+#: xpack/plugins/change_auth_plan/utils.py:442
 msgid "Invalid/incorrect password"
 msgstr "无效/错误 密码"
 
-#: xpack/plugins/change_auth_plan/task_handlers/base/handler.py:250
+#: xpack/plugins/change_auth_plan/utils.py:444
 msgid "Failed to connect to the host"
 msgstr "连接主机失败"
 
-#: xpack/plugins/change_auth_plan/task_handlers/base/handler.py:252
+#: xpack/plugins/change_auth_plan/utils.py:446
 msgid "Data could not be sent to remote"
 msgstr "无法将数据发送到远程"
 
@@ -6070,35 +5699,31 @@ msgstr "华为私有云"
 msgid "Qingyun Private Cloud"
 msgstr "青云私有云"
 
-#: xpack/plugins/cloud/const.py:19
-msgid "Google Cloud Platform"
-msgstr ""
-
-#: xpack/plugins/cloud/const.py:23
+#: xpack/plugins/cloud/const.py:22
 msgid "Instance name"
 msgstr "实例名称"
 
-#: xpack/plugins/cloud/const.py:24
+#: xpack/plugins/cloud/const.py:23
 msgid "Instance name and Partial IP"
 msgstr "实例名称和部分IP"
 
-#: xpack/plugins/cloud/const.py:29
+#: xpack/plugins/cloud/const.py:28
 msgid "Succeed"
 msgstr "成功"
 
-#: xpack/plugins/cloud/const.py:33
+#: xpack/plugins/cloud/const.py:32
 msgid "Unsync"
 msgstr "未同步"
 
-#: xpack/plugins/cloud/const.py:34
+#: xpack/plugins/cloud/const.py:33
 msgid "New Sync"
 msgstr "新同步"
 
-#: xpack/plugins/cloud/const.py:35
+#: xpack/plugins/cloud/const.py:34
 msgid "Synced"
 msgstr "已同步"
 
-#: xpack/plugins/cloud/const.py:36
+#: xpack/plugins/cloud/const.py:35
 msgid "Released"
 msgstr "已释放"
 
@@ -6114,7 +5739,7 @@ msgstr "云服务商"
 msgid "Cloud account"
 msgstr "云账号"
 
-#: xpack/plugins/cloud/models.py:85 xpack/plugins/cloud/serializers/task.py:37
+#: xpack/plugins/cloud/models.py:85 xpack/plugins/cloud/serializers.py:179
 msgid "Regions"
 msgstr "地域"
 
@@ -6122,43 +5747,35 @@ msgstr "地域"
 msgid "Hostname strategy"
 msgstr "主机名策略"
 
-#: xpack/plugins/cloud/models.py:97 xpack/plugins/cloud/serializers/task.py:66
-msgid "Unix admin user"
-msgstr "Unix 特权用户"
-
-#: xpack/plugins/cloud/models.py:101 xpack/plugins/cloud/serializers/task.py:67
-msgid "Windows admin user"
-msgstr "Windows 特权用户"
-
-#: xpack/plugins/cloud/models.py:107 xpack/plugins/cloud/serializers/task.py:45
+#: xpack/plugins/cloud/models.py:102 xpack/plugins/cloud/serializers.py:186
 msgid "IP network segment group"
 msgstr "IP网段组"
 
-#: xpack/plugins/cloud/models.py:110 xpack/plugins/cloud/serializers/task.py:70
+#: xpack/plugins/cloud/models.py:105 xpack/plugins/cloud/serializers.py:208
 msgid "Always update"
 msgstr "总是更新"
 
-#: xpack/plugins/cloud/models.py:116
+#: xpack/plugins/cloud/models.py:111
 msgid "Date last sync"
 msgstr "最后同步日期"
 
-#: xpack/plugins/cloud/models.py:127 xpack/plugins/cloud/models.py:168
+#: xpack/plugins/cloud/models.py:122 xpack/plugins/cloud/models.py:163
 msgid "Sync instance task"
 msgstr "同步实例任务"
 
-#: xpack/plugins/cloud/models.py:179 xpack/plugins/cloud/models.py:224
+#: xpack/plugins/cloud/models.py:174 xpack/plugins/cloud/models.py:219
 msgid "Date sync"
 msgstr "同步日期"
 
-#: xpack/plugins/cloud/models.py:204
+#: xpack/plugins/cloud/models.py:199
 msgid "Sync task"
 msgstr "同步任务"
 
-#: xpack/plugins/cloud/models.py:208
+#: xpack/plugins/cloud/models.py:203
 msgid "Sync instance task history"
 msgstr "同步实例任务历史"
 
-#: xpack/plugins/cloud/models.py:211
+#: xpack/plugins/cloud/models.py:206
 msgid "Instance"
 msgstr "实例"
 
@@ -6302,42 +5919,35 @@ msgstr "西南-贵阳1"
 msgid "EU-Paris"
 msgstr "欧洲-巴黎"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:13
+#: xpack/plugins/cloud/serializers.py:21
 msgid "AccessKey ID"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:16
+#: xpack/plugins/cloud/serializers.py:24
 msgid "AccessKey Secret"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:23
+#: xpack/plugins/cloud/serializers.py:30
 msgid "Client ID"
 msgstr "客户端 ID"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:29
+#: xpack/plugins/cloud/serializers.py:36
 msgid "Tenant ID"
 msgstr "租户 ID"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:32
+#: xpack/plugins/cloud/serializers.py:39
 msgid "Subscription ID"
 msgstr "订阅 ID"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:81
-#: xpack/plugins/cloud/serializers/account_attrs.py:86
+#: xpack/plugins/cloud/serializers.py:51
+msgid "This field is required"
+msgstr "该字段是必填项。"
+
+#: xpack/plugins/cloud/serializers.py:85 xpack/plugins/cloud/serializers.py:89
 msgid "API Endpoint"
 msgstr "API 端点"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:92
-#, fuzzy
-#| msgid "Account key"
-msgid "Service account key"
-msgstr "账户密钥"
-
-#: xpack/plugins/cloud/serializers/account_attrs.py:93
-msgid "The file is in JSON format"
-msgstr ""
-
-#: xpack/plugins/cloud/serializers/task.py:29
+#: xpack/plugins/cloud/serializers.py:171
 msgid ""
 "The IP address that is first matched to will be used as the IP of the "
 "created asset. <br>The default * indicates a random match. <br>Format for "
@@ -6346,11 +5956,11 @@ msgstr ""
 "第一个匹配到的 IP 地址将被用作创建的资产的 IP。<br> 默认值 * 表示随机匹配。"
 "<br> 格式为以逗号分隔的字符串，例如:192.168.1.0/24,10.1.1.1-10.1.1.20"
 
-#: xpack/plugins/cloud/serializers/task.py:35
+#: xpack/plugins/cloud/serializers.py:177
 msgid "History count"
 msgstr "执行次数"
 
-#: xpack/plugins/cloud/serializers/task.py:36
+#: xpack/plugins/cloud/serializers.py:178
 msgid "Instance count"
 msgstr "实例个数"
 
@@ -6441,6 +6051,71 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Enable XRDP server"
+#~ msgstr "启用 XRDP 服务，允许 RDP 客户端"
+
+#~ msgid "Database Change auth plan"
+#~ msgstr "改密计划"
+
+#~ msgid "Database Change auth plan execution"
+#~ msgstr "改密计划执行"
+
+#~ msgid "SystemUser"
+#~ msgstr "系统用户"
+
+#~ msgid "Database Change auth plan task"
+#~ msgstr "改密计划任务"
+
+#~ msgid "Append SSH KEY"
+#~ msgstr "追加新密钥"
+
+#~ msgid "Empty and append SSH KEY"
+#~ msgstr "清空所有密钥再追加新密钥"
+
+#~ msgid "Empty current user and append SSH KEY"
+#~ msgstr "清空当前账号密钥再追加新密钥"
+
+#~ msgid "SSH Key strategy"
+#~ msgstr "SSH Key 策略"
+
+#~ msgid "Manual trigger"
+#~ msgstr "手动触发"
+
+#~ msgid "Timing trigger"
+#~ msgstr "定时触发"
+
+#~ msgid "Trigger mode"
+#~ msgstr "触发模式"
+
+#~ msgid "Change Password"
+#~ msgstr "修改密码"
+
+#~ msgid "Change SSH Key"
+#~ msgstr "修改密钥"
+
+#~ msgid "Require password strategy perform setting"
+#~ msgstr "需要密码策略执行设置"
+
+#~ msgid "Require password perform setting"
+#~ msgstr "需要密码执行设置"
+
+#~ msgid "Require password rule perform setting"
+#~ msgstr "需要密码规则执行设置"
+
+#~ msgid "Require ssh key strategy or ssh key perform setting"
+#~ msgstr "需要ssh密钥策略或ssh密钥执行设置"
+
+#~ msgid "Unix admin user"
+#~ msgstr "Unix 特权用户"
+
+#~ msgid "Windows admin user"
+#~ msgstr "Windows 特权用户"
+
+#, fuzzy
+#~| msgid "Account key"
+#~ msgid "Service account key"
+#~ msgstr "账户密钥"
 
 #~ msgid "App"
 #~ msgstr "应用"
