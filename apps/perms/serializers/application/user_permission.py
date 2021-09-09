@@ -6,10 +6,10 @@ from django.utils.translation import ugettext_lazy as _
 
 from assets.models import SystemUser
 from applications.models import Application
-from applications.serializers import ApplicationSerializerMixin
+from applications.serializers import AppSerializerMixin
 
 __all__ = [
-    'ApplicationGrantedSerializer', 'ApplicationSystemUserSerializer'
+    'AppGrantedSerializer', 'ApplicationSystemUserSerializer'
 ]
 
 
@@ -26,7 +26,7 @@ class ApplicationSystemUserSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
-class ApplicationGrantedSerializer(ApplicationSerializerMixin, serializers.ModelSerializer):
+class AppGrantedSerializer(AppSerializerMixin, serializers.ModelSerializer):
     """
     被授权应用的数据结构
     """

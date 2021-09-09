@@ -160,7 +160,7 @@ class BaseService(object):
         if self.process:
             try:
                 self.process.wait(1)  # 不wait，子进程可能无法回收
-            except subprocess.TimeoutExpired:
+            except:
                 pass
 
         if self.is_running:

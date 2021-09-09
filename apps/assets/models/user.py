@@ -73,6 +73,10 @@ class ProtocolMixin:
     def can_perm_to_asset(self):
         return self.protocol in self.ASSET_CATEGORY_PROTOCOLS
 
+    @property
+    def is_asset_protocol(self):
+        return self.protocol in self.ASSET_CATEGORY_PROTOCOLS
+
 
 class AuthMixin:
     username_same_with_user: bool

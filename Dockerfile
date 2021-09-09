@@ -40,6 +40,12 @@ COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/jumpserver
 RUN mkdir -p /root/.ssh/ \
     && echo "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null" > /root/.ssh/config
 
+RUN mkdir -p /opt/jumpserver/oracle/
+ADD https://f2c-north-rel.oss-cn-qingdao.aliyuncs.com/2.0/north/jumpserver/instantclient-basiclite-linux.x64-21.1.0.0.0.tar /opt/jumpserver/oracle/
+RUN tar xvf /opt/jumpserver/oracle/instantclient-basiclite-linux.x64-21.1.0.0.0.tar -C /opt/jumpserver/oracle/
+RUN sh -c "echo /opt/jumpserver/oracle/instantclient_21_1 > /etc/ld.so.conf.d/oracle-instantclient.conf"
+RUN ldconfig
+
 RUN echo > config.yml
 VOLUME /opt/jumpserver/data
 VOLUME /opt/jumpserver/logs

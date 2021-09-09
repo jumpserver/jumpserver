@@ -23,9 +23,8 @@ class ApplicationViewSet(OrgBulkModelViewSet):
     search_fields = ('name', 'type', 'category')
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_classes = {
-        'default': serializers.ApplicationSerializer,
-        'get_tree': TreeNodeSerializer,
-        'suggestion': serializers.MiniApplicationSerializer
+        'default': serializers.AppSerializer,
+        'get_tree': TreeNodeSerializer
     }
 
     @action(methods=['GET'], detail=False, url_path='tree')

@@ -16,7 +16,6 @@ class AuthBook(BaseUser, AbsConnectivity):
     systemuser = models.ForeignKey('assets.SystemUser', on_delete=models.CASCADE, null=True, verbose_name=_("System user"))
     version = models.IntegerField(default=1, verbose_name=_('Version'))
     history = HistoricalRecords()
-    _systemuser_display = ''
 
     auth_attrs = ['username', 'password', 'private_key', 'public_key']
 
@@ -64,8 +63,6 @@ class AuthBook(BaseUser, AbsConnectivity):
 
     @lazyproperty
     def systemuser_display(self):
-        if self._systemuser_display:
-            return self._systemuser_display
         if not self.systemuser:
             return ''
         return str(self.systemuser)
