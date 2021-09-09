@@ -46,7 +46,7 @@ class BaseHost(Host):
         if host_data.get('username'):
             self.set_variable('ansible_user', host_data['username'])
 
-        # 添加密码和秘钥
+        # 添加密码和密钥
         if host_data.get('password'):
             self.set_variable('ansible_ssh_pass', host_data['password'])
         if host_data.get('private_key'):

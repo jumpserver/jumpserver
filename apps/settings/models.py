@@ -27,7 +27,7 @@ class SettingManager(models.Manager):
 
 class Setting(models.Model):
     name = models.CharField(max_length=128, unique=True, verbose_name=_("Name"))
-    value = models.TextField(verbose_name=_("Value"))
+    value = models.TextField(verbose_name=_("Value"), null=True, blank=True)
     category = models.CharField(max_length=128, default="default")
     encrypted = models.BooleanField(default=False)
     enabled = models.BooleanField(verbose_name=_("Enabled"), default=True)
