@@ -36,7 +36,7 @@ class SecurityAuthSerializer(serializers.Serializer):
         min_value=5, max_value=99999, required=True,
         label=_('Block logon interval'),
         help_text=_(
-            'Tip: (unit/minute) if the user has failed to log in for a limited number of times, '
+            'Unit: minute, If the user has failed to log in for a limited number of times, '
             'no login is allowed during this time interval.'
         )
     )
@@ -44,7 +44,7 @@ class SecurityAuthSerializer(serializers.Serializer):
         min_value=1, max_value=99999, required=True,
         label=_('User password expiration'),
         help_text=_(
-            'Tip: (unit: day) If the user does not update the password during the time, '
+            'Unit: day, If the user does not update the password during the time, '
             'the user password will expire failure;The password expiration reminder mail will be '
             'automatic sent to the user by system within 5 days (daily) before the password expires'
         )
@@ -58,18 +58,22 @@ class SecurityAuthSerializer(serializers.Serializer):
         )
     )
     USER_LOGIN_SINGLE_MACHINE_ENABLED = serializers.BooleanField(
-        label=_("Only single device login"), help_text=_("Next device login, pre login will be logout")
+        required=False, default=False, label=_("Only single device login"),
+        help_text=_("Next device login, pre login will be logout")
     )
     ONLY_ALLOW_EXIST_USER_AUTH = serializers.BooleanField(
-        label=_("Only exist user login"),
+        required=False, default=False, label=_("Only exist user login"),
         help_text=_("If enable, CAS、OIDC auth will be failed, if user not exist yet")
     )
     ONLY_ALLOW_AUTH_FROM_SOURCE = serializers.BooleanField(
-        label=_("Only from source login"),
+        required=False, default=False, label=_("Only from source login"),
         help_text=_("If enable, CAS、OIDC auth will be failed, if user not exist yet")
     )
     SECURITY_MFA_VERIFY_TTL = serializers.IntegerField(label=_("MFA verify TTL"), help_text=_("Unit: second"))
-    SECURITY_LOGIN_CAPTCHA_ENABLED = serializers.BooleanField(label=_("Enable Login captcha"))
+    SECURITY_LOGIN_CAPTCHA_ENABLED = serializers.BooleanField(
+        required=False, default=True,
+        label=_("Enable Login captcha")
+    )
 
 
 class SecuritySettingSerializer(SecurityPasswordRuleSerializer, SecurityAuthSerializer):

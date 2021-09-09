@@ -159,7 +159,7 @@ class PeriodTaskFormMixin(forms.Form):
     )
     interval = forms.IntegerField(
         required=False, initial=24,
-        help_text=_('Tips: (Unit: hour)'), label=_("Cycle perform"),
+        help_text=_('Unit: hour'), label=_("Cycle perform"),
     )
 
     def get_initial_for_field(self, field, field_name):

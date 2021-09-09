@@ -29,8 +29,11 @@ class TerminalSettingSerializer(serializers.Serializer):
         min_value=1, max_value=99999, required=True, label=_('Session keep duration'),
         help_text=_('Unit: days, Session, record, command will be delete if more than duration, only in database')
     )
-    TERMINAL_TELNET_REGEX = serializers.CharField(allow_blank=True, max_length=1024, required=False,
-                                                  label=_('Telnet login regex'))
+    TERMINAL_TELNET_REGEX = serializers.CharField(
+        allow_blank=True, max_length=1024, required=False, label=_('Telnet login regex'),
+        help_text=_("The login success message varies with devices. "
+                    "if you cannot log in to the device through Telnet, set this parameter")
+    )
     TERMINAL_RDP_ADDR = serializers.CharField(
         required=False, label=_("RDP address"),
         max_length=1024,

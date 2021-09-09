@@ -36,7 +36,8 @@ class LDAPSettingSerializer(serializers.Serializer):
     # encrypt_fields 现在使用 write_only 来判断了
 
     AUTH_LDAP_SERVER_URI = serializers.CharField(
-        required=True, max_length=1024, label=_('LDAP server'), help_text=_('eg: ldap://localhost:389')
+        required=True, max_length=1024, label=_('LDAP server'),
+        help_text=_('eg: ldap://localhost:389')
     )
     AUTH_LDAP_BIND_DN = serializers.CharField(required=False, max_length=1024, label=_('Bind DN'))
     AUTH_LDAP_BIND_PASSWORD = serializers.CharField(max_length=1024, write_only=True, required=False,
@@ -51,11 +52,13 @@ class LDAPSettingSerializer(serializers.Serializer):
     )
     AUTH_LDAP_USER_ATTR_MAP = serializers.DictField(
         required=True, label=_('User attr map'),
-        help_text=_('User attr map present how to map LDAP user attr to jumpserver, username,name,email is jumpserver attr')
+        help_text=_('User attr map present how to map LDAP user attr to '
+                    'jumpserver, username,name,email is jumpserver attr')
     )
     AUTH_LDAP_SYNC_IS_PERIODIC = serializers.BooleanField(required=False, label=_('Periodic display'))
     AUTH_LDAP_SYNC_INTERVAL = serializers.CharField(
-        required=False, max_length=1024, allow_null=True, label=_('Interval'), help_text=_('Tips: (Unit: hour)')
+        required=False, max_length=1024, allow_null=True,
+        label=_('Interval'), help_text=_('Unit: hour')
     )
     AUTH_LDAP_SYNC_CRONTAB = serializers.CharField(
         required=False, max_length=1024, allow_null=True, label=_('Regularly perform')

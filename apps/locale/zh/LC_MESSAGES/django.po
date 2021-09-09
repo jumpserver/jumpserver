@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-08 15:23+0800\n"
+"POT-Creation-Date: 2021-09-09 10:53+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -308,7 +308,7 @@ msgstr ""
 #: assets/models/base.py:177 audits/signals_handler.py:63
 #: authentication/forms.py:22
 #: authentication/templates/authentication/login.html:164
-#: settings/serializers/auth/ldap.py:43 users/forms/profile.py:21
+#: settings/serializers/auth/ldap.py:44 users/forms/profile.py:21
 #: users/templates/users/user_otp_check_password.html:13
 #: users/templates/users/user_password_update.html:43
 #: users/templates/users/user_password_verify.html:18
@@ -2116,7 +2116,7 @@ msgid "Cycle perform"
 msgstr "周期执行"
 
 #: ops/mixin.py:33 ops/mixin.py:90 ops/mixin.py:109 ops/mixin.py:150
-#: settings/serializers/auth/ldap.py:61
+#: settings/serializers/auth/ldap.py:64
 msgid "Regularly perform"
 msgstr "定期执行"
 
@@ -2125,7 +2125,7 @@ msgstr "定期执行"
 msgid "Periodic perform"
 msgstr "定时执行"
 
-#: ops/mixin.py:112 settings/serializers/auth/ldap.py:58
+#: ops/mixin.py:112 settings/serializers/auth/ldap.py:61
 msgid "Interval"
 msgstr "间隔"
 
@@ -2152,9 +2152,9 @@ msgstr ""
 "分 时 日 月 星期> （<a href='https://tool.lu/crontab/' target='_blank'>在线工"
 "具</a>） <br>注意： 如果同时设置了定期执行和周期执行，优先使用定期执行"
 
-#: ops/mixin.py:162 settings/serializers/auth/ldap.py:58
-msgid "Tips: (Unit: hour)"
-msgstr "提示：（单位： 时）"
+#: ops/mixin.py:162 settings/serializers/auth/ldap.py:61
+msgid "Unit: hour"
+msgstr "单位： 时"
 
 #: ops/models/adhoc.py:35
 msgid "Callback"
@@ -2537,36 +2537,36 @@ msgstr "启用飞书认证"
 msgid "LDAP server"
 msgstr "LDAP 地址"
 
-#: settings/serializers/auth/ldap.py:39
+#: settings/serializers/auth/ldap.py:40
 msgid "eg: ldap://localhost:389"
 msgstr "如: ldap://localhost:389"
 
-#: settings/serializers/auth/ldap.py:41
+#: settings/serializers/auth/ldap.py:42
 msgid "Bind DN"
 msgstr "绑定 DN"
 
-#: settings/serializers/auth/ldap.py:45
+#: settings/serializers/auth/ldap.py:46
 msgid "User OU"
 msgstr "用户 OU"
 
-#: settings/serializers/auth/ldap.py:46
+#: settings/serializers/auth/ldap.py:47
 msgid "Use | split multi OUs"
 msgstr "多个 OU 使用 | 分割"
 
-#: settings/serializers/auth/ldap.py:49
+#: settings/serializers/auth/ldap.py:50
 msgid "User search filter"
 msgstr "用户过滤器"
 
-#: settings/serializers/auth/ldap.py:50
+#: settings/serializers/auth/ldap.py:51
 #, python-format
 msgid "Choice may be (cn|uid|sAMAccountName)=%(user)s)"
 msgstr "可能的选项是(cn或uid或sAMAccountName=%(user)s)"
 
-#: settings/serializers/auth/ldap.py:53
+#: settings/serializers/auth/ldap.py:54
 msgid "User attr map"
 msgstr "用户属性映射"
 
-#: settings/serializers/auth/ldap.py:54
+#: settings/serializers/auth/ldap.py:55
 msgid ""
 "User attr map present how to map LDAP user attr to jumpserver, username,name,"
 "email is jumpserver attr"
@@ -2574,20 +2574,20 @@ msgstr ""
 "用户属性映射代表怎样将LDAP中用户属性映射到jumpserver用户上，username, name,"
 "email 是jumpserver的用户需要属性"
 
-#: settings/serializers/auth/ldap.py:56 xpack/plugins/cloud/serializers.py:211
+#: settings/serializers/auth/ldap.py:58 xpack/plugins/cloud/serializers.py:211
 #: xpack/plugins/gathered_user/serializers.py:20
 msgid "Periodic display"
 msgstr "定时执行"
 
-#: settings/serializers/auth/ldap.py:63
+#: settings/serializers/auth/ldap.py:66
 msgid "Connect timeout"
 msgstr "连接超时时间"
 
-#: settings/serializers/auth/ldap.py:64
+#: settings/serializers/auth/ldap.py:67
 msgid "Search paged size"
 msgstr "搜索分页数量"
 
-#: settings/serializers/auth/ldap.py:66
+#: settings/serializers/auth/ldap.py:69
 msgid "Enable LDAP auth"
 msgstr "启用 LDAP 认证"
 
@@ -2699,7 +2699,7 @@ msgstr "其它系统可以使用 SSO Token 对接 JumpServer, 免去登录的过
 msgid "SSO auth key TTL"
 msgstr "Token 有效期"
 
-#: settings/serializers/auth/sso.py:16 settings/serializers/security.py:71
+#: settings/serializers/auth/sso.py:16 settings/serializers/security.py:72
 msgid "Unit: second"
 msgstr "单位: 秒"
 
@@ -2856,28 +2856,37 @@ msgid "Tips: Email signature (eg:jumpserver)"
 msgstr "邮件署名 (如:jumpserver)"
 
 #: settings/serializers/other.py:9
-msgid "OTP issuer name"
-msgstr "OTP 扫描后的名称"
-
-#: settings/serializers/other.py:11
-msgid "OTP valid window"
-msgstr "OTP 延迟有效次数"
-
-#: settings/serializers/other.py:13
-msgid "Enable period task"
-msgstr "启用周期任务"
-
-#: settings/serializers/other.py:15
-msgid "Ansible windows default shell"
-msgstr "Ansible Windows 默认 shell"
-
-#: settings/serializers/other.py:18
 msgid "Email suffix"
 msgstr "邮件后缀"
 
+#: settings/serializers/other.py:10
+msgid ""
+"This is used by default if no email is returned during SSO authentication"
+msgstr "SSO认证时，如果没有返回邮件地址，将使用该后缀"
+
+#: settings/serializers/other.py:12
+msgid "Enable tickets"
+msgstr "开启工单系统"
+
+#: settings/serializers/other.py:15
+msgid "OTP issuer name"
+msgstr "OTP 扫描后的名称"
+
+#: settings/serializers/other.py:17
+msgid "OTP valid window"
+msgstr "OTP 延迟有效次数"
+
+#: settings/serializers/other.py:19
+msgid "Enable period task"
+msgstr "启用周期任务"
+
 #: settings/serializers/other.py:21
+msgid "Ansible windows default shell"
+msgstr "Ansible windows shell"
+
+#: settings/serializers/other.py:25
 msgid "Perm single to ungroup node"
-msgstr "授权的单个资产放在未分组节点"
+msgstr "直接授权资产放在未分组节点"
 
 #: settings/serializers/security.py:8
 msgid "Password minimum length"
@@ -2925,10 +2934,9 @@ msgstr "禁止登录时间间隔"
 
 #: settings/serializers/security.py:39
 msgid ""
-"Tip: (unit/minute) if the user has failed to log in for a limited number of "
+"Unit: minute, If the user has failed to log in for a limited number of "
 "times, no login is allowed during this time interval."
-msgstr ""
-"提示：（单位：分）当用户登录失败次数达到限制后，那么在此时间间隔内禁止登录"
+msgstr "单位：分, 当用户登录失败次数达到限制后，那么在此时间间隔内禁止登录"
 
 #: settings/serializers/security.py:45
 msgid "User password expiration"
@@ -2936,13 +2944,13 @@ msgstr "用户密码过期时间"
 
 #: settings/serializers/security.py:47
 msgid ""
-"Tip: (unit: day) If the user does not update the password during the time, "
-"the user password will expire failure;The password expiration reminder mail "
-"will be automatic sent to the user by system within 5 days (daily) before "
-"the password expires"
+"Unit: day, If the user does not update the password during the time, the "
+"user password will expire failure;The password expiration reminder mail will "
+"be automatic sent to the user by system within 5 days (daily) before the "
+"password expires"
 msgstr ""
-"提示：（单位：天）如果用户在此期间没有更新密码，用户密码将过期失效； 密码过期"
-"提醒邮件将在密码过期前5天内由系统（每天）自动发送给用户"
+"单位：天, 如果用户在此期间没有更新密码，用户密码将过期失效； 密码过期提醒邮件"
+"将在密码过期前5天内由系统（每天）自动发送给用户"
 
 #: settings/serializers/security.py:54
 msgid "Number of repeated historical passwords"
@@ -2958,81 +2966,81 @@ msgstr "提示：用户重置密码时，不能为该用户前几次使用过的
 msgid "Only single device login"
 msgstr "仅一台设备登录"
 
-#: settings/serializers/security.py:61
+#: settings/serializers/security.py:62
 msgid "Next device login, pre login will be logout"
 msgstr "下个设备登录，上次登录会被顶掉"
 
-#: settings/serializers/security.py:64
+#: settings/serializers/security.py:65
 msgid "Only exist user login"
 msgstr "仅已存在用户登录"
 
-#: settings/serializers/security.py:65 settings/serializers/security.py:69
+#: settings/serializers/security.py:66 settings/serializers/security.py:70
 msgid "If enable, CAS、OIDC auth will be failed, if user not exist yet"
 msgstr "开启后，如果系统中不存在该用户，CAS、OIDC 登录将会失败"
 
-#: settings/serializers/security.py:68
+#: settings/serializers/security.py:69
 msgid "Only from source login"
 msgstr "仅从用户来源登录"
 
-#: settings/serializers/security.py:71
+#: settings/serializers/security.py:72
 msgid "MFA verify TTL"
 msgstr "MFA 校验有效期"
 
-#: settings/serializers/security.py:72
+#: settings/serializers/security.py:75
 msgid "Enable Login captcha"
 msgstr "启用登录验证码"
 
-#: settings/serializers/security.py:77
+#: settings/serializers/security.py:81
 msgid "Batch command execution"
 msgstr "批量命令执行"
 
-#: settings/serializers/security.py:78
+#: settings/serializers/security.py:82
 msgid "Allow user run batch command or not using ansible"
 msgstr "是否允许用户使用 ansible 执行批量命令"
 
-#: settings/serializers/security.py:81
+#: settings/serializers/security.py:85
 msgid "Enable terminal register"
 msgstr "终端注册"
 
-#: settings/serializers/security.py:82
+#: settings/serializers/security.py:86
 msgid ""
 "Allow terminal register, after all terminal setup, you should disable this "
 "for security"
 msgstr "是否允许终端注册，当所有终端启动后，为了安全应该关闭"
 
-#: settings/serializers/security.py:85
+#: settings/serializers/security.py:89
 msgid "Replay watermark"
 msgstr "录像水印"
 
-#: settings/serializers/security.py:86
+#: settings/serializers/security.py:90
 msgid "Enabled, the session replay contains watermark information"
 msgstr "启用后，会话录像将包含水印信息"
 
-#: settings/serializers/security.py:90
+#: settings/serializers/security.py:94
 msgid "Connection max idle time"
 msgstr "连接最大空闲时间"
 
-#: settings/serializers/security.py:91
+#: settings/serializers/security.py:95
 msgid "If idle time more than it, disconnect connection Unit: minute"
 msgstr "提示：如果超过该配置没有操作，连接会被断开 （单位：分）"
 
-#: settings/serializers/security.py:94
+#: settings/serializers/security.py:98
 msgid "Remember manual auth"
 msgstr "保存手动输入密码"
 
-#: settings/serializers/security.py:97
+#: settings/serializers/security.py:101
 msgid "Enable change auth secure mode"
 msgstr "启用改密安全模式"
 
-#: settings/serializers/security.py:100
+#: settings/serializers/security.py:104
 msgid "Insecure command alert"
 msgstr "危险命令告警"
 
-#: settings/serializers/security.py:103
+#: settings/serializers/security.py:107
 msgid "Email recipient"
 msgstr "邮件收件人"
 
-#: settings/serializers/security.py:104
+#: settings/serializers/security.py:108
 msgid "Multiple user using , split"
 msgstr "多个用户，使用 , 分割"
 
@@ -3080,11 +3088,17 @@ msgstr ""
 msgid "Telnet login regex"
 msgstr "Telnet 成功正则表达式"
 
-#: settings/serializers/terminal.py:35
+#: settings/serializers/terminal.py:34
+msgid ""
+"The login success message varies with devices. if you cannot log in to the "
+"device through Telnet, set this parameter"
+msgstr "不同设备登录成功提示不一样，所以如果 telnet 不能正常登录，可以这里设置"
+
+#: settings/serializers/terminal.py:38
 msgid "RDP address"
 msgstr "RDP 地址"
 
-#: settings/serializers/terminal.py:38
+#: settings/serializers/terminal.py:41
 msgid "RDP visit address, eg: dev.jumpserver.org:3389"
 msgstr "RDP 访问地址, 如: dev.jumpserver.org:3389"
 
