@@ -1618,8 +1618,8 @@ msgid "{} days auto login"
 msgstr "{} 天内自动登录"
 
 #: authentication/forms.py:46
-msgid "Code"
-msgstr ""
+msgid "MFA Code"
+msgstr "MFA 验证码"
 
 #: authentication/forms.py:47
 msgid "MFA type"
@@ -1644,7 +1644,7 @@ msgstr "过期时间"
 
 #: authentication/sms_verify_code.py:17
 msgid "The verification code has expired. Please resend it"
-msgstr ""
+msgstr "验证码已过期，请重新发送"
 
 #: authentication/sms_verify_code.py:22
 msgid "The verification code is incorrect"
@@ -1652,7 +1652,7 @@ msgstr "验证码错误"
 
 #: authentication/sms_verify_code.py:27
 msgid "Please wait {} seconds before sending"
-msgstr ""
+msgstr "请在 {} 秒后发送"
 
 #: authentication/templates/authentication/_access_key_modal.html:6
 msgid "API key list"
@@ -1931,7 +1931,7 @@ msgstr "一次性密码"
 
 #: authentication/views/mfa.py:50 notifications/backends/__init__.py:15
 msgid "SMS"
-msgstr ""
+msgstr "短信"
 
 #: authentication/views/wecom.py:41
 msgid "WeCom Error, Please contact your system administrator"
@@ -2058,8 +2058,8 @@ msgid "Network error, please contact system administrator"
 msgstr "网络错误，请联系系统管理员"
 
 #: common/message/backends/sms/__init__.py:38
-msgid "SMS sign and template bad: {}"
-msgstr ""
+msgid "Invalid SMS sign and template: {}"
+msgstr "无效的短信签名和模版: {}"
 
 #: common/message/backends/sms/__init__.py:43
 msgid "Alibaba"
@@ -2754,11 +2754,11 @@ msgstr "启用 SMS"
 
 #: settings/serializers/auth/sms.py:11
 msgid "Test phone"
-msgstr ""
+msgstr "测试手机号"
 
 #: settings/serializers/auth/sms.py:25 settings/serializers/auth/sms.py:43
 msgid "Signatures and Templates"
-msgstr ""
+msgstr "签名和模版"
 
 #: settings/serializers/auth/sms.py:25 settings/serializers/auth/sms.py:43
 msgid ""
@@ -3772,7 +3772,7 @@ msgstr "用户没有权限"
 
 #: terminal/api/sharing.py:28
 msgid "Secure session sharing settings is disabled"
-msgstr ""
+msgstr "未开启会话共享"
 
 #: terminal/api/storage.py:30
 msgid "Deleting the default storage is not allowed"
@@ -3912,7 +3912,7 @@ msgstr "会话分享"
 
 #: terminal/models/sharing.py:67 terminal/serializers/sharing.py:49
 msgid "Joiner"
-msgstr ""
+msgstr "加入者"
 
 #: terminal/models/sharing.py:70
 msgid "Date joined"
@@ -4394,7 +4394,7 @@ msgstr "工单受理人"
 
 #: tickets/models/ticket.py:45
 msgid "Title"
-msgstr ""
+msgstr "标题"
 
 #: tickets/models/ticket.py:53
 msgid "State"
@@ -6051,77 +6051,3 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
-
-#~ msgid "Enable XRDP server"
-#~ msgstr "启用 XRDP 服务，允许 RDP 客户端"
-
-#~ msgid "Database Change auth plan"
-#~ msgstr "改密计划"
-
-#~ msgid "Database Change auth plan execution"
-#~ msgstr "改密计划执行"
-
-#~ msgid "SystemUser"
-#~ msgstr "系统用户"
-
-#~ msgid "Database Change auth plan task"
-#~ msgstr "改密计划任务"
-
-#~ msgid "Append SSH KEY"
-#~ msgstr "追加新密钥"
-
-#~ msgid "Empty and append SSH KEY"
-#~ msgstr "清空所有密钥再追加新密钥"
-
-#~ msgid "Empty current user and append SSH KEY"
-#~ msgstr "清空当前账号密钥再追加新密钥"
-
-#~ msgid "SSH Key strategy"
-#~ msgstr "SSH Key 策略"
-
-#~ msgid "Manual trigger"
-#~ msgstr "手动触发"
-
-#~ msgid "Timing trigger"
-#~ msgstr "定时触发"
-
-#~ msgid "Trigger mode"
-#~ msgstr "触发模式"
-
-#~ msgid "Change Password"
-#~ msgstr "修改密码"
-
-#~ msgid "Change SSH Key"
-#~ msgstr "修改密钥"
-
-#~ msgid "Require password strategy perform setting"
-#~ msgstr "需要密码策略执行设置"
-
-#~ msgid "Require password perform setting"
-#~ msgstr "需要密码执行设置"
-
-#~ msgid "Require password rule perform setting"
-#~ msgstr "需要密码规则执行设置"
-
-#~ msgid "Require ssh key strategy or ssh key perform setting"
-#~ msgstr "需要ssh密钥策略或ssh密钥执行设置"
-
-#~ msgid "Unix admin user"
-#~ msgstr "Unix 特权用户"
-
-#~ msgid "Windows admin user"
-#~ msgstr "Windows 特权用户"
-
-#, fuzzy
-#~| msgid "Account key"
-#~ msgid "Service account key"
-#~ msgstr "账户密钥"
-
-#~ msgid "App"
-#~ msgstr "应用"
-
-#~ msgid "Application name"
-#~ msgstr "应用名称"
-
-#~ msgid "Authorization rules"
-#~ msgstr "授权规则"
