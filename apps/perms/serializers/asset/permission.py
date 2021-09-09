@@ -39,8 +39,6 @@ class ActionsDisplayField(ActionsField):
 
 class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
     actions = ActionsField(required=False, allow_null=True, label=_("Actions"))
-    authorization_rules_display = serializers.ReadOnlyField(
-        source='get_authorization_rules_display', label=_('Authorization rules'))
     is_valid = serializers.BooleanField(read_only=True, label=_("Is valid"))
     is_expired = serializers.BooleanField(read_only=True, label=_('Is expired'))
     users_display = serializers.ListField(child=serializers.CharField(), label=_('Users display'), required=False)
@@ -55,7 +53,7 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
         fields_small = fields_mini + [
             'is_active', 'is_expired', 'is_valid', 'actions',
             'created_by', 'date_created', 'date_expired',
-            'date_start', 'comment', 'authorization_rules_display'
+            'date_start', 'comment', 'from_ticket'
         ]
         fields_m2m = [
             'users', 'users_display', 'user_groups', 'user_groups_display', 'assets',
@@ -64,7 +62,7 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
             'nodes_amount', 'system_users_amount',
         ]
         fields = fields_small + fields_m2m
-        read_only_fields = ['created_by', 'date_created']
+        read_only_fields = ['created_by', 'date_created', 'from_ticket']
         extra_kwargs = {
             'is_expired': {'label': _('Is expired')},
             'is_valid': {'label': _('Is valid')},
