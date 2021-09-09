@@ -40,8 +40,6 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 ### 在线体验
 
 -   环境地址：<https://demo.jumpserver.org/>
--   用户名：test
--   密码：test01
 
 | :warning: 注意                 |
 | :--------------------------- |
