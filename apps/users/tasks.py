@@ -92,8 +92,8 @@ def import_ldap_user():
 def import_ldap_user_periodic():
     if not settings.AUTH_LDAP:
         return
+    task_name = 'import_ldap_user_periodic'
     if not settings.AUTH_LDAP_SYNC_IS_PERIODIC:
-        task_name = sys._getframe().f_code.co_name
         disable_celery_periodic_task(task_name)
         return
 
@@ -104,7 +104,7 @@ def import_ldap_user_periodic():
         interval = None
     crontab = settings.AUTH_LDAP_SYNC_CRONTAB
     tasks = {
-        'import_ldap_user_periodic': {
+        task_name: {
             'task': import_ldap_user.name,
             'interval': interval,
             'crontab': crontab,
