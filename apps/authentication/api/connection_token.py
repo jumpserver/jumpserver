@@ -85,10 +85,10 @@ class ClientProtocolMixin:
         height = self.request.query_params.get('height')
         width = self.request.query_params.get('width')
         full_screen = is_true(self.request.query_params.get('full_screen'))
-        mnt_local_dev = is_true(self.request.query_params.get('mnt_local_dev'))
+        drives_redirect = is_true(self.request.query_params.get('drives_redirect'))
         token = self.create_token(user, asset, application, system_user)
 
-        if mnt_local_dev:
+        if drives_redirect:
             options['drivestoredirect:s'] = '*'
         options['screen mode id:i'] = '2' if full_screen else '1'
         address = settings.TERMINAL_RDP_ADDR
