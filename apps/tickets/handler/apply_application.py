@@ -3,6 +3,7 @@ from orgs.utils import tmp_to_org, tmp_to_root_org
 from applications.const import AppCategory, AppType
 from applications.models import Application
 from perms.models import ApplicationPermission
+from perms.const import AuthorizationRules
 from assets.models import SystemUser
 
 from .base import BaseHandler
@@ -89,6 +90,7 @@ class Handler(BaseHandler):
         permissions_data = {
             'id': self.ticket.id,
             'name': apply_permission_name,
+            'authorization_rules': AuthorizationRules.ticket,
             'category': apply_category,
             'type': apply_type,
             'comment': str(permission_comment),
