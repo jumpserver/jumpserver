@@ -40,3 +40,7 @@ class TerminalSettingSerializer(serializers.Serializer):
         allow_blank=True,
         help_text=_('RDP visit address, eg: dev.jumpserver.org:3389')
     )
+
+    XRDP_ENABLED = serializers.BooleanField(
+        label=_("Enable XRDP")
+    )

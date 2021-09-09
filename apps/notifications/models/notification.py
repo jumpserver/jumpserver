@@ -6,7 +6,7 @@ __all__ = ('SystemMsgSubscription', 'UserMsgSubscription')
 
 
 class UserMsgSubscription(JMSModel):
-    user = models.ForeignKey('users.User', unique=True, related_name='user_msg_subscriptions', on_delete=models.CASCADE)
+    user = models.OneToOneField('users.User', related_name='user_msg_subscriptions', on_delete=models.CASCADE)
     receive_backends = models.JSONField(default=list)
 
     def __str__(self):

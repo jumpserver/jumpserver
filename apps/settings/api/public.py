@@ -74,6 +74,7 @@ class PublicSettingApi(generics.RetrieveAPIView):
                 "AUTH_FEISHU": settings.AUTH_FEISHU,
                 'SECURITY_WATERMARK_ENABLED': settings.SECURITY_WATERMARK_ENABLED,
                 'SECURITY_SESSION_SHARE': settings.SECURITY_SESSION_SHARE,
+                "XRDP_ENABLED": settings.XRDP_ENABLED,
             }
         }
         return instance
