@@ -40,8 +40,8 @@ class SMS_MESSAGE(TextChoices):
 
 
 class BACKENDS(TextChoices):
-    ALIBABA = 'alibaba', _('Alibaba')
-    TENCENT = 'tencent', _('Tencent')
+    ALIBABA = 'alibaba', _('Alibaba cloud')
+    TENCENT = 'tencent', _('Tencent cloud')
 
 
 class BaseSMSClient:
