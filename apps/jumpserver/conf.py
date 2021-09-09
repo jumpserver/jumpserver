@@ -243,7 +243,7 @@ class Config(dict):
         'LOGIN_REDIRECT_TO_BACKEND':  '',  # 'OPENID / CAS
         'LOGIN_REDIRECT_MSG_ENABLED': True,
 
-        'AUTH_SMS': False,
+        'SMS_ENABLED': False,
         'SMS_BACKEND': '',
         'SMS_TEST_PHONE': '',
 

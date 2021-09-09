@@ -6,7 +6,7 @@ from .base import BackendBase
 
 class SMS(BackendBase):
     account_field = 'phone'
-    is_enable_field_in_settings = 'AUTH_SMS'
+    is_enable_field_in_settings = 'SMS_ENABLED'
 
     def __init__(self):
         """

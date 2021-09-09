@@ -68,6 +68,9 @@ class Message(metaclass=MessageType):
         raise NotImplementedError
 
     def send_msg(self, users: Iterable, backends: Iterable = BACKEND):
+        backends = set(backends)
+        backends.add(BACKEND.SITE_MSG)  # 站内信必须发
+
         for backend in backends:
             try:
                 backend = BACKEND(backend)

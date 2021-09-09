@@ -7,7 +7,7 @@ __all__ = ['AlibabaSMSSettingSerializer', 'TencentSMSSettingSerializer']
 
 
 class BaseSMSSettingSerializer(serializers.Serializer):
-    AUTH_SMS = serializers.BooleanField(default=False, label=_('Enable SMS'))
+    SMS_ENABLED = serializers.BooleanField(default=False, label=_('Enable SMS'))
     SMS_TEST_PHONE = serializers.CharField(max_length=256, required=False, label=_('Test phone'))
 
     def to_representation(self, instance):
