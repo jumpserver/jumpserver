@@ -10,7 +10,7 @@ from users.models import User
 from notifications.backends import BACKEND
 from .models import SystemMsgSubscription, UserMsgSubscription
 
-__all__ = ('SystemMessage', 'UserMessage')
+__all__ = ('SystemMessage', 'UserMessage', 'system_msgs')
 
 
 system_msgs = []

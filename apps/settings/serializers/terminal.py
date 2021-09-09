@@ -35,8 +35,8 @@ class TerminalSettingSerializer(serializers.Serializer):
                     "if you cannot log in to the device through Telnet, set this parameter")
     )
     TERMINAL_RDP_ADDR = serializers.CharField(
-        required=False, label=_("RDP address"),
-        max_length=1024,
-        allow_blank=True,
+        required=False, label=_("RDP address"), max_length=1024, allow_blank=True,
         help_text=_('RDP visit address, eg: dev.jumpserver.org:3389')
     )
+
+    XRDP_ENABLED = serializers.BooleanField(label=_("Enable XRDP"))
