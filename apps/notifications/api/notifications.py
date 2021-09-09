@@ -1,18 +1,18 @@
-from django.http import Http404
-from rest_framework.mixins import ListModelMixin, UpdateModelMixin
+from rest_framework.mixins import ListModelMixin, UpdateModelMixin, RetrieveModelMixin
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
 
 from common.drf.api import JMSGenericViewSet
+from common.permissions import IsObjectOwner, IsSuperUser, OnlySuperUserCanList
 from notifications.notifications import system_msgs
-from notifications.models import SystemMsgSubscription
+from notifications.models import SystemMsgSubscription, UserMsgSubscription
 from notifications.backends import BACKEND
 from notifications.serializers import (
-    SystemMsgSubscriptionSerializer, SystemMsgSubscriptionByCategorySerializer
+    SystemMsgSubscriptionSerializer, SystemMsgSubscriptionByCategorySerializer,
+    UserMsgSubscriptionSerializer,
 )
 
-__all__ = ('BackendListView', 'SystemMsgSubscriptionViewSet')
+__all__ = ('BackendListView', 'SystemMsgSubscriptionViewSet', 'UserMsgSubscriptionViewSet')
 
 
 class BackendListView(APIView):
@@ -70,3 +70,13 @@ class SystemMsgSubscriptionViewSet(ListModelMixin,
 
         serializer = self.get_serializer(data, many=True)
         return Response(data=serializer.data)
+
+
+class UserMsgSubscriptionViewSet(ListModelMixin,
+                                 RetrieveModelMixin,
+                                 UpdateModelMixin,
+                                 JMSGenericViewSet):
+    lookup_field = 'user_id'
+    queryset = UserMsgSubscription.objects.all()
+    serializer_class = UserMsgSubscriptionSerializer
+    permission_classes = (IsObjectOwner | IsSuperUser, OnlySuperUserCanList)

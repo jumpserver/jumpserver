@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from collections import defaultdict
-from django.db.models import F, Value
+from django.db.models import F, Value, Model
 from django.db.models.signals import m2m_changed
 from django.db.models.functions import Concat
 
@@ -13,13 +13,15 @@ from .. import models, serializers
 
 __all__ = [
     'SystemUserAssetRelationViewSet', 'SystemUserNodeRelationViewSet',
-    'SystemUserUserRelationViewSet',
+    'SystemUserUserRelationViewSet', 'BaseRelationViewSet',
 ]
 
 logger = get_logger(__name__)
 
 
 class RelationMixin:
+    model: Model
+
     def get_queryset(self):
         queryset = self.model.objects.all()
         if not current_org.is_root():

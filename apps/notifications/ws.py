@@ -4,7 +4,6 @@ from redis.exceptions import ConnectionError
 from channels.generic.websocket import JsonWebsocketConsumer
 
 from common.utils import get_logger
-from .models import SiteMessage
 from .site_msg import SiteMessageUtil
 from .signals_handler import new_site_msg_chan
 

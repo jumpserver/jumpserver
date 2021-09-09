@@ -105,11 +105,11 @@ class CommandFilterRule(OrgModelMixin):
         return '{} % {}'.format(self.type, self.content)
 
     def create_command_confirm_ticket(self, run_command, session, cmd_filter_rule, org_id):
-        from tickets.const import TicketTypeChoices
+        from tickets.const import TicketType
         from tickets.models import Ticket
         data = {
             'title': _('Command confirm') + ' ({})'.format(session.user),
-            'type': TicketTypeChoices.command_confirm,
+            'type': TicketType.command_confirm,
             'meta': {
                 'apply_run_user': session.user,
                 'apply_run_asset': session.asset,
@@ -122,6 +122,6 @@ class CommandFilterRule(OrgModelMixin):
             'org_id': org_id,
         }
         ticket = Ticket.objects.create(**data)
-        ticket.assignees.set(self.reviewers.all())
+        ticket.create_process_map_and_node(self.reviewers.all())
         ticket.open(applicant=session.user_obj)
         return ticket

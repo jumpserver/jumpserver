@@ -106,6 +106,7 @@ class FeiShu(RequestMixin):
             body['receive_id'] = user_id
 
             try:
+                logger.info(f'Feishu send text: user_ids={user_ids} msg={msg}')
                 self._requests.post(URL.SEND_MESSAGE, params=params, json=body)
             except APIException as e:
                 # 只处理可预知的错误

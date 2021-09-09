@@ -1,11 +1,9 @@
+import importlib
+
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 
-from .dingtalk import DingTalk
-from .email import Email
-from .site_msg import SiteMessage
-from .wecom import WeCom
-from .feishu import FeiShu
+client_name_mapper = {}
 
 
 class BACKEND(models.TextChoices):
@@ -14,17 +12,11 @@ class BACKEND(models.TextChoices):
     DINGTALK = 'dingtalk', _('DingTalk')
     SITE_MSG = 'site_msg', _('Site message')
     FEISHU = 'feishu', _('FeiShu')
+    SMS = 'sms', _('SMS')
 
     @property
     def client(self):
-        client = {
-            self.EMAIL: Email,
-            self.WECOM: WeCom,
-            self.DINGTALK: DingTalk,
-            self.SITE_MSG: SiteMessage,
-            self.FEISHU: FeiShu,
-        }[self]
-        return client
+        return client_name_mapper[self]
 
     def get_account(self, user):
         return self.client.get_account(user)
@@ -37,3 +29,8 @@ class BACKEND(models.TextChoices):
     def filter_enable_backends(cls, backends):
         enable_backends = [b for b in backends if cls(b).is_enable]
         return enable_backends
+
+
+for b in BACKEND:
+    m = importlib.import_module(f'.{b}', __package__)
+    client_name_mapper[b] = m.backend

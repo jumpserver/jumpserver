@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
 from django.db.models import Prefetch
 
+from users.notifications import ResetMFAMsg
 from common.permissions import (
     IsOrgAdmin, IsOrgAdminOrAppUser,
     CanUpdateDeleteUser, IsSuperUser
@@ -16,7 +17,7 @@ from common.mixins import CommonApiMixin
 from common.utils import get_logger
 from orgs.utils import current_org
 from orgs.models import ROLE as ORG_ROLE, OrganizationMember
-from users.utils import send_reset_mfa_mail, LoginBlockUtil, MFABlockUtils
+from users.utils import LoginBlockUtil, MFABlockUtils
 from .. import serializers
 from ..serializers import UserSerializer, UserRetrieveSerializer, MiniUserSerializer, InviteSerializer
 from .mixins import UserQuerysetMixin
@@ -130,14 +131,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
     @action(methods=['get'], detail=False, permission_classes=(IsOrgAdmin,))
     def suggestion(self, request):
         queryset = User.objects.exclude(role=User.ROLE.APP)
-        queryset = self.filter_queryset(queryset)
-        queryset = queryset[:3]
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
+        queryset = self.filter_queryset(queryset)[:3]
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -216,5 +210,6 @@ class UserResetOTPApi(UserQuerysetMixin, generics.RetrieveAPIView):
         if user.mfa_enabled:
             user.reset_mfa()
             user.save()
-            send_reset_mfa_mail(user)
+
+            ResetMFAMsg(user).publish_async()
         return Response({"msg": "success"})

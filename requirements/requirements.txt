@@ -59,7 +59,7 @@ PyNaCl==1.2.1
 python-dateutil==2.6.1
 #python-gssapi==0.6.4
 pytz==2018.3
-PyYAML==5.1
+PyYAML==5.2
 redis==3.5.3
 requests==2.25.1
 jms-storage==0.0.39
@@ -77,7 +77,7 @@ aliyun-python-sdk-core-v3==2.9.1
 aliyun-python-sdk-ecs==4.10.1
 rest_condition==1.0.3
 python-ldap==3.3.1
-tencentcloud-sdk-python==3.0.40
+tencentcloud-sdk-python==3.0.477
 django-radius==1.4.0
 ipip-ipdb==1.2.1
 django-redis-sessions==0.6.1
@@ -114,3 +114,8 @@ azure-identity==1.5.0
 azure-mgmt-subscription==1.0.0
 qingcloud-sdk==1.2.12
 django-simple-history==3.0.0
+google-cloud-compute==0.5.0
+PyMySQL==1.0.2
+cx-Oracle==8.2.1
+psycopg2-binary==2.9.1
+alibabacloud_dysmsapi20170525==2.0.2

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from common.drf.serializers import BulkModelSerializer
-from notifications.models import SystemMsgSubscription
+from notifications.models import SystemMsgSubscription, UserMsgSubscription
 
 
 class SystemMsgSubscriptionSerializer(BulkModelSerializer):
@@ -27,3 +27,11 @@ class SystemMsgSubscriptionByCategorySerializer(serializers.Serializer):
     category = serializers.CharField()
     category_label = serializers.CharField()
     children = SystemMsgSubscriptionSerializer(many=True)
+
+
+class UserMsgSubscriptionSerializer(BulkModelSerializer):
+    receive_backends = serializers.ListField(child=serializers.CharField(), read_only=False)
+
+    class Meta:
+        model = UserMsgSubscription
+        fields = ('user_id', 'receive_backends',)

@@ -25,7 +25,7 @@ class ResourceStatisticsSerializer(serializers.Serializer):
     app_perms_amount = serializers.IntegerField(required=False)
 
 
-class OrgSerializer(ModelSerializer):
+class OrgSerializer(BulkModelSerializer):
     users = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), write_only=True, required=False)
     admins = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), write_only=True, required=False)
     auditors = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), write_only=True, required=False)

@@ -20,17 +20,22 @@ from django.shortcuts import reverse
 
 from orgs.utils import current_org
 from orgs.models import OrganizationMember, Organization
+from common.exceptions import JMSException
 from common.utils import date_expired_default, get_logger, lazyproperty, random_string
 from common import fields
 from common.const import choices
 from common.db.models import TextChoices
-from users.exceptions import MFANotEnabled
+from users.exceptions import MFANotEnabled, PhoneNotSet
 from ..signals import post_user_change_password
 
-
-__all__ = ['User', 'UserPasswordHistory']
+__all__ = ['User', 'UserPasswordHistory', 'MFAType']
 
 logger = get_logger(__file__)
+
+
+class MFAType(TextChoices):
+    OTP = 'otp', _('One-time password')
+    SMS_CODE = 'sms', _('SMS verify code')
 
 
 class AuthMixin:
@@ -369,12 +374,9 @@ class RoleMixin:
     @classmethod
     def get_super_and_org_admins(cls, org=None):
         super_admins = cls.get_super_admins()
-        super_admin_ids = list(super_admins.values_list('id', flat=True))
-        org_admins = cls.get_org_admins(org)
-        org_admin_ids = list(org_admins.values_list('id', flat=True))
-        admin_ids = set(org_admin_ids + super_admin_ids)
-        admins = User.objects.filter(id__in=admin_ids)
-        return admins
+        org_admins = cls.get_org_admins(org=org)
+        admins = org_admins | super_admins
+        return admins.distinct()
 
 
 class TokenMixin:
@@ -518,21 +520,62 @@ class MFAMixin:
         from ..utils import check_otp_code
         return check_otp_code(self.otp_secret_key, code)
 
-    def check_mfa(self, code):
+    def check_mfa(self, code, mfa_type=MFAType.OTP):
         if not self.mfa_enabled:
             raise MFANotEnabled
 
-        if settings.OTP_IN_RADIUS:
-            return self.check_radius(code)
-        else:
-            return self.check_otp(code)
+        if mfa_type == MFAType.OTP:
+            if settings.OTP_IN_RADIUS:
+                return self.check_radius(code)
+            else:
+                return self.check_otp(code)
+        elif mfa_type == MFAType.SMS_CODE:
+            return self.check_sms_code(code)
+
+    def get_supported_mfa_types(self):
+        methods = []
+        if self.otp_secret_key:
+            methods.append(MFAType.OTP)
+        if self.phone:
+            methods.append(MFAType.SMS_CODE)
+        return methods
+
+    def check_sms_code(self, code):
+        from authentication.sms_verify_code import VerifyCodeUtil
+
+        if not self.phone:
+            raise PhoneNotSet
+
+        try:
+            util = VerifyCodeUtil(self.phone)
+            return util.verify(code)
+        except JMSException:
+            return False
+
+    def send_sms_code(self):
+        from authentication.sms_verify_code import VerifyCodeUtil
+
+        if not self.phone:
+            raise PhoneNotSet
+
+        util = VerifyCodeUtil(self.phone)
+        util.touch()
+        return util.timeout
 
     def mfa_enabled_but_not_set(self):
         if not self.mfa_enabled:
             return False, None
-        if self.mfa_is_otp() and not self.otp_secret_key:
-            return True, reverse('authentication:user-otp-enable-start')
-        return False, None
+
+        if not self.mfa_is_otp():
+            return False, None
+
+        if self.mfa_is_otp() and self.otp_secret_key:
+            return False, None
+
+        if self.phone and settings.SMS_ENABLED and settings.XPACK_ENABLED:
+            return False, None
+
+        return True, reverse('authentication:user-otp-enable-start')
 
 
 class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
@@ -625,6 +668,10 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         group_ids = cls.groups.through.objects.filter(user_id=user_id).distinct().values_list('usergroup_id', flat=True)
         group_ids = list(group_ids)
         return group_ids
+
+    @property
+    def receive_backends(self):
+        return self.user_msg_subscription.receive_backends
 
     @property
     def is_wecom_bound(self):

@@ -181,7 +181,7 @@ class UserRetrieveSerializer(UserSerializer):
 class MiniUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'name', 'username']
+        fields = UserSerializer.Meta.fields_mini
 
 
 class InviteSerializer(serializers.Serializer):

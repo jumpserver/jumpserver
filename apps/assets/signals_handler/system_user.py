@@ -131,8 +131,8 @@ def on_system_user_groups_change(instance, action, pk_set, reverse, **kwargs):
 @on_transaction_commit
 def on_system_user_update(instance: SystemUser, created, **kwargs):
     """
-    当系统用户更新时，可能更新了秘钥，用户名等，这时要自动推送系统用户到资产上,
-    其实应该当 用户名，密码，秘钥 sudo等更新时再推送，这里偷个懒,
+    当系统用户更新时，可能更新了密钥，用户名等，这时要自动推送系统用户到资产上,
+    其实应该当 用户名，密码，密钥 sudo等更新时再推送，这里偷个懒,
     这里直接取了 instance.assets 因为nodes和系统用户发生变化时，会自动将nodes下的资产
     关联到上面
     """

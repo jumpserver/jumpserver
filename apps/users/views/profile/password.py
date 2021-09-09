@@ -6,6 +6,8 @@ from django.contrib.auth import authenticate
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.generic.edit import FormView
+from authentication.mixins import PasswordEncryptionViewMixin
+from authentication import errors
 
 from common.utils import get_logger
 from ... import forms
@@ -18,13 +20,17 @@ __all__ = ['UserVerifyPasswordView']
 logger = get_logger(__name__)
 
 
-class UserVerifyPasswordView(FormView):
+class UserVerifyPasswordView(PasswordEncryptionViewMixin, FormView):
     template_name = 'users/user_password_verify.html'
     form_class = forms.UserCheckPasswordForm
 
     def form_valid(self, form):
         user = get_user_or_pre_auth_user(self.request)
-        password = form.cleaned_data.get('password')
+        try:
+            password = self.get_decrypted_password(username=user.username)
+        except errors.AuthFailedError as e:
+            form.add_error("password", _(f"Password invalid") + f'({e.msg})')
+            return self.form_invalid(form)
         user = authenticate(request=self.request, username=user.username, password=password)
         if not user:
             form.add_error("password", _("Password invalid"))

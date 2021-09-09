@@ -12,7 +12,6 @@ from common.db.models import UnionQuerySet
 from common.utils import date_expired_default, lazyproperty
 from orgs.mixins.models import OrgManager
 
-
 __all__ = [
     'BasePermission', 'BasePermissionQuerySet'
 ]
@@ -31,11 +30,7 @@ class BasePermissionQuerySet(models.QuerySet):
 
     def invalid(self):
         now = timezone.now()
-        q = (
-            Q(is_active=False) |
-            Q(date_start__gt=now) |
-            Q(date_expired__lt=now)
-        )
+        q = (Q(is_active=False) | Q(date_start__gt=now) | Q(date_expired__lt=now))
         return self.filter(q)
 
 
@@ -48,13 +43,15 @@ class BasePermission(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     users = models.ManyToManyField('users.User', blank=True, verbose_name=_("User"), related_name='%(class)ss')
-    user_groups = models.ManyToManyField('users.UserGroup', blank=True, verbose_name=_("User group"), related_name='%(class)ss')
+    user_groups = models.ManyToManyField(
+        'users.UserGroup', blank=True, verbose_name=_("User group"), related_name='%(class)ss')
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
     date_start = models.DateTimeField(default=timezone.now, db_index=True, verbose_name=_("Date start"))
     date_expired = models.DateTimeField(default=date_expired_default, db_index=True, verbose_name=_('Date expired'))
     created_by = models.CharField(max_length=128, blank=True, verbose_name=_('Created by'))
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date created'))
     comment = models.TextField(verbose_name=_('Comment'), blank=True)
+    from_ticket = models.BooleanField(default=False, verbose_name=_('From ticket'))
 
     objects = BasePermissionManager.from_queryset(BasePermissionQuerySet)()
 
