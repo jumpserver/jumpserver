@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('users', '0036_user_feishu_id'),
-        ('notifications', '0002_auto_20210823_1619'),
+        ('notifications', '0002_auto_20210909_1946'),
     ]
 
     operations = [

@@ -565,9 +565,17 @@ class MFAMixin:
     def mfa_enabled_but_not_set(self):
         if not self.mfa_enabled:
             return False, None
-        if self.mfa_is_otp() and not self.otp_secret_key and not self.phone:
-            return True, reverse('authentication:user-otp-enable-start')
-        return False, None
+
+        if not self.mfa_is_otp():
+            return False, None
+
+        if self.mfa_is_otp() and self.otp_secret_key:
+            return False, None
+
+        if self.phone and settings.SMS_ENABLED and settings.XPACK_ENABLED:
+            return False, None
+
+        return True, reverse('authentication:user-otp-enable-start')
 
 
 class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
@@ -660,6 +668,10 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         group_ids = cls.groups.through.objects.filter(user_id=user_id).distinct().values_list('usergroup_id', flat=True)
         group_ids = list(group_ids)
         return group_ids
+
+    @property
+    def receive_backends(self):
+        return self.user_msg_subscription.receive_backends
 
     @property
     def is_wecom_bound(self):

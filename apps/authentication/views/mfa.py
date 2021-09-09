@@ -48,7 +48,7 @@ class UserLoginOtpView(mixins.AuthMixin, FormView):
                 {
                     'name': 'sms',
                     'label': _('SMS'),
-                    'enable': bool(user.phone) and settings.AUTH_SMS,
+                    'enable': bool(user.phone) and settings.SMS_ENABLED and settings.XPACK_ENABLED,
                     'selected': False,
                 },
             ]
