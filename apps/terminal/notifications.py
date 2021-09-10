@@ -1,3 +1,5 @@
+from typing import Callable
+
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 
@@ -17,19 +19,35 @@ CATEGORY_LABEL = _('Sessions')
 
 
 class CommandAlertMixin:
+    command: dict
+    _get_message: Callable
+    message_type_label: str
+
     def get_dingtalk_msg(self) -> str:
         msg = self._get_message()
         msg = msg.replace('<br>', '')
         return msg
 
+    def get_subject(self):
+        _input = self.command['input']
+        if isinstance(_input, str):
+            _input = _input.replace('\r\n', ' ').replace('\r', ' ').replace('\n', ' ')
+
+        subject = self.message_type_label + "%(cmd)s" % {
+            'cmd': _input
+        }
+        return subject
+
     @classmethod
     def post_insert_to_db(cls, subscription: SystemMsgSubscription):
         """
-        兼容操作，试图用 `settings.SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER` 的邮件地址assets_systemuser_assets找到
-        用户，把用户设置为默认接收者
+        兼容操作，试图用 `settings.SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER` 的邮件地址
+        assets_systemuser_assets找到用户，把用户设置为默认接收者
         """
         from settings.models import Setting
-        db_setting = Setting.objects.filter(name='SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER').first()
+        db_setting = Setting.objects.filter(
+            name='SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER'
+        ).first()
         if db_setting:
             emails = db_setting.value
         else:
@@ -54,60 +72,41 @@ class CommandAlertMessage(CommandAlertMixin, SystemMessage):
 
     def _get_message(self):
         command = self.command
-        session_obj = Session.objects.get(id=command['session'])
+        session = Session.objects.get(id=command['session'])
+        session_detail_url = reverse(
+            'api-terminal:session-detail', kwargs={'pk': command['session']},
+            external=True, api_to_ui=True
+        )
 
         message = _("""
-                        Command: %(command)s
-                        <br>
-                        Asset: %(host_name)s (%(host_ip)s)
-                        <br>
-                        User: %(user)s
-                        <br>
-                        Level: %(risk_level)s
-                        <br>
-                        Session: <a href="%(session_detail_url)s">session detail</a>
-                        <br>
-                        """) % {
+            Command: %(command)s
+            <br>
+            Asset: %(hostname)s (%(host_ip)s)
+            <br>
+            User: %(user)s
+            <br>
+            Level: %(risk_level)s
+            <br>
+            Session: <a href="%(session_detail_url)s?oid=%(oid)s">session detail</a>
+            <br>
+        """) % {
             'command': command['input'],
-            'host_name': command['asset'],
-            'host_ip': session_obj.asset_obj.ip,
+            'hostname': command['asset'],
+            'host_ip': session.asset_obj.ip,
             'user': command['user'],
             'risk_level': Command.get_risk_level_str(command['risk_level']),
-            'session_detail_url': reverse('api-terminal:session-detail',
-                                          kwargs={'pk': command['session']},
-                                          external=True, api_to_ui=True),
+            'session_detail_url': session_detail_url,
+            'oid': session.org_id
         }
-
         return message
 
     def get_common_msg(self):
         msg = self._get_message()
-
-        return {
-            'subject': msg[:80],
-            'message': msg
-        }
-
-    def get_email_msg(self):
-        command = self.command
-        session_obj = Session.objects.get(id=command['session'])
-
-        input = command['input']
-        if isinstance(input, str):
-            input = input.replace('\r\n', ' ').replace('\r', ' ').replace('\n', ' ')
-
-        subject = _("Insecure Command Alert: [%(name)s->%(login_from)s@%(remote_addr)s] $%(command)s") % {
-            'name': command['user'],
-            'login_from': session_obj.get_login_from_display(),
-            'remote_addr': session_obj.remote_addr,
-            'command': input
-        }
-
-        message = self._get_message()
+        subject = self.get_subject()
 
         return {
             'subject': subject,
-            'message': message
+            'message': msg
         }
 
 
@@ -121,8 +120,8 @@ class CommandExecutionAlert(CommandAlertMixin, SystemMessage):
 
     def _get_message(self):
         command = self.command
-        input = command['input']
-        input = input.replace('\n', '<br>')
+        _input = command['input']
+        _input = _input.replace('\n', '<br>')
 
         assets = ', '.join([str(asset) for asset in command['assets']])
         message = _("""
@@ -137,19 +136,15 @@ class CommandExecutionAlert(CommandAlertMixin, SystemMessage):
                             %(command)s <br>
                             ----------------- Commands ---------------- <br>
                             """) % {
-            'command': input,
+            'command': _input,
             'assets': assets,
             'user': command['user'],
-            'risk_level': Command.get_risk_level_str(command['risk_level']),
+            'risk_level': Command.get_risk_level_str(command['risk_level'])
         }
         return message
 
     def get_common_msg(self):
-        command = self.command
-
-        subject = _("Insecure Web Command Execution Alert: [%(name)s]") % {
-            'name': command['user'],
-        }
+        subject = self.get_subject()
         message = self._get_message()
 
         return {

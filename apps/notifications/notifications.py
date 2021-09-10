@@ -1,7 +1,6 @@
 from typing import Iterable
 import traceback
 from itertools import chain
-from collections import defaultdict
 
 from celery import shared_task
 
@@ -90,6 +89,11 @@ class Message(metaclass=MessageType):
             except:
                 traceback.print_exc()
 
+    def send_test_msg(self):
+        from users.models import User
+        users = User.objects.filter(username='admin')
+        self.send_msg(users, [])
+
     def get_common_msg(self) -> dict:
         raise NotImplementedError
 
@@ -115,7 +119,7 @@ class Message(metaclass=MessageType):
         return self.common_msg
 
     def get_sms_msg(self) -> dict:
-        raise NotImplementedError
+        return self.common_msg
     # --------------------------------------------------------------
 
 
@@ -135,6 +139,7 @@ class SystemMessage(Message):
         ]
 
         self.send_msg(users, receive_backends)
+
 
     @classmethod
     def post_insert_to_db(cls, subscription: SystemMsgSubscription):
