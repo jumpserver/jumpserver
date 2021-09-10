@@ -34,6 +34,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'sso': serializers.SSOSettingSerializer,
         'clean': serializers.CleaningSerializer,
         'other': serializers.OtherSettingSerializer,
+        'sms': serializers.SMSSettingSerializer,
         'alibaba': serializers.AlibabaSMSSettingSerializer,
         'tencent': serializers.TencentSMSSettingSerializer,
     }

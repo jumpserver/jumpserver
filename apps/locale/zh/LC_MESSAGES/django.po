@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-10 12:49+0800\n"
+"POT-Creation-Date: 2021-09-10 16:13+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -3151,6 +3151,14 @@ msgstr "会话分享"
 msgid "Enabled, Allows user active session to be shared with other users"
 msgstr "开启后允许用户分享已连接的资产会话给它人，协同工作"
 
+#: settings/serializers/security.py:115
+msgid "Login Confirm"
+msgstr "登录复核"
+
+#: settings/serializers/security.py:116
+msgid "After opening, please go to the personal information setting approver"
+msgstr "开启后, 请前往个人信息设置审批人"
+
 #: settings/serializers/sms.py:7
 msgid "Label"
 msgstr "标签"
@@ -4013,7 +4021,7 @@ msgid "Danger command alert"
 msgstr "危险命令告警"
 
 #: terminal/notifications.py:82
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "\n"
 "            Command: %(command)s\n"
@@ -5786,7 +5794,7 @@ msgstr "青云私有云"
 
 #: xpack/plugins/cloud/const.py:19
 msgid "Google Cloud Platform"
-msgstr ""
+msgstr "谷歌云"
 
 #: xpack/plugins/cloud/const.py:23
 msgid "Instance name"
@@ -6047,7 +6055,7 @@ msgstr "账户密钥"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:93
 msgid "The file is in JSON format"
-msgstr ""
+msgstr "JSON 格式的文件"
 
 #: xpack/plugins/cloud/serializers/task.py:29
 msgid ""
@@ -6153,39 +6161,3 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
-
-#~ msgid "Database Change auth plan"
-#~ msgstr "改密计划"
-
-#~ msgid "App change auth plan"
-#~ msgstr "改密计划"
-
-#, fuzzy
-#~| msgid "Change auth plan execution"
-#~ msgid "Database Change auth plan execution"
-#~ msgstr "改密计划执行"
-
-#~ msgid "SystemUser"
-#~ msgstr "系统用户"
-
-#, fuzzy
-#~| msgid "Change auth plan task"
-#~ msgid "Database Change auth plan task"
-#~ msgstr "改密计划任务"
-
-#, python-format
-#~ msgid ""
-#~ "Insecure Command Alert: [%(name)s->%(login_from)s@%(remote_addr)s] $"
-#~ "%(command)s"
-#~ msgstr ""
-#~ "危险命令告警: [%(name)s->%(login_from)s@%(remote_addr)s] $%(command)s"
-
-#, python-format
-#~ msgid "Insecure Web Command Execution Alert: [%(name)s]"
-#~ msgstr "批量危险命令告警: [%(name)s]"
-
-#~ msgid "* Please enter custom password"
-#~ msgstr "* 请输入自定义密码"
-
-#~ msgid "This field is required"
-#~ msgstr "该字段是必填项。"

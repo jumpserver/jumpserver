@@ -40,8 +40,8 @@ class SMS_MESSAGE(TextChoices):
 
 
 class BACKENDS(TextChoices):
-    ALIBABA = 'alibaba', _('Alibaba')
-    TENCENT = 'tencent', _('Tencent')
+    ALIBABA = 'alibaba', _('Alibaba cloud')
+    TENCENT = 'tencent', _('Tencent cloud')
 
 
 class BaseSMSClient:
@@ -67,6 +67,12 @@ class SMS:
     client: BaseSMSClient
 
     def __init__(self, backend=None):
+        backend = backend or settings.SMS_BACKEND
+        if backend not in BACKENDS:
+            raise JMSException(
+                code='sms_provider_not_support',
+                detail=_('SMS provider not support: {}').format(backend)
+            )
         m = importlib.import_module(f'.{backend or settings.SMS_BACKEND}', __package__)
         self.client = m.client.new_from_settings()
 
