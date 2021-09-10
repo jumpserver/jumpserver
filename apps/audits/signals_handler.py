@@ -98,68 +98,68 @@ def create_operate_log(action, sender, resource):
 M2M_NEED_RECORD = {
     'OrganizationMember': (
         _('User and Organization'),
-        _('{User} *JOINED* {Organization}'),
-        _('{User} *LEFT* {Organization}')
+        _('{User} JOINED {Organization}'),
+        _('{User} LEFT {Organization}')
     ),
     User.groups.through._meta.object_name: (
         _('User and Group'),
-        _('{User} *JOINED* {UserGroup}'),
-        _('{User} *LEFT* {UserGroup}')
+        _('{User} JOINED {UserGroup}'),
+        _('{User} LEFT {UserGroup}')
     ),
     SystemUser.assets.through._meta.object_name: (
         _('Asset and SystemUser'),
-        _('{Asset} *ADD* {SystemUser}'),
-        _('{Asset} *REMOVE* {SystemUser}')
+        _('{Asset} ADD {SystemUser}'),
+        _('{Asset} REMOVE {SystemUser}')
     ),
     Asset.nodes.through._meta.object_name: (
         _('Node and Asset'),
-        _('{Node} *ADD* {Asset}'),
-        _('{Node} *REMOVE* {Asset}')
+        _('{Node} ADD {Asset}'),
+        _('{Node} REMOVE {Asset}')
     ),
     AssetPermission.users.through._meta.object_name: (
         _('User asset permissions'),
-        _('{AssetPermission} *ADD* {User}'),
-        _('{AssetPermission} *REMOVE* {User}'),
+        _('{AssetPermission} ADD {User}'),
+        _('{AssetPermission} REMOVE {User}'),
     ),
     AssetPermission.user_groups.through._meta.object_name: (
         _('User group asset permissions'),
-        _('{AssetPermission} *ADD* {UserGroup}'),
-        _('{AssetPermission} *REMOVE* {UserGroup}'),
+        _('{AssetPermission} ADD {UserGroup}'),
+        _('{AssetPermission} REMOVE {UserGroup}'),
     ),
     AssetPermission.assets.through._meta.object_name: (
         _('Asset permission'),
-        _('{AssetPermission} *ADD* {Asset}'),
-        _('{AssetPermission} *REMOVE* {Asset}'),
+        _('{AssetPermission} ADD {Asset}'),
+        _('{AssetPermission} REMOVE {Asset}'),
     ),
     AssetPermission.nodes.through._meta.object_name: (
         _('Node permission'),
-        _('{AssetPermission} *ADD* {Node}'),
-        _('{AssetPermission} *REMOVE* {Node}'),
+        _('{AssetPermission} ADD {Node}'),
+        _('{AssetPermission} REMOVE {Node}'),
     ),
     AssetPermission.system_users.through._meta.object_name: (
         _('Asset permission and SystemUser'),
-        _('{AssetPermission} *ADD* {SystemUser}'),
-        _('{AssetPermission} *REMOVE* {SystemUser}'),
+        _('{AssetPermission} ADD {SystemUser}'),
+        _('{AssetPermission} REMOVE {SystemUser}'),
     ),
     ApplicationPermission.users.through._meta.object_name: (
         _('User application permissions'),
-        _('{ApplicationPermission} *ADD* {User}'),
-        _('{ApplicationPermission} *REMOVE* {User}'),
+        _('{ApplicationPermission} ADD {User}'),
+        _('{ApplicationPermission} REMOVE {User}'),
     ),
     ApplicationPermission.user_groups.through._meta.object_name: (
         _('User group application permissions'),
-        _('{ApplicationPermission} *ADD* {UserGroup}'),
-        _('{ApplicationPermission} *REMOVE* {UserGroup}'),
+        _('{ApplicationPermission} ADD {UserGroup}'),
+        _('{ApplicationPermission} REMOVE {UserGroup}'),
     ),
     ApplicationPermission.applications.through._meta.object_name: (
         _('Application permission'),
-        _('{ApplicationPermission} *ADD* {Application}'),
-        _('{ApplicationPermission} *REMOVE* {Application}'),
+        _('{ApplicationPermission} ADD {Application}'),
+        _('{ApplicationPermission} REMOVE {Application}'),
     ),
     ApplicationPermission.system_users.through._meta.object_name: (
         _('Application permission and SystemUser'),
-        _('{ApplicationPermission} *ADD* {SystemUser}'),
-        _('{ApplicationPermission} *REMOVE* {SystemUser}'),
+        _('{ApplicationPermission} ADD {SystemUser}'),
+        _('{ApplicationPermission} REMOVE {SystemUser}'),
     ),
 }
 
