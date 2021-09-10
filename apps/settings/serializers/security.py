@@ -113,6 +113,6 @@ class SecuritySettingSerializer(SecurityPasswordRuleSerializer, SecurityAuthSeri
     )
     LOGIN_CONFIRM_ENABLE = serializers.BooleanField(
         required=False, label=_('Login Confirm'),
-        help_text=_("After opening, please go to the personal information setting approver")
+        help_text=_("Enabled, please go to the user detail add approver")
     )
 

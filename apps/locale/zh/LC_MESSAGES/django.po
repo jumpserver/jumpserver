@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-10 16:13+0800\n"
+"POT-Creation-Date: 2021-09-10 17:40+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -291,7 +291,7 @@ msgstr "类别"
 #: assets/models/user.py:206 perms/models/application_permission.py:23
 #: perms/serializers/application/user_permission.py:34
 #: terminal/models/storage.py:55 terminal/models/storage.py:116
-#: tickets/models/flow.py:50 tickets/models/ticket.py:48
+#: tickets/models/flow.py:51 tickets/models/ticket.py:48
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:27
 #: xpack/plugins/change_auth_plan/models/app.py:28
 #: xpack/plugins/change_auth_plan/models/app.py:148
@@ -1572,7 +1572,7 @@ msgstr ""
 "被临时 锁定 {block_time} 分钟）"
 
 #: authentication/errors.py:74
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid ""
 "The MFA type({mfa_type}) is not supportedYou can also try {times_try} times "
 "(The account will be temporarily locked for {block_time} minutes)"
@@ -1916,7 +1916,7 @@ msgstr "正在跳转到 {} 认证"
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: authentication/views/login.py:215
+#: authentication/views/login.py:217
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -1924,15 +1924,15 @@ msgstr ""
 "等待 <b>{}</b> 确认, 你也可以复制链接发给他/她 <br/>\n"
 "                  不要关闭本页面"
 
-#: authentication/views/login.py:220
+#: authentication/views/login.py:222
 msgid "No ticket found"
 msgstr "没有发现工单"
 
-#: authentication/views/login.py:252
+#: authentication/views/login.py:254
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: authentication/views/login.py:253
+#: authentication/views/login.py:255
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
@@ -2073,12 +2073,16 @@ msgid "Invalid SMS sign and template: {}"
 msgstr "无效的短信签名和模版: {}"
 
 #: common/message/backends/sms/__init__.py:43
-msgid "Alibaba"
+msgid "Alibaba cloud"
 msgstr "阿里云"
 
 #: common/message/backends/sms/__init__.py:44
-msgid "Tencent"
+msgid "Tencent cloud"
 msgstr "腾讯云"
+
+#: common/message/backends/sms/__init__.py:74
+msgid "SMS provider not support: {}"
+msgstr "不支持 SMS 服务商: {}"
 
 #: common/message/backends/sms/alibaba.py:56
 msgid "Signature does not match"
@@ -2766,25 +2770,24 @@ msgid "Enable SMS"
 msgstr "启用 SMS"
 
 #: settings/serializers/auth/sms.py:11
+msgid "SMS provider"
+msgstr "SMS 服务商"
+
+#: settings/serializers/auth/sms.py:15 settings/serializers/email.py:69
+msgid "Signature"
+msgstr "署名"
+
+#: settings/serializers/auth/sms.py:16
+msgid "Template"
+msgstr "模版"
+
+#: settings/serializers/auth/sms.py:20
 msgid "Test phone"
 msgstr "测试手机号"
 
-#: settings/serializers/auth/sms.py:25 settings/serializers/auth/sms.py:43
+#: settings/serializers/auth/sms.py:37 settings/serializers/auth/sms.py:46
 msgid "Signatures and Templates"
 msgstr "签名和模版"
-
-#: settings/serializers/auth/sms.py:25 settings/serializers/auth/sms.py:43
-msgid ""
-"\n"
-"        Filling in JSON Data: \n"
-"        {\n"
-"            \"verification_code\": {\n"
-"                \"sign_name\": \"<Your signature name>\", \n"
-"                \"template_code\": \"<Your template code>\"\n"
-"            }\n"
-"        }\n"
-"        "
-msgstr ""
 
 #: settings/serializers/auth/sso.py:12
 msgid "Enable SSO auth"
@@ -2945,10 +2948,6 @@ msgstr "邮件的内容"
 #: settings/serializers/email.py:66
 msgid "Tips:When creating a user, send the content of the email"
 msgstr "提示: 创建用户时，发送设置密码邮件的内容"
-
-#: settings/serializers/email.py:69
-msgid "Signature"
-msgstr "署名"
 
 #: settings/serializers/email.py:70
 msgid "Tips: Email signature (eg:jumpserver)"
@@ -3156,8 +3155,8 @@ msgid "Login Confirm"
 msgstr "登录复核"
 
 #: settings/serializers/security.py:116
-msgid "After opening, please go to the personal information setting approver"
-msgstr "开启后, 请前往个人信息设置审批人"
+msgid "Enabled, please go to the user detail add approver"
+msgstr "启用后, 请在用户详情中添加审批人"
 
 #: settings/serializers/sms.py:7
 msgid "Label"
@@ -4016,11 +4015,11 @@ msgstr "命令存储"
 msgid "Replay storage"
 msgstr "录像存储"
 
-#: terminal/notifications.py:69
+#: terminal/notifications.py:68
 msgid "Danger command alert"
 msgstr "危险命令告警"
 
-#: terminal/notifications.py:82
+#: terminal/notifications.py:81
 #, python-format
 msgid ""
 "\n"
@@ -4050,11 +4049,11 @@ msgstr ""
 "        <br>\n"
 "        "
 
-#: terminal/notifications.py:117
+#: terminal/notifications.py:116
 msgid "Batch danger command alert"
 msgstr "批量危险命令告警"
 
-#: terminal/notifications.py:128
+#: terminal/notifications.py:127
 #, python-format
 msgid ""
 "\n"
@@ -4374,28 +4373,28 @@ msgstr "用户显示名称"
 msgid "Body"
 msgstr "内容"
 
-#: tickets/models/flow.py:19 tickets/models/flow.py:55
+#: tickets/models/flow.py:20 tickets/models/flow.py:56
 #: tickets/models/ticket.py:25
 msgid "Approve level"
 msgstr "审批级别"
 
-#: tickets/models/flow.py:24 tickets/serializers/ticket/ticket.py:140
+#: tickets/models/flow.py:25 tickets/serializers/ticket/ticket.py:140
 msgid "Approve strategy"
 msgstr "审批策略"
 
-#: tickets/models/flow.py:29 tickets/serializers/ticket/ticket.py:141
+#: tickets/models/flow.py:30 tickets/serializers/ticket/ticket.py:141
 msgid "Assignees"
 msgstr "受理人"
 
-#: tickets/models/flow.py:33
+#: tickets/models/flow.py:34
 msgid "Assignees display"
 msgstr "受理人名称"
 
-#: tickets/models/flow.py:37
+#: tickets/models/flow.py:38
 msgid "Ticket flow approval rule"
 msgstr "工单批准信息"
 
-#: tickets/models/flow.py:60
+#: tickets/models/flow.py:61
 msgid "Ticket flow"
 msgstr "工单流程"
 
@@ -5583,7 +5582,7 @@ msgstr "重置密码成功，返回到登录页面"
 #: xpack/plugins/change_auth_plan/api/app.py:112
 #: xpack/plugins/change_auth_plan/api/asset.py:100
 msgid "The parameter 'action' must be [{}]"
-msgstr ""
+msgstr "参数 'action' 必须是 [{}]"
 
 #: xpack/plugins/change_auth_plan/meta.py:9
 #: xpack/plugins/change_auth_plan/models/asset.py:63
@@ -6161,3 +6160,9 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Alibaba"
+#~ msgstr "阿里云"
+
+#~ msgid "Tencent"
+#~ msgstr "腾讯云"
