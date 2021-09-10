@@ -17,7 +17,7 @@ class SignAndTmplPairSerializer(serializers.Serializer):
 
 
 class BaseSMSSettingSerializer(serializers.Serializer):
-    SMS_TEST_PHONE = serializers.CharField(max_length=256, required=False, label=_('Test phone'))
+    SMS_TEST_PHONE = serializers.CharField(max_length=256, required=False, allow_blank=True, label=_('Test phone'))
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
