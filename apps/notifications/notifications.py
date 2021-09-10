@@ -115,7 +115,7 @@ class Message(metaclass=MessageType):
         return self.common_msg
 
     def get_sms_msg(self) -> dict:
-        raise NotImplementedError
+        return self.common_msg
     # --------------------------------------------------------------
 
 
