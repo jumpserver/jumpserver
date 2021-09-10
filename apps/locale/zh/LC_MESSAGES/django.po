@@ -1568,16 +1568,16 @@ msgid ""
 "SMS verify code invalid,You can also try {times_try} times (The account will "
 "be temporarily locked for {block_time} minutes)"
 msgstr ""
-"短信验证码不正确，或者服务器端时间不对。 您还可以尝试 {times_try} 次（账号将"
-"被临时 锁定 {block_time} 分钟）"
+"短信验证码不正确。 您还可以尝试 {times_try} 次（账号将被临时 锁定 "
+"{block_time} 分钟）"
 
 #: authentication/errors.py:74
 #, python-brace-format
 msgid ""
-"The MFA type({mfa_type}) is not supportedYou can also try {times_try} times "
-"(The account will be temporarily locked for {block_time} minutes)"
+"The MFA type({mfa_type}) is not supported, You can also try {times_try} "
+"times (The account will be temporarily locked for {block_time} minutes)"
 msgstr ""
-"该 ({mfa_type}) MFA 类型不支持。 您还可以尝试 {times_try} 次（账号将被临时 锁"
+"该({mfa_type}) MFA 类型不支持， 您还可以尝试 {times_try} 次（账号将被临时 锁"
 "定 {block_time} 分钟）"
 
 #: authentication/errors.py:79
@@ -1776,11 +1776,12 @@ msgstr "CAS"
 msgid "FeiShu"
 msgstr "飞书"
 
-#: authentication/templates/authentication/login_otp.html:25
+#: authentication/templates/authentication/login_otp.html:24
 msgid "Please enter the verification code"
 msgstr "请输入验证码"
 
-#: authentication/templates/authentication/login_otp.html:28
+#: authentication/templates/authentication/login_otp.html:25
+#: authentication/templates/authentication/login_otp.html:75
 msgid "Send verification code"
 msgstr "发送验证码"
 
@@ -1792,9 +1793,18 @@ msgstr "发送验证码"
 msgid "Next"
 msgstr "下一步"
 
-#: authentication/templates/authentication/login_otp.html:32
+#: authentication/templates/authentication/login_otp.html:31
 msgid "Can't provide security? Please contact the administrator!"
 msgstr "如果不能提供多因子认证验证码，请联系管理员!"
+
+#: authentication/templates/authentication/login_otp.html:68
+#: authentication/templates/authentication/login_otp.html:73
+msgid "Wait: "
+msgstr "等待："
+
+#: authentication/templates/authentication/login_otp.html:81
+msgid "The verification code has been sent"
+msgstr "验证码已发送"
 
 #: authentication/templates/authentication/login_wait_confirm.html:41
 msgid "Refresh"
@@ -2082,7 +2092,7 @@ msgstr "腾讯云"
 
 #: common/message/backends/sms/__init__.py:74
 msgid "SMS provider not support: {}"
-msgstr "不支持 SMS 服务商: {}"
+msgstr "短信服务商不支持：{}"
 
 #: common/message/backends/sms/alibaba.py:56
 msgid "Signature does not match"
@@ -2771,7 +2781,7 @@ msgstr "启用 SMS"
 
 #: settings/serializers/auth/sms.py:11
 msgid "SMS provider"
-msgstr "SMS 服务商"
+msgstr "短信服务商"
 
 #: settings/serializers/auth/sms.py:15 settings/serializers/email.py:69
 msgid "Signature"
@@ -2779,7 +2789,7 @@ msgstr "署名"
 
 #: settings/serializers/auth/sms.py:16
 msgid "Template"
-msgstr "模版"
+msgstr "模板"
 
 #: settings/serializers/auth/sms.py:20
 msgid "Test phone"
@@ -6160,6 +6170,9 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Obtaining verification code"
+#~ msgstr "发送验证码"
 
 #~ msgid "Alibaba"
 #~ msgstr "阿里云"

@@ -19,19 +19,25 @@
             {% endfor %}
             </select>
         </div>
-        <div class="form-group">
-            <input type="text" class="form-control" name="code" placeholder="" required="" autofocus="autofocus">
-            <span class="help-block">
-                {% trans 'Please enter the verification code' %}
-            </span>
-        </div>
-        <button id='send-sms-verify-code' class="btn btn-primary full-width m-b" onclick="sendSMSVerifyCode()" style="display: none">{% trans 'Send verification code' %}</button>
-        <button type="submit" class="btn btn-primary block full-width m-b">{% trans 'Next' %}</button>
+        <div class="form-group" style="display: flex">
 
+            <input id="mfa-code" required type="text" class="form-control" name="code" placeholder="{% trans 'Please enter the verification code' %}" autofocus="autofocus">
+            <button id='send-sms-verify-code' type="button" class="btn btn-info full-width m-b" onclick="sendSMSVerifyCode()" style="width: 150px!important;">{% trans 'Send verification code' %}</button>
+
+        </div>
+
+        <button id='submit_button' type="submit" class="btn btn-primary block full-width m-b">{% trans 'Next' %}</button>
         <div>
             <small>{% trans "Can't provide security? Please contact the administrator!" %}</small>
         </div>
     </form>
+    <style type="text/css">
+    .disabledBtn {
+        background: #e6e4e4!important;
+        border-color: #d8d5d5!important;
+        color: #949191!important;
+    }
+    </style>
     <script>
 
     var methodSelect = document.getElementById('verify-method-select');
@@ -44,19 +50,35 @@
 
         if (type == "sms") {
             currentBtn.style.display = "block";
+            currentBtn.disabled = false;
         }
         else {
             currentBtn.style.display = "none";
+            currentBtn.disabled = true;
         }
     }
-
     function sendSMSVerifyCode(){
+        var currentBtn = document.getElementById('send-sms-verify-code');
+        var time = 60
         var url = "{% url 'api-auth:sms-verify-code-send' %}";
         requestApi({
             url: url,
             method: "POST",
             success: function (data) {
-                alert('验证码已发送');
+                currentBtn.innerHTML =  `{% trans 'Wait: ' %} ${time}`;
+                currentBtn.disabled = true
+                currentBtn.classList.add("disabledBtn" )
+                var TimeInterval = setInterval(()=>{
+                    --time
+                    currentBtn.innerHTML = `{% trans 'Wait: ' %} ${time}`;
+                    if(time === 0) {
+                        currentBtn.innerHTML = "{% trans 'Send verification code' %}"
+                        currentBtn.disabled = false
+                        currentBtn.classList.remove("disabledBtn")
+                        clearInterval(TimeInterval)
+                    }
+                },1000)
+                alert("{% trans 'The verification code has been sent' %}");
             },
             error: function (text, data) {
                 alert(data.detail)

@@ -71,7 +71,7 @@ sms_failed_msg = _(
     "(The account will be temporarily locked for {block_time} minutes)"
 )
 mfa_type_failed_msg = _(
-    "The MFA type({mfa_type}) is not supported"
+    "The MFA type({mfa_type}) is not supported, "
     "You can also try {times_try} times "
     "(The account will be temporarily locked for {block_time} minutes)"
 )
