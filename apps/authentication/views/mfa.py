@@ -32,7 +32,7 @@ class UserLoginOtpView(mixins.AuthMixin, FormView):
         except Exception as e:
             logger.error(e)
             import traceback
-            traceback.print_exception()
+            traceback.print_exception(e)
             return redirect_to_guard_view()
 
     def get_context_data(self, **kwargs):
