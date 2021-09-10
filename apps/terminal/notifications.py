@@ -33,8 +33,7 @@ class CommandAlertMixin:
         if isinstance(_input, str):
             _input = _input.replace('\r\n', ' ').replace('\r', ' ').replace('\n', ' ')
 
-        subject = self.message_type_label + ", %(user)s: $%(cmd)s" % {
-            'user': self.command['user'],
+        subject = self.message_type_label + "%(cmd)s" % {
             'cmd': _input
         }
         return subject
