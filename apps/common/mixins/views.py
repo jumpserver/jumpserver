@@ -3,11 +3,12 @@
 # coding: utf-8
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.utils import timezone
+from rest_framework.decorators import action
+from rest_framework import permissions
 
+from common.permissions import IsValidUser
 
 __all__ = ["DatetimeSearchMixin", "PermissionsMixin"]
-
-from rest_framework import permissions
 
 
 class DatetimeSearchMixin:
@@ -52,3 +53,10 @@ class PermissionsMixin(UserPassesTestMixin):
             if not permission_class().has_permission(self.request, self):
                 return False
         return True
+
+
+class SuggestionMixin:
+
+    @action(methods=['get'], detail=False, permission_classes=(IsValidUser,))
+    def suggestion(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
