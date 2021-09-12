@@ -149,7 +149,7 @@ class TicketFlowApproveSerializer(serializers.ModelSerializer):
         fields = fields_small + fields_m2m
         read_only_fields = ['level', 'assignees_display']
         extra_kwargs = {
-            'assignees': {'write_only': True, 'allow_empty': True}
+            'assignees': {'write_only': True, 'allow_empty': True, 'required': False}
         }
 
     def get_assignees_read_only(self, obj):

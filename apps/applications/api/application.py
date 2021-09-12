@@ -6,14 +6,15 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from common.tree import TreeNodeSerializer
-from ..hands import IsOrgAdminOrAppUser, IsValidUser
+from common.mixins.views import SuggestionMixin
+from ..hands import IsOrgAdminOrAppUser
 from .. import serializers
 from ..models import Application
 
 __all__ = ['ApplicationViewSet']
 
 
-class ApplicationViewSet(OrgBulkModelViewSet):
+class ApplicationViewSet(SuggestionMixin, OrgBulkModelViewSet):
     model = Application
     filterset_fields = {
         'name': ['exact'],
@@ -24,7 +25,8 @@ class ApplicationViewSet(OrgBulkModelViewSet):
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_classes = {
         'default': serializers.AppSerializer,
-        'get_tree': TreeNodeSerializer
+        'get_tree': TreeNodeSerializer,
+        'suggestion': serializers.MiniAppSerializer
     }
 
     @action(methods=['GET'], detail=False, url_path='tree')
@@ -33,10 +35,4 @@ class ApplicationViewSet(OrgBulkModelViewSet):
         queryset = self.filter_queryset(self.get_queryset())
         tree_nodes = Application.create_tree_nodes(queryset, show_count=show_count)
         serializer = self.get_serializer(tree_nodes, many=True)
-        return Response(serializer.data)
-
-    @action(methods=['get'], detail=False, permission_classes=(IsValidUser,))
-    def suggestion(self, request):
-        queryset = self.filter_queryset(self.get_queryset())[:3]
-        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
