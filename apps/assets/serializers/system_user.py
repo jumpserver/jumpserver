@@ -10,7 +10,7 @@ from .utils import validate_password_contains_left_double_curly_bracket
 from .base import AuthSerializerMixin
 
 __all__ = [
-    'SystemUserSerializer',
+    'SystemUserSerializer', 'MiniSystemUserSerializer',
     'SystemUserSimpleSerializer', 'SystemUserAssetRelationSerializer',
     'SystemUserNodeRelationSerializer', 'SystemUserTaskSerializer',
     'SystemUserUserRelationSerializer', 'SystemUserWithAuthInfoSerializer',
@@ -185,6 +185,12 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         return queryset
 
 
+class MiniSystemUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SystemUser
+        fields = SystemUserSerializer.Meta.fields_mini
+
+
 class SystemUserWithAuthInfoSerializer(SystemUserSerializer):
     class Meta(SystemUserSerializer.Meta):
         fields_mini = ['id', 'name', 'username']
@@ -208,6 +214,7 @@ class SystemUserSimpleSerializer(serializers.ModelSerializer):
     """
     系统用户最基本信息的数据结构
     """
+
     class Meta:
         model = SystemUser
         fields = ('id', 'name', 'username')
