@@ -249,12 +249,14 @@ class Config(dict):
 
         'ALIBABA_ACCESS_KEY_ID': '',
         'ALIBABA_ACCESS_KEY_SECRET': '',
-        'ALIBABA_SMS_SIGN_AND_TEMPLATES': {},
+        'ALIBABA_VERIFY_SIGN_NAME': '',
+        'ALIBABA_VERIFY_TEMPLATE_CODE': '',
 
         'TENCENT_SECRET_ID': '',
         'TENCENT_SECRET_KEY': '',
         'TENCENT_SDKAPPID': '',
-        'TENCENT_SMS_SIGN_AND_TEMPLATES': {},
+        'TENCENT_VERIFY_SIGN_NAME': '',
+        'TENCENT_VERIFY_TEMPLATE_CODE': '',
 
         'OTP_VALID_WINDOW': 2,
         'OTP_ISSUER_NAME': 'JumpServer',
