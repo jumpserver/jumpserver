@@ -57,11 +57,12 @@ class PermissionsMixin(UserPassesTestMixin):
 
 
 class SuggestionMixin:
+    suggestion_mini_count = 10
 
     @action(methods=['get'], detail=False, permission_classes=(IsValidUser,))
     def suggestions(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        queryset = queryset[:10]
+        queryset = queryset[:self.suggestion_mini_count]
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)

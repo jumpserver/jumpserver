@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-10 19:00+0800\n"
+"POT-Creation-Date: 2021-09-13 17:05+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -119,7 +119,7 @@ msgstr "系统用户"
 #: acls/models/login_asset_acl.py:22
 #: applications/serializers/attrs/application_category/remote_app.py:37
 #: assets/models/asset.py:357 assets/models/authbook.py:15
-#: assets/models/gathered_user.py:14 assets/serializers/system_user.py:201
+#: assets/models/gathered_user.py:14 assets/serializers/system_user.py:207
 #: audits/models.py:38 perms/models/asset_permission.py:99
 #: templates/index.html:82 terminal/backends/command/models.py:19
 #: terminal/backends/command/serializers.py:13 terminal/models/session.py:40
@@ -278,7 +278,7 @@ msgid "Applications"
 msgstr "应用管理"
 
 #: applications/models/application.py:168
-#: applications/serializers/application.py:82 assets/models/label.py:21
+#: applications/serializers/application.py:88 assets/models/label.py:21
 #: perms/models/application_permission.py:20
 #: perms/serializers/application/user_permission.py:33
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:20
@@ -287,7 +287,7 @@ msgid "Category"
 msgstr "类别"
 
 #: applications/models/application.py:171
-#: applications/serializers/application.py:84 assets/models/cmd_filter.py:53
+#: applications/serializers/application.py:90 assets/models/cmd_filter.py:53
 #: assets/models/user.py:206 perms/models/application_permission.py:23
 #: perms/serializers/application/user_permission.py:34
 #: terminal/models/storage.py:55 terminal/models/storage.py:116
@@ -308,14 +308,14 @@ msgid "Attrs"
 msgstr ""
 
 #: applications/serializers/application.py:59
-#: applications/serializers/application.py:83 assets/serializers/label.py:13
+#: applications/serializers/application.py:89 assets/serializers/label.py:13
 #: perms/serializers/application/permission.py:16
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:24
 msgid "Category display"
 msgstr "类别名称"
 
 #: applications/serializers/application.py:60
-#: applications/serializers/application.py:85
+#: applications/serializers/application.py:91
 #: assets/serializers/system_user.py:26 audits/serializers.py:29
 #: perms/serializers/application/permission.py:17
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:31
@@ -324,7 +324,7 @@ msgstr "类别名称"
 msgid "Type display"
 msgstr "类型名称"
 
-#: applications/serializers/application.py:101
+#: applications/serializers/application.py:107
 msgid "Application display"
 msgstr "应用名称"
 
@@ -735,7 +735,7 @@ msgstr "全称"
 msgid "Parent key"
 msgstr "ssh私钥"
 
-#: assets/models/node.py:559 assets/serializers/system_user.py:200
+#: assets/models/node.py:559 assets/serializers/system_user.py:206
 #: users/templates/users/user_asset_permission.html:41
 #: users/templates/users/user_asset_permission.html:73
 #: users/templates/users/user_asset_permission.html:158
@@ -834,7 +834,7 @@ msgstr "节点名称"
 msgid "Hardware info"
 msgstr "硬件信息"
 
-#: assets/serializers/asset.py:98 assets/serializers/system_user.py:218
+#: assets/serializers/asset.py:98 assets/serializers/system_user.py:225
 #: orgs/mixins/serializers.py:26
 msgid "Org name"
 msgstr "用户名"
@@ -883,7 +883,7 @@ msgstr "密钥指纹"
 msgid "Nodes amount"
 msgstr "节点数量"
 
-#: assets/serializers/system_user.py:53 assets/serializers/system_user.py:202
+#: assets/serializers/system_user.py:53 assets/serializers/system_user.py:208
 msgid "Login mode display"
 msgstr "认证方式名称"
 
@@ -911,11 +911,11 @@ msgstr "路径应该以 / 开头"
 msgid "Password or private key required"
 msgstr "密码或密钥密码需要一个"
 
-#: assets/serializers/system_user.py:217
+#: assets/serializers/system_user.py:224
 msgid "System user name"
 msgstr "系统用户名称"
 
-#: assets/serializers/system_user.py:227
+#: assets/serializers/system_user.py:234
 msgid "Asset hostname"
 msgstr "资产主机名"
 
@@ -1954,7 +1954,7 @@ msgstr "退出登录成功，返回到登录页面"
 msgid "One-time password"
 msgstr "一次性密码"
 
-#: authentication/views/mfa.py:50 notifications/backends/__init__.py:15
+#: authentication/views/mfa.py:50
 msgid "SMS"
 msgstr "短信"
 
@@ -2575,15 +2575,11 @@ msgstr "企业微信 认证"
 msgid "SSO Auth"
 msgstr "SSO Token 认证"
 
-#: settings/serializers/auth/base.py:18 settings/serializers/basic.py:15
+#: settings/serializers/auth/base.py:19 settings/serializers/basic.py:15
 msgid "Forgot password url"
 msgstr "忘记密码 URL"
 
-#: settings/serializers/auth/base.py:21
-msgid "Health check token"
-msgstr "健康检查 Token"
-
-#: settings/serializers/auth/base.py:24
+#: settings/serializers/auth/base.py:25
 msgid "Enable login redirect msg"
 msgstr "启用登录跳转提示"
 
@@ -2994,9 +2990,13 @@ msgstr "启用周期任务"
 
 #: settings/serializers/other.py:21
 msgid "Ansible windows default shell"
-msgstr "Ansible windows shell"
+msgstr "Shell（Windows 资产）"
 
-#: settings/serializers/other.py:25
+#: settings/serializers/other.py:22
+msgid "The shell type used when Windows assets perform ansible tasks"
+msgstr "windows 资产执行 Ansible 任务时，使用的 Shell 类型。"
+
+#: settings/serializers/other.py:26
 msgid "Perm single to ungroup node"
 msgstr "直接授权资产放在未分组节点"
 
@@ -6158,3 +6158,6 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Health check token"
+#~ msgstr "健康检查 Token"
