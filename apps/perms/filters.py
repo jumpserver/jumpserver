@@ -21,8 +21,8 @@ class PermissionBaseFilter(BaseFilterSet):
 
     class Meta:
         fields = (
-            'user_id', 'username', 'system_user_id', 'system_user', 'user_group_id',
-            'user_group', 'name', 'all', 'is_valid',
+            'user_id', 'username', 'system_user_id', 'system_user',
+            'user_group_id', 'user_group', 'name', 'all', 'is_valid',
         )
 
     @property
@@ -118,7 +118,7 @@ class AssetPermissionFilter(PermissionBaseFilter):
         fields = (
             'user_id', 'username', 'system_user_id', 'system_user', 'user_group_id',
             'user_group', 'node_id', 'node', 'asset_id', 'hostname', 'ip', 'name',
-            'all', 'asset_id', 'is_valid', 'is_effective',
+            'all', 'asset_id', 'is_valid', 'is_effective', 'from_ticket'
         )
 
     @property

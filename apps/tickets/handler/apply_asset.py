@@ -32,8 +32,8 @@ class Handler(BaseHandler):
 
     # body
     def _construct_meta_body_of_open(self):
-        apply_assets = self.ticket.meta.get('apply_assets', [])
-        apply_system_users = self.ticket.meta.get('apply_system_users', [])
+        apply_assets = self.ticket.meta.get('apply_assets_display', [])
+        apply_system_users = self.ticket.meta.get('apply_system_users_display', [])
         apply_actions_display = self.ticket.meta.get('apply_actions_display', [])
         apply_date_start = self.ticket.meta.get('apply_date_start')
         apply_date_expired = self.ticket.meta.get('apply_date_expired')
