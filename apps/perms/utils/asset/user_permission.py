@@ -549,7 +549,7 @@ class UserGrantedNodesQueryUtils(UserGrantedUtilsBase):
             return self.get_top_level_nodes()
 
         nodes = PermNode.objects.none()
-        if key == PermNode.FAVORITE_NODE_KEY:
+        if key in [PermNode.FAVORITE_NODE_KEY, PermNode.UNGROUPED_NODE_KEY]:
             return nodes
 
         node = PermNode.objects.get(key=key)
