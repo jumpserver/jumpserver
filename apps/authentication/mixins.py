@@ -415,11 +415,11 @@ class AuthMixin(PasswordEncryptionViewMixin):
             return
         elif ticket.state_reject:
             raise errors.LoginConfirmOtherError(
-                ticket.id, ticket.get_action_display()
+                ticket.id, ticket.get_state_display()
             )
         elif ticket.state_close:
             raise errors.LoginConfirmOtherError(
-                ticket.id, ticket.get_action_display()
+                ticket.id, ticket.get_state_display()
             )
         else:
             raise errors.LoginConfirmOtherError(
