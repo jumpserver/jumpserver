@@ -9,6 +9,7 @@ from notifications.notifications import SystemMessage
 from terminal.models import Session, Command
 from notifications.models import SystemMsgSubscription
 from notifications.backends import BACKEND
+from common.utils import lazyproperty
 
 logger = get_logger(__name__)
 
@@ -23,12 +24,8 @@ class CommandAlertMixin:
     _get_message: Callable
     message_type_label: str
 
-    def get_dingtalk_msg(self) -> str:
-        msg = self._get_message()
-        msg = msg.replace('<br>', '')
-        return msg
-
-    def get_subject(self):
+    @lazyproperty
+    def subject(self):
         _input = self.command['input']
         if isinstance(_input, str):
             _input = _input.replace('\r\n', ' ').replace('\r', ' ').replace('\n', ' ')
@@ -70,7 +67,35 @@ class CommandAlertMessage(CommandAlertMixin, SystemMessage):
     def __init__(self, command):
         self.command = command
 
-    def _get_message(self):
+    def get_text_msg(self) -> dict:
+        command = self.command
+        session = Session.objects.get(id=command['session'])
+        session_detail_url = reverse(
+            'api-terminal:session-detail', kwargs={'pk': command['session']},
+            external=True, api_to_ui=True
+        )
+
+        message = _("""
+Command: %(command)s
+Asset: %(hostname)s (%(host_ip)s)
+User: %(user)s
+Level: %(risk_level)s
+Session: %(session_detail_url)s?oid=%(oid)s
+        """) % {
+            'command': command['input'],
+            'hostname': command['asset'],
+            'host_ip': session.asset_obj.ip,
+            'user': command['user'],
+            'risk_level': Command.get_risk_level_str(command['risk_level']),
+            'session_detail_url': session_detail_url,
+            'oid': session.org_id
+        }
+        return {
+            'subject': self.subject,
+            'message': message
+        }
+
+    def get_html_msg(self) -> dict:
         command = self.command
         session = Session.objects.get(id=command['session'])
         session_detail_url = reverse(
@@ -98,15 +123,9 @@ class CommandAlertMessage(CommandAlertMixin, SystemMessage):
             'session_detail_url': session_detail_url,
             'oid': session.org_id
         }
-        return message
-
-    def get_common_msg(self):
-        msg = self._get_message()
-        subject = self.get_subject()
-
         return {
-            'subject': subject,
-            'message': msg
+            'subject': self.subject,
+            'message': message
         }
 
 
@@ -118,7 +137,7 @@ class CommandExecutionAlert(CommandAlertMixin, SystemMessage):
     def __init__(self, command):
         self.command = command
 
-    def _get_message(self):
+    def get_html_msg(self) -> dict:
         command = self.command
         _input = command['input']
         _input = _input.replace('\n', '<br>')
@@ -141,13 +160,31 @@ class CommandExecutionAlert(CommandAlertMixin, SystemMessage):
             'user': command['user'],
             'risk_level': Command.get_risk_level_str(command['risk_level'])
         }
-        return message
-
-    def get_common_msg(self):
-        subject = self.get_subject()
-        message = self._get_message()
-
         return {
-            'subject': subject,
+            'subject': self.subject,
+            'message': message
+        }
+
+    def get_text_msg(self) -> dict:
+        command = self.command
+        _input = command['input']
+
+        assets = ', '.join([str(asset) for asset in command['assets']])
+        message = _("""
+Assets: %(assets)s
+User: %(user)s
+Level: %(risk_level)s
+
+Commands 👇 ------------
+%(command)s
+------------------------
+                            """) % {
+            'command': _input,
+            'assets': assets,
+            'user': command['user'],
+            'risk_level': Command.get_risk_level_str(command['risk_level'])
+        }
+        return {
+            'subject': self.subject,
             'message': message
         }
