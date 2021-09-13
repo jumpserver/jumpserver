@@ -6,7 +6,6 @@ from rest_framework.exceptions import APIException
 from rest_framework import status
 from django.utils.translation import gettext_lazy as _
 
-from common.message.backends.sms import SMS_MESSAGE
 from common.message.backends.sms.tencent import TencentSMS
 from settings.models import Setting
 from common.permissions import IsSuperUser
@@ -25,7 +24,8 @@ class TencentSMSTestingAPI(GenericAPIView):
 
         tencent_secret_id = serializer.validated_data['TENCENT_SECRET_ID']
         tencent_secret_key = serializer.validated_data.get('TENCENT_SECRET_KEY')
-        tencent_sms_sign_and_tmpl = serializer.validated_data['TENCENT_SMS_SIGN_AND_TEMPLATES']
+        tencent_verify_sign_name = serializer.validated_data['TENCENT_VERIFY_SIGN_NAME']
+        tencent_verify_template_code = serializer.validated_data['TENCENT_VERIFY_TEMPLATE_CODE']
         tencent_sdkappid = serializer.validated_data.get('TENCENT_SDKAPPID')
 
         test_phone = serializer.validated_data.get('SMS_TEST_PHONE')
@@ -46,12 +46,11 @@ class TencentSMSTestingAPI(GenericAPIView):
                 secret_key=tencent_secret_key,
                 sdkappid=tencent_sdkappid
             )
-            sign, tmpl = SMS_MESSAGE.VERIFICATION_CODE.get_sign_and_tmpl(tencent_sms_sign_and_tmpl)
 
             client.send_sms(
                 phone_numbers=[test_phone],
-                sign_name=sign,
-                template_code=tmpl,
+                sign_name=tencent_verify_sign_name,
+                template_code=tencent_verify_template_code,
                 template_param=OrderedDict(code='test')
             )
             return Response(status=status.HTTP_200_OK, data={'msg': _('Test success')})

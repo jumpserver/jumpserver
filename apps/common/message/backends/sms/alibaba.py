@@ -15,7 +15,7 @@ logger = get_logger(__file__)
 
 
 class AlibabaSMS(BaseSMSClient):
-    SIGN_AND_TMPL_SETTING_FIELD = 'ALIBABA_SMS_SIGN_AND_TEMPLATES'
+    SIGN_AND_TMPL_SETTING_FIELD_PREFIX = 'ALIBABA'
 
     @classmethod
     def new_from_settings(cls):
