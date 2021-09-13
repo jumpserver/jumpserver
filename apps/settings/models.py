@@ -86,20 +86,48 @@ class Setting(models.Model):
             setattr(settings, self.name, self.cleaned_value)
 
     @classmethod
-    def refresh_AUTH_LDAP(cls):
-        setting = cls.objects.filter(name='AUTH_LDAP').first()
+    def refresh_authentications(cls, name):
+        setting = cls.objects.filter(name=name).first()
         if not setting:
             return
-        ldap_backend = settings.AUTH_BACKEND_LDAP
-        backends = settings.AUTHENTICATION_BACKENDS
-        has = ldap_backend in backends
-        if setting.cleaned_value and not has:
-            settings.AUTHENTICATION_BACKENDS.insert(0, ldap_backend)
 
-        if not setting.cleaned_value and has:
-            index = backends.index(ldap_backend)
-            backends.pop(index)
-        settings.AUTH_LDAP = setting.cleaned_value
+        backends_map = {
+            'AUTH_LDAP': [settings.AUTH_BACKEND_LDAP],
+            'AUTH_OPENID': [settings.AUTH_BACKEND_OIDC_CODE, settings.AUTH_BACKEND_OIDC_PASSWORD],
+            'AUTH_RADIUS': [settings.AUTH_BACKEND_RADIUS],
+            'AUTH_CAS': [settings.AUTH_BACKEND_CAS],
+        }
+        setting_backends = backends_map[name]
+        auth_backends = settings.AUTHENTICATION_BACKENDS
+
+        for backend in setting_backends:
+            has = backend in auth_backends
+
+            # 添加
+            if setting.cleaned_value and not has:
+                logger.debug('Add auth backend: ', name)
+                settings.AUTHENTICATION_BACKENDS.insert(0, backend)
+
+            # 去掉
+            if not setting.cleaned_value and has:
+                index = auth_backends.index(backend)
+                logger.debug('Pop auth backend: ', name)
+                auth_backends.pop(index)
+
+        # 设置内存值
+        setattr(settings, name, setting.cleaned_value)
+
+    @classmethod
+    def refresh_AUTH_LDAP(cls):
+        cls.refresh_authentications('AUTH_LDAP')
+
+    @classmethod
+    def refresh_AUTH_OPENID(cls):
+        cls.refresh_authentications('AUTH_OPENID')
+
+    @classmethod
+    def refresh_AUTH_RADIUS(cls):
+        cls.refresh_authentications('AUTH_RADIUS')
 
     @classmethod
     def update_or_create(cls, name='', value='', encrypted=False, category=''):
