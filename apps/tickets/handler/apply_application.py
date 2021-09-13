@@ -37,8 +37,8 @@ class Handler(BaseHandler):
     def _construct_meta_body_of_open(self):
         apply_category_display = self.ticket.meta.get('apply_category_display')
         apply_type_display = self.ticket.meta.get('apply_type_display')
-        apply_applications = self.ticket.meta.get('apply_applications', [])
-        apply_system_users = self.ticket.meta.get('apply_system_users', [])
+        apply_applications = self.ticket.meta.get('apply_applications_display', [])
+        apply_system_users = self.ticket.meta.get('apply_system_users_display', [])
         apply_date_start = self.ticket.meta.get('apply_date_start')
         apply_date_expired = self.ticket.meta.get('apply_date_expired')
         applied_body = '''{}: {},
