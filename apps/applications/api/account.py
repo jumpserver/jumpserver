@@ -12,7 +12,7 @@ from .. import serializers
 
 
 class AccountFilterSet(BaseFilterSet):
-    username = filters.CharFilter(field_name='username')
+    username = filters.CharFilter(method='do_nothing')
     type = filters.CharFilter(field_name='type', lookup_expr='exact')
     category = filters.CharFilter(field_name='category', lookup_expr='exact')
     app_display = filters.CharFilter(field_name='app_display', lookup_expr='exact')

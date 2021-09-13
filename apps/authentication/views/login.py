@@ -66,10 +66,12 @@ class UserLoginView(mixins.AuthMixin, FormView):
             return None
 
         login_redirect = settings.LOGIN_REDIRECT_TO_BACKEND.lower()
-        if login_redirect == ['CAS', 'cas'] and cas_auth_url:
+        if login_redirect in ['cas'] and cas_auth_url:
             auth_url = cas_auth_url
-        else:
+        elif login_redirect in ['openid', 'oidc'] and openid_auth_url:
             auth_url = openid_auth_url
+        else:
+            auth_url = openid_auth_url or cas_auth_url
 
         if settings.LOGIN_REDIRECT_TO_BACKEND or not settings.LOGIN_REDIRECT_MSG_ENABLED:
             redirect_url = auth_url
@@ -212,8 +214,10 @@ class UserLoginWaitConfirmView(TemplateView):
         if ticket:
             timestamp_created = datetime.datetime.timestamp(ticket.date_created)
             ticket_detail_url = TICKET_DETAIL_URL.format(id=ticket_id)
+            assignees = ticket.current_node.first().ticket_assignees.all()
+            assignees_display = ', '.join([str(i.assignee) for i in assignees])
             msg = _("""Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>
-                  Don't close this page""").format(ticket.assignees_display)
+                  Don't close this page""").format(assignees_display)
         else:
             timestamp_created = 0
             ticket_detail_url = ''

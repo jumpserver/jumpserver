@@ -27,7 +27,8 @@ class ApplicationPermission(BasePermission):
         verbose_name=_("Application")
     )
     system_users = models.ManyToManyField(
-        'assets.SystemUser', related_name='granted_by_application_permissions',
+        'assets.SystemUser',
+        related_name='granted_by_application_permissions', blank=True,
         verbose_name=_("System user")
     )
 

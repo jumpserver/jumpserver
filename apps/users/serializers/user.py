@@ -169,6 +169,16 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
             self.context['request'], self.context['view'], obj
         )
 
+    def update(self, instance, validated_data):
+        request = self.context.get('request')
+        if request:
+            user = request.user
+            if user.id == instance.id:
+                # 用户自己不能禁用启用自己
+                validated_data.pop('is_active', None)
+
+        return super(UserSerializer, self).update(instance, validated_data)
+
 
 class UserRetrieveSerializer(UserSerializer):
     login_confirm_settings = serializers.PrimaryKeyRelatedField(read_only=True,

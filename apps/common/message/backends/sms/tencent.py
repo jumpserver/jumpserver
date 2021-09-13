@@ -20,7 +20,7 @@ class TencentSMS(BaseSMSClient):
     """
     https://cloud.tencent.com/document/product/382/43196#.E5.8F.91.E9.80.81.E7.9F.AD.E4.BF.A1
     """
-    SIGN_AND_TMPL_SETTING_FIELD = 'TENCENT_SMS_SIGN_AND_TEMPLATES'
+    SIGN_AND_TMPL_SETTING_FIELD_PREFIX = 'TENCENT'
 
     @classmethod
     def new_from_settings(cls):

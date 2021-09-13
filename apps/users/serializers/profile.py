@@ -101,7 +101,7 @@ class UserProfileSerializer(UserSerializer):
     )
     mfa_level = serializers.ChoiceField(choices=MFA_LEVEL_CHOICES, label=_('MFA'), required=False)
     guide_url = serializers.SerializerMethodField()
-    receive_backends = serializers.ListField(child=serializers.CharField())
+    receive_backends = serializers.ListField(child=serializers.CharField(), read_only=True)
 
     class Meta(UserSerializer.Meta):
         fields = UserSerializer.Meta.fields + [

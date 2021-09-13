@@ -52,10 +52,13 @@ class VerifyCodeUtil:
         ttl = self.ttl()
         if ttl > 0:
             raise CodeSendTooFrequently(ttl)
-
-        self.generate()
-        self.save()
-        self.send()
+        try:
+            self.generate()
+            self.save()
+            self.send()
+        except JMSException:
+            self.clear()
+            raise
 
     def generate(self):
         code = ''.join(random.sample('0123456789', 4))

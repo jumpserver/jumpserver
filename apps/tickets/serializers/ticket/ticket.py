@@ -149,13 +149,19 @@ class TicketFlowApproveSerializer(serializers.ModelSerializer):
         fields = fields_small + fields_m2m
         read_only_fields = ['level', 'assignees_display']
         extra_kwargs = {
-            'assignees': {'write_only': True, 'allow_empty': True}
+            'assignees': {'write_only': True, 'allow_empty': True, 'required': False}
         }
 
     def get_assignees_read_only(self, obj):
         if obj.strategy == TicketApprovalStrategy.custom_user:
             return obj.assignees.values_list('id', flat=True)
         return []
+
+    def validate(self, attrs):
+        if attrs['strategy'] == TicketApprovalStrategy.custom_user and not attrs.get('assignees'):
+            error = _('Please select the Assignees')
+            raise serializers.ValidationError(error)
+        return super().validate(attrs)
 
 
 class TicketFlowSerializer(OrgResourceModelSerializerMixin):

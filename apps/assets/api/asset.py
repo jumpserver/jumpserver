@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 #
 from assets.api import FilterAssetByNodeMixin
-from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import RetrieveAPIView
-from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 
 from common.utils import get_logger, get_object_or_none
-from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, IsSuperUser, IsValidUser
+from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, IsSuperUser
+from common.mixins.views import SuggestionMixin
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
 from ..models import Asset, Node, Platform
@@ -27,7 +26,7 @@ __all__ = [
 ]
 
 
-class AssetViewSet(FilterAssetByNodeMixin, OrgBulkModelViewSet):
+class AssetViewSet(SuggestionMixin, FilterAssetByNodeMixin, OrgBulkModelViewSet):
     """
     API endpoint that allows Asset to be viewed or edited.
     """
@@ -63,12 +62,6 @@ class AssetViewSet(FilterAssetByNodeMixin, OrgBulkModelViewSet):
     def perform_create(self, serializer):
         assets = serializer.save()
         self.set_assets_node(assets)
-
-    @action(methods=['get'], detail=False, permission_classes=(IsValidUser,))
-    def suggestion(self, request):
-        queryset = self.filter_queryset(self.get_queryset())[:3]
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
 
 
 class AssetPlatformRetrieveApi(RetrieveAPIView):

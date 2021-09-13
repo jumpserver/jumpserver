@@ -17,8 +17,9 @@ from terminal.models import Session
 from terminal.utils import ComponentsPrometheusMetricsUtil
 from orgs.utils import current_org
 from common.permissions import IsOrgAdmin, IsOrgAuditor
-from common.utils import lazyproperty
+from common.utils import lazyproperty, get_request_ip
 from orgs.caches import OrgResourceStatisticsCache
+
 
 __all__ = ['IndexApi']
 
@@ -297,19 +298,33 @@ class IndexApi(DatesLoginMetricMixin, APIView):
 
 
 class HealthApiMixin(APIView):
-    def is_token_right(self):
-        token = self.request.query_params.get('token')
-        ok_token = settings.HEALTH_CHECK_TOKEN
-        if ok_token and token != ok_token:
-            return False
-        return True
+    pass
 
-    def check_permissions(self, request):
-        if not self.is_token_right():
-            msg = 'Health check token error, ' \
-                  'Please set query param in url and same with setting HEALTH_CHECK_TOKEN. ' \
-                  'eg: $PATH/?token=$HEALTH_CHECK_TOKEN'
-            self.permission_denied(request, message={'error': msg}, code=403)
+    # 先去掉 Health Api 的权限校验，方便各组件直接调用
+
+    # def is_token_right(self):
+    #     token = self.request.query_params.get('token')
+    #     ok_token = settings.HEALTH_CHECK_TOKEN
+    #     if ok_token and token != ok_token:
+    #         return False
+    #     return True
+
+    # def is_localhost(self):
+    #     ip = get_request_ip(self.request)
+    #     return ip in ['localhost', '127.0.0.1']
+
+    # def check_permissions(self, request):
+    #      if self.is_token_right():
+    #          return
+    #      if self.is_localhost():
+    #          return
+    #      msg = '''
+    #      Health check token error,
+    #      Please set query param in url and
+    #      same with setting HEALTH_CHECK_TOKEN.
+    #      eg: $PATH/?token=$HEALTH_CHECK_TOKEN
+    #      '''
+    #      self.permission_denied(request, message={'error': msg}, code=403)
 
 
 class HealthCheckView(HealthApiMixin):

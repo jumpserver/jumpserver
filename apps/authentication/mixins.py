@@ -346,6 +346,10 @@ class AuthMixin(PasswordEncryptionViewMixin):
     def check_user_mfa_if_need(self, user):
         if self.request.session.get('auth_mfa'):
             return
+
+        if settings.OTP_IN_RADIUS:
+            return
+
         if not user.mfa_enabled:
             return
         unset, url = user.mfa_enabled_but_not_set()
@@ -411,11 +415,11 @@ class AuthMixin(PasswordEncryptionViewMixin):
             return
         elif ticket.state_reject:
             raise errors.LoginConfirmOtherError(
-                ticket.id, ticket.get_action_display()
+                ticket.id, ticket.get_state_display()
             )
         elif ticket.state_close:
             raise errors.LoginConfirmOtherError(
-                ticket.id, ticket.get_action_display()
+                ticket.id, ticket.get_state_display()
             )
         else:
             raise errors.LoginConfirmOtherError(

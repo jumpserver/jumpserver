@@ -111,5 +111,8 @@ class SecuritySettingSerializer(SecurityPasswordRuleSerializer, SecurityAuthSeri
         required=True, label=_('Session share'),
         help_text=_("Enabled, Allows user active session to be shared with other users")
     )
-
+    LOGIN_CONFIRM_ENABLE = serializers.BooleanField(
+        required=False, label=_('Login Confirm'),
+        help_text=_("Enabled, please go to the user detail add approver")
+    )
 
