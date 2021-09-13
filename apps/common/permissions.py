@@ -33,6 +33,8 @@ class IsSuperUser(IsValidUser):
 
 class IsSuperUserOrAppUser(IsSuperUser):
     def has_permission(self, request, view):
+        if request.user.is_anonymous:
+            return False
         return super(IsSuperUserOrAppUser, self).has_permission(request, view) \
             or request.user.is_app
 
@@ -66,6 +68,8 @@ class IsOrgAdminOrAppUser(IsValidUser):
 
     def has_permission(self, request, view):
         if not current_org:
+            return False
+        if request.user.is_anonymous:
             return False
         return super(IsOrgAdminOrAppUser, self).has_permission(request, view) \
             and (current_org.can_admin_by(request.user) or request.user.is_app)

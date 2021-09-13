@@ -6,38 +6,7 @@ from common.utils import reverse, get_request_ip_or_data, get_request_user_agent
 from notifications.notifications import UserMessage
 
 
-class BaseUserMessage(UserMessage):
-    def get_text_msg(self) -> dict:
-        raise NotImplementedError
-
-    def get_html_msg(self) -> dict:
-        raise NotImplementedError
-
-    @lazyproperty
-    def text_msg(self) -> dict:
-        return self.get_text_msg()
-
-    @lazyproperty
-    def html_msg(self) -> dict:
-        return self.get_html_msg()
-
-    def get_dingtalk_msg(self) -> dict:
-        return self.text_msg
-
-    def get_wecom_msg(self) -> dict:
-        return self.text_msg
-
-    def get_feishu_msg(self) -> dict:
-        return self.text_msg
-
-    def get_email_msg(self) -> dict:
-        return self.html_msg
-
-    def get_site_msg_msg(self) -> dict:
-        return self.html_msg
-
-
-class ResetPasswordMsg(BaseUserMessage):
+class ResetPasswordMsg(UserMessage):
     def get_text_msg(self) -> dict:
         user = self.user
         subject = _('Reset password')
@@ -104,7 +73,7 @@ Login direct 👇
         }
 
 
-class ResetPasswordSuccessMsg(BaseUserMessage):
+class ResetPasswordSuccessMsg(UserMessage):
     def __init__(self, user, request):
         super().__init__(user)
         self.ip_address = get_request_ip_or_data(request)
@@ -187,7 +156,7 @@ Browser: %(browser)s
         }
 
 
-class PasswordExpirationReminderMsg(BaseUserMessage):
+class PasswordExpirationReminderMsg(UserMessage):
     def get_text_msg(self) -> dict:
         user = self.user
 
@@ -263,7 +232,7 @@ Login direct 👇
         }
 
 
-class UserExpirationReminderMsg(BaseUserMessage):
+class UserExpirationReminderMsg(UserMessage):
     def get_text_msg(self) -> dict:
         subject = _('Expiration notice')
         message = _("""
@@ -303,7 +272,7 @@ In order not to affect your normal work, please contact the administrator for co
         }
 
 
-class ResetSSHKeyMsg(BaseUserMessage):
+class ResetSSHKeyMsg(UserMessage):
     def get_text_msg(self) -> dict:
         subject = _('SSH Key Reset')
         message = _("""
@@ -347,7 +316,7 @@ Login direct 👇
         }
 
 
-class ResetMFAMsg(BaseUserMessage):
+class ResetMFAMsg(UserMessage):
     def get_text_msg(self) -> dict:
         subject = _('MFA Reset')
         message = _("""

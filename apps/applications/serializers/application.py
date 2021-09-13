@@ -15,7 +15,7 @@ from .. import models
 from .. import const
 
 __all__ = [
-    'AppSerializer', 'AppSerializerMixin',
+    'AppSerializer', 'MiniAppSerializer', 'AppSerializerMixin',
     'AppAccountSerializer', 'AppAccountSecretSerializer'
 ]
 
@@ -76,6 +76,12 @@ class AppSerializer(AppSerializerMixin, BulkOrgResourceModelSerializer):
         _attrs = self.instance.attrs if self.instance else {}
         _attrs.update(attrs)
         return _attrs
+
+
+class MiniAppSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Application
+        fields = AppSerializer.Meta.fields_mini
 
 
 class AppAccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):

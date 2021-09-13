@@ -77,7 +77,7 @@ class CommandConfirmAPI(CreateAPIView):
             'check_confirm_status': {'method': 'GET', 'url': confirm_status_url},
             'close_confirm': {'method': 'DELETE', 'url': confirm_status_url},
             'ticket_detail_url': ticket_detail_url,
-            'reviewers': [str(user) for user in ticket.assignees.all()]
+            'reviewers': [str(user) for user in ticket.current_node.first().ticket_assignees.all()]
         }
 
     @lazyproperty

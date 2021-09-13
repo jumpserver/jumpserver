@@ -12,7 +12,7 @@ class BACKEND(models.TextChoices):
     DINGTALK = 'dingtalk', _('DingTalk')
     SITE_MSG = 'site_msg', _('Site message')
     FEISHU = 'feishu', _('FeiShu')
-    SMS = 'sms', _('SMS')
+    # SMS = 'sms', _('SMS')
 
     @property
     def client(self):

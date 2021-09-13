@@ -21,6 +21,7 @@ class OtherSettingSerializer(serializers.Serializer):
             ('powershell', _("PowerShell"))
         ],
         label=_('Ansible windows default shell'),
+        help_text=_('The shell type used when Windows assets perform ansible tasks')
     )
 
     PERM_SINGLE_ASSET_TO_UNGROUP_NODE = serializers.BooleanField(

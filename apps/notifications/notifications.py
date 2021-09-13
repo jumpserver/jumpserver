@@ -1,9 +1,12 @@
 from typing import Iterable
 import traceback
 from itertools import chain
+import time
 
 from celery import shared_task
+from django.utils.translation import gettext_lazy as _
 
+from common.utils.timezone import now
 from common.utils import lazyproperty
 from users.models import User
 from notifications.backends import BACKEND
@@ -97,29 +100,50 @@ class Message(metaclass=MessageType):
     def get_common_msg(self) -> dict:
         raise NotImplementedError
 
+    def get_text_msg(self) -> dict:
+        return self.common_msg
+
+    def get_html_msg(self) -> dict:
+        return self.common_msg
+
     @lazyproperty
     def common_msg(self) -> dict:
         return self.get_common_msg()
 
+    @lazyproperty
+    def text_msg(self) -> dict:
+        return self.get_text_msg()
+
+    @lazyproperty
+    def html_msg(self) -> dict:
+        return self.get_html_msg()
+
     # --------------------------------------------------------------
     # 支持不同发送消息的方式定义自己的消息内容，比如有些支持 html 标签
     def get_dingtalk_msg(self) -> dict:
-        return self.common_msg
+        # 钉钉相同的消息一天只能发一次，所以给所有消息添加基于时间的序号，使他们不相同
+        message = self.text_msg['message']
+        suffix = _('\nTime: {}').format(now())
+
+        return {
+            'subject': self.text_msg['subject'],
+            'message': message + suffix
+        }
 
     def get_wecom_msg(self) -> dict:
-        return self.common_msg
+        return self.text_msg
 
     def get_feishu_msg(self) -> dict:
-        return self.common_msg
+        return self.text_msg
 
     def get_email_msg(self) -> dict:
-        return self.common_msg
+        return self.html_msg
 
     def get_site_msg_msg(self) -> dict:
-        return self.common_msg
+        return self.html_msg
 
     def get_sms_msg(self) -> dict:
-        return self.common_msg
+        return self.text_msg
     # --------------------------------------------------------------
 
 
