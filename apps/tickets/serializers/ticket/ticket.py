@@ -157,6 +157,12 @@ class TicketFlowApproveSerializer(serializers.ModelSerializer):
             return obj.assignees.values_list('id', flat=True)
         return []
 
+    def validate(self, attrs):
+        if attrs['strategy'] == TicketApprovalStrategy.custom_user and not attrs.get('assignees'):
+            error = _('Please select the Assignees')
+            raise serializers.ValidationError(error)
+        return super().validate(attrs)
+
 
 class TicketFlowSerializer(OrgResourceModelSerializerMixin):
     type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type display'))

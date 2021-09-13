@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-13 17:05+0800\n"
+"POT-Creation-Date: 2021-09-13 19:21+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -320,7 +320,7 @@ msgstr "类别名称"
 #: perms/serializers/application/permission.py:17
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:31
 #: tickets/serializers/ticket/ticket.py:22
-#: tickets/serializers/ticket/ticket.py:162
+#: tickets/serializers/ticket/ticket.py:168
 msgid "Type display"
 msgstr "类型名称"
 
@@ -375,7 +375,7 @@ msgstr "目标URL"
 #: applications/serializers/attrs/application_type/custom.py:25
 #: applications/serializers/attrs/application_type/mysql_workbench.py:34
 #: applications/serializers/attrs/application_type/vmware_client.py:30
-#: assets/models/base.py:177 audits/signals_handler.py:63
+#: assets/models/base.py:177 audits/signals_handler.py:65
 #: authentication/forms.py:22
 #: authentication/templates/authentication/login.html:164
 #: settings/serializers/auth/ldap.py:44 users/forms/profile.py:21
@@ -1222,209 +1222,209 @@ msgstr "运行用户名称"
 msgid "User display"
 msgstr "用户名称"
 
-#: audits/signals_handler.py:62
+#: audits/signals_handler.py:64
 msgid "SSH Key"
 msgstr "SSH 密钥"
 
-#: audits/signals_handler.py:64
+#: audits/signals_handler.py:66
 msgid "SSO"
 msgstr ""
 
-#: audits/signals_handler.py:65
+#: audits/signals_handler.py:67
 msgid "Auth Token"
 msgstr "认证令牌"
 
-#: audits/signals_handler.py:66
+#: audits/signals_handler.py:68
 #: authentication/templates/authentication/login.html:210
 #: notifications/backends/__init__.py:11
 msgid "WeCom"
 msgstr "企业微信"
 
-#: audits/signals_handler.py:67
+#: audits/signals_handler.py:69
 #: authentication/templates/authentication/login.html:215
 #: notifications/backends/__init__.py:12
 msgid "DingTalk"
 msgstr "钉钉"
 
-#: audits/signals_handler.py:100
+#: audits/signals_handler.py:102
 msgid "User and Organization"
 msgstr "用户与组织"
 
-#: audits/signals_handler.py:101
+#: audits/signals_handler.py:103
 #, python-brace-format
 msgid "{User} JOINED {Organization}"
 msgstr "{User} 加入 {Organization}"
 
-#: audits/signals_handler.py:102
+#: audits/signals_handler.py:104
 #, python-brace-format
 msgid "{User} LEFT {Organization}"
 msgstr "{User} 离开 {Organization}"
 
-#: audits/signals_handler.py:105
+#: audits/signals_handler.py:107
 msgid "User and Group"
 msgstr "用户与用户组"
 
-#: audits/signals_handler.py:106
+#: audits/signals_handler.py:108
 #, python-brace-format
 msgid "{User} JOINED {UserGroup}"
 msgstr "{User} 加入 {UserGroup}"
 
-#: audits/signals_handler.py:107
+#: audits/signals_handler.py:109
 #, python-brace-format
 msgid "{User} LEFT {UserGroup}"
 msgstr "{User} 离开 {UserGroup}"
 
-#: audits/signals_handler.py:110
+#: audits/signals_handler.py:112
 msgid "Asset and SystemUser"
 msgstr "资产与系统用户"
 
-#: audits/signals_handler.py:111
+#: audits/signals_handler.py:113
 #, python-brace-format
 msgid "{Asset} ADD {SystemUser}"
 msgstr "{Asset} 添加 {SystemUser}"
 
-#: audits/signals_handler.py:112
+#: audits/signals_handler.py:114
 #, python-brace-format
 msgid "{Asset} REMOVE {SystemUser}"
 msgstr "{Asset} 移除 {SystemUser}"
 
-#: audits/signals_handler.py:115
+#: audits/signals_handler.py:117
 msgid "Node and Asset"
 msgstr "节点与资产"
 
-#: audits/signals_handler.py:116
+#: audits/signals_handler.py:118
 #, python-brace-format
 msgid "{Node} ADD {Asset}"
 msgstr "{Node} 添加 {Asset}"
 
-#: audits/signals_handler.py:117
+#: audits/signals_handler.py:119
 #, python-brace-format
 msgid "{Node} REMOVE {Asset}"
 msgstr "{Node} 移除 {Asset}"
 
-#: audits/signals_handler.py:120
+#: audits/signals_handler.py:122
 msgid "User asset permissions"
 msgstr "用户资产授权"
 
-#: audits/signals_handler.py:121
+#: audits/signals_handler.py:123
 #, python-brace-format
 msgid "{AssetPermission} ADD {User}"
 msgstr "{AssetPermission} 添加 {User}"
 
-#: audits/signals_handler.py:122
+#: audits/signals_handler.py:124
 #, python-brace-format
 msgid "{AssetPermission} REMOVE {User}"
 msgstr "{AssetPermission} 移除 {User}"
 
-#: audits/signals_handler.py:125
+#: audits/signals_handler.py:127
 msgid "User group asset permissions"
 msgstr "用户组资产授权"
 
-#: audits/signals_handler.py:126
+#: audits/signals_handler.py:128
 #, python-brace-format
 msgid "{AssetPermission} ADD {UserGroup}"
 msgstr "{AssetPermission} 添加 {UserGroup}"
 
-#: audits/signals_handler.py:127
+#: audits/signals_handler.py:129
 #, python-brace-format
 msgid "{AssetPermission} REMOVE {UserGroup}"
 msgstr "{AssetPermission} 移除 {UserGroup}"
 
-#: audits/signals_handler.py:130 perms/models/asset_permission.py:106
+#: audits/signals_handler.py:132 perms/models/asset_permission.py:106
 #: templates/_nav.html:78 users/templates/users/_user_detail_nav_header.html:31
 msgid "Asset permission"
 msgstr "资产授权"
 
-#: audits/signals_handler.py:131
+#: audits/signals_handler.py:133
 #, python-brace-format
 msgid "{AssetPermission} ADD {Asset}"
 msgstr "{AssetPermission} 添加 {Asset}"
 
-#: audits/signals_handler.py:132
+#: audits/signals_handler.py:134
 #, python-brace-format
 msgid "{AssetPermission} REMOVE {Asset}"
 msgstr "{AssetPermission} 移除 {Asset}"
 
-#: audits/signals_handler.py:135
+#: audits/signals_handler.py:137
 msgid "Node permission"
 msgstr "节点授权"
 
-#: audits/signals_handler.py:136
+#: audits/signals_handler.py:138
 #, python-brace-format
 msgid "{AssetPermission} ADD {Node}"
 msgstr "{AssetPermission} 添加 {Node}"
 
-#: audits/signals_handler.py:137
+#: audits/signals_handler.py:139
 #, python-brace-format
 msgid "{AssetPermission} REMOVE {Node}"
 msgstr "{AssetPermission} 移除 {Node}"
 
-#: audits/signals_handler.py:140
+#: audits/signals_handler.py:142
 msgid "Asset permission and SystemUser"
 msgstr "资产授权与系统用户"
 
-#: audits/signals_handler.py:141
+#: audits/signals_handler.py:143
 #, python-brace-format
 msgid "{AssetPermission} ADD {SystemUser}"
 msgstr "{AssetPermission} 添加 {SystemUser}"
 
-#: audits/signals_handler.py:142
+#: audits/signals_handler.py:144
 #, python-brace-format
 msgid "{AssetPermission} REMOVE {SystemUser}"
 msgstr "{AssetPermission} 移除 {SystemUser}"
 
-#: audits/signals_handler.py:145
+#: audits/signals_handler.py:147
 msgid "User application permissions"
 msgstr "用户应用授权"
 
-#: audits/signals_handler.py:146
+#: audits/signals_handler.py:148
 #, python-brace-format
 msgid "{ApplicationPermission} ADD {User}"
 msgstr "{ApplicationPermission} 添加 {User}"
 
-#: audits/signals_handler.py:147
+#: audits/signals_handler.py:149
 #, python-brace-format
 msgid "{ApplicationPermission} REMOVE {User}"
 msgstr "{ApplicationPermission} 移除 {User}"
 
-#: audits/signals_handler.py:150
+#: audits/signals_handler.py:152
 msgid "User group application permissions"
 msgstr "用户组应用授权"
 
-#: audits/signals_handler.py:151
+#: audits/signals_handler.py:153
 #, python-brace-format
 msgid "{ApplicationPermission} ADD {UserGroup}"
 msgstr "{ApplicationPermission} 添加 {UserGroup}"
 
-#: audits/signals_handler.py:152
+#: audits/signals_handler.py:154
 #, python-brace-format
 msgid "{ApplicationPermission} REMOVE {UserGroup}"
 msgstr "{ApplicationPermission} 移除 {UserGroup}"
 
-#: audits/signals_handler.py:155 perms/models/application_permission.py:37
+#: audits/signals_handler.py:157 perms/models/application_permission.py:37
 msgid "Application permission"
 msgstr "应用管理"
 
-#: audits/signals_handler.py:156
+#: audits/signals_handler.py:158
 #, python-brace-format
 msgid "{ApplicationPermission} ADD {Application}"
 msgstr "{ApplicationPermission} 添加 {Application}"
 
-#: audits/signals_handler.py:157
+#: audits/signals_handler.py:159
 #, python-brace-format
 msgid "{ApplicationPermission} REMOVE {Application}"
 msgstr "{ApplicationPermission} 移除 {Application}"
 
-#: audits/signals_handler.py:160
+#: audits/signals_handler.py:162
 msgid "Application permission and SystemUser"
 msgstr "应用授权与系统用户"
 
-#: audits/signals_handler.py:161
+#: audits/signals_handler.py:163
 #, python-brace-format
 msgid "{ApplicationPermission} ADD {SystemUser}"
 msgstr "{ApplicationPermission} 添加 {SystemUser}"
 
-#: audits/signals_handler.py:162
+#: audits/signals_handler.py:164
 #, python-brace-format
 msgid "{ApplicationPermission} REMOVE {SystemUser}"
 msgstr "{ApplicationPermission} 移除 {SystemUser}"
@@ -2173,6 +2173,14 @@ msgstr "邮件"
 #: notifications/backends/__init__.py:13
 msgid "Site message"
 msgstr "站内信"
+
+#: notifications/notifications.py:126
+#, fuzzy
+#| msgid "Time"
+msgid ""
+"\n"
+"Time: {}"
+msgstr "时间"
 
 #: ops/api/celery.py:61 ops/api/celery.py:76
 msgid "Waiting task start"
@@ -3520,7 +3528,7 @@ msgstr "数据库应用"
 msgid "Perms"
 msgstr "权限管理"
 
-#: templates/_nav.html:97 terminal/notifications.py:18
+#: templates/_nav.html:97 terminal/notifications.py:19
 msgid "Sessions"
 msgstr "会话管理"
 
@@ -4029,11 +4037,49 @@ msgstr "命令存储"
 msgid "Replay storage"
 msgstr "录像存储"
 
-#: terminal/notifications.py:68
+#: terminal/notifications.py:65
 msgid "Danger command alert"
 msgstr "危险命令告警"
 
-#: terminal/notifications.py:81
+#: terminal/notifications.py:78
+#, fuzzy, python-format
+#| msgid ""
+#| "\n"
+#| "            Command: %(command)s\n"
+#| "            <br>\n"
+#| "            Asset: %(hostname)s (%(host_ip)s)\n"
+#| "            <br>\n"
+#| "            User: %(user)s\n"
+#| "            <br>\n"
+#| "            Level: %(risk_level)s\n"
+#| "            <br>\n"
+#| "            Session: <a href=\"%(session_detail_url)s?oid=%(oid)s"
+#| "\">session detail</a>\n"
+#| "            <br>\n"
+#| "        "
+msgid ""
+"\n"
+"Command: %(command)s\n"
+"Asset: %(hostname)s (%(host_ip)s)\n"
+"User: %(user)s\n"
+"Level: %(risk_level)s\n"
+"Session: %(session_detail_url)s?oid=%(oid)s\n"
+"        "
+msgstr ""
+"\n"
+"        命令: %(command)s\n"
+"        <br>\n"
+"        资产: %(hostname)s (%(host_ip)s)\n"
+"        <br>\n"
+"        用户: %(user)s\n"
+"        <br>\n"
+"        等级: %(risk_level)s\n"
+"        <br>\n"
+"        会话: <a href=\"%(session_detail_url)s?oid=%(oid)s\">会话详情</a>\n"
+"        <br>\n"
+"        "
+
+#: terminal/notifications.py:106
 #, python-format
 msgid ""
 "\n"
@@ -4063,11 +4109,11 @@ msgstr ""
 "        <br>\n"
 "        "
 
-#: terminal/notifications.py:116
+#: terminal/notifications.py:135
 msgid "Batch danger command alert"
 msgstr "批量危险命令告警"
 
-#: terminal/notifications.py:127
+#: terminal/notifications.py:146
 #, python-format
 msgid ""
 "\n"
@@ -4098,6 +4144,20 @@ msgstr ""
 "        ----------------- 命令 ---------------- <br>\n"
 "<br>\n"
 "        "
+
+#: terminal/notifications.py:173
+#, python-format
+msgid ""
+"\n"
+"Assets: %(assets)s\n"
+"User: %(user)s\n"
+"Level: %(risk_level)s\n"
+"\n"
+"Commands 👇 ------------\n"
+"%(command)s\n"
+"------------------------\n"
+"                            "
+msgstr ""
 
 #: terminal/serializers/session.py:31
 msgid "User ID"
@@ -4444,6 +4504,18 @@ msgstr "流程"
 msgid "TicketFlow"
 msgstr "工单流程"
 
+#: tickets/notifications.py:44 tickets/notifications.py:56
+msgid "click here to review"
+msgstr "点击查看"
+
+#: tickets/notifications.py:74
+msgid "Your has a new ticket, applicant - {}"
+msgstr "你有一个新的工单, 申请人 - {}"
+
+#: tickets/notifications.py:87
+msgid "Your ticket has been processed, processor - {}"
+msgstr "你的工单已被处理, 处理人 - {}"
+
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:16
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:16
 msgid "Apply name"
@@ -4547,29 +4619,13 @@ msgstr "提交数据中的类型 (`{}`) 与请求URL地址中的类型 (`{}`) �
 msgid "The ticket flow `{}` does not exist"
 msgstr "工单流程 `{}` 不存在"
 
-#: tickets/serializers/ticket/ticket.py:182
+#: tickets/serializers/ticket/ticket.py:162
+msgid "Please select the Assignees"
+msgstr "请选择受理人"
+
+#: tickets/serializers/ticket/ticket.py:188
 msgid "The current organization type already exists"
 msgstr "当前组织已存在该类型"
-
-#: tickets/utils.py:37
-msgid "New Ticket - {} ({})"
-msgstr "新工单 - {} ({})"
-
-#: tickets/utils.py:39
-msgid "Your has a new ticket, applicant - {}"
-msgstr "你有一个新的工单, 申请人 - {}"
-
-#: tickets/utils.py:41 tickets/utils.py:60
-msgid "click here to review"
-msgstr "点击查看"
-
-#: tickets/utils.py:56
-msgid "Ticket has processed - {} ({})"
-msgstr "工单已处理 - {} ({})"
-
-#: tickets/utils.py:58
-msgid "Your ticket has been processed, processor - {}"
-msgstr "你的工单已被处理, 处理人 - {}"
 
 #: users/api/user.py:208
 msgid "Could not reset self otp, use profile reset instead"
@@ -4723,13 +4779,13 @@ msgstr "管理员"
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
-#: users/notifications.py:43 users/notifications.py:76
+#: users/notifications.py:12 users/notifications.py:45
 #: users/templates/users/reset_password.html:5
 #: users/templates/users/reset_password.html:6
 msgid "Reset password"
 msgstr "重置密码"
 
-#: users/notifications.py:44
+#: users/notifications.py:13
 #, python-format
 msgid ""
 "\n"
@@ -4769,7 +4825,7 @@ msgstr ""
 "%(login_url)s\n"
 "\n"
 
-#: users/notifications.py:77
+#: users/notifications.py:46
 #, python-format
 msgid ""
 "\n"
@@ -4813,12 +4869,12 @@ msgstr ""
 "    <br>\n"
 "    "
 
-#: users/notifications.py:116 users/notifications.py:150
+#: users/notifications.py:85 users/notifications.py:119
 #: users/views/profile/reset.py:127
 msgid "Reset password success"
 msgstr "重置密码成功"
 
-#: users/notifications.py:117
+#: users/notifications.py:86
 #, python-format
 msgid ""
 "\n"
@@ -4867,7 +4923,7 @@ msgstr ""
 "        \n"
 "        "
 
-#: users/notifications.py:151
+#: users/notifications.py:120
 #, python-format
 msgid ""
 "\n"
@@ -4930,11 +4986,11 @@ msgstr ""
 "    \n"
 "    "
 
-#: users/notifications.py:194 users/notifications.py:230
+#: users/notifications.py:163 users/notifications.py:199
 msgid "Security notice"
 msgstr "安全通知"
 
-#: users/notifications.py:195
+#: users/notifications.py:164
 #, python-format
 msgid ""
 "\n"
@@ -4978,7 +5034,7 @@ msgstr ""
 "\n"
 "        "
 
-#: users/notifications.py:231
+#: users/notifications.py:200
 #, python-format
 msgid ""
 "\n"
@@ -5027,11 +5083,11 @@ msgstr ""
 "    <br>\n"
 "    "
 
-#: users/notifications.py:268 users/notifications.py:287
+#: users/notifications.py:237 users/notifications.py:256
 msgid "Expiration notice"
 msgstr "过期通知"
 
-#: users/notifications.py:269
+#: users/notifications.py:238
 #, python-format
 msgid ""
 "\n"
@@ -5052,7 +5108,7 @@ msgstr ""
 "为了不影响您正常工作，请联系管理员确认。\n"
 "           "
 
-#: users/notifications.py:288
+#: users/notifications.py:257
 #, python-format
 msgid ""
 "\n"
@@ -5074,11 +5130,11 @@ msgstr ""
 "       <br>\n"
 "       "
 
-#: users/notifications.py:308 users/notifications.py:329
+#: users/notifications.py:277 users/notifications.py:298
 msgid "SSH Key Reset"
 msgstr "重置SSH密钥"
 
-#: users/notifications.py:309
+#: users/notifications.py:278
 #, python-format
 msgid ""
 "\n"
@@ -5103,7 +5159,7 @@ msgstr ""
 "\n"
 "        "
 
-#: users/notifications.py:330
+#: users/notifications.py:299
 #, python-format
 msgid ""
 "\n"
@@ -5128,11 +5184,11 @@ msgstr ""
 "    <br>\n"
 "    "
 
-#: users/notifications.py:352 users/notifications.py:372
+#: users/notifications.py:321 users/notifications.py:341
 msgid "MFA Reset"
 msgstr "重置 MFA"
 
-#: users/notifications.py:353
+#: users/notifications.py:322
 #, python-format
 msgid ""
 "\n"
@@ -5157,7 +5213,7 @@ msgstr ""
 "\n"
 "        "
 
-#: users/notifications.py:373
+#: users/notifications.py:342
 #, python-format
 msgid ""
 "\n"
@@ -6158,6 +6214,12 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "New Ticket - {} ({})"
+#~ msgstr "新工单 - {} ({})"
+
+#~ msgid "Ticket has processed - {} ({})"
+#~ msgstr "工单已处理 - {} ({})"
 
 #~ msgid "Health check token"
 #~ msgstr "健康检查 Token"
