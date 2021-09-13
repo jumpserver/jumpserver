@@ -37,7 +37,7 @@ MODELS_NEED_RECORD = (
     # users
     'User', 'UserGroup',
     # acls
-    'LoginACL', 'LoginAssetACL',
+    'LoginACL', 'LoginAssetACL', 'LoginConfirmSetting',
     # assets
     'Asset', 'Node', 'AdminUser', 'SystemUser', 'Domain', 'Gateway', 'CommandFilterRule',
     'CommandFilter', 'Platform', 'AuthBook',

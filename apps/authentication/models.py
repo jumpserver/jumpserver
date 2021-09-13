@@ -45,6 +45,9 @@ class LoginConfirmSetting(CommonModelMixin):
     reviewers = models.ManyToManyField('users.User', verbose_name=_("Reviewers"), related_name="review_login_confirm_settings", blank=True)
     is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
 
+    class Meta:
+        verbose_name = _('Login Confirm')
+
     @classmethod
     def get_user_confirm_setting(cls, user):
         return get_object_or_none(cls, user=user)
@@ -83,7 +86,8 @@ class LoginConfirmSetting(CommonModelMixin):
         return ticket
 
     def __str__(self):
-        return '{} confirm'.format(self.user.username)
+        reviewers = [u.username for u in self.reviewers.all()]
+        return _('{} need confirm by {}').format(self.user.username, reviewers)
 
 
 class SSOToken(models.JMSBaseModel):
