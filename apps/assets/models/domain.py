@@ -120,6 +120,7 @@ class Gateway(BaseUser):
         except(paramiko.AuthenticationException,
                paramiko.BadAuthenticationType,
                paramiko.SSHException,
+               paramiko.ChannelException,
                paramiko.ssh_exception.NoValidConnectionsError,
                socket.gaierror) as e:
             err = str(e)
@@ -128,6 +129,8 @@ class Gateway(BaseUser):
                 err = err.format(port=self.port, ip=self.ip)
             elif err == 'Authentication failed.':
                 err = _('Authentication failed')
+            elif err == 'Connect failed':
+                err = _('Connect failed')
             self.is_connective = False
             return False, err
 
