@@ -72,6 +72,11 @@ class UserPasswordApi(generics.RetrieveUpdateAPIView):
     def get_object(self):
         return self.request.user
 
+    def update(self, request, *args, **kwargs):
+        resp = super().update(request, *args, **kwargs)
+        ResetPasswordSuccessMsg(self.request.user, request).publish_async()
+        return resp
+
 
 class UserPublicKeyApi(generics.RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
