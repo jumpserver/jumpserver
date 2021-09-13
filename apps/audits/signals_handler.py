@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 #
-from django.db.models.signals import post_save, post_delete, m2m_changed
+from django.db.models.signals import (
+    post_save, post_delete, m2m_changed, pre_delete
+)
 from django.dispatch import receiver
 from django.conf import settings
 from django.db import transaction
@@ -226,7 +228,7 @@ def on_object_created_or_update(sender, instance=None, created=False, update_fie
     create_operate_log(action, sender, instance)
 
 
-@receiver(post_delete)
+@receiver(pre_delete)
 def on_object_delete(sender, instance=None, **kwargs):
     create_operate_log(models.OperateLog.ACTION_DELETE, sender, instance)
 
