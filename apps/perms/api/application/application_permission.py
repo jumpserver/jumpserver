@@ -16,6 +16,7 @@ class ApplicationPermissionViewSet(BasePermissionViewSet):
         'name': ['exact'],
         'category': ['exact'],
         'type': ['exact', 'in'],
+        'from_ticket': ['exact']
     }
     search_fields = ['name', 'category', 'type']
     custom_filter_fields = BasePermissionViewSet.custom_filter_fields + [
