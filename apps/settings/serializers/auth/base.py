@@ -15,7 +15,8 @@ class AuthSettingSerializer(serializers.Serializer):
     AUTH_WECOM = serializers.BooleanField(default=False, label=_('WeCom Auth'))
     AUTH_SSO = serializers.BooleanField(default=False, label=_("SSO Auth"))
     FORGOT_PASSWORD_URL = serializers.CharField(
-        required=False, max_length=1024, label=_("Forgot password url")
+        required=False, allow_blank=True, max_length=1024,
+        label=_("Forgot password url")
     )
     # HEALTH_CHECK_TOKEN = serializers.CharField(
     #     required=False, max_length=1024, label=_("Health check token")
