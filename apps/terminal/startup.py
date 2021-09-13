@@ -50,13 +50,21 @@ class BaseTerminal(object):
             time.sleep(self.interval)
 
     def get_or_register_terminal(self):
-        terminal = Terminal.objects.filter(name=self.name, type=self.type, is_deleted=False).first()
+        terminal = Terminal.objects.filter(
+            name=self.name, type=self.type, is_deleted=False
+        ).first()
         if not terminal:
             terminal = self.register_terminal()
+
+        terminal.remote_addr = self.remote_addr
+        terminal.save()
         return terminal
 
     def register_terminal(self):
-        data = {'name': self.name, 'type': self.type, 'remote_addr': self.remote_addr}
+        data = {
+            'name': self.name, 'type': self.type,
+            'remote_addr': self.remote_addr
+        }
         serializer = TerminalRegistrationSerializer(data=data)
         serializer.is_valid()
         terminal = serializer.save()
@@ -68,7 +76,8 @@ class CoreTerminal(BaseTerminal):
 
     def __init__(self):
         super().__init__(
-            suffix_name=TerminalTypeChoices.core.label, _type=TerminalTypeChoices.core.value
+            suffix_name=TerminalTypeChoices.core.label,
+            _type=TerminalTypeChoices.core.value
         )
 
 
@@ -76,5 +85,6 @@ class CoreTerminal(BaseTerminal):
 class CeleryTerminal(BaseTerminal):
     def __init__(self):
         super().__init__(
-            suffix_name=TerminalTypeChoices.celery.label, _type=TerminalTypeChoices.celery.value
+            suffix_name=TerminalTypeChoices.celery.label,
+            _type=TerminalTypeChoices.celery.value
         )
