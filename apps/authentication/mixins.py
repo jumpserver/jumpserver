@@ -346,6 +346,10 @@ class AuthMixin(PasswordEncryptionViewMixin):
     def check_user_mfa_if_need(self, user):
         if self.request.session.get('auth_mfa'):
             return
+
+        if settings.OTP_IN_RADIUS:
+            return
+
         if not user.mfa_enabled:
             return
         unset, url = user.mfa_enabled_but_not_set()
