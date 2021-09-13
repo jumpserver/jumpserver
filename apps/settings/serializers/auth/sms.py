@@ -8,12 +8,14 @@ __all__ = ['SMSSettingSerializer', 'AlibabaSMSSettingSerializer', 'TencentSMSSet
 
 class SMSSettingSerializer(serializers.Serializer):
     SMS_ENABLED = serializers.BooleanField(default=False, label=_('Enable SMS'))
-    SMS_BACKEND = serializers.ChoiceField(choices=BACKENDS.choices, default=BACKENDS.ALIBABA, label=_('SMS provider'))
+    SMS_BACKEND = serializers.ChoiceField(
+        choices=BACKENDS.choices, default=BACKENDS.ALIBABA, label=_('SMS provider')
+    )
 
 
-class SignAndTmplPairSerializer(serializers.Serializer):
-    sign_name = serializers.CharField(max_length=256, required=True, label=_('Signature'))
-    template_code = serializers.CharField(max_length=256, required=True, label=_('Template'))
+class SignTmplPairSerializer(serializers.Serializer):
+    SIGN_NAME = serializers.CharField(max_length=256, required=True, label=_('Signature'))
+    TEMPLATE_CODE = serializers.CharField(max_length=256, required=True, label=_('Template code'))
 
 
 class BaseSMSSettingSerializer(serializers.Serializer):
@@ -25,23 +27,18 @@ class BaseSMSSettingSerializer(serializers.Serializer):
         return data
 
 
-class SignAndTmplSerializer(serializers.Serializer):
-    verification_code = SignAndTmplPairSerializer(default={'sign_name': '', 'template_code': ''})
-
-
 class AlibabaSMSSettingSerializer(BaseSMSSettingSerializer):
     ALIBABA_ACCESS_KEY_ID = serializers.CharField(max_length=256, required=True, label='AccessKeyId')
     ALIBABA_ACCESS_KEY_SECRET = serializers.CharField(
-        max_length=256, required=False, label='AccessKeySecret', write_only=True)
-    ALIBABA_SMS_SIGN_AND_TEMPLATES = SignAndTmplSerializer(
-        label=_('Signatures and Templates'), required=True
+        max_length=256, required=False, label='AccessKeySecret', write_only=True
     )
+    ALIBABA_VERIFY_SIGN_NAME = serializers.CharField(max_length=256, required=True, label=_('Signature'))
+    ALIBABA_VERIFY_TEMPLATE_CODE = serializers.CharField(max_length=256, required=True, label=_('Template code'))
 
 
 class TencentSMSSettingSerializer(BaseSMSSettingSerializer):
     TENCENT_SECRET_ID = serializers.CharField(max_length=256, required=True, label='Secret id')
     TENCENT_SECRET_KEY = serializers.CharField(max_length=256, required=False, label='Secret key', write_only=True)
     TENCENT_SDKAPPID = serializers.CharField(max_length=256, required=True, label='SDK app id')
-    TENCENT_SMS_SIGN_AND_TEMPLATES = SignAndTmplSerializer(
-        label=_('Signatures and Templates'), required=True
-    )
+    TENCENT_VERIFY_SIGN_NAME = serializers.CharField(max_length=256, required=True, label=_('Signature'))
+    TENCENT_VERIFY_TEMPLATE_CODE = serializers.CharField(max_length=256, required=True, label=_('Template code'))

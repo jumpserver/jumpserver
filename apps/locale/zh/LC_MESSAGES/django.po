@@ -2789,7 +2789,7 @@ msgstr "短信服务商"
 
 #: settings/serializers/auth/sms.py:15 settings/serializers/email.py:69
 msgid "Signature"
-msgstr "署名"
+msgstr "签名"
 
 #: settings/serializers/auth/sms.py:16
 msgid "Template"

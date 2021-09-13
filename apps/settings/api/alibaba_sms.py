@@ -4,7 +4,6 @@ from rest_framework.exceptions import APIException
 from rest_framework import status
 from django.utils.translation import gettext_lazy as _
 
-from common.message.backends.sms import SMS_MESSAGE
 from common.message.backends.sms.alibaba import AlibabaSMS
 from settings.models import Setting
 from common.permissions import IsSuperUser
@@ -23,7 +22,8 @@ class AlibabaSMSTestingAPI(GenericAPIView):
 
         alibaba_access_key_id = serializer.validated_data['ALIBABA_ACCESS_KEY_ID']
         alibaba_access_key_secret = serializer.validated_data.get('ALIBABA_ACCESS_KEY_SECRET')
-        alibaba_sms_sign_and_tmpl = serializer.validated_data['ALIBABA_SMS_SIGN_AND_TEMPLATES']
+        alibaba_verify_sign_name = serializer.validated_data['ALIBABA_VERIFY_SIGN_NAME']
+        alibaba_verify_template_code = serializer.validated_data['ALIBABA_VERIFY_TEMPLATE_CODE']
         test_phone = serializer.validated_data.get('SMS_TEST_PHONE')
 
         if not test_phone:
@@ -41,12 +41,11 @@ class AlibabaSMSTestingAPI(GenericAPIView):
                 access_key_id=alibaba_access_key_id,
                 access_key_secret=alibaba_access_key_secret
             )
-            sign, tmpl = SMS_MESSAGE.VERIFICATION_CODE.get_sign_and_tmpl(alibaba_sms_sign_and_tmpl)
 
             client.send_sms(
                 phone_numbers=[test_phone],
-                sign_name=sign,
-                template_code=tmpl,
+                sign_name=alibaba_verify_sign_name,
+                template_code=alibaba_verify_template_code,
                 template_param={'code': 'test'}
             )
             return Response(status=status.HTTP_200_OK, data={'msg': _('Test success')})
