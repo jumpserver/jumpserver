@@ -105,13 +105,13 @@ class Setting(models.Model):
 
             # 添加
             if setting.cleaned_value and not has:
-                logger.debug('Add auth backend: ', name)
+                logger.debug('Add auth backend: {}'.format(name))
                 settings.AUTHENTICATION_BACKENDS.insert(0, backend)
 
             # 去掉
             if not setting.cleaned_value and has:
                 index = auth_backends.index(backend)
-                logger.debug('Pop auth backend: ', name)
+                logger.debug('Pop auth backend: {}'.format(name))
                 auth_backends.pop(index)
 
         # 设置内存值
