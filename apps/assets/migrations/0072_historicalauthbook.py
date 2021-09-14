@@ -18,7 +18,7 @@ def migrate_old_authbook_to_history(apps, schema_editor):
 
     print()
     while True:
-        authbooks = authbook_model.objects.using(db_alias).filter(is_latest=False)[:20]
+        authbooks = authbook_model.objects.using(db_alias).filter(is_latest=False)[:1000]
         if not authbooks:
             break
         historys = []
