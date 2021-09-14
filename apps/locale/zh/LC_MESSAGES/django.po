@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-14 20:16+0800\n"
+"POT-Creation-Date: 2021-09-15 15:22+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -2382,7 +2382,7 @@ msgstr "组织存在资源 ({}) 不能被删除"
 #: orgs/models.py:432 orgs/serializers.py:106
 #: tickets/serializers/ticket/ticket.py:77
 msgid "Organization"
-msgstr "组织审计员"
+msgstr "组织"
 
 #: orgs/models.py:17 users/const.py:12
 msgid "Organization administrator"
@@ -4499,15 +4499,15 @@ msgstr "流程"
 msgid "TicketFlow"
 msgstr "工单流程"
 
-#: tickets/notifications.py:44 tickets/notifications.py:56
+#: tickets/notifications.py:57
 msgid "click here to review"
 msgstr "点击查看"
 
-#: tickets/notifications.py:74
+#: tickets/notifications.py:75
 msgid "Your has a new ticket, applicant - {}"
 msgstr "你有一个新的工单, 申请人 - {}"
 
-#: tickets/notifications.py:87
+#: tickets/notifications.py:88
 msgid "Your ticket has been processed, processor - {}"
 msgstr "你的工单已被处理, 处理人 - {}"
 
@@ -4774,13 +4774,13 @@ msgstr "管理员"
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
-#: users/notifications.py:12 users/notifications.py:45
+#: users/notifications.py:17 users/notifications.py:50
 #: users/templates/users/reset_password.html:5
 #: users/templates/users/reset_password.html:6
 msgid "Reset password"
 msgstr "重置密码"
 
-#: users/notifications.py:13
+#: users/notifications.py:18
 #, python-format
 msgid ""
 "\n"
@@ -4820,7 +4820,7 @@ msgstr ""
 "%(login_url)s\n"
 "\n"
 
-#: users/notifications.py:46
+#: users/notifications.py:51
 #, python-format
 msgid ""
 "\n"
@@ -4864,12 +4864,13 @@ msgstr ""
 "    <br>\n"
 "    "
 
-#: users/notifications.py:85 users/notifications.py:117
+#: users/notifications.py:90 users/notifications.py:122
 #: users/views/profile/reset.py:127
 msgid "Reset password success"
 msgstr "重置密码成功"
 
-#: users/notifications.py:86
+#: users/notifications.py:91
+#, python-format
 msgid ""
 "\n"
 "        \n"
@@ -4914,7 +4915,7 @@ msgstr ""
 "        \n"
 "        "
 
-#: users/notifications.py:118
+#: users/notifications.py:123
 #, python-format
 msgid ""
 "\n"
@@ -4977,11 +4978,11 @@ msgstr ""
 "    \n"
 "    "
 
-#: users/notifications.py:161 users/notifications.py:197
+#: users/notifications.py:166 users/notifications.py:202
 msgid "Security notice"
 msgstr "安全通知"
 
-#: users/notifications.py:162
+#: users/notifications.py:167
 #, python-format
 msgid ""
 "\n"
@@ -5025,7 +5026,7 @@ msgstr ""
 "\n"
 "        "
 
-#: users/notifications.py:198
+#: users/notifications.py:203
 #, python-format
 msgid ""
 "\n"
@@ -5074,11 +5075,11 @@ msgstr ""
 "    <br>\n"
 "    "
 
-#: users/notifications.py:235 users/notifications.py:254
+#: users/notifications.py:240 users/notifications.py:259
 msgid "Expiration notice"
 msgstr "过期通知"
 
-#: users/notifications.py:236
+#: users/notifications.py:241
 #, python-format
 msgid ""
 "\n"
@@ -5099,7 +5100,7 @@ msgstr ""
 "为了不影响您正常工作，请联系管理员确认。\n"
 "           "
 
-#: users/notifications.py:255
+#: users/notifications.py:260
 #, python-format
 msgid ""
 "\n"
@@ -5121,11 +5122,11 @@ msgstr ""
 "       <br>\n"
 "       "
 
-#: users/notifications.py:275 users/notifications.py:296
+#: users/notifications.py:280 users/notifications.py:301
 msgid "SSH Key Reset"
 msgstr "重置SSH密钥"
 
-#: users/notifications.py:276
+#: users/notifications.py:281
 #, python-format
 msgid ""
 "\n"
@@ -5150,7 +5151,7 @@ msgstr ""
 "\n"
 "        "
 
-#: users/notifications.py:297
+#: users/notifications.py:302
 #, python-format
 msgid ""
 "\n"
@@ -5175,11 +5176,11 @@ msgstr ""
 "    <br>\n"
 "    "
 
-#: users/notifications.py:319 users/notifications.py:339
+#: users/notifications.py:324 users/notifications.py:344
 msgid "MFA Reset"
 msgstr "重置 MFA"
 
-#: users/notifications.py:320
+#: users/notifications.py:325
 #, python-format
 msgid ""
 "\n"
@@ -5204,7 +5205,7 @@ msgstr ""
 "\n"
 "        "
 
-#: users/notifications.py:340
+#: users/notifications.py:345
 #, python-format
 msgid ""
 "\n"
@@ -5278,6 +5279,10 @@ msgstr "是否可更新"
 #: users/serializers/user.py:30
 msgid "Can delete"
 msgstr "是否可删除"
+
+#: users/serializers/user.py:31
+msgid "Can public key authentication"
+msgstr "能否公钥认证"
 
 #: users/serializers/user.py:33 users/serializers/user.py:82
 msgid "Organization role name"

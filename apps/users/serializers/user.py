@@ -28,7 +28,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
     is_expired = serializers.BooleanField(read_only=True, label=_('Is expired'))
     can_update = serializers.SerializerMethodField(label=_('Can update'))
     can_delete = serializers.SerializerMethodField(label=_('Can delete'))
-    can_public_key_auth = serializers.ReadOnlyField(source='can_use_ssh_key_login')
+    can_public_key_auth = serializers.ReadOnlyField(source='can_use_ssh_key_login', label=_('Can public key authentication'))
     org_roles = serializers.ListField(
         label=_('Organization role name'), allow_null=True, required=False,
         child=serializers.ChoiceField(choices=ORG_ROLE.choices), default=["User"]
