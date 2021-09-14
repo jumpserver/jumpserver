@@ -9,13 +9,15 @@ logger = get_logger(__file__)
 
 
 def send_ticket_applied_mail_to_assignees(ticket):
-    assignees = ticket.current_node.first().ticket_assignees.all()
-    if not assignees:
-        logger.debug("Not found assignees, ticket: {}({}), assignees: {}".format(ticket, str(ticket.id), assignees))
+    ticket_assignees = ticket.current_node.first().ticket_assignees.all()
+    if not ticket_assignees:
+        logger.debug(
+            "Not found assignees, ticket: {}({}), assignees: {}".format(ticket, str(ticket.id), ticket_assignees)
+        )
         return
 
-    for assignee in assignees:
-        instance = TicketAppliedToAssignee(assignee, ticket)
+    for ticket_assignee in ticket_assignees:
+        instance = TicketAppliedToAssignee(ticket_assignee.assignee, ticket)
         if settings.DEBUG:
             logger.debug(instance)
         instance.publish_async()
