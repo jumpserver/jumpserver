@@ -18,8 +18,9 @@ class ServerPerformanceMessage(SystemMessage):
         self._msg = msg
 
     def get_common_msg(self):
+        subject = self._msg[:80]
         return {
-            'subject': self._msg[:80],
+            'subject': subject.replace('<br>', '; '),
             'message': self._msg
         }
 
