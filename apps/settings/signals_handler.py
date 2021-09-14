@@ -33,8 +33,10 @@ setting_pub_sub = SettingSubPub()
 @receiver(post_save, sender=Setting)
 @on_transaction_commit
 def refresh_settings_on_changed(sender, instance=None, **kwargs):
-    if instance:
-        setting_pub_sub.publish(instance.name)
+    if not instance:
+        return
+
+    setting_pub_sub.publish(instance.name)
 
     # 配置变化: PERM_SINGLE_ASSET_TO_UNGROUP_NODE
     if instance.name == 'PERM_SINGLE_ASSET_TO_UNGROUP_NODE':
