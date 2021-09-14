@@ -98,10 +98,8 @@ If you have any questions, you can contact the administrator.
 
 
 IP Address: %(ip_address)s
-<br>
-<br>
+\n
 Browser: %(browser)s
-<br>
         
         """) % {
             'name': user.name,

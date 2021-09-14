@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-13 20:32+0800\n"
+"POT-Creation-Date: 2021-09-14 20:16+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -264,7 +264,7 @@ msgid "System user"
 msgstr "系统用户"
 
 #: applications/models/account.py:12 assets/models/authbook.py:17
-#: settings/serializers/auth/cas.py:14
+#: settings/serializers/auth/cas.py:15
 msgid "Version"
 msgstr "版本"
 
@@ -1616,15 +1616,15 @@ msgstr "来源 IP 不被允许登录"
 msgid "SSO auth closed"
 msgstr "SSO 认证关闭了"
 
-#: authentication/errors.py:298 authentication/mixins.py:319
+#: authentication/errors.py:298 authentication/mixins.py:318
 msgid "Your password is too simple, please change it for security"
 msgstr "你的密码过于简单，为了安全，请修改"
 
-#: authentication/errors.py:307 authentication/mixins.py:326
+#: authentication/errors.py:307 authentication/mixins.py:325
 msgid "You should to change your password before login"
 msgstr "登录完成前，请先修改密码"
 
-#: authentication/errors.py:316 authentication/mixins.py:333
+#: authentication/errors.py:316 authentication/mixins.py:332
 msgid "Your password has expired, please reset before logging in"
 msgstr "您的密码已过期，先修改再登录"
 
@@ -1649,7 +1649,7 @@ msgstr "MFA 类型"
 msgid "MFA code"
 msgstr "多因子认证验证码"
 
-#: authentication/mixins.py:309
+#: authentication/mixins.py:308
 msgid "Please change your password"
 msgstr "请修改密码"
 
@@ -1930,19 +1930,19 @@ msgstr "请使用密码登录，然后绑定飞书"
 msgid "Binding FeiShu failed"
 msgstr "绑定飞书失败"
 
-#: authentication/views/login.py:78
+#: authentication/views/login.py:80
 msgid "Redirecting"
 msgstr "跳转中"
 
-#: authentication/views/login.py:79
+#: authentication/views/login.py:81
 msgid "Redirecting to {} authentication"
 msgstr "正在跳转到 {} 认证"
 
-#: authentication/views/login.py:105
+#: authentication/views/login.py:107
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: authentication/views/login.py:217
+#: authentication/views/login.py:219
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -1950,15 +1950,15 @@ msgstr ""
 "等待 <b>{}</b> 确认, 你也可以复制链接发给他/她 <br/>\n"
 "                  不要关闭本页面"
 
-#: authentication/views/login.py:222
+#: authentication/views/login.py:224
 msgid "No ticket found"
 msgstr "没有发现工单"
 
-#: authentication/views/login.py:254
+#: authentication/views/login.py:256
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: authentication/views/login.py:255
+#: authentication/views/login.py:257
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
@@ -2334,22 +2334,22 @@ msgstr "任务结束"
 msgid "Server performance"
 msgstr "监控告警"
 
-#: ops/notifications.py:39
+#: ops/notifications.py:40
 #, python-brace-format
 msgid "The terminal is offline: {name}"
 msgstr "终端已离线: {name}"
 
-#: ops/notifications.py:45
+#: ops/notifications.py:46
 #, python-brace-format
 msgid "[Disk] Disk used more than {max_threshold}%: => {value} ({name})"
 msgstr "[Disk] 硬盘使用率超过 {max_threshold}%: => {value} ({name})"
 
-#: ops/notifications.py:52
+#: ops/notifications.py:53
 #, python-brace-format
 msgid "[Memory] Memory used more than {max_threshold}%: => {value} ({name})"
 msgstr "[Memory] 内存使用率超过 {max_threshold}%: => {value} ({name})"
 
-#: ops/notifications.py:59
+#: ops/notifications.py:60
 #, python-brace-format
 msgid "[CPU] CPU load more than {max_threshold}: => {value} ({name})"
 msgstr "[CPU] CPU 使用率超过 {max_threshold}: => {value} ({name})"
@@ -2563,7 +2563,7 @@ msgstr "成功导入 {} 个用户 ( 组织: {} )"
 msgid "Welcome to the JumpServer open source Bastion Host"
 msgstr "欢迎使用JumpServer开源堡垒机"
 
-#: settings/models.py:123 users/templates/users/reset_password.html:29
+#: settings/models.py:155 users/templates/users/reset_password.html:29
 msgid "Setting"
 msgstr "设置"
 
@@ -2612,22 +2612,26 @@ msgid "Server url"
 msgstr "服务端地址"
 
 #: settings/serializers/auth/cas.py:13
+msgid "Proxy server url"
+msgstr "代理服务地址"
+
+#: settings/serializers/auth/cas.py:14
 msgid "Logout completely"
 msgstr "同步注销"
 
-#: settings/serializers/auth/cas.py:15
+#: settings/serializers/auth/cas.py:16
 msgid "Username attr"
 msgstr "用户名属性"
 
-#: settings/serializers/auth/cas.py:16
+#: settings/serializers/auth/cas.py:17
 msgid "Enable attributes map"
 msgstr "启用属性映射"
 
-#: settings/serializers/auth/cas.py:17
+#: settings/serializers/auth/cas.py:18
 msgid "Rename attr"
 msgstr "映射属性"
 
-#: settings/serializers/auth/cas.py:18
+#: settings/serializers/auth/cas.py:19
 msgid "Create user if not"
 msgstr "创建用户(如果不存在)"
 
@@ -3002,27 +3006,23 @@ msgstr "OTP 扫描后的名称"
 msgid "OTP valid window"
 msgstr "OTP 延迟有效次数"
 
-#: settings/serializers/other.py:17
-msgid "Enable period task"
-msgstr "启用周期任务"
-
-#: settings/serializers/other.py:20
+#: settings/serializers/other.py:19
 msgid "CMD"
 msgstr ""
 
-#: settings/serializers/other.py:21
+#: settings/serializers/other.py:20
 msgid "PowerShell"
 msgstr ""
 
-#: settings/serializers/other.py:23
+#: settings/serializers/other.py:22
 msgid "Shell (Windows)"
 msgstr "Shell（Windows 资产）"
 
-#: settings/serializers/other.py:24
+#: settings/serializers/other.py:23
 msgid "The shell type used when Windows assets perform ansible tasks"
 msgstr "windows 资产执行 Ansible 任务时，使用的 Shell 类型。"
 
-#: settings/serializers/other.py:28
+#: settings/serializers/other.py:27
 msgid "Perm single to ungroup node"
 msgstr "直接授权资产放在未分组节点"
 
@@ -4311,42 +4311,42 @@ msgstr "自定义用户"
 msgid "Ticket already closed"
 msgstr "工单已经关闭"
 
-#: tickets/handler/apply_application.py:51
+#: tickets/handler/apply_application.py:52
 msgid "Applied category"
 msgstr "申请的类别"
 
-#: tickets/handler/apply_application.py:52
+#: tickets/handler/apply_application.py:53
 msgid "Applied type"
 msgstr "申请的类型"
 
-#: tickets/handler/apply_application.py:53
+#: tickets/handler/apply_application.py:54
 msgid "Applied application group"
 msgstr "申请的应用组"
 
-#: tickets/handler/apply_application.py:54 tickets/handler/apply_asset.py:47
+#: tickets/handler/apply_application.py:55 tickets/handler/apply_asset.py:48
 msgid "Applied system user group"
 msgstr "申请的系统用户组"
 
-#: tickets/handler/apply_application.py:55 tickets/handler/apply_asset.py:49
+#: tickets/handler/apply_application.py:56 tickets/handler/apply_asset.py:50
 msgid "Applied date start"
 msgstr "申请的开始日期"
 
-#: tickets/handler/apply_application.py:56 tickets/handler/apply_asset.py:50
+#: tickets/handler/apply_application.py:57 tickets/handler/apply_asset.py:51
 msgid "Applied date expired"
 msgstr "申请的失效日期"
 
-#: tickets/handler/apply_application.py:78 tickets/handler/apply_asset.py:71
+#: tickets/handler/apply_application.py:79 tickets/handler/apply_asset.py:72
 msgid ""
 "Created by the ticket, ticket title: {}, ticket applicant: {}, ticket "
 "processor: {}, ticket ID: {}"
 msgstr ""
 "通过工单创建, 工单标题: {}, 工单申请人: {}, 工单处理人: {}, 工单 ID: {}"
 
-#: tickets/handler/apply_asset.py:46
+#: tickets/handler/apply_asset.py:47
 msgid "Applied hostname group"
 msgstr "申请的主机名组"
 
-#: tickets/handler/apply_asset.py:48
+#: tickets/handler/apply_asset.py:49
 msgid "Applied actions"
 msgstr "申请的动作"
 
@@ -4864,13 +4864,12 @@ msgstr ""
 "    <br>\n"
 "    "
 
-#: users/notifications.py:85 users/notifications.py:119
+#: users/notifications.py:85 users/notifications.py:117
 #: users/views/profile/reset.py:127
 msgid "Reset password success"
 msgstr "重置密码成功"
 
 #: users/notifications.py:86
-#, python-format
 msgid ""
 "\n"
 "        \n"
@@ -4889,10 +4888,9 @@ msgid ""
 "\n"
 "\n"
 "IP Address: %(ip_address)s\n"
-"<br>\n"
-"<br>\n"
+"\n"
+"\n"
 "Browser: %(browser)s\n"
-"<br>\n"
 "        \n"
 "        "
 msgstr ""
@@ -4911,14 +4909,12 @@ msgstr ""
 "\n"
 "\n"
 "IP 地址: %(ip_address)s\n"
-"<br>\n"
-"<br>\n"
+"\n"
 "浏览器: %(browser)s\n"
-"<br>\n"
 "        \n"
 "        "
 
-#: users/notifications.py:120
+#: users/notifications.py:118
 #, python-format
 msgid ""
 "\n"
@@ -4981,11 +4977,11 @@ msgstr ""
 "    \n"
 "    "
 
-#: users/notifications.py:163 users/notifications.py:199
+#: users/notifications.py:161 users/notifications.py:197
 msgid "Security notice"
 msgstr "安全通知"
 
-#: users/notifications.py:164
+#: users/notifications.py:162
 #, python-format
 msgid ""
 "\n"
@@ -5029,7 +5025,7 @@ msgstr ""
 "\n"
 "        "
 
-#: users/notifications.py:200
+#: users/notifications.py:198
 #, python-format
 msgid ""
 "\n"
@@ -5078,11 +5074,11 @@ msgstr ""
 "    <br>\n"
 "    "
 
-#: users/notifications.py:237 users/notifications.py:256
+#: users/notifications.py:235 users/notifications.py:254
 msgid "Expiration notice"
 msgstr "过期通知"
 
-#: users/notifications.py:238
+#: users/notifications.py:236
 #, python-format
 msgid ""
 "\n"
@@ -5103,7 +5099,7 @@ msgstr ""
 "为了不影响您正常工作，请联系管理员确认。\n"
 "           "
 
-#: users/notifications.py:257
+#: users/notifications.py:255
 #, python-format
 msgid ""
 "\n"
@@ -5125,11 +5121,11 @@ msgstr ""
 "       <br>\n"
 "       "
 
-#: users/notifications.py:277 users/notifications.py:298
+#: users/notifications.py:275 users/notifications.py:296
 msgid "SSH Key Reset"
 msgstr "重置SSH密钥"
 
-#: users/notifications.py:278
+#: users/notifications.py:276
 #, python-format
 msgid ""
 "\n"
@@ -5154,7 +5150,7 @@ msgstr ""
 "\n"
 "        "
 
-#: users/notifications.py:299
+#: users/notifications.py:297
 #, python-format
 msgid ""
 "\n"
@@ -5179,11 +5175,11 @@ msgstr ""
 "    <br>\n"
 "    "
 
-#: users/notifications.py:321 users/notifications.py:341
+#: users/notifications.py:319 users/notifications.py:339
 msgid "MFA Reset"
 msgstr "重置 MFA"
 
-#: users/notifications.py:322
+#: users/notifications.py:320
 #, python-format
 msgid ""
 "\n"
@@ -5208,7 +5204,7 @@ msgstr ""
 "\n"
 "        "
 
-#: users/notifications.py:342
+#: users/notifications.py:340
 #, python-format
 msgid ""
 "\n"
@@ -6209,3 +6205,6 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Enable period task"
+#~ msgstr "启用周期任务"
