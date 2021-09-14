@@ -118,6 +118,10 @@ class Setting(models.Model):
         setattr(settings, name, setting.cleaned_value)
 
     @classmethod
+    def refresh_AUTH_CAS(cls):
+        cls.refresh_authentications('AUTH_CAS')
+
+    @classmethod
     def refresh_AUTH_LDAP(cls):
         cls.refresh_authentications('AUTH_LDAP')
 
