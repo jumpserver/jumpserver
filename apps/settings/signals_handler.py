@@ -36,6 +36,7 @@ def refresh_settings_on_changed(sender, instance=None, **kwargs):
     if instance:
         setting_pub_sub.publish(instance.name)
 
+    # 配置变化: PERM_SINGLE_ASSET_TO_UNGROUP_NODE
     if instance.name == 'PERM_SINGLE_ASSET_TO_UNGROUP_NODE':
         # 清除所有用户授权树已构建的标记，下次访问重新生成
         logger.debug('Clean ALL User perm tree built mark')
