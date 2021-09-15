@@ -9,7 +9,7 @@ __all__ = ['MailTestSerializer', 'EmailSettingSerializer', 'EmailContentSettingS
 
 class MailTestSerializer(serializers.Serializer):
     EMAIL_HOST = serializers.CharField(max_length=1024, required=True)
-    EMAIL_PORT = serializers.IntegerField(default=25)
+    EMAIL_PORT = serializers.IntegerField(default=25, min_value=1, max_value=65535)
     EMAIL_HOST_USER = serializers.CharField(max_length=1024)
     EMAIL_HOST_PASSWORD = serializers.CharField(required=False, allow_blank=True)
     EMAIL_FROM = serializers.CharField(required=False, allow_blank=True)
