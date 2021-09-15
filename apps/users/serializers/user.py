@@ -51,6 +51,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
             'date_expired', 'date_joined', 'last_login',  # 日期字段
             'created_by', 'comment',  # 通用字段
             'is_wecom_bound', 'is_dingtalk_bound', 'is_feishu_bound',
+            'wecom_id', 'dingtalk_id', 'feishu_id'
         ]
         # 包含不太常用的字段，可以没有
         fields_verbose = fields_small + [
