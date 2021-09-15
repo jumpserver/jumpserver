@@ -656,9 +656,9 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     need_update_password = models.BooleanField(
         default=False, verbose_name=_('Need update password')
     )
-    wecom_id = models.CharField(null=True, default=None, unique=True, max_length=128)
-    dingtalk_id = models.CharField(null=True, default=None, unique=True, max_length=128)
-    feishu_id = models.CharField(null=True, default=None, unique=True, max_length=128)
+    wecom_id = models.CharField(null=True, default=None, unique=True, max_length=128, verbose_name=_('WeCom'))
+    dingtalk_id = models.CharField(null=True, default=None, unique=True, max_length=128, verbose_name=_('DingTalk'))
+    feishu_id = models.CharField(null=True, default=None, unique=True, max_length=128, verbose_name=_('FeiShu'))
 
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
