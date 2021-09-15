@@ -5,8 +5,11 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from simple_history.models import HistoricalRecords
 
-from common.utils import lazyproperty
+from common.utils import lazyproperty, get_logger
 from .base import BaseUser, AbsConnectivity
+
+logger = get_logger(__name__)
+
 
 __all__ = ['AuthBook']
 
@@ -92,6 +95,24 @@ class AuthBook(BaseUser, AbsConnectivity):
             i.public_key = self.public_key
             i.comment = 'Update triggered by account {}'.format(self.id)
             i.save(update_fields=['password', 'private_key', 'public_key'])
+
+    def remove_asset_admin_user_if_need(self):
+        if not self.asset or not self.asset.admin_user:
+            return
+        if not self.systemuser.is_admin_user:
+            return
+        logger.debug('Remove asset admin user: {} {}'.format(self.asset, self.systemuser))
+        self.asset.admin_user = None
+        self.asset.save()
+
+    def update_asset_admin_user_if_need(self):
+        if not self.systemuser or not self.systemuser.is_admin_user:
+            return
+        if not self.asset or self.asset.admin_user == self.systemuser:
+            return
+        logger.debug('Update asset admin user: {} {}'.format(self.asset, self.systemuser))
+        self.asset.admin_user = self.systemuser
+        self.asset.save()
 
     def __str__(self):
         return self.smart_name

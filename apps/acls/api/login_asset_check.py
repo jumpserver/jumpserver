@@ -9,12 +9,11 @@ from tickets.api import GenericTicketStatusRetrieveCloseAPI
 from ..models import LoginAssetACL
 from .. import serializers
 
-
 __all__ = ['LoginAssetCheckAPI', 'LoginAssetConfirmStatusAPI']
 
 
 class LoginAssetCheckAPI(CreateAPIView):
-    permission_classes = (IsAppUser, )
+    permission_classes = (IsAppUser,)
     serializer_class = serializers.LoginAssetCheckSerializer
 
     def create(self, request, *args, **kwargs):
@@ -57,11 +56,12 @@ class LoginAssetCheckAPI(CreateAPIView):
             external=True, api_to_ui=True
         )
         ticket_detail_url = '{url}?type={type}'.format(url=ticket_detail_url, type=ticket.type)
+        ticket_assignees = ticket.current_node.first().ticket_assignees.all()
         data = {
             'check_confirm_status': {'method': 'GET', 'url': confirm_status_url},
             'close_confirm': {'method': 'DELETE', 'url': confirm_status_url},
             'ticket_detail_url': ticket_detail_url,
-            'reviewers': [str(user) for user in ticket.current_node.first().ticket_assignees.all()],
+            'reviewers': [str(ticket_assignee.assignee) for ticket_assignee in ticket_assignees]
         }
         return data
 
@@ -74,4 +74,3 @@ class LoginAssetCheckAPI(CreateAPIView):
 
 class LoginAssetConfirmStatusAPI(GenericTicketStatusRetrieveCloseAPI):
     pass
-

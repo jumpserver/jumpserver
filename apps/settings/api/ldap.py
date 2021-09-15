@@ -149,16 +149,16 @@ class LDAPUserListApi(generics.ListAPIView):
             sync_util.set_task_status(sync_util.TASK_STATUS_IS_RUNNING)
             t = threading.Thread(target=sync_ldap_user)
             t.start()
-            data = {'msg': 'Sync start.'}
+            data = {'msg': _('Synchronization start, please wait.')}
             return Response(data=data, status=409)
         # 同步任务正在执行
         if sync_util.task_is_running:
-            data = {'msg': 'synchronization is running.'}
+            data = {'msg': _('Synchronization is running, please wait.')}
             return Response(data=data, status=409)
         # 同步任务执行结束
         if sync_util.task_is_over:
             msg = sync_util.get_task_error_msg()
-            data = {'error': 'Synchronization error: {}'.format(msg)}
+            data = {'error': _('Synchronization error: {}'.format(msg))}
             return Response(data=data, status=400)
 
         return super().list(request, *args, **kwargs)

@@ -212,12 +212,12 @@ class Config(dict):
         # Cas 认证
         'AUTH_CAS': False,
         'CAS_SERVER_URL': "https://example.com/cas/",
-        'CAS_ROOT_PROXIED_AS': '',
+        'CAS_ROOT_PROXIED_AS': 'https://example.com',
         'CAS_LOGOUT_COMPLETELY': True,
         'CAS_VERSION': 3,
         'CAS_USERNAME_ATTRIBUTE': 'uid',
         'CAS_APPLY_ATTRIBUTES_TO_USER': False,
-        'CAS_RENAME_ATTRIBUTES': {},
+        'CAS_RENAME_ATTRIBUTES': {'uid': 'username'},
         'CAS_CREATE_USER': True,
 
         'AUTH_SSO': False,

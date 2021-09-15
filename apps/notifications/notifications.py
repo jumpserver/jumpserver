@@ -164,7 +164,6 @@ class SystemMessage(Message):
 
         self.send_msg(users, receive_backends)
 
-
     @classmethod
     def post_insert_to_db(cls, subscription: SystemMsgSubscription):
         pass

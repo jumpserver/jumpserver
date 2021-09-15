@@ -6,6 +6,7 @@ from rest_framework import serializers
 
 from common.mixins import CommonBulkSerializerMixin
 from common.permissions import CanUpdateDeleteUser
+from common.validators import PhoneValidator
 from orgs.models import ROLE as ORG_ROLE
 from ..models import User
 from ..const import SystemOrOrgRole, PasswordStrategy
@@ -28,7 +29,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
     is_expired = serializers.BooleanField(read_only=True, label=_('Is expired'))
     can_update = serializers.SerializerMethodField(label=_('Can update'))
     can_delete = serializers.SerializerMethodField(label=_('Can delete'))
-    can_public_key_auth = serializers.ReadOnlyField(source='can_use_ssh_key_login')
+    can_public_key_auth = serializers.ReadOnlyField(source='can_use_ssh_key_login', label=_('Can public key authentication'))
     org_roles = serializers.ListField(
         label=_('Organization role name'), allow_null=True, required=False,
         child=serializers.ChoiceField(choices=ORG_ROLE.choices), default=["User"]
@@ -51,6 +52,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
             'date_expired', 'date_joined', 'last_login',  # 日期字段
             'created_by', 'comment',  # 通用字段
             'is_wecom_bound', 'is_dingtalk_bound', 'is_feishu_bound',
+            'wecom_id', 'dingtalk_id', 'feishu_id'
         ]
         # 包含不太常用的字段，可以没有
         fields_verbose = fields_small + [
@@ -86,6 +88,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
             'is_wecom_bound': {'label': _('Is wecom bound')},
             'is_dingtalk_bound': {'label': _('Is dingtalk bound')},
             'is_feishu_bound': {'label': _('Is feishu bound')},
+            'phone': {'validators': [PhoneValidator()]},
         }
 
     def __init__(self, *args, **kwargs):

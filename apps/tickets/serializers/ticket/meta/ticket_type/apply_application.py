@@ -69,5 +69,9 @@ class ApplySerializer(serializers.Serializer):
             'Permission named `{}` already exists'.format(permission_name)
         ))
 
-
-
+    def validate_apply_date_expired(self, apply_date_expired):
+        apply_date_start = self.root.initial_data['meta'].get('apply_date_start')
+        if str(apply_date_expired) <= apply_date_start:
+            error = _('The expiration date should be greater than the start date')
+            raise serializers.ValidationError(error)
+        return apply_date_expired

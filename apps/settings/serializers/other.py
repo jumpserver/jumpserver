@@ -12,9 +12,11 @@ class OtherSettingSerializer(serializers.Serializer):
     OTP_ISSUER_NAME = serializers.CharField(
         required=False, max_length=1024, label=_('OTP issuer name'),
     )
-    OTP_VALID_WINDOW = serializers.IntegerField(label=_("OTP valid window"))
+    OTP_VALID_WINDOW = serializers.IntegerField(
+        min_value=1, max_value=10,
+        label=_("OTP valid window")
+    )
 
-    PERIOD_TASK_ENABLED = serializers.BooleanField(required=False, label=_("Enable period task"))
     WINDOWS_SSH_DEFAULT_SHELL = serializers.ChoiceField(
         choices=[
             ('cmd', _("CMD")),
@@ -28,4 +30,8 @@ class OtherSettingSerializer(serializers.Serializer):
         required=False, label=_("Perm single to ungroup node")
     )
 
+    # 准备废弃
+    # PERIOD_TASK_ENABLED = serializers.BooleanField(
+    #     required=False, label=_("Enable period task")
+    # )
 

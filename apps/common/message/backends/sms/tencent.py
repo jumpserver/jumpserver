@@ -82,6 +82,15 @@ class TencentSMS(BaseSMSClient):
 
             resp = self.client.SendSms(req)
 
+            try:
+                code = resp.SendStatusSet[0].Code
+                msg = resp.SendStatusSet[0].Message
+            except IndexError:
+                raise JMSException(code='response_bad', detail=resp)
+
+            if code.lower() != 'ok':
+                raise JMSException(code=code, detail=msg)
+
             return resp
         except TencentCloudSDKException as e:
             raise JMSException(code=e.code, detail=e.message)

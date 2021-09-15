@@ -24,10 +24,11 @@ class Handler(BaseHandler):
         meta_display = dict(zip(meta_display_fields, meta_display_values))
         apply_assets = self.ticket.meta.get('apply_assets')
         apply_system_users = self.ticket.meta.get('apply_system_users')
-        meta_display.update({
-            'apply_assets_display': [str(i) for i in Asset.objects.filter(id__in=apply_assets)],
-            'apply_system_users_display': [str(i)for i in SystemUser.objects.filter(id__in=apply_system_users)]
-        })
+        with tmp_to_org(self.ticket.org_id):
+            meta_display.update({
+                'apply_assets_display': [str(i) for i in Asset.objects.filter(id__in=apply_assets)],
+                'apply_system_users_display': [str(i)for i in SystemUser.objects.filter(id__in=apply_system_users)]
+            })
         return meta_display
 
     # body

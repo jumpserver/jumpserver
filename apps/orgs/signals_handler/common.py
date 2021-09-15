@@ -19,6 +19,7 @@ from common.decorator import on_transaction_commit
 from common.signals import django_ready
 from common.utils import get_logger
 from common.utils.connection import RedisPubSub
+from assets.models import CommandFilterRule
 
 
 logger = get_logger(__file__)
@@ -91,17 +92,18 @@ def on_org_delete(sender, instance, **kwargs):
             root_node.delete()
 
 
-def _remove_users(model, users, org):
+def _remove_users(model, users, org, user_field_name='users'):
     with tmp_to_org(org):
         if not isinstance(users, (tuple, list, set)):
             users = (users, )
 
-        m2m_model = model.users.through
-        reverse = model.users.reverse
+        user_field = getattr(model, user_field_name)
+        m2m_model = user_field.through
+        reverse = user_field.reverse
         if reverse:
-            m2m_field_name = model.users.field.m2m_reverse_field_name()
+            m2m_field_name = user_field.field.m2m_reverse_field_name()
         else:
-            m2m_field_name = model.users.field.m2m_field_name()
+            m2m_field_name = user_field.field.m2m_field_name()
         relations = m2m_model.objects.filter(**{
             'user__in': users,
             f'{m2m_field_name}__org_id': org.id
@@ -148,6 +150,8 @@ def _clear_users_from_org(org, users):
 
     for m in models:
         _remove_users(m, users, org)
+
+    _remove_users(CommandFilterRule, users, org, user_field_name='reviewers')
 
 
 @receiver(m2m_changed, sender=OrganizationMember)

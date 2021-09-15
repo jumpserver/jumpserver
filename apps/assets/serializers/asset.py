@@ -75,10 +75,13 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
         fields_mini = ['id', 'hostname', 'ip', 'platform', 'protocols']
         fields_small = fields_mini + [
             'protocol', 'port', 'protocols', 'is_active', 'public_ip',
+            'comment',
+        ]
+        hardware_fields = [
             'number', 'vendor', 'model', 'sn', 'cpu_model', 'cpu_count',
             'cpu_cores', 'cpu_vcpus', 'memory', 'disk_total', 'disk_info',
-            'os', 'os_version', 'os_arch', 'hostname_raw', 'comment',
-            'hardware_info', 'connectivity', 'date_verified'
+            'os', 'os_version', 'os_arch', 'hostname_raw', 'hardware_info',
+            'connectivity', 'date_verified'
         ]
         fields_fk = [
             'domain', 'domain_display', 'platform', 'admin_user', 'admin_user_display'
@@ -89,15 +92,16 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
         read_only_fields = [
             'created_by', 'date_created',
         ]
-        fields = fields_small + fields_fk + fields_m2m + read_only_fields
+        fields = fields_small + hardware_fields + fields_fk + fields_m2m + read_only_fields
 
-        extra_kwargs = {
+        extra_kwargs = {k: {'read_only': True} for k in hardware_fields}
+        extra_kwargs.update({
             'protocol': {'write_only': True},
             'port': {'write_only': True},
-            'hardware_info': {'label': _('Hardware info')},
-            'org_name': {'label': _('Org name')},
-            'admin_user_display': {'label': _('Admin user display')}
-        }
+            'hardware_info': {'label': _('Hardware info'), 'read_only': True},
+            'org_name': {'label': _('Org name'), 'read_only': True},
+            'admin_user_display': {'label': _('Admin user display'), 'read_only': True},
+        })
 
     def get_fields(self):
         fields = super().get_fields()

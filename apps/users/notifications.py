@@ -7,6 +7,11 @@ from notifications.notifications import UserMessage
 
 
 class ResetPasswordMsg(UserMessage):
+
+    def __init__(self, user):
+        super().__init__(user)
+        self.reset_passwd_token = user.generate_reset_token()
+
     def get_text_msg(self) -> dict:
         user = self.user
         subject = _('Reset password')
@@ -30,7 +35,7 @@ Login direct 👇
 """) % {
             'name': user.name,
             'rest_password_url': reverse('authentication:reset-password', external=True),
-            'rest_password_token': user.generate_reset_token(),
+            'rest_password_token': self.reset_passwd_token,
             'forget_password_url': reverse('authentication:forgot-password', external=True),
             'email': user.email,
             'login_url': reverse('authentication:login', external=True),
@@ -62,7 +67,7 @@ Login direct 👇
             """) % {
             'name': user.name,
             'rest_password_url': reverse('authentication:reset-password', external=True),
-            'rest_password_token': user.generate_reset_token(),
+            'rest_password_token': self.reset_passwd_token,
             'forget_password_url': reverse('authentication:forgot-password', external=True),
             'email': user.email,
             'login_url': reverse('authentication:login', external=True),
@@ -98,10 +103,8 @@ If you have any questions, you can contact the administrator.
 
 
 IP Address: %(ip_address)s
-<br>
-<br>
+\n
 Browser: %(browser)s
-<br>
         
         """) % {
             'name': user.name,

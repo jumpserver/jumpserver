@@ -32,7 +32,7 @@ class CommandStore():
         hosts = config.get("HOSTS")
         kwargs = config.get("OTHER", {})
         self.index = config.get("INDEX") or 'jumpserver'
-        self.doc_type = config.get("DOC_TYPE") or 'command_store'
+        self.doc_type = config.get("DOC_TYPE") or '_doc'
         self.exact_fields = {}
         self.match_fields = {}
 

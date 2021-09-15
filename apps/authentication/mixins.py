@@ -30,8 +30,8 @@ logger = get_logger(__name__)
 def check_backend_can_auth(username, backend_path, allowed_auth_backends):
     if allowed_auth_backends is not None and backend_path not in allowed_auth_backends:
         logger.debug('Skip user auth backend: {}, {} not in'.format(
-                username, backend_path, ','.join(allowed_auth_backends)
-            )
+            username, backend_path, ','.join(allowed_auth_backends)
+        )
         )
         return False
     return True
@@ -201,7 +201,7 @@ class AuthMixin(PasswordEncryptionViewMixin):
             data = request.POST
 
         items = ['username', 'password', 'challenge', 'public_key', 'auto_login']
-        username, password, challenge, public_key, auto_login = bulk_get(data, *items,  default='')
+        username, password, challenge, public_key, auto_login = bulk_get(data, *items, default='')
         ip = self.get_request_ip()
         self._set_partial_credential_error(username=username, ip=ip, request=request)
 
@@ -285,7 +285,6 @@ class AuthMixin(PasswordEncryptionViewMixin):
         elif not user.is_active:
             self.raise_credential_error(errors.reason_user_inactive)
 
-        self._check_is_local_user(user)
         self._check_is_block(user.username)
         self._check_login_acl(user, ip)
 
@@ -363,6 +362,12 @@ class AuthMixin(PasswordEncryptionViewMixin):
         self.request.session['auth_mfa_required'] = ''
         self.request.session['auth_mfa_type'] = mfa_type
 
+    def clean_mfa_mark(self):
+        self.request.session['auth_mfa'] = ''
+        self.request.session['auth_mfa_time'] = ''
+        self.request.session['auth_mfa_required'] = ''
+        self.request.session['auth_mfa_type'] = ''
+
     def check_mfa_is_block(self, username, ip, raise_exception=True):
         if MFABlockUtils(username, ip).is_block():
             logger.warn('Ip was blocked' + ': ' + username + ':' + ip)
@@ -414,10 +419,12 @@ class AuthMixin(PasswordEncryptionViewMixin):
             self.request.session["auth_confirm"] = "1"
             return
         elif ticket.state_reject:
+            self.clean_mfa_mark()
             raise errors.LoginConfirmOtherError(
                 ticket.id, ticket.get_state_display()
             )
         elif ticket.state_close:
+            self.clean_mfa_mark()
             raise errors.LoginConfirmOtherError(
                 ticket.id, ticket.get_state_display()
             )

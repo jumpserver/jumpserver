@@ -13,12 +13,14 @@ EMAIL_TEMPLATE = '''
     <div>
         <p>
             {title} 
-            <a href={ticket_detail_url}>
-                <strong>{ticket_detail_url_description}</strong>
-            </a>
         </p>
         <div>
             {body}
+        </div>
+        <div>
+            <a href={ticket_detail_url}>
+                <strong>{ticket_detail_url_description}</strong>
+            </a>
         </div>
     </div>
 '''
@@ -36,13 +38,12 @@ class BaseTicketMessage(UserMessage):
 
     def get_text_msg(self) -> dict:
         message = """
-        {title}: {ticket_detail_url} -> {ticket_detail_url_description}
+        {title}: {ticket_detail_url}
         {body}
         """.format(
             title=self.content_title,
             ticket_detail_url=self.ticket_detail_url,
-            ticket_detail_url_description=_('click here to review'),
-            body=self.ticket.body
+            body=self.ticket.body.replace('<div style="margin-left: 20px;">', '').replace('</div>', '')
         )
         return {
             'subject': self.subject,
