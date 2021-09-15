@@ -9,6 +9,7 @@ from notifications.notifications import SystemMessage
 from terminal.models import Session, Command
 from notifications.models import SystemMsgSubscription
 from notifications.backends import BACKEND
+from orgs.utils import tmp_to_root_org
 from common.utils import lazyproperty
 
 logger = get_logger(__name__)
@@ -69,7 +70,10 @@ class CommandAlertMessage(CommandAlertMixin, SystemMessage):
 
     def get_text_msg(self) -> dict:
         command = self.command
-        session = Session.objects.get(id=command['session'])
+
+        with tmp_to_root_org():
+            session = Session.objects.get(id=command['session'])
+
         session_detail_url = reverse(
             'api-terminal:session-detail', kwargs={'pk': command['session']},
             external=True, api_to_ui=True
@@ -97,7 +101,10 @@ Session: %(session_detail_url)s?oid=%(oid)s
 
     def get_html_msg(self) -> dict:
         command = self.command
-        session = Session.objects.get(id=command['session'])
+
+        with tmp_to_root_org():
+            session = Session.objects.get(id=command['session'])
+
         session_detail_url = reverse(
             'api-terminal:session-detail', kwargs={'pk': command['session']},
             external=True, api_to_ui=True
