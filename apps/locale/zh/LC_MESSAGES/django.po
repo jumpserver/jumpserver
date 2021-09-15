@@ -841,7 +841,7 @@ msgstr "硬件信息"
 #: assets/serializers/asset.py:98 assets/serializers/system_user.py:225
 #: orgs/mixins/serializers.py:26
 msgid "Org name"
-msgstr "用户名"
+msgstr "组织名称"
 
 #: assets/serializers/asset.py:99
 msgid "Admin user display"
