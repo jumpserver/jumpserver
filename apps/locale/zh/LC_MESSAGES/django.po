@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-15 17:59+0800\n"
+"POT-Creation-Date: 2021-09-15 19:13+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -118,7 +118,7 @@ msgstr "系统用户"
 
 #: acls/models/login_asset_acl.py:22
 #: applications/serializers/attrs/application_category/remote_app.py:37
-#: assets/models/asset.py:357 assets/models/authbook.py:15
+#: assets/models/asset.py:357 assets/models/authbook.py:18
 #: assets/models/gathered_user.py:14 assets/serializers/system_user.py:207
 #: audits/models.py:38 perms/models/asset_permission.py:99
 #: templates/index.html:82 terminal/backends/command/models.py:19
@@ -246,7 +246,7 @@ msgstr "远程应用"
 msgid "Custom"
 msgstr "自定义"
 
-#: applications/models/account.py:11 assets/models/authbook.py:16
+#: applications/models/account.py:11 assets/models/authbook.py:19
 #: assets/models/user.py:281 audits/models.py:39
 #: perms/models/application_permission.py:32
 #: perms/models/asset_permission.py:101 templates/_nav.html:45
@@ -263,7 +263,7 @@ msgstr "自定义"
 msgid "System user"
 msgstr "系统用户"
 
-#: applications/models/account.py:12 assets/models/authbook.py:17
+#: applications/models/account.py:12 assets/models/authbook.py:20
 #: settings/serializers/auth/cas.py:15
 msgid "Version"
 msgstr "版本"
@@ -421,7 +421,7 @@ msgstr "基础"
 msgid "Charset"
 msgstr "编码"
 
-#: assets/models/asset.py:142 assets/serializers/asset.py:168
+#: assets/models/asset.py:142 assets/serializers/asset.py:172
 #: tickets/models/ticket.py:50
 msgid "Meta"
 msgstr "元数据"
@@ -548,7 +548,7 @@ msgstr "创建者"
 msgid "Date created"
 msgstr "创建日期"
 
-#: assets/models/authbook.py:23
+#: assets/models/authbook.py:26
 msgid "AuthBook"
 msgstr "账号"
 
@@ -834,16 +834,16 @@ msgstr "网域名称"
 msgid "Nodes name"
 msgstr "节点名称"
 
-#: assets/serializers/asset.py:97
+#: assets/serializers/asset.py:101
 msgid "Hardware info"
 msgstr "硬件信息"
 
-#: assets/serializers/asset.py:98 assets/serializers/system_user.py:225
+#: assets/serializers/asset.py:102 assets/serializers/system_user.py:225
 #: orgs/mixins/serializers.py:26
 msgid "Org name"
 msgstr "组织名称"
 
-#: assets/serializers/asset.py:99
+#: assets/serializers/asset.py:103
 msgid "Admin user display"
 msgstr "特权用户名称"
 
@@ -2553,6 +2553,18 @@ msgstr "测试成功"
 #: settings/api/email.py:21
 msgid "Test mail sent to {}, please check"
 msgstr "邮件已经发送{}, 请检查"
+
+#: settings/api/ldap.py:152
+msgid "Synchronization start, please wait."
+msgstr "同步开始，请稍等"
+
+#: settings/api/ldap.py:156
+msgid "Synchronization is running, please wait."
+msgstr "同步正在运行，请稍等"
+
+#: settings/api/ldap.py:161
+msgid "Synchronization error: {}"
+msgstr "同步错误: {}"
 
 #: settings/api/ldap.py:194
 msgid "Get ldap users is None"
@@ -6219,8 +6231,3 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
-
-#, fuzzy
-#~| msgid "Empty and append SSH KEY"
-#~ msgid "Empty pre add and append SSH KEY"
-#~ msgstr "清空所有并添加"
