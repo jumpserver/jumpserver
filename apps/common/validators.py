@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 #
+import re
+
 from django.core.validators import RegexValidator
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.validators import (
@@ -32,3 +34,12 @@ class NoSpecialChars:
             raise serializers.ValidationError(
                 _("Should not contains special characters")
             )
+
+
+class PhoneValidator:
+    pattern = re.compile(r"^1[356789]\d{9}$")
+    message = _('The mobile phone number format is incorrect')
+
+    def __call__(self, value):
+        if not self.pattern.match(value):
+            raise serializers.ValidationError(self.message)

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-15 19:29+0800\n"
+"POT-Creation-Date: 2021-09-15 20:07+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -2138,17 +2138,21 @@ msgstr "忽略时间"
 msgid "Invalid ip"
 msgstr "无效IP"
 
-#: common/validators.py:13
+#: common/validators.py:15
 msgid "Special char not allowed"
 msgstr "不能包含特殊字符"
 
-#: common/validators.py:25
+#: common/validators.py:27
 msgid "This field must be unique."
 msgstr "字段必须唯一"
 
-#: common/validators.py:33
+#: common/validators.py:35
 msgid "Should not contains special characters"
 msgstr "不能包含特殊字符"
+
+#: common/validators.py:41
+msgid "The mobile phone number format is incorrect"
+msgstr "手机号格式不正确"
 
 #: jumpserver/context_processor.py:20
 msgid "JumpServer Open Source Bastion Host"
@@ -2400,7 +2404,7 @@ msgstr "组织审计员"
 msgid "GLOBAL"
 msgstr "全局组织"
 
-#: orgs/models.py:434 users/models/user.py:614 users/serializers/user.py:36
+#: orgs/models.py:434 users/models/user.py:614 users/serializers/user.py:37
 #: users/templates/users/_select_user_modal.html:15
 msgid "Role"
 msgstr "角色"
@@ -2487,15 +2491,15 @@ msgstr "来自工单"
 #: perms/serializers/application/permission.py:18
 #: perms/serializers/application/permission.py:38
 #: perms/serializers/asset/permission.py:42
-#: perms/serializers/asset/permission.py:68 users/serializers/user.py:77
+#: perms/serializers/asset/permission.py:68 users/serializers/user.py:78
 msgid "Is valid"
 msgstr "账户是否有效"
 
 #: perms/serializers/application/permission.py:19
 #: perms/serializers/application/permission.py:37
 #: perms/serializers/asset/permission.py:43
-#: perms/serializers/asset/permission.py:67 users/serializers/user.py:28
-#: users/serializers/user.py:78
+#: perms/serializers/asset/permission.py:67 users/serializers/user.py:29
+#: users/serializers/user.py:79
 msgid "Is expired"
 msgstr "是否过期"
 
@@ -5255,7 +5259,7 @@ msgstr ""
 msgid "The old password is incorrect"
 msgstr "旧密码错误"
 
-#: users/serializers/profile.py:36 users/serializers/user.py:138
+#: users/serializers/profile.py:36 users/serializers/user.py:140
 msgid "Password does not match security rules"
 msgstr "密码不满足安全规则"
 
@@ -5267,85 +5271,85 @@ msgstr "新密码不能是最近 {} 次的密码"
 msgid "The newly set password is inconsistent"
 msgstr "两次密码不一致"
 
-#: users/serializers/profile.py:121 users/serializers/user.py:76
+#: users/serializers/profile.py:121 users/serializers/user.py:77
 msgid "Is first login"
 msgstr "首次登录"
 
-#: users/serializers/user.py:22
+#: users/serializers/user.py:23
 #: xpack/plugins/change_auth_plan/models/base.py:32
 #: xpack/plugins/change_auth_plan/serializers/base.py:24
 msgid "Password strategy"
 msgstr "密码策略"
 
-#: users/serializers/user.py:24
+#: users/serializers/user.py:25
 msgid "MFA enabled"
 msgstr "是否开启多因子认证"
 
-#: users/serializers/user.py:25
+#: users/serializers/user.py:26
 msgid "MFA force enabled"
 msgstr "强制启用多因子认证"
 
-#: users/serializers/user.py:26
+#: users/serializers/user.py:27
 msgid "MFA level display"
 msgstr "多因子认证等级名称"
 
-#: users/serializers/user.py:27
+#: users/serializers/user.py:28
 msgid "Login blocked"
 msgstr "登录被阻塞"
 
-#: users/serializers/user.py:29
+#: users/serializers/user.py:30
 msgid "Can update"
 msgstr "是否可更新"
 
-#: users/serializers/user.py:30
+#: users/serializers/user.py:31
 msgid "Can delete"
 msgstr "是否可删除"
 
-#: users/serializers/user.py:31
+#: users/serializers/user.py:32
 msgid "Can public key authentication"
 msgstr "能否公钥认证"
 
-#: users/serializers/user.py:33 users/serializers/user.py:83
+#: users/serializers/user.py:34 users/serializers/user.py:84
 msgid "Organization role name"
 msgstr "组织角色名称"
 
-#: users/serializers/user.py:79
+#: users/serializers/user.py:80
 msgid "Avatar url"
 msgstr "头像路径"
 
-#: users/serializers/user.py:81
+#: users/serializers/user.py:82
 msgid "Groups name"
 msgstr "用户组名"
 
-#: users/serializers/user.py:82
+#: users/serializers/user.py:83
 msgid "Source name"
 msgstr "用户来源名"
 
-#: users/serializers/user.py:84
+#: users/serializers/user.py:85
 msgid "Super role name"
 msgstr "超级角色名称"
 
-#: users/serializers/user.py:85
+#: users/serializers/user.py:86
 msgid "Total role name"
 msgstr "汇总角色名称"
 
-#: users/serializers/user.py:87
+#: users/serializers/user.py:88
 msgid "Is wecom bound"
 msgstr "是否绑定了企业微信"
 
-#: users/serializers/user.py:88
+#: users/serializers/user.py:89
 msgid "Is dingtalk bound"
 msgstr "是否绑定了钉钉"
 
-#: users/serializers/user.py:89
+#: users/serializers/user.py:90
 msgid "Is feishu bound"
 msgstr "是否绑定了飞书"
 
-#: users/serializers/user.py:112
+#: users/serializers/user.py:114
 msgid "Role limit to {}"
 msgstr "角色只能为 {}"
 
-#: users/serializers/user.py:232
+#: users/serializers/user.py:234
 msgid "name not unique"
 msgstr "名称重复"
 

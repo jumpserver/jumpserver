@@ -6,6 +6,7 @@ from rest_framework import serializers
 
 from common.mixins import CommonBulkSerializerMixin
 from common.permissions import CanUpdateDeleteUser
+from common.validators import PhoneValidator
 from orgs.models import ROLE as ORG_ROLE
 from ..models import User
 from ..const import SystemOrOrgRole, PasswordStrategy
@@ -87,6 +88,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
             'is_wecom_bound': {'label': _('Is wecom bound')},
             'is_dingtalk_bound': {'label': _('Is dingtalk bound')},
             'is_feishu_bound': {'label': _('Is feishu bound')},
+            'phone': {'validators': [PhoneValidator()]},
         }
 
     def __init__(self, *args, **kwargs):
