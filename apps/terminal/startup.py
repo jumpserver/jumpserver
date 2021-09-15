@@ -23,8 +23,15 @@ class BaseTerminal(object):
             name = f'[{suffix_name}]-{hostname}'
         self.name = name
         self.interval = 30
-        self.remote_addr = socket.gethostbyname(hostname)
+        self.remote_addr = self.get_remote_addr(hostname)
         self.type = _type
+
+    @staticmethod
+    def get_remote_addr(hostname):
+        try:
+            return socket.gethostbyname(hostname)
+        except socket.gaierror:
+            return '127.0.0.1'
 
     def start_heartbeat_thread(self):
         print(f'- Start heartbeat thread => ({self.name})')
