@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-15 17:07+0800\n"
+"POT-Creation-Date: 2021-09-15 17:59+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1657,7 +1657,7 @@ msgstr "请修改密码"
 msgid "Private Token"
 msgstr "SSH密钥"
 
-#: authentication/models.py:49 settings/serializers/security.py:115
+#: authentication/models.py:49 settings/serializers/security.py:118
 msgid "Login Confirm"
 msgstr "登录复核"
 
@@ -1885,9 +1885,9 @@ msgstr "从钉钉获取用户失败"
 msgid "DingTalk is not bound"
 msgstr "钉钉没有绑定"
 
-#: authentication/views/dingtalk.py:218 authentication/views/wecom.py:216
-msgid "Please login with a password and then bind the WeCom"
-msgstr "请使用密码登录，然后绑定企业微信"
+#: authentication/views/dingtalk.py:218
+msgid "Please login with a password and then bind the DingTalk"
+msgstr "请使用密码登录，然后绑定钉钉"
 
 #: authentication/views/dingtalk.py:260 authentication/views/dingtalk.py:261
 msgid "Binding DingTalk failed"
@@ -2002,6 +2002,10 @@ msgstr "从企业微信获取用户失败"
 #: authentication/views/wecom.py:215
 msgid "WeCom is not bound"
 msgstr "没有绑定企业微信"
+
+#: authentication/views/wecom.py:216
+msgid "Please login with a password and then bind the WeCom"
+msgstr "请使用密码登录，然后绑定企业微信"
 
 #: authentication/views/wecom.py:258 authentication/views/wecom.py:259
 msgid "Binding WeCom failed"
@@ -2690,15 +2694,15 @@ msgstr ""
 msgid "Periodic display"
 msgstr "定时执行"
 
-#: settings/serializers/auth/ldap.py:66
+#: settings/serializers/auth/ldap.py:68
 msgid "Connect timeout"
 msgstr "连接超时时间"
 
-#: settings/serializers/auth/ldap.py:67
+#: settings/serializers/auth/ldap.py:70
 msgid "Search paged size"
 msgstr "搜索分页数量"
 
-#: settings/serializers/auth/ldap.py:69
+#: settings/serializers/auth/ldap.py:72
 msgid "Enable LDAP auth"
 msgstr "启用 LDAP 认证"
 
@@ -2833,7 +2837,7 @@ msgstr "其它系统可以使用 SSO Token 对接 JumpServer, 免去登录的过
 msgid "SSO auth key TTL"
 msgstr "Token 有效期"
 
-#: settings/serializers/auth/sso.py:16 settings/serializers/security.py:72
+#: settings/serializers/auth/sso.py:16 settings/serializers/security.py:74
 msgid "Unit: second"
 msgstr "单位: 秒"
 
@@ -2873,29 +2877,29 @@ msgstr "全局组织名"
 msgid "The name of global organization to display"
 msgstr "全局组织的显示名称，默认为 全局组织"
 
-#: settings/serializers/cleaning.py:9
+#: settings/serializers/cleaning.py:10
 msgid "Login log keep days"
 msgstr "登录日志"
 
-#: settings/serializers/cleaning.py:9 settings/serializers/cleaning.py:12
-#: settings/serializers/cleaning.py:15 settings/serializers/cleaning.py:18
-#: settings/serializers/cleaning.py:21
+#: settings/serializers/cleaning.py:10 settings/serializers/cleaning.py:14
+#: settings/serializers/cleaning.py:18 settings/serializers/cleaning.py:22
+#: settings/serializers/cleaning.py:26
 msgid "Unit: day"
 msgstr "单位: 天"
 
-#: settings/serializers/cleaning.py:12
+#: settings/serializers/cleaning.py:14
 msgid "Task log keep days"
 msgstr "任务日志"
 
-#: settings/serializers/cleaning.py:15
+#: settings/serializers/cleaning.py:18
 msgid "Operate log keep days"
 msgstr "操作日志"
 
-#: settings/serializers/cleaning.py:18
+#: settings/serializers/cleaning.py:22
 msgid "FTP log keep days"
 msgstr "上传下载"
 
-#: settings/serializers/cleaning.py:21
+#: settings/serializers/cleaning.py:26
 msgid "Cloud sync record keep days"
 msgstr "云同步记录"
 
@@ -3002,27 +3006,27 @@ msgstr "启用工单系统"
 msgid "OTP issuer name"
 msgstr "OTP 扫描后的名称"
 
-#: settings/serializers/other.py:15
+#: settings/serializers/other.py:17
 msgid "OTP valid window"
 msgstr "OTP 延迟有效次数"
 
-#: settings/serializers/other.py:19
+#: settings/serializers/other.py:22
 msgid "CMD"
 msgstr ""
 
-#: settings/serializers/other.py:20
+#: settings/serializers/other.py:23
 msgid "PowerShell"
 msgstr ""
 
-#: settings/serializers/other.py:22
+#: settings/serializers/other.py:25
 msgid "Shell (Windows)"
 msgstr "Shell（Windows 资产）"
 
-#: settings/serializers/other.py:23
+#: settings/serializers/other.py:26
 msgid "The shell type used when Windows assets perform ansible tasks"
 msgstr "windows 资产执行 Ansible 任务时，使用的 Shell 类型。"
 
-#: settings/serializers/other.py:27
+#: settings/serializers/other.py:30
 msgid "Perm single to ungroup node"
 msgstr "直接授权资产放在未分组节点"
 
@@ -3120,77 +3124,77 @@ msgstr "开启后，如果系统中不存在该用户，CAS、OIDC 登录将会�
 msgid "Only from source login"
 msgstr "仅从用户来源登录"
 
-#: settings/serializers/security.py:72
+#: settings/serializers/security.py:74
 msgid "MFA verify TTL"
 msgstr "MFA 校验有效期"
 
-#: settings/serializers/security.py:75
+#: settings/serializers/security.py:78
 msgid "Enable Login captcha"
 msgstr "启用登录验证码"
 
-#: settings/serializers/security.py:81
+#: settings/serializers/security.py:84
 msgid "Enable terminal register"
 msgstr "终端注册"
 
-#: settings/serializers/security.py:82
+#: settings/serializers/security.py:85
 msgid ""
 "Allow terminal register, after all terminal setup, you should disable this "
 "for security"
 msgstr "是否允许终端注册，当所有终端启动后，为了安全应该关闭"
 
-#: settings/serializers/security.py:85
+#: settings/serializers/security.py:88
 msgid "Replay watermark"
 msgstr "录像水印"
 
-#: settings/serializers/security.py:86
+#: settings/serializers/security.py:89
 msgid "Enabled, the session replay contains watermark information"
 msgstr "启用后，会话录像将包含水印信息"
 
-#: settings/serializers/security.py:90
+#: settings/serializers/security.py:93
 msgid "Connection max idle time"
 msgstr "连接最大空闲时间"
 
-#: settings/serializers/security.py:91
+#: settings/serializers/security.py:94
 msgid "If idle time more than it, disconnect connection Unit: minute"
 msgstr "提示：如果超过该配置没有操作，连接会被断开 （单位：分）"
 
-#: settings/serializers/security.py:94
+#: settings/serializers/security.py:97
 msgid "Remember manual auth"
 msgstr "保存手动输入密码"
 
-#: settings/serializers/security.py:97
+#: settings/serializers/security.py:100
 msgid "Enable change auth secure mode"
 msgstr "启用改密安全模式"
 
-#: settings/serializers/security.py:100
+#: settings/serializers/security.py:103
 msgid "Insecure command alert"
 msgstr "危险命令告警"
 
-#: settings/serializers/security.py:103
+#: settings/serializers/security.py:106
 msgid "Email recipient"
 msgstr "邮件收件人"
 
-#: settings/serializers/security.py:104
+#: settings/serializers/security.py:107
 msgid "Multiple user using , split"
 msgstr "多个用户，使用 , 分割"
 
-#: settings/serializers/security.py:107
+#: settings/serializers/security.py:110
 msgid "Batch command execution"
 msgstr "批量命令执行"
 
-#: settings/serializers/security.py:108
+#: settings/serializers/security.py:111
 msgid "Allow user run batch command or not using ansible"
 msgstr "是否允许用户使用 ansible 执行批量命令"
 
-#: settings/serializers/security.py:111
+#: settings/serializers/security.py:114
 msgid "Session share"
 msgstr "会话分享"
 
-#: settings/serializers/security.py:112
+#: settings/serializers/security.py:115
 msgid "Enabled, Allows user active session to be shared with other users"
 msgstr "开启后允许用户分享已连接的资产会话给它人，协同工作"
 
-#: settings/serializers/security.py:116
+#: settings/serializers/security.py:119
 msgid "Enabled, please go to the user detail add approver"
 msgstr "启用后, 请在用户详情中添加审批人"
 
@@ -3542,7 +3546,7 @@ msgstr "数据库应用"
 msgid "Perms"
 msgstr "权限管理"
 
-#: templates/_nav.html:97 terminal/notifications.py:19
+#: templates/_nav.html:97 terminal/notifications.py:20
 msgid "Sessions"
 msgstr "会话管理"
 
@@ -4051,11 +4055,11 @@ msgstr "命令存储"
 msgid "Replay storage"
 msgstr "录像存储"
 
-#: terminal/notifications.py:65
+#: terminal/notifications.py:66
 msgid "Danger command alert"
 msgstr "危险命令告警"
 
-#: terminal/notifications.py:78
+#: terminal/notifications.py:82
 #, python-format
 msgid ""
 "\n"
@@ -4074,7 +4078,7 @@ msgstr ""
 "会话: %(session_detail_url)s?oid=%(oid)s\n"
 "        "
 
-#: terminal/notifications.py:106
+#: terminal/notifications.py:113
 #, python-format
 msgid ""
 "\n"
@@ -4104,11 +4108,11 @@ msgstr ""
 "        <br>\n"
 "        "
 
-#: terminal/notifications.py:135
+#: terminal/notifications.py:142
 msgid "Batch danger command alert"
 msgstr "批量危险命令告警"
 
-#: terminal/notifications.py:146
+#: terminal/notifications.py:153
 #, python-format
 msgid ""
 "\n"
@@ -4140,7 +4144,7 @@ msgstr ""
 "<br>\n"
 "        "
 
-#: terminal/notifications.py:173
+#: terminal/notifications.py:180
 #, python-format
 msgid ""
 "\n"
@@ -4537,6 +4541,11 @@ msgstr "批准的系统用户名称"
 #: tickets/serializers/ticket/ticket.py:127
 msgid "Permission named `{}` already exists"
 msgstr "授权名称 `{}` 已存在"
+
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:75
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:67
+msgid "The expiration date should be greater than the start date"
+msgstr "过期时间要大于开始时间"
 
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:20
 msgid "Apply assets"
@@ -6210,3 +6219,8 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#, fuzzy
+#~| msgid "Empty and append SSH KEY"
+#~ msgid "Empty pre add and append SSH KEY"
+#~ msgstr "清空所有并添加"
