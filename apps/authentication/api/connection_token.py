@@ -23,6 +23,7 @@ from common.drf.api import SerializerMixin
 from common.permissions import IsSuperUserOrAppUser, IsValidUser, IsSuperUser
 from orgs.mixins.api import RootOrgViewMixin
 from common.http import is_true
+from assets.models import SystemUser
 
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
@@ -87,6 +88,9 @@ class ClientProtocolMixin:
         full_screen = is_true(self.request.query_params.get('full_screen'))
         drives_redirect = is_true(self.request.query_params.get('drives_redirect'))
         token = self.create_token(user, asset, application, system_user)
+
+        if system_user.login_mode == SystemUser.LOGIN_MANUAL:
+            options['prompt for credentials on client:i'] = '1'
 
         if drives_redirect:
             options['drivestoredirect:s'] = '*'
