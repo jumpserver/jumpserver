@@ -38,7 +38,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'username_same_with_user', 'auto_push', 'auto_generate_key',
             'date_created', 'date_updated', 'comment', 'created_by',
         ]
-        fields_m2m = ['cmd_filters', 'assets_amount']
+        fields_m2m = ['cmd_filters', 'assets_amount', 'nodes']
         fields = fields_small + fields_m2m
         extra_kwargs = {
             'password': {
