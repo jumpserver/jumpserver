@@ -134,6 +134,7 @@ function cancelTicket() {
 }
 
 function cancelCloseConfirm() {
+    cancelTicket();
     window.onbeforeunload = function() {};
     window.onunload = function(){};
 }
