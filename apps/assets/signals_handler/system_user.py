@@ -40,19 +40,6 @@ def on_system_user_assets_change(instance, action, model, pk_set, **kwargs):
         system_user_ids = pk_set
         asset_ids = [instance.id]
 
-    # 特权用户和资产关系发生变化时，更新所有资产的特权用户
-    system_users = SystemUser.objects.filter(id__in=system_user_ids)
-    assets = Asset.objects.filter(id__in=asset_ids)
-    for system_user in system_users:
-        if not system_user.is_admin_user:
-            continue
-        for asset in assets:
-            logger.debug(
-                'Update asset {} admin user is {}'.format(asset, system_user)
-            )
-            asset.admin_user = system_user
-    Asset.objects.bulk_update(assets, ['admin_user'])
-
     org_id = instance.org_id
 
     # 关联创建的 authbook 没有系统用户id
