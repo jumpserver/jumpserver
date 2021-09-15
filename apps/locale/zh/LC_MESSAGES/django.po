@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-15 17:59+0800\n"
+"POT-Creation-Date: 2021-09-15 18:19+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1240,13 +1240,13 @@ msgstr "认证令牌"
 
 #: audits/signals_handler.py:68
 #: authentication/templates/authentication/login.html:210
-#: notifications/backends/__init__.py:11
+#: notifications/backends/__init__.py:11 users/models/user.py:659
 msgid "WeCom"
 msgstr "企业微信"
 
 #: audits/signals_handler.py:69
 #: authentication/templates/authentication/login.html:215
-#: notifications/backends/__init__.py:12
+#: notifications/backends/__init__.py:12 users/models/user.py:660
 msgid "DingTalk"
 msgstr "钉钉"
 
@@ -1788,7 +1788,7 @@ msgid "CAS"
 msgstr "CAS"
 
 #: authentication/templates/authentication/login.html:220
-#: notifications/backends/__init__.py:14
+#: notifications/backends/__init__.py:14 users/models/user.py:661
 msgid "FeiShu"
 msgstr "飞书"
 
@@ -2487,7 +2487,7 @@ msgstr "来自工单"
 #: perms/serializers/application/permission.py:18
 #: perms/serializers/application/permission.py:38
 #: perms/serializers/asset/permission.py:42
-#: perms/serializers/asset/permission.py:68 users/serializers/user.py:76
+#: perms/serializers/asset/permission.py:68 users/serializers/user.py:77
 msgid "Is valid"
 msgstr "账户是否有效"
 
@@ -2495,7 +2495,7 @@ msgstr "账户是否有效"
 #: perms/serializers/application/permission.py:37
 #: perms/serializers/asset/permission.py:43
 #: perms/serializers/asset/permission.py:67 users/serializers/user.py:28
-#: users/serializers/user.py:77
+#: users/serializers/user.py:78
 msgid "Is expired"
 msgstr "是否过期"
 
@@ -5243,7 +5243,7 @@ msgstr ""
 msgid "The old password is incorrect"
 msgstr "旧密码错误"
 
-#: users/serializers/profile.py:36 users/serializers/user.py:137
+#: users/serializers/profile.py:36 users/serializers/user.py:138
 msgid "Password does not match security rules"
 msgstr "密码不满足安全规则"
 
@@ -5255,7 +5255,7 @@ msgstr "新密码不能是最近 {} 次的密码"
 msgid "The newly set password is inconsistent"
 msgstr "两次密码不一致"
 
-#: users/serializers/profile.py:121 users/serializers/user.py:75
+#: users/serializers/profile.py:121 users/serializers/user.py:76
 msgid "Is first login"
 msgstr "首次登录"
 
@@ -5293,47 +5293,47 @@ msgstr "是否可删除"
 msgid "Can public key authentication"
 msgstr "能否公钥认证"
 
-#: users/serializers/user.py:33 users/serializers/user.py:82
+#: users/serializers/user.py:33 users/serializers/user.py:83
 msgid "Organization role name"
 msgstr "组织角色名称"
 
-#: users/serializers/user.py:78
+#: users/serializers/user.py:79
 msgid "Avatar url"
 msgstr "头像路径"
 
-#: users/serializers/user.py:80
+#: users/serializers/user.py:81
 msgid "Groups name"
 msgstr "用户组名"
 
-#: users/serializers/user.py:81
+#: users/serializers/user.py:82
 msgid "Source name"
 msgstr "用户来源名"
 
-#: users/serializers/user.py:83
+#: users/serializers/user.py:84
 msgid "Super role name"
 msgstr "超级角色名称"
 
-#: users/serializers/user.py:84
+#: users/serializers/user.py:85
 msgid "Total role name"
 msgstr "汇总角色名称"
 
-#: users/serializers/user.py:86
+#: users/serializers/user.py:87
 msgid "Is wecom bound"
 msgstr "是否绑定了企业微信"
 
-#: users/serializers/user.py:87
+#: users/serializers/user.py:88
 msgid "Is dingtalk bound"
 msgstr "是否绑定了钉钉"
 
-#: users/serializers/user.py:88
+#: users/serializers/user.py:89
 msgid "Is feishu bound"
 msgstr "是否绑定了飞书"
 
-#: users/serializers/user.py:111
+#: users/serializers/user.py:112
 msgid "Role limit to {}"
 msgstr "角色只能为 {}"
 
-#: users/serializers/user.py:231
+#: users/serializers/user.py:232
 msgid "name not unique"
 msgstr "名称重复"
 
