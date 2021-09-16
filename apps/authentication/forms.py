@@ -67,9 +67,9 @@ class ChallengeMixin(forms.Form):
 
 def get_user_login_form_cls(*, captcha=False):
     bases = []
-    if settings.SECURITY_LOGIN_CAPTCHA_ENABLED and captcha:
-        bases.append(CaptchaMixin)
     if settings.SECURITY_LOGIN_CHALLENGE_ENABLED:
         bases.append(ChallengeMixin)
+    elif settings.SECURITY_LOGIN_CAPTCHA_ENABLED and captcha:
+        bases.append(CaptchaMixin)
     bases.append(UserLoginForm)
     return type('UserLoginForm', tuple(bases), {})

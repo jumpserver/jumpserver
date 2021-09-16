@@ -70,7 +70,7 @@ class SecurityAuthSerializer(serializers.Serializer):
         help_text=_("If enable, CAS、OIDC auth will be failed, if user not exist yet")
     )
     SECURITY_MFA_VERIFY_TTL = serializers.IntegerField(
-        min_value=5, max_value=60*30,
+        min_value=5, max_value=60*60*10,
         label=_("MFA verify TTL"), help_text=_("Unit: second"),
     )
     SECURITY_LOGIN_CAPTCHA_ENABLED = serializers.BooleanField(
