@@ -12,6 +12,7 @@ default-mysql-client
 default-libmysqlclient-dev
 
 # Pillow
+libpq-dev
 libffi-dev
 # libfreetype6-dev
 # libfribidi-dev
