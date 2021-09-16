@@ -89,9 +89,6 @@ class ClientProtocolMixin:
         drives_redirect = is_true(self.request.query_params.get('drives_redirect'))
         token = self.create_token(user, asset, application, system_user)
 
-        if system_user.login_mode == SystemUser.LOGIN_MANUAL:
-            options['prompt for credentials on client:i'] = '1'
-
         if drives_redirect:
             options['drivestoredirect:s'] = '*'
         options['screen mode id:i'] = '2' if full_screen else '1'
@@ -99,7 +96,12 @@ class ClientProtocolMixin:
         if not address or address == 'localhost:3389':
             address = self.request.get_host().split(':')[0] + ':3389'
         options['full address:s'] = address
-        options['username:s'] = '{}|{}'.format(user.username, token)
+
+        if system_user.login_mode == SystemUser.LOGIN_MANUAL:
+            options['username:s'] = 'manual'
+        else:
+            options['username:s'] = '{}|{}'.format(user.username, token)
+
         if system_user.ad_domain:
             options['domain:s'] = system_user.ad_domain
         if width and height:
