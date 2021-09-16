@@ -9,6 +9,7 @@ from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.http import HttpResponse
 from django.shortcuts import reverse, redirect
 from django.utils.decorators import method_decorator
+from django.db import transaction
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
@@ -18,14 +19,13 @@ from django.views.generic.edit import FormView
 from django.conf import settings
 from django.urls import reverse_lazy
 from django.contrib.auth import BACKEND_SESSION_KEY
-from django.db.transaction import atomic
 
-from common.utils import get_request_ip, FlashMessageUtil
+from common.utils import FlashMessageUtil
 from users.utils import (
     redirect_user_first_login_or_index
 )
 from ..const import RSA_PRIVATE_KEY, RSA_PUBLIC_KEY
-from .. import mixins, errors, utils
+from .. import mixins, errors
 from ..forms import get_user_login_form_cls
 
 
@@ -109,7 +109,7 @@ class UserLoginView(mixins.AuthMixin, FormView):
         self.request.session.delete_test_cookie()
 
         try:
-            with atomic():
+            with transaction.atomic():
                 self.check_user_auth(decrypt_passwd=True)
         except errors.AuthFailedError as e:
             form.add_error(None, e.msg)

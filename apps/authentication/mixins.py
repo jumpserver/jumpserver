@@ -191,7 +191,10 @@ class AuthMixin(PasswordEncryptionViewMixin):
         raise self.partial_credential_error(error=error)
 
     def _set_partial_credential_error(self, username, ip, request):
-        self.partial_credential_error = partial(errors.CredentialError, username=username, ip=ip, request=request)
+        self.partial_credential_error = partial(
+            errors.CredentialError, username=username,
+            ip=ip, request=request
+        )
 
     def get_auth_data(self, decrypt_passwd=False):
         request = self.request

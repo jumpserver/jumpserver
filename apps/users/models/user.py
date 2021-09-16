@@ -472,6 +472,7 @@ class MFAMixin:
         (2, _("Force enable")),
     )
     is_org_admin: bool
+    username: str
 
     @property
     def mfa_enabled(self):
