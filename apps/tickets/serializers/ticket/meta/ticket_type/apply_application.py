@@ -6,6 +6,8 @@ from perms.models import ApplicationPermission
 from applications.const import AppCategory, AppType
 from orgs.utils import tmp_to_org
 from tickets.models import Ticket
+from applications.models import Application
+from assets.models import SystemUser
 from .common import DefaultPermissionName
 
 __all__ = [
@@ -70,6 +72,13 @@ class ApplySerializer(serializers.Serializer):
         raise serializers.ValidationError(_(
             'Permission named `{}` already exists'.format(permission_name)
         ))
+
+    def validate_apply_applications(self, apply_applications):
+        type = self.root.initial_data['meta'].get('apply_type')
+        org_id = self.root.initial_data.get('org_id')
+        with tmp_to_org(org_id):
+            applications = Application.objects.filter(id__in=apply_applications, type=type).values_list('id', flat=True)
+        return list(applications)
 
     def validate_apply_date_expired(self, value):
         date_start = self.root.initial_data['meta'].get('apply_date_start')
