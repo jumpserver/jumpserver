@@ -1,6 +1,8 @@
 from datetime import datetime
+from urllib.parse import urljoin
 
 from django.utils.translation import ugettext as _
+from django.conf import settings
 
 from common.utils import reverse, get_request_ip_or_data, get_request_user_agent, lazyproperty
 from notifications.notifications import UserMessage
@@ -160,6 +162,8 @@ Browser: %(browser)s
 
 
 class PasswordExpirationReminderMsg(UserMessage):
+    update_password_url = urljoin(settings.SITE_URL, '/ui/#/users/profile/?activeTab=PasswordUpdate')
+
     def get_text_msg(self) -> dict:
         user = self.user
 
@@ -186,7 +190,7 @@ Login direct 👇
             'name': user.name,
             'date_password_expired': datetime.fromtimestamp(datetime.timestamp(
                 user.date_password_expired)).strftime('%Y-%m-%d %H:%M'),
-            'update_password_url': reverse('users:user-password-update', external=True),
+            'update_password_url': self.update_password_url,
             'forget_password_url': reverse('authentication:forgot-password', external=True),
             'email': user.email,
             'login_url': reverse('authentication:login', external=True),
@@ -224,7 +228,7 @@ Login direct 👇
             'name': user.name,
             'date_password_expired': datetime.fromtimestamp(datetime.timestamp(
                 user.date_password_expired)).strftime('%Y-%m-%d %H:%M'),
-            'update_password_url': reverse('users:user-password-update', external=True),
+            'update_password_url': self.update_password_url,
             'forget_password_url': reverse('authentication:forgot-password', external=True),
             'email': user.email,
             'login_url': reverse('authentication:login', external=True),
