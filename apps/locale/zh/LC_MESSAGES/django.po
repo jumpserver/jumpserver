@@ -3980,7 +3980,7 @@ msgstr "链接失效"
 
 #: terminal/models/sharing.py:50
 msgid "Link expired"
-msgstr "是否过期"
+msgstr "链接过期"
 
 #: terminal/models/sharing.py:63
 msgid "Session sharing"
