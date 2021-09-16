@@ -89,9 +89,6 @@ class ClientProtocolMixin:
         drives_redirect = is_true(self.request.query_params.get('drives_redirect'))
         token = self.create_token(user, asset, application, system_user)
 
-        if system_user.login_mode == SystemUser.LOGIN_MANUAL:
-            options['prompt for credentials on client:i'] = '1'
-
         if drives_redirect:
             options['drivestoredirect:s'] = '*'
         options['screen mode id:i'] = '2' if full_screen else '1'
