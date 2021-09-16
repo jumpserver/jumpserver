@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-15 20:51+0800\n"
+"POT-Creation-Date: 2021-09-16 10:31+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -5678,7 +5678,7 @@ msgstr "* 新密码不能是最近 {} 次的密码"
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
-#: xpack/plugins/change_auth_plan/api/app.py:112
+#: xpack/plugins/change_auth_plan/api/app.py:113
 #: xpack/plugins/change_auth_plan/api/asset.py:100
 msgid "The parameter 'action' must be [{}]"
 msgstr "参数 'action' 必须是 [{}]"
@@ -6126,16 +6126,16 @@ msgstr "租户 ID"
 msgid "Subscription ID"
 msgstr "订阅 ID"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:81
-#: xpack/plugins/cloud/serializers/account_attrs.py:86
+#: xpack/plugins/cloud/serializers/account_attrs.py:87
+#: xpack/plugins/cloud/serializers/account_attrs.py:92
 msgid "API Endpoint"
 msgstr "API 端点"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:92
+#: xpack/plugins/cloud/serializers/account_attrs.py:98
 msgid "Service account key"
 msgstr "账户密钥"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:93
+#: xpack/plugins/cloud/serializers/account_attrs.py:99
 msgid "The file is in JSON format"
 msgstr "JSON 格式的文件"
 
