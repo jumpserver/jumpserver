@@ -1,7 +1,7 @@
 from django.dispatch import receiver
 from django.apps import apps
 from simple_history.signals import pre_create_historical_record
-from django.db.models.signals import post_save, pre_save, post_delete
+from django.db.models.signals import post_save, pre_save, pre_delete
 
 from common.utils import get_logger
 from ..models import AuthBook, SystemUser
@@ -28,7 +28,7 @@ def pre_create_historical_record_callback(sender, history_instance=None, **kwarg
             setattr(history_instance, attr, system_user_attr_value)
 
 
-@receiver(post_delete, sender=AuthBook)
+@receiver(pre_delete, sender=AuthBook)
 def on_authbook_post_delete(sender, instance, **kwargs):
     instance.remove_asset_admin_user_if_need()
 

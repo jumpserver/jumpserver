@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-15 20:51+0800\n"
+"POT-Creation-Date: 2021-09-16 19:25+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -25,7 +25,7 @@ msgstr ""
 #: orgs/models.py:24 perms/models/base.py:44 settings/models.py:29
 #: settings/serializers/sms.py:6 terminal/models/storage.py:23
 #: terminal/models/task.py:16 terminal/models/terminal.py:100
-#: users/forms/profile.py:32 users/models/group.py:15 users/models/user.py:604
+#: users/forms/profile.py:32 users/models/group.py:15 users/models/user.py:605
 #: users/templates/users/_select_user_modal.html:13
 #: users/templates/users/user_asset_permission.html:37
 #: users/templates/users/user_asset_permission.html:154
@@ -60,7 +60,7 @@ msgstr "激活中"
 #: orgs/models.py:27 perms/models/base.py:53 settings/models.py:34
 #: terminal/models/storage.py:26 terminal/models/terminal.py:114
 #: tickets/models/ticket.py:71 users/models/group.py:16
-#: users/models/user.py:637 xpack/plugins/change_auth_plan/models/base.py:41
+#: users/models/user.py:638 xpack/plugins/change_auth_plan/models/base.py:41
 #: xpack/plugins/cloud/models.py:35 xpack/plugins/cloud/models.py:113
 #: xpack/plugins/gathered_user/models.py:26
 msgid "Comment"
@@ -98,7 +98,7 @@ msgstr "动作"
 #: terminal/backends/command/models.py:18
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:38
 #: tickets/models/comment.py:17 users/const.py:14 users/models/user.py:181
-#: users/models/user.py:809 users/models/user.py:835
+#: users/models/user.py:814 users/models/user.py:840
 #: users/serializers/group.py:19
 #: users/templates/users/user_asset_permission.html:38
 #: users/templates/users/user_asset_permission.html:64
@@ -177,7 +177,7 @@ msgstr "格式为逗号分隔的字符串, * 表示匹配所有. "
 #: applications/serializers/attrs/application_type/vmware_client.py:26
 #: assets/models/base.py:176 assets/models/gathered_user.py:15
 #: audits/models.py:105 authentication/forms.py:15 authentication/forms.py:17
-#: ops/models/adhoc.py:148 users/forms/profile.py:31 users/models/user.py:602
+#: ops/models/adhoc.py:148 users/forms/profile.py:31 users/models/user.py:603
 #: users/templates/users/_select_user_modal.html:14
 #: xpack/plugins/change_auth_plan/models/asset.py:35
 #: xpack/plugins/change_auth_plan/models/asset.py:191
@@ -281,7 +281,7 @@ msgstr "应用管理"
 #: applications/serializers/application.py:88 assets/models/label.py:21
 #: perms/models/application_permission.py:20
 #: perms/serializers/application/user_permission.py:33
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:20
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:22
 #: xpack/plugins/change_auth_plan/models/app.py:25
 msgid "Category"
 msgstr "类别"
@@ -292,7 +292,7 @@ msgstr "类别"
 #: perms/serializers/application/user_permission.py:34
 #: terminal/models/storage.py:55 terminal/models/storage.py:116
 #: tickets/models/flow.py:51 tickets/models/ticket.py:48
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:27
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:29
 #: xpack/plugins/change_auth_plan/models/app.py:28
 #: xpack/plugins/change_auth_plan/models/app.py:148
 msgid "Type"
@@ -310,7 +310,7 @@ msgstr ""
 #: applications/serializers/application.py:59
 #: applications/serializers/application.py:89 assets/serializers/label.py:13
 #: perms/serializers/application/permission.py:16
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:24
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:26
 msgid "Category display"
 msgstr "类别名称"
 
@@ -318,7 +318,7 @@ msgstr "类别名称"
 #: applications/serializers/application.py:91
 #: assets/serializers/system_user.py:26 audits/serializers.py:29
 #: perms/serializers/application/permission.py:17
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:31
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:33
 #: tickets/serializers/ticket/ticket.py:22
 #: tickets/serializers/ticket/ticket.py:168
 msgid "Type display"
@@ -377,7 +377,7 @@ msgstr "目标URL"
 #: applications/serializers/attrs/application_type/vmware_client.py:30
 #: assets/models/base.py:177 audits/signals_handler.py:65
 #: authentication/forms.py:22
-#: authentication/templates/authentication/login.html:164
+#: authentication/templates/authentication/login.html:165
 #: settings/serializers/auth/ldap.py:44 users/forms/profile.py:21
 #: users/templates/users/user_otp_check_password.html:13
 #: users/templates/users/user_password_update.html:43
@@ -531,7 +531,7 @@ msgstr "标签管理"
 #: assets/models/cluster.py:28 assets/models/cmd_filter.py:26
 #: assets/models/cmd_filter.py:67 assets/models/group.py:21
 #: common/db/models.py:70 common/mixins/models.py:49 orgs/models.py:25
-#: orgs/models.py:437 perms/models/base.py:51 users/models/user.py:645
+#: orgs/models.py:437 perms/models/base.py:51 users/models/user.py:646
 #: users/serializers/group.py:33
 #: xpack/plugins/change_auth_plan/models/base.py:45
 #: xpack/plugins/cloud/models.py:119 xpack/plugins/gathered_user/models.py:30
@@ -544,7 +544,7 @@ msgstr "创建者"
 #: assets/models/label.py:25 common/db/models.py:72 common/mixins/models.py:50
 #: ops/models/adhoc.py:38 ops/models/command.py:29 orgs/models.py:26
 #: orgs/models.py:435 perms/models/base.py:52 users/models/group.py:18
-#: users/models/user.py:836 xpack/plugins/cloud/models.py:122
+#: users/models/user.py:841 xpack/plugins/cloud/models.py:122
 msgid "Date created"
 msgstr "创建日期"
 
@@ -599,7 +599,7 @@ msgstr "带宽"
 msgid "Contact"
 msgstr "联系人"
 
-#: assets/models/cluster.py:22 users/models/user.py:623
+#: assets/models/cluster.py:22 users/models/user.py:624
 msgid "Phone"
 msgstr "手机"
 
@@ -625,7 +625,7 @@ msgid "Default"
 msgstr "默认"
 
 #: assets/models/cluster.py:36 assets/models/label.py:14
-#: users/models/user.py:821
+#: users/models/user.py:826
 msgid "System"
 msgstr "系统"
 
@@ -687,7 +687,7 @@ msgstr "无法连接到 {ip} 上的端口 {port}"
 msgid "Authentication failed"
 msgstr "认证失败"
 
-#: assets/models/domain.py:133
+#: assets/models/domain.py:133 assets/models/domain.py:155
 msgid "Connect failed"
 msgstr "连接失败"
 
@@ -1091,8 +1091,8 @@ msgstr "成功"
 
 #: audits/models.py:43 ops/models/command.py:30 perms/models/base.py:49
 #: terminal/models/session.py:52
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:53
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:45
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:55
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:47
 #: xpack/plugins/change_auth_plan/models/base.py:105
 #: xpack/plugins/change_auth_plan/models/base.py:189
 #: xpack/plugins/gathered_user/models.py:76
@@ -1160,7 +1160,7 @@ msgstr "用户代理"
 #: audits/models.py:110
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
 #: authentication/templates/authentication/login_otp.html:6
-#: users/forms/profile.py:64 users/models/user.py:626
+#: users/forms/profile.py:64 users/models/user.py:627
 #: users/serializers/profile.py:102
 msgid "MFA"
 msgstr "多因子认证"
@@ -1239,14 +1239,14 @@ msgid "Auth Token"
 msgstr "认证令牌"
 
 #: audits/signals_handler.py:68
-#: authentication/templates/authentication/login.html:210
-#: notifications/backends/__init__.py:11 users/models/user.py:659
+#: authentication/templates/authentication/login.html:216
+#: notifications/backends/__init__.py:11 users/models/user.py:660
 msgid "WeCom"
 msgstr "企业微信"
 
 #: audits/signals_handler.py:69
-#: authentication/templates/authentication/login.html:215
-#: notifications/backends/__init__.py:12 users/models/user.py:660
+#: authentication/templates/authentication/login.html:221
+#: notifications/backends/__init__.py:12 users/models/user.py:661
 msgid "DingTalk"
 msgstr "钉钉"
 
@@ -1433,7 +1433,7 @@ msgstr "{ApplicationPermission} 添加 {SystemUser}"
 msgid "{ApplicationPermission} REMOVE {SystemUser}"
 msgstr "{ApplicationPermission} 移除 {SystemUser}"
 
-#: authentication/api/connection_token.py:226
+#: authentication/api/connection_token.py:227
 msgid "Invalid token"
 msgstr "无效的令牌"
 
@@ -1616,15 +1616,15 @@ msgstr "来源 IP 不被允许登录"
 msgid "SSO auth closed"
 msgstr "SSO 认证关闭了"
 
-#: authentication/errors.py:298 authentication/mixins.py:318
+#: authentication/errors.py:298 authentication/mixins.py:321
 msgid "Your password is too simple, please change it for security"
 msgstr "你的密码过于简单，为了安全，请修改"
 
-#: authentication/errors.py:307 authentication/mixins.py:325
+#: authentication/errors.py:307 authentication/mixins.py:328
 msgid "You should to change your password before login"
 msgstr "登录完成前，请先修改密码"
 
-#: authentication/errors.py:316 authentication/mixins.py:332
+#: authentication/errors.py:316 authentication/mixins.py:335
 msgid "Your password has expired, please reset before logging in"
 msgstr "您的密码已过期，先修改再登录"
 
@@ -1649,7 +1649,7 @@ msgstr "MFA 类型"
 msgid "MFA code"
 msgstr "多因子认证验证码"
 
-#: authentication/mixins.py:308
+#: authentication/mixins.py:311
 msgid "Please change your password"
 msgstr "请修改密码"
 
@@ -1764,31 +1764,31 @@ msgstr "代码错误"
 msgid "Welcome back, please enter username and password to login"
 msgstr "欢迎回来，请输入用户名和密码登录"
 
-#: authentication/templates/authentication/login.html:183
+#: authentication/templates/authentication/login.html:189
 #: users/templates/users/forgot_password.html:15
 #: users/templates/users/forgot_password.html:16
 msgid "Forgot password"
 msgstr "忘记密码"
 
-#: authentication/templates/authentication/login.html:190
+#: authentication/templates/authentication/login.html:196
 #: templates/_header_bar.html:83
 msgid "Login"
 msgstr "登录"
 
-#: authentication/templates/authentication/login.html:197
+#: authentication/templates/authentication/login.html:203
 msgid "More login options"
 msgstr "更多登录方式"
 
-#: authentication/templates/authentication/login.html:200
+#: authentication/templates/authentication/login.html:206
 msgid "OpenID"
 msgstr "OpenID"
 
-#: authentication/templates/authentication/login.html:205
+#: authentication/templates/authentication/login.html:211
 msgid "CAS"
 msgstr "CAS"
 
-#: authentication/templates/authentication/login.html:220
-#: notifications/backends/__init__.py:14 users/models/user.py:661
+#: authentication/templates/authentication/login.html:226
+#: notifications/backends/__init__.py:14 users/models/user.py:662
 msgid "FeiShu"
 msgstr "飞书"
 
@@ -2186,7 +2186,7 @@ msgstr ""
 "div>"
 
 #: notifications/backends/__init__.py:10 users/forms/profile.py:101
-#: users/models/user.py:606
+#: users/models/user.py:607
 msgid "Email"
 msgstr "邮件"
 
@@ -2342,22 +2342,22 @@ msgstr "任务结束"
 msgid "Server performance"
 msgstr "监控告警"
 
-#: ops/notifications.py:40
+#: ops/notifications.py:47
 #, python-brace-format
 msgid "The terminal is offline: {name}"
 msgstr "终端已离线: {name}"
 
-#: ops/notifications.py:46
+#: ops/notifications.py:53
 #, python-brace-format
 msgid "[Disk] Disk used more than {max_threshold}%: => {value} ({name})"
 msgstr "[Disk] 硬盘使用率超过 {max_threshold}%: => {value} ({name})"
 
-#: ops/notifications.py:53
+#: ops/notifications.py:60
 #, python-brace-format
 msgid "[Memory] Memory used more than {max_threshold}%: => {value} ({name})"
 msgstr "[Memory] 内存使用率超过 {max_threshold}%: => {value} ({name})"
 
-#: ops/notifications.py:60
+#: ops/notifications.py:67
 #, python-brace-format
 msgid "[CPU] CPU load more than {max_threshold}: => {value} ({name})"
 msgstr "[CPU] CPU 使用率超过 {max_threshold}: => {value} ({name})"
@@ -2404,7 +2404,7 @@ msgstr "组织审计员"
 msgid "GLOBAL"
 msgstr "全局组织"
 
-#: orgs/models.py:434 users/models/user.py:614 users/serializers/user.py:37
+#: orgs/models.py:434 users/models/user.py:615 users/serializers/user.py:37
 #: users/templates/users/_select_user_modal.html:15
 msgid "Role"
 msgstr "角色"
@@ -2469,7 +2469,7 @@ msgid "Favorite"
 msgstr "收藏夹"
 
 #: perms/models/base.py:47 templates/_nav.html:21 users/models/group.py:31
-#: users/models/user.py:610 users/templates/users/_select_user_modal.html:16
+#: users/models/user.py:611 users/templates/users/_select_user_modal.html:16
 #: users/templates/users/user_asset_permission.html:39
 #: users/templates/users/user_asset_permission.html:67
 #: users/templates/users/user_database_app_permission.html:38
@@ -2478,9 +2478,9 @@ msgid "User group"
 msgstr "用户组"
 
 #: perms/models/base.py:50
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:56
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:48
-#: users/models/user.py:642
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:58
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:50
+#: users/models/user.py:643
 msgid "Date expired"
 msgstr "失效日期"
 
@@ -2583,7 +2583,7 @@ msgstr "成功导入 {} 个用户 ( 组织: {} )"
 msgid "Welcome to the JumpServer open source Bastion Host"
 msgstr "欢迎使用JumpServer开源堡垒机"
 
-#: settings/models.py:155 users/templates/users/reset_password.html:29
+#: settings/models.py:191 users/templates/users/reset_password.html:29
 msgid "Setting"
 msgstr "设置"
 
@@ -3132,13 +3132,17 @@ msgstr "下个设备登录，上次登录会被顶掉"
 msgid "Only exist user login"
 msgstr "仅已存在用户登录"
 
-#: settings/serializers/security.py:66 settings/serializers/security.py:70
+#: settings/serializers/security.py:66
 msgid "If enable, CAS、OIDC auth will be failed, if user not exist yet"
 msgstr "开启后，如果系统中不存在该用户，CAS、OIDC 登录将会失败"
 
 #: settings/serializers/security.py:69
 msgid "Only from source login"
 msgstr "仅从用户来源登录"
+
+#: settings/serializers/security.py:70
+msgid "Only log in from the user source property"
+msgstr "开启后，如果用户来源为本地，CAS、OIDC 登录将会失败"
 
 #: settings/serializers/security.py:74
 msgid "MFA verify TTL"
@@ -3980,7 +3984,7 @@ msgstr "链接失效"
 
 #: terminal/models/sharing.py:50
 msgid "Link expired"
-msgstr "是否过期"
+msgstr "链接过期"
 
 #: terminal/models/sharing.py:63
 msgid "Session sharing"
@@ -4539,52 +4543,52 @@ msgstr "你有一个新的工单, 申请人 - {}"
 msgid "Your ticket has been processed, processor - {}"
 msgstr "你的工单已被处理, 处理人 - {}"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:16
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:16
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:18
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:18
 msgid "Apply name"
 msgstr "应用名称"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:35
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:37
 msgid "Apply applications"
 msgstr "申请应用"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:40
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:42
 msgid "Apply applications display"
 msgstr "应用名称名称"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:44
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:46
 msgid "Apply system users"
 msgstr "系统用户"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:49
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:51
 msgid "Apply system user display"
 msgstr "批准的系统用户名称"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:69
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:61
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:71
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:63
 #: tickets/serializers/ticket/ticket.py:127
 msgid "Permission named `{}` already exists"
 msgstr "授权名称 `{}` 已存在"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:75
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:67
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:80
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:72
 msgid "The expiration date should be greater than the start date"
 msgstr "过期时间要大于开始时间"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:20
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:22
 msgid "Apply assets"
 msgstr "申请资产"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:24
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:26
 msgid "Approve assets display"
 msgstr "批准的资产名称"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:29
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:31
 msgid "Approve system users"
 msgstr "批准的系统用户"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:33
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:41
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:35
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:43
 msgid "Apply assets display"
 msgstr "批准的资产名称"
 
@@ -4758,7 +4762,7 @@ msgstr "不能和原来的密钥相同"
 msgid "Not a valid ssh public key"
 msgstr "SSH密钥不合法"
 
-#: users/forms/profile.py:160 users/models/user.py:634
+#: users/forms/profile.py:160 users/models/user.py:635
 #: users/templates/users/user_password_update.html:48
 msgid "Public key"
 msgstr "SSH公钥"
@@ -4771,49 +4775,49 @@ msgstr "短信验证码"
 msgid "Force enable"
 msgstr "强制启用"
 
-#: users/models/user.py:583
+#: users/models/user.py:584
 msgid "Local"
 msgstr "数据库"
 
-#: users/models/user.py:617
+#: users/models/user.py:618
 msgid "Avatar"
 msgstr "头像"
 
-#: users/models/user.py:620
+#: users/models/user.py:621
 msgid "Wechat"
 msgstr "微信"
 
-#: users/models/user.py:631
+#: users/models/user.py:632
 msgid "Private key"
 msgstr "ssh私钥"
 
-#: users/models/user.py:650
+#: users/models/user.py:651
 msgid "Source"
 msgstr "来源"
 
-#: users/models/user.py:654
+#: users/models/user.py:655
 msgid "Date password last updated"
 msgstr "最后更新密码日期"
 
-#: users/models/user.py:657
+#: users/models/user.py:658
 msgid "Need update password"
 msgstr "需要更新密码"
 
-#: users/models/user.py:817
+#: users/models/user.py:822
 msgid "Administrator"
 msgstr "管理员"
 
-#: users/models/user.py:820
+#: users/models/user.py:825
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
-#: users/notifications.py:17 users/notifications.py:50
+#: users/notifications.py:19 users/notifications.py:52
 #: users/templates/users/reset_password.html:5
 #: users/templates/users/reset_password.html:6
 msgid "Reset password"
 msgstr "重置密码"
 
-#: users/notifications.py:18
+#: users/notifications.py:20
 #, python-format
 msgid ""
 "\n"
@@ -4853,7 +4857,7 @@ msgstr ""
 "%(login_url)s\n"
 "\n"
 
-#: users/notifications.py:51
+#: users/notifications.py:53
 #, python-format
 msgid ""
 "\n"
@@ -4897,12 +4901,12 @@ msgstr ""
 "    <br>\n"
 "    "
 
-#: users/notifications.py:90 users/notifications.py:122
+#: users/notifications.py:92 users/notifications.py:124
 #: users/views/profile/reset.py:127
 msgid "Reset password success"
 msgstr "重置密码成功"
 
-#: users/notifications.py:91
+#: users/notifications.py:93
 #, python-format
 msgid ""
 "\n"
@@ -4948,7 +4952,7 @@ msgstr ""
 "        \n"
 "        "
 
-#: users/notifications.py:123
+#: users/notifications.py:125
 #, python-format
 msgid ""
 "\n"
@@ -5011,11 +5015,11 @@ msgstr ""
 "    \n"
 "    "
 
-#: users/notifications.py:166 users/notifications.py:202
+#: users/notifications.py:170 users/notifications.py:206
 msgid "Security notice"
 msgstr "安全通知"
 
-#: users/notifications.py:167
+#: users/notifications.py:171
 #, python-format
 msgid ""
 "\n"
@@ -5059,7 +5063,7 @@ msgstr ""
 "\n"
 "        "
 
-#: users/notifications.py:203
+#: users/notifications.py:207
 #, python-format
 msgid ""
 "\n"
@@ -5108,11 +5112,11 @@ msgstr ""
 "    <br>\n"
 "    "
 
-#: users/notifications.py:240 users/notifications.py:259
+#: users/notifications.py:244 users/notifications.py:263
 msgid "Expiration notice"
 msgstr "过期通知"
 
-#: users/notifications.py:241
+#: users/notifications.py:245
 #, python-format
 msgid ""
 "\n"
@@ -5133,7 +5137,7 @@ msgstr ""
 "为了不影响您正常工作，请联系管理员确认。\n"
 "           "
 
-#: users/notifications.py:260
+#: users/notifications.py:264
 #, python-format
 msgid ""
 "\n"
@@ -5155,11 +5159,11 @@ msgstr ""
 "       <br>\n"
 "       "
 
-#: users/notifications.py:280 users/notifications.py:301
+#: users/notifications.py:284 users/notifications.py:305
 msgid "SSH Key Reset"
 msgstr "重置SSH密钥"
 
-#: users/notifications.py:281
+#: users/notifications.py:285
 #, python-format
 msgid ""
 "\n"
@@ -5184,7 +5188,7 @@ msgstr ""
 "\n"
 "        "
 
-#: users/notifications.py:302
+#: users/notifications.py:306
 #, python-format
 msgid ""
 "\n"
@@ -5209,11 +5213,11 @@ msgstr ""
 "    <br>\n"
 "    "
 
-#: users/notifications.py:324 users/notifications.py:344
+#: users/notifications.py:328 users/notifications.py:348
 msgid "MFA Reset"
 msgstr "重置 MFA"
 
-#: users/notifications.py:325
+#: users/notifications.py:329
 #, python-format
 msgid ""
 "\n"
@@ -5238,7 +5242,7 @@ msgstr ""
 "\n"
 "        "
 
-#: users/notifications.py:345
+#: users/notifications.py:349
 #, python-format
 msgid ""
 "\n"
@@ -5267,7 +5271,7 @@ msgstr ""
 msgid "The old password is incorrect"
 msgstr "旧密码错误"
 
-#: users/serializers/profile.py:36 users/serializers/user.py:140
+#: users/serializers/profile.py:36 users/serializers/user.py:141
 msgid "Password does not match security rules"
 msgstr "密码不满足安全规则"
 
@@ -5353,11 +5357,15 @@ msgstr "是否绑定了钉钉"
 msgid "Is feishu bound"
 msgstr "是否绑定了飞书"
 
-#: users/serializers/user.py:114
+#: users/serializers/user.py:91
+msgid "Is OTP bound"
+msgstr "是否绑定了虚拟MFA"
+
+#: users/serializers/user.py:115
 msgid "Role limit to {}"
 msgstr "角色只能为 {}"
 
-#: users/serializers/user.py:234
+#: users/serializers/user.py:235
 msgid "name not unique"
 msgstr "名称重复"
 
@@ -6243,3 +6251,6 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Only "
+#~ msgstr "仅能从用户配置来源登录"

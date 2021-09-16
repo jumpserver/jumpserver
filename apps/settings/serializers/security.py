@@ -67,10 +67,10 @@ class SecurityAuthSerializer(serializers.Serializer):
     )
     ONLY_ALLOW_AUTH_FROM_SOURCE = serializers.BooleanField(
         required=False, default=False, label=_("Only from source login"),
-        help_text=_("If enable, CAS、OIDC auth will be failed, if user not exist yet")
+        help_text=_("Only log in from the user source property")
     )
     SECURITY_MFA_VERIFY_TTL = serializers.IntegerField(
-        min_value=5, max_value=60*30,
+        min_value=5, max_value=60*60*10,
         label=_("MFA verify TTL"), help_text=_("Unit: second"),
     )
     SECURITY_LOGIN_CAPTCHA_ENABLED = serializers.BooleanField(

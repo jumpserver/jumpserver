@@ -17,11 +17,18 @@ class ServerPerformanceMessage(SystemMessage):
     def __init__(self, msg):
         self._msg = msg
 
-    def get_common_msg(self):
+    def get_html_msg(self) -> dict:
         subject = self._msg[:80]
         return {
             'subject': subject.replace('<br>', '; '),
             'message': self._msg
+        }
+
+    def get_text_msg(self) -> dict:
+        subject = self._msg[:80]
+        return {
+            'subject': subject.replace('<br>', '; '),
+            'message': self._msg.replace('<br>', '\n')
         }
 
     @classmethod
@@ -39,14 +46,14 @@ class ServerPerformanceCheckUtil(object):
             'max_threshold': False,
             'alarm_msg_format': _('The terminal is offline: {name}')
         },
-        'disk_usage': {
+        'disk_used': {
             'default': 0,
             'max_threshold': 80,
             'alarm_msg_format': _(
                 '[Disk] Disk used more than {max_threshold}%: => {value} ({name})'
             )
         },
-        'memory_usage': {
+        'memory_used': {
             'default': 0,
             'max_threshold': 85,
             'alarm_msg_format': _(
@@ -82,7 +89,6 @@ class ServerPerformanceCheckUtil(object):
         default = data['default']
         max_threshold = data['max_threshold']
         value = getattr(self._terminal.stat, item, default)
-        print(value, max_threshold, self._terminal.name, self._terminal.id)
         if isinstance(value, bool) and value != max_threshold:
             return
         elif isinstance(value, (int, float)) and value < max_threshold:

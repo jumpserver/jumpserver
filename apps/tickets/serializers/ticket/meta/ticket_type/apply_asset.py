@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from perms.serializers import ActionsField
@@ -61,9 +63,12 @@ class ApplySerializer(serializers.Serializer):
             'Permission named `{}` already exists'.format(permission_name)
         ))
 
-    def validate_apply_date_expired(self, apply_date_expired):
-        apply_date_start = self.root.initial_data['meta'].get('apply_date_start')
-        if str(apply_date_expired) <= apply_date_start:
+    def validate_apply_date_expired(self, value):
+        date_start = self.root.initial_data['meta'].get('apply_date_start')
+        date_start = datetime.strptime(date_start, '%Y-%m-%dT%H:%M:%S.%fZ')
+        date_expired = self.root.initial_data['meta'].get('apply_date_expired')
+        date_expired = datetime.strptime(date_expired, '%Y-%m-%dT%H:%M:%S.%fZ')
+        if date_expired <= date_start:
             error = _('The expiration date should be greater than the start date')
             raise serializers.ValidationError(error)
-        return apply_date_expired
+        return value

@@ -472,6 +472,7 @@ class MFAMixin:
         (2, _("Force enable")),
     )
     is_org_admin: bool
+    username: str
 
     @property
     def mfa_enabled(self):
@@ -684,6 +685,10 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     @property
     def is_feishu_bound(self):
         return bool(self.feishu_id)
+
+    @property
+    def is_otp_secret_key_bound(self):
+        return bool(self.otp_secret_key)
 
     def get_absolute_url(self):
         return reverse('users:user-detail', args=(self.id,))
