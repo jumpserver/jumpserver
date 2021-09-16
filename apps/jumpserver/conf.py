@@ -14,6 +14,7 @@ import types
 import errno
 import json
 import yaml
+import copy
 from importlib import import_module
 from django.urls import reverse_lazy
 from urllib.parse import urljoin, urlparse
@@ -348,7 +349,8 @@ class Config(dict):
         'HEALTH_CHECK_TOKEN': '',
     }
 
-    def compatible_auth_openid_of_key(self):
+    @staticmethod
+    def convert_keycloak_to_openid(keycloak_config):
         """
         兼容OpenID旧配置 (即 version <= 1.5.8)
         因为旧配置只支持OpenID协议的Keycloak实现,
@@ -356,64 +358,78 @@ class Config(dict):
         构造出新配置中标准OpenID协议中所需的Endpoint即可
         (Keycloak说明文档参考: https://www.keycloak.org/docs/latest/securing_apps/)
         """
-        if self.AUTH_OPENID and not self.AUTH_OPENID_REALM_NAME:
-            self['AUTH_OPENID_KEYCLOAK'] = False
 
-        if not self.AUTH_OPENID:
+        openid_config = copy.deepcopy(keycloak_config)
+
+        auth_openid = openid_config.get('AUTH_OPENID')
+        auth_openid_realm_name = openid_config.get('AUTH_OPENID_REALM_NAME')
+        auth_openid_server_url = openid_config.get('AUTH_OPENID_SERVER_URL')
+
+        if not auth_openid:
             return
 
-        realm_name = self.AUTH_OPENID_REALM_NAME
-        if realm_name is None:
+        if auth_openid and not auth_openid_realm_name:
+            # 开启的是标准 OpenID 配置，关掉 Keycloak 配置
+            openid_config.update({
+                'AUTH_OPENID_KEYCLOAK': False
+            })
+
+        if auth_openid_realm_name is None:
             return
 
-        compatible_keycloak_config = [
-            (
-                'AUTH_OPENID_PROVIDER_ENDPOINT',
-                self.AUTH_OPENID_SERVER_URL
-            ),
-            (
-                'AUTH_OPENID_PROVIDER_AUTHORIZATION_ENDPOINT',
-                '/realms/{}/protocol/openid-connect/auth'.format(realm_name)
-            ),
-            (
-                'AUTH_OPENID_PROVIDER_TOKEN_ENDPOINT',
-                '/realms/{}/protocol/openid-connect/token'.format(realm_name)
-            ),
-            (
-                'AUTH_OPENID_PROVIDER_JWKS_ENDPOINT',
-                '/realms/{}/protocol/openid-connect/certs'.format(realm_name)
-            ),
-            (
-                'AUTH_OPENID_PROVIDER_USERINFO_ENDPOINT',
-                '/realms/{}/protocol/openid-connect/userinfo'.format(realm_name)
-            ),
-            (
-                'AUTH_OPENID_PROVIDER_END_SESSION_ENDPOINT',
-                '/realms/{}/protocol/openid-connect/logout'.format(realm_name)
-            )
-        ]
-        for key, value in compatible_keycloak_config:
-            self[key] = value
+        # # convert key # #
+        compatible_config = {
+            'AUTH_OPENID_PROVIDER_ENDPOINT': auth_openid_server_url,
 
-    def compatible_auth_openid_of_value(self):
-        """
-        兼容值的绝对路径、相对路径
-        (key 为 AUTH_OPENID_PROVIDER_*_ENDPOINT 的配置)
-        """
-        if not self.AUTH_OPENID:
-            return
+            'AUTH_OPENID_PROVIDER_AUTHORIZATION_ENDPOINT': '/realms/{}/protocol/openid-connect/auth'
+                                                           ''.format(auth_openid_realm_name),
+            'AUTH_OPENID_PROVIDER_TOKEN_ENDPOINT': '/realms/{}/protocol/openid-connect/token'
+                                                   ''.format(auth_openid_realm_name),
+            'AUTH_OPENID_PROVIDER_JWKS_ENDPOINT': '/realms/{}/protocol/openid-connect/certs'
+                                                  ''.format(auth_openid_realm_name),
+            'AUTH_OPENID_PROVIDER_USERINFO_ENDPOINT': '/realms/{}/protocol/openid-connect/userinfo'
+                                                      ''.format(auth_openid_realm_name),
+            'AUTH_OPENID_PROVIDER_END_SESSION_ENDPOINT': '/realms/{}/protocol/openid-connect/logout'
+                                                         ''.format(auth_openid_realm_name)
+        }
+        for key, value in compatible_config.items():
+            openid_config[key] = value
 
-        base = self.AUTH_OPENID_PROVIDER_ENDPOINT
-        config = list(self.items())
-        for key, value in config:
+        # # convert value # #
+        """ 兼容值的绝对路径、相对路径 (key 为 AUTH_OPENID_PROVIDER_*_ENDPOINT 的配置) """
+        base = openid_config.get('AUTH_OPENID_PROVIDER_ENDPOINT')
+        for key, value in openid_config.items():
             result = re.match(r'^AUTH_OPENID_PROVIDER_.*_ENDPOINT$', key)
             if result is None:
                 continue
             if value is None:
                 # None 在 url 中有特殊含义 (比如对于: end_session_endpoint)
                 continue
+
             value = build_absolute_uri(base, value)
+            openid_config[key] = value
+
+        return openid_config
+
+    def get_keycloak_config(self):
+        keycloak_config = {
+            'AUTH_OPENID': self.AUTH_OPENID,
+            'AUTH_OPENID_REALM_NAME': self.AUTH_OPENID_REALM_NAME,
+            'AUTH_OPENID_SERVER_URL': self.AUTH_OPENID_SERVER_URL,
+            'AUTH_OPENID_PROVIDER_ENDPOINT': self.AUTH_OPENID_PROVIDER_ENDPOINT
+        }
+        return keycloak_config
+
+    def set_openid_config(self, openid_config):
+        for key, value in openid_config.items():
             self[key] = value
+
+    def compatible_auth_openid(self, keycloak_config=None):
+        if keycloak_config is None:
+            keycloak_config = self.get_keycloak_config()
+        openid_config = self.convert_keycloak_to_openid(keycloak_config)
+        if openid_config:
+            self.set_openid_config(openid_config)
 
     def compatible(self):
         """
@@ -424,14 +440,8 @@ class Config(dict):
         处理顺序要保持先对key做处理, 再对value做处理,
         因为处理value的时候，只根据最新版本支持的key进行
         """
-        parts = ['key', 'value']
-        targets = ['auth_openid']
-        for part in parts:
-            for target in targets:
-                method_name = 'compatible_{}_of_{}'.format(target, part)
-                method = getattr(self, method_name, None)
-                if method is not None:
-                    method()
+        # 兼容 OpenID 配置
+        self.compatible_auth_openid()
 
     def convert_type(self, k, v):
         default_value = self.defaults.get(k)
