@@ -68,7 +68,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 
 #### 微信交流群
 
-<img src="https://download.jumpserver.org/images/weixin-group.jpeg" alt="微信群二维码" width="200"/>
+<img src="https://download.jumpserver.org/images/wecom-group.jpeg" alt="微信群二维码" width="200"/>
 
 ### 贡献
 如果有你好的想法创意，或者帮助我们修复了 Bug, 欢迎提交 Pull Request
