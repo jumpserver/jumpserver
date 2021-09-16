@@ -17,11 +17,18 @@ class ServerPerformanceMessage(SystemMessage):
     def __init__(self, msg):
         self._msg = msg
 
-    def get_common_msg(self):
+    def get_html_msg(self) -> dict:
         subject = self._msg[:80]
         return {
             'subject': subject.replace('<br>', '; '),
             'message': self._msg
+        }
+
+    def get_text_msg(self) -> dict:
+        subject = self._msg[:80]
+        return {
+            'subject': subject.replace('<br>', '; '),
+            'message': self._msg.replace('<br>', '\n')
         }
 
     @classmethod
