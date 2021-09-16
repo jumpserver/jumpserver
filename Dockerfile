@@ -33,7 +33,7 @@ RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
 COPY ./requirements/requirements.txt ./requirements/requirements.txt
 RUN pip install --upgrade pip==20.2.4 setuptools==49.6.0 wheel==0.34.2 -i ${PIP_MIRROR} \
     && pip config set global.index-url ${PIP_MIRROR} \
-    && pip install --no-cache-dir $(grep 'jms' requirements/requirements.txt) -i ${PIP_JMS_MIRROR} \
+    && pip install --no-cache-dir $(grep -E 'jms|jumpserver' requirements/requirements.txt) -i ${PIP_JMS_MIRROR} \
     && pip install --no-cache-dir -r requirements/requirements.txt
 
 COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/jumpserver
@@ -41,7 +41,7 @@ RUN mkdir -p /root/.ssh/ \
     && echo "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null" > /root/.ssh/config
 
 RUN mkdir -p /opt/jumpserver/oracle/
-ADD https://f2c-north-rel.oss-cn-qingdao.aliyuncs.com/2.0/north/jumpserver/instantclient-basiclite-linux.x64-21.1.0.0.0.tar /opt/jumpserver/oracle/
+ADD https://download.jumpserver.org/public/instantclient-basiclite-linux.x64-21.1.0.0.0.tar /opt/jumpserver/oracle/
 RUN tar xvf /opt/jumpserver/oracle/instantclient-basiclite-linux.x64-21.1.0.0.0.tar -C /opt/jumpserver/oracle/
 RUN sh -c "echo /opt/jumpserver/oracle/instantclient_21_1 > /etc/ld.so.conf.d/oracle-instantclient.conf"
 RUN ldconfig
