@@ -685,6 +685,10 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     def is_feishu_bound(self):
         return bool(self.feishu_id)
 
+    @property
+    def is_otp_secret_key_bound(self):
+        return bool(self.otp_secret_key)
+
     def get_absolute_url(self):
         return reverse('users:user-detail', args=(self.id,))
 
