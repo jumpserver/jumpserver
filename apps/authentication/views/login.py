@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 import os
 import datetime
 
+from django.templatetags.static import static
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.http import HttpResponse
 from django.shortcuts import reverse, redirect
@@ -136,6 +137,43 @@ class UserLoginView(mixins.AuthMixin, FormView):
         self.request.session[RSA_PRIVATE_KEY] = None
         self.request.session[RSA_PUBLIC_KEY] = None
 
+    @staticmethod
+    def get_support_auth_methods():
+        auth_methods = [
+            {
+                'name': 'OpenID',
+                'enabled': settings.AUTH_OPENID,
+                'url': reverse('authentication:openid:login'),
+                'logo':  static('img/login_oidc_logo.png')
+            },
+            {
+                'name': 'CAS',
+                'enabled': settings.AUTH_CAS,
+                'url': reverse('authentication:cas:cas-login'),
+                'logo':  static('img/login_cas_logo.png')
+            },
+            {
+                'name': _('WeCom'),
+                'enabled': settings.AUTH_WECOM,
+                'url': reverse('authentication:wecom-qr-login'),
+                'logo':  static('img/login_wecom_logo.png')
+            },
+            {
+                'name': _('DingTalk'),
+                'enabled': settings.AUTH_DINGTALK,
+                'url': reverse('authentication:dingtalk-qr-login'),
+                'logo':  static('img/login_dingtalk_logo.png')
+            },
+            {
+                'name': _('FeiShu'),
+                'enabled': settings.AUTH_FEISHU,
+                'url': reverse('authentication:feishu-qr-login'),
+                'logo':  static('img/login_feishu_logo.png')
+            }
+        ]
+        return [method for method in auth_methods]
+        # return [method for method in auth_methods if method['enabled']]
+
     def get_context_data(self, **kwargs):
         forgot_password_url = reverse('authentication:forgot-password')
         has_other_auth_backend = settings.AUTHENTICATION_BACKENDS[0] != settings.AUTH_BACKEND_MODEL
@@ -144,6 +182,8 @@ class UserLoginView(mixins.AuthMixin, FormView):
 
         context = {
             'demo_mode': os.environ.get("DEMO_MODE"),
+            'auth_methods': self.get_support_auth_methods(),
+            'has_other_auth'
             'AUTH_OPENID': settings.AUTH_OPENID,
             'AUTH_CAS': settings.AUTH_CAS,
             'AUTH_WECOM': settings.AUTH_WECOM,

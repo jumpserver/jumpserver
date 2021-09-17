@@ -146,11 +146,9 @@
                 <form id="login-form" action="" method="post" role="form" novalidate="novalidate">
                     {% csrf_token %}
                     <div style="line-height: 17px;margin-bottom: 20px;color: #999999;">
-                    {% if form.errors %}
+                    {% if form.non_field_errors %}
                         <p class="help-block red-fonts">
-                            {% if form.non_field_errors %}
-                                {{ form.non_field_errors.as_text }}
-                            {% endif %}
+                            {{ form.non_field_errors.as_text }}
                         </p>
                     {% else %}
                         <p class="welcome-message">
@@ -197,35 +195,15 @@
                     </div>
 
                     <div>
-                        {% if AUTH_OPENID or AUTH_CAS or AUTH_WECOM or AUTH_DINGTALK or AUTH_FEISHU %}
+                        {% if auth_methods %}
                             <div class="hr-line-dashed"></div>
                             <div style="display: inline-block; float: left">
-                                <b class="text-muted text-left" >{% trans "More login options" %}</b>
-                                {% if AUTH_OPENID %}
-                                    <a href="{% url 'authentication:openid:login' %}" class="more-login-item">
-                                        <i class="fa fa-openid"></i> {% trans 'OpenID' %}
-                                    </a>
-                                {% endif %}
-                                {% if AUTH_CAS %}
-                                    <a href="{% url 'authentication:cas:cas-login' %}" class="more-login-item">
-                                        <i class="fa"><img src="{{ LOGIN_CAS_LOGO_URL }}" height="13" width="13"></i> {% trans 'CAS' %}
-                                    </a>
-                                {% endif %}
-                                {% if AUTH_WECOM %}
-                                    <a href="{% url 'authentication:wecom-qr-login' %}" class="more-login-item">
-                                        <i class="fa"><img src="{{ LOGIN_WECOM_LOGO_URL }}" height="13" width="13"></i> {% trans 'WeCom' %}
-                                    </a>
-                                {% endif %}
-                                {% if AUTH_DINGTALK %}
-                                    <a href="{% url 'authentication:dingtalk-qr-login' %}" class="more-login-item">
-                                        <i class="fa"><img src="{{ LOGIN_DINGTALK_LOGO_URL }}" height="13" width="13"></i> {% trans 'DingTalk' %}
-                                    </a>
-                                {% endif %}
-                                {% if AUTH_FEISHU %}
-                                <a href="{% url 'authentication:feishu-qr-login' %}" class="more-login-item">
-                                    <i class="fa"><img src="{{ LOGIN_FEISHU_LOGO_URL }}" height="13" width="13"></i> {% trans 'FeiShu' %}
+                            <b class="text-muted text-left" >{% trans "More login options" %}</b>
+                            {% for method in auth_methods %}
+                                <a href="{{ method.url }}" class="more-login-item">
+                                    <i class="fa"><img src="{{ method.logo }}" height="13" width="13"></i> {{ method.name }}
                                 </a>
-                                {% endif %}
+                            {% endfor %}
                             </div>
                         {% else %}
                             <div class="text-center" style="display: inline-block;">
