@@ -396,7 +396,7 @@ class NodeAllAssetsMappingMixin:
                 mapping[ancestor_key].update(asset_ids)
 
         t3 = time.time()
-        logger.info('t1-t2(DB Query): {} s, t3-t2(Generate mapping): {} s'.format(t2-t1, t3-t2))
+        logger.info('t1-t2( Query): {} s, t3-t2(Generate mapping): {} s'.format(t2-t1, t3-t2))
         return mapping
 
 

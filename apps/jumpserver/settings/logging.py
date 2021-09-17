@@ -136,11 +136,11 @@ LOGGING = {
     }
 }
 
-if os.environ.get("DEBUG_DB"):
-    LOGGING['loggers']['django.db'] = {
-       'handlers': ['console', 'file'],
-       'level': 'DEBUG'
-    }
+# if os.environ.get("DEBUG_DB"):
+LOGGING['loggers']['django.db'] = {
+   'handlers': ['console', 'file'],
+   'level': 'DEBUG'
+}
 
 SYSLOG_ENABLE = CONFIG.SYSLOG_ENABLE
 
