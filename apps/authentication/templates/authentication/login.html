@@ -147,7 +147,7 @@
                     {% csrf_token %}
                     <div style="line-height: 17px;margin-bottom: 20px;color: #999999;">
                     {% if form.errors %}
-                        <p class="help-block">
+                        <p class="help-block red-fonts">
                             {% if form.non_field_errors %}
                                 {{ form.non_field_errors.as_text }}
                             {% endif %}
