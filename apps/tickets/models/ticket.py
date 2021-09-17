@@ -206,9 +206,11 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         self.save()
         post_change_ticket_action.send(sender=self.__class__, ticket=self, action=action)
 
-    # ticket
-    def has_assignee(self, assignee):
+    def has_current_assignee(self, assignee):
         return self.ticket_steps.filter(ticket_assignees__assignee=assignee, level=self.approval_step).exists()
+
+    def has_all_assignee(self, assignee):
+        return self.ticket_steps.filter(ticket_assignees__assignee=assignee).exists()
 
     @classmethod
     def get_user_related_tickets(cls, user):
