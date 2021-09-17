@@ -1,1 +1,1 @@
-g++ libpq-dev libtiff5-dev libjpeg8-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl8.5-dev tk8.5-dev python-tk python-dev openssl libssl-dev libldap2-dev libsasl2-dev sqlite libkrb5-dev sshpass libmysqlclient-dev
+g++ make iputils-ping default-libmysqlclient-dev libpq-dev libffi-dev libldap2-dev libsasl2-dev sshpass
