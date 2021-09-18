@@ -122,7 +122,11 @@ class UserLoginView(mixins.AuthMixin, FormView):
             context = self.get_context_data(form=new_form)
             self.request.session.set_test_cookie()
             return self.render_to_response(context)
-        except (errors.PasswdTooSimple, errors.PasswordRequireResetError, errors.PasswdNeedUpdate) as e:
+        except (
+            errors.PasswdTooSimple,
+            errors.PasswordRequireResetError,
+            errors.PasswdNeedUpdate
+        ) as e:
             return redirect(e.url)
         self.clear_rsa_key()
         return self.redirect_to_guard_view()
@@ -174,22 +178,19 @@ class UserLoginView(mixins.AuthMixin, FormView):
         return [method for method in auth_methods]
         # return [method for method in auth_methods if method['enabled']]
 
-    def get_context_data(self, **kwargs):
+    @staticmethod
+    def get_forgot_password_url():
         forgot_password_url = reverse('authentication:forgot-password')
         has_other_auth_backend = settings.AUTHENTICATION_BACKENDS[0] != settings.AUTH_BACKEND_MODEL
         if has_other_auth_backend and settings.FORGOT_PASSWORD_URL:
             forgot_password_url = settings.FORGOT_PASSWORD_URL
+        return forgot_password_url
 
+    def get_context_data(self, **kwargs):
         context = {
             'demo_mode': os.environ.get("DEMO_MODE"),
             'auth_methods': self.get_support_auth_methods(),
-            'has_other_auth'
-            'AUTH_OPENID': settings.AUTH_OPENID,
-            'AUTH_CAS': settings.AUTH_CAS,
-            'AUTH_WECOM': settings.AUTH_WECOM,
-            'AUTH_DINGTALK': settings.AUTH_DINGTALK,
-            'AUTH_FEISHU': settings.AUTH_FEISHU,
-            'forgot_password_url': forgot_password_url
+            'forgot_password_url': self.get_forgot_password_url()
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
