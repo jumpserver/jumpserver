@@ -175,8 +175,7 @@ class UserLoginView(mixins.AuthMixin, FormView):
                 'logo':  static('img/login_feishu_logo.png')
             }
         ]
-        return [method for method in auth_methods]
-        # return [method for method in auth_methods if method['enabled']]
+        return [method for method in auth_methods if method['enabled']]
 
     @staticmethod
     def get_forgot_password_url():
