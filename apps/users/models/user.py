@@ -537,7 +537,7 @@ class MFAMixin:
         methods = []
         if self.otp_secret_key:
             methods.append(MFAType.OTP)
-        if self.phone:
+        if settings.XPACK_ENABLED and settings.SMS_ENABLED and self.phone:
             methods.append(MFAType.SMS_CODE)
         return methods
 
