@@ -15,4 +15,4 @@ class IsApplicant(permissions.BasePermission):
 
 class IsAssignee(permissions.BasePermission):
     def has_permission(self, request, view):
-        return view.ticket.has_assignee(request.user)
+        return view.ticket.has_all_assignee(request.user)
