@@ -15,7 +15,4 @@ class IsApplicant(permissions.BasePermission):
 
 class IsAssignee(permissions.BasePermission):
     def has_permission(self, request, view):
-        if view.action == 'list':
-            return view.ticket.has_all_assignee(request.user)
-        elif view.action == 'create':
-            return view.ticket.has_current_assignee(request.user)
+        return view.ticket.has_all_assignee(request.user)
