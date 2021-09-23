@@ -62,6 +62,7 @@ class RelationMixin:
     def perform_create(self, serializer):
         instance = serializer.save()
         self.send_post_add_signal(instance)
+        return instance
 
 
 class BaseRelationViewSet(RelationMixin, OrgBulkModelViewSet):
@@ -86,12 +87,32 @@ class SystemUserAssetRelationViewSet(BaseRelationViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         queryset = queryset.annotate(
-            asset_display=Concat(
-                F('asset__hostname'), Value('('),
-                F('asset__ip'), Value(')')
-            )
+            asset_display=Concat(F('asset__hostname'), Value('('), F('asset__ip'), Value(')'))
         )
         return queryset
+
+    def perform_create(self, serializer):
+        instance = super().perform_create(serializer)
+        if isinstance(instance, list):
+            authbooks = instance
+        elif isinstance(instance, self.model):
+            authbooks = [instance]
+        else:
+            authbooks = []
+
+        # 特权用户和资产进行关联时，更新资产的特权用户为当前关联的系统用户
+        assets_admin_user_mapper = {
+            authbook.asset: authbook.systemuser for authbook in authbooks
+            if authbook.systemuser.is_admin_user
+        }
+        self.update_assets_admin_user_if_need(assets_admin_user_mapper)
+
+    @staticmethod
+    def update_assets_admin_user_if_need(assets_admin_user_mapper):
+        for asset, admin_user in assets_admin_user_mapper.items():
+            asset.admin_user = admin_user
+        assets = list(assets_admin_user_mapper.keys())
+        models.Asset.objects.bulk_update(assets, fields=['admin_user'])
 
 
 class SystemUserNodeRelationViewSet(BaseRelationViewSet):
@@ -110,9 +131,32 @@ class SystemUserNodeRelationViewSet(BaseRelationViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset \
-            .annotate(node_key=F('node__key'))
+        queryset = queryset.annotate(node_key=F('node__key'))
         return queryset
+
+    def perform_create(self, serializer):
+        instance = super().perform_create(serializer)
+        if isinstance(instance, list):
+            nodes_systemusers = instance
+        elif isinstance(instance, self.model):
+            nodes_systemusers = [instance]
+        else:
+            nodes_systemusers = []
+        self.update_node_assets_admin_user_if_need(nodes_systemusers)
+
+    def update_node_assets_admin_user_if_need(self, nodes_systemusers):
+        for node_systemuser in nodes_systemusers:
+            if not node_systemuser.systemuser.is_admin_user:
+                continue
+            assets = node_systemuser.node.get_all_assets()
+            admin_user = node_systemuser.systemuser
+            self.update_assets_admin_user(assets, admin_user)
+
+    @staticmethod
+    def update_assets_admin_user(assets, admin_user):
+        for asset in assets:
+            asset.admin_user = admin_user
+        models.Asset.objects.bulk_update(assets, fields=['admin_user'])
 
 
 class SystemUserUserRelationViewSet(BaseRelationViewSet):
