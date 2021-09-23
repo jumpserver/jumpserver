@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-16 19:25+0800\n"
+"POT-Creation-Date: 2021-09-23 11:11+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -281,7 +281,7 @@ msgstr "应用管理"
 #: applications/serializers/application.py:88 assets/models/label.py:21
 #: perms/models/application_permission.py:20
 #: perms/serializers/application/user_permission.py:33
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:22
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:24
 #: xpack/plugins/change_auth_plan/models/app.py:25
 msgid "Category"
 msgstr "类别"
@@ -292,7 +292,7 @@ msgstr "类别"
 #: perms/serializers/application/user_permission.py:34
 #: terminal/models/storage.py:55 terminal/models/storage.py:116
 #: tickets/models/flow.py:51 tickets/models/ticket.py:48
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:29
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:31
 #: xpack/plugins/change_auth_plan/models/app.py:28
 #: xpack/plugins/change_auth_plan/models/app.py:148
 msgid "Type"
@@ -310,7 +310,7 @@ msgstr ""
 #: applications/serializers/application.py:59
 #: applications/serializers/application.py:89 assets/serializers/label.py:13
 #: perms/serializers/application/permission.py:16
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:26
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:28
 msgid "Category display"
 msgstr "类别名称"
 
@@ -318,7 +318,7 @@ msgstr "类别名称"
 #: applications/serializers/application.py:91
 #: assets/serializers/system_user.py:26 audits/serializers.py:29
 #: perms/serializers/application/permission.py:17
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:33
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:35
 #: tickets/serializers/ticket/ticket.py:22
 #: tickets/serializers/ticket/ticket.py:168
 msgid "Type display"
@@ -377,7 +377,7 @@ msgstr "目标URL"
 #: applications/serializers/attrs/application_type/vmware_client.py:30
 #: assets/models/base.py:177 audits/signals_handler.py:65
 #: authentication/forms.py:22
-#: authentication/templates/authentication/login.html:165
+#: authentication/templates/authentication/login.html:163
 #: settings/serializers/auth/ldap.py:44 users/forms/profile.py:21
 #: users/templates/users/user_otp_check_password.html:13
 #: users/templates/users/user_password_update.html:43
@@ -1091,7 +1091,7 @@ msgstr "成功"
 
 #: audits/models.py:43 ops/models/command.py:30 perms/models/base.py:49
 #: terminal/models/session.py:52
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:55
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:57
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:47
 #: xpack/plugins/change_auth_plan/models/base.py:105
 #: xpack/plugins/change_auth_plan/models/base.py:189
@@ -1238,14 +1238,12 @@ msgstr ""
 msgid "Auth Token"
 msgstr "认证令牌"
 
-#: audits/signals_handler.py:68
-#: authentication/templates/authentication/login.html:216
+#: audits/signals_handler.py:68 authentication/views/login.py:160
 #: notifications/backends/__init__.py:11 users/models/user.py:660
 msgid "WeCom"
 msgstr "企业微信"
 
-#: audits/signals_handler.py:69
-#: authentication/templates/authentication/login.html:221
+#: audits/signals_handler.py:69 authentication/views/login.py:166
 #: notifications/backends/__init__.py:12 users/models/user.py:661
 msgid "DingTalk"
 msgstr "钉钉"
@@ -1760,37 +1758,24 @@ msgstr "确认"
 msgid "Code error"
 msgstr "代码错误"
 
-#: authentication/templates/authentication/login.html:157
+#: authentication/templates/authentication/login.html:155
 msgid "Welcome back, please enter username and password to login"
 msgstr "欢迎回来，请输入用户名和密码登录"
 
-#: authentication/templates/authentication/login.html:189
+#: authentication/templates/authentication/login.html:187
 #: users/templates/users/forgot_password.html:15
 #: users/templates/users/forgot_password.html:16
 msgid "Forgot password"
 msgstr "忘记密码"
 
-#: authentication/templates/authentication/login.html:196
+#: authentication/templates/authentication/login.html:194
 #: templates/_header_bar.html:83
 msgid "Login"
 msgstr "登录"
 
-#: authentication/templates/authentication/login.html:203
+#: authentication/templates/authentication/login.html:201
 msgid "More login options"
 msgstr "更多登录方式"
-
-#: authentication/templates/authentication/login.html:206
-msgid "OpenID"
-msgstr "OpenID"
-
-#: authentication/templates/authentication/login.html:211
-msgid "CAS"
-msgstr "CAS"
-
-#: authentication/templates/authentication/login.html:226
-#: notifications/backends/__init__.py:14 users/models/user.py:662
-msgid "FeiShu"
-msgstr "飞书"
 
 #: authentication/templates/authentication/login_otp.html:24
 msgid "Please enter the verification code"
@@ -1930,19 +1915,24 @@ msgstr "请使用密码登录，然后绑定飞书"
 msgid "Binding FeiShu failed"
 msgstr "绑定飞书失败"
 
-#: authentication/views/login.py:80
+#: authentication/views/login.py:81
 msgid "Redirecting"
 msgstr "跳转中"
 
-#: authentication/views/login.py:81
+#: authentication/views/login.py:82
 msgid "Redirecting to {} authentication"
 msgstr "正在跳转到 {} 认证"
 
-#: authentication/views/login.py:107
+#: authentication/views/login.py:108
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: authentication/views/login.py:219
+#: authentication/views/login.py:172 notifications/backends/__init__.py:14
+#: users/models/user.py:662
+msgid "FeiShu"
+msgstr "飞书"
+
+#: authentication/views/login.py:259
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -1950,15 +1940,15 @@ msgstr ""
 "等待 <b>{}</b> 确认, 你也可以复制链接发给他/她 <br/>\n"
 "                  不要关闭本页面"
 
-#: authentication/views/login.py:224
+#: authentication/views/login.py:264
 msgid "No ticket found"
 msgstr "没有发现工单"
 
-#: authentication/views/login.py:256
+#: authentication/views/login.py:296
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: authentication/views/login.py:257
+#: authentication/views/login.py:297
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
@@ -2478,7 +2468,7 @@ msgid "User group"
 msgstr "用户组"
 
 #: perms/models/base.py:50
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:58
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:60
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:50
 #: users/models/user.py:643
 msgid "Date expired"
@@ -4543,34 +4533,34 @@ msgstr "你有一个新的工单, 申请人 - {}"
 msgid "Your ticket has been processed, processor - {}"
 msgstr "你的工单已被处理, 处理人 - {}"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:18
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:20
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:18
 msgid "Apply name"
 msgstr "应用名称"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:37
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:39
 msgid "Apply applications"
 msgstr "申请应用"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:42
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:44
 msgid "Apply applications display"
 msgstr "应用名称名称"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:46
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:48
 msgid "Apply system users"
 msgstr "系统用户"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:51
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:53
 msgid "Apply system user display"
 msgstr "批准的系统用户名称"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:71
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:73
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:63
 #: tickets/serializers/ticket/ticket.py:127
 msgid "Permission named `{}` already exists"
 msgstr "授权名称 `{}` 已存在"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:80
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:89
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:72
 msgid "The expiration date should be greater than the start date"
 msgstr "过期时间要大于开始时间"
@@ -5686,7 +5676,7 @@ msgstr "* 新密码不能是最近 {} 次的密码"
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
-#: xpack/plugins/change_auth_plan/api/app.py:112
+#: xpack/plugins/change_auth_plan/api/app.py:113
 #: xpack/plugins/change_auth_plan/api/asset.py:100
 msgid "The parameter 'action' must be [{}]"
 msgstr "参数 'action' 必须是 [{}]"
@@ -6071,48 +6061,68 @@ msgid "AF-Johannesburg"
 msgstr "非洲-约翰内斯堡"
 
 #: xpack/plugins/cloud/providers/huaweicloud.py:36
-msgid "AP-Bangkok"
-msgstr "亚太-曼谷"
+msgid "CN North-Beijing4"
+msgstr "华北-北京4"
 
 #: xpack/plugins/cloud/providers/huaweicloud.py:37
-msgid "AP-Hong Kong"
-msgstr "亚太-香港"
+msgid "CN North-Beijing1"
+msgstr "华北-北京1"
 
 #: xpack/plugins/cloud/providers/huaweicloud.py:38
-msgid "AP-Singapore"
-msgstr "亚太-新加坡"
+msgid "CN East-Shanghai2"
+msgstr "华东-上海2"
 
 #: xpack/plugins/cloud/providers/huaweicloud.py:39
 msgid "CN East-Shanghai1"
 msgstr "华东-上海1"
 
 #: xpack/plugins/cloud/providers/huaweicloud.py:40
-msgid "CN East-Shanghai2"
-msgstr "华东-上海2"
-
-#: xpack/plugins/cloud/providers/huaweicloud.py:41
-msgid "CN North-Beijing1"
-msgstr "华北-北京1"
-
-#: xpack/plugins/cloud/providers/huaweicloud.py:42
-msgid "CN North-Beijing4"
-msgstr "华北-北京4"
-
-#: xpack/plugins/cloud/providers/huaweicloud.py:43
-msgid "CN Northeast-Dalian"
-msgstr "华北-大连"
-
-#: xpack/plugins/cloud/providers/huaweicloud.py:44
 msgid "CN South-Guangzhou"
 msgstr "华南-广州"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:41
+msgid "LA-Mexico City1"
+msgstr "拉美-墨西哥城一"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:42
+msgid "LA-Santiago"
+msgstr "拉美-圣地亚哥"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:43
+msgid "LA-Sao Paulo1"
+msgstr "拉美-圣保罗一"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:44
+msgid "EU-Paris"
+msgstr "欧洲-巴黎"
 
 #: xpack/plugins/cloud/providers/huaweicloud.py:45
 msgid "CN Southwest-Guiyang1"
 msgstr "西南-贵阳1"
 
 #: xpack/plugins/cloud/providers/huaweicloud.py:46
-msgid "EU-Paris"
-msgstr "欧洲-巴黎"
+msgid "AP-Bangkok"
+msgstr "亚太-曼谷"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:47
+msgid "AP-Singapore"
+msgstr "亚太-新加坡"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:48
+msgid "CN-Hong Kong"
+msgstr "中国-香港"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:50
+msgid "CN Northeast-Dalian"
+msgstr "华北-大连"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:51
+msgid "CN North-Ulanqab1"
+msgstr "华北-乌兰察布一"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:52
+msgid "CN South-Guangzhou-InvitationOnly"
+msgstr "华南-广州-友好用户环境"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:13
 msgid "AccessKey ID"
@@ -6134,16 +6144,16 @@ msgstr "租户 ID"
 msgid "Subscription ID"
 msgstr "订阅 ID"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:81
-#: xpack/plugins/cloud/serializers/account_attrs.py:86
+#: xpack/plugins/cloud/serializers/account_attrs.py:87
+#: xpack/plugins/cloud/serializers/account_attrs.py:92
 msgid "API Endpoint"
 msgstr "API 端点"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:92
+#: xpack/plugins/cloud/serializers/account_attrs.py:98
 msgid "Service account key"
 msgstr "账户密钥"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:93
+#: xpack/plugins/cloud/serializers/account_attrs.py:99
 msgid "The file is in JSON format"
 msgstr "JSON 格式的文件"
 
@@ -6251,6 +6261,12 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "OpenID"
+#~ msgstr "OpenID"
+
+#~ msgid "CAS"
+#~ msgstr "CAS"
 
 #~ msgid "Only "
 #~ msgstr "仅能从用户配置来源登录"
