@@ -34,9 +34,11 @@ def on_authbook_post_delete(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=AuthBook)
-def on_authbook_post_create(sender, instance, **kwargs):
+def on_authbook_post_create(sender, instance, created, **kwargs):
     instance.sync_to_system_user_account()
-    instance.update_asset_admin_user_if_need()
+    if created:
+        # 只在创建时进行更新资产的管理用户
+        instance.update_asset_admin_user_if_need()
 
 
 @receiver(pre_save, sender=AuthBook)
