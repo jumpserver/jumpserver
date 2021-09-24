@@ -10,7 +10,7 @@ from functools import wraps
 import time
 import ipaddress
 import psutil
-
+from typing import Iterable
 
 UUID_PATTERN = re.compile(r'\w{8}(-\w{4}){3}-\w{12}')
 ipip_db = None
@@ -293,4 +293,3 @@ def unique(objects, key=None):
         if v not in seen:
             seen[v] = obj
     return list(seen.values())
-
