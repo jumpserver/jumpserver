@@ -32,6 +32,8 @@ class SerializeApplicationToTreeNodeMixin:
         return node
 
     def serialize_applications_with_org(self, applications):
+        if not applications:
+            return []
         root_node = self.create_root_node()
         tree_nodes = [root_node]
         organizations = self.filter_organizations(applications)
