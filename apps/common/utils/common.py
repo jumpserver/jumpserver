@@ -10,7 +10,10 @@ from functools import wraps
 import time
 import ipaddress
 import psutil
-from typing import Iterable
+import platform
+import os
+
+from django.conf import settings
 
 UUID_PATTERN = re.compile(r'\w{8}(-\w{4}){3}-\w{12}')
 ipip_db = None
@@ -326,3 +329,13 @@ def unique(objects, key=None):
         if v not in seen:
             seen[v] = obj
     return list(seen.values())
+
+
+def get_file_by_arch(dir, filename):
+    platform_name = platform.system()
+    arch = platform.machine()
+
+    file_path = os.path.join(
+        settings.BASE_DIR, dir, platform_name, arch, filename
+    )
+    return file_path
