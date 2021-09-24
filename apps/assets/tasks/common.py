@@ -19,7 +19,7 @@ def add_nodes_assets_to_system_users(nodes_keys, system_users):
         """ 解决资产和节点进行关联时，已经关联过的节点不会触发 authbook post_save 信号， 
         无法更新节点下所有资产的管理用户的问题 """
         for asset in assets:
-            defaults = {'asset': asset, 'system_user': system_user}
+            defaults = {'asset': asset, 'systemuser': system_user, 'org_id': asset.org_id}
             instance, created = AuthBook.objects.update_or_create(
                 defaults=defaults, asset=asset, systemuser=system_user
             )
