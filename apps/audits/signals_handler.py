@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from django.db.models.signals import (
-    post_save, post_delete, m2m_changed, pre_delete
+    post_save, m2m_changed, pre_delete
 )
 from django.dispatch import receiver
 from django.conf import settings
@@ -14,24 +14,24 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.request import Request
 
 from assets.models import Asset, SystemUser
-from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR
+from authentication.signals import post_auth_failed, post_auth_success
+from authentication.utils import check_different_city_login
 from jumpserver.utils import current_request
-from common.utils import get_request_ip, get_logger, get_syslogger
 from users.models import User
 from users.signals import post_user_change_password
-from authentication.signals import post_auth_failed, post_auth_success
 from terminal.models import Session, Command
-from common.utils.encode import model_to_json
 from .utils import write_login_log
 from . import models
 from .models import OperateLog
 from orgs.utils import current_org
 from perms.models import AssetPermission, ApplicationPermission
+from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR
+from common.utils import get_request_ip, get_logger, get_syslogger
+from common.utils.encode import model_to_json
 
 logger = get_logger(__name__)
 sys_logger = get_syslogger(__name__)
 json_render = JSONRenderer()
-
 
 MODELS_NEED_RECORD = (
     # users
@@ -164,7 +164,6 @@ M2M_NEED_RECORD = {
         _('{ApplicationPermission} REMOVE {SystemUser}'),
     ),
 }
-
 
 M2M_ACTION = {
     POST_ADD: 'add',
@@ -305,6 +304,7 @@ def generate_data(username, request, login_type=None):
 @receiver(post_auth_success)
 def on_user_auth_success(sender, user, request, login_type=None, **kwargs):
     logger.debug('User login success: {}'.format(user.username))
+    check_different_city_login(user, request)
     data = generate_data(user.username, request, login_type=login_type)
     data.update({'mfa': int(user.mfa_enabled), 'status': True})
     write_login_log(**data)
