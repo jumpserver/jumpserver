@@ -15,7 +15,7 @@ def migrate_system_assets_to_authbook(apps, schema_editor):
     system_users = system_user_model.objects.all()
     for s in system_users:
         while True:
-            systemuser_asset_relations = system_user_asset_model.objects.filter(systemuser=s)[:20]
+            systemuser_asset_relations = system_user_asset_model.objects.filter(systemuser=s)[:1000]
             if not systemuser_asset_relations:
                 break
             authbooks = []
