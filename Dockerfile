@@ -17,7 +17,7 @@ COPY ./requirements/deb_requirements.txt ./requirements/deb_requirements.txt
 RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
     && sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
     && apt update \
-    && apt -y install telnet iproute2 redis-tools default-mysql-client vim wget curl locales \
+    && apt -y install telnet iproute2 redis-tools default-mysql-client vim wget curl locales procps \
     && apt -y install $(cat requirements/deb_requirements.txt) \
     && rm -rf /var/lib/apt/lists/* \
     && localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8 \
