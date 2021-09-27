@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-23 11:11+0800\n"
+"POT-Creation-Date: 2021-09-29 10:53+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -552,7 +552,7 @@ msgstr "创建日期"
 msgid "AuthBook"
 msgstr "账号"
 
-#: assets/models/base.py:30 assets/tasks/const.py:51 audits/utils.py:30
+#: assets/models/base.py:30 assets/tasks/const.py:51 audits/const.py:5
 msgid "Unknown"
 msgstr "未知"
 
@@ -1667,6 +1667,47 @@ msgstr "{} 需要 {} 复核"
 msgid "Expired"
 msgstr "过期时间"
 
+#: authentication/notifications.py:11
+#, python-brace-format
+msgid ""
+"<h3>{subject}</h3><p>Dear {server_name} user, Hello!</p><p>Your account has "
+"remote login behavior, please pay attention.</p><p>User: {username}</"
+"p><p>Login time: {time}</p><p>Login location: {city} ({ip})</p><p>If you "
+"suspect that the login behavior is abnormal, please modify <p>the account "
+"password in time.</p><br><p>Thank you for your attention to {server_name}!</"
+"p>"
+msgstr ""
+"<h3>{subject}</h3><p>尊敬的{server_name}用户,&nbsp; &nbsp;您好!</p><p>您的账"
+"号存在异地登录行为，请关注。</p><p>用户: {username}</p><p>登录时间: {time}</"
+"p><p>登录地点: {city} ({ip})</p><p>若怀疑此次登录行为异常，请及时修改账号密"
+"码。</p><br><p>感谢您对{server_name}的关注!</p>"
+
+#: authentication/notifications.py:36
+msgid "Different city login reminder"
+msgstr "异地登录提醒"
+
+#: authentication/notifications.py:40
+#, python-brace-format
+msgid ""
+"{subject}\n"
+"Dear {server_name} user, Hello!\n"
+"Your account has remote login behavior, please pay attention.\n"
+"User: {username}\n"
+"Login time: {time}\n"
+"Login location: {city} ({ip})\n"
+"If you suspect that the login behavior is abnormal, please modify the "
+"account password in time.\n"
+"Thank you for your attention to {server_name}!\n"
+msgstr ""
+"{subject}\n"
+"尊敬的{server_name}用户, 您好!\n"
+"您的账号存在异地登录行为，请关注。\n"
+"用户: {username}\n"
+"登录时间: {time}\n"
+"登录地点: {city} ({ip})\n"
+"若怀疑此次登录行为异常，请及时修改账号密码。\n"
+"感谢您对{server_name}的关注!\n"
+
 #: authentication/sms_verify_code.py:17
 msgid "The verification code has expired. Please resend it"
 msgstr "验证码已过期，请重新发送"
@@ -2544,7 +2585,7 @@ msgstr "测试手机号 该字段是必填项。"
 msgid "Test success"
 msgstr "测试成功"
 
-#: settings/api/email.py:21
+#: settings/api/email.py:22
 msgid "Test mail sent to {}, please check"
 msgstr "邮件已经发送{}, 请检查"
 
@@ -2818,7 +2859,7 @@ msgid "SMS provider"
 msgstr "短信服务商"
 
 #: settings/serializers/auth/sms.py:17 settings/serializers/auth/sms.py:35
-#: settings/serializers/auth/sms.py:43 settings/serializers/email.py:69
+#: settings/serializers/auth/sms.py:43 settings/serializers/email.py:63
 msgid "Signature"
 msgstr "签名"
 
@@ -2909,89 +2950,89 @@ msgstr "上传下载"
 msgid "Cloud sync record keep days"
 msgstr "云同步记录"
 
-#: settings/serializers/email.py:24
+#: settings/serializers/email.py:18
 msgid "SMTP host"
 msgstr "SMTP 主机"
 
-#: settings/serializers/email.py:25
+#: settings/serializers/email.py:19
 msgid "SMTP port"
 msgstr "SMTP 端口"
 
-#: settings/serializers/email.py:26
+#: settings/serializers/email.py:20
 msgid "SMTP account"
 msgstr "SMTP 账号"
 
-#: settings/serializers/email.py:28
+#: settings/serializers/email.py:22
 msgid "SMTP password"
 msgstr "SMTP 密码"
 
-#: settings/serializers/email.py:29
+#: settings/serializers/email.py:23
 msgid "Tips: Some provider use token except password"
 msgstr "提示：一些邮件提供商需要输入的是授权码"
 
-#: settings/serializers/email.py:32
+#: settings/serializers/email.py:26
 msgid "Send user"
 msgstr "发件人"
 
-#: settings/serializers/email.py:33
+#: settings/serializers/email.py:27
 msgid "Tips: Send mail account, default SMTP account as the send account"
 msgstr "提示：发送邮件账号，默认使用 SMTP 账号作为发送账号"
 
-#: settings/serializers/email.py:36
+#: settings/serializers/email.py:30
 msgid "Test recipient"
 msgstr "测试收件人"
 
-#: settings/serializers/email.py:37
+#: settings/serializers/email.py:31
 msgid "Tips: Used only as a test mail recipient"
 msgstr "提示：仅用来作为测试邮件收件人"
 
-#: settings/serializers/email.py:40
+#: settings/serializers/email.py:34
 msgid "Use SSL"
 msgstr "使用 SSL"
 
-#: settings/serializers/email.py:41
+#: settings/serializers/email.py:35
 msgid "If SMTP port is 465, may be select"
 msgstr "如果SMTP端口是465，通常需要启用 SSL"
 
-#: settings/serializers/email.py:44
+#: settings/serializers/email.py:38
 msgid "Use TLS"
 msgstr "使用 TLS"
 
-#: settings/serializers/email.py:45
+#: settings/serializers/email.py:39
 msgid "If SMTP port is 587, may be select"
 msgstr "如果SMTP端口是587，通常需要启用 TLS"
 
-#: settings/serializers/email.py:48
+#: settings/serializers/email.py:42
 msgid "Subject prefix"
 msgstr "主题前缀"
 
-#: settings/serializers/email.py:55
+#: settings/serializers/email.py:49
 msgid "Create user email subject"
 msgstr "邮件主题"
 
-#: settings/serializers/email.py:56
+#: settings/serializers/email.py:50
 msgid ""
 "Tips: When creating a user, send the subject of the email (eg:Create account "
 "successfully)"
 msgstr "提示: 创建用户时，发送设置密码邮件的主题 (例如: 创建用户成功)"
 
-#: settings/serializers/email.py:60
+#: settings/serializers/email.py:54
 msgid "Create user honorific"
 msgstr "邮件的敬语"
 
-#: settings/serializers/email.py:61
+#: settings/serializers/email.py:55
 msgid "Tips: When creating a user, send the honorific of the email (eg:Hello)"
 msgstr "提示: 创建用户时，发送设置密码邮件的敬语 (例如: 您好)"
 
-#: settings/serializers/email.py:65
+#: settings/serializers/email.py:59
 msgid "Create user email content"
 msgstr "邮件的内容"
 
-#: settings/serializers/email.py:66
+#: settings/serializers/email.py:60
 msgid "Tips:When creating a user, send the content of the email"
 msgstr "提示: 创建用户时，发送设置密码邮件的内容"
 
-#: settings/serializers/email.py:70
+#: settings/serializers/email.py:64
 msgid "Tips: Email signature (eg:jumpserver)"
 msgstr "邮件署名 (如:jumpserver)"
 
@@ -3872,7 +3913,7 @@ msgstr "测试成功"
 msgid "Test failure: Account invalid"
 msgstr "测试失败: 账户无效"
 
-#: terminal/api/terminal.py:39
+#: terminal/api/terminal.py:41
 msgid "Have online sessions"
 msgstr "有在线会话"
 
@@ -4265,7 +4306,7 @@ msgstr "文档类型"
 msgid "Ignore Certificate Verification"
 msgstr "忽略证书认证"
 
-#: terminal/serializers/terminal.py:78 terminal/serializers/terminal.py:86
+#: terminal/serializers/terminal.py:80 terminal/serializers/terminal.py:88
 msgid "Not found"
 msgstr "没有发现"
 
