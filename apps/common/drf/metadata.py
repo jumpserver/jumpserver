@@ -102,13 +102,13 @@ class SimpleMetadataWithFilters(SimpleMetadata):
         elif hasattr(view, 'get_filterset_fields'):
             fields = view.get_filterset_fields(request)
         elif hasattr(view, 'filterset_class'):
-            fields = view.filterset_class.Meta.fields + \
+            fields = list(view.filterset_class.Meta.fields) + \
                      list(view.filterset_class.declared_filters.keys())
 
         if hasattr(view, 'custom_filter_fields'):
             # 不能写 fields += view.custom_filter_fields
             # 会改变 view 的 filter_fields
-            fields = list(fields) + view.custom_filter_fields
+            fields = list(fields) + list(view.custom_filter_fields)
 
         if isinstance(fields, dict):
             fields = list(fields.keys())
