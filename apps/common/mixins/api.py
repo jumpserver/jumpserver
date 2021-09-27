@@ -112,7 +112,8 @@ class ExtraFilterFieldsMixin:
         backends = list(chain(
             self.filter_backends,
             self.default_added_filters,
-            self.extra_filter_backends))
+            self.extra_filter_backends
+        ))
         return backends
 
     def filter_queryset(self, queryset):
