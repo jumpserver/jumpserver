@@ -39,4 +39,5 @@ logs/*
 .vagrant/
 release/*
 releashe
+django.mo
 /apps/script.py

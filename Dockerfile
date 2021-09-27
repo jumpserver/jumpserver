@@ -35,11 +35,13 @@ RUN mkdir -p /root/.ssh/ \
     && echo "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null" > /root/.ssh/config
 
 RUN mkdir -p /opt/jumpserver/oracle/ \
-    && wget https://download.jumpserver.org/public/instantclient-basiclite-linux.x64-21.1.0.0.0.tar \
+    && wget https://download.jumpserver.org/public/instantclient-basiclite-linux.x64-21.1.0.0.0.tar > /dev/null \
     && tar xf instantclient-basiclite-linux.x64-21.1.0.0.0.tar -C /opt/jumpserver/oracle/ \
     && echo "/opt/jumpserver/oracle/instantclient_21_1" > /etc/ld.so.conf.d/oracle-instantclient.conf \
     && ldconfig \
     && rm -f instantclient-basiclite-linux.x64-21.1.0.0.0.tar
+
+RUN cd apps && python manage.py compilemessages
 
 RUN echo > config.yml
 VOLUME /opt/jumpserver/data
