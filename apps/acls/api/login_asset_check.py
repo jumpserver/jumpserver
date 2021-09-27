@@ -1,10 +1,9 @@
-from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
-from rest_framework.generics import CreateAPIView, RetrieveDestroyAPIView
+from rest_framework.generics import CreateAPIView
 
 from common.permissions import IsAppUser
 from common.utils import reverse, lazyproperty
-from orgs.utils import tmp_to_org, tmp_to_root_org
+from orgs.utils import tmp_to_org
 from tickets.api import GenericTicketStatusRetrieveCloseAPI
 from ..models import LoginAssetACL
 from .. import serializers

@@ -130,7 +130,7 @@
     </li>
 {% endif %}
 
-{% if request.user.can_admin_current_org and LOGIN_CONFIRM_ENABLE and LICENSE_VALID %}
+{% if request.user.can_admin_current_org and LICENSE_VALID %}
     <li id="tickets">
         <a href="{% url 'tickets:ticket-list' %}">
             <i class="fa fa-check-square-o" style="width: 14px"></i>

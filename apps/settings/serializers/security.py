@@ -70,7 +70,7 @@ class SecurityAuthSerializer(serializers.Serializer):
         help_text=_("Only log in from the user source property")
     )
     SECURITY_MFA_VERIFY_TTL = serializers.IntegerField(
-        min_value=5, max_value=60*60*10,
+        min_value=5, max_value=60 * 60 * 10,
         label=_("MFA verify TTL"), help_text=_("Unit: second"),
     )
     SECURITY_LOGIN_CAPTCHA_ENABLED = serializers.BooleanField(
@@ -114,8 +114,3 @@ class SecuritySettingSerializer(SecurityPasswordRuleSerializer, SecurityAuthSeri
         required=True, label=_('Session share'),
         help_text=_("Enabled, Allows user active session to be shared with other users")
     )
-    LOGIN_CONFIRM_ENABLE = serializers.BooleanField(
-        required=False, label=_('Login Confirm'),
-        help_text=_("Enabled, please go to the user detail add approver")
-    )
-

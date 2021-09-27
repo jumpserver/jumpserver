@@ -6,7 +6,6 @@ from django.conf import settings
 from common.exceptions import MFAVerifyRequired
 
 from orgs.utils import current_org
-from common.utils import is_uuid
 
 
 class IsValidUser(permissions.IsAuthenticated, permissions.BasePermission):
@@ -14,7 +13,7 @@ class IsValidUser(permissions.IsAuthenticated, permissions.BasePermission):
 
     def has_permission(self, request, view):
         return super(IsValidUser, self).has_permission(request, view) \
-            and request.user.is_valid
+               and request.user.is_valid
 
 
 class IsAppUser(IsValidUser):
@@ -22,7 +21,7 @@ class IsAppUser(IsValidUser):
 
     def has_permission(self, request, view):
         return super(IsAppUser, self).has_permission(request, view) \
-            and request.user.is_app
+               and request.user.is_app
 
 
 class IsSuperUser(IsValidUser):
@@ -36,7 +35,7 @@ class IsSuperUserOrAppUser(IsSuperUser):
         if request.user.is_anonymous:
             return False
         return super(IsSuperUserOrAppUser, self).has_permission(request, view) \
-            or request.user.is_app
+               or request.user.is_app
 
 
 class IsSuperAuditor(IsValidUser):
@@ -60,7 +59,7 @@ class IsOrgAdmin(IsValidUser):
         if not current_org:
             return False
         return super(IsOrgAdmin, self).has_permission(request, view) \
-            and current_org.can_admin_by(request.user)
+               and current_org.can_admin_by(request.user)
 
 
 class IsOrgAdminOrAppUser(IsValidUser):
@@ -72,7 +71,7 @@ class IsOrgAdminOrAppUser(IsValidUser):
         if request.user.is_anonymous:
             return False
         return super(IsOrgAdminOrAppUser, self).has_permission(request, view) \
-            and (current_org.can_admin_by(request.user) or request.user.is_app)
+               and (current_org.can_admin_by(request.user) or request.user.is_app)
 
 
 class IsOrgAdminOrAppUserOrUserReadonly(IsOrgAdminOrAppUser):
@@ -186,15 +185,6 @@ class IsObjectOwner(IsValidUser):
     def has_object_permission(self, request, view, obj):
         return (super().has_object_permission(request, view, obj) and
                 request.user == getattr(obj, 'user', None))
-
-
-class HasQueryParamsUserAndIsCurrentOrgMember(permissions.BasePermission):
-    def has_permission(self, request, view):
-        query_user_id = request.query_params.get('user')
-        if not query_user_id or not is_uuid(query_user_id):
-            return False
-        query_user = current_org.get_members().filter(id=query_user_id).first()
-        return bool(query_user)
 
 
 class OnlySuperUserCanList(IsValidUser):

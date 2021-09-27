@@ -3,8 +3,7 @@ from rest_framework import serializers
 from common.drf.serializers import BulkModelSerializer
 from orgs.utils import current_org
 from ..models import LoginACL
-from common.utils.ip import is_ip_address, is_ip_network,  is_ip_segment
-
+from common.utils.ip import is_ip_address, is_ip_network, is_ip_segment
 
 __all__ = ['LoginACLSerializer', ]
 
@@ -19,6 +18,16 @@ def ip_group_child_validator(ip_group_child):
         raise serializers.ValidationError(error)
 
 
+common_help_text = _('Format for comma-delimited string, with * indicating a match all. ')
+
+
+class LoginACLUsersSerializer(serializers.Serializer):
+    username_group = serializers.ListField(
+        default=[], child=serializers.CharField(max_length=128), label=_('Username'),
+        help_text=common_help_text
+    )
+
+
 class LoginACLSerializer(BulkModelSerializer):
     ip_group_help_text = _(
         'Format for comma-delimited string, with * indicating a match all. '
@@ -28,32 +37,30 @@ class LoginACLSerializer(BulkModelSerializer):
 
     ip_group = serializers.ListField(
         default=['*'], label=_('IP'), help_text=ip_group_help_text,
-        child=serializers.CharField(max_length=1024, validators=[ip_group_child_validator])
-    )
-    user_display = serializers.ReadOnlyField(source='user.name', label=_('User'))
+        child=serializers.CharField(max_length=1024, validators=[ip_group_child_validator]))
+    user_display = serializers.ReadOnlyField(source='user.name', label=_('Username'))
+    reviewers_display = serializers.SerializerMethodField(label=_('Reviewers'))
     action_display = serializers.ReadOnlyField(source='get_action_display', label=_('Action'))
+    reviewers_amount = serializers.IntegerField(read_only=True, source='reviewers.count')
+    users = LoginACLUsersSerializer(required=False)
 
     class Meta:
         model = LoginACL
         fields_mini = ['id', 'name']
         fields_small = fields_mini + [
             'priority', 'ip_group', 'action', 'action_display',
-            'is_active',
-            'date_created', 'date_updated',
-            'comment', 'created_by',
+            'is_active', 'user', 'user_display', 'users',
+            'date_created', 'date_updated', 'reviewers_amount',
+            'comment', 'created_by'
         ]
-        fields_fk = ['user', 'user_display',]
-        fields = fields_small + fields_fk
+        fields_fk = ['user', 'user_display', ]
+        fields_m2m = ['reviewers', 'reviewers_display']
+        fields = fields_small + fields_fk + fields_m2m
         extra_kwargs = {
             'priority': {'default': 50},
             'is_active': {'default': True},
+            "reviewers": {'allow_null': False, 'required': True},
         }
 
-    @staticmethod
-    def validate_user(user):
-        if user not in current_org.get_members():
-            error = _('The user `{}` is not in the current organization: `{}`').format(
-                user, current_org
-            )
-            raise serializers.ValidationError(error)
-        return user
+    def get_reviewers_display(self, obj):
+        return ','.join([str(user) for user in obj.reviewers.all()])

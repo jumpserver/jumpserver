@@ -124,9 +124,6 @@ REDIS_PORT: 6379
 # 启用定时任务
 # PERIOD_TASK_ENABLED: True
 #
-# 启用二次复合认证配置
-# LOGIN_CONFIRM_ENABLE: False
-#
 # Windows 登录跳过手动输入密码
 # WINDOWS_SKIP_ALL_MANUAL_PASSWORD: False
 

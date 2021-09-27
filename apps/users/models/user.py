@@ -18,6 +18,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.shortcuts import reverse
 
+from acls.models import LoginACL
 from orgs.utils import current_org
 from orgs.models import OrganizationMember, Organization
 from common.exceptions import JMSException
@@ -150,11 +151,8 @@ class AuthMixin:
         return False
 
     def get_login_confirm_setting(self):
-        if hasattr(self, 'login_confirm_setting'):
-            s = self.login_confirm_setting
-            if s.reviewers.all().count() and s.is_active:
-                return s
-        return False
+        acl = LoginACL.filter_acl(self).filter(action=LoginACL.ActionChoices.confirm).first()
+        return acl if acl and acl.reviewers.all().count() else False
 
     @staticmethod
     def get_public_key_body(key):
@@ -758,11 +756,6 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     def get_avatar_url(cls, username):
         user_default = settings.STATIC_URL + "img/avatar/user.png"
         return user_default
-
-    # def admin_orgs(self):
-    #     from orgs.models import Organization
-    #     orgs = Organization.get_user_admin_or_audit_orgs(self)
-    #     return orgs
 
     def avatar_url(self):
         admin_default = settings.STATIC_URL + "img/avatar/admin.png"

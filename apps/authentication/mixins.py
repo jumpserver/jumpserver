@@ -14,7 +14,6 @@ from django.contrib.auth import (
     PermissionDenied, user_login_failed, _clean_credentials
 )
 from django.shortcuts import reverse, redirect
-from django.views.generic.edit import FormView
 
 from common.utils import get_object_or_none, get_request_ip, get_logger, bulk_get, FlashMessageUtil
 from users.models import User, MFAType
@@ -437,8 +436,6 @@ class AuthMixin(PasswordEncryptionViewMixin):
             )
 
     def check_user_login_confirm_if_need(self, user):
-        if not settings.LOGIN_CONFIRM_ENABLE:
-            return
         confirm_setting = user.get_login_confirm_setting()
         if self.request.session.get('auth_confirm') or not confirm_setting:
             return

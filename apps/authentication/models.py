@@ -1,13 +1,10 @@
 import uuid
 
-from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _, ugettext as __
+from django.utils.translation import ugettext_lazy as _
 from rest_framework.authtoken.models import Token
 from django.conf import settings
 
 from common.db import models
-from common.mixins.models import CommonModelMixin
-from common.utils import get_object_or_none, get_request_ip, get_ip_city
 
 
 class AccessKey(models.Model):
@@ -38,56 +35,6 @@ class PrivateToken(Token):
 
     class Meta:
         verbose_name = _('Private Token')
-
-
-class LoginConfirmSetting(CommonModelMixin):
-    user = models.OneToOneField('users.User', on_delete=models.CASCADE, verbose_name=_("User"), related_name="login_confirm_setting")
-    reviewers = models.ManyToManyField('users.User', verbose_name=_("Reviewers"), related_name="review_login_confirm_settings", blank=True)
-    is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
-
-    class Meta:
-        verbose_name = _('Login Confirm')
-
-    @classmethod
-    def get_user_confirm_setting(cls, user):
-        return get_object_or_none(cls, user=user)
-
-    @staticmethod
-    def construct_confirm_ticket_meta(request=None):
-        if request:
-            login_ip = get_request_ip(request)
-        else:
-            login_ip = ''
-        login_ip = login_ip or '0.0.0.0'
-        login_city = get_ip_city(login_ip)
-        login_datetime = timezone.now().strftime('%Y-%m-%d %H:%M:%S')
-        ticket_meta = {
-            'apply_login_ip': login_ip,
-            'apply_login_city': login_city,
-            'apply_login_datetime': login_datetime,
-        }
-        return ticket_meta
-
-    def create_confirm_ticket(self, request=None):
-        from tickets import const
-        from tickets.models import Ticket
-        from orgs.models import Organization
-        ticket_title = _('Login confirm') + ' {}'.format(self.user)
-        ticket_meta = self.construct_confirm_ticket_meta(request)
-        data = {
-            'title': ticket_title,
-            'type': const.TicketType.login_confirm.value,
-            'meta': ticket_meta,
-            'org_id': Organization.ROOT_ID,
-        }
-        ticket = Ticket.objects.create(**data)
-        ticket.create_process_map_and_node(self.reviewers.all())
-        ticket.open(self.user)
-        return ticket
-
-    def __str__(self):
-        reviewers = [u.username for u in self.reviewers.all()]
-        return _('{} need confirm by {}').format(self.user.username, reviewers)
 
 
 class SSOToken(models.JMSBaseModel):
