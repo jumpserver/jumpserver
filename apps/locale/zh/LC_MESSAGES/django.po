@@ -2491,7 +2491,7 @@ msgstr "账户是否有效"
 #: perms/serializers/asset/permission.py:67 users/serializers/user.py:29
 #: users/serializers/user.py:79
 msgid "Is expired"
-msgstr "是否过期"
+msgstr "已过期"
 
 #: perms/serializers/application/permission.py:40
 #: perms/serializers/asset/permission.py:70 users/serializers/group.py:34
@@ -5285,15 +5285,15 @@ msgstr "密码策略"
 
 #: users/serializers/user.py:25
 msgid "MFA enabled"
-msgstr "是否开启多因子认证"
+msgstr "MFA"
 
 #: users/serializers/user.py:26
 msgid "MFA force enabled"
-msgstr "强制启用多因子认证"
+msgstr "强制 MFA"
 
 #: users/serializers/user.py:27
 msgid "MFA level display"
-msgstr "多因子认证等级名称"
+msgstr "MFA 等级名称"
 
 #: users/serializers/user.py:28
 msgid "Login blocked"

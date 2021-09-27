@@ -8,6 +8,7 @@ from rest_framework import generics
 from rest_framework.views import APIView, Response
 from rest_framework import status
 from django.conf import settings
+from django_filters import rest_framework as filters
 from django.utils.translation import gettext_lazy as _
 
 from common.exceptions import JMSException
@@ -30,6 +31,7 @@ class TerminalViewSet(JMSBulkModelViewSet):
     serializer_class = serializers.TerminalSerializer
     permission_classes = (IsSuperUser,)
     filterset_fields = ['name', 'remote_addr', 'type']
+    custom_filter_fields = ['status']
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -75,10 +77,10 @@ class TerminalViewSet(JMSBulkModelViewSet):
 
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
-        status = self.request.query_params.get('status')
-        if not status:
+        s = self.request.query_params.get('status')
+        if not s:
             return queryset
-        filtered_queryset_id = [str(q.id) for q in queryset if q.status == status]
+        filtered_queryset_id = [str(q.id) for q in queryset if q.latest_status == s]
         queryset = queryset.filter(id__in=filtered_queryset_id)
         return queryset
 
