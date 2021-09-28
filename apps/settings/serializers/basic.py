@@ -1,8 +1,11 @@
+import uuid
+
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 
 class AnnouncementSerializer(serializers.Serializer):
+    ID = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     SUBJECT = serializers.CharField(required=True, max_length=1024, label=_("Subject"))
     CONTENT = serializers.CharField(label=_("Content"))
     LINK = serializers.URLField(
@@ -11,9 +14,13 @@ class AnnouncementSerializer(serializers.Serializer):
     )
 
     def to_representation(self, instance):
-        defaults = {'SUBJECT': '', 'CONTENT': '', 'LINK': '', 'ENABLED': False}
+        defaults = {'ID': '', 'SUBJECT': '', 'CONTENT': '', 'LINK': '', 'ENABLED': False}
         data = {**defaults, **instance}
         return super().to_representation(data)
+
+    def to_internal_value(self, data):
+        data['ID'] = str(uuid.uuid4())
+        return super().to_internal_value(data)
 
 
 class BasicSettingSerializer(serializers.Serializer):
