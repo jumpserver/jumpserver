@@ -75,6 +75,8 @@ class PublicSettingApi(generics.RetrieveAPIView):
                 'SECURITY_WATERMARK_ENABLED': settings.SECURITY_WATERMARK_ENABLED,
                 'SECURITY_SESSION_SHARE': settings.SECURITY_SESSION_SHARE,
                 "XRDP_ENABLED": settings.XRDP_ENABLED,
+                "ANNOUNCEMENT_ENABLED": settings.ANNOUNCEMENT_ENABLED,
+                "ANNOUNCEMENT": settings.ANNOUNCEMENT,
             }
         }
         return instance

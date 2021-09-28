@@ -2,6 +2,20 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 
+class AnnouncementSerializer(serializers.Serializer):
+    SUBJECT = serializers.CharField(required=True, max_length=1024, label=_("Subject"))
+    CONTENT = serializers.CharField(label=_("Content"))
+    LINK = serializers.URLField(
+        required=False, allow_null=True, allow_blank=True,
+        label=_("More url"), default='',
+    )
+
+    def to_representation(self, instance):
+        defaults = {'SUBJECT': '', 'CONTENT': '', 'LINK': '', 'ENABLED': False}
+        data = {**defaults, **instance}
+        return super().to_representation(data)
+
+
 class BasicSettingSerializer(serializers.Serializer):
     SITE_URL = serializers.URLField(
         required=True, label=_("Site url"),
@@ -20,3 +34,6 @@ class BasicSettingSerializer(serializers.Serializer):
         required=False, max_length=1024, allow_blank=True, allow_null=True, label=_("Global organization name"),
         help_text=_('The name of global organization to display')
     )
+    TICKETS_ENABLED = serializers.BooleanField(required=False, default=True, label=_("Enable tickets"))
+    ANNOUNCEMENT_ENABLED = serializers.BooleanField(label=_('Announcement enabled'), default=True)
+    ANNOUNCEMENT = AnnouncementSerializer(label=_("Announcement"))
