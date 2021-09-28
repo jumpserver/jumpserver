@@ -41,7 +41,10 @@ RUN mkdir -p /opt/jumpserver/oracle/ \
     && ldconfig \
     && rm -f instantclient-basiclite-linux.x64-21.1.0.0.0.tar
 
-RUN echo > config.yml && cd apps && python manage.py compilemessages
+RUN echo 'SECRET_KEY: BUILD' > config.yml \
+    && cd apps \
+    && python manage.py compilemessages \
+    && echo > ../config.yml
 
 VOLUME /opt/jumpserver/data
 VOLUME /opt/jumpserver/logs
