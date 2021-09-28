@@ -6,17 +6,19 @@ from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
 from django.db.models import Prefetch
 
+from users.notifications import ResetMFAMsg
 from common.permissions import IsOrgAdmin
 from common.mixins import CommonApiMixin
 from common.utils import get_logger
 from orgs.utils import current_org
 from orgs.models import OrganizationMember
-from users.utils import send_reset_mfa_mail, LoginBlockUtil, MFABlockUtils
+from users.utils import LoginBlockUtil, MFABlockUtils
 from .. import serializers
 from ..serializers import UserSerializer, UserRetrieveSerializer, MiniUserSerializer, InviteSerializer
 from .mixins import UserQuerysetMixin
 from ..models import User
 from ..signals import post_user_create
+from ..filters import UserFilter
 from rbac.models import Role, RoleBinding
 
 
@@ -28,8 +30,8 @@ __all__ = [
 
 
 class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
-    filterset_fields = ('username', 'email', 'name', 'id', 'source')
-    search_fields = filterset_fields
+    filterset_class = UserFilter
+    search_fields = ('username', 'email', 'name', 'id', 'source', 'role')
     serializer_classes = {
         'default': UserSerializer,
         'retrieve': UserRetrieveSerializer,
@@ -38,7 +40,9 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
     }
 
     def get_queryset(self):
-        queryset = super().get_queryset().prefetch_related('groups')
+        queryset = super().get_queryset().prefetch_related(
+            'groups'
+        )
         if not current_org.is_root():
             # 为在列表中计算用户在真实组织里的角色
             queryset = queryset.prefetch_related(
@@ -152,7 +156,9 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
 
     @action(methods=['get'], detail=False, permission_classes=(IsOrgAdmin,))
     def suggestion(self, request):
-        queryset = User.get_nature_users()
+        # Todo: Role 这里有问题
+        queryset = User.objects.exclude(role=User.ROLE.APP)
+        queryset = self.filter_queryset(queryset)[:3]
         queryset = self.filter_queryset(queryset)
         queryset = queryset[:3]
 
@@ -241,5 +247,6 @@ class UserResetOTPApi(UserQuerysetMixin, generics.RetrieveAPIView):
         if user.mfa_enabled:
             user.reset_mfa()
             user.save()
-            send_reset_mfa_mail(user)
+
+            ResetMFAMsg(user).publish_async()
         return Response({"msg": "success"})

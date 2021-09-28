@@ -24,7 +24,7 @@ class ApplicationPermissionSerializer(BulkOrgResourceModelSerializer):
         fields_small = fields_mini + [
             'category', 'category_display', 'type', 'type_display',
             'is_active', 'is_expired', 'is_valid',
-            'created_by', 'date_created', 'date_expired', 'date_start', 'comment'
+            'created_by', 'date_created', 'date_expired', 'date_start', 'comment', 'from_ticket'
         ]
         fields_m2m = [
             'users', 'user_groups', 'applications', 'system_users',
@@ -32,7 +32,7 @@ class ApplicationPermissionSerializer(BulkOrgResourceModelSerializer):
             'system_users_amount',
         ]
         fields = fields_small + fields_m2m
-        read_only_fields = ['created_by', 'date_created']
+        read_only_fields = ['created_by', 'date_created', 'from_ticket']
         extra_kwargs = {
             'is_expired': {'label': _('Is expired')},
             'is_valid': {'label': _('Is valid')},

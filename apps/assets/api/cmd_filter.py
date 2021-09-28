@@ -13,7 +13,6 @@ from ..hands import IsOrgAdmin, IsAppUser
 from ..models import CommandFilter, CommandFilterRule
 from .. import serializers
 
-
 __all__ = [
     'CommandFilterViewSet', 'CommandFilterRuleViewSet', 'CommandConfirmAPI',
     'CommandConfirmStatusAPI'
@@ -44,7 +43,7 @@ class CommandFilterRuleViewSet(OrgBulkModelViewSet):
 
 
 class CommandConfirmAPI(CreateAPIView):
-    permission_classes = (IsAppUser, )
+    permission_classes = (IsAppUser,)
     serializer_class = serializers.CommandConfirmSerializer
 
     def create(self, request, *args, **kwargs):
@@ -73,11 +72,12 @@ class CommandConfirmAPI(CreateAPIView):
             external=True, api_to_ui=True
         )
         ticket_detail_url = '{url}?type={type}'.format(url=ticket_detail_url, type=ticket.type)
+        ticket_assignees = ticket.current_node.first().ticket_assignees.all()
         return {
             'check_confirm_status': {'method': 'GET', 'url': confirm_status_url},
             'close_confirm': {'method': 'DELETE', 'url': confirm_status_url},
             'ticket_detail_url': ticket_detail_url,
-            'reviewers': [str(user) for user in ticket.assignees.all()]
+            'reviewers': [str(ticket_assignee.assignee) for ticket_assignee in ticket_assignees]
         }
 
     @lazyproperty
@@ -89,4 +89,3 @@ class CommandConfirmAPI(CreateAPIView):
 
 class CommandConfirmStatusAPI(GenericTicketStatusRetrieveCloseAPI):
     pass
-

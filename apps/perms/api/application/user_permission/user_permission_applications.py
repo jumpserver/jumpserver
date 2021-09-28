@@ -24,8 +24,8 @@ __all__ = [
 
 
 class AllGrantedApplicationsMixin(CommonApiMixin, ListAPIView):
-    only_fields = serializers.ApplicationGrantedSerializer.Meta.only_fields
-    serializer_class = serializers.ApplicationGrantedSerializer
+    only_fields = serializers.AppGrantedSerializer.Meta.only_fields
+    serializer_class = serializers.AppGrantedSerializer
     filterset_fields = {
         'id': ['exact'],
         'name': ['exact'],

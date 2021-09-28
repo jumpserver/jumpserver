@@ -6,10 +6,10 @@ from django.shortcuts import get_object_or_404
 
 from common.utils import get_logger, get_object_or_none
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, IsSuperUser
+from common.mixins.views import SuggestionMixin
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
 from assets.api import FilterAssetByNodeMixin
-from rbac.permissions import RBACPermission
 from ..models import Asset, Node, Platform
 from .. import serializers
 from ..tasks import (
@@ -17,7 +17,6 @@ from ..tasks import (
     test_system_users_connectivity_a_asset, push_system_users_a_asset
 )
 from ..filters import FilterAssetByNodeFilterBackend, LabelFilterBackend, IpInFilterBackend
-
 
 logger = get_logger(__file__)
 __all__ = [
@@ -27,7 +26,7 @@ __all__ = [
 ]
 
 
-class AssetViewSet(FilterAssetByNodeMixin, OrgBulkModelViewSet):
+class AssetViewSet(SuggestionMixin, FilterAssetByNodeMixin, OrgBulkModelViewSet):
     """
     API endpoint that allows Asset to be viewed or edited.
     """
@@ -44,6 +43,7 @@ class AssetViewSet(FilterAssetByNodeMixin, OrgBulkModelViewSet):
     ordering_fields = ("hostname", "ip", "port", "cpu_cores")
     serializer_classes = {
         'default': serializers.AssetSerializer,
+        'suggestion': serializers.MiniAssetSerializer
     }
     extra_filter_backends = [FilterAssetByNodeFilterBackend, LabelFilterBackend, IpInFilterBackend]
 

@@ -243,6 +243,15 @@ class DingTalkAuthentication(JMSModelBackend):
         pass
 
 
+class FeiShuAuthentication(JMSModelBackend):
+    """
+    什么也不做呀😺
+    """
+
+    def authenticate(self, request, **kwargs):
+        pass
+
+
 class AuthorizationTokenAuthentication(JMSModelBackend):
     """
     什么也不做呀😺

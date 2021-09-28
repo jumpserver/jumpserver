@@ -16,8 +16,8 @@ from .models import AccessKey, LoginConfirmSetting
 __all__ = [
     'AccessKeySerializer', 'OtpVerifySerializer', 'BearerTokenSerializer',
     'MFAChallengeSerializer', 'LoginConfirmSettingSerializer', 'SSOTokenSerializer',
-    'ConnectionTokenSerializer', 'ConnectionTokenSecretSerializer', 'RDPFileSerializer',
-    'PasswordVerifySerializer',
+    'ConnectionTokenSerializer', 'ConnectionTokenSecretSerializer',
+    'PasswordVerifySerializer', 'MFASelectTypeSerializer',
 ]
 
 
@@ -75,6 +75,10 @@ class BearerTokenSerializer(serializers.Serializer):
             "user": user
         }
         return instance
+
+
+class MFASelectTypeSerializer(serializers.Serializer):
+    type = serializers.CharField()
 
 
 class MFAChallengeSerializer(serializers.Serializer):
@@ -166,7 +170,7 @@ class ConnectionTokenAssetSerializer(serializers.ModelSerializer):
 class ConnectionTokenSystemUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = SystemUser
-        fields = ['id', 'name', 'username', 'password', 'private_key']
+        fields = ['id', 'name', 'username', 'password', 'private_key', 'ad_domain']
 
 
 class ConnectionTokenGatewaySerializer(serializers.ModelSerializer):

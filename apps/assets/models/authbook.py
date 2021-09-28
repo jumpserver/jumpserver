@@ -5,8 +5,11 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from simple_history.models import HistoricalRecords
 
-from common.utils import lazyproperty
+from common.utils import lazyproperty, get_logger
 from .base import BaseUser, AbsConnectivity
+
+logger = get_logger(__name__)
+
 
 __all__ = ['AuthBook']
 
@@ -16,7 +19,6 @@ class AuthBook(BaseUser, AbsConnectivity):
     systemuser = models.ForeignKey('assets.SystemUser', on_delete=models.CASCADE, null=True, verbose_name=_("System user"))
     version = models.IntegerField(default=1, verbose_name=_('Version'))
     history = HistoricalRecords()
-    _systemuser_display = ''
 
     auth_attrs = ['username', 'password', 'private_key', 'public_key']
 
@@ -64,8 +66,6 @@ class AuthBook(BaseUser, AbsConnectivity):
 
     @lazyproperty
     def systemuser_display(self):
-        if self._systemuser_display:
-            return self._systemuser_display
         if not self.systemuser:
             return ''
         return str(self.systemuser)
@@ -94,7 +94,27 @@ class AuthBook(BaseUser, AbsConnectivity):
             i.private_key = self.private_key
             i.public_key = self.public_key
             i.comment = 'Update triggered by account {}'.format(self.id)
-            i.save(update_fields=['password', 'private_key', 'public_key'])
+
+        # 不触发post_save信号
+        self.__class__.objects.bulk_update(matched, fields=['password', 'private_key', 'public_key'])
+
+    def remove_asset_admin_user_if_need(self):
+        if not self.asset or not self.systemuser:
+            return
+        if not self.systemuser.is_admin_user or self.asset.admin_user != self.systemuser:
+            return
+        self.asset.admin_user = None
+        self.asset.save()
+        logger.debug('Remove asset admin user: {} {}'.format(self.asset, self.systemuser))
+
+    def update_asset_admin_user_if_need(self):
+        if not self.asset or not self.systemuser:
+            return
+        if not self.systemuser.is_admin_user or self.asset.admin_user == self.systemuser:
+            return
+        self.asset.admin_user = self.systemuser
+        self.asset.save()
+        logger.debug('Update asset admin user: {} {}'.format(self.asset, self.systemuser))
 
     def __str__(self):
         return self.smart_name

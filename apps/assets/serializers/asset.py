@@ -8,7 +8,7 @@ from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import Asset, Node, Platform, SystemUser
 
 __all__ = [
-    'AssetSerializer', 'AssetSimpleSerializer',
+    'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',
     'ProtocolsField', 'PlatformSerializer',
     'AssetTaskSerializer', 'AssetsTaskSerializer', 'ProtocolsField'
 ]
@@ -17,7 +17,7 @@ __all__ = [
 class ProtocolField(serializers.RegexField):
     protocols = '|'.join(dict(Asset.Protocol.choices).keys())
     default_error_messages = {
-        'invalid': _('Protocol format should {}/{}'.format(protocols, '1-65535'))
+        'invalid': _('Protocol format should {}/{}').format(protocols, '1-65535')
     }
     regex = r'^(%s)/(\d{1,5})$' % protocols
 
@@ -69,15 +69,19 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     """
     资产的数据结构
     """
+
     class Meta:
         model = Asset
-        fields_mini = ['id', 'hostname', 'ip']
+        fields_mini = ['id', 'hostname', 'ip', 'platform', 'protocols']
         fields_small = fields_mini + [
             'protocol', 'port', 'protocols', 'is_active', 'public_ip',
+            'comment',
+        ]
+        hardware_fields = [
             'number', 'vendor', 'model', 'sn', 'cpu_model', 'cpu_count',
             'cpu_cores', 'cpu_vcpus', 'memory', 'disk_total', 'disk_info',
-            'os', 'os_version', 'os_arch', 'hostname_raw', 'comment',
-            'hardware_info', 'connectivity', 'date_verified'
+            'os', 'os_version', 'os_arch', 'hostname_raw', 'hardware_info',
+            'connectivity', 'date_verified'
         ]
         fields_fk = [
             'domain', 'domain_display', 'platform', 'admin_user', 'admin_user_display'
@@ -88,15 +92,16 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
         read_only_fields = [
             'created_by', 'date_created',
         ]
-        fields = fields_small + fields_fk + fields_m2m + read_only_fields
+        fields = fields_small + hardware_fields + fields_fk + fields_m2m + read_only_fields
 
-        extra_kwargs = {
+        extra_kwargs = {k: {'read_only': True} for k in hardware_fields}
+        extra_kwargs.update({
             'protocol': {'write_only': True},
             'port': {'write_only': True},
-            'hardware_info': {'label': _('Hardware info')},
-            'org_name': {'label': _('Org name')},
-            'admin_user_display': {'label': _('Admin user display')}
-        }
+            'hardware_info': {'label': _('Hardware info'), 'read_only': True},
+            'org_name': {'label': _('Org name'), 'read_only': True},
+            'admin_user_display': {'label': _('Admin user display'), 'read_only': True},
+        })
 
     def get_fields(self):
         fields = super().get_fields()
@@ -157,6 +162,12 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
         return instance
 
 
+class MiniAssetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Asset
+        fields = AssetSerializer.Meta.fields_mini
+
+
 class PlatformSerializer(serializers.ModelSerializer):
     meta = serializers.DictField(required=False, allow_null=True, label=_('Meta'))
 
@@ -177,7 +188,6 @@ class PlatformSerializer(serializers.ModelSerializer):
 
 
 class AssetSimpleSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Asset
         fields = ['id', 'hostname', 'ip', 'port', 'connectivity', 'date_verified']
@@ -200,6 +210,7 @@ class AssetTaskSerializer(AssetsTaskSerializer):
         ('push_system_user', 'push_system_user'),
         ('test_system_user', 'test_system_user')
     ])
+    action = serializers.ChoiceField(choices=ACTION_CHOICES, write_only=True)
     asset = serializers.PrimaryKeyRelatedField(
         queryset=Asset.objects, required=False, allow_empty=True, many=False
     )

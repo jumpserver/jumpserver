@@ -215,7 +215,7 @@ class DingTalkQRLoginCallbackView(AuthMixin, DingTalkQRMixin, View):
         user = get_object_or_none(User, dingtalk_id=userid)
         if user is None:
             title = _('DingTalk is not bound')
-            msg = _('Please login with a password and then bind the WeCom')
+            msg = _('Please login with a password and then bind the DingTalk')
             response = self.get_failed_reponse(login_url, title=title, msg=msg)
             return response
 

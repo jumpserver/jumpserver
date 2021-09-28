@@ -1,7 +1,7 @@
 from django.dispatch import receiver
 from django.apps import apps
 from simple_history.signals import pre_create_historical_record
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save, pre_save, pre_delete
 
 from common.utils import get_logger
 from ..models import AuthBook, SystemUser
@@ -28,15 +28,22 @@ def pre_create_historical_record_callback(sender, history_instance=None, **kwarg
             setattr(history_instance, attr, system_user_attr_value)
 
 
+@receiver(pre_delete, sender=AuthBook)
+def on_authbook_post_delete(sender, instance, **kwargs):
+    instance.remove_asset_admin_user_if_need()
+
+
 @receiver(post_save, sender=AuthBook)
-def on_authbook_post_create(sender, instance, **kwargs):
-    if not instance.systemuser:
-        instance.sync_to_system_user_account()
+def on_authbook_post_create(sender, instance, created, **kwargs):
+    instance.sync_to_system_user_account()
+    if created:
+        # 只在创建时进行更新资产的管理用户
+        instance.update_asset_admin_user_if_need()
 
 
 @receiver(pre_save, sender=AuthBook)
 def on_authbook_pre_create(sender, instance, **kwargs):
     # 升级版本号
-    instance.version = instance.history.all().count() + 1
+    instance.version += 1
     # 即使在 root 组织也不怕
     instance.org_id = instance.asset.org_id

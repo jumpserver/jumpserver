@@ -37,6 +37,7 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
             'can_join': {'label': _('Can join')},
             'terminal': {'label': _('Terminal')},
             'is_finished': {'label': _('Is finished')},
+            'can_terminate': {'label': _('Can terminate')},
         }
 
 
@@ -45,6 +46,9 @@ class SessionDisplaySerializer(SessionSerializer):
 
     class Meta(SessionSerializer.Meta):
         fields = SessionSerializer.Meta.fields + ['command_amount']
+        extra_kwargs = {
+            'command_amount': {'label': _('Command amount')},
+        }
 
 
 class ReplaySerializer(serializers.Serializer):

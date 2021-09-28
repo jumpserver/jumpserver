@@ -14,14 +14,15 @@ from django.contrib.auth import (
     PermissionDenied, user_login_failed, _clean_credentials
 )
 from django.shortcuts import reverse, redirect
+from django.views.generic.edit import FormView
 
 from common.utils import get_object_or_none, get_request_ip, get_logger, bulk_get, FlashMessageUtil
-from users.models import User
+from users.models import User, MFAType
 from users.utils import LoginBlockUtil, MFABlockUtils
 from . import errors
-from .utils import rsa_decrypt
+from .utils import rsa_decrypt, gen_key_pair
 from .signals import post_auth_success, post_auth_failed
-from .const import RSA_PRIVATE_KEY
+from .const import RSA_PRIVATE_KEY, RSA_PUBLIC_KEY
 
 logger = get_logger(__name__)
 
@@ -29,8 +30,8 @@ logger = get_logger(__name__)
 def check_backend_can_auth(username, backend_path, allowed_auth_backends):
     if allowed_auth_backends is not None and backend_path not in allowed_auth_backends:
         logger.debug('Skip user auth backend: {}, {} not in'.format(
-                username, backend_path, ','.join(allowed_auth_backends)
-            )
+            username, backend_path, ','.join(allowed_auth_backends)
+        )
         )
         return False
     return True
@@ -79,7 +80,70 @@ def authenticate(request=None, **credentials):
 auth.authenticate = authenticate
 
 
-class AuthMixin:
+class PasswordEncryptionViewMixin:
+    request = None
+
+    def get_decrypted_password(self, password=None, username=None):
+        request = self.request
+        if hasattr(request, 'data'):
+            data = request.data
+        else:
+            data = request.POST
+
+        username = username or data.get('username')
+        password = password or data.get('password')
+
+        password = self.decrypt_passwd(password)
+        if not password:
+            self.raise_password_decrypt_failed(username=username)
+        return password
+
+    def raise_password_decrypt_failed(self, username):
+        ip = self.get_request_ip()
+        raise errors.CredentialError(
+            error=errors.reason_password_decrypt_failed,
+            username=username, ip=ip, request=self.request
+        )
+
+    def decrypt_passwd(self, raw_passwd):
+        # 获取解密密钥，对密码进行解密
+        rsa_private_key = self.request.session.get(RSA_PRIVATE_KEY)
+        if rsa_private_key is not None:
+            try:
+                return rsa_decrypt(raw_passwd, rsa_private_key)
+            except Exception as e:
+                logger.error(e, exc_info=True)
+                logger.error(
+                    f'Decrypt password failed: password[{raw_passwd}] '
+                    f'rsa_private_key[{rsa_private_key}]'
+                )
+                return None
+        return raw_passwd
+
+    def get_request_ip(self):
+        ip = ''
+        if hasattr(self.request, 'data'):
+            ip = self.request.data.get('remote_addr', '')
+        ip = ip or get_request_ip(self.request)
+        return ip
+
+    def get_context_data(self, **kwargs):
+        # 生成加解密密钥对，public_key传递给前端，private_key存入session中供解密使用
+        rsa_public_key = self.request.session.get(RSA_PUBLIC_KEY)
+        rsa_private_key = self.request.session.get(RSA_PRIVATE_KEY)
+        if not all((rsa_private_key, rsa_public_key)):
+            rsa_private_key, rsa_public_key = gen_key_pair()
+            rsa_public_key = rsa_public_key.replace('\n', '\\n')
+            self.request.session[RSA_PRIVATE_KEY] = rsa_private_key
+            self.request.session[RSA_PUBLIC_KEY] = rsa_public_key
+
+        kwargs.update({
+            'rsa_public_key': rsa_public_key,
+        })
+        return super().get_context_data(**kwargs)
+
+
+class AuthMixin(PasswordEncryptionViewMixin):
     request = None
     partial_credential_error = None
 
@@ -106,13 +170,6 @@ class AuthMixin:
         user.backend = self.request.session.get("auth_backend")
         return user
 
-    def get_request_ip(self):
-        ip = ''
-        if hasattr(self.request, 'data'):
-            ip = self.request.data.get('remote_addr', '')
-        ip = ip or get_request_ip(self.request)
-        return ip
-
     def _check_is_block(self, username, raise_exception=True):
         ip = self.get_request_ip()
         if LoginBlockUtil(username, ip).is_block():
@@ -130,24 +187,14 @@ class AuthMixin:
             username = self.request.POST.get("username")
         self._check_is_block(username, raise_exception)
 
-    def decrypt_passwd(self, raw_passwd):
-        # 获取解密密钥，对密码进行解密
-        rsa_private_key = self.request.session.get(RSA_PRIVATE_KEY)
-        if rsa_private_key is not None:
-            try:
-                return rsa_decrypt(raw_passwd, rsa_private_key)
-            except Exception as e:
-                logger.error(e, exc_info=True)
-                logger.error(f'Decrypt password failed: password[{raw_passwd}] '
-                             f'rsa_private_key[{rsa_private_key}]')
-                return None
-        return raw_passwd
-
     def raise_credential_error(self, error):
         raise self.partial_credential_error(error=error)
 
     def _set_partial_credential_error(self, username, ip, request):
-        self.partial_credential_error = partial(errors.CredentialError, username=username, ip=ip, request=request)
+        self.partial_credential_error = partial(
+            errors.CredentialError, username=username,
+            ip=ip, request=request
+        )
 
     def get_auth_data(self, decrypt_passwd=False):
         request = self.request
@@ -157,15 +204,13 @@ class AuthMixin:
             data = request.POST
 
         items = ['username', 'password', 'challenge', 'public_key', 'auto_login']
-        username, password, challenge, public_key, auto_login = bulk_get(data, *items,  default='')
-        password = password + challenge.strip()
+        username, password, challenge, public_key, auto_login = bulk_get(data, *items, default='')
         ip = self.get_request_ip()
         self._set_partial_credential_error(username=username, ip=ip, request=request)
 
+        password = password + challenge.strip()
         if decrypt_passwd:
-            password = self.decrypt_passwd(password)
-            if not password:
-                self.raise_credential_error(errors.reason_password_decrypt_failed)
+            password = self.get_decrypted_password()
         return username, password, public_key, ip, auto_login
 
     def _check_only_allow_exists_user_auth(self, username):
@@ -243,7 +288,6 @@ class AuthMixin:
         elif not user.is_active:
             self.raise_credential_error(errors.reason_user_inactive)
 
-        self._check_is_local_user(user)
         self._check_is_block(user.username)
         self._check_login_acl(user, ip)
 
@@ -304,17 +348,28 @@ class AuthMixin:
     def check_user_mfa_if_need(self, user):
         if self.request.session.get('auth_mfa'):
             return
+
+        if settings.OTP_IN_RADIUS:
+            return
+
         if not user.mfa_enabled:
             return
         unset, url = user.mfa_enabled_but_not_set()
         if unset:
             raise errors.MFAUnsetError(user, self.request, url)
-        raise errors.MFARequiredError()
+        raise errors.MFARequiredError(mfa_types=user.get_supported_mfa_types())
 
-    def mark_mfa_ok(self):
+    def mark_mfa_ok(self, mfa_type=MFAType.OTP):
         self.request.session['auth_mfa'] = 1
         self.request.session['auth_mfa_time'] = time.time()
-        self.request.session['auth_mfa_type'] = 'otp'
+        self.request.session['auth_mfa_required'] = ''
+        self.request.session['auth_mfa_type'] = mfa_type
+
+    def clean_mfa_mark(self):
+        self.request.session['auth_mfa'] = ''
+        self.request.session['auth_mfa_time'] = ''
+        self.request.session['auth_mfa_required'] = ''
+        self.request.session['auth_mfa_type'] = ''
 
     def check_mfa_is_block(self, username, ip, raise_exception=True):
         if MFABlockUtils(username, ip).is_block():
@@ -325,11 +380,11 @@ class AuthMixin:
             else:
                 return exception
 
-    def check_user_mfa(self, code):
+    def check_user_mfa(self, code, mfa_type=MFAType.OTP):
         user = self.get_user_from_session()
         ip = self.get_request_ip()
         self.check_mfa_is_block(user.username, ip)
-        ok = user.check_mfa(code)
+        ok = user.check_mfa(code, mfa_type=mfa_type)
         if ok:
             self.mark_mfa_ok()
             return
@@ -337,7 +392,7 @@ class AuthMixin:
         raise errors.MFAFailedError(
             username=user.username,
             request=self.request,
-            ip=ip
+            ip=ip, mfa_type=mfa_type,
         )
 
     def get_ticket(self):
@@ -363,16 +418,18 @@ class AuthMixin:
             raise errors.LoginConfirmOtherError('', "Not found")
         if ticket.status_open:
             raise errors.LoginConfirmWaitError(ticket.id)
-        elif ticket.action_approve:
+        elif ticket.state_approve:
             self.request.session["auth_confirm"] = "1"
             return
-        elif ticket.action_reject:
+        elif ticket.state_reject:
+            self.clean_mfa_mark()
             raise errors.LoginConfirmOtherError(
-                ticket.id, ticket.get_action_display()
+                ticket.id, ticket.get_state_display()
             )
-        elif ticket.action_close:
+        elif ticket.state_close:
+            self.clean_mfa_mark()
             raise errors.LoginConfirmOtherError(
-                ticket.id, ticket.get_action_display()
+                ticket.id, ticket.get_state_display()
             )
         else:
             raise errors.LoginConfirmOtherError(
@@ -391,7 +448,6 @@ class AuthMixin:
     def clear_auth_mark(self):
         self.request.session['auth_password'] = ''
         self.request.session['auth_user_id'] = ''
-        self.request.session['auth_mfa'] = ''
         self.request.session['auth_confirm'] = ''
         self.request.session['auth_ticket_id'] = ''
 

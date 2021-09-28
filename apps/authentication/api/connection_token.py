@@ -23,6 +23,7 @@ from common.drf.api import SerializerMixin
 from common.permissions import IsSuperUserOrAppUser, IsValidUser, IsSuperUser
 from orgs.mixins.api import RootOrgViewMixin
 from common.http import is_true
+from assets.models import SystemUser
 
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
@@ -74,6 +75,7 @@ class ClientProtocolMixin:
             'bookmarktype:i': '3',
             'use redirection server name:i': '0',
             'smart sizing:i': '0',
+            #'drivestoredirect:s': '*',
             # 'domain:s': ''
             # 'alternate shell:s:': '||MySQLWorkbench',
             # 'remoteapplicationname:s': 'Firefox',
@@ -84,8 +86,11 @@ class ClientProtocolMixin:
         height = self.request.query_params.get('height')
         width = self.request.query_params.get('width')
         full_screen = is_true(self.request.query_params.get('full_screen'))
+        drives_redirect = is_true(self.request.query_params.get('drives_redirect'))
         token = self.create_token(user, asset, application, system_user)
 
+        if drives_redirect:
+            options['drivestoredirect:s'] = '*'
         options['screen mode id:i'] = '2' if full_screen else '1'
         address = settings.TERMINAL_RDP_ADDR
         if not address or address == 'localhost:3389':

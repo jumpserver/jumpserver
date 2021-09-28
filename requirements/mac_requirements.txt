@@ -1,1 +1,1 @@
-brew install libtiff libjpeg webp little-cms2 openssl
+brew install libtiff libjpeg webp little-cms2 openssl gettext

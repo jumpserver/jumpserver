@@ -120,6 +120,7 @@ class Gateway(BaseUser):
         except(paramiko.AuthenticationException,
                paramiko.BadAuthenticationType,
                paramiko.SSHException,
+               paramiko.ChannelException,
                paramiko.ssh_exception.NoValidConnectionsError,
                socket.gaierror) as e:
             err = str(e)
@@ -128,6 +129,8 @@ class Gateway(BaseUser):
                 err = err.format(port=self.port, ip=self.ip)
             elif err == 'Authentication failed.':
                 err = _('Authentication failed')
+            elif err == 'Connect failed':
+                err = _('Connect failed')
             self.is_connective = False
             return False, err
 
@@ -141,10 +144,17 @@ class Gateway(BaseUser):
                            key_filename=self.private_key_file,
                            sock=sock,
                            timeout=5)
-        except (paramiko.SSHException, paramiko.ssh_exception.SSHException,
-                paramiko.AuthenticationException, TimeoutError) as e:
+        except (paramiko.SSHException,
+                paramiko.ssh_exception.SSHException,
+                paramiko.ChannelException,
+                paramiko.AuthenticationException,
+                TimeoutError) as e:
+
+            err = getattr(e, 'text', str(e))
+            if err == 'Connect failed':
+                err = _('Connect failed')
             self.is_connective = False
-            return False, str(e)
+            return False, err
         finally:
             client.close()
         self.is_connective = True

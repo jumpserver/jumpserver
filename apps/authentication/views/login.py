@@ -4,10 +4,13 @@
 from __future__ import unicode_literals
 import os
 import datetime
+
+from django.templatetags.static import static
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.http import HttpResponse
 from django.shortcuts import reverse, redirect
 from django.utils.decorators import method_decorator
+from django.db import transaction
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
@@ -18,12 +21,12 @@ from django.conf import settings
 from django.urls import reverse_lazy
 from django.contrib.auth import BACKEND_SESSION_KEY
 
-from common.utils import get_request_ip, FlashMessageUtil
+from common.utils import FlashMessageUtil
 from users.utils import (
     redirect_user_first_login_or_index
 )
 from ..const import RSA_PRIVATE_KEY, RSA_PUBLIC_KEY
-from .. import mixins, errors, utils
+from .. import mixins, errors
 from ..forms import get_user_login_form_cls
 
 
@@ -49,7 +52,8 @@ class UserLoginView(mixins.AuthMixin, FormView):
 
         if settings.AUTH_OPENID:
             auth_type = 'OIDC'
-            openid_auth_url = reverse(settings.AUTH_OPENID_AUTH_LOGIN_URL_NAME) + f'?next={next_url}'
+            openid_auth_url = reverse(settings.AUTH_OPENID_AUTH_LOGIN_URL_NAME)
+            openid_auth_url = openid_auth_url + f'?next={next_url}'
         else:
             openid_auth_url = None
 
@@ -62,16 +66,15 @@ class UserLoginView(mixins.AuthMixin, FormView):
         if not any([openid_auth_url, cas_auth_url]):
             return None
 
-        if settings.LOGIN_REDIRECT_TO_BACKEND == 'OPENID' and openid_auth_url:
-            auth_url = openid_auth_url
-
-        elif settings.LOGIN_REDIRECT_TO_BACKEND == 'CAS' and cas_auth_url:
+        login_redirect = settings.LOGIN_REDIRECT_TO_BACKEND.lower()
+        if login_redirect in ['cas'] and cas_auth_url:
             auth_url = cas_auth_url
-
+        elif login_redirect in ['openid', 'oidc'] and openid_auth_url:
+            auth_url = openid_auth_url
         else:
             auth_url = openid_auth_url or cas_auth_url
 
-        if settings.LOGIN_REDIRECT_TO_BACKEND:
+        if settings.LOGIN_REDIRECT_TO_BACKEND or not settings.LOGIN_REDIRECT_MSG_ENABLED:
             redirect_url = auth_url
         else:
             message_data = {
@@ -107,7 +110,8 @@ class UserLoginView(mixins.AuthMixin, FormView):
         self.request.session.delete_test_cookie()
 
         try:
-            self.check_user_auth(decrypt_passwd=True)
+            with transaction.atomic():
+                self.check_user_auth(decrypt_passwd=True)
         except errors.AuthFailedError as e:
             form.add_error(None, e.msg)
             self.set_login_failed_mark()
@@ -118,7 +122,11 @@ class UserLoginView(mixins.AuthMixin, FormView):
             context = self.get_context_data(form=new_form)
             self.request.session.set_test_cookie()
             return self.render_to_response(context)
-        except (errors.PasswdTooSimple, errors.PasswordRequireResetError, errors.PasswdNeedUpdate) as e:
+        except (
+            errors.PasswdTooSimple,
+            errors.PasswordRequireResetError,
+            errors.PasswdNeedUpdate
+        ) as e:
             return redirect(e.url)
         self.clear_rsa_key()
         return self.redirect_to_guard_view()
@@ -133,29 +141,55 @@ class UserLoginView(mixins.AuthMixin, FormView):
         self.request.session[RSA_PRIVATE_KEY] = None
         self.request.session[RSA_PUBLIC_KEY] = None
 
-    def get_context_data(self, **kwargs):
-        # 生成加解密密钥对，public_key传递给前端，private_key存入session中供解密使用
-        rsa_private_key = self.request.session.get(RSA_PRIVATE_KEY)
-        rsa_public_key = self.request.session.get(RSA_PUBLIC_KEY)
-        if not all((rsa_private_key, rsa_public_key)):
-            rsa_private_key, rsa_public_key = utils.gen_key_pair()
-            rsa_public_key = rsa_public_key.replace('\n', '\\n')
-            self.request.session[RSA_PRIVATE_KEY] = rsa_private_key
-            self.request.session[RSA_PUBLIC_KEY] = rsa_public_key
+    @staticmethod
+    def get_support_auth_methods():
+        auth_methods = [
+            {
+                'name': 'OpenID',
+                'enabled': settings.AUTH_OPENID,
+                'url': reverse('authentication:openid:login'),
+                'logo':  static('img/login_oidc_logo.png')
+            },
+            {
+                'name': 'CAS',
+                'enabled': settings.AUTH_CAS,
+                'url': reverse('authentication:cas:cas-login'),
+                'logo':  static('img/login_cas_logo.png')
+            },
+            {
+                'name': _('WeCom'),
+                'enabled': settings.AUTH_WECOM,
+                'url': reverse('authentication:wecom-qr-login'),
+                'logo':  static('img/login_wecom_logo.png')
+            },
+            {
+                'name': _('DingTalk'),
+                'enabled': settings.AUTH_DINGTALK,
+                'url': reverse('authentication:dingtalk-qr-login'),
+                'logo':  static('img/login_dingtalk_logo.png')
+            },
+            {
+                'name': _('FeiShu'),
+                'enabled': settings.AUTH_FEISHU,
+                'url': reverse('authentication:feishu-qr-login'),
+                'logo':  static('img/login_feishu_logo.png')
+            }
+        ]
+        return [method for method in auth_methods if method['enabled']]
 
+    @staticmethod
+    def get_forgot_password_url():
         forgot_password_url = reverse('authentication:forgot-password')
         has_other_auth_backend = settings.AUTHENTICATION_BACKENDS[0] != settings.AUTH_BACKEND_MODEL
         if has_other_auth_backend and settings.FORGOT_PASSWORD_URL:
             forgot_password_url = settings.FORGOT_PASSWORD_URL
+        return forgot_password_url
 
+    def get_context_data(self, **kwargs):
         context = {
             'demo_mode': os.environ.get("DEMO_MODE"),
-            'AUTH_OPENID': settings.AUTH_OPENID,
-            'AUTH_CAS': settings.AUTH_CAS,
-            'AUTH_WECOM': settings.AUTH_WECOM,
-            'AUTH_DINGTALK': settings.AUTH_DINGTALK,
-            'rsa_public_key': rsa_public_key,
-            'forgot_password_url': forgot_password_url
+            'auth_methods': self.get_support_auth_methods(),
+            'forgot_password_url': self.get_forgot_password_url()
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -220,8 +254,10 @@ class UserLoginWaitConfirmView(TemplateView):
         if ticket:
             timestamp_created = datetime.datetime.timestamp(ticket.date_created)
             ticket_detail_url = TICKET_DETAIL_URL.format(id=ticket_id)
+            assignees = ticket.current_node.first().ticket_assignees.all()
+            assignees_display = ', '.join([str(i.assignee) for i in assignees])
             msg = _("""Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>
-                  Don't close this page""").format(ticket.assignees_display)
+                  Don't close this page""").format(assignees_display)
         else:
             timestamp_created = 0
             ticket_detail_url = ''

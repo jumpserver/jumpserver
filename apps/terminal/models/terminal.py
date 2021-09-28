@@ -151,7 +151,8 @@ class Terminal(StorageMixin, TerminalStatusMixin, models.Model):
         configs.update(self.get_replay_storage_setting())
         configs.update(self.get_login_title_setting())
         configs.update({
-            'SECURITY_MAX_IDLE_TIME': settings.SECURITY_MAX_IDLE_TIME
+            'SECURITY_MAX_IDLE_TIME': settings.SECURITY_MAX_IDLE_TIME,
+            'SECURITY_SESSION_SHARE': settings.SECURITY_SESSION_SHARE
         })
         return configs
 

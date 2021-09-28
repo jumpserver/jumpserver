@@ -16,6 +16,7 @@ class ApplicationPermissionViewSet(BasePermissionViewSet):
         'name': ['exact'],
         'category': ['exact'],
         'type': ['exact', 'in'],
+        'from_ticket': ['exact']
     }
     search_fields = ['name', 'category', 'type']
     custom_filter_fields = BasePermissionViewSet.custom_filter_fields + [
@@ -42,7 +43,7 @@ class ApplicationPermissionViewSet(BasePermissionViewSet):
             return queryset
         if not applications:
             return queryset.none()
-        queryset = queryset.filter(applications=applications)
+        queryset = queryset.filter(applications__in=applications)
         return queryset
 
     def filter_queryset(self, queryset):

@@ -19,6 +19,7 @@ __all__ = [
 
 
 class OrgManager(models.Manager):
+
     def all_group_by_org(self):
         from ..models import Organization
         orgs = list(Organization.objects.all())
@@ -49,6 +50,9 @@ class OrgModelMixin(models.Model):
 
     def save(self, *args, **kwargs):
         org = get_current_org()
+        # 这里不可以优化成, 因为 root 组织下可以设置组织 id 来保存
+        # if org.is_root() and not self.org_id:
+        #     raise ...
         if org.is_root():
             if not self.org_id:
                 raise ValidationError('Please save in a organization')

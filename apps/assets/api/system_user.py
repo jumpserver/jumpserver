@@ -6,6 +6,7 @@ from common.utils import get_logger
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, IsValidUser
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
+from common.mixins.views import SuggestionMixin
 from orgs.utils import tmp_to_root_org
 from ..models import SystemUser, Asset
 from .. import serializers
@@ -24,7 +25,7 @@ __all__ = [
 ]
 
 
-class SystemUserViewSet(OrgBulkModelViewSet):
+class SystemUserViewSet(SuggestionMixin, OrgBulkModelViewSet):
     """
     System user api set, for add,delete,update,list,retrieve resource
     """
@@ -39,6 +40,7 @@ class SystemUserViewSet(OrgBulkModelViewSet):
     serializer_class = serializers.SystemUserSerializer
     serializer_classes = {
         'default': serializers.SystemUserSerializer,
+        'suggestion': serializers.MiniSystemUserSerializer
     }
     permission_classes = (IsOrgAdminOrAppUser,)
 

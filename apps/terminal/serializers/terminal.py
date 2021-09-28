@@ -5,6 +5,7 @@ from common.drf.serializers import BulkModelSerializer, AdaptedBulkListSerialize
 from common.utils import is_uuid
 from users.serializers import ServiceAccountSerializer
 from common.utils import get_request_ip
+from .. import const
 
 from ..models import (
     Terminal, Status, Session, Task, CommandStorage, ReplayStorage
@@ -37,7 +38,8 @@ class StatusSerializer(serializers.ModelSerializer):
 class TerminalSerializer(BulkModelSerializer):
     session_online = serializers.ReadOnlyField(source='get_online_session_count')
     is_alive = serializers.BooleanField(read_only=True)
-    status = serializers.CharField(read_only=True, source='latest_status')
+    is_active = serializers.BooleanField(read_only=True, label='Is active')
+    status = serializers.ChoiceField(read_only=True, choices=const.ComponentStatusChoices.choices, source='latest_status')
     status_display = serializers.CharField(read_only=True, source='latest_status_display')
     stat = StatusSerializer(read_only=True, source='latest_stat')
 
@@ -99,15 +101,22 @@ class TerminalRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Terminal
         fields = ['name', 'type', 'comment', 'service_account', 'remote_addr']
-        extra_fields = {
-            'remote_addr': {'readonly': True}
+        extra_kwargs = {
+            'name': {'max_length': 1024},
+            'remote_addr': {'read_only': True}
         }
 
     def is_valid(self, raise_exception=False):
         valid = super().is_valid(raise_exception=raise_exception)
         if not valid:
             return valid
-        data = {'name': self.validated_data.get('name')}
+        name = self.validated_data.get('name')
+        if len(name) > 128:
+            self.validated_data['comment'] = name
+            name = '{}...{}'.format(name[:32], name[-32:])
+            self.validated_data['name'] = name
+
+        data = {'name': name}
         kwargs = {'data': data}
         if self.instance and self.instance.user:
             kwargs['instance'] = self.instance.user

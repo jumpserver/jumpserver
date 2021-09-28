@@ -14,6 +14,7 @@ import types
 import errno
 import json
 import yaml
+import copy
 from importlib import import_module
 from django.urls import reverse_lazy
 from urllib.parse import urljoin, urlparse
@@ -179,13 +180,14 @@ class Config(dict):
         'AUTH_OPENID_CLIENT_SECRET': 'client-secret',
         'AUTH_OPENID_SHARE_SESSION': True,
         'AUTH_OPENID_IGNORE_SSL_VERIFICATION': True,
+
         # OpenID 新配置参数 (version >= 1.5.9)
-        'AUTH_OPENID_PROVIDER_ENDPOINT': 'https://op-example.com/',
-        'AUTH_OPENID_PROVIDER_AUTHORIZATION_ENDPOINT': 'https://op-example.com/authorize',
-        'AUTH_OPENID_PROVIDER_TOKEN_ENDPOINT': 'https://op-example.com/token',
-        'AUTH_OPENID_PROVIDER_JWKS_ENDPOINT': 'https://op-example.com/jwks',
-        'AUTH_OPENID_PROVIDER_USERINFO_ENDPOINT': 'https://op-example.com/userinfo',
-        'AUTH_OPENID_PROVIDER_END_SESSION_ENDPOINT': 'https://op-example.com/logout',
+        'AUTH_OPENID_PROVIDER_ENDPOINT': 'https://oidc.example.com/',
+        'AUTH_OPENID_PROVIDER_AUTHORIZATION_ENDPOINT': 'https://oidc.example.com/authorize',
+        'AUTH_OPENID_PROVIDER_TOKEN_ENDPOINT': 'https://oidc.example.com/token',
+        'AUTH_OPENID_PROVIDER_JWKS_ENDPOINT': 'https://oidc.example.com/jwks',
+        'AUTH_OPENID_PROVIDER_USERINFO_ENDPOINT': 'https://oidc.example.com/userinfo',
+        'AUTH_OPENID_PROVIDER_END_SESSION_ENDPOINT': 'https://oidc.example.com/logout',
         'AUTH_OPENID_PROVIDER_SIGNATURE_ALG': 'HS256',
         'AUTH_OPENID_PROVIDER_SIGNATURE_KEY': None,
         'AUTH_OPENID_SCOPES': 'openid profile email',
@@ -194,10 +196,13 @@ class Config(dict):
         'AUTH_OPENID_USE_STATE': True,
         'AUTH_OPENID_USE_NONCE': True,
         'AUTH_OPENID_ALWAYS_UPDATE_USER': True,
-        # OpenID 旧配置参数 (version <= 1.5.8 (discarded))
-        'AUTH_OPENID_SERVER_URL': 'http://openid',
+
+        # Keycloak 旧配置参数 (version <= 1.5.8 (discarded))
+        'AUTH_OPENID_KEYCLOAK': True,
+        'AUTH_OPENID_SERVER_URL': 'https://keycloak.example.com',
         'AUTH_OPENID_REALM_NAME': None,
 
+        # Raidus 认证
         'AUTH_RADIUS': False,
         'RADIUS_SERVER': 'localhost',
         'RADIUS_PORT': 1812,
@@ -205,33 +210,60 @@ class Config(dict):
         'RADIUS_ENCRYPT_PASSWORD': True,
         'OTP_IN_RADIUS': False,
 
+        # Cas 认证
         'AUTH_CAS': False,
-        'CAS_SERVER_URL': "http://host/cas/",
-        'CAS_ROOT_PROXIED_AS': '',
+        'CAS_SERVER_URL': "https://example.com/cas/",
+        'CAS_ROOT_PROXIED_AS': 'https://example.com',
         'CAS_LOGOUT_COMPLETELY': True,
         'CAS_VERSION': 3,
         'CAS_USERNAME_ATTRIBUTE': 'uid',
         'CAS_APPLY_ATTRIBUTES_TO_USER': False,
-        'CAS_RENAME_ATTRIBUTES': {},
+        'CAS_RENAME_ATTRIBUTES': {'uid': 'username'},
         'CAS_CREATE_USER': True,
 
         'AUTH_SSO': False,
         'AUTH_SSO_AUTHKEY_TTL': 60 * 15,
 
+        # 企业微信
         'AUTH_WECOM': False,
         'WECOM_CORPID': '',
         'WECOM_AGENTID': '',
         'WECOM_SECRET': '',
 
+        # 钉钉
         'AUTH_DINGTALK': False,
         'DINGTALK_AGENTID': '',
         'DINGTALK_APPKEY': '',
         'DINGTALK_APPSECRET': '',
 
+        # 飞书
+        'AUTH_FEISHU': False,
+        'FEISHU_APP_ID': '',
+        'FEISHU_APP_SECRET': '',
+
+        'LOGIN_REDIRECT_TO_BACKEND':  '',  # 'OPENID / CAS
+        'LOGIN_REDIRECT_MSG_ENABLED': True,
+
+        'SMS_ENABLED': False,
+        'SMS_BACKEND': '',
+        'SMS_TEST_PHONE': '',
+
+        'ALIBABA_ACCESS_KEY_ID': '',
+        'ALIBABA_ACCESS_KEY_SECRET': '',
+        'ALIBABA_VERIFY_SIGN_NAME': '',
+        'ALIBABA_VERIFY_TEMPLATE_CODE': '',
+
+        'TENCENT_SECRET_ID': '',
+        'TENCENT_SECRET_KEY': '',
+        'TENCENT_SDKAPPID': '',
+        'TENCENT_VERIFY_SIGN_NAME': '',
+        'TENCENT_VERIFY_TEMPLATE_CODE': '',
+
         'OTP_VALID_WINDOW': 2,
         'OTP_ISSUER_NAME': 'JumpServer',
-        'EMAIL_SUFFIX': 'jumpserver.org',
+        'EMAIL_SUFFIX': 'example.com',
 
+        # Terminal配置
         'TERMINAL_PASSWORD_AUTH': True,
         'TERMINAL_PUBLIC_KEY_AUTH': True,
         'TERMINAL_HEARTBEAT_INTERVAL': 20,
@@ -241,7 +273,10 @@ class Config(dict):
         'TERMINAL_HOST_KEY': '',
         'TERMINAL_TELNET_REGEX': '',
         'TERMINAL_COMMAND_STORAGE': {},
+        'TERMINAL_RDP_ADDR': '',
+        'XRDP_ENABLED': True,
 
+        # 安全配置
         'SECURITY_MFA_AUTH': 0,  # 0 不开启 1 全局开启 2 管理员开启
         'SECURITY_COMMAND_EXECUTION': True,
         'SECURITY_SERVICE_ACCOUNT_REGISTRATION': True,
@@ -258,60 +293,64 @@ class Config(dict):
         'SECURITY_PASSWORD_SPECIAL_CHAR': False,
         'SECURITY_LOGIN_CHALLENGE_ENABLED': False,
         'SECURITY_LOGIN_CAPTCHA_ENABLED': True,
-        'SECURITY_DATA_CRYPTO_ALGO': 'aes',
         'SECURITY_INSECURE_COMMAND': False,
         'SECURITY_INSECURE_COMMAND_LEVEL': 5,
         'SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER': '',
         'SECURITY_LUNA_REMEMBER_AUTH': True,
-        'SECURITY_WATERMARK_ENABLED': False,
+        'SECURITY_WATERMARK_ENABLED': True,
+        'SECURITY_MFA_VERIFY_TTL': 3600,
+        'SECURITY_SESSION_SHARE': True,
+        'OLD_PASSWORD_HISTORY_LIMIT_COUNT': 5,
+        'LOGIN_CONFIRM_ENABLE': False,  # 准备废弃，放到 acl 中
+        'CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED': True,
+        'USER_LOGIN_SINGLE_MACHINE_ENABLED': False,
+        'ONLY_ALLOW_EXIST_USER_AUTH': False,
+        'ONLY_ALLOW_AUTH_FROM_SOURCE': False,
 
+        # 启动前
         'HTTP_BIND_HOST': '0.0.0.0',
         'HTTP_LISTEN_PORT': 8080,
         'WS_LISTEN_PORT': 8070,
+        'SYSLOG_ADDR': '',  # '192.168.0.1:514'
+        'SYSLOG_FACILITY': 'user',
+        'SYSLOG_SOCKTYPE': 2,
+        'PERM_EXPIRED_CHECK_PERIODIC': 60 * 60,
+        'FLOWER_URL': "127.0.0.1:5555",
+        'LANGUAGE_CODE': 'zh',
+        'TIME_ZONE': 'Asia/Shanghai',
+        'FORCE_SCRIPT_NAME': '',
+        'SESSION_COOKIE_SECURE': False,
+        'CSRF_COOKIE_SECURE': False,
+        'REFERER_CHECK_ENABLED': False,
+        'SESSION_SAVE_EVERY_REQUEST': True,
+        'SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE': False,
+        'SERVER_REPLAY_STORAGE': {},
+        'SECURITY_DATA_CRYPTO_ALGO': 'aes',
+
+        # 记录清理清理
         'LOGIN_LOG_KEEP_DAYS': 200,
         'TASK_LOG_KEEP_DAYS': 90,
         'OPERATE_LOG_KEEP_DAYS': 200,
         'FTP_LOG_KEEP_DAYS': 200,
-        'ASSETS_PERM_CACHE_TIME': 3600 * 24,
-        'SECURITY_MFA_VERIFY_TTL': 3600,
-        'OLD_PASSWORD_HISTORY_LIMIT_COUNT': 5,
-        'ASSETS_PERM_CACHE_ENABLE': HAS_XPACK,
-        'SYSLOG_ADDR': '',  # '192.168.0.1:514'
-        'SYSLOG_FACILITY': 'user',
-        'SYSLOG_SOCKTYPE': 2,
-        'PERM_SINGLE_ASSET_TO_UNGROUP_NODE': False,
-        'PERM_EXPIRED_CHECK_PERIODIC': 60 * 60,
-        'WINDOWS_SSH_DEFAULT_SHELL': 'cmd',
-        'FLOWER_URL': "127.0.0.1:5555",
+        'CLOUD_SYNC_TASK_EXECUTION_KEEP_DAYS': 30,
+
+        # 废弃的
         'DEFAULT_ORG_SHOW_ALL_USERS': True,
-        'PERIOD_TASK_ENABLED': True,
-        'FORCE_SCRIPT_NAME': '',
-        'LOGIN_CONFIRM_ENABLE': False,
-        'WINDOWS_SKIP_ALL_MANUAL_PASSWORD': False,
         'ORG_CHANGE_TO_URL': '',
-        'LANGUAGE_CODE': 'zh',
-        'TIME_ZONE': 'Asia/Shanghai',
-        'CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED': True,
-        'USER_LOGIN_SINGLE_MACHINE_ENABLED': False,
-        'TICKETS_ENABLED': True,
-        'SESSION_COOKIE_SECURE': False,
-        'CSRF_COOKIE_SECURE': False,
-        'REFERER_CHECK_ENABLED': False,
-        'SERVER_REPLAY_STORAGE': {},
+        'WINDOWS_SKIP_ALL_MANUAL_PASSWORD': False,
         'CONNECTION_TOKEN_ENABLED': False,
-        'ONLY_ALLOW_EXIST_USER_AUTH': False,
-        'ONLY_ALLOW_AUTH_FROM_SOURCE': False,
-        'DISK_CHECK_ENABLED': True,
-        'SESSION_SAVE_EVERY_REQUEST': True,
-        'SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE': False,
+
+        'PERM_SINGLE_ASSET_TO_UNGROUP_NODE': False,
+        'WINDOWS_SSH_DEFAULT_SHELL': 'cmd',
+        'PERIOD_TASK_ENABLED': True,
+
+        'TICKETS_ENABLED': True,
         'FORGOT_PASSWORD_URL': '',
         'HEALTH_CHECK_TOKEN': '',
-        'LOGIN_REDIRECT_TO_BACKEND':  None,  # 'OPENID / CAS
-
-        'TERMINAL_RDP_ADDR': ''
     }
 
-    def compatible_auth_openid_of_key(self):
+    @staticmethod
+    def convert_keycloak_to_openid(keycloak_config):
         """
         兼容OpenID旧配置 (即 version <= 1.5.8)
         因为旧配置只支持OpenID协议的Keycloak实现,
@@ -319,61 +358,78 @@ class Config(dict):
         构造出新配置中标准OpenID协议中所需的Endpoint即可
         (Keycloak说明文档参考: https://www.keycloak.org/docs/latest/securing_apps/)
         """
-        if not self.AUTH_OPENID:
+
+        openid_config = copy.deepcopy(keycloak_config)
+
+        auth_openid = openid_config.get('AUTH_OPENID')
+        auth_openid_realm_name = openid_config.get('AUTH_OPENID_REALM_NAME')
+        auth_openid_server_url = openid_config.get('AUTH_OPENID_SERVER_URL')
+
+        if not auth_openid:
             return
 
-        realm_name = self.AUTH_OPENID_REALM_NAME
-        if realm_name is None:
+        if auth_openid and not auth_openid_realm_name:
+            # 开启的是标准 OpenID 配置，关掉 Keycloak 配置
+            openid_config.update({
+                'AUTH_OPENID_KEYCLOAK': False
+            })
+
+        if auth_openid_realm_name is None:
             return
 
-        compatible_keycloak_config = [
-            (
-                'AUTH_OPENID_PROVIDER_ENDPOINT',
-                self.AUTH_OPENID_SERVER_URL
-            ),
-            (
-                'AUTH_OPENID_PROVIDER_AUTHORIZATION_ENDPOINT',
-                '/realms/{}/protocol/openid-connect/auth'.format(realm_name)
-            ),
-            (
-                'AUTH_OPENID_PROVIDER_TOKEN_ENDPOINT',
-                '/realms/{}/protocol/openid-connect/token'.format(realm_name)
-            ),
-            (
-                'AUTH_OPENID_PROVIDER_JWKS_ENDPOINT',
-                '/realms/{}/protocol/openid-connect/certs'.format(realm_name)
-            ),
-            (
-                'AUTH_OPENID_PROVIDER_USERINFO_ENDPOINT',
-                '/realms/{}/protocol/openid-connect/userinfo'.format(realm_name)
-            ),
-            (
-                'AUTH_OPENID_PROVIDER_END_SESSION_ENDPOINT',
-                '/realms/{}/protocol/openid-connect/logout'.format(realm_name)
-            )
-        ]
-        for key, value in compatible_keycloak_config:
-            self[key] = value
+        # # convert key # #
+        compatible_config = {
+            'AUTH_OPENID_PROVIDER_ENDPOINT': auth_openid_server_url,
 
-    def compatible_auth_openid_of_value(self):
-        """
-        兼容值的绝对路径、相对路径
-        (key 为 AUTH_OPENID_PROVIDER_*_ENDPOINT 的配置)
-        """
-        if not self.AUTH_OPENID:
-            return
+            'AUTH_OPENID_PROVIDER_AUTHORIZATION_ENDPOINT': '/realms/{}/protocol/openid-connect/auth'
+                                                           ''.format(auth_openid_realm_name),
+            'AUTH_OPENID_PROVIDER_TOKEN_ENDPOINT': '/realms/{}/protocol/openid-connect/token'
+                                                   ''.format(auth_openid_realm_name),
+            'AUTH_OPENID_PROVIDER_JWKS_ENDPOINT': '/realms/{}/protocol/openid-connect/certs'
+                                                  ''.format(auth_openid_realm_name),
+            'AUTH_OPENID_PROVIDER_USERINFO_ENDPOINT': '/realms/{}/protocol/openid-connect/userinfo'
+                                                      ''.format(auth_openid_realm_name),
+            'AUTH_OPENID_PROVIDER_END_SESSION_ENDPOINT': '/realms/{}/protocol/openid-connect/logout'
+                                                         ''.format(auth_openid_realm_name)
+        }
+        for key, value in compatible_config.items():
+            openid_config[key] = value
 
-        base = self.AUTH_OPENID_PROVIDER_ENDPOINT
-        config = list(self.items())
-        for key, value in config:
+        # # convert value # #
+        """ 兼容值的绝对路径、相对路径 (key 为 AUTH_OPENID_PROVIDER_*_ENDPOINT 的配置) """
+        base = openid_config.get('AUTH_OPENID_PROVIDER_ENDPOINT')
+        for key, value in openid_config.items():
             result = re.match(r'^AUTH_OPENID_PROVIDER_.*_ENDPOINT$', key)
             if result is None:
                 continue
             if value is None:
                 # None 在 url 中有特殊含义 (比如对于: end_session_endpoint)
                 continue
+
             value = build_absolute_uri(base, value)
+            openid_config[key] = value
+
+        return openid_config
+
+    def get_keycloak_config(self):
+        keycloak_config = {
+            'AUTH_OPENID': self.AUTH_OPENID,
+            'AUTH_OPENID_REALM_NAME': self.AUTH_OPENID_REALM_NAME,
+            'AUTH_OPENID_SERVER_URL': self.AUTH_OPENID_SERVER_URL,
+            'AUTH_OPENID_PROVIDER_ENDPOINT': self.AUTH_OPENID_PROVIDER_ENDPOINT
+        }
+        return keycloak_config
+
+    def set_openid_config(self, openid_config):
+        for key, value in openid_config.items():
             self[key] = value
+
+    def compatible_auth_openid(self, keycloak_config=None):
+        if keycloak_config is None:
+            keycloak_config = self.get_keycloak_config()
+        openid_config = self.convert_keycloak_to_openid(keycloak_config)
+        if openid_config:
+            self.set_openid_config(openid_config)
 
     def compatible(self):
         """
@@ -384,14 +440,8 @@ class Config(dict):
         处理顺序要保持先对key做处理, 再对value做处理,
         因为处理value的时候，只根据最新版本支持的key进行
         """
-        parts = ['key', 'value']
-        targets = ['auth_openid']
-        for part in parts:
-            for target in targets:
-                method_name = 'compatible_{}_of_{}'.format(target, part)
-                method = getattr(self, method_name, None)
-                if method is not None:
-                    method()
+        # 兼容 OpenID 配置
+        self.compatible_auth_openid()
 
     def convert_type(self, k, v):
         default_value = self.defaults.get(k)

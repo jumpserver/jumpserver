@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 #
-from django.db.models.signals import post_save, post_delete, m2m_changed
+from django.db.models.signals import (
+    post_save, post_delete, m2m_changed, pre_delete
+)
 from django.dispatch import receiver
 from django.conf import settings
 from django.db import transaction
@@ -11,7 +13,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework.renderers import JSONRenderer
 from rest_framework.request import Request
 
-from assets.models import Asset
+from assets.models import Asset, SystemUser
 from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR
 from jumpserver.utils import current_request
 from common.utils import get_request_ip, get_logger, get_syslogger
@@ -35,10 +37,10 @@ MODELS_NEED_RECORD = (
     # users
     'User', 'UserGroup',
     # acls
-    'LoginACL', 'LoginAssetACL',
+    'LoginACL', 'LoginAssetACL', 'LoginConfirmSetting',
     # assets
     'Asset', 'Node', 'AdminUser', 'SystemUser', 'Domain', 'Gateway', 'CommandFilterRule',
-    'CommandFilter', 'Platform',
+    'CommandFilter', 'Platform', 'AuthBook',
     # applications
     'Application',
     # orgs
@@ -98,63 +100,68 @@ def create_operate_log(action, sender, resource):
 M2M_NEED_RECORD = {
     'OrganizationMember': (
         _('User and Organization'),
-        _('{User} *JOINED* {Organization}'),
-        _('{User} *LEFT* {Organization}')
+        _('{User} JOINED {Organization}'),
+        _('{User} LEFT {Organization}')
     ),
     User.groups.through._meta.object_name: (
         _('User and Group'),
-        _('{User} *JOINED* {UserGroup}'),
-        _('{User} *LEFT* {UserGroup}')
+        _('{User} JOINED {UserGroup}'),
+        _('{User} LEFT {UserGroup}')
+    ),
+    SystemUser.assets.through._meta.object_name: (
+        _('Asset and SystemUser'),
+        _('{Asset} ADD {SystemUser}'),
+        _('{Asset} REMOVE {SystemUser}')
     ),
     Asset.nodes.through._meta.object_name: (
         _('Node and Asset'),
-        _('{Node} *ADD* {Asset}'),
-        _('{Node} *REMOVE* {Asset}')
+        _('{Node} ADD {Asset}'),
+        _('{Node} REMOVE {Asset}')
     ),
     AssetPermission.users.through._meta.object_name: (
         _('User asset permissions'),
-        _('{AssetPermission} *ADD* {User}'),
-        _('{AssetPermission} *REMOVE* {User}'),
+        _('{AssetPermission} ADD {User}'),
+        _('{AssetPermission} REMOVE {User}'),
     ),
     AssetPermission.user_groups.through._meta.object_name: (
         _('User group asset permissions'),
-        _('{AssetPermission} *ADD* {UserGroup}'),
-        _('{AssetPermission} *REMOVE* {UserGroup}'),
+        _('{AssetPermission} ADD {UserGroup}'),
+        _('{AssetPermission} REMOVE {UserGroup}'),
     ),
     AssetPermission.assets.through._meta.object_name: (
         _('Asset permission'),
-        _('{AssetPermission} *ADD* {Asset}'),
-        _('{AssetPermission} *REMOVE* {Asset}'),
+        _('{AssetPermission} ADD {Asset}'),
+        _('{AssetPermission} REMOVE {Asset}'),
     ),
     AssetPermission.nodes.through._meta.object_name: (
         _('Node permission'),
-        _('{AssetPermission} *ADD* {Node}'),
-        _('{AssetPermission} *REMOVE* {Node}'),
+        _('{AssetPermission} ADD {Node}'),
+        _('{AssetPermission} REMOVE {Node}'),
     ),
     AssetPermission.system_users.through._meta.object_name: (
         _('Asset permission and SystemUser'),
-        _('{AssetPermission} *ADD* {SystemUser}'),
-        _('{AssetPermission} *REMOVE* {SystemUser}'),
+        _('{AssetPermission} ADD {SystemUser}'),
+        _('{AssetPermission} REMOVE {SystemUser}'),
     ),
     ApplicationPermission.users.through._meta.object_name: (
         _('User application permissions'),
-        _('{ApplicationPermission} *ADD* {User}'),
-        _('{ApplicationPermission} *REMOVE* {User}'),
+        _('{ApplicationPermission} ADD {User}'),
+        _('{ApplicationPermission} REMOVE {User}'),
     ),
     ApplicationPermission.user_groups.through._meta.object_name: (
         _('User group application permissions'),
-        _('{ApplicationPermission} *ADD* {UserGroup}'),
-        _('{ApplicationPermission} *REMOVE* {UserGroup}'),
+        _('{ApplicationPermission} ADD {UserGroup}'),
+        _('{ApplicationPermission} REMOVE {UserGroup}'),
     ),
     ApplicationPermission.applications.through._meta.object_name: (
         _('Application permission'),
-        _('{ApplicationPermission} *ADD* {Application}'),
-        _('{ApplicationPermission} *REMOVE* {Application}'),
+        _('{ApplicationPermission} ADD {Application}'),
+        _('{ApplicationPermission} REMOVE {Application}'),
     ),
     ApplicationPermission.system_users.through._meta.object_name: (
         _('Application permission and SystemUser'),
-        _('{ApplicationPermission} *ADD* {SystemUser}'),
-        _('{ApplicationPermission} *REMOVE* {SystemUser}'),
+        _('{ApplicationPermission} ADD {SystemUser}'),
+        _('{ApplicationPermission} REMOVE {SystemUser}'),
     ),
 }
 
@@ -199,7 +206,7 @@ def on_m2m_changed(sender, action, instance, reverse, model, pk_set, **kwargs):
             resource = resource_tmpl.format(**{
                 instance_name: instance_value,
                 model_name: str(obj)
-            })
+            })[:128]  # `resource` 字段只有 128 个字符长 😔
 
             to_create.append(OperateLog(
                 user=user, action=action, resource_type=resource_type,
@@ -221,7 +228,7 @@ def on_object_created_or_update(sender, instance=None, created=False, update_fie
     create_operate_log(action, sender, instance)
 
 
-@receiver(post_delete)
+@receiver(pre_delete)
 def on_object_delete(sender, instance=None, **kwargs):
     create_operate_log(models.OperateLog.ACTION_DELETE, sender, instance)
 

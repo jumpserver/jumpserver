@@ -88,6 +88,7 @@ MIDDLEWARE = [
     'orgs.middleware.OrgMiddleware',
     'authentication.backends.oidc.middleware.OIDCRefreshIDTokenMiddleware',
     'authentication.backends.cas.middleware.CASMiddleware',
+    'authentication.middleware.MFAMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
 ]
 

@@ -1,1 +1,1 @@
-gcc make krb5-devel libtiff-devel libjpeg-devel libzip-devel freetype-devel lcms2-devel libwebp-devel tcl-devel tk-devel sshpass openldap-devel mariadb-devel mysql-community-devel mysql libffi-devel openssh-clients telnet openldap-clients
+gcc-c++ sshpass mariadb-devel openldap-devel gettext

@@ -157,6 +157,7 @@ $(document).ready(function () {
     cancelCloseConfirm();
     window.location.reload();
 }).on('click', '.btn-return', function () {
+    cancelTicket();
     cancelCloseConfirm();
     window.location = "{% url 'authentication:login' %}"
 })

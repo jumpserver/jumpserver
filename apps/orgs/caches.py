@@ -54,8 +54,8 @@ class OrgResourceStatisticsCache(OrgRelatedCache):
 
     assets_amount = IntegerField()
     nodes_amount = IntegerField(queryset=Node.objects)
-    admin_users_amount = IntegerField(queryset=SystemUser.objects.filter(type=SystemUser.Type.admin))
-    system_users_amount = IntegerField(queryset=SystemUser.objects.filter(type=SystemUser.Type.common))
+    admin_users_amount = IntegerField()
+    system_users_amount = IntegerField()
     domains_amount = IntegerField(queryset=Domain.objects)
     gateways_amount = IntegerField(queryset=Gateway.objects)
 
@@ -76,6 +76,12 @@ class OrgResourceStatisticsCache(OrgRelatedCache):
 
     def get_current_org(self):
         return self.org
+
+    def compute_admin_users_amount(self):
+        return SystemUser.objects.filter(type=SystemUser.Type.admin).count()
+
+    def compute_system_users_amount(self):
+        return SystemUser.objects.filter(type=SystemUser.Type.common).count()
 
     def compute_users_amount(self):
         users = User.get_nature_users()

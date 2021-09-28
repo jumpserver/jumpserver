@@ -20,16 +20,21 @@ from django.shortcuts import reverse
 
 from orgs.utils import current_org
 from orgs.models import OrganizationMember, Organization
+from common.exceptions import JMSException
 from common.utils import date_expired_default, get_logger, lazyproperty, random_string
 from common import fields
 from common.db.models import TextChoices
-from users.exceptions import MFANotEnabled
+from users.exceptions import MFANotEnabled, PhoneNotSet
 from ..signals import post_user_change_password
 
-
-__all__ = ['User', 'UserPasswordHistory']
+__all__ = ['User', 'UserPasswordHistory', 'MFAType']
 
 logger = get_logger(__file__)
+
+
+class MFAType(TextChoices):
+    OTP = 'otp', _('One-time password')
+    SMS_CODE = 'sms', _('SMS verify code')
 
 
 class AuthMixin:
@@ -173,6 +178,111 @@ class AuthMixin:
 
 
 class RoleMixin:
+    class ROLE(TextChoices):
+        ADMIN = choices.ADMIN, _('System administrator')
+        AUDITOR = choices.AUDITOR, _('System auditor')
+        USER = choices.USER, _('User')
+        APP = 'App', _('Application')
+
+    role = ROLE.USER
+
+    @property
+    def role_display(self):
+        return self.get_role_display()
+
+    @lazyproperty
+    def org_roles(self):
+        from orgs.models import ROLE as ORG_ROLE
+
+        if current_org.is_root():
+            # root 组织, 取 User 本身的角色
+            if self.is_superuser:
+                roles = [ORG_ROLE.ADMIN]
+            elif self.is_super_auditor:
+                roles = [ORG_ROLE.AUDITOR]
+            else:
+                roles = [ORG_ROLE.USER]
+        else:
+            # 是真实组织, 取 OrganizationMember 中的角色
+            roles = [
+                getattr(ORG_ROLE, org_member.role.upper())
+                for org_member in self.m2m_org_members.all()
+                if org_member.org_id == current_org.id
+            ]
+            roles.sort()
+        return roles
+
+    @lazyproperty
+    def org_roles_label_list(self):
+        from orgs.models import ROLE as ORG_ROLE
+        return [str(role.label) for role in self.org_roles if role in ORG_ROLE]
+
+    @lazyproperty
+    def org_roles_value_list(self):
+        from orgs.models import ROLE as ORG_ROLE
+        return [str(role.value) for role in self.org_roles if role in ORG_ROLE]
+
+    @lazyproperty
+    def org_role_display(self):
+        return ' | '.join(self.org_roles_label_list)
+
+    @lazyproperty
+    def total_role_display(self):
+        roles = list({self.role_display, *self.org_roles_label_list})
+        roles.sort()
+        return ' | '.join(roles)
+
+    def current_org_roles(self):
+        from orgs.models import OrganizationMember, ROLE as ORG_ROLE
+        if current_org.is_root():
+            if self.is_superuser:
+                return [ORG_ROLE.ADMIN]
+            else:
+                return [ORG_ROLE.USER]
+
+        roles = list(set(OrganizationMember.objects.filter(
+            org_id=current_org.id, user=self
+        ).values_list('role', flat=True)))
+
+        return roles
+
+    @property
+    def is_superuser(self):
+        if self.role == self.ROLE.ADMIN:
+            return True
+        else:
+            return False
+
+    @is_superuser.setter
+    def is_superuser(self, value):
+        if value is True:
+            self.role = self.ROLE.ADMIN
+        else:
+            self.role = self.ROLE.USER
+
+    @property
+    def is_super_auditor(self):
+        return self.role == self.ROLE.AUDITOR
+
+    @property
+    def is_common_user(self):
+        if self.is_org_admin:
+            return False
+        if self.is_org_auditor:
+            return False
+        if self.is_app:
+            return False
+        return True
+
+    @property
+    def is_app(self):
+        return self.role == self.ROLE.APP
+
+    @lazyproperty
+    def user_all_orgs(self):
+        from orgs.models import Organization
+        return Organization.get_user_all_orgs(self)
+
     @lazyproperty
     def perms(self):
         from rbac.models import RoleBinding
@@ -248,6 +358,23 @@ class RoleMixin:
         OrganizationMember.objects.remove_users(org, [self])
 
     @classmethod
+    def get_super_admins(cls):
+        return cls.objects.filter(role=cls.ROLE.ADMIN)
+
+    @classmethod
+    def get_org_admins(cls, org=None):
+        from orgs.models import Organization
+        if not isinstance(org, Organization):
+            org = current_org
+        org_admins = org.admins
+        return org_admins
+
+    @classmethod
+    def get_super_and_org_admins(cls, org=None):
+        super_admins = cls.get_super_admins()
+        org_admins = cls.get_org_admins(org=org)
+        admins = org_admins | super_admins
+        return admins.distinct()
     def get_nature_users(cls, org=None):
         if not org:
             org = Organization.root()
@@ -351,6 +478,7 @@ class MFAMixin:
         (2, _("Force enable")),
     )
     is_org_admin: bool
+    username: str
 
     @property
     def mfa_enabled(self):
@@ -399,21 +527,62 @@ class MFAMixin:
         from ..utils import check_otp_code
         return check_otp_code(self.otp_secret_key, code)
 
-    def check_mfa(self, code):
+    def check_mfa(self, code, mfa_type=MFAType.OTP):
         if not self.mfa_enabled:
             raise MFANotEnabled
 
-        if settings.OTP_IN_RADIUS:
-            return self.check_radius(code)
-        else:
-            return self.check_otp(code)
+        if mfa_type == MFAType.OTP:
+            if settings.OTP_IN_RADIUS:
+                return self.check_radius(code)
+            else:
+                return self.check_otp(code)
+        elif mfa_type == MFAType.SMS_CODE:
+            return self.check_sms_code(code)
+
+    def get_supported_mfa_types(self):
+        methods = []
+        if self.otp_secret_key:
+            methods.append(MFAType.OTP)
+        if settings.XPACK_ENABLED and settings.SMS_ENABLED and self.phone:
+            methods.append(MFAType.SMS_CODE)
+        return methods
+
+    def check_sms_code(self, code):
+        from authentication.sms_verify_code import VerifyCodeUtil
+
+        if not self.phone:
+            raise PhoneNotSet
+
+        try:
+            util = VerifyCodeUtil(self.phone)
+            return util.verify(code)
+        except JMSException:
+            return False
+
+    def send_sms_code(self):
+        from authentication.sms_verify_code import VerifyCodeUtil
+
+        if not self.phone:
+            raise PhoneNotSet
+
+        util = VerifyCodeUtil(self.phone)
+        util.touch()
+        return util.timeout
 
     def mfa_enabled_but_not_set(self):
         if not self.mfa_enabled:
             return False, None
-        if self.mfa_is_otp() and not self.otp_secret_key:
-            return True, reverse('authentication:user-otp-enable-start')
-        return False, None
+
+        if not self.mfa_is_otp():
+            return False, None
+
+        if self.mfa_is_otp() and self.otp_secret_key:
+            return False, None
+
+        if self.phone and settings.SMS_ENABLED and settings.XPACK_ENABLED:
+            return False, None
+
+        return True, reverse('authentication:user-otp-enable-start')
 
 
 class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
@@ -491,11 +660,22 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     need_update_password = models.BooleanField(
         default=False, verbose_name=_('Need update password')
     )
-    wecom_id = models.CharField(null=True, default=None, unique=True, max_length=128)
-    dingtalk_id = models.CharField(null=True, default=None, unique=True, max_length=128)
+    wecom_id = models.CharField(null=True, default=None, unique=True, max_length=128, verbose_name=_('WeCom'))
+    dingtalk_id = models.CharField(null=True, default=None, unique=True, max_length=128, verbose_name=_('DingTalk'))
+    feishu_id = models.CharField(null=True, default=None, unique=True, max_length=128, verbose_name=_('FeiShu'))
 
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
+
+    @classmethod
+    def get_group_ids_by_user_id(cls, user_id):
+        group_ids = cls.groups.through.objects.filter(user_id=user_id).distinct().values_list('usergroup_id', flat=True)
+        group_ids = list(group_ids)
+        return group_ids
+
+    @property
+    def receive_backends(self):
+        return self.user_msg_subscription.receive_backends
 
     @property
     def is_wecom_bound(self):
@@ -504,6 +684,14 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     @property
     def is_dingtalk_bound(self):
         return bool(self.dingtalk_id)
+
+    @property
+    def is_feishu_bound(self):
+        return bool(self.feishu_id)
+
+    @property
+    def is_otp_secret_key_bound(self):
+        return bool(self.otp_secret_key)
 
     def get_absolute_url(self):
         return reverse('users:user-detail', args=(self.id,))

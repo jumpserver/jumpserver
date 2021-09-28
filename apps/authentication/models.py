@@ -45,6 +45,9 @@ class LoginConfirmSetting(CommonModelMixin):
     reviewers = models.ManyToManyField('users.User', verbose_name=_("Reviewers"), related_name="review_login_confirm_settings", blank=True)
     is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
 
+    class Meta:
+        verbose_name = _('Login Confirm')
+
     @classmethod
     def get_user_confirm_setting(cls, user):
         return get_object_or_none(cls, user=user)
@@ -71,20 +74,20 @@ class LoginConfirmSetting(CommonModelMixin):
         from orgs.models import Organization
         ticket_title = _('Login confirm') + ' {}'.format(self.user)
         ticket_meta = self.construct_confirm_ticket_meta(request)
-        ticket_assignees = self.reviewers.all()
         data = {
             'title': ticket_title,
-            'type': const.TicketTypeChoices.login_confirm.value,
+            'type': const.TicketType.login_confirm.value,
             'meta': ticket_meta,
             'org_id': Organization.ROOT_ID,
         }
         ticket = Ticket.objects.create(**data)
-        ticket.assignees.set(ticket_assignees)
+        ticket.create_process_map_and_node(self.reviewers.all())
         ticket.open(self.user)
         return ticket
 
     def __str__(self):
-        return '{} confirm'.format(self.user.username)
+        reviewers = [u.username for u in self.reviewers.all()]
+        return _('{} need confirm by {}').format(self.user.username, reviewers)
 
 
 class SSOToken(models.JMSBaseModel):

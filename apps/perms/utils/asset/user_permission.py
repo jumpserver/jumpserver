@@ -54,12 +54,23 @@ def get_user_all_asset_perm_ids(user) -> set:
 
 
 class UserGrantedTreeRefreshController:
-    key_template = 'perms.user.node_tree.builded_orgs.user_id:{user_id}'
+    key_template = 'perms.user.node_tree.built_orgs.user_id:{user_id}'
 
     def __init__(self, user):
         self.user = user
         self.key = self.key_template.format(user_id=user.id)
         self.client = self.get_redis_client()
+
+    @classmethod
+    def clean_all_user_tree_built_mark(cls):
+        """ 清除所有用户已构建树的标记 """
+        client = cls.get_redis_client()
+        key_match = cls.key_template.format(user_id='*')
+        keys = client.keys(key_match)
+        with client.pipeline() as p:
+            for key in keys:
+                p.delete(key)
+            p.execute()
 
     @classmethod
     def get_redis_client(cls):
@@ -69,13 +80,13 @@ class UserGrantedTreeRefreshController:
         org_ids = self.client.smembers(self.key)
         return {org_id.decode() for org_id in org_ids}
 
-    def set_all_orgs_as_builed(self):
+    def set_all_orgs_as_built(self):
         self.client.sadd(self.key, *self.org_ids)
 
     def have_need_refresh_orgs(self):
-        builded_org_ids = self.client.smembers(self.key)
-        builded_org_ids = {org_id.decode() for org_id in builded_org_ids}
-        have = self.org_ids - builded_org_ids
+        built_org_ids = self.client.smembers(self.key)
+        built_org_ids = {org_id.decode() for org_id in built_org_ids}
+        have = self.org_ids - built_org_ids
         return have
 
     def get_need_refresh_orgs_and_fill_up(self):
@@ -85,15 +96,18 @@ class UserGrantedTreeRefreshController:
             p.smembers(self.key)
             p.sadd(self.key, *org_ids)
             ret = p.execute()
-            builded_org_ids = {org_id.decode() for org_id in ret[0]}
-            ids = org_ids - builded_org_ids
+            built_org_ids = {org_id.decode() for org_id in ret[0]}
+            ids = org_ids - built_org_ids
             orgs = {*Organization.objects.filter(id__in=ids)}
-            logger.info(f'Need rebuild orgs are {orgs}, builed orgs are {ret[0]}, all orgs are {org_ids}')
+            logger.info(
+                f'Need rebuild orgs are {orgs}, built orgs are {ret[0]}, '
+                f'all orgs are {org_ids}'
+            )
             return orgs
 
     @classmethod
     @on_transaction_commit
-    def remove_builed_orgs_from_users(cls, org_ids, user_ids):
+    def remove_built_orgs_from_users(cls, org_ids, user_ids):
         client = cls.get_redis_client()
         org_ids = [str(org_id) for org_id in org_ids]
 
@@ -102,11 +116,12 @@ class UserGrantedTreeRefreshController:
                 key = cls.key_template.format(user_id=user_id)
                 p.srem(key, *org_ids)
             p.execute()
-        logger.info(f'Remove orgs from users builded tree: users:{user_ids} orgs:{org_ids}')
+        logger.info(f'Remove orgs from users built tree: users:{user_ids} '
+                    f'orgs:{org_ids}')
 
     @classmethod
     def add_need_refresh_orgs_for_users(cls, org_ids, user_ids):
-        cls.remove_builed_orgs_from_users(org_ids, user_ids)
+        cls.remove_built_orgs_from_users(org_ids, user_ids)
 
     @classmethod
     @ensure_in_real_or_default_org
@@ -168,7 +183,7 @@ class UserGrantedTreeRefreshController:
         ).values_list('user_id', flat=True)
         user_ids.update(group_user_ids)
 
-        cls.remove_builed_orgs_from_users(
+        cls.remove_built_orgs_from_users(
             [current_org.id], user_ids
         )
 
@@ -193,7 +208,7 @@ class UserGrantedTreeRefreshController:
             with UserGrantedTreeRebuildLock(user_id=user.id):
                 if force:
                     orgs = self.orgs
-                    self.set_all_orgs_as_builed()
+                    self.set_all_orgs_as_built()
                 else:
                     orgs = self.get_need_refresh_orgs_and_fill_up()
 
@@ -549,7 +564,7 @@ class UserGrantedNodesQueryUtils(UserGrantedUtilsBase):
             return self.get_top_level_nodes()
 
         nodes = PermNode.objects.none()
-        if key == PermNode.FAVORITE_NODE_KEY:
+        if key in [PermNode.FAVORITE_NODE_KEY, PermNode.UNGROUPED_NODE_KEY]:
             return nodes
 
         node = PermNode.objects.get(key=key)

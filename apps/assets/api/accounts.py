@@ -40,7 +40,7 @@ class AccountFilterSet(BaseFilterSet):
         if not node_id:
             return qs
         node = get_object_or_404(Node, pk=node_id)
-        node_ids = node.get_children(with_self=True).values_list('id', flat=True)
+        node_ids = node.get_all_children(with_self=True).values_list('id', flat=True)
         node_ids = list(node_ids)
         qs = qs.filter(asset__nodes__in=node_ids)
         return qs
@@ -64,8 +64,8 @@ class AccountViewSet(OrgBulkModelViewSet):
     permission_classes = (IsOrgAdmin,)
 
     def get_queryset(self):
-        queryset = super().get_queryset()\
-            .annotate(ip=F('asset__ip'))\
+        queryset = super().get_queryset() \
+            .annotate(ip=F('asset__ip')) \
             .annotate(hostname=F('asset__hostname'))
         return queryset
 
@@ -110,4 +110,5 @@ class AccountTaskCreateAPI(CreateAPIView):
     def get_exception_handler(self):
         def handler(e, context):
             return Response({"error": str(e)}, status=400)
+
         return handler

@@ -10,11 +10,11 @@ from .utils import validate_password_contains_left_double_curly_bracket
 from .base import AuthSerializerMixin
 
 __all__ = [
-    'SystemUserSerializer',
+    'SystemUserSerializer', 'MiniSystemUserSerializer',
     'SystemUserSimpleSerializer', 'SystemUserAssetRelationSerializer',
     'SystemUserNodeRelationSerializer', 'SystemUserTaskSerializer',
     'SystemUserUserRelationSerializer', 'SystemUserWithAuthInfoSerializer',
-    'SystemUserTempAuthSerializer',
+    'SystemUserTempAuthSerializer', 'RelationMixin',
 ]
 
 
@@ -31,14 +31,14 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         fields_mini = ['id', 'name', 'username']
         fields_write_only = ['password', 'public_key', 'private_key']
         fields_small = fields_mini + fields_write_only + [
-            'type', 'type_display', 'protocol', 'login_mode', 'login_mode_display',
-            'priority', 'sudo', 'shell', 'sftp_root', 'token', 'ssh_key_fingerprint',
-            'home', 'system_groups', 'ad_domain',
+            'token', 'ssh_key_fingerprint',
+            'type', 'type_display', 'protocol', 'is_asset_protocol',
+            'login_mode', 'login_mode_display', 'priority',
+            'sudo', 'shell', 'sftp_root', 'home', 'system_groups', 'ad_domain',
             'username_same_with_user', 'auto_push', 'auto_generate_key',
-            'date_created', 'date_updated',
-            'comment', 'created_by',
+            'date_created', 'date_updated', 'comment', 'created_by',
         ]
-        fields_m2m = ['cmd_filters', 'assets_amount']
+        fields_m2m = ['cmd_filters', 'assets_amount', 'nodes']
         fields = fields_small + fields_m2m
         extra_kwargs = {
             'password': {
@@ -53,6 +53,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'login_mode_display': {'label': _('Login mode display')},
             'created_by': {'read_only': True},
             'ad_domain': {'required': False, 'allow_blank': True, 'label': _('Ad domain')},
+            'is_asset_protocol': {'label': _('Is asset protocol')}
         }
 
     def validate_auto_push(self, value):
@@ -184,6 +185,12 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         return queryset
 
 
+class MiniSystemUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SystemUser
+        fields = SystemUserSerializer.Meta.fields_mini
+
+
 class SystemUserWithAuthInfoSerializer(SystemUserSerializer):
     class Meta(SystemUserSerializer.Meta):
         fields_mini = ['id', 'name', 'username']
@@ -207,6 +214,7 @@ class SystemUserSimpleSerializer(serializers.ModelSerializer):
     """
     系统用户最基本信息的数据结构
     """
+
     class Meta:
         model = SystemUser
         fields = ('id', 'name', 'username')

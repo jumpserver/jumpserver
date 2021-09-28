@@ -33,6 +33,7 @@ app_view_patterns = [
     path('ops/', include('ops.urls.view_urls'), name='ops'),
     path('common/', include('common.urls.view_urls'), name='common'),
     re_path(r'flower/(?P<path>.*)', views.celery_flower_view, name='flower-view'),
+    path('download/', views.ResourceDownload.as_view(), name='download')
 ]
 
 if settings.XPACK_ENABLED:

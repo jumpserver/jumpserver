@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+import builtins
 import time
 from django.utils.translation import ugettext as _
 from django.conf import settings
@@ -8,14 +9,28 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.serializers import ValidationError
 from rest_framework.response import Response
 
-from common.permissions import IsValidUser, NeedMFAVerify
+from authentication.sms_verify_code import VerifyCodeUtil
+from common.exceptions import JMSException
+from common.permissions import IsValidUser, NeedMFAVerify, IsAppUser
+from users.models.user import MFAType
 from ..serializers import OtpVerifySerializer
 from .. import serializers
 from .. import errors
 from ..mixins import AuthMixin
 
 
-__all__ = ['MFAChallengeApi', 'UserOtpVerifyApi']
+__all__ = ['MFAChallengeApi', 'UserOtpVerifyApi', 'SendSMSVerifyCodeApi', 'MFASelectTypeApi']
+
+
+class MFASelectTypeApi(AuthMixin, CreateAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = serializers.MFASelectTypeSerializer
+
+    def perform_create(self, serializer):
+        mfa_type = serializer.validated_data['type']
+        if mfa_type == MFAType.SMS_CODE:
+            user = self.get_user_from_session()
+            user.send_sms_code()
 
 
 class MFAChallengeApi(AuthMixin, CreateAPIView):
@@ -26,7 +41,9 @@ class MFAChallengeApi(AuthMixin, CreateAPIView):
         try:
             user = self.get_user_from_session()
             code = serializer.validated_data.get('code')
-            valid = user.check_mfa(code)
+            mfa_type = serializer.validated_data.get('type', MFAType.OTP)
+
+            valid = user.check_mfa(code, mfa_type=mfa_type)
             if not valid:
                 self.request.session['auth_mfa'] = ''
                 raise errors.MFAFailedError(
@@ -67,3 +84,12 @@ class UserOtpVerifyApi(CreateAPIView):
         if self.request.method.lower() == 'get' and settings.SECURITY_VIEW_AUTH_NEED_MFA:
             self.permission_classes = [NeedMFAVerify]
         return super().get_permissions()
+
+
+class SendSMSVerifyCodeApi(AuthMixin, CreateAPIView):
+    permission_classes = (AllowAny,)
+
+    def create(self, request, *args, **kwargs):
+        user = self.get_user_from_session()
+        timeout = user.send_sms_code()
+        return Response({'code': 'ok','timeout': timeout})

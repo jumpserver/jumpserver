@@ -146,11 +146,9 @@
                 <form id="login-form" action="" method="post" role="form" novalidate="novalidate">
                     {% csrf_token %}
                     <div style="line-height: 17px;margin-bottom: 20px;color: #999999;">
-                    {% if form.errors %}
-                        <p class="red-fonts" style="color: red">
-                            {% if form.non_field_errors %}
-                                {{ form.non_field_errors.as_text }}
-                            {% endif %}
+                    {% if form.non_field_errors %}
+                        <p class="help-block red-fonts">
+                            {{ form.non_field_errors.as_text }}
                         </p>
                     {% else %}
                         <p class="welcome-message">
@@ -160,9 +158,15 @@
                     </div>
 
                     {% bootstrap_field form.username show_label=False %}
-                    <div class="form-group">
-                        <input type="password" class="form-control" id="password" placeholder="{% trans 'Password' %}" required="">
+
+                    <div class="form-group {% if form.password.errors %} has-error {% endif %}">
+                        <input type="password" class="form-control" id="password" placeholder="{% trans 'Password' %}" required>
                         <input id="password-hidden" type="text" style="display:none" name="{{ form.password.html_name }}">
+                        {% if form.password.errors %}
+                        <p class="help-block" style="text-align: left">
+                            {{ form.password.errors.as_text }}
+                        </p>
+                        {% endif %}
                     </div>
                     {% if form.challenge %}
                         {% bootstrap_field form.challenge show_label=False %}
@@ -191,31 +195,15 @@
                     </div>
 
                     <div>
-                        {% if AUTH_OPENID or AUTH_CAS or AUTH_WECOM or AUTH_DINGTALK %}
+                        {% if auth_methods %}
                             <div class="hr-line-dashed"></div>
                             <div style="display: inline-block; float: left">
-                                <b class="text-muted text-left" >{% trans "More login options" %}</b>
-                                {% if AUTH_OPENID %}
-                                    <a href="{% url 'authentication:openid:login' %}" class="more-login-item">
-                                        <i class="fa fa-openid"></i> {% trans 'OpenID' %}
-                                    </a>
-                                {% endif %}
-                                {% if AUTH_CAS %}
-                                    <a href="{% url 'authentication:cas:cas-login' %}" class="more-login-item">
-                                        <i class="fa"><img src="{{ LOGIN_CAS_LOGO_URL }}" height="13" width="13"></i> {% trans 'CAS' %}
-                                    </a>
-                                {% endif %}
-                                {% if AUTH_WECOM %}
-                                    <a href="{% url 'authentication:wecom-qr-login' %}" class="more-login-item">
-                                        <i class="fa"><img src="{{ LOGIN_WECOM_LOGO_URL }}" height="13" width="13"></i> {% trans 'WeCom' %}
-                                    </a>
-                                {% endif %}
-                                {% if AUTH_DINGTALK %}
-                                    <a href="{% url 'authentication:dingtalk-qr-login' %}" class="more-login-item">
-                                        <i class="fa"><img src="{{ LOGIN_DINGTALK_LOGO_URL }}" height="13" width="13"></i> {% trans 'DingTalk' %}
-                                    </a>
-                                {% endif %}
-
+                            <b class="text-muted text-left" >{% trans "More login options" %}</b>
+                            {% for method in auth_methods %}
+                                <a href="{{ method.url }}" class="more-login-item">
+                                    <i class="fa"><img src="{{ method.logo }}" height="13" width="13"></i> {{ method.name }}
+                                </a>
+                            {% endfor %}
                             </div>
                         {% else %}
                             <div class="text-center" style="display: inline-block;">
@@ -231,6 +219,9 @@
 <script type="text/javascript" src="/static/js/plugins/jsencrypt/jsencrypt.min.js"></script>
 <script>
     function encryptLoginPassword(password, rsaPublicKey) {
+        if (!password) {
+            return ''
+        }
         var jsencrypt = new JSEncrypt(); //加密对象
         jsencrypt.setPublicKey(rsaPublicKey); // 设置密钥
         return jsencrypt.encrypt(password); //加密

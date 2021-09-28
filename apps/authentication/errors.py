@@ -4,9 +4,11 @@ from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse
 from django.conf import settings
 
+from authentication import sms_verify_code
 from common.exceptions import JMSException
 from .signals import post_auth_failed
 from users.utils import LoginBlockUtil, MFABlockUtils
+from users.models import MFAType
 
 reason_password_failed = 'password_failed'
 reason_password_decrypt_failed = 'password_decrypt_failed'
@@ -58,8 +60,18 @@ block_mfa_msg = _(
     "The account has been locked "
     "(please contact admin to unlock it or try again after {} minutes)"
 )
-mfa_failed_msg = _(
-    "MFA code invalid, or ntp sync server time, "
+otp_failed_msg = _(
+    "One-time password invalid, or ntp sync server time, "
+    "You can also try {times_try} times "
+    "(The account will be temporarily locked for {block_time} minutes)"
+)
+sms_failed_msg = _(
+    "SMS verify code invalid,"
+    "You can also try {times_try} times "
+    "(The account will be temporarily locked for {block_time} minutes)"
+)
+mfa_type_failed_msg = _(
+    "The MFA type({mfa_type}) is not supported, "
     "You can also try {times_try} times "
     "(The account will be temporarily locked for {block_time} minutes)"
 )
@@ -134,7 +146,7 @@ class MFAFailedError(AuthFailedNeedLogMixin, AuthFailedError):
     error = reason_mfa_failed
     msg: str
 
-    def __init__(self, username, request, ip):
+    def __init__(self, username, request, ip, mfa_type=MFAType.OTP):
         util = MFABlockUtils(username, ip)
         util.incr_failed_count()
 
@@ -142,9 +154,18 @@ class MFAFailedError(AuthFailedNeedLogMixin, AuthFailedError):
         block_time = settings.SECURITY_LOGIN_LIMIT_TIME
 
         if times_remainder:
-            self.msg = mfa_failed_msg.format(
-                times_try=times_remainder, block_time=block_time
-            )
+            if mfa_type == MFAType.OTP:
+                self.msg = otp_failed_msg.format(
+                    times_try=times_remainder, block_time=block_time
+                )
+            elif mfa_type == MFAType.SMS_CODE:
+                self.msg = sms_failed_msg.format(
+                    times_try=times_remainder, block_time=block_time
+                )
+            else:
+                self.msg = mfa_type_failed_msg.format(
+                    mfa_type=mfa_type, times_try=times_remainder, block_time=block_time
+                )
         else:
             self.msg = block_mfa_msg.format(settings.SECURITY_LOGIN_LIMIT_TIME)
         super().__init__(username=username, request=request)
@@ -202,12 +223,16 @@ class MFARequiredError(NeedMoreInfoError):
     msg = mfa_required_msg
     error = 'mfa_required'
 
+    def __init__(self, error='', msg='', mfa_types=tuple(MFAType)):
+        super().__init__(error=error, msg=msg)
+        self.choices = mfa_types
+
     def as_data(self):
         return {
             'error': self.error,
             'msg': self.msg,
             'data': {
-                'choices': ['code'],
+                'choices': self.choices,
                 'url': reverse('api-auth:mfa-challenge')
             }
         }
@@ -313,6 +338,11 @@ class WeComNotBound(JMSException):
 class DingTalkNotBound(JMSException):
     default_code = 'dingtalk_not_bound'
     default_detail = 'DingTalk is not bound'
+
+
+class FeiShuNotBound(JMSException):
+    default_code = 'feishu_not_bound'
+    default_detail = 'FeiShu is not bound'
 
 
 class PasswdInvalid(JMSException):

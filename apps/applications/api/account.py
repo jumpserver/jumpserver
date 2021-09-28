@@ -2,69 +2,57 @@
 #
 
 from django_filters import rest_framework as filters
-from django.conf import settings
-from django.db.models import F, Value, CharField
-from django.db.models.functions import Concat
-from django.http import Http404
+from django.db.models import F, Q
 
 from common.drf.filters import BaseFilterSet
-from common.drf.api import JMSModelViewSet
-from common.utils import unique
-from perms.models import ApplicationPermission
+from common.drf.api import JMSBulkModelViewSet
+from ..models import Account
 from ..hands import IsOrgAdminOrAppUser, IsOrgAdmin, NeedMFAVerify
 from .. import serializers
 
 
 class AccountFilterSet(BaseFilterSet):
-    username = filters.CharFilter(field_name='username')
-    app = filters.CharFilter(field_name='applications', lookup_expr='exact')
-    app_name = filters.CharFilter(field_name='app_name', lookup_expr='exact')
+    username = filters.CharFilter(method='do_nothing')
+    type = filters.CharFilter(field_name='type', lookup_expr='exact')
+    category = filters.CharFilter(field_name='category', lookup_expr='exact')
+    app_display = filters.CharFilter(field_name='app_display', lookup_expr='exact')
 
     class Meta:
-        model = ApplicationPermission
-        fields = ['type', 'category']
+        model = Account
+        fields = ['app', 'systemuser']
+
+    @property
+    def qs(self):
+        qs = super().qs
+        qs = self.filter_username(qs)
+        return qs
+
+    def filter_username(self, qs):
+        username = self.get_query_param('username')
+        if not username:
+            return qs
+        qs = qs.filter(Q(username=username) | Q(systemuser__username=username)).distinct()
+        return qs
 
 
-class ApplicationAccountViewSet(JMSModelViewSet):
-    permission_classes = (IsOrgAdmin, )
-    search_fields = ['username', 'app_name']
+class ApplicationAccountViewSet(JMSBulkModelViewSet):
+    model = Account
+    search_fields = ['username', 'app_display']
     filterset_class = AccountFilterSet
-    filterset_fields = ['username', 'app_name', 'type', 'category']
-    serializer_class = serializers.ApplicationAccountSerializer
-
-    http_method_names = ['get', 'put', 'patch', 'options']
+    filterset_fields = ['username', 'app_display', 'type', 'category', 'app']
+    serializer_class = serializers.AppAccountSerializer
+    permission_classes = (IsOrgAdmin,)
 
     def get_queryset(self):
-        queryset = ApplicationPermission.objects.all() \
-            .annotate(uid=Concat(
-                'applications', Value('_'), 'system_users', output_field=CharField()
-             )) \
-            .annotate(systemuser=F('system_users')) \
-            .annotate(systemuser_display=F('system_users__name')) \
-            .annotate(username=F('system_users__username')) \
-            .annotate(password=F('system_users__password')) \
-            .annotate(app=F('applications')) \
-            .annotate(app_name=F("applications__name")) \
-            .values('username', 'password', 'systemuser', 'systemuser_display',
-                    'app', 'app_name', 'category', 'type', 'uid')
+        queryset = Account.objects.all() \
+            .annotate(type=F('app__type')) \
+            .annotate(app_display=F('app__name')) \
+            .annotate(systemuser_display=F('systemuser__name')) \
+            .annotate(category=F('app__category'))
         return queryset
-
-    def get_object(self):
-        obj = self.get_queryset().filter(
-            uid=self.kwargs['pk']
-        ).first()
-        if not obj:
-            raise Http404()
-        return obj
-
-    def filter_queryset(self, queryset):
-        queryset = super().filter_queryset(queryset)
-        queryset_list = unique(queryset, key=lambda x: (x['app'], x['systemuser']))
-        return queryset_list
 
 
 class ApplicationAccountSecretViewSet(ApplicationAccountViewSet):
-    serializer_class = serializers.ApplicationAccountSecretSerializer
+    serializer_class = serializers.AppAccountSecretSerializer
     permission_classes = [IsOrgAdminOrAppUser, NeedMFAVerify]
     http_method_names = ['get', 'options']
-
