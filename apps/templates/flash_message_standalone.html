@@ -23,13 +23,13 @@
         {% endif %}
         <div class="row">
             {% if has_cancel %}
-            <div class="col-lg-2">
+            <div class="col-sm-3">
                 <a href="{{ cancel_url }}" class="btn btn-default block full-width m-b">
                     {% trans 'Cancel' %}
                 </a>
             </div>
             {% endif %}
-            <div class="col-lg-2">
+            <div class="col-sm-3">
                 <a href="{{ redirect_url }}" class="btn btn-primary block full-width m-b">
                     {% if confirm_button %}
                         {{ confirm_button }}
