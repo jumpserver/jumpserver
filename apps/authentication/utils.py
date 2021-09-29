@@ -4,6 +4,12 @@ import base64
 from Cryptodome.PublicKey import RSA
 from Cryptodome.Cipher import PKCS1_v1_5
 from Cryptodome import Random
+
+from .notifications import DifferentCityLoginMessage
+from audits.models import UserLoginLog
+from audits.const import DEFAULT_CITY
+from common.utils import get_request_ip
+from common.utils import validate_ip, get_ip_city
 from common.utils import get_logger
 
 logger = get_logger(__file__)
@@ -43,3 +49,16 @@ def rsa_decrypt(cipher_text, rsa_private_key=None):
         cipher_decoded = base64.b16decode(hex_fixed.upper())
     message = cipher.decrypt(cipher_decoded, b'error').decode()
     return message
+
+
+def check_different_city_login(user, request):
+    ip = get_request_ip(request) or '0.0.0.0'
+
+    if not (ip and validate_ip(ip)):
+        city = DEFAULT_CITY
+    else:
+        city = get_ip_city(ip) or DEFAULT_CITY
+
+    last_user_login = UserLoginLog.objects.filter(username=user.username, status=True).first()
+    if last_user_login.city != city:
+        DifferentCityLoginMessage(user, ip, city).publish_async()

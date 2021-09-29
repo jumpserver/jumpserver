@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-29 14:42+0800\n"
+"POT-Creation-Date: 2021-09-29 14:51+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -552,7 +552,7 @@ msgstr "创建日期"
 msgid "AuthBook"
 msgstr "账号"
 
-#: assets/models/base.py:30 assets/tasks/const.py:51 audits/utils.py:30
+#: assets/models/base.py:30 assets/tasks/const.py:51 audits/const.py:5
 msgid "Unknown"
 msgstr "未知"
 
@@ -1667,6 +1667,47 @@ msgstr "{} 需要 {} 复核"
 #: authentication/models.py:99
 msgid "Expired"
 msgstr "过期时间"
+
+#: authentication/notifications.py:11
+#, python-brace-format
+msgid ""
+"<h3>{subject}</h3><p>Dear {server_name} user, Hello!</p><p>Your account has "
+"remote login behavior, please pay attention.</p><p>User: {username}</"
+"p><p>Login time: {time}</p><p>Login location: {city} ({ip})</p><p>If you "
+"suspect that the login behavior is abnormal, please modify <p>the account "
+"password in time.</p><br><p>Thank you for your attention to {server_name}!</"
+"p>"
+msgstr ""
+"<h3>{subject}</h3><p>尊敬的{server_name}用户,&nbsp; &nbsp;您好!</p><p>您的账"
+"号存在异地登录行为，请关注。</p><p>用户: {username}</p><p>登录时间: {time}</"
+"p><p>登录地点: {city} ({ip})</p><p>若怀疑此次登录行为异常，请及时修改账号密"
+"码。</p><br><p>感谢您对{server_name}的关注!</p>"
+
+#: authentication/notifications.py:36
+msgid "Different city login reminder"
+msgstr "异地登录提醒"
+
+#: authentication/notifications.py:40
+#, python-brace-format
+msgid ""
+"{subject}\n"
+"Dear {server_name} user, Hello!\n"
+"Your account has remote login behavior, please pay attention.\n"
+"User: {username}\n"
+"Login time: {time}\n"
+"Login location: {city} ({ip})\n"
+"If you suspect that the login behavior is abnormal, please modify the "
+"account password in time.\n"
+"Thank you for your attention to {server_name}!\n"
+msgstr ""
+"{subject}\n"
+"尊敬的{server_name}用户, 您好!\n"
+"您的账号存在异地登录行为，请关注。\n"
+"用户: {username}\n"
+"登录时间: {time}\n"
+"登录地点: {city} ({ip})\n"
+"若怀疑此次登录行为异常，请及时修改账号密码。\n"
+"感谢您对{server_name}的关注!\n"
 
 #: authentication/sms_verify_code.py:17
 msgid "The verification code has expired. Please resend it"
@@ -2853,12 +2894,16 @@ msgid "Enable WeCom Auth"
 msgstr "启用企业微信认证"
 
 #: settings/serializers/basic.py:9
+#, fuzzy
+#| msgid "Object"
 msgid "Subject"
-msgstr "主题"
+msgstr "对象"
 
 #: settings/serializers/basic.py:13
+#, fuzzy
+#| msgid "Target url"
 msgid "More url"
-msgstr "更多信息链接"
+msgstr "目标URL"
 
 #: settings/serializers/basic.py:28
 msgid "Site url"
@@ -6126,8 +6171,6 @@ msgid "AP-Singapore"
 msgstr "亚太-新加坡"
 
 #: xpack/plugins/cloud/providers/huaweicloud.py:48
-#, fuzzy
-#| msgid "CN-Hong Kong"
 msgid "CN-Hong Kong"
 msgstr "中国-香港"
 
@@ -6280,9 +6323,6 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
-
-#~ msgid "Announcement enabled"
-#~ msgstr "启用公告"
 
 #~ msgid "OpenID"
 #~ msgstr "OpenID"
