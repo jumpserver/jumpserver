@@ -2894,16 +2894,12 @@ msgid "Enable WeCom Auth"
 msgstr "启用企业微信认证"
 
 #: settings/serializers/basic.py:9
-#, fuzzy
-#| msgid "Object"
 msgid "Subject"
-msgstr "对象"
+msgstr "主题"
 
 #: settings/serializers/basic.py:13
-#, fuzzy
-#| msgid "Target url"
 msgid "More url"
-msgstr "目标URL"
+msgstr "更多信息 URL"
 
 #: settings/serializers/basic.py:28
 msgid "Site url"
