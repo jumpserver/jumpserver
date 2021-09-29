@@ -21,6 +21,7 @@ from django.shortcuts import reverse
 from orgs.utils import current_org
 from orgs.models import OrganizationMember, Organization
 from common.exceptions import JMSException
+from common.const import choices
 from common.utils import date_expired_default, get_logger, lazyproperty, random_string
 from common import fields
 from common.db.models import TextChoices
@@ -178,13 +179,14 @@ class AuthMixin:
 
 
 class RoleMixin:
+    objects: models.Manager
+    m2m_org_members: models.Manager
+
     class ROLE(TextChoices):
         ADMIN = choices.ADMIN, _('System administrator')
         AUDITOR = choices.AUDITOR, _('System auditor')
         USER = choices.USER, _('User')
         APP = 'App', _('Application')
-
-    role = ROLE.USER
 
     @property
     def role_display(self):
@@ -243,40 +245,7 @@ class RoleMixin:
         roles = list(set(OrganizationMember.objects.filter(
             org_id=current_org.id, user=self
         ).values_list('role', flat=True)))
-
         return roles
-
-    @property
-    def is_superuser(self):
-        if self.role == self.ROLE.ADMIN:
-            return True
-        else:
-            return False
-
-    @is_superuser.setter
-    def is_superuser(self, value):
-        if value is True:
-            self.role = self.ROLE.ADMIN
-        else:
-            self.role = self.ROLE.USER
-
-    @property
-    def is_super_auditor(self):
-        return self.role == self.ROLE.AUDITOR
-
-    @property
-    def is_common_user(self):
-        if self.is_org_admin:
-            return False
-        if self.is_org_auditor:
-            return False
-        if self.is_app:
-            return False
-        return True
-
-    @property
-    def is_app(self):
-        return self.role == self.ROLE.APP
 
     @lazyproperty
     def user_all_orgs(self):
@@ -370,11 +339,6 @@ class RoleMixin:
         return org_admins
 
     @classmethod
-    def get_super_and_org_admins(cls, org=None):
-        super_admins = cls.get_super_admins()
-        org_admins = cls.get_org_admins(org=org)
-        admins = org_admins | super_admins
-        return admins.distinct()
     def get_nature_users(cls, org=None):
         if not org:
             org = Organization.root()
@@ -616,6 +580,10 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         'users.UserGroup', related_name='users',
         blank=True, verbose_name=_('User group')
     )
+    role = models.CharField(
+        choices=RoleMixin.ROLE.choices, default='User', max_length=10,
+        blank=True, verbose_name=_('Role')
+    )
     is_app = models.BooleanField(default=False)
     avatar = models.ImageField(
         upload_to="avatar", null=True, verbose_name=_('Avatar')
@@ -823,13 +791,6 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     class Meta:
         ordering = ['username']
         verbose_name = _("User")
-        default_permissions = []
-        permissions = [
-            ('create_user', _('Create user')),
-            ('update_user', _('Update user')),
-            ('delete_user', _('Delete user')),
-            ('view_user', _('View user'))
-        ]
 
     #: Use this method initial user
     @classmethod

@@ -119,9 +119,6 @@ class UserSerializer(RolesSerilaizerMixin, CommonBulkSerializerMixin, serializer
             'system_role_display': {'label': _('System role name')},
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     @property
     def is_org_admin(self):
         roles = []
@@ -206,7 +203,7 @@ class MiniUserSerializer(serializers.ModelSerializer):
 
 class InviteSerializer(RolesSerilaizerMixin, serializers.Serializer):
     user = serializers.PrimaryKeyRelatedField(
-        queryset=User.get_nature_users()
+        queryset=User.objects.filter(is_app=False)
     )
     system_roles = None
 

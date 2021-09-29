@@ -103,16 +103,15 @@ class UserProfileSerializer(UserSerializer):
     perms = serializers.ListField(label=_("Perms"), read_only=True)
 
     class Meta(UserSerializer.Meta):
+        read_only_fields = [
+            'date_joined', 'last_login', 'created_by', 'source',
+            'receive_backends', 'orgs', 'perms',
+        ]
         fields = UserSerializer.Meta.fields + [
             'public_key_comment', 'public_key_hash_md5',
-            'admin_or_audit_orgs', 'current_org_roles',
-            'guide_url', 'user_all_orgs', 'is_org_admin',
-            'is_superuser', 'receive_backends',
-        ]
-        read_only_fields = [
-            'date_joined', 'last_login', 'created_by', 'source', 'receive_backends',
-            'orgs', 'perms',
-        ]
+            'guide_url',
+        ] + read_only_fields
+
         extra_kwargs = dict(UserSerializer.Meta.extra_kwargs)
         extra_kwargs.update({
             'name': {'read_only': True, 'max_length': 128},
