@@ -67,6 +67,8 @@ class UserLoginView(mixins.AuthMixin, FormView):
             return None
 
         login_redirect = settings.LOGIN_REDIRECT_TO_BACKEND.lower()
+        if login_redirect in ['direct']:
+            return None
         if login_redirect in ['cas'] and cas_auth_url:
             auth_url = cas_auth_url
         elif login_redirect in ['openid', 'oidc'] and openid_auth_url:
