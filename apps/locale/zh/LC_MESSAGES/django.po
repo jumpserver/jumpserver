@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-29 10:53+0800\n"
+"POT-Creation-Date: 2021-09-29 14:51+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -658,7 +658,8 @@ msgstr "复核"
 msgid "Filter"
 msgstr "过滤器"
 
-#: assets/models/cmd_filter.py:56 xpack/plugins/license/models.py:29
+#: assets/models/cmd_filter.py:56 settings/serializers/basic.py:10
+#: xpack/plugins/license/models.py:29
 msgid "Content"
 msgstr "内容"
 
@@ -2646,7 +2647,7 @@ msgstr "企业微信 认证"
 msgid "SSO Auth"
 msgstr "SSO Token 认证"
 
-#: settings/serializers/auth/base.py:19 settings/serializers/basic.py:15
+#: settings/serializers/auth/base.py:19 settings/serializers/basic.py:36
 msgid "Forgot password url"
 msgstr "忘记密码 URL"
 
@@ -2892,23 +2893,31 @@ msgstr "单位: 秒"
 msgid "Enable WeCom Auth"
 msgstr "启用企业微信认证"
 
-#: settings/serializers/basic.py:7
+#: settings/serializers/basic.py:9
+msgid "Subject"
+msgstr "主题"
+
+#: settings/serializers/basic.py:13
+msgid "More url"
+msgstr "更多信息 URL"
+
+#: settings/serializers/basic.py:28
 msgid "Site url"
 msgstr "当前站点URL"
 
-#: settings/serializers/basic.py:8
+#: settings/serializers/basic.py:29
 msgid "eg: http://dev.jumpserver.org:8080"
 msgstr "如: http://dev.jumpserver.org:8080"
 
-#: settings/serializers/basic.py:11
+#: settings/serializers/basic.py:32
 msgid "User guide url"
 msgstr "用户向导URL"
 
-#: settings/serializers/basic.py:12
+#: settings/serializers/basic.py:33
 msgid "User first login update profile done redirect to it"
 msgstr "用户第一次登录，修改profile后重定向到地址, 可以是 wiki 或 其他说明文档"
 
-#: settings/serializers/basic.py:16
+#: settings/serializers/basic.py:37
 msgid ""
 "The forgot password url on login page, If you use ldap or cas external "
 "authentication, you can set it"
@@ -2916,13 +2925,25 @@ msgstr ""
 "登录页面忘记密码URL, 如果使用了 LDAP, OPENID 等外部认证系统，可以自定义用户重"
 "置密码访问的地址"
 
-#: settings/serializers/basic.py:20
+#: settings/serializers/basic.py:41
 msgid "Global organization name"
 msgstr "全局组织名"
 
-#: settings/serializers/basic.py:21
+#: settings/serializers/basic.py:42
 msgid "The name of global organization to display"
 msgstr "全局组织的显示名称，默认为 全局组织"
+
+#: settings/serializers/basic.py:44
+msgid "Enable tickets"
+msgstr "启用工单"
+
+#: settings/serializers/basic.py:45
+msgid "Enable announcement"
+msgstr "启用公告"
+
+#: settings/serializers/basic.py:46
+msgid "Announcement"
+msgstr "公告"
 
 #: settings/serializers/cleaning.py:10
 msgid "Login log keep days"
@@ -3045,35 +3066,31 @@ msgid ""
 "This is used by default if no email is returned during SSO authentication"
 msgstr "SSO认证时，如果没有返回邮件地址，将使用该后缀"
 
-#: settings/serializers/other.py:10
-msgid "Enable tickets"
-msgstr "启用工单系统"
-
-#: settings/serializers/other.py:13
+#: settings/serializers/other.py:12
 msgid "OTP issuer name"
 msgstr "OTP 扫描后的名称"
 
-#: settings/serializers/other.py:17
+#: settings/serializers/other.py:16
 msgid "OTP valid window"
 msgstr "OTP 延迟有效次数"
 
-#: settings/serializers/other.py:22
+#: settings/serializers/other.py:21
 msgid "CMD"
 msgstr ""
 
-#: settings/serializers/other.py:23
+#: settings/serializers/other.py:22
 msgid "PowerShell"
 msgstr ""
 
-#: settings/serializers/other.py:25
+#: settings/serializers/other.py:24
 msgid "Shell (Windows)"
 msgstr "Shell（Windows 资产）"
 
-#: settings/serializers/other.py:26
+#: settings/serializers/other.py:25
 msgid "The shell type used when Windows assets perform ansible tasks"
 msgstr "windows 资产执行 Ansible 任务时，使用的 Shell 类型。"
 
-#: settings/serializers/other.py:30
+#: settings/serializers/other.py:29
 msgid "Perm single to ungroup node"
 msgstr "直接授权资产放在未分组节点"
 

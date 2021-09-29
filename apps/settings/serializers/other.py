@@ -7,7 +7,6 @@ class OtherSettingSerializer(serializers.Serializer):
         required=False, max_length=1024, label=_("Email suffix"),
         help_text=_('This is used by default if no email is returned during SSO authentication')
     )
-    TICKETS_ENABLED = serializers.BooleanField(required=False, default=True, label=_("Enable tickets"))
 
     OTP_ISSUER_NAME = serializers.CharField(
         required=False, max_length=1024, label=_('OTP issuer name'),
