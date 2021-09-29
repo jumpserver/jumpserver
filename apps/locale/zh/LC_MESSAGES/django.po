@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-28 18:47+0800\n"
+"POT-Creation-Date: 2021-09-29 14:42+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -5693,7 +5693,7 @@ msgstr "* 新密码不能是最近 {} 次的密码"
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
-#: xpack/plugins/change_auth_plan/api/app.py:112
+#: xpack/plugins/change_auth_plan/api/app.py:113
 #: xpack/plugins/change_auth_plan/api/asset.py:100
 msgid "The parameter 'action' must be [{}]"
 msgstr "参数 'action' 必须是 [{}]"
@@ -6078,50 +6078,70 @@ msgid "AF-Johannesburg"
 msgstr "非洲-约翰内斯堡"
 
 #: xpack/plugins/cloud/providers/huaweicloud.py:36
-msgid "AP-Bangkok"
-msgstr "亚太-曼谷"
+msgid "CN North-Beijing4"
+msgstr "华北-北京4"
 
 #: xpack/plugins/cloud/providers/huaweicloud.py:37
-#, fuzzy
-#| msgid "CN-Hong Kong"
-msgid "AP-Hong Kong"
-msgstr "中国-香港"
+msgid "CN North-Beijing1"
+msgstr "华北-北京1"
 
 #: xpack/plugins/cloud/providers/huaweicloud.py:38
-msgid "AP-Singapore"
-msgstr "亚太-新加坡"
+msgid "CN East-Shanghai2"
+msgstr "华东-上海2"
 
 #: xpack/plugins/cloud/providers/huaweicloud.py:39
 msgid "CN East-Shanghai1"
 msgstr "华东-上海1"
 
 #: xpack/plugins/cloud/providers/huaweicloud.py:40
-msgid "CN East-Shanghai2"
-msgstr "华东-上海2"
-
-#: xpack/plugins/cloud/providers/huaweicloud.py:41
-msgid "CN North-Beijing1"
-msgstr "华北-北京1"
-
-#: xpack/plugins/cloud/providers/huaweicloud.py:42
-msgid "CN North-Beijing4"
-msgstr "华北-北京4"
-
-#: xpack/plugins/cloud/providers/huaweicloud.py:43
-msgid "CN Northeast-Dalian"
-msgstr "华北-大连"
-
-#: xpack/plugins/cloud/providers/huaweicloud.py:44
 msgid "CN South-Guangzhou"
 msgstr "华南-广州"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:41
+msgid "LA-Mexico City1"
+msgstr "拉美-墨西哥城一"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:42
+msgid "LA-Santiago"
+msgstr "拉美-圣地亚哥"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:43
+msgid "LA-Sao Paulo1"
+msgstr "拉美-圣保罗一"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:44
+msgid "EU-Paris"
+msgstr "欧洲-巴黎"
 
 #: xpack/plugins/cloud/providers/huaweicloud.py:45
 msgid "CN Southwest-Guiyang1"
 msgstr "西南-贵阳1"
 
 #: xpack/plugins/cloud/providers/huaweicloud.py:46
-msgid "EU-Paris"
-msgstr "欧洲-巴黎"
+msgid "AP-Bangkok"
+msgstr "亚太-曼谷"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:47
+msgid "AP-Singapore"
+msgstr "亚太-新加坡"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:48
+#, fuzzy
+#| msgid "CN-Hong Kong"
+msgid "CN-Hong Kong"
+msgstr "中国-香港"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:50
+msgid "CN Northeast-Dalian"
+msgstr "华北-大连"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:51
+msgid "CN North-Ulanqab1"
+msgstr "华北-乌兰察布一"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:52
+msgid "CN South-Guangzhou-InvitationOnly"
+msgstr "华南-广州-友好用户环境"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:13
 msgid "AccessKey ID"
@@ -6143,16 +6163,16 @@ msgstr "租户 ID"
 msgid "Subscription ID"
 msgstr "订阅 ID"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:81
-#: xpack/plugins/cloud/serializers/account_attrs.py:86
+#: xpack/plugins/cloud/serializers/account_attrs.py:87
+#: xpack/plugins/cloud/serializers/account_attrs.py:92
 msgid "API Endpoint"
 msgstr "API 端点"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:92
+#: xpack/plugins/cloud/serializers/account_attrs.py:98
 msgid "Service account key"
 msgstr "账户密钥"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:93
+#: xpack/plugins/cloud/serializers/account_attrs.py:99
 msgid "The file is in JSON format"
 msgstr "JSON 格式的文件"
 
@@ -6263,21 +6283,6 @@ msgstr "社区版"
 
 #~ msgid "Announcement enabled"
 #~ msgstr "启用公告"
-
-#~ msgid "LA-Mexico City1"
-#~ msgstr "拉美-墨西哥城一"
-
-#~ msgid "LA-Santiago"
-#~ msgstr "拉美-圣地亚哥"
-
-#~ msgid "LA-Sao Paulo1"
-#~ msgstr "拉美-圣保罗一"
-
-#~ msgid "CN North-Ulanqab1"
-#~ msgstr "华北-乌兰察布一"
-
-#~ msgid "CN South-Guangzhou-InvitationOnly"
-#~ msgstr "华南-广州-友好用户环境"
 
 #~ msgid "OpenID"
 #~ msgstr "OpenID"
