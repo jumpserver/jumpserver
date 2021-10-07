@@ -23,7 +23,9 @@ from common.drf.api import SerializerMixin
 from common.permissions import IsSuperUserOrAppUser, IsValidUser, IsSuperUser
 from orgs.mixins.api import RootOrgViewMixin
 from common.http import is_true
-from assets.models import SystemUser
+from perms.utils.asset.permission import get_asset_system_user_ids_with_actions_by_user
+from perms.models.asset_permission import Action
+from authentication.errors import NotHaveUpDownLoadPerm
 
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
@@ -89,8 +91,14 @@ class ClientProtocolMixin:
         drives_redirect = is_true(self.request.query_params.get('drives_redirect'))
         token = self.create_token(user, asset, application, system_user)
 
-        if drives_redirect:
-            options['drivestoredirect:s'] = '*'
+        if drives_redirect and asset:
+            systemuser_actions_mapper = get_asset_system_user_ids_with_actions_by_user(user, asset)
+            actions = systemuser_actions_mapper.get(system_user.id, [])
+            if actions & Action.UPDOWNLOAD:
+                options['drivestoredirect:s'] = '*'
+            else:
+                raise NotHaveUpDownLoadPerm
+
         options['screen mode id:i'] = '2' if full_screen else '1'
         address = settings.TERMINAL_RDP_ADDR
         if not address or address == 'localhost:3389':
