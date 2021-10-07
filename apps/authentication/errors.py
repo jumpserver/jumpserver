@@ -3,8 +3,8 @@
 from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse
 from django.conf import settings
+from rest_framework import status
 
-from authentication import sms_verify_code
 from common.exceptions import JMSException
 from .signals import post_auth_failed
 from users.utils import LoginBlockUtil, MFABlockUtils
@@ -348,3 +348,9 @@ class FeiShuNotBound(JMSException):
 class PasswdInvalid(JMSException):
     default_code = 'passwd_invalid'
     default_detail = _('Your password is invalid')
+
+
+class NotHaveUpDownLoadPerm(JMSException):
+    status_code = status.HTTP_403_FORBIDDEN
+    code = 'not_have_up_down_load_perm'
+    default_detail = _('No upload or download permission')
