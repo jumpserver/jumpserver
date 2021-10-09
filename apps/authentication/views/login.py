@@ -29,7 +29,6 @@ from ..const import RSA_PRIVATE_KEY, RSA_PUBLIC_KEY
 from .. import mixins, errors
 from ..forms import get_user_login_form_cls
 
-
 __all__ = [
     'UserLoginView', 'UserLogoutView',
     'UserLoginGuardView', 'UserLoginWaitConfirmView',
@@ -125,9 +124,9 @@ class UserLoginView(mixins.AuthMixin, FormView):
             self.request.session.set_test_cookie()
             return self.render_to_response(context)
         except (
-            errors.PasswdTooSimple,
-            errors.PasswordRequireResetError,
-            errors.PasswdNeedUpdate
+                errors.PasswdTooSimple,
+                errors.PasswordRequireResetError,
+                errors.PasswdNeedUpdate
         ) as e:
             return redirect(e.url)
         self.clear_rsa_key()
@@ -150,31 +149,31 @@ class UserLoginView(mixins.AuthMixin, FormView):
                 'name': 'OpenID',
                 'enabled': settings.AUTH_OPENID,
                 'url': reverse('authentication:openid:login'),
-                'logo':  static('img/login_oidc_logo.png')
+                'logo': static('img/login_oidc_logo.png')
             },
             {
                 'name': 'CAS',
                 'enabled': settings.AUTH_CAS,
                 'url': reverse('authentication:cas:cas-login'),
-                'logo':  static('img/login_cas_logo.png')
+                'logo': static('img/login_cas_logo.png')
             },
             {
                 'name': _('WeCom'),
                 'enabled': settings.AUTH_WECOM,
                 'url': reverse('authentication:wecom-qr-login'),
-                'logo':  static('img/login_wecom_logo.png')
+                'logo': static('img/login_wecom_logo.png')
             },
             {
                 'name': _('DingTalk'),
                 'enabled': settings.AUTH_DINGTALK,
                 'url': reverse('authentication:dingtalk-qr-login'),
-                'logo':  static('img/login_dingtalk_logo.png')
+                'logo': static('img/login_dingtalk_logo.png')
             },
             {
                 'name': _('FeiShu'),
                 'enabled': settings.AUTH_FEISHU,
                 'url': reverse('authentication:feishu-qr-login'),
-                'logo':  static('img/login_feishu_logo.png')
+                'logo': static('img/login_feishu_logo.png')
             }
         ]
         return [method for method in auth_methods if method['enabled']]
@@ -187,6 +186,30 @@ class UserLoginView(mixins.AuthMixin, FormView):
             forgot_password_url = settings.FORGOT_PASSWORD_URL
         return forgot_password_url
 
+    def get_mfa_methods(self):
+        context = {
+            'methods': [
+                {
+                    'name': 'sms',
+                    'label': _('SMS'),
+                    'enable': settings.SMS_ENABLED and settings.XPACK_ENABLED,
+                    'selected': False,
+                },
+                {
+                    'name': 'otp',
+                    'label': _('One-time password'),
+                    'enable': True,
+                    'selected': False,
+                },
+            ]
+        }
+
+        for item in context['methods']:
+            if item['enable']:
+                item['selected'] = True
+                break
+        return context
+
     def get_context_data(self, **kwargs):
         context = {
             'demo_mode': os.environ.get("DEMO_MODE"),
@@ -194,6 +217,7 @@ class UserLoginView(mixins.AuthMixin, FormView):
             'forgot_password_url': self.get_forgot_password_url()
         }
         kwargs.update(context)
+        kwargs.update(self.get_mfa_methods())
         return super().get_context_data(**kwargs)
 
 

@@ -10,23 +10,15 @@
         {{ JMS_TITLE }}
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% include '_head_css_js.html' %}
     <!-- Stylesheets -->
-    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
-    <link href="{% static 'css/bootstrap-style.css' %}" rel="stylesheet">
     <link href="{% static 'css/login-style.css' %}" rel="stylesheet">
-    <link href="{% static 'css/style.css' %}" rel="stylesheet">
     <link href="{% static 'css/jumpserver.css' %}" rel="stylesheet">
-
-    <!-- scripts -->
-    <script src="{% static 'js/jquery-3.1.1.min.js' %}"></script>
-    <script src="{% static 'js/plugins/sweetalert/sweetalert.min.js' %}"></script>
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'js/plugins/datatables/datatables.min.js' %}"></script>
+    <script src="{% static "js/jumpserver.js" %}"></script>
 
     <style>
         .login-content {
-            box-shadow: 0 5px 5px -3px rgb(0 0 0 / 20%), 0 8px 10px 1px rgb(0 0 0 / 14%), 0 3px 14px 2px rgb(0 0 0 / 12%);
+            box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.15), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
         }
 
         .help-block {
@@ -170,6 +162,18 @@
                     </div>
                     {% if form.challenge %}
                         {% bootstrap_field form.challenge show_label=False %}
+                    {% elif form.mfa_type %}
+                        <div class="form-group">
+                            <select id="verify-method-select" name="mfa_type" class="form-control" onchange="select_change(this.value)">
+                            {% for method in methods %}
+                                <option value="{{ method.name }}" {% if method.selected %} selected {% endif %} {% if not method.enable %} disabled {% endif %}>{{ method.label }}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group" style="display: flex">
+                            <input id="mfa-code" required type="text" class="form-control" name="code" placeholder="{% trans 'Please enter the verification code' %}" autofocus="autofocus">
+                            <button id='send-sms-verify-code' type="button" class="btn btn-info full-width" onclick="sendSMSVerifyCode()" style="width: 150px!important;">{% trans 'Send verification code' %}</button>
+                        </div>
                     {% elif form.captcha %}
                         <div class="captch-field">
                             {% bootstrap_field form.captcha show_label=False %}
@@ -218,6 +222,57 @@
 </body>
 <script type="text/javascript" src="/static/js/plugins/jsencrypt/jsencrypt.min.js"></script>
 <script>
+    var methodSelect = document.getElementById('verify-method-select');
+    if (methodSelect.value !== null) {
+        select_change(methodSelect.value);
+    }
+    function select_change(type){
+        var currentBtn = document.getElementById('send-sms-verify-code');
+
+        if (type === "sms") {
+            currentBtn.style.display = "block";
+            currentBtn.disabled = false;
+        }
+        else {
+            currentBtn.style.display = "none";
+            currentBtn.disabled = true;
+        }
+    }
+
+    function sendSMSVerifyCode(){
+        var currentBtn = document.getElementById('send-sms-verify-code');
+        var time = 60
+        var url = "{% url 'api-auth:sms-verify-code-send' %}";
+        var data = {
+            username: $("#id_username").val()
+        };
+        requestApi({
+            url: url,
+            method: "POST",
+            body: JSON.stringify(data),
+            success: function (data) {
+                currentBtn.innerHTML =  `{% trans 'Wait: ' %} ${time}`;
+                currentBtn.disabled = true
+                currentBtn.classList.add("disabledBtn" )
+                var TimeInterval = setInterval(()=>{
+                    --time
+                    currentBtn.innerHTML = `{% trans 'Wait: ' %} ${time}`;
+                    if(time === 0) {
+                        currentBtn.innerHTML = "{% trans 'Send verification code' %}"
+                        currentBtn.disabled = false
+                        currentBtn.classList.remove("disabledBtn")
+                        clearInterval(TimeInterval)
+                    }
+                },1000)
+                alert("{% trans 'The verification code has been sent' %}");
+            },
+            error: function (text, data) {
+                alert(data.detail)
+            },
+            flash_message: false
+        })
+    }
+
     function encryptLoginPassword(password, rsaPublicKey) {
         if (!password) {
             return ''

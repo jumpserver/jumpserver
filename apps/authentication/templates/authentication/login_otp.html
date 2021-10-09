@@ -20,10 +20,8 @@
             </select>
         </div>
         <div class="form-group" style="display: flex">
-
             <input id="mfa-code" required type="text" class="form-control" name="code" placeholder="{% trans 'Please enter the verification code' %}" autofocus="autofocus">
             <button id='send-sms-verify-code' type="button" class="btn btn-info full-width m-b" onclick="sendSMSVerifyCode()" style="width: 150px!important;">{% trans 'Send verification code' %}</button>
-
         </div>
 
         <button id='submit_button' type="submit" class="btn btn-primary block full-width m-b">{% trans 'Next' %}</button>
@@ -48,7 +46,7 @@
     function select_change(type){
         var currentBtn = document.getElementById('send-sms-verify-code');
 
-        if (type == "sms") {
+        if (type === "sms") {
             currentBtn.style.display = "block";
             currentBtn.disabled = false;
         }

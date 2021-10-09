@@ -14,7 +14,6 @@ from django.contrib.auth import (
     PermissionDenied, user_login_failed, _clean_credentials
 )
 from django.shortcuts import reverse, redirect
-from django.views.generic.edit import FormView
 
 from common.utils import get_object_or_none, get_request_ip, get_logger, bulk_get, FlashMessageUtil
 from users.models import User, MFAType
@@ -231,6 +230,17 @@ class AuthMixin(PasswordEncryptionViewMixin):
             self.raise_credential_error(errors.reason_user_inactive)
         return user
 
+    def _check_login_user_mfa(self, user):
+        if settings.SECURITY_MFA_IN_LOGIN_PAGE:
+            request = self.request
+            if hasattr(request, 'data'):
+                data = request.data
+            else:
+                data = request.POST
+            otp_code = data.get('code')
+            mfa_type = data.get('mfa_type')
+            self.check_user_mfa(otp_code, mfa_type, user=user)
+
     def _check_login_acl(self, user, ip):
         # ACL 限制用户登录
         from acls.models import LoginACL
@@ -260,6 +270,8 @@ class AuthMixin(PasswordEncryptionViewMixin):
 
         self._check_only_allow_exists_user_auth(username)
         user = self._check_auth_user_is_valid(username, password, public_key)
+        # 校验login-mfa
+        self._check_login_user_mfa(user)
         # 校验login-acl规则
         self._check_login_acl(user, ip)
         self._check_password_require_reset_or_not(user)
@@ -380,8 +392,8 @@ class AuthMixin(PasswordEncryptionViewMixin):
             else:
                 return exception
 
-    def check_user_mfa(self, code, mfa_type=MFAType.OTP):
-        user = self.get_user_from_session()
+    def check_user_mfa(self, code, mfa_type=MFAType.OTP, user=None):
+        user = user if user else self.get_user_from_session()
         ip = self.get_request_ip()
         self.check_mfa_is_block(user.username, ip)
         ok = user.check_mfa(code, mfa_type=mfa_type)
