@@ -12,6 +12,9 @@ from django.db import migrations, transaction
 
 
 def migrate_old_authbook_to_history(apps, schema_editor):
+    """
+    原来各历史也在 authbook 中，这增加了维护的难度，以后历史数据单独的表, 这里将迁移到历史表中
+    """
     authbook_model = apps.get_model("assets", "AuthBook")
     history_model = apps.get_model("assets", "HistoricalAuthBook")
     db_alias = schema_editor.connection.alias

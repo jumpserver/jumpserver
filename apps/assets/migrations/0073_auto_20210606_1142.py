@@ -6,6 +6,9 @@ import django.db.models.deletion
 
 
 def migrate_system_assets_to_authbook(apps, schema_editor):
+    """
+    迁移 系统用户和资产的关系 到资产账号表中，以后关系也由 账号表维护
+    """
     system_user_model = apps.get_model("assets", "SystemUser")
     system_user_asset_model = system_user_model.assets.through
     authbook_model = apps.get_model('assets', 'AuthBook')
@@ -42,12 +45,18 @@ def migrate_system_assets_to_authbook(apps, schema_editor):
 
 
 def migrate_authbook_secret_to_system_user(apps, schema_editor):
+    """
+    迁移没有系统用户的 authbook 密码到 系统用户和资产关联的 账号上, 因为原来 资产和系统用户关系 没有在
+    authbook 表中，上一步迁移过来了, 这样就需要迁移特殊配置的账号密码，因为以后资产和系统用户的账号密码，直接
+    从 他们记录上找，不用再计算
+    """
     authbook_model = apps.get_model('assets', 'AuthBook')
     history_model = apps.get_model('assets', 'HistoricalAuthBook')
 
     print()
     authbooks_without_systemuser = authbook_model.objects.filter(systemuser__isnull=True)
     for authbook in authbooks_without_systemuser:
+        # 查找与这个账号用户名相同的系统用户且资产相同的账号
         matched = authbook_model.objects.filter(
             asset=authbook.asset, systemuser__username=authbook.username
         )
