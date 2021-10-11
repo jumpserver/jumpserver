@@ -41,12 +41,13 @@
         }
 
         .login-content {
-            height: 472px;
-            width: 984px;
+            height: 490px;
+            width: 1066px;
             margin-right: auto;
             margin-left: auto;
             margin-top: calc((100vh - 470px) / 3);
         }
+
         body {
             background-color: #f2f2f2;
             height: calc(100vh - (100vh - 470px) / 3);
@@ -65,16 +66,8 @@
             width: 50%;
         }
 
-        .captcha {
-            float: right;
-        }
-
         .red-fonts {
             color: red;
-        }
-
-        .field-error {
-            text-align: left;
         }
 
         .form-group.has-error {
@@ -101,14 +94,6 @@
             padding-top: 10px;
         }
 
-        .radio, .checkbox {
-            margin: 0;
-        }
-
-        #github_star {
-            float: right;
-            margin: 10px 10px 0 0;
-        }
         .more-login-item {
             border-right: 1px dashed #dedede;
             padding-left: 5px;
@@ -119,11 +104,15 @@
             border: none;
         }
 
+        .select-con {
+            width: 75px;
+        }
+
     </style>
 </head>
 
 <body>
-<div class="login-content ">
+<div class="login-content">
     <div class="right-image-box">
         <a href="{% if not XPACK_ENABLED %}https://github.com/jumpserver/jumpserver{% endif %}">
             <img src="{{ LOGIN_IMAGE_URL }}" style="height: 100%; width: 100%"/>
@@ -163,16 +152,14 @@
                     {% if form.challenge %}
                         {% bootstrap_field form.challenge show_label=False %}
                     {% elif form.mfa_type %}
-                        <div class="form-group">
-                            <select id="verify-method-select" name="mfa_type" class="form-control" onchange="select_change(this.value)">
+                        <div class="form-group" style="display: flex">
+                            <select id="verify-method-select" name="mfa_type" class="form-control select-con" onchange="select_change(this.value)">
                             {% for method in methods %}
                                 <option value="{{ method.name }}" {% if method.selected %} selected {% endif %} {% if not method.enable %} disabled {% endif %}>{{ method.label }}</option>
                             {% endfor %}
                             </select>
-                        </div>
-                        <div class="form-group" style="display: flex">
-                            <input id="mfa-code" required type="text" class="form-control" name="code" placeholder="{% trans 'Please enter the verification code' %}" autofocus="autofocus">
-                            <button id='send-sms-verify-code' type="button" class="btn btn-info full-width" onclick="sendSMSVerifyCode()" style="width: 150px!important;">{% trans 'Send verification code' %}</button>
+                            <input id="mfa-code" required type="text" class="form-control" name="code" placeholder="{% trans 'Please enter the verification code' %}" autofocus="autofocus">&nbsp;&nbsp;&nbsp;&nbsp;
+                            <button id='send-sms-verify-code' type="button" class="btn btn-info full-width" onclick="sendSMSVerifyCode()" style="width: 130px!important;">{% trans 'Send verification code' %}</button>
                         </div>
                     {% elif form.captcha %}
                         <div class="captch-field">

@@ -1648,6 +1648,9 @@ msgstr "MFA 类型"
 msgid "MFA code"
 msgstr "多因子认证验证码"
 
+msgid "Dynamic code"
+msgstr "动态码"
+
 #: authentication/mixins.py:311
 msgid "Please change your password"
 msgstr "请修改密码"

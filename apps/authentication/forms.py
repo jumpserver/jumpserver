@@ -59,7 +59,7 @@ class ChallengeMixin(forms.Form):
     challenge = forms.CharField(
         label=_('MFA code'), max_length=6, required=False,
         widget=forms.TextInput(attrs={
-            'placeholder': _("MFA code"),
+            'placeholder': _("Dynamic code"),
             'style': 'width: 50%'
         })
     )
