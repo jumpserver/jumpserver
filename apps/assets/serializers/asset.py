@@ -74,11 +74,11 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
         model = Asset
         fields_mini = ['id', 'hostname', 'ip', 'platform', 'protocols']
         fields_small = fields_mini + [
-            'protocol', 'port', 'protocols', 'is_active', 'public_ip',
-            'comment',
+            'protocol', 'port', 'protocols', 'is_active',
+            'public_ip', 'number', 'comment',
         ]
         hardware_fields = [
-            'number', 'vendor', 'model', 'sn', 'cpu_model', 'cpu_count',
+            'vendor', 'model', 'sn', 'cpu_model', 'cpu_count',
             'cpu_cores', 'cpu_vcpus', 'memory', 'disk_total', 'disk_info',
             'os', 'os_version', 'os_arch', 'hostname_raw', 'hardware_info',
             'connectivity', 'date_verified'
