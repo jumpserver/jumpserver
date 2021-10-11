@@ -86,15 +86,16 @@ class UserRoleSerializer(serializers.Serializer):
 
 
 class UserProfileSerializer(UserSerializer):
+    MFA_LEVEL_CHOICES = (
+        (0, _('Disable')),
+        (1, _('Enable')),
+    )
+
     public_key_comment = serializers.CharField(
         source='get_public_key_comment', required=False, read_only=True, max_length=128
     )
     public_key_hash_md5 = serializers.CharField(
         source='get_public_key_hash_md5', required=False, read_only=True, max_length=128
-    )
-    MFA_LEVEL_CHOICES = (
-        (0, _('Disable')),
-        (1, _('Enable')),
     )
     mfa_level = serializers.ChoiceField(choices=MFA_LEVEL_CHOICES, label=_('MFA'), required=False)
     guide_url = serializers.SerializerMethodField()
@@ -108,8 +109,7 @@ class UserProfileSerializer(UserSerializer):
             'receive_backends', 'orgs', 'perms',
         ]
         fields = UserSerializer.Meta.fields + [
-            'public_key_comment', 'public_key_hash_md5',
-            'guide_url',
+            'public_key_comment', 'public_key_hash_md5', 'guide_url',
         ] + read_only_fields
 
         extra_kwargs = dict(UserSerializer.Meta.extra_kwargs)

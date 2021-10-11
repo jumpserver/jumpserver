@@ -181,6 +181,8 @@ class AuthMixin:
 class RoleMixin:
     objects: models.Manager
     m2m_org_members: models.Manager
+    is_authenticated: bool
+    is_valid: bool
 
     class ROLE(TextChoices):
         ADMIN = choices.ADMIN, _('System administrator')
@@ -188,69 +190,15 @@ class RoleMixin:
         USER = choices.USER, _('User')
         APP = 'App', _('Application')
 
-    @property
-    def role_display(self):
-        return self.get_role_display()
-
     @lazyproperty
     def org_roles(self):
-        from orgs.models import ROLE as ORG_ROLE
-
-        if current_org.is_root():
-            # root 组织, 取 User 本身的角色
-            if self.is_superuser:
-                roles = [ORG_ROLE.ADMIN]
-            elif self.is_super_auditor:
-                roles = [ORG_ROLE.AUDITOR]
-            else:
-                roles = [ORG_ROLE.USER]
-        else:
-            # 是真实组织, 取 OrganizationMember 中的角色
-            roles = [
-                getattr(ORG_ROLE, org_member.role.upper())
-                for org_member in self.m2m_org_members.all()
-                if org_member.org_id == current_org.id
-            ]
-            roles.sort()
-        return roles
+        from rbac.models import RoleBinding
+        return RoleBinding.get_user_roles(self)
 
     @lazyproperty
-    def org_roles_label_list(self):
-        from orgs.models import ROLE as ORG_ROLE
-        return [str(role.label) for role in self.org_roles if role in ORG_ROLE]
-
-    @lazyproperty
-    def org_roles_value_list(self):
-        from orgs.models import ROLE as ORG_ROLE
-        return [str(role.value) for role in self.org_roles if role in ORG_ROLE]
-
-    @lazyproperty
-    def org_role_display(self):
-        return ' | '.join(self.org_roles_label_list)
-
-    @lazyproperty
-    def total_role_display(self):
-        roles = list({self.role_display, *self.org_roles_label_list})
-        roles.sort()
-        return ' | '.join(roles)
-
-    def current_org_roles(self):
-        from orgs.models import OrganizationMember, ROLE as ORG_ROLE
-        if current_org.is_root():
-            if self.is_superuser:
-                return [ORG_ROLE.ADMIN]
-            else:
-                return [ORG_ROLE.USER]
-
-        roles = list(set(OrganizationMember.objects.filter(
-            org_id=current_org.id, user=self
-        ).values_list('role', flat=True)))
-        return roles
-
-    @lazyproperty
-    def user_all_orgs(self):
-        from orgs.models import Organization
-        return Organization.get_user_all_orgs(self)
+    def system_roles(self):
+        from rbac.models import RoleBinding
+        return RoleBinding.get_user_system_roles(self)
 
     @lazyproperty
     def perms(self):
@@ -261,11 +209,6 @@ class RoleMixin:
     def roles(self):
         from rbac.models import RoleBinding
         return RoleBinding.get_user_roles(self)
-
-    @lazyproperty
-    def system_roles(self):
-        from rbac.models import RoleBinding
-        return RoleBinding.get_user_system_roles(self)
 
     @lazyproperty
     def org_roles(self):
@@ -279,7 +222,7 @@ class RoleMixin:
             attr_name = f'{scope}_roles'
         roles = getattr(self, attr_name, [])
         roles_display = [str(role) for role in roles]
-        return '|'.join(roles_display)
+        return ' | '.join(roles_display)
 
     @lazyproperty
     def role_display(self):
@@ -292,6 +235,12 @@ class RoleMixin:
     @lazyproperty
     def org_role_display(self):
         return self._get_roles_display(scope='org')
+
+    @lazyproperty
+    def total_role_display(self):
+        roles = list({self.role_display, *self.org_role_display})
+        roles.sort()
+        return ' | '.join(roles)
 
     @property
     def is_superuser(self):
@@ -443,6 +392,7 @@ class MFAMixin:
     )
     is_org_admin: bool
     username: str
+    phone: str
 
     @property
     def mfa_enabled(self):
@@ -637,7 +587,8 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
 
     @classmethod
     def get_group_ids_by_user_id(cls, user_id):
-        group_ids = cls.groups.through.objects.filter(user_id=user_id).distinct().values_list('usergroup_id', flat=True)
+        group_ids = cls.groups.through.objects.filter(user_id=user_id)\
+            .distinct().values_list('usergroup_id', flat=True)
         group_ids = list(group_ids)
         return group_ids
 

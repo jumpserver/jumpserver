@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 #
-from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from common.mixins import CommonBulkSerializerMixin
 from common.permissions import CanUpdateDeleteUser
 from common.validators import PhoneValidator
-from orgs.models import ROLE as ORG_ROLE
 from ..models import User
-from ..const import SystemOrOrgRole, PasswordStrategy
+from ..const import PasswordStrategy
 
 __all__ = [
     'UserSerializer', 'UserRetrieveSerializer', 'MiniUserSerializer',
@@ -17,13 +15,13 @@ __all__ = [
 ]
 
 
-class RolesSerilaizerMixin(serializers.Serializer):
-    system_roles = serializers.ListField(
-        child=serializers.UUIDField(), allow_null=True, required=False,
+class RolesSerializerMixin(serializers.Serializer):
+    system_roles = serializers.PrimaryKeyRelatedField(
+        read_only=True, many=True,
         label=_('System role name'),
     )
-    org_roles = serializers.ListField(
-        child=serializers.UUIDField(), allow_null=True, required=False,
+    org_roles = serializers.PrimaryKeyRelatedField(
+        read_only=True, many=True,
         label=_('Organization role name'),
     )
 
@@ -42,24 +40,29 @@ class RolesSerilaizerMixin(serializers.Serializer):
         return roles_ids
 
 
-class UserSerializer(RolesSerilaizerMixin, CommonBulkSerializerMixin, serializers.ModelSerializer):
+class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializers.ModelSerializer):
     password_strategy = serializers.ChoiceField(
         choices=PasswordStrategy.choices, default=PasswordStrategy.email, required=False,
         write_only=True, label=_('Password strategy')
     )
     mfa_enabled = serializers.BooleanField(read_only=True, label=_('MFA enabled'))
     mfa_force_enabled = serializers.BooleanField(read_only=True, label=_('MFA force enabled'))
-    mfa_level_display = serializers.ReadOnlyField(source='get_mfa_level_display', label=_('MFA level display'))
+    mfa_level_display = serializers.ReadOnlyField(
+        source='get_mfa_level_display', label=_('MFA level display')
+    )
     login_blocked = serializers.BooleanField(read_only=True, label=_('Login blocked'))
     is_expired = serializers.BooleanField(read_only=True, label=_('Is expired'))
-    can_update = serializers.SerializerMethodField(label=_('Can update'))
-    can_delete = serializers.SerializerMethodField(label=_('Can delete'))
-    can_public_key_auth = serializers.ReadOnlyField(source='can_use_ssh_key_login', label=_('Can public key authentication'))
-    org_roles = serializers.ListField(
-        label=_('Organization role name'), allow_null=True, required=False,
-        child=serializers.ChoiceField(choices=ORG_ROLE.choices), default=["User"]
+    can_public_key_auth = serializers.ReadOnlyField(
+        source='can_use_ssh_key_login', label=_('Can public key authentication')
     )
-    system_or_org_role = serializers.ChoiceField(read_only=True, choices=SystemOrOrgRole.choices, label=_('Role'))
+    # Todo: 这里看看该怎么搞
+    # can_update = serializers.SerializerMethodField(label=_('Can update'))
+    # can_delete = serializers.SerializerMethodField(label=_('Can delete'))
+    # org_roles = serializers.ListField(
+    #     label=_('Organization role name'), allow_null=True, required=False,
+    #     child=serializers.ChoiceField(choices=ORG_ROLE.choices), default=["User"]
+    # )
+    # system_or_org_role = serializers.ChoiceField(read_only=True, choices=SystemOrOrgRole.choices, label=_('Role'))
 
     class Meta:
         model = User
@@ -71,8 +74,8 @@ class UserSerializer(RolesSerilaizerMixin, CommonBulkSerializerMixin, serializer
         ]
         # small 指的是 不需要计算的直接能从一张表中获取到的数据
         fields_small = fields_mini + fields_write_only + [
-            'email', 'wechat', 'phone', 'mfa_level',
-            'source', 'source_display', 'can_public_key_auth', 'need_update_password',
+            'email', 'wechat', 'phone', 'mfa_level', 'source', 'source_display',
+            'can_public_key_auth', 'need_update_password',
             'mfa_enabled', 'is_app', 'is_valid', 'is_expired', 'is_active',  # 布尔字段
             'date_expired', 'date_joined', 'last_login',  # 日期字段
             'created_by', 'comment',  # 通用字段
@@ -81,9 +84,9 @@ class UserSerializer(RolesSerilaizerMixin, CommonBulkSerializerMixin, serializer
         ]
         # 包含不太常用的字段，可以没有
         fields_verbose = fields_small + [
-            'system_role_display', 'org_role_display',
+            # 'system_role_display', 'org_role_display',
             'mfa_level_display', 'mfa_force_enabled', 'is_first_login',
-            'date_password_last_updated', 'avatar_url', 'system_or_org_role'
+            'date_password_last_updated', 'avatar_url',
         ]
         # 外键的字段
         fields_fk = []
@@ -201,7 +204,7 @@ class MiniUserSerializer(serializers.ModelSerializer):
         fields = UserSerializer.Meta.fields_mini
 
 
-class InviteSerializer(RolesSerilaizerMixin, serializers.Serializer):
+class InviteSerializer(RolesSerializerMixin, serializers.Serializer):
     user = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.filter(is_app=False)
     )
