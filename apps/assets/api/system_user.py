@@ -91,7 +91,7 @@ class SystemUserAssetAuthInfoApi(generics.RetrieveAPIView):
         asset_id = self.kwargs.get('asset_id')
         user_id = self.request.query_params.get("user_id")
         username = self.request.query_params.get("username")
-        instance.load_asset_more_auth(asset_id=asset_id, user_id=user_id, username=username)
+        instance.load_asset_more_auth(asset_id, user_id, username)
         return instance
 
 
@@ -107,8 +107,7 @@ class SystemUserAppAuthInfoApi(generics.RetrieveAPIView):
         instance = super().get_object()
         app_id = self.kwargs.get('app_id')
         user_id = self.request.query_params.get("user_id")
-        if user_id:
-            instance.load_app_more_auth(app_id, user_id)
+        instance.load_app_more_auth(app_id, user_id)
         return instance
 
 
