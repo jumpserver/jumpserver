@@ -231,7 +231,7 @@ class AuthMixin(PasswordEncryptionViewMixin):
         return user
 
     def _check_login_user_mfa(self, user):
-        if settings.SECURITY_MFA_IN_LOGIN_PAGE:
+        if settings.SECURITY_MFA_IN_LOGIN_PAGE and not settings.SECURITY_LOGIN_CHALLENGE_ENABLED:
             request = self.request
             if hasattr(request, 'data'):
                 data = request.data
@@ -394,9 +394,22 @@ class AuthMixin(PasswordEncryptionViewMixin):
 
     def check_user_mfa(self, code, mfa_type=MFAType.OTP, user=None):
         user = user if user else self.get_user_from_session()
+        if not user.mfa_enabled:
+            raise errors.MFAUnsetError(user, self.request, '')
+
         ip = self.get_request_ip()
         self.check_mfa_is_block(user.username, ip)
-        ok = user.check_mfa(code, mfa_type=mfa_type)
+
+        if mfa_type == MFAType.SMS_CODE:
+            ok = user.check_sms_code(code)
+        elif bool(user.otp_secret_key) and mfa_type == MFAType.OTP:
+            if settings.OTP_IN_RADIUS:
+                ok = user.check_radius(code)
+            else:
+                ok = user.check_otp(code)
+        else:
+            raise errors.MFAUnsetError(user, self.request, '')
+
         if ok:
             self.mark_mfa_ok()
             return

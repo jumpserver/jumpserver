@@ -2,6 +2,7 @@
 #
 import builtins
 import time
+
 from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.shortcuts import get_object_or_404
@@ -95,5 +96,7 @@ class SendSMSVerifyCodeApi(AuthMixin, CreateAPIView):
             user = get_object_or_404(User, username=username)
         else:
             user = self.get_user_from_session()
+        if not user.mfa_enabled:
+            raise errors.NeedMFAError
         timeout = user.send_sms_code()
         return Response({'code': 'ok', 'timeout': timeout})

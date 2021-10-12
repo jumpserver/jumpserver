@@ -69,7 +69,7 @@ def get_user_login_form_cls(*, captcha=False):
     bases = []
     if settings.SECURITY_LOGIN_CHALLENGE_ENABLED:
         bases.append(ChallengeMixin)
-    if settings.SECURITY_MFA_IN_LOGIN_PAGE:
+    elif settings.SECURITY_MFA_IN_LOGIN_PAGE:
         bases.append(UserCheckOtpCodeForm)
     elif settings.SECURITY_LOGIN_CAPTCHA_ENABLED and captcha:
         bases.append(CaptchaMixin)

@@ -354,3 +354,7 @@ class NotHaveUpDownLoadPerm(JMSException):
     status_code = status.HTTP_403_FORBIDDEN
     code = 'not_have_up_down_load_perm'
     default_detail = _('No upload or download permission')
+
+
+class NeedMFAError(JMSException):
+    default_detail = mfa_unset_msg

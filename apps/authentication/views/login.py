@@ -25,6 +25,7 @@ from common.utils import FlashMessageUtil
 from users.utils import (
     redirect_user_first_login_or_index
 )
+from users.exceptions import MFANotEnabled
 from ..const import RSA_PRIVATE_KEY, RSA_PUBLIC_KEY
 from .. import mixins, errors
 from ..forms import get_user_login_form_cls
@@ -116,7 +117,6 @@ class UserLoginView(mixins.AuthMixin, FormView):
         except errors.AuthFailedError as e:
             form.add_error(None, e.msg)
             self.set_login_failed_mark()
-
             form_cls = get_user_login_form_cls(captcha=True)
             new_form = form_cls(data=form.data)
             new_form._errors = form.errors
@@ -129,6 +129,13 @@ class UserLoginView(mixins.AuthMixin, FormView):
                 errors.PasswdNeedUpdate
         ) as e:
             return redirect(e.url)
+        except (
+                errors.MFAUnsetError,
+                errors.MFAFailedError,
+                errors.BlockMFAError
+        ) as e:
+            form.add_error('code', e.msg)
+            return super().form_invalid(form)
         self.clear_rsa_key()
         return self.redirect_to_guard_view()
 

@@ -53,6 +53,10 @@
             height: calc(100vh - (100vh - 470px) / 3);
         }
 
+        .captcha {
+            float: right;
+        }
+
         .right-image-box {
             height: 100%;
             width: 50%;
@@ -158,7 +162,7 @@
                                 <option value="{{ method.name }}" {% if method.selected %} selected {% endif %} {% if not method.enable %} disabled {% endif %}>{{ method.label }}</option>
                             {% endfor %}
                             </select>
-                            <input id="mfa-code" required type="text" class="form-control" name="code" placeholder="{% trans 'Please enter the verification code' %}" autofocus="autofocus">&nbsp;&nbsp;&nbsp;&nbsp;
+                            <input id="mfa-code" type="text" class="form-control" required name="code" placeholder="{% trans 'Please enter the verification code' %}">&nbsp;&nbsp;&nbsp;&nbsp;
                             <button id='send-sms-verify-code' type="button" class="btn btn-info full-width" onclick="sendSMSVerifyCode()" style="width: 130px!important;">{% trans 'Send verification code' %}</button>
                         </div>
                     {% elif form.captcha %}
@@ -275,7 +279,12 @@
         var password = $('#password').val(); //明文密码
         var passwordEncrypted = encryptLoginPassword(password, rsaPublicKey)
         $('#password-hidden').val(passwordEncrypted); //返回给密码输入input
-        $('#login-form').submit();//post提交
+
+        if ($('#mfa-code').val() === '') {
+            alert("{% trans 'Please enter the verification code' %}")
+        } else {
+            $('#login-form').submit();//post提交
+        }
     }
 
     $(document).ready(function () {
