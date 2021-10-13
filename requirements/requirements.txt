@@ -79,7 +79,6 @@ rest_condition==1.0.3
 python-ldap==3.3.1
 tencentcloud-sdk-python==3.0.477
 django-radius==1.4.0
-ipip-ipdb==1.2.1
 django-redis-sessions==0.6.1
 unicodecsv==0.14.1
 python-daemon==2.2.3
@@ -119,3 +118,4 @@ PyMySQL==1.0.2
 cx-Oracle==8.2.1
 psycopg2-binary==2.9.1
 alibabacloud_dysmsapi20170525==2.0.2
+geoip2==4.4.0
