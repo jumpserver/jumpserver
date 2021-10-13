@@ -16,7 +16,6 @@ from ..tasks import (
     push_system_user_to_assets
 )
 
-
 logger = get_logger(__file__)
 __all__ = [
     'SystemUserViewSet', 'SystemUserAuthInfoApi', 'SystemUserAssetAuthInfoApi',
@@ -91,7 +90,7 @@ class SystemUserAssetAuthInfoApi(generics.RetrieveAPIView):
         asset_id = self.kwargs.get('asset_id')
         user_id = self.request.query_params.get("user_id")
         username = self.request.query_params.get("username")
-        instance.load_asset_more_auth(asset_id, user_id, username)
+        instance.load_asset_more_auth(asset_id, username, user_id)
         return instance
 
 
