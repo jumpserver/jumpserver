@@ -8,12 +8,12 @@ from common.message.backends import exceptions as exce
 logger = get_logger(__name__)
 
 
-def digest(corpid, corpsecret):
+def digest(corp_id, corp_secret):
     md5 = hashlib.md5()
-    md5.update(corpid.encode())
-    md5.update(corpsecret.encode())
-    digest = md5.hexdigest()
-    return digest
+    md5.update(corp_id.encode())
+    md5.update(corp_secret.encode())
+    dist = md5.hexdigest()
+    return dist
 
 
 def update_values(default: dict, others: dict):
