@@ -11,8 +11,11 @@ from rest_framework import serializers
 
 from common.utils.strings import no_special_chars
 
-
 alphanumeric = RegexValidator(r'^[0-9a-zA-Z_@\-\.]*$', _('Special char not allowed'))
+
+alphanumeric_re = re.compile(r'^[0-9a-zA-Z_@\-\.]*$')
+
+alphanumeric_cn_re = re.compile(r'^[0-9a-zA-Z_@\-\.\u4E00-\u9FA5]*$')
 
 
 class ProjectUniqueValidator(UniqueTogetherValidator):
