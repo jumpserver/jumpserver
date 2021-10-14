@@ -1595,6 +1595,9 @@ msgstr "需要多因子认证"
 msgid "MFA not set, please set it first"
 msgstr "多因子认证没有设置，请先完成设置"
 
+msgid "OTP not set, please set it first"
+msgstr "OTP认证没有设置，请先完成设置"
+
 #: authentication/errors.py:81
 msgid "Login confirm required"
 msgstr "需要登录复核"
@@ -3202,6 +3205,12 @@ msgstr "MFA 校验有效期"
 #: settings/serializers/security.py:78
 msgid "Enable Login captcha"
 msgstr "启用登录验证码"
+
+msgid "Enable login password add-on"
+msgstr "启用登录密码附加码"
+
+msgid "Enable Login MFA"
+msgstr "启用登录MFA"
 
 #: settings/serializers/security.py:84
 msgid "Enable terminal register"

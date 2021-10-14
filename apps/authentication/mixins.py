@@ -7,6 +7,7 @@ import time
 
 from django.core.cache import cache
 from django.conf import settings
+from django.urls import reverse_lazy
 from django.contrib import auth
 from django.utils.translation import ugettext as _
 from django.contrib.auth import (
@@ -270,13 +271,14 @@ class AuthMixin(PasswordEncryptionViewMixin):
 
         self._check_only_allow_exists_user_auth(username)
         user = self._check_auth_user_is_valid(username, password, public_key)
-        # 校验login-mfa
-        self._check_login_user_mfa(user)
         # 校验login-acl规则
         self._check_login_acl(user, ip)
         self._check_password_require_reset_or_not(user)
         self._check_passwd_is_too_simple(user, password)
         self._check_passwd_need_update(user)
+
+        # 校验login-mfa
+        self._check_login_user_mfa(user)
 
         LoginBlockUtil(username, ip).clean_failed_count()
         request.session['auth_password'] = 1
@@ -408,7 +410,8 @@ class AuthMixin(PasswordEncryptionViewMixin):
             else:
                 ok = user.check_otp(code)
         else:
-            raise errors.MFAUnsetError(user, self.request, '')
+            self.set_passwd_verify_on_session(user)
+            raise errors.OTPRequiredError(reverse_lazy('authentication:user-otp-enable-bind'))
 
         if ok:
             self.mark_mfa_ok()

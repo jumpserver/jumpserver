@@ -135,6 +135,8 @@ class UserLoginView(mixins.AuthMixin, FormView):
         ) as e:
             form.add_error('code', e.msg)
             return super().form_invalid(form)
+        except errors.OTPRequiredError as e:
+            return redirect(e.url)
         self.clear_rsa_key()
         return self.redirect_to_guard_view()
 

@@ -78,6 +78,7 @@ mfa_type_failed_msg = _(
 
 mfa_required_msg = _("MFA required")
 mfa_unset_msg = _("MFA not set, please set it first")
+otp_unset_msg = _("OTP not set, please set it first")
 login_confirm_required_msg = _("Login confirm required")
 login_confirm_wait_msg = _("Wait login confirm ticket for accept")
 login_confirm_error_msg = _("Login confirm ticket was {}")
@@ -358,3 +359,11 @@ class NotHaveUpDownLoadPerm(JMSException):
 
 class NotEnableMFAError(JMSException):
     default_detail = mfa_unset_msg
+
+
+class OTPRequiredError(JMSException):
+    default_detail = otp_unset_msg
+
+    def __init__(self, url, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.url = url

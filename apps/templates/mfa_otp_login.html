@@ -1,0 +1,62 @@
+{% load i18n %}
+<select id="verify-method-select" name="mfa_type" class="form-control select-con" onchange="select_change(this.value)">
+{% for method in methods %}
+    <option value="{{ method.name }}" {% if method.selected %} selected {% endif %} {% if not method.enable %} disabled {% endif %}>{{ method.label }}</option>
+{% endfor %}
+</select>
+<input id="mfa-code" type="text" class="form-control" required name="code" placeholder="{% trans 'Please enter the verification code' %}">&nbsp;&nbsp;&nbsp;&nbsp;
+<button id='send-sms-verify-code' type="button" class="btn btn-info full-width" onclick="sendSMSVerifyCode()" style="width: 130px!important;">{% trans 'Send verification code' %}</button>
+
+
+<script>
+    var methodSelect = document.getElementById('verify-method-select');
+    if (methodSelect.value !== null) {
+        select_change(methodSelect.value);
+    }
+    function select_change(type){
+        var currentBtn = document.getElementById('send-sms-verify-code');
+
+        if (type === "sms") {
+            currentBtn.style.display = "block";
+            currentBtn.disabled = false;
+        }
+        else {
+            currentBtn.style.display = "none";
+            currentBtn.disabled = true;
+        }
+    }
+
+    function sendSMSVerifyCode(){
+        var currentBtn = document.getElementById('send-sms-verify-code');
+        var time = 60
+        var url = "{% url 'api-auth:sms-verify-code-send' %}";
+        var data = {
+            username: $("#id_username").val()
+        };
+        requestApi({
+            url: url,
+            method: "POST",
+            body: JSON.stringify(data),
+            success: function (data) {
+                currentBtn.innerHTML =  `{% trans 'Wait: ' %} ${time}`;
+                currentBtn.disabled = true
+                currentBtn.classList.add("disabledBtn" )
+                var TimeInterval = setInterval(()=>{
+                    --time
+                    currentBtn.innerHTML = `{% trans 'Wait: ' %} ${time}`;
+                    if(time === 0) {
+                        currentBtn.innerHTML = "{% trans 'Send verification code' %}"
+                        currentBtn.disabled = false
+                        currentBtn.classList.remove("disabledBtn")
+                        clearInterval(TimeInterval)
+                    }
+                },1000)
+                alert("{% trans 'The verification code has been sent' %}");
+            },
+            error: function (text, data) {
+                alert(data.detail)
+            },
+            flash_message: false
+        })
+    }
+</script>
