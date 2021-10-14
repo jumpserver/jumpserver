@@ -1,1 +1,1 @@
-g++ make iputils-ping default-libmysqlclient-dev libpq-dev libffi-dev libldap2-dev libsasl2-dev sshpass gettext
+g++ make iputils-ping default-libmysqlclient-dev libpq-dev libffi-dev libldap2-dev libsasl2-dev sshpass
