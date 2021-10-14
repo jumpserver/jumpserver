@@ -4,6 +4,7 @@ from django.db.models import Count
 
 from common.mixins.serializers import BulkSerializerMixin
 from common.utils import ssh_pubkey_gen
+from common.validators import alphanumeric_re, alphanumeric_cn_re
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import SystemUser, Asset
 from .utils import validate_password_contains_left_double_curly_bracket
@@ -97,15 +98,20 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         raise serializers.ValidationError(error)
 
     def validate_username(self, username):
-        if username:
-            return username
-        login_mode = self.get_initial_value("login_mode")
         protocol = self.get_initial_value("protocol")
-        username_same_with_user = self.get_initial_value("username_same_with_user")
+        if username:
+            regx = alphanumeric_re
+            if protocol == SystemUser.Protocol.telnet:
+                regx = alphanumeric_cn_re
+            if not regx.match(username):
+                raise serializers.ValidationError(_('Special char not allowed'))
+            return username
 
+        username_same_with_user = self.get_initial_value("username_same_with_user")
         if username_same_with_user:
             return ''
 
+        login_mode = self.get_initial_value("login_mode")
         if login_mode == SystemUser.LOGIN_AUTO and protocol != SystemUser.Protocol.vnc:
             msg = _('* Automatic login mode must fill in the username.')
             raise serializers.ValidationError(msg)

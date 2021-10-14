@@ -173,7 +173,7 @@ class AuthMixin:
 class BaseUser(OrgModelMixin, AuthMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
-    username = models.CharField(max_length=128, blank=True, verbose_name=_('Username'), validators=[alphanumeric], db_index=True)
+    username = models.CharField(max_length=128, blank=True, verbose_name=_('Username'), db_index=True)
     password = fields.EncryptCharField(max_length=256, blank=True, null=True, verbose_name=_('Password'))
     private_key = fields.EncryptTextField(blank=True, null=True, verbose_name=_('SSH private key'))
     public_key = fields.EncryptTextField(blank=True, null=True, verbose_name=_('SSH public key'))
