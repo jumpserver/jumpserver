@@ -97,6 +97,6 @@ class SendSMSVerifyCodeApi(AuthMixin, CreateAPIView):
         else:
             user = self.get_user_from_session()
         if not user.mfa_enabled:
-            raise errors.NeedMFAError
+            raise errors.NotEnableMFAError
         timeout = user.send_sms_code()
         return Response({'code': 'ok', 'timeout': timeout})

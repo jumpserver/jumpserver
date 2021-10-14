@@ -25,7 +25,6 @@ from common.utils import FlashMessageUtil
 from users.utils import (
     redirect_user_first_login_or_index
 )
-from users.exceptions import MFANotEnabled
 from ..const import RSA_PRIVATE_KEY, RSA_PUBLIC_KEY
 from .. import mixins, errors
 from ..forms import get_user_login_form_cls

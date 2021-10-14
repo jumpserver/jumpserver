@@ -231,15 +231,15 @@ class AuthMixin(PasswordEncryptionViewMixin):
         return user
 
     def _check_login_user_mfa(self, user):
-        if settings.SECURITY_MFA_IN_LOGIN_PAGE and not settings.SECURITY_LOGIN_CHALLENGE_ENABLED:
-            request = self.request
-            if hasattr(request, 'data'):
-                data = request.data
-            else:
-                data = request.POST
-            otp_code = data.get('code')
-            mfa_type = data.get('mfa_type')
-            self.check_user_mfa(otp_code, mfa_type, user=user)
+        request = self.request
+        if hasattr(request, 'data'):
+            data = request.data
+        else:
+            data = request.POST
+        code = data.get('code')
+        mfa_type = data.get('mfa_type')
+        if settings.SECURITY_MFA_IN_LOGIN_PAGE and code and mfa_type:
+            self.check_user_mfa(code, mfa_type, user=user)
 
     def _check_login_acl(self, user, ip):
         # ACL 限制用户登录

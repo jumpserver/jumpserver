@@ -356,5 +356,5 @@ class NotHaveUpDownLoadPerm(JMSException):
     default_detail = _('No upload or download permission')
 
 
-class NeedMFAError(JMSException):
+class NotEnableMFAError(JMSException):
     default_detail = mfa_unset_msg
