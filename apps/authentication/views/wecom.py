@@ -39,7 +39,7 @@ class WeComQRMixin(PermissionsMixin, View):
                 msg = e.detail['errmsg']
             except Exception:
                 msg = _('WeCom Error, Please contact your system administrator')
-            return self.get_failed_reponse(
+            return self.get_failed_response(
                 '/',
                 _('WeCom Error'),
                 msg
@@ -54,7 +54,7 @@ class WeComQRMixin(PermissionsMixin, View):
 
     def get_verify_state_failed_response(self, redirect_uri):
         msg = _("You've been hacked")
-        return self.get_failed_reponse(redirect_uri, msg, msg)
+        return self.get_failed_response(redirect_uri, msg, msg)
 
     def get_qr_url(self, redirect_uri):
         state = random_string(16)
@@ -78,7 +78,7 @@ class WeComQRMixin(PermissionsMixin, View):
         })
         return HttpResponseRedirect(ok_flash_msg_url)
 
-    def get_failed_reponse(self, redirect_url, title, msg):
+    def get_failed_response(self, redirect_url, title, msg):
         failed_flash_msg_url = reverse('authentication:wecom-bind-failed-flash-msg')
         failed_flash_msg_url += '?' + urllib.parse.urlencode({
             'redirect_url': redirect_url,
@@ -89,7 +89,7 @@ class WeComQRMixin(PermissionsMixin, View):
 
     def get_already_bound_response(self, redirect_url):
         msg = _('WeCom is already bound')
-        response = self.get_failed_reponse(redirect_url, msg, msg)
+        response = self.get_failed_response(redirect_url, msg, msg)
         return response
 
 
@@ -102,7 +102,7 @@ class WeComQRBindView(WeComQRMixin, View):
 
         if not is_auth_password_time_valid(request.session):
             msg = _('Please verify your password first')
-            response = self.get_failed_reponse(redirect_url, msg, msg)
+            response = self.get_failed_response(redirect_url, msg, msg)
             return response
 
         redirect_uri = reverse('authentication:wecom-qr-bind-callback', kwargs={'user_id': user.id}, external=True)
@@ -126,7 +126,7 @@ class WeComQRBindCallbackView(WeComQRMixin, View):
         if user is None:
             logger.error(f'WeComQR bind callback error, user_id invalid: user_id={user_id}')
             msg = _('Invalid user_id')
-            response = self.get_failed_reponse(redirect_url, msg, msg)
+            response = self.get_failed_response(redirect_url, msg, msg)
             return response
 
         if user.wecom_id:
@@ -141,7 +141,7 @@ class WeComQRBindCallbackView(WeComQRMixin, View):
         wecom_userid, __ = wecom.get_user_id_by_code(code)
         if not wecom_userid:
             msg = _('WeCom query user failed')
-            response = self.get_failed_reponse(redirect_url, msg, msg)
+            response = self.get_failed_response(redirect_url, msg, msg)
             return response
 
         try:
@@ -150,7 +150,7 @@ class WeComQRBindCallbackView(WeComQRMixin, View):
         except IntegrityError as e:
             if e.args[0] == 1062:
                 msg = _('The WeCom is already bound to another user')
-                response = self.get_failed_reponse(redirect_url, msg, msg)
+                response = self.get_failed_response(redirect_url, msg, msg)
                 return response
             raise e
 
@@ -207,14 +207,14 @@ class WeComQRLoginCallbackView(AuthMixin, WeComQRMixin, View):
         if not wecom_userid:
             # 正常流程不会出这个错误，hack 行为
             msg = _('Failed to get user from WeCom')
-            response = self.get_failed_reponse(login_url, title=msg, msg=msg)
+            response = self.get_failed_response(login_url, title=msg, msg=msg)
             return response
 
         user = get_object_or_none(User, wecom_id=wecom_userid)
         if user is None:
             title = _('WeCom is not bound')
             msg = _('Please login with a password and then bind the WeCom')
-            response = self.get_failed_reponse(login_url, title=title, msg=msg)
+            response = self.get_failed_response(login_url, title=title, msg=msg)
             return response
 
         try:
@@ -222,7 +222,7 @@ class WeComQRLoginCallbackView(AuthMixin, WeComQRMixin, View):
         except errors.AuthFailedError as e:
             self.set_login_failed_mark()
             msg = e.msg
-            response = self.get_failed_reponse(login_url, title=msg, msg=msg)
+            response = self.get_failed_response(login_url, title=msg, msg=msg)
             return response
 
         return self.redirect_to_guard_view()

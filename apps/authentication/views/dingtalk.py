@@ -39,7 +39,7 @@ class DingTalkQRMixin(PermissionsMixin, View):
                 msg = e.detail['errmsg']
             except Exception:
                 msg = _('DingTalk Error, Please contact your system administrator')
-            return self.get_failed_reponse(
+            return self.get_failed_response(
                 '/',
                 _('DingTalk Error'),
                 msg
@@ -54,7 +54,7 @@ class DingTalkQRMixin(PermissionsMixin, View):
 
     def get_verify_state_failed_response(self, redirect_uri):
         msg = _("You've been hacked")
-        return self.get_failed_reponse(redirect_uri, msg, msg)
+        return self.get_failed_response(redirect_uri, msg, msg)
 
     def get_qr_url(self, redirect_uri):
         state = random_string(16)
@@ -79,7 +79,7 @@ class DingTalkQRMixin(PermissionsMixin, View):
         })
         return HttpResponseRedirect(ok_flash_msg_url)
 
-    def get_failed_reponse(self, redirect_url, title, msg):
+    def get_failed_response(self, redirect_url, title, msg):
         failed_flash_msg_url = reverse('authentication:dingtalk-bind-failed-flash-msg')
         failed_flash_msg_url += '?' + urllib.parse.urlencode({
             'redirect_url': redirect_url,
@@ -90,7 +90,7 @@ class DingTalkQRMixin(PermissionsMixin, View):
 
     def get_already_bound_response(self, redirect_url):
         msg = _('DingTalk is already bound')
-        response = self.get_failed_reponse(redirect_url, msg, msg)
+        response = self.get_failed_response(redirect_url, msg, msg)
         return response
 
 
@@ -103,7 +103,7 @@ class DingTalkQRBindView(DingTalkQRMixin, View):
 
         if not is_auth_password_time_valid(request.session):
             msg = _('Please verify your password first')
-            response = self.get_failed_reponse(redirect_url, msg, msg)
+            response = self.get_failed_response(redirect_url, msg, msg)
             return response
 
         redirect_uri = reverse('authentication:dingtalk-qr-bind-callback', kwargs={'user_id': user.id}, external=True)
@@ -127,7 +127,7 @@ class DingTalkQRBindCallbackView(DingTalkQRMixin, View):
         if user is None:
             logger.error(f'DingTalkQR bind callback error, user_id invalid: user_id={user_id}')
             msg = _('Invalid user_id')
-            response = self.get_failed_reponse(redirect_url, msg, msg)
+            response = self.get_failed_response(redirect_url, msg, msg)
             return response
 
         if user.dingtalk_id:
@@ -143,7 +143,7 @@ class DingTalkQRBindCallbackView(DingTalkQRMixin, View):
 
         if not userid:
             msg = _('DingTalk query user failed')
-            response = self.get_failed_reponse(redirect_url, msg, msg)
+            response = self.get_failed_response(redirect_url, msg, msg)
             return response
 
         try:
@@ -152,7 +152,7 @@ class DingTalkQRBindCallbackView(DingTalkQRMixin, View):
         except IntegrityError as e:
             if e.args[0] == 1062:
                 msg = _('The DingTalk is already bound to another user')
-                response = self.get_failed_reponse(redirect_url, msg, msg)
+                response = self.get_failed_response(redirect_url, msg, msg)
                 return response
             raise e
 
@@ -209,14 +209,14 @@ class DingTalkQRLoginCallbackView(AuthMixin, DingTalkQRMixin, View):
         if not userid:
             # 正常流程不会出这个错误，hack 行为
             msg = _('Failed to get user from DingTalk')
-            response = self.get_failed_reponse(login_url, title=msg, msg=msg)
+            response = self.get_failed_response(login_url, title=msg, msg=msg)
             return response
 
         user = get_object_or_none(User, dingtalk_id=userid)
         if user is None:
             title = _('DingTalk is not bound')
             msg = _('Please login with a password and then bind the DingTalk')
-            response = self.get_failed_reponse(login_url, title=title, msg=msg)
+            response = self.get_failed_response(login_url, title=title, msg=msg)
             return response
 
         try:
@@ -224,7 +224,7 @@ class DingTalkQRLoginCallbackView(AuthMixin, DingTalkQRMixin, View):
         except errors.AuthFailedError as e:
             self.set_login_failed_mark()
             msg = e.msg
-            response = self.get_failed_reponse(login_url, title=msg, msg=msg)
+            response = self.get_failed_response(login_url, title=msg, msg=msg)
             return response
 
         return self.redirect_to_guard_view()
