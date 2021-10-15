@@ -11,8 +11,10 @@ from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, IsSuperUser
 from common.mixins.views import SuggestionMixin
 from users.models import User, UserGroup
 from users.serializers import UserSerializer, UserGroupSerializer
+from users.filters import UserFilter
 from perms.models import AssetPermission
 from perms.serializers import AssetPermissionSerializer
+from perms.filters import AssetPermissionFilter
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
 from ..models import Asset, Node, Platform
@@ -179,9 +181,8 @@ class AssetGatewayListApi(generics.ListAPIView):
         return queryset
 
 
-class AssetPermUserListApi(ListAPIView):
+class BaseAssetPermUserOrUserGroupListApi(ListAPIView):
     permission_classes = (IsOrgAdmin,)
-    serializer_class = UserSerializer
 
     def get_object(self):
         asset_id = self.kwargs.get('pk')
@@ -193,6 +194,12 @@ class AssetPermUserListApi(ListAPIView):
         nodes = asset.get_all_nodes(flat=True)
         perms = AssetPermission.objects.filter(Q(assets=asset) | Q(nodes__in=nodes))
         return perms
+
+
+class AssetPermUserListApi(BaseAssetPermUserOrUserGroupListApi):
+    filterset_class = UserFilter
+    search_fields = ('username', 'email', 'name', 'id', 'source', 'role')
+    serializer_class = UserSerializer
 
     def get_queryset(self):
         perms = self.get_asset_related_perms()
@@ -202,53 +209,8 @@ class AssetPermUserListApi(ListAPIView):
         return users
 
 
-class AssetPermUserPermissionsListApi(generics.ListAPIView):
-    permission_classes = (IsOrgAdmin,)
-    model = AssetPermission
-    serializer_class = AssetPermissionSerializer
-
-    def get_object(self):
-        asset_id = self.kwargs.get('pk')
-        asset = get_object_or_404(Asset, pk=asset_id)
-        return asset
-
-    def get_perm_user(self):
-        user_id = self.kwargs.get('perm_user_id')
-        user = get_object_or_404(User, pk=user_id)
-        return user
-
-    def filter_queryset(self, queryset):
-        queryset = self.filter_asset_related(queryset)
-        queryset = self.filter_user_related(queryset)
-        return queryset
-
-    def filter_asset_related(self, queryset):
-        asset = self.get_object()
-        nodes = asset.get_all_nodes(flat=True)
-        perms = queryset.filter(Q(assets=asset) | Q(nodes__in=nodes))
-        return perms
-
-    def filter_user_related(self, queryset):
-        user = self.get_perm_user()
-        user_groups = user.groups.all()
-        perms = queryset.filter(Q(users=user) | Q(user_groups__in=user_groups))
-        return perms
-
-
-class AssetPermUserGroupListApi(ListAPIView):
-    permission_classes = (IsOrgAdmin,)
+class AssetPermUserGroupListApi(BaseAssetPermUserOrUserGroupListApi):
     serializer_class = UserGroupSerializer
-
-    def get_object(self):
-        asset_id = self.kwargs.get('pk')
-        asset = get_object_or_404(Asset, pk=asset_id)
-        return asset
-
-    def get_asset_related_perms(self):
-        asset = self.get_object()
-        nodes = asset.get_all_nodes(flat=True)
-        perms = AssetPermission.objects.filter(Q(assets=asset) | Q(nodes__in=nodes))
-        return perms
 
     def get_queryset(self):
         perms = self.get_asset_related_perms()
@@ -256,25 +218,17 @@ class AssetPermUserGroupListApi(ListAPIView):
         return user_groups
 
 
-class AssetPermUserGroupPermissionsListApi(generics.ListAPIView):
+class BaseAssetPermUserOrUserGroupPermissionsListApiMixin(generics.ListAPIView):
     permission_classes = (IsOrgAdmin,)
     model = AssetPermission
     serializer_class = AssetPermissionSerializer
+    filterset_class = AssetPermissionFilter
+    search_fields = ('name',)
 
     def get_object(self):
         asset_id = self.kwargs.get('pk')
         asset = get_object_or_404(Asset, pk=asset_id)
         return asset
-
-    def get_perm_user_group(self):
-        user_group_id = self.kwargs.get('perm_user_group_id')
-        user_group = get_object_or_404(UserGroup, pk=user_group_id)
-        return user_group
-
-    def filter_queryset(self, queryset):
-        queryset = self.filter_asset_related(queryset)
-        queryset = self.filter_user_group_related(queryset)
-        return queryset
 
     def filter_asset_related(self, queryset):
         asset = self.get_object()
@@ -282,7 +236,45 @@ class AssetPermUserGroupPermissionsListApi(generics.ListAPIView):
         perms = queryset.filter(Q(assets=asset) | Q(nodes__in=nodes))
         return perms
 
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+        queryset = self.filter_asset_related(queryset)
+        return queryset
+
+
+class AssetPermUserPermissionsListApi(BaseAssetPermUserOrUserGroupPermissionsListApiMixin):
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+        queryset = self.filter_user_related(queryset)
+        queryset = queryset.distinct()
+        return queryset
+
+    def filter_user_related(self, queryset):
+        user = self.get_perm_user()
+        user_groups = user.groups.all()
+        perms = queryset.filter(Q(users=user) | Q(user_groups__in=user_groups))
+        return perms
+
+    def get_perm_user(self):
+        user_id = self.kwargs.get('perm_user_id')
+        user = get_object_or_404(User, pk=user_id)
+        return user
+
+
+class AssetPermUserGroupPermissionsListApi(BaseAssetPermUserOrUserGroupPermissionsListApiMixin):
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+        queryset = self.filter_user_group_related(queryset)
+        queryset = queryset.distinct()
+        return queryset
+
     def filter_user_group_related(self, queryset):
         user_group = self.get_perm_user_group()
         perms = queryset.filter(user_groups=user_group)
         return perms
+
+    def get_perm_user_group(self):
+        user_group_id = self.kwargs.get('perm_user_group_id')
+        user_group = get_object_or_404(UserGroup, pk=user_group_id)
+        return user_group
+
