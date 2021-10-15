@@ -53,7 +53,7 @@ class WeComQRMixin(PermissionsMixin, View):
         return True
 
     def get_verify_state_failed_response(self, redirect_uri):
-        msg = _("You've been hacked")
+        msg = _("The system configuration is incorrect. Please contact your administrator")
         return self.get_failed_reponse(redirect_uri, msg, msg)
 
     def get_qr_url(self, redirect_uri):
