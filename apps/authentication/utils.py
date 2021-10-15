@@ -60,5 +60,5 @@ def check_different_city_login(user, request):
         city = get_ip_city(ip) or DEFAULT_CITY
 
     last_user_login = UserLoginLog.objects.filter(username=user.username, status=True).first()
-    if last_user_login.city != city:
+    if last_user_login and last_user_login.city != city:
         DifferentCityLoginMessage(user, ip, city).publish_async()
