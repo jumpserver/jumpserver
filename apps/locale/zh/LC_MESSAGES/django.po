@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-23 11:11+0800\n"
+"POT-Creation-Date: 2021-10-15 10:45+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -377,7 +377,7 @@ msgstr "目标URL"
 #: applications/serializers/attrs/application_type/vmware_client.py:30
 #: assets/models/base.py:177 audits/signals_handler.py:65
 #: authentication/forms.py:22
-#: authentication/templates/authentication/login.html:163
+#: authentication/templates/authentication/login.html:165
 #: settings/serializers/auth/ldap.py:44 users/forms/profile.py:21
 #: users/templates/users/user_otp_check_password.html:13
 #: users/templates/users/user_password_update.html:43
@@ -1238,12 +1238,14 @@ msgstr ""
 msgid "Auth Token"
 msgstr "认证令牌"
 
-#: audits/signals_handler.py:68 authentication/views/login.py:160
+#: audits/signals_handler.py:68
+#: authentication/templates/authentication/login.html:216
 #: notifications/backends/__init__.py:11 users/models/user.py:660
 msgid "WeCom"
 msgstr "企业微信"
 
-#: audits/signals_handler.py:69 authentication/views/login.py:166
+#: audits/signals_handler.py:69
+#: authentication/templates/authentication/login.html:221
 #: notifications/backends/__init__.py:12 users/models/user.py:661
 msgid "DingTalk"
 msgstr "钉钉"
@@ -1758,24 +1760,37 @@ msgstr "确认"
 msgid "Code error"
 msgstr "代码错误"
 
-#: authentication/templates/authentication/login.html:155
+#: authentication/templates/authentication/login.html:157
 msgid "Welcome back, please enter username and password to login"
 msgstr "欢迎回来，请输入用户名和密码登录"
 
-#: authentication/templates/authentication/login.html:187
+#: authentication/templates/authentication/login.html:189
 #: users/templates/users/forgot_password.html:15
 #: users/templates/users/forgot_password.html:16
 msgid "Forgot password"
 msgstr "忘记密码"
 
-#: authentication/templates/authentication/login.html:194
+#: authentication/templates/authentication/login.html:196
 #: templates/_header_bar.html:83
 msgid "Login"
 msgstr "登录"
 
-#: authentication/templates/authentication/login.html:201
+#: authentication/templates/authentication/login.html:203
 msgid "More login options"
 msgstr "更多登录方式"
+
+#: authentication/templates/authentication/login.html:206
+msgid "OpenID"
+msgstr "OpenID"
+
+#: authentication/templates/authentication/login.html:211
+msgid "CAS"
+msgstr "CAS"
+
+#: authentication/templates/authentication/login.html:226
+#: notifications/backends/__init__.py:14 users/models/user.py:662
+msgid "FeiShu"
+msgstr "飞书"
 
 #: authentication/templates/authentication/login_otp.html:24
 msgid "Please enter the verification code"
@@ -1833,8 +1848,9 @@ msgstr "钉钉错误"
 
 #: authentication/views/dingtalk.py:56 authentication/views/feishu.py:52
 #: authentication/views/wecom.py:56
-msgid "You've been hacked"
-msgstr "你被攻击了"
+msgid ""
+"The system configuration is incorrect. Please contact your administrator"
+msgstr "系统配置错误，请联系管理员"
 
 #: authentication/views/dingtalk.py:92
 msgid "DingTalk is already bound"
@@ -1915,24 +1931,19 @@ msgstr "请使用密码登录，然后绑定飞书"
 msgid "Binding FeiShu failed"
 msgstr "绑定飞书失败"
 
-#: authentication/views/login.py:81
+#: authentication/views/login.py:80
 msgid "Redirecting"
 msgstr "跳转中"
 
-#: authentication/views/login.py:82
+#: authentication/views/login.py:81
 msgid "Redirecting to {} authentication"
 msgstr "正在跳转到 {} 认证"
 
-#: authentication/views/login.py:108
+#: authentication/views/login.py:107
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: authentication/views/login.py:172 notifications/backends/__init__.py:14
-#: users/models/user.py:662
-msgid "FeiShu"
-msgstr "飞书"
-
-#: authentication/views/login.py:259
+#: authentication/views/login.py:219
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -1940,15 +1951,15 @@ msgstr ""
 "等待 <b>{}</b> 确认, 你也可以复制链接发给他/她 <br/>\n"
 "                  不要关闭本页面"
 
-#: authentication/views/login.py:264
+#: authentication/views/login.py:224
 msgid "No ticket found"
 msgstr "没有发现工单"
 
-#: authentication/views/login.py:296
+#: authentication/views/login.py:256
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: authentication/views/login.py:297
+#: authentication/views/login.py:257
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
@@ -2544,7 +2555,7 @@ msgstr "测试手机号 该字段是必填项。"
 msgid "Test success"
 msgstr "测试成功"
 
-#: settings/api/email.py:21
+#: settings/api/email.py:22
 msgid "Test mail sent to {}, please check"
 msgstr "邮件已经发送{}, 请检查"
 
@@ -2818,7 +2829,7 @@ msgid "SMS provider"
 msgstr "短信服务商"
 
 #: settings/serializers/auth/sms.py:17 settings/serializers/auth/sms.py:35
-#: settings/serializers/auth/sms.py:43 settings/serializers/email.py:69
+#: settings/serializers/auth/sms.py:43 settings/serializers/email.py:63
 msgid "Signature"
 msgstr "签名"
 
@@ -2909,89 +2920,89 @@ msgstr "上传下载"
 msgid "Cloud sync record keep days"
 msgstr "云同步记录"
 
-#: settings/serializers/email.py:24
+#: settings/serializers/email.py:18
 msgid "SMTP host"
 msgstr "SMTP 主机"
 
-#: settings/serializers/email.py:25
+#: settings/serializers/email.py:19
 msgid "SMTP port"
 msgstr "SMTP 端口"
 
-#: settings/serializers/email.py:26
+#: settings/serializers/email.py:20
 msgid "SMTP account"
 msgstr "SMTP 账号"
 
-#: settings/serializers/email.py:28
+#: settings/serializers/email.py:22
 msgid "SMTP password"
 msgstr "SMTP 密码"
 
-#: settings/serializers/email.py:29
+#: settings/serializers/email.py:23
 msgid "Tips: Some provider use token except password"
 msgstr "提示：一些邮件提供商需要输入的是授权码"
 
-#: settings/serializers/email.py:32
+#: settings/serializers/email.py:26
 msgid "Send user"
 msgstr "发件人"
 
-#: settings/serializers/email.py:33
+#: settings/serializers/email.py:27
 msgid "Tips: Send mail account, default SMTP account as the send account"
 msgstr "提示：发送邮件账号，默认使用 SMTP 账号作为发送账号"
 
-#: settings/serializers/email.py:36
+#: settings/serializers/email.py:30
 msgid "Test recipient"
 msgstr "测试收件人"
 
-#: settings/serializers/email.py:37
+#: settings/serializers/email.py:31
 msgid "Tips: Used only as a test mail recipient"
 msgstr "提示：仅用来作为测试邮件收件人"
 
-#: settings/serializers/email.py:40
+#: settings/serializers/email.py:34
 msgid "Use SSL"
 msgstr "使用 SSL"
 
-#: settings/serializers/email.py:41
+#: settings/serializers/email.py:35
 msgid "If SMTP port is 465, may be select"
 msgstr "如果SMTP端口是465，通常需要启用 SSL"
 
-#: settings/serializers/email.py:44
+#: settings/serializers/email.py:38
 msgid "Use TLS"
 msgstr "使用 TLS"
 
-#: settings/serializers/email.py:45
+#: settings/serializers/email.py:39
 msgid "If SMTP port is 587, may be select"
 msgstr "如果SMTP端口是587，通常需要启用 TLS"
 
-#: settings/serializers/email.py:48
+#: settings/serializers/email.py:42
 msgid "Subject prefix"
 msgstr "主题前缀"
 
-#: settings/serializers/email.py:55
+#: settings/serializers/email.py:49
 msgid "Create user email subject"
 msgstr "邮件主题"
 
-#: settings/serializers/email.py:56
+#: settings/serializers/email.py:50
 msgid ""
 "Tips: When creating a user, send the subject of the email (eg:Create account "
 "successfully)"
 msgstr "提示: 创建用户时，发送设置密码邮件的主题 (例如: 创建用户成功)"
 
-#: settings/serializers/email.py:60
+#: settings/serializers/email.py:54
 msgid "Create user honorific"
 msgstr "邮件的敬语"
 
-#: settings/serializers/email.py:61
+#: settings/serializers/email.py:55
 msgid "Tips: When creating a user, send the honorific of the email (eg:Hello)"
 msgstr "提示: 创建用户时，发送设置密码邮件的敬语 (例如: 您好)"
 
-#: settings/serializers/email.py:65
+#: settings/serializers/email.py:59
 msgid "Create user email content"
 msgstr "邮件的内容"
 
-#: settings/serializers/email.py:66
+#: settings/serializers/email.py:60
 msgid "Tips:When creating a user, send the content of the email"
 msgstr "提示: 创建用户时，发送设置密码邮件的内容"
 
-#: settings/serializers/email.py:70
+#: settings/serializers/email.py:64
 msgid "Tips: Email signature (eg:jumpserver)"
 msgstr "邮件署名 (如:jumpserver)"
 
@@ -6262,11 +6273,8 @@ msgstr "旗舰版"
 msgid "Community edition"
 msgstr "社区版"
 
-#~ msgid "OpenID"
-#~ msgstr "OpenID"
-
-#~ msgid "CAS"
-#~ msgstr "CAS"
+#~ msgid "You've been hacked"
+#~ msgstr "你被攻击了"
 
 #~ msgid "Only "
 #~ msgstr "仅能从用户配置来源登录"
