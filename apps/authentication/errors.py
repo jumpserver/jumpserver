@@ -260,6 +260,13 @@ class LoginIPNotAllowed(ACLError):
         super().__init__(_("IP is not allowed"), **kwargs)
 
 
+class TimePeriodNotAllowed(ACLError):
+    def __init__(self, username, request, **kwargs):
+        self.username = username
+        self.request = request
+        super().__init__(_("Time Period is not allowed"), **kwargs)
+
+
 class LoginConfirmBaseError(NeedMoreInfoError):
     def __init__(self, ticket_id, **kwargs):
         self.ticket_id = ticket_id

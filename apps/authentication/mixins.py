@@ -233,9 +233,12 @@ class AuthMixin(PasswordEncryptionViewMixin):
     def _check_login_acl(self, user, ip):
         # ACL 限制用户登录
         from acls.models import LoginACL
-        is_allowed = LoginACL.allow_user_to_login(user, ip)
+        is_allowed, limit_type = LoginACL.allow_user_to_login(user, ip)
         if not is_allowed:
-            raise errors.LoginIPNotAllowed(username=user.username, request=self.request)
+            if limit_type == 'ip':
+                raise errors.LoginIPNotAllowed(username=user.username, request=self.request)
+            elif limit_type == 'time':
+                raise errors.TimePeriodNotAllowed(username=user.username, request=self.request)
 
     def set_login_failed_mark(self):
         ip = self.get_request_ip()

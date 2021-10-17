@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from .base import BaseACL, BaseACLQuerySet
 from common.utils import get_request_ip, get_ip_city
 from common.utils.ip import contains_ip
+from common.utils.time_period import contains_time_period
 
 
 class ACLManager(models.Manager):
@@ -26,7 +27,7 @@ class LoginACL(BaseACL):
         null=True, blank=True, related_name='login_acls'
     )
     # 规则
-    ip_group = models.JSONField(default=list, verbose_name=_('Login IP'))
+    rules = models.JSONField(default=dict, verbose_name=_('Rule'))
     # 动作
     action = models.CharField(
         max_length=64, verbose_name=_('Action'),
@@ -64,13 +65,20 @@ class LoginACL(BaseACL):
     def allow_user_to_login(user, ip):
         acl = LoginACL.filter_acl(user).exclude(action=LoginACL.ActionChoices.confirm).first()
         if not acl:
-            return True
-        is_contained = contains_ip(ip, acl.ip_group)
-        if acl.action_allow and is_contained:
-            return True
-        if acl.action_reject and not is_contained:
-            return True
-        return False
+            return True, ''
+        ip_group = acl.rules.get('ip_group')
+        time_periods = acl.rules.get('time_period')
+        is_contain_ip = contains_ip(ip, ip_group)
+        is_contain_time_period = contains_time_period(time_periods)
+        if (acl.action_allow and is_contain_ip and is_contain_time_period) or \
+                (acl.action_reject and not is_contain_ip and not is_contain_time_period):
+            return True, ''
+        if not (acl.action_allow and is_contain_ip) or \
+                not (not acl.action_reject and not is_contain_ip):
+            return False, 'ip'
+        if not (acl.action_allow and is_contain_time_period) or \
+                not (not acl.action_reject and not is_contain_time_period):
+            return False, 'time'
 
     @staticmethod
     def construct_confirm_ticket_meta(request=None):

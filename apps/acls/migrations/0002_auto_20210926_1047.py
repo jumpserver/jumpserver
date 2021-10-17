@@ -43,11 +43,25 @@ def migrate_login_confirm(apps, schema_editor):
                 'name': f'{user.name}-{login_confirm} ({date_created})',
                 'created_by': instance.created_by,
                 'action': LoginACL.ActionChoices.confirm,
-                'ip_group': [],
                 'users': {"username_group": []},
             }
             instance = login_acl_model.objects.create(**data)
             instance.reviewers.set(reviewers)
+
+
+def migrate_ip_group(apps, schema_editor):
+    login_acl_model = apps.get_model("acls", "LoginACL")
+    default_time_periods = [{'id': i, 'value': '00:00~00:00'} for i in range(7)]
+    updates = list()
+    with transaction.atomic():
+        for instance in login_acl_model.objects.exclude(action=LoginACL.ActionChoices.confirm):
+            instance.rules = {'ip_group': instance.ip_group}
+            if instance.action == LoginACL.ActionChoices.allow:
+                instance.rules.update({'time_period': default_time_periods})
+            elif instance.action == LoginACL.ActionChoices.reject:
+                instance.rules.update({'time_period': []})
+            updates.append(instance)
+        login_acl_model.objects.bulk_update(updates, ['rules', ])
 
 
 class Migration(migrations.Migration):
@@ -82,4 +96,14 @@ class Migration(migrations.Migration):
         ),
         migrations.RunPython(update_users),
         migrations.RunPython(migrate_login_confirm),
+        migrations.AddField(
+            model_name='loginacl',
+            name='rules',
+            field=models.JSONField(default=dict, verbose_name='Rule'),
+        ),
+        migrations.RunPython(migrate_ip_group),
+        migrations.RemoveField(
+            model_name='loginacl',
+            name='ip_group',
+        ),
     ]
