@@ -5,12 +5,14 @@ from django.core.validators import RegexValidator
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
+from users.models import User, UserGroup
+from perms.models import AssetPermission
 from ..models import Asset, Node, Platform, SystemUser
 
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',
     'ProtocolsField', 'PlatformSerializer',
-    'AssetTaskSerializer', 'AssetsTaskSerializer', 'ProtocolsField'
+    'AssetTaskSerializer', 'AssetsTaskSerializer', 'ProtocolsField',
 ]
 
 
