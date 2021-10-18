@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 import inspect
-from urllib.parse import urlencode
+from django.utils.http import urlencode
 from functools import partial
 import time
 
@@ -204,7 +204,7 @@ class AuthMixin(PasswordEncryptionViewMixin):
             data = request.POST
 
         items = ['username', 'password', 'challenge', 'public_key', 'auto_login']
-        username, password, challenge, public_key, auto_login = bulk_get(data, *items, default='')
+        username, password, challenge, public_key, auto_login = bulk_get(data, items, default='')
         ip = self.get_request_ip()
         self._set_partial_credential_error(username=username, ip=ip, request=request)
 

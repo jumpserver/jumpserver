@@ -275,7 +275,7 @@ class Time:
             last = timestamp
 
 
-def bulk_get(d, *keys, default=None):
+def bulk_get(d, keys, default=None):
     values = []
     for key in keys:
         values.append(d.get(key, default))
