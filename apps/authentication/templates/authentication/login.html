@@ -10,23 +10,15 @@
         {{ JMS_TITLE }}
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% include '_head_css_js.html' %}
     <!-- Stylesheets -->
-    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
-    <link href="{% static 'css/bootstrap-style.css' %}" rel="stylesheet">
     <link href="{% static 'css/login-style.css' %}" rel="stylesheet">
-    <link href="{% static 'css/style.css' %}" rel="stylesheet">
     <link href="{% static 'css/jumpserver.css' %}" rel="stylesheet">
-
-    <!-- scripts -->
-    <script src="{% static 'js/jquery-3.1.1.min.js' %}"></script>
-    <script src="{% static 'js/plugins/sweetalert/sweetalert.min.js' %}"></script>
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'js/plugins/datatables/datatables.min.js' %}"></script>
+    <script src="{% static "js/jumpserver.js" %}"></script>
 
     <style>
         .login-content {
-            box-shadow: 0 5px 5px -3px rgb(0 0 0 / 20%), 0 8px 10px 1px rgb(0 0 0 / 14%), 0 3px 14px 2px rgb(0 0 0 / 12%);
+            box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.15), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
         }
 
         .help-block {
@@ -49,15 +41,20 @@
         }
 
         .login-content {
-            height: 472px;
-            width: 984px;
+            height: 490px;
+            width: 1066px;
             margin-right: auto;
             margin-left: auto;
             margin-top: calc((100vh - 470px) / 3);
         }
+
         body {
             background-color: #f2f2f2;
             height: calc(100vh - (100vh - 470px) / 3);
+        }
+
+        .captcha {
+            float: right;
         }
 
         .right-image-box {
@@ -73,16 +70,8 @@
             width: 50%;
         }
 
-        .captcha {
-            float: right;
-        }
-
         .red-fonts {
             color: red;
-        }
-
-        .field-error {
-            text-align: left;
         }
 
         .form-group.has-error {
@@ -109,14 +98,6 @@
             padding-top: 10px;
         }
 
-        .radio, .checkbox {
-            margin: 0;
-        }
-
-        #github_star {
-            float: right;
-            margin: 10px 10px 0 0;
-        }
         .more-login-item {
             border-right: 1px dashed #dedede;
             padding-left: 5px;
@@ -127,11 +108,18 @@
             border: none;
         }
 
+        .select-con {
+            width: 22%;
+        }
+
+        .mfa-div {
+            width: 100%;
+        }
     </style>
 </head>
 
 <body>
-<div class="login-content ">
+<div class="login-content">
     <div class="right-image-box">
         <a href="{% if not XPACK_ENABLED %}https://github.com/jumpserver/jumpserver{% endif %}">
             <img src="{{ LOGIN_IMAGE_URL }}" style="height: 100%; width: 100%"/>
@@ -170,6 +158,10 @@
                     </div>
                     {% if form.challenge %}
                         {% bootstrap_field form.challenge show_label=False %}
+                    {% elif form.mfa_type %}
+                        <div class="form-group" style="display: flex">
+                        {% include '_mfa_otp_login.html' %}
+                        </div>
                     {% elif form.captcha %}
                         <div class="captch-field">
                             {% bootstrap_field form.captcha show_label=False %}
@@ -233,7 +225,7 @@
         var password = $('#password').val(); //明文密码
         var passwordEncrypted = encryptLoginPassword(password, rsaPublicKey)
         $('#password-hidden').val(passwordEncrypted); //返回给密码输入input
-        $('#login-form').submit();//post提交
+        $('#login-form').submit(); //post提交
     }
 
     $(document).ready(function () {
