@@ -1,5 +1,5 @@
 {% load i18n %}
-<select id="verify-method-select" name="mfa_type" class="form-control select-con" onchange="select_change(this.value)">
+<select id="verify-method-select" name="mfa_type" class="form-control select-con" onchange="selectChange(this.value)">
 {% for method in methods %}
     <option value="{{ method.name }}" {% if method.selected %} selected {% endif %} {% if not method.enable %} disabled {% endif %}>{{ method.label }}</option>
 {% endfor %}
@@ -11,10 +11,10 @@
 <script>
     var methodSelect = document.getElementById('verify-method-select');
     if (methodSelect.value !== null) {
-        select_change(methodSelect.value);
+        selectChange(methodSelect.value);
     }
 
-    function select_change(type) {
+    function selectChange(type) {
         var currentBtn = document.getElementById('send-sms-verify-code');
 
         if (type === "sms") {
