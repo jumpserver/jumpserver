@@ -200,15 +200,13 @@ class UserLoginView(mixins.AuthMixin, FormView):
                 {
                     'name': 'sms',
                     'label': _('SMS'),
-                    'enable': settings.SMS_ENABLED and settings.XPACK_ENABLED,
-                    'selected': False,
+                    'enable': settings.SMS_ENABLED and settings.XPACK_ENABLED
                 },
                 {
                     'name': 'otp',
                     'label': 'OTP',
-                    'enable': True,
-                    'selected': False,
-                },
+                    'enable': True
+                }
             ]
         }
 

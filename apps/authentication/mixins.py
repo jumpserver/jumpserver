@@ -19,6 +19,7 @@ from django.shortcuts import reverse, redirect
 from common.utils import get_object_or_none, get_request_ip, get_logger, bulk_get, FlashMessageUtil
 from users.models import User, MFAType
 from users.utils import LoginBlockUtil, MFABlockUtils
+from users.exceptions import MFANotEnabled
 from . import errors
 from .utils import rsa_decrypt, gen_key_pair
 from .signals import post_auth_success, post_auth_failed
@@ -397,21 +398,15 @@ class AuthMixin(PasswordEncryptionViewMixin):
     def check_user_mfa(self, code, mfa_type=MFAType.OTP, user=None):
         user = user if user else self.get_user_from_session()
         if not user.mfa_enabled:
-            raise errors.MFAUnsetError(user, self.request, '')
+            return True
+
+        if not (bool(user.otp_secret_key) and mfa_type == MFAType.OTP):
+            self.set_passwd_verify_on_session(user)
+            raise errors.OTPRequiredError(reverse_lazy('authentication:user-otp-enable-bind'))
 
         ip = self.get_request_ip()
         self.check_mfa_is_block(user.username, ip)
-
-        if mfa_type == MFAType.SMS_CODE:
-            ok = user.check_sms_code(code)
-        elif bool(user.otp_secret_key) and mfa_type == MFAType.OTP:
-            if settings.OTP_IN_RADIUS:
-                ok = user.check_radius(code)
-            else:
-                ok = user.check_otp(code)
-        else:
-            self.set_passwd_verify_on_session(user)
-            raise errors.OTPRequiredError(reverse_lazy('authentication:user-otp-enable-bind'))
+        ok = user.check_mfa(code, mfa_type=mfa_type)
 
         if ok:
             self.mark_mfa_ok()

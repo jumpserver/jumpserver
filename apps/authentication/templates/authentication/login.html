@@ -222,7 +222,6 @@
         var password = $('#password').val(); //明文密码
         var passwordEncrypted = encryptLoginPassword(password, rsaPublicKey)
         $('#password-hidden').val(passwordEncrypted); //返回给密码输入input
-
         if ($('#mfa-code').val() === '') {
             alert("{% trans 'Please enter the verification code' %}")
         } else {
