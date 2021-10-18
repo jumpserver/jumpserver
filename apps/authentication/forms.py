@@ -43,7 +43,7 @@ class UserLoginForm(forms.Form):
 
 
 class UserCheckOtpCodeForm(forms.Form):
-    code = forms.CharField(label=_('MFA Code'), max_length=6)
+    code = forms.CharField(label=_('MFA Code'), max_length=6, required=False)
     mfa_type = forms.CharField(label=_('MFA type'), max_length=6)
 
 
