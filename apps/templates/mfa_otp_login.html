@@ -1,13 +1,29 @@
 {% load i18n %}
 <select id="verify-method-select" name="mfa_type" class="form-control select-con" onchange="selectChange(this.value)">
-{% for method in methods %}
-    <option value="{{ method.name }}" {% if method.selected %} selected {% endif %} {% if not method.enable %} disabled {% endif %}>{{ method.label }}</option>
-{% endfor %}
+    {% for method in methods %}
+        <option value="{{ method.name }}" {% if method.selected %} selected {% endif %} {% if not method.enable %}
+                disabled {% endif %}>{{ method.label }}</option>
+    {% endfor %}
 </select>
-<input id="mfa-code" type="text" class="form-control" required name="code" placeholder="{% trans 'Please enter the verification code' %}">
-<button id='send-sms-verify-code' type="button" class="btn btn-info full-width" onclick="sendSMSVerifyCode()" style="width: 130px!important;margin-left: 10px!important;">{% trans 'Send verification code' %}</button>
+<div class="mfa-div">
+    <input id="mfa-code" type="text" class="form-control input-style" required name="code"
+           placeholder="{% trans 'Please enter the verification code' %}">
+    <button id='send-sms-verify-code' type="button" class="btn btn-info full-width" onclick="sendSMSVerifyCode()"
+            style="margin-left: 10px!important;height: 100%">{% trans 'Send verification code' %}</button>
+</div>
 
+<style type="text/css">
+    .input-style {
+        width: calc(100% - 114px);
+        display: inline-block;
+    }
 
+    #send-sms-verify-code {
+        width: 110px !important;
+        height: 100%;
+        vertical-align: top;
+    }
+</style>
 <script>
     var methodSelect = document.getElementById('verify-method-select');
     if (methodSelect.value !== null) {
@@ -15,14 +31,12 @@
     }
 
     function selectChange(type) {
-        var currentBtn = document.getElementById('send-sms-verify-code');
-
         if (type === "sms") {
-            currentBtn.style.display = "block";
-            currentBtn.disabled = false;
+            $("#mfa-code").css("cssText", "width: calc(100% - 114px)");
+            $("#send-sms-verify-code").css("cssText", "display: inline-block !important");
         } else {
-            currentBtn.style.display = "none";
-            currentBtn.disabled = true;
+            $("#mfa-code").css("cssText", "width: 100% !important");
+            $("#send-sms-verify-code").css("cssText", "display: none !important");
         }
     }
 
