@@ -204,7 +204,7 @@ class UserLoginView(mixins.AuthMixin, FormView):
                 },
                 {
                     'name': 'otp',
-                    'label': 'OTP',
+                    'label': 'MFA',
                     'enable': True
                 }
             ]

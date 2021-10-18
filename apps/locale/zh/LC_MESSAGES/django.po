@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-15 17:48+0800\n"
+"POT-Creation-Date: 2021-10-18 17:36+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -377,7 +377,7 @@ msgstr "目标URL"
 #: applications/serializers/attrs/application_type/vmware_client.py:30
 #: assets/models/base.py:177 audits/signals_handler.py:65
 #: authentication/forms.py:22
-#: authentication/templates/authentication/login.html:148
+#: authentication/templates/authentication/login.html:151
 #: settings/serializers/auth/ldap.py:44 users/forms/profile.py:21
 #: users/templates/users/user_otp_check_password.html:13
 #: users/templates/users/user_password_update.html:43
@@ -1619,15 +1619,15 @@ msgstr "来源 IP 不被允许登录"
 msgid "SSO auth closed"
 msgstr "SSO 认证关闭了"
 
-#: authentication/errors.py:299 authentication/mixins.py:335
+#: authentication/errors.py:299 authentication/mixins.py:338
 msgid "Your password is too simple, please change it for security"
 msgstr "你的密码过于简单，为了安全，请修改"
 
-#: authentication/errors.py:308 authentication/mixins.py:342
+#: authentication/errors.py:308 authentication/mixins.py:345
 msgid "You should to change your password before login"
 msgstr "登录完成前，请先修改密码"
 
-#: authentication/errors.py:317 authentication/mixins.py:349
+#: authentication/errors.py:317 authentication/mixins.py:352
 msgid "Your password has expired, please reset before logging in"
 msgstr "您的密码已过期，先修改再登录"
 
@@ -1661,7 +1661,7 @@ msgstr "多因子认证验证码"
 msgid "Dynamic code"
 msgstr "动态码"
 
-#: authentication/mixins.py:325
+#: authentication/mixins.py:328
 msgid "Please change your password"
 msgstr "请修改密码"
 
@@ -1813,38 +1813,26 @@ msgstr "确认"
 msgid "Code error"
 msgstr "代码错误"
 
-#: authentication/templates/authentication/login.html:140
+#: authentication/templates/authentication/login.html:143
 msgid "Welcome back, please enter username and password to login"
 msgstr "欢迎回来，请输入用户名和密码登录"
 
-#: authentication/templates/authentication/login.html:176
+#: authentication/templates/authentication/login.html:179
 #: users/templates/users/forgot_password.html:15
 #: users/templates/users/forgot_password.html:16
 msgid "Forgot password"
 msgstr "忘记密码"
 
-#: authentication/templates/authentication/login.html:183
+#: authentication/templates/authentication/login.html:186
 #: templates/_header_bar.html:83
 msgid "Login"
 msgstr "登录"
 
-#: authentication/templates/authentication/login.html:190
+#: authentication/templates/authentication/login.html:193
 msgid "More login options"
 msgstr "更多登录方式"
 
-#: authentication/templates/authentication/login.html:227
-#: authentication/templates/authentication/login_otp.html:23
-#: templates/mfa_otp_login.html:7
-msgid "Please enter the verification code"
-msgstr "请输入验证码"
-
-#: authentication/templates/authentication/login_otp.html:24
-#: authentication/templates/authentication/login_otp.html:73
-#: templates/mfa_otp_login.html:8 templates/mfa_otp_login.html:48
-msgid "Send verification code"
-msgstr "发送验证码"
-
-#: authentication/templates/authentication/login_otp.html:27
+#: authentication/templates/authentication/login_otp.html:19
 #: users/templates/users/user_otp_check_password.html:16
 #: users/templates/users/user_otp_enable_bind.html:24
 #: users/templates/users/user_otp_enable_install_app.html:29
@@ -1852,20 +1840,9 @@ msgstr "发送验证码"
 msgid "Next"
 msgstr "下一步"
 
-#: authentication/templates/authentication/login_otp.html:29
+#: authentication/templates/authentication/login_otp.html:21
 msgid "Can't provide security? Please contact the administrator!"
 msgstr "如果不能提供多因子认证验证码，请联系管理员!"
-
-#: authentication/templates/authentication/login_otp.html:66
-#: authentication/templates/authentication/login_otp.html:71
-#: templates/mfa_otp_login.html:41 templates/mfa_otp_login.html:46
-msgid "Wait: "
-msgstr "等待："
-
-#: authentication/templates/authentication/login_otp.html:79
-#: templates/mfa_otp_login.html:54
-msgid "The verification code has been sent"
-msgstr "验证码已发送"
 
 #: authentication/templates/authentication/login_wait_confirm.html:41
 msgid "Refresh"
@@ -1996,7 +1973,7 @@ msgstr "飞书"
 msgid "SMS"
 msgstr "短信"
 
-#: authentication/views/login.py:293
+#: authentication/views/login.py:291
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -2004,21 +1981,17 @@ msgstr ""
 "等待 <b>{}</b> 确认, 你也可以复制链接发给他/她 <br/>\n"
 "                  不要关闭本页面"
 
-#: authentication/views/login.py:298
+#: authentication/views/login.py:296
 msgid "No ticket found"
 msgstr "没有发现工单"
 
-#: authentication/views/login.py:330
+#: authentication/views/login.py:328
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: authentication/views/login.py:331
+#: authentication/views/login.py:329
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
-
-#: authentication/views/mfa.py:44 users/models/user.py:36
-msgid "One-time password"
-msgstr "一次性密码"
 
 #: authentication/views/wecom.py:41
 msgid "WeCom Error, Please contact your system administrator"
@@ -3890,6 +3863,30 @@ msgstr ""
 "\"%(user_pubkey_update)s\"> 链接 </a> 更新\n"
 "        "
 
+#: templates/_mfa_otp_login.html:14
+msgid "Please enter verification code"
+msgstr "请输入验证码"
+
+#: templates/_mfa_otp_login.html:16 templates/_mfa_otp_login.html:67
+msgid "Send verification code"
+msgstr "发送验证码"
+
+#: templates/_mfa_otp_login.html:37
+msgid "Please enter MFA code"
+msgstr "请输入6位动态安全码"
+
+#: templates/_mfa_otp_login.html:38
+msgid "Please enter SMS code"
+msgstr "请输入短信验证码"
+
+#: templates/_mfa_otp_login.html:60 templates/_mfa_otp_login.html:65
+msgid "Wait: "
+msgstr "等待："
+
+#: templates/_mfa_otp_login.html:73
+msgid "The verification code has been sent"
+msgstr "验证码已发送"
+
 #: templates/_nav.html:7
 msgid "Dashboard"
 msgstr "仪表盘"
@@ -5128,6 +5125,10 @@ msgstr "SSH密钥不合法"
 #: users/templates/users/user_password_update.html:48
 msgid "Public key"
 msgstr "SSH公钥"
+
+#: users/models/user.py:36
+msgid "One-time password"
+msgstr "一次性密码"
 
 #: users/models/user.py:37
 msgid "SMS verify code"

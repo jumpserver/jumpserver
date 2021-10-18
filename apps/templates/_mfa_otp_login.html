@@ -1,14 +1,18 @@
 {% load i18n %}
-<select id="verify-method-select" name="mfa_type" class="form-control select-con" onchange="selectChange(this.value)">
+<select id="verify-method-select" name="mfa_type" class="form-control select-con" style="border-right: none" onchange="selectChange(this.value)">
     {% for method in methods %}
-        <option value="{{ method.name }}" {% if method.selected %} selected {% endif %} {% if not method.enable %}
-                disabled {% endif %}>{{ method.label }}</option>
+        <option value="{{ method.name }}"
+                {% if method.selected %} selected {% endif %}
+{#                {% if not method.enable %} disabled {% endif %}#}
+        >
+            {{ method.label }}
+        </option>
     {% endfor %}
 </select>
 <div class="mfa-div">
     <input id="mfa-code" type="text" class="form-control input-style" required name="code"
-           placeholder="{% trans 'Please enter the verification code' %}">
-    <button id='send-sms-verify-code' type="button" class="btn btn-info full-width" onclick="sendSMSVerifyCode()"
+           placeholder="{% trans 'Please enter verification code' %}">
+    <button id='send-sms-verify-code' type="button" class="btn btn-primary full-width" onclick="sendSMSVerifyCode()"
             style="margin-left: 10px!important;height: 100%">{% trans 'Send verification code' %}</button>
 </div>
 
@@ -29,13 +33,14 @@
     if (methodSelect.value !== null) {
         selectChange(methodSelect.value);
     }
-
     function selectChange(type) {
+        var otpPlaceholder = '{% trans 'Please enter OTP code'  %}';
+        var smsPlaceholder = '{% trans 'Please enter SMS code'  %}';
         if (type === "sms") {
-            $("#mfa-code").css("cssText", "width: calc(100% - 114px)");
+            $("#mfa-code").css("cssText", "width: calc(100% - 114px)").attr('placeholder', smsPlaceholder);
             $("#send-sms-verify-code").css("cssText", "display: inline-block !important");
         } else {
-            $("#mfa-code").css("cssText", "width: 100% !important");
+            $("#mfa-code").css("cssText", "width: 100% !important").attr('placeholder', otpPlaceholder);
             $("#send-sms-verify-code").css("cssText", "display: none !important");
         }
     }

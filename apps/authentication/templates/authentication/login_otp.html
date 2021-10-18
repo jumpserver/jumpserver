@@ -13,7 +13,7 @@
             <p class="red-fonts">{{ form.code.errors.as_text }}</p>
         {% endif %}
         <div class="form-group">
-            {% include 'mfa_otp_login.html' %}
+            {% include '_mfa_otp_login.html' %}
         </div>
         <button id='submit_button' type="submit"
                 class="btn btn-primary block full-width m-b">{% trans 'Next' %}</button>
