@@ -1,6 +1,6 @@
 from django.http.response import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
-from django.utils.http import urlencode
+from urllib.parse import urlencode
 from django.views import View
 from django.conf import settings
 from django.http.request import HttpRequest
