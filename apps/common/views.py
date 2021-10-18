@@ -28,8 +28,8 @@ class FlashMessageMsgView(TemplateView):
         has_cancel = message_data.get('has_cancel', False)
         context = {
             'title': title,
-            'messages': msg,
-            'errors': error,
+            'message': msg,
+            'error': error,
             'interval': interval,
             'redirect_url': redirect_url,
             'auto_redirect': auto_redirect,

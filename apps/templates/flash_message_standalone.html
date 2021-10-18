@@ -7,13 +7,13 @@
 {% block content %}
     <div>
         <p>
-            {% if errors %}
+            {% if error %}
             <div class="alert alert-danger" id="messages">
-                {{ errors }}
+                {{ error }}
             </div>
             {% else %}
             <div class="alert alert-success" id="messages">
-                {{ messages|safe }}
+                {{ message|safe }}
             </div>
             {% endif %}
         </p>
@@ -41,16 +41,18 @@
 
 {% block custom_foot_js %}
 <script>
+    var message = ''
     var time = '{{ interval }}'
-    var messages = '{{ messages|safe }}'
-    var errors = '{{ errors }}'
-    if (errors) {
-        messages = errors
-    }
+
+    {% if error %}
+        message = '{{ error }}'
+    {% else %}
+        message = '{{ message|safe }}'
+    {% endif %}
 
     function redirect_page() {
         if (time >= 0) {
-            var msg = messages + '， <b>' + time + '</b> ...';
+            var msg = message + '， <b>' + time + '</b> ...';
             $('#messages').html(msg);
             time--;
             setTimeout(redirect_page, 1000);
