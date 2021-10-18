@@ -216,11 +216,13 @@ class AuthMixin(PasswordEncryptionViewMixin):
 
     def _check_only_allow_exists_user_auth(self, username):
         # 仅允许预先存在的用户认证
-        if settings.ONLY_ALLOW_EXIST_USER_AUTH:
-            exist = User.objects.filter(username=username).exists()
-            if not exist:
-                logger.error(f"Only allow exist user auth, login failed: {username}")
-                self.raise_credential_error(errors.reason_user_not_exist)
+        if not settings.ONLY_ALLOW_EXIST_USER_AUTH:
+            return
+
+        exist = User.objects.filter(username=username).exists()
+        if not exist:
+            logger.error(f"Only allow exist user auth, login failed: {username}")
+            self.raise_credential_error(errors.reason_user_not_exist)
 
     def _check_auth_user_is_valid(self, username, password, public_key):
         user = authenticate(self.request, username=username, password=password, public_key=public_key)
@@ -232,7 +234,7 @@ class AuthMixin(PasswordEncryptionViewMixin):
             self.raise_credential_error(errors.reason_user_inactive)
         return user
 
-    def _check_login_user_mfa(self, user):
+    def _check_login_mfa_login_if_need(self, user):
         request = self.request
         if hasattr(request, 'data'):
             data = request.data
@@ -267,8 +269,7 @@ class AuthMixin(PasswordEncryptionViewMixin):
 
     def check_user_auth(self, decrypt_passwd=False):
         self.check_is_block()
-        request = self.request
-        username, password, public_key, ip, auto_login = self.get_auth_data(decrypt_passwd=decrypt_passwd)
+        username, password, public_key, ip, auto_login = self.get_auth_data(decrypt_passwd)
 
         self._check_only_allow_exists_user_auth(username)
         user = self._check_auth_user_is_valid(username, password, public_key)
@@ -278,10 +279,11 @@ class AuthMixin(PasswordEncryptionViewMixin):
         self._check_passwd_is_too_simple(user, password)
         self._check_passwd_need_update(user)
 
-        # 校验login-mfa
-        self._check_login_user_mfa(user)
+        # 校验login-mfa, 如果登录页面上显示 mfa 的话
+        self._check_login_mfa_login_if_need(user)
 
         LoginBlockUtil(username, ip).clean_failed_count()
+        request = self.request
         request.session['auth_password'] = 1
         request.session['user_id'] = str(user.id)
         request.session['auto_login'] = auto_login
@@ -363,12 +365,11 @@ class AuthMixin(PasswordEncryptionViewMixin):
     def check_user_mfa_if_need(self, user):
         if self.request.session.get('auth_mfa'):
             return
-
         if settings.OTP_IN_RADIUS:
             return
-
         if not user.mfa_enabled:
             return
+
         unset, url = user.mfa_enabled_but_not_set()
         if unset:
             raise errors.MFAUnsetError(user, self.request, url)
@@ -387,13 +388,15 @@ class AuthMixin(PasswordEncryptionViewMixin):
         self.request.session['auth_mfa_type'] = ''
 
     def check_mfa_is_block(self, username, ip, raise_exception=True):
-        if MFABlockUtils(username, ip).is_block():
-            logger.warn('Ip was blocked' + ': ' + username + ':' + ip)
-            exception = errors.BlockMFAError(username=username, request=self.request, ip=ip)
-            if raise_exception:
-                raise exception
-            else:
-                return exception
+        blocked = MFABlockUtils(username, ip).is_block()
+        if not blocked:
+            return
+        logger.warn('Ip was blocked' + ': ' + username + ':' + ip)
+        exception = errors.BlockMFAError(username=username, request=self.request, ip=ip)
+        if raise_exception:
+            raise exception
+        else:
+            return exception
 
     def check_user_mfa(self, code, mfa_type=MFAType.OTP, user=None):
         user = user if user else self.get_user_from_session()
