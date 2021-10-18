@@ -1,9 +1,9 @@
 {% load i18n %}
-<select id="verify-method-select" name="mfa_type" class="form-control select-con" style="border-right: none" onchange="selectChange(this.value)">
+<select id="verify-method-select" name="mfa_type" class="form-control select-con" onchange="selectChange(this.value)">
     {% for method in methods %}
         <option value="{{ method.name }}"
                 {% if method.selected %} selected {% endif %}
-{#                {% if not method.enable %} disabled {% endif %}#}
+                {% if not method.enable %} disabled {% endif %}
         >
             {{ method.label }}
         </option>
@@ -34,7 +34,7 @@
         selectChange(methodSelect.value);
     }
     function selectChange(type) {
-        var otpPlaceholder = '{% trans 'Please enter OTP code'  %}';
+        var otpPlaceholder = '{% trans 'Please enter MFA code'  %}';
         var smsPlaceholder = '{% trans 'Please enter SMS code'  %}';
         if (type === "sms") {
             $("#mfa-code").css("cssText", "width: calc(100% - 114px)").attr('placeholder', smsPlaceholder);

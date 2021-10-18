@@ -37,26 +37,6 @@ class UserLoginOtpView(mixins.AuthMixin, FormView):
 
     def get_context_data(self, **kwargs):
         user = self.get_user_from_session()
-        context = {
-            'methods': [
-                {
-                    'name': 'otp',
-                    'label': 'OTP',
-                    'enable': bool(user.otp_secret_key),
-                    'selected': False,
-                },
-                {
-                    'name': 'sms',
-                    'label': _('SMS'),
-                    'enable': bool(user.phone) and settings.SMS_ENABLED and settings.XPACK_ENABLED,
-                    'selected': False,
-                },
-            ]
-        }
-
-        for item in context['methods']:
-            if item['enable']:
-                item['selected'] = True
-                break
-        context.update(kwargs)
-        return context
+        methods = self.get_user_mfa_methods(user)
+        kwargs.update({'methods': methods})
+        return kwargs

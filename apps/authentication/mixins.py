@@ -209,9 +209,9 @@ class AuthMixin(PasswordEncryptionViewMixin):
         ip = self.get_request_ip()
         self._set_partial_credential_error(username=username, ip=ip, request=request)
 
-        password = password + challenge.strip()
         if decrypt_passwd:
             password = self.get_decrypted_password()
+        password = password + challenge.strip()
         return username, password, public_key, ip, auto_login
 
     def _check_only_allow_exists_user_auth(self, username):
@@ -494,3 +494,31 @@ class AuthMixin(PasswordEncryptionViewMixin):
         if args:
             guard_url = "%s?%s" % (guard_url, args)
         return redirect(guard_url)
+
+    @staticmethod
+    def get_user_mfa_methods(user=None):
+        otp_enabled = user.otp_secret_key if user else True
+        # 没有用户时，或者有用户并且有电话配置
+        sms_enabled = any([user and user.phone, not user]) \
+            and settings.SMS_ENABLED and settings.XPACK_ENABLED
+
+        methods = [
+            {
+                'name': 'otp',
+                'label': 'MFA',
+                'enable': otp_enabled,
+                'selected': False,
+            },
+            {
+                'name': 'sms',
+                'label': _('SMS'),
+                'enable': sms_enabled,
+                'selected': False,
+            },
+        ]
+
+        for item in methods:
+            if item['enable']:
+                item['selected'] = True
+                break
+        return methods

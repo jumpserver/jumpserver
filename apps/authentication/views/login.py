@@ -194,36 +194,14 @@ class UserLoginView(mixins.AuthMixin, FormView):
             forgot_password_url = settings.FORGOT_PASSWORD_URL
         return forgot_password_url
 
-    def get_mfa_methods(self):
-        context = {
-            'methods': [
-                {
-                    'name': 'sms',
-                    'label': _('SMS'),
-                    'enable': settings.SMS_ENABLED and settings.XPACK_ENABLED
-                },
-                {
-                    'name': 'otp',
-                    'label': 'MFA',
-                    'enable': True
-                }
-            ]
-        }
-
-        for item in context['methods']:
-            if item['enable']:
-                item['selected'] = True
-                break
-        return context
-
     def get_context_data(self, **kwargs):
         context = {
             'demo_mode': os.environ.get("DEMO_MODE"),
             'auth_methods': self.get_support_auth_methods(),
-            'forgot_password_url': self.get_forgot_password_url()
+            'forgot_password_url': self.get_forgot_password_url(),
+            'methods': self.get_user_mfa_methods(),
         }
         kwargs.update(context)
-        kwargs.update(self.get_mfa_methods())
         return super().get_context_data(**kwargs)
 
 
