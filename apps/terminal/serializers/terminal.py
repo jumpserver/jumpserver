@@ -39,7 +39,10 @@ class TerminalSerializer(BulkModelSerializer):
     session_online = serializers.ReadOnlyField(source='get_online_session_count')
     is_alive = serializers.BooleanField(read_only=True)
     is_active = serializers.BooleanField(read_only=True, label='Is active')
-    status = serializers.ChoiceField(read_only=True, choices=const.ComponentStatusChoices.choices, source='latest_status')
+    status = serializers.ChoiceField(
+        read_only=True, choices=const.ComponentStatusChoices.choices,
+        source='latest_status', label=_('Load status')
+    )
     status_display = serializers.CharField(read_only=True, source='latest_status_display')
     stat = StatusSerializer(read_only=True, source='latest_stat')
 
