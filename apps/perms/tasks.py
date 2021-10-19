@@ -7,14 +7,13 @@ from django.db.transaction import atomic
 from django.conf import settings
 from celery import shared_task
 
-from users.models import User
 from orgs.utils import tmp_to_root_org
 from common.utils import get_logger
 from common.utils.timezone import now, dt_formater, dt_parser
 from ops.celery.decorator import register_as_period_task
 from perms.notifications import (
-    AssetPermWillExpireMsg, AssetPermWillExpireForOrgAdminMsg, AssetPermWillExpireForAdminMsg,
-    AppPermWillExpireMsg, AppPermWillExpireForOrgAdminMsg, AppPermWillExpireForAdminMsg,
+    AssetPermWillExpireUserMsg, AssetPermWillExpireForOrgAdminMsg,
+    AppPermWillExpireUserMsg, AppPermWillExpireForOrgAdminMsg
 )
 from perms.models import AssetPermission, ApplicationPermission
 from perms.utils.asset.user_permission import UserGrantedTreeRefreshController
@@ -68,7 +67,8 @@ def check_asset_permission_will_expired():
     org_perm_mapper = defaultdict(set)
 
     asset_perms = AssetPermission.objects.filter(
-        date_expired__gte=start, date_expired__lte=end
+        date_expired__gte=start,
+        date_expired__lte=end
     ).distinct()
 
     for asset_perm in asset_perms:
@@ -83,16 +83,10 @@ def check_asset_permission_will_expired():
             user_asset_mapper[u].update(assets)
 
     for user, assets in user_asset_mapper.items():
-        AssetPermWillExpireMsg(user, assets).publish_async()
-
-    admins = User.objects.filter(role=User.ROLE.ADMIN)
-
-    if org_perm_mapper:
-        for admin in admins:
-            AssetPermWillExpireForAdminMsg(admin, org_perm_mapper).publish_async()
+        AssetPermWillExpireUserMsg(user, assets).publish_async()
 
     for org, perms in org_perm_mapper.items():
-        org_admins = org.admins.exclude(role=User.ROLE.ADMIN)
+        org_admins = org.admins.all()
         for org_admin in org_admins:
             AssetPermWillExpireForOrgAdminMsg(org_admin, perms, org).publish_async()
 
@@ -106,7 +100,8 @@ def check_app_permission_will_expired():
     end = start + timedelta(days=3)
 
     app_perms = ApplicationPermission.objects.filter(
-        date_expired__gte=start, date_expired__lte=end
+        date_expired__gte=start,
+        date_expired__lte=end
     ).distinct()
 
     user_app_mapper = defaultdict(set)
@@ -121,15 +116,9 @@ def check_app_permission_will_expired():
             user_app_mapper[u].update(apps)
 
     for user, apps in user_app_mapper.items():
-        AppPermWillExpireMsg(user, apps).publish_async()
-
-    admins = User.objects.filter(role=User.ROLE.ADMIN)
-
-    if org_perm_mapper:
-        for admin in admins:
-            AppPermWillExpireForAdminMsg(admin, org_perm_mapper).publish_async()
+        AppPermWillExpireUserMsg(user, apps).publish_async()
 
     for org, perms in org_perm_mapper.items():
-        org_admins = org.admins.exclude(role=User.ROLE.ADMIN)
+        org_admins = org.admins.all()
         for org_admin in org_admins:
             AppPermWillExpireForOrgAdminMsg(org_admin, perms, org).publish_async()

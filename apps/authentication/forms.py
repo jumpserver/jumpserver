@@ -43,7 +43,7 @@ class UserLoginForm(forms.Form):
 
 
 class UserCheckOtpCodeForm(forms.Form):
-    code = forms.CharField(label=_('MFA Code'), max_length=6)
+    code = forms.CharField(label=_('MFA Code'), max_length=6, required=False)
     mfa_type = forms.CharField(label=_('MFA type'), max_length=6)
 
 
@@ -59,7 +59,7 @@ class ChallengeMixin(forms.Form):
     challenge = forms.CharField(
         label=_('MFA code'), max_length=6, required=False,
         widget=forms.TextInput(attrs={
-            'placeholder': _("MFA code"),
+            'placeholder': _("Dynamic code"),
             'style': 'width: 50%'
         })
     )
@@ -69,6 +69,8 @@ def get_user_login_form_cls(*, captcha=False):
     bases = []
     if settings.SECURITY_LOGIN_CHALLENGE_ENABLED:
         bases.append(ChallengeMixin)
+    elif settings.SECURITY_MFA_IN_LOGIN_PAGE:
+        bases.append(UserCheckOtpCodeForm)
     elif settings.SECURITY_LOGIN_CAPTCHA_ENABLED and captcha:
         bases.append(CaptchaMixin)
     bases.append(UserLoginForm)

@@ -1,9 +1,9 @@
 from typing import Iterable
 import traceback
 from itertools import chain
-import time
 
 from celery import shared_task
+from bs4 import BeautifulSoup
 from django.utils.translation import gettext_lazy as _
 
 from common.utils.timezone import now
@@ -80,31 +80,44 @@ class Message(metaclass=MessageType):
                     continue
 
                 get_msg_method = getattr(self, f'get_{backend}_msg', self.get_common_msg)
-
                 try:
                     msg = get_msg_method()
                 except NotImplementedError:
                     continue
 
                 client = backend.client()
-
                 client.send_msg(users, **msg)
-            except:
+            except Exception:
                 traceback.print_exc()
 
-    def send_test_msg(self):
+    def send_test_msg(self, ding=True):
         from users.models import User
         users = User.objects.filter(username='admin')
-        self.send_msg(users, [])
+        backends = []
+        if ding:
+            backends.append(BACKEND.DINGTALK)
+        self.send_msg(users, backends)
 
-    def get_common_msg(self) -> dict:
-        raise NotImplementedError
-
-    def get_text_msg(self) -> dict:
-        return self.common_msg
+    @staticmethod
+    def get_common_msg() -> dict:
+        return {
+            'subject': '',
+            'message': ''
+        }
 
     def get_html_msg(self) -> dict:
-        return self.common_msg
+        return self.get_common_msg()
+
+    def get_text_msg(self) -> dict:
+        msg = self.get_html_msg()
+        content = msg['message']
+        content = content.replace('\n', '')
+
+        soup = BeautifulSoup(content, features="lxml")
+        for ele in soup.find_all(["br"]):
+            ele.append('\n')
+        msg['message'] = soup.get_text()
+        return msg
 
     @lazyproperty
     def common_msg(self) -> dict:
@@ -123,7 +136,7 @@ class Message(metaclass=MessageType):
     def get_dingtalk_msg(self) -> dict:
         # 钉钉相同的消息一天只能发一次，所以给所有消息添加基于时间的序号，使他们不相同
         message = self.text_msg['message']
-        suffix = _('\nTime: {}').format(now())
+        suffix = '\n{}: {}'.format(_('Time'),  now().strftime('%Y-%m-%d %H:%M:%S'))
 
         return {
             'subject': self.text_msg['subject'],
@@ -161,7 +174,6 @@ class SystemMessage(Message):
             *subscription.users.all(),
             *chain(*[g.users.all() for g in subscription.groups.all()])
         ]
-
         self.send_msg(users, receive_backends)
 
     @classmethod
@@ -179,7 +191,5 @@ class UserMessage(Message):
         """
         发送消息到每个用户配置的接收方式上
         """
-
         sub = UserMsgSubscription.objects.get(user=self.user)
-
         self.send_msg([self.user], sub.receive_backends)

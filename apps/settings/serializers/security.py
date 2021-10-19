@@ -70,13 +70,39 @@ class SecurityAuthSerializer(serializers.Serializer):
         help_text=_("Only log in from the user source property")
     )
     SECURITY_MFA_VERIFY_TTL = serializers.IntegerField(
-        min_value=5, max_value=60*60*10,
-        label=_("MFA verify TTL"), help_text=_("Unit: second"),
+        min_value=5, max_value=60 * 60 * 10,
+        label=_("MFA verify TTL"),
+        help_text=_("Unit: second, The verification MFA takes effect only when you view the account password"),
+    )
+    SECURITY_LOGIN_CHALLENGE_ENABLED = serializers.BooleanField(
+        required=False, default=False,
+        label=_("Enable Login dynamic code"),
+        help_text=_("The password and additional code are sent to a third party "
+                    "authentication system for verification")
+    )
+    SECURITY_MFA_IN_LOGIN_PAGE = serializers.BooleanField(
+        required=False, default=False,
+        label=_("MFA in login page"),
+        help_text=_("Eu security regulations(GDPR) require MFA to be on the login page")
     )
     SECURITY_LOGIN_CAPTCHA_ENABLED = serializers.BooleanField(
-        required=False, default=True,
-        label=_("Enable Login captcha")
+        required=False, default=False, label=_("Enable Login captcha"),
+        help_text=_("Enable captcha to prevent robot authentication")
     )
+
+    def validate(self, attrs):
+        if attrs.get('SECURITY_MFA_AUTH') != 1:
+            attrs['SECURITY_MFA_IN_LOGIN_PAGE'] = False
+        return attrs
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if data['SECURITY_LOGIN_CHALLENGE_ENABLED']:
+            data['SECURITY_MFA_IN_LOGIN_PAGE'] = False
+            data['SECURITY_LOGIN_CAPTCHA_ENABLED'] = False
+        elif data['SECURITY_MFA_IN_LOGIN_PAGE']:
+            data['SECURITY_LOGIN_CAPTCHA_ENABLED'] = False
+        return data
 
 
 class SecuritySettingSerializer(SecurityPasswordRuleSerializer, SecurityAuthSerializer):
@@ -118,4 +144,3 @@ class SecuritySettingSerializer(SecurityPasswordRuleSerializer, SecurityAuthSeri
         required=False, label=_('Login Confirm'),
         help_text=_("Enabled, please go to the user detail add approver")
     )
-

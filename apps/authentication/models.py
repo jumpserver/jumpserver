@@ -1,7 +1,7 @@
 import uuid
 
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _, ugettext as __
+from django.utils.translation import ugettext_lazy as _
 from rest_framework.authtoken.models import Token
 from django.conf import settings
 

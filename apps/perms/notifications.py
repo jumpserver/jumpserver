@@ -1,56 +1,41 @@
-from datetime import datetime
-from urllib.parse import urljoin
+import textwrap
 
 from django.utils.translation import ugettext as _
-from django.conf import settings
 
-from common.utils import reverse, get_request_ip_or_data, get_request_user_agent, lazyproperty
-from notifications.notifications import UserMessage, SystemMessage
+from common.utils import reverse as js_reverse
+from notifications.notifications import UserMessage
 
 
-class AssetPermWillExpireMsg(UserMessage):
+class BasePermMsg(UserMessage):
+    @staticmethod
+    def get_admin_content_template():
+        message = textwrap.dedent(_("""
+        Hello <b>%(name)s:<b><br>
+        The following <b>%(item_type)s</b> will expire in 3 days
+        <br><br>
+        %(items)s
+        """)).strip()
+        return message
+
+    def get_user_content_template(self):
+        message = self.get_admin_content_template()
+        message += _('<br>If you have any question, please contact the administrator')
+        return message
+
+
+class AssetPermWillExpireUserMsg(BasePermMsg):
     def __init__(self, user, assets):
         super().__init__(user)
         self.assets = assets
 
     def get_html_msg(self) -> dict:
-        user = self.user
-        subject = _('Assets may expire')
-
-        assets_text = ','.join(str(asset) for asset in self.assets)
-        message = _("""
-            Hello %(name)s:
-            <br>
-            Your permissions for the following assets may expire in three days:
-            <br>
-            %(assets)s
-            <br>
-            Please contact the administrator
-        """) % {
-            'name': user.name,
-            'assets': assets_text
-        }
-        return {
-            'subject': subject,
-            'message': message
-        }
-
-    def get_text_msg(self) -> dict:
-        user = self.user
-        subject = _('Assets may expire')
-        assets_text = ','.join(str(asset) for asset in self.assets)
-
-        message = _("""
-Hello %(name)s:
-\n
-Your permissions for the following assets may expire in three days:
-\n
-%(assets)s
-\n
-Please contact the administrator
-        """) % {
-            'name': user.name,
-            'assets': assets_text
+        assets_text = '<br>'.join(str(asset) for asset in self.assets)
+        subject = _("You permed assets is about to expire")
+        template = self.get_user_content_template()
+        message = template % {
+            'name': self.user.name,
+            'items': assets_text,
+            'item_type': _("permed assets")
         }
         return {
             'subject': subject,
@@ -58,48 +43,33 @@ Please contact the administrator
         }
 
 
-class AssetPermWillExpireForOrgAdminMsg(UserMessage):
+class AssetPermWillExpireForOrgAdminMsg(BasePermMsg):
     def __init__(self, user, perms, org):
         super().__init__(user)
         self.perms = perms
         self.org = org
 
-    def get_html_msg(self) -> dict:
-        user = self.user
-        subject = _('Asset permission will expired')
-        perms_text = ','.join(str(perm) for perm in self.perms)
+    def get_item_html(self):
+        content = []
+        item_template = '<a href={}>{}</a>'
+        for perm in self.perms:
+            url = js_reverse(
+                'perms:asset-permission-detail',
+                kwargs={'pk': perm.id}, external=True,
+                api_to_ui=True
+            ) + f'?oid={perm.org_id}'
+            content.append(item_template.format(url, str(perm)))
+        perms_text = '<br>'.join(content)
+        return perms_text
 
-        message = _("""
-            Hello %(name)s:
-            <br>
-            The following asset permissions of organization %(org) will expire in three days
-            <br>
-            %(perms)s
-        """) % {
-            'name': user.name,
-            'org': self.org,
-            'perms': perms_text
-        }
-        return {
-            'subject': subject,
-            'message': message
-        }
-
-    def get_text_msg(self) -> dict:
-        user = self.user
-        subject = _('Asset permission will expired')
-        perms_text = ','.join(str(perm) for perm in self.perms)
-
-        message = _("""
-Hello %(name)s:
-\n
-The following asset permissions of organization %(org) will expire in three days
-\n
-%(perms)s
-        """) % {
-            'name': user.name,
-            'org': self.org,
-            'perms': perms_text
+    def get_html_msg(self):
+        perms_html = self.get_item_html()
+        subject = _("Asset permissions is about to expire")
+        template = self.get_admin_content_template()
+        message = template % {
+            'name': self.user.name,
+            'items': perms_html,
+            'item_type': _('asset permissions of organization {}').format(self.org)
         }
         return {
             'subject': subject,
@@ -107,101 +77,19 @@ The following asset permissions of organization %(org) will expire in three days
         }
 
 
-class AssetPermWillExpireForAdminMsg(UserMessage):
-    def __init__(self, user, org_perm_mapper: dict):
-        super().__init__(user)
-        self.org_perm_mapper = org_perm_mapper
-
-    def get_html_msg(self) -> dict:
-        user = self.user
-        subject = _('Asset permission will expired')
-
-        content = ''
-        for org, perms in self.org_perm_mapper.items():
-            content += f'<br> Orgnization: {org} <br> Permissions: {",".join(str(perm) for perm in perms)} <br>'
-
-        message = _("""
-            Hello %(name)s:
-            <br>
-            The following asset permissions will expire in three days
-            <br>
-            %(content)s
-        """) % {
-            'name': user.name,
-            'content': content,
-        }
-        return {
-            'subject': subject,
-            'message': message
-        }
-
-    def get_text_msg(self) -> dict:
-        user = self.user
-        subject = _('Asset permission will expired')
-
-        content = ''
-        for org, perms in self.org_perm_mapper.items():
-            content += f'\n Orgnization: {org} \n Permissions: {perms} \n'
-
-        message = _("""
-Hello %(name)s:
-\n
-The following asset permissions of organization %(org) will expire in three days
-\n
-%(content)s
-        """) % {
-            'name': user.name,
-            'content': content,
-        }
-        return {
-            'subject': subject,
-            'message': message
-        }
-
-
-class AppPermWillExpireMsg(UserMessage):
+class AppPermWillExpireUserMsg(BasePermMsg):
     def __init__(self, user, apps):
         super().__init__(user)
         self.apps = apps
 
     def get_html_msg(self) -> dict:
-        user = self.user
-        subject = _('Applications may expire')
-
-        apps_text = ','.join(str(app) for app in self.apps)
-        message = _("""
-            Hello %(name)s:
-            <br>
-            Your permissions for the following applications may expire in three days:
-            <br>
-            %(apps)s
-            <br>
-            Please contact the administrator
-        """) % {
-            'name': user.name,
-            'apps': apps_text
-        }
-        return {
-            'subject': subject,
-            'message': message
-        }
-
-    def get_text_msg(self) -> dict:
-        user = self.user
-        subject = _('Applications may expire')
-        apps_text = ','.join(str(app) for app in self.apps)
-
-        message = _("""
-Hello %(name)s:
-\n
-Your permissions for the following applications may expire in three days:
-\n
-%(apps)s
-\n
-Please contact the administrator
-        """) % {
-            'name': user.name,
-            'apps': apps_text
+        apps_text = '<br>'.join(str(app) for app in self.apps)
+        subject = _("Your permed applications is about to expire")
+        template = self.get_user_content_template()
+        message = template % {
+            'name': self.user.name,
+            'item_type': _('permed applications'),
+            'items': apps_text
         }
         return {
             'subject': subject,
@@ -209,100 +97,34 @@ Please contact the administrator
         }
 
 
-class AppPermWillExpireForOrgAdminMsg(UserMessage):
+class AppPermWillExpireForOrgAdminMsg(BasePermMsg):
     def __init__(self, user, perms, org):
         super().__init__(user)
         self.perms = perms
         self.org = org
 
-    def get_html_msg(self) -> dict:
-        user = self.user
-        subject = _('Application permission will expired')
-        perms_text = ','.join(str(perm) for perm in self.perms)
-
-        message = _("""
-            Hello %(name)s:
-            <br>
-            The following application permissions of organization %(org) will expire in three days
-            <br>
-            %(perms)s
-        """) % {
-            'name': user.name,
-            'org': self.org,
-            'perms': perms_text
-        }
-        return {
-            'subject': subject,
-            'message': message
-        }
-
-    def get_text_msg(self) -> dict:
-        user = self.user
-        subject = _('Application permission will expired')
-        perms_text = ','.join(str(perm) for perm in self.perms)
-
-        message = _("""
-Hello %(name)s:
-\n
-The following application permissions of organization %(org) will expire in three days
-\n
-%(perms)s
-        """) % {
-            'name': user.name,
-            'org': self.org,
-            'perms': perms_text
-        }
-        return {
-            'subject': subject,
-            'message': message
-        }
-
-
-class AppPermWillExpireForAdminMsg(UserMessage):
-    def __init__(self, user, org_perm_mapper: dict):
-        super().__init__(user)
-        self.org_perm_mapper = org_perm_mapper
+    def get_items_html(self):
+        content = []
+        item_template = '<a href={}>{}</a>'
+        for perm in self.perms:
+            url = js_reverse(
+                'perms:application-permission-detail',
+                kwargs={'pk': perm.id},
+                external=True,
+                api_to_ui=True
+            ) + f'?oid={perm.org_id}'
+            content.append(item_template.format(url, str(perm)))
+        perms_text = '<br>'.join(content)
+        return perms_text
 
     def get_html_msg(self) -> dict:
-        user = self.user
-        subject = _('Application permission will expired')
-
-        content = ''
-        for org, perms in self.org_perm_mapper.items():
-            content += f'<br>Orgnization: {org} <br> Permissions: {",".join(str(perm) for perm in perms)} <br>'
-
-        message = _("""
-            Hello %(name)s:
-            <br>
-            The following application permissions will expire in three days
-            <br>
-            %(content)s
-        """) % {
-            'name': user.name,
-            'content': content,
-        }
-        return {
-            'subject': subject,
-            'message': message
-        }
-
-    def get_text_msg(self) -> dict:
-        user = self.user
-        subject = _('Application permission will expired')
-
-        content = ''
-        for org, perms in self.org_perm_mapper.items():
-            content += f'\n Orgnization: {org} \n Permissions: {perms} \n'
-
-        message = _("""
-Hello %(name)s:
-\n
-The following application permissions of organization %(org) will expire in three days
-\n
-%(content)s
-        """) % {
-            'name': user.name,
-            'content': content,
+        items = self.get_items_html()
+        subject = _('Application permissions is about to expire')
+        template = self.get_admin_content_template()
+        message = template % {
+            'name': self.user.name,
+            'item_type': _('application permissions of organization {}').format(self.org),
+            'items': items
         }
         return {
             'subject': subject,

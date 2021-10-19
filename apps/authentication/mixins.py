@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 #
 import inspect
-from urllib.parse import urlencode
+from django.utils.http import urlencode
 from functools import partial
 import time
 
 from django.core.cache import cache
 from django.conf import settings
+from django.urls import reverse_lazy
 from django.contrib import auth
 from django.utils.translation import ugettext as _
 from django.contrib.auth import (
@@ -14,11 +15,11 @@ from django.contrib.auth import (
     PermissionDenied, user_login_failed, _clean_credentials
 )
 from django.shortcuts import reverse, redirect
-from django.views.generic.edit import FormView
 
 from common.utils import get_object_or_none, get_request_ip, get_logger, bulk_get, FlashMessageUtil
 from users.models import User, MFAType
 from users.utils import LoginBlockUtil, MFABlockUtils
+from users.exceptions import MFANotEnabled
 from . import errors
 from .utils import rsa_decrypt, gen_key_pair
 from .signals import post_auth_success, post_auth_failed
@@ -204,22 +205,24 @@ class AuthMixin(PasswordEncryptionViewMixin):
             data = request.POST
 
         items = ['username', 'password', 'challenge', 'public_key', 'auto_login']
-        username, password, challenge, public_key, auto_login = bulk_get(data, *items, default='')
+        username, password, challenge, public_key, auto_login = bulk_get(data, items, default='')
         ip = self.get_request_ip()
         self._set_partial_credential_error(username=username, ip=ip, request=request)
 
-        password = password + challenge.strip()
         if decrypt_passwd:
             password = self.get_decrypted_password()
+        password = password + challenge.strip()
         return username, password, public_key, ip, auto_login
 
     def _check_only_allow_exists_user_auth(self, username):
         # 仅允许预先存在的用户认证
-        if settings.ONLY_ALLOW_EXIST_USER_AUTH:
-            exist = User.objects.filter(username=username).exists()
-            if not exist:
-                logger.error(f"Only allow exist user auth, login failed: {username}")
-                self.raise_credential_error(errors.reason_user_not_exist)
+        if not settings.ONLY_ALLOW_EXIST_USER_AUTH:
+            return
+
+        exist = User.objects.filter(username=username).exists()
+        if not exist:
+            logger.error(f"Only allow exist user auth, login failed: {username}")
+            self.raise_credential_error(errors.reason_user_not_exist)
 
     def _check_auth_user_is_valid(self, username, password, public_key):
         user = authenticate(self.request, username=username, password=password, public_key=public_key)
@@ -230,6 +233,17 @@ class AuthMixin(PasswordEncryptionViewMixin):
         elif not user.is_active:
             self.raise_credential_error(errors.reason_user_inactive)
         return user
+
+    def _check_login_mfa_login_if_need(self, user):
+        request = self.request
+        if hasattr(request, 'data'):
+            data = request.data
+        else:
+            data = request.POST
+        code = data.get('code')
+        mfa_type = data.get('mfa_type')
+        if settings.SECURITY_MFA_IN_LOGIN_PAGE and code and mfa_type:
+            self.check_user_mfa(code, mfa_type, user=user)
 
     def _check_login_acl(self, user, ip):
         # ACL 限制用户登录
@@ -255,8 +269,7 @@ class AuthMixin(PasswordEncryptionViewMixin):
 
     def check_user_auth(self, decrypt_passwd=False):
         self.check_is_block()
-        request = self.request
-        username, password, public_key, ip, auto_login = self.get_auth_data(decrypt_passwd=decrypt_passwd)
+        username, password, public_key, ip, auto_login = self.get_auth_data(decrypt_passwd)
 
         self._check_only_allow_exists_user_auth(username)
         user = self._check_auth_user_is_valid(username, password, public_key)
@@ -266,7 +279,11 @@ class AuthMixin(PasswordEncryptionViewMixin):
         self._check_passwd_is_too_simple(user, password)
         self._check_passwd_need_update(user)
 
+        # 校验login-mfa, 如果登录页面上显示 mfa 的话
+        self._check_login_mfa_login_if_need(user)
+
         LoginBlockUtil(username, ip).clean_failed_count()
+        request = self.request
         request.session['auth_password'] = 1
         request.session['user_id'] = str(user.id)
         request.session['auto_login'] = auto_login
@@ -348,12 +365,11 @@ class AuthMixin(PasswordEncryptionViewMixin):
     def check_user_mfa_if_need(self, user):
         if self.request.session.get('auth_mfa'):
             return
-
         if settings.OTP_IN_RADIUS:
             return
-
         if not user.mfa_enabled:
             return
+
         unset, url = user.mfa_enabled_but_not_set()
         if unset:
             raise errors.MFAUnsetError(user, self.request, url)
@@ -372,19 +388,29 @@ class AuthMixin(PasswordEncryptionViewMixin):
         self.request.session['auth_mfa_type'] = ''
 
     def check_mfa_is_block(self, username, ip, raise_exception=True):
-        if MFABlockUtils(username, ip).is_block():
-            logger.warn('Ip was blocked' + ': ' + username + ':' + ip)
-            exception = errors.BlockMFAError(username=username, request=self.request, ip=ip)
-            if raise_exception:
-                raise exception
-            else:
-                return exception
+        blocked = MFABlockUtils(username, ip).is_block()
+        if not blocked:
+            return
+        logger.warn('Ip was blocked' + ': ' + username + ':' + ip)
+        exception = errors.BlockMFAError(username=username, request=self.request, ip=ip)
+        if raise_exception:
+            raise exception
+        else:
+            return exception
 
-    def check_user_mfa(self, code, mfa_type=MFAType.OTP):
-        user = self.get_user_from_session()
+    def check_user_mfa(self, code, mfa_type=MFAType.OTP, user=None):
+        user = user if user else self.get_user_from_session()
+        if not user.mfa_enabled:
+            return True
+
+        if not (bool(user.otp_secret_key) and mfa_type == MFAType.OTP):
+            self.set_passwd_verify_on_session(user)
+            raise errors.OTPRequiredError(reverse_lazy('authentication:user-otp-enable-bind'))
+
         ip = self.get_request_ip()
         self.check_mfa_is_block(user.username, ip)
         ok = user.check_mfa(code, mfa_type=mfa_type)
+
         if ok:
             self.mark_mfa_ok()
             return
@@ -468,3 +494,31 @@ class AuthMixin(PasswordEncryptionViewMixin):
         if args:
             guard_url = "%s?%s" % (guard_url, args)
         return redirect(guard_url)
+
+    @staticmethod
+    def get_user_mfa_methods(user=None):
+        otp_enabled = user.otp_secret_key if user else True
+        # 没有用户时，或者有用户并且有电话配置
+        sms_enabled = any([user and user.phone, not user]) \
+            and settings.SMS_ENABLED and settings.XPACK_ENABLED
+
+        methods = [
+            {
+                'name': 'otp',
+                'label': 'MFA',
+                'enable': otp_enabled,
+                'selected': False,
+            },
+            {
+                'name': 'sms',
+                'label': _('SMS'),
+                'enable': sms_enabled,
+                'selected': False,
+            },
+        ]
+
+        for item in methods:
+            if item['enable']:
+                item['selected'] = True
+                break
+        return methods

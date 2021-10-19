@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-19 10:39+0800\n"
+"POT-Creation-Date: 2021-10-19 20:32+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -25,7 +25,7 @@ msgstr ""
 #: orgs/models.py:24 perms/models/base.py:44 settings/models.py:29
 #: settings/serializers/sms.py:6 terminal/models/storage.py:23
 #: terminal/models/task.py:16 terminal/models/terminal.py:100
-#: users/forms/profile.py:32 users/models/group.py:15 users/models/user.py:605
+#: users/forms/profile.py:32 users/models/group.py:15 users/models/user.py:604
 #: users/templates/users/_select_user_modal.html:13
 #: users/templates/users/user_asset_permission.html:37
 #: users/templates/users/user_asset_permission.html:154
@@ -60,7 +60,7 @@ msgstr "激活中"
 #: orgs/models.py:27 perms/models/base.py:53 settings/models.py:34
 #: terminal/models/storage.py:26 terminal/models/terminal.py:114
 #: tickets/models/ticket.py:71 users/models/group.py:16
-#: users/models/user.py:638 xpack/plugins/change_auth_plan/models/base.py:41
+#: users/models/user.py:637 xpack/plugins/change_auth_plan/models/base.py:41
 #: xpack/plugins/cloud/models.py:35 xpack/plugins/cloud/models.py:113
 #: xpack/plugins/gathered_user/models.py:26
 msgid "Comment"
@@ -97,8 +97,8 @@ msgstr "动作"
 #: perms/models/base.py:45 templates/index.html:78
 #: terminal/backends/command/models.py:18
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:38
-#: tickets/models/comment.py:17 users/const.py:14 users/models/user.py:181
-#: users/models/user.py:814 users/models/user.py:840
+#: tickets/models/comment.py:17 users/const.py:14 users/models/user.py:180
+#: users/models/user.py:813 users/models/user.py:839
 #: users/serializers/group.py:19
 #: users/templates/users/user_asset_permission.html:38
 #: users/templates/users/user_asset_permission.html:64
@@ -177,7 +177,7 @@ msgstr "格式为逗号分隔的字符串, * 表示匹配所有. "
 #: applications/serializers/attrs/application_type/vmware_client.py:26
 #: assets/models/base.py:176 assets/models/gathered_user.py:15
 #: audits/models.py:105 authentication/forms.py:15 authentication/forms.py:17
-#: ops/models/adhoc.py:148 users/forms/profile.py:31 users/models/user.py:603
+#: ops/models/adhoc.py:148 users/forms/profile.py:31 users/models/user.py:602
 #: users/templates/users/_select_user_modal.html:14
 #: xpack/plugins/change_auth_plan/models/asset.py:35
 #: xpack/plugins/change_auth_plan/models/asset.py:191
@@ -377,7 +377,7 @@ msgstr "目标URL"
 #: applications/serializers/attrs/application_type/vmware_client.py:30
 #: assets/models/base.py:177 audits/signals_handler.py:65
 #: authentication/forms.py:22
-#: authentication/templates/authentication/login.html:163
+#: authentication/templates/authentication/login.html:151
 #: settings/serializers/auth/ldap.py:44 users/forms/profile.py:21
 #: users/templates/users/user_otp_check_password.html:13
 #: users/templates/users/user_password_update.html:43
@@ -531,7 +531,7 @@ msgstr "标签管理"
 #: assets/models/cluster.py:28 assets/models/cmd_filter.py:26
 #: assets/models/cmd_filter.py:67 assets/models/group.py:21
 #: common/db/models.py:70 common/mixins/models.py:49 orgs/models.py:25
-#: orgs/models.py:437 perms/models/base.py:51 users/models/user.py:646
+#: orgs/models.py:437 perms/models/base.py:51 users/models/user.py:645
 #: users/serializers/group.py:33
 #: xpack/plugins/change_auth_plan/models/base.py:45
 #: xpack/plugins/cloud/models.py:119 xpack/plugins/gathered_user/models.py:30
@@ -544,7 +544,7 @@ msgstr "创建者"
 #: assets/models/label.py:25 common/db/models.py:72 common/mixins/models.py:50
 #: ops/models/adhoc.py:38 ops/models/command.py:29 orgs/models.py:26
 #: orgs/models.py:435 perms/models/base.py:52 users/models/group.py:18
-#: users/models/user.py:841 xpack/plugins/cloud/models.py:122
+#: users/models/user.py:840 xpack/plugins/cloud/models.py:122
 msgid "Date created"
 msgstr "创建日期"
 
@@ -599,7 +599,7 @@ msgstr "带宽"
 msgid "Contact"
 msgstr "联系人"
 
-#: assets/models/cluster.py:22 users/models/user.py:624
+#: assets/models/cluster.py:22 users/models/user.py:623
 msgid "Phone"
 msgstr "手机"
 
@@ -625,7 +625,7 @@ msgid "Default"
 msgstr "默认"
 
 #: assets/models/cluster.py:36 assets/models/label.py:14
-#: users/models/user.py:826
+#: users/models/user.py:825
 msgid "System"
 msgstr "系统"
 
@@ -1165,7 +1165,7 @@ msgstr "用户代理"
 #: audits/models.py:110
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
 #: authentication/templates/authentication/login_otp.html:6
-#: users/forms/profile.py:64 users/models/user.py:627
+#: users/forms/profile.py:64 users/models/user.py:626
 #: users/serializers/profile.py:102
 msgid "MFA"
 msgstr "多因子认证"
@@ -1243,13 +1243,13 @@ msgstr ""
 msgid "Auth Token"
 msgstr "认证令牌"
 
-#: audits/signals_handler.py:68 authentication/views/login.py:162
-#: notifications/backends/__init__.py:11 users/models/user.py:660
+#: audits/signals_handler.py:68 authentication/views/login.py:169
+#: notifications/backends/__init__.py:11 users/models/user.py:659
 msgid "WeCom"
 msgstr "企业微信"
 
-#: audits/signals_handler.py:69 authentication/views/login.py:168
-#: notifications/backends/__init__.py:12 users/models/user.py:661
+#: audits/signals_handler.py:69 authentication/views/login.py:175
+#: notifications/backends/__init__.py:12 users/models/user.py:660
 msgid "DingTalk"
 msgstr "钉钉"
 
@@ -1600,46 +1600,48 @@ msgid "MFA not set, please set it first"
 msgstr "多因子认证没有设置，请先完成设置"
 
 #: authentication/errors.py:81
+msgid "OTP not set, please set it first"
+msgstr "OTP认证没有设置，请先完成设置"
+
+#: authentication/errors.py:82
 msgid "Login confirm required"
 msgstr "需要登录复核"
 
-#: authentication/errors.py:82
+#: authentication/errors.py:83
 msgid "Wait login confirm ticket for accept"
 msgstr "等待登录复核处理"
 
-#: authentication/errors.py:83
+#: authentication/errors.py:84
 msgid "Login confirm ticket was {}"
 msgstr "登录复核 {}"
 
-#: authentication/errors.py:260
+#: authentication/errors.py:261
 msgid "IP is not allowed"
 msgstr "来源 IP 不被允许登录"
 
-#: authentication/errors.py:293
+#: authentication/errors.py:294
 msgid "SSO auth closed"
 msgstr "SSO 认证关闭了"
 
-#: authentication/errors.py:298 authentication/mixins.py:321
+#: authentication/errors.py:299 authentication/mixins.py:338
 msgid "Your password is too simple, please change it for security"
 msgstr "你的密码过于简单，为了安全，请修改"
 
-#: authentication/errors.py:307 authentication/mixins.py:328
+#: authentication/errors.py:308 authentication/mixins.py:345
 msgid "You should to change your password before login"
 msgstr "登录完成前，请先修改密码"
 
-#: authentication/errors.py:316 authentication/mixins.py:335
+#: authentication/errors.py:317 authentication/mixins.py:352
 msgid "Your password has expired, please reset before logging in"
 msgstr "您的密码已过期，先修改再登录"
 
-#: authentication/errors.py:350
+#: authentication/errors.py:351
 msgid "Your password is invalid"
 msgstr "您的密码无效"
 
-#: authentication/errors.py:356
-#, fuzzy
-#| msgid "Not has host {} permission"
+#: authentication/errors.py:357
 msgid "No upload or download permission"
-msgstr "没有该主机 {} 权限"
+msgstr "没有上传下载权限"
 
 #: authentication/forms.py:35
 msgid "{} days auto login"
@@ -1653,20 +1655,27 @@ msgstr "MFA 验证码"
 msgid "MFA type"
 msgstr "MFA 类型"
 
-#: authentication/forms.py:60 authentication/forms.py:62
-#: users/forms/profile.py:27
+#: authentication/forms.py:60 users/forms/profile.py:27
 msgid "MFA code"
 msgstr "多因子认证验证码"
 
-#: authentication/mixins.py:311
+#: authentication/forms.py:62
+msgid "Dynamic code"
+msgstr "动态码"
+
+#: authentication/mixins.py:328
 msgid "Please change your password"
 msgstr "请修改密码"
+
+#: authentication/mixins.py:514
+msgid "SMS"
+msgstr "短信"
 
 #: authentication/models.py:40
 msgid "Private Token"
 msgstr "SSH密钥"
 
-#: authentication/models.py:49 settings/serializers/security.py:118
+#: authentication/models.py:49 settings/serializers/security.py:144
 msgid "Login Confirm"
 msgstr "登录复核"
 
@@ -1719,15 +1728,15 @@ msgstr ""
 "若怀疑此次登录行为异常，请及时修改账号密码。\n"
 "感谢您对{server_name}的关注!\n"
 
-#: authentication/sms_verify_code.py:17
+#: authentication/sms_verify_code.py:15
 msgid "The verification code has expired. Please resend it"
 msgstr "验证码已过期，请重新发送"
 
-#: authentication/sms_verify_code.py:22
+#: authentication/sms_verify_code.py:20
 msgid "The verification code is incorrect"
 msgstr "验证码错误"
 
-#: authentication/sms_verify_code.py:27
+#: authentication/sms_verify_code.py:25
 msgid "Please wait {} seconds before sending"
 msgstr "请在 {} 秒后发送"
 
@@ -1763,14 +1772,14 @@ msgid "Show"
 msgstr "显示"
 
 #: authentication/templates/authentication/_access_key_modal.html:66
-#: settings/serializers/security.py:25 users/models/user.py:470
+#: settings/serializers/security.py:25 users/models/user.py:469
 #: users/serializers/profile.py:99
 #: users/templates/users/user_verify_mfa.html:32
 msgid "Disable"
 msgstr "禁用"
 
 #: authentication/templates/authentication/_access_key_modal.html:67
-#: users/models/user.py:471 users/serializers/profile.py:100
+#: users/models/user.py:470 users/serializers/profile.py:100
 msgid "Enable"
 msgstr "启用"
 
@@ -1810,35 +1819,26 @@ msgstr "确认"
 msgid "Code error"
 msgstr "代码错误"
 
-#: authentication/templates/authentication/login.html:155
+#: authentication/templates/authentication/login.html:143
 msgid "Welcome back, please enter username and password to login"
 msgstr "欢迎回来，请输入用户名和密码登录"
 
-#: authentication/templates/authentication/login.html:187
+#: authentication/templates/authentication/login.html:179
 #: users/templates/users/forgot_password.html:15
 #: users/templates/users/forgot_password.html:16
 msgid "Forgot password"
 msgstr "忘记密码"
 
-#: authentication/templates/authentication/login.html:194
+#: authentication/templates/authentication/login.html:186
 #: templates/_header_bar.html:83
 msgid "Login"
 msgstr "登录"
 
-#: authentication/templates/authentication/login.html:201
+#: authentication/templates/authentication/login.html:193
 msgid "More login options"
 msgstr "更多登录方式"
 
-#: authentication/templates/authentication/login_otp.html:24
-msgid "Please enter the verification code"
-msgstr "请输入验证码"
-
-#: authentication/templates/authentication/login_otp.html:25
-#: authentication/templates/authentication/login_otp.html:75
-msgid "Send verification code"
-msgstr "发送验证码"
-
-#: authentication/templates/authentication/login_otp.html:29
+#: authentication/templates/authentication/login_otp.html:19
 #: users/templates/users/user_otp_check_password.html:16
 #: users/templates/users/user_otp_enable_bind.html:24
 #: users/templates/users/user_otp_enable_install_app.html:29
@@ -1846,18 +1846,9 @@ msgstr "发送验证码"
 msgid "Next"
 msgstr "下一步"
 
-#: authentication/templates/authentication/login_otp.html:31
+#: authentication/templates/authentication/login_otp.html:21
 msgid "Can't provide security? Please contact the administrator!"
 msgstr "如果不能提供多因子认证验证码，请联系管理员!"
-
-#: authentication/templates/authentication/login_otp.html:68
-#: authentication/templates/authentication/login_otp.html:73
-msgid "Wait: "
-msgstr "等待："
-
-#: authentication/templates/authentication/login_otp.html:81
-msgid "The verification code has been sent"
-msgstr "验证码已发送"
 
 #: authentication/templates/authentication/login_wait_confirm.html:41
 msgid "Refresh"
@@ -1875,119 +1866,107 @@ msgstr "返回"
 msgid "Copy success"
 msgstr "复制成功"
 
-#: authentication/views/dingtalk.py:41
+#: authentication/views/dingtalk.py:37
 msgid "DingTalk Error, Please contact your system administrator"
 msgstr "钉钉错误，请联系系统管理员"
 
-#: authentication/views/dingtalk.py:44
+#: authentication/views/dingtalk.py:40
 msgid "DingTalk Error"
 msgstr "钉钉错误"
 
-#: authentication/views/dingtalk.py:56 authentication/views/feishu.py:52
-#: authentication/views/wecom.py:56
-#, fuzzy
-#| msgid "WeCom Error, Please contact your system administrator"
+#: authentication/views/dingtalk.py:52 authentication/views/feishu.py:48
+#: authentication/views/wecom.py:52
 msgid ""
 "The system configuration is incorrect. Please contact your administrator"
-msgstr "企业微信错误，请联系系统管理员"
+msgstr "企业配置错误，请联系系统管理员"
 
-#: authentication/views/dingtalk.py:92
+#: authentication/views/dingtalk.py:90
 msgid "DingTalk is already bound"
 msgstr "钉钉已经绑定"
 
-#: authentication/views/dingtalk.py:105 authentication/views/feishu.py:99
-#: authentication/views/wecom.py:104
+#: authentication/views/dingtalk.py:103 authentication/views/feishu.py:97
+#: authentication/views/wecom.py:102
 msgid "Please verify your password first"
 msgstr "请检查密码"
 
-#: authentication/views/dingtalk.py:129 authentication/views/wecom.py:128
+#: authentication/views/dingtalk.py:127 authentication/views/wecom.py:126
 msgid "Invalid user_id"
 msgstr "无效的 user_id"
 
-#: authentication/views/dingtalk.py:145
+#: authentication/views/dingtalk.py:143
 msgid "DingTalk query user failed"
 msgstr "钉钉查询用户失败"
 
-#: authentication/views/dingtalk.py:154
+#: authentication/views/dingtalk.py:152
 msgid "The DingTalk is already bound to another user"
 msgstr "该钉钉已经绑定其他用户"
 
-#: authentication/views/dingtalk.py:159 authentication/views/dingtalk.py:242
-#: authentication/views/dingtalk.py:243
+#: authentication/views/dingtalk.py:157
 msgid "Binding DingTalk successfully"
 msgstr "绑定 钉钉 成功"
 
-#: authentication/views/dingtalk.py:211
+#: authentication/views/dingtalk.py:209
 msgid "Failed to get user from DingTalk"
 msgstr "从钉钉获取用户失败"
 
-#: authentication/views/dingtalk.py:217
+#: authentication/views/dingtalk.py:215
 msgid "DingTalk is not bound"
 msgstr "钉钉没有绑定"
 
-#: authentication/views/dingtalk.py:218
+#: authentication/views/dingtalk.py:216
 msgid "Please login with a password and then bind the DingTalk"
 msgstr "请使用密码登录，然后绑定钉钉"
 
-#: authentication/views/dingtalk.py:260 authentication/views/dingtalk.py:261
-msgid "Binding DingTalk failed"
-msgstr "绑定钉钉失败"
-
-#: authentication/views/feishu.py:40
+#: authentication/views/feishu.py:36
 msgid "FeiShu Error"
 msgstr "飞书错误"
 
-#: authentication/views/feishu.py:86
+#: authentication/views/feishu.py:84
 msgid "FeiShu is already bound"
 msgstr "飞书已经绑定"
 
-#: authentication/views/feishu.py:133
+#: authentication/views/feishu.py:131
 msgid "FeiShu query user failed"
 msgstr "飞书查询用户失败"
 
-#: authentication/views/feishu.py:142
+#: authentication/views/feishu.py:140
 msgid "The FeiShu is already bound to another user"
 msgstr "该飞书已经绑定其他用户"
 
-#: authentication/views/feishu.py:147 authentication/views/feishu.py:229
-#: authentication/views/feishu.py:230
+#: authentication/views/feishu.py:145
 msgid "Binding FeiShu successfully"
 msgstr "绑定 飞书 成功"
 
-#: authentication/views/feishu.py:198
+#: authentication/views/feishu.py:196
 msgid "Failed to get user from FeiShu"
 msgstr "从飞书获取用户失败"
 
-#: authentication/views/feishu.py:204
+#: authentication/views/feishu.py:202
 msgid "FeiShu is not bound"
 msgstr "没有绑定飞书"
 
-#: authentication/views/feishu.py:205
+#: authentication/views/feishu.py:203
 msgid "Please login with a password and then bind the FeiShu"
 msgstr "请使用密码登录，然后绑定飞书"
 
-#: authentication/views/feishu.py:247 authentication/views/feishu.py:248
-msgid "Binding FeiShu failed"
-msgstr "绑定飞书失败"
-
-#: authentication/views/login.py:83
+#: authentication/views/login.py:82
 msgid "Redirecting"
 msgstr "跳转中"
 
-#: authentication/views/login.py:84
+#: authentication/views/login.py:83
 msgid "Redirecting to {} authentication"
 msgstr "正在跳转到 {} 认证"
 
-#: authentication/views/login.py:110
+#: authentication/views/login.py:109
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: authentication/views/login.py:174 notifications/backends/__init__.py:14
-#: users/models/user.py:662
+#: authentication/views/login.py:181 notifications/backends/__init__.py:14
+#: users/models/user.py:661
 msgid "FeiShu"
 msgstr "飞书"
 
-#: authentication/views/login.py:261
+#: authentication/views/login.py:269
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -1995,66 +1974,53 @@ msgstr ""
 "等待 <b>{}</b> 确认, 你也可以复制链接发给他/她 <br/>\n"
 "                  不要关闭本页面"
 
-#: authentication/views/login.py:266
+#: authentication/views/login.py:274
 msgid "No ticket found"
 msgstr "没有发现工单"
 
-#: authentication/views/login.py:298
+#: authentication/views/login.py:306
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: authentication/views/login.py:299
+#: authentication/views/login.py:307
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
-#: authentication/views/mfa.py:44 users/models/user.py:37
-msgid "One-time password"
-msgstr "一次性密码"
-
-#: authentication/views/mfa.py:50
-msgid "SMS"
-msgstr "短信"
-
-#: authentication/views/wecom.py:41
+#: authentication/views/wecom.py:37
 msgid "WeCom Error, Please contact your system administrator"
 msgstr "企业微信错误，请联系系统管理员"
 
-#: authentication/views/wecom.py:44
+#: authentication/views/wecom.py:40
 msgid "WeCom Error"
 msgstr "企业微信错误"
 
-#: authentication/views/wecom.py:91
+#: authentication/views/wecom.py:89
 msgid "WeCom is already bound"
 msgstr "企业微信已经绑定"
 
-#: authentication/views/wecom.py:143
+#: authentication/views/wecom.py:141
 msgid "WeCom query user failed"
 msgstr "企业微信查询用户失败"
 
-#: authentication/views/wecom.py:152
+#: authentication/views/wecom.py:150
 msgid "The WeCom is already bound to another user"
 msgstr "该企业微信已经绑定其他用户"
 
-#: authentication/views/wecom.py:157 authentication/views/wecom.py:240
-#: authentication/views/wecom.py:241
+#: authentication/views/wecom.py:155
 msgid "Binding WeCom successfully"
 msgstr "绑定 企业微信 成功"
 
-#: authentication/views/wecom.py:209
+#: authentication/views/wecom.py:204
 msgid "Failed to get user from WeCom"
 msgstr "从企业微信获取用户失败"
 
-#: authentication/views/wecom.py:215
+#: authentication/views/wecom.py:210
 msgid "WeCom is not bound"
 msgstr "没有绑定企业微信"
 
-#: authentication/views/wecom.py:216
+#: authentication/views/wecom.py:211
 msgid "Please login with a password and then bind the WeCom"
 msgstr "请使用密码登录，然后绑定企业微信"
-
-#: authentication/views/wecom.py:258 authentication/views/wecom.py:259
-msgid "Binding WeCom failed"
-msgstr "绑定企业微信失败"
 
 #: common/const/__init__.py:6
 #, python-format
@@ -2188,10 +2154,8 @@ msgid "LAN"
 msgstr ""
 
 #: common/utils/geoip/utils.py:35 common/utils/geoip/utils.py:45
-#, fuzzy
-#| msgid "Unknown"
 msgid "Unknown ip"
-msgstr "未知"
+msgstr "未知ip"
 
 #: common/validators.py:30
 msgid "This field must be unique."
@@ -2237,7 +2201,7 @@ msgstr ""
 "div>"
 
 #: notifications/backends/__init__.py:10 users/forms/profile.py:101
-#: users/models/user.py:607
+#: users/models/user.py:606
 msgid "Email"
 msgstr "邮件"
 
@@ -2245,13 +2209,12 @@ msgstr "邮件"
 msgid "Site message"
 msgstr "站内信"
 
-#: notifications/notifications.py:126
-msgid ""
-"\n"
-"Time: {}"
-msgstr ""
-"\n"
-"时间：{}"
+#: notifications/notifications.py:139 ops/models/adhoc.py:246
+#: xpack/plugins/change_auth_plan/models/base.py:108
+#: xpack/plugins/change_auth_plan/models/base.py:190
+#: xpack/plugins/gathered_user/models.py:79
+msgid "Time"
+msgstr "时间"
 
 #: ops/api/celery.py:61 ops/api/celery.py:76
 msgid "Waiting task start"
@@ -2354,12 +2317,6 @@ msgstr "开始时间"
 msgid "End time"
 msgstr "完成时间"
 
-#: ops/models/adhoc.py:246 xpack/plugins/change_auth_plan/models/base.py:108
-#: xpack/plugins/change_auth_plan/models/base.py:190
-#: xpack/plugins/gathered_user/models.py:79
-msgid "Time"
-msgstr "时间"
-
 #: ops/models/adhoc.py:247 ops/models/command.py:28
 #: terminal/serializers/session.py:39
 msgid "Is finished"
@@ -2455,7 +2412,7 @@ msgstr "组织审计员"
 msgid "GLOBAL"
 msgstr "全局组织"
 
-#: orgs/models.py:434 users/models/user.py:615 users/serializers/user.py:37
+#: orgs/models.py:434 users/models/user.py:614 users/serializers/user.py:37
 #: users/templates/users/_select_user_modal.html:15
 msgid "Role"
 msgstr "角色"
@@ -2468,7 +2425,7 @@ msgstr "管理员正在修改授权，请稍等"
 msgid "The authorization cannot be revoked for the time being"
 msgstr "该授权暂时不能撤销"
 
-#: perms/models/application_permission.py:27 users/models/user.py:182
+#: perms/models/application_permission.py:27 users/models/user.py:181
 msgid "Application"
 msgstr "应用程序"
 
@@ -2520,7 +2477,7 @@ msgid "Favorite"
 msgstr "收藏夹"
 
 #: perms/models/base.py:47 templates/_nav.html:21 users/models/group.py:31
-#: users/models/user.py:611 users/templates/users/_select_user_modal.html:16
+#: users/models/user.py:610 users/templates/users/_select_user_modal.html:16
 #: users/templates/users/user_asset_permission.html:39
 #: users/templates/users/user_asset_permission.html:67
 #: users/templates/users/user_database_app_permission.html:38
@@ -2531,7 +2488,7 @@ msgstr "用户组"
 #: perms/models/base.py:50
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:60
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:50
-#: users/models/user.py:643
+#: users/models/user.py:642
 msgid "Date expired"
 msgstr "失效日期"
 
@@ -2539,271 +2496,58 @@ msgstr "失效日期"
 msgid "From ticket"
 msgstr "来自工单"
 
-#: perms/notifications.py:18 perms/notifications.py:40
-#, fuzzy
-#| msgid "Asset number"
-msgid "Assets may expire"
-msgstr "资产编号"
-
-#: perms/notifications.py:21
-#, fuzzy, python-format
-#| msgid ""
-#| "\n"
-#| "           Hello %(name)s:\n"
-#| "           <br>\n"
-#| "           Your account will expire in %(date_expired)s,\n"
-#| "           <br>\n"
-#| "           In order not to affect your normal work, please contact the "
-#| "administrator for confirmation.\n"
-#| "           <br>\n"
-#| "           "
-msgid ""
-"\n"
-"            Hello %(name)s:\n"
-"            <br>\n"
-"            Your permissions for the following assets may expire in three "
-"days:\n"
-"            <br>\n"
-"            %(assets)s\n"
-"            <br>\n"
-"            Please contact the administrator\n"
-"        "
-msgstr ""
-"\n"
-"       您好 %(name)s:\n"
-"       <br>\n"
-"       您的账户会在 %(date_expired)s 过期，\n"
-"       <br>\n"
-"       为了不影响您正常工作，请联系管理员确认。\n"
-"       <br>\n"
-"       "
-
-#: perms/notifications.py:43
+#: perms/notifications.py:12
 #, python-format
 msgid ""
 "\n"
-"Hello %(name)s:\n"
-"\n"
-"\n"
-"Your permissions for the following assets may expire in three days:\n"
-"\n"
-"\n"
-"%(assets)s\n"
-"\n"
-"\n"
-"Please contact the administrator\n"
+"        Hello <b>%(name)s:<b><br>\n"
+"        The following <b>%(item_type)s</b> will expire in 3 days\n"
+"        <br><br>\n"
+"        %(items)s\n"
 "        "
 msgstr ""
+"\n"
+"       你好 <b>%(name)s:<b><br>\n"
+"       以下 <b>%(item_type)s</b> 即将在 3 天后过期:\n"
+"       <br><br>\n"
+"       %(items)s\n"
+"       "
 
-#: perms/notifications.py:69 perms/notifications.py:90
-#: perms/notifications.py:117 perms/notifications.py:140
-#, fuzzy
-#| msgid "Asset permission"
-msgid "Asset permission will expired"
-msgstr "资产授权"
+#: perms/notifications.py:22
+msgid "<br>If you have any question, please contact the administrator"
+msgstr "<br>如果有疑问或需求，请联系系统管理员"
+
+#: perms/notifications.py:33
+msgid "You permed assets is about to expire"
+msgstr "你授权的资产即将到期"
+
+#: perms/notifications.py:38
+msgid "permed assets"
+msgstr "授权的资产"
+
+#: perms/notifications.py:67
+msgid "Asset permissions is about to expire"
+msgstr "资产授权规则将要过期"
 
 #: perms/notifications.py:72
-msgid ""
-"\n"
-"            Hello %(name)s:\n"
-"            <br>\n"
-"            The following asset permissions of organization %(org) will "
-"expire in three days\n"
-"            <br>\n"
-"            %(perms)s\n"
-"        "
-msgstr ""
+msgid "asset permissions of organization {}"
+msgstr "组织 ({}) 的资产授权"
 
-#: perms/notifications.py:93
-msgid ""
-"\n"
-"Hello %(name)s:\n"
-"\n"
-"\n"
-"The following asset permissions of organization %(org) will expire in three "
-"days\n"
-"\n"
-"\n"
-"%(perms)s\n"
-"        "
-msgstr ""
+#: perms/notifications.py:87
+msgid "Your permed applications is about to expire"
+msgstr "你授权的应用即将过期"
 
-#: perms/notifications.py:123
-#, fuzzy, python-format
-#| msgid ""
-#| "\n"
-#| "           Hello %(name)s:\n"
-#| "           <br>\n"
-#| "           Your account will expire in %(date_expired)s,\n"
-#| "           <br>\n"
-#| "           In order not to affect your normal work, please contact the "
-#| "administrator for confirmation.\n"
-#| "           <br>\n"
-#| "           "
-msgid ""
-"\n"
-"            Hello %(name)s:\n"
-"            <br>\n"
-"            The following asset permissions will expire in three days\n"
-"            <br>\n"
-"            %(content)s\n"
-"        "
-msgstr ""
-"\n"
-"       您好 %(name)s:\n"
-"       <br>\n"
-"       您的账户会在 %(date_expired)s 过期，\n"
-"       <br>\n"
-"       为了不影响您正常工作，请联系管理员确认。\n"
-"       <br>\n"
-"       "
+#: perms/notifications.py:91
+msgid "permed applications"
+msgstr "授权的应用"
 
-#: perms/notifications.py:146
-msgid ""
-"\n"
-"Hello %(name)s:\n"
-"\n"
-"\n"
-"The following asset permissions of organization %(org) will expire in three "
-"days\n"
-"\n"
-"\n"
-"%(content)s\n"
-"        "
-msgstr ""
+#: perms/notifications.py:122
+msgid "Application permissions is about to expire"
+msgstr "应用授权规则即将过期"
 
-#: perms/notifications.py:169 perms/notifications.py:191
-#, fuzzy
-#| msgid "Applications"
-msgid "Applications may expire"
-msgstr "应用管理"
-
-#: perms/notifications.py:172
-#, fuzzy, python-format
-#| msgid ""
-#| "\n"
-#| "           Hello %(name)s:\n"
-#| "           <br>\n"
-#| "           Your account will expire in %(date_expired)s,\n"
-#| "           <br>\n"
-#| "           In order not to affect your normal work, please contact the "
-#| "administrator for confirmation.\n"
-#| "           <br>\n"
-#| "           "
-msgid ""
-"\n"
-"            Hello %(name)s:\n"
-"            <br>\n"
-"            Your permissions for the following applications may expire in "
-"three days:\n"
-"            <br>\n"
-"            %(apps)s\n"
-"            <br>\n"
-"            Please contact the administrator\n"
-"        "
-msgstr ""
-"\n"
-"       您好 %(name)s:\n"
-"       <br>\n"
-"       您的账户会在 %(date_expired)s 过期，\n"
-"       <br>\n"
-"       为了不影响您正常工作，请联系管理员确认。\n"
-"       <br>\n"
-"       "
-
-#: perms/notifications.py:194
-#, python-format
-msgid ""
-"\n"
-"Hello %(name)s:\n"
-"\n"
-"\n"
-"Your permissions for the following applications may expire in three days:\n"
-"\n"
-"\n"
-"%(apps)s\n"
-"\n"
-"\n"
-"Please contact the administrator\n"
-"        "
-msgstr ""
-
-#: perms/notifications.py:220 perms/notifications.py:241
-#: perms/notifications.py:268 perms/notifications.py:291
-#, fuzzy
-#| msgid "Application permission"
-msgid "Application permission will expired"
-msgstr "应用管理"
-
-#: perms/notifications.py:223
-msgid ""
-"\n"
-"            Hello %(name)s:\n"
-"            <br>\n"
-"            The following application permissions of organization %(org) "
-"will expire in three days\n"
-"            <br>\n"
-"            %(perms)s\n"
-"        "
-msgstr ""
-
-#: perms/notifications.py:244
-msgid ""
-"\n"
-"Hello %(name)s:\n"
-"\n"
-"\n"
-"The following application permissions of organization %(org) will expire in "
-"three days\n"
-"\n"
-"\n"
-"%(perms)s\n"
-"        "
-msgstr ""
-
-#: perms/notifications.py:274
-#, fuzzy, python-format
-#| msgid ""
-#| "\n"
-#| "           Hello %(name)s:\n"
-#| "           <br>\n"
-#| "           Your account will expire in %(date_expired)s,\n"
-#| "           <br>\n"
-#| "           In order not to affect your normal work, please contact the "
-#| "administrator for confirmation.\n"
-#| "           <br>\n"
-#| "           "
-msgid ""
-"\n"
-"            Hello %(name)s:\n"
-"            <br>\n"
-"            The following application permissions will expire in three days\n"
-"            <br>\n"
-"            %(content)s\n"
-"        "
-msgstr ""
-"\n"
-"       您好 %(name)s:\n"
-"       <br>\n"
-"       您的账户会在 %(date_expired)s 过期，\n"
-"       <br>\n"
-"       为了不影响您正常工作，请联系管理员确认。\n"
-"       <br>\n"
-"       "
-
-#: perms/notifications.py:297
-msgid ""
-"\n"
-"Hello %(name)s:\n"
-"\n"
-"\n"
-"The following application permissions of organization %(org) will expire in "
-"three days\n"
-"\n"
-"\n"
-"%(content)s\n"
-"        "
-msgstr ""
+#: perms/notifications.py:126
+msgid "application permissions of organization {}"
+msgstr "组织 ({}) 的应用授权"
 
 #: perms/serializers/application/permission.py:18
 #: perms/serializers/application/permission.py:38
@@ -2865,7 +2609,7 @@ msgstr "系统用户名称"
 msgid "test_phone is required"
 msgstr "测试手机号 该字段是必填项。"
 
-#: settings/api/alibaba_sms.py:51 settings/api/dingtalk.py:36
+#: settings/api/alibaba_sms.py:51 settings/api/dingtalk.py:31
 #: settings/api/feishu.py:35 settings/api/tencent_sms.py:56
 #: settings/api/wecom.py:36
 msgid "Test success"
@@ -3170,7 +2914,7 @@ msgstr "其它系统可以使用 SSO Token 对接 JumpServer, 免去登录的过
 msgid "SSO auth key TTL"
 msgstr "Token 有效期"
 
-#: settings/serializers/auth/sso.py:16 settings/serializers/security.py:74
+#: settings/serializers/auth/sso.py:16
 msgid "Unit: second"
 msgstr "单位: 秒"
 
@@ -3481,73 +3225,103 @@ msgstr "开启后，如果用户来源为本地，CAS、OIDC 登录将会失败"
 msgid "MFA verify TTL"
 msgstr "MFA 校验有效期"
 
-#: settings/serializers/security.py:78
+#: settings/serializers/security.py:75
+msgid ""
+"Unit: second, The verification MFA takes effect only when you view the "
+"account password"
+msgstr "单位: 秒, 目前仅在查看账号密码校验 MFA 时生效"
+
+#: settings/serializers/security.py:79
+msgid "Enable Login dynamic code"
+msgstr "启用登录附加码"
+
+#: settings/serializers/security.py:80
+msgid ""
+"The password and additional code are sent to a third party authentication "
+"system for verification"
+msgstr ""
+"密码和附加码一并发送给第三方认证系统进行校验, 如：有的第三方认证系统，需要 密"
+"码+6位数字 完成认证"
+
+#: settings/serializers/security.py:85
+msgid "MFA in login page"
+msgstr "MFA 在登录页面"
+
+#: settings/serializers/security.py:86
+msgid "Eu security regulations(GDPR) require MFA to be on the login page"
+msgstr "欧盟数据安全法规(GDPR) 要求 MFA 在登录页面，来确保系统登录安全"
+
+#: settings/serializers/security.py:89
 msgid "Enable Login captcha"
 msgstr "启用登录验证码"
 
-#: settings/serializers/security.py:84
+#: settings/serializers/security.py:90
+msgid "Enable captcha to prevent robot authentication"
+msgstr "开启验证码，防止机器人登录"
+
+#: settings/serializers/security.py:110
 msgid "Enable terminal register"
 msgstr "终端注册"
 
-#: settings/serializers/security.py:85
+#: settings/serializers/security.py:111
 msgid ""
 "Allow terminal register, after all terminal setup, you should disable this "
 "for security"
 msgstr "是否允许终端注册，当所有终端启动后，为了安全应该关闭"
 
-#: settings/serializers/security.py:88
+#: settings/serializers/security.py:114
 msgid "Enable watermark"
 msgstr "开启水印"
 
-#: settings/serializers/security.py:89
+#: settings/serializers/security.py:115
 msgid "Enabled, the web session and replay contains watermark information"
 msgstr "启用后，Web 会话和录像将包含水印信息"
 
-#: settings/serializers/security.py:93
+#: settings/serializers/security.py:119
 msgid "Connection max idle time"
 msgstr "连接最大空闲时间"
 
-#: settings/serializers/security.py:94
+#: settings/serializers/security.py:120
 msgid "If idle time more than it, disconnect connection Unit: minute"
 msgstr "提示：如果超过该配置没有操作，连接会被断开 （单位：分）"
 
-#: settings/serializers/security.py:97
+#: settings/serializers/security.py:123
 msgid "Remember manual auth"
 msgstr "保存手动输入密码"
 
-#: settings/serializers/security.py:100
+#: settings/serializers/security.py:126
 msgid "Enable change auth secure mode"
 msgstr "启用改密安全模式"
 
-#: settings/serializers/security.py:103
+#: settings/serializers/security.py:129
 msgid "Insecure command alert"
 msgstr "危险命令告警"
 
-#: settings/serializers/security.py:106
+#: settings/serializers/security.py:132
 msgid "Email recipient"
 msgstr "邮件收件人"
 
-#: settings/serializers/security.py:107
+#: settings/serializers/security.py:133
 msgid "Multiple user using , split"
 msgstr "多个用户，使用 , 分割"
 
-#: settings/serializers/security.py:110
+#: settings/serializers/security.py:136
 msgid "Batch command execution"
 msgstr "批量命令执行"
 
-#: settings/serializers/security.py:111
+#: settings/serializers/security.py:137
 msgid "Allow user run batch command or not using ansible"
 msgstr "是否允许用户使用 ansible 执行批量命令"
 
-#: settings/serializers/security.py:114
+#: settings/serializers/security.py:140
 msgid "Session share"
 msgstr "会话分享"
 
-#: settings/serializers/security.py:115
+#: settings/serializers/security.py:141
 msgid "Enabled, Allows user active session to be shared with other users"
 msgstr "开启后允许用户分享已连接的资产会话给它人，协同工作"
 
-#: settings/serializers/security.py:119
+#: settings/serializers/security.py:145
 msgid "Enabled, please go to the user detail add approver"
 msgstr "启用后, 请在用户详情中添加审批人"
 
@@ -3861,6 +3635,30 @@ msgstr ""
 "\"%(user_pubkey_update)s\"> 链接 </a> 更新\n"
 "        "
 
+#: templates/_mfa_otp_login.html:14
+msgid "Please enter verification code"
+msgstr "请输入验证码"
+
+#: templates/_mfa_otp_login.html:16 templates/_mfa_otp_login.html:67
+msgid "Send verification code"
+msgstr "发送验证码"
+
+#: templates/_mfa_otp_login.html:37
+msgid "Please enter MFA code"
+msgstr "请输入6位动态安全码"
+
+#: templates/_mfa_otp_login.html:38
+msgid "Please enter SMS code"
+msgstr "请输入短信验证码"
+
+#: templates/_mfa_otp_login.html:60 templates/_mfa_otp_login.html:65
+msgid "Wait: "
+msgstr "等待："
+
+#: templates/_mfa_otp_login.html:73
+msgid "The verification code has been sent"
+msgstr "验证码已发送"
+
 #: templates/_nav.html:7
 msgid "Dashboard"
 msgstr "仪表盘"
@@ -4009,11 +3807,11 @@ msgstr "确认删除"
 msgid "Are you sure delete"
 msgstr "您确定删除吗?"
 
-#: templates/flash_message_standalone.html:28
+#: templates/flash_message_standalone.html:25
 msgid "Cancel"
 msgstr "取消"
 
-#: templates/flash_message_standalone.html:37
+#: templates/flash_message_standalone.html:34
 msgid "Go"
 msgstr "立即"
 
@@ -4996,11 +4794,11 @@ msgstr "当前组织已存在该类型"
 msgid "Could not reset self otp, use profile reset instead"
 msgstr "不能在该页面重置多因子认证, 请去个人信息页面重置"
 
-#: users/const.py:10 users/models/user.py:179
+#: users/const.py:10 users/models/user.py:178
 msgid "System administrator"
 msgstr "系统管理员"
 
-#: users/const.py:11 users/models/user.py:180
+#: users/const.py:11 users/models/user.py:179
 msgid "System auditor"
 msgstr "系统审计员"
 
@@ -5095,52 +4893,56 @@ msgstr "不能和原来的密钥相同"
 msgid "Not a valid ssh public key"
 msgstr "SSH密钥不合法"
 
-#: users/forms/profile.py:160 users/models/user.py:635
+#: users/forms/profile.py:160 users/models/user.py:634
 #: users/templates/users/user_password_update.html:48
 msgid "Public key"
 msgstr "SSH公钥"
 
-#: users/models/user.py:38
+#: users/models/user.py:36
+msgid "One-time password"
+msgstr "一次性密码"
+
+#: users/models/user.py:37
 msgid "SMS verify code"
 msgstr "短信验证码"
 
-#: users/models/user.py:472
+#: users/models/user.py:471
 msgid "Force enable"
 msgstr "强制启用"
 
-#: users/models/user.py:584
+#: users/models/user.py:583
 msgid "Local"
 msgstr "数据库"
 
-#: users/models/user.py:618
+#: users/models/user.py:617
 msgid "Avatar"
 msgstr "头像"
 
-#: users/models/user.py:621
+#: users/models/user.py:620
 msgid "Wechat"
 msgstr "微信"
 
-#: users/models/user.py:632
+#: users/models/user.py:631
 msgid "Private key"
 msgstr "ssh私钥"
 
-#: users/models/user.py:651
+#: users/models/user.py:650
 msgid "Source"
 msgstr "来源"
 
-#: users/models/user.py:655
+#: users/models/user.py:654
 msgid "Date password last updated"
 msgstr "最后更新密码日期"
 
-#: users/models/user.py:658
+#: users/models/user.py:657
 msgid "Need update password"
 msgstr "需要更新密码"
 
-#: users/models/user.py:822
+#: users/models/user.py:821
 msgid "Administrator"
 msgstr "管理员"
 
-#: users/models/user.py:825
+#: users/models/user.py:824
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
@@ -6605,8 +6407,155 @@ msgstr "旗舰版"
 msgid "Community edition"
 msgstr "社区版"
 
+#~ msgid ""
+#~ "\n"
+#~ "Time: {}"
+#~ msgstr ""
+#~ "\n"
+#~ "时间：{}"
+
+#~ msgid "asset permission"
+#~ msgstr "资产授权"
+
+#~ msgid "Asset permissions will expired"
+#~ msgstr "资产授权即将过期"
+
+#, python-brace-format
+#~ msgid ""
+#~ "\n"
+#~ "Organization: {org}\n"
+#~ "Permissions: {perms}\n"
+#~ msgstr ""
+#~ "\n"
+#~ "组织: {org}\n"
+#~ "权限: {perms}\n"
+
+#~ msgid "asset permissions of organization"
+#~ msgstr "组织资产授权"
+
+#~ msgid "application permissions of organization"
+#~ msgstr "组织的应用授权 {}"
+
+#, python-brace-format
+#~ msgid ""
+#~ "\n"
+#~ " Organization: {org} \n"
+#~ " Permissions: {perms} \n"
+#~ msgstr ""
+#~ "\n"
+#~ "组织: {org} \n"
+#~ "授权: {perms} \n"
+
+#, fuzzy
+#~| msgid "Application permission"
+#~ msgid "application of organization {}"
+#~ msgstr "应用管理"
+
+#~ msgid "Assets may expire"
+#~ msgstr "资产权限将要过期"
+
+#, fuzzy, python-format
+#~ msgid ""
+#~ "\n"
+#~ "            Hello %(name)s:\n"
+#~ "            <br>\n"
+#~ "            The following asset permissions will expire in three days\n"
+#~ "            <br>\n"
+#~ "            %(content)s\n"
+#~ "        "
+#~ msgstr ""
+#~ "\n"
+#~ "       你好 %(name)s:\n"
+#~ "       <br>\n"
+#~ "       以下资产授权将会在未来 3 天过期: \n"
+#~ "       <br>\n"
+#~ "       %(content)s\n"
+#~ "       "
+
+#, fuzzy
+#~| msgid "Applications"
+#~ msgid "Applications may expire"
+#~ msgstr "应用管理"
+
+#, fuzzy, python-format
+#~| msgid ""
+#~| "\n"
+#~| "           Hello %(name)s:\n"
+#~| "           <br>\n"
+#~| "           Your account will expire in %(date_expired)s,\n"
+#~| "           <br>\n"
+#~| "           In order not to affect your normal work, please contact the "
+#~| "administrator for confirmation.\n"
+#~| "           <br>\n"
+#~| "           "
+#~ msgid ""
+#~ "\n"
+#~ "            Hello %(name)s:\n"
+#~ "            <br>\n"
+#~ "            Your permissions for the following applications may expire in "
+#~ "three days:\n"
+#~ "            <br>\n"
+#~ "            %(apps)s\n"
+#~ "            <br>\n"
+#~ "            Please contact the administrator\n"
+#~ "        "
+#~ msgstr ""
+#~ "\n"
+#~ "       您好 %(name)s:\n"
+#~ "       <br>\n"
+#~ "       您的账户会在 %(date_expired)s 过期，\n"
+#~ "       <br>\n"
+#~ "       为了不影响您正常工作，请联系管理员确认。\n"
+#~ "       <br>\n"
+#~ "       "
+
+#, fuzzy, python-format
+#~| msgid ""
+#~| "\n"
+#~| "           Hello %(name)s:\n"
+#~| "           <br>\n"
+#~| "           Your account will expire in %(date_expired)s,\n"
+#~| "           <br>\n"
+#~| "           In order not to affect your normal work, please contact the "
+#~| "administrator for confirmation.\n"
+#~| "           <br>\n"
+#~| "           "
+#~ msgid ""
+#~ "\n"
+#~ "            Hello %(name)s:\n"
+#~ "            <br>\n"
+#~ "            The following application permissions will expire in three "
+#~ "days\n"
+#~ "            <br>\n"
+#~ "            %(content)s\n"
+#~ "        "
+#~ msgstr ""
+#~ "\n"
+#~ "       您好 %(name)s:\n"
+#~ "       <br>\n"
+#~ "       您的账户会在 %(date_expired)s 过期，\n"
+#~ "       <br>\n"
+#~ "       为了不影响您正常工作，请联系管理员确认。\n"
+#~ "       <br>\n"
+#~ "       "
+
 #~ msgid "You've been hacked"
 #~ msgstr "你被攻击了"
+
+#~ msgid "Binding DingTalk failed"
+#~ msgstr "绑定钉钉失败"
+
+#~ msgid "Binding FeiShu failed"
+#~ msgstr "绑定飞书失败"
+
+#~ msgid "Binding WeCom failed"
+#~ msgstr "绑定企业微信失败"
+
+#~ msgid "Enable Login MFA"
+#~ msgstr "启用登录MFA"
+
+#~ msgid "Enable login password add-on"
+#~ msgstr "启用登录密码附加码"
 
 #~ msgid "OpenID"
 #~ msgstr "OpenID"
