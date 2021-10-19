@@ -35,13 +35,14 @@ class UserLoginLogSerializer(serializers.ModelSerializer):
         fields_mini = ['id']
         fields_small = fields_mini + [
             'username', 'type', 'type_display', 'ip', 'city', 'user_agent',
-            'mfa', 'mfa_display', 'reason', 'backend',
+            'mfa', 'mfa_display', 'reason', 'reason_display',  'backend',
             'status', 'status_display',
             'datetime',
         ]
         fields = fields_small
         extra_kwargs = {
-            "user_agent": {'label': _('User agent')}
+            "user_agent": {'label': _('User agent')},
+            "reason_display": {'label': _('Reason')}
         }
 
 
