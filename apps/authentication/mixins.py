@@ -401,9 +401,9 @@ class AuthMixin(PasswordEncryptionViewMixin):
     def check_user_mfa(self, code, mfa_type=MFAType.OTP, user=None):
         user = user if user else self.get_user_from_session()
         if not user.mfa_enabled:
-            return True
+            return
 
-        if not (bool(user.otp_secret_key) and mfa_type == MFAType.OTP):
+        if not bool(user.otp_secret_key) and mfa_type == MFAType.OTP:
             self.set_passwd_verify_on_session(user)
             raise errors.OTPRequiredError(reverse_lazy('authentication:user-otp-enable-bind'))
 
