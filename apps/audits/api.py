@@ -39,19 +39,12 @@ class UserLoginLogViewSet(ListModelMixin, CommonGenericViewSet):
         ('datetime', ('date_from', 'date_to'))
     ]
     filterset_fields = ['username', 'ip', 'city', 'type', 'status', 'mfa']
-    search_fields =['username', 'ip', 'city']
+    search_fields = ['username', 'ip', 'city']
 
     @staticmethod
     def get_org_members():
         users = current_org.get_members().values_list('username', flat=True)
         return users
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        if not current_org.is_default():
-            users = self.get_org_members()
-            queryset = queryset.filter(username__in=users)
-        return queryset
 
 
 class OperateLogViewSet(ListModelMixin, OrgGenericViewSet):
