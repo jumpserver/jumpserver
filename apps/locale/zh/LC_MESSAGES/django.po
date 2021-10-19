@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-29 14:51+0800\n"
+"POT-Creation-Date: 2021-10-19 10:39+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -119,7 +119,7 @@ msgstr "系统用户"
 #: acls/models/login_asset_acl.py:22
 #: applications/serializers/attrs/application_category/remote_app.py:37
 #: assets/models/asset.py:357 assets/models/authbook.py:18
-#: assets/models/gathered_user.py:14 assets/serializers/system_user.py:207
+#: assets/models/gathered_user.py:14 assets/serializers/system_user.py:215
 #: audits/models.py:38 perms/models/asset_permission.py:99
 #: templates/index.html:82 terminal/backends/command/models.py:19
 #: terminal/backends/command/serializers.py:13 terminal/models/session.py:40
@@ -316,7 +316,7 @@ msgstr "类别名称"
 
 #: applications/serializers/application.py:60
 #: applications/serializers/application.py:91
-#: assets/serializers/system_user.py:26 audits/serializers.py:29
+#: assets/serializers/system_user.py:27 audits/serializers.py:29
 #: perms/serializers/application/permission.py:17
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:35
 #: tickets/serializers/ticket/ticket.py:22
@@ -421,7 +421,7 @@ msgstr "基础"
 msgid "Charset"
 msgstr "编码"
 
-#: assets/models/asset.py:142 assets/serializers/asset.py:172
+#: assets/models/asset.py:142 assets/serializers/asset.py:174
 #: tickets/models/ticket.py:50
 msgid "Meta"
 msgstr "元数据"
@@ -431,11 +431,11 @@ msgid "Internal"
 msgstr "内部的"
 
 #: assets/models/asset.py:163 assets/models/asset.py:187
-#: assets/serializers/asset.py:63 perms/serializers/asset/user_permission.py:43
+#: assets/serializers/asset.py:65 perms/serializers/asset/user_permission.py:43
 msgid "Platform"
 msgstr "系统平台"
 
-#: assets/models/asset.py:186 assets/serializers/asset.py:65
+#: assets/models/asset.py:186 assets/serializers/asset.py:67
 #: perms/serializers/asset/user_permission.py:41
 #: xpack/plugins/cloud/models.py:104 xpack/plugins/cloud/serializers/task.py:42
 msgid "Protocols"
@@ -740,7 +740,7 @@ msgstr "全称"
 msgid "Parent key"
 msgstr "ssh私钥"
 
-#: assets/models/node.py:559 assets/serializers/system_user.py:206
+#: assets/models/node.py:559 assets/serializers/system_user.py:214
 #: users/templates/users/user_asset_permission.html:41
 #: users/templates/users/user_asset_permission.html:73
 #: users/templates/users/user_asset_permission.html:158
@@ -764,7 +764,7 @@ msgstr "普通用户"
 msgid "Username same with user"
 msgstr "用户名与用户相同"
 
-#: assets/models/user.py:200 assets/serializers/domain.py:28
+#: assets/models/user.py:200 assets/serializers/domain.py:29
 #: templates/_nav.html:39 xpack/plugins/change_auth_plan/models/asset.py:40
 msgid "Assets"
 msgstr "资产"
@@ -819,32 +819,32 @@ msgstr "%(value)s is not an even number"
 msgid "System user display"
 msgstr "系统用户名称"
 
-#: assets/serializers/asset.py:20
+#: assets/serializers/asset.py:22
 msgid "Protocol format should {}/{}"
 msgstr "协议格式 {}/{}"
 
-#: assets/serializers/asset.py:37
+#: assets/serializers/asset.py:39
 msgid "Protocol duplicate: {}"
 msgstr "协议重复: {}"
 
-#: assets/serializers/asset.py:66
+#: assets/serializers/asset.py:68
 msgid "Domain name"
 msgstr "网域名称"
 
-#: assets/serializers/asset.py:67
+#: assets/serializers/asset.py:69
 msgid "Nodes name"
 msgstr "节点名称"
 
-#: assets/serializers/asset.py:101
+#: assets/serializers/asset.py:103
 msgid "Hardware info"
 msgstr "硬件信息"
 
-#: assets/serializers/asset.py:102 assets/serializers/system_user.py:225
+#: assets/serializers/asset.py:104 assets/serializers/system_user.py:233
 #: orgs/mixins/serializers.py:26
 msgid "Org name"
 msgstr "组织名称"
 
-#: assets/serializers/asset.py:103
+#: assets/serializers/asset.py:105
 msgid "Admin user display"
 msgstr "特权用户名称"
 
@@ -852,18 +852,18 @@ msgstr "特权用户名称"
 msgid "private key invalid"
 msgstr "密钥不合法"
 
-#: assets/serializers/domain.py:12 assets/serializers/label.py:12
-#: assets/serializers/system_user.py:52
+#: assets/serializers/domain.py:13 assets/serializers/label.py:12
+#: assets/serializers/system_user.py:53
 #: perms/serializers/asset/permission.py:72
 msgid "Assets amount"
 msgstr "资产数量"
 
-#: assets/serializers/domain.py:13
+#: assets/serializers/domain.py:14
 #: perms/serializers/application/permission.py:43
 msgid "Applications amount"
 msgstr "应用数量"
 
-#: assets/serializers/domain.py:14
+#: assets/serializers/domain.py:15
 msgid "Gateways count"
 msgstr "网关数量"
 
@@ -879,48 +879,52 @@ msgstr "不能包含: /"
 msgid "The same level node name cannot be the same"
 msgstr "同级别节点名字不能重复"
 
-#: assets/serializers/system_user.py:27
+#: assets/serializers/system_user.py:28
 msgid "SSH key fingerprint"
 msgstr "密钥指纹"
 
-#: assets/serializers/system_user.py:51
+#: assets/serializers/system_user.py:52
 #: perms/serializers/asset/permission.py:73
 msgid "Nodes amount"
 msgstr "节点数量"
 
-#: assets/serializers/system_user.py:53 assets/serializers/system_user.py:208
+#: assets/serializers/system_user.py:54 assets/serializers/system_user.py:216
 msgid "Login mode display"
 msgstr "认证方式名称"
 
-#: assets/serializers/system_user.py:55
+#: assets/serializers/system_user.py:56
 msgid "Ad domain"
 msgstr "Ad 网域"
 
-#: assets/serializers/system_user.py:56
+#: assets/serializers/system_user.py:57
 msgid "Is asset protocol"
 msgstr ""
 
-#: assets/serializers/system_user.py:96
+#: assets/serializers/system_user.py:97
 msgid "Username same with user with protocol {} only allow 1"
 msgstr "用户名和用户相同的一种协议只允许存在一个"
 
-#: assets/serializers/system_user.py:110
+#: assets/serializers/system_user.py:107 common/validators.py:14
+msgid "Special char not allowed"
+msgstr "不能包含特殊字符"
+
+#: assets/serializers/system_user.py:116
 msgid "* Automatic login mode must fill in the username."
 msgstr "自动登录模式，必须填写用户名"
 
-#: assets/serializers/system_user.py:124
+#: assets/serializers/system_user.py:130
 msgid "Path should starts with /"
 msgstr "路径应该以 / 开头"
 
-#: assets/serializers/system_user.py:149
+#: assets/serializers/system_user.py:155
 msgid "Password or private key required"
 msgstr "密码或密钥密码需要一个"
 
-#: assets/serializers/system_user.py:224
+#: assets/serializers/system_user.py:232
 msgid "System user name"
 msgstr "系统用户名称"
 
-#: assets/serializers/system_user.py:234
+#: assets/serializers/system_user.py:242
 msgid "Asset hostname"
 msgstr "资产主机名"
 
@@ -1239,12 +1243,12 @@ msgstr ""
 msgid "Auth Token"
 msgstr "认证令牌"
 
-#: audits/signals_handler.py:68 authentication/views/login.py:160
+#: audits/signals_handler.py:68 authentication/views/login.py:162
 #: notifications/backends/__init__.py:11 users/models/user.py:660
 msgid "WeCom"
 msgstr "企业微信"
 
-#: audits/signals_handler.py:69 authentication/views/login.py:166
+#: audits/signals_handler.py:69 authentication/views/login.py:168
 #: notifications/backends/__init__.py:12 users/models/user.py:661
 msgid "DingTalk"
 msgstr "钉钉"
@@ -1432,7 +1436,7 @@ msgstr "{ApplicationPermission} 添加 {SystemUser}"
 msgid "{ApplicationPermission} REMOVE {SystemUser}"
 msgstr "{ApplicationPermission} 移除 {SystemUser}"
 
-#: authentication/api/connection_token.py:227
+#: authentication/api/connection_token.py:235
 msgid "Invalid token"
 msgstr "无效的令牌"
 
@@ -1630,6 +1634,12 @@ msgstr "您的密码已过期，先修改再登录"
 #: authentication/errors.py:350
 msgid "Your password is invalid"
 msgstr "您的密码无效"
+
+#: authentication/errors.py:356
+#, fuzzy
+#| msgid "Not has host {} permission"
+msgid "No upload or download permission"
+msgstr "没有该主机 {} 权限"
 
 #: authentication/forms.py:35
 msgid "{} days auto login"
@@ -1875,8 +1885,11 @@ msgstr "钉钉错误"
 
 #: authentication/views/dingtalk.py:56 authentication/views/feishu.py:52
 #: authentication/views/wecom.py:56
-msgid "You've been hacked"
-msgstr "你被攻击了"
+#, fuzzy
+#| msgid "WeCom Error, Please contact your system administrator"
+msgid ""
+"The system configuration is incorrect. Please contact your administrator"
+msgstr "企业微信错误，请联系系统管理员"
 
 #: authentication/views/dingtalk.py:92
 msgid "DingTalk is already bound"
@@ -1957,24 +1970,24 @@ msgstr "请使用密码登录，然后绑定飞书"
 msgid "Binding FeiShu failed"
 msgstr "绑定飞书失败"
 
-#: authentication/views/login.py:81
+#: authentication/views/login.py:83
 msgid "Redirecting"
 msgstr "跳转中"
 
-#: authentication/views/login.py:82
+#: authentication/views/login.py:84
 msgid "Redirecting to {} authentication"
 msgstr "正在跳转到 {} 认证"
 
-#: authentication/views/login.py:108
+#: authentication/views/login.py:110
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: authentication/views/login.py:172 notifications/backends/__init__.py:14
+#: authentication/views/login.py:174 notifications/backends/__init__.py:14
 #: users/models/user.py:662
 msgid "FeiShu"
 msgstr "飞书"
 
-#: authentication/views/login.py:259
+#: authentication/views/login.py:261
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -1982,15 +1995,15 @@ msgstr ""
 "等待 <b>{}</b> 确认, 你也可以复制链接发给他/她 <br/>\n"
 "                  不要关闭本页面"
 
-#: authentication/views/login.py:264
+#: authentication/views/login.py:266
 msgid "No ticket found"
 msgstr "没有发现工单"
 
-#: authentication/views/login.py:296
+#: authentication/views/login.py:298
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: authentication/views/login.py:297
+#: authentication/views/login.py:299
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
@@ -2166,23 +2179,29 @@ msgstr "忽略的"
 msgid "discard time"
 msgstr "忽略时间"
 
-#: common/utils/ipip/utils.py:15
+#: common/utils/geoip/utils.py:17 common/utils/geoip/utils.py:30
 msgid "Invalid ip"
 msgstr "无效IP"
 
-#: common/validators.py:15
-msgid "Special char not allowed"
-msgstr "不能包含特殊字符"
+#: common/utils/geoip/utils.py:28
+msgid "LAN"
+msgstr ""
 
-#: common/validators.py:27
+#: common/utils/geoip/utils.py:35 common/utils/geoip/utils.py:45
+#, fuzzy
+#| msgid "Unknown"
+msgid "Unknown ip"
+msgstr "未知"
+
+#: common/validators.py:30
 msgid "This field must be unique."
 msgstr "字段必须唯一"
 
-#: common/validators.py:35
+#: common/validators.py:38
 msgid "Should not contains special characters"
 msgstr "不能包含特殊字符"
 
-#: common/validators.py:41
+#: common/validators.py:44
 msgid "The mobile phone number format is incorrect"
 msgstr "手机号格式不正确"
 
@@ -2519,6 +2538,272 @@ msgstr "失效日期"
 #: perms/models/base.py:54
 msgid "From ticket"
 msgstr "来自工单"
+
+#: perms/notifications.py:18 perms/notifications.py:40
+#, fuzzy
+#| msgid "Asset number"
+msgid "Assets may expire"
+msgstr "资产编号"
+
+#: perms/notifications.py:21
+#, fuzzy, python-format
+#| msgid ""
+#| "\n"
+#| "           Hello %(name)s:\n"
+#| "           <br>\n"
+#| "           Your account will expire in %(date_expired)s,\n"
+#| "           <br>\n"
+#| "           In order not to affect your normal work, please contact the "
+#| "administrator for confirmation.\n"
+#| "           <br>\n"
+#| "           "
+msgid ""
+"\n"
+"            Hello %(name)s:\n"
+"            <br>\n"
+"            Your permissions for the following assets may expire in three "
+"days:\n"
+"            <br>\n"
+"            %(assets)s\n"
+"            <br>\n"
+"            Please contact the administrator\n"
+"        "
+msgstr ""
+"\n"
+"       您好 %(name)s:\n"
+"       <br>\n"
+"       您的账户会在 %(date_expired)s 过期，\n"
+"       <br>\n"
+"       为了不影响您正常工作，请联系管理员确认。\n"
+"       <br>\n"
+"       "
+
+#: perms/notifications.py:43
+#, python-format
+msgid ""
+"\n"
+"Hello %(name)s:\n"
+"\n"
+"\n"
+"Your permissions for the following assets may expire in three days:\n"
+"\n"
+"\n"
+"%(assets)s\n"
+"\n"
+"\n"
+"Please contact the administrator\n"
+"        "
+msgstr ""
+
+#: perms/notifications.py:69 perms/notifications.py:90
+#: perms/notifications.py:117 perms/notifications.py:140
+#, fuzzy
+#| msgid "Asset permission"
+msgid "Asset permission will expired"
+msgstr "资产授权"
+
+#: perms/notifications.py:72
+msgid ""
+"\n"
+"            Hello %(name)s:\n"
+"            <br>\n"
+"            The following asset permissions of organization %(org) will "
+"expire in three days\n"
+"            <br>\n"
+"            %(perms)s\n"
+"        "
+msgstr ""
+
+#: perms/notifications.py:93
+msgid ""
+"\n"
+"Hello %(name)s:\n"
+"\n"
+"\n"
+"The following asset permissions of organization %(org) will expire in three "
+"days\n"
+"\n"
+"\n"
+"%(perms)s\n"
+"        "
+msgstr ""
+
+#: perms/notifications.py:123
+#, fuzzy, python-format
+#| msgid ""
+#| "\n"
+#| "           Hello %(name)s:\n"
+#| "           <br>\n"
+#| "           Your account will expire in %(date_expired)s,\n"
+#| "           <br>\n"
+#| "           In order not to affect your normal work, please contact the "
+#| "administrator for confirmation.\n"
+#| "           <br>\n"
+#| "           "
+msgid ""
+"\n"
+"            Hello %(name)s:\n"
+"            <br>\n"
+"            The following asset permissions will expire in three days\n"
+"            <br>\n"
+"            %(content)s\n"
+"        "
+msgstr ""
+"\n"
+"       您好 %(name)s:\n"
+"       <br>\n"
+"       您的账户会在 %(date_expired)s 过期，\n"
+"       <br>\n"
+"       为了不影响您正常工作，请联系管理员确认。\n"
+"       <br>\n"
+"       "
+
+#: perms/notifications.py:146
+msgid ""
+"\n"
+"Hello %(name)s:\n"
+"\n"
+"\n"
+"The following asset permissions of organization %(org) will expire in three "
+"days\n"
+"\n"
+"\n"
+"%(content)s\n"
+"        "
+msgstr ""
+
+#: perms/notifications.py:169 perms/notifications.py:191
+#, fuzzy
+#| msgid "Applications"
+msgid "Applications may expire"
+msgstr "应用管理"
+
+#: perms/notifications.py:172
+#, fuzzy, python-format
+#| msgid ""
+#| "\n"
+#| "           Hello %(name)s:\n"
+#| "           <br>\n"
+#| "           Your account will expire in %(date_expired)s,\n"
+#| "           <br>\n"
+#| "           In order not to affect your normal work, please contact the "
+#| "administrator for confirmation.\n"
+#| "           <br>\n"
+#| "           "
+msgid ""
+"\n"
+"            Hello %(name)s:\n"
+"            <br>\n"
+"            Your permissions for the following applications may expire in "
+"three days:\n"
+"            <br>\n"
+"            %(apps)s\n"
+"            <br>\n"
+"            Please contact the administrator\n"
+"        "
+msgstr ""
+"\n"
+"       您好 %(name)s:\n"
+"       <br>\n"
+"       您的账户会在 %(date_expired)s 过期，\n"
+"       <br>\n"
+"       为了不影响您正常工作，请联系管理员确认。\n"
+"       <br>\n"
+"       "
+
+#: perms/notifications.py:194
+#, python-format
+msgid ""
+"\n"
+"Hello %(name)s:\n"
+"\n"
+"\n"
+"Your permissions for the following applications may expire in three days:\n"
+"\n"
+"\n"
+"%(apps)s\n"
+"\n"
+"\n"
+"Please contact the administrator\n"
+"        "
+msgstr ""
+
+#: perms/notifications.py:220 perms/notifications.py:241
+#: perms/notifications.py:268 perms/notifications.py:291
+#, fuzzy
+#| msgid "Application permission"
+msgid "Application permission will expired"
+msgstr "应用管理"
+
+#: perms/notifications.py:223
+msgid ""
+"\n"
+"            Hello %(name)s:\n"
+"            <br>\n"
+"            The following application permissions of organization %(org) "
+"will expire in three days\n"
+"            <br>\n"
+"            %(perms)s\n"
+"        "
+msgstr ""
+
+#: perms/notifications.py:244
+msgid ""
+"\n"
+"Hello %(name)s:\n"
+"\n"
+"\n"
+"The following application permissions of organization %(org) will expire in "
+"three days\n"
+"\n"
+"\n"
+"%(perms)s\n"
+"        "
+msgstr ""
+
+#: perms/notifications.py:274
+#, fuzzy, python-format
+#| msgid ""
+#| "\n"
+#| "           Hello %(name)s:\n"
+#| "           <br>\n"
+#| "           Your account will expire in %(date_expired)s,\n"
+#| "           <br>\n"
+#| "           In order not to affect your normal work, please contact the "
+#| "administrator for confirmation.\n"
+#| "           <br>\n"
+#| "           "
+msgid ""
+"\n"
+"            Hello %(name)s:\n"
+"            <br>\n"
+"            The following application permissions will expire in three days\n"
+"            <br>\n"
+"            %(content)s\n"
+"        "
+msgstr ""
+"\n"
+"       您好 %(name)s:\n"
+"       <br>\n"
+"       您的账户会在 %(date_expired)s 过期，\n"
+"       <br>\n"
+"       为了不影响您正常工作，请联系管理员确认。\n"
+"       <br>\n"
+"       "
+
+#: perms/notifications.py:297
+msgid ""
+"\n"
+"Hello %(name)s:\n"
+"\n"
+"\n"
+"The following application permissions of organization %(org) will expire in "
+"three days\n"
+"\n"
+"\n"
+"%(content)s\n"
+"        "
+msgstr ""
 
 #: perms/serializers/application/permission.py:18
 #: perms/serializers/application/permission.py:38
@@ -3211,12 +3496,12 @@ msgid ""
 msgstr "是否允许终端注册，当所有终端启动后，为了安全应该关闭"
 
 #: settings/serializers/security.py:88
-msgid "Replay watermark"
-msgstr "录像水印"
+msgid "Enable watermark"
+msgstr "开启水印"
 
 #: settings/serializers/security.py:89
-msgid "Enabled, the session replay contains watermark information"
-msgstr "启用后，会话录像将包含水印信息"
+msgid "Enabled, the web session and replay contains watermark information"
+msgstr "启用后，Web 会话和录像将包含水印信息"
 
 #: settings/serializers/security.py:93
 msgid "Connection max idle time"
@@ -6319,6 +6604,9 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "You've been hacked"
+#~ msgstr "你被攻击了"
 
 #~ msgid "OpenID"
 #~ msgstr "OpenID"

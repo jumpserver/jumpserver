@@ -187,7 +187,9 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.annotate(assets_amount=Count("assets"))
+        queryset = queryset\
+            .annotate(assets_amount=Count("assets"))\
+            .prefetch_related('nodes', 'cmd_filters')
         return queryset
 
 
