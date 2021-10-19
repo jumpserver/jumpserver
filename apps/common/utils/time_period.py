@@ -1,4 +1,4 @@
-from django.utils.timezone import now
+from common.utils.timezone import now
 
 
 def contains_time_period(time_periods):

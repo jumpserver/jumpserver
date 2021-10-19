@@ -15,17 +15,6 @@ def has_zh(name: str) -> bool:
     return False
 
 
-def update_users(apps, schema_editor):
-    login_acl_model = apps.get_model("acls", "LoginACL")
-
-    updates = list()
-    with transaction.atomic():
-        for instance in login_acl_model.objects.all():
-            instance.users.update({"username_group": []})
-            updates.append(instance)
-        login_acl_model.objects.bulk_update(updates, ['users', ])
-
-
 def migrate_login_confirm(apps, schema_editor):
     login_acl_model = apps.get_model("acls", "LoginACL")
     login_confirm_model = apps.get_model("authentication", "LoginConfirmSetting")
@@ -42,8 +31,7 @@ def migrate_login_confirm(apps, schema_editor):
                 'user': user,
                 'name': f'{user.name}-{login_confirm} ({date_created})',
                 'created_by': instance.created_by,
-                'action': LoginACL.ActionChoices.confirm,
-                'users': {"username_group": []},
+                'action': LoginACL.ActionChoices.confirm
             }
             instance = login_acl_model.objects.create(**data)
             instance.reviewers.set(reviewers)
@@ -83,18 +71,12 @@ class Migration(migrations.Migration):
             field=models.ManyToManyField(blank=True, related_name='login_confirm_acls',
                                          to=settings.AUTH_USER_MODEL, verbose_name='Reviewers'),
         ),
-        migrations.AddField(
-            model_name='loginacl',
-            name='users',
-            field=models.JSONField(default=dict, verbose_name='User match'),
-        ),
         migrations.AlterField(
             model_name='loginacl',
             name='user',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE,
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
                                     related_name='login_acls', to=settings.AUTH_USER_MODEL, verbose_name='User'),
         ),
-        migrations.RunPython(update_users),
         migrations.RunPython(migrate_login_confirm),
         migrations.AddField(
             model_name='loginacl',

@@ -21,10 +21,9 @@ class LoginACL(BaseACL):
         confirm = 'confirm', _('Login confirm')
 
     # 用户
-    users = models.JSONField(default=dict, verbose_name=_('User match'))
     user = models.ForeignKey(
         'users.User', on_delete=models.CASCADE, verbose_name=_('User'),
-        null=True, blank=True, related_name='login_acls'
+        related_name='login_acls'
     )
     # 规则
     rules = models.JSONField(default=dict, verbose_name=_('Rule'))
@@ -55,11 +54,7 @@ class LoginACL(BaseACL):
 
     @classmethod
     def filter_acl(cls, user):
-        queryset = (cls.objects.filter(
-            Q(users__username_group__contains=user.username) |
-            Q(users__username_group__contains='*')
-        ) | user.login_acls.all()).valid().distinct()
-        return queryset
+        return user.login_acls.all().valid().distinct()
 
     @staticmethod
     def allow_user_to_login(user, ip):
