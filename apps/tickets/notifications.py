@@ -6,6 +6,7 @@ from django.utils.translation import ugettext as _
 from . import const
 from notifications.notifications import UserMessage
 from common.utils import get_logger
+from .models import Ticket
 
 logger = get_logger(__file__)
 
@@ -27,28 +28,17 @@ EMAIL_TEMPLATE = '''
 
 
 class BaseTicketMessage(UserMessage):
+    title: ''
+    ticket: Ticket
+    content_title: str
 
     @property
     def subject(self):
-        return _(self.title).format(self.ticket.title, self.ticket.get_type_display())
+        return self.title.format(self.ticket.title, self.ticket.get_type_display())
 
     @property
     def ticket_detail_url(self):
         return urljoin(settings.SITE_URL, const.TICKET_DETAIL_URL.format(id=str(self.ticket.id)))
-
-    def get_text_msg(self) -> dict:
-        message = """
-        {title}: {ticket_detail_url}
-        {body}
-        """.format(
-            title=self.content_title,
-            ticket_detail_url=self.ticket_detail_url,
-            body=self.ticket.body.replace('<div style="margin-left: 20px;">', '').replace('</div>', '')
-        )
-        return {
-            'subject': self.subject,
-            'message': message
-        }
 
     def get_html_msg(self) -> dict:
         message = EMAIL_TEMPLATE.format(
@@ -62,9 +52,13 @@ class BaseTicketMessage(UserMessage):
             'message': message
         }
 
+    @classmethod
+    def gen_test_msg(cls):
+        return cls(None)
+
 
 class TicketAppliedToAssignee(BaseTicketMessage):
-    title = 'New Ticket - {} ({})'
+    title = _('New Ticket - {} ({})')
 
     def __init__(self, user, ticket):
         self.ticket = ticket
@@ -76,7 +70,7 @@ class TicketAppliedToAssignee(BaseTicketMessage):
 
 
 class TicketProcessedToApplicant(BaseTicketMessage):
-    title = 'Ticket has processed - {} ({})'
+    title = _('Ticket has processed - {} ({})')
 
     def __init__(self, user, ticket, processor):
         self.ticket = ticket

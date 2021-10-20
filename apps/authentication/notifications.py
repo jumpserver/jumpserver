@@ -35,31 +35,6 @@ class DifferentCityLoginMessage(UserMessage):
     def subject(self):
         return _('Different city login reminder')
 
-    def get_text_msg(self) -> dict:
-        message = _(
-            ""
-            "{subject}\n"
-            "Dear {server_name} user, Hello!\n"
-            "Your account has remote login behavior, please pay attention.\n"
-            "User: {username}\n"
-            "Login time: {time}\n"
-            "Login location: {city} ({ip})\n"
-            "If you suspect that the login behavior is abnormal, please modify "
-            "the account password in time.\n"
-            "Thank you for your attention to {server_name}!\n"
-        ).format(
-            subject=self.subject,
-            server_name=PublicSettingApi.get_login_title(),
-            username=self.user.username,
-            ip=self.ip,
-            time=self.time,
-            city=self.city,
-        )
-        return {
-            'subject': self.subject,
-            'message': message
-        }
-
     def get_html_msg(self) -> dict:
         message = EMAIL_TEMPLATE.format(
             subject=self.subject,
@@ -73,3 +48,11 @@ class DifferentCityLoginMessage(UserMessage):
             'subject': self.subject,
             'message': message
         }
+
+    @classmethod
+    def gen_test_msg(cls):
+        from users.models import User
+        user = User.objects.first()
+        ip = '8.8.8.8'
+        city = '洛杉矶'
+        return cls(user, ip, city)

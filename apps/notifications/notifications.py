@@ -1,3 +1,4 @@
+from abc import ABC
 from typing import Iterable
 import traceback
 from itertools import chain
@@ -17,6 +18,7 @@ __all__ = ('SystemMessage', 'UserMessage', 'system_msgs')
 
 system_msgs = []
 user_msgs = []
+all_msgs = []
 
 
 class MessageType(type):
@@ -66,6 +68,10 @@ class Message(metaclass=MessageType):
     def publish_async(self):
         return publish_task.delay(self)
 
+    @classmethod
+    def gen_test_msg(cls):
+        raise NotImplementedError
+
     def publish(self):
         raise NotImplementedError
 
@@ -114,8 +120,6 @@ class Message(metaclass=MessageType):
         content = content.replace('\n', '')
 
         soup = BeautifulSoup(content, features="lxml")
-        for ele in soup.find_all(["br"]):
-            ele.append('\n')
         msg['message'] = soup.get_text()
         return msg
 
@@ -136,7 +140,7 @@ class Message(metaclass=MessageType):
     def get_dingtalk_msg(self) -> dict:
         # 钉钉相同的消息一天只能发一次，所以给所有消息添加基于时间的序号，使他们不相同
         message = self.text_msg['message']
-        suffix = '\n{}: {}'.format(_('Time'),  now().strftime('%Y-%m-%d %H:%M:%S'))
+        suffix = '\n\n{}: {}'.format(_('Time'),  now().strftime('%Y-%m-%d %H:%M:%S'))
 
         return {
             'subject': self.text_msg['subject'],
@@ -157,7 +161,28 @@ class Message(metaclass=MessageType):
 
     def get_sms_msg(self) -> dict:
         return self.text_msg
-    # --------------------------------------------------------------
+
+    @classmethod
+    def test_all_messages(cls):
+        def get_subclasses(cls):
+            """returns all subclasses of argument, cls"""
+            if issubclass(cls, type):
+                subclasses = cls.__subclasses__(cls)
+            else:
+                subclasses = cls.__subclasses__()
+            for subclass in subclasses:
+                subclasses.extend(get_subclasses(subclass))
+            return subclasses
+
+        messages_cls = get_subclasses(cls)
+        for _cls in messages_cls:
+            try:
+                msg = _cls.gen_test_msg()
+            except NotImplementedError:
+                continue
+            if not msg:
+                continue
+            msg.send_test_msg()
 
 
 class SystemMessage(Message):
@@ -180,6 +205,10 @@ class SystemMessage(Message):
     def post_insert_to_db(cls, subscription: SystemMsgSubscription):
         pass
 
+    @classmethod
+    def gen_test_msg(cls):
+        raise NotImplementedError
+
 
 class UserMessage(Message):
     user: User
@@ -193,3 +222,7 @@ class UserMessage(Message):
         """
         sub = UserMsgSubscription.objects.get(user=self.user)
         self.send_msg([self.user], sub.receive_backends)
+
+    @classmethod
+    def gen_test_msg(cls):
+        raise NotImplementedError

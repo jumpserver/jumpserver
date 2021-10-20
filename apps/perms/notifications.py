@@ -10,17 +10,24 @@ class BasePermMsg(UserMessage):
     @staticmethod
     def get_admin_content_template():
         message = textwrap.dedent(_("""
-        Hello <b>%(name)s:<b><br>
+        Hello <b>%(name)s:</b>
+        <br>
         The following <b>%(item_type)s</b> will expire in 3 days
-        <br><br>
+        <br>
+        <br>
         %(items)s
         """)).strip()
         return message
 
     def get_user_content_template(self):
         message = self.get_admin_content_template()
-        message += _('<br>If you have any question, please contact the administrator')
+        message += _('<br>'
+                     'If you have any question, please contact the administrator')
         return message
+
+    @classmethod
+    def gen_test_msg(cls):
+        return
 
 
 class AssetPermWillExpireUserMsg(BasePermMsg):
@@ -41,6 +48,14 @@ class AssetPermWillExpireUserMsg(BasePermMsg):
             'subject': subject,
             'message': message
         }
+
+    @classmethod
+    def gen_test_msg(cls):
+        from users.models import User
+        from assets.models import Asset
+        user = User.objects.first()
+        assets = Asset.objects.all()[:10]
+        return cls(user, assets)
 
 
 class AssetPermWillExpireForOrgAdminMsg(BasePermMsg):
@@ -76,6 +91,17 @@ class AssetPermWillExpireForOrgAdminMsg(BasePermMsg):
             'message': message
         }
 
+    @classmethod
+    def gen_test_msg(cls):
+        from users.models import User
+        from perms.models import AssetPermission
+        from orgs.models import Organization
+
+        user = User.objects.first()
+        perms = AssetPermission.objects.all()[:10]
+        org = Organization.objects.first()
+        return cls(user, perms, org)
+
 
 class AppPermWillExpireUserMsg(BasePermMsg):
     def __init__(self, user, apps):
@@ -95,6 +121,15 @@ class AppPermWillExpireUserMsg(BasePermMsg):
             'subject': subject,
             'message': message
         }
+
+    @classmethod
+    def gen_test_msg(cls):
+        from users.models import User
+        from applications.models import Application
+
+        user = User.objects.first()
+        apps = Application.objects.all()[:10]
+        return cls(user, apps)
 
 
 class AppPermWillExpireForOrgAdminMsg(BasePermMsg):
@@ -130,3 +165,14 @@ class AppPermWillExpireForOrgAdminMsg(BasePermMsg):
             'subject': subject,
             'message': message
         }
+
+    @classmethod
+    def gen_test_msg(cls):
+        from users.models import User
+        from perms.models import ApplicationPermission
+        from orgs.models import Organization
+
+        user = User.objects.first()
+        perms = ApplicationPermission.objects.all()[:10]
+        org = Organization.objects.first()
+        return cls(user, perms, org)

@@ -24,19 +24,26 @@ class ServerPerformanceMessage(SystemMessage):
             'message': self._msg
         }
 
-    def get_text_msg(self) -> dict:
-        subject = self._msg[:80]
-        return {
-            'subject': subject.replace('<br>', '; '),
-            'message': self._msg.replace('<br>', '\n')
-        }
-
     @classmethod
     def post_insert_to_db(cls, subscription: SystemMsgSubscription):
         admins = User.objects.filter(role=User.ROLE.ADMIN)
         subscription.users.add(*admins)
         subscription.receive_backends = [BACKEND.EMAIL]
         subscription.save()
+
+    @classmethod
+    def gen_test_msg(cls):
+        alarm_messages = []
+        items_mapper = ServerPerformanceCheckUtil.items_mapper
+        for item, data in items_mapper.items():
+            msg = data['alarm_msg_format']
+            max_threshold = data['max_threshold']
+            value = 123
+            msg = msg.format(max_threshold=max_threshold, value=value, name='Fake terminal')
+            alarm_messages.append(msg)
+
+        msg = '<br>'.join(alarm_messages)
+        return cls(msg)
 
 
 class ServerPerformanceCheckUtil(object):
