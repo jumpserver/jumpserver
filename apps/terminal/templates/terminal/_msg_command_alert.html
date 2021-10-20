@@ -1,0 +1,17 @@
+{% load i18n %}
+
+<p>
+    <b>{% trans 'Command' %}:</b> {{ command }}
+</p>
+<p>
+    <b>{% trans 'Asset' %}:</b> {{ hostname }}({{ host_ip }})
+</p>
+<p>
+    <b>{% trans 'User' %}:</b> {{ user }}
+</p>
+<p>
+    <b>{% trans 'Level' %}:</b> {{ risk_level }}
+</p>
+<p>
+    <b>{% trans 'Session' %}:</b> <a href="{{ session_detail_url}}?oid={{ oid }}">{% trans 'view' %}</a>
+</p>

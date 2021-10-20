@@ -66,7 +66,17 @@ class TicketAppliedToAssignee(BaseTicketMessage):
 
     @property
     def content_title(self):
-        return _('Your has a new ticket, applicant - {}').format(str(self.ticket.applicant_display))
+        return _('Your has a new ticket, applicant - {}').format(
+            str(self.ticket.applicant_display)
+        )
+
+    @classmethod
+    def gen_test_msg(cls):
+        from .models import Ticket
+        from users.models import User
+        ticket = Ticket.objects.first()
+        user = User.objects.first()
+        return cls(user, ticket)
 
 
 class TicketProcessedToApplicant(BaseTicketMessage):
@@ -80,3 +90,12 @@ class TicketProcessedToApplicant(BaseTicketMessage):
     @property
     def content_title(self):
         return _('Your ticket has been processed, processor - {}').format(str(self.processor))
+
+    @classmethod
+    def gen_test_msg(cls):
+        from .models import Ticket
+        from users.models import User
+        ticket = Ticket.objects.first()
+        user = User.objects.first()
+        processor = User.objects.last()
+        return cls(user, ticket, processor)

@@ -1,16 +1,16 @@
 from datetime import datetime
 from urllib.parse import urljoin
-import textwrap
 
+from django.utils import timezone
 from django.utils.translation import ugettext as _
 from django.conf import settings
+from django.template.loader import render_to_string
 
 from common.utils import reverse, get_request_ip_or_data, get_request_user_agent
 from notifications.notifications import UserMessage
 
 
 class ResetPasswordMsg(UserMessage):
-
     def __init__(self, user):
         super().__init__(user)
         self.reset_passwd_token = user.generate_reset_token()
@@ -18,29 +18,14 @@ class ResetPasswordMsg(UserMessage):
     def get_html_msg(self) -> dict:
         user = self.user
         subject = _('Reset password')
-        message = textwrap.dedent(_("""
-            Hello %(name)s:
-            <br>
-            Please click the link below to reset your password, if not your request, concern your account security
-            <br>
-            <a href="%(rest_password_url)s?token=%(rest_password_token)s" class='showLink'>Click here reset password</a>
-            <br>
-            This link is valid for 1 hour. After it expires, <a href="%(forget_password_url)s?email=%(email)s">request new one</a>
-            <br>
-            <br>
-            ---
-        
-            <br>
-            <a href="%(login_url)s">Login direct</a>
-            <br>
-            """)) % {
-            'name': user.name,
+        context = {
+            'user': user,
             'rest_password_url': reverse('authentication:reset-password', external=True),
             'rest_password_token': self.reset_passwd_token,
             'forget_password_url': reverse('authentication:forgot-password', external=True),
-            'email': user.email,
             'login_url': reverse('authentication:login', external=True),
         }
+        message = render_to_string('authentication/_msg_reset_password.html', context)
         return {
             'subject': subject,
             'message': message
@@ -63,33 +48,12 @@ class ResetPasswordSuccessMsg(UserMessage):
         user = self.user
 
         subject = _('Reset password success')
-        message = textwrap.dedent(_("""
-        Hi %(name)s:
-        <br>
-        <br>
-        Your JumpServer password has just been successfully updated.
-        <br>
-        <br>
-        If the password update was not initiated by you, your account may have security issues. 
-        It is recommended that you log on to the JumpServer immediately and change your password.
-        <br>
-        <br>
-        If you have any questions, you can contact the administrator.
-        <br>
-        <br>
-        ---
-        <br>
-        <br>
-        IP Address: %(ip_address)s
-        <br>
-        <br>
-        Browser: %(browser)s
-        <br>
-        """)) % {
+        context = {
             'name': user.name,
             'ip_address': self.ip_address,
             'browser': self.browser,
         }
+        message = render_to_string('authentication/_msg_rest_password_success.html', context)
         return {
             'subject': subject,
             'message': message
@@ -111,34 +75,19 @@ class PasswordExpirationReminderMsg(UserMessage):
 
     def get_html_msg(self) -> dict:
         user = self.user
+        subject = _('Password is about expire')
 
-        subject = _('Security notice')
-        message = textwrap.dedent(_("""
-        Hello %(name)s:
-        <br>
-        Your password will expire in %(date_password_expired)s,
-        <br>
-        For your account security, please click on the link below to update your password in time
-        <br>
-        <a href="%(update_password_url)s">Click here update password</a>
-        <br>
-        If your password has expired, please click 
-        <a href="%(forget_password_url)s?email=%(email)s">Password expired</a> 
-        to apply for a password reset email.
-        <br>
-        ---
-        <br>
-        <a href="%(login_url)s">Login direct</a>
-        <br>
-        """)) % {
+        date_password_expired_local = timezone.localtime(user.date_password_expired)
+        date_password_expired = date_password_expired_local.strftime('%Y-%m-%d %H:%M:%S')
+        context = {
             'name': user.name,
-            'date_password_expired': datetime.fromtimestamp(datetime.timestamp(
-                user.date_password_expired)).strftime('%Y-%m-%d %H:%M'),
+            'date_password_expired': date_password_expired,
             'update_password_url': self.update_password_url,
             'forget_password_url': reverse('authentication:forgot-password', external=True),
             'email': user.email,
             'login_url': reverse('authentication:login', external=True),
         }
+        message = render_to_string('users/_msg_password_expire_reminder.html', context)
         return {
             'subject': subject,
             'message': message
@@ -153,19 +102,14 @@ class PasswordExpirationReminderMsg(UserMessage):
 
 class UserExpirationReminderMsg(UserMessage):
     def get_html_msg(self) -> dict:
-        subject = _('Expiration notice')
-        message = textwrap.dedent(_("""
-           Hello %(name)s:
-           <br>
-           Your account will expire in %(date_expired)s,
-           <br>
-           In order not to affect your normal work, please contact the administrator for confirmation.
-           <br>
-           """)) % {
-                'name': self.user.name,
-                'date_expired': datetime.fromtimestamp(datetime.timestamp(
-                    self.user.date_expired)).strftime('%Y-%m-%d %H:%M'),
+        subject = _('Account is about expire')
+        date_expired_local = timezone.localtime(self.user.date_password_expired)
+        date_expired = date_expired_local.strftime('%Y-%m-%d %H:%M:%S')
+        context = {
+            'name': self.user.name,
+            'date_expired': date_expired
         }
+        message = render_to_string('users/_msg_account_expire_reminder.html', context)
         return {
             'subject': subject,
             'message': message
@@ -180,20 +124,12 @@ class UserExpirationReminderMsg(UserMessage):
 
 class ResetSSHKeyMsg(UserMessage):
     def get_html_msg(self) -> dict:
-        subject = _('SSH Key Reset')
-        message = _("""
-        Hello %(name)s:
-        <br>
-        Your ssh public key has been reset by site administrator.
-        Please login and reset your ssh public key.
-        <br>
-        <a href="%(login_url)s">Login direct</a>
-        <br>
-        """) % {
+        subject = _('Reset SSH Key')
+        context = {
             'name': self.user.name,
             'login_url': reverse('authentication:login', external=True),
         }
-
+        message = render_to_string('users/_msg_reset_ssh_key.html', context)
         return {
             'subject': subject,
             'message': message
@@ -208,19 +144,12 @@ class ResetSSHKeyMsg(UserMessage):
 
 class ResetMFAMsg(UserMessage):
     def get_html_msg(self) -> dict:
-        subject = _('MFA Reset')
-        message = _("""
-        Hello %(name)s:
-        <br>
-        Your MFA has been reset by site administrator.
-        Please login and reset your MFA.
-        <br>
-        <a href="%(login_url)s">Login direct</a>
-        <br>
-        """) % {
+        subject = _('Reset MFA')
+        context = {
             'name': self.user.name,
             'login_url': reverse('authentication:login', external=True),
         }
+        message = render_to_string('users/_msg_reset_mfa.html', context)
         return {
             'subject': subject,
             'message': message

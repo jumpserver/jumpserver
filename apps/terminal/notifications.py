@@ -3,6 +3,7 @@ import textwrap
 
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
+from django.template.loader import render_to_string
 
 from users.models import User
 from common.utils import get_logger, reverse
@@ -79,24 +80,11 @@ class CommandAlertMessage(CommandAlertMixin, SystemMessage):
 
         with tmp_to_root_org():
             session = Session.objects.get(id=command['session'])
-
         session_detail_url = reverse(
             'api-terminal:session-detail', kwargs={'pk': command['session']},
             external=True, api_to_ui=True
         )
-
-        message = textwrap.dedent(_("""
-            Command: %(command)s
-            <br>
-            Asset: %(hostname)s (%(host_ip)s)
-            <br>
-            User: %(user)s
-            <br>
-            Level: %(risk_level)s
-            <br>
-            Session: <a href="%(session_detail_url)s?oid=%(oid)s">session detail</a>
-            <br>
-        """)) % {
+        context = {
             'command': command['input'],
             'hostname': command['asset'],
             'host_ip': session.asset_obj.ip,
@@ -105,6 +93,7 @@ class CommandAlertMessage(CommandAlertMixin, SystemMessage):
             'session_detail_url': session_detail_url,
             'oid': session.org_id
         }
+        message = render_to_string('terminal/_msg_command_alert.html', context)
         return {
             'subject': self.subject,
             'message': message
@@ -121,9 +110,15 @@ class CommandExecutionAlert(CommandAlertMixin, SystemMessage):
 
     @classmethod
     def gen_test_msg(cls):
-        from .models import Command
-        command = Command.objects.first().to_dict()
-        return cls(command)
+        from assets.models import Asset
+        from users.models import User
+        cmd = {
+            'input': 'ifconfig eth0',
+            'assets': Asset.objects.all()[:10],
+            'user': str(User.objects.first()),
+            'risk_level': 5,
+        }
+        return cls(cmd)
 
     def get_html_msg(self) -> dict:
         command = self.command
@@ -131,23 +126,13 @@ class CommandExecutionAlert(CommandAlertMixin, SystemMessage):
         _input = _input.replace('\n', '<br>')
 
         assets = ', '.join([str(asset) for asset in command['assets']])
-        message = textwrap.dedent(_("""
-            Assets: %(assets)s
-            <br>
-            User: %(user)s
-            <br>
-            Level: %(risk_level)s
-            <br>
-
-            ----------------- Commands ---------------- <br>
-            %(command)s <br>
-            ----------------- Commands ---------------- <br>
-        """)) % {
+        context = {
             'command': _input,
             'assets': assets,
             'user': command['user'],
             'risk_level': Command.get_risk_level_str(command['risk_level'])
         }
+        message = render_to_string('terminal/_msg_command_execue_alert.html', context)
         return {
             'subject': self.subject,
             'message': message

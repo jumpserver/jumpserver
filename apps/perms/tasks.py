@@ -12,8 +12,8 @@ from common.utils import get_logger
 from common.utils.timezone import now, dt_formater, dt_parser
 from ops.celery.decorator import register_as_period_task
 from perms.notifications import (
-    AssetPermWillExpireUserMsg, AssetPermWillExpireForOrgAdminMsg,
-    AppPermWillExpireUserMsg, AppPermWillExpireForOrgAdminMsg
+    PermedWillExpireUserMsg, AssetPermsWillExpireForOrgAdminMsg,
+    PermedAppsWillExpireUserMsg, AppPermsWillExpireForOrgAdminMsg
 )
 from perms.models import AssetPermission, ApplicationPermission
 from perms.utils.asset.user_permission import UserGrantedTreeRefreshController
@@ -83,12 +83,12 @@ def check_asset_permission_will_expired():
             user_asset_mapper[u].update(assets)
 
     for user, assets in user_asset_mapper.items():
-        AssetPermWillExpireUserMsg(user, assets).publish_async()
+        PermedWillExpireUserMsg(user, assets).publish_async()
 
     for org, perms in org_perm_mapper.items():
         org_admins = org.admins.all()
         for org_admin in org_admins:
-            AssetPermWillExpireForOrgAdminMsg(org_admin, perms, org).publish_async()
+            AssetPermsWillExpireForOrgAdminMsg(org_admin, perms, org).publish_async()
 
 
 @register_as_period_task(crontab='0 10 * * *')
@@ -116,9 +116,9 @@ def check_app_permission_will_expired():
             user_app_mapper[u].update(apps)
 
     for user, apps in user_app_mapper.items():
-        AppPermWillExpireUserMsg(user, apps).publish_async()
+        PermedAppsWillExpireUserMsg(user, apps).publish_async()
 
     for org, perms in org_perm_mapper.items():
         org_admins = org.admins.all()
         for org_admin in org_admins:
-            AppPermWillExpireForOrgAdminMsg(org_admin, perms, org).publish_async()
+            AppPermsWillExpireForOrgAdminMsg(org_admin, perms, org).publish_async()

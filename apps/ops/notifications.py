@@ -57,21 +57,21 @@ class ServerPerformanceCheckUtil(object):
             'default': 0,
             'max_threshold': 80,
             'alarm_msg_format': _(
-                '[Disk] Disk used more than {max_threshold}%: => {value} ({name})'
+                'Disk used more than {max_threshold}%: => {value} ({name})'
             )
         },
         'memory_used': {
             'default': 0,
             'max_threshold': 85,
             'alarm_msg_format': _(
-                '[Memory] Memory used more than {max_threshold}%: => {value} ({name})'
+                'Memory used more than {max_threshold}%: => {value} ({name})'
             ),
         },
         'cpu_load': {
             'default': 0,
             'max_threshold': 5,
             'alarm_msg_format': _(
-                '[CPU] CPU load more than {max_threshold}: => {value} ({name})'
+                'CPU load more than {max_threshold}: => {value} ({name})'
             ),
         },
     }

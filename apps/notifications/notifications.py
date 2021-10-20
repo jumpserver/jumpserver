@@ -1,10 +1,9 @@
-from abc import ABC
-from typing import Iterable
 import traceback
+from html2text import HTML2Text
+from typing import Iterable
 from itertools import chain
 
 from celery import shared_task
-from bs4 import BeautifulSoup
 from django.utils.translation import gettext_lazy as _
 
 from common.utils.timezone import now
@@ -60,6 +59,7 @@ class Message(metaclass=MessageType):
     message_type_label: str
     category: str
     category_label: str
+    text_msg_ignore_links = True
 
     @classmethod
     def get_message_type(cls):
@@ -96,13 +96,18 @@ class Message(metaclass=MessageType):
             except Exception:
                 traceback.print_exc()
 
-    def send_test_msg(self, ding=True):
+    @classmethod
+    def send_test_msg(cls, ding=True):
+        msg = cls.gen_test_msg()
+        if not msg:
+            return
+
         from users.models import User
         users = User.objects.filter(username='admin')
         backends = []
         if ding:
             backends.append(BACKEND.DINGTALK)
-        self.send_msg(users, backends)
+        msg.send_msg(users, backends)
 
     @staticmethod
     def get_common_msg() -> dict:
@@ -115,12 +120,11 @@ class Message(metaclass=MessageType):
         return self.get_common_msg()
 
     def get_text_msg(self) -> dict:
+        h = HTML2Text()
         msg = self.get_html_msg()
         content = msg['message']
-        content = content.replace('\n', '')
-
-        soup = BeautifulSoup(content, features="lxml")
-        msg['message'] = soup.get_text()
+        h.ignore_links = self.text_msg_ignore_links
+        msg['message'] = h.handle(content)
         return msg
 
     @lazyproperty
@@ -177,12 +181,9 @@ class Message(metaclass=MessageType):
         messages_cls = get_subclasses(cls)
         for _cls in messages_cls:
             try:
-                msg = _cls.gen_test_msg()
+                msg = _cls.send_test_msg()
             except NotImplementedError:
                 continue
-            if not msg:
-                continue
-            msg.send_test_msg()
 
 
 class SystemMessage(Message):
