@@ -144,7 +144,7 @@ class Message(metaclass=MessageType):
     def get_dingtalk_msg(self) -> dict:
         # 钉钉相同的消息一天只能发一次，所以给所有消息添加基于时间的序号，使他们不相同
         message = self.text_msg['message']
-        suffix = '\n\n{}: {}'.format(_('Time'),  now().strftime('%Y-%m-%d %H:%M:%S'))
+        suffix = '\n{}: {}'.format(_('Time'),  now().strftime('%Y-%m-%d %H:%M:%S'))
 
         return {
             'subject': self.text_msg['subject'],
