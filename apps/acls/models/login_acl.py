@@ -93,8 +93,6 @@ class LoginACL(BaseACL):
 
         return allow, reject_type
 
-
-
     @staticmethod
     def construct_confirm_ticket_meta(request=None):
         login_ip = get_request_ip(request) if request else ''

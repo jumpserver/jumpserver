@@ -9,7 +9,7 @@ from celery import shared_task
 
 from orgs.utils import tmp_to_root_org
 from common.utils import get_logger
-from common.utils.timezone import now, dt_formater, dt_parser
+from common.utils.timezone import local_now, dt_formatter, dt_parser
 from ops.celery.decorator import register_as_period_task
 from perms.notifications import (
     PermedWillExpireUserMsg, AssetPermsWillExpireForOrgAdminMsg,
@@ -33,10 +33,10 @@ def check_asset_permission_expired():
 
     setting_name = 'last_asset_perm_expired_check'
 
-    end = now()
+    end = local_now()
     default_start = end - timedelta(days=36000)  # Long long ago in china
 
-    defaults = {'value': dt_formater(default_start)}
+    defaults = {'value': dt_formatter(default_start)}
     setting, created = Setting.objects.get_or_create(
         name=setting_name, defaults=defaults
     )
@@ -44,7 +44,7 @@ def check_asset_permission_expired():
         start = default_start
     else:
         start = dt_parser(setting.value)
-    setting.value = dt_formater(end)
+    setting.value = dt_formatter(end)
     setting.save()
 
     asset_perm_ids = AssetPermission.objects.filter(
@@ -60,7 +60,7 @@ def check_asset_permission_expired():
 @atomic()
 @tmp_to_root_org()
 def check_asset_permission_will_expired():
-    start = now()
+    start = local_now()
     end = start + timedelta(days=3)
 
     user_asset_mapper = defaultdict(set)
@@ -96,7 +96,7 @@ def check_asset_permission_will_expired():
 @atomic()
 @tmp_to_root_org()
 def check_app_permission_will_expired():
-    start = now()
+    start = local_now()
     end = start + timedelta(days=3)
 
     app_perms = ApplicationPermission.objects.filter(

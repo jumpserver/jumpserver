@@ -303,7 +303,7 @@ class UserLogoutView(TemplateView):
     def get_context_data(self, **kwargs):
         context = {
             'title': _('Logout success'),
-            'messages': _('Logout success, return login page'),
+            'message': _('Logout success, return login page'),
             'interval': 3,
             'redirect_url': reverse('authentication:login'),
             'auto_redirect': True,

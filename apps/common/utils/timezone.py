@@ -20,14 +20,14 @@ def as_current_tz(dt: datetime.datetime):
     return astimezone(dt, dj_timezone.get_current_timezone())
 
 
-def utcnow():
+def utc_now():
     return dj_timezone.now()
 
 
-def now():
-    return as_current_tz(utcnow())
+def local_now():
+    return as_current_tz(utc_now())
 
 
 _rest_dt_field = DateTimeField()
 dt_parser = _rest_dt_field.to_internal_value
-dt_formater = _rest_dt_field.to_representation
+dt_formatter = _rest_dt_field.to_representation

@@ -11,7 +11,7 @@ from django_celery_beat.models import (
     PeriodicTask, IntervalSchedule, CrontabSchedule, PeriodicTasks
 )
 
-from common.utils.timezone import now
+from common.utils.timezone import local_now
 from common.utils import get_logger
 
 logger = get_logger(__name__)
@@ -52,7 +52,7 @@ def create_or_update_celery_periodic_tasks(tasks):
             interval = IntervalSchedule.objects.filter(**kwargs).first()
             if interval is None:
                 interval = IntervalSchedule.objects.create(**kwargs)
-            last_run_at = now()
+            last_run_at = local_now()
         elif isinstance(detail.get("crontab"), str):
             try:
                 minute, hour, day, month, week = detail["crontab"].split()

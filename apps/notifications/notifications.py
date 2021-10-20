@@ -6,7 +6,7 @@ from itertools import chain
 from celery import shared_task
 from django.utils.translation import gettext_lazy as _
 
-from common.utils.timezone import now
+from common.utils.timezone import local_now
 from common.utils import lazyproperty
 from users.models import User
 from notifications.backends import BACKEND
@@ -144,7 +144,8 @@ class Message(metaclass=MessageType):
     def get_dingtalk_msg(self) -> dict:
         # 钉钉相同的消息一天只能发一次，所以给所有消息添加基于时间的序号，使他们不相同
         message = self.text_msg['message']
-        suffix = '\n{}: {}'.format(_('Time'),  now().strftime('%Y-%m-%d %H:%M:%S'))
+        time = local_now().strftime('%Y-%m-%d %H:%M:%S')
+        suffix = '\n{}: {}'.format(_('Time'), time)
 
         return {
             'subject': self.text_msg['subject'],

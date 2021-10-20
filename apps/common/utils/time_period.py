@@ -1,4 +1,4 @@
-from common.utils.timezone import now
+from common.utils.timezone import local_now
 
 
 def contains_time_period(time_periods):
@@ -8,8 +8,8 @@ def contains_time_period(time_periods):
     if not time_periods:
         return False
 
-    current_time = now().strftime('%H:%M')
-    today_time_period = next(filter(lambda x: str(x['id']) == now().strftime("%w"), time_periods))
+    current_time = local_now().strftime('%H:%M')
+    today_time_period = next(filter(lambda x: str(x['id']) == local_now().strftime("%w"), time_periods))
     for time in today_time_period['value'].split('、'):
         start, end = time.split('~')
         end = "24:00" if end == "00:00" else end

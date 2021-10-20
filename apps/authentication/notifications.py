@@ -15,7 +15,8 @@ class DifferentCityLoginMessage(UserMessage):
         super().__init__(user)
 
     def get_html_msg(self) -> dict:
-        now = timezone.now().strftime("%Y-%m-%d %H:%M:%S")
+        now_local = timezone.localtime(timezone.now())
+        now = now_local.strftime("%Y-%m-%d %H:%M:%S")
         subject = _('Different city login reminder')
         context = dict(
             subject=subject,
