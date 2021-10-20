@@ -17,7 +17,7 @@ COPY ./requirements/deb_requirements.txt ./requirements/deb_requirements.txt
 RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
     && sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
     && apt update \
-    && apt -y install telnet iproute2 redis-tools default-mysql-client vim wget curl locales \
+    && apt -y install telnet iproute2 redis-tools default-mysql-client vim wget curl locales procps \
     && apt -y install $(cat requirements/deb_requirements.txt) \
     && rm -rf /var/lib/apt/lists/* \
     && localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8 \
@@ -35,13 +35,14 @@ RUN mkdir -p /root/.ssh/ \
     && echo "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null" > /root/.ssh/config
 
 RUN mkdir -p /opt/jumpserver/oracle/ \
-    && wget https://download.jumpserver.org/public/instantclient-basiclite-linux.x64-21.1.0.0.0.tar \
+    && wget https://download.jumpserver.org/public/instantclient-basiclite-linux.x64-21.1.0.0.0.tar > /dev/null \
     && tar xf instantclient-basiclite-linux.x64-21.1.0.0.0.tar -C /opt/jumpserver/oracle/ \
     && echo "/opt/jumpserver/oracle/instantclient_21_1" > /etc/ld.so.conf.d/oracle-instantclient.conf \
     && ldconfig \
     && rm -f instantclient-basiclite-linux.x64-21.1.0.0.0.tar
 
 RUN echo > config.yml
+
 VOLUME /opt/jumpserver/data
 VOLUME /opt/jumpserver/logs
 

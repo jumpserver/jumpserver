@@ -29,7 +29,6 @@ from ..const import RSA_PRIVATE_KEY, RSA_PUBLIC_KEY
 from .. import mixins, errors
 from ..forms import get_user_login_form_cls
 
-
 __all__ = [
     'UserLoginView', 'UserLogoutView',
     'UserLoginGuardView', 'UserLoginWaitConfirmView',
@@ -67,6 +66,8 @@ class UserLoginView(mixins.AuthMixin, FormView):
             return None
 
         login_redirect = settings.LOGIN_REDIRECT_TO_BACKEND.lower()
+        if login_redirect in ['direct']:
+            return None
         if login_redirect in ['cas'] and cas_auth_url:
             auth_url = cas_auth_url
         elif login_redirect in ['openid', 'oidc'] and openid_auth_url:
@@ -110,12 +111,10 @@ class UserLoginView(mixins.AuthMixin, FormView):
         self.request.session.delete_test_cookie()
 
         try:
-            with transaction.atomic():
-                self.check_user_auth(decrypt_passwd=True)
+            self.check_user_auth(decrypt_passwd=True)
         except errors.AuthFailedError as e:
             form.add_error(None, e.msg)
             self.set_login_failed_mark()
-
             form_cls = get_user_login_form_cls(captcha=True)
             new_form = form_cls(data=form.data)
             new_form._errors = form.errors
@@ -123,10 +122,19 @@ class UserLoginView(mixins.AuthMixin, FormView):
             self.request.session.set_test_cookie()
             return self.render_to_response(context)
         except (
-            errors.PasswdTooSimple,
-            errors.PasswordRequireResetError,
-            errors.PasswdNeedUpdate
+                errors.PasswdTooSimple,
+                errors.PasswordRequireResetError,
+                errors.PasswdNeedUpdate
         ) as e:
+            return redirect(e.url)
+        except (
+                errors.MFAUnsetError,
+                errors.MFAFailedError,
+                errors.BlockMFAError
+        ) as e:
+            form.add_error('code', e.msg)
+            return super().form_invalid(form)
+        except errors.OTPRequiredError as e:
             return redirect(e.url)
         self.clear_rsa_key()
         return self.redirect_to_guard_view()
@@ -148,31 +156,31 @@ class UserLoginView(mixins.AuthMixin, FormView):
                 'name': 'OpenID',
                 'enabled': settings.AUTH_OPENID,
                 'url': reverse('authentication:openid:login'),
-                'logo':  static('img/login_oidc_logo.png')
+                'logo': static('img/login_oidc_logo.png')
             },
             {
                 'name': 'CAS',
                 'enabled': settings.AUTH_CAS,
                 'url': reverse('authentication:cas:cas-login'),
-                'logo':  static('img/login_cas_logo.png')
+                'logo': static('img/login_cas_logo.png')
             },
             {
                 'name': _('WeCom'),
                 'enabled': settings.AUTH_WECOM,
                 'url': reverse('authentication:wecom-qr-login'),
-                'logo':  static('img/login_wecom_logo.png')
+                'logo': static('img/login_wecom_logo.png')
             },
             {
                 'name': _('DingTalk'),
                 'enabled': settings.AUTH_DINGTALK,
                 'url': reverse('authentication:dingtalk-qr-login'),
-                'logo':  static('img/login_dingtalk_logo.png')
+                'logo': static('img/login_dingtalk_logo.png')
             },
             {
                 'name': _('FeiShu'),
                 'enabled': settings.AUTH_FEISHU,
                 'url': reverse('authentication:feishu-qr-login'),
-                'logo':  static('img/login_feishu_logo.png')
+                'logo': static('img/login_feishu_logo.png')
             }
         ]
         return [method for method in auth_methods if method['enabled']]
@@ -189,7 +197,8 @@ class UserLoginView(mixins.AuthMixin, FormView):
         context = {
             'demo_mode': os.environ.get("DEMO_MODE"),
             'auth_methods': self.get_support_auth_methods(),
-            'forgot_password_url': self.get_forgot_password_url()
+            'forgot_password_url': self.get_forgot_password_url(),
+            'methods': self.get_user_mfa_methods(),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

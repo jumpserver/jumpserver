@@ -13,7 +13,6 @@ router.register('connection-token', api.UserConnectionTokenViewSet, 'connection-
 
 
 urlpatterns = [
-    # path('token/', api.UserToken.as_view(), name='user-token'),
     path('wecom/qr/unbind/', api.WeComQRUnBindForUserApi.as_view(), name='wecom-qr-unbind'),
     path('wecom/qr/unbind/<uuid:user_id>/', api.WeComQRUnBindForAdminApi.as_view(), name='wecom-qr-unbind-for-admin'),
 

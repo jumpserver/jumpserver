@@ -144,6 +144,10 @@ class Config(dict):
 
         'GLOBAL_ORG_DISPLAY_NAME': '',
         'SITE_URL': 'http://localhost:8080',
+        'USER_GUIDE_URL': '',
+        'ANNOUNCEMENT_ENABLED': True,
+        'ANNOUNCEMENT': {},
+
         'CAPTCHA_TEST_MODE': None,
         'TOKEN_EXPIRATION': 3600 * 24,
         'DISPLAY_PER_PAGE': 25,
@@ -291,6 +295,7 @@ class Config(dict):
         'SECURITY_PASSWORD_LOWER_CASE': False,
         'SECURITY_PASSWORD_NUMBER': False,
         'SECURITY_PASSWORD_SPECIAL_CHAR': False,
+        'SECURITY_MFA_IN_LOGIN_PAGE': False,
         'SECURITY_LOGIN_CHALLENGE_ENABLED': False,
         'SECURITY_LOGIN_CAPTCHA_ENABLED': True,
         'SECURITY_INSECURE_COMMAND': False,

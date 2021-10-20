@@ -9,10 +9,9 @@ import datetime
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.hashers import check_password, make_password
+from django.contrib.auth.hashers import check_password
 from django.core.cache import cache
 from django.db import models
-from django.db.models import TextChoices
 
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone

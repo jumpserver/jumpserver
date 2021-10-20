@@ -1,10 +1,8 @@
 import random
 
-from django.conf import settings
 from django.core.cache import cache
 from django.utils.translation import gettext_lazy as _
 
-from common.message.backends.sms.alibaba import AlibabaSMS
 from common.message.backends.sms import SMS
 from common.utils import get_logger
 from common.exceptions import JMSException

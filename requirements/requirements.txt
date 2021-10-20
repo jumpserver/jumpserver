@@ -14,7 +14,7 @@ coreapi==2.3.3
 coreschema==0.0.4
 cryptography==3.3.2
 decorator==4.1.2
-Django==3.1.12
+Django==3.1.13
 django-auth-ldap==2.2.0
 django-bootstrap3==14.2.0
 django-celery-beat==2.0
@@ -31,7 +31,7 @@ docutils==0.14
 ecdsa==0.13.3
 enum-compat==0.0.2
 ephem==3.7.6.0
-eventlet==0.24.1
+eventlet==0.31.1
 future==0.16.0
 ForgeryPy3==0.3.1
 greenlet==0.4.14
@@ -49,7 +49,7 @@ olefile==0.44
 openapi-codec==1.3.2
 paramiko==2.7.2
 passlib==1.7.1
-Pillow==8.2.0
+Pillow==8.3.2
 pyasn1==0.4.8
 pycparser==2.19
 pycryptodome==3.10.1
@@ -59,7 +59,7 @@ PyNaCl==1.2.1
 python-dateutil==2.6.1
 #python-gssapi==0.6.4
 pytz==2018.3
-PyYAML==5.2
+PyYAML==5.4
 redis==3.5.3
 requests==2.25.1
 jms-storage==0.0.39
@@ -79,7 +79,6 @@ rest_condition==1.0.3
 python-ldap==3.3.1
 tencentcloud-sdk-python==3.0.477
 django-radius==1.4.0
-ipip-ipdb==1.2.1
 django-redis-sessions==0.6.1
 unicodecsv==0.14.1
 python-daemon==2.2.3
@@ -119,3 +118,4 @@ PyMySQL==1.0.2
 cx-Oracle==8.2.1
 psycopg2-binary==2.9.1
 alibabacloud_dysmsapi20170525==2.0.2
+geoip2==4.4.0

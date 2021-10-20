@@ -20,20 +20,20 @@ class FlashMessageMsgView(TemplateView):
         if not message_data:
             return HttpResponse('Message code error')
 
-        title, message, redirect_url, confirm_button, cancel_url = bulk_get(
-            message_data, 'title', 'message', 'redirect_url', 'confirm_button', 'cancel_url'
-        )
+        items = ('title', 'message', 'error', 'redirect_url', 'confirm_button', 'cancel_url')
+        title, msg, error, redirect_url, confirm_btn, cancel_url = bulk_get(message_data, items)
 
         interval = message_data.get('interval', 3)
         auto_redirect = message_data.get('auto_redirect', True)
         has_cancel = message_data.get('has_cancel', False)
         context = {
             'title': title,
-            'messages': message,
+            'message': msg,
+            'error': error,
             'interval': interval,
             'redirect_url': redirect_url,
             'auto_redirect': auto_redirect,
-            'confirm_button': confirm_button,
+            'confirm_button': confirm_btn,
             'has_cancel': has_cancel,
             'cancel_url': cancel_url,
         }

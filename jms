@@ -100,9 +100,20 @@ def collect_static():
     logging.info("Collect static files done")
 
 
+def compile_i81n_file():
+    django_mo_file = os.path.join(BASE_DIR, 'apps', 'locale', 'zh', 'LC_MESSAGES', 'django.mo')
+    if os.path.exists(django_mo_file):
+        return
+    os.chdir(os.path.join(BASE_DIR, 'apps'))
+    _cmd = 'python3 manage.py compilemessages --no-input -c &> /dev/null '
+    subprocess.call(_cmd, shell=True)
+    logging.info("Compile i18n files done")
+
+
 def upgrade_db():
     collect_static()
     perform_db_migrate()
+    collect_static()
 
 
 def prepare():
