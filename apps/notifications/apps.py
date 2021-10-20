@@ -6,4 +6,5 @@ class NotificationsConfig(AppConfig):
 
     def ready(self):
         from . import signals_handler
+        from . import notifications
         super().ready()

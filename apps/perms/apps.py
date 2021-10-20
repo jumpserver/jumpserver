@@ -9,3 +9,4 @@ class PermsConfig(AppConfig):
     def ready(self):
         super().ready()
         from . import signals_handler
+        from . import notifications

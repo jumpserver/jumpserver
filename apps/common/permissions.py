@@ -14,7 +14,7 @@ class IsValidUser(permissions.IsAuthenticated, permissions.BasePermission):
 
     def has_permission(self, request, view):
         return super(IsValidUser, self).has_permission(request, view) \
-            and request.user.is_valid
+               and request.user.is_valid
 
 
 class IsAppUser(IsValidUser):
@@ -22,7 +22,7 @@ class IsAppUser(IsValidUser):
 
     def has_permission(self, request, view):
         return super(IsAppUser, self).has_permission(request, view) \
-            and request.user.is_app
+               and request.user.is_app
 
 
 class IsSuperUser(IsValidUser):
@@ -36,7 +36,7 @@ class IsSuperUserOrAppUser(IsSuperUser):
         if request.user.is_anonymous:
             return False
         return super(IsSuperUserOrAppUser, self).has_permission(request, view) \
-            or request.user.is_app
+               or request.user.is_app
 
 
 class IsSuperAuditor(IsValidUser):
@@ -60,7 +60,7 @@ class IsOrgAdmin(IsValidUser):
         if not current_org:
             return False
         return super(IsOrgAdmin, self).has_permission(request, view) \
-            and current_org.can_admin_by(request.user)
+               and current_org.can_admin_by(request.user)
 
 
 class IsOrgAdminOrAppUser(IsValidUser):
@@ -72,7 +72,7 @@ class IsOrgAdminOrAppUser(IsValidUser):
         if request.user.is_anonymous:
             return False
         return super(IsOrgAdminOrAppUser, self).has_permission(request, view) \
-            and (current_org.can_admin_by(request.user) or request.user.is_app)
+               and (current_org.can_admin_by(request.user) or request.user.is_app)
 
 
 class IsOrgAdminOrAppUserOrUserReadonly(IsOrgAdminOrAppUser):

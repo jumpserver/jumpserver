@@ -9,6 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 from common.permissions import IsSuperUser
 from common.utils import get_logger
 from .. import serializers
+from django.conf import settings
 
 logger = get_logger(__file__)
 
@@ -24,14 +25,15 @@ class MailTestingAPI(APIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        email_host = serializer.validated_data['EMAIL_HOST']
-        email_port = serializer.validated_data['EMAIL_PORT']
-        email_host_user = serializer.validated_data["EMAIL_HOST_USER"]
-        email_host_password = serializer.validated_data['EMAIL_HOST_PASSWORD']
-        email_from = serializer.validated_data["EMAIL_FROM"]
-        email_recipient = serializer.validated_data["EMAIL_RECIPIENT"]
-        email_use_ssl = serializer.validated_data['EMAIL_USE_SSL']
-        email_use_tls = serializer.validated_data['EMAIL_USE_TLS']
+        # 测试邮件时，邮件服务器信息从配置中获取
+        email_host = settings.EMAIL_HOST
+        email_port = settings.EMAIL_PORT
+        email_host_user = settings.EMAIL_HOST_USER
+        email_host_password = settings.EMAIL_HOST_PASSWORD
+        email_from = serializer.validated_data.get('EMAIL_FROM')
+        email_use_ssl = settings.EMAIL_USE_SSL
+        email_use_tls = settings.EMAIL_USE_TLS
+        email_recipient = serializer.validated_data.get('EMAIL_RECIPIENT')
 
         # 设置 settings 的值，会导致动态配置在当前进程失效
         # for k, v in serializer.validated_data.items():

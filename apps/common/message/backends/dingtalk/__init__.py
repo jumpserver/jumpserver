@@ -14,7 +14,8 @@ def sign(secret, data):
     digest = hmac.HMAC(
         key=secret.encode('utf8'),
         msg=data.encode('utf8'),
-        digestmod=hmac._hashlib.sha256).digest()
+        digestmod=hmac._hashlib.sha256
+    ).digest()
     signature = base64.standard_b64encode(digest).decode('utf8')
     # signature = urllib.parse.quote(signature, safe='')
     # signature = signature.replace('+', '%20').replace('*', '%2A').replace('~', '%7E').replace('/', '%2F')
@@ -39,9 +40,9 @@ class DingTalkRequests(BaseRequest):
     invalid_token_errcodes = (ErrorCode.INVALID_TOKEN,)
 
     def __init__(self, appid, appsecret, agentid, timeout=None):
-        self._appid = appid
-        self._appsecret = appsecret
-        self._agentid = agentid
+        self._appid = appid or ''
+        self._appsecret = appsecret or ''
+        self._agentid = agentid or ''
 
         super().__init__(timeout=timeout)
 
@@ -74,7 +75,7 @@ class DingTalkRequests(BaseRequest):
     def post(self, url, json=None, params=None,
              with_token=False, with_sign=False,
              check_errcode_is_0=True,
-             **kwargs):
+             **kwargs) -> dict:
         pass
     post = as_request(post)
 
@@ -86,11 +87,10 @@ class DingTalkRequests(BaseRequest):
 
         timestamp = str(int(time.time() * 1000))
         signature = sign(self._appsecret, timestamp)
-        accessKey = self._appid
 
         params['timestamp'] = timestamp
         params['signature'] = signature
-        params['accessKey'] = accessKey
+        params['accessKey'] = self._appid
 
     def request(self, method, url,
                 with_token=False, with_sign=False,
@@ -102,15 +102,16 @@ class DingTalkRequests(BaseRequest):
 
         data = super().request(
             method, url, with_token=with_token,
-            check_errcode_is_0=check_errcode_is_0, **kwargs)
+            check_errcode_is_0=check_errcode_is_0, **kwargs
+        )
         return data
 
 
 class DingTalk:
     def __init__(self, appid, appsecret, agentid, timeout=None):
-        self._appid = appid
-        self._appsecret = appsecret
-        self._agentid = agentid
+        self._appid = appid or ''
+        self._appsecret = appsecret or ''
+        self._agentid = agentid or ''
 
         self._request = DingTalkRequests(
             appid=appid, appsecret=appsecret, agentid=agentid,

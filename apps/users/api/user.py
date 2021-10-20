@@ -19,7 +19,7 @@ from orgs.utils import current_org
 from orgs.models import ROLE as ORG_ROLE, OrganizationMember
 from users.utils import LoginBlockUtil, MFABlockUtils
 from .. import serializers
-from ..serializers import UserSerializer, UserRetrieveSerializer, MiniUserSerializer, InviteSerializer
+from ..serializers import UserSerializer, MiniUserSerializer, InviteSerializer
 from .mixins import UserQuerysetMixin
 from ..models import User
 from ..signals import post_user_create
@@ -38,7 +38,6 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
     permission_classes = (IsOrgAdmin, CanUpdateDeleteUser)
     serializer_classes = {
         'default': UserSerializer,
-        'retrieve': UserRetrieveSerializer,
         'suggestion': MiniUserSerializer,
         'invite': InviteSerializer,
     }

@@ -50,7 +50,6 @@ class PublicSettingApi(generics.RetrieveAPIView):
                 "WINDOWS_SKIP_ALL_MANUAL_PASSWORD": settings.WINDOWS_SKIP_ALL_MANUAL_PASSWORD,
                 "SECURITY_MAX_IDLE_TIME": settings.SECURITY_MAX_IDLE_TIME,
                 "XPACK_ENABLED": settings.XPACK_ENABLED,
-                "LOGIN_CONFIRM_ENABLE": settings.LOGIN_CONFIRM_ENABLE,
                 "SECURITY_VIEW_AUTH_NEED_MFA": settings.SECURITY_VIEW_AUTH_NEED_MFA,
                 "SECURITY_MFA_VERIFY_TTL": settings.SECURITY_MFA_VERIFY_TTL,
                 "OLD_PASSWORD_HISTORY_LIMIT_COUNT": settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT,
@@ -75,6 +74,8 @@ class PublicSettingApi(generics.RetrieveAPIView):
                 'SECURITY_WATERMARK_ENABLED': settings.SECURITY_WATERMARK_ENABLED,
                 'SECURITY_SESSION_SHARE': settings.SECURITY_SESSION_SHARE,
                 "XRDP_ENABLED": settings.XRDP_ENABLED,
+                "ANNOUNCEMENT_ENABLED": settings.ANNOUNCEMENT_ENABLED,
+                "ANNOUNCEMENT": settings.ANNOUNCEMENT,
             }
         }
         return instance

@@ -144,6 +144,10 @@ class Config(dict):
 
         'GLOBAL_ORG_DISPLAY_NAME': '',
         'SITE_URL': 'http://localhost:8080',
+        'USER_GUIDE_URL': '',
+        'ANNOUNCEMENT_ENABLED': True,
+        'ANNOUNCEMENT': {},
+
         'CAPTCHA_TEST_MODE': None,
         'TOKEN_EXPIRATION': 3600 * 24,
         'DISPLAY_PER_PAGE': 25,
@@ -291,6 +295,7 @@ class Config(dict):
         'SECURITY_PASSWORD_LOWER_CASE': False,
         'SECURITY_PASSWORD_NUMBER': False,
         'SECURITY_PASSWORD_SPECIAL_CHAR': False,
+        'SECURITY_MFA_IN_LOGIN_PAGE': False,
         'SECURITY_LOGIN_CHALLENGE_ENABLED': False,
         'SECURITY_LOGIN_CAPTCHA_ENABLED': True,
         'SECURITY_INSECURE_COMMAND': False,
@@ -301,7 +306,6 @@ class Config(dict):
         'SECURITY_MFA_VERIFY_TTL': 3600,
         'SECURITY_SESSION_SHARE': True,
         'OLD_PASSWORD_HISTORY_LIMIT_COUNT': 5,
-        'LOGIN_CONFIRM_ENABLE': False,  # 准备废弃，放到 acl 中
         'CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED': True,
         'USER_LOGIN_SINGLE_MACHINE_ENABLED': False,
         'ONLY_ALLOW_EXIST_USER_AUTH': False,

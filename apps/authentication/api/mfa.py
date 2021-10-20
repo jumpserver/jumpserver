@@ -2,17 +2,17 @@
 #
 import builtins
 import time
+
 from django.utils.translation import ugettext as _
 from django.conf import settings
+from django.shortcuts import get_object_or_404
 from rest_framework.permissions import AllowAny
 from rest_framework.generics import CreateAPIView
 from rest_framework.serializers import ValidationError
 from rest_framework.response import Response
 
-from authentication.sms_verify_code import VerifyCodeUtil
-from common.exceptions import JMSException
-from common.permissions import IsValidUser, NeedMFAVerify, IsAppUser
-from users.models.user import MFAType
+from common.permissions import IsValidUser, NeedMFAVerify
+from users.models.user import MFAType, User
 from ..serializers import OtpVerifySerializer
 from .. import serializers
 from .. import errors
@@ -90,6 +90,13 @@ class SendSMSVerifyCodeApi(AuthMixin, CreateAPIView):
     permission_classes = (AllowAny,)
 
     def create(self, request, *args, **kwargs):
-        user = self.get_user_from_session()
+        username = request.data.get('username', '')
+        username = username.strip()
+        if username:
+            user = get_object_or_404(User, username=username)
+        else:
+            user = self.get_user_from_session()
+        if not user.mfa_enabled:
+            raise errors.NotEnableMFAError
         timeout = user.send_sms_code()
-        return Response({'code': 'ok','timeout': timeout})
+        return Response({'code': 'ok', 'timeout': timeout})

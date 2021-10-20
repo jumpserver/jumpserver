@@ -47,9 +47,9 @@ class WeComRequests(BaseRequest):
     invalid_token_errcodes = (ErrorCode.INVALID_TOKEN,)
 
     def __init__(self, corpid, corpsecret, agentid, timeout=None):
-        self._corpid = corpid
-        self._corpsecret = corpsecret
-        self._agentid = agentid
+        self._corpid = corpid or ''
+        self._corpsecret = corpsecret or ''
+        self._agentid = agentid or ''
 
         super().__init__(timeout=timeout)
 
@@ -79,9 +79,9 @@ class WeCom(RequestMixin):
     """
 
     def __init__(self, corpid, corpsecret, agentid, timeout=None):
-        self._corpid = corpid
-        self._corpsecret = corpsecret
-        self._agentid = agentid
+        self._corpid = corpid or ''
+        self._corpsecret = corpsecret or ''
+        self._agentid = agentid or ''
 
         self._requests = WeComRequests(
             corpid=corpid,

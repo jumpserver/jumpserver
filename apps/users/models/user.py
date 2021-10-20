@@ -9,15 +9,15 @@ import datetime
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.hashers import check_password, make_password
+from django.contrib.auth.hashers import check_password
 from django.core.cache import cache
 from django.db import models
-from django.db.models import TextChoices
 
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.shortcuts import reverse
 
+from acls.models import LoginACL
 from orgs.utils import current_org
 from orgs.models import OrganizationMember, Organization
 from common.exceptions import JMSException
@@ -147,13 +147,6 @@ class AuthMixin:
     def password_will_expired(self):
         if self.is_local and 0 <= self.password_expired_remain_days < 5:
             return True
-        return False
-
-    def get_login_confirm_setting(self):
-        if hasattr(self, 'login_confirm_setting'):
-            s = self.login_confirm_setting
-            if s.reviewers.all().count() and s.is_active:
-                return s
         return False
 
     @staticmethod
@@ -537,7 +530,7 @@ class MFAMixin:
         methods = []
         if self.otp_secret_key:
             methods.append(MFAType.OTP)
-        if self.phone:
+        if settings.XPACK_ENABLED and settings.SMS_ENABLED and self.phone:
             methods.append(MFAType.SMS_CODE)
         return methods
 
@@ -758,11 +751,6 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     def get_avatar_url(cls, username):
         user_default = settings.STATIC_URL + "img/avatar/user.png"
         return user_default
-
-    # def admin_orgs(self):
-    #     from orgs.models import Organization
-    #     orgs = Organization.get_user_admin_or_audit_orgs(self)
-    #     return orgs
 
     def avatar_url(self):
         admin_default = settings.STATIC_URL + "img/avatar/admin.png"

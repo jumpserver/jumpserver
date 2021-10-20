@@ -6,30 +6,27 @@
 
 {% block content %}
     <div>
-        {% if errors %}
-            <p>
-            <div class="alert alert-danger">
-                {{ errors }}
+        <p>
+            {% if error %}
+            <div class="alert alert-danger" id="messages">
+                {{ error }}
             </div>
-            </p>
-        {% endif %}
-
-        {% if messages %}
-            <p>
+            {% else %}
             <div class="alert alert-success" id="messages">
-                {{ messages|safe }}
+                {{ message|safe }}
             </div>
-            </p>
-        {% endif %}
+            {% endif %}
+        </p>
+
         <div class="row">
             {% if has_cancel %}
-            <div class="col-lg-2">
+            <div class="col-sm-3">
                 <a href="{{ cancel_url }}" class="btn btn-default block full-width m-b">
                     {% trans 'Cancel' %}
                 </a>
             </div>
             {% endif %}
-            <div class="col-lg-2">
+            <div class="col-sm-3">
                 <a href="{{ redirect_url }}" class="btn btn-primary block full-width m-b">
                     {% if confirm_button %}
                         {{ confirm_button }}
@@ -44,17 +41,19 @@
 
 {% block custom_foot_js %}
 <script>
-    var time = '{{ interval }}';
-    if (!time) {
-        time = 5;
-    } else {
-        time = parseInt(time);
-    }
+    var message = ''
+    var time = '{{ interval }}'
+
+    {% if error %}
+        message = '{{ error }}'
+    {% else %}
+        message = '{{ message|safe }}'
+    {% endif %}
 
     function redirect_page() {
         if (time >= 0) {
-            var messages = '{{ messages|safe }}， <b>' + time + '</b> ...';
-            $('#messages').html(messages);
+            var msg = message + '， <b>' + time + '</b> ...';
+            $('#messages').html(msg);
             time--;
             setTimeout(redirect_page, 1000);
         } else {

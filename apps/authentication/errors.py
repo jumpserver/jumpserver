@@ -3,8 +3,8 @@
 from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse
 from django.conf import settings
+from rest_framework import status
 
-from authentication import sms_verify_code
 from common.exceptions import JMSException
 from .signals import post_auth_failed
 from users.utils import LoginBlockUtil, MFABlockUtils
@@ -78,6 +78,7 @@ mfa_type_failed_msg = _(
 
 mfa_required_msg = _("MFA required")
 mfa_unset_msg = _("MFA not set, please set it first")
+otp_unset_msg = _("OTP not set, please set it first")
 login_confirm_required_msg = _("Login confirm required")
 login_confirm_wait_msg = _("Wait login confirm ticket for accept")
 login_confirm_error_msg = _("Login confirm ticket was {}")
@@ -260,6 +261,13 @@ class LoginIPNotAllowed(ACLError):
         super().__init__(_("IP is not allowed"), **kwargs)
 
 
+class TimePeriodNotAllowed(ACLError):
+    def __init__(self, username, request, **kwargs):
+        self.username = username
+        self.request = request
+        super().__init__(_("Time Period is not allowed"), **kwargs)
+
+
 class LoginConfirmBaseError(NeedMoreInfoError):
     def __init__(self, ticket_id, **kwargs):
         self.ticket_id = ticket_id
@@ -348,3 +356,21 @@ class FeiShuNotBound(JMSException):
 class PasswdInvalid(JMSException):
     default_code = 'passwd_invalid'
     default_detail = _('Your password is invalid')
+
+
+class NotHaveUpDownLoadPerm(JMSException):
+    status_code = status.HTTP_403_FORBIDDEN
+    code = 'not_have_up_down_load_perm'
+    default_detail = _('No upload or download permission')
+
+
+class NotEnableMFAError(JMSException):
+    default_detail = mfa_unset_msg
+
+
+class OTPRequiredError(JMSException):
+    default_detail = otp_unset_msg
+
+    def __init__(self, url, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.url = url

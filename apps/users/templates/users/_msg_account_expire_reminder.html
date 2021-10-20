@@ -1,0 +1,9 @@
+{% load i18n %}
+
+<p>
+    {% trans 'Hello' %} {{ name }},
+</p>
+<p>
+    {% trans 'Your account will expire in' %} {{ date_expired }}, <br />
+    {% trans 'In order not to affect your normal work, please contact the administrator for confirmation.' %}
+</p>

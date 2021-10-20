@@ -1,0 +1,24 @@
+{% load i18n %}
+
+<p>
+    <b>{% trans 'User' %}:</b> {{ user }}
+</p>
+<p>
+    <b>{% trans 'Level' %}:</b> {{ risk_level }}
+</p>
+<div>
+    <b>{% trans 'Command' %}: </b><br>
+    <pre>
+    {{ command }}
+    </pre>
+</div>
+<div>
+    <b>{% trans 'Assets' %}:</b><br>
+    <ul>
+        {% for asset, url in assets_with_url %}
+            <li>
+                <a href="{{ url }}">{{ asset }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>

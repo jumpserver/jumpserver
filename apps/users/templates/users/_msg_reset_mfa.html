@@ -1,0 +1,12 @@
+{% load i18n %}
+
+<p>
+    {% trans 'Hello' %} {{ name }},
+</p>
+<p>
+    {% trans 'Your MFA has been reset by site administrator.' %} <br />
+    {% trans 'Please login and reset your MFA.' %}
+</p>
+<p>
+    <a href="{{ login_url }}">{% trans 'Login direct' %}</a>
+</p>

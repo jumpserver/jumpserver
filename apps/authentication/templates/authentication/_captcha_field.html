@@ -5,9 +5,9 @@
         <div class="col-sm-6">
             <div class="input-group-prepend">
                 {% if audio %}
-                    <a title="{% trans "Play CAPTCHA as audio file" %}" href="{{ audio }}">
+                    <a title="{% trans "Play CAPTCHA as audio file" %}" href="{{ audio }}"></a>
                 {% endif %}
-            </div>
+                </div>
             {% include "django/forms/widgets/multiwidget.html" %}
          </div>
     </div>

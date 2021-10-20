@@ -69,8 +69,8 @@ class FeiShu(RequestMixin):
     """
 
     def __init__(self, app_id, app_secret, timeout=None):
-        self._app_id = app_id
-        self._app_secret = app_secret
+        self._app_id = app_id or ''
+        self._app_secret = app_secret or ''
 
         self._requests = FeishuRequests(
             app_id=app_id,
