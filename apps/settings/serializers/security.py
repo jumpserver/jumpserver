@@ -111,8 +111,8 @@ class SecuritySettingSerializer(SecurityPasswordRuleSerializer, SecurityAuthSeri
         help_text=_("Allow terminal register, after all terminal setup, you should disable this for security")
     )
     SECURITY_WATERMARK_ENABLED = serializers.BooleanField(
-        required=True, label=_('Replay watermark'),
-        help_text=_('Enabled, the session replay contains watermark information')
+        required=True, label=_('Enable watermark'),
+        help_text=_('Enabled, the web session and replay contains watermark information')
     )
     SECURITY_MAX_IDLE_TIME = serializers.IntegerField(
         min_value=1, max_value=99999, required=False,

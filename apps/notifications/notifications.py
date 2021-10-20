@@ -1,12 +1,12 @@
-from typing import Iterable
 import traceback
+from html2text import HTML2Text
+from typing import Iterable
 from itertools import chain
-import time
 
 from celery import shared_task
 from django.utils.translation import gettext_lazy as _
 
-from common.utils.timezone import now
+from common.utils.timezone import local_now
 from common.utils import lazyproperty
 from users.models import User
 from notifications.backends import BACKEND
@@ -17,6 +17,7 @@ __all__ = ('SystemMessage', 'UserMessage', 'system_msgs')
 
 system_msgs = []
 user_msgs = []
+all_msgs = []
 
 
 class MessageType(type):
@@ -58,6 +59,7 @@ class Message(metaclass=MessageType):
     message_type_label: str
     category: str
     category_label: str
+    text_msg_ignore_links = True
 
     @classmethod
     def get_message_type(cls):
@@ -65,6 +67,10 @@ class Message(metaclass=MessageType):
 
     def publish_async(self):
         return publish_task.delay(self)
+
+    @classmethod
+    def gen_test_msg(cls):
+        raise NotImplementedError
 
     def publish(self):
         raise NotImplementedError
@@ -80,31 +86,46 @@ class Message(metaclass=MessageType):
                     continue
 
                 get_msg_method = getattr(self, f'get_{backend}_msg', self.get_common_msg)
-
                 try:
                     msg = get_msg_method()
                 except NotImplementedError:
                     continue
 
                 client = backend.client()
-
                 client.send_msg(users, **msg)
-            except:
+            except Exception:
                 traceback.print_exc()
 
-    def send_test_msg(self):
+    @classmethod
+    def send_test_msg(cls, ding=True):
+        msg = cls.gen_test_msg()
+        if not msg:
+            return
+
         from users.models import User
         users = User.objects.filter(username='admin')
-        self.send_msg(users, [])
+        backends = []
+        if ding:
+            backends.append(BACKEND.DINGTALK)
+        msg.send_msg(users, backends)
 
-    def get_common_msg(self) -> dict:
-        raise NotImplementedError
-
-    def get_text_msg(self) -> dict:
-        return self.common_msg
+    @staticmethod
+    def get_common_msg() -> dict:
+        return {
+            'subject': '',
+            'message': ''
+        }
 
     def get_html_msg(self) -> dict:
-        return self.common_msg
+        return self.get_common_msg()
+
+    def get_text_msg(self) -> dict:
+        h = HTML2Text()
+        msg = self.get_html_msg()
+        content = msg['message']
+        h.ignore_links = self.text_msg_ignore_links
+        msg['message'] = h.handle(content)
+        return msg
 
     @lazyproperty
     def common_msg(self) -> dict:
@@ -123,7 +144,8 @@ class Message(metaclass=MessageType):
     def get_dingtalk_msg(self) -> dict:
         # 钉钉相同的消息一天只能发一次，所以给所有消息添加基于时间的序号，使他们不相同
         message = self.text_msg['message']
-        suffix = _('\nTime: {}').format(now())
+        time = local_now().strftime('%Y-%m-%d %H:%M:%S')
+        suffix = '\n{}: {}'.format(_('Time'), time)
 
         return {
             'subject': self.text_msg['subject'],
@@ -144,7 +166,25 @@ class Message(metaclass=MessageType):
 
     def get_sms_msg(self) -> dict:
         return self.text_msg
-    # --------------------------------------------------------------
+
+    @classmethod
+    def test_all_messages(cls):
+        def get_subclasses(cls):
+            """returns all subclasses of argument, cls"""
+            if issubclass(cls, type):
+                subclasses = cls.__subclasses__(cls)
+            else:
+                subclasses = cls.__subclasses__()
+            for subclass in subclasses:
+                subclasses.extend(get_subclasses(subclass))
+            return subclasses
+
+        messages_cls = get_subclasses(cls)
+        for _cls in messages_cls:
+            try:
+                msg = _cls.send_test_msg()
+            except NotImplementedError:
+                continue
 
 
 class SystemMessage(Message):
@@ -161,12 +201,15 @@ class SystemMessage(Message):
             *subscription.users.all(),
             *chain(*[g.users.all() for g in subscription.groups.all()])
         ]
-
         self.send_msg(users, receive_backends)
 
     @classmethod
     def post_insert_to_db(cls, subscription: SystemMsgSubscription):
         pass
+
+    @classmethod
+    def gen_test_msg(cls):
+        raise NotImplementedError
 
 
 class UserMessage(Message):
@@ -179,7 +222,9 @@ class UserMessage(Message):
         """
         发送消息到每个用户配置的接收方式上
         """
-
         sub = UserMsgSubscription.objects.get(user=self.user)
-
         self.send_msg([self.user], sub.receive_backends)
+
+    @classmethod
+    def gen_test_msg(cls):
+        raise NotImplementedError

@@ -190,7 +190,7 @@ class UserOtpSettingsSuccessView(TemplateView):
         title, describe = self.get_title_describe()
         context = {
             'title': title,
-            'messages': describe,
+            'message': describe,
             'interval': 1,
             'redirect_url': reverse('authentication:login'),
             'auto_redirect': True,
