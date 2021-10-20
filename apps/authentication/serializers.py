@@ -10,12 +10,11 @@ from applications.models import Application
 from users.serializers import UserProfileSerializer
 from assets.serializers import ProtocolsField
 from perms.serializers.asset.permission import ActionsField
-from .models import AccessKey, LoginConfirmSetting
-
+from .models import AccessKey
 
 __all__ = [
     'AccessKeySerializer', 'OtpVerifySerializer', 'BearerTokenSerializer',
-    'MFAChallengeSerializer', 'LoginConfirmSettingSerializer', 'SSOTokenSerializer',
+    'MFAChallengeSerializer', 'SSOTokenSerializer',
     'ConnectionTokenSerializer', 'ConnectionTokenSecretSerializer',
     'PasswordVerifySerializer', 'MFASelectTypeSerializer',
 ]
@@ -90,13 +89,6 @@ class MFAChallengeSerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         pass
-
-
-class LoginConfirmSettingSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = LoginConfirmSetting
-        fields = ['id', 'user', 'reviewers', 'date_created', 'date_updated']
-        read_only_fields = ['date_created', 'date_updated']
 
 
 class SSOTokenSerializer(serializers.Serializer):
@@ -201,4 +193,3 @@ class ConnectionTokenSecretSerializer(serializers.Serializer):
     gateway = ConnectionTokenGatewaySerializer(read_only=True)
     actions = ActionsField()
     expired_at = serializers.IntegerField()
-

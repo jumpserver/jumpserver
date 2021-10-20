@@ -8,27 +8,10 @@ from django.shortcuts import get_object_or_404
 
 from common.utils import get_logger
 from common.permissions import IsOrgAdmin
-from ..models import LoginConfirmSetting
-from ..serializers import LoginConfirmSettingSerializer
 from .. import errors, mixins
 
-__all__ = ['LoginConfirmSettingUpdateApi', 'TicketStatusApi']
+__all__ = ['TicketStatusApi']
 logger = get_logger(__name__)
-
-
-class LoginConfirmSettingUpdateApi(UpdateAPIView):
-    permission_classes = (IsOrgAdmin,)
-    serializer_class = LoginConfirmSettingSerializer
-
-    def get_object(self):
-        from users.models import User
-        user_id = self.kwargs.get('user_id')
-        user = get_object_or_404(User, pk=user_id)
-        defaults = {'user': user}
-        s, created = LoginConfirmSetting.objects.get_or_create(
-            defaults, user=user,
-        )
-        return s
 
 
 class TicketStatusApi(mixins.AuthMixin, APIView):

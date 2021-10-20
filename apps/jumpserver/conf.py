@@ -306,7 +306,6 @@ class Config(dict):
         'SECURITY_MFA_VERIFY_TTL': 3600,
         'SECURITY_SESSION_SHARE': True,
         'OLD_PASSWORD_HISTORY_LIMIT_COUNT': 5,
-        'LOGIN_CONFIRM_ENABLE': False,  # 准备废弃，放到 acl 中
         'CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED': True,
         'USER_LOGIN_SINGLE_MACHINE_ENABLED': False,
         'ONLY_ALLOW_EXIST_USER_AUTH': False,

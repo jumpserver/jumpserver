@@ -1615,6 +1615,9 @@ msgstr "登录复核 {}"
 msgid "IP is not allowed"
 msgstr "来源 IP 不被允许登录"
 
+msgid "Time Period is not allowed"
+msgstr "该 时间段 不被允许登录"
+
 #: authentication/errors.py:294
 msgid "SSO auth closed"
 msgstr "SSO 认证关闭了"

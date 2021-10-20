@@ -31,7 +31,6 @@ urlpatterns = [
     path('sms/verify-code/send/', api.SendSMSVerifyCodeApi.as_view(), name='sms-verify-code-send'),
     path('password/verify/', api.UserPasswordVerifyApi.as_view(), name='user-password-verify'),
     path('login-confirm-ticket/status/', api.TicketStatusApi.as_view(), name='login-confirm-ticket-status'),
-    path('login-confirm-settings/<uuid:user_id>/', api.LoginConfirmSettingUpdateApi.as_view(), name='login-confirm-setting-update')
 ]
 
 urlpatterns += router.urls

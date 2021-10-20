@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
@@ -12,7 +11,7 @@ from ..models import User
 from ..const import SystemOrOrgRole, PasswordStrategy
 
 __all__ = [
-    'UserSerializer', 'UserRetrieveSerializer', 'MiniUserSerializer',
+    'UserSerializer', 'MiniUserSerializer',
     'InviteSerializer', 'ServiceAccountSerializer',
 ]
 
@@ -29,7 +28,8 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
     is_expired = serializers.BooleanField(read_only=True, label=_('Is expired'))
     can_update = serializers.SerializerMethodField(label=_('Can update'))
     can_delete = serializers.SerializerMethodField(label=_('Can delete'))
-    can_public_key_auth = serializers.ReadOnlyField(source='can_use_ssh_key_login', label=_('Can public key authentication'))
+    can_public_key_auth = serializers.ReadOnlyField(
+        source='can_use_ssh_key_login', label=_('Can public key authentication'))
     org_roles = serializers.ListField(
         label=_('Organization role name'), allow_null=True, required=False,
         child=serializers.ChoiceField(choices=ORG_ROLE.choices), default=["User"]
@@ -182,14 +182,6 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
                 validated_data.pop('is_active', None)
 
         return super(UserSerializer, self).update(instance, validated_data)
-
-
-class UserRetrieveSerializer(UserSerializer):
-    login_confirm_settings = serializers.PrimaryKeyRelatedField(read_only=True,
-                                                                source='login_confirm_setting.reviewers', many=True)
-
-    class Meta(UserSerializer.Meta):
-        fields = UserSerializer.Meta.fields + ['login_confirm_settings']
 
 
 class MiniUserSerializer(serializers.ModelSerializer):

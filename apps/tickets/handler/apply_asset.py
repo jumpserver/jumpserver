@@ -44,11 +44,11 @@ class Handler(BaseHandler):
             {}: {},
             {}: {}
         '''.format(
-            _("Applied hostname group"), apply_assets,
-            _("Applied system user group"), apply_system_users,
-            _("Applied actions"), apply_actions_display,
-            _('Applied date start'), apply_date_start,
-            _('Applied date expired'), apply_date_expired,
+            _("Applied hostname group"), ','.join(apply_assets),
+            _("Applied system user group"), ','.join(apply_system_users),
+            _("Applied actions"), ','.join(apply_actions_display),
+            _('Applied date start'), apply_date_start.strftime('%Y-%m-%d %H:%M:%S'),
+            _('Applied date expired'), apply_date_expired.strftime('%Y-%m-%d %H:%M:%S'),
         )
         return applied_body
 
