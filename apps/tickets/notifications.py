@@ -39,7 +39,7 @@ class BaseTicketMessage(UserMessage):
 
     @classmethod
     def gen_test_msg(cls):
-        return cls(None)
+        return None
 
 
 class TicketAppliedToAssignee(BaseTicketMessage):
