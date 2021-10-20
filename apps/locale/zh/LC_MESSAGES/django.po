@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-20 18:42+0800\n"
+"POT-Creation-Date: 2021-10-20 18:58+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1825,20 +1825,20 @@ msgid ""
 "concern your account security"
 msgstr "请点击下面链接重置密码， 如果不是您申请的，请关注账号安全"
 
-#: authentication/templates/authentication/_msg_reset_password.html:6
+#: authentication/templates/authentication/_msg_reset_password.html:7
 msgid "Click here reset password"
 msgstr "点击这里重置密码"
 
-#: authentication/templates/authentication/_msg_reset_password.html:9
+#: authentication/templates/authentication/_msg_reset_password.html:10
 msgid "This link is valid for 1 hour. After it expires,"
 msgstr "这个链接有效期1小时, 超过时间您可以"
 
-#: authentication/templates/authentication/_msg_reset_password.html:9
+#: authentication/templates/authentication/_msg_reset_password.html:10
 msgid "request new one"
 msgstr "重新申请"
 
-#: authentication/templates/authentication/_msg_reset_password.html:13
-#: users/templates/users/_msg_password_expire_reminder.html:26
+#: authentication/templates/authentication/_msg_reset_password.html:14
+#: users/templates/users/_msg_password_expire_reminder.html:22
 #: users/templates/users/_msg_reset_mfa.html:11
 #: users/templates/users/_msg_reset_ssh_key.html:11
 msgid "Login direct"
@@ -2252,7 +2252,7 @@ msgstr "邮件"
 msgid "Site message"
 msgstr "站内信"
 
-#: notifications/notifications.py:145 ops/models/adhoc.py:246
+#: notifications/notifications.py:147 ops/models/adhoc.py:246
 #: xpack/plugins/change_auth_plan/models/base.py:108
 #: xpack/plugins/change_auth_plan/models/base.py:190
 #: xpack/plugins/gathered_user/models.py:79
@@ -4615,23 +4615,19 @@ msgstr "流程"
 msgid "TicketFlow"
 msgstr "工单流程"
 
-#: tickets/notifications.py:47
-msgid "click here to review"
-msgstr "点击查看"
-
-#: tickets/notifications.py:61
+#: tickets/notifications.py:46
 msgid "New Ticket - {} ({})"
-msgstr ""
+msgstr "新工单 - {} ({})"
 
-#: tickets/notifications.py:69
+#: tickets/notifications.py:54
 msgid "Your has a new ticket, applicant - {}"
 msgstr "你有一个新的工单, 申请人 - {}"
 
-#: tickets/notifications.py:83
+#: tickets/notifications.py:68
 msgid "Ticket has processed - {} ({})"
 msgstr "你的工单已被处理, 处理人 - {} ({})"
 
-#: tickets/notifications.py:92
+#: tickets/notifications.py:77
 msgid "Your ticket has been processed, processor - {}"
 msgstr "你的工单已被处理, 处理人 - {}"
 
@@ -4750,6 +4746,12 @@ msgstr "请选择受理人"
 #: tickets/serializers/ticket/ticket.py:188
 msgid "The current organization type already exists"
 msgstr "当前组织已存在该类型"
+
+#: tickets/templates/tickets/_msg_ticket.html:11
+#, fuzzy
+#| msgid "click here to review"
+msgid "Click here to review"
+msgstr "点击查看"
 
 #: users/api/user.py:208
 msgid "Could not reset self otp, use profile reset instead"
@@ -4908,7 +4910,7 @@ msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
 #: users/notifications.py:20
-#: users/templates/users/_msg_password_expire_reminder.html:18
+#: users/templates/users/_msg_password_expire_reminder.html:17
 #: users/templates/users/reset_password.html:5
 #: users/templates/users/reset_password.html:6
 msgid "Reset password"
@@ -5078,11 +5080,11 @@ msgstr "为了您的账号安全，请点击下面的链接及时更新密码"
 msgid "Click here update password"
 msgstr "点击这里更新密码"
 
-#: users/templates/users/_msg_password_expire_reminder.html:17
+#: users/templates/users/_msg_password_expire_reminder.html:16
 msgid "If your password has expired, please click"
 msgstr "如果你的密码已过期，先点击"
 
-#: users/templates/users/_msg_password_expire_reminder.html:19
+#: users/templates/users/_msg_password_expire_reminder.html:18
 msgid "to apply for a password reset email."
 msgstr "申请重置"
 
@@ -5988,7 +5990,6 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
-
 
 #~ msgid ""
 #~ "\n"

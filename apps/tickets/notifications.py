@@ -1,6 +1,7 @@
 from urllib.parse import urljoin
 
 from django.conf import settings
+from django.template.loader import render_to_string
 from django.utils.translation import ugettext as _
 
 from . import const
@@ -9,22 +10,6 @@ from common.utils import get_logger
 from .models import Ticket
 
 logger = get_logger(__file__)
-
-EMAIL_TEMPLATE = '''
-    <div>
-        <p>
-            {title} 
-        </p>
-        <div>
-            {body}
-        </div>
-        <div>
-            <a href={ticket_detail_url}>
-                <strong>{ticket_detail_url_description}</strong>
-            </a>
-        </div>
-    </div>
-'''
 
 
 class BaseTicketMessage(UserMessage):
@@ -41,12 +26,12 @@ class BaseTicketMessage(UserMessage):
         return urljoin(settings.SITE_URL, const.TICKET_DETAIL_URL.format(id=str(self.ticket.id)))
 
     def get_html_msg(self) -> dict:
-        message = EMAIL_TEMPLATE.format(
+        context = dict(
             title=self.content_title,
             ticket_detail_url=self.ticket_detail_url,
-            ticket_detail_url_description=_('click here to review'),
             body=self.ticket.body.replace('\n', '<br/>'),
         )
+        message = render_to_string('tickets/_msg_ticket.html', context)
         return {
             'subject': self.subject,
             'message': message

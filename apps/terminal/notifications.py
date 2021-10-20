@@ -125,14 +125,18 @@ class CommandExecutionAlert(CommandAlertMixin, SystemMessage):
         _input = command['input']
         _input = _input.replace('\n', '<br>')
 
-        assets = ', '.join([str(asset) for asset in command['assets']])
+        assets_with_url = []
+        for asset in command['assets']:
+            url = reverse('assets:asset-detail', kwargs={'pk': asset.id}, api_to_ui=True, external=True)
+            assets_with_url.append([asset, url])
+
         context = {
             'command': _input,
-            'assets': assets,
+            'assets_with_url': assets_with_url,
             'user': command['user'],
             'risk_level': Command.get_risk_level_str(command['risk_level'])
         }
-        message = render_to_string('terminal/_msg_command_execue_alert.html', context)
+        message = render_to_string('terminal/_msg_command_execute_alert.html', context)
         return {
             'subject': self.subject,
             'message': message
