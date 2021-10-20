@@ -43,11 +43,7 @@ def migrate_ip_group(apps, schema_editor):
     updates = list()
     with transaction.atomic():
         for instance in login_acl_model.objects.exclude(action=LoginACL.ActionChoices.confirm):
-            instance.rules = {'ip_group': instance.ip_group}
-            if instance.action == LoginACL.ActionChoices.allow:
-                instance.rules.update({'time_period': default_time_periods})
-            elif instance.action == LoginACL.ActionChoices.reject:
-                instance.rules.update({'time_period': []})
+            instance.rules = {'ip_group': instance.ip_group, 'time_period': default_time_periods}
             updates.append(instance)
         login_acl_model.objects.bulk_update(updates, ['rules', ])
 

@@ -57,6 +57,18 @@ class LoginACL(BaseACL):
         return user.login_acls.all().valid().distinct()
 
     @staticmethod
+    def allow_user_confirm_if_need(user, ip):
+        acl = LoginACL.filter_acl(user).filter(action=LoginACL.ActionChoices.confirm).first()
+        acl = acl if acl and acl.reviewers.exists() else None
+        if not acl:
+            return False, acl
+        ip_group = acl.rules.get('ip_group')
+        time_periods = acl.rules.get('time_period')
+        is_contain_ip = contains_ip(ip, ip_group)
+        is_contain_time_period = contains_time_period(time_periods)
+        return is_contain_ip and is_contain_time_period, acl
+
+    @staticmethod
     def allow_user_to_login(user, ip):
         acl = LoginACL.filter_acl(user).exclude(action=LoginACL.ActionChoices.confirm).first()
         if not acl:
@@ -65,15 +77,23 @@ class LoginACL(BaseACL):
         time_periods = acl.rules.get('time_period')
         is_contain_ip = contains_ip(ip, ip_group)
         is_contain_time_period = contains_time_period(time_periods)
-        if (acl.action_allow and is_contain_ip and is_contain_time_period) or \
-                (acl.action_reject and not is_contain_ip and not is_contain_time_period):
-            return True, ''
-        if not (acl.action_allow and is_contain_ip) or \
-                not (not acl.action_reject and not is_contain_ip):
-            return False, 'ip'
-        if not (acl.action_allow and is_contain_time_period) or \
-                not (not acl.action_reject and not is_contain_time_period):
-            return False, 'time'
+
+        reject_type = ''
+        if is_contain_ip and is_contain_time_period:
+            # 满足条件
+            allow = acl.action_allow
+            if not allow:
+                reject_type = 'ip' if is_contain_ip else 'time'
+        else:
+            # 不满足条件
+            # 如果acl本身允许，那就拒绝；如果本身拒绝，那就允许
+            allow = not acl.action_allow
+            if not allow:
+                reject_type = 'ip' if not is_contain_ip else 'time'
+
+        return allow, reject_type
+
+
 
     @staticmethod
     def construct_confirm_ticket_meta(request=None):

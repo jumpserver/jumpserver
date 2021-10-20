@@ -149,10 +149,6 @@ class AuthMixin:
             return True
         return False
 
-    def get_login_confirm_setting(self):
-        acl = LoginACL.filter_acl(self).filter(action=LoginACL.ActionChoices.confirm).first()
-        return acl if acl and acl.reviewers.all().count() else False
-
     @staticmethod
     def get_public_key_body(key):
         for i in key.split():
