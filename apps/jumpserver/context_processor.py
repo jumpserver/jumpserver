@@ -24,7 +24,6 @@ def jumpserver_processor(request):
         'SECURITY_MFA_VERIFY_TTL': settings.SECURITY_MFA_VERIFY_TTL,
         'FORCE_SCRIPT_NAME': settings.FORCE_SCRIPT_NAME,
         'SECURITY_VIEW_AUTH_NEED_MFA': settings.SECURITY_VIEW_AUTH_NEED_MFA,
-        'LOGIN_CONFIRM_ENABLE': settings.LOGIN_CONFIRM_ENABLE,
     }
     return context
 

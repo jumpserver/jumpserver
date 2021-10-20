@@ -111,8 +111,7 @@ class UserLoginView(mixins.AuthMixin, FormView):
         self.request.session.delete_test_cookie()
 
         try:
-            with transaction.atomic():
-                self.check_user_auth(decrypt_passwd=True)
+            self.check_user_auth(decrypt_passwd=True)
         except errors.AuthFailedError as e:
             form.add_error(None, e.msg)
             self.set_login_failed_mark()

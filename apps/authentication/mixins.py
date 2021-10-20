@@ -17,9 +17,9 @@ from django.contrib.auth import (
 from django.shortcuts import reverse, redirect
 
 from common.utils import get_object_or_none, get_request_ip, get_logger, bulk_get, FlashMessageUtil
+from acls.models import LoginACL
 from users.models import User, MFAType
 from users.utils import LoginBlockUtil, MFABlockUtils
-from users.exceptions import MFANotEnabled
 from . import errors
 from .utils import rsa_decrypt, gen_key_pair
 from .signals import post_auth_success, post_auth_failed
@@ -247,10 +247,12 @@ class AuthMixin(PasswordEncryptionViewMixin):
 
     def _check_login_acl(self, user, ip):
         # ACL 限制用户登录
-        from acls.models import LoginACL
-        is_allowed = LoginACL.allow_user_to_login(user, ip)
+        is_allowed, limit_type = LoginACL.allow_user_to_login(user, ip)
         if not is_allowed:
-            raise errors.LoginIPNotAllowed(username=user.username, request=self.request)
+            if limit_type == 'ip':
+                raise errors.LoginIPNotAllowed(username=user.username, request=self.request)
+            elif limit_type == 'time':
+                raise errors.TimePeriodNotAllowed(username=user.username, request=self.request)
 
     def set_login_failed_mark(self):
         ip = self.get_request_ip()
@@ -401,9 +403,9 @@ class AuthMixin(PasswordEncryptionViewMixin):
     def check_user_mfa(self, code, mfa_type=MFAType.OTP, user=None):
         user = user if user else self.get_user_from_session()
         if not user.mfa_enabled:
-            return True
+            return
 
-        if not (bool(user.otp_secret_key) and mfa_type == MFAType.OTP):
+        if not bool(user.otp_secret_key) and mfa_type == MFAType.OTP:
             self.set_passwd_verify_on_session(user)
             raise errors.OTPRequiredError(reverse_lazy('authentication:user-otp-enable-bind'))
 
@@ -463,10 +465,9 @@ class AuthMixin(PasswordEncryptionViewMixin):
             )
 
     def check_user_login_confirm_if_need(self, user):
-        if not settings.LOGIN_CONFIRM_ENABLE:
-            return
-        confirm_setting = user.get_login_confirm_setting()
-        if self.request.session.get('auth_confirm') or not confirm_setting:
+        ip = self.get_request_ip()
+        is_allowed, confirm_setting = LoginACL.allow_user_confirm_if_need(user, ip)
+        if self.request.session.get('auth_confirm') or not is_allowed:
             return
         self.get_ticket_or_create(confirm_setting)
         self.check_user_login_confirm()

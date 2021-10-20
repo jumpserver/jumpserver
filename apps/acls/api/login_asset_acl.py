@@ -1,4 +1,3 @@
-
 from orgs.mixins.api import OrgBulkModelViewSet
 from common.permissions import IsOrgAdmin
 from .. import models, serializers
