@@ -150,15 +150,19 @@ class ClientProtocolMixin:
     def get_client_protocol_data(self, serializer):
         asset, application, system_user, user = self.get_request_resource(serializer)
         protocol = system_user.protocol
+        username = user.username
+        name = ''
         if protocol == 'rdp':
             name, config = self.get_rdp_file_content(serializer)
         elif protocol == 'vnc':
             raise HttpResponse(status=404, data={"error": "VNC not support"})
         else:
             config = 'ssh://system_user@asset@user@jumpserver-ssh'
+        filename = "{}-{}-jumpserver".format(username, name)
         data = {
+            "filename": filename,
             "protocol": system_user.protocol,
-            "username": user.username,
+            "username": username,
             "config": config
         }
         return data
