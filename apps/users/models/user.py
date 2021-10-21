@@ -17,7 +17,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.shortcuts import reverse
 
-from acls.models import LoginACL
 from orgs.utils import current_org
 from orgs.models import OrganizationMember, Organization
 from common.exceptions import JMSException
