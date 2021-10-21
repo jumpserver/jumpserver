@@ -11,5 +11,5 @@ class LoginAclFilter(BaseFilterSet):
     class Meta:
         model = LoginACL
         fields = (
-            'name', 'user', 'user_display'
+            'name', 'user', 'user_display', 'action'
         )
