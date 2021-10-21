@@ -9,8 +9,9 @@ class Handler(BaseHandler):
         apply_login_user = self.ticket.meta.get('apply_login_user')
         apply_login_asset = self.ticket.meta.get('apply_login_asset')
         apply_login_system_user = self.ticket.meta.get('apply_login_system_user')
-        applied_body = '''{}: {},
-            {}: {},
+        applied_body = '''
+            {}: {}
+            {}: {}
             {}: {}
         '''.format(
             _("Applied login user"), apply_login_user,

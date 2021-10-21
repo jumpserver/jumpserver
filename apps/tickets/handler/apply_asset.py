@@ -69,10 +69,10 @@ class Handler(BaseHandler):
             str(self.ticket.__class__.__name__), str(self.ticket.id)
         )
         permission_comment = _(
-            'Created by the ticket, '
-            'ticket title: {}, '
-            'ticket applicant: {}, '
-            'ticket processor: {}, '
+            'Created by the ticket '
+            'ticket title: {} '
+            'ticket applicant: {} '
+            'ticket processor: {} '
             'ticket ID: {}'
         ).format(
             self.ticket.title,

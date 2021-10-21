@@ -14,12 +14,13 @@ class Handler(BaseHandler):
         apply_from_cmd_filter_rule_id = self.ticket.meta.get('apply_from_cmd_filter_rule_id')
         apply_from_cmd_filter_id = self.ticket.meta.get('apply_from_cmd_filter_id')
 
-        applied_body = '''{}: {},
-            {}: {},
-            {}: {},
-            {}: {},
-            {}: {},
-            {}: {},
+        applied_body = '''
+            {}: {}
+            {}: {}
+            {}: {}
+            {}: {}
+            {}: {}
+            {}: {}
         '''.format(
             _("Applied run user"), apply_run_user,
             _("Applied run asset"), apply_run_asset,

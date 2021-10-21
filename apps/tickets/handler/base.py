@@ -105,28 +105,29 @@ class BaseHandler(object):
         return basic_body + meta_body
 
     def _construct_basic_body(self):
-        basic_body = '''{}: {},
-            {}: {},
-            {}: {},
-            {}: {},
+        basic_body = '''
+            {}: {}
+            {}: {}
+            {}: {}
+            {}: {}
         '''.format(
             _('Ticket title'), self.ticket.title,
             _('Ticket type'), self.ticket.get_type_display(),
             _('Ticket status'), self.ticket.get_status_display(),
             _('Ticket applicant'), self.ticket.applicant_display,
-        )
+        ).strip()
         body = self.body_html_format.format(_("Ticket basic info"), basic_body)
         return body
 
     def _construct_meta_body(self):
         body = ''
-        open_body = self._base_construct_meta_body_of_open()
+        open_body = self._base_construct_meta_body_of_open().strip()
         body += open_body
         return body
 
     def _base_construct_meta_body_of_open(self):
         meta_body_of_open = getattr(
             self, '_construct_meta_body_of_open', lambda: _('No content')
-        )()
+        )().strip()
         body = self.body_html_format.format(_('Ticket applied info'), meta_body_of_open)
         return body

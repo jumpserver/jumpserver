@@ -6,13 +6,7 @@ from common.utils import reverse as js_reverse
 from notifications.notifications import UserMessage
 
 
-class BasePermMsg(UserMessage):
-    @classmethod
-    def gen_test_msg(cls):
-        return
-
-
-class PermedWillExpireUserMsg(BasePermMsg):
+class PermedWillExpireUserMsg(UserMessage):
     def __init__(self, user, assets):
         super().__init__(user)
         self.assets = assets
@@ -40,7 +34,7 @@ class PermedWillExpireUserMsg(BasePermMsg):
         return cls(user, assets)
 
 
-class AssetPermsWillExpireForOrgAdminMsg(BasePermMsg):
+class AssetPermsWillExpireForOrgAdminMsg(UserMessage):
 
     def __init__(self, user, perms, org):
         super().__init__(user)
@@ -84,7 +78,7 @@ class AssetPermsWillExpireForOrgAdminMsg(BasePermMsg):
         return cls(user, perms, org)
 
 
-class PermedAppsWillExpireUserMsg(BasePermMsg):
+class PermedAppsWillExpireUserMsg(UserMessage):
     def __init__(self, user, apps):
         super().__init__(user)
         self.apps = apps
@@ -112,7 +106,7 @@ class PermedAppsWillExpireUserMsg(BasePermMsg):
         return cls(user, apps)
 
 
-class AppPermsWillExpireForOrgAdminMsg(BasePermMsg):
+class AppPermsWillExpireForOrgAdminMsg(UserMessage):
     def __init__(self, user, perms, org):
         super().__init__(user)
         self.perms = perms

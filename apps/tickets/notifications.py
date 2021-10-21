@@ -2,7 +2,7 @@ from urllib.parse import urljoin
 
 from django.conf import settings
 from django.template.loader import render_to_string
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 
 from . import const
 from notifications.notifications import UserMessage
@@ -18,12 +18,16 @@ class BaseTicketMessage(UserMessage):
     content_title: str
 
     @property
-    def subject(self):
-        return self.title.format(self.ticket.title, self.ticket.get_type_display())
-
-    @property
     def ticket_detail_url(self):
         return urljoin(settings.SITE_URL, const.TICKET_DETAIL_URL.format(id=str(self.ticket.id)))
+
+    @property
+    def content_title(self):
+        raise NotImplementedError
+
+    @property
+    def subject(self):
+        raise NotImplementedError
 
     def get_html_msg(self) -> dict:
         context = dict(
@@ -43,8 +47,6 @@ class BaseTicketMessage(UserMessage):
 
 
 class TicketAppliedToAssignee(BaseTicketMessage):
-    title = _('New Ticket - {} ({})')
-
     def __init__(self, user, ticket):
         self.ticket = ticket
         super().__init__(user)
@@ -54,6 +56,13 @@ class TicketAppliedToAssignee(BaseTicketMessage):
         return _('Your has a new ticket, applicant - {}').format(
             str(self.ticket.applicant_display)
         )
+
+    @property
+    def subject(self):
+        title = _('New Ticket - {} ({})').format(
+            self.ticket.title, self.ticket.get_type_display()
+        )
+        return title
 
     @classmethod
     def gen_test_msg(cls):
@@ -65,8 +74,6 @@ class TicketAppliedToAssignee(BaseTicketMessage):
 
 
 class TicketProcessedToApplicant(BaseTicketMessage):
-    title = _('Ticket has processed - {} ({})')
-
     def __init__(self, user, ticket, processor):
         self.ticket = ticket
         self.processor = processor
@@ -75,6 +82,13 @@ class TicketProcessedToApplicant(BaseTicketMessage):
     @property
     def content_title(self):
         return _('Your ticket has been processed, processor - {}').format(str(self.processor))
+
+    @property
+    def subject(self):
+        title = _('Ticket has processed - {} ({})').format(
+            self.ticket.title, self.ticket.get_type_display()
+        )
+        return title
 
     @classmethod
     def gen_test_msg(cls):
