@@ -1,10 +1,10 @@
 {% load i18n %}
 <div>
     <p>
-        {{ title}}
+        {{ title | safe }}
     </p>
     <div>
-        {{ body}}
+        {{ body | safe }}
     </div>
     <div>
         <a href={{ ticket_detail_url }}>
