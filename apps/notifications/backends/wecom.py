@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from common.message.backends.wecom import WeCom as Client
+from common.sdk.im.wecom import WeCom as Client
 from .base import BackendBase
 
 

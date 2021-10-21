@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from common.message.backends.feishu import FeiShu as Client
+from common.sdk.im.feishu import FeiShu as Client
 from .base import BackendBase
 
 

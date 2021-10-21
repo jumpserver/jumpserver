@@ -14,8 +14,8 @@ from users.models import User
 from common.utils import get_logger, FlashMessageUtil
 from common.utils.random import random_string
 from common.utils.django import reverse, get_object_or_none
-from common.message.backends.wecom import URL
-from common.message.backends.wecom import WeCom
+from common.sdk.im.wecom import URL
+from common.sdk.im.wecom import WeCom
 from common.mixins.views import PermissionsMixin
 from authentication import errors
 from authentication.mixins import AuthMixin

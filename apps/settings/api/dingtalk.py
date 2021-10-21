@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 from django.conf import settings
 from common.permissions import IsSuperUser
-from common.message.backends.dingtalk import DingTalk
+from common.sdk.im.dingtalk import DingTalk
 
 from .. import serializers
 

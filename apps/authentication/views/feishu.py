@@ -15,7 +15,7 @@ from common.utils import get_logger, FlashMessageUtil
 from common.utils.random import random_string
 from common.utils.django import reverse, get_object_or_none
 from common.mixins.views import PermissionsMixin
-from common.message.backends.feishu import FeiShu, URL
+from common.sdk.im.feishu import FeiShu, URL
 from authentication import errors
 from authentication.mixins import AuthMixin
 
