@@ -2,7 +2,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 
 from common.permissions import IsSuperUser
-from common.sdk.im.sms import BACKENDS
+from common.sdk.sms import BACKENDS
 from settings.serializers.sms import SMSBackendSerializer
 
 

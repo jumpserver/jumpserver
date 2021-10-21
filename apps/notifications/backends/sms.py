@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from common.sdk.im.sms.alibaba import AlibabaSMS as Client
+from common.sdk.sms.alibaba import AlibabaSMS as Client
 from .base import BackendBase
 
 

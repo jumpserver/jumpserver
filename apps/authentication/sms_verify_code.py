@@ -3,7 +3,7 @@ import random
 from django.core.cache import cache
 from django.utils.translation import gettext_lazy as _
 
-from common.sdk.im.sms import SMS
+from common.sdk.sms import SMS
 from common.utils import get_logger
 from common.exceptions import JMSException
 
