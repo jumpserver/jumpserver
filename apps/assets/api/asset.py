@@ -8,7 +8,7 @@ from django.db.models import Q
 
 from common.utils import get_logger, get_object_or_none
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, IsSuperUser
-from common.mixins.views import SuggestionMixin
+from common.mixins.api import SuggestionMixin
 from users.models import User, UserGroup
 from users.serializers import UserSerializer, UserGroupSerializer
 from users.filters import UserFilter
