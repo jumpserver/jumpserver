@@ -8,7 +8,6 @@ from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
 from django.db.models import Prefetch
 
-from users.notifications import ResetMFAMsg
 from common.permissions import (
     IsOrgAdmin, IsOrgAdminOrAppUser,
     CanUpdateDeleteUser, IsSuperUser
@@ -18,9 +17,10 @@ from common.utils import get_logger
 from orgs.utils import current_org
 from orgs.models import ROLE as ORG_ROLE, OrganizationMember
 from users.utils import LoginBlockUtil, MFABlockUtils
+from .mixins import UserQuerysetMixin
+from ..notifications import ResetMFAMsg
 from .. import serializers
 from ..serializers import UserSerializer, MiniUserSerializer, InviteSerializer
-from .mixins import UserQuerysetMixin
 from ..models import User
 from ..signals import post_user_create
 from ..filters import OrgRoleUserFilterBackend, UserFilter
@@ -128,9 +128,9 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         return super().perform_bulk_update(serializer)
 
     @action(methods=['get'], detail=False, permission_classes=(IsOrgAdmin,))
-    def suggestion(self, request):
+    def suggestion(self, *args, **kwargs):
         queryset = User.objects.exclude(role=User.ROLE.APP)
-        queryset = self.filter_queryset(queryset)[:3]
+        queryset = self.filter_queryset(queryset)[:6]
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -206,6 +206,7 @@ class UserResetOTPApi(UserQuerysetMixin, generics.RetrieveAPIView):
         if user == request.user:
             msg = _("Could not reset self otp, use profile reset instead")
             return Response({"error": msg}, status=401)
+
         if user.mfa_enabled:
             user.reset_mfa()
             user.save()
