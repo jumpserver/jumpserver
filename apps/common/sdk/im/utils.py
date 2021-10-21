@@ -3,7 +3,7 @@ import inspect
 from inspect import Parameter
 
 from common.utils.common import get_logger
-from common.message.backends import exceptions as exce
+from common.sdk.im import exceptions as exce
 
 logger = get_logger(__name__)
 

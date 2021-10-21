@@ -14,11 +14,11 @@ from users.models import User
 from common.utils import get_logger, FlashMessageUtil
 from common.utils.random import random_string
 from common.utils.django import reverse, get_object_or_none
-from common.message.backends.dingtalk import URL
+from common.sdk.im.dingtalk import URL
 from common.mixins.views import PermissionsMixin
 from authentication import errors
 from authentication.mixins import AuthMixin
-from common.message.backends.dingtalk import DingTalk
+from common.sdk.im.dingtalk import DingTalk
 
 logger = get_logger(__file__)
 

@@ -6,7 +6,7 @@ from django.core.cache import cache
 from .utils import DictWrapper
 from common.utils.common import get_logger
 from common.utils import lazyproperty
-from common.message.backends.utils import set_default, as_request
+from common.sdk.im.utils import set_default, as_request
 
 from . import exceptions as exce
 
