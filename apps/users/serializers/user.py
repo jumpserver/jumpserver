@@ -108,6 +108,11 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
             choices.pop(User.ROLE.AUDITOR, None)
         role._choices = choices
 
+    def validate_mfa_level(self, value):
+        if self.instance and value == 0:
+            self.instance.disable_mfa()
+        return value
+
     def validate_role(self, value):
         request = self.context.get('request')
         if not request.user.is_superuser and value != User.ROLE.USER:
