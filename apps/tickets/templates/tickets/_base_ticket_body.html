@@ -1,12 +1,17 @@
 {% load i18n %}
 <div>
-    <p>
-        {{ title | safe }}
+    <p class="ticket-info">
+        {{ ticket_info }}
     </p>
     <div>
+        <p>
+        </p>
+        <p>
+
+        </p>
+
         {{ body | safe }}
     </div>
-    <br>
     <div>
         <a href={{ ticket_detail_url }}>
             {% trans 'Click here to review' %}

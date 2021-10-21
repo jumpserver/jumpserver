@@ -43,11 +43,11 @@ class Handler(BaseHandler):
         apply_date_start = self.ticket.meta.get('apply_date_start')
         apply_date_expired = self.ticket.meta.get('apply_date_expired')
         applied_body = '''{}: {},
-            {}: {},
-            {}: {},
-            {}: {},
-            {}: {},
-            {}: {},
+            {}: {}
+            {}: {}
+            {}: {}
+            {}: {}
+            {}: {}
         '''.format(
             _('Applied category'), apply_category_display,
             _('Applied type'), apply_type_display,
