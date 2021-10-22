@@ -1,4 +1,3 @@
-from datetime import datetime
 from urllib.parse import urljoin
 
 from django.utils import timezone
@@ -71,18 +70,18 @@ class ResetPasswordSuccessMsg(UserMessage):
 
 
 class PasswordExpirationReminderMsg(UserMessage):
-    update_password_url = urljoin(settings.SITE_URL, '/ui/#/users/profile/?activeTab=PasswordUpdate')
 
     def get_html_msg(self) -> dict:
         user = self.user
         subject = _('Password is about expire')
 
+        update_password_url = urljoin(settings.SITE_URL, '/ui/#/users/profile/?activeTab=PasswordUpdate')
         date_password_expired_local = timezone.localtime(user.date_password_expired)
         date_password_expired = date_password_expired_local.strftime('%Y-%m-%d %H:%M:%S')
         context = {
             'name': user.name,
             'date_password_expired': date_password_expired,
-            'update_password_url': self.update_password_url,
+            'update_password_url': update_password_url,
             'forget_password_url': reverse('authentication:forgot-password', external=True),
             'email': user.email,
             'login_url': reverse('authentication:login', external=True),
