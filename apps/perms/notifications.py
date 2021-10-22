@@ -109,8 +109,6 @@ class PermedAppsWillExpireUserMsg(UserMessage):
 
 
 class AppPermsWillExpireForOrgAdminMsg(UserMessage):
-    perm_detail_url = urljoin(settings.SITE_URL, '/ui/#/perms/app-permissions/{}')
-
     def __init__(self, user, perms, org):
         super().__init__(user)
         self.perms = perms
@@ -118,8 +116,9 @@ class AppPermsWillExpireForOrgAdminMsg(UserMessage):
 
     def get_items_with_url(self):
         items_with_url = []
+        perm_detail_url = urljoin(settings.SITE_URL, '/ui/#/perms/app-permissions/{}')
         for perm in self.perms:
-            url = self.perm_detail_url.format(perm.id) + f'?oid={perm.org_id}'
+            url = perm_detail_url.format(perm.id) + f'?oid={perm.org_id}'
             items_with_url.append([perm.name, url])
         return items_with_url
 
