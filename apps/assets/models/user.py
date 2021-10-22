@@ -103,16 +103,23 @@ class AuthMixin:
         password = cache.get(key)
         return password
 
-    def load_tmp_auth_if_has(self, asset_or_app_id, user):
-        if not asset_or_app_id or not user:
-            return
+    def _clean_auth_info_if_manual_login_mode(self):
+        if self.login_mode == self.LOGIN_MANUAL:
+            self.password = ''
+            self.private_key = ''
+            self.public_key = ''
 
+    def _load_tmp_auth_if_has(self, asset_or_app_id, user_id):
         if self.login_mode != self.LOGIN_MANUAL:
             return
 
-        auth = self.get_temp_auth(asset_or_app_id, user)
+        if not asset_or_app_id or not user_id:
+            return
+
+        auth = self.get_temp_auth(asset_or_app_id, user_id)
         if not auth:
             return
+
         username = auth.get('username')
         password = auth.get('password')
 
@@ -122,17 +129,11 @@ class AuthMixin:
             self.password = password
 
     def load_app_more_auth(self, app_id=None, user_id=None):
-        from users.models import User
-
+        self._clean_auth_info_if_manual_login_mode()
+        # 加载临时认证信息
         if self.login_mode == self.LOGIN_MANUAL:
-            self.password = ''
-            self.private_key = ''
-        if not user_id:
+            self._load_tmp_auth_if_has(app_id, user_id)
             return
-        user = get_object_or_none(User, pk=user_id)
-        if not user:
-            return
-        self.load_tmp_auth_if_has(app_id, user)
 
     def load_asset_special_auth(self, asset, username=''):
         """
@@ -152,34 +153,25 @@ class AuthMixin:
 
     def load_asset_more_auth(self, asset_id=None, username=None, user_id=None):
         from users.models import User
-
+        self._clean_auth_info_if_manual_login_mode()
+        # 加载临时认证信息
         if self.login_mode == self.LOGIN_MANUAL:
-            self.password = ''
-            self.private_key = ''
-
-        asset = None
-        if asset_id:
-            asset = get_object_or_none(Asset, pk=asset_id)
-        # 没有资产就没有必要继续了
-        if not asset:
-            logger.debug('Asset not found, pass')
+            self._load_tmp_auth_if_has(asset_id, user_id)
             return
-
-        user = None
-        if user_id:
-            user = get_object_or_none(User, pk=user_id)
-
-        _username = self.username
+        # 更新用户名
+        user = get_object_or_none(User, pk=user_id) if user_id else None
         if self.username_same_with_user:
             if user and not username:
                 _username = user.username
             else:
                 _username = username
             self.username = _username
-
         # 加载某个资产的特殊配置认证信息
-        self.load_asset_special_auth(asset, _username)
-        self.load_tmp_auth_if_has(asset_id, user)
+        asset = get_object_or_none(Asset, pk=asset_id) if asset_id else None
+        if not asset:
+            logger.debug('Asset not found, pass')
+            return
+        self.load_asset_special_auth(asset, self.username)
 
 
 class SystemUser(ProtocolMixin, AuthMixin, BaseUser):

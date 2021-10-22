@@ -22,6 +22,8 @@ class DomainViewSet(OrgBulkModelViewSet):
     search_fields = filterset_fields
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.DomainSerializer
+    ordering_fields = ('name',)
+    ordering = ('name', )
 
     def get_serializer_class(self):
         if self.request.query_params.get('gateway'):

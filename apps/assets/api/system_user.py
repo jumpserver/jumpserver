@@ -41,6 +41,8 @@ class SystemUserViewSet(SuggestionMixin, OrgBulkModelViewSet):
         'default': serializers.SystemUserSerializer,
         'suggestion': serializers.MiniSystemUserSerializer
     }
+    ordering_fields = ('name', 'protocol')
+    ordering = ('name', )
     permission_classes = (IsOrgAdminOrAppUser,)
 
 
@@ -73,7 +75,7 @@ class SystemUserTempAuthInfoApi(generics.CreateAPIView):
 
         with tmp_to_root_org():
             instance = get_object_or_404(SystemUser, pk=pk)
-            instance.set_temp_auth(instance_id, user, data)
+            instance.set_temp_auth(instance_id, user.id, data)
         return Response(serializer.data, status=201)
 
 

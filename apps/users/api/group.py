@@ -16,3 +16,5 @@ class UserGroupViewSet(OrgBulkModelViewSet):
     search_fields = filterset_fields
     permission_classes = (IsOrgAdmin,)
     serializer_class = UserGroupSerializer
+    ordering_fields = ('name', )
+    ordering = ('name', )

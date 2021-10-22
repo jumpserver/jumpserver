@@ -48,6 +48,8 @@ class OrgViewSet(BulkModelViewSet):
     queryset = Organization.objects.all()
     serializer_class = OrgSerializer
     permission_classes = (IsSuperUserOrAppUser,)
+    ordering_fields = ('name',)
+    ordering = ('name', )
 
     def get_serializer_class(self):
         mapper = {

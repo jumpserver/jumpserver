@@ -29,6 +29,8 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     search_fields = [
         'title', 'action', 'type', 'status', 'applicant_display'
     ]
+    ordering_fields = ('title',)
+    ordering = ('title', )
 
     def create(self, request, *args, **kwargs):
         raise MethodNotAllowed(self.action)
