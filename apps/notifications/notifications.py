@@ -181,13 +181,13 @@ class Message(metaclass=MessageType):
         return self.text_msg
 
     def get_email_msg(self) -> dict:
-        return self.html_msg
+        return self.html_msg_with_sign
 
     def get_site_msg_msg(self) -> dict:
         return self.html_msg
 
     def get_sms_msg(self) -> dict:
-        return self.text_msg
+        return self.text_msg_with_sign
 
     @classmethod
     def get_all_sub_messages(cls):
