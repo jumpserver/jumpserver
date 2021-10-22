@@ -19,6 +19,7 @@ class BaseTicketMessage(UserMessage):
 
     @property
     def ticket_detail_url(self):
+        tp = self.ticket.type
         return urljoin(settings.SITE_URL, const.TICKET_DETAIL_URL.format(id=str(self.ticket.id)))
 
     @property

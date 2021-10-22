@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-21 18:50+0800\n"
+"POT-Creation-Date: 2021-10-22 19:15+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -85,8 +85,7 @@ msgstr "登录复核"
 #: orgs/models.py:19 orgs/models.py:433 perms/models/base.py:45
 #: templates/index.html:78 terminal/backends/command/models.py:18
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:38
-#: terminal/templates/terminal/_msg_command_alert.html:10
-#: terminal/templates/terminal/_msg_command_execute_alert.html:4
+#: terminal/notifications.py:91 terminal/notifications.py:136
 #: tickets/models/comment.py:17 users/const.py:14 users/models/user.py:173
 #: users/models/user.py:801 users/models/user.py:827
 #: users/serializers/group.py:19
@@ -128,7 +127,7 @@ msgstr "系统用户"
 #: audits/models.py:38 perms/models/asset_permission.py:99
 #: templates/index.html:82 terminal/backends/command/models.py:19
 #: terminal/backends/command/serializers.py:13 terminal/models/session.py:40
-#: terminal/templates/terminal/_msg_command_alert.html:7
+#: terminal/notifications.py:90
 #: users/templates/users/user_asset_permission.html:40
 #: users/templates/users/user_asset_permission.html:70
 #: xpack/plugins/change_auth_plan/models/asset.py:195
@@ -154,6 +153,7 @@ msgstr "格式为逗号分隔的字符串, * 表示匹配所有. "
 #: audits/models.py:105 authentication/forms.py:15 authentication/forms.py:17
 #: authentication/templates/authentication/_msg_different_city.html:9
 #: ops/models/adhoc.py:148 users/forms/profile.py:31 users/models/user.py:595
+#: users/templates/users/_msg_user_created.html:10
 #: users/templates/users/_select_user_modal.html:14
 #: xpack/plugins/change_auth_plan/models/asset.py:35
 #: xpack/plugins/change_auth_plan/models/asset.py:191
@@ -174,7 +174,7 @@ msgstr ""
 #: applications/serializers/attrs/application_type/mysql_workbench.py:18
 #: assets/models/asset.py:180 assets/models/domain.py:61
 #: assets/serializers/account.py:12
-#: authentication/templates/authentication/_msg_rest_password_success.html:9
+#: authentication/templates/authentication/_msg_rest_password_success.html:8
 #: settings/serializers/terminal.py:8
 #: users/templates/users/_granted_assets.html:26
 #: users/templates/users/user_asset_permission.html:156
@@ -384,6 +384,7 @@ msgstr "目标URL"
 #: authentication/forms.py:22
 #: authentication/templates/authentication/login.html:151
 #: settings/serializers/auth/ldap.py:44 users/forms/profile.py:21
+#: users/templates/users/_msg_user_created.html:11
 #: users/templates/users/user_otp_check_password.html:13
 #: users/templates/users/user_password_update.html:43
 #: users/templates/users/user_password_verify.html:18
@@ -647,7 +648,7 @@ msgstr "正则表达式"
 
 #: assets/models/cmd_filter.py:41 ops/models/command.py:25
 #: terminal/backends/command/serializers.py:15 terminal/models/session.py:49
-#: terminal/templates/terminal/_msg_command_alert.html:4
+#: terminal/templates/terminal/_msg_command_alert.html:12
 #: terminal/templates/terminal/_msg_command_execute_alert.html:10
 msgid "Command"
 msgstr "命令"
@@ -1445,7 +1446,7 @@ msgstr "{ApplicationPermission} 添加 {SystemUser}"
 msgid "{ApplicationPermission} REMOVE {SystemUser}"
 msgstr "{ApplicationPermission} 移除 {SystemUser}"
 
-#: authentication/api/connection_token.py:235
+#: authentication/api/connection_token.py:239
 msgid "Invalid token"
 msgstr "无效的令牌"
 
@@ -1731,6 +1732,7 @@ msgid "Secret"
 msgstr "密钥"
 
 #: authentication/templates/authentication/_access_key_modal.html:33
+#: terminal/notifications.py:93 terminal/notifications.py:138
 msgid "Date"
 msgstr "日期"
 
@@ -1788,8 +1790,8 @@ msgid "Code error"
 msgstr "代码错误"
 
 #: authentication/templates/authentication/_msg_different_city.html:3
-#: authentication/templates/authentication/_msg_reset_password.html:2
-#: authentication/templates/authentication/_msg_rest_password_success.html:3
+#: authentication/templates/authentication/_msg_reset_password.html:3
+#: authentication/templates/authentication/_msg_rest_password_success.html:2
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: perms/templates/perms/_msg_permed_items_expire.html:3
 #: users/templates/users/_msg_account_expire_reminder.html:4
@@ -1807,53 +1809,48 @@ msgstr "你的账号存在异地登录行为，请关注。"
 msgid "Login time"
 msgstr "登录日期"
 
-#: authentication/templates/authentication/_msg_different_city.html:16
+#: authentication/templates/authentication/_msg_different_city.html:15
 msgid ""
 "If you suspect that the login behavior is abnormal, please modify the "
 "account password in time."
 msgstr "若怀疑此次登录行为异常，请及时修改账号密码"
 
-#: authentication/templates/authentication/_msg_reset_password.html:4
+#: authentication/templates/authentication/_msg_reset_password.html:6
 msgid ""
 "Please click the link below to reset your password, if not your request, "
 "concern your account security"
 msgstr "请点击下面链接重置密码， 如果不是您申请的，请关注账号安全"
 
-#: authentication/templates/authentication/_msg_reset_password.html:7
+#: authentication/templates/authentication/_msg_reset_password.html:9
 msgid "Click here reset password"
 msgstr "点击这里重置密码"
 
-#: authentication/templates/authentication/_msg_reset_password.html:10
-msgid "This link is valid for 1 hour. After it expires,"
+#: authentication/templates/authentication/_msg_reset_password.html:13
+#: users/templates/users/_msg_user_created.html:17
+msgid "This link is valid for 1 hour. After it expires"
 msgstr "这个链接有效期1小时, 超过时间您可以"
 
-#: authentication/templates/authentication/_msg_reset_password.html:10
+#: authentication/templates/authentication/_msg_reset_password.html:15
+#: users/templates/users/_msg_user_created.html:18
 msgid "request new one"
 msgstr "重新申请"
 
-#: authentication/templates/authentication/_msg_reset_password.html:14
-#: users/templates/users/_msg_password_expire_reminder.html:22
-#: users/templates/users/_msg_reset_mfa.html:11
-#: users/templates/users/_msg_reset_ssh_key.html:11
-msgid "Login direct"
-msgstr "直接登录"
+#: authentication/templates/authentication/_msg_rest_password_success.html:5
+msgid "Your password has just been successfully updated"
+msgstr "你的密码刚刚成功更新"
 
-#: authentication/templates/authentication/_msg_rest_password_success.html:6
-msgid "Your password has just been successfully updated."
-msgstr "你的密码刚刚已经成功更新。"
-
-#: authentication/templates/authentication/_msg_rest_password_success.html:10
+#: authentication/templates/authentication/_msg_rest_password_success.html:9
 msgid "Browser"
 msgstr "浏览器"
 
-#: authentication/templates/authentication/_msg_rest_password_success.html:15
+#: authentication/templates/authentication/_msg_rest_password_success.html:12
 msgid ""
 "If the password update was not initiated by you, your account may have "
-"security issues."
-msgstr "如果这次密码更新不是由你发起的，那么你的账号可能存在安全问题。"
+"security issues"
+msgstr "如果这次密码更新不是由你发起的，那么你的账号可能存在安全问题"
 
-#: authentication/templates/authentication/_msg_rest_password_success.html:16
-msgid "If you have any questions, you can contact the administrator."
+#: authentication/templates/authentication/_msg_rest_password_success.html:13
+msgid "If you have any questions, you can contact the administrator"
 msgstr "如果有疑问或需求，请联系系统管理员"
 
 #: authentication/templates/authentication/login.html:143
@@ -2206,7 +2203,7 @@ msgstr "不能包含特殊字符"
 msgid "The mobile phone number format is incorrect"
 msgstr "手机号格式不正确"
 
-#: jumpserver/context_processor.py:20
+#: jumpserver/context_processor.py:17
 msgid "JumpServer Open Source Bastion Host"
 msgstr "JumpServer 开源堡垒机"
 
@@ -2246,7 +2243,7 @@ msgstr "邮件"
 msgid "Site message"
 msgstr "站内信"
 
-#: notifications/notifications.py:148 ops/models/adhoc.py:246
+#: notifications/notifications.py:167 ops/models/adhoc.py:246
 #: xpack/plugins/change_auth_plan/models/base.py:108
 #: xpack/plugins/change_auth_plan/models/base.py:190
 #: xpack/plugins/gathered_user/models.py:79
@@ -2261,7 +2258,7 @@ msgstr "等待任务开始"
 msgid "Not has host {} permission"
 msgstr "没有该主机 {} 权限"
 
-#: ops/apps.py:9 ops/notifications.py:14
+#: ops/apps.py:9 ops/notifications.py:15
 msgid "Operations"
 msgstr "运维"
 
@@ -2383,29 +2380,33 @@ msgstr "命令 `{}` 不允许被执行 ......."
 msgid "Task end"
 msgstr "任务结束"
 
-#: ops/notifications.py:15
+#: ops/notifications.py:16
 msgid "Server performance"
 msgstr "监控告警"
 
-#: ops/notifications.py:54
+#: ops/notifications.py:22
+msgid "Terminal health check warning"
+msgstr ""
+
+#: ops/notifications.py:63
 #, python-brace-format
 msgid "The terminal is offline: {name}"
 msgstr "终端已离线: {name}"
 
-#: ops/notifications.py:60
+#: ops/notifications.py:68
 #, python-brace-format
-msgid "Disk used more than {max_threshold}%: => {value} ({name})"
-msgstr "硬盘使用率超过 {max_threshold}%: => {value} ({name})"
+msgid "Disk used more than {max_threshold}%: => {value}"
+msgstr "硬盘使用率超过 {max_threshold}%: => {value}"
 
-#: ops/notifications.py:67
+#: ops/notifications.py:73
 #, python-brace-format
-msgid "Memory used more than {max_threshold}%: => {value} ({name})"
-msgstr "内存使用率超过 {max_threshold}%: => {value} ({name})"
+msgid "Memory used more than {max_threshold}%: => {value}"
+msgstr "内存使用率超过 {max_threshold}%: => {value}"
 
-#: ops/notifications.py:74
+#: ops/notifications.py:78
 #, python-brace-format
-msgid "CPU load more than {max_threshold}: => {value} ({name})"
-msgstr "CPU 使用率超过 {max_threshold}: => {value} ({name})"
+msgid "CPU load more than {max_threshold}: => {value}"
+msgstr "CPU 使用率超过 {max_threshold}: => {value}"
 
 #: ops/tasks.py:71
 msgid "Clean task history period"
@@ -2533,35 +2534,35 @@ msgstr "失效日期"
 msgid "From ticket"
 msgstr "来自工单"
 
-#: perms/notifications.py:19
+#: perms/notifications.py:15
 msgid "You permed assets is about to expire"
 msgstr "你授权的资产即将到期"
 
-#: perms/notifications.py:23
+#: perms/notifications.py:19
 msgid "permed assets"
 msgstr "授权的资产"
 
-#: perms/notifications.py:61
+#: perms/notifications.py:57
 msgid "Asset permissions is about to expire"
 msgstr "资产授权规则将要过期"
 
-#: perms/notifications.py:65
+#: perms/notifications.py:61
 msgid "asset permissions of organization {}"
 msgstr "组织 ({}) 的资产授权"
 
-#: perms/notifications.py:91
+#: perms/notifications.py:87
 msgid "Your permed applications is about to expire"
 msgstr "你授权的应用即将过期"
 
-#: perms/notifications.py:94
+#: perms/notifications.py:90
 msgid "permed applications"
 msgstr "授权的应用"
 
-#: perms/notifications.py:132
+#: perms/notifications.py:128
 msgid "Application permissions is about to expire"
 msgstr "应用授权规则即将过期"
 
-#: perms/notifications.py:135
+#: perms/notifications.py:131
 msgid "application permissions of organization {}"
 msgstr "组织 ({}) 的应用授权"
 
@@ -2633,7 +2634,7 @@ msgstr ""
 "        以下 %(item_type)s 即将在 3 天后过期\n"
 "    "
 
-#: perms/templates/perms/_msg_permed_items_expire.html:22
+#: perms/templates/perms/_msg_permed_items_expire.html:20
 msgid "If you have any question, please contact the administrator"
 msgstr "如果有疑问或需求，请联系系统管理员"
 
@@ -2670,11 +2671,6 @@ msgstr "获取 LDAP 用户为 None"
 #: settings/api/ldap.py:203
 msgid "Imported {} users successfully (Organization: {})"
 msgstr "成功导入 {} 个用户 ( 组织: {} )"
-
-#: settings/api/public.py:41 xpack/plugins/interface/api.py:18
-#: xpack/plugins/interface/models.py:36
-msgid "Welcome to the JumpServer open source Bastion Host"
-msgstr "欢迎使用JumpServer开源堡垒机"
 
 #: settings/models.py:191 users/templates/users/reset_password.html:29
 msgid "Setting"
@@ -3725,7 +3721,7 @@ msgstr "数据库应用"
 msgid "Perms"
 msgstr "权限管理"
 
-#: templates/_nav.html:97 terminal/notifications.py:22
+#: templates/_nav.html:97 terminal/notifications.py:24
 msgid "Sessions"
 msgstr "会话管理"
 
@@ -4068,7 +4064,7 @@ msgstr "输出"
 
 #: terminal/backends/command/models.py:23 terminal/models/sharing.py:15
 #: terminal/models/sharing.py:58
-#: terminal/templates/terminal/_msg_command_alert.html:16
+#: terminal/templates/terminal/_msg_command_alert.html:10
 msgid "Session"
 msgstr "会话"
 
@@ -4235,11 +4231,15 @@ msgstr "命令存储"
 msgid "Replay storage"
 msgstr "录像存储"
 
-#: terminal/notifications.py:68
+#: terminal/notifications.py:70
 msgid "Danger command alert"
 msgstr "危险命令告警"
 
-#: terminal/notifications.py:106
+#: terminal/notifications.py:92 terminal/notifications.py:137
+msgid "Level"
+msgstr "级别"
+
+#: terminal/notifications.py:110
 msgid "Batch danger command alert"
 msgstr "批量危险命令告警"
 
@@ -4348,12 +4348,7 @@ msgstr ""
 msgid "Not found"
 msgstr "没有发现"
 
-#: terminal/templates/terminal/_msg_command_alert.html:13
-#: terminal/templates/terminal/_msg_command_execute_alert.html:7
-msgid "Level"
-msgstr "级别"
-
-#: terminal/templates/terminal/_msg_command_alert.html:16
+#: terminal/templates/terminal/_msg_command_alert.html:10
 msgid "view"
 msgstr "查看"
 
@@ -4445,7 +4440,7 @@ msgstr "申请的开始日期"
 msgid "Applied date expired"
 msgstr "申请的失效日期"
 
-#: tickets/handler/apply_application.py:79 tickets/handler/apply_asset.py:72
+#: tickets/handler/apply_application.py:79
 msgid ""
 "Created by the ticket, ticket title: {}, ticket applicant: {}, ticket "
 "processor: {}, ticket ID: {}"
@@ -4460,87 +4455,94 @@ msgstr "申请的主机名组"
 msgid "Applied actions"
 msgstr "申请的动作"
 
+#: tickets/handler/apply_asset.py:72
+msgid ""
+"Created by the ticket ticket title: {} ticket applicant: {} ticket "
+"processor: {} ticket ID: {}"
+msgstr ""
+"通过工单创建, 工单标题: {}, 工单申请人: {}, 工单处理人: {}, 工单 ID: {}"
+
 #: tickets/handler/base.py:86
 msgid "{} {} the ticket"
-msgstr "{} {}工单"
+msgstr "{} {} 工单"
 
-#: tickets/handler/base.py:113
+#: tickets/handler/base.py:114
 msgid "Ticket title"
 msgstr "工单标题"
 
-#: tickets/handler/base.py:114
+#: tickets/handler/base.py:115
 msgid "Ticket type"
 msgstr "工单类型"
 
-#: tickets/handler/base.py:115
+#: tickets/handler/base.py:116
 msgid "Ticket status"
 msgstr "工单状态"
 
-#: tickets/handler/base.py:116
+#: tickets/handler/base.py:117
 msgid "Ticket applicant"
 msgstr "工单申请人"
 
-#: tickets/handler/base.py:118
+#: tickets/handler/base.py:119
 msgid "Ticket basic info"
 msgstr "工单基本信息"
 
-#: tickets/handler/base.py:129
+#: tickets/handler/base.py:130
 msgid "No content"
 msgstr "无内容"
 
-#: tickets/handler/base.py:131
+#: tickets/handler/base.py:132
 msgid "Ticket applied info"
 msgstr "工单申请信息"
 
-#: tickets/handler/command_confirm.py:24
+#: tickets/handler/command_confirm.py:25
 msgid "Applied run user"
 msgstr "申请运行的用户"
 
-#: tickets/handler/command_confirm.py:25
+#: tickets/handler/command_confirm.py:26
 msgid "Applied run asset"
 msgstr "申请运行的资产"
 
-#: tickets/handler/command_confirm.py:26
+#: tickets/handler/command_confirm.py:27
 msgid "Applied run system user"
 msgstr "申请运行的系统用户"
 
-#: tickets/handler/command_confirm.py:27
+#: tickets/handler/command_confirm.py:28
 msgid "Applied run command"
 msgstr "申请运行的命令"
 
-#: tickets/handler/command_confirm.py:28
+#: tickets/handler/command_confirm.py:29
 msgid "Applied from session"
 msgstr "申请来自会话"
 
-#: tickets/handler/command_confirm.py:29
+#: tickets/handler/command_confirm.py:30
 msgid "Applied from command filter rules"
 msgstr "申请来自命令过滤规则"
 
-#: tickets/handler/command_confirm.py:30
+#: tickets/handler/command_confirm.py:31
 msgid "Applied from command filter"
 msgstr "申请来自命令过滤规则"
 
-#: tickets/handler/login_asset_confirm.py:16
+#: tickets/handler/login_asset_confirm.py:17
 msgid "Applied login user"
 msgstr "申请登录的用户"
 
-#: tickets/handler/login_asset_confirm.py:17
+#: tickets/handler/login_asset_confirm.py:18
 msgid "Applied login asset"
 msgstr "申请登录的资产"
 
-#: tickets/handler/login_asset_confirm.py:18
+#: tickets/handler/login_asset_confirm.py:19
 msgid "Applied login system user"
 msgstr "申请登录的系统用户"
 
-#: tickets/handler/login_confirm.py:16
+#: tickets/handler/login_confirm.py:17
 msgid "Applied login IP"
 msgstr "申请登录的IP"
 
-#: tickets/handler/login_confirm.py:17
+#: tickets/handler/login_confirm.py:18
 msgid "Applied login city"
 msgstr "申请登录的城市"
 
-#: tickets/handler/login_confirm.py:18
+#: tickets/handler/login_confirm.py:19
 msgid "Applied login datetime"
 msgstr "申请登录的日期"
 
@@ -4741,7 +4743,8 @@ msgstr "请选择受理人"
 msgid "The current organization type already exists"
 msgstr "当前组织已存在该类型"
 
-#: tickets/templates/tickets/_msg_ticket.html:11
+#: tickets/templates/tickets/_base_ticket_body.html:17
+#: tickets/templates/tickets/_msg_ticket.html:12
 msgid "Click here to review"
 msgstr "点击查看"
 
@@ -4901,30 +4904,38 @@ msgstr "管理员"
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
-#: users/notifications.py:20
+#: users/notifications.py:15
+msgid "Create account successfully"
+msgstr "创建账户成功"
+
+#: users/notifications.py:19
+msgid "Hello {}"
+msgstr "你好"
+
+#: users/notifications.py:51
 #: users/templates/users/_msg_password_expire_reminder.html:17
 #: users/templates/users/reset_password.html:5
 #: users/templates/users/reset_password.html:6
 msgid "Reset password"
 msgstr "重置密码"
 
-#: users/notifications.py:50 users/views/profile/reset.py:127
+#: users/notifications.py:81 users/views/profile/reset.py:127
 msgid "Reset password success"
 msgstr "重置密码成功"
 
-#: users/notifications.py:78
+#: users/notifications.py:110
 msgid "Password is about expire"
 msgstr "密码即将过期"
 
-#: users/notifications.py:105
+#: users/notifications.py:137
 msgid "Account is about expire"
 msgstr "账号即将过期"
 
-#: users/notifications.py:127
+#: users/notifications.py:161
 msgid "Reset SSH Key"
 msgstr "重置 SSH 密钥"
 
-#: users/notifications.py:147
+#: users/notifications.py:181
 msgid "Reset MFA"
 msgstr "重置 MFA"
 
@@ -5073,28 +5084,34 @@ msgid "Click here update password"
 msgstr "点击这里更新密码"
 
 #: users/templates/users/_msg_password_expire_reminder.html:16
-msgid "If your password has expired, please click"
-msgstr "如果你的密码已过期，先点击"
-
-#: users/templates/users/_msg_password_expire_reminder.html:18
-msgid "to apply for a password reset email."
-msgstr "申请重置"
+msgid "If your password has expired, please click the link below to"
+msgstr "如果你的密码已过期，请点击"
 
 #: users/templates/users/_msg_reset_mfa.html:7
-msgid "Your MFA has been reset by site administrator."
-msgstr "你的 MFA 已经被管理员重置。"
+msgid "Your MFA has been reset by site administrator"
+msgstr "你的 MFA 已经被管理员重置"
 
 #: users/templates/users/_msg_reset_mfa.html:8
-msgid "Please login and reset your MFA."
-msgstr "请登录并重新设置你的 MFA"
+#: users/templates/users/_msg_reset_ssh_key.html:8
+msgid "Please click the link below to set"
+msgstr "请点击下面链接设置"
+
+#: users/templates/users/_msg_reset_mfa.html:11
+#: users/templates/users/_msg_reset_ssh_key.html:11
+msgid "Click here set"
+msgstr "点击这里设置"
 
 #: users/templates/users/_msg_reset_ssh_key.html:7
-msgid "Your ssh public key has been reset by site administrator."
-msgstr "你的 SSH 密钥已经被管理员重置。"
+msgid "Your ssh public key has been reset by site administrator"
+msgstr "你的 SSH 密钥已经被管理员重置"
 
-#: users/templates/users/_msg_reset_ssh_key.html:8
-msgid "Please login and reset your ssh public key."
-msgstr "请登录并重新设置你的密钥"
+#: users/templates/users/_msg_user_created.html:8
+msgid "Your account has been created successfully"
+msgstr "您的账户已创建成功"
+
+#: users/templates/users/_msg_user_created.html:13
+msgid "click here to set your password"
+msgstr "点击这里设置密码"
 
 #: users/templates/users/_select_user_modal.html:5
 msgid "Please Select User"
@@ -5278,56 +5295,6 @@ msgstr "账号保护已开启，请根据提示完成以下操作"
 #: users/templates/users/user_verify_mfa.html:13
 msgid "Open MFA Authenticator and enter the 6-bit dynamic code"
 msgstr "请打开MFA验证器，输入6位动态码"
-
-# msgid "Update user"
-# msgstr "更新用户"
-#: users/utils.py:23
-#, python-format
-msgid ""
-"\n"
-"        <div>\n"
-"            <p>Your account has been created successfully</p>\n"
-"            <div>\n"
-"                Username: %(username)s\n"
-"                <br/>\n"
-"                Password: <a href=\"%(rest_password_url)s?token="
-"%(rest_password_token)s\">\n"
-"                click here to set your password</a> \n"
-"                (This link is valid for 1 hour. After it expires, <a href="
-"\"%(forget_password_url)s?email=%(email)s\">request new one</a>)\n"
-"            </div>\n"
-"            <div>\n"
-"                <p>---</p>\n"
-"                <a href=\"%(login_url)s\">Login direct</a>\n"
-"            </div>\n"
-"        </div>\n"
-"        "
-msgstr ""
-"\n"
-"        <div>\n"
-"            <p>您的账户已创建成功</p>\n"
-"            <div>\n"
-"                用户名: %(username)s\n"
-"                <br/>\n"
-"                密码: <a href=\"%(rest_password_url)s?token="
-"%(rest_password_token)s\">请点击这里设置密码</a> (这个链接有效期1小时, 超过时"
-"间您可以 <a href=\"%(forget_password_url)s?email=%(email)s\">重新申请</a>)\n"
-"            </div>\n"
-"            <div>\n"
-"                <p>---</p>\n"
-"                <a href=\"%(login_url)s\">直接登录</a>\n"
-"            </div>\n"
-"        </div>\n"
-"        "
-
-#: users/utils.py:57
-msgid "Create account successfully"
-msgstr "创建账户成功"
-
-#: users/utils.py:61
-#, python-format
-msgid "Hello %(name)s"
-msgstr "你好 %(name)s"
 
 #: users/views/profile/otp.py:122 users/views/profile/otp.py:161
 #: users/views/profile/otp.py:181
@@ -5923,11 +5890,11 @@ msgstr "资产为空，请更改节点"
 msgid "Executed times"
 msgstr "执行次数"
 
-#: xpack/plugins/interface/api.py:68
+#: xpack/plugins/interface/api.py:43
 msgid "It is already in the default setting state!"
 msgstr "当前已经是初始化状态！"
 
-#: xpack/plugins/interface/api.py:72
+#: xpack/plugins/interface/api.py:46
 msgid "Restore default successfully."
 msgstr "恢复默认成功！"
 
@@ -5935,23 +5902,23 @@ msgstr "恢复默认成功！"
 msgid "Interface settings"
 msgstr "界面设置"
 
-#: xpack/plugins/interface/models.py:15
+#: xpack/plugins/interface/models.py:16
 msgid "Title of login page"
 msgstr "登录页面标题"
 
-#: xpack/plugins/interface/models.py:19
+#: xpack/plugins/interface/models.py:20
 msgid "Image of login page"
 msgstr "登录页面图片"
 
-#: xpack/plugins/interface/models.py:23
+#: xpack/plugins/interface/models.py:24
 msgid "Website icon"
 msgstr "网站图标"
 
-#: xpack/plugins/interface/models.py:27
+#: xpack/plugins/interface/models.py:28
 msgid "Logo of management page"
 msgstr "管理页面logo"
 
-#: xpack/plugins/interface/models.py:31
+#: xpack/plugins/interface/models.py:32
 msgid "Logo of logout page"
 msgstr "退出页面logo"
 
@@ -5982,6 +5949,69 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Login direct"
+#~ msgstr "直接登录"
+
+#~ msgid "to apply for a password reset email."
+#~ msgstr "申请重置"
+
+#~ msgid "Please login and reset your MFA."
+#~ msgstr "请登录并重新设置你的 MFA"
+
+#~ msgid "Please login and reset your ssh public key."
+#~ msgstr "请登录并重新设置你的密钥"
+
+# msgid "Update user"
+# msgstr "更新用户"
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "        <div>\n"
+#~ "            <p>Your account has been created successfully</p>\n"
+#~ "            <div>\n"
+#~ "                Username: %(username)s\n"
+#~ "                <br/>\n"
+#~ "                Password: <a href=\"%(rest_password_url)s?token="
+#~ "%(rest_password_token)s\">\n"
+#~ "                click here to set your password</a> \n"
+#~ "                (This link is valid for 1 hour. After it expires, <a href="
+#~ "\"%(forget_password_url)s?email=%(email)s\">request new one</a>)\n"
+#~ "            </div>\n"
+#~ "            <div>\n"
+#~ "                <p>---</p>\n"
+#~ "                <a href=\"%(login_url)s\">Login direct</a>\n"
+#~ "            </div>\n"
+#~ "        </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "\n"
+#~ "        <div>\n"
+#~ "            <p>您的账户已创建成功</p>\n"
+#~ "            <div>\n"
+#~ "                用户名: %(username)s\n"
+#~ "                <br/>\n"
+#~ "                密码: <a href=\"%(rest_password_url)s?token="
+#~ "%(rest_password_token)s\">请点击这里设置密码</a> (这个链接有效期1小时, 超"
+#~ "过时间您可以 <a href=\"%(forget_password_url)s?email=%(email)s\">重新申请"
+#~ "</a>)\n"
+#~ "            </div>\n"
+#~ "            <div>\n"
+#~ "                <p>---</p>\n"
+#~ "                <a href=\"%(login_url)s\">直接登录</a>\n"
+#~ "            </div>\n"
+#~ "        </div>\n"
+#~ "        "
+
+#, python-format
+#~ msgid "Hello %(name)s"
+#~ msgstr "你好 %(name)s"
+
+#~ msgid "This link is valid for 1 hour. After it expires,"
+#~ msgstr "这个链接有效期1小时, 超过时间您可以"
+
+#~ msgid "Welcome to the JumpServer open source Bastion Host"
+#~ msgstr "欢迎使用JumpServer开源堡垒机"
 
 #~ msgid "Login IP"
 #~ msgstr "登录IP"

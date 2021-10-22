@@ -8,67 +8,24 @@ import logging
 import time
 
 from django.conf import settings
-from django.utils.translation import ugettext as _
 from django.core.cache import cache
 
 from common.tasks import send_mail_async
-from common.utils import reverse, get_object_or_none, get_request_ip_or_data, get_request_user_agent
+from common.utils import reverse, get_object_or_none
 from .models import User
 
 
 logger = logging.getLogger('jumpserver')
 
 
-def construct_user_created_email_body(user):
-    default_body = _("""
-        <div>
-            <p>Your account has been created successfully</p>
-            <div>
-                Username: %(username)s
-                <br/>
-                Password: <a href="%(rest_password_url)s?token=%(rest_password_token)s">
-                click here to set your password</a> 
-                (This link is valid for 1 hour. After it expires, <a href="%(forget_password_url)s?email=%(email)s">request new one</a>)
-            </div>
-            <div>
-                <p>---</p>
-                <a href="%(login_url)s">Login direct</a>
-            </div>
-        </div>
-        """) % {
-        'username': user.username,
-        'rest_password_url': reverse('authentication:reset-password', external=True),
-        'rest_password_token': user.generate_reset_token(),
-        'forget_password_url': reverse('authentication:forgot-password', external=True),
-        'email': user.email,
-        'login_url': reverse('authentication:login', external=True),
-    }
-
-    if settings.EMAIL_CUSTOM_USER_CREATED_BODY:
-        custom_body = '<p style="text-indent:2em">' + settings.EMAIL_CUSTOM_USER_CREATED_BODY + '</p>'
-    else:
-        custom_body = ''
-    body = custom_body + default_body
-    return body
-
-
 def send_user_created_mail(user):
+    from .notifications import UserCreatedMsg
+
     recipient_list = [user.email]
-    subject = _('Create account successfully')
-    if settings.EMAIL_CUSTOM_USER_CREATED_SUBJECT:
-        subject = settings.EMAIL_CUSTOM_USER_CREATED_SUBJECT
+    msg = UserCreatedMsg.html_msg
+    subject = msg['subject']
+    message = msg['message']
 
-    honorific = '<p>' + _('Hello %(name)s') % {'name': user.name} + ':</p>'
-    if settings.EMAIL_CUSTOM_USER_CREATED_HONORIFIC:
-        honorific = '<p>' + settings.EMAIL_CUSTOM_USER_CREATED_HONORIFIC + ':</p>'
-
-    body = construct_user_created_email_body(user)
-
-    signature = '<p style="float:right">jumpserver</p>'
-    if settings.EMAIL_CUSTOM_USER_CREATED_SIGNATURE:
-        signature = '<p style="float:right">' + settings.EMAIL_CUSTOM_USER_CREATED_SIGNATURE + '</p>'
-
-    message = honorific + body + signature
     if settings.DEBUG:
         try:
             print(message)

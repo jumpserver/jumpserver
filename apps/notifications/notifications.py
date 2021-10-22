@@ -2,22 +2,23 @@ import traceback
 from html2text import HTML2Text
 from typing import Iterable
 from itertools import chain
+import textwrap
 
 from celery import shared_task
 from django.utils.translation import gettext_lazy as _
 
 from common.utils.timezone import local_now
 from common.utils import lazyproperty
+from settings.utils import get_login_title
 from users.models import User
 from notifications.backends import BACKEND
 from .models import SystemMsgSubscription, UserMsgSubscription
 
-__all__ = ('SystemMessage', 'UserMessage', 'system_msgs')
+__all__ = ('SystemMessage', 'UserMessage', 'system_msgs', 'Message')
 
 
 system_msgs = []
 user_msgs = []
-all_msgs = []
 
 
 class MessageType(type):
@@ -55,7 +56,6 @@ class Message(metaclass=MessageType):
         - publish 该方法的实现与消息订阅的表结构有关
         - send_msg
     """
-
     message_type_label: str
     category: str
     category_label: str
@@ -84,16 +84,13 @@ class Message(metaclass=MessageType):
                 backend = BACKEND(backend)
                 if not backend.is_enable:
                     continue
-
                 get_msg_method = getattr(self, f'get_{backend}_msg', self.get_common_msg)
-                try:
-                    msg = get_msg_method()
-                except NotImplementedError:
-                    continue
-
+                msg = get_msg_method()
                 client = backend.client()
                 client.send_msg(users, **msg)
-            except Exception:
+            except NotImplementedError:
+                continue
+            except:
                 traceback.print_exc()
 
     @classmethod
@@ -111,10 +108,7 @@ class Message(metaclass=MessageType):
 
     @staticmethod
     def get_common_msg() -> dict:
-        return {
-            'subject': '',
-            'message': ''
-        }
+        return {'subject': '', 'message': ''}
 
     def get_html_msg(self) -> dict:
         return self.get_common_msg()
@@ -133,11 +127,39 @@ class Message(metaclass=MessageType):
 
     @lazyproperty
     def text_msg(self) -> dict:
-        return self.get_text_msg()
+        msg = self.get_text_msg()
+        return msg
 
     @lazyproperty
     def html_msg(self) -> dict:
-        return self.get_html_msg()
+        msg = self.get_html_msg()
+        return msg
+
+    @lazyproperty
+    def html_msg_with_sign(self):
+        msg = self.get_html_msg()
+        msg['message'] = textwrap.dedent("""
+        {}
+        <br />
+        —
+        <br />
+        <small>{}</small>
+        """).format(msg['message'], self.signature)
+        return msg
+
+    @lazyproperty
+    def text_msg_with_sign(self):
+        msg = self.get_text_msg()
+        msg['message'] = textwrap.dedent("""
+        {}
+        —
+        {}
+        """).format(msg['message'], self.signature)
+        return msg
+
+    @lazyproperty
+    def signature(self):
+        return get_login_title()
 
     # --------------------------------------------------------------
     # 支持不同发送消息的方式定义自己的消息内容，比如有些支持 html 标签
@@ -168,7 +190,7 @@ class Message(metaclass=MessageType):
         return self.text_msg
 
     @classmethod
-    def test_all_messages(cls):
+    def get_all_sub_messages(cls):
         def get_subclasses(cls):
             """returns all subclasses of argument, cls"""
             if issubclass(cls, type):
@@ -180,6 +202,12 @@ class Message(metaclass=MessageType):
             return subclasses
 
         messages_cls = get_subclasses(cls)
+        return messages_cls
+
+    @classmethod
+    def test_all_messages(cls):
+        messages_cls = cls.get_all_sub_messages()
+
         for _cls in messages_cls:
             try:
                 msg = _cls.send_test_msg()
@@ -224,6 +252,11 @@ class UserMessage(Message):
         """
         sub = UserMsgSubscription.objects.get(user=self.user)
         self.send_msg([self.user], sub.receive_backends)
+
+    @classmethod
+    def get_test_user(cls):
+        from users.models import User
+        return User.objects.all().first()
 
     @classmethod
     def gen_test_msg(cls):
