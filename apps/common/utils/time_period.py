@@ -10,6 +10,10 @@ def contains_time_period(time_periods):
 
     current_time = local_now().strftime('%H:%M')
     today_time_period = next(filter(lambda x: str(x['id']) == local_now().strftime("%w"), time_periods))
+    today_time_period = today_time_period['value']
+    if not today_time_period:
+        return False
+
     for time in today_time_period['value'].split('、'):
         start, end = time.split('~')
         end = "24:00" if end == "00:00" else end
