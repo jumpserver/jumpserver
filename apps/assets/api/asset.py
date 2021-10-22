@@ -50,6 +50,7 @@ class AssetViewSet(SuggestionMixin, FilterAssetByNodeMixin, OrgBulkModelViewSet)
     }
     search_fields = ("hostname", "ip")
     ordering_fields = ("hostname", "ip", "port", "cpu_cores")
+    ordering = ('hostname', )
     serializer_classes = {
         'default': serializers.AssetSerializer,
         'suggestion': serializers.MiniAssetSerializer

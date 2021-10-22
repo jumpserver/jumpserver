@@ -17,6 +17,7 @@ logger = logging.getLogger(__file__)
 class TaskViewSet(BulkModelViewSet):
     queryset = Task.objects.all()
     serializer_class = serializers.TaskSerializer
+    filterset_fields = ('is_finished',)
     permission_classes = (IsOrgAdminOrAppUser,)
 
 

@@ -22,6 +22,8 @@ class ApplicationPermissionViewSet(BasePermissionViewSet):
     custom_filter_fields = BasePermissionViewSet.custom_filter_fields + [
         'application_id', 'application', 'app', 'app_name'
     ]
+    ordering_fields = ('name',)
+    ordering = ('name', )
 
     def get_queryset(self):
         queryset = super().get_queryset().prefetch_related(

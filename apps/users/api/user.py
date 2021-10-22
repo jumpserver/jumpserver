@@ -42,6 +42,8 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         'invite': InviteSerializer,
     }
     extra_filter_backends = [OrgRoleUserFilterBackend]
+    ordering_fields = ('name',)
+    ordering = ('name', )
 
     def get_queryset(self):
         queryset = super().get_queryset().prefetch_related(
