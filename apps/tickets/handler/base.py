@@ -25,12 +25,12 @@ class BaseHandler(object):
         if self.ticket.approval_step != len(self.ticket.process_map):
             self.ticket.approval_step += 1
             self.ticket.create_related_node()
+            self._send_applied_mail_to_assignees()
             is_finished = False
         else:
             self.ticket.set_state_approve()
             self.ticket.set_status_closed()
             is_finished = True
-        self._send_applied_mail_to_assignees()
 
         self.__on_process(self.ticket.processor)
         return is_finished
