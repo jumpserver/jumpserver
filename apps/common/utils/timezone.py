@@ -28,6 +28,10 @@ def local_now():
     return as_current_tz(utc_now())
 
 
+def local_now_display(fmt='%Y-%m-%d %H:%M:%S'):
+    return local_now().strftime(fmt)
+
+
 _rest_dt_field = DateTimeField()
 dt_parser = _rest_dt_field.to_internal_value
 dt_formatter = _rest_dt_field.to_representation

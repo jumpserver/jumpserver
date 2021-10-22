@@ -1,17 +1,16 @@
 {% load i18n %}
 
-<p>
-    <b>{% trans 'Command' %}:</b> {{ command }}
-</p>
-<p>
-    <b>{% trans 'Asset' %}:</b> {{ hostname }}({{ host_ip }})
-</p>
-<p>
-    <b>{% trans 'User' %}:</b> {{ user }}
-</p>
-<p>
-    <b>{% trans 'Level' %}:</b> {{ risk_level }}
-</p>
-<p>
-    <b>{% trans 'Session' %}:</b> <a href="{{ session_detail_url}}?oid={{ oid }}">{% trans 'view' %}</a>
-</p>
+<div>
+    {% for item, value in items.items %}
+    <span class="cmd-item">
+        <b>{{ item }}:</b> {{ value }}
+    </span>
+    <br />
+    {% endfor %}
+    <b>{% trans 'Session' %}:</b> <a href="{{ session_url }}">{% trans 'view' %}</a>
+    <br />
+    <b>{% trans 'Command' %}: </b><br />
+    <pre>
+{{ command }}
+    </pre>
+</div>

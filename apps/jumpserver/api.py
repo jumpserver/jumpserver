@@ -8,7 +8,6 @@ from django.http.response import JsonResponse, HttpResponse
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from collections import Counter
-from django.conf import settings
 from rest_framework.response import Response
 
 from users.models import User

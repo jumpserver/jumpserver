@@ -12,7 +12,10 @@ from notifications.serializers import (
     UserMsgSubscriptionSerializer,
 )
 
-__all__ = ('BackendListView', 'SystemMsgSubscriptionViewSet', 'UserMsgSubscriptionViewSet')
+__all__ = (
+    'BackendListView', 'SystemMsgSubscriptionViewSet',
+    'UserMsgSubscriptionViewSet', 'get_all_test_messages'
+)
 
 
 class BackendListView(APIView):
@@ -80,3 +83,43 @@ class UserMsgSubscriptionViewSet(ListModelMixin,
     queryset = UserMsgSubscription.objects.all()
     serializer_class = UserMsgSubscriptionSerializer
     permission_classes = (IsObjectOwner | IsSuperUser, OnlySuperUserCanList)
+
+
+def get_all_test_messages(request):
+    import textwrap
+    from ..notifications import Message
+    from django.shortcuts import HttpResponse
+
+    msgs_cls = Message.get_all_sub_messages()
+    html_data = '<h3>HTML 格式 </h3>'
+    text_data = '<h3>Text 格式</h3>'
+
+    for msg_cls in msgs_cls:
+        try:
+            msg = msg_cls.gen_test_msg()
+            if not msg:
+                continue
+            msg_html = msg.html_msg_with_sign['message']
+            msg_text = msg.text_msg_with_sign['message']
+        except NotImplementedError:
+            msg_html = msg_text = '没有实现方法'
+        except Exception as e:
+            msg_html = msg_text = 'Error: ' + str(e)
+
+        html_data += """
+        <h3>{}</h3>
+        {}
+        <hr />
+        """.format(msg_cls.__name__, msg_html)
+
+        text_data += textwrap.dedent("""
+        <h3>{}</h3>
+        <pre>
+        {}
+        </pre>
+        <br/>
+        <hr />
+        """).format(msg_cls.__name__, msg_text)
+    return HttpResponse(html_data + text_data)
+
+

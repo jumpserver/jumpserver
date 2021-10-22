@@ -13,6 +13,8 @@ from notifications.models import SystemMsgSubscription
 from notifications.backends import BACKEND
 from orgs.utils import tmp_to_root_org
 from common.utils import lazyproperty
+from common.utils.timezone import local_now_display
+
 
 logger = get_logger(__name__)
 
@@ -73,25 +75,26 @@ class CommandAlertMessage(CommandAlertMixin, SystemMessage):
     @classmethod
     def gen_test_msg(cls):
         command = Command.objects.first().to_dict()
+        command['session'] = Session.objects.first().id
         return cls(command)
 
     def get_html_msg(self) -> dict:
         command = self.command
-
-        with tmp_to_root_org():
-            session = Session.objects.get(id=command['session'])
         session_detail_url = reverse(
             'api-terminal:session-detail', kwargs={'pk': command['session']},
             external=True, api_to_ui=True
-        )
+        ) + '?oid={}'.format(self.command['org_id'])
+        level = Command.get_risk_level_str(command['risk_level'])
+        items = {
+            _("Asset"): command['asset'],
+            _("User"): command['user'],
+            _("Level"): level,
+            _("Date"): local_now_display(),
+        }
         context = {
-            'command': command['input'],
-            'hostname': command['asset'],
-            'host_ip': session.asset_obj.ip,
-            'user': command['user'],
-            'risk_level': Command.get_risk_level_str(command['risk_level']),
-            'session_detail_url': session_detail_url,
-            'oid': session.org_id
+            'items': items,
+            'session_url': session_detail_url,
+            "command": command['input'],
         }
         message = render_to_string('terminal/_msg_command_alert.html', context)
         return {
@@ -122,19 +125,25 @@ class CommandExecutionAlert(CommandAlertMixin, SystemMessage):
 
     def get_html_msg(self) -> dict:
         command = self.command
-        _input = command['input']
-        _input = _input.replace('\n', '<br>')
-
         assets_with_url = []
         for asset in command['assets']:
-            url = reverse('assets:asset-detail', kwargs={'pk': asset.id}, api_to_ui=True, external=True)
+            url = reverse(
+                'assets:asset-detail', kwargs={'pk': asset.id},
+                api_to_ui=True, external=True
+            ) + '?oid={}'.format(asset.org_id)
             assets_with_url.append([asset, url])
 
+        level = Command.get_risk_level_str(command['risk_level'])
+        items = {
+            _("User"): command['user'],
+            _("Level"): level,
+            _("Date"): local_now_display(),
+        }
+
         context = {
-            'command': _input,
+            'items': items,
             'assets_with_url': assets_with_url,
-            'user': command['user'],
-            'risk_level': Command.get_risk_level_str(command['risk_level'])
+            'command': command['input'],
         }
         message = render_to_string('terminal/_msg_command_execute_alert.html', context)
         return {

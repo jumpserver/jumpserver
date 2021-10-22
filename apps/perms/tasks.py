@@ -12,7 +12,7 @@ from common.utils import get_logger
 from common.utils.timezone import local_now, dt_formatter, dt_parser
 from ops.celery.decorator import register_as_period_task
 from perms.notifications import (
-    PermedWillExpireUserMsg, AssetPermsWillExpireForOrgAdminMsg,
+    PermedAssetsWillExpireUserMsg, AssetPermsWillExpireForOrgAdminMsg,
     PermedAppsWillExpireUserMsg, AppPermsWillExpireForOrgAdminMsg
 )
 from perms.models import AssetPermission, ApplicationPermission
@@ -83,7 +83,7 @@ def check_asset_permission_will_expired():
             user_asset_mapper[u].update(assets)
 
     for user, assets in user_asset_mapper.items():
-        PermedWillExpireUserMsg(user, assets).publish_async()
+        PermedAssetsWillExpireUserMsg(user, assets).publish_async()
 
     for org, perms in org_perm_mapper.items():
         org_admins = org.admins.all()

@@ -1,16 +1,16 @@
 {% load i18n %}
 
-<p>
-    <b>{% trans 'User' %}:</b> {{ user }}
-</p>
-<p>
-    <b>{% trans 'Level' %}:</b> {{ risk_level }}
-</p>
 <div>
-    <b>{% trans 'Command' %}: </b><br>
-<pre>
+{% for item, value in items.items %}
+    <span class="cmd-item">
+        <b>{{ item }}:</b> {{ value }}
+    </span>
+    <br />
+{% endfor %}
+    <b>{% trans 'Command' %}: </b><br />
+    <pre>
 {{ command }}
-</pre>
+    </pre>
 </div>
 <div>
     <b>{% trans 'Assets' %}:</b><br>
