@@ -12,21 +12,18 @@ from notifications.notifications import UserMessage
 class UserCreatedMsg(UserMessage):
     def get_html_msg(self) -> dict:
         user = self.user
-        subject = _('Create account successfully')
-        if settings.EMAIL_CUSTOM_USER_CREATED_SUBJECT:
-            subject = settings.EMAIL_CUSTOM_USER_CREATED_SUBJECT
 
-        honorific = settings.EMAIL_CUSTOM_USER_CREATED_HONORIFIC or _('Hello {}').format(user.name)
-        signature = settings.EMAIL_CUSTOM_USER_CREATED_SIGNATURE or 'JumpServer'
+        subject = str(settings.EMAIL_CUSTOM_USER_CREATED_SUBJECT)
+        honorific = str(settings.EMAIL_CUSTOM_USER_CREATED_HONORIFIC)
+        content = str(settings.EMAIL_CUSTOM_USER_CREATED_BODY)
 
         context = {
             'honorific': honorific,
-            'signature':  signature,
-            'username': user.username,
+            'content': content,
+            'user': user,
             'rest_password_url': reverse('authentication:reset-password', external=True),
             'rest_password_token': user.generate_reset_token(),
             'forget_password_url': reverse('authentication:forgot-password', external=True),
-            'email': user.email,
             'login_url': reverse('authentication:login', external=True),
         }
         message = render_to_string('users/_msg_user_created.html', context)
