@@ -242,7 +242,12 @@ class AuthMixin(PasswordEncryptionViewMixin):
             data = request.POST
         code = data.get('code')
         mfa_type = data.get('mfa_type')
-        if settings.SECURITY_MFA_IN_LOGIN_PAGE and code and mfa_type:
+        if settings.SECURITY_MFA_IN_LOGIN_PAGE and mfa_type:
+            if not code:
+                if mfa_type ==  MFAType.OTP and bool(user.otp_secret_key):
+                    raise errors.OTPCodeRequiredError
+                elif mfa_type ==  MFAType.SMS_CODE:
+                    raise errors.SMSCodeRequiredError
             self.check_user_mfa(code, mfa_type, user=user)
 
     def _check_login_acl(self, user, ip):
@@ -405,9 +410,12 @@ class AuthMixin(PasswordEncryptionViewMixin):
         if not user.mfa_enabled:
             return
 
+        if not bool(user.phone) and mfa_type == MFAType.SMS_CODE:
+            raise errors.UserPhoneNotSet
+
         if not bool(user.otp_secret_key) and mfa_type == MFAType.OTP:
             self.set_passwd_verify_on_session(user)
-            raise errors.OTPRequiredError(reverse_lazy('authentication:user-otp-enable-bind'))
+            raise errors.OTPBindRequiredError(reverse_lazy('authentication:user-otp-enable-bind'))
 
         ip = self.get_request_ip()
         self.check_mfa_is_block(user.username, ip)

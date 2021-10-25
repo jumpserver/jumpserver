@@ -372,9 +372,19 @@ class NotEnableMFAError(JMSException):
     default_detail = mfa_unset_msg
 
 
-class OTPRequiredError(JMSException):
+class OTPBindRequiredError(JMSException):
     default_detail = otp_unset_msg
 
     def __init__(self, url, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.url = url
+
+
+class OTPCodeRequiredError(AuthFailedError):
+    msg = _("Please enter MFA code")
+
+class SMSCodeRequiredError(AuthFailedError):
+    msg = _("Please enter SMS code")
+
+class UserPhoneNotSet(AuthFailedError):
+    msg = _('Phone not set')
