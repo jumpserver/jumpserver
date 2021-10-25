@@ -140,10 +140,12 @@ class Message(metaclass=MessageType):
         msg = self.get_html_msg()
         msg['message'] = textwrap.dedent("""
         {}
+        <small>
         <br />
         —
         <br />
-        <small>{}</small>
+        {}
+        </small>
         """).format(msg['message'], self.signature)
         return msg
 
