@@ -3,8 +3,8 @@ import hmac
 import base64
 
 from common.utils import get_logger
-from common.message.backends.utils import digest, as_request
-from common.message.backends.mixin import BaseRequest
+from common.sdk.im.utils import digest, as_request
+from common.sdk.im.mixin import BaseRequest
 
 logger = get_logger(__file__)
 

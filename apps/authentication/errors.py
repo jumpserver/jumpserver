@@ -134,6 +134,10 @@ class CredentialError(AuthFailedNeedLogMixin, AuthFailedNeedBlockMixin, AuthFail
         times_remainder = util.get_remainder_times()
         block_time = settings.SECURITY_LOGIN_LIMIT_TIME
 
+        if times_remainder < 1:
+            self.msg = block_login_msg.format(settings.SECURITY_LOGIN_LIMIT_TIME)
+            return
+
         default_msg = invalid_login_msg.format(
             times_try=times_remainder, block_time=block_time
         )

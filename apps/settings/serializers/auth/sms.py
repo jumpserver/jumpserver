@@ -1,7 +1,7 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from common.message.backends.sms import BACKENDS
+from common.sdk.sms import BACKENDS
 
 __all__ = ['SMSSettingSerializer', 'AlibabaSMSSettingSerializer', 'TencentSMSSettingSerializer']
 

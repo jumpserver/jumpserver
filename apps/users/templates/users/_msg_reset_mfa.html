@@ -4,9 +4,9 @@
     {% trans 'Hello' %} {{ name }},
 </p>
 <p>
-    {% trans 'Your MFA has been reset by site administrator.' %} <br />
-    {% trans 'Please login and reset your MFA.' %}
-</p>
-<p>
-    <a href="{{ login_url }}">{% trans 'Login direct' %}</a>
+    {% trans 'Your MFA has been reset by site administrator' %} <br />
+    {% trans 'Please click the link below to set' %}
+    <br>
+    <br>
+    <a href="{{ url }}" class='showLink'>{% trans 'Click here set' %}</a>
 </p>

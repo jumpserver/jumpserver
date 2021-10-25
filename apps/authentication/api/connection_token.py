@@ -19,7 +19,7 @@ from rest_framework import serializers
 
 from authentication.signals import post_auth_failed, post_auth_success
 from common.utils import get_logger, random_string
-from common.drf.api import SerializerMixin
+from common.mixins.api import SerializerMixin
 from common.permissions import IsSuperUserOrAppUser, IsValidUser, IsSuperUser
 from orgs.mixins.api import RootOrgViewMixin
 from common.http import is_true
@@ -150,15 +150,19 @@ class ClientProtocolMixin:
     def get_client_protocol_data(self, serializer):
         asset, application, system_user, user = self.get_request_resource(serializer)
         protocol = system_user.protocol
+        username = user.username
+        name = ''
         if protocol == 'rdp':
             name, config = self.get_rdp_file_content(serializer)
         elif protocol == 'vnc':
             raise HttpResponse(status=404, data={"error": "VNC not support"})
         else:
             config = 'ssh://system_user@asset@user@jumpserver-ssh'
+        filename = "{}-{}-jumpserver".format(username, name)
         data = {
+            "filename": filename,
             "protocol": system_user.protocol,
-            "username": user.username,
+            "username": username,
             "config": config
         }
         return data

@@ -4,7 +4,7 @@ from rest_framework.exceptions import APIException
 from rest_framework import status
 from django.utils.translation import gettext_lazy as _
 
-from common.message.backends.sms.alibaba import AlibabaSMS
+from common.sdk.sms.alibaba import AlibabaSMS
 from settings.models import Setting
 from common.permissions import IsSuperUser
 from common.exceptions import JMSException

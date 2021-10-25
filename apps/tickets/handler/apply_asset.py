@@ -47,8 +47,8 @@ class Handler(BaseHandler):
             _("Applied hostname group"), ','.join(apply_assets),
             _("Applied system user group"), ','.join(apply_system_users),
             _("Applied actions"), ','.join(apply_actions_display),
-            _('Applied date start'), apply_date_start.strftime('%Y-%m-%d %H:%M:%S'),
-            _('Applied date expired'), apply_date_expired.strftime('%Y-%m-%d %H:%M:%S'),
+            _('Applied date start'), apply_date_start,
+            _('Applied date expired'), apply_date_expired,
         )
         return applied_body
 
@@ -69,15 +69,15 @@ class Handler(BaseHandler):
             str(self.ticket.__class__.__name__), str(self.ticket.id)
         )
         permission_comment = _(
-            'Created by the ticket, '
-            'ticket title: {}, '
-            'ticket applicant: {}, '
-            'ticket processor: {}, '
+            'Created by the ticket '
+            'ticket title: {} '
+            'ticket applicant: {} '
+            'ticket processor: {} '
             'ticket ID: {}'
         ).format(
             self.ticket.title,
             self.ticket.applicant_display,
-            str(self.ticket.processor),
+            ','.join([i['processor_display'] for i in self.ticket.process_map]),
             str(self.ticket.id)
         )
 

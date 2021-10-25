@@ -6,7 +6,7 @@ from common.utils import get_logger
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, IsValidUser
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
-from common.mixins.views import SuggestionMixin
+from common.mixins.api import SuggestionMixin
 from orgs.utils import tmp_to_root_org
 from ..models import SystemUser, Asset
 from .. import serializers
@@ -41,6 +41,8 @@ class SystemUserViewSet(SuggestionMixin, OrgBulkModelViewSet):
         'default': serializers.SystemUserSerializer,
         'suggestion': serializers.MiniSystemUserSerializer
     }
+    ordering_fields = ('name', 'protocol')
+    ordering = ('name', )
     permission_classes = (IsOrgAdminOrAppUser,)
 
 
@@ -73,7 +75,7 @@ class SystemUserTempAuthInfoApi(generics.CreateAPIView):
 
         with tmp_to_root_org():
             instance = get_object_or_404(SystemUser, pk=pk)
-            instance.set_temp_auth(instance_id, user, data)
+            instance.set_temp_auth(instance_id, user.id, data)
         return Response(serializer.data, status=201)
 
 

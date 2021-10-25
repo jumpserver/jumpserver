@@ -26,6 +26,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     auto_generate_key = serializers.BooleanField(initial=True, required=False, write_only=True)
     type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type display'))
     ssh_key_fingerprint = serializers.ReadOnlyField(label=_('SSH key fingerprint'))
+    applications_amount = serializers.IntegerField(source='apps_amount', label=_('Apps amount'))
 
     class Meta:
         model = SystemUser
@@ -39,7 +40,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'username_same_with_user', 'auto_push', 'auto_generate_key',
             'date_created', 'date_updated', 'comment', 'created_by',
         ]
-        fields_m2m = ['cmd_filters', 'assets_amount', 'nodes']
+        fields_m2m = ['cmd_filters', 'assets_amount', 'applications_amount', 'nodes']
         fields = fields_small + fields_m2m
         extra_kwargs = {
             'password': {
@@ -123,26 +124,14 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             return ''
         return home
 
-    def validate_sftp_root(self, value):
+    @staticmethod
+    def validate_sftp_root(value):
         if value in ['home', 'tmp']:
             return value
         if not value.startswith('/'):
             error = _("Path should starts with /")
             raise serializers.ValidationError(error)
         return value
-
-    def validate_admin_user(self, attrs):
-        if self.instance:
-            tp = self.instance.type
-        else:
-            tp = attrs.get('type')
-        if tp != SystemUser.Type.admin:
-            return attrs
-        attrs['protocol'] = SystemUser.Protocol.ssh
-        attrs['login_mode'] = SystemUser.LOGIN_AUTO
-        attrs['username_same_with_user'] = False
-        attrs['auto_push'] = False
-        return attrs
 
     def validate_password(self, password):
         super().validate_password(password)
@@ -155,7 +144,20 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             raise serializers.ValidationError(_("Password or private key required"))
         return password
 
-    def validate_gen_key(self, attrs):
+    def _validate_admin_user(self, attrs):
+        if self.instance:
+            tp = self.instance.type
+        else:
+            tp = attrs.get('type')
+        if tp != SystemUser.Type.admin:
+            return attrs
+        attrs['protocol'] = SystemUser.Protocol.ssh
+        attrs['login_mode'] = SystemUser.LOGIN_AUTO
+        attrs['username_same_with_user'] = False
+        attrs['auto_push'] = False
+        return attrs
+
+    def _validate_gen_key(self, attrs):
         username = attrs.get("username", "manual")
         auto_gen_key = attrs.pop("auto_generate_key", False)
         protocol = attrs.get("protocol")
@@ -179,16 +181,30 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             attrs["public_key"] = public_key
         return attrs
 
+    def _validate_login_mode(self, attrs):
+        if 'login_mode' in attrs:
+            login_mode = attrs['login_mode']
+        else:
+            login_mode = self.instance.login_mode if self.instance else SystemUser.LOGIN_AUTO
+
+        if login_mode == SystemUser.LOGIN_MANUAL:
+            attrs['password'] = ''
+            attrs['private_key'] = ''
+            attrs['public_key'] = ''
+
+        return attrs
+
     def validate(self, attrs):
-        attrs = self.validate_admin_user(attrs)
-        attrs = self.validate_gen_key(attrs)
+        attrs = self._validate_admin_user(attrs)
+        attrs = self._validate_gen_key(attrs)
+        attrs = self._validate_login_mode(attrs)
         return attrs
 
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
         queryset = queryset\
-            .annotate(assets_amount=Count("assets"))\
+            .annotate(assets_amount=Count("assets")) \
             .prefetch_related('nodes', 'cmd_filters')
         return queryset
 

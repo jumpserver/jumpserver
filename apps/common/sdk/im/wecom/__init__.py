@@ -4,8 +4,8 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import APIException
 
 from common.utils.common import get_logger
-from common.message.backends.utils import digest, DictWrapper, update_values, set_default
-from common.message.backends.mixin import RequestMixin, BaseRequest
+from common.sdk.im.utils import digest, DictWrapper, update_values, set_default
+from common.sdk.im.mixin import RequestMixin, BaseRequest
 
 logger = get_logger(__name__)
 

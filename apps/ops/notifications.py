@@ -1,4 +1,5 @@
 from django.utils.translation import gettext_lazy as _
+from django.template.loader import render_to_string
 
 from notifications.notifications import SystemMessage
 from notifications.models import SystemMsgSubscription
@@ -14,14 +15,18 @@ class ServerPerformanceMessage(SystemMessage):
     category_label = _('Operations')
     message_type_label = _('Server performance')
 
-    def __init__(self, msg):
-        self._msg = msg
+    def __init__(self, terms_with_errors):
+        self.terms_with_errors = terms_with_errors
 
     def get_html_msg(self) -> dict:
-        subject = self._msg[:80]
+        subject = _("Terminal health check warning")
+        context = {
+            'terms_with_errors': self.terms_with_errors
+        }
+        message = render_to_string('ops/_msg_terminal_performance.html', context)
         return {
-            'subject': subject.replace('<br>', '; '),
-            'message': self._msg
+            'subject': subject,
+            'message': message
         }
 
     @classmethod
@@ -33,17 +38,21 @@ class ServerPerformanceMessage(SystemMessage):
 
     @classmethod
     def gen_test_msg(cls):
-        alarm_messages = []
+        from terminal.models import Terminal
         items_mapper = ServerPerformanceCheckUtil.items_mapper
-        for item, data in items_mapper.items():
-            msg = data['alarm_msg_format']
-            max_threshold = data['max_threshold']
-            value = 123
-            msg = msg.format(max_threshold=max_threshold, value=value, name='Fake terminal')
-            alarm_messages.append(msg)
+        terms_with_errors = []
+        terms = Terminal.objects.all()[:5]
 
-        msg = '<br>'.join(alarm_messages)
-        return cls(msg)
+        for i, term in enumerate(terms, 1):
+            errors = []
+            for item, data in items_mapper.items():
+                msg = data['alarm_msg_format']
+                max_threshold = data['max_threshold']
+                value = 123 // i+1
+                msg = msg.format(max_threshold=max_threshold, value=value, name=term.name)
+                errors.append(msg)
+            terms_with_errors.append([term, errors])
+        return cls(terms_with_errors)
 
 
 class ServerPerformanceCheckUtil(object):
@@ -56,59 +65,65 @@ class ServerPerformanceCheckUtil(object):
         'disk_used': {
             'default': 0,
             'max_threshold': 80,
-            'alarm_msg_format': _(
-                'Disk used more than {max_threshold}%: => {value} ({name})'
-            )
+            'alarm_msg_format': _('Disk used more than {max_threshold}%: => {value}')
         },
         'memory_used': {
             'default': 0,
             'max_threshold': 85,
-            'alarm_msg_format': _(
-                'Memory used more than {max_threshold}%: => {value} ({name})'
-            ),
+            'alarm_msg_format': _('Memory used more than {max_threshold}%: => {value}'),
         },
         'cpu_load': {
             'default': 0,
             'max_threshold': 5,
-            'alarm_msg_format': _(
-                'CPU load more than {max_threshold}: => {value} ({name})'
-            ),
+            'alarm_msg_format': _('CPU load more than {max_threshold}: => {value}'),
         },
     }
 
     def __init__(self):
-        self.alarm_messages = []
+        self.terms_with_errors = []
         self._terminals = []
-        self._terminal = None
 
     def check_and_publish(self):
         self.check()
         self.publish()
 
     def check(self):
-        self.alarm_messages = []
+        self.terms_with_errors = []
         self.initial_terminals()
-        for item, data in self.items_mapper.items():
-            for self._terminal in self._terminals:
-                self.check_item(item, data)
 
-    def check_item(self, item, data):
+        for term in self._terminals:
+            errors = self.check_terminal(term)
+            if not errors:
+                continue
+            self.terms_with_errors.append((term, errors))
+
+    def check_terminal(self, term):
+        errors = []
+        for item, data in self.items_mapper.items():
+            error = self.check_item(term, item, data)
+            if not error:
+                continue
+            errors.append(error)
+        return errors
+
+    @staticmethod
+    def check_item(term, item, data):
         default = data['default']
         max_threshold = data['max_threshold']
-        value = getattr(self._terminal.stat, item, default)
+        value = getattr(term.stat, item, default)
+
         if isinstance(value, bool) and value != max_threshold:
             return
         elif isinstance(value, (int, float)) and value < max_threshold:
             return
         msg = data['alarm_msg_format']
-        msg = msg.format(max_threshold=max_threshold, value=value, name=self._terminal.name)
-        self.alarm_messages.append(msg)
+        error = msg.format(max_threshold=max_threshold, value=value, name=term.name)
+        return error
 
     def publish(self):
-        if not self.alarm_messages:
+        if not self.terms_with_errors:
             return
-        msg = '<br>'.join(self.alarm_messages)
-        ServerPerformanceMessage(msg).publish()
+        ServerPerformanceMessage(self.terms_with_errors).publish()
 
     def initial_terminals(self):
         terminals = []

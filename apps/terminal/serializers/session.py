@@ -42,13 +42,10 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
 
 
 class SessionDisplaySerializer(SessionSerializer):
-    command_amount = serializers.IntegerField(read_only=True)
+    command_amount = serializers.IntegerField(read_only=True, label=_('Command amount'))
 
     class Meta(SessionSerializer.Meta):
         fields = SessionSerializer.Meta.fields + ['command_amount']
-        extra_kwargs = {
-            'command_amount': {'label': _('Command amount')},
-        }
 
 
 class ReplaySerializer(serializers.Serializer):

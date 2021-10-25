@@ -48,6 +48,8 @@ class OrgViewSet(BulkModelViewSet):
     queryset = Organization.objects.all()
     serializer_class = OrgSerializer
     permission_classes = (IsSuperUserOrAppUser,)
+    ordering_fields = ('name',)
+    ordering = ('name', )
 
     def get_serializer_class(self):
         mapper = {
@@ -74,7 +76,7 @@ class OrgViewSet(BulkModelViewSet):
 
     def perform_destroy(self, instance):
         if str(current_org) == str(instance):
-            msg = _('The current organization ({}) cannot be deleted'.format(current_org))
+            msg = _('The current organization ({}) cannot be deleted').format(current_org)
             raise PermissionDenied(detail=msg)
 
         for model in org_related_models:

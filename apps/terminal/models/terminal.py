@@ -134,11 +134,8 @@ class Terminal(StorageMixin, TerminalStatusMixin, models.Model):
 
     @staticmethod
     def get_login_title_setting():
-        login_title = None
-        if settings.XPACK_ENABLED:
-            from xpack.plugins.interface.models import Interface
-            login_title = Interface.get_login_title()
-        return {'TERMINAL_HEADER_TITLE': login_title}
+        from settings.utils import get_login_title
+        return {'TERMINAL_HEADER_TITLE': get_login_title()}
 
     @property
     def config(self):
