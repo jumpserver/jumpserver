@@ -26,7 +26,9 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     auto_generate_key = serializers.BooleanField(initial=True, required=False, write_only=True)
     type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type display'))
     ssh_key_fingerprint = serializers.ReadOnlyField(label=_('SSH key fingerprint'))
-    applications_amount = serializers.IntegerField(source='apps_amount', label=_('Apps amount'))
+    applications_amount = serializers.IntegerField(
+        source='apps_amount', read_only=True, label=_('Apps amount')
+    )
 
     class Meta:
         model = SystemUser
