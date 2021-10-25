@@ -124,18 +124,19 @@ class UserLoginView(mixins.AuthMixin, FormView):
         except (
                 errors.PasswdTooSimple,
                 errors.PasswordRequireResetError,
-                errors.PasswdNeedUpdate
+                errors.PasswdNeedUpdate,
+                errors.OTPBindRequiredError
         ) as e:
             return redirect(e.url)
         except (
-                errors.MFAUnsetError,
                 errors.MFAFailedError,
-                errors.BlockMFAError
+                errors.BlockMFAError,
+                errors.OTPCodeRequiredError,
+                errors.SMSCodeRequiredError,
+                errors.UserPhoneNotSet
         ) as e:
             form.add_error('code', e.msg)
             return super().form_invalid(form)
-        except errors.OTPRequiredError as e:
-            return redirect(e.url)
         self.clear_rsa_key()
         return self.redirect_to_guard_view()
 
