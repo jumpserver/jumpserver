@@ -26,6 +26,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     auto_generate_key = serializers.BooleanField(initial=True, required=False, write_only=True)
     type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type display'))
     ssh_key_fingerprint = serializers.ReadOnlyField(label=_('SSH key fingerprint'))
+    applications_amount = serializers.IntegerField(source='apps_amount', label=_('Apps amount'))
 
     class Meta:
         model = SystemUser
@@ -39,7 +40,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'username_same_with_user', 'auto_push', 'auto_generate_key',
             'date_created', 'date_updated', 'comment', 'created_by',
         ]
-        fields_m2m = ['cmd_filters', 'assets_amount', 'nodes']
+        fields_m2m = ['cmd_filters', 'assets_amount', 'applications_amount', 'nodes']
         fields = fields_small + fields_m2m
         extra_kwargs = {
             'password': {
@@ -203,7 +204,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
         queryset = queryset\
-            .annotate(assets_amount=Count("assets"))\
+            .annotate(assets_amount=Count("assets")) \
             .prefetch_related('nodes', 'cmd_filters')
         return queryset
 
