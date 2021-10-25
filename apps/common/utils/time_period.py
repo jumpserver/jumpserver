@@ -14,7 +14,7 @@ def contains_time_period(time_periods):
     if not today_time_period:
         return False
 
-    for time in today_time_period['value'].split('、'):
+    for time in today_time_period.split('、'):
         start, end = time.split('~')
         end = "24:00" if end == "00:00" else end
         if start <= current_time <= end:
