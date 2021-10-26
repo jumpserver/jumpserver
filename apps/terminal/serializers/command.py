@@ -8,3 +8,4 @@ class InsecureCommandAlertSerializer(serializers.Serializer):
     user = serializers.CharField()
     risk_level = serializers.IntegerField()
     session = serializers.UUIDField()
+    org_id = serializers.CharField()
