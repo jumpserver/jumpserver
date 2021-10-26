@@ -180,6 +180,7 @@ class Application(CommonModelMixin, OrgModelMixin, ApplicationTreeNodeMixin):
     )
 
     class Meta:
+        verbose_name = _('Application')
         unique_together = [('org_id', 'name')]
         ordering = ('name',)
 

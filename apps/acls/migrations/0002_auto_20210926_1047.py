@@ -86,4 +86,12 @@ class Migration(migrations.Migration):
             model_name='loginacl',
             name='ip_group',
         ),
+        migrations.AlterModelOptions(
+            name='loginacl',
+            options={'ordering': ('priority', '-date_updated', 'name'), 'verbose_name': 'Login acl'},
+        ),
+        migrations.AlterModelOptions(
+            name='loginassetacl',
+            options={'ordering': ('priority', '-date_updated', 'name'), 'verbose_name': 'Login asset acl'},
+        ),
     ]
