@@ -7,6 +7,8 @@ from acls.models import LoginACL
 LOGIN_CONFIRM_ZH = '登录复核'
 LOGIN_CONFIRM_EN = 'Login confirm'
 
+DEFAULT_TIME_PERIODS = [{'id': i, 'value': '00:00~00:00'} for i in range(7)]
+
 
 def has_zh(name: str) -> bool:
     for i in name:
@@ -31,7 +33,8 @@ def migrate_login_confirm(apps, schema_editor):
                 'user': user,
                 'name': f'{user.name}-{login_confirm} ({date_created})',
                 'created_by': instance.created_by,
-                'action': LoginACL.ActionChoices.confirm
+                'action': LoginACL.ActionChoices.confirm,
+                'rules': {'ip_group': ['*'], 'time_period': DEFAULT_TIME_PERIODS}
             }
             instance = login_acl_model.objects.create(**data)
             instance.reviewers.set(reviewers)
@@ -39,11 +42,10 @@ def migrate_login_confirm(apps, schema_editor):
 
 def migrate_ip_group(apps, schema_editor):
     login_acl_model = apps.get_model("acls", "LoginACL")
-    default_time_periods = [{'id': i, 'value': '00:00~00:00'} for i in range(7)]
     updates = list()
     with transaction.atomic():
         for instance in login_acl_model.objects.exclude(action=LoginACL.ActionChoices.confirm):
-            instance.rules = {'ip_group': instance.ip_group, 'time_period': default_time_periods}
+            instance.rules = {'ip_group': instance.ip_group, 'time_period': DEFAULT_TIME_PERIODS}
             updates.append(instance)
         login_acl_model.objects.bulk_update(updates, ['rules', ])
 

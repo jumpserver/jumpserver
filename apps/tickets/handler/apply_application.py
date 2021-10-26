@@ -84,7 +84,7 @@ class Handler(BaseHandler):
         ).format(
             self.ticket.title,
             self.ticket.applicant_display,
-            str(self.ticket.processor),
+            ','.join([i['processor_display'] for i in self.ticket.process_map]),
             str(self.ticket.id)
         )
         permissions_data = {
