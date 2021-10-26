@@ -22,7 +22,7 @@ def send_user_created_mail(user):
     from .notifications import UserCreatedMsg
 
     recipient_list = [user.email]
-    msg = UserCreatedMsg.html_msg
+    msg = UserCreatedMsg(user).html_msg
     subject = msg['subject']
     message = msg['message']
 

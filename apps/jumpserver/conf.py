@@ -18,6 +18,7 @@ import copy
 from importlib import import_module
 from django.urls import reverse_lazy
 from urllib.parse import urljoin, urlparse
+from django.utils.translation import ugettext_lazy as _
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
@@ -262,6 +263,11 @@ class Config(dict):
         'TENCENT_SDKAPPID': '',
         'TENCENT_VERIFY_SIGN_NAME': '',
         'TENCENT_VERIFY_TEMPLATE_CODE': '',
+
+        # Email
+        'EMAIL_CUSTOM_USER_CREATED_SUBJECT': _('Create account successfully'),
+        'EMAIL_CUSTOM_USER_CREATED_HONORIFIC': _('Hello'),
+        'EMAIL_CUSTOM_USER_CREATED_BODY': _('Your account has been created successfully'),
 
         'OTP_VALID_WINDOW': 2,
         'OTP_ISSUER_NAME': 'JumpServer',

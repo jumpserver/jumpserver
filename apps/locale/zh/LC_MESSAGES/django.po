@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-25 14:56+0800\n"
+"POT-Creation-Date: 2021-10-25 16:48+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -123,7 +123,7 @@ msgstr "系统用户"
 #: acls/models/login_asset_acl.py:22
 #: applications/serializers/attrs/application_category/remote_app.py:37
 #: assets/models/asset.py:357 assets/models/authbook.py:18
-#: assets/models/gathered_user.py:14 assets/serializers/system_user.py:231
+#: assets/models/gathered_user.py:14 assets/serializers/system_user.py:230
 #: audits/models.py:38 perms/models/asset_permission.py:99
 #: templates/index.html:82 terminal/backends/command/models.py:19
 #: terminal/backends/command/serializers.py:13 terminal/models/session.py:40
@@ -747,7 +747,7 @@ msgstr "全称"
 msgid "Parent key"
 msgstr "ssh私钥"
 
-#: assets/models/node.py:559 assets/serializers/system_user.py:230
+#: assets/models/node.py:559 assets/serializers/system_user.py:229
 #: users/templates/users/user_asset_permission.html:41
 #: users/templates/users/user_asset_permission.html:73
 #: users/templates/users/user_asset_permission.html:158
@@ -848,7 +848,7 @@ msgstr "节点名称"
 msgid "Hardware info"
 msgstr "硬件信息"
 
-#: assets/serializers/asset.py:104 assets/serializers/system_user.py:249
+#: assets/serializers/asset.py:104 assets/serializers/system_user.py:248
 #: orgs/mixins/serializers.py:26
 msgid "Org name"
 msgstr "组织名称"
@@ -862,7 +862,7 @@ msgid "private key invalid"
 msgstr "密钥不合法"
 
 #: assets/serializers/domain.py:13 assets/serializers/label.py:12
-#: assets/serializers/system_user.py:54
+#: assets/serializers/system_user.py:53
 #: perms/serializers/asset/permission.py:72
 msgid "Assets amount"
 msgstr "资产数量"
@@ -892,52 +892,48 @@ msgstr "同级别节点名字不能重复"
 msgid "SSH key fingerprint"
 msgstr "密钥指纹"
 
-#: assets/serializers/system_user.py:29
-msgid "Apps amount"
-msgstr "应用数量"
-
-#: assets/serializers/system_user.py:53
+#: assets/serializers/system_user.py:52
 #: perms/serializers/asset/permission.py:73
 msgid "Nodes amount"
 msgstr "节点数量"
 
-#: assets/serializers/system_user.py:55 assets/serializers/system_user.py:232
+#: assets/serializers/system_user.py:54 assets/serializers/system_user.py:231
 msgid "Login mode display"
 msgstr "认证方式名称"
 
-#: assets/serializers/system_user.py:57
+#: assets/serializers/system_user.py:56
 msgid "Ad domain"
 msgstr "Ad 网域"
 
-#: assets/serializers/system_user.py:58
+#: assets/serializers/system_user.py:57
 msgid "Is asset protocol"
 msgstr ""
 
-#: assets/serializers/system_user.py:98
+#: assets/serializers/system_user.py:97
 msgid "Username same with user with protocol {} only allow 1"
 msgstr "用户名和用户相同的一种协议只允许存在一个"
 
-#: assets/serializers/system_user.py:108 common/validators.py:14
+#: assets/serializers/system_user.py:107 common/validators.py:14
 msgid "Special char not allowed"
 msgstr "不能包含特殊字符"
 
-#: assets/serializers/system_user.py:117
+#: assets/serializers/system_user.py:116
 msgid "* Automatic login mode must fill in the username."
 msgstr "自动登录模式，必须填写用户名"
 
-#: assets/serializers/system_user.py:132
+#: assets/serializers/system_user.py:131
 msgid "Path should starts with /"
 msgstr "路径应该以 / 开头"
 
-#: assets/serializers/system_user.py:144
+#: assets/serializers/system_user.py:143
 msgid "Password or private key required"
 msgstr "密码或密钥密码需要一个"
 
-#: assets/serializers/system_user.py:248
+#: assets/serializers/system_user.py:247
 msgid "System user name"
 msgstr "系统用户名称"
 
-#: assets/serializers/system_user.py:258
+#: assets/serializers/system_user.py:257
 msgid "Asset hostname"
 msgstr "资产主机名"
 
@@ -1629,35 +1625,35 @@ msgstr "等待登录复核处理"
 msgid "Login confirm ticket was {}"
 msgstr "登录复核 {}"
 
-#: authentication/errors.py:265
+#: authentication/errors.py:261
 msgid "IP is not allowed"
 msgstr "来源 IP 不被允许登录"
 
-#: authentication/errors.py:272
+#: authentication/errors.py:268
 msgid "Time Period is not allowed"
 msgstr "该 时间段 不被允许登录"
 
-#: authentication/errors.py:305
+#: authentication/errors.py:301
 msgid "SSO auth closed"
 msgstr "SSO 认证关闭了"
 
-#: authentication/errors.py:310 authentication/mixins.py:340
+#: authentication/errors.py:306 authentication/mixins.py:340
 msgid "Your password is too simple, please change it for security"
 msgstr "你的密码过于简单，为了安全，请修改"
 
-#: authentication/errors.py:319 authentication/mixins.py:347
+#: authentication/errors.py:315 authentication/mixins.py:347
 msgid "You should to change your password before login"
 msgstr "登录完成前，请先修改密码"
 
-#: authentication/errors.py:328 authentication/mixins.py:354
+#: authentication/errors.py:324 authentication/mixins.py:354
 msgid "Your password has expired, please reset before logging in"
 msgstr "您的密码已过期，先修改再登录"
 
-#: authentication/errors.py:362
+#: authentication/errors.py:358
 msgid "Your password is invalid"
 msgstr "您的密码无效"
 
-#: authentication/errors.py:368
+#: authentication/errors.py:364
 msgid "No upload or download permission"
 msgstr "没有上传下载权限"
 
@@ -1796,6 +1792,7 @@ msgstr "代码错误"
 #: authentication/templates/authentication/_msg_different_city.html:3
 #: authentication/templates/authentication/_msg_reset_password.html:3
 #: authentication/templates/authentication/_msg_rest_password_success.html:2
+#: jumpserver/conf.py:269
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: perms/templates/perms/_msg_permed_items_expire.html:3
 #: users/templates/users/_msg_account_expire_reminder.html:4
@@ -2207,6 +2204,15 @@ msgstr "不能包含特殊字符"
 msgid "The mobile phone number format is incorrect"
 msgstr "手机号格式不正确"
 
+#: jumpserver/conf.py:268 settings/serializers/email.py:51
+msgid "Create account successfully"
+msgstr "创建账户成功"
+
+#: jumpserver/conf.py:270 settings/serializers/email.py:63
+#: users/templates/users/_msg_user_created.html:8
+msgid "Your account has been created successfully"
+msgstr "你的账户已创建成功"
+
 #: jumpserver/context_processor.py:17
 msgid "JumpServer Open Source Bastion Host"
 msgstr "JumpServer 开源堡垒机"
@@ -2247,7 +2253,7 @@ msgstr "邮件"
 msgid "Site message"
 msgstr "站内信"
 
-#: notifications/notifications.py:172 ops/models/adhoc.py:246
+#: notifications/notifications.py:170 ops/models/adhoc.py:246
 #: xpack/plugins/change_auth_plan/models/base.py:108
 #: xpack/plugins/change_auth_plan/models/base.py:190
 #: xpack/plugins/gathered_user/models.py:79
@@ -2921,7 +2927,7 @@ msgid "SMS provider"
 msgstr "短信服务商"
 
 #: settings/serializers/auth/sms.py:17 settings/serializers/auth/sms.py:35
-#: settings/serializers/auth/sms.py:43 settings/serializers/email.py:63
+#: settings/serializers/auth/sms.py:43
 msgid "Signature"
 msgstr "签名"
 
@@ -3098,25 +3104,26 @@ msgid ""
 "successfully)"
 msgstr "提示: 创建用户时，发送设置密码邮件的主题 (例如: 创建用户成功)"
 
-#: settings/serializers/email.py:54
-msgid "Create user honorific"
-msgstr "邮件的敬语"
-
 #: settings/serializers/email.py:55
+msgid "Create user honorific"
+msgstr "邮件问候语"
+
+#: settings/serializers/email.py:56
+#, python-brace-format
+msgid "Hello {name}"
+msgstr "你好 {name}"
+
+#: settings/serializers/email.py:57
 msgid "Tips: When creating a user, send the honorific of the email (eg:Hello)"
 msgstr "提示: 创建用户时，发送设置密码邮件的敬语 (例如: 你好)"
 
-#: settings/serializers/email.py:59
+#: settings/serializers/email.py:61
 msgid "Create user email content"
 msgstr "邮件的内容"
 
-#: settings/serializers/email.py:60
+#: settings/serializers/email.py:62
 msgid "Tips:When creating a user, send the content of the email"
 msgstr "提示: 创建用户时，发送设置密码邮件的内容"
-
-#: settings/serializers/email.py:64
-msgid "Tips: Email signature (eg:jumpserver)"
-msgstr "邮件署名 (如:jumpserver)"
 
 #: settings/serializers/other.py:7
 msgid "Email suffix"
@@ -4466,35 +4473,35 @@ msgid ""
 msgstr ""
 "通过工单创建, 工单标题: {}, 工单申请人: {}, 工单处理人: {}, 工单 ID: {}"
 
-#: tickets/handler/base.py:88
+#: tickets/handler/base.py:86
 msgid "{} {} the ticket"
 msgstr "{} {} 工单"
 
-#: tickets/handler/base.py:116
+#: tickets/handler/base.py:114
 msgid "Ticket title"
 msgstr "工单标题"
 
-#: tickets/handler/base.py:117
+#: tickets/handler/base.py:115
 msgid "Ticket type"
 msgstr "工单类型"
 
-#: tickets/handler/base.py:118
+#: tickets/handler/base.py:116
 msgid "Ticket status"
 msgstr "工单状态"
 
-#: tickets/handler/base.py:119
+#: tickets/handler/base.py:117
 msgid "Ticket applicant"
 msgstr "工单申请人"
 
-#: tickets/handler/base.py:121
+#: tickets/handler/base.py:119
 msgid "Ticket basic info"
 msgstr "工单基本信息"
 
-#: tickets/handler/base.py:132
+#: tickets/handler/base.py:130
 msgid "No content"
 msgstr "无内容"
 
-#: tickets/handler/base.py:134
+#: tickets/handler/base.py:132
 msgid "Ticket applied info"
 msgstr "工单申请信息"
 
@@ -4908,38 +4915,30 @@ msgstr "管理员"
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
-#: users/notifications.py:15
-msgid "Create account successfully"
-msgstr "创建账户成功"
-
-#: users/notifications.py:19
-msgid "Hello {}"
-msgstr "你好"
-
-#: users/notifications.py:51
+#: users/notifications.py:56
 #: users/templates/users/_msg_password_expire_reminder.html:17
 #: users/templates/users/reset_password.html:5
 #: users/templates/users/reset_password.html:6
 msgid "Reset password"
 msgstr "重置密码"
 
-#: users/notifications.py:81 users/views/profile/reset.py:127
+#: users/notifications.py:86 users/views/profile/reset.py:127
 msgid "Reset password success"
 msgstr "重置密码成功"
 
-#: users/notifications.py:107
+#: users/notifications.py:112
 msgid "Password is about expire"
 msgstr "密码即将过期"
 
-#: users/notifications.py:135
+#: users/notifications.py:140
 msgid "Account is about expire"
 msgstr "账号即将过期"
 
-#: users/notifications.py:157
+#: users/notifications.py:162
 msgid "Reset SSH Key"
 msgstr "重置 SSH 密钥"
 
-#: users/notifications.py:178
+#: users/notifications.py:183
 msgid "Reset MFA"
 msgstr "重置 MFA"
 
@@ -5108,10 +5107,6 @@ msgstr "点击这里设置"
 #: users/templates/users/_msg_reset_ssh_key.html:7
 msgid "Your ssh public key has been reset by site administrator"
 msgstr "你的 SSH 密钥已经被管理员重置"
-
-#: users/templates/users/_msg_user_created.html:8
-msgid "Your account has been created successfully"
-msgstr "您的账户已创建成功"
 
 #: users/templates/users/_msg_user_created.html:13
 msgid "click here to set your password"
@@ -5368,8 +5363,8 @@ msgstr "* 新密码不能是最近 {} 次的密码"
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
-#: xpack/plugins/change_auth_plan/api/app.py:114
-#: xpack/plugins/change_auth_plan/api/asset.py:101
+#: xpack/plugins/change_auth_plan/api/app.py:113
+#: xpack/plugins/change_auth_plan/api/asset.py:100
 msgid "The parameter 'action' must be [{}]"
 msgstr "参数 'action' 必须是 [{}]"
 
@@ -5953,6 +5948,9 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Tips: Email signature (eg:jumpserver)"
+#~ msgstr "邮件署名 (如:jumpserver)"
 
 #~ msgid "Login direct"
 #~ msgstr "直接登录"
