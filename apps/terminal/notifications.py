@@ -80,10 +80,12 @@ class CommandAlertMessage(CommandAlertMixin, SystemMessage):
 
     def get_html_msg(self) -> dict:
         command = self.command
+        session = Session.objects.get(id=command['session'])
+
         session_detail_url = reverse(
             'api-terminal:session-detail', kwargs={'pk': command['session']},
             external=True, api_to_ui=True
-        ) + '?oid={}'.format(self.command['org_id'])
+        ) + '?oid={}'.format(session.org_id)
         level = Command.get_risk_level_str(command['risk_level'])
         items = {
             _("Asset"): command['asset'],
