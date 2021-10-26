@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-26 16:21+0800\n"
+"POT-Creation-Date: 2021-10-26 17:16+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -74,7 +74,7 @@ msgstr "拒绝"
 msgid "Allow"
 msgstr "允许"
 
-#: acls/models/login_acl.py:21 acls/models/login_acl.py:113
+#: acls/models/login_acl.py:21 acls/models/login_acl.py:114
 #: acls/models/login_asset_acl.py:17 tickets/const.py:9
 msgid "Login confirm"
 msgstr "登录复核"
@@ -116,6 +116,10 @@ msgstr "动作"
 msgid "Reviewers"
 msgstr "审批人"
 
+#: acls/models/login_acl.py:43
+msgid "Login acl"
+msgstr "登录访问控制"
+
 #: acls/models/login_asset_acl.py:21
 #: applications/serializers/application.py:108
 #: applications/serializers/application.py:139
@@ -137,7 +141,11 @@ msgstr "系统用户"
 msgid "Asset"
 msgstr "资产"
 
-#: acls/models/login_asset_acl.py:89 tickets/const.py:12
+#: acls/models/login_asset_acl.py:40
+msgid "Login asset acl"
+msgstr "登录资产访问控制"
+
+#: acls/models/login_asset_acl.py:90 tickets/const.py:12
 msgid "Login asset confirm"
 msgstr "登录资产复核"
 
@@ -313,6 +321,11 @@ msgstr "网域"
 #: applications/models/application.py:177 xpack/plugins/cloud/models.py:33
 msgid "Attrs"
 msgstr ""
+
+#: applications/models/application.py:183
+#: perms/models/application_permission.py:27 users/models/user.py:174
+msgid "Application"
+msgstr "应用程序"
 
 #: applications/serializers/application.py:59
 #: applications/serializers/application.py:89 assets/serializers/label.py:13
@@ -896,10 +909,8 @@ msgid "SSH key fingerprint"
 msgstr "密钥指纹"
 
 #: assets/serializers/system_user.py:30
-#, fuzzy
-#| msgid "Assets amount"
 msgid "Apps amount"
-msgstr "资产数量"
+msgstr "应用数量"
 
 #: assets/serializers/system_user.py:55
 #: perms/serializers/asset/permission.py:73
@@ -1429,7 +1440,7 @@ msgstr "{ApplicationPermission} 移除 {UserGroup}"
 
 #: audits/signals_handler.py:157 perms/models/application_permission.py:37
 msgid "Application permission"
-msgstr "应用管理"
+msgstr "应用授权"
 
 #: audits/signals_handler.py:158
 #, python-brace-format
@@ -2492,10 +2503,6 @@ msgstr "管理员正在修改授权，请稍等"
 #: perms/exceptions.py:14
 msgid "The authorization cannot be revoked for the time being"
 msgstr "该授权暂时不能撤销"
-
-#: perms/models/application_permission.py:27 users/models/user.py:174
-msgid "Application"
-msgstr "应用程序"
 
 #: perms/models/asset_permission.py:37 settings/serializers/terminal.py:12
 msgid "All"
@@ -5391,8 +5398,8 @@ msgstr "* 新密码不能是最近 {} 次的密码"
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
-#: xpack/plugins/change_auth_plan/api/app.py:113
-#: xpack/plugins/change_auth_plan/api/asset.py:100
+#: xpack/plugins/change_auth_plan/api/app.py:114
+#: xpack/plugins/change_auth_plan/api/asset.py:101
 msgid "The parameter 'action' must be [{}]"
 msgstr "参数 'action' 必须是 [{}]"
 
@@ -5889,7 +5896,7 @@ msgstr "执行次数"
 msgid "Instance count"
 msgstr "实例个数"
 
-#: xpack/plugins/cloud/utils.py:65
+#: xpack/plugins/cloud/utils.py:68
 msgid "Account unavailable"
 msgstr "账户无效"
 
