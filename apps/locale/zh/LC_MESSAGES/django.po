@@ -4014,6 +4014,27 @@ msgstr "前"
 msgid "Login in "
 msgstr "登录了"
 
+#: templates/resource_download.html:15 templates/resource_download.html:21
+#: templates/resource_download.html:22 templates/resource_download.html:27
+msgid "Client"
+msgstr "客户端"
+
+#: templates/resource_download.html:17
+msgid ""
+"JumpServer Client, currently used to launch the client, now only support "
+"launch RDP client, The SSH client will next"
+msgstr "JumpServer 客户端，目前用来唤起 特定客户端程序 连接资产, 目前仅支持 RDP 客户端，SSH、Telnet 会在未来支持"
+
+#: templates/resource_download.html:27
+msgid "Official"
+msgstr "官方"
+
+#: templates/resource_download.html:29
+msgid ""
+"macOS needs to download the client to connect RDP asset, which comes with "
+"Windows"
+msgstr "macOS 需要下载客户端来连接 RDP 资产，Windows 系统默认安装了该程序"
+
 #: templates/rest_framework/base.html:128
 msgid "Filters"
 msgstr "过滤"
