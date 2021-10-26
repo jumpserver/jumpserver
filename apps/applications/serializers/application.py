@@ -104,7 +104,8 @@ class AppAccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         extra_kwargs = {
             'username': {'default': '', 'required': False},
             'password': {'write_only': True},
-            'app_display': {'label': _('Application display')}
+            'app_display': {'label': _('Application display')},
+            'systemuser_display': {'label': _('System User')}
         }
         use_model_bulk_create = True
         model_bulk_create_kwargs = {
@@ -134,4 +135,6 @@ class AppAccountSecretSerializer(AppAccountSerializer):
             'password': {'write_only': False},
             'private_key': {'write_only': False},
             'public_key': {'write_only': False},
+            'app_display': {'label': _('Application display')},
+            'systemuser_display': {'label': _('System User')}
         }
