@@ -40,6 +40,7 @@ class LoginACL(BaseACL):
 
     class Meta:
         ordering = ('priority', '-date_updated', 'name')
+        verbose_name = _('Login acl')
 
     def __str__(self):
         return self.name

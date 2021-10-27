@@ -54,6 +54,7 @@ class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('acls', '0001_initial'),
+        ('authentication', '0004_ssotoken'),
     ]
 
     operations = [
@@ -85,5 +86,13 @@ class Migration(migrations.Migration):
         migrations.RemoveField(
             model_name='loginacl',
             name='ip_group',
+        ),
+        migrations.AlterModelOptions(
+            name='loginacl',
+            options={'ordering': ('priority', '-date_updated', 'name'), 'verbose_name': 'Login acl'},
+        ),
+        migrations.AlterModelOptions(
+            name='loginassetacl',
+            options={'ordering': ('priority', '-date_updated', 'name'), 'verbose_name': 'Login asset acl'},
         ),
     ]
