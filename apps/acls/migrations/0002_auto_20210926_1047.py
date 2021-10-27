@@ -54,6 +54,7 @@ class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('acls', '0001_initial'),
+        ('authentication', '0004_ssotoken'),
     ]
 
     operations = [
