@@ -11,7 +11,7 @@ common_help_text = _('Format for comma-delimited string, with * indicating a mat
 
 
 class LoginACLSerializer(BulkModelSerializer):
-    user_display = serializers.ReadOnlyField(source='user.name', label=_('Username'))
+    user_display = serializers.ReadOnlyField(source='user.username', label=_('Username'))
     reviewers_display = serializers.SerializerMethodField(label=_('Reviewers'))
     action_display = serializers.ReadOnlyField(source='get_action_display', label=_('Action'))
     reviewers_amount = serializers.IntegerField(read_only=True, source='reviewers.count')
