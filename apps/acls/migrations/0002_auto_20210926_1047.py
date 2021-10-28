@@ -76,12 +76,12 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
                                     related_name='login_acls', to=settings.AUTH_USER_MODEL, verbose_name='User'),
         ),
-        migrations.RunPython(migrate_login_confirm),
         migrations.AddField(
             model_name='loginacl',
             name='rules',
             field=models.JSONField(default=dict, verbose_name='Rule'),
         ),
+        migrations.RunPython(migrate_login_confirm),
         migrations.RunPython(migrate_ip_group),
         migrations.RemoveField(
             model_name='loginacl',

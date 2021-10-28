@@ -35,6 +35,20 @@ class LoginACLSerializer(BulkModelSerializer):
             "reviewers": {'allow_null': False, 'required': True},
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.set_action_choices()
+
+    def set_action_choices(self):
+        from xpack.plugins.license.models import License
+        action = self.fields.get('action')
+        if not action:
+            return
+        choices = action._choices
+        if not License.has_valid_license():
+            choices.pop(LoginACL.ActionChoices.confirm, None)
+        action._choices = choices
+
     def get_rules_serializer(self):
         return RuleSerializer()
 
