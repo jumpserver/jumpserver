@@ -19,7 +19,7 @@ class ApplySerializer(serializers.Serializer):
     )
     # 申请信息
     apply_assets = serializers.ListField(
-        required=True, allow_null=True, child=serializers.UUIDField(), label=_('Apply assets')
+        required=True, allow_empty=False, child=serializers.UUIDField(), label=_('Apply assets')
     )
     apply_assets_display = serializers.ListField(
         required=False, read_only=True, child=serializers.CharField(),
@@ -27,7 +27,7 @@ class ApplySerializer(serializers.Serializer):
         default=list,
     )
     apply_system_users = serializers.ListField(
-        required=True, allow_null=True, child=serializers.UUIDField(),
+        required=True, allow_empty=False, child=serializers.UUIDField(),
         label=_('Approve system users')
     )
     apply_system_users_display = serializers.ListField(

@@ -37,7 +37,7 @@ class ApplySerializer(serializers.Serializer):
     )
     apply_applications = serializers.ListField(
         required=True, child=serializers.UUIDField(), label=_('Apply applications'),
-        allow_null=True
+        allow_empty=False
     )
     apply_applications_display = serializers.ListField(
         required=False, read_only=True, child=serializers.CharField(),
@@ -46,7 +46,7 @@ class ApplySerializer(serializers.Serializer):
     )
     apply_system_users = serializers.ListField(
         required=True, child=serializers.UUIDField(), label=_('Apply system users'),
-        allow_null=True
+        allow_empty=False
     )
     apply_system_users_display = serializers.ListField(
         required=False, read_only=True, child=serializers.CharField(),
