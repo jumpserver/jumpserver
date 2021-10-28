@@ -9,7 +9,7 @@ class OtherSettingSerializer(serializers.Serializer):
     )
 
     OTP_ISSUER_NAME = serializers.CharField(
-        required=False, max_length=1024, label=_('OTP issuer name'),
+        required=False, max_length=16, label=_('OTP issuer name'),
     )
     OTP_VALID_WINDOW = serializers.IntegerField(
         min_value=1, max_value=10,
