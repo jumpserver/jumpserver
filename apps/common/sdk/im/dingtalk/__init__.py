@@ -38,6 +38,7 @@ class URL:
 
 class DingTalkRequests(BaseRequest):
     invalid_token_errcodes = (ErrorCode.INVALID_TOKEN,)
+    msg_key = 'errmsg'
 
     def __init__(self, appid, appsecret, agentid, timeout=None):
         self._appid = appid or ''

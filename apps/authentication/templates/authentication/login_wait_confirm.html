@@ -159,7 +159,9 @@ $(document).ready(function () {
 }).on('click', '.btn-return', function () {
     cancelTicket();
     cancelCloseConfirm();
-    window.location = "{% url 'authentication:login' %}"
+    setTimeout(() => {
+        window.location = "{% url 'authentication:login' %}"
+    }, 1000);
 })
 
 </script>

@@ -184,7 +184,7 @@ class LDAPServerUtil(object):
             if attr == 'is_active' and mapping.lower() == 'useraccountcontrol' \
                     and value:
                 value = int(value) & LDAP_AD_ACCOUNT_DISABLE != LDAP_AD_ACCOUNT_DISABLE
-            user[attr] = value
+            user[attr] = value.strip() if isinstance(value, str) else value
         return user
 
     def user_entries_to_dict(self, user_entries):
