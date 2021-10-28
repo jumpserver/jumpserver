@@ -160,7 +160,7 @@ class TicketFlowApproveSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         if attrs['strategy'] == TicketApprovalStrategy.custom_user and not attrs.get('assignees'):
             error = _('Please select the Assignees')
-            raise serializers.ValidationError(error)
+            raise serializers.ValidationError({'assignees': error})
         return super().validate(attrs)
 
 
