@@ -30,7 +30,7 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
         'title', 'action', 'type', 'status', 'applicant_display'
     ]
     ordering_fields = ('title', 'applicant_display', 'status', 'state', 'action_display', 'date_created')
-    ordering = ('title', )
+    ordering = ('-date_created', )
 
     def create(self, request, *args, **kwargs):
         raise MethodNotAllowed(self.action)
