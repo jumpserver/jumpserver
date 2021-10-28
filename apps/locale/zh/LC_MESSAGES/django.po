@@ -98,7 +98,7 @@ msgstr "用户"
 
 #: acls/models/login_acl.py:29
 msgid "Rule"
-msgstr ""
+msgstr "规则"
 
 #: acls/models/login_acl.py:32 acls/models/login_asset_acl.py:26
 #: acls/serializers/login_acl.py:16 acls/serializers/login_asset_acl.py:75
@@ -240,7 +240,7 @@ msgstr ""
 
 #: acls/serializers/rules/rules.py:34
 msgid "Time Period"
-msgstr ""
+msgstr "时段"
 
 #: applications/api/mixin.py:20 templates/_nav_user.html:10
 msgid "My applications"
@@ -927,7 +927,7 @@ msgstr "Ad 网域"
 
 #: assets/serializers/system_user.py:60
 msgid "Is asset protocol"
-msgstr ""
+msgstr "资产协议"
 
 #: assets/serializers/system_user.py:100
 msgid "Username same with user with protocol {} only allow 1"
@@ -2427,7 +2427,7 @@ msgstr "监控告警"
 
 #: ops/notifications.py:22
 msgid "Terminal health check warning"
-msgstr ""
+msgstr "终端健康状况检查警告"
 
 #: ops/notifications.py:63
 #, python-brace-format
@@ -4392,7 +4392,7 @@ msgstr "忽略证书认证"
 
 #: terminal/serializers/terminal.py:44
 msgid "Load status"
-msgstr ""
+msgstr "负载状态"
 
 #: terminal/serializers/terminal.py:83 terminal/serializers/terminal.py:91
 msgid "Not found"
