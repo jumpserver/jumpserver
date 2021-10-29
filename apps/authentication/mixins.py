@@ -372,9 +372,6 @@ class AuthMixin(PasswordEncryptionViewMixin):
     def check_user_mfa_if_need(self, user):
         if self.request.session.get('auth_mfa'):
             return
-        # 开启OTP_IN_RADIUS跳转到MFA认证页面
-        # if settings.OTP_IN_RADIUS:
-        #     return
         if not user.mfa_enabled:
             return
 
@@ -414,7 +411,7 @@ class AuthMixin(PasswordEncryptionViewMixin):
         if not bool(user.phone) and mfa_type == MFAType.SMS_CODE:
             raise errors.UserPhoneNotSet
 
-        if not bool(user.otp_secret_key) and mfa_type == MFAType.OTP:
+        if not settings.OTP_IN_RADIUS and not bool(user.otp_secret_key) and mfa_type == MFAType.OTP:
             self.set_passwd_verify_on_session(user)
             raise errors.OTPBindRequiredError(reverse_lazy('authentication:user-otp-enable-bind'))
 

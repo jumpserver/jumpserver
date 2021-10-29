@@ -470,6 +470,8 @@ class MFAMixin:
     def mfa_enabled(self):
         if self.mfa_force_enabled:
             return True
+        if settings.OTP_IN_RADIUS:
+            return True
         return self.mfa_level > 0
 
     @property
@@ -527,7 +529,7 @@ class MFAMixin:
 
     def get_supported_mfa_types(self):
         methods = []
-        if self.otp_secret_key:
+        if self.otp_secret_key or settings.OTP_IN_RADIUS:
             methods.append(MFAType.OTP)
         if settings.XPACK_ENABLED and settings.SMS_ENABLED and self.phone:
             methods.append(MFAType.SMS_CODE)
