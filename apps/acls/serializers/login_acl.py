@@ -2,6 +2,7 @@ from django.utils.translation import ugettext as _
 from rest_framework import serializers
 from common.drf.serializers import BulkModelSerializer
 from common.drf.serializers import MethodSerializer
+from jumpserver.utils import has_valid_xpack_license
 from ..models import LoginACL
 from .rules import RuleSerializer
 
@@ -40,12 +41,11 @@ class LoginACLSerializer(BulkModelSerializer):
         self.set_action_choices()
 
     def set_action_choices(self):
-        from xpack.plugins.license.models import License
         action = self.fields.get('action')
         if not action:
             return
         choices = action._choices
-        if not License.has_valid_license():
+        if not has_valid_xpack_license():
             choices.pop(LoginACL.ActionChoices.confirm, None)
         action._choices = choices
 
