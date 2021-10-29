@@ -15,7 +15,7 @@ from .signals import post_auth_success, post_auth_failed
 def on_user_auth_login_success(sender, user, request, **kwargs):
     # 开启了 MFA，且没有校验过
 
-    if user.mfa_enabled and not settings.OTP_IN_RADIUS and not request.session.get('auth_mfa'):
+    if (user.mfa_enabled or settings.OTP_IN_RADIUS) and not request.session.get('auth_mfa'):
         request.session['auth_mfa_required'] = 1
 
     if settings.USER_LOGIN_SINGLE_MACHINE_ENABLED:

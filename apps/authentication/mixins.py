@@ -372,8 +372,9 @@ class AuthMixin(PasswordEncryptionViewMixin):
     def check_user_mfa_if_need(self, user):
         if self.request.session.get('auth_mfa'):
             return
-        if settings.OTP_IN_RADIUS:
-            return
+        # 开启OTP_IN_RADIUS跳转到MFA认证页面
+        # if settings.OTP_IN_RADIUS:
+        #     return
         if not user.mfa_enabled:
             return
 
@@ -506,7 +507,16 @@ class AuthMixin(PasswordEncryptionViewMixin):
 
     @staticmethod
     def get_user_mfa_methods(user=None):
-        otp_enabled = user.otp_secret_key if user else True
+        # otp_enabled = user.otp_secret_key if user else True
+        if not user:
+            otp_enabled = True
+        elif user and user.otp_secret_key:
+            otp_enabled = True
+        elif settings.OTP_IN_RADIUS:
+            otp_enabled = True
+        else:
+            otp_enabled = False
+
         # 没有用户时，或者有用户并且有电话配置
         sms_enabled = any([user and user.phone, not user]) \
             and settings.SMS_ENABLED and settings.XPACK_ENABLED
