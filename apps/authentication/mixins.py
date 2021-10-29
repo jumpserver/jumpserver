@@ -244,9 +244,9 @@ class AuthMixin(PasswordEncryptionViewMixin):
         mfa_type = data.get('mfa_type')
         if settings.SECURITY_MFA_IN_LOGIN_PAGE and mfa_type:
             if not code:
-                if mfa_type ==  MFAType.OTP and bool(user.otp_secret_key):
+                if mfa_type == MFAType.OTP and (bool(user.otp_secret_key) or settings.OTP_IN_RADIUS):
                     raise errors.OTPCodeRequiredError
-                elif mfa_type ==  MFAType.SMS_CODE:
+                elif mfa_type == MFAType.SMS_CODE:
                     raise errors.SMSCodeRequiredError
             self.check_user_mfa(code, mfa_type, user=user)
 
