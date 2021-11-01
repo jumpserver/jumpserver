@@ -10,10 +10,10 @@ __all__ = [
 
 
 class RadiusSettingSerializer(serializers.Serializer):
-    AUTH_RADIUS = serializers.BooleanField(required=False, label=_('Enable RADIUS Auth'))
-    RADIUS_SERVER = serializers.CharField(required=False, max_length=1024, label=_('Host'))
+    AUTH_RADIUS = serializers.BooleanField(required=False, label=_('Enable Radius Auth'))
+    RADIUS_SERVER = serializers.CharField(required=False, allow_blank=True, max_length=1024, label=_('Host'))
     RADIUS_PORT = serializers.IntegerField(required=False, label=_('Port'))
     RADIUS_SECRET = serializers.CharField(
         required=False, max_length=1024, allow_null=True, label=_('Secret'), write_only=True
     )
-    OTP_IN_RADIUS = serializers.BooleanField(required=False, label=_('OTP in radius'))
+    OTP_IN_RADIUS = serializers.BooleanField(required=False, label=_('OTP in Radius'))
