@@ -10,6 +10,8 @@ from ansible.plugins.callback import CallbackBase
 from ansible.plugins.callback.default import CallbackModule
 from ansible.plugins.callback.minimal import CallbackModule as CMDCallBackModule
 
+from common.utils.strings import safe_str
+
 
 class CallbackMixin:
     def __init__(self, display=None):
@@ -84,7 +86,7 @@ class AdHocResultCallback(CallbackMixin, CallbackModule, CMDCallBackModule):
             detail = {
                 'cmd': cmd,
                 'stderr': task_result.get('stderr'),
-                'stdout': task_result.get('stdout'),
+                'stdout': safe_str(str(task_result.get('stdout', ''))),
                 'rc': task_result.get('rc'),
                 'delta': task_result.get('delta'),
                 'msg': task_result.get('msg', '')
@@ -216,7 +218,7 @@ class CommandResultCallback(AdHocResultCallback):
         if t == "ok":
             cmd['cmd'] = res._result.get('cmd')
             cmd['stderr'] = res._result.get('stderr')
-            cmd['stdout'] = res._result.get('stdout')
+            cmd['stdout'] = safe_str(str(res._result.get('stdout', '')))
             cmd['rc'] = res._result.get('rc')
             cmd['delta'] = res._result.get('delta')
         else:
