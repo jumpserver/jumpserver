@@ -2938,11 +2938,11 @@ msgid "Always update user"
 msgstr "总是更新用户信息"
 
 #: settings/serializers/auth/radius.py:13
-msgid "Enable RADIUS Auth"
-msgstr "启用 RADIUS 认证"
+msgid "Enable Radius Auth"
+msgstr "启用 Radius 认证"
 
 #: settings/serializers/auth/radius.py:19
-msgid "OTP in radius"
+msgid "OTP in Radius"
 msgstr "使用 Radius OTP"
 
 #: settings/serializers/auth/sms.py:10
