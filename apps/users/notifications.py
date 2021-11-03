@@ -1,4 +1,5 @@
 from urllib.parse import urljoin
+from collections import defaultdict
 
 from django.utils import timezone
 from django.utils.translation import ugettext as _
@@ -13,13 +14,19 @@ class UserCreatedMsg(UserMessage):
     def get_html_msg(self) -> dict:
         user = self.user
 
-        subject = str(settings.EMAIL_CUSTOM_USER_CREATED_SUBJECT)
-        honorific = str(settings.EMAIL_CUSTOM_USER_CREATED_HONORIFIC)
-        content = str(settings.EMAIL_CUSTOM_USER_CREATED_BODY)
+        mail_context = {
+            'subject': str(settings.EMAIL_CUSTOM_USER_CREATED_SUBJECT),
+            'honorific': str(settings.EMAIL_CUSTOM_USER_CREATED_HONORIFIC),
+            'content': str(settings.EMAIL_CUSTOM_USER_CREATED_BODY)
+        }
+
+        user_info = {'username': user.username, 'name': user.name, 'email': user.email}
+        # 转换成 defaultdict，否则 format 时会报 KeyError
+        user_info = defaultdict(str, **user_info)
+        mail_context = {k: v.format_map(user_info) for k, v in mail_context.items()}
 
         context = {
-            'honorific': honorific,
-            'content': content,
+            **mail_context,
             'user': user,
             'rest_password_url': reverse('authentication:reset-password', external=True),
             'rest_password_token': user.generate_reset_token(),
@@ -28,7 +35,7 @@ class UserCreatedMsg(UserMessage):
         }
         message = render_to_string('users/_msg_user_created.html', context)
         return {
-            'subject': subject,
+            'subject': mail_context['subject'],
             'message': message
         }
 
