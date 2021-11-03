@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 #
 import inspect
-from django.utils.http import urlencode
 from functools import partial
 import time
+from typing import Callable
 
+from django.utils.http import urlencode
 from django.core.cache import cache
 from django.conf import settings
 from django.urls import reverse_lazy
 from django.contrib import auth
 from django.utils.translation import ugettext as _
+from rest_framework.request import Request
 from django.contrib.auth import (
     BACKEND_SESSION_KEY, _get_backends,
     PermissionDenied, user_login_failed, _clean_credentials
@@ -32,8 +34,7 @@ def check_backend_can_auth(username, backend_path, allowed_auth_backends):
     if allowed_auth_backends is not None and backend_path not in allowed_auth_backends:
         logger.debug('Skip user auth backend: {}, {} not in'.format(
             username, backend_path, ','.join(allowed_auth_backends)
-        )
-        )
+        ))
         return False
     return True
 
@@ -144,11 +145,18 @@ class PasswordEncryptionViewMixin:
         return super().get_context_data(**kwargs)
 
 
-class AuthMixin(PasswordEncryptionViewMixin):
-    request = None
-    partial_credential_error = None
+class CommonMixin(PasswordEncryptionViewMixin):
+    request: Request
+    get_request_ip: Callable
 
-    key_prefix_captcha = "_LOGIN_INVALID_{}"
+    def raise_credential_error(self, error):
+        raise self.partial_credential_error(error=error)
+
+    def _set_partial_credential_error(self, username, ip, request):
+        self.partial_credential_error = partial(
+            errors.CredentialError, username=username,
+            ip=ip, request=request
+        )
 
     def get_user_from_session(self):
         if self.request.session.is_empty():
@@ -171,32 +179,6 @@ class AuthMixin(PasswordEncryptionViewMixin):
         user.backend = self.request.session.get("auth_backend")
         return user
 
-    def _check_is_block(self, username, raise_exception=True):
-        ip = self.get_request_ip()
-        if LoginBlockUtil(username, ip).is_block():
-            logger.warn('Ip was blocked' + ': ' + username + ':' + ip)
-            exception = errors.BlockLoginError(username=username, ip=ip)
-            if raise_exception:
-                raise errors.BlockLoginError(username=username, ip=ip)
-            else:
-                return exception
-
-    def check_is_block(self, raise_exception=True):
-        if hasattr(self.request, 'data'):
-            username = self.request.data.get("username")
-        else:
-            username = self.request.POST.get("username")
-        self._check_is_block(username, raise_exception)
-
-    def raise_credential_error(self, error):
-        raise self.partial_credential_error(error=error)
-
-    def _set_partial_credential_error(self, username, ip, request):
-        self.partial_credential_error = partial(
-            errors.CredentialError, username=username,
-            ip=ip, request=request
-        )
-
     def get_auth_data(self, decrypt_passwd=False):
         request = self.request
         if hasattr(request, 'data'):
@@ -214,6 +196,30 @@ class AuthMixin(PasswordEncryptionViewMixin):
         password = password + challenge.strip()
         return username, password, public_key, ip, auto_login
 
+
+class AuthPreCheckMixin(CommonMixin):
+    request: Request
+    get_request_ip: Callable
+
+    def _check_is_block(self, username, raise_exception=True):
+        ip = self.get_request_ip()
+        is_block = LoginBlockUtil(username, ip).is_block()
+        if not is_block:
+            return
+        logger.warn('Ip was blocked' + ': ' + username + ':' + ip)
+        exception = errors.BlockLoginError(username=username, ip=ip)
+        if raise_exception:
+            raise errors.BlockLoginError(username=username, ip=ip)
+        else:
+            return exception
+
+    def check_is_block(self, raise_exception=True):
+        if hasattr(self.request, 'data'):
+            username = self.request.data.get("username")
+        else:
+            username = self.request.POST.get("username")
+        self._check_is_block(username, raise_exception)
+
     def _check_only_allow_exists_user_auth(self, username):
         # 仅允许预先存在的用户认证
         if not settings.ONLY_ALLOW_EXIST_USER_AUTH:
@@ -224,150 +230,38 @@ class AuthMixin(PasswordEncryptionViewMixin):
             logger.error(f"Only allow exist user auth, login failed: {username}")
             self.raise_credential_error(errors.reason_user_not_exist)
 
-    def _check_auth_user_is_valid(self, username, password, public_key):
-        user = authenticate(self.request, username=username, password=password, public_key=public_key)
-        if not user:
-            self.raise_credential_error(errors.reason_password_failed)
-        elif user.is_expired:
-            self.raise_credential_error(errors.reason_user_expired)
-        elif not user.is_active:
-            self.raise_credential_error(errors.reason_user_inactive)
-        return user
-
-    def _check_login_mfa_login_if_need(self, user):
-        request = self.request
-        if hasattr(request, 'data'):
-            data = request.data
-        else:
-            data = request.POST
-        code = data.get('code')
-        mfa_type = data.get('mfa_type')
-        if settings.SECURITY_MFA_IN_LOGIN_PAGE and mfa_type:
-            if not code:
-                if mfa_type ==  MFAType.OTP and bool(user.otp_secret_key):
-                    raise errors.OTPCodeRequiredError
-                elif mfa_type ==  MFAType.SMS_CODE:
-                    raise errors.SMSCodeRequiredError
-            self.check_user_mfa(code, mfa_type, user=user)
-
     def _check_login_acl(self, user, ip):
         # ACL 限制用户登录
         is_allowed, limit_type = LoginACL.allow_user_to_login(user, ip)
-        if not is_allowed:
-            if limit_type == 'ip':
-                raise errors.LoginIPNotAllowed(username=user.username, request=self.request)
-            elif limit_type == 'time':
-                raise errors.TimePeriodNotAllowed(username=user.username, request=self.request)
+        if is_allowed:
+            return
+        if limit_type == 'ip':
+            raise errors.LoginIPNotAllowed(username=user.username, request=self.request)
+        elif limit_type == 'time':
+            raise errors.TimePeriodNotAllowed(username=user.username, request=self.request)
 
-    def set_login_failed_mark(self):
-        ip = self.get_request_ip()
-        cache.set(self.key_prefix_captcha.format(ip), 1, 3600)
+    def pre_check(self):
+        pass
 
-    def set_passwd_verify_on_session(self, user: User):
-        self.request.session['user_id'] = str(user.id)
-        self.request.session['auth_password'] = 1
-        self.request.session['auth_password_expired_at'] = time.time() + settings.AUTH_EXPIRED_SECONDS
 
-    def check_is_need_captcha(self):
-        # 最近有登录失败时需要填写验证码
-        ip = get_request_ip(self.request)
-        need = cache.get(self.key_prefix_captcha.format(ip))
-        return need
+class MFAMixin:
+    request: Request
+    get_user_from_session: Callable
+    get_request_ip: Callable
+    set_passwd_verify_on_session: Callable
 
-    def check_user_auth(self, decrypt_passwd=False):
-        self.check_is_block()
-        username, password, public_key, ip, auto_login = self.get_auth_data(decrypt_passwd)
+    def _check_login_mfa_login_if_need(self, user):
+        if not settings.SECURITY_MFA_IN_LOGIN_PAGE:
+            return
 
-        self._check_only_allow_exists_user_auth(username)
-        user = self._check_auth_user_is_valid(username, password, public_key)
-        # 校验login-acl规则
-        self._check_login_acl(user, ip)
-        self._check_password_require_reset_or_not(user)
-        self._check_passwd_is_too_simple(user, password)
-        self._check_passwd_need_update(user)
-
-        # 校验login-mfa, 如果登录页面上显示 mfa 的话
-        self._check_login_mfa_login_if_need(user)
-
-        LoginBlockUtil(username, ip).clean_failed_count()
         request = self.request
-        request.session['auth_password'] = 1
-        request.session['user_id'] = str(user.id)
-        request.session['auto_login'] = auto_login
-        request.session['auth_backend'] = getattr(user, 'backend', settings.AUTH_BACKEND_MODEL)
-        return user
+        data = request.data if hasattr(request, 'data') else request.POST
+        code = data.get('code')
+        mfa_type = data.get('mfa_type', 'otp')
+        if not code:
+            raise errors.OTPCodeRequiredError
 
-    def _check_is_local_user(self, user: User):
-        if user.source != User.Source.local:
-            raise self.raise_credential_error(error=errors.only_local_users_are_allowed)
-
-    def check_oauth2_auth(self, user: User, auth_backend):
-        ip = self.get_request_ip()
-        request = self.request
-
-        self._set_partial_credential_error(user.username, ip, request)
-
-        if user.is_expired:
-            self.raise_credential_error(errors.reason_user_expired)
-        elif not user.is_active:
-            self.raise_credential_error(errors.reason_user_inactive)
-
-        self._check_is_block(user.username)
-        self._check_login_acl(user, ip)
-
-        LoginBlockUtil(user.username, ip).clean_failed_count()
-        MFABlockUtils(user.username, ip).clean_failed_count()
-
-        request.session['auth_password'] = 1
-        request.session['user_id'] = str(user.id)
-        request.session['auth_backend'] = auth_backend
-        return user
-
-    @classmethod
-    def generate_reset_password_url_with_flash_msg(cls, user, message):
-        reset_passwd_url = reverse('authentication:reset-password')
-        query_str = urlencode({
-            'token': user.generate_reset_token()
-        })
-        reset_passwd_url = f'{reset_passwd_url}?{query_str}'
-
-        message_data = {
-            'title': _('Please change your password'),
-            'message': message,
-            'interval': 3,
-            'redirect_url': reset_passwd_url,
-        }
-        return FlashMessageUtil.gen_message_url(message_data)
-
-    @classmethod
-    def _check_passwd_is_too_simple(cls, user: User, password):
-        if user.is_superuser and password == 'admin':
-            message = _('Your password is too simple, please change it for security')
-            url = cls.generate_reset_password_url_with_flash_msg(user, message=message)
-            raise errors.PasswdTooSimple(url)
-
-    @classmethod
-    def _check_passwd_need_update(cls, user: User):
-        if user.need_update_password:
-            message = _('You should to change your password before login')
-            url = cls.generate_reset_password_url_with_flash_msg(user, message)
-            raise errors.PasswdNeedUpdate(url)
-
-    @classmethod
-    def _check_password_require_reset_or_not(cls, user: User):
-        if user.password_has_expired:
-            message = _('Your password has expired, please reset before logging in')
-            url = cls.generate_reset_password_url_with_flash_msg(user, message)
-            raise errors.PasswordRequireResetError(url)
-
-    def check_user_auth_if_need(self, decrypt_passwd=False):
-        request = self.request
-        if request.session.get('auth_password') and \
-                request.session.get('user_id'):
-            user = self.get_user_from_session()
-            if user:
-                return user
-        return self.check_user_auth(decrypt_passwd=decrypt_passwd)
+        self.check_user_mfa(code, mfa_type, user=user)
 
     def check_user_mfa_if_need(self, user):
         if self.request.session.get('auth_mfa'):
@@ -431,6 +325,82 @@ class AuthMixin(PasswordEncryptionViewMixin):
             ip=ip, mfa_type=mfa_type,
         )
 
+    @staticmethod
+    def get_user_mfa_methods(user=None):
+        otp_enabled = user.otp_secret_key if user else True
+        # 没有用户时，或者有用户并且有电话配置
+        sms_enabled = any([user and user.phone, not user]) \
+            and settings.SMS_ENABLED \
+            and settings.XPACK_ENABLED
+
+        methods = [
+            {
+                'name': 'otp',
+                'label': 'MFA',
+                'enable': otp_enabled,
+                'selected': False,
+            },
+            {
+                'name': 'sms',
+                'label': _('SMS'),
+                'enable': sms_enabled,
+                'selected': False,
+            },
+        ]
+
+        for item in methods:
+            if item['enable']:
+                item['selected'] = True
+                break
+        return methods
+
+    def mfa_check(self):
+        pass
+
+
+class AuthPostCheckMixin:
+    @classmethod
+    def generate_reset_password_url_with_flash_msg(cls, user, message):
+        reset_passwd_url = reverse('authentication:reset-password')
+        query_str = urlencode({
+            'token': user.generate_reset_token()
+        })
+        reset_passwd_url = f'{reset_passwd_url}?{query_str}'
+
+        message_data = {
+            'title': _('Please change your password'),
+            'message': message,
+            'interval': 3,
+            'redirect_url': reset_passwd_url,
+        }
+        return FlashMessageUtil.gen_message_url(message_data)
+
+    @classmethod
+    def _check_passwd_is_too_simple(cls, user: User, password):
+        if user.is_superuser and password == 'admin':
+            message = _('Your password is too simple, please change it for security')
+            url = cls.generate_reset_password_url_with_flash_msg(user, message=message)
+            raise errors.PasswdTooSimple(url)
+
+    @classmethod
+    def _check_passwd_need_update(cls, user: User):
+        if user.need_update_password:
+            message = _('You should to change your password before login')
+            url = cls.generate_reset_password_url_with_flash_msg(user, message)
+            raise errors.PasswdNeedUpdate(url)
+
+    @classmethod
+    def _check_password_require_reset_or_not(cls, user: User):
+        if user.password_has_expired:
+            message = _('Your password has expired, please reset before logging in')
+            url = cls.generate_reset_password_url_with_flash_msg(user, message)
+            raise errors.PasswordRequireResetError(url)
+
+
+class AuthConfirmMixin:
+    request: Request
+    get_request_ip: Callable
+
     def get_ticket(self):
         from tickets.models import Ticket
         ticket_id = self.request.session.get("auth_ticket_id")
@@ -480,6 +450,92 @@ class AuthMixin(PasswordEncryptionViewMixin):
         self.get_ticket_or_create(confirm_setting)
         self.check_user_login_confirm()
 
+
+class AuthMixin(CommonMixin, AuthPreCheckMixin, MFAMixin):
+    request = None
+    partial_credential_error = None
+
+    key_prefix_captcha = "_LOGIN_INVALID_{}"
+
+    def _check_auth_user_is_valid(self, username, password, public_key):
+        user = authenticate(self.request, username=username, password=password, public_key=public_key)
+        if not user:
+            self.raise_credential_error(errors.reason_password_failed)
+        elif user.is_expired:
+            self.raise_credential_error(errors.reason_user_expired)
+        elif not user.is_active:
+            self.raise_credential_error(errors.reason_user_inactive)
+        return user
+
+    def set_login_failed_mark(self):
+        ip = self.get_request_ip()
+        cache.set(self.key_prefix_captcha.format(ip), 1, 3600)
+
+    def set_passwd_verify_on_session(self, user: User):
+        self.request.session['user_id'] = str(user.id)
+        self.request.session['auth_password'] = 1
+        self.request.session['auth_password_expired_at'] = time.time() + settings.AUTH_EXPIRED_SECONDS
+
+    def check_is_need_captcha(self):
+        # 最近有登录失败时需要填写验证码
+        ip = get_request_ip(self.request)
+        need = cache.get(self.key_prefix_captcha.format(ip))
+        return need
+
+    def check_user_auth(self, decrypt_passwd=False):
+        self.check_is_block()
+        username, password, public_key, ip, auto_login = self.get_auth_data(decrypt_passwd)
+
+        self._check_only_allow_exists_user_auth(username)
+        user = self._check_auth_user_is_valid(username, password, public_key)
+        # 校验login-acl规则
+        self._check_login_acl(user, ip)
+        self._check_password_require_reset_or_not(user)
+        self._check_passwd_is_too_simple(user, password)
+        self._check_passwd_need_update(user)
+
+        # 校验login-mfa, 如果登录页面上显示 mfa 的话
+        self._check_login_mfa_login_if_need(user)
+
+        LoginBlockUtil(username, ip).clean_failed_count()
+        request = self.request
+        request.session['auth_password'] = 1
+        request.session['user_id'] = str(user.id)
+        request.session['auto_login'] = auto_login
+        request.session['auth_backend'] = getattr(user, 'backend', settings.AUTH_BACKEND_MODEL)
+        return user
+
+    def check_oauth2_auth(self, user: User, auth_backend):
+        ip = self.get_request_ip()
+        request = self.request
+
+        self._set_partial_credential_error(user.username, ip, request)
+
+        if user.is_expired:
+            self.raise_credential_error(errors.reason_user_expired)
+        elif not user.is_active:
+            self.raise_credential_error(errors.reason_user_inactive)
+
+        self._check_is_block(user.username)
+        self._check_login_acl(user, ip)
+
+        LoginBlockUtil(user.username, ip).clean_failed_count()
+        MFABlockUtils(user.username, ip).clean_failed_count()
+
+        request.session['auth_password'] = 1
+        request.session['user_id'] = str(user.id)
+        request.session['auth_backend'] = auth_backend
+        return user
+
+    def check_user_auth_if_need(self, decrypt_passwd=False):
+        request = self.request
+        if request.session.get('auth_password') and \
+                request.session.get('user_id'):
+            user = self.get_user_from_session()
+            if user:
+                return user
+        return self.check_user_auth(decrypt_passwd=decrypt_passwd)
+
     def clear_auth_mark(self):
         self.request.session['auth_password'] = ''
         self.request.session['auth_user_id'] = ''
@@ -503,31 +559,3 @@ class AuthMixin(PasswordEncryptionViewMixin):
         if args:
             guard_url = "%s?%s" % (guard_url, args)
         return redirect(guard_url)
-
-    @staticmethod
-    def get_user_mfa_methods(user=None):
-        otp_enabled = user.otp_secret_key if user else True
-        # 没有用户时，或者有用户并且有电话配置
-        sms_enabled = any([user and user.phone, not user]) \
-            and settings.SMS_ENABLED and settings.XPACK_ENABLED
-
-        methods = [
-            {
-                'name': 'otp',
-                'label': 'MFA',
-                'enable': otp_enabled,
-                'selected': False,
-            },
-            {
-                'name': 'sms',
-                'label': _('SMS'),
-                'enable': sms_enabled,
-                'selected': False,
-            },
-        ]
-
-        for item in methods:
-            if item['enable']:
-                item['selected'] = True
-                break
-        return methods

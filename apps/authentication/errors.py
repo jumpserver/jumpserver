@@ -383,8 +383,10 @@ class OTPBindRequiredError(JMSException):
 class OTPCodeRequiredError(AuthFailedError):
     msg = _("Please enter MFA code")
 
+
 class SMSCodeRequiredError(AuthFailedError):
     msg = _("Please enter SMS code")
+
 
 class UserPhoneNotSet(AuthFailedError):
     msg = _('Phone not set')
