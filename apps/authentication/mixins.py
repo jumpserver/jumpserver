@@ -483,13 +483,17 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, MFAMixin):
         return need
 
     def check_user_auth(self, decrypt_passwd=False):
+        # pre check
         self.check_is_block()
         username, password, public_key, ip, auto_login = self.get_auth_data(decrypt_passwd)
-
         self._check_only_allow_exists_user_auth(username)
+
+        # check auth
         user = self._check_auth_user_is_valid(username, password, public_key)
         # 校验login-acl规则
         self._check_login_acl(user, ip)
+
+        # post check
         self._check_password_require_reset_or_not(user)
         self._check_passwd_is_too_simple(user, password)
         self._check_passwd_need_update(user)
@@ -497,13 +501,16 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, MFAMixin):
         # 校验login-mfa, 如果登录页面上显示 mfa 的话
         self._check_login_mfa_login_if_need(user)
 
-        LoginBlockUtil(username, ip).clean_failed_count()
+        self.set_auth_mark(user=user, auto_login=auto_login, ip=ip)
+        return user
+
+    def set_auth_mark(self, user, auto_login, ip):
+        LoginBlockUtil(user.username, ip).clean_failed_count()
         request = self.request
         request.session['auth_password'] = 1
         request.session['user_id'] = str(user.id)
         request.session['auto_login'] = auto_login
         request.session['auth_backend'] = getattr(user, 'backend', settings.AUTH_BACKEND_MODEL)
-        return user
 
     def check_oauth2_auth(self, user: User, auth_backend):
         ip = self.get_request_ip()
