@@ -140,3 +140,5 @@ def on_system_user_update(instance: SystemUser, created, **kwargs):
         logger.info("System user update signal recv: {}".format(instance))
         assets = instance.assets.all().valid()
         push_system_user_to_assets.delay(instance.id, [_asset.id for _asset in assets])
+        # add assets to su_from
+        instance.add_related_assets_to_su_from_if_need(assets)

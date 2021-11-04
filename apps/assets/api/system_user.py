@@ -8,6 +8,7 @@ from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
 from common.mixins.api import SuggestionMixin
 from orgs.utils import tmp_to_root_org
+from rest_framework.decorators import action
 from ..models import SystemUser, Asset
 from .. import serializers
 from ..serializers import SystemUserWithAuthInfoSerializer, SystemUserTempAuthSerializer
@@ -44,6 +45,19 @@ class SystemUserViewSet(SuggestionMixin, OrgBulkModelViewSet):
     ordering_fields = ('name', 'protocol', 'login_mode')
     ordering = ('name', )
     permission_classes = (IsOrgAdminOrAppUser,)
+
+    @action(methods=['get'], detail=False, url_path='su-from')
+    def su_from(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        queryset = queryset.filter(
+            protocol=SystemUser.Protocol.ssh, login_mode=SystemUser.LOGIN_AUTO
+        )
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class SystemUserAuthInfoApi(generics.RetrieveUpdateDestroyAPIView):
