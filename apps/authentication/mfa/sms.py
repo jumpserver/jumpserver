@@ -5,6 +5,9 @@ from .base import BaseMFA
 from common.sdk.sms import SendAndVerifySMSUtil
 
 
+sms_failed_msg = _("SMS verify code invalid")
+
+
 class MFASms(BaseMFA):
     name = 'sms'
     display_name = _("SMS")
@@ -14,7 +17,9 @@ class MFASms(BaseMFA):
         self.sms = SendAndVerifySMSUtil(user.phone)
 
     def check_code(self, code):
-        return self.sms.verify(code)
+        ok = self.sms.verify(code)
+        msg = '' if ok else sms_failed_msg
+        return ok, msg
 
     def has_set(self):
         return self.user.phone
@@ -26,5 +31,6 @@ class MFASms(BaseMFA):
     def send_challenge(self):
         self.sms.gen_and_send()
 
-    def enabled(self):
+    @staticmethod
+    def enabled():
         return settings.SMS_ENABLED

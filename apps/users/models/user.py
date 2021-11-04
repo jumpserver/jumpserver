@@ -12,30 +12,21 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.hashers import check_password
 from django.core.cache import cache
 from django.db import models
-
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.shortcuts import reverse
 
 from orgs.utils import current_org
 from orgs.models import OrganizationMember, Organization
-from common.exceptions import JMSException
 from common.utils import date_expired_default, get_logger, lazyproperty, random_string
 from common import fields
 from common.const import choices
 from common.db.models import TextChoices
-from users.exceptions import MFANotEnabled, PhoneNotSet
 from ..signals import post_user_change_password
 
-__all__ = ['User', 'UserPasswordHistory', 'MFAType']
+__all__ = ['User', 'UserPasswordHistory']
 
 logger = get_logger(__file__)
-
-
-class MFAType(TextChoices):
-    OTP = 'otp', _('One-time password')
-    OTP_RADIUS = 'otp_radius', _("OTP Radius")
-    SMS_CODE = 'sms', _('SMS verify code')
 
 
 class AuthMixin:
@@ -497,9 +488,28 @@ class MFAMixin:
     def disable_mfa(self):
         self.mfa_level = 0
 
-    def get_support_mfa_backends(self):
-        from authentication.mfa import get_supported_mfa_backends
-        return get_supported_mfa_backends(self)
+    def mfa_no_available(self):
+        backends = self.supported_mfa_backends
+        backends_set = [backend for backend in backends if backend.has_set]
+        return len(backends_set) == 0
+
+    @lazyproperty
+    def supported_mfa_backends(self):
+        backends = self.__class__.get_enabled_mfa_backends()
+        backends_instance = [cls(self) for cls in backends]
+        backends_set = [backend.__class__ for backend in backends_instance if backend.has_set()]
+        return backends_set
+
+    @property
+    def supported_mfa_backends_mapper(self):
+        return {b.name: b for b in self.supported_mfa_backends}
+
+    @classmethod
+    def get_enabled_mfa_backends(cls):
+        from authentication.mfa import MFA_BACKENDS
+        backends = [cls for cls in MFA_BACKENDS if cls.enabled()]
+        backends_enabled = [backend for backend in backends if backend.enabled()]
+        return backends_enabled
 
     def reset_mfa(self):
         pass

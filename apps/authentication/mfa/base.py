@@ -23,14 +23,14 @@ class BaseMFA(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def check_code(self, code):
-        raise False
+    def check_code(self, code) -> tuple:
+        return False, 'Error msg'
 
     @abc.abstractmethod
     def has_set(self):
         return False
 
-    @property
+    @staticmethod
     @abc.abstractmethod
-    def enabled(self):
+    def enabled():
         return False

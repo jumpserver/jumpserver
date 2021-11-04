@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-import builtins
 import time
 
 from django.utils.translation import ugettext as _
@@ -12,25 +11,37 @@ from rest_framework.serializers import ValidationError
 from rest_framework.response import Response
 
 from common.permissions import IsValidUser, NeedMFAVerify
-from users.models.user import MFAType, User
+from users.models.user import User
 from ..serializers import OtpVerifySerializer
 from .. import serializers
 from .. import errors
+from ..mfa.otp import MFAOtp
 from ..mixins import AuthMixin
 
 
-__all__ = ['MFAChallengeApi', 'UserOtpVerifyApi', 'SendSMSVerifyCodeApi', 'MFASelectTypeApi']
+__all__ = [
+    'MFAChallengeApi', 'UserOtpVerifyApi', 'SendSMSVerifyCodeApi',
+    'MFASendChallengeApi'
+]
 
 
-class MFASelectTypeApi(AuthMixin, CreateAPIView):
+class MFASendChallengeApi(AuthMixin, CreateAPIView):
+    """
+    选择 MFA 后对应操作 api，koko 目前在用
+    """
     permission_classes = (AllowAny,)
     serializer_class = serializers.MFASelectTypeSerializer
 
     def perform_create(self, serializer):
         mfa_type = serializer.validated_data['type']
-        if mfa_type == MFAType.SMS_CODE:
-            user = self.get_user_from_session()
-            user.send_sms_code()
+        user = self.get_user_from_session()
+        mfa_mapper = user.supported_mfa_backends_mapper
+        backend_cls = mfa_mapper.get(mfa_type)
+
+        if not backend_cls or backend_cls.challenge_required:
+            return
+        backend = backend_cls(user)
+        backend.send_challenge()
 
 
 class MFAChallengeApi(AuthMixin, CreateAPIView):
@@ -38,28 +49,20 @@ class MFAChallengeApi(AuthMixin, CreateAPIView):
     serializer_class = serializers.MFAChallengeSerializer
 
     def perform_create(self, serializer):
-        try:
-            user = self.get_user_from_session()
-            code = serializer.validated_data.get('code')
-            mfa_type = serializer.validated_data.get('type', MFAType.OTP)
+        user = self.get_user_from_session()
+        code = serializer.validated_data.get('code')
+        mfa_type = serializer.validated_data.get('type', '')
+        self.check_user_mfa(code, mfa_type, user)
 
-            valid = user.check_mfa(code, mfa_type=mfa_type)
-            if not valid:
-                self.request.session['auth_mfa'] = ''
-                raise errors.MFAFailedError(
-                    username=user.username, request=self.request, ip=self.get_request_ip()
-                )
-            else:
-                self.request.session['auth_mfa'] = '1'
+    def create(self, request, *args, **kwargs):
+        try:
+            super().create(request, *args, **kwargs)
+            return Response({'msg': 'ok'})
         except errors.AuthFailedError as e:
             data = {"error": e.error, "msg": e.msg}
             raise ValidationError(data)
         except errors.NeedMoreInfoError as e:
             return Response(e.as_data(), status=200)
-
-    def create(self, request, *args, **kwargs):
-        super().create(request, *args, **kwargs)
-        return Response({'msg': 'ok'})
 
 
 class UserOtpVerifyApi(CreateAPIView):
@@ -73,8 +76,9 @@ class UserOtpVerifyApi(CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         code = serializer.validated_data["code"]
+        otp = MFAOtp(request.user)
 
-        if request.user.check_mfa(code):
+        if otp.check_code(code):
             request.session["MFA_VERIFY_TIME"] = int(time.time())
             return Response({"ok": "1"})
         else:

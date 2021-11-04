@@ -1,5 +1,7 @@
 {% load i18n %}
-<select id="verify-method-select" name="mfa_type" class="form-control select-con" onchange="selectChange(this.value)">
+<select id="verify-method-select" name="mfa_type" class="form-control select-con"
+        onchange="selectChange(this.value)"
+>
     {% for method in methods %}
         <option value="{{ method.name }}"
                 {% if method.selected %} selected {% endif %}
@@ -11,12 +13,17 @@
 </select>
 <div class="mfa-div">
     <input id="mfa-code" type="text" class="form-control input-style" required name="code"
-           placeholder="{% trans 'Please enter verification code' %}">
-    <button id='send-sms-verify-code' type="button" class="btn btn-primary full-width" onclick="sendSMSVerifyCode()"
-            style="margin-left: 10px!important;height: 100%">{% trans 'Send verification code' %}</button>
+           placeholder="{% trans 'Please enter verification code' %}"
+    >
+    <button id='send-sms-verify-code' class="btn btn-primary full-width"
+            style="margin-left: 0 !important; width: 100%"
+            type='button' onclick="sendSMSVerifyCode()"
+    >
+        {% trans 'Send verification code' %}
+    </button>
 </div>
 
-<style type="text/css">
+<style>
     .input-style {
         width: calc(100% - 114px);
         display: inline-block;
@@ -26,6 +33,7 @@
         width: 110px !important;
         height: 100%;
         vertical-align: top;
+
     }
 </style>
 <script>
@@ -60,14 +68,14 @@
                 currentBtn.innerHTML = `{% trans 'Wait: ' %} ${time}`;
                 currentBtn.disabled = true
                 currentBtn.classList.add("disabledBtn")
-                var TimeInterval = setInterval(() => {
+                var interval = setInterval(function () {
                     --time
                     currentBtn.innerHTML = `{% trans 'Wait: ' %} ${time}`;
                     if (time === 0) {
                         currentBtn.innerHTML = "{% trans 'Send verification code' %}"
                         currentBtn.disabled = false
                         currentBtn.classList.remove("disabledBtn")
-                        clearInterval(TimeInterval)
+                        clearInterval(interval)
                     }
                 }, 1000)
                 alert("{% trans 'The verification code has been sent' %}");

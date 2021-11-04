@@ -4,6 +4,8 @@ from django.conf import settings
 from .base import BaseMFA
 from ..backends.radius import RadiusBackend
 
+mfa_failed_msg = _("Radius verify code invalid")
+
 
 class MFARadius(BaseMFA):
     name = 'otp_radius'
@@ -15,11 +17,14 @@ class MFARadius(BaseMFA):
         user = backend.authenticate(
             None, username=username, password=code
         )
-        return user is not None
+        ok = user is not None
+        msg = '' if ok else mfa_failed_msg
+        return ok, msg
 
     def has_set(self):
         return True
 
-    def enabled(self):
+    @staticmethod
+    def enabled():
         return settings.OTP_IN_RADIUS
 

@@ -15,7 +15,7 @@ __all__ = ['UserLoginOtpView']
 
 
 class UserLoginOtpView(mixins.AuthMixin, FormView):
-    template_name = 'authentication/login_otp.html'
+    template_name = 'authentication/login_mfa.html'
     form_class = forms.UserCheckOtpCodeForm
     redirect_field_name = 'next'
 
