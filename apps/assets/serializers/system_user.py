@@ -58,7 +58,8 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'login_mode_display': {'label': _('Login mode display')},
             'created_by': {'read_only': True},
             'ad_domain': {'required': False, 'allow_blank': True, 'label': _('Ad domain')},
-            'is_asset_protocol': {'label': _('Is asset protocol')}
+            'is_asset_protocol': {'label': _('Is asset protocol')},
+            'su_from': {'help_text': _('Only ssh and automatic login system users are supported')}
         }
 
     def validate_auto_push(self, value):

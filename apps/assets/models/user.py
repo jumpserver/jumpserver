@@ -210,7 +210,7 @@ class SystemUser(ProtocolMixin, AuthMixin, BaseUser):
     ad_domain = models.CharField(default='', max_length=256)
     # linux su 命令 (switch user)
     su_enabled = models.BooleanField(default=False, verbose_name=_('Enable switch user'))
-    su_from = models.ForeignKey('self', on_delete=models.SET_NULL, related_name='system_users', null=True, verbose_name=_("Switch from"))
+    su_from = models.ForeignKey('self', on_delete=models.SET_NULL, related_name='su_to', null=True, verbose_name=_("Switch from"))
 
     def __str__(self):
         username = self.username
