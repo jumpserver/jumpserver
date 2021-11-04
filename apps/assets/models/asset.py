@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 
 import uuid
 import logging
@@ -260,6 +260,10 @@ class Asset(AbsConnectivity, ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
         """
         return self.admin_user.username
 
+    @lazyproperty
+    def admin_user_password(self):
+        return self.admin_user.password
+
     def is_windows(self):
         return self.platform.is_windows()
 
@@ -351,6 +355,10 @@ class Asset(AbsConnectivity, ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
             .values_list('systemuser_id', flat=True)
         system_users = SystemUser.objects.filter(id__in=system_user_ids)
         return system_users
+
+    @property
+    def exist_custom_command(self):
+        return bool(self.platform.meta.get('custom_auth_commands'))
 
     class Meta:
         unique_together = [('org_id', 'hostname')]

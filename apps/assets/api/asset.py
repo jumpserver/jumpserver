@@ -21,7 +21,8 @@ from ..models import Asset, Node, Platform
 from .. import serializers
 from ..tasks import (
     update_assets_hardware_info_manual, test_assets_connectivity_manual,
-    test_system_users_connectivity_a_asset, push_system_users_a_asset
+    test_system_users_connectivity_a_asset, push_system_users_a_asset,
+    test_assets_connectivity_manual
 )
 from ..filters import FilterAssetByNodeFilterBackend, LabelFilterBackend, IpInFilterBackend
 
@@ -86,11 +87,15 @@ class AssetPlatformRetrieveApi(RetrieveAPIView):
 
 
 class AssetPlatformViewSet(ModelViewSet):
-    queryset = Platform.objects.all()
     permission_classes = (IsSuperUser,)
     serializer_class = serializers.PlatformSerializer
     filterset_fields = ['name', 'base']
     search_fields = ['name']
+
+    def get_queryset(self):
+        if self.request.query_params.get('type') == 'custom':
+            return Platform.objects.filter(internal=False)
+        return Platform.objects.all()
 
     def get_permissions(self):
         if self.request.method.lower() in ['get', 'options']:

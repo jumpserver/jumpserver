@@ -8,13 +8,18 @@ from common.utils import get_logger
 from orgs.utils import org_aware_func
 from ..models import Asset, Connectivity, AuthBook
 from . import const
-from .utils import clean_ansible_task_hosts, group_asset_by_platform
+from .utils import (
+    clean_ansible_task_hosts, group_asset_by_platform,
+    CustomSSHClient, group_asset_by_auth_type, color_string
+)
 
 
 logger = get_logger(__file__)
 __all__ = [
-    'test_asset_connectivity_util', 'test_asset_connectivity_manual',
+    'test_asset_connectivity_by_ansible', 'test_asset_connectivity_manual_by_ansible',
     'test_node_assets_connectivity_manual', 'test_assets_connectivity_manual',
+    'test_asset_connectivity_by_ssh', 'test_asset_connectivity_manual_by_ssh',
+    'test_assets_connectivity_manual'
 ]
 
 
@@ -42,7 +47,7 @@ def set_assets_accounts_connectivity(assets, results_summary):
 
 @shared_task(queue="ansible")
 @org_aware_func("assets")
-def test_asset_connectivity_util(assets, task_name=None):
+def test_asset_connectivity_by_ansible(assets, task_name=None):
     from ops.utils import update_or_create_ansible_task
 
     if task_name is None:
@@ -87,9 +92,9 @@ def test_asset_connectivity_util(assets, task_name=None):
 
 
 @shared_task(queue="ansible")
-def test_asset_connectivity_manual(asset):
+def test_asset_connectivity_manual_by_ansible(asset):
     task_name = _("Test assets connectivity: {}").format(asset)
-    summary = test_asset_connectivity_util([asset], task_name=task_name)
+    summary = test_asset_connectivity_by_ansible([asset], task_name=task_name)
 
     if summary.get('dark'):
         return False, summary['dark']
@@ -100,7 +105,7 @@ def test_asset_connectivity_manual(asset):
 @shared_task(queue="ansible")
 def test_assets_connectivity_manual(assets):
     task_name = _("Test assets connectivity: {}").format([asset.hostname for asset in assets])
-    summary = test_asset_connectivity_util(assets, task_name=task_name)
+    summary = test_asset_connectivity_by_ansible(assets, task_name=task_name)
 
     if summary.get('dark'):
         return False, summary['dark']
@@ -110,8 +115,85 @@ def test_assets_connectivity_manual(assets):
 
 @shared_task(queue="ansible")
 def test_node_assets_connectivity_manual(node):
-    task_name = _("Test if the assets under the node are connectable: {}".format(node.name))
     assets = node.get_all_assets()
-    result = test_asset_connectivity_util(assets, task_name=task_name)
-    return result
+    custom_assets, ansible_assets = group_asset_by_auth_type(assets)
 
+    task_name = '开始测试节点 {} 下自定义平台资产列表的可连接性'.format(node.name)
+    results_summary = test_asset_connectivity_by_ssh(custom_assets, task_name=task_name)
+    logger.info('Connectable: {}\nDark: {}'.format(
+        color_string(results_summary['contacted'], 'green'),
+        color_string(results_summary['dark'], 'red')
+    ))
+
+    if ansible_assets:
+        task_name = _("Test if the assets under the node are connectable: {}".format(node.name))
+        test_asset_connectivity_by_ansible(ansible_assets, task_name=task_name)
+
+
+@shared_task
+@org_aware_func("assets")
+def test_asset_connectivity_by_ssh(assets, task_name=None):
+    results_summary = dict(
+        contacted=defaultdict(dict), dark=defaultdict(dict), success=True
+    )
+
+    if not assets:
+        logger.info('没有匹配到自定义平台的资产')
+        return results_summary
+
+    if task_name is None:
+        task_name = _("Test assets connectivity")
+    logger.info(task_name)
+
+    for asset in assets:
+        contacted, dark = {}, {}
+        connect_params = {
+            'hostname': asset.ip,
+            'port': asset.port,
+            'username': asset.admin_user_username,
+            'password': asset.admin_user_password,
+            'allow_agent': False,
+            'look_for_keys': False
+        }
+        ssh_client = CustomSSHClient()
+        dark_msg = ssh_client.connect(**connect_params)
+        ssh_client.close()
+        if dark_msg:
+            dark = {asset.hostname: dark_msg}
+            success = False
+        else:
+            contacted = {asset.hostname: _('Connectable')}
+            success = True
+
+        results_summary['success'] &= success
+        results_summary['contacted'].update(contacted)
+        results_summary['dark'].update(dark)
+
+    set_assets_accounts_connectivity(assets, results_summary)
+    return results_summary
+
+
+@shared_task
+def test_asset_connectivity_manual_by_ssh(asset):
+    summary = test_asset_connectivity_by_ssh([asset])
+
+    if summary.get('dark'):
+        return False, summary['dark']
+    else:
+        return True, ""
+
+
+@shared_task(queue='ansible')
+def test_assets_connectivity_manual(assets):
+    custom_assets, ansible_assets = group_asset_by_auth_type(assets)
+
+    if custom_assets:
+        task_name = _("Test assets connectivity: {}").format([asset.hostname for asset in custom_assets])
+        results_summary = test_asset_connectivity_by_ssh(custom_assets, task_name=task_name)
+        logger.info('Connectable: {}\nDark: {}'.format(
+            color_string(results_summary['contacted'], 'green'),
+            color_string(results_summary['dark'], 'red')
+        ))
+    if ansible_assets:
+        task_name = _("Test assets connectivity: {}").format([asset.hostname for asset in ansible_assets])
+        test_asset_connectivity_by_ansible(ansible_assets, task_name=task_name)

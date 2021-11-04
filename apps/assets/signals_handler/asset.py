@@ -11,7 +11,7 @@ from common.decorator import on_transaction_commit
 from assets.models import Asset, SystemUser, Node
 from assets.tasks import (
     update_assets_hardware_info_util,
-    test_asset_connectivity_util,
+    test_asset_connectivity_by_ansible,
     push_system_user_to_assets,
 )
 
@@ -25,7 +25,7 @@ def update_asset_hardware_info_on_created(asset):
 
 def test_asset_conn_on_created(asset):
     logger.debug("Test asset `{}` connectivity".format(asset))
-    test_asset_connectivity_util.delay([asset])
+    test_asset_connectivity_by_ansible.delay([asset])
 
 
 @receiver(pre_save, sender=Node)
