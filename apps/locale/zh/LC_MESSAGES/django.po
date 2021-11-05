@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-03 11:14+0800\n"
+"POT-Creation-Date: 2021-11-05 11:41+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -129,7 +129,7 @@ msgstr "系统用户"
 #: acls/models/login_asset_acl.py:22
 #: applications/serializers/attrs/application_category/remote_app.py:37
 #: assets/models/asset.py:357 assets/models/authbook.py:18
-#: assets/models/gathered_user.py:14 assets/serializers/system_user.py:233
+#: assets/models/gathered_user.py:14 assets/serializers/system_user.py:258
 #: audits/models.py:38 perms/models/asset_permission.py:99
 #: templates/index.html:82 terminal/backends/command/models.py:19
 #: terminal/backends/command/serializers.py:13 terminal/models/session.py:40
@@ -262,7 +262,7 @@ msgid "Custom"
 msgstr "自定义"
 
 #: applications/models/account.py:11 assets/models/authbook.py:19
-#: assets/models/user.py:273 audits/models.py:39
+#: assets/models/user.py:291 audits/models.py:39
 #: perms/models/application_permission.py:32
 #: perms/models/asset_permission.py:101 templates/_nav.html:45
 #: terminal/backends/command/models.py:20
@@ -379,6 +379,7 @@ msgid "Application path"
 msgstr "应用路径"
 
 #: applications/serializers/attrs/application_category/remote_app.py:45
+#: assets/serializers/system_user.py:157
 #: xpack/plugins/change_auth_plan/serializers/asset.py:65
 #: xpack/plugins/change_auth_plan/serializers/asset.py:68
 #: xpack/plugins/change_auth_plan/serializers/asset.py:71
@@ -476,7 +477,7 @@ msgid "Is active"
 msgstr "激活"
 
 #: assets/models/asset.py:193 assets/models/cluster.py:19
-#: assets/models/user.py:187 assets/models/user.py:322 templates/_nav.html:44
+#: assets/models/user.py:187 assets/models/user.py:340 templates/_nav.html:44
 msgid "Admin user"
 msgstr "特权用户"
 
@@ -763,7 +764,7 @@ msgstr "全称"
 msgid "Parent key"
 msgstr "ssh私钥"
 
-#: assets/models/node.py:559 assets/serializers/system_user.py:232
+#: assets/models/node.py:559 assets/serializers/system_user.py:257
 #: users/templates/users/user_asset_permission.html:41
 #: users/templates/users/user_asset_permission.html:73
 #: users/templates/users/user_asset_permission.html:158
@@ -835,6 +836,14 @@ msgstr "家目录"
 msgid "System groups"
 msgstr "用户组"
 
+#: assets/models/user.py:212
+msgid "Switch user"
+msgstr "切换用户"
+
+#: assets/models/user.py:213
+msgid "Switch from"
+msgstr "切换自"
+
 #: assets/models/utils.py:35
 #, python-format
 msgid "%(value)s is not an even number"
@@ -864,7 +873,7 @@ msgstr "节点名称"
 msgid "Hardware info"
 msgstr "硬件信息"
 
-#: assets/serializers/asset.py:104 assets/serializers/system_user.py:251
+#: assets/serializers/asset.py:104 assets/serializers/system_user.py:276
 #: orgs/mixins/serializers.py:26
 msgid "Org name"
 msgstr "组织名称"
@@ -878,7 +887,7 @@ msgid "private key invalid"
 msgstr "密钥不合法"
 
 #: assets/serializers/domain.py:13 assets/serializers/label.py:12
-#: assets/serializers/system_user.py:56
+#: assets/serializers/system_user.py:57
 #: perms/serializers/asset/permission.py:72
 msgid "Assets amount"
 msgstr "资产数量"
@@ -912,48 +921,64 @@ msgstr "密钥指纹"
 msgid "Apps amount"
 msgstr "应用数量"
 
-#: assets/serializers/system_user.py:55
+#: assets/serializers/system_user.py:56
 #: perms/serializers/asset/permission.py:73
 msgid "Nodes amount"
 msgstr "节点数量"
 
-#: assets/serializers/system_user.py:57 assets/serializers/system_user.py:234
+#: assets/serializers/system_user.py:58 assets/serializers/system_user.py:259
 msgid "Login mode display"
 msgstr "认证方式名称"
 
-#: assets/serializers/system_user.py:59
+#: assets/serializers/system_user.py:60
 msgid "Ad domain"
 msgstr "Ad 网域"
 
-#: assets/serializers/system_user.py:60
+#: assets/serializers/system_user.py:61
 msgid "Is asset protocol"
 msgstr "资产协议"
 
-#: assets/serializers/system_user.py:100
+#: assets/serializers/system_user.py:62
+msgid "Only ssh and automatic login system users are supported"
+msgstr "仅支持ssh协议和自动登录的系统用户"
+
+#: assets/serializers/system_user.py:102
 msgid "Username same with user with protocol {} only allow 1"
 msgstr "用户名和用户相同的一种协议只允许存在一个"
 
-#: assets/serializers/system_user.py:110 common/validators.py:14
+#: assets/serializers/system_user.py:112 common/validators.py:14
 msgid "Special char not allowed"
 msgstr "不能包含特殊字符"
 
-#: assets/serializers/system_user.py:119
+#: assets/serializers/system_user.py:121
 msgid "* Automatic login mode must fill in the username."
 msgstr "自动登录模式，必须填写用户名"
 
-#: assets/serializers/system_user.py:134
+#: assets/serializers/system_user.py:136
 msgid "Path should starts with /"
 msgstr "路径应该以 / 开头"
 
-#: assets/serializers/system_user.py:146
+#: assets/serializers/system_user.py:148
 msgid "Password or private key required"
 msgstr "密码或密钥密码需要一个"
 
-#: assets/serializers/system_user.py:250
+#: assets/serializers/system_user.py:162
+msgid "Only ssh protocol system users are allowed"
+msgstr "仅允许ssh协议的系统用户"
+
+#: assets/serializers/system_user.py:166
+msgid "The protocol must be consistent with the current user: {}"
+msgstr "协议必须和当前用户保持一致: {}"
+
+#: assets/serializers/system_user.py:170
+msgid "Only system users with automatic login are allowed"
+msgstr "仅允许自动登录的系统用户"
+
+#: assets/serializers/system_user.py:275
 msgid "System user name"
 msgstr "系统用户名称"
 
-#: assets/serializers/system_user.py:260
+#: assets/serializers/system_user.py:285
 msgid "Asset hostname"
 msgstr "资产主机名"
 
@@ -3149,7 +3174,8 @@ msgstr "邮件的内容"
 msgid ""
 "Tips: When creating a user, send the content of the email, support "
 "{username} {name} {email} label"
-msgstr "提示: 创建用户时，发送设置密码邮件的内容, 支持 {username} {name} {email} 标签"
+msgstr ""
+"提示: 创建用户时，发送设置密码邮件的内容, 支持 {username} {name} {email} 标签"
 
 #: settings/serializers/email.py:64
 msgid "Tips: Email signature (eg:jumpserver)"
@@ -5404,8 +5430,8 @@ msgstr "* 新密码不能是最近 {} 次的密码"
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
-#: xpack/plugins/change_auth_plan/api/app.py:113
-#: xpack/plugins/change_auth_plan/api/asset.py:100
+#: xpack/plugins/change_auth_plan/api/app.py:114
+#: xpack/plugins/change_auth_plan/api/asset.py:101
 msgid "The parameter 'action' must be [{}]"
 msgstr "参数 'action' 必须是 [{}]"
 
@@ -5536,15 +5562,15 @@ msgstr "* 请输入正确的密码长度"
 msgid "* Password length range 6-30 bits"
 msgstr "* 密码长度范围 6-30 位"
 
-#: xpack/plugins/change_auth_plan/task_handlers/base/handler.py:248
+#: xpack/plugins/change_auth_plan/task_handlers/base/handler.py:249
 msgid "Invalid/incorrect password"
 msgstr "无效/错误 密码"
 
-#: xpack/plugins/change_auth_plan/task_handlers/base/handler.py:250
+#: xpack/plugins/change_auth_plan/task_handlers/base/handler.py:251
 msgid "Failed to connect to the host"
 msgstr "连接主机失败"
 
-#: xpack/plugins/change_auth_plan/task_handlers/base/handler.py:252
+#: xpack/plugins/change_auth_plan/task_handlers/base/handler.py:253
 msgid "Data could not be sent to remote"
 msgstr "无法将数据发送到远程"
 
@@ -5902,7 +5928,7 @@ msgstr "执行次数"
 msgid "Instance count"
 msgstr "实例个数"
 
-#: xpack/plugins/cloud/utils.py:65
+#: xpack/plugins/cloud/utils.py:68
 msgid "Account unavailable"
 msgstr "账户无效"
 
