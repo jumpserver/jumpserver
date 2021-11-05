@@ -14,11 +14,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='systemuser',
             name='su_enabled',
-            field=models.BooleanField(default=False, verbose_name='Enable switch user'),
+            field=models.BooleanField(default=False, verbose_name='Switch user'),
         ),
         migrations.AddField(
             model_name='systemuser',
             name='su_from',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='system_users', to='assets.systemuser', verbose_name='Switch from'),
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='su_to', to='assets.systemuser', verbose_name='Switch from'),
         ),
     ]

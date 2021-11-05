@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-04 17:09+0800\n"
+"POT-Creation-Date: 2021-11-05 11:41+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -129,7 +129,7 @@ msgstr "系统用户"
 #: acls/models/login_asset_acl.py:22
 #: applications/serializers/attrs/application_category/remote_app.py:37
 #: assets/models/asset.py:357 assets/models/authbook.py:18
-#: assets/models/gathered_user.py:14 assets/serializers/system_user.py:255
+#: assets/models/gathered_user.py:14 assets/serializers/system_user.py:258
 #: audits/models.py:38 perms/models/asset_permission.py:99
 #: templates/index.html:82 terminal/backends/command/models.py:19
 #: terminal/backends/command/serializers.py:13 terminal/models/session.py:40
@@ -379,6 +379,7 @@ msgid "Application path"
 msgstr "应用路径"
 
 #: applications/serializers/attrs/application_category/remote_app.py:45
+#: assets/serializers/system_user.py:157
 #: xpack/plugins/change_auth_plan/serializers/asset.py:65
 #: xpack/plugins/change_auth_plan/serializers/asset.py:68
 #: xpack/plugins/change_auth_plan/serializers/asset.py:71
@@ -763,7 +764,7 @@ msgstr "全称"
 msgid "Parent key"
 msgstr "ssh私钥"
 
-#: assets/models/node.py:559 assets/serializers/system_user.py:254
+#: assets/models/node.py:559 assets/serializers/system_user.py:257
 #: users/templates/users/user_asset_permission.html:41
 #: users/templates/users/user_asset_permission.html:73
 #: users/templates/users/user_asset_permission.html:158
@@ -836,8 +837,8 @@ msgid "System groups"
 msgstr "用户组"
 
 #: assets/models/user.py:212
-msgid "Enable switch user"
-msgstr "启用切换用户"
+msgid "Switch user"
+msgstr "切换用户"
 
 #: assets/models/user.py:213
 msgid "Switch from"
@@ -872,7 +873,7 @@ msgstr "节点名称"
 msgid "Hardware info"
 msgstr "硬件信息"
 
-#: assets/serializers/asset.py:104 assets/serializers/system_user.py:273
+#: assets/serializers/asset.py:104 assets/serializers/system_user.py:276
 #: orgs/mixins/serializers.py:26
 msgid "Org name"
 msgstr "组织名称"
@@ -925,7 +926,7 @@ msgstr "应用数量"
 msgid "Nodes amount"
 msgstr "节点数量"
 
-#: assets/serializers/system_user.py:58 assets/serializers/system_user.py:256
+#: assets/serializers/system_user.py:58 assets/serializers/system_user.py:259
 msgid "Login mode display"
 msgstr "认证方式名称"
 
@@ -961,23 +962,23 @@ msgstr "路径应该以 / 开头"
 msgid "Password or private key required"
 msgstr "密码或密钥密码需要一个"
 
-#: assets/serializers/system_user.py:159
+#: assets/serializers/system_user.py:162
 msgid "Only ssh protocol system users are allowed"
 msgstr "仅允许ssh协议的系统用户"
 
-#: assets/serializers/system_user.py:163
+#: assets/serializers/system_user.py:166
 msgid "The protocol must be consistent with the current user: {}"
 msgstr "协议必须和当前用户保持一致: {}"
 
-#: assets/serializers/system_user.py:167
+#: assets/serializers/system_user.py:170
 msgid "Only system users with automatic login are allowed"
 msgstr "仅允许自动登录的系统用户"
 
-#: assets/serializers/system_user.py:272
+#: assets/serializers/system_user.py:275
 msgid "System user name"
 msgstr "系统用户名称"
 
-#: assets/serializers/system_user.py:282
+#: assets/serializers/system_user.py:285
 msgid "Asset hostname"
 msgstr "资产主机名"
 

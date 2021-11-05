@@ -153,6 +153,9 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         su_enabled = self.get_initial_value('su_enabled', default=False)
         if not su_enabled:
             return
+        if not su_from:
+            error = _('This field is required.')
+            raise serializers.ValidationError(error)
         # self: protocol ssh
         protocol = self.get_initial_value('protocol', default=SystemUser.Protocol.ssh.value)
         if protocol not in [SystemUser.Protocol.ssh.value]:
