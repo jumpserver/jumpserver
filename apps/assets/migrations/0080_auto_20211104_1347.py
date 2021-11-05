@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='systemuser',
             name='su_enabled',
-            field=models.BooleanField(default=False, verbose_name='Switch user'),
+            field=models.BooleanField(default=False, verbose_name='User switch'),
         ),
         migrations.AddField(
             model_name='systemuser',

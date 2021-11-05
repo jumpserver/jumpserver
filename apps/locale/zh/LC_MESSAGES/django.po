@@ -837,8 +837,8 @@ msgid "System groups"
 msgstr "用户组"
 
 #: assets/models/user.py:212
-msgid "Switch user"
-msgstr "切换用户"
+msgid "User switch"
+msgstr "用户切换"
 
 #: assets/models/user.py:213
 msgid "Switch from"
