@@ -246,7 +246,7 @@ class AuthMixin(PasswordEncryptionViewMixin):
             if not code:
                 if mfa_type ==  MFAType.OTP and bool(user.otp_secret_key):
                     raise errors.OTPCodeRequiredError
-                elif mfa_type ==  MFAType.SMS_CODE:
+                elif mfa_type ==  MFAType.SMS:
                     raise errors.SMSCodeRequiredError
             self.check_user_mfa(code, mfa_type, user=user)
 
@@ -370,20 +370,22 @@ class AuthMixin(PasswordEncryptionViewMixin):
         return self.check_user_auth(decrypt_passwd=decrypt_passwd)
 
     def check_user_mfa_if_need(self, user):
-        if self.request.session.get('auth_mfa'):
-            return
-        if settings.OTP_IN_RADIUS:
-            return
+        # MFA 尚未开启
         if not user.mfa_enabled:
             return
-
-        unset, url = user.mfa_enabled_but_not_set()
-        if unset:
-            raise errors.MFAUnsetError(user, self.request, url)
-        raise errors.MFARequiredError(mfa_types=user.get_supported_mfa_types())
+        # MFA 已经认证
+        already_auth_mfa = self.request.session.get('auth_mfa')
+        if already_auth_mfa:
+            return
+        # MFA 需要绑定
+        if user.otp_need_bind():
+            raise errors.OTPNeedBindError(user, self.request)
+        # MFA 需要认证
+        mfa_types = user.get_enabled_mfa_types()
+        raise errors.MFARequiredError(mfa_types=mfa_types)
 
     def mark_mfa_ok(self, mfa_type=MFAType.OTP):
-        self.request.session['auth_mfa'] = 1
+        self.request.session['auth_mfa'] = '1'
         self.request.session['auth_mfa_time'] = time.time()
         self.request.session['auth_mfa_required'] = ''
         self.request.session['auth_mfa_type'] = mfa_type
@@ -410,7 +412,7 @@ class AuthMixin(PasswordEncryptionViewMixin):
         if not user.mfa_enabled:
             return
 
-        if not bool(user.phone) and mfa_type == MFAType.SMS_CODE:
+        if not bool(user.phone) and mfa_type == MFAType.SMS:
             raise errors.UserPhoneNotSet
 
         if not bool(user.otp_secret_key) and mfa_type == MFAType.OTP:

@@ -25,6 +25,7 @@ from common import fields
 from common.const import choices
 from common.db.models import TextChoices
 from users.exceptions import MFANotEnabled, PhoneNotSet
+from jumpserver.utils import has_valid_xpack_license
 from ..signals import post_user_change_password
 
 __all__ = ['User', 'UserPasswordHistory', 'MFAType']
@@ -34,7 +35,8 @@ logger = get_logger(__file__)
 
 class MFAType(TextChoices):
     OTP = 'otp', _('One-time password')
-    SMS_CODE = 'sms', _('SMS verify code')
+    OTP_RADIUS = 'otp_radius', _('One-time password (radius)')
+    SMS = 'sms', _('SMS verify code')
 
 
 class AuthMixin:
@@ -458,84 +460,95 @@ class TokenMixin:
 class MFAMixin:
     mfa_level = 0
     otp_secret_key = ''
+    MFA_LEVEL_DISABLE = 0
+    MFA_LEVEL_ENABLE = 1
+    MFA_LEVEL_FORCE_ENABLE = 2
     MFA_LEVEL_CHOICES = (
-        (0, _('Disable')),
-        (1, _('Enable')),
-        (2, _("Force enable")),
+        (MFA_LEVEL_DISABLE, _('Disable')),
+        (MFA_LEVEL_ENABLE, _('Enable')),
+        (MFA_LEVEL_FORCE_ENABLE, _("Force enable")),
     )
     is_org_admin: bool
     username: str
 
     @property
     def mfa_enabled(self):
-        if self.mfa_force_enabled:
-            return True
-        return self.mfa_level > 0
+        return self.otp_enabled or self.otp_radius_enabled or self.sms_enabled
 
     @property
-    def mfa_force_enabled(self):
+    def otp_enabled(self):
+        # 强制开启 or 自己开启
+        return self.otp_force_enabled or self.mfa_level > 0
+
+    @property
+    def otp_force_enabled(self):
+        # 全局强制开启: 针对所有用户
         if settings.SECURITY_MFA_AUTH in [True, 1]:
             return True
+        # 全局强制开启: 针对所有管理员
         if settings.SECURITY_MFA_AUTH == 2 and self.is_org_admin:
             return True
+        # 强制开启: 针对自己
         return self.mfa_level == 2
 
-    def enable_mfa(self):
-        if not self.mfa_level == 2:
-            self.mfa_level = 1
+    @property
+    def otp_radius_enabled(self):
+        return settings.OTP_IN_RADIUS
 
-    def force_enable_mfa(self):
-        self.mfa_level = 2
-
-    def disable_mfa(self):
-        self.mfa_level = 0
-        self.otp_secret_key = None
-
-    def reset_mfa(self):
-        if self.mfa_is_otp():
-            self.otp_secret_key = ''
-
-    @staticmethod
-    def mfa_is_otp():
-        if settings.OTP_IN_RADIUS:
+    @property
+    def sms_enabled(self):
+        if not has_valid_xpack_license():
+            return False
+        if not settings.SMS_ENABLED:
+            return False
+        if not self.phone:
             return False
         return True
 
-    def check_radius(self, code):
-        from authentication.backends.radius import RadiusBackend
-        backend = RadiusBackend()
-        user = backend.authenticate(None, username=self.username, password=code)
-        if user:
-            return True
-        return False
+    @property
+    def mfa_force_enabled(self):
+        """ 兼容之前的字段名称 (应取名为: otp_force_enabled) """
+        return self.otp_force_enabled
 
+    @property
+    def otp_need_bind(self):
+        if self.otp_radius_enabled:
+            return False
+        if not self.otp_enabled:
+            return False
+        if self.otp_secret_key:
+            return False
+        return True
+
+    def enable_otp(self, otp_secret_key=None):
+        if self.mfa_level == self.MFA_LEVEL_DISABLE:
+            self.mfa_level = self.MFA_LEVEL_ENABLE
+        if otp_secret_key:
+            self.otp_secret_key = otp_secret_key
+        self.save()
+
+    def disable_otp(self):
+        self.mfa_level = 0
+        self.otp_secret_key = None
+        self.save()
+
+    def reset_otp(self):
+        self.otp_secret_key = None
+        self.save()
+
+    # check: otp、otp_radius、sms
     def check_otp(self, code):
         from ..utils import check_otp_code
         return check_otp_code(self.otp_secret_key, code)
 
-    def check_mfa(self, code, mfa_type=MFAType.OTP):
-        if not self.mfa_enabled:
-            raise MFANotEnabled
+    def check_otp_radius(self, code):
+        from authentication.backends.radius import RadiusBackend
+        backend = RadiusBackend()
+        user = backend.authenticate(None, username=self.username, password=code)
+        return bool(user)
 
-        if mfa_type == MFAType.OTP:
-            if settings.OTP_IN_RADIUS:
-                return self.check_radius(code)
-            else:
-                return self.check_otp(code)
-        elif mfa_type == MFAType.SMS_CODE:
-            return self.check_sms_code(code)
-
-    def get_supported_mfa_types(self):
-        methods = []
-        if self.otp_secret_key:
-            methods.append(MFAType.OTP)
-        if settings.XPACK_ENABLED and settings.SMS_ENABLED and self.phone:
-            methods.append(MFAType.SMS_CODE)
-        return methods
-
-    def check_sms_code(self, code):
+    def check_sms(self, code):
         from authentication.sms_verify_code import VerifyCodeUtil
-
         if not self.phone:
             raise PhoneNotSet
 
@@ -545,30 +558,44 @@ class MFAMixin:
         except JMSException:
             return False
 
+    def check_mfa(self, code, tp=None):
+        # 未开启
+        if not self.mfa_enabled:
+            return False
+        # 指定类型校验
+        if tp == MFAType.SMS:
+            return self.check_sms(code)
+        elif tp == MFAType.OTP:
+            return self.check_otp(code)
+        elif tp == MFAType.OTP_RADIUS:
+            return self.check_otp_radius(code)
+        # 未指定类型校验
+        ok = False
+        if self.otp_radius_enabled:
+            ok = self.check_otp_radius(code)
+        if self.otp_enabled:
+            ok = self.check_otp(code)
+        if self.sms_enabled:
+            ok = self.check_sms(code)
+        return ok
+
+    def get_enabled_mfa_types(self):
+        types = []
+        if self.otp_enabled:
+            types.append(MFAType.OTP)
+        if self.otp_radius_enabled:
+            types.append(MFAType.OTP_RADIUS)
+        if self.sms_enabled:
+            types.append(MFAType.SMS)
+        return types
+
     def send_sms_code(self):
+        if not self.sms_enabled:
+            return False
         from authentication.sms_verify_code import VerifyCodeUtil
-
-        if not self.phone:
-            raise PhoneNotSet
-
         util = VerifyCodeUtil(self.phone)
         util.touch()
         return util.timeout
-
-    def mfa_enabled_but_not_set(self):
-        if not self.mfa_enabled:
-            return False, None
-
-        if not self.mfa_is_otp():
-            return False, None
-
-        if self.mfa_is_otp() and self.otp_secret_key:
-            return False, None
-
-        if self.phone and settings.SMS_ENABLED and settings.XPACK_ENABLED:
-            return False, None
-
-        return True, reverse('authentication:user-otp-enable-start')
 
 
 class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):

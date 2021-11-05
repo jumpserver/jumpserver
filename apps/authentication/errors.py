@@ -163,7 +163,7 @@ class MFAFailedError(AuthFailedNeedLogMixin, AuthFailedError):
                 self.msg = otp_failed_msg.format(
                     times_try=times_remainder, block_time=block_time
                 )
-            elif mfa_type == MFAType.SMS_CODE:
+            elif mfa_type == MFAType.SMS:
                 self.msg = sms_failed_msg.format(
                     times_try=times_remainder, block_time=block_time
                 )
@@ -184,14 +184,13 @@ class BlockMFAError(AuthFailedNeedLogMixin, AuthFailedError):
         super().__init__(username=username, request=request, ip=ip)
 
 
-class MFAUnsetError(AuthFailedNeedLogMixin, AuthFailedError):
+class OTPNeedBindError(AuthFailedNeedLogMixin, AuthFailedError):
     error = reason_mfa_unset
     msg = mfa_unset_msg
 
-    def __init__(self, user, request, url):
+    def __init__(self, user, request):
         super().__init__(username=user.username, request=request)
         self.user = user
-        self.url = url
 
 
 class BlockLoginError(AuthFailedNeedBlockMixin, AuthFailedError):
@@ -383,8 +382,10 @@ class OTPBindRequiredError(JMSException):
 class OTPCodeRequiredError(AuthFailedError):
     msg = _("Please enter MFA code")
 
+
 class SMSCodeRequiredError(AuthFailedError):
     msg = _("Please enter SMS code")
+
 
 class UserPhoneNotSet(AuthFailedError):
     msg = _('Phone not set')

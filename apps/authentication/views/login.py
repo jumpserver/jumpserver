@@ -210,6 +210,7 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
     login_url = reverse_lazy('authentication:login')
     login_otp_url = reverse_lazy('authentication:login-otp')
     login_confirm_url = reverse_lazy('authentication:login-wait-confirm')
+    otp_bind_url = reverse_lazy('authentication:user-otp-enable-start')
 
     def format_redirect_url(self, url):
         args = self.request.META.get('QUERY_STRING', '')
@@ -233,10 +234,10 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
             return self.format_redirect_url(self.login_url)
         except errors.MFARequiredError:
             return self.format_redirect_url(self.login_otp_url)
+        except errors.OTPNeedBindError:
+            return self.format_redirect_url(self.otp_bind_url)
         except errors.LoginConfirmBaseError:
             return self.format_redirect_url(self.login_confirm_url)
-        except errors.MFAUnsetError as e:
-            return e.url
         except errors.PasswdTooSimple as e:
             return e.url
         else:

@@ -40,7 +40,7 @@ class UserOtpEnableStartView(UserVerifyPasswordView):
         if settings.OTP_IN_RADIUS:
             user_id = self.request.session.get('user_id')
             user = get_object_or_404(User, id=user_id)
-            user.enable_mfa()
+            user.enable_otp()
             user.save()
         return resp
 
@@ -125,9 +125,7 @@ class UserOtpEnableBindView(AuthMixin, TemplateView, FormView):
 
     def save_otp(self, otp_secret_key):
         user = get_user_or_pre_auth_user(self.request)
-        user.enable_mfa()
-        user.otp_secret_key = otp_secret_key
-        user.save()
+        user.enable_otp(otp_secret_key=otp_secret_key)
 
     def get_context_data(self, **kwargs):
         user = get_user_or_pre_auth_user(self.request)
@@ -154,8 +152,7 @@ class UserDisableMFAView(FormView):
 
         valid = user.check_mfa(otp_code)
         if valid:
-            user.disable_mfa()
-            user.save()
+            user.disable_otp()
             return super().form_valid(form)
         else:
             error = _('MFA code invalid, or ntp sync server time')

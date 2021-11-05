@@ -210,8 +210,7 @@ class UserResetOTPApi(UserQuerysetMixin, generics.RetrieveAPIView):
             return Response({"error": msg}, status=401)
 
         if user.mfa_enabled:
-            user.reset_mfa()
-            user.save()
+            user.reset_otp()
 
             ResetMFAMsg(user).publish_async()
         return Response({"msg": "success"})

@@ -28,7 +28,7 @@ class MFASelectTypeApi(AuthMixin, CreateAPIView):
 
     def perform_create(self, serializer):
         mfa_type = serializer.validated_data['type']
-        if mfa_type == MFAType.SMS_CODE:
+        if mfa_type == MFAType.SMS:
             user = self.get_user_from_session()
             user.send_sms_code()
 
