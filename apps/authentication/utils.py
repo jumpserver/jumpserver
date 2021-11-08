@@ -5,6 +5,7 @@ from Cryptodome.PublicKey import RSA
 from Cryptodome.Cipher import PKCS1_v1_5
 from Cryptodome import Random
 
+from django.conf import settings
 from .notifications import DifferentCityLoginMessage
 from audits.models import UserLoginLog
 from audits.const import DEFAULT_CITY
@@ -51,7 +52,10 @@ def rsa_decrypt(cipher_text, rsa_private_key=None):
     return message
 
 
-def check_different_city_login(user, request):
+def check_different_city_login_if_need(user, request):
+    if not settings.SECURITY_CHECK_DIFFERENT_CITY_LOGIN:
+        return
+
     ip = get_request_ip(request) or '0.0.0.0'
 
     if not (ip and validate_ip(ip)):
