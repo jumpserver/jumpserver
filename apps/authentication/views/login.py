@@ -208,7 +208,7 @@ class UserLoginView(mixins.AuthMixin, FormView):
 class UserLoginGuardView(mixins.AuthMixin, RedirectView):
     redirect_field_name = 'next'
     login_url = reverse_lazy('authentication:login')
-    login_otp_url = reverse_lazy('authentication:login-otp')
+    login_otp_url = reverse_lazy('authentication:login-mfa')
     login_confirm_url = reverse_lazy('authentication:login-wait-confirm')
 
     def format_redirect_url(self, url):

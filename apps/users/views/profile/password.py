@@ -26,6 +26,8 @@ class UserVerifyPasswordView(PasswordEncryptionViewMixin, FormView):
 
     def form_valid(self, form):
         user = get_user_or_pre_auth_user(self.request)
+        if user is None:
+            return redirect('authentication:login')
         try:
             password = self.get_decrypted_password(username=user.username)
         except errors.AuthFailedError as e:

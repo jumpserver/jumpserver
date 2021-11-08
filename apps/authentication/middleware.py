@@ -10,5 +10,5 @@ class MFAMiddleware:
         if request.path.find('/auth/login/otp/') > -1:
             return response
         if request.session.get('auth_mfa_required'):
-            return redirect('authentication:login-otp')
+            return redirect('authentication:login-mfa')
         return response

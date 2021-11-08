@@ -53,7 +53,6 @@ class SendAndVerifySMSUtil:
     def generate(self):
         code = ''.join(random.sample('0123456789', 4))
         self.code = code
-        cache.set(self.key, self.code, self.timeout)
         return code
 
     def clear(self):
@@ -65,9 +64,11 @@ class SendAndVerifySMSUtil:
         """
         ttl = self.ttl()
         if ttl > 0:
+            logger.error('Send sms too frequently, delay {}'.format(ttl))
             raise CodeSendTooFrequently(ttl)
         sms = SMS()
         sms.send_verify_code(self.phone, code)
+        cache.set(self.key, self.code, self.timeout)
         logger.info(f'Send sms verify code to {self.phone}: {code}')
 
     def verify(self, code):

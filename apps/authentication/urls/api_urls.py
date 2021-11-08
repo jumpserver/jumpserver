@@ -25,8 +25,8 @@ urlpatterns = [
 
     path('auth/', api.TokenCreateApi.as_view(), name='user-auth'),
     path('tokens/', api.TokenCreateApi.as_view(), name='auth-token'),
-    path('mfa/challenge/', api.MFAChallengeApi.as_view(), name='mfa-challenge'),
-    path('mfa/select/', api.MFASendChallengeApi.as_view(), name='mfa-select'),
+    path('mfa/challenge/', api.MFAChallengeVerifyApi.as_view(), name='mfa-challenge'),
+    path('mfa/select/', api.MFASendCodeApi.as_view(), name='mfa-select'),
     path('otp/verify/', api.UserOtpVerifyApi.as_view(), name='user-otp-verify'),
     path('sms/verify-code/send/', api.SendSMSVerifyCodeApi.as_view(), name='sms-verify-code-send'),
     path('password/verify/', api.UserPasswordVerifyApi.as_view(), name='user-password-verify'),

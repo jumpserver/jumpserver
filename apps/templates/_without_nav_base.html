@@ -8,18 +8,23 @@
 		<title> {{ JMS_TITLE }} </title>
         <link rel="shortcut icon" href="{{ FAVICON_URL }}" type="image/x-icon">
 {#        <link rel="stylesheet" href="{% static 'fonts/font_otp/iconfont.css' %}" />#}
+        {% include '_head_css_js.html' %}
+        <link href="{% static 'css/jumpserver.css' %}" rel="stylesheet">
+        <link href="{% static 'css/style.css' %}" rel="stylesheet">
         <link rel="stylesheet" href="{% static 'css/otp.css' %}" />
-        <script src="{% static 'js/jquery-3.1.1.min.js' %}"></script>
+{#        <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" />#}
+{#        <link rel="stylesheet" href="{% static 'css/style.css' %}" />#}
+{#        <script src="{% static 'js/jquery-3.1.1.min.js' %}"></script>#}
         <script src="{% static "js/plugins/qrcode/qrcode.min.js" %}"></script>
 	</head>
 
-	<body>
+	<body style="background-color: #f3f3f4">
 		 <header>
 		 	<div class="logo">
 		 		<a href="{% url 'index' %}">
                     <img src="{{ LOGO_URL }}" alt="" width="50px" height="50px"/>
                 </a>
-		 		<a href="{% url 'index' %}">{{ JMS_TITLE }}</a>
+		 		<span style="font-size: 18px; line-height: 50px">{{ JMS_TITLE }}</span>
 		 	</div>
 		 	<div>
                 <a href="{% url 'index' %}">{% trans 'Home page' %}</a>
@@ -38,6 +43,7 @@
                  {% include '_copyright.html' %}
              </div>
          </footer>
+         {% include '_foot_js.html' %}
 	</body>
 </html>
 

@@ -3,18 +3,16 @@
 
 from __future__ import unicode_literals
 from django.views.generic.edit import FormView
-from django.utils.translation import gettext_lazy as _
-from django.conf import settings
+
+from common.utils import get_logger
 from .. import forms, errors, mixins
 from .utils import redirect_to_guard_view
 
-from common.utils import get_logger
-
 logger = get_logger(__name__)
-__all__ = ['UserLoginOtpView']
+__all__ = ['UserLoginMFAView']
 
 
-class UserLoginOtpView(mixins.AuthMixin, FormView):
+class UserLoginMFAView(mixins.AuthMixin, FormView):
     template_name = 'authentication/login_mfa.html'
     form_class = forms.UserCheckOtpCodeForm
     redirect_field_name = 'next'
@@ -40,3 +38,4 @@ class UserLoginOtpView(mixins.AuthMixin, FormView):
         methods = self.get_user_mfa_methods(user)
         kwargs.update({'methods': methods})
         return kwargs
+

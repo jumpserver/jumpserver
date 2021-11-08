@@ -497,7 +497,7 @@ class MFAMixin:
     def supported_mfa_backends(self):
         backends = self.__class__.get_enabled_mfa_backends()
         backends_instance = [cls(self) for cls in backends]
-        backends_set = [backend.__class__ for backend in backends_instance if backend.has_set()]
+        backends_set = [b.__class__ for b in backends_instance if b.has_set()]
         return backends_set
 
     @property
@@ -507,12 +507,15 @@ class MFAMixin:
     @classmethod
     def get_enabled_mfa_backends(cls):
         from authentication.mfa import MFA_BACKENDS
-        backends = [cls for cls in MFA_BACKENDS if cls.enabled()]
-        backends_enabled = [backend for backend in backends if backend.enabled()]
-        return backends_enabled
+        backends = [b for b in MFA_BACKENDS if b.enabled()]
+        return backends
 
-    def reset_mfa(self):
-        pass
+    def get_mfa_backend_by_typ(self, mfa_type):
+        mfa_mapper = self.supported_mfa_backends_mapper
+        backend_cls = mfa_mapper.get(mfa_type)
+        if not backend_cls:
+            return None
+        return backend_cls
 
 
 class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):

@@ -206,4 +206,4 @@ def is_auth_password_time_valid(session):
 
 
 def is_auth_otp_time_valid(session):
-    return is_auth_time_valid(session, 'auth_opt_expired_at')
+    return is_auth_time_valid(session, 'auth_otp_expired_at')

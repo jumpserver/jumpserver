@@ -34,3 +34,23 @@ class MFASms(BaseMFA):
     @staticmethod
     def enabled():
         return settings.SMS_ENABLED
+
+    def get_set_url(self) -> str:
+        return '/ui/#/users/profile/?activeTab=ProfileUpdate'
+
+    def can_unset(self) -> bool:
+        return True
+
+    def unset(self):
+        return '/ui/#/users/profile/?activeTab=ProfileUpdate'
+
+    @staticmethod
+    def help_text_of_set():
+        return _("Set phone number to enable")
+
+    @staticmethod
+    def help_text_of_unset():
+        return _("Clear phone number to disable")
+
+    def get_unset_url(self) -> str:
+        return '/ui/#/users/profile/?activeTab=ProfileUpdate'

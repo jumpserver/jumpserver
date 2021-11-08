@@ -11,6 +11,7 @@ from django.conf import settings
 from django.http.response import HttpResponseForbidden
 
 from authentication.mixins import AuthMixin
+from authentication.mfa import MFAOtp
 from users.models import User
 from common.utils import get_logger, get_object_or_none
 from common.permissions import IsValidUser
@@ -24,8 +25,10 @@ from ...utils import (
 __all__ = [
     'UserOtpEnableStartView',
     'UserOtpEnableInstallAppView',
-    'UserOtpEnableBindView', 'UserOtpSettingsSuccessView',
-    'UserDisableMFAView', 'UserOtpUpdateView',
+    'UserOtpEnableBindView',
+    'UserOtpSettingsSuccessView',
+    'UserOtpDisableView',
+    'UserOtpUpdateView',
 ]
 
 logger = get_logger(__name__)
@@ -34,22 +37,8 @@ logger = get_logger(__name__)
 class UserOtpEnableStartView(UserVerifyPasswordView):
     template_name = 'users/user_otp_check_password.html'
 
-    def form_valid(self, form):
-        # 开启了 OTP IN RADIUS 就不用绑定了
-        resp = super().form_valid(form)
-        if settings.OTP_IN_RADIUS:
-            user_id = self.request.session.get('user_id')
-            user = get_object_or_404(User, id=user_id)
-            user.enable_mfa()
-            user.save()
-        return resp
-
     def get_success_url(self):
-        if settings.OTP_IN_RADIUS:
-            success_url = reverse_lazy('authentication:user-otp-settings-success')
-        else:
-            success_url = reverse('authentication:user-otp-enable-install-app')
-        return success_url
+        return reverse('authentication:user-otp-enable-install-app')
 
 
 class UserOtpEnableInstallAppView(TemplateView):
@@ -142,7 +131,7 @@ class UserOtpEnableBindView(AuthMixin, TemplateView, FormView):
         return super().get_context_data(**kwargs)
 
 
-class UserDisableMFAView(FormView):
+class UserOtpDisableView(FormView):
     template_name = 'users/user_verify_mfa.html'
     form_class = forms.UserCheckOtpCodeForm
     success_url = reverse_lazy('authentication:user-otp-settings-success')
@@ -151,11 +140,11 @@ class UserDisableMFAView(FormView):
     def form_valid(self, form):
         user = self.request.user
         otp_code = form.cleaned_data.get('otp_code')
+        otp = MFAOtp(user)
 
-        valid = user.check_mfa(otp_code)
+        valid = otp.check_code(otp_code)
         if valid:
-            user.disable_mfa()
-            user.save()
+            otp.unset()
             return super().form_valid(form)
         else:
             error = _('MFA code invalid, or ntp sync server time')
@@ -175,7 +164,7 @@ class UserOtpUpdateView(FormView):
 
         valid = user.check_mfa(otp_code)
         if valid:
-            self.request.session['auth_opt_expired_at'] = time.time() + settings.AUTH_EXPIRED_SECONDS
+            self.request.session['auth_otp_expired_at'] = time.time() + settings.AUTH_EXPIRED_SECONDS
             return super().form_valid(form)
         else:
             error = _('MFA code invalid, or ntp sync server time')
@@ -200,12 +189,15 @@ class UserOtpSettingsSuccessView(TemplateView):
 
     def get_title_describe(self):
         user = get_user_or_pre_auth_user(self.request)
-        if self.request.user.is_authenticated:
-            auth_logout(self.request)
-        title = _('MFA enable success')
-        describe = _('MFA enable success, return login page')
-        if not user.mfa_enabled:
+        otp = MFAOtp(user)
+        if otp.has_set():
+            title = _('MFA enable success')
+            describe = _('MFA enable success, return login page')
+        else:
             title = _('MFA disable success')
             describe = _('MFA disable success, return login page')
+
+        if self.request.user.is_authenticated:
+            auth_logout(self.request)
         return title, describe
 

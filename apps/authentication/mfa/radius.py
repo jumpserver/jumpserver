@@ -9,7 +9,7 @@ mfa_failed_msg = _("Radius verify code invalid")
 
 class MFARadius(BaseMFA):
     name = 'otp_radius'
-    display_name = _('OTP Radius')
+    display_name = _('MFA Radius')
 
     def check_code(self, code):
         backend = RadiusBackend()
@@ -28,3 +28,19 @@ class MFARadius(BaseMFA):
     def enabled():
         return settings.OTP_IN_RADIUS
 
+    def get_set_url(self) -> str:
+        return ''
+
+    def can_unset(self):
+        return False
+
+    def unset(self):
+        return ''
+
+    @staticmethod
+    def help_text_of_unset():
+        return _("Radius global enabled, cannot disable")
+        # return 'Radius 是全局的配置，不可以禁用'
+
+    def get_unset_url(self) -> str:
+        return ''

@@ -11,6 +11,7 @@ from rest_framework.serializers import ValidationError
 from rest_framework.response import Response
 
 from common.permissions import IsValidUser, NeedMFAVerify
+from common.utils import get_logger
 from users.models.user import User
 from ..serializers import OtpVerifySerializer
 from .. import serializers
@@ -19,13 +20,15 @@ from ..mfa.otp import MFAOtp
 from ..mixins import AuthMixin
 
 
+logger = get_logger(__name__)
+
 __all__ = [
-    'MFAChallengeApi', 'UserOtpVerifyApi', 'SendSMSVerifyCodeApi',
-    'MFASendChallengeApi'
+    'MFAChallengeVerifyApi', 'UserOtpVerifyApi', 'SendSMSVerifyCodeApi',
+    'MFASendCodeApi'
 ]
 
 
-class MFASendChallengeApi(AuthMixin, CreateAPIView):
+class MFASendCodeApi(AuthMixin, CreateAPIView):
     """
     选择 MFA 后对应操作 api，koko 目前在用
     """
@@ -33,18 +36,33 @@ class MFASendChallengeApi(AuthMixin, CreateAPIView):
     serializer_class = serializers.MFASelectTypeSerializer
 
     def perform_create(self, serializer):
+        username = serializer.validated_data.get('username', '')
         mfa_type = serializer.validated_data['type']
-        user = self.get_user_from_session()
-        mfa_mapper = user.supported_mfa_backends_mapper
-        backend_cls = mfa_mapper.get(mfa_type)
+        if not username:
+            user = self.get_user_from_session()
+        else:
+            user = get_object_or_404(User, username=username)
 
-        if not backend_cls or backend_cls.challenge_required:
-            return
+        backend_cls = user.get_mfa_backend_by_typ(mfa_type)
+        if not backend_cls or not backend_cls.challenge_required:
+            raise ValidationError('MFA type not support: {} {}'.format(mfa_type, backend_cls))
+
         backend = backend_cls(user)
         backend.send_challenge()
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-class MFAChallengeApi(AuthMixin, CreateAPIView):
+        try:
+            self.perform_create(serializer)
+            return Response(serializer.data, status=201)
+        except Exception as e:
+            logger.exception(e)
+            return Response({'error': str(e)}, status=400)
+
+
+class MFAChallengeVerifyApi(AuthMixin, CreateAPIView):
     permission_classes = (AllowAny,)
     serializer_class = serializers.MFAChallengeSerializer
 
@@ -85,7 +103,8 @@ class UserOtpVerifyApi(CreateAPIView):
             return Response({"error": _("Code is invalid")}, status=400)
 
     def get_permissions(self):
-        if self.request.method.lower() == 'get' and settings.SECURITY_VIEW_AUTH_NEED_MFA:
+        if self.request.method.lower() == 'get' \
+                and settings.SECURITY_VIEW_AUTH_NEED_MFA:
             self.permission_classes = [NeedMFAVerify]
         return super().get_permissions()
 

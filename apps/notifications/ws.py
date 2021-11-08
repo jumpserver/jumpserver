@@ -68,5 +68,8 @@ class SiteMsgWebsocket(JsonWebsocketConsumer):
 
     def disconnect(self, close_code):
         if self.chan is not None:
-            self.chan.close()
+            try:
+                self.chan.close()
+            except:
+                pass
         self.close()

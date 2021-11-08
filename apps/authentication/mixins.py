@@ -295,12 +295,10 @@ class MFAMixin:
         ip = self.get_request_ip()
         self.check_mfa_is_block(user.username, ip)
 
-        mfa_backends_mapper = {b.name: b for b in user.supported_mfa_backends}
-        mfa_backend = mfa_backends_mapper.get(mfa_type)
-
         ok = False
-        if mfa_backend:
-            ok, msg = mfa_backend.check_code(code)
+        mfa_backend_cls = user.get_mfa_backend_by_typ(mfa_type)
+        if mfa_backend_cls:
+            ok, msg = mfa_backend_cls(user).check_code(code)
         else:
             msg = _('The MFA type({}) is not supported'.format(mfa_type))
 
@@ -321,18 +319,15 @@ class MFAMixin:
         methods = []
 
         for backend_cls in mfa_backends:
-            backend = backend_cls(user)
-            methods.append({
-                'name': backend.name,
-                'label': backend.display_name,
-                'enable': backend.has_set() if user else False,
+            data = {
+                'name': backend_cls.name,
+                'label': backend_cls.display_name,
+                'enable': True,
                 'selected': False
-            })
-
-        for item in methods:
-            if item['enable']:
-                item['selected'] = True
-                break
+            }
+            if user:
+                data['enable'] = backend_cls(user).has_set()
+            methods.append(data)
         return methods
 
 

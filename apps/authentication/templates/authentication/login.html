@@ -160,7 +160,7 @@
                         {% bootstrap_field form.challenge show_label=False %}
                     {% elif form.mfa_type %}
                         <div class="form-group" style="display: flex">
-                        {% include '_mfa_otp_login.html' %}
+                        {% include '_mfa_login_field.html' %}
                         </div>
                     {% elif form.captcha %}
                         <div class="captch-field">
