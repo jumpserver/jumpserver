@@ -57,7 +57,7 @@ class EmailContentSettingSerializer(serializers.Serializer):
     EMAIL_CUSTOM_USER_CREATED_BODY = serializers.CharField(
         max_length=4096, allow_blank=True, required=False,
         label=_('Create user email content'),
-        help_text=_('Tips:When creating a user, send the content of the email')
+        help_text=_('Tips: When creating a user, send the content of the email, support {username} {name} {email} label')
     )
     EMAIL_CUSTOM_USER_CREATED_SIGNATURE = serializers.CharField(
         max_length=512, allow_blank=True, required=False, label=_('Signature'),

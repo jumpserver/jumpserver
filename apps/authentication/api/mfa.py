@@ -23,7 +23,7 @@ from ..mixins import AuthMixin
 logger = get_logger(__name__)
 
 __all__ = [
-    'MFAChallengeVerifyApi', 'UserOtpVerifyApi', 'SendSMSVerifyCodeApi',
+    'MFAChallengeVerifyApi', 'UserOtpVerifyApi',
     'MFASendCodeApi'
 ]
 
@@ -43,7 +43,7 @@ class MFASendCodeApi(AuthMixin, CreateAPIView):
         else:
             user = get_object_or_404(User, username=username)
 
-        backend_cls = user.get_mfa_backend_by_typ(mfa_type)
+        backend_cls = user.get_mfa_backend_by_type(mfa_type)
         if not backend_cls or not backend_cls.challenge_required:
             raise ValidationError('MFA type not support: {} {}'.format(mfa_type, backend_cls))
 
@@ -107,19 +107,3 @@ class UserOtpVerifyApi(CreateAPIView):
                 and settings.SECURITY_VIEW_AUTH_NEED_MFA:
             self.permission_classes = [NeedMFAVerify]
         return super().get_permissions()
-
-
-class SendSMSVerifyCodeApi(AuthMixin, CreateAPIView):
-    permission_classes = (AllowAny,)
-
-    def create(self, request, *args, **kwargs):
-        username = request.data.get('username', '')
-        username = username.strip()
-        if username:
-            user = get_object_or_404(User, username=username)
-        else:
-            user = self.get_user_from_session()
-        if not user.mfa_enabled:
-            raise errors.NotEnableMFAError
-        timeout = user.send_sms_code()
-        return Response({'code': 'ok', 'timeout': timeout})

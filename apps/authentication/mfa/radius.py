@@ -9,7 +9,7 @@ mfa_failed_msg = _("Radius verify code invalid")
 
 class MFARadius(BaseMFA):
     name = 'otp_radius'
-    display_name = _('MFA Radius')
+    display_name = _('Radius MFA')
 
     def check_code(self, code):
         backend = RadiusBackend()

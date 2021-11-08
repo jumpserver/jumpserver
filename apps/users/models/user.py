@@ -510,7 +510,7 @@ class MFAMixin:
         backends = [b for b in MFA_BACKENDS if b.enabled()]
         return backends
 
-    def get_mfa_backend_by_typ(self, mfa_type):
+    def get_mfa_backend_by_type(self, mfa_type):
         mfa_mapper = self.supported_mfa_backends_mapper
         backend_cls = mfa_mapper.get(mfa_type)
         if not backend_cls:

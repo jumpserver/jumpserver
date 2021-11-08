@@ -296,7 +296,7 @@ class MFAMixin:
         self.check_mfa_is_block(user.username, ip)
 
         ok = False
-        mfa_backend_cls = user.get_mfa_backend_by_typ(mfa_type)
+        mfa_backend_cls = user.get_mfa_backend_by_type(mfa_type)
         if mfa_backend_cls:
             ok, msg = mfa_backend_cls(user).check_code(code)
         else:
