@@ -4,6 +4,7 @@ import urllib.parse
 import json
 import base64
 from typing import Callable
+import os
 
 from django.conf import settings
 from django.core.cache import cache
@@ -49,6 +50,10 @@ class ClientProtocolMixin:
         if not user or not self.request.user.is_superuser:
             user = self.request.user
         return asset, application, system_user, user
+
+    @staticmethod
+    def parse_env_bool(env_key, env_default, true_value, false_value):
+        return true_value if is_true(os.getenv(env_key, env_default)) else false_value
 
     def get_rdp_file_content(self, serializer):
         options = {
@@ -112,6 +117,10 @@ class ClientProtocolMixin:
             options['desktopheight:i'] = height
         else:
             options['smart sizing:i'] = '1'
+
+        options['session bpp:i'] = os.getenv('JUMPSERVER_COLOR_DEPTH', '32')
+        options['audiomode:i'] = self.parse_env_bool('JUMPSERVER_DISABLE_AUDIO', 'false', '2', '0')
+
         content = ''
         for k, v in options.items():
             content += f'{k}:{v}\n'
