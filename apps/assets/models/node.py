@@ -1,24 +1,19 @@
 # -*- coding: utf-8 -*-
 #
 import re
-import time
-import uuid
 import threading
-import os
 import time
 import uuid
 
 from collections import defaultdict
 from django.db import models, transaction
 from django.db.models import Q, Manager
-from django.db.utils import IntegrityError
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 from django.db.transaction import atomic
 from django.core.cache import cache
 
 from common.utils.lock import DistributedLock
-from common.utils.common import timeit
 from common.db.models import output_as_string
 from common.utils import get_logger
 from orgs.mixins.models import OrgModelMixin, OrgManager

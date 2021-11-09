@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'acls.apps.AclsConfig',
     'notifications.apps.NotificationsConfig',
     'common.apps.CommonConfig',
+    'secret.apps.VaultConfig',
     'jms_oidc_rp',
     'rest_framework',
     'rest_framework_swagger',
