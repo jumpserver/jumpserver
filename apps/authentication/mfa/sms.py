@@ -21,7 +21,7 @@ class MFASms(BaseMFA):
         msg = '' if ok else sms_failed_msg
         return ok, msg
 
-    def has_set(self):
+    def is_active(self):
         return self.user.phone
 
     @staticmethod
@@ -32,25 +32,25 @@ class MFASms(BaseMFA):
         self.sms.gen_and_send()
 
     @staticmethod
-    def enabled():
+    def global_enabled():
         return settings.SMS_ENABLED
 
-    def get_set_url(self) -> str:
+    def get_enable_url(self) -> str:
         return '/ui/#/users/profile/?activeTab=ProfileUpdate'
 
-    def can_unset(self) -> bool:
+    def can_disable(self) -> bool:
         return True
 
-    def unset(self):
+    def disable(self):
         return '/ui/#/users/profile/?activeTab=ProfileUpdate'
 
     @staticmethod
-    def help_text_of_set():
+    def help_text_of_enable():
         return _("Set phone number to enable")
 
     @staticmethod
-    def help_text_of_unset():
+    def help_text_of_disable():
         return _("Clear phone number to disable")
 
-    def get_unset_url(self) -> str:
+    def get_disable_url(self) -> str:
         return '/ui/#/users/profile/?activeTab=ProfileUpdate'

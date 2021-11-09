@@ -16,7 +16,7 @@ from django.contrib.auth import (
     BACKEND_SESSION_KEY, _get_backends,
     PermissionDenied, user_login_failed, _clean_credentials
 )
-from django.shortcuts import reverse, redirect
+from django.shortcuts import reverse, redirect, get_object_or_404
 
 from common.utils import get_object_or_none, get_request_ip, get_logger, bulk_get, FlashMessageUtil
 from acls.models import LoginACL
@@ -163,20 +163,24 @@ class CommonMixin(PasswordEncryptionViewMixin):
         if self.request.session.is_empty():
             raise errors.SessionEmptyError()
 
-        if all((self.request.user,
-                not self.request.user.is_anonymous,
-                BACKEND_SESSION_KEY in self.request.session)):
+        if all([
+            self.request.user,
+            not self.request.user.is_anonymous,
+            BACKEND_SESSION_KEY in self.request.session
+        ]):
             user = self.request.user
             user.backend = self.request.session[BACKEND_SESSION_KEY]
             return user
 
         user_id = self.request.session.get('user_id')
-        if not user_id:
-            user = None
-        else:
-            user = get_object_or_none(User, pk=user_id)
-        if not user:
+        auth_password = self.request.session.get('auth_password')
+        auth_expired_at = self.request.session.get('auth_password_expired_at')
+        auth_expired = auth_expired_at < time.time() if auth_expired_at else False
+
+        if not user_id or not auth_password or auth_expired:
             raise errors.SessionEmptyError()
+
+        user = get_object_or_404(User, pk=user_id)
         user.backend = self.request.session.get("auth_backend")
         return user
 
@@ -237,7 +241,6 @@ class MFAMixin:
     request: Request
     get_user_from_session: Callable
     get_request_ip: Callable
-    set_passwd_verify_on_session: Callable
 
     def _check_login_mfa_login_if_need(self, user):
         if not settings.SECURITY_MFA_IN_LOGIN_PAGE:
@@ -257,11 +260,11 @@ class MFAMixin:
         if not user.mfa_enabled:
             return
 
-        unset = user.mfa_no_available()
-        if unset:
+        active_mfa_mapper = user.active_mfa_backends_mapper
+        if not active_mfa_mapper:
             url = reverse('authentication:user-otp-enable-start')
             raise errors.MFAUnsetError(user, self.request, url)
-        raise errors.MFARequiredError
+        raise errors.MFARequiredError(mfa_types=tuple(active_mfa_mapper.keys()))
 
     def mark_mfa_ok(self, mfa_type):
         self.request.session['auth_mfa'] = 1
@@ -315,7 +318,7 @@ class MFAMixin:
 
     @staticmethod
     def get_user_mfa_methods(user=None):
-        mfa_backends = User.get_enabled_mfa_backends()
+        mfa_backends = User.get_global_enabled_mfa_backends()
         methods = []
 
         for backend_cls in mfa_backends:
@@ -326,7 +329,7 @@ class MFAMixin:
                 'selected': False
             }
             if user:
-                data['enable'] = backend_cls(user).has_set()
+                data['enable'] = backend_cls(user).is_active()
             methods.append(data)
         return methods
 
@@ -457,12 +460,6 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, MFAMixin, AuthPost
         ip = self.get_request_ip()
         cache.set(self.key_prefix_captcha.format(ip), 1, 3600)
 
-    def set_passwd_verify_on_session(self, user: User):
-        self.request.session['user_id'] = str(user.id)
-        self.request.session['auth_password'] = 1
-        self.request.session['auth_password_expired_at'] = \
-            time.time() + settings.AUTH_EXPIRED_SECONDS
-
     def check_is_need_captcha(self):
         # 最近有登录失败时需要填写验证码
         ip = get_request_ip(self.request)
@@ -490,13 +487,14 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, MFAMixin, AuthPost
         self._check_login_mfa_login_if_need(user)
 
         # 标记密码验证成功
-        self.set_auth_mark(user=user, auto_login=auto_login, ip=ip)
+        self.mark_password_ok(user=user, auto_login=auto_login)
+        LoginBlockUtil(user.username, ip).clean_failed_count()
         return user
 
-    def set_auth_mark(self, user, auto_login, ip):
-        LoginBlockUtil(user.username, ip).clean_failed_count()
+    def mark_password_ok(self, user, auto_login=False):
         request = self.request
         request.session['auth_password'] = 1
+        request.session['auth_password_expired_at'] = time.time() + settings.AUTH_EXPIRED_SECONDS
         request.session['user_id'] = str(user.id)
         request.session['auto_login'] = auto_login
         request.session['auth_backend'] = getattr(user, 'backend', settings.AUTH_BACKEND_MODEL)
@@ -518,19 +516,14 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, MFAMixin, AuthPost
         LoginBlockUtil(user.username, ip).clean_failed_count()
         MFABlockUtils(user.username, ip).clean_failed_count()
 
-        request.session['auth_password'] = 1
-        request.session['user_id'] = str(user.id)
-        request.session['auth_backend'] = auth_backend
+        self.mark_password_ok(user, False)
         return user
 
     def check_user_auth_if_need(self, decrypt_passwd=False):
         request = self.request
-        if request.session.get('auth_password') and \
-                request.session.get('user_id'):
-            user = self.get_user_from_session()
-            if user:
-                return user
-        return self.check_user_auth(decrypt_passwd=decrypt_passwd)
+        if not request.session.get('auth_password'):
+            return self.check_user_auth(decrypt_passwd=decrypt_passwd)
+        return self.get_user_from_session()
 
     def clear_auth_mark(self):
         self.request.session['auth_password'] = ''

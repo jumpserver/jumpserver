@@ -53,19 +53,19 @@
                         <span class="col-sm-6">
                         {% if b.has_set %}
                             <button class="btn btn-warning btn-xs" style="float: right"
-                                    {% if not b.can_unset %} disabled {% endif %}
-                                    onclick="goTo('{{ b.get_unset_url }}')"
+                                    {% if not b.can_disable %} disabled {% endif %}
+                                    onclick="goTo('{{ b.get_disable_url }}')"
                             >
                                 {% trans 'Disable' %}
                             </button>
-                            <span class="help-inline">{{ b.help_text_of_unset }}</span>
+                            <span class="help-inline">{{ b.help_text_of_disable }}</span>
                         {% else %}
                             <button class="btn btn-primary btn-xs" style="float: right"
-                                    onclick="goTo('{{ b.get_set_url }}')"
+                                    onclick="goTo('{{ b.get_enable_url }}')"
                             >
                                 {% trans 'Enable' %}
                             </button>
-                            <span class="help-inline">{{ b.help_text_of_set }}</span>
+                            <span class="help-inline">{{ b.help_text_of_enable }}</span>
                         {% endif %}
                     </span>
                     </div>

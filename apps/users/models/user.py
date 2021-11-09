@@ -488,30 +488,28 @@ class MFAMixin:
     def disable_mfa(self):
         self.mfa_level = 0
 
-    def mfa_no_available(self):
-        backends = self.supported_mfa_backends
-        backends_set = [backend for backend in backends if backend.has_set]
-        return len(backends_set) == 0
+    def no_active_mfa(self):
+        return len(self.active_mfa_backends) == 0
 
     @lazyproperty
-    def supported_mfa_backends(self):
-        backends = self.__class__.get_enabled_mfa_backends()
+    def active_mfa_backends(self):
+        backends = self.__class__.get_global_enabled_mfa_backends()
         backends_instance = [cls(self) for cls in backends]
-        backends_set = [b.__class__ for b in backends_instance if b.has_set()]
-        return backends_set
+        backends_owned = [b.__class__ for b in backends_instance if b.is_active()]
+        return backends_owned
 
     @property
-    def supported_mfa_backends_mapper(self):
-        return {b.name: b for b in self.supported_mfa_backends}
+    def active_mfa_backends_mapper(self):
+        return {b.name: b for b in self.active_mfa_backends}
 
     @classmethod
-    def get_enabled_mfa_backends(cls):
+    def get_global_enabled_mfa_backends(cls):
         from authentication.mfa import MFA_BACKENDS
-        backends = [b for b in MFA_BACKENDS if b.enabled()]
+        backends = [b for b in MFA_BACKENDS if b.global_enabled()]
         return backends
 
     def get_mfa_backend_by_type(self, mfa_type):
-        mfa_mapper = self.supported_mfa_backends_mapper
+        mfa_mapper = self.active_mfa_backends_mapper
         backend_cls = mfa_mapper.get(mfa_type)
         if not backend_cls:
             return None

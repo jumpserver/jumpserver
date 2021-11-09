@@ -21,26 +21,26 @@ class MFARadius(BaseMFA):
         msg = '' if ok else mfa_failed_msg
         return ok, msg
 
-    def has_set(self):
+    def is_active(self):
         return True
 
     @staticmethod
-    def enabled():
+    def global_enabled():
         return settings.OTP_IN_RADIUS
 
-    def get_set_url(self) -> str:
+    def get_enable_url(self) -> str:
         return ''
 
-    def can_unset(self):
+    def can_disable(self):
         return False
 
-    def unset(self):
+    def disable(self):
         return ''
 
     @staticmethod
-    def help_text_of_unset():
+    def help_text_of_disable():
         return _("Radius global enabled, cannot disable")
         # return 'Radius 是全局的配置，不可以禁用'
 
-    def get_unset_url(self) -> str:
+    def get_disable_url(self) -> str:
         return ''

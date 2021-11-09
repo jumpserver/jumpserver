@@ -96,11 +96,12 @@ class UserOtpVerifyApi(CreateAPIView):
         code = serializer.validated_data["code"]
         otp = MFAOtp(request.user)
 
-        if otp.check_code(code):
+        ok, error = otp.check_code(code)
+        if ok:
             request.session["MFA_VERIFY_TIME"] = int(time.time())
             return Response({"ok": "1"})
         else:
-            return Response({"error": _("Code is invalid")}, status=400)
+            return Response({"error": _("Code is invalid, ") + error}, status=400)
 
     def get_permissions(self):
         if self.request.method.lower() == 'get' \

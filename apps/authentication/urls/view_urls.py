@@ -51,8 +51,6 @@ urlpatterns = [
     path('profile/otp/enable/bind/', users_view.UserOtpEnableBindView.as_view(), name='user-otp-enable-bind'),
     path('profile/otp/disable/', users_view.UserOtpDisableView.as_view(),
          name='user-otp-disable'),
-    path('profile/otp/update/', users_view.UserOtpUpdateView.as_view(), name='user-otp-update'),
-    path('profile/otp/settings-success/', users_view.UserOtpSettingsSuccessView.as_view(), name='user-otp-settings-success'),
     path('first-login/', users_view.UserFirstLoginView.as_view(), name='user-first-login'),
 
     # openid

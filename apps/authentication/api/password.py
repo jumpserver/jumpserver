@@ -22,5 +22,5 @@ class UserPasswordVerifyApi(AuthMixin, CreateAPIView):
         if not user:
             raise PasswdInvalid
 
-        self.set_passwd_verify_on_session(user)
+        self.mark_password_ok(user)
         return Response()

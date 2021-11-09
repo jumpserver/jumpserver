@@ -33,35 +33,35 @@ class BaseMFA(abc.ABC):
         return False, 'Error msg'
 
     @abc.abstractmethod
-    def has_set(self):
+    def is_active(self):
         return False
 
     @staticmethod
     @abc.abstractmethod
-    def enabled():
+    def global_enabled():
         return False
 
     @abc.abstractmethod
-    def get_set_url(self) -> str:
+    def get_enable_url(self) -> str:
         return ''
 
     @abc.abstractmethod
-    def get_unset_url(self) -> str:
+    def get_disable_url(self) -> str:
         return ''
 
     @abc.abstractmethod
-    def unset(self):
+    def disable(self):
         pass
 
     @abc.abstractmethod
-    def can_unset(self) -> bool:
+    def can_disable(self) -> bool:
         return True
 
     @staticmethod
-    def help_text_of_set():
+    def help_text_of_enable():
         return ''
 
     @staticmethod
-    def help_text_of_unset():
+    def help_text_of_disable():
         return ''
 
