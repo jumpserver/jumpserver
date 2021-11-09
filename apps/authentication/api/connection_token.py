@@ -4,6 +4,7 @@ import urllib.parse
 import json
 import base64
 from typing import Callable
+import os
 
 from django.conf import settings
 from django.core.cache import cache
@@ -58,7 +59,7 @@ class ClientProtocolMixin:
             # 'desktopwidth:i': '1280',
             # 'desktopheight:i': '800',
             'use multimon:i': '0',
-            'session bpp:i': '32',
+            # 'session bpp:i': '32',
             'audiomode:i': '0',
             'disable wallpaper:i': '0',
             'disable full window drag:i': '0',
@@ -112,6 +113,9 @@ class ClientProtocolMixin:
             options['desktopheight:i'] = height
         else:
             options['smart sizing:i'] = '1'
+
+        options['session bpp:i'] = os.getenv('JUMPSERVER_COLOR_DEPTH', '32')
+
         content = ''
         for k, v in options.items():
             content += f'{k}:{v}\n'
