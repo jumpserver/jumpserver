@@ -4,8 +4,17 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class BaseMFA(abc.ABC):
+    placeholder = _('Please input security code')
+
     def __init__(self, user):
+        """
+        :param user:  Authenticated user, Anonymous or None
+        因为首页登录时，可能没法获取到一些状态
+        """
         self.user = user
+
+    def is_authenticated(self):
+        return self.user and self.user.is_authenticated
 
     @property
     @abc.abstractmethod
@@ -16,10 +25,6 @@ class BaseMFA(abc.ABC):
     @abc.abstractmethod
     def display_name(self):
         return ''
-
-    @property
-    def placeholder(self):
-        return _('Please input security code')
 
     @staticmethod
     def challenge_required():

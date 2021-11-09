@@ -16,10 +16,9 @@ class MFASettingView(PermissionsMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        mfa_backends = User.get_global_enabled_mfa_backends()
-        mfa_backends_instance = [cls(self.request.user) for cls in mfa_backends]
+        mfa_backends = User.get_user_mfa_backends(self.request.user)
         context.update({
-            'mfa_backends': mfa_backends_instance,
+            'mfa_backends': mfa_backends,
         })
         return context
 

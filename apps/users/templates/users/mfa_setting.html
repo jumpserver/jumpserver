@@ -49,9 +49,10 @@
             <div style="height: 100%; width: 100%;">
                 {% for b in mfa_backends %}
                     <div class="row" style="padding-top: 10px">
-                        <li class="col-sm-6" style="font-size: 14px">{{ b.display_name }}</li>
+                        <li class="col-sm-6" style="font-size: 14px">{{ b.display_name }}
+                            {{ b.enable }}</li>
                         <span class="col-sm-6">
-                        {% if b.has_set %}
+                        {% if b.is_active %}
                             <button class="btn btn-warning btn-xs" style="float: right"
                                     {% if not b.can_disable %} disabled {% endif %}
                                     onclick="goTo('{{ b.get_disable_url }}')"

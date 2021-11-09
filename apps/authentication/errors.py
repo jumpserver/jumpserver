@@ -283,7 +283,7 @@ class SSOAuthClosed(JMSException):
     default_detail = _('SSO auth closed')
 
 
-class PasswdTooSimple(JMSException):
+class PasswordTooSimple(JMSException):
     default_code = 'passwd_too_simple'
     default_detail = _('Your password is too simple, please change it for security')
 
@@ -292,7 +292,7 @@ class PasswdTooSimple(JMSException):
         self.url = url
 
 
-class PasswdNeedUpdate(JMSException):
+class PasswordNeedUpdate(JMSException):
     default_code = 'passwd_need_update'
     default_detail = _('You should to change your password before login')
 
@@ -335,7 +335,7 @@ class FeiShuNotBound(JMSException):
     default_detail = 'FeiShu is not bound'
 
 
-class PasswdInvalid(JMSException):
+class PasswordInvalid(JMSException):
     default_code = 'passwd_invalid'
     default_detail = _('Your password is invalid')
 
@@ -346,10 +346,6 @@ class NotHaveUpDownLoadPerm(JMSException):
     default_detail = _('No upload or download permission')
 
 
-class NotEnableMFAError(JMSException):
-    default_detail = mfa_unset_msg
-
-
 class OTPBindRequiredError(JMSException):
     default_detail = otp_unset_msg
 
@@ -358,7 +354,7 @@ class OTPBindRequiredError(JMSException):
         self.url = url
 
 
-class OTPCodeRequiredError(AuthFailedError):
+class MFACodeRequiredError(AuthFailedError):
     msg = _("Please enter MFA code")
 
 

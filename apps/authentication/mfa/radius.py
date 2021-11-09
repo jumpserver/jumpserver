@@ -12,6 +12,7 @@ class MFARadius(BaseMFA):
     display_name = _('Radius MFA')
 
     def check_code(self, code):
+        assert self.is_authenticated()
         backend = RadiusBackend()
         username = self.user.username
         user = backend.authenticate(
@@ -40,7 +41,6 @@ class MFARadius(BaseMFA):
     @staticmethod
     def help_text_of_disable():
         return _("Radius global enabled, cannot disable")
-        # return 'Radius 是全局的配置，不可以禁用'
 
     def get_disable_url(self) -> str:
         return ''

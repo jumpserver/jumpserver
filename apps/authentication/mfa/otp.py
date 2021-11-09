@@ -13,11 +13,15 @@ class MFAOtp(BaseMFA):
 
     def check_code(self, code):
         from users.utils import check_otp_code
+        assert self.is_authenticated()
+
         ok = check_otp_code(self.user.otp_secret_key, code)
         msg = '' if ok else otp_failed_msg
         return ok, msg
 
     def is_active(self):
+        if not self.is_authenticated():
+            return True
         return self.user.otp_secret_key
 
     @staticmethod
@@ -28,6 +32,7 @@ class MFAOtp(BaseMFA):
         return reverse('authentication:user-otp-enable-start')
 
     def disable(self):
+        assert self.is_authenticated()
         self.user.otp_secret_key = ''
         self.user.save(update_fields=['otp_secret_key'])
 

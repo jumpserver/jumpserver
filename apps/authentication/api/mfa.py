@@ -43,12 +43,10 @@ class MFASendCodeApi(AuthMixin, CreateAPIView):
         else:
             user = get_object_or_404(User, username=username)
 
-        backend_cls = user.get_mfa_backend_by_type(mfa_type)
-        if not backend_cls or not backend_cls.challenge_required:
-            raise ValidationError('MFA type not support: {} {}'.format(mfa_type, backend_cls))
-
-        backend = backend_cls(user)
-        backend.send_challenge()
+        mfa_backend = user.get_mfa_backend_by_type(mfa_type)
+        if not mfa_backend or not mfa_backend.challenge_required:
+            raise ValidationError('MFA type not support: {} {}'.format(mfa_type, mfa_backend))
+        mfa_backend.send_challenge()
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -70,7 +68,7 @@ class MFAChallengeVerifyApi(AuthMixin, CreateAPIView):
         user = self.get_user_from_session()
         code = serializer.validated_data.get('code')
         mfa_type = serializer.validated_data.get('type', '')
-        self.check_user_mfa(code, mfa_type, user)
+        self._do_check_user_mfa(code, mfa_type, user)
 
     def create(self, request, *args, **kwargs):
         try:

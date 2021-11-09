@@ -134,7 +134,7 @@ class PasswordEncryptionViewMixin:
         # 生成加解密密钥对，public_key传递给前端，private_key存入session中供解密使用
         rsa_public_key = self.request.session.get(RSA_PUBLIC_KEY)
         rsa_private_key = self.request.session.get(RSA_PRIVATE_KEY)
-        if not all((rsa_private_key, rsa_public_key)):
+        if not all([rsa_private_key, rsa_public_key]):
             rsa_private_key, rsa_public_key = gen_key_pair()
             rsa_public_key = rsa_public_key.replace('\n', '\\n')
             self.request.session[RSA_PRIVATE_KEY] = rsa_private_key
@@ -242,7 +242,7 @@ class MFAMixin:
     get_user_from_session: Callable
     get_request_ip: Callable
 
-    def _check_login_mfa_login_if_need(self, user):
+    def _check_login_page_mfa_if_need(self, user):
         if not settings.SECURITY_MFA_IN_LOGIN_PAGE:
             return
 
@@ -251,8 +251,8 @@ class MFAMixin:
         code = data.get('code')
         mfa_type = data.get('mfa_type', 'otp')
         if not code:
-            raise errors.OTPCodeRequiredError
-        self.check_user_mfa(code, mfa_type, user=user)
+            raise errors.MFACodeRequiredError
+        self._do_check_user_mfa(code, mfa_type, user=user)
 
     def check_user_mfa_if_need(self, user):
         if self.request.session.get('auth_mfa'):
@@ -269,14 +269,13 @@ class MFAMixin:
     def mark_mfa_ok(self, mfa_type):
         self.request.session['auth_mfa'] = 1
         self.request.session['auth_mfa_time'] = time.time()
-        self.request.session['auth_mfa_required'] = ''
+        self.request.session['auth_mfa_required'] = 0
         self.request.session['auth_mfa_type'] = mfa_type
 
     def clean_mfa_mark(self):
-        self.request.session['auth_mfa'] = ''
-        self.request.session['auth_mfa_time'] = ''
-        self.request.session['auth_mfa_required'] = ''
-        self.request.session['auth_mfa_type'] = ''
+        keys = ['auth_mfa', 'auth_mfa_time', 'auth_mfa_required', 'auth_mfa_type']
+        for k in keys:
+            self.request.session.pop(k, '')
 
     def check_mfa_is_block(self, username, ip, raise_exception=True):
         blocked = MFABlockUtils(username, ip).is_block()
@@ -289,7 +288,7 @@ class MFAMixin:
         else:
             return exception
 
-    def check_user_mfa(self, code, mfa_type, user=None):
+    def _do_check_user_mfa(self, code, mfa_type, user=None):
         user = user if user else self.get_user_from_session()
         if not user.mfa_enabled:
             return
@@ -299,9 +298,9 @@ class MFAMixin:
         self.check_mfa_is_block(user.username, ip)
 
         ok = False
-        mfa_backend_cls = user.get_mfa_backend_by_type(mfa_type)
-        if mfa_backend_cls:
-            ok, msg = mfa_backend_cls(user).check_code(code)
+        mfa_backend = user.get_mfa_backend_by_type(mfa_type)
+        if mfa_backend:
+            ok, msg = mfa_backend.check_code(code)
         else:
             msg = _('The MFA type({}) is not supported'.format(mfa_type))
 
@@ -317,21 +316,9 @@ class MFAMixin:
         )
 
     @staticmethod
-    def get_user_mfa_methods(user=None):
-        mfa_backends = User.get_global_enabled_mfa_backends()
-        methods = []
-
-        for backend_cls in mfa_backends:
-            data = {
-                'name': backend_cls.name,
-                'label': backend_cls.display_name,
-                'enable': True,
-                'selected': False
-            }
-            if user:
-                data['enable'] = backend_cls(user).is_active()
-            methods.append(data)
-        return methods
+    def get_user_mfa_context(user=None):
+        mfa_backends = User.get_user_mfa_backends(user)
+        return {'mfa_backends': mfa_backends}
 
 
 class AuthPostCheckMixin:
@@ -356,14 +343,14 @@ class AuthPostCheckMixin:
         if user.is_superuser and password == 'admin':
             message = _('Your password is too simple, please change it for security')
             url = cls.generate_reset_password_url_with_flash_msg(user, message=message)
-            raise errors.PasswdTooSimple(url)
+            raise errors.PasswordTooSimple(url)
 
     @classmethod
     def _check_passwd_need_update(cls, user: User):
         if user.need_update_password:
             message = _('You should to change your password before login')
             url = cls.generate_reset_password_url_with_flash_msg(user, message)
-            raise errors.PasswdNeedUpdate(url)
+            raise errors.PasswordNeedUpdate(url)
 
     @classmethod
     def _check_password_require_reset_or_not(cls, user: User):
@@ -484,7 +471,7 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, MFAMixin, AuthPost
         self._check_passwd_need_update(user)
 
         # 校验login-mfa, 如果登录页面上显示 mfa 的话
-        self._check_login_mfa_login_if_need(user)
+        self._check_login_page_mfa_if_need(user)
 
         # 标记密码验证成功
         self.mark_password_ok(user=user, auto_login=auto_login)
@@ -526,10 +513,9 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, MFAMixin, AuthPost
         return self.get_user_from_session()
 
     def clear_auth_mark(self):
-        self.request.session['auth_password'] = ''
-        self.request.session['auth_user_id'] = ''
-        self.request.session['auth_confirm'] = ''
-        self.request.session['auth_ticket_id'] = ''
+        keys = ['auth_password', 'user_id', 'auth_confirm', 'auth_ticket_id']
+        for k in keys:
+            self.request.session.pop(k, '')
 
     def send_auth_signal(self, success=True, user=None, username='', reason=''):
         if success:

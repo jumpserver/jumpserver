@@ -122,16 +122,16 @@ class UserLoginView(mixins.AuthMixin, FormView):
             self.request.session.set_test_cookie()
             return self.render_to_response(context)
         except (
-                errors.PasswdTooSimple,
+                errors.PasswordTooSimple,
                 errors.PasswordRequireResetError,
-                errors.PasswdNeedUpdate,
+                errors.PasswordNeedUpdate,
                 errors.OTPBindRequiredError
         ) as e:
             return redirect(e.url)
         except (
                 errors.MFAFailedError,
                 errors.BlockMFAError,
-                errors.OTPCodeRequiredError,
+                errors.MFACodeRequiredError,
                 errors.SMSCodeRequiredError,
                 errors.UserPhoneNotSet
         ) as e:
@@ -199,7 +199,7 @@ class UserLoginView(mixins.AuthMixin, FormView):
             'demo_mode': os.environ.get("DEMO_MODE"),
             'auth_methods': self.get_support_auth_methods(),
             'forgot_password_url': self.get_forgot_password_url(),
-            'methods': self.get_user_mfa_methods(),
+            **self.get_user_mfa_context(self.request.user)
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -238,7 +238,7 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
             return self.format_redirect_url(self.login_confirm_url)
         except errors.MFAUnsetError as e:
             return e.url
-        except errors.PasswdTooSimple as e:
+        except errors.PasswordTooSimple as e:
             return e.url
         else:
             self.login_it(user)

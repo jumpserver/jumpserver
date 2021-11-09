@@ -5329,7 +5329,7 @@ msgstr "的密码完成绑定操作"
 
 #: users/templates/users/user_otp_enable_bind.html:6
 msgid "Bind one-time password authenticator"
-msgstr "绑定一次性密码验证器"
+msgstr "绑定MFA验证器"
 
 #: users/templates/users/user_otp_enable_bind.html:13
 msgid ""

@@ -493,27 +493,26 @@ class MFAMixin:
 
     @lazyproperty
     def active_mfa_backends(self):
-        backends = self.__class__.get_global_enabled_mfa_backends()
-        backends_instance = [cls(self) for cls in backends]
-        backends_owned = [b.__class__ for b in backends_instance if b.is_active()]
-        return backends_owned
+        backends = self.get_user_mfa_backends(self)
+        active_backends = [b for b in backends if b.is_active()]
+        return active_backends
 
     @property
     def active_mfa_backends_mapper(self):
         return {b.name: b for b in self.active_mfa_backends}
 
-    @classmethod
-    def get_global_enabled_mfa_backends(cls):
+    @staticmethod
+    def get_user_mfa_backends(user):
         from authentication.mfa import MFA_BACKENDS
-        backends = [b for b in MFA_BACKENDS if b.global_enabled()]
+        backends = [cls(user) for cls in MFA_BACKENDS if cls.global_enabled()]
         return backends
 
     def get_mfa_backend_by_type(self, mfa_type):
         mfa_mapper = self.active_mfa_backends_mapper
-        backend_cls = mfa_mapper.get(mfa_type)
-        if not backend_cls:
+        backend = mfa_mapper.get(mfa_type)
+        if not backend:
             return None
-        return backend_cls
+        return backend
 
 
 class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
