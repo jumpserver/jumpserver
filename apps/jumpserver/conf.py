@@ -355,6 +355,11 @@ class Config(dict):
         'WINDOWS_SSH_DEFAULT_SHELL': 'cmd',
         'PERIOD_TASK_ENABLED': True,
 
+        # 导航栏 帮助
+        'HELP_DOCUMENT_URL': 'http://docs.jumpserver.org',
+        'HELP_SUPPORT_URL': 'http://www.jumpserver.org/support/',
+        'OFFICIAL_WEBSITE_URL': 'http://www.jumpserver.org',
+
         'TICKETS_ENABLED': True,
         'FORGOT_PASSWORD_URL': '',
         'HEALTH_CHECK_TOKEN': '',
