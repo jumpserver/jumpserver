@@ -28,6 +28,7 @@ __all__ = [
 ]
 
 
+# MFASelectAPi 原来的名字
 class MFASendCodeApi(AuthMixin, CreateAPIView):
     """
     选择 MFA 后对应操作 api，koko 目前在用
@@ -99,7 +100,7 @@ class UserOtpVerifyApi(CreateAPIView):
             request.session["MFA_VERIFY_TIME"] = int(time.time())
             return Response({"ok": "1"})
         else:
-            return Response({"error": _("Code is invalid, ") + error}, status=400)
+            return Response({"error": _("Code is invalid") + ", " + error}, status=400)
 
     def get_permissions(self):
         if self.request.method.lower() == 'get' \

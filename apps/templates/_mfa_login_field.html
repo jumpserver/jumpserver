@@ -80,7 +80,8 @@
         let time = 60;
         const url = "{% url 'api-auth:mfa-select' %}";
         const data = {
-            type: $("#mfa-select").val()
+            type: $("#mfa-select").val(),
+            username: $('input[name="username"]').val()
         };
 
         function onSuccess() {

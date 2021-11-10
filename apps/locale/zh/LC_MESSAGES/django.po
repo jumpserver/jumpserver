@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-10 09:54+0800\n"
+"POT-Creation-Date: 2021-11-10 10:53+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1496,7 +1496,9 @@ msgid "Invalid token"
 msgstr "无效的令牌"
 
 #: authentication/api/mfa.py:102
-msgid "Code is invalid, "
+#, fuzzy
+#| msgid "Code is invalid, "
+msgid "Code is invalid"
 msgstr "验证码无效"
 
 #: authentication/backends/api.py:67
@@ -3760,11 +3762,11 @@ msgstr ""
 msgid "Send verification code"
 msgstr "发送验证码"
 
-#: templates/_mfa_login_field.html:86
+#: templates/_mfa_login_field.html:91
 msgid "Wait: "
 msgstr "等待："
 
-#: templates/_mfa_login_field.html:96
+#: templates/_mfa_login_field.html:101
 msgid "The verification code has been sent"
 msgstr "验证码已发送"
 
