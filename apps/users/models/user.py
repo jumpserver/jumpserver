@@ -12,33 +12,28 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.hashers import check_password
 from django.core.cache import cache
 from django.db import models
-
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.shortcuts import reverse
 
 from orgs.utils import current_org
 from orgs.models import OrganizationMember, Organization
-from common.exceptions import JMSException
 from common.utils import date_expired_default, get_logger, lazyproperty, random_string
 from common import fields
 from common.const import choices
 from common.db.models import TextChoices
-from users.exceptions import MFANotEnabled, PhoneNotSet
 from ..signals import post_user_change_password
 
-__all__ = ['User', 'UserPasswordHistory', 'MFAType']
+__all__ = ['User', 'UserPasswordHistory']
 
 logger = get_logger(__file__)
 
 
-class MFAType(TextChoices):
-    OTP = 'otp', _('One-time password')
-    SMS_CODE = 'sms', _('SMS verify code')
-
-
 class AuthMixin:
     date_password_last_updated: datetime.datetime
+    history_passwords: models.Manager
+    need_update_password: bool
+    public_key: str
     is_local: bool
 
     @property
@@ -77,7 +72,8 @@ class AuthMixin:
 
     def is_history_password(self, password):
         allow_history_password_count = settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT
-        history_passwords = self.history_passwords.all().order_by('-date_created')[:int(allow_history_password_count)]
+        history_passwords = self.history_passwords.all() \
+            .order_by('-date_created')[:int(allow_history_password_count)]
 
         for history_password in history_passwords:
             if check_password(password, history_password.password):
@@ -474,9 +470,11 @@ class MFAMixin:
 
     @property
     def mfa_force_enabled(self):
-        if settings.SECURITY_MFA_AUTH in [True, 1]:
+        force_level = settings.SECURITY_MFA_AUTH
+        if force_level in [True, 1]:
             return True
-        if settings.SECURITY_MFA_AUTH == 2 and self.is_org_admin:
+        # 2 管理员强制开启
+        if force_level == 2 and self.is_org_admin:
             return True
         return self.mfa_level == 2
 
@@ -489,86 +487,32 @@ class MFAMixin:
 
     def disable_mfa(self):
         self.mfa_level = 0
-        self.otp_secret_key = None
 
-    def reset_mfa(self):
-        if self.mfa_is_otp():
-            self.otp_secret_key = ''
+    def no_active_mfa(self):
+        return len(self.active_mfa_backends) == 0
+
+    @lazyproperty
+    def active_mfa_backends(self):
+        backends = self.get_user_mfa_backends(self)
+        active_backends = [b for b in backends if b.is_active()]
+        return active_backends
+
+    @property
+    def active_mfa_backends_mapper(self):
+        return {b.name: b for b in self.active_mfa_backends}
 
     @staticmethod
-    def mfa_is_otp():
-        if settings.OTP_IN_RADIUS:
-            return False
-        return True
+    def get_user_mfa_backends(user):
+        from authentication.mfa import MFA_BACKENDS
+        backends = [cls(user) for cls in MFA_BACKENDS if cls.global_enabled()]
+        return backends
 
-    def check_radius(self, code):
-        from authentication.backends.radius import RadiusBackend
-        backend = RadiusBackend()
-        user = backend.authenticate(None, username=self.username, password=code)
-        if user:
-            return True
-        return False
-
-    def check_otp(self, code):
-        from ..utils import check_otp_code
-        return check_otp_code(self.otp_secret_key, code)
-
-    def check_mfa(self, code, mfa_type=MFAType.OTP):
-        if not self.mfa_enabled:
-            raise MFANotEnabled
-
-        if mfa_type == MFAType.OTP:
-            if settings.OTP_IN_RADIUS:
-                return self.check_radius(code)
-            else:
-                return self.check_otp(code)
-        elif mfa_type == MFAType.SMS_CODE:
-            return self.check_sms_code(code)
-
-    def get_supported_mfa_types(self):
-        methods = []
-        if self.otp_secret_key:
-            methods.append(MFAType.OTP)
-        if settings.XPACK_ENABLED and settings.SMS_ENABLED and self.phone:
-            methods.append(MFAType.SMS_CODE)
-        return methods
-
-    def check_sms_code(self, code):
-        from authentication.sms_verify_code import VerifyCodeUtil
-
-        if not self.phone:
-            raise PhoneNotSet
-
-        try:
-            util = VerifyCodeUtil(self.phone)
-            return util.verify(code)
-        except JMSException:
-            return False
-
-    def send_sms_code(self):
-        from authentication.sms_verify_code import VerifyCodeUtil
-
-        if not self.phone:
-            raise PhoneNotSet
-
-        util = VerifyCodeUtil(self.phone)
-        util.touch()
-        return util.timeout
-
-    def mfa_enabled_but_not_set(self):
-        if not self.mfa_enabled:
-            return False, None
-
-        if not self.mfa_is_otp():
-            return False, None
-
-        if self.mfa_is_otp() and self.otp_secret_key:
-            return False, None
-
-        if self.phone and settings.SMS_ENABLED and settings.XPACK_ENABLED:
-            return False, None
-
-        return True, reverse('authentication:user-otp-enable-start')
+    def get_mfa_backend_by_type(self, mfa_type):
+        mfa_mapper = self.active_mfa_backends_mapper
+        backend = mfa_mapper.get(mfa_type)
+        if not backend:
+            return None
+        return backend
 
 
 class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):

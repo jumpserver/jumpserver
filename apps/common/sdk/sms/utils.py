@@ -3,7 +3,7 @@ import random
 from django.core.cache import cache
 from django.utils.translation import gettext_lazy as _
 
-from common.sdk.sms import SMS
+from .endpoint import SMS
 from common.utils import get_logger
 from common.exceptions import JMSException
 
@@ -28,32 +28,24 @@ class CodeSendTooFrequently(JMSException):
         super().__init__(detail=self.default_detail.format(ttl))
 
 
-class VerifyCodeUtil:
-    KEY_TMPL = 'auth-verify_code-{}'
+class SendAndVerifySMSUtil:
+    KEY_TMPL = 'auth-verify-code-{}'
     TIMEOUT = 60
 
-    def __init__(self, account, key_suffix=None, timeout=None):
-        self.account = account
-        self.key_suffix = key_suffix
+    def __init__(self, phone, key_suffix=None, timeout=None):
+        self.phone = phone
         self.code = ''
+        self.timeout = timeout or self.TIMEOUT
+        self.key_suffix = key_suffix or str(phone)
+        self.key = self.KEY_TMPL.format(key_suffix)
 
-        if key_suffix is not None:
-            self.key = self.KEY_TMPL.format(key_suffix)
-        else:
-            self.key = self.KEY_TMPL.format(account)
-        self.timeout = self.TIMEOUT if timeout is None else timeout
-
-    def touch(self):
+    def gen_and_send(self):
         """
         生成，保存，发送
         """
-        ttl = self.ttl()
-        if ttl > 0:
-            raise CodeSendTooFrequently(ttl)
         try:
-            self.generate()
-            self.save()
-            self.send()
+            code = self.generate()
+            self.send(code)
         except JMSException:
             self.clear()
             raise
@@ -66,19 +58,18 @@ class VerifyCodeUtil:
     def clear(self):
         cache.delete(self.key)
 
-    def save(self):
-        cache.set(self.key, self.code, self.timeout)
-
-    def send(self):
+    def send(self, code):
         """
         发送信息的方法，如果有错误直接抛出 api 异常
         """
-        account = self.account
-        code = self.code
-
+        ttl = self.ttl()
+        if ttl > 0:
+            logger.error('Send sms too frequently, delay {}'.format(ttl))
+            raise CodeSendTooFrequently(ttl)
         sms = SMS()
-        sms.send_verify_code(account, code)
-        logger.info(f'Send sms verify code: account={account} code={code}')
+        sms.send_verify_code(self.phone, code)
+        cache.set(self.key, self.code, self.timeout)
+        logger.info(f'Send sms verify code to {self.phone}: {code}')
 
     def verify(self, code):
         right = cache.get(self.key)

@@ -13,19 +13,18 @@
             <p class="red-fonts">{{ form.code.errors.as_text }}</p>
         {% endif %}
         <div class="form-group">
-            {% include '_mfa_otp_login.html' %}
+            {% include '_mfa_login_field.html' %}
         </div>
-        <button id='submit_button' type="submit"
-                class="btn btn-primary block full-width m-b">{% trans 'Next' %}</button>
+        <button id='submit_button' type="submit" class="btn btn-primary block full-width m-b">
+            {% trans 'Next' %}
+        </button>
         <div>
             <small>{% trans "Can't provide security? Please contact the administrator!" %}</small>
         </div>
     </form>
-    <style type="text/css">
+    <style>
         .mfa-div {
             margin-top: 15px;
         }
     </style>
-    <script>
-    </script>
 {% endblock %}

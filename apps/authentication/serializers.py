@@ -78,6 +78,7 @@ class BearerTokenSerializer(serializers.Serializer):
 
 class MFASelectTypeSerializer(serializers.Serializer):
     type = serializers.CharField()
+    username = serializers.CharField(required=False, allow_blank=True, allow_null=True)
 
 
 class MFAChallengeSerializer(serializers.Serializer):

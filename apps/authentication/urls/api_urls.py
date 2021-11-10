@@ -25,10 +25,11 @@ urlpatterns = [
 
     path('auth/', api.TokenCreateApi.as_view(), name='user-auth'),
     path('tokens/', api.TokenCreateApi.as_view(), name='auth-token'),
-    path('mfa/challenge/', api.MFAChallengeApi.as_view(), name='mfa-challenge'),
-    path('mfa/select/', api.MFASelectTypeApi.as_view(), name='mfa-select'),
+    path('mfa/verify/', api.MFAChallengeVerifyApi.as_view(), name='mfa-verify'),
+    path('mfa/challenge/', api.MFAChallengeVerifyApi.as_view(), name='mfa-challenge'),
+    path('mfa/select/', api.MFASendCodeApi.as_view(), name='mfa-select'),
+    path('mfa/send-code/', api.MFASendCodeApi.as_view(), name='mfa-send-codej'),
     path('otp/verify/', api.UserOtpVerifyApi.as_view(), name='user-otp-verify'),
-    path('sms/verify-code/send/', api.SendSMSVerifyCodeApi.as_view(), name='sms-verify-code-send'),
     path('password/verify/', api.UserPasswordVerifyApi.as_view(), name='user-password-verify'),
     path('login-confirm-ticket/status/', api.TicketStatusApi.as_view(), name='login-confirm-ticket-status'),
 ]
