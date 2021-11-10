@@ -3448,6 +3448,17 @@ msgstr "会话分享"
 msgid "Enabled, Allows user active session to be shared with other users"
 msgstr "开启后允许用户分享已连接的资产会话给它人，协同工作"
 
+#: settings/serializers/security.py:144
+msgid "Remote Login Protection"
+msgstr "异地登录保护"
+
+#: settings/serializers/security.py:145
+msgid ""
+"The system determines whether the login IP address belongs to a common login "
+"city. If the account is logged in from a common login city, the system sends "
+"a remote login reminder"
+msgstr "根据登录IP是否所属常用登录城市进行判断，若账号在非常用城市登录，会发送异地登录提醒"
+
 #: settings/serializers/sms.py:7
 msgid "Label"
 msgstr "标签"

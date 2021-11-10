@@ -15,7 +15,7 @@ from rest_framework.request import Request
 
 from assets.models import Asset, SystemUser
 from authentication.signals import post_auth_failed, post_auth_success
-from authentication.utils import check_different_city_login
+from authentication.utils import check_different_city_login_if_need
 from jumpserver.utils import current_request
 from users.models import User
 from users.signals import post_user_change_password
@@ -304,7 +304,7 @@ def generate_data(username, request, login_type=None):
 @receiver(post_auth_success)
 def on_user_auth_success(sender, user, request, login_type=None, **kwargs):
     logger.debug('User login success: {}'.format(user.username))
-    check_different_city_login(user, request)
+    check_different_city_login_if_need(user, request)
     data = generate_data(user.username, request, login_type=login_type)
     data.update({'mfa': int(user.mfa_enabled), 'status': True})
     write_login_log(**data)
