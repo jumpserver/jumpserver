@@ -29,6 +29,21 @@ class OtherSettingSerializer(serializers.Serializer):
         required=False, label=_("Perm single to ungroup node")
     )
 
+    HELP_DOCUMENT_URL = serializers.URLField(
+        required=False, allow_blank=True, allow_null=True, label=_("Help Docs URL"),
+        help_text=_('default: http://docs.jumpserver.org')
+    )
+
+    HELP_SUPPORT_URL = serializers.URLField(
+        required=False, allow_blank=True, allow_null=True, label=_("Help Support URL"),
+        help_text=_('default: http://www.jumpserver.org/support/')
+    )
+
+    OFFICIAL_WEBSITE_URL = serializers.URLField(
+        required=False, allow_blank=True, allow_null=True, label=_("Help Website URL"),
+        help_text=_('default: http://www.jumpserver.org')
+    )
+
     # 准备废弃
     # PERIOD_TASK_ENABLED = serializers.BooleanField(
     #     required=False, label=_("Enable period task")
