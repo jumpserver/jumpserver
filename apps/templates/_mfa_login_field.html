@@ -18,7 +18,7 @@
             {% if backend.challenge_required %}challenge-required{% endif %}"
             style="display: none"
         >
-            <input type="text" class="form-control input-style" required name="code"
+            <input type="text" class="form-control input-style"
                    placeholder="{{ backend.placeholder }}"
             >
             {% if backend.challenge_required %}
@@ -69,6 +69,11 @@
         if (!onLoad) {
             localStorage.setItem(preferMFAKey, name)
         }
+
+        $('.input-style').each(function (i, ele){
+            $(ele).attr('name', '').attr('required', false)
+        })
+        $('#mfa-' + name + ' .input-style').attr('name', 'code').attr('required', true)
     }
 
     function sendChallengeCode(currentBtn) {

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-08 19:32+0800\n"
+"POT-Creation-Date: 2021-11-10 09:54+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -25,7 +25,7 @@ msgstr ""
 #: orgs/models.py:24 perms/models/base.py:44 settings/models.py:29
 #: settings/serializers/sms.py:6 terminal/models/storage.py:23
 #: terminal/models/task.py:16 terminal/models/terminal.py:100
-#: users/forms/profile.py:32 users/models/group.py:15 users/models/user.py:544
+#: users/forms/profile.py:32 users/models/group.py:15 users/models/user.py:541
 #: users/templates/users/_select_user_modal.html:13
 #: users/templates/users/user_asset_permission.html:37
 #: users/templates/users/user_asset_permission.html:154
@@ -60,7 +60,7 @@ msgstr "激活中"
 #: orgs/models.py:27 perms/models/base.py:53 settings/models.py:34
 #: terminal/models/storage.py:26 terminal/models/terminal.py:114
 #: tickets/models/ticket.py:71 users/models/group.py:16
-#: users/models/user.py:577 xpack/plugins/change_auth_plan/models/base.py:41
+#: users/models/user.py:574 xpack/plugins/change_auth_plan/models/base.py:41
 #: xpack/plugins/cloud/models.py:35 xpack/plugins/cloud/models.py:113
 #: xpack/plugins/gathered_user/models.py:26
 msgid "Comment"
@@ -87,7 +87,7 @@ msgstr "登录复核"
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:38
 #: terminal/notifications.py:90 terminal/notifications.py:138
 #: tickets/models/comment.py:17 users/const.py:14 users/models/user.py:169
-#: users/models/user.py:748 users/models/user.py:774
+#: users/models/user.py:745 users/models/user.py:771
 #: users/serializers/group.py:19
 #: users/templates/users/user_asset_permission.html:38
 #: users/templates/users/user_asset_permission.html:64
@@ -162,7 +162,7 @@ msgstr "格式为逗号分隔的字符串, * 表示匹配所有. "
 #: assets/models/base.py:176 assets/models/gathered_user.py:15
 #: audits/models.py:105 authentication/forms.py:15 authentication/forms.py:17
 #: authentication/templates/authentication/_msg_different_city.html:9
-#: ops/models/adhoc.py:148 users/forms/profile.py:31 users/models/user.py:542
+#: ops/models/adhoc.py:148 users/forms/profile.py:31 users/models/user.py:539
 #: users/templates/users/_msg_user_created.html:12
 #: users/templates/users/_select_user_modal.html:14
 #: xpack/plugins/change_auth_plan/models/asset.py:35
@@ -553,7 +553,7 @@ msgstr "标签管理"
 #: assets/models/cluster.py:28 assets/models/cmd_filter.py:26
 #: assets/models/cmd_filter.py:67 assets/models/group.py:21
 #: common/db/models.py:70 common/mixins/models.py:49 orgs/models.py:25
-#: orgs/models.py:437 perms/models/base.py:51 users/models/user.py:585
+#: orgs/models.py:437 perms/models/base.py:51 users/models/user.py:582
 #: users/serializers/group.py:33
 #: xpack/plugins/change_auth_plan/models/base.py:45
 #: xpack/plugins/cloud/models.py:119 xpack/plugins/gathered_user/models.py:30
@@ -566,7 +566,7 @@ msgstr "创建者"
 #: assets/models/label.py:25 common/db/models.py:72 common/mixins/models.py:50
 #: ops/models/adhoc.py:38 ops/models/command.py:29 orgs/models.py:26
 #: orgs/models.py:435 perms/models/base.py:52 users/models/group.py:18
-#: users/models/user.py:775 xpack/plugins/cloud/models.py:122
+#: users/models/user.py:772 xpack/plugins/cloud/models.py:122
 msgid "Date created"
 msgstr "创建日期"
 
@@ -621,7 +621,7 @@ msgstr "带宽"
 msgid "Contact"
 msgstr "联系人"
 
-#: assets/models/cluster.py:22 users/models/user.py:563
+#: assets/models/cluster.py:22 users/models/user.py:560
 msgid "Phone"
 msgstr "手机"
 
@@ -647,7 +647,7 @@ msgid "Default"
 msgstr "默认"
 
 #: assets/models/cluster.py:36 assets/models/label.py:14
-#: users/models/user.py:760
+#: users/models/user.py:757
 msgid "System"
 msgstr "系统"
 
@@ -1220,7 +1220,7 @@ msgstr "用户代理"
 #: audits/models.py:110
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
 #: authentication/templates/authentication/login_mfa.html:6
-#: users/forms/profile.py:64 users/models/user.py:566
+#: users/forms/profile.py:64 users/models/user.py:563
 #: users/serializers/profile.py:102
 msgid "MFA"
 msgstr "多因子认证"
@@ -1299,12 +1299,12 @@ msgid "Auth Token"
 msgstr "认证令牌"
 
 #: audits/signals_handler.py:68 authentication/views/login.py:169
-#: notifications/backends/__init__.py:11 users/models/user.py:599
+#: notifications/backends/__init__.py:11 users/models/user.py:596
 msgid "WeCom"
 msgstr "企业微信"
 
 #: audits/signals_handler.py:69 authentication/views/login.py:175
-#: notifications/backends/__init__.py:12 users/models/user.py:600
+#: notifications/backends/__init__.py:12 users/models/user.py:597
 msgid "DingTalk"
 msgstr "钉钉"
 
@@ -1495,9 +1495,9 @@ msgstr "{ApplicationPermission} 移除 {SystemUser}"
 msgid "Invalid token"
 msgstr "无效的令牌"
 
-#: authentication/api/mfa.py:103
-msgid "Code is invalid"
-msgstr "Code无效"
+#: authentication/api/mfa.py:102
+msgid "Code is invalid, "
+msgstr "验证码无效"
 
 #: authentication/backends/api.py:67
 msgid "Invalid signature header. No credentials provided."
@@ -1624,8 +1624,7 @@ msgid ""
 "{error},You can also try {times_try} times (The account will be temporarily "
 "locked for {block_time} minutes)"
 msgstr ""
-"{error},您还可以尝试 {times_try} 次（账号将被临时锁定 "
-"{block_time} 分钟）"
+"{error},您还可以尝试 {times_try} 次（账号将被临时锁定 {block_time} 分钟）"
 
 #: authentication/errors.py:67
 msgid "MFA required"
@@ -1663,15 +1662,15 @@ msgstr "该 时间段 不被允许登录"
 msgid "SSO auth closed"
 msgstr "SSO 认证关闭了"
 
-#: authentication/errors.py:288 authentication/mixins.py:354
+#: authentication/errors.py:288 authentication/mixins.py:344
 msgid "Your password is too simple, please change it for security"
 msgstr "你的密码过于简单，为了安全，请修改"
 
-#: authentication/errors.py:297 authentication/mixins.py:361
+#: authentication/errors.py:297 authentication/mixins.py:351
 msgid "You should to change your password before login"
 msgstr "登录完成前，请先修改密码"
 
-#: authentication/errors.py:306 authentication/mixins.py:368
+#: authentication/errors.py:306 authentication/mixins.py:358
 msgid "Your password has expired, please reset before logging in"
 msgstr "您的密码已过期，先修改再登录"
 
@@ -1683,15 +1682,15 @@ msgstr "您的密码无效"
 msgid "No upload or download permission"
 msgstr "没有上传下载权限"
 
-#: authentication/errors.py:362 templates/_mfa_login_field.html:44
+#: authentication/errors.py:358
 msgid "Please enter MFA code"
 msgstr "请输入6位动态安全码"
 
-#: authentication/errors.py:366 templates/_mfa_login_field.html:45
+#: authentication/errors.py:362
 msgid "Please enter SMS code"
 msgstr "请输入短信验证码"
 
-#: authentication/errors.py:370 users/exceptions.py:15
+#: authentication/errors.py:366 users/exceptions.py:15
 msgid "Phone not set"
 msgstr "手机号没有设置"
 
@@ -1715,51 +1714,59 @@ msgstr "多因子认证验证码"
 msgid "Dynamic code"
 msgstr "动态码"
 
-#: authentication/mfa/base.py:22
+#: authentication/mfa/base.py:7
 msgid "Please input security code"
 msgstr "请输入 6 位动态安全码"
 
 #: authentication/mfa/otp.py:7
-msgid "One-time password invalid, or ntp sync server time"
-msgstr "MFA 验证码不正确，或者服务器端时间不对"
+msgid "OTP code invalid, or server time error"
+msgstr "MFA (OTP) 验证码错误，或者服务器端时间不对"
 
-#: authentication/mfa/otp.py:42
-msgid "Download MFA APP, Using dynamic code"
-msgstr "下载 MFA APP, 使用一次性动态码"
+#: authentication/mfa/otp.py:12
+msgid "OTP"
+msgstr "MFA (OTP)"
+
+#: authentication/mfa/otp.py:47
+msgid "Virtual OTP based MFA"
+msgstr "虚拟 MFA (OTP)"
 
 #: authentication/mfa/radius.py:7
 msgid "Radius verify code invalid"
 msgstr "Radius 校验失败"
 
 #: authentication/mfa/radius.py:12
-msgid "MFA Radius"
+msgid "Radius MFA"
 msgstr "Radius MFA"
 
-#: authentication/mfa/radius.py:42
+#: authentication/mfa/radius.py:43
 msgid "Radius global enabled, cannot disable"
 msgstr "Radius MFA 全局开启，无法被禁用"
 
-#: authentication/mfa/sms.py:8
+#: authentication/mfa/sms.py:7
 msgid "SMS verify code invalid"
 msgstr "短信验证码校验失败"
 
-#: authentication/mfa/sms.py:13
+#: authentication/mfa/sms.py:12
 msgid "SMS"
 msgstr "短信"
 
-#: authentication/mfa/sms.py:49
+#: authentication/mfa/sms.py:13
+msgid "SMS verification code"
+msgstr "短信验证码"
+
+#: authentication/mfa/sms.py:53
 msgid "Set phone number to enable"
 msgstr "设置手机号码启用"
 
-#: authentication/mfa/sms.py:53
+#: authentication/mfa/sms.py:57
 msgid "Clear phone number to disable"
 msgstr "清空手机号码禁用"
 
-#: authentication/mixins.py:303
+#: authentication/mixins.py:305
 msgid "The MFA type({}) is not supported"
 msgstr "该 MFA 方法 ({}) 不被支持"
 
-#: authentication/mixins.py:344
+#: authentication/mixins.py:334
 msgid "Please change your password"
 msgstr "请修改密码"
 
@@ -1809,15 +1816,15 @@ msgstr "显示"
 
 #: authentication/templates/authentication/_access_key_modal.html:66
 #: settings/serializers/security.py:25 users/models/user.py:458
-#: users/serializers/profile.py:99 users/templates/users/enable_mfa.html:59
-#: users/templates/users/user_verify_mfa.html:32
+#: users/serializers/profile.py:99 users/templates/users/mfa_setting.html:60
+#: users/templates/users/user_verify_mfa.html:36
 msgid "Disable"
 msgstr "禁用"
 
 #: authentication/templates/authentication/_access_key_modal.html:67
 #: users/models/user.py:459 users/serializers/profile.py:100
-#: users/templates/users/enable_mfa.html:26
-#: users/templates/users/enable_mfa.html:66
+#: users/templates/users/mfa_setting.html:26
+#: users/templates/users/mfa_setting.html:67
 msgid "Enable"
 msgstr "启用"
 
@@ -1946,7 +1953,7 @@ msgstr "更多登录方式"
 #: users/templates/users/user_otp_check_password.html:18
 #: users/templates/users/user_otp_enable_bind.html:24
 #: users/templates/users/user_otp_enable_install_app.html:29
-#: users/templates/users/user_verify_mfa.html:26
+#: users/templates/users/user_verify_mfa.html:30
 msgid "Next"
 msgstr "下一步"
 
@@ -2066,11 +2073,11 @@ msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
 #: authentication/views/login.py:181 notifications/backends/__init__.py:14
-#: users/models/user.py:601
+#: users/models/user.py:598
 msgid "FeiShu"
 msgstr "飞书"
 
-#: authentication/views/login.py:269
+#: authentication/views/login.py:270
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -2078,15 +2085,15 @@ msgstr ""
 "等待 <b>{}</b> 确认, 你也可以复制链接发给他/她 <br/>\n"
 "                  不要关闭本页面"
 
-#: authentication/views/login.py:274
+#: authentication/views/login.py:275
 msgid "No ticket found"
 msgstr "没有发现工单"
 
-#: authentication/views/login.py:306
+#: authentication/views/login.py:307
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: authentication/views/login.py:307
+#: authentication/views/login.py:308
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
@@ -2325,7 +2332,7 @@ msgstr ""
 "div>"
 
 #: notifications/backends/__init__.py:10 users/forms/profile.py:101
-#: users/models/user.py:546
+#: users/models/user.py:543
 msgid "Email"
 msgstr "邮件"
 
@@ -2540,7 +2547,7 @@ msgstr "组织审计员"
 msgid "GLOBAL"
 msgstr "全局组织"
 
-#: orgs/models.py:434 users/models/user.py:554 users/serializers/user.py:37
+#: orgs/models.py:434 users/models/user.py:551 users/serializers/user.py:37
 #: users/templates/users/_select_user_modal.html:15
 msgid "Role"
 msgstr "角色"
@@ -2601,7 +2608,7 @@ msgid "Favorite"
 msgstr "收藏夹"
 
 #: perms/models/base.py:47 templates/_nav.html:21 users/models/group.py:31
-#: users/models/user.py:550 users/templates/users/_select_user_modal.html:16
+#: users/models/user.py:547 users/templates/users/_select_user_modal.html:16
 #: users/templates/users/user_asset_permission.html:39
 #: users/templates/users/user_asset_permission.html:67
 #: users/templates/users/user_database_app_permission.html:38
@@ -2612,7 +2619,7 @@ msgstr "用户组"
 #: perms/models/base.py:50
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:60
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:50
-#: users/models/user.py:582
+#: users/models/user.py:579
 msgid "Date expired"
 msgstr "失效日期"
 
@@ -3646,7 +3653,7 @@ msgstr "下载更新模版"
 msgid "Help"
 msgstr "帮助"
 
-#: templates/_header_bar.html:19 templates/_without_nav_base.html:32
+#: templates/_header_bar.html:19
 msgid "Docs"
 msgstr "文档"
 
@@ -3749,19 +3756,15 @@ msgstr ""
 "\"%(user_pubkey_update)s\"> 链接 </a> 更新\n"
 "        "
 
-#: templates/_mfa_login_field.html:15
-msgid "Please enter verification code"
-msgstr "请输入验证码"
-
-#: templates/_mfa_login_field.html:21 templates/_mfa_login_field.html:71
+#: templates/_mfa_login_field.html:28
 msgid "Send verification code"
 msgstr "发送验证码"
 
-#: templates/_mfa_login_field.html:64 templates/_mfa_login_field.html:69
+#: templates/_mfa_login_field.html:86
 msgid "Wait: "
 msgstr "等待："
 
-#: templates/_mfa_login_field.html:77
+#: templates/_mfa_login_field.html:96
 msgid "The verification code has been sent"
 msgstr "验证码已发送"
 
@@ -3901,7 +3904,7 @@ msgid ""
 "Displays the results of items _START_ to _END_; A total of _TOTAL_ entries"
 msgstr "显示第 _START_ 至 _END_ 项结果; 总共 _TOTAL_ 项"
 
-#: templates/_without_nav_base.html:30
+#: templates/_without_nav_base.html:26
 msgid "Home page"
 msgstr "首页"
 
@@ -4952,7 +4955,7 @@ msgstr "不能和原来的密钥相同"
 msgid "Not a valid ssh public key"
 msgstr "SSH密钥不合法"
 
-#: users/forms/profile.py:160 users/models/user.py:574
+#: users/forms/profile.py:160 users/models/user.py:571
 #: users/templates/users/user_password_update.html:48
 msgid "Public key"
 msgstr "SSH公钥"
@@ -4961,39 +4964,39 @@ msgstr "SSH公钥"
 msgid "Force enable"
 msgstr "强制启用"
 
-#: users/models/user.py:523
+#: users/models/user.py:520
 msgid "Local"
 msgstr "数据库"
 
-#: users/models/user.py:557
+#: users/models/user.py:554
 msgid "Avatar"
 msgstr "头像"
 
-#: users/models/user.py:560
+#: users/models/user.py:557
 msgid "Wechat"
 msgstr "微信"
 
-#: users/models/user.py:571
+#: users/models/user.py:568
 msgid "Private key"
 msgstr "ssh私钥"
 
-#: users/models/user.py:590
+#: users/models/user.py:587
 msgid "Source"
 msgstr "来源"
 
-#: users/models/user.py:594
+#: users/models/user.py:591
 msgid "Date password last updated"
 msgstr "最后更新密码日期"
 
-#: users/models/user.py:597
+#: users/models/user.py:594
 msgid "Need update password"
 msgstr "需要更新密码"
 
-#: users/models/user.py:756
+#: users/models/user.py:753
 msgid "Administrator"
 msgstr "管理员"
 
-#: users/models/user.py:759
+#: users/models/user.py:756
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
@@ -5222,19 +5225,6 @@ msgstr "数据库应用授权"
 msgid "Update User SSH Public Key"
 msgstr "更新SSH密钥"
 
-#: users/templates/users/enable_mfa.html:24
-#: users/templates/users/user_otp_check_password.html:6
-msgid "Enable MFA"
-msgstr "启用 MFA 多因子认证"
-
-#: users/templates/users/enable_mfa.html:30
-msgid "MFA force enable, cannot disable"
-msgstr "MFA 已强制启用，无法禁用"
-
-#: users/templates/users/enable_mfa.html:48
-msgid "MFA setting"
-msgstr "设置 MFA 多因子认证"
-
 #: users/templates/users/first_login.html:6
 #: users/templates/users/first_login_done.html:19
 msgid "First Login"
@@ -5260,6 +5250,18 @@ msgstr "输入您的邮箱, 将会发一封重置邮件到您的邮箱中"
 #: users/templates/users/user_password_update.html:75
 msgid "Submit"
 msgstr "提交"
+
+#: users/templates/users/mfa_setting.html:24
+msgid "Enable MFA"
+msgstr "启用 MFA 多因子认证"
+
+#: users/templates/users/mfa_setting.html:30
+msgid "MFA force enable, cannot disable"
+msgstr "MFA 已强制启用，无法禁用"
+
+#: users/templates/users/mfa_setting.html:48
+msgid "MFA setting"
+msgstr "设置 MFA 多因子认证"
 
 #: users/templates/users/reset_password.html:23
 #: users/templates/users/user_password_update.html:64
@@ -5315,6 +5317,10 @@ msgstr "包含"
 msgid "Exclude"
 msgstr "不包含"
 
+#: users/templates/users/user_otp_check_password.html:6
+msgid "Enable OTP"
+msgstr "启用 MFA (OTP)"
+
 #: users/templates/users/user_otp_check_password.html:10
 msgid "Please enter the password of"
 msgstr "请输入"
@@ -5338,7 +5344,7 @@ msgid ""
 msgstr "使用MFA验证器应用扫描以下二维码，获取6位验证码"
 
 #: users/templates/users/user_otp_enable_bind.html:22
-#: users/templates/users/user_verify_mfa.html:23
+#: users/templates/users/user_verify_mfa.html:27
 msgid "Six figures"
 msgstr "6位数字"
 
@@ -5375,42 +5381,49 @@ msgstr "重置"
 msgid "Verify password"
 msgstr "校验密码"
 
-#: users/templates/users/user_verify_mfa.html:6
+#: users/templates/users/user_verify_mfa.html:9
 msgid "Authenticate"
 msgstr "验证身份"
 
-#: users/templates/users/user_verify_mfa.html:11
+#: users/templates/users/user_verify_mfa.html:15
 msgid ""
 "The account protection has been opened, please complete the following "
 "operations according to the prompts"
 msgstr "账号保护已开启，请根据提示完成以下操作"
 
-#: users/templates/users/user_verify_mfa.html:13
+#: users/templates/users/user_verify_mfa.html:17
 msgid "Open MFA Authenticator and enter the 6-bit dynamic code"
 msgstr "请打开MFA验证器，输入6位动态码"
 
-#: users/views/profile/otp.py:111 users/views/profile/otp.py:150
-#: users/views/profile/otp.py:170
-msgid "MFA code invalid, or ntp sync server time"
-msgstr "MFA验证码不正确，或者服务器端时间不对"
+#: users/views/profile/otp.py:80
+msgid "Already bound"
+msgstr "已经绑定"
 
-#: users/views/profile/otp.py:194
-msgid "MFA enable success"
-msgstr "多因子认证启用成功"
+#: users/views/profile/otp.py:81
+msgid "MFA already bound, disable first, then bound"
+msgstr "MFA (OTP) 已经绑定，请先禁用，再绑定"
 
-#: users/views/profile/otp.py:195
-msgid "MFA enable success, return login page"
-msgstr "多因子认证启用成功，返回到登录页面"
+#: users/views/profile/otp.py:108
+msgid "OTP enable success"
+msgstr "MFA (OTP) 启用成功"
 
-#: users/views/profile/otp.py:197
-msgid "MFA disable success"
-msgstr "多因子认证禁用成功"
+#: users/views/profile/otp.py:109
+msgid "OTP enable success, return login page"
+msgstr "MFA (OTP) 启用成功，返回到登录页面"
 
-#: users/views/profile/otp.py:198
-msgid "MFA disable success, return login page"
-msgstr "多因子认证禁用成功，返回登录页面"
+#: users/views/profile/otp.py:151
+msgid "Disable OTP"
+msgstr "禁用 MFA (OTP)"
 
-#: users/views/profile/password.py:34 users/views/profile/password.py:38
+#: users/views/profile/otp.py:157
+msgid "OTP disable success"
+msgstr "MFA (OTP) 禁用成功"
+
+#: users/views/profile/otp.py:158
+msgid "OTP disable success, return login page"
+msgstr "MFA (OTP) 禁用成功，返回登录页面"
+
+#: users/views/profile/password.py:36 users/views/profile/password.py:41
 msgid "Password invalid"
 msgstr "用户名或密码无效"
 
@@ -6042,6 +6055,18 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "One-time password invalid, or ntp sync server time"
+#~ msgstr "MFA 验证码不正确，或者服务器端时间不对"
+
+#~ msgid "Download MFA APP, Using dynamic code"
+#~ msgstr "下载 MFA APP, 使用一次性动态码"
+
+#~ msgid "MFA Radius"
+#~ msgstr "Radius MFA"
+
+#~ msgid "Please enter verification code"
+#~ msgstr "请输入验证码"
 
 #, python-brace-format
 #~ msgid ""
