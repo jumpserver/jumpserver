@@ -11,7 +11,7 @@ def create_internal_platform(apps, schema_editor):
         ('Windows-TLS', 'Windows', {'security': 'tls'}),
     )
     for name, base, meta in type_platforms:
-        defaults = {'name': name, 'base': base, 'meta': meta}
+        defaults = {'name': name, 'base': base, 'meta': meta, 'internal': True}
         model.objects.using(db_alias).update_or_create(
             name=name, defaults=defaults
         )
