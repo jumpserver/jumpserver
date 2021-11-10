@@ -358,7 +358,6 @@ class Config(dict):
         # 导航栏 帮助
         'HELP_DOCUMENT_URL': 'http://docs.jumpserver.org',
         'HELP_SUPPORT_URL': 'http://www.jumpserver.org/support/',
-        'OFFICIAL_WEBSITE_URL': 'http://www.jumpserver.org',
 
         'TICKETS_ENABLED': True,
         'FORGOT_PASSWORD_URL': '',

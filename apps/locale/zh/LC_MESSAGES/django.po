@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-10 10:53+0800\n"
+"POT-Creation-Date: 2021-11-10 17:18+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1495,7 +1495,7 @@ msgstr "{ApplicationPermission} 移除 {SystemUser}"
 msgid "Invalid token"
 msgstr "无效的令牌"
 
-#: authentication/api/mfa.py:102
+#: authentication/api/mfa.py:103
 #, fuzzy
 #| msgid "Code is invalid, "
 msgid "Code is invalid"
@@ -3247,8 +3247,36 @@ msgid "The shell type used when Windows assets perform ansible tasks"
 msgstr "windows 资产执行 Ansible 任务时，使用的 Shell 类型。"
 
 #: settings/serializers/other.py:29
+msgid "Perm ungroup node"
+msgstr "授权未分组节点"
+
+#: settings/serializers/other.py:30
 msgid "Perm single to ungroup node"
-msgstr "直接授权资产放在未分组节点"
+msgstr "授权未分组节点"
+
+#: settings/serializers/other.py:34
+msgid "Help Docs URL"
+msgstr ""
+
+#: settings/serializers/other.py:35
+msgid "default: http://docs.jumpserver.org"
+msgstr "默认: http://dev.jumpserver.org:8080"
+
+#: settings/serializers/other.py:39
+msgid "Help Support URL"
+msgstr "支持链接"
+
+#: settings/serializers/other.py:40
+msgid "default: http://www.jumpserver.org/support/"
+msgstr "默认: http://www.jumpserver.org/support/"
+
+#: settings/serializers/other.py:44
+msgid "Help Website URL"
+msgstr "官网链接"
+
+#: settings/serializers/other.py:45
+msgid "default: http://www.jumpserver.org"
+msgstr "如: http://dev.jumpserver.org:8080"
 
 #: settings/serializers/security.py:8
 msgid "Password minimum length"
@@ -3457,7 +3485,9 @@ msgid ""
 "The system determines whether the login IP address belongs to a common login "
 "city. If the account is logged in from a common login city, the system sends "
 "a remote login reminder"
-msgstr "根据登录IP是否所属常用登录城市进行判断，若账号在非常用城市登录，会发送异地登录提醒"
+msgstr ""
+"根据登录IP是否所属常用登录城市进行判断，若账号在非常用城市登录，会发送异地登"
+"录提醒"
 
 #: settings/serializers/sms.py:7
 msgid "Label"
@@ -3773,11 +3803,11 @@ msgstr ""
 msgid "Send verification code"
 msgstr "发送验证码"
 
-#: templates/_mfa_login_field.html:91
+#: templates/_mfa_login_field.html:92
 msgid "Wait: "
 msgstr "等待："
 
-#: templates/_mfa_login_field.html:101
+#: templates/_mfa_login_field.html:102
 msgid "The verification code has been sent"
 msgstr "验证码已发送"
 
