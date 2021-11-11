@@ -54,9 +54,9 @@ class BearerTokenSerializer(serializers.Serializer):
         user.last_login = timezone.now()
         user.save(update_fields=['last_login'])
 
-    def create(self, validated_data):
+    def get_request_user(self):
         request = self.context.get('request')
-        if request.user and not request.user.is_anonymous:
+        if request.user and request.user.is_authenticated:
             user = request.user
         else:
             user_id = request.session.get('user_id')
@@ -65,6 +65,12 @@ class BearerTokenSerializer(serializers.Serializer):
                 raise serializers.ValidationError(
                     "user id {} not exist".format(user_id)
                 )
+        return user
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        user = self.get_request_user()
+
         token, date_expired = user.create_bearer_token(request)
         self.update_last_login(user)
 
