@@ -14,7 +14,6 @@ from common.tasks import send_mail_async
 from common.utils import reverse, get_object_or_none
 from .models import User
 
-
 logger = logging.getLogger('jumpserver')
 
 
@@ -101,7 +100,7 @@ def check_password_rules(password, is_org_admin=False):
         min_length = settings.SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH
     else:
         min_length = settings.SECURITY_PASSWORD_MIN_LENGTH
-    pattern += '.{' + str(min_length-1) + ',}$'
+    pattern += '.{' + str(min_length - 1) + ',}$'
     match_obj = re.match(pattern, password)
     return bool(match_obj)
 
@@ -173,6 +172,33 @@ class BlockUtilBase:
         return bool(cache.get(self.block_key))
 
 
+class BlockGlobalIpUtilBase:
+    LIMIT_KEY_TMPL: str
+    BLOCK_KEY_TMPL: str
+
+    def __init__(self, ip):
+        self.ip = ip
+        self.limit_key = self.LIMIT_KEY_TMPL.format(ip)
+        self.block_key = self.BLOCK_KEY_TMPL.format(ip)
+        self.key_ttl = int(settings.SECURITY_LOGIN_LIMIT_TIME) * 60
+
+    def sign_limit_key_and_block_key(self):
+        count = cache.get(self.limit_key, 0)
+        count += 1
+        cache.set(self.limit_key, count, self.key_ttl)
+
+        limit_count = settings.SECURITY_LOGIN_LIMIT_COUNT
+        if count >= limit_count:
+            cache.set(self.block_key, True, self.key_ttl)
+
+    def is_block(self):
+        if self.ip in settings.SECURITY_LOGIN_IP_BLACK_LIST:
+            self.sign_limit_key_and_block_key()
+            return bool(cache.get(self.block_key))
+        else:
+            return False
+
+
 class LoginBlockUtil(BlockUtilBase):
     LIMIT_KEY_TMPL = "_LOGIN_LIMIT_{}_{}"
     BLOCK_KEY_TMPL = "_LOGIN_BLOCK_{}"
@@ -181,6 +207,11 @@ class LoginBlockUtil(BlockUtilBase):
 class MFABlockUtils(BlockUtilBase):
     LIMIT_KEY_TMPL = "_MFA_LIMIT_{}_{}"
     BLOCK_KEY_TMPL = "_MFA_BLOCK_{}"
+
+
+class LoginIpBlockUtil(BlockGlobalIpUtilBase):
+    LIMIT_KEY_TMPL = "_LOGIN_LIMIT_{}"
+    BLOCK_KEY_TMPL = "_LOGIN_BLOCK_{}"
 
 
 def construct_user_email(username, email):

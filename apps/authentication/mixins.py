@@ -8,7 +8,6 @@ from typing import Callable
 from django.utils.http import urlencode
 from django.core.cache import cache
 from django.conf import settings
-from django.urls import reverse_lazy
 from django.contrib import auth
 from django.utils.translation import ugettext as _
 from rest_framework.request import Request
@@ -18,10 +17,10 @@ from django.contrib.auth import (
 )
 from django.shortcuts import reverse, redirect, get_object_or_404
 
-from common.utils import get_object_or_none, get_request_ip, get_logger, bulk_get, FlashMessageUtil
+from common.utils import get_request_ip, get_logger, bulk_get, FlashMessageUtil
 from acls.models import LoginACL
 from users.models import User
-from users.utils import LoginBlockUtil, MFABlockUtils
+from users.utils import LoginBlockUtil, MFABlockUtils, LoginIpBlockUtil
 from . import errors
 from .utils import rsa_decrypt, gen_key_pair
 from .signals import post_auth_success, post_auth_failed
@@ -76,7 +75,9 @@ def authenticate(request=None, **credentials):
         return user
 
     # The credentials supplied are invalid to all backends, fire signal
-    user_login_failed.send(sender=__name__, credentials=_clean_credentials(credentials), request=request)
+    user_login_failed.send(
+        sender=__name__, credentials=_clean_credentials(credentials), request=request
+    )
 
 
 auth.authenticate = authenticate
@@ -209,6 +210,10 @@ class AuthPreCheckMixin:
 
     def _check_is_block(self, username, raise_exception=True):
         ip = self.get_request_ip()
+
+        if LoginIpBlockUtil(ip).is_block():
+            raise errors.BlockGlobalIpLoginError(username=username, ip=ip)
+
         is_block = LoginBlockUtil(username, ip).is_block()
         if not is_block:
             return
@@ -224,6 +229,7 @@ class AuthPreCheckMixin:
             username = self.request.data.get("username")
         else:
             username = self.request.POST.get("username")
+
         self._check_is_block(username, raise_exception)
 
     def _check_only_allow_exists_user_auth(self, username):

@@ -133,7 +133,8 @@ class UserLoginView(mixins.AuthMixin, FormView):
                 errors.BlockMFAError,
                 errors.MFACodeRequiredError,
                 errors.SMSCodeRequiredError,
-                errors.UserPhoneNotSet
+                errors.UserPhoneNotSet,
+                errors.BlockGlobalIpLoginError
         ) as e:
             form.add_error('code', e.msg)
             return super().form_invalid(form)

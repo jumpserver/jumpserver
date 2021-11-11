@@ -180,6 +180,14 @@ class BlockLoginError(AuthFailedNeedBlockMixin, AuthFailedError):
         super().__init__(username=username, ip=ip)
 
 
+class BlockGlobalIpLoginError(AuthFailedError):
+    error = 'block_global_ip_login'
+
+    def __init__(self, username, ip):
+        self.msg = _("IP is not allowed")
+        super().__init__(username=username, ip=ip)
+
+
 class SessionEmptyError(AuthFailedError):
     msg = session_empty_msg
     error = 'session_empty'
