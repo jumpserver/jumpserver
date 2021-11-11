@@ -33,8 +33,8 @@ class TokenCreateApi(AuthMixin, CreateAPIView):
             self.check_user_mfa_if_need(user)
             self.check_user_login_confirm_if_need(user)
             self.send_auth_signal(success=True, user=user)
-            self.clear_auth_mark()
             resp = super().create(request, *args, **kwargs)
+            self.clear_auth_mark()
             return resp
         except errors.AuthFailedError as e:
             return Response(e.as_data(), status=400)

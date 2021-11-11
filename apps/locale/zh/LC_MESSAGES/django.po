@@ -3240,7 +3240,7 @@ msgstr ""
 
 #: settings/serializers/other.py:24
 msgid "Shell (Windows)"
-msgstr "Shell（Windows 资产）"
+msgstr "Windows shell"
 
 #: settings/serializers/other.py:25
 msgid "The shell type used when Windows assets perform ansible tasks"
@@ -3248,15 +3248,15 @@ msgstr "windows 资产执行 Ansible 任务时，使用的 Shell 类型。"
 
 #: settings/serializers/other.py:29
 msgid "Perm ungroup node"
-msgstr "授权未分组节点"
+msgstr "显示未分组节点"
 
 #: settings/serializers/other.py:30
 msgid "Perm single to ungroup node"
-msgstr "授权未分组节点"
+msgstr "放置单独授权的资产到未分组节点, 避免能看到资产所在节点，但该节点未被授权的问题"
 
 #: settings/serializers/other.py:34
 msgid "Help Docs URL"
-msgstr ""
+msgstr "文档链接"
 
 #: settings/serializers/other.py:35
 msgid "default: http://docs.jumpserver.org"
