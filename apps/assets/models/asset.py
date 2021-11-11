@@ -164,38 +164,7 @@ class Platform(models.Model):
         # ordering = ('name',)
 
 
-class Asset(AbsConnectivity, ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
-    # Important
-    PLATFORM_CHOICES = (
-        ('Linux', 'Linux'),
-        ('Unix', 'Unix'),
-        ('MacOS', 'MacOS'),
-        ('BSD', 'BSD'),
-        ('Windows', 'Windows'),
-        ('Windows2016', 'Windows(2016)'),
-        ('Other', 'Other'),
-    )
-
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    ip = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
-    hostname = models.CharField(max_length=128, verbose_name=_('Hostname'))
-    protocol = models.CharField(max_length=128, default=ProtocolsMixin.Protocol.ssh,
-                                choices=ProtocolsMixin.Protocol.choices,
-                                verbose_name=_('Protocol'))
-    port = models.IntegerField(default=22, verbose_name=_('Port'))
-    protocols = models.CharField(max_length=128, default='ssh/22', blank=True, verbose_name=_("Protocols"))
-    platform = models.ForeignKey(Platform, default=Platform.default, on_delete=models.PROTECT, verbose_name=_("Platform"), related_name='assets')
-    domain = models.ForeignKey("assets.Domain", null=True, blank=True, related_name='assets', verbose_name=_("Domain"), on_delete=models.SET_NULL)
-    nodes = models.ManyToManyField('assets.Node', default=default_node, related_name='assets', verbose_name=_("Nodes"))
-    is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
-
-    # Auth
-    admin_user = models.ForeignKey('assets.SystemUser', on_delete=models.SET_NULL, null=True, verbose_name=_("Admin user"), related_name='admin_assets')
-
-    # Some information
-    public_ip = models.CharField(max_length=128, blank=True, null=True, verbose_name=_('Public IP'))
-    number = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Asset number'))
-
+class AbsHardwareInfo(models.Model):
     # Collect
     vendor = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('Vendor'))
     model = models.CharField(max_length=54, null=True, blank=True, verbose_name=_('Model'))
@@ -213,6 +182,49 @@ class Asset(AbsConnectivity, ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     os_version = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('OS version'))
     os_arch = models.CharField(max_length=16, blank=True, null=True, verbose_name=_('OS arch'))
     hostname_raw = models.CharField(max_length=128, blank=True, null=True, verbose_name=_('Hostname raw'))
+
+    class Meta:
+        abstract = True
+
+    @property
+    def cpu_info(self):
+        info = ""
+        if self.cpu_model:
+            info += self.cpu_model
+        if self.cpu_count and self.cpu_cores:
+            info += "{}*{}".format(self.cpu_count, self.cpu_cores)
+        return info
+
+    @property
+    def hardware_info(self):
+        if self.cpu_count:
+            return '{} Core {} {}'.format(
+                self.cpu_vcpus or self.cpu_count * self.cpu_cores,
+                self.memory, self.disk_total
+            )
+        else:
+            return ''
+
+
+class Asset(AbsConnectivity, AbsHardwareInfo, ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    ip = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
+    hostname = models.CharField(max_length=128, verbose_name=_('Hostname'))
+    protocol = models.CharField(max_length=128, default=ProtocolsMixin.Protocol.ssh,
+                                choices=ProtocolsMixin.Protocol.choices, verbose_name=_('Protocol'))
+    port = models.IntegerField(default=22, verbose_name=_('Port'))
+    protocols = models.CharField(max_length=128, default='ssh/22', blank=True, verbose_name=_("Protocols"))
+    platform = models.ForeignKey(Platform, default=Platform.default, on_delete=models.PROTECT, verbose_name=_("Platform"), related_name='assets')
+    domain = models.ForeignKey("assets.Domain", null=True, blank=True, related_name='assets', verbose_name=_("Domain"), on_delete=models.SET_NULL)
+    nodes = models.ManyToManyField('assets.Node', default=default_node, related_name='assets', verbose_name=_("Nodes"))
+    is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
+
+    # Auth
+    admin_user = models.ForeignKey('assets.SystemUser', on_delete=models.SET_NULL, null=True, verbose_name=_("Admin user"), related_name='admin_assets')
+
+    # Some information
+    public_ip = models.CharField(max_length=128, blank=True, null=True, verbose_name=_('Public IP'))
+    number = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Asset number'))
 
     labels = models.ManyToManyField('assets.Label', blank=True, related_name='assets', verbose_name=_("Labels"))
     created_by = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Created by'))
@@ -268,25 +280,6 @@ class Asset(AbsConnectivity, ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
 
     def is_support_ansible(self):
         return self.has_protocol('ssh') and self.platform_base not in ("Other",)
-
-    @property
-    def cpu_info(self):
-        info = ""
-        if self.cpu_model:
-            info += self.cpu_model
-        if self.cpu_count and self.cpu_cores:
-            info += "{}*{}".format(self.cpu_count, self.cpu_cores)
-        return info
-
-    @property
-    def hardware_info(self):
-        if self.cpu_count:
-            return '{} Core {} {}'.format(
-                self.cpu_vcpus or self.cpu_count * self.cpu_cores,
-                self.memory, self.disk_total
-            )
-        else:
-            return ''
 
     def get_auth_info(self):
         if not self.admin_user:

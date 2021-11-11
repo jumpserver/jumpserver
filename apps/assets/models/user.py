@@ -208,6 +208,9 @@ class SystemUser(ProtocolMixin, AuthMixin, BaseUser):
     home = models.CharField(max_length=4096, default='', verbose_name=_('Home'), blank=True)
     system_groups = models.CharField(default='', max_length=4096, verbose_name=_('System groups'), blank=True)
     ad_domain = models.CharField(default='', max_length=256)
+    # linux su 命令 (switch user)
+    su_enabled = models.BooleanField(default=False, verbose_name=_('User switch'))
+    su_from = models.ForeignKey('self', on_delete=models.SET_NULL, related_name='su_to', null=True, verbose_name=_("Switch from"))
 
     def __str__(self):
         username = self.username
@@ -266,6 +269,21 @@ class SystemUser(ProtocolMixin, AuthMixin, BaseUser):
         asset_ids.update(nodes_asset_ids)
         assets = Asset.objects.filter(id__in=asset_ids)
         return assets
+
+    def add_related_assets(self, assets_or_ids):
+        self.assets.add(*tuple(assets_or_ids))
+        self.add_related_assets_to_su_from_if_need(assets_or_ids)
+
+    def add_related_assets_to_su_from_if_need(self, assets_or_ids):
+        if self.protocol not in [self.Protocol.ssh.value]:
+            return
+        if not self.su_enabled:
+            return
+        if not self.su_from:
+            return
+        if self.su_from.protocol != self.protocol:
+            return
+        self.su_from.assets.add(*tuple(assets_or_ids))
 
     class Meta:
         ordering = ['name']

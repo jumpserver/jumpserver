@@ -3,7 +3,11 @@
 {% load i18n %}
 
 {% block small_title %}
-    {% trans 'Authenticate' %}
+    {% if title %}
+        {{ title }}
+    {% else %}
+        {% trans 'Authenticate' %}
+    {% endif %}
 {% endblock %}
 
 {% block content %}

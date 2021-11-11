@@ -140,3 +140,8 @@ class SecuritySettingSerializer(SecurityPasswordRuleSerializer, SecurityAuthSeri
         required=True, label=_('Session share'),
         help_text=_("Enabled, Allows user active session to be shared with other users")
     )
+    SECURITY_CHECK_DIFFERENT_CITY_LOGIN = serializers.BooleanField(
+        required=False, label=_('Remote Login Protection'),
+        help_text=_('The system determines whether the login IP address belongs to a common login city. '
+                    'If the account is logged in from a common login city, the system sends a remote login reminder')
+    )

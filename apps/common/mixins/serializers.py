@@ -298,9 +298,12 @@ class CommonSerializerMixin(DynamicFieldsMixin, DefaultValueFieldsMixin):
 
     def get_initial_value(self, attr, default=None):
         value = self.initial_data.get(attr)
-        if not value and self.instance:
+        if value is not None:
+            return value
+        if self.instance:
             value = getattr(self.instance, attr, default)
-        return value
+            return value
+        return default
 
 
 class CommonBulkSerializerMixin(BulkSerializerMixin, CommonSerializerMixin):

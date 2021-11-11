@@ -26,7 +26,18 @@ class OtherSettingSerializer(serializers.Serializer):
     )
 
     PERM_SINGLE_ASSET_TO_UNGROUP_NODE = serializers.BooleanField(
-        required=False, label=_("Perm single to ungroup node")
+        required=False, label=_("Perm ungroup node"),
+        help_text=_("Perm single to ungroup node")
+    )
+
+    HELP_DOCUMENT_URL = serializers.URLField(
+        required=False, allow_blank=True, allow_null=True, label=_("Help Docs URL"),
+        help_text=_('default: http://docs.jumpserver.org')
+    )
+
+    HELP_SUPPORT_URL = serializers.URLField(
+        required=False, allow_blank=True, allow_null=True, label=_("Help Support URL"),
+        help_text=_('default: http://www.jumpserver.org/support/')
     )
 
     # 准备废弃

@@ -311,6 +311,7 @@ class Config(dict):
         'SECURITY_WATERMARK_ENABLED': True,
         'SECURITY_MFA_VERIFY_TTL': 3600,
         'SECURITY_SESSION_SHARE': True,
+        'SECURITY_CHECK_DIFFERENT_CITY_LOGIN': True,
         'OLD_PASSWORD_HISTORY_LIMIT_COUNT': 5,
         'CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED': True,
         'USER_LOGIN_SINGLE_MACHINE_ENABLED': False,
@@ -353,6 +354,10 @@ class Config(dict):
         'PERM_SINGLE_ASSET_TO_UNGROUP_NODE': False,
         'WINDOWS_SSH_DEFAULT_SHELL': 'cmd',
         'PERIOD_TASK_ENABLED': True,
+
+        # 导航栏 帮助
+        'HELP_DOCUMENT_URL': 'http://docs.jumpserver.org',
+        'HELP_SUPPORT_URL': 'http://www.jumpserver.org/support/',
 
         'TICKETS_ENABLED': True,
         'FORGOT_PASSWORD_URL': '',

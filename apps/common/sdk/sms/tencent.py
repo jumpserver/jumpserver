@@ -10,7 +10,8 @@ from tencentcloud.sms.v20210111 import sms_client, models
 # 导入可选配置类
 from tencentcloud.common.profile.client_profile import ClientProfile
 from tencentcloud.common.profile.http_profile import HttpProfile
-from . import BaseSMSClient
+
+from .base import BaseSMSClient
 
 logger = get_logger(__file__)
 

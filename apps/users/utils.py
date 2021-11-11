@@ -137,7 +137,7 @@ class BlockUtilBase:
         times_remainder = int(times_up) - int(times_failed)
         return times_remainder
 
-    def incr_failed_count(self):
+    def incr_failed_count(self) -> int:
         limit_key = self.limit_key
         count = cache.get(limit_key, 0)
         count += 1
@@ -146,6 +146,7 @@ class BlockUtilBase:
         limit_count = settings.SECURITY_LOGIN_LIMIT_COUNT
         if count >= limit_count:
             cache.set(self.block_key, True, self.key_ttl)
+        return limit_count - count
 
     def get_failed_count(self):
         count = cache.get(self.limit_key, 0)
@@ -205,4 +206,4 @@ def is_auth_password_time_valid(session):
 
 
 def is_auth_otp_time_valid(session):
-    return is_auth_time_valid(session, 'auth_opt_expired_at')
+    return is_auth_time_valid(session, 'auth_otp_expired_at')
