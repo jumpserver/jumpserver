@@ -69,10 +69,12 @@ class Role(JMSModel):
     def create_builtin_roles(cls):
         scope_role_names_mapper = {
             cls.Scope.system: [
-                cls.system_admin_name, cls.system_auditor_name, cls.system_user_name,
-                cls.app_name,
+                cls.system_admin_name, cls.system_auditor_name,
+                cls.system_user_name, cls.app_name,
             ],
-            cls.Scope.org: [cls.org_admin_name, cls.org_auditor_name, cls.org_user_name]
+            cls.Scope.org: [
+                cls.org_admin_name, cls.org_auditor_name, cls.org_user_name
+            ]
         }
         for scope, role_names in scope_role_names_mapper.items():
             for name in role_names:
@@ -123,7 +125,21 @@ class RoleBinding(JMSModel):
         perms = set()
         for binding in bindings:
             perms |= binding.get_perms()
+        perms = sorted(list(perms), key=cls.sort_perms)
         return perms
+
+    @staticmethod
+    def sort_perms(perm):
+        perm_split = perm.split('.')
+        if len(perm_split) != 2:
+            return perm_split
+        app, code = perm_split[0], perm_split[1]
+        action_resource = code.split('_')
+        if len(action_resource) == 1:
+            action_resource.append('')
+        action = action_resource[0]
+        resource = '_'.join(action_resource[1:])
+        return [app, resource, action]
 
     @classmethod
     def get_user_perms(cls, user):
