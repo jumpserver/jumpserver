@@ -103,7 +103,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'port': {'write_only': True},
             'hardware_info': {'label': _('Hardware info'), 'read_only': True},
             'admin_user_display': {'label': _('Admin user display'), 'read_only': True},
-            'cpu_info': {'label': _('CPU Info')},
+            'cpu_info': {'label': _('CPU info')},
         }
 
     def get_fields(self):
