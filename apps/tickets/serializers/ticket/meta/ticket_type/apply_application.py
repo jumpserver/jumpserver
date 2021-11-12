@@ -77,14 +77,19 @@ class ApplySerializer(serializers.Serializer):
         type = self.root.initial_data['meta'].get('apply_type')
         org_id = self.root.initial_data.get('org_id')
         with tmp_to_org(org_id):
-            applications = Application.objects.filter(id__in=apply_applications, type=type).values_list('id', flat=True)
+            applications = Application.objects.filter(
+                id__in=apply_applications, type=type
+            ).values_list('id', flat=True)
         return list(applications)
 
     def validate(self, attrs):
-        apply_date_start = attrs['apply_date_start']
-        apply_date_expired = attrs['apply_date_expired']
+        apply_date_start = attrs['apply_date_start'].strftime('%Y-%m-%d %H:%M:%S')
+        apply_date_expired = attrs['apply_date_expired'].strftime('%Y-%m-%d %H:%M:%S')
 
         if apply_date_expired <= apply_date_start:
             error = _('The expiration date should be greater than the start date')
             raise serializers.ValidationError({'apply_date_expired': error})
+
+        attrs['apply_date_start'] = apply_date_start
+        attrs['apply_date_expired'] = apply_date_expired
         return attrs
