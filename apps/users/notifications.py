@@ -105,6 +105,38 @@ class ResetPasswordSuccessMsg(UserMessage):
         return cls(user, request)
 
 
+class ResetPublicKeySuccessMsg(UserMessage):
+    def __init__(self, user, request):
+        super().__init__(user)
+        self.ip_address = get_request_ip_or_data(request)
+        self.browser = get_request_user_agent(request)
+
+    def get_html_msg(self) -> dict:
+        user = self.user
+
+        subject = _('Reset public key success')
+        context = {
+            'name': user.name,
+            'ip_address': self.ip_address,
+            'browser': self.browser,
+        }
+        message = render_to_string('authentication/_msg_rest_public_key_success.html', context)
+        return {
+            'subject': subject,
+            'message': message
+        }
+
+    @classmethod
+    def gen_test_msg(cls):
+        from users.models import User
+        from rest_framework.test import APIRequestFactory
+        from rest_framework.request import Request
+        factory = APIRequestFactory()
+        request = Request(factory.get('/notes/'))
+        user = User.objects.first()
+        return cls(user, request)
+
+
 class PasswordExpirationReminderMsg(UserMessage):
     def get_html_msg(self) -> dict:
         user = self.user
