@@ -879,7 +879,7 @@ msgid "Admin user display"
 msgstr "特权用户名称"
 
 #: assets/serializers/asset.py:106
-msgid "CPU Info"
+msgid "CPU info"
 msgstr "CPU信息"
 
 #: assets/serializers/base.py:41
