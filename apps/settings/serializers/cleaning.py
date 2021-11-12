@@ -25,3 +25,8 @@ class CleaningSerializer(serializers.Serializer):
         min_value=1, max_value=9999,
         label=_("Cloud sync record keep days"), help_text=_("Unit: day")
     )
+    TERMINAL_SESSION_KEEP_DURATION = serializers.IntegerField(
+        min_value=1, max_value=99999, required=True, label=_('Session keep duration'),
+        help_text=_('Unit: days, Session, record, command will be delete if more than duration, only in database')
+    )
+
