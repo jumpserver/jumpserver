@@ -5,7 +5,10 @@ from rest_framework import generics
 from common.permissions import IsOrgAdmin
 from rest_framework.permissions import IsAuthenticated
 
-from users.notifications import ResetPasswordMsg, ResetPasswordSuccessMsg, ResetSSHKeyMsg
+from users.notifications import (
+    ResetPasswordMsg, ResetPasswordSuccessMsg, ResetSSHKeyMsg,
+    ResetPublicKeySuccessMsg,
+)
 from common.permissions import (
     IsCurrentUserOrReadOnly
 )
@@ -87,4 +90,4 @@ class UserPublicKeyApi(generics.RetrieveUpdateAPIView):
 
     def perform_update(self, serializer):
         super().perform_update(serializer)
-        ResetPasswordSuccessMsg(self.get_object(), self.request).publish_async()
+        ResetPublicKeySuccessMsg(self.get_object(), self.request).publish_async()
