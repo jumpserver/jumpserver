@@ -28,7 +28,7 @@ class AssetSystemUserSerializer(serializers.ModelSerializer):
         model = SystemUser
         only_fields = (
             'id', 'name', 'username', 'priority', 'protocol', 'login_mode',
-            'sftp_root', 'username_same_with_user',
+            'sftp_root', 'username_same_with_user', 'su_enabled', 'su_from',
         )
         fields = list(only_fields) + ["actions"]
         read_only_fields = fields
