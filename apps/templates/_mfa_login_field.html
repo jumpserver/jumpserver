@@ -54,9 +54,13 @@
     $(document).ready(function () {
         const mfaSelectRef = document.getElementById('mfa-select');
         const preferMFA = localStorage.getItem(preferMFAKey);
-        if (preferMFA) {
+        const valueSelector = "value=" + preferMFA
+        const preferMFADisabled = $(`#mfa-select option[${valueSelector}]`).attr('disabled')
+
+        if (preferMFA && !preferMFADisabled) {
             mfaSelectRef.value = preferMFA;
         }
+
         const mfaSelect = mfaSelectRef.value;
         if (mfaSelect !== null) {
             selectChange(mfaSelect, true);
@@ -73,7 +77,10 @@
         $('.input-style').each(function (i, ele){
             $(ele).attr('name', '').attr('required', false)
         })
-        $('#mfa-' + name + ' .input-style').attr('name', 'code').attr('required', true)
+        $('#mfa-' + name + ' .input-style')
+            .attr('name', 'code')
+            .attr('required', true)
+            .focus()
     }
 
     function sendChallengeCode(currentBtn) {
