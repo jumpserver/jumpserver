@@ -71,7 +71,6 @@ class BaseRelationViewSet(RelationMixin, OrgBulkModelViewSet):
 class SystemUserAssetRelationViewSet(BaseRelationViewSet):
     serializer_class = serializers.SystemUserAssetRelationSerializer
     model = models.SystemUser.assets.through
-    permission_classes = (IsOrgAdmin,)
     filterset_fields = [
         'id', 'asset', 'systemuser',
     ]
@@ -97,7 +96,6 @@ class SystemUserAssetRelationViewSet(BaseRelationViewSet):
 class SystemUserNodeRelationViewSet(BaseRelationViewSet):
     serializer_class = serializers.SystemUserNodeRelationSerializer
     model = models.SystemUser.nodes.through
-    permission_classes = (IsOrgAdmin,)
     filterset_fields = [
         'id', 'node', 'systemuser',
     ]
@@ -118,7 +116,6 @@ class SystemUserNodeRelationViewSet(BaseRelationViewSet):
 class SystemUserUserRelationViewSet(BaseRelationViewSet):
     serializer_class = serializers.SystemUserUserRelationSerializer
     model = models.SystemUser.users.through
-    permission_classes = (IsOrgAdmin,)
     filterset_fields = [
         'id', 'user', 'systemuser',
     ]

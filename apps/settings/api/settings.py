@@ -14,7 +14,6 @@ logger = get_logger(__file__)
 
 
 class SettingsApi(generics.RetrieveUpdateAPIView):
-    permission_classes = (IsSuperUser,)
     serializer_class_mapper = {
         'all': serializers.SettingsSerializer,
         'basic': serializers.BasicSettingSerializer,

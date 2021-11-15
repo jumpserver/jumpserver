@@ -7,7 +7,6 @@ from settings.serializers.sms import SMSBackendSerializer
 
 
 class SMSBackendAPI(ListAPIView):
-    permission_classes = (IsSuperUser,)
     serializer_class = SMSBackendSerializer
 
     def list(self, request, *args, **kwargs):

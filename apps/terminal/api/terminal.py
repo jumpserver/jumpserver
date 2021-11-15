@@ -29,7 +29,6 @@ logger = logging.getLogger(__file__)
 class TerminalViewSet(JMSBulkModelViewSet):
     queryset = Terminal.objects.filter(is_deleted=False)
     serializer_class = serializers.TerminalSerializer
-    permission_classes = (IsSuperUser,)
     filterset_fields = ['name', 'remote_addr', 'type']
     custom_filter_fields = ['status']
 

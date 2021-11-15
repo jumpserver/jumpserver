@@ -144,15 +144,14 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
             self.check_object_permissions(self.request, obj)
             self.perform_destroy(obj)
 
-    def get_permissions(self):
+    # def get_permissions(self):
+    #     return []
         # if self.action in ["retrieve", "list"]:
         #     if self.request.query_params.get('all'):
-        #         self.permission_classes = (IsSuperUser,)
-        #     else:
+        #         self.#     else:
         #         self.permission_classes = (IsOrgAdminOrAppUser,)
         # elif self.action in ['destroy']:
-        #     self.permission_classes = (IsSuperUser,)
-        return super().get_permissions()
+        #     self.return super().get_permissions()
 
     @action(methods=['get'], detail=False, permission_classes=(IsOrgAdmin,))
     def suggestion(self, request):
@@ -215,7 +214,6 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
 
 
 class UserChangePasswordApi(UserQuerysetMixin, generics.UpdateAPIView):
-    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.ChangeUserPasswordSerializer
 
     def perform_update(self, serializer):
@@ -225,7 +223,6 @@ class UserChangePasswordApi(UserQuerysetMixin, generics.UpdateAPIView):
 
 
 class UserUnblockPKApi(UserQuerysetMixin, generics.UpdateAPIView):
-    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.UserSerializer
 
     def perform_update(self, serializer):
@@ -236,7 +233,6 @@ class UserUnblockPKApi(UserQuerysetMixin, generics.UpdateAPIView):
 
 
 class UserResetOTPApi(UserQuerysetMixin, generics.RetrieveAPIView):
-    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.ResetOTPSerializer
 
     def retrieve(self, request, *args, **kwargs):

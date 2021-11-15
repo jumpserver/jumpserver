@@ -12,7 +12,6 @@ from .. import serializers
 
 
 class FeiShuTestingAPI(GenericAPIView):
-    permission_classes = (IsSuperUser,)
     serializer_class = serializers.FeiShuSettingSerializer
 
     def post(self, request):

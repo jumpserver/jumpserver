@@ -23,7 +23,7 @@ class CommandFilterViewSet(OrgBulkModelViewSet):
     model = CommandFilter
     filterset_fields = ("name",)
     search_fields = filterset_fields
-    permission_classes = (IsOrgAdmin,)
+
     serializer_class = serializers.CommandFilterSerializer
 
 
@@ -31,7 +31,6 @@ class CommandFilterRuleViewSet(OrgBulkModelViewSet):
     model = CommandFilterRule
     filterset_fields = ("content",)
     search_fields = filterset_fields
-    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.CommandFilterRuleSerializer
 
     def get_queryset(self):

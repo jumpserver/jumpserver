@@ -14,8 +14,6 @@ class BasePermissionViewSet(OrgBulkModelViewSet):
         'user_id', 'username', 'system_user_id', 'system_user',
         'user_group_id', 'user_group'
     ]
-    permission_classes = (IsOrgAdmin,)
-
     def filter_valid(self, queryset):
         valid_query = self.request.query_params.get('is_valid', None)
         if valid_query is None:

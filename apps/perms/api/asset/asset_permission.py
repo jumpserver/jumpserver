@@ -16,7 +16,6 @@ class AssetPermissionViewSet(OrgBulkModelViewSet):
     """
     资产授权列表的增删改查api
     """
-    permission_classes = (IsOrgAdmin,)
     model = AssetPermission
     serializer_class = serializers.AssetPermissionSerializer
     filterset_class = AssetPermissionFilter

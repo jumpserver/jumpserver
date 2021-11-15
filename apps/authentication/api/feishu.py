@@ -5,7 +5,6 @@ from rest_framework.response import Response
 from users.permissions import IsAuthPasswdTimeValid
 from users.models import User
 from common.utils import get_logger
-from common.permissions import IsOrgAdmin
 from common.mixins.api import RoleUserMixin, RoleAdminMixin
 from authentication import errors
 
@@ -32,7 +31,6 @@ class FeiShuQRUnBindForUserApi(RoleUserMixin, FeiShuQRUnBindBase):
 
 class FeiShuQRUnBindForAdminApi(RoleAdminMixin, FeiShuQRUnBindBase):
     user_id_url_kwarg = 'user_id'
-    permission_classes = (IsOrgAdmin,)
 
 
 class FeiShuEventSubscriptionCallback(APIView):

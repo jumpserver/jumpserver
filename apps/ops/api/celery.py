@@ -88,7 +88,6 @@ class CeleryResultApi(generics.RetrieveAPIView):
 class CeleryPeriodTaskViewSet(CommonApiMixin, viewsets.ModelViewSet):
     queryset = PeriodicTask.objects.all()
     serializer_class = CeleryPeriodTaskSerializer
-    permission_classes = (IsSuperUser,)
     http_method_names = ('get', 'head', 'options', 'patch')
 
     def get_queryset(self):

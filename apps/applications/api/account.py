@@ -41,8 +41,6 @@ class ApplicationAccountViewSet(JMSBulkModelViewSet):
     filterset_class = AccountFilterSet
     filterset_fields = ['username', 'app_display', 'type', 'category', 'app']
     serializer_class = serializers.AppAccountSerializer
-    permission_classes = (IsOrgAdmin,)
-
     def get_queryset(self):
         queryset = Account.objects.all() \
             .annotate(type=F('app__type')) \

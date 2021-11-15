@@ -13,7 +13,6 @@ from .. import serializers
 
 
 class AlibabaSMSTestingAPI(GenericAPIView):
-    permission_classes = (IsSuperUser,)
     serializer_class = serializers.AlibabaSMSSettingSerializer
 
     def post(self, request):

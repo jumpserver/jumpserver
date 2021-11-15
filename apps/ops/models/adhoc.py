@@ -37,7 +37,8 @@ class Task(PeriodTaskModelMixin, OrgModelMixin):
     comment = models.TextField(blank=True, verbose_name=_("Comment"))
     date_created = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name=_("Date created"))
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
-    latest_adhoc = models.ForeignKey('ops.AdHoc', on_delete=models.SET_NULL, null=True, related_name='task_latest')
+    latest_adhoc = models.ForeignKey('ops.AdHoc', on_delete=models.SET_NULL,
+                                     null=True, related_name='task_latest')
     latest_execution = models.ForeignKey('ops.AdHocExecution', on_delete=models.SET_NULL, null=True, related_name='task_latest')
     total_run_amount = models.IntegerField(default=0)
     success_run_amount = models.IntegerField(default=0)

@@ -1,9 +1,11 @@
 #
 exclude_permissions = [
     ('assets', 'add_asset'),
-    ('assets', 'view_asset'),
 
     ('users', 'view_user'),
+    ('users', 'add_usergroup'),
+    ('users', 'change_usergroup'),
+    ('users', 'delete_usergroup'),
 ]
 
 system_scope_permissions = [

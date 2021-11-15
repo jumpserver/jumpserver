@@ -32,4 +32,4 @@ class WeComQRUnBindForUserApi(RoleUserMixin, WeComQRUnBindBase):
 
 class WeComQRUnBindForAdminApi(RoleAdminMixin, WeComQRUnBindBase):
     user_id_url_kwarg = 'user_id'
-    permission_classes = (IsOrgAdmin,)
+    

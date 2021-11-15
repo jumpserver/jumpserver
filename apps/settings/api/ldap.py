@@ -25,7 +25,6 @@ logger = get_logger(__file__)
 
 
 class LDAPTestingConfigAPI(APIView):
-    permission_classes = (IsSuperUser,)
     serializer_class = LDAPTestConfigSerializer
 
     def post(self, request):
@@ -61,7 +60,6 @@ class LDAPTestingConfigAPI(APIView):
 
 
 class LDAPTestingLoginAPI(APIView):
-    permission_classes = (IsSuperUser,)
     serializer_class = LDAPTestLoginSerializer
 
     def post(self, request):
@@ -76,7 +74,6 @@ class LDAPTestingLoginAPI(APIView):
 
 
 class LDAPUserListApi(generics.ListAPIView):
-    permission_classes = (IsSuperUser,)
     serializer_class = LDAPUserSerializer
 
     def get_queryset_from_cache(self):
@@ -165,8 +162,6 @@ class LDAPUserListApi(generics.ListAPIView):
 
 
 class LDAPUserImportAPI(APIView):
-    permission_classes = (IsSuperUser,)
-
     def get_org(self):
         org_id = self.request.data.get('org_id')
         if is_uuid(org_id):
@@ -205,8 +200,6 @@ class LDAPUserImportAPI(APIView):
 
 
 class LDAPCacheRefreshAPI(generics.RetrieveAPIView):
-    permission_classes = (IsSuperUser,)
-
     def retrieve(self, request, *args, **kwargs):
         try:
             LDAPSyncUtil().clear_cache()

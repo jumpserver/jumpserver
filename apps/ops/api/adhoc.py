@@ -30,8 +30,6 @@ class TaskViewSet(OrgBulkModelViewSet):
     filterset_fields = ("name",)
     search_fields = filterset_fields
     serializer_class = TaskSerializer
-    permission_classes = (IsOrgAdmin,)
-
     def get_serializer_class(self):
         if self.action == 'retrieve':
             return TaskDetailSerializer
@@ -46,8 +44,6 @@ class TaskViewSet(OrgBulkModelViewSet):
 class TaskRun(generics.RetrieveAPIView):
     queryset = Task.objects.all()
     serializer_class = CeleryTaskSerializer
-    permission_classes = (IsOrgAdmin,)
-
     def retrieve(self, request, *args, **kwargs):
         task = self.get_object()
         t = run_ansible_task.delay(str(task.id))
@@ -57,8 +53,6 @@ class TaskRun(generics.RetrieveAPIView):
 class AdHocViewSet(viewsets.ModelViewSet):
     queryset = AdHoc.objects.all()
     serializer_class = AdHocSerializer
-    permission_classes = (IsOrgAdmin,)
-
     def get_serializer_class(self):
         if self.action == 'retrieve':
             return AdHocDetailSerializer
@@ -75,8 +69,6 @@ class AdHocViewSet(viewsets.ModelViewSet):
 class AdHocRunHistoryViewSet(viewsets.ModelViewSet):
     queryset = AdHocExecution.objects.all()
     serializer_class = AdHocExecutionSerializer
-    permission_classes = (IsOrgAdmin,)
-
     def get_queryset(self):
         task_id = self.request.query_params.get('task')
         adhoc_id = self.request.query_params.get('adhoc')

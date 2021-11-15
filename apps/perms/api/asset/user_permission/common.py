@@ -86,8 +86,6 @@ class ValidateUserAssetPermissionApi(APIView):
 
 # TODO 删除
 class RefreshAssetPermissionCacheApi(RetrieveAPIView):
-    permission_classes = (IsOrgAdmin,)
-
     def retrieve(self, request, *args, **kwargs):
         return Response({'msg': True}, status=200)
 
@@ -131,7 +129,5 @@ class MyGrantedAssetSystemUsersApi(UserGrantedAssetSystemUsersForAdminApi):
 
 # TODO 删除
 class UserAssetPermissionsCacheApi(DestroyAPIView):
-    permission_classes = (IsOrgAdmin,)
-
     def destroy(self, request, *args, **kwargs):
         return Response(status=204)

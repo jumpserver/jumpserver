@@ -15,7 +15,6 @@ from .. import serializers
 
 
 class TencentSMSTestingAPI(GenericAPIView):
-    permission_classes = (IsSuperUser,)
     serializer_class = serializers.TencentSMSSettingSerializer
 
     def post(self, request):

@@ -30,7 +30,6 @@ class LabelViewSet(OrgBulkModelViewSet):
     model = Label
     filterset_fields = ("name", "value")
     search_fields = filterset_fields
-    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.LabelSerializer
 
     def list(self, request, *args, **kwargs):

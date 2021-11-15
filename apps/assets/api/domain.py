@@ -38,7 +38,6 @@ class GatewayViewSet(OrgBulkModelViewSet):
 
 
 class GatewayTestConnectionApi(SingleObjectMixin, APIView):
-    permission_classes = (IsOrgAdmin,)
     object = None
 
     def post(self, request, *args, **kwargs):

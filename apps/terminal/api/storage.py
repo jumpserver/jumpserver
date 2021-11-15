@@ -39,7 +39,6 @@ class CommandStorageViewSet(BaseStorageViewSetMixin, viewsets.ModelViewSet):
     search_fields = ('name', 'type')
     queryset = CommandStorage.objects.all()
     serializer_class = CommandStorageSerializer
-    permission_classes = (IsSuperUser,)
     filterset_class = CommandStorageFilter
 
     @action(methods=[GET], detail=False, permission_classes=(IsOrgAuditor, ), filterset_class=CommandFilterForStorageTree)
@@ -107,12 +106,9 @@ class ReplayStorageViewSet(BaseStorageViewSetMixin, viewsets.ModelViewSet):
     search_fields = filterset_fields
     queryset = ReplayStorage.objects.all()
     serializer_class = ReplayStorageSerializer
-    permission_classes = (IsSuperUser,)
 
 
 class BaseStorageTestConnectiveMixin:
-    permission_classes = (IsSuperUser,)
-
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         try:

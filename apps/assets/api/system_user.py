@@ -113,7 +113,6 @@ class SystemUserAppAuthInfoApi(generics.RetrieveAPIView):
 
 
 class SystemUserTaskApi(generics.CreateAPIView):
-    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.SystemUserTaskSerializer
 
     def do_push(self, system_user, asset_ids=None):
@@ -171,7 +170,6 @@ class SystemUserCommandFilterRuleListApi(generics.ListAPIView):
 
 
 class SystemUserAssetsListView(generics.ListAPIView):
-    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.AssetSimpleSerializer
     filterset_fields = ("hostname", "ip")
     search_fields = filterset_fields

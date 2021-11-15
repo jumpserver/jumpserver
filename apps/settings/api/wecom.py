@@ -12,7 +12,6 @@ from .. import serializers
 
 
 class WeComTestingAPI(GenericAPIView):
-    permission_classes = (IsSuperUser,)
     serializer_class = serializers.WeComSettingSerializer
 
     def post(self, request):

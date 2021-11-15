@@ -12,7 +12,6 @@ from .. import serializers
 
 
 class DingTalkTestingAPI(GenericAPIView):
-    permission_classes = (IsSuperUser,)
     serializer_class = serializers.DingTalkSettingSerializer
 
     def post(self, request):

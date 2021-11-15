@@ -32,8 +32,6 @@ class SSOViewSet(AuthMixin, JMSGenericViewSet):
         'login_url': SSOTokenSerializer,
         'login': EmptySerializer
     }
-    permission_classes = (IsSuperUser,)
-
     @action(methods=[POST], detail=False, permission_classes=[IsSuperUser], url_path='login-url')
     def login_url(self, request, *args, **kwargs):
         if not settings.AUTH_SSO:

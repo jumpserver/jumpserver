@@ -17,7 +17,6 @@ __all__ = ['MailTestingAPI']
 
 
 class MailTestingAPI(APIView):
-    permission_classes = (IsSuperUser,)
     serializer_class = serializers.MailTestSerializer
     success_message = _("Test mail sent to {}, please check")
 

@@ -7,7 +7,6 @@ from rest_framework.permissions import AllowAny
 from django.shortcuts import get_object_or_404
 
 from common.utils import get_logger
-from common.permissions import IsOrgAdmin
 from ..models import LoginConfirmSetting
 from ..serializers import LoginConfirmSettingSerializer
 from .. import errors, mixins
@@ -17,7 +16,6 @@ logger = get_logger(__name__)
 
 
 class LoginConfirmSettingUpdateApi(UpdateAPIView):
-    permission_classes = (IsOrgAdmin,)
     serializer_class = LoginConfirmSettingSerializer
 
     def get_object(self):

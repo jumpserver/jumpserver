@@ -5,7 +5,7 @@ from rest_framework.generics import RetrieveAPIView
 from django.shortcuts import get_object_or_404
 
 from common.utils import get_logger, get_object_or_none
-from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, IsSuperUser
+from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
 from common.mixins.views import SuggestionMixin
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
@@ -76,7 +76,6 @@ class AssetPlatformRetrieveApi(RetrieveAPIView):
 
 class AssetPlatformViewSet(ModelViewSet):
     queryset = Platform.objects.all()
-    permission_classes = (IsSuperUser,)
     serializer_class = serializers.PlatformSerializer
     filterset_fields = ['name', 'base']
     search_fields = ['name']
@@ -120,8 +119,6 @@ class AssetsTaskMixin:
 class AssetTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
     model = Asset
     serializer_class = serializers.AssetTaskSerializer
-    permission_classes = (IsOrgAdmin,)
-
     def create(self, request, *args, **kwargs):
         pk = self.kwargs.get('pk')
         request.data['asset'] = pk
@@ -155,8 +152,6 @@ class AssetTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
 class AssetsTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
     model = Asset
     serializer_class = serializers.AssetsTaskSerializer
-    permission_classes = (IsOrgAdmin,)
-
 
 class AssetGatewayListApi(generics.ListAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)

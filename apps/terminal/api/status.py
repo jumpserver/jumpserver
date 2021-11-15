@@ -61,8 +61,6 @@ class StatusViewSet(viewsets.ModelViewSet):
 
 class ComponentsMetricsAPIView(generics.GenericAPIView):
     """ 返回汇总组件指标数据 """
-    permission_classes = (IsSuperUser,)
-
     def get(self, request, *args, **kwargs):
         util = TypedComponentsStatusMetricsUtil()
         metrics = util.get_metrics()

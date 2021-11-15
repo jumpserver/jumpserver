@@ -61,8 +61,6 @@ class AccountViewSet(OrgBulkModelViewSet):
         'default': serializers.AccountSerializer,
         'verify_account': serializers.AssetTaskSerializer
     }
-    permission_classes = (IsOrgAdmin,)
-
     def get_queryset(self):
         queryset = super().get_queryset() \
             .annotate(ip=F('asset__ip')) \
