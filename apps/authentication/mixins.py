@@ -248,16 +248,24 @@ class MFAMixin:
     get_user_from_session: Callable
     get_request_ip: Callable
 
+    def _check_if_no_active_mfa(self, user):
+        active_mfa_mapper = user.active_mfa_backends_mapper
+        if not active_mfa_mapper:
+            url = reverse('authentication:user-otp-enable-start')
+            raise errors.MFAUnsetError(user, self.request, url)
+
     def _check_login_page_mfa_if_need(self, user):
         if not settings.SECURITY_MFA_IN_LOGIN_PAGE:
             return
+        self._check_if_no_active_mfa(user)
 
         request = self.request
         data = request.data if hasattr(request, 'data') else request.POST
         code = data.get('code')
         mfa_type = data.get('mfa_type', 'otp')
+
         if not code:
-            raise errors.MFACodeRequiredError
+            return
         self._do_check_user_mfa(code, mfa_type, user=user)
 
     def check_user_mfa_if_need(self, user):
@@ -266,10 +274,9 @@ class MFAMixin:
         if not user.mfa_enabled:
             return
 
+        self._check_if_no_active_mfa(user)
+
         active_mfa_mapper = user.active_mfa_backends_mapper
-        if not active_mfa_mapper:
-            url = reverse('authentication:user-otp-enable-start')
-            raise errors.MFAUnsetError(user, self.request, url)
         raise errors.MFARequiredError(mfa_types=tuple(active_mfa_mapper.keys()))
 
     def mark_mfa_ok(self, mfa_type):
