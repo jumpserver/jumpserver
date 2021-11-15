@@ -1690,7 +1690,7 @@ msgstr "没有上传下载权限"
 
 #: authentication/errors.py:366
 msgid "Please enter MFA code"
-msgstr "请输入6位动态安全码"
+msgstr "请输入验证码"
 
 #: authentication/errors.py:370
 msgid "Please enter SMS code"
