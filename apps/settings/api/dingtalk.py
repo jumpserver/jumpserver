@@ -5,7 +5,6 @@ from rest_framework import status
 from django.utils.translation import gettext_lazy as _
 
 from settings.models import Setting
-from common.permissions import IsSuperUser
 from common.message.backends.dingtalk import DingTalk
 
 from .. import serializers

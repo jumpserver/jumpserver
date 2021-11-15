@@ -1,5 +1,7 @@
 from rest_framework.generics import ListAPIView
 
+from django.db.models import F
+
 from common.drf.api import JMSModelViewSet
 from common.permissions import IsOrgAdmin, IsValidUser
 from ..models import Permission, RoleBinding
@@ -15,7 +17,8 @@ class PermissionViewSet(JMSModelViewSet):
 
     def get_queryset(self):
         scope = self.request.query_params.get('scope')
-        return Permission.get_permissions(scope)
+        return Permission.get_permissions(scope).prefetch_related('content_type')
+
 
 
 # class UserPermsApi(ListAPIView):
