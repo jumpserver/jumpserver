@@ -16,6 +16,11 @@ def create_internal_platform(apps, schema_editor):
             name=name, defaults=defaults
         )
 
+    win2016 = model.objects.filter(name='Windows2016').first()
+    if win2016:
+        win2016.internal = False
+        win2016.save(update_fields=['internal'])
+
 
 class Migration(migrations.Migration):
 
