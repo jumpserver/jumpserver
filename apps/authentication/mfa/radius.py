@@ -9,7 +9,8 @@ mfa_failed_msg = _("Radius verify code invalid")
 
 class MFARadius(BaseMFA):
     name = 'otp_radius'
-    display_name = _('Radius MFA')
+    display_name = 'Radius'
+    placeholder = _("Radius verification code")
 
     def check_code(self, code):
         assert self.is_authenticated()

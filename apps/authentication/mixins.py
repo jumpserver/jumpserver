@@ -312,10 +312,13 @@ class MFAMixin:
 
         ok = False
         mfa_backend = user.get_mfa_backend_by_type(mfa_type)
-        if mfa_backend:
-            ok, msg = mfa_backend.check_code(code)
+        backend_error = _('The MFA type ({}) is not enabled')
+        if not mfa_backend:
+            msg = backend_error.format(mfa_type)
+        elif not mfa_backend.is_active():
+            msg = backend_error.format(mfa_backend.display_name)
         else:
-            msg = _('The MFA type({}) is not supported'.format(mfa_type))
+            ok, msg = mfa_backend.check_code(code)
 
         if ok:
             self.mark_mfa_ok(mfa_type)

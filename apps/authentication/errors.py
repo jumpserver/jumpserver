@@ -60,7 +60,7 @@ block_mfa_msg = _(
     "(please contact admin to unlock it or try again after {} minutes)"
 )
 mfa_error_msg = _(
-    "{error},"
+    "{error}, "
     "You can also try {times_try} times "
     "(The account will be temporarily locked for {block_time} minutes)"
 )
