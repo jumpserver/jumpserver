@@ -77,6 +77,14 @@
         $('.input-style').each(function (i, ele){
             $(ele).attr('name', '').attr('required', false)
         })
+
+        const currentMFAInput = $('#mfa-' + name + ' .input-style')
+        currentMFAInput.attr('name', 'code').attr('required', true)
+
+        // 登录页时，不应该默认focus
+        if ($('input[name="username"]').length == 0) {
+            currentMFAInput.focus()
+        }
         $('#mfa-' + name + ' .input-style')
             .attr('name', 'code')
             .attr('required', true)
