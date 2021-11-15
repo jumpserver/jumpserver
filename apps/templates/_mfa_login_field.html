@@ -75,7 +75,7 @@
         }
 
         $('.input-style').each(function (i, ele){
-            $(ele).attr('name', '').attr('required', false)
+            $(ele).attr('name', '')
         })
 
         const currentMFAInputRef = $('#mfa-' + name + ' .input-style')
@@ -86,7 +86,7 @@
         if (!usernameRef || usernameRef.length === 0) {
             currentMFAInputRef.focus()
         }
-        currentMFAInputRef.attr('name', 'code').attr('required', true)
+        currentMFAInputRef.attr('name', 'code')
     }
 
     function sendChallengeCode(currentBtn) {
