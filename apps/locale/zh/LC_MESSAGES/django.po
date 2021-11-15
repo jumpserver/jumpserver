@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-12 16:51+0800\n"
+"POT-Creation-Date: 2021-11-15 17:52+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1223,11 +1223,10 @@ msgstr "用户代理"
 
 #: audits/models.py:110
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
-#: authentication/templates/authentication/login_mfa.html:6
 #: users/forms/profile.py:64 users/models/user.py:563
 #: users/serializers/profile.py:102
 msgid "MFA"
-msgstr "多因子认证"
+msgstr "MFA"
 
 #: audits/models.py:111 audits/serializers.py:45 terminal/models/sharing.py:88
 #: xpack/plugins/change_auth_plan/models/base.py:187
@@ -1258,7 +1257,7 @@ msgstr "状态名称"
 
 #: audits/serializers.py:31
 msgid "MFA display"
-msgstr "多因子认证"
+msgstr "MFA名称"
 
 #: audits/serializers.py:76 audits/serializers.py:91 ops/models/adhoc.py:248
 #: terminal/serializers/session.py:35
@@ -1500,8 +1499,6 @@ msgid "Invalid token"
 msgstr "无效的令牌"
 
 #: authentication/api/mfa.py:103
-#, fuzzy
-#| msgid "Code is invalid, "
 msgid "Code is invalid"
 msgstr "验证码无效"
 
@@ -1566,11 +1563,11 @@ msgstr "密码解密失败"
 
 #: authentication/errors.py:28
 msgid "MFA failed"
-msgstr "多因子认证失败"
+msgstr "MFA 校验失败"
 
 #: authentication/errors.py:29
 msgid "MFA unset"
-msgstr "多因子认证没有设定"
+msgstr "MFA 没有设定"
 
 #: authentication/errors.py:30
 msgid "Username does not exist"
@@ -1627,76 +1624,72 @@ msgstr "账号已被锁定（请联系管理员解锁 或 {}分钟后重试）"
 #: authentication/errors.py:63
 #, python-brace-format
 msgid ""
-"{error},You can also try {times_try} times (The account will be temporarily "
+"{error}, You can also try {times_try} times (The account will be temporarily "
 "locked for {block_time} minutes)"
 msgstr ""
-"{error},您还可以尝试 {times_try} 次（账号将被临时锁定 {block_time} 分钟）"
+"{error}，您还可以尝试 {times_try} 次（账号将被临时锁定 {block_time} 分钟）"
 
 #: authentication/errors.py:67
 msgid "MFA required"
-msgstr "需要多因子认证"
+msgstr "需要 MFA 认证"
 
 #: authentication/errors.py:68
 msgid "MFA not set, please set it first"
-msgstr "多因子认证没有设置，请先完成设置"
+msgstr "MFA 没有设置，请先完成设置"
 
 #: authentication/errors.py:69
-msgid "OTP not set, please set it first"
-msgstr "OTP认证没有设置，请先完成设置"
-
-#: authentication/errors.py:70
 msgid "Login confirm required"
 msgstr "需要登录复核"
 
-#: authentication/errors.py:71
+#: authentication/errors.py:70
 msgid "Wait login confirm ticket for accept"
 msgstr "等待登录复核处理"
 
-#: authentication/errors.py:72
+#: authentication/errors.py:71
 msgid "Login confirm ticket was {}"
 msgstr "登录复核 {}"
 
-#: authentication/errors.py:187 authentication/errors.py:251
+#: authentication/errors.py:184 authentication/errors.py:248
 msgid "IP is not allowed"
 msgstr "来源 IP 不被允许登录"
 
-#: authentication/errors.py:258
+#: authentication/errors.py:255
 msgid "Time Period is not allowed"
 msgstr "该 时间段 不被允许登录"
 
-#: authentication/errors.py:291
+#: authentication/errors.py:288
 msgid "SSO auth closed"
 msgstr "SSO 认证关闭了"
 
-#: authentication/errors.py:296 authentication/mixins.py:350
+#: authentication/errors.py:293 authentication/mixins.py:359
 msgid "Your password is too simple, please change it for security"
 msgstr "你的密码过于简单，为了安全，请修改"
 
-#: authentication/errors.py:305 authentication/mixins.py:357
+#: authentication/errors.py:302 authentication/mixins.py:366
 msgid "You should to change your password before login"
 msgstr "登录完成前，请先修改密码"
 
-#: authentication/errors.py:314 authentication/mixins.py:364
+#: authentication/errors.py:311 authentication/mixins.py:373
 msgid "Your password has expired, please reset before logging in"
 msgstr "您的密码已过期，先修改再登录"
 
-#: authentication/errors.py:348
+#: authentication/errors.py:345
 msgid "Your password is invalid"
 msgstr "您的密码无效"
 
-#: authentication/errors.py:354
+#: authentication/errors.py:351
 msgid "No upload or download permission"
 msgstr "没有上传下载权限"
 
-#: authentication/errors.py:366
+#: authentication/errors.py:356
 msgid "Please enter MFA code"
-msgstr "请输入验证码"
+msgstr "请输入 MFA 验证码"
 
-#: authentication/errors.py:370
+#: authentication/errors.py:361
 msgid "Please enter SMS code"
 msgstr "请输入短信验证码"
 
-#: authentication/errors.py:374 users/exceptions.py:15
+#: authentication/errors.py:366 users/exceptions.py:15
 msgid "Phone not set"
 msgstr "手机号没有设置"
 
@@ -1714,7 +1707,7 @@ msgstr "MFA 类型"
 
 #: authentication/forms.py:60 users/forms/profile.py:27
 msgid "MFA code"
-msgstr "多因子认证验证码"
+msgstr "MFA 验证码"
 
 #: authentication/forms.py:62
 msgid "Dynamic code"
@@ -1722,29 +1715,33 @@ msgstr "动态码"
 
 #: authentication/mfa/base.py:7
 msgid "Please input security code"
-msgstr "请输入 6 位动态安全码"
+msgstr "请输入动态安全码"
 
 #: authentication/mfa/otp.py:7
 msgid "OTP code invalid, or server time error"
-msgstr "MFA (OTP) 验证码错误，或者服务器端时间不对"
+msgstr "虚拟 MFA 验证码错误，或者服务器端时间不对"
 
 #: authentication/mfa/otp.py:12
 msgid "OTP"
-msgstr "MFA (OTP)"
+msgstr "MFA"
 
-#: authentication/mfa/otp.py:47
+#: authentication/mfa/otp.py:13
+msgid "OTP verification code"
+msgstr "虚拟 MFA 验证码"
+
+#: authentication/mfa/otp.py:48
 msgid "Virtual OTP based MFA"
-msgstr "虚拟 MFA (OTP)"
+msgstr "虚拟 MFA(OTP)"
 
 #: authentication/mfa/radius.py:7
 msgid "Radius verify code invalid"
 msgstr "Radius 校验失败"
 
-#: authentication/mfa/radius.py:12
-msgid "Radius MFA"
-msgstr "Radius MFA"
+#: authentication/mfa/radius.py:13
+msgid "Radius verification code"
+msgstr "Radius 动态安全码"
 
-#: authentication/mfa/radius.py:43
+#: authentication/mfa/radius.py:44
 msgid "Radius global enabled, cannot disable"
 msgstr "Radius MFA 全局开启，无法被禁用"
 
@@ -1760,19 +1757,19 @@ msgstr "短信"
 msgid "SMS verification code"
 msgstr "短信验证码"
 
-#: authentication/mfa/sms.py:53
+#: authentication/mfa/sms.py:57
 msgid "Set phone number to enable"
 msgstr "设置手机号码启用"
 
-#: authentication/mfa/sms.py:57
+#: authentication/mfa/sms.py:61
 msgid "Clear phone number to disable"
 msgstr "清空手机号码禁用"
 
-#: authentication/mixins.py:311
-msgid "The MFA type({}) is not supported"
-msgstr "该 MFA 方法 ({}) 不被支持"
+#: authentication/mixins.py:316 authentication/mixins.py:318
+msgid "The MFA type ({}) is not enabled"
+msgstr "该 MFA ({}) 方式没有启用"
 
-#: authentication/mixins.py:340
+#: authentication/mixins.py:349
 msgid "Please change your password"
 msgstr "请修改密码"
 
@@ -1855,11 +1852,11 @@ msgstr "验证码"
 
 #: authentication/templates/authentication/_mfa_confirm_modal.html:5
 msgid "MFA confirm"
-msgstr "多因子认证校验"
+msgstr "MFA 认证校验"
 
 #: authentication/templates/authentication/_mfa_confirm_modal.html:17
 msgid "Need MFA for view auth"
-msgstr "需要多因子认证来查看账号信息"
+msgstr "需要 MFA 认证来查看账号信息"
 
 #: authentication/templates/authentication/_mfa_confirm_modal.html:20
 #: templates/_modal.html:23 templates/flash_message_standalone.html:34
@@ -1968,6 +1965,10 @@ msgstr "登录"
 msgid "More login options"
 msgstr "更多登录方式"
 
+#: authentication/templates/authentication/login_mfa.html:6
+msgid "MFA Auth"
+msgstr "MFA 多因子认证"
+
 #: authentication/templates/authentication/login_mfa.html:19
 #: users/templates/users/user_otp_check_password.html:18
 #: users/templates/users/user_otp_enable_bind.html:24
@@ -1978,7 +1979,7 @@ msgstr "下一步"
 
 #: authentication/templates/authentication/login_mfa.html:22
 msgid "Can't provide security? Please contact the administrator!"
-msgstr "如果不能提供多因子认证验证码，请联系管理员!"
+msgstr "如果不能提供 MFA 验证码，请联系管理员!"
 
 #: authentication/templates/authentication/login_wait_confirm.html:41
 msgid "Refresh"
@@ -3140,6 +3141,18 @@ msgstr "上传下载"
 msgid "Cloud sync record keep days"
 msgstr "云同步记录"
 
+#: settings/serializers/cleaning.py:29
+msgid "Session keep duration"
+msgstr "会话日志保存时间"
+
+#: settings/serializers/cleaning.py:30
+msgid ""
+"Unit: days, Session, record, command will be delete if more than duration, "
+"only in database"
+msgstr ""
+"单位：天。 会话、录像、命令记录超过该时长将会被删除(仅影响数据库存储, oss等不"
+"受影响)"
+
 #: settings/serializers/email.py:18
 msgid "SMTP host"
 msgstr "SMTP 主机"
@@ -3423,7 +3436,7 @@ msgstr ""
 
 #: settings/serializers/security.py:112
 msgid "MFA in login page"
-msgstr "MFA 在登录页面"
+msgstr "MFA 在登录页面输入"
 
 #: settings/serializers/security.py:113
 msgid "Eu security regulations(GDPR) require MFA to be on the login page"
@@ -3545,36 +3558,24 @@ msgid "List page size"
 msgstr "资产列表每页数量"
 
 #: settings/serializers/terminal.py:29
-msgid "Session keep duration"
-msgstr "会话日志保存时间"
-
-#: settings/serializers/terminal.py:30
-msgid ""
-"Unit: days, Session, record, command will be delete if more than duration, "
-"only in database"
-msgstr ""
-"单位：天。 会话、录像、命令记录超过该时长将会被删除(仅影响数据库存储, oss等不"
-"受影响)"
-
-#: settings/serializers/terminal.py:33
 msgid "Telnet login regex"
 msgstr "Telnet 成功正则表达式"
 
-#: settings/serializers/terminal.py:34
+#: settings/serializers/terminal.py:30
 msgid ""
 "The login success message varies with devices. if you cannot log in to the "
 "device through Telnet, set this parameter"
 msgstr "不同设备登录成功提示不一样，所以如果 telnet 不能正常登录，可以这里设置"
 
-#: settings/serializers/terminal.py:38
+#: settings/serializers/terminal.py:34
 msgid "RDP address"
 msgstr "RDP 地址"
 
-#: settings/serializers/terminal.py:39
+#: settings/serializers/terminal.py:35
 msgid "RDP visit address, eg: dev.jumpserver.org:3389"
 msgstr "RDP 访问地址, 如: dev.jumpserver.org:3389"
 
-#: settings/serializers/terminal.py:42
+#: settings/serializers/terminal.py:38
 msgid "Enable XRDP"
 msgstr "启用 XRDP 服务"
 
@@ -3826,11 +3827,11 @@ msgstr ""
 msgid "Send verification code"
 msgstr "发送验证码"
 
-#: templates/_mfa_login_field.html:92
+#: templates/_mfa_login_field.html:107
 msgid "Wait: "
 msgstr "等待："
 
-#: templates/_mfa_login_field.html:102
+#: templates/_mfa_login_field.html:117
 msgid "The verification code has been sent"
 msgstr "验证码已发送"
 
@@ -4828,7 +4829,7 @@ msgstr "批准的系统用户名称"
 msgid "Permission named `{}` already exists"
 msgstr "授权名称 `{}` 已存在"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:88
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:90
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:71
 msgid "The expiration date should be greater than the start date"
 msgstr "过期时间要大于开始时间"
@@ -4924,7 +4925,7 @@ msgstr "点击查看"
 
 #: users/api/user.py:209
 msgid "Could not reset self otp, use profile reset instead"
-msgstr "不能在该页面重置多因子认证, 请去个人信息页面重置"
+msgstr "不能在该页面重置 MFA 多因子认证, 请去个人信息页面重置"
 
 #: users/const.py:10 users/models/user.py:167
 msgid "System administrator"
@@ -4944,11 +4945,11 @@ msgstr "设置密码"
 
 #: users/exceptions.py:10
 msgid "MFA not enabled"
-msgstr "MFA没有开启"
+msgstr "MFA 多因子认证没有开启"
 
 #: users/exceptions.py:20
 msgid "MFA method not support"
-msgstr "MFA 方法不支持"
+msgstr "不支持该 MFA 方式"
 
 #: users/forms/profile.py:49
 msgid ""
@@ -4957,11 +4958,11 @@ msgid ""
 "modification -> change MFA Settings\"!"
 msgstr ""
 "启用之后您将会在下次登录时进入多因子认证绑定流程；您也可以在（个人信息->快速"
-"修改->更改多因子设置）中直接绑定！"
+"修改->设置 MFA 多因子认证）中直接绑定！"
 
 #: users/forms/profile.py:60
 msgid "* Enable MFA to make the account more secure."
-msgstr "* 启用多因子认证，使账号更加安全。"
+msgstr "* 启用 MFA 多因子认证，使账号更加安全。"
 
 #: users/forms/profile.py:69
 msgid ""
@@ -4970,7 +4971,7 @@ msgid ""
 "password, enabling MFA)"
 msgstr ""
 "为了保护您和公司的安全，请妥善保管您的账户、密码和密钥等重要敏感信息；（如："
-"设置复杂密码，并启用多因子认证）"
+"设置复杂密码，并启用 MFA 多因子认证）"
 
 #: users/forms/profile.py:76
 msgid "Finish"
@@ -5189,7 +5190,7 @@ msgstr "是否绑定了飞书"
 
 #: users/serializers/user.py:92
 msgid "Is OTP bound"
-msgstr "是否绑定了虚拟MFA"
+msgstr "是否绑定了虚拟 MFA"
 
 #: users/serializers/user.py:116
 msgid "Role limit to {}"
@@ -5463,7 +5464,7 @@ msgstr "账号保护已开启，请根据提示完成以下操作"
 
 #: users/templates/users/user_verify_mfa.html:17
 msgid "Open MFA Authenticator and enter the 6-bit dynamic code"
-msgstr "请打开MFA验证器，输入6位动态码"
+msgstr "请打开 MFA 验证器，输入 6 位动态码"
 
 #: users/views/profile/otp.py:80
 msgid "Already bound"
@@ -5483,7 +5484,7 @@ msgstr "MFA (OTP) 启用成功，返回到登录页面"
 
 #: users/views/profile/otp.py:151
 msgid "Disable OTP"
-msgstr "禁用 MFA (OTP)"
+msgstr "禁用虚拟 MFA(OTP)"
 
 #: users/views/profile/otp.py:157
 msgid "OTP disable success"
@@ -6125,6 +6126,12 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "OTP not set, please set it first"
+#~ msgstr "OTP认证没有设置，请先完成设置"
+
+#~ msgid "Radius MFA"
+#~ msgstr "Radius MFA"
 
 #~ msgid "Help Website URL"
 #~ msgstr "官网链接"
