@@ -122,10 +122,10 @@ class UserLoginView(mixins.AuthMixin, FormView):
             self.request.session.set_test_cookie()
             return self.render_to_response(context)
         except (
+                errors.MFAUnsetError,
                 errors.PasswordTooSimple,
                 errors.PasswordRequireResetError,
-                errors.PasswordNeedUpdate,
-                errors.OTPBindRequiredError
+                errors.PasswordNeedUpdate
         ) as e:
             return redirect(e.url)
         except (

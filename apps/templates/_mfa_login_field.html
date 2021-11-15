@@ -85,6 +85,10 @@
         if ($('input[name="username"]').length == 0) {
             currentMFAInput.focus()
         }
+        $('#mfa-' + name + ' .input-style')
+            .attr('name', 'code')
+            .attr('required', true)
+            .focus()
     }
 
     function sendChallengeCode(currentBtn) {
