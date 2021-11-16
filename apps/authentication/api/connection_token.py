@@ -26,7 +26,6 @@ from orgs.mixins.api import RootOrgViewMixin
 from common.http import is_true
 from perms.utils.asset.permission import get_asset_system_user_ids_with_actions_by_user
 from perms.models.asset_permission import Action
-from authentication.errors import NotHaveUpDownLoadPerm
 
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
@@ -360,14 +359,12 @@ class UserConnectionTokenViewSet(
             raise serializers.ValidationError("User not valid, disabled or expired")
 
         system_user = get_object_or_404(SystemUser, id=value.get('system_user'))
-
         asset = None
         app = None
         if value.get('type') == 'asset':
             asset = get_object_or_404(Asset, id=value.get('asset'))
             if not asset.is_active:
                 raise serializers.ValidationError("Asset disabled")
-
             has_perm, expired_at = asset_validate_permission(user, asset, system_user, 'connect')
         else:
             app = get_object_or_404(Application, id=value.get('application'))

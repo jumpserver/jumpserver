@@ -345,12 +345,6 @@ class PasswordInvalid(JMSException):
     default_detail = _('Your password is invalid')
 
 
-class NotHaveUpDownLoadPerm(JMSException):
-    status_code = status.HTTP_403_FORBIDDEN
-    code = 'not_have_up_down_load_perm'
-    default_detail = _('No upload or download permission')
-
-
 class MFACodeRequiredError(AuthFailedError):
     error = 'mfa_code_required'
     msg = _("Please enter MFA code")
