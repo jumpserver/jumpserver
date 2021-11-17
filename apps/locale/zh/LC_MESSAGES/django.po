@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-12 16:51+0800\n"
+"POT-Creation-Date: 2021-11-17 15:54+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1500,10 +1500,8 @@ msgid "Invalid token"
 msgstr "无效的令牌"
 
 #: authentication/api/mfa.py:103
-#, fuzzy
-#| msgid "Code is invalid, "
-msgid "Code is invalid"
-msgstr "验证码无效"
+msgid "Code is invalid, {}"
+msgstr "验证码无效: {}"
 
 #: authentication/backends/api.py:67
 msgid "Invalid signature header. No credentials provided."
@@ -1641,62 +1639,58 @@ msgid "MFA not set, please set it first"
 msgstr "多因子认证没有设置，请先完成设置"
 
 #: authentication/errors.py:69
-msgid "OTP not set, please set it first"
-msgstr "OTP认证没有设置，请先完成设置"
-
-#: authentication/errors.py:70
 msgid "Login confirm required"
 msgstr "需要登录复核"
 
-#: authentication/errors.py:71
+#: authentication/errors.py:70
 msgid "Wait login confirm ticket for accept"
 msgstr "等待登录复核处理"
 
-#: authentication/errors.py:72
+#: authentication/errors.py:71
 msgid "Login confirm ticket was {}"
 msgstr "登录复核 {}"
 
-#: authentication/errors.py:187 authentication/errors.py:251
+#: authentication/errors.py:184 authentication/errors.py:248
 msgid "IP is not allowed"
 msgstr "来源 IP 不被允许登录"
 
-#: authentication/errors.py:258
+#: authentication/errors.py:255
 msgid "Time Period is not allowed"
 msgstr "该 时间段 不被允许登录"
 
-#: authentication/errors.py:291
+#: authentication/errors.py:288
 msgid "SSO auth closed"
 msgstr "SSO 认证关闭了"
 
-#: authentication/errors.py:296 authentication/mixins.py:350
+#: authentication/errors.py:293 authentication/mixins.py:357
 msgid "Your password is too simple, please change it for security"
 msgstr "你的密码过于简单，为了安全，请修改"
 
-#: authentication/errors.py:305 authentication/mixins.py:357
+#: authentication/errors.py:302 authentication/mixins.py:364
 msgid "You should to change your password before login"
 msgstr "登录完成前，请先修改密码"
 
-#: authentication/errors.py:314 authentication/mixins.py:364
+#: authentication/errors.py:311 authentication/mixins.py:371
 msgid "Your password has expired, please reset before logging in"
 msgstr "您的密码已过期，先修改再登录"
 
-#: authentication/errors.py:348
+#: authentication/errors.py:345
 msgid "Your password is invalid"
 msgstr "您的密码无效"
 
-#: authentication/errors.py:354
+#: authentication/errors.py:351
 msgid "No upload or download permission"
 msgstr "没有上传下载权限"
 
-#: authentication/errors.py:366
+#: authentication/errors.py:356
 msgid "Please enter MFA code"
 msgstr "请输入验证码"
 
-#: authentication/errors.py:370
+#: authentication/errors.py:361
 msgid "Please enter SMS code"
 msgstr "请输入短信验证码"
 
-#: authentication/errors.py:374 users/exceptions.py:15
+#: authentication/errors.py:366 users/exceptions.py:15
 msgid "Phone not set"
 msgstr "手机号没有设置"
 
@@ -1768,11 +1762,11 @@ msgstr "设置手机号码启用"
 msgid "Clear phone number to disable"
 msgstr "清空手机号码禁用"
 
-#: authentication/mixins.py:311
+#: authentication/mixins.py:318
 msgid "The MFA type({}) is not supported"
 msgstr "该 MFA 方法 ({}) 不被支持"
 
-#: authentication/mixins.py:340
+#: authentication/mixins.py:347
 msgid "Please change your password"
 msgstr "请修改密码"
 
@@ -3140,6 +3134,18 @@ msgstr "上传下载"
 msgid "Cloud sync record keep days"
 msgstr "云同步记录"
 
+#: settings/serializers/cleaning.py:29
+msgid "Session keep duration"
+msgstr "会话日志保存时间"
+
+#: settings/serializers/cleaning.py:30
+msgid ""
+"Unit: days, Session, record, command will be delete if more than duration, "
+"only in database"
+msgstr ""
+"单位：天。 会话、录像、命令记录超过该时长将会被删除(仅影响数据库存储, oss等不"
+"受影响)"
+
 #: settings/serializers/email.py:18
 msgid "SMTP host"
 msgstr "SMTP 主机"
@@ -3545,36 +3551,24 @@ msgid "List page size"
 msgstr "资产列表每页数量"
 
 #: settings/serializers/terminal.py:29
-msgid "Session keep duration"
-msgstr "会话日志保存时间"
-
-#: settings/serializers/terminal.py:30
-msgid ""
-"Unit: days, Session, record, command will be delete if more than duration, "
-"only in database"
-msgstr ""
-"单位：天。 会话、录像、命令记录超过该时长将会被删除(仅影响数据库存储, oss等不"
-"受影响)"
-
-#: settings/serializers/terminal.py:33
 msgid "Telnet login regex"
 msgstr "Telnet 成功正则表达式"
 
-#: settings/serializers/terminal.py:34
+#: settings/serializers/terminal.py:30
 msgid ""
 "The login success message varies with devices. if you cannot log in to the "
 "device through Telnet, set this parameter"
 msgstr "不同设备登录成功提示不一样，所以如果 telnet 不能正常登录，可以这里设置"
 
-#: settings/serializers/terminal.py:38
+#: settings/serializers/terminal.py:34
 msgid "RDP address"
 msgstr "RDP 地址"
 
-#: settings/serializers/terminal.py:39
+#: settings/serializers/terminal.py:35
 msgid "RDP visit address, eg: dev.jumpserver.org:3389"
 msgstr "RDP 访问地址, 如: dev.jumpserver.org:3389"
 
-#: settings/serializers/terminal.py:42
+#: settings/serializers/terminal.py:38
 msgid "Enable XRDP"
 msgstr "启用 XRDP 服务"
 
@@ -3826,11 +3820,11 @@ msgstr ""
 msgid "Send verification code"
 msgstr "发送验证码"
 
-#: templates/_mfa_login_field.html:92
+#: templates/_mfa_login_field.html:107
 msgid "Wait: "
 msgstr "等待："
 
-#: templates/_mfa_login_field.html:102
+#: templates/_mfa_login_field.html:117
 msgid "The verification code has been sent"
 msgstr "验证码已发送"
 
@@ -4828,7 +4822,7 @@ msgstr "批准的系统用户名称"
 msgid "Permission named `{}` already exists"
 msgstr "授权名称 `{}` 已存在"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:88
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:90
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:71
 msgid "The expiration date should be greater than the start date"
 msgstr "过期时间要大于开始时间"
@@ -6125,6 +6119,9 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "OTP not set, please set it first"
+#~ msgstr "OTP认证没有设置，请先完成设置"
 
 #~ msgid "Help Website URL"
 #~ msgstr "官网链接"
