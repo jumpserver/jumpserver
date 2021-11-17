@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-15 17:52+0800\n"
+"POT-Creation-Date: 2021-11-17 15:44+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -25,7 +25,7 @@ msgstr ""
 #: orgs/models.py:24 perms/models/base.py:44 settings/models.py:29
 #: settings/serializers/sms.py:6 terminal/models/storage.py:23
 #: terminal/models/task.py:16 terminal/models/terminal.py:100
-#: users/forms/profile.py:32 users/models/group.py:15 users/models/user.py:541
+#: users/forms/profile.py:32 users/models/group.py:15 users/models/user.py:547
 #: users/templates/users/_select_user_modal.html:13
 #: users/templates/users/user_asset_permission.html:37
 #: users/templates/users/user_asset_permission.html:154
@@ -60,7 +60,7 @@ msgstr "激活中"
 #: orgs/models.py:27 perms/models/base.py:53 settings/models.py:34
 #: terminal/models/storage.py:26 terminal/models/terminal.py:114
 #: tickets/models/ticket.py:71 users/models/group.py:16
-#: users/models/user.py:574 xpack/plugins/change_auth_plan/models/base.py:41
+#: users/models/user.py:580 xpack/plugins/change_auth_plan/models/base.py:41
 #: xpack/plugins/cloud/models.py:35 xpack/plugins/cloud/models.py:113
 #: xpack/plugins/gathered_user/models.py:26
 msgid "Comment"
@@ -87,7 +87,7 @@ msgstr "登录复核"
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:38
 #: terminal/notifications.py:90 terminal/notifications.py:138
 #: tickets/models/comment.py:17 users/const.py:14 users/models/user.py:169
-#: users/models/user.py:745 users/models/user.py:771
+#: users/models/user.py:751 users/models/user.py:777
 #: users/serializers/group.py:19
 #: users/templates/users/user_asset_permission.html:38
 #: users/templates/users/user_asset_permission.html:64
@@ -162,7 +162,7 @@ msgstr "格式为逗号分隔的字符串, * 表示匹配所有. "
 #: assets/models/base.py:176 assets/models/gathered_user.py:15
 #: audits/models.py:105 authentication/forms.py:15 authentication/forms.py:17
 #: authentication/templates/authentication/_msg_different_city.html:9
-#: ops/models/adhoc.py:148 users/forms/profile.py:31 users/models/user.py:539
+#: ops/models/adhoc.py:148 users/forms/profile.py:31 users/models/user.py:545
 #: users/templates/users/_msg_user_created.html:12
 #: users/templates/users/_select_user_modal.html:14
 #: xpack/plugins/change_auth_plan/models/asset.py:35
@@ -554,7 +554,7 @@ msgstr "标签管理"
 #: assets/models/cluster.py:28 assets/models/cmd_filter.py:26
 #: assets/models/cmd_filter.py:67 assets/models/group.py:21
 #: common/db/models.py:70 common/mixins/models.py:49 orgs/models.py:25
-#: orgs/models.py:437 perms/models/base.py:51 users/models/user.py:582
+#: orgs/models.py:437 perms/models/base.py:51 users/models/user.py:588
 #: users/serializers/group.py:33
 #: xpack/plugins/change_auth_plan/models/base.py:45
 #: xpack/plugins/cloud/models.py:119 xpack/plugins/gathered_user/models.py:30
@@ -567,7 +567,7 @@ msgstr "创建者"
 #: assets/models/label.py:25 common/db/models.py:72 common/mixins/models.py:50
 #: ops/models/adhoc.py:38 ops/models/command.py:29 orgs/models.py:26
 #: orgs/models.py:435 perms/models/base.py:52 users/models/group.py:18
-#: users/models/user.py:772 xpack/plugins/cloud/models.py:122
+#: users/models/user.py:778 xpack/plugins/cloud/models.py:122
 msgid "Date created"
 msgstr "创建日期"
 
@@ -622,7 +622,7 @@ msgstr "带宽"
 msgid "Contact"
 msgstr "联系人"
 
-#: assets/models/cluster.py:22 users/models/user.py:560
+#: assets/models/cluster.py:22 users/models/user.py:566
 msgid "Phone"
 msgstr "手机"
 
@@ -648,7 +648,7 @@ msgid "Default"
 msgstr "默认"
 
 #: assets/models/cluster.py:36 assets/models/label.py:14
-#: users/models/user.py:757
+#: users/models/user.py:763
 msgid "System"
 msgstr "系统"
 
@@ -1223,12 +1223,12 @@ msgstr "用户代理"
 
 #: audits/models.py:110
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
-#: users/forms/profile.py:64 users/models/user.py:563
+#: users/forms/profile.py:64 users/models/user.py:569
 #: users/serializers/profile.py:102
 msgid "MFA"
 msgstr "MFA"
 
-#: audits/models.py:111 audits/serializers.py:45 terminal/models/sharing.py:88
+#: audits/models.py:111 terminal/models/sharing.py:88
 #: xpack/plugins/change_auth_plan/models/base.py:187
 #: xpack/plugins/cloud/models.py:176
 msgid "Reason"
@@ -1258,6 +1258,10 @@ msgstr "状态名称"
 #: audits/serializers.py:31
 msgid "MFA display"
 msgstr "MFA名称"
+
+#: audits/serializers.py:45
+msgid "Reason display"
+msgstr "原因显示"
 
 #: audits/serializers.py:76 audits/serializers.py:91 ops/models/adhoc.py:248
 #: terminal/serializers/session.py:35
@@ -1302,12 +1306,12 @@ msgid "Auth Token"
 msgstr "认证令牌"
 
 #: audits/signals_handler.py:68 authentication/views/login.py:170
-#: notifications/backends/__init__.py:11 users/models/user.py:596
+#: notifications/backends/__init__.py:11 users/models/user.py:602
 msgid "WeCom"
 msgstr "企业微信"
 
 #: audits/signals_handler.py:69 authentication/views/login.py:176
-#: notifications/backends/__init__.py:12 users/models/user.py:597
+#: notifications/backends/__init__.py:12 users/models/user.py:603
 msgid "DingTalk"
 msgstr "钉钉"
 
@@ -1494,7 +1498,7 @@ msgstr "{ApplicationPermission} 添加 {SystemUser}"
 msgid "{ApplicationPermission} REMOVE {SystemUser}"
 msgstr "{ApplicationPermission} 移除 {SystemUser}"
 
-#: authentication/api/connection_token.py:248
+#: authentication/api/connection_token.py:259
 msgid "Invalid token"
 msgstr "无效的令牌"
 
@@ -1661,15 +1665,15 @@ msgstr "该 时间段 不被允许登录"
 msgid "SSO auth closed"
 msgstr "SSO 认证关闭了"
 
-#: authentication/errors.py:293 authentication/mixins.py:359
+#: authentication/errors.py:293 authentication/mixins.py:360
 msgid "Your password is too simple, please change it for security"
 msgstr "你的密码过于简单，为了安全，请修改"
 
-#: authentication/errors.py:302 authentication/mixins.py:366
+#: authentication/errors.py:302 authentication/mixins.py:367
 msgid "You should to change your password before login"
 msgstr "登录完成前，请先修改密码"
 
-#: authentication/errors.py:311 authentication/mixins.py:373
+#: authentication/errors.py:311 authentication/mixins.py:374
 msgid "Your password has expired, please reset before logging in"
 msgstr "您的密码已过期，先修改再登录"
 
@@ -1677,19 +1681,15 @@ msgstr "您的密码已过期，先修改再登录"
 msgid "Your password is invalid"
 msgstr "您的密码无效"
 
-#: authentication/errors.py:351
-msgid "No upload or download permission"
-msgstr "没有上传下载权限"
-
-#: authentication/errors.py:356
+#: authentication/errors.py:350
 msgid "Please enter MFA code"
 msgstr "请输入 MFA 验证码"
 
-#: authentication/errors.py:361
+#: authentication/errors.py:355
 msgid "Please enter SMS code"
 msgstr "请输入短信验证码"
 
-#: authentication/errors.py:366 users/exceptions.py:15
+#: authentication/errors.py:360 users/exceptions.py:15
 msgid "Phone not set"
 msgstr "手机号没有设置"
 
@@ -1765,11 +1765,11 @@ msgstr "设置手机号码启用"
 msgid "Clear phone number to disable"
 msgstr "清空手机号码禁用"
 
-#: authentication/mixins.py:316 authentication/mixins.py:318
+#: authentication/mixins.py:315
 msgid "The MFA type ({}) is not enabled"
 msgstr "该 MFA ({}) 方式没有启用"
 
-#: authentication/mixins.py:349
+#: authentication/mixins.py:350
 msgid "Please change your password"
 msgstr "请修改密码"
 
@@ -2093,7 +2093,7 @@ msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
 #: authentication/views/login.py:182 notifications/backends/__init__.py:14
-#: users/models/user.py:598
+#: users/models/user.py:604
 msgid "FeiShu"
 msgstr "飞书"
 
@@ -2352,7 +2352,7 @@ msgstr ""
 "div>"
 
 #: notifications/backends/__init__.py:10 users/forms/profile.py:101
-#: users/models/user.py:543
+#: users/models/user.py:549
 msgid "Email"
 msgstr "邮件"
 
@@ -2567,7 +2567,7 @@ msgstr "组织审计员"
 msgid "GLOBAL"
 msgstr "全局组织"
 
-#: orgs/models.py:434 users/models/user.py:551 users/serializers/user.py:37
+#: orgs/models.py:434 users/models/user.py:557 users/serializers/user.py:37
 #: users/templates/users/_select_user_modal.html:15
 msgid "Role"
 msgstr "角色"
@@ -2628,7 +2628,7 @@ msgid "Favorite"
 msgstr "收藏夹"
 
 #: perms/models/base.py:47 templates/_nav.html:21 users/models/group.py:31
-#: users/models/user.py:547 users/templates/users/_select_user_modal.html:16
+#: users/models/user.py:553 users/templates/users/_select_user_modal.html:16
 #: users/templates/users/user_asset_permission.html:39
 #: users/templates/users/user_asset_permission.html:67
 #: users/templates/users/user_database_app_permission.html:38
@@ -2639,7 +2639,7 @@ msgstr "用户组"
 #: perms/models/base.py:50
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:60
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:50
-#: users/models/user.py:579
+#: users/models/user.py:585
 msgid "Date expired"
 msgstr "失效日期"
 
@@ -3827,11 +3827,11 @@ msgstr ""
 msgid "Send verification code"
 msgstr "发送验证码"
 
-#: templates/_mfa_login_field.html:107
+#: templates/_mfa_login_field.html:105
 msgid "Wait: "
 msgstr "等待："
 
-#: templates/_mfa_login_field.html:117
+#: templates/_mfa_login_field.html:115
 msgid "The verification code has been sent"
 msgstr "验证码已发送"
 
@@ -5022,7 +5022,7 @@ msgstr "不能和原来的密钥相同"
 msgid "Not a valid ssh public key"
 msgstr "SSH密钥不合法"
 
-#: users/forms/profile.py:160 users/models/user.py:571
+#: users/forms/profile.py:160 users/models/user.py:577
 #: users/templates/users/user_password_update.html:48
 msgid "Public key"
 msgstr "SSH公钥"
@@ -5031,39 +5031,39 @@ msgstr "SSH公钥"
 msgid "Force enable"
 msgstr "强制启用"
 
-#: users/models/user.py:520
+#: users/models/user.py:526
 msgid "Local"
 msgstr "数据库"
 
-#: users/models/user.py:554
+#: users/models/user.py:560
 msgid "Avatar"
 msgstr "头像"
 
-#: users/models/user.py:557
+#: users/models/user.py:563
 msgid "Wechat"
 msgstr "微信"
 
-#: users/models/user.py:568
+#: users/models/user.py:574
 msgid "Private key"
 msgstr "ssh私钥"
 
-#: users/models/user.py:587
+#: users/models/user.py:593
 msgid "Source"
 msgstr "来源"
 
-#: users/models/user.py:591
+#: users/models/user.py:597
 msgid "Date password last updated"
 msgstr "最后更新密码日期"
 
-#: users/models/user.py:594
+#: users/models/user.py:600
 msgid "Need update password"
 msgstr "需要更新密码"
 
-#: users/models/user.py:753
+#: users/models/user.py:759
 msgid "Administrator"
 msgstr "管理员"
 
-#: users/models/user.py:756
+#: users/models/user.py:762
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
@@ -6126,6 +6126,9 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "No upload or download permission"
+#~ msgstr "没有上传下载权限"
 
 #~ msgid "OTP not set, please set it first"
 #~ msgstr "OTP认证没有设置，请先完成设置"

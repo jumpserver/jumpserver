@@ -42,7 +42,7 @@ class UserLoginLogSerializer(serializers.ModelSerializer):
         fields = fields_small
         extra_kwargs = {
             "user_agent": {'label': _('User agent')},
-            "reason_display": {'label': _('Reason')}
+            "reason_display": {'label': _('Reason display')}
         }
 
 
