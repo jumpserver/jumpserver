@@ -59,6 +59,8 @@ class PublicSettingApi(generics.RetrieveAPIView):
                 "XRDP_ENABLED": settings.XRDP_ENABLED,
                 "ANNOUNCEMENT_ENABLED": settings.ANNOUNCEMENT_ENABLED,
                 "ANNOUNCEMENT": settings.ANNOUNCEMENT,
+                "HELP_DOCUMENT_URL": settings.HELP_DOCUMENT_URL,
+                "HELP_SUPPORT_URL": settings.HELP_SUPPORT_URL,
             }
         }
         return instance
