@@ -6,20 +6,19 @@ __all__ = ['RoleSerializer', 'RoleBindingSerializer']
 
 
 class RoleSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Role
-        fields = [
-            'id', 'name', 'scope', 'permissions', 'builtin', 'comment',
-            'date_created', 'date_updated', 'created_by', 'updated_by'
-        ]
+        fields_mini = ['id', 'name', 'scope']
         read_only_fields = [
-            'builtin', 'date_created', 'date_updated', 'created_by', 'updated_by'
+            'users_amount', 'builtin', 'date_created',
+            'date_updated', 'created_by', 'updated_by'
+        ]
+        fields = fields_mini + read_only_fields + [
+            'comment',
         ]
 
 
 class RoleBindingSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = RoleBinding
         fields = ['id', 'scope', 'user', 'role', 'org']

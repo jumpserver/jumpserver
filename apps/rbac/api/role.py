@@ -1,3 +1,5 @@
+from django.db.models import Count
+
 from common.drf.api import JMSModelViewSet
 from common.permissions import IsSuperUser, IsOrgAdmin
 from ..serializers import RoleSerializer, RoleBindingSerializer
@@ -12,6 +14,12 @@ class RoleViewSet(JMSModelViewSet):
     filterset_fields = ['name', 'scope', 'builtin']
     search_fields = filterset_fields
     permission_classes = (IsSuperUser, )
+
+    def get_queryset(self):
+        queryset = super().get_queryset()\
+            .annotate(users_amount=Count('users')) \
+            .annotate(permissions_amount=Count('permissions'))
+        return queryset
 
 
 class RoleBindingViewSet(JMSModelViewSet):

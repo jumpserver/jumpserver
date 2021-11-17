@@ -23,7 +23,6 @@ from common.drf.api import SerializerMixin
 from common.permissions import IsSuperUserOrAppUser, IsValidUser, IsSuperUser
 from orgs.mixins.api import RootOrgViewMixin
 from common.http import is_true
-from assets.models import SystemUser
 
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,

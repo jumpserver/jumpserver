@@ -2,11 +2,11 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 
 from common.db.models import JMSModel
-from orgs.utils import current_org
+from common.utils import lazyproperty
 from .permission import Permission
 from .. import const
 
-__all__ = ['Role', 'RoleBinding']
+__all__ = ['Role']
 
 
 class Scope(models.TextChoices):
@@ -20,8 +20,11 @@ class Role(JMSModel):
 
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     scope = models.CharField(
-        max_length=128, choices=Scope.choices, default=Scope.system,
-        verbose_name=_('Scope')
+        max_length=128, choices=Scope.choices, default=Scope.system, verbose_name=_('Scope')
+    )
+    users = models.ManyToManyField(
+        'users.User', verbose_name=_("Users"), related_name='roles',
+        through='rbac.RoleBinding', through_fields=['role', 'user'],
     )
     permissions = models.ManyToManyField(
         'rbac.Permission', related_name='roles', blank=True, verbose_name=_('Permissions')
@@ -40,23 +43,30 @@ class Role(JMSModel):
         unique_together = [('name', 'scope')]
 
     def get_permissions(self):
-        if self.builtin and self.name in [self.system_admin_name, self.org_admin_name]:
+        admin_names = [self.system_admin_name, self.org_admin_name]
+        if self.builtin and self.name in admin_names:
             permissions = Permission.objects.all()
         else:
             permissions = self.permissions.all()
 
-        excludes = const.exclude_permissions
+        excludes = list(const.exclude_permissions)
         if self.scope == Scope.org:
             excludes.extend(const.system_scope_permissions)
 
         for app_label, code_name in excludes:
-            permissions = permissions.exclude(codename=code_name, content_type__app_label=app_label)
+            permissions = permissions.exclude(
+                codename=code_name,
+                content_type__app_label=app_label
+            )
         return permissions
 
-    def get_bound_users(self):
-        from users.models import User
-        users_id = RoleBinding.objects.filter(role=self).values_list('user_id', flat=True)
-        return User.objects.filter(id__in=users_id)
+    @lazyproperty
+    def users_amount(self):
+        return self.users.count()
+
+    @lazyproperty
+    def permissions_amount(self):
+        return self.permissions.count()
 
     def __str__(self):
         return '%s (%s)' % (self.name, self.get_scope_display())
@@ -80,92 +90,3 @@ class Role(JMSModel):
             for name in role_names:
                 cls.objects.create(name=name, scope=scope, builtin=True)
 
-
-class RoleBinding(JMSModel):
-    """ 定义 用户-角色 关系 """
-    Scope = Role.Scope
-
-    scope = models.CharField(
-        max_length=128, choices=Scope.choices, default=Scope.system,
-        verbose_name=_('Scope')
-    )
-    user = models.ForeignKey(
-        'users.User', related_name='role_bindings', on_delete=models.CASCADE, verbose_name=_('User')
-    )
-    role = models.ForeignKey(
-        Role, related_name='role_bindings', on_delete=models.CASCADE, verbose_name=_('Role')
-    )
-    org = models.ForeignKey(
-        'orgs.Organization', related_name='role_bindings', blank=True, null=True,
-        on_delete=models.CASCADE, verbose_name=_('Organization')
-    )
-
-    class Meta:
-        verbose_name = _('Role binding')
-        unique_together = ('user', 'role', 'org')
-
-    def __str__(self):
-        display = '{user} & {role}'.format(user=self.user, role=self.role)
-        if self.org:
-            display += ' | {org}'.format(org=self.org)
-        return display
-
-    def save(self, *args, **kwargs):
-        self.scope = self.role.scope
-        return super().save(*args, **kwargs)
-
-    def get_perms(self):
-        perms = list(self.role.get_permissions().values_list(
-            'content_type__app_label', 'codename'
-        ))
-        return set(["%s.%s" % (ct, codename) for ct, codename in perms])
-
-    @classmethod
-    def get_binding_perms(cls, bindings):
-        perms = set()
-        for binding in bindings:
-            perms |= binding.get_perms()
-        perms = sorted(list(perms), key=cls.sort_perms)
-        return perms
-
-    @staticmethod
-    def sort_perms(perm):
-        perm_split = perm.split('.')
-        if len(perm_split) != 2:
-            return perm_split
-        app, code = perm_split[0], perm_split[1]
-        action_resource = code.split('_')
-        if len(action_resource) == 1:
-            action_resource.append('')
-        action = action_resource[0]
-        resource = '_'.join(action_resource[1:])
-        return [app, resource, action]
-
-    @classmethod
-    def get_user_perms(cls, user):
-        q = models.Q(user=user, org__isnull=True, scope=cls.Scope.system)
-        if current_org and not current_org.is_root:
-            q |= models.Q(user=user, org=current_org.org_id, scope=cls.Scope.org)
-        bindings = cls.objects.filter(q)
-        perms = cls.get_binding_perms(bindings)
-        return perms
-
-    @classmethod
-    def get_user_system_roles(cls, user):
-        role_ids = cls.objects.filter(user=user, org__isnull=True, scope=cls.Scope.system)\
-            .values_list('role', flat=True)
-        roles = Role.objects.filter(id__in=role_ids)
-        return roles
-
-    @classmethod
-    def get_user_current_org_role(cls, user):
-        role_ids = cls.objects.filter(user=user, org=current_org, scope=cls.Scope.org)\
-            .values_list('role', flat=True)
-        roles = Role.objects.filter(id__in=role_ids)
-        return roles
-
-    @classmethod
-    def get_user_roles(cls, user):
-        role_ids = cls.objects.filter(user=user).values_list('role', flat=True)
-        roles = Role.objects.filter(id__in=role_ids)
-        return roles

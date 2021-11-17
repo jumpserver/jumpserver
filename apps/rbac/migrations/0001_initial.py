@@ -111,6 +111,8 @@ class Migration(migrations.Migration):
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('name', models.CharField(max_length=128, verbose_name='Name')),
                 ('scope', models.CharField(choices=[('system', 'System'), ('org', 'Organization')], default='system', max_length=128, verbose_name='Scope')),
+                ('users', models.ManyToManyField(related_name='roles',
+                                                 through='rbac.RoleBinding', to=settings.AUTH_USER_MODEL, verbose_name='Users')),
                 ('builtin', models.BooleanField(default=False, verbose_name='Built-in')),
                 ('comment', models.TextField(blank=True, default='', max_length=128, verbose_name='Comment')),
                 ('permissions', models.ManyToManyField(blank=True, related_name='roles', to='rbac.Permission', verbose_name='Permissions')),
