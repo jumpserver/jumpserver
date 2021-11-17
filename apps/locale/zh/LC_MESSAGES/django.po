@@ -1261,7 +1261,7 @@ msgstr "MFA名称"
 
 #: audits/serializers.py:45
 msgid "Reason display"
-msgstr "原因显示"
+msgstr "原因描述"
 
 #: audits/serializers.py:76 audits/serializers.py:91 ops/models/adhoc.py:248
 #: terminal/serializers/session.py:35
