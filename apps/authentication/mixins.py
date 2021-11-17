@@ -8,7 +8,6 @@ from typing import Callable
 from django.utils.http import urlencode
 from django.core.cache import cache
 from django.conf import settings
-from django.urls import reverse_lazy
 from django.contrib import auth
 from django.utils.translation import ugettext as _
 from rest_framework.request import Request
@@ -18,10 +17,10 @@ from django.contrib.auth import (
 )
 from django.shortcuts import reverse, redirect, get_object_or_404
 
-from common.utils import get_object_or_none, get_request_ip, get_logger, bulk_get, FlashMessageUtil
+from common.utils import get_request_ip, get_logger, bulk_get, FlashMessageUtil
 from acls.models import LoginACL
 from users.models import User
-from users.utils import LoginBlockUtil, MFABlockUtils
+from users.utils import LoginBlockUtil, MFABlockUtils, LoginIpBlockUtil
 from . import errors
 from .utils import rsa_decrypt, gen_key_pair
 from .signals import post_auth_success, post_auth_failed
@@ -76,7 +75,9 @@ def authenticate(request=None, **credentials):
         return user
 
     # The credentials supplied are invalid to all backends, fire signal
-    user_login_failed.send(sender=__name__, credentials=_clean_credentials(credentials), request=request)
+    user_login_failed.send(
+        sender=__name__, credentials=_clean_credentials(credentials), request=request
+    )
 
 
 auth.authenticate = authenticate
@@ -209,6 +210,10 @@ class AuthPreCheckMixin:
 
     def _check_is_block(self, username, raise_exception=True):
         ip = self.get_request_ip()
+
+        if LoginIpBlockUtil(ip).is_block():
+            raise errors.BlockGlobalIpLoginError(username=username, ip=ip)
+
         is_block = LoginBlockUtil(username, ip).is_block()
         if not is_block:
             return
@@ -224,6 +229,7 @@ class AuthPreCheckMixin:
             username = self.request.data.get("username")
         else:
             username = self.request.POST.get("username")
+
         self._check_is_block(username, raise_exception)
 
     def _check_only_allow_exists_user_auth(self, username):
@@ -242,16 +248,24 @@ class MFAMixin:
     get_user_from_session: Callable
     get_request_ip: Callable
 
+    def _check_if_no_active_mfa(self, user):
+        active_mfa_mapper = user.active_mfa_backends_mapper
+        if not active_mfa_mapper:
+            url = reverse('authentication:user-otp-enable-start')
+            raise errors.MFAUnsetError(user, self.request, url)
+
     def _check_login_page_mfa_if_need(self, user):
         if not settings.SECURITY_MFA_IN_LOGIN_PAGE:
             return
+        self._check_if_no_active_mfa(user)
 
         request = self.request
         data = request.data if hasattr(request, 'data') else request.POST
         code = data.get('code')
         mfa_type = data.get('mfa_type', 'otp')
+
         if not code:
-            raise errors.MFACodeRequiredError
+            return
         self._do_check_user_mfa(code, mfa_type, user=user)
 
     def check_user_mfa_if_need(self, user):
@@ -260,10 +274,9 @@ class MFAMixin:
         if not user.mfa_enabled:
             return
 
+        self._check_if_no_active_mfa(user)
+
         active_mfa_mapper = user.active_mfa_backends_mapper
-        if not active_mfa_mapper:
-            url = reverse('authentication:user-otp-enable-start')
-            raise errors.MFAUnsetError(user, self.request, url)
         raise errors.MFARequiredError(mfa_types=tuple(active_mfa_mapper.keys()))
 
     def mark_mfa_ok(self, mfa_type):
@@ -299,10 +312,13 @@ class MFAMixin:
 
         ok = False
         mfa_backend = user.get_mfa_backend_by_type(mfa_type)
-        if mfa_backend:
-            ok, msg = mfa_backend.check_code(code)
+        backend_error = _('The MFA type ({}) is not enabled')
+        if not mfa_backend:
+            msg = backend_error.format(mfa_type)
+        elif not mfa_backend.is_active():
+            msg = backend_error.format(mfa_backend.display_name)
         else:
-            msg = _('The MFA type({}) is not supported'.format(mfa_type))
+            ok, msg = mfa_backend.check_code(code)
 
         if ok:
             self.mark_mfa_ok(mfa_type)

@@ -44,7 +44,7 @@ class MFASendCodeApi(AuthMixin, CreateAPIView):
         else:
             user = get_object_or_404(User, username=username)
 
-        mfa_backend = user.get_mfa_backend_by_type(mfa_type)
+        mfa_backend = user.get_active_mfa_backend_by_type(mfa_type)
         if not mfa_backend or not mfa_backend.challenge_required:
             raise ValidationError('MFA type not support: {} {}'.format(mfa_type, mfa_backend))
         mfa_backend.send_challenge()
@@ -100,7 +100,7 @@ class UserOtpVerifyApi(CreateAPIView):
             request.session["MFA_VERIFY_TIME"] = int(time.time())
             return Response({"ok": "1"})
         else:
-            return Response({"error": _("Code is invalid") + ", " + error}, status=400)
+            return Response({"error": _("Code is invalid, {}").format(error)}, status=400)
 
     def get_permissions(self):
         if self.request.method.lower() == 'get' \

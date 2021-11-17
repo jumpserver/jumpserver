@@ -19,8 +19,12 @@ class MFASms(BaseMFA):
 
     def check_code(self, code):
         assert self.is_authenticated()
-        ok = self.sms.verify(code)
-        msg = '' if ok else sms_failed_msg
+        ok = False
+        msg = ''
+        try:
+            ok = self.sms.verify(code)
+        except Exception as e:
+            msg = str(e)
         return ok, msg
 
     def is_active(self):

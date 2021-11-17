@@ -64,10 +64,13 @@ class ApplySerializer(serializers.Serializer):
         ))
 
     def validate(self, attrs):
-        apply_date_start = attrs['apply_date_start']
-        apply_date_expired = attrs['apply_date_expired']
+        apply_date_start = attrs['apply_date_start'].strftime('%Y-%m-%d %H:%M:%S')
+        apply_date_expired = attrs['apply_date_expired'].strftime('%Y-%m-%d %H:%M:%S')
 
         if apply_date_expired <= apply_date_start:
             error = _('The expiration date should be greater than the start date')
             raise serializers.ValidationError({'apply_date_expired': error})
+
+        attrs['apply_date_start'] = apply_date_start
+        attrs['apply_date_expired'] = apply_date_expired
         return attrs

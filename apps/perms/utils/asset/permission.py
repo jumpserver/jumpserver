@@ -86,7 +86,7 @@ def get_asset_system_user_ids_with_actions_by_user(user: User, asset: Asset):
 
 def has_asset_system_permission(user: User, asset: Asset, system_user: SystemUser):
     systemuser_actions_mapper = get_asset_system_user_ids_with_actions_by_user(user, asset)
-    actions = systemuser_actions_mapper.get(system_user.id, [])
+    actions = systemuser_actions_mapper.get(system_user.id, 0)
     if actions:
         return True
     return False

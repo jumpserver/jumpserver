@@ -54,9 +54,13 @@
     $(document).ready(function () {
         const mfaSelectRef = document.getElementById('mfa-select');
         const preferMFA = localStorage.getItem(preferMFAKey);
-        if (preferMFA) {
+        const valueSelector = "value=" + preferMFA
+        const preferMFADisabled = $(`#mfa-select option[${valueSelector}]`).attr('disabled')
+
+        if (preferMFA && !preferMFADisabled) {
             mfaSelectRef.value = preferMFA;
         }
+
         const mfaSelect = mfaSelectRef.value;
         if (mfaSelect !== null) {
             selectChange(mfaSelect, true);
@@ -71,9 +75,18 @@
         }
 
         $('.input-style').each(function (i, ele){
-            $(ele).attr('name', '').attr('required', false)
+            $(ele).attr('name', '')
         })
-        $('#mfa-' + name + ' .input-style').attr('name', 'code').attr('required', true)
+
+        const currentMFAInputRef = $('#mfa-' + name + ' .input-style')
+        currentMFAInputRef.attr('name', 'code').attr('required', true)
+
+        // 登录页时，不应该默认focus
+        const usernameRef = $('input[name="username"]')
+        if (!usernameRef || usernameRef.length === 0) {
+            currentMFAInputRef.focus()
+        }
+        currentMFAInputRef.attr('name', 'code')
     }
 
     function sendChallengeCode(currentBtn) {

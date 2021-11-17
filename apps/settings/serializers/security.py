@@ -1,6 +1,8 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
+from common.utils.ip import is_ip_address, is_ip_network, is_ip_segment
+
 
 class SecurityPasswordRuleSerializer(serializers.Serializer):
     SECURITY_PASSWORD_MIN_LENGTH = serializers.IntegerField(
@@ -14,9 +16,24 @@ class SecurityPasswordRuleSerializer(serializers.Serializer):
     SECURITY_PASSWORD_UPPER_CASE = serializers.BooleanField(
         required=False, label=_('Must contain capital')
     )
-    SECURITY_PASSWORD_LOWER_CASE = serializers.BooleanField(required=False, label=_('Must contain lowercase'))
-    SECURITY_PASSWORD_NUMBER = serializers.BooleanField(required=False, label=_('Must contain numeric'))
-    SECURITY_PASSWORD_SPECIAL_CHAR = serializers.BooleanField(required=False, label=_('Must contain special'))
+    SECURITY_PASSWORD_LOWER_CASE = serializers.BooleanField(
+        required=False, label=_('Must contain lowercase')
+    )
+    SECURITY_PASSWORD_NUMBER = serializers.BooleanField(
+        required=False, label=_('Must contain numeric')
+    )
+    SECURITY_PASSWORD_SPECIAL_CHAR = serializers.BooleanField(
+        required=False, label=_('Must contain special')
+    )
+
+
+def ip_child_validator(ip_child):
+    is_valid = is_ip_address(ip_child) \
+               or is_ip_network(ip_child) \
+               or is_ip_segment(ip_child)
+    if not is_valid:
+        error = _('IP address invalid: `{}`').format(ip_child)
+        raise serializers.ValidationError(error)
 
 
 class SecurityAuthSerializer(serializers.Serializer):
@@ -38,6 +55,14 @@ class SecurityAuthSerializer(serializers.Serializer):
         help_text=_(
             'Unit: minute, If the user has failed to log in for a limited number of times, '
             'no login is allowed during this time interval.'
+        )
+    )
+    SECURITY_LOGIN_IP_BLACK_LIST = serializers.ListField(
+        default=[], label=_('IP Black List'), allow_empty=True,
+        child=serializers.CharField(max_length=1024, validators=[ip_child_validator]),
+        help_text=_(
+            'Format for comma-delimited string. Such as: '
+            '192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64'
         )
     )
     SECURITY_PASSWORD_EXPIRATION_TIME = serializers.IntegerField(
@@ -72,7 +97,9 @@ class SecurityAuthSerializer(serializers.Serializer):
     SECURITY_MFA_VERIFY_TTL = serializers.IntegerField(
         min_value=5, max_value=60 * 60 * 10,
         label=_("MFA verify TTL"),
-        help_text=_("Unit: second, The verification MFA takes effect only when you view the account password"),
+        help_text=_(
+            "Unit: second, The verification MFA takes effect only when you view the account password"
+        )
     )
     SECURITY_LOGIN_CHALLENGE_ENABLED = serializers.BooleanField(
         required=False, default=False,
@@ -108,7 +135,9 @@ class SecurityAuthSerializer(serializers.Serializer):
 class SecuritySettingSerializer(SecurityPasswordRuleSerializer, SecurityAuthSerializer):
     SECURITY_SERVICE_ACCOUNT_REGISTRATION = serializers.BooleanField(
         required=True, label=_('Enable terminal register'),
-        help_text=_("Allow terminal register, after all terminal setup, you should disable this for security")
+        help_text=_(
+            "Allow terminal register, after all terminal setup, you should disable this for security"
+        )
     )
     SECURITY_WATERMARK_ENABLED = serializers.BooleanField(
         required=True, label=_('Enable watermark'),
@@ -142,6 +171,8 @@ class SecuritySettingSerializer(SecurityPasswordRuleSerializer, SecurityAuthSeri
     )
     SECURITY_CHECK_DIFFERENT_CITY_LOGIN = serializers.BooleanField(
         required=False, label=_('Remote Login Protection'),
-        help_text=_('The system determines whether the login IP address belongs to a common login city. '
-                    'If the account is logged in from a common login city, the system sends a remote login reminder')
+        help_text=_(
+            'The system determines whether the login IP address belongs to a common login city. '
+            'If the account is logged in from a common login city, the system sends a remote login reminder'
+        )
     )

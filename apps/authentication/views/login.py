@@ -122,10 +122,10 @@ class UserLoginView(mixins.AuthMixin, FormView):
             self.request.session.set_test_cookie()
             return self.render_to_response(context)
         except (
+                errors.MFAUnsetError,
                 errors.PasswordTooSimple,
                 errors.PasswordRequireResetError,
-                errors.PasswordNeedUpdate,
-                errors.OTPBindRequiredError
+                errors.PasswordNeedUpdate
         ) as e:
             return redirect(e.url)
         except (
@@ -133,7 +133,8 @@ class UserLoginView(mixins.AuthMixin, FormView):
                 errors.BlockMFAError,
                 errors.MFACodeRequiredError,
                 errors.SMSCodeRequiredError,
-                errors.UserPhoneNotSet
+                errors.UserPhoneNotSet,
+                errors.BlockGlobalIpLoginError
         ) as e:
             form.add_error('code', e.msg)
             return super().form_invalid(form)

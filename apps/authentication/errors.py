@@ -60,13 +60,12 @@ block_mfa_msg = _(
     "(please contact admin to unlock it or try again after {} minutes)"
 )
 mfa_error_msg = _(
-    "{error},"
+    "{error}, "
     "You can also try {times_try} times "
     "(The account will be temporarily locked for {block_time} minutes)"
 )
 mfa_required_msg = _("MFA required")
 mfa_unset_msg = _("MFA not set, please set it first")
-otp_unset_msg = _("OTP not set, please set it first")
 login_confirm_required_msg = _("Login confirm required")
 login_confirm_wait_msg = _("Wait login confirm ticket for accept")
 login_confirm_error_msg = _("Login confirm ticket was {}")
@@ -162,13 +161,11 @@ class BlockMFAError(AuthFailedNeedLogMixin, AuthFailedError):
         super().__init__(username=username, request=request, ip=ip)
 
 
-class MFAUnsetError(AuthFailedNeedLogMixin, AuthFailedError):
+class MFAUnsetError(Exception):
     error = reason_mfa_unset
     msg = mfa_unset_msg
 
     def __init__(self, user, request, url):
-        super().__init__(username=user.username, request=request)
-        self.user = user
         self.url = url
 
 
@@ -177,6 +174,14 @@ class BlockLoginError(AuthFailedNeedBlockMixin, AuthFailedError):
 
     def __init__(self, username, ip):
         self.msg = block_login_msg.format(settings.SECURITY_LOGIN_LIMIT_TIME)
+        super().__init__(username=username, ip=ip)
+
+
+class BlockGlobalIpLoginError(AuthFailedError):
+    error = 'block_global_ip_login'
+
+    def __init__(self, username, ip):
+        self.msg = _("IP is not allowed")
         super().__init__(username=username, ip=ip)
 
 
@@ -340,27 +345,16 @@ class PasswordInvalid(JMSException):
     default_detail = _('Your password is invalid')
 
 
-class NotHaveUpDownLoadPerm(JMSException):
-    status_code = status.HTTP_403_FORBIDDEN
-    code = 'not_have_up_down_load_perm'
-    default_detail = _('No upload or download permission')
-
-
-class OTPBindRequiredError(JMSException):
-    default_detail = otp_unset_msg
-
-    def __init__(self, url, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.url = url
-
-
 class MFACodeRequiredError(AuthFailedError):
+    error = 'mfa_code_required'
     msg = _("Please enter MFA code")
 
 
 class SMSCodeRequiredError(AuthFailedError):
+    error = 'sms_code_required'
     msg = _("Please enter SMS code")
 
 
 class UserPhoneNotSet(AuthFailedError):
+    error = 'phone_not_set'
     msg = _('Phone not set')
