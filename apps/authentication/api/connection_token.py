@@ -26,7 +26,6 @@ from orgs.mixins.api import RootOrgViewMixin
 from common.http import is_true
 from perms.utils.asset.permission import get_asset_system_user_ids_with_actions_by_user
 from perms.models.asset_permission import Action
-from authentication.errors import NotHaveUpDownLoadPerm
 
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
@@ -96,22 +95,26 @@ class ClientProtocolMixin:
         drives_redirect = is_true(self.request.query_params.get('drives_redirect'))
         token = self.create_token(user, asset, application, system_user)
 
+        # 设置磁盘挂载
         if drives_redirect and asset:
             systemuser_actions_mapper = get_asset_system_user_ids_with_actions_by_user(user, asset)
-            actions = systemuser_actions_mapper.get(system_user.id, [])
+            actions = systemuser_actions_mapper.get(system_user.id, 0)
             if actions & Action.UPDOWNLOAD:
                 options['drivestoredirect:s'] = '*'
-            else:
-                raise NotHaveUpDownLoadPerm
 
+        # 全屏
         options['screen mode id:i'] = '2' if full_screen else '1'
+
+        # RDP Server 地址
         address = settings.TERMINAL_RDP_ADDR
         if not address or address == 'localhost:3389':
             address = self.request.get_host().split(':')[0] + ':3389'
         options['full address:s'] = address
+        # 用户名
         options['username:s'] = '{}|{}'.format(user.username, token)
         if system_user.ad_domain:
             options['domain:s'] = system_user.ad_domain
+        # 宽高
         if width and height:
             options['desktopwidth:i'] = width
             options['desktopheight:i'] = height
@@ -160,13 +163,16 @@ class ClientProtocolMixin:
         asset, application, system_user, user = self.get_request_resource(serializer)
         protocol = system_user.protocol
         username = user.username
-        name = ''
+
         if protocol == 'rdp':
             name, config = self.get_rdp_file_content(serializer)
-        elif protocol == 'vnc':
-            raise HttpResponse(status=404, data={"error": "VNC not support"})
-        else:
+        elif protocol == 'ssh':
+            # Todo:
+            name = ''
             config = 'ssh://system_user@asset@user@jumpserver-ssh'
+        else:
+            raise ValueError('Protocol not support: {}'.format(protocol))
+
         filename = "{}-{}-jumpserver".format(username, name)
         data = {
             "filename": filename,
@@ -179,8 +185,13 @@ class ClientProtocolMixin:
     @action(methods=['POST', 'GET'], detail=False, url_path='client-url', permission_classes=[IsValidUser])
     def get_client_protocol_url(self, request, *args, **kwargs):
         serializer = self.get_valid_serializer()
-        protocol_data = self.get_client_protocol_data(serializer)
-        protocol_data = base64.b64encode(json.dumps(protocol_data).encode()).decode()
+        try:
+            protocol_data = self.get_client_protocol_data(serializer)
+        except ValueError as e:
+            return Response({'error': str(e)}, status=401)
+
+        protocol_data = json.dumps(protocol_data).encode()
+        protocol_data = base64.b64encode(protocol_data).decode()
         data = {
             'url': 'jms://{}'.format(protocol_data),
         }
@@ -348,14 +359,12 @@ class UserConnectionTokenViewSet(
             raise serializers.ValidationError("User not valid, disabled or expired")
 
         system_user = get_object_or_404(SystemUser, id=value.get('system_user'))
-
         asset = None
         app = None
         if value.get('type') == 'asset':
             asset = get_object_or_404(Asset, id=value.get('asset'))
             if not asset.is_active:
                 raise serializers.ValidationError("Asset disabled")
-
             has_perm, expired_at = asset_validate_permission(user, asset, system_user, 'connect')
         else:
             app = get_object_or_404(Application, id=value.get('application'))

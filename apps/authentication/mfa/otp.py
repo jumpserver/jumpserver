@@ -10,6 +10,7 @@ otp_failed_msg = _("OTP code invalid, or server time error")
 class MFAOtp(BaseMFA):
     name = 'otp'
     display_name = _('OTP')
+    placeholder = _('OTP verification code')
 
     def check_code(self, code):
         from users.utils import check_otp_code

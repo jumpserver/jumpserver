@@ -60,7 +60,7 @@ block_mfa_msg = _(
     "(please contact admin to unlock it or try again after {} minutes)"
 )
 mfa_error_msg = _(
-    "{error},"
+    "{error}, "
     "You can also try {times_try} times "
     "(The account will be temporarily locked for {block_time} minutes)"
 )
@@ -343,12 +343,6 @@ class FeiShuNotBound(JMSException):
 class PasswordInvalid(JMSException):
     default_code = 'passwd_invalid'
     default_detail = _('Your password is invalid')
-
-
-class NotHaveUpDownLoadPerm(JMSException):
-    status_code = status.HTTP_403_FORBIDDEN
-    code = 'not_have_up_down_load_perm'
-    default_detail = _('No upload or download permission')
 
 
 class MFACodeRequiredError(AuthFailedError):

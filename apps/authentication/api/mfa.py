@@ -44,7 +44,7 @@ class MFASendCodeApi(AuthMixin, CreateAPIView):
         else:
             user = get_object_or_404(User, username=username)
 
-        mfa_backend = user.get_mfa_backend_by_type(mfa_type)
+        mfa_backend = user.get_active_mfa_backend_by_type(mfa_type)
         if not mfa_backend or not mfa_backend.challenge_required:
             raise ValidationError('MFA type not support: {} {}'.format(mfa_type, mfa_backend))
         mfa_backend.send_challenge()

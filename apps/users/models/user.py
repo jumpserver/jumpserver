@@ -507,8 +507,14 @@ class MFAMixin:
         backends = [cls(user) for cls in MFA_BACKENDS if cls.global_enabled()]
         return backends
 
+    def get_active_mfa_backend_by_type(self, mfa_type):
+        backend = self.get_mfa_backend_by_type(mfa_type)
+        if not backend or not backend.is_active():
+            return None
+        return backend
+
     def get_mfa_backend_by_type(self, mfa_type):
-        mfa_mapper = self.active_mfa_backends_mapper
+        mfa_mapper = {b.name: b for b in self.get_user_mfa_backends(self)}
         backend = mfa_mapper.get(mfa_type)
         if not backend:
             return None
