@@ -119,7 +119,7 @@ class BlockGlobalIpLoginError(AuthFailedError):
 
     def __init__(self, username, ip, **kwargs):
         self.msg = _("IP is not allowed")
-        LoginIpBlockUtil(ip).incr_failed_count()
+        LoginIpBlockUtil(ip).set_block_if_need()
         super().__init__(username=username, ip=ip, **kwargs)
 
 

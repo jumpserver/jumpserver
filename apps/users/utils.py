@@ -182,29 +182,32 @@ class BlockGlobalIpUtilBase:
         self.block_key = self.BLOCK_KEY_TMPL.format(ip)
         self.key_ttl = int(settings.SECURITY_LOGIN_LIMIT_TIME) * 60
 
-    def check_include_ip(self):
+    @property
+    def ip_in_black_list(self):
         return self.ip in settings.SECURITY_LOGIN_IP_BLACK_LIST
 
-    def incr_failed_count(self):
-        if self.check_include_ip:
-            count = cache.get(self.limit_key, 0)
-            count += 1
-            cache.set(self.limit_key, count, self.key_ttl)
+    def set_block_if_need(self):
+        if not self.ip_in_black_list:
+            return
+        count = cache.get(self.limit_key, 0)
+        count += 1
+        cache.set(self.limit_key, count, self.key_ttl)
 
-            limit_count = settings.SECURITY_LOGIN_LIMIT_COUNT
-            if count >= limit_count:
-                cache.set(self.block_key, True, self.key_ttl)
+        limit_count = settings.SECURITY_LOGIN_LIMIT_COUNT
+        if count < limit_count:
+            return
+        cache.set(self.block_key, True, self.key_ttl)
 
-    def clean_failed_count(self):
-        if self.check_include_ip:
-            cache.delete(self.limit_key)
-            cache.delete(self.block_key)
+    def clean_block_if_need(self):
+        if not self.ip_in_black_list:
+            return
+        cache.delete(self.limit_key)
+        cache.delete(self.block_key)
 
     def is_block(self):
-        if self.check_include_ip:
-            return bool(cache.get(self.block_key))
-        else:
+        if not self.ip_in_black_list:
             return False
+        return bool(cache.get(self.block_key))
 
 
 class LoginBlockUtil(BlockUtilBase):

@@ -492,7 +492,7 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, MFAMixin, AuthPost
         # 标记密码验证成功
         self.mark_password_ok(user=user, auto_login=auto_login)
         LoginBlockUtil(user.username, ip).clean_failed_count()
-        LoginIpBlockUtil(ip).clean_failed_count()
+        LoginIpBlockUtil(ip).clean_block_if_need()
         return user
 
     def mark_password_ok(self, user, auto_login=False):
@@ -518,7 +518,7 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, MFAMixin, AuthPost
         self._check_login_acl(user, ip)
 
         LoginBlockUtil(user.username, ip).clean_failed_count()
-        LoginIpBlockUtil(ip).clean_failed_count()
+        LoginIpBlockUtil(ip).clean_block_if_need()
         MFABlockUtils(user.username, ip).clean_failed_count()
 
         self.mark_password_ok(user, False)
