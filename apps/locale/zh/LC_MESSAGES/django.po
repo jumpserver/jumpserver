@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-17 16:39+0800\n"
+"POT-Creation-Date: 2021-11-18 21:41+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1619,13 +1619,19 @@ msgstr ""
 "您输入的用户名或密码不正确，请重新输入。 您还可以尝试 {times_try} 次（账号将"
 "被临时 锁定 {block_time} 分钟）"
 
-#: authentication/errors.py:55 authentication/errors.py:59
+#: authentication/errors.py:55 authentication/errors.py:63
 msgid ""
 "The account has been locked (please contact admin to unlock it or try again "
 "after {} minutes)"
 msgstr "账号已被锁定（请联系管理员解锁 或 {}分钟后重试）"
 
-#: authentication/errors.py:63
+#: authentication/errors.py:59
+msgid ""
+"The ip has been locked (please contact admin to unlock it or try again after "
+"{} minutes)"
+msgstr "IP已被锁定（请联系管理员解锁 或 {}分钟后重试）"
+
+#: authentication/errors.py:67
 #, python-brace-format
 msgid ""
 "{error}, You can also try {times_try} times (The account will be temporarily "
@@ -1633,63 +1639,63 @@ msgid ""
 msgstr ""
 "{error}，您还可以尝试 {times_try} 次（账号将被临时锁定 {block_time} 分钟）"
 
-#: authentication/errors.py:67
+#: authentication/errors.py:71
 msgid "MFA required"
 msgstr "需要 MFA 认证"
 
-#: authentication/errors.py:68
+#: authentication/errors.py:72
 msgid "MFA not set, please set it first"
 msgstr "MFA 没有设置，请先完成设置"
 
-#: authentication/errors.py:69
+#: authentication/errors.py:73
 msgid "Login confirm required"
 msgstr "需要登录复核"
 
-#: authentication/errors.py:70
+#: authentication/errors.py:74
 msgid "Wait login confirm ticket for accept"
 msgstr "等待登录复核处理"
 
-#: authentication/errors.py:71
+#: authentication/errors.py:75
 msgid "Login confirm ticket was {}"
 msgstr "登录复核 {}"
 
-#: authentication/errors.py:184 authentication/errors.py:248
+#: authentication/errors.py:125 authentication/errors.py:255
 msgid "IP is not allowed"
 msgstr "来源 IP 不被允许登录"
 
-#: authentication/errors.py:255
+#: authentication/errors.py:262
 msgid "Time Period is not allowed"
 msgstr "该 时间段 不被允许登录"
 
-#: authentication/errors.py:288
+#: authentication/errors.py:295
 msgid "SSO auth closed"
 msgstr "SSO 认证关闭了"
 
-#: authentication/errors.py:293 authentication/mixins.py:360
+#: authentication/errors.py:300 authentication/mixins.py:360
 msgid "Your password is too simple, please change it for security"
 msgstr "你的密码过于简单，为了安全，请修改"
 
-#: authentication/errors.py:302 authentication/mixins.py:367
+#: authentication/errors.py:309 authentication/mixins.py:367
 msgid "You should to change your password before login"
 msgstr "登录完成前，请先修改密码"
 
-#: authentication/errors.py:311 authentication/mixins.py:374
+#: authentication/errors.py:318 authentication/mixins.py:374
 msgid "Your password has expired, please reset before logging in"
 msgstr "您的密码已过期，先修改再登录"
 
-#: authentication/errors.py:345
+#: authentication/errors.py:352
 msgid "Your password is invalid"
 msgstr "您的密码无效"
 
-#: authentication/errors.py:350
+#: authentication/errors.py:357
 msgid "Please enter MFA code"
 msgstr "请输入 MFA 验证码"
 
-#: authentication/errors.py:355
+#: authentication/errors.py:362
 msgid "Please enter SMS code"
 msgstr "请输入短信验证码"
 
-#: authentication/errors.py:360 users/exceptions.py:15
+#: authentication/errors.py:367 users/exceptions.py:15
 msgid "Phone not set"
 msgstr "手机号没有设置"
 
@@ -3339,12 +3345,12 @@ msgid "Global MFA auth"
 msgstr "全局启用 MFA 认证"
 
 #: settings/serializers/security.py:50
-msgid "Limit the number of login failures"
-msgstr "限制登录失败次数"
+msgid "Limit the number of user login failures"
+msgstr "限制用户登录失败次数"
 
 #: settings/serializers/security.py:54
-msgid "Block logon interval"
-msgstr "禁止登录时间间隔"
+msgid "Block user login interval"
+msgstr "禁止用户登录时间间隔"
 
 #: settings/serializers/security.py:56
 msgid ""
@@ -3352,11 +3358,25 @@ msgid ""
 "times, no login is allowed during this time interval."
 msgstr "单位：分, 当用户登录失败次数达到限制后，那么在此时间间隔内禁止登录"
 
-#: settings/serializers/security.py:61
-msgid "Login IP Black List"
-msgstr "登录 IP 黑名单"
+#: settings/serializers/security.py:62
+msgid "Limit the number of IP login failures"
+msgstr "限制 IP 登录失败次数"
 
-#: settings/serializers/security.py:64
+#: settings/serializers/security.py:66
+msgid "Block IP login interval"
+msgstr "禁止 IP 登录时间间隔"
+
+#: settings/serializers/security.py:68
+msgid ""
+"Unit: minute, If the IP has failed to log in for a limited number of times, "
+"no login is allowed during this time interval."
+msgstr "单位：分, 当IP登录失败次数达到限制后，那么在此时间间隔内禁止登录"
+
+#: settings/serializers/security.py:73
+msgid "Login IP White List"
+msgstr "登录 IP 白名单"
+
+#: settings/serializers/security.py:76 settings/serializers/security.py:84
 msgid ""
 "Format for comma-delimited string. Such as: 192.168.10.1, 192.168.1.0/24, "
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64"
@@ -3364,11 +3384,15 @@ msgstr ""
 "格式为逗号分隔的字符串。例如: 192.168.10.1, 192.168.1.0/24, "
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 （支持网域）"
 
-#: settings/serializers/security.py:70
+#: settings/serializers/security.py:81
+msgid "Login IP Black List"
+msgstr "登录 IP 黑名单"
+
+#: settings/serializers/security.py:90
 msgid "User password expiration"
 msgstr "用户密码过期时间"
 
-#: settings/serializers/security.py:72
+#: settings/serializers/security.py:92
 msgid ""
 "Unit: day, If the user does not update the password during the time, the "
 "user password will expire failure;The password expiration reminder mail will "
@@ -3378,55 +3402,55 @@ msgstr ""
 "单位：天, 如果用户在此期间没有更新密码，用户密码将过期失效； 密码过期提醒邮件"
 "将在密码过期前5天内由系统（每天）自动发送给用户"
 
-#: settings/serializers/security.py:79
+#: settings/serializers/security.py:99
 msgid "Number of repeated historical passwords"
 msgstr "不能设置近几次密码"
 
-#: settings/serializers/security.py:81
+#: settings/serializers/security.py:101
 msgid ""
 "Tip: When the user resets the password, it cannot be the previous n "
 "historical passwords of the user"
 msgstr "提示：用户重置密码时，不能为该用户前几次使用过的密码"
 
-#: settings/serializers/security.py:86
+#: settings/serializers/security.py:106
 msgid "Only single device login"
 msgstr "仅一台设备登录"
 
-#: settings/serializers/security.py:87
+#: settings/serializers/security.py:107
 msgid "Next device login, pre login will be logout"
 msgstr "下个设备登录，上次登录会被顶掉"
 
-#: settings/serializers/security.py:90
+#: settings/serializers/security.py:110
 msgid "Only exist user login"
 msgstr "仅已存在用户登录"
 
-#: settings/serializers/security.py:91
+#: settings/serializers/security.py:111
 msgid "If enable, CAS、OIDC auth will be failed, if user not exist yet"
 msgstr "开启后，如果系统中不存在该用户，CAS、OIDC 登录将会失败"
 
-#: settings/serializers/security.py:94
+#: settings/serializers/security.py:114
 msgid "Only from source login"
 msgstr "仅从用户来源登录"
 
-#: settings/serializers/security.py:95
+#: settings/serializers/security.py:115
 msgid "Only log in from the user source property"
 msgstr "开启后，如果用户来源为本地，CAS、OIDC 登录将会失败"
 
-#: settings/serializers/security.py:99
+#: settings/serializers/security.py:119
 msgid "MFA verify TTL"
 msgstr "MFA 校验有效期"
 
-#: settings/serializers/security.py:101
+#: settings/serializers/security.py:121
 msgid ""
 "Unit: second, The verification MFA takes effect only when you view the "
 "account password"
 msgstr "单位: 秒, 目前仅在查看账号密码校验 MFA 时生效"
 
-#: settings/serializers/security.py:106
+#: settings/serializers/security.py:126
 msgid "Enable Login dynamic code"
 msgstr "启用登录附加码"
 
-#: settings/serializers/security.py:107
+#: settings/serializers/security.py:127
 msgid ""
 "The password and additional code are sent to a third party authentication "
 "system for verification"
@@ -3434,89 +3458,89 @@ msgstr ""
 "密码和附加码一并发送给第三方认证系统进行校验, 如：有的第三方认证系统，需要 密"
 "码+6位数字 完成认证"
 
-#: settings/serializers/security.py:112
+#: settings/serializers/security.py:132
 msgid "MFA in login page"
 msgstr "MFA 在登录页面输入"
 
-#: settings/serializers/security.py:113
+#: settings/serializers/security.py:133
 msgid "Eu security regulations(GDPR) require MFA to be on the login page"
 msgstr "欧盟数据安全法规(GDPR) 要求 MFA 在登录页面，来确保系统登录安全"
 
-#: settings/serializers/security.py:116
+#: settings/serializers/security.py:136
 msgid "Enable Login captcha"
 msgstr "启用登录验证码"
 
-#: settings/serializers/security.py:117
+#: settings/serializers/security.py:137
 msgid "Enable captcha to prevent robot authentication"
 msgstr "开启验证码，防止机器人登录"
 
-#: settings/serializers/security.py:137
+#: settings/serializers/security.py:157
 msgid "Enable terminal register"
 msgstr "终端注册"
 
-#: settings/serializers/security.py:139
+#: settings/serializers/security.py:159
 msgid ""
 "Allow terminal register, after all terminal setup, you should disable this "
 "for security"
 msgstr "是否允许终端注册，当所有终端启动后，为了安全应该关闭"
 
-#: settings/serializers/security.py:143
+#: settings/serializers/security.py:163
 msgid "Enable watermark"
 msgstr "开启水印"
 
-#: settings/serializers/security.py:144
+#: settings/serializers/security.py:164
 msgid "Enabled, the web session and replay contains watermark information"
 msgstr "启用后，Web 会话和录像将包含水印信息"
 
-#: settings/serializers/security.py:148
+#: settings/serializers/security.py:168
 msgid "Connection max idle time"
 msgstr "连接最大空闲时间"
 
-#: settings/serializers/security.py:149
+#: settings/serializers/security.py:169
 msgid "If idle time more than it, disconnect connection Unit: minute"
 msgstr "提示：如果超过该配置没有操作，连接会被断开 （单位：分）"
 
-#: settings/serializers/security.py:152
+#: settings/serializers/security.py:172
 msgid "Remember manual auth"
 msgstr "保存手动输入密码"
 
-#: settings/serializers/security.py:155
+#: settings/serializers/security.py:175
 msgid "Enable change auth secure mode"
 msgstr "启用改密安全模式"
 
-#: settings/serializers/security.py:158
+#: settings/serializers/security.py:178
 msgid "Insecure command alert"
 msgstr "危险命令告警"
 
-#: settings/serializers/security.py:161
+#: settings/serializers/security.py:181
 msgid "Email recipient"
 msgstr "邮件收件人"
 
-#: settings/serializers/security.py:162
+#: settings/serializers/security.py:182
 msgid "Multiple user using , split"
 msgstr "多个用户，使用 , 分割"
 
-#: settings/serializers/security.py:165
+#: settings/serializers/security.py:185
 msgid "Batch command execution"
 msgstr "批量命令执行"
 
-#: settings/serializers/security.py:166
+#: settings/serializers/security.py:186
 msgid "Allow user run batch command or not using ansible"
 msgstr "是否允许用户使用 ansible 执行批量命令"
 
-#: settings/serializers/security.py:169
+#: settings/serializers/security.py:189
 msgid "Session share"
 msgstr "会话分享"
 
-#: settings/serializers/security.py:170
+#: settings/serializers/security.py:190
 msgid "Enabled, Allows user active session to be shared with other users"
 msgstr "开启后允许用户分享已连接的资产会话给它人，协同工作"
 
-#: settings/serializers/security.py:173
+#: settings/serializers/security.py:193
 msgid "Remote Login Protection"
 msgstr "异地登录保护"
 
-#: settings/serializers/security.py:175
+#: settings/serializers/security.py:195
 msgid ""
 "The system determines whether the login IP address belongs to a common login "
 "city. If the account is logged in from a common login city, the system sends "
@@ -3579,104 +3603,104 @@ msgstr "RDP 访问地址, 如: dev.jumpserver.org:3389"
 msgid "Enable XRDP"
 msgstr "启用 XRDP 服务"
 
-#: settings/utils/ldap.py:412
+#: settings/utils/ldap.py:415
 msgid "ldap:// or ldaps:// protocol is used."
 msgstr "使用 ldap:// 或 ldaps:// 协议"
 
-#: settings/utils/ldap.py:423
+#: settings/utils/ldap.py:426
 msgid "Host or port is disconnected: {}"
 msgstr "主机或端口不可连接: {}"
 
-#: settings/utils/ldap.py:425
+#: settings/utils/ldap.py:428
 msgid "The port is not the port of the LDAP service: {}"
 msgstr "端口不是LDAP服务端口: {}"
 
-#: settings/utils/ldap.py:427
+#: settings/utils/ldap.py:430
 msgid "Please add certificate: {}"
 msgstr "请添加证书"
 
-#: settings/utils/ldap.py:431 settings/utils/ldap.py:458
-#: settings/utils/ldap.py:488 settings/utils/ldap.py:516
+#: settings/utils/ldap.py:434 settings/utils/ldap.py:461
+#: settings/utils/ldap.py:491 settings/utils/ldap.py:519
 msgid "Unknown error: {}"
 msgstr "未知错误: {}"
 
-#: settings/utils/ldap.py:445
+#: settings/utils/ldap.py:448
 msgid "Bind DN or Password incorrect"
 msgstr "绑定DN或密码错误"
 
-#: settings/utils/ldap.py:452
+#: settings/utils/ldap.py:455
 msgid "Please enter Bind DN: {}"
 msgstr "请输入绑定DN: {}"
 
-#: settings/utils/ldap.py:454
+#: settings/utils/ldap.py:457
 msgid "Please enter Password: {}"
 msgstr "请输入密码: {}"
 
-#: settings/utils/ldap.py:456
+#: settings/utils/ldap.py:459
 msgid "Please enter correct Bind DN and Password: {}"
 msgstr "请输入正确的绑定DN和密码: {}"
 
-#: settings/utils/ldap.py:474
+#: settings/utils/ldap.py:477
 msgid "Invalid User OU or User search filter: {}"
 msgstr "不合法的用户OU或用户过滤器: {}"
 
-#: settings/utils/ldap.py:505
+#: settings/utils/ldap.py:508
 msgid "LDAP User attr map not include: {}"
 msgstr "LDAP属性映射没有包含: {}"
 
-#: settings/utils/ldap.py:512
+#: settings/utils/ldap.py:515
 msgid "LDAP User attr map is not dict"
 msgstr "LDAP属性映射不合法"
 
-#: settings/utils/ldap.py:531
+#: settings/utils/ldap.py:534
 msgid "LDAP authentication is not enabled"
 msgstr "LDAP认证没有启用"
 
-#: settings/utils/ldap.py:549
+#: settings/utils/ldap.py:552
 msgid "Error (Invalid LDAP server): {}"
 msgstr "错误 （不合法的LDAP服务器地址）: {}"
 
-#: settings/utils/ldap.py:551
+#: settings/utils/ldap.py:554
 msgid "Error (Invalid Bind DN): {}"
 msgstr "错误（不合法的绑定DN）: {}"
 
-#: settings/utils/ldap.py:553
+#: settings/utils/ldap.py:556
 msgid "Error (Invalid LDAP User attr map): {}"
 msgstr "错误（不合法的LDAP属性映射）: {}"
 
-#: settings/utils/ldap.py:555
+#: settings/utils/ldap.py:558
 msgid "Error (Invalid User OU or User search filter): {}"
 msgstr "错误（不合法的用户OU或用户过滤器）: {}"
 
-#: settings/utils/ldap.py:557
+#: settings/utils/ldap.py:560
 msgid "Error (Not enabled LDAP authentication): {}"
 msgstr "错误（没有启用LDAP认证）: {}"
 
-#: settings/utils/ldap.py:559
+#: settings/utils/ldap.py:562
 msgid "Error (Unknown): {}"
 msgstr "错误（未知）: {}"
 
-#: settings/utils/ldap.py:562
+#: settings/utils/ldap.py:565
 msgid "Succeed: Match {} s user"
 msgstr "成功匹配 {} 个用户"
 
-#: settings/utils/ldap.py:595
+#: settings/utils/ldap.py:598
 msgid "Authentication failed (configuration incorrect): {}"
 msgstr "认证失败（配置错误）: {}"
 
-#: settings/utils/ldap.py:597
+#: settings/utils/ldap.py:600
 msgid "Authentication failed (before login check failed): {}"
 msgstr "认证失败（登录前检查失败）: {}"
 
-#: settings/utils/ldap.py:599
+#: settings/utils/ldap.py:602
 msgid "Authentication failed (username or password incorrect): {}"
 msgstr "认证失败 (用户名或密码不正确): {}"
 
-#: settings/utils/ldap.py:601
+#: settings/utils/ldap.py:604
 msgid "Authentication failed (Unknown): {}"
 msgstr "认证失败: (未知): {}"
 
-#: settings/utils/ldap.py:604
+#: settings/utils/ldap.py:607
 msgid "Authentication success: {}"
 msgstr "认证成功: {}"
 
@@ -3827,11 +3851,11 @@ msgstr ""
 msgid "Send verification code"
 msgstr "发送验证码"
 
-#: templates/_mfa_login_field.html:105
+#: templates/_mfa_login_field.html:106
 msgid "Wait: "
 msgstr "等待："
 
-#: templates/_mfa_login_field.html:115
+#: templates/_mfa_login_field.html:116
 msgid "The verification code has been sent"
 msgstr "验证码已发送"
 
@@ -6126,201 +6150,3 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
-
-#~ msgid "No upload or download permission"
-#~ msgstr "没有上传下载权限"
-
-#~ msgid "OTP not set, please set it first"
-#~ msgstr "OTP认证没有设置，请先完成设置"
-
-#~ msgid "Radius MFA"
-#~ msgstr "Radius MFA"
-
-#~ msgid "Help Website URL"
-#~ msgstr "官网链接"
-
-#~ msgid "default: http://www.jumpserver.org"
-#~ msgstr "如: http://dev.jumpserver.org:8080"
-
-#~ msgid "One-time password invalid, or ntp sync server time"
-#~ msgstr "MFA 验证码不正确，或者服务器端时间不对"
-
-#~ msgid "Download MFA APP, Using dynamic code"
-#~ msgstr "下载 MFA APP, 使用一次性动态码"
-
-#~ msgid "MFA Radius"
-#~ msgstr "Radius MFA"
-
-#~ msgid "Please enter verification code"
-#~ msgstr "请输入验证码"
-
-#, python-brace-format
-#~ msgid ""
-#~ "One-time password invalid, or ntp sync server time, You can also try "
-#~ "{times_try} times (The account will be temporarily locked for "
-#~ "{block_time} minutes)"
-#~ msgstr ""
-#~ "虚拟MFA 不正确，或者服务器端时间不对。 您还可以尝试 {times_try} 次（账号将"
-#~ "被临时 锁定 {block_time} 分钟）"
-
-#, python-brace-format
-#~ msgid ""
-#~ "The MFA type({mfa_type}) is not supported, You can also try {times_try} "
-#~ "times (The account will be temporarily locked for {block_time} minutes)"
-#~ msgstr ""
-#~ "该({mfa_type}) MFA 类型不支持， 您还可以尝试 {times_try} 次（账号将被临时 "
-#~ "锁定 {block_time} 分钟）"
-
-#~ msgid "One-time password"
-#~ msgstr "一次性密码"
-
-#~ msgid "Go"
-#~ msgstr "立即"
-
-#, python-brace-format
-#~ msgid "Hello {name}"
-#~ msgstr "你好 {name}"
-
-#~ msgid "Login direct"
-#~ msgstr "直接登录"
-
-#~ msgid "to apply for a password reset email."
-#~ msgstr "申请重置"
-
-#~ msgid "Please login and reset your MFA."
-#~ msgstr "请登录并重新设置你的 MFA"
-
-#~ msgid "Please login and reset your ssh public key."
-#~ msgstr "请登录并重新设置你的密钥"
-
-# msgid "Update user"
-# msgstr "更新用户"
-#, python-format
-#~ msgid ""
-#~ "\n"
-#~ "        <div>\n"
-#~ "            <p>Your account has been created successfully</p>\n"
-#~ "            <div>\n"
-#~ "                Username: %(username)s\n"
-#~ "                <br/>\n"
-#~ "                Password: <a href=\"%(rest_password_url)s?token="
-#~ "%(rest_password_token)s\">\n"
-#~ "                click here to set your password</a> \n"
-#~ "                (This link is valid for 1 hour. After it expires, <a href="
-#~ "\"%(forget_password_url)s?email=%(email)s\">request new one</a>)\n"
-#~ "            </div>\n"
-#~ "            <div>\n"
-#~ "                <p>---</p>\n"
-#~ "                <a href=\"%(login_url)s\">Login direct</a>\n"
-#~ "            </div>\n"
-#~ "        </div>\n"
-#~ "        "
-#~ msgstr ""
-#~ "\n"
-#~ "        <div>\n"
-#~ "            <p>您的账户已创建成功</p>\n"
-#~ "            <div>\n"
-#~ "                用户名: %(username)s\n"
-#~ "                <br/>\n"
-#~ "                密码: <a href=\"%(rest_password_url)s?token="
-#~ "%(rest_password_token)s\">请点击这里设置密码</a> (这个链接有效期1小时, 超"
-#~ "过时间您可以 <a href=\"%(forget_password_url)s?email=%(email)s\">重新申请"
-#~ "</a>)\n"
-#~ "            </div>\n"
-#~ "            <div>\n"
-#~ "                <p>---</p>\n"
-#~ "                <a href=\"%(login_url)s\">直接登录</a>\n"
-#~ "            </div>\n"
-#~ "        </div>\n"
-#~ "        "
-
-#, python-format
-#~ msgid "Hello %(name)s"
-#~ msgstr "你好 %(name)s"
-
-#~ msgid "This link is valid for 1 hour. After it expires,"
-#~ msgstr "这个链接有效期1小时, 超过时间您可以"
-
-#~ msgid "Welcome to the JumpServer open source Bastion Host"
-#~ msgstr "欢迎使用JumpServer开源堡垒机"
-
-#~ msgid "Login IP"
-#~ msgstr "登录IP"
-
-#~ msgid "The user `{}` is not in the current organization: `{}`"
-#~ msgstr "用户 `{}` 不在当前组织: `{}`"
-
-#~ msgid "Login Confirm"
-#~ msgstr "登录复核"
-
-#~ msgid "{} need confirm by {}"
-#~ msgstr "{} 需要 {} 复核"
-
-#~ msgid "Enabled, please go to the user detail add approver"
-#~ msgstr "启用后, 请在用户详情中添加审批人"
-
-#~ msgid ""
-#~ "\n"
-#~ "Time: {}"
-#~ msgstr ""
-#~ "\n"
-#~ "时间：{}"
-
-#~ msgid "asset permission"
-#~ msgstr "资产授权"
-
-#~ msgid "Asset permissions will expired"
-#~ msgstr "资产授权即将过期"
-
-#, python-brace-format
-#~ msgid ""
-#~ "\n"
-#~ "Organization: {org}\n"
-#~ "Permissions: {perms}\n"
-#~ msgstr ""
-#~ "\n"
-#~ "组织: {org}\n"
-#~ "权限: {perms}\n"
-
-#~ msgid "asset permissions of organization"
-#~ msgstr "组织资产授权"
-
-#~ msgid "application permissions of organization"
-#~ msgstr "组织的应用授权 {}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "\n"
-#~ " Organization: {org} \n"
-#~ " Permissions: {perms} \n"
-#~ msgstr ""
-#~ "\n"
-#~ "组织: {org} \n"
-#~ "授权: {perms} \n"
-
-#~ msgid "You've been hacked"
-#~ msgstr "你被攻击了"
-
-#~ msgid "Binding DingTalk failed"
-#~ msgstr "绑定钉钉失败"
-
-#~ msgid "Binding FeiShu failed"
-#~ msgstr "绑定飞书失败"
-
-#~ msgid "Binding WeCom failed"
-#~ msgstr "绑定企业微信失败"
-
-#~ msgid "Enable Login MFA"
-#~ msgstr "启用登录MFA"
-
-#~ msgid "Enable login password add-on"
-#~ msgstr "启用登录密码附加码"
-
-#~ msgid "OpenID"
-#~ msgstr "OpenID"
-
-#~ msgid "CAS"
-#~ msgstr "CAS"
-
-#~ msgid "Only "
-#~ msgstr "仅能从用户配置来源登录"
