@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-18 19:00+0800\n"
+"POT-Creation-Date: 2021-11-19 15:28+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -180,7 +180,7 @@ msgstr ""
 "格式为逗号分隔的字符串, * 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, "
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 （支持网域）"
 
-#: acls/serializers/login_asset_acl.py:31 acls/serializers/rules/rules.py:32
+#: acls/serializers/login_asset_acl.py:31 acls/serializers/rules/rules.py:33
 #: applications/serializers/attrs/application_type/mysql_workbench.py:18
 #: assets/models/asset.py:211 assets/models/domain.py:61
 #: assets/serializers/account.py:12
@@ -225,12 +225,12 @@ msgstr "组织 `{}` 不存在"
 msgid "None of the reviewers belong to Organization `{}`"
 msgstr "所有复核人都不属于组织 `{}`"
 
-#: acls/serializers/rules/rules.py:20 settings/serializers/security.py:35
+#: acls/serializers/rules/rules.py:20
 #: xpack/plugins/cloud/serializers/task.py:23
 msgid "IP address invalid: `{}`"
 msgstr "IP 地址无效: `{}`"
 
-#: acls/serializers/rules/rules.py:26
+#: acls/serializers/rules/rules.py:25
 msgid ""
 "Format for comma-delimited string, with * indicating a match all. Such as: "
 "192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:"
@@ -239,7 +239,7 @@ msgstr ""
 "格式为逗号分隔的字符串, * 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, "
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64"
 
-#: acls/serializers/rules/rules.py:34
+#: acls/serializers/rules/rules.py:35
 msgid "Time Period"
 msgstr "时段"
 
@@ -1619,13 +1619,19 @@ msgstr ""
 "您输入的用户名或密码不正确，请重新输入。 您还可以尝试 {times_try} 次（账号将"
 "被临时 锁定 {block_time} 分钟）"
 
-#: authentication/errors.py:55 authentication/errors.py:59
+#: authentication/errors.py:55 authentication/errors.py:63
 msgid ""
 "The account has been locked (please contact admin to unlock it or try again "
 "after {} minutes)"
-msgstr "账号已被锁定（请联系管理员解锁 或 {}分钟后重试）"
+msgstr "账号已被锁定（请联系管理员解锁或{}分钟后重试）"
 
-#: authentication/errors.py:63
+#: authentication/errors.py:59
+msgid ""
+"The ip has been locked (please contact admin to unlock it or try again after "
+"{} minutes)"
+msgstr "IP 已被锁定（请联系管理员解锁或{}分钟后重试）"
+
+#: authentication/errors.py:67
 #, python-brace-format
 msgid ""
 "{error}, You can also try {times_try} times (The account will be temporarily "
@@ -1633,63 +1639,63 @@ msgid ""
 msgstr ""
 "{error}，您还可以尝试 {times_try} 次（账号将被临时锁定 {block_time} 分钟）"
 
-#: authentication/errors.py:67
+#: authentication/errors.py:71
 msgid "MFA required"
 msgstr "需要 MFA 认证"
 
-#: authentication/errors.py:68
+#: authentication/errors.py:72
 msgid "MFA not set, please set it first"
 msgstr "MFA 没有设置，请先完成设置"
 
-#: authentication/errors.py:69
+#: authentication/errors.py:73
 msgid "Login confirm required"
 msgstr "需要登录复核"
 
-#: authentication/errors.py:70
+#: authentication/errors.py:74
 msgid "Wait login confirm ticket for accept"
 msgstr "等待登录复核处理"
 
-#: authentication/errors.py:71
+#: authentication/errors.py:75
 msgid "Login confirm ticket was {}"
 msgstr "登录复核 {}"
 
-#: authentication/errors.py:121 authentication/errors.py:251
+#: authentication/errors.py:255
 msgid "IP is not allowed"
 msgstr "来源 IP 不被允许登录"
 
-#: authentication/errors.py:258
+#: authentication/errors.py:262
 msgid "Time Period is not allowed"
 msgstr "该 时间段 不被允许登录"
 
-#: authentication/errors.py:291
+#: authentication/errors.py:295
 msgid "SSO auth closed"
 msgstr "SSO 认证关闭了"
 
-#: authentication/errors.py:296 authentication/mixins.py:360
+#: authentication/errors.py:300 authentication/mixins.py:360
 msgid "Your password is too simple, please change it for security"
 msgstr "你的密码过于简单，为了安全，请修改"
 
-#: authentication/errors.py:305 authentication/mixins.py:367
+#: authentication/errors.py:309 authentication/mixins.py:367
 msgid "You should to change your password before login"
 msgstr "登录完成前，请先修改密码"
 
-#: authentication/errors.py:314 authentication/mixins.py:374
+#: authentication/errors.py:318 authentication/mixins.py:374
 msgid "Your password has expired, please reset before logging in"
 msgstr "您的密码已过期，先修改再登录"
 
-#: authentication/errors.py:348
+#: authentication/errors.py:352
 msgid "Your password is invalid"
 msgstr "您的密码无效"
 
-#: authentication/errors.py:353
+#: authentication/errors.py:357
 msgid "Please enter MFA code"
 msgstr "请输入 MFA 验证码"
 
-#: authentication/errors.py:358
+#: authentication/errors.py:362
 msgid "Please enter SMS code"
 msgstr "请输入短信验证码"
 
-#: authentication/errors.py:363 users/exceptions.py:15
+#: authentication/errors.py:367 users/exceptions.py:15
 msgid "Phone not set"
 msgstr "手机号没有设置"
 
@@ -1818,7 +1824,7 @@ msgid "Show"
 msgstr "显示"
 
 #: authentication/templates/authentication/_access_key_modal.html:66
-#: settings/serializers/security.py:42 users/models/user.py:458
+#: settings/serializers/security.py:39 users/models/user.py:458
 #: users/serializers/profile.py:99 users/templates/users/mfa_setting.html:60
 #: users/templates/users/user_verify_mfa.html:36
 msgid "Disable"
@@ -3326,49 +3332,53 @@ msgstr "必须包含数字"
 msgid "Must contain special"
 msgstr "必须包含特殊字符"
 
-#: settings/serializers/security.py:43
-msgid "All users"
-msgstr "所有用户"
-
-#: settings/serializers/security.py:44
-msgid "Only admin users"
-msgstr "仅管理员"
-
-#: settings/serializers/security.py:46
-msgid "Global MFA auth"
-msgstr "全局启用 MFA 认证"
-
-#: settings/serializers/security.py:50
-msgid "Limit the number of login failures"
-msgstr "限制登录失败次数"
-
-#: settings/serializers/security.py:54
-msgid "Block logon interval"
-msgstr "禁止登录时间间隔"
-
-#: settings/serializers/security.py:56
+#: settings/serializers/security.py:31
 msgid ""
 "Unit: minute, If the user has failed to log in for a limited number of "
 "times, no login is allowed during this time interval."
 msgstr "单位：分, 当用户登录失败次数达到限制后，那么在此时间间隔内禁止登录"
 
-#: settings/serializers/security.py:61
-msgid "Login IP Black List"
-msgstr "登录 IP 黑名单"
+#: settings/serializers/security.py:40
+msgid "All users"
+msgstr "所有用户"
+
+#: settings/serializers/security.py:41
+msgid "Only admin users"
+msgstr "仅管理员"
+
+#: settings/serializers/security.py:43
+msgid "Global MFA auth"
+msgstr "全局启用 MFA 认证"
+
+#: settings/serializers/security.py:47
+msgid "Limit the number of user login failures"
+msgstr "限制用户登录失败次数"
+
+#: settings/serializers/security.py:51
+msgid "Block user login interval"
+msgstr "禁止用户登录时间间隔"
+
+#: settings/serializers/security.py:56
+msgid "Limit the number of IP login failures"
+msgstr "限制 IP 登录失败次数"
+
+#: settings/serializers/security.py:60
+msgid "Block IP login interval"
+msgstr "禁止 IP 登录时间间隔"
 
 #: settings/serializers/security.py:64
-msgid ""
-"Format for comma-delimited string. Such as: 192.168.10.1, 192.168.1.0/24, "
-"10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64"
-msgstr ""
-"格式为逗号分隔的字符串。例如: 192.168.10.1, 192.168.1.0/24, "
-"10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 （支持网域）"
+msgid "Login IP White List"
+msgstr "IP 登录白名单"
 
-#: settings/serializers/security.py:70
+#: settings/serializers/security.py:69
+msgid "Login IP Black List"
+msgstr "IP 登录黑名单"
+
+#: settings/serializers/security.py:75
 msgid "User password expiration"
 msgstr "用户密码过期时间"
 
-#: settings/serializers/security.py:72
+#: settings/serializers/security.py:77
 msgid ""
 "Unit: day, If the user does not update the password during the time, the "
 "user password will expire failure;The password expiration reminder mail will "
@@ -3378,55 +3388,55 @@ msgstr ""
 "单位：天, 如果用户在此期间没有更新密码，用户密码将过期失效； 密码过期提醒邮件"
 "将在密码过期前5天内由系统（每天）自动发送给用户"
 
-#: settings/serializers/security.py:79
+#: settings/serializers/security.py:84
 msgid "Number of repeated historical passwords"
 msgstr "不能设置近几次密码"
 
-#: settings/serializers/security.py:81
+#: settings/serializers/security.py:86
 msgid ""
 "Tip: When the user resets the password, it cannot be the previous n "
 "historical passwords of the user"
 msgstr "提示：用户重置密码时，不能为该用户前几次使用过的密码"
 
-#: settings/serializers/security.py:86
+#: settings/serializers/security.py:91
 msgid "Only single device login"
 msgstr "仅一台设备登录"
 
-#: settings/serializers/security.py:87
+#: settings/serializers/security.py:92
 msgid "Next device login, pre login will be logout"
 msgstr "下个设备登录，上次登录会被顶掉"
 
-#: settings/serializers/security.py:90
+#: settings/serializers/security.py:95
 msgid "Only exist user login"
 msgstr "仅已存在用户登录"
 
-#: settings/serializers/security.py:91
+#: settings/serializers/security.py:96
 msgid "If enable, CAS、OIDC auth will be failed, if user not exist yet"
 msgstr "开启后，如果系统中不存在该用户，CAS、OIDC 登录将会失败"
 
-#: settings/serializers/security.py:94
+#: settings/serializers/security.py:99
 msgid "Only from source login"
 msgstr "仅从用户来源登录"
 
-#: settings/serializers/security.py:95
+#: settings/serializers/security.py:100
 msgid "Only log in from the user source property"
 msgstr "开启后，如果用户来源为本地，CAS、OIDC 登录将会失败"
 
-#: settings/serializers/security.py:99
+#: settings/serializers/security.py:104
 msgid "MFA verify TTL"
 msgstr "MFA 校验有效期"
 
-#: settings/serializers/security.py:101
+#: settings/serializers/security.py:106
 msgid ""
 "Unit: second, The verification MFA takes effect only when you view the "
 "account password"
 msgstr "单位: 秒, 目前仅在查看账号密码校验 MFA 时生效"
 
-#: settings/serializers/security.py:106
+#: settings/serializers/security.py:111
 msgid "Enable Login dynamic code"
 msgstr "启用登录附加码"
 
-#: settings/serializers/security.py:107
+#: settings/serializers/security.py:112
 msgid ""
 "The password and additional code are sent to a third party authentication "
 "system for verification"
@@ -3434,96 +3444,96 @@ msgstr ""
 "密码和附加码一并发送给第三方认证系统进行校验, 如：有的第三方认证系统，需要 密"
 "码+6位数字 完成认证"
 
-#: settings/serializers/security.py:112
+#: settings/serializers/security.py:117
 msgid "MFA in login page"
 msgstr "MFA 在登录页面输入"
 
-#: settings/serializers/security.py:113
+#: settings/serializers/security.py:118
 msgid "Eu security regulations(GDPR) require MFA to be on the login page"
 msgstr "欧盟数据安全法规(GDPR) 要求 MFA 在登录页面，来确保系统登录安全"
 
-#: settings/serializers/security.py:116
+#: settings/serializers/security.py:121
 msgid "Enable Login captcha"
 msgstr "启用登录验证码"
 
-#: settings/serializers/security.py:117
+#: settings/serializers/security.py:122
 msgid "Enable captcha to prevent robot authentication"
 msgstr "开启验证码，防止机器人登录"
 
-#: settings/serializers/security.py:137
+#: settings/serializers/security.py:142
 msgid "Enable terminal register"
 msgstr "终端注册"
 
-#: settings/serializers/security.py:139
+#: settings/serializers/security.py:144
 msgid ""
 "Allow terminal register, after all terminal setup, you should disable this "
 "for security"
 msgstr "是否允许终端注册，当所有终端启动后，为了安全应该关闭"
 
-#: settings/serializers/security.py:143
+#: settings/serializers/security.py:148
 msgid "Enable watermark"
 msgstr "开启水印"
 
-#: settings/serializers/security.py:144
+#: settings/serializers/security.py:149
 msgid "Enabled, the web session and replay contains watermark information"
 msgstr "启用后，Web 会话和录像将包含水印信息"
 
-#: settings/serializers/security.py:148
+#: settings/serializers/security.py:153
 msgid "Connection max idle time"
 msgstr "连接最大空闲时间"
 
-#: settings/serializers/security.py:149
+#: settings/serializers/security.py:154
 msgid "If idle time more than it, disconnect connection Unit: minute"
 msgstr "提示：如果超过该配置没有操作，连接会被断开 （单位：分）"
 
-#: settings/serializers/security.py:152
+#: settings/serializers/security.py:157
 msgid "Remember manual auth"
 msgstr "保存手动输入密码"
 
-#: settings/serializers/security.py:155
+#: settings/serializers/security.py:160
 msgid "Enable change auth secure mode"
 msgstr "启用改密安全模式"
 
-#: settings/serializers/security.py:158
+#: settings/serializers/security.py:163
 msgid "Insecure command alert"
 msgstr "危险命令告警"
 
-#: settings/serializers/security.py:161
+#: settings/serializers/security.py:166
 msgid "Email recipient"
 msgstr "邮件收件人"
 
-#: settings/serializers/security.py:162
+#: settings/serializers/security.py:167
 msgid "Multiple user using , split"
 msgstr "多个用户，使用 , 分割"
 
-#: settings/serializers/security.py:165
+#: settings/serializers/security.py:170
 msgid "Batch command execution"
 msgstr "批量命令执行"
 
-#: settings/serializers/security.py:166
+#: settings/serializers/security.py:171
 msgid "Allow user run batch command or not using ansible"
 msgstr "是否允许用户使用 ansible 执行批量命令"
 
-#: settings/serializers/security.py:169
+#: settings/serializers/security.py:174
 msgid "Session share"
 msgstr "会话分享"
 
-#: settings/serializers/security.py:170
+#: settings/serializers/security.py:175
 msgid "Enabled, Allows user active session to be shared with other users"
 msgstr "开启后允许用户分享已连接的资产会话给它人，协同工作"
 
-#: settings/serializers/security.py:173
+#: settings/serializers/security.py:178
 msgid "Remote Login Protection"
 msgstr "异地登录保护"
 
-#: settings/serializers/security.py:175
+#: settings/serializers/security.py:180
 msgid ""
 "The system determines whether the login IP address belongs to a common login "
 "city. If the account is logged in from a common login city, the system sends "
 "a remote login reminder"
 msgstr ""
-"根据登录IP是否所属常用登录城市进行判断，若账号在非常用城市登录，会发送异地登"
-"录提醒"
+"根据登录 IP 是否所属常用登录城市进行判断，若账号在非常用城市登录，会发送异地"
+"登录提醒"
 
 #: settings/serializers/sms.py:7
 msgid "Label"
@@ -6126,3 +6136,4 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
