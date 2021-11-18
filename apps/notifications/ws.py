@@ -50,7 +50,10 @@ class SiteMsgWebsocket(JsonWebsocketConsumer):
         self.send_unread_msg_count()
 
         try:
-            for message in self.chan.listen():
+            msgs = self.chan.listen()
+            # 开始之前关闭连接，因为server端可能关闭了连接，而 client 还在 CONN_MAX_AGE 中
+            close_old_connections()
+            for message in msgs:
                 if message['type'] != 'message':
                     continue
 

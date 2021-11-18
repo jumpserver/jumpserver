@@ -84,7 +84,10 @@ def subscribe_settings_change(sender, **kwargs):
         while True:
             try:
                 sub = setting_pub_sub.subscribe()
-                for msg in sub.listen():
+                msgs = sub.listen()
+                # 开始之前关闭连接，因为server端可能关闭了连接，而 client 还在 CONN_MAX_AGE 中
+                close_old_connections()
+                for msg in msgs:
                     if msg["type"] != "message":
                         continue
                     item = msg['data'].decode()

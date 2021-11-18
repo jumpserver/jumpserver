@@ -82,7 +82,10 @@ def subscribe_node_assets_mapping_expire(sender, **kwargs):
         while True:
             try:
                 subscribe = node_assets_mapping_for_memory_pub_sub.subscribe()
-                for message in subscribe.listen():
+                msgs = subscribe.listen()
+                # 开始之前关闭连接，因为server端可能关闭了连接，而 client 还在 CONN_MAX_AGE 中
+                close_old_connections()
+                for message in msgs:
                     if message["type"] != "message":
                         continue
                     org_id = message['data'].decode()
@@ -97,6 +100,7 @@ def subscribe_node_assets_mapping_expire(sender, **kwargs):
                 logger.exception(f'subscribe_node_assets_mapping_expire: {e}')
                 Node.expire_all_orgs_node_all_asset_ids_mapping_from_memory()
             finally:
+                # 请求结束，关闭连接
                 close_old_connections()
 
     t = threading.Thread(target=keep_subscribe_node_assets_relation)
