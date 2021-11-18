@@ -3354,7 +3354,7 @@ msgstr "单位：分, 当用户登录失败次数达到限制后，那么在此�
 
 #: settings/serializers/security.py:61
 msgid "Login IP Black List"
-msgstr "登录IP黑名单"
+msgstr "登录 IP 黑名单"
 
 #: settings/serializers/security.py:64
 msgid ""
