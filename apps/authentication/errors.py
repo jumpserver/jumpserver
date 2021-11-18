@@ -51,8 +51,12 @@ invalid_login_msg = _(
     "You can also try {times_try} times "
     "(The account will be temporarily locked for {block_time} minutes)"
 )
-block_login_msg = _(
+block_user_login_msg = _(
     "The account has been locked "
+    "(please contact admin to unlock it or try again after {} minutes)"
+)
+block_ip_login_msg = _(
+    "The ip has been locked "
     "(please contact admin to unlock it or try again after {} minutes)"
 )
 block_mfa_msg = _(
@@ -118,7 +122,7 @@ class BlockGlobalIpLoginError(AuthFailedError):
     error = 'block_global_ip_login'
 
     def __init__(self, username, ip, **kwargs):
-        self.msg = _("IP is not allowed")
+        self.msg = block_ip_login_msg.format(settings.SECURITY_LOGIN_IP_LIMIT_TIME)
         LoginIpBlockUtil(ip).set_block_if_need()
         super().__init__(username=username, ip=ip, **kwargs)
 
@@ -133,7 +137,7 @@ class CredentialError(
         block_time = settings.SECURITY_LOGIN_LIMIT_TIME
 
         if times_remainder < 1:
-            self.msg = block_login_msg.format(settings.SECURITY_LOGIN_LIMIT_TIME)
+            self.msg = block_user_login_msg.format(settings.SECURITY_LOGIN_LIMIT_TIME)
             return
 
         default_msg = invalid_login_msg.format(
@@ -184,7 +188,7 @@ class BlockLoginError(AuthFailedNeedBlockMixin, AuthFailedError):
     error = 'block_login'
 
     def __init__(self, username, ip):
-        self.msg = block_login_msg.format(settings.SECURITY_LOGIN_LIMIT_TIME)
+        self.msg = block_user_login_msg.format(settings.SECURITY_LOGIN_LIMIT_TIME)
         super().__init__(username=username, ip=ip)
 
 
