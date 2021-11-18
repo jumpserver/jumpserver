@@ -1,4 +1,5 @@
 from common.utils import get_logger
+from django.db import connections
 
 logger = get_logger(__file__)
 
@@ -38,3 +39,8 @@ def get_objects(model, pks):
         not_found_pks = pks - exists_pks
         logger.error(f'DoesNotExist: <{model.__name__}: {not_found_pks}>')
     return objs
+
+
+def close_old_connections():
+    for conn in connections.all():
+        conn.close_if_unusable_or_obsolete()

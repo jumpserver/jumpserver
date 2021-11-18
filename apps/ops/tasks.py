@@ -137,9 +137,14 @@ def check_server_performance_period():
 
 @shared_task(queue="ansible")
 def hello(name, callback=None):
+    from users.models import User
     import time
-    time.sleep(10)
+
+    count = User.objects.count()
     print("Hello {}".format(name))
+    print("Count: ", count)
+    time.sleep(1)
+    return count
 
 
 @shared_task

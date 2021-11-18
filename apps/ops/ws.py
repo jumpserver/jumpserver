@@ -2,12 +2,12 @@ import time
 import os
 import threading
 import json
+from channels.generic.websocket import JsonWebsocketConsumer
 
 from common.utils import get_logger
-
+from common.db.utils import close_old_connections
 from .celery.utils import get_celery_task_log_path
 from .ansible.utils import get_ansible_task_log_path
-from channels.generic.websocket import JsonWebsocketConsumer
 
 logger = get_logger(__name__)
 
@@ -86,3 +86,4 @@ class TaskLogWebsocket(JsonWebsocketConsumer):
     def disconnect(self, close_code):
         self.disconnected = True
         self.close()
+        close_old_connections()

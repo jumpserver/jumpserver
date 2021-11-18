@@ -6,6 +6,7 @@ from functools import partial
 
 from django.dispatch import receiver
 from django.utils.functional import LazyObject
+from common.db.utils import close_old_connections
 from django.db.models.signals import m2m_changed
 from django.db.models.signals import post_save, post_delete, pre_delete
 
@@ -45,11 +46,14 @@ def expire_orgs_mapping_for_memory(org_id):
 def subscribe_orgs_mapping_expire(sender, **kwargs):
     logger.debug("Start subscribe for expire orgs mapping from memory")
 
-    def keep_subscribe():
+    def keep_subscribe_org_mapping():
         while True:
             try:
                 subscribe = orgs_mapping_for_memory_pub_sub.subscribe()
-                for message in subscribe.listen():
+                msgs = subscribe.listen()
+                # 开始之前关闭连接，因为server端可能关闭了连接，而 client 还在 CONN_MAX_AGE 中
+                close_old_connections()
+                for message in msgs:
                     if message['type'] != 'message':
                         continue
                     if message['data'] == b'error':
@@ -59,8 +63,11 @@ def subscribe_orgs_mapping_expire(sender, **kwargs):
             except Exception as e:
                 logger.exception(f'subscribe_orgs_mapping_expire: {e}')
                 Organization.expire_orgs_mapping()
+            finally:
+                # 结束收关闭连接
+                close_old_connections()
 
-    t = threading.Thread(target=keep_subscribe)
+    t = threading.Thread(target=keep_subscribe_org_mapping)
     t.daemon = True
     t.start()
 
