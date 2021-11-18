@@ -24,9 +24,9 @@ from copy import deepcopy
 
 from common.const import LDAP_AD_ACCOUNT_DISABLE
 from common.utils import timeit, get_logger
+from common.db.utils import close_old_connections
 from users.utils import construct_user_email
 from users.models import User
-from orgs.models import Organization
 from authentication.backends.ldap import LDAPAuthorizationBackend, LDAPUser
 
 logger = get_logger(__file__)
@@ -114,7 +114,7 @@ class LDAPServerUtil(object):
             cookie = self.connection.result['controls']['1.2.840.113556.1.4.319']['value']['cookie']
             return cookie
         except Exception as e:
-            logger.error(e, exc_info=True)
+            logger.debug(e, exc_info=True)
             return None
 
     def get_search_filter_extra(self):
@@ -331,15 +331,17 @@ class LDAPSyncUtil(object):
 
     def perform_sync(self):
         logger.info('Start perform sync ldap users from server to cache')
-        self.pre_sync()
         try:
+            self.pre_sync()
             self.sync()
+            self.post_sync()
         except Exception as e:
             error_msg = str(e)
             logger.error(error_msg)
             self.set_task_error_msg(error_msg)
-        self.post_sync()
-        logger.info('End perform sync ldap users from server to cache')
+        finally:
+            logger.info('End perform sync ldap users from server to cache')
+            close_old_connections()
 
 
 class LDAPImportUtil(object):
