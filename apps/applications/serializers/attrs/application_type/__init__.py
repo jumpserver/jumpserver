@@ -3,6 +3,7 @@ from .mysql import *
 from .mariadb import *
 from .oracle import *
 from .pgsql import *
+from .sqlserver import *
 
 from .chrome import *
 from .mysql_workbench import *

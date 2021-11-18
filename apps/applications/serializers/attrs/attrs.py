@@ -28,6 +28,7 @@ type_serializer_classes_mapping = {
     const.AppType.mariadb.value: application_type.MariaDBSerializer,
     const.AppType.oracle.value: application_type.OracleSerializer,
     const.AppType.pgsql.value: application_type.PostgreSerializer,
+    const.AppType.sqlserver.value: application_type.SQLServerSerializer,
     # remote-app
     const.AppType.chrome.value: application_type.ChromeSerializer,
     const.AppType.mysql_workbench.value: application_type.MySQLWorkbenchSerializer,
