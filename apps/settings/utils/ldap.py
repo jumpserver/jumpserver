@@ -114,7 +114,7 @@ class LDAPServerUtil(object):
             cookie = self.connection.result['controls']['1.2.840.113556.1.4.319']['value']['cookie']
             return cookie
         except Exception as e:
-            logger.error(e, exc_info=True)
+            logger.debug(e, exc_info=True)
             return None
 
     def get_search_filter_extra(self):
