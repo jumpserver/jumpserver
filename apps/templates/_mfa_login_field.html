@@ -75,18 +75,19 @@
         }
 
         $('.input-style').each(function (i, ele){
-            $(ele).attr('name', '')
+            $(ele).attr('name', 'code-test')
         })
 
         const currentMFAInputRef = $('#mfa-' + name + ' .input-style')
-        currentMFAInputRef.attr('name', 'code').attr('required', true)
+        currentMFAInputRef.attr('name', 'code')
 
         // 登录页时，不应该默认focus
         const usernameRef = $('input[name="username"]')
         if (!usernameRef || usernameRef.length === 0) {
-            currentMFAInputRef.focus()
+            setTimeout(() => {
+                currentMFAInputRef.focus()
+            })
         }
-        currentMFAInputRef.attr('name', 'code')
     }
 
     function sendChallengeCode(currentBtn) {
