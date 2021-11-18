@@ -47,14 +47,34 @@ class SecurityAuthSerializer(serializers.Serializer):
     )
     SECURITY_LOGIN_LIMIT_COUNT = serializers.IntegerField(
         min_value=3, max_value=99999,
-        label=_('Limit the number of login failures')
+        label=_('Limit the number of user login failures')
     )
     SECURITY_LOGIN_LIMIT_TIME = serializers.IntegerField(
         min_value=5, max_value=99999, required=True,
-        label=_('Block logon interval'),
+        label=_('Block user login interval'),
         help_text=_(
             'Unit: minute, If the user has failed to log in for a limited number of times, '
             'no login is allowed during this time interval.'
+        )
+    )
+    SECURITY_LOGIN_IP_LIMIT_COUNT = serializers.IntegerField(
+        min_value=3, max_value=99999,
+        label=_('Limit the number of IP login failures')
+    )
+    SECURITY_LOGIN_IP_LIMIT_TIME = serializers.IntegerField(
+        min_value=1, max_value=99999, required=True,
+        label=_('Block IP login interval'),
+        help_text=_(
+            'Unit: minute, If the IP has failed to log in for a limited number of times, '
+            'no login is allowed during this time interval.'
+        )
+    )
+    SECURITY_LOGIN_IP_WHITE_LIST = serializers.ListField(
+        default=[], label=_('Login IP White List'), allow_empty=True,
+        child=serializers.CharField(max_length=1024, validators=[ip_child_validator]),
+        help_text=_(
+            'Format for comma-delimited string. Such as: '
+            '192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64'
         )
     )
     SECURITY_LOGIN_IP_BLACK_LIST = serializers.ListField(

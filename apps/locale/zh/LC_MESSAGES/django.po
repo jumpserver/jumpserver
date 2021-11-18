@@ -1625,6 +1625,11 @@ msgid ""
 "after {} minutes)"
 msgstr "账号已被锁定（请联系管理员解锁 或 {}分钟后重试）"
 
+msgid ""
+"The ip has been locked (please contact admin to unlock it or try again "
+"after {} minutes)"
+msgstr "IP已被锁定（请联系管理员解锁 或 {}分钟后重试）"
+
 #: authentication/errors.py:63
 #, python-brace-format
 msgid ""
@@ -3339,12 +3344,29 @@ msgid "Global MFA auth"
 msgstr "全局启用 MFA 认证"
 
 #: settings/serializers/security.py:50
-msgid "Limit the number of login failures"
-msgstr "限制登录失败次数"
+msgid "Limit the number of user login failures"
+msgstr "限制用户登录失败次数"
 
 #: settings/serializers/security.py:54
-msgid "Block logon interval"
-msgstr "禁止登录时间间隔"
+msgid "Block user login interval"
+msgstr "禁止用户登录时间间隔"
+
+msgid "Limit the number of IP login failures"
+msgstr "限制IP登录失败次数"
+
+msgid "Block IP login interval"
+msgstr "禁止IP登录时间间隔"
+
+msgid "Login IP White List"
+msgstr "IP登录白名单"
+
+msgid "Login IP Black List"
+msgstr "IP登录黑名单"
+
+msgid ""
+"Unit: minute, If the IP has failed to log in for a limited number of "
+"times, no login is allowed during this time interval."
+msgstr "单位：分, 当IP登录失败次数达到限制后，那么在此时间间隔内禁止登录"
 
 #: settings/serializers/security.py:56
 msgid ""
