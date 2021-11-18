@@ -58,7 +58,7 @@ class SecurityAuthSerializer(serializers.Serializer):
         )
     )
     SECURITY_LOGIN_IP_BLACK_LIST = serializers.ListField(
-        default=[], label=_('IP Black List'), allow_empty=True,
+        default=[], label=_('Login IP Black List'), allow_empty=True,
         child=serializers.CharField(max_length=1024, validators=[ip_child_validator]),
         help_text=_(
             'Format for comma-delimited string. Such as: '

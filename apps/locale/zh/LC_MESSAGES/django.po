@@ -3353,8 +3353,8 @@ msgid ""
 msgstr "单位：分, 当用户登录失败次数达到限制后，那么在此时间间隔内禁止登录"
 
 #: settings/serializers/security.py:61
-msgid "IP Black List"
-msgstr "IP 黑名单"
+msgid "Login IP Black List"
+msgstr "登陆IP黑名单"
 
 #: settings/serializers/security.py:64
 msgid ""
