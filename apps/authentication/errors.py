@@ -7,7 +7,7 @@ from rest_framework import status
 
 from common.exceptions import JMSException
 from .signals import post_auth_failed
-from users.utils import LoginBlockUtil, MFABlockUtils
+from users.utils import LoginBlockUtil, MFABlockUtils, LoginIpBlockUtil
 
 reason_password_failed = 'password_failed'
 reason_password_decrypt_failed = 'password_decrypt_failed'
@@ -114,7 +114,18 @@ class AuthFailedError(Exception):
         return str(self.msg)
 
 
-class CredentialError(AuthFailedNeedLogMixin, AuthFailedNeedBlockMixin, AuthFailedError):
+class BlockGlobalIpLoginError(AuthFailedError):
+    error = 'block_global_ip_login'
+
+    def __init__(self, username, ip, **kwargs):
+        self.msg = _("IP is not allowed")
+        LoginIpBlockUtil(ip).set_block_if_need()
+        super().__init__(username=username, ip=ip, **kwargs)
+
+
+class CredentialError(
+    AuthFailedNeedLogMixin, AuthFailedNeedBlockMixin, BlockGlobalIpLoginError, AuthFailedError
+):
     def __init__(self, error, username, ip, request):
         super().__init__(error=error, username=username, ip=ip, request=request)
         util = LoginBlockUtil(username, ip)
@@ -174,14 +185,6 @@ class BlockLoginError(AuthFailedNeedBlockMixin, AuthFailedError):
 
     def __init__(self, username, ip):
         self.msg = block_login_msg.format(settings.SECURITY_LOGIN_LIMIT_TIME)
-        super().__init__(username=username, ip=ip)
-
-
-class BlockGlobalIpLoginError(AuthFailedError):
-    error = 'block_global_ip_login'
-
-    def __init__(self, username, ip):
-        self.msg = _("IP is not allowed")
         super().__init__(username=username, ip=ip)
 
 
