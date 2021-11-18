@@ -3,6 +3,7 @@ import json
 from redis.exceptions import ConnectionError
 from channels.generic.websocket import JsonWebsocketConsumer
 
+from common.db.utils import close_old_connections
 from common.utils import get_logger
 from .site_msg import SiteMessageUtil
 from .signals_handler import new_site_msg_chan
@@ -52,24 +53,34 @@ class SiteMsgWebsocket(JsonWebsocketConsumer):
             for message in self.chan.listen():
                 if message['type'] != 'message':
                     continue
+
                 try:
                     msg = json.loads(message['data'].decode())
-                    logger.debug('New site msg recv, may be mine: {}'.format(msg))
-                    if not msg:
-                        continue
-                    users = msg.get('users', [])
-                    logger.debug('Message users: {}'.format(users))
-                    if user_id in users:
-                        self.send_unread_msg_count()
                 except json.JSONDecoder as e:
                     logger.debug('Decode json error: ', e)
+                    continue
+                if not msg:
+                    continue
+
+                logger.debug('New site msg recv, may be mine: {}'.format(msg))
+                users = msg.get('users', [])
+                logger.debug('Message users: {}'.format(users))
+                if user_id in users:
+                    self.send_unread_msg_count()
         except ConnectionError:
-            logger.debug('Redis chan closed')
+            logger.error('Redis chan closed')
+        finally:
+            logger.info('Notification ws thread end')
+            close_old_connections()
 
     def disconnect(self, close_code):
-        if self.chan is not None:
-            try:
+        try:
+            if self.chan is not None:
                 self.chan.close()
-            except:
-                pass
-        self.close()
+            close_old_connections()
+            self.close()
+        finally:
+            logger.info('Notification websocket disconnect')
+
+
+
