@@ -6,6 +6,7 @@ from functools import partial
 
 from django.dispatch import receiver
 from django.utils.functional import LazyObject
+from common.db.utils import close_old_connections
 from django.db.models.signals import m2m_changed
 from django.db.models.signals import post_save, post_delete, pre_delete
 
@@ -59,6 +60,8 @@ def subscribe_orgs_mapping_expire(sender, **kwargs):
             except Exception as e:
                 logger.exception(f'subscribe_orgs_mapping_expire: {e}')
                 Organization.expire_orgs_mapping()
+            finally:
+                close_old_connections()
 
     t = threading.Thread(target=keep_subscribe)
     t.daemon = True

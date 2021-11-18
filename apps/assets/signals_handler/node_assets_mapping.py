@@ -10,6 +10,7 @@ from django.dispatch import receiver
 from django.utils.functional import LazyObject
 
 from common.signals import django_ready
+from common.db.utils import close_old_connections
 from common.utils.connection import RedisPubSub
 from common.utils import get_logger
 from assets.models import Asset, Node
@@ -77,7 +78,7 @@ def on_node_asset_change(sender, instance, **kwargs):
 def subscribe_node_assets_mapping_expire(sender, **kwargs):
     logger.debug("Start subscribe for expire node assets id mapping from memory")
 
-    def keep_subscribe():
+    def keep_subscribe_node_assets_relation():
         while True:
             try:
                 subscribe = node_assets_mapping_for_memory_pub_sub.subscribe()
@@ -95,7 +96,9 @@ def subscribe_node_assets_mapping_expire(sender, **kwargs):
             except Exception as e:
                 logger.exception(f'subscribe_node_assets_mapping_expire: {e}')
                 Node.expire_all_orgs_node_all_asset_ids_mapping_from_memory()
+            finally:
+                close_old_connections()
 
-    t = threading.Thread(target=keep_subscribe)
+    t = threading.Thread(target=keep_subscribe_node_assets_relation)
     t.daemon = True
     t.start()
