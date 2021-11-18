@@ -11,7 +11,7 @@ from django.conf import settings
 from django.core.cache import cache
 
 from common.tasks import send_mail_async
-from common.utils import reverse, get_object_or_none
+from common.utils import reverse, get_object_or_none, ip
 from .models import User
 
 logger = logging.getLogger('jumpserver')
@@ -184,22 +184,23 @@ class BlockGlobalIpUtilBase:
 
     @property
     def ip_in_black_list(self):
-        return self.ip in settings.SECURITY_LOGIN_IP_BLACK_LIST
+        return ip.contains_ip(self.ip, settings.SECURITY_LOGIN_IP_BLACK_LIST)
 
     @property
     def ip_in_white_list(self):
-        return self.ip in settings.SECURITY_LOGIN_IP_WHITE_LIST
+        return ip.contains_ip(self.ip, settings.SECURITY_LOGIN_IP_WHITE_LIST)
 
     def set_block_if_need(self):
-        if not self.ip_in_white_list and not self.ip_in_black_list:
-            count = cache.get(self.limit_key, 0)
-            count += 1
-            cache.set(self.limit_key, count, self.key_ttl)
+        if self.ip_in_white_list or self.ip_in_black_list:
+            return
+        count = cache.get(self.limit_key, 0)
+        count += 1
+        cache.set(self.limit_key, count, self.key_ttl)
 
-            limit_count = settings.SECURITY_LOGIN_IP_LIMIT_COUNT
-            if count < limit_count:
-                return
-            cache.set(self.block_key, True, self.key_ttl)
+        limit_count = settings.SECURITY_LOGIN_IP_LIMIT_COUNT
+        if count < limit_count:
+            return
+        cache.set(self.block_key, True, self.key_ttl)
 
     def clean_block_if_need(self):
         cache.delete(self.limit_key)
@@ -210,8 +211,7 @@ class BlockGlobalIpUtilBase:
             return False
         if self.ip_in_black_list:
             return True
-        if not self.ip_in_white_list and not self.ip_in_black_list:
-            return bool(cache.get(self.block_key))
+        return bool(cache.get(self.block_key))
 
 
 class LoginBlockUtil(BlockUtilBase):
