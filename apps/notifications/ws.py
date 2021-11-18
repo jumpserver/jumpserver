@@ -2,6 +2,7 @@ import threading
 import json
 from redis.exceptions import ConnectionError
 from channels.generic.websocket import JsonWebsocketConsumer
+from django.db import close_old_connections
 
 from common.utils import get_logger
 from .site_msg import SiteMessageUtil
@@ -65,8 +66,11 @@ class SiteMsgWebsocket(JsonWebsocketConsumer):
                     logger.debug('Decode json error: ', e)
         except ConnectionError:
             logger.debug('Redis chan closed')
+        finally:
+            close_old_connections()
 
     def disconnect(self, close_code):
         if self.chan is not None:
             self.chan.close()
         self.close()
+        close_old_connections()
