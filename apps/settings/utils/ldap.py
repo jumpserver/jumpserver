@@ -165,6 +165,7 @@ class LDAPServerUtil(object):
         user_entries = list()
         search_ous = str(self.config.search_ou).split('|')
         for search_ou in search_ous:
+            search_ou = search_ou.strip()
             logger.info("Search user entries ou: {}".format(search_ou))
             self.search_user_entries_ou(search_ou)
             user_entries.extend(self.connection.entries)
