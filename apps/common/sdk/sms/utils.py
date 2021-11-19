@@ -37,12 +37,17 @@ class SendAndVerifySMSUtil:
         self.code = ''
         self.timeout = timeout or self.TIMEOUT
         self.key_suffix = key_suffix or str(phone)
-        self.key = self.KEY_TMPL.format(key_suffix)
+        self.key = self.KEY_TMPL.format(self.key_suffix)
 
     def gen_and_send(self):
         """
         生成，保存，发送
         """
+        ttl = self.ttl()
+        if ttl > 0:
+            logger.error('Send sms too frequently, delay {}'.format(ttl))
+            raise CodeSendTooFrequently(ttl)
+
         try:
             code = self.generate()
             self.send(code)
@@ -62,10 +67,6 @@ class SendAndVerifySMSUtil:
         """
         发送信息的方法，如果有错误直接抛出 api 异常
         """
-        ttl = self.ttl()
-        if ttl > 0:
-            logger.error('Send sms too frequently, delay {}'.format(ttl))
-            raise CodeSendTooFrequently(ttl)
         sms = SMS()
         sms.send_verify_code(self.phone, code)
         cache.set(self.key, self.code, self.timeout)
