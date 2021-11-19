@@ -1,4 +1,7 @@
+from rest_framework.response import Response
+from rest_framework.decorators import action
 
+from common.tree import TreeNodeSerializer
 from common.drf.api import JMSModelViewSet
 from common.permissions import IsOrgAdmin, IsValidUser
 from ..models import Permission, RoleBinding
@@ -9,8 +12,19 @@ __all__ = ['PermissionViewSet']
 
 class PermissionViewSet(JMSModelViewSet):
     filterset_fields = ['codename']
-    serializer_class = PermissionSerializer
+    serializer_classes = {
+        'get_tree': TreeNodeSerializer,
+        'default': PermissionSerializer
+    }
     permission_classes = (IsOrgAdmin, )
+
+    @action(methods=['GET'], detail=False, url_path='tree')
+    def get_tree(self, request, *args, **kwargs):
+        show_count = request.query_params.get('show_count', '1') == '1'
+        queryset = self.filter_queryset(self.get_queryset())
+        tree_nodes = Permission.create_tree_nodes(queryset)
+        serializer = self.get_serializer(tree_nodes, many=True)
+        return Response(serializer.data)
 
     def get_queryset(self):
         scope = self.request.query_params.get('scope') or 'org'
