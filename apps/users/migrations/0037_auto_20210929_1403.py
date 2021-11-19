@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('users', '0036_user_feishu_id'),
-        ('rbac', '0001_initial'),
+        # ('rbac', '0001_initial'),
     ]
 
     operations = [
