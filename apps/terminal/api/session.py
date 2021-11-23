@@ -28,7 +28,6 @@ from ..hands import SystemUser
 from ..models import Session
 from .. import serializers
 
-
 __all__ = [
     'SessionViewSet', 'SessionReplayViewSet', 'SessionJoinValidateAPI'
 ]
@@ -41,7 +40,7 @@ class SessionViewSet(OrgBulkModelViewSet):
         'default': serializers.SessionSerializer,
         'display': serializers.SessionDisplaySerializer,
     }
-    permission_classes = (IsOrgAdminOrAppUser, )
+    permission_classes = (IsOrgAdminOrAppUser,)
     search_fields = [
         "user", "asset", "system_user", "remote_addr", "protocol", "is_finished", 'login_from',
     ]
@@ -71,7 +70,8 @@ class SessionViewSet(OrgBulkModelViewSet):
         os.chdir(current_dir)
         return file
 
-    @action(methods=[GET], detail=True, renderer_classes=(PassthroughRenderer,), url_path='replay/download', url_name='replay-download')
+    @action(methods=[GET], detail=True, renderer_classes=(PassthroughRenderer,), url_path='replay/download',
+            url_name='replay-download')
     def download(self, request, *args, **kwargs):
         session = self.get_object()
         local_path, url = utils.get_session_replay_url(session)
@@ -102,7 +102,7 @@ class SessionViewSet(OrgBulkModelViewSet):
 
     def get_permissions(self):
         if self.request.method.lower() in ['get', 'options']:
-            self.permission_classes = (IsOrgAdminOrAppUser | IsOrgAuditor, )
+            self.permission_classes = (IsOrgAdminOrAppUser | IsOrgAuditor,)
         return super().get_permissions()
 
 
@@ -119,7 +119,9 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
 
         if serializer.is_valid():
             file = serializer.validated_data['file']
-            name, err = session.save_replay_to_storage(file)
+            # 兼容旧版本 API 未指定 version 为 2 的情况
+            version = serializer.validated_data.get('version', 2)
+            name, err = session.save_replay_to_storage_with_version(file, version)
             if not name:
                 msg = "Failed save replay `{}`: {}".format(session_id, err)
                 logger.error(msg)
@@ -137,6 +139,8 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
         if session.protocol in ('rdp', 'vnc'):
             # 需要考虑录像播放和离线播放器的约定，暂时不处理
             tp = 'guacamole'
+        if url.endswith('.cast.gz'):
+            tp = 'asciicast'
 
         download_url = reverse('api-terminal:session-replay-download', kwargs={'pk': session.id})
         data = {
@@ -168,7 +172,7 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
 
 
 class SessionJoinValidateAPI(views.APIView):
-    permission_classes = (IsAppUser, )
+    permission_classes = (IsAppUser,)
     serializer_class = serializers.SessionJoinValidateSerializer
 
     def post(self, request, *args, **kwargs):
