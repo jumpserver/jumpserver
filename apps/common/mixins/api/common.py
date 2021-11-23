@@ -10,6 +10,7 @@ from .serializer import SerializerMixin
 from .filter import ExtraFilterFieldsMixin
 from .action import RenderToJsonMixin
 from .queryset import QuerySetMixin
+from .object import GetObjectMixin
 
 
 __all__ = [
@@ -82,14 +83,11 @@ class RelationMixin:
         self.send_m2m_changed_signal(instance, 'post_remove')
 
 
-class CommonApiMixin(SerializerMixin, ExtraFilterFieldsMixin, RenderToJsonMixin):
+class CommonApiMixin(GetObjectMixin, SerializerMixin, ExtraFilterFieldsMixin, RenderToJsonMixin):
     pass
 
 
-class CommonMixin(SerializerMixin,
-                  QuerySetMixin,
-                  ExtraFilterFieldsMixin,
-                  RenderToJsonMixin):
+class CommonMixin(GetObjectMixin, SerializerMixin, QuerySetMixin, ExtraFilterFieldsMixin, RenderToJsonMixin):
     pass
 
 

@@ -13,23 +13,17 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.db.models import QuerySet
 
-from common.utils import random_string, signer
+from common.utils import random_string
 from common.utils import (
     ssh_key_string_to_obj, ssh_key_gen, get_logger, lazyproperty
 )
 from common.utils.encode import ssh_pubkey_gen
-from common.validators import alphanumeric
 from common import fields
 from orgs.mixins.models import OrgModelMixin
-
+from secret.backends import Secret
+from ..const import Connectivity, StorageType
 
 logger = get_logger(__file__)
-
-
-class Connectivity(models.TextChoices):
-    unknown = 'unknown', _('Unknown')
-    ok = 'ok', _('Ok')
-    failed = 'failed', _('Failed')
 
 
 class AbsConnectivity(models.Model):
@@ -132,11 +126,14 @@ class AuthMixin:
             self.save(update_fields=update_fields)
 
     def _merge_auth(self, other):
-        if other.password:
-            self.password = other.password
-        if other.public_key or other.private_key:
-            self.private_key = other.private_key
-            self.public_key = other.public_key
+        password = other.password
+        private_key = other.private_key
+        public_key = other.public_key
+        if password:
+            self.password = password
+        if public_key or private_key:
+            self.private_key = private_key
+            self.public_key = public_key
 
     def clear_auth(self):
         self.password = ''
@@ -171,6 +168,8 @@ class AuthMixin:
 
 
 class BaseUser(OrgModelMixin, AuthMixin):
+    SECRET_FIELD = ['password', 'private_key', 'public_key']
+
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     username = models.CharField(max_length=128, blank=True, verbose_name=_('Username'), db_index=True)
@@ -181,6 +180,9 @@ class BaseUser(OrgModelMixin, AuthMixin):
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
     created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
+    storage_type = models.CharField(
+        max_length=64, choices=StorageType.choices, default=StorageType.db, verbose_name=_('Type')
+    )
 
     ASSETS_AMOUNT_CACHE_KEY = "ASSET_USER_{}_ASSETS_AMOUNT"
     ASSET_USER_CACHE_TIME = 600
@@ -232,6 +234,29 @@ class BaseUser(OrgModelMixin, AuthMixin):
             'private_key': self.private_key_file,
         }
 
+    def get_secret_data(self, name=None):
+        field = self.SECRET_FIELD
+        backend = self.storage_type
+        if backend != StorageType.db:
+            client = Secret(self, backend)
+            secret_data = client.get_secret()
+            if name:
+                return secret_data.get(name, '')
+            else:
+                return {i: secret_data.get(i, '') for i in field}
+        else:
+            if name:
+                return getattr(self, name)
+            else:
+                return {i: getattr(self, i) for i in field}
+
+    def replace_secret(self, name=None):
+        secret_data = self.get_secret_data(name)
+        if not name:
+            for k, v in secret_data.items():
+                setattr(self, k, v)
+        else:
+            setattr(self, name, secret_data)
+
     class Meta:
         abstract = True
-

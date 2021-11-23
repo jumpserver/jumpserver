@@ -39,6 +39,7 @@ class AuthBook(BaseUser, AbsConnectivity):
         return ''
 
     def load_auth(self):
+        self.systemuser.replace_secret()
         for attr in self.auth_attrs:
             value = self.get_or_systemuser_attr(attr)
             self.auth_snapshot[attr] = [getattr(self, attr), value]
@@ -55,8 +56,10 @@ class AuthBook(BaseUser, AbsConnectivity):
                 setattr(self, attr, origin_value)
 
     def save(self, *args, **kwargs):
+        self.replace_secret()
         self.unload_auth()
         instance = super().save(*args, **kwargs)
+        instance.replace_secret()
         self.load_auth()
         return instance
 

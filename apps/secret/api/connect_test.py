@@ -3,7 +3,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework import status
 from django.utils.translation import gettext_lazy as _
 
-from ..backends import VaultClient, vault_client
+from ..backends.vault import client as vault_client
 from common.permissions import IsSuperUser
 
 from .. import serializers
@@ -22,10 +22,8 @@ class VaultConnectTestingAPI(GenericAPIView):
         url = serializer.validated_data['VAULT_URL']
         token = serializer.validated_data.get('VAULT_TOKEN')
 
-        client = VaultClient(url)
-        client.check_base_token_authentication(token)
-        if client.is_active:
-            setattr(vault_client, 'client', client.client)
+        client = vault_client('connect_test', url=url, token=token)
+        if client.client.is_active:
             return Response(status=status.HTTP_200_OK, data={'msg': _('Test success')})
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': _('Test fail')})

@@ -1,7 +1,6 @@
 from hvac import exceptions
-from .client import VaultClient
-from .base import BaseVault
 from common.utils import get_logger
+from .base import BaseVault
 
 __all__ = ['KVEngineVault', ]
 
@@ -10,8 +9,8 @@ logger = get_logger(__name__)
 
 class KVEngineVault(BaseVault):
 
-    def __init__(self, client: VaultClient, path):
-        super().__init__(client)
+    def __init__(self, path, url=None, token=None):
+        super().__init__(url, token)
         secrets_max_versions = 5
         assert isinstance(secrets_max_versions, int) and 3 <= secrets_max_versions, (
             'secrets_max_versions must to be an integer that is greater than or equal to 3'
@@ -33,6 +32,8 @@ class KVEngineVault(BaseVault):
             backend_type=self.secrets_engine_type,
             path=self.secrets_engine_path
         )
+        import time
+        time.sleep(1)
         # config
         self.client.secrets.kv.v2.configure(
             max_versions=self.secrets_max_versions,

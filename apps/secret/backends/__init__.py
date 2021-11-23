@@ -1,1 +1,1 @@
-
+from .endpoint import Secret

@@ -46,7 +46,7 @@ class SystemUserViewSet(SuggestionMixin, OrgBulkModelViewSet):
         'suggestion': serializers.MiniSystemUserSerializer
     }
     ordering_fields = ('name', 'protocol', 'login_mode')
-    ordering = ('name', )
+    ordering = ('name',)
     permission_classes = (IsOrgAdminOrAppUser,)
 
     @action(methods=['get'], detail=False, url_path='su-from')

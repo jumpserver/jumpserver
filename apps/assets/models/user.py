@@ -146,6 +146,7 @@ class AuthMixin:
         else:
             authbooks.sort(key=lambda x: 1 if x.username == username else 0, reverse=True)
             authbook = authbooks[0]
+        authbook.replace_secret()
         authbook.load_auth()
         self.password = authbook.password
         self.private_key = authbook.private_key

@@ -244,6 +244,7 @@ def push_system_user_util(system_user, assets, task_name, username=None):
         ).prefetch_related('systemuser')
 
         for auth_book in auth_books:
+            auth_book.replace_secret()
             auth_book.load_auth()
             special_auth_set.add((auth_book.username, auth_book.asset_id))
 
@@ -260,6 +261,7 @@ def push_system_user_util(system_user, assets, task_name, username=None):
             run_task(tasks, no_special_assets)
 
         for auth_book in auth_books:
+            auth_book.replace_secret()
             system_user._merge_auth(auth_book)
             tasks = get_push_system_user_tasks(system_user, platform, username=auth_book.username)
             asset = id_asset_map[auth_book.asset_id]

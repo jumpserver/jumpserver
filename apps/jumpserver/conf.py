@@ -364,9 +364,16 @@ class Config(dict):
         'FTP_LOG_KEEP_DAYS': 200,
         'CLOUD_SYNC_TASK_EXECUTION_KEEP_DAYS': 30,
 
+        'SECRET_STORAGE_BACKEND': 'vault',
+
         # vault相关
         'VAULT_URL': 'http://127.0.0.1:8200',
         'VAULT_TOKEN': 's.JqVYFWIrtPzctcePjaWTtxXf',
+
+        # pam相关
+        'PAM_URL': '',
+        'PAM_USERNAME': '',
+        'PAM_PASSWORD': '',
 
         # 废弃的
         'DEFAULT_ORG_SHOW_ALL_USERS': True,
