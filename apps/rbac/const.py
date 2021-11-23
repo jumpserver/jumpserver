@@ -1,4 +1,12 @@
-#
+from django.db import models
+from django.utils.translation import ugettext_lazy as _
+
+
+class Scope(models.TextChoices):
+    system = 'system', _('System')
+    org = 'org', _('Organization')
+
+
 exclude_permissions = [
     ('assets', 'add_asset'),
 
@@ -7,6 +15,7 @@ exclude_permissions = [
     ('users', 'change_usergroup'),
     ('users', 'delete_usergroup'),
 ]
+
 
 system_scope_permissions = [
     ('users', 'delete_user'),

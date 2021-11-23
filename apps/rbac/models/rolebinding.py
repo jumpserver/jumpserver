@@ -5,13 +5,13 @@ from common.db.models import JMSModel
 from orgs.utils import current_org
 
 from .role import Role
+from .. const import Scope
 
 __all__ = ['RoleBinding']
 
 
 class RoleBinding(JMSModel):
     """ 定义 用户-角色 关系 """
-    Scope = Role.Scope
 
     scope = models.CharField(
         max_length=128, choices=Scope.choices, default=Scope.system,
@@ -71,23 +71,23 @@ class RoleBinding(JMSModel):
 
     @classmethod
     def get_user_perms(cls, user):
-        q = models.Q(user=user, org__isnull=True, scope=cls.Scope.system)
+        q = models.Q(user=user, org__isnull=True, scope=Scope.system)
         if current_org and not current_org.is_root:
-            q |= models.Q(user=user, org=current_org.org_id, scope=cls.Scope.org)
+            q |= models.Q(user=user, org=current_org.org_id, scope=Scope.org)
         bindings = cls.objects.filter(q)
         perms = cls.get_binding_perms(bindings)
         return perms
 
     @classmethod
     def get_user_system_roles(cls, user):
-        role_ids = cls.objects.filter(user=user, org__isnull=True, scope=cls.Scope.system) \
+        role_ids = cls.objects.filter(user=user, org__isnull=True, scope=Scope.system) \
             .values_list('role', flat=True)
         roles = Role.objects.filter(id__in=role_ids)
         return roles
 
     @classmethod
     def get_user_current_org_role(cls, user):
-        role_ids = cls.objects.filter(user=user, org=current_org, scope=cls.Scope.org) \
+        role_ids = cls.objects.filter(user=user, org=current_org, scope=Scope.org) \
             .values_list('role', flat=True)
         roles = Role.objects.filter(id__in=role_ids)
         return roles

@@ -1,5 +1,6 @@
 from django.db.models import Count
 
+from common.tree import TreeNodeSerializer
 from common.drf.api import JMSModelViewSet
 from common.permissions import IsSuperUser, IsOrgAdmin
 from ..serializers import RoleSerializer, RoleBindingSerializer
@@ -10,7 +11,10 @@ __all__ = ['RoleViewSet', 'RoleBindingViewSet']
 
 class RoleViewSet(JMSModelViewSet):
     queryset = Role.objects.all()
-    serializer_class = RoleSerializer
+    serializer_classes = {
+        'get_tree': TreeNodeSerializer,
+        'default': RoleSerializer
+    }
     filterset_fields = ['name', 'scope', 'builtin']
     search_fields = filterset_fields
     permission_classes = (IsSuperUser, )

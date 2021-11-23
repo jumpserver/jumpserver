@@ -5,18 +5,14 @@ from common.db.models import JMSModel
 from common.utils import lazyproperty
 from .permission import Permission
 from .. import const
+from ..const import Scope
 
 __all__ = ['Role']
 
 
-class Scope(models.TextChoices):
-    system = 'system', _('System')
-    org = 'org', _('Organization')
-
-
 class Role(JMSModel):
     """ 定义 角色 ｜ 角色-权限 关系 """
-    Scope = Scope
+    Scope = const.Scope
 
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     scope = models.CharField(
@@ -44,20 +40,13 @@ class Role(JMSModel):
 
     def get_permissions(self):
         admin_names = [self.system_admin_name, self.org_admin_name]
+
         if self.builtin and self.name in admin_names:
             permissions = Permission.objects.all()
         else:
             permissions = self.permissions.all()
 
-        excludes = list(const.exclude_permissions)
-        if self.scope == Scope.org:
-            excludes.extend(const.system_scope_permissions)
-
-        for app_label, code_name in excludes:
-            permissions = permissions.exclude(
-                codename=code_name,
-                content_type__app_label=app_label
-            )
+        permissions = Permission.clean_permissions(permissions, self.scope)
         return permissions
 
     @lazyproperty
@@ -78,11 +67,11 @@ class Role(JMSModel):
     @classmethod
     def create_builtin_roles(cls):
         scope_role_names_mapper = {
-            cls.Scope.system: [
+            Scope.system: [
                 cls.system_admin_name, cls.system_auditor_name,
-                cls.system_user_name, cls.app_name,
+                cls.app_name,
             ],
-            cls.Scope.org: [
+            Scope.org: [
                 cls.org_admin_name, cls.org_auditor_name, cls.org_user_name
             ]
         }
