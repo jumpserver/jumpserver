@@ -210,7 +210,7 @@ class UserResetMFAApi(UserQuerysetMixin, generics.RetrieveAPIView):
             return Response({"error": msg}, status=401)
 
         backends = user.active_mfa_backends_mapper
-        for backend in backends:
+        for backend in backends.values():
             if backend.can_disable():
                 backend.disable()
 
