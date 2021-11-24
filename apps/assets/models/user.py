@@ -32,6 +32,7 @@ class ProtocolMixin:
         oracle = 'oracle', 'Oracle'
         mariadb = 'mariadb', 'MariaDB'
         postgresql = 'postgresql', 'PostgreSQL'
+        sqlserver = 'sqlserver', 'SQLServer'
         k8s = 'k8s', 'K8S'
 
     SUPPORT_PUSH_PROTOCOLS = [Protocol.ssh, Protocol.rdp]
@@ -43,7 +44,7 @@ class ProtocolMixin:
         Protocol.rdp
     ]
     APPLICATION_CATEGORY_DB_PROTOCOLS = [
-        Protocol.mysql, Protocol.oracle, Protocol.mariadb, Protocol.postgresql
+        Protocol.mysql, Protocol.oracle, Protocol.mariadb, Protocol.postgresql, Protocol.sqlserver
     ]
     APPLICATION_CATEGORY_CLOUD_PROTOCOLS = [
         Protocol.k8s
