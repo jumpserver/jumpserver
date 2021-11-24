@@ -7,7 +7,6 @@ from django.dispatch import receiver
 from django_cas_ng.signals import cas_user_authenticated
 
 from jms_oidc_rp.signals import openid_user_login_failed, openid_user_login_success
-
 from .signals import post_auth_success, post_auth_failed
 
 

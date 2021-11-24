@@ -417,12 +417,10 @@ class AuthACLMixin:
             self.request.session["auth_confirm"] = "1"
             return
         elif ticket.state_reject:
-            self.clean_mfa_mark()
             raise errors.LoginConfirmOtherError(
                 ticket.id, ticket.get_state_display()
             )
         elif ticket.state_close:
-            self.clean_mfa_mark()
             raise errors.LoginConfirmOtherError(
                 ticket.id, ticket.get_state_display()
             )
