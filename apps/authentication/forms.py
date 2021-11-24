@@ -43,8 +43,8 @@ class UserLoginForm(forms.Form):
 
 
 class UserCheckOtpCodeForm(forms.Form):
-    code = forms.CharField(label=_('MFA Code'), max_length=6, required=False)
-    mfa_type = forms.CharField(label=_('MFA type'), max_length=6)
+    code = forms.CharField(label=_('MFA Code'), max_length=128, required=False)
+    mfa_type = forms.CharField(label=_('MFA type'), max_length=128)
 
 
 class CustomCaptchaTextInput(CaptchaTextInput):
@@ -57,7 +57,7 @@ class CaptchaMixin(forms.Form):
 
 class ChallengeMixin(forms.Form):
     challenge = forms.CharField(
-        label=_('MFA code'), max_length=6, required=False,
+        label=_('MFA code'), max_length=128, required=False,
         widget=forms.TextInput(attrs={
             'placeholder': _("Dynamic code"),
             'style': 'width: 50%'
