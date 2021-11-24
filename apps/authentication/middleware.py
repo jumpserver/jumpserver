@@ -7,8 +7,11 @@ class MFAMiddleware:
 
     def __call__(self, request):
         response = self.get_response(request)
-        if request.path.find('/auth/login/otp/') > -1:
-            return response
+
+        white_urls = ['mfa', 'jsi18n', 'static', 'otp']
+        for url in white_urls:
+            if request.path.find(url) > -1:
+                return response
         if request.session.get('auth_mfa_required'):
             return redirect('authentication:login-mfa')
         return response
