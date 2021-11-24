@@ -58,7 +58,7 @@ class Role(JMSModel):
         return self.permissions.count()
 
     def __str__(self):
-        return '%s (%s)' % (self.name, self.get_scope_display())
+        return '%s(%s)' % (self.name, self.get_scope_display())
 
     @classmethod
     def get_builtin_role(cls, name, scope):

@@ -14,8 +14,11 @@ class RoleSerializer(serializers.ModelSerializer):
             'date_updated', 'created_by', 'updated_by'
         ]
         fields = fields_mini + read_only_fields + [
-            'comment',
+            'comment', 'permissions'
         ]
+        extra_kwargs = {
+            'permissions': {'write_only': True}
+        }
 
 
 class RoleBindingSerializer(serializers.ModelSerializer):

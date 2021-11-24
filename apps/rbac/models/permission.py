@@ -24,14 +24,8 @@ class PermissionTreeMixin:
 
     @classmethod
     def create_apps_tree_nodes(cls, all_permissions, permissions):
-        app_counts = all_permissions \
-            .values('app') \
-            .order_by('app') \
-            .annotate(count=Count('app'))
-        app_checked_counts = permissions \
-            .values('app') \
-            .order_by('app') \
-            .annotate(count=Count('app'))
+        app_counts = all_permissions.values('app').order_by('app').annotate(count=Count('app'))
+        app_checked_counts = permissions.values('app').order_by('app').annotate(count=Count('app'))
         app_checked_counts_mapper = {i['app']: i['count'] for i in app_checked_counts}
 
         nodes = []
@@ -89,7 +83,6 @@ class PermissionTreeMixin:
                 'isParent': True,
                 'open': False,
                 'checked': total_counts == check_counts,
-                # 'halfCheck': check_counts != 0,
                 'meta': {
                     'type': 'model',
                 }
@@ -129,7 +122,6 @@ class PermissionTreeMixin:
             'pId': '',
             'isParent': True,
             'checked': total_counts == check_counts,
-            # 'halfCheck': check_count != 0,
             'open': True,
             'meta': {
                 'type': 'root',

@@ -18,24 +18,25 @@ class PermissionViewSet(JMSModelViewSet):
         'default': PermissionSerializer
     }
     permission_classes = (IsOrgAdmin, )
+    scope = 'org'
 
     @action(methods=['GET'], detail=False, url_path='tree')
     def get_tree(self, request, *args, **kwargs):
-        show_count = request.query_params.get('show_count', '1') == '1'
         queryset = self.filter_queryset(self.get_queryset()).distinct()
-        tree_nodes = Permission.create_tree_nodes(queryset)
+        tree_nodes = Permission.create_tree_nodes(queryset, scope=self.scope)
         serializer = self.get_serializer(tree_nodes, many=True)
         return Response(serializer.data)
 
     def get_queryset(self):
-        scope = self.request.query_params.get('scope') or 'org'
+        self.scope = self.request.query_params.get('scope') or 'org'
         role_id = self.request.query_params.get('role')
 
         if role_id:
             role = get_object_or_404(Role, pk=role_id)
+            self.scope = role.scope
             queryset = role.get_permissions()
         else:
-            queryset = Permission.get_permissions(scope)
+            queryset = Permission.get_permissions(self.scope)
 
         queryset = queryset.prefetch_related('content_type')
         return queryset
