@@ -120,3 +120,4 @@ psycopg2-binary==2.9.1
 alibabacloud_dysmsapi20170525==2.0.2
 geoip2==4.4.0
 html2text==2020.1.16
+python-novaclient==11.0.1
