@@ -143,7 +143,7 @@ class AssetPermissionFilter(PermissionBaseFilter):
         if not _nodes:
             return queryset.none()
 
-        node = _nodes.get()
+        node = _nodes.first()
 
         if not is_query_all:
             queryset = queryset.filter(nodes=node)
@@ -170,7 +170,7 @@ class AssetPermissionFilter(PermissionBaseFilter):
             return queryset
         if not assets:
             return queryset.none()
-        asset = assets.get()
+        asset = assets.first()
 
         if not is_query_all:
             queryset = queryset.filter(assets=asset)
