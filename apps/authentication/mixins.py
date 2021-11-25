@@ -257,7 +257,8 @@ class MFAMixin:
     def _check_login_page_mfa_if_need(self, user):
         if not settings.SECURITY_MFA_IN_LOGIN_PAGE:
             return
-        self._check_if_no_active_mfa(user)
+        if not user.active_mfa_backends:
+            return
 
         request = self.request
         data = request.data if hasattr(request, 'data') else request.POST
@@ -274,10 +275,8 @@ class MFAMixin:
         if not user.mfa_enabled:
             return
 
-        self._check_if_no_active_mfa(user)
-
-        active_mfa_mapper = user.active_mfa_backends_mapper
-        raise errors.MFARequiredError(mfa_types=tuple(active_mfa_mapper.keys()))
+        active_mfa_names = user.active_mfa_backends_mapper.keys()
+        raise errors.MFARequiredError(mfa_types=tuple(active_mfa_names))
 
     def mark_mfa_ok(self, mfa_type):
         self.request.session['auth_mfa'] = 1
