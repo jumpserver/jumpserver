@@ -16,12 +16,12 @@
 
         <div id="qr_code"></div>
         <div style="display: block; margin: 0">Secret: {{ otp_secret_key }}</div>
-        <form class="" role="form" method="post" action="">
+        <form id="bind-form" class="" role="form" method="post" action="">
             {% csrf_token %}
             <div class="form-input">
                 <input type="text" class="" name="otp_code" placeholder="{% trans 'Six figures' %}" required="">
             </div>
-            <button type="submit" class="next">{% trans 'Next' %}</button>
+            <a type="submit" class="next button" onclick="submitForm()">{% trans 'Next' %}</a>
             {% if 'otp_code' in form.errors %}
                 <p style="color: #ed5565">{{ form.otp_code.errors.as_text }}</p>
             {% endif %}
@@ -32,6 +32,10 @@
     <script>
         $('.change-color li:eq(1) i').css('color', '#1ab394');
         $('.change-color li:eq(2) i').css('color', '#1ab394');
+
+        function submitForm() {
+            $('#bind-form').submit()
+        }
 
         $(document).ready(function() {
             // 生成用户绑定otp的二维码
