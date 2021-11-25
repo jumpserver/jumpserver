@@ -257,7 +257,8 @@ class MFAMixin:
     def _check_login_page_mfa_if_need(self, user):
         if not settings.SECURITY_MFA_IN_LOGIN_PAGE:
             return
-        self._check_if_no_active_mfa(user)
+        if not user.active_mfa_backends:
+            return
 
         request = self.request
         data = request.data if hasattr(request, 'data') else request.POST

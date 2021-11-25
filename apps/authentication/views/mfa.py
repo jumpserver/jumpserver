@@ -3,6 +3,7 @@
 
 from __future__ import unicode_literals
 from django.views.generic.edit import FormView
+from django.shortcuts import redirect
 
 from common.utils import get_logger
 from .. import forms, errors, mixins
@@ -19,9 +20,13 @@ class UserLoginMFAView(mixins.AuthMixin, FormView):
 
     def get(self, *args, **kwargs):
         try:
-            self.get_user_from_session()
+            user = self.get_user_from_session()
         except errors.SessionEmptyError:
-            return redirect_to_guard_view()
+            return redirect_to_guard_view('session_empty')
+
+        active_mfa_backends = user.active_mfa_backends
+        if not active_mfa_backends:
+            return redirect('authentication:user-otp-enable-start')
         return super().get(*args, **kwargs)
 
     def form_valid(self, form):
