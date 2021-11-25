@@ -3,6 +3,7 @@
 
 from __future__ import unicode_literals
 from django.views.generic.edit import FormView
+from django.shortcuts import redirect
 
 from common.utils import get_logger
 from .. import forms, errors, mixins
@@ -19,9 +20,15 @@ class UserLoginMFAView(mixins.AuthMixin, FormView):
 
     def get(self, *args, **kwargs):
         try:
-            self.get_user_from_session()
+            user = self.get_user_from_session()
         except errors.SessionEmptyError:
-            return redirect_to_guard_view()
+            return redirect_to_guard_view('session_empty')
+
+        try:
+            self._check_if_no_active_mfa(user)
+        except errors.MFAUnsetError as e:
+            return redirect(e.url + '?_=login_mfa')
+
         return super().get(*args, **kwargs)
 
     def form_valid(self, form):
@@ -30,17 +37,17 @@ class UserLoginMFAView(mixins.AuthMixin, FormView):
 
         try:
             self._do_check_user_mfa(code, mfa_type)
-            return redirect_to_guard_view()
+            return redirect_to_guard_view('mfa_ok')
         except (errors.MFAFailedError, errors.BlockMFAError) as e:
             form.add_error('code', e.msg)
             return super().form_invalid(form)
         except errors.SessionEmptyError:
-            return redirect_to_guard_view()
+            return redirect_to_guard_view('session_empty')
         except Exception as e:
             logger.error(e)
             import traceback
             traceback.print_exc()
-            return redirect_to_guard_view()
+            return redirect_to_guard_view('unexpect')
 
     def get_context_data(self, **kwargs):
         user = self.get_user_from_session()
