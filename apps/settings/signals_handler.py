@@ -86,17 +86,17 @@ def subscribe_settings_change(sender, **kwargs):
                 sub = setting_pub_sub.subscribe()
                 msgs = sub.listen()
                 # 开始之前关闭连接，因为server端可能关闭了连接，而 client 还在 CONN_MAX_AGE 中
-                close_old_connections()
                 for msg in msgs:
                     if msg["type"] != "message":
                         continue
+                    close_old_connections()
                     item = msg['data'].decode()
                     logger.debug("Found setting change: {}".format(str(item)))
                     Setting.refresh_item(item)
+                    close_old_connections()
             except Exception as e:
                 logger.exception(f'subscribe_settings_change: {e}')
                 Setting.refresh_all_settings()
-            finally:
                 close_old_connections()
 
     t = threading.Thread(target=keep_subscribe_settings_change)

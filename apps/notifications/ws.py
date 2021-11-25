@@ -52,11 +52,10 @@ class SiteMsgWebsocket(JsonWebsocketConsumer):
         try:
             msgs = self.chan.listen()
             # 开始之前关闭连接，因为server端可能关闭了连接，而 client 还在 CONN_MAX_AGE 中
-            close_old_connections()
             for message in msgs:
                 if message['type'] != 'message':
                     continue
-
+                close_old_connections()
                 try:
                     msg = json.loads(message['data'].decode())
                 except json.JSONDecoder as e:
@@ -70,6 +69,7 @@ class SiteMsgWebsocket(JsonWebsocketConsumer):
                 logger.debug('Message users: {}'.format(users))
                 if user_id in users:
                     self.send_unread_msg_count()
+                close_old_connections()
         except ConnectionError:
             logger.error('Redis chan closed')
         finally:
