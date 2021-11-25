@@ -207,7 +207,7 @@ class UserResetMFAApi(UserQuerysetMixin, generics.RetrieveAPIView):
         user = self.get_object() if kwargs.get('pk') else request.user
         if user == request.user:
             msg = _("Could not reset self otp, use profile reset instead")
-            return Response({"error": msg}, status=401)
+            return Response({"error": msg}, status=400)
 
         backends = user.active_mfa_backends_mapper
         for backend in backends.values():
