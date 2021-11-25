@@ -170,13 +170,13 @@ class AssetPermissionFilter(PermissionBaseFilter):
             return queryset
         if not assets:
             return queryset.none()
-        asset = assets.first()
+        assetids = list(assets.values_list('id', flat=True))
 
         if not is_query_all:
-            queryset = queryset.filter(assets=asset)
+            queryset = queryset.filter(assets__in=assetids)
             return queryset
         inherit_all_nodekeys = set()
-        inherit_nodekeys = asset.nodes.values_list('key', flat=True)
+        inherit_nodekeys = set(assets.values_list('nodes__key', flat=True))
 
         for key in inherit_nodekeys:
             ancestor_keys = Node.get_node_ancestor_keys(key, with_self=True)
@@ -185,8 +185,8 @@ class AssetPermissionFilter(PermissionBaseFilter):
         inherit_all_nodeids = Node.objects.filter(key__in=inherit_all_nodekeys).values_list('id', flat=True)
         inherit_all_nodeids = list(inherit_all_nodeids)
 
-        qs1 = queryset.filter(assets=asset).distinct()
-        qs2 = queryset.filter(nodes__id__in=inherit_all_nodeids).distinct()
+        qs1 = queryset.filter(assets__in=assetids).distinct()
+        qs2 = queryset.filter(nodes__in=inherit_all_nodeids).distinct()
 
         qs = UnionQuerySet(qs1, qs2)
         return qs
