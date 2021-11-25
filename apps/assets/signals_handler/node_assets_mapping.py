@@ -84,10 +84,10 @@ def subscribe_node_assets_mapping_expire(sender, **kwargs):
                 subscribe = node_assets_mapping_for_memory_pub_sub.subscribe()
                 msgs = subscribe.listen()
                 # 开始之前关闭连接，因为server端可能关闭了连接，而 client 还在 CONN_MAX_AGE 中
-                close_old_connections()
                 for message in msgs:
                     if message["type"] != "message":
                         continue
+                    close_old_connections()
                     org_id = message['data'].decode()
                     root_org_id = Organization.ROOT_ID
                     Node.expire_node_all_asset_ids_mapping_from_memory(org_id)
@@ -96,6 +96,7 @@ def subscribe_node_assets_mapping_expire(sender, **kwargs):
                         "Expire node assets id mapping from memory of org={}, pid={}"
                         "".format(str(org_id), os.getpid())
                     )
+                    close_old_connections()
             except Exception as e:
                 logger.exception(f'subscribe_node_assets_mapping_expire: {e}')
                 Node.expire_all_orgs_node_all_asset_ids_mapping_from_memory()
