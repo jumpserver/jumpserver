@@ -136,6 +136,10 @@ article ul li:last-child{
     border-radius: 6px;
     color: white;
 }
+
+.next:hover {
+	color: white;
+}
 /*绑定TOTP*/
 
 /*版权信息*/
