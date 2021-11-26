@@ -31,6 +31,7 @@ class Session(OrgModelMixin):
         MYSQL = 'mysql', 'mysql'
         ORACLE = 'oracle', 'oracle'
         MARIADB = 'mariadb', 'mariadb'
+        SQLSERVER = 'sqlserver', 'sqlserver'
         POSTGRESQL = 'postgresql', 'postgresql'
         K8S = 'k8s', 'kubernetes'
 
@@ -122,7 +123,7 @@ class Session(OrgModelMixin):
     @property
     def db_protocols(self):
         _PROTOCOL = self.PROTOCOL
-        return [_PROTOCOL.MYSQL, _PROTOCOL.MARIADB, _PROTOCOL.ORACLE, _PROTOCOL.POSTGRESQL]
+        return [_PROTOCOL.MYSQL, _PROTOCOL.MARIADB, _PROTOCOL.ORACLE, _PROTOCOL.POSTGRESQL, _PROTOCOL.SQLSERVER]
 
     @property
     def can_terminate(self):
