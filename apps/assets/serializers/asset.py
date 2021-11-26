@@ -69,6 +69,9 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     nodes_display = serializers.ListField(
         child=serializers.CharField(), label=_('Nodes name'), required=False
     )
+    labels_display = serializers.ListField(
+        child=serializers.CharField(), label=_('Labels name'), required=False, read_only=True
+    )
 
     """
     资产的数据结构
@@ -91,7 +94,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'domain', 'domain_display', 'platform', 'admin_user', 'admin_user_display'
         ]
         fields_m2m = [
-            'nodes', 'nodes_display', 'labels',
+            'nodes', 'nodes_display', 'labels', 'labels_display',
         ]
         read_only_fields = [
             'connectivity', 'date_verified', 'cpu_info', 'hardware_info',
