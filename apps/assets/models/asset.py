@@ -299,6 +299,12 @@ class Asset(AbsConnectivity, AbsHardwareInfo, ProtocolsMixin, NodesRelationMixin
             names.append(n.full_value)
         return names
 
+    def labels_display(self):
+        names = []
+        for n in self.labels.all():
+            names.append(n.name + ':' + n.value)
+        return names
+
     def as_node(self):
         from .node import Node
         fake_node = Node()
@@ -338,7 +344,7 @@ class Asset(AbsConnectivity, AbsHardwareInfo, ProtocolsMixin, NodesRelationMixin
         tree_node = TreeNode(**data)
         return tree_node
 
-    def get_all_systemusers(self):
+    def get_all_system_users(self):
         from .user import SystemUser
         system_user_ids = SystemUser.assets.through.objects.filter(asset=self)\
             .values_list('systemuser_id', flat=True)
