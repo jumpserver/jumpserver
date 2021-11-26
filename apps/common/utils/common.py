@@ -252,7 +252,33 @@ def get_cpu_load():
     return float(single_cpu_load_1)
 
 
+def get_docker_mem_usage_if_limit():
+    try:
+        with open('/sys/fs/cgroup/memory/memory.limit_in_bytes') as f:
+            limit_in_bytes = int(f.readline())
+            total = psutil.virtual_memory().total
+            if limit_in_bytes >= total:
+                raise ValueError('Not limit')
+
+        with open('/sys/fs/cgroup/memory/memory.usage_in_bytes') as f:
+            usage_in_bytes = int(f.readline())
+
+        with open('/sys/fs/cgroup/memory/memory.stat') as f:
+            lines = f.readlines()
+            name, value = lines[33].split()
+            total_inactive_file = int(value)
+
+        return ((usage_in_bytes - total_inactive_file) / limit_in_bytes) * 100
+
+    except Exception as e:
+        logger.error(f'Get memory usage by docker limit: {e}')
+        return None
+
+
 def get_memory_usage():
+    usage = get_docker_mem_usage_if_limit()
+    if usage is not None:
+        return usage
     return psutil.virtual_memory().percent
 
 
