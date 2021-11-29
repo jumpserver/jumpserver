@@ -1,4 +1,4 @@
-import abc
+from abc import ABCMeta, abstractmethod
 from typing import List
 
 import hvac
@@ -9,7 +9,8 @@ from common.utils import get_logger
 logger = get_logger(__name__)
 
 
-class BaseVault(abc.ABC):
+class BaseVault(object):
+    __metaclass__ = ABCMeta
 
     def __init__(self, url, token):
         self.client = hvac.Client(url=url)
@@ -38,6 +39,6 @@ class BaseVault(abc.ABC):
         for key in keys:
             self.client.sys.unseal(key)
 
-    @abc.abstractmethod
+    @abstractmethod
     def enable_secrets_engine(self) -> None:
-        pass
+        raise NotImplementedError

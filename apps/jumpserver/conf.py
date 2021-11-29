@@ -371,9 +371,9 @@ class Config(dict):
         'VAULT_TOKEN': 's.JqVYFWIrtPzctcePjaWTtxXf',
 
         # pam相关
-        'PAM_URL': '',
-        'PAM_USERNAME': '',
-        'PAM_PASSWORD': '',
+        'PAM_URL': 'https://10.1.12.76',
+        'PAM_USERNAME': 'admin',
+        'PAM_PASSWORD': 'fit2cloud',
 
         # 废弃的
         'DEFAULT_ORG_SHOW_ALL_USERS': True,

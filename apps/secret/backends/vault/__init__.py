@@ -23,14 +23,6 @@ class VaultSecretClient(BaseSecretClient):
             )
         self.path = self.instance.pk
 
-    def create_secret_data(self):
-        instance = self.instance
-        fields = getattr(instance, 'SECRET_FIELD')
-        secret_data = {
-            k: getattr(instance, f'_{k}') for k in fields
-        }
-        return secret_data
-
     def update_or_create_secret(self):
         secret_data = self.create_secret_data()
         self.client.update_or_create(self.path, secret_data)

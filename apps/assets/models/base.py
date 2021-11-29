@@ -20,7 +20,7 @@ from common.utils import (
 from common.utils.encode import ssh_pubkey_gen
 from common import fields
 from orgs.mixins.models import OrgModelMixin
-from secret.backends import Secret
+from secret.utils import get_secret_data, replace_secret
 from ..const import Connectivity, StorageType
 
 logger = get_logger(__file__)
@@ -235,28 +235,10 @@ class BaseUser(OrgModelMixin, AuthMixin):
         }
 
     def get_secret_data(self, name=None):
-        field = self.SECRET_FIELD
-        backend = self.storage_type
-        if backend != StorageType.db:
-            client = Secret(self, backend)
-            secret_data = client.get_secret()
-            if name:
-                return secret_data.get(name, '')
-            else:
-                return {i: secret_data.get(i, '') for i in field}
-        else:
-            if name:
-                return getattr(self, name)
-            else:
-                return {i: getattr(self, i) for i in field}
+        return get_secret_data(self, name)
 
     def replace_secret(self, name=None):
-        secret_data = self.get_secret_data(name)
-        if not name:
-            for k, v in secret_data.items():
-                setattr(self, k, v)
-        else:
-            setattr(self, name, secret_data)
+        return replace_secret(self, name)
 
     class Meta:
         abstract = True

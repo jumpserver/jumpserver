@@ -11,6 +11,9 @@ class PamSecretClient(BaseSecretClient):
     def update_or_create_secret(self):
         pass
 
+    def patch_secret(self, old_secret_data):
+        pass
+
     def delete_secret(self):
         pass
 
