@@ -109,6 +109,9 @@ class CommandStorage(CommonStorageModelMixin, CommonModelMixin):
             backend = engine_mod.CommandStore(self.config)
             backend.pre_use_check()
 
+    class Meta:
+        verbose_name = _("Command storage")
+
 
 class ReplayStorage(CommonStorageModelMixin, CommonModelMixin):
     type = models.CharField(
@@ -165,3 +168,6 @@ class ReplayStorage(CommonStorageModelMixin, CommonModelMixin):
 
     def is_use(self):
         return Terminal.objects.filter(replay_storage=self.name).exists()
+
+    class Meta:
+        verbose_name = _("Replay storage")

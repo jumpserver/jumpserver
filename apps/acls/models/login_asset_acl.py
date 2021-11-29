@@ -37,6 +37,7 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
     class Meta:
         unique_together = ('name', 'org_id')
         ordering = ('priority', '-date_updated', 'name')
+        verbose_name = _("Login asset acl")
 
     def __str__(self):
         return self.name

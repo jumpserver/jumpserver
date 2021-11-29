@@ -1,9 +1,11 @@
-from django.db import models
 import datetime
-from common.mixins import CommonModelMixin
-from orgs.mixins.models import OrgModelMixin
+
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+
+from common.mixins import CommonModelMixin
+from orgs.mixins.models import OrgModelMixin
 from .session import Session
 
 
@@ -29,6 +31,7 @@ class SessionSharing(CommonModelMixin, OrgModelMixin):
 
     class Meta:
         ordering = ('-date_created', )
+        verbose_name = _('Session sharing')
 
     def __str__(self):
         return 'Creator: {}'.format(self.creator)
@@ -93,6 +96,7 @@ class SessionJoinRecord(CommonModelMixin, OrgModelMixin):
 
     class Meta:
         ordering = ('-date_joined', )
+        verbose_name = _("Session join record")
 
     def __str__(self):
         return 'Joiner: {}'.format(self.joiner)

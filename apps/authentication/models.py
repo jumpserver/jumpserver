@@ -32,6 +32,9 @@ class AccessKey(models.Model):
     def __str__(self):
         return str(self.id)
 
+    class Meta:
+        verbose_name = _("Access key")
+
 
 class PrivateToken(Token):
     """Inherit from auth token, otherwise migration is boring"""
@@ -98,3 +101,6 @@ class SSOToken(models.JMSBaseModel):
     authkey = models.UUIDField(primary_key=True, default=uuid.uuid4, verbose_name=_('Token'))
     expired = models.BooleanField(default=False, verbose_name=_('Expired'))
     user = models.ForeignKey('users.User', on_delete=models.PROTECT, verbose_name=_('User'), db_constraint=False)
+
+    class Meta:
+        verbose_name = _('SSO token')

@@ -126,6 +126,7 @@ class Task(PeriodTaskModelMixin, OrgModelMixin):
         db_table = 'ops_task'
         unique_together = ('name', 'org_id')
         ordering = ('-date_updated',)
+        verbose_name = _("Task")
         get_latest_by = 'date_created'
 
 
@@ -230,6 +231,7 @@ class AdHoc(OrgModelMixin):
     class Meta:
         db_table = "ops_adhoc"
         get_latest_by = 'date_created'
+        verbose_name = _('AdHoc')
 
 
 class AdHocExecution(OrgModelMixin):
@@ -325,3 +327,4 @@ class AdHocExecution(OrgModelMixin):
     class Meta:
         db_table = "ops_adhoc_execution"
         get_latest_by = 'date_start'
+        verbose_name = _("AdHoc execution")

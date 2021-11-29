@@ -42,6 +42,9 @@ class FTPLog(OrgModelMixin):
     is_success = models.BooleanField(default=True, verbose_name=_("Success"))
     date_start = models.DateTimeField(auto_now_add=True, verbose_name=_('Date start'))
 
+    class Meta:
+        verbose_name = _("File transfer log")
+
 
 class OperateLog(OrgModelMixin):
     ACTION_CREATE = 'create'
@@ -68,6 +71,9 @@ class OperateLog(OrgModelMixin):
             self.org_id = Organization.ROOT_ID
         return super(OperateLog, self).save(*args, **kwargs)
 
+    class Meta:
+        verbose_name = _("Operate log")
+
 
 class PasswordChangeLog(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
@@ -78,6 +84,9 @@ class PasswordChangeLog(models.Model):
 
     def __str__(self):
         return "{} change {}'s password".format(self.change_by, self.user)
+
+    class Meta:
+        verbose_name = _('Password change log')
 
 
 class UserLoginLog(models.Model):
@@ -146,3 +155,4 @@ class UserLoginLog(models.Model):
 
     class Meta:
         ordering = ['-datetime', 'username']
+        verbose_name = _('User login log')

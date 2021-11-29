@@ -26,6 +26,9 @@ class TicketStep(CommonModelMixin):
     )
     state = models.CharField(choices=ProcessStatus.choices, max_length=64, default=ProcessStatus.notified)
 
+    class Meta:
+        verbose_name = _("Ticket step")
+
 
 class TicketAssignee(CommonModelMixin):
     assignee = models.ForeignKey(
@@ -76,6 +79,7 @@ class Ticket(CommonModelMixin, OrgModelMixin):
 
     class Meta:
         ordering = ('-date_created',)
+        verbose_name = _('Ticket')
 
     def __str__(self):
         return '{}({})'.format(self.title, self.applicant_display)

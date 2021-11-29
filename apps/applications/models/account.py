@@ -15,7 +15,7 @@ class Account(BaseUser):
     auth_attrs = ['username', 'password', 'private_key', 'public_key']
 
     class Meta:
-        verbose_name = _('Account')
+        verbose_name = _('Application account')
         unique_together = [('username', 'app', 'systemuser')]
 
     def __init__(self, *args, **kwargs):

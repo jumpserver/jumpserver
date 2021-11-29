@@ -37,6 +37,7 @@ class Role(JMSModel):
 
     class Meta:
         unique_together = [('name', 'scope')]
+        verbose_name = _('Role')
 
     def get_permissions(self):
         admin_names = [self.system_admin_name, self.org_admin_name]

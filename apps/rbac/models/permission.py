@@ -2,7 +2,8 @@ import uuid
 from typing import Callable
 from django.db import models
 from django.db.models import F, Count
-from django.utils.translation import ugettext_lazy as _
+from django.apps import apps
+from django.utils.translation import ugettext_lazy as _, ugettext
 from django.contrib.auth.models import Permission as DjangoPermission
 from django.contrib.auth.models import ContentType as DjangoContentType
 
@@ -27,23 +28,29 @@ class PermissionTreeMixin:
         app_counts = all_permissions.values('app').order_by('app').annotate(count=Count('app'))
         app_checked_counts = permissions.values('app').order_by('app').annotate(count=Count('app'))
         app_checked_counts_mapper = {i['app']: i['count'] for i in app_checked_counts}
+        all_apps = apps.get_app_configs()
+        apps_name_mapper = {
+            app.name: app.verbose_name
+            for app in all_apps if hasattr(app, 'verbose_name')
+        }
 
         nodes = []
+
         for i in app_counts:
             app = i['app']
             total_counts = i['count']
             check_counts = app_checked_counts_mapper.get(app, 0)
-            name = f'{app}({check_counts}/{total_counts})'
+            name = apps_name_mapper.get(app, app)
+            full_name = f'{name}({check_counts}/{total_counts})'
 
             node = TreeNode(**{
                 'id': app,
-                'name': name,
-                'title': app,
+                'name': full_name,
+                'title': name,
                 'pId': '$ROOT$',
                 'isParent': True,
                 'open': False,
                 'checked': total_counts == check_counts,
-                # 'halfCheck': check_counts != 0,
                 'iconSkin': '',
                 'meta': {
                     'type': 'app',
@@ -54,32 +61,38 @@ class PermissionTreeMixin:
 
     @classmethod
     def create_models_tree_nodes(cls, all_permissions, permissions):
+        content_types = ContentType.objects.all()
+
         model_counts = all_permissions \
-            .values('model', 'app', 'model_id') \
-            .order_by('model_id') \
-            .annotate(count=Count('model_id'))
+            .values('model', 'app', 'content_type') \
+            .order_by('content_type') \
+            .annotate(count=Count('content_type'))
         model_check_counts = permissions \
-            .values('model_id', 'model') \
-            .order_by('model_id') \
-            .annotate(count=Count('model_id'))
+            .values('content_type', 'model') \
+            .order_by('content_type') \
+            .annotate(count=Count('content_type'))
+        model_counts_mapper = {
+            i['content_type']: i['count']
+            for i in model_counts
+        }
         model_check_counts_mapper = {
-            i['model_id']: i['count']
+            i['content_type']: i['count']
             for i in model_check_counts
         }
 
         nodes = []
-        for i in model_counts:
-            app = i['app']
-            model_id = i['model_id']
-            model = i['model']
-            total_counts = i['count']
-            check_counts = model_check_counts_mapper.get(model_id, 0)
-            name = f'{model}({check_counts}/{total_counts})'
+        for ct in content_types:
+            total_counts = model_counts_mapper.get(ct.id, 0)
+            if total_counts == 0:
+                continue
+            check_counts = model_check_counts_mapper.get(ct.id, 0)
+            model_id = f'{ct.app_label}_{ct.model}'
+            name = f'{ct.name}({check_counts}/{total_counts})'
             node = TreeNode(**{
-                'id': "model_{}".format(model_id),
-                'name': name,
-                'title': model,
-                'pId': app,
+                'id': model_id,
+                'name': name + "||" + ct.model,
+                'title': name,
+                'pId': ct.app_label,
                 'isParent': True,
                 'open': False,
                 'checked': total_counts == check_counts,
@@ -90,16 +103,51 @@ class PermissionTreeMixin:
             nodes.append(node)
         return nodes
 
+    @staticmethod
+    def _get_permission_name(p, content_types_name_mapper):
+        code_name = p.codename
+        action_mapper = {
+            'add': ugettext('Create'),
+            'view': ugettext('View'),
+            'change': ugettext('Update'),
+            'delete': ugettext('Delete')
+        }
+        name = ''
+        ct = ''
+        if 'add_' in p.codename:
+            name = action_mapper['add']
+            ct = code_name.replace('add_', '')
+        elif 'view_' in p.codename:
+            name = action_mapper['view']
+            ct = code_name.replace('view_', '')
+        elif 'change_' in p.codename:
+            name = action_mapper['change']
+            ct = code_name.replace('change_', '')
+        elif 'delete' in code_name:
+            name = action_mapper['delete']
+            ct = code_name.replace('delete_', '')
+
+        if ct in content_types_name_mapper:
+            name += content_types_name_mapper[ct]
+        else:
+            name = p.name
+        return name
+
     @classmethod
     def create_permissions_tree_nodes(cls, all_permissions, permissions):
         permissions_id = permissions.values_list('id', flat=True)
         nodes = []
+        content_types = ContentType.objects.all()
+        content_types_name_mapper = {ct.model: ct.name for ct in content_types}
         for p in all_permissions:
+            model_id = f'{p.app}_{p.model}'
+            name = cls._get_permission_name(p, content_types_name_mapper)
+
             node = TreeNode(**{
                 'id': p.id,
-                'name': p.name,
+                'name': name,
                 'title': p.name,
-                'pId': f'model_{p.model_id}',
+                'pId': f'{model_id}',
                 'isParent': False,
                 'iconSkin': 'file',
                 'checked': p.id in permissions_id,
@@ -135,8 +183,7 @@ class PermissionTreeMixin:
         for i, perms in enumerate(perms_using):
             perms_using[i] = perms.select_related('content_type') \
                 .annotate(app=F('content_type__app_label')) \
-                .annotate(model=F('content_type__model')) \
-                .annotate(model_id=F('content_type__id'))
+                .annotate(model=F('content_type__model'))
 
         all_permissions, permissions = perms_using
         nodes = [cls.create_root_tree_node(all_permissions, permissions)]
@@ -163,11 +210,17 @@ class Permission(DjangoPermission, PermissionTreeMixin):
         if scope == Scope.org:
             excludes.extend(const.system_scope_permissions)
 
-        for app_label, code_name in excludes:
-            permissions = permissions.exclude(
-                codename=code_name,
-                content_type__app_label=app_label
-            )
+        for app_label, model, code_name in excludes:
+            kwargs = {}
+
+            if app_label != '*':
+                kwargs['content_type__app_label'] = app_label
+            if model != '*':
+                kwargs['content_type__model'] = model
+            if code_name != '*':
+                kwargs['codename'] = code_name
+
+            permissions = permissions.exclude(**kwargs)
         return permissions
 
     @classmethod
