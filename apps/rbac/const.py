@@ -7,7 +7,7 @@ class Scope(models.TextChoices):
     org = 'org', _('Organization')
 
 
-exclude_permissions = [
+exclude_permissions = (
     ('auth', '*', '*'),
     ('authentication', 'loginconfirmsetting', '*'),
     ('captcha', '*', '*'),
@@ -61,28 +61,38 @@ exclude_permissions = [
     ('audits', 'ftplog', 'change_ftplog'),
     ('audits', 'ftplog', 'delete_ftplog'),
     ('terminal', 'session', 'delete_session'),
-    ('tickets', 'approvalrule', '*'),
-    ('tickets', 'ticketassignee', '*'),
-    ('tickets', 'ticketstep', '*'),
+    ('tickets', '*', '*'),
     ('users', 'userpasswordhistory', '*'),
     ('xpack', 'interface', 'add_interface'),
     ('xpack', 'interface', 'delete_interface'),
-]
+)
 
 
-system_scope_permissions = [
+system_scope_permissions = (
     ('users', 'users', 'delete_user'),
-    ('rbac', 'role', 'add_role'),
-    ('rbac', 'role', 'change_role'),
-    # 'delete_role',
-    # 'view_role',
-    # 'view_permission',
-    # 'add_organization',
-    # 'change_organization',
-    # 'delete_organization',
-    # 'view_organization',
-    # 'change_license',
-    # 'change_interface',
-    # 'change_setting',
-    # 'view_setting',
+    ('rbac', '*', '*'),
+    ('orgs', 'organization', '*'),
+    ('xpack', 'license', '*'),
+    ('settings', 'setting', '*'),
+)
+
+
+auditor_permissions = (
+    ('audits', '*', '*'),
+    ('rbac', 'extralpermission', 'view_auditview'),
+    ('terminal', 'session', '*'),
+    ('terminal', 'command', '*'),
+)
+
+user_permissions = (
+    ('rbac', 'extralpermission', 'view_userview'),
+)
+
+app_permissions = [
+    ('terminal', '*', '*'),
+    ('acls', 'loginacl', 'view_loginacl'),
+    ('acls', 'loginassetacl', 'view_loginassetacl'),
+    ('applications', 'application', 'view_application'),
+    ('applications', 'applicationuser', 'view_applicationuser'),
+    ('assets', 'asset', 'view_asset'),
 ]

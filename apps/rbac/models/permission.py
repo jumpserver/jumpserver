@@ -1,7 +1,8 @@
 import uuid
 from typing import Callable
+
 from django.db import models
-from django.db.models import F, Count
+from django.db.models import F, Count, Q
 from django.apps import apps
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.contrib.auth.models import Permission as DjangoPermission
@@ -24,7 +25,7 @@ class PermissionTreeMixin:
     get_permissions: Callable
 
     @classmethod
-    def _create_apps_tree_nodes(cls, all_permissions, permissions):
+    def _create_apps_tree_nodes(cls, all_permissions, permissions, check_disabled=False):
         app_counts = all_permissions.values('app').order_by('app').annotate(count=Count('app'))
         app_checked_counts = permissions.values('app').order_by('app').annotate(count=Count('app'))
         app_checked_counts_mapper = {i['app']: i['count'] for i in app_checked_counts}
@@ -33,9 +34,8 @@ class PermissionTreeMixin:
             app.name: app.verbose_name
             for app in all_apps if hasattr(app, 'verbose_name')
         }
-
         nodes = []
-
+        
         for i in app_counts:
             app = i['app']
             total_counts = i['count']
@@ -50,6 +50,7 @@ class PermissionTreeMixin:
                 'pId': '$ROOT$',
                 'isParent': True,
                 'open': False,
+                'chkDisabled': check_disabled,
                 'checked': total_counts == check_counts,
                 'iconSkin': '',
                 'meta': {
@@ -60,7 +61,7 @@ class PermissionTreeMixin:
         return nodes
 
     @classmethod
-    def _create_models_tree_nodes(cls, all_permissions, permissions):
+    def _create_models_tree_nodes(cls, all_permissions, permissions, check_disabled=False):
         content_types = ContentType.objects.all()
 
         model_counts = all_permissions \
@@ -94,6 +95,7 @@ class PermissionTreeMixin:
                 # 'name': name + "||" + ct.model,
                 'title': name,
                 'pId': ct.app_label,
+                'chkDisabled': check_disabled,
                 'isParent': True,
                 'open': False,
                 'checked': total_counts == check_counts,
@@ -135,7 +137,7 @@ class PermissionTreeMixin:
         return name
 
     @classmethod
-    def _create_permissions_tree_nodes(cls, all_permissions, permissions):
+    def _create_perms_tree_nodes(cls, all_permissions, permissions, check_disabled=False):
         permissions_id = permissions.values_list('id', flat=True)
         nodes = []
         content_types = ContentType.objects.all()
@@ -150,6 +152,7 @@ class PermissionTreeMixin:
                 'title': p.name,
                 'pId': model_id,
                 'isParent': False,
+                'chkDisabled': check_disabled,
                 'iconSkin': 'file',
                 'checked': p.id in permissions_id,
                 'open': False,
@@ -161,7 +164,7 @@ class PermissionTreeMixin:
         return nodes
 
     @staticmethod
-    def _create_root_tree_node(all_permissions, permissions):
+    def _create_root_tree_node(all_permissions, permissions, check_disabled=False):
         total_counts = all_permissions.count()
         check_counts = permissions.count()
         node = TreeNode(**{
@@ -169,6 +172,7 @@ class PermissionTreeMixin:
             'name': f'所有权限({check_counts}/{total_counts})',
             'title': '所有权限',
             'pId': '',
+            'chkDisabled': check_disabled,
             'isParent': True,
             'checked': total_counts == check_counts,
             'open': True,
@@ -179,7 +183,7 @@ class PermissionTreeMixin:
         return node
 
     @classmethod
-    def create_tree_nodes(cls, permissions, scope='org'):
+    def create_tree_nodes(cls, permissions, scope='org', check_disabled=False):
         perms_using = [cls.get_permissions(scope), permissions]
         for i, perms in enumerate(perms_using):
             perms_using[i] = perms.select_related('content_type') \
@@ -187,12 +191,12 @@ class PermissionTreeMixin:
                 .annotate(model=F('content_type__model'))
 
         all_permissions, permissions = perms_using
-        nodes = [cls._create_root_tree_node(all_permissions, permissions)]
-        apps_nodes = cls._create_apps_tree_nodes(all_permissions, permissions)
-        models_nodes = cls._create_models_tree_nodes(all_permissions, permissions)
-        permissions_nodes = cls._create_permissions_tree_nodes(all_permissions, permissions)
+        nodes = [cls._create_root_tree_node(all_permissions, permissions, check_disabled)]
+        apps_nodes = cls._create_apps_tree_nodes(all_permissions, permissions, check_disabled)
+        models_nodes = cls._create_models_tree_nodes(all_permissions, permissions, check_disabled)
+        perms_nodes = cls._create_perms_tree_nodes(all_permissions, permissions, check_disabled)
 
-        nodes += apps_nodes + models_nodes + permissions_nodes
+        nodes += apps_nodes + models_nodes + perms_nodes
         return nodes
 
 
@@ -207,22 +211,31 @@ class Permission(DjangoPermission, PermissionTreeMixin):
         return '%s.%s' % (self.content_type.app_label, self.codename)
 
     @classmethod
-    def clean_permissions(cls, permissions, scope=Scope.system):
-        excludes = list(const.exclude_permissions)
-        if scope == Scope.org:
-            excludes.extend(const.system_scope_permissions)
-
-        for app_label, model, code_name in excludes:
+    def get_define_permissions_q(cls, defines):
+        """
+        :param defines: [(app, model, codename),]
+        :return:
+        """
+        q = Q()
+        for app_label, model, code_name in defines:
             kwargs = {}
-
             if app_label != '*':
                 kwargs['content_type__app_label'] = app_label
             if model != '*':
                 kwargs['content_type__model'] = model
             if code_name != '*':
                 kwargs['codename'] = code_name
+            q |= Q(**kwargs)
+        return q
 
-            permissions = permissions.exclude(**kwargs)
+    @classmethod
+    def clean_permissions(cls, permissions, scope=Scope.system):
+        excludes = list(const.exclude_permissions)
+        if scope == Scope.org:
+            excludes.extend(const.system_scope_permissions)
+
+        q = cls.get_define_permissions_q(excludes)
+        permissions = permissions.exclude(q)
         return permissions
 
     @classmethod

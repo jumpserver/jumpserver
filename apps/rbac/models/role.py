@@ -37,11 +37,10 @@ class Role(JMSModel):
 
     class Meta:
         unique_together = [('name', 'scope')]
-        permissions = (
-            ('view_rolepermissions', 'Can view role permissions'),
-            ('change_rolepermissions', 'Can change role permissions'),
-        )
         verbose_name = _('Role')
+
+    def __str__(self):
+        return '%s(%s)' % (self.name, self.get_scope_display())
 
     def get_permissions(self):
         admin_names = [self.system_admin_name, self.org_admin_name]
@@ -50,7 +49,6 @@ class Role(JMSModel):
             permissions = Permission.objects.all()
         else:
             permissions = self.permissions.all()
-
         permissions = Permission.clean_permissions(permissions, self.scope)
         return permissions
 
@@ -62,25 +60,25 @@ class Role(JMSModel):
     def permissions_amount(self):
         return self.permissions.count()
 
-    def __str__(self):
-        return '%s(%s)' % (self.name, self.get_scope_display())
-
     @classmethod
     def get_builtin_role(cls, name, scope):
         return cls.objects.filter(name=name, scope=scope, builtin=True).first()
 
     @classmethod
     def create_builtin_roles(cls):
-        scope_role_names_mapper = {
-            Scope.system: [
-                cls.system_admin_name, cls.system_auditor_name,
-                cls.app_name,
-            ],
-            Scope.org: [
-                cls.org_admin_name, cls.org_auditor_name, cls.org_user_name
-            ]
-        }
-        for scope, role_names in scope_role_names_mapper.items():
-            for name in role_names:
-                cls.objects.create(name=name, scope=scope, builtin=True)
+        roles = [
+            (cls.system_admin_name, Scope.system, []),
+            (cls.system_auditor_name, Scope.system, const.auditor_permissions),
+            (cls.app_name, Scope.system, const.app_permissions),
+            (cls.org_admin_name, Scope.org, []),
+            (cls.org_auditor_name, Scope.org, const.auditor_permissions),
+            (cls.org_user_name, Scope.org, []),
+        ]
+        for name, scope, permissions_define in roles:
+            permissions = Permission.get_permissions(scope)
+            q = Permission.get_define_permissions_q(permissions_define)
+            permissions = permissions.filter(q)
 
+            defaults = {'scope': scope, 'builtin': True, 'name': name}
+            role, created = cls.objects.update_or_create(defaults, name=name)
+            role.permissions.set(permissions)

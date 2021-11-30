@@ -102,4 +102,5 @@ class TreeNodeSerializer(serializers.Serializer):
     nocheck = serializers.BooleanField(default=False)
     checked = serializers.BooleanField(default=False)
     halfCheck = serializers.BooleanField(default=False)
+    chkDisabled = serializers.BooleanField(default=False)
     meta = serializers.JSONField()

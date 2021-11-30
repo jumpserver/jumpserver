@@ -47,19 +47,16 @@ class RoleBindingViewSet(JMSModelViewSet):
 
 class RolePermissionsViewSet(PermissionViewSet):
     action_perms_map = {
-        'list': 'role.view_rolepermissions',
-        'retrieve': 'role.view_rolepermissions',
-        'get_tree': 'role.view_rolepermissions',
-        'update': 'role.change_rolepermissions',
-        'destroy': 'role.delete_rolepermissions',
+        'get_tree': 'role.view_role',
     }
-
     http_method_names = ['get', 'option']
+    check_disabled = False
 
     def get_queryset(self):
         role_id = self.kwargs.get('role_pk')
         role = Role.objects.get(id=role_id)
         self.scope = role.scope
+        self.check_disabled = role.builtin
         queryset = role.get_permissions()\
             .prefetch_related('content_type')
         return queryset
