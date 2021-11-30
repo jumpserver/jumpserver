@@ -264,11 +264,18 @@ def get_docker_mem_usage_if_limit():
             usage_in_bytes = int(f.readline())
 
         with open('/sys/fs/cgroup/memory/memory.stat') as f:
-            lines = f.readlines()
-            name, value = lines[33].split()
-            total_inactive_file = int(value)
+            inactive_file = 0
+            for line in f:
+                if line.startswith('total_inactive_file'):
+                    name, inactive_file = line.split()
+                    break
 
-        return ((usage_in_bytes - total_inactive_file) / limit_in_bytes) * 100
+                if line.startswith('inactive_file'):
+                    name, inactive_file = line.split()
+                    continue
+
+            inactive_file = int(inactive_file)
+        return ((usage_in_bytes - inactive_file) / limit_in_bytes) * 100
 
     except Exception as e:
         logger.error(f'Get memory usage by docker limit: {e}')
