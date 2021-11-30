@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-26 15:16+0800\n"
+"POT-Creation-Date: 2021-11-30 16:35+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -167,7 +167,7 @@ msgstr "格式为逗号分隔的字符串, * 表示匹配所有. "
 #: users/templates/users/_select_user_modal.html:14
 #: xpack/plugins/change_auth_plan/models/asset.py:35
 #: xpack/plugins/change_auth_plan/models/asset.py:191
-#: xpack/plugins/cloud/serializers/account_attrs.py:62
+#: xpack/plugins/cloud/serializers/account_attrs.py:22
 msgid "Username"
 msgstr "用户名"
 
@@ -297,7 +297,7 @@ msgstr "应用管理"
 #: applications/serializers/application.py:88 assets/models/label.py:21
 #: perms/models/application_permission.py:20
 #: perms/serializers/application/user_permission.py:33
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:24
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:22
 #: xpack/plugins/change_auth_plan/models/app.py:25
 msgid "Category"
 msgstr "类别"
@@ -308,7 +308,7 @@ msgstr "类别"
 #: perms/serializers/application/user_permission.py:34
 #: terminal/models/storage.py:55 terminal/models/storage.py:116
 #: tickets/models/flow.py:51 tickets/models/ticket.py:48
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:31
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:29
 #: xpack/plugins/change_auth_plan/models/app.py:28
 #: xpack/plugins/change_auth_plan/models/app.py:148
 msgid "Type"
@@ -331,7 +331,7 @@ msgstr "应用程序"
 #: applications/serializers/application.py:59
 #: applications/serializers/application.py:89 assets/serializers/label.py:13
 #: perms/serializers/application/permission.py:16
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:28
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:26
 msgid "Category display"
 msgstr "类别名称"
 
@@ -339,7 +339,7 @@ msgstr "类别名称"
 #: applications/serializers/application.py:91
 #: assets/serializers/system_user.py:27 audits/serializers.py:29
 #: perms/serializers/application/permission.py:17
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:35
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:33
 #: tickets/serializers/ticket/ticket.py:22
 #: tickets/serializers/ticket/ticket.py:168
 msgid "Type display"
@@ -357,7 +357,7 @@ msgstr "集群"
 
 #: applications/serializers/attrs/application_category/db.py:11
 #: ops/models/adhoc.py:146 settings/serializers/auth/radius.py:14
-#: xpack/plugins/cloud/serializers/account_attrs.py:60
+#: xpack/plugins/cloud/serializers/account_attrs.py:68
 msgid "Host"
 msgstr "主机"
 
@@ -369,7 +369,7 @@ msgstr "主机"
 #: applications/serializers/attrs/application_type/sqlserver.py:11
 #: assets/models/asset.py:215 assets/models/domain.py:62
 #: settings/serializers/auth/radius.py:15
-#: xpack/plugins/cloud/serializers/account_attrs.py:61
+#: xpack/plugins/cloud/serializers/account_attrs.py:69
 msgid "Port"
 msgstr "端口"
 
@@ -386,7 +386,7 @@ msgstr "应用路径"
 #: xpack/plugins/change_auth_plan/serializers/asset.py:68
 #: xpack/plugins/change_auth_plan/serializers/asset.py:71
 #: xpack/plugins/change_auth_plan/serializers/asset.py:87
-#: xpack/plugins/cloud/serializers/account_attrs.py:44
+#: xpack/plugins/cloud/serializers/account_attrs.py:52
 msgid "This field is required."
 msgstr "该字段是必填项。"
 
@@ -409,7 +409,7 @@ msgstr "目标URL"
 #: xpack/plugins/change_auth_plan/models/base.py:39
 #: xpack/plugins/change_auth_plan/models/base.py:114
 #: xpack/plugins/change_auth_plan/models/base.py:182
-#: xpack/plugins/cloud/serializers/account_attrs.py:64
+#: xpack/plugins/cloud/serializers/account_attrs.py:24
 msgid "Password"
 msgstr "密码"
 
@@ -425,15 +425,15 @@ msgstr "目标URL"
 msgid "Number required"
 msgstr "需要为数字"
 
-#: assets/api/node.py:65
+#: assets/api/node.py:66
 msgid "You can't update the root node name"
 msgstr "不能修改根节点名称"
 
-#: assets/api/node.py:72
+#: assets/api/node.py:73
 msgid "You can't delete the root node ({})"
 msgstr "不能删除根节点 ({})"
 
-#: assets/api/node.py:75
+#: assets/api/node.py:76
 msgid "Deletion failed and the node contains assets"
 msgstr "删除失败，节点包含资产"
 
@@ -584,7 +584,7 @@ msgid "Ok"
 msgstr "成功"
 
 #: assets/models/base.py:32 audits/models.py:102
-#: xpack/plugins/cloud/const.py:28
+#: xpack/plugins/cloud/const.py:29
 msgid "Failed"
 msgstr "失败"
 
@@ -1158,8 +1158,8 @@ msgstr "成功"
 
 #: audits/models.py:43 ops/models/command.py:30 perms/models/base.py:49
 #: terminal/models/session.py:53
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:57
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:47
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:55
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:57
 #: xpack/plugins/change_auth_plan/models/base.py:105
 #: xpack/plugins/change_auth_plan/models/base.py:189
 #: xpack/plugins/gathered_user/models.py:76
@@ -2647,8 +2647,8 @@ msgid "User group"
 msgstr "用户组"
 
 #: perms/models/base.py:50
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:60
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:50
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:58
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:60
 #: users/models/user.py:585
 msgid "Date expired"
 msgstr "失效日期"
@@ -2943,7 +2943,7 @@ msgid "Client Id"
 msgstr "客户端 ID"
 
 #: settings/serializers/auth/oidc.py:18
-#: xpack/plugins/cloud/serializers/account_attrs.py:26
+#: xpack/plugins/cloud/serializers/account_attrs.py:34
 msgid "Client Secret"
 msgstr "客户端密钥"
 
@@ -4605,46 +4605,50 @@ msgstr "自定义用户"
 msgid "Ticket already closed"
 msgstr "工单已经关闭"
 
-#: tickets/handler/apply_application.py:52
+#: tickets/handler/apply_application.py:53
 msgid "Applied category"
 msgstr "申请的类别"
 
-#: tickets/handler/apply_application.py:53
+#: tickets/handler/apply_application.py:54
 msgid "Applied type"
 msgstr "申请的类型"
 
-#: tickets/handler/apply_application.py:54
+#: tickets/handler/apply_application.py:55
 msgid "Applied application group"
 msgstr "申请的应用组"
 
-#: tickets/handler/apply_application.py:55 tickets/handler/apply_asset.py:48
+#: tickets/handler/apply_application.py:56 tickets/handler/apply_asset.py:52
 msgid "Applied system user group"
 msgstr "申请的系统用户组"
 
-#: tickets/handler/apply_application.py:56 tickets/handler/apply_asset.py:50
+#: tickets/handler/apply_application.py:57 tickets/handler/apply_asset.py:54
 msgid "Applied date start"
 msgstr "申请的开始日期"
 
-#: tickets/handler/apply_application.py:57 tickets/handler/apply_asset.py:51
+#: tickets/handler/apply_application.py:58 tickets/handler/apply_asset.py:55
 msgid "Applied date expired"
 msgstr "申请的失效日期"
 
-#: tickets/handler/apply_application.py:79
+#: tickets/handler/apply_application.py:80
 msgid ""
 "Created by the ticket, ticket title: {}, ticket applicant: {}, ticket "
 "processor: {}, ticket ID: {}"
 msgstr ""
 "通过工单创建, 工单标题: {}, 工单申请人: {}, 工单处理人: {}, 工单 ID: {}"
 
-#: tickets/handler/apply_asset.py:47
-msgid "Applied hostname group"
-msgstr "申请的主机名组"
+#: tickets/handler/apply_asset.py:50
+msgid "Applied node group"
+msgstr "申请的节点名称组"
 
-#: tickets/handler/apply_asset.py:49
+#: tickets/handler/apply_asset.py:51
+msgid "Applied hostname group"
+msgstr "申请的主机名称组"
+
+#: tickets/handler/apply_asset.py:53
 msgid "Applied actions"
 msgstr "申请的动作"
 
-#: tickets/handler/apply_asset.py:72
+#: tickets/handler/apply_asset.py:77
 msgid ""
 "Created by the ticket ticket title: {} ticket applicant: {} ticket "
 "processor: {} ticket ID: {}"
@@ -4816,54 +4820,60 @@ msgstr "你的工单已被处理, 处理人 - {}"
 msgid "Ticket has processed - {} ({})"
 msgstr "你的工单已被处理, 处理人 - {} ({})"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:20
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:18
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:18
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:19
 msgid "Apply name"
 msgstr "应用名称"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:39
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:37
 msgid "Apply applications"
 msgstr "申请应用"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:44
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:42
 msgid "Apply applications display"
 msgstr "应用名称名称"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:48
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:46
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:41
 msgid "Apply system users"
-msgstr "系统用户"
+msgstr "申请的系统用户"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:53
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:51
 msgid "Apply system user display"
-msgstr "批准的系统用户名称"
+msgstr "申请的系统用户名称"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:73
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:63
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:71
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:73
 #: tickets/serializers/ticket/ticket.py:127
 msgid "Permission named `{}` already exists"
 msgstr "授权名称 `{}` 已存在"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:90
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:71
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:88
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:87
 msgid "The expiration date should be greater than the start date"
 msgstr "过期时间要大于开始时间"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:22
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:14
+msgid "Select at least one asset or node"
+msgstr "资产或者节点至少选择一项"
+
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:23
+msgid "Apply nodes"
+msgstr "申请节点"
+
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:27
+msgid "Apply nodes display"
+msgstr "申请的节点名称"
+
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:32
 msgid "Apply assets"
 msgstr "申请资产"
 
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:26
-msgid "Approve assets display"
-msgstr "批准的资产名称"
-
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:31
-msgid "Approve system users"
-msgstr "批准的系统用户"
-
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:35
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:43
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:36
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:45
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:53
 msgid "Apply assets display"
-msgstr "批准的资产名称"
+msgstr "申请的资产名称"
 
 #: tickets/serializers/ticket/meta/ticket_type/command_confirm.py:12
 msgid "Run user"
@@ -5740,34 +5750,40 @@ msgid "Qingyun Private Cloud"
 msgstr "青云私有云"
 
 #: xpack/plugins/cloud/const.py:19
+#, fuzzy
+#| msgid "Tencent Cloud"
+msgid "OpenStack Cloud"
+msgstr "腾讯云"
+
+#: xpack/plugins/cloud/const.py:20
 msgid "Google Cloud Platform"
 msgstr "谷歌云"
 
-#: xpack/plugins/cloud/const.py:23
+#: xpack/plugins/cloud/const.py:24
 msgid "Instance name"
 msgstr "实例名称"
 
-#: xpack/plugins/cloud/const.py:24
+#: xpack/plugins/cloud/const.py:25
 msgid "Instance name and Partial IP"
 msgstr "实例名称和部分IP"
 
-#: xpack/plugins/cloud/const.py:29
+#: xpack/plugins/cloud/const.py:30
 msgid "Succeed"
 msgstr "成功"
 
-#: xpack/plugins/cloud/const.py:33
+#: xpack/plugins/cloud/const.py:34
 msgid "Unsync"
 msgstr "未同步"
 
-#: xpack/plugins/cloud/const.py:34
+#: xpack/plugins/cloud/const.py:35
 msgid "New Sync"
 msgstr "新同步"
 
-#: xpack/plugins/cloud/const.py:35
+#: xpack/plugins/cloud/const.py:36
 msgid "Synced"
 msgstr "已同步"
 
-#: xpack/plugins/cloud/const.py:36
+#: xpack/plugins/cloud/const.py:37
 msgid "Released"
 msgstr "已释放"
 
@@ -5999,28 +6015,40 @@ msgstr ""
 msgid "AccessKey Secret"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:23
+#: xpack/plugins/cloud/serializers/account_attrs.py:31
 msgid "Client ID"
 msgstr "客户端 ID"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:29
+#: xpack/plugins/cloud/serializers/account_attrs.py:37
 msgid "Tenant ID"
 msgstr "租户 ID"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:32
+#: xpack/plugins/cloud/serializers/account_attrs.py:40
 msgid "Subscription ID"
 msgstr "订阅 ID"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:87
-#: xpack/plugins/cloud/serializers/account_attrs.py:92
+#: xpack/plugins/cloud/serializers/account_attrs.py:91
+#: xpack/plugins/cloud/serializers/account_attrs.py:96
 msgid "API Endpoint"
 msgstr "API 端点"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:98
+#: xpack/plugins/cloud/serializers/account_attrs.py:101
+#, fuzzy
+#| msgid "Target url"
+msgid "auth url"
+msgstr "目标URL"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:103
+#, fuzzy
+#| msgid "Domain name"
+msgid "user domain name"
+msgstr "网域名称"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:110
 msgid "Service account key"
 msgstr "账户密钥"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:99
+#: xpack/plugins/cloud/serializers/account_attrs.py:111
 msgid "The file is in JSON format"
 msgstr "JSON 格式的文件"
 
