@@ -24,7 +24,7 @@ class PermissionTreeMixin:
     get_permissions: Callable
 
     @classmethod
-    def create_apps_tree_nodes(cls, all_permissions, permissions):
+    def _create_apps_tree_nodes(cls, all_permissions, permissions):
         app_counts = all_permissions.values('app').order_by('app').annotate(count=Count('app'))
         app_checked_counts = permissions.values('app').order_by('app').annotate(count=Count('app'))
         app_checked_counts_mapper = {i['app']: i['count'] for i in app_checked_counts}
@@ -60,7 +60,7 @@ class PermissionTreeMixin:
         return nodes
 
     @classmethod
-    def create_models_tree_nodes(cls, all_permissions, permissions):
+    def _create_models_tree_nodes(cls, all_permissions, permissions):
         content_types = ContentType.objects.all()
 
         model_counts = all_permissions \
@@ -90,7 +90,8 @@ class PermissionTreeMixin:
             name = f'{ct.name}({check_counts}/{total_counts})'
             node = TreeNode(**{
                 'id': model_id,
-                'name': name + "||" + ct.model,
+                'name': name,
+                # 'name': name + "||" + ct.model,
                 'title': name,
                 'pId': ct.app_label,
                 'isParent': True,
@@ -134,7 +135,7 @@ class PermissionTreeMixin:
         return name
 
     @classmethod
-    def create_permissions_tree_nodes(cls, all_permissions, permissions):
+    def _create_permissions_tree_nodes(cls, all_permissions, permissions):
         permissions_id = permissions.values_list('id', flat=True)
         nodes = []
         content_types = ContentType.objects.all()
@@ -147,7 +148,7 @@ class PermissionTreeMixin:
                 'id': p.id,
                 'name': name,
                 'title': p.name,
-                'pId': f'{model_id}',
+                'pId': model_id,
                 'isParent': False,
                 'iconSkin': 'file',
                 'checked': p.id in permissions_id,
@@ -160,7 +161,7 @@ class PermissionTreeMixin:
         return nodes
 
     @staticmethod
-    def create_root_tree_node(all_permissions, permissions):
+    def _create_root_tree_node(all_permissions, permissions):
         total_counts = all_permissions.count()
         check_counts = permissions.count()
         node = TreeNode(**{
@@ -186,10 +187,10 @@ class PermissionTreeMixin:
                 .annotate(model=F('content_type__model'))
 
         all_permissions, permissions = perms_using
-        nodes = [cls.create_root_tree_node(all_permissions, permissions)]
-        apps_nodes = cls.create_apps_tree_nodes(all_permissions, permissions)
-        models_nodes = cls.create_models_tree_nodes(all_permissions, permissions)
-        permissions_nodes = cls.create_permissions_tree_nodes(all_permissions, permissions)
+        nodes = [cls._create_root_tree_node(all_permissions, permissions)]
+        apps_nodes = cls._create_apps_tree_nodes(all_permissions, permissions)
+        models_nodes = cls._create_models_tree_nodes(all_permissions, permissions)
+        permissions_nodes = cls._create_permissions_tree_nodes(all_permissions, permissions)
 
         nodes += apps_nodes + models_nodes + permissions_nodes
         return nodes
@@ -199,6 +200,7 @@ class Permission(DjangoPermission, PermissionTreeMixin):
     """ 权限类 """
     class Meta:
         proxy = True
+        verbose_name = _('Permission')
 
     @property
     def app_label_codename(self):
@@ -237,6 +239,7 @@ class ExtraPermission(models.Model):
 
     class Meta:
         default_permissions = []
+        verbose_name = _('Extra permission')
         permissions = [
             ('view_adminview', _('Can view admin view')),
             ('view_auditview', _('Can view audit view')),

@@ -37,6 +37,10 @@ class Role(JMSModel):
 
     class Meta:
         unique_together = [('name', 'scope')]
+        permissions = (
+            ('view_rolepermissions', 'Can view role permissions'),
+            ('change_rolepermissions', 'Can change role permissions'),
+        )
         verbose_name = _('Role')
 
     def get_permissions(self):

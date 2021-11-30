@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-29 19:01+0800\n"
+"POT-Creation-Date: 2021-11-30 14:37+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -114,10 +114,8 @@ msgid "User"
 msgstr "用户"
 
 #: acls/models/login_acl.py:35
-#, fuzzy
-#| msgid "Login log"
 msgid "Login acl"
-msgstr "登录日志"
+msgstr "登录 ACL"
 
 #: acls/models/login_asset_acl.py:17 authentication/models.py:78
 #: tickets/const.py:9
@@ -138,7 +136,7 @@ msgstr "系统用户"
 #: users/templates/users/user_asset_permission.html:40
 #: users/templates/users/user_asset_permission.html:70
 #: xpack/plugins/change_auth_plan/models/asset.py:195
-#: xpack/plugins/cloud/models.py:217
+#: xpack/plugins/cloud/models.py:220
 msgid "Asset"
 msgstr "资产"
 
@@ -148,10 +146,8 @@ msgid "Reviewers"
 msgstr "审批人"
 
 #: acls/models/login_asset_acl.py:40
-#, fuzzy
-#| msgid "Login asset"
 msgid "Login asset acl"
-msgstr "登录资产"
+msgstr "登录资产 ACL"
 
 #: acls/models/login_asset_acl.py:90 tickets/const.py:12
 msgid "Login asset confirm"
@@ -1076,7 +1072,7 @@ msgstr "日志审计"
 
 #: audits/models.py:26 audits/models.py:56
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/models/permission.py:113
+#: rbac/models/permission.py:114
 #: users/templates/users/user_asset_permission.html:128
 #: users/templates/users/user_database_app_permission.html:111
 msgid "Delete"
@@ -1134,18 +1130,16 @@ msgid "Date start"
 msgstr "开始日期"
 
 #: audits/models.py:46
-#, fuzzy
-#| msgid "File manager"
 msgid "File transfer log"
-msgstr "文件管理"
+msgstr "文件传输日志"
 
 #: audits/models.py:54
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/models/permission.py:110
+#: rbac/models/permission.py:111
 msgid "Create"
 msgstr "创建"
 
-#: audits/models.py:55 rbac/models/permission.py:112
+#: audits/models.py:55 rbac/models/permission.py:113
 #: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
 #: users/templates/users/user_asset_permission.html:127
 #: users/templates/users/user_database_app_permission.html:110
@@ -1165,20 +1159,16 @@ msgid "Datetime"
 msgstr "日期"
 
 #: audits/models.py:75
-#, fuzzy
-#| msgid "Operate"
 msgid "Operate log"
-msgstr "操作"
+msgstr "操作日志"
 
 #: audits/models.py:81
 msgid "Change by"
 msgstr "修改者"
 
 #: audits/models.py:89
-#, fuzzy
-#| msgid "Password change log"
 msgid "Password change log"
-msgstr "改密日志"
+msgstr "密码更新日志"
 
 #: audits/models.py:104
 msgid "Disabled"
@@ -1226,7 +1216,7 @@ msgstr "原因"
 
 #: audits/models.py:121 terminal/models/status.py:33
 #: tickets/models/ticket.py:60 xpack/plugins/cloud/models.py:172
-#: xpack/plugins/cloud/models.py:221
+#: xpack/plugins/cloud/models.py:224
 msgid "Status"
 msgstr "状态"
 
@@ -1239,10 +1229,8 @@ msgid "Authentication backend"
 msgstr "认证方式"
 
 #: audits/models.py:158
-#, fuzzy
-#| msgid "Only exist user login"
 msgid "User login log"
-msgstr "仅已存在用户登录"
+msgstr "用户登录日志"
 
 #: audits/serializers.py:14
 msgid "Operate display"
@@ -1465,7 +1453,7 @@ msgstr "{ApplicationPermission} 移除 {UserGroup}"
 
 #: audits/signals_handler.py:157 perms/models/application_permission.py:37
 msgid "Application permission"
-msgstr "应用管理"
+msgstr "应用授权"
 
 #: audits/signals_handler.py:158
 #, python-brace-format
@@ -1531,7 +1519,7 @@ msgstr ""
 
 #: authentication/backends/api.py:116
 msgid "Expired, more than 15 minutes"
-msgstr ""
+msgstr "已过期，超过 15 分钟"
 
 #: authentication/backends/api.py:123
 msgid "User disabled."
@@ -1736,10 +1724,8 @@ msgid "Expired"
 msgstr "过期时间"
 
 #: authentication/models.py:106
-#, fuzzy
-#| msgid "Private Token"
 msgid "SSO token"
-msgstr "SSH密钥"
+msgstr "SSO Token"
 
 #: authentication/sms_verify_code.py:17
 msgid "The verification code has expired. Please resend it"
@@ -2400,10 +2386,8 @@ msgid "Adhoc result summary"
 msgstr "汇总"
 
 #: ops/models/adhoc.py:330
-#, fuzzy
-#| msgid "Command execution"
 msgid "AdHoc execution"
-msgstr "命令执行"
+msgstr "任务执行"
 
 #: ops/models/command.py:31
 msgid "Date finished"
@@ -2639,19 +2623,27 @@ msgstr "系统用户名称"
 msgid "RBAC"
 msgstr "角色管理"
 
-#: rbac/models/permission.py:111
+#: rbac/models/permission.py:112
 msgid "View"
 msgstr "查看"
 
-#: rbac/models/permission.py:241
+#: rbac/models/permission.py:203
+msgid "Permission"
+msgstr "权限"
+
+#: rbac/models/permission.py:242
+msgid "Extra permission"
+msgstr "其它权限"
+
+#: rbac/models/permission.py:244
 msgid "Can view admin view"
 msgstr "查看管理视图"
 
-#: rbac/models/permission.py:242
+#: rbac/models/permission.py:245
 msgid "Can view audit view"
 msgstr "查看审计视图"
 
-#: rbac/models/permission.py:243
+#: rbac/models/permission.py:246
 msgid "Can view user view"
 msgstr "查看用户视图"
 
@@ -2706,7 +2698,7 @@ msgid "Imported {} users successfully (Organization: {})"
 msgstr "成功导入 {} 个用户 ( 组织: {} )"
 
 #: settings/api/public.py:41 xpack/plugins/interface/api.py:18
-#: xpack/plugins/interface/models.py:36
+#: xpack/plugins/interface/models.py:39
 msgid "Welcome to the JumpServer open source Bastion Host"
 msgstr "欢迎使用JumpServer开源堡垒机"
 
@@ -3950,10 +3942,8 @@ msgid "Storage is invalid"
 msgstr "存储无效"
 
 #: terminal/models/command.py:24
-#, fuzzy
-#| msgid "Command confirm"
 msgid "Command record"
-msgstr "命令复核"
+msgstr "命令记录"
 
 #: terminal/models/session.py:44 terminal/models/sharing.py:84
 msgid "Login from"
@@ -3968,10 +3958,8 @@ msgid "Date end"
 msgstr "结束日期"
 
 #: terminal/models/session.py:214
-#, fuzzy
-#| msgid "Session share"
 msgid "Session record"
-msgstr "会话分享"
+msgstr "会话记录"
 
 #: terminal/models/sharing.py:22
 msgid "Creator"
@@ -4015,10 +4003,8 @@ msgid "Finished"
 msgstr "结束"
 
 #: terminal/models/sharing.py:99
-#, fuzzy
-#| msgid "Session online"
 msgid "Session join record"
-msgstr "在线会话"
+msgstr "会话加入记录"
 
 #: terminal/models/sharing.py:115
 msgid "Invalid verification code"
@@ -4248,7 +4234,7 @@ msgstr "Secret key"
 msgid "Endpoint"
 msgstr "端点"
 
-#: terminal/serializers/storage.py:66 xpack/plugins/cloud/models.py:214
+#: terminal/serializers/storage.py:66 xpack/plugins/cloud/models.py:217
 msgid "Region"
 msgstr "地域"
 
@@ -4521,10 +4507,8 @@ msgid "Ticket flow"
 msgstr "工单流程"
 
 #: tickets/models/ticket.py:30
-#, fuzzy
-#| msgid "Ticket type"
 msgid "Ticket step"
-msgstr "工单类型"
+msgstr "工单步骤"
 
 #: tickets/models/ticket.py:41
 msgid "Ticket assignee"
@@ -4559,10 +4543,8 @@ msgid "TicketFlow"
 msgstr "工单流程"
 
 #: tickets/models/ticket.py:82
-#, fuzzy
-#| msgid "Tickets"
 msgid "Ticket"
-msgstr "工单管理"
+msgstr "工单"
 
 #: tickets/notifications.py:57
 msgid "click here to review"
@@ -4845,10 +4827,8 @@ msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
 #: users/models/user.py:780
-#, fuzzy
-#| msgid "User password expiration"
 msgid "User password history"
-msgstr "用户密码过期时间"
+msgstr "用户密码历史"
 
 #: users/notifications.py:19 users/notifications.py:52
 #: users/templates/users/reset_password.html:5
@@ -5736,7 +5716,6 @@ msgid "The parameter 'action' must be [{}]"
 msgstr "参数 'action' 必须是 [{}]"
 
 #: xpack/plugins/change_auth_plan/meta.py:9
-#: xpack/plugins/change_auth_plan/models/asset.py:63
 #: xpack/plugins/change_auth_plan/models/asset.py:119
 msgid "Change auth plan"
 msgstr "改密计划"
@@ -5744,7 +5723,7 @@ msgstr "改密计划"
 #: xpack/plugins/change_auth_plan/models/app.py:41
 #: xpack/plugins/change_auth_plan/models/app.py:90
 msgid "Application change auth plan"
-msgstr "应用改密计划执行"
+msgstr "应用改密计划"
 
 #: xpack/plugins/change_auth_plan/models/app.py:94
 #: xpack/plugins/change_auth_plan/models/app.py:146
@@ -5757,7 +5736,7 @@ msgstr "应用"
 
 #: xpack/plugins/change_auth_plan/models/app.py:151
 msgid "Application change auth plan task"
-msgstr "用用改密计划任务"
+msgstr "应用改密计划子任务"
 
 #: xpack/plugins/change_auth_plan/models/asset.py:30
 msgid "Append SSH KEY"
@@ -5776,14 +5755,21 @@ msgstr "替换 (由 JumpServer 生成的密钥)"
 msgid "SSH Key strategy"
 msgstr "SSH 密钥策略"
 
+#: xpack/plugins/change_auth_plan/models/asset.py:63
+msgid "Asset change auth plan"
+msgstr "资产改密计划"
+
 #: xpack/plugins/change_auth_plan/models/asset.py:130
+msgid "Asset change auth plan execution"
+msgstr "资产改密计划执行"
+
 #: xpack/plugins/change_auth_plan/models/asset.py:206
 msgid "Change auth plan execution"
 msgstr "改密计划执行"
 
 #: xpack/plugins/change_auth_plan/models/asset.py:213
-msgid "Change auth plan task"
-msgstr "改密计划任务"
+msgid "Asset change auth plan task"
+msgstr "资产改密计划子任务"
 
 #: xpack/plugins/change_auth_plan/models/base.py:24
 msgid "Custom password"
@@ -6006,21 +5992,29 @@ msgstr "最后同步日期"
 msgid "Sync instance task"
 msgstr "同步实例任务"
 
-#: xpack/plugins/cloud/models.py:179 xpack/plugins/cloud/models.py:224
+#: xpack/plugins/cloud/models.py:179 xpack/plugins/cloud/models.py:227
 msgid "Date sync"
 msgstr "同步日期"
 
-#: xpack/plugins/cloud/models.py:204
+#: xpack/plugins/cloud/models.py:183
+msgid "Sync instance task execution"
+msgstr "同步实例任务执行"
+
+#: xpack/plugins/cloud/models.py:207
 msgid "Sync task"
 msgstr "同步任务"
 
-#: xpack/plugins/cloud/models.py:208
+#: xpack/plugins/cloud/models.py:211
 msgid "Sync instance task history"
 msgstr "同步实例任务历史"
 
-#: xpack/plugins/cloud/models.py:211
+#: xpack/plugins/cloud/models.py:214
 msgid "Instance"
 msgstr "实例"
+
+#: xpack/plugins/cloud/models.py:231
+msgid "Sync instance detail"
+msgstr "同步实例详情"
 
 #: xpack/plugins/cloud/providers/aws_international.py:17
 msgid "China (Beijing)"
@@ -6287,6 +6281,10 @@ msgstr "管理页面logo"
 #: xpack/plugins/interface/models.py:31
 msgid "Logo of logout page"
 msgstr "退出页面logo"
+
+#: xpack/plugins/interface/models.py:35
+msgid "Interface setting"
+msgstr "界面设置"
 
 #: xpack/plugins/license/api.py:37
 msgid "License import successfully"

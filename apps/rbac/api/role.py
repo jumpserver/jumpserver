@@ -1,13 +1,10 @@
 from django.db.models import Count
-from django.shortcuts import get_object_or_404
-from rest_framework.response import Response
-from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
+from django.utils.translation import ugettext as _
 
-from common.tree import TreeNodeSerializer
 from common.drf.api import JMSModelViewSet
-from common.permissions import IsSuperUser, IsOrgAdmin
 from ..serializers import RoleSerializer, RoleBindingSerializer
-from ..models import Role, RoleBinding, Permission
+from ..models import Role, RoleBinding
 from .permission import PermissionViewSet
 
 __all__ = ['RoleViewSet', 'RoleBindingViewSet', 'RolePermissionsViewSet']
@@ -16,19 +13,23 @@ __all__ = ['RoleViewSet', 'RoleBindingViewSet', 'RolePermissionsViewSet']
 class RoleViewSet(JMSModelViewSet):
     queryset = Role.objects.all()
     serializer_classes = {
-        'get_tree': TreeNodeSerializer,
         'default': RoleSerializer
     }
     filterset_fields = ['name', 'scope', 'builtin']
     search_fields = filterset_fields
-    permission_classes = (IsSuperUser, )
 
-    @action(methods=['GET'], detail=False, url_path='tree')
-    def get_tree(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset()).distinct()
-        tree_nodes = Permission.create_tree_nodes(queryset, scope=self.scope)
-        serializer = self.get_serializer(tree_nodes, many=True)
-        return Response(serializer.data)
+    def perform_destroy(self, instance):
+        if instance.builtin:
+            error = _("Internal role, can't be destroy")
+            raise PermissionDenied(error)
+        return super().perform_destroy(instance)
+
+    def perform_update(self, serializer):
+        instance = serializer.instance
+        if instance.builtin:
+            error = _("Internal role, can't be update")
+            raise PermissionDenied(error)
+        return super().perform_update(serializer)
 
     def get_queryset(self):
         queryset = super().get_queryset()\
@@ -42,16 +43,22 @@ class RoleBindingViewSet(JMSModelViewSet):
     serializer_class = RoleBindingSerializer
     filterset_fields = ['scope', 'user', 'role', 'org']
     search_fields = filterset_fields
-    permission_classes = (IsOrgAdmin, )
 
 
 class RolePermissionsViewSet(PermissionViewSet):
+    action_perms_map = {
+        'list': 'role.view_rolepermissions',
+        'retrieve': 'role.view_rolepermissions',
+        'get_tree': 'role.view_rolepermissions',
+        'update': 'role.change_rolepermissions',
+        'destroy': 'role.delete_rolepermissions',
+    }
+
+    http_method_names = ['get', 'option']
+
     def get_queryset(self):
-        print("Kwargs: ", self.kwargs)
         role_id = self.kwargs.get('role_pk')
-        print("roleId: ", role_id)
         role = Role.objects.get(id=role_id)
-        # role = get_object_or_404(Role, pk=role_id)
         self.scope = role.scope
         queryset = role.get_permissions()\
             .prefetch_related('content_type')

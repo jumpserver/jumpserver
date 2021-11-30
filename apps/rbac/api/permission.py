@@ -4,7 +4,6 @@ from django.shortcuts import get_object_or_404
 
 from common.tree import TreeNodeSerializer
 from common.drf.api import JMSModelViewSet
-from common.permissions import IsOrgAdmin
 from ..models import Permission, Role
 from ..serializers import PermissionSerializer
 
@@ -17,8 +16,8 @@ class PermissionViewSet(JMSModelViewSet):
         'get_tree': TreeNodeSerializer,
         'default': PermissionSerializer
     }
-    permission_classes = (IsOrgAdmin, )
     scope = 'org'
+    http_method_names = ['get', 'option', 'head']
 
     @action(methods=['GET'], detail=False, url_path='tree')
     def get_tree(self, request, *args, **kwargs):

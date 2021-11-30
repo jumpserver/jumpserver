@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.utils.translation import ugettext_lazy as _
 
 from ..models import Role, RoleBinding
 
@@ -17,7 +18,8 @@ class RoleSerializer(serializers.ModelSerializer):
             'comment', 'permissions'
         ]
         extra_kwargs = {
-            'permissions': {'write_only': True}
+            'permissions': {'write_only': True},
+            'users_amount': {'label': _('Users amount')}
         }
 
 
