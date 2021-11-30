@@ -13,6 +13,7 @@ from django.db.models.signals import m2m_changed
 from common.const.http import POST
 from common.exceptions import SomeoneIsDoingThis
 from common.const.signals import PRE_REMOVE, POST_REMOVE
+from common.mixins.api import SuggestionMixin
 from assets.models import Asset
 from common.utils import get_logger, get_object_or_none
 from common.tree import TreeNodeSerializer
@@ -41,7 +42,7 @@ __all__ = [
 ]
 
 
-class NodeViewSet(OrgModelViewSet):
+class NodeViewSet(SuggestionMixin, OrgModelViewSet):
     model = Node
     filterset_fields = ('value', 'key', 'id')
     search_fields = ('value', )
