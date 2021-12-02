@@ -21,5 +21,5 @@ class Migration(migrations.Migration):
         migrations.AlterModelOptions(
             name='role',
             options={'verbose_name': 'Role'},
-        ),
+        )
     ]

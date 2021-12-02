@@ -5,7 +5,6 @@ from common.db.models import JMSModel
 from common.utils import lazyproperty
 from .permission import Permission
 from .. import const
-from ..const import Scope
 
 __all__ = ['Role']
 
@@ -27,6 +26,8 @@ class Role(JMSModel):
     )
     builtin = models.BooleanField(default=False, verbose_name=_('Built-in'))
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
+
+    BuiltinRole = const.BuiltinRole
 
     system_admin_name = 'SystemAdmin'
     org_admin_name = 'OrgAdmin'
@@ -66,19 +67,4 @@ class Role(JMSModel):
 
     @classmethod
     def create_builtin_roles(cls):
-        roles = [
-            (cls.system_admin_name, Scope.system, []),
-            (cls.system_auditor_name, Scope.system, const.auditor_permissions),
-            (cls.app_name, Scope.system, const.app_permissions),
-            (cls.org_admin_name, Scope.org, []),
-            (cls.org_auditor_name, Scope.org, const.auditor_permissions),
-            (cls.org_user_name, Scope.org, []),
-        ]
-        for name, scope, permissions_define in roles:
-            permissions = Permission.get_permissions(scope)
-            q = Permission.get_define_permissions_q(permissions_define)
-            permissions = permissions.filter(q)
-
-            defaults = {'scope': scope, 'builtin': True, 'name': name}
-            role, created = cls.objects.update_or_create(defaults, name=name)
-            role.permissions.set(permissions)
+        const.BuiltinRole.sync_to_db(cls)

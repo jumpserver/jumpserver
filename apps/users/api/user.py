@@ -14,7 +14,10 @@ from orgs.utils import current_org
 from orgs.models import OrganizationMember
 from users.utils import LoginBlockUtil, MFABlockUtils
 from .. import serializers
-from ..serializers import UserSerializer, UserRetrieveSerializer, MiniUserSerializer, InviteSerializer
+from ..serializers import (
+    UserSerializer, UserRetrieveSerializer,
+    MiniUserSerializer, InviteSerializer
+)
 from .mixins import UserQuerysetMixin
 from ..models import User
 from ..signals import post_user_create
@@ -40,23 +43,18 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
     }
 
     def get_queryset(self):
-        queryset = super().get_queryset().prefetch_related(
-            'groups'
-        )
+        queryset = super().get_queryset().prefetch_related('groups')
         if not current_org.is_root():
             # 为在列表中计算用户在真实组织里的角色
+            member_queryset = OrganizationMember.objects.filter(org__id=current_org.id)
             queryset = queryset.prefetch_related(
-                Prefetch(
-                    'm2m_org_members',
-                    queryset=OrganizationMember.objects.filter(org__id=current_org.id)
-                )
-            )
+                Prefetch('m2m_org_members', queryset=member_queryset)
+            ).filter(m2m_org_members__id=current_org.id)
         return queryset
 
     @staticmethod
     def get_serializer_roles(serializer):
         roles_map = {str(role.id): role for role in Role.objects.all()}
-
         validated_data = serializer.validated_data
 
         if isinstance(validated_data, list):

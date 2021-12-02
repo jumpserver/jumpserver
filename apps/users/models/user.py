@@ -245,7 +245,7 @@ class RoleMixin:
     @property
     def is_superuser(self):
         from rbac.models import Role
-        role = Role.get_builtin_role(name=Role.system_admin_name, scope=Role.Scope.system)
+        role = Role.BuiltinRole.system_admin.get_role()
         return role in self.system_roles
 
     @property
