@@ -1,0 +1,15 @@
+name: Issue Open Check
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  issue-open-add-labels:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add labels
+        uses: actions-cool/issues-helper@v2
+        with:
+          actions: 'add-labels'
+          labels: '状态:待处理'

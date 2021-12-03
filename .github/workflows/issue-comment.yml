@@ -1,0 +1,20 @@
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  add-label-if-is-author:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.comment.pull_request.user.id == github.event.comment.user.id }}
+    steps:
+      - name: Add require handle label
+        uses: actions-cool/issues-helper@v2
+        with:
+          actions: 'add-labels'
+          labels: '状态:待处理'
+
+      - name: Remove require reply label
+        uses: actions-cool/issues-helper@v2
+        with:
+          actions: 'remove-labels'
+          labels: '状态:待反馈'
