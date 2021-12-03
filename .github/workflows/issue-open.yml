@@ -10,6 +10,7 @@ jobs:
     steps:
       - name: Add labels
         uses: actions-cool/issues-helper@v2
+        if: ${{ !github.event.comment.pull_request.pull_request }}
         with:
           actions: 'add-labels'
           labels: '状态:待处理'
