@@ -1,0 +1,15 @@
+on:
+  schedule:
+    - cron: "0 9 * * 1"
+
+jobs:
+  check-inactive-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check inactive issues and send msg
+        uses: jumpserver/action-issues-alert@master
+        with:
+          hook: ${{ secrets.WECHAT_GROUP_WEB_HOOK }}
+          type: inactive
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
