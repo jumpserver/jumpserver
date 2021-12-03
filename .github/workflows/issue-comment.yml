@@ -5,7 +5,7 @@ on:
 jobs:
   add-label-if-is-author:
     runs-on: ubuntu-latest
-    if: ${{ github.event.comment.pull_request.user.id == github.event.comment.user.id }}
+    if: ${{ github.event.comment.pull_request.user.id == github.event.comment.user.id }} && ${{ !github.event.comment.pull_request.pull_request }}
     steps:
       - name: Add require handle label
         uses: actions-cool/issues-helper@v2
