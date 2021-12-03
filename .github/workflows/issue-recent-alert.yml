@@ -1,0 +1,15 @@
+on:
+  schedule:
+    - cron: "0 9 * * *"
+
+jobs:
+  check-recent-issues-not-handle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check recent issues and send msg
+        uses: jumpserver/action-issues-alert@master
+        with:
+          hook: ${{ secrets.WECHAT_GROUP_WEB_HOOK }}
+          type: recent
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
