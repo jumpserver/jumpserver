@@ -49,7 +49,7 @@ class DistributedLock(RedisLock):
         else:
             auto_renewal = False
 
-        super().__init__(redis_client=redis, name=name, expire=expire, auto_renewal=auto_renewal)
+        super().__init__(redis_client=redis, name='{'+name+'}', expire=expire, auto_renewal=auto_renewal)
         self._release_on_transaction_commit = release_on_transaction_commit
         self._release_raise_exc = release_raise_exc
         self._reentrant = reentrant
