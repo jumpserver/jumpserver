@@ -576,6 +576,9 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     public_key = fields.EncryptTextField(
         blank=True, null=True, verbose_name=_('Public key')
     )
+    secret_key = fields.EncryptCharField(
+        max_length=256, blank=True, null=True, verbose_name=_('Secret key')
+    )
     comment = models.TextField(
         blank=True, null=True, verbose_name=_('Comment')
     )

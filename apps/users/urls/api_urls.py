@@ -22,6 +22,7 @@ router.register(r'connection-token', auth_api.UserConnectionTokenViewSet, 'conne
 urlpatterns = [
     path('profile/', api.UserProfileApi.as_view(), name='user-profile'),
     path('profile/password/', api.UserPasswordApi.as_view(), name='user-password'),
+    path('profile/secret-key/', api.UserSecretKeyApi.as_view(), name='user-secret-key'),
     path('profile/public-key/', api.UserPublicKeyApi.as_view(), name='user-public-key'),
     path('profile/mfa/reset/', api.UserResetMFAApi.as_view(), name='my-mfa-reset'),
     path('users/<uuid:pk>/mfa/reset/', api.UserResetMFAApi.as_view(), name='user-reset-mfa'),
