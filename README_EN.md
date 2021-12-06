@@ -2,13 +2,13 @@
 <h3 align="center">Open Source Bastion Host</h3>
 
 <p align="center">
-  <a href="https://www.gnu.org/licenses/gpl-3.0.html"><img src="https://shields.io/github/license/jumpserver/jumpserver" alt="License: GPL v2"></a>
+  <a href="https://www.gnu.org/licenses/gpl-3.0.html"><img src="https://img.shields.io/github/license/jumpserver/jumpserver" alt="License: GPLv3"></a>
   <a href="https://shields.io/github/downloads/jumpserver/jumpserver/total"><img src="https://shields.io/github/downloads/jumpserver/jumpserver/total" alt=" release"></a>
   <a href="https://hub.docker.com/u/jumpserver"><img src="https://img.shields.io/docker/pulls/jumpserver/jms_all.svg" alt="Codacy"></a>
   <a href="https://github.com/jumpserver/jumpserver"><img src="https://img.shields.io/github/stars/jumpserver/jumpserver?color=%231890FF&style=flat-square" alt="Stars"></a>
 </p>
 
-JumpServer is the world's first open-source Bastion Host and is licensed under the GNU GPL v2.0. It is a 4A-compliant professional operation and maintenance security audit system.
+JumpServer is the world's first open-source Bastion Host and is licensed under the GPLv3. It is a 4A-compliant professional operation and maintenance security audit system.
 
 JumpServer uses Python / Django for development, follows Web 2.0 specifications, and is equipped with an industry-leading Web Terminal solution that provides a beautiful user interface and great user experience
 
@@ -92,3 +92,4 @@ Licensed under The GNU General Public License version 3 (GPLv3)  (the "License")
 https://www.gnu.org/licenses/gpl-3.0.htmll
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+
