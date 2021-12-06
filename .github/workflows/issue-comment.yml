@@ -2,6 +2,8 @@ on:
   issue_comment:
     types: [created]
 
+name: Add issues workflow labels
+
 jobs:
   add-label-if-is-author:
     runs-on: ubuntu-latest

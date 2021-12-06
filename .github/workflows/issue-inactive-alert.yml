@@ -2,6 +2,8 @@ on:
   schedule:
     - cron: "0 9 * * 1"
 
+name: Check inactive issues
+
 jobs:
   check-inactive-issues:
     runs-on: ubuntu-latest
