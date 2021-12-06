@@ -8,7 +8,7 @@
   <a href="https://github.com/jumpserver/jumpserver"><img src="https://img.shields.io/github/stars/jumpserver/jumpserver?color=%231890FF&style=flat-square" alt="Stars"></a>
 </p>
 
-JumpServer is the world's first open-source Bastion Host and is licensed under the GNU GPL v2.0. It is a 4A-compliant professional operation and maintenance security audit system.
+JumpServer is the world's first open-source Bastion Host and is licensed under the GPLv3. It is a 4A-compliant professional operation and maintenance security audit system.
 
 JumpServer uses Python / Django for development, follows Web 2.0 specifications, and is equipped with an industry-leading Web Terminal solution that provides a beautiful user interface and great user experience
 
