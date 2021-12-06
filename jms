@@ -113,7 +113,6 @@ def compile_i81n_file():
 def upgrade_db():
     collect_static()
     perform_db_migrate()
-    collect_static()
 
 
 def prepare():
