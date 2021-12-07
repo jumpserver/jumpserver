@@ -1,6 +1,6 @@
 on:
   schedule:
-    - cron: "0 9 * * *"
+    - cron: "0 1 * * *"
 
 name: Check recent handle issues
 
