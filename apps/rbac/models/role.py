@@ -1,9 +1,10 @@
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, gettext
 from django.db import models
 
 from common.db.models import JMSModel
 from common.utils import lazyproperty
 from .permission import Permission
+from ..builtin import BuiltinRole
 from .. import const
 
 __all__ = ['Role']
@@ -27,14 +28,7 @@ class Role(JMSModel):
     builtin = models.BooleanField(default=False, verbose_name=_('Built-in'))
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
 
-    BuiltinRole = const.BuiltinRole
-
-    system_admin_name = 'SystemAdmin'
-    org_admin_name = 'OrgAdmin'
-    system_auditor_name = 'SystemAuditor'
-    org_auditor_name = 'OrgAuditor'
-    org_user_name = 'OrgUser'
-    app_name = 'App'
+    BuiltinRole = BuiltinRole
 
     class Meta:
         unique_together = [('name', 'scope')]
@@ -44,7 +38,7 @@ class Role(JMSModel):
         return '%s(%s)' % (self.name, self.get_scope_display())
 
     def get_permissions(self):
-        admin_names = [self.system_admin_name, self.org_admin_name]
+        admin_names = [self.BuiltinRole.org_admin.name, self.BuiltinRole.system_admin.name]
 
         if self.builtin and self.name in admin_names:
             permissions = Permission.objects.all()
@@ -67,4 +61,8 @@ class Role(JMSModel):
 
     @classmethod
     def create_builtin_roles(cls):
-        const.BuiltinRole.sync_to_db(cls)
+        const.BuiltinRole.sync_to_db()
+
+    @property
+    def name_display(self):
+        return gettext(self.name)

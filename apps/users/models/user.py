@@ -531,7 +531,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         blank=True, verbose_name=_('User group')
     )
     role = models.CharField(
-        choices=RoleMixin.ROLE.choices, default='User', max_length=10,
+        default='User', max_length=10,
         blank=True, verbose_name=_('Role')
     )
     is_app = models.BooleanField(default=False)
