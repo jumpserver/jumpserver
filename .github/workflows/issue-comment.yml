@@ -20,3 +20,19 @@ jobs:
         with:
           actions: 'remove-labels'
           labels: '状态:待反馈'
+
+  add-label-if-not-author:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.comment.pull_request.user.id != github.event.comment.user.id }} && ${{ !github.event.comment.pull_request.pull_request }}
+    steps:
+      - name: Add require replay label
+        uses: actions-cool/issues-helper@v2
+        with:
+          actions: 'add-labels'
+          labels: '状态:待反馈'
+
+      - name: Remove require handle label
+        uses: actions-cool/issues-helper@v2
+        with:
+          actions: 'remove-labels'
+          labels: '状态:待处理'
