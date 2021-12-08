@@ -85,7 +85,7 @@ def upload_session_replay_to_external_storage(session_id):
         logger.error(f'Session replay not found, may be upload error: {local_path}')
         return
     abs_path = default_storage.path(local_path)
-    remote_path = session.generate_rel_path_by_local_path(abs_path)
+    remote_path = session.get_relative_path_by_local_path(abs_path)
     ok, err = server_replay_storage.upload(abs_path, remote_path)
     if not ok:
         logger.error(f'Session replay upload to external error: {err}')

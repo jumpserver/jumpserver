@@ -64,31 +64,33 @@ class Session(OrgModelMixin):
         获取所有可能的本地存储录像文件路径
         :return:
         """
-        return [self.get_local_path_by_suffix(suffix)
+        return [self.get_local_storage_path_by_suffix(suffix)
                 for suffix in self.SUFFIX_MAP.values()]
 
-    def get_all_possible_rel_replay_path(self):
+    def get_all_possible_relative_path(self):
         """
         获取所有可能的外部存储录像文件路径
         :return:
         """
-        return [self.get_rel_replay_path_by_suffix(suffix)
+        return [self.get_relative_path_by_suffix(suffix)
                 for suffix in self.SUFFIX_MAP.values()]
 
-    def get_local_path_by_suffix(self, suffix='.cast.gz'):
+    def get_local_storage_path_by_suffix(self, suffix='.cast.gz'):
         """
+        local_path: replay/2021-12-08/session_id.cast.gz
         通过后缀名获取本地存储的录像文件路径
         :param suffix: .cast.gz | '.replay.gz' | '.gz'
         :return:
         """
-        rel_path = self.get_rel_replay_path_by_suffix(suffix)
+        rel_path = self.get_relative_path_by_suffix(suffix)
         if suffix == '.gz':
             # 兼容 v1 的版本
             return rel_path
         return os.path.join(self.upload_to, rel_path)
 
-    def get_rel_replay_path_by_suffix(self, suffix='.cast.gz'):
+    def get_relative_path_by_suffix(self, suffix='.cast.gz'):
         """
+        relative_path: 2021-12-08/session_id.cast.gz
         通过后缀名获取外部存储录像文件路径
         :param suffix: .cast.gz | '.replay.gz' | '.gz'
         :return:
@@ -96,22 +98,19 @@ class Session(OrgModelMixin):
         date = self.date_start.strftime('%Y-%m-%d')
         return os.path.join(date, str(self.id) + suffix)
 
-    def generate_local_path_by_rel_path(self, rel_path):
-        suffix = self.parse_path_name_suffix(rel_path)
-        return self.get_local_path_by_suffix(suffix)
+    def get_local_path_by_relative_path(self, rel_path):
+        """
+        2021-12-08/session_id.cast.gz
+        :param rel_path:
+        :return: replay/2021-12-08/session_id.cast.gz
+        """
+        return '{}/{}'.format(self.upload_to, rel_path)
 
-    def generate_rel_path_by_local_path(self, local_path):
-        suffix = self.parse_path_name_suffix(local_path)
-        return self.get_rel_replay_path_by_suffix(suffix)
+    def get_relative_path_by_local_path(self, local_path):
+        return local_path.replace('{}/'.format(self.upload_to), '')
 
-    def parse_path_name_suffix(self, path):
-        for suffix in self.DEFAULT_SUFFIXES:
-            if path.endswith(suffix):
-                return suffix
-        return self.SUFFIX_MAP.get(2)
-
-    def get_rel_path_by_storage(self, storage):
-        session_paths = self.get_all_possible_rel_replay_path()
+    def find_ok_relative_path_in_storage(self, storage):
+        session_paths = self.get_all_possible_relative_path()
         for rel_path in session_paths:
             if storage.exists(rel_path):
                 return rel_path
@@ -174,7 +173,7 @@ class Session(OrgModelMixin):
 
     def save_replay_to_storage_with_version(self, f, version=2):
         suffix = self.SUFFIX_MAP.get(version, '.cast.gz')
-        local_path = self.get_local_path_by_suffix(suffix)
+        local_path = self.get_local_storage_path_by_suffix(suffix)
         try:
             name = default_storage.save(local_path, f)
         except OSError as e:
