@@ -1,7 +1,10 @@
 from functools import wraps
 import threading
 
-from redis_lock import Lock as RedisLock, NotAcquired
+from redis_lock import (
+    Lock as RedisLock, NotAcquired, UNLOCK_SCRIPT,
+    EXTEND_SCRIPT, RESET_SCRIPT, RESET_ALL_SCRIPT
+)
 from redis import Redis
 from django.db import transaction
 
@@ -50,6 +53,7 @@ class DistributedLock(RedisLock):
             auto_renewal = False
 
         super().__init__(redis_client=redis, name=name, expire=expire, auto_renewal=auto_renewal)
+        self.register_scripts(redis)
         self._release_on_transaction_commit = release_on_transaction_commit
         self._release_raise_exc = release_raise_exc
         self._reentrant = reentrant
@@ -72,6 +76,13 @@ class DistributedLock(RedisLock):
             with self.__class__(**self.kwargs_copy):
                 return func(*args, **kwds)
         return inner
+
+    @classmethod
+    def register_scripts(cls, redis_client):
+        cls.unlock_script = redis_client.register_script(UNLOCK_SCRIPT)
+        cls.extend_script = redis_client.register_script(EXTEND_SCRIPT)
+        cls.reset_script = redis_client.register_script(RESET_SCRIPT)
+        cls.reset_all_script = redis_client.register_script(RESET_ALL_SCRIPT)
 
     def locked_by_me(self):
         if self.locked():
