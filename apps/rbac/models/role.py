@@ -61,8 +61,10 @@ class Role(JMSModel):
 
     @classmethod
     def create_builtin_roles(cls):
-        const.BuiltinRole.sync_to_db()
+        BuiltinRole.sync_to_db()
 
     @property
     def name_display(self):
+        if not self.builtin:
+            return self.name
         return gettext(self.name)

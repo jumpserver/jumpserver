@@ -2,34 +2,44 @@
 
 from django.db import migrations
 
-from rbac.const import BuiltinRole
+from rbac.builtin import BuiltinRole
 
 
 def migrate_system_role_binding(apps, schema_editor):
-    pass
+    db_alias = schema_editor.connection.alias
+    user_model = apps.get_model('users', 'User')
+    role_binding_model = apps.get_model('rbac', 'RoleBinding')
+    users = user_model.objects.using(db_alias).all()
+
+    role_bindings = []
+    for user in users:
+        role = BuiltinRole.get_system_role_by_old_name(user.role)
+        role_binding = role_binding_model(
+            scope='org',
+            user=user.id,
+            role=role.id,
+        )
+        role_binding.append(role_binding)
+    role_binding_model.objects.bulk_create(role_bindings)
 
 
 def migrate_org_role_binding(apps, schema_editor):
+    db_alias = schema_editor.connection.alias
     org_member_model = apps.get_model('orgs', 'OrganizationMember')
     role_binding_model = apps.get_model('rbac', 'RoleBinding')
-    role_model = apps.get_model('rbac', 'Role')
-    members = org_member_model.objects.all()
+    members = org_member_model.objects.using(db_alias).all()
 
-    role_name_mapper = {role.name: role for role in role_model.objects.all()}
     role_bindings = []
     for member in members:
         role = BuiltinRole.get_org_role_by_old_name(member.role)
         role_binding = role_binding_model(
             scope='org',
-            user=member.user,
+            user=member.user.id,
+            role=role.id,
+            org=member.org.id
         )
         role_binding.append(role_binding)
     role_binding_model.objects.bulk_create(role_bindings)
-
-    # for role_name in ['Admin', 'Auditor', 'User']:
-    #     role_members = members.filter(_role=role_name)
-    #     print("Migrate org role members: {} {}".format(role_name, role_members.count()))
-    #     role_members.update(role=role.ids)
 
 
 class Migration(migrations.Migration):
@@ -39,4 +49,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunPython(migrate_system_role_binding),
+        migrations.RunPython(migrate_org_role_binding)
     ]

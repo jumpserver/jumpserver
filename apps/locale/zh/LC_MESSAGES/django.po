@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-30 14:37+0800\n"
+"POT-Creation-Date: 2021-12-08 11:32+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -100,7 +100,7 @@ msgstr "动作"
 #: audits/models.py:36 audits/models.py:59 audits/models.py:80
 #: audits/serializers.py:93 authentication/models.py:47
 #: authentication/models.py:103 orgs/models.py:17 orgs/models.py:179
-#: perms/models/base.py:45 rbac/models/rolebinding.py:21
+#: perms/models/base.py:45 rbac/builtin.py:68 rbac/models/rolebinding.py:21
 #: templates/index.html:78 terminal/backends/command/models.py:18
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:38
 #: tickets/models/comment.py:17 users/const.py:14 users/models/user.py:190
@@ -1072,7 +1072,7 @@ msgstr "日志审计"
 
 #: audits/models.py:26 audits/models.py:56
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/models/permission.py:114
+#: rbac/models/permission.py:132
 #: users/templates/users/user_asset_permission.html:128
 #: users/templates/users/user_database_app_permission.html:111
 msgid "Delete"
@@ -1135,11 +1135,11 @@ msgstr "文件传输日志"
 
 #: audits/models.py:54
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/models/permission.py:111
+#: rbac/models/permission.py:129
 msgid "Create"
 msgstr "创建"
 
-#: audits/models.py:55 rbac/models/permission.py:113
+#: audits/models.py:55 rbac/models/permission.py:131
 #: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
 #: users/templates/users/user_asset_permission.html:127
 #: users/templates/users/user_database_app_permission.html:110
@@ -2479,7 +2479,7 @@ msgstr "组织审计员"
 msgid "GLOBAL"
 msgstr "全局组织"
 
-#: orgs/models.py:180 rbac/models/role.py:40 rbac/models/rolebinding.py:24
+#: orgs/models.py:180 rbac/models/role.py:35 rbac/models/rolebinding.py:24
 #: users/models/user.py:535 users/templates/users/_select_user_modal.html:15
 msgid "Role"
 msgstr "角色"
@@ -2579,7 +2579,8 @@ msgid "Is expired"
 msgstr "已过期"
 
 #: perms/serializers/application/permission.py:40
-#: perms/serializers/asset/permission.py:70 users/serializers/group.py:34
+#: perms/serializers/asset/permission.py:70 rbac/serializers/role.py:22
+#: users/serializers/group.py:34
 msgid "Users amount"
 msgstr "用户数量"
 
@@ -2619,31 +2620,63 @@ msgstr "节点名称"
 msgid "System users display"
 msgstr "系统用户名称"
 
+#: rbac/api/role.py:23
+msgid "Internal role, can't be destroy"
+msgstr ""
+
+#: rbac/api/role.py:30
+msgid "Internal role, can't be update"
+msgstr ""
+
 #: rbac/apps.py:7
 msgid "RBAC"
 msgstr "角色管理"
 
-#: rbac/models/permission.py:112
+#: rbac/builtin.py:62
+msgid "SystemAdmin"
+msgstr "系统"
+
+#: rbac/builtin.py:65
+msgid "SystemAuditor"
+msgstr "系统审计员"
+
+#: rbac/builtin.py:71 xpack/plugins/change_auth_plan/models/app.py:139
+msgid "App"
+msgstr "应用程序"
+
+#: rbac/builtin.py:74
+msgid "OrgAdmin"
+msgstr "组织管理员"
+
+#: rbac/builtin.py:77
+msgid "OrgAuditor"
+msgstr "日志审计"
+
+#: rbac/builtin.py:80
+msgid "OrgUser"
+msgstr "组织用户"
+
+#: rbac/models/permission.py:130
 msgid "View"
 msgstr "查看"
 
-#: rbac/models/permission.py:203
+#: rbac/models/permission.py:213
 msgid "Permission"
 msgstr "权限"
 
-#: rbac/models/permission.py:242
+#: rbac/models/permission.py:266
 msgid "Extra permission"
 msgstr "其它权限"
 
-#: rbac/models/permission.py:244
+#: rbac/models/permission.py:268
 msgid "Can view admin view"
 msgstr "查看管理视图"
 
-#: rbac/models/permission.py:245
+#: rbac/models/permission.py:269
 msgid "Can view audit view"
 msgstr "查看审计视图"
 
-#: rbac/models/permission.py:246
+#: rbac/models/permission.py:270
 msgid "Can view user view"
 msgstr "查看用户视图"
 
@@ -2662,6 +2695,12 @@ msgstr "角色绑定"
 #: rbac/serializers/permission.py:26 users/serializers/profile.py:104
 msgid "Perms"
 msgstr "权限管理"
+
+#: rbac/serializers/role.py:23
+#, fuzzy
+#| msgid "Nodes display"
+msgid "Name display"
+msgstr "节点名称"
 
 #: settings/api/alibaba_sms.py:29 settings/api/tencent_sms.py:33
 msgid "test_phone is required"
@@ -4674,7 +4713,7 @@ msgstr "请选择受理人"
 msgid "The current organization type already exists"
 msgstr "当前组织已存在该类型"
 
-#: users/api/user.py:241
+#: users/api/user.py:239
 msgid "Could not reset self otp, use profile reset instead"
 msgstr "不能在该页面重置多因子认证, 请去个人信息页面重置"
 
@@ -5730,10 +5769,6 @@ msgstr "应用改密计划"
 msgid "Application change auth plan execution"
 msgstr "应用改密计划执行"
 
-#: xpack/plugins/change_auth_plan/models/app.py:139
-msgid "App"
-msgstr "应用"
-
 #: xpack/plugins/change_auth_plan/models/app.py:151
 msgid "Application change auth plan task"
 msgstr "应用改密计划子任务"
@@ -6313,6 +6348,9 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "SystemUser"
+#~ msgstr "系统用户"
 
 #~ msgid "Delete user"
 #~ msgstr "删除用户"

@@ -1,6 +1,6 @@
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ugettext_noop
 
-from . import const
+from .const import Scope
 
 
 auditor_perms = (
@@ -25,8 +25,10 @@ app_perms = [
 
 
 class PreRole:
-    def __init__(self, _id, name, scope, perms):
-        self.id = _id
+    id_prefix = '00000000-0000-0000-0000-00000000000'
+
+    def __init__(self, index, name, scope, perms):
+        self.id = self.id_prefix + index
         self.name = name
         self.scope = scope
         self.perms = perms
@@ -40,26 +42,43 @@ class PreRole:
         q = Permission.get_define_permissions_q(self.perms)
         permissions = Permission.get_permissions(self.scope)
         perms = permissions.filter(q).values_list('id', flat=True)
-        defaults = {'scope': self.scope, 'builtin': True, 'name': self.name, permissions: perms}
+        defaults = {
+            'id': self.id, 'name': self.name, 'scope': self.scope,
+            'builtin': True, 'permissions': perms
+        }
         return defaults
 
     def get_or_create_role(self):
         from rbac.models import Role
         defaults = self.get_defaults()
         permissions = defaults.pop('permissions', [])
-        role, created = Role.objects.get_or_create(defaults, name=self.name)
+        role, created = Role.objects.get_or_create(defaults, id=self.id)
         role.permissions.set(permissions)
         return role, created
 
 
 class BuiltinRole:
-    system_admin = PreRole('SystemAdmin', const.Scope.system, [])
-    system_auditor = PreRole('SystemAuditor', const.Scope.system, auditor_perms)
-    system_user = PreRole('SystemUser', const.Scope.system, user_perms)
-    system_app = PreRole('App', const.Scope.system, app_perms)
-    org_admin = PreRole('OrgAdmin', const.Scope.org, [])
-    org_auditor = PreRole('OrgAuditor', const.Scope.org, auditor_perms)
-    org_user = PreRole('OrgUser', const.Scope.org, user_perms)
+    system_admin = PreRole(
+        '1', ugettext_noop('SystemAdmin'), Scope.system, []
+    )
+    system_auditor = PreRole(
+        '2', ugettext_noop('SystemAuditor'), Scope.system, auditor_perms
+    )
+    system_user = PreRole(
+        '3', ugettext_noop('User'), Scope.system, user_perms
+    )
+    system_app = PreRole(
+        '4', ugettext_noop('App'), Scope.system, app_perms
+    )
+    org_admin = PreRole(
+        '5', ugettext_noop('OrgAdmin'), Scope.org, []
+    )
+    org_auditor = PreRole(
+        '6', ugettext_noop('OrgAuditor'), Scope.org, auditor_perms
+    )
+    org_user = PreRole(
+        '7', ugettext_noop('OrgUser'), Scope.org, user_perms
+    )
 
     @classmethod
     def get_roles(cls):
@@ -74,7 +93,7 @@ class BuiltinRole:
     def get_system_role_by_old_name(cls, name):
         mapper = {
             'App': cls.system_app,
-            'Admin': cls.system_app,
+            'Admin': cls.system_admin,
             'User': cls.system_user,
             'Auditor': cls.system_auditor
         }

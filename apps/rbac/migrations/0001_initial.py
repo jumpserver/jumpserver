@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('auth', '0012_alter_user_first_name_max_length'),
         ('contenttypes', '0002_remove_content_type_name'),
-        ('orgs', '0011_auto_20210929_1106'),
+        ('orgs', '0010_auto_20210219_1241'),
     ]
 
     operations = [
