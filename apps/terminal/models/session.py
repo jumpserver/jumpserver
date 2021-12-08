@@ -59,6 +59,7 @@ class Session(OrgModelMixin):
     SUFFIX_MAP = {1: '.gz', 2: '.replay.gz', 3: '.cast.gz'}
     DEFAULT_SUFFIXES = ['.replay.gz', '.cast.gz', '.gz']
 
+    # Todo: 将来干掉 local_path, 使用 default storage 实现
     def get_all_possible_local_path(self):
         """
         获取所有可能的本地存储录像文件路径
