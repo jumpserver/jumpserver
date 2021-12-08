@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-07 16:48+0800\n"
+"POT-Creation-Date: 2021-12-08 17:30+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -696,7 +696,7 @@ msgstr "每行一个命令"
 msgid "Command filter rule"
 msgstr "命令过滤规则"
 
-#: assets/models/cmd_filter.py:111 tickets/const.py:13
+#: assets/models/cmd_filter.py:119 tickets/const.py:13
 msgid "Command confirm"
 msgstr "命令复核"
 
@@ -5704,9 +5704,8 @@ msgid "Run times"
 msgstr "执行次数"
 
 #: xpack/plugins/change_auth_plan/serializers/base.py:45
-msgid ""
-"In the future, it may support enterprise wechat, flying book, nailing, etc"
-msgstr "将来可能会支持企业微信、飞书、钉钉等"
+msgid "Currently only mail sending is supported"
+msgstr "当前只支持邮件发送"
 
 #: xpack/plugins/change_auth_plan/serializers/base.py:57
 msgid "* Please enter the correct password length"
