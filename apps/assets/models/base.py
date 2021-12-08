@@ -180,9 +180,6 @@ class BaseUser(OrgModelMixin, AuthMixin):
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
     created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
-    storage_type = models.CharField(
-        max_length=64, choices=StorageType.choices, default=StorageType.db, verbose_name=_('Type')
-    )
 
     ASSETS_AMOUNT_CACHE_KEY = "ASSET_USER_{}_ASSETS_AMOUNT"
     ASSET_USER_CACHE_TIME = 600

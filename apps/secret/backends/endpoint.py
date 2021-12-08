@@ -24,8 +24,8 @@ class Secret:
         m = importlib.import_module(f'.{backend}', __package__)
         self.client = getattr(m, 'client')(instance)
 
-    def update_or_create_secret(self):
-        self.client.update_or_create_secret()
+    def update_or_create_secret(self, secret_data=None):
+        self.client.update_or_create_secret(secret_data)
 
     def patch_secret(self, old_secret_data):
         self.client.patch_secret(old_secret_data)
@@ -38,3 +38,10 @@ class Secret:
 
     def clear_secret(self):
         self.client.clear_secret()
+
+    @staticmethod
+    def is_allow(model_or_instance, is_instance=False):
+        from assets.models import BaseUser
+        if is_instance:
+            return isinstance(model_or_instance, BaseUser)
+        return issubclass(model_or_instance, BaseUser)

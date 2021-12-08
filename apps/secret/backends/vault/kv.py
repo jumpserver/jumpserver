@@ -18,7 +18,7 @@ class KVEngineVault(BaseVault):
 
         self.secrets_max_versions = secrets_max_versions
         self.secrets_engine_type = 'kv-v2'
-        self.secrets_engine_path = 'jms({})/'.format(path)
+        self.secrets_engine_path = path
         self.enable_secrets_engine()
 
     def enable_secrets_engine(self):

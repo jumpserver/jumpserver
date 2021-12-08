@@ -2,40 +2,41 @@
 #
 from rest_framework import generics
 
+from common.mixins.api.object import GetObjectMixin
 from .api import OrgQuerySetMixin
 
 
-class ListAPIView(OrgQuerySetMixin, generics.ListAPIView):
+class ListAPIView(GetObjectMixin, OrgQuerySetMixin, generics.ListAPIView):
     pass
 
 
-class RetrieveAPIView(OrgQuerySetMixin, generics.RetrieveAPIView):
+class RetrieveAPIView(GetObjectMixin, OrgQuerySetMixin, generics.RetrieveAPIView):
     pass
 
 
-class CreateAPIView(OrgQuerySetMixin, generics.CreateAPIView):
+class CreateAPIView(GetObjectMixin, OrgQuerySetMixin, generics.CreateAPIView):
     pass
 
 
-class DestroyAPIView(OrgQuerySetMixin, generics.DestroyAPIView):
+class DestroyAPIView(GetObjectMixin, OrgQuerySetMixin, generics.DestroyAPIView):
     pass
 
 
-class ListCreateAPIView(OrgQuerySetMixin, generics.ListCreateAPIView):
+class ListCreateAPIView(GetObjectMixin, OrgQuerySetMixin, generics.ListCreateAPIView):
     pass
 
 
-class UpdateAPIView(OrgQuerySetMixin, generics.UpdateAPIView):
+class UpdateAPIView(GetObjectMixin, OrgQuerySetMixin, generics.UpdateAPIView):
     pass
 
 
-class RetrieveUpdateAPIView(OrgQuerySetMixin, generics.RetrieveUpdateAPIView):
+class RetrieveUpdateAPIView(GetObjectMixin, OrgQuerySetMixin, generics.RetrieveUpdateAPIView):
     pass
 
 
-class RetrieveDestroyAPIView(OrgQuerySetMixin, generics.RetrieveDestroyAPIView):
+class RetrieveDestroyAPIView(GetObjectMixin, OrgQuerySetMixin, generics.RetrieveDestroyAPIView):
     pass
 
 
-class RetrieveUpdateDestroyAPIView(OrgQuerySetMixin, generics.RetrieveUpdateDestroyAPIView):
+class RetrieveUpdateDestroyAPIView(GetObjectMixin, OrgQuerySetMixin, generics.RetrieveUpdateDestroyAPIView):
     pass

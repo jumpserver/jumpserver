@@ -11,7 +11,7 @@ class BaseSecretClient(object):
         self.instance = instance
 
     @abstractmethod
-    def update_or_create_secret(self):
+    def update_or_create_secret(self, secret_data=None):
         raise NotImplementedError
 
     @abstractmethod
@@ -39,4 +39,4 @@ class BaseSecretClient(object):
             if not hasattr(self.instance, f'_{secret_field}'):
                 secret = getattr(self.instance, secret_field)
                 setattr(self.instance, f'_{secret_field}', secret)
-                setattr(self.instance, secret_field, '')
+                setattr(self.instance, secret_field, None)

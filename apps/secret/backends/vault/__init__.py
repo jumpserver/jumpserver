@@ -11,8 +11,10 @@ class VaultSecretClient(BaseSecretClient):
 
     def __init__(self, instance: Model):
         super().__init__(instance)
+        app_label = instance._meta.app_label
+        object_name = instance._meta.object_name
         self.client = KVEngineVault(
-            path=instance._meta.db_table,
+            settings.VAULT_PATH,
             url=settings.VAULT_URL,
             token=settings.VAULT_TOKEN
         )
@@ -21,10 +23,11 @@ class VaultSecretClient(BaseSecretClient):
                 code='init_vault_fail',
                 detail=_('Initialization vault fail')
             )
-        self.path = self.instance.pk
+        self.path = f'{app_label}/{object_name}/{self.instance.pk}'
 
-    def update_or_create_secret(self):
-        secret_data = self.create_secret_data()
+    def update_or_create_secret(self, secret_data=None):
+        if not secret_data:
+            secret_data = self.create_secret_data()
         self.client.update_or_create(self.path, secret_data)
 
     def patch_secret(self, old_secret_data):

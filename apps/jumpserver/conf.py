@@ -367,6 +367,7 @@ class Config(dict):
         'SECRET_STORAGE_BACKEND': 'vault',
 
         # vault相关
+        'VAULT_PATH': 'jms/',
         'VAULT_URL': 'http://127.0.0.1:8200',
         'VAULT_TOKEN': 's.JqVYFWIrtPzctcePjaWTtxXf',
 

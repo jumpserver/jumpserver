@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 
-from assets.models import BaseUser
+from secret.backends.endpoint import Secret
 
 __all__ = ['GetObjectMixin']
 
@@ -11,6 +11,6 @@ class GetObjectMixin:
 
     def get_object(self):
         obj = super().get_object()
-        if isinstance(obj, BaseUser):
+        if Secret.is_allow(obj, is_instance=True):
             obj.replace_secret()
         return obj
