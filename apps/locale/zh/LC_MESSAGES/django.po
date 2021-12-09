@@ -1750,7 +1750,7 @@ msgstr "虚拟 MFA 验证码错误，或者服务器端时间不对"
 
 #: authentication/mfa/otp.py:12
 msgid "OTP"
-msgstr "MFA"
+msgstr "虚拟 MFA"
 
 #: authentication/mfa/otp.py:13
 msgid "OTP verification code"
