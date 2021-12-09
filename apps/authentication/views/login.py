@@ -48,7 +48,6 @@ class UserLoginView(mixins.AuthMixin, FormView):
             return None
         next_url = request.GET.get('next') or '/'
         auth_type = ''
-
         if settings.AUTH_OPENID:
             auth_type = 'OIDC'
             openid_auth_url = reverse(settings.AUTH_OPENID_AUTH_LOGIN_URL_NAME)
@@ -62,7 +61,13 @@ class UserLoginView(mixins.AuthMixin, FormView):
         else:
             cas_auth_url = None
 
-        if not any([openid_auth_url, cas_auth_url]):
+        if settings.AUTH_SAML2:
+            auth_type = 'saml2'
+            saml2_auth_url = reverse(settings.SAML2_LOGIN_URL_NAME) + f'?next={next_url}'
+        else:
+            saml2_auth_url = None
+
+        if not any([openid_auth_url, cas_auth_url, saml2_auth_url]):
             return None
 
         login_redirect = settings.LOGIN_REDIRECT_TO_BACKEND.lower()
@@ -72,8 +77,10 @@ class UserLoginView(mixins.AuthMixin, FormView):
             auth_url = cas_auth_url
         elif login_redirect in ['openid', 'oidc'] and openid_auth_url:
             auth_url = openid_auth_url
+        elif login_redirect in ['saml2'] and saml2_auth_url:
+            auth_url = saml2_auth_url
         else:
-            auth_url = openid_auth_url or cas_auth_url
+            auth_url = openid_auth_url or cas_auth_url or saml2_auth_url
 
         if settings.LOGIN_REDIRECT_TO_BACKEND or not settings.LOGIN_REDIRECT_MSG_ENABLED:
             redirect_url = auth_url
@@ -164,6 +171,12 @@ class UserLoginView(mixins.AuthMixin, FormView):
                 'name': 'CAS',
                 'enabled': settings.AUTH_CAS,
                 'url': reverse('authentication:cas:cas-login'),
+                'logo': static('img/login_cas_logo.png')
+            },
+            {
+                'name': 'SAML2',
+                'enabled': settings.AUTH_SAML2,
+                'url': reverse('authentication:saml2:saml2-login'),
                 'logo': static('img/login_cas_logo.png')
             },
             {
@@ -292,6 +305,8 @@ class UserLogoutView(TemplateView):
             return settings.AUTH_OPENID_AUTH_LOGOUT_URL_NAME
         elif 'CAS' in backend:
             return settings.CAS_LOGOUT_URL_NAME
+        elif 'saml2' in backend:
+            return settings.SAML2_LOGOUT_URL_NAME
         return None
 
     def get(self, request, *args, **kwargs):
