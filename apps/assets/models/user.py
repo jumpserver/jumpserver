@@ -203,7 +203,6 @@ class SystemUser(ProtocolMixin, AuthMixin, BaseUser):
     sudo = models.TextField(default='/bin/whoami', verbose_name=_('Sudo'))
     shell = models.CharField(max_length=64,  default='/bin/bash', verbose_name=_('Shell'))
     login_mode = models.CharField(choices=LOGIN_MODE_CHOICES, default=LOGIN_AUTO, max_length=10, verbose_name=_('Login mode'))
-    cmd_filters = models.ManyToManyField('CommandFilter', related_name='system_users', verbose_name=_("Command filter"), blank=True)
     sftp_root = models.CharField(default='tmp', max_length=128, verbose_name=_("SFTP Root"))
     token = models.TextField(default='', verbose_name=_('Token'))
     home = models.CharField(max_length=4096, default='', verbose_name=_('Home'), blank=True)

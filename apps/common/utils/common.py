@@ -10,7 +10,10 @@ from functools import wraps
 import time
 import ipaddress
 import psutil
-from typing import Iterable
+import platform
+import os
+
+from django.conf import settings
 
 UUID_PATTERN = re.compile(r'\w{8}(-\w{4}){3}-\w{12}')
 ipip_db = None
@@ -252,7 +255,40 @@ def get_cpu_load():
     return float(single_cpu_load_1)
 
 
+def get_docker_mem_usage_if_limit():
+    try:
+        with open('/sys/fs/cgroup/memory/memory.limit_in_bytes') as f:
+            limit_in_bytes = int(f.readline())
+            total = psutil.virtual_memory().total
+            if limit_in_bytes >= total:
+                raise ValueError('Not limit')
+
+        with open('/sys/fs/cgroup/memory/memory.usage_in_bytes') as f:
+            usage_in_bytes = int(f.readline())
+
+        with open('/sys/fs/cgroup/memory/memory.stat') as f:
+            inactive_file = 0
+            for line in f:
+                if line.startswith('total_inactive_file'):
+                    name, inactive_file = line.split()
+                    break
+
+                if line.startswith('inactive_file'):
+                    name, inactive_file = line.split()
+                    continue
+
+            inactive_file = int(inactive_file)
+        return ((usage_in_bytes - inactive_file) / limit_in_bytes) * 100
+
+    except Exception as e:
+        logger.debug(f'Get memory usage by docker limit: {e}')
+        return None
+
+
 def get_memory_usage():
+    usage = get_docker_mem_usage_if_limit()
+    if usage is not None:
+        return usage
     return psutil.virtual_memory().percent
 
 
@@ -293,3 +329,13 @@ def unique(objects, key=None):
         if v not in seen:
             seen[v] = obj
     return list(seen.values())
+
+
+def get_file_by_arch(dir, filename):
+    platform_name = platform.system()
+    arch = platform.machine()
+
+    file_path = os.path.join(
+        settings.BASE_DIR, dir, platform_name, arch, filename
+    )
+    return file_path

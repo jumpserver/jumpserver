@@ -6,10 +6,12 @@ from django.utils.translation import ugettext as _
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 from django.contrib.auth import logout as auth_logout
+from django.shortcuts import redirect
 from django.http.response import HttpResponseRedirect
 
 from authentication.mixins import AuthMixin
 from authentication.mfa import MFAOtp, otp_failed_msg
+from authentication.errors import SessionEmptyError
 from common.utils import get_logger, FlashMessageUtil
 from common.mixins.views import PermissionsMixin
 from common.permissions import IsValidUser
@@ -30,11 +32,15 @@ __all__ = [
 logger = get_logger(__name__)
 
 
-class UserOtpEnableStartView(UserVerifyPasswordView):
+class UserOtpEnableStartView(AuthMixin, TemplateView):
     template_name = 'users/user_otp_check_password.html'
 
-    def get_success_url(self):
-        return reverse('authentication:user-otp-enable-install-app')
+    def get(self, request, *args, **kwargs):
+        try:
+            self.get_user_from_session()
+        except SessionEmptyError:
+            return redirect('authentication:login') + '?_=otp_enable_start'
+        return super().get(request, *args, **kwargs)
 
 
 class UserOtpEnableInstallAppView(TemplateView):

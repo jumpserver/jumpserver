@@ -229,6 +229,19 @@ class Config(dict):
         'AUTH_SSO': False,
         'AUTH_SSO_AUTHKEY_TTL': 60 * 15,
 
+        # SAML2 认证
+        'AUTH_SAML2': False,
+        'SAML2_LOGOUT_COMPLETELY': True,
+        'AUTH_SAML2_ALWAYS_UPDATE_USER': True,
+        'SAML2_RENAME_ATTRIBUTES': {'uid': 'username', 'email': 'email'},
+        'SAML2_OTHER_SETTINGS_PATH': '',
+        'SAML2_IDP_METADATA_URL': '',
+        'SAML2_IDP_METADATA_XML': '',
+        'SAML2_SP_KEY_CONTENT': '',
+        'SAML2_SP_CERT_CONTENT': '',
+        'AUTH_SAML2_PROVIDER_AUTHORIZATION_ENDPOINT': '/',
+        'AUTH_SAML2_AUTHENTICATION_FAILURE_REDIRECT_URI': '/',
+
         # 企业微信
         'AUTH_WECOM': False,
         'WECOM_CORPID': '',
@@ -246,7 +259,7 @@ class Config(dict):
         'FEISHU_APP_ID': '',
         'FEISHU_APP_SECRET': '',
 
-        'LOGIN_REDIRECT_TO_BACKEND':  '',  # 'OPENID / CAS
+        'LOGIN_REDIRECT_TO_BACKEND':  '',  # 'OPENID / CAS / SAML2
         'LOGIN_REDIRECT_MSG_ENABLED': True,
 
         'SMS_ENABLED': False,
@@ -291,9 +304,6 @@ class Config(dict):
         'SECURITY_COMMAND_EXECUTION': True,
         'SECURITY_SERVICE_ACCOUNT_REGISTRATION': True,
         'SECURITY_VIEW_AUTH_NEED_MFA': True,
-        'SECURITY_LOGIN_LIMIT_COUNT': 7,
-        'SECURITY_LOGIN_IP_BLACK_LIST': [],
-        'SECURITY_LOGIN_LIMIT_TIME': 30,
         'SECURITY_MAX_IDLE_TIME': 30,
         'SECURITY_PASSWORD_EXPIRATION_TIME': 9999,
         'SECURITY_PASSWORD_MIN_LENGTH': 6,
@@ -318,6 +328,14 @@ class Config(dict):
         'USER_LOGIN_SINGLE_MACHINE_ENABLED': False,
         'ONLY_ALLOW_EXIST_USER_AUTH': False,
         'ONLY_ALLOW_AUTH_FROM_SOURCE': False,
+        # 用户登录限制的规则
+        'SECURITY_LOGIN_LIMIT_COUNT': 7,
+        'SECURITY_LOGIN_LIMIT_TIME': 30,
+        # 登录IP限制的规则
+        'SECURITY_LOGIN_IP_BLACK_LIST': [],
+        'SECURITY_LOGIN_IP_WHITE_LIST': [],
+        'SECURITY_LOGIN_IP_LIMIT_COUNT': 99999,
+        'SECURITY_LOGIN_IP_LIMIT_TIME': 30,
 
         # 启动前
         'HTTP_BIND_HOST': '0.0.0.0',

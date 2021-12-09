@@ -1,13 +1,11 @@
-from datetime import datetime
-
-from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
+from rest_framework import serializers
+
 from perms.models import ApplicationPermission
 from applications.const import AppCategory, AppType
 from orgs.utils import tmp_to_org
 from tickets.models import Ticket
 from applications.models import Application
-from assets.models import SystemUser
 from .common import DefaultPermissionName
 
 __all__ = [

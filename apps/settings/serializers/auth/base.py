@@ -14,6 +14,7 @@ class AuthSettingSerializer(serializers.Serializer):
     AUTH_FEISHU = serializers.BooleanField(default=False, label=_('FeiShu Auth'))
     AUTH_WECOM = serializers.BooleanField(default=False, label=_('WeCom Auth'))
     AUTH_SSO = serializers.BooleanField(default=False, label=_("SSO Auth"))
+    AUTH_SAML2 = serializers.BooleanField(default=False, label=_("SAML2 Auth"))
     FORGOT_PASSWORD_URL = serializers.CharField(
         required=False, allow_blank=True, max_length=1024,
         label=_("Forgot password url")

@@ -1,7 +1,7 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from common.utils.ip import is_ip_address, is_ip_network, is_ip_segment
+from acls.serializers.rules import ip_group_help_text, ip_group_child_validator
 
 
 class SecurityPasswordRuleSerializer(serializers.Serializer):
@@ -27,13 +27,10 @@ class SecurityPasswordRuleSerializer(serializers.Serializer):
     )
 
 
-def ip_child_validator(ip_child):
-    is_valid = is_ip_address(ip_child) \
-               or is_ip_network(ip_child) \
-               or is_ip_segment(ip_child)
-    if not is_valid:
-        error = _('IP address invalid: `{}`').format(ip_child)
-        raise serializers.ValidationError(error)
+login_ip_limit_time_help_text = _(
+    'Unit: minute, If the user has failed to log in for a limited number of times, '
+    'no login is allowed during this time interval.'
+)
 
 
 class SecurityAuthSerializer(serializers.Serializer):
@@ -47,23 +44,31 @@ class SecurityAuthSerializer(serializers.Serializer):
     )
     SECURITY_LOGIN_LIMIT_COUNT = serializers.IntegerField(
         min_value=3, max_value=99999,
-        label=_('Limit the number of login failures')
+        label=_('Limit the number of user login failures')
     )
     SECURITY_LOGIN_LIMIT_TIME = serializers.IntegerField(
         min_value=5, max_value=99999, required=True,
-        label=_('Block logon interval'),
-        help_text=_(
-            'Unit: minute, If the user has failed to log in for a limited number of times, '
-            'no login is allowed during this time interval.'
-        )
+        label=_('Block user login interval'),
+        help_text=login_ip_limit_time_help_text
+    )
+    SECURITY_LOGIN_IP_LIMIT_COUNT = serializers.IntegerField(
+        min_value=3, max_value=99999,
+        label=_('Limit the number of IP login failures')
+    )
+    SECURITY_LOGIN_IP_LIMIT_TIME = serializers.IntegerField(
+        min_value=5, max_value=99999, required=True,
+        label=_('Block IP login interval'),
+        help_text=login_ip_limit_time_help_text
+    )
+    SECURITY_LOGIN_IP_WHITE_LIST = serializers.ListField(
+        default=[], label=_('Login IP White List'), allow_empty=True,
+        child=serializers.CharField(max_length=1024, validators=[ip_group_child_validator]),
+        help_text=ip_group_help_text
     )
     SECURITY_LOGIN_IP_BLACK_LIST = serializers.ListField(
         default=[], label=_('Login IP Black List'), allow_empty=True,
-        child=serializers.CharField(max_length=1024, validators=[ip_child_validator]),
-        help_text=_(
-            'Format for comma-delimited string. Such as: '
-            '192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64'
-        )
+        child=serializers.CharField(max_length=1024, validators=[ip_group_child_validator]),
+        help_text=ip_group_help_text
     )
     SECURITY_PASSWORD_EXPIRATION_TIME = serializers.IntegerField(
         min_value=1, max_value=99999, required=True,

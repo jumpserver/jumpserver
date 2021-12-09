@@ -48,8 +48,10 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         extra_kwargs = {
             'password': {
                 "write_only": True,
+                'trim_whitespace': False,
                 "validators": [validate_password_contains_left_double_curly_bracket]
             },
+            'cmd_filters': {"required": False},
             'public_key': {"write_only": True},
             'private_key': {"write_only": True},
             'token': {"write_only": True},

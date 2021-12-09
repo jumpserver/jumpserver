@@ -1,11 +1,9 @@
-from assets.models import Asset
-from assets.models import SystemUser
-
-from .base import BaseHandler
 from django.utils.translation import ugettext as _
 
+from assets.models import Node, Asset, SystemUser
 from perms.models import AssetPermission, Action
 from orgs.utils import tmp_to_org, tmp_to_root_org
+from .base import BaseHandler
 
 
 class Handler(BaseHandler):
@@ -22,17 +20,22 @@ class Handler(BaseHandler):
         apply_actions_display = Action.value_to_choices_display(apply_actions)
         meta_display_values = [apply_actions_display]
         meta_display = dict(zip(meta_display_fields, meta_display_values))
-        apply_assets = self.ticket.meta.get('apply_assets')
+        apply_nodes = self.ticket.meta.get('apply_nodes', [])
+        apply_assets = self.ticket.meta.get('apply_assets', [])
         apply_system_users = self.ticket.meta.get('apply_system_users')
         with tmp_to_org(self.ticket.org_id):
             meta_display.update({
+                'apply_nodes_display': [str(i) for i in Node.objects.filter(id__in=apply_nodes)],
                 'apply_assets_display': [str(i) for i in Asset.objects.filter(id__in=apply_assets)],
-                'apply_system_users_display': [str(i)for i in SystemUser.objects.filter(id__in=apply_system_users)]
+                'apply_system_users_display': [
+                    str(i) for i in SystemUser.objects.filter(id__in=apply_system_users)
+                ]
             })
         return meta_display
 
     # body
     def _construct_meta_body_of_open(self):
+        apply_nodes = self.ticket.meta.get('apply_nodes_display', [])
         apply_assets = self.ticket.meta.get('apply_assets_display', [])
         apply_system_users = self.ticket.meta.get('apply_system_users_display', [])
         apply_actions_display = self.ticket.meta.get('apply_actions_display', [])
@@ -44,6 +47,7 @@ class Handler(BaseHandler):
             {}: {},
             {}: {}
         '''.format(
+            _("Applied node group"), ','.join(apply_nodes),
             _("Applied hostname group"), ','.join(apply_assets),
             _("Applied system user group"), ','.join(apply_system_users),
             _("Applied actions"), ','.join(apply_actions_display),
@@ -60,6 +64,7 @@ class Handler(BaseHandler):
                 return asset_permission
 
         apply_permission_name = self.ticket.meta.get('apply_permission_name', )
+        apply_nodes = self.ticket.meta.get('apply_nodes', [])
         apply_assets = self.ticket.meta.get('apply_assets', [])
         apply_system_users = self.ticket.meta.get('apply_system_users', [])
         apply_actions = self.ticket.meta.get('apply_actions', Action.NONE)
@@ -94,6 +99,7 @@ class Handler(BaseHandler):
         with tmp_to_org(self.ticket.org_id):
             asset_permission = AssetPermission.objects.create(**permission_data)
             asset_permission.users.add(self.ticket.applicant)
+            asset_permission.nodes.set(apply_nodes)
             asset_permission.assets.set(apply_assets)
             asset_permission.system_users.set(apply_system_users)
 

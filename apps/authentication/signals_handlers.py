@@ -8,6 +8,9 @@ from django_cas_ng.signals import cas_user_authenticated
 
 from jms_oidc_rp.signals import openid_user_login_failed, openid_user_login_success
 
+from authentication.backends.saml2.signals import (
+    saml2_user_authenticated, saml2_user_authentication_failed
+)
 from .signals import post_auth_success, post_auth_failed
 
 
@@ -43,3 +46,15 @@ def on_oidc_user_login_failed(sender, username, request, reason, **kwargs):
 def on_cas_user_login_success(sender, request, user, **kwargs):
     request.session['auth_backend'] = settings.AUTH_BACKEND_CAS
     post_auth_success.send(sender, user=user, request=request)
+
+
+@receiver(saml2_user_authenticated)
+def on_saml2_user_login_success(sender, request, user, **kwargs):
+    request.session['auth_backend'] = settings.AUTH_BACKEND_SAML2
+    post_auth_success.send(sender, user=user, request=request)
+
+
+@receiver(saml2_user_authentication_failed)
+def on_saml2_user_login_failed(sender, request, username, reason, **kwargs):
+    request.session['auth_backend'] = settings.AUTH_BACKEND_SAML2
+    post_auth_failed.send(sender, username=username, request=request, reason=reason)

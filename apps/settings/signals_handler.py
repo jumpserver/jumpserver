@@ -11,7 +11,6 @@ from jumpserver.utils import current_request
 from common.decorator import on_transaction_commit
 from common.utils import get_logger, ssh_key_gen
 from common.utils.connection import RedisPubSub
-from common.db.utils import close_old_connections
 from common.signals import django_ready
 from .models import Setting
 
@@ -81,23 +80,9 @@ def subscribe_settings_change(sender, **kwargs):
     logger.debug("Start subscribe setting change")
 
     def keep_subscribe_settings_change():
-        while True:
-            try:
-                sub = setting_pub_sub.subscribe()
-                msgs = sub.listen()
-                # 开始之前关闭连接，因为server端可能关闭了连接，而 client 还在 CONN_MAX_AGE 中
-                close_old_connections()
-                for msg in msgs:
-                    if msg["type"] != "message":
-                        continue
-                    item = msg['data'].decode()
-                    logger.debug("Found setting change: {}".format(str(item)))
-                    Setting.refresh_item(item)
-            except Exception as e:
-                logger.exception(f'subscribe_settings_change: {e}')
-                Setting.refresh_all_settings()
-            finally:
-                close_old_connections()
+        setting_pub_sub.keep_handle_msg(
+            lambda name: Setting.refresh_item(name)
+        )
 
     t = threading.Thread(target=keep_subscribe_settings_change)
     t.daemon = True

@@ -40,5 +40,7 @@ class TokenCreateApi(AuthMixin, CreateAPIView):
             return Response(e.as_data(), status=400)
         except errors.NeedMoreInfoError as e:
             return Response(e.as_data(), status=200)
-        except errors.PasswordTooSimple as e:
-            return redirect(e.url)
+        except errors.MFAUnsetError:
+            return Response({'error': 'MFA unset, please set first'}, status=400)
+        except Exception as e:
+            return Response({"error": str(e)}, status=400)

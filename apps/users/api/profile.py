@@ -19,7 +19,8 @@ from .mixins import UserQuerysetMixin
 __all__ = [
     'UserResetPasswordApi', 'UserResetPKApi',
     'UserProfileApi', 'UserUpdatePKApi',
-    'UserPasswordApi', 'UserPublicKeyApi'
+    'UserPasswordApi', 'UserSecretKeyApi',
+    'UserPublicKeyApi'
 ]
 
 
@@ -79,6 +80,14 @@ class UserPasswordApi(generics.RetrieveUpdateAPIView):
         resp = super().update(request, *args, **kwargs)
         ResetPasswordSuccessMsg(self.request.user, request).publish_async()
         return resp
+
+
+class UserSecretKeyApi(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = serializers.UserUpdateSecretKeySerializer
+
+    def get_object(self):
+        return self.request.user
 
 
 class UserPublicKeyApi(generics.RetrieveUpdateAPIView):
