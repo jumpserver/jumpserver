@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-09 19:55+0800\n"
+"POT-Creation-Date: 2021-12-09 20:32+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -131,7 +131,7 @@ msgstr "系统用户"
 #: applications/serializers/attrs/application_category/remote_app.py:37
 #: assets/models/asset.py:356 assets/models/authbook.py:18
 #: assets/models/cmd_filter.py:34 assets/models/gathered_user.py:14
-#: assets/serializers/system_user.py:259 audits/models.py:38
+#: assets/serializers/system_user.py:260 audits/models.py:38
 #: perms/models/asset_permission.py:99 templates/index.html:82
 #: terminal/backends/command/models.py:19
 #: terminal/backends/command/serializers.py:13 terminal/models/session.py:41
@@ -383,7 +383,7 @@ msgid "Application path"
 msgstr "应用路径"
 
 #: applications/serializers/attrs/application_category/remote_app.py:45
-#: assets/serializers/system_user.py:158
+#: assets/serializers/system_user.py:159
 #: xpack/plugins/change_auth_plan/serializers/asset.py:65
 #: xpack/plugins/change_auth_plan/serializers/asset.py:68
 #: xpack/plugins/change_auth_plan/serializers/asset.py:71
@@ -781,7 +781,7 @@ msgstr "全称"
 msgid "Parent key"
 msgstr "ssh私钥"
 
-#: assets/models/node.py:559 assets/serializers/system_user.py:258
+#: assets/models/node.py:559 assets/serializers/system_user.py:259
 #: users/templates/users/user_asset_permission.html:41
 #: users/templates/users/user_asset_permission.html:73
 #: users/templates/users/user_asset_permission.html:158
@@ -907,7 +907,7 @@ msgid "private key invalid"
 msgstr "密钥不合法"
 
 #: assets/serializers/domain.py:13 assets/serializers/label.py:12
-#: assets/serializers/system_user.py:58
+#: assets/serializers/system_user.py:59
 #: perms/serializers/asset/permission.py:72
 msgid "Assets amount"
 msgstr "资产数量"
@@ -941,68 +941,68 @@ msgstr "密钥指纹"
 msgid "Apps amount"
 msgstr "应用数量"
 
-#: assets/serializers/system_user.py:57
+#: assets/serializers/system_user.py:58
 #: perms/serializers/asset/permission.py:73
 msgid "Nodes amount"
 msgstr "节点数量"
 
-#: assets/serializers/system_user.py:59 assets/serializers/system_user.py:260
+#: assets/serializers/system_user.py:60 assets/serializers/system_user.py:261
 msgid "Login mode display"
 msgstr "认证方式名称"
 
-#: assets/serializers/system_user.py:61
+#: assets/serializers/system_user.py:62
 msgid "Ad domain"
 msgstr "Ad 网域"
 
-#: assets/serializers/system_user.py:62
+#: assets/serializers/system_user.py:63
 msgid "Is asset protocol"
 msgstr "资产协议"
 
-#: assets/serializers/system_user.py:63
+#: assets/serializers/system_user.py:64
 msgid "Only ssh and automatic login system users are supported"
 msgstr "仅支持ssh协议和自动登录的系统用户"
 
-#: assets/serializers/system_user.py:103
+#: assets/serializers/system_user.py:104
 msgid "Username same with user with protocol {} only allow 1"
 msgstr "用户名和用户相同的一种协议只允许存在一个"
 
-#: assets/serializers/system_user.py:113 common/validators.py:14
+#: assets/serializers/system_user.py:114 common/validators.py:14
 msgid "Special char not allowed"
 msgstr "不能包含特殊字符"
 
-#: assets/serializers/system_user.py:122
+#: assets/serializers/system_user.py:123
 msgid "* Automatic login mode must fill in the username."
 msgstr "自动登录模式，必须填写用户名"
 
-#: assets/serializers/system_user.py:137
+#: assets/serializers/system_user.py:138
 msgid "Path should starts with /"
 msgstr "路径应该以 / 开头"
 
-#: assets/serializers/system_user.py:149
+#: assets/serializers/system_user.py:150
 msgid "Password or private key required"
 msgstr "密码或密钥密码需要一个"
 
-#: assets/serializers/system_user.py:163
+#: assets/serializers/system_user.py:164
 msgid "Only ssh protocol system users are allowed"
 msgstr "仅允许ssh协议的系统用户"
 
-#: assets/serializers/system_user.py:167
+#: assets/serializers/system_user.py:168
 msgid "The protocol must be consistent with the current user: {}"
 msgstr "协议必须和当前用户保持一致: {}"
 
-#: assets/serializers/system_user.py:171
+#: assets/serializers/system_user.py:172
 msgid "Only system users with automatic login are allowed"
 msgstr "仅允许自动登录的系统用户"
 
-#: assets/serializers/system_user.py:276
+#: assets/serializers/system_user.py:277
 msgid "System user name"
 msgstr "系统用户名称"
 
-#: assets/serializers/system_user.py:277 orgs/mixins/serializers.py:26
+#: assets/serializers/system_user.py:278 orgs/mixins/serializers.py:26
 msgid "Org name"
 msgstr "组织名称"
 
-#: assets/serializers/system_user.py:286
+#: assets/serializers/system_user.py:287
 msgid "Asset hostname"
 msgstr "资产主机名"
 
@@ -6091,19 +6091,23 @@ msgstr "订阅 ID"
 msgid "API Endpoint"
 msgstr "API 端点"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:101
+#: xpack/plugins/cloud/serializers/account_attrs.py:102
 msgid "Auth url"
 msgstr "认证地址"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:103
+msgid "eg: http://openstack.example.com:5000/v3"
+msgstr ""
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:106
 msgid "User domain"
 msgstr "用户域"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:110
+#: xpack/plugins/cloud/serializers/account_attrs.py:113
 msgid "Service account key"
 msgstr "账户密钥"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:111
+#: xpack/plugins/cloud/serializers/account_attrs.py:114
 msgid "The file is in JSON format"
 msgstr "JSON 格式的文件"
 
