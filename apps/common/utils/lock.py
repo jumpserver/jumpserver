@@ -80,11 +80,10 @@ class DistributedLock(RedisLock):
 
     @classmethod
     def register_scripts(cls, redis_client):
-        # cls.unlock_script = redis_client.register_script(UNLOCK_SCRIPT)
-        # cls.extend_script = redis_client.register_script(EXTEND_SCRIPT)
-        # cls.reset_script = redis_client.register_script(RESET_SCRIPT)
-        # cls.reset_all_script = redis_client.register_script(RESET_ALL_SCRIPT)
-        pass
+        cls.unlock_script = redis_client.register_script(UNLOCK_SCRIPT)
+        cls.extend_script = redis_client.register_script(EXTEND_SCRIPT)
+        cls.reset_script = redis_client.register_script(RESET_SCRIPT)
+        cls.reset_all_script = redis_client.register_script(RESET_ALL_SCRIPT)
 
     def locked_by_me(self):
         if self.locked():
