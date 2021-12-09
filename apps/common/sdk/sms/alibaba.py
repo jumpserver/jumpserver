@@ -9,7 +9,7 @@ from Tea.exceptions import TeaException
 
 from common.utils import get_logger
 from common.exceptions import JMSException
-from . import BaseSMSClient
+from .base import BaseSMSClient
 
 logger = get_logger(__file__)
 

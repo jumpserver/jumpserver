@@ -129,20 +129,22 @@ class UserLoginView(mixins.AuthMixin, FormView):
             self.request.session.set_test_cookie()
             return self.render_to_response(context)
         except (
-                errors.PasswdTooSimple,
+                errors.MFAUnsetError,
+                errors.PasswordTooSimple,
                 errors.PasswordRequireResetError,
-                errors.PasswdNeedUpdate
+                errors.PasswordNeedUpdate
         ) as e:
             return redirect(e.url)
         except (
-                errors.MFAUnsetError,
                 errors.MFAFailedError,
-                errors.BlockMFAError
+                errors.BlockMFAError,
+                errors.MFACodeRequiredError,
+                errors.SMSCodeRequiredError,
+                errors.UserPhoneNotSet,
+                errors.BlockGlobalIpLoginError
         ) as e:
             form.add_error('code', e.msg)
             return super().form_invalid(form)
-        except errors.OTPRequiredError as e:
-            return redirect(e.url)
         self.clear_rsa_key()
         return self.redirect_to_guard_view()
 
@@ -211,7 +213,7 @@ class UserLoginView(mixins.AuthMixin, FormView):
             'demo_mode': os.environ.get("DEMO_MODE"),
             'auth_methods': self.get_support_auth_methods(),
             'forgot_password_url': self.get_forgot_password_url(),
-            'methods': self.get_user_mfa_methods(),
+            **self.get_user_mfa_context(self.request.user)
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -220,7 +222,7 @@ class UserLoginView(mixins.AuthMixin, FormView):
 class UserLoginGuardView(mixins.AuthMixin, RedirectView):
     redirect_field_name = 'next'
     login_url = reverse_lazy('authentication:login')
-    login_otp_url = reverse_lazy('authentication:login-otp')
+    login_mfa_url = reverse_lazy('authentication:login-mfa')
     login_confirm_url = reverse_lazy('authentication:login-wait-confirm')
 
     def format_redirect_url(self, url):
@@ -241,15 +243,16 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
             user = self.check_user_auth_if_need()
             self.check_user_mfa_if_need(user)
             self.check_user_login_confirm_if_need(user)
-        except (errors.CredentialError, errors.SessionEmptyError):
+        except (errors.CredentialError, errors.SessionEmptyError) as e:
+            print("Error: ", e)
             return self.format_redirect_url(self.login_url)
         except errors.MFARequiredError:
-            return self.format_redirect_url(self.login_otp_url)
+            return self.format_redirect_url(self.login_mfa_url)
         except errors.LoginConfirmBaseError:
             return self.format_redirect_url(self.login_confirm_url)
         except errors.MFAUnsetError as e:
             return e.url
-        except errors.PasswdTooSimple as e:
+        except errors.PasswordTooSimple as e:
             return e.url
         else:
             self.login_it(user)

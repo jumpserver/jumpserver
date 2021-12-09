@@ -18,6 +18,7 @@ import copy
 from importlib import import_module
 from django.urls import reverse_lazy
 from urllib.parse import urljoin, urlparse
+from django.utils.translation import ugettext_lazy as _
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
@@ -276,6 +277,11 @@ class Config(dict):
         'TENCENT_VERIFY_SIGN_NAME': '',
         'TENCENT_VERIFY_TEMPLATE_CODE': '',
 
+        # Email
+        'EMAIL_CUSTOM_USER_CREATED_SUBJECT': _('Create account successfully'),
+        'EMAIL_CUSTOM_USER_CREATED_HONORIFIC': _('Hello'),
+        'EMAIL_CUSTOM_USER_CREATED_BODY': _('Your account has been created successfully'),
+
         'OTP_VALID_WINDOW': 2,
         'OTP_ISSUER_NAME': 'JumpServer',
         'EMAIL_SUFFIX': 'example.com',
@@ -298,8 +304,6 @@ class Config(dict):
         'SECURITY_COMMAND_EXECUTION': True,
         'SECURITY_SERVICE_ACCOUNT_REGISTRATION': True,
         'SECURITY_VIEW_AUTH_NEED_MFA': True,
-        'SECURITY_LOGIN_LIMIT_COUNT': 7,
-        'SECURITY_LOGIN_LIMIT_TIME': 30,
         'SECURITY_MAX_IDLE_TIME': 30,
         'SECURITY_PASSWORD_EXPIRATION_TIME': 9999,
         'SECURITY_PASSWORD_MIN_LENGTH': 6,
@@ -318,11 +322,20 @@ class Config(dict):
         'SECURITY_WATERMARK_ENABLED': True,
         'SECURITY_MFA_VERIFY_TTL': 3600,
         'SECURITY_SESSION_SHARE': True,
+        'SECURITY_CHECK_DIFFERENT_CITY_LOGIN': True,
         'OLD_PASSWORD_HISTORY_LIMIT_COUNT': 5,
         'CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED': True,
         'USER_LOGIN_SINGLE_MACHINE_ENABLED': False,
         'ONLY_ALLOW_EXIST_USER_AUTH': False,
         'ONLY_ALLOW_AUTH_FROM_SOURCE': False,
+        # 用户登录限制的规则
+        'SECURITY_LOGIN_LIMIT_COUNT': 7,
+        'SECURITY_LOGIN_LIMIT_TIME': 30,
+        # 登录IP限制的规则
+        'SECURITY_LOGIN_IP_BLACK_LIST': [],
+        'SECURITY_LOGIN_IP_WHITE_LIST': [],
+        'SECURITY_LOGIN_IP_LIMIT_COUNT': 99999,
+        'SECURITY_LOGIN_IP_LIMIT_TIME': 30,
 
         # 启动前
         'HTTP_BIND_HOST': '0.0.0.0',
@@ -360,6 +373,10 @@ class Config(dict):
         'PERM_SINGLE_ASSET_TO_UNGROUP_NODE': False,
         'WINDOWS_SSH_DEFAULT_SHELL': 'cmd',
         'PERIOD_TASK_ENABLED': True,
+
+        # 导航栏 帮助
+        'HELP_DOCUMENT_URL': 'http://docs.jumpserver.org',
+        'HELP_SUPPORT_URL': 'http://www.jumpserver.org/support/',
 
         'TICKETS_ENABLED': True,
         'FORGOT_PASSWORD_URL': '',

@@ -1,13 +1,15 @@
 {% load i18n %}
 
 <p>
-    {{ honorific }}:
+    {{ honorific }} {{ user }},
 </p>
 
 <div>
-    <p>{% trans 'Your account has been created successfully' %}</p>
     <p>
-        {% trans 'Username' %}: {{ username }} <br />
+        {{ content }}
+    </p>
+    <p>
+        {% trans 'Username' %}: {{ user.username }} <br />
         {% trans 'Password' %}:
         <a href="{{ rest_password_url}}?token={{ rest_password_token }}">
             {% trans 'click here to set your password' %}
@@ -15,6 +17,6 @@
     </p>
     <p>
           {% trans 'This link is valid for 1 hour. After it expires' %}
-          <a href="{{ forget_password_url }}?email={{ email }}">{% trans 'request new one' %}</a>
+          <a href="{{ forget_password_url }}?email={{ user.email }}">{% trans 'request new one' %}</a>
     </p>
 </div>

@@ -12,7 +12,7 @@ app_name = 'authentication'
 urlpatterns = [
     # login
     path('login/', non_atomic_requests(views.UserLoginView.as_view()), name='login'),
-    path('login/otp/', views.UserLoginOtpView.as_view(), name='login-otp'),
+    path('login/mfa/', views.UserLoginMFAView.as_view(), name='login-mfa'),
     path('login/wait-confirm/', views.UserLoginWaitConfirmView.as_view(), name='login-wait-confirm'),
     path('login/guard/', views.UserLoginGuardView.as_view(), name='login-guard'),
     path('logout/', views.UserLogoutView.as_view(), name='logout'),
@@ -42,14 +42,15 @@ urlpatterns = [
 
     # Profile
     path('profile/pubkey/generate/', users_view.UserPublicKeyGenerateView.as_view(), name='user-pubkey-generate'),
+    path('profile/mfa/', users_view.MFASettingView.as_view(), name='user-mfa-setting'),
+
+    # OTP Setting
     path('profile/otp/enable/start/', users_view.UserOtpEnableStartView.as_view(), name='user-otp-enable-start'),
     path('profile/otp/enable/install-app/', users_view.UserOtpEnableInstallAppView.as_view(),
          name='user-otp-enable-install-app'),
     path('profile/otp/enable/bind/', users_view.UserOtpEnableBindView.as_view(), name='user-otp-enable-bind'),
-    path('profile/otp/disable/authentication/', users_view.UserDisableMFAView.as_view(),
-         name='user-otp-disable-authentication'),
-    path('profile/otp/update/', users_view.UserOtpUpdateView.as_view(), name='user-otp-update'),
-    path('profile/otp/settings-success/', users_view.UserOtpSettingsSuccessView.as_view(), name='user-otp-settings-success'),
+    path('profile/otp/disable/', users_view.UserOtpDisableView.as_view(),
+         name='user-otp-disable'),
     path('first-login/', users_view.UserFirstLoginView.as_view(), name='user-first-login'),
 
     # openid

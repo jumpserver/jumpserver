@@ -25,7 +25,7 @@ def utc_now():
 
 
 def local_now():
-    return as_current_tz(utc_now())
+    return dj_timezone.localtime(dj_timezone.now())
 
 
 def local_now_display(fmt='%Y-%m-%d %H:%M:%S'):

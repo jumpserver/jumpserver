@@ -1,11 +1,10 @@
 from django.db import models
-from django.db.models import Q
-from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from .base import BaseACL, BaseACLQuerySet
 from common.utils import get_request_ip, get_ip_city
 from common.utils.ip import contains_ip
 from common.utils.time_period import contains_time_period
+from common.utils.timezone import local_now_display
 
 
 class ACLManager(models.Manager):
@@ -40,6 +39,7 @@ class LoginACL(BaseACL):
 
     class Meta:
         ordering = ('priority', '-date_updated', 'name')
+        verbose_name = _('Login acl')
 
     def __str__(self):
         return self.name
@@ -58,7 +58,9 @@ class LoginACL(BaseACL):
 
     @staticmethod
     def allow_user_confirm_if_need(user, ip):
-        acl = LoginACL.filter_acl(user).filter(action=LoginACL.ActionChoices.confirm).first()
+        acl = LoginACL.filter_acl(user).filter(
+            action=LoginACL.ActionChoices.confirm
+        ).first()
         acl = acl if acl and acl.reviewers.exists() else None
         if not acl:
             return False, acl
@@ -70,7 +72,9 @@ class LoginACL(BaseACL):
 
     @staticmethod
     def allow_user_to_login(user, ip):
-        acl = LoginACL.filter_acl(user).exclude(action=LoginACL.ActionChoices.confirm).first()
+        acl = LoginACL.filter_acl(user).exclude(
+            action=LoginACL.ActionChoices.confirm
+        ).first()
         if not acl:
             return True, ''
         ip_group = acl.rules.get('ip_group')
@@ -98,7 +102,7 @@ class LoginACL(BaseACL):
         login_ip = get_request_ip(request) if request else ''
         login_ip = login_ip or '0.0.0.0'
         login_city = get_ip_city(login_ip)
-        login_datetime = timezone.now().strftime('%Y-%m-%d %H:%M:%S')
+        login_datetime = local_now_display()
         ticket_meta = {
             'apply_login_ip': login_ip,
             'apply_login_city': login_city,

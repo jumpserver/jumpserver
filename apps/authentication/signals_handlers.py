@@ -16,11 +16,11 @@ from .signals import post_auth_success, post_auth_failed
 
 @receiver(user_logged_in)
 def on_user_auth_login_success(sender, user, request, **kwargs):
-    # 开启了 MFA，且没有校验过
-
-    if user.mfa_enabled and not settings.OTP_IN_RADIUS and not request.session.get('auth_mfa'):
+    # 开启了 MFA，且没有校验过, 可以全局校验, middleware 中可以全局管理 oidc 等第三方认证的 MFA
+    if user.mfa_enabled and not request.session.get('auth_mfa'):
         request.session['auth_mfa_required'] = 1
 
+    # 单点登录，超过了自动退出
     if settings.USER_LOGIN_SINGLE_MACHINE_ENABLED:
         user_id = 'single_machine_login_' + str(user.id)
         session_key = cache.get(user_id)

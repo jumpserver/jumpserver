@@ -37,8 +37,10 @@ def on_authbook_post_delete(sender, instance, **kwargs):
 def on_authbook_post_create(sender, instance, created, **kwargs):
     instance.sync_to_system_user_account()
     if created:
+        pass
+        # # 不再自动更新资产管理用户，只允许用户手动指定。
         # 只在创建时进行更新资产的管理用户
-        instance.update_asset_admin_user_if_need()
+        # instance.update_asset_admin_user_if_need()
 
 
 @receiver(pre_save, sender=AuthBook)

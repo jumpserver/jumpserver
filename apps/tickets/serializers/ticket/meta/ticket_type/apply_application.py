@@ -1,13 +1,11 @@
-from datetime import datetime
-
-from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
+from rest_framework import serializers
+
 from perms.models import ApplicationPermission
 from applications.const import AppCategory, AppType
 from orgs.utils import tmp_to_org
 from tickets.models import Ticket
 from applications.models import Application
-from assets.models import SystemUser
 from .common import DefaultPermissionName
 
 __all__ = [
@@ -77,15 +75,19 @@ class ApplySerializer(serializers.Serializer):
         type = self.root.initial_data['meta'].get('apply_type')
         org_id = self.root.initial_data.get('org_id')
         with tmp_to_org(org_id):
-            applications = Application.objects.filter(id__in=apply_applications, type=type).values_list('id', flat=True)
+            applications = Application.objects.filter(
+                id__in=apply_applications, type=type
+            ).values_list('id', flat=True)
         return list(applications)
 
-    def validate_apply_date_expired(self, value):
-        date_start = self.root.initial_data['meta'].get('apply_date_start')
-        date_start = datetime.strptime(date_start, '%Y-%m-%dT%H:%M:%S.%fZ')
-        date_expired = self.root.initial_data['meta'].get('apply_date_expired')
-        date_expired = datetime.strptime(date_expired, '%Y-%m-%dT%H:%M:%S.%fZ')
-        if date_expired <= date_start:
+    def validate(self, attrs):
+        apply_date_start = attrs['apply_date_start'].strftime('%Y-%m-%d %H:%M:%S')
+        apply_date_expired = attrs['apply_date_expired'].strftime('%Y-%m-%d %H:%M:%S')
+
+        if apply_date_expired <= apply_date_start:
             error = _('The expiration date should be greater than the start date')
-            raise serializers.ValidationError(error)
-        return value
+            raise serializers.ValidationError({'apply_date_expired': error})
+
+        attrs['apply_date_start'] = apply_date_start
+        attrs['apply_date_expired'] = apply_date_expired
+        return attrs

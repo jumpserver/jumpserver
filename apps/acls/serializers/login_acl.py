@@ -2,6 +2,7 @@ from django.utils.translation import ugettext as _
 from rest_framework import serializers
 from common.drf.serializers import BulkModelSerializer
 from common.drf.serializers import MethodSerializer
+from jumpserver.utils import has_valid_xpack_license
 from ..models import LoginACL
 from .rules import RuleSerializer
 
@@ -11,7 +12,7 @@ common_help_text = _('Format for comma-delimited string, with * indicating a mat
 
 
 class LoginACLSerializer(BulkModelSerializer):
-    user_display = serializers.ReadOnlyField(source='user.name', label=_('Username'))
+    user_display = serializers.ReadOnlyField(source='user.username', label=_('Username'))
     reviewers_display = serializers.SerializerMethodField(label=_('Reviewers'))
     action_display = serializers.ReadOnlyField(source='get_action_display', label=_('Action'))
     reviewers_amount = serializers.IntegerField(read_only=True, source='reviewers.count')
@@ -34,6 +35,19 @@ class LoginACLSerializer(BulkModelSerializer):
             'is_active': {'default': True},
             "reviewers": {'allow_null': False, 'required': True},
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.set_action_choices()
+
+    def set_action_choices(self):
+        action = self.fields.get('action')
+        if not action:
+            return
+        choices = action._choices
+        if not has_valid_xpack_license():
+            choices.pop(LoginACL.ActionChoices.confirm, None)
+        action._choices = choices
 
     def get_rules_serializer(self):
         return RuleSerializer()

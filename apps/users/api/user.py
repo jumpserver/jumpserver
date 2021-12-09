@@ -28,7 +28,7 @@ from ..filters import OrgRoleUserFilterBackend, UserFilter
 logger = get_logger(__name__)
 __all__ = [
     'UserViewSet', 'UserChangePasswordApi',
-    'UserUnblockPKApi', 'UserResetOTPApi',
+    'UserUnblockPKApi', 'UserResetMFAApi',
 ]
 
 
@@ -199,7 +199,7 @@ class UserUnblockPKApi(UserQuerysetMixin, generics.UpdateAPIView):
         MFABlockUtils.unblock_user(username)
 
 
-class UserResetOTPApi(UserQuerysetMixin, generics.RetrieveAPIView):
+class UserResetMFAApi(UserQuerysetMixin, generics.RetrieveAPIView):
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.ResetOTPSerializer
 
@@ -207,11 +207,12 @@ class UserResetOTPApi(UserQuerysetMixin, generics.RetrieveAPIView):
         user = self.get_object() if kwargs.get('pk') else request.user
         if user == request.user:
             msg = _("Could not reset self otp, use profile reset instead")
-            return Response({"error": msg}, status=401)
+            return Response({"error": msg}, status=400)
 
-        if user.mfa_enabled:
-            user.reset_mfa()
-            user.save()
+        backends = user.active_mfa_backends_mapper
+        for backend in backends.values():
+            if backend.can_disable():
+                backend.disable()
 
-            ResetMFAMsg(user).publish_async()
+        ResetMFAMsg(user).publish_async()
         return Response({"msg": "success"})

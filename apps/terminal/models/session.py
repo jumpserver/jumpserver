@@ -31,6 +31,7 @@ class Session(OrgModelMixin):
         MYSQL = 'mysql', 'mysql'
         ORACLE = 'oracle', 'oracle'
         MARIADB = 'mariadb', 'mariadb'
+        SQLSERVER = 'sqlserver', 'sqlserver'
         POSTGRESQL = 'postgresql', 'postgresql'
         K8S = 'k8s', 'kubernetes'
 
@@ -55,26 +56,65 @@ class Session(OrgModelMixin):
     upload_to = 'replay'
     ACTIVE_CACHE_KEY_PREFIX = 'SESSION_ACTIVE_{}'
     _DATE_START_FIRST_HAS_REPLAY_RDP_SESSION = None
+    SUFFIX_MAP = {1: '.gz', 2: '.replay.gz', 3: '.cast.gz'}
+    DEFAULT_SUFFIXES = ['.replay.gz', '.cast.gz', '.gz']
 
-    def get_rel_replay_path(self, version=2):
+    # Todo: 将来干掉 local_path, 使用 default storage 实现
+    def get_all_possible_local_path(self):
         """
-        获取session日志的文件路径
-        :param version: 原来后缀是 .gz，为了统一新版本改为 .replay.gz
+        获取所有可能的本地存储录像文件路径
         :return:
         """
-        suffix = '.replay.gz'
-        if version == 1:
-            suffix = '.gz'
+        return [self.get_local_storage_path_by_suffix(suffix)
+                for suffix in self.SUFFIX_MAP.values()]
+
+    def get_all_possible_relative_path(self):
+        """
+        获取所有可能的外部存储录像文件路径
+        :return:
+        """
+        return [self.get_relative_path_by_suffix(suffix)
+                for suffix in self.SUFFIX_MAP.values()]
+
+    def get_local_storage_path_by_suffix(self, suffix='.cast.gz'):
+        """
+        local_path: replay/2021-12-08/session_id.cast.gz
+        通过后缀名获取本地存储的录像文件路径
+        :param suffix: .cast.gz | '.replay.gz' | '.gz'
+        :return:
+        """
+        rel_path = self.get_relative_path_by_suffix(suffix)
+        if suffix == '.gz':
+            # 兼容 v1 的版本
+            return rel_path
+        return os.path.join(self.upload_to, rel_path)
+
+    def get_relative_path_by_suffix(self, suffix='.cast.gz'):
+        """
+        relative_path: 2021-12-08/session_id.cast.gz
+        通过后缀名获取外部存储录像文件路径
+        :param suffix: .cast.gz | '.replay.gz' | '.gz'
+        :return:
+        """
         date = self.date_start.strftime('%Y-%m-%d')
         return os.path.join(date, str(self.id) + suffix)
 
-    def get_local_path(self, version=2):
-        rel_path = self.get_rel_replay_path(version=version)
-        if version == 2:
-            local_path = os.path.join(self.upload_to, rel_path)
-        else:
-            local_path = rel_path
-        return local_path
+    def get_local_path_by_relative_path(self, rel_path):
+        """
+        2021-12-08/session_id.cast.gz
+        :param rel_path:
+        :return: replay/2021-12-08/session_id.cast.gz
+        """
+        return '{}/{}'.format(self.upload_to, rel_path)
+
+    def get_relative_path_by_local_path(self, local_path):
+        return local_path.replace('{}/'.format(self.upload_to), '')
+
+    def find_ok_relative_path_in_storage(self, storage):
+        session_paths = self.get_all_possible_relative_path()
+        for rel_path in session_paths:
+            if storage.exists(rel_path):
+                return rel_path
 
     @property
     def asset_obj(self):
@@ -122,7 +162,7 @@ class Session(OrgModelMixin):
     @property
     def db_protocols(self):
         _PROTOCOL = self.PROTOCOL
-        return [_PROTOCOL.MYSQL, _PROTOCOL.MARIADB, _PROTOCOL.ORACLE, _PROTOCOL.POSTGRESQL]
+        return [_PROTOCOL.MYSQL, _PROTOCOL.MARIADB, _PROTOCOL.ORACLE, _PROTOCOL.POSTGRESQL, _PROTOCOL.SQLSERVER]
 
     @property
     def can_terminate(self):
@@ -132,8 +172,9 @@ class Session(OrgModelMixin):
         else:
             return True
 
-    def save_replay_to_storage(self, f):
-        local_path = self.get_local_path()
+    def save_replay_to_storage_with_version(self, f, version=2):
+        suffix = self.SUFFIX_MAP.get(version, '.cast.gz')
+        local_path = self.get_local_storage_path_by_suffix(suffix)
         try:
             name = default_storage.save(local_path, f)
         except OSError as e:
@@ -147,7 +188,7 @@ class Session(OrgModelMixin):
     @classmethod
     def set_sessions_active(cls, session_ids):
         data = {cls.ACTIVE_CACHE_KEY_PREFIX.format(i): i for i in session_ids}
-        cache.set_many(data, timeout=5*60)
+        cache.set_many(data, timeout=5 * 60)
 
     @classmethod
     def get_active_sessions(cls):
@@ -194,7 +235,7 @@ class Session(OrgModelMixin):
             for user, asset, system_user in ziped:
                 ip = random_ip()
                 date_start = random_datetime(month_ago, now)
-                date_end = random_datetime(date_start, date_start+timezone.timedelta(hours=2))
+                date_end = random_datetime(date_start, date_start + timezone.timedelta(hours=2))
                 data = dict(
                     user=str(user), user_id=user.id,
                     asset=str(asset), asset_id=asset.id,

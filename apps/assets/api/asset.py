@@ -147,7 +147,7 @@ class AssetTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
         asset = data['asset']
         system_users = data.get('system_users')
         if not system_users:
-            system_users = asset.get_all_systemusers()
+            system_users = asset.get_all_system_users()
         if action == 'push_system_user':
             task = push_system_users_a_asset.delay(system_users, asset=asset)
         elif action == 'test_system_user':

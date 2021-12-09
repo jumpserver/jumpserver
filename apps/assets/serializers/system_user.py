@@ -40,6 +40,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'login_mode', 'login_mode_display', 'priority',
             'sudo', 'shell', 'sftp_root', 'home', 'system_groups', 'ad_domain',
             'username_same_with_user', 'auto_push', 'auto_generate_key',
+            'su_enabled', 'su_from',
             'date_created', 'date_updated', 'comment', 'created_by',
         ]
         fields_m2m = ['cmd_filters', 'assets_amount', 'applications_amount', 'nodes']
@@ -47,6 +48,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         extra_kwargs = {
             'password': {
                 "write_only": True,
+                'trim_whitespace': False,
                 "validators": [validate_password_contains_left_double_curly_bracket]
             },
             'public_key': {"write_only": True},
@@ -57,7 +59,8 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'login_mode_display': {'label': _('Login mode display')},
             'created_by': {'read_only': True},
             'ad_domain': {'required': False, 'allow_blank': True, 'label': _('Ad domain')},
-            'is_asset_protocol': {'label': _('Is asset protocol')}
+            'is_asset_protocol': {'label': _('Is asset protocol')},
+            'su_from': {'help_text': _('Only ssh and automatic login system users are supported')}
         }
 
     def validate_auto_push(self, value):
@@ -145,6 +148,29 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
                 not private_key and login_mode == SystemUser.LOGIN_AUTO:
             raise serializers.ValidationError(_("Password or private key required"))
         return password
+
+    def validate_su_from(self, su_from: SystemUser):
+        # self: su enabled
+        su_enabled = self.get_initial_value('su_enabled', default=False)
+        if not su_enabled:
+            return
+        if not su_from:
+            error = _('This field is required.')
+            raise serializers.ValidationError(error)
+        # self: protocol ssh
+        protocol = self.get_initial_value('protocol', default=SystemUser.Protocol.ssh.value)
+        if protocol not in [SystemUser.Protocol.ssh.value]:
+            error = _('Only ssh protocol system users are allowed')
+            raise serializers.ValidationError(error)
+        # su_from: protocol same
+        if su_from.protocol != protocol:
+            error = _('The protocol must be consistent with the current user: {}').format(protocol)
+            raise serializers.ValidationError(error)
+        # su_from: login model auto
+        if su_from.login_mode != su_from.LOGIN_AUTO:
+            error = _('Only system users with automatic login are allowed')
+            raise serializers.ValidationError(error)
+        return su_from
 
     def _validate_admin_user(self, attrs):
         if self.instance:

@@ -2,8 +2,10 @@
 #
 import urllib.parse
 import json
-import base64
 from typing import Callable
+import os
+import base64
+import ctypes
 
 from django.conf import settings
 from django.core.cache import cache
@@ -17,15 +19,16 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework import serializers
 
+from applications.models import Application
 from authentication.signals import post_auth_failed, post_auth_success
 from common.utils import get_logger, random_string
 from common.mixins.api import SerializerMixin
 from common.permissions import IsSuperUserOrAppUser, IsValidUser, IsSuperUser
+from common.utils.common import get_file_by_arch
 from orgs.mixins.api import RootOrgViewMixin
 from common.http import is_true
 from perms.utils.asset.permission import get_asset_system_user_ids_with_actions_by_user
 from perms.models.asset_permission import Action
-from authentication.errors import NotHaveUpDownLoadPerm
 
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
@@ -49,6 +52,10 @@ class ClientProtocolMixin:
         if not user or not self.request.user.is_superuser:
             user = self.request.user
         return asset, application, system_user, user
+
+    @staticmethod
+    def parse_env_bool(env_key, env_default, true_value, false_value):
+        return true_value if is_true(os.getenv(env_key, env_default)) else false_value
 
     def get_rdp_file_content(self, serializer):
         options = {
@@ -91,37 +98,68 @@ class ClientProtocolMixin:
         drives_redirect = is_true(self.request.query_params.get('drives_redirect'))
         token = self.create_token(user, asset, application, system_user)
 
+        # 设置磁盘挂载
         if drives_redirect and asset:
             systemuser_actions_mapper = get_asset_system_user_ids_with_actions_by_user(user, asset)
-            actions = systemuser_actions_mapper.get(system_user.id, [])
+            actions = systemuser_actions_mapper.get(system_user.id, 0)
             if actions & Action.UPDOWNLOAD:
                 options['drivestoredirect:s'] = '*'
-            else:
-                raise NotHaveUpDownLoadPerm
 
+        # 全屏
         options['screen mode id:i'] = '2' if full_screen else '1'
+
+        # RDP Server 地址
         address = settings.TERMINAL_RDP_ADDR
         if not address or address == 'localhost:3389':
             address = self.request.get_host().split(':')[0] + ':3389'
         options['full address:s'] = address
+        # 用户名
         options['username:s'] = '{}|{}'.format(user.username, token)
         if system_user.ad_domain:
             options['domain:s'] = system_user.ad_domain
+        # 宽高
         if width and height:
             options['desktopwidth:i'] = width
             options['desktopheight:i'] = height
         else:
             options['smart sizing:i'] = '1'
-        content = ''
-        for k, v in options.items():
-            content += f'{k}:{v}\n'
+
+        options['session bpp:i'] = os.getenv('JUMPSERVER_COLOR_DEPTH', '32')
+        options['audiomode:i'] = self.parse_env_bool('JUMPSERVER_DISABLE_AUDIO', 'false', '2', '0')
+
         if asset:
             name = asset.hostname
         elif application:
             name = application.name
+            application.get_rdp_remote_app_setting()
+
+            app = f'||jmservisor'
+            options['remoteapplicationmode:i'] = '1'
+            options['alternate shell:s'] = app
+            options['remoteapplicationprogram:s'] = app
+            options['remoteapplicationname:s'] = name
+            options['remoteapplicationcmdline:s'] = '- ' + self.get_encrypt_cmdline(application)
         else:
             name = '*'
+
+        content = ''
+        for k, v in options.items():
+            content += f'{k}:{v}\n'
         return name, content
+
+    def get_encrypt_cmdline(self, app: Application):
+
+        parameters = app.get_rdp_remote_app_setting()['parameters']
+        parameters = parameters.encode('ascii')
+
+        lib_path = get_file_by_arch('xpack/libs', 'librailencrypt.so')
+        lib = ctypes.CDLL(lib_path)
+        lib.encrypt.argtypes = [ctypes.c_char_p, ctypes.c_int]
+        lib.encrypt.restype = ctypes.c_char_p
+
+        rst = lib.encrypt(parameters, len(parameters))
+        rst = rst.decode('ascii')
+        return rst
 
     @action(methods=['POST', 'GET'], detail=False, url_path='rdp/file', permission_classes=[IsValidUser])
     def get_rdp_file(self, request, *args, **kwargs):
@@ -151,13 +189,16 @@ class ClientProtocolMixin:
         asset, application, system_user, user = self.get_request_resource(serializer)
         protocol = system_user.protocol
         username = user.username
-        name = ''
+
         if protocol == 'rdp':
             name, config = self.get_rdp_file_content(serializer)
-        elif protocol == 'vnc':
-            raise HttpResponse(status=404, data={"error": "VNC not support"})
-        else:
+        elif protocol == 'ssh':
+            # Todo:
+            name = ''
             config = 'ssh://system_user@asset@user@jumpserver-ssh'
+        else:
+            raise ValueError('Protocol not support: {}'.format(protocol))
+
         filename = "{}-{}-jumpserver".format(username, name)
         data = {
             "filename": filename,
@@ -170,8 +211,13 @@ class ClientProtocolMixin:
     @action(methods=['POST', 'GET'], detail=False, url_path='client-url', permission_classes=[IsValidUser])
     def get_client_protocol_url(self, request, *args, **kwargs):
         serializer = self.get_valid_serializer()
-        protocol_data = self.get_client_protocol_data(serializer)
-        protocol_data = base64.b64encode(json.dumps(protocol_data).encode()).decode()
+        try:
+            protocol_data = self.get_client_protocol_data(serializer)
+        except ValueError as e:
+            return Response({'error': str(e)}, status=401)
+
+        protocol_data = json.dumps(protocol_data).encode()
+        protocol_data = base64.b64encode(protocol_data).decode()
         data = {
             'url': 'jms://{}'.format(protocol_data),
         }
@@ -339,14 +385,12 @@ class UserConnectionTokenViewSet(
             raise serializers.ValidationError("User not valid, disabled or expired")
 
         system_user = get_object_or_404(SystemUser, id=value.get('system_user'))
-
         asset = None
         app = None
         if value.get('type') == 'asset':
             asset = get_object_or_404(Asset, id=value.get('asset'))
             if not asset.is_active:
                 raise serializers.ValidationError("Asset disabled")
-
             has_perm, expired_at = asset_validate_permission(user, asset, system_user, 'connect')
         else:
             app = get_object_or_404(Application, id=value.get('application'))

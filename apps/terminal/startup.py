@@ -3,8 +3,12 @@ import time
 import socket
 import threading
 from django.conf import settings
+from django.db.utils import OperationalError
+
+from common.db.utils import close_old_connections
 from common.decorator import Singleton
 from common.utils import get_disk_usage, get_cpu_load, get_memory_usage, get_logger
+
 from .serializers.terminal import TerminalRegistrationSerializer, StatusSerializer
 from .const import TerminalTypeChoices
 from .models.terminal import Terminal
@@ -52,9 +56,12 @@ class BaseTerminal(object):
             status_serializer.validated_data.pop('sessions', None)
             terminal = self.get_or_register_terminal()
             status_serializer.validated_data['terminal'] = terminal
-            status_serializer.save()
 
-            time.sleep(self.interval)
+            try:
+                status_serializer.save()
+                time.sleep(self.interval)
+            except OperationalError:
+                close_old_connections()
 
     def get_or_register_terminal(self):
         terminal = Terminal.objects.filter(

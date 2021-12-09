@@ -1,3 +1,4 @@
+# 编译代码
 FROM python:3.8.6-slim as stage-build
 MAINTAINER JumpServer Team <ibuler@qq.com>
 ARG VERSION
@@ -7,9 +8,12 @@ WORKDIR /opt/jumpserver
 ADD . .
 RUN cd utils && bash -ixeu build.sh
 
+# 构建运行时环境
 FROM python:3.8.6-slim
 ARG PIP_MIRROR=https://pypi.douban.com/simple
 ENV PIP_MIRROR=$PIP_MIRROR
+ARG PIP_JMS_MIRROR=https://pypi.douban.com/simple
+ENV PIP_JMS_MIRROR=$PIP_JMS_MIRROR
 
 WORKDIR /opt/jumpserver
 
@@ -27,12 +31,15 @@ RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
 
 COPY ./requirements/requirements.txt ./requirements/requirements.txt
 RUN pip install --upgrade pip==20.2.4 setuptools==49.6.0 wheel==0.34.2 -i ${PIP_MIRROR} \
+    && pip install --no-cache-dir $(grep -E 'jms|jumpserver' requirements/requirements.txt) -i ${PIP_JMS_MIRROR} \
     && pip install --no-cache-dir -r requirements/requirements.txt -i ${PIP_MIRROR} \
     && rm -rf ~/.cache/pip
 
 COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/jumpserver
 RUN mkdir -p /root/.ssh/ \
-    && echo "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null" > /root/.ssh/config
+    && echo "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null" > /root/.ssh/config \
+    && mv /bin/sh /bin/sh.bak  \
+    && ln -s /bin/bash /bin/sh
 
 RUN mkdir -p /opt/jumpserver/oracle/ \
     && wget https://download.jumpserver.org/public/instantclient-basiclite-linux.x64-21.1.0.0.0.tar > /dev/null \

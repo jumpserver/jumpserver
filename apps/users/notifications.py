@@ -1,4 +1,5 @@
 from urllib.parse import urljoin
+from collections import defaultdict
 
 from django.utils import timezone
 from django.utils.translation import ugettext as _
@@ -12,26 +13,29 @@ from notifications.notifications import UserMessage
 class UserCreatedMsg(UserMessage):
     def get_html_msg(self) -> dict:
         user = self.user
-        subject = _('Create account successfully')
-        if settings.EMAIL_CUSTOM_USER_CREATED_SUBJECT:
-            subject = settings.EMAIL_CUSTOM_USER_CREATED_SUBJECT
 
-        honorific = settings.EMAIL_CUSTOM_USER_CREATED_HONORIFIC or _('Hello {}').format(user.name)
-        signature = settings.EMAIL_CUSTOM_USER_CREATED_SIGNATURE or 'JumpServer'
+        mail_context = {
+            'subject': str(settings.EMAIL_CUSTOM_USER_CREATED_SUBJECT),
+            'honorific': str(settings.EMAIL_CUSTOM_USER_CREATED_HONORIFIC),
+            'content': str(settings.EMAIL_CUSTOM_USER_CREATED_BODY)
+        }
+
+        user_info = {'username': user.username, 'name': user.name, 'email': user.email}
+        # 转换成 defaultdict，否则 format 时会报 KeyError
+        user_info = defaultdict(str, **user_info)
+        mail_context = {k: v.format_map(user_info) for k, v in mail_context.items()}
 
         context = {
-            'honorific': honorific,
-            'signature':  signature,
-            'username': user.username,
+            **mail_context,
+            'user': user,
             'rest_password_url': reverse('authentication:reset-password', external=True),
             'rest_password_token': user.generate_reset_token(),
             'forget_password_url': reverse('authentication:forgot-password', external=True),
-            'email': user.email,
             'login_url': reverse('authentication:login', external=True),
         }
         message = render_to_string('users/_msg_user_created.html', context)
         return {
-            'subject': subject,
+            'subject': mail_context['subject'],
             'message': message
         }
 
@@ -85,6 +89,38 @@ class ResetPasswordSuccessMsg(UserMessage):
             'browser': self.browser,
         }
         message = render_to_string('authentication/_msg_rest_password_success.html', context)
+        return {
+            'subject': subject,
+            'message': message
+        }
+
+    @classmethod
+    def gen_test_msg(cls):
+        from users.models import User
+        from rest_framework.test import APIRequestFactory
+        from rest_framework.request import Request
+        factory = APIRequestFactory()
+        request = Request(factory.get('/notes/'))
+        user = User.objects.first()
+        return cls(user, request)
+
+
+class ResetPublicKeySuccessMsg(UserMessage):
+    def __init__(self, user, request):
+        super().__init__(user)
+        self.ip_address = get_request_ip_or_data(request)
+        self.browser = get_request_user_agent(request)
+
+    def get_html_msg(self) -> dict:
+        user = self.user
+
+        subject = _('Reset public key success')
+        context = {
+            'name': user.name,
+            'ip_address': self.ip_address,
+            'browser': self.browser,
+        }
+        message = render_to_string('authentication/_msg_rest_public_key_success.html', context)
         return {
             'subject': subject,
             'message': message

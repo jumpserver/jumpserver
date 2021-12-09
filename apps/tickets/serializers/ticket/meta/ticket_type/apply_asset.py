@@ -1,7 +1,6 @@
-from datetime import datetime
-
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
+
 from perms.serializers import ActionsField
 from perms.models import AssetPermission
 from orgs.utils import tmp_to_org
@@ -12,23 +11,34 @@ __all__ = [
     'ApplySerializer',
 ]
 
+asset_or_node_help_text = _("Select at least one asset or node")
+
 
 class ApplySerializer(serializers.Serializer):
     apply_permission_name = serializers.CharField(
         max_length=128, default=DefaultPermissionName(), label=_('Apply name')
     )
+    apply_nodes = serializers.ListField(
+        required=False, allow_null=True, child=serializers.UUIDField(),
+        label=_('Apply nodes'), help_text=asset_or_node_help_text,
+        default=list
+    )
+    apply_nodes_display = serializers.ListField(
+        child=serializers.CharField(), label=_('Apply nodes display'), required=False
+    )
     # 申请信息
     apply_assets = serializers.ListField(
-        required=True, allow_null=True, child=serializers.UUIDField(), label=_('Apply assets')
+        required=False, allow_null=True, child=serializers.UUIDField(),
+        label=_('Apply assets'), help_text=asset_or_node_help_text
     )
     apply_assets_display = serializers.ListField(
         required=False, read_only=True, child=serializers.CharField(),
-        label=_('Approve assets display'), allow_null=True,
-        default=list,
+        label=_('Apply assets display'), allow_null=True,
+        default=list
     )
     apply_system_users = serializers.ListField(
         required=True, allow_null=True, child=serializers.UUIDField(),
-        label=_('Approve system users')
+        label=_('Apply system users')
     )
     apply_system_users_display = serializers.ListField(
         required=False, read_only=True, child=serializers.CharField(),
@@ -63,12 +73,20 @@ class ApplySerializer(serializers.Serializer):
             'Permission named `{}` already exists'.format(permission_name)
         ))
 
-    def validate_apply_date_expired(self, value):
-        date_start = self.root.initial_data['meta'].get('apply_date_start')
-        date_start = datetime.strptime(date_start, '%Y-%m-%dT%H:%M:%S.%fZ')
-        date_expired = self.root.initial_data['meta'].get('apply_date_expired')
-        date_expired = datetime.strptime(date_expired, '%Y-%m-%dT%H:%M:%S.%fZ')
-        if date_expired <= date_start:
+    def validate(self, attrs):
+        if not attrs.get('apply_nodes') and not attrs.get('apply_assets'):
+            raise serializers.ValidationError({
+                'apply_nodes': asset_or_node_help_text,
+                'apply_assets': asset_or_node_help_text,
+            })
+
+        apply_date_start = attrs['apply_date_start'].strftime('%Y-%m-%d %H:%M:%S')
+        apply_date_expired = attrs['apply_date_expired'].strftime('%Y-%m-%d %H:%M:%S')
+
+        if apply_date_expired <= apply_date_start:
             error = _('The expiration date should be greater than the start date')
-            raise serializers.ValidationError(error)
-        return value
+            raise serializers.ValidationError({'apply_date_expired': error})
+
+        attrs['apply_date_start'] = apply_date_start
+        attrs['apply_date_expired'] = apply_date_expired
+        return attrs

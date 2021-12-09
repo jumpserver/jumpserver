@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-import copy
 from rest_framework import serializers
 from urllib.parse import urlparse
 from django.utils.translation import ugettext_lazy as _
@@ -9,6 +8,7 @@ from common.drf.serializers import MethodSerializer
 from common.drf.fields import ReadableHiddenField
 from ..models import ReplayStorage, CommandStorage
 from .. import const
+from rest_framework.validators import UniqueValidator
 
 
 # Replay storage serializers
@@ -220,6 +220,9 @@ class CommandStorageSerializer(BaseStorageSerializer):
 
     class Meta(BaseStorageSerializer.Meta):
         model = CommandStorage
+        extra_kwargs = {
+            'name': {'validators': [UniqueValidator(queryset=CommandStorage.objects.all())]}
+        }
 
 
 # ReplayStorageSerializer
@@ -230,4 +233,6 @@ class ReplayStorageSerializer(BaseStorageSerializer):
 
     class Meta(BaseStorageSerializer.Meta):
         model = ReplayStorage
-
+        extra_kwargs = {
+            'name': {'validators': [UniqueValidator(queryset=ReplayStorage.objects.all())]}
+        }

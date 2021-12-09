@@ -53,7 +53,7 @@ def set_remote_app_asset_system_users_if_need(instance: ApplicationPermission, s
 
     system_users = system_users or instance.system_users.all()
     for system_user in system_users:
-        system_user.assets.add(*asset_ids)
+        system_user.add_related_assets(asset_ids)
 
         if system_user.username_same_with_user:
             users = users or instance.users.all()

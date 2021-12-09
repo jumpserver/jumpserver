@@ -70,7 +70,8 @@ def on_permission_assets_changed(instance, action, reverse, pk_set, model, **kwa
     # TODO 待优化
     system_users = instance.system_users.all()
     for system_user in system_users:
-        system_user.assets.add(*tuple(assets))
+        system_user: SystemUser
+        system_user.add_related_assets(assets)
 
 
 @receiver(m2m_changed, sender=AssetPermission.system_users.through)
@@ -88,7 +89,7 @@ def on_asset_permission_system_users_changed(instance, action, reverse, **kwargs
 
     for system_user in system_users:
         system_user.nodes.add(*tuple(nodes))
-        system_user.assets.add(*tuple(assets))
+        system_user.add_related_assets(assets)
 
         # 动态系统用户，需要关联用户和用户组了
         if system_user.username_same_with_user:

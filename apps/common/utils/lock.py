@@ -1,7 +1,10 @@
 from functools import wraps
 import threading
 
-from redis_lock import Lock as RedisLock, NotAcquired
+from redis_lock import (
+    Lock as RedisLock, NotAcquired, UNLOCK_SCRIPT,
+    EXTEND_SCRIPT, RESET_SCRIPT, RESET_ALL_SCRIPT
+)
 from redis import Redis
 from django.db import transaction
 
@@ -49,7 +52,8 @@ class DistributedLock(RedisLock):
         else:
             auto_renewal = False
 
-        super().__init__(redis_client=redis, name=name, expire=expire, auto_renewal=auto_renewal)
+        super().__init__(redis_client=redis, name='{' + name + '}', expire=expire, auto_renewal=auto_renewal)
+        self.register_scripts(redis)
         self._release_on_transaction_commit = release_on_transaction_commit
         self._release_raise_exc = release_raise_exc
         self._reentrant = reentrant
@@ -71,7 +75,16 @@ class DistributedLock(RedisLock):
             # 要创建一个新的锁对象
             with self.__class__(**self.kwargs_copy):
                 return func(*args, **kwds)
+
         return inner
+
+    @classmethod
+    def register_scripts(cls, redis_client):
+        # cls.unlock_script = redis_client.register_script(UNLOCK_SCRIPT)
+        # cls.extend_script = redis_client.register_script(EXTEND_SCRIPT)
+        # cls.reset_script = redis_client.register_script(RESET_SCRIPT)
+        # cls.reset_all_script = redis_client.register_script(RESET_ALL_SCRIPT)
+        pass
 
     def locked_by_me(self):
         if self.locked():
@@ -92,8 +105,7 @@ class DistributedLock(RedisLock):
         if self._reentrant:
             if self.locked_by_current_thread():
                 self._acquired_reentrant_lock = True
-                logger.debug(
-                    f'Reentry lock ok: lock_id={self.id} owner_id={self.get_owner_id()} lock={self.name} thread={self._thread_id}')
+                logger.debug(f'Reentry lock ok: lock_id={self.id} owner_id={self.get_owner_id()} lock={self.name} thread={self._thread_id}')
                 return True
 
             logger.debug(f'Attempt acquire reentrant-lock: lock_id={self.id} lock={self.name} thread={self._thread_id}')
@@ -102,7 +114,8 @@ class DistributedLock(RedisLock):
                 logger.debug(f'Acquired reentrant-lock ok: lock_id={self.id} lock={self.name} thread={self._thread_id}')
                 setattr(thread_local, self.name, self.id)
             else:
-                logger.debug(f'Acquired reentrant-lock failed: lock_id={self.id} lock={self.name} thread={self._thread_id}')
+                logger.debug(
+                    f'Acquired reentrant-lock failed: lock_id={self.id} lock={self.name} thread={self._thread_id}')
             return acquired
         else:
             logger.debug(f'Attempt acquire lock: lock_id={self.id} lock={self.name} thread={self._thread_id}')
@@ -174,11 +187,13 @@ class DistributedLock(RedisLock):
                 else:
                     _release = self._release_on_reentrant_locked_by_brother
             else:
-                self._raise_exc_with_log(f'Reentrant-lock is not acquired: lock_id={self.id} lock={self.name} thread={self._thread_id}')
+                self._raise_exc_with_log(
+                    f'Reentrant-lock is not acquired: lock_id={self.id} lock={self.name} thread={self._thread_id}')
 
         # 处理是否在事务提交时才释放锁
         if self._release_on_transaction_commit:
-            logger.debug(f'Release lock on transaction commit ... :lock_id={self.id} lock={self.name} thread={self._thread_id}')
+            logger.debug(
+                f'Release lock on transaction commit ... :lock_id={self.id} lock={self.name} thread={self._thread_id}')
             transaction.on_commit(_release)
         else:
             _release()

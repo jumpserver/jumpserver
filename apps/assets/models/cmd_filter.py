@@ -75,9 +75,17 @@ class CommandFilterRule(OrgModelMixin):
         if self.type == 'command':
             regex = []
             content = self.content.replace('\r\n', '\n')
-            for cmd in content.split('\n'):
+            for _cmd in content.split('\n'):
+                cmd = re.sub(r'\s+', ' ', _cmd)
                 cmd = re.escape(cmd)
                 cmd = cmd.replace('\\ ', '\s+')
+
+                # 有空格就不能 铆钉单词了
+                if ' ' in _cmd:
+                    regex.append(cmd)
+                    continue
+
+                # 如果是单个字符
                 if cmd[-1].isalpha():
                     regex.append(r'\b{0}\b'.format(cmd))
                 else:
