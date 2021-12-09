@@ -1,15 +1,18 @@
 # ~*~ coding: utf-8 ~*~
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
+from django.db.models import Q
 
-from common.utils import get_logger
+from common.utils import get_logger, get_object_or_none
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, IsValidUser
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
 from common.mixins.api import SuggestionMixin
 from orgs.utils import tmp_to_root_org
 from rest_framework.decorators import action
-from ..models import SystemUser, Asset
+from users.models import User, UserGroup
+from applications.models import Application
+from ..models import SystemUser, Asset, CommandFilter, CommandFilterRule
 from .. import serializers
 from ..serializers import SystemUserWithAuthInfoSerializer, SystemUserTempAuthSerializer
 from ..tasks import (
@@ -192,9 +195,42 @@ class SystemUserCommandFilterRuleListApi(generics.ListAPIView):
         return CommandFilterRuleSerializer
 
     def get_queryset(self):
-        pk = self.kwargs.get('pk', None)
-        system_user = get_object_or_404(SystemUser, pk=pk)
-        return system_user.cmd_filter_rules
+        user_groups = []
+        user_id = self.request.query_params.get('user_id')
+        user = get_object_or_none(User, pk=user_id)
+        if user:
+            user_groups.extend(list(user.groups.all()))
+        user_group_id = self.request.query_params.get('user_group_id')
+        user_group = get_object_or_none(UserGroup, pk=user_group_id)
+        if user_group:
+            user_groups.append(user_group)
+        system_user_id = self.kwargs.get('pk', None)
+        system_user = get_object_or_none(SystemUser, pk=system_user_id)
+        if not system_user:
+            system_user_id = self.request.query_params.get('system_user_id')
+            system_user = get_object_or_none(SystemUser, pk=system_user_id)
+        asset_id = self.request.query_params.get('asset_id')
+        asset = get_object_or_none(Asset, pk=asset_id)
+        application_id = self.request.query_params.get('application_id')
+        application = get_object_or_none(Application, pk=application_id)
+        q = Q()
+        if user:
+            q |= Q(users=user)
+        if user_group:
+            q |= Q(user_groups__in=set(user_groups))
+        if system_user:
+            q |= Q(system_users=system_user)
+        if asset:
+            q |= Q(assets=asset)
+        if application:
+            q |= Q(applications=application)
+        if q:
+            cmd_filters = CommandFilter.objects.filter(q).filter(is_active=True)
+            rule_ids = cmd_filters.values_list('rules', flat=True)
+            rules = CommandFilterRule.objects.filter(id__in=rule_ids)
+        else:
+            rules = CommandFilterRule.objects.none()
+        return rules
 
 
 class SystemUserAssetsListView(generics.ListAPIView):

@@ -29,7 +29,7 @@ class CommandFilterViewSet(OrgBulkModelViewSet):
 
 class CommandFilterRuleViewSet(OrgBulkModelViewSet):
     model = CommandFilterRule
-    filterset_fields = ("content",)
+    filterset_fields = ('content',)
     search_fields = filterset_fields
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.CommandFilterRuleSerializer

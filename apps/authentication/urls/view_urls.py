@@ -56,5 +56,6 @@ urlpatterns = [
     # openid
     path('cas/', include(('authentication.backends.cas.urls', 'authentication'), namespace='cas')),
     path('openid/', include(('jms_oidc_rp.urls', 'authentication'), namespace='openid')),
+    path('saml2/', include(('authentication.backends.saml2.urls', 'authentication'), namespace='saml2')),
     path('captcha/', include('captcha.urls')),
 ]

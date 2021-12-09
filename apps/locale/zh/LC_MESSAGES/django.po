@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-08 17:30+0800\n"
+"POT-Creation-Date: 2021-12-09 17:52+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -20,7 +20,7 @@ msgstr ""
 #: acls/models/base.py:25 acls/serializers/login_asset_acl.py:47
 #: applications/models/application.py:166 assets/models/asset.py:139
 #: assets/models/base.py:175 assets/models/cluster.py:18
-#: assets/models/cmd_filter.py:21 assets/models/domain.py:24
+#: assets/models/cmd_filter.py:23 assets/models/domain.py:24
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
 #: orgs/models.py:24 perms/models/base.py:44 settings/models.py:29
 #: settings/serializers/sms.py:6 terminal/models/storage.py:23
@@ -34,12 +34,12 @@ msgstr ""
 msgid "Name"
 msgstr "名称"
 
-#: acls/models/base.py:27 assets/models/cmd_filter.py:54
+#: acls/models/base.py:27 assets/models/cmd_filter.py:77
 #: assets/models/user.py:200
 msgid "Priority"
 msgstr "优先级"
 
-#: acls/models/base.py:28 assets/models/cmd_filter.py:54
+#: acls/models/base.py:28 assets/models/cmd_filter.py:77
 #: assets/models/user.py:200
 msgid "1-100, the lower the value will be match first"
 msgstr "优先级可选范围为 1-100 (数值越小越优先)"
@@ -54,7 +54,7 @@ msgstr "激活中"
 #: acls/models/base.py:32 applications/models/application.py:179
 #: assets/models/asset.py:144 assets/models/asset.py:232
 #: assets/models/base.py:180 assets/models/cluster.py:29
-#: assets/models/cmd_filter.py:23 assets/models/cmd_filter.py:64
+#: assets/models/cmd_filter.py:44 assets/models/cmd_filter.py:87
 #: assets/models/domain.py:25 assets/models/domain.py:65
 #: assets/models/group.py:23 assets/models/label.py:23 ops/models/adhoc.py:37
 #: orgs/models.py:27 perms/models/base.py:53 settings/models.py:34
@@ -70,7 +70,7 @@ msgstr "备注"
 msgid "Reject"
 msgstr "拒绝"
 
-#: acls/models/login_acl.py:19 assets/models/cmd_filter.py:48
+#: acls/models/login_acl.py:19 assets/models/cmd_filter.py:71
 msgid "Allow"
 msgstr "允许"
 
@@ -80,10 +80,11 @@ msgid "Login confirm"
 msgstr "登录复核"
 
 #: acls/models/login_acl.py:24 acls/models/login_asset_acl.py:20
-#: assets/models/label.py:15 audits/models.py:36 audits/models.py:56
-#: audits/models.py:74 audits/serializers.py:94 authentication/models.py:47
-#: orgs/models.py:19 orgs/models.py:433 perms/models/base.py:45
-#: templates/index.html:78 terminal/backends/command/models.py:18
+#: assets/models/cmd_filter.py:26 assets/models/label.py:15 audits/models.py:36
+#: audits/models.py:56 audits/models.py:74 audits/serializers.py:94
+#: authentication/models.py:47 orgs/models.py:19 orgs/models.py:433
+#: perms/models/base.py:45 templates/index.html:78
+#: terminal/backends/command/models.py:18
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:39
 #: terminal/notifications.py:90 terminal/notifications.py:138
 #: tickets/models/comment.py:17 users/const.py:14 users/models/user.py:169
@@ -102,7 +103,7 @@ msgstr "规则"
 
 #: acls/models/login_acl.py:31 acls/models/login_asset_acl.py:26
 #: acls/serializers/login_acl.py:17 acls/serializers/login_asset_acl.py:75
-#: assets/models/cmd_filter.py:57 audits/models.py:57
+#: assets/models/cmd_filter.py:80 audits/models.py:57
 #: authentication/templates/authentication/_access_key_modal.html:34
 #: users/templates/users/_granted_assets.html:29
 #: users/templates/users/user_asset_permission.html:44
@@ -112,7 +113,7 @@ msgid "Action"
 msgstr "动作"
 
 #: acls/models/login_acl.py:35 acls/models/login_asset_acl.py:32
-#: acls/serializers/login_acl.py:16 assets/models/cmd_filter.py:62
+#: acls/serializers/login_acl.py:16 assets/models/cmd_filter.py:85
 msgid "Reviewers"
 msgstr "审批人"
 
@@ -129,9 +130,10 @@ msgstr "系统用户"
 #: acls/models/login_asset_acl.py:22
 #: applications/serializers/attrs/application_category/remote_app.py:37
 #: assets/models/asset.py:356 assets/models/authbook.py:18
-#: assets/models/gathered_user.py:14 assets/serializers/system_user.py:259
-#: audits/models.py:38 perms/models/asset_permission.py:99
-#: templates/index.html:82 terminal/backends/command/models.py:19
+#: assets/models/cmd_filter.py:34 assets/models/gathered_user.py:14
+#: assets/serializers/system_user.py:259 audits/models.py:38
+#: perms/models/asset_permission.py:99 templates/index.html:82
+#: terminal/backends/command/models.py:19
 #: terminal/backends/command/serializers.py:13 terminal/models/session.py:41
 #: terminal/notifications.py:89
 #: users/templates/users/user_asset_permission.html:40
@@ -263,7 +265,7 @@ msgid "Custom"
 msgstr "自定义"
 
 #: applications/models/account.py:11 assets/models/authbook.py:19
-#: assets/models/user.py:292 audits/models.py:39
+#: assets/models/cmd_filter.py:38 assets/models/user.py:291 audits/models.py:39
 #: perms/models/application_permission.py:32
 #: perms/models/asset_permission.py:101 templates/_nav.html:45
 #: terminal/backends/command/models.py:20
@@ -303,7 +305,7 @@ msgid "Category"
 msgstr "类别"
 
 #: applications/models/application.py:171
-#: applications/serializers/application.py:90 assets/models/cmd_filter.py:53
+#: applications/serializers/application.py:90 assets/models/cmd_filter.py:76
 #: assets/models/user.py:199 perms/models/application_permission.py:23
 #: perms/serializers/application/user_permission.py:34
 #: terminal/models/storage.py:55 terminal/models/storage.py:116
@@ -323,7 +325,7 @@ msgstr "网域"
 msgid "Attrs"
 msgstr ""
 
-#: applications/models/application.py:183
+#: applications/models/application.py:183 assets/models/cmd_filter.py:41
 #: perms/models/application_permission.py:27 users/models/user.py:170
 msgid "Application"
 msgstr "应用程序"
@@ -528,13 +530,13 @@ msgstr "协议组"
 msgid "Nodes"
 msgstr "节点"
 
-#: assets/models/asset.py:220 assets/models/cmd_filter.py:22
+#: assets/models/asset.py:220 assets/models/cmd_filter.py:43
 #: assets/models/domain.py:66 assets/models/label.py:22
 msgid "Is active"
 msgstr "激活"
 
 #: assets/models/asset.py:223 assets/models/cluster.py:19
-#: assets/models/user.py:188 assets/models/user.py:341 templates/_nav.html:44
+#: assets/models/user.py:188 assets/models/user.py:340 templates/_nav.html:44
 msgid "Admin user"
 msgstr "特权用户"
 
@@ -551,8 +553,8 @@ msgid "Labels"
 msgstr "标签管理"
 
 #: assets/models/asset.py:230 assets/models/base.py:183
-#: assets/models/cluster.py:28 assets/models/cmd_filter.py:26
-#: assets/models/cmd_filter.py:67 assets/models/group.py:21
+#: assets/models/cluster.py:28 assets/models/cmd_filter.py:48
+#: assets/models/cmd_filter.py:90 assets/models/group.py:21
 #: common/db/models.py:70 common/mixins/models.py:49 orgs/models.py:25
 #: orgs/models.py:437 perms/models/base.py:51 users/models/user.py:591
 #: users/serializers/group.py:33
@@ -656,47 +658,61 @@ msgstr "系统"
 msgid "Default Cluster"
 msgstr "默认Cluster"
 
-#: assets/models/cmd_filter.py:33 assets/models/user.py:206
+#: assets/models/cmd_filter.py:30 perms/models/base.py:47
+#: templates/_nav.html:21 users/models/group.py:31 users/models/user.py:553
+#: users/templates/users/_select_user_modal.html:16
+#: users/templates/users/user_asset_permission.html:39
+#: users/templates/users/user_asset_permission.html:67
+#: users/templates/users/user_database_app_permission.html:38
+#: users/templates/users/user_database_app_permission.html:61
+msgid "User group"
+msgstr "用户组"
+
+#: assets/models/cmd_filter.py:56
 msgid "Command filter"
 msgstr "命令过滤器"
 
-#: assets/models/cmd_filter.py:40
+#: assets/models/cmd_filter.py:63
 msgid "Regex"
 msgstr "正则表达式"
 
-#: assets/models/cmd_filter.py:41 ops/models/command.py:25
+#: assets/models/cmd_filter.py:64 ops/models/command.py:25
 #: terminal/backends/command/serializers.py:15 terminal/models/session.py:50
 #: terminal/templates/terminal/_msg_command_alert.html:12
 #: terminal/templates/terminal/_msg_command_execute_alert.html:10
 msgid "Command"
 msgstr "命令"
 
-#: assets/models/cmd_filter.py:47
+#: assets/models/cmd_filter.py:70
 msgid "Deny"
 msgstr "拒绝"
 
-#: assets/models/cmd_filter.py:49
+#: assets/models/cmd_filter.py:72
 msgid "Reconfirm"
 msgstr "复核"
 
-#: assets/models/cmd_filter.py:52
+#: assets/models/cmd_filter.py:75
 msgid "Filter"
 msgstr "过滤器"
 
-#: assets/models/cmd_filter.py:56 settings/serializers/basic.py:10
+#: assets/models/cmd_filter.py:79 settings/serializers/basic.py:10
 #: xpack/plugins/license/models.py:29
 msgid "Content"
 msgstr "内容"
 
-#: assets/models/cmd_filter.py:56
+#: assets/models/cmd_filter.py:79
 msgid "One line one command"
 msgstr "每行一个命令"
 
-#: assets/models/cmd_filter.py:71
+#: assets/models/cmd_filter.py:94
 msgid "Command filter rule"
 msgstr "命令过滤规则"
 
-#: assets/models/cmd_filter.py:119 tickets/const.py:13
+#: assets/models/cmd_filter.py:132
+msgid "The generated regular expression is incorrect: {}"
+msgstr "生成的正则表达式有误"
+
+#: assets/models/cmd_filter.py:158 tickets/const.py:13
 msgid "Command confirm"
 msgstr "命令复核"
 
@@ -821,27 +837,27 @@ msgstr "Shell"
 msgid "Login mode"
 msgstr "认证方式"
 
-#: assets/models/user.py:207
+#: assets/models/user.py:206
 msgid "SFTP Root"
 msgstr "SFTP根路径"
 
-#: assets/models/user.py:208 authentication/models.py:45
+#: assets/models/user.py:207 authentication/models.py:45
 msgid "Token"
 msgstr ""
 
-#: assets/models/user.py:209
+#: assets/models/user.py:208
 msgid "Home"
 msgstr "家目录"
 
-#: assets/models/user.py:210
+#: assets/models/user.py:209
 msgid "System groups"
 msgstr "用户组"
 
-#: assets/models/user.py:213
+#: assets/models/user.py:212
 msgid "User switch"
 msgstr "用户切换"
 
-#: assets/models/user.py:214
+#: assets/models/user.py:213
 msgid "Switch from"
 msgstr "切换自"
 
@@ -1503,7 +1519,7 @@ msgstr "{ApplicationPermission} 添加 {SystemUser}"
 msgid "{ApplicationPermission} REMOVE {SystemUser}"
 msgstr "{ApplicationPermission} 移除 {SystemUser}"
 
-#: authentication/api/connection_token.py:259
+#: authentication/api/connection_token.py:285
 msgid "Invalid token"
 msgstr "无效的令牌"
 
@@ -2637,15 +2653,6 @@ msgstr "未分组"
 #: perms/models/asset_permission.py:211
 msgid "Favorite"
 msgstr "收藏夹"
-
-#: perms/models/base.py:47 templates/_nav.html:21 users/models/group.py:31
-#: users/models/user.py:553 users/templates/users/_select_user_modal.html:16
-#: users/templates/users/user_asset_permission.html:39
-#: users/templates/users/user_asset_permission.html:67
-#: users/templates/users/user_database_app_permission.html:38
-#: users/templates/users/user_database_app_permission.html:61
-msgid "User group"
-msgstr "用户组"
 
 #: perms/models/base.py:50
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:58
@@ -4179,19 +4186,19 @@ msgstr "macOS 需要下载客户端来连接 RDP 资产，Windows 系统默认�
 msgid "Filters"
 msgstr "过滤"
 
-#: terminal/api/session.py:185
+#: terminal/api/session.py:189
 msgid "Session does not exist: {}"
 msgstr "会话不存在: {}"
 
-#: terminal/api/session.py:188
+#: terminal/api/session.py:192
 msgid "Session is finished or the protocol not supported"
 msgstr "会话已经完成或协议不支持"
 
-#: terminal/api/session.py:193
+#: terminal/api/session.py:197
 msgid "User does not exist: {}"
 msgstr "用户不存在: {}"
 
-#: terminal/api/session.py:197
+#: terminal/api/session.py:201
 msgid "User does not have permission"
 msgstr "用户没有权限"
 
@@ -5780,10 +5787,8 @@ msgid "Qingyun Private Cloud"
 msgstr "青云私有云"
 
 #: xpack/plugins/cloud/const.py:19
-#, fuzzy
-#| msgid "Tencent Cloud"
 msgid "OpenStack Cloud"
-msgstr "腾讯云"
+msgstr "OpenStack Cloud"
 
 #: xpack/plugins/cloud/const.py:20
 msgid "Google Cloud Platform"
@@ -6063,16 +6068,12 @@ msgid "API Endpoint"
 msgstr "API 端点"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:101
-#, fuzzy
-#| msgid "Target url"
-msgid "auth url"
-msgstr "目标URL"
+msgid "Auth url"
+msgstr "认证地址"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:103
-#, fuzzy
-#| msgid "Domain name"
-msgid "user domain name"
-msgstr "网域名称"
+msgid "User domain"
+msgstr "用户域"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:110
 msgid "Service account key"
