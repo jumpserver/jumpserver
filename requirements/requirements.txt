@@ -123,3 +123,4 @@ html2text==2020.1.16
 python-novaclient==11.0.1
 pyzipper==0.3.5
 python3-saml==1.12.0
+python-keystoneclient==4.3.0
