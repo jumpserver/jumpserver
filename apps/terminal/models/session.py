@@ -113,7 +113,8 @@ class Session(OrgModelMixin):
     def find_ok_relative_path_in_storage(self, storage):
         session_paths = self.get_all_possible_relative_path()
         for rel_path in session_paths:
-            if storage.exists(rel_path):
+            ok, msg = storage.exists(rel_path)
+            if ok:
                 return rel_path
 
     @property
