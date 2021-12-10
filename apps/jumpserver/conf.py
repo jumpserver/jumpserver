@@ -234,7 +234,7 @@ class Config(dict):
         'SAML2_LOGOUT_COMPLETELY': True,
         'AUTH_SAML2_ALWAYS_UPDATE_USER': True,
         'SAML2_RENAME_ATTRIBUTES': {'uid': 'username', 'email': 'email'},
-        'SAML2_OTHER_SETTINGS_PATH': '',
+        'SAML2_SP_ADVANCED_SETTINGS': {"organization": {"en": {"name": "JumpServer", "displayname": "JumpServer", "url": "https://jumpserver.org/"}}},
         'SAML2_IDP_METADATA_URL': '',
         'SAML2_IDP_METADATA_XML': '',
         'SAML2_SP_KEY_CONTENT': '',
