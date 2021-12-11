@@ -6,5 +6,4 @@ class VaultConfig(AppConfig):
 
     def ready(self):
         from . import signals_handler
-        # init_vault_path()
         return super().ready()

@@ -1,11 +1,15 @@
 from abc import ABCMeta
 
-from django.conf import settings
-
 from adapter import Client
+from adapter.exceptions import Unauthorized
+
 from common.utils import get_logger
 
 logger = get_logger(__name__)
+
+
+# API 文档
+# https://10.1.12.76/shterm/resources/docs/rest/index.html#api-Dev-PostDataBase
 
 
 class BasePam(object):
@@ -17,12 +21,16 @@ class BasePam(object):
         "content-type": "application/json;charset=utf-8"
     }
 
-    def __init__(self):
-        username = settings.PAM_USERNAME
-        password = settings.PAM_PASSWORD
-        self.client = self.login(username, password)
+    def __init__(self, url, username, password):
+        self.client = Client(url=url, verify=False)
+        self.is_active = True
+        try:
+            self.login(username, password)
+        except Unauthorized:
+            self.is_active = False
+            logger.warning('Pam user authentication failed')
 
     def login(self, username, password):
-        path = '/shterm/api/authenticate'
+        path = '/api/authenticate'
         data = dict(username=username, password=password)
-        return Client(verify=False).adapter.post(path, headers=self.header, json=data)
+        return self.client.adapter.post(path, headers=self.header, json=data)

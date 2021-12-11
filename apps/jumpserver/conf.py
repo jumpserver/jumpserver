@@ -372,7 +372,7 @@ class Config(dict):
         'VAULT_TOKEN': 's.JqVYFWIrtPzctcePjaWTtxXf',
 
         # pam相关
-        'PAM_URL': 'https://10.1.12.76',
+        'PAM_URL': 'https://10.1.12.76/shterm',
         'PAM_USERNAME': 'admin',
         'PAM_PASSWORD': 'fit2cloud',
 

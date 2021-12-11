@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#
 from hvac import exceptions
 from common.utils import get_logger
 from .base import BaseVault
