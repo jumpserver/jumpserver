@@ -25,9 +25,6 @@ class Client(object):
     ):
         url = url if url else settings.PAM_URL
 
-        if not verify:
-            verify = True
-
         self._adapter = adapter(
             base_uri=url,
             cert=cert,

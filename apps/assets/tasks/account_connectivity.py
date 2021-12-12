@@ -81,6 +81,7 @@ def test_account_connectivity_util(account, task_name):
     if not check_asset_can_run_ansible(account.asset):
         return
 
+    account.replace_secret()
     account.load_auth()
     try:
         raw, summary = test_user_connectivity(

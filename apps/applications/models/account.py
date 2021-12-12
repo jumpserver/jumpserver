@@ -47,7 +47,6 @@ class Account(BaseUser):
                 setattr(self, attr, origin_value)
 
     def save(self, *args, **kwargs):
-        self.replace_secret()
         self.unload_auth()
         instance = super().save(*args, **kwargs)
         instance.replace_secret()

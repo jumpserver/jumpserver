@@ -11,7 +11,7 @@ class BaseSecretClient(object):
         self.instance = instance
 
     @abstractmethod
-    def update_or_create_secret(self, secret_data=None):
+    def create_secret(self, secret_data=None):
         raise NotImplementedError
 
     @abstractmethod
@@ -32,6 +32,19 @@ class BaseSecretClient(object):
         secret_data = {
             k: getattr(instance, f'_{k}') for k in fields
         }
+        return secret_data
+
+    def get_change_secret_data(self, old_secret_data):
+        secret_data = old_secret_data
+        new_secret_data = self.create_secret_data()
+        for k, v in new_secret_data.items():
+            if v:
+                if v != secret_data[k]:
+                    secret_data[k] = v
+                else:
+                    secret_data.pop(k, None)
+            else:
+                secret_data.pop(k, None)
         return secret_data
 
     def clear_secret(self):

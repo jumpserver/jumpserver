@@ -1,7 +1,7 @@
 from abc import ABCMeta
 
-from adapter import Client
-from adapter.exceptions import Unauthorized
+from ..adapter import Client
+from ..adapter.exceptions import Unauthorized
 
 from common.utils import get_logger
 

@@ -39,6 +39,7 @@ class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         return queryset
 
     def to_representation(self, instance):
+        instance.replace_secret()
         instance.load_auth()
         return super().to_representation(instance)
 

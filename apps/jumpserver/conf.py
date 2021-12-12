@@ -364,7 +364,7 @@ class Config(dict):
         'FTP_LOG_KEEP_DAYS': 200,
         'CLOUD_SYNC_TASK_EXECUTION_KEEP_DAYS': 30,
 
-        'SECRET_STORAGE_BACKEND': 'vault',
+        'SECRET_STORAGE_BACKEND': 'pam',
 
         # vault相关
         'VAULT_PATH': 'jms/',

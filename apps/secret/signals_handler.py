@@ -31,7 +31,7 @@ def update_or_create_secret(sender, instance=None, created=None, **kwargs):
         if hasattr(instance, backend):
             client = getattr(instance, backend)
             if created:
-                client.update_or_create_secret()
+                client.create_secret()
             else:
                 old_secret_data = client.get_secret()
                 client.patch_secret(old_secret_data)

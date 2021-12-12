@@ -24,8 +24,8 @@ class Secret:
         m = importlib.import_module(f'.{backend}', __package__)
         self.client = getattr(m, 'client')(instance)
 
-    def update_or_create_secret(self, secret_data=None):
-        self.client.update_or_create_secret(secret_data)
+    def create_secret(self, secret_data=None):
+        self.client.create_secret(secret_data)
 
     def patch_secret(self, old_secret_data):
         self.client.patch_secret(old_secret_data)

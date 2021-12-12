@@ -115,10 +115,10 @@ class JSONAdapter(RawAdapter):
 
     def request(self, *args, **kwargs):
         response = super().request(*args, **kwargs)
-        if response.status_code == 200:
+        if response.status_code in [200, 201, 204]:
             try:
                 return response.json()
-            except ValueError:
+            except Exception:
                 pass
 
         return response
