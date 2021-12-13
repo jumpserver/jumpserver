@@ -3,7 +3,10 @@
 from rest_framework.mixins import ListModelMixin, CreateModelMixin
 from django.db.models import F, Value
 from django.db.models.functions import Concat
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import generics
 
+from common.drf.api import JMSReadOnlyModelViewSet
 from common.drf.filters import DatetimeRangeFilter
 from common.api import CommonGenericViewSet
 from orgs.mixins.api import OrgGenericViewSet, OrgBulkModelViewSet, OrgRelationMixin
@@ -28,7 +31,7 @@ class FTPLogViewSet(CreateModelMixin,
     ordering = ['-date_start']
 
 
-class UserLoginLogViewSet(ListModelMixin, CommonGenericViewSet):
+class UserLoginCommonMixin:
     queryset = UserLoginLog.objects.all()
     serializer_class = UserLoginLogSerializer
     extra_filter_backends = [DatetimeRangeFilter]
@@ -37,6 +40,9 @@ class UserLoginLogViewSet(ListModelMixin, CommonGenericViewSet):
     ]
     filterset_fields = ['username', 'ip', 'city', 'type', 'status', 'mfa']
     search_fields = ['username', 'ip', 'city']
+
+
+class UserLoginLogViewSet(UserLoginCommonMixin, ListModelMixin, CommonGenericViewSet):
 
     @staticmethod
     def get_org_members():
@@ -50,6 +56,15 @@ class UserLoginLogViewSet(ListModelMixin, CommonGenericViewSet):
         users = self.get_org_members()
         queryset = queryset.filter(username__in=users)
         return queryset
+
+
+class MyLoginLogAPIView(UserLoginCommonMixin, generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        qs = qs.filter(username=self.request.user.username)
+        return qs
 
 
 class OperateLogViewSet(ListModelMixin, OrgGenericViewSet):

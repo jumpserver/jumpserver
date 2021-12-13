@@ -1,7 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 from __future__ import unicode_literals
 
-from django.urls.conf import re_path
+from django.urls.conf import re_path, path
 from rest_framework.routers import DefaultRouter
 
 from common import api as capi
@@ -20,6 +20,7 @@ router.register(r'command-executions-hosts-relations', api.CommandExecutionHostR
 
 
 urlpatterns = [
+    path('my-login-logs/', api.MyLoginLogAPIView.as_view(), name='my-login-log'),
 ]
 
 old_version_urlpatterns = [
