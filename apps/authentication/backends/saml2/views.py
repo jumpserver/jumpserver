@@ -1,5 +1,4 @@
-import json
-import os
+import copy
 
 from django.views import View
 from django.contrib import auth as auth
@@ -96,9 +95,17 @@ class PrepareRequestMixin:
     def get_advanced_settings():
         try:
             other_settings = dict(settings.SAML2_SP_ADVANCED_SETTINGS)
+            other_settings = copy.deepcopy(other_settings)
         except Exception as error:
             logger.error('Get other settings error: %s', error)
             other_settings = {}
+
+        security_default = {
+            'wantAttributeStatement': False,
+            'allowRepeatAttributeName': True
+        }
+        security = other_settings.get('security', {})
+        security_default.update(security)
 
         default = {
             "organization": {
@@ -107,9 +114,10 @@ class PrepareRequestMixin:
                     "displayname": "JumpServer",
                     "url": "https://jumpserver.org/"
                 }
-            }
+            },
         }
         default.update(other_settings)
+        default['security'] = security_default
         return default
 
     def get_sp_settings(self):
@@ -156,9 +164,12 @@ class PrepareRequestMixin:
         user_attrs = {}
         real_key_index = len(settings.SITE_URL) + 1
         attrs = saml_instance.get_attributes()
+        valid_attrs = ['username', 'name', 'email', 'comment', 'phone']
 
         for attr, value in attrs.items():
             attr = attr[real_key_index:]
+            if attr not in valid_attrs:
+                continue
             user_attrs[attr] = self.value_to_str(value)
         return user_attrs
 
