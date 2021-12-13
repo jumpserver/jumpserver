@@ -17,8 +17,7 @@ logger = get_logger(__file__)
 
 
 class SAML2Backend(ModelBackend):
-    @staticmethod
-    def user_can_authenticate(user):
+    def user_can_authenticate(self, user):
         is_valid = getattr(user, 'is_valid', None)
         return is_valid or is_valid is None
 
@@ -42,9 +41,10 @@ class SAML2Backend(ModelBackend):
         log_prompt = "Process authenticate [SAML2AuthCodeBackend]: {}"
         logger.debug(log_prompt.format('Start'))
         if saml_user_data is None:
-            logger.debug(log_prompt.format('saml_user_data is missing'))
+            logger.error(log_prompt.format('saml_user_data is missing'))
             return None
 
+        logger.debug(log_prompt.format('saml data, {}'.format(saml_user_data)))
         username = saml_user_data.get('username')
         if not username:
             logger.debug(log_prompt.format('username is missing'))

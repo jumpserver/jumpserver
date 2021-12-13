@@ -17,6 +17,9 @@ class SAML2SettingSerializer(serializers.Serializer):
     SAML2_IDP_METADATA_XML = serializers.CharField(
         allow_blank=True, required=False, label=_('IDP Metadata XML')
     )
+    SAML2_SP_ADVANCED_SETTINGS = serializers.JSONField(
+        required=False, label=_('SP ADVANCED SETTINGS')
+    )
     SAML2_SP_KEY_CONTENT = serializers.CharField(
         allow_blank=True, required=False,
         write_only=True, label=_('SP Private Key')

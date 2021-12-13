@@ -108,7 +108,8 @@ class TicketApplySerializer(TicketSerializer):
 
     def validate(self, attrs):
         ticket_type = attrs.get('type')
-        flow = TicketFlow.get_org_related_flows().filter(type=ticket_type).first()
+        org_id = attrs.get('org_id')
+        flow = TicketFlow.get_org_related_flows(org_id=org_id).filter(type=ticket_type).first()
         if flow:
             attrs['flow'] = flow
         else:

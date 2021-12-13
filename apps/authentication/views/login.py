@@ -46,57 +46,35 @@ class UserLoginView(mixins.AuthMixin, FormView):
         # show jumpserver login page if request http://{JUMP-SERVER}/?admin=1
         if self.request.GET.get("admin", 0):
             return None
+
+        auth_types = [m for m in self.get_support_auth_methods() if m.get('auto_redirect')]
+        if not auth_types:
+            return None
+
+        # 明确直接登录哪个
+        login_to = settings.LOGIN_REDIRECT_TO_BACKEND.upper()
+        if login_to == 'DIRECT':
+            return None
+
+        auth_method = next(filter(lambda x: x['name'] == login_to, auth_types), None)
+        if not auth_method:
+            auth_method = auth_types[0]
+
+        auth_name, redirect_url = auth_method['name'], auth_method['url']
         next_url = request.GET.get('next') or '/'
-        auth_type = ''
-        if settings.AUTH_OPENID:
-            auth_type = 'OIDC'
-            openid_auth_url = reverse(settings.AUTH_OPENID_AUTH_LOGIN_URL_NAME)
-            openid_auth_url = openid_auth_url + f'?next={next_url}'
-        else:
-            openid_auth_url = None
+        query_string = request.GET.urlencode()
+        redirect_url = '{}?next={}&{}'.format(redirect_url, next_url, query_string)
 
-        if settings.AUTH_CAS:
-            auth_type = 'CAS'
-            cas_auth_url = reverse(settings.CAS_LOGIN_URL_NAME) + f'?next={next_url}'
-        else:
-            cas_auth_url = None
-
-        if settings.AUTH_SAML2:
-            auth_type = 'saml2'
-            saml2_auth_url = reverse(settings.SAML2_LOGIN_URL_NAME) + f'?next={next_url}'
-        else:
-            saml2_auth_url = None
-
-        if not any([openid_auth_url, cas_auth_url, saml2_auth_url]):
-            return None
-
-        login_redirect = settings.LOGIN_REDIRECT_TO_BACKEND.lower()
-        if login_redirect in ['direct']:
-            return None
-        if login_redirect in ['cas'] and cas_auth_url:
-            auth_url = cas_auth_url
-        elif login_redirect in ['openid', 'oidc'] and openid_auth_url:
-            auth_url = openid_auth_url
-        elif login_redirect in ['saml2'] and saml2_auth_url:
-            auth_url = saml2_auth_url
-        else:
-            auth_url = openid_auth_url or cas_auth_url or saml2_auth_url
-
-        if settings.LOGIN_REDIRECT_TO_BACKEND or not settings.LOGIN_REDIRECT_MSG_ENABLED:
-            redirect_url = auth_url
-        else:
+        if settings.LOGIN_REDIRECT_MSG_ENABLED:
             message_data = {
                 'title': _('Redirecting'),
-                'message': _("Redirecting to {} authentication").format(auth_type),
-                'redirect_url': auth_url,
+                'message': _("Redirecting to {} authentication").format(auth_name),
+                'redirect_url': redirect_url,
                 'interval': 3,
                 'has_cancel': True,
                 'cancel_url': reverse('authentication:login') + '?admin=1'
             }
             redirect_url = FlashMessageUtil.gen_message_url(message_data)
-
-        query_string = request.GET.urlencode()
-        redirect_url = "{}&{}".format(redirect_url, query_string)
         return redirect_url
 
     def get(self, request, *args, **kwargs):
@@ -165,25 +143,28 @@ class UserLoginView(mixins.AuthMixin, FormView):
                 'name': 'OpenID',
                 'enabled': settings.AUTH_OPENID,
                 'url': reverse('authentication:openid:login'),
-                'logo': static('img/login_oidc_logo.png')
+                'logo': static('img/login_oidc_logo.png'),
+                'auto_redirect': True  # 是否支持自动重定向
             },
             {
                 'name': 'CAS',
                 'enabled': settings.AUTH_CAS,
                 'url': reverse('authentication:cas:cas-login'),
-                'logo': static('img/login_cas_logo.png')
+                'logo': static('img/login_cas_logo.png'),
+                'auto_redirect': True
             },
             {
                 'name': 'SAML2',
                 'enabled': settings.AUTH_SAML2,
                 'url': reverse('authentication:saml2:saml2-login'),
-                'logo': static('img/login_cas_logo.png')
+                'logo': static('img/login_cas_logo.png'),
+                'auto_redirect': True
             },
             {
                 'name': _('WeCom'),
                 'enabled': settings.AUTH_WECOM,
                 'url': reverse('authentication:wecom-qr-login'),
-                'logo': static('img/login_wecom_logo.png')
+                'logo': static('img/login_wecom_logo.png'),
             },
             {
                 'name': _('DingTalk'),

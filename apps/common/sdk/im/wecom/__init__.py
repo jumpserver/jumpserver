@@ -124,6 +124,9 @@ class WeCom(RequestMixin):
             return users
         self._requests.check_errcode_is_0(data)
 
+        if 'invaliduser' not in data:
+            return ()
+
         invaliduser = data['invaliduser']
         if not invaliduser:
             return ()
