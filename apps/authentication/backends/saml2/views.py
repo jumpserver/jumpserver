@@ -40,18 +40,20 @@ class PrepareRequestMixin:
         idp_metadata_url = settings.SAML2_IDP_METADATA_URL
         logger.debug('Start getting IDP configuration')
 
+        xml_idp_settings = None
         try:
-            xml_idp_settings = IdPMetadataParse.parse(idp_metadata_xml)
+            if idp_metadata_xml.strip():
+                xml_idp_settings = IdPMetadataParse.parse(idp_metadata_xml)
         except Exception as err:
-            xml_idp_settings = None
             logger.warning('Failed to get IDP metadata XML settings, error: %s', str(err))
 
+        url_idp_settings = None
         try:
-            url_idp_settings = IdPMetadataParse.parse_remote(
-                idp_metadata_url, timeout=20
-            )
+            if idp_metadata_url.strip():
+                url_idp_settings = IdPMetadataParse.parse_remote(
+                    idp_metadata_url, timeout=20
+                )
         except Exception as err:
-            url_idp_settings = None
             logger.warning('Failed to get IDP metadata URL settings, error: %s', str(err))
 
         idp_settings = url_idp_settings or xml_idp_settings
@@ -164,7 +166,7 @@ class PrepareRequestMixin:
 class Saml2AuthRequestView(View, PrepareRequestMixin):
 
     def get(self, request):
-        log_prompt = "Process GET requests [SAML2AuthRequestView]: {}"
+        log_prompt = "Process SAML GET requests: {}"
         logger.debug(log_prompt.format('Start'))
 
         try:
@@ -183,12 +185,12 @@ class Saml2EndSessionView(View, PrepareRequestMixin):
     http_method_names = ['get', 'post', ]
 
     def get(self, request):
-        log_prompt = "Process GET requests [SAML2EndSessionView]: {}"
+        log_prompt = "Process SAML GET requests: {}"
         logger.debug(log_prompt.format('Start'))
         return self.post(request)
 
     def post(self, request):
-        log_prompt = "Process POST requests [SAML2EndSessionView]: {}"
+        log_prompt = "Process SAML POST requests: {}"
         logger.debug(log_prompt.format('Start'))
 
         logout_url = settings.LOGOUT_REDIRECT_URL or '/'
@@ -209,7 +211,7 @@ class Saml2EndSessionView(View, PrepareRequestMixin):
 class Saml2AuthCallbackView(View, PrepareRequestMixin):
 
     def post(self, request):
-        log_prompt = "Process POST requests [SAML2AuthCallbackView]: {}"
+        log_prompt = "Process SAML2 POST requests: {}"
         post_data = request.POST
 
         try:
@@ -224,24 +226,25 @@ class Saml2AuthCallbackView(View, PrepareRequestMixin):
 
         logger.debug(log_prompt.format('Process saml response'))
         saml_instance.process_response(request_id=request_id)
-        errors = saml_instance.get_errors()
+        errors = saml_instance.get_last_error_reason()
 
-        if not errors:
-            if 'AuthNRequestID' in request.session:
-                del request.session['AuthNRequestID']
+        if errors:
+            logger.error(log_prompt.format('Saml response has error: %s' % str(errors)))
+            return HttpResponseRedirect(settings.AUTH_SAML2_AUTHENTICATION_FAILURE_REDIRECT_URI)
 
-            logger.debug(log_prompt.format('Process authenticate'))
-            saml_user_data = self.get_attributes(saml_instance)
-            user = auth.authenticate(request=request, saml_user_data=saml_user_data)
-            if user and user.is_valid:
-                logger.debug(log_prompt.format('Login: {}'.format(user)))
-                auth.login(self.request, user)
+        if 'AuthNRequestID' in request.session:
+            del request.session['AuthNRequestID']
 
-            logger.debug(log_prompt.format('Redirect'))
-            next_url = saml_instance.redirect_to(post_data.get('RelayState', '/'))
-            return HttpResponseRedirect(next_url)
-        logger.error(log_prompt.format('Saml response has error: %s' % str(errors)))
-        return HttpResponseRedirect(settings.AUTH_SAML2_AUTHENTICATION_FAILURE_REDIRECT_URI)
+        logger.debug(log_prompt.format('Process authenticate'))
+        saml_user_data = self.get_attributes(saml_instance)
+        user = auth.authenticate(request=request, saml_user_data=saml_user_data)
+        if user and user.is_valid:
+            logger.debug(log_prompt.format('Login: {}'.format(user)))
+            auth.login(self.request, user)
+
+        logger.debug(log_prompt.format('Redirect'))
+        next_url = saml_instance.redirect_to(post_data.get('RelayState', '/'))
+        return HttpResponseRedirect(next_url)
 
     @csrf_exempt
     def dispatch(self, *args, **kwargs):
