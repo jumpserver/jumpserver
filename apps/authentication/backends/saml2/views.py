@@ -92,14 +92,11 @@ class PrepareRequestMixin:
 
     @staticmethod
     def get_advanced_settings():
-        other_settings = {}
-        other_settings_path = settings.SAML2_OTHER_SETTINGS_PATH
-        if os.path.exists(other_settings_path):
-            with open(other_settings_path, 'r') as json_data:
-                try:
-                    other_settings = json.loads(json_data.read())
-                except Exception as error:
-                    logger.error('Get other settings error: %s', error)
+        try:
+            other_settings = dict(settings.SAML2_SP_ADVANCED_SETTINGS)
+        except Exception as error:
+            logger.error('Get other settings error: %s', error)
+            other_settings = {}
 
         default = {
             "organization": {
