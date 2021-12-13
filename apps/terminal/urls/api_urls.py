@@ -11,6 +11,8 @@ from .. import api
 app_name = 'terminal'
 
 router = BulkRouter()
+router.register(r'sessions/my', api.MySessionViewSet, 'my-session')
+router.register(r'sessions/asset/my', api.MySessionAssetViewSet, 'my-asset')
 router.register(r'sessions', api.SessionViewSet, 'session')
 router.register(r'terminals/(?P<terminal>[a-zA-Z0-9\-]{36})?/?status', api.StatusViewSet, 'terminal-status')
 router.register(r'terminals/(?P<terminal>[a-zA-Z0-9\-]{36})?/?sessions', api.SessionViewSet, 'terminal-sessions')
