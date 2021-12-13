@@ -7,7 +7,7 @@ from common.mixins.models import CommonModelMixin
 from common.db.encoder import ModelJSONFieldEncoder
 from orgs.mixins.models import OrgModelMixin
 from orgs.models import Organization
-from orgs.utils import tmp_to_root_org
+from orgs.utils import tmp_to_root_org, tmp_to_org
 from ..const import TicketType, TicketApprovalLevel, TicketApprovalStrategy
 from ..signals import post_or_update_change_ticket_flow_approval
 
@@ -64,9 +64,13 @@ class TicketFlow(CommonModelMixin, OrgModelMixin):
         return '{}'.format(self.type)
 
     @classmethod
-    def get_org_related_flows(cls):
-        flows = cls.objects.all()
+    def get_org_related_flows(cls, org_id=None):
+        if org_id:
+            with tmp_to_org(org_id):
+                flows = cls.objects.all()
+        else:
+            flows = cls.objects.all()
         cur_flow_types = flows.values_list('type', flat=True)
         with tmp_to_root_org():
-            diff_global_flows = cls.objects.exclude(type__in=cur_flow_types).filter(org_id=Organization.ROOT_ID)
+            diff_global_flows = cls.objects.exclude(type__in=cur_flow_types)
         return flows | diff_global_flows
