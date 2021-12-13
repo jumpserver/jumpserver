@@ -281,7 +281,6 @@ def get_docker_mem_usage_if_limit():
         return ((usage_in_bytes - inactive_file) / limit_in_bytes) * 100
 
     except Exception as e:
-        logger.debug(f'Get memory usage by docker limit: {e}')
         return None
 
 
