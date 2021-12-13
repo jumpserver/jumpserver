@@ -2857,7 +2857,7 @@ msgstr "服务端地址"
 
 #: settings/serializers/auth/cas.py:13
 msgid "Proxy server url"
-msgstr "代理服务地址"
+msgstr "回调地址"
 
 #: settings/serializers/auth/cas.py:14 settings/serializers/auth/saml2.py:29
 msgid "Logout completely"
