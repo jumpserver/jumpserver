@@ -170,7 +170,7 @@ class BaseService(object):
 
     def _restart(self):
         if self.retry > self.max_retry:
-            logging.info("Service start failed, exit: ", self.name)
+            logging.info("Service start failed, exit: {}".format(self.name))
             self.EXIT_EVENT.set()
             return
         self.retry += 1
