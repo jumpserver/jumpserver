@@ -23,6 +23,9 @@ def add_nodes_assets_to_system_users(nodes_keys, system_users):
             instance, created = AuthBook.objects.update_or_create(
                 defaults=defaults, asset=asset, systemuser=system_user
             )
+            if created:
+                from assets.tasks import push_system_user_to_assets
+                push_system_user_to_assets.delay(system_user.id, [asset.id])
             # # 不再自动更新资产管理用户，只允许用户手动指定。
             # 只要关联都需要更新资产的管理用户
             # instance.update_asset_admin_user_if_need()
