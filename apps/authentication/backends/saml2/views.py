@@ -1,5 +1,7 @@
 import copy
 
+from urllib import parse
+
 from django.views import View
 from django.contrib import auth as auth
 from django.urls import reverse
@@ -23,9 +25,13 @@ logger = get_logger(__file__)
 
 class PrepareRequestMixin:
     @staticmethod
-    def prepare_django_request(request):
+    def is_secure():
+        url_result = parse.urlparse(settings.SITE_URL)
+        return 'on' if url_result.scheme == 'https' else 'off'
+
+    def prepare_django_request(self, request):
         result = {
-            'https': 'on' if request.is_secure() else 'off',
+            'https': self.is_secure(),
             'http_host': request.META['HTTP_HOST'],
             'script_name': request.META['PATH_INFO'],
             'get_data': request.GET.copy(),
