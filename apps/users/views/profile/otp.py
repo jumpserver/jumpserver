@@ -39,7 +39,8 @@ class UserOtpEnableStartView(AuthMixin, TemplateView):
         try:
             self.get_user_from_session()
         except SessionEmptyError:
-            return redirect('authentication:login') + '?_=otp_enable_start'
+            url = reverse('authentication:login') + '?_=otp_enable_start'
+            return redirect(url)
         return super().get(request, *args, **kwargs)
 
 
@@ -72,8 +73,8 @@ class UserOtpEnableBindView(AuthMixin, TemplateView, FormView):
     def _pre_check_can_bind(self):
         try:
             user = self.get_user_from_session()
-        except:
-            verify_url = reverse('authentication:user-otp-enable-start')
+        except Exception as e:
+            verify_url = reverse('authentication:user-otp-enable-start') + f'?e={e}'
             return HttpResponseRedirect(verify_url)
 
         if user.otp_secret_key:
