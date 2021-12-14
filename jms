@@ -121,20 +121,21 @@ def start_services():
     if action == 'start' and {'all', 'web'} & set(services):
         prepare()
 
-    services_string = ' '.join(services)
-    cmd = f'{args.action} {services_string}'
+    start_args = []
     if args.daemon:
-        cmd += ' --daemon'
+        start_args.append('--daemon')
     if args.worker:
-        cmd += f' --worker {args.worker}'
+        start_args.extend(['--worker', str(args.worker)])
     if args.force:
-        cmd += ' --force'
+        start_args.append('--force')
 
-    lines = cmd.split()
     try:
-        management.call_command(*lines)
+        management.call_command(action, *services, *start_args)
+    except KeyboardInterrupt:
+        logging.info('Cancel ...')
+        time.sleep(2)
     except Exception as e:
-        logging.error("Start service error {}: {}".format(lines[0], e))
+        logging.error("Start service error {}: {}".format(services, e))
         time.sleep(2)
 
 
