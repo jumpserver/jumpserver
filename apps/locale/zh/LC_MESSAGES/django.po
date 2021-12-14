@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-09 20:32+0800\n"
+"POT-Creation-Date: 2021-12-14 17:54+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -343,7 +343,7 @@ msgstr "类别名称"
 #: perms/serializers/application/permission.py:17
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:33
 #: tickets/serializers/ticket/ticket.py:22
-#: tickets/serializers/ticket/ticket.py:168
+#: tickets/serializers/ticket/ticket.py:169
 msgid "Type display"
 msgstr "类型名称"
 
@@ -384,10 +384,10 @@ msgstr "应用路径"
 
 #: applications/serializers/attrs/application_category/remote_app.py:45
 #: assets/serializers/system_user.py:159
-#: xpack/plugins/change_auth_plan/serializers/asset.py:65
-#: xpack/plugins/change_auth_plan/serializers/asset.py:68
-#: xpack/plugins/change_auth_plan/serializers/asset.py:71
-#: xpack/plugins/change_auth_plan/serializers/asset.py:87
+#: xpack/plugins/change_auth_plan/serializers/asset.py:64
+#: xpack/plugins/change_auth_plan/serializers/asset.py:67
+#: xpack/plugins/change_auth_plan/serializers/asset.py:70
+#: xpack/plugins/change_auth_plan/serializers/asset.py:101
 #: xpack/plugins/cloud/serializers/account_attrs.py:52
 msgid "This field is required."
 msgstr "该字段是必填项。"
@@ -586,6 +586,7 @@ msgid "Ok"
 msgstr "成功"
 
 #: assets/models/base.py:32 audits/models.py:102
+#: xpack/plugins/change_auth_plan/task_handlers/base/manager.py:121
 #: xpack/plugins/cloud/const.py:29
 msgid "Failed"
 msgstr "失败"
@@ -1169,6 +1170,7 @@ msgid "Filename"
 msgstr "文件名"
 
 #: audits/models.py:42 audits/models.py:101 terminal/models/sharing.py:84
+#: xpack/plugins/change_auth_plan/task_handlers/base/manager.py:119
 msgid "Success"
 msgstr "成功"
 
@@ -1326,12 +1328,12 @@ msgstr ""
 msgid "Auth Token"
 msgstr "认证令牌"
 
-#: audits/signals_handler.py:68 authentication/views/login.py:183
+#: audits/signals_handler.py:68 authentication/views/login.py:164
 #: notifications/backends/__init__.py:11 users/models/user.py:607
 msgid "WeCom"
 msgstr "企业微信"
 
-#: audits/signals_handler.py:69 authentication/views/login.py:189
+#: audits/signals_handler.py:69 authentication/views/login.py:170
 #: notifications/backends/__init__.py:12 users/models/user.py:608
 msgid "DingTalk"
 msgstr "钉钉"
@@ -1899,7 +1901,7 @@ msgstr "代码错误"
 #: authentication/templates/authentication/_msg_reset_password.html:3
 #: authentication/templates/authentication/_msg_rest_password_success.html:2
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:2
-#: jumpserver/conf.py:282
+#: jumpserver/conf.py:293
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: perms/templates/perms/_msg_permed_items_expire.html:3
 #: users/templates/users/_msg_account_expire_reminder.html:4
@@ -2107,24 +2109,24 @@ msgstr "没有绑定飞书"
 msgid "Please login with a password and then bind the FeiShu"
 msgstr "请使用密码登录，然后绑定飞书"
 
-#: authentication/views/login.py:89
+#: authentication/views/login.py:70
 msgid "Redirecting"
 msgstr "跳转中"
 
-#: authentication/views/login.py:90
+#: authentication/views/login.py:71
 msgid "Redirecting to {} authentication"
 msgstr "正在跳转到 {} 认证"
 
-#: authentication/views/login.py:116
+#: authentication/views/login.py:94
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: authentication/views/login.py:195 notifications/backends/__init__.py:14
+#: authentication/views/login.py:176 notifications/backends/__init__.py:14
 #: users/models/user.py:609
 msgid "FeiShu"
 msgstr "飞书"
 
-#: authentication/views/login.py:284
+#: authentication/views/login.py:265
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -2132,15 +2134,15 @@ msgstr ""
 "等待 <b>{}</b> 确认, 你也可以复制链接发给他/她 <br/>\n"
 "                  不要关闭本页面"
 
-#: authentication/views/login.py:289
+#: authentication/views/login.py:270
 msgid "No ticket found"
 msgstr "没有发现工单"
 
-#: authentication/views/login.py:323
+#: authentication/views/login.py:304
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: authentication/views/login.py:324
+#: authentication/views/login.py:305
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
@@ -2339,11 +2341,11 @@ msgstr "不能包含特殊字符"
 msgid "The mobile phone number format is incorrect"
 msgstr "手机号格式不正确"
 
-#: jumpserver/conf.py:281
+#: jumpserver/conf.py:292
 msgid "Create account successfully"
 msgstr "创建账户成功"
 
-#: jumpserver/conf.py:283
+#: jumpserver/conf.py:294
 msgid "Your account has been created successfully"
 msgstr "你的账户已创建成功"
 
@@ -2859,7 +2861,7 @@ msgstr "服务端地址"
 msgid "Proxy server url"
 msgstr "回调地址"
 
-#: settings/serializers/auth/cas.py:14 settings/serializers/auth/saml2.py:29
+#: settings/serializers/auth/cas.py:14 settings/serializers/auth/saml2.py:32
 msgid "Logout completely"
 msgstr "同步注销"
 
@@ -2871,7 +2873,7 @@ msgstr "用户名属性"
 msgid "Enable attributes map"
 msgstr "启用属性映射"
 
-#: settings/serializers/auth/cas.py:18 settings/serializers/auth/saml2.py:28
+#: settings/serializers/auth/cas.py:18 settings/serializers/auth/saml2.py:31
 msgid "Rename attr"
 msgstr "映射属性"
 
@@ -3031,7 +3033,7 @@ msgstr "使用状态"
 msgid "Use nonce"
 msgstr "临时使用"
 
-#: settings/serializers/auth/oidc.py:76 settings/serializers/auth/saml2.py:30
+#: settings/serializers/auth/oidc.py:76 settings/serializers/auth/saml2.py:33
 msgid "Always update user"
 msgstr "总是更新用户信息"
 
@@ -3048,20 +3050,24 @@ msgid "Enable SAML2 Auth"
 msgstr "启用 SAML2 认证"
 
 #: settings/serializers/auth/saml2.py:15
-msgid "IDP Metadata URL"
+msgid "IDP metadata URL"
 msgstr ""
 
 #: settings/serializers/auth/saml2.py:18
-msgid "IDP Metadata XML"
+msgid "IDP metadata XML"
 msgstr ""
 
-#: settings/serializers/auth/saml2.py:22
-msgid "SP Private Key"
-msgstr ""
+#: settings/serializers/auth/saml2.py:21
+msgid "SP advanced settings"
+msgstr "高级设置"
 
-#: settings/serializers/auth/saml2.py:26
-msgid "SP Public Cert"
-msgstr ""
+#: settings/serializers/auth/saml2.py:25
+msgid "SP private key"
+msgstr "SP 密钥"
+
+#: settings/serializers/auth/saml2.py:29
+msgid "SP cert"
+msgstr "SP 证书"
 
 #: settings/serializers/auth/sms.py:10
 msgid "Enable SMS"
@@ -4784,11 +4790,11 @@ msgstr "内容"
 msgid "Approve level"
 msgstr "审批级别"
 
-#: tickets/models/flow.py:25 tickets/serializers/ticket/ticket.py:140
+#: tickets/models/flow.py:25 tickets/serializers/ticket/ticket.py:141
 msgid "Approve strategy"
 msgstr "审批策略"
 
-#: tickets/models/flow.py:30 tickets/serializers/ticket/ticket.py:141
+#: tickets/models/flow.py:30 tickets/serializers/ticket/ticket.py:142
 msgid "Assignees"
 msgstr "受理人"
 
@@ -4876,7 +4882,7 @@ msgstr "申请的系统用户名称"
 
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:71
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:73
-#: tickets/serializers/ticket/ticket.py:127
+#: tickets/serializers/ticket/ticket.py:128
 msgid "Permission named `{}` already exists"
 msgstr "授权名称 `{}` 已存在"
 
@@ -4936,7 +4942,7 @@ msgid "From cmd filter"
 msgstr "来自命令过滤规则"
 
 #: tickets/serializers/ticket/meta/ticket_type/common.py:11
-#: tickets/serializers/ticket/ticket.py:122
+#: tickets/serializers/ticket/ticket.py:123
 msgid "Created by ticket ({}-{})"
 msgstr "通过工单创建 ({}-{})"
 
@@ -4962,15 +4968,15 @@ msgid ""
 "request url (`{}`)"
 msgstr "提交数据中的类型 (`{}`) 与请求URL地址中的类型 (`{}`) 不一致"
 
-#: tickets/serializers/ticket/ticket.py:115
+#: tickets/serializers/ticket/ticket.py:116
 msgid "The ticket flow `{}` does not exist"
 msgstr "工单流程 `{}` 不存在"
 
-#: tickets/serializers/ticket/ticket.py:162
+#: tickets/serializers/ticket/ticket.py:163
 msgid "Please select the Assignees"
 msgstr "请选择受理人"
 
-#: tickets/serializers/ticket/ticket.py:188
+#: tickets/serializers/ticket/ticket.py:189
 msgid "The current organization type already exists"
 msgstr "当前组织已存在该类型"
 
@@ -5633,7 +5639,7 @@ msgid "Replace (The key generated by JumpServer) "
 msgstr "替换 (由 JumpServer 生成的密钥)"
 
 #: xpack/plugins/change_auth_plan/models/asset.py:50
-#: xpack/plugins/change_auth_plan/serializers/asset.py:34
+#: xpack/plugins/change_auth_plan/serializers/asset.py:33
 msgid "SSH Key strategy"
 msgstr "SSH 密钥策略"
 
@@ -5722,11 +5728,11 @@ msgstr ""
 "{} - 改密任务已完成: 未设置加密密码 - 请前往个人信息 -> 文件加密密码中设置加"
 "密密码"
 
-#: xpack/plugins/change_auth_plan/serializers/asset.py:31
+#: xpack/plugins/change_auth_plan/serializers/asset.py:30
 msgid "Change Password"
 msgstr "更改密码"
 
-#: xpack/plugins/change_auth_plan/serializers/asset.py:32
+#: xpack/plugins/change_auth_plan/serializers/asset.py:31
 msgid "Change SSH Key"
 msgstr "修改 SSH Key"
 
@@ -5811,8 +5817,8 @@ msgid "Qingyun Private Cloud"
 msgstr "青云私有云"
 
 #: xpack/plugins/cloud/const.py:19
-msgid "OpenStack Cloud"
-msgstr "OpenStack Cloud"
+msgid "OpenStack"
+msgstr "OpenStack"
 
 #: xpack/plugins/cloud/const.py:20
 msgid "Google Cloud Platform"
