@@ -294,7 +294,7 @@ class SecretDetailMixin:
             data.update(asset_detail)
         else:
             app_detail = self._get_application_secret_detail(app)
-            system_user.load_app_more_auth(app.id, user.id)
+            system_user.load_app_more_auth(app.id, user.username, user.id)
             data['type'] = 'application'
             data.update(app_detail)
 
