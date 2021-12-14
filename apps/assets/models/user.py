@@ -129,12 +129,21 @@ class AuthMixin:
         if password:
             self.password = password
 
-    def load_app_more_auth(self, app_id=None, user_id=None):
+    def load_app_more_auth(self, app_id=None, username=None, user_id=None):
         self._clean_auth_info_if_manual_login_mode()
         # 加载临时认证信息
         if self.login_mode == self.LOGIN_MANUAL:
             self._load_tmp_auth_if_has(app_id, user_id)
             return
+        # 更新用户名
+        from users.models import User
+        user = get_object_or_none(User, pk=user_id) if user_id else None
+        if self.username_same_with_user:
+            if user and not username:
+                _username = user.username
+            else:
+                _username = username
+            self.username = _username
 
     def load_asset_special_auth(self, asset, username=''):
         """
