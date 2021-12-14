@@ -5,6 +5,7 @@ from django.db.models.signals import post_save, pre_save, pre_delete
 
 from common.utils import get_logger
 from ..models import AuthBook, SystemUser
+from assets.tasks import push_system_user_to_assets
 
 AuthBookHistory = apps.get_model('assets', 'HistoricalAuthBook')
 logger = get_logger(__name__)
@@ -37,7 +38,7 @@ def on_authbook_post_delete(sender, instance, **kwargs):
 def on_authbook_post_create(sender, instance, created, **kwargs):
     instance.sync_to_system_user_account()
     if created:
-        pass
+        push_system_user_to_assets.delay(instance.systemuser_id, [instance.asset_id])
         # # 不再自动更新资产管理用户，只允许用户手动指定。
         # 只在创建时进行更新资产的管理用户
         # instance.update_asset_admin_user_if_need()
