@@ -29,9 +29,9 @@ class BaseHandler(object):
             self._send_applied_mail_to_assignees()
             is_finished = False
         else:
-            self._send_processed_mail_to_applicant(self.ticket.processor)
             self.ticket.set_state_approve()
             self.ticket.set_status_closed()
+            self._send_processed_mail_to_applicant(self.ticket.processor)
             is_finished = True
 
         self.ticket.save()
