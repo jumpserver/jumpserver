@@ -15,7 +15,7 @@ alphanumeric = RegexValidator(r'^[0-9a-zA-Z_@\-\.]*$', _('Special char not allow
 
 alphanumeric_re = re.compile(r'^[0-9a-zA-Z_@\-\.]*$')
 
-alphanumeric_cn_re = re.compile(r'^[0-9a-zA-Z_@\-\.\u4E00-\u9FA5]*$')
+alphanumeric_cn_re = re.compile(r'^[0-9a-zA-Z_@\$\-\.\u4E00-\u9FA5]*$')
 
 
 class ProjectUniqueValidator(UniqueTogetherValidator):
