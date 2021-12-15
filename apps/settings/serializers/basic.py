@@ -44,3 +44,10 @@ class BasicSettingSerializer(serializers.Serializer):
     TICKETS_ENABLED = serializers.BooleanField(required=False, default=True, label=_("Enable tickets"))
     ANNOUNCEMENT_ENABLED = serializers.BooleanField(label=_('Enable announcement'), default=True)
     ANNOUNCEMENT = AnnouncementSerializer(label=_("Announcement"))
+
+    @staticmethod
+    def validate_SITE_URL(s):
+        if not s:
+            return 'http://127.0.0.1'
+        return s.strip('/')
+
