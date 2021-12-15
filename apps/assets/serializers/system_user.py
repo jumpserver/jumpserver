@@ -108,7 +108,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         protocol = self.get_initial_value("protocol")
         if username:
             regx = alphanumeric_re
-            if protocol == SystemUser.Protocol.telnet:
+            if protocol == SystemUser.Protocol.telnet or protocol == SystemUser.Protocol.rdp:
                 regx = alphanumeric_cn_re
             if not regx.match(username):
                 raise serializers.ValidationError(_('Special char not allowed'))
