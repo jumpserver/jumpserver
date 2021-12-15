@@ -217,7 +217,7 @@ class SystemUserCommandFilterRuleListApi(generics.ListAPIView):
         q = Q()
         if user:
             q |= Q(users=user)
-        if user_group:
+        if user_groups:
             q |= Q(user_groups__in=set(user_groups))
         if system_user:
             q |= Q(system_users=system_user)
