@@ -270,7 +270,7 @@ class Saml2AuthCallbackView(View, PrepareRequestMixin):
 
 class Saml2AuthMetadataView(View, PrepareRequestMixin):
 
-    def get(self, _):
+    def get(self, request):
         saml_settings = self.get_sp_settings()
         saml_settings = JmsSaml2Settings(
             settings=saml_settings, sp_validation_only=True,
@@ -279,8 +279,17 @@ class Saml2AuthMetadataView(View, PrepareRequestMixin):
         metadata = saml_settings.get_sp_metadata()
         errors = saml_settings.validate_metadata(metadata)
 
+        key = saml_settings.get_sp_key()
+        cert = saml_settings.get_sp_cert()
+        if not key:
+            errors.append('Not found SP private key')
+        if not cert:
+            errors.append('Not found SP cert')
+
         if len(errors) == 0:
             resp = HttpResponse(content=metadata, content_type='text/xml')
         else:
-            resp = HttpResponseServerError(content=', '.join(errors))
+            content = "Error occur: <br>"
+            content += '<br>'.join(errors)
+            resp = HttpResponseServerError(content=content)
         return resp
