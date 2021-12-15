@@ -3,7 +3,9 @@
 import uuid
 import re
 
+
 from django.db import models
+from django.db.models import When, Case, Value
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.translation import ugettext_lazy as _
 
@@ -56,6 +58,25 @@ class CommandFilter(OrgModelMixin):
         verbose_name = _("Command filter")
 
 
+class CommandFilterRuleQueryset(models.QuerySet):
+
+    def custom_order(self):
+        action_map = {
+            CommandFilterRule.ActionChoices.deny.value: 0,
+            CommandFilterRule.ActionChoices.confirm.value: 1,
+            CommandFilterRule.ActionChoices.allow.value: 2
+        }
+        case_action = Case(*[
+            When(action__iexact=action, then=Value(as_action))
+            for action, as_action in action_map.items()
+        ])
+        return self.order_by('priority', case_action.asc())
+
+
+class CommandFilterRuleManager(models.Manager):
+    pass
+
+
 class CommandFilterRule(OrgModelMixin):
     TYPE_REGEX = 'regex'
     TYPE_COMMAND = 'command'
@@ -88,6 +109,8 @@ class CommandFilterRule(OrgModelMixin):
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
     created_by = models.CharField(max_length=128, blank=True, default='', verbose_name=_('Created by'))
+
+    objects = models.Manager.from_queryset(CommandFilterRuleQueryset)()
 
     class Meta:
         ordering = ('priority', 'action')

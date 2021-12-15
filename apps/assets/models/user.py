@@ -258,7 +258,7 @@ class SystemUser(ProtocolMixin, AuthMixin, BaseUser):
         from .cmd_filter import CommandFilterRule
         rules = CommandFilterRule.objects.filter(
             filter__in=self.cmd_filters.all()
-        ).distinct()
+        ).custom_order().distinct()
         return rules
 
     def is_command_can_run(self, command):

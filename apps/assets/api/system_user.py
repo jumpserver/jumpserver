@@ -228,7 +228,7 @@ class SystemUserCommandFilterRuleListApi(generics.ListAPIView):
         if q:
             cmd_filters = CommandFilter.objects.filter(q).filter(is_active=True)
             rule_ids = cmd_filters.values_list('rules', flat=True)
-            rules = CommandFilterRule.objects.filter(id__in=rule_ids)
+            rules = CommandFilterRule.objects.filter(id__in=rule_ids).custom_order()
         else:
             rules = CommandFilterRule.objects.none()
         return rules
