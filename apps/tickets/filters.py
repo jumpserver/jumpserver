@@ -10,7 +10,7 @@ class TicketFilter(BaseFilterSet):
     class Meta:
         model = Ticket
         fields = (
-            'id', 'title', 'type', 'status', 'applicant', 'assignees__id',
+            'id', 'title', 'type', 'status', 'state', 'applicant', 'assignees__id',
             'applicant_display',
         )
 

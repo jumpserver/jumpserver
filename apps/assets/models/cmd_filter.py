@@ -68,7 +68,7 @@ class CommandFilterRule(OrgModelMixin):
 
     class ActionChoices(models.IntegerChoices):
         deny = 0, _('Deny')
-        allow = 1, _('Allow')
+        allow = 9, _('Allow')
         confirm = 2, _('Reconfirm')
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
