@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-14 17:54+0800\n"
+"POT-Creation-Date: 2021-12-15 15:41+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -35,12 +35,12 @@ msgid "Name"
 msgstr "名称"
 
 #: acls/models/base.py:27 assets/models/cmd_filter.py:77
-#: assets/models/user.py:200
+#: assets/models/user.py:209
 msgid "Priority"
 msgstr "优先级"
 
 #: acls/models/base.py:28 assets/models/cmd_filter.py:77
-#: assets/models/user.py:200
+#: assets/models/user.py:209
 msgid "1-100, the lower the value will be match first"
 msgstr "优先级可选范围为 1-100 (数值越小越优先)"
 
@@ -209,7 +209,7 @@ msgid ""
 msgstr "格式为逗号分隔的字符串, * 表示匹配所有. 可选的协议有： {}"
 
 #: acls/serializers/login_asset_acl.py:55 assets/models/asset.py:214
-#: assets/models/domain.py:63 assets/models/user.py:201
+#: assets/models/domain.py:63 assets/models/user.py:210
 #: terminal/serializers/session.py:30 terminal/serializers/storage.py:69
 msgid "Protocol"
 msgstr "协议"
@@ -265,7 +265,7 @@ msgid "Custom"
 msgstr "自定义"
 
 #: applications/models/account.py:11 assets/models/authbook.py:19
-#: assets/models/cmd_filter.py:38 assets/models/user.py:291 audits/models.py:39
+#: assets/models/cmd_filter.py:38 assets/models/user.py:300 audits/models.py:39
 #: perms/models/application_permission.py:32
 #: perms/models/asset_permission.py:101 templates/_nav.html:45
 #: terminal/backends/command/models.py:20
@@ -306,7 +306,7 @@ msgstr "类别"
 
 #: applications/models/application.py:171
 #: applications/serializers/application.py:90 assets/models/cmd_filter.py:76
-#: assets/models/user.py:199 perms/models/application_permission.py:23
+#: assets/models/user.py:208 perms/models/application_permission.py:23
 #: perms/serializers/application/user_permission.py:34
 #: terminal/models/storage.py:55 terminal/models/storage.py:116
 #: tickets/models/flow.py:51 tickets/models/ticket.py:48
@@ -523,7 +523,7 @@ msgstr "主机名原始"
 msgid "Protocols"
 msgstr "协议组"
 
-#: assets/models/asset.py:219 assets/models/user.py:191
+#: assets/models/asset.py:219 assets/models/user.py:200
 #: perms/models/asset_permission.py:100
 #: xpack/plugins/change_auth_plan/models/asset.py:44
 #: xpack/plugins/gathered_user/models.py:24
@@ -536,7 +536,7 @@ msgid "Is active"
 msgstr "激活"
 
 #: assets/models/asset.py:223 assets/models/cluster.py:19
-#: assets/models/user.py:188 assets/models/user.py:340 templates/_nav.html:44
+#: assets/models/user.py:197 assets/models/user.py:349 templates/_nav.html:44
 msgid "Admin user"
 msgstr "特权用户"
 
@@ -790,75 +790,75 @@ msgstr "ssh私钥"
 msgid "Node"
 msgstr "节点"
 
-#: assets/models/user.py:182
+#: assets/models/user.py:191
 msgid "Automatic managed"
 msgstr "托管密码"
 
-#: assets/models/user.py:183
+#: assets/models/user.py:192
 msgid "Manually input"
 msgstr "手动输入"
 
-#: assets/models/user.py:187
+#: assets/models/user.py:196
 msgid "Common user"
 msgstr "普通用户"
 
-#: assets/models/user.py:190
+#: assets/models/user.py:199
 msgid "Username same with user"
 msgstr "用户名与用户相同"
 
-#: assets/models/user.py:193 assets/serializers/domain.py:29
+#: assets/models/user.py:202 assets/serializers/domain.py:29
 #: templates/_nav.html:39
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 #: xpack/plugins/change_auth_plan/models/asset.py:40
 msgid "Assets"
 msgstr "资产"
 
-#: assets/models/user.py:197 templates/_nav.html:17
+#: assets/models/user.py:206 templates/_nav.html:17
 #: users/views/profile/pubkey.py:37
 msgid "Users"
 msgstr "用户管理"
 
-#: assets/models/user.py:198
+#: assets/models/user.py:207
 msgid "User groups"
 msgstr "用户组"
 
-#: assets/models/user.py:202
+#: assets/models/user.py:211
 msgid "Auto push"
 msgstr "自动推送"
 
-#: assets/models/user.py:203
+#: assets/models/user.py:212
 msgid "Sudo"
 msgstr "Sudo"
 
-#: assets/models/user.py:204
+#: assets/models/user.py:213
 msgid "Shell"
 msgstr "Shell"
 
-#: assets/models/user.py:205
+#: assets/models/user.py:214
 msgid "Login mode"
 msgstr "认证方式"
 
-#: assets/models/user.py:206
+#: assets/models/user.py:215
 msgid "SFTP Root"
 msgstr "SFTP根路径"
 
-#: assets/models/user.py:207 authentication/models.py:45
+#: assets/models/user.py:216 authentication/models.py:45
 msgid "Token"
 msgstr ""
 
-#: assets/models/user.py:208
+#: assets/models/user.py:217
 msgid "Home"
 msgstr "家目录"
 
-#: assets/models/user.py:209
+#: assets/models/user.py:218
 msgid "System groups"
 msgstr "用户组"
 
-#: assets/models/user.py:212
+#: assets/models/user.py:221
 msgid "User switch"
 msgstr "用户切换"
 
-#: assets/models/user.py:213
+#: assets/models/user.py:222
 msgid "Switch from"
 msgstr "切换自"
 
@@ -1068,24 +1068,24 @@ msgid ""
 "The task of self-checking is already running and cannot be started repeatedly"
 msgstr "自检程序已经在运行，不能重复启动"
 
-#: assets/tasks/push_system_user.py:194
+#: assets/tasks/push_system_user.py:199
 msgid "System user is dynamic: {}"
 msgstr "系统用户是动态的: {}"
 
-#: assets/tasks/push_system_user.py:234
+#: assets/tasks/push_system_user.py:239
 msgid "Start push system user for platform: [{}]"
 msgstr "推送系统用户到平台: [{}]"
 
-#: assets/tasks/push_system_user.py:235
+#: assets/tasks/push_system_user.py:240
 #: assets/tasks/system_user_connectivity.py:106
 msgid "Hosts count: {}"
 msgstr "主机数量: {}"
 
-#: assets/tasks/push_system_user.py:277 assets/tasks/push_system_user.py:310
+#: assets/tasks/push_system_user.py:282 assets/tasks/push_system_user.py:315
 msgid "Push system users to assets: {}"
 msgstr "推送系统用户到入资产: {}"
 
-#: assets/tasks/push_system_user.py:289
+#: assets/tasks/push_system_user.py:294
 msgid "Push system users to asset: {}({}) => {}"
 msgstr "推送系统用户到入资产: {}({}) => {}"
 
@@ -2785,23 +2785,23 @@ msgstr "测试成功"
 msgid "Test mail sent to {}, please check"
 msgstr "邮件已经发送{}, 请检查"
 
-#: settings/api/ldap.py:152
+#: settings/api/ldap.py:157
 msgid "Synchronization start, please wait."
 msgstr "同步开始，请稍等"
 
-#: settings/api/ldap.py:156
+#: settings/api/ldap.py:161
 msgid "Synchronization is running, please wait."
 msgstr "同步正在运行，请稍等"
 
-#: settings/api/ldap.py:161
+#: settings/api/ldap.py:166
 msgid "Synchronization error: {}"
 msgstr "同步错误: {}"
 
-#: settings/api/ldap.py:194
+#: settings/api/ldap.py:199
 msgid "Get ldap users is None"
 msgstr "获取 LDAP 用户为 None"
 
-#: settings/api/ldap.py:203
+#: settings/api/ldap.py:208
 msgid "Imported {} users successfully (Organization: {})"
 msgstr "成功导入 {} 个用户 ( 组织: {} )"
 
@@ -5516,31 +5516,31 @@ msgstr "账号保护已开启，请根据提示完成以下操作"
 msgid "Open MFA Authenticator and enter the 6-bit dynamic code"
 msgstr "请打开 MFA 验证器，输入 6 位动态码"
 
-#: users/views/profile/otp.py:86
+#: users/views/profile/otp.py:87
 msgid "Already bound"
 msgstr "已经绑定"
 
-#: users/views/profile/otp.py:87
+#: users/views/profile/otp.py:88
 msgid "MFA already bound, disable first, then bound"
 msgstr "MFA(OTP) 已经绑定，请先禁用，再绑定"
 
-#: users/views/profile/otp.py:114
+#: users/views/profile/otp.py:115
 msgid "OTP enable success"
 msgstr "MFA(OTP) 启用成功"
 
-#: users/views/profile/otp.py:115
+#: users/views/profile/otp.py:116
 msgid "OTP enable success, return login page"
 msgstr "MFA(OTP) 启用成功，返回到登录页面"
 
-#: users/views/profile/otp.py:157
+#: users/views/profile/otp.py:158
 msgid "Disable OTP"
 msgstr "禁用虚拟 MFA(OTP)"
 
-#: users/views/profile/otp.py:163
+#: users/views/profile/otp.py:164
 msgid "OTP disable success"
 msgstr "MFA(OTP) 禁用成功"
 
-#: users/views/profile/otp.py:164
+#: users/views/profile/otp.py:165
 msgid "OTP disable success, return login page"
 msgstr "MFA(OTP) 禁用成功，返回登录页面"
 
@@ -5752,15 +5752,19 @@ msgstr "* 请输入正确的密码长度"
 msgid "* Password length range 6-30 bits"
 msgstr "* 密码长度范围 6-30 位"
 
-#: xpack/plugins/change_auth_plan/task_handlers/base/handler.py:249
+#: xpack/plugins/change_auth_plan/task_handlers/base/handler.py:236
+msgid "After many attempts to change the secret, it still failed"
+msgstr "多次尝试改密后, 依然失败"
+
+#: xpack/plugins/change_auth_plan/task_handlers/base/handler.py:255
 msgid "Invalid/incorrect password"
 msgstr "无效/错误 密码"
 
-#: xpack/plugins/change_auth_plan/task_handlers/base/handler.py:251
+#: xpack/plugins/change_auth_plan/task_handlers/base/handler.py:257
 msgid "Failed to connect to the host"
 msgstr "连接主机失败"
 
-#: xpack/plugins/change_auth_plan/task_handlers/base/handler.py:253
+#: xpack/plugins/change_auth_plan/task_handlers/base/handler.py:259
 msgid "Data could not be sent to remote"
 msgstr "无法将数据发送到远程"
 
