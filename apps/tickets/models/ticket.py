@@ -140,24 +140,29 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         self.status = TicketStatus.closed
 
     def create_related_node(self):
+        org_id = self.flow.org_id
         approval_rule = self.get_current_ticket_flow_approve()
         ticket_step = TicketStep.objects.create(ticket=self, level=self.approval_step)
         ticket_assignees = []
-        assignees = approval_rule.assignees.all()
+        assignees = approval_rule.get_assignees(org_id=org_id)
         for assignee in assignees:
             ticket_assignees.append(TicketAssignee(step=ticket_step, assignee=assignee))
         TicketAssignee.objects.bulk_create(ticket_assignees)
 
     def create_process_map(self):
+        org_id = self.flow.org_id
         approval_rules = self.flow.rules.order_by('level')
         nodes = list()
         for node in approval_rules:
+            assignees = node.get_assignees(org_id=org_id)
+            assignee_ids = [assignee.id for assignee in assignees]
+            assignees_display = [str(assignee) for assignee in assignees]
             nodes.append(
                 {
                     'approval_level': node.level,
                     'state': ProcessStatus.notified,
-                    'assignees': [i for i in node.assignees.values_list('id', flat=True)],
-                    'assignees_display': node.assignees_display
+                    'assignees': assignee_ids,
+                    'assignees_display': assignees_display
                 }
             )
         return nodes

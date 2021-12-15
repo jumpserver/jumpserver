@@ -94,7 +94,6 @@ class TicketFlowViewSet(JMSBulkModelViewSet):
     def perform_create_or_update(self, serializer):
         instance = serializer.save()
         instance.save()
-        instance.rules.model.change_assignees_display(instance.rules.all())
 
     def perform_create(self, serializer):
         self.perform_create_or_update(serializer)
