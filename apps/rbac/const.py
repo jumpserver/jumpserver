@@ -68,7 +68,7 @@ exclude_permissions = (
 )
 
 
-system_scope_permissions = (
+only_system_permissions = (
     ('users', 'users', 'delete_user'),
     ('rbac', '*', '*'),
     ('orgs', 'organization', '*'),
@@ -76,3 +76,8 @@ system_scope_permissions = (
     ('settings', 'setting', '*'),
 )
 
+only_org_permissions = (
+)
+
+system_exclude_permissions = list(exclude_permissions) + list(only_org_permissions)
+org_exclude_permissions = list(exclude_permissions) + list(only_system_permissions)

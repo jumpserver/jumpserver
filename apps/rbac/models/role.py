@@ -18,10 +18,6 @@ class Role(JMSModel):
     scope = models.CharField(
         max_length=128, choices=Scope.choices, default=Scope.system, verbose_name=_('Scope')
     )
-    users = models.ManyToManyField(
-        'users.User', verbose_name=_("Users"), related_name='roles',
-        through='rbac.RoleBinding', through_fields=['role', 'user'],
-    )
     permissions = models.ManyToManyField(
         'rbac.Permission', related_name='roles', blank=True, verbose_name=_('Permissions')
     )
@@ -37,10 +33,43 @@ class Role(JMSModel):
     def __str__(self):
         return '%s(%s)' % (self.name, self.get_scope_display())
 
-    def get_permissions(self):
+    def is_admin(self):
         admin_names = [self.BuiltinRole.org_admin.name, self.BuiltinRole.system_admin.name]
+        yes = self.builtin and self.name in admin_names
+        return yes
 
-        if self.builtin and self.name in admin_names:
+    @staticmethod
+    def get_scope_roles_permissions(roles, scope):
+        has_admin = any([r.is_admin() for r in roles])
+        if has_admin:
+            perms = Permission.objects.all()
+        else:
+            perms = Permission.objects.filter(roles=roles).distinct()
+        perms = Permission.clean_permissions(perms, scope=scope)
+        return perms
+
+    @classmethod
+    def get_roles_permissions(cls, roles):
+        org_roles = [role for role in roles if role.scope == cls.Scope.org]
+        has_org_admin = any([r.is_org_admin() for r in org_roles])
+        if has_org_admin:
+            org_perms = Permission.objects.all()
+        else:
+            org_perms = Permission.objects.filter(roles=org_roles).distinct()
+        org_perms = Permission.clean_permissions(org_perms, scope=cls.Scope.org)
+
+        system_roles = [role for role in roles if role.scope == cls.Scope.system]
+        has_system_admin = any([r.is_system_admin() for r in system_roles])
+        if has_system_admin:
+            system_perms = Permission.objects.all()
+        else:
+            system_perms = Permission.objects.filter(rols=system_roles).distinct()
+        system_perms = Permission.clean_permissions(system_perms, scope=cls.Scope.system)
+
+        return
+
+    def get_permissions(self):
+        if self.is_sys_admin() or self.is_org_admin():
             permissions = Permission.objects.all()
         else:
             permissions = self.permissions.all()

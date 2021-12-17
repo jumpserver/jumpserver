@@ -14,5 +14,5 @@ class ServiceAccountRegistrationViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         app = serializer.save()
-        role = Role.get_builtin_role(name=Role.app_name, scope=Role.Scope.system)
+        role = Role.BuiltinRole.system_app.get_role()
         RoleBinding.objects.create(user=app, role=role)

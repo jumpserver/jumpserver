@@ -180,67 +180,34 @@ class AuthMixin:
 
 class RoleMixin:
     objects: models.Manager
-    m2m_org_members: models.Manager
+    roles: models.Manager
     is_authenticated: bool
     is_valid: bool
 
-    class ROLE(TextChoices):
-        ADMIN = choices.ADMIN, _('System administrator')
-        AUDITOR = choices.AUDITOR, _('System auditor')
-        USER = choices.USER, _('User')
-        APP = 'App', _('Application')
-
     @lazyproperty
     def org_roles(self):
-        from rbac.models import RoleBinding
-        return RoleBinding.get_user_roles(self)
+        from rbac.models import Role
+        return self.roles.filter(scope=Role.Scope.system)
 
     @lazyproperty
     def system_roles(self):
-        from rbac.models import RoleBinding
-        return RoleBinding.get_user_system_roles(self)
+        from rbac.models import Role
+        return self.roles.filter(scope=Role.Scope.system)
 
     @lazyproperty
     def perms(self):
-        from rbac.models import RoleBinding
-        return RoleBinding.get_user_perms(self)
-
-    @lazyproperty
-    def roles(self):
-        from rbac.models import RoleBinding
-        return RoleBinding.get_user_roles(self)
-
-    @lazyproperty
-    def org_roles(self):
-        from rbac.models import RoleBinding
-        return RoleBinding.get_user_roles(self)
+        return self.get_all_permissions()
 
     def _get_roles_display(self, scope=None):
-        if scope is None:
-            attr_name = 'roles'
-        else:
-            attr_name = f'{scope}_roles'
-        roles = getattr(self, attr_name, [])
+        roles = self.roles.filter().order_by('-scope')
+        if scope:
+            roles = roles.filter(scope=scope)
         roles_display = [str(role) for role in roles]
         return ' | '.join(roles_display)
 
     @lazyproperty
-    def role_display(self):
+    def total_roles_display(self):
         return self._get_roles_display()
-
-    @lazyproperty
-    def system_role_display(self):
-        return self._get_roles_display(scope='system')
-
-    @lazyproperty
-    def org_role_display(self):
-        return self._get_roles_display(scope='org')
-
-    @lazyproperty
-    def total_role_display(self):
-        roles = list({self.role_display, *self.org_role_display})
-        roles.sort()
-        return ' | '.join(roles)
 
     @property
     def is_superuser(self):
@@ -264,7 +231,7 @@ class RoleMixin:
             is_active=False, comment=comment, is_first_login=False, created_by='System'
         )
         access_key = app.create_access_key()
-        role = Role.get_builtin_role(name=Role.app_name, scope=Role.Scope.system)
+        role = Role.BuiltinRole.system_app.get_role()
         role_binding = RoleBinding(user=app, role=role)
         role_binding.save()
         return app, access_key
@@ -277,7 +244,8 @@ class RoleMixin:
 
     @classmethod
     def get_super_admins(cls):
-        return cls.objects.filter(role=cls.ROLE.ADMIN)
+        from rbac.models import Role
+        # Todo
 
     @classmethod
     def get_org_admins(cls, org=None):
@@ -296,6 +264,10 @@ class RoleMixin:
         else:
             members = cls.objects.none()
         return members
+
+    def get_all_permissions(self):
+        from rbac.models import RoleBinding
+        return RoleBinding.get_user_perms(self)
 
 
 class TokenMixin:

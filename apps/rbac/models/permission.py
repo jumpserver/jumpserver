@@ -236,10 +236,10 @@ class Permission(DjangoPermission):
 
     @classmethod
     def clean_permissions(cls, permissions, scope=Scope.system):
-        excludes = list(const.exclude_permissions)
         if scope == Scope.org:
-            excludes.extend(const.system_scope_permissions)
-
+            excludes = const.org_exclude_permissions
+        else:
+            excludes = const.system_exclude_permissions
         q = cls.get_define_permissions_q(excludes)
         permissions = permissions.exclude(q)
         return permissions

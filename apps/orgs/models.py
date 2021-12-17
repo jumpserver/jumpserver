@@ -6,15 +6,7 @@ from django.db.models import signals
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import lazyproperty, settings
-from common.const import choices
 from common.tree import TreeNode
-from common.db.models import TextChoices
-
-
-class ROLE(TextChoices):
-    ADMIN = choices.ADMIN, _('Organization administrator')
-    AUDITOR = choices.AUDITOR, _("Organization auditor")
-    USER = choices.USER, _('User')
 
 
 class Organization(models.Model):

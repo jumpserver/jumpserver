@@ -1,5 +1,6 @@
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
+from django.db.models import Q
 
 from common.db.models import JMSModel
 from orgs.utils import current_org
@@ -42,58 +43,56 @@ class RoleBinding(JMSModel):
         self.scope = self.role.scope
         return super().save(*args, **kwargs)
 
-    def get_perms(self):
-        perms = list(self.role.get_permissions().values_list(
-            'content_type__app_label', 'codename'
-        ))
-        return set(["%s.%s" % (ct, codename) for ct, codename in perms])
-
-    @classmethod
-    def get_binding_perms(cls, bindings):
-        perms = set()
-        for binding in bindings:
-            perms |= binding.get_perms()
-        perms = sorted(list(perms), key=cls.sort_perms)
-        return perms
+    # def get_perms(self):
+    #     perms = list(self.role.get_permissions().values_list(
+    #         'content_type__app_label', 'codename'
+    #     ))
+    #     return set(["%s.%s" % (ct, codename) for ct, codename in perms])
+    #
+    # @classmethod
+    # def get_binding_perms(cls, bindings):
+    #     perms = set()
+    #     for binding in bindings:
+    #         perms |= binding.get_perms()
+    #     perms = sorted(list(perms), key=cls.sort_perms)
+    #     return perms
+    #
+    # @staticmethod
+    # def sort_perms(perm):
+    #     perm_split = perm.split('.')
+    #     if len(perm_split) != 2:
+    #         return perm_split
+    #     app, code = perm_split[0], perm_split[1]
+    #     action_resource = code.split('_')
+    #     if len(action_resource) == 1:
+    #         action_resource.append('')
+    #     action = action_resource[0]
+    #     resource = '_'.join(action_resource[1:])
+    #     return [app, resource, action]
 
     @staticmethod
-    def sort_perms(perm):
-        perm_split = perm.split('.')
-        if len(perm_split) != 2:
-            return perm_split
-        app, code = perm_split[0], perm_split[1]
-        action_resource = code.split('_')
-        if len(action_resource) == 1:
-            action_resource.append('')
-        action = action_resource[0]
-        resource = '_'.join(action_resource[1:])
-        return [app, resource, action]
+    def _get_filter_q():
+        q = Q(scope=Role.Scope.system)
+        if current_org:
+            q |= Q(org_id=current_org.id, scope=Role.Scope.org)
+        return q
 
     @classmethod
     def get_user_perms(cls, user):
-        q = models.Q(user=user, org__isnull=True, scope=Scope.system)
-        if current_org and not current_org.is_root:
-            q |= models.Q(user=user, org=current_org.org_id, scope=Scope.org)
-        bindings = cls.objects.filter(q)
-        perms = cls.get_binding_perms(bindings)
-        return perms
+        roles = cls.get_user_roles(user)
+        return Role.get_roles_permissions(roles)
 
     @classmethod
-    def get_user_system_roles(cls, user):
-        role_ids = cls.objects.filter(user=user, org__isnull=True, scope=Scope.system) \
-            .values_list('role', flat=True)
-        roles = Role.objects.filter(id__in=role_ids)
-        return roles
-
-    @classmethod
-    def get_user_current_org_role(cls, user):
-        role_ids = cls.objects.filter(user=user, org=current_org, scope=Scope.org) \
-            .values_list('role', flat=True)
-        roles = Role.objects.filter(id__in=role_ids)
-        return roles
+    def get_role_users(cls, role):
+        from users.models import User
+        q = cls._get_filter_q()
+        bindings = cls.objects.filter(role=role).filter(q)
+        users_id = bindings.values_list('user', flat=True).distinct()
+        return User.objects.filter(id__in=users_id)
 
     @classmethod
     def get_user_roles(cls, user):
-        role_ids = cls.objects.filter(user=user).values_list('role', flat=True)
-        roles = Role.objects.filter(id__in=role_ids)
-        return roles
+        q = cls._get_filter_q()
+        bindings = cls.objects.filter(user=user).filter(q)
+        roles_id = bindings.values_list('role', flat=True).distinct()
+        return Role.objects.filter(id__In=roles_id)
