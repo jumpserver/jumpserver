@@ -124,3 +124,4 @@ python-novaclient==11.0.1
 pyzipper==0.3.5
 python3-saml==1.12.0
 python-keystoneclient==4.3.0
+pymssql==2.1.5
