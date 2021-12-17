@@ -35,6 +35,16 @@ p {
             <li><a href="/download/Microsoft_Remote_Desktop_10.6.7_installer.pkg">Microsoft_Remote_Desktop_10.6.7_installer.pkg</a></li>
         </ul>
     </div>
+
+    {% if XPACK_ENABLED  %}
+        <div class="group">
+            <h2>Windows {% trans 'Remote application publisher tools' %}</h2>
+            <p>{% trans 'Jmservisor is the script file needed to pull up a remote application in the Windows Remote Application publisher' %}</p>
+            <ul>
+                <li><a href="/download/JumpServer-Jmservisor.msi">Jmservisor {% trans 'Script' %}</a></li>
+            </ul>
+        </div>
+    {% endif %}
 </div>
 <style>
 ul {
