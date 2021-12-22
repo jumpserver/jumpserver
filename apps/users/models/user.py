@@ -185,6 +185,11 @@ class RoleMixin:
     is_valid: bool
 
     @lazyproperty
+    def roles(self):
+        from rbac.models import RoleBinding
+        return RoleBinding.get_user_roles(self)
+
+    @lazyproperty
     def org_roles(self):
         from rbac.models import Role
         return self.roles.filter(scope=Role.Scope.system)
@@ -211,9 +216,8 @@ class RoleMixin:
 
     @property
     def is_superuser(self):
-        from rbac.models import Role
-        role = Role.BuiltinRole.system_admin.get_role()
-        return role in self.system_roles
+        yes = any([r.is_admin for r in self.system_roles])
+        return yes
 
     @property
     def is_staff(self):

@@ -2634,7 +2634,7 @@ msgstr "角色管理"
 
 #: rbac/builtin.py:62
 msgid "SystemAdmin"
-msgstr "系统"
+msgstr "系统管理员"
 
 #: rbac/builtin.py:65
 msgid "SystemAuditor"

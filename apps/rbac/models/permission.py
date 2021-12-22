@@ -212,6 +212,14 @@ class Permission(DjangoPermission):
         proxy = True
         verbose_name = _('Permission')
 
+    @classmethod
+    def to_perms(cls, queryset):
+        perms = queryset.values_list(
+            'content_type__app_label', 'codename'
+        )
+        perms = list(set(["%s.%s" % (ct, codename) for ct, codename in perms]))
+        return sorted(perms)
+
     @property
     def app_label_codename(self):
         return '%s.%s' % (self.content_type.app_label, self.codename)

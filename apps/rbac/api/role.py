@@ -33,7 +33,6 @@ class RoleViewSet(JMSModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()\
-            .annotate(users_amount=Count('users')) \
             .annotate(permissions_amount=Count('permissions'))
         return queryset
 

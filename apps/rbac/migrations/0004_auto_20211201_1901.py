@@ -15,7 +15,7 @@ def migrate_system_role_binding(apps, schema_editor):
     for user in users:
         role = BuiltinRole.get_system_role_by_old_name(user.role)
         role_binding = role_binding_model(
-            scope='org',
+            scope='system',
             user_id=user.id,
             role_id=role.id,
         )

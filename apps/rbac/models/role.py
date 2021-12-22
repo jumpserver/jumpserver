@@ -33,48 +33,57 @@ class Role(JMSModel):
     def __str__(self):
         return '%s(%s)' % (self.name, self.get_scope_display())
 
+    def is_system_admin(self):
+        return self.name == self.BuiltinRole.system_admin.name and self.builtin
+
+    def is_org_admin(self):
+        return self.name == self.BuiltinRole.org_admin.name and self.builtin
+
     def is_admin(self):
-        admin_names = [self.BuiltinRole.org_admin.name, self.BuiltinRole.system_admin.name]
-        yes = self.builtin and self.name in admin_names
+        yes = self.is_system_admin() or self.is_org_admin()
         return yes
 
     @staticmethod
-    def get_scope_roles_permissions(roles, scope):
+    def get_scope_roles_perms(roles, scope):
         has_admin = any([r.is_admin() for r in roles])
         if has_admin:
             perms = Permission.objects.all()
         else:
-            perms = Permission.objects.filter(roles=roles).distinct()
+            perms = Permission.objects.filter(roles__in=roles).distinct()
         perms = Permission.clean_permissions(perms, scope=scope)
         return perms
 
     @classmethod
     def get_roles_permissions(cls, roles):
         org_roles = [role for role in roles if role.scope == cls.Scope.org]
-        has_org_admin = any([r.is_org_admin() for r in org_roles])
-        if has_org_admin:
-            org_perms = Permission.objects.all()
-        else:
-            org_perms = Permission.objects.filter(roles=org_roles).distinct()
-        org_perms = Permission.clean_permissions(org_perms, scope=cls.Scope.org)
+        org_perms_id = cls.get_scope_roles_perms(org_roles, cls.Scope.org)\
+            .values_list('id', flat=True)
 
         system_roles = [role for role in roles if role.scope == cls.Scope.system]
-        has_system_admin = any([r.is_system_admin() for r in system_roles])
-        if has_system_admin:
-            system_perms = Permission.objects.all()
-        else:
-            system_perms = Permission.objects.filter(rols=system_roles).distinct()
-        system_perms = Permission.clean_permissions(system_perms, scope=cls.Scope.system)
+        system_perms_id = cls.get_scope_roles_perms(system_roles, cls.Scope.system)\
+            .values_list('id', flat=True)
+        perms_id = set(org_perms_id) | set(system_perms_id)
+        permissions = Permission.objects.filter(id__in=perms_id)\
+            .prefetch_related('content_type')
+        return permissions
 
-        return
+    @classmethod
+    def get_roles_perms(cls, roles):
+        permissions = cls.get_roles_permissions(roles)
+        return Permission.to_perms(permissions)
 
     def get_permissions(self):
-        if self.is_sys_admin() or self.is_org_admin():
+        if self.is_system_admin() or self.is_org_admin():
             permissions = Permission.objects.all()
         else:
             permissions = self.permissions.all()
         permissions = Permission.clean_permissions(permissions, self.scope)
         return permissions
+
+    @lazyproperty
+    def users(self):
+        from .rolebinding import RoleBinding
+        return RoleBinding.get_role_users(self)
 
     @lazyproperty
     def users_amount(self):

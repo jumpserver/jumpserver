@@ -11,7 +11,7 @@ from common.permissions import IsOrgAdmin
 from common.mixins import CommonApiMixin
 from common.utils import get_logger
 from orgs.utils import current_org
-from orgs.models import OrganizationMember
+from rbac.models import RoleBinding
 from users.utils import LoginBlockUtil, MFABlockUtils
 from .. import serializers
 from ..serializers import (
@@ -46,9 +46,9 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         queryset = super().get_queryset().prefetch_related('groups')
         if not current_org.is_root():
             # 为在列表中计算用户在真实组织里的角色
-            member_queryset = OrganizationMember.objects.filter(org__id=current_org.id)
+            role_bindings = RoleBinding.objects.filter(org__id=current_org.id)
             queryset = queryset.prefetch_related(
-                Prefetch('m2m_org_members', queryset=member_queryset)
+                Prefetch('m2m_org_members', queryset=role_bindings)
             ).filter(m2m_org_members__id=current_org.id)
         return queryset
 

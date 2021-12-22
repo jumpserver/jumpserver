@@ -13,7 +13,6 @@ __all__ = ['RoleBinding']
 
 class RoleBinding(JMSModel):
     """ 定义 用户-角色 关系 """
-
     scope = models.CharField(
         max_length=128, choices=Scope.choices, default=Scope.system,
         verbose_name=_('Scope')
@@ -43,33 +42,6 @@ class RoleBinding(JMSModel):
         self.scope = self.role.scope
         return super().save(*args, **kwargs)
 
-    # def get_perms(self):
-    #     perms = list(self.role.get_permissions().values_list(
-    #         'content_type__app_label', 'codename'
-    #     ))
-    #     return set(["%s.%s" % (ct, codename) for ct, codename in perms])
-    #
-    # @classmethod
-    # def get_binding_perms(cls, bindings):
-    #     perms = set()
-    #     for binding in bindings:
-    #         perms |= binding.get_perms()
-    #     perms = sorted(list(perms), key=cls.sort_perms)
-    #     return perms
-    #
-    # @staticmethod
-    # def sort_perms(perm):
-    #     perm_split = perm.split('.')
-    #     if len(perm_split) != 2:
-    #         return perm_split
-    #     app, code = perm_split[0], perm_split[1]
-    #     action_resource = code.split('_')
-    #     if len(action_resource) == 1:
-    #         action_resource.append('')
-    #     action = action_resource[0]
-    #     resource = '_'.join(action_resource[1:])
-    #     return [app, resource, action]
-
     @staticmethod
     def _get_filter_q():
         q = Q(scope=Role.Scope.system)
@@ -80,7 +52,7 @@ class RoleBinding(JMSModel):
     @classmethod
     def get_user_perms(cls, user):
         roles = cls.get_user_roles(user)
-        return Role.get_roles_permissions(roles)
+        return Role.get_roles_perms(roles)
 
     @classmethod
     def get_role_users(cls, role):
@@ -95,4 +67,4 @@ class RoleBinding(JMSModel):
         q = cls._get_filter_q()
         bindings = cls.objects.filter(user=user).filter(q)
         roles_id = bindings.values_list('role', flat=True).distinct()
-        return Role.objects.filter(id__In=roles_id)
+        return Role.objects.filter(id__in=roles_id)
