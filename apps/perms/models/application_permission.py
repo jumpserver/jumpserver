@@ -6,7 +6,7 @@ from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import lazyproperty
-from .base import BasePermission
+from .base import BasePermission, Action
 from users.models import User
 from applications.const import AppCategory, AppType
 
@@ -72,3 +72,31 @@ class ApplicationPermission(BasePermission):
             Q(id__in=user_ids) | Q(groups__id__in=user_group_ids)
         )
         return users
+
+    @classmethod
+    def get_include_actions_choices(cls, category=None):
+        actions = {Action.ALL, Action.CONNECT}
+        if category == AppCategory.db:
+            _actions = [Action.UPLOAD, Action.DOWNLOAD]
+        elif category == AppCategory.remote_app:
+            _actions = [
+                Action.UPLOAD, Action.DOWNLOAD,
+                Action.CLIPBOARD_COPY, Action.CLIPBOARD_PASTE
+            ]
+        else:
+            _actions = []
+        actions.update(_actions)
+
+        if (Action.UPLOAD in actions) or (Action.DOWNLOAD in actions):
+            actions.update([Action.UPDOWNLOAD])
+        if (Action.CLIPBOARD_COPY in actions) or (Action.CLIPBOARD_PASTE in actions):
+            actions.update([Action.CLIPBOARD_COPY_PASTE])
+
+        choices = [Action.NAME_MAP[action] for action in actions]
+        return choices
+
+    @classmethod
+    def get_exclude_actions_choices(cls, category=None):
+        include_choices = cls.get_include_actions_choices(category)
+        exclude_choices = set(Action.NAME_MAP.values()) - set(include_choices)
+        return exclude_choices

@@ -11,7 +11,7 @@ from perms.utils.asset.user_permission import get_user_all_asset_perm_ids
 logger = get_logger(__file__)
 
 
-def validate_permission(user, asset, system_user, action_name):
+def validate_permission(user, asset, system_user, action='connect'):
 
     if not system_user.protocol in asset.protocols_as_dict.keys():
         return False, time.time()
@@ -50,10 +50,22 @@ def validate_permission(user, asset, system_user, action_name):
         id__in=asset_perm_ids
     ).order_by('-date_expired')
 
-    for asset_perm in asset_perms:
-        if action_name in Action.value_to_choices(asset_perm.actions):
-            return True, asset_perm.date_expired.timestamp()
-    return False, time.time()
+    if asset_perms:
+        actions = set()
+        actions_values = asset_perms.values_list('actions', flat=True)
+        for value in actions_values:
+            _actions = Action.value_to_choices(value)
+            actions.update(_actions)
+        asset_perm: AssetPermission = asset_perms.first()
+        actions = list(actions)
+        expire_at = asset_perm.date_expired.timestamp()
+    else:
+        actions = []
+        expire_at = time.time()
+
+    # TODO: 组件改造API完成后统一通过actions判断has_perm
+    has_perm = action in actions
+    return has_perm, actions, expire_at
 
 
 def get_asset_system_user_ids_with_actions(asset_perm_ids, asset: Asset):

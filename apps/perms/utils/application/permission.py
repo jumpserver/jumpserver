@@ -3,7 +3,7 @@ import time
 from django.db.models import Q
 
 from common.utils import get_logger
-from perms.models import ApplicationPermission
+from perms.models import ApplicationPermission, Action
 
 logger = get_logger(__file__)
 
@@ -33,31 +33,38 @@ def get_user_all_app_perm_ids(user) -> set:
     return app_perm_ids
 
 
-def validate_permission(user, application, system_user):
+def validate_permission(user, application, system_user, action='connect'):
     app_perm_ids = get_user_all_app_perm_ids(user)
     app_perm_ids = ApplicationPermission.applications.through.objects.filter(
         applicationpermission_id__in=app_perm_ids,
         application_id=application.id
     ).values_list('applicationpermission_id', flat=True)
-
     app_perm_ids = set(app_perm_ids)
-
     app_perm_ids = ApplicationPermission.system_users.through.objects.filter(
         applicationpermission_id__in=app_perm_ids,
         systemuser_id=system_user.id
     ).values_list('applicationpermission_id', flat=True)
-
     app_perm_ids = set(app_perm_ids)
-
-    app_perm = ApplicationPermission.objects.filter(
+    app_perms = ApplicationPermission.objects.filter(
         id__in=app_perm_ids
-    ).order_by('-date_expired').first()
+    ).order_by('-date_expired')
 
-    app_perm: ApplicationPermission
-    if app_perm:
-        return True, app_perm.date_expired.timestamp()
+    if app_perms:
+        actions = set()
+        actions_values = app_perms.values_list('actions', flat=True)
+        for value in actions_values:
+            _actions = Action.value_to_choices(value)
+            actions.update(_actions)
+        actions = list(actions)
+        app_perm: ApplicationPermission = app_perms.first()
+        expire_at = app_perm.date_expired.timestamp()
     else:
-        return False, time.time()
+        actions = []
+        expire_at = time.time()
+
+    # TODO: 组件改造API完成后统一通过actions判断has_perm
+    has_perm = action in actions
+    return has_perm, actions, expire_at
 
 
 def get_application_system_user_ids(user, application):
