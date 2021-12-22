@@ -9,7 +9,7 @@ from assets.models import Asset, SystemUser, Gateway
 from applications.models import Application
 from users.serializers import UserProfileSerializer
 from assets.serializers import ProtocolsField
-from perms.serializers.asset.permission import ActionsField
+from perms.serializers.base import ActionsField
 from .models import AccessKey
 
 __all__ = [
