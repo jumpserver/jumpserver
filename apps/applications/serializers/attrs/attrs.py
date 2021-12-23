@@ -25,6 +25,7 @@ category_serializer_classes_mapping = {
 type_serializer_classes_mapping = {
     # db
     const.AppType.mysql.value: application_type.MySQLSerializer,
+    const.AppType.redis.value: application_type.RedisSerializer,
     const.AppType.mariadb.value: application_type.MariaDBSerializer,
     const.AppType.oracle.value: application_type.OracleSerializer,
     const.AppType.pgsql.value: application_type.PostgreSerializer,

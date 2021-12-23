@@ -119,7 +119,8 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             return ''
 
         login_mode = self.get_initial_value("login_mode")
-        if login_mode == SystemUser.LOGIN_AUTO and protocol != SystemUser.Protocol.vnc:
+        if login_mode == SystemUser.LOGIN_AUTO and protocol != SystemUser.Protocol.vnc \
+                and protocol != SystemUser.Protocol.redis:
             msg = _('* Automatic login mode must fill in the username.')
             raise serializers.ValidationError(msg)
         return username

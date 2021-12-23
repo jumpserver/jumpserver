@@ -149,3 +149,13 @@ class IpInFilterBackend(filters.BaseFilterBackend):
                 )
             )
         ]
+
+
+class ProtocolInFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        protocols = request.query_params.get('protocols')
+        if not protocols:
+            return queryset
+        protocol_list = [i.strip() for i in protocols.split(',')]
+        queryset = queryset.filter(protocol__in=protocol_list)
+        return queryset
