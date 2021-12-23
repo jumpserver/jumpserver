@@ -16,6 +16,7 @@ from ..tasks import (
     push_system_user_to_assets_manual, test_system_user_connectivity_manual,
     push_system_user_to_assets
 )
+from ..filters import ProtocolInFilterBackend
 
 logger = get_logger(__file__)
 __all__ = [
@@ -37,6 +38,7 @@ class SystemUserViewSet(SuggestionMixin, OrgBulkModelViewSet):
         'type': ['exact', 'in'],
     }
     search_fields = filterset_fields
+    extra_filter_backends = [ProtocolInFilterBackend]
     serializer_class = serializers.SystemUserSerializer
     serializer_classes = {
         'default': serializers.SystemUserSerializer,

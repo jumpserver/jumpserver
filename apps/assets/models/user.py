@@ -29,6 +29,8 @@ class ProtocolMixin:
         telnet = 'telnet', 'Telnet'
         vnc = 'vnc', 'VNC'
         mysql = 'mysql', 'MySQL'
+        redis = 'redis', 'Redis'
+        redis_acl = 'redis_acl', 'Redis ACL'
         oracle = 'oracle', 'Oracle'
         mariadb = 'mariadb', 'MariaDB'
         postgresql = 'postgresql', 'PostgreSQL'
@@ -44,7 +46,8 @@ class ProtocolMixin:
         Protocol.rdp
     ]
     APPLICATION_CATEGORY_DB_PROTOCOLS = [
-        Protocol.mysql, Protocol.oracle, Protocol.mariadb, Protocol.postgresql, Protocol.sqlserver
+        Protocol.mysql, Protocol.redis, Protocol.redis_acl, Protocol.oracle,
+        Protocol.mariadb, Protocol.postgresql, Protocol.sqlserver
     ]
     APPLICATION_CATEGORY_CLOUD_PROTOCOLS = [
         Protocol.k8s
