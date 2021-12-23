@@ -37,7 +37,9 @@ RUN pip install --upgrade pip==20.2.4 setuptools==49.6.0 wheel==0.34.2 -i ${PIP_
 
 COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/jumpserver
 RUN mkdir -p /root/.ssh/ \
-    && echo "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null" > /root/.ssh/config
+    && echo "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null" > /root/.ssh/config \
+    && mv /bin/sh /bin/sh.bak  \
+    && ln -s /bin/bash /bin/sh
 
 RUN mkdir -p /opt/jumpserver/oracle/ \
     && wget https://download.jumpserver.org/public/instantclient-basiclite-linux.x64-21.1.0.0.0.tar > /dev/null \

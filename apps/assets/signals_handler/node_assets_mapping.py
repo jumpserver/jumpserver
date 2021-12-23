@@ -40,10 +40,6 @@ def expire_node_assets_mapping_for_memory(org_id):
     root_org_id = Organization.ROOT_ID
 
     # 当前进程清除(cache 数据)
-    logger.debug(
-        "Expire node assets id mapping from cache of org={}, pid={}"
-        "".format(org_id, os.getpid())
-    )
     Node.expire_node_all_asset_ids_mapping_from_cache(org_id)
     Node.expire_node_all_asset_ids_mapping_from_cache(root_org_id)
 
@@ -81,10 +77,6 @@ def subscribe_node_assets_mapping_expire(sender, **kwargs):
         root_org_id = Organization.ROOT_ID
         Node.expire_node_all_asset_ids_mapping_from_memory(org_id)
         Node.expire_node_all_asset_ids_mapping_from_memory(root_org_id)
-        logger.debug(
-            "Expire node assets id mapping from memory of org={}, pid={}"
-            "".format(str(org_id), os.getpid())
-        )
 
     def keep_subscribe_node_assets_relation():
         node_assets_mapping_for_memory_pub_sub.keep_handle_msg(handle_node_relation_change)

@@ -2,9 +2,10 @@
 #
 import urllib.parse
 import json
-import base64
 from typing import Callable
 import os
+import base64
+import ctypes
 
 from django.conf import settings
 from django.core.cache import cache
@@ -18,10 +19,12 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework import serializers
 
+from applications.models import Application
 from authentication.signals import post_auth_failed, post_auth_success
 from common.utils import get_logger, random_string
 from common.mixins.api import SerializerMixin
 from common.permissions import IsSuperUserOrAppUser, IsValidUser, IsSuperUser
+from common.utils.common import get_file_by_arch
 from orgs.mixins.api import RootOrgViewMixin
 from common.http import is_true
 from perms.utils.asset.permission import get_asset_system_user_ids_with_actions_by_user
@@ -124,16 +127,39 @@ class ClientProtocolMixin:
         options['session bpp:i'] = os.getenv('JUMPSERVER_COLOR_DEPTH', '32')
         options['audiomode:i'] = self.parse_env_bool('JUMPSERVER_DISABLE_AUDIO', 'false', '2', '0')
 
-        content = ''
-        for k, v in options.items():
-            content += f'{k}:{v}\n'
         if asset:
             name = asset.hostname
         elif application:
             name = application.name
+            application.get_rdp_remote_app_setting()
+
+            app = f'||jmservisor'
+            options['remoteapplicationmode:i'] = '1'
+            options['alternate shell:s'] = app
+            options['remoteapplicationprogram:s'] = app
+            options['remoteapplicationname:s'] = name
+            options['remoteapplicationcmdline:s'] = '- ' + self.get_encrypt_cmdline(application)
         else:
             name = '*'
+
+        content = ''
+        for k, v in options.items():
+            content += f'{k}:{v}\n'
         return name, content
+
+    def get_encrypt_cmdline(self, app: Application):
+
+        parameters = app.get_rdp_remote_app_setting()['parameters']
+        parameters = parameters.encode('ascii')
+
+        lib_path = get_file_by_arch('xpack/libs', 'librailencrypt.so')
+        lib = ctypes.CDLL(lib_path)
+        lib.encrypt.argtypes = [ctypes.c_char_p, ctypes.c_int]
+        lib.encrypt.restype = ctypes.c_char_p
+
+        rst = lib.encrypt(parameters, len(parameters))
+        rst = rst.decode('ascii')
+        return rst
 
     @action(methods=['POST', 'GET'], detail=False, url_path='rdp/file', permission_classes=[IsValidUser])
     def get_rdp_file(self, request, *args, **kwargs):
@@ -268,7 +294,7 @@ class SecretDetailMixin:
             data.update(asset_detail)
         else:
             app_detail = self._get_application_secret_detail(app)
-            system_user.load_app_more_auth(app.id, user.id)
+            system_user.load_app_more_auth(app.id, user.username, user.id)
             data['type'] = 'application'
             data.update(app_detail)
 

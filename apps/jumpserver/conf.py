@@ -229,6 +229,30 @@ class Config(dict):
         'AUTH_SSO': False,
         'AUTH_SSO_AUTHKEY_TTL': 60 * 15,
 
+        # SAML2 认证
+        'AUTH_SAML2': False,
+        'SAML2_LOGOUT_COMPLETELY': True,
+        'AUTH_SAML2_ALWAYS_UPDATE_USER': True,
+        'SAML2_RENAME_ATTRIBUTES': {'uid': 'username', 'email': 'email'},
+        'SAML2_SP_ADVANCED_SETTINGS': {
+            "organization": {
+                "en": {
+                    "name": "JumpServer",
+                    "displayname": "JumpServer",
+                    "url": "https://jumpserver.org/"
+                }
+            },
+            "strict": True,
+            "security": {
+            }
+        },
+        'SAML2_IDP_METADATA_URL': '',
+        'SAML2_IDP_METADATA_XML': '',
+        'SAML2_SP_KEY_CONTENT': '',
+        'SAML2_SP_CERT_CONTENT': '',
+        'AUTH_SAML2_PROVIDER_AUTHORIZATION_ENDPOINT': '/',
+        'AUTH_SAML2_AUTHENTICATION_FAILURE_REDIRECT_URI': '/',
+
         # 企业微信
         'AUTH_WECOM': False,
         'WECOM_CORPID': '',
@@ -246,7 +270,7 @@ class Config(dict):
         'FEISHU_APP_ID': '',
         'FEISHU_APP_SECRET': '',
 
-        'LOGIN_REDIRECT_TO_BACKEND':  '',  # 'OPENID / CAS
+        'LOGIN_REDIRECT_TO_BACKEND':  '',  # 'OPENID / CAS / SAML2
         'LOGIN_REDIRECT_MSG_ENABLED': True,
 
         'SMS_ENABLED': False,

@@ -138,7 +138,7 @@ def get_push_unixlike_system_user_tasks(system_user, username=None):
     return tasks
 
 
-def get_push_windows_system_user_tasks(system_user, username=None):
+def get_push_windows_system_user_tasks(system_user: SystemUser, username=None):
     if username is None:
         username = system_user.username
     password = system_user.password
@@ -151,6 +151,11 @@ def get_push_windows_system_user_tasks(system_user, username=None):
     if not password:
         logger.error("Error: no password found")
         return tasks
+
+    if system_user.ad_domain:
+        logger.error('System user with AD domain do not support push.')
+        return tasks
+
     task = {
         'name': 'Add user {}'.format(username),
         'action': {

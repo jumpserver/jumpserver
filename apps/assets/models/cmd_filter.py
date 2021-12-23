@@ -7,8 +7,10 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import lazyproperty
+from common.utils import lazyproperty, get_logger
 from orgs.mixins.models import OrgModelMixin
+
+logger = get_logger(__file__)
 
 
 __all__ = [
@@ -19,11 +21,32 @@ __all__ = [
 class CommandFilter(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=64, verbose_name=_("Name"))
+    users = models.ManyToManyField(
+        'users.User', related_name='cmd_filters', blank=True,
+        verbose_name=_("User")
+    )
+    user_groups = models.ManyToManyField(
+        'users.UserGroup', related_name='cmd_filters', blank=True,
+        verbose_name=_("User group"),
+    )
+    assets = models.ManyToManyField(
+        'assets.Asset', related_name='cmd_filters', blank=True,
+        verbose_name=_("Asset")
+    )
+    system_users = models.ManyToManyField(
+        'assets.SystemUser', related_name='cmd_filters', blank=True,
+        verbose_name=_("System user"))
+    applications = models.ManyToManyField(
+        'applications.Application', related_name='cmd_filters', blank=True,
+        verbose_name=_("Application")
+    )
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
     comment = models.TextField(blank=True, default='', verbose_name=_("Comment"))
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
-    created_by = models.CharField(max_length=128, blank=True, default='', verbose_name=_('Created by'))
+    created_by = models.CharField(
+        max_length=128, blank=True, default='', verbose_name=_('Created by')
+    )
 
     def __str__(self):
         return self.name
@@ -45,7 +68,7 @@ class CommandFilterRule(OrgModelMixin):
 
     class ActionChoices(models.IntegerChoices):
         deny = 0, _('Deny')
-        allow = 1, _('Allow')
+        allow = 9, _('Allow')
         confirm = 2, _('Reconfirm')
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
@@ -71,28 +94,52 @@ class CommandFilterRule(OrgModelMixin):
         verbose_name = _("Command filter rule")
 
     @lazyproperty
-    def _pattern(self):
+    def pattern(self):
         if self.type == 'command':
-            regex = []
-            content = self.content.replace('\r\n', '\n')
-            for cmd in content.split('\n'):
-                cmd = re.escape(cmd)
-                cmd = cmd.replace('\\ ', '\s+')
-                if cmd[-1].isalpha():
-                    regex.append(r'\b{0}\b'.format(cmd))
-                else:
-                    regex.append(r'\b{0}'.format(cmd))
-            s = r'{}'.format('|'.join(regex))
+            s = self.construct_command_regex(content=self.content)
         else:
             s = r'{0}'.format(self.content)
+
+        return s
+
+    @classmethod
+    def construct_command_regex(cls, content):
+        regex = []
+        content = content.replace('\r\n', '\n')
+        for _cmd in content.split('\n'):
+            cmd = re.sub(r'\s+', ' ', _cmd)
+            cmd = re.escape(cmd)
+            cmd = cmd.replace('\\ ', '\s+')
+
+            # 有空格就不能 铆钉单词了
+            if ' ' in _cmd:
+                regex.append(cmd)
+                continue
+
+            # 如果是单个字符
+            if cmd[-1].isalpha():
+                regex.append(r'\b{0}\b'.format(cmd))
+            else:
+                regex.append(r'\b{0}'.format(cmd))
+        s = r'(?i){}'.format('|'.join(regex))
+        return s
+
+    @staticmethod
+    def compile_regex(regex):
         try:
-            _pattern = re.compile(s)
-        except:
-            _pattern = ''
-        return _pattern
+            pattern = re.compile(regex)
+        except Exception as e:
+            error = _('The generated regular expression is incorrect: {}').format(str(e))
+            logger.error(error)
+            return False, error, None
+        return True, '', pattern
 
     def match(self, data):
-        found = self._pattern.search(data)
+        succeed, error, pattern = self.compile_regex(regex=self.pattern)
+        if not succeed:
+            return self.ACTION_UNKNOWN, ''
+
+        found = pattern.search(data)
         if not found:
             return self.ACTION_UNKNOWN, ''
 

@@ -10,7 +10,10 @@ from functools import wraps
 import time
 import ipaddress
 import psutil
-from typing import Iterable
+import platform
+import os
+
+from django.conf import settings
 
 UUID_PATTERN = re.compile(r'\w{8}(-\w{4}){3}-\w{12}')
 ipip_db = None
@@ -264,14 +267,20 @@ def get_docker_mem_usage_if_limit():
             usage_in_bytes = int(f.readline())
 
         with open('/sys/fs/cgroup/memory/memory.stat') as f:
-            lines = f.readlines()
-            name, value = lines[33].split()
-            total_inactive_file = int(value)
+            inactive_file = 0
+            for line in f:
+                if line.startswith('total_inactive_file'):
+                    name, inactive_file = line.split()
+                    break
 
-        return ((usage_in_bytes - total_inactive_file) / limit_in_bytes) * 100
+                if line.startswith('inactive_file'):
+                    name, inactive_file = line.split()
+                    continue
+
+            inactive_file = int(inactive_file)
+        return ((usage_in_bytes - inactive_file) / limit_in_bytes) * 100
 
     except Exception as e:
-        logger.error(f'Get memory usage by docker limit: {e}')
         return None
 
 
@@ -319,3 +328,13 @@ def unique(objects, key=None):
         if v not in seen:
             seen[v] = obj
     return list(seen.values())
+
+
+def get_file_by_arch(dir, filename):
+    platform_name = platform.system()
+    arch = platform.machine()
+
+    file_path = os.path.join(
+        settings.BASE_DIR, dir, platform_name, arch, filename
+    )
+    return file_path

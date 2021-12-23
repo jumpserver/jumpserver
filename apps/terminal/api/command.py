@@ -121,8 +121,11 @@ class CommandViewSet(JMSBulkModelViewSet):
             qs = storage.get_command_queryset()
             commands = self.filter_queryset(qs)
             merged_commands.extend(commands[:])  # ES 默认只取 10 条数据
-
-        merged_commands.sort(key=lambda command: command.timestamp, reverse=True)
+        order = self.request.query_params.get('order', None)
+        if order == 'timestamp':
+            merged_commands.sort(key=lambda command: command.timestamp)
+        else:
+            merged_commands.sort(key=lambda command: command.timestamp, reverse=True)
         page = self.paginate_queryset(merged_commands)
         if page is not None:
             serializer = self.get_serializer(page, many=True)

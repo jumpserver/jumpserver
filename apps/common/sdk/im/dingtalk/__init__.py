@@ -151,12 +151,29 @@ class DingTalk:
             'data': data
         }
         data = self._request.post(URL.SEND_MESSAGE_BY_TEMPLATE, json=body, with_token=True)
+        return data
+
+    def send_markdown(self, user_ids, title, msg):
+        body = {
+            'agent_id': self._agentid,
+            'userid_list': ','.join(user_ids),
+            'to_all_user': False,
+            'msg': {
+                'msgtype': 'markdown',
+                'markdown': {
+                    'title': title,
+                    'text': msg
+                }
+            }
+        }
+        logger.info(f'Dingtalk send markdown to user {user_ids}: {msg}')
+        data = self._request.post(URL.SEND_MESSAGE, json=body, with_token=True)
+        return data
 
     def send_text(self, user_ids, msg):
         body = {
             'agent_id': self._agentid,
             'userid_list': ','.join(user_ids),
-            # 'dept_id_list': '',
             'to_all_user': False,
             'msg': {
                 'msgtype': 'text',
@@ -165,7 +182,7 @@ class DingTalk:
                 }
             }
         }
-        logger.info(f'Dingtalk send text: user_ids={user_ids} msg={msg}')
+        logger.info(f'Dingtalk send msg to user {user_ids}: {msg}')
         data = self._request.post(URL.SEND_MESSAGE, json=body, with_token=True)
         return data
 

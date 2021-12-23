@@ -15,6 +15,9 @@
             {% trans 'click here to set your password' %}
         </a>
     </p>
+
+
+    -
     <p>
           {% trans 'This link is valid for 1 hour. After it expires' %}
           <a href="{{ forget_password_url }}?email={{ user.email }}">{% trans 'request new one' %}</a>

@@ -90,7 +90,10 @@ class WeCom(RequestMixin):
             timeout=timeout
         )
 
-    def send_text(self, users: Iterable, msg: AnyStr, **kwargs):
+    def send_markdown(self, users: Iterable, msg: AnyStr, **kwargs):
+        pass
+
+    def send_text(self, users: Iterable, msg: AnyStr, markdown=False, **kwargs):
         """
         https://open.work.weixin.qq.com/api/doc/90000/90135/90236
 
@@ -115,6 +118,13 @@ class WeCom(RequestMixin):
            },
            **extra_params
         }
+        if markdown:
+            body['msgtype'] = 'markdown'
+            body["markdown"] = {
+                "content": msg
+            }
+            body.pop('text', '')
+
         logger.info(f'Wecom send text: users={users} msg={msg}')
         data = self._requests.post(URL.SEND_MESSAGE, json=body, check_errcode_is_0=False)
 
@@ -123,6 +133,9 @@ class WeCom(RequestMixin):
             # 全部接收人无权限或不存在
             return users
         self._requests.check_errcode_is_0(data)
+
+        if 'invaliduser' not in data:
+            return ()
 
         invaliduser = data['invaliduser']
         if not invaliduser:

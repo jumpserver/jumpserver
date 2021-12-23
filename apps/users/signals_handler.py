@@ -10,12 +10,35 @@ from django.db.models.signals import post_save
 
 from jms_oidc_rp.signals import openid_create_or_update_user
 
+from authentication.backends.saml2.signals import saml2_create_or_update_user
 from common.utils import get_logger
 from .signals import post_user_create
 from .models import User, UserPasswordHistory
 
 
 logger = get_logger(__file__)
+
+
+def user_authenticated_handle(user, created, source, attrs=None, **kwargs):
+    if created and settings.ONLY_ALLOW_EXIST_USER_AUTH:
+        user.delete()
+        raise PermissionDenied(f'Not allow non-exist user auth: {user.username}')
+    if created:
+        user.source = source
+        user.save()
+    elif not created and settings.AUTH_SAML2_ALWAYS_UPDATE_USER:
+        attr_whitelist = ('user', 'username', 'email', 'phone', 'comment')
+        logger.debug(
+            "Receive saml2 user updated signal: {}, "
+            "Update user info: {},"
+            "(Update only properties in the whitelist. [{}])"
+            "".format(user, str(attrs), ','.join(attr_whitelist))
+        )
+        if attrs is not None:
+            for key, value in attrs.items():
+                if key in attr_whitelist and value:
+                    setattr(user, key, value)
+            user.save()
 
 
 @receiver(post_save, sender=User)
@@ -44,12 +67,14 @@ def on_user_create(sender, user=None, **kwargs):
 
 @receiver(cas_user_authenticated)
 def on_cas_user_authenticated(sender, user, created, **kwargs):
-    if created and settings.ONLY_ALLOW_EXIST_USER_AUTH:
-        user.delete()
-        raise PermissionDenied(f'Not allow non-exist user auth: {user.username}')
-    if created:
-        user.source = user.Source.cas.value
-        user.save()
+    source = user.Source.cas.value
+    user_authenticated_handle(user, created, source)
+
+
+@receiver(saml2_create_or_update_user)
+def on_saml2_create_or_update_user(sender, user, created, attrs, **kwargs):
+    source = user.Source.saml2.value
+    user_authenticated_handle(user, created, source, attrs, **kwargs)
 
 
 @receiver(populate_user)

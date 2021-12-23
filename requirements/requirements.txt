@@ -62,7 +62,7 @@ pytz==2018.3
 PyYAML==5.4
 redis==3.5.3
 requests==2.25.1
-jms-storage==0.0.39
+jms-storage==0.0.40
 s3transfer==0.5.0
 simplejson==3.13.2
 six==1.11.0
@@ -95,7 +95,7 @@ python-cas==1.5.0
 ipython
 huaweicloud-sdk-python==1.0.21
 django-redis==4.11.0
-python-redis-lock==3.5.0
+python-redis-lock==3.7.0
 jumpserver-django-oidc-rp==0.3.7.8
 django-mysql==3.9.0
 gmssl==3.2.1
@@ -121,3 +121,7 @@ alibabacloud_dysmsapi20170525==2.0.2
 geoip2==4.4.0
 html2text==2020.1.16
 python-novaclient==11.0.1
+pyzipper==0.3.5
+python3-saml==1.12.0
+python-keystoneclient==4.3.0
+pymssql==2.1.5

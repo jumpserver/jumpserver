@@ -94,7 +94,7 @@ class Message(metaclass=MessageType):
                 traceback.print_exc()
 
     @classmethod
-    def send_test_msg(cls, ding=True):
+    def send_test_msg(cls, ding=True, wecom=False):
         msg = cls.gen_test_msg()
         if not msg:
             return
@@ -104,6 +104,8 @@ class Message(metaclass=MessageType):
         backends = []
         if ding:
             backends.append(BACKEND.DINGTALK)
+        if wecom:
+            backends.append(BACKEND.WECOM)
         msg.send_msg(users, backends)
 
     @staticmethod
@@ -113,8 +115,17 @@ class Message(metaclass=MessageType):
     def get_html_msg(self) -> dict:
         return self.get_common_msg()
 
+    def get_markdown_msg(self) -> dict:
+        h = HTML2Text()
+        h.body_width = 300
+        msg = self.get_html_msg()
+        content = msg['message']
+        msg['message'] = h.handle(content)
+        return msg
+
     def get_text_msg(self) -> dict:
         h = HTML2Text()
+        h.body_width = 90
         msg = self.get_html_msg()
         content = msg['message']
         h.ignore_links = self.text_msg_ignore_links
@@ -129,6 +140,10 @@ class Message(metaclass=MessageType):
     def text_msg(self) -> dict:
         msg = self.get_text_msg()
         return msg
+
+    @lazyproperty
+    def markdown_msg(self):
+        return self.get_markdown_msg()
 
     @lazyproperty
     def html_msg(self) -> dict:
@@ -167,17 +182,17 @@ class Message(metaclass=MessageType):
     # 支持不同发送消息的方式定义自己的消息内容，比如有些支持 html 标签
     def get_dingtalk_msg(self) -> dict:
         # 钉钉相同的消息一天只能发一次，所以给所有消息添加基于时间的序号，使他们不相同
-        message = self.text_msg['message']
+        message = self.markdown_msg['message']
         time = local_now().strftime('%Y-%m-%d %H:%M:%S')
         suffix = '\n{}: {}'.format(_('Time'), time)
 
         return {
-            'subject': self.text_msg['subject'],
+            'subject': self.markdown_msg['subject'],
             'message': message + suffix
         }
 
     def get_wecom_msg(self) -> dict:
-        return self.text_msg
+        return self.markdown_msg
 
     def get_feishu_msg(self) -> dict:
         return self.text_msg
@@ -207,12 +222,12 @@ class Message(metaclass=MessageType):
         return messages_cls
 
     @classmethod
-    def test_all_messages(cls):
+    def test_all_messages(cls, ding=True, wecom=False):
         messages_cls = cls.get_all_sub_messages()
 
         for _cls in messages_cls:
             try:
-                msg = _cls.send_test_msg()
+                _cls.send_test_msg(ding=ding, wecom=wecom)
             except NotImplementedError:
                 continue
 

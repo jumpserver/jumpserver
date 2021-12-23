@@ -528,6 +528,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         openid = 'openid', 'OpenID'
         radius = 'radius', 'Radius'
         cas = 'cas', 'CAS'
+        saml2 = 'saml2', 'SAML2'
 
     SOURCE_BACKEND_MAPPING = {
         Source.local: [
@@ -538,6 +539,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         Source.openid: [settings.AUTH_BACKEND_OIDC_PASSWORD, settings.AUTH_BACKEND_OIDC_CODE],
         Source.radius: [settings.AUTH_BACKEND_RADIUS],
         Source.cas: [settings.AUTH_BACKEND_CAS],
+        Source.saml2: [settings.AUTH_BACKEND_SAML2],
     }
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
@@ -575,6 +577,9 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     )
     public_key = fields.EncryptTextField(
         blank=True, null=True, verbose_name=_('Public key')
+    )
+    secret_key = fields.EncryptCharField(
+        max_length=256, blank=True, null=True, verbose_name=_('Secret key')
     )
     comment = models.TextField(
         blank=True, null=True, verbose_name=_('Comment')
