@@ -1,24 +1,23 @@
 # ~*~ coding: utf-8 ~*~
+from collections import defaultdict
 from django.utils.translation import ugettext as _
 from rest_framework.decorators import action
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
-from django.db.models import Prefetch
 
 from users.notifications import ResetMFAMsg
 from common.permissions import IsOrgAdmin
 from common.mixins import CommonApiMixin
 from common.utils import get_logger
 from orgs.utils import current_org
-from rbac.models import RoleBinding
 from users.utils import LoginBlockUtil, MFABlockUtils
+from .mixins import UserQuerysetMixin
 from .. import serializers
 from ..serializers import (
     UserSerializer, UserRetrieveSerializer,
     MiniUserSerializer, InviteSerializer
 )
-from .mixins import UserQuerysetMixin
 from ..models import User
 from ..signals import post_user_create
 from ..filters import UserFilter
@@ -44,89 +43,57 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset().prefetch_related('groups')
-        if not current_org.is_root():
-            # 为在列表中计算用户在真实组织里的角色
-            role_bindings = RoleBinding.objects.filter(org__id=current_org.id)
-            queryset = queryset.prefetch_related(
-                Prefetch('m2m_org_members', queryset=role_bindings)
-            ).filter(m2m_org_members__id=current_org.id)
         return queryset
 
     @staticmethod
-    def get_serializer_roles(serializer):
-        roles_map = {str(role.id): role for role in Role.objects.all()}
-        validated_data = serializer.validated_data
+    def set_roles(queryset):
+        # Todo: 未来有机会用 SQL 实现
+        queryset_list = list(queryset)
+        user_ids = [u.id for u in queryset_list]
+        role_bindings = RoleBinding.objects.filter(user__in=user_ids) \
+            .values('user_id', 'role_id', 'scope')
 
-        if isinstance(validated_data, list):
-            system_roles_ids = [item.pop('system_roles', []) for item in validated_data]
-            org_roles_ids = [item.pop('org_roles', []) for item in validated_data]
-        else:
-            system_roles_ids = [validated_data.pop('system_roles', [])]
-            org_roles_ids = [validated_data.pop('org_roles', [])]
+        role_mapper = {r.id: r for r in Role.objects.all()}
+        user_org_role_mapper = defaultdict(set)
+        user_system_role_mapper = defaultdict(set)
 
-        system_roles = []
-        for roles_ids in system_roles_ids:
-            roles = [roles_map[role_id] for role_id in roles_ids if role_id in roles_map]
-            system_roles.append(roles)
+        for binding in role_bindings:
+            role_id = binding['role_id']
+            user_id = binding['user_id']
+            if binding['scope'] == RoleBinding.Scope.system:
+                user_system_role_mapper[user_id].add(role_mapper[role_id])
+            else:
+                user_org_role_mapper[user_id].add(role_mapper[role_id])
 
-        org_roles = []
-        for roles_ids in org_roles_ids:
-            roles = [roles_map[role_id] for role_id in roles_ids if role_id in roles_map]
-            org_roles.append(roles)
+        for u in queryset_list:
+            system_roles = user_system_role_mapper[u.id]
+            org_roles = user_org_role_mapper[u.id]
+            u.roles.cache_set(system_roles | org_roles)
+            u.org_roles.cache_set(org_roles)
+            u.system_roles.cache_set(system_roles)
+        return queryset_list
 
-        return system_roles, org_roles
-
-    @staticmethod
-    def add_users_to_org(users):
-        # 只有真实存在的组织才真正关联用户
-        if not current_org:
-            return
-        if current_org.is_root():
-            return
-        current_org.members.add(*users)
-
-    @staticmethod
-    def set_users_roles(users, system_roles=None, org_roles=None, update=False):
-        if not current_org:
-            return
-
-        if system_roles:
-            for _user, _system_roles in zip(users, system_roles):
-                if update and not _system_roles:
-                    continue
-                RoleBinding.objects.filter(user=_user, org=None).delete()
-                roles_bindings = [RoleBinding(user=_user, role=role) for role in _system_roles]
-                RoleBinding.objects.bulk_create(roles_bindings)
-
-        if current_org.is_root():
-            return
-
-        if org_roles:
-            for _user, _org_roles in zip(users, org_roles):
-                if update and not _org_roles:
-                    continue
-                RoleBinding.objects.filter(user=_user, org=current_org).delete()
-                roles_bindings = [
-                    RoleBinding(user=_user, role=role, org=current_org) for role in _org_roles
-                ]
-                RoleBinding.objects.bulk_create(roles_bindings)
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+        queryset_list = self.set_roles(queryset)
+        return queryset_list
 
     def perform_create(self, serializer):
         users = serializer.save()
-        system_roles, org_roles = self.get_serializer_roles(serializer)
+        # system_roles, org_roles = self.get_serializer_roles(serializer)
         if isinstance(users, User):
             users = [users]
-        self.add_users_to_org(users)
-        self.set_users_roles(users, system_roles, org_roles)
+        # self.add_users_to_org(users)
+        # self.set_users_roles(users, system_roles, org_roles)
         self.send_created_signal(users)
 
     def perform_update(self, serializer):
         users = serializer.save()
-        system_roles, org_roles = self.get_serializer_roles(serializer)
+        # system_roles, org_roles = self.get_serializer_roles(serializer)
         if isinstance(users, User):
             users = [users]
-        self.add_users_to_org(users)
-        self.set_users_roles(users, system_roles, org_roles, update=True)
+        # self.add_users_to_org(users)
+        # self.set_users_roles(users, system_roles, org_roles, update=True)
 
     def perform_bulk_update(self, serializer):
         user_ids = [

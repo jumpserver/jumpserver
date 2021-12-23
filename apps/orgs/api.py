@@ -53,7 +53,7 @@ class OrgViewSet(BulkModelViewSet):
     @tmp_to_root_org()
     def get_data_from_model(self, org, model):
         if model == User:
-            data = model.get_nature_users(org=org)
+            data = model.get_org_users(org=org)
         elif model == Node:
             # 根节点不能手动删除，所以排除检查
             data = model.objects.filter(org_id=org.id).exclude(parent_key='', key__regex=r'^[0-9]+$')

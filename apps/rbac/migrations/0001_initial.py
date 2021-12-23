@@ -95,11 +95,6 @@ class Migration(migrations.Migration):
             name='permissions',
             field=models.ManyToManyField(blank=True, related_name='roles', to='rbac.Permission', verbose_name='Permissions'),
         ),
-        migrations.AddField(
-            model_name='role',
-            name='users',
-            field=models.ManyToManyField(related_name='roles', through='rbac.RoleBinding', to=settings.AUTH_USER_MODEL, verbose_name='Users'),
-        ),
         migrations.AlterUniqueTogether(
             name='role',
             unique_together={('name', 'scope')},

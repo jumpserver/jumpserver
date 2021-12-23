@@ -10,6 +10,18 @@ from .. import const
 __all__ = ['Role']
 
 
+class SystemRoleManager(models.Manager):
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(scope=const.Scope.system)
+
+
+class OrgRoleManager(models.Manager):
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(scope=const.Scope.org)
+
+
 class Role(JMSModel):
     """ 定义 角色 ｜ 角色-权限 关系 """
     Scope = const.Scope
@@ -25,6 +37,9 @@ class Role(JMSModel):
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
 
     BuiltinRole = BuiltinRole
+    objects = models.Manager()
+    org_roles = OrgRoleManager()
+    system_roles = SystemRoleManager()
 
     class Meta:
         unique_together = [('name', 'scope')]
@@ -73,7 +88,7 @@ class Role(JMSModel):
         return Permission.to_perms(permissions)
 
     def get_permissions(self):
-        if self.is_system_admin() or self.is_org_admin():
+        if self.is_admin():
             permissions = Permission.objects.all()
         else:
             permissions = self.permissions.all()
@@ -92,10 +107,6 @@ class Role(JMSModel):
     @lazyproperty
     def permissions_amount(self):
         return self.permissions.count()
-
-    @classmethod
-    def get_builtin_role(cls, name, scope):
-        return cls.objects.filter(name=name, scope=scope, builtin=True).first()
 
     @classmethod
     def create_builtin_roles(cls):

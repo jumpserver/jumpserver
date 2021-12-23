@@ -23,6 +23,7 @@ __all__ = [
 class UserResetPasswordApi(UserQuerysetMixin, generics.UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
+
     def perform_update(self, serializer):
         # Note: we are not updating the user object here.
         # We just do the reset-password stuff.
@@ -34,6 +35,7 @@ class UserResetPasswordApi(UserQuerysetMixin, generics.UpdateAPIView):
 
 class UserResetPKApi(UserQuerysetMixin, generics.UpdateAPIView):
     serializer_class = serializers.UserSerializer
+    
     def perform_update(self, serializer):
         user = self.get_object()
         user.public_key = None

@@ -4,14 +4,24 @@ from django.db.models import Q
 
 from common.db.models import JMSModel
 from orgs.utils import current_org
-
 from .role import Role
 from .. const import Scope
 
 __all__ = ['RoleBinding']
 
 
+class RoleBindingManager(models.Manager):
+    def get_queryset(self):
+        queryset = super(RoleBindingManager, self).get_queryset()
+        q = Q(scope=Scope.system)
+        if not current_org.is_root():
+            q |= Q(org_id=current_org.id, scope=Scope.org)
+        queryset = queryset.filter(q)
+        return queryset
+
+
 class RoleBinding(JMSModel):
+    Scope = Scope
     """ 定义 用户-角色 关系 """
     scope = models.CharField(
         max_length=128, choices=Scope.choices, default=Scope.system,
@@ -27,6 +37,7 @@ class RoleBinding(JMSModel):
         'orgs.Organization', related_name='role_bindings', blank=True, null=True,
         on_delete=models.CASCADE, verbose_name=_('Organization')
     )
+    objects = RoleBindingManager()
 
     class Meta:
         verbose_name = _('Role binding')
@@ -42,13 +53,6 @@ class RoleBinding(JMSModel):
         self.scope = self.role.scope
         return super().save(*args, **kwargs)
 
-    @staticmethod
-    def _get_filter_q():
-        q = Q(scope=Role.Scope.system)
-        if current_org:
-            q |= Q(org_id=current_org.id, scope=Role.Scope.org)
-        return q
-
     @classmethod
     def get_user_perms(cls, user):
         roles = cls.get_user_roles(user)
@@ -57,14 +61,12 @@ class RoleBinding(JMSModel):
     @classmethod
     def get_role_users(cls, role):
         from users.models import User
-        q = cls._get_filter_q()
-        bindings = cls.objects.filter(role=role).filter(q)
-        users_id = bindings.values_list('user', flat=True).distinct()
-        return User.objects.filter(id__in=users_id)
+        bindings = cls.objects.filter(role=role, scope=role.scope)
+        user_ids = bindings.values_list('user', flat=True).distinct()
+        return User.objects.filter(id__in=user_ids)
 
     @classmethod
     def get_user_roles(cls, user):
-        q = cls._get_filter_q()
-        bindings = cls.objects.filter(user=user).filter(q)
+        bindings = cls.objects.filter(user=user)
         roles_id = bindings.values_list('role', flat=True).distinct()
         return Role.objects.filter(id__in=roles_id)

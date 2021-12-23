@@ -21,7 +21,7 @@ logger = get_logger(__file__)
 
 @shared_task
 def check_password_expired():
-    users = User.get_nature_users().filter(source=User.Source.local.value)
+    users = User.get_nature_users().filter(source=User.Source.local)
     for user in users:
         if not user.is_valid:
             continue
@@ -49,7 +49,7 @@ def check_password_expired_periodic():
 
 @shared_task
 def check_user_expired():
-    users = User.get_nature_users()
+    users = User.get_nature_users().filter(source=User.Source.local)
     for user in users:
         if not user.is_valid:
             continue

@@ -177,7 +177,7 @@ class OrganizationMember(models.Model):
     objects = OrgMemberManager()
 
     class Meta:
-        unique_together = [('org', 'user')]
+        unique_together = [('org', 'user', 'role')]
         db_table = 'orgs_organization_members'
 
     def __str__(self):

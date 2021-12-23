@@ -154,6 +154,20 @@ class UserProfileSerializer(UserSerializer):
             return public_key
         return None
 
+    def validate_password(self, password):
+        from rbac.models import Role
+        from ..utils import check_password_rules
+        if not self.instance:
+            return password
+
+        is_org_admin = self.instance.org_roles.filter(
+            name=Role.BuiltinRole.org_admin.name
+        ).exsits()
+        if not check_password_rules(password, is_org_admin=is_org_admin):
+            msg = _('Password does not match security rules')
+            raise serializers.ValidationError(msg)
+        return password
+
 
 class UserPKUpdateSerializer(serializers.ModelSerializer):
     class Meta:

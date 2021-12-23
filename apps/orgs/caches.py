@@ -84,7 +84,7 @@ class OrgResourceStatisticsCache(OrgRelatedCache):
         return SystemUser.objects.filter(type=SystemUser.Type.common).count()
 
     def compute_users_amount(self):
-        users = User.get_nature_users()
+        users = User.get_org_users()
 
         if not self.org.is_root():
             users = users.filter(m2m_org_members__org_id=self.org.id)

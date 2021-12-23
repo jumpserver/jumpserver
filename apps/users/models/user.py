@@ -13,15 +13,13 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.hashers import check_password
 from django.core.cache import cache
 from django.db import models
-
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.shortcuts import reverse
 
 from orgs.utils import current_org
-from orgs.models import OrganizationMember, Organization
+from orgs.models import Organization
 from common.exceptions import JMSException
-from common.const import choices
 from common.utils import date_expired_default, get_logger, lazyproperty, random_string
 from common import fields
 from common.db.models import TextChoices
@@ -178,45 +176,105 @@ class AuthMixin:
             return False
 
 
+class RoleManager(models.Manager):
+    scope = None
+    __cache = None
+
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+
+    @property
+    def display(self):
+        roles = sorted(list(self.all()), key=lambda r: r.scope)
+        roles_display = [role.name_display for role in roles]
+        return ', '.join(roles_display)
+
+    @property
+    def role_bindings(self):
+        from rbac.models import RoleBinding
+        queryset = RoleBinding.objects.filter(user=self.user)
+        if self.scope:
+            queryset = queryset.filter(scope=self.scope)
+        return queryset
+
+    def get_queryset(self):
+        if self.__cache is not None:
+            return self.__cache
+        from rbac.models import RoleBinding
+        queryset = RoleBinding.get_user_roles(self.user)
+        if self.scope:
+            queryset = queryset.filter(scope=self.scope)
+        return queryset
+
+    def clear(self):
+        if not self.scope:
+            return
+        return self.role_bindings.delete()
+
+    def add(self, role):
+        from rbac.models import RoleBinding
+        kwargs = {
+            'role': role,
+            'user': self.user
+        }
+        if current_org.is_root() and role.scope == RoleBinding.org:
+            kwargs['org_id'] = current_org.id
+
+        try:
+            RoleBinding.objects.create(**kwargs)
+        except:
+            pass
+
+    def set(self, roles):
+        self.clear()
+        for role in roles:
+            self.add(role)
+
+    def cache_set(self, roles):
+        self.__cache = roles
+
+
+class OrgRoleManager(RoleManager):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from rbac.const import Scope
+        self.scope = Scope.org
+
+
+class SystemRoleManager(RoleManager):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from rbac.const import Scope
+        self.scope = Scope.system
+
+
 class RoleMixin:
     objects: models.Manager
-    roles: models.Manager
     is_authenticated: bool
     is_valid: bool
+    _org_roles = None
+    _system_roles = None
 
     @lazyproperty
     def roles(self):
-        from rbac.models import RoleBinding
-        return RoleBinding.get_user_roles(self)
+        return RoleManager(self)
 
     @lazyproperty
     def org_roles(self):
-        from rbac.models import Role
-        return self.roles.filter(scope=Role.Scope.system)
+        return OrgRoleManager(self)
 
     @lazyproperty
     def system_roles(self):
-        from rbac.models import Role
-        return self.roles.filter(scope=Role.Scope.system)
+        return SystemRoleManager(self)
 
     @lazyproperty
     def perms(self):
         return self.get_all_permissions()
 
-    def _get_roles_display(self, scope=None):
-        roles = self.roles.filter().order_by('-scope')
-        if scope:
-            roles = roles.filter(scope=scope)
-        roles_display = [str(role) for role in roles]
-        return ' | '.join(roles_display)
-
-    @lazyproperty
-    def total_roles_display(self):
-        return self._get_roles_display()
-
     @property
     def is_superuser(self):
-        yes = any([r.is_admin for r in self.system_roles])
+        yes = any([r.is_admin for r in self.system_roles.all()])
         return yes
 
     @property
@@ -229,49 +287,54 @@ class RoleMixin:
 
     @classmethod
     def create_app_user(cls, name, comment):
-        from rbac.models import Role, RoleBinding
+        from rbac.models import Role
         app = cls.objects.create(
             username=name, name=name, email='{}@local.domain'.format(name),
-            is_active=False, comment=comment, is_first_login=False, created_by='System'
+            is_active=False, comment=comment, is_first_login=False, created_by='System',
+            is_app=True,
         )
         access_key = app.create_access_key()
         role = Role.BuiltinRole.system_app.get_role()
-        role_binding = RoleBinding(user=app, role=role)
-        role_binding.save()
+        app.system_roles.add(role)
         return app, access_key
 
     def remove(self):
         if current_org.is_root():
             return
-        org = Organization.get_instance(current_org.id)
-        OrganizationMember.objects.remove_users(org, [self])
+        self.org_roles.clear()
 
     @classmethod
     def get_super_admins(cls):
-        from rbac.models import Role
-        # Todo
+        from rbac.models import Role, RoleBinding
+        system_admin = Role.BuiltinRole.system_admin.get_role()
+        return RoleBinding.get_role_users(system_admin)
 
     @classmethod
     def get_org_admins(cls, org=None):
-        from orgs.models import Organization
-        if not isinstance(org, Organization):
-            org = current_org
-        org_admins = org.admins
-        return org_admins
+        from rbac.models import Role, RoleBinding
+        org_admin = Role.BuiltinRole.org_admin.get_role()
+        return RoleBinding.get_role_users(org_admin)
 
     @classmethod
-    def get_nature_users(cls, org=None):
-        if not org:
-            org = Organization.root()
-        if isinstance(org, Organization):
-            members = org.get_members()
-        else:
-            members = cls.objects.none()
-        return members
+    def get_nature_users(cls):
+        return cls.objects.filter(is_app=False)
+
+    @classmethod
+    def get_org_users(cls, org=None):
+        from rbac.models import RoleBinding
+        queryset = cls.objects.all()
+        if org is None:
+            org = current_org
+        if not org.is_root():
+            role_bindings = RoleBinding.objects.filter(org_id=org.id)
+            user_ids = role_bindings.values_list('user', flat=True).distinct()
+            queryset = cls.objects.filter(id__in=user_ids)
+        return queryset
 
     def get_all_permissions(self):
         from rbac.models import RoleBinding
-        return RoleBinding.get_user_perms(self)
+        perms = RoleBinding.get_user_perms(self)
+        return perms
 
 
 class TokenMixin:
