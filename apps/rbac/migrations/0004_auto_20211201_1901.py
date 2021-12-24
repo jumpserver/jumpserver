@@ -20,7 +20,7 @@ def migrate_system_role_binding(apps, schema_editor):
             role_id=role.id,
         )
         role_bindings.append(role_binding)
-    role_binding_model.objects.bulk_create(role_bindings)
+    role_binding_model.objects.bulk_create(role_bindings, ignore_conflicts=True)
 
 
 def migrate_org_role_binding(apps, schema_editor):
@@ -39,7 +39,7 @@ def migrate_org_role_binding(apps, schema_editor):
             org_id=member.org.id
         )
         role_bindings.append(role_binding)
-    role_binding_model.objects.bulk_create(role_bindings)
+    role_binding_model.objects.bulk_create(role_bindings, ignore_conflicts=True)
 
 
 class Migration(migrations.Migration):
