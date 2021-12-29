@@ -30,6 +30,7 @@ urlpatterns = [
          api.SessionReplayViewSet.as_view({'get': 'retrieve', 'post': 'create'}),
          name='session-replay'),
     path('tasks/kill-session/', api.KillSessionAPI.as_view(), name='kill-session'),
+    path('tasks/kill-session-for-ticket/', api.KillSessionForTicketAPI.as_view(), name='kill-session-for-ticket'),
     path('terminals/config/', api.TerminalConfig.as_view(), name='terminal-config'),
     path('commands/export/', api.CommandExportApi.as_view(), name="command-export"),
     path('commands/insecure-command/', api.InsecureCommandAlertAPI.as_view(), name="command-alert"),
