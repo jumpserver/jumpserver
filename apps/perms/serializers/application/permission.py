@@ -63,6 +63,7 @@ class ApplicationPermissionSerializer(BulkOrgResourceModelSerializer):
         for choice in exclude_choices:
             choices.pop(choice, None)
         actions._choices = choices
+        actions.default = list(choices.keys())
 
     @classmethod
     def setup_eager_loading(cls, queryset):
