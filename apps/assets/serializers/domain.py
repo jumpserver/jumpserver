@@ -49,7 +49,7 @@ class GatewaySerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         model = Gateway
         fields_mini = ['id', 'name']
         fields_write_only = [
-            'password', 'private_key', 'public_key',
+            'password', 'private_key', 'public_key', 'passphrase'
         ]
         fields_small = fields_mini + fields_write_only + [
             'username', 'ip', 'port', 'protocol',
