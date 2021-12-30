@@ -99,4 +99,52 @@ class Migration(migrations.Migration):
             name='role',
             unique_together={('name', 'scope')},
         ),
+        migrations.CreateModel(
+            name='OrgRoleBinding',
+            fields=[
+            ],
+            options={
+                'verbose_name': 'Organization role binding',
+                'proxy': True,
+                'indexes': [],
+                'constraints': [],
+            },
+            bases=('rbac.rolebinding',),
+        ),
+        migrations.CreateModel(
+            name='SystemRoleBinding',
+            fields=[
+            ],
+            options={
+                'verbose_name': 'System role binding',
+                'proxy': True,
+                'indexes': [],
+                'constraints': [],
+            },
+            bases=('rbac.rolebinding',),
+        ),
+        migrations.CreateModel(
+            name='OrgRole',
+            fields=[
+            ],
+            options={
+                'verbose_name': 'Organization role',
+                'proxy': True,
+                'indexes': [],
+                'constraints': [],
+            },
+            bases=('rbac.role',),
+        ),
+        migrations.CreateModel(
+            name='SystemRole',
+            fields=[
+            ],
+            options={
+                'verbose_name': 'System role',
+                'proxy': True,
+                'indexes': [],
+                'constraints': [],
+            },
+            bases=('rbac.role',),
+        ),
     ]

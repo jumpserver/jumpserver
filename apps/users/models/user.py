@@ -212,24 +212,30 @@ class RoleManager(models.Manager):
             return
         return self.role_bindings.delete()
 
-    def add(self, role):
+    def add(self, *roles):
         from rbac.models import RoleBinding
-        kwargs = {
-            'role': role,
-            'user': self.user
-        }
-        if current_org.is_root() and role.scope == RoleBinding.org:
-            kwargs['org_id'] = current_org.id
+        items = []
+
+        for role in roles:
+            kwargs = {
+                'role': role,
+                'user': self.user,
+                'scope': role.scope
+            }
+            if self.scope and role.scope != self.scope:
+                continue
+            if not current_org.is_root() and role.scope == RoleBinding.Scope.org:
+                kwargs['org_id'] = current_org.id
+            items.append(RoleBinding(**kwargs))
 
         try:
-            RoleBinding.objects.create(**kwargs)
-        except:
-            pass
+            RoleBinding.objects.bulk_create(items, ignore_conflicts=True)
+        except Exception as e:
+            logger.error('Create role binding error: {}'.format(e))
 
     def set(self, roles):
         self.clear()
-        for role in roles:
-            self.add(role)
+        self.add(*roles)
 
     def cache_set(self, roles):
         self.__cache = roles
@@ -272,9 +278,12 @@ class RoleMixin:
     def perms(self):
         return self.get_all_permissions()
 
-    @property
+    @lazyproperty
     def is_superuser(self):
-        yes = any([r.is_admin for r in self.system_roles.all()])
+        from rbac.builtin import BuiltinRole
+        yes = self.system_roles.filter(
+            name=BuiltinRole.system_admin.name
+        ).exists()
         return yes
 
     @property
@@ -781,6 +790,10 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     class Meta:
         ordering = ['username']
         verbose_name = _("User")
+        permissions = [
+            ('invite', _('Can invite user')),
+            ('remove', _('Can remove user'))
+        ]
 
     #: Use this method initial user
     @classmethod

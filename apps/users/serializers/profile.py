@@ -134,6 +134,13 @@ class UserProfileSerializer(UserSerializer):
             fields.remove('password')
             extra_kwargs.pop('password', None)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        system_roles_field = self.fields.get('system_roles')
+        org_roles_field = self.fields.get('org_roles')
+        system_roles_field.read_only = True
+        org_roles_field.read_only = True
+
     @staticmethod
     def get_guide_url(obj):
         return settings.USER_GUIDE_URL

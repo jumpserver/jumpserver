@@ -117,3 +117,15 @@ class Role(JMSModel):
         if not self.builtin:
             return self.name
         return gettext(self.name)
+
+
+class SystemRole(Role):
+    class Meta:
+        proxy = True
+        verbose_name = _('System role')
+
+
+class OrgRole(Role):
+    class Meta:
+        proxy = True
+        verbose_name = _('Organization role')

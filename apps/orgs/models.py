@@ -144,7 +144,6 @@ class Organization(models.Model):
 
 
 class OrgMemberManager(models.Manager):
-
     def remove_users(self, org, users):
         from users.models import User
         pk_set = []
@@ -154,8 +153,11 @@ class OrgMemberManager(models.Manager):
             else:
                 pk_set.append(user)
 
-        send = partial(signals.m2m_changed.send, sender=self.model, instance=org, reverse=False,
-                       model=User, pk_set=pk_set, using=self.db)
+        send = partial(
+            signals.m2m_changed.send, sender=self.model,
+            instance=org, reverse=False, model=User,
+            pk_set=pk_set, using=self.db
+        )
         send(action="pre_remove")
         self.filter(org_id=org.id, user_id__in=pk_set).delete()
         send(action="post_remove")

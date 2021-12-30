@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 #
+from copy import deepcopy
+from functools import partial
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from common.mixins import CommonBulkSerializerMixin
 from common.permissions import CanUpdateDeleteUser
 from common.validators import PhoneValidator
+from rbac.permissions import RBACPermission
+from rbac.models import OrgRoleBinding, SystemRoleBinding
 from ..models import User
 from ..const import PasswordStrategy
 from rbac.models import Role
@@ -35,6 +39,34 @@ class RolesSerializerMixin(serializers.Serializer):
     @staticmethod
     def get_org_roles_display(user):
         return user.org_roles.display
+
+    def get_fields(self):
+        fields = super().get_fields()
+        request = self.context.get('request')
+        view = self.context.get('view')
+        if not all([request, view, hasattr(view, 'action')]):
+            print("request: ", request)
+            return fields
+        print("action is: {}".format(view.action))
+        if request.user.is_anonymous:
+            return fields
+        action = view.action or 'list'
+
+        model_cls_field_mapper = {
+            SystemRoleBinding: ['system_roles', 'system_roles_display'],
+            OrgRoleBinding: ['org_roles', 'system_roles_display']
+        }
+
+        for model_cls, fields_names in model_cls_field_mapper.items():
+            perms = RBACPermission.get_action_default_perms(action, model_cls)
+
+            if not request.user.has_perms(perms):
+                print("pop fields: ", fields_names)
+                for field_name in fields_names:
+                    fields.pop(field_name, None)
+
+        print("Fields: {}".format(fields.keys()))
+        return fields
 
 
 class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializers.ModelSerializer):
@@ -116,7 +148,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
             'system_role_display': {'label': _('System role name')},
         }
 
-    custom_m2m_fields = ['system_roles', 'org_roles']
+    custom_m2m_fields = ('system_roles', 'org_roles')
 
     def validate_password(self, password):
         password_strategy = self.initial_data.get('password_strategy')
@@ -148,24 +180,30 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
         attrs = self.clean_auth_fields(attrs)
         attrs.pop('password_strategy', None)
         return attrs
+    # Todo: 不知道怎么优化呢
+    # def get_can_update(self, obj):
+    #     return CanUpdateDeleteUser.has_update_object_permission(
+    #         self.context['request'], self.context['view'], obj
+    #     )
+    #
+    # def get_can_delete(self, obj):
+    #     return CanUpdateDeleteUser.has_delete_object_permission(
+    #         self.context['request'], self.context['view'], obj
+    #     )
 
-    def get_can_update(self, obj):
-        return CanUpdateDeleteUser.has_update_object_permission(
-            self.context['request'], self.context['view'], obj
-        )
-
-    def get_can_delete(self, obj):
-        return CanUpdateDeleteUser.has_delete_object_permission(
-            self.context['request'], self.context['view'], obj
-        )
-
-    @staticmethod
-    def update_custom_m2m_fields(instance, m2m_values):
+    def save_and_set_custom_m2m_fields(self, validated_data, save_handler):
+        m2m_values = {
+            f: validated_data.pop(f, None)
+            for f in self.custom_m2m_fields
+        }
+        instance = save_handler(validated_data)
         for field_name, value in m2m_values.items():
             if value is None:
                 continue
             field = getattr(instance, field_name)
+            print("set field {} to {}".format(field_name, value))
             field.set(value)
+        return instance
 
     def validate_is_active(self, is_active):
         request = self.context.get('request')
@@ -179,21 +217,13 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
         return is_active
 
     def update(self, instance, validated_data):
-        custom_m2m_values = {
-            f: validated_data.pop(f, None)
-            for f in self.custom_m2m_fields
-        }
-        instance = super().update(instance, validated_data)
-        self.update_custom_m2m_fields(instance, custom_m2m_values)
+        save_handler = partial(super().update, instance)
+        instance = self.save_and_set_custom_m2m_fields(validated_data, save_handler)
         return instance
 
     def create(self, validated_data):
-        custom_m2m_values = {
-            f: validated_data.pop(f, None)
-            for f in self.custom_m2m_fields
-        }
-        instance = super().create(validated_data)
-        self.update_custom_m2m_fields(instance, custom_m2m_values)
+        save_handler = super().create
+        instance = self.save_and_set_custom_m2m_fields(validated_data, save_handler)
         return instance
 
 
@@ -213,10 +243,13 @@ class MiniUserSerializer(serializers.ModelSerializer):
 
 
 class InviteSerializer(RolesSerializerMixin, serializers.Serializer):
-    user = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.filter(is_app=False)
+    users = serializers.PrimaryKeyRelatedField(
+        queryset=User.get_nature_users(), many=True, label=_('Select users'),
+        help_text=_('为了安全，仅会返回 3 个用户，请输入名称精准匹配')
     )
     system_roles = None
+    system_roles_display = None
+    org_roles_display = None
 
 
 class ServiceAccountSerializer(serializers.ModelSerializer):
@@ -244,8 +277,7 @@ class ServiceAccountSerializer(serializers.ModelSerializer):
             users = User.objects.exclude(id=self.instance.id)
         else:
             users = User.objects.all()
-        if users.filter(email=email) or \
-                users.filter(username=username):
+        if users.filter(email=email) or users.filter(username=username):
             raise serializers.ValidationError(_('name not unique'), code='unique')
         return name
 

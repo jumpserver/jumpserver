@@ -2640,7 +2640,7 @@ msgstr "组织管理员"
 
 #: rbac/builtin.py:77
 msgid "OrgAuditor"
-msgstr "日志审计"
+msgstr "组织审计员"
 
 #: rbac/builtin.py:80
 msgid "OrgUser"

@@ -1,4 +1,5 @@
 from rest_framework import permissions, exceptions
+from django.utils.datastructures import OrderedSet
 
 
 class RBACPermission(permissions.DjangoModelPermissions):
@@ -33,6 +34,11 @@ class RBACPermission(permissions.DjangoModelPermissions):
             for k, v in view.action_perms_map.items():
                 perms[k] = v
         return perms
+
+    @classmethod
+    def get_action_default_perms(cls, action, model_cls):
+        perm_temps = cls.default_action_perms_map.get(action)
+        return cls.format_perms(perm_temps, model_cls)
 
     @staticmethod
     def format_perms(perm_temps, model_cls):

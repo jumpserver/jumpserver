@@ -1,4 +1,4 @@
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.db.models import Q
 
@@ -7,7 +7,7 @@ from orgs.utils import current_org
 from .role import Role
 from .. const import Scope
 
-__all__ = ['RoleBinding']
+__all__ = ['RoleBinding', 'SystemRoleBinding', 'OrgRoleBinding']
 
 
 class RoleBindingManager(models.Manager):
@@ -70,3 +70,45 @@ class RoleBinding(JMSModel):
         bindings = cls.objects.filter(user=user)
         roles_id = bindings.values_list('role', flat=True).distinct()
         return Role.objects.filter(id__in=roles_id)
+
+
+class OrgRoleBindingManager(models.Manager):
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if current_org.is_root():
+            return queryset.none()
+
+        queryset = queryset.filter(org=current_org)
+        return queryset
+
+
+class OrgRoleBinding(RoleBinding):
+    objects = RoleBindingManager()
+
+    def save(self, *args, **kwargs):
+        self.org_id = current_org.id
+        self.scope = Scope.org
+        return super().save(*args, **kwargs)
+
+    class Meta:
+        proxy = True
+        verbose_name = _('Organization role binding')
+
+
+class SystemRoleBindingManager(models.Manager):
+    def get_queryset(self):
+        queryset = super().get_queryset().\
+            filter(scope=Scope.org)
+        return queryset
+
+
+class SystemRoleBinding(RoleBinding):
+    objects = SystemRoleBindingManager()
+
+    class Meta:
+        proxy = True
+        verbose_name = _('System role binding')
+
+    def save(self, *args, **kwargs):
+        self.scope = Scope.system
+        return super().save(*args, **kwargs)

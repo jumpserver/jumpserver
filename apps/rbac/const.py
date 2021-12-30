@@ -69,8 +69,13 @@ exclude_permissions = (
 
 
 only_system_permissions = (
-    ('users', 'users', 'delete_user'),
-    ('rbac', '*', '*'),
+    ('users', 'user', 'delete_user'),
+    ('rbac', 'role', 'delete_role'),
+    ('rbac', 'role', 'add_role'),
+    ('rbac', 'role', 'change_role'),
+    ('rbac', 'systemrole', '*'),
+    ('rbac', 'rolebinding', '*'),
+    ('rbac', 'systemrolebinding', '*'),
     ('orgs', 'organization', '*'),
     ('xpack', 'license', '*'),
     ('settings', 'setting', '*'),

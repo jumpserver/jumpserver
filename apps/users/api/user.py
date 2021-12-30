@@ -46,9 +46,9 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         return queryset
 
     @staticmethod
-    def set_roles(queryset):
+    def set_users_roles_for_cache(queryset):
         # Todo: 未来有机会用 SQL 实现
-        queryset_list = list(queryset)
+        queryset_list = queryset
         user_ids = [u.id for u in queryset_list]
         role_bindings = RoleBinding.objects.filter(user__in=user_ids) \
             .values('user_id', 'role_id', 'scope')
@@ -75,25 +75,14 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
 
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
-        queryset_list = self.set_roles(queryset)
+        queryset_list = self.set_users_roles_for_cache(queryset)
         return queryset_list
 
     def perform_create(self, serializer):
         users = serializer.save()
-        # system_roles, org_roles = self.get_serializer_roles(serializer)
         if isinstance(users, User):
             users = [users]
-        # self.add_users_to_org(users)
-        # self.set_users_roles(users, system_roles, org_roles)
         self.send_created_signal(users)
-
-    def perform_update(self, serializer):
-        users = serializer.save()
-        # system_roles, org_roles = self.get_serializer_roles(serializer)
-        if isinstance(users, User):
-            users = [users]
-        # self.add_users_to_org(users)
-        # self.set_users_roles(users, system_roles, org_roles, update=True)
 
     def perform_bulk_update(self, serializer):
         user_ids = [
@@ -119,12 +108,9 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         #     self.return super().get_permissions()
 
     @action(methods=['get'], detail=False, permission_classes=(IsOrgAdmin,))
-    def suggestion(self, request):
-        # Todo: Role 这里有问题
-        queryset = User.objects.exclude(role=User.ROLE.APP)
+    def suggestion(self, *args, **kwargs):
+        queryset = User.get_nature_users()
         queryset = self.filter_queryset(queryset)[:3]
-        queryset = self.filter_queryset(queryset)
-        queryset = queryset[:3]
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -136,24 +122,19 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
 
     @action(methods=['post'], detail=False, permission_classes=(IsOrgAdmin,))
     def invite(self, request):
-        data = request.data
-        if not isinstance(data, list):
-            data = [request.data]
         if not current_org or current_org.is_root():
             error = {"error": "Not a valid org"}
             return Response(error, status=400)
 
         serializer_cls = self.get_serializer_class()
-        serializer = serializer_cls(data=data, many=True)
+        serializer = serializer_cls(data=request.data)
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data
 
-        users = [data['user'] for data in validated_data]
-        org_roles = self.get_serializer_roles(serializer)
-
-        self.add_users_to_org(users)
-        self.set_users_roles(users, org_roles=org_roles)
-
+        users = validated_data['users']
+        org_roles = validated_data['org_roles']
+        for user in users:
+            user.org_roles.set(org_roles)
         return Response(serializer.data, status=201)
 
     @action(methods=['post'], detail=True, permission_classes=(IsOrgAdmin,))
