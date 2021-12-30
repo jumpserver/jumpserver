@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 #
+from io import StringIO
 
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
-from common.utils import ssh_pubkey_gen, validate_ssh_private_key
+from common.utils import ssh_pubkey_gen, ssh_private_key_gen, validate_ssh_private_key
 
 
 class AuthSerializer(serializers.ModelSerializer):
@@ -28,17 +29,27 @@ class AuthSerializer(serializers.ModelSerializer):
         return self.instance
 
 
-class AuthSerializerMixin:
+class AuthSerializerMixin(serializers.ModelSerializer):
+    passphrase = serializers.CharField(
+        allow_blank=True, allow_null=True, required=False, max_length=512,
+        write_only=True, label=_('Key password')
+    )
+
     def validate_password(self, password):
         return password
 
     def validate_private_key(self, private_key):
         if not private_key:
             return
-        password = self.initial_data.get("password")
-        valid = validate_ssh_private_key(private_key, password)
+        passphrase = self.initial_data.get('passphrase')
+        valid = validate_ssh_private_key(private_key, password=passphrase)
         if not valid:
-            raise serializers.ValidationError(_("private key invalid"))
+            raise serializers.ValidationError(_("private key invalid or passphrase error"))
+
+        private_key = ssh_private_key_gen(private_key, password=passphrase)
+        string_io = StringIO()
+        private_key.write_private_key(string_io)
+        private_key = string_io.getvalue()
         return private_key
 
     def validate_public_key(self, public_key):
@@ -50,6 +61,7 @@ class AuthSerializerMixin:
             value = validated_data.get(field)
             if not value:
                 validated_data.pop(field, None)
+        validated_data.pop('passphrase', None)
 
     def create(self, validated_data):
         self.clean_auth_fields(validated_data)

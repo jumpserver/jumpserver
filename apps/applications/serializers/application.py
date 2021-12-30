@@ -96,7 +96,7 @@ class AppAccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     class Meta:
         model = models.Account
         fields_mini = ['id', 'username', 'version']
-        fields_write_only = ['password', 'private_key']
+        fields_write_only = ['password', 'private_key', 'passphrase']
         fields_fk = ['systemuser', 'systemuser_display', 'app', 'app_display']
         fields = fields_mini + fields_fk + fields_write_only + [
             'type', 'type_display', 'category', 'category_display',
