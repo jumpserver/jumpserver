@@ -194,6 +194,11 @@ class SystemUser(ProtocolMixin, AuthMixin, BaseUser):
         (LOGIN_MANUAL, _('Manually input'))
     )
 
+    class SuType(TextChoices):
+        su = 'su', 'su'
+        enable = 'enable', 'enable'
+        other = 'other', 'other'
+
     class Type(TextChoices):
         common = 'common', _('Common user')
         admin = 'admin', _('Admin user')
@@ -221,6 +226,8 @@ class SystemUser(ProtocolMixin, AuthMixin, BaseUser):
     ad_domain = models.CharField(default='', max_length=256)
     # linux su 命令 (switch user)
     su_enabled = models.BooleanField(default=False, verbose_name=_('User switch'))
+    su_type = models.CharField(choices=SuType.choices, default=SuType.su, max_length=16, verbose_name=_('Switch Type'))
+    su_extra = models.CharField(max_length=128, null=True, verbose_name=_('Switch Extra'))
     su_from = models.ForeignKey('self', on_delete=models.SET_NULL, related_name='su_to', null=True, verbose_name=_("Switch from"))
 
     def __str__(self):

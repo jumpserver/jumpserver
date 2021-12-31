@@ -40,7 +40,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'login_mode', 'login_mode_display', 'priority',
             'sudo', 'shell', 'sftp_root', 'home', 'system_groups', 'ad_domain',
             'username_same_with_user', 'auto_push', 'auto_generate_key',
-            'su_enabled', 'su_from',
+            'su_enabled', 'su_from', 'su_type', 'su_extra',
             'date_created', 'date_updated', 'comment', 'created_by',
         ]
         fields_m2m = ['cmd_filters', 'assets_amount', 'applications_amount', 'nodes']
