@@ -281,9 +281,8 @@ class RoleMixin:
     @lazyproperty
     def is_superuser(self):
         from rbac.builtin import BuiltinRole
-        yes = self.system_roles.filter(
-            name=BuiltinRole.system_admin.name
-        ).exists()
+        names = [r.name for r in self.system_roles.all()]
+        yes = BuiltinRole.system_admin.name in names
         return yes
 
     @property

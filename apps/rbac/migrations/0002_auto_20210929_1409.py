@@ -11,10 +11,6 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterModelOptions(
-            name='extrapermission',
-            options={'default_permissions': [], 'permissions': [('view_adminview', 'Can view admin view'), ('view_auditview', 'Can view audit view'), ('view_userview', 'Can view user view')], 'verbose_name': 'Extra permission'},
-        ),
-        migrations.AlterModelOptions(
             name='permission',
             options={'verbose_name': 'Permission'},
         ),

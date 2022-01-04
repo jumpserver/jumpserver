@@ -5,13 +5,17 @@ from .const import Scope
 
 auditor_perms = (
     ('audits', '*', '*'),
-    ('rbac', 'extralpermission', 'view_auditview'),
+    ('rbac', 'menupermission', 'view_auditview'),
     ('terminal', 'session', '*'),
     ('terminal', 'command', '*'),
 )
 
 user_perms = (
-    ('rbac', 'extralpermission', 'view_userview'),
+    ('rbac', 'menupermission', 'view_userview'),
+    ('perms', 'assetpermission', 'view_myassets'),
+    ('perms', 'assetpermission', 'connect_myassets'),
+    ('perms', 'applicationpermission', 'view_myapps'),
+    ('perms', 'applicationpermission', 'connect_myapps'),
 )
 
 app_perms = [

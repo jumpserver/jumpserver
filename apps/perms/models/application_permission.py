@@ -36,6 +36,12 @@ class ApplicationPermission(BasePermission):
         unique_together = [('org_id', 'name')]
         verbose_name = _('Application permission')
         ordering = ('name',)
+        permissions = [
+            ('view_myapps', _('Can view my apps')),
+            ('connect_myapps', _('Can connect my apps')),
+            ('view_userapps', _('Can view user apps')),
+            ('view_usergroupapps', _('Can view usergroup apps')),
+        ]
 
     @property
     def category_remote_app(self):

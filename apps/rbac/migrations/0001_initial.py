@@ -21,12 +21,13 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='ExtraPermission',
+            name='MenuPermission',
             fields=[
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
             ],
             options={
-                'permissions': [('view_adminview', 'Can view admin view'), ('view_auditview', 'Can view audit view'), ('view_userview', 'Can view user view')],
+                'verbose_name': 'Menu permission',
+                'permissions': [('view_adminview', 'Admin view'), ('view_auditview', 'Audit view'), ('view_userview', 'User view')],
                 'default_permissions': [],
             },
         ),

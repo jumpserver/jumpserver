@@ -265,15 +265,3 @@ class Permission(DjangoPermission):
         return permissions
 
 
-class ExtraPermission(models.Model):
-    """ 附加权限位类，用来定义无资源类的权限，不做实体资源 """
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-
-    class Meta:
-        default_permissions = []
-        verbose_name = _('Extra permission')
-        permissions = [
-            ('view_adminview', _('Can view admin view')),
-            ('view_auditview', _('Can view audit view')),
-            ('view_userview', _('Can view user view')),
-        ]

@@ -45,9 +45,9 @@ class RoleBindingViewSet(JMSModelViewSet):
 
 
 class RolePermissionsViewSet(PermissionViewSet):
-    action_perms_map = {
-        'get_tree': 'role.view_role',
-    }
+    rbac_perms = (
+        ('get_tree', 'role.view_role'),
+    )
     http_method_names = ['get', 'option']
     check_disabled = False
 

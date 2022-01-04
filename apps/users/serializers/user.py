@@ -23,11 +23,11 @@ __all__ = [
 class RolesSerializerMixin(serializers.Serializer):
     system_roles = serializers.ManyRelatedField(
         child_relation=serializers.PrimaryKeyRelatedField(queryset=Role.system_roles),
-        label=_('System role name'),
+        label=_('System roles'),
     )
     org_roles = serializers.ManyRelatedField(
         child_relation=serializers.PrimaryKeyRelatedField(queryset=Role.org_roles),
-        label=_('Organization role name'),
+        label=_('Org roles'),
     )
     system_roles_display = serializers.SerializerMethodField(label=_('System roles'))
     org_roles_display = serializers.SerializerMethodField(label=_('Org roles'))
@@ -40,18 +40,16 @@ class RolesSerializerMixin(serializers.Serializer):
     def get_org_roles_display(user):
         return user.org_roles.display
 
-    def get_fields(self):
-        fields = super().get_fields()
+    def pop_roles_if_need(self, fields):
         request = self.context.get('request')
         view = self.context.get('view')
+
         if not all([request, view, hasattr(view, 'action')]):
-            print("request: ", request)
             return fields
-        print("action is: {}".format(view.action))
         if request.user.is_anonymous:
             return fields
-        action = view.action or 'list'
 
+        action = view.action or 'list'
         model_cls_field_mapper = {
             SystemRoleBinding: ['system_roles', 'system_roles_display'],
             OrgRoleBinding: ['org_roles', 'system_roles_display']
@@ -59,13 +57,16 @@ class RolesSerializerMixin(serializers.Serializer):
 
         for model_cls, fields_names in model_cls_field_mapper.items():
             perms = RBACPermission.get_action_default_perms(action, model_cls)
+            if request.user.has_perms(perms):
+                continue
+            # 没有权限就去掉
+            for field_name in fields_names:
+                fields.pop(field_name, None)
+        return fields
 
-            if not request.user.has_perms(perms):
-                print("pop fields: ", fields_names)
-                for field_name in fields_names:
-                    fields.pop(field_name, None)
-
-        print("Fields: {}".format(fields.keys()))
+    def get_fields(self):
+        fields = super().get_fields()
+        self.pop_roles_if_need(fields)
         return fields
 
 
@@ -87,6 +88,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
     # Todo: 这里看看该怎么搞
     # can_update = serializers.SerializerMethodField(label=_('Can update'))
     # can_delete = serializers.SerializerMethodField(label=_('Can delete'))
+    custom_m2m_fields = ('system_roles', 'org_roles')
 
     class Meta:
         model = User
@@ -148,8 +150,6 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
             'system_role_display': {'label': _('System role name')},
         }
 
-    custom_m2m_fields = ('system_roles', 'org_roles')
-
     def validate_password(self, password):
         password_strategy = self.initial_data.get('password_strategy')
         if self.instance is None and password_strategy != PasswordStrategy.custom:
@@ -201,7 +201,6 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
             if value is None:
                 continue
             field = getattr(instance, field_name)
-            print("set field {} to {}".format(field_name, value))
             field.set(value)
         return instance
 

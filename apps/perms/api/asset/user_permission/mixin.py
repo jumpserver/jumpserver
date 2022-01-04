@@ -22,11 +22,17 @@ class PermBaseMixin:
 
 
 class RoleAdminMixin(PermBaseMixin, _RoleAdminMixin):
-    permission_classes = (IsOrgAdminOrAppUser,)
+    rbac_perms = (
+        ('list', 'view_userassets'),
+        ('retrieve', 'view_userassets')
+    )
 
 
 class RoleUserMixin(PermBaseMixin, _RoleUserMixin):
-    permission_classes = (IsValidUser,)
+    rbac_perms = {
+        'list': 'view_myassets',
+        'retrieve': ''
+    }
 
     def get(self, request, *args, **kwargs):
         with tmp_to_root_org():
