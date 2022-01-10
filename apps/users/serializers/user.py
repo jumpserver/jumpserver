@@ -56,7 +56,7 @@ class RolesSerializerMixin(serializers.Serializer):
         }
 
         for model_cls, fields_names in model_cls_field_mapper.items():
-            perms = RBACPermission.get_action_default_perms(action, model_cls)
+            perms = RBACPermission.parse_action_model_perms(action, model_cls)
             if request.user.has_perms(perms):
                 continue
             # 没有权限就去掉

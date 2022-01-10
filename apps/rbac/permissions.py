@@ -1,5 +1,9 @@
 from rest_framework import permissions, exceptions
 
+from common.utils import get_logger
+
+logger = get_logger(__name__)
+
 
 class RBACPermission(permissions.DjangoModelPermissions):
     default_rbac_perms_tmpl = (
@@ -50,21 +54,20 @@ class RBACPermission(permissions.DjangoModelPermissions):
             perms[action] = self.format_perms(tmpl, model_cls)
         return perms
 
-    def get_rbac_perms(self, view, model_cls):
+    def get_rbac_perms(self, view, model_cls) -> dict:
         if hasattr(view, 'get_rbac_perms'):
             return dict(view.get_rbac_perms())
-
         perms = self.get_default_action_perms(model_cls)
         if hasattr(view, 'rbac_perms'):
-            for k, v in dict(view.rbac_perms).items():
-                perms[k] = v
+            perms.update(dict(view.rbac_perms))
         return perms
 
     def _get_action_perms(self, action, model_cls, view):
         action_perms_map = self.get_rbac_perms(view, model_cls)
-
         if action not in action_perms_map:
-            raise exceptions.PermissionDenied()
+            msg = 'Action not allowed: {}'.format(action)
+            logger.error(msg)
+            raise exceptions.PermissionDenied(msg)
         perms = action_perms_map[action]
         return perms
 
@@ -102,6 +105,7 @@ class RBACPermission(permissions.DjangoModelPermissions):
             return True
 
         perms = self.get_require_perms(request, view)
+        logger.debug('View {} require perms: {}'.format(view, perms))
         if isinstance(perms, str):
             perms = [perms]
         return request.user.has_perms(perms)

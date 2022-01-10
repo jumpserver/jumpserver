@@ -120,12 +120,16 @@ class Role(JMSModel):
 
 
 class SystemRole(Role):
+    objects = SystemRoleManager()
+
     class Meta:
         proxy = True
         verbose_name = _('System role')
 
 
 class OrgRole(Role):
+    objects = OrgRoleManager()
+
     class Meta:
         proxy = True
         verbose_name = _('Organization role')
