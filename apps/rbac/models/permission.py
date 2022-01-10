@@ -230,6 +230,8 @@ class Permission(DjangoPermission):
         :param defines: [(app, model, codename),]
         :return:
         """
+        if not defines:
+            return None
         q = Q()
         for app_label, model, code_name in defines:
             kwargs = {}
@@ -249,7 +251,8 @@ class Permission(DjangoPermission):
         else:
             excludes = const.system_exclude_permissions
         q = cls.get_define_permissions_q(excludes)
-        permissions = permissions.exclude(q)
+        if q:
+            permissions = permissions.exclude(q)
         return permissions
 
     @staticmethod

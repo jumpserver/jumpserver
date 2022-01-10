@@ -45,7 +45,11 @@ class PreRole:
         from rbac.models import Permission
         q = Permission.get_define_permissions_q(self.perms)
         permissions = Permission.get_permissions(self.scope)
-        perms = permissions.filter(q).values_list('id', flat=True)
+        if q:
+            permissions = permissions.filter(q)
+        else:
+            permissions = permissions.none()
+        perms = permissions.values_list('id', flat=True)
         defaults = {
             'id': self.id, 'name': self.name, 'scope': self.scope,
             'builtin': True, 'permissions': perms
@@ -69,7 +73,7 @@ class BuiltinRole:
         '2', ugettext_noop('SystemAuditor'), Scope.system, auditor_perms
     )
     system_user = PreRole(
-        '3', ugettext_noop('User'), Scope.system, user_perms
+        '3', ugettext_noop('User'), Scope.system, []
     )
     system_app = PreRole(
         '4', ugettext_noop('App'), Scope.system, app_perms

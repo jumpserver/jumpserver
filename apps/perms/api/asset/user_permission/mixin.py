@@ -22,19 +22,19 @@ class PermBaseMixin:
 
 class RoleAdminMixin(PermBaseMixin, _RoleAdminMixin):
     rbac_perms = (
-        ('list', 'view_userassets'),
-        ('retrieve', 'view_userassets'),
-        ('get_tree', 'view_userassets'),
-        ('GET', 'view_userassets'),
+        ('list', 'perms.view_userassets'),
+        ('retrieve', 'perms.view_userassets'),
+        ('get_tree', 'perms.view_userassets'),
+        ('GET', 'perms.view_userassets'),
     )
 
 
 class RoleUserMixin(PermBaseMixin, _RoleUserMixin):
     rbac_perms = (
-        ('list', 'view_myassets'),
-        ('retrieve', 'view_myassets'),
-        ('get_tree', 'view_myassets'),
-        ('GET', 'view_myassets'),
+        ('list', 'perms.view_myassets'),
+        ('retrieve', 'perms.view_myassets'),
+        ('get_tree', 'perms.view_myassets'),
+        ('GET', 'perms.view_myassets'),
     )
 
     def get(self, request, *args, **kwargs):

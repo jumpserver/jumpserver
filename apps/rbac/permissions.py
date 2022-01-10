@@ -105,8 +105,9 @@ class RBACPermission(permissions.DjangoModelPermissions):
             return True
 
         perms = self.get_require_perms(request, view)
-        logger.debug('View {} require perms: {}'.format(view, perms))
         if isinstance(perms, str):
             perms = [perms]
-        return request.user.has_perms(perms)
+        has = request.user.has_perms(perms)
+        logger.debug('View require perms: {}'.format(perms))
+        return has
 

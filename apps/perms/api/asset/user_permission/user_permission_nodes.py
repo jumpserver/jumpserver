@@ -105,10 +105,7 @@ class UserGrantedNodeChildrenForAdminApi(RoleAdminMixin, UserGrantedNodeChildren
 
 
 class MyGrantedNodeChildrenApi(RoleUserMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenApi):
-    def get_permissions(self):
-        permissions = super().get_permissions()
-        print("permissions is: {}".format(permissions))
-        return permissions
+    pass
 
 
 class UserGrantedNodeChildrenAsTreeForAdminApi(RoleAdminMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenAsTreeApi):
@@ -116,7 +113,9 @@ class UserGrantedNodeChildrenAsTreeForAdminApi(RoleAdminMixin, UserGrantedNodeCh
 
 
 class MyGrantedNodeChildrenAsTreeApi(RoleUserMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenAsTreeApi):
-    pass
+    def get_permissions(self):
+        permissions = super().get_permissions()
+        return permissions
 
 
 class UserGrantedNodesForAdminApi(RoleAdminMixin, UserGrantedNodesMixin, BaseGrantedNodeApi):
