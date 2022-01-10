@@ -28,7 +28,8 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
         fields_small = fields_mini + [
             'type', 'type_display', 'meta', 'state', 'approval_step',
             'status', 'status_display', 'applicant_display', 'process_map',
-            'date_created', 'date_updated', 'comment', 'org_id', 'org_name', 'body'
+            'date_created', 'date_updated', 'comment', 'org_id', 'org_name', 'body',
+            'serial_num',
         ]
         fields_fk = ['applicant', ]
         fields = fields_small + fields_fk

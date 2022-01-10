@@ -3,7 +3,11 @@
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
+from datetime import timedelta
+from django.db.utils import IntegrityError
 
+from common.exceptions import JMSException
+from common.utils.timezone import as_current_tz
 from common.mixins.models import CommonModelMixin
 from common.db.encoder import ModelJSONFieldEncoder
 from orgs.mixins.models import OrgModelMixin
@@ -73,6 +77,7 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         'TicketFlow', related_name='tickets', on_delete=models.SET_NULL, null=True,
         verbose_name=_("TicketFlow")
     )
+    serial_num = models.CharField(max_length=256, unique=True, null=True, verbose_name=_('Serial number'))
 
     class Meta:
         ordering = ('-date_created',)
@@ -245,3 +250,49 @@ class Ticket(CommonModelMixin, OrgModelMixin):
     def body(self):
         _body = self.handler.get_body()
         return _body
+
+    def get_serial_num_date(self):
+        date_created = as_current_tz(self.date_created)
+        date = date_created.strftime('%Y%m%d')
+        return date
+
+    def get_last_serail_num(self):
+        date_created = as_current_tz(self.date_created)
+        date_prefix = date_created.strftime('%Y%m%d')
+
+        ticket = Ticket.objects.select_for_update().filter(
+            serial_num__startswith=date_prefix
+        ).order_by('-date_created').first()
+
+        if ticket:
+            # 202212010001
+            num_str = ticket.serial_num[8:]
+            num = int(num_str)
+            return num
+        return None
+
+    def get_next_serail_num(self):
+        num = self.get_last_serail_num()
+        if num is None:
+            num = 0
+        return '%04d' % (num + 1)
+
+    def construct_serial_num(self):
+        date_prefix = self.get_serial_num_date()
+        num_suffix = self.get_next_serail_num()
+        return date_prefix + num_suffix
+
+    def update_serial_num_if_need(self):
+        if self.serial_num:
+            return
+
+        try:
+            self.serial_num = self.construct_serial_num()
+            self.save(update_fields=('serial_num',))
+        except IntegrityError as e:
+            if e.args[0] == 1062:
+                # 虽然做了 `select_for_update` 但是每天的第一条工单仍可能造成冲突
+                # 但概率小，这里只报错，用户重新提交即可
+                raise JMSException(detail=_('Please try again'), code='please_try_again')
+
+            raise e
