@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-31 10:28+0800\n"
+"POT-Creation-Date: 2022-01-12 15:28+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "X-Generator: Poedit 2.4.3\n"
 
 #: acls/models/base.py:25 acls/serializers/login_asset_acl.py:47
-#: applications/models/application.py:166 assets/models/asset.py:139
+#: applications/models/application.py:202 assets/models/asset.py:139
 #: assets/models/base.py:175 assets/models/cluster.py:18
 #: assets/models/cmd_filter.py:23 assets/models/domain.py:24
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
@@ -51,16 +51,17 @@ msgstr "优先级可选范围为 1-100 (数值越小越优先)"
 msgid "Active"
 msgstr "激活中"
 
-#: acls/models/base.py:32 applications/models/application.py:179
+#: acls/models/base.py:32 applications/models/application.py:215
 #: assets/models/asset.py:144 assets/models/asset.py:232
-#: assets/models/base.py:180 assets/models/cluster.py:29
-#: assets/models/cmd_filter.py:44 assets/models/cmd_filter.py:87
-#: assets/models/domain.py:25 assets/models/domain.py:65
-#: assets/models/group.py:23 assets/models/label.py:23 ops/models/adhoc.py:37
-#: orgs/models.py:27 perms/models/base.py:129 settings/models.py:34
-#: terminal/models/storage.py:26 terminal/models/terminal.py:114
-#: tickets/models/ticket.py:71 users/models/group.py:16
-#: users/models/user.py:585 xpack/plugins/change_auth_plan/models/base.py:41
+#: assets/models/backup.py:27 assets/models/base.py:180
+#: assets/models/cluster.py:29 assets/models/cmd_filter.py:44
+#: assets/models/cmd_filter.py:87 assets/models/domain.py:25
+#: assets/models/domain.py:65 assets/models/group.py:23
+#: assets/models/label.py:23 ops/models/adhoc.py:37 orgs/models.py:27
+#: perms/models/base.py:129 settings/models.py:34 terminal/models/storage.py:26
+#: terminal/models/terminal.py:114 tickets/models/ticket.py:71
+#: users/models/group.py:16 users/models/user.py:585
+#: xpack/plugins/change_auth_plan/models/base.py:41
 #: xpack/plugins/cloud/models.py:35 xpack/plugins/cloud/models.py:113
 #: xpack/plugins/gathered_user/models.py:26
 msgid "Comment"
@@ -245,7 +246,7 @@ msgstr ""
 msgid "Time Period"
 msgstr "时段"
 
-#: applications/api/mixin.py:20 templates/_nav_user.html:10
+#: applications/api/mixin.py:28 templates/_nav_user.html:10
 msgid "My applications"
 msgstr "我的应用"
 
@@ -291,11 +292,11 @@ msgstr "版本"
 msgid "Account"
 msgstr "账户"
 
-#: applications/models/application.py:50 templates/_nav.html:60
+#: applications/models/application.py:60 templates/_nav.html:60
 msgid "Applications"
 msgstr "应用管理"
 
-#: applications/models/application.py:168
+#: applications/models/application.py:204
 #: applications/serializers/application.py:88 assets/models/label.py:21
 #: perms/models/application_permission.py:20
 #: perms/serializers/application/user_permission.py:33
@@ -304,7 +305,7 @@ msgstr "应用管理"
 msgid "Category"
 msgstr "类别"
 
-#: applications/models/application.py:171
+#: applications/models/application.py:207
 #: applications/serializers/application.py:90 assets/models/cmd_filter.py:76
 #: assets/models/user.py:210 perms/models/application_permission.py:23
 #: perms/serializers/application/user_permission.py:34
@@ -316,16 +317,16 @@ msgstr "类别"
 msgid "Type"
 msgstr "类型"
 
-#: applications/models/application.py:175 assets/models/asset.py:218
+#: applications/models/application.py:211 assets/models/asset.py:218
 #: assets/models/domain.py:30 assets/models/domain.py:64
 msgid "Domain"
 msgstr "网域"
 
-#: applications/models/application.py:177 xpack/plugins/cloud/models.py:33
+#: applications/models/application.py:213 xpack/plugins/cloud/models.py:33
 msgid "Attrs"
-msgstr ""
+msgstr "属性"
 
-#: applications/models/application.py:183 assets/models/cmd_filter.py:41
+#: applications/models/application.py:219 assets/models/cmd_filter.py:41
 #: perms/models/application_permission.py:27 users/models/user.py:170
 msgid "Application"
 msgstr "应用程序"
@@ -577,6 +578,75 @@ msgstr "创建日期"
 #: assets/models/authbook.py:26
 msgid "AuthBook"
 msgstr "账号"
+
+#: assets/models/backup.py:25 assets/serializers/backup.py:28
+#: xpack/plugins/change_auth_plan/models/app.py:41
+#: xpack/plugins/change_auth_plan/models/asset.py:62
+#: xpack/plugins/change_auth_plan/serializers/base.py:44
+msgid "Recipient"
+msgstr "收件人"
+
+#: assets/models/backup.py:35 assets/models/backup.py:96
+#, fuzzy
+#| msgid "Account key"
+msgid "Account backup plan"
+msgstr "账户密钥"
+
+#: assets/models/backup.py:72 xpack/plugins/change_auth_plan/models/base.py:104
+msgid "Manual trigger"
+msgstr "手动触发"
+
+#: assets/models/backup.py:73 xpack/plugins/change_auth_plan/models/base.py:105
+msgid "Timing trigger"
+msgstr "定时触发"
+
+#: assets/models/backup.py:77 audits/models.py:43 ops/models/command.py:30
+#: perms/models/base.py:125 terminal/models/session.py:54
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:55
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:57
+#: xpack/plugins/change_auth_plan/models/base.py:109
+#: xpack/plugins/change_auth_plan/models/base.py:200
+#: xpack/plugins/gathered_user/models.py:76
+msgid "Date start"
+msgstr "开始日期"
+
+#: assets/models/backup.py:80 notifications/notifications.py:187
+#: ops/models/adhoc.py:246 xpack/plugins/change_auth_plan/models/base.py:112
+#: xpack/plugins/change_auth_plan/models/base.py:201
+#: xpack/plugins/gathered_user/models.py:79
+msgid "Time"
+msgstr "时间"
+
+#: assets/models/backup.py:84
+#, fuzzy
+#| msgid "Change auth plan snapshot"
+msgid "Escape route snapshot"
+msgstr "改密计划快照"
+
+#: assets/models/backup.py:88 assets/serializers/backup.py:36
+#: xpack/plugins/change_auth_plan/models/base.py:122
+#: xpack/plugins/change_auth_plan/serializers/base.py:73
+msgid "Trigger mode"
+msgstr "触发模式"
+
+#: assets/models/backup.py:91 audits/models.py:111
+#: terminal/models/sharing.py:88
+#: xpack/plugins/change_auth_plan/models/base.py:198
+#: xpack/plugins/cloud/models.py:176
+msgid "Reason"
+msgstr "原因"
+
+#: assets/models/backup.py:93 audits/serializers.py:76 audits/serializers.py:91
+#: ops/models/adhoc.py:248 terminal/serializers/session.py:35
+#: xpack/plugins/change_auth_plan/models/base.py:199
+msgid "Is success"
+msgstr "是否成功"
+
+#: assets/models/backup.py:100
+#, fuzzy
+#| msgid "Change auth plan execution"
+msgid "Account backup execution"
+msgstr "改密计划执行"
 
 #: assets/models/base.py:30 assets/tasks/const.py:51 audits/const.py:5
 msgid "Unknown"
@@ -868,6 +938,25 @@ msgstr "切换自"
 msgid "%(value)s is not an even number"
 msgstr "%(value)s is not an even number"
 
+#: assets/notifications.py:8
+msgid "Notification of account backup route task results"
+msgstr "账号备份任务结果通知"
+
+#: assets/notifications.py:18
+msgid ""
+"{} - The account backup passage task has been completed. See the attachment "
+"for details"
+msgstr "{} - 账号备份任务已完成, 详情见附件"
+
+#: assets/notifications.py:19
+msgid ""
+"{} - The account backup passage task has been completed: the encryption "
+"password has not been set - please go to personal information -> file "
+"encryption password to set the encryption password"
+msgstr ""
+"{} - 账号备份任务已完成: 未设置加密密码 - 请前往个人信息 -> 文件加密密码中设"
+"置加密密码"
+
 #: assets/serializers/account.py:31 assets/serializers/account.py:52
 msgid "System user display"
 msgstr "系统用户名称"
@@ -903,6 +992,16 @@ msgstr "特权用户名称"
 #: assets/serializers/asset.py:109
 msgid "CPU info"
 msgstr "CPU信息"
+
+#: assets/serializers/backup.py:27 ops/mixin.py:106 ops/mixin.py:147
+#: xpack/plugins/change_auth_plan/serializers/base.py:42
+msgid "Periodic perform"
+msgstr "定时执行"
+
+#: assets/serializers/backup.py:29
+#: xpack/plugins/change_auth_plan/serializers/base.py:45
+msgid "Currently only mail sending is supported"
+msgstr "当前只支持邮件发送"
 
 #: assets/serializers/base.py:35
 msgid "Key password"
@@ -1179,16 +1278,6 @@ msgstr "文件名"
 msgid "Success"
 msgstr "成功"
 
-#: audits/models.py:43 ops/models/command.py:30 perms/models/base.py:125
-#: terminal/models/session.py:54
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:55
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:57
-#: xpack/plugins/change_auth_plan/models/base.py:109
-#: xpack/plugins/change_auth_plan/models/base.py:200
-#: xpack/plugins/gathered_user/models.py:76
-msgid "Date start"
-msgstr "开始日期"
-
 #: audits/models.py:51
 #: authentication/templates/authentication/_access_key_modal.html:22
 msgid "Create"
@@ -1255,12 +1344,6 @@ msgstr "用户代理"
 msgid "MFA"
 msgstr "MFA"
 
-#: audits/models.py:111 terminal/models/sharing.py:88
-#: xpack/plugins/change_auth_plan/models/base.py:198
-#: xpack/plugins/cloud/models.py:176
-msgid "Reason"
-msgstr "原因"
-
 #: audits/models.py:112 tickets/models/ticket.py:57
 #: xpack/plugins/cloud/models.py:172 xpack/plugins/cloud/models.py:221
 msgid "Status"
@@ -1289,12 +1372,6 @@ msgstr "MFA名称"
 #: audits/serializers.py:45
 msgid "Reason display"
 msgstr "原因描述"
-
-#: audits/serializers.py:76 audits/serializers.py:91 ops/models/adhoc.py:248
-#: terminal/serializers/session.py:35
-#: xpack/plugins/change_auth_plan/models/base.py:199
-msgid "Is success"
-msgstr "是否成功"
 
 #: audits/serializers.py:78
 msgid "Hosts display"
@@ -2394,13 +2471,6 @@ msgstr "邮件"
 msgid "Site message"
 msgstr "站内信"
 
-#: notifications/notifications.py:187 ops/models/adhoc.py:246
-#: xpack/plugins/change_auth_plan/models/base.py:112
-#: xpack/plugins/change_auth_plan/models/base.py:201
-#: xpack/plugins/gathered_user/models.py:79
-msgid "Time"
-msgstr "时间"
-
 #: ops/api/celery.py:61 ops/api/celery.py:76
 msgid "Waiting task start"
 msgstr "等待任务开始"
@@ -2421,11 +2491,6 @@ msgstr "周期执行"
 #: settings/serializers/auth/ldap.py:64
 msgid "Regularly perform"
 msgstr "定期执行"
-
-#: ops/mixin.py:106 ops/mixin.py:147
-#: xpack/plugins/change_auth_plan/serializers/base.py:42
-msgid "Periodic perform"
-msgstr "定时执行"
 
 #: ops/mixin.py:112 settings/serializers/auth/ldap.py:61
 msgid "Interval"
@@ -4231,19 +4296,19 @@ msgstr "Jmservisor 是在 windows 远程应用发布服务器中用来拉起远�
 msgid "Filters"
 msgstr "过滤"
 
-#: terminal/api/session.py:189
+#: terminal/api/session.py:190
 msgid "Session does not exist: {}"
 msgstr "会话不存在: {}"
 
-#: terminal/api/session.py:192
+#: terminal/api/session.py:193
 msgid "Session is finished or the protocol not supported"
 msgstr "会话已经完成或协议不支持"
 
-#: terminal/api/session.py:197
+#: terminal/api/session.py:198
 msgid "User does not exist: {}"
 msgstr "用户不存在: {}"
 
-#: terminal/api/session.py:201
+#: terminal/api/session.py:205
 msgid "User does not have permission"
 msgstr "用户没有权限"
 
@@ -5617,12 +5682,6 @@ msgstr "参数 'action' 必须是 [{}]"
 msgid "Change auth plan"
 msgstr "改密计划"
 
-#: xpack/plugins/change_auth_plan/models/app.py:41
-#: xpack/plugins/change_auth_plan/models/asset.py:62
-#: xpack/plugins/change_auth_plan/serializers/base.py:44
-msgid "Recipient"
-msgstr "收件人"
-
 #: xpack/plugins/change_auth_plan/models/app.py:46
 #: xpack/plugins/change_auth_plan/models/app.py:95
 msgid "Application change auth plan"
@@ -5683,22 +5742,9 @@ msgstr "使用不同的随机密码"
 msgid "Password rules"
 msgstr "密码规则"
 
-#: xpack/plugins/change_auth_plan/models/base.py:104
-msgid "Manual trigger"
-msgstr "手动触发"
-
-#: xpack/plugins/change_auth_plan/models/base.py:105
-msgid "Timing trigger"
-msgstr "定时触发"
-
 #: xpack/plugins/change_auth_plan/models/base.py:115
 msgid "Change auth plan snapshot"
 msgstr "改密计划快照"
-
-#: xpack/plugins/change_auth_plan/models/base.py:122
-#: xpack/plugins/change_auth_plan/serializers/base.py:73
-msgid "Trigger mode"
-msgstr "触发模式"
 
 #: xpack/plugins/change_auth_plan/models/base.py:184
 msgid "Ready"
@@ -5754,10 +5800,6 @@ msgstr "修改 SSH Key"
 #: xpack/plugins/change_auth_plan/serializers/base.py:43
 msgid "Run times"
 msgstr "执行次数"
-
-#: xpack/plugins/change_auth_plan/serializers/base.py:45
-msgid "Currently only mail sending is supported"
-msgstr "当前只支持邮件发送"
 
 #: xpack/plugins/change_auth_plan/serializers/base.py:57
 msgid "* Please enter the correct password length"
@@ -6244,3 +6286,28 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#, fuzzy
+#~| msgid "Change auth plan execution"
+#~ msgid "Account backup plan execution"
+#~ msgstr "改密计划执行"
+
+#, fuzzy
+#~| msgid "Change auth plan task"
+#~ msgid "Account backup plan task"
+#~ msgstr "改密计划任务"
+
+#, fuzzy
+#~| msgid "Change auth plan"
+#~ msgid "Escape route plan"
+#~ msgstr "改密计划"
+
+#, fuzzy
+#~| msgid "Change auth plan execution"
+#~ msgid "Escape route execution"
+#~ msgstr "改密计划执行"
+
+#, fuzzy
+#~| msgid "Change auth plan task"
+#~ msgid "Escape route plan task"
+#~ msgstr "改密计划任务"

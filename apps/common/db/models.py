@@ -66,6 +66,47 @@ class ChoiceSet(metaclass=ChoiceSetType):
     choices = None  # 用于 Django Model 中的 choices 配置， 为了代码提示在此声明
 
 
+class BitOperationChoice:
+    NONE = 0
+    NAME_MAP: dict
+    DB_CHOICES: tuple
+    NAME_MAP_REVERSE: dict
+
+    @classmethod
+    def value_to_choices(cls, value):
+        if isinstance(value, list):
+            return value
+        value = int(value)
+        choices = [cls.NAME_MAP[i] for i, j in cls.DB_CHOICES if value & i == i]
+        return choices
+
+    @classmethod
+    def value_to_choices_display(cls, value):
+        choices = cls.value_to_choices(value)
+        return [str(dict(cls.choices())[i]) for i in choices]
+
+    @classmethod
+    def choices_to_value(cls, value):
+        if not isinstance(value, list):
+            return cls.NONE
+        db_value = [
+            cls.NAME_MAP_REVERSE[v] for v in value
+            if v in cls.NAME_MAP_REVERSE.keys()
+        ]
+        if not db_value:
+            return cls.NONE
+
+        def to_choices(x, y):
+            return x | y
+
+        result = reduce(to_choices, db_value)
+        return result
+
+    @classmethod
+    def choices(cls):
+        return [(cls.NAME_MAP[i], j) for i, j in cls.DB_CHOICES]
+
+
 class JMSBaseModel(Model):
     created_by = CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
     updated_by = CharField(max_length=32, null=True, blank=True, verbose_name=_('Updated by'))

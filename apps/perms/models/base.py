@@ -2,14 +2,13 @@
 #
 
 import uuid
-from functools import reduce
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone
 from orgs.mixins.models import OrgModelMixin
 
-from common.db.models import UnionQuerySet
+from common.db.models import UnionQuerySet, BitOperationChoice
 from common.utils import date_expired_default, lazyproperty
 from orgs.mixins.models import OrgManager
 
@@ -40,15 +39,14 @@ class BasePermissionManager(OrgManager):
         return self.get_queryset().valid()
 
 
-class Action:
-    NONE = 0
+class Action(BitOperationChoice):
+    ALL = 0xff
 
     CONNECT = 0b1
     UPLOAD = 0b1 << 1
     DOWNLOAD = 0b1 << 2
     CLIPBOARD_COPY = 0b1 << 3
     CLIPBOARD_PASTE = 0b1 << 4
-    ALL = 0xff
     UPDOWNLOAD = UPLOAD | DOWNLOAD
     CLIPBOARD_COPY_PASTE = CLIPBOARD_COPY | CLIPBOARD_PASTE
 
@@ -78,40 +76,6 @@ class Action:
     CHOICES = []
     for i, j in DB_CHOICES:
         CHOICES.append((NAME_MAP[i], j))
-
-    @classmethod
-    def value_to_choices(cls, value):
-        if isinstance(value, list):
-            return value
-        value = int(value)
-        choices = [cls.NAME_MAP[i] for i, j in cls.DB_CHOICES if value & i == i]
-        return choices
-
-    @classmethod
-    def value_to_choices_display(cls, value):
-        choices = cls.value_to_choices(value)
-        return [str(dict(cls.choices())[i]) for i in choices]
-
-    @classmethod
-    def choices_to_value(cls, value):
-        if not isinstance(value, list):
-            return cls.NONE
-        db_value = [
-            cls.NAME_MAP_REVERSE[v] for v in value
-            if v in cls.NAME_MAP_REVERSE.keys()
-        ]
-        if not db_value:
-            return cls.NONE
-
-        def to_choices(x, y):
-            return x | y
-
-        result = reduce(to_choices, db_value)
-        return result
-
-    @classmethod
-    def choices(cls):
-        return [(cls.NAME_MAP[i], j) for i, j in cls.DB_CHOICES]
 
 
 class BasePermission(OrgModelMixin):

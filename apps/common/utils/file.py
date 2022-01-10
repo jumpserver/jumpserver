@@ -10,10 +10,11 @@ def create_csv_file(filename, headers, rows, ):
         w.writerows(rows)
 
 
-def encrypt_and_compress_zip_file(filename, secret_password, encrypted_filename):
+def encrypt_and_compress_zip_file(filename, secret_password, encrypted_filenames):
     with pyzipper.AESZipFile(
             filename, 'w', compression=pyzipper.ZIP_LZMA, encryption=pyzipper.WZ_AES
     ) as zf:
         zf.setpassword(secret_password)
-        with open(encrypted_filename, 'rb') as f:
-            zf.writestr(os.path.basename(encrypted_filename), f.read())
+        for encrypted_filename in encrypted_filenames:
+            with open(encrypted_filename, 'rb') as f:
+                zf.writestr(os.path.basename(encrypted_filename), f.read())

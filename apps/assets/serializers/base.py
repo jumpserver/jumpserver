@@ -6,6 +6,7 @@ from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
 from common.utils import ssh_pubkey_gen, ssh_private_key_gen, validate_ssh_private_key
+from assets.models import Type
 
 
 class AuthSerializer(serializers.ModelSerializer):
@@ -70,3 +71,24 @@ class AuthSerializerMixin(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         self.clean_auth_fields(validated_data)
         return super().update(instance, validated_data)
+
+
+class TypesField(serializers.MultipleChoiceField):
+    def __init__(self, *args, **kwargs):
+        kwargs['choices'] = Type.CHOICES
+        super().__init__(*args, **kwargs)
+
+    def to_representation(self, value):
+        return Type.value_to_choices(value)
+
+    def to_internal_value(self, data):
+        if data is None:
+            return data
+        return Type.choices_to_value(data)
+
+
+class ActionsDisplayField(TypesField):
+    def to_representation(self, value):
+        values = super().to_representation(value)
+        choices = dict(Type.CHOICES)
+        return [choices.get(i) for i in values]
