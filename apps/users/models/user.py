@@ -329,14 +329,11 @@ class RoleMixin:
 
     @classmethod
     def get_org_users(cls, org=None):
-        from rbac.models import RoleBinding
         queryset = cls.objects.all()
         if org is None:
             org = current_org
         if not org.is_root():
-            role_bindings = RoleBinding.objects.filter(org_id=org.id)
-            user_ids = role_bindings.values_list('user', flat=True).distinct()
-            queryset = cls.objects.filter(id__in=user_ids)
+            queryset = current_org.get_members()
         return queryset
 
     def get_all_permissions(self):
@@ -614,7 +611,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         max_length=30, default='', blank=True, verbose_name=_('Created by')
     )
     source = models.CharField(
-        max_length=30, default=Source.local,
+        max_length=30, default=Source.local.value,
         choices=Source.choices,
         verbose_name=_('Source')
     )
@@ -750,18 +747,12 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
             return True
         if MFABlockUtils.is_user_block(self.username):
             return True
-
         return False
 
     def delete(self, using=None, keep_parents=False):
         if self.pk == 1 or self.username == 'admin':
             return
         return super(User, self).delete()
-
-    def has_perm(self, perm, obj=None):
-        has_perm = super().has_perm(perm, obj=obj)
-        print("has perm: {}".format(has_perm))
-        return has_perm
 
     @classmethod
     def get_user_allowed_auth_backends(cls, username):
@@ -779,11 +770,15 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         return self.SOURCE_BACKEND_MAPPING.get(self.source, [])
 
     @property
-    def belongs_orgs(self):
-        if self.is_superuser:
+    def all_orgs(self):
+        from rbac.builtin import BuiltinRole
+        has_system_role = self.system_roles.all()\
+            .exclude(name=BuiltinRole.system_user.name)\
+            .exists()
+        if has_system_role:
             orgs = [Organization.root()] + list(Organization.objects.all())
         else:
-            orgs = list(self.orgs.all())
+            orgs = list(self.orgs.all().distinct())
         return orgs
 
     class Meta:

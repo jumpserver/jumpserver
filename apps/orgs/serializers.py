@@ -1,10 +1,7 @@
-from django.db.models import F
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 
-from common.drf.serializers import BulkModelSerializer
-from common.db.models import concated_display as display
-from .models import Organization, OrganizationMember
+from .models import Organization
 
 
 class ResourceStatisticsSerializer(serializers.Serializer):
@@ -39,32 +36,6 @@ class OrgSerializer(ModelSerializer):
         fields_m2m = []
         fields = fields_small + fields_m2m
         read_only_fields = ['created_by', 'date_created']
-
-
-class OrgMemberSerializer(BulkModelSerializer):
-    org_display = serializers.CharField(read_only=True)
-    user_display = serializers.CharField(read_only=True)
-
-    class Meta:
-        model = OrganizationMember
-        fields_mini = ['id']
-        fields_small = fields_mini + []
-        fields_fk = ['org', 'user', 'org_display', 'user_display',]
-        fields = fields_small + fields_fk
-        use_model_bulk_create = True
-        model_bulk_create_kwargs = {'ignore_conflicts': True}
-
-    def get_unique_together_validators(self):
-        if self.parent:
-            return []
-        return super().get_unique_together_validators()
-
-    @classmethod
-    def setup_eager_loading(cls, queryset):
-        return queryset.annotate(
-            org_display=F('org__name'),
-            user_display=display('user__name', 'user__username')
-        ).distinct()
 
 
 class CurrentOrgSerializer(ModelSerializer):

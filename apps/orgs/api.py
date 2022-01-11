@@ -10,7 +10,7 @@ from common.permissions import IsSuperUserOrAppUser, IsValidUser, UserCanAnyPerm
 from common.drf.api import JMSBulkRelationModelViewSet
 from .models import Organization
 from .serializers import (
-    OrgSerializer, OrgMemberSerializer, CurrentOrgSerializer
+    OrgSerializer, CurrentOrgSerializer
 )
 from users.models import User, UserGroup
 from assets.models import (
@@ -21,7 +21,6 @@ from applications.models import Application
 from perms.models import AssetPermission, ApplicationPermission
 from orgs.utils import current_org, tmp_to_root_org
 from common.utils import get_logger
-from .filters import OrgMemberRelationFilterSet
 
 
 logger = get_logger(__file__)
@@ -79,24 +78,6 @@ class OrgViewSet(BulkModelViewSet):
             raise PermissionDenied(detail=msg)
 
         super().perform_destroy(instance)
-
-
-class OrgMemberRelationBulkViewSet(JMSBulkRelationModelViewSet):
-    permission_classes = (IsSuperUserOrAppUser,)
-    m2m_field = Organization.members.field
-    serializer_class = OrgMemberSerializer
-    filterset_class = OrgMemberRelationFilterSet
-    search_fields = ('user__name', 'user__username', 'org__name')
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        queryset = queryset.exclude(user__is_app=True)
-        return queryset
-
-    def perform_bulk_destroy(self, queryset):
-        objs = list(queryset.all().prefetch_related('user', 'org'))
-        queryset.delete()
-        self.send_m2m_changed_signal(objs, action='post_remove')
 
 
 class CurrentOrgDetailApi(RetrieveAPIView):

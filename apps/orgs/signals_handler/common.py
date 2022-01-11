@@ -10,7 +10,7 @@ from django.db.models.signals import m2m_changed
 from django.db.models.signals import post_save, post_delete, pre_delete
 
 from orgs.utils import tmp_to_org
-from orgs.models import Organization, OrganizationMember
+from orgs.models import Organization
 from orgs.hands import set_current_org, Node, get_current_org
 from perms.models import (AssetPermission, ApplicationPermission)
 from users.models import UserGroup, User
@@ -153,24 +153,24 @@ def _clear_users_from_org(org, users):
 
     _remove_users(CommandFilterRule, users, org, user_field_name='reviewers')
 
-
-@receiver(m2m_changed, sender=OrganizationMember)
-def on_org_user_changed(action, instance, reverse, pk_set, **kwargs):
-    if action == 'post_remove':
-        if reverse:
-            user = instance
-            org_pk_set = pk_set
-
-            orgs = Organization.objects.filter(id__in=org_pk_set)
-            for org in orgs:
-                if not org.members.filter(id=user.id).exists():
-                    _clear_users_from_org(org, user)
-        else:
-            org = instance
-            user_pk_set = pk_set
-
-            leaved_users = set(pk_set) - set(org.members.filter(id__in=user_pk_set).values_list('id', flat=True))
-            _clear_users_from_org(org, leaved_users)
+#
+# @receiver(m2m_changed, sender=OrganizationMember)
+# def on_org_user_changed(action, instance, reverse, pk_set, **kwargs):
+#     if action == 'post_remove':
+#         if reverse:
+#             user = instance
+#             org_pk_set = pk_set
+#
+#             orgs = Organization.objects.filter(id__in=org_pk_set)
+#             for org in orgs:
+#                 if not org.members.filter(id=user.id).exists():
+#                     _clear_users_from_org(org, user)
+#         else:
+#             org = instance
+#             user_pk_set = pk_set
+#
+#             leaved_users = set(pk_set) - set(org.members.filter(id__in=user_pk_set).values_list('id', flat=True))
+#             _clear_users_from_org(org, leaved_users)
 
 
 @receiver(post_save, sender=User)

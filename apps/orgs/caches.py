@@ -10,7 +10,6 @@ from assets.models import Node, AdminUser, SystemUser, Domain, Gateway, Asset
 from terminal.models import Session
 from applications.models import Application
 from perms.models import AssetPermission, ApplicationPermission
-from .models import OrganizationMember
 
 logger = get_logger(__file__)
 

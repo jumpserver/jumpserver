@@ -1,8 +1,6 @@
 import uuid
-from functools import partial
 
 from django.db import models
-from django.db.models import signals
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import lazyproperty, settings
@@ -15,7 +13,7 @@ class Organization(models.Model):
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
-    members = models.ManyToManyField('users.User', related_name='orgs', through='orgs.OrganizationMember', through_fields=('org', 'user'))
+    members = models.ManyToManyField('users.User', related_name='orgs', through='rbac.RoleBinding', through_fields=('org', 'user'))
 
     ROOT_ID = '00000000-0000-0000-0000-000000000000'
     ROOT_NAME = _('GLOBAL')
@@ -25,6 +23,9 @@ class Organization(models.Model):
 
     class Meta:
         verbose_name = _("Organization")
+        permissions = (
+            ('view_rootorg', _('Can view root org')),
+        )
 
     def __str__(self):
         return str(self.name)
@@ -72,14 +73,6 @@ class Organization(models.Model):
     def org_id(self):
         return self.id
 
-    def get_members(self):
-        from users.models import User
-        if self.is_root():
-            members = User.objects.all()
-        else:
-            members = self.members.all()
-        return members.exclude(is_app=False)
-
     @classmethod
     def default(cls):
         defaults = dict(id=cls.DEFAULT_ID, name=cls.DEFAULT_NAME)
@@ -106,10 +99,13 @@ class Organization(models.Model):
         from .caches import OrgResourceStatisticsCache
         return OrgResourceStatisticsCache(self)
 
+    def get_members(self):
+        return self.members.all().distinct()
+
     def get_total_resources_amount(self):
         from django.apps import apps
         from orgs.mixins.models import OrgModelMixin
-        summary = {'users.Members': self.members.all().count()}
+        summary = {'users.Members': self.get_members().count()}
         for app_name, app_config in apps.app_configs.items():
             models_cls = app_config.get_models()
             for model in models_cls:
@@ -143,24 +139,24 @@ class Organization(models.Model):
         return node
 
 
-class OrgMemberManager(models.Manager):
-    def remove_users(self, org, users):
-        from users.models import User
-        pk_set = []
-        for user in users:
-            if hasattr(user, 'pk'):
-                pk_set.append(user.pk)
-            else:
-                pk_set.append(user)
-
-        send = partial(
-            signals.m2m_changed.send, sender=self.model,
-            instance=org, reverse=False, model=User,
-            pk_set=pk_set, using=self.db
-        )
-        send(action="pre_remove")
-        self.filter(org_id=org.id, user_id__in=pk_set).delete()
-        send(action="post_remove")
+# class OrgMemberManager(models.Manager):
+#     def remove_users(self, org, users):
+#         from users.models import User
+#         pk_set = []
+#         for user in users:
+#             if hasattr(user, 'pk'):
+#                 pk_set.append(user.pk)
+#             else:
+#                 pk_set.append(user)
+#
+#         send = partial(
+#             signals.m2m_changed.send, sender=self.model,
+#             instance=org, reverse=False, model=User,
+#             pk_set=pk_set, using=self.db
+#         )
+#         send(action="pre_remove")
+#         self.filter(org_id=org.id, user_id__in=pk_set).delete()
+#         send(action="post_remove")
 
 
 class OrganizationMember(models.Model):
@@ -175,8 +171,7 @@ class OrganizationMember(models.Model):
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
     created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
-
-    objects = OrgMemberManager()
+    # objects = OrgMemberManager()
 
     class Meta:
         unique_together = [('org', 'user', 'role')]
