@@ -65,6 +65,7 @@ def subscribe_orgs_mapping_expire(sender, **kwargs):
     t.start()
 
 
+# 创建对应的root
 @receiver(post_save, sender=Organization)
 def on_org_create_or_update(sender, instance, created=False, **kwargs):
     # 必须放到最开始, 因为下面调用Node.save方法时会获取当前组织的org_id(即instance.org_id), 如果不过期会找不到

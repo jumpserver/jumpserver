@@ -6,8 +6,7 @@ from rest_framework_bulk import BulkModelViewSet
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.exceptions import PermissionDenied
 
-from common.permissions import IsSuperUserOrAppUser, IsValidUser, UserCanAnyPermCurrentOrg
-from common.drf.api import JMSBulkRelationModelViewSet
+from common.permissions import IsValidUser, UserCanAnyPermCurrentOrg
 from .models import Organization
 from .serializers import (
     OrgSerializer, CurrentOrgSerializer
@@ -40,7 +39,6 @@ class OrgViewSet(BulkModelViewSet):
     search_fields = ('name', 'comment')
     queryset = Organization.objects.all()
     serializer_class = OrgSerializer
-    permission_classes = (IsSuperUserOrAppUser,)
 
     def get_serializer_class(self):
         mapper = {

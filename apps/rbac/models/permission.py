@@ -163,7 +163,7 @@ class PermissionTreeUtil:
 
             node = TreeNode(**{
                 'id': p.id,
-                'name': name,
+                'name': name + '({})'.format(p.app_label_codename),
                 'title': p.name,
                 'pId': model_id,
                 'isParent': False,

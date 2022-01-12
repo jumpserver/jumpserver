@@ -5,7 +5,7 @@ from django.db.models import Q
 from common.db.models import JMSModel
 from orgs.utils import current_org
 from .role import Role
-from .. const import Scope
+from ..const import Scope
 
 __all__ = ['RoleBinding', 'SystemRoleBinding', 'OrgRoleBinding']
 
@@ -83,7 +83,7 @@ class OrgRoleBindingManager(models.Manager):
 
 
 class OrgRoleBinding(RoleBinding):
-    objects = RoleBindingManager()
+    objects = OrgRoleBindingManager()
 
     def save(self, *args, **kwargs):
         self.org_id = current_org.id

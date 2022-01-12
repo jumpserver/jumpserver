@@ -96,6 +96,8 @@ class Organization(models.Model):
 
     @lazyproperty
     def resource_statistics_cache(self):
+        # Todo: 由于 redis 问题，没能获取到
+        return {}
         from .caches import OrgResourceStatisticsCache
         return OrgResourceStatisticsCache(self)
 

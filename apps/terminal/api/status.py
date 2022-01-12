@@ -7,7 +7,7 @@ from rest_framework import viewsets, generics
 from rest_framework.views import  Response
 from rest_framework import status
 
-from common.permissions import IsAppUser, IsOrgAdminOrAppUser, IsSuperUser
+from common.permissions import IsAppUser, IsOrgAdminOrAppUser
 from ..models import Terminal, Status, Session
 from .. import serializers
 from ..utils import TypedComponentsStatusMetricsUtil
@@ -61,6 +61,10 @@ class StatusViewSet(viewsets.ModelViewSet):
 
 class ComponentsMetricsAPIView(generics.GenericAPIView):
     """ 返回汇总组件指标数据 """
+    rbac_perms = {
+        'GET': 'terminal.view_terminal'
+    }
+
     def get(self, request, *args, **kwargs):
         util = TypedComponentsStatusMetricsUtil()
         metrics = util.get_metrics()
