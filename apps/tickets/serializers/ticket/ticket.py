@@ -8,7 +8,6 @@ from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from perms.models import AssetPermission
 from orgs.models import Organization
 from orgs.utils import tmp_to_org
-from users.models import User
 from tickets.models import Ticket, TicketFlow, ApprovalRule
 from tickets.const import TicketApprovalStrategy
 from .meta import type_serializer_classes_mapping
@@ -29,7 +28,8 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
         fields_small = fields_mini + [
             'type', 'type_display', 'meta', 'state', 'approval_step',
             'status', 'status_display', 'applicant_display', 'process_map',
-            'date_created', 'date_updated', 'comment', 'org_id', 'org_name', 'body'
+            'date_created', 'date_updated', 'comment', 'org_id', 'org_name', 'body',
+            'serial_num',
         ]
         fields_fk = ['applicant', ]
         fields = fields_small + fields_fk
@@ -139,7 +139,8 @@ class TicketApproveSerializer(TicketSerializer):
 
 class TicketFlowApproveSerializer(serializers.ModelSerializer):
     strategy_display = serializers.ReadOnlyField(source='get_strategy_display', label=_('Approve strategy'))
-    assignees_read_only = serializers.SerializerMethodField(label=_("Assignees"))
+    assignees_read_only = serializers.SerializerMethodField(label=_('Assignees'))
+    assignees_display = serializers.SerializerMethodField(label=_('Assignees display'))
 
     class Meta:
         model = ApprovalRule
@@ -152,6 +153,9 @@ class TicketFlowApproveSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'assignees': {'write_only': True, 'allow_empty': True, 'required': False}
         }
+
+    def get_assignees_display(self, obj):
+        return [str(assignee) for assignee in obj.get_assignees()]
 
     def get_assignees_read_only(self, obj):
         if obj.strategy == TicketApprovalStrategy.custom_user:
@@ -190,7 +194,9 @@ class TicketFlowSerializer(OrgResourceModelSerializerMixin):
                 raise serializers.ValidationError(error)
         return value
 
-    def create_or_update(self, action, validated_data, related, assignees, instance=None):
+    def create_or_update(self, action, validated_data, instance=None):
+        related = 'rules'
+        assignees = 'assignees'
         childs = validated_data.pop(related, [])
         if not instance:
             instance = getattr(super(), action)(validated_data)
@@ -203,12 +209,6 @@ class TicketFlowSerializer(OrgResourceModelSerializerMixin):
         for level, data in enumerate(childs, 1):
             data_m2m = data.pop(assignees, None)
             child_instance = related_model.objects.create(**data, level=level)
-            if child_instance.strategy == TicketApprovalStrategy.super_admin:
-                data_m2m = list(User.get_super_admins())
-            elif child_instance.strategy == TicketApprovalStrategy.org_admin:
-                data_m2m = list(User.get_org_admins())
-            elif child_instance.strategy == TicketApprovalStrategy.super_org_admin:
-                data_m2m = list(User.get_super_and_org_admins())
             getattr(child_instance, assignees).set(data_m2m)
             child_instances.append(child_instance)
         instance_related.set(child_instances)
@@ -216,12 +216,12 @@ class TicketFlowSerializer(OrgResourceModelSerializerMixin):
 
     @atomic
     def create(self, validated_data):
-        return self.create_or_update('create', validated_data, 'rules', 'assignees')
+        return self.create_or_update('create', validated_data)
 
     @atomic
     def update(self, instance, validated_data):
         if instance.org_id == Organization.ROOT_ID:
             instance = self.create(validated_data)
         else:
-            instance = self.create_or_update('update', validated_data, 'rules', 'assignees', instance)
+            instance = self.create_or_update('update', validated_data, instance)
         return instance

@@ -169,7 +169,7 @@ class PasswordExpirationReminderMsg(UserMessage):
 class UserExpirationReminderMsg(UserMessage):
     def get_html_msg(self) -> dict:
         subject = _('Account is about expire')
-        date_expired_local = timezone.localtime(self.user.date_password_expired)
+        date_expired_local = timezone.localtime(self.user.date_expired)
         date_expired = date_expired_local.strftime('%Y-%m-%d %H:%M:%S')
         context = {
             'name': self.user.name,

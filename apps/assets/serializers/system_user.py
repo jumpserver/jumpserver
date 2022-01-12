@@ -4,7 +4,7 @@ from django.db.models import Count
 
 from common.mixins.serializers import BulkSerializerMixin
 from common.utils import ssh_pubkey_gen
-from common.validators import alphanumeric_re, alphanumeric_cn_re
+from common.validators import alphanumeric_re, alphanumeric_cn_re, alphanumeric_win_re
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import SystemUser, Asset
 from .utils import validate_password_contains_left_double_curly_bracket
@@ -33,7 +33,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     class Meta:
         model = SystemUser
         fields_mini = ['id', 'name', 'username']
-        fields_write_only = ['password', 'public_key', 'private_key']
+        fields_write_only = ['password', 'public_key', 'private_key', 'passphrase']
         fields_small = fields_mini + fields_write_only + [
             'token', 'ssh_key_fingerprint',
             'type', 'type_display', 'protocol', 'is_asset_protocol',
@@ -107,9 +107,12 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     def validate_username(self, username):
         protocol = self.get_initial_value("protocol")
         if username:
-            regx = alphanumeric_re
             if protocol == SystemUser.Protocol.telnet:
                 regx = alphanumeric_cn_re
+            elif protocol == SystemUser.Protocol.rdp:
+                regx = alphanumeric_win_re
+            else:
+                regx = alphanumeric_re
             if not regx.match(username):
                 raise serializers.ValidationError(_('Special char not allowed'))
             return username
@@ -119,7 +122,8 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             return ''
 
         login_mode = self.get_initial_value("login_mode")
-        if login_mode == SystemUser.LOGIN_AUTO and protocol != SystemUser.Protocol.vnc:
+        if login_mode == SystemUser.LOGIN_AUTO and protocol != SystemUser.Protocol.vnc \
+                and protocol != SystemUser.Protocol.redis:
             msg = _('* Automatic login mode must fill in the username.')
             raise serializers.ValidationError(msg)
         return username
@@ -141,9 +145,9 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
 
     def validate_password(self, password):
         super().validate_password(password)
-        auto_gen_key = self.get_initial_value("auto_generate_key", False)
-        private_key = self.get_initial_value("private_key")
-        login_mode = self.get_initial_value("login_mode")
+        auto_gen_key = self.get_initial_value('auto_generate_key', False)
+        private_key = self.get_initial_value('private_key')
+        login_mode = self.get_initial_value('login_mode')
 
         if not self.instance and not auto_gen_key and not password and \
                 not private_key and login_mode == SystemUser.LOGIN_AUTO:
@@ -187,9 +191,9 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         return attrs
 
     def _validate_gen_key(self, attrs):
-        username = attrs.get("username", "manual")
-        auto_gen_key = attrs.pop("auto_generate_key", False)
-        protocol = attrs.get("protocol")
+        username = attrs.get('username', 'manual')
+        auto_gen_key = attrs.pop('auto_generate_key', False)
+        protocol = attrs.get('protocol')
 
         if protocol not in SystemUser.SUPPORT_PUSH_PROTOCOLS:
             return attrs
@@ -197,17 +201,17 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         # 自动生成
         if auto_gen_key and not self.instance:
             password = SystemUser.gen_password()
-            attrs["password"] = password
+            attrs['password'] = password
             if protocol == SystemUser.Protocol.ssh:
                 private_key, public_key = SystemUser.gen_key(username)
-                attrs["private_key"] = private_key
-                attrs["public_key"] = public_key
+                attrs['private_key'] = private_key
+                attrs['public_key'] = public_key
         # 如果设置了private key，没有设置public key则生成
-        elif attrs.get("private_key", None):
-            private_key = attrs["private_key"]
-            password = attrs.get("password")
+        elif attrs.get('private_key'):
+            private_key = attrs['private_key']
+            password = attrs.get('password')
             public_key = ssh_pubkey_gen(private_key, password=password, username=username)
-            attrs["public_key"] = public_key
+            attrs['public_key'] = public_key
         return attrs
 
     def _validate_login_mode(self, attrs):
@@ -232,7 +236,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset\
+        queryset = queryset \
             .annotate(assets_amount=Count("assets")) \
             .prefetch_related('nodes', 'cmd_filters')
         return queryset

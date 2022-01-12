@@ -19,6 +19,7 @@ class SessionCommandSerializer(serializers.Serializer):
     risk_level_display = serializers.SerializerMethodField(label=_('Risk level display'))
     org_id = serializers.CharField(max_length=36, required=False, default='', allow_null=True, allow_blank=True)
     timestamp = serializers.IntegerField(label=_('Timestamp'))
+    remote_addr = serializers.CharField(read_only=True, label=_('Remote Address'))
 
     @staticmethod
     def get_risk_level_display(obj):

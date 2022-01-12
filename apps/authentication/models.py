@@ -44,4 +44,4 @@ class SSOToken(models.JMSBaseModel):
     """
     authkey = models.UUIDField(primary_key=True, default=uuid.uuid4, verbose_name=_('Token'))
     expired = models.BooleanField(default=False, verbose_name=_('Expired'))
-    user = models.ForeignKey('users.User', on_delete=models.PROTECT, verbose_name=_('User'), db_constraint=False)
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE, verbose_name=_('User'), db_constraint=False)

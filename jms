@@ -83,7 +83,7 @@ def perform_db_migrate():
     try:
         management.call_command('migrate')
     except Exception:
-        logging.error('Perform migrate failed, exit')
+        logging.error('Perform migrate failed, exit', exc_info=True)
         sys.exit(11)
 
 

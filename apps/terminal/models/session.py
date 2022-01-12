@@ -29,6 +29,7 @@ class Session(OrgModelMixin):
         VNC = 'vnc', 'vnc'
         TELNET = 'telnet', 'telnet'
         MYSQL = 'mysql', 'mysql'
+        REDIS = 'redis', 'redis'
         ORACLE = 'oracle', 'oracle'
         MARIADB = 'mariadb', 'mariadb'
         SQLSERVER = 'sqlserver', 'sqlserver'
@@ -162,7 +163,8 @@ class Session(OrgModelMixin):
     @property
     def db_protocols(self):
         _PROTOCOL = self.PROTOCOL
-        return [_PROTOCOL.MYSQL, _PROTOCOL.MARIADB, _PROTOCOL.ORACLE, _PROTOCOL.POSTGRESQL, _PROTOCOL.SQLSERVER]
+        return [_PROTOCOL.MYSQL, _PROTOCOL.MARIADB, _PROTOCOL.REDIS,
+                _PROTOCOL.ORACLE, _PROTOCOL.POSTGRESQL, _PROTOCOL.SQLSERVER]
 
     @property
     def can_terminate(self):

@@ -54,10 +54,15 @@ class ApplicationsAsTreeMixin(SerializeApplicationToTreeNodeMixin):
     将应用序列化成树的结构返回
     """
     serializer_class = TreeNodeSerializer
+    user: None
 
     def list(self, request, *args, **kwargs):
+        tree_id = request.query_params.get('tree_id', None)
+        parent_info = request.query_params.get('parentInfo', None)
         queryset = self.filter_queryset(self.get_queryset())
-        tree_nodes = self.serialize_applications_with_org(queryset)
+        tree_nodes = self.serialize_applications_with_org(
+            queryset, tree_id, parent_info, self.user
+        )
         serializer = self.get_serializer(tree_nodes, many=True)
         return Response(data=serializer.data)
 

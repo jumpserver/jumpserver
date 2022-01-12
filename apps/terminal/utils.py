@@ -11,6 +11,9 @@ import jms_storage
 from common.utils import get_logger
 from . import const
 from .models import ReplayStorage
+from tickets.models import TicketSession, TicketStep, TicketAssignee
+from tickets.const import ProcessStatus
+
 
 logger = get_logger(__name__)
 
@@ -247,3 +250,11 @@ class ComponentsPrometheusMetricsUtil(TypedComponentsStatusMetricsUtil):
             prometheus_metrics.append('\n')
         prometheus_metrics_text = '\n'.join(prometheus_metrics)
         return prometheus_metrics_text
+
+
+def is_session_approver(session_id, user_id):
+    ticket = TicketSession.get_ticket_by_session_id(session_id)
+    if not ticket:
+        return False
+    ok = ticket.has_all_assignee(user_id)
+    return ok

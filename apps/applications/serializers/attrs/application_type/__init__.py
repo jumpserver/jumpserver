@@ -1,5 +1,6 @@
 
 from .mysql import *
+from .redis import *
 from .mariadb import *
 from .oracle import *
 from .pgsql import *

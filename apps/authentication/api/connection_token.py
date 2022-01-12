@@ -28,7 +28,7 @@ from common.utils.common import get_file_by_arch
 from orgs.mixins.api import RootOrgViewMixin
 from common.http import is_true
 from perms.utils.asset.permission import get_asset_system_user_ids_with_actions_by_user
-from perms.models.asset_permission import Action
+from perms.models.base import Action
 
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
@@ -231,7 +231,7 @@ class SecretDetailMixin:
 
     @staticmethod
     def _get_application_secret_detail(application):
-        from perms.models import Action
+        from perms.models.base import Action
         gateway = None
 
         if not application.category_remote_app:
@@ -391,10 +391,10 @@ class UserConnectionTokenViewSet(
             asset = get_object_or_404(Asset, id=value.get('asset'))
             if not asset.is_active:
                 raise serializers.ValidationError("Asset disabled")
-            has_perm, expired_at = asset_validate_permission(user, asset, system_user, 'connect')
+            has_perm, actions, expired_at = asset_validate_permission(user, asset, system_user)
         else:
             app = get_object_or_404(Application, id=value.get('application'))
-            has_perm, expired_at = app_validate_permission(user, app, system_user)
+            has_perm, actions, expired_at = app_validate_permission(user, app, system_user)
 
         if not has_perm:
             raise serializers.ValidationError('Permission expired or invalid')

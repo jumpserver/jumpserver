@@ -1,5 +1,5 @@
 # 编译代码
-FROM python:3.8.6-slim as stage-build
+FROM python:3.8-slim as stage-build
 MAINTAINER JumpServer Team <ibuler@qq.com>
 ARG VERSION
 ENV VERSION=$VERSION
@@ -9,7 +9,7 @@ ADD . .
 RUN cd utils && bash -ixeu build.sh
 
 # 构建运行时环境
-FROM python:3.8.6-slim
+FROM python:3.8-slim
 ARG PIP_MIRROR=https://pypi.douban.com/simple
 ENV PIP_MIRROR=$PIP_MIRROR
 ARG PIP_JMS_MIRROR=https://pypi.douban.com/simple

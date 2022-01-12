@@ -17,7 +17,7 @@ from common.mixins.api import SuggestionMixin
 from assets.models import Asset
 from common.utils import get_logger, get_object_or_none
 from common.tree import TreeNodeSerializer
-from orgs.mixins.api import OrgModelViewSet
+from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
 from orgs.utils import current_org
 from ..hands import IsOrgAdmin
@@ -42,18 +42,12 @@ __all__ = [
 ]
 
 
-class NodeViewSet(SuggestionMixin, OrgModelViewSet):
+class NodeViewSet(SuggestionMixin, OrgBulkModelViewSet):
     model = Node
     filterset_fields = ('value', 'key', 'id')
     search_fields = ('value', )
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.NodeSerializer
-
-    # 仅支持根节点指直接创建，子节点下的节点需要通过children接口创建
-    def perform_create(self, serializer):
-        child_key = Node.org_root().get_next_child_key()
-        serializer.validated_data["key"] = child_key
-        serializer.save()
 
     @action(methods=[POST], detail=False, url_path='check_assets_amount_task')
     def check_assets_amount_task(self, request):

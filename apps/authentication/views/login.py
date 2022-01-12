@@ -157,7 +157,7 @@ class UserLoginView(mixins.AuthMixin, FormView):
                 'name': 'SAML2',
                 'enabled': settings.AUTH_SAML2,
                 'url': reverse('authentication:saml2:saml2-login'),
-                'logo': static('img/login_cas_logo.png'),
+                'logo': static('img/login_saml2_logo.png'),
                 'auto_redirect': True
             },
             {

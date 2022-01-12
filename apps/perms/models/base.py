@@ -8,12 +8,12 @@ from django.db.models import Q
 from django.utils import timezone
 from orgs.mixins.models import OrgModelMixin
 
-from common.db.models import UnionQuerySet
+from common.db.models import UnionQuerySet, BitOperationChoice
 from common.utils import date_expired_default, lazyproperty
 from orgs.mixins.models import OrgManager
 
 __all__ = [
-    'BasePermission', 'BasePermissionQuerySet'
+    'BasePermission', 'BasePermissionQuerySet', 'Action'
 ]
 
 
@@ -39,12 +39,52 @@ class BasePermissionManager(OrgManager):
         return self.get_queryset().valid()
 
 
+class Action(BitOperationChoice):
+    ALL = 0xff
+
+    CONNECT = 0b1
+    UPLOAD = 0b1 << 1
+    DOWNLOAD = 0b1 << 2
+    CLIPBOARD_COPY = 0b1 << 3
+    CLIPBOARD_PASTE = 0b1 << 4
+    UPDOWNLOAD = UPLOAD | DOWNLOAD
+    CLIPBOARD_COPY_PASTE = CLIPBOARD_COPY | CLIPBOARD_PASTE
+
+    DB_CHOICES = (
+        (ALL, _('All')),
+        (CONNECT, _('Connect')),
+        (UPLOAD, _('Upload file')),
+        (DOWNLOAD, _('Download file')),
+        (UPDOWNLOAD, _("Upload download")),
+        (CLIPBOARD_COPY, _('Clipboard copy')),
+        (CLIPBOARD_PASTE, _('Clipboard paste')),
+        (CLIPBOARD_COPY_PASTE, _('Clipboard copy paste'))
+    )
+
+    NAME_MAP = {
+        ALL: "all",
+        CONNECT: "connect",
+        UPLOAD: "upload_file",
+        DOWNLOAD: "download_file",
+        UPDOWNLOAD: "updownload",
+        CLIPBOARD_COPY: 'clipboard_copy',
+        CLIPBOARD_PASTE: 'clipboard_paste',
+        CLIPBOARD_COPY_PASTE: 'clipboard_copy_paste'
+    }
+
+    NAME_MAP_REVERSE = {v: k for k, v in NAME_MAP.items()}
+    CHOICES = []
+    for i, j in DB_CHOICES:
+        CHOICES.append((NAME_MAP[i], j))
+
+
 class BasePermission(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     users = models.ManyToManyField('users.User', blank=True, verbose_name=_("User"), related_name='%(class)ss')
     user_groups = models.ManyToManyField(
         'users.UserGroup', blank=True, verbose_name=_("User group"), related_name='%(class)ss')
+    actions = models.IntegerField(choices=Action.DB_CHOICES, default=Action.ALL, verbose_name=_("Actions"))
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
     date_start = models.DateTimeField(default=timezone.now, db_index=True, verbose_name=_("Date start"))
     date_expired = models.DateTimeField(default=date_expired_default, db_index=True, verbose_name=_('Date expired'))
