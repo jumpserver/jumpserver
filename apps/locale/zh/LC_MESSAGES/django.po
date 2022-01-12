@@ -35,12 +35,12 @@ msgid "Name"
 msgstr "名称"
 
 #: acls/models/base.py:27 assets/models/cmd_filter.py:77
-#: assets/models/user.py:211
+#: assets/models/user.py:216
 msgid "Priority"
 msgstr "优先级"
 
 #: acls/models/base.py:28 assets/models/cmd_filter.py:77
-#: assets/models/user.py:211
+#: assets/models/user.py:216
 msgid "1-100, the lower the value will be match first"
 msgstr "优先级可选范围为 1-100 (数值越小越优先)"
 
@@ -212,7 +212,7 @@ msgid ""
 msgstr "格式为逗号分隔的字符串, * 表示匹配所有. 可选的协议有： {}"
 
 #: acls/serializers/login_asset_acl.py:55 assets/models/asset.py:214
-#: assets/models/domain.py:63 assets/models/user.py:212
+#: assets/models/domain.py:63 assets/models/user.py:217
 #: terminal/serializers/session.py:30 terminal/serializers/storage.py:69
 msgid "Protocol"
 msgstr "协议"
@@ -268,7 +268,7 @@ msgid "Custom"
 msgstr "自定义"
 
 #: applications/models/account.py:11 assets/models/authbook.py:19
-#: assets/models/cmd_filter.py:38 assets/models/user.py:302 audits/models.py:39
+#: assets/models/cmd_filter.py:38 assets/models/user.py:309 audits/models.py:39
 #: perms/models/application_permission.py:32
 #: perms/models/asset_permission.py:26 templates/_nav.html:45
 #: terminal/backends/command/models.py:21
@@ -332,6 +332,7 @@ msgstr "属性"
 #: applications/models/application.py:219 assets/models/backup.py:32
 #: assets/models/cmd_filter.py:41 perms/models/application_permission.py:27
 #: users/models/user.py:170
+
 msgid "Application"
 msgstr "应用程序"
 
@@ -529,7 +530,7 @@ msgstr "主机名原始"
 msgid "Protocols"
 msgstr "协议组"
 
-#: assets/models/asset.py:219 assets/models/user.py:202
+#: assets/models/asset.py:219 assets/models/user.py:207
 #: perms/models/asset_permission.py:25
 #: xpack/plugins/change_auth_plan/models/asset.py:43
 #: xpack/plugins/gathered_user/models.py:24
@@ -542,7 +543,7 @@ msgid "Is active"
 msgstr "激活"
 
 #: assets/models/asset.py:223 assets/models/cluster.py:19
-#: assets/models/user.py:199 assets/models/user.py:351 templates/_nav.html:44
+#: assets/models/user.py:204 assets/models/user.py:358 templates/_nav.html:44
 msgid "Admin user"
 msgstr "特权用户"
 
@@ -877,67 +878,75 @@ msgstr "托管密码"
 msgid "Manually input"
 msgstr "手动输入"
 
-#: assets/models/user.py:198
+#: assets/models/user.py:203
 msgid "Common user"
 msgstr "普通用户"
 
-#: assets/models/user.py:201
+#: assets/models/user.py:206
 msgid "Username same with user"
 msgstr "用户名与用户相同"
 
-#: assets/models/user.py:204 assets/serializers/domain.py:29
+#: assets/models/user.py:209 assets/serializers/domain.py:29
 #: templates/_nav.html:39
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 #: xpack/plugins/change_auth_plan/models/asset.py:39
 msgid "Assets"
 msgstr "资产"
 
-#: assets/models/user.py:208 templates/_nav.html:17
+#: assets/models/user.py:213 templates/_nav.html:17
 #: users/views/profile/pubkey.py:37
 msgid "Users"
 msgstr "用户管理"
 
-#: assets/models/user.py:209
+#: assets/models/user.py:214
 msgid "User groups"
 msgstr "用户组"
 
-#: assets/models/user.py:213
+#: assets/models/user.py:218
 msgid "Auto push"
 msgstr "自动推送"
 
-#: assets/models/user.py:214
+#: assets/models/user.py:219
 msgid "Sudo"
 msgstr "Sudo"
 
-#: assets/models/user.py:215
+#: assets/models/user.py:220
 msgid "Shell"
 msgstr "Shell"
 
-#: assets/models/user.py:216
+#: assets/models/user.py:221
 msgid "Login mode"
 msgstr "认证方式"
 
-#: assets/models/user.py:217
+#: assets/models/user.py:222
 msgid "SFTP Root"
 msgstr "SFTP根路径"
 
-#: assets/models/user.py:218 authentication/models.py:45
+#: assets/models/user.py:223 authentication/models.py:45
 msgid "Token"
 msgstr ""
 
-#: assets/models/user.py:219
+#: assets/models/user.py:224
 msgid "Home"
 msgstr "家目录"
 
-#: assets/models/user.py:220
+#: assets/models/user.py:225
 msgid "System groups"
 msgstr "用户组"
 
-#: assets/models/user.py:223
+#: assets/models/user.py:228
 msgid "User switch"
 msgstr "用户切换"
 
-#: assets/models/user.py:224
+#: assets/models/user.py:229
+msgid "Switch Type"
+msgstr "切换类型"
+
+#: assets/models/user.py:230
+msgid "Switch Extra"
+msgstr "自定义切换命令"
+
+#: assets/models/user.py:231
 msgid "Switch from"
 msgstr "切换自"
 
