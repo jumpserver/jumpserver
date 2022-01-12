@@ -145,7 +145,7 @@ class FeiShuQRBindCallbackView(FeiShuQRMixin, View):
             raise e
 
         ip = get_request_ip(request)
-        OAuthBindMessage(user, ip, _('WeCom'), user_id).publish_async()
+        OAuthBindMessage(user, ip, _('FeiShu'), user_id).publish_async()
         msg = _('Binding FeiShu successfully')
         response = self.get_success_response(redirect_url, msg, msg)
         return response

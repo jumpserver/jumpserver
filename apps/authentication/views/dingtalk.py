@@ -157,7 +157,7 @@ class DingTalkQRBindCallbackView(DingTalkQRMixin, View):
             raise e
 
         ip = get_request_ip(request)
-        OAuthBindMessage(user, ip, _('WeCom'), user_id).publish_async()
+        OAuthBindMessage(user, ip, _('DingTalk'), user_id).publish_async()
         msg = _('Binding DingTalk successfully')
         response = self.get_success_response(redirect_url, msg, msg)
         return response
