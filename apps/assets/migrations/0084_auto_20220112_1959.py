@@ -49,7 +49,7 @@ class Migration(migrations.Migration):
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('date_start', models.DateTimeField(auto_now_add=True, verbose_name='Date start')),
                 ('timedelta', models.FloatField(default=0.0, null=True, verbose_name='Time')),
-                ('plan_snapshot', models.JSONField(blank=True, default=dict, encoder=common.db.encoder.ModelJSONFieldEncoder, null=True, verbose_name='Escape route snapshot')),
+                ('plan_snapshot', models.JSONField(blank=True, default=dict, encoder=common.db.encoder.ModelJSONFieldEncoder, null=True, verbose_name='Account backup snapshot')),
                 ('trigger', models.CharField(choices=[('manual', 'Manual trigger'), ('timing', 'Timing trigger')], default='manual', max_length=128, verbose_name='Trigger mode')),
                 ('reason', models.CharField(blank=True, max_length=1024, null=True, verbose_name='Reason')),
                 ('is_success', models.BooleanField(default=False, verbose_name='Is success')),
