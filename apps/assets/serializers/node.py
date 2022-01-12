@@ -17,6 +17,9 @@ class NodeSerializer(BulkOrgResourceModelSerializer):
     value = serializers.CharField(
         required=False, allow_blank=True, allow_null=True, label=_("value")
     )
+    full_value = serializers.CharField(
+        required=False, allow_blank=True, allow_null=True, label=_("Full value")
+    )
 
     class Meta:
         model = Node
@@ -39,6 +42,19 @@ class NodeSerializer(BulkOrgResourceModelSerializer):
                 _('The same level node name cannot be the same')
             )
         return data
+
+    def create(self, validated_data):
+        full_value = validated_data.get('full_value')
+        value = validated_data.get('value')
+
+        # 直接多层级创建
+        if full_value:
+            node = Node.create_node_by_full_value(full_value)
+        # 根据 value 在 root 下创建
+        else:
+            key = Node.org_root().get_next_child_key()
+            node = Node.objects.create(key=key, value=value)
+        return node
 
 
 class NodeAssetsSerializer(BulkOrgResourceModelSerializer):
