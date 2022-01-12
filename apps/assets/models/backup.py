@@ -109,7 +109,7 @@ class AccountBackupPlanExecution(OrgModelMixin):
     )
     plan_snapshot = models.JSONField(
         encoder=ModelJSONFieldEncoder, default=dict,
-        blank=True, null=True, verbose_name=_('Escape route snapshot')
+        blank=True, null=True, verbose_name=_('Account backup snapshot')
     )
     trigger = models.CharField(
         max_length=128, default=Trigger.manual, choices=Trigger.choices,
