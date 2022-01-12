@@ -17,8 +17,10 @@ from common.utils.django import reverse, get_object_or_none
 from common.sdk.im.wecom import URL
 from common.sdk.im.wecom import WeCom
 from common.mixins.views import PermissionsMixin
+from common.utils.common import get_request_ip
 from authentication import errors
 from authentication.mixins import AuthMixin
+from authentication.notifications import OAuthBindMessage
 
 logger = get_logger(__file__)
 
@@ -152,6 +154,8 @@ class WeComQRBindCallbackView(WeComQRMixin, View):
                 return response
             raise e
 
+        ip = get_request_ip(request)
+        OAuthBindMessage(user, ip, _('WeCom'), wecom_userid).publish_async()
         msg = _('Binding WeCom successfully')
         response = self.get_success_response(redirect_url, msg, msg)
         return response

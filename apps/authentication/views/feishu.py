@@ -16,8 +16,10 @@ from common.utils.random import random_string
 from common.utils.django import reverse, get_object_or_none
 from common.mixins.views import PermissionsMixin
 from common.sdk.im.feishu import FeiShu, URL
+from common.utils.common import get_request_ip
 from authentication import errors
 from authentication.mixins import AuthMixin
+from authentication.notifications import OAuthBindMessage
 
 logger = get_logger(__file__)
 
@@ -142,6 +144,8 @@ class FeiShuQRBindCallbackView(FeiShuQRMixin, View):
                 return response
             raise e
 
+        ip = get_request_ip(request)
+        OAuthBindMessage(user, ip, _('WeCom'), user_id).publish_async()
         msg = _('Binding FeiShu successfully')
         response = self.get_success_response(redirect_url, msg, msg)
         return response
