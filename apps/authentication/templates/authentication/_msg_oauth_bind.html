@@ -1,0 +1,18 @@
+{% load i18n %}
+<p>
+    {% trans 'Hello' %} {{ name }},
+</p>
+<p>
+    {% trans 'Your account has just been bound to' %} {{ oauth_name }}
+</p>
+<p>
+    <b>{% trans 'Username' %}:</b> {{ username }}<br>
+    <b>{{ oauth_name }}:</b> {{ oauth_id }}<br>
+    <b>{% trans 'Time' %}:</b> {{ time }}<br>
+    <b>{% trans 'IP' %}:</b> {{ ip }}
+</p>
+
+-
+<p>
+    {% trans 'If the operation is not your own, unbind and change the password.' %}
+</p>

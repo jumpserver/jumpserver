@@ -19,6 +19,8 @@ from common.mixins.views import PermissionsMixin
 from authentication import errors
 from authentication.mixins import AuthMixin
 from common.sdk.im.dingtalk import DingTalk
+from common.utils.common import get_request_ip
+from authentication.notifications import OAuthBindMessage
 
 logger = get_logger(__file__)
 
@@ -154,6 +156,8 @@ class DingTalkQRBindCallbackView(DingTalkQRMixin, View):
                 return response
             raise e
 
+        ip = get_request_ip(request)
+        OAuthBindMessage(user, ip, _('WeCom'), user_id).publish_async()
         msg = _('Binding DingTalk successfully')
         response = self.get_success_response(redirect_url, msg, msg)
         return response
