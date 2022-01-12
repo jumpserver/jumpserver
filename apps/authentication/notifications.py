@@ -49,7 +49,7 @@ class OAuthBindMessage(UserMessage):
 
     def get_html_msg(self) -> dict:
         now = local_now_display()
-        subject = self.oauth_name + _('binding reminder')
+        subject = self.oauth_name + ' ' + _('binding reminder')
         context = dict(
             subject=subject,
             name=self.user.name,
