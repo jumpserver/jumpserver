@@ -7,3 +7,14 @@ JumpServer 是一款正在成长的安全产品， 请参考 [基本安全建议
 - ibuler@fit2cloud.com
 - support@fit2cloud.com
 - 400-052-0755
+
+
+# Security Policy
+JumpServer is a security product, The installation and development should follow our security tips.
+
+## Reporting a Vulnerability
+All security bugs should be reported to the contact as below:
+
+- ibuler@fit2cloud.com
+- support@fit2cloud.com
+- 400-052-0755

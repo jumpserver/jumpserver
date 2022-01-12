@@ -51,7 +51,7 @@ class TencentSMSTestingAPI(GenericAPIView):
                 phone_numbers=[test_phone],
                 sign_name=tencent_verify_sign_name,
                 template_code=tencent_verify_template_code,
-                template_param=OrderedDict(code='test')
+                template_param=OrderedDict(code='666666')
             )
             return Response(status=status.HTTP_200_OK, data={'msg': _('Test success')})
         except APIException as e:
