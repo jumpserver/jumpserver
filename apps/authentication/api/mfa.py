@@ -36,8 +36,16 @@ class MFASendCodeApi(AuthMixin, CreateAPIView):
     """
     permission_classes = (AllowAny,)
     serializer_class = serializers.MFASelectTypeSerializer
-    username: ''
-    ip: ''
+    username = ''
+    ip = ''
+
+    def get_user_from_db(self, username):
+        try:
+            user = get_object_or_404(User, username=username)
+            return user
+        except Exception as e:
+            self.incr_mfa_failed_time(username, self.ip)
+            raise e
 
     def perform_create(self, serializer):
         username = serializer.validated_data.get('username', '')
@@ -48,8 +56,7 @@ class MFASendCodeApi(AuthMixin, CreateAPIView):
         if not username:
             user = self.get_user_from_session()
         else:
-            user = get_object_or_404(User, username=username)
-        self.username = username
+            user = self.get_user_from_db(username)
 
         mfa_backend = user.get_active_mfa_backend_by_type(mfa_type)
         if not mfa_backend or not mfa_backend.challenge_required:
@@ -59,13 +66,6 @@ class MFASendCodeApi(AuthMixin, CreateAPIView):
             mfa_backend.send_challenge()
         except Exception as e:
             raise UnexpectError(str(e))
-
-    def create(self, request, *args, **kwargs):
-        try:
-            super().create(request, *args, **kwargs)
-        except Exception as e:
-            self.incr_mfa_failed_time(self.username, self.ip)
-            raise e
 
 
 class MFAChallengeVerifyApi(AuthMixin, CreateAPIView):
