@@ -29,7 +29,10 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     search_fields = [
         'title', 'action', 'type', 'status', 'applicant_display'
     ]
-    ordering_fields = ('title', 'applicant_display', 'status', 'state', 'action_display', 'date_created')
+    ordering_fields = (
+        'title', 'applicant_display', 'status', 'state', 'action_display',
+        'date_created', 'serial_num',
+    )
     ordering = ('-date_created', )
 
     def create(self, request, *args, **kwargs):
