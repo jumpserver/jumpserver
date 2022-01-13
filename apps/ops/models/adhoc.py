@@ -9,7 +9,7 @@ from celery import current_task
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, gettext
 
 from common.utils import get_logger, lazyproperty
 from common.fields.model import (
@@ -57,6 +57,17 @@ class Task(PeriodTaskModelMixin, OrgModelMixin):
             return self.latest_execution.is_success
         else:
             return False
+
+    @lazyproperty
+    def display_name(self):
+        sps = ['. ', ': ']
+        spb = {str(sp in self.name): sp for sp in sps}
+        sp = spb.get('True')
+        if not sp:
+            return self.name
+
+        tpl, data = self.name.split(sp, 1)
+        return gettext(tpl + sp) + data
 
     @property
     def timedelta(self):

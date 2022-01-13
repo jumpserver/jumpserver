@@ -4,7 +4,7 @@ import json
 import re
 
 from celery import shared_task
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, gettext_noop
 
 from common.utils import (
     capacity_convert, sum_capacity, get_logger
@@ -94,7 +94,7 @@ def update_assets_hardware_info_util(assets, task_name=None):
     """
     from ops.utils import update_or_create_ansible_task
     if task_name is None:
-        task_name = _("Update some assets hardware info")
+        task_name = gettext_noop("Update some assets hardware info. ")
     tasks = const.UPDATE_ASSETS_HARDWARE_TASKS
     hosts = clean_ansible_task_hosts(assets)
     if not hosts:
@@ -111,13 +111,13 @@ def update_assets_hardware_info_util(assets, task_name=None):
 
 @shared_task(queue="ansible")
 def update_asset_hardware_info_manual(asset):
-    task_name = _("Update asset hardware info: {}").format(asset.hostname)
+    task_name = gettext_noop("Update asset hardware info: ") + str(asset.hostname)
     update_assets_hardware_info_util([asset], task_name=task_name)
 
 
 @shared_task(queue="ansible")
 def update_assets_hardware_info_manual(assets):
-    task_name = _("Update assets hardware info: {}").format([asset.hostname for asset in assets])
+    task_name = gettext_noop("Update assets hardware info: ") + str([asset.hostname for asset in assets])
     update_assets_hardware_info_util(assets, task_name=task_name)
 
 
@@ -134,7 +134,7 @@ def update_assets_hardware_info_period():
 
 @shared_task(queue="ansible")
 def update_node_assets_hardware_info_manual(node):
-    task_name = _("Update node asset hardware information: {}").format(node.name)
+    task_name = gettext_noop("Update node asset hardware information: ") + str(node.name)
     assets = node.get_all_assets()
     result = update_assets_hardware_info_util(assets, task_name=task_name)
     return result
