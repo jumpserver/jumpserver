@@ -294,6 +294,7 @@ function requestApi(props) {
             if (user_fail_message) {
                 msg = user_fail_message;
             } else if (jqXHR.responseJSON) {
+                console.log(responseJSON)
                 if (jqXHR.responseJSON.error) {
                     msg = jqXHR.responseJSON.error
                 } else if (jqXHR.responseJSON.msg) {

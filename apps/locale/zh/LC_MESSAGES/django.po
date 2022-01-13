@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-13 14:05+0800\n"
+"POT-Creation-Date: 2022-01-13 16:57+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1622,7 +1622,11 @@ msgstr "{ApplicationPermission} 移除 {SystemUser}"
 msgid "Invalid token"
 msgstr "无效的令牌"
 
-#: authentication/api/mfa.py:103
+#: authentication/api/mfa.py:50
+msgid "Current user not support mfa type: {}"
+msgstr "当前用户不支持 MFA 类型: {}"
+
+#: authentication/api/mfa.py:97
 msgid "Code is invalid, {}"
 msgstr "验证码无效: {}"
 
@@ -2347,6 +2351,10 @@ msgstr "被其他对象关联，不能删除"
 msgid "This action require verify your MFA"
 msgstr "这个操作需要验证 MFA"
 
+#: common/exceptions.py:53
+msgid "Unexpect error occur"
+msgstr ""
+
 #: common/fields/model.py:80
 msgid "Marshal dict data to char field"
 msgstr "编码 dict 为 char"
@@ -2892,7 +2900,7 @@ msgstr "获取 LDAP 用户为 None"
 msgid "Imported {} users successfully (Organization: {})"
 msgstr "成功导入 {} 个用户 ( 组织: {} )"
 
-#: settings/models.py:196 users/templates/users/reset_password.html:29
+#: settings/models.py:195 users/templates/users/reset_password.html:29
 msgid "Setting"
 msgstr "设置"
 
@@ -6307,6 +6315,9 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "MFA type not support: {}"
+#~ msgstr "MFA 类型不支持：{}"
 
 #~ msgid "Push system users to asset: {}({}) => {}"
 #~ msgstr "推送系统用户到入资产: {}({}) => {}"

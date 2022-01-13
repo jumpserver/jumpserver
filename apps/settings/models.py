@@ -79,7 +79,6 @@ class Setting(models.Model):
         item.refresh_setting()
 
     def refresh_setting(self):
-        logger.debug(f"Refresh setting: {self.name}")
         if hasattr(self.__class__, f'refresh_{self.name}'):
             getattr(self.__class__, f'refresh_{self.name}')()
         else:

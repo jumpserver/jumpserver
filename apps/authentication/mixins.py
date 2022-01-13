@@ -335,6 +335,11 @@ class MFAMixin:
         mfa_backends = User.get_user_mfa_backends(user)
         return {'mfa_backends': mfa_backends}
 
+    @staticmethod
+    def incr_mfa_failed_time(username, ip):
+        util = MFABlockUtils(username, ip)
+        util.incr_failed_count()
+
 
 class AuthPostCheckMixin:
     @classmethod
