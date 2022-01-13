@@ -9,12 +9,12 @@ from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from perms.models import AssetPermission, Action
 from assets.models import Asset, Node, SystemUser
 from users.models import User, UserGroup
-from ..base import ActionsField
+from ..base import ActionsField, BasePermissionSerializer
 
 __all__ = ['AssetPermissionSerializer']
 
 
-class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
+class AssetPermissionSerializer(BasePermissionSerializer):
     actions = ActionsField(required=False, allow_null=True, label=_("Actions"))
     is_valid = serializers.BooleanField(read_only=True, label=_("Is valid"))
     is_expired = serializers.BooleanField(read_only=True, label=_('Is expired'))

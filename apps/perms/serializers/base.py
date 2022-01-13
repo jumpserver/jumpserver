@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from perms.models import Action
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
-__all__ = ['ActionsDisplayField', 'ActionsField']
+__all__ = ['ActionsDisplayField', 'ActionsField', 'BasePermissionSerializer']
 
 
 class ActionsField(serializers.MultipleChoiceField):
@@ -24,3 +25,21 @@ class ActionsDisplayField(ActionsField):
         choices = dict(Action.CHOICES)
         return [choices.get(i) for i in values]
 
+
+class BasePermissionSerializer(BulkOrgResourceModelSerializer):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.set_actions_field()
+
+    def set_actions_field(self):
+        actions = self.fields.get('actions')
+        if not actions:
+            return
+        choices = actions._choices
+        choices = self._filter_actions_choices(choices)
+        actions._choices = choices
+        actions.default = list(choices.keys())
+
+    def _filter_actions_choices(self, choices):
+        return choices
