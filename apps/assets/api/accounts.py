@@ -66,7 +66,9 @@ class AccountViewSet(OrgBulkModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset() \
             .annotate(ip=F('asset__ip')) \
-            .annotate(hostname=F('asset__hostname'))
+            .annotate(hostname=F('asset__hostname')) \
+            .annotate(platform=F('asset__platform__name')) \
+            .annotate(protocols=F('asset__protocols'))
         return queryset
 
     @action(methods=['post'], detail=True, url_path='verify')

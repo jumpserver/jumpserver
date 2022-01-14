@@ -1,15 +1,19 @@
 import os
 import time
 import pandas as pd
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
+from rest_framework import serializers
 
-from assets.models import AuthBook, Asset, BaseUser, ProtocolsMixin
+from assets.models import AuthBook
+from assets.api import AccountViewSet
+from assets.serializers import AccountSecretSerializer
 from assets.notifications import AccountBackupExecutionTaskMsg
-from applications.models import Account, Application
+from applications.api import ApplicationAccountViewSet
 from applications.const import AppType
+from applications.serializers import AppAccountSecretSerializer
 from users.models import User
 from common.utils import get_logger
 from common.utils.timezone import local_now_display
@@ -20,7 +24,55 @@ logger = get_logger(__file__)
 PATH = os.path.join(os.path.dirname(settings.BASE_DIR), 'tmp')
 
 
-class AssetAccountHandler:
+class BaseAccountHandler:
+    @classmethod
+    def unpack_data(cls, serializer_data, data=None):
+        if data is None:
+            data = {}
+        for k, v in serializer_data.items():
+            if isinstance(v, OrderedDict):
+                cls.unpack_data(v, data)
+            else:
+                data[k] = v
+        return data
+
+    @classmethod
+    def get_header_backup_fields(cls, serializer, fields=None, fields_backup=None):
+        if fields_backup is None:
+            fields_backup = []
+        if fields is None:
+            fields = {}
+        try:
+            backup = serializer.Meta.fields_backup
+        except AttributeError:
+            backup = serializer.fields.keys()
+
+        for field in backup:
+            fields_backup.append(field)
+
+        for k, v in serializer.fields.items():
+            if isinstance(v, serializers.Serializer):
+                cls.get_header_backup_fields(v, fields, fields_backup)
+            else:
+                fields[k] = v.label
+        return fields, fields_backup
+
+    @classmethod
+    def create_row(cls, account, serializer):
+        serializer = serializer(account)
+        data = cls.unpack_data(serializer.data)
+        header, fields_backup = cls.get_header_backup_fields(serializer)
+        row = {}
+        fields_backup = fields_backup + [
+            'username', 'password', 'private_key', 'public_key',
+            'date_created', 'date_updated', 'version'
+        ]
+        for field in fields_backup:
+            row[header[field]] = data[field]
+        return row
+
+
+class AssetAccountHandler(BaseAccountHandler):
     @staticmethod
     def get_filename(plan_name):
         filename = os.path.join(
@@ -28,32 +80,24 @@ class AssetAccountHandler:
         )
         return filename
 
-    @staticmethod
-    def create_df():
+    @classmethod
+    def create_df(cls):
         df_dict = defaultdict(list)
         label_key = AuthBook._meta.verbose_name
-        accounts = AuthBook.objects.all().prefetch_related('systemuser', 'asset')
+        accounts = AccountViewSet().get_queryset()
         for account in accounts:
             account.load_auth()
-            protocol = account.asset.protocol
-            protocol_label = getattr(ProtocolsMixin.Protocol, protocol).label
-            row = {
-                getattr(Asset, 'hostname').field.verbose_name: account.asset.hostname,
-                getattr(Asset, 'ip').field.verbose_name: account.asset.ip,
-            }
-            secret_row = AccountBackupHandler.create_secret_row(account)
-            row.update(secret_row)
-            row.update({
-                getattr(Asset, 'protocol').field.verbose_name: protocol_label,
-                getattr(AuthBook, 'version').field.verbose_name: account.version
-            })
+            row = cls.create_row(account, AccountSecretSerializer)
             df_dict[label_key].append(row)
         for k, v in df_dict.items():
             df_dict[k] = pd.DataFrame(v)
+        logger.info(
+            '\n\033[33m- 共收集{}条资产账号\033[0m'.format(accounts.count())
+        )
         return df_dict
 
 
-class AppAccountHandler:
+class AppAccountHandler(BaseAccountHandler):
     @staticmethod
     def get_filename(plan_name):
         filename = os.path.join(
@@ -61,10 +105,10 @@ class AppAccountHandler:
         )
         return filename
 
-    @staticmethod
-    def create_df():
+    @classmethod
+    def create_df(cls):
         df_dict = defaultdict(list)
-        accounts = Account.objects.all().prefetch_related('systemuser', 'app')
+        accounts = ApplicationAccountViewSet().get_queryset()
         for account in accounts:
             account.load_auth()
             app_type = account.app.type
@@ -72,18 +116,13 @@ class AppAccountHandler:
                 label_key = getattr(AppType, 'pgsql').label
             else:
                 label_key = getattr(AppType, app_type).label
-            row = {
-                getattr(Application, 'name').field.verbose_name: account.app.name,
-                getattr(Application, 'attrs').field.verbose_name: account.app.attrs
-            }
-            secret_row = AccountBackupHandler.create_secret_row(account)
-            row.update(secret_row)
-            row.update({
-                getattr(Account, 'version').field.verbose_name: account.version
-            })
+            row = cls.create_row(account, AppAccountSecretSerializer)
             df_dict[label_key].append(row)
         for k, v in df_dict.items():
             df_dict[k] = pd.DataFrame(v)
+        logger.info(
+            '\n\033[33m- 共收集{}条应用账号\033[0m'.format(accounts.count())
+        )
         return df_dict
 
 
@@ -102,7 +141,7 @@ class AccountBackupHandler:
     def create_excel(self):
         logger.info(
             '\n'
-            '\033[32m>>> 正在生成资产及应用相关备份信息文件\033[0m'
+            '\033[32m>>> 正在生成资产或应用相关备份信息文件\033[0m'
             ''
         )
         # Print task start date
@@ -191,13 +230,3 @@ class AccountBackupHandler:
             logger.info('\n任务结束: {}'.format(local_now_display()))
             timedelta = round((time.time() - time_start), 2)
             logger.info('用时: {}'.format(timedelta))
-
-    @staticmethod
-    def create_secret_row(instance):
-        row = {
-            getattr(BaseUser, 'username').field.verbose_name: instance.username,
-            getattr(BaseUser, 'password').field.verbose_name: instance.password,
-            getattr(BaseUser, 'private_key').field.verbose_name: instance.private_key,
-            getattr(BaseUser, 'public_key').field.verbose_name: instance.public_key
-        }
-        return row

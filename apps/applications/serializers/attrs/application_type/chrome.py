@@ -3,8 +3,7 @@ from rest_framework import serializers
 
 from ..application_category import RemoteAppSerializer
 
-
-__all__ = ['ChromeSerializer']
+__all__ = ['ChromeSerializer', 'ChromeSecretSerializer']
 
 
 class ChromeSerializer(RemoteAppSerializer):
@@ -24,3 +23,9 @@ class ChromeSerializer(RemoteAppSerializer):
         allow_null=True
     )
 
+
+class ChromeSecretSerializer(ChromeSerializer):
+    chrome_password = serializers.CharField(
+        max_length=128, allow_blank=True, required=False, read_only=True, label=_('Password'),
+        allow_null=True
+    )

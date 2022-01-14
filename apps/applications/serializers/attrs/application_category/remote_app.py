@@ -10,7 +10,6 @@ from assets.models import Asset
 
 logger = get_logger(__file__)
 
-
 __all__ = ['RemoteAppSerializer']
 
 

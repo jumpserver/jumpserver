@@ -1,11 +1,9 @@
-
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from ..application_category import RemoteAppSerializer
 
-
-__all__ = ['CustomSerializer']
+__all__ = ['CustomSerializer', 'CustomSecretSerializer']
 
 
 class CustomSerializer(RemoteAppSerializer):
@@ -23,5 +21,12 @@ class CustomSerializer(RemoteAppSerializer):
     )
     custom_password = serializers.CharField(
         max_length=128, allow_blank=True, required=False, write_only=True, label=_('Password'),
+        allow_null=True,
+    )
+
+
+class CustomSecretSerializer(RemoteAppSerializer):
+    custom_password = serializers.CharField(
+        max_length=128, allow_blank=True, required=False, read_only=True, label=_('Password'),
         allow_null=True,
     )

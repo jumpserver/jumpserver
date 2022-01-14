@@ -1,6 +1,5 @@
 # coding: utf-8
 #
-
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
@@ -9,7 +8,8 @@ from assets.serializers.base import AuthSerializerMixin
 from common.drf.serializers import MethodSerializer
 from .attrs import (
     category_serializer_classes_mapping,
-    type_serializer_classes_mapping
+    type_serializer_classes_mapping,
+    type_secret_serializer_classes_mapping
 )
 from .. import models
 from .. import const
@@ -23,17 +23,28 @@ __all__ = [
 class AppSerializerMixin(serializers.Serializer):
     attrs = MethodSerializer()
 
+    @property
+    def app(self):
+        if isinstance(self.instance, models.Application):
+            instance = self.instance
+        else:
+            instance = None
+        return instance
+
     def get_attrs_serializer(self):
         default_serializer = serializers.Serializer(read_only=True)
-        if isinstance(self.instance, models.Application):
-            _type = self.instance.type
-            _category = self.instance.category
+        instance = self.app
+        if instance:
+            _type = instance.type
+            _category = instance.category
         else:
             _type = self.context['request'].query_params.get('type')
             _category = self.context['request'].query_params.get('category')
-
         if _type:
-            serializer_class = type_serializer_classes_mapping.get(_type)
+            if isinstance(self, AppAccountSecretSerializer):
+                serializer_class = type_secret_serializer_classes_mapping.get(_type)
+            else:
+                serializer_class = type_serializer_classes_mapping.get(_type)
         elif _category:
             serializer_class = category_serializer_classes_mapping.get(_category)
         else:
@@ -84,11 +95,13 @@ class MiniAppSerializer(serializers.ModelSerializer):
         fields = AppSerializer.Meta.fields_mini
 
 
-class AppAccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
+class AppAccountSerializer(AppSerializerMixin, AuthSerializerMixin, BulkOrgResourceModelSerializer):
     category = serializers.ChoiceField(label=_('Category'), choices=const.AppCategory.choices, read_only=True)
     category_display = serializers.SerializerMethodField(label=_('Category display'))
     type = serializers.ChoiceField(label=_('Type'), choices=const.AppType.choices, read_only=True)
     type_display = serializers.SerializerMethodField(label=_('Type display'))
+    date_created = serializers.DateTimeField(label=_('Date created'), format="%Y/%m/%d %H:%M:%S", read_only=True)
+    date_updated = serializers.DateTimeField(label=_('Date updated'), format="%Y/%m/%d %H:%M:%S", read_only=True)
 
     category_mapper = dict(const.AppCategory.choices)
     type_mapper = dict(const.AppType.choices)
@@ -97,9 +110,10 @@ class AppAccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         model = models.Account
         fields_mini = ['id', 'username', 'version']
         fields_write_only = ['password', 'private_key', 'passphrase']
+        fields_other = ['date_created', 'date_updated']
         fields_fk = ['systemuser', 'systemuser_display', 'app', 'app_display']
-        fields = fields_mini + fields_fk + fields_write_only + [
-            'type', 'type_display', 'category', 'category_display',
+        fields = fields_mini + fields_fk + fields_write_only + fields_other + [
+            'type', 'type_display', 'category', 'category_display', 'attrs'
         ]
         extra_kwargs = {
             'username': {'default': '', 'required': False},
@@ -111,6 +125,14 @@ class AppAccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         model_bulk_create_kwargs = {
             'ignore_conflicts': True
         }
+
+    @property
+    def app(self):
+        if isinstance(self.instance, models.Account):
+            instance = self.instance.app
+        else:
+            instance = None
+        return instance
 
     def get_category_display(self, obj):
         return self.category_mapper.get(obj.category)
@@ -131,6 +153,7 @@ class AppAccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
 
 class AppAccountSecretSerializer(AppAccountSerializer):
     class Meta(AppAccountSerializer.Meta):
+        fields_backup = ['app_display']
         extra_kwargs = {
             'password': {'write_only': False},
             'private_key': {'write_only': False},

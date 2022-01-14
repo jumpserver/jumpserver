@@ -3,8 +3,7 @@ from rest_framework import serializers
 
 from ..application_category import RemoteAppSerializer
 
-
-__all__ = ['MySQLWorkbenchSerializer']
+__all__ = ['MySQLWorkbenchSerializer', 'MySQLWorkbenchSecretSerializer']
 
 
 class MySQLWorkbenchSerializer(RemoteAppSerializer):
@@ -32,5 +31,12 @@ class MySQLWorkbenchSerializer(RemoteAppSerializer):
     )
     mysql_workbench_password = serializers.CharField(
         max_length=128, allow_blank=True, required=False, write_only=True, label=_('Password'),
+        allow_null=True,
+    )
+
+
+class MySQLWorkbenchSecretSerializer(RemoteAppSerializer):
+    mysql_workbench_password = serializers.CharField(
+        max_length=128, allow_blank=True, required=False, read_only=True, label=_('Password'),
         allow_null=True,
     )

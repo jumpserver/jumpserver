@@ -11,10 +11,18 @@ from .utils import validate_password_contains_left_double_curly_bracket
 class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     ip = serializers.ReadOnlyField(label=_("IP"))
     hostname = serializers.ReadOnlyField(label=_("Hostname"))
+    platform = serializers.ReadOnlyField(label=_("Platform"))
+    protocols = serializers.SerializerMethodField(label=_("Protocols"))
+    date_created = serializers.DateTimeField(
+        label=_('Date created'), format="%Y/%m/%d %H:%M:%S", read_only=True
+    )
+    date_updated = serializers.DateTimeField(
+        label=_('Date updated'), format="%Y/%m/%d %H:%M:%S", read_only=True
+    )
 
     class Meta:
         model = AuthBook
-        fields_mini = ['id', 'username', 'ip', 'hostname', 'version']
+        fields_mini = ['id', 'username', 'ip', 'hostname', 'platform', 'protocols', 'version']
         fields_write_only = ['password', 'private_key', "public_key", 'passphrase']
         fields_other = ['date_created', 'date_updated', 'connectivity', 'date_verified', 'comment']
         fields_small = fields_mini + fields_write_only + fields_other
@@ -32,6 +40,9 @@ class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         }
         ref_name = 'AssetAccountSerializer'
 
+    def get_protocols(self, v):
+        return v.protocols.replace(' ', ', ')
+
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
@@ -45,6 +56,7 @@ class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
 
 class AccountSecretSerializer(AccountSerializer):
     class Meta(AccountSerializer.Meta):
+        fields_backup = ['hostname', 'ip', 'platform', 'protocols']
         extra_kwargs = {
             'password': {'write_only': False},
             'private_key': {'write_only': False},
