@@ -260,7 +260,7 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         date_created = as_current_tz(self.date_created)
         date_prefix = date_created.strftime('%Y%m%d')
 
-        ticket = Ticket.objects.select_for_update().filter(
+        ticket = Ticket.all().select_for_update().filter(
             serial_num__startswith=date_prefix
         ).order_by('-date_created').first()
 
