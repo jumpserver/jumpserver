@@ -16,16 +16,16 @@ class ChromeSerializer(RemoteAppSerializer):
         max_length=128, allow_blank=True, required=False, label=_('Target URL'), allow_null=True,
     )
     chrome_username = serializers.CharField(
-        max_length=128, allow_blank=True, required=False, label=_('Username'), allow_null=True,
+        max_length=128, allow_blank=True, required=False, label=_('Chrome username'), allow_null=True,
     )
     chrome_password = serializers.CharField(
-        max_length=128, allow_blank=True, required=False, write_only=True, label=_('Password'),
+        max_length=128, allow_blank=True, required=False, write_only=True, label=_('Chrome password'),
         allow_null=True
     )
 
 
 class ChromeSecretSerializer(ChromeSerializer):
     chrome_password = serializers.CharField(
-        max_length=128, allow_blank=True, required=False, read_only=True, label=_('Password'),
+        max_length=128, allow_blank=True, required=False, read_only=True, label=_('Chrome password'),
         allow_null=True
     )

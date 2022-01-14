@@ -26,17 +26,17 @@ class MySQLWorkbenchSerializer(RemoteAppSerializer):
         allow_null=True,
     )
     mysql_workbench_username = serializers.CharField(
-        max_length=128, allow_blank=True, required=False, label=_('Username'),
+        max_length=128, allow_blank=True, required=False, label=_('Mysql workbench username'),
         allow_null=True,
     )
     mysql_workbench_password = serializers.CharField(
-        max_length=128, allow_blank=True, required=False, write_only=True, label=_('Password'),
+        max_length=128, allow_blank=True, required=False, write_only=True, label=_('Mysql workbench password'),
         allow_null=True,
     )
 
 
 class MySQLWorkbenchSecretSerializer(RemoteAppSerializer):
     mysql_workbench_password = serializers.CharField(
-        max_length=128, allow_blank=True, required=False, read_only=True, label=_('Password'),
+        max_length=128, allow_blank=True, required=False, read_only=True, label=_('Mysql workbench password'),
         allow_null=True,
     )

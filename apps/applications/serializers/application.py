@@ -109,7 +109,7 @@ class AppAccountSerializer(AppSerializerMixin, AuthSerializerMixin, BulkOrgResou
     class Meta:
         model = models.Account
         fields_mini = ['id', 'username', 'version']
-        fields_write_only = ['password', 'private_key', 'passphrase']
+        fields_write_only = ['password', 'private_key', 'public_key', 'passphrase']
         fields_other = ['date_created', 'date_updated']
         fields_fk = ['systemuser', 'systemuser_display', 'app', 'app_display']
         fields = fields_mini + fields_fk + fields_write_only + fields_other + [
@@ -153,7 +153,10 @@ class AppAccountSerializer(AppSerializerMixin, AuthSerializerMixin, BulkOrgResou
 
 class AppAccountSecretSerializer(AppAccountSerializer):
     class Meta(AppAccountSerializer.Meta):
-        fields_backup = ['app_display']
+        fields_backup = [
+            'id', 'app_display', 'attrs', 'username', 'password', 'private_key',
+            'public_key', 'date_created', 'date_updated', 'version'
+        ]
         extra_kwargs = {
             'password': {'write_only': False},
             'private_key': {'write_only': False},

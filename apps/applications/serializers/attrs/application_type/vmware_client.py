@@ -22,17 +22,17 @@ class VMwareClientSerializer(RemoteAppSerializer):
         allow_null=True
     )
     vmware_username = serializers.CharField(
-        max_length=128, allow_blank=True, required=False, label=_('Username'),
+        max_length=128, allow_blank=True, required=False, label=_('Vmware username'),
         allow_null=True
     )
     vmware_password = serializers.CharField(
-        max_length=128, allow_blank=True, required=False, write_only=True, label=_('Password'),
+        max_length=128, allow_blank=True, required=False, write_only=True, label=_('Vmware password'),
         allow_null=True
     )
 
 
 class VMwareClientSecretSerializer(RemoteAppSerializer):
     vmware_password = serializers.CharField(
-        max_length=128, allow_blank=True, required=False, read_only=True, label=_('Password'),
+        max_length=128, allow_blank=True, required=False, read_only=True, label=_('Vmware password'),
         allow_null=True
     )
