@@ -195,7 +195,8 @@ class Ticket(CommonModelMixin, OrgModelMixin):
     def update_current_step_state_and_assignee(self, processor, state):
         if self.status_closed:
             raise AlreadyClosed
-        self.state = state
+        if state != TicketState.approved:
+            self.state = state
         current_node = self.current_node
         current_node.update(state=state)
         current_node.first().ticket_assignees.filter(assignee=processor).update(state=state)
