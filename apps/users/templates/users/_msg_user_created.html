@@ -6,7 +6,7 @@
 
 <div>
     <p>
-        {{ content }}
+        {{ content | safe }}
     </p>
     <p>
         {% trans 'Username' %}: {{ user.username }} <br />
