@@ -62,8 +62,6 @@ class MFASendCodeApi(AuthMixin, CreateAPIView):
         username = serializer.validated_data.get('username', '')
         mfa_type = serializer.validated_data['type']
 
-        self.ip = self.get_request_ip()
-        self.check_mfa_is_block(username, self.ip)
         if not username:
             user = self.get_user_from_session()
         else:
