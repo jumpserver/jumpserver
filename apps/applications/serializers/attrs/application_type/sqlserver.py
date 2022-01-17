@@ -3,7 +3,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from ..application_category import DBSerializer
 
-
 __all__ = ['SQLServerSerializer']
 
 

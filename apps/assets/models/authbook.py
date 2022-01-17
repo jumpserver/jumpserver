@@ -2,6 +2,7 @@
 #
 
 from django.db import models
+from django.db.models import F
 from django.utils.translation import ugettext_lazy as _
 from simple_history.models import HistoricalRecords
 
@@ -115,6 +116,15 @@ class AuthBook(BaseUser, AbsConnectivity):
         self.asset.admin_user = self.systemuser
         self.asset.save()
         logger.debug('Update asset admin user: {} {}'.format(self.asset, self.systemuser))
+
+    @classmethod
+    def get_queryset(cls):
+        queryset = cls.objects.all() \
+            .annotate(ip=F('asset__ip')) \
+            .annotate(hostname=F('asset__hostname')) \
+            .annotate(platform=F('asset__platform__name')) \
+            .annotate(protocols=F('asset__protocols'))
+        return queryset
 
     def __str__(self):
         return self.smart_name
