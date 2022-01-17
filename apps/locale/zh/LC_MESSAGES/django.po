@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-13 16:57+0800\n"
+"POT-Creation-Date: 2022-01-17 19:06+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -436,8 +436,6 @@ msgid "Target url"
 msgstr "目标URL"
 
 #: applications/serializers/attrs/application_type/custom.py:19
-#, fuzzy
-#| msgid "Custom username"
 msgid "Custom Username"
 msgstr "自定义用户名"
 
@@ -1657,11 +1655,11 @@ msgstr "{ApplicationPermission} 移除 {SystemUser}"
 msgid "Invalid token"
 msgstr "无效的令牌"
 
-#: authentication/api/mfa.py:50
+#: authentication/api/mfa.py:72
 msgid "Current user not support mfa type: {}"
 msgstr "当前用户不支持 MFA 类型: {}"
 
-#: authentication/api/mfa.py:97
+#: authentication/api/mfa.py:119
 msgid "Code is invalid, {}"
 msgstr "验证码无效: {}"
 
@@ -4978,7 +4976,7 @@ msgstr "流程"
 msgid "TicketFlow"
 msgstr "工单流程"
 
-#: tickets/models/ticket.py:296
+#: tickets/models/ticket.py:297
 msgid "Please try again"
 msgstr "请再次尝试"
 
