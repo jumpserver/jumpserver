@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-15 22:47+0800\n"
+"POT-Creation-Date: 2022-01-13 16:57+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1657,11 +1657,11 @@ msgstr "{ApplicationPermission} 移除 {SystemUser}"
 msgid "Invalid token"
 msgstr "无效的令牌"
 
-#: authentication/api/mfa.py:63
+#: authentication/api/mfa.py:50
 msgid "Current user not support mfa type: {}"
 msgstr "当前用户不支持 MFA 类型: {}"
 
-#: authentication/api/mfa.py:110
+#: authentication/api/mfa.py:97
 msgid "Code is invalid, {}"
 msgstr "验证码无效: {}"
 

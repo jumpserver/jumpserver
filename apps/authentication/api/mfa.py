@@ -47,12 +47,21 @@ class MFASendCodeApi(AuthMixin, CreateAPIView):
             self.incr_mfa_failed_time(username, self.ip)
             raise e
 
+    def get_user_from_db(self, username):
+        """避免暴力测试用户名"""
+        ip = self.get_request_ip()
+        self.check_mfa_is_block(username, ip)
+        try:
+            user = get_object_or_404(User, username=username)
+            return user
+        except Exception as e:
+            self.incr_mfa_failed_time(username, ip)
+            raise e
+
     def perform_create(self, serializer):
         username = serializer.validated_data.get('username', '')
         mfa_type = serializer.validated_data['type']
 
-        self.ip = self.get_request_ip()
-        self.check_mfa_is_block(username, self.ip)
         if not username:
             user = self.get_user_from_session()
         else:
