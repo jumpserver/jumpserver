@@ -3,6 +3,7 @@ from django.db import models
 from django.db.models import Q
 
 from common.db.models import JMSModel
+from common.utils import lazyproperty
 from orgs.utils import current_org
 from .role import Role
 from ..const import Scope
@@ -71,6 +72,14 @@ class RoleBinding(JMSModel):
         roles_id = bindings.values_list('role', flat=True).distinct()
         return Role.objects.filter(id__in=roles_id)
 
+    @lazyproperty
+    def user_display(self):
+        return self.user.name
+
+    @lazyproperty
+    def role_display(self):
+        return self.role.display_name
+
 
 class OrgRoleBindingManager(models.Manager):
     def get_queryset(self):
@@ -78,7 +87,7 @@ class OrgRoleBindingManager(models.Manager):
         if current_org.is_root():
             return queryset.none()
 
-        queryset = queryset.filter(org=current_org)
+        queryset = queryset.filter(org=current_org.id)
         return queryset
 
 

@@ -187,7 +187,7 @@ class RoleManager(models.Manager):
     @property
     def display(self):
         roles = sorted(list(self.all()), key=lambda r: r.scope)
-        roles_display = [role.name_display for role in roles]
+        roles_display = [role.display_name for role in roles]
         return ', '.join(roles_display)
 
     @property

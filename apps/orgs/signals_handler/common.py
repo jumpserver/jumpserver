@@ -154,6 +154,7 @@ def _clear_users_from_org(org, users):
 
     _remove_users(CommandFilterRule, users, org, user_field_name='reviewers')
 
+
 #
 # @receiver(m2m_changed, sender=OrganizationMember)
 # def on_org_user_changed(action, instance, reverse, pk_set, **kwargs):

@@ -1,22 +1,30 @@
 from django.db.models import Count
-from rest_framework.exceptions import PermissionDenied
 from django.utils.translation import ugettext as _
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.decorators import action
 
 from common.drf.api import JMSModelViewSet
-from ..serializers import RoleSerializer, RoleBindingSerializer
-from ..models import Role, RoleBinding
+from ..serializers import RoleSerializer, RoleUserSerializer
+from ..models import Role, SystemRole, OrgRole
 from .permission import PermissionViewSet
 
-__all__ = ['RoleViewSet', 'RoleBindingViewSet', 'RolePermissionsViewSet']
+__all__ = [
+    'RoleViewSet', 'RolePermissionsViewSet',
+    'SystemRoleViewSet', 'OrgRoleViewSet'
+]
 
 
 class RoleViewSet(JMSModelViewSet):
     queryset = Role.objects.all()
     serializer_classes = {
-        'default': RoleSerializer
+        'default': RoleSerializer,
+        'users': RoleUserSerializer,
     }
     filterset_fields = ['name', 'scope', 'builtin']
     search_fields = filterset_fields
+    rbac_perms = {
+        'users': 'rbac.view_rolebinding'
+    }
 
     def perform_destroy(self, instance):
         if instance.builtin:
@@ -36,14 +44,22 @@ class RoleViewSet(JMSModelViewSet):
             .annotate(permissions_amount=Count('permissions'))
         return queryset
 
+    @action(methods=['GET'], detail=True)
+    def users(self, *args, **kwargs):
+        role = self.get_object()
+        queryset = role.users
+        return self.get_paginated_response_with_query_set(queryset)
 
-class RoleBindingViewSet(JMSModelViewSet):
-    queryset = RoleBinding.objects.all()
-    serializer_class = RoleBindingSerializer
-    filterset_fields = ['scope', 'user', 'role', 'org']
-    search_fields = filterset_fields
+
+class SystemRoleViewSet(RoleViewSet):
+    queryset = SystemRole.objects.all()
 
 
+class OrgRoleViewSet(RoleViewSet):
+    queryset = OrgRole.objects.all()
+
+
+# Sub view set
 class RolePermissionsViewSet(PermissionViewSet):
     rbac_perms = (
         ('get_tree', 'role.view_role'),

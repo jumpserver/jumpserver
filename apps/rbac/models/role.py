@@ -7,7 +7,7 @@ from .permission import Permission
 from ..builtin import BuiltinRole
 from .. import const
 
-__all__ = ['Role']
+__all__ = ['Role', 'SystemRole', 'OrgRole']
 
 
 class SystemRoleManager(models.Manager):
@@ -113,7 +113,7 @@ class Role(JMSModel):
         BuiltinRole.sync_to_db()
 
     @property
-    def name_display(self):
+    def display_name(self):
         if not self.builtin:
             return self.name
         return gettext(self.name)
