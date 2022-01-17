@@ -84,6 +84,12 @@ class CommandStore():
                     },
                     "org_id": {
                         "type": "keyword"
+                    },
+                    "@timestamp": {
+                        "type": "date"
+                    },
+                    "timestamp": {
+                        "type": "long"
                     }
                 }
             }
