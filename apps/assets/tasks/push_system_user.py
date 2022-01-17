@@ -3,7 +3,7 @@
 from itertools import groupby
 from celery import shared_task
 from common.db.utils import get_object_if_need, get_objects
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, gettext_noop
 from django.db.models import Empty, Q
 
 from common.utils import encrypt_password, get_logger
@@ -279,7 +279,7 @@ def push_system_user_to_assets_manual(system_user, username=None):
     """
     system_user = get_object_if_need(SystemUser, system_user)
     assets = system_user.get_related_assets()
-    task_name = _("Push system users to assets: {}").format(system_user.name)
+    task_name = gettext_noop("Push system users to assets: ") + system_user.name
     return push_system_user_util(system_user, assets, task_name=task_name, username=username)
 
 
@@ -291,7 +291,7 @@ def push_system_user_a_asset_manual(system_user, asset, username=None):
     """
     # if username is None:
     #     username = system_user.username
-    task_name = _("Push system users to asset: {}({}) => {}").format(
+    task_name = gettext_noop("Push system users to asset: ") + "{}({}) => {}".format(
         system_user.name, username, asset
     )
     return push_system_user_util(system_user, [asset], task_name=task_name, username=username)
@@ -312,7 +312,7 @@ def push_system_user_to_assets(system_user_id, asset_ids, username=None):
     """
     system_user = SystemUser.objects.get(id=system_user_id)
     assets = get_objects(Asset, asset_ids)
-    task_name = _("Push system users to assets: {}").format(system_user.name)
+    task_name = gettext_noop("Push system users to assets: ") + system_user.name
 
     return push_system_user_util(system_user, assets, task_name, username=username)
 

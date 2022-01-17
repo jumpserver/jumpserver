@@ -56,7 +56,7 @@ class TaskSerializer(BulkOrgResourceModelSerializer):
 
     class Meta:
         model = Task
-        fields_mini = ['id', 'name']
+        fields_mini = ['id', 'name', 'display_name']
         fields_small = fields_mini + [
             'interval', 'crontab',
             'is_periodic', 'is_deleted',

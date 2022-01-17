@@ -335,6 +335,11 @@ class MFAMixin:
         mfa_backends = User.get_user_mfa_backends(user)
         return {'mfa_backends': mfa_backends}
 
+    @staticmethod
+    def incr_mfa_failed_time(username, ip):
+        util = MFABlockUtils(username, ip)
+        util.incr_failed_count()
+
 
 class AuthPostCheckMixin:
     @classmethod
@@ -450,7 +455,10 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, MFAMixin, AuthPost
         )
         if not user:
             self.raise_credential_error(errors.reason_password_failed)
-        elif user.is_expired:
+
+        self.request.session['auth_backend'] = getattr(user, 'backend', settings.AUTH_BACKEND_MODEL)
+
+        if user.is_expired:
             self.raise_credential_error(errors.reason_user_expired)
         elif not user.is_active:
             self.raise_credential_error(errors.reason_user_inactive)

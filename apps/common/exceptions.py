@@ -45,3 +45,9 @@ class MFAVerifyRequired(JMSException):
     status_code = status.HTTP_400_BAD_REQUEST
     default_code = 'mfa_verify_required'
     default_detail = _('This action require verify your MFA')
+
+
+class UnexpectError(JMSException):
+    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    default_code = 'unexpect_error'
+    default_detail = _('Unexpect error occur')

@@ -4,7 +4,7 @@ import re
 from collections import defaultdict
 
 from celery import shared_task
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext_noop
 from django.utils import timezone
 
 from orgs.utils import tmp_to_org, org_aware_func
@@ -108,7 +108,7 @@ def add_asset_users(assets, results):
 def gather_asset_users(assets, task_name=None):
     from ops.utils import update_or_create_ansible_task
     if task_name is None:
-        task_name = _("Gather assets users")
+        task_name = gettext_noop("Gather assets users")
     assets = clean_ansible_task_hosts(assets)
     if not assets:
         return

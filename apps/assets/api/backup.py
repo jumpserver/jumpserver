@@ -32,8 +32,8 @@ class AccountBackupPlanExecutionViewSet(
     mixins.RetrieveModelMixin, viewsets.GenericViewSet
 ):
     serializer_class = serializers.AccountBackupPlanExecutionSerializer
-    search_fields = ('trigger', 'plan_id')
-    filterset_fields = search_fields
+    search_fields = ('trigger',)
+    filterset_fields = ('trigger', 'plan_id')
     permission_classes = (IsOrgAdmin,)
 
     def get_queryset(self):

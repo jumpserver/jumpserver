@@ -5,9 +5,10 @@ import time
 
 from django.conf import settings
 from celery import shared_task, subtask
+
 from celery.exceptions import SoftTimeLimitExceeded
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, gettext
 
 from common.utils import get_logger, get_object_or_none, get_log_keep_day
 from orgs.utils import tmp_to_root_org, tmp_to_org
@@ -141,10 +142,10 @@ def hello(name, callback=None):
     import time
 
     count = User.objects.count()
-    print("Hello {}".format(name))
+    print(gettext("Hello") + ': ' + name)
     print("Count: ", count)
     time.sleep(1)
-    return count
+    return gettext("Hello")
 
 
 @shared_task
@@ -177,3 +178,4 @@ def add_m(x):
         s.append(add.s(i))
     res = chain(*tuple(s))()
     return res
+

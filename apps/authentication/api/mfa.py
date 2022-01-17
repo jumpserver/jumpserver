@@ -12,6 +12,7 @@ from rest_framework.response import Response
 
 from common.permissions import IsValidUser, NeedMFAVerify
 from common.utils import get_logger
+from common.exceptions import UnexpectError
 from users.models.user import User
 from ..serializers import OtpVerifySerializer
 from .. import serializers
@@ -35,30 +36,45 @@ class MFASendCodeApi(AuthMixin, CreateAPIView):
     """
     permission_classes = (AllowAny,)
     serializer_class = serializers.MFASelectTypeSerializer
+    username = ''
+    ip = ''
+
+    def get_user_from_db(self, username):
+        try:
+            user = get_object_or_404(User, username=username)
+            return user
+        except Exception as e:
+            self.incr_mfa_failed_time(username, self.ip)
+            raise e
+
+    def get_user_from_db(self, username):
+        """避免暴力测试用户名"""
+        ip = self.get_request_ip()
+        self.check_mfa_is_block(username, ip)
+        try:
+            user = get_object_or_404(User, username=username)
+            return user
+        except Exception as e:
+            self.incr_mfa_failed_time(username, ip)
+            raise e
 
     def perform_create(self, serializer):
         username = serializer.validated_data.get('username', '')
         mfa_type = serializer.validated_data['type']
+
         if not username:
             user = self.get_user_from_session()
         else:
-            user = get_object_or_404(User, username=username)
+            user = self.get_user_from_db(username)
 
         mfa_backend = user.get_active_mfa_backend_by_type(mfa_type)
         if not mfa_backend or not mfa_backend.challenge_required:
-            raise ValidationError('MFA type not support: {} {}'.format(mfa_type, mfa_backend))
-        mfa_backend.send_challenge()
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
+            error = _('Current user not support mfa type: {}').format(mfa_type)
+            raise ValidationError({'error': error})
         try:
-            self.perform_create(serializer)
-            return Response(serializer.data, status=201)
+            mfa_backend.send_challenge()
         except Exception as e:
-            logger.exception(e)
-            return Response({'error': str(e)}, status=400)
+            raise UnexpectError(str(e))
 
 
 class MFAChallengeVerifyApi(AuthMixin, CreateAPIView):
