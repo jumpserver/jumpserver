@@ -6,14 +6,14 @@ from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from perms.models import ApplicationPermission
-from ..base import ActionsField
+from ..base import ActionsField, BasePermissionSerializer
 
 __all__ = [
     'ApplicationPermissionSerializer'
 ]
 
 
-class ApplicationPermissionSerializer(BulkOrgResourceModelSerializer):
+class ApplicationPermissionSerializer(BasePermissionSerializer):
     actions = ActionsField(required=False, allow_null=True, label=_("Actions"))
     category_display = serializers.ReadOnlyField(source='get_category_display', label=_('Category display'))
     type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type display'))
@@ -46,15 +46,7 @@ class ApplicationPermissionSerializer(BulkOrgResourceModelSerializer):
             'applications_amount': {'label': _('Applications amount')},
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.set_actions_choices()
-
-    def set_actions_choices(self):
-        actions = self.fields.get('actions')
-        if not actions:
-            return
-        choices = actions._choices
+    def _filter_actions_choices(self, choices):
         if request := self.context.get('request'):
             category = request.query_params.get('category')
         else:
@@ -62,8 +54,7 @@ class ApplicationPermissionSerializer(BulkOrgResourceModelSerializer):
         exclude_choices = ApplicationPermission.get_exclude_actions_choices(category=category)
         for choice in exclude_choices:
             choices.pop(choice, None)
-        actions._choices = choices
-        actions.default = list(choices.keys())
+        return choices
 
     @classmethod
     def setup_eager_loading(cls, queryset):

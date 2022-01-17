@@ -44,11 +44,7 @@ class ApplicationAccountViewSet(JMSBulkModelViewSet):
     permission_classes = (IsOrgAdmin,)
 
     def get_queryset(self):
-        queryset = Account.objects.all() \
-            .annotate(type=F('app__type')) \
-            .annotate(app_display=F('app__name')) \
-            .annotate(systemuser_display=F('systemuser__name')) \
-            .annotate(category=F('app__category'))
+        queryset = Account.get_queryset()
         return queryset
 
 

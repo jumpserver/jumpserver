@@ -2,7 +2,7 @@ from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from django.conf import settings
 
-from jumpserver.utils import has_valid_xpack_license
+from jumpserver.utils import has_valid_xpack_license, get_xpack_license_info
 from common.utils import get_logger
 from .. import serializers
 from ..utils import get_interface_setting
@@ -40,6 +40,7 @@ class PublicSettingApi(generics.RetrieveAPIView):
                 "SECURITY_PASSWORD_EXPIRATION_TIME": settings.SECURITY_PASSWORD_EXPIRATION_TIME,
                 "SECURITY_LUNA_REMEMBER_AUTH": settings.SECURITY_LUNA_REMEMBER_AUTH,
                 "XPACK_LICENSE_IS_VALID": has_valid_xpack_license(),
+                "XPACK_LICENSE_INFO": get_xpack_license_info(),
                 "LOGIN_TITLE": self.get_login_title(),
                 "LOGO_URLS": self.get_logo_urls(),
                 "TICKETS_ENABLED": settings.TICKETS_ENABLED,

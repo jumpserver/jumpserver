@@ -1,6 +1,5 @@
 from .mysql import MySQLSerializer
 
-
 __all__ = ['MariaDBSerializer']
 
 

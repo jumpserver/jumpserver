@@ -76,11 +76,10 @@ class PrepareRequestMixin:
     @staticmethod
     def get_attribute_consuming_service():
         attr_mapping = settings.SAML2_RENAME_ATTRIBUTES
-        name_prefix = settings.SITE_URL
         if attr_mapping and isinstance(attr_mapping, dict):
             attr_list = [
                 {
-                    "name": '{}/{}'.format(name_prefix, sp_key),
+                    "name": sp_key,
                     "friendlyName": idp_key, "isRequired": True
                 }
                 for idp_key, sp_key in attr_mapping.items()
@@ -168,12 +167,10 @@ class PrepareRequestMixin:
 
     def get_attributes(self, saml_instance):
         user_attrs = {}
-        real_key_index = len(settings.SITE_URL) + 1
         attrs = saml_instance.get_attributes()
         valid_attrs = ['username', 'name', 'email', 'comment', 'phone']
 
         for attr, value in attrs.items():
-            attr = attr[real_key_index:]
             if attr not in valid_attrs:
                 continue
             user_attrs[attr] = self.value_to_str(value)

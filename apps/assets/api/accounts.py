@@ -64,9 +64,7 @@ class AccountViewSet(OrgBulkModelViewSet):
     permission_classes = (IsOrgAdmin,)
 
     def get_queryset(self):
-        queryset = super().get_queryset() \
-            .annotate(ip=F('asset__ip')) \
-            .annotate(hostname=F('asset__hostname'))
+        queryset = AuthBook.get_queryset()
         return queryset
 
     @action(methods=['post'], detail=True, url_path='verify')

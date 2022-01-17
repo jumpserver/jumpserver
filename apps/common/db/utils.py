@@ -44,6 +44,7 @@ def get_objects(model, pks):
     return objs
 
 
+# 复制 django.db.close_old_connections, 因为它没有导出，ide 提示有问题
 def close_old_connections():
     for conn in connections.all():
         conn.close_if_unusable_or_obsolete()
