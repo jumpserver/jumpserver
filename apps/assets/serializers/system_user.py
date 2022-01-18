@@ -51,7 +51,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
                 'trim_whitespace': False,
                 "validators": [validate_password_contains_left_double_curly_bracket]
             },
-            'cmd_filters': {"required": False},
+            'cmd_filters': {"required": False, 'label': _('Command filter')},
             'public_key': {"write_only": True},
             'private_key': {"write_only": True},
             'token': {"write_only": True},
