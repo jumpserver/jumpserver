@@ -2,8 +2,9 @@ import uuid
 
 from django.db import models
 from django.db.models import Q
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext, ugettext_lazy as _
 from django.utils import timezone
+from common.utils import lazyproperty
 
 from orgs.mixins.models import OrgModelMixin, Organization
 from orgs.utils import current_org
@@ -63,6 +64,10 @@ class OperateLog(OrgModelMixin):
     def __str__(self):
         return "<{}> {} <{}>".format(self.user, self.action, self.resource)
 
+    @lazyproperty
+    def resource_type_display(self):
+        return gettext(self.resource_type)
+
     def save(self, *args, **kwargs):
         if current_org.is_root() and not self.org_id:
             self.org_id = Organization.ROOT_ID
@@ -112,6 +117,10 @@ class UserLoginLog(models.Model):
     status = models.BooleanField(max_length=2, default=True, choices=STATUS_CHOICE, verbose_name=_('Status'))
     datetime = models.DateTimeField(default=timezone.now, verbose_name=_('Date login'))
     backend = models.CharField(max_length=32, default='', verbose_name=_('Authentication backend'))
+
+    @property
+    def backend_display(self):
+        return gettext(self.backend)
 
     @classmethod
     def get_login_logs(cls, date_from=None, date_to=None, user=None, keyword=None):
