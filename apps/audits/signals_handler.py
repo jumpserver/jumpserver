@@ -10,6 +10,7 @@ from django.utils import timezone
 from django.utils.functional import LazyObject
 from django.contrib.auth import BACKEND_SESSION_KEY
 from django.utils.translation import ugettext_lazy as _
+from django.utils import translation
 from rest_framework.renderers import JSONRenderer
 from rest_framework.request import Request
 
@@ -83,7 +84,8 @@ def create_operate_log(action, sender, resource):
     model_name = sender._meta.object_name
     if model_name not in MODELS_NEED_RECORD:
         return
-    resource_type = sender._meta.verbose_name
+    with translation.override('en'):
+        resource_type = sender._meta.verbose_name
     remote_addr = get_request_ip(current_request)
 
     data = {
@@ -290,13 +292,16 @@ def generate_data(username, request, login_type=None):
     if login_type is None:
         login_type = 'W'
 
+    with translation.override('en'):
+        backend = str(get_login_backend(request))
+
     data = {
         'username': username,
         'ip': login_ip,
         'type': login_type,
         'user_agent': user_agent[0:254],
         'datetime': timezone.now(),
-        'backend': get_login_backend(request)
+        'backend': backend,
     }
     return data
 
