@@ -2,9 +2,9 @@ from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
 from users.models import User
-from ..models import Role, RoleBinding
+from ..models import Role
 
-__all__ = ['RoleSerializer', 'RoleBindingSerializer', 'RoleUserSerializer']
+__all__ = ['RoleSerializer', 'RoleUserSerializer']
 
 
 class RoleSerializer(serializers.ModelSerializer):
@@ -23,16 +23,6 @@ class RoleSerializer(serializers.ModelSerializer):
             'users_amount': {'label': _('Users amount')},
             'display_name': {'label': _('Name display')}
         }
-
-
-class RoleBindingSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = RoleBinding
-        fields = [
-            'id', 'user',  'user_display', 'role', 'role_display',
-            'scope', 'org',
-        ]
-        read_only_fields = ['scope']
 
 
 class RoleUserSerializer(serializers.ModelSerializer):

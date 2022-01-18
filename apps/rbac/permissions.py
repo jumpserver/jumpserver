@@ -12,7 +12,7 @@ class RBACPermission(permissions.DjangoModelPermissions):
         ('create', '%(app_label)s.add_%(model_name)s'),
         ('update', '%(app_label)s.change_%(model_name)s'),
         ('partial_update', '%(app_label)s.change_%(model_name)s'),
-        ('delete', '%(app_label)s.delete_%(model_name)s'),
+        ('destroy', '%(app_label)s.delete_%(model_name)s'),
         ('metadata', ''),
         ('GET', '%(app_label)s.view_%(model_name)s'),
         ('OPTIONS', ''),
@@ -65,7 +65,9 @@ class RBACPermission(permissions.DjangoModelPermissions):
     def _get_action_perms(self, action, model_cls, view):
         action_perms_map = self.get_rbac_perms(view, model_cls)
         if action not in action_perms_map:
-            msg = 'Action not allowed: {}'.format(action)
+            msg = 'Action not allowed: {}, only `{}` supported'.format(
+                action, ','.join(list(action_perms_map.keys()))
+            )
             logger.error(msg)
             raise exceptions.PermissionDenied(msg)
         perms = action_perms_map[action]

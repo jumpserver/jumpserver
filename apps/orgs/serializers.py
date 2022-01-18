@@ -1,6 +1,7 @@
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 
+from .utils import get_current_org
 from .models import Organization
 
 
@@ -42,3 +43,13 @@ class CurrentOrgSerializer(ModelSerializer):
     class Meta:
         model = Organization
         fields = ['id', 'name', 'is_default', 'is_root', 'comment']
+
+
+class CurrentOrgDefault:
+    requires_context = False
+
+    def __call__(self, *args):
+        return get_current_org()
+
+    def __repr__(self):
+        return '%s()' % self.__class__.__name__

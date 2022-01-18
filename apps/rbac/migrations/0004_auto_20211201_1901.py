@@ -8,7 +8,7 @@ from rbac.builtin import BuiltinRole
 def migrate_system_role_binding(apps, schema_editor):
     db_alias = schema_editor.connection.alias
     user_model = apps.get_model('users', 'User')
-    role_binding_model = apps.get_model('rbac', 'RoleBinding')
+    role_binding_model = apps.get_model('rbac', 'SystemRoleBinding')
     users = user_model.objects.using(db_alias).all()
 
     role_bindings = []
@@ -39,7 +39,7 @@ def migrate_org_role_binding(apps, schema_editor):
             org_id=member.org.id
         )
         role_bindings.append(role_binding)
-    role_binding_model.objects.bulk_create(role_bindings, ignore_conflicts=True)
+    role_binding_model.objects.bulk_create(role_bindings)
 
 
 class Migration(migrations.Migration):

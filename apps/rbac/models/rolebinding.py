@@ -1,6 +1,7 @@
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.db.models import Q
+from rest_framework.serializers import ValidationError
 
 from common.db.models import JMSModel
 from common.utils import lazyproperty
@@ -42,7 +43,9 @@ class RoleBinding(JMSModel):
 
     class Meta:
         verbose_name = _('Role binding')
-        unique_together = ('user', 'role', 'org')
+        unique_together = [
+            ('user', 'role', 'org'),
+        ]
 
     def __str__(self):
         display = '{user} & {role}'.format(user=self.user, role=self.role)
@@ -98,6 +101,17 @@ class OrgRoleBinding(RoleBinding):
         self.org_id = current_org.id
         self.scope = Scope.org
         return super().save(*args, **kwargs)
+
+    def delete(self, **kwargs):
+        has_other_role = self.__class__.objects \
+            .filter(user=self.user, scope=self.scope) \
+            .exclude(id=self.id) \
+            .exists()
+        if not has_other_role:
+            error = _('User last role in org, can not be delete, '
+                      'you can remove user from org instead')
+            raise ValidationError({'error': error})
+        return super().delete(**kwargs)
 
     class Meta:
         proxy = True
