@@ -48,11 +48,14 @@ class UserLoginLogSerializer(serializers.ModelSerializer):
 
 
 class OperateLogSerializer(serializers.ModelSerializer):
+    action_display = serializers.CharField(source='get_action_display', label=_('Action'))
+
     class Meta:
         model = models.OperateLog
         fields_mini = ['id']
         fields_small = fields_mini + [
-            'user', 'action', 'resource_type', 'resource_type_display', 'resource',
+            'user', 'action', 'action_display',
+            'resource_type', 'resource_type_display', 'resource',
             'remote_addr', 'datetime', 'org_id'
         ]
         fields = fields_small
