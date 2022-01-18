@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-18 12:23+0800\n"
+"POT-Creation-Date: 2022-01-18 14:20+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -781,7 +781,7 @@ msgstr "默认Cluster"
 msgid "User group"
 msgstr "用户组"
 
-#: assets/models/cmd_filter.py:56
+#: assets/models/cmd_filter.py:56 assets/serializers/system_user.py:54
 msgid "Command filter"
 msgstr "命令过滤器"
 
