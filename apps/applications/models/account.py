@@ -9,7 +9,7 @@ from assets.models.base import BaseUser
 
 class Account(BaseUser):
     app = models.ForeignKey(
-        'applications.Application', on_delete=models.CASCADE, null=True, verbose_name=_('Database')
+        'applications.Application', on_delete=models.CASCADE, null=True, verbose_name=_('Application')
     )
     systemuser = models.ForeignKey(
         'assets.SystemUser', on_delete=models.CASCADE, null=True, verbose_name=_("System user")
