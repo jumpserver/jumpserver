@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-17 19:06+0800\n"
+"POT-Creation-Date: 2022-01-18 16:03+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -5762,6 +5762,11 @@ msgstr "应用"
 msgid "Application change auth plan task"
 msgstr "用用改密计划任务"
 
+#: xpack/plugins/change_auth_plan/models/app.py:180
+#: xpack/plugins/change_auth_plan/models/asset.py:259
+msgid "Password cannot be set to blank, exit"
+msgstr "密码不能设置为空, 退出"
+
 #: xpack/plugins/change_auth_plan/models/asset.py:29
 msgid "Append SSH KEY"
 msgstr "追加"
@@ -5787,6 +5792,20 @@ msgstr "改密计划执行"
 #: xpack/plugins/change_auth_plan/models/asset.py:217
 msgid "Change auth plan task"
 msgstr "改密计划任务"
+
+#: xpack/plugins/change_auth_plan/models/asset.py:251
+msgid "This asset does not have a privileged user set: {}"
+msgstr "该资产没有设置特权用户: {}"
+
+#: xpack/plugins/change_auth_plan/models/asset.py:255
+msgid ""
+"The password and key of the current asset privileged user cannot be changed: "
+"{}"
+msgstr "不能更改当前资产特权用户的密码及密钥: {}"
+
+#: xpack/plugins/change_auth_plan/models/asset.py:264
+msgid "Public key cannot be set to null, exit"
+msgstr "公钥不能设置为空, 退出"
 
 #: xpack/plugins/change_auth_plan/models/base.py:25
 msgid "All assets use the same random password"
