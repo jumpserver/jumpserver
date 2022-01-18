@@ -12,6 +12,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _, gettext
 
 from common.utils import get_logger, lazyproperty
+from common.utils.translate import translate_value
 from common.fields.model import (
     JsonListTextField, JsonDictCharField, EncryptJsonDictCharField,
     JsonDictTextField,
@@ -60,14 +61,8 @@ class Task(PeriodTaskModelMixin, OrgModelMixin):
 
     @lazyproperty
     def display_name(self):
-        sps = ['. ', ': ']
-        spb = {str(sp in self.name): sp for sp in sps}
-        sp = spb.get('True')
-        if not sp:
-            return self.name
-
-        tpl, data = self.name.split(sp, 1)
-        return gettext(tpl + sp) + data
+        value = translate_value(self.name)
+        return value
 
     @property
     def timedelta(self):
