@@ -38,6 +38,7 @@ class CommandExecution(OrgModelMixin):
         with tmp_to_org(self.run_as.org_id):
             super().save(*args, **kwargs)
 
+    @property
     def inventory(self):
         if self.run_as.username_same_with_user:
             username = self.user.username
@@ -105,7 +106,7 @@ class CommandExecution(OrgModelMixin):
         return allow_assets
 
     def run(self):
-        print('-'*10 + ' ' + ugettext('Task start') + ' ' + '-'*10)
+        print('-' * 10 + ' ' + ugettext('Task start') + ' ' + '-' * 10)
         org = Organization.get_instance(self.run_as.org_id)
         org.change_to()
         self.date_start = timezone.now()
@@ -117,7 +118,7 @@ class CommandExecution(OrgModelMixin):
                 print(f'资产{asset}: 命令{self.command}不允许执行')
             if not allow_assets:
                 self.result = {
-                    "error": _('There are currently no assets that can be executed')
+                    "error": 'There are currently no assets that can be executed'
                 }
                 self.save()
                 return self.result
@@ -147,10 +148,10 @@ class CommandExecution(OrgModelMixin):
                 'user': str(self.user),
                 'risk_level': 5,
             }).publish_async()
-            self.result = {"error":  msg}
+            self.result = {"error": msg}
         self.org_id = self.run_as.org_id
         self.is_finished = True
         self.date_finished = timezone.now()
         self.save()
-        print('-'*10 + ' ' + ugettext('Task end') + ' ' + '-'*10)
+        print('-' * 10 + ' ' + ugettext('Task end') + ' ' + '-' * 10)
         return self.result
