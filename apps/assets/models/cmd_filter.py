@@ -4,14 +4,18 @@ import uuid
 import re
 
 from django.db import models
+from django.db.models import Q
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import lazyproperty, get_logger
+from users.models import User, UserGroup
+from applications.models import Application
+from ..models import SystemUser, Asset
+
+from common.utils import lazyproperty, get_logger, get_object_or_none
 from orgs.mixins.models import OrgModelMixin
 
 logger = get_logger(__file__)
-
 
 __all__ = [
     'CommandFilter', 'CommandFilterRule'
@@ -72,10 +76,14 @@ class CommandFilterRule(OrgModelMixin):
         confirm = 2, _('Reconfirm')
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    filter = models.ForeignKey('CommandFilter', on_delete=models.CASCADE, verbose_name=_("Filter"), related_name='rules')
+    filter = models.ForeignKey(
+        'CommandFilter', on_delete=models.CASCADE, verbose_name=_("Filter"), related_name='rules'
+    )
     type = models.CharField(max_length=16, default=TYPE_COMMAND, choices=TYPE_CHOICES, verbose_name=_("Type"))
-    priority = models.IntegerField(default=50, verbose_name=_("Priority"), help_text=_("1-100, the lower the value will be match first"),
-                                   validators=[MinValueValidator(1), MaxValueValidator(100)])
+    priority = models.IntegerField(
+        default=50, verbose_name=_("Priority"), help_text=_("1-100, the lower the value will be match first"),
+        validators=[MinValueValidator(1), MaxValueValidator(100)]
+    )
     content = models.TextField(verbose_name=_("Content"), help_text=_("One line one command"))
     action = models.IntegerField(default=ActionChoices.deny, choices=ActionChoices.choices, verbose_name=_("Action"))
     # 动作: 附加字段
@@ -172,3 +180,34 @@ class CommandFilterRule(OrgModelMixin):
         ticket.create_process_map_and_node(self.reviewers.all())
         ticket.open(applicant=session.user_obj)
         return ticket
+
+    @classmethod
+    def get_queryset(cls, user_id=None, user_group_id=None, system_user_id=None, asset_id=None, application_id=None):
+        user_groups = []
+        user = get_object_or_none(User, pk=user_id)
+        if user:
+            user_groups.extend(list(user.groups.all()))
+        user_group = get_object_or_none(UserGroup, pk=user_group_id)
+        if user_group:
+            user_groups.append(user_group)
+        system_user = get_object_or_none(SystemUser, pk=system_user_id)
+        asset = get_object_or_none(Asset, pk=asset_id)
+        application = get_object_or_none(Application, pk=application_id)
+        q = Q()
+        if user:
+            q |= Q(users=user)
+        if user_groups:
+            q |= Q(user_groups__in=set(user_groups))
+        if system_user:
+            q |= Q(system_users=system_user)
+        if asset:
+            q |= Q(assets=asset)
+        if application:
+            q |= Q(applications=application)
+        if q:
+            cmd_filters = CommandFilter.objects.filter(q).filter(is_active=True)
+            rule_ids = cmd_filters.values_list('rules', flat=True)
+            rules = cls.objects.filter(id__in=rule_ids)
+        else:
+            rules = cls.objects.none()
+        return rules

@@ -5,6 +5,7 @@
 import logging
 
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.cache import cache
@@ -150,7 +151,9 @@ class AuthMixin:
     def load_asset_special_auth(self, asset, username=''):
         """
         """
-        authbooks = list(AuthBook.objects.filter(asset=asset, systemuser=self))
+        authbooks = AuthBook.objects.filter(asset=asset).filter(
+            Q(username=username) | Q(systemuser=self)
+        )
         if len(authbooks) == 0:
             return None
         elif len(authbooks) == 1:
