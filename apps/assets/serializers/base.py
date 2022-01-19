@@ -43,6 +43,7 @@ class AuthSerializerMixin(serializers.ModelSerializer):
         if not private_key:
             return
         passphrase = self.initial_data.get('passphrase')
+        passphrase = passphrase if passphrase else None
         valid = validate_ssh_private_key(private_key, password=passphrase)
         if not valid:
             raise serializers.ValidationError(_("private key invalid or passphrase error"))
