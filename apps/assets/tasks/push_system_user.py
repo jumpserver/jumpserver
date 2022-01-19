@@ -245,7 +245,7 @@ def push_system_user_util(system_user, assets, task_name, username=None):
         special_auth_set = set()
 
         auth_books = AuthBook.objects.filter(asset_id__in=asset_ids).filter(
-            Q(username__in=usernames) | Q(systemuser__username__in=usernames)
+            Q(username__in=usernames) | Q(systemuser=system_user)
         ).prefetch_related('systemuser')
 
         for auth_book in auth_books:
