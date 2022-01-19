@@ -24,7 +24,7 @@ from common.utils import date_expired_default, get_logger, lazyproperty, random_
 from common import fields
 from common.db.models import TextChoices
 from users.exceptions import MFANotEnabled, PhoneNotSet
-from ..signals import post_user_change_password
+from ..signals import post_user_change_password, post_user_leave_org, pre_user_leave_org
 
 __all__ = ['User', 'UserPasswordHistory', 'MFAType']
 
@@ -309,7 +309,10 @@ class RoleMixin:
     def remove(self):
         if current_org.is_root():
             return
+        kwargs = dict(sender=self.__class__, user=self, org=current_org)
+        pre_user_leave_org.send(**kwargs)
         self.org_roles.clear()
+        post_user_leave_org.send(**kwargs)
 
     @classmethod
     def get_super_admins(cls):
