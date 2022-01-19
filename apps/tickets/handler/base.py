@@ -80,7 +80,7 @@ class BaseHandler(object):
     def _create_comment_on_action(self, action):
         user = self.ticket.processor
         # 打开或关闭工单，备注显示是自己，其他是受理人
-        if self.ticket.state_open or self.ticket.state_close:
+        if action == TicketAction.open or action == TicketAction.close:
             user = self.ticket.applicant
         user_display = str(user)
         action_display = getattr(TicketAction, action).label
