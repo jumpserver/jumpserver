@@ -157,10 +157,7 @@ class AppAccountSecretSerializer(AppAccountSerializer):
             'id', 'app_display', 'attrs', 'username', 'password', 'private_key',
             'public_key', 'date_created', 'date_updated', 'version'
         ]
-        fields = [
-            field_name for field_name in AppAccountSerializer.Meta.fields
-            if field_name not in ['attrs']
-        ]
+
         extra_kwargs = {
             'password': {'write_only': False},
             'private_key': {'write_only': False},
