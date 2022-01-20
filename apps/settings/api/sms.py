@@ -1,13 +1,15 @@
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 
-from common.permissions import IsSuperUser
 from common.message.backends.sms import BACKENDS
 from settings.serializers.sms import SMSBackendSerializer
 
 
 class SMSBackendAPI(ListAPIView):
     serializer_class = SMSBackendSerializer
+    rbac_perms = {
+        'list': 'settings.view_setting'
+    }
 
     def list(self, request, *args, **kwargs):
         data = [
@@ -15,7 +17,7 @@ class SMSBackendAPI(ListAPIView):
                 'name': b,
                 'label': b.label
             }
-            for b in BACKENDS
+            for b in BACKENDS.choices
         ]
 
         return Response(data)

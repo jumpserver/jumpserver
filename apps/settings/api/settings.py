@@ -5,7 +5,6 @@ from rest_framework import generics
 from django.conf import settings
 
 from jumpserver.conf import Config
-from common.permissions import IsSuperUser
 from rbac.permissions import RBACPermission
 from common.utils import get_logger
 from .. import serializers

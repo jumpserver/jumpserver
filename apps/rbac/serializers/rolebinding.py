@@ -30,6 +30,10 @@ class SystemRoleBindingSerializer(RoleBindingSerializer):
     class Meta(RoleBindingSerializer.Meta):
         model = SystemRoleBinding
 
+    def get_field_names(self, *args):
+        names = super().get_field_names(*args)
+        return list(set(names) - {'org'})
+
 
 class OrgRoleBindingSerializer(RoleBindingSerializer):
     org = serializers.PrimaryKeyRelatedField(

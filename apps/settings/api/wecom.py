@@ -5,7 +5,6 @@ from rest_framework import status
 from django.utils.translation import gettext_lazy as _
 
 from settings.models import Setting
-from common.permissions import IsSuperUser
 from common.message.backends.wecom import WeCom
 
 from .. import serializers
@@ -13,6 +12,9 @@ from .. import serializers
 
 class WeComTestingAPI(GenericAPIView):
     serializer_class = serializers.WeComSettingSerializer
+    rbac_perms = {
+        'POST': 'settings.change_setting'
+    }
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)

@@ -6,7 +6,6 @@ from django.utils.translation import gettext_lazy as _
 
 from common.message.backends.sms.alibaba import AlibabaSMS
 from settings.models import Setting
-from common.permissions import IsSuperUser
 from common.exceptions import JMSException
 
 from .. import serializers
@@ -14,6 +13,9 @@ from .. import serializers
 
 class AlibabaSMSTestingAPI(GenericAPIView):
     serializer_class = serializers.AlibabaSMSSettingSerializer
+    rbac_perms = {
+        'POST': 'settings.change_setting'
+    }
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)

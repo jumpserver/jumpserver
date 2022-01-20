@@ -3,7 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
-from common.permissions import IsAppUser, IsSuperUser
+from common.permissions import IsAppUser
 from common.const.http import PATCH
 from orgs.mixins.api import OrgModelViewSet
 from .. import serializers, models
@@ -13,15 +13,15 @@ __all__ = ['SessionSharingViewSet', 'SessionJoinRecordsViewSet']
 
 class SessionSharingViewSet(OrgModelViewSet):
     serializer_class = serializers.SessionSharingSerializer
-    permission_classes = (IsAppUser | IsSuperUser, )
     search_fields = ('session', 'creator', 'is_active', 'expired_time')
+    # permission_classes = (IsAppUser)
     filterset_fields = search_fields
     model = models.SessionSharing
 
-    def get_permissions(self):
-        if self.request.method.lower() in ['post']:
-            self.permission_classes = (IsAppUser,)
-        return super().get_permissions()
+    # def get_permissions(self):
+    #     if self.request.method.lower() in ['post']:
+    #         self.permission_classes = (IsAppUser,)
+    #     return super().get_permissions()
 
     def create(self, request, *args, **kwargs):
         if not settings.SECURITY_SESSION_SHARE:
@@ -35,7 +35,7 @@ class SessionSharingViewSet(OrgModelViewSet):
 
 class SessionJoinRecordsViewSet(OrgModelViewSet):
     serializer_class = serializers.SessionJoinRecordSerializer
-    permission_classes = (IsAppUser | IsSuperUser, )
+    # permission_classes = (IsAppUser)
     search_fields = (
         'sharing', 'session', 'joiner', 'date_joined', 'date_left',
         'login_from', 'is_success', 'is_finished'

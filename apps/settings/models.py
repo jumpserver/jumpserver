@@ -188,4 +188,4 @@ class Setting(models.Model):
 
     class Meta:
         db_table = "settings_setting"
-        verbose_name = _("Setting")
+        verbose_name = _("System setting")

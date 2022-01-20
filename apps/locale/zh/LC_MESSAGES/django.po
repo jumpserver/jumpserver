@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-20 11:28+0800\n"
+"POT-Creation-Date: 2022-01-20 14:18+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -2447,7 +2447,7 @@ msgstr "组织管理"
 
 #: orgs/mixins/models.py:46 orgs/mixins/serializers.py:25 orgs/models.py:25
 #: orgs/models.py:170 rbac/const.py:7 rbac/models/rolebinding.py:40
-#: rbac/serializers/rolebinding.py:36 tickets/serializers/ticket/ticket.py:77
+#: rbac/serializers/rolebinding.py:40 tickets/serializers/ticket/ticket.py:77
 msgid "Organization"
 msgstr "组织"
 
@@ -2751,63 +2751,67 @@ msgid "Scope display"
 msgstr "类型名称"
 
 #: rbac/serializers/role.py:27
-msgid "Name display"
-msgstr "节点名称"
+#, fuzzy
+#| msgid "User display name"
+msgid "Display name"
+msgstr "用户显示名称"
 
 #: rbac/serializers/rolebinding.py:23
 msgid "Role display"
 msgstr "角色名称"
 
-#: rbac/serializers/rolebinding.py:52
+#: rbac/serializers/rolebinding.py:56
 msgid "Has bound this role"
 msgstr "已经绑定该角色"
 
-#: settings/api/alibaba_sms.py:29 settings/api/tencent_sms.py:33
+#: settings/api/alibaba_sms.py:31 settings/api/tencent_sms.py:33
 msgid "test_phone is required"
 msgstr "测试手机号 该字段是必填项。"
 
-#: settings/api/alibaba_sms.py:50 settings/api/dingtalk.py:34
-#: settings/api/feishu.py:34 settings/api/tencent_sms.py:55
-#: settings/api/wecom.py:35
+#: settings/api/alibaba_sms.py:52 settings/api/dingtalk.py:34
+#: settings/api/feishu.py:35 settings/api/tencent_sms.py:55
+#: settings/api/wecom.py:37
 msgid "Test success"
 msgstr "测试成功"
 
-#: settings/api/email.py:21
+#: settings/api/email.py:20
 msgid "Test mail sent to {}, please check"
 msgstr "邮件已经发送{}, 请检查"
 
-#: settings/api/ldap.py:149
+#: settings/api/ldap.py:157
 msgid "Synchronization start, please wait."
 msgstr "同步开始，请稍等"
 
-#: settings/api/ldap.py:153
+#: settings/api/ldap.py:161
 msgid "Synchronization is running, please wait."
 msgstr "同步正在运行，请稍等"
 
-#: settings/api/ldap.py:158
+#: settings/api/ldap.py:166
 msgid "Synchronization error: {}"
 msgstr "同步错误: {}"
 
-#: settings/api/ldap.py:189
+#: settings/api/ldap.py:197
 msgid "Get ldap users is None"
 msgstr "获取 LDAP 用户为 None"
 
-#: settings/api/ldap.py:198
+#: settings/api/ldap.py:206
 msgid "Imported {} users successfully (Organization: {})"
 msgstr "成功导入 {} 个用户 ( 组织: {} )"
 
-#: settings/api/public.py:41 xpack/plugins/interface/api.py:18
+#: settings/api/public.py:41 xpack/plugins/interface/api.py:19
 #: xpack/plugins/interface/models.py:39
 msgid "Welcome to the JumpServer open source Bastion Host"
 msgstr "欢迎使用JumpServer开源堡垒机"
 
 #: settings/apps.py:7
 msgid "Settings"
-msgstr "系统设置"
-
-#: settings/models.py:191 users/templates/users/reset_password.html:29
-msgid "Setting"
 msgstr "设置"
+
+#: settings/models.py:191
+#, fuzzy
+#| msgid "Login system user"
+msgid "System setting"
+msgstr "登录系统用户"
 
 #: settings/serializers/auth/base.py:10
 msgid "CAS Auth"
@@ -5609,6 +5613,10 @@ msgstr "您的密码必须满足："
 msgid "Password strength"
 msgstr "密码强度："
 
+#: users/templates/users/reset_password.html:29
+msgid "Setting"
+msgstr "设置"
+
 #: users/templates/users/reset_password.html:48
 #: users/templates/users/user_password_update.html:102
 msgid "Very weak"
@@ -6379,11 +6387,11 @@ msgstr "资产为空，请更改节点"
 msgid "Executed times"
 msgstr "执行次数"
 
-#: xpack/plugins/interface/api.py:68
+#: xpack/plugins/interface/api.py:72
 msgid "It is already in the default setting state!"
 msgstr "当前已经是初始化状态！"
 
-#: xpack/plugins/interface/api.py:72
+#: xpack/plugins/interface/api.py:76
 msgid "Restore default successfully."
 msgstr "恢复默认成功！"
 
@@ -6442,6 +6450,9 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Name display"
+#~ msgstr "节点名称"
 
 #~ msgid "User and Organization"
 #~ msgstr "用户与组织"
@@ -6507,11 +6518,6 @@ msgstr "社区版"
 #~| msgid "Update"
 #~ msgid "Update license"
 #~ msgstr "更新"
-
-#, fuzzy
-#~| msgid "Login system user"
-#~ msgid "View system setting"
-#~ msgstr "登录系统用户"
 
 #, fuzzy
 #~| msgid "Create user if not"

@@ -10,7 +10,7 @@ from django_filters import utils
 
 from terminal import const
 from common.const.http import GET
-from common.permissions import IsSuperUser, IsOrgAuditor
+from common.permissions import IsOrgAuditor
 from terminal.filters import CommandStorageFilter, CommandFilter, CommandFilterForStorageTree
 from ..models import CommandStorage, ReplayStorage
 from ..serializers import CommandStorageSerializer, ReplayStorageSerializer

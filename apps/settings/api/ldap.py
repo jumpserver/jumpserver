@@ -12,7 +12,6 @@ from ..utils import (
     LDAP_USE_CACHE_FLAGS, LDAPTestUtil
 )
 from ..tasks import sync_ldap_user
-from common.permissions import IsSuperUser
 from common.utils import get_logger, is_uuid
 from ..serializers import (
     LDAPTestConfigSerializer, LDAPUserSerializer,
@@ -26,6 +25,9 @@ logger = get_logger(__file__)
 
 class LDAPTestingConfigAPI(APIView):
     serializer_class = LDAPTestConfigSerializer
+    rbac_perms = {
+        'POST': 'settings.change_setting'
+    }
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -61,6 +63,9 @@ class LDAPTestingConfigAPI(APIView):
 
 class LDAPTestingLoginAPI(APIView):
     serializer_class = LDAPTestLoginSerializer
+    rbac_perms = {
+        'POST': 'settings.change_setting'
+    }
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -75,6 +80,9 @@ class LDAPTestingLoginAPI(APIView):
 
 class LDAPUserListApi(generics.ListAPIView):
     serializer_class = LDAPUserSerializer
+    rbac_perms = {
+        'POST': 'settings.change_setting'
+    }
 
     def get_queryset_from_cache(self):
         search_value = self.request.query_params.get('search')
