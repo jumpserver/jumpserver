@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-19 19:02+0800\n"
+"POT-Creation-Date: 2022-01-20 10:38+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -35,12 +35,12 @@ msgid "Name"
 msgstr "名称"
 
 #: acls/models/base.py:27 assets/models/cmd_filter.py:84
-#: assets/models/user.py:211
+#: assets/models/user.py:214
 msgid "Priority"
 msgstr "优先级"
 
 #: acls/models/base.py:28 assets/models/cmd_filter.py:84
-#: assets/models/user.py:211
+#: assets/models/user.py:214
 msgid "1-100, the lower the value will be match first"
 msgstr "优先级可选范围为 1-100 (数值越小越优先)"
 
@@ -208,7 +208,7 @@ msgid ""
 msgstr "格式为逗号分隔的字符串, * 表示匹配所有. 可选的协议有： {}"
 
 #: acls/serializers/login_asset_acl.py:55 assets/models/asset.py:214
-#: assets/models/domain.py:63 assets/models/user.py:212
+#: assets/models/domain.py:63 assets/models/user.py:215
 #: terminal/serializers/session.py:30 terminal/serializers/storage.py:69
 msgid "Protocol"
 msgstr "协议"
@@ -270,7 +270,7 @@ msgid "Application"
 msgstr "应用程序"
 
 #: applications/models/account.py:15 assets/models/authbook.py:20
-#: assets/models/cmd_filter.py:42 assets/models/user.py:302 audits/models.py:40
+#: assets/models/cmd_filter.py:42 assets/models/user.py:305 audits/models.py:40
 #: perms/models/application_permission.py:32
 #: perms/models/asset_permission.py:26 templates/_nav.html:45
 #: terminal/backends/command/models.py:21
@@ -311,7 +311,7 @@ msgstr "类别"
 
 #: applications/models/application.py:207
 #: applications/serializers/application.py:101 assets/models/backup.py:49
-#: assets/models/cmd_filter.py:82 assets/models/user.py:210
+#: assets/models/cmd_filter.py:82 assets/models/user.py:213
 #: perms/models/application_permission.py:23
 #: perms/serializers/application/user_permission.py:34
 #: terminal/models/storage.py:55 terminal/models/storage.py:116
@@ -564,7 +564,7 @@ msgstr "主机名原始"
 msgid "Protocols"
 msgstr "协议组"
 
-#: assets/models/asset.py:219 assets/models/user.py:202
+#: assets/models/asset.py:219 assets/models/user.py:205
 #: perms/models/asset_permission.py:25
 #: xpack/plugins/change_auth_plan/models/asset.py:43
 #: xpack/plugins/gathered_user/models.py:24
@@ -577,7 +577,7 @@ msgid "Is active"
 msgstr "激活"
 
 #: assets/models/asset.py:223 assets/models/cluster.py:19
-#: assets/models/user.py:199 assets/models/user.py:351 templates/_nav.html:44
+#: assets/models/user.py:202 assets/models/user.py:354 templates/_nav.html:44
 msgid "Admin user"
 msgstr "特权用户"
 
@@ -902,75 +902,75 @@ msgstr "ssh私钥"
 msgid "Node"
 msgstr "节点"
 
-#: assets/models/user.py:193
+#: assets/models/user.py:196
 msgid "Automatic managed"
 msgstr "托管密码"
 
-#: assets/models/user.py:194
+#: assets/models/user.py:197
 msgid "Manually input"
 msgstr "手动输入"
 
-#: assets/models/user.py:198
+#: assets/models/user.py:201
 msgid "Common user"
 msgstr "普通用户"
 
-#: assets/models/user.py:201
+#: assets/models/user.py:204
 msgid "Username same with user"
 msgstr "用户名与用户相同"
 
-#: assets/models/user.py:204 assets/serializers/domain.py:29
+#: assets/models/user.py:207 assets/serializers/domain.py:29
 #: templates/_nav.html:39
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 #: xpack/plugins/change_auth_plan/models/asset.py:39
 msgid "Assets"
 msgstr "资产"
 
-#: assets/models/user.py:208 templates/_nav.html:17
+#: assets/models/user.py:211 templates/_nav.html:17
 #: users/views/profile/pubkey.py:37
 msgid "Users"
 msgstr "用户管理"
 
-#: assets/models/user.py:209
+#: assets/models/user.py:212
 msgid "User groups"
 msgstr "用户组"
 
-#: assets/models/user.py:213
+#: assets/models/user.py:216
 msgid "Auto push"
 msgstr "自动推送"
 
-#: assets/models/user.py:214
+#: assets/models/user.py:217
 msgid "Sudo"
 msgstr "Sudo"
 
-#: assets/models/user.py:215
+#: assets/models/user.py:218
 msgid "Shell"
 msgstr "Shell"
 
-#: assets/models/user.py:216
+#: assets/models/user.py:219
 msgid "Login mode"
 msgstr "认证方式"
 
-#: assets/models/user.py:217
+#: assets/models/user.py:220
 msgid "SFTP Root"
 msgstr "SFTP根路径"
 
-#: assets/models/user.py:218 authentication/models.py:45
+#: assets/models/user.py:221 authentication/models.py:45
 msgid "Token"
 msgstr ""
 
-#: assets/models/user.py:219
+#: assets/models/user.py:222
 msgid "Home"
 msgstr "家目录"
 
-#: assets/models/user.py:220
+#: assets/models/user.py:223
 msgid "System groups"
 msgstr "用户组"
 
-#: assets/models/user.py:223
+#: assets/models/user.py:226
 msgid "User switch"
 msgstr "用户切换"
 
-#: assets/models/user.py:224
+#: assets/models/user.py:227
 msgid "Switch from"
 msgstr "切换自"
 
@@ -2653,19 +2653,15 @@ msgstr "汇总"
 msgid "Date finished"
 msgstr "结束日期"
 
-#: ops/models/command.py:108
+#: ops/models/command.py:109
 msgid "Task start"
 msgstr "任务开始"
 
-#: ops/models/command.py:120
-msgid "There are currently no assets that can be executed"
-msgstr "当前没有匹配到可允许执行的资产"
-
-#: ops/models/command.py:142
+#: ops/models/command.py:143
 msgid "Command `{}` is forbidden ........"
 msgstr "命令 `{}` 不允许被执行 ......."
 
-#: ops/models/command.py:155
+#: ops/models/command.py:156
 msgid "Task end"
 msgstr "任务结束"
 
