@@ -10,7 +10,7 @@ from celery.result import AsyncResult
 from rest_framework import generics
 from django_celery_beat.models import PeriodicTask
 
-from common.permissions import IsValidUser, IsSuperUser
+from common.permissions import IsValidUser
 from common.api import LogTailApi
 from ..models import CeleryTask
 from ..serializers import CeleryResultSerializer, CeleryPeriodTaskSerializer

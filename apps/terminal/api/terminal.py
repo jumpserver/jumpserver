@@ -8,13 +8,12 @@ from rest_framework import generics
 from rest_framework.views import APIView, Response
 from rest_framework import status
 from django.conf import settings
-from django_filters import rest_framework as filters
 from django.utils.translation import gettext_lazy as _
 
 from common.exceptions import JMSException
 from common.drf.api import JMSBulkModelViewSet
 from common.utils import get_object_or_none
-from common.permissions import IsAppUser, IsSuperUser, WithBootstrapToken
+from common.permissions import IsAppUser, WithBootstrapToken
 from ..models import Terminal
 from .. import serializers
 from .. import exceptions

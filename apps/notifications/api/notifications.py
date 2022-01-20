@@ -22,7 +22,7 @@ class BackendListView(APIView):
                 'name': backend,
                 'name_display': backend.label
             }
-            for backend in BACKEND
+            for backend in BACKEND.choices
             if backend.is_enable
         ]
         return Response(data=data)

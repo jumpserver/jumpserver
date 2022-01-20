@@ -32,6 +32,12 @@ class IsSuperUser(IsValidUser):
                and request.user.is_superuser
 
 
+class OnlySuperUser(IsValidUser):
+    def has_permission(self, request, view):
+        return super().has_permission(request, view) \
+               and request.user.is_superuser
+
+
 class IsSuperUserOrAppUser(IsSuperUser):
     def has_permission(self, request, view):
         return True

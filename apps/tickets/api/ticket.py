@@ -7,7 +7,7 @@ from rest_framework.response import Response
 
 from common.const.http import POST, PUT
 from common.mixins.api import CommonApiMixin
-from common.permissions import IsValidUser, IsOrgAdmin, IsSuperUser
+from common.permissions import IsValidUser
 from common.drf.api import JMSBulkModelViewSet
 
 from tickets import serializers
@@ -76,7 +76,6 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
 
 
 class TicketFlowViewSet(JMSBulkModelViewSet):
-    permission_classes = (IsOrgAdmin, IsSuperUser)
     serializer_class = serializers.TicketFlowSerializer
 
     filterset_fields = ['id', 'type']
