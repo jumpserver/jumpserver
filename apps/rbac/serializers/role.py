@@ -8,12 +8,15 @@ __all__ = ['RoleSerializer', 'RoleUserSerializer']
 
 
 class RoleSerializer(serializers.ModelSerializer):
+    scope_display = serializers.ReadOnlyField(source='get_scope_display', label=_('Scope display'))
+
     class Meta:
         model = Role
         fields_mini = ['id', 'name', 'display_name', 'scope']
         read_only_fields = [
-            'users_amount', 'builtin', 'date_created',
-            'date_updated', 'created_by', 'updated_by'
+            'users_amount', 'builtin', 'scope_display',
+            'date_created', 'date_updated',
+            'created_by', 'updated_by',
         ]
         fields = fields_mini + read_only_fields + [
             'comment', 'permissions'
@@ -21,7 +24,7 @@ class RoleSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'permissions': {'write_only': True},
             'users_amount': {'label': _('Users amount')},
-            'display_name': {'label': _('Name display')}
+            'display_name': {'label': _('Display name')}
         }
 
 

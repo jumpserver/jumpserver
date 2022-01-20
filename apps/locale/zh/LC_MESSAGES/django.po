@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-31 15:46+0800\n"
+"POT-Creation-Date: 2022-01-20 11:28+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -26,7 +26,7 @@ msgstr "访问控制"
 #: assets/models/base.py:175 assets/models/cluster.py:18
 #: assets/models/cmd_filter.py:21 assets/models/domain.py:24
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
-#: orgs/models.py:14 perms/models/base.py:44 rbac/models/role.py:29
+#: orgs/models.py:12 perms/models/base.py:44 rbac/models/role.py:29
 #: settings/models.py:29 settings/serializers/sms.py:6
 #: terminal/models/storage.py:23 terminal/models/task.py:16
 #: terminal/models/terminal.py:100 users/forms/profile.py:32
@@ -62,7 +62,7 @@ msgstr "激活中"
 #: assets/models/cmd_filter.py:23 assets/models/cmd_filter.py:64
 #: assets/models/domain.py:25 assets/models/domain.py:65
 #: assets/models/group.py:23 assets/models/label.py:23 ops/models/adhoc.py:37
-#: orgs/models.py:17 perms/models/base.py:53 rbac/models/role.py:37
+#: orgs/models.py:15 perms/models/base.py:53 rbac/models/role.py:37
 #: settings/models.py:34 terminal/models/storage.py:26
 #: terminal/models/terminal.py:114 tickets/models/comment.py:24
 #: tickets/models/ticket.py:74 users/models/group.py:16
@@ -99,12 +99,12 @@ msgstr "动作"
 #: acls/serializers/login_acl.py:33 assets/models/label.py:15
 #: audits/models.py:36 audits/models.py:59 audits/models.py:80
 #: audits/serializers.py:93 authentication/models.py:47
-#: authentication/models.py:103 orgs/models.py:173 perms/models/base.py:45
-#: rbac/builtin.py:68 rbac/models/rolebinding.py:31 templates/index.html:78
+#: authentication/models.py:103 orgs/models.py:171 perms/models/base.py:45
+#: rbac/builtin.py:76 rbac/models/rolebinding.py:33 templates/index.html:78
 #: terminal/backends/command/models.py:18
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:38
-#: tickets/models/comment.py:17 users/const.py:14 users/models/user.py:791
-#: users/models/user.py:821 users/serializers/group.py:19
+#: tickets/models/comment.py:17 users/const.py:14 users/models/user.py:789
+#: users/models/user.py:819 users/serializers/group.py:19
 #: users/templates/users/user_asset_permission.html:38
 #: users/templates/users/user_asset_permission.html:64
 #: users/templates/users/user_database_app_permission.html:37
@@ -555,8 +555,8 @@ msgstr "标签管理"
 #: assets/models/asset.py:218 assets/models/base.py:183
 #: assets/models/cluster.py:28 assets/models/cmd_filter.py:26
 #: assets/models/cmd_filter.py:67 assets/models/group.py:21
-#: common/db/models.py:70 common/mixins/models.py:49 orgs/models.py:15
-#: orgs/models.py:177 perms/models/base.py:51 users/models/user.py:614
+#: common/db/models.py:70 common/mixins/models.py:49 orgs/models.py:13
+#: orgs/models.py:175 perms/models/base.py:51 users/models/user.py:614
 #: users/serializers/group.py:33
 #: xpack/plugins/change_auth_plan/models/base.py:45
 #: xpack/plugins/cloud/models.py:119 xpack/plugins/gathered_user/models.py:30
@@ -567,9 +567,9 @@ msgstr "创建者"
 #: assets/models/cluster.py:26 assets/models/domain.py:27
 #: assets/models/gathered_user.py:19 assets/models/group.py:22
 #: assets/models/label.py:25 common/db/models.py:72 common/mixins/models.py:50
-#: ops/models/adhoc.py:38 ops/models/command.py:29 orgs/models.py:16
-#: orgs/models.py:175 perms/models/base.py:52 users/models/group.py:18
-#: users/models/user.py:822 xpack/plugins/cloud/models.py:122
+#: ops/models/adhoc.py:38 ops/models/command.py:29 orgs/models.py:14
+#: orgs/models.py:173 perms/models/base.py:52 users/models/group.py:18
+#: users/models/user.py:820 xpack/plugins/cloud/models.py:122
 msgid "Date created"
 msgstr "创建日期"
 
@@ -612,7 +612,7 @@ msgstr "SSH公钥"
 
 #: assets/models/base.py:182 assets/models/gathered_user.py:20
 #: common/db/models.py:73 common/mixins/models.py:51 ops/models/adhoc.py:39
-#: orgs/models.py:176
+#: orgs/models.py:174
 msgid "Date updated"
 msgstr "更新日期"
 
@@ -650,7 +650,7 @@ msgid "Default"
 msgstr "默认"
 
 #: assets/models/cluster.py:36 assets/models/label.py:14 rbac/const.py:6
-#: users/models/user.py:807
+#: users/models/user.py:805
 msgid "System"
 msgstr "系统"
 
@@ -756,7 +756,7 @@ msgstr "新节点"
 msgid "empty"
 msgstr "空"
 
-#: assets/models/node.py:545 perms/models/asset_permission.py:176
+#: assets/models/node.py:545 perms/models/asset_permission.py:182
 msgid "Key"
 msgstr "键"
 
@@ -764,7 +764,7 @@ msgstr "键"
 msgid "Full value"
 msgstr "全称"
 
-#: assets/models/node.py:550 perms/models/asset_permission.py:177
+#: assets/models/node.py:550 perms/models/asset_permission.py:183
 msgid "Parent key"
 msgstr "ssh私钥"
 
@@ -1268,7 +1268,7 @@ msgstr "运行用户"
 msgid "Run as display"
 msgstr "运行用户名称"
 
-#: audits/serializers.py:95
+#: audits/serializers.py:95 rbac/serializers/rolebinding.py:22
 msgid "User display"
 msgstr "用户名称"
 
@@ -1295,184 +1295,170 @@ msgid "DingTalk"
 msgstr "钉钉"
 
 #: audits/signals_handler.py:102
-msgid "User and Organization"
-msgstr "用户与组织"
-
-#: audits/signals_handler.py:103
-#, python-brace-format
-msgid "{User} JOINED {Organization}"
-msgstr "{User} 加入 {Organization}"
-
-#: audits/signals_handler.py:104
-#, python-brace-format
-msgid "{User} LEFT {Organization}"
-msgstr "{User} 离开 {Organization}"
-
-#: audits/signals_handler.py:107
 msgid "User and Group"
 msgstr "用户与用户组"
 
-#: audits/signals_handler.py:108
+#: audits/signals_handler.py:103
 #, python-brace-format
 msgid "{User} JOINED {UserGroup}"
 msgstr "{User} 加入 {UserGroup}"
 
-#: audits/signals_handler.py:109
+#: audits/signals_handler.py:104
 #, python-brace-format
 msgid "{User} LEFT {UserGroup}"
 msgstr "{User} 离开 {UserGroup}"
 
-#: audits/signals_handler.py:112
+#: audits/signals_handler.py:107
 msgid "Asset and SystemUser"
 msgstr "资产与系统用户"
 
-#: audits/signals_handler.py:113
+#: audits/signals_handler.py:108
 #, python-brace-format
 msgid "{Asset} ADD {SystemUser}"
 msgstr "{Asset} 添加 {SystemUser}"
 
-#: audits/signals_handler.py:114
+#: audits/signals_handler.py:109
 #, python-brace-format
 msgid "{Asset} REMOVE {SystemUser}"
 msgstr "{Asset} 移除 {SystemUser}"
 
-#: audits/signals_handler.py:117
+#: audits/signals_handler.py:112
 msgid "Node and Asset"
 msgstr "节点与资产"
 
-#: audits/signals_handler.py:118
+#: audits/signals_handler.py:113
 #, python-brace-format
 msgid "{Node} ADD {Asset}"
 msgstr "{Node} 添加 {Asset}"
 
-#: audits/signals_handler.py:119
+#: audits/signals_handler.py:114
 #, python-brace-format
 msgid "{Node} REMOVE {Asset}"
 msgstr "{Node} 移除 {Asset}"
 
-#: audits/signals_handler.py:122
+#: audits/signals_handler.py:117
 msgid "User asset permissions"
 msgstr "用户资产授权"
 
-#: audits/signals_handler.py:123
+#: audits/signals_handler.py:118
 #, python-brace-format
 msgid "{AssetPermission} ADD {User}"
 msgstr "{AssetPermission} 添加 {User}"
 
-#: audits/signals_handler.py:124
+#: audits/signals_handler.py:119
 #, python-brace-format
 msgid "{AssetPermission} REMOVE {User}"
 msgstr "{AssetPermission} 移除 {User}"
 
-#: audits/signals_handler.py:127
+#: audits/signals_handler.py:122
 msgid "User group asset permissions"
 msgstr "用户组资产授权"
 
-#: audits/signals_handler.py:128
+#: audits/signals_handler.py:123
 #, python-brace-format
 msgid "{AssetPermission} ADD {UserGroup}"
 msgstr "{AssetPermission} 添加 {UserGroup}"
 
-#: audits/signals_handler.py:129
+#: audits/signals_handler.py:124
 #, python-brace-format
 msgid "{AssetPermission} REMOVE {UserGroup}"
 msgstr "{AssetPermission} 移除 {UserGroup}"
 
-#: audits/signals_handler.py:132 perms/models/asset_permission.py:106
+#: audits/signals_handler.py:127 perms/models/asset_permission.py:106
 #: users/templates/users/_user_detail_nav_header.html:31
 msgid "Asset permission"
 msgstr "资产授权"
 
-#: audits/signals_handler.py:133
+#: audits/signals_handler.py:128
 #, python-brace-format
 msgid "{AssetPermission} ADD {Asset}"
 msgstr "{AssetPermission} 添加 {Asset}"
 
-#: audits/signals_handler.py:134
+#: audits/signals_handler.py:129
 #, python-brace-format
 msgid "{AssetPermission} REMOVE {Asset}"
 msgstr "{AssetPermission} 移除 {Asset}"
 
-#: audits/signals_handler.py:137
+#: audits/signals_handler.py:132
 msgid "Node permission"
 msgstr "节点授权"
 
-#: audits/signals_handler.py:138
+#: audits/signals_handler.py:133
 #, python-brace-format
 msgid "{AssetPermission} ADD {Node}"
 msgstr "{AssetPermission} 添加 {Node}"
 
-#: audits/signals_handler.py:139
+#: audits/signals_handler.py:134
 #, python-brace-format
 msgid "{AssetPermission} REMOVE {Node}"
 msgstr "{AssetPermission} 移除 {Node}"
 
-#: audits/signals_handler.py:142
+#: audits/signals_handler.py:137
 msgid "Asset permission and SystemUser"
 msgstr "资产授权与系统用户"
 
-#: audits/signals_handler.py:143
+#: audits/signals_handler.py:138
 #, python-brace-format
 msgid "{AssetPermission} ADD {SystemUser}"
 msgstr "{AssetPermission} 添加 {SystemUser}"
 
-#: audits/signals_handler.py:144
+#: audits/signals_handler.py:139
 #, python-brace-format
 msgid "{AssetPermission} REMOVE {SystemUser}"
 msgstr "{AssetPermission} 移除 {SystemUser}"
 
-#: audits/signals_handler.py:147
+#: audits/signals_handler.py:142
 msgid "User application permissions"
 msgstr "用户应用授权"
 
-#: audits/signals_handler.py:148
+#: audits/signals_handler.py:143
 #, python-brace-format
 msgid "{ApplicationPermission} ADD {User}"
 msgstr "{ApplicationPermission} 添加 {User}"
 
-#: audits/signals_handler.py:149
+#: audits/signals_handler.py:144
 #, python-brace-format
 msgid "{ApplicationPermission} REMOVE {User}"
 msgstr "{ApplicationPermission} 移除 {User}"
 
-#: audits/signals_handler.py:152
+#: audits/signals_handler.py:147
 msgid "User group application permissions"
 msgstr "用户组应用授权"
 
-#: audits/signals_handler.py:153
+#: audits/signals_handler.py:148
 #, python-brace-format
 msgid "{ApplicationPermission} ADD {UserGroup}"
 msgstr "{ApplicationPermission} 添加 {UserGroup}"
 
-#: audits/signals_handler.py:154
+#: audits/signals_handler.py:149
 #, python-brace-format
 msgid "{ApplicationPermission} REMOVE {UserGroup}"
 msgstr "{ApplicationPermission} 移除 {UserGroup}"
 
-#: audits/signals_handler.py:157 perms/models/application_permission.py:37
+#: audits/signals_handler.py:152 perms/models/application_permission.py:37
 msgid "Application permission"
 msgstr "应用授权"
 
-#: audits/signals_handler.py:158
+#: audits/signals_handler.py:153
 #, python-brace-format
 msgid "{ApplicationPermission} ADD {Application}"
 msgstr "{ApplicationPermission} 添加 {Application}"
 
-#: audits/signals_handler.py:159
+#: audits/signals_handler.py:154
 #, python-brace-format
 msgid "{ApplicationPermission} REMOVE {Application}"
 msgstr "{ApplicationPermission} 移除 {Application}"
 
-#: audits/signals_handler.py:162
+#: audits/signals_handler.py:157
 msgid "Application permission and SystemUser"
 msgstr "应用授权与系统用户"
 
-#: audits/signals_handler.py:163
+#: audits/signals_handler.py:158
 #, python-brace-format
 msgid "{ApplicationPermission} ADD {SystemUser}"
 msgstr "{ApplicationPermission} 添加 {SystemUser}"
 
-#: audits/signals_handler.py:164
+#: audits/signals_handler.py:159
 #, python-brace-format
 msgid "{ApplicationPermission} REMOVE {SystemUser}"
 msgstr "{ApplicationPermission} 移除 {SystemUser}"
@@ -2447,11 +2433,11 @@ msgstr "任务列表"
 msgid "Update task content: {}"
 msgstr "更新任务内容: {}"
 
-#: orgs/api.py:69
+#: orgs/api.py:66
 msgid "The current organization ({}) cannot be deleted"
 msgstr "当前组织 ({}) 不能被删除"
 
-#: orgs/api.py:77
+#: orgs/api.py:74
 msgid "The organization have resource ({}) cannot be deleted"
 msgstr "组织存在资源 ({}) 不能被删除"
 
@@ -2459,17 +2445,23 @@ msgstr "组织存在资源 ({}) 不能被删除"
 msgid "Organizations"
 msgstr "组织管理"
 
-#: orgs/mixins/models.py:46 orgs/mixins/serializers.py:25 orgs/models.py:27
-#: orgs/models.py:172 rbac/const.py:7 rbac/models/rolebinding.py:38
-#: tickets/serializers/ticket/ticket.py:77
+#: orgs/mixins/models.py:46 orgs/mixins/serializers.py:25 orgs/models.py:25
+#: orgs/models.py:170 rbac/const.py:7 rbac/models/rolebinding.py:40
+#: rbac/serializers/rolebinding.py:36 tickets/serializers/ticket/ticket.py:77
 msgid "Organization"
 msgstr "组织"
 
-#: orgs/models.py:21
+#: orgs/models.py:19
 msgid "GLOBAL"
 msgstr "全局组织"
 
-#: orgs/models.py:174 rbac/models/role.py:46 rbac/models/rolebinding.py:34
+#: orgs/models.py:27
+#, fuzzy
+#| msgid "Can view user view"
+msgid "Can view root org"
+msgstr "查看用户视图"
+
+#: orgs/models.py:172 rbac/models/role.py:46 rbac/models/rolebinding.py:36
 #: users/models/user.py:582 users/templates/users/_select_user_modal.html:15
 msgid "Role"
 msgstr "角色"
@@ -2485,6 +2477,28 @@ msgstr "管理员正在修改授权，请稍等"
 #: perms/exceptions.py:14
 msgid "The authorization cannot be revoked for the time being"
 msgstr "该授权暂时不能撤销"
+
+#: perms/models/application_permission.py:40
+#, fuzzy
+#| msgid "Can view admin view"
+msgid "Can view my apps"
+msgstr "查看管理视图"
+
+#: perms/models/application_permission.py:41
+msgid "Can connect my apps"
+msgstr ""
+
+#: perms/models/application_permission.py:42
+#, fuzzy
+#| msgid "Can view user view"
+msgid "Can view user apps"
+msgstr "查看用户视图"
+
+#: perms/models/application_permission.py:43
+#, fuzzy
+#| msgid "User group"
+msgid "Can view usergroup apps"
+msgstr "用户组"
 
 #: perms/models/asset_permission.py:37 settings/serializers/terminal.py:12
 msgid "All"
@@ -2525,11 +2539,35 @@ msgstr "剪贴板复制粘贴"
 msgid "Actions"
 msgstr "动作"
 
-#: perms/models/asset_permission.py:209
+#: perms/models/asset_permission.py:109
+#, fuzzy
+#| msgid "My assets"
+msgid "Can view my assets"
+msgstr "我的资产"
+
+#: perms/models/asset_permission.py:110
+#, fuzzy
+#| msgid "Connect timeout"
+msgid "Can connect my assets"
+msgstr "连接超时时间"
+
+#: perms/models/asset_permission.py:111
+#, fuzzy
+#| msgid "Can view user view"
+msgid "Can view user assets"
+msgstr "查看用户视图"
+
+#: perms/models/asset_permission.py:112
+#, fuzzy
+#| msgid "Can view user view"
+msgid "Can view usergroup assets"
+msgstr "查看用户视图"
+
+#: perms/models/asset_permission.py:215
 msgid "Ungrouped"
 msgstr "未分组"
 
-#: perms/models/asset_permission.py:211
+#: perms/models/asset_permission.py:217
 msgid "Favorite"
 msgstr "收藏夹"
 
@@ -2569,7 +2607,7 @@ msgid "Is expired"
 msgstr "已过期"
 
 #: perms/serializers/application/permission.py:40
-#: perms/serializers/asset/permission.py:70 rbac/serializers/role.py:22
+#: perms/serializers/asset/permission.py:70 rbac/serializers/role.py:26
 #: users/serializers/group.py:34
 msgid "Users amount"
 msgstr "用户数量"
@@ -2610,11 +2648,11 @@ msgstr "节点名称"
 msgid "System users display"
 msgstr "系统用户名称"
 
-#: rbac/api/role.py:23
+#: rbac/api/role.py:31
 msgid "Internal role, can't be destroy"
 msgstr ""
 
-#: rbac/api/role.py:30
+#: rbac/api/role.py:38
 msgid "Internal role, can't be update"
 msgstr ""
 
@@ -2622,29 +2660,45 @@ msgstr ""
 msgid "RBAC"
 msgstr "角色管理"
 
-#: rbac/builtin.py:62
+#: rbac/builtin.py:70
 msgid "SystemAdmin"
 msgstr "系统管理员"
 
-#: rbac/builtin.py:65
+#: rbac/builtin.py:73
 msgid "SystemAuditor"
 msgstr "系统审计员"
 
-#: rbac/builtin.py:71 xpack/plugins/change_auth_plan/models/app.py:139
+#: rbac/builtin.py:79 xpack/plugins/change_auth_plan/models/app.py:139
 msgid "App"
 msgstr "应用程序"
 
-#: rbac/builtin.py:74
+#: rbac/builtin.py:82
 msgid "OrgAdmin"
 msgstr "组织管理员"
 
-#: rbac/builtin.py:77
+#: rbac/builtin.py:85
 msgid "OrgAuditor"
 msgstr "组织审计员"
 
-#: rbac/builtin.py:80
+#: rbac/builtin.py:88
 msgid "OrgUser"
 msgstr "组织用户"
+
+#: rbac/models/menu.py:13
+msgid "Menu permission"
+msgstr "菜单权限"
+
+#: rbac/models/menu.py:15
+msgid "Admin view"
+msgstr "管理视图"
+
+#: rbac/models/menu.py:16
+msgid "Audit view"
+msgstr "审计视图"
+
+#: rbac/models/menu.py:17
+msgid "User view"
+msgstr "用户视图"
 
 #: rbac/models/permission.py:130
 msgid "View"
@@ -2654,23 +2708,7 @@ msgstr "查看"
 msgid "Permission"
 msgstr "权限"
 
-#: rbac/models/permission.py:274
-msgid "Extra permission"
-msgstr "其它权限"
-
-#: rbac/models/permission.py:276
-msgid "Can view admin view"
-msgstr "查看管理视图"
-
-#: rbac/models/permission.py:277
-msgid "Can view audit view"
-msgstr "查看审计视图"
-
-#: rbac/models/permission.py:278
-msgid "Can view user view"
-msgstr "查看用户视图"
-
-#: rbac/models/role.py:31 rbac/models/rolebinding.py:28
+#: rbac/models/role.py:31 rbac/models/rolebinding.py:30
 msgid "Scope"
 msgstr "范围"
 
@@ -2678,43 +2716,51 @@ msgstr "范围"
 msgid "Built-in"
 msgstr "内置"
 
-#: rbac/models/role.py:125
-#, fuzzy
-#| msgid "System roles"
+#: rbac/models/role.py:127
 msgid "System role"
 msgstr "系统角色"
 
-#: rbac/models/role.py:131
-#, fuzzy
-#| msgid "Organization role name"
+#: rbac/models/role.py:135
 msgid "Organization role"
-msgstr "组织角色名称"
+msgstr "组织角色"
 
-#: rbac/models/rolebinding.py:43
+#: rbac/models/rolebinding.py:45
 msgid "Role binding"
 msgstr "角色绑定"
 
-#: rbac/models/rolebinding.py:95
-#, fuzzy
-#| msgid "Organization role name"
-msgid "Organization role binding"
-msgstr "组织角色名称"
+#: rbac/models/rolebinding.py:111
+msgid ""
+"User last role in org, can not be delete, you can remove user from org "
+"instead"
+msgstr "用户最后一个角色，不能被"
 
-#: rbac/models/rolebinding.py:110
-#, fuzzy
-#| msgid "System role name"
+#: rbac/models/rolebinding.py:118
+msgid "Organization role binding"
+msgstr "组织角色授权"
+
+#: rbac/models/rolebinding.py:133
 msgid "System role binding"
-msgstr "系统角色名称"
+msgstr "系统角色授权"
 
 #: rbac/serializers/permission.py:26 users/serializers/profile.py:104
 msgid "Perms"
-msgstr "权限管理"
+msgstr "权限"
 
-#: rbac/serializers/role.py:23
-#, fuzzy
-#| msgid "Nodes display"
+#: rbac/serializers/role.py:11
+msgid "Scope display"
+msgstr "类型名称"
+
+#: rbac/serializers/role.py:27
 msgid "Name display"
 msgstr "节点名称"
+
+#: rbac/serializers/rolebinding.py:23
+msgid "Role display"
+msgstr "角色名称"
+
+#: rbac/serializers/rolebinding.py:52
+msgid "Has bound this role"
+msgstr "已经绑定该角色"
 
 #: settings/api/alibaba_sms.py:29 settings/api/tencent_sms.py:33
 msgid "test_phone is required"
@@ -3918,7 +3964,7 @@ msgstr "测试成功"
 msgid "Test failure: Account invalid"
 msgstr "测试失败: 账户无效"
 
-#: terminal/api/terminal.py:40
+#: terminal/api/terminal.py:39
 msgid "Have online sessions"
 msgstr "有在线会话"
 
@@ -4834,7 +4880,7 @@ msgid "Public key should not be the same as your old one."
 msgstr "不能和原来的密钥相同"
 
 #: users/forms/profile.py:149 users/serializers/profile.py:74
-#: users/serializers/profile.py:160 users/serializers/profile.py:187
+#: users/serializers/profile.py:156 users/serializers/profile.py:183
 msgid "Not a valid ssh public key"
 msgstr "SSH密钥不合法"
 
@@ -4879,27 +4925,23 @@ msgstr "最后更新密码日期"
 msgid "Need update password"
 msgstr "需要更新密码"
 
-#: users/models/user.py:793
-#, fuzzy
-#| msgid "Can view user view"
+#: users/models/user.py:791
 msgid "Can invite user"
-msgstr "查看用户视图"
+msgstr "可以邀请用户"
 
-#: users/models/user.py:794
-#, fuzzy
-#| msgid "System user"
+#: users/models/user.py:792
 msgid "Can remove user"
-msgstr "系统用户"
+msgstr "可以请离用户"
 
-#: users/models/user.py:803
+#: users/models/user.py:801
 msgid "Administrator"
 msgstr "管理员"
 
-#: users/models/user.py:806
+#: users/models/user.py:804
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
-#: users/models/user.py:831
+#: users/models/user.py:829
 msgid "User password history"
 msgstr "用户密码历史"
 
@@ -5363,7 +5405,7 @@ msgstr ""
 msgid "The old password is incorrect"
 msgstr "旧密码错误"
 
-#: users/serializers/profile.py:36 users/serializers/profile.py:174
+#: users/serializers/profile.py:36 users/serializers/profile.py:170
 msgid "Password does not match security rules"
 msgstr "密码不满足安全规则"
 
@@ -6373,11 +6415,11 @@ msgstr "退出页面logo"
 msgid "Interface setting"
 msgstr "界面设置"
 
-#: xpack/plugins/license/api.py:37
+#: xpack/plugins/license/api.py:41
 msgid "License import successfully"
 msgstr "许可证导入成功"
 
-#: xpack/plugins/license/api.py:38
+#: xpack/plugins/license/api.py:42
 msgid "License is invalid"
 msgstr "无效的许可证"
 
@@ -6400,6 +6442,23 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "User and Organization"
+#~ msgstr "用户与组织"
+
+#, python-brace-format
+#~ msgid "{User} JOINED {Organization}"
+#~ msgstr "{User} 加入 {Organization}"
+
+#, python-brace-format
+#~ msgid "{User} LEFT {Organization}"
+#~ msgstr "{User} 离开 {Organization}"
+
+#~ msgid "Extra permission"
+#~ msgstr "其它权限"
+
+#~ msgid "Can view audit view"
+#~ msgstr "查看审计视图"
 
 #, fuzzy
 #~| msgid "Organization role name"
@@ -6463,11 +6522,6 @@ msgstr "社区版"
 #~| msgid "Update"
 #~ msgid "Update user"
 #~ msgstr "更新"
-
-#, fuzzy
-#~| msgid "User group"
-#~ msgid "View user group"
-#~ msgstr "用户组"
 
 #, fuzzy
 #~| msgid "Access key"
@@ -7063,11 +7117,6 @@ msgstr "社区版"
 #~| msgid "Create user if not"
 #~ msgid "Create user login log"
 #~ msgstr "创建用户(如果不存在)"
-
-#, fuzzy
-#~| msgid "My assets"
-#~ msgid "View my asset"
-#~ msgstr "我的资产"
 
 #, fuzzy
 #~| msgid "My applications"
