@@ -151,9 +151,9 @@ class AuthMixin:
     def load_asset_special_auth(self, asset, username=''):
         """
         """
-        authbooks = AuthBook.objects.filter(asset=asset).filter(
+        authbooks = list(AuthBook.objects.filter(asset=asset).filter(
             Q(username=username) | Q(systemuser=self)
-        )
+        ))
         if len(authbooks) == 0:
             return None
         elif len(authbooks) == 1:
