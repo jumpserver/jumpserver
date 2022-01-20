@@ -157,6 +157,7 @@ class AppAccountSecretSerializer(AppAccountSerializer):
             'id', 'app_display', 'attrs', 'username', 'password', 'private_key',
             'public_key', 'date_created', 'date_updated', 'version'
         ]
+
         extra_kwargs = {
             'password': {'write_only': False},
             'private_key': {'write_only': False},
