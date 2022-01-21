@@ -13,17 +13,8 @@ class IsValidUser(permissions.IsAuthenticated, permissions.BasePermission):
     """Allows access to valid user, is active and not expired"""
 
     def has_permission(self, request, view):
-        return True
         return super(IsValidUser, self).has_permission(request, view) \
             and request.user.is_valid
-
-
-class IsAppUser(IsValidUser):
-    """Allows access only to app user """
-
-    def has_permission(self, request, view):
-        return super(IsAppUser, self).has_permission(request, view) \
-            and request.user.is_app
 
 
 class IsSuperUser(IsValidUser):

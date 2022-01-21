@@ -20,7 +20,7 @@ from rest_framework import serializers
 from authentication.signals import post_auth_failed, post_auth_success
 from common.utils import get_logger, random_string
 from common.drf.api import SerializerMixin
-from common.permissions import IsSuperUserOrAppUser, IsValidUser, IsSuperUser
+from common.permissions import IsValidUser, IsSuperUser
 from orgs.mixins.api import RootOrgViewMixin
 from common.http import is_true
 
@@ -33,6 +33,14 @@ __all__ = ['UserConnectionTokenViewSet']
 
 
 class ClientProtocolMixin:
+    """
+    下载客户端支持的连接文件，里面包含了 token，和 其他连接信息
+
+    - [x] RDP
+    - [ ] KoKo
+
+    本质上，这里还是暴露出 token 来，进行使用
+    """
     request: Request
     get_serializer: Callable
     create_token: Callable
@@ -114,7 +122,7 @@ class ClientProtocolMixin:
             name = '*'
         return name, content
 
-    @action(methods=['POST', 'GET'], detail=False, url_path='rdp/file', permission_classes=[IsValidUser])
+    @action(methods=['POST', 'GET'], detail=False, url_path='rdp/file')
     def get_rdp_file(self, request, *args, **kwargs):
         if self.request.method == 'GET':
             data = self.request.query_params
@@ -144,7 +152,7 @@ class ClientProtocolMixin:
         if protocol == 'rdp':
             name, config = self.get_rdp_file_content(serializer)
         elif protocol == 'vnc':
-            raise HttpResponse(status=404, data={"error": "VNC not support"})
+            return {"error": "VNC not support"}
         else:
             config = 'ssh://system_user@asset@user@jumpserver-ssh'
         data = {
@@ -154,7 +162,7 @@ class ClientProtocolMixin:
         }
         return data
 
-    @action(methods=['POST', 'GET'], detail=False, url_path='client-url', permission_classes=[IsValidUser])
+    @action(methods=['POST', 'GET'], detail=False, url_path='client-url')
     def get_client_protocol_url(self, request, *args, **kwargs):
         serializer = self.get_valid_serializer()
         protocol_data = self.get_client_protocol_data(serializer)
@@ -215,8 +223,14 @@ class SecretDetailMixin:
             'actions': actions,
         }
 
-    @action(methods=['POST'], detail=False, permission_classes=[IsSuperUserOrAppUser], url_path='secret-info/detail')
+    @action(methods=['POST'], detail=False, url_path='secret-info/detail')
     def get_secret_detail(self, request, *args, **kwargs):
+        perm_required = 'authentication.view_connectiontokensecret'
+
+        # 非常重要的 api，再逻辑层再判断一下，双重保险
+        if not request.user.has_perm(perm_required):
+            raise PermissionDenied('Not allow to view secret')
+
         token = request.data.get('token', '')
         try:
             value, user, system_user, asset, app, expired_at = self.valid_token(token)
@@ -250,12 +264,17 @@ class UserConnectionTokenViewSet(
     RootOrgViewMixin, SerializerMixin, ClientProtocolMixin,
     SecretDetailMixin, GenericViewSet
 ):
-    permission_classes = (IsSuperUserOrAppUser,)
     serializer_classes = {
         'default': ConnectionTokenSerializer,
         'get_secret_detail': ConnectionTokenSecretSerializer,
     }
     CACHE_KEY_PREFIX = 'CONNECTION_TOKEN_{}'
+    rbac_perms = {
+        'create': 'add_connectiontoken',
+        'get_secret_detail': 'view_connectiontokensecret',
+        'get_rdp_file': 'add_connectiontoken',
+        'get_client_protocol_url': 'add_connectiontoken',
+    }
 
     @staticmethod
     def check_resource_permission(user, asset, application, system_user):
