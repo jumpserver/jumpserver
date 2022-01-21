@@ -25,6 +25,10 @@ class AuthBook(BaseUser, AbsConnectivity):
     class Meta:
         verbose_name = _('AuthBook')
         unique_together = [('username', 'asset', 'systemuser')]
+        permissions = [
+            ('view_assetaccountsecret', _('Can view asset account secret')),
+            ('change_assetaccountsecret', _('Can change asset account secret'))
+        ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

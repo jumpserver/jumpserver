@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-import builtins
 import time
 from django.utils.translation import ugettext as _
 from django.conf import settings
@@ -9,9 +8,7 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.serializers import ValidationError
 from rest_framework.response import Response
 
-from authentication.sms_verify_code import VerifyCodeUtil
-from common.exceptions import JMSException
-from common.permissions import IsValidUser, NeedMFAVerify, IsAppUser
+from common.permissions import IsValidUser, NeedMFAVerify
 from users.models.user import MFAType
 from ..serializers import OtpVerifySerializer
 from .. import serializers

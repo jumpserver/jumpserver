@@ -6,7 +6,7 @@ import tarfile
 from django.shortcuts import get_object_or_404, reverse
 from django.utils.translation import ugettext as _
 from django.utils.encoding import escape_uri_path
-from django.http import FileResponse, HttpResponse
+from django.http import FileResponse
 from django.core.files.storage import default_storage
 from rest_framework import viewsets, views
 from rest_framework.response import Response
@@ -15,16 +15,15 @@ from rest_framework.decorators import action
 from common.utils import model_to_json
 from .. import utils
 from common.const.http import GET
-from common.utils import is_uuid, get_logger, get_object_or_none
+from common.utils import get_logger, get_object_or_none
 from common.mixins.api import AsyncApiMixin
-from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor, IsAppUser
+from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor, IsValidUser
 from common.drf.filters import DatetimeRangeFilter
 from common.drf.renders import PassthroughRenderer
 from orgs.mixins.api import OrgBulkModelViewSet
-from orgs.utils import tmp_to_root_org, tmp_to_org
+from orgs.utils import tmp_to_root_org
 from users.models import User
 from ..utils import find_session_replay_local, download_session_replay
-from ..hands import SystemUser
 from ..models import Session
 from .. import serializers
 
@@ -168,7 +167,10 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
 
 
 class SessionJoinValidateAPI(views.APIView):
-    permission_classes = (IsAppUser, )
+    """
+    监控用
+    """
+    permission_classes = (IsValidUser, )
     serializer_class = serializers.SessionJoinValidateSerializer
 
     def post(self, request, *args, **kwargs):

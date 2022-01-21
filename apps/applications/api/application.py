@@ -7,7 +7,6 @@ from rest_framework.response import Response
 
 from common.tree import TreeNodeSerializer
 from common.mixins.views import SuggestionMixin
-from ..hands import IsOrgAdminOrAppUser
 from .. import serializers
 from ..models import Application
 
@@ -22,7 +21,6 @@ class ApplicationViewSet(SuggestionMixin, OrgBulkModelViewSet):
         'type': ['exact', 'in'],
     }
     search_fields = ('name', 'type', 'category')
-    permission_classes = (IsOrgAdminOrAppUser,)
     serializer_classes = {
         'default': serializers.AppSerializer,
         'get_tree': TreeNodeSerializer,

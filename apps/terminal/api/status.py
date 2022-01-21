@@ -4,10 +4,9 @@
 import logging
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, generics
-from rest_framework.views import  Response
+from rest_framework.views import Response
 from rest_framework import status
 
-from common.permissions import IsAppUser, IsOrgAdminOrAppUser
 from ..models import Terminal, Status, Session
 from .. import serializers
 from ..utils import TypedComponentsStatusMetricsUtil
@@ -15,16 +14,12 @@ from ..utils import TypedComponentsStatusMetricsUtil
 logger = logging.getLogger(__file__)
 
 
-__all__ = [
-    'StatusViewSet',
-    'ComponentsMetricsAPIView',
-]
+__all__ = ['StatusViewSet', 'ComponentsMetricsAPIView']
 
 
 class StatusViewSet(viewsets.ModelViewSet):
     queryset = Status.objects.all()
     serializer_class = serializers.StatusSerializer
-    permission_classes = (IsOrgAdminOrAppUser,)
     session_serializer_class = serializers.SessionSerializer
     task_serializer_class = serializers.TaskSerializer
 
@@ -52,11 +47,6 @@ class StatusViewSet(viewsets.ModelViewSet):
         serializer.validated_data.pop('sessions', None)
         serializer.validated_data["terminal"] = self.request.user.terminal
         return super().perform_create(serializer)
-
-    def get_permissions(self):
-        if self.action == "create":
-            self.permission_classes = (IsAppUser,)
-        return super().get_permissions()
 
 
 class ComponentsMetricsAPIView(generics.GenericAPIView):

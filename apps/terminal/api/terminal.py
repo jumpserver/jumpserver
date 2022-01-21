@@ -84,7 +84,9 @@ class TerminalViewSet(JMSBulkModelViewSet):
 
 
 class TerminalConfig(APIView):
-    permission_classes = (IsAppUser,)
+    rbac_perms = {
+        'GET': 'view_terminalconfig'
+    }
 
     def get(self, request):
         config = request.user.terminal.config

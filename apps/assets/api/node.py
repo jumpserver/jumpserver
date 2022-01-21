@@ -19,7 +19,6 @@ from common.tree import TreeNodeSerializer
 from orgs.mixins.api import OrgModelViewSet
 from orgs.mixins import generics
 from orgs.utils import current_org
-from ..hands import IsOrgAdmin
 from ..models import Node
 from ..tasks import (
     update_node_assets_hardware_info_manual,

@@ -17,6 +17,10 @@ class Account(BaseUser):
     class Meta:
         verbose_name = _('Application account')
         unique_together = [('username', 'app', 'systemuser')]
+        permissions = [
+            ('view_applicationaccountsecret', _('Can view application account secret')),
+            ('change_appplicationaccountsecret', _('Can view application account secret')),
+        ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

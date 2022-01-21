@@ -12,7 +12,7 @@ from django.template import loader
 from terminal.models import CommandStorage
 from terminal.filters import CommandFilter
 from orgs.utils import current_org
-from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor, IsAppUser
+from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor
 from common.drf.api import JMSBulkModelViewSet
 from common.utils import get_logger
 from terminal.serializers import InsecureCommandAlertSerializer
@@ -105,7 +105,6 @@ class CommandViewSet(JMSBulkModelViewSet):
 
     """
     command_store = get_command_storage()
-    permission_classes = [IsOrgAdminOrAppUser | IsOrgAuditor]
     serializer_class = SessionCommandSerializer
     filterset_class = CommandFilter
     ordering_fields = ('timestamp', )
@@ -177,6 +176,9 @@ class CommandViewSet(JMSBulkModelViewSet):
 
 class CommandExportApi(CommandQueryMixin, generics.ListAPIView):
     serializer_class = SessionCommandSerializer
+    rbac_perms = {
+        'POST': 'terminal.view_command'
+    }
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
@@ -196,8 +198,10 @@ class CommandExportApi(CommandQueryMixin, generics.ListAPIView):
 
 
 class InsecureCommandAlertAPI(generics.CreateAPIView):
-    permission_classes = [IsAppUser]
     serializer_class = InsecureCommandAlertSerializer
+    rbac_perms = {
+        'POST': 'terminal.add_command'
+    }
 
     def post(self, request, *args, **kwargs):
         serializer = InsecureCommandAlertSerializer(data=request.data, many=True)

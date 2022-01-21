@@ -9,7 +9,7 @@ from rest_framework.response import Response
 
 from common.permissions import IsValidUser
 
-__all__ = ["DatetimeSearchMixin", "PermissionsMixin"]
+__all__ = ["DatetimeSearchMixin", "PermissionsMixin", "SuggestionMixin"]
 
 
 class DatetimeSearchMixin:

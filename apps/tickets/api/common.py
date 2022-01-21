@@ -2,7 +2,6 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.generics import RetrieveDestroyAPIView
 
-from common.permissions import IsAppUser
 from common.utils import lazyproperty
 from orgs.utils import tmp_to_root_org
 from ..models import Ticket
@@ -12,7 +11,7 @@ __all__ = ['GenericTicketStatusRetrieveCloseAPI']
 
 
 class GenericTicketStatusRetrieveCloseAPI(RetrieveDestroyAPIView):
-    permission_classes = (IsAppUser, )
+    queryset = Ticket.objects.all()
 
     def retrieve(self, request, *args, **kwargs):
         if self.ticket.state_open:
