@@ -87,15 +87,11 @@ class AssetPlatformRetrieveApi(RetrieveAPIView):
 
 
 class AssetPlatformViewSet(ModelViewSet):
+    queryset = Platform.objects.all()
     permission_classes = (IsSuperUser,)
     serializer_class = serializers.PlatformSerializer
-    filterset_fields = ['name', 'base']
+    filterset_fields = ['name', 'base', 'internal']
     search_fields = ['name']
-
-    def get_queryset(self):
-        if self.request.query_params.get('type') == 'custom':
-            return Platform.objects.filter(internal=False)
-        return Platform.objects.all()
 
     def get_permissions(self):
         if self.request.method.lower() in ['get', 'options']:
