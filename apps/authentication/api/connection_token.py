@@ -298,9 +298,6 @@ class SecretDetailMixin:
             data['type'] = 'application'
             data.update(app_detail)
 
-        self.request.session['auth_backend'] = settings.AUTH_BACKEND_AUTH_TOKEN
-        post_auth_success.send(sender=self.__class__, user=user, request=self.request, login_type='T')
-
         serializer = self.get_serializer(data)
         return Response(data=serializer.data, status=200)
 
