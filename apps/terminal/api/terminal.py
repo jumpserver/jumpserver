@@ -13,7 +13,7 @@ from django.utils.translation import gettext_lazy as _
 from common.exceptions import JMSException
 from common.drf.api import JMSBulkModelViewSet
 from common.utils import get_object_or_none
-from common.permissions import IsAppUser, WithBootstrapToken
+from common.permissions import WithBootstrapToken
 from ..models import Terminal
 from .. import serializers
 from .. import exceptions

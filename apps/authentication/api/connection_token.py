@@ -270,6 +270,7 @@ class UserConnectionTokenViewSet(
     }
     CACHE_KEY_PREFIX = 'CONNECTION_TOKEN_{}'
     rbac_perms = {
+        'GET': 'view_connectiontoken',
         'create': 'add_connectiontoken',
         'get_secret_detail': 'view_connectiontokensecret',
         'get_rdp_file': 'add_connectiontoken',
@@ -361,14 +362,6 @@ class UserConnectionTokenViewSet(
         if not has_perm:
             raise serializers.ValidationError('Permission expired or invalid')
         return value, user, system_user, asset, app, expired_at
-
-    def get_permissions(self):
-        if self.action in ["create", "get_rdp_file"]:
-            if self.request.data.get('user', None):
-                self.permission_classes = (IsSuperUser,)
-            else:
-                self.permission_classes = (IsValidUser,)
-        return super().get_permissions()
 
     def get(self, request):
         token = request.query_params.get('token')
