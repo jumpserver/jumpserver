@@ -4,10 +4,10 @@ from itertools import groupby
 from celery import shared_task
 from common.db.utils import get_object_if_need, get_objects
 from django.utils.translation import ugettext as _
-from django.db.models import Empty, Q
+from django.db.models import Empty
 
 from common.utils import encrypt_password, get_logger
-from assets.models import SystemUser, Asset, AuthBook
+from assets.models import SystemUser, Asset
 from orgs.utils import org_aware_func, tmp_to_root_org
 from . import const
 from .utils import clean_ansible_task_hosts, group_asset_by_platform
@@ -178,6 +178,7 @@ def get_push_windows_system_user_tasks(system_user: SystemUser, username=None):
 
 def get_push_system_user_tasks(system_user, platform="unixlike", username=None):
     """
+    获取推送系统用户的 ansible 命令，跟资产无关
     :param system_user:
     :param platform:
     :param username: 当动态时，近推送某个
@@ -209,17 +210,9 @@ def push_system_user_util(system_user, assets, task_name, username=None):
     if not assets:
         return {}
 
+    # 资产按平台分类
     assets_sorted = sorted(assets, key=group_asset_by_platform)
     platform_hosts = groupby(assets_sorted, key=group_asset_by_platform)
-
-    def run_task(_tasks, _hosts):
-        if not _tasks:
-            return
-        task, created = update_or_create_ansible_task(
-            task_name=task_name, hosts=_hosts, tasks=_tasks, pattern='all',
-            options=const.TASK_OPTIONS, run_as_admin=True,
-        )
-        task.run()
 
     if system_user.username_same_with_user:
         if username is None:
@@ -232,6 +225,15 @@ def push_system_user_util(system_user, assets, task_name, username=None):
         assert username is None, 'Only Dynamic user can assign `username`'
         usernames = [system_user.username]
 
+    def run_task(_tasks, _hosts):
+        if not _tasks:
+            return
+        task, created = update_or_create_ansible_task(
+            task_name=task_name, hosts=_hosts, tasks=_tasks, pattern='all',
+            options=const.TASK_OPTIONS, run_as_admin=True,
+        )
+        task.run()
+
     for platform, _assets in platform_hosts:
         _assets = list(_assets)
         if not _assets:
@@ -239,36 +241,11 @@ def push_system_user_util(system_user, assets, task_name, username=None):
         print(_("Start push system user for platform: [{}]").format(platform))
         print(_("Hosts count: {}").format(len(_assets)))
 
-        id_asset_map = {_asset.id: _asset for _asset in _assets}
-        asset_ids = id_asset_map.keys()
-        no_special_auth = []
-        special_auth_set = set()
-
-        auth_books = AuthBook.objects.filter(asset_id__in=asset_ids).filter(
-            Q(username__in=usernames) | Q(systemuser__username__in=usernames)
-        ).prefetch_related('systemuser')
-
-        for auth_book in auth_books:
-            auth_book.load_auth()
-            special_auth_set.add((auth_book.username, auth_book.asset_id))
-
-        for _username in usernames:
-            no_special_assets = []
-            for asset_id in asset_ids:
-                if (_username, asset_id) not in special_auth_set:
-                    no_special_assets.append(id_asset_map[asset_id])
-            if no_special_assets:
-                no_special_auth.append((_username, no_special_assets))
-
-        for _username, no_special_assets in no_special_auth:
-            tasks = get_push_system_user_tasks(system_user, platform, username=_username)
-            run_task(tasks, no_special_assets)
-
-        for auth_book in auth_books:
-            system_user._merge_auth(auth_book)
-            tasks = get_push_system_user_tasks(system_user, platform, username=auth_book.username)
-            asset = id_asset_map[auth_book.asset_id]
-            run_task(tasks, [asset])
+        for u in usernames:
+            for a in _assets:
+                system_user.load_asset_special_auth(a, u)
+                tasks = get_push_system_user_tasks(system_user, platform, username=u)
+                run_task(tasks, [a])
 
 
 @shared_task(queue="ansible")
