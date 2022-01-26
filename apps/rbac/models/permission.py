@@ -108,7 +108,6 @@ class PermissionTreeUtil:
             node = TreeNode(**{
                 'id': model_id,
                 'name': name,
-                # 'name': name + "||" + ct.model,
                 'title': name,
                 'pId': ct.app_label,
                 'chkDisabled': self.check_disabled,
@@ -233,14 +232,25 @@ class Permission(DjangoPermission):
         if not defines:
             return None
         q = Q()
-        for app_label, model, code_name in defines:
+
+        for define in defines:
+            app_label, model, actions, resource, *args = list(define)
             kwargs = {}
             if app_label != '*':
                 kwargs['content_type__app_label'] = app_label
             if model != '*':
                 kwargs['content_type__model'] = model
-            if code_name != '*':
-                kwargs['codename'] = code_name
+
+            actions_list = [a.strip() for a in actions.split(',')]
+            actions_regex = '|'.join(actions_list)
+            if actions == '*' and resource == '*':
+                pass
+            elif actions == '*' and resource != '*':
+                kwargs['codename__iregex'] = r'[a-z]+_{}'.format(resource)
+            elif actions != '*' and resource == '*':
+                kwargs['codename__iregex'] = r'({})_\w+'.format(actions_regex)
+            else:
+                kwargs['codename__iregex'] = r'{}_{}'.format(actions_regex, resource)
             q |= Q(**kwargs)
         return q
 

@@ -1,41 +1,45 @@
-from django.utils.translation import ugettext_lazy as _, ugettext_noop
+from django.utils.translation import ugettext_noop
 
-from .const import Scope
+from .const import Scope, system_exclude_permissions, org_exclude_permissions
 
 
 auditor_perms = (
-    ('audits', '*', '*'),
-    ('rbac', 'menupermission', 'view_auditview'),
-    ('terminal', 'session', '*'),
-    ('terminal', 'command', '*'),
+    ('audits', '*', '*', '*'),
+    ('rbac', 'menupermission', 'view', 'auditview'),
+    ('terminal', 'session', '*', '*'),
+    ('terminal', 'command', '*', '*'),
 )
 
 user_perms = (
-    ('rbac', 'menupermission', 'view_userview'),
-    ('perms', 'assetpermission', 'view_myassets'),
-    ('perms', 'assetpermission', 'connect_myassets'),
-    ('perms', 'applicationpermission', 'view_myapps'),
-    ('perms', 'applicationpermission', 'connect_myapps'),
+    ('rbac', 'menupermission', 'view', 'userview'),
+    ('perms', 'assetpermission', 'view,connect', 'myassets'),
+    ('perms', 'applicationpermission', 'view,connect', 'myapps'),
 )
 
-app_perms = [
-    ('terminal', '*', '*'),
-    ('acls', 'loginacl', 'view_loginacl'),
-    ('acls', 'loginassetacl', 'view_loginassetacl'),
-    ('applications', 'application', 'view_application'),
-    ('applications', 'applicationuser', 'view_applicationuser'),
-    ('assets', 'asset', 'view_asset'),
+app_exclude_perms = [
+    ('users', 'user', 'add,delete', 'user'),
+    ('orgs', 'org', 'add,delete,change', 'org'),
+    ('rbac', '*', '*', '*'),
 ]
+
+need_check = [
+    *auditor_perms, *user_perms, *app_exclude_perms,
+    *system_exclude_permissions, *org_exclude_permissions
+]
+defines_errors = [d for d in need_check if len(d) != 4]
+if len(defines_errors) != 0:
+    raise ValueError('Perms define error: {}'.format(defines_errors))
 
 
 class PreRole:
     id_prefix = '00000000-0000-0000-0000-00000000000'
 
-    def __init__(self, index, name, scope, perms):
+    def __init__(self, index, name, scope, perms, perms_type='include'):
         self.id = self.id_prefix + index
         self.name = name
         self.scope = scope
         self.perms = perms
+        self.perms_type = perms_type
 
     def get_role(self):
         from rbac.models import Role
@@ -45,10 +49,12 @@ class PreRole:
         from rbac.models import Permission
         q = Permission.get_define_permissions_q(self.perms)
         permissions = Permission.get_permissions(self.scope)
-        if q:
+        if not q:
+            permissions = permissions.none()
+        if self.perms_type == 'include':
             permissions = permissions.filter(q)
         else:
-            permissions = permissions.none()
+            permissions = permissions.exclude(q)
         perms = permissions.values_list('id', flat=True)
         defaults = {
             'id': self.id, 'name': self.name, 'scope': self.scope,
@@ -76,7 +82,7 @@ class BuiltinRole:
         '3', ugettext_noop('User'), Scope.system, []
     )
     system_app = PreRole(
-        '4', ugettext_noop('App'), Scope.system, app_perms
+        '4', ugettext_noop('App'), Scope.system, app_exclude_perms, 'exclude'
     )
     org_admin = PreRole(
         '5', ugettext_noop('OrgAdmin'), Scope.org, []
