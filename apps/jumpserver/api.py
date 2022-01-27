@@ -8,7 +8,6 @@ from django.http.response import JsonResponse, HttpResponse
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from collections import Counter
-from django.conf import settings
 from rest_framework.response import Response
 
 from users.models import User
@@ -16,8 +15,7 @@ from assets.models import Asset
 from terminal.models import Session
 from terminal.utils import ComponentsPrometheusMetricsUtil
 from orgs.utils import current_org
-from common.permissions import IsOrgAdmin, IsOrgAuditor
-from common.utils import lazyproperty, get_request_ip
+from common.utils import lazyproperty
 from orgs.caches import OrgResourceStatisticsCache
 
 
@@ -214,8 +212,10 @@ class DatesLoginMetricMixin:
 
 
 class IndexApi(DatesLoginMetricMixin, APIView):
-    permission_classes = (IsOrgAdmin | IsOrgAuditor,)
     http_method_names = ['get']
+    rbac_perms = {
+        'GET': 'view_auditview'
+    }
 
     def get(self, request, *args, **kwargs):
         data = {}

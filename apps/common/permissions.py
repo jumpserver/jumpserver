@@ -29,31 +29,6 @@ class OnlySuperUser(IsValidUser):
                and request.user.is_superuser
 
 
-class IsSuperUserOrAppUser(IsSuperUser):
-    def has_permission(self, request, view):
-        return True
-        if request.user.is_anonymous:
-            return False
-        return super(IsSuperUserOrAppUser, self).has_permission(request, view) \
-            or request.user.is_app
-
-
-class IsSuperAuditor(IsValidUser):
-    def has_permission(self, request, view):
-        return True
-        return super(IsSuperAuditor, self).has_permission(request, view) \
-               and request.user.is_super_auditor
-
-
-class IsOrgAuditor(IsValidUser):
-    def has_permission(self, request, view):
-        return True
-        if not current_org:
-            return False
-        return super(IsOrgAuditor, self).has_permission(request, view) \
-               and current_org.can_audit_by(request.user)
-
-
 class IsOrgAdmin(IsValidUser):
     """Allows access only to superuser"""
 
@@ -61,8 +36,6 @@ class IsOrgAdmin(IsValidUser):
         if not current_org:
             return False
         return True
-        # return super(IsOrgAdmin, self).has_permission(request, view) \
-        #     and current_org.can_admin_by(request.user)
 
 
 class IsOrgAdminOrAppUser(IsValidUser):
@@ -74,8 +47,6 @@ class IsOrgAdminOrAppUser(IsValidUser):
         if request.user.is_anonymous:
             return False
         return True
-        # return super(IsOrgAdminOrAppUser, self).has_permission(request, view) \
-        #     and (current_org.can_admin_by(request.user) or request.user.is_app)
 
 
 class IsOrgAdminOrAppUserOrUserReadonly(IsOrgAdminOrAppUser):

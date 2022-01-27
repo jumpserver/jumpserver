@@ -17,7 +17,7 @@ from .. import utils
 from common.const.http import GET
 from common.utils import get_logger, get_object_or_none
 from common.mixins.api import AsyncApiMixin
-from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor, IsValidUser
+from common.permissions import IsValidUser
 from common.drf.filters import DatetimeRangeFilter
 from common.drf.renders import PassthroughRenderer
 from orgs.mixins.api import OrgBulkModelViewSet
@@ -40,9 +40,9 @@ class SessionViewSet(OrgBulkModelViewSet):
         'default': serializers.SessionSerializer,
         'display': serializers.SessionDisplaySerializer,
     }
-    permission_classes = (IsOrgAdminOrAppUser, )
     search_fields = [
-        "user", "asset", "system_user", "remote_addr", "protocol", "is_finished", 'login_from',
+        "user", "asset", "system_user", "remote_addr",
+        "protocol", "is_finished", 'login_from',
     ]
     filterset_fields = search_fields + ['terminal']
     date_range_filter_fields = [
@@ -99,17 +99,11 @@ class SessionViewSet(OrgBulkModelViewSet):
             serializer.validated_data["terminal"] = self.request.user.terminal
         return super().perform_create(serializer)
 
-    def get_permissions(self):
-        if self.request.method.lower() in ['get', 'options']:
-            self.permission_classes = (IsOrgAdminOrAppUser | IsOrgAuditor, )
-        return super().get_permissions()
-
 
 class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
     serializer_class = serializers.ReplaySerializer
-    permission_classes = (IsOrgAdminOrAppUser | IsOrgAuditor,)
-    session = None
     download_cache_key = "SESSION_REPLAY_DOWNLOAD_{}"
+    session = None
 
     def create(self, request, *args, **kwargs):
         session_id = kwargs.get('pk')

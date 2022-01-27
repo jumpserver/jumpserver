@@ -3,12 +3,12 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 
 from common.utils import get_logger
-from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, IsValidUser
+from common.permissions import IsValidUser
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
 from common.mixins.views import SuggestionMixin
 from orgs.utils import tmp_to_root_org
-from ..models import SystemUser, Asset
+from ..models import SystemUser, CommandFilterRule
 from .. import serializers
 from ..serializers import SystemUserWithAuthInfoSerializer, SystemUserTempAuthSerializer
 from ..tasks import (
@@ -42,7 +42,6 @@ class SystemUserViewSet(SuggestionMixin, OrgBulkModelViewSet):
         'default': serializers.SystemUserSerializer,
         'suggestion': serializers.MiniSystemUserSerializer
     }
-    permission_classes = (IsOrgAdminOrAppUser,)
 
 
 class SystemUserAuthInfoApi(generics.RetrieveUpdateDestroyAPIView):
@@ -50,8 +49,13 @@ class SystemUserAuthInfoApi(generics.RetrieveUpdateDestroyAPIView):
     Get system user auth info
     """
     model = SystemUser
-    permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = SystemUserWithAuthInfoSerializer
+    rbac_perms = {
+        'retrieve': 'assets.view_systemusersecret',
+        'list': 'assets.view_systemusersecret',
+        'change': 'assets.change_systemuser',
+        'destroy': 'assets.change_systemuser',
+    }
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -83,7 +87,6 @@ class SystemUserAssetAuthInfoApi(generics.RetrieveAPIView):
     Get system user with asset auth info
     """
     model = SystemUser
-    permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = SystemUserWithAuthInfoSerializer
 
     def get_object(self):
@@ -100,8 +103,10 @@ class SystemUserAppAuthInfoApi(generics.RetrieveAPIView):
     Get system user with asset auth info
     """
     model = SystemUser
-    permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = SystemUserWithAuthInfoSerializer
+    rbac_perms = {
+        'retrieve': 'assets.view_systemusersecret',
+    }
 
     def get_object(self):
         instance = super().get_object()
@@ -134,6 +139,18 @@ class SystemUserTaskApi(generics.CreateAPIView):
         pk = self.kwargs.get('pk')
         return get_object_or_404(SystemUser, pk=pk)
 
+    def check_permissions(self, request):
+        action = request.data.get('action')
+        action_perm_require = {
+            'push': 'assets.push_systemuser',
+            'test': 'assets.test_connectivity'
+        }
+        perm_required = action_perm_require.get(action)
+        has = self.request.user.has_perm(perm_required)
+
+        if not has:
+            self.permission_denied(request)
+
     def perform_create(self, serializer):
         action = serializer.validated_data["action"]
         asset = serializer.validated_data.get('asset')
@@ -157,7 +174,9 @@ class SystemUserTaskApi(generics.CreateAPIView):
 
 
 class SystemUserCommandFilterRuleListApi(generics.ListAPIView):
-    permission_classes = (IsOrgAdminOrAppUser,)
+    rbac_perms = {
+        'list': 'assets.view_commandfilterule'
+    }
 
     def get_serializer_class(self):
         from ..serializers import CommandFilterRuleSerializer
@@ -173,6 +192,9 @@ class SystemUserAssetsListView(generics.ListAPIView):
     serializer_class = serializers.AssetSimpleSerializer
     filterset_fields = ("hostname", "ip")
     search_fields = filterset_fields
+    rbac_perms = {
+        'list': 'assets.view_asset'
+    }
 
     def get_object(self):
         pk = self.kwargs.get('pk')

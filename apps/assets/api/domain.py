@@ -6,7 +6,6 @@ from rest_framework.views import APIView, Response
 from rest_framework.serializers import ValidationError
 
 from common.utils import get_logger
-from common.permissions import IsOrgAdminOrAppUser
 from orgs.mixins.api import OrgBulkModelViewSet
 from ..models import Domain, Gateway
 from .. import serializers
@@ -20,7 +19,6 @@ class DomainViewSet(OrgBulkModelViewSet):
     model = Domain
     filterset_fields = ("name", )
     search_fields = filterset_fields
-    permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.DomainSerializer
 
     def get_serializer_class(self):
@@ -33,12 +31,14 @@ class GatewayViewSet(OrgBulkModelViewSet):
     model = Gateway
     filterset_fields = ("domain__name", "name", "username", "ip", "domain")
     search_fields = ("domain__name", "name", "username", "ip")
-    permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.GatewaySerializer
 
 
 class GatewayTestConnectionApi(SingleObjectMixin, APIView):
     object = None
+    rbac_perms = {
+        'POST': 'assets.change_gateway'
+    }
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object(Gateway.objects.all())

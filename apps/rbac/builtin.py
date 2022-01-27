@@ -43,18 +43,20 @@ class PreRole:
 
     def get_role(self):
         from rbac.models import Role
-        return Role.objects.get(name=self.name)
+        return Role.objects.get(id=self.id)
 
     def get_defaults(self):
         from rbac.models import Permission
         q = Permission.get_define_permissions_q(self.perms)
         permissions = Permission.get_permissions(self.scope)
+
         if not q:
             permissions = permissions.none()
-        if self.perms_type == 'include':
+        elif self.perms_type == 'include':
             permissions = permissions.filter(q)
         else:
             permissions = permissions.exclude(q)
+
         perms = permissions.values_list('id', flat=True)
         defaults = {
             'id': self.id, 'name': self.name, 'scope': self.scope,
@@ -78,11 +80,11 @@ class BuiltinRole:
     system_auditor = PreRole(
         '2', ugettext_noop('SystemAuditor'), Scope.system, auditor_perms
     )
+    system_app = PreRole(
+        '4', ugettext_noop('SystemApp'), Scope.system, app_exclude_perms, 'exclude'
+    )
     system_user = PreRole(
         '3', ugettext_noop('User'), Scope.system, []
-    )
-    system_app = PreRole(
-        '4', ugettext_noop('App'), Scope.system, app_exclude_perms, 'exclude'
     )
     org_admin = PreRole(
         '5', ugettext_noop('OrgAdmin'), Scope.org, []

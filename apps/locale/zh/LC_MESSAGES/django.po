@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-20 14:18+0800\n"
+"POT-Creation-Date: 2022-01-27 13:29+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -100,7 +100,7 @@ msgstr "动作"
 #: audits/models.py:36 audits/models.py:59 audits/models.py:80
 #: audits/serializers.py:93 authentication/models.py:47
 #: authentication/models.py:103 orgs/models.py:171 perms/models/base.py:45
-#: rbac/builtin.py:76 rbac/models/rolebinding.py:33 templates/index.html:78
+#: rbac/builtin.py:87 rbac/models/rolebinding.py:33 templates/index.html:78
 #: terminal/backends/command/models.py:18
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:38
 #: tickets/models/comment.py:17 users/const.py:14 users/models/user.py:789
@@ -288,6 +288,10 @@ msgstr "版本"
 msgid "Application account"
 msgstr "应用账号"
 
+#: applications/models/account.py:21 applications/models/account.py:22
+msgid "Can view application account secret"
+msgstr "可以查看应用账号密码"
+
 #: applications/models/application.py:168
 #: applications/serializers/application.py:88 assets/models/label.py:21
 #: perms/models/application_permission.py:20
@@ -421,15 +425,15 @@ msgstr "目标URL"
 msgid "Number required"
 msgstr "需要为数字"
 
-#: assets/api/node.py:64
+#: assets/api/node.py:63
 msgid "You can't update the root node name"
 msgstr "不能修改根节点名称"
 
-#: assets/api/node.py:71
+#: assets/api/node.py:70
 msgid "You can't delete the root node ({})"
 msgstr "不能删除根节点 ({})"
 
-#: assets/api/node.py:74
+#: assets/api/node.py:73
 msgid "Deletion failed and the node contains assets"
 msgstr "删除失败，节点包含资产"
 
@@ -576,6 +580,16 @@ msgstr "创建日期"
 #: assets/models/authbook.py:26
 msgid "AuthBook"
 msgstr "账号"
+
+#: assets/models/authbook.py:29
+#, fuzzy
+#| msgid "Can view user view"
+msgid "Can view asset account secret"
+msgstr "查看用户视图"
+
+#: assets/models/authbook.py:30
+msgid "Can change asset account secret"
+msgstr ""
 
 #: assets/models/base.py:30 assets/tasks/const.py:51 audits/utils.py:30
 msgid "Unknown"
@@ -1070,7 +1084,7 @@ msgstr "日志审计"
 
 #: audits/models.py:26 audits/models.py:56
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/models/permission.py:132
+#: rbac/models/permission.py:131
 #: users/templates/users/user_asset_permission.html:128
 #: users/templates/users/user_database_app_permission.html:111
 msgid "Delete"
@@ -1133,11 +1147,11 @@ msgstr "文件传输日志"
 
 #: audits/models.py:54
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/models/permission.py:129
+#: rbac/models/permission.py:128
 msgid "Create"
 msgstr "创建"
 
-#: audits/models.py:55 rbac/models/permission.py:131
+#: audits/models.py:55 rbac/models/permission.py:130
 #: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
 #: users/templates/users/user_asset_permission.html:127
 #: users/templates/users/user_database_app_permission.html:110
@@ -1463,11 +1477,11 @@ msgstr "{ApplicationPermission} 添加 {SystemUser}"
 msgid "{ApplicationPermission} REMOVE {SystemUser}"
 msgstr "{ApplicationPermission} 移除 {SystemUser}"
 
-#: authentication/api/connection_token.py:226
+#: authentication/api/connection_token.py:240
 msgid "Invalid token"
 msgstr "无效的令牌"
 
-#: authentication/api/mfa.py:81
+#: authentication/api/mfa.py:78
 msgid "Code is invalid"
 msgstr "Code无效"
 
@@ -1710,6 +1724,16 @@ msgstr "过期时间"
 #: authentication/models.py:106
 msgid "SSO token"
 msgstr "SSO Token"
+
+#: authentication/models.py:115
+msgid "Can add super connection token"
+msgstr ""
+
+#: authentication/models.py:116
+#, fuzzy
+#| msgid "Connect timeout"
+msgid "Can view connect token secret"
+msgstr "连接超时时间"
 
 #: authentication/sms_verify_code.py:17
 msgid "The verification code has expired. Please resend it"
@@ -2660,27 +2684,27 @@ msgstr ""
 msgid "RBAC"
 msgstr "角色管理"
 
-#: rbac/builtin.py:70
+#: rbac/builtin.py:78
 msgid "SystemAdmin"
 msgstr "系统管理员"
 
-#: rbac/builtin.py:73
+#: rbac/builtin.py:81
 msgid "SystemAuditor"
 msgstr "系统审计员"
 
-#: rbac/builtin.py:79 xpack/plugins/change_auth_plan/models/app.py:139
-msgid "App"
-msgstr "应用程序"
+#: rbac/builtin.py:84
+msgid "SystemApp"
+msgstr "系统组件"
 
-#: rbac/builtin.py:82
+#: rbac/builtin.py:90
 msgid "OrgAdmin"
 msgstr "组织管理员"
 
-#: rbac/builtin.py:85
+#: rbac/builtin.py:93
 msgid "OrgAuditor"
 msgstr "组织审计员"
 
-#: rbac/builtin.py:88
+#: rbac/builtin.py:96
 msgid "OrgUser"
 msgstr "组织用户"
 
@@ -2700,11 +2724,11 @@ msgstr "审计视图"
 msgid "User view"
 msgstr "用户视图"
 
-#: rbac/models/permission.py:130
+#: rbac/models/permission.py:129
 msgid "View"
 msgstr "查看"
 
-#: rbac/models/permission.py:213
+#: rbac/models/permission.py:212
 msgid "Permission"
 msgstr "权限"
 
@@ -2764,12 +2788,12 @@ msgstr "角色名称"
 msgid "Has bound this role"
 msgstr "已经绑定该角色"
 
-#: settings/api/alibaba_sms.py:31 settings/api/tencent_sms.py:33
+#: settings/api/alibaba_sms.py:31 settings/api/tencent_sms.py:35
 msgid "test_phone is required"
 msgstr "测试手机号 该字段是必填项。"
 
 #: settings/api/alibaba_sms.py:52 settings/api/dingtalk.py:34
-#: settings/api/feishu.py:35 settings/api/tencent_sms.py:55
+#: settings/api/feishu.py:35 settings/api/tencent_sms.py:57
 #: settings/api/wecom.py:37
 msgid "Test success"
 msgstr "测试成功"
@@ -3924,15 +3948,15 @@ msgstr "登录了"
 msgid "Filters"
 msgstr "过滤"
 
-#: terminal/api/session.py:185
+#: terminal/api/session.py:187
 msgid "Session does not exist: {}"
 msgstr "会话不存在: {}"
 
-#: terminal/api/session.py:188
+#: terminal/api/session.py:190
 msgid "Session is finished or the protocol not supported"
 msgstr "会话已经完成或协议不支持"
 
-#: terminal/api/session.py:193
+#: terminal/api/session.py:195
 msgid "User does not exist: {}"
 msgstr "用户不存在: {}"
 
@@ -5870,6 +5894,10 @@ msgstr "应用改密计划"
 #: xpack/plugins/change_auth_plan/models/app.py:146
 msgid "Application change auth plan execution"
 msgstr "应用改密计划执行"
+
+#: xpack/plugins/change_auth_plan/models/app.py:139
+msgid "App"
+msgstr "应用程序"
 
 #: xpack/plugins/change_auth_plan/models/app.py:151
 msgid "Application change auth plan task"

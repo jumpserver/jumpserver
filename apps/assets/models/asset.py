@@ -356,3 +356,7 @@ class Asset(AbsConnectivity, ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
         unique_together = [('org_id', 'hostname')]
         verbose_name = _("Asset")
         ordering = ["hostname", ]
+        permissions = [
+            ('test_assetconnectivity', 'Can test asset connectivity'),
+            ('push_assetsystemuser', 'Can push system user to asset'),
+        ]
