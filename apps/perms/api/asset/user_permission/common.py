@@ -13,7 +13,7 @@ from rest_framework.generics import (
 
 from orgs.utils import tmp_to_root_org
 from perms.utils.asset.permission import get_asset_system_user_ids_with_actions_by_user, validate_permission
-from common.permissions import IsOrgAdminOrAppUser, IsOrgAdmin, IsValidUser
+from common.permissions import IsOrgAdminOrAppUser, IsValidUser
 from common.utils import get_logger, lazyproperty
 
 from perms.hands import User, Asset, SystemUser
@@ -62,9 +62,6 @@ class GetUserAssetPermissionActionsApi(RetrieveAPIView):
 @method_decorator(tmp_to_root_org(), name='get')
 class ValidateUserAssetPermissionApi(APIView):
     permission_classes = (IsOrgAdminOrAppUser,)
-
-    def get_cache_policy(self):
-        return 0
 
     def get(self, request, *args, **kwargs):
         user_id = self.request.query_params.get('user_id', '')

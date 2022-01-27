@@ -5,7 +5,6 @@ from rest_framework.generics import RetrieveAPIView
 from django.shortcuts import get_object_or_404
 
 from common.utils import get_logger, get_object_or_none
-from common.permissions import IsOrgAdmin
 from common.mixins.views import SuggestionMixin
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics

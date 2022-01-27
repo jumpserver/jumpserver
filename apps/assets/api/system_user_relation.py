@@ -5,7 +5,6 @@ from django.db.models import F, Value, Model
 from django.db.models.signals import m2m_changed
 from django.db.models.functions import Concat
 
-from common.permissions import IsOrgAdmin
 from common.utils import get_logger
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import current_org

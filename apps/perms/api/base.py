@@ -1,5 +1,4 @@
 from django.db.models import Q
-from common.permissions import IsOrgAdmin
 from common.utils import get_object_or_none
 from orgs.mixins.api import OrgBulkModelViewSet
 from assets.models import SystemUser
@@ -14,6 +13,7 @@ class BasePermissionViewSet(OrgBulkModelViewSet):
         'user_id', 'username', 'system_user_id', 'system_user',
         'user_group_id', 'user_group'
     ]
+
     def filter_valid(self, queryset):
         valid_query = self.request.query_params.get('is_valid', None)
         if valid_query is None:

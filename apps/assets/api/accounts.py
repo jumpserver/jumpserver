@@ -61,6 +61,7 @@ class AccountViewSet(OrgBulkModelViewSet):
         'default': serializers.AccountSerializer,
         'verify_account': serializers.AssetTaskSerializer
     }
+
     def get_queryset(self):
         queryset = super().get_queryset() \
             .annotate(ip=F('asset__ip')) \
@@ -81,16 +82,21 @@ class AccountSecretsViewSet(AccountViewSet):
     serializer_classes = {
         'default': serializers.AccountSecretSerializer
     }
-    permission_classes = (IsOrgAdmin, NeedMFAVerify)
     http_method_names = ['get']
+    rbac_perms = {
+        'list': 'assets.view_assetsecret',
+        'retrieve': 'assets.view_assetsecret',
+    }
 
 
 class AccountTaskCreateAPI(CreateAPIView):
-    permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.AccountTaskSerializer
     filterset_fields = AccountViewSet.filterset_fields
     search_fields = AccountViewSet.search_fields
     filterset_class = AccountViewSet.filterset_class
+
+    def check_permissions(self, request):
+        return request.user.has_perm('assets.test_assetconnectivity')
 
     def get_accounts(self):
         queryset = AuthBook.objects.all()
@@ -108,5 +114,4 @@ class AccountTaskCreateAPI(CreateAPIView):
     def get_exception_handler(self):
         def handler(e, context):
             return Response({"error": str(e)}, status=400)
-
         return handler

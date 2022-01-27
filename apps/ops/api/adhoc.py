@@ -5,8 +5,6 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, generics
 from rest_framework.views import Response
 
-from common.drf.api import JMSBulkModelViewSet
-from common.permissions import IsOrgAdmin
 from common.drf.serializers import CeleryTaskSerializer
 from ..models import Task, AdHoc, AdHocExecution
 from ..serializers import (
@@ -18,7 +16,6 @@ from ..serializers import (
 )
 from ..tasks import run_ansible_task
 from orgs.mixins.api import OrgBulkModelViewSet
-from orgs.utils import current_org
 
 __all__ = [
     'TaskViewSet', 'TaskRun', 'AdHocViewSet', 'AdHocRunHistoryViewSet'
@@ -30,6 +27,7 @@ class TaskViewSet(OrgBulkModelViewSet):
     filterset_fields = ("name",)
     search_fields = filterset_fields
     serializer_class = TaskSerializer
+
     def get_serializer_class(self):
         if self.action == 'retrieve':
             return TaskDetailSerializer
@@ -44,6 +42,7 @@ class TaskViewSet(OrgBulkModelViewSet):
 class TaskRun(generics.RetrieveAPIView):
     queryset = Task.objects.all()
     serializer_class = CeleryTaskSerializer
+
     def retrieve(self, request, *args, **kwargs):
         task = self.get_object()
         t = run_ansible_task.delay(str(task.id))
@@ -53,6 +52,7 @@ class TaskRun(generics.RetrieveAPIView):
 class AdHocViewSet(viewsets.ModelViewSet):
     queryset = AdHoc.objects.all()
     serializer_class = AdHocSerializer
+
     def get_serializer_class(self):
         if self.action == 'retrieve':
             return AdHocDetailSerializer
@@ -69,6 +69,7 @@ class AdHocViewSet(viewsets.ModelViewSet):
 class AdHocRunHistoryViewSet(viewsets.ModelViewSet):
     queryset = AdHocExecution.objects.all()
     serializer_class = AdHocExecutionSerializer
+
     def get_queryset(self):
         task_id = self.request.query_params.get('task')
         adhoc_id = self.request.query_params.get('adhoc')

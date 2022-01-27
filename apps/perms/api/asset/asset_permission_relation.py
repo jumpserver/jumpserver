@@ -2,15 +2,12 @@
 #
 from rest_framework import generics
 from django.db.models import F, Value
-from django.db.models import Q
 from django.db.models.functions import Concat
 from django.shortcuts import get_object_or_404
 
-from assets.models import Node, Asset
 from orgs.mixins.api import OrgRelationMixin
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import current_org
-from common.permissions import IsOrgAdmin
 from perms import serializers
 from perms import models
 from perms.utils.asset.user_permission import UserGrantedAssetsQueryUtils
