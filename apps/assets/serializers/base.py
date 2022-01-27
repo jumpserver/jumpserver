@@ -2,7 +2,7 @@
 #
 from io import StringIO
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from common.utils import ssh_pubkey_gen, ssh_private_key_gen, validate_ssh_private_key
