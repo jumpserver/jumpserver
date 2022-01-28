@@ -2,7 +2,6 @@
 import uuid
 
 from rest_framework import generics
-from common.permissions import IsOrgAdmin
 from rest_framework.permissions import IsAuthenticated
 
 from users.notifications import ResetPasswordMsg, ResetPasswordSuccessMsg, ResetSSHKeyMsg
@@ -40,7 +39,6 @@ class UserResetPKApi(UserQuerysetMixin, generics.UpdateAPIView):
         user = self.get_object()
         user.public_key = None
         user.save()
-
         ResetSSHKeyMsg(user).publish_async()
 
 

@@ -788,8 +788,9 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         ordering = ['username']
         verbose_name = _("User")
         permissions = [
-            ('invite', _('Can invite user')),
-            ('remove', _('Can remove user'))
+            ('invite_user', _('Can invite user')),
+            ('remove_user', _('Can remove user')),
+            ('view_usersuggesion', _('Can view suggested user')),
         ]
 
     #: Use this method initial user

@@ -13,7 +13,7 @@ from rest_framework.generics import (
 
 from orgs.utils import tmp_to_root_org
 from perms.utils.asset.permission import get_asset_system_user_ids_with_actions_by_user, validate_permission
-from common.permissions import IsOrgAdminOrAppUser, IsValidUser
+from common.permissions import IsValidUser
 from common.utils import get_logger, lazyproperty
 
 from perms.hands import User, Asset, SystemUser
@@ -33,8 +33,10 @@ __all__ = [
 
 @method_decorator(tmp_to_root_org(), name='get')
 class GetUserAssetPermissionActionsApi(RetrieveAPIView):
-    permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.ActionsSerializer
+    rbac_perms = {
+        'retrieve': 'perms.view_userassets'
+    }
 
     def get_user(self):
         user_id = self.request.query_params.get('user_id', '')
@@ -61,7 +63,9 @@ class GetUserAssetPermissionActionsApi(RetrieveAPIView):
 
 @method_decorator(tmp_to_root_org(), name='get')
 class ValidateUserAssetPermissionApi(APIView):
-    permission_classes = (IsOrgAdminOrAppUser,)
+    rbac_perms = {
+        'GET': 'perms.view_userassets'
+    }
 
     def get(self, request, *args, **kwargs):
         user_id = self.request.query_params.get('user_id', '')
@@ -88,9 +92,11 @@ class RefreshAssetPermissionCacheApi(RetrieveAPIView):
 
 
 class UserGrantedAssetSystemUsersForAdminApi(ListAPIView):
-    permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.AssetSystemUserSerializer
     only_fields = serializers.AssetSystemUserSerializer.Meta.only_fields
+    rbac_perms = {
+        'list': 'perms.view_userassets'
+    }
 
     @lazyproperty
     def user(self):

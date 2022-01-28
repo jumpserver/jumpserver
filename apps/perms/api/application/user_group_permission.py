@@ -4,7 +4,6 @@
 from django.db.models import Q
 from rest_framework.generics import ListAPIView
 
-from common.permissions import IsOrgAdminOrAppUser
 from common.mixins.api import CommonApiMixin
 from applications.models import Application
 from perms import serializers
@@ -18,11 +17,13 @@ class UserGroupGrantedApplicationsApi(CommonApiMixin, ListAPIView):
     """
     获取用户组直接授权的应用
     """
-    permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.AppGrantedSerializer
     only_fields = serializers.AppGrantedSerializer.Meta.only_fields
     filterset_fields = ['id', 'name', 'category', 'type', 'comment']
     search_fields = ['name', 'comment']
+    rbac_perms = {
+        'list': 'perms.view_applicationpermission'
+    }
 
     def get_queryset(self):
         user_group_id = self.kwargs.get('pk', '')

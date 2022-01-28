@@ -40,6 +40,9 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         'suggestion': MiniUserSerializer,
         'invite': InviteSerializer,
     }
+    rbac_perms = {
+        'suggestion': 'users.view_suggesteduser',
+    }
 
     def get_queryset(self):
         queryset = super().get_queryset().prefetch_related('groups')
@@ -98,16 +101,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
             self.check_object_permissions(self.request, obj)
             self.perform_destroy(obj)
 
-    # def get_permissions(self):
-    #     return []
-        # if self.action in ["retrieve", "list"]:
-        #     if self.request.query_params.get('all'):
-        #         self.#     else:
-        #         self.permission_classes = (IsOrgAdminOrAppUser,)
-        # elif self.action in ['destroy']:
-        #     self.return super().get_permissions()
-
-    @action(methods=['get'], detail=False, permission_classes=(IsOrgAdmin,))
+    @action(methods=['get'], detail=False)
     def suggestion(self, *args, **kwargs):
         queryset = User.get_nature_users()
         queryset = self.filter_queryset(queryset)[:3]

@@ -9,7 +9,6 @@ from applications.models import Application
 from orgs.mixins.api import OrgRelationMixin
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import current_org
-from common.permissions import IsOrgAdmin
 from perms import serializers
 from perms import models
 
