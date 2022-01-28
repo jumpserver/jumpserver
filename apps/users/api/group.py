@@ -4,7 +4,6 @@
 from ..serializers import UserGroupSerializer
 from ..models import UserGroup
 from orgs.mixins.api import OrgBulkModelViewSet
-from common.permissions import IsOrgAdmin
 
 
 __all__ = ['UserGroupViewSet']

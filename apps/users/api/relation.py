@@ -4,7 +4,6 @@
 from django.db.models import F
 
 from common.drf.api import JMSBulkRelationModelViewSet
-from common.permissions import IsOrgAdmin
 from .. import serializers
 from ..models import User
 

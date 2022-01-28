@@ -7,7 +7,6 @@ from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
 
 from users.notifications import ResetMFAMsg
-from common.permissions import IsOrgAdmin
 from common.mixins import CommonApiMixin
 from common.utils import get_logger
 from orgs.utils import current_org
@@ -41,7 +40,10 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         'invite': InviteSerializer,
     }
     rbac_perms = {
-        'suggestion': 'users.view_suggesteduser',
+        'suggestion': 'users.match_user',
+        'invite': 'users.invite_user',
+        'remove': 'users.remove_user',
+        'bulk_remove': 'users.remove_user',
     }
 
     def get_queryset(self):
@@ -114,7 +116,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    @action(methods=['post'], detail=False, permission_classes=(IsOrgAdmin,))
+    @action(methods=['post'], detail=False)
     def invite(self, request):
         if not current_org or current_org.is_root():
             error = {"error": "Not a valid org"}
@@ -131,13 +133,13 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
             user.org_roles.set(org_roles)
         return Response(serializer.data, status=201)
 
-    @action(methods=['post'], detail=True, permission_classes=(IsOrgAdmin,))
+    @action(methods=['post'], detail=True)
     def remove(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.remove()
         return Response(status=204)
 
-    @action(methods=['post'], detail=False, permission_classes=(IsOrgAdmin,), url_path='remove')
+    @action(methods=['post'], detail=False, url_path='remove')
     def bulk_remove(self, request, *args, **kwargs):
         qs = self.get_queryset()
         filtered = self.filter_queryset(qs)

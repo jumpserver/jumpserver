@@ -790,7 +790,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         permissions = [
             ('invite_user', _('Can invite user')),
             ('remove_user', _('Can remove user')),
-            ('view_usersuggesion', _('Can view suggested user')),
+            ('match_user', _('Can match user')),
         ]
 
     #: Use this method initial user

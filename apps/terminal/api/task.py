@@ -5,7 +5,6 @@ from rest_framework.views import APIView, Response
 from rest_framework_bulk import BulkModelViewSet
 
 from common.utils import get_object_or_none
-from common.permissions import IsOrgAdminOrAppUser
 from ..models import Session, Task
 from .. import serializers
 
@@ -17,12 +16,13 @@ logger = logging.getLogger(__file__)
 class TaskViewSet(BulkModelViewSet):
     queryset = Task.objects.all()
     serializer_class = serializers.TaskSerializer
-    permission_classes = (IsOrgAdminOrAppUser,)
 
 
 class KillSessionAPI(APIView):
-    permission_classes = (IsOrgAdminOrAppUser,)
     model = Task
+    rbac_perms = {
+        'POST': 'terminal.add_task'
+    }
 
     def post(self, request, *args, **kwargs):
         validated_session = []
