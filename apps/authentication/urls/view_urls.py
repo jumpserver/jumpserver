@@ -58,4 +58,7 @@ urlpatterns = [
     path('openid/', include(('jms_oidc_rp.urls', 'authentication'), namespace='openid')),
     path('saml2/', include(('authentication.backends.saml2.urls', 'authentication'), namespace='saml2')),
     path('captcha/', include('captcha.urls')),
+
+    path('ssh-sso-entrance/', views.SSHSSORedirectApi.as_view(), name='ssh-sso-entry'),
+    path('ssh-sso-token/', views.SSHSSOTokenMsgView.as_view(), name='ssh-sso-token'),
 ]

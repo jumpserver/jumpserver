@@ -9,6 +9,7 @@ from django.utils.http import urlencode
 from django.core.cache import cache
 from django.conf import settings
 from django.contrib import auth
+from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext as _
 from rest_framework.request import Request
 from django.contrib.auth import (
@@ -17,7 +18,10 @@ from django.contrib.auth import (
 )
 from django.shortcuts import reverse, redirect, get_object_or_404
 
-from common.utils import get_request_ip, get_logger, bulk_get, FlashMessageUtil
+from common.utils import (
+    get_request_ip, get_logger, bulk_get, FlashMessageUtil,
+    get_object_or_none,
+)
 from acls.models import LoginACL
 from users.models import User
 from users.utils import LoginBlockUtil, MFABlockUtils, LoginIpBlockUtil
@@ -464,6 +468,15 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, MFAMixin, AuthPost
             self.raise_credential_error(errors.reason_user_inactive)
         return user
 
+    @staticmethod
+    def _check_auth_is_by_ssh_token(username, password):
+        model = get_user_model()
+        user_id = cache.get(password)
+        user = get_object_or_none(model, id=user_id)
+        if user and getattr(user, 'username') != username:
+            user = None
+        return user
+
     def set_login_failed_mark(self):
         ip = self.get_request_ip()
         cache.set(self.key_prefix_captcha.format(ip), 1, 3600)
@@ -480,8 +493,11 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, MFAMixin, AuthPost
         username, password, public_key, ip, auto_login = self.get_auth_data(decrypt_passwd)
         self._check_only_allow_exists_user_auth(username)
 
-        # check auth
-        user = self._check_auth_user_is_valid(username, password, public_key)
+        # ssh token check
+        user = self._check_auth_is_by_ssh_token(username, password)
+        if not user:
+            # check auth
+            user = self._check_auth_user_is_valid(username, password, public_key)
 
         # 校验login-acl规则
         self._check_login_acl(user, ip)

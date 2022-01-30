@@ -6,12 +6,15 @@ from Cryptodome.Cipher import PKCS1_v1_5
 from Cryptodome import Random
 
 from django.conf import settings
+
 from .notifications import DifferentCityLoginMessage
 from audits.models import UserLoginLog
+from users.models import User
 from audits.const import DEFAULT_CITY
 from common.utils import get_request_ip
 from common.utils import validate_ip, get_ip_city
 from common.utils import get_logger
+from common.utils.django import reverse
 
 logger = get_logger(__file__)
 
@@ -70,3 +73,12 @@ def check_different_city_login_if_need(user, request):
 
         if last_user_login and last_user_login.city != city:
             DifferentCityLoginMessage(user, ip, city).publish_async()
+
+
+def get_sso_url(sso_type, next_url):
+    url = None
+    if sso_type == User.Source.saml2:
+        url = reverse('authentication:saml2:saml2-login') + '?next_url=%s' % next_url
+    elif sso_type == User.Source.openid:
+        url = reverse('authentication:openid:login') + '?next=%s' % next_url
+    return url

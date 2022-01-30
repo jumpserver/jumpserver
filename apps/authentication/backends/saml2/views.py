@@ -176,6 +176,10 @@ class PrepareRequestMixin:
             user_attrs[attr] = self.value_to_str(value)
         return user_attrs
 
+    @staticmethod
+    def get_next_url(request):
+        return request.GET.get('next_url', '')
+
 
 class Saml2AuthRequestView(View, PrepareRequestMixin):
 
@@ -189,7 +193,9 @@ class Saml2AuthRequestView(View, PrepareRequestMixin):
             logger.error(log_prompt.format('Init saml auth error: %s' % error))
             return HttpResponse(error, status=412)
 
-        next_url = settings.AUTH_SAML2_PROVIDER_AUTHORIZATION_ENDPOINT
+        param_next_url = request.GET.get('next_url', '')
+        default_next_url = settings.AUTH_SAML2_PROVIDER_AUTHORIZATION_ENDPOINT
+        next_url = param_next_url or default_next_url
         url = saml_instance.login(return_to=next_url)
         logger.debug(log_prompt.format('Redirect login url'))
         return HttpResponseRedirect(url)

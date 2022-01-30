@@ -1,0 +1,57 @@
+{% extends '_base_only_content.html' %}
+{% load static %}
+{% load i18n %}
+{% block html_title %} {{ title }} {% endblock %}
+{% block title %} {{ title }}{% endblock %}
+
+{% block content %}
+    <div>
+        <p>
+            {% if error %}
+            <div class="alert alert-danger" id="messages">
+                {{ error }}
+            </div>
+            {% else %}
+            <div class="alert alert-warning">
+                {{ user|safe }}
+            </div>
+            <div class="alert alert-success" id="messages">
+                {{ message|safe }}
+            </div>
+            {% endif %}
+        </p>
+
+        <div class="row">
+            {% if not error %}
+            <div class="col-sm-3">
+                <a id="copy" class="btn btn-primary block full-width m-b">
+                    {{ confirm_button }}
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        <div id="tip">
+        </div>
+    </div>
+{% endblock %}
+
+{% block custom_foot_js %}
+<script src="{% static "js/plugins/clipboard/clipboard.min.js" %}"></script>
+<script>
+    var content = $('#messages').html();
+    var clipboard = new Clipboard('#copy', {
+        text: function() {
+            return $.trim(content);
+        }
+    });
+    clipboard.on('success', function(e) {
+        var tip = $('#tip')
+        var tip_content = '<div class="alert alert-success" id="tip" style="text-align: center">复制成功</div>'
+        tip.append(tip_content)
+        setTimeout(function (){
+            tip.children().remove()
+        }, 5000);
+    });
+
+</script>
+{% endblock %}

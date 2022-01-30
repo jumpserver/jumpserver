@@ -32,6 +32,8 @@ urlpatterns = [
     path('otp/verify/', api.UserOtpVerifyApi.as_view(), name='user-otp-verify'),
     path('password/verify/', api.UserPasswordVerifyApi.as_view(), name='user-password-verify'),
     path('login-confirm-ticket/status/', api.TicketStatusApi.as_view(), name='login-confirm-ticket-status'),
+
+    path('sso-banners/', api.SSOBannerApi.as_view(), name='sso-banner'),
 ]
 
 urlpatterns += router.urls

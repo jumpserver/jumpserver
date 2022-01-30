@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-20 10:38+0800\n"
+"POT-Creation-Date: 2022-01-30 18:03+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -124,7 +124,7 @@ msgstr "登录访问控制"
 
 #: acls/models/login_asset_acl.py:21
 #: applications/serializers/application.py:122
-#: applications/serializers/application.py:165
+#: applications/serializers/application.py:166
 msgid "System User"
 msgstr "系统用户"
 
@@ -368,7 +368,7 @@ msgid "Date updated"
 msgstr "更新日期"
 
 #: applications/serializers/application.py:121
-#: applications/serializers/application.py:164
+#: applications/serializers/application.py:165
 msgid "Application display"
 msgstr "应用名称"
 
@@ -1828,15 +1828,15 @@ msgstr "该 时间段 不被允许登录"
 msgid "SSO auth closed"
 msgstr "SSO 认证关闭了"
 
-#: authentication/errors.py:300 authentication/mixins.py:364
+#: authentication/errors.py:300 authentication/mixins.py:368
 msgid "Your password is too simple, please change it for security"
 msgstr "你的密码过于简单，为了安全，请修改"
 
-#: authentication/errors.py:309 authentication/mixins.py:371
+#: authentication/errors.py:309 authentication/mixins.py:375
 msgid "You should to change your password before login"
 msgstr "登录完成前，请先修改密码"
 
-#: authentication/errors.py:318 authentication/mixins.py:378
+#: authentication/errors.py:318 authentication/mixins.py:382
 msgid "Your password has expired, please reset before logging in"
 msgstr "您的密码已过期，先修改再登录"
 
@@ -1928,11 +1928,11 @@ msgstr "设置手机号码启用"
 msgid "Clear phone number to disable"
 msgstr "清空手机号码禁用"
 
-#: authentication/mixins.py:314
+#: authentication/mixins.py:318
 msgid "The MFA type ({}) is not enabled"
 msgstr "该 MFA ({}) 方式没有启用"
 
-#: authentication/mixins.py:354
+#: authentication/mixins.py:358
 msgid "Please change your password"
 msgstr "请修改密码"
 
@@ -2292,6 +2292,20 @@ msgstr "退出登录成功"
 #: authentication/views/login.py:305
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
+
+#: authentication/views/ssh_token.py:65
+msgid "SSH - Login temporary password"
+msgstr "SSH - 登录临时密码"
+
+#: authentication/views/ssh_token.py:66
+msgid "copy"
+msgstr "复制"
+
+#: authentication/views/ssh_token.py:69
+msgid ""
+"You have not obtained the temporary password or the temporary password has "
+"expired"
+msgstr "您未获取过临时密码或者临时密码已经过期"
 
 #: authentication/views/wecom.py:39
 msgid "WeCom Error, Please contact your system administrator"
