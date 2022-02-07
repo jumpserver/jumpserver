@@ -5,13 +5,17 @@ from channels.generic.websocket import JsonWebsocketConsumer
 from common.utils import get_logger
 from common.db.utils import safe_db_connection
 from .site_msg import SiteMessageUtil
-from .signals_handler import new_site_msg_chan
+from .signals_handler import NewSiteMsgSubPub
 
 logger = get_logger(__name__)
 
 
 class SiteMsgWebsocket(JsonWebsocketConsumer):
     refresh_every_seconds = 10
+
+    def __init__(self, *args, **kwargs):
+        super(SiteMsgWebsocket, self).__init__(*args, **kwargs)
+        self.subscriber = None
 
     def connect(self):
         user = self.scope["user"]
@@ -22,6 +26,10 @@ class SiteMsgWebsocket(JsonWebsocketConsumer):
             thread.start()
         else:
             self.close()
+
+    def disconnect(self, code):
+        if self.subscriber:
+            self.subscriber.close_handle_msg()
 
     def receive(self, text_data=None, bytes_data=None, **kwargs):
         data = json.loads(text_data)
@@ -56,4 +64,6 @@ class SiteMsgWebsocket(JsonWebsocketConsumer):
             if user_id in users:
                 ws.send_unread_msg_count()
 
-        new_site_msg_chan.keep_handle_msg(handle_new_site_msg_recv)
+        subscriber = NewSiteMsgSubPub()
+        self.subscriber = subscriber
+        subscriber.keep_handle_msg(handle_new_site_msg_recv)
