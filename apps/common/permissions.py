@@ -5,8 +5,6 @@ from rest_framework import permissions
 from django.conf import settings
 from common.exceptions import MFAVerifyRequired
 
-from orgs.utils import current_org
-
 
 class IsValidUser(permissions.IsAuthenticated, permissions.BasePermission):
     """Allows access to valid user, is active and not expired"""
@@ -16,52 +14,10 @@ class IsValidUser(permissions.IsAuthenticated, permissions.BasePermission):
             and request.user.is_valid
 
 
-class IsSuperUser(IsValidUser):
-    def has_permission(self, request, view):
-        return super(IsSuperUser, self).has_permission(request, view) \
-               and request.user.is_superuser
-
-
 class OnlySuperUser(IsValidUser):
     def has_permission(self, request, view):
         return super().has_permission(request, view) \
                and request.user.is_superuser
-
-
-class IsOrgAdmin(IsValidUser):
-    """Allows access only to superuser"""
-
-    def has_permission(self, request, view):
-        if not current_org:
-            return False
-        return True
-
-
-class IsOrgAdminOrAppUser(IsValidUser):
-    """Allows access between superuser and app user"""
-
-    def has_permission(self, request, view):
-        if not current_org:
-            return False
-        if request.user.is_anonymous:
-            return False
-        return True
-
-
-class IsOrgAdminOrAppUserOrUserReadonly(IsOrgAdminOrAppUser):
-    def has_permission(self, request, view):
-        if IsValidUser.has_permission(self, request, view) \
-                and request.method in permissions.SAFE_METHODS:
-            return True
-        else:
-            return IsOrgAdminOrAppUser.has_permission(self, request, view)
-
-
-class IsCurrentUserOrReadOnly(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-        return obj == request.user
 
 
 class WithBootstrapToken(permissions.BasePermission):
@@ -71,17 +27,6 @@ class WithBootstrapToken(permissions.BasePermission):
             return False
         request_bootstrap_token = authorization.split()[-1]
         return settings.BOOTSTRAP_TOKEN == request_bootstrap_token
-
-
-class UserCanAnyPermCurrentOrg(permissions.BasePermission):
-    def has_permission(self, request, view):
-        return True
-        # return current_org.can_any_by(request.user)
-
-
-class UserCanUpdatePassword(permissions.BasePermission):
-    def has_permission(self, request, view):
-        return request.user.can_update_password()
 
 
 class UserCanUpdateSSHKey(permissions.BasePermission):
@@ -100,71 +45,7 @@ class NeedMFAVerify(permissions.BasePermission):
         raise MFAVerifyRequired()
 
 
-class CanUpdateDeleteUser(permissions.BasePermission):
-
-    @staticmethod
-    def has_delete_object_permission(request, view, obj):
-        if request.user.is_anonymous:
-            return False
-        if not request.user.can_admin_current_org:
-            return False
-        # 超级管理员 / 组织管理员
-        if str(request.user.id) == str(obj.id):
-            return False
-        # 超级管理员
-        if request.user.is_superuser:
-            if obj.is_superuser and obj.username in ['admin']:
-                return False
-            return True
-        # 组织管理员
-        if obj.is_superuser:
-            return False
-        if obj.is_super_auditor:
-            return False
-        if obj.can_admin_current_org:
-            return False
-        return True
-
-    @staticmethod
-    def has_update_object_permission(request, view, obj):
-        if request.user.is_anonymous:
-            return False
-        if not request.user.can_admin_current_org:
-            return False
-        # 超级管理员 / 组织管理员
-        if str(request.user.id) == str(obj.id):
-            return True
-        # 超级管理员
-        if request.user.is_superuser:
-            return True
-        # 组织管理员
-        if obj.is_superuser:
-            return False
-        if obj.is_super_auditor:
-            return False
-        return True
-
-    def has_object_permission(self, request, view, obj):
-        if request.user.is_anonymous:
-            return False
-        if not request.user.can_admin_current_org:
-            return False
-        if request.method in ['DELETE']:
-            return self.has_delete_object_permission(request, view, obj)
-        if request.method in ['PUT', 'PATCH']:
-            return self.has_update_object_permission(request, view, obj)
-        return True
-
-
 class IsObjectOwner(IsValidUser):
     def has_object_permission(self, request, view, obj):
         return (super().has_object_permission(request, view, obj) and
                 request.user == getattr(obj, 'user', None))
-
-
-class OnlySuperUserCanList(IsValidUser):
-    def has_permission(self, request, view):
-        user = request.user
-        if view.action == 'list' and not user.is_superuser:
-            return False
-        return True

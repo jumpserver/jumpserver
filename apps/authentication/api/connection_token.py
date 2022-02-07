@@ -20,7 +20,6 @@ from rest_framework import serializers
 from authentication.signals import post_auth_failed, post_auth_success
 from common.utils import get_logger, random_string
 from common.drf.api import SerializerMixin
-from common.permissions import IsValidUser, IsSuperUser
 from orgs.mixins.api import RootOrgViewMixin
 from common.http import is_true
 

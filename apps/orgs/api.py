@@ -6,7 +6,7 @@ from rest_framework_bulk import BulkModelViewSet
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.exceptions import PermissionDenied
 
-from common.permissions import IsValidUser, UserCanAnyPermCurrentOrg
+from common.permissions import IsValidUser
 from .models import Organization
 from .serializers import (
     OrgSerializer, CurrentOrgSerializer
@@ -80,7 +80,7 @@ class OrgViewSet(BulkModelViewSet):
 
 class CurrentOrgDetailApi(RetrieveAPIView):
     serializer_class = CurrentOrgSerializer
-    permission_classes = (IsValidUser, UserCanAnyPermCurrentOrg)
+    permission_classes = (IsValidUser,)
 
     def get_object(self):
         return current_org

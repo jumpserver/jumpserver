@@ -6,7 +6,6 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from common.mixins import CommonBulkSerializerMixin
-from common.permissions import CanUpdateDeleteUser
 from common.validators import PhoneValidator
 from rbac.permissions import RBACPermission
 from rbac.models import OrgRoleBinding, SystemRoleBinding
