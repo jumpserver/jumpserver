@@ -23,6 +23,7 @@ class RedisPubSub:
     def __init__(self, ch, db=10):
         self.ch = ch
         self.redis = get_redis_client(db)
+        self.subscriber = None
 
     def subscribe(self):
         ps = self.redis.pubsub()
@@ -41,7 +42,9 @@ class RedisPubSub:
         :param handle: lambda item: do_something
         :return:
         """
+        self.close_handle_msg()
         sub = self.subscribe()
+        self.subscriber = sub
         msgs = sub.listen()
 
         try:
@@ -64,4 +67,9 @@ class RedisPubSub:
             sub.close()
         except Exception as e:
             logger.error("Redis observer close error: ", e)
+
+    def close_handle_msg(self):
+        if self.subscriber:
+            self.subscriber.close()
+            self.subscriber = None
 
