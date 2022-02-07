@@ -12,14 +12,13 @@ logger = get_logger(__name__)
 
 class SiteMsgWebsocket(JsonWebsocketConsumer):
     refresh_every_seconds = 10
+    sub = None
 
     def connect(self):
         user = self.scope["user"]
         if user.is_authenticated:
             self.accept()
-
-            thread = threading.Thread(target=self.watch_recv_new_site_msg)
-            thread.start()
+            self.sub = self.watch_recv_new_site_msg()
         else:
             self.close()
 
@@ -56,4 +55,9 @@ class SiteMsgWebsocket(JsonWebsocketConsumer):
             if user_id in users:
                 ws.send_unread_msg_count()
 
-        new_site_msg_chan.keep_handle_msg(handle_new_site_msg_recv)
+        return new_site_msg_chan.subscribe(handle_new_site_msg_recv)
+
+    def disconnect(self, code):
+        if self.sub:
+            self.sub.unsubscribe()
+
