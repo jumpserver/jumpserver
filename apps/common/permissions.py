@@ -29,11 +29,6 @@ class WithBootstrapToken(permissions.BasePermission):
         return settings.BOOTSTRAP_TOKEN == request_bootstrap_token
 
 
-class UserCanUpdateSSHKey(permissions.BasePermission):
-    def has_permission(self, request, view):
-        return request.user.can_update_ssh_key()
-
-
 class NeedMFAVerify(permissions.BasePermission):
     def has_permission(self, request, view):
         if not settings.SECURITY_VIEW_AUTH_NEED_MFA:
