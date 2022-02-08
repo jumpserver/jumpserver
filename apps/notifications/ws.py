@@ -50,6 +50,7 @@ class SiteMsgWebsocket(JsonWebsocketConsumer):
 
         while not self.disconnected:
             subscribe = new_site_msg_chan.subscribe()
+            self.subscribe = subscribe
             for message in subscribe.listen():
                 if message['type'] != 'message':
                     continue
@@ -67,4 +68,5 @@ class SiteMsgWebsocket(JsonWebsocketConsumer):
 
     def disconnect(self, close_code):
         self.disconnected = True
+        self.subscribe.close()
         self.close()
