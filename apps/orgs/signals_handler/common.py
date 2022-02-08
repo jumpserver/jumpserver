@@ -46,7 +46,7 @@ def subscribe_orgs_mapping_expire(sender, **kwargs):
     logger.debug("Start subscribe for expire orgs mapping from memory")
 
     def keep_subscribe_org_mapping():
-        orgs_mapping_for_memory_pub_sub.keep_handle_msg(
+        orgs_mapping_for_memory_pub_sub.subscribe(
             lambda org_id: Organization.expire_orgs_mapping()
         )
 

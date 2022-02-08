@@ -90,6 +90,7 @@ class RedisPubSub:
 
     def subscribe(self, _next, error=None, complete=None):
         ps = self.redis.pubsub()
+        ps.subscribe(self.ch)
         sub = Subscription(self.ch, ps)
         sub.keep_handle_msg(_next, error, complete)
         return sub
