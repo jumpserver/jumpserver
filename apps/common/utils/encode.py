@@ -208,30 +208,7 @@ def ensure_last_char_is_ascii(data):
 secret_pattern = re.compile(r'password|secret|key', re.IGNORECASE)
 
 
-def model_to_dict_pro(instance, fields=None, exclude=None):
-    from ..fields.model import EncryptMixin
-    opts = instance._meta
-    data = {}
-    for f in chain(opts.concrete_fields, opts.private_fields):
-        if not getattr(f, 'editable', False):
-            continue
-        if fields and f.name not in fields:
-            continue
-        if exclude and f.name in exclude:
-            continue
-        if isinstance(f, FileField):
-            continue
-        if isinstance(f, EncryptMixin):
-            continue
-        if secret_pattern.search(f.name):
-            continue
-        value = f.value_from_object(instance)
-        data[f.name] = value
-    return data
-
-
-def model_to_json(instance, sort_keys=True, indent=2, cls=None):
-    data = model_to_dict_pro(instance)
+def data_to_json(data, sort_keys=True, indent=2, cls=None):
     if cls is None:
         cls = DjangoJSONEncoder
     return json.dumps(data, sort_keys=sort_keys, indent=indent, cls=cls)
