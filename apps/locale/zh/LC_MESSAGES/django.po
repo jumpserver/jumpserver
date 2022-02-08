@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-20 10:38+0800\n"
+"POT-Creation-Date: 2022-02-08 11:43+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -55,7 +55,7 @@ msgstr "激活中"
 #: assets/models/asset.py:144 assets/models/asset.py:232
 #: assets/models/backup.py:54 assets/models/base.py:180
 #: assets/models/cluster.py:29 assets/models/cmd_filter.py:48
-#: assets/models/cmd_filter.py:95 assets/models/domain.py:25
+#: assets/models/cmd_filter.py:96 assets/models/domain.py:25
 #: assets/models/domain.py:65 assets/models/group.py:23
 #: assets/models/label.py:23 ops/models/adhoc.py:38 orgs/models.py:27
 #: perms/models/base.py:93 settings/models.py:34 terminal/models/storage.py:26
@@ -104,7 +104,7 @@ msgstr "规则"
 
 #: acls/models/login_acl.py:31 acls/models/login_asset_acl.py:26
 #: acls/serializers/login_acl.py:17 acls/serializers/login_asset_acl.py:75
-#: assets/models/cmd_filter.py:88 audits/models.py:58 audits/serializers.py:51
+#: assets/models/cmd_filter.py:89 audits/models.py:58 audits/serializers.py:51
 #: authentication/templates/authentication/_access_key_modal.html:34
 #: users/templates/users/_granted_assets.html:29
 #: users/templates/users/user_asset_permission.html:44
@@ -114,7 +114,7 @@ msgid "Action"
 msgstr "动作"
 
 #: acls/models/login_acl.py:35 acls/models/login_asset_acl.py:32
-#: acls/serializers/login_acl.py:16 assets/models/cmd_filter.py:93
+#: acls/serializers/login_acl.py:16 assets/models/cmd_filter.py:94
 msgid "Reviewers"
 msgstr "审批人"
 
@@ -124,7 +124,7 @@ msgstr "登录访问控制"
 
 #: acls/models/login_asset_acl.py:21
 #: applications/serializers/application.py:122
-#: applications/serializers/application.py:165
+#: applications/serializers/application.py:166
 msgid "System User"
 msgstr "系统用户"
 
@@ -368,7 +368,7 @@ msgid "Date updated"
 msgstr "更新日期"
 
 #: applications/serializers/application.py:121
-#: applications/serializers/application.py:164
+#: applications/serializers/application.py:165
 msgid "Application display"
 msgstr "应用名称"
 
@@ -595,7 +595,7 @@ msgstr "标签管理"
 
 #: assets/models/asset.py:230 assets/models/base.py:183
 #: assets/models/cluster.py:28 assets/models/cmd_filter.py:52
-#: assets/models/cmd_filter.py:98 assets/models/group.py:21
+#: assets/models/cmd_filter.py:99 assets/models/group.py:21
 #: common/db/models.py:111 common/mixins/models.py:49 orgs/models.py:25
 #: orgs/models.py:437 perms/models/base.py:91 users/models/user.py:593
 #: users/serializers/group.py:33
@@ -817,15 +817,19 @@ msgstr "内容"
 msgid "One line one command"
 msgstr "每行一个命令"
 
-#: assets/models/cmd_filter.py:102
+#: assets/models/cmd_filter.py:88
+msgid "Ignore case"
+msgstr "忽略大小写"
+
+#: assets/models/cmd_filter.py:103
 msgid "Command filter rule"
 msgstr "命令过滤规则"
 
-#: assets/models/cmd_filter.py:140
+#: assets/models/cmd_filter.py:141
 msgid "The generated regular expression is incorrect: {}"
 msgstr "生成的正则表达式有误"
 
-#: assets/models/cmd_filter.py:166 tickets/const.py:13
+#: assets/models/cmd_filter.py:167 tickets/const.py:13
 msgid "Command confirm"
 msgstr "命令复核"
 

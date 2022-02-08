@@ -38,7 +38,7 @@ class CommandFilterRuleSerializer(BulkOrgResourceModelSerializer):
         model = CommandFilterRule
         fields_mini = ['id']
         fields_small = fields_mini + [
-           'type', 'type_display', 'content', 'pattern', 'priority',
+           'type', 'type_display', 'content', 'ignore_case', 'pattern', 'priority',
            'action', 'action_display', 'reviewers',
            'date_created', 'date_updated',
            'comment', 'created_by',

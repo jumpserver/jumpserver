@@ -85,6 +85,7 @@ class CommandFilterRule(OrgModelMixin):
         validators=[MinValueValidator(1), MaxValueValidator(100)]
     )
     content = models.TextField(verbose_name=_("Content"), help_text=_("One line one command"))
+    ignore_case = models.BooleanField(default=True, verbose_name=_('Ignore case'))
     action = models.IntegerField(default=ActionChoices.deny, choices=ActionChoices.choices, verbose_name=_("Action"))
     # 动作: 附加字段
     # - confirm: 命令复核人
@@ -129,13 +130,15 @@ class CommandFilterRule(OrgModelMixin):
                 regex.append(r'\b{0}\b'.format(cmd))
             else:
                 regex.append(r'\b{0}'.format(cmd))
-        s = r'(?i){}'.format('|'.join(regex))
+        s = r'{}'.format('|'.join(regex))
         return s
 
-    @staticmethod
-    def compile_regex(regex):
+    def compile_regex(self, regex):
         try:
-            pattern = re.compile(regex)
+            if self.ignore_case:
+                pattern = re.compile(regex, re.IGNORECASE)
+            else:
+                pattern = re.compile(regex)
         except Exception as e:
             error = _('The generated regular expression is incorrect: {}').format(str(e))
             logger.error(error)
