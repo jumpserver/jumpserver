@@ -17,7 +17,9 @@ from .signals import post_auth_success, post_auth_failed
 @receiver(user_logged_in)
 def on_user_auth_login_success(sender, user, request, **kwargs):
     # 开启了 MFA，且没有校验过, 可以全局校验, middleware 中可以全局管理 oidc 等第三方认证的 MFA
-    if user.mfa_enabled and not request.session.get('auth_mfa'):
+    if settings.SECURITY_MFA_AUTH_ENABLED_FOR_THIRD_PARTY \
+            and user.mfa_enabled \
+            and not request.session.get('auth_mfa'):
         request.session['auth_mfa_required'] = 1
 
     # 单点登录，超过了自动退出
