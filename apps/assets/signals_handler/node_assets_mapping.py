@@ -79,7 +79,7 @@ def subscribe_node_assets_mapping_expire(sender, **kwargs):
         Node.expire_node_all_asset_ids_mapping_from_memory(root_org_id)
 
     def keep_subscribe_node_assets_relation():
-        node_assets_mapping_for_memory_pub_sub.keep_handle_msg(handle_node_relation_change)
+        node_assets_mapping_for_memory_pub_sub.subscribe(handle_node_relation_change)
 
     t = threading.Thread(target=keep_subscribe_node_assets_relation)
     t.daemon = True
