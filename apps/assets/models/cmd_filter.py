@@ -133,9 +133,10 @@ class CommandFilterRule(OrgModelMixin):
         s = r'{}'.format('|'.join(regex))
         return s
 
-    def compile_regex(self, regex):
+    @staticmethod
+    def compile_regex(regex, ignore_case):
         try:
-            if self.ignore_case:
+            if ignore_case:
                 pattern = re.compile(regex, re.IGNORECASE)
             else:
                 pattern = re.compile(regex)
@@ -146,7 +147,7 @@ class CommandFilterRule(OrgModelMixin):
         return True, '', pattern
 
     def match(self, data):
-        succeed, error, pattern = self.compile_regex(regex=self.pattern)
+        succeed, error, pattern = self.compile_regex(self.pattern, self.ignore_case)
         if not succeed:
             return self.ACTION_UNKNOWN, ''
 

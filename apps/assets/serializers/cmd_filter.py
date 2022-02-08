@@ -66,7 +66,8 @@ class CommandFilterRuleSerializer(BulkOrgResourceModelSerializer):
             regex = CommandFilterRule.construct_command_regex(content)
         else:
             regex = content
-        succeed, error, pattern = CommandFilterRule.compile_regex(regex)
+        ignore_case = self.initial_data.get('ignore_case')
+        succeed, error, pattern = CommandFilterRule.compile_regex(regex, ignore_case)
         if not succeed:
             raise serializers.ValidationError(error)
         return content
