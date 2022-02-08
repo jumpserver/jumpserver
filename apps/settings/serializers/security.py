@@ -42,6 +42,11 @@ class SecurityAuthSerializer(serializers.Serializer):
         ),
         required=False, label=_("Global MFA auth")
     )
+    SECURITY_MFA_AUTH_ENABLED_FOR_THIRD_PARTY = serializers.BooleanField(
+        required=False, default=True,
+        label=_('Third-party login users perform MFA authentication'),
+        help_text=_('The third-party login modes include OIDC, CAS, and SAML2'),
+    )
     SECURITY_LOGIN_LIMIT_COUNT = serializers.IntegerField(
         min_value=3, max_value=99999,
         label=_('Limit the number of user login failures')
