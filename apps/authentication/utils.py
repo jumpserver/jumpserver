@@ -81,4 +81,6 @@ def get_sso_url(sso_type, next_url):
         url = reverse('authentication:saml2:saml2-login') + '?next_url=%s' % next_url
     elif sso_type == User.Source.openid:
         url = reverse('authentication:openid:login') + '?next=%s' % next_url
+    elif sso_type == User.Source.cas:
+        url = reverse('authentication:cas:cas-login') + '?next=%s' % next_url
     return url

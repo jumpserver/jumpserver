@@ -108,10 +108,9 @@ class SSOBannerApi(GenericAPIView):
         if user is None:
             return Response(data=local_user_response)
 
-        if user.source == User.Source.local:
-            return Response(data=local_user_response)
-
-        if user.source not in [User.Source.saml2, User.Source.openid]:
+        if user.source not in [
+            User.Source.saml2, User.Source.openid, User.Source.cas
+        ]:
             return Response(data=local_user_response)
 
         ssh_token = random_string(36)
