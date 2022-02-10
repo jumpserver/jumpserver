@@ -171,7 +171,7 @@ class PrepareRequestMixin:
         valid_attrs = ['username', 'name', 'email', 'comment', 'phone']
 
         for attr, value in attrs.items():
-            attr = attr.rsplit('/')[-1]
+            attr = attr.rsplit('/', 1)[-1]
             if attr not in valid_attrs:
                 continue
             user_attrs[attr] = self.value_to_str(value)
