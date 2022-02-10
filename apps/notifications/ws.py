@@ -4,7 +4,6 @@ import json
 from channels.generic.websocket import JsonWebsocketConsumer
 
 from common.utils import get_logger
-from .models import SiteMessage
 from .site_msg import SiteMessageUtil
 from .signals_handler import new_site_msg_chan
 
@@ -14,6 +13,7 @@ logger = get_logger(__name__)
 class SiteMsgWebsocket(JsonWebsocketConsumer):
     disconnected = False
     refresh_every_seconds = 10
+    subscribe = None
 
     def connect(self):
         user = self.scope["user"]
@@ -68,5 +68,6 @@ class SiteMsgWebsocket(JsonWebsocketConsumer):
 
     def disconnect(self, close_code):
         self.disconnected = True
-        self.subscribe.close()
         self.close()
+        if self.subscribe:
+            self.subscribe.close()
