@@ -6,7 +6,8 @@ from django.utils.translation import ugettext_lazy as _
 from users.models import User
 from common.mixins.models import CommonModelMixin
 from orgs.mixins.models import OrgModelMixin
-from orgs.utils import tmp_to_root_org, tmp_to_org, get_current_org_id
+from orgs.models import Organization
+from orgs.utils import tmp_to_org, get_current_org_id
 from ..const import TicketType, TicketApprovalLevel, TicketApprovalStrategy
 
 __all__ = ['TicketFlow', 'ApprovalRule']
@@ -75,6 +76,7 @@ class TicketFlow(CommonModelMixin, OrgModelMixin):
         else:
             flows = cls.objects.all()
         cur_flow_types = flows.values_list('type', flat=True)
-        with tmp_to_root_org():
-            diff_global_flows = cls.objects.exclude(type__in=cur_flow_types)
+        root_id = Organization.ROOT_ID
+        with tmp_to_org(root_id):
+            diff_global_flows = cls.objects.exclude(type__in=cur_flow_types).filter(org_id=root_id)
         return flows | diff_global_flows
