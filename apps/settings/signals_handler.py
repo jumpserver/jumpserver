@@ -80,9 +80,7 @@ def subscribe_settings_change(sender, **kwargs):
     logger.debug("Start subscribe setting change")
 
     def keep_subscribe_settings_change():
-        setting_pub_sub.keep_handle_msg(
-            lambda name: Setting.refresh_item(name)
-        )
+        setting_pub_sub.subscribe(lambda name: Setting.refresh_item(name))
 
     t = threading.Thread(target=keep_subscribe_settings_change)
     t.daemon = True

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-20 10:38+0800\n"
+"POT-Creation-Date: 2022-02-08 17:40+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -55,7 +55,7 @@ msgstr "激活中"
 #: assets/models/asset.py:144 assets/models/asset.py:232
 #: assets/models/backup.py:54 assets/models/base.py:180
 #: assets/models/cluster.py:29 assets/models/cmd_filter.py:48
-#: assets/models/cmd_filter.py:95 assets/models/domain.py:25
+#: assets/models/cmd_filter.py:96 assets/models/domain.py:25
 #: assets/models/domain.py:65 assets/models/group.py:23
 #: assets/models/label.py:23 ops/models/adhoc.py:38 orgs/models.py:27
 #: perms/models/base.py:93 settings/models.py:34 terminal/models/storage.py:26
@@ -104,7 +104,7 @@ msgstr "规则"
 
 #: acls/models/login_acl.py:31 acls/models/login_asset_acl.py:26
 #: acls/serializers/login_acl.py:17 acls/serializers/login_asset_acl.py:75
-#: assets/models/cmd_filter.py:88 audits/models.py:58 audits/serializers.py:51
+#: assets/models/cmd_filter.py:89 audits/models.py:58 audits/serializers.py:51
 #: authentication/templates/authentication/_access_key_modal.html:34
 #: users/templates/users/_granted_assets.html:29
 #: users/templates/users/user_asset_permission.html:44
@@ -114,7 +114,7 @@ msgid "Action"
 msgstr "动作"
 
 #: acls/models/login_acl.py:35 acls/models/login_asset_acl.py:32
-#: acls/serializers/login_acl.py:16 assets/models/cmd_filter.py:93
+#: acls/serializers/login_acl.py:16 assets/models/cmd_filter.py:94
 msgid "Reviewers"
 msgstr "审批人"
 
@@ -124,7 +124,7 @@ msgstr "登录访问控制"
 
 #: acls/models/login_asset_acl.py:21
 #: applications/serializers/application.py:122
-#: applications/serializers/application.py:165
+#: applications/serializers/application.py:166
 msgid "System User"
 msgstr "系统用户"
 
@@ -368,7 +368,7 @@ msgid "Date updated"
 msgstr "更新日期"
 
 #: applications/serializers/application.py:121
-#: applications/serializers/application.py:164
+#: applications/serializers/application.py:165
 msgid "Application display"
 msgstr "应用名称"
 
@@ -595,7 +595,7 @@ msgstr "标签管理"
 
 #: assets/models/asset.py:230 assets/models/base.py:183
 #: assets/models/cluster.py:28 assets/models/cmd_filter.py:52
-#: assets/models/cmd_filter.py:98 assets/models/group.py:21
+#: assets/models/cmd_filter.py:99 assets/models/group.py:21
 #: common/db/models.py:111 common/mixins/models.py:49 orgs/models.py:25
 #: orgs/models.py:437 perms/models/base.py:91 users/models/user.py:593
 #: users/serializers/group.py:33
@@ -817,15 +817,19 @@ msgstr "内容"
 msgid "One line one command"
 msgstr "每行一个命令"
 
-#: assets/models/cmd_filter.py:102
+#: assets/models/cmd_filter.py:88
+msgid "Ignore case"
+msgstr "忽略大小写"
+
+#: assets/models/cmd_filter.py:103
 msgid "Command filter rule"
 msgstr "命令过滤规则"
 
-#: assets/models/cmd_filter.py:140
+#: assets/models/cmd_filter.py:144
 msgid "The generated regular expression is incorrect: {}"
 msgstr "生成的正则表达式有误"
 
-#: assets/models/cmd_filter.py:166 tickets/const.py:13
+#: assets/models/cmd_filter.py:170 tickets/const.py:13
 msgid "Command confirm"
 msgstr "命令复核"
 
@@ -3521,34 +3525,42 @@ msgid "Global MFA auth"
 msgstr "全局启用 MFA 认证"
 
 #: settings/serializers/security.py:47
+msgid "Third-party login users perform MFA authentication"
+msgstr "第三方登录用户进行MFA认证"
+
+#: settings/serializers/security.py:48
+msgid "The third-party login modes include OIDC, CAS, and SAML2"
+msgstr "第三方登录方式包括: OIDC、CAS、SAML2"
+
+#: settings/serializers/security.py:52
 msgid "Limit the number of user login failures"
 msgstr "限制用户登录失败次数"
 
-#: settings/serializers/security.py:51
+#: settings/serializers/security.py:56
 msgid "Block user login interval"
 msgstr "禁止用户登录时间间隔"
 
-#: settings/serializers/security.py:56
+#: settings/serializers/security.py:61
 msgid "Limit the number of IP login failures"
 msgstr "限制 IP 登录失败次数"
 
-#: settings/serializers/security.py:60
+#: settings/serializers/security.py:65
 msgid "Block IP login interval"
 msgstr "禁止 IP 登录时间间隔"
 
-#: settings/serializers/security.py:64
+#: settings/serializers/security.py:69
 msgid "Login IP White List"
 msgstr "IP 登录白名单"
 
-#: settings/serializers/security.py:69
+#: settings/serializers/security.py:74
 msgid "Login IP Black List"
 msgstr "IP 登录黑名单"
 
-#: settings/serializers/security.py:75
+#: settings/serializers/security.py:80
 msgid "User password expiration"
 msgstr "用户密码过期时间"
 
-#: settings/serializers/security.py:77
+#: settings/serializers/security.py:82
 msgid ""
 "Unit: day, If the user does not update the password during the time, the "
 "user password will expire failure;The password expiration reminder mail will "
@@ -3558,55 +3570,55 @@ msgstr ""
 "单位：天, 如果用户在此期间没有更新密码，用户密码将过期失效； 密码过期提醒邮件"
 "将在密码过期前5天内由系统（每天）自动发送给用户"
 
-#: settings/serializers/security.py:84
+#: settings/serializers/security.py:89
 msgid "Number of repeated historical passwords"
 msgstr "不能设置近几次密码"
 
-#: settings/serializers/security.py:86
+#: settings/serializers/security.py:91
 msgid ""
 "Tip: When the user resets the password, it cannot be the previous n "
 "historical passwords of the user"
 msgstr "提示：用户重置密码时，不能为该用户前几次使用过的密码"
 
-#: settings/serializers/security.py:91
+#: settings/serializers/security.py:96
 msgid "Only single device login"
 msgstr "仅一台设备登录"
 
-#: settings/serializers/security.py:92
+#: settings/serializers/security.py:97
 msgid "Next device login, pre login will be logout"
 msgstr "下个设备登录，上次登录会被顶掉"
 
-#: settings/serializers/security.py:95
+#: settings/serializers/security.py:100
 msgid "Only exist user login"
 msgstr "仅已存在用户登录"
 
-#: settings/serializers/security.py:96
+#: settings/serializers/security.py:101
 msgid "If enable, CAS、OIDC auth will be failed, if user not exist yet"
 msgstr "开启后，如果系统中不存在该用户，CAS、OIDC 登录将会失败"
 
-#: settings/serializers/security.py:99
+#: settings/serializers/security.py:104
 msgid "Only from source login"
 msgstr "仅从用户来源登录"
 
-#: settings/serializers/security.py:100
+#: settings/serializers/security.py:105
 msgid "Only log in from the user source property"
 msgstr "开启后，如果用户来源为本地，CAS、OIDC 登录将会失败"
 
-#: settings/serializers/security.py:104
+#: settings/serializers/security.py:109
 msgid "MFA verify TTL"
 msgstr "MFA 校验有效期"
 
-#: settings/serializers/security.py:106
+#: settings/serializers/security.py:111
 msgid ""
 "Unit: second, The verification MFA takes effect only when you view the "
 "account password"
 msgstr "单位: 秒, 目前仅在查看账号密码校验 MFA 时生效"
 
-#: settings/serializers/security.py:111
+#: settings/serializers/security.py:116
 msgid "Enable Login dynamic code"
 msgstr "启用登录附加码"
 
-#: settings/serializers/security.py:112
+#: settings/serializers/security.py:117
 msgid ""
 "The password and additional code are sent to a third party authentication "
 "system for verification"
@@ -3614,89 +3626,89 @@ msgstr ""
 "密码和附加码一并发送给第三方认证系统进行校验, 如：有的第三方认证系统，需要 密"
 "码+6位数字 完成认证"
 
-#: settings/serializers/security.py:117
+#: settings/serializers/security.py:122
 msgid "MFA in login page"
 msgstr "MFA 在登录页面输入"
 
-#: settings/serializers/security.py:118
+#: settings/serializers/security.py:123
 msgid "Eu security regulations(GDPR) require MFA to be on the login page"
 msgstr "欧盟数据安全法规(GDPR) 要求 MFA 在登录页面，来确保系统登录安全"
 
-#: settings/serializers/security.py:121
+#: settings/serializers/security.py:126
 msgid "Enable Login captcha"
 msgstr "启用登录验证码"
 
-#: settings/serializers/security.py:122
+#: settings/serializers/security.py:127
 msgid "Enable captcha to prevent robot authentication"
 msgstr "开启验证码，防止机器人登录"
 
-#: settings/serializers/security.py:142
+#: settings/serializers/security.py:147
 msgid "Enable terminal register"
 msgstr "终端注册"
 
-#: settings/serializers/security.py:144
+#: settings/serializers/security.py:149
 msgid ""
 "Allow terminal register, after all terminal setup, you should disable this "
 "for security"
 msgstr "是否允许终端注册，当所有终端启动后，为了安全应该关闭"
 
-#: settings/serializers/security.py:148
+#: settings/serializers/security.py:153
 msgid "Enable watermark"
 msgstr "开启水印"
 
-#: settings/serializers/security.py:149
+#: settings/serializers/security.py:154
 msgid "Enabled, the web session and replay contains watermark information"
 msgstr "启用后，Web 会话和录像将包含水印信息"
 
-#: settings/serializers/security.py:153
+#: settings/serializers/security.py:158
 msgid "Connection max idle time"
 msgstr "连接最大空闲时间"
 
-#: settings/serializers/security.py:154
+#: settings/serializers/security.py:159
 msgid "If idle time more than it, disconnect connection Unit: minute"
 msgstr "提示：如果超过该配置没有操作，连接会被断开 （单位：分）"
 
-#: settings/serializers/security.py:157
+#: settings/serializers/security.py:162
 msgid "Remember manual auth"
 msgstr "保存手动输入密码"
 
-#: settings/serializers/security.py:160
+#: settings/serializers/security.py:165
 msgid "Enable change auth secure mode"
 msgstr "启用改密安全模式"
 
-#: settings/serializers/security.py:163
+#: settings/serializers/security.py:168
 msgid "Insecure command alert"
 msgstr "危险命令告警"
 
-#: settings/serializers/security.py:166
+#: settings/serializers/security.py:171
 msgid "Email recipient"
 msgstr "邮件收件人"
 
-#: settings/serializers/security.py:167
+#: settings/serializers/security.py:172
 msgid "Multiple user using , split"
 msgstr "多个用户，使用 , 分割"
 
-#: settings/serializers/security.py:170
+#: settings/serializers/security.py:175
 msgid "Batch command execution"
 msgstr "批量命令执行"
 
-#: settings/serializers/security.py:171
+#: settings/serializers/security.py:176
 msgid "Allow user run batch command or not using ansible"
 msgstr "是否允许用户使用 ansible 执行批量命令"
 
-#: settings/serializers/security.py:174
+#: settings/serializers/security.py:179
 msgid "Session share"
 msgstr "会话分享"
 
-#: settings/serializers/security.py:175
+#: settings/serializers/security.py:180
 msgid "Enabled, Allows user active session to be shared with other users"
 msgstr "开启后允许用户分享已连接的资产会话给它人，协同工作"
 
-#: settings/serializers/security.py:178
+#: settings/serializers/security.py:183
 msgid "Remote Login Protection"
 msgstr "异地登录保护"
 
-#: settings/serializers/security.py:180
+#: settings/serializers/security.py:185
 msgid ""
 "The system determines whether the login IP address belongs to a common login "
 "city. If the account is logged in from a common login city, the system sends "

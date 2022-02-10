@@ -20,7 +20,7 @@ jobs:
         run: |
           TAG=$(basename ${GITHUB_REF})
           VERSION=${TAG/v/}
-          wget https://raw.githubusercontent.com/jumpserver/installer/v${VERSION}/quick_start.sh
+          wget https://raw.githubusercontent.com/jumpserver/installer/master/quick_start.sh
           sed -i "s@Version=.*@Version=v${VERSION}@g" quick_start.sh
           echo "::set-output name=TAG::$TAG"
           echo "::set-output name=VERSION::$VERSION"

@@ -38,7 +38,7 @@ class CommandFilterRuleSerializer(BulkOrgResourceModelSerializer):
         model = CommandFilterRule
         fields_mini = ['id']
         fields_small = fields_mini + [
-           'type', 'type_display', 'content', 'pattern', 'priority',
+           'type', 'type_display', 'content', 'ignore_case', 'pattern', 'priority',
            'action', 'action_display', 'reviewers',
            'date_created', 'date_updated',
            'comment', 'created_by',
@@ -66,7 +66,8 @@ class CommandFilterRuleSerializer(BulkOrgResourceModelSerializer):
             regex = CommandFilterRule.construct_command_regex(content)
         else:
             regex = content
-        succeed, error, pattern = CommandFilterRule.compile_regex(regex)
+        ignore_case = self.initial_data.get('ignore_case')
+        succeed, error, pattern = CommandFilterRule.compile_regex(regex, ignore_case)
         if not succeed:
             raise serializers.ValidationError(error)
         return content
