@@ -26,6 +26,9 @@ class ApplicationViewSet(SuggestionMixin, OrgBulkModelViewSet):
         'get_tree': TreeNodeSerializer,
         'suggestion': serializers.MiniAppSerializer
     }
+    rbac_perms = {
+        'get_tree': 'applications.view_application'
+    }
 
     @action(methods=['GET'], detail=False, url_path='tree')
     def get_tree(self, request, *args, **kwargs):
