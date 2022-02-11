@@ -128,6 +128,9 @@ class Task(PeriodTaskModelMixin, OrgModelMixin):
         ordering = ('-date_updated',)
         verbose_name = _("Task")
         get_latest_by = 'date_created'
+        permissions = [
+            ('view_taskmonitor', _('Can view task monitor'))
+        ]
 
 
 class AdHoc(OrgModelMixin):

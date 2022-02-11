@@ -250,7 +250,7 @@ class Permission(DjangoPermission):
             elif actions != '*' and resource == '*':
                 kwargs['codename__iregex'] = r'({})_\w+'.format(actions_regex)
             else:
-                kwargs['codename__iregex'] = r'{}_{}'.format(actions_regex, resource)
+                kwargs['codename__iregex'] = r'({})_{}'.format(actions_regex, resource)
             q |= Q(**kwargs)
         return q
 
