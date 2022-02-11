@@ -72,4 +72,3 @@ class RedisPubSub:
         if self.subscriber:
             self.subscriber.close()
             self.subscriber = None
-
