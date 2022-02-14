@@ -2873,7 +2873,7 @@ msgstr "用户名称"
 
 #: perms/serializers/asset/permission.py:22
 msgid "User groups display"
-msgstr "用户名称"
+msgstr "用户组名称"
 
 #: perms/serializers/asset/permission.py:23
 msgid "Assets display"
