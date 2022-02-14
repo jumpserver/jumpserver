@@ -18,7 +18,6 @@ from .models import Status, Session, Command
 from .backends import server_replay_storage
 from .utils import find_session_replay_local
 
-
 CACHE_REFRESH_INTERVAL = 10
 RUNNING = False
 logger = get_task_logger(__name__)
@@ -64,7 +63,7 @@ def clean_expired_session_period():
     logger.info("Clean session item done")
     expired_commands.delete()
     logger.info("Clean session command done")
-    command = "find %s -mtime +%s -name '*.gz' -exec rm -f {} \\;" % (
+    command = "find %s -mtime +%s \\( -name '*.json' -o -name '*.tar' -o -name '*.gz' \\) -exec rm -f {} \\;" % (
         replay_dir, days
     )
     subprocess.call(command, shell=True)
