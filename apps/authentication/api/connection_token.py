@@ -11,6 +11,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
+from django.utils import timezone
 from django.utils.translation import ugettext as _
 from rest_framework.response import Response
 from rest_framework.request import Request
@@ -148,7 +149,6 @@ class ClientProtocolMixin:
         return name, content
 
     def get_encrypt_cmdline(self, app: Application):
-
         parameters = app.get_rdp_remote_app_setting()['parameters']
         parameters = parameters.encode('ascii')
 
@@ -231,19 +231,16 @@ class SecretDetailMixin:
 
     @staticmethod
     def _get_application_secret_detail(application):
-        from perms.models.base import Action
         gateway = None
+        remote_app = None
+        asset = None
 
-        if not application.category_remote_app:
-            actions = Action.NONE
-            remote_app = {}
-            asset = None
-            domain = application.domain
-        else:
+        if application.category_remote_app:
             remote_app = application.get_rdp_remote_app_setting()
-            actions = Action.CONNECT
             asset = application.get_remote_app_asset()
             domain = asset.domain
+        else:
+            domain = application.domain
 
         if domain and domain.has_gateway():
             gateway = domain.random_gateway()
@@ -253,15 +250,10 @@ class SecretDetailMixin:
             'application': application,
             'gateway': gateway,
             'remote_app': remote_app,
-            'actions': actions
         }
 
     @staticmethod
-    def _get_asset_secret_detail(asset, user, system_user):
-        from perms.utils.asset import get_asset_system_user_ids_with_actions_by_user
-        systemuserid_actions_mapper = get_asset_system_user_ids_with_actions_by_user(user, asset)
-        actions = systemuserid_actions_mapper.get(system_user.id, [])
-
+    def _get_asset_secret_detail(asset):
         gateway = None
         if asset and asset.domain and asset.domain.has_gateway():
             gateway = asset.domain.random_gateway()
@@ -271,14 +263,13 @@ class SecretDetailMixin:
             'application': None,
             'gateway': gateway,
             'remote_app': None,
-            'actions': actions,
         }
 
     @action(methods=['POST'], detail=False, permission_classes=[IsSuperUserOrAppUser], url_path='secret-info/detail')
     def get_secret_detail(self, request, *args, **kwargs):
         token = request.data.get('token', '')
         try:
-            value, user, system_user, asset, app, expired_at = self.valid_token(token)
+            value, user, system_user, asset, app, expired_at, actions = self.valid_token(token)
         except serializers.ValidationError as e:
             post_auth_failed.send(
                 sender=self.__class__, username='', request=self.request,
@@ -286,9 +277,13 @@ class SecretDetailMixin:
             )
             raise e
 
-        data = dict(user=user, system_user=system_user, expired_at=expired_at)
+        data = dict(
+            id=token, secret=value.get('secret', ''),
+            user=user, system_user=system_user,
+            expired_at=expired_at, actions=actions
+        )
         if asset:
-            asset_detail = self._get_asset_secret_detail(asset, user=user, system_user=system_user)
+            asset_detail = self._get_asset_secret_detail(asset)
             system_user.load_asset_more_auth(asset.id, user.username, user.id)
             data['type'] = 'asset'
             data.update(asset_detail)
@@ -333,11 +328,16 @@ class UserConnectionTokenViewSet(
             raise PermissionDenied('Only super user can create user token')
         self.check_resource_permission(user, asset, application, system_user)
         token = random_string(36)
+        secret = random_string(16)
         value = {
+            'id': token,
+            'secret': secret,
             'user': str(user.id),
             'username': user.username,
             'system_user': str(system_user.id),
-            'system_user_name': system_user.name
+            'system_user_name': system_user.name,
+            'created_by': str(self.request.user),
+            'date_created': str(timezone.now())
         }
 
         if asset:
@@ -395,7 +395,7 @@ class UserConnectionTokenViewSet(
 
         if not has_perm:
             raise serializers.ValidationError('Permission expired or invalid')
-        return value, user, system_user, asset, app, expired_at
+        return value, user, system_user, asset, app, expired_at, actions
 
     def get_permissions(self):
         if self.action in ["create", "get_rdp_file"]:
