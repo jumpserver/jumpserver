@@ -191,6 +191,8 @@ class ConnectionTokenApplicationSerializer(serializers.ModelSerializer):
 
 
 class ConnectionTokenSecretSerializer(serializers.Serializer):
+    id = serializers.CharField(read_only=True)
+    secret = serializers.CharField(read_only=True)
     type = serializers.ChoiceField(choices=[('application', 'Application'), ('asset', 'Asset')])
     user = ConnectionTokenUserSerializer(read_only=True)
     asset = ConnectionTokenAssetSerializer(read_only=True)
