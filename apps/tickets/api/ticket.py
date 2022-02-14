@@ -33,7 +33,7 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
         'title', 'applicant_display', 'status', 'state', 'action_display',
         'date_created', 'serial_num',
     )
-    ordering = ('-date_created', )
+    ordering = ('-date_created',)
 
     def create(self, request, *args, **kwargs):
         raise MethodNotAllowed(self.action)
@@ -81,7 +81,7 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
 
 
 class TicketFlowViewSet(JMSBulkModelViewSet):
-    permission_classes = (IsOrgAdmin, IsSuperUser)
+    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.TicketFlowSerializer
 
     filterset_fields = ['id', 'type']
