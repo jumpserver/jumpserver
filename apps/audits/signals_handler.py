@@ -170,9 +170,9 @@ M2M_NEED_RECORD = {
 }
 
 M2M_ACTION = {
-    POST_ADD: 'add',
-    POST_REMOVE: 'remove',
-    POST_CLEAR: 'remove',
+    POST_ADD: OperateLog.ACTION_CREATE,
+    POST_REMOVE: OperateLog.ACTION_DELETE,
+    POST_CLEAR: OperateLog.ACTION_DELETE,
 }
 
 
@@ -187,14 +187,14 @@ def on_m2m_changed(sender, action, instance, reverse, model, pk_set, **kwargs):
 
     sender_name = sender._meta.object_name
     if sender_name in M2M_NEED_RECORD:
-        action = M2M_ACTION[action]
         org_id = current_org.id
         remote_addr = get_request_ip(current_request)
         user = str(user)
         resource_type, resource_tmpl_add, resource_tmpl_remove = M2M_NEED_RECORD[sender_name]
-        if action == 'add':
+        action = M2M_ACTION[action]
+        if action == OperateLog.ACTION_CREATE:
             resource_tmpl = resource_tmpl_add
-        elif action == 'remove':
+        elif action == OperateLog.ACTION_DELETE:
             resource_tmpl = resource_tmpl_remove
 
         to_create = []
