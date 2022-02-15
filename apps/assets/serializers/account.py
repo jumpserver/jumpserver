@@ -6,6 +6,7 @@ from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
 from .base import AuthSerializerMixin
 from .utils import validate_password_contains_left_double_curly_bracket
+from common.utils.encode import ssh_pubkey_gen
 
 
 class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
@@ -39,6 +40,21 @@ class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'systemuser_display': {'label': _('System user display')}
         }
         ref_name = 'AssetAccountSerializer'
+
+    def _validate_gen_key(self, attrs):
+        private_key = attrs.get('private_key')
+        if not private_key:
+            return attrs
+
+        password = attrs.get('passphrase')
+        username = attrs.get('username')
+        public_key = ssh_pubkey_gen(private_key, password=password, username=username)
+        attrs['public_key'] = public_key
+        return attrs
+
+    def validate(self, attrs):
+        attrs = self._validate_gen_key(attrs)
+        return attrs
 
     def get_protocols(self, v):
         return v.protocols.replace(' ', ', ')
