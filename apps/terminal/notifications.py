@@ -1,7 +1,6 @@
 from typing import Callable
-import textwrap
 
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.template.loader import render_to_string
 
@@ -11,7 +10,6 @@ from notifications.notifications import SystemMessage
 from terminal.models import Session, Command
 from notifications.models import SystemMsgSubscription
 from notifications.backends import BACKEND
-from orgs.utils import tmp_to_root_org
 from common.utils import lazyproperty
 from common.utils.timezone import local_now_display
 
