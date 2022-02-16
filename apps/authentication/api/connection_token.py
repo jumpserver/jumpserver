@@ -21,15 +21,17 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework import serializers
 
 from applications.models import Application
-from authentication.signals import post_auth_failed, post_auth_success
+from authentication.signals import post_auth_failed
 from common.utils import get_logger, random_string
 from common.mixins.api import SerializerMixin
 from common.permissions import IsSuperUserOrAppUser, IsValidUser, IsSuperUser
 from common.utils.common import get_file_by_arch
 from orgs.mixins.api import RootOrgViewMixin
 from common.http import is_true
-from perms.utils.asset.permission import get_asset_system_user_ids_with_actions_by_user
 from perms.models.base import Action
+from perms.utils.application.permission import validate_permission as app_validate_permission
+from perms.utils.application.permission import get_application_actions
+from perms.utils.asset.permission import get_asset_actions
 
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
@@ -100,10 +102,14 @@ class ClientProtocolMixin:
         token = self.create_token(user, asset, application, system_user)
 
         # 设置磁盘挂载
-        if drives_redirect and asset:
-            systemuser_actions_mapper = get_asset_system_user_ids_with_actions_by_user(user, asset)
-            actions = systemuser_actions_mapper.get(system_user.id, 0)
-            if actions & Action.UPDOWNLOAD:
+        if drives_redirect:
+            actions = 0
+            if asset:
+                actions = get_asset_actions(user, asset, system_user)
+            elif application:
+                actions = get_application_actions(user, application, system_user)
+
+            if actions & Action.UPDOWNLOAD == Action.UPDOWNLOAD:
                 options['drivestoredirect:s'] = '*'
 
         # 全屏
