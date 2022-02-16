@@ -26,6 +26,7 @@ class AccountFilterSet(BaseFilterSet):
         qs = super().qs
         qs = self.filter_username(qs)
         qs = self.filter_node(qs)
+        qs = qs.distinct()
         return qs
 
     def filter_username(self, qs):
