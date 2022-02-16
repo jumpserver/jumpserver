@@ -13,7 +13,6 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 
 from common.utils import model_to_json
-from .. import utils
 from common.const.http import GET
 from common.utils import get_logger, get_object_or_none
 from common.mixins.api import AsyncApiMixin
@@ -21,8 +20,9 @@ from common.permissions import IsValidUser
 from common.drf.filters import DatetimeRangeFilter
 from common.drf.renders import PassthroughRenderer
 from orgs.mixins.api import OrgBulkModelViewSet
-from orgs.utils import tmp_to_root_org
+from orgs.utils import tmp_to_root_org, tmp_to_org
 from users.models import User
+from .. import utils
 from ..utils import find_session_replay_local, download_session_replay
 from ..models import Session
 from .. import serializers
@@ -49,6 +49,9 @@ class SessionViewSet(OrgBulkModelViewSet):
         ('date_start', ('date_from', 'date_to'))
     ]
     extra_filter_backends = [DatetimeRangeFilter]
+    rbac_perms = {
+        'download': ['terminal.download_sessionreplay']
+    }
 
     @staticmethod
     def prepare_offline_file(session, local_path):
@@ -104,6 +107,10 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
     serializer_class = serializers.ReplaySerializer
     download_cache_key = "SESSION_REPLAY_DOWNLOAD_{}"
     session = None
+    rbac_perms = {
+        'create': 'terminal.upload_session',
+        'retrieve': 'terminal.download_session',
+    }
 
     def create(self, request, *args, **kwargs):
         session_id = kwargs.get('pk')
@@ -164,8 +171,10 @@ class SessionJoinValidateAPI(views.APIView):
     """
     监控用
     """
-    permission_classes = (IsValidUser, )
     serializer_class = serializers.SessionJoinValidateSerializer
+    rbac_perms = {
+        'POST': 'terminal.validate_sessionactionperm'
+    }
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
@@ -188,5 +197,10 @@ class SessionJoinValidateAPI(views.APIView):
         if not user:
             msg = _('User does not exist: {}'.format(user_id))
             return Response({'ok': False, 'msg': msg}, status=401)
-        # TODO: permission
+
+        with tmp_to_org(session.org):
+            if not user.has_perm('terminal.monitor_session'):
+                msg = _('User does not have permission')
+                return Response({'ok': False, 'msg': msg}, status=401)
+
         return Response({'ok': True, 'msg': ''}, status=200)

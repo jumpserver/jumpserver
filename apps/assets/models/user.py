@@ -281,7 +281,7 @@ class SystemUser(ProtocolMixin, AuthMixin, BaseUser):
         verbose_name = _("System user")
 
 
-# Todo: 准备废弃
+# Deprecated: 准备废弃
 class AdminUser(BaseUser):
     """
     A privileged user that ansible can use it to push system user and so on

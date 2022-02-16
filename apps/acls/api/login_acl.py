@@ -10,5 +10,4 @@ class LoginACLViewSet(JMSBulkModelViewSet):
     filterset_fields = ('name', 'user', )
     search_fields = filterset_fields
     serializer_class = serializers.LoginACLSerializer
-    # Todo: 这里是不是要返回用户自己的 acl
 

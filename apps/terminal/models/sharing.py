@@ -32,6 +32,9 @@ class SessionSharing(CommonModelMixin, OrgModelMixin):
     class Meta:
         ordering = ('-date_created', )
         verbose_name = _('Session sharing')
+        permissions = [
+            ('add_supersessionsharing', _("Can add super session sharing"))
+        ]
 
     def __str__(self):
         return 'Creator: {}'.format(self.creator)

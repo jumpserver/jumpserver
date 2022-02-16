@@ -16,8 +16,10 @@ class SessionSharingViewSet(OrgModelViewSet):
     serializer_class = serializers.SessionSharingSerializer
     search_fields = ('session', 'creator', 'is_active', 'expired_time')
     filterset_fields = search_fields
-    permission_classes = (IsValidUser,)
     model = models.SessionSharing
+    rbac_perms = {
+        'create': 'terminal.add_supersessionsharing',
+    }
 
     def get_queryset(self):
         queryset = models.SessionSharing.objects.filter(creator=self.request.user)

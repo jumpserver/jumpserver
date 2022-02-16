@@ -21,7 +21,7 @@ class TaskViewSet(BulkModelViewSet):
 class KillSessionAPI(APIView):
     model = Task
     rbac_perms = {
-        'POST': 'terminal.add_task'
+        'POST': 'terminal.terminate_session'
     }
 
     def post(self, request, *args, **kwargs):

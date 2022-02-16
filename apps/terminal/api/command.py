@@ -176,7 +176,7 @@ class CommandViewSet(JMSBulkModelViewSet):
 class CommandExportApi(CommandQueryMixin, generics.ListAPIView):
     serializer_class = SessionCommandSerializer
     rbac_perms = {
-        'POST': 'terminal.view_command'
+        'list': 'terminal.view_command'
     }
 
     def list(self, request, *args, **kwargs):
