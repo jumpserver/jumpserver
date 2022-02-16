@@ -1,18 +1,17 @@
 # ~*~ coding: utf-8 ~*~
 from django.shortcuts import get_object_or_404
+from django.middleware import csrf
 from rest_framework.response import Response
-from django.db.models import Q
 
 from common.utils import get_logger, get_object_or_none
+from common.utils.crypto import get_aes_crypto
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, IsValidUser
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
 from common.mixins.api import SuggestionMixin
 from orgs.utils import tmp_to_root_org
 from rest_framework.decorators import action
-from users.models import User, UserGroup
-from applications.models import Application
-from ..models import SystemUser, Asset, CommandFilter, CommandFilterRule
+from ..models import SystemUser, CommandFilterRule
 from .. import serializers
 from ..serializers import SystemUserWithAuthInfoSerializer, SystemUserTempAuthSerializer
 from ..tasks import (
@@ -95,17 +94,27 @@ class SystemUserTempAuthInfoApi(generics.CreateAPIView):
     permission_classes = (IsValidUser,)
     serializer_class = SystemUserTempAuthSerializer
 
+    def decrypt_data_if_need(self, data):
+        csrf_token = self.request.META.get('CSRF_COOKIE')
+        aes = get_aes_crypto(csrf_token, 'ECB')
+        password = data.get('password', '')
+        try:
+            data['password'] = aes.decrypt(password)
+        except:
+            pass
+        return data
+
     def create(self, request, *args, **kwargs):
         serializer = super().get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
         pk = kwargs.get('pk')
-        user = self.request.user
-        data = serializer.validated_data
+        data = self.decrypt_data_if_need(serializer.validated_data)
         instance_id = data.get('instance_id')
 
         with tmp_to_root_org():
             instance = get_object_or_404(SystemUser, pk=pk)
-            instance.set_temp_auth(instance_id, user.id, data)
+            instance.set_temp_auth(instance_id, self.request.user, data)
         return Response(serializer.data, status=201)
 
 

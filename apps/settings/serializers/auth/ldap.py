@@ -55,13 +55,15 @@ class LDAPSettingSerializer(serializers.Serializer):
         help_text=_('User attr map present how to map LDAP user attr to '
                     'jumpserver, username,name,email is jumpserver attr')
     )
-    AUTH_LDAP_SYNC_IS_PERIODIC = serializers.BooleanField(required=False, label=_('Periodic display'))
-    AUTH_LDAP_SYNC_INTERVAL = serializers.CharField(
-        required=False, max_length=1024, allow_null=True,
-        label=_('Interval'), help_text=_('Unit: hour')
+    AUTH_LDAP_SYNC_IS_PERIODIC = serializers.BooleanField(
+        required=False, label=_('Periodic perform')
     )
     AUTH_LDAP_SYNC_CRONTAB = serializers.CharField(
-        required=False, max_length=1024, allow_null=True, label=_('Regularly perform')
+        required=False, max_length=128, allow_null=True, allow_blank=True,
+        label=_('Regularly perform')
+    )
+    AUTH_LDAP_SYNC_INTERVAL = serializers.IntegerField(
+        required=False, default=24, allow_null=True, label=_('Cycle perform')
     )
     AUTH_LDAP_CONNECT_TIMEOUT = serializers.IntegerField(
         min_value=1, max_value=300,
