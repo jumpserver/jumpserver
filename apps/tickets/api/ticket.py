@@ -81,7 +81,7 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
 
 
 class TicketFlowViewSet(JMSBulkModelViewSet):
-    permission_classes = (IsOrgAdmin,)
+    permission_classes = (IsSuperUser,)
     serializer_class = serializers.TicketFlowSerializer
 
     filterset_fields = ['id', 'type']
