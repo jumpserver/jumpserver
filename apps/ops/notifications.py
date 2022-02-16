@@ -1,4 +1,5 @@
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext
 from django.template.loader import render_to_string
 
 from notifications.notifications import SystemMessage
@@ -19,7 +20,7 @@ class ServerPerformanceMessage(SystemMessage):
         self.terms_with_errors = terms_with_errors
 
     def get_html_msg(self) -> dict:
-        subject = _("Terminal health check warning")
+        subject = gettext("Terminal health check warning")
         context = {
             'terms_with_errors': self.terms_with_errors
         }
