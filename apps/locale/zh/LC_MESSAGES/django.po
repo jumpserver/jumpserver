@@ -1955,7 +1955,7 @@ msgstr "异地登录提醒"
 
 #: authentication/notifications.py:52
 msgid "binding reminder"
-msgstr "定时提醒"
+msgstr "绑定提醒"
 
 #: authentication/templates/authentication/_access_key_modal.html:6
 msgid "API key list"
