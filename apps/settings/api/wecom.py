@@ -5,7 +5,7 @@ from rest_framework import status
 from django.utils.translation import gettext_lazy as _
 
 from settings.models import Setting
-from common.message.backends.wecom import WeCom
+from common.sdk.im.wecom import WeCom
 
 from .. import serializers
 

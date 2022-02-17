@@ -6,7 +6,6 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
 from common.utils import get_logger, get_object_or_none
-from common.permissions import IsOrgAdmin
 from common.mixins.api import SuggestionMixin
 from users.models import User, UserGroup
 from users.serializers import UserSerializer, UserGroupSerializer
@@ -191,7 +190,6 @@ class AssetGatewayListApi(generics.ListAPIView):
 
 
 class BaseAssetPermUserOrUserGroupListApi(ListAPIView):
-    permission_classes = (IsOrgAdmin,)
 
     def get_object(self):
         asset_id = self.kwargs.get('pk')
@@ -228,11 +226,13 @@ class AssetPermUserGroupListApi(BaseAssetPermUserOrUserGroupListApi):
 
 
 class BaseAssetPermUserOrUserGroupPermissionsListApiMixin(generics.ListAPIView):
-    permission_classes = (IsOrgAdmin,)
     model = AssetPermission
     serializer_class = AssetPermissionSerializer
     filterset_class = AssetPermissionFilter
     search_fields = ('name',)
+    rbac_perms = {
+        'list': 'perms.view_assetpermission'
+    }
 
     def get_object(self):
         asset_id = self.kwargs.get('pk')
