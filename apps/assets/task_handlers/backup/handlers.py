@@ -52,10 +52,11 @@ class BaseAccountHandler:
         return header_fields
 
     @classmethod
-    def create_row(cls, account, serializer_cls):
+    def create_row(cls, account, serializer_cls, header_fields=None):
         serializer = serializer_cls(account)
+        if not header_fields:
+            header_fields = cls.get_header_fields(serializer)
         data = cls.unpack_data(serializer.data)
-        header_fields = cls.get_header_fields(serializer)
         row_dict = {}
         for field, header_name in header_fields.items():
             row_dict[header_name] = data[field]
@@ -74,12 +75,16 @@ class AssetAccountHandler(BaseAccountHandler):
     def create_df(cls):
         df_dict = defaultdict(list)
         sheet_name = AuthBook._meta.verbose_name
-        accounts = AuthBook.get_queryset()
+
+        accounts = AuthBook.get_queryset().select_related('systemuser')
+        if not accounts.first():
+            return df_dict
+
+        header_fields = cls.get_header_fields(AccountSecretSerializer(accounts.first()))
         for account in accounts:
             account.load_auth()
-            row = cls.create_row(account, AccountSecretSerializer)
+            row = cls.create_row(account, AccountSecretSerializer, header_fields)
             df_dict[sheet_name].append(row)
-
         for k, v in df_dict.items():
             df_dict[k] = pd.DataFrame(v)
 
@@ -98,7 +103,7 @@ class AppAccountHandler(BaseAccountHandler):
     @classmethod
     def create_df(cls):
         df_dict = defaultdict(list)
-        accounts = Account.get_queryset()
+        accounts = Account.get_queryset().select_related('systemuser')
         for account in accounts:
             account.load_auth()
             app_type = account.type
