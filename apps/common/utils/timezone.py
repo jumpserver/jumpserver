@@ -1,4 +1,5 @@
 import datetime
+import time
 
 import pytz
 from django.utils import timezone as dj_timezone
@@ -30,6 +31,10 @@ def local_now():
 
 def local_now_display(fmt='%Y-%m-%d %H:%M:%S'):
     return local_now().strftime(fmt)
+
+
+def timestamp():
+    return int(time.time())
 
 
 _rest_dt_field = DateTimeField()

@@ -32,6 +32,7 @@ urlpatterns = [
     path('otp/verify/', api.UserOtpVerifyApi.as_view(), name='user-otp-verify'),
     path('password/verify/', api.UserPasswordVerifyApi.as_view(), name='user-password-verify'),
     path('login-confirm-ticket/status/', api.TicketStatusApi.as_view(), name='login-confirm-ticket-status'),
+    path('temp-password/', api.TempPasswordApi.as_view(), name='temp-password'),
 ]
 
 urlpatterns += router.urls
