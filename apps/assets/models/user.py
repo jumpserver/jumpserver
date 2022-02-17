@@ -152,17 +152,37 @@ class AuthMixin:
 
     def load_asset_special_auth(self, asset, username=''):
         """
+        AuthBook 的数据状态
+            | asset | systemuser | username |
+        1   |   *   |     *      |     x    |
+        2   |   *   |     x      |     *    |
+
+        当前 AuthBook 只有以上两种状态，systemuser 与 username 不会并存。
+        正常的资产与系统用户关联产生的是第1种状态，改密则产生第2种状态。改密之后
+        只有 username 而没有 systemuser 。
+
+        Freq: 关联同一资产的多个系统用户指定同一用户名时，修改用户密码会影响所有系统用户
+
+        这里有一个不对称的行为，同名系统用户密码覆盖
+        当有相同 username 的多个系统用户时，有改密动作之后，所有的同名系统用户都使用最后
+        一次改动，但如果没有发生过改密，同名系统用户使用的密码还是各自的。
+
         """
-        authbooks = list(AuthBook.objects.filter(asset=asset).filter(
-            Q(username=username) | Q(systemuser=self)
-        ))
-        if len(authbooks) == 0:
+        if username == '':
+            username = self.username
+
+        authbook = AuthBook.objects.filter(
+            asset=asset, username=username, systemuser__isnull=True
+        ).order_by('-date_created').first()
+
+        if not authbook:
+            authbook = AuthBook.objects.filter(
+                asset=asset, systemuser=self
+            ).order_by('-date_created').first()
+
+        if not authbook:
             return None
-        elif len(authbooks) == 1:
-            authbook = authbooks[0]
-        else:
-            authbooks.sort(key=lambda x: 1 if x.username == username else 0, reverse=True)
-            authbook = authbooks[0]
+
         authbook.load_auth()
         self.password = authbook.password
         self.private_key = authbook.private_key

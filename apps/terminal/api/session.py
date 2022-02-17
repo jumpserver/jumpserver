@@ -12,7 +12,7 @@ from rest_framework import viewsets, views
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
-from common.utils import model_to_json
+from common.utils import data_to_json
 from .. import utils
 from common.const.http import GET
 from common.utils import get_logger, get_object_or_none
@@ -62,7 +62,9 @@ class SessionViewSet(OrgBulkModelViewSet):
         os.chdir(dir_path)
 
         with open(meta_filename, 'wt') as f:
-            f.write(model_to_json(session))
+            serializer = serializers.SessionDisplaySerializer(session)
+            data = data_to_json(serializer.data)
+            f.write(data)
 
         with tarfile.open(offline_filename, 'w') as f:
             f.add(replay_filename)

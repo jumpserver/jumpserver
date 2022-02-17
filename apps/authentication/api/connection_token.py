@@ -11,6 +11,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
+from django.utils import timezone
 from django.utils.translation import ugettext as _
 from rest_framework.response import Response
 from rest_framework.request import Request
@@ -20,15 +21,17 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework import serializers
 
 from applications.models import Application
-from authentication.signals import post_auth_failed, post_auth_success
+from authentication.signals import post_auth_failed
 from common.utils import get_logger, random_string
 from common.mixins.api import SerializerMixin
 from common.permissions import IsSuperUserOrAppUser, IsValidUser, IsSuperUser
 from common.utils.common import get_file_by_arch
 from orgs.mixins.api import RootOrgViewMixin
 from common.http import is_true
-from perms.utils.asset.permission import get_asset_system_user_ids_with_actions_by_user
 from perms.models.base import Action
+from perms.utils.application.permission import validate_permission as app_validate_permission
+from perms.utils.application.permission import get_application_actions
+from perms.utils.asset.permission import get_asset_actions
 
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
@@ -99,10 +102,14 @@ class ClientProtocolMixin:
         token = self.create_token(user, asset, application, system_user)
 
         # 设置磁盘挂载
-        if drives_redirect and asset:
-            systemuser_actions_mapper = get_asset_system_user_ids_with_actions_by_user(user, asset)
-            actions = systemuser_actions_mapper.get(system_user.id, 0)
-            if actions & Action.UPDOWNLOAD:
+        if drives_redirect:
+            actions = 0
+            if asset:
+                actions = get_asset_actions(user, asset, system_user)
+            elif application:
+                actions = get_application_actions(user, application, system_user)
+
+            if actions & Action.UPDOWNLOAD == Action.UPDOWNLOAD:
                 options['drivestoredirect:s'] = '*'
 
         # 全屏
@@ -148,7 +155,6 @@ class ClientProtocolMixin:
         return name, content
 
     def get_encrypt_cmdline(self, app: Application):
-
         parameters = app.get_rdp_remote_app_setting()['parameters']
         parameters = parameters.encode('ascii')
 
@@ -231,19 +237,16 @@ class SecretDetailMixin:
 
     @staticmethod
     def _get_application_secret_detail(application):
-        from perms.models.base import Action
         gateway = None
+        remote_app = None
+        asset = None
 
-        if not application.category_remote_app:
-            actions = Action.NONE
-            remote_app = {}
-            asset = None
-            domain = application.domain
-        else:
+        if application.category_remote_app:
             remote_app = application.get_rdp_remote_app_setting()
-            actions = Action.CONNECT
             asset = application.get_remote_app_asset()
             domain = asset.domain
+        else:
+            domain = application.domain
 
         if domain and domain.has_gateway():
             gateway = domain.random_gateway()
@@ -253,15 +256,10 @@ class SecretDetailMixin:
             'application': application,
             'gateway': gateway,
             'remote_app': remote_app,
-            'actions': actions
         }
 
     @staticmethod
-    def _get_asset_secret_detail(asset, user, system_user):
-        from perms.utils.asset import get_asset_system_user_ids_with_actions_by_user
-        systemuserid_actions_mapper = get_asset_system_user_ids_with_actions_by_user(user, asset)
-        actions = systemuserid_actions_mapper.get(system_user.id, [])
-
+    def _get_asset_secret_detail(asset):
         gateway = None
         if asset and asset.domain and asset.domain.has_gateway():
             gateway = asset.domain.random_gateway()
@@ -271,14 +269,13 @@ class SecretDetailMixin:
             'application': None,
             'gateway': gateway,
             'remote_app': None,
-            'actions': actions,
         }
 
     @action(methods=['POST'], detail=False, permission_classes=[IsSuperUserOrAppUser], url_path='secret-info/detail')
     def get_secret_detail(self, request, *args, **kwargs):
         token = request.data.get('token', '')
         try:
-            value, user, system_user, asset, app, expired_at = self.valid_token(token)
+            value, user, system_user, asset, app, expired_at, actions = self.valid_token(token)
         except serializers.ValidationError as e:
             post_auth_failed.send(
                 sender=self.__class__, username='', request=self.request,
@@ -286,9 +283,13 @@ class SecretDetailMixin:
             )
             raise e
 
-        data = dict(user=user, system_user=system_user, expired_at=expired_at)
+        data = dict(
+            id=token, secret=value.get('secret', ''),
+            user=user, system_user=system_user,
+            expired_at=expired_at, actions=actions
+        )
         if asset:
-            asset_detail = self._get_asset_secret_detail(asset, user=user, system_user=system_user)
+            asset_detail = self._get_asset_secret_detail(asset)
             system_user.load_asset_more_auth(asset.id, user.username, user.id)
             data['type'] = 'asset'
             data.update(asset_detail)
@@ -297,9 +298,6 @@ class SecretDetailMixin:
             system_user.load_app_more_auth(app.id, user.username, user.id)
             data['type'] = 'application'
             data.update(app_detail)
-
-        self.request.session['auth_backend'] = settings.AUTH_BACKEND_AUTH_TOKEN
-        post_auth_success.send(sender=self.__class__, user=user, request=self.request, login_type='T')
 
         serializer = self.get_serializer(data)
         return Response(data=serializer.data, status=200)
@@ -336,11 +334,16 @@ class UserConnectionTokenViewSet(
             raise PermissionDenied('Only super user can create user token')
         self.check_resource_permission(user, asset, application, system_user)
         token = random_string(36)
+        secret = random_string(16)
         value = {
+            'id': token,
+            'secret': secret,
             'user': str(user.id),
             'username': user.username,
             'system_user': str(system_user.id),
-            'system_user_name': system_user.name
+            'system_user_name': system_user.name,
+            'created_by': str(self.request.user),
+            'date_created': str(timezone.now())
         }
 
         if asset:
@@ -398,7 +401,7 @@ class UserConnectionTokenViewSet(
 
         if not has_perm:
             raise serializers.ValidationError('Permission expired or invalid')
-        return value, user, system_user, asset, app, expired_at
+        return value, user, system_user, asset, app, expired_at, actions
 
     def get_permissions(self):
         if self.action in ["create", "get_rdp_file"]:

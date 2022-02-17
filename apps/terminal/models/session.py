@@ -57,7 +57,6 @@ class Session(OrgModelMixin):
 
     upload_to = 'replay'
     ACTIVE_CACHE_KEY_PREFIX = 'SESSION_ACTIVE_{}'
-    _DATE_START_FIRST_HAS_REPLAY_RDP_SESSION = None
     SUFFIX_MAP = {1: '.gz', 2: '.replay.gz', 3: '.cast.gz'}
     DEFAULT_SUFFIXES = ['.replay.gz', '.cast.gz', '.gz']
 
@@ -126,25 +125,8 @@ class Session(OrgModelMixin):
     def user_obj(self):
         return User.objects.get(id=self.user_id)
 
-    @property
-    def _date_start_first_has_replay_rdp_session(self):
-        if self.__class__._DATE_START_FIRST_HAS_REPLAY_RDP_SESSION is None:
-            instance = self.__class__.objects.filter(
-                protocol='rdp', has_replay=True
-            ).order_by('date_start').first()
-            if not instance:
-                date_start = timezone.now() - timezone.timedelta(days=365)
-            else:
-                date_start = instance.date_start
-            self.__class__._DATE_START_FIRST_HAS_REPLAY_RDP_SESSION = date_start
-        return self.__class__._DATE_START_FIRST_HAS_REPLAY_RDP_SESSION
-
     def can_replay(self):
-        if self.has_replay:
-            return True
-        if self.date_start < self._date_start_first_has_replay_rdp_session:
-            return True
-        return False
+        return self.has_replay
 
     @property
     def can_join(self):

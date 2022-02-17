@@ -22,13 +22,15 @@ from users.models import User
 from users.signals import post_user_change_password
 from terminal.models import Session, Command
 from .utils import write_login_log
-from . import models
+from . import models, serializers
 from .models import OperateLog
 from orgs.utils import current_org
 from perms.models import AssetPermission, ApplicationPermission
+from terminal.backends.command.serializers import SessionCommandSerializer
+from terminal.serializers import SessionSerializer
 from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR
 from common.utils import get_request_ip, get_logger, get_syslogger
-from common.utils.encode import model_to_json
+from common.utils.encode import data_to_json
 
 logger = get_logger(__name__)
 sys_logger = get_syslogger(__name__)
@@ -168,9 +170,9 @@ M2M_NEED_RECORD = {
 }
 
 M2M_ACTION = {
-    POST_ADD: 'add',
-    POST_REMOVE: 'remove',
-    POST_CLEAR: 'remove',
+    POST_ADD: OperateLog.ACTION_CREATE,
+    POST_REMOVE: OperateLog.ACTION_DELETE,
+    POST_CLEAR: OperateLog.ACTION_DELETE,
 }
 
 
@@ -185,14 +187,14 @@ def on_m2m_changed(sender, action, instance, reverse, model, pk_set, **kwargs):
 
     sender_name = sender._meta.object_name
     if sender_name in M2M_NEED_RECORD:
-        action = M2M_ACTION[action]
         org_id = current_org.id
         remote_addr = get_request_ip(current_request)
         user = str(user)
         resource_type, resource_tmpl_add, resource_tmpl_remove = M2M_NEED_RECORD[sender_name]
-        if action == 'add':
+        action = M2M_ACTION[action]
+        if action == OperateLog.ACTION_CREATE:
             resource_tmpl = resource_tmpl_add
-        elif action == 'remove':
+        elif action == OperateLog.ACTION_DELETE:
             resource_tmpl = resource_tmpl_remove
 
         to_create = []
@@ -255,20 +257,27 @@ def on_user_change_password(sender, user=None, **kwargs):
 def on_audits_log_create(sender, instance=None, **kwargs):
     if sender == models.UserLoginLog:
         category = "login_log"
+        serializer_cls = serializers.UserLoginLogSerializer
     elif sender == models.FTPLog:
         category = "ftp_log"
+        serializer_cls = serializers.FTPLogSerializer
     elif sender == models.OperateLog:
         category = "operation_log"
+        serializer_cls = serializers.OperateLogSerializer
     elif sender == models.PasswordChangeLog:
         category = "password_change_log"
+        serializer_cls = serializers.PasswordChangeLogSerializer
     elif sender == Session:
         category = "host_session_log"
+        serializer_cls = SessionSerializer
     elif sender == Command:
         category = "session_command_log"
+        serializer_cls = SessionCommandSerializer
     else:
         return
 
-    data = model_to_json(instance, indent=None)
+    serializer = serializer_cls(instance)
+    data = data_to_json(serializer.data, indent=None)
     msg = "{} - {}".format(category, data)
     sys_logger.info(msg)
 
