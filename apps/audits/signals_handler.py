@@ -102,11 +102,6 @@ def create_operate_log(action, sender, resource):
 
 
 M2M_NEED_RECORD = {
-    'OrganizationMember': (
-        _('User and Organization'),
-        _('{User} JOINED {Organization}'),
-        _('{User} LEFT {Organization}')
-    ),
     User.groups.through._meta.object_name: (
         _('User and Group'),
         _('{User} JOINED {UserGroup}'),

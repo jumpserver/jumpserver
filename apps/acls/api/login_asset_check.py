@@ -1,7 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.generics import CreateAPIView
 
-from common.permissions import IsAppUser
 from common.utils import reverse, lazyproperty
 from orgs.utils import tmp_to_org
 from tickets.api import GenericTicketStatusRetrieveCloseAPI
@@ -12,8 +11,8 @@ __all__ = ['LoginAssetCheckAPI', 'LoginAssetConfirmStatusAPI']
 
 
 class LoginAssetCheckAPI(CreateAPIView):
-    permission_classes = (IsAppUser,)
     serializer_class = serializers.LoginAssetCheckSerializer
+    model = LoginAssetACL
 
     def create(self, request, *args, **kwargs):
         is_need_confirm, response_data = self.check_if_need_confirm()

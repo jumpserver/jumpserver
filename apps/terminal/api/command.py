@@ -9,10 +9,9 @@ from rest_framework.fields import DateTimeField
 from rest_framework.response import Response
 from django.template import loader
 
-from terminal.models import CommandStorage, Session
+from terminal.models import CommandStorage, Session, Command
 from terminal.filters import CommandFilter
 from orgs.utils import current_org
-from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor, IsAppUser
 from common.drf.api import JMSBulkModelViewSet
 from common.utils import get_logger
 from terminal.serializers import InsecureCommandAlertSerializer
@@ -29,7 +28,6 @@ __all__ = ['CommandViewSet', 'CommandExportApi', 'InsecureCommandAlertAPI']
 
 class CommandQueryMixin:
     command_store = get_command_storage()
-    permission_classes = [IsOrgAdminOrAppUser | IsOrgAuditor]
     filterset_fields = [
         "asset", "system_user", "user", "session", "risk_level",
         "input"
@@ -105,9 +103,9 @@ class CommandViewSet(JMSBulkModelViewSet):
 
     """
     command_store = get_command_storage()
-    permission_classes = [IsOrgAdminOrAppUser | IsOrgAuditor]
     serializer_class = SessionCommandSerializer
     filterset_class = CommandFilter
+    model = Command
     ordering_fields = ('timestamp', )
 
     def merge_all_storage_list(self, request, *args, **kwargs):
@@ -191,6 +189,9 @@ class CommandViewSet(JMSBulkModelViewSet):
 
 class CommandExportApi(CommandQueryMixin, generics.ListAPIView):
     serializer_class = SessionCommandSerializer
+    rbac_perms = {
+        'list': 'terminal.view_command'
+    }
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
@@ -210,8 +211,10 @@ class CommandExportApi(CommandQueryMixin, generics.ListAPIView):
 
 
 class InsecureCommandAlertAPI(generics.CreateAPIView):
-    permission_classes = [IsAppUser]
     serializer_class = InsecureCommandAlertSerializer
+    rbac_perms = {
+        'POST': 'terminal.add_command'
+    }
 
     def post(self, request, *args, **kwargs):
         serializer = InsecureCommandAlertSerializer(data=request.data, many=True)

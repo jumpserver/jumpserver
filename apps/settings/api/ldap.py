@@ -13,7 +13,6 @@ from ..utils import (
     LDAP_USE_CACHE_FLAGS, LDAPTestUtil
 )
 from ..tasks import sync_ldap_user
-from common.permissions import IsSuperUser
 from common.utils import get_logger, is_uuid
 from ..serializers import (
     LDAPTestConfigSerializer, LDAPUserSerializer,
@@ -26,8 +25,10 @@ logger = get_logger(__file__)
 
 
 class LDAPTestingConfigAPI(APIView):
-    permission_classes = (IsSuperUser,)
     serializer_class = LDAPTestConfigSerializer
+    rbac_perms = {
+        'POST': 'settings.change_setting'
+    }
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -66,8 +67,10 @@ class LDAPTestingConfigAPI(APIView):
 
 
 class LDAPTestingLoginAPI(APIView):
-    permission_classes = (IsSuperUser,)
     serializer_class = LDAPTestLoginSerializer
+    rbac_perms = {
+        'POST': 'settings.change_setting'
+    }
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -81,8 +84,10 @@ class LDAPTestingLoginAPI(APIView):
 
 
 class LDAPUserListApi(generics.ListAPIView):
-    permission_classes = (IsSuperUser,)
     serializer_class = LDAPUserSerializer
+    rbac_perms = {
+        'POST': 'settings.change_setting'
+    }
 
     def get_queryset_from_cache(self):
         search_value = self.request.query_params.get('search')
@@ -170,8 +175,6 @@ class LDAPUserListApi(generics.ListAPIView):
 
 
 class LDAPUserImportAPI(APIView):
-    permission_classes = (IsSuperUser,)
-
     def get_org(self):
         org_id = self.request.data.get('org_id')
         if is_uuid(org_id):
@@ -210,8 +213,6 @@ class LDAPUserImportAPI(APIView):
 
 
 class LDAPCacheRefreshAPI(generics.RetrieveAPIView):
-    permission_classes = (IsSuperUser,)
-
     def retrieve(self, request, *args, **kwargs):
         try:
             LDAPSyncUtil().clear_cache()

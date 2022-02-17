@@ -2,6 +2,8 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.db.models.signals import post_save
+from django.utils.translation import ugettext_lazy as _
+
 from ..backends.command.models import AbstractSessionCommand
 
 
@@ -19,3 +21,4 @@ class Command(AbstractSessionCommand):
     class Meta:
         db_table = "terminal_command"
         ordering = ('-timestamp',)
+        verbose_name = _('Command record')

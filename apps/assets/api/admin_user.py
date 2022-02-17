@@ -2,9 +2,9 @@ from django.db.models import Count
 
 from orgs.mixins.api import OrgBulkModelViewSet
 from common.utils import get_logger
-from ..hands import IsOrgAdmin
 from ..models import SystemUser
 from .. import serializers
+from rbac.permissions import RBACPermission
 
 
 logger = get_logger(__file__)
@@ -20,7 +20,7 @@ class AdminUserViewSet(OrgBulkModelViewSet):
     filterset_fields = ("name", "username")
     search_fields = filterset_fields
     serializer_class = serializers.AdminUserSerializer
-    permission_classes = (IsOrgAdmin,)
+    permission_classes = (RBACPermission,)
     ordering_fields = ('name',)
     ordering = ('name', )
 

@@ -1,12 +1,8 @@
-from django.db.models import F
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
-from django.utils.translation import ugettext_lazy as _
 
-from users.models.user import User
-from common.drf.serializers import BulkModelSerializer
-from common.db.models import concated_display as display
-from .models import Organization, OrganizationMember, ROLE
+from .utils import get_current_org
+from .models import Organization
 
 
 class ResourceStatisticsSerializer(serializers.Serializer):
@@ -25,11 +21,7 @@ class ResourceStatisticsSerializer(serializers.Serializer):
     app_perms_amount = serializers.IntegerField(required=False)
 
 
-class OrgSerializer(BulkModelSerializer):
-    users = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), write_only=True, required=False)
-    admins = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), write_only=True, required=False)
-    auditors = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), write_only=True, required=False)
-
+class OrgSerializer(ModelSerializer):
     resource_statistics = ResourceStatisticsSerializer(source='resource_statistics_cache', read_only=True)
 
     class Meta:
@@ -38,104 +30,26 @@ class OrgSerializer(BulkModelSerializer):
         fields_small = fields_mini + [
             'resource_statistics',
             'is_default', 'is_root',
-            'date_created',
+            'date_created', 'created_by',
             'comment', 'created_by',
         ]
 
-        fields_m2m = ['users', 'admins', 'auditors']
+        fields_m2m = []
         fields = fields_small + fields_m2m
         read_only_fields = ['created_by', 'date_created']
-
-    def create(self, validated_data):
-        members = self._pop_members(validated_data)
-        instance = Organization.objects.create(**validated_data)
-        OrganizationMember.objects.add_users_by_role(instance, *members)
-        return instance
-
-    def _pop_members(self, validated_data):
-        return (
-            validated_data.pop('users', None),
-            validated_data.pop('admins', None),
-            validated_data.pop('auditors', None)
-        )
-
-    def update(self, instance, validated_data):
-        members = self._pop_members(validated_data)
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-        OrganizationMember.objects.set_users_by_role(instance, *members)
-        return instance
-
-
-class OrgReadSerializer(OrgSerializer):
-    pass
-
-
-class OrgMemberSerializer(BulkModelSerializer):
-    org_display = serializers.CharField(read_only=True)
-    user_display = serializers.CharField(read_only=True)
-    role_display = serializers.CharField(source='get_role_display', read_only=True)
-
-    class Meta:
-        model = OrganizationMember
-        fields_mini = ['id']
-        fields_small = fields_mini + [
-            'role', 'role_display'
-        ]
-        fields_fk = ['org', 'user', 'org_display', 'user_display',]
-        fields = fields_small + fields_fk
-        use_model_bulk_create = True
-        model_bulk_create_kwargs = {'ignore_conflicts': True}
-
-    def get_unique_together_validators(self):
-        if self.parent:
-            return []
-        return super().get_unique_together_validators()
-
-    @classmethod
-    def setup_eager_loading(cls, queryset):
-        return queryset.annotate(
-            org_display=F('org__name'),
-            user_display=display('user__name', 'user__username')
-        ).distinct()
-
-
-class OrgMemberOldBaseSerializer(BulkModelSerializer):
-    organization = serializers.PrimaryKeyRelatedField(
-        label=_('Organization'), queryset=Organization.objects.all(), required=True, source='org'
-    )
-
-    def to_internal_value(self, data):
-        view = self.context['view']
-        org_id = view.kwargs.get('org_id')
-        if org_id:
-            data['organization'] = org_id
-        return super().to_internal_value(data)
-
-    class Meta:
-        model = OrganizationMember
-        fields = ('id', 'organization', 'user', 'role')
-
-
-class OrgMemberAdminSerializer(OrgMemberOldBaseSerializer):
-    role = serializers.HiddenField(default=ROLE.ADMIN)
-
-
-class OrgMemberUserSerializer(OrgMemberOldBaseSerializer):
-    role = serializers.HiddenField(default=ROLE.USER)
-
-
-class OrgRetrieveSerializer(OrgReadSerializer):
-    admins = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    auditors = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    users = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-
-    class Meta(OrgReadSerializer.Meta):
-        pass
 
 
 class CurrentOrgSerializer(ModelSerializer):
     class Meta:
         model = Organization
         fields = ['id', 'name', 'is_default', 'is_root', 'comment']
+
+
+class CurrentOrgDefault:
+    requires_context = False
+
+    def __call__(self, *args):
+        return get_current_org()
+
+    def __repr__(self):
+        return '%s()' % self.__class__.__name__

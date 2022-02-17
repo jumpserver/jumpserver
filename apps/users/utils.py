@@ -238,9 +238,9 @@ def construct_user_email(username, email):
     return email
 
 
-def get_current_org_members(exclude=()):
+def get_current_org_members():
     from orgs.utils import current_org
-    return current_org.get_members(exclude=exclude)
+    return current_org.get_members()
 
 
 def is_auth_time_valid(session, key):

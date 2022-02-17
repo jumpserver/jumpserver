@@ -8,15 +8,16 @@ from django.utils.translation import gettext_lazy as _
 
 from common.sdk.sms.tencent import TencentSMS
 from settings.models import Setting
-from common.permissions import IsSuperUser
 from common.exceptions import JMSException
 
 from .. import serializers
 
 
 class TencentSMSTestingAPI(GenericAPIView):
-    permission_classes = (IsSuperUser,)
     serializer_class = serializers.TencentSMSSettingSerializer
+    rbac_perms = {
+        'POST': 'settings.change_setting'
+    }
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)

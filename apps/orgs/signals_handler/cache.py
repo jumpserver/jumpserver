@@ -1,15 +1,13 @@
-from django.db.models.signals import m2m_changed
 from django.db.models.signals import post_save, pre_delete, pre_save, post_delete
 from django.dispatch import receiver
 
-from orgs.models import Organization, OrganizationMember
+from orgs.models import Organization
 from assets.models import Node
 from perms.models import (AssetPermission, ApplicationPermission)
 from users.models import UserGroup, User
 from applications.models import Application
 from terminal.models import Session
-from assets.models import Asset, AdminUser, SystemUser, Domain, Gateway
-from common.const.signals import POST_PREFIX
+from assets.models import Asset, SystemUser, Domain, Gateway
 from orgs.caches import OrgResourceStatisticsCache
 
 
@@ -32,20 +30,20 @@ def on_user_delete_refresh_cache(sender, instance, **kwargs):
     refresh_user_amount_on_user_create_or_delete(instance.id)
 
 
-@receiver(m2m_changed, sender=OrganizationMember)
-def on_org_user_changed_refresh_cache(sender, action, instance, reverse, pk_set, **kwargs):
-    if not action.startswith(POST_PREFIX):
-        return
-
-    if reverse:
-        orgs = Organization.objects.filter(id__in=pk_set)
-    else:
-        orgs = [instance]
-
-    for org in orgs:
-        org_cache = OrgResourceStatisticsCache(org)
-        org_cache.expire('users_amount')
-    OrgResourceStatisticsCache(Organization.root()).expire('users_amount')
+# @receiver(m2m_changed, sender=OrganizationMember)
+# def on_org_user_changed_refresh_cache(sender, action, instance, reverse, pk_set, **kwargs):
+#     if not action.startswith(POST_PREFIX):
+#         return
+#
+#     if reverse:
+#         orgs = Organization.objects.filter(id__in=pk_set)
+#     else:
+#         orgs = [instance]
+#
+#     for org in orgs:
+#         org_cache = OrgResourceStatisticsCache(org)
+#         org_cache.expire('users_amount')
+#     OrgResourceStatisticsCache(Organization.root()).expire('users_amount')
 
 
 class OrgResourceStatisticsRefreshUtil:

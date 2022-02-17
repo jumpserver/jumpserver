@@ -9,7 +9,6 @@ from applications.models import Application
 from orgs.mixins.api import OrgRelationMixin
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import current_org
-from common.permissions import IsOrgAdmin
 from perms import serializers
 from perms import models
 
@@ -36,7 +35,6 @@ class RelationMixin(OrgRelationMixin, OrgBulkModelViewSet):
 class ApplicationPermissionUserRelationViewSet(RelationMixin):
     serializer_class = serializers.ApplicationPermissionUserRelationSerializer
     m2m_field = models.ApplicationPermission.users.field
-    permission_classes = (IsOrgAdmin,)
     filterset_fields = [
         'id', "user", "applicationpermission",
     ]
@@ -51,7 +49,6 @@ class ApplicationPermissionUserRelationViewSet(RelationMixin):
 class ApplicationPermissionUserGroupRelationViewSet(RelationMixin):
     serializer_class = serializers.ApplicationPermissionUserGroupRelationSerializer
     m2m_field = models.ApplicationPermission.user_groups.field
-    permission_classes = (IsOrgAdmin,)
     filterset_fields = [
         'id', "usergroup", "applicationpermission"
     ]
@@ -66,7 +63,6 @@ class ApplicationPermissionUserGroupRelationViewSet(RelationMixin):
 class ApplicationPermissionApplicationRelationViewSet(RelationMixin):
     serializer_class = serializers.ApplicationPermissionApplicationRelationSerializer
     m2m_field = models.ApplicationPermission.applications.field
-    permission_classes = (IsOrgAdmin,)
     filterset_fields = [
         'id', 'application', 'applicationpermission',
     ]
@@ -81,7 +77,6 @@ class ApplicationPermissionApplicationRelationViewSet(RelationMixin):
 class ApplicationPermissionSystemUserRelationViewSet(RelationMixin):
     serializer_class = serializers.ApplicationPermissionSystemUserRelationSerializer
     m2m_field = models.ApplicationPermission.system_users.field
-    permission_classes = (IsOrgAdmin,)
     filterset_fields = [
         'id', 'systemuser', 'applicationpermission',
     ]
@@ -100,7 +95,6 @@ class ApplicationPermissionSystemUserRelationViewSet(RelationMixin):
 
 
 class ApplicationPermissionAllApplicationListApi(generics.ListAPIView):
-    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.ApplicationPermissionAllApplicationSerializer
     only_fields = serializers.ApplicationPermissionAllApplicationSerializer.Meta.only_fields
     filterset_fields = ('name',)
@@ -115,7 +109,6 @@ class ApplicationPermissionAllApplicationListApi(generics.ListAPIView):
 
 
 class ApplicationPermissionAllUserListApi(generics.ListAPIView):
-    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.ApplicationPermissionAllUserSerializer
     only_fields = serializers.ApplicationPermissionAllUserSerializer.Meta.only_fields
     filterset_fields = ('username', 'name')

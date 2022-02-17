@@ -6,7 +6,6 @@ from rest_framework.views import Response, APIView
 from django.core.mail import send_mail, get_connection
 from django.utils.translation import ugettext_lazy as _
 
-from common.permissions import IsSuperUser
 from common.utils import get_logger
 from .. import serializers
 from django.conf import settings
@@ -17,9 +16,11 @@ __all__ = ['MailTestingAPI']
 
 
 class MailTestingAPI(APIView):
-    permission_classes = (IsSuperUser,)
     serializer_class = serializers.MailTestSerializer
     success_message = _("Test mail sent to {}, please check")
+    rbac_perms = {
+        'POST': 'settings.change_setting'
+    }
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)

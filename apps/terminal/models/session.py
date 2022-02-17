@@ -236,6 +236,13 @@ class Session(OrgModelMixin):
     class Meta:
         db_table = "terminal_session"
         ordering = ["-date_start"]
+        verbose_name = _('Session record')
+        permissions = [
+            ('monitor_session', _('Can monitor session')),
+            ('share_session', _('Can share session')),
+            ('terminate_session', _('Can terminate session')),
+            ('validate_sessionactionperm', _('Can validate session action perm')),
+        ]
 
     def __str__(self):
         return "{0.id} of {0.user} to {0.asset}".format(self)

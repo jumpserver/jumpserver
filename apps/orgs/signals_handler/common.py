@@ -10,7 +10,7 @@ from django.db.models.signals import m2m_changed
 from django.db.models.signals import post_save, pre_delete
 
 from orgs.utils import tmp_to_org
-from orgs.models import Organization, OrganizationMember
+from orgs.models import Organization
 from orgs.hands import set_current_org, Node, get_current_org
 from perms.models import (AssetPermission, ApplicationPermission)
 from users.models import UserGroup, User
@@ -20,6 +20,7 @@ from common.signals import django_ready
 from common.utils import get_logger
 from common.utils.connection import RedisPubSub
 from assets.models import CommandFilterRule
+from users.signals import post_user_leave_org
 
 
 logger = get_logger(__file__)
@@ -55,6 +56,7 @@ def subscribe_orgs_mapping_expire(sender, **kwargs):
     t.start()
 
 
+# 创建对应的root
 @receiver(post_save, sender=Organization)
 def on_org_create_or_update(sender, instance, created=False, **kwargs):
     # 必须放到最开始, 因为下面调用Node.save方法时会获取当前组织的org_id(即instance.org_id), 如果不过期会找不到
@@ -72,9 +74,6 @@ def on_org_create_or_update(sender, instance, created=False, **kwargs):
 def on_org_delete(sender, instance, **kwargs):
     expire_orgs_mapping_for_memory(instance.id)
 
-
-@receiver(pre_delete, sender=Organization)
-def on_org_delete(sender, instance, **kwargs):
     # 删除该组织下所有 节点
     with tmp_to_org(instance):
         root_node = Node.org_root()
@@ -144,25 +143,6 @@ def _clear_users_from_org(org, users):
     _remove_users(CommandFilterRule, users, org, user_field_name='reviewers')
 
 
-@receiver(m2m_changed, sender=OrganizationMember)
-def on_org_user_changed(action, instance, reverse, pk_set, **kwargs):
-    if action == 'post_remove':
-        if reverse:
-            user = instance
-            org_pk_set = pk_set
-
-            orgs = Organization.objects.filter(id__in=org_pk_set)
-            for org in orgs:
-                if not org.members.filter(id=user.id).exists():
-                    _clear_users_from_org(org, user)
-        else:
-            org = instance
-            user_pk_set = pk_set
-
-            leaved_users = set(pk_set) - set(org.members.filter(id__in=user_pk_set).values_list('id', flat=True))
-            _clear_users_from_org(org, leaved_users)
-
-
 @receiver(post_save, sender=User)
 @on_transaction_commit
 def on_user_created_set_default_org(sender, instance, created, **kwargs):
@@ -171,3 +151,9 @@ def on_user_created_set_default_org(sender, instance, created, **kwargs):
     if instance.orgs.count() > 0:
         return
     Organization.default().members.add(instance)
+
+
+@receiver(post_user_leave_org)
+def on_user_leave_org(sender, user=None, org=None, **kwargs):
+    logger.debug('User leave org signal recv: {} <> {}'.format(user, org))
+    _clear_users_from_org(org, [user])

@@ -8,13 +8,12 @@ from rest_framework import generics
 from rest_framework.views import APIView, Response
 from rest_framework import status
 from django.conf import settings
-from django_filters import rest_framework as filters
 from django.utils.translation import gettext_lazy as _
 
 from common.exceptions import JMSException
 from common.drf.api import JMSBulkModelViewSet
 from common.utils import get_object_or_none
-from common.permissions import IsAppUser, IsSuperUser, WithBootstrapToken
+from common.permissions import WithBootstrapToken
 from ..models import Terminal
 from .. import serializers
 from .. import exceptions
@@ -29,7 +28,6 @@ logger = logging.getLogger(__file__)
 class TerminalViewSet(JMSBulkModelViewSet):
     queryset = Terminal.objects.filter(is_deleted=False)
     serializer_class = serializers.TerminalSerializer
-    permission_classes = (IsSuperUser,)
     filterset_fields = ['name', 'remote_addr', 'type']
     custom_filter_fields = ['status']
 
@@ -86,7 +84,9 @@ class TerminalViewSet(JMSBulkModelViewSet):
 
 
 class TerminalConfig(APIView):
-    permission_classes = (IsAppUser,)
+    rbac_perms = {
+        'GET': 'view_terminalconfig'
+    }
 
     def get(self, request):
         config = request.user.terminal.config

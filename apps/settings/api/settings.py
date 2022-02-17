@@ -5,7 +5,7 @@ from rest_framework import generics
 from django.conf import settings
 
 from jumpserver.conf import Config
-from common.permissions import IsSuperUser
+from rbac.permissions import RBACPermission
 from common.utils import get_logger
 from .. import serializers
 from ..models import Setting
@@ -14,7 +14,8 @@ logger = get_logger(__file__)
 
 
 class SettingsApi(generics.RetrieveUpdateAPIView):
-    permission_classes = (IsSuperUser,)
+    permission_classes = (RBACPermission,)
+
     serializer_class_mapper = {
         'all': serializers.SettingsSerializer,
         'basic': serializers.BasicSettingSerializer,
@@ -39,6 +40,9 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'alibaba': serializers.AlibabaSMSSettingSerializer,
         'tencent': serializers.TencentSMSSettingSerializer,
     }
+
+    def get_queryset(self):
+        return Setting.objects.all()
 
     def get_serializer_class(self):
         category = self.request.query_params.get('category', 'basic')

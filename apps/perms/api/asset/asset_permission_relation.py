@@ -2,15 +2,12 @@
 #
 from rest_framework import generics
 from django.db.models import F, Value
-from django.db.models import Q
 from django.db.models.functions import Concat
 from django.shortcuts import get_object_or_404
 
-from assets.models import Node, Asset
 from orgs.mixins.api import OrgRelationMixin
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import current_org
-from common.permissions import IsOrgAdmin
 from perms import serializers
 from perms import models
 from perms.utils.asset.user_permission import UserGrantedAssetsQueryUtils
@@ -36,7 +33,6 @@ class RelationMixin(OrgRelationMixin, OrgBulkModelViewSet):
 class AssetPermissionUserRelationViewSet(RelationMixin):
     serializer_class = serializers.AssetPermissionUserRelationSerializer
     m2m_field = models.AssetPermission.users.field
-    permission_classes = (IsOrgAdmin,)
     filterset_fields = [
         'id', "user", "assetpermission",
     ]
@@ -50,7 +46,6 @@ class AssetPermissionUserRelationViewSet(RelationMixin):
 
 
 class AssetPermissionAllUserListApi(generics.ListAPIView):
-    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.AssetPermissionAllUserSerializer
     filterset_fields = ("username", "name")
     search_fields = filterset_fields
@@ -67,7 +62,6 @@ class AssetPermissionAllUserListApi(generics.ListAPIView):
 class AssetPermissionUserGroupRelationViewSet(RelationMixin):
     serializer_class = serializers.AssetPermissionUserGroupRelationSerializer
     m2m_field = models.AssetPermission.user_groups.field
-    permission_classes = (IsOrgAdmin,)
     filterset_fields = [
         'id', "usergroup", "assetpermission"
     ]
@@ -83,7 +77,6 @@ class AssetPermissionUserGroupRelationViewSet(RelationMixin):
 class AssetPermissionAssetRelationViewSet(RelationMixin):
     serializer_class = serializers.AssetPermissionAssetRelationSerializer
     m2m_field = models.AssetPermission.assets.field
-    permission_classes = (IsOrgAdmin,)
     filterset_fields = [
         'id', 'asset', 'assetpermission',
     ]
@@ -97,7 +90,6 @@ class AssetPermissionAssetRelationViewSet(RelationMixin):
 
 
 class AssetPermissionAllAssetListApi(generics.ListAPIView):
-    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.AssetPermissionAllAssetSerializer
     filterset_fields = ("hostname", "ip")
     search_fields = filterset_fields
@@ -112,7 +104,6 @@ class AssetPermissionAllAssetListApi(generics.ListAPIView):
 class AssetPermissionNodeRelationViewSet(RelationMixin):
     serializer_class = serializers.AssetPermissionNodeRelationSerializer
     m2m_field = models.AssetPermission.nodes.field
-    permission_classes = (IsOrgAdmin,)
     filterset_fields = [
         'id', 'node', 'assetpermission',
     ]
@@ -128,7 +119,6 @@ class AssetPermissionNodeRelationViewSet(RelationMixin):
 class AssetPermissionSystemUserRelationViewSet(RelationMixin):
     serializer_class = serializers.AssetPermissionSystemUserRelationSerializer
     m2m_field = models.AssetPermission.system_users.field
-    permission_classes = (IsOrgAdmin,)
     filterset_fields = [
         'id', 'systemuser', 'assetpermission',
     ]

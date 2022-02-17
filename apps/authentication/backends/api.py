@@ -29,6 +29,9 @@ def get_request_date_header(request):
 
 
 class JMSModelBackend(ModelBackend):
+    def has_perm(self, user_obj, perm, obj=None):
+        return False
+
     def user_can_authenticate(self, user):
         return True
 
