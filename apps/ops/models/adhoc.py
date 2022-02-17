@@ -38,7 +38,8 @@ class Task(PeriodTaskModelMixin, OrgModelMixin):
     comment = models.TextField(blank=True, verbose_name=_("Comment"))
     date_created = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name=_("Date created"))
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
-    latest_adhoc = models.ForeignKey('ops.AdHoc', on_delete=models.SET_NULL, null=True, related_name='task_latest')
+    latest_adhoc = models.ForeignKey('ops.AdHoc', on_delete=models.SET_NULL,
+                                     null=True, related_name='task_latest')
     latest_execution = models.ForeignKey('ops.AdHocExecution', on_delete=models.SET_NULL, null=True, related_name='task_latest')
     total_run_amount = models.IntegerField(default=0)
     success_run_amount = models.IntegerField(default=0)
@@ -131,7 +132,11 @@ class Task(PeriodTaskModelMixin, OrgModelMixin):
         db_table = 'ops_task'
         unique_together = ('name', 'org_id')
         ordering = ('-date_updated',)
+        verbose_name = _("Task")
         get_latest_by = 'date_created'
+        permissions = [
+            ('view_taskmonitor', _('Can view task monitor'))
+        ]
 
 
 class AdHoc(OrgModelMixin):
@@ -235,6 +240,7 @@ class AdHoc(OrgModelMixin):
     class Meta:
         db_table = "ops_adhoc"
         get_latest_by = 'date_created'
+        verbose_name = _('AdHoc')
 
 
 class AdHocExecution(OrgModelMixin):
@@ -330,3 +336,4 @@ class AdHocExecution(OrgModelMixin):
     class Meta:
         db_table = "ops_adhoc_execution"
         get_latest_by = 'date_start'
+        verbose_name = _("AdHoc execution")

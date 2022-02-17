@@ -6,8 +6,9 @@ from django.db.models import F, Q
 
 from common.drf.filters import BaseFilterSet
 from common.drf.api import JMSBulkModelViewSet
+from rbac.permissions import RBACPermission
 from ..models import Account
-from ..hands import IsOrgAdminOrAppUser, IsOrgAdmin, NeedMFAVerify
+from ..hands import NeedMFAVerify
 from .. import serializers
 
 
@@ -31,7 +32,8 @@ class AccountFilterSet(BaseFilterSet):
         username = self.get_query_param('username')
         if not username:
             return qs
-        qs = qs.filter(Q(username=username) | Q(systemuser__username=username)).distinct()
+        q = Q(username=username) | Q(systemuser__username=username)
+        qs = qs.filter(q).distinct()
         return qs
 
 
@@ -41,7 +43,6 @@ class ApplicationAccountViewSet(JMSBulkModelViewSet):
     filterset_class = AccountFilterSet
     filterset_fields = ['username', 'app_display', 'type', 'category', 'app']
     serializer_class = serializers.AppAccountSerializer
-    permission_classes = (IsOrgAdmin,)
 
     def get_queryset(self):
         queryset = Account.get_queryset()
@@ -50,5 +51,9 @@ class ApplicationAccountViewSet(JMSBulkModelViewSet):
 
 class ApplicationAccountSecretViewSet(ApplicationAccountViewSet):
     serializer_class = serializers.AppAccountSecretSerializer
-    permission_classes = [IsOrgAdminOrAppUser, NeedMFAVerify]
+    permission_classes = [RBACPermission, NeedMFAVerify]
     http_method_names = ['get', 'options']
+    rbac_perms = {
+        'retrieve': 'view_applicationaccountsecret',
+        'list': 'view_applicationaccountsecret',
+    }

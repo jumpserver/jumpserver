@@ -6,11 +6,10 @@ from orgs.utils import current_org, tmp_to_org
 from common.cache import Cache, IntegerField
 from common.utils import get_logger
 from users.models import UserGroup, User
-from assets.models import Node, AdminUser, SystemUser, Domain, Gateway, Asset
+from assets.models import Node, SystemUser, Domain, Gateway, Asset
 from terminal.models import Session
 from applications.models import Application
 from perms.models import AssetPermission, ApplicationPermission
-from .models import OrganizationMember
 
 logger = get_logger(__file__)
 
@@ -84,13 +83,8 @@ class OrgResourceStatisticsCache(OrgRelatedCache):
         return SystemUser.objects.filter(type=SystemUser.Type.common).count()
 
     def compute_users_amount(self):
-        users = User.objects.exclude(role='App')
-
-        if not self.org.is_root():
-            users = users.filter(m2m_org_members__org_id=self.org.id)
-
-        users_amount = users.values('id').distinct().count()
-        return users_amount
+        amount = User.get_org_users(self.org).count()
+        return amount
 
     def compute_assets_amount(self):
         if self.org.is_root():

@@ -2,32 +2,27 @@
 import uuid
 
 from rest_framework import generics
-from common.permissions import IsOrgAdmin
 from rest_framework.permissions import IsAuthenticated
 
 from users.notifications import (
     ResetPasswordMsg, ResetPasswordSuccessMsg, ResetSSHKeyMsg,
     ResetPublicKeySuccessMsg,
 )
-from common.permissions import (
-    IsCurrentUserOrReadOnly
-)
+
 from .. import serializers
 from ..models import User
 from .mixins import UserQuerysetMixin
 
 __all__ = [
     'UserResetPasswordApi', 'UserResetPKApi',
-    'UserProfileApi', 'UserUpdatePKApi',
-    'UserPasswordApi', 'UserSecretKeyApi',
-    'UserPublicKeyApi'
+    'UserProfileApi', 'UserPasswordApi',
+    'UserSecretKeyApi', 'UserPublicKeyApi'
 ]
 
 
 class UserResetPasswordApi(UserQuerysetMixin, generics.UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
-    permission_classes = (IsOrgAdmin,)
 
     def perform_update(self, serializer):
         # Note: we are not updating the user object here.
@@ -40,25 +35,12 @@ class UserResetPasswordApi(UserQuerysetMixin, generics.UpdateAPIView):
 
 class UserResetPKApi(UserQuerysetMixin, generics.UpdateAPIView):
     serializer_class = serializers.UserSerializer
-    permission_classes = (IsOrgAdmin,)
 
     def perform_update(self, serializer):
         user = self.get_object()
         user.public_key = None
         user.save()
-
         ResetSSHKeyMsg(user).publish_async()
-
-
-# 废弃
-class UserUpdatePKApi(UserQuerysetMixin, generics.UpdateAPIView):
-    serializer_class = serializers.UserPKUpdateSerializer
-    permission_classes = (IsCurrentUserOrReadOnly,)
-
-    def perform_update(self, serializer):
-        user = self.get_object()
-        user.public_key = serializer.validated_data['public_key']
-        user.save()
 
 
 class UserProfileApi(generics.RetrieveUpdateAPIView):

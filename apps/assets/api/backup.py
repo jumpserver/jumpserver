@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 #
-from rest_framework import status, mixins, viewsets
+from rest_framework import status, viewsets
 from rest_framework.response import Response
 
-from common.permissions import IsOrgAdmin
 from orgs.mixins.api import OrgBulkModelViewSet
-
 from .. import serializers
 from ..tasks import execute_account_backup_plan
 from ..models import (
@@ -24,17 +22,13 @@ class AccountBackupPlanViewSet(OrgBulkModelViewSet):
     ordering_fields = ('name',)
     ordering = ('name',)
     serializer_class = serializers.AccountBackupPlanSerializer
-    permission_classes = (IsOrgAdmin,)
 
 
-class AccountBackupPlanExecutionViewSet(
-    mixins.CreateModelMixin, mixins.ListModelMixin,
-    mixins.RetrieveModelMixin, viewsets.GenericViewSet
-):
+class AccountBackupPlanExecutionViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.AccountBackupPlanExecutionSerializer
     search_fields = ('trigger',)
     filterset_fields = ('trigger', 'plan_id')
-    permission_classes = (IsOrgAdmin,)
+    http_method_names = ['get', 'post']
 
     def get_queryset(self):
         queryset = AccountBackupPlanExecution.objects.all()

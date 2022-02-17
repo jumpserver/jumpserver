@@ -1,44 +1,15 @@
 # ~*~ coding: utf-8 ~*~
 
 from django.http import HttpResponse
-from django.urls import reverse_lazy
-from django.utils.translation import ugettext as _
 from django.views import View
-from django.views.generic.edit import UpdateView
 
 from common.utils import get_logger, ssh_key_gen
-from common.permissions import (
-    IsValidUser,
-    UserCanUpdateSSHKey,
-)
+from common.permissions import IsValidUser
 from common.mixins.views import PermissionsMixin
-from ... import forms
-from ...models import User
 
-__all__ = [
-    'UserPublicKeyUpdateView', 'UserPublicKeyGenerateView',
-]
+__all__ = ['UserPublicKeyGenerateView']
 
 logger = get_logger(__name__)
-
-
-class UserPublicKeyUpdateView(PermissionsMixin, UpdateView):
-    template_name = 'users/user_pubkey_update.html'
-    model = User
-    form_class = forms.UserPublicKeyForm
-    permission_classes = [IsValidUser, UserCanUpdateSSHKey]
-    success_url = reverse_lazy('users:user-profile')
-
-    def get_object(self, queryset=None):
-        return self.request.user
-
-    def get_context_data(self, **kwargs):
-        context = {
-            'app': _('Users'),
-            'action': _('Public key update'),
-        }
-        kwargs.update(context)
-        return super().get_context_data(**kwargs)
 
 
 class UserPublicKeyGenerateView(PermissionsMixin, View):

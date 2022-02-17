@@ -5,7 +5,6 @@ from django.db.models import F, Value, Model
 from django.db.models.signals import m2m_changed
 from django.db.models.functions import Concat
 
-from common.permissions import IsOrgAdmin
 from common.utils import get_logger
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import current_org
@@ -71,7 +70,6 @@ class BaseRelationViewSet(RelationMixin, OrgBulkModelViewSet):
 class SystemUserAssetRelationViewSet(BaseRelationViewSet):
     serializer_class = serializers.SystemUserAssetRelationSerializer
     model = models.SystemUser.assets.through
-    permission_classes = (IsOrgAdmin,)
     filterset_fields = [
         'id', 'asset', 'systemuser',
     ]
@@ -97,7 +95,6 @@ class SystemUserAssetRelationViewSet(BaseRelationViewSet):
 class SystemUserNodeRelationViewSet(BaseRelationViewSet):
     serializer_class = serializers.SystemUserNodeRelationSerializer
     model = models.SystemUser.nodes.through
-    permission_classes = (IsOrgAdmin,)
     filterset_fields = [
         'id', 'node', 'systemuser',
     ]
@@ -118,7 +115,6 @@ class SystemUserNodeRelationViewSet(BaseRelationViewSet):
 class SystemUserUserRelationViewSet(BaseRelationViewSet):
     serializer_class = serializers.SystemUserUserRelationSerializer
     model = models.SystemUser.users.through
-    permission_classes = (IsOrgAdmin,)
     filterset_fields = [
         'id', 'user', 'systemuser',
     ]
