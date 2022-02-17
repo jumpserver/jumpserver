@@ -17,11 +17,12 @@ class AppCategory(TextChoices):
 class AppType(TextChoices):
     # db category
     mysql = 'mysql', 'MySQL'
-    redis = 'redis', 'Redis'
     oracle = 'oracle', 'Oracle'
     pgsql = 'postgresql', 'PostgreSQL'
     mariadb = 'mariadb', 'MariaDB'
     sqlserver = 'sqlserver', 'SQLServer'
+    redis = 'redis', 'Redis'
+    mongodb = 'mongodb', 'MongoDB'
 
     # remote-app category
     chrome = 'chrome', 'Chrome'
@@ -36,7 +37,7 @@ class AppType(TextChoices):
     def category_types_mapper(cls):
         return {
             AppCategory.db: [
-                cls.mysql, cls.oracle, cls.redis, cls.pgsql, cls.mariadb, cls.sqlserver
+                cls.mysql, cls.oracle, cls.pgsql, cls.mariadb, cls.sqlserver, cls.redis, cls.mongodb
             ],
             AppCategory.remote_app: [cls.chrome, cls.mysql_workbench, cls.vmware_client, cls.custom],
             AppCategory.cloud: [cls.k8s]
