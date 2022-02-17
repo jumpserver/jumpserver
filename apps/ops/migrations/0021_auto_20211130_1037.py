@@ -26,4 +26,8 @@ class Migration(migrations.Migration):
             name='task',
             options={'get_latest_by': 'date_created', 'ordering': ('-date_updated',), 'verbose_name': 'Task'},
         ),
+        migrations.AlterModelOptions(
+            name='task',
+            options={'get_latest_by': 'date_created', 'ordering': ('-date_updated',), 'permissions': [('view_taskmonitor', 'Can view task monitor')], 'verbose_name': 'Task'},
+        ),
     ]
