@@ -1,4 +1,5 @@
 from django.utils.translation import ugettext as _
+
 from orgs.utils import tmp_to_org, tmp_to_root_org
 from applications.const import AppCategory, AppType
 from applications.models import Application
@@ -43,16 +44,16 @@ class Handler(BaseHandler):
         apply_date_start = self.ticket.meta.get('apply_date_start')
         apply_date_expired = self.ticket.meta.get('apply_date_expired')
         applied_body = '''{}: {},
-            {}: {},
-            {}: {},
-            {}: {},
-            {}: {},
-            {}: {},
+            {}: {}
+            {}: {}
+            {}: {}
+            {}: {}
+            {}: {}
         '''.format(
             _('Applied category'), apply_category_display,
             _('Applied type'), apply_type_display,
-            _('Applied application group'), apply_applications,
-            _('Applied system user group'), apply_system_users,
+            _('Applied application group'), ','.join(apply_applications),
+            _('Applied system user group'), ','.join(apply_system_users),
             _('Applied date start'), apply_date_start,
             _('Applied date expired'), apply_date_expired,
         )
@@ -84,7 +85,7 @@ class Handler(BaseHandler):
         ).format(
             self.ticket.title,
             self.ticket.applicant_display,
-            str(self.ticket.processor),
+            ','.join([i['processor_display'] for i in self.ticket.process_map]),
             str(self.ticket.id)
         )
         permissions_data = {

@@ -29,6 +29,11 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     search_fields = [
         'title', 'action', 'type', 'status', 'applicant_display'
     ]
+    ordering_fields = (
+        'title', 'applicant_display', 'status', 'state', 'action_display',
+        'date_created', 'serial_num',
+    )
+    ordering = ('-date_created',)
 
     def create(self, request, *args, **kwargs):
         raise MethodNotAllowed(self.action)
@@ -91,7 +96,6 @@ class TicketFlowViewSet(JMSBulkModelViewSet):
     def perform_create_or_update(self, serializer):
         instance = serializer.save()
         instance.save()
-        instance.rules.model.change_assignees_display(instance.rules.all())
 
     def perform_create(self, serializer):
         self.perform_create_or_update(serializer)

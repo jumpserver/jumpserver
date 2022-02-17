@@ -1,0 +1,15 @@
+{% load i18n %}
+<div>
+    <p>
+        {{ title | safe }}
+    </p>
+    <div>
+        {{ body | safe }}
+    </div>
+    <br>
+    <div>
+        <a href="{{ ticket_detail_url }}" target="_blank">
+            {% trans 'Click here to review' %}
+        </a>
+    </div>
+</div>

@@ -2,20 +2,27 @@
 # coding: utf-8
 
 import os
-import subprocess
 import logging
 import logging.handlers
 import time
 import argparse
 import sys
+import django
+from django.core import management
+from django.db.utils import OperationalError
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, BASE_DIR)
+APP_DIR = os.path.join(BASE_DIR, 'apps')
+
+os.chdir(APP_DIR)
+sys.path.insert(0, APP_DIR)
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "jumpserver.settings")
+django.setup()
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
 
 try:
-    from apps.jumpserver import const
+    from jumpserver import const
     __version__ = const.VERSION
 except ImportError as e:
     print("Not found __version__: {}".format(e))
@@ -25,7 +32,7 @@ except ImportError as e:
     sys.exit(1)
 
 try:
-    from apps.jumpserver.const import CONFIG
+    from jumpserver.const import CONFIG
 except ImportError as e:
     print("Import error: {}".format(e))
     print("Could not find config file, `cp config_example.yml config.yml`")
@@ -48,56 +55,45 @@ except:
 
 
 def check_database_connection():
-    os.chdir(os.path.join(BASE_DIR, 'apps'))
     for i in range(60):
-        logging.info("Check database connection ...")
-        _code = subprocess.call("python manage.py showmigrations users ", shell=True)
-        if _code == 0:
+        logging.info(f"Check database connection: {i}")
+        try:
+            management.call_command('check', '--database', 'default')
             logging.info("Database connect success")
             return
+        except OperationalError:
+            logging.info('Database not setup, retry')
+        except Exception as e:
+            logging.error('Unexpect error occur: {}'.format(str(e)))
         time.sleep(1)
     logging.error("Connection database failed, exit")
     sys.exit(10)
 
 
-def check_migrations():
-    _apps_dir = os.path.join(BASE_DIR, 'apps')
-    _cmd = "python manage.py showmigrations | grep '\[.\]' | grep -v '\[X\]'"
-    _code = subprocess.call(_cmd, shell=True, cwd=_apps_dir)
-
-    if _code == 1:
-        return
-    # for i in range(3):
-    #     print("!!! Warning: Has SQL migrations not perform, 有 SQL 变更没有执行")
-    #     print("You should run `./PROC upgrade_db` first, 请先运行 ./PROC upgrade_db, 进行表结构变更")
-    # sys.exit(1)
-
-
 def expire_caches():
-    _apps_dir = os.path.join(BASE_DIR, 'apps')
-    _code = subprocess.call("python manage.py expire_caches", shell=True, cwd=_apps_dir)
-
-    if _code == 1:
-        return
+    try:
+        management.call_command('expire_caches')
+    except:
+        pass
 
 
 def perform_db_migrate():
     logging.info("Check database structure change ...")
-    os.chdir(os.path.join(BASE_DIR, 'apps'))
     logging.info("Migrate model change to database ...")
-    _code = subprocess.call('python3 manage.py migrate', shell=True)
-    if _code == 0:
-        return
-    logging.error('Perform migrate failed, exit')
-    sys.exit(11)
+    try:
+        management.call_command('migrate')
+    except Exception:
+        logging.error('Perform migrate failed, exit', exc_info=True)
+        sys.exit(11)
 
 
 def collect_static():
     logging.info("Collect static files")
-    os.chdir(os.path.join(BASE_DIR, 'apps'))
-    _cmd = 'python3 manage.py collectstatic --no-input -c &> /dev/null '
-    subprocess.call(_cmd, shell=True)
-    logging.info("Collect static files done")
+    try:
+        management.call_command('collectstatic', '--no-input', '-c', verbosity=0, interactive=False)
+        logging.info("Collect static files done")
+    except:
+        pass
 
 
 def compile_i81n_file():
@@ -105,23 +101,42 @@ def compile_i81n_file():
     if os.path.exists(django_mo_file):
         return
     os.chdir(os.path.join(BASE_DIR, 'apps'))
-    _cmd = 'python3 manage.py compilemessages --no-input -c &> /dev/null '
-    subprocess.call(_cmd, shell=True)
+    management.call_command('compilemessages', verbosity=0, interactive=False)
     logging.info("Compile i18n files done")
 
 
 def upgrade_db():
     collect_static()
     perform_db_migrate()
-    collect_static()
 
 
 def prepare():
-    # installer(check) & k8s(no check)
     check_database_connection()
-    check_migrations()
     upgrade_db()
     expire_caches()
+
+
+def start_services():
+    services = args.services if isinstance(args.services, list) else [args.services]
+    if action == 'start' and {'all', 'web'} & set(services):
+        prepare()
+
+    start_args = []
+    if args.daemon:
+        start_args.append('--daemon')
+    if args.worker:
+        start_args.extend(['--worker', str(args.worker)])
+    if args.force:
+        start_args.append('--force')
+
+    try:
+        management.call_command(action, *services, *start_args)
+    except KeyboardInterrupt:
+        logging.info('Cancel ...')
+        time.sleep(2)
+    except Exception as e:
+        logging.error("Start service error {}: {}".format(services, e))
+        time.sleep(2)
 
 
 if __name__ == '__main__':
@@ -156,23 +171,4 @@ if __name__ == '__main__':
     elif action == "collect_static":
         collect_static()
     else:
-        services = args.services if isinstance(args.services, list) else [args.services]
-        if action == 'start' and {'all', 'web'} & set(services):
-            prepare()
-
-        services_string = ' '.join(services)
-        cmd = f'python manage.py {args.action} {services_string}'
-        if args.daemon:
-            cmd += ' --daemon'
-        if args.worker:
-            cmd += f' --worker {args.worker}'
-        if args.force:
-            cmd += ' --force'
-        apps_dir = os.path.join(BASE_DIR, 'apps')
-
-        try:
-            # processes: main(3s) -> call(0.25s) -> service -> sub-process
-            code = subprocess.call(cmd, shell=True, cwd=apps_dir)
-        except KeyboardInterrupt:
-            time.sleep(2)
-            pass
+        start_services()

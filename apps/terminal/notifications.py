@@ -1,7 +1,8 @@
 from typing import Callable
 
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from django.template.loader import render_to_string
 
 from users.models import User
 from common.utils import get_logger, reverse
@@ -9,8 +10,9 @@ from notifications.notifications import SystemMessage
 from terminal.models import Session, Command
 from notifications.models import SystemMsgSubscription
 from notifications.backends import BACKEND
-from orgs.utils import tmp_to_root_org
 from common.utils import lazyproperty
+from common.utils.timezone import local_now_display
+
 
 logger = get_logger(__name__)
 
@@ -68,68 +70,31 @@ class CommandAlertMessage(CommandAlertMixin, SystemMessage):
     def __init__(self, command):
         self.command = command
 
-    def get_text_msg(self) -> dict:
-        command = self.command
-
-        with tmp_to_root_org():
-            session = Session.objects.get(id=command['session'])
-
-        session_detail_url = reverse(
-            'api-terminal:session-detail', kwargs={'pk': command['session']},
-            external=True, api_to_ui=True
-        )
-
-        message = _("""
-Command: %(command)s
-Asset: %(hostname)s (%(host_ip)s)
-User: %(user)s
-Level: %(risk_level)s
-Session: %(session_detail_url)s?oid=%(oid)s
-        """) % {
-            'command': command['input'],
-            'hostname': command['asset'],
-            'host_ip': session.asset_obj.ip,
-            'user': command['user'],
-            'risk_level': Command.get_risk_level_str(command['risk_level']),
-            'session_detail_url': session_detail_url,
-            'oid': session.org_id
-        }
-        return {
-            'subject': self.subject,
-            'message': message
-        }
+    @classmethod
+    def gen_test_msg(cls):
+        command = Command.objects.first().to_dict()
+        command['session'] = Session.objects.first().id
+        return cls(command)
 
     def get_html_msg(self) -> dict:
         command = self.command
-
-        with tmp_to_root_org():
-            session = Session.objects.get(id=command['session'])
-
         session_detail_url = reverse(
             'api-terminal:session-detail', kwargs={'pk': command['session']},
             external=True, api_to_ui=True
-        )
-
-        message = _("""
-            Command: %(command)s
-            <br>
-            Asset: %(hostname)s (%(host_ip)s)
-            <br>
-            User: %(user)s
-            <br>
-            Level: %(risk_level)s
-            <br>
-            Session: <a href="%(session_detail_url)s?oid=%(oid)s">session detail</a>
-            <br>
-        """) % {
-            'command': command['input'],
-            'hostname': command['asset'],
-            'host_ip': session.asset_obj.ip,
-            'user': command['user'],
-            'risk_level': Command.get_risk_level_str(command['risk_level']),
-            'session_detail_url': session_detail_url,
-            'oid': session.org_id
+        ) + '?oid={}'.format(self.command['org_id'])
+        level = Command.get_risk_level_str(command['risk_level'])
+        items = {
+            _("Asset"): command['asset'],
+            _("User"): command['user'],
+            _("Level"): level,
+            _("Date"): local_now_display(),
         }
+        context = {
+            'items': items,
+            'session_url': session_detail_url,
+            "command": command['input'],
+        }
+        message = render_to_string('terminal/_msg_command_alert.html', context)
         return {
             'subject': self.subject,
             'message': message
@@ -144,53 +109,41 @@ class CommandExecutionAlert(CommandAlertMixin, SystemMessage):
     def __init__(self, command):
         self.command = command
 
+    @classmethod
+    def gen_test_msg(cls):
+        from assets.models import Asset
+        from users.models import User
+        cmd = {
+            'input': 'ifconfig eth0',
+            'assets': Asset.objects.all()[:10],
+            'user': str(User.objects.first()),
+            'risk_level': 5,
+        }
+        return cls(cmd)
+
     def get_html_msg(self) -> dict:
         command = self.command
-        _input = command['input']
-        _input = _input.replace('\n', '<br>')
+        assets_with_url = []
+        for asset in command['assets']:
+            url = reverse(
+                'assets:asset-detail', kwargs={'pk': asset.id},
+                api_to_ui=True, external=True
+            ) + '?oid={}'.format(asset.org_id)
+            assets_with_url.append([asset, url])
 
-        assets = ', '.join([str(asset) for asset in command['assets']])
-        message = _("""
-                            Assets: %(assets)s
-                            <br>
-                            User: %(user)s
-                            <br>
-                            Level: %(risk_level)s
-                            <br>
-
-                            ----------------- Commands ---------------- <br>
-                            %(command)s <br>
-                            ----------------- Commands ---------------- <br>
-                            """) % {
-            'command': _input,
-            'assets': assets,
-            'user': command['user'],
-            'risk_level': Command.get_risk_level_str(command['risk_level'])
-        }
-        return {
-            'subject': self.subject,
-            'message': message
+        level = Command.get_risk_level_str(command['risk_level'])
+        items = {
+            _("User"): command['user'],
+            _("Level"): level,
+            _("Date"): local_now_display(),
         }
 
-    def get_text_msg(self) -> dict:
-        command = self.command
-        _input = command['input']
-
-        assets = ', '.join([str(asset) for asset in command['assets']])
-        message = _("""
-Assets: %(assets)s
-User: %(user)s
-Level: %(risk_level)s
-
-Commands 👇 ------------
-%(command)s
-------------------------
-                            """) % {
-            'command': _input,
-            'assets': assets,
-            'user': command['user'],
-            'risk_level': Command.get_risk_level_str(command['risk_level'])
+        context = {
+            'items': items,
+            'assets_with_url': assets_with_url,
+            'command': command['input'],
         }
+        message = render_to_string('terminal/_msg_command_execute_alert.html', context)
         return {
             'subject': self.subject,
             'message': message

@@ -1,12 +1,11 @@
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
-from django.templatetags.static import static
 
-from jumpserver.utils import has_valid_xpack_license
+from jumpserver.utils import has_valid_xpack_license, get_xpack_license_info
 from common.utils import get_logger
 from .. import serializers
+from ..utils import get_interface_setting
 
 logger = get_logger(__name__)
 
@@ -19,30 +18,14 @@ class PublicSettingApi(generics.RetrieveAPIView):
 
     @staticmethod
     def get_logo_urls():
-        logo_urls = {
-            'logo_logout': static('img/logo.png'),
-            'logo_index': static('img/logo_text.png'),
-            'login_image': static('img/login_image.jpg'),
-            'favicon': static('img/facio.ico')
-        }
-        if not settings.XPACK_ENABLED:
-            return logo_urls
-        from xpack.plugins.interface.models import Interface
-        obj = Interface.interface()
-        if not obj:
-            return logo_urls
-        for attr in ['logo_logout', 'logo_index', 'login_image', 'favicon']:
-            if getattr(obj, attr, '') and getattr(obj, attr).url:
-                logo_urls.update({attr: getattr(obj, attr).url})
-        return logo_urls
+        interface = get_interface_setting()
+        keys = ['logo_logout', 'logo_index', 'login_image', 'favicon']
+        return {k: interface[k] for k in keys}
 
     @staticmethod
     def get_login_title():
-        default_title = _('Welcome to the JumpServer open source Bastion Host')
-        if not settings.XPACK_ENABLED:
-            return default_title
-        from xpack.plugins.interface.models import Interface
-        return Interface.get_login_title()
+        interface = get_interface_setting()
+        return interface['login_title']
 
     def get_object(self):
         instance = {
@@ -50,7 +33,6 @@ class PublicSettingApi(generics.RetrieveAPIView):
                 "WINDOWS_SKIP_ALL_MANUAL_PASSWORD": settings.WINDOWS_SKIP_ALL_MANUAL_PASSWORD,
                 "SECURITY_MAX_IDLE_TIME": settings.SECURITY_MAX_IDLE_TIME,
                 "XPACK_ENABLED": settings.XPACK_ENABLED,
-                "LOGIN_CONFIRM_ENABLE": settings.LOGIN_CONFIRM_ENABLE,
                 "SECURITY_VIEW_AUTH_NEED_MFA": settings.SECURITY_VIEW_AUTH_NEED_MFA,
                 "SECURITY_MFA_VERIFY_TTL": settings.SECURITY_MFA_VERIFY_TTL,
                 "OLD_PASSWORD_HISTORY_LIMIT_COUNT": settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT,
@@ -58,6 +40,7 @@ class PublicSettingApi(generics.RetrieveAPIView):
                 "SECURITY_PASSWORD_EXPIRATION_TIME": settings.SECURITY_PASSWORD_EXPIRATION_TIME,
                 "SECURITY_LUNA_REMEMBER_AUTH": settings.SECURITY_LUNA_REMEMBER_AUTH,
                 "XPACK_LICENSE_IS_VALID": has_valid_xpack_license(),
+                "XPACK_LICENSE_INFO": get_xpack_license_info(),
                 "LOGIN_TITLE": self.get_login_title(),
                 "LOGO_URLS": self.get_logo_urls(),
                 "TICKETS_ENABLED": settings.TICKETS_ENABLED,
@@ -75,6 +58,10 @@ class PublicSettingApi(generics.RetrieveAPIView):
                 'SECURITY_WATERMARK_ENABLED': settings.SECURITY_WATERMARK_ENABLED,
                 'SECURITY_SESSION_SHARE': settings.SECURITY_SESSION_SHARE,
                 "XRDP_ENABLED": settings.XRDP_ENABLED,
+                "ANNOUNCEMENT_ENABLED": settings.ANNOUNCEMENT_ENABLED,
+                "ANNOUNCEMENT": settings.ANNOUNCEMENT,
+                "HELP_DOCUMENT_URL": settings.HELP_DOCUMENT_URL,
+                "HELP_SUPPORT_URL": settings.HELP_SUPPORT_URL,
             }
         }
         return instance

@@ -1,0 +1,17 @@
+{% load i18n %}
+<p>
+    {% trans 'Hello' %} {{ name }},
+</p>
+<p>
+    {% trans 'Your account has remote login behavior, please pay attention' %}
+</p>
+<p>
+    <b>{% trans 'Username' %}:</b> {{ username }}<br>
+    <b>{% trans 'Login time' %}:</b> {{ time }}<br>
+    <b>{% trans 'Login city' %}:</b> {{ city }}({{ ip }})
+</p>
+
+-
+<p>
+    {% trans 'If you suspect that the login behavior is abnormal, please modify the account password in time.' %}
+</p>

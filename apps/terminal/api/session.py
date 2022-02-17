@@ -12,11 +12,10 @@ from rest_framework import viewsets, views
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
-from common.utils import model_to_json
+from common.utils import data_to_json
 from common.const.http import GET
 from common.utils import get_logger, get_object_or_none
 from common.mixins.api import AsyncApiMixin
-from common.permissions import IsValidUser
 from common.drf.filters import DatetimeRangeFilter
 from common.drf.renders import PassthroughRenderer
 from orgs.mixins.api import OrgBulkModelViewSet
@@ -26,11 +25,12 @@ from .. import utils
 from ..utils import find_session_replay_local, download_session_replay
 from ..models import Session
 from .. import serializers
-
+from terminal.utils import is_session_approver
 
 __all__ = [
     'SessionViewSet', 'SessionReplayViewSet', 'SessionJoinValidateAPI'
 ]
+
 logger = get_logger(__name__)
 
 
@@ -64,7 +64,9 @@ class SessionViewSet(OrgBulkModelViewSet):
         os.chdir(dir_path)
 
         with open(meta_filename, 'wt') as f:
-            f.write(model_to_json(session))
+            serializer = serializers.SessionDisplaySerializer(session)
+            data = data_to_json(serializer.data)
+            f.write(data)
 
         with tarfile.open(offline_filename, 'w') as f:
             f.add(replay_filename)
@@ -73,7 +75,8 @@ class SessionViewSet(OrgBulkModelViewSet):
         os.chdir(current_dir)
         return file
 
-    @action(methods=[GET], detail=True, renderer_classes=(PassthroughRenderer,), url_path='replay/download', url_name='replay-download')
+    @action(methods=[GET], detail=True, renderer_classes=(PassthroughRenderer,), url_path='replay/download',
+            url_name='replay-download')
     def download(self, request, *args, **kwargs):
         session = self.get_object()
         local_path, url = utils.get_session_replay_url(session)
@@ -119,7 +122,9 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
 
         if serializer.is_valid():
             file = serializer.validated_data['file']
-            name, err = session.save_replay_to_storage(file)
+            # 兼容旧版本 API 未指定 version 为 2 的情况
+            version = serializer.validated_data.get('version', 2)
+            name, err = session.save_replay_to_storage_with_version(file, version)
             if not name:
                 msg = "Failed save replay `{}`: {}".format(session_id, err)
                 logger.error(msg)
@@ -137,6 +142,8 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
         if session.protocol in ('rdp', 'vnc'):
             # 需要考虑录像播放和离线播放器的约定，暂时不处理
             tp = 'guacamole'
+        if url.endswith('.cast.gz'):
+            tp = 'asciicast'
 
         download_url = reverse('api-terminal:session-replay-download', kwargs={'pk': session.id})
         data = {
@@ -199,6 +206,9 @@ class SessionJoinValidateAPI(views.APIView):
             return Response({'ok': False, 'msg': msg}, status=401)
 
         with tmp_to_org(session.org):
+            if is_session_approver(session_id, user_id):
+                return Response({'ok': True, 'msg': ''}, status=200)
+
             if not user.has_perm('terminal.monitor_session'):
                 msg = _('User does not have permission')
                 return Response({'ok': False, 'msg': msg}, status=401)

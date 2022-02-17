@@ -1,8 +1,8 @@
 import csv
 import codecs
 from django.http import HttpResponse
-from django.utils.translation import ugettext as _
 
+from .const import DEFAULT_CITY
 from common.utils import validate_ip, get_ip_city
 
 
@@ -27,12 +27,12 @@ def write_content_to_excel(response, header=None, login_logs=None, fields=None):
 
 def write_login_log(*args, **kwargs):
     from audits.models import UserLoginLog
-    default_city = _("Unknown")
+
     ip = kwargs.get('ip') or ''
     if not (ip and validate_ip(ip)):
         ip = ip[:15]
-        city = default_city
+        city = DEFAULT_CITY
     else:
-        city = get_ip_city(ip) or default_city
+        city = get_ip_city(ip) or DEFAULT_CITY
     kwargs.update({'ip': ip, 'city': city})
     UserLoginLog.objects.create(**kwargs)

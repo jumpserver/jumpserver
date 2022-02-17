@@ -1,32 +1,33 @@
 # ~*~ coding: utf-8 ~*~
 from collections import defaultdict
+
 from django.utils.translation import ugettext as _
 from rest_framework.decorators import action
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
 
-from users.notifications import ResetMFAMsg
 from common.mixins import CommonApiMixin
 from common.utils import get_logger
 from orgs.utils import current_org
+from rbac.models import Role, RoleBinding
 from users.utils import LoginBlockUtil, MFABlockUtils
 from .mixins import UserQuerysetMixin
+from ..notifications import ResetMFAMsg
 from .. import serializers
 from ..serializers import (
-    UserSerializer, UserRetrieveSerializer,
+    UserSerializer,
     MiniUserSerializer, InviteSerializer
 )
 from ..models import User
 from ..signals import post_user_create
 from ..filters import UserFilter
-from rbac.models import Role, RoleBinding
 
 
 logger = get_logger(__name__)
 __all__ = [
     'UserViewSet', 'UserChangePasswordApi',
-    'UserUnblockPKApi', 'UserResetOTPApi',
+    'UserUnblockPKApi', 'UserResetMFAApi',
 ]
 
 
@@ -35,10 +36,11 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
     search_fields = ('username', 'email', 'name', 'id', 'source', 'role')
     serializer_classes = {
         'default': UserSerializer,
-        'retrieve': UserRetrieveSerializer,
         'suggestion': MiniUserSerializer,
         'invite': InviteSerializer,
     }
+    ordering_fields = ('name',)
+    ordering = ('name', )
     rbac_perms = {
         'suggestion': 'users.match_user',
         'invite': 'users.invite_user',
@@ -106,13 +108,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
     @action(methods=['get'], detail=False)
     def suggestion(self, *args, **kwargs):
         queryset = User.get_nature_users()
-        queryset = self.filter_queryset(queryset)[:3]
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
+        queryset = self.filter_queryset(queryset)[:6]
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -174,17 +170,19 @@ class UserUnblockPKApi(UserQuerysetMixin, generics.UpdateAPIView):
         MFABlockUtils.unblock_user(username)
 
 
-class UserResetOTPApi(UserQuerysetMixin, generics.RetrieveAPIView):
+class UserResetMFAApi(UserQuerysetMixin, generics.RetrieveAPIView):
     serializer_class = serializers.ResetOTPSerializer
 
     def retrieve(self, request, *args, **kwargs):
         user = self.get_object() if kwargs.get('pk') else request.user
         if user == request.user:
             msg = _("Could not reset self otp, use profile reset instead")
-            return Response({"error": msg}, status=401)
-        if user.mfa_enabled:
-            user.reset_mfa()
-            user.save()
+            return Response({"error": msg}, status=400)
 
-            ResetMFAMsg(user).publish_async()
+        backends = user.active_mfa_backends_mapper
+        for backend in backends.values():
+            if backend.can_disable():
+                backend.disable()
+
+        ResetMFAMsg(user).publish_async()
         return Response({"msg": "success"})

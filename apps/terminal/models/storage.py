@@ -167,7 +167,7 @@ class ReplayStorage(CommonStorageModelMixin, CommonModelMixin):
         return storage.is_valid(src, target)
 
     def is_use(self):
-        return Terminal.objects.filter(replay_storage=self.name).exists()
+        return Terminal.objects.filter(replay_storage=self.name, is_deleted=False).exists()
 
     class Meta:
         verbose_name = _("Replay storage")

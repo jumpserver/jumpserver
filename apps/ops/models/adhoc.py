@@ -9,9 +9,10 @@ from celery import current_task
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, gettext
 
 from common.utils import get_logger, lazyproperty
+from common.utils.translate import translate_value
 from common.fields.model import (
     JsonListTextField, JsonDictCharField, EncryptJsonDictCharField,
     JsonDictTextField,
@@ -58,6 +59,11 @@ class Task(PeriodTaskModelMixin, OrgModelMixin):
             return self.latest_execution.is_success
         else:
             return False
+
+    @lazyproperty
+    def display_name(self):
+        value = translate_value(self.name)
+        return value
 
     @property
     def timedelta(self):

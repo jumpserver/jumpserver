@@ -1,0 +1,24 @@
+{% load i18n %}
+
+<div>
+{% for item, value in items.items %}
+    <span class="cmd-item">
+        <b>{{ item }}:</b> {{ value }}
+    </span>
+    <br />
+{% endfor %}
+    <b>{% trans 'Command' %}: </b><br />
+    <pre>
+{{ command }}
+    </pre>
+</div>
+<div>
+    <b>{% trans 'Assets' %}:</b><br>
+    <ul>
+        {% for asset, url in assets_with_url %}
+            <li>
+                <a href="{{ url }}" target="_blank">{{ asset }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>

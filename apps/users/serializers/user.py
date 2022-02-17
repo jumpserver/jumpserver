@@ -14,7 +14,7 @@ from ..const import PasswordStrategy
 from rbac.models import Role
 
 __all__ = [
-    'UserSerializer', 'UserRetrieveSerializer', 'MiniUserSerializer',
+    'UserSerializer', 'MiniUserSerializer',
     'InviteSerializer', 'ServiceAccountSerializer',
 ]
 
@@ -125,6 +125,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
 
         read_only_fields = [
             'date_joined', 'last_login', 'created_by', 'is_first_login',
+            'wecom_id', 'dingtalk_id', 'feishu_id'
         ]
         extra_kwargs = {
             'password': {'write_only': True, 'required': False, 'allow_null': True, 'allow_blank': True},

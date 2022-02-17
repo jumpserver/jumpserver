@@ -9,35 +9,12 @@ from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from perms.models import AssetPermission, Action
 from assets.models import Asset, Node, SystemUser
 from users.models import User, UserGroup
+from ..base import ActionsField, BasePermissionSerializer
 
-__all__ = [
-    'AssetPermissionSerializer',
-    'ActionsField',
-]
+__all__ = ['AssetPermissionSerializer']
 
 
-class ActionsField(serializers.MultipleChoiceField):
-    def __init__(self, *args, **kwargs):
-        kwargs['choices'] = Action.CHOICES
-        super().__init__(*args, **kwargs)
-
-    def to_representation(self, value):
-        return Action.value_to_choices(value)
-
-    def to_internal_value(self, data):
-        if data is None:
-            return data
-        return Action.choices_to_value(data)
-
-
-class ActionsDisplayField(ActionsField):
-    def to_representation(self, value):
-        values = super().to_representation(value)
-        choices = dict(Action.CHOICES)
-        return [choices.get(i) for i in values]
-
-
-class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
+class AssetPermissionSerializer(BasePermissionSerializer):
     actions = ActionsField(required=False, allow_null=True, label=_("Actions"))
     is_valid = serializers.BooleanField(read_only=True, label=_("Is valid"))
     is_expired = serializers.BooleanField(read_only=True, label=_('Is expired'))

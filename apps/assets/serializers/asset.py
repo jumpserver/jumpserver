@@ -10,7 +10,7 @@ from ..models import Asset, Node, Platform, SystemUser
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',
     'ProtocolsField', 'PlatformSerializer',
-    'AssetTaskSerializer', 'AssetsTaskSerializer', 'ProtocolsField'
+    'AssetTaskSerializer', 'AssetsTaskSerializer', 'ProtocolsField',
 ]
 
 
@@ -64,7 +64,12 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     )
     protocols = ProtocolsField(label=_('Protocols'), required=False, default=['ssh/22'])
     domain_display = serializers.ReadOnlyField(source='domain.name', label=_('Domain name'))
-    nodes_display = serializers.ListField(child=serializers.CharField(), label=_('Nodes name'), required=False)
+    nodes_display = serializers.ListField(
+        child=serializers.CharField(), label=_('Nodes name'), required=False
+    )
+    labels_display = serializers.ListField(
+        child=serializers.CharField(), label=_('Labels name'), required=False, read_only=True
+    )
 
     """
     资产的数据结构
@@ -74,34 +79,33 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
         model = Asset
         fields_mini = ['id', 'hostname', 'ip', 'platform', 'protocols']
         fields_small = fields_mini + [
-            'protocol', 'port', 'protocols', 'is_active', 'public_ip',
-            'comment',
+            'protocol', 'port', 'protocols', 'is_active',
+            'public_ip', 'number', 'comment',
         ]
-        hardware_fields = [
-            'number', 'vendor', 'model', 'sn', 'cpu_model', 'cpu_count',
+        fields_hardware = [
+            'vendor', 'model', 'sn', 'cpu_model', 'cpu_count',
             'cpu_cores', 'cpu_vcpus', 'memory', 'disk_total', 'disk_info',
-            'os', 'os_version', 'os_arch', 'hostname_raw', 'hardware_info',
-            'connectivity', 'date_verified'
+            'os', 'os_version', 'os_arch', 'hostname_raw',
+            'cpu_info', 'hardware_info',
         ]
         fields_fk = [
             'domain', 'domain_display', 'platform', 'admin_user', 'admin_user_display'
         ]
         fields_m2m = [
-            'nodes', 'nodes_display', 'labels',
+            'nodes', 'nodes_display', 'labels', 'labels_display',
         ]
         read_only_fields = [
+            'connectivity', 'date_verified', 'cpu_info', 'hardware_info',
             'created_by', 'date_created',
         ]
-        fields = fields_small + hardware_fields + fields_fk + fields_m2m + read_only_fields
-
-        extra_kwargs = {k: {'read_only': True} for k in hardware_fields}
-        extra_kwargs.update({
+        fields = fields_small + fields_hardware + fields_fk + fields_m2m + read_only_fields
+        extra_kwargs = {
             'protocol': {'write_only': True},
             'port': {'write_only': True},
             'hardware_info': {'label': _('Hardware info'), 'read_only': True},
-            'org_name': {'label': _('Org name'), 'read_only': True},
             'admin_user_display': {'label': _('Admin user display'), 'read_only': True},
-        })
+            'cpu_info': {'label': _('CPU info')},
+        }
 
     def get_fields(self):
         fields = super().get_fields()

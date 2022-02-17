@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.permissions import AllowAny
 
-from common.utils.timezone import utcnow
+from common.utils.timezone import utc_now
 from common.const.http import POST, GET
 from common.drf.api import JMSGenericViewSet
 from common.drf.serializers import EmptySerializer
@@ -78,7 +78,7 @@ class SSOViewSet(AuthMixin, JMSGenericViewSet):
             return HttpResponseRedirect(next_url)
 
         # 判断是否过期
-        if (utcnow().timestamp() - token.date_created.timestamp()) > settings.AUTH_SSO_AUTHKEY_TTL:
+        if (utc_now().timestamp() - token.date_created.timestamp()) > settings.AUTH_SSO_AUTHKEY_TTL:
             self.send_auth_signal(success=False, reason='authkey_timeout')
             return HttpResponseRedirect(next_url)
 

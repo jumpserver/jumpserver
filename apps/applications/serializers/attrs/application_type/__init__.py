@@ -1,8 +1,10 @@
 
 from .mysql import *
+from .redis import *
 from .mariadb import *
 from .oracle import *
 from .pgsql import *
+from .sqlserver import *
 
 from .chrome import *
 from .mysql_workbench import *

@@ -79,7 +79,6 @@ class Setting(models.Model):
         item.refresh_setting()
 
     def refresh_setting(self):
-        logger.debug(f"Refresh setting: {self.name}")
         if hasattr(self.__class__, f'refresh_{self.name}'):
             getattr(self.__class__, f'refresh_{self.name}')()
         else:
@@ -97,6 +96,7 @@ class Setting(models.Model):
             'AUTH_OPENID': [settings.AUTH_BACKEND_OIDC_CODE, settings.AUTH_BACKEND_OIDC_PASSWORD],
             'AUTH_RADIUS': [settings.AUTH_BACKEND_RADIUS],
             'AUTH_CAS': [settings.AUTH_BACKEND_CAS],
+            'AUTH_SAML2': [settings.AUTH_BACKEND_SAML2],
         }
         setting_backends = backends_map[name]
         auth_backends = settings.AUTHENTICATION_BACKENDS
@@ -129,6 +129,10 @@ class Setting(models.Model):
     @classmethod
     def refresh_AUTH_OPENID(cls):
         cls.refresh_authentications('AUTH_OPENID')
+
+    @classmethod
+    def refresh_AUTH_SAML2(cls):
+        cls.refresh_authentications('AUTH_SAML2')
 
     def refresh_keycloak_to_openid_if_need(self):
         watch_config_names = [

@@ -13,7 +13,7 @@ from .serializers import (
 )
 from users.models import User, UserGroup
 from assets.models import (
-    Asset, Domain, AdminUser, SystemUser, Label, Node, Gateway,
+    Asset, Domain, SystemUser, Label, Node, Gateway,
     CommandFilter, CommandFilterRule, GatheredUser
 )
 from applications.models import Application
@@ -27,7 +27,7 @@ logger = get_logger(__file__)
 
 # 部分 org 相关的 model，需要清空这些数据之后才能删除该组织
 org_related_models = [
-    User, UserGroup, Asset, Label, Domain, Gateway, Node, AdminUser, SystemUser, Label,
+    User, UserGroup, Asset, Label, Domain, Gateway, Node, SystemUser, Label,
     CommandFilter, CommandFilterRule, GatheredUser,
     AssetPermission, ApplicationPermission,
     Application,
@@ -39,6 +39,8 @@ class OrgViewSet(BulkModelViewSet):
     search_fields = ('name', 'comment')
     queryset = Organization.objects.all()
     serializer_class = OrgSerializer
+    ordering_fields = ('name',)
+    ordering = ('name', )
 
     def get_serializer_class(self):
         mapper = {
@@ -63,7 +65,7 @@ class OrgViewSet(BulkModelViewSet):
 
     def perform_destroy(self, instance):
         if str(current_org) == str(instance):
-            msg = _('The current organization ({}) cannot be deleted'.format(current_org))
+            msg = _('The current organization ({}) cannot be deleted').format(current_org)
             raise PermissionDenied(detail=msg)
 
         for model in org_related_models:

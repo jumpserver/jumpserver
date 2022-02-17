@@ -13,6 +13,7 @@ class TreeNode:
     pId = ""
     open = False
     iconSkin = ""
+    parentInfo = ''
     meta = {}
     checked = False
 
@@ -96,6 +97,7 @@ class TreeNodeSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=128)
     title = serializers.CharField(max_length=128)
     pId = serializers.CharField(max_length=128)
+    parentInfo = serializers.CharField(max_length=4096, allow_blank=True)
     isParent = serializers.BooleanField(default=False)
     open = serializers.BooleanField(default=False)
     iconSkin = serializers.CharField(max_length=128, allow_blank=True)

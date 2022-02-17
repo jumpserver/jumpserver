@@ -1,7 +1,7 @@
 from django.db.models import F
 from django.db import transaction
 
-from common.utils.timezone import now
+from common.utils.timezone import local_now
 from common.utils import get_logger
 from users.models import User
 from .models import SiteMessage as SiteMessageModel, SiteMessageUsers
@@ -88,7 +88,7 @@ class SiteMessageUtil:
 
         for site_msg_user in site_msg_users:
             site_msg_user.has_read = True
-            site_msg_user.read_at = now()
+            site_msg_user.read_at = local_now()
 
         SiteMessageUsers.objects.bulk_update(
             site_msg_users, fields=('has_read', 'read_at'))

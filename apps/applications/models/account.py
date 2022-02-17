@@ -1,5 +1,6 @@
 from django.db import models
 from simple_history.models import HistoricalRecords
+from django.db.models import F
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import lazyproperty
@@ -7,8 +8,12 @@ from assets.models.base import BaseUser
 
 
 class Account(BaseUser):
-    app = models.ForeignKey('applications.Application', on_delete=models.CASCADE, null=True, verbose_name=_('Database'))
-    systemuser = models.ForeignKey('assets.SystemUser', on_delete=models.CASCADE, null=True, verbose_name=_("System user"))
+    app = models.ForeignKey(
+        'applications.Application', on_delete=models.CASCADE, null=True, verbose_name=_('Application')
+    )
+    systemuser = models.ForeignKey(
+        'assets.SystemUser', on_delete=models.CASCADE, null=True, verbose_name=_("System user")
+    )
     version = models.IntegerField(default=1, verbose_name=_('Version'))
     history = HistoricalRecords()
 
@@ -65,6 +70,10 @@ class Account(BaseUser):
         return self.app.type
 
     @lazyproperty
+    def attrs(self):
+        return self.app.attrs
+
+    @lazyproperty
     def app_display(self):
         return self.systemuser.name
 
@@ -87,6 +96,15 @@ class Account(BaseUser):
         else:
             app = '*'
         return '{}@{}'.format(username, app)
+
+    @classmethod
+    def get_queryset(cls):
+        queryset = cls.objects.all() \
+            .annotate(type=F('app__type')) \
+            .annotate(app_display=F('app__name')) \
+            .annotate(systemuser_display=F('systemuser__name')) \
+            .annotate(category=F('app__category'))
+        return queryset
 
     def __str__(self):
         return self.smart_name

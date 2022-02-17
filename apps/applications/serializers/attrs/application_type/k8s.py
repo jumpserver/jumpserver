@@ -1,6 +1,5 @@
 from ..application_category import CloudSerializer
 
-
 __all__ = ['K8SSerializer']
 
 

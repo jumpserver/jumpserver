@@ -1,0 +1,20 @@
+{% load i18n %}
+<div>
+    <p class="ticket-info">
+        {{ ticket_info }}
+    </p>
+    <div>
+        <p>
+        </p>
+        <p>
+
+        </p>
+
+        {{ body | safe }}
+    </div>
+    <div>
+        <a href={{ ticket_detail_url }}>
+            {% trans 'Click here to review' %}
+        </a>
+    </div>
+</div>

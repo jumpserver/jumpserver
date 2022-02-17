@@ -3,6 +3,7 @@
 import re
 from rest_framework import serializers
 
+from django.utils.translation import ugettext_lazy as _
 from ..models import CommandFilter, CommandFilterRule
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from orgs.utils import tmp_to_root_org
@@ -22,16 +23,14 @@ class CommandFilterSerializer(BulkOrgResourceModelSerializer):
             'comment', 'created_by',
         ]
         fields_fk = ['rules']
-        fields_m2m = ['system_users']
+        fields_m2m = ['users', 'user_groups', 'system_users', 'assets', 'applications']
         fields = fields_small + fields_fk + fields_m2m
         extra_kwargs = {
-            'rules': {'read_only': True},
-            'system_users': {'required': False},
+            'rules': {'read_only': True}
         }
 
 
 class CommandFilterRuleSerializer(BulkOrgResourceModelSerializer):
-    invalid_pattern = re.compile(r'[\.\*\+\[\\\?\{\}\^\$\|\(\)\#\<\>]')
     type_display = serializers.ReadOnlyField(source='get_type_display')
     action_display = serializers.ReadOnlyField(source='get_action_display')
 
@@ -39,13 +38,13 @@ class CommandFilterRuleSerializer(BulkOrgResourceModelSerializer):
         model = CommandFilterRule
         fields_mini = ['id']
         fields_small = fields_mini + [
-           'type', 'type_display', 'content', 'priority',
+           'type', 'type_display', 'content', 'ignore_case', 'pattern', 'priority',
            'action', 'action_display', 'reviewers',
            'date_created', 'date_updated',
            'comment', 'created_by',
         ]
         fields_fk = ['filter']
-        fields = '__all__'
+        fields = fields_small + fields_fk
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -61,15 +60,17 @@ class CommandFilterRuleSerializer(BulkOrgResourceModelSerializer):
             choices.pop(CommandFilterRule.ActionChoices.confirm, None)
         action._choices = choices
 
-    # def validate_content(self, content):
-    #     tp = self.initial_data.get("type")
-    #     if tp == CommandFilterRule.TYPE_REGEX:
-    #         return content
-    #     if self.invalid_pattern.search(content):
-    #         invalid_char = self.invalid_pattern.pattern.replace('\\', '')
-    #         msg = _("Content should not be contain: {}").format(invalid_char)
-    #         raise serializers.ValidationError(msg)
-    #     return content
+    def validate_content(self, content):
+        tp = self.initial_data.get("type")
+        if tp == CommandFilterRule.TYPE_COMMAND:
+            regex = CommandFilterRule.construct_command_regex(content)
+        else:
+            regex = content
+        ignore_case = self.initial_data.get('ignore_case')
+        succeed, error, pattern = CommandFilterRule.compile_regex(regex, ignore_case)
+        if not succeed:
+            raise serializers.ValidationError(error)
+        return content
 
 
 class CommandConfirmSerializer(serializers.Serializer):

@@ -56,7 +56,17 @@ class Status(models.Model):
         stat = cls(**data)
         stat.terminal = terminal
         stat.is_alive = terminal.is_alive
+        stat.keep_one_decimal_place()
         return stat
+
+    def keep_one_decimal_place(self):
+        keys = ['cpu_load', 'memory_used', 'disk_used']
+        for key in keys:
+            value = getattr(self, key, 0)
+            if not isinstance(value, (int, float)):
+                continue
+            value = '%.1f' % value
+            setattr(self, key, float(value))
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):

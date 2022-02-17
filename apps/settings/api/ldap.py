@@ -6,6 +6,7 @@ from rest_framework import generics
 from rest_framework.views import Response, APIView
 from orgs.models import Organization
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
 from ..utils import (
     LDAPServerUtil, LDAPCacheUtil, LDAPImportUtil, LDAPSyncUtil,
@@ -48,6 +49,10 @@ class LDAPTestingConfigAPI(APIView):
         search_filter = serializer.validated_data["AUTH_LDAP_SEARCH_FILTER"]
         attr_map = serializer.validated_data["AUTH_LDAP_USER_ATTR_MAP"]
         auth_ldap = serializer.validated_data.get('AUTH_LDAP', False)
+
+        if not password:
+            password = settings.AUTH_LDAP_BIND_PASSWORD
+
         config = {
             'server_uri': server_uri,
             'bind_dn': bind_dn,

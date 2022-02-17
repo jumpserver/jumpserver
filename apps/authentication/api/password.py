@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from authentication.serializers import PasswordVerifySerializer
 from common.permissions import IsValidUser
 from authentication.mixins import authenticate
-from authentication.errors import PasswdInvalid
+from authentication.errors import PasswordInvalid
 from authentication.mixins import AuthMixin
 
 
@@ -20,7 +20,7 @@ class UserPasswordVerifyApi(AuthMixin, CreateAPIView):
 
         user = authenticate(request=request, username=user.username, password=password)
         if not user:
-            raise PasswdInvalid
+            raise PasswordInvalid
 
-        self.set_passwd_verify_on_session(user)
+        self.mark_password_ok(user)
         return Response()

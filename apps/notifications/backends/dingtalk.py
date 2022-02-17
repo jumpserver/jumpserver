@@ -1,5 +1,5 @@
 from django.conf import settings
-from common.message.backends.dingtalk import DingTalk as Client
+from common.sdk.im.dingtalk import DingTalk as Client
 from .base import BackendBase
 
 
@@ -16,7 +16,7 @@ class DingTalk(BackendBase):
 
     def send_msg(self, users, message, subject=None):
         accounts, __, __ = self.get_accounts(users)
-        return self.dingtalk.send_text(accounts, message)
+        return self.dingtalk.send_markdown(accounts, subject, message)
 
 
 backend = DingTalk

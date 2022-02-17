@@ -9,13 +9,12 @@ from assets.models import Asset, SystemUser, Gateway
 from applications.models import Application
 from users.serializers import UserProfileSerializer
 from assets.serializers import ProtocolsField
-from perms.serializers.asset.permission import ActionsField
-from .models import AccessKey, LoginConfirmSetting
-
+from perms.serializers.base import ActionsField
+from .models import AccessKey
 
 __all__ = [
     'AccessKeySerializer', 'OtpVerifySerializer', 'BearerTokenSerializer',
-    'MFAChallengeSerializer', 'LoginConfirmSettingSerializer', 'SSOTokenSerializer',
+    'MFAChallengeSerializer', 'SSOTokenSerializer',
     'ConnectionTokenSerializer', 'ConnectionTokenSecretSerializer',
     'PasswordVerifySerializer', 'MFASelectTypeSerializer',
 ]
@@ -55,9 +54,9 @@ class BearerTokenSerializer(serializers.Serializer):
         user.last_login = timezone.now()
         user.save(update_fields=['last_login'])
 
-    def create(self, validated_data):
+    def get_request_user(self):
         request = self.context.get('request')
-        if request.user and not request.user.is_anonymous:
+        if request.user and request.user.is_authenticated:
             user = request.user
         else:
             user_id = request.session.get('user_id')
@@ -66,6 +65,12 @@ class BearerTokenSerializer(serializers.Serializer):
                 raise serializers.ValidationError(
                     "user id {} not exist".format(user_id)
                 )
+        return user
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        user = self.get_request_user()
+
         token, date_expired = user.create_bearer_token(request)
         self.update_last_login(user)
 
@@ -79,6 +84,7 @@ class BearerTokenSerializer(serializers.Serializer):
 
 class MFASelectTypeSerializer(serializers.Serializer):
     type = serializers.CharField()
+    username = serializers.CharField(required=False, allow_blank=True, allow_null=True)
 
 
 class MFAChallengeSerializer(serializers.Serializer):
@@ -90,13 +96,6 @@ class MFAChallengeSerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         pass
-
-
-class LoginConfirmSettingSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = LoginConfirmSetting
-        fields = ['id', 'user', 'reviewers', 'date_created', 'date_updated']
-        read_only_fields = ['date_created', 'date_updated']
 
 
 class SSOTokenSerializer(serializers.Serializer):
@@ -192,6 +191,8 @@ class ConnectionTokenApplicationSerializer(serializers.ModelSerializer):
 
 
 class ConnectionTokenSecretSerializer(serializers.Serializer):
+    id = serializers.CharField(read_only=True)
+    secret = serializers.CharField(read_only=True)
     type = serializers.ChoiceField(choices=[('application', 'Application'), ('asset', 'Asset')])
     user = ConnectionTokenUserSerializer(read_only=True)
     asset = ConnectionTokenAssetSerializer(read_only=True)
@@ -201,4 +202,3 @@ class ConnectionTokenSecretSerializer(serializers.Serializer):
     gateway = ConnectionTokenGatewaySerializer(read_only=True)
     actions = ActionsField()
     expired_at = serializers.IntegerField()
-

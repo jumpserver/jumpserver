@@ -21,6 +21,8 @@ class AdminUserViewSet(OrgBulkModelViewSet):
     search_fields = filterset_fields
     serializer_class = serializers.AdminUserSerializer
     permission_classes = (RBACPermission,)
+    ordering_fields = ('name',)
+    ordering = ('name', )
 
     def get_queryset(self):
         queryset = super().get_queryset().filter(type=SystemUser.Type.admin)

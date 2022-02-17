@@ -6,16 +6,25 @@ from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
 from .base import AuthSerializerMixin
 from .utils import validate_password_contains_left_double_curly_bracket
+from common.utils.encode import ssh_pubkey_gen
 
 
 class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     ip = serializers.ReadOnlyField(label=_("IP"))
     hostname = serializers.ReadOnlyField(label=_("Hostname"))
+    platform = serializers.ReadOnlyField(label=_("Platform"))
+    protocols = serializers.SerializerMethodField(label=_("Protocols"))
+    date_created = serializers.DateTimeField(
+        label=_('Date created'), format="%Y/%m/%d %H:%M:%S", read_only=True
+    )
+    date_updated = serializers.DateTimeField(
+        label=_('Date updated'), format="%Y/%m/%d %H:%M:%S", read_only=True
+    )
 
     class Meta:
         model = AuthBook
-        fields_mini = ['id', 'username', 'ip', 'hostname', 'version']
-        fields_write_only = ['password', 'private_key', "public_key"]
+        fields_mini = ['id', 'username', 'ip', 'hostname', 'platform', 'protocols', 'version']
+        fields_write_only = ['password', 'private_key', "public_key", 'passphrase']
         fields_other = ['date_created', 'date_updated', 'connectivity', 'date_verified', 'comment']
         fields_small = fields_mini + fields_write_only + fields_other
         fields_fk = ['asset', 'systemuser', 'systemuser_display']
@@ -32,6 +41,24 @@ class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         }
         ref_name = 'AssetAccountSerializer'
 
+    def _validate_gen_key(self, attrs):
+        private_key = attrs.get('private_key')
+        if not private_key:
+            return attrs
+
+        password = attrs.get('passphrase')
+        username = attrs.get('username')
+        public_key = ssh_pubkey_gen(private_key, password=password, username=username)
+        attrs['public_key'] = public_key
+        return attrs
+
+    def validate(self, attrs):
+        attrs = self._validate_gen_key(attrs)
+        return attrs
+
+    def get_protocols(self, v):
+        return v.protocols.replace(' ', ', ')
+
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
@@ -45,6 +72,10 @@ class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
 
 class AccountSecretSerializer(AccountSerializer):
     class Meta(AccountSerializer.Meta):
+        fields_backup = [
+            'hostname', 'ip', 'platform', 'protocols', 'username', 'password',
+            'private_key', 'public_key', 'date_created', 'date_updated', 'version'
+        ]
         extra_kwargs = {
             'password': {'write_only': False},
             'private_key': {'write_only': False},

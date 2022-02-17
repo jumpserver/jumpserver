@@ -54,6 +54,9 @@ class AdHocDisplay(Display, metaclass=UnSingleton):
         self.log_file.write(msg)
 
     def display(self,  msg, color=None, stderr=False, screen_only=False, log_only=False, newline=True):
+        if log_only:
+            return
+
         if color:
             msg = stringc(msg, color)
 
@@ -62,7 +65,5 @@ class AdHocDisplay(Display, metaclass=UnSingleton):
         else:
             msg2 = msg
 
-        if log_only:
-            self._write_to_log_file(msg2)
-        else:
-            self._write_to_screen(msg2, stderr)
+        self._write_to_log_file(msg2)
+        self._write_to_screen(msg2, stderr)

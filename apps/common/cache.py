@@ -173,7 +173,6 @@ class Cache(metaclass=CacheType):
     def expire(self, *fields):
         self._data = None
         if not fields:
-            logger.debug(f'Delete cached key: key={self.key}')
             self.redis.delete(self.key)
         else:
             self.redis.hdel(self.key, *fields)

@@ -8,67 +8,23 @@ import logging
 import time
 
 from django.conf import settings
-from django.utils.translation import ugettext as _
 from django.core.cache import cache
 
 from common.tasks import send_mail_async
-from common.utils import reverse, get_object_or_none, get_request_ip_or_data, get_request_user_agent
+from common.utils import reverse, get_object_or_none, ip
 from .models import User
-
 
 logger = logging.getLogger('jumpserver')
 
 
-def construct_user_created_email_body(user):
-    default_body = _("""
-        <div>
-            <p>Your account has been created successfully</p>
-            <div>
-                Username: %(username)s
-                <br/>
-                Password: <a href="%(rest_password_url)s?token=%(rest_password_token)s">
-                click here to set your password</a> 
-                (This link is valid for 1 hour. After it expires, <a href="%(forget_password_url)s?email=%(email)s">request new one</a>)
-            </div>
-            <div>
-                <p>---</p>
-                <a href="%(login_url)s">Login direct</a>
-            </div>
-        </div>
-        """) % {
-        'username': user.username,
-        'rest_password_url': reverse('authentication:reset-password', external=True),
-        'rest_password_token': user.generate_reset_token(),
-        'forget_password_url': reverse('authentication:forgot-password', external=True),
-        'email': user.email,
-        'login_url': reverse('authentication:login', external=True),
-    }
-
-    if settings.EMAIL_CUSTOM_USER_CREATED_BODY:
-        custom_body = '<p style="text-indent:2em">' + settings.EMAIL_CUSTOM_USER_CREATED_BODY + '</p>'
-    else:
-        custom_body = ''
-    body = custom_body + default_body
-    return body
-
-
 def send_user_created_mail(user):
+    from .notifications import UserCreatedMsg
+
     recipient_list = [user.email]
-    subject = _('Create account successfully')
-    if settings.EMAIL_CUSTOM_USER_CREATED_SUBJECT:
-        subject = settings.EMAIL_CUSTOM_USER_CREATED_SUBJECT
+    msg = UserCreatedMsg(user).html_msg
+    subject = msg['subject']
+    message = msg['message']
 
-    honorific = '<p>' + _('Hello %(name)s') % {'name': user.name} + ':</p>'
-    if settings.EMAIL_CUSTOM_USER_CREATED_HONORIFIC:
-        honorific = '<p>' + settings.EMAIL_CUSTOM_USER_CREATED_HONORIFIC + ':</p>'
-
-    body = construct_user_created_email_body(user)
-
-    signature = '<p style="float:right">jumpserver</p>'
-    if settings.EMAIL_CUSTOM_USER_CREATED_SIGNATURE:
-        signature = '<p style="float:right">' + settings.EMAIL_CUSTOM_USER_CREATED_SIGNATURE + '</p>'
-
-    message = honorific + body + signature
     if settings.DEBUG:
         try:
             print(message)
@@ -144,7 +100,7 @@ def check_password_rules(password, is_org_admin=False):
         min_length = settings.SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH
     else:
         min_length = settings.SECURITY_PASSWORD_MIN_LENGTH
-    pattern += '.{' + str(min_length-1) + ',}$'
+    pattern += '.{' + str(min_length - 1) + ',}$'
     match_obj = re.match(pattern, password)
     return bool(match_obj)
 
@@ -180,7 +136,7 @@ class BlockUtilBase:
         times_remainder = int(times_up) - int(times_failed)
         return times_remainder
 
-    def incr_failed_count(self):
+    def incr_failed_count(self) -> int:
         limit_key = self.limit_key
         count = cache.get(limit_key, 0)
         count += 1
@@ -189,6 +145,7 @@ class BlockUtilBase:
         limit_count = settings.SECURITY_LOGIN_LIMIT_COUNT
         if count >= limit_count:
             cache.set(self.block_key, True, self.key_ttl)
+        return limit_count - count
 
     def get_failed_count(self):
         count = cache.get(self.limit_key, 0)
@@ -215,6 +172,48 @@ class BlockUtilBase:
         return bool(cache.get(self.block_key))
 
 
+class BlockGlobalIpUtilBase:
+    LIMIT_KEY_TMPL: str
+    BLOCK_KEY_TMPL: str
+
+    def __init__(self, ip):
+        self.ip = ip
+        self.limit_key = self.LIMIT_KEY_TMPL.format(ip)
+        self.block_key = self.BLOCK_KEY_TMPL.format(ip)
+        self.key_ttl = int(settings.SECURITY_LOGIN_IP_LIMIT_TIME) * 60
+
+    @property
+    def ip_in_black_list(self):
+        return ip.contains_ip(self.ip, settings.SECURITY_LOGIN_IP_BLACK_LIST)
+
+    @property
+    def ip_in_white_list(self):
+        return ip.contains_ip(self.ip, settings.SECURITY_LOGIN_IP_WHITE_LIST)
+
+    def set_block_if_need(self):
+        if self.ip_in_white_list or self.ip_in_black_list:
+            return
+        count = cache.get(self.limit_key, 0)
+        count += 1
+        cache.set(self.limit_key, count, self.key_ttl)
+
+        limit_count = settings.SECURITY_LOGIN_IP_LIMIT_COUNT
+        if count < limit_count:
+            return
+        cache.set(self.block_key, True, self.key_ttl)
+
+    def clean_block_if_need(self):
+        cache.delete(self.limit_key)
+        cache.delete(self.block_key)
+
+    def is_block(self):
+        if self.ip_in_white_list:
+            return False
+        if self.ip_in_black_list:
+            return True
+        return bool(cache.get(self.block_key))
+
+
 class LoginBlockUtil(BlockUtilBase):
     LIMIT_KEY_TMPL = "_LOGIN_LIMIT_{}_{}"
     BLOCK_KEY_TMPL = "_LOGIN_BLOCK_{}"
@@ -223,6 +222,11 @@ class LoginBlockUtil(BlockUtilBase):
 class MFABlockUtils(BlockUtilBase):
     LIMIT_KEY_TMPL = "_MFA_LIMIT_{}_{}"
     BLOCK_KEY_TMPL = "_MFA_BLOCK_{}"
+
+
+class LoginIpBlockUtil(BlockGlobalIpUtilBase):
+    LIMIT_KEY_TMPL = "_LOGIN_LIMIT_{}"
+    BLOCK_KEY_TMPL = "_LOGIN_BLOCK_{}"
 
 
 def construct_user_email(username, email):
@@ -248,4 +252,4 @@ def is_auth_password_time_valid(session):
 
 
 def is_auth_otp_time_valid(session):
-    return is_auth_time_valid(session, 'auth_opt_expired_at')
+    return is_auth_time_valid(session, 'auth_otp_expired_at')

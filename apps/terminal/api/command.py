@@ -9,7 +9,7 @@ from rest_framework.fields import DateTimeField
 from rest_framework.response import Response
 from django.template import loader
 
-from terminal.models import CommandStorage, Command
+from terminal.models import CommandStorage, Session, Command
 from terminal.filters import CommandFilter
 from orgs.utils import current_org
 from common.drf.api import JMSBulkModelViewSet
@@ -119,8 +119,11 @@ class CommandViewSet(JMSBulkModelViewSet):
             qs = storage.get_command_queryset()
             commands = self.filter_queryset(qs)
             merged_commands.extend(commands[:])  # ES 默认只取 10 条数据
-
-        merged_commands.sort(key=lambda command: command.timestamp, reverse=True)
+        order = self.request.query_params.get('order', None)
+        if order == 'timestamp':
+            merged_commands.sort(key=lambda command: command.timestamp)
+        else:
+            merged_commands.sort(key=lambda command: command.timestamp, reverse=True)
         page = self.paginate_queryset(merged_commands)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -141,14 +144,25 @@ class CommandViewSet(JMSBulkModelViewSet):
 
         page = self.paginate_queryset(queryset)
         if page is not None:
+            page = self.load_remote_addr(page)
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
         # 适配像 ES 这种没有指定分页只返回少量数据的情况
         queryset = queryset[:]
 
+        queryset = self.load_remote_addr(queryset)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+    def load_remote_addr(self, queryset):
+        commands = list(queryset)
+        session_ids = {command.session for command in commands}
+        sessions = Session.objects.filter(id__in=session_ids).values_list('id', 'remote_addr')
+        session_addr_map = {str(i): addr for i, addr in sessions}
+        for command in commands:
+            command.remote_addr = session_addr_map.get(command.session, '')
+        return commands
 
     def get_queryset(self):
         command_storage_id = self.request.query_params.get('command_storage_id')

@@ -1,30 +1,31 @@
 # -*- coding: utf-8 -*-
 #
 import os
-from itertools import groupby
+from itertools import groupby, chain
 
 from django.conf import settings
 from django.core.files.storage import default_storage
-from django.utils.translation import ugettext as _
 
 import jms_storage
 
-from common.tasks import send_mail_async
-from common.utils import get_logger, reverse
+from common.utils import get_logger
 from . import const
-from .models import ReplayStorage, Session, Command
+from .models import ReplayStorage
+from tickets.models import TicketSession, TicketStep, TicketAssignee
+from tickets.const import ProcessStatus
+
 
 logger = get_logger(__name__)
 
 
 def find_session_replay_local(session):
-    # 新版本和老版本的文件后缀不同
-    session_path = session.get_rel_replay_path()  # 存在外部存储上的路径
-    local_path = session.get_local_path()
-    local_path_v1 = session.get_local_path(version=1)
+    # 存在外部存储上，所有可能的路径名
+    session_paths = session.get_all_possible_relative_path()
 
-    # 去default storage中查找
-    for _local_path in (local_path, local_path_v1, session_path):
+    # 存在本地存储上，所有可能的路径名
+    local_paths = session.get_all_possible_local_path()
+
+    for _local_path in chain(session_paths, local_paths):
         if default_storage.exists(_local_path):
             url = default_storage.url(_local_path)
             return _local_path, url
@@ -32,8 +33,6 @@ def find_session_replay_local(session):
 
 
 def download_session_replay(session):
-    session_path = session.get_rel_replay_path()  # 存在外部存储上的路径
-    local_path = session.get_local_path()
     replay_storages = ReplayStorage.objects.all()
     configs = {
         storage.name: storage.config
@@ -45,13 +44,23 @@ def download_session_replay(session):
     if not configs:
         msg = "Not found replay file, and not remote storage set"
         return None, msg
+    storage = jms_storage.get_multi_object_storage(configs)
+
+    # 获取外部存储路径名
+    session_path = session.find_ok_relative_path_in_storage(storage)
+    if not session_path:
+        msg = "Not found session replay file"
+        return None, msg
+
+    # 通过外部存储路径名后缀，构造真实的本地存储路径
+    local_path = session.get_local_path_by_relative_path(session_path)
 
     # 保存到storage的路径
     target_path = os.path.join(default_storage.base_location, local_path)
     target_dir = os.path.dirname(target_path)
     if not os.path.isdir(target_dir):
         os.makedirs(target_dir, exist_ok=True)
-    storage = jms_storage.get_multi_object_storage(configs)
+
     ok, err = storage.download(session_path, target_path)
     if not ok:
         msg = "Failed download replay file: {}".format(err)
@@ -241,3 +250,11 @@ class ComponentsPrometheusMetricsUtil(TypedComponentsStatusMetricsUtil):
             prometheus_metrics.append('\n')
         prometheus_metrics_text = '\n'.join(prometheus_metrics)
         return prometheus_metrics_text
+
+
+def is_session_approver(session_id, user_id):
+    ticket = TicketSession.get_ticket_by_session_id(session_id)
+    if not ticket:
+        return False
+    ok = ticket.has_all_assignee(user_id)
+    return ok

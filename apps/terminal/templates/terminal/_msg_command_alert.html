@@ -1,0 +1,16 @@
+{% load i18n %}
+
+<div>
+    {% for item, value in items.items %}
+    <span class="cmd-item">
+        <b>{{ item }}:</b> {{ value }}
+    </span>
+    <br />
+    {% endfor %}
+    <b>{% trans 'Session' %}:</b> <a href="{{ session_url }}" target="_blank">{% trans 'view' %}</a>
+    <br />
+    <b>{% trans 'Command' %}: </b><br />
+    <pre>
+{{ command }}
+    </pre>
+</div>

@@ -1,5 +1,4 @@
 import logging
-from functools import reduce
 
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import F
@@ -14,92 +13,17 @@ from .base import BasePermission
 
 
 __all__ = [
-    'AssetPermission', 'Action', 'PermNode', 'UserAssetGrantedTreeNodeRelation',
+    'AssetPermission', 'PermNode', 'UserAssetGrantedTreeNodeRelation',
 ]
 
 # 使用场景
 logger = logging.getLogger(__name__)
 
 
-class Action:
-    NONE = 0
-
-    CONNECT = 0b1
-    UPLOAD = 0b1 << 1
-    DOWNLOAD = 0b1 << 2
-    CLIPBOARD_COPY = 0b1 << 3
-    CLIPBOARD_PASTE = 0b1 << 4
-    ALL = 0xff
-    UPDOWNLOAD = UPLOAD | DOWNLOAD
-    CLIPBOARD_COPY_PASTE = CLIPBOARD_COPY | CLIPBOARD_PASTE
-
-    DB_CHOICES = (
-        (ALL, _('All')),
-        (CONNECT, _('Connect')),
-        (UPLOAD, _('Upload file')),
-        (DOWNLOAD, _('Download file')),
-        (UPDOWNLOAD, _("Upload download")),
-        (CLIPBOARD_COPY, _('Clipboard copy')),
-        (CLIPBOARD_PASTE, _('Clipboard paste')),
-        (CLIPBOARD_COPY_PASTE, _('Clipboard copy paste'))
-    )
-
-    NAME_MAP = {
-        ALL: "all",
-        CONNECT: "connect",
-        UPLOAD: "upload_file",
-        DOWNLOAD: "download_file",
-        UPDOWNLOAD: "updownload",
-        CLIPBOARD_COPY: 'clipboard_copy',
-        CLIPBOARD_PASTE: 'clipboard_paste',
-        CLIPBOARD_COPY_PASTE: 'clipboard_copy_paste'
-    }
-
-    NAME_MAP_REVERSE = {v: k for k, v in NAME_MAP.items()}
-    CHOICES = []
-    for i, j in DB_CHOICES:
-        CHOICES.append((NAME_MAP[i], j))
-
-    @classmethod
-    def value_to_choices(cls, value):
-        if isinstance(value, list):
-            return value
-        value = int(value)
-        choices = [cls.NAME_MAP[i] for i, j in cls.DB_CHOICES if value & i == i]
-        return choices
-
-    @classmethod
-    def value_to_choices_display(cls, value):
-        choices = cls.value_to_choices(value)
-        return [str(dict(cls.choices())[i]) for i in choices]
-
-    @classmethod
-    def choices_to_value(cls, value):
-        if not isinstance(value, list):
-            return cls.NONE
-        db_value = [
-            cls.NAME_MAP_REVERSE[v] for v in value
-            if v in cls.NAME_MAP_REVERSE.keys()
-        ]
-        if not db_value:
-            return cls.NONE
-
-        def to_choices(x, y):
-            return x | y
-
-        result = reduce(to_choices, db_value)
-        return result
-
-    @classmethod
-    def choices(cls):
-        return [(cls.NAME_MAP[i], j) for i, j in cls.DB_CHOICES]
-
-
 class AssetPermission(BasePermission):
     assets = models.ManyToManyField('assets.Asset', related_name='granted_by_permissions', blank=True, verbose_name=_("Asset"))
     nodes = models.ManyToManyField('assets.Node', related_name='granted_by_permissions', blank=True, verbose_name=_("Nodes"))
     system_users = models.ManyToManyField('assets.SystemUser', related_name='granted_by_permissions', blank=True, verbose_name=_("System user"))
-    actions = models.IntegerField(choices=Action.DB_CHOICES, default=Action.ALL, verbose_name=_("Actions"))
 
     class Meta:
         unique_together = [('org_id', 'name')]

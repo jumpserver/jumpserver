@@ -1,7 +1,7 @@
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 
-from common.message.backends.sms import BACKENDS
+from common.sdk.sms import BACKENDS
 from settings.serializers.sms import SMSBackendSerializer
 
 

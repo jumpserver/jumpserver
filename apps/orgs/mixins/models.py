@@ -14,7 +14,7 @@ from ..models import Organization
 logger = get_logger(__file__)
 
 __all__ = [
-    'OrgManager', 'OrgModelMixin',
+    'OrgManager', 'OrgModelMixin', 'Organization'
 ]
 
 

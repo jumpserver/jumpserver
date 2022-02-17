@@ -1,7 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 
 from celery import shared_task
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, gettext_noop
 
 from common.utils import get_logger
 from orgs.utils import org_aware_func
@@ -104,6 +104,6 @@ def test_accounts_connectivity_manual(accounts):
     :param accounts: <AuthBook>对象
     """
     for account in accounts:
-        task_name = _("Test account connectivity: {}").format(account)
+        task_name = gettext_noop("Test account connectivity: ") + str(account)
         test_account_connectivity_util(account, task_name)
         print(".\n")

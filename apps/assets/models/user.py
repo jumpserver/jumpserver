@@ -5,6 +5,7 @@
 import logging
 
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.cache import cache
@@ -29,9 +30,11 @@ class ProtocolMixin:
         telnet = 'telnet', 'Telnet'
         vnc = 'vnc', 'VNC'
         mysql = 'mysql', 'MySQL'
+        redis = 'redis', 'Redis'
         oracle = 'oracle', 'Oracle'
         mariadb = 'mariadb', 'MariaDB'
         postgresql = 'postgresql', 'PostgreSQL'
+        sqlserver = 'sqlserver', 'SQLServer'
         k8s = 'k8s', 'K8S'
 
     SUPPORT_PUSH_PROTOCOLS = [Protocol.ssh, Protocol.rdp]
@@ -43,7 +46,8 @@ class ProtocolMixin:
         Protocol.rdp
     ]
     APPLICATION_CATEGORY_DB_PROTOCOLS = [
-        Protocol.mysql, Protocol.oracle, Protocol.mariadb, Protocol.postgresql
+        Protocol.mysql, Protocol.redis, Protocol.oracle,
+        Protocol.mariadb, Protocol.postgresql, Protocol.sqlserver
     ]
     APPLICATION_CATEGORY_CLOUD_PROTOCOLS = [
         Protocol.k8s
@@ -103,16 +107,23 @@ class AuthMixin:
         password = cache.get(key)
         return password
 
-    def load_tmp_auth_if_has(self, asset_or_app_id, user):
-        if not asset_or_app_id or not user:
-            return
+    def _clean_auth_info_if_manual_login_mode(self):
+        if self.login_mode == self.LOGIN_MANUAL:
+            self.password = ''
+            self.private_key = ''
+            self.public_key = ''
 
+    def _load_tmp_auth_if_has(self, asset_or_app_id, user_id):
         if self.login_mode != self.LOGIN_MANUAL:
             return
 
-        auth = self.get_temp_auth(asset_or_app_id, user)
+        if not asset_or_app_id or not user_id:
+            return
+
+        auth = self.get_temp_auth(asset_or_app_id, user_id)
         if not auth:
             return
+
         username = auth.get('username')
         password = auth.get('password')
 
@@ -121,55 +132,15 @@ class AuthMixin:
         if password:
             self.password = password
 
-    def load_app_more_auth(self, app_id=None, user_id=None):
-        from users.models import User
-
+    def load_app_more_auth(self, app_id=None, username=None, user_id=None):
+        self._clean_auth_info_if_manual_login_mode()
+        # 加载临时认证信息
         if self.login_mode == self.LOGIN_MANUAL:
-            self.password = ''
-            self.private_key = ''
-        if not user_id:
+            self._load_tmp_auth_if_has(app_id, user_id)
             return
-        user = get_object_or_none(User, pk=user_id)
-        if not user:
-            return
-        self.load_tmp_auth_if_has(app_id, user)
-
-    def load_asset_special_auth(self, asset, username=''):
-        """
-        """
-        authbooks = list(AuthBook.objects.filter(asset=asset, systemuser=self))
-        if len(authbooks) == 0:
-            return None
-        elif len(authbooks) == 1:
-            authbook = authbooks[0]
-        else:
-            authbooks.sort(key=lambda x: 1 if x.username == username else 0, reverse=True)
-            authbook = authbooks[0]
-        authbook.load_auth()
-        self.password = authbook.password
-        self.private_key = authbook.private_key
-        self.public_key = authbook.public_key
-
-    def load_asset_more_auth(self, asset_id=None, username=None, user_id=None):
+        # 更新用户名
         from users.models import User
-
-        if self.login_mode == self.LOGIN_MANUAL:
-            self.password = ''
-            self.private_key = ''
-
-        asset = None
-        if asset_id:
-            asset = get_object_or_none(Asset, pk=asset_id)
-        # 没有资产就没有必要继续了
-        if not asset:
-            logger.debug('Asset not found, pass')
-            return
-
-        user = None
-        if user_id:
-            user = get_object_or_none(User, pk=user_id)
-
-        _username = self.username
+        user = get_object_or_none(User, pk=user_id) if user_id else None
         if self.username_same_with_user:
             if user and not username:
                 _username = user.username
@@ -177,9 +148,65 @@ class AuthMixin:
                 _username = username
             self.username = _username
 
+    def load_asset_special_auth(self, asset, username=''):
+        """
+        AuthBook 的数据状态
+            | asset | systemuser | username |
+        1   |   *   |     *      |     x    |
+        2   |   *   |     x      |     *    |
+
+        当前 AuthBook 只有以上两种状态，systemuser 与 username 不会并存。
+        正常的资产与系统用户关联产生的是第1种状态，改密则产生第2种状态。改密之后
+        只有 username 而没有 systemuser 。
+
+        Freq: 关联同一资产的多个系统用户指定同一用户名时，修改用户密码会影响所有系统用户
+
+        这里有一个不对称的行为，同名系统用户密码覆盖
+        当有相同 username 的多个系统用户时，有改密动作之后，所有的同名系统用户都使用最后
+        一次改动，但如果没有发生过改密，同名系统用户使用的密码还是各自的。
+
+        """
+        if username == '':
+            username = self.username
+
+        authbook = AuthBook.objects.filter(
+            asset=asset, username=username, systemuser__isnull=True
+        ).order_by('-date_created').first()
+
+        if not authbook:
+            authbook = AuthBook.objects.filter(
+                asset=asset, systemuser=self
+            ).order_by('-date_created').first()
+
+        if not authbook:
+            return None
+
+        authbook.load_auth()
+        self.password = authbook.password
+        self.private_key = authbook.private_key
+        self.public_key = authbook.public_key
+
+    def load_asset_more_auth(self, asset_id=None, username=None, user_id=None):
+        from users.models import User
+        self._clean_auth_info_if_manual_login_mode()
+        # 加载临时认证信息
+        if self.login_mode == self.LOGIN_MANUAL:
+            self._load_tmp_auth_if_has(asset_id, user_id)
+            return
+        # 更新用户名
+        user = get_object_or_none(User, pk=user_id) if user_id else None
+        if self.username_same_with_user:
+            if user and not username:
+                _username = user.username
+            else:
+                _username = username
+            self.username = _username
         # 加载某个资产的特殊配置认证信息
-        self.load_asset_special_auth(asset, _username)
-        self.load_tmp_auth_if_has(asset_id, user)
+        asset = get_object_or_none(Asset, pk=asset_id) if asset_id else None
+        if not asset:
+            logger.debug('Asset not found, pass')
+            return
+        self.load_asset_special_auth(asset, self.username)
 
 
 class SystemUser(ProtocolMixin, AuthMixin, BaseUser):
@@ -210,12 +237,14 @@ class SystemUser(ProtocolMixin, AuthMixin, BaseUser):
     sudo = models.TextField(default='/bin/whoami', verbose_name=_('Sudo'))
     shell = models.CharField(max_length=64,  default='/bin/bash', verbose_name=_('Shell'))
     login_mode = models.CharField(choices=LOGIN_MODE_CHOICES, default=LOGIN_AUTO, max_length=10, verbose_name=_('Login mode'))
-    cmd_filters = models.ManyToManyField('CommandFilter', related_name='system_users', verbose_name=_("Command filter"), blank=True)
     sftp_root = models.CharField(default='tmp', max_length=128, verbose_name=_("SFTP Root"))
     token = models.TextField(default='', verbose_name=_('Token'))
     home = models.CharField(max_length=4096, default='', verbose_name=_('Home'), blank=True)
     system_groups = models.CharField(default='', max_length=4096, verbose_name=_('System groups'), blank=True)
     ad_domain = models.CharField(default='', max_length=256)
+    # linux su 命令 (switch user)
+    su_enabled = models.BooleanField(default=False, verbose_name=_('User switch'))
+    su_from = models.ForeignKey('self', on_delete=models.SET_NULL, related_name='su_to', null=True, verbose_name=_("Switch from"))
 
     def __str__(self):
         username = self.username
@@ -274,6 +303,21 @@ class SystemUser(ProtocolMixin, AuthMixin, BaseUser):
         asset_ids.update(nodes_asset_ids)
         assets = Asset.objects.filter(id__in=asset_ids)
         return assets
+
+    def add_related_assets(self, assets_or_ids):
+        self.assets.add(*tuple(assets_or_ids))
+        self.add_related_assets_to_su_from_if_need(assets_or_ids)
+
+    def add_related_assets_to_su_from_if_need(self, assets_or_ids):
+        if self.protocol not in [self.Protocol.ssh.value]:
+            return
+        if not self.su_enabled:
+            return
+        if not self.su_from:
+            return
+        if self.su_from.protocol != self.protocol:
+            return
+        self.su_from.assets.add(*tuple(assets_or_ids))
 
     class Meta:
         ordering = ['name']

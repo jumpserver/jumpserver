@@ -1,0 +1,16 @@
+{% load i18n %}
+<p>
+    {% trans 'Hello' %} {{ name }},
+</p>
+
+<p>
+    {% blocktranslate %}
+        The following {{ item_type }} will expire in 3 days
+    {% endblocktranslate %}
+</p>
+
+<ul>
+    {% for item, url in items_with_url %}
+        <li><a href="{{ url }}" target="_blank">{{ item }}</a></li>
+    {% endfor %}
+</ul>

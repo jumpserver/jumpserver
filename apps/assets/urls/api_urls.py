@@ -26,6 +26,8 @@ router.register(r'favorite-assets', api.FavoriteAssetViewSet, 'favorite-asset')
 router.register(r'system-users-assets-relations', api.SystemUserAssetRelationViewSet, 'system-users-assets-relation')
 router.register(r'system-users-nodes-relations', api.SystemUserNodeRelationViewSet, 'system-users-nodes-relation')
 router.register(r'system-users-users-relations', api.SystemUserUserRelationViewSet, 'system-users-users-relation')
+router.register(r'backup', api.AccountBackupPlanViewSet, 'backup')
+router.register(r'backup-execution', api.AccountBackupPlanExecutionViewSet, 'backup-execution')
 
 cmd_filter_router = routers.NestedDefaultRouter(router, r'cmd-filters', lookup='filter')
 cmd_filter_router.register(r'rules', api.CommandFilterRuleViewSet, 'cmd-filter-rule')
@@ -36,6 +38,10 @@ urlpatterns = [
     path('assets/<uuid:pk>/platform/', api.AssetPlatformRetrieveApi.as_view(), name='asset-platform-detail'),
     path('assets/<uuid:pk>/tasks/', api.AssetTaskCreateApi.as_view(), name='asset-task-create'),
     path('assets/tasks/', api.AssetsTaskCreateApi.as_view(), name='assets-task-create'),
+    path('assets/<uuid:pk>/perm-users/', api.AssetPermUserListApi.as_view(), name='asset-perm-user-list'),
+    path('assets/<uuid:pk>/perm-users/<uuid:perm_user_id>/permissions/', api.AssetPermUserPermissionsListApi.as_view(), name='asset-perm-user-permission-list'),
+    path('assets/<uuid:pk>/perm-user-groups/', api.AssetPermUserGroupListApi.as_view(), name='asset-perm-user-group-list'),
+    path('assets/<uuid:pk>/perm-user-groups/<uuid:perm_user_group_id>/permissions/', api.AssetPermUserGroupPermissionsListApi.as_view(), name='asset-perm-user-group-permission-list'),
 
     path('system-users/<uuid:pk>/auth-info/', api.SystemUserAuthInfoApi.as_view(), name='system-user-auth-info'),
     path('system-users/<uuid:pk>/assets/', api.SystemUserAssetsListView.as_view(), name='system-user-assets'),
@@ -44,6 +50,7 @@ urlpatterns = [
     path('system-users/<uuid:pk>/temp-auth/', api.SystemUserTempAuthInfoApi.as_view(), name='system-user-asset-temp-info'),
     path('system-users/<uuid:pk>/tasks/', api.SystemUserTaskApi.as_view(), name='system-user-task-create'),
     path('system-users/<uuid:pk>/cmd-filter-rules/', api.SystemUserCommandFilterRuleListApi.as_view(), name='system-user-cmd-filter-rule-list'),
+    path('cmd-filter-rules/', api.SystemUserCommandFilterRuleListApi.as_view(), name='cmd-filter-rules'),
 
     path('accounts/tasks/', api.AccountTaskCreateAPI.as_view(), name='account-task-create'),
 

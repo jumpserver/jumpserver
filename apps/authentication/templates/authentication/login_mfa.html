@@ -1,0 +1,30 @@
+{% extends '_base_only_content.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}
+    {% trans 'MFA Auth' %}
+{% endblock %}
+
+{% block content %}
+    <form class="m-t" role="form" method="post" action="">
+        {% csrf_token %}
+        {% if 'code' in form.errors %}
+            <p class="red-fonts">{{ form.code.errors.as_text }}</p>
+        {% endif %}
+        <div class="form-group">
+            {% include '_mfa_login_field.html' %}
+        </div>
+        <button id='submit_button' type="submit" class="btn btn-primary block full-width m-b">
+            {% trans 'Next' %}
+        </button>
+        <div>
+            <small>{% trans "Can't provide security? Please contact the administrator!" %}</small>
+        </div>
+    </form>
+    <style>
+        .mfa-div {
+            margin-top: 15px;
+        }
+    </style>
+{% endblock %}

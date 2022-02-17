@@ -59,7 +59,8 @@ class LoginAssetCheckAPI(CreateAPIView):
             'check_confirm_status': {'method': 'GET', 'url': confirm_status_url},
             'close_confirm': {'method': 'DELETE', 'url': confirm_status_url},
             'ticket_detail_url': ticket_detail_url,
-            'reviewers': [str(ticket_assignee.assignee) for ticket_assignee in ticket_assignees]
+            'reviewers': [str(ticket_assignee.assignee) for ticket_assignee in ticket_assignees],
+            'ticket_id': str(ticket.id)
         }
         return data
 

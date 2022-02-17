@@ -1,0 +1,127 @@
+{% load i18n %}
+{% load static %}
+
+<select id="mfa-select" name="mfa_type" class="form-control select-con"
+        onchange="selectChange(this.value)"
+>
+    {% for backend in mfa_backends %}
+        <option value="{{ backend.name }}"
+                {% if not backend.is_active %} disabled {% endif %}
+        >
+            {{ backend.display_name }}
+        </option>
+    {% endfor %}
+</select>
+<div class="mfa-div">
+    {% for backend in mfa_backends %}
+        <div id="mfa-{{ backend.name }}" class="mfa-field
+            {% if backend.challenge_required %}challenge-required{% endif %}"
+            style="display: none"
+        >
+            <input type="text" class="form-control input-style"
+                   placeholder="{{ backend.placeholder }}"
+            >
+            {% if backend.challenge_required %}
+            <button class="btn btn-primary full-width btn-challenge"
+                    type='button' onclick="sendChallengeCode(this)"
+            >
+                {% trans 'Send verification code' %}
+            </button>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>
+
+<style>
+    .input-style {
+        width: 100%;
+        display: inline-block;
+    }
+
+    .challenge-required .input-style {
+        width: calc(100% - 114px);
+        display: inline-block;
+    }
+
+    .btn-challenge {
+        width: 110px !important;
+        height: 100%;
+        vertical-align: top;
+    }
+</style>
+<script>
+    const preferMFAKey = 'mfaPrefer'
+    $(document).ready(function () {
+        const mfaSelectRef = document.getElementById('mfa-select');
+        const preferMFA = localStorage.getItem(preferMFAKey);
+        const valueSelector = "value=" + preferMFA
+        const preferMFADisabled = $(`#mfa-select option[${valueSelector}]`).attr('disabled')
+
+        if (preferMFA && !preferMFADisabled) {
+            mfaSelectRef.value = preferMFA;
+        }
+
+        const mfaSelect = mfaSelectRef.value;
+        if (mfaSelect !== null) {
+            selectChange(mfaSelect, true);
+        }
+    })
+
+    function selectChange(name, onLoad) {
+        $('.mfa-field').hide()
+        $('#mfa-' + name).show()
+        if (!onLoad) {
+            localStorage.setItem(preferMFAKey, name)
+        }
+
+        $('.input-style').each(function (i, ele){
+            $(ele).attr('name', 'code-test')
+        })
+
+        const currentMFAInputRef = $('#mfa-' + name + ' .input-style')
+        currentMFAInputRef.attr('name', 'code')
+
+        // 登录页时，不应该默认focus
+        const usernameRef = $('input[name="username"]')
+        if (!usernameRef || usernameRef.length === 0) {
+            setTimeout(() => {
+                currentMFAInputRef.focus()
+            })
+        }
+    }
+
+    function sendChallengeCode(currentBtn) {
+        let time = 60;
+        const url = "{% url 'api-auth:mfa-select' %}";
+        const data = {
+            type: $("#mfa-select").val(),
+            username: $('input[name="username"]').val()
+        };
+
+        function onSuccess() {
+            const originBtnText = currentBtn.innerHTML;
+            currentBtn.disabled = true
+
+            const interval = setInterval(function () {
+                currentBtn.innerHTML = `{% trans 'Wait: ' %} ${time}`;
+                time -= 1
+
+                if (time === 0) {
+                    currentBtn.innerHTML = originBtnText
+                    currentBtn.disabled = false
+                    clearInterval(interval)
+                }
+            }, 1000)
+            setTimeout(function (){
+                toastr.success("{% trans 'The verification code has been sent' %}");
+            })
+        }
+
+        requestApi({
+            url: url,
+            method: "POST",
+            body: JSON.stringify(data),
+            success: onSuccess
+        })
+    }
+</script>

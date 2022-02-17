@@ -1,6 +1,8 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
+from acls.serializers.rules import ip_group_help_text, ip_group_child_validator
+
 
 class SecurityPasswordRuleSerializer(serializers.Serializer):
     SECURITY_PASSWORD_MIN_LENGTH = serializers.IntegerField(
@@ -14,9 +16,21 @@ class SecurityPasswordRuleSerializer(serializers.Serializer):
     SECURITY_PASSWORD_UPPER_CASE = serializers.BooleanField(
         required=False, label=_('Must contain capital')
     )
-    SECURITY_PASSWORD_LOWER_CASE = serializers.BooleanField(required=False, label=_('Must contain lowercase'))
-    SECURITY_PASSWORD_NUMBER = serializers.BooleanField(required=False, label=_('Must contain numeric'))
-    SECURITY_PASSWORD_SPECIAL_CHAR = serializers.BooleanField(required=False, label=_('Must contain special'))
+    SECURITY_PASSWORD_LOWER_CASE = serializers.BooleanField(
+        required=False, label=_('Must contain lowercase')
+    )
+    SECURITY_PASSWORD_NUMBER = serializers.BooleanField(
+        required=False, label=_('Must contain numeric')
+    )
+    SECURITY_PASSWORD_SPECIAL_CHAR = serializers.BooleanField(
+        required=False, label=_('Must contain special')
+    )
+
+
+login_ip_limit_time_help_text = _(
+    'Unit: minute, If the user has failed to log in for a limited number of times, '
+    'no login is allowed during this time interval.'
+)
 
 
 class SecurityAuthSerializer(serializers.Serializer):
@@ -28,17 +42,38 @@ class SecurityAuthSerializer(serializers.Serializer):
         ),
         required=False, label=_("Global MFA auth")
     )
+    SECURITY_MFA_AUTH_ENABLED_FOR_THIRD_PARTY = serializers.BooleanField(
+        required=False, default=True,
+        label=_('Third-party login users perform MFA authentication'),
+        help_text=_('The third-party login modes include OIDC, CAS, and SAML2'),
+    )
     SECURITY_LOGIN_LIMIT_COUNT = serializers.IntegerField(
         min_value=3, max_value=99999,
-        label=_('Limit the number of login failures')
+        label=_('Limit the number of user login failures')
     )
     SECURITY_LOGIN_LIMIT_TIME = serializers.IntegerField(
         min_value=5, max_value=99999, required=True,
-        label=_('Block logon interval'),
-        help_text=_(
-            'Unit: minute, If the user has failed to log in for a limited number of times, '
-            'no login is allowed during this time interval.'
-        )
+        label=_('Block user login interval'),
+        help_text=login_ip_limit_time_help_text
+    )
+    SECURITY_LOGIN_IP_LIMIT_COUNT = serializers.IntegerField(
+        min_value=3, max_value=99999,
+        label=_('Limit the number of IP login failures')
+    )
+    SECURITY_LOGIN_IP_LIMIT_TIME = serializers.IntegerField(
+        min_value=5, max_value=99999, required=True,
+        label=_('Block IP login interval'),
+        help_text=login_ip_limit_time_help_text
+    )
+    SECURITY_LOGIN_IP_WHITE_LIST = serializers.ListField(
+        default=[], label=_('Login IP White List'), allow_empty=True,
+        child=serializers.CharField(max_length=1024, validators=[ip_group_child_validator]),
+        help_text=ip_group_help_text
+    )
+    SECURITY_LOGIN_IP_BLACK_LIST = serializers.ListField(
+        default=[], label=_('Login IP Black List'), allow_empty=True,
+        child=serializers.CharField(max_length=1024, validators=[ip_group_child_validator]),
+        help_text=ip_group_help_text
     )
     SECURITY_PASSWORD_EXPIRATION_TIME = serializers.IntegerField(
         min_value=1, max_value=99999, required=True,
@@ -70,23 +105,53 @@ class SecurityAuthSerializer(serializers.Serializer):
         help_text=_("Only log in from the user source property")
     )
     SECURITY_MFA_VERIFY_TTL = serializers.IntegerField(
-        min_value=5, max_value=60*60*10,
-        label=_("MFA verify TTL"), help_text=_("Unit: second"),
+        min_value=5, max_value=60 * 60 * 10,
+        label=_("MFA verify TTL"),
+        help_text=_(
+            "Unit: second, The verification MFA takes effect only when you view the account password"
+        )
+    )
+    SECURITY_LOGIN_CHALLENGE_ENABLED = serializers.BooleanField(
+        required=False, default=False,
+        label=_("Enable Login dynamic code"),
+        help_text=_("The password and additional code are sent to a third party "
+                    "authentication system for verification")
+    )
+    SECURITY_MFA_IN_LOGIN_PAGE = serializers.BooleanField(
+        required=False, default=False,
+        label=_("MFA in login page"),
+        help_text=_("Eu security regulations(GDPR) require MFA to be on the login page")
     )
     SECURITY_LOGIN_CAPTCHA_ENABLED = serializers.BooleanField(
-        required=False, default=True,
-        label=_("Enable Login captcha")
+        required=False, default=False, label=_("Enable Login captcha"),
+        help_text=_("Enable captcha to prevent robot authentication")
     )
+
+    def validate(self, attrs):
+        if attrs.get('SECURITY_MFA_AUTH') != 1:
+            attrs['SECURITY_MFA_IN_LOGIN_PAGE'] = False
+        return attrs
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if data['SECURITY_LOGIN_CHALLENGE_ENABLED']:
+            data['SECURITY_MFA_IN_LOGIN_PAGE'] = False
+            data['SECURITY_LOGIN_CAPTCHA_ENABLED'] = False
+        elif data['SECURITY_MFA_IN_LOGIN_PAGE']:
+            data['SECURITY_LOGIN_CAPTCHA_ENABLED'] = False
+        return data
 
 
 class SecuritySettingSerializer(SecurityPasswordRuleSerializer, SecurityAuthSerializer):
     SECURITY_SERVICE_ACCOUNT_REGISTRATION = serializers.BooleanField(
         required=True, label=_('Enable terminal register'),
-        help_text=_("Allow terminal register, after all terminal setup, you should disable this for security")
+        help_text=_(
+            "Allow terminal register, after all terminal setup, you should disable this for security"
+        )
     )
     SECURITY_WATERMARK_ENABLED = serializers.BooleanField(
-        required=True, label=_('Replay watermark'),
-        help_text=_('Enabled, the session replay contains watermark information')
+        required=True, label=_('Enable watermark'),
+        help_text=_('Enabled, the web session and replay contains watermark information')
     )
     SECURITY_MAX_IDLE_TIME = serializers.IntegerField(
         min_value=1, max_value=99999, required=False,
@@ -114,8 +179,10 @@ class SecuritySettingSerializer(SecurityPasswordRuleSerializer, SecurityAuthSeri
         required=True, label=_('Session share'),
         help_text=_("Enabled, Allows user active session to be shared with other users")
     )
-    LOGIN_CONFIRM_ENABLE = serializers.BooleanField(
-        required=False, label=_('Login Confirm'),
-        help_text=_("Enabled, please go to the user detail add approver")
+    SECURITY_CHECK_DIFFERENT_CITY_LOGIN = serializers.BooleanField(
+        required=False, label=_('Remote Login Protection'),
+        help_text=_(
+            'The system determines whether the login IP address belongs to a common login city. '
+            'If the account is logged in from a common login city, the system sends a remote login reminder'
+        )
     )
-

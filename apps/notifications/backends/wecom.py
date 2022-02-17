@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from common.message.backends.wecom import WeCom as Client
+from common.sdk.im.wecom import WeCom as Client
 from .base import BackendBase
 
 
@@ -17,7 +17,7 @@ class WeCom(BackendBase):
 
     def send_msg(self, users, message, subject=None):
         accounts, __, __ = self.get_accounts(users)
-        return self.wecom.send_text(accounts, message)
+        return self.wecom.send_text(accounts, message, markdown=True)
 
 
 backend = WeCom

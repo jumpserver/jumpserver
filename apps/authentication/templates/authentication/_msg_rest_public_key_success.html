@@ -1,0 +1,15 @@
+{% load i18n %}
+<p>{% trans 'Hello' %} {{ name }},</p>
+
+<p>
+    {% trans 'Your public key has just been successfully updated' %}
+</p>
+<p>
+    <b>{% trans 'IP' %}:</b> {{ ip_address }} <br />
+    <b>{% trans 'Browser' %}:</b> {{ browser }}
+</p>
+-
+<p>
+    {% trans 'If the public key update was not initiated by you, your account may have security issues' %} <br />
+    {% trans 'If you have any questions, you can contact the administrator' %}
+</p>

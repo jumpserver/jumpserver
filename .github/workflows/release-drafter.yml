@@ -20,6 +20,8 @@ jobs:
         run: |
           TAG=$(basename ${GITHUB_REF})
           VERSION=${TAG/v/}
+          wget https://raw.githubusercontent.com/jumpserver/installer/master/quick_start.sh
+          sed -i "s@Version=.*@Version=v${VERSION}@g" quick_start.sh
           echo "::set-output name=TAG::$TAG"
           echo "::set-output name=VERSION::$VERSION"
       - name: Create Release
@@ -31,6 +33,16 @@ jobs:
           config-name: release-config.yml
           version: ${{ steps.get_version.outputs.TAG }}
           tag: ${{ steps.get_version.outputs.TAG }}
+      - name: Upload Quick Start Script
+        id: upload-release-quick-start-shell
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./quick_start.sh
+          asset_name: quick_start.sh
+          asset_content_type: application/text
 
   build-and-release:
     needs: create-realese

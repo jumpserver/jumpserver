@@ -1,20 +1,50 @@
 {% extends '_without_nav_base.html' %}
+{% load i18n %}
 {% block body %}
+<style>
+li {
+    list-style: disc;
+}
+ul {
+    padding-left: 30px;
+    padding-top: 10px;
+}
+p {
+    padding-top: 10px;
+}
+</style>
 <div style="margin: 0 200px">
     <div class="group">
-        <h2>JumpServer Clients</h2>
+        <h2>JumpServer {% trans 'Client' %}</h2>
+        <p>
+            {% trans 'JumpServer Client, currently used to launch the client, now only support launch RDP client, The SSH client will next' %}
+{#            //JumpServer 客户端，支持 RDP 的本地拉起，后续会支持拉起 ssh。#}
+        </p>
         <ul>
-            <li><a href="/download/JumpServer-Client-Installer.msi">jumpserver-client-windows.msi</a></li>
-            <li><a href="/download/JumpServer-Client-Installer.dmg">jumpserver-client-macos.dmg</a></li>
+            <li> <a href="/download/JumpServer-Client-Installer.msi">Windows {% trans 'Client' %}</a></li>
+            <li> <a href="/download/JumpServer-Client-Installer.dmg">macOS {% trans 'Client' %}</a></li>
         </ul>
     </div>
 
     <div class="group">
-        <h2>RDP Clients</h2>
+        <h2>{% trans 'Microsoft' %} RDP {% trans 'Official' %}{% trans 'Client' %}</h2>
+        <p>
+            {% trans 'macOS needs to download the client to connect RDP asset, which comes with Windows' %}
+        </p>
         <ul>
             <li><a href="/download/Microsoft_Remote_Desktop_10.6.7_installer.pkg">Microsoft_Remote_Desktop_10.6.7_installer.pkg</a></li>
         </ul>
     </div>
+
+    {% if XPACK_ENABLED  %}
+        <div class="group">
+            <h2>{% trans 'Windows Remote application publisher tools' %}</h2>
+            <p>{% trans 'Jmservisor is the program used to pull up remote applications in Windows Remote Application publisher' %}</p>
+            <ul>
+                <li><a href="/download/Jmservisor.msi">Jmservisor</a></li>
+            </ul>
+        </div>
+    {% endif %}
 </div>
 <style>
 ul {

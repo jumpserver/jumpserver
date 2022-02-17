@@ -46,7 +46,6 @@ def on_site_message_create(sender, instance, created, **kwargs):
         'message': instance.message,
         'users': user_ids
     }
-    data = json.dumps(data)
     new_site_msg_chan.publish(data)
 
 

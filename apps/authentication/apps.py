@@ -8,5 +8,6 @@ class AuthenticationConfig(AppConfig):
 
     def ready(self):
         from . import signals_handlers
+        from . import notifications
         super().ready()
 

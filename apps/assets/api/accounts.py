@@ -25,6 +25,7 @@ class AccountFilterSet(BaseFilterSet):
         qs = super().qs
         qs = self.filter_username(qs)
         qs = self.filter_node(qs)
+        qs = qs.distinct()
         return qs
 
     def filter_username(self, qs):
@@ -62,9 +63,7 @@ class AccountViewSet(OrgBulkModelViewSet):
     }
 
     def get_queryset(self):
-        queryset = super().get_queryset() \
-            .annotate(ip=F('asset__ip')) \
-            .annotate(hostname=F('asset__hostname'))
+        queryset = AuthBook.get_queryset()
         return queryset
 
     @action(methods=['post'], detail=True, url_path='verify')

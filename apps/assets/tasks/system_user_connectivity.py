@@ -3,7 +3,7 @@ from itertools import groupby
 from collections import defaultdict
 
 from celery import shared_task
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, gettext_noop
 
 from assets.models import Asset
 from common.utils import get_logger
@@ -115,7 +115,7 @@ def test_system_user_connectivity_util(system_user, assets, task_name):
 @shared_task(queue="ansible")
 @org_aware_func("system_user")
 def test_system_user_connectivity_manual(system_user, asset_ids=None):
-    task_name = _("Test system user connectivity: {}").format(system_user)
+    task_name = gettext_noop("Test system user connectivity: ") + str(system_user)
     if asset_ids:
         assets = Asset.objects.filter(id__in=asset_ids)
     else:
@@ -126,7 +126,7 @@ def test_system_user_connectivity_manual(system_user, asset_ids=None):
 @shared_task(queue="ansible")
 @org_aware_func("system_user")
 def test_system_user_connectivity_a_asset(system_user, asset):
-    task_name = _("Test system user connectivity: {} => {}").format(
+    task_name = gettext_noop("Test system user connectivity: ") + "{} => {}".format(
         system_user, asset
     )
     test_system_user_connectivity_util(system_user, [asset], task_name)
@@ -145,7 +145,7 @@ def test_system_user_connectivity_period():
         return
     queryset_map = SystemUser.objects.all_group_by_org()
     for org, system_user in queryset_map.items():
-        task_name = _("Test system user connectivity period: {}").format(system_user)
+        task_name = gettext_noop("Test system user connectivity period: ") + str(system_user)
         with tmp_to_org(org):
             assets = system_user.get_related_assets()
             test_system_user_connectivity_util(system_user, assets, task_name)

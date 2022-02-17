@@ -3,3 +3,4 @@
 
 from .asset_permission import *
 from .application_permission import *
+from .base import *

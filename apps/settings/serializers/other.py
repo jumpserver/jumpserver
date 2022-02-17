@@ -7,10 +7,9 @@ class OtherSettingSerializer(serializers.Serializer):
         required=False, max_length=1024, label=_("Email suffix"),
         help_text=_('This is used by default if no email is returned during SSO authentication')
     )
-    TICKETS_ENABLED = serializers.BooleanField(required=False, default=True, label=_("Enable tickets"))
 
     OTP_ISSUER_NAME = serializers.CharField(
-        required=False, max_length=1024, label=_('OTP issuer name'),
+        required=False, max_length=16, label=_('OTP issuer name'),
     )
     OTP_VALID_WINDOW = serializers.IntegerField(
         min_value=1, max_value=10,
@@ -27,7 +26,18 @@ class OtherSettingSerializer(serializers.Serializer):
     )
 
     PERM_SINGLE_ASSET_TO_UNGROUP_NODE = serializers.BooleanField(
-        required=False, label=_("Perm single to ungroup node")
+        required=False, label=_("Perm ungroup node"),
+        help_text=_("Perm single to ungroup node")
+    )
+
+    HELP_DOCUMENT_URL = serializers.URLField(
+        required=False, allow_blank=True, allow_null=True, label=_("Help Docs URL"),
+        help_text=_('default: http://docs.jumpserver.org')
+    )
+
+    HELP_SUPPORT_URL = serializers.URLField(
+        required=False, allow_blank=True, allow_null=True, label=_("Help Support URL"),
+        help_text=_('default: http://www.jumpserver.org/support/')
     )
 
     # 准备废弃

@@ -53,6 +53,27 @@ class UserUpdatePasswordSerializer(serializers.ModelSerializer):
         return instance
 
 
+class UserUpdateSecretKeySerializer(serializers.ModelSerializer):
+    new_secret_key = serializers.CharField(required=True, max_length=128, write_only=True)
+    new_secret_key_again = serializers.CharField(required=True, max_length=128, write_only=True)
+
+    class Meta:
+        model = User
+        fields = ['new_secret_key', 'new_secret_key_again']
+
+    def validate_new_secret_key_again(self, value):
+        if value != self.initial_data.get('new_secret_key', ''):
+            msg = _('The newly set password is inconsistent')
+            raise serializers.ValidationError(msg)
+        return value
+
+    def update(self, instance, validated_data):
+        new_secret_key = self.validated_data.get('new_secret_key')
+        instance.secret_key = new_secret_key
+        instance.save()
+        return instance
+
+
 class UserUpdatePublicKeySerializer(serializers.ModelSerializer):
     public_key_comment = serializers.CharField(
         source='get_public_key_comment', required=False, read_only=True, max_length=128
@@ -185,7 +206,6 @@ class UserPKUpdateSerializer(serializers.ModelSerializer):
 
 
 class ChangeUserPasswordSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
         fields = ['password']

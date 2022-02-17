@@ -33,6 +33,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'radius': serializers.RadiusSettingSerializer,
         'cas': serializers.CASSettingSerializer,
         'sso': serializers.SSOSettingSerializer,
+        'saml2': serializers.SAML2SettingSerializer,
         'clean': serializers.CleaningSerializer,
         'other': serializers.OtherSettingSerializer,
         'sms': serializers.SMSSettingSerializer,

@@ -71,7 +71,7 @@ class OrgResourceStatisticsCache(OrgRelatedCache):
         self.org = org
 
     def get_key_suffix(self):
-        return f'<org:{self.org.id}>'
+        return f'org_{self.org.id}'
 
     def get_current_org(self):
         return self.org

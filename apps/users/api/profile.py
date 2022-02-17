@@ -4,15 +4,19 @@ import uuid
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
-from users.notifications import ResetPasswordMsg, ResetPasswordSuccessMsg, ResetSSHKeyMsg
+from users.notifications import (
+    ResetPasswordMsg, ResetPasswordSuccessMsg, ResetSSHKeyMsg,
+    ResetPublicKeySuccessMsg,
+)
+
 from .. import serializers
 from ..models import User
 from .mixins import UserQuerysetMixin
 
 __all__ = [
     'UserResetPasswordApi', 'UserResetPKApi',
-    'UserProfileApi',
-    'UserPasswordApi', 'UserPublicKeyApi'
+    'UserProfileApi', 'UserPasswordApi',
+    'UserSecretKeyApi', 'UserPublicKeyApi'
 ]
 
 
@@ -31,7 +35,7 @@ class UserResetPasswordApi(UserQuerysetMixin, generics.UpdateAPIView):
 
 class UserResetPKApi(UserQuerysetMixin, generics.UpdateAPIView):
     serializer_class = serializers.UserSerializer
-    
+
     def perform_update(self, serializer):
         user = self.get_object()
         user.public_key = None
@@ -60,6 +64,14 @@ class UserPasswordApi(generics.RetrieveUpdateAPIView):
         return resp
 
 
+class UserSecretKeyApi(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = serializers.UserUpdateSecretKeySerializer
+
+    def get_object(self):
+        return self.request.user
+
+
 class UserPublicKeyApi(generics.RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = serializers.UserUpdatePublicKeySerializer
@@ -69,4 +81,4 @@ class UserPublicKeyApi(generics.RetrieveUpdateAPIView):
 
     def perform_update(self, serializer):
         super().perform_update(serializer)
-        ResetPasswordSuccessMsg(self.get_object(), self.request).publish_async()
+        ResetPublicKeySuccessMsg(self.get_object(), self.request).publish_async()

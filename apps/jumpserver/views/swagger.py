@@ -55,7 +55,7 @@ api_info = openapi.Info(
     description="JumpServer Restful api docs",
     terms_of_service="https://www.jumpserver.org",
     contact=openapi.Contact(email="support@fit2cloud.com"),
-    license=openapi.License(name="GPLv2 License"),
+    license=openapi.License(name="GPLv3 License"),
 )
 
 

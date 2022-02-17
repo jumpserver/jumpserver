@@ -29,7 +29,6 @@ from ..const import RSA_PRIVATE_KEY, RSA_PUBLIC_KEY
 from .. import mixins, errors
 from ..forms import get_user_login_form_cls
 
-
 __all__ = [
     'UserLoginView', 'UserLogoutView',
     'UserLoginGuardView', 'UserLoginWaitConfirmView',
@@ -47,48 +46,35 @@ class UserLoginView(mixins.AuthMixin, FormView):
         # show jumpserver login page if request http://{JUMP-SERVER}/?admin=1
         if self.request.GET.get("admin", 0):
             return None
-        next_url = request.GET.get('next') or '/'
-        auth_type = ''
 
-        if settings.AUTH_OPENID:
-            auth_type = 'OIDC'
-            openid_auth_url = reverse(settings.AUTH_OPENID_AUTH_LOGIN_URL_NAME)
-            openid_auth_url = openid_auth_url + f'?next={next_url}'
-        else:
-            openid_auth_url = None
-
-        if settings.AUTH_CAS:
-            auth_type = 'CAS'
-            cas_auth_url = reverse(settings.CAS_LOGIN_URL_NAME) + f'?next={next_url}'
-        else:
-            cas_auth_url = None
-
-        if not any([openid_auth_url, cas_auth_url]):
+        auth_types = [m for m in self.get_support_auth_methods() if m.get('auto_redirect')]
+        if not auth_types:
             return None
 
-        login_redirect = settings.LOGIN_REDIRECT_TO_BACKEND.lower()
-        if login_redirect in ['cas'] and cas_auth_url:
-            auth_url = cas_auth_url
-        elif login_redirect in ['openid', 'oidc'] and openid_auth_url:
-            auth_url = openid_auth_url
-        else:
-            auth_url = openid_auth_url or cas_auth_url
+        # 明确直接登录哪个
+        login_to = settings.LOGIN_REDIRECT_TO_BACKEND.upper()
+        if login_to == 'DIRECT':
+            return None
 
-        if settings.LOGIN_REDIRECT_TO_BACKEND or not settings.LOGIN_REDIRECT_MSG_ENABLED:
-            redirect_url = auth_url
-        else:
+        auth_method = next(filter(lambda x: x['name'] == login_to, auth_types), None)
+        if not auth_method:
+            auth_method = auth_types[0]
+
+        auth_name, redirect_url = auth_method['name'], auth_method['url']
+        next_url = request.GET.get('next') or '/'
+        query_string = request.GET.urlencode()
+        redirect_url = '{}?next={}&{}'.format(redirect_url, next_url, query_string)
+
+        if settings.LOGIN_REDIRECT_MSG_ENABLED:
             message_data = {
                 'title': _('Redirecting'),
-                'message': _("Redirecting to {} authentication").format(auth_type),
-                'redirect_url': auth_url,
+                'message': _("Redirecting to {} authentication").format(auth_name),
+                'redirect_url': redirect_url,
                 'interval': 3,
                 'has_cancel': True,
                 'cancel_url': reverse('authentication:login') + '?admin=1'
             }
             redirect_url = FlashMessageUtil.gen_message_url(message_data)
-
-        query_string = request.GET.urlencode()
-        redirect_url = "{}&{}".format(redirect_url, query_string)
         return redirect_url
 
     def get(self, request, *args, **kwargs):
@@ -110,12 +96,10 @@ class UserLoginView(mixins.AuthMixin, FormView):
         self.request.session.delete_test_cookie()
 
         try:
-            with transaction.atomic():
-                self.check_user_auth(decrypt_passwd=True)
+            self.check_user_auth(decrypt_passwd=True)
         except errors.AuthFailedError as e:
             form.add_error(None, e.msg)
             self.set_login_failed_mark()
-
             form_cls = get_user_login_form_cls(captcha=True)
             new_form = form_cls(data=form.data)
             new_form._errors = form.errors
@@ -123,11 +107,22 @@ class UserLoginView(mixins.AuthMixin, FormView):
             self.request.session.set_test_cookie()
             return self.render_to_response(context)
         except (
-            errors.PasswdTooSimple,
-            errors.PasswordRequireResetError,
-            errors.PasswdNeedUpdate
+                errors.MFAUnsetError,
+                errors.PasswordTooSimple,
+                errors.PasswordRequireResetError,
+                errors.PasswordNeedUpdate
         ) as e:
             return redirect(e.url)
+        except (
+                errors.MFAFailedError,
+                errors.BlockMFAError,
+                errors.MFACodeRequiredError,
+                errors.SMSCodeRequiredError,
+                errors.UserPhoneNotSet,
+                errors.BlockGlobalIpLoginError
+        ) as e:
+            form.add_error('code', e.msg)
+            return super().form_invalid(form)
         self.clear_rsa_key()
         return self.redirect_to_guard_view()
 
@@ -148,31 +143,40 @@ class UserLoginView(mixins.AuthMixin, FormView):
                 'name': 'OpenID',
                 'enabled': settings.AUTH_OPENID,
                 'url': reverse('authentication:openid:login'),
-                'logo':  static('img/login_oidc_logo.png')
+                'logo': static('img/login_oidc_logo.png'),
+                'auto_redirect': True  # 是否支持自动重定向
             },
             {
                 'name': 'CAS',
                 'enabled': settings.AUTH_CAS,
                 'url': reverse('authentication:cas:cas-login'),
-                'logo':  static('img/login_cas_logo.png')
+                'logo': static('img/login_cas_logo.png'),
+                'auto_redirect': True
+            },
+            {
+                'name': 'SAML2',
+                'enabled': settings.AUTH_SAML2,
+                'url': reverse('authentication:saml2:saml2-login'),
+                'logo': static('img/login_saml2_logo.png'),
+                'auto_redirect': True
             },
             {
                 'name': _('WeCom'),
                 'enabled': settings.AUTH_WECOM,
                 'url': reverse('authentication:wecom-qr-login'),
-                'logo':  static('img/login_wecom_logo.png')
+                'logo': static('img/login_wecom_logo.png'),
             },
             {
                 'name': _('DingTalk'),
                 'enabled': settings.AUTH_DINGTALK,
                 'url': reverse('authentication:dingtalk-qr-login'),
-                'logo':  static('img/login_dingtalk_logo.png')
+                'logo': static('img/login_dingtalk_logo.png')
             },
             {
                 'name': _('FeiShu'),
                 'enabled': settings.AUTH_FEISHU,
                 'url': reverse('authentication:feishu-qr-login'),
-                'logo':  static('img/login_feishu_logo.png')
+                'logo': static('img/login_feishu_logo.png')
             }
         ]
         return [method for method in auth_methods if method['enabled']]
@@ -189,7 +193,8 @@ class UserLoginView(mixins.AuthMixin, FormView):
         context = {
             'demo_mode': os.environ.get("DEMO_MODE"),
             'auth_methods': self.get_support_auth_methods(),
-            'forgot_password_url': self.get_forgot_password_url()
+            'forgot_password_url': self.get_forgot_password_url(),
+            **self.get_user_mfa_context(self.request.user)
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -198,7 +203,7 @@ class UserLoginView(mixins.AuthMixin, FormView):
 class UserLoginGuardView(mixins.AuthMixin, RedirectView):
     redirect_field_name = 'next'
     login_url = reverse_lazy('authentication:login')
-    login_otp_url = reverse_lazy('authentication:login-otp')
+    login_mfa_url = reverse_lazy('authentication:login-mfa')
     login_confirm_url = reverse_lazy('authentication:login-wait-confirm')
 
     def format_redirect_url(self, url):
@@ -219,15 +224,16 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
             user = self.check_user_auth_if_need()
             self.check_user_mfa_if_need(user)
             self.check_user_login_confirm_if_need(user)
-        except (errors.CredentialError, errors.SessionEmptyError):
+        except (errors.CredentialError, errors.SessionEmptyError) as e:
+            print("Error: ", e)
             return self.format_redirect_url(self.login_url)
         except errors.MFARequiredError:
-            return self.format_redirect_url(self.login_otp_url)
+            return self.format_redirect_url(self.login_mfa_url)
         except errors.LoginConfirmBaseError:
             return self.format_redirect_url(self.login_confirm_url)
         except errors.MFAUnsetError as e:
             return e.url
-        except errors.PasswdTooSimple as e:
+        except errors.PasswordTooSimple as e:
             return e.url
         else:
             self.login_it(user)
@@ -280,6 +286,8 @@ class UserLogoutView(TemplateView):
             return settings.AUTH_OPENID_AUTH_LOGOUT_URL_NAME
         elif 'CAS' in backend:
             return settings.CAS_LOGOUT_URL_NAME
+        elif 'saml2' in backend:
+            return settings.SAML2_LOGOUT_URL_NAME
         return None
 
     def get(self, request, *args, **kwargs):
@@ -294,7 +302,7 @@ class UserLogoutView(TemplateView):
     def get_context_data(self, **kwargs):
         context = {
             'title': _('Logout success'),
-            'messages': _('Logout success, return login page'),
+            'message': _('Logout success, return login page'),
             'interval': 3,
             'redirect_url': reverse('authentication:login'),
             'auto_redirect': True,

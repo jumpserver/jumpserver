@@ -5,7 +5,8 @@ from rest_framework import status
 from django.utils.translation import gettext_lazy as _
 
 from settings.models import Setting
-from common.message.backends.feishu import FeiShu
+from common.sdk.im.feishu import FeiShu
+
 from .. import serializers
 
 

@@ -11,7 +11,7 @@ class IsValidUser(permissions.IsAuthenticated, permissions.BasePermission):
 
     def has_permission(self, request, view):
         return super(IsValidUser, self).has_permission(request, view) \
-            and request.user.is_valid
+               and request.user.is_valid
 
 
 class OnlySuperUser(IsValidUser):

@@ -84,6 +84,12 @@ class CommandStore():
                     },
                     "org_id": {
                         "type": "keyword"
+                    },
+                    "@timestamp": {
+                        "type": "date"
+                    },
+                    "timestamp": {
+                        "type": "long"
                     }
                 }
             }
@@ -131,10 +137,13 @@ class CommandStore():
             index=self.index, doc_type=self.doc_type, body=body, from_=from_, size=size,
             sort=sort
         )
+        source_data = []
+        for item in data['hits']['hits']:
+            if item:
+                item['_source'].update({'id': item['_id']})
+                source_data.append(item['_source'])
 
-        return AbstractSessionCommand.from_multi_dict(
-            [item['_source'] for item in data['hits']['hits'] if item]
-        )
+        return AbstractSessionCommand.from_multi_dict(source_data)
 
     def count(self, **query):
         body = self.get_query_body(**query)
@@ -160,11 +169,16 @@ class CommandStore():
             new_kwargs[k] = str(v) if isinstance(v, UUID) else v
         kwargs = new_kwargs
 
+        index_in_field = 'id__in'
         exact_fields = self.exact_fields
         match_fields = self.match_fields
 
         match = {}
         exact = {}
+        index = {}
+
+        if index_in_field in kwargs:
+            index['values'] = kwargs[index_in_field]
 
         for k, v in kwargs.items():
             if k in exact_fields:
@@ -221,6 +235,10 @@ class CommandStore():
                                 'timestamp': timestamp_range
                             }
                         }
+                    ] + [
+                        {
+                            'ids': {k: v}
+                        } for k, v in index.items()
                     ]
                 }
             },
