@@ -13,7 +13,7 @@ from rest_framework.generics import (
 
 from orgs.utils import tmp_to_root_org
 from perms.utils.asset.permission import get_asset_system_user_ids_with_actions_by_user, validate_permission
-from common.permissions import IsOrgAdminOrAppUser, IsOrgAdmin, IsValidUser
+from common.permissions import IsValidUser
 from common.utils import get_logger, lazyproperty
 
 from perms.hands import User, Asset, SystemUser
@@ -33,8 +33,10 @@ __all__ = [
 
 @method_decorator(tmp_to_root_org(), name='get')
 class GetUserAssetPermissionActionsApi(RetrieveAPIView):
-    permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.ActionsSerializer
+    rbac_perms = {
+        'retrieve': 'perms.view_userassets'
+    }
 
     def get_user(self):
         user_id = self.request.query_params.get('user_id', '')
@@ -61,10 +63,9 @@ class GetUserAssetPermissionActionsApi(RetrieveAPIView):
 
 @method_decorator(tmp_to_root_org(), name='get')
 class ValidateUserAssetPermissionApi(APIView):
-    permission_classes = (IsOrgAdminOrAppUser,)
-
-    def get_cache_policy(self):
-        return 0
+    rbac_perms = {
+        'GET': 'perms.view_userassets'
+    }
 
     def get(self, request, *args, **kwargs):
         user_id = self.request.query_params.get('user_id', '')
@@ -97,16 +98,16 @@ class ValidateUserAssetPermissionApi(APIView):
 
 # TODO 删除
 class RefreshAssetPermissionCacheApi(RetrieveAPIView):
-    permission_classes = (IsOrgAdmin,)
-
     def retrieve(self, request, *args, **kwargs):
         return Response({'msg': True}, status=200)
 
 
 class UserGrantedAssetSystemUsersForAdminApi(ListAPIView):
-    permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.AssetSystemUserSerializer
     only_fields = serializers.AssetSystemUserSerializer.Meta.only_fields
+    rbac_perms = {
+        'list': 'perms.view_userassets'
+    }
 
     @lazyproperty
     def user(self):
@@ -142,7 +143,5 @@ class MyGrantedAssetSystemUsersApi(UserGrantedAssetSystemUsersForAdminApi):
 
 # TODO 删除
 class UserAssetPermissionsCacheApi(DestroyAPIView):
-    permission_classes = (IsOrgAdmin,)
-
     def destroy(self, request, *args, **kwargs):
         return Response(status=204)

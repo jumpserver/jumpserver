@@ -4,7 +4,6 @@ from rest_framework.mixins import ListModelMixin, CreateModelMixin
 from django.db.models import F, Value
 from django.db.models.functions import Concat
 
-from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor, IsOrgAdmin
 from common.drf.filters import DatetimeRangeFilter
 from common.api import CommonGenericViewSet
 from orgs.mixins.api import OrgGenericViewSet, OrgBulkModelViewSet, OrgRelationMixin
@@ -20,7 +19,6 @@ class FTPLogViewSet(CreateModelMixin,
                     OrgGenericViewSet):
     model = FTPLog
     serializer_class = FTPLogSerializer
-    permission_classes = (IsOrgAdminOrAppUser | IsOrgAuditor,)
     extra_filter_backends = [DatetimeRangeFilter]
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))
@@ -32,7 +30,6 @@ class FTPLogViewSet(CreateModelMixin,
 
 class UserLoginLogViewSet(ListModelMixin, CommonGenericViewSet):
     queryset = UserLoginLog.objects.all()
-    permission_classes = [IsOrgAdmin | IsOrgAuditor]
     serializer_class = UserLoginLogSerializer
     extra_filter_backends = [DatetimeRangeFilter]
     date_range_filter_fields = [
@@ -58,7 +55,6 @@ class UserLoginLogViewSet(ListModelMixin, CommonGenericViewSet):
 class OperateLogViewSet(ListModelMixin, OrgGenericViewSet):
     model = OperateLog
     serializer_class = OperateLogSerializer
-    permission_classes = [IsOrgAdmin | IsOrgAuditor]
     extra_filter_backends = [DatetimeRangeFilter]
     date_range_filter_fields = [
         ('datetime', ('date_from', 'date_to'))
@@ -70,7 +66,6 @@ class OperateLogViewSet(ListModelMixin, OrgGenericViewSet):
 
 class PasswordChangeLogViewSet(ListModelMixin, CommonGenericViewSet):
     queryset = PasswordChangeLog.objects.all()
-    permission_classes = [IsOrgAdmin | IsOrgAuditor]
     serializer_class = PasswordChangeLogSerializer
     extra_filter_backends = [DatetimeRangeFilter]
     date_range_filter_fields = [
@@ -91,7 +86,6 @@ class PasswordChangeLogViewSet(ListModelMixin, CommonGenericViewSet):
 class CommandExecutionViewSet(ListModelMixin, OrgGenericViewSet):
     model = CommandExecution
     serializer_class = CommandExecutionSerializer
-    permission_classes = [IsOrgAdmin | IsOrgAuditor]
     extra_filter_backends = [DatetimeRangeFilter]
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))
@@ -117,7 +111,6 @@ class CommandExecutionViewSet(ListModelMixin, OrgGenericViewSet):
 class CommandExecutionHostRelationViewSet(OrgRelationMixin, OrgBulkModelViewSet):
     serializer_class = CommandExecutionHostsRelationSerializer
     m2m_field = CommandExecution.hosts.field
-    permission_classes = [IsOrgAdmin | IsOrgAuditor]
     filterset_fields = [
         'id', 'asset', 'commandexecution'
     ]

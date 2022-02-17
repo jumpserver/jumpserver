@@ -20,7 +20,6 @@ from common.tree import TreeNodeSerializer
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
 from orgs.utils import current_org
-from ..hands import IsOrgAdmin
 from ..models import Node
 from ..tasks import (
     update_node_assets_hardware_info_manual,
@@ -46,7 +45,6 @@ class NodeViewSet(SuggestionMixin, OrgBulkModelViewSet):
     model = Node
     filterset_fields = ('value', 'key', 'id')
     search_fields = ('value', )
-    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.NodeSerializer
 
     @action(methods=[POST], detail=False, url_path='check_assets_amount_task')
@@ -85,7 +83,6 @@ class NodeListAsTreeApi(generics.ListAPIView):
     ]
     """
     model = Node
-    permission_classes = (IsOrgAdmin,)
     serializer_class = TreeNodeSerializer
 
     @staticmethod
@@ -100,7 +97,6 @@ class NodeListAsTreeApi(generics.ListAPIView):
 
 
 class NodeChildrenApi(generics.ListCreateAPIView):
-    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.NodeSerializer
     instance = None
     is_initial = False
@@ -199,7 +195,6 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
 
 
 class NodeAssetsApi(generics.ListAPIView):
-    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.AssetSerializer
 
     def get_queryset(self):
@@ -214,7 +209,6 @@ class NodeAssetsApi(generics.ListAPIView):
 
 class NodeAddChildrenApi(generics.UpdateAPIView):
     model = Node
-    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.NodeAddChildrenSerializer
     instance = None
 
@@ -231,7 +225,6 @@ class NodeAddChildrenApi(generics.UpdateAPIView):
 class NodeAddAssetsApi(generics.UpdateAPIView):
     model = Node
     serializer_class = serializers.NodeAssetsSerializer
-    permission_classes = (IsOrgAdmin,)
     instance = None
 
     def perform_update(self, serializer):
@@ -243,7 +236,6 @@ class NodeAddAssetsApi(generics.UpdateAPIView):
 class NodeRemoveAssetsApi(generics.UpdateAPIView):
     model = Node
     serializer_class = serializers.NodeAssetsSerializer
-    permission_classes = (IsOrgAdmin,)
     instance = None
 
     def perform_update(self, serializer):
@@ -262,7 +254,6 @@ class NodeRemoveAssetsApi(generics.UpdateAPIView):
 class MoveAssetsToNodeApi(generics.UpdateAPIView):
     model = Node
     serializer_class = serializers.NodeAssetsSerializer
-    permission_classes = (IsOrgAdmin,)
     instance = None
 
     def perform_update(self, serializer):
@@ -305,8 +296,6 @@ class MoveAssetsToNodeApi(generics.UpdateAPIView):
 class NodeTaskCreateApi(generics.CreateAPIView):
     model = Node
     serializer_class = serializers.NodeTaskSerializer
-    permission_classes = (IsOrgAdmin,)
-
     def get_object(self):
         node_id = self.kwargs.get('pk')
         node = get_object_or_none(self.model, id=node_id)

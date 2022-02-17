@@ -24,12 +24,10 @@ from applications.models import Application
 from authentication.signals import post_auth_failed
 from common.utils import get_logger, random_string
 from common.mixins.api import SerializerMixin
-from common.permissions import IsSuperUserOrAppUser, IsValidUser, IsSuperUser
 from common.utils.common import get_file_by_arch
 from orgs.mixins.api import RootOrgViewMixin
 from common.http import is_true
 from perms.models.base import Action
-from perms.utils.application.permission import validate_permission as app_validate_permission
 from perms.utils.application.permission import get_application_actions
 from perms.utils.asset.permission import get_asset_actions
 
@@ -42,6 +40,14 @@ __all__ = ['UserConnectionTokenViewSet']
 
 
 class ClientProtocolMixin:
+    """
+    下载客户端支持的连接文件，里面包含了 token，和 其他连接信息
+
+    - [x] RDP
+    - [ ] KoKo
+
+    本质上，这里还是暴露出 token 来，进行使用
+    """
     request: Request
     get_serializer: Callable
     create_token: Callable
@@ -167,7 +173,7 @@ class ClientProtocolMixin:
         rst = rst.decode('ascii')
         return rst
 
-    @action(methods=['POST', 'GET'], detail=False, url_path='rdp/file', permission_classes=[IsValidUser])
+    @action(methods=['POST', 'GET'], detail=False, url_path='rdp/file')
     def get_rdp_file(self, request, *args, **kwargs):
         if self.request.method == 'GET':
             data = self.request.query_params
@@ -214,7 +220,7 @@ class ClientProtocolMixin:
         }
         return data
 
-    @action(methods=['POST', 'GET'], detail=False, url_path='client-url', permission_classes=[IsValidUser])
+    @action(methods=['POST', 'GET'], detail=False, url_path='client-url')
     def get_client_protocol_url(self, request, *args, **kwargs):
         serializer = self.get_valid_serializer()
         try:
@@ -271,8 +277,14 @@ class SecretDetailMixin:
             'remote_app': None,
         }
 
-    @action(methods=['POST'], detail=False, permission_classes=[IsSuperUserOrAppUser], url_path='secret-info/detail')
+    @action(methods=['POST'], detail=False, url_path='secret-info/detail')
     def get_secret_detail(self, request, *args, **kwargs):
+        perm_required = 'authentication.view_connectiontokensecret'
+
+        # 非常重要的 api，再逻辑层再判断一下，双重保险
+        if not request.user.has_perm(perm_required):
+            raise PermissionDenied('Not allow to view secret')
+
         token = request.data.get('token', '')
         try:
             value, user, system_user, asset, app, expired_at, actions = self.valid_token(token)
@@ -307,12 +319,18 @@ class UserConnectionTokenViewSet(
     RootOrgViewMixin, SerializerMixin, ClientProtocolMixin,
     SecretDetailMixin, GenericViewSet
 ):
-    permission_classes = (IsSuperUserOrAppUser,)
     serializer_classes = {
         'default': ConnectionTokenSerializer,
         'get_secret_detail': ConnectionTokenSecretSerializer,
     }
     CACHE_KEY_PREFIX = 'CONNECTION_TOKEN_{}'
+    rbac_perms = {
+        'GET': 'view_connectiontoken',
+        'create': 'add_connectiontoken',
+        'get_secret_detail': 'view_connectiontokensecret',
+        'get_rdp_file': 'add_connectiontoken',
+        'get_client_protocol_url': 'add_connectiontoken',
+    }
 
     @staticmethod
     def check_resource_permission(user, asset, application, system_user):
@@ -402,14 +420,6 @@ class UserConnectionTokenViewSet(
         if not has_perm:
             raise serializers.ValidationError('Permission expired or invalid')
         return value, user, system_user, asset, app, expired_at, actions
-
-    def get_permissions(self):
-        if self.action in ["create", "get_rdp_file"]:
-            if self.request.data.get('user', None):
-                self.permission_classes = (IsSuperUser,)
-            else:
-                self.permission_classes = (IsValidUser,)
-        return super().get_permissions()
 
     def get(self, request):
         token = request.query_params.get('token')

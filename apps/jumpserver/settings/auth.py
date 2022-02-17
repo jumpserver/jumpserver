@@ -139,6 +139,7 @@ OTP_IN_RADIUS = CONFIG.OTP_IN_RADIUS
 
 
 AUTH_BACKEND_MODEL = 'authentication.backends.api.JMSModelBackend'
+RBAC_BACKEND = 'rbac.backends.RBACBackend'
 AUTH_BACKEND_PUBKEY = 'authentication.backends.pubkey.PublicKeyAuthBackend'
 AUTH_BACKEND_LDAP = 'authentication.backends.ldap.LDAPAuthorizationBackend'
 AUTH_BACKEND_OIDC_PASSWORD = 'jms_oidc_rp.backends.OIDCAuthPasswordBackend'
@@ -154,7 +155,7 @@ AUTH_BACKEND_SAML2 = 'authentication.backends.saml2.SAML2Backend'
 
 
 AUTHENTICATION_BACKENDS = [
-    AUTH_BACKEND_MODEL, AUTH_BACKEND_PUBKEY, AUTH_BACKEND_WECOM,
+    AUTH_BACKEND_MODEL, RBAC_BACKEND, AUTH_BACKEND_PUBKEY, AUTH_BACKEND_WECOM,
     AUTH_BACKEND_DINGTALK, AUTH_BACKEND_FEISHU, AUTH_BACKEND_AUTH_TOKEN,
     AUTH_BACKEND_SSO,
 ]

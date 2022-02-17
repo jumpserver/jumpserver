@@ -9,7 +9,6 @@ from common.utils import reverse
 from common.utils import lazyproperty
 from orgs.mixins.api import OrgBulkModelViewSet
 from tickets.api import GenericTicketStatusRetrieveCloseAPI
-from ..hands import IsOrgAdmin, IsAppUser
 from ..models import CommandFilter, CommandFilterRule
 from .. import serializers
 
@@ -23,7 +22,6 @@ class CommandFilterViewSet(OrgBulkModelViewSet):
     model = CommandFilter
     filterset_fields = ("name",)
     search_fields = filterset_fields
-    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.CommandFilterSerializer
 
 
@@ -31,7 +29,6 @@ class CommandFilterRuleViewSet(OrgBulkModelViewSet):
     model = CommandFilterRule
     filterset_fields = ('content',)
     search_fields = filterset_fields
-    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.CommandFilterRuleSerializer
 
     def get_queryset(self):
@@ -43,8 +40,10 @@ class CommandFilterRuleViewSet(OrgBulkModelViewSet):
 
 
 class CommandConfirmAPI(CreateAPIView):
-    permission_classes = (IsAppUser,)
     serializer_class = serializers.CommandConfirmSerializer
+    rbac_perms = {
+        'create': 'tickets.add_ticket'
+    }
 
     def create(self, request, *args, **kwargs):
         ticket = self.create_command_confirm_ticket()

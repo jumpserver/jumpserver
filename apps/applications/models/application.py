@@ -219,6 +219,7 @@ class Application(CommonModelMixin, OrgModelMixin, ApplicationTreeNodeMixin):
         verbose_name = _('Application')
         unique_together = [('org_id', 'name')]
         ordering = ('name',)
+        verbose_name = _("Application")
 
     def __str__(self):
         category_display = self.get_category_display()
@@ -265,3 +266,4 @@ class Application(CommonModelMixin, OrgModelMixin, ApplicationTreeNodeMixin):
 class ApplicationUser(SystemUser):
     class Meta:
         proxy = True
+        verbose_name = _('Application user')

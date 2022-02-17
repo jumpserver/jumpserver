@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from common.drf.api import JMSGenericViewSet
-from common.permissions import IsObjectOwner, IsSuperUser, OnlySuperUserCanList
+from common.permissions import IsValidUser
 from notifications.notifications import system_msgs
 from notifications.models import SystemMsgSubscription, UserMsgSubscription
 from notifications.backends import BACKEND
@@ -25,7 +25,7 @@ class BackendListView(APIView):
                 'name': backend,
                 'name_display': backend.label
             }
-            for backend in BACKEND
+            for backend in BACKEND.choices
             if backend.is_enable
         ]
         return Response(data=data)
@@ -40,6 +40,9 @@ class SystemMsgSubscriptionViewSet(ListModelMixin,
         'list': SystemMsgSubscriptionByCategorySerializer,
         'update': SystemMsgSubscriptionSerializer,
         'partial_update': SystemMsgSubscriptionSerializer
+    }
+    rbac_perms = {
+
     }
 
     def list(self, request, *args, **kwargs):
@@ -80,9 +83,13 @@ class UserMsgSubscriptionViewSet(ListModelMixin,
                                  UpdateModelMixin,
                                  JMSGenericViewSet):
     lookup_field = 'user_id'
-    queryset = UserMsgSubscription.objects.all()
     serializer_class = UserMsgSubscriptionSerializer
-    permission_classes = (IsObjectOwner | IsSuperUser, OnlySuperUserCanList)
+    permission_classes = (IsValidUser,)
+
+    def get_queryset(self):
+        queryset = UserMsgSubscription.objects.filter(user=self.request.user)
+        return queryset
+
 
 
 def get_all_test_messages(request):

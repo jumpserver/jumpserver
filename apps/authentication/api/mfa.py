@@ -40,14 +40,6 @@ class MFASendCodeApi(AuthMixin, CreateAPIView):
     ip = ''
 
     def get_user_from_db(self, username):
-        try:
-            user = get_object_or_404(User, username=username)
-            return user
-        except Exception as e:
-            self.incr_mfa_failed_time(username, self.ip)
-            raise e
-
-    def get_user_from_db(self, username):
         """避免暴力测试用户名"""
         ip = self.get_request_ip()
         self.check_mfa_is_block(username, ip)

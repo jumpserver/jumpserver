@@ -13,7 +13,7 @@ from common.utils.timezone import utc_now
 from common.const.http import POST, GET
 from common.drf.api import JMSGenericViewSet
 from common.drf.serializers import EmptySerializer
-from common.permissions import IsSuperUser
+from common.permissions import OnlySuperUser
 from common.utils import reverse
 from users.models import User
 from ..serializers import SSOTokenSerializer
@@ -32,9 +32,8 @@ class SSOViewSet(AuthMixin, JMSGenericViewSet):
         'login_url': SSOTokenSerializer,
         'login': EmptySerializer
     }
-    permission_classes = (IsSuperUser,)
 
-    @action(methods=[POST], detail=False, permission_classes=[IsSuperUser], url_path='login-url')
+    @action(methods=[POST], detail=False, permission_classes=[OnlySuperUser], url_path='login-url')
     def login_url(self, request, *args, **kwargs):
         if not settings.AUTH_SSO:
             raise SSOAuthClosed()

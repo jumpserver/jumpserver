@@ -6,7 +6,6 @@ from django.shortcuts import get_object_or_404
 from rest_framework.generics import CreateAPIView
 
 from orgs.mixins.api import OrgBulkModelViewSet
-from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, NeedMFAVerify
 from common.drf.filters import BaseFilterSet
 from ..tasks.account_connectivity import test_accounts_connectivity_manual
 from ..models import AuthBook, Node
@@ -62,7 +61,6 @@ class AccountViewSet(OrgBulkModelViewSet):
         'default': serializers.AccountSerializer,
         'verify_account': serializers.AssetTaskSerializer
     }
-    permission_classes = (IsOrgAdmin,)
 
     def get_queryset(self):
         queryset = AuthBook.get_queryset()
@@ -82,16 +80,21 @@ class AccountSecretsViewSet(AccountViewSet):
     serializer_classes = {
         'default': serializers.AccountSecretSerializer
     }
-    permission_classes = (IsOrgAdmin, NeedMFAVerify)
     http_method_names = ['get']
+    rbac_perms = {
+        'list': 'assets.view_assetsecret',
+        'retrieve': 'assets.view_assetsecret',
+    }
 
 
 class AccountTaskCreateAPI(CreateAPIView):
-    permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.AccountTaskSerializer
     filterset_fields = AccountViewSet.filterset_fields
     search_fields = AccountViewSet.search_fields
     filterset_class = AccountViewSet.filterset_class
+
+    def check_permissions(self, request):
+        return request.user.has_perm('assets.test_assetconnectivity')
 
     def get_accounts(self):
         queryset = AuthBook.objects.all()
@@ -109,5 +112,4 @@ class AccountTaskCreateAPI(CreateAPIView):
     def get_exception_handler(self):
         def handler(e, context):
             return Response({"error": str(e)}, status=400)
-
         return handler

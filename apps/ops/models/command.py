@@ -155,3 +155,6 @@ class CommandExecution(OrgModelMixin):
         self.save()
         print('-' * 10 + ' ' + ugettext('Task end') + ' ' + '-' * 10)
         return self.result
+
+    class Meta:
+        verbose_name = _("Command execution")

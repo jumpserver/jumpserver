@@ -189,4 +189,8 @@ class Terminal(StorageMixin, TerminalStatusMixin, models.Model):
     class Meta:
         ordering = ('is_accepted',)
         db_table = "terminal"
+        verbose_name = _("Terminal")
+        permissions = (
+            ('view_terminalconfig', 'Can view terminal config'),
+        )
 

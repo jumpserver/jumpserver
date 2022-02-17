@@ -6,8 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from common.tree import TreeNodeSerializer
-from common.mixins.api import SuggestionMixin
-from ..hands import IsOrgAdminOrAppUser
+from common.mixins.views import SuggestionMixin
 from .. import serializers
 from ..models import Application
 
@@ -22,11 +21,13 @@ class ApplicationViewSet(SuggestionMixin, OrgBulkModelViewSet):
         'type': ['exact', 'in'],
     }
     search_fields = ('name', 'type', 'category')
-    permission_classes = (IsOrgAdminOrAppUser,)
     serializer_classes = {
         'default': serializers.AppSerializer,
         'get_tree': TreeNodeSerializer,
         'suggestion': serializers.MiniAppSerializer
+    }
+    rbac_perms = {
+        'get_tree': 'applications.view_application'
     }
 
     @action(methods=['GET'], detail=False, url_path='tree')

@@ -16,8 +16,7 @@ from perms.utils.application.permission import (
     get_application_system_user_ids,
     validate_permission,
 )
-from perms.api.asset.user_permission.mixin import RoleAdminMixin, RoleUserMixin
-from common.permissions import IsOrgAdminOrAppUser
+from .mixin import RoleAdminMixin, RoleUserMixin
 from perms.hands import User, SystemUser
 from perms import serializers
 
@@ -56,7 +55,9 @@ class MyGrantedApplicationSystemUsersApi(RoleUserMixin, GrantedApplicationSystem
 
 @method_decorator(tmp_to_root_org(), name='get')
 class ValidateUserApplicationPermissionApi(APIView):
-    permission_classes = (IsOrgAdminOrAppUser,)
+    rbac_perms = {
+        'GET': 'view_applicationpermission'
+    }
 
     def get(self, request, *args, **kwargs):
         user_id = request.query_params.get('user_id', '')

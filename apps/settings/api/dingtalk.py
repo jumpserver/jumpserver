@@ -5,14 +5,11 @@ from rest_framework import status
 from django.utils.translation import gettext_lazy as _
 
 from django.conf import settings
-from common.permissions import IsSuperUser
 from common.sdk.im.dingtalk import DingTalk
-
 from .. import serializers
 
 
 class DingTalkTestingAPI(GenericAPIView):
-    permission_classes = (IsSuperUser,)
     serializer_class = serializers.DingTalkSettingSerializer
 
     def post(self, request):
