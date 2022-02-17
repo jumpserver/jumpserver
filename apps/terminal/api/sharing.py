@@ -36,9 +36,6 @@ class SessionSharingViewSet(OrgModelViewSet):
 
 
 class SessionJoinRecordsViewSet(OrgModelViewSet):
-    """
-    Todo: 没有单独校验 api， 整合 Session Join Api
-    """
     serializer_class = serializers.SessionJoinRecordSerializer
     search_fields = (
         'sharing', 'session', 'joiner', 'date_joined', 'date_left',
