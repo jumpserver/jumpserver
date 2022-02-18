@@ -270,14 +270,14 @@ class RoleMixin:
     @lazyproperty
     def is_superuser(self):
         from rbac.builtin import BuiltinRole
-        return self.system_roles.filter(name=BuiltinRole.system_admin.name)
+        return self.system_roles.filter(id=BuiltinRole.system_admin.id).exists()
 
     @lazyproperty
     def is_org_admin(self):
         from rbac.builtin import BuiltinRole
         if self.is_superuser:
             return True
-        return self.org_roles.filter(name=BuiltinRole.org_admin.name)
+        return self.org_roles.filter(id=BuiltinRole.org_admin.id).exists()
 
     @property
     def is_staff(self):
@@ -292,7 +292,7 @@ class RoleMixin:
         app = cls.objects.create(
             username=name, name=name, email='{}@local.domain'.format(name),
             comment=comment, is_first_login=False,
-            created_by='System', is_sa=True,
+            created_by='System', is_service_account=True,
         )
         access_key = app.create_access_key()
         return app, access_key
@@ -324,7 +324,7 @@ class RoleMixin:
 
     @classmethod
     def get_nature_users(cls):
-        return cls.objects.filter(is_sa=False)
+        return cls.objects.filter(is_service_account=False)
 
     @classmethod
     def get_org_users(cls, org=None):
@@ -533,7 +533,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         default='User', max_length=10,
         blank=True, verbose_name=_('Role')
     )
-    is_sa = models.BooleanField(default=False, verbose_name=_("Is service account"))
+    is_service_account = models.BooleanField(default=False, verbose_name=_("Is service account"))
     avatar = models.ImageField(
         upload_to="avatar", null=True, verbose_name=_('Avatar')
     )

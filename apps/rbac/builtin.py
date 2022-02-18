@@ -31,7 +31,7 @@ if len(defines_errors) != 0:
     raise ValueError('Perms define error: {}'.format(defines_errors))
 
 
-class PreRole:
+class PredefineRole:
     id_prefix = '00000000-0000-0000-0000-00000000000'
 
     def __init__(self, index, name, scope, perms, perms_type='include'):
@@ -45,7 +45,7 @@ class PreRole:
         from rbac.models import Role
         return Role.objects.get(id=self.id)
 
-    def get_defaults(self):
+    def _get_defaults(self):
         from rbac.models import Permission
         q = Permission.get_define_permissions_q(self.perms)
         permissions = Permission.get_permissions(self.scope)
@@ -66,7 +66,7 @@ class PreRole:
 
     def get_or_create_role(self):
         from rbac.models import Role
-        defaults = self.get_defaults()
+        defaults = self._get_defaults()
         permissions = defaults.pop('permissions', [])
         role, created = Role.objects.get_or_create(defaults, id=self.id)
         role.permissions.set(permissions)
@@ -74,25 +74,25 @@ class PreRole:
 
 
 class BuiltinRole:
-    system_admin = PreRole(
+    system_admin = PredefineRole(
         '1', ugettext_noop('SystemAdmin'), Scope.system, []
     )
-    system_auditor = PreRole(
+    system_auditor = PredefineRole(
         '2', ugettext_noop('SystemAuditor'), Scope.system, auditor_perms
     )
-    system_component = PreRole(
+    system_component = PredefineRole(
         '4', ugettext_noop('SystemComponent'), Scope.system, app_exclude_perms, 'exclude'
     )
-    system_user = PreRole(
+    system_user = PredefineRole(
         '3', ugettext_noop('User'), Scope.system, []
     )
-    org_admin = PreRole(
+    org_admin = PredefineRole(
         '5', ugettext_noop('OrgAdmin'), Scope.org, []
     )
-    org_auditor = PreRole(
+    org_auditor = PredefineRole(
         '6', ugettext_noop('OrgAuditor'), Scope.org, auditor_perms
     )
-    org_user = PreRole(
+    org_user = PredefineRole(
         '7', ugettext_noop('OrgUser'), Scope.org, user_perms
     )
 
@@ -101,7 +101,7 @@ class BuiltinRole:
         roles = {
             k: v
             for k, v in cls.__dict__.items()
-            if isinstance(v, PreRole)
+            if isinstance(v, PredefineRole)
         }
         return roles
 
