@@ -2,8 +2,6 @@
 #
 
 from django.utils.translation import ugettext as _
-from rest_framework import status
-from rest_framework.views import Response
 from rest_framework_bulk import BulkModelViewSet
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.exceptions import PermissionDenied
