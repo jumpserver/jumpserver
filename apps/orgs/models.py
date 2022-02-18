@@ -13,7 +13,9 @@ class Organization(models.Model):
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
-    members = models.ManyToManyField('users.User', related_name='orgs', through='rbac.RoleBinding', through_fields=('org', 'user'))
+    members = models.ManyToManyField(
+        'users.User', related_name='orgs', through='rbac.RoleBinding', through_fields=('org', 'user')
+    )
 
     ROOT_ID = '00000000-0000-0000-0000-000000000000'
     ROOT_NAME = _('GLOBAL')
@@ -152,6 +154,16 @@ class Organization(models.Model):
         })
         return node
 
+    def delete_related_models(self):
+        from orgs.utils import tmp_to_root_org
+        from tickets.models import TicketFlow
+        with tmp_to_root_org():
+            TicketFlow.objects.filter(org_id=self.id).delete()
+
+    def delete(self, *args, **kwargs):
+        self.delete_related_models()
+        return super().delete(*args, **kwargs)
+
 
 # class OrgMemberManager(models.Manager):
 #     def remove_users(self, org, users):
@@ -179,12 +191,17 @@ class OrganizationMember(models.Model):
     """
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    org = models.ForeignKey(Organization, related_name='m2m_org_members', on_delete=models.CASCADE, verbose_name=_('Organization'))
-    user = models.ForeignKey('users.User', related_name='m2m_org_members', on_delete=models.CASCADE, verbose_name=_('User'))
+    org = models.ForeignKey(
+        Organization, related_name='m2m_org_members', on_delete=models.CASCADE, verbose_name=_('Organization')
+    )
+    user = models.ForeignKey(
+        'users.User', related_name='m2m_org_members', on_delete=models.CASCADE, verbose_name=_('User')
+    )
     role = models.CharField(max_length=16, default='User', verbose_name=_("Role"))
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
     created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
+
     # objects = OrgMemberManager()
 
     class Meta:
