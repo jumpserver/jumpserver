@@ -25,7 +25,9 @@ class Organization(models.Model):
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
-    members = models.ManyToManyField('users.User', related_name='orgs', through='orgs.OrganizationMember', through_fields=('org', 'user'))
+    members = models.ManyToManyField(
+        'users.User', related_name='orgs', through='orgs.OrganizationMember', through_fields=('org', 'user')
+    )
 
     ROOT_ID = '00000000-0000-0000-0000-000000000000'
     ROOT_NAME = _('GLOBAL')
@@ -142,7 +144,7 @@ class Organization(models.Model):
     @classmethod
     def get_user_orgs_by_role(cls, user, role):
         if not isinstance(role, (tuple, list)):
-            role = (role, )
+            role = (role,)
 
         return cls.objects.filter(
             m2m_org_members__role__in=role,
@@ -247,6 +249,16 @@ class Organization(models.Model):
             }
         })
         return node
+
+    def delete_related_models(self):
+        from orgs.utils import tmp_to_root_org
+        from tickets.models import TicketFlow
+        with tmp_to_root_org():
+            TicketFlow.objects.filter(org_id=self.id).delete()
+
+    def delete(self, *args, **kwargs):
+        self.delete_related_models()
+        return super().delete(*args, **kwargs)
 
 
 def _convert_to_uuid_set(users):
@@ -429,8 +441,12 @@ class OrganizationMember(models.Model):
     """
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    org = models.ForeignKey(Organization, related_name='m2m_org_members', on_delete=models.CASCADE, verbose_name=_('Organization'))
-    user = models.ForeignKey('users.User', related_name='m2m_org_members', on_delete=models.CASCADE, verbose_name=_('User'))
+    org = models.ForeignKey(
+        Organization, related_name='m2m_org_members', on_delete=models.CASCADE, verbose_name=_('Organization')
+    )
+    user = models.ForeignKey(
+        'users.User', related_name='m2m_org_members', on_delete=models.CASCADE, verbose_name=_('User')
+    )
     role = models.CharField(max_length=16, choices=ROLE.choices, default=ROLE.USER, verbose_name=_("Role"))
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
