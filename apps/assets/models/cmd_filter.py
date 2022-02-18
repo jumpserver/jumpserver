@@ -186,13 +186,15 @@ class CommandFilterRule(OrgModelMixin):
         return ticket
 
     @classmethod
-    def get_queryset(cls, user_id=None, user_group_id=None, system_user_id=None, asset_id=None, application_id=None):
+    def get_queryset(cls, user_id=None, user_group_id=None, system_user_id=None,
+                     asset_id=None, application_id=None, org_id=None):
         user_groups = []
         user = get_object_or_none(User, pk=user_id)
         if user:
             user_groups.extend(list(user.groups.all()))
         user_group = get_object_or_none(UserGroup, pk=user_group_id)
         if user_group:
+            org_id = user_group.org_id
             user_groups.append(user_group)
         system_user = get_object_or_none(SystemUser, pk=system_user_id)
         asset = get_object_or_none(Asset, pk=asset_id)
@@ -203,13 +205,18 @@ class CommandFilterRule(OrgModelMixin):
         if user_groups:
             q |= Q(user_groups__in=set(user_groups))
         if system_user:
+            org_id = system_user.org_id
             q |= Q(system_users=system_user)
         if asset:
+            org_id = asset.org_id
             q |= Q(assets=asset)
         if application:
+            org_id = application.org_id
             q |= Q(applications=application)
         if q:
             cmd_filters = CommandFilter.objects.filter(q).filter(is_active=True)
+            if org_id:
+                cmd_filters = cmd_filters.filter(org_id=org_id)
             rule_ids = cmd_filters.values_list('rules', flat=True)
             rules = cls.objects.filter(id__in=rule_ids)
         else:
