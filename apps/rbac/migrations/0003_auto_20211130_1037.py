@@ -5,7 +5,7 @@ from rbac.builtin import BuiltinRole
 
 
 def create_builtin_roles(apps, schema_editor):
-    BuiltinRole.sync_to_db()
+    BuiltinRole.sync_to_db(show_msg=True)
 
 
 class Migration(migrations.Migration):
