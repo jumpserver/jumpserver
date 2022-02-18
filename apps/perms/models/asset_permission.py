@@ -1,9 +1,8 @@
 import logging
 
 from django.utils.translation import ugettext_lazy as _
-from django.db.models import F
+from django.db.models import F, TextChoices
 
-from common.db.models import TextChoices
 from orgs.mixins.models import OrgModelMixin
 from common.db import models
 from common.utils import lazyproperty

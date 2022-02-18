@@ -21,7 +21,7 @@ from orgs.utils import current_org
 from orgs.models import Organization
 from common.utils import date_expired_default, get_logger, lazyproperty, random_string
 from common import fields
-from common.db.models import TextChoices
+from django.db.models import TextChoices
 from ..signals import post_user_change_password, post_user_leave_org, pre_user_leave_org
 
 __all__ = ['User', 'UserPasswordHistory']

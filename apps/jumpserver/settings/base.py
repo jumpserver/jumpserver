@@ -69,7 +69,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.forms',
-    'simple_history',
+    'simple_history',  # 这个要放到最后，别特么瞎改顺序
 ]
 
 MIDDLEWARE = [
