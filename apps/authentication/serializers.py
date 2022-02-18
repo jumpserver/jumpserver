@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 from common.utils import get_object_or_none
 from users.models import User
-from assets.models import Asset, SystemUser, Gateway
+from assets.models import Asset, SystemUser, Gateway, Domain
 from applications.models import Application
 from users.serializers import UserProfileSerializer
 from assets.serializers import ProtocolsField
@@ -169,7 +169,7 @@ class ConnectionTokenAssetSerializer(serializers.ModelSerializer):
 class ConnectionTokenSystemUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = SystemUser
-        fields = ['id', 'name', 'username', 'password', 'private_key', 'ad_domain']
+        fields = ['id', 'name', 'username', 'password', 'private_key', 'ad_domain', 'org_id']
 
 
 class ConnectionTokenGatewaySerializer(serializers.ModelSerializer):
@@ -185,9 +185,19 @@ class ConnectionTokenRemoteAppSerializer(serializers.Serializer):
 
 
 class ConnectionTokenApplicationSerializer(serializers.ModelSerializer):
+    attrs = serializers.JSONField(read_only=True)
+
     class Meta:
         model = Application
-        fields = ['id', 'name', 'category', 'type']
+        fields = ['id', 'name', 'category', 'type', 'attrs', 'org_id']
+
+
+class ConnectionTokenDomainSerializer(serializers.ModelSerializer):
+    gateways = ConnectionTokenGatewaySerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Domain
+        fields = ['id', 'name', 'gateways']
 
 
 class ConnectionTokenSecretSerializer(serializers.Serializer):
@@ -199,6 +209,7 @@ class ConnectionTokenSecretSerializer(serializers.Serializer):
     remote_app = ConnectionTokenRemoteAppSerializer(read_only=True)
     application = ConnectionTokenApplicationSerializer(read_only=True)
     system_user = ConnectionTokenSystemUserSerializer(read_only=True)
+    domain = ConnectionTokenDomainSerializer(read_only=True)
     gateway = ConnectionTokenGatewaySerializer(read_only=True)
     actions = ActionsField()
     expired_at = serializers.IntegerField()

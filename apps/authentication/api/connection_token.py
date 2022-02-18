@@ -261,6 +261,7 @@ class SecretDetailMixin:
             'asset': asset,
             'application': application,
             'gateway': gateway,
+            'domain': domain,
             'remote_app': remote_app,
         }
 
@@ -273,6 +274,7 @@ class SecretDetailMixin:
         return {
             'asset': asset,
             'application': None,
+            'domain': asset.domain,
             'gateway': gateway,
             'remote_app': None,
         }
