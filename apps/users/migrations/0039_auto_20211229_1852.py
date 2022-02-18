@@ -6,7 +6,7 @@ from django.db import migrations, models
 def migrate_app_users(apps, schema_editor):
     user_model = apps.get_model('users', 'User')
     app_users = user_model.objects.filter(role='App')
-    app_users.update(is_app=True)
+    app_users.update(is_sa=True)
 
 
 class Migration(migrations.Migration):
@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='user',
-            name='is_app',
+            name='is_sa',
             field=models.BooleanField(default=False),
         ),
         migrations.RunPython(migrate_app_users),

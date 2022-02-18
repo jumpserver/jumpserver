@@ -274,6 +274,15 @@ class RoleMixin:
         yes = BuiltinRole.system_admin.name in names
         return yes
 
+    @lazyproperty
+    def is_org_admin(self):
+        from rbac.builtin import BuiltinRole
+        if self.is_superuser:
+            return True
+        names = [r.name for r in self.org_roles.all()]
+        yes = BuiltinRole.org_admin.name in names
+        return yes
+
     @property
     def is_staff(self):
         return self.is_authenticated and self.is_valid
@@ -287,7 +296,7 @@ class RoleMixin:
         app = cls.objects.create(
             username=name, name=name, email='{}@local.domain'.format(name),
             is_active=False, comment=comment, is_first_login=False,
-            created_by='System', is_app=True,
+            created_by='System', is_sa=True,
         )
         access_key = app.create_access_key()
         return app, access_key
@@ -319,7 +328,7 @@ class RoleMixin:
 
     @classmethod
     def get_nature_users(cls):
-        return cls.objects.filter(is_app=False)
+        return cls.objects.filter(is_sa=False)
 
     @classmethod
     def get_org_users(cls, org=None):
@@ -528,7 +537,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         default='User', max_length=10,
         blank=True, verbose_name=_('Role')
     )
-    is_app = models.BooleanField(default=False)
+    is_sa = models.BooleanField(default=False)
     avatar = models.ImageField(
         upload_to="avatar", null=True, verbose_name=_('Avatar')
     )

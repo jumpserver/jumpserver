@@ -101,7 +101,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
         fields_small = fields_mini + fields_write_only + [
             'email', 'wechat', 'phone', 'mfa_level', 'source', 'source_display',
             'can_public_key_auth', 'need_update_password',
-            'mfa_enabled', 'is_app', 'is_valid', 'is_expired', 'is_active',  # 布尔字段
+            'mfa_enabled', 'is_sa', 'is_valid', 'is_expired', 'is_active',  # 布尔字段
             'date_expired', 'date_joined', 'last_login',  # 日期字段
             'created_by', 'comment',  # 通用字段
             'is_wecom_bound', 'is_dingtalk_bound', 'is_feishu_bound', 'is_otp_secret_key_bound',
@@ -132,7 +132,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
             'public_key': {'write_only': True},
             'is_first_login': {'label': _('Is first login'), 'read_only': True},
             'is_valid': {'label': _('Is valid')},
-            'is_app':  {'label': _('Is app user')},
+            'is_sa':  {'label': _('Is app user')},
             'is_expired': {'label': _('Is expired')},
             'avatar_url': {'label': _('Avatar url')},
             'created_by': {'read_only': True, 'allow_blank': True},
