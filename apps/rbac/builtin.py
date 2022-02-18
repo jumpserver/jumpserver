@@ -64,11 +64,11 @@ class PredefineRole:
         }
         return defaults
 
-    def get_or_create_role(self):
+    def update_or_create_role(self):
         from rbac.models import Role
         defaults = self._get_defaults()
         permissions = defaults.pop('permissions', [])
-        role, created = Role.objects.get_or_create(defaults, id=self.id)
+        role, created = Role.objects.update_or_create(defaults, id=self.id)
         role.permissions.set(permissions)
         return role, created
 
@@ -125,10 +125,10 @@ class BuiltinRole:
         return mapper[name].get_role()
 
     @classmethod
-    def sync_to_db(cls):
+    def sync_to_db(cls, show_msg=False):
         roles = cls.get_roles()
 
         for pre_role in roles.values():
-            role, created = pre_role.get_or_create_role()
-            print("Create builtin Role: {} - {}".format(role.name, created))
-
+            role, created = pre_role.update_or_create_role()
+            if show_msg:
+                print("Update builtin Role: {} - {}".format(role.name, created))
