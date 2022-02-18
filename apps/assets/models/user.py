@@ -5,13 +5,11 @@
 import logging
 
 from django.db import models
-from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.cache import cache
 
 from common.utils import signer, get_object_or_none
-from common.db.models import TextChoices
 from .base import BaseUser
 from .asset import Asset
 from .authbook import AuthBook
@@ -24,7 +22,7 @@ logger = logging.getLogger(__name__)
 class ProtocolMixin:
     protocol: str
 
-    class Protocol(TextChoices):
+    class Protocol(models.TextChoices):
         ssh = 'ssh', 'SSH'
         rdp = 'rdp', 'RDP'
         telnet = 'telnet', 'Telnet'
@@ -217,7 +215,7 @@ class SystemUser(ProtocolMixin, AuthMixin, BaseUser):
         (LOGIN_MANUAL, _('Manually input'))
     )
 
-    class Type(TextChoices):
+    class Type(models.TextChoices):
         common = 'common', _('Common user')
         admin = 'admin', _('Admin user')
 
