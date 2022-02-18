@@ -80,8 +80,8 @@ class BuiltinRole:
     system_auditor = PreRole(
         '2', ugettext_noop('SystemAuditor'), Scope.system, auditor_perms
     )
-    system_app = PreRole(
-        '4', ugettext_noop('SystemApp'), Scope.system, app_exclude_perms, 'exclude'
+    system_component = PreRole(
+        '4', ugettext_noop('SystemComponent'), Scope.system, app_exclude_perms, 'exclude'
     )
     system_user = PreRole(
         '3', ugettext_noop('User'), Scope.system, []
@@ -108,7 +108,7 @@ class BuiltinRole:
     @classmethod
     def get_system_role_by_old_name(cls, name):
         mapper = {
-            'App': cls.system_app,
+            'App': cls.system_component,
             'Admin': cls.system_admin,
             'User': cls.system_user,
             'Auditor': cls.system_auditor

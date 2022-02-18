@@ -157,15 +157,6 @@ class Terminal(StorageMixin, TerminalStatusMixin, models.Model):
     def service_account(self):
         return self.user
 
-    def create_app_user(self):
-        random = uuid.uuid4().hex[:6]
-        user, access_key = User.create_app_user(
-            name="{}-{}".format(self.name, random), comment=self.comment
-        )
-        self.user = user
-        self.save()
-        return user, access_key
-
     def delete(self, using=None, keep_parents=False):
         if self.user:
             self.user.delete()

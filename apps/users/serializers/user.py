@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-from copy import deepcopy
 from functools import partial
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
@@ -12,6 +11,7 @@ from rbac.models import OrgRoleBinding, SystemRoleBinding
 from ..models import User
 from ..const import PasswordStrategy
 from rbac.models import Role
+from rbac.builtin import BuiltinRole
 
 __all__ = [
     'UserSerializer', 'MiniUserSerializer',
@@ -280,13 +280,6 @@ class ServiceAccountSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(_('name not unique'), code='unique')
         return name
 
-    def save(self, **kwargs):
-        self.validated_data['email'] = self.get_email()
-        self.validated_data['username'] = self.get_username()
-        self.validated_data['is_app'] = True
-        return super().save(**kwargs)
-
     def create(self, validated_data):
-        instance = super().create(validated_data)
-        instance.create_access_key()
-        return instance
+        user, ak = User.create_service_account(validated_data['name'], validated_data['comment'])
+        return user

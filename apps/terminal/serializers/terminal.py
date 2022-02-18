@@ -127,13 +127,14 @@ class TerminalRegistrationSerializer(serializers.ModelSerializer):
         valid = self.service_account.is_valid(raise_exception=True)
         return valid
 
-    def save(self, **kwargs):
-        instance = super().save(**kwargs)
+    def create(self, validated_data):
+        instance = super().create(validated_data)
         request = self.context.get('request')
         instance.is_accepted = True
         if request:
             instance.remote_addr = get_request_ip(request)
-        sa = self.service_account.save()
+        sa = self.service_account.create(validated_data)
+        sa.set_component_role()
         instance.user = sa
         instance.command_storage = CommandStorage.default().name
         instance.replay_storage = ReplayStorage.default().name
