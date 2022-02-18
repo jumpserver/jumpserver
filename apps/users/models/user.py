@@ -295,7 +295,7 @@ class RoleMixin:
     def create_service_account(cls, name, comment):
         app = cls.objects.create(
             username=name, name=name, email='{}@local.domain'.format(name),
-            is_active=False, comment=comment, is_first_login=False,
+            comment=comment, is_first_login=False,
             created_by='System', is_sa=True,
         )
         access_key = app.create_access_key()
