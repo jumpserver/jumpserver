@@ -1,6 +1,11 @@
 import os
 import platform
 
+if platform.system() == 'Darwin' and platform.machine() == 'arm64':
+    import pymysql
+    pymysql.version_info = (1, 4, 2, "final", 0)
+    pymysql.install_as_MySQLdb()
+
 from django.urls import reverse_lazy
 
 from .. import const
@@ -157,11 +162,7 @@ DATABASES = {
         'OPTIONS': DB_OPTIONS
     }
 }
-if platform.system() == 'Darwin' and platform.machine() == 'arm64':
-    import pymysql
 
-    pymysql.version_info = (1, 4, 2, "final", 0)
-    pymysql.install_as_MySQLdb()
 
 DB_CA_PATH = os.path.join(PROJECT_DIR, 'data', 'certs', 'db_ca.pem')
 if CONFIG.DB_ENGINE.lower() == 'mysql':
