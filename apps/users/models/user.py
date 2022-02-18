@@ -537,7 +537,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         default='User', max_length=10,
         blank=True, verbose_name=_('Role')
     )
-    is_sa = models.BooleanField(default=False)
+    is_sa = models.BooleanField(default=False, verbose_name=_("Is service account"))
     avatar = models.ImageField(
         upload_to="avatar", null=True, verbose_name=_('Avatar')
     )

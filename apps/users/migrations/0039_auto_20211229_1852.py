@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='user',
             name='is_sa',
-            field=models.BooleanField(default=False),
+            field=models.BooleanField(default=False, verbose_name='Is service account'),
         ),
         migrations.RunPython(migrate_app_users),
         migrations.AlterModelOptions(

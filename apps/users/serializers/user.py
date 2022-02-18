@@ -132,7 +132,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
             'public_key': {'write_only': True},
             'is_first_login': {'label': _('Is first login'), 'read_only': True},
             'is_valid': {'label': _('Is valid')},
-            'is_sa':  {'label': _('Is app user')},
+            'is_sa':  {'label': _('Is service account')},
             'is_expired': {'label': _('Is expired')},
             'avatar_url': {'label': _('Avatar url')},
             'created_by': {'read_only': True, 'allow_blank': True},
