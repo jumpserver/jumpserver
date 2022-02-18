@@ -59,7 +59,7 @@ class TempPasswordApi(APIView):
 
     def post(self, request):
         user = request.user
-        temp_password, _ = self.get_temp_password(user.id)
+        temp_password, created_time = self.get_temp_password(user.id)
         cache.delete(temp_password)
 
         key = '%s_%s' % (TEMP_PASSWORD, user.id)
