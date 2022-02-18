@@ -270,18 +270,14 @@ class RoleMixin:
     @lazyproperty
     def is_superuser(self):
         from rbac.builtin import BuiltinRole
-        names = [r.name for r in self.system_roles.all()]
-        yes = BuiltinRole.system_admin.name in names
-        return yes
+        return self.system_roles.filter(name=BuiltinRole.system_admin.name)
 
     @lazyproperty
     def is_org_admin(self):
         from rbac.builtin import BuiltinRole
         if self.is_superuser:
             return True
-        names = [r.name for r in self.org_roles.all()]
-        yes = BuiltinRole.org_admin.name in names
-        return yes
+        return self.org_roles.filter(name=BuiltinRole.org_admin.name)
 
     @property
     def is_staff(self):
