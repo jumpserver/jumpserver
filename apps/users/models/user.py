@@ -283,17 +283,19 @@ class RoleMixin:
         pass
 
     @classmethod
-    def create_app_user(cls, name, comment):
-        from rbac.models import Role
+    def create_service_account(cls, name, comment):
         app = cls.objects.create(
             username=name, name=name, email='{}@local.domain'.format(name),
-            is_active=False, comment=comment, is_first_login=False, created_by='System',
-            is_app=True,
+            is_active=False, comment=comment, is_first_login=False,
+            created_by='System', is_app=True,
         )
         access_key = app.create_access_key()
-        role = Role.BuiltinRole.system_app.get_role()
-        app.system_roles.add(role)
         return app, access_key
+
+    def set_component_role(self):
+        from rbac.models import Role
+        role = Role.BuiltinRole.system_component.get_role()
+        self.system_roles.add(role)
 
     def remove(self):
         if current_org.is_root():

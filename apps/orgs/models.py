@@ -104,6 +104,18 @@ class Organization(models.Model):
     def get_members(self):
         return self.members.all().distinct()
 
+    def add_member(self, user, role=None):
+        from rbac.builtin import BuiltinRole
+        from .utils import tmp_to_org
+        role_id = BuiltinRole.org_user.id
+        if role:
+            role_id = role.id
+        with tmp_to_org(self):
+            self.members.through.objects.create(
+                user=user, role_id=role_id,
+                org_id=self.id, scope='org'
+            )
+
     def get_total_resources_amount(self):
         from django.apps import apps
         from orgs.mixins.models import OrgModelMixin

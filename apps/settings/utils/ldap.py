@@ -376,8 +376,10 @@ class LDAPImportUtil(object):
             except Exception as e:
                 errors.append({user['username']: str(e)})
                 logger.error(e)
-        if org and not org.is_root():
-            org.members.add(*objs)
+        if org and org.is_root():
+            return
+        for obj in objs:
+            org.add_member.add(obj)
         logger.info('End perform import ldap users')
         return errors
 

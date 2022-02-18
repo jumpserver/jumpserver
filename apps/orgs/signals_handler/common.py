@@ -150,7 +150,8 @@ def on_user_created_set_default_org(sender, instance, created, **kwargs):
         return
     if instance.orgs.count() > 0:
         return
-    Organization.default().members.add(instance)
+    with tmp_to_org(Organization.default()):
+        Organization.default().add_member(instance)
 
 
 @receiver(post_user_leave_org)

@@ -85,9 +85,11 @@ def create_system_messages(app_config: AppConfig, **kwargs):
 
 @receiver(post_save, sender=User)
 def on_user_post_save(sender, instance, created, **kwargs):
-    if created:
-        receive_backends = []
-        for backend in BACKEND:
-            if backend.get_account(instance):
-                receive_backends.append(backend)
-        UserMsgSubscription.objects.create(user=instance, receive_backends=receive_backends)
+    if not created:
+        return
+    receive_backends = []
+    # Todo: IDE 识别不了 get_account
+    for backend in BACKEND:
+        if backend.get_account(instance):
+            receive_backends.append(backend)
+    UserMsgSubscription.objects.create(user=instance, receive_backends=receive_backends)
