@@ -56,7 +56,7 @@ class MyGrantedApplicationSystemUsersApi(RoleUserMixin, GrantedApplicationSystem
 @method_decorator(tmp_to_root_org(), name='get')
 class ValidateUserApplicationPermissionApi(APIView):
     rbac_perms = {
-        'GET': 'view_applicationpermission'
+        'GET': 'ops.view_applicationpermission'
     }
 
     def get(self, request, *args, **kwargs):
