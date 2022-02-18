@@ -325,11 +325,11 @@ class UserConnectionTokenViewSet(
     }
     CACHE_KEY_PREFIX = 'CONNECTION_TOKEN_{}'
     rbac_perms = {
-        'GET': 'view_connectiontoken',
-        'create': 'add_connectiontoken',
-        'get_secret_detail': 'view_connectiontokensecret',
-        'get_rdp_file': 'add_connectiontoken',
-        'get_client_protocol_url': 'add_connectiontoken',
+        'GET': 'authentication.view_connectiontoken',
+        'create': 'authentication.add_connectiontoken',
+        'get_secret_detail': 'authentication.view_connectiontokensecret',
+        'get_rdp_file': 'authentication.add_connectiontoken',
+        'get_client_protocol_url': 'authentication.add_connectiontoken',
     }
 
     @staticmethod
