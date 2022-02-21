@@ -101,7 +101,7 @@ class LDAPUserListApi(generics.ListAPIView):
 
     def get_queryset(self):
         if hasattr(self, 'swagger_fake_view'):
-            return []
+            return User.objects.none()
         cache_police = self.request.query_params.get('cache_police', True)
         if cache_police in LDAP_USE_CACHE_FLAGS:
             users = self.get_queryset_from_cache()

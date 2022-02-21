@@ -37,6 +37,7 @@ class GatewayViewSet(OrgBulkModelViewSet):
 
 
 class GatewayTestConnectionApi(SingleObjectMixin, APIView):
+    queryset = Gateway.objects.all()
     object = None
     rbac_perms = {
         'POST': 'assets.change_gateway'
