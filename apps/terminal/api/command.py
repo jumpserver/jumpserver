@@ -166,6 +166,9 @@ class CommandViewSet(JMSBulkModelViewSet):
 
     def get_queryset(self):
         command_storage_id = self.request.query_params.get('command_storage_id')
+        if not command_storage_id:
+            return Command.objects.none()
+
         storage = CommandStorage.objects.get(id=command_storage_id)
         if not storage.is_valid():
             raise StorageInvalid

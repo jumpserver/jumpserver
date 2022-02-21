@@ -40,7 +40,9 @@ class UserGroupGrantedAssetsApi(ListAPIView):
     }
 
     def get_queryset(self):
-        user_group_id = self.kwargs.get('pk', '')
+        user_group_id = self.kwargs.get('pk')
+        if not user_group_id:
+            return Asset.objects.none()
 
         asset_perm_ids = list(AssetPermission.objects.valid().filter(
             user_groups__id=user_group_id
@@ -127,7 +129,10 @@ class UserGroupGrantedNodesApi(ListAPIView):
     }
 
     def get_queryset(self):
-        user_group_id = self.kwargs.get('pk', '')
+        user_group_id = self.kwargs.get('pk')
+        if not user_group_id:
+            return Node.objects.none()
+
         nodes = Node.objects.filter(
             Q(granted_by_permissions__user_groups__id=user_group_id) |
             Q(assets__granted_by_permissions__user_groups__id=user_group_id)
