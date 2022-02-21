@@ -19,6 +19,8 @@ __all__ = (
 
 
 class BackendListView(APIView):
+    permission_classes = IsValidUser
+
     def get(self, request):
         data = [
             {
@@ -91,7 +93,6 @@ class UserMsgSubscriptionViewSet(ListModelMixin,
         return queryset
 
 
-
 def get_all_test_messages(request):
     import textwrap
     from ..notifications import Message
@@ -128,5 +129,3 @@ def get_all_test_messages(request):
         <hr />
         """).format(msg_cls.__name__, msg_text)
     return HttpResponse(html_data + text_data)
-
-
