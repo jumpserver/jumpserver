@@ -356,6 +356,7 @@ class Config(dict):
         'SYSLOG_ADDR': '',  # '192.168.0.1:514'
         'SYSLOG_FACILITY': 'user',
         'SYSLOG_SOCKTYPE': 2,
+        'SYSLOG_TCP_SEPARATOR_CHAR': '\n',
         'PERM_EXPIRED_CHECK_PERIODIC': 60 * 60,
         'FLOWER_URL': "127.0.0.1:5555",
         'LANGUAGE_CODE': 'zh',
