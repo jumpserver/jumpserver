@@ -13,7 +13,7 @@ from django.core.cache import cache
 from assets.models import Asset
 from users.models import User
 from orgs.mixins.models import OrgModelMixin
-from common.db.models import TextChoices
+from django.db.models import TextChoices
 from ..backends import get_multi_command_storage
 
 

@@ -1,10 +1,10 @@
 #  coding: utf-8
 #
-from django.db.models import TextChoices
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 
-class AppCategory(TextChoices):
+class AppCategory(models.TextChoices):
     db = 'db', _('Database')
     remote_app = 'remote_app', _('Remote app')
     cloud = 'cloud', 'Cloud'
@@ -14,7 +14,7 @@ class AppCategory(TextChoices):
         return dict(cls.choices).get(category, '')
 
 
-class AppType(TextChoices):
+class AppType(models.TextChoices):
     # db category
     mysql = 'mysql', 'MySQL'
     redis = 'redis', 'Redis'

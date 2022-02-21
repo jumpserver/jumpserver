@@ -54,6 +54,6 @@ class ApplicationAccountSecretViewSet(ApplicationAccountViewSet):
     permission_classes = [RBACPermission, NeedMFAVerify]
     http_method_names = ['get', 'options']
     rbac_perms = {
-        'retrieve': 'view_applicationaccountsecret',
-        'list': 'view_applicationaccountsecret',
+        'retrieve': 'applications.view_applicationaccountsecret',
+        'list': 'applications.view_applicationaccountsecret',
     }

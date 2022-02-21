@@ -49,10 +49,10 @@ class Role(JMSModel):
         return '%s(%s)' % (self.name, self.get_scope_display())
 
     def is_system_admin(self):
-        return self.id == self.BuiltinRole.system_admin.id and self.builtin
+        return str(self.id) == self.BuiltinRole.system_admin.id and self.builtin
 
     def is_org_admin(self):
-        return self.id == self.BuiltinRole.org_admin.id and self.builtin
+        return str(self.id) == self.BuiltinRole.org_admin.id and self.builtin
 
     def is_admin(self):
         yes = self.is_system_admin() or self.is_org_admin()

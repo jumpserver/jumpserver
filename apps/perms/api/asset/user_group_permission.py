@@ -123,7 +123,7 @@ class UserGroupGrantedNodeAssetsApi(ListAPIView):
 class UserGroupGrantedNodesApi(ListAPIView):
     serializer_class = serializers.NodeGrantedSerializer
     rbac_perms = {
-        'list': 'view_userassets'
+        'list': 'perms.view_userassets'
     }
 
     def get_queryset(self):
@@ -137,7 +137,7 @@ class UserGroupGrantedNodesApi(ListAPIView):
 
 class UserGroupGrantedNodeChildrenAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
     rbac_perms = {
-        'list': 'view_userassets'
+        'list': 'perms.view_userassets'
     }
 
     def get_children_nodes(self, parent_key):

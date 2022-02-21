@@ -1,7 +1,5 @@
-import uuid
 from typing import Callable
 
-from django.db import models
 from django.db.models import F, Count, Q
 from django.apps import apps
 from django.utils.translation import ugettext_lazy as _, ugettext

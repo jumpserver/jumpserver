@@ -1,4 +1,10 @@
 import os
+import platform
+
+if platform.system() == 'Darwin' and platform.machine() == 'arm64':
+    import pymysql
+    pymysql.version_info = (1, 4, 2, "final", 0)
+    pymysql.install_as_MySQLdb()
 
 from django.urls import reverse_lazy
 
@@ -68,9 +74,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.forms',
-    'simple_history',
+    'simple_history',  # 这个要放到最后，别特么瞎改顺序
 ]
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -91,7 +96,6 @@ MIDDLEWARE = [
     'authentication.middleware.MFAMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
 ]
-
 
 ROOT_URLCONF = 'jumpserver.urls'
 
@@ -158,12 +162,13 @@ DATABASES = {
         'OPTIONS': DB_OPTIONS
     }
 }
+
+
 DB_CA_PATH = os.path.join(PROJECT_DIR, 'data', 'certs', 'db_ca.pem')
 if CONFIG.DB_ENGINE.lower() == 'mysql':
     DB_OPTIONS['init_command'] = "SET sql_mode='STRICT_TRANS_TABLES'"
     if os.path.isfile(DB_CA_PATH):
         DB_OPTIONS['ssl'] = {'ca': DB_CA_PATH}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
@@ -233,7 +238,6 @@ EMAIL_FROM = CONFIG.EMAIL_FROM
 EMAIL_RECIPIENT = CONFIG.EMAIL_RECIPIENT
 EMAIL_USE_SSL = CONFIG.EMAIL_USE_SSL
 EMAIL_USE_TLS = CONFIG.EMAIL_USE_TLS
-
 
 # Custom User Auth model
 AUTH_USER_MODEL = 'users.User'
