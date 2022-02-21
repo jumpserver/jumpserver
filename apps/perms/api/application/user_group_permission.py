@@ -26,7 +26,10 @@ class UserGroupGrantedApplicationsApi(CommonApiMixin, ListAPIView):
     }
 
     def get_queryset(self):
-        user_group_id = self.kwargs.get('pk', '')
+        user_group_id = self.kwargs.get('pk')
+        if not user_group_id:
+            return Application.objects.none()
+
         queryset = Application.objects\
             .filter(Q(granted_by_permissions__user_groups__id=user_group_id))\
             .distinct().only(*self.only_fields)
