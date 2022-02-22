@@ -167,7 +167,7 @@ class AuthMixin:
 
 class RoleManager(models.Manager):
     scope = None
-    __cache = None
+    _cache = None
 
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -187,14 +187,17 @@ class RoleManager(models.Manager):
             queryset = queryset.filter(scope=self.scope)
         return queryset
 
-    def get_queryset(self):
-        if self.__cache is not None:
-            return self.__cache
+    def _get_queryset(self):
         from rbac.models import RoleBinding
         queryset = RoleBinding.get_user_roles(self.user)
         if self.scope:
             queryset = queryset.filter(scope=self.scope)
         return queryset
+
+    def get_queryset(self):
+        if self._cache is not None:
+            return self._cache
+        return self._get_queryset()
 
     def clear(self):
         if not self.scope:
@@ -227,7 +230,9 @@ class RoleManager(models.Manager):
         self.add(*roles)
 
     def cache_set(self, roles):
-        self.__cache = roles
+        query = self._get_queryset()
+        query._result_cache = roles
+        self._cache = query
 
 
 class OrgRoleManager(RoleManager):
@@ -270,9 +275,10 @@ class RoleMixin:
     @lazyproperty
     def is_superuser(self):
         """
-        由于这里用了 cache ，所以不能改成 self.system_roles.filter().exists()
+        由于这里用了 cache ，所以不能改成 self.system_roles.filter().exists() 会查询的
         """
         from rbac.builtin import BuiltinRole
+        # return self.system_roles.all().filter(id=BuiltinRole.system_admin.id).exists()
         ids = [str(r.id) for r in self.system_roles.all()]
         yes = BuiltinRole.system_admin.id in ids
         return yes
