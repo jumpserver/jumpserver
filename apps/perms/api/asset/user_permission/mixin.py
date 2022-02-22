@@ -40,3 +40,7 @@ class RoleUserMixin(PermBaseMixin, _RoleUserMixin):
     def get(self, request, *args, **kwargs):
         with tmp_to_root_org():
             return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        with tmp_to_root_org():
+            return super().get_queryset()
