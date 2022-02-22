@@ -11,7 +11,7 @@ from orgs.utils import tmp_to_root_org
 
 
 class TicketSessionRelationViewSet(CreateModelMixin, JMSGenericViewSet):
-    queryset = TicketSession
+    queryset = TicketSession.objects.all()
     serializer_class = TicketSessionRelationSerializer
 
 

@@ -168,6 +168,7 @@ class Setting(models.Model):
         # 刷新 settings
         for key, value in openid_config.items():
             setattr(settings, key, value)
+            self.__class__.update_or_create(key, value, encrypted=False, category=self.category)
 
     @classmethod
     def refresh_AUTH_RADIUS(cls):

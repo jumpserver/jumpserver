@@ -61,6 +61,7 @@ class OrgRoleViewSet(RoleViewSet):
 
 # Sub view set
 class RolePermissionsViewSet(PermissionViewSet):
+    filterset_fields = []
     rbac_perms = (
         ('get_tree', 'role.view_role'),
     )
@@ -69,6 +70,9 @@ class RolePermissionsViewSet(PermissionViewSet):
 
     def get_queryset(self):
         role_id = self.kwargs.get('role_pk')
+        if not role_id:
+            return Role.objects.none()
+
         role = Role.objects.get(id=role_id)
         self.scope = role.scope
         self.check_disabled = role.builtin
