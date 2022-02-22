@@ -5,7 +5,7 @@ import json
 import os
 from collections import defaultdict
 
-from ansible import constants as C
+import ansible.constants as C
 from ansible.plugins.callback import CallbackBase
 from ansible.plugins.callback.default import CallbackModule
 from ansible.plugins.callback.minimal import CallbackModule as CMDCallBackModule
