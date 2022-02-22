@@ -1,0 +1,23 @@
+- hosts: testhost
+  vars:
+    ansible_user: root
+    ansible_ssh_password: Fit2Cloud20202
+    user1: web
+    user1password: Fit2Cloud@12344
+
+  tasks:
+    - name: 监测特权用户密码
+      ping:
+
+    - name: 更改用户密码
+      user:
+        name: "{{ user1 }}"
+        password: "{{ user1password|password_hash('sha512', 'K3mIlKK') }}"
+        update_password: always
+
+    - name: 校验密码是否更改成功
+      vars:
+        - ansible_user: '{{ user1 }}'
+          ansible_ssh_password: '{{ user1password }}'
+      ping:
+
