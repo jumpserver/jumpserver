@@ -11,17 +11,17 @@ from typing import Callable
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.hashers import check_password
-from django.core.cache import cache
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from django.core.cache import cache
 from django.shortcuts import reverse
+from django.utils.translation import ugettext_lazy as _
 
 from orgs.utils import current_org
 from orgs.models import Organization
+from rbac.models import Role
 from common.utils import date_expired_default, get_logger, lazyproperty, random_string
 from common import fields
-from django.db.models import TextChoices
 from ..signals import post_user_change_password, post_user_leave_org, pre_user_leave_org
 
 __all__ = ['User', 'UserPasswordHistory']
@@ -189,7 +189,7 @@ class RoleManager(models.Manager):
 
     def get_queryset(self):
         if self.__cache is not None:
-            return self.__cache
+            return Role.objects.filter(id__in=self.__cache)
         from rbac.models import RoleBinding
         queryset = RoleBinding.get_user_roles(self.user)
         if self.scope:
@@ -497,7 +497,7 @@ class MFAMixin:
 
 
 class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
-    class Source(TextChoices):
+    class Source(models.TextChoices):
         local = 'local', _('Local')
         ldap = 'ldap', 'LDAP/AD'
         openid = 'openid', 'OpenID'

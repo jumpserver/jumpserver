@@ -10,19 +10,17 @@ from rest_framework_bulk import BulkModelViewSet
 from common.mixins import CommonApiMixin
 from common.utils import get_logger
 from orgs.utils import current_org
-from rbac.models import Role, RoleBinding
+from rbac.models import RoleBinding
 from users.utils import LoginBlockUtil, MFABlockUtils
 from .mixins import UserQuerysetMixin
 from ..notifications import ResetMFAMsg
-from .. import serializers
-from ..serializers import (
-    UserSerializer,
-    MiniUserSerializer, InviteSerializer
-)
 from ..models import User
 from ..signals import post_user_create
 from ..filters import UserFilter
-
+from ..serializers import (
+    UserSerializer, ResetOTPSerializer, ChangeUserPasswordSerializer,
+    MiniUserSerializer, InviteSerializer
+)
 
 logger = get_logger(__name__)
 __all__ = [
@@ -40,7 +38,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         'invite': InviteSerializer,
     }
     ordering_fields = ('name',)
-    ordering = ('name', )
+    ordering = ('name',)
     rbac_perms = {
         'suggestion': 'users.match_user',
         'invite': 'users.invite_user',
@@ -60,7 +58,6 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         role_bindings = RoleBinding.objects.filter(user__in=user_ids) \
             .values('user_id', 'role_id', 'scope')
 
-        role_mapper = {r.id: r for r in Role.objects.all()}
         user_org_role_mapper = defaultdict(set)
         user_system_role_mapper = defaultdict(set)
 
@@ -68,9 +65,9 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
             role_id = binding['role_id']
             user_id = binding['user_id']
             if binding['scope'] == RoleBinding.Scope.system:
-                user_system_role_mapper[user_id].add(role_mapper[role_id])
+                user_system_role_mapper[user_id].add(role_id)
             else:
-                user_org_role_mapper[user_id].add(role_mapper[role_id])
+                user_org_role_mapper[user_id].add(role_id)
 
         for u in queryset_list:
             system_roles = user_system_role_mapper[u.id]
@@ -152,7 +149,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
 
 
 class UserChangePasswordApi(UserQuerysetMixin, generics.UpdateAPIView):
-    serializer_class = serializers.ChangeUserPasswordSerializer
+    serializer_class = ChangeUserPasswordSerializer
 
     def perform_update(self, serializer):
         user = self.get_object()
@@ -161,7 +158,7 @@ class UserChangePasswordApi(UserQuerysetMixin, generics.UpdateAPIView):
 
 
 class UserUnblockPKApi(UserQuerysetMixin, generics.UpdateAPIView):
-    serializer_class = serializers.UserSerializer
+    serializer_class = UserSerializer
 
     def perform_update(self, serializer):
         user = self.get_object()
@@ -171,7 +168,7 @@ class UserUnblockPKApi(UserQuerysetMixin, generics.UpdateAPIView):
 
 
 class UserResetMFAApi(UserQuerysetMixin, generics.RetrieveAPIView):
-    serializer_class = serializers.ResetOTPSerializer
+    serializer_class = ResetOTPSerializer
 
     def retrieve(self, request, *args, **kwargs):
         user = self.get_object() if kwargs.get('pk') else request.user
