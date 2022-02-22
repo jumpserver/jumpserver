@@ -45,6 +45,10 @@ class SystemUserViewSet(SuggestionMixin, OrgBulkModelViewSet):
     }
     ordering_fields = ('name', 'protocol', 'login_mode')
     ordering = ('name', )
+    rbac_perms = {
+        'su_from': 'assets.view_systemuser',
+        'su_to': 'assets.view_systemuser'
+    }
 
     @action(methods=['get'], detail=False, url_path='su-from')
     def su_from(self, request, *args, **kwargs):
