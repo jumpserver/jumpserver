@@ -244,7 +244,7 @@ class MiniUserSerializer(serializers.ModelSerializer):
 class InviteSerializer(RolesSerializerMixin, serializers.Serializer):
     users = serializers.PrimaryKeyRelatedField(
         queryset=User.get_nature_users(), many=True, label=_('Select users'),
-        help_text=_('为了安全，仅会返回 3 个用户，请输入名称精准匹配')
+        help_text=_('For security, only list several users')
     )
     system_roles = None
     system_roles_display = None
