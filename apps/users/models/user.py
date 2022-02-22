@@ -269,15 +269,22 @@ class RoleMixin:
 
     @lazyproperty
     def is_superuser(self):
+        """
+        由于这里用了 cache ，所以不能改成 self.system_roles.filter().exists()
+        """
         from rbac.builtin import BuiltinRole
-        return self.system_roles.filter(id=BuiltinRole.system_admin.id).exists()
+        ids = [str(r.id) for r in self.system_roles.all()]
+        yes = BuiltinRole.system_admin.id in ids
+        return yes
 
     @lazyproperty
     def is_org_admin(self):
         from rbac.builtin import BuiltinRole
         if self.is_superuser:
             return True
-        return self.org_roles.filter(id=BuiltinRole.org_admin.id).exists()
+        ids = [str(r.id) for r in self.org_roles.all()]
+        yes = BuiltinRole.org_admin.id in ids
+        return yes
 
     @property
     def is_staff(self):
