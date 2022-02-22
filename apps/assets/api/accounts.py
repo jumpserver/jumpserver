@@ -61,6 +61,9 @@ class AccountViewSet(OrgBulkModelViewSet):
         'default': serializers.AccountSerializer,
         'verify_account': serializers.AssetTaskSerializer
     }
+    rbac_perms = {
+        'verify_account': 'assets.add_authbook'
+    }
 
     def get_queryset(self):
         queryset = AuthBook.get_queryset()
