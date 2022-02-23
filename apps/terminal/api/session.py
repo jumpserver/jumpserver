@@ -164,8 +164,8 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
     download_cache_key = "SESSION_REPLAY_DOWNLOAD_{}"
     session = None
     rbac_perms = {
-        'create': 'terminal.upload_session',
-        'retrieve': 'terminal.download_session',
+        'create': 'terminal.upload_sessionreplay',
+        'retrieve': 'terminal.download_sessionreplay',
     }
 
     def create(self, request, *args, **kwargs):
