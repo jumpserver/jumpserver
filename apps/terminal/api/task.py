@@ -12,7 +12,6 @@ from .. import serializers
 from terminal.utils import is_session_approver
 from orgs.utils import tmp_to_root_org
 
-
 __all__ = ['TaskViewSet', 'KillSessionAPI', 'KillSessionForTicketAPI']
 logger = logging.getLogger(__file__)
 
@@ -45,6 +44,11 @@ class KillSessionAPI(APIView):
         'POST': 'terminal.terminate_session'
     }
 
+    def post(self, request, *args, **kwargs):
+        session_ids = request.data
+        validated_session = kill_sessions(session_ids, request.user)
+        return Response({"ok": validated_session})
+
 
 class KillSessionForTicketAPI(APIView):
     permission_classes = (IsAuthenticated, )
@@ -61,4 +65,3 @@ class KillSessionForTicketAPI(APIView):
             validated_session = kill_sessions(session_ids, request.user)
 
         return Response({"ok": validated_session})
-
