@@ -23,7 +23,6 @@ from ..models import User
 from ..signals import post_user_create
 from ..filters import UserFilter
 
-
 logger = get_logger(__name__)
 __all__ = [
     'UserViewSet', 'UserChangePasswordApi',
@@ -40,7 +39,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         'invite': InviteSerializer,
     }
     ordering_fields = ('name',)
-    ordering = ('name', )
+    ordering = ('name',)
     rbac_perms = {
         'suggestion': 'users.match_user',
         'invite': 'users.invite_user',
@@ -51,6 +50,19 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset().prefetch_related('groups')
         return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            page = self.set_users_roles_for_cache(page)
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        queryset = self.set_users_roles_for_cache(queryset)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     @staticmethod
     def set_users_roles_for_cache(queryset):
@@ -78,11 +90,6 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
             u.roles.cache_set(system_roles | org_roles)
             u.org_roles.cache_set(org_roles)
             u.system_roles.cache_set(system_roles)
-        return queryset_list
-
-    def filter_queryset(self, queryset):
-        queryset = super().filter_queryset(queryset)
-        queryset_list = self.set_users_roles_for_cache(queryset)
         return queryset_list
 
     def perform_create(self, serializer):
