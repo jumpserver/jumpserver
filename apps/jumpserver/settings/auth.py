@@ -74,6 +74,13 @@ AUTH_OPENID_ALWAYS_UPDATE_USER = CONFIG.AUTH_OPENID_ALWAYS_UPDATE_USER
 AUTH_OPENID_AUTH_LOGIN_URL_NAME = 'authentication:openid:login'
 AUTH_OPENID_AUTH_LOGIN_CALLBACK_URL_NAME = 'authentication:openid:login-callback'
 AUTH_OPENID_AUTH_LOGOUT_URL_NAME = 'authentication:openid:logout'
+# Other default
+AUTH_OPENID_STATE_LENGTH = 32
+AUTH_OPENID_NONCE_LENGTH = 32
+AUTH_OPENID_AUTHENTICATION_REDIRECT_URI = '/'
+AUTH_OPENID_AUTHENTICATION_FAILURE_REDIRECT_URI = '/'
+AUTH_OPENID_PROVIDER_END_SESSION_REDIRECT_URI_PARAMETER = 'post_logout_redirect_uri'
+AUTH_OPENID_PROVIDER_END_SESSION_ID_TOKEN_PARAMETER = 'id_token_hint'
 # ==============================================================================
 
 # Radius Auth
@@ -142,8 +149,8 @@ AUTH_BACKEND_MODEL = 'authentication.backends.api.JMSModelBackend'
 RBAC_BACKEND = 'rbac.backends.RBACBackend'
 AUTH_BACKEND_PUBKEY = 'authentication.backends.pubkey.PublicKeyAuthBackend'
 AUTH_BACKEND_LDAP = 'authentication.backends.ldap.LDAPAuthorizationBackend'
-AUTH_BACKEND_OIDC_PASSWORD = 'jms_oidc_rp.backends.OIDCAuthPasswordBackend'
-AUTH_BACKEND_OIDC_CODE = 'jms_oidc_rp.backends.OIDCAuthCodeBackend'
+AUTH_BACKEND_OIDC_PASSWORD = 'authentication.backends.oidc.backends.OIDCAuthPasswordBackend'
+AUTH_BACKEND_OIDC_CODE = 'authentication.backends.oidc.backends.OIDCAuthCodeBackend'
 AUTH_BACKEND_RADIUS = 'authentication.backends.radius.RadiusBackend'
 AUTH_BACKEND_CAS = 'authentication.backends.cas.CASBackend'
 AUTH_BACKEND_SSO = 'authentication.backends.api.SSOAuthentication'
