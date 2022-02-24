@@ -7,6 +7,7 @@ auditor_perms = (
     ('common', 'permission', 'view', 'resourcestatistics'),
     ('audits', '*', '*', '*'),
     ('rbac', 'menupermission', 'view', 'auditview'),
+    ('terminal', 'commandstorage', 'view', 'commandstorage'),
     ('terminal', 'session', '*', '*'),
     ('terminal', 'command', '*', '*'),
 )
