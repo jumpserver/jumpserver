@@ -8,7 +8,7 @@ from django.core.exceptions import PermissionDenied
 from django_cas_ng.signals import cas_user_authenticated
 from django.db.models.signals import post_save
 
-from jms_oidc_rp.signals import openid_create_or_update_user
+from authentication.backends.oidc.signals import openid_create_or_update_user
 
 from authentication.backends.saml2.signals import saml2_create_or_update_user
 from common.utils import get_logger

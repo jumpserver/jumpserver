@@ -6,7 +6,7 @@ from django.core.cache import cache
 from django.dispatch import receiver
 from django_cas_ng.signals import cas_user_authenticated
 
-from jms_oidc_rp.signals import openid_user_login_failed, openid_user_login_success
+from authentication.backends.oidc.signals import openid_user_login_failed, openid_user_login_success
 
 from authentication.backends.saml2.signals import (
     saml2_user_authenticated, saml2_user_authentication_failed
