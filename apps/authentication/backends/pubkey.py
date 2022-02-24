@@ -1,13 +1,20 @@
 # -*- coding: utf-8 -*-
 #
 from django.contrib.auth import get_user_model
+from django.conf import settings
+
+from .base import JMSBaseAuthBackend
 
 UserModel = get_user_model()
 
 __all__ = ['PublicKeyAuthBackend']
 
 
-class PublicKeyAuthBackend:
+class PublicKeyAuthBackend(JMSBaseAuthBackend):
+    @classmethod
+    def is_enabled(cls):
+        return settings.TERMINAL_PUBLIC_KEY_AUTH
+
     def authenticate(self, request, username=None, public_key=None, **kwargs):
         if not public_key:
             return None
@@ -22,8 +29,7 @@ class PublicKeyAuthBackend:
                   self.user_can_authenticate(user):
                 return user
 
-    @staticmethod
-    def user_can_authenticate(user):
+    def user_can_authenticate(self, user):
         """
         Reject users with is_active=False. Custom user models that don't have
         that attribute are allowed.

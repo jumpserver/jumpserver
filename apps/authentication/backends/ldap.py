@@ -1,25 +1,27 @@
 # coding:utf-8
 #
 
-import warnings
 import ldap
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-from django_auth_ldap.backend import _LDAPUser, LDAPBackend, LDAPSettings
+from django_auth_ldap.backend import _LDAPUser, LDAPBackend
 from django_auth_ldap.config import _LDAPConfig, LDAPSearch, LDAPSearchUnion
 
 from users.utils import construct_user_email
 from common.const import LDAP_AD_ACCOUNT_DISABLE
+from .base import JMSBaseAuthBackend
 
 logger = _LDAPConfig.get_logger()
 
 
-class LDAPAuthorizationBackend(LDAPBackend):
+class LDAPAuthorizationBackend(JMSBaseAuthBackend, LDAPBackend):
     """
     Override this class to override _LDAPUser to LDAPUser
     """
-    @staticmethod
-    def user_can_authenticate(user):
+    def is_enabled(self):
+        return settings.AUTH_LDAP
+
+    def user_can_authenticate(self, user):
         """
         Reject users with is_active=False. Custom user models that don't have
         that attribute are allowed.
@@ -29,15 +31,15 @@ class LDAPAuthorizationBackend(LDAPBackend):
 
     def get_or_build_user(self, username, ldap_user):
         """
-                This must return a (User, built) 2-tuple for the given LDAP user.
+        This must return a (User, built) 2-tuple for the given LDAP user.
 
-                username is the Django-friendly username of the user. ldap_user.dn is
-                the user's DN and ldap_user.attrs contains all of their LDAP
-                attributes.
+        username is the Django-friendly username of the user. ldap_user.dn is
+        the user's DN and ldap_user.attrs contains all of their LDAP
+        attributes.
 
-                The returned User object may be an unsaved model instance.
+        The returned User object may be an unsaved model instance.
 
-                """
+        """
         model = self.get_user_model()
 
         if self.settings.USER_QUERY_FIELD:

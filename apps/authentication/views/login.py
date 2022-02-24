@@ -184,7 +184,7 @@ class UserLoginView(mixins.AuthMixin, FormView):
     @staticmethod
     def get_forgot_password_url():
         forgot_password_url = reverse('authentication:forgot-password')
-        has_other_auth_backend = settings.AUTHENTICATION_BACKENDS[0] != settings.AUTH_BACKEND_MODEL
+        has_other_auth_backend = settings.AUTHENTICATION_BACKENDS[1] != settings.AUTH_BACKEND_MODEL
         if has_other_auth_backend and settings.FORGOT_PASSWORD_URL:
             forgot_password_url = settings.FORGOT_PASSWORD_URL
         return forgot_password_url

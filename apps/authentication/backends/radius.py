@@ -6,6 +6,8 @@ from django.contrib.auth import get_user_model
 from radiusauth.backends import RADIUSBackend, RADIUSRealmBackend
 from django.conf import settings
 
+from .base import JMSBaseAuthBackend
+
 
 User = get_user_model()
 
@@ -39,11 +41,11 @@ class CreateUserMixin:
             return None
 
 
-class RadiusBackend(CreateUserMixin, RADIUSBackend):
+class RadiusBackend(CreateUserMixin, JMSBaseAuthBackend, RADIUSBackend):
     def authenticate(self, request, username='', password='', **kwargs):
         return super().authenticate(request, username=username, password=password)
 
 
-class RadiusRealmBackend(CreateUserMixin, RADIUSRealmBackend):
+class RadiusRealmBackend(CreateUserMixin, JMSBaseAuthBackend, RADIUSRealmBackend):
     def authenticate(self, request, username='', password='', realm=None, **kwargs):
         return super().authenticate(request, username=username, password=password, realm=realm)

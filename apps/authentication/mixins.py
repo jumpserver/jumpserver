@@ -13,7 +13,7 @@ from django.utils.translation import ugettext as _
 from rest_framework.request import Request
 from django.contrib.auth import (
     BACKEND_SESSION_KEY, _get_backends,
-    PermissionDenied, user_login_failed, _clean_credentials
+    PermissionDenied, user_login_failed, _clean_credentials,
 )
 from django.shortcuts import reverse, redirect, get_object_or_404
 
@@ -29,7 +29,7 @@ from .const import RSA_PRIVATE_KEY, RSA_PUBLIC_KEY
 logger = get_logger(__name__)
 
 
-def check_backend_can_auth(username, backend_path, allowed_auth_backends):
+def check_backend_can_auth(username, backend, backend_path, allowed_auth_backends):
     if allowed_auth_backends is not None and backend_path not in allowed_auth_backends:
         logger.debug('Skip user auth backend: {}, {} not in'.format(
             username, backend_path, ','.join(allowed_auth_backends)
@@ -41,13 +41,14 @@ def check_backend_can_auth(username, backend_path, allowed_auth_backends):
 def authenticate(request=None, **credentials):
     """
     If the given credentials are valid, return a User object.
+    之所以 hack 这个 auticate
     """
     username = credentials.get('username')
     allowed_auth_backends = User.get_user_allowed_auth_backends(username)
 
     for backend, backend_path in _get_backends(return_tuples=True):
         # 预先检查，不浪费认证时间
-        if not check_backend_can_auth(username, backend_path, allowed_auth_backends):
+        if not check_backend_can_auth(username, backend, backend_path, allowed_auth_backends):
             continue
 
         backend_signature = inspect.signature(backend.authenticate)
