@@ -233,7 +233,7 @@ class MiniUserSerializer(serializers.ModelSerializer):
 class InviteSerializer(RolesSerializerMixin, serializers.Serializer):
     users = serializers.PrimaryKeyRelatedField(
         queryset=User.get_nature_users(), many=True, label=_('Select users'),
-        help_text=_('For security, only list several user')
+        help_text=_('For security, only list several users')
     )
     system_roles = None
     system_roles_display = None
