@@ -24,7 +24,6 @@ router.register(r'session-sharings', api.SessionSharingViewSet, 'session-sharing
 router.register(r'session-join-records', api.SessionJoinRecordsViewSet, 'session-sharing-record')
 
 urlpatterns = [
-    path('my-login-assets/', api.MySessionAssetAPIView.as_view(), name='my-login-asset'),
     path('my-sessions/', api.MySessionAPIView.as_view(), name='my-session'),
     path('terminal-registrations/', api.TerminalRegistrationApi.as_view(), name='terminal-registration'),
     path('registration/', api.TerminalRegistrationApi.as_view(), name='registration'),

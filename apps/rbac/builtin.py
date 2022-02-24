@@ -4,6 +4,7 @@ from .const import Scope, system_exclude_permissions, org_exclude_permissions
 
 
 auditor_perms = (
+    ('common', 'permission', 'view', 'resourcestatistics'),
     ('audits', '*', '*', '*'),
     ('rbac', 'menupermission', 'view', 'auditview'),
     ('terminal', 'session', '*', '*'),

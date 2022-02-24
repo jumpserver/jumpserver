@@ -341,7 +341,7 @@ class RoleMixin:
 
     @classmethod
     def get_org_users(cls, org=None):
-        queryset = cls.objects.all()
+        queryset = cls.get_nature_users()
         if org is None:
             org = current_org
         if not org.is_root():
