@@ -11,7 +11,6 @@ from rbac.models import OrgRoleBinding, SystemRoleBinding
 from ..models import User
 from ..const import PasswordStrategy
 from rbac.models import Role
-from rbac.builtin import BuiltinRole
 
 __all__ = [
     'UserSerializer', 'MiniUserSerializer',
@@ -180,16 +179,6 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
         attrs = self.clean_auth_fields(attrs)
         attrs.pop('password_strategy', None)
         return attrs
-    # Todo: 不知道怎么优化呢
-    # def get_can_update(self, obj):
-    #     return CanUpdateDeleteUser.has_update_object_permission(
-    #         self.context['request'], self.context['view'], obj
-    #     )
-    #
-    # def get_can_delete(self, obj):
-    #     return CanUpdateDeleteUser.has_delete_object_permission(
-    #         self.context['request'], self.context['view'], obj
-    #     )
 
     def save_and_set_custom_m2m_fields(self, validated_data, save_handler):
         m2m_values = {

@@ -29,8 +29,8 @@ __all__ = ['CommandViewSet', 'CommandExportApi', 'InsecureCommandAlertAPI']
 class CommandQueryMixin:
     command_store = get_command_storage()
     filterset_fields = [
-        "asset", "system_user", "user", "session", "risk_level",
-        "input"
+        "asset", "system_user", "user", "session",
+        "risk_level", "input"
     ]
     default_days_ago = 5
 

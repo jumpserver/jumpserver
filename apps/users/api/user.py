@@ -9,6 +9,7 @@ from rest_framework_bulk import BulkModelViewSet
 
 from common.mixins import CommonApiMixin
 from common.utils import get_logger
+from common.mixins.api import SuggestionMixin
 from orgs.utils import current_org
 from rbac.models import Role, RoleBinding
 from users.utils import LoginBlockUtil, MFABlockUtils
@@ -30,7 +31,7 @@ __all__ = [
 ]
 
 
-class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
+class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelViewSet):
     filterset_class = UserFilter
     search_fields = ('username', 'email', 'name', 'id', 'source', 'role')
     serializer_classes = {
@@ -41,7 +42,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
     ordering_fields = ('name',)
     ordering = ('name',)
     rbac_perms = {
-        'suggestion': 'users.match_user',
+        'match': 'users.match_user',
         'invite': 'users.invite_user',
         'remove': 'users.remove_user',
         'bulk_remove': 'users.remove_user',
@@ -51,18 +52,14 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         queryset = super().get_queryset().prefetch_related('groups')
         return queryset
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+    def paginate_queryset(self, queryset):
+        page = super().paginate_queryset(queryset)
 
-        page = self.paginate_queryset(queryset)
-        if page is not None:
+        if page:
             page = self.set_users_roles_for_cache(page)
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        queryset = self.set_users_roles_for_cache(queryset)
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        else:
+            self.set_users_roles_for_cache(queryset)
+        return page
 
     @staticmethod
     def set_users_roles_for_cache(queryset):
@@ -87,7 +84,6 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         for u in queryset_list:
             system_roles = user_system_role_mapper[u.id]
             org_roles = user_org_role_mapper[u.id]
-            u.roles.cache_set(system_roles | org_roles)
             u.org_roles.cache_set(org_roles)
             u.system_roles.cache_set(system_roles)
         return queryset_list
@@ -111,13 +107,6 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
         for obj in objects:
             self.check_object_permissions(self.request, obj)
             self.perform_destroy(obj)
-
-    @action(methods=['get'], detail=False)
-    def suggestion(self, *args, **kwargs):
-        queryset = User.get_nature_users()
-        queryset = self.filter_queryset(queryset)[:6]
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
 
     @action(methods=['post'], detail=False)
     def invite(self, request):
