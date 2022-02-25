@@ -41,11 +41,17 @@ class CreateUserMixin:
             return None
 
 
-class RadiusBackend(CreateUserMixin, JMSBaseAuthBackend, RADIUSBackend):
+class RadiusBaseBackend(CreateUserMixin, JMSBaseAuthBackend):
+    @staticmethod
+    def is_enabled():
+        return settings.AUTH_RADIUS
+
+
+class RadiusBackend(RadiusBaseBackend, RADIUSBackend):
     def authenticate(self, request, username='', password='', **kwargs):
         return super().authenticate(request, username=username, password=password)
 
 
-class RadiusRealmBackend(CreateUserMixin, JMSBaseAuthBackend, RADIUSRealmBackend):
+class RadiusRealmBackend(RadiusBaseBackend, RADIUSRealmBackend):
     def authenticate(self, request, username='', password='', realm=None, **kwargs):
         return super().authenticate(request, username=username, password=password, realm=realm)

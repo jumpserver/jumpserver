@@ -18,16 +18,9 @@ logger = get_logger(__file__)
 
 
 class SAML2Backend(JMSBaseAuthBackend):
-    @classmethod
-    def is_enabled(cls):
+    @staticmethod
+    def is_enabled():
         return settings.AUTH_SAML2
-
-    def user_can_authenticate(self, user):
-        is_valid = getattr(user, 'is_valid', None)
-        return is_valid or is_valid is None
-
-    def has_perm(self, user_obj, perm, obj=None):
-        return False
 
     @transaction.atomic
     def get_or_create_from_saml_data(self, request, **saml_user_data):

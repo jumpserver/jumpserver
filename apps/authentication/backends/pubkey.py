@@ -11,8 +11,8 @@ __all__ = ['PublicKeyAuthBackend']
 
 
 class PublicKeyAuthBackend(JMSBaseAuthBackend):
-    @classmethod
-    def is_enabled(cls):
+    @staticmethod
+    def is_enabled():
         return settings.TERMINAL_PUBLIC_KEY_AUTH
 
     def authenticate(self, request, username=None, public_key=None, **kwargs):
@@ -28,14 +28,6 @@ class PublicKeyAuthBackend(JMSBaseAuthBackend):
             if user.check_public_key(public_key) and \
                   self.user_can_authenticate(user):
                 return user
-
-    def user_can_authenticate(self, user):
-        """
-        Reject users with is_active=False. Custom user models that don't have
-        that attribute are allowed.
-        """
-        is_active = getattr(user, 'is_active', None)
-        return is_active or is_active is None
 
     def get_user(self, user_id):
         try:
