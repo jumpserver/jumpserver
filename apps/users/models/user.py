@@ -520,14 +520,27 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
 
     SOURCE_BACKEND_MAPPING = {
         Source.local: [
-            settings.AUTH_BACKEND_MODEL, settings.AUTH_BACKEND_PUBKEY,
-            settings.AUTH_BACKEND_WECOM, settings.AUTH_BACKEND_DINGTALK,
+            settings.AUTH_BACKEND_MODEL,
+            settings.AUTH_BACKEND_PUBKEY,
+            settings.AUTH_BACKEND_WECOM,
+            settings.AUTH_BACKEND_DINGTALK,
         ],
-        Source.ldap: [settings.AUTH_BACKEND_LDAP],
-        Source.openid: [settings.AUTH_BACKEND_OIDC_PASSWORD, settings.AUTH_BACKEND_OIDC_CODE],
-        Source.radius: [settings.AUTH_BACKEND_RADIUS],
-        Source.cas: [settings.AUTH_BACKEND_CAS],
-        Source.saml2: [settings.AUTH_BACKEND_SAML2],
+        Source.ldap: [
+            settings.AUTH_BACKEND_LDAP
+        ],
+        Source.openid: [
+            settings.AUTH_BACKEND_OIDC_PASSWORD,
+            settings.AUTH_BACKEND_OIDC_CODE
+        ],
+        Source.radius: [
+            settings.AUTH_BACKEND_RADIUS
+        ],
+        Source.cas: [
+            settings.AUTH_BACKEND_CAS
+        ],
+        Source.saml2: [
+            settings.AUTH_BACKEND_SAML2
+        ],
     }
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
@@ -728,7 +741,6 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     @classmethod
     def get_user_allowed_auth_backends(cls, username):
         if not settings.ONLY_ALLOW_AUTH_FROM_SOURCE or not username:
-            # return settings.AUTHENTICATION_BACKENDS
             return None
         user = cls.objects.filter(username=username).first()
         if not user:

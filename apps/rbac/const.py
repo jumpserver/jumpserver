@@ -16,7 +16,6 @@ exclude_permissions = (
     ('contenttypes', '*', '*', '*'),
     ('django_cas_ng', '*', '*', '*'),
     ('django_celery_beat', '*', '*', '*'),
-    ('jms_oidc_rp', '*', '*', '*'),
     ('admin', '*', '*', '*'),
     ('sessions', '*', '*', '*'),
     ('notifications', '*', '*', '*'),

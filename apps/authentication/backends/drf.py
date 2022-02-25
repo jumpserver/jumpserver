@@ -8,13 +8,14 @@ from django.core.cache import cache
 from django.utils.translation import ugettext as _
 from six import text_type
 from django.contrib.auth import get_user_model
-from django.contrib.auth.backends import ModelBackend
+
 from rest_framework import HTTP_HEADER_ENCODING
 from rest_framework import authentication, exceptions
 from common.auth import signature
 
 from common.utils import get_object_or_none, make_signature, http_to_unixtime
 from ..models import AccessKey, PrivateToken
+from .base import JMSBaseAuthBackend, JMSModelBackend
 
 
 UserModel = get_user_model()
@@ -26,21 +27,6 @@ def get_request_date_header(request):
         # Work around django test client oddness
         date = date.encode(HTTP_HEADER_ENCODING)
     return date
-
-
-class JMSModelBackend(ModelBackend):
-    def has_perm(self, user_obj, perm, obj=None):
-        return False
-
-    def user_can_authenticate(self, user):
-        return True
-
-    def get_user(self, user_id):
-        try:
-            user = UserModel._default_manager.get(pk=user_id)
-        except UserModel.DoesNotExist:
-            return None
-        return user if user.is_valid else None
 
 
 class AccessKeyAuthentication(authentication.BaseAuthentication):
@@ -167,7 +153,7 @@ class AccessTokenAuthentication(authentication.BaseAuthentication):
         return self.keyword
 
 
-class PrivateTokenAuthentication(authentication.TokenAuthentication):
+class PrivateTokenAuthentication(JMSBaseAuthBackend, authentication.TokenAuthentication):
     model = PrivateToken
 
 
@@ -215,46 +201,3 @@ class SignatureAuthentication(signature.SignatureAuthentication):
         except AccessKey.DoesNotExist:
             return None, None
 
-
-class SSOAuthentication(JMSModelBackend):
-    """
-    什么也不做呀😺
-    """
-
-    def authenticate(self, request, sso_token=None, **kwargs):
-        pass
-
-
-class WeComAuthentication(JMSModelBackend):
-    """
-    什么也不做呀😺
-    """
-
-    def authenticate(self, request, **kwargs):
-        pass
-
-
-class DingTalkAuthentication(JMSModelBackend):
-    """
-    什么也不做呀😺
-    """
-
-    def authenticate(self, request, **kwargs):
-        pass
-
-
-class FeiShuAuthentication(JMSModelBackend):
-    """
-    什么也不做呀😺
-    """
-
-    def authenticate(self, request, **kwargs):
-        pass
-
-
-class AuthorizationTokenAuthentication(JMSModelBackend):
-    """
-    什么也不做呀😺
-    """
-    def authenticate(self, request, **kwargs):
-        pass

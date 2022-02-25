@@ -107,7 +107,7 @@ class Setting(models.Model):
             # 添加
             if setting.cleaned_value and not has:
                 logger.debug('Add auth backend: {}'.format(name))
-                settings.AUTHENTICATION_BACKENDS.insert(0, backend)
+                settings.AUTHENTICATION_BACKENDS.insert(1, backend)
 
             # 去掉
             if not setting.cleaned_value and has:

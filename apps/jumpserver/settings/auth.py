@@ -74,6 +74,13 @@ AUTH_OPENID_ALWAYS_UPDATE_USER = CONFIG.AUTH_OPENID_ALWAYS_UPDATE_USER
 AUTH_OPENID_AUTH_LOGIN_URL_NAME = 'authentication:openid:login'
 AUTH_OPENID_AUTH_LOGIN_CALLBACK_URL_NAME = 'authentication:openid:login-callback'
 AUTH_OPENID_AUTH_LOGOUT_URL_NAME = 'authentication:openid:logout'
+# Other default
+AUTH_OPENID_STATE_LENGTH = 32
+AUTH_OPENID_NONCE_LENGTH = 32
+AUTH_OPENID_AUTHENTICATION_REDIRECT_URI = '/'
+AUTH_OPENID_AUTHENTICATION_FAILURE_REDIRECT_URI = '/'
+AUTH_OPENID_PROVIDER_END_SESSION_REDIRECT_URI_PARAMETER = 'post_logout_redirect_uri'
+AUTH_OPENID_PROVIDER_END_SESSION_ID_TOKEN_PARAMETER = 'id_token_hint'
 # ==============================================================================
 
 # Radius Auth
@@ -138,38 +145,34 @@ TOKEN_EXPIRATION = CONFIG.TOKEN_EXPIRATION
 OTP_IN_RADIUS = CONFIG.OTP_IN_RADIUS
 
 
-AUTH_BACKEND_MODEL = 'authentication.backends.api.JMSModelBackend'
+AUTH_BACKEND_MODEL = 'authentication.backends.base.JMSModelBackend'
 RBAC_BACKEND = 'rbac.backends.RBACBackend'
 AUTH_BACKEND_PUBKEY = 'authentication.backends.pubkey.PublicKeyAuthBackend'
 AUTH_BACKEND_LDAP = 'authentication.backends.ldap.LDAPAuthorizationBackend'
-AUTH_BACKEND_OIDC_PASSWORD = 'jms_oidc_rp.backends.OIDCAuthPasswordBackend'
-AUTH_BACKEND_OIDC_CODE = 'jms_oidc_rp.backends.OIDCAuthCodeBackend'
+AUTH_BACKEND_OIDC_PASSWORD = 'authentication.backends.oidc.backends.OIDCAuthPasswordBackend'
+AUTH_BACKEND_OIDC_CODE = 'authentication.backends.oidc.backends.OIDCAuthCodeBackend'
 AUTH_BACKEND_RADIUS = 'authentication.backends.radius.RadiusBackend'
-AUTH_BACKEND_CAS = 'authentication.backends.cas.CASBackend'
-AUTH_BACKEND_SSO = 'authentication.backends.api.SSOAuthentication'
-AUTH_BACKEND_WECOM = 'authentication.backends.api.WeComAuthentication'
-AUTH_BACKEND_DINGTALK = 'authentication.backends.api.DingTalkAuthentication'
-AUTH_BACKEND_FEISHU = 'authentication.backends.api.FeiShuAuthentication'
-AUTH_BACKEND_AUTH_TOKEN = 'authentication.backends.api.AuthorizationTokenAuthentication'
-AUTH_BACKEND_SAML2 = 'authentication.backends.saml2.SAML2Backend'
+AUTH_BACKEND_CAS = 'authentication.backends.cas.backends.CASBackend'
+AUTH_BACKEND_SSO = 'authentication.backends.sso.SSOAuthentication'
+AUTH_BACKEND_WECOM = 'authentication.backends.sso.WeComAuthentication'
+AUTH_BACKEND_DINGTALK = 'authentication.backends.sso.DingTalkAuthentication'
+AUTH_BACKEND_FEISHU = 'authentication.backends.sso.FeiShuAuthentication'
+AUTH_BACKEND_AUTH_TOKEN = 'authentication.backends.sso.AuthorizationTokenAuthentication'
+AUTH_BACKEND_SAML2 = 'authentication.backends.saml2.backends.SAML2Backend'
 
 
 AUTHENTICATION_BACKENDS = [
-    AUTH_BACKEND_MODEL, RBAC_BACKEND, AUTH_BACKEND_PUBKEY, AUTH_BACKEND_WECOM,
-    AUTH_BACKEND_DINGTALK, AUTH_BACKEND_FEISHU, AUTH_BACKEND_AUTH_TOKEN,
-    AUTH_BACKEND_SSO,
+    # 只做权限校验
+    RBAC_BACKEND,
+    # 密码形式
+    AUTH_BACKEND_MODEL,  AUTH_BACKEND_PUBKEY, AUTH_BACKEND_LDAP, AUTH_BACKEND_RADIUS,
+    # 跳转形式
+    AUTH_BACKEND_CAS, AUTH_BACKEND_OIDC_PASSWORD, AUTH_BACKEND_OIDC_CODE, AUTH_BACKEND_SAML2,
+    # 扫码模式
+    AUTH_BACKEND_WECOM, AUTH_BACKEND_DINGTALK, AUTH_BACKEND_FEISHU,
+    # Token模式
+    AUTH_BACKEND_AUTH_TOKEN, AUTH_BACKEND_SSO,
 ]
-
-if AUTH_CAS:
-    AUTHENTICATION_BACKENDS.insert(0, AUTH_BACKEND_CAS)
-if AUTH_OPENID:
-    AUTHENTICATION_BACKENDS.insert(0, AUTH_BACKEND_OIDC_PASSWORD)
-    AUTHENTICATION_BACKENDS.insert(0, AUTH_BACKEND_OIDC_CODE)
-if AUTH_RADIUS:
-    AUTHENTICATION_BACKENDS.insert(0, AUTH_BACKEND_RADIUS)
-if AUTH_SAML2:
-    AUTHENTICATION_BACKENDS.insert(0, AUTH_BACKEND_SAML2)
-
 
 ONLY_ALLOW_EXIST_USER_AUTH = CONFIG.ONLY_ALLOW_EXIST_USER_AUTH
 ONLY_ALLOW_AUTH_FROM_SOURCE = CONFIG.ONLY_ALLOW_AUTH_FROM_SOURCE
