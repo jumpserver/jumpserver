@@ -1,15 +1,13 @@
-from django.contrib.auth.backends import ModelBackend
 from django.core.exceptions import PermissionDenied
 
 from authentication.backends.base import JMSBaseAuthBackend
 
 
 class RBACBackend(JMSBaseAuthBackend):
-    # 只做权限校验
-
+    """ 只做权限校验 """
     @staticmethod
     def is_enabled():
-        return False
+        return True
 
     def authenticate(self, *args, **kwargs):
         return None
