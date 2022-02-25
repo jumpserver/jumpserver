@@ -152,13 +152,13 @@ AUTH_BACKEND_LDAP = 'authentication.backends.ldap.LDAPAuthorizationBackend'
 AUTH_BACKEND_OIDC_PASSWORD = 'authentication.backends.oidc.backends.OIDCAuthPasswordBackend'
 AUTH_BACKEND_OIDC_CODE = 'authentication.backends.oidc.backends.OIDCAuthCodeBackend'
 AUTH_BACKEND_RADIUS = 'authentication.backends.radius.RadiusBackend'
-AUTH_BACKEND_CAS = 'authentication.backends.cas.CASBackend'
+AUTH_BACKEND_CAS = 'authentication.backends.cas.backends.CASBackend'
 AUTH_BACKEND_SSO = 'authentication.backends.sso.SSOAuthentication'
 AUTH_BACKEND_WECOM = 'authentication.backends.sso.WeComAuthentication'
 AUTH_BACKEND_DINGTALK = 'authentication.backends.sso.DingTalkAuthentication'
 AUTH_BACKEND_FEISHU = 'authentication.backends.sso.FeiShuAuthentication'
 AUTH_BACKEND_AUTH_TOKEN = 'authentication.backends.sso.AuthorizationTokenAuthentication'
-AUTH_BACKEND_SAML2 = 'authentication.backends.saml2.SAML2Backend'
+AUTH_BACKEND_SAML2 = 'authentication.backends.saml2.backends.SAML2Backend'
 
 
 AUTHENTICATION_BACKENDS = [

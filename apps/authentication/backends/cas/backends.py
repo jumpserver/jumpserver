@@ -9,12 +9,6 @@ __all__ = ['CASBackend']
 
 
 class CASBackend(JMSBaseAuthBackend, _CASBackend):
-    @classmethod
-    def is_enabled(cls):
+    @staticmethod
+    def is_enabled():
         return settings.AUTH_CAS
-
-    def user_can_authenticate(self, user):
-        return True
-
-    def has_perm(self, user_obj, perm, obj=None):
-        return False

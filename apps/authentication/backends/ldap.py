@@ -18,16 +18,9 @@ class LDAPAuthorizationBackend(JMSBaseAuthBackend, LDAPBackend):
     """
     Override this class to override _LDAPUser to LDAPUser
     """
-    def is_enabled(self):
+    @staticmethod
+    def is_enabled():
         return settings.AUTH_LDAP
-
-    def user_can_authenticate(self, user):
-        """
-        Reject users with is_active=False. Custom user models that don't have
-        that attribute are allowed.
-        """
-        is_valid = getattr(user, 'is_valid', None)
-        return is_valid or is_valid is None
 
     def get_or_build_user(self, username, ldap_user):
         """

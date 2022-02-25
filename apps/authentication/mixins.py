@@ -12,9 +12,10 @@ from django.contrib import auth
 from django.utils.translation import ugettext as _
 from rest_framework.request import Request
 from django.contrib.auth import (
-    BACKEND_SESSION_KEY, _get_backends,
+    BACKEND_SESSION_KEY, load_backend,
     PermissionDenied, user_login_failed, _clean_credentials,
 )
+from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import reverse, redirect, get_object_or_404
 
 from common.utils import get_request_ip, get_logger, bulk_get, FlashMessageUtil
@@ -29,13 +30,23 @@ from .const import RSA_PRIVATE_KEY, RSA_PUBLIC_KEY
 logger = get_logger(__name__)
 
 
-def check_backend_can_auth(username, backend, backend_path, allowed_auth_backends):
-    if allowed_auth_backends is not None and backend_path not in allowed_auth_backends:
-        logger.debug('Skip user auth backend: {}, {} not in'.format(
-            username, backend_path, ','.join(allowed_auth_backends)
-        ))
-        return False
-    return True
+def _get_backends(return_tuples=False):
+    backends = []
+    for backend_path in settings.AUTHENTICATION_BACKENDS:
+        backend = load_backend(backend_path)
+        # 检查 backend 是否启用
+        if not backend.is_enabled():
+            continue
+        backends.append((backend, backend_path) if return_tuples else backend)
+    if not backends:
+        raise ImproperlyConfigured(
+            'No authentication backends have been defined. Does '
+            'AUTHENTICATION_BACKENDS contain anything?'
+        )
+    return backends
+
+
+auth._get_backends = _get_backends
 
 
 def authenticate(request=None, **credentials):
@@ -44,13 +55,13 @@ def authenticate(request=None, **credentials):
     之所以 hack 这个 auticate
     """
     username = credentials.get('username')
-    allowed_auth_backends = User.get_user_allowed_auth_backends(username)
 
     for backend, backend_path in _get_backends(return_tuples=True):
         # 预先检查，不浪费认证时间
-        if not check_backend_can_auth(username, backend, backend_path, allowed_auth_backends):
+        if not backend.username_can_authenticate(username):
             continue
 
+        # 原生
         backend_signature = inspect.signature(backend.authenticate)
         try:
             backend_signature.bind(request, **credentials)
@@ -64,21 +75,17 @@ def authenticate(request=None, **credentials):
             break
         if user is None:
             continue
-        # 如果是 None, 证明没有检查过, 需要再次检查
-        if allowed_auth_backends is None:
-            # 有些 authentication 参数中不带 username, 之后还要再检查
-            allowed_auth_backends = user.get_allowed_auth_backends()
-            if not check_backend_can_auth(user.username, backend_path, allowed_auth_backends):
-                continue
+
+        # 再次检查遇检查中遗漏的用户
+        if not backend.user_can_authenticate(user):
+            continue
 
         # Annotate the user object with the path of the backend.
         user.backend = backend_path
         return user
 
     # The credentials supplied are invalid to all backends, fire signal
-    user_login_failed.send(
-        sender=__name__, credentials=_clean_credentials(credentials), request=request
-    )
+    user_login_failed.send(sender=__name__, credentials=_clean_credentials(credentials), request=request)
 
 
 auth.authenticate = authenticate

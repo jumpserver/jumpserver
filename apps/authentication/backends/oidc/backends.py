@@ -19,6 +19,7 @@ from django.conf import settings
 
 from common.utils import get_logger
 
+from ..base import JMSBaseAuthBackend
 from .utils import validate_and_return_id_token, build_absolute_uri
 from .decorator import ssl_verification
 from .signals import (
@@ -56,17 +57,15 @@ class UserMixin:
         )
         return user, created
 
+
+class OIDCBaseBackend(UserMixin, JMSBaseAuthBackend, ModelBackend):
+
     @staticmethod
-    def user_can_authenticate(user):
-        """
-        Reject users with is_active=False. Custom user models that don't have
-        that attribute are allowed.
-        """
-        is_valid = getattr(user, 'is_valid', None)
-        return is_valid or is_valid is None
+    def is_enabled():
+        return settings.AUTH_OPENID
 
 
-class OIDCAuthCodeBackend(UserMixin, ModelBackend):
+class OIDCAuthCodeBackend(OIDCBaseBackend):
     """ Allows to authenticate users using an OpenID Connect Provider (OP).
 
     This authentication backend is able to authenticate users in the case of the OpenID Connect
@@ -193,7 +192,7 @@ class OIDCAuthCodeBackend(UserMixin, ModelBackend):
             return None
 
 
-class OIDCAuthPasswordBackend(UserMixin, ModelBackend):
+class OIDCAuthPasswordBackend(OIDCBaseBackend):
 
     @ssl_verification
     def authenticate(self, request, username=None, password=None, **kwargs):
