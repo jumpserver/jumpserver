@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 #
 
+import datetime
 import logging
+from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, generics
 from rest_framework.views import Response
@@ -28,13 +30,23 @@ class StatusViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.handle_sessions()
         self.perform_create(serializer)
-        tasks = self.request.user.terminal.task_set.filter(is_finished=False)
-        serializer = self.task_serializer_class(tasks, many=True)
-        return Response(serializer.data, status=201)
+        task_serializer = self.get_task_serializer()
+        return Response(task_serializer.data, status=201)
 
     def handle_sessions(self):
         session_ids = self.request.data.get('sessions', [])
         Session.set_sessions_active(session_ids)
+
+    def perform_create(self, serializer):
+        serializer.validated_data.pop('sessions', None)
+        serializer.validated_data["terminal"] = self.request.user.terminal
+        return super().perform_create(serializer)
+
+    def get_task_serializer(self):
+        critical_time = timezone.now() - datetime.timedelta(minutes=10)
+        tasks = self.request.user.terminal.task_set.filter(is_finished=False, date_created__gte=critical_time)
+        serializer = self.task_serializer_class(tasks, many=True)
+        return serializer
 
     def get_queryset(self):
         terminal_id = self.kwargs.get("terminal", None)
@@ -42,11 +54,6 @@ class StatusViewSet(viewsets.ModelViewSet):
             terminal = get_object_or_404(Terminal, id=terminal_id)
             return terminal.status_set.all()
         return super().get_queryset()
-
-    def perform_create(self, serializer):
-        serializer.validated_data.pop('sessions', None)
-        serializer.validated_data["terminal"] = self.request.user.terminal
-        return super().perform_create(serializer)
 
 
 class ComponentsMetricsAPIView(generics.GenericAPIView):
