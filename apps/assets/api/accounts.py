@@ -1,12 +1,14 @@
 from django.db.models import F, Q
-from rest_framework.decorators import action
-from django_filters import rest_framework as filters
-from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from django_filters import rest_framework as filters
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from rest_framework.generics import CreateAPIView
 
 from orgs.mixins.api import OrgBulkModelViewSet
+from rbac.permissions import RBACPermission
 from common.drf.filters import BaseFilterSet
+from common.permissions import NeedMFAVerify
 from ..tasks.account_connectivity import test_accounts_connectivity_manual
 from ..models import AuthBook, Node
 from .. import serializers
@@ -57,6 +59,7 @@ class AccountViewSet(OrgBulkModelViewSet):
     filterset_fields = ("username", "asset", "systemuser", 'ip', 'hostname')
     search_fields = ('username', 'ip', 'hostname', 'systemuser__username')
     filterset_class = AccountFilterSet
+    permission_classes = [RBACPermission, NeedMFAVerify]
     serializer_classes = {
         'default': serializers.AccountSerializer,
         'verify_account': serializers.AssetTaskSerializer
