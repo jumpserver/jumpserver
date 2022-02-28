@@ -114,22 +114,37 @@ class UserGrantedAssetSystemUsersForAdminApi(ListAPIView):
         user_id = self.kwargs.get('pk')
         return User.objects.get(id=user_id)
 
+    @lazyproperty
+    def system_users_with_actions(self):
+        asset_id = self.kwargs.get('asset_id')
+        asset = get_object_or_404(Asset, id=asset_id, is_active=True)
+        return self.get_asset_system_user_ids_with_actions(asset)
+
     def get_asset_system_user_ids_with_actions(self, asset):
         return get_asset_system_user_ids_with_actions_by_user(self.user, asset)
 
     def get_queryset(self):
-        asset_id = self.kwargs.get('asset_id')
-        asset = get_object_or_404(Asset, id=asset_id, is_active=True)
-        system_users_with_actions = self.get_asset_system_user_ids_with_actions(asset)
-        system_user_ids = system_users_with_actions.keys()
-        system_users = SystemUser.objects.filter(id__in=system_user_ids)\
+        system_user_ids = self.system_users_with_actions.keys()
+        system_users = SystemUser.objects.filter(id__in=system_user_ids) \
             .only(*self.serializer_class.Meta.only_fields) \
             .order_by('name')
-        system_users = list(system_users)
-        for system_user in system_users:
-            actions = system_users_with_actions.get(system_user.id, 0)
-            system_user.actions = actions
         return system_users
+
+    def paginate_queryset(self, queryset):
+        page = super().paginate_queryset(queryset)
+
+        if page:
+            page = self.set_systemusers_action(page)
+        else:
+            self.set_systemusers_action(queryset)
+        return page
+
+    def set_systemusers_action(self, queryset):
+        queryset_list = list(queryset)
+        for system_user in queryset_list:
+            actions = self.system_users_with_actions.get(system_user.id, 0)
+            system_user.actions = actions
+        return queryset_list
 
 
 @method_decorator(tmp_to_root_org(), name='list')
