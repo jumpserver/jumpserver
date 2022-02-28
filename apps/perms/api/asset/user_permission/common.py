@@ -35,7 +35,8 @@ __all__ = [
 class GetUserAssetPermissionActionsApi(RetrieveAPIView):
     serializer_class = serializers.ActionsSerializer
     rbac_perms = {
-        'retrieve': 'perms.view_userassets'
+        'retrieve': 'perms.view_userassets',
+        'GET': 'perms.view_userassets',
     }
 
     def get_user(self):
