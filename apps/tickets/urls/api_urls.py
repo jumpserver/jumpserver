@@ -16,5 +16,6 @@ router.register('ticket-session-relation', api.TicketSessionRelationViewSet, 'ti
 
 urlpatterns = [
     path('tickets/<uuid:ticket_id>/session/', api.TicketSessionApi.as_view(), name='ticket-sesion'),
+    path('super-tickets/<uuid:pk>/status/', api.SuperTicketStatusAPI.as_view(), name='super-ticket-status'),
 ]
 urlpatterns += router.urls

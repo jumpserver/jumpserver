@@ -2,5 +2,5 @@
 #
 from .ticket import *
 from .comment import *
-from .common import *
+from .super_ticket import *
 from .relation import *

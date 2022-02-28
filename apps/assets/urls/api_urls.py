@@ -68,7 +68,6 @@ urlpatterns = [
     path('gateways/<uuid:pk>/test-connective/', api.GatewayTestConnectionApi.as_view(), name='test-gateway-connective'),
 
     path('cmd-filters/command-confirm/', api.CommandConfirmAPI.as_view(), name='command-confirm'),
-    path('cmd-filters/command-confirm/<uuid:pk>/status/', api.CommandConfirmStatusAPI.as_view(), name='command-confirm-status')
 
 ]
 
