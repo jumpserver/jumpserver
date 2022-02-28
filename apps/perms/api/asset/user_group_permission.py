@@ -36,7 +36,7 @@ class UserGroupGrantedAssetsApi(ListAPIView):
     filterset_fields = ['hostname', 'ip', 'id', 'comment']
     search_fields = ['hostname', 'ip', 'comment']
     rbac_perms = {
-        'list': 'perms.view_userassets'
+        'list': 'perms.view_usergroupassets',
     }
 
     def get_queryset(self):
@@ -73,7 +73,7 @@ class UserGroupGrantedNodeAssetsApi(ListAPIView):
     filterset_fields = ['hostname', 'ip', 'id', 'comment']
     search_fields = ['hostname', 'ip', 'comment']
     rbac_perms = {
-        'list': 'perms.view_userassets'
+        'list': 'perms.view_usergroupassets',
     }
 
     def get_queryset(self):
@@ -125,7 +125,7 @@ class UserGroupGrantedNodeAssetsApi(ListAPIView):
 class UserGroupGrantedNodesApi(ListAPIView):
     serializer_class = serializers.NodeGrantedSerializer
     rbac_perms = {
-        'list': 'perms.view_userassets'
+        'list': 'perms.view_usergroupassets',
     }
 
     def get_queryset(self):
@@ -142,7 +142,8 @@ class UserGroupGrantedNodesApi(ListAPIView):
 
 class UserGroupGrantedNodeChildrenAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
     rbac_perms = {
-        'list': 'perms.view_userassets'
+        'list': 'perms.view_usergroupassets',
+        'GET': 'perms.view_usergroupassets',
     }
 
     def get_children_nodes(self, parent_key):

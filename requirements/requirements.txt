@@ -55,9 +55,8 @@ pycparser==2.19
 pycryptodome==3.12.0
 pycryptodomex==3.12.0
 pyotp==2.2.6
-PyNaCl==1.2.1
+PyNaCl==1.5.0
 python-dateutil==2.8.2
-#python-gssapi==0.6.4
 pytz==2018.3
 PyYAML==6.0
 redis==3.5.3
