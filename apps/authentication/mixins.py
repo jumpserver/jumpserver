@@ -57,8 +57,8 @@ def authenticate(request=None, **credentials):
     username = credentials.get('username')
 
     for backend, backend_path in _get_backends(return_tuples=True):
-        # 预先检查，不浪费认证时间
-        if not backend.username_can_authenticate(username):
+        # 检查用户名是否允许认证 (预先检查，不浪费认证时间)
+        if not backend.username_allow_authenticate(username):
             continue
 
         # 原生
@@ -76,8 +76,8 @@ def authenticate(request=None, **credentials):
         if user is None:
             continue
 
-        # 再次检查遇检查中遗漏的用户
-        if not backend.user_can_authenticate(user):
+        # 检查用户是否允许认证
+        if not backend.user_allow_authenticate(user):
             continue
 
         # Annotate the user object with the path of the backend.

@@ -79,60 +79,8 @@ class Setting(models.Model):
         item.refresh_setting()
 
     def refresh_setting(self):
-        if hasattr(self.__class__, f'refresh_{self.name}'):
-            getattr(self.__class__, f'refresh_{self.name}')()
-        else:
-            setattr(settings, self.name, self.cleaned_value)
+        setattr(settings, self.name, self.cleaned_value)
         self.refresh_keycloak_to_openid_if_need()
-
-    @classmethod
-    def refresh_authentications(cls, name):
-        setting = cls.objects.filter(name=name).first()
-        if not setting:
-            return
-
-        backends_map = {
-            'AUTH_LDAP': [settings.AUTH_BACKEND_LDAP],
-            'AUTH_OPENID': [settings.AUTH_BACKEND_OIDC_CODE, settings.AUTH_BACKEND_OIDC_PASSWORD],
-            'AUTH_RADIUS': [settings.AUTH_BACKEND_RADIUS],
-            'AUTH_CAS': [settings.AUTH_BACKEND_CAS],
-            'AUTH_SAML2': [settings.AUTH_BACKEND_SAML2],
-        }
-        setting_backends = backends_map[name]
-        auth_backends = settings.AUTHENTICATION_BACKENDS
-
-        for backend in setting_backends:
-            has = backend in auth_backends
-
-            # 添加
-            if setting.cleaned_value and not has:
-                logger.debug('Add auth backend: {}'.format(name))
-                settings.AUTHENTICATION_BACKENDS.insert(1, backend)
-
-            # 去掉
-            if not setting.cleaned_value and has:
-                index = auth_backends.index(backend)
-                logger.debug('Pop auth backend: {}'.format(name))
-                auth_backends.pop(index)
-
-        # 设置内存值
-        setattr(settings, name, setting.cleaned_value)
-
-    @classmethod
-    def refresh_AUTH_CAS(cls):
-        cls.refresh_authentications('AUTH_CAS')
-
-    @classmethod
-    def refresh_AUTH_LDAP(cls):
-        cls.refresh_authentications('AUTH_LDAP')
-
-    @classmethod
-    def refresh_AUTH_OPENID(cls):
-        cls.refresh_authentications('AUTH_OPENID')
-
-    @classmethod
-    def refresh_AUTH_SAML2(cls):
-        cls.refresh_authentications('AUTH_SAML2')
 
     def refresh_keycloak_to_openid_if_need(self):
         watch_config_names = [
@@ -169,10 +117,6 @@ class Setting(models.Model):
         for key, value in openid_config.items():
             setattr(settings, key, value)
             self.__class__.update_or_create(key, value, encrypted=False, category=self.category)
-
-    @classmethod
-    def refresh_AUTH_RADIUS(cls):
-        cls.refresh_authentications('AUTH_RADIUS')
 
     @classmethod
     def update_or_create(cls, name='', value='', encrypted=False, category=''):
