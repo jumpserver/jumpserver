@@ -48,11 +48,81 @@ class TicketAssignee(CommonModelMixin):
         return '{0.assignee.name}({0.assignee.username})_{0.step}'.format(self)
 
 
-class ActionMixin:
-    pass
+class StatusMixin:
+    state: str
+    status: str
+    applicant: models.ForeignKey
+    current_node: models.Manager
+
+    def set_state_approve(self):
+        self.state = TicketState.approved
+
+    def set_state_reject(self):
+        self.state = TicketState.rejected
+
+    def set_state_closed(self):
+        self.state = TicketState.closed
+
+    def set_status_closed(self):
+        self.status = TicketStatus.closed
+
+    # status
+    @property
+    def status_open(self):
+        return self.status == TicketStatus.open.value
+
+    @property
+    def status_closed(self):
+        return self.status == TicketStatus.closed.value
+
+    @property
+    def state_open(self):
+        return self.state == TicketState.open.value
+
+    @property
+    def state_approve(self):
+        return self.state == TicketState.approved.value
+
+    @property
+    def state_reject(self):
+        return self.state == TicketState.rejected.value
+
+    @property
+    def state_close(self):
+        return self.state == TicketState.closed.value
+
+    # action changed
+    def open(self, applicant):
+        self.applicant = applicant
+        self._change_action(TicketAction.open)
+
+    def approve(self, processor):
+        self.update_current_step_state_and_assignee(processor, TicketState.approved)
+        self._change_action(TicketAction.approve)
+
+    def reject(self, processor):
+        self.update_current_step_state_and_assignee(processor, TicketState.rejected)
+        self._change_action(TicketAction.reject)
+
+    def close(self, processor):
+        self.update_current_step_state_and_assignee(processor, TicketState.closed)
+        self._change_action(TicketAction.close)
+
+    def update_current_step_state_and_assignee(self, processor, state):
+        if self.status_closed:
+            raise AlreadyClosed
+        if state != TicketState.approved:
+            self.state = state
+        current_node = self.current_node
+        current_node.update(state=state)
+        current_node.first().ticket_assignees.filter(assignee=processor).update(state=state)
+
+    def _change_action(self, action):
+        self.save()
+        post_change_ticket_action.send(sender=self.__class__, ticket=self, action=action)
 
 
-class Ticket(CommonModelMixin, OrgModelMixin):
+class Ticket(CommonModelMixin, StatusMixin, OrgModelMixin):
     title = models.CharField(max_length=256, verbose_name=_("Title"))
     type = models.CharField(
         max_length=64, choices=TicketType.choices,
@@ -106,31 +176,6 @@ class Ticket(CommonModelMixin, OrgModelMixin):
     def type_login_confirm(self):
         return self.type == TicketType.login_confirm.value
 
-    # status
-    @property
-    def status_open(self):
-        return self.status == TicketStatus.open.value
-
-    @property
-    def status_closed(self):
-        return self.status == TicketStatus.closed.value
-
-    @property
-    def state_open(self):
-        return self.state == TicketState.open.value
-
-    @property
-    def state_approve(self):
-        return self.state == TicketState.approved.value
-
-    @property
-    def state_reject(self):
-        return self.state == TicketState.rejected.value
-
-    @property
-    def state_close(self):
-        return self.state == TicketState.closed.value
-
     @property
     def current_node(self):
         return self.ticket_steps.filter(level=self.approval_step)
@@ -139,18 +184,6 @@ class Ticket(CommonModelMixin, OrgModelMixin):
     def processor(self):
         processor = self.current_node.first().ticket_assignees.exclude(state=ProcessStatus.notified).first()
         return processor.assignee if processor else None
-
-    def set_state_approve(self):
-        self.state = TicketState.approved
-
-    def set_state_reject(self):
-        self.state = TicketState.rejected
-
-    def set_state_closed(self):
-        self.state = TicketState.closed
-
-    def set_status_closed(self):
-        self.status = TicketStatus.closed
 
     def create_related_node(self):
         org_id = self.flow.org_id
@@ -194,36 +227,6 @@ class Ticket(CommonModelMixin, OrgModelMixin):
         for assignee in assignees:
             ticket_assignees.append(TicketAssignee(step=ticket_step, assignee=assignee))
         TicketAssignee.objects.bulk_create(ticket_assignees)
-
-    # action changed
-    def open(self, applicant):
-        self.applicant = applicant
-        self._change_action(TicketAction.open)
-
-    def update_current_step_state_and_assignee(self, processor, state):
-        if self.status_closed:
-            raise AlreadyClosed
-        if state != TicketState.approved:
-            self.state = state
-        current_node = self.current_node
-        current_node.update(state=state)
-        current_node.first().ticket_assignees.filter(assignee=processor).update(state=state)
-
-    def approve(self, processor):
-        self.update_current_step_state_and_assignee(processor, TicketState.approved)
-        self._change_action(TicketAction.approve)
-
-    def reject(self, processor):
-        self.update_current_step_state_and_assignee(processor, TicketState.rejected)
-        self._change_action(TicketAction.reject)
-
-    def close(self, processor):
-        self.update_current_step_state_and_assignee(processor, TicketState.closed)
-        self._change_action(TicketAction.close)
-
-    def _change_action(self, action):
-        self.save()
-        post_change_ticket_action.send(sender=self.__class__, ticket=self, action=action)
 
     def has_current_assignee(self, assignee):
         return self.ticket_steps.filter(ticket_assignees__assignee=assignee, level=self.approval_step).exists()
