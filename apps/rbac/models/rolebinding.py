@@ -90,7 +90,7 @@ class OrgRoleBindingManager(models.Manager):
         if current_org.is_root():
             return queryset.none()
 
-        queryset = queryset.filter(org=current_org.id)
+        queryset = queryset.filter(org=current_org.id, scope=Scope.org)
         return queryset
 
 
@@ -120,8 +120,7 @@ class OrgRoleBinding(RoleBinding):
 
 class SystemRoleBindingManager(models.Manager):
     def get_queryset(self):
-        queryset = super().get_queryset().\
-            filter(scope=Scope.org)
+        queryset = super().get_queryset().filter(scope=Scope.system)
         return queryset
 
 
