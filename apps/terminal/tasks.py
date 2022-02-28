@@ -14,7 +14,7 @@ from common.utils import get_log_keep_day
 from ops.celery.decorator import (
     register_as_period_task, after_app_ready_start, after_app_shutdown_clean_periodic
 )
-from .models import Status, Session, Command
+from .models import Status, Session, Command, Task
 from .backends import server_replay_storage
 from .utils import find_session_replay_local
 
@@ -39,6 +39,11 @@ def delete_terminal_status_period():
 def clean_orphan_session():
     active_sessions = Session.objects.filter(is_finished=False)
     for session in active_sessions:
+        # finished task
+        Task.objects.filter(args=str(session.id), is_finished=False).update(
+            is_finished=True, date_finished=timezone.now()
+        )
+        # finished session
         if session.is_active():
             continue
         session.is_finished = True
