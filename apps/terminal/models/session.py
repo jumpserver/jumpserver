@@ -22,6 +22,7 @@ class Session(OrgModelMixin):
         ST = 'ST', 'SSH Terminal'
         RT = 'RT', 'RDP Terminal'
         WT = 'WT', 'Web Terminal'
+        DT = 'DT', 'DB Terminal'
 
     class PROTOCOL(TextChoices):
         SSH = 'ssh', 'ssh'
