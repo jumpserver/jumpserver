@@ -14,7 +14,7 @@ class LoginAssetCheckAPI(CreateAPIView):
     serializer_class = serializers.LoginAssetCheckSerializer
     model = LoginAssetACL
     rbac_perms = {
-        'create': 'tickets.add_superticket'
+        'POST': 'tickets.add_superticket'
     }
 
     def get_queryset(self):
