@@ -739,15 +739,15 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         return super(User, self).delete()
 
     @classmethod
-    def get_user_allowed_auth_backends(cls, username):
+    def get_user_allowed_auth_backend_paths(cls, username):
         if not settings.ONLY_ALLOW_AUTH_FROM_SOURCE or not username:
             return None
         user = cls.objects.filter(username=username).first()
         if not user:
             return None
-        return user.get_allowed_auth_backends()
+        return user.get_allowed_auth_backend_paths()
 
-    def get_allowed_auth_backends(self):
+    def get_allowed_auth_backend_paths(self):
         if not settings.ONLY_ALLOW_AUTH_FROM_SOURCE:
             return None
         return self.SOURCE_BACKEND_MAPPING.get(self.source, [])
