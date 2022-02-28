@@ -51,7 +51,7 @@ exclude_permissions = (
     ('audits', 'userloginlog', 'change,delete,change', 'userloginlog'),
     ('audits', 'ftplog', 'change,delete', 'ftplog'),
     ('terminal', 'session', 'delete', 'session'),
-    ('tickets', '*', '*', '*'),
+    ('tickets', 'ticket', '*', '*'),
     ('users', 'userpasswordhistory', '*', '*'),
     ('xpack', 'interface', 'add,delete', 'interface'),
 )
