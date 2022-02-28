@@ -92,6 +92,14 @@ class ReplayStorageTypeOBSSerializer(ReplayStorageTypeBaseSerializer):
     )
 
 
+class ReplayStorageTypeCOSSerializer(ReplayStorageTypeS3Serializer):
+    endpoint_help_text = '''Such as: http://cos.{REGION_NAME}.myqcloud.com'''
+    ENDPOINT = serializers.CharField(
+        validators=[replay_storage_endpoint_format_validator],
+        required=True, max_length=1024, label=_('Endpoint'), help_text=_(endpoint_help_text),
+        allow_null=True,
+    )
+
 class ReplayStorageTypeAzureSerializer(serializers.Serializer):
     class EndpointSuffixChoices(TextChoices):
         china = 'core.chinacloudapi.cn', 'core.chinacloudapi.cn'
@@ -116,7 +124,8 @@ replay_storage_type_serializer_classes_mapping = {
     const.ReplayStorageTypeChoices.swift.value: ReplayStorageTypeSwiftSerializer,
     const.ReplayStorageTypeChoices.oss.value: ReplayStorageTypeOSSSerializer,
     const.ReplayStorageTypeChoices.azure.value: ReplayStorageTypeAzureSerializer,
-    const.ReplayStorageTypeChoices.obs.value: ReplayStorageTypeOBSSerializer
+    const.ReplayStorageTypeChoices.obs.value: ReplayStorageTypeOBSSerializer,
+    const.ReplayStorageTypeChoices.cos.value: ReplayStorageTypeCOSSerializer
 }
 
 # Command storage serializers
