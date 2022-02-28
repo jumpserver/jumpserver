@@ -17,7 +17,7 @@ from tickets.signals import post_change_ticket_action
 from tickets.handler import get_ticket_handler
 from tickets.errors import AlreadyClosed
 
-__all__ = ['Ticket', 'TicketStep', 'TicketAssignee']
+__all__ = ['Ticket', 'TicketStep', 'TicketAssignee', 'SuperTicket']
 
 
 class TicketStep(CommonModelMixin):

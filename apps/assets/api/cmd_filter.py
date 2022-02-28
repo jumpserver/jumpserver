@@ -8,13 +8,11 @@ from django.shortcuts import get_object_or_404
 from common.utils import reverse
 from common.utils import lazyproperty
 from orgs.mixins.api import OrgBulkModelViewSet
-from tickets.api import GenericTicketStatusRetrieveCloseAPI
 from ..models import CommandFilter, CommandFilterRule
 from .. import serializers
 
 __all__ = [
     'CommandFilterViewSet', 'CommandFilterRuleViewSet', 'CommandConfirmAPI',
-    'CommandConfirmStatusAPI'
 ]
 
 
@@ -62,7 +60,7 @@ class CommandConfirmAPI(CreateAPIView):
     @staticmethod
     def get_response_data(ticket):
         confirm_status_url = reverse(
-            view_name='api-assets:command-confirm-status',
+            view_name='api-tickets:super-ticket-status',
             kwargs={'pk': str(ticket.id)}
         )
         ticket_detail_url = reverse(
@@ -85,6 +83,3 @@ class CommandConfirmAPI(CreateAPIView):
         serializer.is_valid(raise_exception=True)
         return serializer
 
-
-class CommandConfirmStatusAPI(GenericTicketStatusRetrieveCloseAPI):
-    pass
