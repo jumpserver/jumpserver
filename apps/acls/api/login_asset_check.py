@@ -13,6 +13,9 @@ __all__ = ['LoginAssetCheckAPI', 'LoginAssetConfirmStatusAPI']
 class LoginAssetCheckAPI(CreateAPIView):
     serializer_class = serializers.LoginAssetCheckSerializer
     model = LoginAssetACL
+    rbac_perms = {
+        'create': 'tickets.add_superticket'
+    }
 
     def create(self, request, *args, **kwargs):
         is_need_confirm, response_data = self.check_if_need_confirm()

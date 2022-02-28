@@ -48,6 +48,10 @@ class TicketAssignee(CommonModelMixin):
         return '{0.assignee.name}({0.assignee.username})_{0.step}'.format(self)
 
 
+class ActionMixin:
+    pass
+
+
 class Ticket(CommonModelMixin, OrgModelMixin):
     title = models.CharField(max_length=256, verbose_name=_("Title"))
     type = models.CharField(
@@ -301,3 +305,9 @@ class Ticket(CommonModelMixin, OrgModelMixin):
                 raise JMSException(detail=_('Please try again'), code='please_try_again')
 
             raise e
+
+
+class SuperTicket(Ticket):
+    class Meta:
+        proxy = True
+        verbose_name = _("Super ticket")
