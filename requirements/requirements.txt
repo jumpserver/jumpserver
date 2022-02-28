@@ -127,3 +127,5 @@ kubernetes==21.7.0
 websocket-client==1.2.3
 numpy==1.22.0
 pandas==1.3.5
+pyjwkest==1.4.2
+jsonfield2==4.0.0.post0
