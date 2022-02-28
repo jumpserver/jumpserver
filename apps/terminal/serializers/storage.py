@@ -42,8 +42,8 @@ class ReplayStorageTypeBaseSerializer(serializers.Serializer):
 
 class ReplayStorageTypeS3Serializer(ReplayStorageTypeBaseSerializer):
     endpoint_help_text = '''
-        S3 format: http://s3.{REGION_NAME}.amazonaws.com
-        S3(China) format: http://s3.{REGION_NAME}.amazonaws.com.cn
+        S3 format: http://s3.{REGION_NAME}.amazonaws.com <br>
+        S3(China) format: http://s3.{REGION_NAME}.amazonaws.com.cn <br>
         Such as: http://s3.cn-north-1.amazonaws.com.cn
     '''
     ENDPOINT = serializers.CharField(
@@ -73,7 +73,7 @@ class ReplayStorageTypeSwiftSerializer(ReplayStorageTypeBaseSerializer):
 
 class ReplayStorageTypeOSSSerializer(ReplayStorageTypeBaseSerializer):
     endpoint_help_text = '''
-        OSS format: http://{REGION_NAME}.aliyuncs.com
+        OSS format: http://{REGION_NAME}.aliyuncs.com <br>
         Such as: http://oss-cn-hangzhou.aliyuncs.com
     '''
     ENDPOINT = serializers.CharField(
@@ -84,11 +84,20 @@ class ReplayStorageTypeOSSSerializer(ReplayStorageTypeBaseSerializer):
 
 class ReplayStorageTypeOBSSerializer(ReplayStorageTypeBaseSerializer):
     endpoint_help_text = '''
-        OBS format: obs.{REGION_NAME}.myhuaweicloud.com
+        OBS format: obs.{REGION_NAME}.myhuaweicloud.com <br>
         Such as: obs.cn-north-4.myhuaweicloud.com
     '''
     ENDPOINT = serializers.CharField(
         max_length=1024, label=_('Endpoint'), help_text=_(endpoint_help_text), allow_null=True,
+    )
+
+
+class ReplayStorageTypeCOSSerializer(ReplayStorageTypeS3Serializer):
+    endpoint_help_text = '''Such as: http://cos.{REGION_NAME}.myqcloud.com'''
+    ENDPOINT = serializers.CharField(
+        validators=[replay_storage_endpoint_format_validator],
+        required=True, max_length=1024, label=_('Endpoint'), help_text=_(endpoint_help_text),
+        allow_null=True,
     )
 
 
@@ -116,7 +125,8 @@ replay_storage_type_serializer_classes_mapping = {
     const.ReplayStorageTypeChoices.swift.value: ReplayStorageTypeSwiftSerializer,
     const.ReplayStorageTypeChoices.oss.value: ReplayStorageTypeOSSSerializer,
     const.ReplayStorageTypeChoices.azure.value: ReplayStorageTypeAzureSerializer,
-    const.ReplayStorageTypeChoices.obs.value: ReplayStorageTypeOBSSerializer
+    const.ReplayStorageTypeChoices.obs.value: ReplayStorageTypeOBSSerializer,
+    const.ReplayStorageTypeChoices.cos.value: ReplayStorageTypeCOSSerializer
 }
 
 # Command storage serializers
@@ -143,7 +153,7 @@ def command_storage_es_host_format_validator(host):
 class CommandStorageTypeESSerializer(serializers.Serializer):
 
     hosts_help_text = '''
-        Tip: If there are multiple hosts, use a comma (,) to separate them. 
+        Tip: If there are multiple hosts, use a comma (,) to separate them. <br>
         (eg: http://www.jumpserver.a.com:9100, http://www.jumpserver.b.com:9100)
     '''
     HOSTS = serializers.ListField(

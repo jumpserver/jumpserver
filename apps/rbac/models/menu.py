@@ -12,7 +12,7 @@ class MenuPermission(models.Model):
         default_permissions = []
         verbose_name = _('Menu permission')
         permissions = [
-            ('view_adminview', _('Console view')),
-            ('view_auditview', _('Audit view')),
-            ('view_userview', _('Workspace view')),
+            ('view_adminview', _('view console view')),
+            ('view_auditview', _('view audit view')),
+            ('view_userview', _('view workspace view')),
         ]

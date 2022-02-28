@@ -105,7 +105,7 @@ class ClientProtocolMixin:
         width = self.request.query_params.get('width')
         full_screen = is_true(self.request.query_params.get('full_screen'))
         drives_redirect = is_true(self.request.query_params.get('drives_redirect'))
-        token = self.create_token(user, asset, application, system_user)
+        token, secret = self.create_token(user, asset, application, system_user)
 
         # 设置磁盘挂载
         if drives_redirect:
@@ -381,15 +381,15 @@ class UserConnectionTokenViewSet(
 
         key = self.CACHE_KEY_PREFIX.format(token)
         cache.set(key, value, timeout=ttl)
-        return token
+        return token, secret
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         asset, application, system_user, user = self.get_request_resource(serializer)
-        token = self.create_token(user, asset, application, system_user)
-        return Response({"token": token}, status=201)
+        token, secret = self.create_token(user, asset, application, system_user)
+        return Response({"id": token, 'secret': secret}, status=201)
 
     def valid_token(self, token):
         from users.models import User

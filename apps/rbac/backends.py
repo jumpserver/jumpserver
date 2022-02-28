@@ -12,7 +12,7 @@ class RBACBackend(JMSBaseAuthBackend):
     def authenticate(self, *args, **kwargs):
         return None
 
-    def username_can_authenticate(self, username):
+    def username_allow_authenticate(self, username):
         return False
 
     def has_perm(self, user_obj, perm, obj=None):

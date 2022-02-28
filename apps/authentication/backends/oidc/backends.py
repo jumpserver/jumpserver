@@ -28,6 +28,8 @@ from .signals import (
 
 logger = get_logger(__file__)
 
+__all__ = ['OIDCAuthCodeBackend', 'OIDCAuthPasswordBackend']
+
 
 class UserMixin:
 

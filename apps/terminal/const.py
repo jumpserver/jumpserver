@@ -17,6 +17,7 @@ class ReplayStorageTypeChoices(TextChoices):
     oss = 'oss', 'OSS'
     azure = 'azure', 'Azure'
     obs = 'obs', 'OBS'
+    cos = 'cos', 'COS'
 
 
 class CommandStorageTypeChoices(TextChoices):
@@ -47,6 +48,7 @@ class TerminalTypeChoices(TextChoices):
     lion = 'lion', 'Lion'
     core = 'core', 'Core'
     celery = 'celery', 'Celery'
+    magnus = 'magnus',  'Magnus'
 
     @classmethod
     def types(cls):

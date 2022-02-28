@@ -46,7 +46,10 @@ class OrgRoleBindingViewSet(RoleBindingViewSet):
     def perform_bulk_create(self, serializer):
         validated_data = serializer.validated_data
         bindings = [
-            OrgRoleBinding(role=d['role'], user=d['user'], org_id=current_org.id, scope='org')
+            OrgRoleBinding(
+                role=d['role'], user=d['user'],
+                org_id=current_org.id, scope='org'
+            )
             for d in validated_data
         ]
         OrgRoleBinding.objects.bulk_create(bindings, ignore_conflicts=True)

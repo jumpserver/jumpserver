@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'verbose_name': 'Menu permission',
-                'permissions': [('view_adminview', 'Admin view'), ('view_auditview', 'Audit view'), ('view_userview', 'User view')],
+                'permissions': [('view_adminview', 'view console view'), ('view_auditview', 'view audit view'), ('view_userview', 'view workspace view')],
                 'default_permissions': [],
             },
         ),

@@ -42,7 +42,7 @@ class CommandFilterRuleViewSet(OrgBulkModelViewSet):
 class CommandConfirmAPI(CreateAPIView):
     serializer_class = serializers.CommandConfirmSerializer
     rbac_perms = {
-        'create': 'tickets.add_ticket'
+        'POST': 'tickets.add_superticket'
     }
 
     def create(self, request, *args, **kwargs):
