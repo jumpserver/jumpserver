@@ -2,7 +2,7 @@ from logging.handlers import SysLogHandler, SYSLOG_UDP_PORT
 import socket
 
 
-class TcpSyslogHandler(SysLogHandler):
+class JMSSyslogHandler(SysLogHandler):
     """
     This class override the python SyslogHandler emit function.
     It is needed to deal with appending of the nul character to the end of the message when using TCP.
@@ -19,7 +19,7 @@ class TcpSyslogHandler(SysLogHandler):
         :param facility: Same as in the super class.
         :param socktype: Same as in the super class.
         """
-        super(TcpSyslogHandler, self).__init__(address=address, facility=facility, socktype=socktype)
+        super(JMSSyslogHandler, self).__init__(address=address, facility=facility, socktype=socktype)
 
         self.message_separator_char = message_separator_char
 

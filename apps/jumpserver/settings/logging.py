@@ -147,7 +147,7 @@ SYSLOG_ENABLE = CONFIG.SYSLOG_ENABLE
 if CONFIG.SYSLOG_ADDR != '' and len(CONFIG.SYSLOG_ADDR.split(':')) == 2:
     host, port = CONFIG.SYSLOG_ADDR.split(':')
     LOGGING['handlers']['syslog'].update({
-        'class': 'common.logging.handlers.TcpSyslogHandler',
+        'class': 'common.logging.handlers.JMSSyslogHandler',
         'facility': CONFIG.SYSLOG_FACILITY,
         'address': (host, int(port)),
         'socktype': CONFIG.SYSLOG_SOCKTYPE,
