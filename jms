@@ -63,8 +63,8 @@ def check_database_connection():
             return
         except OperationalError:
             logging.info('Database not setup, retry')
-        except Exception as e:
-            logging.error('Unexpect error occur: {}'.format(str(e)))
+        except Exception as exc:
+            logging.error('Unexpect error occur: {}'.format(str(exc)))
         time.sleep(1)
     logging.error("Connection database failed, exit")
     sys.exit(10)
@@ -96,7 +96,7 @@ def collect_static():
         pass
 
 
-def compile_i81n_file():
+def compile_i18n_file():
     django_mo_file = os.path.join(BASE_DIR, 'apps', 'locale', 'zh', 'LC_MESSAGES', 'django.mo')
     if os.path.exists(django_mo_file):
         return
@@ -134,8 +134,8 @@ def start_services():
     except KeyboardInterrupt:
         logging.info('Cancel ...')
         time.sleep(2)
-    except Exception as e:
-        logging.error("Start service error {}: {}".format(services, e))
+    except Exception as exc:
+        logging.error("Start service error {}: {}".format(services, exc))
         time.sleep(2)
 
 

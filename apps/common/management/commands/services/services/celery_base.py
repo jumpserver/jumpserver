@@ -23,9 +23,10 @@ class CeleryBaseService(BaseService):
             server_hostname = '%h'
 
         cmd = [
-            'celery', 'worker',
-            '-P', 'threads',
+            'celery',
             '-A', 'ops',
+            'worker',
+            '-P', 'threads',
             '-l', 'INFO',
             '-c', str(self.num),
             '-Q', self.queue,

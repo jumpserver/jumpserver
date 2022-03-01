@@ -52,7 +52,7 @@ class Services(TextChoices):
 
     @classmethod
     def export_services_values(cls):
-        return [cls.all.value, cls.web.value, cls.task.value]
+        return [cls.all.value, cls.web.value, cls.task.value] + [s.value for s in cls.all_services()]
 
     @classmethod
     def get_service_objects(cls, service_names, **kwargs):

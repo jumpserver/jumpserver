@@ -22,8 +22,9 @@ redis = Redis(host=CONFIG.REDIS_HOST, port=CONFIG.REDIS_PORT, password=CONFIG.RE
 scheduler = "django_celery_beat.schedulers:DatabaseScheduler"
 
 cmd = [
-    'celery', 'beat',
+    'celery',
     '-A', 'ops',
+    'beat',
     '-l', 'INFO',
     '--scheduler', scheduler,
     '--max-interval', '60'
