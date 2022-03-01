@@ -16,4 +16,6 @@ class SuperTicketSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_processor(ticket):
+        if not ticket.processor:
+            return ''
         return str(ticket.processor)
