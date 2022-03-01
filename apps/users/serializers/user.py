@@ -131,7 +131,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
             'public_key': {'write_only': True},
             'is_first_login': {'label': _('Is first login'), 'read_only': True},
             'is_valid': {'label': _('Is valid')},
-            'is_service_account':  {'label': _('Is service account')},
+            'is_service_account': {'label': _('Is service account')},
             'is_expired': {'label': _('Is expired')},
             'avatar_url': {'label': _('Avatar url')},
             'created_by': {'read_only': True, 'allow_blank': True},
@@ -243,7 +243,7 @@ class InviteSerializer(RolesSerializerMixin, serializers.Serializer):
 class ServiceAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'name', 'access_key']
+        fields = ['id', 'name', 'access_key', 'comment']
         read_only_fields = ['access_key']
 
     def __init__(self, *args, **kwargs):
