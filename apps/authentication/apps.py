@@ -7,7 +7,7 @@ class AuthenticationConfig(AppConfig):
     verbose_name = _('Authentication')
 
     def ready(self):
-        from . import signals_handlers
+        from . import signal_handlers
         from . import notifications
         super().ready()
 

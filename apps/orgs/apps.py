@@ -7,4 +7,4 @@ class OrgsConfig(AppConfig):
     verbose_name = _('Organizations')
 
     def ready(self):
-        from . import signals_handler
+        from . import signal_handlers
