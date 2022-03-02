@@ -123,6 +123,11 @@ extra_nodes_data = [
         "id": "asset_change_plan_node",
         "name": _("Asset change auth"),
         "pId": "accounts"
+    },
+    {
+        "id": "terminal_node",
+        "name": _("Terminal"),
+        "pId": "view_setting"
     }
 ]
 
@@ -147,6 +152,11 @@ special_pid_mapper = {
     'xpack.gatherusertaskexecution': 'gather_account_node',
     'orgs.organization': 'view_setting',
     'settings.setting': 'view_setting',
+    'terminal.terminal': 'terminal_node',
+    'terminal.commandstorage': 'terminal_node',
+    'terminal.replaystorage': 'terminal_node',
+    'terminal.status': 'terminal_node',
+    'terminal.task': 'terminal_node',
 }
 
 
