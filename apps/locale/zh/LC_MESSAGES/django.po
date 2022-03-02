@@ -3053,6 +3053,10 @@ msgstr ""
 msgid "Internal role, can't be update"
 msgstr ""
 
+#: rbac/api/rolebinding.py:46
+msgid "{} at least one system role"
+msgstr "{} 至少有一个系统角色"
+
 #: rbac/apps.py:7
 msgid "RBAC"
 msgstr "RBAC"
@@ -5249,7 +5253,7 @@ msgstr "你的工单已被处理, 处理人 - {} ({})"
 
 #: tickets/serializers/super_ticket.py:11
 msgid "Processor"
-msgstr "流程"
+msgstr "处理人"
 
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:18
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:19
