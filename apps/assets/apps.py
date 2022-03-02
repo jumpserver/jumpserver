@@ -6,11 +6,11 @@ from django.apps import AppConfig
 
 class AssetsConfig(AppConfig):
     name = 'assets'
-    verbose_name = _('Assets')
+    verbose_name = _('App assets')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def ready(self):
         super().ready()
-        from . import signals_handler
+        from . import signal_handlers

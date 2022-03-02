@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 #
+from typing import Callable
+
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
-from datetime import timedelta
 from django.db.utils import IntegrityError
 
 from common.exceptions import JMSException
@@ -53,6 +54,7 @@ class StatusMixin:
     status: str
     applicant: models.ForeignKey
     current_node: models.Manager
+    save: Callable
 
     def set_state_approve(self):
         self.state = TicketState.approved
@@ -182,7 +184,8 @@ class Ticket(CommonModelMixin, StatusMixin, OrgModelMixin):
 
     @property
     def processor(self):
-        processor = self.current_node.first().ticket_assignees.exclude(state=ProcessStatus.notified).first()
+        processor = self.current_node.first().ticket_assignees\
+            .exclude(state=ProcessStatus.notified).first()
         return processor.assignee if processor else None
 
     def create_related_node(self):

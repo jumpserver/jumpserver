@@ -19,8 +19,14 @@ class Migration(migrations.Migration):
                 ('date_created', models.DateTimeField(auto_now_add=True, null=True, verbose_name='Date created')),
                 ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
             ],
-            options={
-                'permissions': [('add_superconnectiontoken', 'Can add super connection token'), ('view_connectiontokensecret', 'Can view connect token secret')],
-            },
+            options={'verbose_name': 'Connection token'},
+        ),
+        migrations.AlterModelOptions(
+            name='accesskey',
+            options={'verbose_name': 'Access key'},
+        ),
+        migrations.AlterModelOptions(
+            name='ssotoken',
+            options={'verbose_name': 'SSO token'},
         ),
     ]

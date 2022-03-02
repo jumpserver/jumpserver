@@ -302,16 +302,26 @@ class SecretDetailMixin:
             user=user, system_user=system_user,
             expired_at=expired_at, actions=actions
         )
+        cmd_filter_kwargs = {
+            'system_user_id': system_user.id,
+            'user_id': user.id,
+        }
         if asset:
             asset_detail = self._get_asset_secret_detail(asset)
             system_user.load_asset_more_auth(asset.id, user.username, user.id)
             data['type'] = 'asset'
             data.update(asset_detail)
+            cmd_filter_kwargs['asset_id'] = asset.id
         else:
             app_detail = self._get_application_secret_detail(app)
             system_user.load_app_more_auth(app.id, user.username, user.id)
             data['type'] = 'application'
             data.update(app_detail)
+            cmd_filter_kwargs['application_id'] = app.id
+
+        from assets.models import CommandFilterRule
+        cmd_filter_rules = CommandFilterRule.get_queryset(**cmd_filter_kwargs)
+        data['cmd_filter_rules'] = cmd_filter_rules
 
         serializer = self.get_serializer(data)
         return Response(data=serializer.data, status=200)
@@ -350,8 +360,10 @@ class UserConnectionTokenViewSet(
         return True
 
     def create_token(self, user, asset, application, system_user, ttl=5 * 60):
-        if not self.request.user.is_superuser and user != self.request.user:
-            raise PermissionDenied('Only super user can create user token')
+        # 再次强调一下权限
+        perm_required = 'authentication.add_superconnectiontoken'
+        if user != self.request.user and not self.request.user.has_perm(perm_required):
+            raise PermissionDenied('Only can create user token')
         self.check_resource_permission(user, asset, application, system_user)
         token = random_string(36)
         secret = random_string(16)

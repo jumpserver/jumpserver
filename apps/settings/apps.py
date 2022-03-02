@@ -7,4 +7,4 @@ class SettingsConfig(AppConfig):
     verbose_name = _('Settings')
 
     def ready(self):
-        from . import signals_handler
+        from . import signal_handlers

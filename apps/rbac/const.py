@@ -16,10 +16,12 @@ exclude_permissions = (
     ('contenttypes', '*', '*', '*'),
     ('django_cas_ng', '*', '*', '*'),
     ('django_celery_beat', '*', '*', '*'),
+    ('jms_oidc_rp', '*', '*', '*'),
     ('admin', '*', '*', '*'),
     ('sessions', '*', '*', '*'),
     ('notifications', '*', '*', '*'),
 
+    ('applications', 'applicationuser', '*', '*'),
     ('applications', 'historicalaccount', '*', '*'),
     ('applications', 'databaseapp', '*', '*'),
     ('applications', 'k8sapp', '*', '*'),
@@ -51,9 +53,15 @@ exclude_permissions = (
     ('audits', 'userloginlog', 'change,delete,change', 'userloginlog'),
     ('audits', 'ftplog', 'change,delete', 'ftplog'),
     ('terminal', 'session', 'delete', 'session'),
+    ('terminal', 'session', 'delete,change', 'command'),
     ('tickets', 'ticket', '*', '*'),
     ('users', 'userpasswordhistory', '*', '*'),
-    ('xpack', 'interface', 'add,delete', 'interface'),
+    ('xpack', 'interface', '*', '*'),
+    ('xpack', 'license', '*', '*'),
+    ('common', 'permission', 'add,delete,view,change', 'permission'),
+    ('terminal', 'command', 'delete,change', 'command'),
+    ('terminal', 'sessionjoinrecord', 'delete', 'sessionjoinrecord'),
+    ('terminal', 'sessionreplay', 'delete', 'sessionreplay'),
 )
 
 

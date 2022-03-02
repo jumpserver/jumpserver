@@ -355,6 +355,6 @@ class Asset(AbsConnectivity, AbsHardwareInfo, ProtocolsMixin, NodesRelationMixin
         verbose_name = _("Asset")
         ordering = ["hostname", ]
         permissions = [
-            ('test_assetconnectivity', 'Can test asset connectivity'),
-            ('push_assetsystemuser', 'Can push system user to asset'),
+            ('test_assetconnectivity', _('Can test asset connectivity')),
+            ('push_assetsystemuser', _('Can push system user to asset')),
         ]
