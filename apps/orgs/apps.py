@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 
 class OrgsConfig(AppConfig):
     name = 'orgs'
-    verbose_name = _('Organizations')
+    verbose_name = _('App organizations')
 
     def ready(self):
         from . import signal_handlers

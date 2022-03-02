@@ -6,7 +6,7 @@ from django.apps import AppConfig
 
 class OpsConfig(AppConfig):
     name = 'ops'
-    verbose_name = _('Operations')
+    verbose_name = _('App ops')
 
     def ready(self):
         from orgs.models import Organization

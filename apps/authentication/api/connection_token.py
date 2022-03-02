@@ -360,8 +360,10 @@ class UserConnectionTokenViewSet(
         return True
 
     def create_token(self, user, asset, application, system_user, ttl=5 * 60):
-        if not self.request.user.is_superuser and user != self.request.user:
-            raise PermissionDenied('Only super user can create user token')
+        # 再次强调一下权限
+        perm_required = 'authentication.add_superconnectiontoken'
+        if user != self.request.user and not self.request.user.has_perm(perm_required):
+            raise PermissionDenied('Only can create user token')
         self.check_resource_permission(user, asset, application, system_user)
         token = random_string(36)
         secret = random_string(16)

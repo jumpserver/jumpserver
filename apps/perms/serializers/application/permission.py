@@ -43,7 +43,7 @@ class ApplicationPermissionSerializer(BasePermissionSerializer):
             'users_amount': {'label': _('Users amount')},
             'user_groups_amount': {'label': _('User groups amount')},
             'system_users_amount': {'label': _('System users amount')},
-            'applications_amount': {'label': _('Applications amount')},
+            'applications_amount': {'label': _('Apps amount')},
         }
 
     def _filter_actions_choices(self, choices):

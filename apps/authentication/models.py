@@ -58,7 +58,10 @@ class ConnectionToken(models.JMSBaseModel):
     # Todo: add connection token 可能要授权给 普通用户, 或者放开就行
 
     class Meta:
-        permissions = [
-            ('add_superconnectiontoken', _('Can add super connection token')),
-            ('view_connectiontokensecret', _('Can view connect token secret'))
-        ]
+        verbose_name = _('Connection token')
+
+
+class SuperConnectionToken(ConnectionToken):
+    class Meta:
+        proxy = True
+        verbose_name = _("Super connection token")
