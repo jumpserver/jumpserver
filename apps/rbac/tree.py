@@ -20,7 +20,7 @@ perm_app_nodes = [
     },
     {
         'app': 'accounts',
-        'full_name': _('Accounts')
+        'full_name': _('Account')
     },
     {
        'app': 'perms'

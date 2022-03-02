@@ -1,9 +1,10 @@
-
+from django.utils.translation import ugettext as _
 from django.db.models import F, Value
 from django.db.models.functions import Concat
 
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import current_org
+from common.exceptions import JMSException
 from .. import serializers
 from ..models import RoleBinding, SystemRoleBinding, OrgRoleBinding
 
@@ -22,7 +23,7 @@ class RoleBindingViewSet(OrgBulkModelViewSet):
     ]
 
     def get_queryset(self):
-        queryset = super().get_queryset()\
+        queryset = super().get_queryset() \
             .prefetch_related('user', 'role') \
             .annotate(
                 user_display=Concat(
@@ -37,6 +38,17 @@ class RoleBindingViewSet(OrgBulkModelViewSet):
 class SystemRoleBindingViewSet(RoleBindingViewSet):
     model = SystemRoleBinding
     serializer_class = serializers.SystemRoleBindingSerializer
+
+    def perform_destroy(self, instance):
+        user = instance.user
+        role_qs = self.model.objects.filter(user=user)
+        if role_qs.count() == 1:
+            msg = _('{} at least one system role').format(user)
+            raise JMSException(
+                code='system_role_delete_error',
+                detail=msg
+            )
+        super().perform_destroy(instance)
 
 
 class OrgRoleBindingViewSet(RoleBindingViewSet):
