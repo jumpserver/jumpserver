@@ -302,16 +302,26 @@ class SecretDetailMixin:
             user=user, system_user=system_user,
             expired_at=expired_at, actions=actions
         )
+        cmd_filter_kwargs = {
+            'system_user_id': system_user.id,
+            'user_id': user.id,
+        }
         if asset:
             asset_detail = self._get_asset_secret_detail(asset)
             system_user.load_asset_more_auth(asset.id, user.username, user.id)
             data['type'] = 'asset'
             data.update(asset_detail)
+            cmd_filter_kwargs['asset_id'] = asset.id
         else:
             app_detail = self._get_application_secret_detail(app)
             system_user.load_app_more_auth(app.id, user.username, user.id)
             data['type'] = 'application'
             data.update(app_detail)
+            cmd_filter_kwargs['application_id'] = app.id
+
+        from assets.models import CommandFilterRule
+        cmd_filter_rules = CommandFilterRule.get_queryset(**cmd_filter_kwargs)
+        data['cmd_filter_rules'] = cmd_filter_rules
 
         serializer = self.get_serializer(data)
         return Response(data=serializer.data, status=200)

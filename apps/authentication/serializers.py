@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 from common.utils import get_object_or_none
 from users.models import User
-from assets.models import Asset, SystemUser, Gateway, Domain
+from assets.models import Asset, SystemUser, Gateway, Domain, CommandFilterRule
 from applications.models import Application
 from users.serializers import UserProfileSerializer
 from assets.serializers import ProtocolsField
@@ -200,6 +200,17 @@ class ConnectionTokenDomainSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'gateways']
 
 
+class ConnectionTokenFilterRuleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CommandFilterRule
+        fields = [
+            'id', 'type', 'content', 'ignore_case', 'pattern',
+            'priority', 'action',
+            'date_created',
+        ]
+
+
 class ConnectionTokenSecretSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)
     secret = serializers.CharField(read_only=True)
@@ -209,6 +220,7 @@ class ConnectionTokenSecretSerializer(serializers.Serializer):
     remote_app = ConnectionTokenRemoteAppSerializer(read_only=True)
     application = ConnectionTokenApplicationSerializer(read_only=True)
     system_user = ConnectionTokenSystemUserSerializer(read_only=True)
+    cmd_filter_rules = ConnectionTokenFilterRuleSerializer(many=True)
     domain = ConnectionTokenDomainSerializer(read_only=True)
     gateway = ConnectionTokenGatewaySerializer(read_only=True)
     actions = ActionsField()

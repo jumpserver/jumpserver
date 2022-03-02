@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 #
+from typing import Callable
+
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
@@ -52,6 +54,7 @@ class StatusMixin:
     status: str
     applicant: models.ForeignKey
     current_node: models.Manager
+    save: Callable
 
     def set_state_approve(self):
         self.state = TicketState.approved
