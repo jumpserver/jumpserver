@@ -115,10 +115,21 @@
         .mfa-div {
             width: 100%;
         }
+
+        .login-page-language {
+            margin-right: -11px !important;
+            padding-top: 12px !important;
+            padding-left: 0 !important;
+            padding-bottom: 8px !important;
+            color: #666 !important;
+            font-weight: 350 !important;
+            min-height: auto !important;
+        }
     </style>
 </head>
 
 <body>
+
 <div class="login-content">
     <div class="right-image-box">
         <a href="{% if not XPACK_ENABLED %}https://github.com/jumpserver/jumpserver{% endif %}">
@@ -127,6 +138,22 @@
     </div>
     <div class="left-form-box {% if not form.challenge and not form.captcha %} no-captcha-challenge {% endif %}">
         <div style="background-color: white">
+            <ul class="nav navbar-top-links navbar-right">
+                <li class="dropdown">
+                    <a class="dropdown-toggle login-page-language" data-toggle="dropdown" href="#" target="_blank">
+                        <i class="fa fa-globe fa-lg" style="margin-right: 2px"></i>
+                        {% ifequal request.COOKIES.django_language 'en' %}
+                            <span>English<b class="caret"></b></span>
+                        {% else %}
+                            <span>中文(简体)<b class="caret"></b></span>
+                        {% endifequal %}
+                    </a>
+                    <ul class="dropdown-menu profile-dropdown dropdown-menu-right">
+                        <li> <a id="switch_cn" href="{% url 'i18n-switch' lang='zh-hans' %}"> <span>中文(简体)</span> </a> </li>
+                        <li> <a id="switch_en" href="{% url 'i18n-switch' lang='en' %}"> <span>English</span> </a> </li>
+                    </ul>
+                </li>
+            </ul>
             <div class="jms-title">
                 <span style="font-size: 21px;font-weight:400;color: #151515;letter-spacing: 0;">{{ JMS_TITLE }}</span>
             </div>
