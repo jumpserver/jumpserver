@@ -2,7 +2,7 @@
 `m2m_changed`
 
 ```
-def m2m_signals_handler(action, instance, reverse, model, pk_set, using):
+def m2m_signal_handler(action, instance, reverse, model, pk_set, using):
      pass
 ```
 """

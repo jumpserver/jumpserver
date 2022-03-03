@@ -49,7 +49,7 @@ def on_site_message_create(sender, instance, created, **kwargs):
     new_site_msg_chan.publish(data)
 
 
-@receiver(post_migrate, dispatch_uid='notifications.signals_handler.create_system_messages')
+@receiver(post_migrate, dispatch_uid='notifications.signal_handlers.create_system_messages')
 def create_system_messages(app_config: AppConfig, **kwargs):
     try:
         notifications_module = import_module('.notifications', app_config.module.__package__)
