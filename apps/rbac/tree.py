@@ -126,12 +126,12 @@ extra_nodes_data = [
     },
     {
         "id": "terminal_node",
-        "name": _("Terminal"),
+        "name": _("Terminal setting"),
         "pId": "view_setting"
     }
 ]
 
-special_pid_mapper = {
+special_model_pid_mapper = {
     'common.permission': 'view_other',
     "assets.authbook": "accounts",
     "applications.account": "accounts",
@@ -158,6 +158,14 @@ special_pid_mapper = {
     'terminal.status': 'terminal_node',
     'terminal.task': 'terminal_node',
 }
+
+model_verbose_name_mapper = {
+    'orgs.organization': _("App organizations"),
+}
+
+xpack_required = [
+    'accounts', 'rbac.'
+]
 
 
 class PermissionTreeUtil:
@@ -198,6 +206,8 @@ class PermissionTreeUtil:
             }
             total_count = self.total_counts[app]
             checked_count = self.checked_counts[app]
+            if total_count == 0:
+                continue
             self.total_counts[view] += total_count
             self.checked_counts[view] += checked_count
             node = self._create_node(
@@ -238,14 +248,18 @@ class PermissionTreeUtil:
                 continue
 
             model_id = '{}.{}'.format(ct.app_label, ct.model)
+            # 获取 pid
             app = ct.app_label
-            if special_pid_mapper.get(model_id):
-                app = special_pid_mapper[model_id]
-
+            if special_model_pid_mapper.get(model_id):
+                app = special_model_pid_mapper[model_id]
             self.total_counts[app] += total_count
             self.checked_counts[app] += checked_count
 
+            # 获取 name
             name = f'{ct.name}'
+            if model_verbose_name_mapper.get(model_id):
+                name = model_verbose_name_mapper[model_id]
+
             node = self._create_node({
                 'id': model_id,
                 'name': name,

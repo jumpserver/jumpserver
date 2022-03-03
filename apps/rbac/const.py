@@ -20,6 +20,7 @@ exclude_permissions = (
     ('admin', '*', '*', '*'),
     ('sessions', '*', '*', '*'),
     ('notifications', '*', '*', '*'),
+    ('common', 'setting', '*', '*'),
 
     ('applications', 'applicationuser', '*', '*'),
     ('applications', 'historicalaccount', '*', '*'),
@@ -42,6 +43,8 @@ exclude_permissions = (
     ('perms', 'rebuildusertreetask', '*', '*'),
     ('rbac', 'contenttype', '*', '*'),
     ('rbac', 'permission', 'add,delete,change', 'permission'),
+    ('rbac', 'rolebingding', '*', '*'),
+    ('rbac', 'role', '*', '*'),
     ('ops', 'adhoc', '*', '*'),
     ('ops', 'adhocexecution', '*', '*'),
     ('ops', 'celerytask', '*', '*'),
