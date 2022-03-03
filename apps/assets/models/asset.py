@@ -357,4 +357,5 @@ class Asset(AbsConnectivity, AbsHardwareInfo, ProtocolsMixin, NodesRelationMixin
         permissions = [
             ('test_assetconnectivity', _('Can test asset connectivity')),
             ('push_assetsystemuser', _('Can push system user to asset')),
+            ('match_asset', _('Can match asset')),
         ]
