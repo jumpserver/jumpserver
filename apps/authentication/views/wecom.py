@@ -28,7 +28,7 @@ logger = get_logger(__file__)
 WECOM_STATE_SESSION_KEY = '_wecom_state'
 
 
-class WeComQRMixin(PermissionsMixin, View):
+class WeComBaseMixin(PermissionsMixin, View):
     def dispatch(self, request, *args, **kwargs):
         try:
             return super().dispatch(request, *args, **kwargs)
@@ -54,19 +54,6 @@ class WeComQRMixin(PermissionsMixin, View):
         msg = _("The system configuration is incorrect. Please contact your administrator")
         return self.get_failed_response(redirect_uri, msg, msg)
 
-    def get_qr_url(self, redirect_uri):
-        state = random_string(16)
-        self.request.session[WECOM_STATE_SESSION_KEY] = state
-
-        params = {
-            'appid': settings.WECOM_CORPID,
-            'agentid': settings.WECOM_AGENTID,
-            'state': state,
-            'redirect_uri': redirect_uri,
-        }
-        url = URL.QR_CONNECT + '?' + urlencode(params)
-        return url
-
     @staticmethod
     def get_success_response(redirect_url, title, msg):
         message_data = {
@@ -91,6 +78,46 @@ class WeComQRMixin(PermissionsMixin, View):
         msg = _('WeCom is already bound')
         response = self.get_failed_response(redirect_url, msg, msg)
         return response
+
+
+class WeComQRMixin(WeComBaseMixin, View):
+
+    def get_qr_url(self, redirect_uri):
+        state = random_string(16)
+        self.request.session[WECOM_STATE_SESSION_KEY] = state
+
+        params = {
+            'appid': settings.WECOM_CORPID,
+            'agentid': settings.WECOM_AGENTID,
+            'state': state,
+            'redirect_uri': redirect_uri,
+        }
+        url = URL.QR_CONNECT + '?' + urlencode(params)
+        return url
+
+
+class WeComOAuthMixin(WeComBaseMixin, View):
+
+    def get_oauth_url(self, redirect_uri):
+        if not settings.AUTH_WECOM:
+            return reverse('authentication:login')
+        state = random_string(16)
+        self.request.session[WECOM_STATE_SESSION_KEY] = state
+
+        params = {
+            'appid': settings.WECOM_CORPID,
+            'agentid': settings.WECOM_AGENTID,
+            'state': state,
+            'redirect_uri': redirect_uri,
+            'response_type': 'code',
+            'scope': 'snsapi_base',
+        }
+
+        if not settings.WECOM_OAUTH:
+            url = reverse('authentication:wecom-qr-login')
+        else:
+            url = URL.OAUTH_CONNECT + '?' + urlencode(params) + '#wechat_redirect'
+        return url
 
 
 class WeComQRBindView(WeComQRMixin, View):
@@ -187,6 +214,60 @@ class WeComQRLoginView(WeComQRMixin, View):
 
 
 class WeComQRLoginCallbackView(AuthMixin, WeComQRMixin, View):
+    permission_classes = (AllowAny,)
+
+    def get(self, request: HttpRequest):
+        code = request.GET.get('code')
+        redirect_url = request.GET.get('redirect_url')
+        login_url = reverse('authentication:login')
+
+        if not self.verify_state():
+            return self.get_verify_state_failed_response(redirect_url)
+
+        wecom = WeCom(
+            corpid=settings.WECOM_CORPID,
+            corpsecret=settings.WECOM_SECRET,
+            agentid=settings.WECOM_AGENTID
+        )
+        wecom_userid, __ = wecom.get_user_id_by_code(code)
+        if not wecom_userid:
+            # 正常流程不会出这个错误，hack 行为
+            msg = _('Failed to get user from WeCom')
+            response = self.get_failed_response(login_url, title=msg, msg=msg)
+            return response
+
+        user = get_object_or_none(User, wecom_id=wecom_userid)
+        if user is None:
+            title = _('WeCom is not bound')
+            msg = _('Please login with a password and then bind the WeCom')
+            response = self.get_failed_response(login_url, title=title, msg=msg)
+            return response
+
+        try:
+            self.check_oauth2_auth(user, settings.AUTH_BACKEND_WECOM)
+        except errors.AuthFailedError as e:
+            self.set_login_failed_mark()
+            msg = e.msg
+            response = self.get_failed_response(login_url, title=msg, msg=msg)
+            return response
+
+        return self.redirect_to_guard_view()
+
+
+class WeComOAuthLoginView(WeComOAuthMixin, View):
+    permission_classes = (AllowAny,)
+
+    def get(self,  request: HttpRequest):
+        redirect_url = request.GET.get('redirect_url')
+
+        redirect_uri = reverse('authentication:wecom-oauth-login-callback', external=True)
+        redirect_uri += '?' + urlencode({'redirect_url': redirect_url})
+
+        url = self.get_oauth_url(redirect_uri)
+        return HttpResponseRedirect(url)
+
+
+class WeComOAuthLoginCallbackView(AuthMixin, WeComOAuthMixin, View):
     permission_classes = (AllowAny,)
 
     def get(self, request: HttpRequest):
