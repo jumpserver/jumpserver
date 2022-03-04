@@ -77,6 +77,7 @@ only_system_permissions = (
     ('orgs', 'organization', '*', '*'),
     ('xpack', 'license', '*', '*'),
     ('settings', 'setting', '*', '*'),
+    ('terminal', 'terminal', '*', '*'),
 )
 
 only_org_permissions = (

@@ -368,6 +368,8 @@ class PermissionTreeUtil:
             }
             total_count = self.total_counts[view]
             checked_count = self.checked_counts[view]
+            if total_count == 0:
+                continue
             node = self._create_node(data, total_count, checked_count, 'view')
             nodes.append(node)
         return nodes
@@ -379,6 +381,8 @@ class PermissionTreeUtil:
             pid = data['pId']
             checked_count = self.checked_counts[i]
             total_count = self.total_counts[i]
+            if total_count == 0:
+                continue
             self.total_counts[pid] += total_count
             self.checked_counts[pid] += checked_count
             node = self._create_node(
