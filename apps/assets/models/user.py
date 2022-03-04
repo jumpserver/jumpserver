@@ -323,6 +323,9 @@ class SystemUser(ProtocolMixin, AuthMixin, BaseUser):
         ordering = ['name']
         unique_together = [('name', 'org_id')]
         verbose_name = _("System user")
+        permissions = [
+            ('match_systemuser', _('Can match system user')),
+        ]
 
 
 # Deprecated: 准备废弃

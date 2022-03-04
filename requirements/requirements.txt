@@ -24,7 +24,7 @@ django-ranged-response==0.2.0
 django-redis-cache==2.1.1
 django-rest-swagger==2.2.0
 django-simple-captcha==0.5.13
-django-timezone-field==4.0
+django-timezone-field==4.1.0
 djangorestframework==3.12.2
 djangorestframework-bulk==0.2.1
 docutils==0.14

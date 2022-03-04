@@ -47,7 +47,8 @@ class SystemUserViewSet(SuggestionMixin, OrgBulkModelViewSet):
     ordering = ('name', )
     rbac_perms = {
         'su_from': 'assets.view_systemuser',
-        'su_to': 'assets.view_systemuser'
+        'su_to': 'assets.view_systemuser',
+        'match': 'assets.match_systemuser'
     }
 
     @action(methods=['get'], detail=False, url_path='su-from')

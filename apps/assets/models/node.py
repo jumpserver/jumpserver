@@ -558,6 +558,9 @@ class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
     class Meta:
         verbose_name = _("Node")
         ordering = ['parent_key', 'value']
+        permissions = [
+            ('match_node', _('Can match node')),
+        ]
 
     def __str__(self):
         return self.full_value

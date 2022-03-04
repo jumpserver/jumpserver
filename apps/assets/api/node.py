@@ -46,6 +46,9 @@ class NodeViewSet(SuggestionMixin, OrgBulkModelViewSet):
     filterset_fields = ('value', 'key', 'id')
     search_fields = ('value', )
     serializer_class = serializers.NodeSerializer
+    rbac_perms = {
+        'match': 'assets.match_node'
+    }
 
     @action(methods=[POST], detail=False, url_path='check_assets_amount_task')
     def check_assets_amount_task(self, request):
