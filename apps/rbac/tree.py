@@ -11,6 +11,7 @@ from django.utils.translation import ugettext
 from .models import Permission, ContentType
 from common.tree import TreeNode
 
+# 根节点
 root_node_data = {
     'id': '$ROOT$',
     'name': _('All permissions'),
@@ -18,6 +19,7 @@ root_node_data = {
     'pId': '',
 }
 
+# 第二层 view 节点，手动创建的
 view_nodes_data = [
     {
         'id': 'view_console',
@@ -41,6 +43,7 @@ view_nodes_data = [
     }
 ]
 
+# 第三层 app 节点，定义了父子关系
 app_nodes_data = [
     {
         'id': 'users',
@@ -98,6 +101,7 @@ app_nodes_data = [
     }
 ]
 
+# 额外其他节点，可以在不同的层次，需要指定父节点，可以将一些 model 归类到这个节点下面
 extra_nodes_data = [
     {
         "id": "cloud_import",
@@ -131,6 +135,7 @@ extra_nodes_data = [
     }
 ]
 
+# 将 model 放到其它节点下，而不是本来的 app 中
 special_model_pid_mapper = {
     'common.permission': 'view_other',
     "assets.authbook": "accounts",
@@ -157,14 +162,19 @@ special_model_pid_mapper = {
     'terminal.replaystorage': 'terminal_node',
     'terminal.status': 'terminal_node',
     'terminal.task': 'terminal_node',
+    'audits.ftplog': 'terminal',
+    'rbac.menupermission': 'view_other',
 }
 
 model_verbose_name_mapper = {
     'orgs.organization': _("App organizations"),
 }
 
-xpack_required = [
-    'accounts', 'rbac.'
+xpack_apps = [
+    'xpack', 'tickets',
+]
+
+xpack_models = [
 ]
 
 
@@ -236,6 +246,17 @@ class PermissionTreeUtil:
         }
         return model_counts_mapper, model_check_counts_mapper
 
+    @staticmethod
+    def _check_model_xpack(model_id):
+        app, model = model_id.split('.', 2)
+        if settings.XPACK_ENABLED:
+            return True
+        if app in xpack_apps:
+            return False
+        if model_id in xpack_models:
+            return False
+        return True
+
     def _create_models_nodes(self):
         content_types = ContentType.objects.all()
         total_counts_mapper, checked_counts_mapper = self._get_model_counts_mapper()
@@ -248,6 +269,8 @@ class PermissionTreeUtil:
                 continue
 
             model_id = '{}.{}'.format(ct.app_label, ct.model)
+            if not self._check_model_xpack(model_id):
+                continue
             # 获取 pid
             app = ct.app_label
             if special_model_pid_mapper.get(model_id):
@@ -307,6 +330,8 @@ class PermissionTreeUtil:
 
         for p in self.all_permissions:
             model_id = f'{p.app}.{p.model}'
+            if not self._check_model_xpack(model_id):
+                continue
             name = self._get_permission_name(p, content_types_name_mapper)
             if settings.DEBUG:
                 name += '({})'.format(p.app_label_codename)

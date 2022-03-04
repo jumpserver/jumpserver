@@ -78,6 +78,10 @@ only_system_permissions = (
     ('xpack', 'license', '*', '*'),
     ('settings', 'setting', '*', '*'),
     ('terminal', 'terminal', '*', '*'),
+    ('terminal', 'commandstorage', '*', '*'),
+    ('terminal', 'replaystorage', '*', '*'),
+    ('terminal', 'status', '*', '*'),
+    ('terminal', 'task', '*', '*'),
 )
 
 only_org_permissions = (

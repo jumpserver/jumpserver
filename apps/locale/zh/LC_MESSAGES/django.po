@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-02 19:46+0800\n"
+"POT-Creation-Date: 2022-03-04 15:36+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -90,7 +90,7 @@ msgstr "登录复核"
 #: assets/models/cmd_filter.py:30 assets/models/label.py:15 audits/models.py:37
 #: audits/models.py:60 audits/models.py:85 audits/serializers.py:100
 #: authentication/models.py:50 orgs/models.py:196 perms/models/base.py:84
-#: rbac/builtin.py:89 rbac/models/rolebinding.py:33 templates/index.html:78
+#: rbac/builtin.py:99 rbac/models/rolebinding.py:35 templates/index.html:78
 #: terminal/backends/command/models.py:19
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:42
 #: terminal/notifications.py:88 terminal/notifications.py:136
@@ -481,15 +481,15 @@ msgstr "Vmware 密码"
 msgid "Number required"
 msgstr "需要为数字"
 
-#: assets/api/node.py:58
+#: assets/api/node.py:61
 msgid "You can't update the root node name"
 msgstr "不能修改根节点名称"
 
-#: assets/api/node.py:65
+#: assets/api/node.py:68
 msgid "You can't delete the root node ({})"
 msgstr "不能删除根节点 ({})"
 
-#: assets/api/node.py:68
+#: assets/api/node.py:71
 msgid "Deletion failed and the node contains assets"
 msgstr "删除失败，节点包含资产"
 
@@ -595,7 +595,7 @@ msgid "Is active"
 msgstr "激活"
 
 #: assets/models/asset.py:222 assets/models/cluster.py:19
-#: assets/models/user.py:222 assets/models/user.py:374
+#: assets/models/user.py:222 assets/models/user.py:377
 msgid "Admin user"
 msgstr "特权用户"
 
@@ -629,6 +629,12 @@ msgstr "可以测试资产连接性"
 #: assets/models/asset.py:359
 msgid "Can push system user to asset"
 msgstr "可以推送系统用户到资产"
+
+#: assets/models/asset.py:360
+#, fuzzy
+#| msgid "Can match user"
+msgid "Can match asset"
+msgstr "可以匹配用户"
 
 #: assets/models/authbook.py:27
 msgid "AuthBook"
@@ -744,7 +750,7 @@ msgstr "校验日期"
 
 #: assets/models/base.py:177 audits/signal_handlers.py:68
 #: authentication/forms.py:22
-#: authentication/templates/authentication/login.html:151
+#: authentication/templates/authentication/login.html:178
 #: settings/serializers/auth/ldap.py:44 users/forms/profile.py:21
 #: users/templates/users/_msg_user_created.html:13
 #: users/templates/users/user_password_update.html:43
@@ -933,7 +939,7 @@ msgstr "空"
 msgid "Key"
 msgstr "键"
 
-#: assets/models/node.py:547 assets/serializers/node.py:21
+#: assets/models/node.py:547 assets/serializers/node.py:20
 msgid "Full value"
 msgstr "全称"
 
@@ -948,6 +954,12 @@ msgstr "ssh私钥"
 #: xpack/plugins/cloud/models.py:93 xpack/plugins/cloud/serializers/task.py:69
 msgid "Node"
 msgstr "节点"
+
+#: assets/models/node.py:562
+#, fuzzy
+#| msgid "Can match user"
+msgid "Can match node"
+msgstr "可以匹配用户"
 
 #: assets/models/user.py:216
 msgid "Automatic managed"
@@ -1018,6 +1030,12 @@ msgstr "用户切换"
 #: assets/models/user.py:247
 msgid "Switch from"
 msgstr "切换自"
+
+#: assets/models/user.py:327
+#, fuzzy
+#| msgid "Can match user"
+msgid "Can match system user"
+msgstr "可以匹配用户"
 
 #: assets/models/utils.py:35
 #, python-format
@@ -1120,15 +1138,15 @@ msgstr "应用数量"
 msgid "Gateways count"
 msgstr "网关数量"
 
-#: assets/serializers/node.py:18
+#: assets/serializers/node.py:17
 msgid "value"
 msgstr "值"
 
-#: assets/serializers/node.py:32
+#: assets/serializers/node.py:31
 msgid "Can't contains: /"
 msgstr "不能包含: /"
 
-#: assets/serializers/node.py:42
+#: assets/serializers/node.py:41
 msgid "The same level node name cannot be the same"
 msgstr "同级别节点名字不能重复"
 
@@ -1327,7 +1345,7 @@ msgstr "日志审计"
 
 #: audits/models.py:27 audits/models.py:57
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:254 users/templates/users/user_asset_permission.html:128
+#: rbac/tree.py:278 users/templates/users/user_asset_permission.html:128
 #: users/templates/users/user_database_app_permission.html:111
 msgid "Delete"
 msgstr "删除"
@@ -1381,11 +1399,11 @@ msgstr "文件管理"
 
 #: audits/models.py:55
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:251
+#: rbac/tree.py:275
 msgid "Create"
 msgstr "创建"
 
-#: audits/models.py:56 rbac/tree.py:253 templates/_csv_import_export.html:18
+#: audits/models.py:56 rbac/tree.py:277 templates/_csv_import_export.html:18
 #: templates/_csv_update_modal.html:6
 #: users/templates/users/user_asset_permission.html:127
 #: users/templates/users/user_database_app_permission.html:110
@@ -2015,13 +2033,11 @@ msgstr ""
 msgid "Connection token"
 msgstr ""
 
-#: authentication/models.py:63
-msgid "Can add super connection token"
+#: authentication/models.py:67
+#, fuzzy
+#| msgid "Can add super connection token"
+msgid "Super connection token"
 msgstr "可以添加 超级连接Token"
-
-#: authentication/models.py:64
-msgid "Can view connect token secret"
-msgstr "可以查看 连接Token 密文"
 
 #: authentication/notifications.py:19
 msgid "Different city login reminder"
@@ -2201,22 +2217,22 @@ msgid ""
 "security issues"
 msgstr "如果这次公钥更新不是由你发起的，那么你的账号可能存在安全问题"
 
-#: authentication/templates/authentication/login.html:143
+#: authentication/templates/authentication/login.html:170
 msgid "Welcome back, please enter username and password to login"
 msgstr "欢迎回来，请输入用户名和密码登录"
 
-#: authentication/templates/authentication/login.html:179
+#: authentication/templates/authentication/login.html:206
 #: users/templates/users/forgot_password.html:15
 #: users/templates/users/forgot_password.html:16
 msgid "Forgot password"
 msgstr "忘记密码"
 
-#: authentication/templates/authentication/login.html:186
+#: authentication/templates/authentication/login.html:213
 #: templates/_header_bar.html:83
 msgid "Login"
 msgstr "登录"
 
-#: authentication/templates/authentication/login.html:193
+#: authentication/templates/authentication/login.html:220
 msgid "More login options"
 msgstr "更多登录方式"
 
@@ -2826,12 +2842,12 @@ msgstr "当前组织 ({}) 不能被删除"
 msgid "The organization have resource ({}) cannot be deleted"
 msgstr "组织存在资源 ({}) 不能被删除"
 
-#: orgs/apps.py:7
+#: orgs/apps.py:7 rbac/tree.py:163
 msgid "App organizations"
 msgstr "组织管理"
 
 #: orgs/mixins/models.py:46 orgs/mixins/serializers.py:25 orgs/models.py:27
-#: orgs/models.py:193 rbac/const.py:7 rbac/models/rolebinding.py:40
+#: orgs/models.py:193 rbac/const.py:7 rbac/models/rolebinding.py:42
 #: rbac/serializers/rolebinding.py:40 tickets/serializers/ticket/ticket.py:77
 msgid "Organization"
 msgstr "组织"
@@ -2844,7 +2860,7 @@ msgstr "全局组织"
 msgid "Can view root org"
 msgstr "可以查看全局组织"
 
-#: orgs/models.py:198 rbac/models/role.py:46 rbac/models/rolebinding.py:36
+#: orgs/models.py:198 rbac/models/role.py:46 rbac/models/rolebinding.py:38
 #: users/models/user.py:560 users/templates/users/_select_user_modal.html:15
 msgid "Role"
 msgstr "角色"
@@ -3061,27 +3077,27 @@ msgstr "{} 至少有一个系统角色"
 msgid "RBAC"
 msgstr "RBAC"
 
-#: rbac/builtin.py:80
+#: rbac/builtin.py:90
 msgid "SystemAdmin"
 msgstr "系统管理员"
 
-#: rbac/builtin.py:83
+#: rbac/builtin.py:93
 msgid "SystemAuditor"
 msgstr "系统审计员"
 
-#: rbac/builtin.py:86
+#: rbac/builtin.py:96
 msgid "SystemComponent"
 msgstr "系统组件"
 
-#: rbac/builtin.py:92
+#: rbac/builtin.py:102
 msgid "OrgAdmin"
 msgstr "组织管理员"
 
-#: rbac/builtin.py:95
+#: rbac/builtin.py:105
 msgid "OrgAuditor"
 msgstr "组织审计员"
 
-#: rbac/builtin.py:98
+#: rbac/builtin.py:108
 msgid "OrgUser"
 msgstr "组织用户"
 
@@ -3105,7 +3121,7 @@ msgstr "查看工作台"
 msgid "Permission"
 msgstr "授权"
 
-#: rbac/models/role.py:31 rbac/models/rolebinding.py:30
+#: rbac/models/role.py:31 rbac/models/rolebinding.py:32
 msgid "Scope"
 msgstr "范围"
 
@@ -3125,21 +3141,21 @@ msgstr "系统角色"
 msgid "Organization role"
 msgstr "组织角色"
 
-#: rbac/models/rolebinding.py:45
+#: rbac/models/rolebinding.py:47
 msgid "Role binding"
 msgstr "角色绑定"
 
-#: rbac/models/rolebinding.py:111
+#: rbac/models/rolebinding.py:113
 msgid ""
 "User last role in org, can not be delete, you can remove user from org "
 "instead"
 msgstr "用户最后一个角色，不能删除，你可以将用户从组织移除"
 
-#: rbac/models/rolebinding.py:118
+#: rbac/models/rolebinding.py:120
 msgid "Organization role binding"
 msgstr "组织角色绑定"
 
-#: rbac/models/rolebinding.py:132
+#: rbac/models/rolebinding.py:134
 msgid "System role binding"
 msgstr "系统角色绑定"
 
@@ -3215,7 +3231,11 @@ msgstr "应用改密"
 msgid "Asset change auth"
 msgstr "资产改密"
 
-#: rbac/tree.py:252
+#: rbac/tree.py:129
+msgid "Terminal setting"
+msgstr "终端设置"
+
+#: rbac/tree.py:276
 msgid "View"
 msgstr "查看"
 
@@ -6687,6 +6707,9 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Can view connect token secret"
+#~ msgstr "可以查看 连接Token 密文"
 
 #~ msgid "AppAsset"
 #~ msgstr "资产管理"

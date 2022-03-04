@@ -401,7 +401,12 @@ class UserConnectionTokenViewSet(
 
         asset, application, system_user, user = self.get_request_resource(serializer)
         token, secret = self.create_token(user, asset, application, system_user)
-        return Response({"id": token, 'secret': secret}, status=201)
+        tp = 'app' if application else 'asset'
+        data = {
+            "id": token, 'secret': secret,
+            'type': tp, 'protocol': system_user.protocol
+        }
+        return Response(data, status=201)
 
     def valid_token(self, token):
         from users.models import User
