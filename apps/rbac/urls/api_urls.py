@@ -16,9 +16,12 @@ router.register(r'system-role-bindings', api.SystemRoleBindingViewSet, 'system-r
 router.register(r'org-role-bindings', api.OrgRoleBindingViewSet, 'org-role-binding')
 router.register(r'permissions', api.PermissionViewSet, 'permission')
 
-role_router = routers.NestedDefaultRouter(router, r'roles', lookup='role')
-role_router.register(r'permissions', api.RolePermissionsViewSet, 'role-permission')
+system_role_router = routers.NestedDefaultRouter(router, r'system-roles', lookup='system_role')
+system_role_router.register(r'permissions', api.SystemRolePermissionsViewSet, 'system-role-permission')
+
+org_role_router = routers.NestedDefaultRouter(router, r'org-roles', lookup='org_role')
+org_role_router.register(r'permissions', api.OrgRolePermissionsViewSet, 'org-role-permission')
 
 urlpatterns = []
 
-urlpatterns += router.urls + role_router.urls
+urlpatterns += router.urls + system_role_router.urls + org_role_router.urls

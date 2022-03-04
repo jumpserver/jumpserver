@@ -9,8 +9,8 @@ from ..models import Role, SystemRole, OrgRole
 from .permission import PermissionViewSet
 
 __all__ = [
-    'RoleViewSet', 'RolePermissionsViewSet',
-    'SystemRoleViewSet', 'OrgRoleViewSet'
+    'RoleViewSet', 'SystemRoleViewSet', 'OrgRoleViewSet',
+    'SystemRolePermissionsViewSet', 'OrgRolePermissionsViewSet',
 ]
 
 
@@ -40,7 +40,7 @@ class RoleViewSet(JMSModelViewSet):
         return super().perform_update(serializer)
 
     def get_queryset(self):
-        queryset = super().get_queryset()\
+        queryset = super().get_queryset() \
             .annotate(permissions_amount=Count('permissions'))
         return queryset
 
@@ -59,23 +59,40 @@ class OrgRoleViewSet(RoleViewSet):
     queryset = OrgRole.objects.all()
 
 
-# Sub view set
-class RolePermissionsViewSet(PermissionViewSet):
+class BaseRolePermissionsViewSet(PermissionViewSet):
+    model = None
+    role_pk = None
     filterset_fields = []
-    rbac_perms = (
-        ('get_tree', 'role.view_role'),
-    )
     http_method_names = ['get', 'option']
     check_disabled = False
 
     def get_queryset(self):
-        role_id = self.kwargs.get('role_pk')
+        role_id = self.kwargs.get(self.role_pk)
         if not role_id:
-            return Role.objects.none()
+            return self.model.objects.none()
 
-        role = Role.objects.get(id=role_id)
+        role = self.model.objects.get(id=role_id)
         self.scope = role.scope
         self.check_disabled = role.builtin
-        queryset = role.get_permissions()\
+        queryset = role.get_permissions() \
             .prefetch_related('content_type')
         return queryset
+
+
+# Sub view set
+class SystemRolePermissionsViewSet(BaseRolePermissionsViewSet):
+    role_pk = 'system_role_pk'
+    model = SystemRole
+    rbac_perms = (
+        ('get_tree', 'rbac.view_systemrole'),
+    )
+
+
+# Sub view set
+class OrgRolePermissionsViewSet(BaseRolePermissionsViewSet):
+    role_pk = 'org_role_pk'
+    model = OrgRole
+    rbac_perms = (
+        ('get_tree', 'rbac.view_orgrole'),
+    )
+
