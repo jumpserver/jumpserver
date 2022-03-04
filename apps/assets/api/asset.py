@@ -54,6 +54,9 @@ class AssetViewSet(SuggestionMixin, FilterAssetByNodeMixin, OrgBulkModelViewSet)
         'default': serializers.AssetSerializer,
         'suggestion': serializers.MiniAssetSerializer
     }
+    rbac_perms = {
+        'match': 'assets.match_asset'
+    }
     extra_filter_backends = [FilterAssetByNodeFilterBackend, LabelFilterBackend, IpInFilterBackend]
 
     def set_assets_node(self, assets):
