@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'notifications.apps.NotificationsConfig',
     'rbac.apps.RBACConfig',
     'common.apps.CommonConfig',
+    'jms_oidc_rp',
     'rest_framework',
     'rest_framework_swagger',
     'drf_yasg',

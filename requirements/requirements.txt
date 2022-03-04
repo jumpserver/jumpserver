@@ -95,6 +95,7 @@ ipython
 huaweicloud-sdk-python==1.0.21
 django-redis==4.11.0
 python-redis-lock==3.7.0
+jumpserver-django-oidc-rp==0.3.7.8
 django-mysql==3.9.0
 gmssl==3.2.1
 azure-mgmt-compute==4.6.2
