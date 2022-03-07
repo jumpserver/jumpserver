@@ -88,7 +88,7 @@ class AssetAccountHandler(BaseAccountHandler):
         for k, v in df_dict.items():
             df_dict[k] = pd.DataFrame(v)
 
-        logger.info('\n\033[33m- 共收集{}条资产账号\033[0m'.format(accounts.count()))
+        logger.info('\n\033[33m- 共收集 {} 条资产账号\033[0m'.format(accounts.count()))
         return df_dict
 
 
