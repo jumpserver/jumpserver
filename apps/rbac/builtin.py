@@ -21,11 +21,14 @@ auditor_perms = (
 
 user_perms = (
     ('rbac', 'menupermission', 'view', 'userview'),
-    ('perms', 'assetpermission', 'view,connect', 'myassets'),
-    ('perms', 'applicationpermission', 'view,connect', 'myapps'),
+    ('rbac', 'menupermission', 'view', 'webterminal'),
+    ('rbac', 'menupermission', 'view', 'filemanager'),
+    ('perms', 'permedasset', 'view,connect', 'myassets'),
+    ('perms', 'permedapplication', 'view,connect', 'myapps'),
     ('assets', 'asset', 'match', 'asset'),
     ('assets', 'systemuser', 'match', 'systemuser'),
     ('assets', 'node', 'match', 'node'),
+    ('ops', 'commandexecution', 'add', 'commandexecution'),
 )
 
 app_exclude_perms = [

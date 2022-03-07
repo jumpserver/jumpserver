@@ -132,7 +132,17 @@ extra_nodes_data = [
         "id": "terminal_node",
         "name": _("Terminal setting"),
         "pId": "view_setting"
-    }
+    },
+    {
+        'id': "my_assets",
+        "name": _("My assets"),
+        "pId": "view_workspace"
+    },
+    {
+        'id': "my_apps",
+        "name": _("My apps"),
+        "pId": "view_workspace"
+    },
 ]
 
 # 将 model 放到其它节点下，而不是本来的 app 中
@@ -164,10 +174,16 @@ special_model_pid_mapper = {
     'terminal.task': 'terminal_node',
     'audits.ftplog': 'terminal',
     'rbac.menupermission': 'view_other',
+    'perms.view_myassets': 'my_assets',
+    'perms.connect_myassets': 'my_assets',
+    'perms.view_myapps': 'my_apps',
+    'perms.connect_myapps': 'my_apps',
+    'ops.commandexecution': 'view_workspace',
 }
 
 model_verbose_name_mapper = {
     'orgs.organization': _("App organizations"),
+    'tickets.comment': _("Ticket comment"),
 }
 
 xpack_apps = [
@@ -259,28 +275,28 @@ class PermissionTreeUtil:
 
     def _create_models_nodes(self):
         content_types = ContentType.objects.all()
-        total_counts_mapper, checked_counts_mapper = self._get_model_counts_mapper()
 
         nodes = []
         for ct in content_types:
-            total_count = total_counts_mapper.get(ct.id, 0)
-            checked_count = checked_counts_mapper.get(ct.id, 0)
-            if total_count == 0:
-                continue
-
             model_id = '{}.{}'.format(ct.app_label, ct.model)
             if not self._check_model_xpack(model_id):
                 continue
+
+            total_count = self.total_counts[model_id]
+            checked_count = self.checked_counts[model_id]
+            if total_count == 0:
+                continue
+
             # 获取 pid
             app = ct.app_label
-            if special_model_pid_mapper.get(model_id):
+            if model_id in special_model_pid_mapper:
                 app = special_model_pid_mapper[model_id]
             self.total_counts[app] += total_count
             self.checked_counts[app] += checked_count
 
             # 获取 name
             name = f'{ct.name}'
-            if model_verbose_name_mapper.get(model_id):
+            if model_id in model_verbose_name_mapper:
                 name = model_verbose_name_mapper[model_id]
 
             node = self._create_node({
@@ -336,11 +352,21 @@ class PermissionTreeUtil:
             if settings.DEBUG:
                 name += '({})'.format(p.app_label_codename)
 
+            title = p.app_label_codename
+            pid = model_id
+            if title in special_model_pid_mapper:
+                pid = special_model_pid_mapper[title]
+
+            self.total_counts[pid] += 1
+            checked = p.id in permissions_id
+            if checked:
+                self.checked_counts[pid] += 1
+
             node = TreeNode(**{
                 'id': p.id,
                 'name': name,
-                'title': p.app_label_codename,
-                'pId': model_id,
+                'title': title,
+                'pId': pid,
                 'isParent': False,
                 'chkDisabled': self.check_disabled,
                 'iconSkin': 'file',
@@ -395,10 +421,10 @@ class PermissionTreeUtil:
             checked_count = self.checked_counts[view]
             if total_count == 0:
                 continue
-            node = self._create_node(data, total_count, checked_count, 'view')
+            node = self._create_node(data, total_count, checked_count, 'view', is_open=False)
             nodes.append(node)
         return nodes
-    
+
     def _create_extra_nodes(self):
         nodes = []
         for data in extra_nodes_data:
@@ -423,8 +449,8 @@ class PermissionTreeUtil:
         perms_nodes = self._create_perms_nodes()
         models_nodes = self._create_models_nodes()
         apps_nodes = self.create_apps_nodes()
-        views_nodes = self._create_views_node()
         extra_nodes = self._create_extra_nodes()
+        views_nodes = self._create_views_node()
 
         nodes += views_nodes + apps_nodes + models_nodes + perms_nodes + extra_nodes
         return nodes
