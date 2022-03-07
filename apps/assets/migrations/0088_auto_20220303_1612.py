@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='asset',
-            options={'ordering': ['hostname'], 'permissions': [('test_assetconnectivity', 'Can test asset connectivity'), ('push_assetsystemuser', 'Can push system user to asset'), ('match_asset', 'Can match asset')], 'verbose_name': 'Asset'},
+            options={'ordering': ['hostname'], 'permissions': [('refresh_assethardwareinfo', 'Can refresh asset hardware info'), ('test_assetconnectivity', 'Can test asset connectivity'), ('push_assetsystemuser', 'Can push system user to asset'), ('match_asset', 'Can match asset')], 'verbose_name': 'Asset'},
         ),
         migrations.AlterModelOptions(
             name='node',

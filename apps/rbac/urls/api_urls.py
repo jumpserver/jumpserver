@@ -9,11 +9,14 @@ app_name = 'rbac'
 
 router = BulkRouter()
 router.register(r'roles', api.RoleViewSet, 'role')
-router.register(r'system-roles', api.SystemRoleViewSet, 'system-role')
-router.register(r'org-roles', api.OrgRoleViewSet, 'org-role')
 router.register(r'role-bindings', api.RoleBindingViewSet, 'role-binding')
+
+router.register(r'system-roles', api.SystemRoleViewSet, 'system-role')
 router.register(r'system-role-bindings', api.SystemRoleBindingViewSet, 'system-role-binding')
+
+router.register(r'org-roles', api.OrgRoleViewSet, 'org-role')
 router.register(r'org-role-bindings', api.OrgRoleBindingViewSet, 'org-role-binding')
+
 router.register(r'permissions', api.PermissionViewSet, 'permission')
 
 system_role_router = routers.NestedDefaultRouter(router, r'system-roles', lookup='system_role')

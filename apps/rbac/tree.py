@@ -342,7 +342,7 @@ class PermissionTreeUtil:
             node = TreeNode(**{
                 'id': p.id,
                 'name': name,
-                'title': p.name,
+                'title': p.app_label_codename,
                 'pId': model_id,
                 'isParent': False,
                 'chkDisabled': self.check_disabled,

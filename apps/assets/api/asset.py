@@ -138,7 +138,9 @@ class AssetTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
     def check_permissions(self, request):
         action = request.data.get('action')
         action_perm_require = {
+            'refresh': 'assets.refresh_assethardwareinfo',
             'push_system_user': 'assets.push_assetsystemuser',
+            'test': 'assets.test_assetconnectivity',
             'test_system_user': 'assets.test_assetconnectivity'
         }
         perm_required = action_perm_require.get(action)

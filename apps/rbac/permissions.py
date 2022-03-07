@@ -26,6 +26,7 @@ class RBACPermission(permissions.DjangoModelPermissions):
         ('PATCH', '%(app_label)s.change_%(model_name)s'),
         ('DELETE', '%(app_label)s.delete_%(model_name)s'),
     )
+
     # rbac_perms = ((), ())
     # def get_rbac_perms():
     #     return {}
@@ -77,6 +78,17 @@ class RBACPermission(permissions.DjangoModelPermissions):
         perms = action_perms_map[action]
         return perms
 
+    def get_model_cls(self, view):
+        if hasattr(view, 'perm_model'):
+            return getattr(view, 'perm_model')
+
+        try:
+            queryset = self._queryset(view)
+            model_cls = queryset.model
+        except AssertionError:
+            model_cls = None
+        return model_cls
+
     def get_require_perms(self, request, view):
         """
         获取 request, view 需要的 perms
@@ -84,12 +96,8 @@ class RBACPermission(permissions.DjangoModelPermissions):
         :param view:
         :return:
         """
-        try:
-            queryset = self._queryset(view)
-            model_cls = queryset.model
-        except AssertionError:
-            model_cls = None
 
+        model_cls = self.get_model_cls(view)
         action = getattr(view, 'action', None)
         if not action:
             action = request.method
@@ -116,4 +124,3 @@ class RBACPermission(permissions.DjangoModelPermissions):
         has = request.user.has_perms(perms)
         logger.debug('View require perms: {}, result: {}'.format(perms, has))
         return has
-
