@@ -88,8 +88,8 @@ class AccountSecretsViewSet(AccountViewSet):
     http_method_names = ['get']
     permission_classes = [RBACPermission, NeedMFAVerify]
     rbac_perms = {
-        'list': 'assets.view_assetsecret',
-        'retrieve': 'assets.view_assetsecret',
+        'list': 'assets.view_assetaccountsecret',
+        'retrieve': 'assets.view_assetaccountsecret',
     }
 
 
