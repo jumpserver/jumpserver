@@ -44,11 +44,8 @@ class SystemRoleBindingViewSet(RoleBindingViewSet):
         role_qs = self.model.objects.filter(user=user)
         if role_qs.count() == 1:
             msg = _('{} at least one system role').format(user)
-            raise JMSException(
-                code='system_role_delete_error',
-                detail=msg
-            )
-        super().perform_destroy(instance)
+            raise JMSException(code='system_role_delete_error', detail=msg)
+        return super().perform_destroy(instance)
 
 
 class OrgRoleBindingViewSet(RoleBindingViewSet):
