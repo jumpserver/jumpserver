@@ -19,5 +19,6 @@ class Migration(migrations.Migration):
                 ('session', models.ForeignKey(db_constraint=False, on_delete=django.db.models.deletion.CASCADE, related_name='ticket_relation', to='terminal.session')),
                 ('ticket', models.ForeignKey(db_constraint=False, on_delete=django.db.models.deletion.CASCADE, related_name='session_relation', to='tickets.ticket')),
             ],
+            options={'verbose_name': 'Ticket session relation'},
         ),
     ]

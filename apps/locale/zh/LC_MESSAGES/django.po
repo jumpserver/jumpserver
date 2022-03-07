@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-07 10:31+0800\n"
+"POT-Creation-Date: 2022-03-07 18:41+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -275,13 +275,13 @@ msgstr "自定义"
 
 #: applications/models/account.py:12 applications/models/application.py:219
 #: assets/models/backup.py:32 assets/models/cmd_filter.py:45
-#: perms/models/application_permission.py:27
+#: perms/models/application_permission.py:28
 msgid "Application"
 msgstr "应用程序"
 
 #: applications/models/account.py:15 assets/models/authbook.py:20
 #: assets/models/cmd_filter.py:42 assets/models/user.py:325 audits/models.py:40
-#: perms/models/application_permission.py:32
+#: perms/models/application_permission.py:33
 #: perms/models/asset_permission.py:25 terminal/backends/command/models.py:21
 #: terminal/backends/command/serializers.py:14 terminal/models/session.py:46
 #: users/templates/users/_granted_assets.html:27
@@ -311,7 +311,7 @@ msgstr "可以查看应用账号密码"
 
 #: applications/models/application.py:204
 #: applications/serializers/application.py:99 assets/models/label.py:21
-#: perms/models/application_permission.py:20
+#: perms/models/application_permission.py:21
 #: perms/serializers/application/user_permission.py:33
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:22
 #: xpack/plugins/change_auth_plan/models/app.py:25
@@ -321,7 +321,7 @@ msgstr "类别"
 #: applications/models/application.py:207
 #: applications/serializers/application.py:101 assets/models/backup.py:49
 #: assets/models/cmd_filter.py:82 assets/models/user.py:233
-#: perms/models/application_permission.py:23
+#: perms/models/application_permission.py:24
 #: perms/serializers/application/user_permission.py:34
 #: terminal/models/storage.py:55 terminal/models/storage.py:119
 #: tickets/models/flow.py:56 tickets/models/ticket.py:131
@@ -623,14 +623,18 @@ msgid "Created by"
 msgstr "创建者"
 
 #: assets/models/asset.py:358
+msgid "Can refresh asset hardware info"
+msgstr "可以更新资产硬件信息"
+
+#: assets/models/asset.py:359
 msgid "Can test asset connectivity"
 msgstr "可以测试资产连接性"
 
-#: assets/models/asset.py:359
+#: assets/models/asset.py:360
 msgid "Can push system user to asset"
 msgstr "可以推送系统用户到资产"
 
-#: assets/models/asset.py:360
+#: assets/models/asset.py:361
 msgid "Can match asset"
 msgstr "可以匹配资产"
 
@@ -933,7 +937,7 @@ msgstr "新节点"
 msgid "empty"
 msgstr "空"
 
-#: assets/models/node.py:545 perms/models/asset_permission.py:105
+#: assets/models/node.py:545 perms/models/asset_permission.py:99
 msgid "Key"
 msgstr "键"
 
@@ -941,7 +945,7 @@ msgstr "键"
 msgid "Full value"
 msgstr "全称"
 
-#: assets/models/node.py:550 perms/models/asset_permission.py:106
+#: assets/models/node.py:550 perms/models/asset_permission.py:100
 msgid "Parent key"
 msgstr "ssh私钥"
 
@@ -1339,7 +1343,7 @@ msgstr "日志审计"
 
 #: audits/models.py:27 audits/models.py:57
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:301 users/templates/users/user_asset_permission.html:128
+#: rbac/tree.py:317 users/templates/users/user_asset_permission.html:128
 #: users/templates/users/user_database_app_permission.html:111
 msgid "Delete"
 msgstr "删除"
@@ -1393,11 +1397,11 @@ msgstr "文件管理"
 
 #: audits/models.py:55
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:298
+#: rbac/tree.py:314
 msgid "Create"
 msgstr "创建"
 
-#: audits/models.py:56 rbac/tree.py:300 templates/_csv_import_export.html:18
+#: audits/models.py:56 rbac/tree.py:316 templates/_csv_import_export.html:18
 #: templates/_csv_update_modal.html:6
 #: users/templates/users/user_asset_permission.html:127
 #: users/templates/users/user_database_app_permission.html:110
@@ -1690,7 +1694,7 @@ msgstr "{ApplicationPermission} 添加 {UserGroup}"
 msgid "{ApplicationPermission} REMOVE {UserGroup}"
 msgstr "{ApplicationPermission} 移除 {UserGroup}"
 
-#: audits/signal_handlers.py:156 perms/models/application_permission.py:37
+#: audits/signal_handlers.py:156 perms/models/application_permission.py:38
 msgid "Application permission"
 msgstr "应用授权"
 
@@ -2515,14 +2519,6 @@ msgstr "忽略的"
 msgid "discard time"
 msgstr "忽略时间"
 
-#: common/models.py:7
-msgid "Common permission"
-msgstr "通用权限"
-
-#: common/models.py:9
-msgid "Can view resource statistics"
-msgstr "可以查看资源统计"
-
 #: common/sdk/im/exceptions.py:23
 msgid "Network error, please contact system administrator"
 msgstr "网络错误，请联系系统管理员"
@@ -2838,7 +2834,7 @@ msgstr "当前组织 ({}) 不能被删除"
 msgid "The organization have resource ({}) cannot be deleted"
 msgstr "组织存在资源 ({}) 不能被删除"
 
-#: orgs/apps.py:7 rbac/tree.py:170
+#: orgs/apps.py:7 rbac/tree.py:185
 msgid "App organizations"
 msgstr "组织管理"
 
@@ -2873,45 +2869,53 @@ msgstr "管理员正在修改授权，请稍等"
 msgid "The authorization cannot be revoked for the time being"
 msgstr "该授权暂时不能撤销"
 
-#: perms/models/application_permission.py:40
+#: perms/models/application_permission.py:110
+msgid "Permed app"
+msgstr "授权的应用"
+
+#: perms/models/application_permission.py:112
 msgid "Can view my apps"
-msgstr "可以查看授权的应用"
+msgstr "可以查看我的应用"
 
-#: perms/models/application_permission.py:41
+#: perms/models/application_permission.py:113
 msgid "Can connect my apps"
-msgstr "可以连接授权的应用"
+msgstr "可以我的应用"
 
-#: perms/models/application_permission.py:42
+#: perms/models/application_permission.py:114
 msgid "Can view user apps"
-msgstr "可以查看授权的应用"
+msgstr "可以查看用户授权的应用"
 
-#: perms/models/application_permission.py:43
+#: perms/models/application_permission.py:115
 msgid "Can view usergroup apps"
 msgstr "可以查看用户组授权的应用"
 
-#: perms/models/asset_permission.py:32
-msgid "Can view my assets"
-msgstr "可以查看授权的资产"
-
-#: perms/models/asset_permission.py:33
-msgid "Can connect my assets"
-msgstr "可以连接登录资产"
-
-#: perms/models/asset_permission.py:34
-msgid "Can view user assets"
-msgstr "可以查看用户授权的资产"
-
-#: perms/models/asset_permission.py:35
-msgid "Can view usergroup assets"
-msgstr "可以查看用户组授权的资产"
-
-#: perms/models/asset_permission.py:138
+#: perms/models/asset_permission.py:132
 msgid "Ungrouped"
 msgstr "未分组"
 
-#: perms/models/asset_permission.py:140
+#: perms/models/asset_permission.py:134
 msgid "Favorite"
 msgstr "收藏夹"
+
+#: perms/models/asset_permission.py:181
+msgid "Permed asset"
+msgstr "授权的资产"
+
+#: perms/models/asset_permission.py:183
+msgid "Can view my assets"
+msgstr "可以查看资产"
+
+#: perms/models/asset_permission.py:184
+msgid "Can connect my assets"
+msgstr "可以连接资产"
+
+#: perms/models/asset_permission.py:185
+msgid "Can view user assets"
+msgstr "可以查看用户授权的资产"
+
+#: perms/models/asset_permission.py:186
+msgid "Can view usergroup assets"
+msgstr "可以查看用户组授权的资产"
 
 #: perms/models/base.py:55
 msgid "Connect"
@@ -2987,15 +2991,15 @@ msgstr "组织 ({}) 的应用授权"
 #: perms/serializers/application/permission.py:20
 #: perms/serializers/application/permission.py:41
 #: perms/serializers/asset/permission.py:19
-#: perms/serializers/asset/permission.py:45 users/serializers/user.py:133
+#: perms/serializers/asset/permission.py:45 users/serializers/user.py:135
 msgid "Is valid"
 msgstr "账号是否有效"
 
 #: perms/serializers/application/permission.py:21
 #: perms/serializers/application/permission.py:40
 #: perms/serializers/asset/permission.py:20
-#: perms/serializers/asset/permission.py:44 users/serializers/user.py:82
-#: users/serializers/user.py:135
+#: perms/serializers/asset/permission.py:44 users/serializers/user.py:84
+#: users/serializers/user.py:137
 msgid "Is expired"
 msgstr "已过期"
 
@@ -3061,7 +3065,11 @@ msgstr "如果有疑问或需求，请联系系统管理员"
 msgid "Internal role, can't be destroy"
 msgstr ""
 
-#: rbac/api/role.py:38
+#: rbac/api/role.py:34
+msgid "The role has been bound to users, can't be destroy"
+msgstr ""
+
+#: rbac/api/role.py:41
 msgid "Internal role, can't be update"
 msgstr ""
 
@@ -3102,16 +3110,28 @@ msgid "Menu permission"
 msgstr "菜单授权"
 
 #: rbac/models/menu.py:15
-msgid "view console view"
-msgstr "查看控制台"
+msgid "Can view resource statistics"
+msgstr "可以查看资源统计"
 
 #: rbac/models/menu.py:16
-msgid "view audit view"
-msgstr "查看安全审计"
+msgid "Can view console view"
+msgstr "可以查看控制台"
 
 #: rbac/models/menu.py:17
-msgid "view workspace view"
-msgstr "查看工作台"
+msgid "Can view audit view"
+msgstr "可以查看审计台"
+
+#: rbac/models/menu.py:18
+msgid "Can view workspace view"
+msgstr "可以查看工作台"
+
+#: rbac/models/menu.py:19
+msgid "Can view web terminal"
+msgstr "Web终端"
+
+#: rbac/models/menu.py:20
+msgid "Can view file manager"
+msgstr "文件管理"
 
 #: rbac/models/permission.py:22
 msgid "Permission"
@@ -3189,7 +3209,7 @@ msgstr "工作台"
 
 #: rbac/tree.py:34
 msgid "Audit view"
-msgstr "安全审计"
+msgstr "审计台"
 
 #: rbac/tree.py:38 settings/models.py:140
 msgid "System setting"
@@ -3231,7 +3251,19 @@ msgstr "资产改密"
 msgid "Terminal setting"
 msgstr "终端设置"
 
-#: rbac/tree.py:299
+#: rbac/tree.py:138
+msgid "My assets"
+msgstr "我的资产"
+
+#: rbac/tree.py:143
+msgid "My apps"
+msgstr "我的应用"
+
+#: rbac/tree.py:186
+msgid "Ticket comment"
+msgstr "工单评论"
+
+#: rbac/tree.py:315
 msgid "View"
 msgstr "查看"
 
@@ -5203,6 +5235,10 @@ msgstr "工单批准信息"
 msgid "Ticket flow"
 msgstr "工单流程"
 
+#: tickets/models/relation.py:10
+msgid "Ticket session relation"
+msgstr "工单会话"
+
 #: tickets/models/ticket.py:35
 msgid "Ticket step"
 msgstr "工单步骤"
@@ -5505,7 +5541,7 @@ msgid "Public key should not be the same as your old one."
 msgstr "不能和原来的密钥相同"
 
 #: users/forms/profile.py:149 users/serializers/profile.py:95
-#: users/serializers/profile.py:177 users/serializers/profile.py:204
+#: users/serializers/profile.py:175 users/serializers/profile.py:202
 msgid "Not a valid ssh public key"
 msgstr "SSH密钥不合法"
 
@@ -5522,7 +5558,7 @@ msgstr "强制启用"
 msgid "Local"
 msgstr "数据库"
 
-#: users/models/user.py:562 users/serializers/user.py:134
+#: users/models/user.py:562 users/serializers/user.py:136
 msgid "Is service account"
 msgstr "服务账号"
 
@@ -5609,7 +5645,7 @@ msgstr "重置 MFA"
 msgid "The old password is incorrect"
 msgstr "旧密码错误"
 
-#: users/serializers/profile.py:36 users/serializers/profile.py:191
+#: users/serializers/profile.py:36 users/serializers/profile.py:189
 msgid "Password does not match security rules"
 msgstr "密码不满足安全规则"
 
@@ -5621,97 +5657,97 @@ msgstr "新密码不能是最近 {} 次的密码"
 msgid "The newly set password is inconsistent"
 msgstr "两次密码不一致"
 
-#: users/serializers/profile.py:141 users/serializers/user.py:132
+#: users/serializers/profile.py:141 users/serializers/user.py:134
 msgid "Is first login"
 msgstr "首次登录"
 
-#: users/serializers/user.py:24 users/serializers/user.py:30
+#: users/serializers/user.py:25 users/serializers/user.py:32
 msgid "System roles"
 msgstr "系统角色"
 
-#: users/serializers/user.py:28 users/serializers/user.py:31
+#: users/serializers/user.py:30 users/serializers/user.py:33
 msgid "Org roles"
 msgstr "组织角色"
 
-#: users/serializers/user.py:74
+#: users/serializers/user.py:76
 #: xpack/plugins/change_auth_plan/models/base.py:35
 #: xpack/plugins/change_auth_plan/serializers/base.py:22
 msgid "Password strategy"
 msgstr "密码策略"
 
-#: users/serializers/user.py:76
+#: users/serializers/user.py:78
 msgid "MFA enabled"
 msgstr "MFA"
 
-#: users/serializers/user.py:77
+#: users/serializers/user.py:79
 msgid "MFA force enabled"
 msgstr "强制 MFA"
 
-#: users/serializers/user.py:79
+#: users/serializers/user.py:81
 msgid "MFA level display"
 msgstr "MFA 等级名称"
 
-#: users/serializers/user.py:81
+#: users/serializers/user.py:83
 msgid "Login blocked"
 msgstr "登录被阻塞"
 
-#: users/serializers/user.py:84
+#: users/serializers/user.py:86
 msgid "Can public key authentication"
 msgstr "能否公钥认证"
 
-#: users/serializers/user.py:136
+#: users/serializers/user.py:138
 msgid "Avatar url"
 msgstr "头像路径"
 
-#: users/serializers/user.py:138
+#: users/serializers/user.py:140
 msgid "Groups name"
 msgstr "用户组名"
 
-#: users/serializers/user.py:139
+#: users/serializers/user.py:141
 msgid "Source name"
 msgstr "用户来源名"
 
-#: users/serializers/user.py:140
+#: users/serializers/user.py:142
 msgid "Organization role name"
 msgstr "组织角色名称"
 
-#: users/serializers/user.py:141
+#: users/serializers/user.py:143
 msgid "Super role name"
 msgstr "超级角色名称"
 
-#: users/serializers/user.py:142
+#: users/serializers/user.py:144
 msgid "Total role name"
 msgstr "汇总角色名称"
 
-#: users/serializers/user.py:144
+#: users/serializers/user.py:146
 msgid "Is wecom bound"
 msgstr "是否绑定了企业微信"
 
-#: users/serializers/user.py:145
+#: users/serializers/user.py:147
 msgid "Is dingtalk bound"
 msgstr "是否绑定了钉钉"
 
-#: users/serializers/user.py:146
+#: users/serializers/user.py:148
 msgid "Is feishu bound"
 msgstr "是否绑定了飞书"
 
-#: users/serializers/user.py:147
+#: users/serializers/user.py:149
 msgid "Is OTP bound"
 msgstr "是否绑定了虚拟 MFA"
 
-#: users/serializers/user.py:149
+#: users/serializers/user.py:151
 msgid "System role name"
 msgstr "系统角色名称"
 
-#: users/serializers/user.py:235
+#: users/serializers/user.py:236
 msgid "Select users"
 msgstr "选择用户"
 
-#: users/serializers/user.py:236
+#: users/serializers/user.py:237
 msgid "For security, only list several users"
 msgstr "为了安全，仅列出几个用户"
 
-#: users/serializers/user.py:269
+#: users/serializers/user.py:270
 msgid "name not unique"
 msgstr "名称重复"
 
@@ -6704,6 +6740,9 @@ msgstr "旗舰版"
 msgid "Community edition"
 msgstr "社区版"
 
+#~ msgid "Common permission"
+#~ msgstr "通用权限"
+
 #~ msgid "Can view connect token secret"
 #~ msgstr "可以查看 连接Token 密文"
 
@@ -6748,9 +6787,6 @@ msgstr "社区版"
 #~ msgid "Commands"
 #~ msgstr "命令记录"
 
-#~ msgid "Web terminal"
-#~ msgstr "Web终端"
-
 #~ msgid "Job Center"
 #~ msgstr "作业中心"
 
@@ -6771,9 +6807,6 @@ msgstr "社区版"
 
 #~ msgid "Sync instance"
 #~ msgstr "同步实例"
-
-#~ msgid "My assets"
-#~ msgstr "我的资产"
 
 #~ msgid "Can update"
 #~ msgstr "是否可更新"

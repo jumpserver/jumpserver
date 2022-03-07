@@ -38,12 +38,4 @@ class Migration(migrations.Migration):
             },
             bases=('assets.asset',),
         ),
-        migrations.AlterModelOptions(
-            name='applicationpermission',
-            options={'ordering': ('name',), 'verbose_name': 'Application permission'},
-        ),
-        migrations.AlterModelOptions(
-            name='assetpermission',
-            options={'ordering': ('name',), 'verbose_name': 'Asset permission'},
-        ),
     ]
