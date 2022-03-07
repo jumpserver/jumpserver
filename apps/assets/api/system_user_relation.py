@@ -64,7 +64,7 @@ class RelationMixin:
 
 
 class BaseRelationViewSet(RelationMixin, OrgBulkModelViewSet):
-    pass
+    perm_model = models.SystemUser
 
 
 class SystemUserAssetRelationViewSet(BaseRelationViewSet):
@@ -136,4 +136,3 @@ class SystemUserUserRelationViewSet(BaseRelationViewSet):
             )
         )
         return queryset
-
