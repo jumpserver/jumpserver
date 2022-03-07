@@ -23,6 +23,6 @@ class RoleUserMixin(_RoleUserMixin):
         ('GET', 'perms.view_myapps'),
     )
 
-    def get(self, request, *args, **kwargs):
+    def dispatch(self, *args, **kwargs):
         with tmp_to_root_org():
-            return super().get(request, *args, **kwargs)
+            return super().dispatch(*args, **kwargs)

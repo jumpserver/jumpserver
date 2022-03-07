@@ -28,7 +28,7 @@ __all__ = [
 ]
 
 
-class GrantedApplicationSystemUsersMixin(ListAPIView):
+class BaseGrantedApplicationSystemUsersApi(ListAPIView):
     serializer_class = serializers.ApplicationSystemUserSerializer
     only_fields = serializers.ApplicationSystemUserSerializer.Meta.only_fields
     user: None
@@ -45,11 +45,11 @@ class GrantedApplicationSystemUsersMixin(ListAPIView):
         return system_users
 
 
-class UserGrantedApplicationSystemUsersApi(RoleAdminMixin, GrantedApplicationSystemUsersMixin):
+class UserGrantedApplicationSystemUsersApi(RoleAdminMixin, BaseGrantedApplicationSystemUsersApi):
     pass
 
 
-class MyGrantedApplicationSystemUsersApi(RoleUserMixin, GrantedApplicationSystemUsersMixin):
+class MyGrantedApplicationSystemUsersApi(RoleUserMixin, BaseGrantedApplicationSystemUsersApi):
     pass
 
 

@@ -19,6 +19,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'permissions': [('view_resourcestatistics', 'Can view resource statistics')],
+                'verbose_name': 'Common permission'
             },
         ),
     ]

@@ -37,10 +37,6 @@ class RoleUserMixin(PermBaseMixin, _RoleUserMixin):
         ('GET', 'perms.view_myassets'),
     )
 
-    def get(self, request, *args, **kwargs):
+    def dispatch(self, *args, **kwargs):
         with tmp_to_root_org():
-            return super().get(request, *args, **kwargs)
-
-    def get_queryset(self):
-        with tmp_to_root_org():
-            return super().get_queryset()
+            return super().dispatch(*args, **kwargs)
