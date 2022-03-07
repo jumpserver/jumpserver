@@ -23,6 +23,8 @@ __all__ = [
 
 
 class RelationMixin(OrgRelationMixin, OrgBulkModelViewSet):
+    perm_model = models.ApplicationPermission
+
     def get_queryset(self):
         queryset = super().get_queryset()
         org_id = current_org.org_id()
@@ -86,8 +88,8 @@ class ApplicationPermissionSystemUserRelationViewSet(RelationMixin):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset \
-            .annotate(systemuser_display=Concat(
+        queryset = queryset.annotate(
+            systemuser_display=Concat(
                 F('systemuser__name'), Value('('), F('systemuser__username'),
                 Value(')')
             ))
@@ -103,7 +105,7 @@ class ApplicationPermissionAllApplicationListApi(generics.ListAPIView):
     def get_queryset(self):
         pk = self.kwargs.get('pk')
         perm = get_object_or_404(models.ApplicationPermission, pk=pk)
-        applications = Application.objects.filter(granted_by_permissions=perm)\
+        applications = Application.objects.filter(granted_by_permissions=perm) \
             .only(*self.only_fields).distinct()
         return applications
 
