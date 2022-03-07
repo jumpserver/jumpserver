@@ -10,7 +10,7 @@ from rest_framework.generics import (
     ListAPIView, get_object_or_404
 )
 
-from orgs.utils import tmp_to_root_org
+from orgs.utils import tmp_to_root_org, get_current_org
 from applications.models import Application
 from perms.utils.application.permission import (
     get_application_system_user_ids,
@@ -56,7 +56,7 @@ class MyGrantedApplicationSystemUsersApi(RoleUserMixin, BaseGrantedApplicationSy
 @method_decorator(tmp_to_root_org(), name='get')
 class ValidateUserApplicationPermissionApi(APIView):
     rbac_perms = {
-        'GET': 'ops.view_applicationpermission'
+        'GET': 'perms.view_applicationpermission'
     }
 
     def get(self, request, *args, **kwargs):

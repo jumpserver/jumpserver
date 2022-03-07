@@ -283,5 +283,7 @@ class ServiceAccountSerializer(serializers.ModelSerializer):
         return name
 
     def create(self, validated_data):
-        user, ak = User.create_service_account(validated_data['name'], validated_data['comment'])
+        name = validated_data['name']
+        comment = validated_data.get('comment', '')
+        user, ak = User.create_service_account(name, comment)
         return user
