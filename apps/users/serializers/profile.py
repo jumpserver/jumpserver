@@ -147,8 +147,6 @@ class UserProfileSerializer(UserSerializer):
             'date_expired': {'read_only': True},
             'date_joined': {'read_only': True},
             'last_login': {'read_only': True},
-            'system_roles': {'read_only': True},
-            'org_roles': {'read_only': True},
         })
 
         if 'password' in fields:

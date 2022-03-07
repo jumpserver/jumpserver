@@ -21,7 +21,6 @@ __all__ = [
 
 class RolesSerializerMixin(serializers.Serializer):
     system_roles = serializers.ManyRelatedField(
-        allow_empty=False,
         child_relation=serializers.PrimaryKeyRelatedField(queryset=Role.system_roles),
         label=_('System roles'),
     )
@@ -69,16 +68,6 @@ class RolesSerializerMixin(serializers.Serializer):
         fields = super().get_fields()
         self.pop_roles_if_need(fields)
         return fields
-
-    @staticmethod
-    def _validate_org_roles(attrs):
-        if current_org.is_root():
-            attrs.pop('org_roles', None)
-            return attrs
-        org_roles = attrs.get('org_roles', None)
-        if not org_roles:
-            raise serializers.ValidationError({'org_roles': _('This field is required.')})
-        return attrs
 
 
 class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializers.ModelSerializer):
@@ -188,7 +177,6 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
         return attrs
 
     def validate(self, attrs):
-        attrs = self._validate_org_roles(attrs)
         attrs = self.change_password_to_raw(attrs)
         attrs = self.clean_auth_fields(attrs)
         attrs.pop('password_strategy', None)
