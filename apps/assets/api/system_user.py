@@ -186,8 +186,8 @@ class SystemUserTaskApi(generics.CreateAPIView):
     def check_permissions(self, request):
         action = request.data.get('action')
         action_perm_require = {
-            'push': 'assets.push_systemuser',
-            'test': 'assets.test_connectivity'
+            'push': 'assets.push_assetsystemuser',
+            'test': 'assets.test_assetconnectivity'
         }
         perm_required = action_perm_require.get(action)
         has = self.request.user.has_perm(perm_required)
