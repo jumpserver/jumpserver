@@ -30,6 +30,9 @@ class RoleViewSet(JMSModelViewSet):
         if instance.builtin:
             error = _("Internal role, can't be destroy")
             raise PermissionDenied(error)
+        if instance.users.count() >= 1:
+            error = _("The role has been bound to users, can't be destroy")
+            raise PermissionDenied(error)
         return super().perform_destroy(instance)
 
     def perform_update(self, serializer):
