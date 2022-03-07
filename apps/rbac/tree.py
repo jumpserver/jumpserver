@@ -164,6 +164,9 @@ special_model_pid_mapper = {
     'terminal.task': 'terminal_node',
     'audits.ftplog': 'terminal',
     'rbac.menupermission': 'view_other',
+    'perms.view_myapps': 'view_workspace',
+    'perms.view_myassets': 'view_workspace',
+    'ops.commandexecution': 'view_workspace',
 }
 
 model_verbose_name_mapper = {

@@ -28,12 +28,6 @@ class AssetPermission(BasePermission):
         unique_together = [('org_id', 'name')]
         verbose_name = _("Asset permission")
         ordering = ('name',)
-        permissions = [
-            ('view_myassets', _('Can view my assets')),
-            ('connect_myassets', _('Can connect my assets')),
-            ('view_userassets', _('Can view user assets')),
-            ('view_usergroupassets', _('Can view usergroup assets')),
-        ]
 
     @lazyproperty
     def users_amount(self):
@@ -179,3 +173,16 @@ class PermNode(Node):
     def save(self):
         # 这是个只读 Model
         raise NotImplementedError
+
+
+class PermedAsset(Asset):
+    class Meta:
+        proxy = True
+        verbose_name = _('Permed asset')
+        permissions = [
+            ('view_myassets', _('Can view my assets')),
+            ('connect_myassets', _('Can connect my assets')),
+            ('view_userassets', _('Can view user assets')),
+            ('view_usergroupassets', _('Can view usergroup assets')),
+        ]
+
