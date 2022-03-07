@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-04 15:36+0800\n"
+"POT-Creation-Date: 2022-03-07 10:31+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -631,10 +631,8 @@ msgid "Can push system user to asset"
 msgstr "可以推送系统用户到资产"
 
 #: assets/models/asset.py:360
-#, fuzzy
-#| msgid "Can match user"
 msgid "Can match asset"
-msgstr "可以匹配用户"
+msgstr "可以匹配资产"
 
 #: assets/models/authbook.py:27
 msgid "AuthBook"
@@ -956,10 +954,8 @@ msgid "Node"
 msgstr "节点"
 
 #: assets/models/node.py:562
-#, fuzzy
-#| msgid "Can match user"
 msgid "Can match node"
-msgstr "可以匹配用户"
+msgstr "可以匹配节点"
 
 #: assets/models/user.py:216
 msgid "Automatic managed"
@@ -1032,10 +1028,8 @@ msgid "Switch from"
 msgstr "切换自"
 
 #: assets/models/user.py:327
-#, fuzzy
-#| msgid "Can match user"
 msgid "Can match system user"
-msgstr "可以匹配用户"
+msgstr "可以匹配系统用户"
 
 #: assets/models/utils.py:35
 #, python-format
@@ -1345,7 +1339,7 @@ msgstr "日志审计"
 
 #: audits/models.py:27 audits/models.py:57
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:278 users/templates/users/user_asset_permission.html:128
+#: rbac/tree.py:301 users/templates/users/user_asset_permission.html:128
 #: users/templates/users/user_database_app_permission.html:111
 msgid "Delete"
 msgstr "删除"
@@ -1399,11 +1393,11 @@ msgstr "文件管理"
 
 #: audits/models.py:55
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:275
+#: rbac/tree.py:298
 msgid "Create"
 msgstr "创建"
 
-#: audits/models.py:56 rbac/tree.py:277 templates/_csv_import_export.html:18
+#: audits/models.py:56 rbac/tree.py:300 templates/_csv_import_export.html:18
 #: templates/_csv_update_modal.html:6
 #: users/templates/users/user_asset_permission.html:127
 #: users/templates/users/user_database_app_permission.html:110
@@ -2031,13 +2025,11 @@ msgstr ""
 
 #: authentication/models.py:61
 msgid "Connection token"
-msgstr ""
+msgstr "连接Token"
 
 #: authentication/models.py:67
-#, fuzzy
-#| msgid "Can add super connection token"
 msgid "Super connection token"
-msgstr "可以添加 超级连接Token"
+msgstr "超级连接Token"
 
 #: authentication/notifications.py:19
 msgid "Different city login reminder"
@@ -2523,7 +2515,11 @@ msgstr "忽略的"
 msgid "discard time"
 msgstr "忽略时间"
 
-#: common/models.py:8
+#: common/models.py:7
+msgid "Common permission"
+msgstr "通用权限"
+
+#: common/models.py:9
 msgid "Can view resource statistics"
 msgstr "可以查看资源统计"
 
@@ -2842,7 +2838,7 @@ msgstr "当前组织 ({}) 不能被删除"
 msgid "The organization have resource ({}) cannot be deleted"
 msgstr "组织存在资源 ({}) 不能被删除"
 
-#: orgs/apps.py:7 rbac/tree.py:163
+#: orgs/apps.py:7 rbac/tree.py:170
 msgid "App organizations"
 msgstr "组织管理"
 
@@ -3179,63 +3175,63 @@ msgstr "角色显示"
 msgid "Has bound this role"
 msgstr "已经绑定"
 
-#: rbac/tree.py:16 rbac/tree.py:17
+#: rbac/tree.py:17 rbac/tree.py:18
 msgid "All permissions"
 msgstr "所有权限"
 
-#: rbac/tree.py:24
+#: rbac/tree.py:26
 msgid "Console view"
 msgstr "控制台"
 
-#: rbac/tree.py:28
+#: rbac/tree.py:30
 msgid "Workspace view"
 msgstr "工作台"
 
-#: rbac/tree.py:32
+#: rbac/tree.py:34
 msgid "Audit view"
 msgstr "安全审计"
 
-#: rbac/tree.py:36 settings/models.py:140
+#: rbac/tree.py:38 settings/models.py:140
 msgid "System setting"
 msgstr "系统设置"
 
-#: rbac/tree.py:40
+#: rbac/tree.py:42
 msgid "Other"
-msgstr ""
+msgstr "其它"
 
-#: rbac/tree.py:59
+#: rbac/tree.py:62
 msgid "Accounts"
 msgstr "账号管理"
 
-#: rbac/tree.py:76
+#: rbac/tree.py:79
 msgid "Session audits"
 msgstr "会话审计"
 
-#: rbac/tree.py:104
+#: rbac/tree.py:108
 msgid "Cloud import"
 msgstr "云同步"
 
-#: rbac/tree.py:109
+#: rbac/tree.py:113
 msgid "Backup account"
 msgstr "备份账号"
 
-#: rbac/tree.py:114
+#: rbac/tree.py:118
 msgid "Gather account"
 msgstr "收集账号"
 
-#: rbac/tree.py:119
+#: rbac/tree.py:123
 msgid "App change auth"
 msgstr "应用改密"
 
-#: rbac/tree.py:124
+#: rbac/tree.py:128
 msgid "Asset change auth"
 msgstr "资产改密"
 
-#: rbac/tree.py:129
+#: rbac/tree.py:133
 msgid "Terminal setting"
 msgstr "终端设置"
 
-#: rbac/tree.py:276
+#: rbac/tree.py:299
 msgid "View"
 msgstr "查看"
 
