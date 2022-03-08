@@ -6,7 +6,8 @@ from rest_framework import serializers
 
 from common.mixins import CommonBulkSerializerMixin
 from common.validators import PhoneValidator
-from orgs.utils import current_org
+from rbac.models import Role
+from rbac.builtin import BuiltinRole
 from rbac.permissions import RBACPermission
 from rbac.models import OrgRoleBinding, SystemRoleBinding
 from ..models import User
@@ -88,7 +89,10 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
     # Todo: 这里看看该怎么搞
     # can_update = serializers.SerializerMethodField(label=_('Can update'))
     # can_delete = serializers.SerializerMethodField(label=_('Can delete'))
-    custom_m2m_fields = ('system_roles', 'org_roles')
+    custom_m2m_fields = {
+        'system_roles': [BuiltinRole.system_user],
+        'org_roles': [BuiltinRole.org_user]
+    }
 
     class Meta:
         model = User
@@ -182,10 +186,17 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
         attrs.pop('password_strategy', None)
         return attrs
 
-    def save_and_set_custom_m2m_fields(self, validated_data, save_handler):
-        m2m_values = {
-            f: validated_data.pop(f, None) for f in self.custom_m2m_fields
-        }
+    def save_and_set_custom_m2m_fields(self, validated_data, save_handler, created):
+        m2m_values = {}
+        for f, default_roles in self.custom_m2m_fields.items():
+            roles = validated_data.pop(f, None)
+            if created and not roles:
+                roles = [
+                    Role.objects.filter(id=role.id).first()
+                    for role in default_roles
+                ]
+            m2m_values[f] = roles
+
         instance = save_handler(validated_data)
         for field_name, value in m2m_values.items():
             if value is None:
@@ -207,12 +218,12 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
 
     def update(self, instance, validated_data):
         save_handler = partial(super().update, instance)
-        instance = self.save_and_set_custom_m2m_fields(validated_data, save_handler)
+        instance = self.save_and_set_custom_m2m_fields(validated_data, save_handler, created=False)
         return instance
 
     def create(self, validated_data):
         save_handler = super().create
-        instance = self.save_and_set_custom_m2m_fields(validated_data, save_handler)
+        instance = self.save_and_set_custom_m2m_fields(validated_data, save_handler, created=True)
         return instance
 
 
