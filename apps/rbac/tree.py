@@ -8,8 +8,8 @@ from django.apps import apps
 from django.db.models import F, Count
 from django.utils.translation import ugettext
 
-from .models import Permission, ContentType
 from common.tree import TreeNode
+from .models import Permission, ContentType
 
 # 根节点
 root_node_data = {
@@ -21,132 +21,44 @@ root_node_data = {
 
 # 第二层 view 节点，手动创建的
 view_nodes_data = [
-    {
-        'id': 'view_console',
-        'name': _('Console view'),
-    },
-    {
-        'id': 'view_workspace',
-        'name': _('Workspace view'),
-    },
-    {
-        'id': 'view_audit',
-        'name': _('Audit view'),
-    },
-    {
-        'id': 'view_setting',
-        'name': _('System setting'),
-    },
-    {
-        'id': 'view_other',
-        'name': _('Other'),
-    }
+    {'id': 'view_console', 'name': _('Console view')},
+    {'id': 'view_workspace', 'name': _('Workspace view')},
+    {'id': 'view_audit', 'name': _('Audit view')},
+    {'id': 'view_setting', 'name': _('System setting')},
+    {'id': 'view_other', 'name': _('Other')},
 ]
 
-# 第三层 app 节点，定义了父子关系
+# 第三层 app 节点，手动创建
 app_nodes_data = [
-    {
-        'id': 'users',
-        'view': 'view_console',
-    },
-    {
-        'id': 'assets',
-        'view': 'view_console',
-    },
-    {
-        'id': 'applications',
-        'view': 'view_console',
-    },
-    {
-        'id': 'accounts',
-        'name': _('Accounts'),
-        'view': 'view_console',
-    },
-    {
-        'id': 'perms',
-        'view': 'view_console',
-    },
-    {
-        'id': 'acls',
-        'view': 'view_console',
-    },
-    {
-        'id': 'ops',
-        'view': 'view_console',
-    },
-    {
-        'id': 'terminal',
-        'name': _('Session audits'),
-        'view': 'view_audit',
-    },
-    {
-        'id': 'audits',
-        'view': 'view_audit',
-    },
-    {
-        'id': 'rbac',
-        'view': 'view_console'
-    },
-    {
-        'id': 'settings',
-        'view': 'view_setting'
-    },
-    {
-        'id': 'tickets',
-        'view': 'view_other',
-    },
-    {
-        'id': 'authentication',
-        'view': 'view_other'
-    }
+    {'id': 'users', 'view': 'view_console'},
+    {'id': 'assets', 'view': 'view_console'},
+    {'id': 'applications', 'view': 'view_console'},
+    {'id': 'accounts', 'name': _('Accounts'), 'view': 'view_console'},
+    {'id': 'perms', 'view': 'view_console'},
+    {'id': 'acls', 'view': 'view_console'},
+    {'id': 'ops', 'view': 'view_console'},
+    {'id': 'terminal', 'name': _('Session audits'), 'view': 'view_audit'},
+    {'id': 'audits', 'view': 'view_audit'},
+    {'id': 'rbac', 'view': 'view_console'},
+    {'id': 'settings', 'view': 'view_setting'},
+    {'id': 'tickets', 'view': 'view_other'},
+    {'id': 'authentication', 'view': 'view_other'},
 ]
 
 # 额外其他节点，可以在不同的层次，需要指定父节点，可以将一些 model 归类到这个节点下面
 extra_nodes_data = [
-    {
-        "id": "cloud_import",
-        "name": _("Cloud import"),
-        "pId": "assets",
-    },
-    {
-        "id": "backup_account_node",
-        "name": _("Backup account"),
-        "pId": "accounts"
-    },
-    {
-        "id": "gather_account_node",
-        "name": _("Gather account"),
-        "pId": "accounts",
-    },
-    {
-        "id": "app_change_plan_node",
-        "name": _("App change auth"),
-        "pId": "accounts"
-    },
-    {
-        "id": "asset_change_plan_node",
-        "name": _("Asset change auth"),
-        "pId": "accounts"
-    },
-    {
-        "id": "terminal_node",
-        "name": _("Terminal setting"),
-        "pId": "view_setting"
-    },
-    {
-        'id': "my_assets",
-        "name": _("My assets"),
-        "pId": "view_workspace"
-    },
-    {
-        'id': "my_apps",
-        "name": _("My apps"),
-        "pId": "view_workspace"
-    },
+    {"id": "cloud_import", "name": _("Cloud import"), "pId": "assets"},
+    {"id": "backup_account_node", "name": _("Backup account"), "pId": "accounts"},
+    {"id": "gather_account_node", "name": _("Gather account"), "pId": "accounts"},
+    {"id": "app_change_plan_node", "name": _("App change auth"), "pId": "accounts"},
+    {"id": "asset_change_plan_node", "name": _("Asset change auth"), "pId": "accounts"},
+    {"id": "terminal_node", "name": _("Terminal setting"), "pId": "view_setting"},
+    {'id': "my_assets", "name": _("My assets"), "pId": "view_workspace"},
+    {'id': "my_apps", "name": _("My apps"), "pId": "view_workspace"},
 ]
 
 # 将 model 放到其它节点下，而不是本来的 app 中
-special_model_pid_mapper = {
+special_pid_mapper = {
     'common.permission': 'view_other',
     "assets.authbook": "accounts",
     "applications.account": "accounts",
@@ -181,16 +93,13 @@ special_model_pid_mapper = {
     'ops.commandexecution': 'view_workspace',
 }
 
-model_verbose_name_mapper = {
+verbose_name_mapper = {
     'orgs.organization': _("App organizations"),
     'tickets.comment': _("Ticket comment"),
 }
 
-xpack_apps = [
+xpack_nodes = [
     'xpack', 'tickets',
-]
-
-xpack_models = [
 ]
 
 
@@ -201,7 +110,7 @@ class PermissionTreeUtil:
         self.permissions = self.prefetch_permissions(permissions)
         self.all_permissions = self.prefetch_permissions(
             Permission.get_permissions(scope)
-        )
+        ).order_by('-codename')
         self.check_disabled = check_disabled
         self.total_counts = defaultdict(int)
         self.checked_counts = defaultdict(int)
@@ -267,9 +176,9 @@ class PermissionTreeUtil:
         app, model = model_id.split('.', 2)
         if settings.XPACK_ENABLED:
             return True
-        if app in xpack_apps:
+        if app in xpack_nodes:
             return False
-        if model_id in xpack_models:
+        if model_id in xpack_nodes:
             return False
         return True
 
@@ -289,15 +198,15 @@ class PermissionTreeUtil:
 
             # 获取 pid
             app = ct.app_label
-            if model_id in special_model_pid_mapper:
-                app = special_model_pid_mapper[model_id]
+            if model_id in special_pid_mapper:
+                app = special_pid_mapper[model_id]
             self.total_counts[app] += total_count
             self.checked_counts[app] += checked_count
 
             # 获取 name
             name = f'{ct.name}'
-            if model_id in model_verbose_name_mapper:
-                name = model_verbose_name_mapper[model_id]
+            if model_id in verbose_name_mapper:
+                name = verbose_name_mapper[model_id]
 
             node = self._create_node({
                 'id': model_id,
@@ -348,14 +257,16 @@ class PermissionTreeUtil:
             model_id = f'{p.app}.{p.model}'
             if not self._check_model_xpack(model_id):
                 continue
+            # name 要特殊处理，解决 i18n 问题
             name = self._get_permission_name(p, content_types_name_mapper)
             if settings.DEBUG:
                 name += '({})'.format(p.app_label_codename)
 
             title = p.app_label_codename
             pid = model_id
-            if title in special_model_pid_mapper:
-                pid = special_model_pid_mapper[title]
+            # perm node 的特殊设置用的是 title，因为 id 是数字，不一致
+            if title in special_pid_mapper:
+                pid = special_pid_mapper[title]
 
             self.total_counts[pid] += 1
             checked = p.id in permissions_id
@@ -421,7 +332,7 @@ class PermissionTreeUtil:
             checked_count = self.checked_counts[view]
             if total_count == 0:
                 continue
-            node = self._create_node(data, total_count, checked_count, 'view', is_open=False)
+            node = self._create_node(data, total_count, checked_count, 'view', is_open=True)
             nodes.append(node)
         return nodes
 
@@ -441,7 +352,6 @@ class PermissionTreeUtil:
                 'extra', is_open=False
             )
             nodes.append(node)
-
         return nodes
 
     def create_tree_nodes(self):

@@ -253,8 +253,10 @@ class RoleMixin:
     objects: models.Manager
     is_authenticated: bool
     is_valid: bool
+    id: str
     _org_roles = None
     _system_roles = None
+    PERM_CACHE_KEY = 'USER_PERMS_{}_{}'
 
     @lazyproperty
     def roles(self):
@@ -270,7 +272,16 @@ class RoleMixin:
 
     @lazyproperty
     def perms(self):
-        return self.get_all_permissions()
+        key = self.PERM_CACHE_KEY.format(self.id, current_org.id)
+        perms = cache.get(key)
+        if not perms:
+            perms = self.get_all_permissions()
+            cache.set(key, perms, 3600)
+        return perms
+
+    def expire_perms_cache(self):
+        key = self.PERM_CACHE_KEY.format(self.id, '*')
+        cache.delete_pattern(key)
 
     @lazyproperty
     def is_superuser(self):

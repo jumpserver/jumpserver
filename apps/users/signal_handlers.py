@@ -43,10 +43,12 @@ def user_authenticated_handle(user, created, source, attrs=None, **kwargs):
 
 @receiver(post_save, sender=User)
 def save_passwd_change(sender, instance: User, **kwargs):
-    passwds = UserPasswordHistory.objects.filter(user=instance).order_by('-date_created')\
-                  .values_list('password', flat=True)[:int(settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT)]
+    passwords = UserPasswordHistory.objects.filter(user=instance) \
+        .order_by('-date_created')\
+        .values_list('password', flat=True)
+    passwords = passwords[:int(settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT)]
 
-    for p in passwds:
+    for p in passwords:
         if instance.password == p:
             break
     else:
