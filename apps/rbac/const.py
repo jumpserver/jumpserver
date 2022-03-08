@@ -79,6 +79,8 @@ only_system_permissions = (
     ('rbac', 'systemrole', '*', '*'),
     ('rbac', 'rolebinding', '*', '*'),
     ('rbac', 'systemrolebinding', '*', '*'),
+    ('rbac', 'orgrole', 'delete,add,change', '*'),
+    ('rbac', 'orgrolebinding', 'delete,add,change', '*'),
     ('orgs', 'organization', '*', '*'),
     ('xpack', 'license', '*', '*'),
     ('settings', 'setting', '*', '*'),
