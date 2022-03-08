@@ -14,7 +14,6 @@ from terminal.filters import CommandStorageFilter, CommandFilter, CommandFilterF
 from ..models import CommandStorage, ReplayStorage
 from ..serializers import CommandStorageSerializer, ReplayStorageSerializer
 
-
 __all__ = [
     'CommandStorageViewSet', 'CommandStorageTestConnectiveApi',
     'ReplayStorageViewSet', 'ReplayStorageTestConnectiveApi'
@@ -40,7 +39,7 @@ class CommandStorageViewSet(BaseStorageViewSetMixin, viewsets.ModelViewSet):
     serializer_class = CommandStorageSerializer
     filterset_class = CommandStorageFilter
     rbac_perms = {
-        'tree': 'terminal.view_commandstorage'
+        'tree': 'terminal.view_commandstorage | terminal.view_command'
     }
 
     @action(methods=[GET], detail=False, filterset_class=CommandFilterForStorageTree)
