@@ -6102,7 +6102,7 @@ msgstr "改密计划"
 #: xpack/plugins/change_auth_plan/models/app.py:46
 #: xpack/plugins/change_auth_plan/models/app.py:95
 msgid "Application change auth plan"
-msgstr "应用改密计划执行"
+msgstr "应用改密计划"
 
 #: xpack/plugins/change_auth_plan/models/app.py:99
 #: xpack/plugins/change_auth_plan/models/app.py:151
