@@ -258,7 +258,6 @@ class Config(dict):
         'WECOM_CORPID': '',
         'WECOM_AGENTID': '',
         'WECOM_SECRET': '',
-        'WECOM_OAUTH': False,
 
         # 钉钉
         'AUTH_DINGTALK': False,

@@ -28,6 +28,7 @@ class ErrorCode:
 
 class URL:
     QR_CONNECT = 'https://oapi.dingtalk.com/connect/qrconnect'
+    OAUTH_CONNECT = 'https://oapi.dingtalk.com/connect/oauth2/sns_authorize'
     GET_USER_INFO_BY_CODE = 'https://oapi.dingtalk.com/sns/getuserinfo_bycode'
     GET_TOKEN = 'https://oapi.dingtalk.com/gettoken'
     SEND_MESSAGE_BY_TEMPLATE = 'https://oapi.dingtalk.com/topapi/message/corpconversation/sendbytemplate'
