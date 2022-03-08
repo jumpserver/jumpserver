@@ -14,6 +14,7 @@ auditor_perms = (
     ('common', 'permission', 'view', 'resourcestatistics'),
     ('audits', '*', '*', '*'),
     ('terminal', 'commandstorage', 'view', 'commandstorage'),
+    ('terminal', 'sessionreplay', 'view,download', 'sessionreplay'),
     ('terminal', 'session', '*', '*'),
     ('terminal', 'command', '*', '*'),
     ('ops', 'commandexecution', 'view', 'commandexecution'),
