@@ -55,9 +55,9 @@ class Subscription:
                         _next(item)
                 except Exception as e:
                     error(msg, item)
-                    logger.error('Subscribe handler handle msg error: ', e)
+                    logger.error('Subscribe handler handle msg error: {}'.format(e))
         except Exception as e:
-            logger.error('Consume msg error: ', e)
+            logger.error('Consume msg error: {}'.format(e))
 
         try:
             complete()
@@ -100,4 +100,4 @@ class RedisPubSub:
         self.redis.publish(self.ch, data_json)
         return True
 
-    
+
