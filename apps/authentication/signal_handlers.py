@@ -6,8 +6,9 @@ from django.core.cache import cache
 from django.dispatch import receiver
 from django_cas_ng.signals import cas_user_authenticated
 
-from authentication.backends.oidc.signals import openid_user_login_failed, openid_user_login_success
-
+from authentication.backends.oidc.signals import (
+    openid_user_login_failed, openid_user_login_success
+)
 from authentication.backends.saml2.signals import (
     saml2_user_authenticated, saml2_user_authentication_failed
 )
@@ -16,6 +17,9 @@ from .signals import post_auth_success, post_auth_failed
 
 @receiver(user_logged_in)
 def on_user_auth_login_success(sender, user, request, **kwargs):
+    # 失效 perms 缓存
+    user.expire_perms_cache()
+
     # 开启了 MFA，且没有校验过, 可以全局校验, middleware 中可以全局管理 oidc 等第三方认证的 MFA
     if settings.SECURITY_MFA_AUTH_ENABLED_FOR_THIRD_PARTY \
             and user.mfa_enabled \
@@ -24,12 +28,12 @@ def on_user_auth_login_success(sender, user, request, **kwargs):
 
     # 单点登录，超过了自动退出
     if settings.USER_LOGIN_SINGLE_MACHINE_ENABLED:
-        user_id = 'single_machine_login_' + str(user.id)
-        session_key = cache.get(user_id)
+        lock_key = 'single_machine_login_' + str(user.id)
+        session_key = cache.get(lock_key)
         if session_key and session_key != request.session.session_key:
             session = import_module(settings.SESSION_ENGINE).SessionStore(session_key)
             session.delete()
-        cache.set(user_id, request.session.session_key, None)
+        cache.set(lock_key, request.session.session_key, None)
 
 
 @receiver(openid_user_login_success)
