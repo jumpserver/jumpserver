@@ -4,17 +4,6 @@ permission_tree_nodes = {
     # 节点
     'root': {
         'name': _('All permissions'),
-        # 'id': '',
-        # 'pId': '',
-        # 'open': True,
-        # 'title': _('All permissions'),
-        # 'isParent': True,
-        # 'chkDisabled': False,
-        # 'iconSkin': 'file',
-        # 'checked': False,
-        # 'meta': {
-        #     'type': 'perm'
-        # }
     },
     'view': {
         'name': _("View menu")
@@ -285,7 +274,7 @@ permission_tree_nodes = {
     'assets.match_asset': {
         'name': _('View some of the assets searched')
     },
-    'rbac.view_userview': {
+    'rbac.view_workspace': {
         'checked': True,
         'chkDisabled': True,
     },

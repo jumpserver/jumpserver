@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-10 05:41+0800\n"
+"POT-Creation-Date: 2022-03-10 06:45+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -301,7 +301,7 @@ msgstr "系统用户"
 msgid "Version"
 msgstr "版本"
 
-#: applications/models/account.py:23 rbac/ztree/tree_nodes.py:158
+#: applications/models/account.py:23 rbac/ztree/tree_nodes.py:147
 msgid "Application account"
 msgstr "应用账号"
 
@@ -344,19 +344,19 @@ msgstr "属性"
 msgid "Application user"
 msgstr "应用用户"
 
-#: applications/models/application.py:274 rbac/ztree/tree_nodes.py:146
+#: applications/models/application.py:274 rbac/ztree/tree_nodes.py:135
 msgid "Remote application"
 msgstr "远程应用"
 
 #: applications/models/application.py:280
-#: perms/models/application_permission.py:134 rbac/ztree/tree_nodes.py:149
-#: rbac/ztree/tree_nodes.py:203
+#: perms/models/application_permission.py:134 rbac/ztree/tree_nodes.py:138
+#: rbac/ztree/tree_nodes.py:192
 msgid "Database application"
 msgstr "数据库应用"
 
 #: applications/models/application.py:286
-#: perms/models/application_permission.py:145 rbac/ztree/tree_nodes.py:152
-#: rbac/ztree/tree_nodes.py:206
+#: perms/models/application_permission.py:145 rbac/ztree/tree_nodes.py:141
+#: rbac/ztree/tree_nodes.py:195
 msgid "Kubernetes"
 msgstr ""
 
@@ -839,7 +839,7 @@ msgid "Default Cluster"
 msgstr "默认Cluster"
 
 #: assets/models/cmd_filter.py:34 perms/models/base.py:86
-#: rbac/ztree/tree_nodes.py:95 users/models/group.py:31
+#: rbac/ztree/tree_nodes.py:84 users/models/group.py:31
 #: users/models/user.py:573 users/templates/users/_select_user_modal.html:16
 #: users/templates/users/user_asset_permission.html:39
 #: users/templates/users/user_asset_permission.html:67
@@ -849,7 +849,7 @@ msgid "User group"
 msgstr "用户组"
 
 #: assets/models/cmd_filter.py:60 assets/serializers/system_user.py:54
-#: rbac/ztree/tree_nodes.py:134
+#: rbac/ztree/tree_nodes.py:123
 msgid "Command filter"
 msgstr "命令过滤器"
 
@@ -889,7 +889,7 @@ msgstr "每行一个命令"
 msgid "Ignore case"
 msgstr "忽略大小写"
 
-#: assets/models/cmd_filter.py:103 rbac/ztree/tree_nodes.py:137
+#: assets/models/cmd_filter.py:103 rbac/ztree/tree_nodes.py:126
 msgid "Command filter rule"
 msgstr "命令过滤规则"
 
@@ -1376,7 +1376,7 @@ msgstr "日志审计"
 
 #: audits/models.py:27 audits/models.py:57
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:226 rbac/ztree/tree.py:152
+#: rbac/tree.py:226 rbac/ztree/tree.py:156
 #: users/templates/users/user_asset_permission.html:128
 #: users/templates/users/user_database_app_permission.html:111
 msgid "Delete"
@@ -1431,11 +1431,11 @@ msgstr "文件管理"
 
 #: audits/models.py:55
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:223 rbac/ztree/tree.py:149
+#: rbac/tree.py:223 rbac/ztree/tree.py:153
 msgid "Create"
 msgstr "创建"
 
-#: audits/models.py:56 rbac/tree.py:225 rbac/ztree/tree.py:151
+#: audits/models.py:56 rbac/tree.py:225 rbac/ztree/tree.py:155
 #: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
 #: users/templates/users/user_asset_permission.html:127
 #: users/templates/users/user_database_app_permission.html:110
@@ -1658,7 +1658,7 @@ msgid "{AssetPermission} REMOVE {UserGroup}"
 msgstr "{AssetPermission} 移除 {UserGroup}"
 
 #: audits/signal_handlers.py:131 perms/models/asset_permission.py:29
-#: rbac/ztree/tree_nodes.py:38 rbac/ztree/tree_nodes.py:182
+#: rbac/ztree/tree_nodes.py:27 rbac/ztree/tree_nodes.py:171
 #: users/templates/users/_user_detail_nav_header.html:31
 msgid "Asset permission"
 msgstr "资产授权"
@@ -1730,7 +1730,7 @@ msgid "{ApplicationPermission} REMOVE {UserGroup}"
 msgstr "{ApplicationPermission} 移除 {UserGroup}"
 
 #: audits/signal_handlers.py:156 perms/models/application_permission.py:38
-#: rbac/ztree/tree_nodes.py:101 rbac/ztree/tree_nodes.py:185
+#: rbac/ztree/tree_nodes.py:90 rbac/ztree/tree_nodes.py:174
 msgid "Application permission"
 msgstr "应用授权"
 
@@ -2671,7 +2671,7 @@ msgstr "通知"
 msgid "Email"
 msgstr "邮件"
 
-#: notifications/backends/__init__.py:13 rbac/ztree/tree_nodes.py:268
+#: notifications/backends/__init__.py:13 rbac/ztree/tree_nodes.py:257
 msgid "Site message"
 msgstr "站内信"
 
@@ -3182,30 +3182,26 @@ msgid "Menu permission"
 msgstr "菜单授权"
 
 #: rbac/models/menu.py:15
-msgid "Can view resource statistics"
-msgstr "可以查看资源统计"
+msgid "Can view console view"
+msgstr "可以显示控制台"
 
 #: rbac/models/menu.py:16
-msgid "Can view console view"
-msgstr "可以查看控制台"
+msgid "Can view audit view"
+msgstr "可以显示审计台"
 
 #: rbac/models/menu.py:17
-msgid "Can view audit view"
-msgstr "可以查看审计台"
+msgid "Can view workspace view"
+msgstr "可以显示工作台"
 
 #: rbac/models/menu.py:18
-msgid "Can view workspace view"
-msgstr "可以查看工作台"
-
-#: rbac/models/menu.py:19
 msgid "Can view web terminal"
 msgstr "Web终端"
 
-#: rbac/models/menu.py:20
+#: rbac/models/menu.py:19
 msgid "Can view file manager"
 msgstr "文件管理"
 
-#: rbac/models/menu.py:21
+#: rbac/models/menu.py:20
 msgid "Can view dashboard"
 msgstr "仪表盘"
 
@@ -3225,11 +3221,11 @@ msgstr "授权"
 msgid "Built-in"
 msgstr "内置"
 
-#: rbac/models/role.py:127 rbac/ztree/tree_nodes.py:241
+#: rbac/models/role.py:127 rbac/ztree/tree_nodes.py:230
 msgid "System role"
 msgstr "系统角色"
 
-#: rbac/models/role.py:135 rbac/ztree/tree_nodes.py:238
+#: rbac/models/role.py:135 rbac/ztree/tree_nodes.py:227
 msgid "Organization role"
 msgstr "组织角色"
 
@@ -3275,19 +3271,19 @@ msgstr "已经绑定"
 msgid "All permissions"
 msgstr "所有权限"
 
-#: rbac/tree.py:24 rbac/ztree/tree_nodes.py:23
+#: rbac/tree.py:24 rbac/ztree/tree_nodes.py:12
 msgid "Console view"
 msgstr "控制台"
 
-#: rbac/tree.py:25 rbac/ztree/tree_nodes.py:32
+#: rbac/tree.py:25 rbac/ztree/tree_nodes.py:21
 msgid "Workspace view"
 msgstr "工作台"
 
-#: rbac/tree.py:26 rbac/ztree/tree_nodes.py:35
+#: rbac/tree.py:26 rbac/ztree/tree_nodes.py:24
 msgid "Audit view"
 msgstr "审计台"
 
-#: rbac/tree.py:27 rbac/ztree/tree_nodes.py:62 settings/models.py:140
+#: rbac/tree.py:27 rbac/ztree/tree_nodes.py:51 settings/models.py:140
 msgid "System setting"
 msgstr "系统设置"
 
@@ -3299,7 +3295,7 @@ msgstr "其它"
 msgid "Accounts"
 msgstr "账号管理"
 
-#: rbac/tree.py:40 rbac/ztree/tree_nodes.py:41
+#: rbac/tree.py:40 rbac/ztree/tree_nodes.py:30
 msgid "Session audits"
 msgstr "会话审计"
 
@@ -3323,11 +3319,11 @@ msgstr "应用改密"
 msgid "Asset change auth"
 msgstr "资产改密"
 
-#: rbac/tree.py:55 rbac/ztree/tree_nodes.py:209
+#: rbac/tree.py:55 rbac/ztree/tree_nodes.py:198
 msgid "Terminal setting"
 msgstr "终端设置"
 
-#: rbac/tree.py:56 rbac/ztree/tree_nodes.py:53
+#: rbac/tree.py:56 rbac/ztree/tree_nodes.py:42
 msgid "My assets"
 msgstr "我的资产"
 
@@ -3339,269 +3335,269 @@ msgstr "我的应用"
 msgid "Ticket comment"
 msgstr "工单评论"
 
-#: rbac/tree.py:224 rbac/ztree/tree.py:150
+#: rbac/tree.py:224 rbac/ztree/tree.py:154
 msgid "View"
 msgstr "查看"
 
-#: rbac/ztree/tree.py:95 rbac/ztree/tree_nodes.py:107
+#: rbac/ztree/tree.py:99 rbac/ztree/tree_nodes.py:96
 msgid "Detail"
 msgstr "详情"
 
-#: rbac/ztree/tree_nodes.py:20
+#: rbac/ztree/tree_nodes.py:9
 msgid "View menu"
 msgstr "视图菜单"
 
-#: rbac/ztree/tree_nodes.py:26
+#: rbac/ztree/tree_nodes.py:15
 msgid "User management"
 msgstr "用户管理"
 
-#: rbac/ztree/tree_nodes.py:29
+#: rbac/ztree/tree_nodes.py:18
 msgid "User list"
 msgstr "用户列表"
 
-#: rbac/ztree/tree_nodes.py:44
+#: rbac/ztree/tree_nodes.py:33
 msgid "Online/Offline Session record"
 msgstr "在线/离线会话记录"
 
-#: rbac/ztree/tree_nodes.py:47
+#: rbac/ztree/tree_nodes.py:36
 msgid "Asset management"
 msgstr "资产管理"
 
-#: rbac/ztree/tree_nodes.py:50 rbac/ztree/tree_nodes.py:128
+#: rbac/ztree/tree_nodes.py:39 rbac/ztree/tree_nodes.py:117
 msgid "Asset list"
 msgstr "资产列表"
 
-#: rbac/ztree/tree_nodes.py:56
+#: rbac/ztree/tree_nodes.py:45
 msgid "My application"
 msgstr "我的应用"
 
-#: rbac/ztree/tree_nodes.py:59 rbac/ztree/tree_nodes.py:265
+#: rbac/ztree/tree_nodes.py:48 rbac/ztree/tree_nodes.py:254
 msgid "Bulk command"
 msgstr "批量命令"
 
-#: rbac/ztree/tree_nodes.py:65
+#: rbac/ztree/tree_nodes.py:54
 msgid "Ticket system"
 msgstr "工单系统"
 
-#: rbac/ztree/tree_nodes.py:68 templates/_header_bar.html:12
+#: rbac/ztree/tree_nodes.py:57 templates/_header_bar.html:12
 msgid "Help"
 msgstr "帮助"
 
-#: rbac/ztree/tree_nodes.py:71
+#: rbac/ztree/tree_nodes.py:60
 msgid "API permission"
 msgstr "API权限"
 
-#: rbac/ztree/tree_nodes.py:74
+#: rbac/ztree/tree_nodes.py:63
 msgid "Application management"
 msgstr "应用管理"
 
-#: rbac/ztree/tree_nodes.py:77
+#: rbac/ztree/tree_nodes.py:66
 msgid "Account management"
 msgstr "账号管理"
 
-#: rbac/ztree/tree_nodes.py:80
+#: rbac/ztree/tree_nodes.py:69
 msgid "Permission management"
 msgstr "权限管理"
 
-#: rbac/ztree/tree_nodes.py:83
+#: rbac/ztree/tree_nodes.py:72
 msgid "Access control"
 msgstr "访问控制"
 
-#: rbac/ztree/tree_nodes.py:86
+#: rbac/ztree/tree_nodes.py:75
 msgid "Job center"
 msgstr "作业中心"
 
-#: rbac/ztree/tree_nodes.py:89
+#: rbac/ztree/tree_nodes.py:78
 msgid "Session audit"
 msgstr "会话审计"
 
-#: rbac/ztree/tree_nodes.py:92
+#: rbac/ztree/tree_nodes.py:81
 msgid "Log audit"
 msgstr "日志审计"
 
-#: rbac/ztree/tree_nodes.py:98
+#: rbac/ztree/tree_nodes.py:87
 msgid "Role list"
 msgstr "角色列表"
 
-#: rbac/ztree/tree_nodes.py:104
+#: rbac/ztree/tree_nodes.py:93
 msgid "User login acl"
 msgstr "用户登录规则"
 
-#: rbac/ztree/tree_nodes.py:110
+#: rbac/ztree/tree_nodes.py:99
 msgid "Permission list"
 msgstr "权限列表"
 
-#: rbac/ztree/tree_nodes.py:113
+#: rbac/ztree/tree_nodes.py:102
 msgid "Node tree"
 msgstr "节点树"
 
-#: rbac/ztree/tree_nodes.py:116
+#: rbac/ztree/tree_nodes.py:105
 msgid "Cloud sync"
 msgstr "云同步"
 
-#: rbac/ztree/tree_nodes.py:119
+#: rbac/ztree/tree_nodes.py:108
 msgid "Sync instance task list"
 msgstr "同步实例任务列表"
 
-#: rbac/ztree/tree_nodes.py:122 rbac/ztree/tree_nodes.py:131
+#: rbac/ztree/tree_nodes.py:111 rbac/ztree/tree_nodes.py:120
 msgid "Account list"
 msgstr "账号列表"
 
-#: rbac/ztree/tree_nodes.py:125
+#: rbac/ztree/tree_nodes.py:114
 msgid "Common/Admin User"
 msgstr "普通/特权用户"
 
-#: rbac/ztree/tree_nodes.py:140
+#: rbac/ztree/tree_nodes.py:129
 msgid "Platform list"
 msgstr "平台列表"
 
-#: rbac/ztree/tree_nodes.py:143
+#: rbac/ztree/tree_nodes.py:132
 msgid "Label management"
 msgstr "标签管理"
 
-#: rbac/ztree/tree_nodes.py:155
+#: rbac/ztree/tree_nodes.py:144
 msgid "Asset account"
 msgstr "资产账号"
 
-#: rbac/ztree/tree_nodes.py:161 xpack/plugins/gathered_user/meta.py:11
+#: rbac/ztree/tree_nodes.py:150 xpack/plugins/gathered_user/meta.py:11
 msgid "Gathered user"
 msgstr "收集用户"
 
-#: rbac/ztree/tree_nodes.py:164
+#: rbac/ztree/tree_nodes.py:153
 msgid "Gathered user list"
 msgstr "收集用户列表"
 
-#: rbac/ztree/tree_nodes.py:167
+#: rbac/ztree/tree_nodes.py:156
 msgid "Gathered user task list"
 msgstr "收集用户任务列表"
 
-#: rbac/ztree/tree_nodes.py:170 xpack/plugins/change_auth_plan/meta.py:9
+#: rbac/ztree/tree_nodes.py:159 xpack/plugins/change_auth_plan/meta.py:9
 #: xpack/plugins/change_auth_plan/models/asset.py:123
 msgid "Change auth plan"
 msgstr "改密计划"
 
-#: rbac/ztree/tree_nodes.py:173
+#: rbac/ztree/tree_nodes.py:162
 #: xpack/plugins/change_auth_plan/models/asset.py:67
 msgid "Asset change auth plan"
 msgstr "资产改密计划"
 
-#: rbac/ztree/tree_nodes.py:176 xpack/plugins/change_auth_plan/models/app.py:46
+#: rbac/ztree/tree_nodes.py:165 xpack/plugins/change_auth_plan/models/app.py:46
 #: xpack/plugins/change_auth_plan/models/app.py:95
 msgid "Application change auth plan"
 msgstr "应用改密计划"
 
-#: rbac/ztree/tree_nodes.py:179
+#: rbac/ztree/tree_nodes.py:168
 msgid "Account backup"
 msgstr "账号备份"
 
-#: rbac/ztree/tree_nodes.py:188
+#: rbac/ztree/tree_nodes.py:177
 msgid "Asset login"
 msgstr "资产登录"
 
-#: rbac/ztree/tree_nodes.py:191
+#: rbac/ztree/tree_nodes.py:180
 msgid "Task list"
 msgstr "任务列表"
 
-#: rbac/ztree/tree_nodes.py:194 terminal/models/command.py:24
+#: rbac/ztree/tree_nodes.py:183 terminal/models/command.py:24
 msgid "Command record"
 msgstr "命令记录"
 
-#: rbac/ztree/tree_nodes.py:197
+#: rbac/ztree/tree_nodes.py:186
 msgid "File transfer"
 msgstr "文件传输"
 
-#: rbac/ztree/tree_nodes.py:200
+#: rbac/ztree/tree_nodes.py:189
 msgid "Remote App"
 msgstr "远程应用"
 
-#: rbac/ztree/tree_nodes.py:212
+#: rbac/ztree/tree_nodes.py:201
 msgid "Terminal management"
 msgstr "终端管理"
 
-#: rbac/ztree/tree_nodes.py:215 terminal/models/storage.py:113
+#: rbac/ztree/tree_nodes.py:204 terminal/models/storage.py:113
 #: terminal/models/terminal.py:108
 msgid "Command storage"
 msgstr "命令存储"
 
-#: rbac/ztree/tree_nodes.py:218 terminal/models/storage.py:173
+#: rbac/ztree/tree_nodes.py:207 terminal/models/storage.py:173
 #: terminal/models/terminal.py:109
 msgid "Replay storage"
 msgstr "录像存储"
 
-#: rbac/ztree/tree_nodes.py:221
+#: rbac/ztree/tree_nodes.py:210
 msgid "Organization management"
 msgstr "组织管理"
 
-#: rbac/ztree/tree_nodes.py:224 xpack/plugins/license/meta.py:11
+#: rbac/ztree/tree_nodes.py:213 xpack/plugins/license/meta.py:11
 #: xpack/plugins/license/models.py:127
 msgid "License"
 msgstr "许可证"
 
-#: rbac/ztree/tree_nodes.py:229
+#: rbac/ztree/tree_nodes.py:218
 msgid "View all permission"
 msgstr "查看所有权限"
 
-#: rbac/ztree/tree_nodes.py:232
+#: rbac/ztree/tree_nodes.py:221
 msgid "Domain list"
 msgstr "网域列表"
 
-#: rbac/ztree/tree_nodes.py:235
+#: rbac/ztree/tree_nodes.py:224
 msgid "Gateway list"
 msgstr "网关列表"
 
-#: rbac/ztree/tree_nodes.py:244
+#: rbac/ztree/tree_nodes.py:233
 msgid "Run gather user task"
 msgstr "执行收集用户任务"
 
-#: rbac/ztree/tree_nodes.py:247
+#: rbac/ztree/tree_nodes.py:236
 msgid "Run asset change auth plan"
 msgstr "执行资产改密计划"
 
-#: rbac/ztree/tree_nodes.py:250
+#: rbac/ztree/tree_nodes.py:239
 msgid "Run application change auth plan"
 msgstr "执行应用改密计划"
 
-#: rbac/ztree/tree_nodes.py:253
+#: rbac/ztree/tree_nodes.py:242
 msgid "Run account backup plan"
 msgstr "执行账号备份计划"
 
-#: rbac/ztree/tree_nodes.py:256
+#: rbac/ztree/tree_nodes.py:245
 msgid "Run task"
 msgstr "运行任务"
 
-#: rbac/ztree/tree_nodes.py:259
+#: rbac/ztree/tree_nodes.py:248
 msgid "View task version"
 msgstr "查看任务版本"
 
-#: rbac/ztree/tree_nodes.py:262
+#: rbac/ztree/tree_nodes.py:251
 msgid "View execution history"
 msgstr "查看执行历史"
 
-#: rbac/ztree/tree_nodes.py:271
+#: rbac/ztree/tree_nodes.py:260
 msgid "Message subscription"
 msgstr "消息订阅"
 
-#: rbac/ztree/tree_nodes.py:274
+#: rbac/ztree/tree_nodes.py:263
 msgid "Component monitor"
 msgstr "组件监控"
 
-#: rbac/ztree/tree_nodes.py:277
+#: rbac/ztree/tree_nodes.py:266
 msgid "View my/assigned ticket"
 msgstr "查看我的/待审批工单"
 
-#: rbac/ztree/tree_nodes.py:280
+#: rbac/ztree/tree_nodes.py:269
 msgid "Create asset/application ticket"
 msgstr "创建资产/应用申请工单"
 
-#: rbac/ztree/tree_nodes.py:283
+#: rbac/ztree/tree_nodes.py:272
 msgid "Change/close ticket"
 msgstr "更新/关闭工单"
 
-#: rbac/ztree/tree_nodes.py:286
+#: rbac/ztree/tree_nodes.py:275
 msgid "View some of the assets searched"
 msgstr "查看搜索的部分资产"
 
-#: rbac/ztree/tree_nodes.py:293
+#: rbac/ztree/tree_nodes.py:282
 msgid "Overview"
 msgstr "概览"
 
@@ -7074,3 +7070,6 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Can view resource statistics"
+#~ msgstr "可以查看资源统计"

@@ -6,8 +6,8 @@ flag_scope_system = '!'
 
 permission_paths = [
     # format: 权限树路径 / app.codename @ 企业版、系统级别
-    '/root/view/view_console/rbac.view_adminview',
-    '/root/view/view_console/rbac.view_resourcestatistics',
+    '/root/view/view_console/rbac.view_console',
+    '/root/view/view_console/rbac.view_dashboard',
     '/root/view/view_console/user_management/user_list/users.view_user',
     '/root/view/view_console/user_management/user_list/users.add_user',
     '/root/view/view_console/user_management/user_list/users.change_user',
@@ -178,8 +178,8 @@ permission_paths = [
     '/root/view/view_console/job_center/task_list/task_list_detail/ops.view_adhocexecution',
     '/root/view/view_console/job_center/ops.view_taskmonitor',
 
-    '/root/view/view_audit/rbac.view_auditview',
-    '/root/view/view_audit/rbac.view_resourcestatistics',
+    '/root/view/view_audit/rbac.view_audit',
+    '/root/view/view_audit/rbac.view_dashboard',
     '/root/view/view_audit/session_audit/session_record/terminal.view_session',
     '/root/view/view_audit/session_audit/session_record/terminal.terminate_session',
     '/root/view/view_audit/session_audit/session_record/terminal.monitor_session',
@@ -193,7 +193,7 @@ permission_paths = [
     '/root/view/view_audit/log_audit/audits.view_passwordchangelog',
     '/root/view/view_audit/log_audit/ops.view_commandexecution',
 
-    '/root/view/view_workspace/rbac.view_userview',
+    '/root/view/view_workspace/rbac.view_workspace',
     '/root/view/view_workspace/rbac.view_overview',
     '/root/view/view_workspace/my_asset/perms.view_myassets',
     '/root/view/view_workspace/my_asset/perms.connect_myassets',

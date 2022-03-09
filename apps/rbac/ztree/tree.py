@@ -178,6 +178,17 @@ class ZTree(object):
         return name
 
     @classmethod
+    def get_permissions_app_label_codename(cls, scope):
+        perm_paths = cls.get_permission_paths(scope)
+        perms = []
+        for path in perm_paths:
+            path, app_label_code_name = path.rsplit('/', 1)
+            if not app_label_code_name:
+                continue
+            perms.append(app_label_code_name)
+        return perms
+
+    @classmethod
     def get_permission_paths(cls, scope):
         perm_paths = []
         for path in permission_paths:
@@ -189,14 +200,3 @@ class ZTree(object):
                     continue
             perm_paths.append(path)
         return perm_paths
-
-    @classmethod
-    def get_permissions_app_label_codename(cls, scope):
-        perm_paths = cls.get_permission_paths(scope)
-        perms = []
-        for path in perm_paths:
-            path, app_label_code_name = path.rsplit('/', 1)
-            if not app_label_code_name:
-                continue
-            perms.append(app_label_code_name)
-        return perms
