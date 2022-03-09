@@ -112,11 +112,7 @@ class WeComOAuthMixin(WeComBaseMixin, View):
             'response_type': 'code',
             'scope': 'snsapi_base',
         }
-
-        if not settings.WECOM_OAUTH:
-            url = reverse('authentication:wecom-qr-login')
-        else:
-            url = URL.OAUTH_CONNECT + '?' + urlencode(params) + '#wechat_redirect'
+        url = URL.OAUTH_CONNECT + '?' + urlencode(params) + '#wechat_redirect'
         return url
 
 

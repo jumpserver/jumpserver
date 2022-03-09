@@ -100,7 +100,7 @@ class DingTalkQRMixin(DingTalkBaseMixin, View):
 class DingTalkOAuthMixin(DingTalkBaseMixin, View):
 
     def get_oauth_url(self, redirect_uri):
-        if not settings.AUTH_WECOM:
+        if not settings.AUTH_DINGTALK:
             return reverse('authentication:login')
         state = random_string(16)
         self.request.session[DINGTALK_STATE_SESSION_KEY] = state
@@ -112,7 +112,6 @@ class DingTalkOAuthMixin(DingTalkBaseMixin, View):
             'state': state,
             'redirect_uri': redirect_uri,
         }
-
         url = URL.OAUTH_CONNECT + '?' + urlencode(params)
         return url
 
