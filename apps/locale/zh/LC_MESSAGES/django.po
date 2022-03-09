@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-10 02:08+0800\n"
+"POT-Creation-Date: 2022-03-10 04:22+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1376,7 +1376,7 @@ msgstr "日志审计"
 
 #: audits/models.py:27 audits/models.py:57
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:226 rbac/ztree/tree.py:119
+#: rbac/tree.py:226 rbac/ztree/tree.py:150
 #: users/templates/users/user_asset_permission.html:128
 #: users/templates/users/user_database_app_permission.html:111
 msgid "Delete"
@@ -1431,11 +1431,11 @@ msgstr "文件管理"
 
 #: audits/models.py:55
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:223 rbac/ztree/tree.py:116
+#: rbac/tree.py:223 rbac/ztree/tree.py:147
 msgid "Create"
 msgstr "创建"
 
-#: audits/models.py:56 rbac/tree.py:225 rbac/ztree/tree.py:118
+#: audits/models.py:56 rbac/tree.py:225 rbac/ztree/tree.py:149
 #: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
 #: users/templates/users/user_asset_permission.html:127
 #: users/templates/users/user_database_app_permission.html:110
@@ -3335,11 +3335,11 @@ msgstr "我的应用"
 msgid "Ticket comment"
 msgstr "工单评论"
 
-#: rbac/tree.py:224 rbac/ztree/tree.py:117
+#: rbac/tree.py:224 rbac/ztree/tree.py:148
 msgid "View"
 msgstr "查看"
 
-#: rbac/ztree/tree.py:58 rbac/ztree/tree_nodes.py:107
+#: rbac/ztree/tree.py:95 rbac/ztree/tree_nodes.py:107
 msgid "Detail"
 msgstr "详情"
 
@@ -3596,6 +3596,10 @@ msgstr "更新/关闭工单"
 #: rbac/ztree/tree_nodes.py:286
 msgid "View some of the assets searched"
 msgstr "查看搜索的部分资产"
+
+#: rbac/ztree/tree_nodes.py:289
+msgid "Overview"
+msgstr "概览"
 
 #: settings/api/alibaba_sms.py:31 settings/api/tencent_sms.py:35
 msgid "test_phone is required"
