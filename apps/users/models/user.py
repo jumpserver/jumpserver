@@ -346,20 +346,23 @@ class RoleMixin:
         org_admin = Role.BuiltinRole.org_admin.get_role()
         return RoleBinding.get_role_users(org_admin)
 
-    @classmethod
-    def get_nature_users(cls, queryset=None):
-        if not queryset:
-            return cls.objects.filter(is_service_account=False)
+    @staticmethod
+    def filter_not_service_account(queryset):
         return queryset.filter(is_service_account=False)
 
     @classmethod
+    def get_nature_users(cls):
+        queryset = cls.objects.all()
+        return cls.filter_not_service_account(queryset)
+
+    @classmethod
     def get_org_users(cls, org=None):
-        queryset = None
+        queryset = cls.objects.all()
         if org is None:
             org = current_org
         if not org.is_root():
             queryset = current_org.get_members()
-        queryset = cls.get_nature_users(queryset)
+        queryset = cls.filter_not_service_account(queryset)
         return queryset
 
     def get_all_permissions(self):
