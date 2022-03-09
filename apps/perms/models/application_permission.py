@@ -36,8 +36,10 @@ class ApplicationPermission(BasePermission):
     class Meta:
         unique_together = [('org_id', 'name')]
         verbose_name = _('Application permission')
+        permissions = [
+            ('view_permuserapplication', _('Can view application of permission to user'))
+        ]
         ordering = ('name',)
-
 
     @property
     def category_remote_app(self):
@@ -107,10 +109,42 @@ class ApplicationPermission(BasePermission):
 class PermedApplication(Application):
     class Meta:
         proxy = True
-        verbose_name = _("Permed app")
+        verbose_name = _('Permed application')
+        default_permissions = []
         permissions = [
-            ('view_myapps', _('Can view my apps')),
-            ('connect_myapps', _('Can connect my apps')),
             ('view_userapps', _('Can view user apps')),
             ('view_usergroupapps', _('Can view usergroup apps')),
+        ]
+
+
+class PermedRemoteApp(Application):
+    class Meta:
+        proxy = True
+        verbose_name = _('Permed remote application')
+        default_permissions = []
+        permissions = [
+            ('view_myremoteapp', _('Can view my remoteapp')),
+            ('connect_myremoteapp', _('Can connect my remoteapp')),
+        ]
+
+
+class PermedDatabaseApp(Application):
+    class Meta:
+        proxy = True
+        verbose_name = _('Database application')
+        default_permissions = []
+        permissions = [
+            ('view_mydatabaseapp', _('Can view my database application')),
+            ('connect_mydatabaseapp', _('Can connect my database application')),
+        ]
+
+
+class PermedKubernetesApp(Application):
+    class Meta:
+        proxy = True
+        verbose_name = _('Kubernetes')
+        default_permissions = []
+        permissions = [
+            ('view_mykubernetesapp', _('Can view my kubernetes application')),
+            ('connect_mykubernetesapp', _('Can connect my kubernetes application')),
         ]

@@ -28,6 +28,10 @@ class AssetPermission(BasePermission):
         unique_together = [('org_id', 'name')]
         verbose_name = _("Asset permission")
         ordering = ('name',)
+        permissions = [
+            ('view_permuserasset', _('Can view asset of permission to user')),
+            ('view_permusergroupasset', _('Can view asset of permission to user group'))
+        ]
 
     @lazyproperty
     def users_amount(self):

@@ -52,19 +52,26 @@ class ZTree(object):
     def create_tree_nodes_by_path(self, perm_path):
         path, perm_app_label_codename = perm_path.rsplit('/', 1)
         # add path
-        pid = None
+        pid = ''
         for level, tree_node_id in enumerate(path.lstrip('/').split('/'), start=1):
-            data = permission_tree_nodes.get(tree_node_id, {})
-            data.update({
+            if 'detail' in tree_node_id:
+                name = _('Detail')
+            else:
+                name = tree_node_id
+
+            data = {
                 'id': tree_node_id,
                 'pId': pid,
-            })
+                'name': name
+            }
             if level <= 1 or True:
                 data.update({
                     'open': True
                 })
-            self.tree_nodes.add(data)
+            _data = permission_tree_nodes.get(tree_node_id, {})
+            data.update(_data)
             pid = data['id']
+            self.tree_nodes.add(data)
 
         # add perm
         if not perm_app_label_codename:
@@ -85,6 +92,8 @@ class ZTree(object):
             'iconSkin': 'file',
             'open': False,
         }
+        _data = permission_tree_nodes.get(perm_app_label_codename, {})
+        data.update(_data)
         self.tree_nodes.add(data)
 
     def get_permission_paths(self):

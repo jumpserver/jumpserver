@@ -13,19 +13,6 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='PermedApplication',
-            fields=[
-            ],
-            options={
-                'verbose_name': 'Permed app',
-                'permissions': [('view_myapps', 'Can view my apps'), ('connect_myapps', 'Can connect my apps'), ('view_userapps', 'Can view user apps'), ('view_usergroupapps', 'Can view usergroup apps')],
-                'proxy': True,
-                'indexes': [],
-                'constraints': [],
-            },
-            bases=('applications.application',),
-        ),
-        migrations.CreateModel(
             name='PermedAsset',
             fields=[
             ],
