@@ -5,8 +5,10 @@ from common.tree import TreeNode as RawTreeNode
 from django.utils.translation import gettext_lazy as _, gettext
 from rbac.models import Permission, ContentType
 from django.db.models import F, Count
-from .permissions import permission_paths
+from .permissions import permission_paths, flag_license_required, flag_sep, flag_scope_system
 from .tree_nodes import permission_tree_nodes
+from ..const import Scope
+from jumpserver.utils import has_valid_xpack_license
 
 
 class TreeNode(RawTreeNode):
@@ -58,6 +60,8 @@ class TreeNodes:
 
 class ZTree(object):
 
+    has_valid_license = has_valid_xpack_license()
+
     def __init__(self, checked_permission, scope, check_disabled=False):
         self.scope = scope
         self.checked_permission = self.prefetch_permissions(
@@ -71,7 +75,7 @@ class ZTree(object):
         self.content_types_name_mapper = {ct.model: ct.name for ct in ContentType.objects.all()}
         self.check_disabled = check_disabled
         self.tree_nodes = TreeNodes()
-        self.show_node_level = 2
+        self.show_node_level = 3
 
     @staticmethod
     def prefetch_permissions(permissions):
@@ -96,6 +100,7 @@ class ZTree(object):
             data = dict({
                 'id': tree_node_id,
                 'name': name,
+                'title': name,
                 'pId': pid,
                 'isParent': True,
                 'chkDisabled': self.check_disabled,
@@ -115,9 +120,9 @@ class ZTree(object):
         perm = self.permissions_mapper.get(perm_app_label_codename)
         if perm:
             # 解决同一个权限不能在多个节点的问题
-            _id = f'{pid}#{perm.id}',
+            _id = f'{pid}#{perm.id}'
             name = self._get_permission_name(perm)
-            checked = perm.id in self.checked_permissions_mapper,
+            checked = perm.id in self.checked_permissions_mapper
         else:
             #  最终不应该走这里，所有权限都要在数据库里
             _id = perm_app_label_codename
@@ -128,6 +133,7 @@ class ZTree(object):
             'id': _id,
             'pId': pid,
             'name': name,
+            'title': perm_app_label_codename,
             'chkDisabled': self.check_disabled,
             'isParent': False,
             'iconSkin': 'file',
@@ -175,9 +181,12 @@ class ZTree(object):
     def get_permission_paths(cls, scope):
         perm_paths = []
         for path in permission_paths:
-            if '@' in path:
-                path, flags = path.split('@')
-            # if flags # if scop
+            if flag_sep in path:
+                path, flags = path.split(flag_sep)
+                if flag_scope_system in flags and scope == Scope.org:
+                    continue
+                if flag_license_required in flags and not cls.has_valid_license:
+                    continue
             perm_paths.append(path)
         return perm_paths
 

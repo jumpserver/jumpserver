@@ -59,6 +59,9 @@ class ConnectionToken(models.JMSBaseModel):
 
     class Meta:
         verbose_name = _('Connection token')
+        permissions = [
+            ('view_connectiontokensecret', _('Can view connection token secret'))
+        ]
 
 
 class SuperConnectionToken(ConnectionToken):

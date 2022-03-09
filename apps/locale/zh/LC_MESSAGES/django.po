@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-10 04:22+0800\n"
+"POT-Creation-Date: 2022-03-10 05:41+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1376,7 +1376,7 @@ msgstr "日志审计"
 
 #: audits/models.py:27 audits/models.py:57
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:226 rbac/ztree/tree.py:150
+#: rbac/tree.py:226 rbac/ztree/tree.py:152
 #: users/templates/users/user_asset_permission.html:128
 #: users/templates/users/user_database_app_permission.html:111
 msgid "Delete"
@@ -1431,11 +1431,11 @@ msgstr "文件管理"
 
 #: audits/models.py:55
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:223 rbac/ztree/tree.py:147
+#: rbac/tree.py:223 rbac/ztree/tree.py:149
 msgid "Create"
 msgstr "创建"
 
-#: audits/models.py:56 rbac/tree.py:225 rbac/ztree/tree.py:149
+#: audits/models.py:56 rbac/tree.py:225 rbac/ztree/tree.py:151
 #: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
 #: users/templates/users/user_asset_permission.html:127
 #: users/templates/users/user_database_app_permission.html:110
@@ -2065,11 +2065,15 @@ msgstr ""
 
 #: authentication/models.py:61
 msgid "Connection token"
-msgstr "连接Token"
+msgstr "连接令牌"
 
-#: authentication/models.py:67
+#: authentication/models.py:63
+msgid "Can view connection token secret"
+msgstr "可以查看连接令牌密文"
+
+#: authentication/models.py:70
 msgid "Super connection token"
-msgstr "超级连接Token"
+msgstr "超级连接令牌"
 
 #: authentication/notifications.py:19
 msgid "Different city login reminder"
@@ -3335,7 +3339,7 @@ msgstr "我的应用"
 msgid "Ticket comment"
 msgstr "工单评论"
 
-#: rbac/tree.py:224 rbac/ztree/tree.py:148
+#: rbac/tree.py:224 rbac/ztree/tree.py:150
 msgid "View"
 msgstr "查看"
 
@@ -3597,7 +3601,7 @@ msgstr "更新/关闭工单"
 msgid "View some of the assets searched"
 msgstr "查看搜索的部分资产"
 
-#: rbac/ztree/tree_nodes.py:289
+#: rbac/ztree/tree_nodes.py:293
 msgid "Overview"
 msgstr "概览"
 

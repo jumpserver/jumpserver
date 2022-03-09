@@ -285,9 +285,13 @@ permission_tree_nodes = {
     'assets.match_asset': {
         'name': _('View some of the assets searched')
     },
-    'rbac.overview(any)': {
+    'rbac.view_userview': {
+        'checked': True,
+        'chkDisabled': True,
+    },
+    'rbac.view_overview': {
         'name': _('Overview'),
         'checked': True,
-        'disabled': True,
+        'chkDisabled': True,
     }
 }
