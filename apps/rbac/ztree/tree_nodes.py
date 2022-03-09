@@ -20,7 +20,7 @@ permission_tree_nodes = {
         'name': _("View menu")
     },
     'view_console': {
-        'name': _('Console view')
+        'name': _('Console view'),
     },
     'user_management': {
         'name': _('User management')
@@ -270,7 +270,7 @@ permission_tree_nodes = {
     'notifications.change_systemmsgsubscription': {
         'name': _('Message subscription')
     },
-    'terminal.view_termianlstatus': {
+    'terminal.view_status': {
         'name': _('Component monitor')
     },
     'tickets.view_ticket': {
@@ -281,5 +281,13 @@ permission_tree_nodes = {
     },
     'tickets.change_ticket': {
         'name': _('Change/close ticket')
+    },
+    'assets.match_asset': {
+        'name': _('View some of the assets searched')
+    },
+    'rbac.overview(any)': {
+        'name': _('Overview'),
+        'checked': True,
+        'disabled': True,
     }
 }

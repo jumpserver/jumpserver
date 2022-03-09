@@ -22,13 +22,10 @@ class PermissionViewSet(JMSModelViewSet):
 
     @action(methods=['GET'], detail=False, url_path='tree')
     def get_tree(self, request, *args, **kwargs):
-        # queryset = self.filter_queryset(self.get_queryset()).distinct()
-        # tree_nodes = Permission.create_tree_nodes(
-        #     queryset, scope=self.scope, check_disabled=self.check_disabled
-        # )
-        from ..ztree.tree import ZTree
-        tree = ZTree(scop=self.scope)
-        tree_nodes = tree.get_tree_nodes()
+        queryset = self.filter_queryset(self.get_queryset()).distinct()
+        tree_nodes = Permission.create_tree_nodes(
+            queryset, scope=self.scope, check_disabled=self.check_disabled
+        )
         serializer = self.get_serializer(tree_nodes, many=True)
         return Response(serializer.data)
 

@@ -1,6 +1,7 @@
+import random
 from collections import defaultdict
 from django.utils.translation import ugettext
-from common.tree import TreeNode
+from common.tree import TreeNode as RawTreeNode
 from django.utils.translation import gettext_lazy as _, gettext
 from rbac.models import Permission, ContentType
 from django.db.models import F, Count
@@ -8,107 +9,137 @@ from .permissions import permission_paths
 from .tree_nodes import permission_tree_nodes
 
 
+class TreeNode(RawTreeNode):
+    total_count = 0
+    checked_count = 0
+
+    def checked_if_need(self):
+        self.checked = self.total_count == self.checked_count
+
+    def refresh_name(self):
+        self.name = str(self.name) + f'({self.checked_count}/{self.total_count})'
+
+
 class TreeNodes:
 
     def __init__(self):
         self.tree_nodes = defaultdict(TreeNode)
 
+    def add_node(self, data):
+        tree_node = self.add(data)
+        tree_node.total_count += 1
+
+    def add_leaf(self, data):
+        tree_node = self.add(data)
+        if not data['checked']:
+            return
+
+        parent_node = self.tree_nodes.get(tree_node.pId)
+        while parent_node:
+            parent_node.checked_count += 1
+            parent_node = self.tree_nodes.get(parent_node.pId)
+
     def add(self, data):
         _id = data['id']
-        name = data.get('name', _id)
-        data['name'] = name
-        tree_node = TreeNode(**data)
+        data['name'] = data.get('name') or data['id']
+        tree_node = self.tree_nodes.get(_id, TreeNode(**data))
         self.tree_nodes[tree_node.id] = tree_node
+        return tree_node
 
     def get(self):
-        return list(self.tree_nodes.values())
+        tree_nodes = list(self.tree_nodes.values())
+        for tree_node in tree_nodes:
+            if not tree_node.isParent:
+                continue
+            tree_node.refresh_name()
+            tree_node.checked_if_need()
+        return tree_nodes
 
 
 class ZTree(object):
 
-    def __init__(self, scop):
-        self.scop = scop
-        self.permissions = self.prefetch_permissions()
+    def __init__(self, checked_permission, scope, check_disabled=False):
+        self.scope = scope
+        self.checked_permission = self.prefetch_permissions(
+            checked_permission
+        )
+        self.checked_permissions_mapper = {p.id: p for p in self.checked_permission}
+        self.permissions = self.prefetch_permissions(
+            Permission.get_permissions(scope)
+        )
         self.permissions_mapper = {p.app_label_codename: p for p in self.permissions}
+        self.content_types_name_mapper = {ct.model: ct.name for ct in ContentType.objects.all()}
+        self.check_disabled = check_disabled
         self.tree_nodes = TreeNodes()
-        content_types = ContentType.objects.all()
-        self.content_types_name_mapper = {ct.model: ct.name for ct in content_types}
+        self.show_node_level = 2
 
     @staticmethod
-    def prefetch_permissions():
-        return Permission.objects.all().select_related('content_type') \
+    def prefetch_permissions(permissions):
+        return permissions.select_related('content_type') \
             .annotate(app=F('content_type__app_label')) \
             .annotate(model=F('content_type__model'))
 
     def get_tree_nodes(self):
-        self.create_tree_nodes()
+        perm_paths = self.__class__.get_permission_paths(self.scope)
+        for perm_path in perm_paths:
+            self.generate_tree_nodes_by_path(perm_path)
         return self.tree_nodes.get()
 
-    def create_tree_nodes(self):
-        perm_paths = self.get_permission_paths()
-        for perm_path in perm_paths:
-            self.create_tree_nodes_by_path(perm_path)
-
-    def create_tree_nodes_by_path(self, perm_path):
+    def generate_tree_nodes_by_path(self, perm_path):
         path, perm_app_label_codename = perm_path.rsplit('/', 1)
-        # add path
-        pid = ''
-        for level, tree_node_id in enumerate(path.lstrip('/').split('/'), start=1):
-            if 'detail' in tree_node_id:
-                name = _('Detail')
-            else:
-                name = tree_node_id
 
-            data = {
+        # add path
+        path_list = path.lstrip('/').split('/')
+        pid = ''
+        for level, tree_node_id in enumerate(path_list, start=1):
+            name = _('Detail') if 'detail' in tree_node_id else tree_node_id
+            data = dict({
                 'id': tree_node_id,
+                'name': name,
                 'pId': pid,
-                'name': name
-            }
-            if level <= 1 or True:
-                data.update({
-                    'open': True
-                })
+                'isParent': True,
+                'chkDisabled': self.check_disabled,
+                'open': level < self.show_node_level,
+                'meta': {
+                    'type': 'perm',
+                }
+            })
             _data = permission_tree_nodes.get(tree_node_id, {})
             data.update(_data)
             pid = data['id']
-            self.tree_nodes.add(data)
+            self.tree_nodes.add_node(data)
 
         # add perm
         if not perm_app_label_codename:
             return
         perm = self.permissions_mapper.get(perm_app_label_codename)
         if perm:
+            # 解决同一个权限不能在多个节点的问题
             _id = f'{pid}#{perm.id}',
             name = self._get_permission_name(perm)
+            checked = perm.id in self.checked_permissions_mapper,
         else:
+            #  最终不应该走这里，所有权限都要在数据库里
             _id = perm_app_label_codename
             name = perm_app_label_codename
+            checked = False
 
         data = {
             'id': _id,
             'pId': pid,
             'name': name,
+            'chkDisabled': self.check_disabled,
             'isParent': False,
             'iconSkin': 'file',
             'open': False,
+            'checked': checked,
+            'meta': {
+                'type': 'perm',
+            }
         }
         _data = permission_tree_nodes.get(perm_app_label_codename, {})
         data.update(_data)
-        self.tree_nodes.add(data)
-
-    def get_permission_paths(self):
-        # filter scop
-        # filter license
-        print(self.scop)
-        perm_paths = []
-        for path in permission_paths:
-            # if '.' not in path:
-            #     continue
-            if '@' in path:
-                path, flags = path.split('@')
-            # if flags
-            perm_paths.append(path)
-        return perm_paths
+        self.tree_nodes.add_leaf(data)
 
     def _get_permission_name(self, p):
         code_name = p.codename
@@ -139,3 +170,24 @@ class ZTree(object):
             name = gettext(p.name)
             name = name.replace('Can ', '').replace('可以', '')
         return name
+
+    @classmethod
+    def get_permission_paths(cls, scope):
+        perm_paths = []
+        for path in permission_paths:
+            if '@' in path:
+                path, flags = path.split('@')
+            # if flags # if scop
+            perm_paths.append(path)
+        return perm_paths
+
+    @classmethod
+    def get_permissions_app_label_codename(cls, scope):
+        perm_paths = cls.get_permission_paths(scope)
+        perms = []
+        for path in perm_paths:
+            path, app_label_code_name = path.rsplit('/', 1)
+            if not app_label_code_name:
+                continue
+            perms.append(app_label_code_name)
+        return perms

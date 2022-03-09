@@ -274,7 +274,7 @@ class RoleMixin:
     def perms(self):
         key = self.PERM_CACHE_KEY.format(self.id, current_org.id)
         perms = cache.get(key)
-        if not perms:
+        if not perms or True:
             perms = self.get_all_permissions()
             cache.set(key, perms, 3600)
         return perms

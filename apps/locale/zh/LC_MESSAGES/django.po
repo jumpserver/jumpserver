@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-10 01:40+0800\n"
+"POT-Creation-Date: 2022-03-10 02:08+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -3201,6 +3201,10 @@ msgstr "Web终端"
 msgid "Can view file manager"
 msgstr "文件管理"
 
+#: rbac/models/menu.py:21
+msgid "Can view dashboard"
+msgstr "仪表盘"
+
 #: rbac/models/permission.py:22
 msgid "Permission"
 msgstr "授权"
@@ -3588,6 +3592,10 @@ msgstr "创建资产/应用申请工单"
 #: rbac/ztree/tree_nodes.py:283
 msgid "Change/close ticket"
 msgstr "更新/关闭工单"
+
+#: rbac/ztree/tree_nodes.py:286
+msgid "View some of the assets searched"
+msgstr "查看搜索的部分资产"
 
 #: settings/api/alibaba_sms.py:31 settings/api/tencent_sms.py:35
 msgid "test_phone is required"
