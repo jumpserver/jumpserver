@@ -47,7 +47,8 @@ class NodeViewSet(SuggestionMixin, OrgBulkModelViewSet):
     search_fields = ('value', )
     serializer_class = serializers.NodeSerializer
     rbac_perms = {
-        'match': 'assets.match_node'
+        'match': 'assets.match_node',
+        'check_assets_amount_task': 'assets.change_node'
     }
 
     @action(methods=[POST], detail=False, url_path='check_assets_amount_task')
