@@ -111,10 +111,10 @@ class Organization(models.Model):
         if role:
             role_id = role.id
         with tmp_to_org(self):
-            self.members.through.objects.create(
-                user=user, role_id=role_id,
-                org_id=self.id, scope='org'
-            )
+            defaults = {
+                'user': user, 'role_id': role_id, 'org_id': self.id, 'scope': 'org'
+            }
+            self.members.through.objects.update_or_create(**defaults, defaults=defaults)
 
     def get_total_resources_amount(self):
         from django.apps import apps
