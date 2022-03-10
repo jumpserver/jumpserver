@@ -8,6 +8,7 @@ from orgs.models import Organization
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
+from ..models import Setting
 from ..utils import (
     LDAPServerUtil, LDAPCacheUtil, LDAPImportUtil, LDAPSyncUtil,
     LDAP_USE_CACHE_FLAGS, LDAPTestUtil
@@ -26,8 +27,9 @@ logger = get_logger(__file__)
 
 class LDAPTestingConfigAPI(APIView):
     serializer_class = LDAPTestConfigSerializer
+    perm_model = Setting
     rbac_perms = {
-        'POST': 'settings.change_setting'
+        'POST': 'settings.change_auth'
     }
 
     def post(self, request):
@@ -68,8 +70,9 @@ class LDAPTestingConfigAPI(APIView):
 
 class LDAPTestingLoginAPI(APIView):
     serializer_class = LDAPTestLoginSerializer
+    perm_model = Setting
     rbac_perms = {
-        'POST': 'settings.change_setting'
+        'POST': 'settings.change_auth'
     }
 
     def post(self, request):
@@ -85,8 +88,9 @@ class LDAPTestingLoginAPI(APIView):
 
 class LDAPUserListApi(generics.ListAPIView):
     serializer_class = LDAPUserSerializer
+    perm_model = Setting
     rbac_perms = {
-        'POST': 'settings.change_setting'
+        'list': 'settings.change_auth'
     }
 
     def get_queryset_from_cache(self):
@@ -175,6 +179,11 @@ class LDAPUserListApi(generics.ListAPIView):
 
 
 class LDAPUserImportAPI(APIView):
+    perm_model = Setting
+    rbac_perms = {
+        'POST': 'settings.change_auth'
+    }
+
     def get_org(self):
         org_id = self.request.data.get('org_id')
         if is_uuid(org_id):
@@ -213,6 +222,11 @@ class LDAPUserImportAPI(APIView):
 
 
 class LDAPCacheRefreshAPI(generics.RetrieveAPIView):
+    perm_model = Setting
+    rbac_perms = {
+        'retrieve': 'settings.change_auth'
+    }
+
     def retrieve(self, request, *args, **kwargs):
         try:
             LDAPSyncUtil().clear_cache()
