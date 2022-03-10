@@ -51,4 +51,3 @@ class PermissionViewSet(JMSModelViewSet):
 #         perms = RoleBinding.get_user_perms(request.user)
 #         serializer = super().get_serializer(data={'perms': perms})
 #         return Res
-

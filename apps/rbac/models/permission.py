@@ -64,12 +64,22 @@ class Permission(DjangoPermission):
             q |= Q(**kwargs)
         return q
 
+    @classmethod
+    def clean_permissions(cls, permissions, scope=Scope.system):
+        if scope == Scope.org:
+            excludes = const.org_exclude_permissions
+        else:
+            excludes = const.system_exclude_permissions
+        q = cls.get_define_permissions_q(excludes)
+        if q:
+            permissions = permissions.exclude(q)
+        return permissions
+
     @staticmethod
     def create_tree_nodes(permissions, scope, check_disabled=False):
-        from ..ztree.tree import ZTree
-        ztree = ZTree(permissions, scope, check_disabled)
-        tree_nodes = ztree.get_tree_nodes()
-        return tree_nodes
+        from ..tree import PermissionTreeUtil
+        util = PermissionTreeUtil(permissions, scope, check_disabled)
+        return util.create_tree_nodes()
 
     @classmethod
     def get_permissions(cls, scope):
@@ -77,13 +87,3 @@ class Permission(DjangoPermission):
         permissions = cls.clean_permissions(permissions, scope=scope)
         return permissions
 
-    @classmethod
-    def clean_permissions(cls, permissions, scope=Scope.system):
-        from ..ztree.tree import ZTree
-        perms_app_label_codename = ZTree.get_permissions_app_label_codename(scope)
-        q = Q()
-        for app_label_codename in perms_app_label_codename:
-            app_label, codename = app_label_codename.split('.')
-            q |= Q(**{'content_type__app_label': app_label, 'codename': codename})
-        permissions = permissions.filter(q)
-        return permissions
