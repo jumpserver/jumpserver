@@ -3,15 +3,18 @@
 from django.views.generic import TemplateView
 from django.conf import settings
 
-from common.permissions import IsOrgAdmin, IsOrgAuditor
 from common.mixins.views import PermissionsMixin
+from rbac.permissions import RBACPermission
 
 __all__ = ['CeleryTaskLogView']
 
 
 class CeleryTaskLogView(PermissionsMixin, TemplateView):
     template_name = 'ops/celery_task_log.html'
-    permission_classes = [IsOrgAdmin | IsOrgAuditor]
+    permission_classes = [RBACPermission]
+    rbac_perms = {
+        'GET': 'ops.view_tasklog'
+    }
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

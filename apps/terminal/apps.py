@@ -6,9 +6,9 @@ from django.apps import AppConfig
 
 class TerminalConfig(AppConfig):
     name = 'terminal'
-    verbose_name = _('Terminal')
+    verbose_name = _('Terminals')
 
     def ready(self):
-        from . import signals_handler
+        from . import signal_handlers
         from . import notifications
         return super().ready()

@@ -2,7 +2,6 @@
 #
 from rest_framework.request import Request
 
-from common.permissions import IsOrgAdminOrAppUser, IsValidUser
 from common.http import is_true
 from common.mixins.api import RoleAdminMixin as _RoleAdminMixin
 from common.mixins.api import RoleUserMixin as _RoleUserMixin
@@ -22,12 +21,22 @@ class PermBaseMixin:
 
 
 class RoleAdminMixin(PermBaseMixin, _RoleAdminMixin):
-    permission_classes = (IsOrgAdminOrAppUser,)
+    rbac_perms = (
+        ('list', 'perms.view_userassets'),
+        ('retrieve', 'perms.view_userassets'),
+        ('get_tree', 'perms.view_userassets'),
+        ('GET', 'perms.view_userassets'),
+    )
 
 
 class RoleUserMixin(PermBaseMixin, _RoleUserMixin):
-    permission_classes = (IsValidUser,)
+    rbac_perms = (
+        ('list', 'perms.view_myassets'),
+        ('retrieve', 'perms.view_myassets'),
+        ('get_tree', 'perms.view_myassets'),
+        ('GET', 'perms.view_myassets'),
+    )
 
-    def get(self, request, *args, **kwargs):
+    def dispatch(self, *args, **kwargs):
         with tmp_to_root_org():
-            return super().get(request, *args, **kwargs)
+            return super().dispatch(*args, **kwargs)

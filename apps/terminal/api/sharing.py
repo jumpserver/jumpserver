@@ -3,8 +3,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
-from common.permissions import IsAppUser, IsSuperUser
+
 from common.const.http import PATCH
+from common.permissions import IsValidUser
 from orgs.mixins.api import OrgModelViewSet
 from .. import serializers, models
 
@@ -13,21 +14,22 @@ __all__ = ['SessionSharingViewSet', 'SessionJoinRecordsViewSet']
 
 class SessionSharingViewSet(OrgModelViewSet):
     serializer_class = serializers.SessionSharingSerializer
-    permission_classes = (IsAppUser | IsSuperUser, )
     search_fields = ('session', 'creator', 'is_active', 'expired_time')
     filterset_fields = search_fields
     model = models.SessionSharing
+    rbac_perms = {
+        'create': 'terminal.add_supersessionsharing',
+    }
 
-    def get_permissions(self):
-        if self.request.method.lower() in ['post']:
-            self.permission_classes = (IsAppUser,)
-        return super().get_permissions()
+    def get_queryset(self):
+        queryset = models.SessionSharing.objects.filter(creator=self.request.user)
+        return queryset
 
-    def create(self, request, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
         if not settings.SECURITY_SESSION_SHARE:
             detail = _('Secure session sharing settings is disabled')
             raise MethodNotAllowed(self.action, detail=detail)
-        return super().create(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         raise MethodNotAllowed(self.action)
@@ -35,18 +37,12 @@ class SessionSharingViewSet(OrgModelViewSet):
 
 class SessionJoinRecordsViewSet(OrgModelViewSet):
     serializer_class = serializers.SessionJoinRecordSerializer
-    permission_classes = (IsAppUser | IsSuperUser, )
     search_fields = (
         'sharing', 'session', 'joiner', 'date_joined', 'date_left',
         'login_from', 'is_success', 'is_finished'
     )
     filterset_fields = search_fields
     model = models.SessionJoinRecord
-
-    def get_permissions(self):
-        if self.request.method.lower() in ['post']:
-            self.permission_classes = (IsAppUser,)
-        return super().get_permissions()
 
     def create(self, request, *args, **kwargs):
         try:

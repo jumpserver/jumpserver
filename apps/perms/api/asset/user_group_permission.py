@@ -6,7 +6,6 @@ from django.db.models import Q
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 
-from common.permissions import IsOrgAdminOrAppUser
 from common.utils import lazyproperty
 from perms.models import AssetPermission
 from assets.models import Asset, Node
@@ -32,14 +31,18 @@ class UserGroupMixin:
 
 
 class UserGroupGrantedAssetsApi(ListAPIView):
-    permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.AssetGrantedSerializer
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
     filterset_fields = ['hostname', 'ip', 'id', 'comment']
     search_fields = ['hostname', 'ip', 'comment']
+    rbac_perms = {
+        'list': 'perms.view_usergroupassets',
+    }
 
     def get_queryset(self):
-        user_group_id = self.kwargs.get('pk', '')
+        user_group_id = self.kwargs.get('pk')
+        if not user_group_id:
+            return Asset.objects.none()
 
         asset_perm_ids = list(AssetPermission.objects.valid().filter(
             user_groups__id=user_group_id
@@ -65,11 +68,13 @@ class UserGroupGrantedAssetsApi(ListAPIView):
 
 
 class UserGroupGrantedNodeAssetsApi(ListAPIView):
-    permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.AssetGrantedSerializer
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
     filterset_fields = ['hostname', 'ip', 'id', 'comment']
     search_fields = ['hostname', 'ip', 'comment']
+    rbac_perms = {
+        'list': 'perms.view_usergroupassets',
+    }
 
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
@@ -119,10 +124,15 @@ class UserGroupGrantedNodeAssetsApi(ListAPIView):
 
 class UserGroupGrantedNodesApi(ListAPIView):
     serializer_class = serializers.NodeGrantedSerializer
-    permission_classes = (IsOrgAdminOrAppUser,)
+    rbac_perms = {
+        'list': 'perms.view_usergroupassets',
+    }
 
     def get_queryset(self):
-        user_group_id = self.kwargs.get('pk', '')
+        user_group_id = self.kwargs.get('pk')
+        if not user_group_id:
+            return Node.objects.none()
+
         nodes = Node.objects.filter(
             Q(granted_by_permissions__user_groups__id=user_group_id) |
             Q(assets__granted_by_permissions__user_groups__id=user_group_id)
@@ -131,7 +141,10 @@ class UserGroupGrantedNodesApi(ListAPIView):
 
 
 class UserGroupGrantedNodeChildrenAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
-    permission_classes = (IsOrgAdminOrAppUser,)
+    rbac_perms = {
+        'list': 'perms.view_usergroupassets',
+        'GET': 'perms.view_usergroupassets',
+    }
 
     def get_children_nodes(self, parent_key):
         return Node.objects.filter(parent_key=parent_key)

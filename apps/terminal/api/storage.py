@@ -10,11 +10,9 @@ from django_filters import utils
 
 from terminal import const
 from common.const.http import GET
-from common.permissions import IsSuperUser, IsOrgAuditor
 from terminal.filters import CommandStorageFilter, CommandFilter, CommandFilterForStorageTree
 from ..models import CommandStorage, ReplayStorage
 from ..serializers import CommandStorageSerializer, ReplayStorageSerializer
-
 
 __all__ = [
     'CommandStorageViewSet', 'CommandStorageTestConnectiveApi',
@@ -39,10 +37,12 @@ class CommandStorageViewSet(BaseStorageViewSetMixin, viewsets.ModelViewSet):
     search_fields = ('name', 'type')
     queryset = CommandStorage.objects.all()
     serializer_class = CommandStorageSerializer
-    permission_classes = (IsSuperUser,)
     filterset_class = CommandStorageFilter
+    rbac_perms = {
+        'tree': 'terminal.view_commandstorage | terminal.view_command'
+    }
 
-    @action(methods=[GET], detail=False, permission_classes=(IsOrgAuditor, ), filterset_class=CommandFilterForStorageTree)
+    @action(methods=[GET], detail=False, filterset_class=CommandFilterForStorageTree)
     def tree(self, request: Request):
         storage_qs = self.get_queryset().exclude(name='null')
         storages_with_count = []
@@ -107,12 +107,9 @@ class ReplayStorageViewSet(BaseStorageViewSetMixin, viewsets.ModelViewSet):
     search_fields = filterset_fields
     queryset = ReplayStorage.objects.all()
     serializer_class = ReplayStorageSerializer
-    permission_classes = (IsSuperUser,)
 
 
 class BaseStorageTestConnectiveMixin:
-    permission_classes = (IsSuperUser,)
-
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         try:

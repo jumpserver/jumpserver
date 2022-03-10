@@ -7,6 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from common.utils import lazyproperty
 from .base import BasePermission, Action
+from applications.models import Application
 from users.models import User
 from applications.const import AppCategory, AppType
 
@@ -35,6 +36,9 @@ class ApplicationPermission(BasePermission):
     class Meta:
         unique_together = [('org_id', 'name')]
         verbose_name = _('Application permission')
+        permissions = [
+            ('view_permuserapplication', _('Can view application of permission to user'))
+        ]
         ordering = ('name',)
 
     @property
@@ -100,3 +104,16 @@ class ApplicationPermission(BasePermission):
         include_choices = cls.get_include_actions_choices(category)
         exclude_choices = set(Action.NAME_MAP.values()) - set(include_choices)
         return exclude_choices
+
+
+class PermedApplication(Application):
+    class Meta:
+        proxy = True
+        verbose_name = _('Permed application')
+        default_permissions = []
+        permissions = [
+            ('view_myapps', 'Can view my apps'),
+            ('connect_myapps', 'Can connect my apps'),
+            ('view_userapps', _('Can view user apps')),
+            ('view_usergroupapps', _('Can view usergroup apps')),
+        ]

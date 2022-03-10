@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 #
-from assets.api import FilterAssetByNodeMixin
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import RetrieveAPIView, ListAPIView
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
 from common.utils import get_logger, get_object_or_none
-from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, IsSuperUser
 from common.mixins.api import SuggestionMixin
 from users.models import User, UserGroup
 from users.serializers import UserSerializer, UserGroupSerializer
@@ -17,6 +15,7 @@ from perms.serializers import AssetPermissionSerializer
 from perms.filters import AssetPermissionFilter
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
+from assets.api import FilterAssetByNodeMixin
 from ..models import Asset, Node, Platform
 from .. import serializers
 from ..tasks import (
@@ -55,7 +54,9 @@ class AssetViewSet(SuggestionMixin, FilterAssetByNodeMixin, OrgBulkModelViewSet)
         'default': serializers.AssetSerializer,
         'suggestion': serializers.MiniAssetSerializer
     }
-    permission_classes = (IsOrgAdminOrAppUser,)
+    rbac_perms = {
+        'match': 'assets.match_asset'
+    }
     extra_filter_backends = [FilterAssetByNodeFilterBackend, LabelFilterBackend, IpInFilterBackend]
 
     def set_assets_node(self, assets):
@@ -76,8 +77,10 @@ class AssetViewSet(SuggestionMixin, FilterAssetByNodeMixin, OrgBulkModelViewSet)
 
 class AssetPlatformRetrieveApi(RetrieveAPIView):
     queryset = Platform.objects.all()
-    permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.PlatformSerializer
+    rbac_perms = {
+        'retrieve': 'assets.view_gateway'
+    }
 
     def get_object(self):
         asset_pk = self.kwargs.get('pk')
@@ -87,15 +90,9 @@ class AssetPlatformRetrieveApi(RetrieveAPIView):
 
 class AssetPlatformViewSet(ModelViewSet):
     queryset = Platform.objects.all()
-    permission_classes = (IsSuperUser,)
     serializer_class = serializers.PlatformSerializer
     filterset_fields = ['name', 'base']
     search_fields = ['name']
-
-    def get_permissions(self):
-        if self.request.method.lower() in ['get', 'options']:
-            self.permission_classes = (IsOrgAdmin,)
-        return super().get_permissions()
 
     def check_object_permissions(self, request, obj):
         if request.method.lower() in ['delete', 'put', 'patch'] and obj.internal:
@@ -131,7 +128,6 @@ class AssetsTaskMixin:
 class AssetTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
     model = Asset
     serializer_class = serializers.AssetTaskSerializer
-    permission_classes = (IsOrgAdmin,)
 
     def create(self, request, *args, **kwargs):
         pk = self.kwargs.get('pk')
@@ -139,11 +135,26 @@ class AssetTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
         request.data['assets'] = [pk]
         return super().create(request, *args, **kwargs)
 
+    def check_permissions(self, request):
+        action = request.data.get('action')
+        action_perm_require = {
+            'refresh': 'assets.refresh_assethardwareinfo',
+            'push_system_user': 'assets.push_assetsystemuser',
+            'test': 'assets.test_assetconnectivity',
+            'test_system_user': 'assets.test_assetconnectivity'
+        }
+        perm_required = action_perm_require.get(action)
+        has = self.request.user.has_perm(perm_required)
+
+        if not has:
+            self.permission_denied(request)
+
     def perform_asset_task(self, serializer):
         data = serializer.validated_data
         action = data['action']
         if action not in ['push_system_user', 'test_system_user']:
             return
+
         asset = data['asset']
         system_users = data.get('system_users')
         if not system_users:
@@ -166,12 +177,23 @@ class AssetTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
 class AssetsTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
     model = Asset
     serializer_class = serializers.AssetsTaskSerializer
-    permission_classes = (IsOrgAdmin,)
+
+    def check_permissions(self, request):
+        action = request.data.get('action')
+        action_perm_require = {
+            'refresh': 'assets.refresh_assethardwareinfo1',
+        }
+        perm_required = action_perm_require.get(action)
+        has = self.request.user.has_perm(perm_required)
+        if not has:
+            self.permission_denied(request)
 
 
 class AssetGatewayListApi(generics.ListAPIView):
-    permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.GatewayWithAuthSerializer
+    rbac_perms = {
+        'list': 'assets.view_gateway'
+    }
 
     def get_queryset(self):
         asset_id = self.kwargs.get('pk')
@@ -183,7 +205,6 @@ class AssetGatewayListApi(generics.ListAPIView):
 
 
 class BaseAssetPermUserOrUserGroupListApi(ListAPIView):
-    permission_classes = (IsOrgAdmin,)
 
     def get_object(self):
         asset_id = self.kwargs.get('pk')
@@ -220,11 +241,13 @@ class AssetPermUserGroupListApi(BaseAssetPermUserOrUserGroupListApi):
 
 
 class BaseAssetPermUserOrUserGroupPermissionsListApiMixin(generics.ListAPIView):
-    permission_classes = (IsOrgAdmin,)
     model = AssetPermission
     serializer_class = AssetPermissionSerializer
     filterset_class = AssetPermissionFilter
     search_fields = ('name',)
+    rbac_perms = {
+        'list': 'perms.view_assetpermission'
+    }
 
     def get_object(self):
         asset_id = self.kwargs.get('pk')

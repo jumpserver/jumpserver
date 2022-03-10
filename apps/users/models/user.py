@@ -6,6 +6,7 @@ import base64
 import string
 import random
 import datetime
+from typing import Callable
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
@@ -17,12 +18,11 @@ from django.utils import timezone
 from django.shortcuts import reverse
 
 from orgs.utils import current_org
-from orgs.models import OrganizationMember, Organization
+from orgs.models import Organization
 from common.utils import date_expired_default, get_logger, lazyproperty, random_string
 from common import fields
-from common.const import choices
-from common.db.models import TextChoices
-from ..signals import post_user_change_password
+from django.db.models import TextChoices
+from ..signals import post_user_change_password, post_user_leave_org, pre_user_leave_org
 
 __all__ = ['User', 'UserPasswordHistory']
 
@@ -35,6 +35,9 @@ class AuthMixin:
     need_update_password: bool
     public_key: str
     is_local: bool
+    set_password: Callable
+    save: Callable
+    history_passwords: models.Manager
 
     @property
     def password_raw(self):
@@ -162,209 +165,217 @@ class AuthMixin:
             return False
 
 
-class RoleMixin:
-    class ROLE(TextChoices):
-        ADMIN = choices.ADMIN, _('System administrator')
-        AUDITOR = choices.AUDITOR, _('System auditor')
-        USER = choices.USER, _('User')
-        APP = 'App', _('Application')
+class RoleManager(models.Manager):
+    scope = None
+    _cache = None
 
-    role = ROLE.USER
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
 
     @property
-    def role_display(self):
-        return self.get_role_display()
+    def display(self):
+        roles = sorted(list(self.all()), key=lambda r: r.scope)
+        roles_display = [role.display_name for role in roles]
+        return ', '.join(roles_display)
+
+    @property
+    def role_bindings(self):
+        from rbac.models import RoleBinding
+        queryset = RoleBinding.objects.filter(user=self.user)
+        if self.scope:
+            queryset = queryset.filter(scope=self.scope)
+        return queryset
+
+    def _get_queryset(self):
+        from rbac.models import RoleBinding
+        queryset = RoleBinding.get_user_roles(self.user)
+        if self.scope:
+            queryset = queryset.filter(scope=self.scope)
+        return queryset
+
+    def get_queryset(self):
+        if self._cache is not None:
+            return self._cache
+        return self._get_queryset()
+
+    def clear(self):
+        if not self.scope:
+            return
+        return self.role_bindings.delete()
+
+    def add(self, *roles):
+        from rbac.models import RoleBinding
+        items = []
+
+        for role in roles:
+            kwargs = {
+                'role': role,
+                'user': self.user,
+                'scope': role.scope
+            }
+            if self.scope and role.scope != self.scope:
+                continue
+            if not current_org.is_root() and role.scope == RoleBinding.Scope.org:
+                kwargs['org_id'] = current_org.id
+            items.append(RoleBinding(**kwargs))
+
+        try:
+            RoleBinding.objects.bulk_create(items, ignore_conflicts=True)
+        except Exception as e:
+            logger.error('Create role binding error: {}'.format(e))
+
+    def set(self, roles):
+        self.clear()
+        self.add(*roles)
+
+    def cache_set(self, roles):
+        query = self._get_queryset()
+        query._result_cache = roles
+        self._cache = query
+
+
+class OrgRoleManager(RoleManager):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from rbac.const import Scope
+        self.scope = Scope.org
+
+
+class SystemRoleManager(RoleManager):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from rbac.const import Scope
+        self.scope = Scope.system
+
+
+class RoleMixin:
+    objects: models.Manager
+    is_authenticated: bool
+    is_valid: bool
+    id: str
+    _org_roles = None
+    _system_roles = None
+    PERM_CACHE_KEY = 'USER_PERMS_{}_{}'
+
+    @lazyproperty
+    def roles(self):
+        return RoleManager(self)
 
     @lazyproperty
     def org_roles(self):
-        from orgs.models import ROLE as ORG_ROLE
-
-        if current_org.is_root():
-            # root 组织, 取 User 本身的角色
-            if self.is_superuser:
-                roles = [ORG_ROLE.ADMIN]
-            elif self.is_super_auditor:
-                roles = [ORG_ROLE.AUDITOR]
-            else:
-                roles = [ORG_ROLE.USER]
-        else:
-            # 是真实组织, 取 OrganizationMember 中的角色
-            roles = [
-                getattr(ORG_ROLE, org_member.role.upper())
-                for org_member in self.m2m_org_members.all()
-                if org_member.org_id == current_org.id
-            ]
-            roles.sort()
-        return roles
+        return OrgRoleManager(self)
 
     @lazyproperty
-    def org_roles_label_list(self):
-        from orgs.models import ROLE as ORG_ROLE
-        return [str(role.label) for role in self.org_roles if role in ORG_ROLE]
+    def system_roles(self):
+        return SystemRoleManager(self)
 
     @lazyproperty
-    def org_roles_value_list(self):
-        from orgs.models import ROLE as ORG_ROLE
-        return [str(role.value) for role in self.org_roles if role in ORG_ROLE]
+    def perms(self):
+        key = self.PERM_CACHE_KEY.format(self.id, current_org.id)
+        perms = cache.get(key)
+        if not perms or settings.DEBUG:
+            perms = self.get_all_permissions()
+            cache.set(key, perms, 3600)
+        return perms
+
+    def expire_perms_cache(self):
+        key = self.PERM_CACHE_KEY.format(self.id, '*')
+        cache.delete_pattern(key)
 
     @lazyproperty
-    def org_role_display(self):
-        return ' | '.join(self.org_roles_label_list)
-
-    @lazyproperty
-    def total_role_display(self):
-        roles = list({self.role_display, *self.org_roles_label_list})
-        roles.sort()
-        return ' | '.join(roles)
-
-    def current_org_roles(self):
-        from orgs.models import OrganizationMember, ROLE as ORG_ROLE
-        if current_org.is_root():
-            if self.is_superuser:
-                return [ORG_ROLE.ADMIN]
-            else:
-                return [ORG_ROLE.USER]
-
-        roles = list(set(OrganizationMember.objects.filter(
-            org_id=current_org.id, user=self
-        ).values_list('role', flat=True)))
-
-        return roles
-
-    @property
     def is_superuser(self):
-        if self.role == self.ROLE.ADMIN:
-            return True
-        else:
-            return False
-
-    @is_superuser.setter
-    def is_superuser(self, value):
-        if value is True:
-            self.role = self.ROLE.ADMIN
-        else:
-            self.role = self.ROLE.USER
-
-    @property
-    def is_super_auditor(self):
-        return self.role == self.ROLE.AUDITOR
-
-    @property
-    def is_common_user(self):
-        if self.is_org_admin:
-            return False
-        if self.is_org_auditor:
-            return False
-        if self.is_app:
-            return False
-        return True
-
-    @property
-    def is_app(self):
-        return self.role == self.ROLE.APP
-
-    @lazyproperty
-    def user_all_orgs(self):
-        from orgs.models import Organization
-        return Organization.get_user_all_orgs(self)
-
-    @lazyproperty
-    def user_orgs(self):
-        from orgs.models import Organization
-        return Organization.get_user_user_orgs(self)
-
-    @lazyproperty
-    def admin_orgs(self):
-        from orgs.models import Organization
-        return Organization.get_user_admin_orgs(self)
-
-    @lazyproperty
-    def audit_orgs(self):
-        from orgs.models import Organization
-        return Organization.get_user_audit_orgs(self)
-
-    @lazyproperty
-    def admin_or_audit_orgs(self):
-        from orgs.models import Organization
-        return Organization.get_user_admin_or_audit_orgs(self)
+        """
+        由于这里用了 cache ，所以不能改成 self.system_roles.filter().exists() 会查询的
+        """
+        from rbac.builtin import BuiltinRole
+        # return self.system_roles.all().filter(id=BuiltinRole.system_admin.id).exists()
+        ids = [str(r.id) for r in self.system_roles.all()]
+        yes = BuiltinRole.system_admin.id in ids
+        return yes
 
     @lazyproperty
     def is_org_admin(self):
-        from orgs.models import ROLE as ORG_ROLE
-        if self.is_superuser or self.m2m_org_members.filter(role=ORG_ROLE.ADMIN).exists():
+        from rbac.builtin import BuiltinRole
+        if self.is_superuser:
             return True
-        else:
-            return False
-
-    @lazyproperty
-    def is_org_auditor(self):
-        from orgs.models import ROLE as ORG_ROLE
-        if self.is_super_auditor or self.m2m_org_members.filter(role=ORG_ROLE.AUDITOR).exists():
-            return True
-        else:
-            return False
-
-    @lazyproperty
-    def can_admin_current_org(self):
-        return current_org.can_admin_by(self)
-
-    @lazyproperty
-    def can_audit_current_org(self):
-        return current_org.can_audit_by(self)
-
-    @lazyproperty
-    def can_user_current_org(self):
-        return current_org.can_use_by(self)
-
-    @lazyproperty
-    def can_admin_or_audit_current_org(self):
-        return self.can_admin_current_org or self.can_audit_current_org
+        ids = [str(r.id) for r in self.org_roles.all()]
+        yes = BuiltinRole.org_admin.id in ids
+        return yes
 
     @property
     def is_staff(self):
-        if self.is_authenticated and self.is_valid:
-            return True
-        else:
-            return False
+        return self.is_authenticated and self.is_valid
 
     @is_staff.setter
     def is_staff(self, value):
         pass
 
     @classmethod
-    def create_app_user(cls, name, comment):
+    def create_service_account(cls, name, comment):
         app = cls.objects.create(
             username=name, name=name, email='{}@local.domain'.format(name),
-            is_active=False, role=cls.ROLE.APP, comment=comment,
-            is_first_login=False, created_by='System'
+            comment=comment, is_first_login=False,
+            created_by='System', is_service_account=True,
         )
         access_key = app.create_access_key()
         return app, access_key
 
+    def set_component_role(self):
+        from rbac.models import Role
+        role = Role.BuiltinRole.system_component.get_role()
+        self.system_roles.add(role)
+
     def remove(self):
         if current_org.is_root():
             return
-        org = Organization.get_instance(current_org.id)
-        OrganizationMember.objects.remove_users(org, [self])
+        kwargs = dict(sender=self.__class__, user=self, org=current_org)
+        pre_user_leave_org.send(**kwargs)
+        self.org_roles.clear()
+        post_user_leave_org.send(**kwargs)
 
     @classmethod
     def get_super_admins(cls):
-        return cls.objects.filter(role=cls.ROLE.ADMIN)
+        from rbac.models import Role, RoleBinding
+        system_admin = Role.BuiltinRole.system_admin.get_role()
+        return RoleBinding.get_role_users(system_admin)
 
     @classmethod
-    def get_org_admins(cls, org=None):
-        from orgs.models import Organization
-        if not isinstance(org, Organization):
-            org = current_org
-        org_admins = org.admins
-        return org_admins
+    def get_org_admins(cls):
+        from rbac.models import Role, RoleBinding
+        org_admin = Role.BuiltinRole.org_admin.get_role()
+        return RoleBinding.get_role_users(org_admin)
 
     @classmethod
-    def get_super_and_org_admins(cls, org=None):
+    def get_super_and_org_admins(cls):
         super_admins = cls.get_super_admins()
-        org_admins = cls.get_org_admins(org=org)
+        org_admins = cls.get_org_admins()
         admins = org_admins | super_admins
         return admins.distinct()
+
+    @staticmethod
+    def filter_not_service_account(queryset):
+        return queryset.filter(is_service_account=False)
+
+    @classmethod
+    def get_nature_users(cls):
+        queryset = cls.objects.all()
+        return cls.filter_not_service_account(queryset)
+
+    @classmethod
+    def get_org_users(cls, org=None):
+        queryset = cls.objects.all()
+        if org is None:
+            org = current_org
+        if not org.is_root():
+            queryset = current_org.get_members()
+        queryset = cls.filter_not_service_account(queryset)
+        return queryset
+
+    def get_all_permissions(self):
+        from rbac.models import RoleBinding
+        perms = RoleBinding.get_user_perms(self)
+        return perms
 
 
 class TokenMixin:
@@ -461,6 +472,7 @@ class MFAMixin:
     )
     is_org_admin: bool
     username: str
+    phone: str
 
     @property
     def mfa_enabled(self):
@@ -532,14 +544,27 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
 
     SOURCE_BACKEND_MAPPING = {
         Source.local: [
-            settings.AUTH_BACKEND_MODEL, settings.AUTH_BACKEND_PUBKEY,
-            settings.AUTH_BACKEND_WECOM, settings.AUTH_BACKEND_DINGTALK,
+            settings.AUTH_BACKEND_MODEL,
+            settings.AUTH_BACKEND_PUBKEY,
+            settings.AUTH_BACKEND_WECOM,
+            settings.AUTH_BACKEND_DINGTALK,
         ],
-        Source.ldap: [settings.AUTH_BACKEND_LDAP],
-        Source.openid: [settings.AUTH_BACKEND_OIDC_PASSWORD, settings.AUTH_BACKEND_OIDC_CODE],
-        Source.radius: [settings.AUTH_BACKEND_RADIUS],
-        Source.cas: [settings.AUTH_BACKEND_CAS],
-        Source.saml2: [settings.AUTH_BACKEND_SAML2],
+        Source.ldap: [
+            settings.AUTH_BACKEND_LDAP
+        ],
+        Source.openid: [
+            settings.AUTH_BACKEND_OIDC_PASSWORD,
+            settings.AUTH_BACKEND_OIDC_CODE
+        ],
+        Source.radius: [
+            settings.AUTH_BACKEND_RADIUS
+        ],
+        Source.cas: [
+            settings.AUTH_BACKEND_CAS
+        ],
+        Source.saml2: [
+            settings.AUTH_BACKEND_SAML2
+        ],
     }
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
@@ -555,9 +580,10 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         blank=True, verbose_name=_('User group')
     )
     role = models.CharField(
-        choices=RoleMixin.ROLE.choices, default='User', max_length=10,
+        default='User', max_length=10,
         blank=True, verbose_name=_('Role')
     )
+    is_service_account = models.BooleanField(default=False, verbose_name=_("Is service account"))
     avatar = models.ImageField(
         upload_to="avatar", null=True, verbose_name=_('Avatar')
     )
@@ -613,7 +639,8 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
 
     @classmethod
     def get_group_ids_by_user_id(cls, user_id):
-        group_ids = cls.groups.through.objects.filter(user_id=user_id).distinct().values_list('usergroup_id', flat=True)
+        group_ids = cls.groups.through.objects.filter(user_id=user_id)\
+            .distinct().values_list('usergroup_id', flat=True)
         group_ids = list(group_ids)
         return group_ids
 
@@ -691,7 +718,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         if self.username == 'admin':
             self.role = 'Admin'
             self.is_active = True
-        super().save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     def is_member_of(self, user_group):
         if user_group in self.groups.all():
@@ -728,7 +755,6 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
             return True
         if MFABlockUtils.is_user_block(self.username):
             return True
-
         return False
 
     def delete(self, using=None, keep_parents=False):
@@ -737,23 +763,39 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         return super(User, self).delete()
 
     @classmethod
-    def get_user_allowed_auth_backends(cls, username):
+    def get_user_allowed_auth_backend_paths(cls, username):
         if not settings.ONLY_ALLOW_AUTH_FROM_SOURCE or not username:
-            # return settings.AUTHENTICATION_BACKENDS
             return None
         user = cls.objects.filter(username=username).first()
         if not user:
             return None
-        return user.get_allowed_auth_backends()
+        return user.get_allowed_auth_backend_paths()
 
-    def get_allowed_auth_backends(self):
+    def get_allowed_auth_backend_paths(self):
         if not settings.ONLY_ALLOW_AUTH_FROM_SOURCE:
             return None
         return self.SOURCE_BACKEND_MAPPING.get(self.source, [])
 
+    @property
+    def all_orgs(self):
+        from rbac.builtin import BuiltinRole
+        has_system_role = self.system_roles.all()\
+            .exclude(name=BuiltinRole.system_user.name)\
+            .exists()
+        if has_system_role:
+            orgs = [Organization.root()] + list(Organization.objects.all())
+        else:
+            orgs = list(self.orgs.all().distinct())
+        return orgs
+
     class Meta:
         ordering = ['username']
         verbose_name = _("User")
+        permissions = [
+            ('invite_user', _('Can invite user')),
+            ('remove_user', _('Can remove user')),
+            ('match_user', _('Can match user')),
+        ]
 
     #: Use this method initial user
     @classmethod
@@ -787,3 +829,6 @@ class UserPasswordHistory(models.Model):
 
     def __repr__(self):
         return self.__str__()
+
+    class Meta:
+        verbose_name = _("User password history")

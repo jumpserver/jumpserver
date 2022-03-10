@@ -85,15 +85,15 @@ class MyAllAssetsAsTreeApi(UserAllGrantedAssetsQuerysetMixin,
     pass
 
 
-class UserGrantedNodeAssetsForAdminApi(UserGrantedNodeAssetsMixin,
-                                       RoleAdminMixin,
+class UserGrantedNodeAssetsForAdminApi(RoleAdminMixin,
+                                       UserGrantedNodeAssetsMixin,
                                        AssetsSerializerFormatMixin,
                                        ListAPIView):
     pass
 
 
-class MyGrantedNodeAssetsApi(UserGrantedNodeAssetsMixin,
-                             RoleUserMixin,
+class MyGrantedNodeAssetsApi(RoleUserMixin,
+                             UserGrantedNodeAssetsMixin,
                              AssetsSerializerFormatMixin,
                              ListAPIView):
     pass

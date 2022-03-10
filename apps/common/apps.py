@@ -8,7 +8,7 @@ class CommonConfig(AppConfig):
     name = 'common'
 
     def ready(self):
-        from . import signals_handlers
+        from . import signal_handlers
         from .signals import django_ready
         if 'migrate' in sys.argv or 'compilemessages' in sys.argv:
             return

@@ -206,6 +206,7 @@ class TicketFlowSerializer(OrgResourceModelSerializerMixin):
         instance_related = getattr(instance, related)
         child_instances = []
         related_model = instance_related.model
+        # Todo: 这个权限的判断
         for level, data in enumerate(childs, 1):
             data_m2m = data.pop(assignees, None)
             child_instance = related_model.objects.create(**data, level=level)

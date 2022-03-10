@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
 #
+from functools import partial
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from common.mixins import CommonBulkSerializerMixin
-from common.permissions import CanUpdateDeleteUser
 from common.validators import PhoneValidator
-from orgs.models import ROLE as ORG_ROLE
+from rbac.models import Role
+from rbac.builtin import BuiltinRole
+from rbac.permissions import RBACPermission
+from rbac.models import OrgRoleBinding, SystemRoleBinding
 from ..models import User
-from ..const import SystemOrOrgRole, PasswordStrategy
+from ..const import PasswordStrategy
+from rbac.models import Role
 
 __all__ = [
     'UserSerializer', 'MiniUserSerializer',
@@ -16,25 +20,79 @@ __all__ = [
 ]
 
 
-class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
+class RolesSerializerMixin(serializers.Serializer):
+    system_roles = serializers.ManyRelatedField(
+        child_relation=serializers.PrimaryKeyRelatedField(queryset=Role.system_roles),
+        label=_('System roles'),
+    )
+    org_roles = serializers.ManyRelatedField(
+        required=False,
+        child_relation=serializers.PrimaryKeyRelatedField(queryset=Role.org_roles),
+        label=_('Org roles'),
+    )
+    system_roles_display = serializers.SerializerMethodField(label=_('System roles'))
+    org_roles_display = serializers.SerializerMethodField(label=_('Org roles'))
+
+    @staticmethod
+    def get_system_roles_display(user):
+        return user.system_roles.display
+
+    @staticmethod
+    def get_org_roles_display(user):
+        return user.org_roles.display
+
+    def pop_roles_if_need(self, fields):
+        request = self.context.get('request')
+        view = self.context.get('view')
+
+        if not all([request, view, hasattr(view, 'action')]):
+            return fields
+        if request.user.is_anonymous:
+            return fields
+
+        action = view.action or 'list'
+        model_cls_field_mapper = {
+            SystemRoleBinding: ['system_roles', 'system_roles_display'],
+            OrgRoleBinding: ['org_roles', 'system_roles_display']
+        }
+
+        for model_cls, fields_names in model_cls_field_mapper.items():
+            perms = RBACPermission.parse_action_model_perms(action, model_cls)
+            if request.user.has_perms(perms):
+                continue
+            # 没有权限就去掉
+            for field_name in fields_names:
+                fields.pop(field_name, None)
+        return fields
+
+    def get_fields(self):
+        fields = super().get_fields()
+        self.pop_roles_if_need(fields)
+        return fields
+
+
+class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializers.ModelSerializer):
     password_strategy = serializers.ChoiceField(
         choices=PasswordStrategy.choices, default=PasswordStrategy.email, required=False,
         write_only=True, label=_('Password strategy')
     )
     mfa_enabled = serializers.BooleanField(read_only=True, label=_('MFA enabled'))
     mfa_force_enabled = serializers.BooleanField(read_only=True, label=_('MFA force enabled'))
-    mfa_level_display = serializers.ReadOnlyField(source='get_mfa_level_display', label=_('MFA level display'))
+    mfa_level_display = serializers.ReadOnlyField(
+        source='get_mfa_level_display', label=_('MFA level display')
+    )
     login_blocked = serializers.BooleanField(read_only=True, label=_('Login blocked'))
     is_expired = serializers.BooleanField(read_only=True, label=_('Is expired'))
-    can_update = serializers.SerializerMethodField(label=_('Can update'))
-    can_delete = serializers.SerializerMethodField(label=_('Can delete'))
     can_public_key_auth = serializers.ReadOnlyField(
-        source='can_use_ssh_key_login', label=_('Can public key authentication'))
-    org_roles = serializers.ListField(
-        label=_('Organization role name'), allow_null=True, required=False,
-        child=serializers.ChoiceField(choices=ORG_ROLE.choices), default=["User"]
+        source='can_use_ssh_key_login', label=_('Can public key authentication')
     )
-    system_or_org_role = serializers.ChoiceField(read_only=True, choices=SystemOrOrgRole.choices, label=_('Role'))
+    # Todo: 这里看看该怎么搞
+    # can_update = serializers.SerializerMethodField(label=_('Can update'))
+    # can_delete = serializers.SerializerMethodField(label=_('Can delete'))
+    custom_m2m_fields = {
+        'system_roles': [BuiltinRole.system_user],
+        'org_roles': [BuiltinRole.org_user]
+    }
 
     class Meta:
         model = User
@@ -46,9 +104,9 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         ]
         # small 指的是 不需要计算的直接能从一张表中获取到的数据
         fields_small = fields_mini + fields_write_only + [
-            'email', 'wechat', 'phone', 'mfa_level',
-            'source', 'source_display', 'can_public_key_auth', 'need_update_password',
-            'mfa_enabled', 'is_valid', 'is_expired', 'is_active',  # 布尔字段
+            'email', 'wechat', 'phone', 'mfa_level', 'source', 'source_display',
+            'can_public_key_auth', 'need_update_password',
+            'mfa_enabled', 'is_service_account', 'is_valid', 'is_expired', 'is_active',  # 布尔字段
             'date_expired', 'date_joined', 'last_login',  # 日期字段
             'created_by', 'comment',  # 通用字段
             'is_wecom_bound', 'is_dingtalk_bound', 'is_feishu_bound', 'is_otp_secret_key_bound',
@@ -56,16 +114,18 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         ]
         # 包含不太常用的字段，可以没有
         fields_verbose = fields_small + [
-            'total_role_display', 'org_role_display',
             'mfa_level_display', 'mfa_force_enabled', 'is_first_login',
-            'date_password_last_updated', 'avatar_url', 'system_or_org_role'
+            'date_password_last_updated', 'avatar_url',
         ]
         # 外键的字段
-        fields_fk = ['role', 'role_display']
+        fields_fk = []
         # 多对多字段
-        fields_m2m = ['groups', 'groups_display', 'org_roles']
+        fields_m2m = [
+            'groups', 'groups_display', 'system_roles', 'org_roles',
+            'system_roles_display', 'org_roles_display'
+        ]
         # 在serializer 上定义的字段
-        fields_custom = ['can_update', 'can_delete', 'login_blocked', 'password_strategy']
+        fields_custom = ['login_blocked', 'password_strategy']
         fields = fields_verbose + fields_fk + fields_m2m + fields_custom
 
         read_only_fields = [
@@ -77,6 +137,7 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
             'public_key': {'write_only': True},
             'is_first_login': {'label': _('Is first login'), 'read_only': True},
             'is_valid': {'label': _('Is valid')},
+            'is_service_account': {'label': _('Is service account')},
             'is_expired': {'label': _('Is expired')},
             'avatar_url': {'label': _('Avatar url')},
             'created_by': {'read_only': True, 'allow_blank': True},
@@ -91,46 +152,10 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
             'is_feishu_bound': {'label': _('Is feishu bound')},
             'is_otp_secret_key_bound': {'label': _('Is OTP bound')},
             'phone': {'validators': [PhoneValidator()]},
+            'system_role_display': {'label': _('System role name')},
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.set_role_choices()
-
-    def set_role_choices(self):
-        role = self.fields.get('role')
-        if not role:
-            return
-        choices = role._choices
-        choices.pop(User.ROLE.APP, None)
-        request = self.context.get('request')
-        if request and hasattr(request, 'user') and not request.user.is_superuser:
-            choices.pop(User.ROLE.ADMIN, None)
-            choices.pop(User.ROLE.AUDITOR, None)
-        role._choices = choices
-
-    def validate_role(self, value):
-        request = self.context.get('request')
-        if not request.user.is_superuser and value != User.ROLE.USER:
-            role_display = User.ROLE.USER.label
-            msg = _("Role limit to {}".format(role_display))
-            raise serializers.ValidationError(msg)
-        return value
-
-    @property
-    def is_org_admin(self):
-        roles = []
-        role = self.initial_data.get('role')
-        if role:
-            roles.append(role)
-        org_roles = self.initial_data.get('org_roles')
-        if org_roles:
-            roles.extend(org_roles)
-        is_org_admin = User.ROLE.ADMIN.value in roles
-        return is_org_admin
-
     def validate_password(self, password):
-        from ..utils import check_password_rules
         password_strategy = self.initial_data.get('password_strategy')
         if self.instance is None and password_strategy != PasswordStrategy.custom:
             # 创建用户，使用邮件设置密码
@@ -138,9 +163,6 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         if self.instance and not password:
             # 更新用户, 未设置密码
             return
-        if not check_password_rules(password, is_org_admin=self.is_org_admin):
-            msg = _('Password does not match security rules')
-            raise serializers.ValidationError(msg)
         return password
 
     @staticmethod
@@ -164,25 +186,54 @@ class UserSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
         attrs.pop('password_strategy', None)
         return attrs
 
-    def get_can_update(self, obj):
-        return CanUpdateDeleteUser.has_update_object_permission(
-            self.context['request'], self.context['view'], obj
-        )
+    def save_and_set_custom_m2m_fields(self, validated_data, save_handler, created):
+        m2m_values = {}
+        for f, default_roles in self.custom_m2m_fields.items():
+            roles = validated_data.pop(f, None)
+            if created and not roles:
+                roles = [
+                    Role.objects.filter(id=role.id).first()
+                    for role in default_roles
+                ]
+            m2m_values[f] = roles
 
-    def get_can_delete(self, obj):
-        return CanUpdateDeleteUser.has_delete_object_permission(
-            self.context['request'], self.context['view'], obj
-        )
+        instance = save_handler(validated_data)
+        for field_name, value in m2m_values.items():
+            if value is None:
+                continue
+            field = getattr(instance, field_name)
+            field.set(value)
+        return instance
+
+    def validate_is_active(self, is_active):
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            return is_active
+
+        user = request.user
+        if user.id == self.instance.id and not is_active:
+            # 用户自己不能禁用启用自己
+            raise serializers.ValidationError("Cannot inactive self")
+        return is_active
 
     def update(self, instance, validated_data):
-        request = self.context.get('request')
-        if request:
-            user = request.user
-            if user.id == instance.id:
-                # 用户自己不能禁用启用自己
-                validated_data.pop('is_active', None)
+        save_handler = partial(super().update, instance)
+        instance = self.save_and_set_custom_m2m_fields(validated_data, save_handler, created=False)
+        return instance
 
-        return super(UserSerializer, self).update(instance, validated_data)
+    def create(self, validated_data):
+        save_handler = super().create
+        instance = self.save_and_set_custom_m2m_fields(validated_data, save_handler, created=True)
+        return instance
+
+
+class UserRetrieveSerializer(UserSerializer):
+    login_confirm_settings = serializers.PrimaryKeyRelatedField(
+        read_only=True, source='login_confirm_setting.reviewers', many=True
+    )
+
+    class Meta(UserSerializer.Meta):
+        fields = UserSerializer.Meta.fields + ['login_confirm_settings']
 
 
 class MiniUserSerializer(serializers.ModelSerializer):
@@ -191,17 +242,20 @@ class MiniUserSerializer(serializers.ModelSerializer):
         fields = UserSerializer.Meta.fields_mini
 
 
-class InviteSerializer(serializers.Serializer):
-    user = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.exclude(role=User.ROLE.APP)
+class InviteSerializer(RolesSerializerMixin, serializers.Serializer):
+    users = serializers.PrimaryKeyRelatedField(
+        queryset=User.get_nature_users(), many=True, label=_('Select users'),
+        help_text=_('For security, only list several users')
     )
-    role = serializers.ChoiceField(choices=ORG_ROLE.choices)
+    system_roles = None
+    system_roles_display = None
+    org_roles_display = None
 
 
 class ServiceAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'name', 'access_key']
+        fields = ['id', 'name', 'access_key', 'comment']
         read_only_fields = ['access_key']
 
     def __init__(self, *args, **kwargs):
@@ -223,18 +277,12 @@ class ServiceAccountSerializer(serializers.ModelSerializer):
             users = User.objects.exclude(id=self.instance.id)
         else:
             users = User.objects.all()
-        if users.filter(email=email) or \
-                users.filter(username=username):
+        if users.filter(email=email) or users.filter(username=username):
             raise serializers.ValidationError(_('name not unique'), code='unique')
         return name
 
-    def save(self, **kwargs):
-        self.validated_data['email'] = self.get_email()
-        self.validated_data['username'] = self.get_username()
-        self.validated_data['role'] = User.ROLE.APP
-        return super().save(**kwargs)
-
     def create(self, validated_data):
-        instance = super().create(validated_data)
-        instance.create_access_key()
-        return instance
+        name = validated_data['name']
+        comment = validated_data.get('comment', '')
+        user, ak = User.create_service_account(name, comment)
+        return user

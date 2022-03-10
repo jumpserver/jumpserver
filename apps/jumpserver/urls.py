@@ -24,6 +24,7 @@ api_v1 = [
     path('tickets/', include('tickets.urls.api_urls', namespace='api-tickets')),
     path('acls/', include('acls.urls.api_urls', namespace='api-acls')),
     path('notifications/', include('notifications.urls.api_urls', namespace='api-notifications')),
+    path('rbac/', include('rbac.urls.api_urls', namespace='api-rbac')),
     path('prometheus/metrics/', api.PrometheusMetricsApi.as_view()),
 ]
 
@@ -32,7 +33,8 @@ app_view_patterns = [
     path('ops/', include('ops.urls.view_urls'), name='ops'),
     path('common/', include('common.urls.view_urls'), name='common'),
     re_path(r'flower/(?P<path>.*)', views.celery_flower_view, name='flower-view'),
-    path('download/', views.ResourceDownload.as_view(), name='download')
+    path('download/', views.ResourceDownload.as_view(), name='download'),
+    path('i18n/<str:lang>/', views.I18NView.as_view(), name='i18n-switch'),
 ]
 
 if settings.XPACK_ENABLED:

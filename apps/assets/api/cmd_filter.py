@@ -8,14 +8,11 @@ from django.shortcuts import get_object_or_404
 from common.utils import reverse
 from common.utils import lazyproperty
 from orgs.mixins.api import OrgBulkModelViewSet
-from tickets.api import GenericTicketStatusRetrieveCloseAPI
-from ..hands import IsOrgAdmin, IsAppUser
 from ..models import CommandFilter, CommandFilterRule
 from .. import serializers
 
 __all__ = [
     'CommandFilterViewSet', 'CommandFilterRuleViewSet', 'CommandConfirmAPI',
-    'CommandConfirmStatusAPI'
 ]
 
 
@@ -23,7 +20,6 @@ class CommandFilterViewSet(OrgBulkModelViewSet):
     model = CommandFilter
     filterset_fields = ("name",)
     search_fields = filterset_fields
-    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.CommandFilterSerializer
 
 
@@ -31,7 +27,6 @@ class CommandFilterRuleViewSet(OrgBulkModelViewSet):
     model = CommandFilterRule
     filterset_fields = ('content',)
     search_fields = filterset_fields
-    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.CommandFilterRuleSerializer
 
     def get_queryset(self):
@@ -43,8 +38,10 @@ class CommandFilterRuleViewSet(OrgBulkModelViewSet):
 
 
 class CommandConfirmAPI(CreateAPIView):
-    permission_classes = (IsAppUser,)
     serializer_class = serializers.CommandConfirmSerializer
+    rbac_perms = {
+        'POST': 'tickets.add_superticket'
+    }
 
     def create(self, request, *args, **kwargs):
         ticket = self.create_command_confirm_ticket()
@@ -56,14 +53,14 @@ class CommandConfirmAPI(CreateAPIView):
             run_command=self.serializer.data.get('run_command'),
             session=self.serializer.session,
             cmd_filter_rule=self.serializer.cmd_filter_rule,
-            org_id=self.serializer.org.id
+            org_id=self.serializer.org.id,
         )
         return ticket
 
     @staticmethod
     def get_response_data(ticket):
         confirm_status_url = reverse(
-            view_name='api-assets:command-confirm-status',
+            view_name='api-tickets:super-ticket-status',
             kwargs={'pk': str(ticket.id)}
         )
         ticket_detail_url = reverse(
@@ -86,6 +83,3 @@ class CommandConfirmAPI(CreateAPIView):
         serializer.is_valid(raise_exception=True)
         return serializer
 
-
-class CommandConfirmStatusAPI(GenericTicketStatusRetrieveCloseAPI):
-    pass

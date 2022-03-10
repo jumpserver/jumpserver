@@ -7,7 +7,6 @@ import random
 from django.core.cache import cache
 import paramiko
 from django.db import models
-from django.db.models import TextChoices
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import get_logger
@@ -55,7 +54,7 @@ class Gateway(BaseUser):
     UNCONNECTIVE_SILENCE_PERIOD_KEY_TMPL = 'asset_unconnective_gateway_silence_period_{}'
     UNCONNECTIVE_SILENCE_PERIOD_BEGIN_VALUE = 60 * 5
 
-    class Protocol(TextChoices):
+    class Protocol(models.TextChoices):
         ssh = 'ssh', 'SSH'
 
     ip = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
@@ -71,6 +70,9 @@ class Gateway(BaseUser):
     class Meta:
         unique_together = [('name', 'org_id')]
         verbose_name = _("Gateway")
+        permissions = [
+            ('test_gateway', _('Test gateway'))
+        ]
 
     def set_unconnective(self):
         unconnective_key = self.UNCONNECTIVE_KEY_TMPL.format(self.id)

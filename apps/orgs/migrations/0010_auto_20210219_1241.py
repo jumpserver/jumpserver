@@ -44,11 +44,12 @@ def migrate_default_org_id(apps, schema_editor):
 
 
 def add_all_user_to_default_org(apps, schema_editor):
-    User = apps.get_model('users', 'User')
-    Organization = apps.get_model('orgs', 'Organization')
+    user_model = apps.get_model('users', 'User')
+    org_model = apps.get_model('orgs', 'Organization')
+    org_members_model = apps.get_model('orgs', 'OrganizationMember')
 
-    users_qs = User.objects.all()
-    default_org = Organization.objects.get(id=default_id)
+    users_qs = user_model.objects.all()
+    default_org = org_model.objects.get(id=default_id)
 
     t_start = time.time()
     count = users_qs.count()
@@ -57,7 +58,8 @@ def add_all_user_to_default_org(apps, schema_editor):
     batch_size = 1000
     for i in range(0, count, batch_size):
         users = list(users_qs[i:i + batch_size])
-        default_org.members.add(*users)
+        members = [org_members_model(user=user, org=default_org) for user in users]
+        org_members_model.objects.bulk_create(members, ignore_conflicts=True)
         print(f'Add users to default org: {i+1}-{i+len(users)}')
     interval = round((time.time() - t_start) * 1000, 2)
     print(f'done, use {interval} ms')

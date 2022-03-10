@@ -13,7 +13,7 @@ __all__ = ('ServerPerformanceMessage', 'ServerPerformanceCheckUtil')
 
 class ServerPerformanceMessage(SystemMessage):
     category = 'Operations'
-    category_label = _('Operations')
+    category_label = _('App ops')
     message_type_label = _('Server performance')
 
     def __init__(self, terms_with_errors):
@@ -32,7 +32,11 @@ class ServerPerformanceMessage(SystemMessage):
 
     @classmethod
     def post_insert_to_db(cls, subscription: SystemMsgSubscription):
-        admins = User.objects.filter(role=User.ROLE.ADMIN)
+        from rbac.models import Role, RoleBinding
+        # Todo: 需要更改这里
+        admin_role = Role.BuiltinRole.system_admin.get_role()
+        admins_ids = RoleBinding.objects.filter(role=admin_role).values_list('user_id', flat=True)
+        admins = User.objects.filter(id__in=admins_ids)
         subscription.users.add(*admins)
         subscription.receive_backends = [BACKEND.EMAIL]
         subscription.save()

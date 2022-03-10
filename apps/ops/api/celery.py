@@ -10,7 +10,7 @@ from celery.result import AsyncResult
 from rest_framework import generics
 from django_celery_beat.models import PeriodicTask
 
-from common.permissions import IsValidUser, IsSuperUser
+from common.permissions import IsValidUser
 from common.api import LogTailApi
 from ..models import CeleryTask
 from ..serializers import CeleryResultSerializer, CeleryPeriodTaskSerializer
@@ -88,7 +88,6 @@ class CeleryResultApi(generics.RetrieveAPIView):
 class CeleryPeriodTaskViewSet(CommonApiMixin, viewsets.ModelViewSet):
     queryset = PeriodicTask.objects.all()
     serializer_class = CeleryPeriodTaskSerializer
-    permission_classes = (IsSuperUser,)
     http_method_names = ('get', 'head', 'options', 'patch')
 
     def get_queryset(self):

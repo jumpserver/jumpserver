@@ -10,14 +10,13 @@ from rest_framework.generics import (
     ListAPIView, get_object_or_404
 )
 
-from orgs.utils import tmp_to_root_org
+from orgs.utils import tmp_to_root_org, get_current_org
 from applications.models import Application
 from perms.utils.application.permission import (
     get_application_system_user_ids,
     validate_permission,
 )
-from perms.api.asset.user_permission.mixin import RoleAdminMixin, RoleUserMixin
-from common.permissions import IsOrgAdminOrAppUser
+from .mixin import RoleAdminMixin, RoleUserMixin
 from perms.hands import User, SystemUser
 from perms import serializers
 
@@ -29,7 +28,7 @@ __all__ = [
 ]
 
 
-class GrantedApplicationSystemUsersMixin(ListAPIView):
+class BaseGrantedApplicationSystemUsersApi(ListAPIView):
     serializer_class = serializers.ApplicationSystemUserSerializer
     only_fields = serializers.ApplicationSystemUserSerializer.Meta.only_fields
     user: None
@@ -46,17 +45,19 @@ class GrantedApplicationSystemUsersMixin(ListAPIView):
         return system_users
 
 
-class UserGrantedApplicationSystemUsersApi(RoleAdminMixin, GrantedApplicationSystemUsersMixin):
+class UserGrantedApplicationSystemUsersApi(RoleAdminMixin, BaseGrantedApplicationSystemUsersApi):
     pass
 
 
-class MyGrantedApplicationSystemUsersApi(RoleUserMixin, GrantedApplicationSystemUsersMixin):
+class MyGrantedApplicationSystemUsersApi(RoleUserMixin, BaseGrantedApplicationSystemUsersApi):
     pass
 
 
 @method_decorator(tmp_to_root_org(), name='get')
 class ValidateUserApplicationPermissionApi(APIView):
-    permission_classes = (IsOrgAdminOrAppUser,)
+    rbac_perms = {
+        'GET': 'perms.view_applicationpermission'
+    }
 
     def get(self, request, *args, **kwargs):
         user_id = request.query_params.get('user_id', '')

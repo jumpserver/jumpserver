@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from django.contrib.auth import get_user_model
-from django.contrib.auth.backends import ModelBackend
+from django.conf import settings
 from django.db import transaction
 
 from common.utils import get_logger
@@ -10,16 +10,17 @@ from .signals import (
     saml2_user_authenticated, saml2_user_authentication_failed,
     saml2_create_or_update_user
 )
+from ..base import JMSBaseAuthBackend
 
 __all__ = ['SAML2Backend']
 
 logger = get_logger(__file__)
 
 
-class SAML2Backend(ModelBackend):
-    def user_can_authenticate(self, user):
-        is_valid = getattr(user, 'is_valid', None)
-        return is_valid or is_valid is None
+class SAML2Backend(JMSBaseAuthBackend):
+    @staticmethod
+    def is_enabled():
+        return settings.AUTH_SAML2
 
     @transaction.atomic
     def get_or_create_from_saml_data(self, request, **saml_user_data):

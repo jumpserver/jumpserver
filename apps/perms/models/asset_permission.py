@@ -1,9 +1,8 @@
 import logging
 
 from django.utils.translation import ugettext_lazy as _
-from django.db.models import F
+from django.db.models import F, TextChoices
 
-from common.db.models import TextChoices
 from orgs.mixins.models import OrgModelMixin
 from common.db import models
 from common.utils import lazyproperty
@@ -29,6 +28,10 @@ class AssetPermission(BasePermission):
         unique_together = [('org_id', 'name')]
         verbose_name = _("Asset permission")
         ordering = ('name',)
+        permissions = [
+            ('view_permuserasset', _('Can view asset of permission to user')),
+            ('view_permusergroupasset', _('Can view asset of permission to user group'))
+        ]
 
     @lazyproperty
     def users_amount(self):
@@ -174,3 +177,16 @@ class PermNode(Node):
     def save(self):
         # 这是个只读 Model
         raise NotImplementedError
+
+
+class PermedAsset(Asset):
+    class Meta:
+        proxy = True
+        verbose_name = _('Permed asset')
+        permissions = [
+            ('view_myassets', _('Can view my assets')),
+            ('connect_myassets', _('Can connect my assets')),
+            ('view_userassets', _('Can view user assets')),
+            ('view_usergroupassets', _('Can view usergroup assets')),
+        ]
+

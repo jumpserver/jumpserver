@@ -7,12 +7,10 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 from common.utils import get_object_or_none
-from common.permissions import IsOrgAdminOrAppUser
 from ..models import Session, Task
 from .. import serializers
 from terminal.utils import is_session_approver
 from orgs.utils import tmp_to_root_org
-
 
 __all__ = ['TaskViewSet', 'KillSessionAPI', 'KillSessionForTicketAPI']
 logger = logging.getLogger(__file__)
@@ -22,7 +20,6 @@ class TaskViewSet(BulkModelViewSet):
     queryset = Task.objects.all()
     serializer_class = serializers.TaskSerializer
     filterset_fields = ('is_finished',)
-    permission_classes = (IsOrgAdminOrAppUser,)
 
 
 def kill_sessions(session_ids, user):
@@ -42,12 +39,14 @@ def kill_sessions(session_ids, user):
 
 
 class KillSessionAPI(APIView):
-    permission_classes = (IsOrgAdminOrAppUser,)
+    model = Task
+    rbac_perms = {
+        'POST': 'terminal.terminate_session'
+    }
 
     def post(self, request, *args, **kwargs):
         session_ids = request.data
-        user = request.user
-        validated_session = kill_sessions(session_ids, user)
+        validated_session = kill_sessions(session_ids, request.user)
         return Response({"ok": validated_session})
 
 
@@ -66,4 +65,3 @@ class KillSessionForTicketAPI(APIView):
             validated_session = kill_sessions(session_ids, request.user)
 
         return Response({"ok": validated_session})
-

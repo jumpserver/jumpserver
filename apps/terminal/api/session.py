@@ -11,28 +11,41 @@ from django.core.files.storage import default_storage
 from rest_framework import viewsets, views
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import generics
 
 from common.utils import data_to_json
-from .. import utils
 from common.const.http import GET
 from common.utils import get_logger, get_object_or_none
 from common.mixins.api import AsyncApiMixin
-from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor, IsAppUser
 from common.drf.filters import DatetimeRangeFilter
 from common.drf.renders import PassthroughRenderer
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import tmp_to_root_org, tmp_to_org
 from users.models import User
+from .. import utils
 from ..utils import find_session_replay_local, download_session_replay
 from ..models import Session
 from .. import serializers
 from terminal.utils import is_session_approver
 
 __all__ = [
-    'SessionViewSet', 'SessionReplayViewSet', 'SessionJoinValidateAPI'
+    'SessionViewSet', 'SessionReplayViewSet', 'SessionJoinValidateAPI',
+    'MySessionAPIView',
 ]
 
 logger = get_logger(__name__)
+
+
+class MySessionAPIView(generics.ListAPIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = serializers.SessionSerializer
+
+    def get_queryset(self):
+        with tmp_to_root_org():
+            user = self.request.user
+            qs = Session.objects.filter(user_id=user.id)
+            return qs
 
 
 class SessionViewSet(OrgBulkModelViewSet):
@@ -41,15 +54,18 @@ class SessionViewSet(OrgBulkModelViewSet):
         'default': serializers.SessionSerializer,
         'display': serializers.SessionDisplaySerializer,
     }
-    permission_classes = (IsOrgAdminOrAppUser,)
     search_fields = [
-        "user", "asset", "system_user", "remote_addr", "protocol", "is_finished", 'login_from',
+        "user", "asset", "system_user", "remote_addr",
+        "protocol", "is_finished", 'login_from',
     ]
     filterset_fields = search_fields + ['terminal']
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))
     ]
     extra_filter_backends = [DatetimeRangeFilter]
+    rbac_perms = {
+        'download': ['terminal.download_sessionreplay']
+    }
 
     @staticmethod
     def prepare_offline_file(session, local_path):
@@ -103,17 +119,15 @@ class SessionViewSet(OrgBulkModelViewSet):
             serializer.validated_data["terminal"] = self.request.user.terminal
         return super().perform_create(serializer)
 
-    def get_permissions(self):
-        if self.request.method.lower() in ['get', 'options']:
-            self.permission_classes = (IsOrgAdminOrAppUser | IsOrgAuditor,)
-        return super().get_permissions()
-
 
 class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
     serializer_class = serializers.ReplaySerializer
-    permission_classes = (IsOrgAdminOrAppUser | IsOrgAuditor,)
-    session = None
     download_cache_key = "SESSION_REPLAY_DOWNLOAD_{}"
+    session = None
+    rbac_perms = {
+        'create': 'terminal.upload_sessionreplay',
+        'retrieve': 'terminal.download_sessionreplay',
+    }
 
     def create(self, request, *args, **kwargs):
         session_id = kwargs.get('pk')
@@ -175,8 +189,13 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
 
 
 class SessionJoinValidateAPI(views.APIView):
-    permission_classes = (IsAppUser,)
+    """
+    监控用
+    """
     serializer_class = serializers.SessionJoinValidateSerializer
+    rbac_perms = {
+        'POST': 'terminal.validate_sessionactionperm'
+    }
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
@@ -199,11 +218,12 @@ class SessionJoinValidateAPI(views.APIView):
         if not user:
             msg = _('User does not exist: {}'.format(user_id))
             return Response({'ok': False, 'msg': msg}, status=401)
+
         with tmp_to_org(session.org):
             if is_session_approver(session_id, user_id):
                 return Response({'ok': True, 'msg': ''}, status=200)
 
-            if not user.admin_or_audit_orgs:
+            if not user.has_perm('terminal.monitor_session'):
                 msg = _('User does not have permission')
                 return Response({'ok': False, 'msg': msg}, status=401)
 

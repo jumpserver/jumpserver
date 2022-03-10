@@ -8,7 +8,6 @@ from rest_framework.decorators import action
 from rest_framework.request import Request
 
 from common.const.http import POST
-from common.permissions import IsValidUser
 
 
 __all__ = ['SuggestionMixin', 'RenderToJsonMixin']
@@ -23,8 +22,8 @@ class SuggestionMixin:
     get_serializer: Callable
     get_paginated_response: Callable
 
-    @action(methods=['get'], detail=False, permission_classes=(IsValidUser,))
-    def suggestions(self, request, *args, **kwargs):
+    @action(methods=['get'], detail=False, url_path='suggestions')
+    def match(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         queryset = queryset[:self.suggestion_limit]
         page = self.paginate_queryset(queryset)

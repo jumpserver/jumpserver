@@ -5,13 +5,11 @@
 import logging
 
 from django.db import models
-from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.cache import cache
 
 from common.utils import signer, get_object_or_none
-from common.db.models import TextChoices
 from .base import BaseUser
 from .asset import Asset
 from .authbook import AuthBook
@@ -24,17 +22,18 @@ logger = logging.getLogger(__name__)
 class ProtocolMixin:
     protocol: str
 
-    class Protocol(TextChoices):
+    class Protocol(models.TextChoices):
         ssh = 'ssh', 'SSH'
         rdp = 'rdp', 'RDP'
         telnet = 'telnet', 'Telnet'
         vnc = 'vnc', 'VNC'
         mysql = 'mysql', 'MySQL'
-        redis = 'redis', 'Redis'
         oracle = 'oracle', 'Oracle'
         mariadb = 'mariadb', 'MariaDB'
         postgresql = 'postgresql', 'PostgreSQL'
         sqlserver = 'sqlserver', 'SQLServer'
+        redis = 'redis', 'Redis'
+        mongodb = 'mongodb', 'MongoDB'
         k8s = 'k8s', 'K8S'
 
     SUPPORT_PUSH_PROTOCOLS = [Protocol.ssh, Protocol.rdp]
@@ -46,8 +45,9 @@ class ProtocolMixin:
         Protocol.rdp
     ]
     APPLICATION_CATEGORY_DB_PROTOCOLS = [
-        Protocol.mysql, Protocol.redis, Protocol.oracle,
-        Protocol.mariadb, Protocol.postgresql, Protocol.sqlserver
+        Protocol.mysql, Protocol.mariadb, Protocol.oracle,
+        Protocol.postgresql, Protocol.sqlserver,
+        Protocol.redis, Protocol.mongodb
     ]
     APPLICATION_CATEGORY_CLOUD_PROTOCOLS = [
         Protocol.k8s
@@ -217,7 +217,7 @@ class SystemUser(ProtocolMixin, AuthMixin, BaseUser):
         (LOGIN_MANUAL, _('Manually input'))
     )
 
-    class Type(TextChoices):
+    class Type(models.TextChoices):
         common = 'common', _('Common user')
         admin = 'admin', _('Admin user')
 
@@ -323,9 +323,15 @@ class SystemUser(ProtocolMixin, AuthMixin, BaseUser):
         ordering = ['name']
         unique_together = [('name', 'org_id')]
         verbose_name = _("System user")
+        permissions = [
+            ('view_systemuserasset', _('Can view system user asset')),
+            ('add_systemuserasset', _('Can add asset to system user')),
+            ('remove_systemuserasset', _('Can remove system user asset')),
+            ('match_systemuser', _('Can match system user')),
+        ]
 
 
-# Todo: 准备废弃
+# Deprecated: 准备废弃
 class AdminUser(BaseUser):
     """
     A privileged user that ansible can use it to push system user and so on

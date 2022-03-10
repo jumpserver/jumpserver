@@ -7,7 +7,7 @@ REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': (
-        'common.permissions.IsSuperUser',
+        'rbac.permissions.RBACPermission',
     ),
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
@@ -26,11 +26,11 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         # 'rest_framework.authentication.BasicAuthentication',
-        'authentication.backends.api.AccessKeyAuthentication',
-        'authentication.backends.api.AccessTokenAuthentication',
-        'authentication.backends.api.PrivateTokenAuthentication',
-        'authentication.backends.api.SignatureAuthentication',
-        'authentication.backends.api.SessionAuthentication',
+        'authentication.backends.drf.AccessKeyAuthentication',
+        'authentication.backends.drf.AccessTokenAuthentication',
+        'authentication.backends.drf.PrivateTokenAuthentication',
+        'authentication.backends.drf.SignatureAuthentication',
+        'authentication.backends.drf.SessionAuthentication',
     ),
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',

@@ -24,7 +24,9 @@ router.register(r'session-sharings', api.SessionSharingViewSet, 'session-sharing
 router.register(r'session-join-records', api.SessionJoinRecordsViewSet, 'session-sharing-record')
 
 urlpatterns = [
+    path('my-sessions/', api.MySessionAPIView.as_view(), name='my-session'),
     path('terminal-registrations/', api.TerminalRegistrationApi.as_view(), name='terminal-registration'),
+    path('registration/', api.TerminalRegistrationApi.as_view(), name='registration'),
     path('sessions/join/validate/', api.SessionJoinValidateAPI.as_view(), name='join-session-validate'),
     path('sessions/<uuid:pk>/replay/',
          api.SessionReplayViewSet.as_view({'get': 'retrieve', 'post': 'create'}),

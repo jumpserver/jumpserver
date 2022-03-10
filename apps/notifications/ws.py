@@ -5,7 +5,7 @@ from channels.generic.websocket import JsonWebsocketConsumer
 from common.utils import get_logger
 from common.db.utils import safe_db_connection
 from .site_msg import SiteMessageUtil
-from .signals_handler import new_site_msg_chan
+from .signal_handlers import new_site_msg_chan
 
 logger = get_logger(__name__)
 

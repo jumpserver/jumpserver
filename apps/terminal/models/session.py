@@ -13,7 +13,7 @@ from django.core.cache import cache
 from assets.models import Asset
 from users.models import User
 from orgs.mixins.models import OrgModelMixin
-from common.db.models import TextChoices
+from django.db.models import TextChoices
 from ..backends import get_multi_command_storage
 
 
@@ -22,6 +22,7 @@ class Session(OrgModelMixin):
         ST = 'ST', 'SSH Terminal'
         RT = 'RT', 'RDP Terminal'
         WT = 'WT', 'Web Terminal'
+        DT = 'DT', 'DB Terminal'
 
     class PROTOCOL(TextChoices):
         SSH = 'ssh', 'ssh'
@@ -29,11 +30,12 @@ class Session(OrgModelMixin):
         VNC = 'vnc', 'vnc'
         TELNET = 'telnet', 'telnet'
         MYSQL = 'mysql', 'mysql'
-        REDIS = 'redis', 'redis'
         ORACLE = 'oracle', 'oracle'
         MARIADB = 'mariadb', 'mariadb'
         SQLSERVER = 'sqlserver', 'sqlserver'
         POSTGRESQL = 'postgresql', 'postgresql'
+        REDIS = 'redis', 'redis'
+        MONGODB = 'mongodb', 'MongoDB'
         K8S = 'k8s', 'kubernetes'
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
@@ -145,8 +147,9 @@ class Session(OrgModelMixin):
     @property
     def db_protocols(self):
         _PROTOCOL = self.PROTOCOL
-        return [_PROTOCOL.MYSQL, _PROTOCOL.MARIADB, _PROTOCOL.REDIS,
-                _PROTOCOL.ORACLE, _PROTOCOL.POSTGRESQL, _PROTOCOL.SQLSERVER]
+        return [_PROTOCOL.MYSQL, _PROTOCOL.MARIADB, _PROTOCOL.ORACLE,
+                _PROTOCOL.POSTGRESQL, _PROTOCOL.SQLSERVER,
+                _PROTOCOL.REDIS, _PROTOCOL.MONGODB]
 
     @property
     def can_terminate(self):
@@ -236,6 +239,13 @@ class Session(OrgModelMixin):
     class Meta:
         db_table = "terminal_session"
         ordering = ["-date_start"]
+        verbose_name = _('Session record')
+        permissions = [
+            ('monitor_session', _('Can monitor session')),
+            ('share_session', _('Can share session')),
+            ('terminate_session', _('Can terminate session')),
+            ('validate_sessionactionperm', _('Can validate session action perm')),
+        ]
 
     def __str__(self):
         return "{0.id} of {0.user} to {0.asset}".format(self)

@@ -8,7 +8,6 @@ from functools import reduce
 from collections import OrderedDict
 
 from django.db import models
-from common.db.models import TextChoices
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import ValidationError
 
@@ -59,7 +58,7 @@ class AssetQuerySet(models.QuerySet):
 class ProtocolsMixin:
     protocols = ''
 
-    class Protocol(TextChoices):
+    class Protocol(models.TextChoices):
         ssh = 'ssh', 'SSH'
         rdp = 'rdp', 'RDP'
         telnet = 'telnet', 'Telnet'
@@ -355,3 +354,11 @@ class Asset(AbsConnectivity, AbsHardwareInfo, ProtocolsMixin, NodesRelationMixin
         unique_together = [('org_id', 'hostname')]
         verbose_name = _("Asset")
         ordering = ["hostname", ]
+        permissions = [
+            ('refresh_assethardwareinfo', _('Can refresh asset hardware info')),
+            ('test_assetconnectivity', _('Can test asset connectivity')),
+            ('push_assetsystemuser', _('Can push system user to asset')),
+            ('match_asset', _('Can match asset')),
+            ('add_assettonode', _('Add asset to node')),
+            ('move_assettonode', _('Move asset to node')),
+        ]

@@ -107,33 +107,32 @@ class UserRoleSerializer(serializers.Serializer):
 
 
 class UserProfileSerializer(UserSerializer):
-    admin_or_audit_orgs = UserOrgSerializer(many=True, read_only=True)
-    user_all_orgs = UserOrgSerializer(many=True, read_only=True)
-    current_org_roles = serializers.ListField(read_only=True)
+    MFA_LEVEL_CHOICES = (
+        (0, _('Disable')),
+        (1, _('Enable')),
+    )
+
     public_key_comment = serializers.CharField(
         source='get_public_key_comment', required=False, read_only=True, max_length=128
     )
     public_key_hash_md5 = serializers.CharField(
         source='get_public_key_hash_md5', required=False, read_only=True, max_length=128
     )
-    MFA_LEVEL_CHOICES = (
-        (0, _('Disable')),
-        (1, _('Enable')),
-    )
     mfa_level = serializers.ChoiceField(choices=MFA_LEVEL_CHOICES, label=_('MFA'), required=False)
     guide_url = serializers.SerializerMethodField()
     receive_backends = serializers.ListField(child=serializers.CharField(), read_only=True)
+    orgs = UserOrgSerializer(many=True, read_only=True, source='all_orgs')
+    perms = serializers.ListField(label=_("Perms"), read_only=True)
 
     class Meta(UserSerializer.Meta):
-        fields = UserSerializer.Meta.fields + [
-            'public_key_comment', 'public_key_hash_md5',
-            'admin_or_audit_orgs', 'current_org_roles',
-            'guide_url', 'user_all_orgs', 'is_org_admin',
-            'is_superuser', 'receive_backends',
-        ]
         read_only_fields = [
-            'date_joined', 'last_login', 'created_by', 'source', 'receive_backends',
+            'date_joined', 'last_login', 'created_by', 'source',
+            'receive_backends', 'orgs', 'perms',
         ]
+        fields = UserSerializer.Meta.fields + [
+            'public_key_comment', 'public_key_hash_md5', 'guide_url',
+        ] + read_only_fields
+
         extra_kwargs = dict(UserSerializer.Meta.extra_kwargs)
         extra_kwargs.update({
             'name': {'read_only': True, 'max_length': 128},
@@ -144,17 +143,22 @@ class UserProfileSerializer(UserSerializer):
             'is_valid': {'read_only': True},
             'is_active': {'read_only': True},
             'groups': {'read_only': True},
-            'roles': {'read_only': True},
             'password_strategy': {'read_only': True},
             'date_expired': {'read_only': True},
             'date_joined': {'read_only': True},
             'last_login': {'read_only': True},
-            'role': {'read_only': True},
         })
 
         if 'password' in fields:
             fields.remove('password')
             extra_kwargs.pop('password', None)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        system_roles_field = self.fields.get('system_roles')
+        org_roles_field = self.fields.get('org_roles')
+        system_roles_field.read_only = True
+        org_roles_field.read_only = True
 
     @staticmethod
     def get_guide_url(obj):
@@ -171,6 +175,20 @@ class UserProfileSerializer(UserSerializer):
                 raise serializers.ValidationError(_('Not a valid ssh public key'))
             return public_key
         return None
+
+    def validate_password(self, password):
+        from rbac.models import Role
+        from ..utils import check_password_rules
+        if not self.instance:
+            return password
+
+        is_org_admin = self.instance.org_roles.filter(
+            name=Role.BuiltinRole.org_admin.name
+        ).exsits()
+        if not check_password_rules(password, is_org_admin=is_org_admin):
+            msg = _('Password does not match security rules')
+            raise serializers.ValidationError(msg)
+        return password
 
 
 class UserPKUpdateSerializer(serializers.ModelSerializer):

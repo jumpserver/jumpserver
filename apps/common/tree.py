@@ -15,6 +15,7 @@ class TreeNode:
     iconSkin = ""
     parentInfo = ''
     meta = {}
+    checked = False
 
     _tree = None
 
@@ -101,4 +102,7 @@ class TreeNodeSerializer(serializers.Serializer):
     open = serializers.BooleanField(default=False)
     iconSkin = serializers.CharField(max_length=128, allow_blank=True)
     nocheck = serializers.BooleanField(default=False)
+    checked = serializers.BooleanField(default=False)
+    halfCheck = serializers.BooleanField(default=False)
+    chkDisabled = serializers.BooleanField(default=False)
     meta = serializers.JSONField()

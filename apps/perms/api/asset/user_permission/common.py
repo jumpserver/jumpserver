@@ -13,7 +13,7 @@ from rest_framework.generics import (
 
 from orgs.utils import tmp_to_root_org
 from perms.utils.asset.permission import get_asset_system_user_ids_with_actions_by_user, validate_permission
-from common.permissions import IsOrgAdminOrAppUser, IsOrgAdmin, IsValidUser
+from common.permissions import IsValidUser
 from common.utils import get_logger, lazyproperty
 
 from perms.hands import User, Asset, SystemUser
@@ -33,8 +33,11 @@ __all__ = [
 
 @method_decorator(tmp_to_root_org(), name='get')
 class GetUserAssetPermissionActionsApi(RetrieveAPIView):
-    permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.ActionsSerializer
+    rbac_perms = {
+        'retrieve': 'perms.view_userassets',
+        'GET': 'perms.view_userassets',
+    }
 
     def get_user(self):
         user_id = self.request.query_params.get('user_id', '')
@@ -61,10 +64,9 @@ class GetUserAssetPermissionActionsApi(RetrieveAPIView):
 
 @method_decorator(tmp_to_root_org(), name='get')
 class ValidateUserAssetPermissionApi(APIView):
-    permission_classes = (IsOrgAdminOrAppUser,)
-
-    def get_cache_policy(self):
-        return 0
+    rbac_perms = {
+        'GET': 'perms.view_userassets'
+    }
 
     def get(self, request, *args, **kwargs):
         user_id = self.request.query_params.get('user_id', '')
@@ -97,38 +99,53 @@ class ValidateUserAssetPermissionApi(APIView):
 
 # TODO 删除
 class RefreshAssetPermissionCacheApi(RetrieveAPIView):
-    permission_classes = (IsOrgAdmin,)
-
     def retrieve(self, request, *args, **kwargs):
         return Response({'msg': True}, status=200)
 
 
 class UserGrantedAssetSystemUsersForAdminApi(ListAPIView):
-    permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.AssetSystemUserSerializer
     only_fields = serializers.AssetSystemUserSerializer.Meta.only_fields
+    rbac_perms = {
+        'list': 'perms.view_userassets'
+    }
 
     @lazyproperty
     def user(self):
         user_id = self.kwargs.get('pk')
         return User.objects.get(id=user_id)
 
+    @lazyproperty
+    def system_users_with_actions(self):
+        asset_id = self.kwargs.get('asset_id')
+        asset = get_object_or_404(Asset, id=asset_id, is_active=True)
+        return self.get_asset_system_user_ids_with_actions(asset)
+
     def get_asset_system_user_ids_with_actions(self, asset):
         return get_asset_system_user_ids_with_actions_by_user(self.user, asset)
 
     def get_queryset(self):
-        asset_id = self.kwargs.get('asset_id')
-        asset = get_object_or_404(Asset, id=asset_id, is_active=True)
-        system_users_with_actions = self.get_asset_system_user_ids_with_actions(asset)
-        system_user_ids = system_users_with_actions.keys()
-        system_users = SystemUser.objects.filter(id__in=system_user_ids)\
+        system_user_ids = self.system_users_with_actions.keys()
+        system_users = SystemUser.objects.filter(id__in=system_user_ids) \
             .only(*self.serializer_class.Meta.only_fields) \
             .order_by('name')
-        system_users = list(system_users)
-        for system_user in system_users:
-            actions = system_users_with_actions.get(system_user.id, 0)
-            system_user.actions = actions
         return system_users
+
+    def paginate_queryset(self, queryset):
+        page = super().paginate_queryset(queryset)
+
+        if page:
+            page = self.set_systemusers_action(page)
+        else:
+            self.set_systemusers_action(queryset)
+        return page
+
+    def set_systemusers_action(self, queryset):
+        queryset_list = list(queryset)
+        for system_user in queryset_list:
+            actions = self.system_users_with_actions.get(system_user.id, 0)
+            system_user.actions = actions
+        return queryset_list
 
 
 @method_decorator(tmp_to_root_org(), name='list')
@@ -142,7 +159,5 @@ class MyGrantedAssetSystemUsersApi(UserGrantedAssetSystemUsersForAdminApi):
 
 # TODO 删除
 class UserAssetPermissionsCacheApi(DestroyAPIView):
-    permission_classes = (IsOrgAdmin,)
-
     def destroy(self, request, *args, **kwargs):
         return Response(status=204)

@@ -29,6 +29,9 @@ class AccessKey(models.Model):
     def __str__(self):
         return str(self.id)
 
+    class Meta:
+        verbose_name = _("Access key")
+
 
 class PrivateToken(Token):
     """Inherit from auth token, otherwise migration is boring"""
@@ -45,3 +48,23 @@ class SSOToken(models.JMSBaseModel):
     authkey = models.UUIDField(primary_key=True, default=uuid.uuid4, verbose_name=_('Token'))
     expired = models.BooleanField(default=False, verbose_name=_('Expired'))
     user = models.ForeignKey('users.User', on_delete=models.CASCADE, verbose_name=_('User'), db_constraint=False)
+
+    class Meta:
+        verbose_name = _('SSO token')
+
+
+class ConnectionToken(models.JMSBaseModel):
+    # Todo: 未来可能放到这里，不记录到 redis 了，虽然方便，但是不易于审计
+    # Todo: add connection token 可能要授权给 普通用户, 或者放开就行
+
+    class Meta:
+        verbose_name = _('Connection token')
+        permissions = [
+            ('view_connectiontokensecret', _('Can view connection token secret'))
+        ]
+
+
+class SuperConnectionToken(ConnectionToken):
+    class Meta:
+        proxy = True
+        verbose_name = _("Super connection token")

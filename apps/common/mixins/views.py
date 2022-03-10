@@ -2,8 +2,11 @@
 #
 from django.contrib.auth.mixins import UserPassesTestMixin
 from rest_framework import permissions
+from rest_framework.decorators import action
 from rest_framework.request import Request
+from rest_framework.response import Response
 
+from common.permissions import IsValidUser
 
 __all__ = ["PermissionsMixin"]
 
@@ -21,5 +24,3 @@ class PermissionsMixin(UserPassesTestMixin):
             if not permission_class().has_permission(self.request, self):
                 return False
         return True
-
-
