@@ -119,7 +119,8 @@ class AppAccountSerializer(AppSerializerMixin, AuthSerializerMixin, BulkOrgResou
             'username': {'default': '', 'required': False},
             'password': {'write_only': True},
             'app_display': {'label': _('Application display')},
-            'systemuser_display': {'label': _('System User')}
+            'systemuser_display': {'label': _('System User')},
+            'account': {'label': _('account')}
         }
         use_model_bulk_create = True
         model_bulk_create_kwargs = {

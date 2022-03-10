@@ -3,6 +3,12 @@
 from django.db import migrations
 
 
+def drop_old_permissions(apps, schema_editor):
+    content_type_model = apps.get_model("rbac", "ContentType")
+    db_alias = schema_editor.connection.alias
+    content_type_model.objects.using(db_alias).filter(platform__startswith='Win').update(protocol='rdp')
+
+
 class Migration(migrations.Migration):
 
     dependencies = [

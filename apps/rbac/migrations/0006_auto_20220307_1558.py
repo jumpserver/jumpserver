@@ -8,6 +8,7 @@ def delete_unused_permissions(apps, schema_editor):
     content_type_model = apps.get_model('rbac', 'ContentType')
     content_type_delete_required = [
         ('common', 'permission'),
+        ('applications', 'k8sapp'),
     ]
     for app, model in content_type_delete_required:
         content_type_model.objects.filter(app_label=app, model=model).delete()
