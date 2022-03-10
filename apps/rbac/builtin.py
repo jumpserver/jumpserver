@@ -4,6 +4,7 @@ from .const import Scope, system_exclude_permissions, org_exclude_permissions
 
 user_perms = (
     ('rbac', 'menupermission', 'view', 'workspace'),
+    ('rbac', 'menupermission', 'view', 'userview'),
     ('rbac', 'menupermission', 'view', 'webterminal'),
     ('rbac', 'menupermission', 'view', 'filemanager'),
     ('perms', 'permedasset', 'view,connect', 'myassets'),
