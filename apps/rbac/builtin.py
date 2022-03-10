@@ -2,38 +2,28 @@ from django.utils.translation import ugettext_noop
 
 from .const import Scope, system_exclude_permissions, org_exclude_permissions
 
-
-auditor_perms = (
-    ('rbac', 'menupermission', 'view', 'userview'),
-    ('rbac', 'menupermission', 'view', 'auditview'),
-    ('perms', 'assetpermission', 'view,connect', 'myassets'),
-    ('perms', 'applicationpermission', 'view,connect', 'myapps'),
-    ('assets', 'asset', 'match', 'asset'),
-    ('assets', 'systemuser', 'match', 'systemuser'),
-    ('assets', 'node', 'match', 'node'),
-    ('common', 'permission', 'view', 'resourcestatistics'),
-    ('audits', '*', '*', '*'),
-    ('terminal', 'commandstorage', 'view', 'commandstorage'),
-    ('terminal', 'sessionreplay', 'view,download', 'sessionreplay'),
-    ('terminal', 'session', '*', '*'),
-    ('terminal', 'command', '*', '*'),
-    ('ops', 'commandexecution', 'view', 'commandexecution'),
-)
-
 user_perms = (
-    ('rbac', 'menupermission', 'view', 'userview'),
+    ('rbac', 'menupermission', 'view', 'workspace'),
     ('rbac', 'menupermission', 'view', 'webterminal'),
     ('rbac', 'menupermission', 'view', 'filemanager'),
     ('perms', 'permedasset', 'view,connect', 'myassets'),
     ('perms', 'permedapplication', 'view,connect', 'myapps'),
-    ('perms', 'permedkubernetesapp', 'view,connect', 'mykubernetesapp'),
-    ('perms', 'permedremoteApp', 'view,connect', 'myremoteapp'),
-    ('perms', 'permeddatabaseapp', 'view,connect', 'mydatabaseapp'),
     ('assets', 'asset', 'match', 'asset'),
     ('assets', 'systemuser', 'match', 'systemuser'),
     ('assets', 'node', 'match', 'node'),
     ('ops', 'commandexecution', 'add', 'commandexecution'),
 )
+
+auditor_perms = user_perms + (
+    ('rbac', 'menupermission', 'view', 'audit'),
+    ('rbac', 'menupermission', 'view', 'dashboard'),
+    ('audits', '*', '*', '*'),
+    ('terminal', 'commandstorage', 'view', 'commandstorage'),
+    ('terminal', 'sessionreplay', 'view,download', 'sessionreplay'),
+    ('terminal', 'session', '*', '*'),
+    ('terminal', 'command', '*', '*'),
+)
+
 
 app_exclude_perms = [
     ('users', 'user', 'add,delete', 'user'),

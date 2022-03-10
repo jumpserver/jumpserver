@@ -178,6 +178,16 @@ class AssetsTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
     model = Asset
     serializer_class = serializers.AssetsTaskSerializer
 
+    def check_permissions(self, request):
+        action = request.data.get('action')
+        action_perm_require = {
+            'refresh': 'assets.refresh_assethardwareinfo1',
+        }
+        perm_required = action_perm_require.get(action)
+        has = self.request.user.has_perm(perm_required)
+        if not has:
+            self.permission_denied(request)
+
 
 class AssetGatewayListApi(generics.ListAPIView):
     serializer_class = serializers.GatewayWithAuthSerializer
