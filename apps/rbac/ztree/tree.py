@@ -9,17 +9,23 @@ from .permissions import permission_paths, flag_license_required, flag_sep, flag
 from .tree_nodes import permission_tree_nodes
 from ..const import Scope
 from jumpserver.utils import has_valid_xpack_license
+from django.conf import settings
 
 
 class TreeNode(RawTreeNode):
     total_count = 0
     checked_count = 0
+    app_label_codename = ''
 
-    def checked_if_need(self):
-        self.checked = self.total_count == self.checked_count
+    def mark_checked_if_need(self):
+        if self.isParent:
+            self.checked = self.total_count == self.checked_count
 
-    def refresh_name(self):
-        self.name = str(self.name) + f'({self.checked_count}/{self.total_count})'
+    def refresh_name_if_need(self):
+        if self.isParent:
+            self.name = str(self.name) + f'({self.checked_count}/{self.total_count})'
+        elif settings.DEBUG:
+            self.name = str(self.name) + f'({self.app_label_codename})'
 
 
 class TreeNodes:
@@ -51,10 +57,8 @@ class TreeNodes:
     def get(self):
         tree_nodes = list(self.tree_nodes.values())
         for tree_node in tree_nodes:
-            if not tree_node.isParent:
-                continue
-            tree_node.refresh_name()
-            tree_node.checked_if_need()
+            tree_node.mark_checked_if_need()
+            tree_node.refresh_name_if_need()
         return tree_nodes
 
 
@@ -75,7 +79,7 @@ class ZTree(object):
         self.content_types_name_mapper = {ct.model: ct.name for ct in ContentType.objects.all()}
         self.check_disabled = check_disabled
         self.tree_nodes = TreeNodes()
-        self.show_node_level = 11
+        self.show_node_level = 3
 
     @staticmethod
     def prefetch_permissions(permissions):
@@ -135,6 +139,7 @@ class ZTree(object):
             'name': name,
             'title': perm_app_label_codename,
             'chkDisabled': self.check_disabled,
+            'app_label_codename': perm_app_label_codename,
             'isParent': False,
             'iconSkin': 'file',
             'open': False,
