@@ -112,39 +112,8 @@ class PermedApplication(Application):
         verbose_name = _('Permed application')
         default_permissions = []
         permissions = [
+            ('view_myapps', 'Can view my apps'),
+            ('connect_myapps', 'Can connect my apps'),
             ('view_userapps', _('Can view user apps')),
             ('view_usergroupapps', _('Can view usergroup apps')),
-        ]
-
-
-class PermedRemoteApp(Application):
-    class Meta:
-        proxy = True
-        verbose_name = _('Permed remote application')
-        default_permissions = []
-        permissions = [
-            ('view_myremoteapp', _('Can view my remoteapp')),
-            ('connect_myremoteapp', _('Can connect my remoteapp')),
-        ]
-
-
-class PermedDatabaseApp(Application):
-    class Meta:
-        proxy = True
-        verbose_name = _('Database application')
-        default_permissions = []
-        permissions = [
-            ('view_mydatabaseapp', _('Can view my database application')),
-            ('connect_mydatabaseapp', _('Can connect my database application')),
-        ]
-
-
-class PermedKubernetesApp(Application):
-    class Meta:
-        proxy = True
-        verbose_name = _('Kubernetes')
-        default_permissions = []
-        permissions = [
-            ('view_mykubernetesapp', _('Can view my kubernetes application')),
-            ('connect_mykubernetesapp', _('Can connect my kubernetes application')),
         ]
