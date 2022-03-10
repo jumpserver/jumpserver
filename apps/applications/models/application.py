@@ -269,21 +269,3 @@ class ApplicationUser(SystemUser):
     class Meta:
         proxy = True
         verbose_name = _('Application user')
-
-
-class RemoteApp(Application):
-    class Meta:
-        proxy = True
-        verbose_name = _('Remote application')
-
-
-class DatabaseApp(Application):
-    class Meta:
-        proxy = True
-        verbose_name = _('Database application')
-
-
-class KubernetesApp(Application):
-    class Meta:
-        proxy = True
-        verbose_name = _('Kubernetes')
