@@ -214,7 +214,7 @@ class DatesLoginMetricMixin:
 class IndexApi(DatesLoginMetricMixin, APIView):
     http_method_names = ['get']
     rbac_perms = {
-        'GET': 'rbac.view_resourcestatistics'
+        'GET': 'rbac.view_dashboard'
     }
 
     def get(self, request, *args, **kwargs):
