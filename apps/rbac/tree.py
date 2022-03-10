@@ -97,6 +97,8 @@ special_pid_mapper = {
     "perms.connect_myremoteapp": "my_apps",
     "perms.view_mydatabaseapp": "my_apps",
     "perms.connect_mydatabaseapp": "my_apps",
+    "xpack.interface": "view_setting",
+    "settings.change_terminal": "terminal_node"
 }
 
 verbose_name_mapper = {
@@ -109,6 +111,7 @@ xpack_nodes = [
     'xpack', 'tickets', 'applications.remoteapp',
     "assets.accountbackupplan", "assets.accountbackupplanexecution",
     "rbac.orgrole", "rbac.orgrolebinding",
+    "settings.change_interface",
 ]
 
 

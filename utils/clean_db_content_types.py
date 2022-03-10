@@ -52,6 +52,9 @@ def clean_db_content_types():
         ('applications', 'remoteapp', 'delete_remoteapp'),
         ('applications', 'remoteapp', 'view_remoteapp'),
 
+        ('settings', 'setting', 'change_terminal_basic_setting'),
+        ('rbac', 'menupermission', 'view_resourcestatistics'),
+
 
     ]
     for app, model, codename in permissions_delete_required:
