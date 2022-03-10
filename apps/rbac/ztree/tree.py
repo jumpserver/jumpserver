@@ -75,7 +75,7 @@ class ZTree(object):
         self.content_types_name_mapper = {ct.model: ct.name for ct in ContentType.objects.all()}
         self.check_disabled = check_disabled
         self.tree_nodes = TreeNodes()
-        self.show_node_level = 3
+        self.show_node_level = 11
 
     @staticmethod
     def prefetch_permissions(permissions):

@@ -18,4 +18,12 @@ class Migration(migrations.Migration):
             name='systemuser',
             options={'ordering': ['name'], 'permissions': [('view_systemuserasset', 'Can view system user asset'), ('add_systemuserasset', 'Can add asset to system user'), ('remove_systemuserasset', 'Can remove system user asset'), ('match_systemuser', 'Can match system user')], 'verbose_name': 'System user'},
         ),
+        migrations.AlterModelOptions(
+            name='asset',
+            options={'ordering': ['hostname'], 'permissions': [('refresh_assethardwareinfo', 'Can refresh asset hardware info'), ('test_assetconnectivity', 'Can test asset connectivity'), ('push_assetsystemuser', 'Can push system user to asset'), ('match_asset', 'Can match asset'), ('add_assettonode', 'Add asset to node'), ('move_assettonode', 'Move asset to node')], 'verbose_name': 'Asset'},
+        ),
+        migrations.AlterModelOptions(
+            name='gateway',
+            options={'permissions': [('test_gateway', 'Test gateway')], 'verbose_name': 'Gateway'},
+        ),
     ]

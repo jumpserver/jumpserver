@@ -70,6 +70,9 @@ class Gateway(BaseUser):
     class Meta:
         unique_together = [('name', 'org_id')]
         verbose_name = _("Gateway")
+        permissions = [
+            ('test_gateway', _('Test gateway'))
+        ]
 
     def set_unconnective(self):
         unconnective_key = self.UNCONNECTIVE_KEY_TMPL.format(self.id)

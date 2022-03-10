@@ -282,5 +282,27 @@ permission_tree_nodes = {
         'name': _('Overview'),
         'checked': True,
         'chkDisabled': True,
+    },
+    'rbac.view_orgrolebinding': {
+        'name': _('View permission user')
+    },
+    'rbac.add_orgrolebinding': {
+        'name': _('Add user to role')
+    },
+    'rbac.delete_orgrolebinding': {
+        'name': _('Remove user from role')
+    },
+    'rbac.view_systemrolebinding': {
+        'name': _('View permission user')
+    },
+    'rbac.add_systemrolebinding': {
+        'name': _('Add user to role')
+    },
+    'rbac.delete_systemrolebinding': {
+        'name': _('Remove user from role')
+    },
+    'xpack.add_syncinstancetaskexecution': {
+        'name': _('Run sync instance task')
     }
+
 }
