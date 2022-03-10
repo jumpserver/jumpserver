@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-10 10:33+0800\n"
+"POT-Creation-Date: 2022-03-10 15:35+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -30,7 +30,7 @@ msgstr "访问控制"
 #: settings/models.py:29 settings/serializers/sms.py:6
 #: terminal/models/storage.py:23 terminal/models/task.py:16
 #: terminal/models/terminal.py:100 users/forms/profile.py:32
-#: users/models/group.py:15 users/models/user.py:567
+#: users/models/group.py:15 users/models/user.py:574
 #: users/templates/users/_select_user_modal.html:13
 #: users/templates/users/user_asset_permission.html:37
 #: users/templates/users/user_asset_permission.html:154
@@ -66,9 +66,9 @@ msgstr "激活中"
 #: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:34
 #: terminal/models/storage.py:26 terminal/models/terminal.py:114
 #: tickets/models/comment.py:24 tickets/models/ticket.py:154
-#: users/models/group.py:16 users/models/user.py:604
+#: users/models/group.py:16 users/models/user.py:611
 #: xpack/plugins/change_auth_plan/models/base.py:44
-#: xpack/plugins/cloud/models.py:35 xpack/plugins/cloud/models.py:116
+#: xpack/plugins/cloud/models.py:35 xpack/plugins/cloud/models.py:113
 #: xpack/plugins/gathered_user/models.py:26
 msgid "Comment"
 msgstr "备注"
@@ -94,8 +94,8 @@ msgstr "登录复核"
 #: terminal/backends/command/models.py:19
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:42
 #: terminal/notifications.py:88 terminal/notifications.py:136
-#: tickets/models/comment.py:17 users/const.py:14 users/models/user.py:786
-#: users/models/user.py:817 users/serializers/group.py:19
+#: tickets/models/comment.py:17 users/const.py:14 users/models/user.py:793
+#: users/models/user.py:824 users/serializers/group.py:19
 #: users/templates/users/user_asset_permission.html:38
 #: users/templates/users/user_asset_permission.html:64
 #: users/templates/users/user_database_app_permission.html:37
@@ -146,7 +146,7 @@ msgstr "系统用户"
 #: users/templates/users/user_asset_permission.html:70
 #: xpack/plugins/change_auth_plan/models/asset.py:199
 #: xpack/plugins/change_auth_plan/serializers/asset.py:180
-#: xpack/plugins/cloud/models.py:223
+#: xpack/plugins/cloud/models.py:220
 msgid "Asset"
 msgstr "资产"
 
@@ -168,7 +168,7 @@ msgstr "格式为逗号分隔的字符串, * 表示匹配所有. "
 #: authentication/forms.py:15 authentication/forms.py:17
 #: authentication/templates/authentication/_msg_different_city.html:9
 #: authentication/templates/authentication/_msg_oauth_bind.html:9
-#: ops/models/adhoc.py:159 users/forms/profile.py:31 users/models/user.py:565
+#: ops/models/adhoc.py:159 users/forms/profile.py:31 users/models/user.py:572
 #: users/templates/users/_msg_user_created.html:12
 #: users/templates/users/_select_user_modal.html:14
 #: xpack/plugins/change_auth_plan/models/asset.py:34
@@ -384,8 +384,8 @@ msgstr "类型名称"
 #: assets/serializers/account.py:18 common/db/models.py:113
 #: common/mixins/models.py:50 ops/models/adhoc.py:39 ops/models/command.py:30
 #: orgs/models.py:14 orgs/models.py:199 perms/models/base.py:92
-#: users/models/group.py:18 users/models/user.py:818
-#: xpack/plugins/cloud/models.py:125
+#: users/models/group.py:18 users/models/user.py:825
+#: xpack/plugins/cloud/models.py:122
 msgid "Date created"
 msgstr "创建日期"
 
@@ -594,7 +594,7 @@ msgstr "主机名原始"
 
 #: assets/models/asset.py:215 assets/serializers/account.py:16
 #: assets/serializers/asset.py:65 perms/serializers/asset/user_permission.py:41
-#: xpack/plugins/cloud/models.py:107 xpack/plugins/cloud/serializers/task.py:42
+#: xpack/plugins/cloud/models.py:104 xpack/plugins/cloud/serializers/task.py:42
 msgid "Protocols"
 msgstr "协议组"
 
@@ -631,10 +631,10 @@ msgstr "标签管理"
 #: assets/models/cluster.py:28 assets/models/cmd_filter.py:52
 #: assets/models/cmd_filter.py:99 assets/models/group.py:21
 #: common/db/models.py:111 common/mixins/models.py:49 orgs/models.py:13
-#: orgs/models.py:201 perms/models/base.py:91 users/models/user.py:612
+#: orgs/models.py:201 perms/models/base.py:91 users/models/user.py:619
 #: users/serializers/group.py:33
 #: xpack/plugins/change_auth_plan/models/base.py:48
-#: xpack/plugins/cloud/models.py:122 xpack/plugins/gathered_user/models.py:30
+#: xpack/plugins/cloud/models.py:119 xpack/plugins/gathered_user/models.py:30
 msgid "Created by"
 msgstr "创建者"
 
@@ -738,7 +738,7 @@ msgstr "触发模式"
 #: xpack/plugins/change_auth_plan/models/base.py:201
 #: xpack/plugins/change_auth_plan/serializers/app.py:66
 #: xpack/plugins/change_auth_plan/serializers/asset.py:179
-#: xpack/plugins/cloud/models.py:179
+#: xpack/plugins/cloud/models.py:176
 msgid "Reason"
 msgstr "原因"
 
@@ -812,7 +812,7 @@ msgstr "带宽"
 msgid "Contact"
 msgstr "联系人"
 
-#: assets/models/cluster.py:22 users/models/user.py:587
+#: assets/models/cluster.py:22 users/models/user.py:594
 msgid "Phone"
 msgstr "手机"
 
@@ -838,7 +838,7 @@ msgid "Default"
 msgstr "默认"
 
 #: assets/models/cluster.py:36 assets/models/label.py:14 rbac/const.py:6
-#: users/models/user.py:803
+#: users/models/user.py:810
 msgid "System"
 msgstr "系统"
 
@@ -848,7 +848,7 @@ msgstr "默认Cluster"
 
 #: assets/models/cmd_filter.py:34 perms/models/base.py:86
 #: rbac/ztree/tree_nodes.py:84 users/models/group.py:31
-#: users/models/user.py:573 users/templates/users/_select_user_modal.html:16
+#: users/models/user.py:580 users/templates/users/_select_user_modal.html:16
 #: users/templates/users/user_asset_permission.html:39
 #: users/templates/users/user_asset_permission.html:67
 #: users/templates/users/user_database_app_permission.html:38
@@ -986,7 +986,7 @@ msgstr "ssh私钥"
 #: users/templates/users/user_asset_permission.html:41
 #: users/templates/users/user_asset_permission.html:73
 #: users/templates/users/user_asset_permission.html:158
-#: xpack/plugins/cloud/models.py:96 xpack/plugins/cloud/serializers/task.py:69
+#: xpack/plugins/cloud/models.py:93 xpack/plugins/cloud/serializers/task.py:69
 msgid "Node"
 msgstr "节点"
 
@@ -1388,7 +1388,7 @@ msgstr "日志审计"
 
 #: audits/models.py:27 audits/models.py:57
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:226 rbac/ztree/tree.py:156
+#: rbac/tree.py:227 rbac/ztree/tree.py:161
 #: users/templates/users/user_asset_permission.html:128
 #: users/templates/users/user_database_app_permission.html:111
 msgid "Delete"
@@ -1443,11 +1443,11 @@ msgstr "文件管理"
 
 #: audits/models.py:55
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:223 rbac/ztree/tree.py:153
+#: rbac/tree.py:224 rbac/ztree/tree.py:158
 msgid "Create"
 msgstr "创建"
 
-#: audits/models.py:56 rbac/tree.py:225 rbac/ztree/tree.py:155
+#: audits/models.py:56 rbac/tree.py:226 rbac/ztree/tree.py:160
 #: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
 #: users/templates/users/user_asset_permission.html:127
 #: users/templates/users/user_database_app_permission.html:110
@@ -1511,14 +1511,14 @@ msgstr "用户代理"
 
 #: audits/models.py:124
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
-#: users/forms/profile.py:64 users/models/user.py:590
+#: users/forms/profile.py:64 users/models/user.py:597
 #: users/serializers/profile.py:121
 msgid "MFA"
 msgstr "MFA"
 
 #: audits/models.py:126 terminal/models/status.py:33
-#: tickets/models/ticket.py:140 xpack/plugins/cloud/models.py:175
-#: xpack/plugins/cloud/models.py:227
+#: tickets/models/ticket.py:140 xpack/plugins/cloud/models.py:172
+#: xpack/plugins/cloud/models.py:224
 msgid "Status"
 msgstr "状态"
 
@@ -1555,7 +1555,7 @@ msgid "Hosts display"
 msgstr "主机名称"
 
 #: audits/serializers.py:96 ops/models/command.py:27
-#: xpack/plugins/cloud/models.py:173
+#: xpack/plugins/cloud/models.py:170
 msgid "Result"
 msgstr "结果"
 
@@ -1589,13 +1589,13 @@ msgstr "认证令牌"
 
 #: audits/signal_handlers.py:71 authentication/notifications.py:73
 #: authentication/views/login.py:164 authentication/views/wecom.py:158
-#: notifications/backends/__init__.py:11 users/models/user.py:626
+#: notifications/backends/__init__.py:11 users/models/user.py:633
 msgid "WeCom"
 msgstr "企业微信"
 
 #: audits/signal_handlers.py:72 authentication/views/dingtalk.py:160
 #: authentication/views/login.py:170 notifications/backends/__init__.py:12
-#: users/models/user.py:627
+#: users/models/user.py:634
 msgid "DingTalk"
 msgstr "钉钉"
 
@@ -2128,14 +2128,14 @@ msgid "Show"
 msgstr "显示"
 
 #: authentication/templates/authentication/_access_key_modal.html:66
-#: settings/serializers/security.py:39 users/models/user.py:462
+#: settings/serializers/security.py:39 users/models/user.py:469
 #: users/serializers/profile.py:111 users/templates/users/mfa_setting.html:60
 #: users/templates/users/user_verify_mfa.html:36
 msgid "Disable"
 msgstr "禁用"
 
 #: authentication/templates/authentication/_access_key_modal.html:67
-#: users/models/user.py:463 users/serializers/profile.py:112
+#: users/models/user.py:470 users/serializers/profile.py:112
 #: users/templates/users/mfa_setting.html:26
 #: users/templates/users/mfa_setting.html:67
 msgid "Enable"
@@ -2384,7 +2384,7 @@ msgid "The FeiShu is already bound to another user"
 msgstr "该飞书已经绑定其他用户"
 
 #: authentication/views/feishu.py:148 authentication/views/login.py:176
-#: notifications/backends/__init__.py:14 users/models/user.py:628
+#: notifications/backends/__init__.py:14 users/models/user.py:635
 msgid "FeiShu"
 msgstr "飞书"
 
@@ -2679,7 +2679,7 @@ msgid "Notifications"
 msgstr "通知"
 
 #: notifications/backends/__init__.py:10 users/forms/profile.py:101
-#: users/models/user.py:569
+#: users/models/user.py:576
 msgid "Email"
 msgstr "邮件"
 
@@ -2905,7 +2905,7 @@ msgid "Can view root org"
 msgstr "可以查看全局组织"
 
 #: orgs/models.py:198 rbac/models/role.py:46 rbac/models/rolebinding.py:38
-#: users/models/user.py:577 users/templates/users/_select_user_modal.html:15
+#: users/models/user.py:584 users/templates/users/_select_user_modal.html:15
 msgid "Role"
 msgstr "角色"
 
@@ -3032,7 +3032,7 @@ msgstr "剪贴板复制粘贴"
 #: perms/models/base.py:90
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:58
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:60
-#: users/models/user.py:609
+#: users/models/user.py:616
 msgid "Date expired"
 msgstr "失效日期"
 
@@ -3347,11 +3347,15 @@ msgstr "我的应用"
 msgid "Ticket comment"
 msgstr "工单评论"
 
-#: rbac/tree.py:224 rbac/ztree/tree.py:154
+#: rbac/tree.py:99
+msgid "Common setting"
+msgstr "一般设置"
+
+#: rbac/tree.py:225 rbac/ztree/tree.py:159
 msgid "View"
 msgstr "查看"
 
-#: rbac/ztree/tree.py:99 rbac/ztree/tree_nodes.py:96
+#: rbac/ztree/tree.py:103 rbac/ztree/tree_nodes.py:96
 msgid "Detail"
 msgstr "详情"
 
@@ -5316,7 +5320,7 @@ msgstr "端点无效: 移除路径 `{}`"
 msgid "Bucket"
 msgstr "桶名称"
 
-#: terminal/serializers/storage.py:34 users/models/user.py:601
+#: terminal/serializers/storage.py:34 users/models/user.py:608
 msgid "Secret key"
 msgstr "密钥"
 
@@ -5326,7 +5330,7 @@ msgstr "密钥"
 msgid "Endpoint"
 msgstr "端点"
 
-#: terminal/serializers/storage.py:66 xpack/plugins/cloud/models.py:220
+#: terminal/serializers/storage.py:66 xpack/plugins/cloud/models.py:217
 msgid "Region"
 msgstr "地域"
 
@@ -5923,68 +5927,68 @@ msgstr "不能和原来的密钥相同"
 msgid "Not a valid ssh public key"
 msgstr "SSH密钥不合法"
 
-#: users/forms/profile.py:160 users/models/user.py:598
+#: users/forms/profile.py:160 users/models/user.py:605
 #: users/templates/users/user_password_update.html:48
 msgid "Public key"
 msgstr "SSH公钥"
 
-#: users/models/user.py:464
+#: users/models/user.py:471
 msgid "Force enable"
 msgstr "强制启用"
 
-#: users/models/user.py:531
+#: users/models/user.py:538
 msgid "Local"
 msgstr "数据库"
 
-#: users/models/user.py:579 users/serializers/user.py:140
+#: users/models/user.py:586 users/serializers/user.py:140
 msgid "Is service account"
 msgstr "服务账号"
 
-#: users/models/user.py:581
+#: users/models/user.py:588
 msgid "Avatar"
 msgstr "头像"
 
-#: users/models/user.py:584
+#: users/models/user.py:591
 msgid "Wechat"
 msgstr "微信"
 
-#: users/models/user.py:595
+#: users/models/user.py:602
 msgid "Private key"
 msgstr "ssh私钥"
 
-#: users/models/user.py:617
+#: users/models/user.py:624
 msgid "Source"
 msgstr "来源"
 
-#: users/models/user.py:621
+#: users/models/user.py:628
 msgid "Date password last updated"
 msgstr "最后更新密码日期"
 
-#: users/models/user.py:624
+#: users/models/user.py:631
 msgid "Need update password"
 msgstr "需要更新密码"
 
-#: users/models/user.py:788
+#: users/models/user.py:795
 msgid "Can invite user"
 msgstr "可以邀请用户"
 
-#: users/models/user.py:789
+#: users/models/user.py:796
 msgid "Can remove user"
 msgstr "可以移除用户"
 
-#: users/models/user.py:790
+#: users/models/user.py:797
 msgid "Can match user"
 msgstr "可以匹配用户"
 
-#: users/models/user.py:799
+#: users/models/user.py:806
 msgid "Administrator"
 msgstr "管理员"
 
-#: users/models/user.py:802
+#: users/models/user.py:809
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
-#: users/models/user.py:827
+#: users/models/user.py:834
 msgid "User password history"
 msgstr "用户密码历史"
 
@@ -6724,71 +6728,64 @@ msgstr "云管中心"
 msgid "Provider"
 msgstr "云服务商"
 
-#: xpack/plugins/cloud/models.py:39
-msgid "Cloud account"
-msgstr "云账号"
-
-#: xpack/plugins/cloud/models.py:41
-msgid "Test cloud account"
-msgstr "测试云账号"
-
-#: xpack/plugins/cloud/models.py:85 xpack/plugins/cloud/serializers/task.py:66
+#: xpack/plugins/cloud/models.py:39 xpack/plugins/cloud/models.py:82
+#: xpack/plugins/cloud/serializers/task.py:66
 msgid "Account"
 msgstr "账号"
 
-#: xpack/plugins/cloud/models.py:88 xpack/plugins/cloud/serializers/task.py:37
+#: xpack/plugins/cloud/models.py:85 xpack/plugins/cloud/serializers/task.py:37
 msgid "Regions"
 msgstr "地域"
 
-#: xpack/plugins/cloud/models.py:91
+#: xpack/plugins/cloud/models.py:88
 msgid "Hostname strategy"
 msgstr "主机名策略"
 
-#: xpack/plugins/cloud/models.py:100 xpack/plugins/cloud/serializers/task.py:67
+#: xpack/plugins/cloud/models.py:97 xpack/plugins/cloud/serializers/task.py:67
 msgid "Unix admin user"
 msgstr "Unix 管理员"
 
-#: xpack/plugins/cloud/models.py:104 xpack/plugins/cloud/serializers/task.py:68
+#: xpack/plugins/cloud/models.py:101 xpack/plugins/cloud/serializers/task.py:68
 msgid "Windows admin user"
 msgstr "Windows 管理员"
 
-#: xpack/plugins/cloud/models.py:110 xpack/plugins/cloud/serializers/task.py:45
+#: xpack/plugins/cloud/models.py:107 xpack/plugins/cloud/serializers/task.py:45
 msgid "IP network segment group"
 msgstr "IP网段组"
 
-#: xpack/plugins/cloud/models.py:113 xpack/plugins/cloud/serializers/task.py:71
+#: xpack/plugins/cloud/models.py:110 xpack/plugins/cloud/serializers/task.py:71
 msgid "Always update"
 msgstr "总是更新"
 
-#: xpack/plugins/cloud/models.py:119
+#: xpack/plugins/cloud/models.py:116
 msgid "Date last sync"
 msgstr "最后同步日期"
 
-#: xpack/plugins/cloud/models.py:130 xpack/plugins/cloud/models.py:171
+#: xpack/plugins/cloud/models.py:127 xpack/plugins/cloud/models.py:168
 msgid "Sync instance task"
 msgstr "同步实例任务"
 
-#: xpack/plugins/cloud/models.py:182 xpack/plugins/cloud/models.py:230
+#: xpack/plugins/cloud/models.py:179 xpack/plugins/cloud/models.py:227
 msgid "Date sync"
 msgstr "同步日期"
 
-#: xpack/plugins/cloud/models.py:186
+#: xpack/plugins/cloud/models.py:183
 msgid "Sync instance task execution"
 msgstr "同步实例任务执行"
 
-#: xpack/plugins/cloud/models.py:210
+#: xpack/plugins/cloud/models.py:207
 msgid "Sync task"
 msgstr "同步任务"
 
-#: xpack/plugins/cloud/models.py:214
+#: xpack/plugins/cloud/models.py:211
 msgid "Sync instance task history"
 msgstr "同步实例任务历史"
 
-#: xpack/plugins/cloud/models.py:217
+#: xpack/plugins/cloud/models.py:214
 msgid "Instance"
 msgstr "实例"
 
-#: xpack/plugins/cloud/models.py:234
+#: xpack/plugins/cloud/models.py:231
 msgid "Sync instance detail"
 msgstr "同步实例详情"
 
@@ -7102,6 +7099,12 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Cloud account"
+#~ msgstr "云账号"
+
+#~ msgid "Test cloud account"
+#~ msgstr "测试云账号"
 
 #~ msgid "Can view resource statistics"
 #~ msgstr "可以查看资源统计"

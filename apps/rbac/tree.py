@@ -96,6 +96,7 @@ special_pid_mapper = {
 verbose_name_mapper = {
     'orgs.organization': _("App organizations"),
     'tickets.comment': _("Ticket comment"),
+    'settings.setting': _("Common setting"),
 }
 
 xpack_nodes = [
