@@ -62,6 +62,8 @@ exclude_permissions = (
     ('tickets', 'ticketapprovalrule', '*', '*'),
     ('xpack', 'interface', '*', '*'),
     ('xpack', 'license', '*', '*'),
+    ('xpack', 'syncinstancedetail', 'add,delete,change', 'syncinstancedetail'),
+    ('xpack', 'syncinstancetaskexecution', 'add,delete,change', 'syncinstancetaskexecution'),
     ('common', 'permission', 'add,delete,view,change', 'permission'),
     ('terminal', 'command', 'delete,change', 'command'),
     ('terminal', 'status', 'delete,change', 'status'),
