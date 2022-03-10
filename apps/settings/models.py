@@ -142,9 +142,12 @@ class Setting(models.Model):
             ('change_basic', _('Can change basic setting')),
             ('change_email', _('Can change email setting')),
             ('change_auth', _('Can change auth setting')),
+            ('change_sys_msg_sub', _('Can sys msg sub setting')),
             ('change_sms', _('Can change sms setting')),
             ('change_security', _('Can change security setting')),
             ('change_clean', _('Can change clean setting')),
+            ('change_interface', _('Can change interface setting')),
+            ('change_license', _('Can change license setting')),
+            ('change_terminal', _('Can change terminal setting')),
             ('change_other', _('Can change other setting')),
-            ('change_terminal_basic_setting', _('Can change terminal basic setting')),
         ]

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-10 10:33+0800\n"
+"POT-Creation-Date: 2022-03-10 20:12+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -90,7 +90,7 @@ msgstr "登录复核"
 #: assets/models/cmd_filter.py:30 assets/models/label.py:15 audits/models.py:37
 #: audits/models.py:60 audits/models.py:85 audits/serializers.py:100
 #: authentication/models.py:50 orgs/models.py:196 perms/models/base.py:84
-#: rbac/builtin.py:103 rbac/models/rolebinding.py:35 templates/index.html:78
+#: rbac/builtin.py:96 rbac/models/rolebinding.py:35 templates/index.html:78
 #: terminal/backends/command/models.py:19
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:42
 #: terminal/notifications.py:88 terminal/notifications.py:136
@@ -340,25 +340,13 @@ msgstr "网域"
 msgid "Attrs"
 msgstr "属性"
 
-#: applications/models/application.py:268
+#: applications/models/application.py:223
+msgid "Can match application"
+msgstr "匹配应用"
+
+#: applications/models/application.py:271
 msgid "Application user"
 msgstr "应用用户"
-
-#: applications/models/application.py:274 rbac/ztree/tree_nodes.py:135
-msgid "Remote application"
-msgstr "远程应用"
-
-#: applications/models/application.py:280
-#: perms/models/application_permission.py:134 rbac/ztree/tree_nodes.py:138
-#: rbac/ztree/tree_nodes.py:192
-msgid "Database application"
-msgstr "数据库应用"
-
-#: applications/models/application.py:286
-#: perms/models/application_permission.py:145 rbac/ztree/tree_nodes.py:141
-#: rbac/ztree/tree_nodes.py:195
-msgid "Kubernetes"
-msgstr ""
 
 #: applications/serializers/application.py:70
 #: applications/serializers/application.py:100 assets/serializers/label.py:13
@@ -1392,7 +1380,7 @@ msgstr "日志审计"
 
 #: audits/models.py:27 audits/models.py:57
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:227 rbac/ztree/tree.py:161
+#: rbac/tree.py:238 rbac/ztree/tree.py:161
 #: users/templates/users/user_asset_permission.html:128
 #: users/templates/users/user_database_app_permission.html:111
 msgid "Delete"
@@ -1447,11 +1435,11 @@ msgstr "文件管理"
 
 #: audits/models.py:55
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:224 rbac/ztree/tree.py:158
+#: rbac/tree.py:235 rbac/ztree/tree.py:158
 msgid "Create"
 msgstr "创建"
 
-#: audits/models.py:56 rbac/tree.py:226 rbac/ztree/tree.py:160
+#: audits/models.py:56 rbac/tree.py:237 rbac/ztree/tree.py:160
 #: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
 #: users/templates/users/user_asset_permission.html:127
 #: users/templates/users/user_database_app_permission.html:110
@@ -2890,7 +2878,7 @@ msgstr "当前组织 ({}) 不能被删除"
 msgid "The organization have resource ({}) cannot be deleted"
 msgstr "组织存在资源 ({}) 不能被删除"
 
-#: orgs/apps.py:7 rbac/tree.py:97
+#: orgs/apps.py:7 rbac/tree.py:105
 msgid "App organizations"
 msgstr "组织管理"
 
@@ -2933,41 +2921,13 @@ msgstr "可以查看授权给用户的应用"
 msgid "Permed application"
 msgstr "授权的应用"
 
-#: perms/models/application_permission.py:115
+#: perms/models/application_permission.py:117
 msgid "Can view user apps"
 msgstr "可以查看用户授权的应用"
 
-#: perms/models/application_permission.py:116
+#: perms/models/application_permission.py:118
 msgid "Can view usergroup apps"
 msgstr "可以查看用户组授权的应用"
-
-#: perms/models/application_permission.py:123
-msgid "Permed remote application"
-msgstr "授权的远程应用"
-
-#: perms/models/application_permission.py:126
-msgid "Can view my remoteapp"
-msgstr "可以查看我的应用"
-
-#: perms/models/application_permission.py:127
-msgid "Can connect my remoteapp"
-msgstr "可以连接我的远程应用"
-
-#: perms/models/application_permission.py:137
-msgid "Can view my database application"
-msgstr "可以查看我的数据库应用"
-
-#: perms/models/application_permission.py:138
-msgid "Can connect my database application"
-msgstr "可以连接我的数据库应用"
-
-#: perms/models/application_permission.py:148
-msgid "Can view my kubernetes application"
-msgstr "可以查看我的Kubernetes"
-
-#: perms/models/application_permission.py:149
-msgid "Can connect my kubernetes application"
-msgstr "可以连接我的Kubernetes"
 
 #: perms/models/asset_permission.py:32
 msgid "Can view asset of permission to user"
@@ -3169,27 +3129,27 @@ msgstr "{} 至少有一个系统角色"
 msgid "RBAC"
 msgstr "RBAC"
 
-#: rbac/builtin.py:94
+#: rbac/builtin.py:87
 msgid "SystemAdmin"
 msgstr "系统管理员"
 
-#: rbac/builtin.py:97
+#: rbac/builtin.py:90
 msgid "SystemAuditor"
 msgstr "系统审计员"
 
-#: rbac/builtin.py:100
+#: rbac/builtin.py:93
 msgid "SystemComponent"
 msgstr "系统组件"
 
-#: rbac/builtin.py:106
+#: rbac/builtin.py:99
 msgid "OrgAdmin"
 msgstr "组织管理员"
 
-#: rbac/builtin.py:109
+#: rbac/builtin.py:102
 msgid "OrgAuditor"
 msgstr "组织审计员"
 
-#: rbac/builtin.py:112
+#: rbac/builtin.py:105
 msgid "OrgUser"
 msgstr "组织用户"
 
@@ -3347,15 +3307,15 @@ msgstr "我的资产"
 msgid "My apps"
 msgstr "我的应用"
 
-#: rbac/tree.py:98
+#: rbac/tree.py:106
 msgid "Ticket comment"
 msgstr "工单评论"
 
-#: rbac/tree.py:99
+#: rbac/tree.py:107
 msgid "Common setting"
 msgstr "一般设置"
 
-#: rbac/tree.py:225 rbac/ztree/tree.py:159
+#: rbac/tree.py:236 rbac/ztree/tree.py:159
 msgid "View"
 msgstr "查看"
 
@@ -3474,6 +3434,18 @@ msgstr "平台列表"
 #: rbac/ztree/tree_nodes.py:132
 msgid "Label management"
 msgstr "标签管理"
+
+#: rbac/ztree/tree_nodes.py:135
+msgid "Remote application"
+msgstr "远程应用"
+
+#: rbac/ztree/tree_nodes.py:138 rbac/ztree/tree_nodes.py:192
+msgid "Database application"
+msgstr "数据库应用"
+
+#: rbac/ztree/tree_nodes.py:141 rbac/ztree/tree_nodes.py:195
+msgid "Kubernetes"
+msgstr ""
 
 #: rbac/ztree/tree_nodes.py:144
 msgid "Asset account"
@@ -3651,23 +3623,23 @@ msgstr "测试成功"
 msgid "Test mail sent to {}, please check"
 msgstr "邮件已经发送{}, 请检查"
 
-#: settings/api/ldap.py:162
+#: settings/api/ldap.py:166
 msgid "Synchronization start, please wait."
 msgstr "同步开始，请稍等"
 
-#: settings/api/ldap.py:166
+#: settings/api/ldap.py:170
 msgid "Synchronization is running, please wait."
 msgstr "同步正在运行，请稍等"
 
-#: settings/api/ldap.py:171
+#: settings/api/ldap.py:175
 msgid "Synchronization error: {}"
 msgstr "同步错误: {}"
 
-#: settings/api/ldap.py:202
+#: settings/api/ldap.py:211
 msgid "Get ldap users is None"
 msgstr "获取 LDAP 用户为 None"
 
-#: settings/api/ldap.py:211
+#: settings/api/ldap.py:220
 msgid "Imported {} users successfully (Organization: {})"
 msgstr "成功导入 {} 个用户 ( 组织: {} )"
 
@@ -3688,24 +3660,36 @@ msgid "Can change auth setting"
 msgstr "认证设置"
 
 #: settings/models.py:145
+msgid "Can sys msg sub setting"
+msgstr "消息订阅设置"
+
+#: settings/models.py:146
 msgid "Can change sms setting"
 msgstr "短信设置"
 
-#: settings/models.py:146
+#: settings/models.py:147
 msgid "Can change security setting"
 msgstr "安全设置"
 
-#: settings/models.py:147
+#: settings/models.py:148
 msgid "Can change clean setting"
 msgstr "定期清理"
 
-#: settings/models.py:148
-msgid "Can change other setting"
-msgstr "其他设置"
-
 #: settings/models.py:149
-msgid "Can change terminal basic setting"
-msgstr "基本设置"
+msgid "Can change interface setting"
+msgstr "界面设置"
+
+#: settings/models.py:150
+msgid "Can change license setting"
+msgstr "许可证设置"
+
+#: settings/models.py:151
+msgid "Can change terminal setting"
+msgstr "终端设置"
+
+#: settings/models.py:152
+msgid "Can change other setting"
+msgstr "其它设置"
 
 #: settings/serializers/auth/base.py:10
 msgid "CAS Auth"
@@ -7103,6 +7087,30 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Permed remote application"
+#~ msgstr "授权的远程应用"
+
+#~ msgid "Can view my remoteapp"
+#~ msgstr "可以查看我的应用"
+
+#~ msgid "Can connect my remoteapp"
+#~ msgstr "可以连接我的远程应用"
+
+#~ msgid "Can view my database application"
+#~ msgstr "可以查看我的数据库应用"
+
+#~ msgid "Can connect my database application"
+#~ msgstr "可以连接我的数据库应用"
+
+#~ msgid "Can view my kubernetes application"
+#~ msgstr "可以查看我的Kubernetes"
+
+#~ msgid "Can connect my kubernetes application"
+#~ msgstr "可以连接我的Kubernetes"
+
+#~ msgid "Can change terminal basic setting"
+#~ msgstr "基本设置"
 
 #~ msgid "Cloud account"
 #~ msgstr "云账号"
