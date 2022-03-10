@@ -341,10 +341,17 @@ class RoleMixin:
         return RoleBinding.get_role_users(system_admin)
 
     @classmethod
-    def get_org_admins(cls, org=None):
+    def get_org_admins(cls):
         from rbac.models import Role, RoleBinding
         org_admin = Role.BuiltinRole.org_admin.get_role()
         return RoleBinding.get_role_users(org_admin)
+
+    @classmethod
+    def get_super_and_org_admins(cls):
+        super_admins = cls.get_super_admins()
+        org_admins = cls.get_org_admins()
+        admins = org_admins | super_admins
+        return admins.distinct()
 
     @staticmethod
     def filter_not_service_account(queryset):
