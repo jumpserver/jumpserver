@@ -72,7 +72,7 @@ special_pid_mapper = {
     'xpack.applicationchangeauthplanexecution': 'app_change_plan_node',
     'xpack.applicationchangeauthplantask': 'app_change_plan_node',
     'xpack.changeauthplan': 'asset_change_plan_node',
-    'xpack.changeauthplanexecution': 'asset_change_plan_node',
+    'xpack.changeauthplanexecution': 'gather_account_node',
     'xpack.changeauthplantask': 'asset_change_plan_node',
     "assets.gathereduser": "gather_account_node",
     'xpack.gatherusertask': 'gather_account_node',
@@ -91,6 +91,12 @@ special_pid_mapper = {
     'perms.view_myapps': 'my_apps',
     'perms.connect_myapps': 'my_apps',
     'ops.commandexecution': 'view_workspace',
+    "perms.view_mykubernetsapp": "my_apps",
+    "perms.connect_mykubernetsapp": "my_apps",
+    "perms.view_myremoteapp": "my_apps",
+    "perms.connect_myremoteapp": "my_apps",
+    "perms.view_mydatabaseapp": "my_apps",
+    "perms.connect_mydatabaseapp": "my_apps",
 }
 
 verbose_name_mapper = {
@@ -100,7 +106,9 @@ verbose_name_mapper = {
 }
 
 xpack_nodes = [
-    'xpack', 'tickets',
+    'xpack', 'tickets', 'applications.remoteapp',
+    "assets.accountbackupplan", "assets.accountbackupplanexecution",
+    "rbac.orgrole", "rbac.orgrolebinding",
 ]
 
 
