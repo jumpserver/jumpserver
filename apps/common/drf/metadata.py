@@ -34,9 +34,12 @@ class SimpleMetadataWithFilters(SimpleMetadata):
         actions = {}
         for method in self.methods & set(view.allowed_methods):
             if hasattr(view, 'action_map'):
+                view.raw_action = view.action
                 view.action = view.action_map.get(method.lower(), view.action)
 
             view.request = clone_request(request, method)
+            # 保留原生方法,如OPTIONS
+            view.request.raw_method = request.method
             try:
                 # Test global permissions
                 if hasattr(view, 'check_permissions'):
