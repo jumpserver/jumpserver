@@ -98,7 +98,14 @@ special_pid_mapper = {
     "perms.view_mydatabaseapp": "my_apps",
     "perms.connect_mydatabaseapp": "my_apps",
     "xpack.interface": "view_setting",
-    "settings.change_terminal": "terminal_node"
+    "settings.change_terminal": "terminal_node",
+    "settings.view_setting": "view_setting",
+    "settings.change_setting": "view_setting",
+    "rbac.view_console": "view_console",
+    "rbac.view_audit": "view_audit",
+    "rbac.view_workspace": "view_workspace",
+    "rbac.view_webterminal": "view_workspace",
+    "rbac.view_filemanager": "view_workspace",
 }
 
 verbose_name_mapper = {
@@ -115,6 +122,32 @@ xpack_nodes = [
 ]
 
 
+def _sort_action(node):
+    value = 0
+
+    if 'view' in node.title:
+        value += 2
+    elif 'add' in node.title:
+        value += 4
+    elif 'change' in node.title:
+        value += 6
+    elif 'delete' in node.title:
+        value += 8
+    else:
+        value += 10
+    return value
+
+
+def sort_nodes(node):
+    value = 0
+
+    if node.isParent:
+        value += 50
+    else:
+        value += _sort_action(node)
+    return value
+
+
 class PermissionTreeUtil:
     get_permissions: Callable
 
@@ -122,7 +155,7 @@ class PermissionTreeUtil:
         self.permissions = self.prefetch_permissions(permissions)
         self.all_permissions = self.prefetch_permissions(
             Permission.get_permissions(scope)
-        ).order_by('-codename')
+        )
         self.check_disabled = check_disabled
         self.total_counts = defaultdict(int)
         self.checked_counts = defaultdict(int)
@@ -323,6 +356,8 @@ class PermissionTreeUtil:
         if not node_data.get('title'):
             node_data['title'] = node_data['name']
         node = TreeNode(**node_data)
+        if settings.DEBUG:
+            node.name += ('-' + node.id)
         node.name += f'({checked_count}/{total_count})'
         return node
 
@@ -367,12 +402,12 @@ class PermissionTreeUtil:
         return nodes
 
     def create_tree_nodes(self):
-        nodes = [self._create_root_tree_node()]
-        perms_nodes = self._create_perms_nodes()
-        models_nodes = self._create_models_nodes()
-        apps_nodes = self.create_apps_nodes()
-        extra_nodes = self._create_extra_nodes()
-        views_nodes = self._create_views_node()
+        nodes = self._create_perms_nodes()
+        nodes += self._create_models_nodes()
+        nodes += self.create_apps_nodes()
+        nodes += self._create_extra_nodes()
+        nodes += self._create_views_node()
+        nodes += [self._create_root_tree_node()]
 
-        nodes += views_nodes + apps_nodes + models_nodes + perms_nodes + extra_nodes
+        nodes.sort(key=sort_nodes)
         return nodes
