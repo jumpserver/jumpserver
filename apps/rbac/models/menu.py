@@ -17,5 +17,4 @@ class MenuPermission(models.Model):
             ('view_workspace', _('Can view workspace view')),
             ('view_webterminal', _('Can view web terminal')),
             ('view_filemanager', _('Can view file manager')),
-            ('view_dashboard', _('Can view dashboard')),
         ]
