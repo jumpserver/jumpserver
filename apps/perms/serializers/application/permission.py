@@ -5,7 +5,7 @@ from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-from perms.models import ApplicationPermission
+from perms.models import ApplicationPermission, Action
 from ..base import ActionsField, BasePermissionSerializer
 
 __all__ = [
