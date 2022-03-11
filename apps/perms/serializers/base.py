@@ -39,7 +39,13 @@ class BasePermissionSerializer(BulkOrgResourceModelSerializer):
         choices = actions._choices
         choices = self._filter_actions_choices(choices)
         actions._choices = choices
-        actions.default = list(choices.keys())
+        method = getattr(self.context['request'], 'raw_method', '')
+        if method.lower() == 'options':
+            default = list(choices.keys())
+        else:
+            choices.pop('all', None)
+            default = Action.choices_to_value(list(choices.keys()))
+        actions.default = default
 
     def _filter_actions_choices(self, choices):
         return choices
