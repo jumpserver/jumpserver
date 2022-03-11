@@ -305,7 +305,7 @@ class PermissionTreeUtil:
             # name 要特殊处理，解决 i18n 问题
             name = self._get_permission_name(p, content_types_name_mapper)
             if settings.DEBUG:
-                name += '({})'.format(p.app_label_codename)
+                name += '[{}]'.format(p.app_label_codename)
 
             title = p.app_label_codename
             pid = model_id
@@ -353,9 +353,10 @@ class PermissionTreeUtil:
             },
             **data
         }
-        if not node_data.get('title'):
-            node_data['title'] = node_data['name']
+        node_data['title'] = node_data['id']
         node = TreeNode(**node_data)
+        if settings.DEBUG:
+            node.name += ('[' + node.id + ']')
         if settings.DEBUG:
             node.name += ('-' + node.id)
         node.name += f'({checked_count}/{total_count})'
