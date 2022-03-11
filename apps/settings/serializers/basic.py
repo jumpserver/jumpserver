@@ -41,7 +41,6 @@ class BasicSettingSerializer(serializers.Serializer):
         required=False, max_length=1024, allow_blank=True, allow_null=True, label=_("Global organization name"),
         help_text=_('The name of global organization to display')
     )
-    TICKETS_ENABLED = serializers.BooleanField(required=False, default=True, label=_("Enable tickets"))
     ANNOUNCEMENT_ENABLED = serializers.BooleanField(label=_('Enable announcement'), default=True)
     ANNOUNCEMENT = AnnouncementSerializer(label=_("Announcement"))
 
