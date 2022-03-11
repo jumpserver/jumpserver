@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+from django.db.models import Q
 from django.db.models.signals import m2m_changed
 from django.dispatch import receiver
 
@@ -8,7 +9,7 @@ from assets.models import SystemUser
 from common.utils import get_logger
 from common.decorator import on_transaction_commit
 from common.exceptions import M2MReverseNotAllowed
-from common.const.signals import POST_ADD
+from common.const.signals import POST_ADD, POST_REMOVE
 from perms.models import AssetPermission
 
 
@@ -97,6 +98,31 @@ def on_asset_permission_system_users_changed(instance, action, reverse, **kwargs
             groups = instance.user_groups.all().values_list('id', flat=True)
             system_user.groups.add(*tuple(groups))
             system_user.users.add(*tuple(users))
+
+
+@receiver(m2m_changed, sender=AssetPermission.users.through)
+@on_transaction_commit
+def on_remove_user_from_asset_permission(instance, pk_set, action, **kwargs):
+    """
+    当授权规则移除用户时，移除授权规则关联的动态用户关联的用户
+    防止同送的时候再次推送
+
+    pk_set: [user_id, user_id]
+    """
+    if action != POST_REMOVE:
+        return
+    instance: AssetPermission
+    system_user_ids = instance.system_users.all().values_list('id')
+    q = Q()
+    for system_user_id in system_user_ids:
+        for user_id in pk_set:
+            data = {
+                'systemuser_id': system_user_id,
+                'user_id': user_id
+            }
+            q |= Q(**data)
+            print('maybe remove system-user-user: ', data)
+    SystemUser.users.through.objects.filter(q).delete()
 
 
 @receiver(m2m_changed, sender=AssetPermission.users.through)
