@@ -5,12 +5,13 @@ from django.db.models import F
 
 from common.drf.api import JMSBulkRelationModelViewSet
 from .. import serializers
-from ..models import User
+from ..models import User, UserGroup
 
 __all__ = ['UserUserGroupRelationViewSet']
 
 
 class UserUserGroupRelationViewSet(JMSBulkRelationModelViewSet):
+    perm_model = UserGroup
     filterset_fields = ('user', 'usergroup')
     search_fields = filterset_fields
     serializer_class = serializers.UserUserGroupRelationSerializer
