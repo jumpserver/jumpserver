@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 #
 import os
+import ssl
+
+from .base import REDIS_SSL_CA_CERTS, REDIS_SSL_CERTFILE, REDIS_SSL_KEYFILE
 from ..const import CONFIG, PROJECT_DIR
 
 REST_FRAMEWORK = {
@@ -82,16 +85,24 @@ BOOTSTRAP3 = {
 
 
 # Django channels support websocket
-CHANNEL_REDIS = "redis://:{}@{}:{}/{}".format(
-    CONFIG.REDIS_PASSWORD, CONFIG.REDIS_HOST, CONFIG.REDIS_PORT,
-    CONFIG.REDIS_DB_WS,
-)
+if not CONFIG.REDIS_USE_SSL:
+    context = None
+else:
+    context = ssl.SSLContext()
+    context.check_hostname = False
+    context.load_verify_locations(REDIS_SSL_CA_CERTS)
+    context.load_cert_chain(REDIS_SSL_CERTFILE, REDIS_SSL_KEYFILE)
 
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [CHANNEL_REDIS],
+            "hosts": [{
+                'address': (CONFIG.REDIS_HOST, CONFIG.REDIS_PORT),
+                'db': CONFIG.REDIS_DB_WS,
+                'password': CONFIG.REDIS_PASSWORD,
+                'ssl':  context
+            }],
         },
     },
 }
@@ -102,7 +113,8 @@ ASGI_APPLICATION = 'jumpserver.routing.application'
 CELERY_LOG_DIR = os.path.join(PROJECT_DIR, 'data', 'celery')
 
 # Celery using redis as broker
-CELERY_BROKER_URL = 'redis://:%(password)s@%(host)s:%(port)s/%(db)s' % {
+CELERY_BROKER_URL = '%(protocol)s://:%(password)s@%(host)s:%(port)s/%(db)s' % {
+    'protocol': 'rediss' if CONFIG.REDIS_USE_SSL else 'redis',
     'password': CONFIG.REDIS_PASSWORD,
     'host': CONFIG.REDIS_HOST,
     'port': CONFIG.REDIS_PORT,
@@ -125,6 +137,13 @@ CELERY_WORKER_REDIRECT_STDOUTS_LEVEL = "INFO"
 # CELERY_WORKER_HIJACK_ROOT_LOGGER = True
 # CELERY_WORKER_MAX_TASKS_PER_CHILD = 40
 CELERY_TASK_SOFT_TIME_LIMIT = 3600
+if CONFIG.REDIS_USE_SSL:
+    CELERY_BROKER_USE_SSL = CELERY_REDIS_BACKEND_USE_SSL = {
+        'ssl_cert_reqs': 'required',
+        'ssl_ca_certs': REDIS_SSL_CA_CERTS,
+        'ssl_certfile': REDIS_SSL_CERTFILE,
+        'ssl_keyfile': REDIS_SSL_KEYFILE
+    }
 
 ANSIBLE_LOG_DIR = os.path.join(PROJECT_DIR, 'data', 'ansible')
 

@@ -135,10 +135,13 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE = CONFIG.SESSION_EXPIRE_AT_BROWSER_CLOSE_F
 SESSION_SAVE_EVERY_REQUEST = CONFIG.SESSION_SAVE_EVERY_REQUEST
 SESSION_ENGINE = 'jumpserver.rewriting.session'
 SESSION_REDIS = {
-    'host': CONFIG.REDIS_HOST,
-    'port': CONFIG.REDIS_PORT,
-    'password': CONFIG.REDIS_PASSWORD,
-    'db': CONFIG.REDIS_DB_SESSION,
+    'url': '%(protocol)s://:%(password)s@%(host)s:%(port)s/%(db)s' % {
+        'protocol': 'rediss' if CONFIG.REDIS_USE_SSL else 'redis',
+        'password': CONFIG.REDIS_PASSWORD,
+        'host': CONFIG.REDIS_HOST,
+        'port': CONFIG.REDIS_PORT,
+        'db': CONFIG.REDIS_DB_CACHE,
+    },
     'prefix': 'auth_session',
     'socket_timeout': 1,
     'retry_on_timeout': False
@@ -246,18 +249,28 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o755
 
 # Cache use redis
+REDIS_SSL_KEYFILE = os.path.join(PROJECT_DIR, 'data', 'certs', 'redis_client.key')
+REDIS_SSL_CERTFILE = os.path.join(PROJECT_DIR, 'data', 'certs', 'redis_client.crt')
+REDIS_SSL_CA_CERTS = os.path.join(PROJECT_DIR, 'data', 'certs', 'redis_ca.crt')
+
 CACHES = {
     'default': {
         # 'BACKEND': 'redis_cache.RedisCache',
         'BACKEND': 'redis_lock.django_cache.RedisCache',
-        'LOCATION': 'redis://:%(password)s@%(host)s:%(port)s/%(db)s' % {
+        'LOCATION': '%(protocol)s://:%(password)s@%(host)s:%(port)s/%(db)s' % {
+            'protocol': 'rediss' if CONFIG.REDIS_USE_SSL else 'redis',
             'password': CONFIG.REDIS_PASSWORD,
             'host': CONFIG.REDIS_HOST,
             'port': CONFIG.REDIS_PORT,
             'db': CONFIG.REDIS_DB_CACHE,
         },
         'OPTIONS': {
-            "REDIS_CLIENT_KWARGS": {"health_check_interval": 30}
+            "REDIS_CLIENT_KWARGS": {"health_check_interval": 30},
+            "CONNECTION_POOL_KWARGS": {
+                "ssl_keyfile": REDIS_SSL_KEYFILE,
+                "ssl_certfile": REDIS_SSL_CERTFILE,
+                "ssl_ca_certs": REDIS_SSL_CA_CERTS
+            } if CONFIG.REDIS_USE_SSL else {}
         }
     }
 }

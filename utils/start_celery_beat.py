@@ -18,7 +18,20 @@ os.environ.setdefault('PYTHONOPTIMIZE', '1')
 if os.getuid() == 0:
     os.environ.setdefault('C_FORCE_ROOT', '1')
 
-redis = Redis(host=CONFIG.REDIS_HOST, port=CONFIG.REDIS_PORT, password=CONFIG.REDIS_PASSWORD)
+REDIS_SSL_KEYFILE = os.path.join(BASE_DIR, 'data', 'certs', 'redis_client.key')
+REDIS_SSL_CERTFILE = os.path.join(BASE_DIR, 'data', 'certs', 'redis_client.crt')
+REDIS_SSL_CA_CERTS = os.path.join(BASE_DIR, 'data', 'certs', 'redis_ca.crt')
+
+params = {
+    'host': CONFIG.REDIS_HOST,
+    'port': CONFIG.REDIS_PORT,
+    'password': CONFIG.REDIS_PASSWORD,
+    "ssl": CONFIG.REDIS_USE_SSL,
+    "ssl_keyfile": REDIS_SSL_KEYFILE,
+    "ssl_certfile": REDIS_SSL_CERTFILE,
+    "ssl_ca_certs": REDIS_SSL_CA_CERTS
+}
+redis = Redis(**params)
 scheduler = "django_celery_beat.schedulers:DatabaseScheduler"
 
 cmd = [
