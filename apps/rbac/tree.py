@@ -357,6 +357,8 @@ class PermissionTreeUtil:
         node = TreeNode(**node_data)
         if settings.DEBUG:
             node.name += ('[' + node.id + ']')
+        if settings.DEBUG:
+            node.name += ('-' + node.id)
         node.name += f'({checked_count}/{total_count})'
         return node
 

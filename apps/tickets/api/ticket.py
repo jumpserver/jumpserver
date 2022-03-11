@@ -19,7 +19,6 @@ __all__ = ['TicketViewSet', 'TicketFlowViewSet']
 
 
 class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
-    permission_classes = (IsValidUser,)
     serializer_class = serializers.TicketDisplaySerializer
     serializer_classes = {
         'open': serializers.TicketApplySerializer,
