@@ -23,6 +23,10 @@ exclude_permissions = (
     ('common', 'setting', '*', '*'),
 
     ('authentication', 'privatetoken', '*', '*'),
+    ('authentication', 'accesskey', 'change,delete', 'accesskey'),
+    ('authentication', 'connectiontoken', 'change,delete', 'connectiontoken'),
+    ('authentication', 'ssotoken', 'change,delete', 'ssotoken'),
+    ('authentication', 'superconnectiontoken', 'change,delete', 'superconnectiontoken'),
     ('users', 'userpasswordhistory', '*', '*'),
     ('applications', 'applicationuser', '*', '*'),
     ('applications', 'historicalaccount', '*', '*'),
@@ -58,6 +62,7 @@ exclude_permissions = (
     ('audits', 'ftplog', 'change,delete', 'ftplog'),
     ('tickets', 'ticketflow', 'add,delete', 'ticketflow'),
     ('tickets', 'comment', 'change,delete', 'comment'),
+    ('tickets', 'ticket', 'delete', 'ticket'),
     ('tickets', 'ticketstep', '*', '*'),
     ('tickets', 'approvalrule', '*', '*'),
     ('xpack', 'interface', '*', '*'),
@@ -75,6 +80,7 @@ exclude_permissions = (
 
 
 only_system_permissions = (
+    ('assets', 'platform', '*', '*'),
     ('users', 'user', 'delete', 'user'),
     ('rbac', 'role', 'delete,add,change', 'role'),
     ('rbac', 'systemrole', '*', '*'),
