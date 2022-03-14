@@ -11,7 +11,6 @@ exclude_permissions = (
     # ('App', 'Model', 'Action', 'Resource') Model 和 Resource 可能不同
     # users.add_user
     ('auth', '*', '*', '*'),
-    ('authentication', 'loginconfirmsetting', '*', '*'),
     ('captcha', '*', '*', '*'),
     ('contenttypes', '*', '*', '*'),
     ('django_cas_ng', '*', '*', '*'),
@@ -38,9 +37,6 @@ exclude_permissions = (
     ('assets', 'assetuser', '*', '*'),
     ('assets', 'gathereduser', 'add,delete,change', 'gathereduser'),
     ('assets', 'accountbackupplanexecution', 'delete,change', 'accountbackupplanexecution'),
-    ('perms', 'databaseapppermission', '*', '*'),
-    ('perms', 'k8sapppermission', '*', '*'),
-    ('perms', 'remoteapppermission', '*', '*'),
     ('perms', 'userassetgrantedtreenoderelation', '*', '*'),
     ('perms', 'usergrantedmappingnode', '*', '*'),
     ('perms', 'permnode', '*', '*'),
