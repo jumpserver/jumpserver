@@ -123,28 +123,30 @@ xpack_nodes = [
 
 
 def _sort_action(node):
-    value = 0
+    if node.isParent:
+        return ['zz', 0]
 
-    if 'view' in node.title:
-        value += 2
-    elif 'add' in node.title:
-        value += 4
-    elif 'change' in node.title:
-        value += 6
-    elif 'delete' in node.title:
-        value += 8
-    else:
-        value += 10
-    return value
+    action_resource = node.title.split('.')[-1]
+    action, resource = action_resource.split('_', 2)
+    action_value_mapper = {
+        'view': 2,
+        'add': 4,
+        'change': 6,
+        'delete': 8
+    }
+    v = action_value_mapper.get(action, 10)
+    return [resource, v]
 
 
 def sort_nodes(node):
-    value = 0
+    value = []
 
     if node.isParent:
-        value += 50
+        value.append(50)
     else:
-        value += _sort_action(node)
+        value.append(0)
+
+    value.extend(_sort_action(node))
     return value
 
 
