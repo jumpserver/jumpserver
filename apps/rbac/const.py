@@ -49,7 +49,7 @@ exclude_permissions = (
     ('rbac', 'permission', 'add,delete,change', 'permission'),
     ('rbac', 'rolebinding', '*', '*'),
     ('rbac', 'role', '*', '*'),
-    ('ops', 'adhoc', '*', '*'),
+    ('ops', 'adhoc', 'delete,change', '*'),
     ('ops', 'adhocexecution', 'delete,change', '*'),
     ('ops', 'celerytask', '*', '*'),
     ('ops', 'task', 'add,change', 'task'),
