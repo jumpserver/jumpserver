@@ -14,6 +14,10 @@ class ContentType(DjangoContentType):
     class Meta:
         proxy = True
 
+    @property
+    def app_model(self):
+        return '%s.%s' % (self.app_label, self.model)
+
 
 class Permission(DjangoPermission):
     """ 权限类 """
