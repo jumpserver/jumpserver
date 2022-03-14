@@ -11,6 +11,7 @@ app_name = 'applications'
 router = BulkRouter()
 router.register(r'applications', api.ApplicationViewSet, 'application')
 router.register(r'accounts', api.ApplicationAccountViewSet, 'application-account')
+router.register(r'system-users-apps-relations', api.SystemUserAppRelationViewSet, 'system-users-apps-relation')
 router.register(r'account-secrets', api.ApplicationAccountSecretViewSet, 'application-account-secret')
 
 

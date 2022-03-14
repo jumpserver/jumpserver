@@ -265,6 +265,7 @@ class PermissionTreeUtil:
 
     @staticmethod
     def _get_permission_name(p, content_types_name_mapper):
+        p: Permission
         code_name = p.codename
         action_mapper = {
             'add': ugettext('Create'),
@@ -287,8 +288,9 @@ class PermissionTreeUtil:
             name = action_mapper['delete']
             ct = code_name.replace('delete_', '')
 
-        if ct in content_types_name_mapper:
-            name += content_types_name_mapper[ct]
+        app_model = '%s.%s' % (p.content_type.app_label, ct)
+        if app_model in content_types_name_mapper:
+            name += content_types_name_mapper[app_model]
         else:
             name = gettext(p.name)
             name = name.replace('Can ', '').replace('可以', '')
@@ -298,7 +300,7 @@ class PermissionTreeUtil:
         permissions_id = self.permissions.values_list('id', flat=True)
         nodes = []
         content_types = ContentType.objects.all()
-        content_types_name_mapper = {ct.model: ct.name for ct in content_types}
+        content_types_name_mapper = {ct.app_model: ct.name for ct in content_types}
 
         for p in self.all_permissions:
             model_id = f'{p.app}.{p.model}'

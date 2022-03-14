@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='account',
-            options={'permissions': [('view_applicationaccountsecret', 'Can view application account secret'), ('change_appplicationaccountsecret', 'Can view application account secret')], 'verbose_name': 'Application account'},
+            options={'permissions': [('view_applicationaccountsecret', 'Can view application account secret'), ('change_appplicationaccountsecret', 'Can change application account secret')], 'verbose_name': 'Application account'},
         ),
         migrations.AlterModelOptions(
             name='applicationuser',
