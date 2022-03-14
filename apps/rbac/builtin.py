@@ -22,6 +22,7 @@ auditor_perms = user_perms + (
     ('terminal', 'sessionreplay', 'view,download', 'sessionreplay'),
     ('terminal', 'session', '*', '*'),
     ('terminal', 'command', '*', '*'),
+    ('ops', 'commandexecution', 'view', 'commandexecution')
 )
 
 

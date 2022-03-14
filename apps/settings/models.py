@@ -139,7 +139,6 @@ class Setting(models.Model):
         db_table = "settings_setting"
         verbose_name = _("System setting")
         permissions = [
-            ('change_basic', _('Can change basic setting')),
             ('change_email', _('Can change email setting')),
             ('change_auth', _('Can change auth setting')),
             ('change_systemmsgsubscription', _('Can sys msg sub setting')),

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from perms.models import Action
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
+from rest_framework.fields import empty
 
 __all__ = ['ActionsDisplayField', 'ActionsField', 'BasePermissionSerializer']
 
@@ -9,6 +10,12 @@ class ActionsField(serializers.MultipleChoiceField):
     def __init__(self, *args, **kwargs):
         kwargs['choices'] = Action.CHOICES
         super().__init__(*args, **kwargs)
+
+    def run_validation(self, data=empty):
+        data = super(ActionsField, self).run_validation()
+        if isinstance(data, list):
+            data = Action.choices_to_value(value=data)
+        return data
 
     def to_representation(self, value):
         return Action.value_to_choices(value)
