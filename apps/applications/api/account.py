@@ -7,6 +7,7 @@ from django.db.models import F, Q
 from common.drf.filters import BaseFilterSet
 from common.drf.api import JMSBulkModelViewSet
 from rbac.permissions import RBACPermission
+from assets.models import SystemUser
 from ..models import Account
 from ..hands import NeedMFAVerify
 from .. import serializers
@@ -47,6 +48,10 @@ class ApplicationAccountViewSet(JMSBulkModelViewSet):
     def get_queryset(self):
         queryset = Account.get_queryset()
         return queryset
+
+
+class SystemUserAppRelationViewSet(ApplicationAccountViewSet):
+    perm_model = SystemUser
 
 
 class ApplicationAccountSecretViewSet(ApplicationAccountViewSet):
