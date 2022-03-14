@@ -10,14 +10,14 @@ from .signals import (
     saml2_user_authenticated, saml2_user_authentication_failed,
     saml2_create_or_update_user
 )
-from ..base import JMSBaseAuthBackend
+from ..base import JMSModelBackend
 
 __all__ = ['SAML2Backend']
 
 logger = get_logger(__file__)
 
 
-class SAML2Backend(JMSBaseAuthBackend):
+class SAML2Backend(JMSModelBackend):
     @staticmethod
     def is_enabled():
         return settings.AUTH_SAML2
