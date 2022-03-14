@@ -72,6 +72,8 @@ exclude_permissions = (
     ('xpack', 'license', '*', '*'),
     ('xpack', 'syncinstancedetail', 'add,delete,change', 'syncinstancedetail'),
     ('xpack', 'syncinstancetaskexecution', 'add,delete,change', 'syncinstancetaskexecution'),
+    ('xpack', 'changeauthplanexecution', 'add,delete,change', 'changeauthplanexecution'),
+    ('xpack', 'changeauthplantask', 'add,delete', 'changeauthplantask'),
     ('common', 'permission', 'add,delete,view,change', 'permission'),
     ('terminal', 'command', 'delete,change', 'command'),
     ('terminal', 'status', 'delete,change', 'status'),

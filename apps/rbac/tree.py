@@ -72,7 +72,7 @@ special_pid_mapper = {
     'xpack.applicationchangeauthplanexecution': 'app_change_plan_node',
     'xpack.applicationchangeauthplantask': 'app_change_plan_node',
     'xpack.changeauthplan': 'asset_change_plan_node',
-    'xpack.changeauthplanexecution': 'gather_account_node',
+    'xpack.changeauthplanexecution': 'asset_change_plan_node',
     'xpack.changeauthplantask': 'asset_change_plan_node',
     "assets.gathereduser": "gather_account_node",
     'xpack.gatherusertask': 'gather_account_node',
