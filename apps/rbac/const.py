@@ -36,6 +36,8 @@ exclude_permissions = (
     ('assets', 'favoriteasset', '*', '*'),
     ('assets', 'historicalauthbook', '*', '*'),
     ('assets', 'assetuser', '*', '*'),
+    ('assets', 'gathereduser', 'add,delete,change', 'gathereduser'),
+    ('assets', 'accountbackupplanexecution', 'delete,change', 'accountbackupplanexecution'),
     ('perms', 'databaseapppermission', '*', '*'),
     ('perms', 'k8sapppermission', '*', '*'),
     ('perms', 'remoteapppermission', '*', '*'),

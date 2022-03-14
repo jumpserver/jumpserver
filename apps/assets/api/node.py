@@ -30,7 +30,6 @@ from .. import serializers
 from .mixin import SerializeToTreeNodeMixin
 from assets.locks import NodeAddChildrenLock
 
-
 logger = get_logger(__file__)
 __all__ = [
     'NodeViewSet', 'NodeChildrenApi', 'NodeAssetsApi',
@@ -44,7 +43,7 @@ __all__ = [
 class NodeViewSet(SuggestionMixin, OrgBulkModelViewSet):
     model = Node
     filterset_fields = ('value', 'key', 'id')
-    search_fields = ('value', )
+    search_fields = ('value',)
     serializer_class = serializers.NodeSerializer
     rbac_perms = {
         'match': 'assets.match_node',
@@ -298,8 +297,22 @@ class MoveAssetsToNodeApi(generics.UpdateAPIView):
 
 
 class NodeTaskCreateApi(generics.CreateAPIView):
+    perm_model = Asset
     model = Node
     serializer_class = serializers.NodeTaskSerializer
+
+    def check_permissions(self, request):
+        action = request.data.get('action')
+        action_perm_require = {
+            'refresh': 'assets.refresh_assethardwareinfo',
+            'test': 'assets.test_assetconnectivity'
+        }
+        perm_required = action_perm_require.get(action)
+        has = self.request.user.has_perm(perm_required)
+
+        if not has:
+            self.permission_denied(request)
+
     def get_object(self):
         node_id = self.kwargs.get('pk')
         node = get_object_or_none(self.model, id=node_id)
@@ -331,4 +344,3 @@ class NodeTaskCreateApi(generics.CreateAPIView):
         else:
             task = test_node_assets_connectivity_manual.delay(node)
         self.set_serializer_data(serializer, task)
-
