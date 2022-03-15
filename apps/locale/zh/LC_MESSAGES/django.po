@@ -310,8 +310,6 @@ msgid "Can view application account secret"
 msgstr "可以查看应用账号密码"
 
 #: applications/models/account.py:27
-#, fuzzy
-#| msgid "Can view application account secret"
 msgid "Can change application account secret"
 msgstr "可以查看应用账号密码"
 
