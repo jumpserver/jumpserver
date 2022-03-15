@@ -3,6 +3,7 @@ from urllib.parse import urlencode, parse_qsl
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
 from orgs.mixins.models import OrgModelMixin
 from common.mixins import CommonModelMixin
@@ -79,6 +80,8 @@ class ApplicationTreeNodeMixin:
         nodes = []
         categories = const.AppType.category_types_mapper().keys()
         for category in categories:
+            if not settings.XPACK_ENABLED and const.AppCategory.is_xpack(category):
+                continue
             i = cls.create_tree_id(pid, 'category', category.value)
             node = cls.create_choice_node(
                 category, i, pid=pid, tp='category',
@@ -97,6 +100,8 @@ class ApplicationTreeNodeMixin:
         type_category_mapper = const.AppType.type_category_mapper()
         types = const.AppType.type_category_mapper().keys()
         for tp in types:
+            if not settings.XPACK_ENABLED and const.AppType.is_xpack(tp):
+                continue
             category = type_category_mapper.get(tp)
             pid = cls.create_tree_id(pid, 'category', category.value)
             i = cls.create_tree_id(pid, 'type', tp.value)
@@ -155,6 +160,8 @@ class ApplicationTreeNodeMixin:
 
         # 应用的节点
         for app in queryset:
+            if not settings.XPACK_ENABLED and const.AppType.is_xpack(app.type):
+                continue
             node = app.as_tree_node(root_node.id)
             tree_nodes.append(node)
         return tree_nodes
