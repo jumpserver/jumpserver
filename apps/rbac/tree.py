@@ -116,7 +116,8 @@ xpack_nodes = [
     'xpack', 'tickets', 'applications.remoteapp',
     "assets.accountbackupplan", "assets.accountbackupplanexecution",
     "rbac.orgrole", "rbac.orgrolebinding",
-    "settings.change_interface",
+    "settings.change_interface", 'assets.gathereduser',
+    'gather_account_node'
 ]
 
 
