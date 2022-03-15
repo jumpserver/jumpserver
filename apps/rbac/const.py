@@ -55,7 +55,7 @@ exclude_permissions = (
     ('ops', 'task', 'add,change', 'task'),
     ('ops', 'commandexecution', 'delete,change', 'commandexecution'),
     ('orgs', 'organizationmember', '*', '*'),
-    ('settings', 'setting', 'add,delete', 'setting'),
+    ('settings', 'setting', 'add,change,delete', 'setting'),
     ('audits', 'operatelog', 'add,delete,change', 'operatelog'),
     ('audits', 'passwordchangelog', 'add,change,delete', 'passwordchangelog'),
     ('audits', 'userloginlog', 'add,change,delete,change', 'userloginlog'),

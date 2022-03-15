@@ -16,7 +16,7 @@ from .. import serializers
 class TencentSMSTestingAPI(GenericAPIView):
     serializer_class = serializers.TencentSMSSettingSerializer
     rbac_perms = {
-        'POST': 'settings.change_setting'
+        'POST': 'settings.change_sms'
     }
 
     def post(self, request):

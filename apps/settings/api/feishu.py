@@ -13,7 +13,7 @@ from .. import serializers
 class FeiShuTestingAPI(GenericAPIView):
     serializer_class = serializers.FeiShuSettingSerializer
     rbac_perms = {
-        'POST': 'settings.change_setting'
+        'POST': 'settings.change_auth'
     }
 
     def post(self, request):
