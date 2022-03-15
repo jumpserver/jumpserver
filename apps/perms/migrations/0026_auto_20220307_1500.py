@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'verbose_name': 'Permed asset',
-                'permissions': [('view_myassets', 'Can view my assets'), ('connect_myassets', 'Can connect my assets'), ('view_userassets', 'Can view user assets'), ('view_usergroupassets', 'Can view usergroup assets')],
+                'permissions': [('view_myassets', 'Can view my assets'), ('view_userassets', 'Can view user assets'), ('view_usergroupassets', 'Can view usergroup assets')],
                 'proxy': True,
                 'indexes': [],
                 'constraints': [],
