@@ -6,7 +6,6 @@ import os
 from django.test import TestCase
 
 from ops.models import Task, AdHoc
-from ops.utils import run_adhoc_object
 
 
 class TestRunAdHoc(TestCase):

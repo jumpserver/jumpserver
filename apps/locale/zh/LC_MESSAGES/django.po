@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-14 15:58+0800\n"
+"POT-Creation-Date: 2022-03-15 16:44+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -305,8 +305,14 @@ msgstr "版本"
 msgid "Application account"
 msgstr "应用账号"
 
-#: applications/models/account.py:26 applications/models/account.py:27
+#: applications/models/account.py:26
 msgid "Can view application account secret"
+msgstr "可以查看应用账号密码"
+
+#: applications/models/account.py:27
+#, fuzzy
+#| msgid "Can view application account secret"
+msgid "Can change application account secret"
 msgstr "可以查看应用账号密码"
 
 #: applications/models/application.py:204
@@ -2679,7 +2685,7 @@ msgstr "站内信"
 msgid "Waiting task start"
 msgstr "等待任务开始"
 
-#: ops/api/command.py:61
+#: ops/api/command.py:56
 msgid "Not has host {} permission"
 msgstr "没有该主机 {} 权限"
 
@@ -2767,7 +2773,7 @@ msgstr "创建者"
 
 #: ops/models/adhoc.py:243
 msgid "AdHoc"
-msgstr ""
+msgstr "任务各版本"
 
 #: ops/models/adhoc.py:252
 msgid "Task display"
@@ -2800,7 +2806,7 @@ msgstr "汇总"
 
 #: ops/models/adhoc.py:339
 msgid "AdHoc execution"
-msgstr "命令执行"
+msgstr "任务执行历史"
 
 #: ops/models/command.py:32
 msgid "Date finished"
@@ -2874,7 +2880,7 @@ msgstr "当前组织 ({}) 不能被删除"
 msgid "The organization have resource ({}) cannot be deleted"
 msgstr "组织存在资源 ({}) 不能被删除"
 
-#: orgs/apps.py:7 rbac/tree.py:112
+#: orgs/apps.py:7 rbac/tree.py:111
 msgid "App organizations"
 msgstr "组织管理"
 
@@ -2917,11 +2923,11 @@ msgstr "可以查看授权给用户的应用"
 msgid "Permed application"
 msgstr "授权的应用"
 
-#: perms/models/application_permission.py:117
+#: perms/models/application_permission.py:116
 msgid "Can view user apps"
 msgstr "可以查看用户授权的应用"
 
-#: perms/models/application_permission.py:118
+#: perms/models/application_permission.py:117
 msgid "Can view usergroup apps"
 msgstr "可以查看用户组授权的应用"
 
@@ -2950,14 +2956,10 @@ msgid "Can view my assets"
 msgstr "可以查看我的资产"
 
 #: perms/models/asset_permission.py:188
-msgid "Can connect my assets"
-msgstr "可以连接我的资产"
-
-#: perms/models/asset_permission.py:189
 msgid "Can view user assets"
 msgstr "可以查看用户授权的资产"
 
-#: perms/models/asset_permission.py:190
+#: perms/models/asset_permission.py:189
 msgid "Can view usergroup assets"
 msgstr "可以查看用户组授权的资产"
 
@@ -3173,7 +3175,7 @@ msgstr "Web终端"
 msgid "Can view file manager"
 msgstr "文件管理"
 
-#: rbac/models/permission.py:22
+#: rbac/models/permission.py:26
 msgid "Permission"
 msgstr "授权"
 
@@ -3299,11 +3301,11 @@ msgstr "我的资产"
 msgid "My apps"
 msgstr "我的应用"
 
-#: rbac/tree.py:113
+#: rbac/tree.py:112
 msgid "Ticket comment"
 msgstr "工单评论"
 
-#: rbac/tree.py:114
+#: rbac/tree.py:113
 msgid "Common setting"
 msgstr "一般设置"
 
@@ -4961,6 +4963,10 @@ msgstr "HTTP端口"
 #: terminal/models/terminal.py:183 terminal/serializers/session.py:38
 msgid "Terminal"
 msgstr "终端"
+
+#: terminal/models/terminal.py:185
+msgid "Can view terminal config"
+msgstr "可以查看终端配置"
 
 #: terminal/notifications.py:22
 msgid "Sessions"
@@ -6799,11 +6805,11 @@ msgstr "退出页面logo"
 msgid "Interface setting"
 msgstr "界面设置"
 
-#: xpack/plugins/license/api.py:41
+#: xpack/plugins/license/api.py:43
 msgid "License import successfully"
 msgstr "许可证导入成功"
 
-#: xpack/plugins/license/api.py:42
+#: xpack/plugins/license/api.py:44
 msgid "License is invalid"
 msgstr "无效的许可证"
 
@@ -6826,6 +6832,9 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Can connect my assets"
+#~ msgstr "可以连接我的资产"
 
 #~ msgid "Can view dashboard"
 #~ msgstr "仪表盘"
