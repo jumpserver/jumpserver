@@ -15,7 +15,7 @@ __all__ = ['CommentViewSet']
 
 class CommentViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.CommentSerializer
-    permission_classes = (RBACPermission| IsSwagger | IsAssignee | IsApplicant)
+    permission_classes = (RBACPermission, IsSwagger | IsAssignee | IsApplicant)
 
     @lazyproperty
     def ticket(self):
