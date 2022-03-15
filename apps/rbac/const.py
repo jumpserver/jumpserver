@@ -78,7 +78,7 @@ exclude_permissions = (
     ('terminal', 'command', 'delete,change', 'command'),
     ('terminal', 'status', 'delete,change', 'status'),
     ('terminal', 'sessionjoinrecord', 'delete', 'sessionjoinrecord'),
-    ('terminal', 'sessionreplay', 'delete', 'sessionreplay'),
+    ('terminal', 'sessionreplay', 'add,change,delete', 'sessionreplay'),
     ('terminal', 'session', 'delete', 'session'),
     ('terminal', 'session', 'delete,change', 'command'),
 )
