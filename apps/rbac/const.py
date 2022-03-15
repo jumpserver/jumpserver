@@ -80,7 +80,7 @@ exclude_permissions = (
     ('terminal', 'sessionjoinrecord', 'delete', 'sessionjoinrecord'),
     ('terminal', 'sessionreplay', 'add,change,delete', 'sessionreplay'),
     ('terminal', 'sessionsharing', 'view,add,change,delete', 'sessionsharing'),
-    ('terminal', 'session', 'delete', 'session'),
+    ('terminal', 'session', 'delete,share', 'session'),
     ('terminal', 'session', 'delete,change', 'command'),
 )
 
