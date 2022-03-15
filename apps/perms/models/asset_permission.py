@@ -185,7 +185,6 @@ class PermedAsset(Asset):
         verbose_name = _('Permed asset')
         permissions = [
             ('view_myassets', _('Can view my assets')),
-            ('connect_myassets', _('Can connect my assets')),
             ('view_userassets', _('Can view user assets')),
             ('view_usergroupassets', _('Can view usergroup assets')),
         ]

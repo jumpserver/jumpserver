@@ -72,7 +72,7 @@ special_pid_mapper = {
     'xpack.applicationchangeauthplanexecution': 'app_change_plan_node',
     'xpack.applicationchangeauthplantask': 'app_change_plan_node',
     'xpack.changeauthplan': 'asset_change_plan_node',
-    'xpack.changeauthplanexecution': 'gather_account_node',
+    'xpack.changeauthplanexecution': 'asset_change_plan_node',
     'xpack.changeauthplantask': 'asset_change_plan_node',
     "assets.gathereduser": "gather_account_node",
     'xpack.gatherusertask': 'gather_account_node',
@@ -87,10 +87,9 @@ special_pid_mapper = {
     'audits.ftplog': 'terminal',
     'rbac.menupermission': 'view_other',
     'perms.view_myassets': 'my_assets',
-    'perms.connect_myassets': 'my_assets',
     'perms.view_myapps': 'my_apps',
-    'perms.connect_myapps': 'my_apps',
-    'ops.commandexecution': 'view_workspace',
+    'ops.add_commandexecution': 'view_workspace',
+    'ops.view_commandexecution': 'audits',
     "perms.view_mykubernetsapp": "my_apps",
     "perms.connect_mykubernetsapp": "my_apps",
     "perms.view_myremoteapp": "my_apps",
@@ -123,28 +122,30 @@ xpack_nodes = [
 
 
 def _sort_action(node):
-    value = 0
+    if node.isParent:
+        return ['zz', 0]
 
-    if 'view' in node.title:
-        value += 2
-    elif 'add' in node.title:
-        value += 4
-    elif 'change' in node.title:
-        value += 6
-    elif 'delete' in node.title:
-        value += 8
-    else:
-        value += 10
-    return value
+    action_resource = node.title.split('.')[-1]
+    action, resource = action_resource.split('_', 2)
+    action_value_mapper = {
+        'view': 2,
+        'add': 4,
+        'change': 6,
+        'delete': 8
+    }
+    v = action_value_mapper.get(action, 10)
+    return [resource, v]
 
 
 def sort_nodes(node):
-    value = 0
+    value = []
 
     if node.isParent:
-        value += 50
+        value.append(50)
     else:
-        value += _sort_action(node)
+        value.append(0)
+
+    value.extend(_sort_action(node))
     return value
 
 
@@ -263,6 +264,7 @@ class PermissionTreeUtil:
 
     @staticmethod
     def _get_permission_name(p, content_types_name_mapper):
+        p: Permission
         code_name = p.codename
         action_mapper = {
             'add': ugettext('Create'),
@@ -285,8 +287,9 @@ class PermissionTreeUtil:
             name = action_mapper['delete']
             ct = code_name.replace('delete_', '')
 
-        if ct in content_types_name_mapper:
-            name += content_types_name_mapper[ct]
+        app_model = '%s.%s' % (p.content_type.app_label, ct)
+        if app_model in content_types_name_mapper:
+            name += content_types_name_mapper[app_model]
         else:
             name = gettext(p.name)
             name = name.replace('Can ', '').replace('可以', '')
@@ -296,7 +299,7 @@ class PermissionTreeUtil:
         permissions_id = self.permissions.values_list('id', flat=True)
         nodes = []
         content_types = ContentType.objects.all()
-        content_types_name_mapper = {ct.model: ct.name for ct in content_types}
+        content_types_name_mapper = {ct.app_model: ct.name for ct in content_types}
 
         for p in self.all_permissions:
             model_id = f'{p.app}.{p.model}'

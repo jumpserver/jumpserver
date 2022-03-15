@@ -141,7 +141,7 @@ class Setting(models.Model):
         permissions = [
             ('change_email', _('Can change email setting')),
             ('change_auth', _('Can change auth setting')),
-            ('change_systemmsgsubscription', _('Can sys msg sub setting')),
+            ('change_systemmsgsubscription', _('Can change system msg sub setting')),
             ('change_sms', _('Can change sms setting')),
             ('change_security', _('Can change security setting')),
             ('change_clean', _('Can change clean setting')),

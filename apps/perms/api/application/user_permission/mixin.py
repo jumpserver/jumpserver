@@ -6,7 +6,7 @@ from common.mixins.api import RoleUserMixin as _RoleUserMixin
 from orgs.utils import tmp_to_root_org
 
 
-class RoleAdminMixin(_RoleAdminMixin):
+class AppRoleAdminMixin(_RoleAdminMixin):
     rbac_perms = (
         ('list', 'perms.view_userapp'),
         ('retrieve', 'perms.view_userapps'),
@@ -15,7 +15,7 @@ class RoleAdminMixin(_RoleAdminMixin):
     )
 
 
-class RoleUserMixin(_RoleUserMixin):
+class AppRoleUserMixin(_RoleUserMixin):
     rbac_perms = (
         ('list', 'perms.view_myapps'),
         ('retrieve', 'perms.view_myapps'),

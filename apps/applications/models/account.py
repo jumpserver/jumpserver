@@ -24,7 +24,7 @@ class Account(BaseUser):
         unique_together = [('username', 'app', 'systemuser')]
         permissions = [
             ('view_applicationaccountsecret', _('Can view application account secret')),
-            ('change_appplicationaccountsecret', _('Can view application account secret')),
+            ('change_appplicationaccountsecret', _('Can change application account secret')),
         ]
 
     def __init__(self, *args, **kwargs):

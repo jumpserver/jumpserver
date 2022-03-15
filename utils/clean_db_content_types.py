@@ -22,6 +22,9 @@ def clean_db_content_types():
         ContentType.objects.filter(app_label=app, model=model).delete()
 
     permissions_delete_required = [
+        ('perms', 'permedasset', 'connect_myassets'),
+        ('perms', 'permedapplication', 'connect_myapps'),
+
         ('perms', 'assetpermission', 'connect_myassets'),
         ('perms', 'assetpermission', 'view_myassets'),
         ('perms', 'assetpermission', 'view_userassets'),

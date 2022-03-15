@@ -2,7 +2,7 @@ from rest_framework.generics import ListAPIView
 from django.conf import settings
 
 from common.utils import get_logger
-from ..mixin import RoleAdminMixin, RoleUserMixin
+from ..mixin import AssetRoleAdminMixin, AssetRoleUserMixin
 from .mixin import (
     UserAllGrantedAssetsQuerysetMixin, UserDirectGrantedAssetsQuerysetMixin, UserFavoriteGrantedAssetsMixin,
     UserGrantedNodeAssetsMixin, AssetsSerializerFormatMixin, AssetsTreeFormatMixin,
@@ -19,42 +19,42 @@ logger = get_logger(__name__)
 
 
 class UserDirectGrantedAssetsForAdminApi(UserDirectGrantedAssetsQuerysetMixin,
-                                         RoleAdminMixin,
+                                         AssetRoleAdminMixin,
                                          AssetsSerializerFormatMixin,
                                          ListAPIView):
     pass
 
 
 class MyDirectGrantedAssetsApi(UserDirectGrantedAssetsQuerysetMixin,
-                               RoleUserMixin,
+                               AssetRoleUserMixin,
                                AssetsSerializerFormatMixin,
                                ListAPIView):
     pass
 
 
 class UserFavoriteGrantedAssetsForAdminApi(UserFavoriteGrantedAssetsMixin,
-                                           RoleAdminMixin,
+                                           AssetRoleAdminMixin,
                                            AssetsSerializerFormatMixin,
                                            ListAPIView):
     pass
 
 
 class MyFavoriteGrantedAssetsApi(UserFavoriteGrantedAssetsMixin,
-                                 RoleUserMixin,
+                                 AssetRoleUserMixin,
                                  AssetsSerializerFormatMixin,
                                  ListAPIView):
     pass
 
 
 class UserDirectGrantedAssetsAsTreeForAdminApi(UserDirectGrantedAssetsQuerysetMixin,
-                                               RoleAdminMixin,
+                                               AssetRoleAdminMixin,
                                                AssetsTreeFormatMixin,
                                                ListAPIView):
     pass
 
 
 class MyUngroupAssetsAsTreeApi(UserDirectGrantedAssetsQuerysetMixin,
-                               RoleUserMixin,
+                               AssetRoleUserMixin,
                                AssetsTreeFormatMixin,
                                ListAPIView):
     def get_queryset(self):
@@ -65,34 +65,34 @@ class MyUngroupAssetsAsTreeApi(UserDirectGrantedAssetsQuerysetMixin,
 
 
 class UserAllGrantedAssetsApi(UserAllGrantedAssetsQuerysetMixin,
-                              RoleAdminMixin,
+                              AssetRoleAdminMixin,
                               AssetsSerializerFormatMixin,
                               ListAPIView):
     pass
 
 
 class MyAllGrantedAssetsApi(UserAllGrantedAssetsQuerysetMixin,
-                            RoleUserMixin,
+                            AssetRoleUserMixin,
                             AssetsSerializerFormatMixin,
                             ListAPIView):
     pass
 
 
 class MyAllAssetsAsTreeApi(UserAllGrantedAssetsQuerysetMixin,
-                           RoleUserMixin,
+                           AssetRoleUserMixin,
                            AssetsTreeFormatMixin,
                            ListAPIView):
     pass
 
 
-class UserGrantedNodeAssetsForAdminApi(RoleAdminMixin,
+class UserGrantedNodeAssetsForAdminApi(AssetRoleAdminMixin,
                                        UserGrantedNodeAssetsMixin,
                                        AssetsSerializerFormatMixin,
                                        ListAPIView):
     pass
 
 
-class MyGrantedNodeAssetsApi(RoleUserMixin,
+class MyGrantedNodeAssetsApi(AssetRoleUserMixin,
                              UserGrantedNodeAssetsMixin,
                              AssetsSerializerFormatMixin,
                              ListAPIView):

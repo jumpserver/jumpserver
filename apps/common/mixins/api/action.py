@@ -38,7 +38,7 @@ class SuggestionMixin:
 
 class RenderToJsonMixin:
     @action(methods=[POST], detail=False, url_path='render-to-json')
-    def render_to_json(self, request: Request):
+    def render_to_json(self, request: Request, *args, **kwargs):
         data = {
             'title': (),
             'data': request.data,
