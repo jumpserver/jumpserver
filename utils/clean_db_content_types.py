@@ -23,6 +23,7 @@ def clean_db_content_types():
 
     permissions_delete_required = [
         ('perms', 'permedasset', 'connect_myassets'),
+        ('perms', 'permedapplication', 'connect_myapps'),
 
         ('perms', 'assetpermission', 'connect_myassets'),
         ('perms', 'assetpermission', 'view_myassets'),
