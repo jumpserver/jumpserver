@@ -9,7 +9,7 @@ from rest_framework.request import Request
 
 from assets.api.mixin import SerializeToTreeNodeMixin
 from common.utils import get_logger
-from .mixin import RoleAdminMixin, RoleUserMixin
+from .mixin import AssetRoleAdminMixin, AssetRoleUserMixin
 from perms.hands import User
 from perms import serializers
 
@@ -100,33 +100,33 @@ class UserGrantedNodesMixin:
 
 # ------------------------------------------
 # 最终的 api
-class UserGrantedNodeChildrenForAdminApi(RoleAdminMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenApi):
+class UserGrantedNodeChildrenForAdminApi(AssetRoleAdminMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenApi):
     pass
 
 
-class MyGrantedNodeChildrenApi(RoleUserMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenApi):
+class MyGrantedNodeChildrenApi(AssetRoleUserMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenApi):
     pass
 
 
-class UserGrantedNodeChildrenAsTreeForAdminApi(RoleAdminMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenAsTreeApi):
+class UserGrantedNodeChildrenAsTreeForAdminApi(AssetRoleAdminMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenAsTreeApi):
     pass
 
 
-class MyGrantedNodeChildrenAsTreeApi(RoleUserMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenAsTreeApi):
+class MyGrantedNodeChildrenAsTreeApi(AssetRoleUserMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenAsTreeApi):
     def get_permissions(self):
         permissions = super().get_permissions()
         return permissions
 
 
-class UserGrantedNodesForAdminApi(RoleAdminMixin, UserGrantedNodesMixin, BaseGrantedNodeApi):
+class UserGrantedNodesForAdminApi(AssetRoleAdminMixin, UserGrantedNodesMixin, BaseGrantedNodeApi):
     pass
 
 
-class MyGrantedNodesApi(RoleUserMixin, UserGrantedNodesMixin, BaseGrantedNodeApi):
+class MyGrantedNodesApi(AssetRoleUserMixin, UserGrantedNodesMixin, BaseGrantedNodeApi):
     pass
 
 
-class MyGrantedNodesAsTreeApi(RoleUserMixin, UserGrantedNodesMixin, BaseGrantedNodeAsTreeApi):
+class MyGrantedNodesAsTreeApi(AssetRoleUserMixin, UserGrantedNodesMixin, BaseGrantedNodeAsTreeApi):
     pass
 
 # ------------------------------------------

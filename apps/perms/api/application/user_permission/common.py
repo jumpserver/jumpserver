@@ -16,7 +16,7 @@ from perms.utils.application.permission import (
     get_application_system_user_ids,
     validate_permission,
 )
-from .mixin import RoleAdminMixin, RoleUserMixin
+from .mixin import AppRoleAdminMixin, AppRoleUserMixin
 from perms.hands import User, SystemUser
 from perms import serializers
 
@@ -45,11 +45,11 @@ class BaseGrantedApplicationSystemUsersApi(ListAPIView):
         return system_users
 
 
-class UserGrantedApplicationSystemUsersApi(RoleAdminMixin, BaseGrantedApplicationSystemUsersApi):
+class UserGrantedApplicationSystemUsersApi(AppRoleAdminMixin, BaseGrantedApplicationSystemUsersApi):
     pass
 
 
-class MyGrantedApplicationSystemUsersApi(RoleUserMixin, BaseGrantedApplicationSystemUsersApi):
+class MyGrantedApplicationSystemUsersApi(AppRoleUserMixin, BaseGrantedApplicationSystemUsersApi):
     pass
 
 
