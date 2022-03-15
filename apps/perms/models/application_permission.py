@@ -113,7 +113,6 @@ class PermedApplication(Application):
         default_permissions = []
         permissions = [
             ('view_myapps', 'Can view my apps'),
-            ('connect_myapps', 'Can connect my apps'),
             ('view_userapps', _('Can view user apps')),
             ('view_usergroupapps', _('Can view usergroup apps')),
         ]

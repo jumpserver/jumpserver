@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'verbose_name': 'Permed application',
-                'permissions': [('view_myapps', 'Can view my apps'), ('connect_myapps', 'Can connect my apps'), ('view_userapps', 'Can view user apps'), ('view_usergroupapps', 'Can view usergroup apps')],
+                'permissions': [('view_myapps', 'Can view my apps'), ('view_userapps', 'Can view user apps'), ('view_usergroupapps', 'Can view usergroup apps')],
                 'proxy': True,
                 'default_permissions': [],
                 'indexes': [],
