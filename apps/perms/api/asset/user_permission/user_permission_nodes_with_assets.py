@@ -10,7 +10,7 @@ from common.utils.common import timeit
 from orgs.utils import tmp_to_root_org
 from common.permissions import IsValidUser
 from common.utils import get_logger, get_object_or_none
-from .mixin import RoleUserMixin, RoleAdminMixin
+from .mixin import AssetRoleUserMixin, AssetRoleAdminMixin
 from perms.utils.asset.user_permission import (
     UserGrantedTreeBuildUtils, get_user_all_asset_perm_ids,
     UserGrantedNodesQueryUtils, UserGrantedAssetsQueryUtils,
@@ -146,9 +146,9 @@ class GrantedNodeChildrenWithAssetsAsTreeApiMixin(SerializeToTreeNodeMixin,
         return Response(data=[*tree_nodes, *tree_assets])
 
 
-class UserGrantedNodeChildrenWithAssetsAsTreeApi(RoleAdminMixin, GrantedNodeChildrenWithAssetsAsTreeApiMixin):
+class UserGrantedNodeChildrenWithAssetsAsTreeApi(AssetRoleAdminMixin, GrantedNodeChildrenWithAssetsAsTreeApiMixin):
     pass
 
 
-class MyGrantedNodeChildrenWithAssetsAsTreeApi(RoleUserMixin, GrantedNodeChildrenWithAssetsAsTreeApiMixin):
+class MyGrantedNodeChildrenWithAssetsAsTreeApi(AssetRoleUserMixin, GrantedNodeChildrenWithAssetsAsTreeApiMixin):
     pass

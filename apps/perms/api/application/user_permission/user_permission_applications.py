@@ -9,7 +9,7 @@ from applications.api.mixin import (
     SerializeApplicationToTreeNodeMixin
 )
 from perms import serializers
-from perms.api.asset.user_permission.mixin import RoleAdminMixin, RoleUserMixin
+from .mixin import AppRoleAdminMixin, AppRoleUserMixin
 from perms.utils.application.user_permission import (
     get_user_granted_all_applications
 )
@@ -41,11 +41,11 @@ class AllGrantedApplicationsMixin(CommonApiMixin, ListAPIView):
         return queryset.only(*self.only_fields)
 
 
-class UserAllGrantedApplicationsApi(RoleAdminMixin, AllGrantedApplicationsMixin):
+class UserAllGrantedApplicationsApi(AppRoleAdminMixin, AllGrantedApplicationsMixin):
     pass
 
 
-class MyAllGrantedApplicationsApi(RoleUserMixin, AllGrantedApplicationsMixin):
+class MyAllGrantedApplicationsApi(AppRoleUserMixin, AllGrantedApplicationsMixin):
     pass
 
 

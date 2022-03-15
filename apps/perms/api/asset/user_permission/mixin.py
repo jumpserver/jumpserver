@@ -20,7 +20,7 @@ class PermBaseMixin:
         return super().get(request, *args, **kwargs)
 
 
-class RoleAdminMixin(PermBaseMixin, _RoleAdminMixin):
+class AssetRoleAdminMixin(PermBaseMixin, _RoleAdminMixin):
     rbac_perms = (
         ('list', 'perms.view_userassets'),
         ('retrieve', 'perms.view_userassets'),
@@ -29,7 +29,7 @@ class RoleAdminMixin(PermBaseMixin, _RoleAdminMixin):
     )
 
 
-class RoleUserMixin(PermBaseMixin, _RoleUserMixin):
+class AssetRoleUserMixin(PermBaseMixin, _RoleUserMixin):
     rbac_perms = (
         ('list', 'perms.view_myassets'),
         ('retrieve', 'perms.view_myassets'),
