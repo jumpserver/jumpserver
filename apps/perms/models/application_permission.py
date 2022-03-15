@@ -112,7 +112,7 @@ class PermedApplication(Application):
         verbose_name = _('Permed application')
         default_permissions = []
         permissions = [
-            ('view_myapps', 'Can view my apps'),
+            ('view_myapps', _('Can view my apps')),
             ('view_userapps', _('Can view user apps')),
             ('view_usergroupapps', _('Can view usergroup apps')),
         ]
