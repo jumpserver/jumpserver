@@ -22,7 +22,6 @@ from perms import serializers
 logger = get_logger(__name__)
 
 __all__ = [
-    'RefreshAssetPermissionCacheApi',
     'UserGrantedAssetSystemUsersForAdminApi',
     'ValidateUserAssetPermissionApi',
     'GetUserAssetPermissionActionsApi',
@@ -95,12 +94,6 @@ class ValidateUserAssetPermissionApi(APIView):
             'expire_at': int(expire_at)
         }
         return Response(data, status=status_code)
-
-
-# TODO 删除
-class RefreshAssetPermissionCacheApi(RetrieveAPIView):
-    def retrieve(self, request, *args, **kwargs):
-        return Response({'msg': True}, status=200)
 
 
 class UserGrantedAssetSystemUsersForAdminApi(ListAPIView):
