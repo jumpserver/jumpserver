@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-15 16:44+0800\n"
+"POT-Creation-Date: 2022-03-15 19:46+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1383,7 +1383,7 @@ msgstr "日志审计"
 
 #: audits/models.py:27 audits/models.py:57
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:273 users/templates/users/user_asset_permission.html:128
+#: rbac/tree.py:158 users/templates/users/user_asset_permission.html:128
 #: users/templates/users/user_database_app_permission.html:111
 msgid "Delete"
 msgstr "删除"
@@ -1437,11 +1437,11 @@ msgstr "文件管理"
 
 #: audits/models.py:55
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:270
+#: rbac/tree.py:155
 msgid "Create"
 msgstr "创建"
 
-#: audits/models.py:56 rbac/tree.py:272 templates/_csv_import_export.html:18
+#: audits/models.py:56 rbac/tree.py:157 templates/_csv_import_export.html:18
 #: templates/_csv_update_modal.html:6
 #: users/templates/users/user_asset_permission.html:127
 #: users/templates/users/user_database_app_permission.html:110
@@ -2121,7 +2121,7 @@ msgstr "显示"
 
 #: authentication/templates/authentication/_access_key_modal.html:66
 #: settings/serializers/security.py:39 users/models/user.py:469
-#: users/serializers/profile.py:111 users/templates/users/mfa_setting.html:60
+#: users/serializers/profile.py:111 users/templates/users/mfa_setting.html:61
 #: users/templates/users/user_verify_mfa.html:36
 msgid "Disable"
 msgstr "禁用"
@@ -2129,7 +2129,7 @@ msgstr "禁用"
 #: authentication/templates/authentication/_access_key_modal.html:67
 #: users/models/user.py:470 users/serializers/profile.py:112
 #: users/templates/users/mfa_setting.html:26
-#: users/templates/users/mfa_setting.html:67
+#: users/templates/users/mfa_setting.html:68
 msgid "Enable"
 msgstr "启用"
 
@@ -2921,6 +2921,10 @@ msgstr "可以查看授权给用户的应用"
 msgid "Permed application"
 msgstr "授权的应用"
 
+#: perms/models/application_permission.py:115
+msgid "Can view my apps"
+msgstr "可以查看我的应用"
+
 #: perms/models/application_permission.py:116
 msgid "Can view user apps"
 msgstr "可以查看用户授权的应用"
@@ -3307,7 +3311,7 @@ msgstr "工单评论"
 msgid "Common setting"
 msgstr "一般设置"
 
-#: rbac/tree.py:271
+#: rbac/tree.py:156
 msgid "View"
 msgstr "查看"
 
