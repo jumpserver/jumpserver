@@ -151,6 +151,21 @@ def sort_nodes(node):
 
 class PermissionTreeUtil:
     get_permissions: Callable
+    action_mapper = {
+        'add': ugettext('Create'),
+        'view': ugettext('View'),
+        'change': ugettext('Update'),
+        'delete': ugettext('Delete')
+    }
+    action_icon = {
+        'add': 'add',
+        'view': 'view',
+        'change': 'change',
+        'delete': 'delete',
+        'invite': 'invite',
+        'match': 'match',
+        'remove': 'remove'
+    }
 
     def __init__(self, permissions, scope, check_disabled=False):
         self.permissions = self.prefetch_permissions(permissions)
@@ -262,38 +277,17 @@ class PermissionTreeUtil:
             nodes.append(node)
         return nodes
 
-    @staticmethod
-    def _get_permission_name(p, content_types_name_mapper):
-        p: Permission
-        code_name = p.codename
-        action_mapper = {
-            'add': ugettext('Create'),
-            'view': ugettext('View'),
-            'change': ugettext('Update'),
-            'delete': ugettext('Delete')
-        }
-        name = ''
-        ct = ''
-        if 'add_' in p.codename:
-            name = action_mapper['add']
-            ct = code_name.replace('add_', '')
-        elif 'view_' in p.codename:
-            name = action_mapper['view']
-            ct = code_name.replace('view_', '')
-        elif 'change_' in p.codename:
-            name = action_mapper['change']
-            ct = code_name.replace('change_', '')
-        elif 'delete' in code_name:
-            name = action_mapper['delete']
-            ct = code_name.replace('delete_', '')
-
-        app_model = '%s.%s' % (p.content_type.app_label, ct)
-        if app_model in content_types_name_mapper:
-            name += content_types_name_mapper[app_model]
+    def _get_permission_name_icon(self, p: Permission, content_types_name_mapper: dict):
+        action, resource = p.codename.split('_', 1)
+        app_model = '%s.%s' % (p.content_type.app_label, resource)
+        if action in self.action_mapper and app_model in content_types_name_mapper:
+            action_name = self.action_mapper[action]
+            name = action_name + content_types_name_mapper[app_model]
         else:
             name = gettext(p.name)
-            name = name.replace('Can ', '').replace('可以', '')
-        return name
+        icon = self.action_icon.get(action, 'file')
+        name = name.replace('Can ', '').replace('可以', '')
+        return name, icon
 
     def _create_perms_nodes(self):
         permissions_id = self.permissions.values_list('id', flat=True)
@@ -306,7 +300,7 @@ class PermissionTreeUtil:
             if not self._check_model_xpack(model_id):
                 continue
             # name 要特殊处理，解决 i18n 问题
-            name = self._get_permission_name(p, content_types_name_mapper)
+            name, icon = self._get_permission_name_icon(p, content_types_name_mapper)
             if settings.DEBUG:
                 name += '[{}]'.format(p.app_label_codename)
 
@@ -328,7 +322,7 @@ class PermissionTreeUtil:
                 'pId': pid,
                 'isParent': False,
                 'chkDisabled': self.check_disabled,
-                'iconSkin': 'file',
+                'iconSkin': icon,
                 'checked': p.id in permissions_id,
                 'open': False,
                 'meta': {
