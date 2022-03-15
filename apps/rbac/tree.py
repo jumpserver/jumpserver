@@ -99,7 +99,6 @@ special_pid_mapper = {
     "xpack.interface": "view_setting",
     "settings.change_terminal": "terminal_node",
     "settings.view_setting": "view_setting",
-    "settings.change_setting": "view_setting",
     "rbac.view_console": "view_console",
     "rbac.view_audit": "view_audit",
     "rbac.view_workspace": "view_workspace",

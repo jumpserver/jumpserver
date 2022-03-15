@@ -13,7 +13,7 @@ from .. import serializers
 class WeComTestingAPI(GenericAPIView):
     serializer_class = serializers.WeComSettingSerializer
     rbac_perms = {
-        'POST': 'settings.change_setting'
+        'POST': 'settings.change_auth'
     }
 
     def post(self, request):
