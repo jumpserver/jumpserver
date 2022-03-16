@@ -35,7 +35,7 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     )
     ordering = ('-date_created',)
     rbac_perms = {
-        'open': 'tickets.view_ticket'
+        'open': 'tickets.view_ticket',
     }
 
     def create(self, request, *args, **kwargs):
