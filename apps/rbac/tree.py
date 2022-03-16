@@ -2,7 +2,7 @@
 from collections import defaultdict
 from typing import Callable
 
-from django.utils.translation import gettext_lazy as _, gettext
+from django.utils.translation import gettext_lazy as _, gettext, get_language
 from django.conf import settings
 from django.apps import apps
 from django.db.models import F, Count
@@ -155,10 +155,10 @@ def sort_nodes(node):
 class PermissionTreeUtil:
     get_permissions: Callable
     action_mapper = {
-        'add': ugettext('Create'),
-        'view': ugettext('View'),
-        'change': ugettext('Update'),
-        'delete': ugettext('Delete')
+        'add': ugettext('create'),
+        'view': ugettext('view'),
+        'change': ugettext('update'),
+        'delete': ugettext('delete')
     }
     action_icon = {
         'add': 'add',
@@ -178,6 +178,7 @@ class PermissionTreeUtil:
         self.check_disabled = check_disabled
         self.total_counts = defaultdict(int)
         self.checked_counts = defaultdict(int)
+        self.lang = get_language()
 
     @staticmethod
     def prefetch_permissions(perms):
@@ -288,12 +289,18 @@ class PermissionTreeUtil:
             return name, icon
 
         app_model = '%s.%s' % (p.content_type.app_label, resource)
-        if action in self.action_mapper and app_model in content_types_name_mapper:
+        if self.lang == 'en':
+            name = p.name
+        # 因为默认的权限位是没有翻译的，所以我们要用 action + resource name 去拼
+        elif action in self.action_mapper and app_model in content_types_name_mapper:
             action_name = self.action_mapper[action]
-            name = action_name + content_types_name_mapper[app_model]
+            resource_name = content_types_name_mapper[app_model]
+            split = ''
+            name = '{}{}{}'.format(action_name, split, resource_name)
+        # 手动创建的 permission
         else:
             name = gettext(p.name)
-        name = name.replace('Can ', '').replace('可以', '')
+        name = name.replace('Can ', '').replace('可以', '').capitalize()
         return name, icon
 
     def _create_perms_nodes(self):
