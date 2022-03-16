@@ -109,7 +109,6 @@ class RBACPermission(permissions.DjangoModelPermissions):
         if not action:
             action = request.method
         perms = self._get_action_perms(action, model_cls, view)
-        print(model_cls, perms, action)
         return perms
 
     def has_permission(self, request, view):
