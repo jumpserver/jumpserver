@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-16 17:35+0800\n"
+"POT-Creation-Date: 2022-03-16 20:38+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -26,7 +26,7 @@ msgstr "访问控制"
 #: assets/models/base.py:175 assets/models/cluster.py:18
 #: assets/models/cmd_filter.py:27 assets/models/domain.py:23
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
-#: orgs/models.py:12 perms/models/base.py:83 rbac/models/role.py:29
+#: orgs/models.py:65 perms/models/base.py:83 rbac/models/role.py:29
 #: settings/models.py:29 settings/serializers/sms.py:6
 #: terminal/models/storage.py:23 terminal/models/task.py:16
 #: terminal/models/terminal.py:100 users/forms/profile.py:32
@@ -62,7 +62,7 @@ msgstr "激活中"
 #: assets/models/cluster.py:29 assets/models/cmd_filter.py:48
 #: assets/models/cmd_filter.py:96 assets/models/domain.py:24
 #: assets/models/domain.py:64 assets/models/group.py:23
-#: assets/models/label.py:23 ops/models/adhoc.py:38 orgs/models.py:15
+#: assets/models/label.py:23 ops/models/adhoc.py:38 orgs/models.py:68
 #: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:34
 #: terminal/models/storage.py:26 terminal/models/terminal.py:114
 #: tickets/models/comment.py:24 tickets/models/ticket.py:154
@@ -89,8 +89,8 @@ msgstr "登录复核"
 #: acls/models/login_acl.py:24 acls/models/login_asset_acl.py:20
 #: assets/models/cmd_filter.py:30 assets/models/label.py:15 audits/models.py:37
 #: audits/models.py:60 audits/models.py:85 audits/serializers.py:100
-#: authentication/models.py:50 orgs/models.py:191 perms/models/base.py:84
-#: rbac/builtin.py:97 rbac/models/rolebinding.py:33 templates/index.html:78
+#: authentication/models.py:50 orgs/models.py:214 perms/models/base.py:84
+#: rbac/builtin.py:97 rbac/models/rolebinding.py:39 templates/index.html:78
 #: terminal/backends/command/models.py:19
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:42
 #: terminal/notifications.py:88 terminal/notifications.py:136
@@ -375,7 +375,7 @@ msgstr "类型名称"
 #: assets/models/group.py:22 assets/models/label.py:25
 #: assets/serializers/account.py:18 common/db/models.py:113
 #: common/mixins/models.py:50 ops/models/adhoc.py:39 ops/models/command.py:30
-#: orgs/models.py:14 orgs/models.py:194 perms/models/base.py:92
+#: orgs/models.py:67 orgs/models.py:217 perms/models/base.py:92
 #: users/models/group.py:18 users/models/user.py:827
 #: xpack/plugins/cloud/models.py:125
 msgid "Date created"
@@ -384,7 +384,7 @@ msgstr "创建日期"
 #: applications/serializers/application.py:104 assets/models/base.py:182
 #: assets/models/gathered_user.py:20 assets/serializers/account.py:21
 #: common/db/models.py:114 common/mixins/models.py:51 ops/models/adhoc.py:40
-#: orgs/models.py:195
+#: orgs/models.py:218
 msgid "Date updated"
 msgstr "更新日期"
 
@@ -626,8 +626,8 @@ msgstr "标签管理"
 #: assets/models/asset.py:229 assets/models/base.py:183
 #: assets/models/cluster.py:28 assets/models/cmd_filter.py:52
 #: assets/models/cmd_filter.py:99 assets/models/group.py:21
-#: common/db/models.py:111 common/mixins/models.py:49 orgs/models.py:13
-#: orgs/models.py:196 perms/models/base.py:91 users/models/user.py:619
+#: common/db/models.py:111 common/mixins/models.py:49 orgs/models.py:66
+#: orgs/models.py:219 perms/models/base.py:91 users/models/user.py:619
 #: users/serializers/group.py:33
 #: xpack/plugins/change_auth_plan/models/base.py:48
 #: xpack/plugins/cloud/models.py:122 xpack/plugins/gathered_user/models.py:30
@@ -1255,6 +1255,7 @@ msgid "System user name"
 msgstr "系统用户名称"
 
 #: assets/serializers/system_user.py:282 orgs/mixins/serializers.py:26
+#: rbac/serializers/rolebinding.py:23
 msgid "Org name"
 msgstr "组织名称"
 
@@ -1383,7 +1384,7 @@ msgstr "日志审计"
 
 #: audits/models.py:27 audits/models.py:57
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:161 users/templates/users/user_asset_permission.html:128
+#: rbac/tree.py:162 users/templates/users/user_asset_permission.html:128
 #: users/templates/users/user_database_app_permission.html:111
 msgid "Delete"
 msgstr "删除"
@@ -1437,11 +1438,11 @@ msgstr "文件管理"
 
 #: audits/models.py:55
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:158
+#: rbac/tree.py:159
 msgid "Create"
 msgstr "创建"
 
-#: audits/models.py:56 rbac/tree.py:160 templates/_csv_import_export.html:18
+#: audits/models.py:56 rbac/tree.py:161 templates/_csv_import_export.html:18
 #: templates/_csv_update_modal.html:6
 #: users/templates/users/user_asset_permission.html:127
 #: users/templates/users/user_database_app_permission.html:110
@@ -1565,7 +1566,7 @@ msgstr "运行用户"
 msgid "Run as display"
 msgstr "运行用户名称"
 
-#: audits/serializers.py:102 rbac/serializers/rolebinding.py:22
+#: audits/serializers.py:102 rbac/serializers/rolebinding.py:21
 msgid "User display"
 msgstr "用户名称"
 
@@ -2882,21 +2883,21 @@ msgstr "组织存在资源 ({}) 不能被删除"
 msgid "App organizations"
 msgstr "组织管理"
 
-#: orgs/mixins/models.py:46 orgs/mixins/serializers.py:25 orgs/models.py:27
-#: orgs/models.py:188 rbac/const.py:7 rbac/models/rolebinding.py:40
+#: orgs/mixins/models.py:46 orgs/mixins/serializers.py:25 orgs/models.py:80
+#: orgs/models.py:211 rbac/const.py:7 rbac/models/rolebinding.py:46
 #: rbac/serializers/rolebinding.py:40 tickets/serializers/ticket/ticket.py:77
 msgid "Organization"
 msgstr "组织"
 
-#: orgs/models.py:21
+#: orgs/models.py:74
 msgid "GLOBAL"
 msgstr "全局组织"
 
-#: orgs/models.py:29
+#: orgs/models.py:82
 msgid "Can view root org"
 msgstr "可以查看全局组织"
 
-#: orgs/models.py:193 rbac/models/role.py:46 rbac/models/rolebinding.py:36
+#: orgs/models.py:216 rbac/models/role.py:46 rbac/models/rolebinding.py:42
 #: users/models/user.py:584 users/templates/users/_select_user_modal.html:15
 msgid "Role"
 msgstr "角色"
@@ -3121,7 +3122,7 @@ msgstr "角色已绑定用户，不能删除"
 msgid "Internal role, can't be update"
 msgstr "内部角色，不能更新"
 
-#: rbac/api/rolebinding.py:46
+#: rbac/api/rolebinding.py:52
 msgid "{} at least one system role"
 msgstr "{} 至少有一个系统角色"
 
@@ -3179,9 +3180,9 @@ msgstr "文件管理"
 
 #: rbac/models/permission.py:26
 msgid "Permission"
-msgstr "授权"
+msgstr "权限"
 
-#: rbac/models/role.py:31 rbac/models/rolebinding.py:30
+#: rbac/models/role.py:31 rbac/models/rolebinding.py:36
 msgid "Scope"
 msgstr "范围"
 
@@ -3201,21 +3202,21 @@ msgstr "系统角色"
 msgid "Organization role"
 msgstr "组织角色"
 
-#: rbac/models/rolebinding.py:45
+#: rbac/models/rolebinding.py:51
 msgid "Role binding"
 msgstr "角色绑定"
 
-#: rbac/models/rolebinding.py:111
+#: rbac/models/rolebinding.py:123
 msgid ""
 "User last role in org, can not be delete, you can remove user from org "
 "instead"
 msgstr "用户最后一个角色，不能删除，你可以将用户从组织移除"
 
-#: rbac/models/rolebinding.py:118
+#: rbac/models/rolebinding.py:130
 msgid "Organization role binding"
 msgstr "组织角色绑定"
 
-#: rbac/models/rolebinding.py:132
+#: rbac/models/rolebinding.py:145
 msgid "System role binding"
 msgstr "系统角色绑定"
 
@@ -3231,7 +3232,7 @@ msgstr "范围名称"
 msgid "Display name"
 msgstr "显示名称"
 
-#: rbac/serializers/rolebinding.py:23
+#: rbac/serializers/rolebinding.py:22
 msgid "Role display"
 msgstr "角色显示"
 
@@ -3316,10 +3317,14 @@ msgid "Common setting"
 msgstr "一般设置"
 
 #: rbac/tree.py:115
+msgid "View permission tree"
+msgstr "查看授权树"
+
+#: rbac/tree.py:116
 msgid "Execute batch command"
 msgstr "执行批量命令"
 
-#: rbac/tree.py:159
+#: rbac/tree.py:160
 msgid "View"
 msgstr "查看"
 
@@ -6181,7 +6186,7 @@ msgstr "重置密码成功，返回到登录页面"
 msgid "XPACK"
 msgstr ""
 
-#: xpack/plugins/change_auth_plan/api/app.py:109
+#: xpack/plugins/change_auth_plan/api/app.py:112
 #: xpack/plugins/change_auth_plan/api/asset.py:95
 msgid "The parameter 'action' must be [{}]"
 msgstr "参数 'action' 必须是 [{}]"
@@ -6811,11 +6816,11 @@ msgstr "退出页面logo"
 msgid "Interface setting"
 msgstr "界面设置"
 
-#: xpack/plugins/license/api.py:41
+#: xpack/plugins/license/api.py:43
 msgid "License import successfully"
 msgstr "许可证导入成功"
 
-#: xpack/plugins/license/api.py:42
+#: xpack/plugins/license/api.py:44
 msgid "License is invalid"
 msgstr "无效的许可证"
 
@@ -7015,9 +7020,6 @@ msgstr "社区版"
 
 #~ msgid "Overview"
 #~ msgstr "概览"
-
-#~ msgid "View permission user"
-#~ msgstr "查看授权用户"
 
 #~ msgid "Add user to role"
 #~ msgstr "添加用户到角色"

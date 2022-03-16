@@ -112,6 +112,7 @@ verbose_name_mapper = {
     'tickets.comment': _("Ticket comment"),
     'tickets.view_ticket': _("Ticket"),
     'settings.setting': _("Common setting"),
+    'rbac.view_permission': _('View permission tree'),
     'ops.add_commandexecution': _('Execute batch command')
 }
 
