@@ -15,11 +15,17 @@ __all__ = ['RoleBinding', 'SystemRoleBinding', 'OrgRoleBinding']
 class RoleBindingManager(models.Manager):
     def get_queryset(self):
         queryset = super(RoleBindingManager, self).get_queryset()
-        q = Q(scope=Scope.system)
+        q = Q(scope=Scope.system, org__isnull=True)
         if not current_org.is_root():
             q |= Q(org_id=current_org.id, scope=Scope.org)
         queryset = queryset.filter(q)
         return queryset
+
+    def root_all(self):
+        queryset = super().get_queryset()
+        if current_org.is_root():
+            return queryset
+        return self.get_queryset()
 
 
 class RoleBinding(JMSModel):
@@ -53,6 +59,12 @@ class RoleBinding(JMSModel):
             display += ' | {org}'.format(org=self.org)
         return display
 
+    @property
+    def org_name(self):
+        if self.org:
+            return self.org.name
+        return ''
+
     def save(self, *args, **kwargs):
         self.scope = self.role.scope
         return super().save(*args, **kwargs)
@@ -65,7 +77,7 @@ class RoleBinding(JMSModel):
     @classmethod
     def get_role_users(cls, role):
         from users.models import User
-        bindings = cls.objects.filter(role=role, scope=role.scope)
+        bindings = cls.objects.root_all().filter(role=role, scope=role.scope)
         user_ids = bindings.values_list('user', flat=True).distinct()
         return User.objects.filter(id__in=user_ids)
 
@@ -84,13 +96,13 @@ class RoleBinding(JMSModel):
         return self.role.display_name
 
 
-class OrgRoleBindingManager(models.Manager):
+class OrgRoleBindingManager(RoleBindingManager):
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super(RoleBindingManager, self).get_queryset()
         if current_org.is_root():
-            queryset = queryset.filter(scope=Scope.org)
+            queryset = queryset.none()
         else:
-            queryset = queryset.filter(org=current_org.id, scope=Scope.org)
+            queryset = queryset.filter(org_id=current_org.id, scope=Scope.org)
         return queryset
 
 
@@ -118,9 +130,10 @@ class OrgRoleBinding(RoleBinding):
         verbose_name = _('Organization role binding')
 
 
-class SystemRoleBindingManager(models.Manager):
+class SystemRoleBindingManager(RoleBindingManager):
     def get_queryset(self):
-        queryset = super().get_queryset().filter(scope=Scope.system)
+        queryset = super(RoleBindingManager, self).get_queryset()\
+            .filter(scope=Scope.system)
         return queryset
 
 

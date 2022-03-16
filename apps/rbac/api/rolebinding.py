@@ -22,9 +22,10 @@ class RoleBindingViewSet(OrgBulkModelViewSet):
         'user__name', 'user__username', 'role__name'
     ]
 
-    def get_queryset(self):
-        queryset = super().get_queryset() \
-            .prefetch_related('user', 'role') \
+    @staticmethod
+    def annotate_queryset(queryset):
+        queryset = queryset \
+            .prefetch_related('user', 'role', 'org') \
             .annotate(
                 user_display=Concat(
                     F('user__name'), Value('('),
@@ -32,6 +33,11 @@ class RoleBindingViewSet(OrgBulkModelViewSet):
                 ),
                 role_display=F('role__name')
             )
+        return queryset
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = self.annotate_queryset(queryset)
         return queryset
 
 
@@ -49,8 +55,12 @@ class SystemRoleBindingViewSet(RoleBindingViewSet):
 
 
 class OrgRoleBindingViewSet(RoleBindingViewSet):
-    model = OrgRoleBinding
     serializer_class = serializers.OrgRoleBindingSerializer
+
+    def get_queryset(self):
+        queryset = OrgRoleBinding.objects.root_all()
+        queryset = self.annotate_queryset(queryset)
+        return queryset
 
     def perform_bulk_create(self, serializer):
         validated_data = serializer.validated_data
