@@ -37,7 +37,8 @@ class OrgRoleMixin:
             'auditor': BuiltinRole.org_auditor,
             'admin': BuiltinRole.org_admin
         }
-        role = role_mapper.get(role_name)
+        assert role_name in role_mapper
+        role = role_mapper.get(role_name).get_role()
         with tmp_to_org(self):
             org_admins = OrgRoleBinding.get_role_users(role)
             return org_admins
