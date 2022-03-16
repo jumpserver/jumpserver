@@ -33,6 +33,20 @@ def clean_db_content_types():
         ('perms', 'applicationpermission', 'connect_myapps'),
         ('perms', 'applicationpermission', 'view_userapps'),
         ('perms', 'applicationpermission', 'view_usergroupapps'),
+        ('perms', 'databaseapppermission', 'view_databaseapppermission'),
+        ('perms', 'databaseapppermission', 'add_databaseapppermission'),
+        ('perms', 'databaseapppermission', 'change_databaseapppermission'),
+        ('perms', 'databaseapppermission', 'delete_databaseapppermission'),
+
+        ('perms', 'k8sapppermission', 'view_k8sapppermission'),
+        ('perms', 'k8sapppermission', 'add_k8sapppermission'),
+        ('perms', 'k8sapppermission', 'change_k8sapppermission'),
+        ('perms', 'k8sapppermission', 'delete_k8sapppermission'),
+
+        ('perms', 'remoteapppermission', 'view_remoteapppermission'),
+        ('perms', 'remoteapppermission', 'add_remoteapppermission'),
+        ('perms', 'remoteapppermission', 'change_remoteapppermission'),
+        ('perms', 'remoteapppermission', 'delete_remoteapppermission'),
 
 
         ('perms', 'permeddatabaseapp', 'connect_mydatabaseapp'),
