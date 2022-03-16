@@ -112,6 +112,7 @@ verbose_name_mapper = {
     'tickets.comment': _("Ticket comment"),
     'tickets.view_ticket': _("Ticket"),
     'settings.setting': _("Common setting"),
+    'ops.add_commandexecution': _('Execute batch command')
 }
 
 xpack_nodes = [

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-15 19:46+0800\n"
+"POT-Creation-Date: 2022-03-16 17:35+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -22,7 +22,7 @@ msgid "Acls"
 msgstr "访问控制"
 
 #: acls/models/base.py:25 acls/serializers/login_asset_acl.py:47
-#: applications/models/application.py:202 assets/models/asset.py:138
+#: applications/models/application.py:209 assets/models/asset.py:138
 #: assets/models/base.py:175 assets/models/cluster.py:18
 #: assets/models/cmd_filter.py:27 assets/models/domain.py:23
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
@@ -56,7 +56,7 @@ msgstr "优先级可选范围为 1-100 (数值越小越优先)"
 msgid "Active"
 msgstr "激活中"
 
-#: acls/models/base.py:32 applications/models/application.py:215
+#: acls/models/base.py:32 applications/models/application.py:222
 #: assets/models/asset.py:143 assets/models/asset.py:231
 #: assets/models/backup.py:54 assets/models/base.py:180
 #: assets/models/cluster.py:29 assets/models/cmd_filter.py:48
@@ -89,13 +89,13 @@ msgstr "登录复核"
 #: acls/models/login_acl.py:24 acls/models/login_asset_acl.py:20
 #: assets/models/cmd_filter.py:30 assets/models/label.py:15 audits/models.py:37
 #: audits/models.py:60 audits/models.py:85 audits/serializers.py:100
-#: authentication/models.py:50 orgs/models.py:196 perms/models/base.py:84
-#: rbac/builtin.py:97 rbac/models/rolebinding.py:35 templates/index.html:78
+#: authentication/models.py:50 orgs/models.py:191 perms/models/base.py:84
+#: rbac/builtin.py:97 rbac/models/rolebinding.py:33 templates/index.html:78
 #: terminal/backends/command/models.py:19
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:42
 #: terminal/notifications.py:88 terminal/notifications.py:136
-#: tickets/models/comment.py:17 users/const.py:14 users/models/user.py:793
-#: users/models/user.py:824 users/serializers/group.py:19
+#: tickets/models/comment.py:17 users/const.py:14 users/models/user.py:795
+#: users/models/user.py:826 users/serializers/group.py:19
 #: users/templates/users/user_asset_permission.html:38
 #: users/templates/users/user_asset_permission.html:64
 #: users/templates/users/user_database_app_permission.html:37
@@ -254,7 +254,7 @@ msgstr "时段"
 msgid "My applications"
 msgstr "我的应用"
 
-#: applications/apps.py:9 applications/models/application.py:60
+#: applications/apps.py:9 applications/models/application.py:61
 msgid "Applications"
 msgstr "应用管理"
 
@@ -269,11 +269,11 @@ msgstr "数据库"
 msgid "Remote app"
 msgstr "远程应用"
 
-#: applications/const.py:31
+#: applications/const.py:35
 msgid "Custom"
 msgstr "自定义"
 
-#: applications/models/account.py:12 applications/models/application.py:219
+#: applications/models/account.py:12 applications/models/application.py:226
 #: assets/models/backup.py:32 assets/models/cmd_filter.py:45
 #: perms/models/application_permission.py:28
 msgid "Application"
@@ -313,7 +313,7 @@ msgstr "可以查看应用账号密码"
 msgid "Can change application account secret"
 msgstr "可以查看应用账号密码"
 
-#: applications/models/application.py:204
+#: applications/models/application.py:211
 #: applications/serializers/application.py:99 assets/models/label.py:21
 #: perms/models/application_permission.py:21
 #: perms/serializers/application/user_permission.py:33
@@ -322,7 +322,7 @@ msgstr "可以查看应用账号密码"
 msgid "Category"
 msgstr "类别"
 
-#: applications/models/application.py:207
+#: applications/models/application.py:214
 #: applications/serializers/application.py:101 assets/models/backup.py:49
 #: assets/models/cmd_filter.py:82 assets/models/user.py:233
 #: perms/models/application_permission.py:24
@@ -335,20 +335,20 @@ msgstr "类别"
 msgid "Type"
 msgstr "类型"
 
-#: applications/models/application.py:211 assets/models/asset.py:217
+#: applications/models/application.py:218 assets/models/asset.py:217
 #: assets/models/domain.py:29 assets/models/domain.py:63
 msgid "Domain"
 msgstr "网域"
 
-#: applications/models/application.py:213 xpack/plugins/cloud/models.py:33
+#: applications/models/application.py:220 xpack/plugins/cloud/models.py:33
 msgid "Attrs"
 msgstr "属性"
 
-#: applications/models/application.py:223
+#: applications/models/application.py:230
 msgid "Can match application"
 msgstr "匹配应用"
 
-#: applications/models/application.py:271
+#: applications/models/application.py:278
 msgid "Application user"
 msgstr "应用用户"
 
@@ -375,8 +375,8 @@ msgstr "类型名称"
 #: assets/models/group.py:22 assets/models/label.py:25
 #: assets/serializers/account.py:18 common/db/models.py:113
 #: common/mixins/models.py:50 ops/models/adhoc.py:39 ops/models/command.py:30
-#: orgs/models.py:14 orgs/models.py:199 perms/models/base.py:92
-#: users/models/group.py:18 users/models/user.py:825
+#: orgs/models.py:14 orgs/models.py:194 perms/models/base.py:92
+#: users/models/group.py:18 users/models/user.py:827
 #: xpack/plugins/cloud/models.py:125
 msgid "Date created"
 msgstr "创建日期"
@@ -384,7 +384,7 @@ msgstr "创建日期"
 #: applications/serializers/application.py:104 assets/models/base.py:182
 #: assets/models/gathered_user.py:20 assets/serializers/account.py:21
 #: common/db/models.py:114 common/mixins/models.py:51 ops/models/adhoc.py:40
-#: orgs/models.py:200
+#: orgs/models.py:195
 msgid "Date updated"
 msgstr "更新日期"
 
@@ -627,7 +627,7 @@ msgstr "标签管理"
 #: assets/models/cluster.py:28 assets/models/cmd_filter.py:52
 #: assets/models/cmd_filter.py:99 assets/models/group.py:21
 #: common/db/models.py:111 common/mixins/models.py:49 orgs/models.py:13
-#: orgs/models.py:201 perms/models/base.py:91 users/models/user.py:619
+#: orgs/models.py:196 perms/models/base.py:91 users/models/user.py:619
 #: users/serializers/group.py:33
 #: xpack/plugins/change_auth_plan/models/base.py:48
 #: xpack/plugins/cloud/models.py:122 xpack/plugins/gathered_user/models.py:30
@@ -834,7 +834,7 @@ msgid "Default"
 msgstr "默认"
 
 #: assets/models/cluster.py:36 assets/models/label.py:14 rbac/const.py:6
-#: users/models/user.py:810
+#: users/models/user.py:812
 msgid "System"
 msgstr "系统"
 
@@ -1383,7 +1383,7 @@ msgstr "日志审计"
 
 #: audits/models.py:27 audits/models.py:57
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:158 users/templates/users/user_asset_permission.html:128
+#: rbac/tree.py:161 users/templates/users/user_asset_permission.html:128
 #: users/templates/users/user_database_app_permission.html:111
 msgid "Delete"
 msgstr "删除"
@@ -1437,11 +1437,11 @@ msgstr "文件管理"
 
 #: audits/models.py:55
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:155
+#: rbac/tree.py:158
 msgid "Create"
 msgstr "创建"
 
-#: audits/models.py:56 rbac/tree.py:157 templates/_csv_import_export.html:18
+#: audits/models.py:56 rbac/tree.py:160 templates/_csv_import_export.html:18
 #: templates/_csv_update_modal.html:6
 #: users/templates/users/user_asset_permission.html:127
 #: users/templates/users/user_database_app_permission.html:110
@@ -2883,7 +2883,7 @@ msgid "App organizations"
 msgstr "组织管理"
 
 #: orgs/mixins/models.py:46 orgs/mixins/serializers.py:25 orgs/models.py:27
-#: orgs/models.py:193 rbac/const.py:7 rbac/models/rolebinding.py:42
+#: orgs/models.py:188 rbac/const.py:7 rbac/models/rolebinding.py:40
 #: rbac/serializers/rolebinding.py:40 tickets/serializers/ticket/ticket.py:77
 msgid "Organization"
 msgstr "组织"
@@ -2896,7 +2896,7 @@ msgstr "全局组织"
 msgid "Can view root org"
 msgstr "可以查看全局组织"
 
-#: orgs/models.py:198 rbac/models/role.py:46 rbac/models/rolebinding.py:38
+#: orgs/models.py:193 rbac/models/role.py:46 rbac/models/rolebinding.py:36
 #: users/models/user.py:584 users/templates/users/_select_user_modal.html:15
 msgid "Role"
 msgstr "角色"
@@ -3181,7 +3181,7 @@ msgstr "文件管理"
 msgid "Permission"
 msgstr "授权"
 
-#: rbac/models/role.py:31 rbac/models/rolebinding.py:32
+#: rbac/models/role.py:31 rbac/models/rolebinding.py:30
 msgid "Scope"
 msgstr "范围"
 
@@ -3201,21 +3201,21 @@ msgstr "系统角色"
 msgid "Organization role"
 msgstr "组织角色"
 
-#: rbac/models/rolebinding.py:47
+#: rbac/models/rolebinding.py:45
 msgid "Role binding"
 msgstr "角色绑定"
 
-#: rbac/models/rolebinding.py:113
+#: rbac/models/rolebinding.py:111
 msgid ""
 "User last role in org, can not be delete, you can remove user from org "
 "instead"
 msgstr "用户最后一个角色，不能删除，你可以将用户从组织移除"
 
-#: rbac/models/rolebinding.py:120
+#: rbac/models/rolebinding.py:118
 msgid "Organization role binding"
 msgstr "组织角色绑定"
 
-#: rbac/models/rolebinding.py:134
+#: rbac/models/rolebinding.py:132
 msgid "System role binding"
 msgstr "系统角色绑定"
 
@@ -3307,11 +3307,19 @@ msgstr "我的应用"
 msgid "Ticket comment"
 msgstr "工单评论"
 
-#: rbac/tree.py:113
+#: rbac/tree.py:113 tickets/models/ticket.py:163
+msgid "Ticket"
+msgstr "工单管理"
+
+#: rbac/tree.py:114
 msgid "Common setting"
 msgstr "一般设置"
 
-#: rbac/tree.py:156
+#: rbac/tree.py:115
+msgid "Execute batch command"
+msgstr "执行批量命令"
+
+#: rbac/tree.py:159
 msgid "View"
 msgstr "查看"
 
@@ -5363,10 +5371,6 @@ msgstr "流程"
 msgid "TicketFlow"
 msgstr "工单流程"
 
-#: tickets/models/ticket.py:163
-msgid "Ticket"
-msgstr "工单管理"
-
 #: tickets/models/ticket.py:311
 msgid "Please try again"
 msgstr "请再次尝试"
@@ -5674,27 +5678,27 @@ msgstr "最后更新密码日期"
 msgid "Need update password"
 msgstr "需要更新密码"
 
-#: users/models/user.py:795
+#: users/models/user.py:797
 msgid "Can invite user"
 msgstr "可以邀请用户"
 
-#: users/models/user.py:796
+#: users/models/user.py:798
 msgid "Can remove user"
 msgstr "可以移除用户"
 
-#: users/models/user.py:797
+#: users/models/user.py:799
 msgid "Can match user"
 msgstr "可以匹配用户"
 
-#: users/models/user.py:806
+#: users/models/user.py:808
 msgid "Administrator"
 msgstr "管理员"
 
-#: users/models/user.py:809
+#: users/models/user.py:811
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
-#: users/models/user.py:834
+#: users/models/user.py:836
 msgid "User password history"
 msgstr "用户密码历史"
 
@@ -6807,11 +6811,11 @@ msgstr "退出页面logo"
 msgid "Interface setting"
 msgstr "界面设置"
 
-#: xpack/plugins/license/api.py:43
+#: xpack/plugins/license/api.py:41
 msgid "License import successfully"
 msgstr "许可证导入成功"
 
-#: xpack/plugins/license/api.py:44
+#: xpack/plugins/license/api.py:42
 msgid "License is invalid"
 msgstr "无效的许可证"
 

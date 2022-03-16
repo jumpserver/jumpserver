@@ -164,7 +164,7 @@ class Organization(models.Model):
         return super().delete(*args, **kwargs)
 
     @property
-    def admin(self):
+    def admins(self):
         from rbac.models import OrgRoleBinding
         from users.models import User
         from rbac.builtin import BuiltinRole
