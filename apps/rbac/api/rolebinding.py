@@ -8,7 +8,10 @@ from common.exceptions import JMSException
 from .. import serializers
 from ..models import RoleBinding, SystemRoleBinding, OrgRoleBinding
 
-__all__ = ['RoleBindingViewSet', 'SystemRoleBindingViewSet', 'OrgRoleBindingViewSet']
+__all__ = [
+    'RoleBindingViewSet', 'SystemRoleBindingViewSet',
+    'OrgRoleBindingViewSet'
+]
 
 
 class RoleBindingViewSet(OrgBulkModelViewSet):
@@ -22,9 +25,8 @@ class RoleBindingViewSet(OrgBulkModelViewSet):
         'user__name', 'user__username', 'role__name'
     ]
 
-    @staticmethod
-    def annotate_queryset(queryset):
-        queryset = queryset \
+    def get_queryset(self):
+        queryset = self._get_queryset()\
             .prefetch_related('user', 'role', 'org') \
             .annotate(
                 user_display=Concat(
@@ -35,10 +37,8 @@ class RoleBindingViewSet(OrgBulkModelViewSet):
             )
         return queryset
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        queryset = self.annotate_queryset(queryset)
-        return queryset
+    def _get_queryset(self):
+        return super().get_queryset()
 
 
 class SystemRoleBindingViewSet(RoleBindingViewSet):
@@ -57,10 +57,8 @@ class SystemRoleBindingViewSet(RoleBindingViewSet):
 class OrgRoleBindingViewSet(RoleBindingViewSet):
     serializer_class = serializers.OrgRoleBindingSerializer
 
-    def get_queryset(self):
-        queryset = OrgRoleBinding.objects.root_all()
-        queryset = self.annotate_queryset(queryset)
-        return queryset
+    def _get_queryset(self):
+        return OrgRoleBinding.objects.root_all()
 
     def perform_bulk_create(self, serializer):
         validated_data = serializer.validated_data
