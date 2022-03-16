@@ -28,7 +28,7 @@ class ApplicationViewSet(SuggestionMixin, OrgBulkModelViewSet):
     }
     rbac_perms = {
         'get_tree': 'applications.view_application',
-        'match': 'assets.match_application'
+        'match': 'applications.match_application'
     }
 
     @action(methods=['GET'], detail=False, url_path='tree')
