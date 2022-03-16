@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-16 19:59+0800\n"
+"POT-Creation-Date: 2022-03-16 20:38+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -90,7 +90,7 @@ msgstr "登录复核"
 #: assets/models/cmd_filter.py:30 assets/models/label.py:15 audits/models.py:37
 #: audits/models.py:60 audits/models.py:85 audits/serializers.py:100
 #: authentication/models.py:50 orgs/models.py:214 perms/models/base.py:84
-#: rbac/builtin.py:98 rbac/models/rolebinding.py:39 templates/index.html:78
+#: rbac/builtin.py:97 rbac/models/rolebinding.py:39 templates/index.html:78
 #: terminal/backends/command/models.py:19
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:42
 #: terminal/notifications.py:88 terminal/notifications.py:136
@@ -1384,7 +1384,7 @@ msgstr "日志审计"
 
 #: audits/models.py:27 audits/models.py:57
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:160 users/templates/users/user_asset_permission.html:128
+#: rbac/tree.py:162 users/templates/users/user_asset_permission.html:128
 #: users/templates/users/user_database_app_permission.html:111
 msgid "Delete"
 msgstr "删除"
@@ -1438,11 +1438,11 @@ msgstr "文件管理"
 
 #: audits/models.py:55
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:157
+#: rbac/tree.py:159
 msgid "Create"
 msgstr "创建"
 
-#: audits/models.py:56 rbac/tree.py:159 templates/_csv_import_export.html:18
+#: audits/models.py:56 rbac/tree.py:161 templates/_csv_import_export.html:18
 #: templates/_csv_update_modal.html:6
 #: users/templates/users/user_asset_permission.html:127
 #: users/templates/users/user_database_app_permission.html:110
@@ -3180,7 +3180,7 @@ msgstr "文件管理"
 
 #: rbac/models/permission.py:26
 msgid "Permission"
-msgstr "授权"
+msgstr "权限"
 
 #: rbac/models/role.py:31 rbac/models/rolebinding.py:36
 msgid "Scope"
@@ -3316,11 +3316,15 @@ msgstr "工单管理"
 msgid "Common setting"
 msgstr "一般设置"
 
-#: rbac/tree.py:114
+#: rbac/tree.py:115
+msgid "View permission tree"
+msgstr "查看授权树"
+
+#: rbac/tree.py:116
 msgid "Execute batch command"
 msgstr "执行批量命令"
 
-#: rbac/tree.py:158
+#: rbac/tree.py:160
 msgid "View"
 msgstr "查看"
 
@@ -6182,7 +6186,7 @@ msgstr "重置密码成功，返回到登录页面"
 msgid "XPACK"
 msgstr ""
 
-#: xpack/plugins/change_auth_plan/api/app.py:109
+#: xpack/plugins/change_auth_plan/api/app.py:112
 #: xpack/plugins/change_auth_plan/api/asset.py:95
 msgid "The parameter 'action' must be [{}]"
 msgstr "参数 'action' 必须是 [{}]"
@@ -6812,11 +6816,11 @@ msgstr "退出页面logo"
 msgid "Interface setting"
 msgstr "界面设置"
 
-#: xpack/plugins/license/api.py:41
+#: xpack/plugins/license/api.py:43
 msgid "License import successfully"
 msgstr "许可证导入成功"
 
-#: xpack/plugins/license/api.py:42
+#: xpack/plugins/license/api.py:44
 msgid "License is invalid"
 msgstr "无效的许可证"
 
@@ -7031,9 +7035,6 @@ msgstr "社区版"
 
 #~ msgid "Overview"
 #~ msgstr "概览"
-
-#~ msgid "View permission user"
-#~ msgstr "查看授权用户"
 
 #~ msgid "Add user to role"
 #~ msgstr "添加用户到角色"
