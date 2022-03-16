@@ -2879,7 +2879,7 @@ msgstr "当前组织 ({}) 不能被删除"
 msgid "The organization have resource ({}) cannot be deleted"
 msgstr "组织存在资源 ({}) 不能被删除"
 
-#: orgs/apps.py:7 rbac/tree.py:111
+#: orgs/apps.py:7 rbac/tree.py:110
 msgid "App organizations"
 msgstr "组织管理"
 
@@ -3130,27 +3130,27 @@ msgstr "{} 至少有一个系统角色"
 msgid "RBAC"
 msgstr "RBAC"
 
-#: rbac/builtin.py:88
+#: rbac/builtin.py:89
 msgid "SystemAdmin"
 msgstr "系统管理员"
 
-#: rbac/builtin.py:91
+#: rbac/builtin.py:92
 msgid "SystemAuditor"
 msgstr "系统审计员"
 
-#: rbac/builtin.py:94
+#: rbac/builtin.py:95
 msgid "SystemComponent"
 msgstr "系统组件"
 
-#: rbac/builtin.py:100
+#: rbac/builtin.py:101
 msgid "OrgAdmin"
 msgstr "组织管理员"
 
-#: rbac/builtin.py:103
+#: rbac/builtin.py:104
 msgid "OrgAuditor"
 msgstr "组织审计员"
 
-#: rbac/builtin.py:106
+#: rbac/builtin.py:107
 msgid "OrgUser"
 msgstr "组织用户"
 
@@ -3240,79 +3240,79 @@ msgstr "角色显示"
 msgid "Has bound this role"
 msgstr "已经绑定"
 
-#: rbac/tree.py:17 rbac/tree.py:18
+#: rbac/tree.py:16 rbac/tree.py:17
 msgid "All permissions"
 msgstr "所有权限"
 
-#: rbac/tree.py:24
+#: rbac/tree.py:23
 msgid "Console view"
 msgstr "控制台"
 
-#: rbac/tree.py:25
+#: rbac/tree.py:24
 msgid "Workspace view"
 msgstr "工作台"
 
-#: rbac/tree.py:26
+#: rbac/tree.py:25
 msgid "Audit view"
 msgstr "审计台"
 
-#: rbac/tree.py:27 settings/models.py:140
+#: rbac/tree.py:26 settings/models.py:140
 msgid "System setting"
 msgstr "系统设置"
 
-#: rbac/tree.py:28
+#: rbac/tree.py:27
 msgid "Other"
 msgstr "其它"
 
-#: rbac/tree.py:36
+#: rbac/tree.py:35
 msgid "Accounts"
 msgstr "账号管理"
 
-#: rbac/tree.py:40
+#: rbac/tree.py:39
 msgid "Session audits"
 msgstr "会话审计"
 
-#: rbac/tree.py:50
+#: rbac/tree.py:49
 msgid "Cloud import"
 msgstr "云同步"
 
-#: rbac/tree.py:51
+#: rbac/tree.py:50
 msgid "Backup account"
 msgstr "备份账号"
 
-#: rbac/tree.py:52
+#: rbac/tree.py:51
 msgid "Gather account"
 msgstr "收集账号"
 
-#: rbac/tree.py:53
+#: rbac/tree.py:52
 msgid "App change auth"
 msgstr "应用改密"
 
-#: rbac/tree.py:54
+#: rbac/tree.py:53
 msgid "Asset change auth"
 msgstr "资产改密"
 
-#: rbac/tree.py:55
+#: rbac/tree.py:54
 msgid "Terminal setting"
 msgstr "终端设置"
 
-#: rbac/tree.py:56
+#: rbac/tree.py:55
 msgid "My assets"
 msgstr "我的资产"
 
-#: rbac/tree.py:57
+#: rbac/tree.py:56
 msgid "My apps"
 msgstr "我的应用"
 
-#: rbac/tree.py:112
+#: rbac/tree.py:111
 msgid "Ticket comment"
 msgstr "工单评论"
 
-#: rbac/tree.py:113 tickets/models/ticket.py:163
+#: rbac/tree.py:112 tickets/models/ticket.py:163
 msgid "Ticket"
 msgstr "工单管理"
 
-#: rbac/tree.py:114
+#: rbac/tree.py:113
 msgid "Common setting"
 msgstr "一般设置"
 
@@ -6843,6 +6843,21 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#, fuzzy
+#~| msgid "Create"
+#~ msgid "create"
+#~ msgstr "创建"
+
+#, fuzzy
+#~| msgid "Update"
+#~ msgid "update"
+#~ msgstr "更新"
+
+#, fuzzy
+#~| msgid "Delete"
+#~ msgid "delete"
+#~ msgstr "删除"
 
 #~ msgid "Can connect my assets"
 #~ msgstr "可以连接我的资产"
