@@ -2804,7 +2804,7 @@ msgstr "汇总"
 
 #: ops/models/adhoc.py:339
 msgid "AdHoc execution"
-msgstr "任务执行历史"
+msgstr "任务执行"
 
 #: ops/models/command.py:32
 msgid "Date finished"

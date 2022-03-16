@@ -112,7 +112,8 @@ class Organization(models.Model):
             role_id = role.id
         with tmp_to_org(self):
             defaults = {
-                'user': user, 'role_id': role_id, 'org_id': self.id, 'scope': 'org'
+                'user': user, 'role_id': role_id,
+                'org_id': self.id, 'scope': 'org'
             }
             self.members.through.objects.update_or_create(**defaults, defaults=defaults)
 
@@ -162,25 +163,19 @@ class Organization(models.Model):
         self.delete_related_models()
         return super().delete(*args, **kwargs)
 
+    @property
+    def admin(self):
+        from rbac.models import OrgRoleBinding
+        from users.models import User
+        from rbac.builtin import BuiltinRole
+        from .utils import tmp_to_org
 
-# class OrgMemberManager(models.Manager):
-#     def remove_users(self, org, users):
-#         from users.models import User
-#         pk_set = []
-#         for user in users:
-#             if hasattr(user, 'pk'):
-#                 pk_set.append(user.pk)
-#             else:
-#                 pk_set.append(user)
-#
-#         send = partial(
-#             signals.m2m_changed.send, sender=self.model,
-#             instance=org, reverse=False, model=User,
-#             pk_set=pk_set, using=self.db
-#         )
-#         send(action="pre_remove")
-#         self.filter(org_id=org.id, user_id__in=pk_set).delete()
-#         send(action="post_remove")
+        role_org_admin = BuiltinRole.org_admin.get_role()
+        with tmp_to_org(self):
+            org_admins = OrgRoleBinding.get_role_users(role_org_admin)
+            if not org_admins:
+                org_admins = User.objects.filter(username='admin')
+            return org_admins
 
 
 class OrganizationMember(models.Model):
