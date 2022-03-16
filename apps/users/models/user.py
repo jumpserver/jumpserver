@@ -790,6 +790,10 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
             orgs = [Organization.root()] + orgs
         return orgs
 
+    @property
+    def my_orgs(self):
+        return list(self.orgs.all().distinct())
+
     class Meta:
         ordering = ['username']
         verbose_name = _("User")
