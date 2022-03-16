@@ -12,6 +12,9 @@ user_perms = (
     ('assets', 'systemuser', 'match', 'systemuser'),
     ('assets', 'node', 'match', 'node'),
     ('ops', 'commandexecution', 'add', 'commandexecution'),
+    ('tickets', 'comment', '*', '*'),
+    ('tickets', 'superticket', '*', '*'),
+    ('tickets', 'ticket', '*', '*')
 )
 
 auditor_perms = user_perms + (
