@@ -14,7 +14,7 @@ __all__ = ['celery_flower_view']
 
 @csrf_exempt
 def celery_flower_view(request, path):
-    if not request.user.is_superuser:
+    if not request.user.has_perm('ops.view_taskmonitor'):
         return HttpResponse("Forbidden")
     remote_url = 'http://{}/{}'.format(flower_url, path)
     try:
