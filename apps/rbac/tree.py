@@ -2,11 +2,10 @@
 from collections import defaultdict
 from typing import Callable
 
-from django.utils.translation import gettext_lazy as _, gettext
+from django.utils.translation import gettext_lazy as _, gettext, get_language
 from django.conf import settings
 from django.apps import apps
 from django.db.models import F, Count
-from django.utils.translation import ugettext
 
 from common.tree import TreeNode
 from .models import Permission, ContentType
@@ -104,19 +103,24 @@ special_pid_mapper = {
     "rbac.view_workspace": "view_workspace",
     "rbac.view_webterminal": "view_workspace",
     "rbac.view_filemanager": "view_workspace",
+    'tickets.view_ticket': 'tickets'
 }
 
 verbose_name_mapper = {
     'orgs.organization': _("App organizations"),
     'tickets.comment': _("Ticket comment"),
+    'tickets.view_ticket': _("Ticket"),
     'settings.setting': _("Common setting"),
+    'rbac.view_permission': _('View permission tree'),
+    'ops.add_commandexecution': _('Execute batch command')
 }
 
 xpack_nodes = [
     'xpack', 'tickets', 'applications.remoteapp',
     "assets.accountbackupplan", "assets.accountbackupplanexecution",
     "rbac.orgrole", "rbac.orgrolebinding",
-    "settings.change_interface",
+    "settings.change_interface", 'assets.gathereduser',
+    'gather_account_node'
 ]
 
 
@@ -151,10 +155,10 @@ def sort_nodes(node):
 class PermissionTreeUtil:
     get_permissions: Callable
     action_mapper = {
-        'add': ugettext('Create'),
-        'view': ugettext('View'),
-        'change': ugettext('Update'),
-        'delete': ugettext('Delete')
+        'add': _('Create'),
+        'view': _('View'),
+        'change': _('Update'),
+        'delete': _('Delete')
     }
     action_icon = {
         'add': 'add',
@@ -174,6 +178,7 @@ class PermissionTreeUtil:
         self.check_disabled = check_disabled
         self.total_counts = defaultdict(int)
         self.checked_counts = defaultdict(int)
+        self.lang = get_language()
 
     @staticmethod
     def prefetch_permissions(perms):
@@ -278,14 +283,24 @@ class PermissionTreeUtil:
 
     def _get_permission_name_icon(self, p: Permission, content_types_name_mapper: dict):
         action, resource = p.codename.split('_', 1)
+        icon = self.action_icon.get(action, 'file')
+        name = verbose_name_mapper.get(p.app_label_codename)
+        if name:
+            return name, icon
+
         app_model = '%s.%s' % (p.content_type.app_label, resource)
-        if action in self.action_mapper and app_model in content_types_name_mapper:
+        if self.lang == 'en':
+            name = p.name
+        # 因为默认的权限位是没有翻译的，所以我们要用 action + resource name 去拼
+        elif action in self.action_mapper and app_model in content_types_name_mapper:
             action_name = self.action_mapper[action]
-            name = action_name + content_types_name_mapper[app_model]
+            resource_name = content_types_name_mapper[app_model]
+            sep = ''
+            name = '{}{}{}'.format(action_name, sep, resource_name)
+        # 手动创建的 permission
         else:
             name = gettext(p.name)
-        icon = self.action_icon.get(action, 'file')
-        name = name.replace('Can ', '').replace('可以', '')
+        name = name.replace('Can ', '').replace('可以', '').capitalize()
         return name, icon
 
     def _create_perms_nodes(self):

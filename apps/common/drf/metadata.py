@@ -32,6 +32,7 @@ class SimpleMetadataWithFilters(SimpleMetadata):
         the fields that are accepted for 'PUT' and 'POST' methods.
         """
         actions = {}
+        view.raw_action = getattr(view, 'action', None)
         for method in self.methods & set(view.allowed_methods):
             if hasattr(view, 'action_map'):
                 view.action = view.action_map.get(method.lower(), view.action)
