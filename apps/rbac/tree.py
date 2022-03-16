@@ -6,7 +6,6 @@ from django.utils.translation import gettext_lazy as _, gettext, get_language
 from django.conf import settings
 from django.apps import apps
 from django.db.models import F, Count
-from django.utils.translation import ugettext
 
 from common.tree import TreeNode
 from .models import Permission, ContentType
@@ -155,10 +154,10 @@ def sort_nodes(node):
 class PermissionTreeUtil:
     get_permissions: Callable
     action_mapper = {
-        'add': ugettext('create'),
-        'view': ugettext('view'),
-        'change': ugettext('update'),
-        'delete': ugettext('delete')
+        'add': _('Create'),
+        'view': _('View'),
+        'change': _('Update'),
+        'delete': _('Delete')
     }
     action_icon = {
         'add': 'add',
