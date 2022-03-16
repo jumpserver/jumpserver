@@ -12,7 +12,7 @@ class ActionsField(serializers.MultipleChoiceField):
         super().__init__(*args, **kwargs)
 
     def run_validation(self, data=empty):
-        data = super(ActionsField, self).run_validation()
+        data = super(ActionsField, self).run_validation(data)
         if isinstance(data, list):
             data = Action.choices_to_value(value=data)
         return data
