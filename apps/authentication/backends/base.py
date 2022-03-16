@@ -22,8 +22,10 @@ class JMSBaseAuthBackend:
         Reject users with is_valid=False. Custom user models that don't have
         that attribute are allowed.
         """
-        is_valid = getattr(user, 'is_valid', None)
-        return is_valid or is_valid is None
+        # 在 check_user_auth 中进行了校验，可以返回对应的错误信息
+        # is_valid = getattr(user, 'is_valid', None)
+        # return is_valid or is_valid is None
+        return True
 
     # allow user to authenticate
     def username_allow_authenticate(self, username):
