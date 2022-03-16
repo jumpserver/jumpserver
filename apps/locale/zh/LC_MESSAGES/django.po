@@ -3111,15 +3111,15 @@ msgstr "如果有疑问或需求，请联系系统管理员"
 
 #: rbac/api/role.py:32
 msgid "Internal role, can't be destroy"
-msgstr ""
+msgstr "内部角色，不能删除"
 
 #: rbac/api/role.py:36
 msgid "The role has been bound to users, can't be destroy"
-msgstr ""
+msgstr "角色已绑定用户，不能删除"
 
 #: rbac/api/role.py:43
 msgid "Internal role, can't be update"
-msgstr ""
+msgstr "内部角色，不能更新"
 
 #: rbac/api/rolebinding.py:46
 msgid "{} at least one system role"

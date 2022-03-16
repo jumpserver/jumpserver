@@ -15,11 +15,9 @@ __all__ = ['RoleBinding', 'SystemRoleBinding', 'OrgRoleBinding']
 class RoleBindingManager(models.Manager):
     def get_queryset(self):
         queryset = super(RoleBindingManager, self).get_queryset()
-
+        q = Q(scope=Scope.system)
         if not current_org.is_root():
-            q = Q(scope=Scope.system) | Q(org_id=current_org.id, scope=Scope.org)
-        else:
-            q = Q()
+            q |= Q(org_id=current_org.id, scope=Scope.org)
         queryset = queryset.filter(q)
         return queryset
 
