@@ -294,8 +294,8 @@ class PermissionTreeUtil:
         elif action in self.action_mapper and app_model in content_types_name_mapper:
             action_name = self.action_mapper[action]
             resource_name = content_types_name_mapper[app_model]
-            split = ''
-            name = '{}{}{}'.format(action_name, split, resource_name)
+            sep = ''
+            name = '{}{}{}'.format(action_name, sep, resource_name)
         # 手动创建的 permission
         else:
             name = gettext(p.name)
