@@ -42,6 +42,9 @@ class TaskViewSet(OrgBulkModelViewSet):
 class TaskRun(generics.RetrieveAPIView):
     queryset = Task.objects.all()
     serializer_class = CeleryTaskSerializer
+    rbac_perms = {
+        'retrieve': 'ops.add_adhoc'
+    }
 
     def retrieve(self, request, *args, **kwargs):
         task = self.get_object()
