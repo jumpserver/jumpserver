@@ -104,11 +104,13 @@ special_pid_mapper = {
     "rbac.view_workspace": "view_workspace",
     "rbac.view_webterminal": "view_workspace",
     "rbac.view_filemanager": "view_workspace",
+    'tickets.view_ticket': 'tickets'
 }
 
 verbose_name_mapper = {
     'orgs.organization': _("App organizations"),
     'tickets.comment': _("Ticket comment"),
+    'tickets.view_ticket': _("Ticket"),
     'settings.setting': _("Common setting"),
 }
 
@@ -279,13 +281,17 @@ class PermissionTreeUtil:
 
     def _get_permission_name_icon(self, p: Permission, content_types_name_mapper: dict):
         action, resource = p.codename.split('_', 1)
+        icon = self.action_icon.get(action, 'file')
+        name = verbose_name_mapper.get(p.app_label_codename)
+        if name:
+            return name, icon
+
         app_model = '%s.%s' % (p.content_type.app_label, resource)
         if action in self.action_mapper and app_model in content_types_name_mapper:
             action_name = self.action_mapper[action]
             name = action_name + content_types_name_mapper[app_model]
         else:
             name = gettext(p.name)
-        icon = self.action_icon.get(action, 'file')
         name = name.replace('Can ', '').replace('可以', '')
         return name, icon
 

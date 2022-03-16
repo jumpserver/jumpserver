@@ -69,13 +69,16 @@ class RBACPermission(permissions.DjangoModelPermissions):
 
     def _get_action_perms(self, action, model_cls, view):
         action_perms_map = self.get_rbac_perms(view, model_cls)
-        if action not in action_perms_map:
+        if action in action_perms_map:
+            perms = action_perms_map[action]
+        elif '*' in action_perms_map:
+            perms = action_perms_map['*']
+        else:
             msg = 'Action not allowed: {}, only `{}` supported'.format(
                 action, ','.join(list(action_perms_map.keys()))
             )
             logger.error(msg)
             raise exceptions.PermissionDenied(msg)
-        perms = action_perms_map[action]
         return perms
 
     def get_model_cls(self, view):
@@ -96,7 +99,6 @@ class RBACPermission(permissions.DjangoModelPermissions):
         :param view:
         :return:
         """
-
         model_cls = self.get_model_cls(view)
         action = getattr(view, 'action', None)
         if not action:
