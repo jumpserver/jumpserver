@@ -783,9 +783,11 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
             .exclude(name=BuiltinRole.system_user.name)\
             .exists()
         if has_system_role:
-            orgs = [Organization.root()] + list(Organization.objects.all())
+            orgs = list(Organization.objects.all())
         else:
             orgs = list(self.orgs.all().distinct())
+        if self.has_perm('orgs.view_rootorg'):
+            orgs = [Organization.root()] + orgs
         return orgs
 
     class Meta:
