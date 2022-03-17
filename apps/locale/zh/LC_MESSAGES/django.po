@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-16 20:38+0800\n"
+"POT-Creation-Date: 2022-03-17 15:06+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -90,12 +90,12 @@ msgstr "登录复核"
 #: assets/models/cmd_filter.py:30 assets/models/label.py:15 audits/models.py:37
 #: audits/models.py:60 audits/models.py:85 audits/serializers.py:100
 #: authentication/models.py:50 orgs/models.py:214 perms/models/base.py:84
-#: rbac/builtin.py:97 rbac/models/rolebinding.py:39 templates/index.html:78
+#: rbac/builtin.py:98 rbac/models/rolebinding.py:39 templates/index.html:78
 #: terminal/backends/command/models.py:19
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:42
 #: terminal/notifications.py:88 terminal/notifications.py:136
-#: tickets/models/comment.py:17 users/const.py:14 users/models/user.py:795
-#: users/models/user.py:826 users/serializers/group.py:19
+#: tickets/models/comment.py:17 users/const.py:14 users/models/user.py:799
+#: users/models/user.py:830 users/serializers/group.py:19
 #: users/templates/users/user_asset_permission.html:38
 #: users/templates/users/user_asset_permission.html:64
 #: users/templates/users/user_database_app_permission.html:37
@@ -341,6 +341,7 @@ msgid "Domain"
 msgstr "网域"
 
 #: applications/models/application.py:220 xpack/plugins/cloud/models.py:33
+#: xpack/plugins/cloud/serializers/account.py:57
 msgid "Attrs"
 msgstr "属性"
 
@@ -376,7 +377,7 @@ msgstr "类型名称"
 #: assets/serializers/account.py:18 common/db/models.py:113
 #: common/mixins/models.py:50 ops/models/adhoc.py:39 ops/models/command.py:30
 #: orgs/models.py:67 orgs/models.py:217 perms/models/base.py:92
-#: users/models/group.py:18 users/models/user.py:827
+#: users/models/group.py:18 users/models/user.py:831
 #: xpack/plugins/cloud/models.py:125
 msgid "Date created"
 msgstr "创建日期"
@@ -834,7 +835,7 @@ msgid "Default"
 msgstr "默认"
 
 #: assets/models/cluster.py:36 assets/models/label.py:14 rbac/const.py:6
-#: users/models/user.py:812
+#: users/models/user.py:816
 msgid "System"
 msgstr "系统"
 
@@ -1162,6 +1163,24 @@ msgstr "密钥密码"
 msgid "private key invalid or passphrase error"
 msgstr "密钥不合法或密钥密码错误"
 
+#: assets/serializers/cmd_filter.py:28 assets/serializers/cmd_filter.py:49
+#, fuzzy
+#| msgid "Date created"
+msgid "date created"
+msgstr "创建日期"
+
+#: assets/serializers/cmd_filter.py:29 assets/serializers/cmd_filter.py:50
+#, fuzzy
+#| msgid "Date updated"
+msgid "date updated"
+msgstr "更新日期"
+
+#: assets/serializers/cmd_filter.py:51
+#, fuzzy
+#| msgid "Application display"
+msgid "Action display"
+msgstr "应用名称"
+
 #: assets/serializers/domain.py:13 assets/serializers/label.py:12
 #: assets/serializers/system_user.py:59
 #: perms/serializers/asset/permission.py:49
@@ -1384,7 +1403,7 @@ msgstr "日志审计"
 
 #: audits/models.py:27 audits/models.py:57
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:162 users/templates/users/user_asset_permission.html:128
+#: rbac/tree.py:164 users/templates/users/user_asset_permission.html:128
 #: users/templates/users/user_database_app_permission.html:111
 msgid "Delete"
 msgstr "删除"
@@ -1438,11 +1457,11 @@ msgstr "文件管理"
 
 #: audits/models.py:55
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:159
+#: rbac/tree.py:161
 msgid "Create"
 msgstr "创建"
 
-#: audits/models.py:56 rbac/tree.py:161 templates/_csv_import_export.html:18
+#: audits/models.py:56 rbac/tree.py:163 templates/_csv_import_export.html:18
 #: templates/_csv_update_modal.html:6
 #: users/templates/users/user_asset_permission.html:127
 #: users/templates/users/user_database_app_permission.html:110
@@ -3220,7 +3239,7 @@ msgstr "组织角色绑定"
 msgid "System role binding"
 msgstr "系统角色绑定"
 
-#: rbac/serializers/permission.py:26 users/serializers/profile.py:125
+#: rbac/serializers/permission.py:26 users/serializers/profile.py:126
 msgid "Perms"
 msgstr "权限"
 
@@ -3316,15 +3335,15 @@ msgstr "工单管理"
 msgid "Common setting"
 msgstr "一般设置"
 
-#: rbac/tree.py:115
+#: rbac/tree.py:114
 msgid "View permission tree"
 msgstr "查看授权树"
 
-#: rbac/tree.py:116
+#: rbac/tree.py:115
 msgid "Execute batch command"
 msgstr "执行批量命令"
 
-#: rbac/tree.py:160
+#: rbac/tree.py:162
 msgid "View"
 msgstr "查看"
 
@@ -5384,19 +5403,19 @@ msgstr "请再次尝试"
 msgid "Super ticket"
 msgstr "超级工单"
 
-#: tickets/notifications.py:57
+#: tickets/notifications.py:63
 msgid "Your has a new ticket, applicant - {}"
 msgstr "你有一个新的工单, 申请人 - {}"
 
-#: tickets/notifications.py:63
+#: tickets/notifications.py:69
 msgid "New Ticket - {} ({})"
 msgstr "新工单 - {} ({})"
 
-#: tickets/notifications.py:85
+#: tickets/notifications.py:91
 msgid "Your ticket has been processed, processor - {}"
 msgstr "你的工单已被处理, 处理人 - {}"
 
-#: tickets/notifications.py:89
+#: tickets/notifications.py:95
 msgid "Ticket has processed - {} ({})"
 msgstr "你的工单已被处理, 处理人 - {} ({})"
 
@@ -5638,7 +5657,7 @@ msgid "Public key should not be the same as your old one."
 msgstr "不能和原来的密钥相同"
 
 #: users/forms/profile.py:149 users/serializers/profile.py:95
-#: users/serializers/profile.py:175 users/serializers/profile.py:202
+#: users/serializers/profile.py:176 users/serializers/profile.py:203
 msgid "Not a valid ssh public key"
 msgstr "SSH密钥不合法"
 
@@ -5683,27 +5702,27 @@ msgstr "最后更新密码日期"
 msgid "Need update password"
 msgstr "需要更新密码"
 
-#: users/models/user.py:797
+#: users/models/user.py:801
 msgid "Can invite user"
 msgstr "可以邀请用户"
 
-#: users/models/user.py:798
+#: users/models/user.py:802
 msgid "Can remove user"
 msgstr "可以移除用户"
 
-#: users/models/user.py:799
+#: users/models/user.py:803
 msgid "Can match user"
 msgstr "可以匹配用户"
 
-#: users/models/user.py:808
+#: users/models/user.py:812
 msgid "Administrator"
 msgstr "管理员"
 
-#: users/models/user.py:811
+#: users/models/user.py:815
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
-#: users/models/user.py:836
+#: users/models/user.py:840
 msgid "User password history"
 msgstr "用户密码历史"
 
@@ -5742,7 +5761,7 @@ msgstr "重置 MFA"
 msgid "The old password is incorrect"
 msgstr "旧密码错误"
 
-#: users/serializers/profile.py:36 users/serializers/profile.py:189
+#: users/serializers/profile.py:36 users/serializers/profile.py:190
 msgid "Password does not match security rules"
 msgstr "密码不满足安全规则"
 
@@ -5754,7 +5773,7 @@ msgstr "新密码不能是最近 {} 次的密码"
 msgid "The newly set password is inconsistent"
 msgstr "两次密码不一致"
 
-#: users/serializers/profile.py:141 users/serializers/user.py:138
+#: users/serializers/profile.py:142 users/serializers/user.py:138
 msgid "Is first login"
 msgstr "首次登录"
 
@@ -6684,6 +6703,14 @@ msgstr "华北-乌兰察布一"
 #: xpack/plugins/cloud/providers/huaweicloud.py:52
 msgid "CN South-Guangzhou-InvitationOnly"
 msgstr "华南-广州-友好用户环境"
+
+#: xpack/plugins/cloud/serializers/account.py:58
+msgid "Validity display"
+msgstr "有效显示"
+
+#: xpack/plugins/cloud/serializers/account.py:59
+msgid "Provider display"
+msgstr "服务商名称"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:13
 msgid "AccessKey ID"
