@@ -25,8 +25,8 @@ class CommandFilterSerializer(BulkOrgResourceModelSerializer):
         fields = fields_small + fields_fk + fields_m2m
         extra_kwargs = {
             'rules': {'read_only': True},
-            'date_created': {'label': _("date created")},
-            'date_updated': {'label': _("date updated")},
+            'date_created': {'label': _("Date created")},
+            'date_updated': {'label': _("Date updated")},
         }
 
 
