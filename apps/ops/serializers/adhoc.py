@@ -136,8 +136,7 @@ class CommandExecutionSerializer(serializers.ModelSerializer):
         fields_mini = ['id']
         fields_small = fields_mini + [
             'command', 'result', 'log_url',
-            'is_finished',
-            'date_created', 'date_finished'
+            'is_finished', 'date_created', 'date_finished'
         ]
         fields_fk = ['run_as']
         fields_m2m = ['hosts']
