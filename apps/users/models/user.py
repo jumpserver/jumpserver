@@ -384,7 +384,7 @@ class RoleMixin:
 
     def set_default_system_role(self):
         from rbac.builtin import BuiltinRole
-        role_user = BuiltinRole.org_user.get_role()
+        role_user = BuiltinRole.system_user.get_role()
         self.system_roles.add(role_user)
 
 
