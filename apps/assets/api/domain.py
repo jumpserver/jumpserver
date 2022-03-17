@@ -40,7 +40,7 @@ class GatewayTestConnectionApi(SingleObjectMixin, APIView):
     queryset = Gateway.objects.all()
     object = None
     rbac_perms = {
-        'POST': 'assets.change_gateway'
+        'POST': 'assets.test_gateway'
     }
 
     def post(self, request, *args, **kwargs):
