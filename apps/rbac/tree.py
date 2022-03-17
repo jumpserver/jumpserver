@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from collections import defaultdict
 from typing import Callable
+import os
 
 from django.utils.translation import gettext_lazy as _, gettext, get_language
 from django.conf import settings
@@ -9,6 +10,8 @@ from django.db.models import F, Count
 
 from common.tree import TreeNode
 from .models import Permission, ContentType
+
+DEBUG_DB = os.environ.get('DEBUG_DB', '0') == '1'
 
 # 根节点
 root_node_data = {
@@ -315,7 +318,7 @@ class PermissionTreeUtil:
                 continue
             # name 要特殊处理，解决 i18n 问题
             name, icon = self._get_permission_name_icon(p, content_types_name_mapper)
-            if settings.DEBUG:
+            if DEBUG_DB:
                 name += '[{}]'.format(p.app_label_codename)
 
             title = p.app_label_codename
@@ -366,9 +369,9 @@ class PermissionTreeUtil:
         }
         node_data['title'] = node_data['id']
         node = TreeNode(**node_data)
-        if settings.DEBUG:
+        if DEBUG_DB:
             node.name += ('[' + node.id + ']')
-        if settings.DEBUG:
+        if DEBUG_DB:
             node.name += ('-' + node.id)
         node.name += f'({checked_count}/{total_count})'
         return node

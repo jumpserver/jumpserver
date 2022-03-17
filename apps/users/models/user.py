@@ -279,8 +279,13 @@ class RoleMixin:
             cache.set(key, perms, 3600)
         return perms
 
-    def expire_perms_cache(self):
+    def expire_rbac_perms_cache(self):
         key = self.PERM_CACHE_KEY.format(self.id, '*')
+        cache.delete_pattern(key)
+
+    @classmethod
+    def expire_users_rbac_perms_cache(cls):
+        key = cls.PERM_CACHE_KEY.format('*', '*')
         cache.delete_pattern(key)
 
     @lazyproperty
