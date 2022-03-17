@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-17 18:41+0800\n"
+"POT-Creation-Date: 2022-03-17 19:16+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -342,6 +342,7 @@ msgid "Domain"
 msgstr "网域"
 
 #: applications/models/application.py:220 xpack/plugins/cloud/models.py:33
+#: xpack/plugins/cloud/serializers/account.py:57
 msgid "Attrs"
 msgstr "属性"
 
@@ -6668,6 +6669,18 @@ msgstr "华北-乌兰察布一"
 msgid "CN South-Guangzhou-InvitationOnly"
 msgstr "华南-广州-友好用户环境"
 
+#: xpack/plugins/cloud/serializers/account.py:58
+#, fuzzy
+#| msgid "Category display"
+msgid "Validity display"
+msgstr "类别名称"
+
+#: xpack/plugins/cloud/serializers/account.py:59
+#, fuzzy
+#| msgid "Nodes display"
+msgid "Provider display"
+msgstr "节点名称"
+
 #: xpack/plugins/cloud/serializers/account_attrs.py:13
 msgid "AccessKey ID"
 msgstr ""
@@ -6826,271 +6839,3 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
-
-#~ msgid "Can view application of permission to user"
-#~ msgstr "可以查看授权给用户的应用"
-
-#~ msgid "Can view asset of permission to user"
-#~ msgstr "可以查看授权给用户的资产"
-
-#~ msgid "Can view asset of permission to user group"
-#~ msgstr "可以查看授权给用户组的资产"
-
-#~ msgid "Validity display"
-#~ msgstr "有效显示"
-
-#~ msgid "Provider display"
-#~ msgstr "服务商名称"
-
-#, fuzzy
-#~| msgid "Date created"
-#~ msgid "date created"
-#~ msgstr "创建日期"
-
-#, fuzzy
-#~| msgid "Date updated"
-#~ msgid "date updated"
-#~ msgstr "更新日期"
-
-#~ msgid "Can view system user asset"
-#~ msgstr "可以查看系统用户资产列表"
-
-#~ msgid "Can add asset to system user"
-#~ msgstr "可以添加资产到系统用户"
-
-#~ msgid "Can remove system user asset"
-#~ msgstr "可以移除系统用户资产"
-
-#, fuzzy
-#~| msgid "Create"
-#~ msgid "create"
-#~ msgstr "创建"
-
-#, fuzzy
-#~| msgid "Update"
-#~ msgid "update"
-#~ msgstr "更新"
-
-#, fuzzy
-#~| msgid "Delete"
-#~ msgid "delete"
-#~ msgstr "删除"
-
-#~ msgid "Can connect my assets"
-#~ msgstr "可以连接我的资产"
-
-#~ msgid "Can view dashboard"
-#~ msgstr "仪表盘"
-
-#~ msgid "Detail"
-#~ msgstr "详情"
-
-#~ msgid "View menu"
-#~ msgstr "视图菜单"
-
-#~ msgid "User management"
-#~ msgstr "用户管理"
-
-#~ msgid "User list"
-#~ msgstr "用户列表"
-
-#~ msgid "Online/Offline Session record"
-#~ msgstr "在线/离线会话记录"
-
-#~ msgid "Asset management"
-#~ msgstr "资产管理"
-
-#~ msgid "Asset list"
-#~ msgstr "资产列表"
-
-#~ msgid "My application"
-#~ msgstr "我的应用"
-
-#~ msgid "Bulk command"
-#~ msgstr "批量命令"
-
-#~ msgid "Ticket system"
-#~ msgstr "工单系统"
-
-#~ msgid "API permission"
-#~ msgstr "API权限"
-
-#~ msgid "Application management"
-#~ msgstr "应用管理"
-
-#~ msgid "Account management"
-#~ msgstr "账号管理"
-
-#~ msgid "Permission management"
-#~ msgstr "权限管理"
-
-#~ msgid "Access control"
-#~ msgstr "访问控制"
-
-#~ msgid "Job center"
-#~ msgstr "作业中心"
-
-#~ msgid "Session audit"
-#~ msgstr "会话审计"
-
-#~ msgid "Log audit"
-#~ msgstr "日志审计"
-
-#~ msgid "Role list"
-#~ msgstr "角色列表"
-
-#~ msgid "User login acl"
-#~ msgstr "用户登录规则"
-
-#~ msgid "Permission list"
-#~ msgstr "权限列表"
-
-#~ msgid "Node tree"
-#~ msgstr "节点树"
-
-#~ msgid "Cloud sync"
-#~ msgstr "云同步"
-
-#~ msgid "Sync instance task list"
-#~ msgstr "同步实例任务列表"
-
-#~ msgid "Account list"
-#~ msgstr "账号列表"
-
-#~ msgid "Common/Admin User"
-#~ msgstr "普通/特权用户"
-
-#~ msgid "Platform list"
-#~ msgstr "平台列表"
-
-#~ msgid "Label management"
-#~ msgstr "标签管理"
-
-#~ msgid "Remote application"
-#~ msgstr "远程应用"
-
-#~ msgid "Database application"
-#~ msgstr "数据库应用"
-
-#~ msgid "Asset account"
-#~ msgstr "资产账号"
-
-#~ msgid "Gathered user list"
-#~ msgstr "收集用户列表"
-
-#~ msgid "Gathered user task list"
-#~ msgstr "收集用户任务列表"
-
-#~ msgid "Account backup"
-#~ msgstr "账号备份"
-
-#~ msgid "Asset login"
-#~ msgstr "资产登录"
-
-#~ msgid "Task list"
-#~ msgstr "任务列表"
-
-#~ msgid "File transfer"
-#~ msgstr "文件传输"
-
-#~ msgid "Remote App"
-#~ msgstr "远程应用"
-
-#~ msgid "Terminal management"
-#~ msgstr "终端管理"
-
-#~ msgid "Organization management"
-#~ msgstr "组织管理"
-
-#~ msgid "View all permission"
-#~ msgstr "查看所有权限"
-
-#~ msgid "Domain list"
-#~ msgstr "网域列表"
-
-#~ msgid "Gateway list"
-#~ msgstr "网关列表"
-
-#~ msgid "Run gather user task"
-#~ msgstr "执行收集用户任务"
-
-#~ msgid "Run asset change auth plan"
-#~ msgstr "执行资产改密计划"
-
-#~ msgid "Run application change auth plan"
-#~ msgstr "执行应用改密计划"
-
-#~ msgid "Run account backup plan"
-#~ msgstr "执行账号备份计划"
-
-#~ msgid "Run task"
-#~ msgstr "运行任务"
-
-#~ msgid "View task version"
-#~ msgstr "查看任务版本"
-
-#~ msgid "View execution history"
-#~ msgstr "查看执行历史"
-
-#~ msgid "Message subscription"
-#~ msgstr "消息订阅"
-
-#~ msgid "Component monitor"
-#~ msgstr "组件监控"
-
-#~ msgid "View my/assigned ticket"
-#~ msgstr "查看我的/待审批工单"
-
-#~ msgid "Create asset/application ticket"
-#~ msgstr "创建资产/应用申请工单"
-
-#~ msgid "Change/close ticket"
-#~ msgstr "更新/关闭工单"
-
-#~ msgid "View some of the assets searched"
-#~ msgstr "查看搜索的部分资产"
-
-#~ msgid "Overview"
-#~ msgstr "概览"
-
-#~ msgid "Add user to role"
-#~ msgstr "添加用户到角色"
-
-#~ msgid "Remove user from role"
-#~ msgstr "从角色移除用户"
-
-#~ msgid "Run sync instance task"
-#~ msgstr "执行同步实例任务"
-
-#~ msgid "Can change basic setting"
-#~ msgstr "基本设置"
-
-#~ msgid "Enable tickets"
-#~ msgstr "启用工单"
-
-#~ msgid "Permed remote application"
-#~ msgstr "授权的远程应用"
-
-#~ msgid "Can view my remoteapp"
-#~ msgstr "可以查看我的应用"
-
-#~ msgid "Can connect my remoteapp"
-#~ msgstr "可以连接我的远程应用"
-
-#~ msgid "Can view my database application"
-#~ msgstr "可以查看我的数据库应用"
-
-#~ msgid "Can connect my database application"
-#~ msgstr "可以连接我的数据库应用"
-
-#~ msgid "Can view my kubernetes application"
-#~ msgstr "可以查看我的Kubernetes"
-
-#~ msgid "Can connect my kubernetes application"
-#~ msgstr "可以连接我的Kubernetes"
-
-#~ msgid "Can change terminal basic setting"
-#~ msgstr "基本设置"
-
-#~ msgid "Can view resource statistics"
-#~ msgstr "可以查看资源统计"
