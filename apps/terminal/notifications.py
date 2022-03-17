@@ -82,6 +82,9 @@ class CommandAlertMessage(CommandAlertMixin, SystemMessage):
             'api-terminal:session-detail', kwargs={'pk': command['session']},
             external=True, api_to_ui=True
         ) + '?oid={}'.format(self.command['org_id'])
+        session_detail_url = session_detail_url.replace(
+            '/terminal/sessions/', '/audit/sessions/sessions/'
+        )
         level = Command.get_risk_level_str(command['risk_level'])
         items = {
             _("Asset"): command['asset'],

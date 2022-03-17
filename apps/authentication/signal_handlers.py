@@ -18,7 +18,7 @@ from .signals import post_auth_success, post_auth_failed
 @receiver(user_logged_in)
 def on_user_auth_login_success(sender, user, request, **kwargs):
     # 失效 perms 缓存
-    user.expire_perms_cache()
+    user.expire_rbac_perms_cache()
 
     # 开启了 MFA，且没有校验过, 可以全局校验, middleware 中可以全局管理 oidc 等第三方认证的 MFA
     if settings.SECURITY_MFA_AUTH_ENABLED_FOR_THIRD_PARTY \
