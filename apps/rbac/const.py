@@ -29,7 +29,7 @@ exclude_permissions = (
     ('users', 'userpasswordhistory', '*', '*'),
     ('applications', 'applicationuser', '*', '*'),
     ('applications', 'historicalaccount', '*', '*'),
-    ('applications', 'account', 'add,change', 'account'),
+    ('applications', 'account', 'add,change,delete', 'account'),
     ('assets', 'adminuser', '*', '*'),
     ('assets', 'assetgroup', '*', '*'),
     ('assets', 'cluster', '*', '*'),
