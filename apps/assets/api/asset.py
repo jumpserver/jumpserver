@@ -206,7 +206,7 @@ class AssetGatewayListApi(generics.ListAPIView):
 
 class BaseAssetPermUserOrUserGroupListApi(ListAPIView):
     rbac_perms = {
-        'GET': 'assets.view_asset'
+        'GET': 'perms.view_assetpermission'
     }
 
     def get_object(self):
@@ -226,7 +226,7 @@ class AssetPermUserListApi(BaseAssetPermUserOrUserGroupListApi):
     search_fields = ('username', 'email', 'name', 'id', 'source', 'role')
     serializer_class = UserSerializer
     rbac_perms = {
-        'GET': 'assets.view_asset'
+        'GET': 'perms.view_assetpermission'
     }
 
     def get_queryset(self):

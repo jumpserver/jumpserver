@@ -39,7 +39,7 @@ exclude_permissions = (
     ('assets', 'assetuser', '*', '*'),
     ('assets', 'gathereduser', 'add,delete,change', 'gathereduser'),
     ('assets', 'accountbackupplanexecution', 'delete,change', 'accountbackupplanexecution'),
-    ('assets', 'authbook', 'add,change', 'authbook'),
+    ('assets', 'authbook', 'change', 'authbook'),
     ('perms', 'userassetgrantedtreenoderelation', '*', '*'),
     ('perms', 'usergrantedmappingnode', '*', '*'),
     ('perms', 'permnode', '*', '*'),
