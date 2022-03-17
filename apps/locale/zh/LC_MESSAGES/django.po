@@ -6670,16 +6670,12 @@ msgid "CN South-Guangzhou-InvitationOnly"
 msgstr "华南-广州-友好用户环境"
 
 #: xpack/plugins/cloud/serializers/account.py:58
-#, fuzzy
-#| msgid "Category display"
 msgid "Validity display"
-msgstr "类别名称"
+msgstr "有效性显示"
 
 #: xpack/plugins/cloud/serializers/account.py:59
-#, fuzzy
-#| msgid "Nodes display"
 msgid "Provider display"
-msgstr "节点名称"
+msgstr "服务商显示"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:13
 msgid "AccessKey ID"
