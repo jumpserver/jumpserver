@@ -37,7 +37,6 @@ class ApplicationPermission(BasePermission):
         unique_together = [('org_id', 'name')]
         verbose_name = _('Application permission')
         permissions = [
-            ('view_permuserapplication', _('Can view application of permission to user'))
         ]
         ordering = ('name',)
 
