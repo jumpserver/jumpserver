@@ -382,6 +382,11 @@ class RoleMixin:
         perms = RoleBinding.get_user_perms(self)
         return perms
 
+    def set_default_system_role(self):
+        from rbac.builtin import BuiltinRole
+        role_user = BuiltinRole.org_user.get_role()
+        self.system_roles.add(role_user)
+
 
 class TokenMixin:
     CACHE_KEY_USER_RESET_PASSWORD_PREFIX = "_KEY_USER_RESET_PASSWORD_{}"

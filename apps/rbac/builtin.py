@@ -89,7 +89,7 @@ class PredefineRole:
 
 class BuiltinRole:
     system_admin = PredefineRole(
-        '1', ugettext_noop('SystemAdmin'), Scope.system, []
+        '1', ugettext_noop('SystemAdmin'), Scope.system, user_perms
     )
     system_auditor = PredefineRole(
         '2', ugettext_noop('SystemAuditor'), Scope.system, auditor_perms

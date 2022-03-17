@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-
 from django.dispatch import receiver
 from django_auth_ldap.backend import populate_user
 from django.conf import settings
@@ -11,6 +10,7 @@ from django.db.models.signals import post_save
 from authentication.backends.oidc.signals import openid_create_or_update_user
 from authentication.backends.saml2.signals import saml2_create_or_update_user
 from common.utils import get_logger
+from common.decorator import on_transaction_commit
 from .signals import post_user_create
 from .models import User, UserPasswordHistory
 
@@ -58,6 +58,17 @@ def save_passwd_change(sender, instance: User, **kwargs):
             user=instance, password=instance.password,
             date_created=instance.date_password_last_updated
         )
+
+
+@receiver(post_save, sender=User)
+@on_transaction_commit
+def on_user_create_set_default_system_role(sender, instance, created, **kwargs):
+    if not created:
+        return
+    has_system_role = instance.system_roles.all().exists()
+    if not has_system_role:
+        logger.debug("Receive user create signal, set default role")
+        instance.set_default_system_role()
 
 
 @receiver(post_user_create)
