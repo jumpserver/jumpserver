@@ -324,9 +324,6 @@ class SystemUser(ProtocolMixin, AuthMixin, BaseUser):
         unique_together = [('name', 'org_id')]
         verbose_name = _("System user")
         permissions = [
-            ('view_systemuserasset', _('Can view system user asset')),
-            ('add_systemuserasset', _('Can add asset to system user')),
-            ('remove_systemuserasset', _('Can remove system user asset')),
             ('match_systemuser', _('Can match system user')),
         ]
 
