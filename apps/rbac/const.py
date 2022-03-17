@@ -103,6 +103,7 @@ only_system_permissions = (
     ('terminal', 'replaystorage', '*', '*'),
     ('terminal', 'status', '*', '*'),
     ('terminal', 'task', '*', '*'),
+    ('authentication', '*', '*', '*'),
 )
 
 only_org_permissions = (
