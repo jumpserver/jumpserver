@@ -43,8 +43,7 @@ class SystemMsgSubscriptionViewSet(ListModelMixin,
         'partial_update': SystemMsgSubscriptionSerializer
     }
     rbac_perms = {
-        'list': 'settings.change_systemmsgsubscription',
-        'update': 'settings.change_systemmsgsubscription'
+        '*': 'settings.change_systemmsgsubscription'
     }
 
     def list(self, request, *args, **kwargs):

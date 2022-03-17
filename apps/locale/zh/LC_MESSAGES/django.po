@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-17 15:19+0800\n"
+"POT-Creation-Date: 2022-03-17 18:41+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -137,9 +137,10 @@ msgstr "系统用户"
 #: applications/serializers/attrs/application_category/remote_app.py:36
 #: assets/models/asset.py:355 assets/models/authbook.py:19
 #: assets/models/backup.py:31 assets/models/cmd_filter.py:38
-#: assets/models/gathered_user.py:14 assets/serializers/system_user.py:264
-#: audits/models.py:39 perms/models/asset_permission.py:23
-#: templates/index.html:82 terminal/backends/command/models.py:20
+#: assets/models/gathered_user.py:14 assets/serializers/label.py:30
+#: assets/serializers/system_user.py:264 audits/models.py:39
+#: perms/models/asset_permission.py:23 templates/index.html:82
+#: terminal/backends/command/models.py:20
 #: terminal/backends/command/serializers.py:13 terminal/models/session.py:44
 #: terminal/notifications.py:90
 #: users/templates/users/user_asset_permission.html:40
@@ -341,7 +342,6 @@ msgid "Domain"
 msgstr "网域"
 
 #: applications/models/application.py:220 xpack/plugins/cloud/models.py:33
-#: xpack/plugins/cloud/serializers/account.py:57
 msgid "Attrs"
 msgstr "属性"
 
@@ -968,7 +968,7 @@ msgstr "新节点"
 msgid "empty"
 msgstr "空"
 
-#: assets/models/node.py:545 perms/models/asset_permission.py:103
+#: assets/models/node.py:545 perms/models/asset_permission.py:101
 msgid "Key"
 msgstr "键"
 
@@ -976,7 +976,7 @@ msgstr "键"
 msgid "Full value"
 msgstr "全称"
 
-#: assets/models/node.py:550 perms/models/asset_permission.py:104
+#: assets/models/node.py:550 perms/models/asset_permission.py:102
 msgid "Parent key"
 msgstr "ssh私钥"
 
@@ -1154,10 +1154,8 @@ msgid "private key invalid or passphrase error"
 msgstr "密钥不合法或密钥密码错误"
 
 #: assets/serializers/cmd_filter.py:51
-#, fuzzy
-#| msgid "Application display"
 msgid "Action display"
-msgstr "应用名称"
+msgstr "动作"
 
 #: assets/serializers/domain.py:13 assets/serializers/label.py:12
 #: assets/serializers/system_user.py:59
@@ -2808,19 +2806,19 @@ msgstr "任务执行"
 msgid "Date finished"
 msgstr "结束日期"
 
-#: ops/models/command.py:109
+#: ops/models/command.py:113
 msgid "Task start"
 msgstr "任务开始"
 
-#: ops/models/command.py:143
+#: ops/models/command.py:147
 msgid "Command `{}` is forbidden ........"
 msgstr "命令 `{}` 不允许被执行 ......."
 
-#: ops/models/command.py:156
+#: ops/models/command.py:160
 msgid "Task end"
 msgstr "任务结束"
 
-#: ops/models/command.py:160
+#: ops/models/command.py:164
 msgid "Command execution"
 msgstr "命令执行"
 
@@ -2911,55 +2909,43 @@ msgstr "管理员正在修改授权，请稍等"
 msgid "The authorization cannot be revoked for the time being"
 msgstr "该授权暂时不能撤销"
 
-#: perms/models/application_permission.py:40
-msgid "Can view application of permission to user"
-msgstr "可以查看授权给用户的应用"
-
-#: perms/models/application_permission.py:112
+#: perms/models/application_permission.py:111
 msgid "Permed application"
 msgstr "授权的应用"
 
-#: perms/models/application_permission.py:115
+#: perms/models/application_permission.py:114
 msgid "Can view my apps"
 msgstr "可以查看我的应用"
 
-#: perms/models/application_permission.py:116
+#: perms/models/application_permission.py:115
 msgid "Can view user apps"
 msgstr "可以查看用户授权的应用"
 
-#: perms/models/application_permission.py:117
+#: perms/models/application_permission.py:116
 msgid "Can view usergroup apps"
 msgstr "可以查看用户组授权的应用"
 
-#: perms/models/asset_permission.py:32
-msgid "Can view asset of permission to user"
-msgstr "可以查看授权给用户的资产"
-
-#: perms/models/asset_permission.py:33
-msgid "Can view asset of permission to user group"
-msgstr "可以查看授权给用户组的资产"
-
-#: perms/models/asset_permission.py:136
+#: perms/models/asset_permission.py:134
 msgid "Ungrouped"
 msgstr "未分组"
 
-#: perms/models/asset_permission.py:138
+#: perms/models/asset_permission.py:136
 msgid "Favorite"
 msgstr "收藏夹"
 
-#: perms/models/asset_permission.py:185
+#: perms/models/asset_permission.py:183
 msgid "Permed asset"
 msgstr "授权的资产"
 
-#: perms/models/asset_permission.py:187
+#: perms/models/asset_permission.py:185
 msgid "Can view my assets"
 msgstr "可以查看我的资产"
 
-#: perms/models/asset_permission.py:188
+#: perms/models/asset_permission.py:186
 msgid "Can view user assets"
 msgstr "可以查看用户授权的资产"
 
-#: perms/models/asset_permission.py:189
+#: perms/models/asset_permission.py:187
 msgid "Can view usergroup assets"
 msgstr "可以查看用户组授权的资产"
 
@@ -6682,14 +6668,6 @@ msgstr "华北-乌兰察布一"
 msgid "CN South-Guangzhou-InvitationOnly"
 msgstr "华南-广州-友好用户环境"
 
-#: xpack/plugins/cloud/serializers/account.py:58
-msgid "Validity display"
-msgstr "有效显示"
-
-#: xpack/plugins/cloud/serializers/account.py:59
-msgid "Provider display"
-msgstr "服务商名称"
-
 #: xpack/plugins/cloud/serializers/account_attrs.py:13
 msgid "AccessKey ID"
 msgstr ""
@@ -6848,6 +6826,21 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Can view application of permission to user"
+#~ msgstr "可以查看授权给用户的应用"
+
+#~ msgid "Can view asset of permission to user"
+#~ msgstr "可以查看授权给用户的资产"
+
+#~ msgid "Can view asset of permission to user group"
+#~ msgstr "可以查看授权给用户组的资产"
+
+#~ msgid "Validity display"
+#~ msgstr "有效显示"
+
+#~ msgid "Provider display"
+#~ msgstr "服务商名称"
 
 #, fuzzy
 #~| msgid "Date created"
