@@ -6,13 +6,11 @@ from rest_framework import serializers
 
 from common.mixins import CommonBulkSerializerMixin
 from common.validators import PhoneValidator
-from rbac.models import Role
 from rbac.builtin import BuiltinRole
 from rbac.permissions import RBACPermission
-from rbac.models import OrgRoleBinding, SystemRoleBinding
+from rbac.models import OrgRoleBinding, SystemRoleBinding, Role
 from ..models import User
 from ..const import PasswordStrategy
-from rbac.models import Role
 
 __all__ = [
     'UserSerializer', 'MiniUserSerializer',

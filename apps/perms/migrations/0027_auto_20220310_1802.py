@@ -27,10 +27,10 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterModelOptions(
             name='applicationpermission',
-            options={'ordering': ('name',), 'permissions': [('view_permuserapplication', 'Can view application of permission to user')], 'verbose_name': 'Application permission'},
+            options={'ordering': ('name',), 'permissions': [], 'verbose_name': 'Application permission'},
         ),
         migrations.AlterModelOptions(
             name='assetpermission',
-            options={'ordering': ('name',), 'permissions': [('view_permuserasset', 'Can view asset of permission to user'), ('view_permusergroupasset', 'Can view asset of permission to user group')], 'verbose_name': 'Asset permission'},
+            options={'ordering': ('name',), 'permissions': [], 'verbose_name': 'Asset permission'},
         ),
     ]

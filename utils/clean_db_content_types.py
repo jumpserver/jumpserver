@@ -55,6 +55,9 @@ def clean_db_content_types():
         ('perms', 'permedkubernetesapp', 'view_mykubernetesapp'),
         ('perms', 'permedremoteapp', 'connect_myremoteapp'),
         ('perms', 'permedremoteapp', 'view_myremoteapp'),
+        ('perms', 'applicationpermission', 'view_permuserapplication'),
+        ('perms', 'assetpermission', 'view_permuserasset'),
+        ('perms', 'assetpermission', 'view_permusergroupasset'),
 
         ('applications', 'databaseapp', 'add_databaseapp'),
         ('applications', 'databaseapp', 'change_databaseapp'),
@@ -79,6 +82,9 @@ def clean_db_content_types():
         ('rbac', 'menupermission', 'view_userview'),
         ('rbac', 'menupermission', 'view_adminview'),
         ('rbac', 'menupermission', 'view_auditview'),
+        ('assets', 'systemuser', 'view_systemuserasset'),
+        ('assets', 'systemuser', 'add_systemuserasset'),
+        ('assets', 'systemuser', 'remove_systemuserasset'),
     ]
     for app, model, codename in permissions_delete_required:
         print('delete {}.{} ({})'.format(app, codename, model))

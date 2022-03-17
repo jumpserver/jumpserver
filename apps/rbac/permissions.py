@@ -66,8 +66,10 @@ class RBACPermission(permissions.DjangoModelPermissions):
         perms = {}
         if hasattr(view, 'rbac_perms'):
             perms.update(dict(view.rbac_perms))
+        default_perms = self.get_default_action_perms(model_cls)
         if '*' not in perms:
-            perms.update(self.get_default_action_perms(model_cls))
+            for k, v in default_perms.items():
+                perms.setdefault(k, v)
         return perms
 
     def _get_action_perms(self, action, model_cls, view):

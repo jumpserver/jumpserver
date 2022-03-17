@@ -17,7 +17,7 @@ class ApplicationViewSet(SuggestionMixin, OrgBulkModelViewSet):
     model = Application
     filterset_fields = {
         'name': ['exact'],
-        'category': ['exact'],
+        'category': ['exact', 'in'],
         'type': ['exact', 'in'],
     }
     search_fields = ('name', 'type', 'category')
