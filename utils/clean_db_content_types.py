@@ -79,6 +79,9 @@ def clean_db_content_types():
         ('rbac', 'menupermission', 'view_userview'),
         ('rbac', 'menupermission', 'view_adminview'),
         ('rbac', 'menupermission', 'view_auditview'),
+        ('assets', 'systemuser', 'view_systemuserasset'),
+        ('assets', 'systemuser', 'add_systemuserasset'),
+        ('assets', 'systemuser', 'remove_systemuserasset'),
     ]
     for app, model, codename in permissions_delete_required:
         print('delete {}.{} ({})'.format(app, codename, model))

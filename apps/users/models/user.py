@@ -279,8 +279,13 @@ class RoleMixin:
             cache.set(key, perms, 3600)
         return perms
 
-    def expire_perms_cache(self):
+    def expire_rbac_perms_cache(self):
         key = self.PERM_CACHE_KEY.format(self.id, '*')
+        cache.delete_pattern(key)
+
+    @classmethod
+    def expire_users_rbac_perms_cache(cls):
+        key = cls.PERM_CACHE_KEY.format('*', '*')
         cache.delete_pattern(key)
 
     @lazyproperty
@@ -376,6 +381,11 @@ class RoleMixin:
         from rbac.models import RoleBinding
         perms = RoleBinding.get_user_perms(self)
         return perms
+
+    def set_default_system_role(self):
+        from rbac.builtin import BuiltinRole
+        role_user = BuiltinRole.org_user.get_role()
+        self.system_roles.add(role_user)
 
 
 class TokenMixin:

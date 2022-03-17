@@ -41,13 +41,3 @@ class PermissionViewSet(JMSModelViewSet):
             queryset = Permission.get_permissions(self.scope)
         queryset = queryset.prefetch_related('content_type')
         return queryset
-
-
-# class UserPermsApi(ListAPIView):
-#     serializer_class = UserPermsSerializer
-#     permission_classes = (IsValidUser,)
-#
-#     def list(self, request, *args, **kwargs):
-#         perms = RoleBinding.get_user_perms(request.user)
-#         serializer = super().get_serializer(data={'perms': perms})
-#         return Res
