@@ -12,13 +12,11 @@ from terminal.models import Session
 
 
 class CommandFilterSerializer(BulkOrgResourceModelSerializer):
-
     class Meta:
         model = CommandFilter
         fields_mini = ['id', 'name']
         fields_small = fields_mini + [
-            'org_id', 'org_name',
-            'is_active',
+            'org_id', 'org_name', 'is_active',
             'date_created', 'date_updated',
             'comment', 'created_by',
         ]
@@ -26,7 +24,9 @@ class CommandFilterSerializer(BulkOrgResourceModelSerializer):
         fields_m2m = ['users', 'user_groups', 'system_users', 'assets', 'applications']
         fields = fields_small + fields_fk + fields_m2m
         extra_kwargs = {
-            'rules': {'read_only': True}
+            'rules': {'read_only': True},
+            'date_created': {'label': _("Date created")},
+            'date_updated': {'label': _("Date updated")},
         }
 
 
@@ -45,6 +45,11 @@ class CommandFilterRuleSerializer(BulkOrgResourceModelSerializer):
         ]
         fields_fk = ['filter']
         fields = fields_small + fields_fk
+        extra_kwargs = {
+            'date_created': {'label': _("Date created")},
+            'date_updated': {'label': _("Date updated")},
+            'action_display': {'label': _("Action display")}
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

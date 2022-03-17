@@ -320,7 +320,7 @@ class PermissionTreeUtil:
             if not self._check_model_xpack(model_id):
                 continue
             title = p.app_label_codename
-            if title in xpack_nodes:
+            if not settings.XPACK_ENABLED and title in xpack_nodes:
                 continue
 
             # name 要特殊处理，解决 i18n 问题
