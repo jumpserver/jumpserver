@@ -10,7 +10,7 @@ from rest_framework_bulk import BulkModelViewSet
 from common.mixins import CommonApiMixin
 from common.utils import get_logger
 from common.mixins.api import SuggestionMixin
-from orgs.utils import current_org
+from orgs.utils import current_org, tmp_to_root_org
 from rbac.models import Role, RoleBinding
 from users.utils import LoginBlockUtil, MFABlockUtils
 from .mixins import UserQuerysetMixin
@@ -60,6 +60,11 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
         else:
             self.set_users_roles_for_cache(queryset)
         return page
+
+    @action(methods=['get'], detail=False, url_path='suggestions')
+    def match(self, request, *args, **kwargs):
+        with tmp_to_root_org():
+            return super().match(request, *args, **kwargs)
 
     @staticmethod
     def set_users_roles_for_cache(queryset):
