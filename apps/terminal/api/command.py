@@ -105,6 +105,7 @@ class CommandViewSet(JMSBulkModelViewSet):
     command_store = get_command_storage()
     serializer_class = SessionCommandSerializer
     filterset_class = CommandFilter
+    search_fields = ('input',)
     model = Command
     ordering_fields = ('timestamp', )
 
