@@ -55,6 +55,9 @@ def clean_db_content_types():
         ('perms', 'permedkubernetesapp', 'view_mykubernetesapp'),
         ('perms', 'permedremoteapp', 'connect_myremoteapp'),
         ('perms', 'permedremoteapp', 'view_myremoteapp'),
+        ('perms', 'applicationpermission', 'view_permuserapplication'),
+        ('perms', 'assetpermission', 'view_permuserasset'),
+        ('perms', 'assetpermission', 'view_permusergroupasset'),
 
         ('applications', 'databaseapp', 'add_databaseapp'),
         ('applications', 'databaseapp', 'change_databaseapp'),
