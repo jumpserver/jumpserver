@@ -2,6 +2,8 @@ from django.utils.translation import ugettext_noop
 
 from .const import Scope, system_exclude_permissions, org_exclude_permissions
 
+# Todo: 获取应该区分 系统用户，和组织用户的权限
+# 工作台也区分组织后再考虑
 user_perms = (
     ('rbac', 'menupermission', 'view', 'workspace'),
     ('rbac', 'menupermission', 'view', 'webterminal'),
@@ -12,14 +14,13 @@ user_perms = (
     ('assets', 'systemuser', 'match', 'systemuser'),
     ('assets', 'node', 'match', 'node'),
     ('applications', 'application', 'match', 'application'),
-    ('tickets', 'ticket', 'view', 'ticket'),
     ('ops', 'commandexecution', 'add', 'commandexecution'),
     ('authentication', 'connectiontoken', 'add', 'connectiontoken'),
+    ('tickets', 'ticket', 'view', 'ticket'),
 )
 
 auditor_perms = user_perms + (
     ('rbac', 'menupermission', 'view', 'audit'),
-    ('rbac', 'menupermission', 'view', 'dashboard'),
     ('audits', '*', '*', '*'),
     ('terminal', 'commandstorage', 'view', 'commandstorage'),
     ('terminal', 'sessionreplay', 'view,download', 'sessionreplay'),
@@ -88,7 +89,7 @@ class PredefineRole:
 
 class BuiltinRole:
     system_admin = PredefineRole(
-        '1', ugettext_noop('SystemAdmin'), Scope.system, []
+        '1', ugettext_noop('SystemAdmin'), Scope.system, user_perms
     )
     system_auditor = PredefineRole(
         '2', ugettext_noop('SystemAuditor'), Scope.system, auditor_perms
