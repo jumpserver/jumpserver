@@ -119,11 +119,14 @@ verbose_name_mapper = {
 }
 
 xpack_nodes = [
-    'xpack', 'tickets', 'applications.remoteapp',
-    "assets.accountbackupplan", "assets.accountbackupplanexecution",
+    'xpack', 'tickets', 'gather_account_node',
+    'applications.remoteapp', "assets.accountbackupplan",
+    "assets.accountbackupplanexecution",
     "rbac.orgrole", "rbac.orgrolebinding",
-    "settings.change_interface", 'assets.gathereduser',
-    'gather_account_node'
+    'assets.gathereduser',
+
+    'settings.change_interface', 'settings.change_sms',
+    'users.invite_user', 'users.remove_user',
 ]
 
 
@@ -316,12 +319,15 @@ class PermissionTreeUtil:
             model_id = f'{p.app}.{p.model}'
             if not self._check_model_xpack(model_id):
                 continue
+            title = p.app_label_codename
+            if title in xpack_nodes:
+                continue
+
             # name 要特殊处理，解决 i18n 问题
             name, icon = self._get_permission_name_icon(p, content_types_name_mapper)
             if DEBUG_DB:
                 name += '[{}]'.format(p.app_label_codename)
 
-            title = p.app_label_codename
             pid = model_id
             # perm node 的特殊设置用的是 title，因为 id 是数字，不一致
             if title in special_pid_mapper:
