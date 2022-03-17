@@ -11,6 +11,8 @@ user_perms = (
     ('assets', 'asset', 'match', 'asset'),
     ('assets', 'systemuser', 'match', 'systemuser'),
     ('assets', 'node', 'match', 'node'),
+    ('applications', 'application', 'match', 'application'),
+    ('tickets', 'ticket', 'view', 'ticket'),
     ('ops', 'commandexecution', 'add', 'commandexecution'),
     ('authentication', 'connectiontoken', 'add', 'connectiontoken'),
 )
