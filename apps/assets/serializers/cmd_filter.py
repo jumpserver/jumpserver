@@ -46,8 +46,8 @@ class CommandFilterRuleSerializer(BulkOrgResourceModelSerializer):
         fields_fk = ['filter']
         fields = fields_small + fields_fk
         extra_kwargs = {
-            'date_created': {'label': _("date created")},
-            'date_updated': {'label': _("date updated")},
+            'date_created': {'label': _("Date created")},
+            'date_updated': {'label': _("Date updated")},
             'action_display': {'label': _("Action display")}
         }
 

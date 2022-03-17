@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-17 15:06+0800\n"
+"POT-Creation-Date: 2022-03-17 15:17+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -374,18 +374,18 @@ msgstr "类型名称"
 #: assets/models/base.py:181 assets/models/cluster.py:26
 #: assets/models/domain.py:26 assets/models/gathered_user.py:19
 #: assets/models/group.py:22 assets/models/label.py:25
-#: assets/serializers/account.py:18 common/db/models.py:113
-#: common/mixins/models.py:50 ops/models/adhoc.py:39 ops/models/command.py:30
-#: orgs/models.py:67 orgs/models.py:217 perms/models/base.py:92
-#: users/models/group.py:18 users/models/user.py:831
+#: assets/serializers/account.py:18 assets/serializers/cmd_filter.py:49
+#: common/db/models.py:113 common/mixins/models.py:50 ops/models/adhoc.py:39
+#: ops/models/command.py:30 orgs/models.py:67 orgs/models.py:217
+#: perms/models/base.py:92 users/models/group.py:18 users/models/user.py:831
 #: xpack/plugins/cloud/models.py:125
 msgid "Date created"
 msgstr "创建日期"
 
 #: applications/serializers/application.py:104 assets/models/base.py:182
 #: assets/models/gathered_user.py:20 assets/serializers/account.py:21
-#: common/db/models.py:114 common/mixins/models.py:51 ops/models/adhoc.py:40
-#: orgs/models.py:218
+#: assets/serializers/cmd_filter.py:50 common/db/models.py:114
+#: common/mixins/models.py:51 ops/models/adhoc.py:40 orgs/models.py:218
 msgid "Date updated"
 msgstr "更新日期"
 
@@ -1163,13 +1163,13 @@ msgstr "密钥密码"
 msgid "private key invalid or passphrase error"
 msgstr "密钥不合法或密钥密码错误"
 
-#: assets/serializers/cmd_filter.py:28 assets/serializers/cmd_filter.py:49
+#: assets/serializers/cmd_filter.py:28
 #, fuzzy
 #| msgid "Date created"
 msgid "date created"
 msgstr "创建日期"
 
-#: assets/serializers/cmd_filter.py:29 assets/serializers/cmd_filter.py:50
+#: assets/serializers/cmd_filter.py:29
 #, fuzzy
 #| msgid "Date updated"
 msgid "date updated"
