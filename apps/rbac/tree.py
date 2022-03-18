@@ -87,7 +87,6 @@ special_pid_mapper = {
     'terminal.status': 'terminal_node',
     'terminal.task': 'terminal_node',
     'audits.ftplog': 'terminal',
-    'rbac.menupermission': 'view_other',
     'perms.view_myassets': 'my_assets',
     'perms.view_myapps': 'my_apps',
     'ops.add_commandexecution': 'view_workspace',

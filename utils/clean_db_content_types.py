@@ -58,7 +58,7 @@ def clean_db_content_types():
         ('perms', 'applicationpermission', 'view_permuserapplication'),
         ('perms', 'assetpermission', 'view_permuserasset'),
         ('perms', 'assetpermission', 'view_permusergroupasset'),
-
+        ('rbac', 'menupermission', 'view_dashboard'),
         ('applications', 'databaseapp', 'add_databaseapp'),
         ('applications', 'databaseapp', 'change_databaseapp'),
         ('applications', 'databaseapp', 'delete_databaseapp'),
