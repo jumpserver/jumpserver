@@ -58,7 +58,7 @@ class LoginAssetCheckAPI(CreateAPIView):
             kwargs={'pk': str(ticket.id)},
             external=True, api_to_ui=True
         )
-        ticket_detail_url = '{url}?type={type}'.format(url=ticket_detail_url, type=ticket.type)
+        ticket_detail_url = f'{ticket_detail_url}?type={ticket.type}&oid={ticket.org_id}'
         ticket_assignees = ticket.current_node.first().ticket_assignees.all()
         data = {
             'check_confirm_status': {'method': 'GET', 'url': confirm_status_url},
