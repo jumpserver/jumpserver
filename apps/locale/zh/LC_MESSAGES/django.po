@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-17 19:16+0800\n"
+"POT-Creation-Date: 2022-03-18 13:47+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -342,7 +342,7 @@ msgid "Domain"
 msgstr "网域"
 
 #: applications/models/application.py:220 xpack/plugins/cloud/models.py:33
-#: xpack/plugins/cloud/serializers/account.py:57
+#: xpack/plugins/cloud/serializers/account.py:58
 msgid "Attrs"
 msgstr "属性"
 
@@ -766,7 +766,7 @@ msgstr "成功"
 #: assets/models/base.py:32 audits/models.py:116
 #: xpack/plugins/change_auth_plan/serializers/app.py:88
 #: xpack/plugins/change_auth_plan/serializers/asset.py:198
-#: xpack/plugins/cloud/const.py:29
+#: xpack/plugins/cloud/const.py:30
 msgid "Failed"
 msgstr "失败"
 
@@ -6378,58 +6378,62 @@ msgid "Huawei Cloud"
 msgstr "华为云"
 
 #: xpack/plugins/cloud/const.py:14
+msgid "Baidu Cloud"
+msgstr "百度云"
+
+#: xpack/plugins/cloud/const.py:15
 msgid "Tencent Cloud"
 msgstr "腾讯云"
 
-#: xpack/plugins/cloud/const.py:15
+#: xpack/plugins/cloud/const.py:16
 msgid "VMware"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:16 xpack/plugins/cloud/providers/nutanix.py:13
+#: xpack/plugins/cloud/const.py:17 xpack/plugins/cloud/providers/nutanix.py:13
 msgid "Nutanix"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:17
+#: xpack/plugins/cloud/const.py:18
 msgid "Huawei Private Cloud"
 msgstr "华为私有云"
 
-#: xpack/plugins/cloud/const.py:18
+#: xpack/plugins/cloud/const.py:19
 msgid "Qingyun Private Cloud"
 msgstr "青云私有云"
 
-#: xpack/plugins/cloud/const.py:19
+#: xpack/plugins/cloud/const.py:20
 msgid "OpenStack"
 msgstr "OpenStack"
 
-#: xpack/plugins/cloud/const.py:20
+#: xpack/plugins/cloud/const.py:21
 msgid "Google Cloud Platform"
 msgstr "谷歌云"
 
-#: xpack/plugins/cloud/const.py:24
+#: xpack/plugins/cloud/const.py:25
 msgid "Instance name"
 msgstr "实例名称"
 
-#: xpack/plugins/cloud/const.py:25
+#: xpack/plugins/cloud/const.py:26
 msgid "Instance name and Partial IP"
 msgstr "实例名称和部分IP"
 
-#: xpack/plugins/cloud/const.py:30
+#: xpack/plugins/cloud/const.py:31
 msgid "Succeed"
 msgstr "成功"
 
-#: xpack/plugins/cloud/const.py:34
+#: xpack/plugins/cloud/const.py:35
 msgid "Unsync"
 msgstr "未同步"
 
-#: xpack/plugins/cloud/const.py:35
+#: xpack/plugins/cloud/const.py:36
 msgid "New Sync"
 msgstr "新同步"
 
-#: xpack/plugins/cloud/const.py:36
+#: xpack/plugins/cloud/const.py:37
 msgid "Synced"
 msgstr "已同步"
 
-#: xpack/plugins/cloud/const.py:37
+#: xpack/plugins/cloud/const.py:38
 msgid "Released"
 msgstr "已释放"
 
@@ -6601,6 +6605,41 @@ msgstr "中东（巴林）"
 msgid "South America (São Paulo)"
 msgstr "南美洲（圣保罗）"
 
+#: xpack/plugins/cloud/providers/baiducloud.py:54
+msgid "CN North-Beijing"
+msgstr "华北-北京"
+
+#: xpack/plugins/cloud/providers/baiducloud.py:55
+#: xpack/plugins/cloud/providers/huaweicloud.py:40
+msgid "CN South-Guangzhou"
+msgstr "华南-广州"
+
+#: xpack/plugins/cloud/providers/baiducloud.py:56
+msgid "CN East-Suzhou"
+msgstr "华东-苏州"
+
+#: xpack/plugins/cloud/providers/baiducloud.py:57
+#: xpack/plugins/cloud/providers/huaweicloud.py:48
+msgid "CN-Hong Kong"
+msgstr "中国-香港"
+
+#: xpack/plugins/cloud/providers/baiducloud.py:58
+msgid "CN Center-Wuhan"
+msgstr "华中-武汉"
+
+#: xpack/plugins/cloud/providers/baiducloud.py:59
+msgid "CN North-Baoding"
+msgstr "华北-保定"
+
+#: xpack/plugins/cloud/providers/baiducloud.py:60
+msgid "CN East-Shanghai"
+msgstr "华东-上海"
+
+#: xpack/plugins/cloud/providers/baiducloud.py:61
+#: xpack/plugins/cloud/providers/huaweicloud.py:47
+msgid "AP-Singapore"
+msgstr "亚太-新加坡"
+
 #: xpack/plugins/cloud/providers/huaweicloud.py:35
 msgid "AF-Johannesburg"
 msgstr "非洲-约翰内斯堡"
@@ -6620,10 +6659,6 @@ msgstr "华东-上海2"
 #: xpack/plugins/cloud/providers/huaweicloud.py:39
 msgid "CN East-Shanghai1"
 msgstr "华东-上海1"
-
-#: xpack/plugins/cloud/providers/huaweicloud.py:40
-msgid "CN South-Guangzhou"
-msgstr "华南-广州"
 
 #: xpack/plugins/cloud/providers/huaweicloud.py:41
 msgid "LA-Mexico City1"
@@ -6649,14 +6684,6 @@ msgstr "西南-贵阳1"
 msgid "AP-Bangkok"
 msgstr "亚太-曼谷"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:47
-msgid "AP-Singapore"
-msgstr "亚太-新加坡"
-
-#: xpack/plugins/cloud/providers/huaweicloud.py:48
-msgid "CN-Hong Kong"
-msgstr "中国-香港"
-
 #: xpack/plugins/cloud/providers/huaweicloud.py:50
 msgid "CN Northeast-Dalian"
 msgstr "华北-大连"
@@ -6669,11 +6696,11 @@ msgstr "华北-乌兰察布一"
 msgid "CN South-Guangzhou-InvitationOnly"
 msgstr "华南-广州-友好用户环境"
 
-#: xpack/plugins/cloud/serializers/account.py:58
+#: xpack/plugins/cloud/serializers/account.py:59
 msgid "Validity display"
 msgstr "有效性显示"
 
-#: xpack/plugins/cloud/serializers/account.py:59
+#: xpack/plugins/cloud/serializers/account.py:60
 msgid "Provider display"
 msgstr "服务商显示"
 
