@@ -49,6 +49,8 @@ exclude_permissions = (
     ('rbac', 'contenttype', '*', '*'),
     ('rbac', 'permission', 'add,delete,change', 'permission'),
     ('rbac', 'rolebinding', '*', '*'),
+    ('rbac', 'systemrolebinding', 'change', 'systemrolebinding'),
+    ('rbac', 'orgrolebinding', 'change', 'orgrolebinding'),
     ('rbac', 'role', '*', '*'),
     ('ops', 'adhoc', 'delete,change', '*'),
     ('ops', 'adhocexecution', 'add,delete,change', '*'),
