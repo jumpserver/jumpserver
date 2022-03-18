@@ -4,9 +4,9 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 
-from . import const
 from notifications.notifications import UserMessage
 from common.utils import get_logger
+from .const import TICKET_DETAIL_URL
 from .models import Ticket
 
 logger = get_logger(__file__)
@@ -22,9 +22,10 @@ class BaseTicketMessage(UserMessage):
         tp = self.ticket.type
         return urljoin(
             settings.SITE_URL,
-            const.TICKET_DETAIL_URL.format(
+            TICKET_DETAIL_URL.format(
                 id=str(self.ticket.id),
-                type=tp
+                type=tp,
+                oid=self.ticket.org_id
             )
         )
 
