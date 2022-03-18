@@ -108,6 +108,7 @@ only_system_permissions = (
     ('terminal', 'status', '*', '*'),
     ('terminal', 'task', '*', '*'),
     ('authentication', '*', '*', '*'),
+    ('tickets', '*', '*', '*'),
 )
 
 only_org_permissions = (
