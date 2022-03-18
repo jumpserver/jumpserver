@@ -100,6 +100,9 @@ class ApplicationTreeNodeMixin:
         type_category_mapper = const.AppType.type_category_mapper()
         types = const.AppType.type_category_mapper().keys()
         for tp in types:
+            # TODO: Temporary exclude mongodb
+            if tp == const.AppType.mongodb:
+                continue
             if not settings.XPACK_ENABLED and const.AppType.is_xpack(tp):
                 continue
             category = type_category_mapper.get(tp)
