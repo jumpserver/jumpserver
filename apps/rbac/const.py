@@ -100,6 +100,7 @@ only_system_permissions = (
     ('orgs', 'organization', '*', '*'),
     ('xpack', 'license', '*', '*'),
     ('settings', 'setting', '*', '*'),
+    ('tickets', '*', '*', '*'),
     ('ops', 'task', 'view', 'taskmonitor'),
     ('terminal', 'terminal', '*', '*'),
     ('terminal', 'commandstorage', '*', '*'),

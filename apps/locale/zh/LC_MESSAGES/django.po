@@ -2050,7 +2050,7 @@ msgstr "请修改密码"
 
 #: authentication/models.py:33 terminal/serializers/storage.py:30
 msgid "Access key"
-msgstr "Api key"
+msgstr "API key"
 
 #: authentication/models.py:40
 msgid "Private Token"
