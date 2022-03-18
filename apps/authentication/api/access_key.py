@@ -8,7 +8,6 @@ from .. import serializers
 
 
 class AccessKeyViewSet(ModelViewSet):
-    permission_classes = (IsValidUser,)
     serializer_class = serializers.AccessKeySerializer
     search_fields = ['^id', '^secret']
 
