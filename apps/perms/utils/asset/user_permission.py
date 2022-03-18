@@ -202,7 +202,9 @@ class UserGrantedTreeRefreshController:
         user = self.user
 
         with tmp_to_root_org():
-            UserAssetGrantedTreeNodeRelation.objects.filter(user=user).exclude(org_id__in=self.org_ids).delete()
+            UserAssetGrantedTreeNodeRelation.objects.filter(user=user)\
+                .exclude(org_id__in=self.org_ids)\
+                .delete()
 
         if force or self.have_need_refresh_orgs():
             with UserGrantedTreeRebuildLock(user_id=user.id):
@@ -219,7 +221,9 @@ class UserGrantedTreeRefreshController:
                         utils = UserGrantedTreeBuildUtils(user)
                         utils.rebuild_user_granted_tree()
                         logger.info(
-                            f'Rebuild user tree ok: cost={time.time() - t_start} user={self.user} org={current_org}')
+                            f'Rebuild user tree ok: cost={time.time() - t_start} '
+                            f'user={self.user} org={current_org}'
+                        )
 
 
 class UserGrantedUtilsBase:
