@@ -12,7 +12,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.hashers import check_password
 from django.core.cache import cache
-from django.db import models, transaction
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.shortcuts import reverse
