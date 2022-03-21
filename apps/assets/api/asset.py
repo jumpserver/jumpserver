@@ -16,7 +16,7 @@ from perms.filters import AssetPermissionFilter
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
 from assets.api import FilterAssetByNodeMixin
-from ..models import Asset, Node, Platform
+from ..models import Asset, Node, Platform, Gateway
 from .. import serializers
 from ..tasks import (
     update_assets_hardware_info_manual, test_assets_connectivity_manual,
@@ -199,7 +199,7 @@ class AssetGatewayListApi(generics.ListAPIView):
         asset_id = self.kwargs.get('pk')
         asset = get_object_or_404(Asset, pk=asset_id)
         if not asset.domain:
-            return []
+            return Gateway.objects.none()
         queryset = asset.domain.gateways.filter(protocol='ssh')
         return queryset
 
