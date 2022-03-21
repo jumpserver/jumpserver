@@ -172,6 +172,22 @@ class RoleManager(models.Manager):
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = user
+        self.role_binding_cls = self.get_role_binding_cls()
+        self.role_cls = self.get_role_cls()
+
+    def get_role_binding_cls(self):
+        from rbac.models import SystemRoleBinding, OrgRoleBinding
+        if self.scope == 'org':
+            return OrgRoleBinding
+        else:
+            return SystemRoleBinding
+
+    def get_role_cls(self):
+        from rbac.models import SystemRole, OrgRole
+        if self.scope == 'org':
+            return OrgRole
+        else:
+            return SystemRole
 
     @property
     def display(self):
@@ -181,15 +197,13 @@ class RoleManager(models.Manager):
 
     @property
     def role_bindings(self):
-        from rbac.models import RoleBinding
-        queryset = RoleBinding.objects.filter(user=self.user)
+        queryset = self.role_binding_cls.objects.filter(user=self.user)
         if self.scope:
             queryset = queryset.filter(scope=self.scope)
         return queryset
 
     def _get_queryset(self):
-        from rbac.models import RoleBinding
-        queryset = RoleBinding.get_user_roles(self.user)
+        queryset = self.role_binding_cls.get_user_roles(self.user)
         if self.scope:
             queryset = queryset.filter(scope=self.scope)
         return queryset
@@ -204,35 +218,83 @@ class RoleManager(models.Manager):
             return
         return self.role_bindings.delete()
 
-    def add(self, *roles):
-        from rbac.models import RoleBinding
-        items = []
+    def _clean_roles(self, roles_or_ids):
+        if not roles_or_ids:
+            return
+        is_model = isinstance(roles_or_ids[0], models.Model)
+        if not is_model:
+            roles = self.role_cls.objects.filter(id__in=roles_or_ids)
+        else:
+            roles = roles_or_ids
+        roles = list([r for r in roles if r.scope == self.scope])
+        return roles
 
-        for role in roles:
+    def add(self, *roles):
+        if not roles:
+            return
+
+        roles = self._clean_roles(roles)
+        old_ids = self.role_bindings.values_list('role', flat=True)
+        need_adds = [r for r in roles if r.id not in old_ids]
+
+        items = []
+        for role in need_adds:
             kwargs = {
                 'role': role,
                 'user': self.user,
-                'scope': role.scope
+                'scope': self.scope
             }
-            if self.scope and role.scope != self.scope:
-                continue
-            if not current_org.is_root() and role.scope == RoleBinding.Scope.org:
+            if not current_org.is_root():
                 kwargs['org_id'] = current_org.id
-            items.append(RoleBinding(**kwargs))
+            items.append(self.role_binding_cls(**kwargs))
 
         try:
-            RoleBinding.objects.bulk_create(items, ignore_conflicts=True)
+            self.role_binding_cls.objects.bulk_create(items, ignore_conflicts=True)
         except Exception as e:
             logger.error('Create role binding error: {}'.format(e))
 
-    def set(self, roles):
-        self.clear()
-        self.add(*roles)
+    def set(self, roles, clear=False):
+        if clear:
+            self.clear()
+            self.add(*roles)
+            return
+
+        role_ids = set([r.id for r in roles])
+        old_ids = self.role_bindings.values_list('role', flat=True)
+        old_ids = set(old_ids)
+
+        del_ids = old_ids - role_ids
+        add_ids = role_ids - old_ids
+        self.remove(*del_ids)
+        self.add(*add_ids)
+
+    def remove(self, *roles):
+        if not roles:
+            return
+        roles = self._clean_roles(roles)
+        return self.role_bindings.filter(role__in=roles).delete()
 
     def cache_set(self, roles):
         query = self._get_queryset()
         query._result_cache = roles
         self._cache = query
+
+    def remove_role_system_admin(self):
+        role = self.builtin_role.system_admin.get_role()
+        return self.remove(role)
+
+    def add_role_system_admin(self):
+        role = self.builtin_role.system_admin.get_role()
+        return self.add(role)
+
+    def add_role_system_user(self):
+        role = self.builtin_role.system_user.get_role()
+        return self.add(role)
+
+    @property
+    def builtin_role(self):
+        from rbac.builtin import BuiltinRole
+        return BuiltinRole
 
 
 class OrgRoleManager(RoleManager):
@@ -257,6 +319,7 @@ class RoleMixin:
     _org_roles = None
     _system_roles = None
     PERM_CACHE_KEY = 'USER_PERMS_{}_{}'
+    _is_superuser = None
 
     @lazyproperty
     def roles(self):
@@ -288,16 +351,26 @@ class RoleMixin:
         key = cls.PERM_CACHE_KEY.format('*', '*')
         cache.delete_pattern(key)
 
-    @lazyproperty
+    @property
     def is_superuser(self):
         """
         由于这里用了 cache ，所以不能改成 self.system_roles.filter().exists() 会查询的
         """
+        if not self._is_superuser:
+            return self._is_superuser
+
         from rbac.builtin import BuiltinRole
-        # return self.system_roles.all().filter(id=BuiltinRole.system_admin.id).exists()
         ids = [str(r.id) for r in self.system_roles.all()]
         yes = BuiltinRole.system_admin.id in ids
+        self._is_superuser = yes
         return yes
+
+    @is_superuser.setter
+    def is_superuser(self, value):
+        if value:
+            self.system_roles.add_role_system_admin()
+        else:
+            self.system_roles.remove_role_system_admin()
 
     @lazyproperty
     def is_org_admin(self):
@@ -381,11 +454,6 @@ class RoleMixin:
         from rbac.models import RoleBinding
         perms = RoleBinding.get_user_perms(self)
         return perms
-
-    def set_default_system_role(self):
-        from rbac.builtin import BuiltinRole
-        role_user = BuiltinRole.system_user.get_role()
-        self.system_roles.add(role_user)
 
 
 class TokenMixin:
