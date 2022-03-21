@@ -109,7 +109,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
         return super().perform_bulk_update(serializer)
 
     def allow_bulk_destroy(self, qs, filtered):
-        return qs.count() != filtered.count()
+        return filtered.count() < qs.count()
 
     def perform_bulk_destroy(self, objects):
         for obj in objects:
