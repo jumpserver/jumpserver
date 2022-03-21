@@ -1,6 +1,6 @@
 from redis_sessions.session import (
     force_unicode, SessionStore as RedisSessionStore,
-    RedisServer as RedisRedisServer, settings as redis_setting
+    RedisServer as _RedisServer, settings as redis_setting
 )
 from redis import exceptions, Redis
 from django.conf import settings
@@ -8,7 +8,7 @@ from django.conf import settings
 from jumpserver.const import CONFIG
 
 
-class RedisServer(RedisRedisServer):
+class RedisServer(_RedisServer):
     __redis = {}
 
     def get(self):
