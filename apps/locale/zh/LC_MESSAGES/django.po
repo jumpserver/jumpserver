@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-18 13:47+0800\n"
+"POT-Creation-Date: 2022-03-21 10:37+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -22,7 +22,7 @@ msgid "Acls"
 msgstr "访问控制"
 
 #: acls/models/base.py:25 acls/serializers/login_asset_acl.py:47
-#: applications/models/application.py:209 assets/models/asset.py:138
+#: applications/models/application.py:212 assets/models/asset.py:138
 #: assets/models/base.py:175 assets/models/cluster.py:18
 #: assets/models/cmd_filter.py:27 assets/models/domain.py:23
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
@@ -56,7 +56,7 @@ msgstr "优先级可选范围为 1-100 (数值越小越优先)"
 msgid "Active"
 msgstr "激活中"
 
-#: acls/models/base.py:32 applications/models/application.py:222
+#: acls/models/base.py:32 applications/models/application.py:225
 #: assets/models/asset.py:143 assets/models/asset.py:231
 #: assets/models/backup.py:54 assets/models/base.py:180
 #: assets/models/cluster.py:29 assets/models/cmd_filter.py:48
@@ -274,7 +274,7 @@ msgstr "远程应用"
 msgid "Custom"
 msgstr "自定义"
 
-#: applications/models/account.py:12 applications/models/application.py:226
+#: applications/models/account.py:12 applications/models/application.py:229
 #: assets/models/backup.py:32 assets/models/cmd_filter.py:45
 #: perms/models/application_permission.py:28
 msgid "Application"
@@ -314,7 +314,7 @@ msgstr "可以查看应用账号密码"
 msgid "Can change application account secret"
 msgstr "可以查看应用账号密码"
 
-#: applications/models/application.py:211
+#: applications/models/application.py:214
 #: applications/serializers/application.py:99 assets/models/label.py:21
 #: perms/models/application_permission.py:21
 #: perms/serializers/application/user_permission.py:33
@@ -323,7 +323,7 @@ msgstr "可以查看应用账号密码"
 msgid "Category"
 msgstr "类别"
 
-#: applications/models/application.py:214
+#: applications/models/application.py:217
 #: applications/serializers/application.py:101 assets/models/backup.py:49
 #: assets/models/cmd_filter.py:82 assets/models/user.py:233
 #: perms/models/application_permission.py:24
@@ -336,21 +336,21 @@ msgstr "类别"
 msgid "Type"
 msgstr "类型"
 
-#: applications/models/application.py:218 assets/models/asset.py:217
+#: applications/models/application.py:221 assets/models/asset.py:217
 #: assets/models/domain.py:29 assets/models/domain.py:63
 msgid "Domain"
 msgstr "网域"
 
-#: applications/models/application.py:220 xpack/plugins/cloud/models.py:33
+#: applications/models/application.py:223 xpack/plugins/cloud/models.py:33
 #: xpack/plugins/cloud/serializers/account.py:58
 msgid "Attrs"
 msgstr "属性"
 
-#: applications/models/application.py:230
+#: applications/models/application.py:233
 msgid "Can match application"
 msgstr "匹配应用"
 
-#: applications/models/application.py:278
+#: applications/models/application.py:281
 msgid "Application user"
 msgstr "应用用户"
 
@@ -1380,7 +1380,7 @@ msgstr "日志审计"
 
 #: audits/models.py:27 audits/models.py:57
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:167 users/templates/users/user_asset_permission.html:128
+#: rbac/tree.py:166 users/templates/users/user_asset_permission.html:128
 #: users/templates/users/user_database_app_permission.html:111
 msgid "Delete"
 msgstr "删除"
@@ -1434,11 +1434,11 @@ msgstr "文件管理"
 
 #: audits/models.py:55
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:164
+#: rbac/tree.py:163
 msgid "Create"
 msgstr "创建"
 
-#: audits/models.py:56 rbac/tree.py:166 templates/_csv_import_export.html:18
+#: audits/models.py:56 rbac/tree.py:165 templates/_csv_import_export.html:18
 #: templates/_csv_update_modal.html:6
 #: users/templates/users/user_asset_permission.html:127
 #: users/templates/users/user_database_app_permission.html:110
@@ -2050,7 +2050,7 @@ msgstr "请修改密码"
 
 #: authentication/models.py:33 terminal/serializers/storage.py:30
 msgid "Access key"
-msgstr "Api key"
+msgstr "API key"
 
 #: authentication/models.py:40
 msgid "Private Token"
@@ -2875,7 +2875,7 @@ msgstr "当前组织 ({}) 不能被删除"
 msgid "The organization have resource ({}) cannot be deleted"
 msgstr "组织存在资源 ({}) 不能被删除"
 
-#: orgs/apps.py:7 rbac/tree.py:113
+#: orgs/apps.py:7 rbac/tree.py:112
 msgid "App organizations"
 msgstr "组织管理"
 
@@ -3288,27 +3288,27 @@ msgstr "我的资产"
 msgid "My apps"
 msgstr "我的应用"
 
-#: rbac/tree.py:114
+#: rbac/tree.py:113
 msgid "Ticket comment"
 msgstr "工单评论"
 
-#: rbac/tree.py:115 tickets/models/ticket.py:163
+#: rbac/tree.py:114 tickets/models/ticket.py:163
 msgid "Ticket"
 msgstr "工单管理"
 
-#: rbac/tree.py:116
+#: rbac/tree.py:115
 msgid "Common setting"
 msgstr "一般设置"
 
-#: rbac/tree.py:117
+#: rbac/tree.py:116
 msgid "View permission tree"
 msgstr "查看授权树"
 
-#: rbac/tree.py:118
+#: rbac/tree.py:117
 msgid "Execute batch command"
 msgstr "执行批量命令"
 
-#: rbac/tree.py:165
+#: rbac/tree.py:164
 msgid "View"
 msgstr "查看"
 
