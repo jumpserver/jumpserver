@@ -68,7 +68,7 @@ def on_user_create_set_default_system_role(sender, instance, created, **kwargs):
     has_system_role = instance.system_roles.all().exists()
     if not has_system_role:
         logger.debug("Receive user create signal, set default role")
-        instance.set_default_system_role()
+        instance.system_roles.add_role_system_user()
 
 
 @receiver(post_user_create)

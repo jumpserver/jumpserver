@@ -1,6 +1,7 @@
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.db.models import Q
+from django.core.exceptions import ValidationError
 from rest_framework.serializers import ValidationError
 
 from common.db.models import JMSModel
@@ -67,6 +68,7 @@ class RoleBinding(JMSModel):
 
     def save(self, *args, **kwargs):
         self.scope = self.role.scope
+        self.clean()
         return super().save(*args, **kwargs)
 
     @classmethod
@@ -94,6 +96,9 @@ class RoleBinding(JMSModel):
     @lazyproperty
     def role_display(self):
         return self.role.display_name
+
+    def is_scope_org(self):
+        return self.scope == Scope.org
 
 
 class OrgRoleBindingManager(RoleBindingManager):
@@ -147,3 +152,12 @@ class SystemRoleBinding(RoleBinding):
     def save(self, *args, **kwargs):
         self.scope = Scope.system
         return super().save(*args, **kwargs)
+
+    def clean(self):
+        kwargs = dict(role=self.role, user=self.user, scope=self.scope)
+        exists = self.__class__.objects.filter(**kwargs).exists()
+        if exists:
+            msg = "Duplicate for key 'role_user' of system role binding, {}_{}".format(
+                self.role.id, self.user.id
+            )
+            raise ValidationError(msg)

@@ -118,6 +118,9 @@ class Role(JMSModel):
             return self.name
         return gettext(self.name)
 
+    def is_org(self):
+        return self.scope == const.Scope.org
+
 
 class SystemRole(Role):
     objects = SystemRoleManager()
