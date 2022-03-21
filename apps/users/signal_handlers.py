@@ -60,9 +60,30 @@ def save_passwd_change(sender, instance: User, **kwargs):
         )
 
 
+def update_role_superuser_if_need(user):
+    if not user._update_superuser:
+        return
+    value = user._is_superuser
+    from rbac.models import SystemRoleBinding
+    from rbac.builtin import BuiltinRole
+    role = BuiltinRole.system_admin.get_role()
+
+    kwargs = {'user_id': user.id, 'role_id': role.id, 'scope': 'system'}
+    exists = SystemRoleBinding.objects.filter(**kwargs).exists()
+    # 需要添加并且不存在
+    if value and not exists:
+        SystemRoleBinding.objects.create(**kwargs)
+    # 需要删除并且存在
+    elif not value and exists:
+        SystemRoleBinding.objects.filter(**kwargs).delete()
+    else:
+        print("No need operate")
+
+
 @receiver(post_save, sender=User)
 @on_transaction_commit
 def on_user_create_set_default_system_role(sender, instance, created, **kwargs):
+    update_role_superuser_if_need(instance)
     if not created:
         return
     has_system_role = instance.system_roles.all().exists()
