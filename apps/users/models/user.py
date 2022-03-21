@@ -308,22 +308,6 @@ class RoleMixin:
     def is_superuser(self, value):
         self._is_superuser = value
         self._update_superuser = True
-        # from rbac.models import SystemRoleBinding
-        # from rbac.builtin import BuiltinRole
-        # role = BuiltinRole.system_admin.get_role()
-        #
-        # kwargs = {'user_id': self.id, 'role_id': role.id, 'scope': 'system'}
-        # exists = SystemRoleBinding.objects.filter(**kwargs).exists()
-        # print("kwargs: ", kwargs)
-        # print("Exist: ", exists)
-        # # 需要添加并且不存在
-        # if value and not exists:
-        #     transaction.on_commit(lambda: SystemRoleBinding.objects.create(**kwargs))
-        # # 需要删除并且存在
-        # elif not value and exists:
-        #     transaction.on_commit(lambda: SystemRoleBinding.objects.filter(**kwargs).delete())
-        # else:
-        #     print("No need operate")
 
     @lazyproperty
     def is_org_admin(self):
