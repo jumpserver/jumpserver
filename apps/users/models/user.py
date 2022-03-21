@@ -320,6 +320,7 @@ class RoleMixin:
     _system_roles = None
     PERM_CACHE_KEY = 'USER_PERMS_{}_{}'
     _is_superuser = None
+    _update_superuser = False
 
     @lazyproperty
     def roles(self):
@@ -367,6 +368,8 @@ class RoleMixin:
 
     @is_superuser.setter
     def is_superuser(self, value):
+        self._is_superuser = value
+        self._update_superuser = True
         if value:
             self.system_roles.add_role_system_admin()
         else:
