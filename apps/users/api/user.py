@@ -108,6 +108,9 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
             self.check_object_permissions(self.request, user)
         return super().perform_bulk_update(serializer)
 
+    def allow_bulk_destroy(self, qs, filtered):
+        return qs.count() != filtered.count()
+
     def perform_bulk_destroy(self, objects):
         for obj in objects:
             self.check_object_permissions(self.request, obj)
