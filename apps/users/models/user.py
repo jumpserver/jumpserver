@@ -12,7 +12,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.hashers import check_password
 from django.core.cache import cache
-from django.db import models
+from django.db import models, transaction
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.shortcuts import reverse
@@ -257,6 +257,8 @@ class RoleMixin:
     _org_roles = None
     _system_roles = None
     PERM_CACHE_KEY = 'USER_PERMS_{}_{}'
+    _is_superuser = None
+    _update_superuser = False
 
     @lazyproperty
     def roles(self):
@@ -288,16 +290,40 @@ class RoleMixin:
         key = cls.PERM_CACHE_KEY.format('*', '*')
         cache.delete_pattern(key)
 
-    @lazyproperty
+    @property
     def is_superuser(self):
         """
         由于这里用了 cache ，所以不能改成 self.system_roles.filter().exists() 会查询的
         """
+        if self._is_superuser is not None:
+            return self._is_superuser
         from rbac.builtin import BuiltinRole
         # return self.system_roles.all().filter(id=BuiltinRole.system_admin.id).exists()
         ids = [str(r.id) for r in self.system_roles.all()]
         yes = BuiltinRole.system_admin.id in ids
+        self._is_superuser = yes
         return yes
+
+    @is_superuser.setter
+    def is_superuser(self, value):
+        self._is_superuser = value
+        self._update_superuser = True
+        # from rbac.models import SystemRoleBinding
+        # from rbac.builtin import BuiltinRole
+        # role = BuiltinRole.system_admin.get_role()
+        #
+        # kwargs = {'user_id': self.id, 'role_id': role.id, 'scope': 'system'}
+        # exists = SystemRoleBinding.objects.filter(**kwargs).exists()
+        # print("kwargs: ", kwargs)
+        # print("Exist: ", exists)
+        # # 需要添加并且不存在
+        # if value and not exists:
+        #     transaction.on_commit(lambda: SystemRoleBinding.objects.create(**kwargs))
+        # # 需要删除并且存在
+        # elif not value and exists:
+        #     transaction.on_commit(lambda: SystemRoleBinding.objects.filter(**kwargs).delete())
+        # else:
+        #     print("No need operate")
 
     @lazyproperty
     def is_org_admin(self):
