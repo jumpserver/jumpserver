@@ -224,6 +224,8 @@ class RoleManager(models.Manager):
             RoleBinding.objects.bulk_create(items, ignore_conflicts=True)
         except Exception as e:
             logger.error('Create role binding error: {}'.format(e))
+        finally:
+            self.user.expire_users_rbac_perms_cache()
 
     def set(self, roles):
         self.clear()
