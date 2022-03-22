@@ -83,6 +83,6 @@ class SSOViewSet(AuthMixin, JMSGenericViewSet):
             return HttpResponseRedirect(next_url)
 
         user = token.user
-        login(self.request, user, 'authentication.backends.api.SSOAuthentication')
+        login(self.request, user, settings.AUTH_BACKEND_SSO)
         self.send_auth_signal(success=True, user=user)
         return HttpResponseRedirect(next_url)

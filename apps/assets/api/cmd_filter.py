@@ -53,7 +53,7 @@ class CommandConfirmAPI(CreateAPIView):
             run_command=self.serializer.data.get('run_command'),
             session=self.serializer.session,
             cmd_filter_rule=self.serializer.cmd_filter_rule,
-            org_id=self.serializer.org.id
+            org_id=self.serializer.org.id,
         )
         return ticket
 

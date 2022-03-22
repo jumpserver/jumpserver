@@ -16,8 +16,9 @@ class FlowerService(BaseService):
         if os.getuid() == 0:
             os.environ.setdefault('C_FORCE_ROOT', '1')
         cmd = [
-            'celery', 'flower',
+            'celery',
             '-A', 'ops',
+            'flower',
             '-l', 'INFO',
             '--url_prefix=/core/flower',
             '--auto_refresh=False',

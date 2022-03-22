@@ -2,7 +2,7 @@
 #
 from django.templatetags.static import static
 from django.conf import settings
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 
 default_context = {
     'DEFAULT_PK': '00000000-0000-0000-0000-000000000000',

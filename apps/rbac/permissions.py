@@ -16,15 +16,17 @@ class RBACPermission(permissions.DjangoModelPermissions):
         ('bulk_update', '%(app_label)s.change_%(model_name)s'),
         ('partial_bulk_update', '%(app_label)s.change_%(model_name)s'),
         ('bulk_destroy', '%(app_label)s.delete_%(model_name)s'),
-        ('metadata', ''),
+        ('render_to_json', '%(app_label)s.add_%(model_name)s'),
+        ('metadata', '*'),
         ('GET', '%(app_label)s.view_%(model_name)s'),
-        ('OPTIONS', ''),
+        ('OPTIONS', '*'),
         ('HEAD', '%(app_label)s.view_%(model_name)s'),
         ('POST', '%(app_label)s.add_%(model_name)s'),
         ('PUT', '%(app_label)s.change_%(model_name)s'),
         ('PATCH', '%(app_label)s.change_%(model_name)s'),
         ('DELETE', '%(app_label)s.delete_%(model_name)s'),
     )
+
     # rbac_perms = ((), ())
     # def get_rbac_perms():
     #     return {}
@@ -52,6 +54,7 @@ class RBACPermission(permissions.DjangoModelPermissions):
     def get_default_action_perms(self, model_cls):
         if model_cls is None:
             return {}
+
         perms = {}
         for action, tmpl in dict(self.default_rbac_perms_tmpl).items():
             perms[action] = self.format_perms(tmpl, model_cls)
@@ -60,21 +63,39 @@ class RBACPermission(permissions.DjangoModelPermissions):
     def get_rbac_perms(self, view, model_cls) -> dict:
         if hasattr(view, 'get_rbac_perms'):
             return dict(view.get_rbac_perms())
-        perms = self.get_default_action_perms(model_cls)
+        perms = {}
         if hasattr(view, 'rbac_perms'):
             perms.update(dict(view.rbac_perms))
+        default_perms = self.get_default_action_perms(model_cls)
+        if '*' not in perms:
+            for k, v in default_perms.items():
+                perms.setdefault(k, v)
         return perms
 
     def _get_action_perms(self, action, model_cls, view):
         action_perms_map = self.get_rbac_perms(view, model_cls)
-        if action not in action_perms_map:
+        if action in action_perms_map:
+            perms = action_perms_map[action]
+        elif '*' in action_perms_map:
+            perms = action_perms_map['*']
+        else:
             msg = 'Action not allowed: {}, only `{}` supported'.format(
                 action, ','.join(list(action_perms_map.keys()))
             )
             logger.error(msg)
             raise exceptions.PermissionDenied(msg)
-        perms = action_perms_map[action]
         return perms
+
+    def get_model_cls(self, view):
+        if hasattr(view, 'perm_model'):
+            return getattr(view, 'perm_model')
+
+        try:
+            queryset = self._queryset(view)
+            model_cls = queryset.model
+        except:
+            model_cls = None
+        return model_cls
 
     def get_require_perms(self, request, view):
         """
@@ -83,12 +104,7 @@ class RBACPermission(permissions.DjangoModelPermissions):
         :param view:
         :return:
         """
-        try:
-            queryset = self._queryset(view)
-            model_cls = queryset.model
-        except AssertionError:
-            model_cls = None
-
+        model_cls = self.get_model_cls(view)
         action = getattr(view, 'action', None)
         if not action:
             action = request.method
@@ -105,8 +121,8 @@ class RBACPermission(permissions.DjangoModelPermissions):
         if request.user.is_anonymous and self.authenticated_users_only:
             return False
 
-        action = getattr(view, 'action', None)
-        if action == 'metadata':
+        raw_action = getattr(view, 'raw_action', None)
+        if raw_action == 'metadata':
             return True
 
         perms = self.get_require_perms(request, view)
@@ -115,4 +131,3 @@ class RBACPermission(permissions.DjangoModelPermissions):
         has = request.user.has_perms(perms)
         logger.debug('View require perms: {}, result: {}'.format(perms, has))
         return has
-

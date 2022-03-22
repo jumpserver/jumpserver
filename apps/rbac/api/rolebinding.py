@@ -1,13 +1,17 @@
-
+from django.utils.translation import ugettext as _
 from django.db.models import F, Value
 from django.db.models.functions import Concat
 
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import current_org
+from common.exceptions import JMSException
 from .. import serializers
 from ..models import RoleBinding, SystemRoleBinding, OrgRoleBinding
 
-__all__ = ['RoleBindingViewSet', 'SystemRoleBindingViewSet', 'OrgRoleBindingViewSet']
+__all__ = [
+    'RoleBindingViewSet', 'SystemRoleBindingViewSet',
+    'OrgRoleBindingViewSet'
+]
 
 
 class RoleBindingViewSet(OrgBulkModelViewSet):
@@ -22,8 +26,8 @@ class RoleBindingViewSet(OrgBulkModelViewSet):
     ]
 
     def get_queryset(self):
-        queryset = super().get_queryset()\
-            .prefetch_related('user', 'role') \
+        queryset = self._get_queryset()\
+            .prefetch_related('user', 'role', 'org') \
             .annotate(
                 user_display=Concat(
                     F('user__name'), Value('('),
@@ -33,15 +37,28 @@ class RoleBindingViewSet(OrgBulkModelViewSet):
             )
         return queryset
 
+    def _get_queryset(self):
+        return super().get_queryset()
+
 
 class SystemRoleBindingViewSet(RoleBindingViewSet):
     model = SystemRoleBinding
     serializer_class = serializers.SystemRoleBindingSerializer
 
+    def perform_destroy(self, instance):
+        user = instance.user
+        role_qs = self.model.objects.filter(user=user)
+        if role_qs.count() == 1:
+            msg = _('{} at least one system role').format(user)
+            raise JMSException(code='system_role_delete_error', detail=msg)
+        return super().perform_destroy(instance)
+
 
 class OrgRoleBindingViewSet(RoleBindingViewSet):
-    model = OrgRoleBinding
     serializer_class = serializers.OrgRoleBindingSerializer
+
+    def _get_queryset(self):
+        return OrgRoleBinding.objects.root_all()
 
     def perform_bulk_create(self, serializer):
         validated_data = serializer.validated_data

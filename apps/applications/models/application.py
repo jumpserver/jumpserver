@@ -3,10 +3,12 @@ from urllib.parse import urlencode, parse_qsl
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
 from orgs.mixins.models import OrgModelMixin
 from common.mixins import CommonModelMixin
 from common.tree import TreeNode
+from common.utils import is_uuid
 from assets.models import Asset, SystemUser
 
 from ..utils import KubernetesTree
@@ -79,6 +81,8 @@ class ApplicationTreeNodeMixin:
         nodes = []
         categories = const.AppType.category_types_mapper().keys()
         for category in categories:
+            if not settings.XPACK_ENABLED and const.AppCategory.is_xpack(category):
+                continue
             i = cls.create_tree_id(pid, 'category', category.value)
             node = cls.create_choice_node(
                 category, i, pid=pid, tp='category',
@@ -97,6 +101,11 @@ class ApplicationTreeNodeMixin:
         type_category_mapper = const.AppType.type_category_mapper()
         types = const.AppType.type_category_mapper().keys()
         for tp in types:
+            # TODO: Temporary exclude mongodb
+            if tp == const.AppType.mongodb:
+                continue
+            if not settings.XPACK_ENABLED and const.AppType.is_xpack(tp):
+                continue
             category = type_category_mapper.get(tp)
             pid = cls.create_tree_id(pid, 'category', category.value)
             i = cls.create_tree_id(pid, 'type', tp.value)
@@ -155,6 +164,8 @@ class ApplicationTreeNodeMixin:
 
         # 应用的节点
         for app in queryset:
+            if not settings.XPACK_ENABLED and const.AppType.is_xpack(app.type):
+                continue
             node = app.as_tree_node(root_node.id)
             tree_nodes.append(node)
         return tree_nodes
@@ -219,6 +230,9 @@ class Application(CommonModelMixin, OrgModelMixin, ApplicationTreeNodeMixin):
         verbose_name = _('Application')
         unique_together = [('org_id', 'name')]
         ordering = ('name',)
+        permissions = [
+            ('match_application', _('Can match application')),
+        ]
 
     def __str__(self):
         category_display = self.get_category_display()
@@ -254,12 +268,12 @@ class Application(CommonModelMixin, OrgModelMixin, ApplicationTreeNodeMixin):
             'parameters': parameters
         }
 
-    def get_remote_app_asset(self):
+    def get_remote_app_asset(self, raise_exception=True):
         asset_id = self.attrs.get('asset')
-        if not asset_id:
+        if is_uuid(asset_id):
+            return Asset.objects.filter(id=asset_id).first()
+        if raise_exception:
             raise ValueError("Remote App not has asset attr")
-        asset = Asset.objects.filter(id=asset_id).first()
-        return asset
 
 
 class ApplicationUser(SystemUser):

@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from assets.signals_handler.node_assets_mapping import expire_node_assets_mapping_for_memory
+from assets.signal_handlers.node_assets_mapping import expire_node_assets_mapping_for_memory
 from orgs.caches import OrgResourceStatisticsCache
 from orgs.models import Organization
 

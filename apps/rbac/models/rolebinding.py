@@ -1,6 +1,7 @@
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.db.models import Q
+from django.core.exceptions import ValidationError
 from rest_framework.serializers import ValidationError
 
 from common.db.models import JMSModel
@@ -15,11 +16,17 @@ __all__ = ['RoleBinding', 'SystemRoleBinding', 'OrgRoleBinding']
 class RoleBindingManager(models.Manager):
     def get_queryset(self):
         queryset = super(RoleBindingManager, self).get_queryset()
-        q = Q(scope=Scope.system)
+        q = Q(scope=Scope.system, org__isnull=True)
         if not current_org.is_root():
             q |= Q(org_id=current_org.id, scope=Scope.org)
         queryset = queryset.filter(q)
         return queryset
+
+    def root_all(self):
+        queryset = super().get_queryset()
+        if current_org.is_root():
+            return queryset
+        return self.get_queryset()
 
 
 class RoleBinding(JMSModel):
@@ -53,8 +60,15 @@ class RoleBinding(JMSModel):
             display += ' | {org}'.format(org=self.org)
         return display
 
+    @property
+    def org_name(self):
+        if self.org:
+            return self.org.name
+        return ''
+
     def save(self, *args, **kwargs):
         self.scope = self.role.scope
+        self.clean()
         return super().save(*args, **kwargs)
 
     @classmethod
@@ -65,7 +79,7 @@ class RoleBinding(JMSModel):
     @classmethod
     def get_role_users(cls, role):
         from users.models import User
-        bindings = cls.objects.filter(role=role, scope=role.scope)
+        bindings = cls.objects.root_all().filter(role=role, scope=role.scope)
         user_ids = bindings.values_list('user', flat=True).distinct()
         return User.objects.filter(id__in=user_ids)
 
@@ -83,14 +97,17 @@ class RoleBinding(JMSModel):
     def role_display(self):
         return self.role.display_name
 
+    def is_scope_org(self):
+        return self.scope == Scope.org
 
-class OrgRoleBindingManager(models.Manager):
+
+class OrgRoleBindingManager(RoleBindingManager):
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super(RoleBindingManager, self).get_queryset()
         if current_org.is_root():
-            return queryset.none()
-
-        queryset = queryset.filter(org=current_org.id, scope=Scope.org)
+            queryset = queryset.none()
+        else:
+            queryset = queryset.filter(org_id=current_org.id, scope=Scope.org)
         return queryset
 
 
@@ -118,9 +135,10 @@ class OrgRoleBinding(RoleBinding):
         verbose_name = _('Organization role binding')
 
 
-class SystemRoleBindingManager(models.Manager):
+class SystemRoleBindingManager(RoleBindingManager):
     def get_queryset(self):
-        queryset = super().get_queryset().filter(scope=Scope.system)
+        queryset = super(RoleBindingManager, self).get_queryset()\
+            .filter(scope=Scope.system)
         return queryset
 
 
@@ -134,3 +152,12 @@ class SystemRoleBinding(RoleBinding):
     def save(self, *args, **kwargs):
         self.scope = Scope.system
         return super().save(*args, **kwargs)
+
+    def clean(self):
+        kwargs = dict(role=self.role, user=self.user, scope=self.scope)
+        exists = self.__class__.objects.filter(**kwargs).exists()
+        if exists:
+            msg = "Duplicate for key 'role_user' of system role binding, {}_{}".format(
+                self.role.id, self.user.id
+            )
+            raise ValidationError(msg)

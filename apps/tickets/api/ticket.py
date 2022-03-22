@@ -7,8 +7,9 @@ from rest_framework.response import Response
 
 from common.const.http import POST, PUT
 from common.mixins.api import CommonApiMixin
-from common.permissions import IsValidUser
 from common.drf.api import JMSBulkModelViewSet
+
+from rbac.permissions import RBACPermission
 
 from tickets import serializers
 from tickets.models import Ticket, TicketFlow
@@ -19,7 +20,6 @@ __all__ = ['TicketViewSet', 'TicketFlowViewSet']
 
 
 class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
-    permission_classes = (IsValidUser,)
     serializer_class = serializers.TicketDisplaySerializer
     serializer_classes = {
         'open': serializers.TicketApplySerializer,
@@ -34,6 +34,9 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
         'date_created', 'serial_num',
     )
     ordering = ('-date_created',)
+    rbac_perms = {
+        'open': 'tickets.view_ticket',
+    }
 
     def create(self, request, *args, **kwargs):
         raise MethodNotAllowed(self.action)
@@ -54,7 +57,7 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
         instance.process_map = instance.create_process_map()
         instance.open(applicant=self.request.user)
 
-    @action(detail=False, methods=[POST], permission_classes=[IsValidUser, ])
+    @action(detail=False, methods=[POST], permission_classes=[RBACPermission, ])
     def open(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
 

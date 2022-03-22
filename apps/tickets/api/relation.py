@@ -17,6 +17,10 @@ class TicketSessionRelationViewSet(CreateModelMixin, JMSGenericViewSet):
 
 # Todo: 放到上面的 ViewSet 中
 class TicketSessionApi(views.APIView):
+    perm_model = TicketSession
+    rbac_perms = {
+        '*': ['tickets.view_ticket']
+    }
 
     def get(self, request, *args, **kwargs):
         with tmp_to_root_org():

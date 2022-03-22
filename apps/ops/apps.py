@@ -6,13 +6,13 @@ from django.apps import AppConfig
 
 class OpsConfig(AppConfig):
     name = 'ops'
-    verbose_name = _('Operations')
+    verbose_name = _('App ops')
 
     def ready(self):
         from orgs.models import Organization
         from orgs.utils import set_current_org
         set_current_org(Organization.root())
         from .celery import signal_handler
-        from . import signals_handler
+        from . import signal_handlers
         from . import notifications
         super().ready()

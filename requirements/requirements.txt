@@ -17,14 +17,14 @@ decorator==4.1.2
 Django==3.1.14
 django-auth-ldap==2.2.0
 django-bootstrap3==14.2.0
-django-celery-beat==2.0
+django-celery-beat==2.2.1
 django-filter==2.4.0
 django-formtools==2.2
 django-ranged-response==0.2.0
 django-redis-cache==2.1.1
 django-rest-swagger==2.2.0
 django-simple-captcha==0.5.13
-django-timezone-field==4.0
+django-timezone-field==4.1.0
 djangorestframework==3.12.2
 djangorestframework-bulk==0.2.1
 docutils==0.14
@@ -84,7 +84,7 @@ python-daemon==2.2.3
 httpsig==1.3.0
 treelib==1.5.3
 django-proxy==1.2.1
-flower==0.9.3
+flower==1.0.0
 channels-redis==3.2.0
 channels==2.4.0
 daphne==2.4.1
@@ -95,6 +95,7 @@ ipython
 huaweicloud-sdk-python==1.0.21
 django-redis==4.11.0
 python-redis-lock==3.7.0
+jumpserver-django-oidc-rp==0.3.7.8
 django-mysql==3.9.0
 gmssl==3.2.1
 azure-mgmt-compute==4.6.2
@@ -129,3 +130,4 @@ numpy==1.22.0
 pandas==1.3.5
 pyjwkest==1.4.2
 jsonfield2==4.0.0.post0
+bce-python-sdk==0.8.64

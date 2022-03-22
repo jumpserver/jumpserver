@@ -9,6 +9,7 @@ class SessionReplay(CommonModelMixin):
     session = models.ForeignKey(Session, on_delete=models.CASCADE, verbose_name=_("Session"))
 
     class Meta:
+        verbose_name = _("Session replay")
         permissions = [
             ('upload_sessionreplay', _("Can upload session replay")),
             ('download_sessionreplay', _("Can download session replay")),

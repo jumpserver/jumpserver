@@ -19,7 +19,7 @@ class MailTestingAPI(APIView):
     serializer_class = serializers.MailTestSerializer
     success_message = _("Test mail sent to {}, please check")
     rbac_perms = {
-        'POST': 'settings.change_setting'
+        'POST': 'settings.change_email'
     }
 
     def post(self, request):

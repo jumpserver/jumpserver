@@ -16,7 +16,7 @@ from perms.filters import AssetPermissionFilter
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
 from assets.api import FilterAssetByNodeMixin
-from ..models import Asset, Node, Platform
+from ..models import Asset, Node, Platform, Gateway
 from .. import serializers
 from ..tasks import (
     update_assets_hardware_info_manual, test_assets_connectivity_manual,
@@ -53,6 +53,9 @@ class AssetViewSet(SuggestionMixin, FilterAssetByNodeMixin, OrgBulkModelViewSet)
     serializer_classes = {
         'default': serializers.AssetSerializer,
         'suggestion': serializers.MiniAssetSerializer
+    }
+    rbac_perms = {
+        'match': 'assets.match_asset'
     }
     extra_filter_backends = [FilterAssetByNodeFilterBackend, LabelFilterBackend, IpInFilterBackend]
 
@@ -135,7 +138,9 @@ class AssetTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
     def check_permissions(self, request):
         action = request.data.get('action')
         action_perm_require = {
+            'refresh': 'assets.refresh_assethardwareinfo',
             'push_system_user': 'assets.push_assetsystemuser',
+            'test': 'assets.test_assetconnectivity',
             'test_system_user': 'assets.test_assetconnectivity'
         }
         perm_required = action_perm_require.get(action)
@@ -173,6 +178,16 @@ class AssetsTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
     model = Asset
     serializer_class = serializers.AssetsTaskSerializer
 
+    def check_permissions(self, request):
+        action = request.data.get('action')
+        action_perm_require = {
+            'refresh': 'assets.refresh_assethardwareinfo',
+        }
+        perm_required = action_perm_require.get(action)
+        has = self.request.user.has_perm(perm_required)
+        if not has:
+            self.permission_denied(request)
+
 
 class AssetGatewayListApi(generics.ListAPIView):
     serializer_class = serializers.GatewayWithAuthSerializer
@@ -184,12 +199,15 @@ class AssetGatewayListApi(generics.ListAPIView):
         asset_id = self.kwargs.get('pk')
         asset = get_object_or_404(Asset, pk=asset_id)
         if not asset.domain:
-            return []
+            return Gateway.objects.none()
         queryset = asset.domain.gateways.filter(protocol='ssh')
         return queryset
 
 
 class BaseAssetPermUserOrUserGroupListApi(ListAPIView):
+    rbac_perms = {
+        'GET': 'perms.view_assetpermission'
+    }
 
     def get_object(self):
         asset_id = self.kwargs.get('pk')
@@ -207,6 +225,9 @@ class AssetPermUserListApi(BaseAssetPermUserOrUserGroupListApi):
     filterset_class = UserFilter
     search_fields = ('username', 'email', 'name', 'id', 'source', 'role')
     serializer_class = UserSerializer
+    rbac_perms = {
+        'GET': 'perms.view_assetpermission'
+    }
 
     def get_queryset(self):
         perms = self.get_asset_related_perms()

@@ -64,7 +64,8 @@ class AccountViewSet(OrgBulkModelViewSet):
         'verify_account': serializers.AssetTaskSerializer
     }
     rbac_perms = {
-        'verify_account': 'assets.add_authbook'
+        'verify_account': 'assets.test_authbook',
+        'partial_update': 'assets.change_assetaccountsecret',
     }
 
     def get_queryset(self):
@@ -88,8 +89,8 @@ class AccountSecretsViewSet(AccountViewSet):
     http_method_names = ['get']
     permission_classes = [RBACPermission, NeedMFAVerify]
     rbac_perms = {
-        'list': 'assets.view_assetsecret',
-        'retrieve': 'assets.view_assetsecret',
+        'list': 'assets.view_assetaccountsecret',
+        'retrieve': 'assets.view_assetaccountsecret',
     }
 
 

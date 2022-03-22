@@ -28,7 +28,7 @@ class AccountBackupPlanExecutionViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.AccountBackupPlanExecutionSerializer
     search_fields = ('trigger',)
     filterset_fields = ('trigger', 'plan_id')
-    http_method_names = ['get', 'post']
+    http_method_names = ['get', 'post', 'options']
 
     def get_queryset(self):
         queryset = AccountBackupPlanExecution.objects.all()

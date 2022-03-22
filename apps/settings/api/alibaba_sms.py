@@ -14,7 +14,7 @@ from .. import serializers
 class AlibabaSMSTestingAPI(GenericAPIView):
     serializer_class = serializers.AlibabaSMSSettingSerializer
     rbac_perms = {
-        'POST': 'settings.change_setting'
+        'POST': 'settings.change_sms'
     }
 
     def post(self, request):

@@ -41,8 +41,40 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'tencent': serializers.TencentSMSSettingSerializer,
     }
 
+    rbac_category_permissions = {
+        'basic': 'settings.view_setting',
+        'terminal': 'settings.change_terminal',
+        'security': 'settings.change_security',
+        'ldap': 'settings.change_auth',
+        'email': 'settings.change_email',
+        'email_content': 'settings.change_email',
+        'wecom': 'settings.change_auth',
+        'dingtalk': 'settings.change_auth',
+        'feishu': 'settings.change_auth',
+        'auth': 'settings.change_auth',
+        'oidc': 'settings.change_auth',
+        'keycloak': 'settings.change_auth',
+        'radius': 'settings.change_auth',
+        'cas': 'settings.change_auth',
+        'sso': 'settings.change_auth',
+        'saml2': 'settings.change_auth',
+        'clean': 'settings.change_clean',
+        'other': 'settings.change_other',
+        'sms': 'settings.change_sms',
+        'alibaba': 'settings.change_sms',
+        'tencent': 'settings.change_sms',
+    }
+
     def get_queryset(self):
         return Setting.objects.all()
+
+    def check_permissions(self, request):
+        category = request.query_params.get('category', 'basic')
+        perm_required = self.rbac_category_permissions.get(category)
+        has = self.request.user.has_perm(perm_required)
+
+        if not has:
+            self.permission_denied(request)
 
     def get_serializer_class(self):
         category = self.request.query_params.get('category', 'basic')

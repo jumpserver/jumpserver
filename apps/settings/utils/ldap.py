@@ -379,7 +379,7 @@ class LDAPImportUtil(object):
         if org and org.is_root():
             return
         for obj in objs:
-            org.add_member.add(obj)
+            org.add_member(obj)
         logger.info('End perform import ldap users')
         return errors
 

@@ -11,6 +11,9 @@ from .. import serializers
 
 class DingTalkTestingAPI(GenericAPIView):
     serializer_class = serializers.DingTalkSettingSerializer
+    rbac_perms = {
+        'POST': 'settings.change_auth'
+    }
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)

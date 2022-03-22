@@ -9,6 +9,6 @@ class UsersConfig(AppConfig):
     verbose_name = _('Users')
 
     def ready(self):
-        from . import signals_handler
+        from . import signal_handlers
         from . import notifications
         super().ready()

@@ -6,11 +6,11 @@ from rest_framework import serializers
 
 from common.mixins import CommonBulkSerializerMixin
 from common.validators import PhoneValidator
+from rbac.builtin import BuiltinRole
 from rbac.permissions import RBACPermission
-from rbac.models import OrgRoleBinding, SystemRoleBinding
+from rbac.models import OrgRoleBinding, SystemRoleBinding, Role
 from ..models import User
 from ..const import PasswordStrategy
-from rbac.models import Role
 
 __all__ = [
     'UserSerializer', 'MiniUserSerializer',
@@ -24,6 +24,7 @@ class RolesSerializerMixin(serializers.Serializer):
         label=_('System roles'),
     )
     org_roles = serializers.ManyRelatedField(
+        required=False,
         child_relation=serializers.PrimaryKeyRelatedField(queryset=Role.org_roles),
         label=_('Org roles'),
     )
@@ -48,6 +49,8 @@ class RolesSerializerMixin(serializers.Serializer):
             return fields
 
         action = view.action or 'list'
+        if action in ('partial_bulk_update', 'bulk_update', 'partial_update', 'update'):
+            action = 'create'
         model_cls_field_mapper = {
             SystemRoleBinding: ['system_roles', 'system_roles_display'],
             OrgRoleBinding: ['org_roles', 'system_roles_display']
@@ -86,7 +89,10 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
     # Todo: 这里看看该怎么搞
     # can_update = serializers.SerializerMethodField(label=_('Can update'))
     # can_delete = serializers.SerializerMethodField(label=_('Can delete'))
-    custom_m2m_fields = ('system_roles', 'org_roles')
+    custom_m2m_fields = {
+        'system_roles': [BuiltinRole.system_user],
+        'org_roles': [BuiltinRole.org_user]
+    }
 
     class Meta:
         model = User
@@ -131,7 +137,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
             'public_key': {'write_only': True},
             'is_first_login': {'label': _('Is first login'), 'read_only': True},
             'is_valid': {'label': _('Is valid')},
-            'is_service_account':  {'label': _('Is service account')},
+            'is_service_account': {'label': _('Is service account')},
             'is_expired': {'label': _('Is expired')},
             'avatar_url': {'label': _('Avatar url')},
             'created_by': {'read_only': True, 'allow_blank': True},
@@ -180,11 +186,17 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
         attrs.pop('password_strategy', None)
         return attrs
 
-    def save_and_set_custom_m2m_fields(self, validated_data, save_handler):
-        m2m_values = {
-            f: validated_data.pop(f, None)
-            for f in self.custom_m2m_fields
-        }
+    def save_and_set_custom_m2m_fields(self, validated_data, save_handler, created):
+        m2m_values = {}
+        for f, default_roles in self.custom_m2m_fields.items():
+            roles = validated_data.pop(f, None)
+            if created and not roles:
+                roles = [
+                    Role.objects.filter(id=role.id).first()
+                    for role in default_roles
+                ]
+            m2m_values[f] = roles
+
         instance = save_handler(validated_data)
         for field_name, value in m2m_values.items():
             if value is None:
@@ -206,12 +218,12 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
 
     def update(self, instance, validated_data):
         save_handler = partial(super().update, instance)
-        instance = self.save_and_set_custom_m2m_fields(validated_data, save_handler)
+        instance = self.save_and_set_custom_m2m_fields(validated_data, save_handler, created=False)
         return instance
 
     def create(self, validated_data):
         save_handler = super().create
-        instance = self.save_and_set_custom_m2m_fields(validated_data, save_handler)
+        instance = self.save_and_set_custom_m2m_fields(validated_data, save_handler, created=True)
         return instance
 
 
@@ -243,7 +255,7 @@ class InviteSerializer(RolesSerializerMixin, serializers.Serializer):
 class ServiceAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'name', 'access_key']
+        fields = ['id', 'name', 'access_key', 'comment']
         read_only_fields = ['access_key']
 
     def __init__(self, *args, **kwargs):
@@ -270,5 +282,7 @@ class ServiceAccountSerializer(serializers.ModelSerializer):
         return name
 
     def create(self, validated_data):
-        user, ak = User.create_service_account(validated_data['name'], validated_data['comment'])
+        name = validated_data['name']
+        comment = validated_data.get('comment', '')
+        user, ak = User.create_service_account(name, comment)
         return user

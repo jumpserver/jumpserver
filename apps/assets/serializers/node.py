@@ -5,7 +5,6 @@ from django.utils.translation import ugettext as _
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import Asset, Node
 
-
 __all__ = [
     'NodeSerializer', "NodeAddChildrenSerializer",
     "NodeAssetsSerializer", "NodeTaskSerializer",
@@ -45,7 +44,6 @@ class NodeSerializer(BulkOrgResourceModelSerializer):
 
     def create(self, validated_data):
         full_value = validated_data.get('full_value')
-        value = validated_data.get('value')
 
         # 直接多层级创建
         if full_value:
@@ -53,7 +51,8 @@ class NodeSerializer(BulkOrgResourceModelSerializer):
         # 根据 value 在 root 下创建
         else:
             key = Node.org_root().get_next_child_key()
-            node = Node.objects.create(key=key, value=value)
+            validated_data['key'] = key
+            node = Node.objects.create(**validated_data)
         return node
 
 

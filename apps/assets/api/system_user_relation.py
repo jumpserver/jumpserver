@@ -64,10 +64,11 @@ class RelationMixin:
 
 
 class BaseRelationViewSet(RelationMixin, OrgBulkModelViewSet):
-    pass
+    perm_model = models.SystemUser
 
 
 class SystemUserAssetRelationViewSet(BaseRelationViewSet):
+    perm_model = models.AuthBook
     serializer_class = serializers.SystemUserAssetRelationSerializer
     model = models.SystemUser.assets.through
     filterset_fields = [
@@ -136,4 +137,3 @@ class SystemUserUserRelationViewSet(BaseRelationViewSet):
             )
         )
         return queryset
-

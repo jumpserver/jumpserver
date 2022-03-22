@@ -27,6 +27,7 @@ class AuthBook(BaseUser, AbsConnectivity):
         verbose_name = _('AuthBook')
         unique_together = [('username', 'asset', 'systemuser')]
         permissions = [
+            ('test_authbook', _('Can test asset account connectivity')),
             ('view_assetaccountsecret', _('Can view asset account secret')),
             ('change_assetaccountsecret', _('Can change asset account secret'))
         ]

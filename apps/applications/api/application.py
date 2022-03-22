@@ -17,7 +17,7 @@ class ApplicationViewSet(SuggestionMixin, OrgBulkModelViewSet):
     model = Application
     filterset_fields = {
         'name': ['exact'],
-        'category': ['exact'],
+        'category': ['exact', 'in'],
         'type': ['exact', 'in'],
     }
     search_fields = ('name', 'type', 'category')
@@ -27,7 +27,8 @@ class ApplicationViewSet(SuggestionMixin, OrgBulkModelViewSet):
         'suggestion': serializers.MiniAppSerializer
     }
     rbac_perms = {
-        'get_tree': 'applications.view_application'
+        'get_tree': 'applications.view_application',
+        'match': 'applications.match_application'
     }
 
     @action(methods=['GET'], detail=False, url_path='tree')

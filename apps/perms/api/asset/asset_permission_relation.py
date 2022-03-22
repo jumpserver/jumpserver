@@ -21,6 +21,8 @@ __all__ = [
 
 
 class RelationMixin(OrgRelationMixin, OrgBulkModelViewSet):
+    perm_model = models.AssetPermission
+
     def get_queryset(self):
         queryset = super().get_queryset()
         org_id = current_org.org_id()
@@ -128,9 +130,8 @@ class AssetPermissionSystemUserRelationViewSet(RelationMixin):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset \
-            .annotate(systemuser_display=Concat(
-                F('systemuser__name'), Value('('), F('systemuser__username'),
-                Value(')')
+        queryset = queryset.annotate(
+            systemuser_display=Concat(
+                F('systemuser__name'), Value('('), F('systemuser__username'), Value(')')
             ))
         return queryset

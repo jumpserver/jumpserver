@@ -10,6 +10,7 @@ from django.conf import settings
 from assets.models import Asset, Node
 from orgs.mixins.api import RootOrgViewMixin
 from common.permissions import IsValidUser
+from rbac.permissions import RBACPermission
 from ..models import CommandExecution
 from ..serializers import CommandExecutionSerializer
 from ..tasks import run_command_execution
@@ -17,12 +18,10 @@ from ..tasks import run_command_execution
 
 class CommandExecutionViewSet(RootOrgViewMixin, viewsets.ModelViewSet):
     serializer_class = CommandExecutionSerializer
-    permission_classes = (IsValidUser,)
+    permission_classes = (RBACPermission,)
 
     def get_queryset(self):
-        return CommandExecution.objects.filter(
-            user_id=str(self.request.user.id)
-        )
+        return CommandExecution.objects.filter(user_id=str(self.request.user.id))
 
     def check_hosts(self, serializer):
         data = serializer.validated_data
@@ -36,11 +35,7 @@ class CommandExecutionViewSet(RootOrgViewMixin, viewsets.ModelViewSet):
         )
 
         permed_assets = set()
-        permed_assets.update(
-            Asset.objects.filter(
-                id__in=[a.id for a in assets]
-            ).filter(q).distinct()
-        )
+        permed_assets.update(Asset.objects.filter(id__in=[a.id for a in assets]).filter(q).distinct())
         node_keys = Node.objects.filter(q).distinct().values_list('key', flat=True)
 
         nodes_assets_q = Q()
