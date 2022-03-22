@@ -10,6 +10,7 @@ from django.db import transaction
 
 from common.utils import get_logger
 from common.utils.inspect import copy_function_args
+from common.utils.connection import get_redis_client
 from jumpserver.const import CONFIG
 from common.local import thread_local
 
@@ -44,7 +45,7 @@ class DistributedLock(RedisLock):
             是否可重入
         """
         self.kwargs_copy = copy_function_args(self.__init__, locals())
-        redis = Redis(host=CONFIG.REDIS_HOST, port=CONFIG.REDIS_PORT, password=CONFIG.REDIS_PASSWORD)
+        redis = get_redis_client()
 
         if expire is None:
             expire = auto_renewal_seconds

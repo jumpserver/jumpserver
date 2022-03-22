@@ -1,11 +1,9 @@
 import time
 
-from redis import Redis
-
 from common.utils.lock import DistributedLock
+from common.utils.connection import get_redis_client
 from common.utils import lazyproperty
 from common.utils import get_logger
-from jumpserver.const import CONFIG
 
 logger = get_logger(__file__)
 
@@ -58,7 +56,7 @@ class Cache(metaclass=CacheType):
 
     def __init__(self):
         self._data = None
-        self.redis = Redis(host=CONFIG.REDIS_HOST, port=CONFIG.REDIS_PORT, password=CONFIG.REDIS_PASSWORD)
+        self.redis = get_redis_client()
 
     def __getitem__(self, item):
         return self.field_desc_mapper[item]
