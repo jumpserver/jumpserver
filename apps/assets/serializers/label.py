@@ -27,7 +27,7 @@ class LabelSerializer(BulkOrgResourceModelSerializer):
             'category', 'date_created', 'asset_count',
         )
         extra_kwargs = {
-            'assets': {'required': False}
+            'assets': {'required': False, 'label': _('Asset')}
         }
 
     @staticmethod

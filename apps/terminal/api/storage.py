@@ -131,7 +131,13 @@ class BaseStorageTestConnectiveMixin:
 
 class CommandStorageTestConnectiveApi(BaseStorageTestConnectiveMixin, generics.RetrieveAPIView):
     queryset = CommandStorage.objects.all()
+    rbac_perms = {
+        'retrieve': 'terminal.view_commandstorage'
+    }
 
 
 class ReplayStorageTestConnectiveApi(BaseStorageTestConnectiveMixin, generics.RetrieveAPIView):
     queryset = ReplayStorage.objects.all()
+    rbac_perms = {
+        'retrieve': 'terminal.view_replaystorage'
+    }

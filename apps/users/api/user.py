@@ -10,7 +10,7 @@ from rest_framework_bulk import BulkModelViewSet
 from common.mixins import CommonApiMixin
 from common.utils import get_logger
 from common.mixins.api import SuggestionMixin
-from orgs.utils import current_org
+from orgs.utils import current_org, tmp_to_root_org
 from rbac.models import Role, RoleBinding
 from users.utils import LoginBlockUtil, MFABlockUtils
 from .mixins import UserQuerysetMixin
@@ -61,6 +61,11 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
             self.set_users_roles_for_cache(queryset)
         return page
 
+    @action(methods=['get'], detail=False, url_path='suggestions')
+    def match(self, request, *args, **kwargs):
+        with tmp_to_root_org():
+            return super().match(request, *args, **kwargs)
+
     @staticmethod
     def set_users_roles_for_cache(queryset):
         # Todo: 未来有机会用 SQL 实现
@@ -102,6 +107,9 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
         for user in users:
             self.check_object_permissions(self.request, user)
         return super().perform_bulk_update(serializer)
+
+    def allow_bulk_destroy(self, qs, filtered):
+        return filtered.count() < qs.count()
 
     def perform_bulk_destroy(self, objects):
         for obj in objects:

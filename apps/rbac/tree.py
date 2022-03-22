@@ -1,15 +1,17 @@
 #!/usr/bin/python
 from collections import defaultdict
 from typing import Callable
+import os
 
-from django.utils.translation import gettext_lazy as _, gettext
+from django.utils.translation import gettext_lazy as _, gettext, get_language
 from django.conf import settings
 from django.apps import apps
 from django.db.models import F, Count
-from django.utils.translation import ugettext
 
 from common.tree import TreeNode
 from .models import Permission, ContentType
+
+DEBUG_DB = os.environ.get('DEBUG_DB', '0') == '1'
 
 # 根节点
 root_node_data = {
@@ -85,7 +87,6 @@ special_pid_mapper = {
     'terminal.status': 'terminal_node',
     'terminal.task': 'terminal_node',
     'audits.ftplog': 'terminal',
-    'rbac.menupermission': 'view_other',
     'perms.view_myassets': 'my_assets',
     'perms.view_myapps': 'my_apps',
     'ops.add_commandexecution': 'view_workspace',
@@ -99,25 +100,32 @@ special_pid_mapper = {
     "xpack.interface": "view_setting",
     "settings.change_terminal": "terminal_node",
     "settings.view_setting": "view_setting",
-    "settings.change_setting": "view_setting",
     "rbac.view_console": "view_console",
     "rbac.view_audit": "view_audit",
     "rbac.view_workspace": "view_workspace",
     "rbac.view_webterminal": "view_workspace",
     "rbac.view_filemanager": "view_workspace",
+    'tickets.view_ticket': 'tickets'
 }
 
 verbose_name_mapper = {
     'orgs.organization': _("App organizations"),
     'tickets.comment': _("Ticket comment"),
+    'tickets.view_ticket': _("Ticket"),
     'settings.setting': _("Common setting"),
+    'rbac.view_permission': _('View permission tree'),
+    'ops.add_commandexecution': _('Execute batch command')
 }
 
 xpack_nodes = [
-    'xpack', 'tickets', 'applications.remoteapp',
-    "assets.accountbackupplan", "assets.accountbackupplanexecution",
+    'xpack', 'tickets', 'gather_account_node',
+    'applications.remoteapp', "assets.accountbackupplan",
+    "assets.accountbackupplanexecution",
     "rbac.orgrole", "rbac.orgrolebinding",
-    "settings.change_interface",
+    'assets.gathereduser',
+
+    'settings.change_interface', 'settings.change_sms',
+    'users.invite_user', 'users.remove_user',
 ]
 
 
@@ -151,6 +159,21 @@ def sort_nodes(node):
 
 class PermissionTreeUtil:
     get_permissions: Callable
+    action_mapper = {
+        'add': _('Create'),
+        'view': _('View'),
+        'change': _('Update'),
+        'delete': _('Delete')
+    }
+    action_icon = {
+        'add': 'add',
+        'view': 'view',
+        'change': 'change',
+        'delete': 'delete',
+        'invite': 'invite',
+        'match': 'match',
+        'remove': 'remove'
+    }
 
     def __init__(self, permissions, scope, check_disabled=False):
         self.permissions = self.prefetch_permissions(permissions)
@@ -160,6 +183,7 @@ class PermissionTreeUtil:
         self.check_disabled = check_disabled
         self.total_counts = defaultdict(int)
         self.checked_counts = defaultdict(int)
+        self.lang = get_language()
 
     @staticmethod
     def prefetch_permissions(perms):
@@ -262,38 +286,27 @@ class PermissionTreeUtil:
             nodes.append(node)
         return nodes
 
-    @staticmethod
-    def _get_permission_name(p, content_types_name_mapper):
-        p: Permission
-        code_name = p.codename
-        action_mapper = {
-            'add': ugettext('Create'),
-            'view': ugettext('View'),
-            'change': ugettext('Update'),
-            'delete': ugettext('Delete')
-        }
-        name = ''
-        ct = ''
-        if 'add_' in p.codename:
-            name = action_mapper['add']
-            ct = code_name.replace('add_', '')
-        elif 'view_' in p.codename:
-            name = action_mapper['view']
-            ct = code_name.replace('view_', '')
-        elif 'change_' in p.codename:
-            name = action_mapper['change']
-            ct = code_name.replace('change_', '')
-        elif 'delete' in code_name:
-            name = action_mapper['delete']
-            ct = code_name.replace('delete_', '')
+    def _get_permission_name_icon(self, p: Permission, content_types_name_mapper: dict):
+        action, resource = p.codename.split('_', 1)
+        icon = self.action_icon.get(action, 'file')
+        name = verbose_name_mapper.get(p.app_label_codename)
+        if name:
+            return name, icon
 
-        app_model = '%s.%s' % (p.content_type.app_label, ct)
-        if app_model in content_types_name_mapper:
-            name += content_types_name_mapper[app_model]
+        app_model = '%s.%s' % (p.content_type.app_label, resource)
+        if self.lang == 'en':
+            name = p.name
+        # 因为默认的权限位是没有翻译的，所以我们要用 action + resource name 去拼
+        elif action in self.action_mapper and app_model in content_types_name_mapper:
+            action_name = self.action_mapper[action]
+            resource_name = content_types_name_mapper[app_model]
+            sep = ''
+            name = '{}{}{}'.format(action_name, sep, resource_name)
+        # 手动创建的 permission
         else:
             name = gettext(p.name)
-            name = name.replace('Can ', '').replace('可以', '')
-        return name
+        name = name.replace('Can ', '').replace('可以', '').capitalize()
+        return name, icon
 
     def _create_perms_nodes(self):
         permissions_id = self.permissions.values_list('id', flat=True)
@@ -305,12 +318,15 @@ class PermissionTreeUtil:
             model_id = f'{p.app}.{p.model}'
             if not self._check_model_xpack(model_id):
                 continue
+            title = p.app_label_codename
+            if not settings.XPACK_ENABLED and title in xpack_nodes:
+                continue
+
             # name 要特殊处理，解决 i18n 问题
-            name = self._get_permission_name(p, content_types_name_mapper)
-            if settings.DEBUG:
+            name, icon = self._get_permission_name_icon(p, content_types_name_mapper)
+            if DEBUG_DB:
                 name += '[{}]'.format(p.app_label_codename)
 
-            title = p.app_label_codename
             pid = model_id
             # perm node 的特殊设置用的是 title，因为 id 是数字，不一致
             if title in special_pid_mapper:
@@ -328,7 +344,7 @@ class PermissionTreeUtil:
                 'pId': pid,
                 'isParent': False,
                 'chkDisabled': self.check_disabled,
-                'iconSkin': 'file',
+                'iconSkin': icon,
                 'checked': p.id in permissions_id,
                 'open': False,
                 'meta': {
@@ -358,9 +374,9 @@ class PermissionTreeUtil:
         }
         node_data['title'] = node_data['id']
         node = TreeNode(**node_data)
-        if settings.DEBUG:
+        if DEBUG_DB:
             node.name += ('[' + node.id + ']')
-        if settings.DEBUG:
+        if DEBUG_DB:
             node.name += ('-' + node.id)
         node.name += f'({checked_count}/{total_count})'
         return node

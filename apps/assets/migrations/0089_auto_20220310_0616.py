@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterModelOptions(
             name='systemuser',
-            options={'ordering': ['name'], 'permissions': [('view_systemuserasset', 'Can view system user asset'), ('add_systemuserasset', 'Can add asset to system user'), ('remove_systemuserasset', 'Can remove system user asset'), ('match_systemuser', 'Can match system user')], 'verbose_name': 'System user'},
+            options={'ordering': ['name'], 'permissions': [('match_systemuser', 'Can match system user')], 'verbose_name': 'System user'},
         ),
         migrations.AlterModelOptions(
             name='asset',

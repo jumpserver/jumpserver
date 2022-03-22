@@ -13,13 +13,17 @@ class AppCategory(models.TextChoices):
     def get_label(cls, category):
         return dict(cls.choices).get(category, '')
 
+    @classmethod
+    def is_xpack(cls, category):
+        return category in ['remote_app']
+
 
 class AppType(models.TextChoices):
     # db category
     mysql = 'mysql', 'MySQL'
+    mariadb = 'mariadb', 'MariaDB'
     oracle = 'oracle', 'Oracle'
     pgsql = 'postgresql', 'PostgreSQL'
-    mariadb = 'mariadb', 'MariaDB'
     sqlserver = 'sqlserver', 'SQLServer'
     redis = 'redis', 'Redis'
     mongodb = 'mongodb', 'MongoDB'
@@ -37,9 +41,13 @@ class AppType(models.TextChoices):
     def category_types_mapper(cls):
         return {
             AppCategory.db: [
-                cls.mysql, cls.oracle, cls.pgsql, cls.mariadb, cls.sqlserver, cls.redis, cls.mongodb
+                cls.mysql, cls.oracle, cls.pgsql, cls.mariadb,
+                cls.sqlserver, cls.redis, cls.mongodb
             ],
-            AppCategory.remote_app: [cls.chrome, cls.mysql_workbench, cls.vmware_client, cls.custom],
+            AppCategory.remote_app: [
+                cls.chrome, cls.mysql_workbench,
+                cls.vmware_client, cls.custom
+            ],
             AppCategory.cloud: [cls.k8s]
         }
 
@@ -66,3 +74,12 @@ class AppType(models.TextChoices):
     @classmethod
     def cloud_types(cls):
         return [tp.value for tp in cls.category_types_mapper()[AppCategory.cloud]]
+
+    @classmethod
+    def is_xpack(cls, tp):
+        tp_category_mapper = cls.type_category_mapper()
+        category = tp_category_mapper[tp]
+
+        if AppCategory.is_xpack(category):
+            return True
+        return tp in ['oracle', 'postgresql', 'sqlserver']

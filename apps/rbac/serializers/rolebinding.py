@@ -2,7 +2,6 @@ from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.serializers import CurrentOrgDefault
-from orgs.utils import current_org
 from ..models import RoleBinding, SystemRoleBinding, OrgRoleBinding
 
 __all__ = [
@@ -15,12 +14,13 @@ class RoleBindingSerializer(serializers.ModelSerializer):
         model = RoleBinding
         fields = [
             'id', 'user',  'user_display', 'role', 'role_display',
-            'scope', 'org',
+            'scope', 'org', 'org_name',
         ]
         read_only_fields = ['scope']
         extra_kwargs = {
             'user_display': {'label': _('User display')},
             'role_display': {'label': _('Role display')},
+            'org_name': {'label': _("Org name")}
         }
 
 

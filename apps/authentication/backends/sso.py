@@ -1,9 +1,9 @@
 from django.conf import settings
 
-from .base import JMSBaseAuthBackend
+from .base import JMSModelBackend
 
 
-class SSOAuthentication(JMSBaseAuthBackend):
+class SSOAuthentication(JMSModelBackend):
     """
     什么也不做呀😺
     """
@@ -16,7 +16,7 @@ class SSOAuthentication(JMSBaseAuthBackend):
         pass
 
 
-class WeComAuthentication(JMSBaseAuthBackend):
+class WeComAuthentication(JMSModelBackend):
     """
     什么也不做呀😺
     """
@@ -29,7 +29,7 @@ class WeComAuthentication(JMSBaseAuthBackend):
         pass
 
 
-class DingTalkAuthentication(JMSBaseAuthBackend):
+class DingTalkAuthentication(JMSModelBackend):
     """
     什么也不做呀😺
     """
@@ -42,7 +42,7 @@ class DingTalkAuthentication(JMSBaseAuthBackend):
         pass
 
 
-class FeiShuAuthentication(JMSBaseAuthBackend):
+class FeiShuAuthentication(JMSModelBackend):
     """
     什么也不做呀😺
     """
@@ -55,7 +55,7 @@ class FeiShuAuthentication(JMSBaseAuthBackend):
         pass
 
 
-class AuthorizationTokenAuthentication(JMSBaseAuthBackend):
+class AuthorizationTokenAuthentication(JMSModelBackend):
     """
     什么也不做呀😺
     """

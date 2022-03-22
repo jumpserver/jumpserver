@@ -131,6 +131,10 @@ class CommandExecutionHostRelationViewSet(OrgRelationMixin, OrgBulkModelViewSet)
     ]
     search_fields = ('asset__hostname', )
     http_method_names = ['options', 'get']
+    rbac_perms = {
+        'GET': 'ops.view_commandexecution',
+        'list': 'ops.view_commandexecution',
+    }
 
     def get_queryset(self):
         queryset = super().get_queryset()

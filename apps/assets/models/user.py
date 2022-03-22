@@ -133,6 +133,14 @@ class AuthMixin:
             self.password = password
 
     def load_app_more_auth(self, app_id=None, username=None, user_id=None):
+        from applications.models import Application
+        app = get_object_or_none(Application, pk=app_id)
+        if app and app.category_remote_app:
+            # Remote app
+            self._load_remoteapp_more_auth(app, username, user_id)
+            return
+
+        # Other app
         self._clean_auth_info_if_manual_login_mode()
         # 加载临时认证信息
         if self.login_mode == self.LOGIN_MANUAL:
@@ -147,6 +155,11 @@ class AuthMixin:
             else:
                 _username = username
             self.username = _username
+
+    def _load_remoteapp_more_auth(self, app, username, user_id):
+        asset = app.get_remote_app_asset(raise_exception=False)
+        if asset:
+            self.load_asset_more_auth(asset_id=asset.id, username=username, user_id=user_id)
 
     def load_asset_special_auth(self, asset, username=''):
         """
@@ -324,9 +337,6 @@ class SystemUser(ProtocolMixin, AuthMixin, BaseUser):
         unique_together = [('name', 'org_id')]
         verbose_name = _("System user")
         permissions = [
-            ('view_systemuserasset', _('Can view system user asset')),
-            ('add_systemuserasset', _('Can add asset to system user')),
-            ('remove_systemuserasset', _('Can remove system user asset')),
             ('match_systemuser', _('Can match system user')),
         ]
 

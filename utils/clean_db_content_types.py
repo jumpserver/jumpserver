@@ -33,6 +33,20 @@ def clean_db_content_types():
         ('perms', 'applicationpermission', 'connect_myapps'),
         ('perms', 'applicationpermission', 'view_userapps'),
         ('perms', 'applicationpermission', 'view_usergroupapps'),
+        ('perms', 'databaseapppermission', 'view_databaseapppermission'),
+        ('perms', 'databaseapppermission', 'add_databaseapppermission'),
+        ('perms', 'databaseapppermission', 'change_databaseapppermission'),
+        ('perms', 'databaseapppermission', 'delete_databaseapppermission'),
+
+        ('perms', 'k8sapppermission', 'view_k8sapppermission'),
+        ('perms', 'k8sapppermission', 'add_k8sapppermission'),
+        ('perms', 'k8sapppermission', 'change_k8sapppermission'),
+        ('perms', 'k8sapppermission', 'delete_k8sapppermission'),
+
+        ('perms', 'remoteapppermission', 'view_remoteapppermission'),
+        ('perms', 'remoteapppermission', 'add_remoteapppermission'),
+        ('perms', 'remoteapppermission', 'change_remoteapppermission'),
+        ('perms', 'remoteapppermission', 'delete_remoteapppermission'),
 
 
         ('perms', 'permeddatabaseapp', 'connect_mydatabaseapp'),
@@ -41,7 +55,10 @@ def clean_db_content_types():
         ('perms', 'permedkubernetesapp', 'view_mykubernetesapp'),
         ('perms', 'permedremoteapp', 'connect_myremoteapp'),
         ('perms', 'permedremoteapp', 'view_myremoteapp'),
-
+        ('perms', 'applicationpermission', 'view_permuserapplication'),
+        ('perms', 'assetpermission', 'view_permuserasset'),
+        ('perms', 'assetpermission', 'view_permusergroupasset'),
+        ('rbac', 'menupermission', 'view_dashboard'),
         ('applications', 'databaseapp', 'add_databaseapp'),
         ('applications', 'databaseapp', 'change_databaseapp'),
         ('applications', 'databaseapp', 'delete_databaseapp'),
@@ -65,6 +82,9 @@ def clean_db_content_types():
         ('rbac', 'menupermission', 'view_userview'),
         ('rbac', 'menupermission', 'view_adminview'),
         ('rbac', 'menupermission', 'view_auditview'),
+        ('assets', 'systemuser', 'view_systemuserasset'),
+        ('assets', 'systemuser', 'add_systemuserasset'),
+        ('assets', 'systemuser', 'remove_systemuserasset'),
     ]
     for app, model, codename in permissions_delete_required:
         print('delete {}.{} ({})'.format(app, codename, model))

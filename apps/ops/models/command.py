@@ -55,6 +55,10 @@ class CommandExecution(OrgModelMixin):
     def user_display(self):
         return str(self.user)
 
+    @lazyproperty
+    def hosts_display(self):
+        return ','.join(self.hosts.all().values_list('hostname', flat=True))
+
     @property
     def result(self):
         if self._result:

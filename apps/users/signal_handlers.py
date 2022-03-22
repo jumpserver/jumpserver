@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-
 from django.dispatch import receiver
 from django_auth_ldap.backend import populate_user
 from django.conf import settings
@@ -9,9 +8,9 @@ from django_cas_ng.signals import cas_user_authenticated
 from django.db.models.signals import post_save
 
 from authentication.backends.oidc.signals import openid_create_or_update_user
-
 from authentication.backends.saml2.signals import saml2_create_or_update_user
 from common.utils import get_logger
+from common.decorator import on_transaction_commit
 from .signals import post_user_create
 from .models import User, UserPasswordHistory
 
@@ -26,7 +25,8 @@ def user_authenticated_handle(user, created, source, attrs=None, **kwargs):
     if created:
         user.source = source
         user.save()
-    elif not created and settings.AUTH_SAML2_ALWAYS_UPDATE_USER:
+
+    if not created and settings.AUTH_SAML2_ALWAYS_UPDATE_USER:
         attr_whitelist = ('user', 'username', 'email', 'phone', 'comment')
         logger.debug(
             "Receive saml2 user updated signal: {}, "
@@ -34,16 +34,18 @@ def user_authenticated_handle(user, created, source, attrs=None, **kwargs):
             "(Update only properties in the whitelist. [{}])"
             "".format(user, str(attrs), ','.join(attr_whitelist))
         )
-        if attrs is not None:
-            for key, value in attrs.items():
-                if key in attr_whitelist and value:
-                    setattr(user, key, value)
-            user.save()
+        if not attrs:
+            return
+        for key, value in attrs.items():
+            if key in attr_whitelist and value:
+                setattr(user, key, value)
+        user.save()
 
 
 @receiver(post_save, sender=User)
 def save_passwd_change(sender, instance: User, **kwargs):
-    passwords = UserPasswordHistory.objects.filter(user=instance) \
+    passwords = UserPasswordHistory.objects\
+        .filter(user=instance) \
         .order_by('-date_created')\
         .values_list('password', flat=True)
     passwords = passwords[:int(settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT)]
@@ -56,6 +58,28 @@ def save_passwd_change(sender, instance: User, **kwargs):
             user=instance, password=instance.password,
             date_created=instance.date_password_last_updated
         )
+
+
+def update_role_superuser_if_need(user):
+    if not user._update_superuser:
+        return
+    value = user._is_superuser
+    if value:
+        user.system_roles.add_role_system_admin()
+    else:
+        user.system_roles.remove_role_system_admin()
+
+
+@receiver(post_save, sender=User)
+@on_transaction_commit
+def on_user_create_set_default_system_role(sender, instance, created, **kwargs):
+    update_role_superuser_if_need(instance)
+    if not created:
+        return
+    has_system_role = instance.system_roles.all().exists()
+    if not has_system_role:
+        logger.debug("Receive user create signal, set default role")
+        instance.system_roles.add_role_system_user()
 
 
 @receiver(post_user_create)

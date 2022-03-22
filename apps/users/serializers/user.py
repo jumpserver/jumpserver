@@ -6,13 +6,11 @@ from rest_framework import serializers
 
 from common.mixins import CommonBulkSerializerMixin
 from common.validators import PhoneValidator
-from rbac.models import Role
 from rbac.builtin import BuiltinRole
 from rbac.permissions import RBACPermission
-from rbac.models import OrgRoleBinding, SystemRoleBinding
+from rbac.models import OrgRoleBinding, SystemRoleBinding, Role
 from ..models import User
 from ..const import PasswordStrategy
-from rbac.models import Role
 
 __all__ = [
     'UserSerializer', 'MiniUserSerializer',
@@ -51,6 +49,8 @@ class RolesSerializerMixin(serializers.Serializer):
             return fields
 
         action = view.action or 'list'
+        if action in ('partial_bulk_update', 'bulk_update', 'partial_update', 'update'):
+            action = 'create'
         model_cls_field_mapper = {
             SystemRoleBinding: ['system_roles', 'system_roles_display'],
             OrgRoleBinding: ['org_roles', 'system_roles_display']

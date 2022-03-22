@@ -7,7 +7,60 @@ from common.utils import lazyproperty, settings
 from common.tree import TreeNode
 
 
-class Organization(models.Model):
+class OrgRoleMixin:
+    members: models.Manager
+
+    def get_members(self):
+        return self.members.all().distinct()
+
+    def add_member(self, user, role=None):
+        from rbac.builtin import BuiltinRole
+        from .utils import tmp_to_org
+        role_id = BuiltinRole.org_user.id
+        if role:
+            role_id = role.id
+        with tmp_to_org(self):
+            defaults = {
+                'user': user, 'role_id': role_id,
+                'org_id': self.id, 'scope': 'org'
+            }
+            self.members.through.objects.update_or_create(**defaults, defaults=defaults)
+
+    def get_origin_role_members(self, role_name):
+        from rbac.models import OrgRoleBinding
+        from users.models import User
+        from rbac.builtin import BuiltinRole
+        from .utils import tmp_to_org
+
+        role_mapper = {
+            'user': BuiltinRole.org_user,
+            'auditor': BuiltinRole.org_auditor,
+            'admin': BuiltinRole.org_admin
+        }
+        assert role_name in role_mapper
+        role = role_mapper.get(role_name).get_role()
+        with tmp_to_org(self):
+            org_admins = OrgRoleBinding.get_role_users(role)
+            return org_admins
+
+    @property
+    def admins(self):
+        from users.models import User
+        admins = self.get_origin_role_members('admin')
+        if not admins:
+            admins = User.objects.filter(username='admin')
+        return admins
+
+    @property
+    def auditors(self):
+        return self.get_origin_role_members('auditor')
+
+    @property
+    def users(self):
+        return self.get_origin_role_members('user')
+
+
+class Organization(OrgRoleMixin, models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, unique=True, verbose_name=_("Name"))
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
@@ -101,21 +154,6 @@ class Organization(models.Model):
         from .caches import OrgResourceStatisticsCache
         return OrgResourceStatisticsCache(self)
 
-    def get_members(self):
-        return self.members.all().distinct()
-
-    def add_member(self, user, role=None):
-        from rbac.builtin import BuiltinRole
-        from .utils import tmp_to_org
-        role_id = BuiltinRole.org_user.id
-        if role:
-            role_id = role.id
-        with tmp_to_org(self):
-            defaults = {
-                'user': user, 'role_id': role_id, 'org_id': self.id, 'scope': 'org'
-            }
-            self.members.through.objects.update_or_create(**defaults, defaults=defaults)
-
     def get_total_resources_amount(self):
         from django.apps import apps
         from orgs.mixins.models import OrgModelMixin
@@ -161,26 +199,6 @@ class Organization(models.Model):
     def delete(self, *args, **kwargs):
         self.delete_related_models()
         return super().delete(*args, **kwargs)
-
-
-# class OrgMemberManager(models.Manager):
-#     def remove_users(self, org, users):
-#         from users.models import User
-#         pk_set = []
-#         for user in users:
-#             if hasattr(user, 'pk'):
-#                 pk_set.append(user.pk)
-#             else:
-#                 pk_set.append(user)
-#
-#         send = partial(
-#             signals.m2m_changed.send, sender=self.model,
-#             instance=org, reverse=False, model=User,
-#             pk_set=pk_set, using=self.db
-#         )
-#         send(action="pre_remove")
-#         self.filter(org_id=org.id, user_id__in=pk_set).delete()
-#         send(action="post_remove")
 
 
 class OrganizationMember(models.Model):
