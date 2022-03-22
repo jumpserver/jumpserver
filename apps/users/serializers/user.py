@@ -49,6 +49,8 @@ class RolesSerializerMixin(serializers.Serializer):
             return fields
 
         action = view.action or 'list'
+        if action in ('partial_bulk_update', 'bulk_update', 'partial_update', 'update'):
+            action = 'create'
         model_cls_field_mapper = {
             SystemRoleBinding: ['system_roles', 'system_roles_display'],
             OrgRoleBinding: ['org_roles', 'system_roles_display']
