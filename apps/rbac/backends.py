@@ -16,7 +16,7 @@ class RBACBackend(JMSBaseAuthBackend):
         return False
 
     def has_perm(self, user_obj, perm, obj=None):
-        if not user_obj.is_active:
+        if not user_obj.is_active or not perm:
             raise PermissionDenied()
         if perm == '*':
             return True
