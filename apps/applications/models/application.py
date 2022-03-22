@@ -7,6 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from orgs.mixins.models import OrgModelMixin
 from common.mixins import CommonModelMixin
 from common.tree import TreeNode
+from common.utils import is_uuid
 from assets.models import Asset, SystemUser
 
 from ..utils import KubernetesTree
@@ -254,12 +255,12 @@ class Application(CommonModelMixin, OrgModelMixin, ApplicationTreeNodeMixin):
             'parameters': parameters
         }
 
-    def get_remote_app_asset(self):
+    def get_remote_app_asset(self, raise_exception=True):
         asset_id = self.attrs.get('asset')
-        if not asset_id:
+        if is_uuid(asset_id):
+            return Asset.objects.filter(id=asset_id).first()
+        if raise_exception:
             raise ValueError("Remote App not has asset attr")
-        asset = Asset.objects.filter(id=asset_id).first()
-        return asset
 
 
 class ApplicationUser(SystemUser):
