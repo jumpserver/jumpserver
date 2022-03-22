@@ -237,16 +237,16 @@ class RoleManager(models.Manager):
 
 class OrgRoleManager(RoleManager):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
         from rbac.const import Scope
         self.scope = Scope.org
+        super().__init__(*args, **kwargs)
 
 
 class SystemRoleManager(RoleManager):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
         from rbac.const import Scope
         self.scope = Scope.system
+        super().__init__(*args, **kwargs)
 
 
 class RoleMixin:
