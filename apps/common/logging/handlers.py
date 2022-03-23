@@ -34,9 +34,14 @@ class JMSSyslogHandler(SysLogHandler):
         exception information is present, it is NOT sent to the server.
         """
         try:
-            msg = self.format(record) + self.message_separator_char
+            msg = self.format(record)
             if self.ident:
                 msg = self.ident + msg
+            if self.socktype == socket.SOCK_STREAM:
+                msg = msg + self.message_separator_char
+            else:
+                if self.append_nul:
+                    msg += '\000'
 
             # We need to convert record level to lowercase, maybe this will
             # change in the future.
