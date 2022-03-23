@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 #
 import re
+
 from django.shortcuts import reverse as dj_reverse
 from django.conf import settings
 from django.utils import timezone
+from django.db import models
+from django.db.models.signals import post_save, pre_save
 
 
 UUID_PATTERN = re.compile(r'[0-9a-zA-Z\-]{36}')
@@ -58,3 +61,12 @@ def get_log_keep_day(s, defaults=200):
     except ValueError:
         days = defaults
     return days
+
+
+def bulk_create_with_signal(cls: models.Model, items, **kwargs):
+    for i in items:
+        pre_save.send(sender=cls, instance=i)
+    result = cls.objects.bulk_create(items, **kwargs)
+    for i in items:
+        post_save.send(sender=cls, instance=i, created=True)
+    return result
