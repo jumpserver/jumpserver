@@ -30,19 +30,15 @@ class PublicSettingApi(generics.RetrieveAPIView):
     def get_object(self):
         instance = {
             "data": {
+                # Security
                 "WINDOWS_SKIP_ALL_MANUAL_PASSWORD": settings.WINDOWS_SKIP_ALL_MANUAL_PASSWORD,
+                "OLD_PASSWORD_HISTORY_LIMIT_COUNT": settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT,
                 "SECURITY_MAX_IDLE_TIME": settings.SECURITY_MAX_IDLE_TIME,
-                "XPACK_ENABLED": settings.XPACK_ENABLED,
                 "SECURITY_VIEW_AUTH_NEED_MFA": settings.SECURITY_VIEW_AUTH_NEED_MFA,
                 "SECURITY_MFA_VERIFY_TTL": settings.SECURITY_MFA_VERIFY_TTL,
-                "OLD_PASSWORD_HISTORY_LIMIT_COUNT": settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT,
                 "SECURITY_COMMAND_EXECUTION": settings.SECURITY_COMMAND_EXECUTION,
                 "SECURITY_PASSWORD_EXPIRATION_TIME": settings.SECURITY_PASSWORD_EXPIRATION_TIME,
                 "SECURITY_LUNA_REMEMBER_AUTH": settings.SECURITY_LUNA_REMEMBER_AUTH,
-                "XPACK_LICENSE_IS_VALID": has_valid_xpack_license(),
-                "XPACK_LICENSE_INFO": get_xpack_license_info(),
-                "LOGIN_TITLE": self.get_login_title(),
-                "LOGO_URLS": self.get_logo_urls(),
                 "PASSWORD_RULE": {
                     'SECURITY_PASSWORD_MIN_LENGTH': settings.SECURITY_PASSWORD_MIN_LENGTH,
                     'SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH': settings.SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH,
@@ -51,16 +47,29 @@ class PublicSettingApi(generics.RetrieveAPIView):
                     'SECURITY_PASSWORD_NUMBER': settings.SECURITY_PASSWORD_NUMBER,
                     'SECURITY_PASSWORD_SPECIAL_CHAR': settings.SECURITY_PASSWORD_SPECIAL_CHAR,
                 },
+                'SECURITY_WATERMARK_ENABLED': settings.SECURITY_WATERMARK_ENABLED,
+                'SECURITY_SESSION_SHARE': settings.SECURITY_SESSION_SHARE,
+                # XPACK
+                "XPACK_ENABLED": settings.XPACK_ENABLED,
+                "XPACK_LICENSE_IS_VALID": has_valid_xpack_license(),
+                "XPACK_LICENSE_INFO": get_xpack_license_info(),
+                # Performance
+                "LOGIN_TITLE": self.get_login_title(),
+                "LOGO_URLS": self.get_logo_urls(),
+                "HELP_DOCUMENT_URL": settings.HELP_DOCUMENT_URL,
+                "HELP_SUPPORT_URL": settings.HELP_SUPPORT_URL,
+                # Auth
                 "AUTH_WECOM": settings.AUTH_WECOM,
                 "AUTH_DINGTALK": settings.AUTH_DINGTALK,
                 "AUTH_FEISHU": settings.AUTH_FEISHU,
-                'SECURITY_WATERMARK_ENABLED': settings.SECURITY_WATERMARK_ENABLED,
-                'SECURITY_SESSION_SHARE': settings.SECURITY_SESSION_SHARE,
+                # Terminal
                 "XRDP_ENABLED": settings.XRDP_ENABLED,
+                "TERMINAL_MAGNUS_ENABLED": settings.TERMINAL_MAGNUS_ENABLED,
+                "TERMINAL_MAGNUS_MYSQL_PORT": settings.TERMINAL_MAGNUS_MYSQL_PORT,
+                "TERMINAL_MAGNUS_POSTGRE_PORT": settings.TERMINAL_MAGNUS_POSTGRE_PORT,
+                # Announcement
                 "ANNOUNCEMENT_ENABLED": settings.ANNOUNCEMENT_ENABLED,
                 "ANNOUNCEMENT": settings.ANNOUNCEMENT,
-                "HELP_DOCUMENT_URL": settings.HELP_DOCUMENT_URL,
-                "HELP_SUPPORT_URL": settings.HELP_SUPPORT_URL,
             }
         }
         return instance
