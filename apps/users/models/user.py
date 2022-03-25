@@ -8,21 +8,22 @@ import random
 import datetime
 from typing import Callable
 
+from django.db import models
 from django.conf import settings
+from django.utils import timezone
+from django.core.cache import cache
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.hashers import check_password
-from django.core.cache import cache
-from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.utils import timezone
 from django.shortcuts import reverse
-from django.db.models.signals import pre_save, post_save
 
 from orgs.utils import current_org
 from orgs.models import Organization
+from rbac.const import Scope
 from common import fields
-from common.utils import date_expired_default, get_logger, lazyproperty, random_string, bulk_create_with_signal
-from django.db.models import TextChoices
+from common.utils import (
+    date_expired_default, get_logger, lazyproperty, random_string, bulk_create_with_signal
+)
 from ..signals import post_user_change_password, post_user_leave_org, pre_user_leave_org
 
 __all__ = ['User', 'UserPasswordHistory']
@@ -177,7 +178,7 @@ class RoleManager(models.Manager):
     @lazyproperty
     def role_binding_cls(self):
         from rbac.models import SystemRoleBinding, OrgRoleBinding
-        if self.scope == 'org':
+        if self.scope == Scope.org:
             return OrgRoleBinding
         else:
             return SystemRoleBinding
@@ -185,7 +186,7 @@ class RoleManager(models.Manager):
     @lazyproperty
     def role_cls(self):
         from rbac.models import SystemRole, OrgRole
-        if self.scope == 'org':
+        if self.scope == Scope.org:
             return OrgRole
         else:
             return SystemRole
@@ -241,8 +242,11 @@ class RoleManager(models.Manager):
         items = []
         for role in need_adds:
             kwargs = {'role': role, 'user': self.user, 'scope': self.scope}
-            if not current_org.is_root():
-                kwargs['org_id'] = current_org.id
+            if self.scope == Scope.org:
+                if current_org.is_root():
+                    continue
+                else:
+                    kwargs['org_id'] = current_org.id
             items.append(self.role_binding_cls(**kwargs))
 
         try:
@@ -615,7 +619,7 @@ class MFAMixin:
 
 
 class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
-    class Source(TextChoices):
+    class Source(models.TextChoices):
         local = 'local', _('Local')
         ldap = 'ldap', 'LDAP/AD'
         openid = 'openid', 'OpenID'
