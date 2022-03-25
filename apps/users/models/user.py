@@ -12,17 +12,18 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from django.core.cache import cache
-from django.shortcuts import reverse
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.hashers import check_password
 from django.utils.translation import ugettext_lazy as _
-
+from django.shortcuts import reverse
 
 from orgs.utils import current_org
 from orgs.models import Organization
 from rbac.const import Scope
 from common import fields
-from common.utils import date_expired_default, get_logger, lazyproperty, random_string
+from common.utils import (
+    date_expired_default, get_logger, lazyproperty, random_string, bulk_create_with_signal
+)
 from ..signals import post_user_change_password, post_user_leave_org, pre_user_leave_org
 
 __all__ = ['User', 'UserPasswordHistory']
@@ -173,17 +174,17 @@ class RoleManager(models.Manager):
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = user
-        self.role_binding_cls = self.get_role_binding_cls()
-        self.role_cls = self.get_role_cls()
 
-    def get_role_binding_cls(self):
+    @lazyproperty
+    def role_binding_cls(self):
         from rbac.models import SystemRoleBinding, OrgRoleBinding
         if self.scope == Scope.org:
             return OrgRoleBinding
         else:
             return SystemRoleBinding
 
-    def get_role_cls(self):
+    @lazyproperty
+    def role_cls(self):
         from rbac.models import SystemRole, OrgRole
         if self.scope == Scope.org:
             return OrgRole
@@ -240,17 +241,18 @@ class RoleManager(models.Manager):
 
         items = []
         for role in need_adds:
-            kwargs = {
-                'role': role,
-                'user': self.user,
-                'scope': self.scope
-            }
-            if self.scope == Scope.org and not current_org.is_root():
-                kwargs['org_id'] = current_org.id
+            kwargs = {'role': role, 'user': self.user, 'scope': self.scope}
+            if self.scope == Scope.org:
+                if current_org.is_root():
+                    continue
+                else:
+                    kwargs['org_id'] = current_org.id
             items.append(self.role_binding_cls(**kwargs))
 
         try:
-            self.role_binding_cls.objects.bulk_create(items, ignore_conflicts=True)
+            result = bulk_create_with_signal(self.role_binding_cls, items, ignore_conflicts=True)
+            self.user.expire_users_rbac_perms_cache()
+            return result
         except Exception as e:
             logger.error('Create role binding error: {}'.format(e))
 
@@ -273,24 +275,14 @@ class RoleManager(models.Manager):
         if not roles:
             return
         roles = self._clean_roles(roles)
-        return self.role_bindings.filter(role__in=roles).delete()
+        deleted = self.role_bindings.filter(role__in=roles).delete()
+        self.user.expire_users_rbac_perms_cache()
+        return deleted
 
     def cache_set(self, roles):
         query = self._get_queryset()
         query._result_cache = roles
         self._cache = query
-
-    def remove_role_system_admin(self):
-        role = self.builtin_role.system_admin.get_role()
-        return self.remove(role)
-
-    def add_role_system_admin(self):
-        role = self.builtin_role.system_admin.get_role()
-        return self.add(role)
-
-    def add_role_system_user(self):
-        role = self.builtin_role.system_user.get_role()
-        return self.add(role)
 
     @property
     def builtin_role(self):
@@ -310,6 +302,22 @@ class SystemRoleManager(RoleManager):
         from rbac.const import Scope
         self.scope = Scope.system
         super().__init__(*args, **kwargs)
+
+    def remove_role_system_admin(self):
+        role = self.builtin_role.system_admin.get_role()
+        return self.remove(role)
+
+    def add_role_system_admin(self):
+        role = self.builtin_role.system_admin.get_role()
+        return self.add(role)
+
+    def add_role_system_user(self):
+        role = self.builtin_role.system_user.get_role()
+        return self.add(role)
+
+    def add_role_system_component(self):
+        role = self.builtin_role.system_component.get_role()
+        self.add(role)
 
 
 class RoleMixin:
@@ -402,11 +410,6 @@ class RoleMixin:
         )
         access_key = app.create_access_key()
         return app, access_key
-
-    def set_component_role(self):
-        from rbac.models import Role
-        role = Role.BuiltinRole.system_component.get_role()
-        self.system_roles.add(role)
 
     def remove(self):
         if current_org.is_root():

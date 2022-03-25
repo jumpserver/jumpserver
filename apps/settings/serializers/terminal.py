@@ -22,9 +22,12 @@ class TerminalSettingSerializer(serializers.Serializer):
         help_text=_('Tips: If use other auth method, like AD/LDAP, you should disable this to '
                     'avoid being able to log in after deleting')
     )
-    TERMINAL_ASSET_LIST_SORT_BY = serializers.ChoiceField(SORT_BY_CHOICES, required=False, label=_('List sort by'))
-    TERMINAL_ASSET_LIST_PAGE_SIZE = serializers.ChoiceField(PAGE_SIZE_CHOICES, required=False,
-                                                            label=_('List page size'))
+    TERMINAL_ASSET_LIST_SORT_BY = serializers.ChoiceField(
+        SORT_BY_CHOICES, required=False, label=_('List sort by')
+    )
+    TERMINAL_ASSET_LIST_PAGE_SIZE = serializers.ChoiceField(
+        PAGE_SIZE_CHOICES, required=False, label=_('List page size')
+    )
     TERMINAL_TELNET_REGEX = serializers.CharField(
         allow_blank=True, max_length=1024, required=False, label=_('Telnet login regex'),
         help_text=_("The login success message varies with devices. "
@@ -34,5 +37,19 @@ class TerminalSettingSerializer(serializers.Serializer):
         required=False, label=_("RDP address"), max_length=1024, allow_blank=True,
         help_text=_('RDP visit address, eg: dev.jumpserver.org:3389')
     )
-
     XRDP_ENABLED = serializers.BooleanField(label=_("Enable XRDP"))
+
+    TERMINAL_MAGNUS_ENABLED = serializers.BooleanField(label=_("Enable database proxy"))
+    TERMINAL_MAGNUS_HOST = serializers.CharField(
+        required=False, label=_("Database proxy host"), max_length=1024, allow_blank=True,
+        help_text=_('Database proxy host, eg: dev.jumpserver.org')
+    )
+    TERMINAL_MAGNUS_MYSQL_PORT = serializers.IntegerField(
+        required=False, label=_("MySQL port"), default=33060,
+        help_text=_('Database proxy MySQL protocol port')
+    )
+    TERMINAL_MAGNUS_POSTGRE_PORT = serializers.IntegerField(
+        required=False, label=_("PostgreSQL port"), default=54320,
+        help_text=_('Database proxy PostgreSQL port')
+    )
+

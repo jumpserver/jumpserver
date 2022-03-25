@@ -16,8 +16,10 @@ import json
 import yaml
 import copy
 from importlib import import_module
-from django.urls import reverse_lazy
 from urllib.parse import urljoin, urlparse
+
+from django.urls import reverse_lazy
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -307,8 +309,13 @@ class Config(dict):
         'TERMINAL_HOST_KEY': '',
         'TERMINAL_TELNET_REGEX': '',
         'TERMINAL_COMMAND_STORAGE': {},
-        'TERMINAL_RDP_ADDR': '',
+        'TERMINAL_RDP_ADDR': lambda: urlparse(settings.SITE_URL).hostname + ':3389',
         'XRDP_ENABLED': True,
+
+        'TERMINAL_MAGNUS_ENABLED': True,
+        'TERMINAL_MAGNUS_HOST': lambda: urlparse(settings.SITE_URL).hostname,
+        'TERMINAL_MAGNUS_MYSQL_PORT': 33060,
+        'TERMINAL_MAGNUS_POSTGRE_PORT': 54320,
 
         # 安全配置
         'SECURITY_MFA_AUTH': 0,  # 0 不开启 1 全局开启 2 管理员开启
@@ -392,6 +399,7 @@ class Config(dict):
 
         'FORGOT_PASSWORD_URL': '',
         'HEALTH_CHECK_TOKEN': '',
+
     }
 
     @staticmethod
@@ -540,7 +548,8 @@ class Config(dict):
         value = self.get_from_env(item)
         if value is not None:
             return value
-        return self.defaults.get(item)
+        value = self.defaults.get(item)
+        return value
 
     def __getitem__(self, item):
         return self.get(item)
