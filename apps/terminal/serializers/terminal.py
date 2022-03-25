@@ -8,7 +8,7 @@ from common.utils import get_request_ip
 from .. import const
 
 from ..models import (
-    Terminal, Status, Session, Task, CommandStorage, ReplayStorage
+    Terminal, Status, Task, CommandStorage, ReplayStorage
 )
 
 
@@ -53,13 +53,11 @@ class TerminalSerializer(BulkModelSerializer):
             'type', 'remote_addr', 'http_port', 'ssh_port',
             'session_online', 'command_storage', 'replay_storage',
             'is_accepted', "is_active", 'is_alive',
-            'date_created',
-            'comment',
+            'date_created', 'comment',
         ]
         fields_fk = ['status', 'status_display', 'stat']
         fields = fields_small + fields_fk
         read_only_fields = ['type', 'date_created']
-
         extra_kwargs = {
             'command_storage': {'required': True, },
             'replay_storage': {'required': True, },
@@ -134,7 +132,7 @@ class TerminalRegistrationSerializer(serializers.ModelSerializer):
         if request:
             instance.remote_addr = get_request_ip(request)
         sa = self.service_account.create(validated_data)
-        sa.set_component_role()
+        sa.system_roles.add_role_system_component()
         instance.user = sa
         instance.command_storage = CommandStorage.default().name
         instance.replay_storage = ReplayStorage.default().name

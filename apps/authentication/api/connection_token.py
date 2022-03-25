@@ -92,7 +92,7 @@ class ClientProtocolMixin:
             'autoreconnection enabled:i': '1',
             'bookmarktype:i': '3',
             'use redirection server name:i': '0',
-            'smart sizing:i': '0',
+            'smart sizing:i': '1',
             #'drivestoredirect:s': '*',
             # 'domain:s': ''
             # 'alternate shell:s:': '||MySQLWorkbench',
@@ -134,8 +134,7 @@ class ClientProtocolMixin:
         if width and height:
             options['desktopwidth:i'] = width
             options['desktopheight:i'] = height
-        else:
-            options['smart sizing:i'] = '1'
+            options['winposstr:s:'] = f'0,1,0,0,{width},{height}'
 
         options['session bpp:i'] = os.getenv('JUMPSERVER_COLOR_DEPTH', '32')
         options['audiomode:i'] = self.parse_env_bool('JUMPSERVER_DISABLE_AUDIO', 'false', '2', '0')

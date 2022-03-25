@@ -3,6 +3,8 @@
 import json
 import threading
 
+from django.conf import LazySettings
+from django.db.utils import ProgrammingError, OperationalError
 from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save
 from django.utils.functional import LazyObject
@@ -85,3 +87,17 @@ def subscribe_settings_change(sender, **kwargs):
     t = threading.Thread(target=keep_subscribe_settings_change)
     t.daemon = True
     t.start()
+
+
+@receiver(django_ready)
+def monkey_patch_settings(sender, **kwargs):
+    def monkey_patch_getattr(self, name):
+        val = getattr(self._wrapped, name)
+        if callable(val):
+            val = val()
+        return val
+
+    try:
+        LazySettings.__getattr__ = monkey_patch_getattr
+    except (ProgrammingError, OperationalError):
+        pass
