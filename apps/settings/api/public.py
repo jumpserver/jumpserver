@@ -65,6 +65,7 @@ class PublicSettingApi(generics.RetrieveAPIView):
                 # Terminal
                 "XRDP_ENABLED": settings.XRDP_ENABLED,
                 "TERMINAL_MAGNUS_ENABLED": settings.TERMINAL_MAGNUS_ENABLED,
+                "TERMINAL_MAGNUS_HOST": settings.TERMINAL_MAGNUS_HOST,
                 "TERMINAL_MAGNUS_MYSQL_PORT": settings.TERMINAL_MAGNUS_MYSQL_PORT,
                 "TERMINAL_MAGNUS_POSTGRE_PORT": settings.TERMINAL_MAGNUS_POSTGRE_PORT,
                 # Announcement
