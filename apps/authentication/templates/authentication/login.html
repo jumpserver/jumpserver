@@ -142,15 +142,18 @@
                 <li class="dropdown">
                     <a class="dropdown-toggle login-page-language" data-toggle="dropdown" href="#" target="_blank">
                         <i class="fa fa-globe fa-lg" style="margin-right: 2px"></i>
-                        {% ifequal request.COOKIES.django_language 'en' %}
+                        {% if request.COOKIES.django_language == 'en' %}
                             <span>English<b class="caret"></b></span>
+                        {% elif request.COOKIES.django_language == 'ja' %}
+                            <span>日本語<b class="caret"></b></span>
                         {% else %}
                             <span>中文(简体)<b class="caret"></b></span>
-                        {% endifequal %}
+                        {% endif %}
                     </a>
                     <ul class="dropdown-menu profile-dropdown dropdown-menu-right">
                         <li> <a id="switch_cn" href="{% url 'i18n-switch' lang='zh-hans' %}"> <span>中文(简体)</span> </a> </li>
                         <li> <a id="switch_en" href="{% url 'i18n-switch' lang='en' %}"> <span>English</span> </a> </li>
+                        <li> <a id="switch_ja" href="{% url 'i18n-switch' lang='ja' %}"> <span>日本語</span> </a> </li>
                     </ul>
                 </li>
             </ul>
