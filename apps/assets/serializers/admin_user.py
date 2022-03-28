@@ -15,6 +15,7 @@ class AdminUserSerializer(SuS):
                  SuS.Meta.fields_m2m + \
                  [
                      'type', 'protocol', "priority", 'sftp_root', 'ssh_key_fingerprint',
+                     'su_enabled', 'su_from',
                      'date_created', 'date_updated', 'comment', 'created_by',
                  ]
 

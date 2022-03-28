@@ -280,16 +280,44 @@ class Asset(AbsConnectivity, AbsHardwareInfo, ProtocolsMixin, NodesRelationMixin
     def is_support_ansible(self):
         return self.has_protocol('ssh') and self.platform_base not in ("Other",)
 
-    def get_auth_info(self):
+    def get_auth_info(self, with_become=False):
         if not self.admin_user:
             return {}
 
-        self.admin_user.load_asset_special_auth(self)
+        if self.is_unixlike() and self.admin_user.su_enabled and self.admin_user.su_from:
+            auth_user = self.admin_user.su_from
+            become_user = self.admin_user
+        else:
+            auth_user = self.admin_user
+            become_user = None
+
+        auth_user.load_asset_special_auth(self)
         info = {
-            'username': self.admin_user.username,
-            'password': self.admin_user.password,
-            'private_key': self.admin_user.private_key_file,
+            'username': auth_user.username,
+            'password': auth_user.password,
+            'private_key': auth_user.private_key_file
         }
+
+        if not with_become:
+            return info
+
+        if become_user:
+            become_user.load_asset_special_auth(self)
+            become_method = 'su'
+            become_username = become_user.username
+            become_pass = become_user.password
+        else:
+            become_method = 'sudo'
+            become_username = 'root'
+            become_pass = auth_user.password
+        become_info = {
+            'become': {
+                'method': become_method,
+                'username': become_username,
+                'pass': become_pass
+            }
+        }
+        info.update(become_info)
         return info
 
     def nodes_display(self):
