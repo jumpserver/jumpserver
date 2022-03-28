@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-22 15:28+0800\n"
+"POT-Creation-Date: 2022-03-29 12:58+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,7 +23,7 @@ msgid "Acls"
 msgstr "Acls"
 
 #: acls/models/base.py:25 acls/serializers/login_asset_acl.py:47
-#: applications/models/application.py:212 assets/models/asset.py:138
+#: applications/models/application.py:211 assets/models/asset.py:138
 #: assets/models/base.py:175 assets/models/cluster.py:18
 #: assets/models/cmd_filter.py:27 assets/models/domain.py:23
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
@@ -31,7 +31,7 @@ msgstr "Acls"
 #: settings/models.py:29 settings/serializers/sms.py:6
 #: terminal/models/storage.py:23 terminal/models/task.py:16
 #: terminal/models/terminal.py:100 users/forms/profile.py:32
-#: users/models/group.py:15 users/models/user.py:655
+#: users/models/group.py:15 users/models/user.py:659
 #: users/templates/users/_select_user_modal.html:13
 #: users/templates/users/user_asset_permission.html:37
 #: users/templates/users/user_asset_permission.html:154
@@ -41,12 +41,12 @@ msgid "Name"
 msgstr "名前"
 
 #: acls/models/base.py:27 assets/models/cmd_filter.py:84
-#: assets/models/user.py:234
+#: assets/models/user.py:247
 msgid "Priority"
 msgstr "優先順位"
 
 #: acls/models/base.py:28 assets/models/cmd_filter.py:84
-#: assets/models/user.py:234
+#: assets/models/user.py:247
 msgid "1-100, the lower the value will be match first"
 msgstr "1-100、低い値は最初に一致します"
 
@@ -57,7 +57,7 @@ msgstr "1-100、低い値は最初に一致します"
 msgid "Active"
 msgstr "アクティブ"
 
-#: acls/models/base.py:32 applications/models/application.py:225
+#: acls/models/base.py:32 applications/models/application.py:224
 #: assets/models/asset.py:143 assets/models/asset.py:231
 #: assets/models/backup.py:54 assets/models/base.py:180
 #: assets/models/cluster.py:29 assets/models/cmd_filter.py:48
@@ -67,7 +67,7 @@ msgstr "アクティブ"
 #: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:34
 #: terminal/models/storage.py:26 terminal/models/terminal.py:114
 #: tickets/models/comment.py:24 tickets/models/ticket.py:154
-#: users/models/group.py:16 users/models/user.py:692
+#: users/models/group.py:16 users/models/user.py:696
 #: xpack/plugins/change_auth_plan/models/base.py:44
 #: xpack/plugins/cloud/models.py:35 xpack/plugins/cloud/models.py:116
 #: xpack/plugins/gathered_user/models.py:26
@@ -95,8 +95,8 @@ msgstr "ログイン確認"
 #: terminal/backends/command/models.py:19
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:42
 #: terminal/notifications.py:91 terminal/notifications.py:139
-#: tickets/models/comment.py:17 users/const.py:14 users/models/user.py:880
-#: users/models/user.py:911 users/serializers/group.py:19
+#: tickets/models/comment.py:17 users/const.py:14 users/models/user.py:884
+#: users/models/user.py:915 users/serializers/group.py:19
 #: users/templates/users/user_asset_permission.html:38
 #: users/templates/users/user_asset_permission.html:64
 #: users/templates/users/user_database_app_permission.html:37
@@ -170,7 +170,7 @@ msgstr "コンマ区切り文字列の形式。* はすべて一致すること�
 #: authentication/forms.py:15 authentication/forms.py:17
 #: authentication/templates/authentication/_msg_different_city.html:9
 #: authentication/templates/authentication/_msg_oauth_bind.html:9
-#: ops/models/adhoc.py:159 users/forms/profile.py:31 users/models/user.py:653
+#: ops/models/adhoc.py:159 users/forms/profile.py:31 users/models/user.py:657
 #: users/templates/users/_msg_user_created.html:12
 #: users/templates/users/_select_user_modal.html:14
 #: xpack/plugins/change_auth_plan/models/asset.py:34
@@ -215,11 +215,11 @@ msgid ""
 "Format for comma-delimited string, with * indicating a match all. Protocol "
 "options: {}"
 msgstr ""
-"コンマ区切り文字列の形式。* はすべて一致することを示します。プロトコル"
-"オプション: {}"
+"コンマ区切り文字列の形式。* はすべて一致することを示します。プロトコルオプ"
+"ション: {}"
 
 #: acls/serializers/login_asset_acl.py:55 assets/models/asset.py:213
-#: assets/models/domain.py:62 assets/models/user.py:235
+#: assets/models/domain.py:62 assets/models/user.py:248
 #: terminal/serializers/session.py:30 terminal/serializers/storage.py:69
 msgid "Protocol"
 msgstr "プロトコル"
@@ -260,7 +260,7 @@ msgstr "期間"
 msgid "My applications"
 msgstr "私のアプリケーション"
 
-#: applications/apps.py:9 applications/models/application.py:61
+#: applications/apps.py:9 applications/models/application.py:62
 msgid "Applications"
 msgstr "アプリケーション"
 
@@ -279,14 +279,14 @@ msgstr "リモートアプリ"
 msgid "Custom"
 msgstr "カスタム"
 
-#: applications/models/account.py:12 applications/models/application.py:229
+#: applications/models/account.py:12 applications/models/application.py:228
 #: assets/models/backup.py:32 assets/models/cmd_filter.py:45
 #: perms/models/application_permission.py:28
 msgid "Application"
 msgstr "アプリケーション"
 
 #: applications/models/account.py:15 assets/models/authbook.py:20
-#: assets/models/cmd_filter.py:42 assets/models/user.py:325 audits/models.py:40
+#: assets/models/cmd_filter.py:42 assets/models/user.py:338 audits/models.py:40
 #: perms/models/application_permission.py:33
 #: perms/models/asset_permission.py:25 terminal/backends/command/models.py:21
 #: terminal/backends/command/serializers.py:14 terminal/models/session.py:46
@@ -319,7 +319,7 @@ msgstr "アプリケーションアカウントの秘密を表示できます"
 msgid "Can change application account secret"
 msgstr "アプリケーションアカウントの秘密を変更できます"
 
-#: applications/models/application.py:214
+#: applications/models/application.py:213
 #: applications/serializers/application.py:99 assets/models/label.py:21
 #: perms/models/application_permission.py:21
 #: perms/serializers/application/user_permission.py:33
@@ -328,9 +328,9 @@ msgstr "アプリケーションアカウントの秘密を変更できます"
 msgid "Category"
 msgstr "カテゴリ"
 
-#: applications/models/application.py:217
+#: applications/models/application.py:216
 #: applications/serializers/application.py:101 assets/models/backup.py:49
-#: assets/models/cmd_filter.py:82 assets/models/user.py:233
+#: assets/models/cmd_filter.py:82 assets/models/user.py:246
 #: perms/models/application_permission.py:24
 #: perms/serializers/application/user_permission.py:34
 #: terminal/models/storage.py:55 terminal/models/storage.py:119
@@ -341,21 +341,21 @@ msgstr "カテゴリ"
 msgid "Type"
 msgstr "タイプ"
 
-#: applications/models/application.py:221 assets/models/asset.py:217
+#: applications/models/application.py:220 assets/models/asset.py:217
 #: assets/models/domain.py:29 assets/models/domain.py:63
 msgid "Domain"
 msgstr "ドメイン"
 
-#: applications/models/application.py:223 xpack/plugins/cloud/models.py:33
+#: applications/models/application.py:222 xpack/plugins/cloud/models.py:33
 #: xpack/plugins/cloud/serializers/account.py:58
 msgid "Attrs"
 msgstr "ツールバーの"
 
-#: applications/models/application.py:233
+#: applications/models/application.py:232
 msgid "Can match application"
 msgstr "アプリケーションを一致させることができます"
 
-#: applications/models/application.py:281
+#: applications/models/application.py:280
 msgid "Application user"
 msgstr "アプリケーションユーザー"
 
@@ -384,7 +384,7 @@ msgstr "タイプ表示"
 #: assets/serializers/cmd_filter.py:49 common/db/models.py:113
 #: common/mixins/models.py:50 ops/models/adhoc.py:39 ops/models/command.py:30
 #: orgs/models.py:67 orgs/models.py:217 perms/models/base.py:92
-#: users/models/group.py:18 users/models/user.py:912
+#: users/models/group.py:18 users/models/user.py:916
 #: xpack/plugins/cloud/models.py:125
 msgid "Date created"
 msgstr "作成された日付"
@@ -603,7 +603,7 @@ msgstr "ホスト名生"
 msgid "Protocols"
 msgstr "プロトコル"
 
-#: assets/models/asset.py:218 assets/models/user.py:225
+#: assets/models/asset.py:218 assets/models/user.py:238
 #: perms/models/asset_permission.py:24
 #: xpack/plugins/change_auth_plan/models/asset.py:43
 #: xpack/plugins/gathered_user/models.py:24
@@ -616,7 +616,7 @@ msgid "Is active"
 msgstr "アクティブです。"
 
 #: assets/models/asset.py:222 assets/models/cluster.py:19
-#: assets/models/user.py:222 assets/models/user.py:377
+#: assets/models/user.py:235 assets/models/user.py:390
 msgid "Admin user"
 msgstr "管理ユーザー"
 
@@ -636,7 +636,7 @@ msgstr "ラベル"
 #: assets/models/cluster.py:28 assets/models/cmd_filter.py:52
 #: assets/models/cmd_filter.py:99 assets/models/group.py:21
 #: common/db/models.py:111 common/mixins/models.py:49 orgs/models.py:66
-#: orgs/models.py:219 perms/models/base.py:91 users/models/user.py:700
+#: orgs/models.py:219 perms/models/base.py:91 users/models/user.py:704
 #: users/serializers/group.py:33
 #: xpack/plugins/change_auth_plan/models/base.py:48
 #: xpack/plugins/cloud/models.py:122 xpack/plugins/gathered_user/models.py:30
@@ -785,7 +785,7 @@ msgstr "確認済みの日付"
 
 #: assets/models/base.py:177 audits/signal_handlers.py:68
 #: authentication/forms.py:22
-#: authentication/templates/authentication/login.html:178
+#: authentication/templates/authentication/login.html:181
 #: settings/serializers/auth/ldap.py:44 users/forms/profile.py:21
 #: users/templates/users/_msg_user_created.html:13
 #: users/templates/users/user_password_update.html:43
@@ -817,7 +817,7 @@ msgstr "帯域幅"
 msgid "Contact"
 msgstr "連絡先"
 
-#: assets/models/cluster.py:22 users/models/user.py:675
+#: assets/models/cluster.py:22 users/models/user.py:679
 msgid "Phone"
 msgstr "電話"
 
@@ -843,7 +843,7 @@ msgid "Default"
 msgstr "デフォルト"
 
 #: assets/models/cluster.py:36 assets/models/label.py:14 rbac/const.py:6
-#: users/models/user.py:897
+#: users/models/user.py:901
 msgid "System"
 msgstr "システム"
 
@@ -852,7 +852,7 @@ msgid "Default Cluster"
 msgstr "デフォルトクラスター"
 
 #: assets/models/cmd_filter.py:34 perms/models/base.py:86
-#: users/models/group.py:31 users/models/user.py:661
+#: users/models/group.py:31 users/models/user.py:665
 #: users/templates/users/_select_user_modal.html:16
 #: users/templates/users/user_asset_permission.html:39
 #: users/templates/users/user_asset_permission.html:67
@@ -998,77 +998,77 @@ msgstr "ノード"
 msgid "Can match node"
 msgstr "ノードを一致させることができます"
 
-#: assets/models/user.py:216
+#: assets/models/user.py:229
 msgid "Automatic managed"
 msgstr "自動管理"
 
-#: assets/models/user.py:217
+#: assets/models/user.py:230
 msgid "Manually input"
 msgstr "手動入力"
 
-#: assets/models/user.py:221
+#: assets/models/user.py:234
 msgid "Common user"
 msgstr "共通ユーザー"
 
-#: assets/models/user.py:224
+#: assets/models/user.py:237
 msgid "Username same with user"
 msgstr "ユーザーと同じユーザー名"
 
-#: assets/models/user.py:227 assets/serializers/domain.py:29
+#: assets/models/user.py:240 assets/serializers/domain.py:29
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 #: xpack/plugins/change_auth_plan/models/asset.py:39
 msgid "Assets"
 msgstr "資産"
 
-#: assets/models/user.py:231 users/apps.py:9
+#: assets/models/user.py:244 users/apps.py:9
 msgid "Users"
 msgstr "ユーザー"
 
-#: assets/models/user.py:232
+#: assets/models/user.py:245
 msgid "User groups"
 msgstr "ユーザーグループ"
 
-#: assets/models/user.py:236
+#: assets/models/user.py:249
 msgid "Auto push"
 msgstr "オートプッシュ"
 
-#: assets/models/user.py:237
+#: assets/models/user.py:250
 msgid "Sudo"
 msgstr "すど"
 
-#: assets/models/user.py:238
+#: assets/models/user.py:251
 msgid "Shell"
 msgstr "シェル"
 
-#: assets/models/user.py:239
+#: assets/models/user.py:252
 msgid "Login mode"
 msgstr "ログインモード"
 
-#: assets/models/user.py:240
+#: assets/models/user.py:253
 msgid "SFTP Root"
 msgstr "SFTPルート"
 
-#: assets/models/user.py:241 authentication/models.py:48
+#: assets/models/user.py:254 authentication/models.py:48
 msgid "Token"
 msgstr "トークン"
 
-#: assets/models/user.py:242
+#: assets/models/user.py:255
 msgid "Home"
 msgstr "ホーム"
 
-#: assets/models/user.py:243
+#: assets/models/user.py:256
 msgid "System groups"
 msgstr "システムグループ"
 
-#: assets/models/user.py:246
+#: assets/models/user.py:259
 msgid "User switch"
 msgstr "ユーザースイッチ"
 
-#: assets/models/user.py:247
+#: assets/models/user.py:260
 msgid "Switch from"
 msgstr "から切り替え"
 
-#: assets/models/user.py:327
+#: assets/models/user.py:340
 msgid "Can match system user"
 msgstr "システムユーザーに一致できます"
 
@@ -1085,14 +1085,19 @@ msgstr "アカウントバックアップルートタスクの結果の通知"
 msgid ""
 "{} - The account backup passage task has been completed. See the attachment "
 "for details"
-msgstr "{} -アカウントバックアップの通過タスクが完了しました。詳細は添付ファイルをご覧ください"
+msgstr ""
+"{} -アカウントバックアップの通過タスクが完了しました。詳細は添付ファイルをご"
+"覧ください"
 
 #: assets/notifications.py:19
 msgid ""
 "{} - The account backup passage task has been completed: the encryption "
 "password has not been set - please go to personal information -> file "
 "encryption password to set the encryption password"
-msgstr "{} -アカウントのバックアップ通過タスクが完了しました: 暗号化パスワードが設定されていません-個人情報にアクセスしてください-> ファイル暗号化パスワードを設定してください暗号化パスワード"
+msgstr ""
+"{} -アカウントのバックアップ通過タスクが完了しました: 暗号化パスワードが設定"
+"されていません-個人情報にアクセスしてください-> ファイル暗号化パスワードを設"
+"定してください暗号化パスワード"
 
 #: assets/serializers/account.py:40 assets/serializers/account.py:83
 msgid "System user display"
@@ -1268,7 +1273,9 @@ msgstr "パスワードには '{{' を含まない"
 
 #: assets/tasks/account_connectivity.py:30
 msgid "The asset {} system platform {} does not support run Ansible tasks"
-msgstr "資産 {} システムプラットフォーム {} はAnsibleタスクの実行をサポートしていません。"
+msgstr ""
+"資産 {} システムプラットフォーム {} はAnsibleタスクの実行をサポートしていませ"
+"ん。"
 
 #: assets/tasks/account_connectivity.py:107
 msgid "Test account connectivity: "
@@ -1321,7 +1328,9 @@ msgstr "資産ユーザーの収集"
 #: assets/tasks/nodes_amount.py:27
 msgid ""
 "The task of self-checking is already running and cannot be started repeatedly"
-msgstr "セルフチェックのタスクはすでに実行されており、繰り返し開始することはできません"
+msgstr ""
+"セルフチェックのタスクはすでに実行されており、繰り返し開始することはできませ"
+"ん"
 
 #: assets/tasks/push_system_user.py:200
 msgid "System user is dynamic: {}"
@@ -1505,7 +1514,7 @@ msgstr "ユーザーエージェント"
 
 #: audits/models.py:124
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
-#: users/forms/profile.py:64 users/models/user.py:678
+#: users/forms/profile.py:64 users/models/user.py:682
 #: users/serializers/profile.py:121
 msgid "MFA"
 msgstr "MFA"
@@ -1583,13 +1592,13 @@ msgstr "認証トークン"
 
 #: audits/signal_handlers.py:71 authentication/notifications.py:73
 #: authentication/views/login.py:164 authentication/views/wecom.py:158
-#: notifications/backends/__init__.py:11 users/models/user.py:714
+#: notifications/backends/__init__.py:11 users/models/user.py:718
 msgid "WeCom"
 msgstr "企業微信"
 
 #: audits/signal_handlers.py:72 authentication/views/dingtalk.py:160
 #: authentication/views/login.py:170 notifications/backends/__init__.py:12
-#: users/models/user.py:715
+#: users/models/user.py:719
 msgid "DingTalk"
 msgstr "DingTalk"
 
@@ -1762,7 +1771,7 @@ msgstr "{ApplicationPermission} 追加 {SystemUser}"
 msgid "{ApplicationPermission} REMOVE {SystemUser}"
 msgstr "{ApplicationPermission} 削除 {SystemUser}"
 
-#: authentication/api/connection_token.py:296
+#: authentication/api/connection_token.py:313
 msgid "Invalid token"
 msgstr "無効なトークン"
 
@@ -1794,7 +1803,8 @@ msgstr "署名ヘッダーが無効です。AccessKeyIdのような形式: Signa
 msgid ""
 "Invalid signature header. Signature string should not contain invalid "
 "characters."
-msgstr "署名ヘッダーが無効です。署名文字列に無効な文字を含めることはできません。"
+msgstr ""
+"署名ヘッダーが無効です。署名文字列に無効な文字を含めることはできません。"
 
 #: authentication/backends/drf.py:90 authentication/backends/drf.py:106
 msgid "Invalid signature."
@@ -1823,7 +1833,8 @@ msgstr "無効なトークンヘッダー。記号文字列にはスペースを
 #: authentication/backends/drf.py:137
 msgid ""
 "Invalid token header. Sign string should not contain invalid characters."
-msgstr "無効なトークンヘッダー。署名文字列に無効な文字を含めることはできません。"
+msgstr ""
+"無効なトークンヘッダー。署名文字列に無効な文字を含めることはできません。"
 
 #: authentication/backends/drf.py:148
 msgid "Invalid token or cache refreshed."
@@ -1887,26 +1898,35 @@ msgid ""
 "The username or password you entered is incorrect, please enter it again. "
 "You can also try {times_try} times (The account will be temporarily locked "
 "for {block_time} minutes)"
-msgstr "入力したユーザー名またはパスワードが正しくありません。再度入力してください。 {times_try} 回試すこともできます (アカウントは {block_time} 分の間一時的にロックされます)"
+msgstr ""
+"入力したユーザー名またはパスワードが正しくありません。再度入力してください。 "
+"{times_try} 回試すこともできます (アカウントは {block_time} 分の間一時的に"
+"ロックされます)"
 
 #: authentication/errors.py:55 authentication/errors.py:63
 msgid ""
 "The account has been locked (please contact admin to unlock it or try again "
 "after {} minutes)"
-msgstr "アカウントがロックされています (管理者に連絡してロックを解除するか、 {} 分後にもう一度お試しください)"
+msgstr ""
+"アカウントがロックされています (管理者に連絡してロックを解除するか、 {} 分後"
+"にもう一度お試しください)"
 
 #: authentication/errors.py:59
 msgid ""
 "The ip has been locked (please contact admin to unlock it or try again after "
 "{} minutes)"
-msgstr "IPがロックされています (管理者に連絡してロックを解除するか、 {} 分後にもう一度お試しください)"
+msgstr ""
+"IPがロックされています (管理者に連絡してロックを解除するか、 {} 分後にもう一"
+"度お試しください)"
 
 #: authentication/errors.py:67
 #, python-brace-format
 msgid ""
 "{error}, You can also try {times_try} times (The account will be temporarily "
 "locked for {block_time} minutes)"
-msgstr "{error},{times_try} 回も試すことができます (アカウントは {block_time} 分の間一時的にロックされます)"
+msgstr ""
+"{error},{times_try} 回も試すことができます (アカウントは {block_time} 分の間"
+"一時的にロックされます)"
 
 #: authentication/errors.py:71
 msgid "MFA required"
@@ -1950,7 +1970,8 @@ msgstr "ログインする前にパスワードを変更する必要がありま
 
 #: authentication/errors.py:318 authentication/mixins.py:386
 msgid "Your password has expired, please reset before logging in"
-msgstr "パスワードの有効期限が切れました。ログインする前にリセットしてください。"
+msgstr ""
+"パスワードの有効期限が切れました。ログインする前にリセットしてください。"
 
 #: authentication/errors.py:352
 msgid "Your password is invalid"
@@ -2117,14 +2138,14 @@ msgid "Show"
 msgstr "表示"
 
 #: authentication/templates/authentication/_access_key_modal.html:66
-#: settings/serializers/security.py:39 users/models/user.py:550
+#: settings/serializers/security.py:39 users/models/user.py:554
 #: users/serializers/profile.py:111 users/templates/users/mfa_setting.html:61
 #: users/templates/users/user_verify_mfa.html:36
 msgid "Disable"
 msgstr "無効化"
 
 #: authentication/templates/authentication/_access_key_modal.html:67
-#: users/models/user.py:551 users/serializers/profile.py:112
+#: users/models/user.py:555 users/serializers/profile.py:112
 #: users/templates/users/mfa_setting.html:26
 #: users/templates/users/mfa_setting.html:68
 msgid "Enable"
@@ -2172,7 +2193,7 @@ msgstr "コードエラー"
 #: authentication/templates/authentication/_msg_reset_password.html:3
 #: authentication/templates/authentication/_msg_rest_password_success.html:2
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:2
-#: jumpserver/conf.py:293 ops/tasks.py:145 ops/tasks.py:148
+#: jumpserver/conf.py:295 ops/tasks.py:145 ops/tasks.py:148
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: perms/templates/perms/_msg_permed_items_expire.html:3
 #: users/templates/users/_msg_account_expire_reminder.html:4
@@ -2194,7 +2215,9 @@ msgstr "ログイン時間"
 msgid ""
 "If you suspect that the login behavior is abnormal, please modify the "
 "account password in time."
-msgstr "ログイン動作が異常であると疑われる場合は、時間内にアカウントのパスワードを変更してください。"
+msgstr ""
+"ログイン動作が異常であると疑われる場合は、時間内にアカウントのパスワードを変"
+"更してください。"
 
 #: authentication/templates/authentication/_msg_oauth_bind.html:6
 msgid "Your account has just been bound to"
@@ -2208,7 +2231,9 @@ msgstr "操作が独自のものでない場合は、パスワードをバイン
 msgid ""
 "Please click the link below to reset your password, if not your request, "
 "concern your account security"
-msgstr "下のリンクをクリックしてパスワードをリセットしてください。リクエストがない場合は、アカウントのセキュリティに関係します。"
+msgstr ""
+"下のリンクをクリックしてパスワードをリセットしてください。リクエストがない場"
+"合は、アカウントのセキュリティに関係します。"
 
 #: authentication/templates/authentication/_msg_reset_password.html:10
 msgid "Click here reset password"
@@ -2237,7 +2262,9 @@ msgstr "ブラウザ"
 msgid ""
 "If the password update was not initiated by you, your account may have "
 "security issues"
-msgstr "パスワードの更新が開始されなかった場合、アカウントにセキュリティ上の問題がある可能性があります"
+msgstr ""
+"パスワードの更新が開始されなかった場合、アカウントにセキュリティ上の問題があ"
+"る可能性があります"
 
 #: authentication/templates/authentication/_msg_rest_password_success.html:14
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:14
@@ -2252,24 +2279,27 @@ msgstr "公開鍵が正常に更新されました"
 msgid ""
 "If the public key update was not initiated by you, your account may have "
 "security issues"
-msgstr "公開鍵の更新が開始されなかった場合、アカウントにセキュリティ上の問題がある可能性があります"
+msgstr ""
+"公開鍵の更新が開始されなかった場合、アカウントにセキュリティ上の問題がある可"
+"能性があります"
 
-#: authentication/templates/authentication/login.html:170
+#: authentication/templates/authentication/login.html:173
 msgid "Welcome back, please enter username and password to login"
-msgstr "おかえりなさい、ログインするためにユーザー名とパスワードを入力してください"
+msgstr ""
+"おかえりなさい、ログインするためにユーザー名とパスワードを入力してください"
 
-#: authentication/templates/authentication/login.html:206
+#: authentication/templates/authentication/login.html:209
 #: users/templates/users/forgot_password.html:15
 #: users/templates/users/forgot_password.html:16
 msgid "Forgot password"
 msgstr "パスワードを忘れた"
 
-#: authentication/templates/authentication/login.html:213
-#: templates/_header_bar.html:83
+#: authentication/templates/authentication/login.html:216
+#: templates/_header_bar.html:89
 msgid "Login"
 msgstr "ログイン"
 
-#: authentication/templates/authentication/login.html:220
+#: authentication/templates/authentication/login.html:223
 msgid "More login options"
 msgstr "その他のログインオプション"
 
@@ -2373,7 +2403,7 @@ msgid "The FeiShu is already bound to another user"
 msgstr "FeiShuはすでに別のユーザーにバインドされています"
 
 #: authentication/views/feishu.py:148 authentication/views/login.py:176
-#: notifications/backends/__init__.py:14 users/models/user.py:716
+#: notifications/backends/__init__.py:14 users/models/user.py:720
 msgid "FeiShu"
 msgstr "本を飛ばす"
 
@@ -2409,7 +2439,8 @@ msgstr "クッキーを有効にして、もう一度お試しください。"
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
-msgstr "<b>{}</b> 確認を待ちます。彼女/彼へのリンクをコピーすることもできます <br/>\n"
+msgstr ""
+"<b>{}</b> 確認を待ちます。彼女/彼へのリンクをコピーすることもできます <br/>\n"
 "                  このページを閉じないでください"
 
 #: authentication/views/login.py:268
@@ -2623,11 +2654,11 @@ msgstr "特殊文字を含むべきではない"
 msgid "The mobile phone number format is incorrect"
 msgstr "携帯電話番号の形式が正しくありません"
 
-#: jumpserver/conf.py:292
+#: jumpserver/conf.py:294
 msgid "Create account successfully"
 msgstr "アカウントを正常に作成"
 
-#: jumpserver/conf.py:294
+#: jumpserver/conf.py:296
 msgid "Your account has been created successfully"
 msgstr "アカウントが正常に作成されました"
 
@@ -2644,25 +2675,35 @@ msgid ""
 "<div>Luna is a separately deployed program, you need to deploy Luna, koko, "
 "configure nginx for url distribution,</div> </div>If you see this page, "
 "prove that you are not accessing the nginx listening port. Good luck.</div>"
-msgstr "<div> Lunaは個別にデプロイされたプログラムです。Luna、kokoをデプロイする必要があります。urlディストリビューションにnginxを設定します。</div> </div> このページが表示されている場合は、nginxリスニングポートにアクセスしていないことを証明してください。頑張ってください。</div>"
+msgstr ""
+"<div> Lunaは個別にデプロイされたプログラムです。Luna、kokoをデプロイする必要"
+"があります。urlディストリビューションにnginxを設定します。</div> </div> この"
+"ページが表示されている場合は、nginxリスニングポートにアクセスしていないことを"
+"証明してください。頑張ってください。</div>"
 
 #: jumpserver/views/other.py:70
 msgid "Websocket server run on port: {}, you should proxy it on nginx"
-msgstr "Websocket サーバーはport: {}で実行されます。nginxでプロキシする必要があります。"
+msgstr ""
+"Websocket サーバーはport: {}で実行されます。nginxでプロキシする必要がありま"
+"す。"
 
 #: jumpserver/views/other.py:84
 msgid ""
 "<div>Koko is a separately deployed program, you need to deploy Koko, "
 "configure nginx for url distribution,</div> </div>If you see this page, "
 "prove that you are not accessing the nginx listening port. Good luck.</div>"
-msgstr "<div> Kokoは個別にデプロイされているプログラムです。Kokoをデプロイする必要があります。URL配布用にnginxを設定します。</div> </div> このページが表示されている場合は、nginxリスニングポートにアクセスしていないことを証明してください。頑張ってください。</div>"
+msgstr ""
+"<div> Kokoは個別にデプロイされているプログラムです。Kokoをデプロイする必要が"
+"あります。URL配布用にnginxを設定します。</div> </div> このページが表示されて"
+"いる場合は、nginxリスニングポートにアクセスしていないことを証明してください。"
+"頑張ってください。</div>"
 
 #: notifications/apps.py:7
 msgid "Notifications"
 msgstr "通知"
 
 #: notifications/backends/__init__.py:10 users/forms/profile.py:101
-#: users/models/user.py:657
+#: users/models/user.py:661
 msgid "Email"
 msgstr "メール"
 
@@ -2715,9 +2756,9 @@ msgid ""
 "crontab/' target='_blank'>Online tools</a>) <br>Note: If both Regularly "
 "perform and Cycle perform are set, give priority to Regularly perform"
 msgstr ""
-"eg:毎週日03:05<5 3**0><br>ヒント:5ビットLinux crontab式<"
-"分時日月曜日>(<a href='https://tool.lu/crontab/' target='_blank'>オンラインワーク"
-"</a>)<br>注意:定期実行と周期実行を同時に設定した場合は、定期実行を優先します。"
+"eg:毎週日03:05<5 3**0><br>ヒント:5ビットLinux crontab式<分時日月曜日>(<a "
+"href='https://tool.lu/crontab/' target='_blank'>オンラインワーク</a>)<br>注"
+"意:定期実行と周期実行を同時に設定した場合は、定期実行を優先します。"
 
 #: ops/mixin.py:162
 msgid "Unit: hour"
@@ -2888,7 +2929,7 @@ msgid "Can view root org"
 msgstr "グローバル組織を表示できます"
 
 #: orgs/models.py:216 rbac/models/role.py:46 rbac/models/rolebinding.py:43
-#: users/models/user.py:665 users/templates/users/_select_user_modal.html:15
+#: users/models/user.py:669 users/templates/users/_select_user_modal.html:15
 msgid "Role"
 msgstr "ロール"
 
@@ -2975,7 +3016,7 @@ msgstr "クリップボードコピーペースト"
 #: perms/models/base.py:90
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:58
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:60
-#: users/models/user.py:697
+#: users/models/user.py:701
 msgid "Date expired"
 msgstr "期限切れの日付"
 
@@ -3018,15 +3059,15 @@ msgstr "Organization {} のアプリケーション権限"
 #: perms/serializers/application/permission.py:20
 #: perms/serializers/application/permission.py:41
 #: perms/serializers/asset/permission.py:19
-#: perms/serializers/asset/permission.py:45 users/serializers/user.py:137
+#: perms/serializers/asset/permission.py:45 users/serializers/user.py:139
 msgid "Is valid"
 msgstr "有効です"
 
 #: perms/serializers/application/permission.py:21
 #: perms/serializers/application/permission.py:40
 #: perms/serializers/asset/permission.py:20
-#: perms/serializers/asset/permission.py:44 users/serializers/user.py:83
-#: users/serializers/user.py:139
+#: perms/serializers/asset/permission.py:44 users/serializers/user.py:85
+#: users/serializers/user.py:141
 msgid "Is expired"
 msgstr "期限切れです"
 
@@ -3050,7 +3091,9 @@ msgstr "システムユーザー数"
 msgid ""
 "The application list contains applications that are different from the "
 "permission type. ({})"
-msgstr "アプリケーションリストには、権限タイプとは異なるアプリケーションが含まれています。({})"
+msgstr ""
+"アプリケーションリストには、権限タイプとは異なるアプリケーションが含まれてい"
+"ます。({})"
 
 #: perms/serializers/asset/permission.py:21
 msgid "Users display"
@@ -3188,7 +3231,8 @@ msgstr "ロールバインディング"
 msgid ""
 "User last role in org, can not be delete, you can remove user from org "
 "instead"
-msgstr "ユーザーの最後のロールは削除できません。ユーザーを組織から削除できます。"
+msgstr ""
+"ユーザーの最後のロールは削除できません。ユーザーを組織から削除できます。"
 
 #: rbac/models/rolebinding.py:135
 msgid "Organization role binding"
@@ -3502,8 +3546,8 @@ msgid ""
 "User attr map present how to map LDAP user attr to jumpserver, username,name,"
 "email is jumpserver attr"
 msgstr ""
-"ユーザー属性マッピングは、LDAPのユーザー属性をjumpserverユーザーにマッピングする方法、username, name,"
-"emailはjumpserverのユーザーが必要とする属性です"
+"ユーザー属性マッピングは、LDAPのユーザー属性をjumpserverユーザーにマッピング"
+"する方法、username, name,emailはjumpserverのユーザーが必要とする属性です"
 
 #: settings/serializers/auth/ldap.py:70
 msgid "Connect timeout"
@@ -3666,7 +3710,8 @@ msgstr "SSO Token認証の有効化"
 
 #: settings/serializers/auth/sso.py:13
 msgid "Other service can using SSO token login to JumpServer without password"
-msgstr "他のサービスはパスワードなしでJumpServerへのSSOトークンログインを使用できます"
+msgstr ""
+"他のサービスはパスワードなしでJumpServerへのSSOトークンログインを使用できます"
 
 #: settings/serializers/auth/sso.py:16
 msgid "SSO auth key TTL"
@@ -3708,7 +3753,9 @@ msgstr "ユーザーの最初のログイン更新プロファイルがリダイ
 msgid ""
 "The forgot password url on login page, If you use ldap or cas external "
 "authentication, you can set it"
-msgstr "ログインページでパスワードのURLを忘れてしまいました。ldapまたはcasの外部認証を使用している場合は、設定できます。"
+msgstr ""
+"ログインページでパスワードのURLを忘れてしまいました。ldapまたはcasの外部認証"
+"を使用している場合は、設定できます。"
 
 #: settings/serializers/basic.py:41
 msgid "Global organization name"
@@ -3761,8 +3808,8 @@ msgid ""
 "Unit: days, Session, record, command will be delete if more than duration, "
 "only in database"
 msgstr ""
-"単位:日。セッション、録画、コマンドレコードがそれを超えると削除されます(データベースストレージにのみ影響します。ossなどは影響しません」"
-"影響を受ける)"
+"単位:日。セッション、録画、コマンドレコードがそれを超えると削除されます(デー"
+"タベースストレージにのみ影響します。ossなどは影響しません」影響を受ける)"
 
 #: settings/serializers/email.py:18
 msgid "SMTP host"
@@ -3790,7 +3837,9 @@ msgstr "ユーザーを送信"
 
 #: settings/serializers/email.py:27
 msgid "Tips: Send mail account, default SMTP account as the send account"
-msgstr "ヒント: 送信メールアカウント、送信アカウントとしてのデフォルトのSMTPアカウント"
+msgstr ""
+"ヒント: 送信メールアカウント、送信アカウントとしてのデフォルトのSMTPアカウン"
+"ト"
 
 #: settings/serializers/email.py:30
 msgid "Test recipient"
@@ -3828,7 +3877,9 @@ msgstr "ユーザーメール件名の作成"
 msgid ""
 "Tips: When creating a user, send the subject of the email (eg:Create account "
 "successfully)"
-msgstr "ヒント: ユーザーを作成するときに、メールの件名を送信します (例: アカウントを正常に作成)"
+msgstr ""
+"ヒント: ユーザーを作成するときに、メールの件名を送信します (例: アカウントを"
+"正常に作成)"
 
 #: settings/serializers/email.py:54
 msgid "Create user honorific"
@@ -3836,7 +3887,8 @@ msgstr "ユーザー敬語の作成"
 
 #: settings/serializers/email.py:55
 msgid "Tips: When creating a user, send the honorific of the email (eg:Hello)"
-msgstr "ヒント: ユーザーを作成するときは、メールの敬語を送信します (例: こんにちは)"
+msgstr ""
+"ヒント: ユーザーを作成するときは、メールの敬語を送信します (例: こんにちは)"
 
 #: settings/serializers/email.py:59
 msgid "Create user email content"
@@ -3848,7 +3900,8 @@ msgid ""
 "Tips: When creating a user, send the content of the email, support "
 "{username} {name} {email} label"
 msgstr ""
-"ヒント:ユーザーの作成時にパスワード設定メールの内容を送信し、{username}{name}{email}ラベルをサポートします。"
+"ヒント:ユーザーの作成時にパスワード設定メールの内容を送信し、{username}{name}"
+"{email}ラベルをサポートします。"
 
 #: settings/serializers/email.py:64
 msgid "Tips: Email signature (eg:jumpserver)"
@@ -3885,7 +3938,8 @@ msgstr "シェル (Windows)"
 
 #: settings/serializers/other.py:25
 msgid "The shell type used when Windows assets perform ansible tasks"
-msgstr "Windowsアセットが実行可能なタスクを実行するときに使用されるシェルタイプ"
+msgstr ""
+"Windowsアセットが実行可能なタスクを実行するときに使用されるシェルタイプ"
 
 #: settings/serializers/other.py:29
 msgid "Perm ungroup node"
@@ -3893,7 +3947,10 @@ msgstr "グループ化されていないノードを表示"
 
 #: settings/serializers/other.py:30
 msgid "Perm single to ungroup node"
-msgstr "グループ化されていないノードに個別に許可された資産を配置し、資産が存在するノードが表示されないようにしますが、そのノードが許可されていないという質問に質問"
+msgstr ""
+"グループ化されていないノードに個別に許可された資産を配置し、資産が存在する"
+"ノードが表示されないようにしますが、そのノードが許可されていないという質問に"
+"質問"
 
 #: settings/serializers/other.py:34
 msgid "Help Docs URL"
@@ -3939,7 +3996,9 @@ msgstr "特別な"
 msgid ""
 "Unit: minute, If the user has failed to log in for a limited number of "
 "times, no login is allowed during this time interval."
-msgstr "単位: 分。ユーザーが限られた回数だけログインできなかった場合、この時間間隔ではログインはできません。"
+msgstr ""
+"単位: 分。ユーザーが限られた回数だけログインできなかった場合、この時間間隔で"
+"はログインはできません。"
 
 #: settings/serializers/security.py:40
 msgid "All users"
@@ -3995,7 +4054,11 @@ msgid ""
 "user password will expire failure;The password expiration reminder mail will "
 "be automatic sent to the user by system within 5 days (daily) before the "
 "password expires"
-msgstr "単位: 日。ユーザーがその期間中にパスワードを更新しなかった場合、ユーザーパスワードの有効期限が切れます。パスワードの有効期限が切れる前の5日 (毎日) 以内に、パスワードの有効期限が切れるリマインダーメールがシステムからユーザーに自動的に送信されます。"
+msgstr ""
+"単位: 日。ユーザーがその期間中にパスワードを更新しなかった場合、ユーザーパス"
+"ワードの有効期限が切れます。パスワードの有効期限が切れる前の5日 (毎日) 以内"
+"に、パスワードの有効期限が切れるリマインダーメールがシステムからユーザーに自"
+"動的に送信されます。"
 
 #: settings/serializers/security.py:89
 msgid "Number of repeated historical passwords"
@@ -4005,7 +4068,9 @@ msgstr "繰り返された履歴パスワードの数"
 msgid ""
 "Tip: When the user resets the password, it cannot be the previous n "
 "historical passwords of the user"
-msgstr "ヒント: ユーザーがパスワードをリセットすると、ユーザーの前のnの履歴パスワードにすることはできません"
+msgstr ""
+"ヒント: ユーザーがパスワードをリセットすると、ユーザーの前のnの履歴パスワード"
+"にすることはできません"
 
 #: settings/serializers/security.py:96
 msgid "Only single device login"
@@ -4039,7 +4104,9 @@ msgstr "MFAはTTLを確認します"
 msgid ""
 "Unit: second, The verification MFA takes effect only when you view the "
 "account password"
-msgstr "単位: 2番目に、検証MFAはアカウントのパスワードを表示したときにのみ有効になります。"
+msgstr ""
+"単位: 2番目に、検証MFAはアカウントのパスワードを表示したときにのみ有効になり"
+"ます。"
 
 #: settings/serializers/security.py:116
 msgid "Enable Login dynamic code"
@@ -4049,7 +4116,9 @@ msgstr "ログイン動的コードの有効化"
 msgid ""
 "The password and additional code are sent to a third party authentication "
 "system for verification"
-msgstr "パスワードと追加コードは、検証のためにサードパーティの認証システムに送信されます"
+msgstr ""
+"パスワードと追加コードは、検証のためにサードパーティの認証システムに送信され"
+"ます"
 
 #: settings/serializers/security.py:122
 msgid "MFA in login page"
@@ -4057,7 +4126,8 @@ msgstr "ログインページのMFA"
 
 #: settings/serializers/security.py:123
 msgid "Eu security regulations(GDPR) require MFA to be on the login page"
-msgstr "Euセキュリティ規制 (GDPR) では、MFAがログインページにある必要があります"
+msgstr ""
+"Euセキュリティ規制 (GDPR) では、MFAがログインページにある必要があります"
 
 #: settings/serializers/security.py:126
 msgid "Enable Login captcha"
@@ -4075,7 +4145,9 @@ msgstr "ターミナルレジスタの有効化"
 msgid ""
 "Allow terminal register, after all terminal setup, you should disable this "
 "for security"
-msgstr "ターミナルレジスタを許可し、すべてのターミナルセットアップの後、セキュリティのためにこれを無効にする必要があります"
+msgstr ""
+"ターミナルレジスタを許可し、すべてのターミナルセットアップの後、セキュリティ"
+"のためにこれを無効にする必要があります"
 
 #: settings/serializers/security.py:153
 msgid "Enable watermark"
@@ -4127,7 +4199,8 @@ msgstr "セッション共有"
 
 #: settings/serializers/security.py:180
 msgid "Enabled, Allows user active session to be shared with other users"
-msgstr "ユーザーのアクティブなセッションを他のユーザーと共有できるようにします。"
+msgstr ""
+"ユーザーのアクティブなセッションを他のユーザーと共有できるようにします。"
 
 #: settings/serializers/security.py:183
 msgid "Remote Login Protection"
@@ -4138,7 +4211,10 @@ msgid ""
 "The system determines whether the login IP address belongs to a common login "
 "city. If the account is logged in from a common login city, the system sends "
 "a remote login reminder"
-msgstr "システムは、ログインIPアドレスが共通のログイン都市に属しているかどうかを判断します。アカウントが共通のログイン都市からログインしている場合、システムはリモートログインリマインダーを送信します"
+msgstr ""
+"システムは、ログインIPアドレスが共通のログイン都市に属しているかどうかを判断"
+"します。アカウントが共通のログイン都市からログインしている場合、システムはリ"
+"モートログインリマインダーを送信します"
 
 #: settings/serializers/terminal.py:13
 msgid "Auto"
@@ -4157,38 +4233,78 @@ msgid ""
 "Tips: If use other auth method, like AD/LDAP, you should disable this to "
 "avoid being able to log in after deleting"
 msgstr ""
-"ヒント: AD/LDAPなどの他の認証方法を使用する場合は、サードパーティ製システムの削除後にこの項目を無効にする必要があります, "
-"ログインも可能"
+"ヒント: AD/LDAPなどの他の認証方法を使用する場合は、サードパーティ製システムの"
+"削除後にこの項目を無効にする必要があります, ログインも可能"
 
-#: settings/serializers/terminal.py:25
+#: settings/serializers/terminal.py:26
 msgid "List sort by"
 msgstr "リストの並べ替え"
 
-#: settings/serializers/terminal.py:27
+#: settings/serializers/terminal.py:29
 msgid "List page size"
 msgstr "ページサイズを一覧表示"
 
-#: settings/serializers/terminal.py:29
+#: settings/serializers/terminal.py:32
 msgid "Telnet login regex"
 msgstr "Telnetログインregex"
 
-#: settings/serializers/terminal.py:30
+#: settings/serializers/terminal.py:33
 msgid ""
 "The login success message varies with devices. if you cannot log in to the "
 "device through Telnet, set this parameter"
-msgstr "ログイン成功メッセージはデバイスによって異なります。Telnet経由でデバイスにログインできない場合は、このパラメーターを設定します。"
+msgstr ""
+"ログイン成功メッセージはデバイスによって異なります。Telnet経由でデバイスにロ"
+"グインできない場合は、このパラメーターを設定します。"
 
-#: settings/serializers/terminal.py:34
+#: settings/serializers/terminal.py:37
 msgid "RDP address"
 msgstr "RDPアドレス"
 
-#: settings/serializers/terminal.py:35
+#: settings/serializers/terminal.py:38
 msgid "RDP visit address, eg: dev.jumpserver.org:3389"
 msgstr "RDP訪問先住所、例: dev.jumpserver.org:3389"
 
-#: settings/serializers/terminal.py:38
+#: settings/serializers/terminal.py:40
 msgid "Enable XRDP"
 msgstr "XRDPの有効化"
+
+#: settings/serializers/terminal.py:42
+msgid "Koko host"
+msgstr "KOKO ホストアドレス"
+
+#: settings/serializers/terminal.py:43
+msgid "Koko ssh port"
+msgstr "KOKO ssh ポート"
+
+#: settings/serializers/terminal.py:45
+msgid "Enable database proxy"
+msgstr "属性マップの有効化"
+
+#: settings/serializers/terminal.py:47
+#, fuzzy
+#| msgid "DatabaseApp"
+msgid "Database proxy host"
+msgstr "データベースの適用"
+
+#: settings/serializers/terminal.py:48
+msgid "Database proxy host, eg: dev.jumpserver.org"
+msgstr "RDP訪問先住所、例: dev.jumpserver.org:3389"
+
+#: settings/serializers/terminal.py:51
+msgid "MySQL port"
+msgstr "SMTPポート"
+
+#: settings/serializers/terminal.py:52
+msgid "Database proxy MySQL protocol port"
+msgstr ""
+
+#: settings/serializers/terminal.py:55
+msgid "PostgreSQL port"
+msgstr ""
+
+#: settings/serializers/terminal.py:56
+msgid "Database proxy PostgreSQL port"
+msgstr ""
 
 #: settings/utils/ldap.py:417
 msgid "ldap:// or ldaps:// protocol is used."
@@ -4305,7 +4421,9 @@ msgstr "インポート"
 
 #: templates/_csv_import_modal.html:12
 msgid "Download the imported template or use the exported CSV file format"
-msgstr "インポートしたテンプレートをダウンロードするか、エクスポートしたCSVファイル形式を使用する"
+msgstr ""
+"インポートしたテンプレートをダウンロードするか、エクスポートしたCSVファイル形"
+"式を使用する"
 
 #: templates/_csv_import_modal.html:13
 msgid "Download the import template"
@@ -4321,7 +4439,9 @@ msgstr "ファイルを選択してください"
 
 #: templates/_csv_update_modal.html:12
 msgid "Download the update template or use the exported CSV file format"
-msgstr "更新テンプレートをダウンロードするか、エクスポートしたCSVファイル形式を使用する"
+msgstr ""
+"更新テンプレートをダウンロードするか、エクスポートしたCSVファイル形式を使用す"
+"る"
 
 #: templates/_csv_update_modal.html:13
 msgid "Download the update template"
@@ -4339,24 +4459,24 @@ msgstr "ドキュメント"
 msgid "Commercial support"
 msgstr "商用サポート"
 
-#: templates/_header_bar.html:70 users/forms/profile.py:43
+#: templates/_header_bar.html:76 users/forms/profile.py:43
 #: users/templates/users/user_password_update.html:39
 msgid "Profile"
 msgstr "プロフィール"
 
-#: templates/_header_bar.html:73
+#: templates/_header_bar.html:79
 msgid "Admin page"
 msgstr "ページの管理"
 
-#: templates/_header_bar.html:75
+#: templates/_header_bar.html:81
 msgid "User page"
 msgstr "ユーザーページ"
 
-#: templates/_header_bar.html:78
+#: templates/_header_bar.html:84
 msgid "API Key"
 msgstr "API Key"
 
-#: templates/_header_bar.html:79
+#: templates/_header_bar.html:85
 msgid "Logout"
 msgstr "ログアウト"
 
@@ -4367,7 +4487,8 @@ msgid ""
 "            "
 msgstr ""
 "\n"
-"                アカウントが期限切れになったので、管理者に連絡してください。            "
+"                アカウントが期限切れになったので、管理者に連絡してくださ"
+"い。            "
 
 #: templates/_message.html:13
 msgid "Your account will at"
@@ -4386,8 +4507,8 @@ msgid ""
 "            "
 msgstr ""
 "\n"
-"                パスワードが期限切れになりましたので、クリックしてください <a href="
-"\"%(user_password_update_url)s\"> リンク </a> パスワードの更新\n"
+"                パスワードが期限切れになりましたので、クリックしてください "
+"<a href=\"%(user_password_update_url)s\"> リンク </a> パスワードの更新\n"
 "        "
 
 #: templates/_message.html:30
@@ -4403,8 +4524,8 @@ msgid ""
 "            "
 msgstr ""
 "\n"
-"                クリックしてください <a href=\"%(user_password_update_url)s\"> リンク </a> パ"
-"スワードの更新\n"
+"                クリックしてください <a href=\"%(user_password_update_url)s"
+"\"> リンク </a> パスワードの更新\n"
 "        "
 
 #: templates/_message.html:43
@@ -4416,8 +4537,8 @@ msgid ""
 "        "
 msgstr ""
 "\n"
-"                あなたの情報が不完全なので、クリックしてください。 <a href=\"%(first_login_url)s\"> リンク "
-"</a> 補完\n"
+"                あなたの情報が不完全なので、クリックしてください。 <a href="
+"\"%(first_login_url)s\"> リンク </a> 補完\n"
 "                "
 
 #: templates/_message.html:56
@@ -4502,7 +4623,9 @@ msgstr "アクティブなユーザー資産比率"
 msgid ""
 "The following graphs describe the percentage of active users per month and "
 "assets per user host per month, respectively."
-msgstr "次のグラフは、1か月あたりのアクティブユーザーの割合と、1か月あたりのユーザーホストあたりの資産の割合をそれぞれ示しています。"
+msgstr ""
+"次のグラフは、1か月あたりのアクティブユーザーの割合と、1か月あたりのユーザー"
+"ホストあたりの資産の割合をそれぞれ示しています。"
 
 #: templates/index.html:97 templates/index.html:112
 msgid "Top 10 assets in a week"
@@ -4621,7 +4744,9 @@ msgstr "クライアント"
 msgid ""
 "JumpServer Client, currently used to launch the client, now only support "
 "launch RDP client, The SSH client will next"
-msgstr "現在クライアントの起動に使用されているJumpServerクライアントは、RDPクライアントの起動のみをサポートしています。"
+msgstr ""
+"現在クライアントの起動に使用されているJumpServerクライアントは、RDPクライアン"
+"トの起動のみをサポートしています。"
 
 #: templates/resource_download.html:30
 msgid "Microsoft"
@@ -4635,7 +4760,9 @@ msgstr "公式"
 msgid ""
 "macOS needs to download the client to connect RDP asset, which comes with "
 "Windows"
-msgstr "MacOSは、Windowsに付属のRDPアセットを接続するためにクライアントをダウンロードする必要があります"
+msgstr ""
+"MacOSは、Windowsに付属のRDPアセットを接続するためにクライアントをダウンロード"
+"する必要があります"
 
 #: templates/resource_download.html:41
 msgid "Windows Remote application publisher tools"
@@ -4645,7 +4772,9 @@ msgstr "Windowsリモートアプリケーション発行者ツール"
 msgid ""
 "Jmservisor is the program used to pull up remote applications in Windows "
 "Remote Application publisher"
-msgstr "Jmservisorはwindowsリモートアプリケーションパブリケーションサーバでリモートアプリケーションを引き出すためのプログラムです"
+msgstr ""
+"Jmservisorはwindowsリモートアプリケーションパブリケーションサーバでリモートア"
+"プリケーションを引き出すためのプログラムです"
 
 #: templates/rest_framework/base.html:128
 msgid "Filters"
@@ -5005,7 +5134,7 @@ msgstr "エンドポイントが無効: パス '{}' を削除"
 msgid "Bucket"
 msgstr "バケット"
 
-#: terminal/serializers/storage.py:34 users/models/user.py:689
+#: terminal/serializers/storage.py:34 users/models/user.py:693
 msgid "Secret key"
 msgstr "秘密キー"
 
@@ -5063,7 +5192,7 @@ msgstr "証明書の検証を無視する"
 msgid "Load status"
 msgstr "ロードステータス"
 
-#: terminal/serializers/terminal.py:83 terminal/serializers/terminal.py:91
+#: terminal/serializers/terminal.py:81 terminal/serializers/terminal.py:89
 msgid "Not found"
 msgstr "見つかりません"
 
@@ -5167,7 +5296,9 @@ msgstr "適用期限が切れた"
 msgid ""
 "Created by the ticket, ticket title: {}, ticket applicant: {}, ticket "
 "processor: {}, ticket ID: {}"
-msgstr "チケットによって作成されたチケットタイトル: {}、チケット申請者: {}、チケット処理者: {}、チケットID: {}"
+msgstr ""
+"チケットによって作成されたチケットタイトル: {}、チケット申請者: {}、チケット"
+"処理者: {}、チケットID: {}"
 
 #: tickets/handler/apply_asset.py:50
 msgid "Applied node group"
@@ -5185,7 +5316,9 @@ msgstr "応用アクション"
 msgid ""
 "Created by the ticket ticket title: {} ticket applicant: {} ticket "
 "processor: {} ticket ID: {}"
-msgstr "チケットのタイトル: {} チケット申請者: {} チケットプロセッサ: {} チケットID: {}"
+msgstr ""
+"チケットのタイトル: {} チケット申請者: {} チケットプロセッサ: {} チケットID: "
+"{}"
 
 #: tickets/handler/base.py:88
 msgid "{} {} the ticket"
@@ -5476,7 +5609,9 @@ msgstr "ログイン日時"
 msgid ""
 "The `type` in the submission data (`{}`) is different from the type in the "
 "request url (`{}`)"
-msgstr "送信データ ('{}') の「タイプ」は、リクエストURL ('{}') のタイプとは異なります。"
+msgstr ""
+"送信データ ('{}') の「タイプ」は、リクエストURL ('{}') のタイプとは異なりま"
+"す。"
 
 #: tickets/serializers/ticket/ticket.py:116
 msgid "The ticket flow `{}` does not exist"
@@ -5541,8 +5676,8 @@ msgid ""
 "in. you can also directly bind in \"personal information -> quick "
 "modification -> change MFA Settings\"!"
 msgstr ""
-"有効にすると、次回のログイン時にマルチファクタ認証バインドプロセスに入ります。(個人情報->クイック"
-"修正->MFAマルチファクタ認証の設定)で直接バインド!"
+"有効にすると、次回のログイン時にマルチファクタ認証バインドプロセスに入りま"
+"す。(個人情報->クイック修正->MFAマルチファクタ認証の設定)で直接バインド!"
 
 #: users/forms/profile.py:60
 msgid "* Enable MFA to make the account more secure."
@@ -5553,7 +5688,9 @@ msgid ""
 "In order to protect you and your company, please keep your account, password "
 "and key sensitive information properly. (for example: setting complex "
 "password, enabling MFA)"
-msgstr "あなたとあなたの会社を保護するために、アカウント、パスワード、キーの機密情報を適切に保管してください。(例: 複雑なパスワードの設定、MFAの有効化)"
+msgstr ""
+"あなたとあなたの会社を保護するために、アカウント、パスワード、キーの機密情報"
+"を適切に保管してください。(例: 複雑なパスワードの設定、MFAの有効化)"
 
 #: users/forms/profile.py:76
 msgid "Finish"
@@ -5604,68 +5741,68 @@ msgstr "公開鍵は古いものと同じであってはなりません。"
 msgid "Not a valid ssh public key"
 msgstr "有効なssh公開鍵ではありません"
 
-#: users/forms/profile.py:160 users/models/user.py:686
+#: users/forms/profile.py:160 users/models/user.py:690
 #: users/templates/users/user_password_update.html:48
 msgid "Public key"
 msgstr "公開キー"
 
-#: users/models/user.py:552
+#: users/models/user.py:556
 msgid "Force enable"
 msgstr "強制有効"
 
-#: users/models/user.py:619
+#: users/models/user.py:623
 msgid "Local"
 msgstr "ローカル"
 
-#: users/models/user.py:667 users/serializers/user.py:138
+#: users/models/user.py:671 users/serializers/user.py:140
 msgid "Is service account"
 msgstr "サービスアカウントです"
 
-#: users/models/user.py:669
+#: users/models/user.py:673
 msgid "Avatar"
 msgstr "アバター"
 
-#: users/models/user.py:672
+#: users/models/user.py:676
 msgid "Wechat"
 msgstr "微信"
 
-#: users/models/user.py:683
+#: users/models/user.py:687
 msgid "Private key"
 msgstr "ssh秘密鍵"
 
-#: users/models/user.py:705
+#: users/models/user.py:709
 msgid "Source"
 msgstr "ソース"
 
-#: users/models/user.py:709
+#: users/models/user.py:713
 msgid "Date password last updated"
 msgstr "最終更新日パスワード"
 
-#: users/models/user.py:712
+#: users/models/user.py:716
 msgid "Need update password"
 msgstr "更新パスワードが必要"
 
-#: users/models/user.py:882
+#: users/models/user.py:886
 msgid "Can invite user"
 msgstr "ユーザーを招待できます"
 
-#: users/models/user.py:883
+#: users/models/user.py:887
 msgid "Can remove user"
 msgstr "ユーザーを削除できます"
 
-#: users/models/user.py:884
+#: users/models/user.py:888
 msgid "Can match user"
 msgstr "ユーザーに一致できます"
 
-#: users/models/user.py:893
+#: users/models/user.py:897
 msgid "Administrator"
 msgstr "管理者"
 
-#: users/models/user.py:896
+#: users/models/user.py:900
 msgid "Administrator is the super user of system"
 msgstr "管理者はシステムのスーパーユーザーです"
 
-#: users/models/user.py:921
+#: users/models/user.py:925
 msgid "User password history"
 msgstr "ユーザーパスワード履歴"
 
@@ -5716,7 +5853,7 @@ msgstr "新しいパスワードを最後の {} 個のパスワードにする�
 msgid "The newly set password is inconsistent"
 msgstr "新しく設定されたパスワードが一致しない"
 
-#: users/serializers/profile.py:142 users/serializers/user.py:136
+#: users/serializers/profile.py:142 users/serializers/user.py:138
 msgid "Is first login"
 msgstr "最初のログインです"
 
@@ -5728,85 +5865,85 @@ msgstr "システムの役割"
 msgid "Org roles"
 msgstr "組織ロール"
 
-#: users/serializers/user.py:75
+#: users/serializers/user.py:77
 #: xpack/plugins/change_auth_plan/models/base.py:35
 #: xpack/plugins/change_auth_plan/serializers/base.py:22
 msgid "Password strategy"
 msgstr "パスワード戦略"
 
-#: users/serializers/user.py:77
+#: users/serializers/user.py:79
 msgid "MFA enabled"
 msgstr "MFA有効化"
 
-#: users/serializers/user.py:78
+#: users/serializers/user.py:80
 msgid "MFA force enabled"
 msgstr "MFAフォース有効化"
 
-#: users/serializers/user.py:80
+#: users/serializers/user.py:82
 msgid "MFA level display"
 msgstr "MFAレベル表示"
 
-#: users/serializers/user.py:82
+#: users/serializers/user.py:84
 msgid "Login blocked"
 msgstr "ログインブロック"
 
-#: users/serializers/user.py:85
+#: users/serializers/user.py:87
 msgid "Can public key authentication"
 msgstr "公開鍵認証が可能"
 
-#: users/serializers/user.py:140
+#: users/serializers/user.py:142
 msgid "Avatar url"
 msgstr "アバターURL"
 
-#: users/serializers/user.py:142
+#: users/serializers/user.py:144
 msgid "Groups name"
 msgstr "グループ名"
 
-#: users/serializers/user.py:143
+#: users/serializers/user.py:145
 msgid "Source name"
 msgstr "ソース名"
 
-#: users/serializers/user.py:144
+#: users/serializers/user.py:146
 msgid "Organization role name"
 msgstr "組織の役割名"
 
-#: users/serializers/user.py:145
+#: users/serializers/user.py:147
 msgid "Super role name"
 msgstr "スーパーロール名"
 
-#: users/serializers/user.py:146
+#: users/serializers/user.py:148
 msgid "Total role name"
 msgstr "合計ロール名"
 
-#: users/serializers/user.py:148
+#: users/serializers/user.py:150
 msgid "Is wecom bound"
 msgstr "企業の微信をバインドしているかどうか"
 
-#: users/serializers/user.py:149
+#: users/serializers/user.py:151
 msgid "Is dingtalk bound"
 msgstr "ピンをバインドしているかどうか"
 
-#: users/serializers/user.py:150
+#: users/serializers/user.py:152
 msgid "Is feishu bound"
 msgstr "飛本を縛ったかどうか"
 
-#: users/serializers/user.py:151
+#: users/serializers/user.py:153
 msgid "Is OTP bound"
 msgstr "仮想MFAがバインドされているか"
 
-#: users/serializers/user.py:153
+#: users/serializers/user.py:155
 msgid "System role name"
 msgstr "システムロール名"
 
-#: users/serializers/user.py:245
+#: users/serializers/user.py:247
 msgid "Select users"
 msgstr "ユーザーの選択"
 
-#: users/serializers/user.py:246
+#: users/serializers/user.py:248
 msgid "For security, only list several users"
 msgstr "セキュリティのために、複数のユーザーのみをリストします"
 
-#: users/serializers/user.py:279
+#: users/serializers/user.py:281
 msgid "name not unique"
 msgstr "名前が一意ではない"
 
@@ -5822,7 +5959,8 @@ msgstr "アカウントの有効期限は"
 msgid ""
 "In order not to affect your normal work, please contact the administrator "
 "for confirmation."
-msgstr "通常の作業に影響を与えないように、確認のために管理者に連絡してください。"
+msgstr ""
+"通常の作業に影響を与えないように、確認のために管理者に連絡してください。"
 
 #: users/templates/users/_msg_password_expire_reminder.html:7
 msgid "Your password will expire in"
@@ -5832,7 +5970,9 @@ msgstr "パスワードは"
 msgid ""
 "For your account security, please click on the link below to update your "
 "password in time"
-msgstr "アカウントのセキュリティについては、下のリンクをクリックしてパスワードを時間内に更新してください"
+msgstr ""
+"アカウントのセキュリティについては、下のリンクをクリックしてパスワードを時間"
+"内に更新してください"
 
 #: users/templates/users/_msg_password_expire_reminder.html:11
 msgid "Click here update password"
@@ -5840,7 +5980,8 @@ msgstr "ここをクリック更新パスワード"
 
 #: users/templates/users/_msg_password_expire_reminder.html:16
 msgid "If your password has expired, please click the link below to"
-msgstr "パスワードの有効期限が切れている場合は、以下のリンクをクリックしてください"
+msgstr ""
+"パスワードの有効期限が切れている場合は、以下のリンクをクリックしてください"
 
 #: users/templates/users/_msg_reset_mfa.html:7
 msgid "Your MFA has been reset by site administrator"
@@ -6017,7 +6158,9 @@ msgstr "ワンタイムパスワード認証子のバインド"
 msgid ""
 "Use the MFA Authenticator application to scan the following qr code for a 6-"
 "bit verification code"
-msgstr "MFA Authenticatorアプリケーションを使用して、次のqrコードを6ビット検証コードでスキャンします。"
+msgstr ""
+"MFA Authenticatorアプリケーションを使用して、次のqrコードを6ビット検証コード"
+"でスキャンします。"
 
 #: users/templates/users/user_otp_enable_bind.html:22
 #: users/templates/users/user_verify_mfa.html:27
@@ -6032,7 +6175,9 @@ msgstr "アプリのインストール"
 msgid ""
 "Download and install the MFA Authenticator application on your phone or "
 "applet of WeChat"
-msgstr "携帯電話またはWeChatのアプレットにMFA Authenticatorアプリケーションをダウンロードしてインストールします"
+msgstr ""
+"携帯電話またはWeChatのアプレットにMFA Authenticatorアプリケーションをダウン"
+"ロードしてインストールします"
 
 #: users/templates/users/user_otp_enable_install_app.html:18
 msgid "Android downloads"
@@ -6046,7 +6191,9 @@ msgstr "IPhoneのダウンロード"
 msgid ""
 "After installation, click the next step to enter the binding page (if "
 "installed, go to the next step directly)."
-msgstr "インストール後、次のステップをクリックしてバインディングページに入ります (インストールされている場合は、次のステップに直接進みます)。"
+msgstr ""
+"インストール後、次のステップをクリックしてバインディングページに入ります (イ"
+"ンストールされている場合は、次のステップに直接進みます)。"
 
 #: users/templates/users/user_password_update.html:74
 msgid "Reset"
@@ -6065,7 +6212,8 @@ msgstr "認証"
 msgid ""
 "The account protection has been opened, please complete the following "
 "operations according to the prompts"
-msgstr "アカウント保護が開始されました。プロンプトに従って次の操作を完了してください"
+msgstr ""
+"アカウント保護が開始されました。プロンプトに従って次の操作を完了してください"
 
 #: users/templates/users/user_verify_mfa.html:17
 msgid "Open MFA Authenticator and enter the 6-bit dynamic code"
@@ -6077,7 +6225,8 @@ msgstr "すでにバインド済み"
 
 #: users/views/profile/otp.py:88
 msgid "MFA already bound, disable first, then bound"
-msgstr "MFAはすでにバインドされており、最初に無効にしてからバインドされています。"
+msgstr ""
+"MFAはすでにバインドされており、最初に無効にしてからバインドされています。"
 
 #: users/views/profile/otp.py:115
 msgid "OTP enable success"
@@ -6109,7 +6258,9 @@ msgstr "リセットパスワードメッセージを送信"
 
 #: users/views/profile/reset.py:41
 msgid "Send reset password mail success, login your mail box and follow it "
-msgstr "リセットパスワードメールの成功を送信し、メールボックスにログインしてそれに従う"
+msgstr ""
+"リセットパスワードメールの成功を送信し、メールボックスにログインしてそれに従"
+"う"
 
 #: users/views/profile/reset.py:52
 msgid "Email address invalid, please input again"
@@ -6119,7 +6270,9 @@ msgstr "メールアドレスが無効です。再度入力してください"
 msgid ""
 "The user is from {}, please go to the corresponding system to change the "
 "password"
-msgstr "ユーザーは {}からです。対応するシステムにアクセスしてパスワードを変更してください。"
+msgstr ""
+"ユーザーは {}からです。対応するシステムにアクセスしてパスワードを変更してくだ"
+"さい。"
 
 #: users/views/profile/reset.py:84 users/views/profile/reset.py:95
 msgid "Token invalid or expired"
@@ -6280,7 +6433,9 @@ msgid ""
 "{} - The encryption change task has been completed: the encryption password "
 "has not been set - please go to personal information -> file encryption "
 "password to set the encryption password"
-msgstr "{} -暗号化変更タスクが完了しました: 暗号化パスワードが設定されていません-個人情報にアクセスしてください-> ファイル暗号化パスワードを設定してください"
+msgstr ""
+"{} -暗号化変更タスクが完了しました: 暗号化パスワードが設定されていません-個人"
+"情報にアクセスしてください-> ファイル暗号化パスワードを設定してください"
 
 #: xpack/plugins/change_auth_plan/serializers/asset.py:32
 msgid "Change Password"
@@ -6728,8 +6883,9 @@ msgid ""
 "created asset. <br>The default * indicates a random match. <br>Format for "
 "comma-delimited string, Such as: 192.168.1.0/24, 10.1.1.1-10.1.1.20"
 msgstr ""
-"最初に一致するIPアドレスは、作成された資産のIPとして使用されます。<br>デフォルト*はランダムマッチングを表します。"
-"<br> カンマで区切られた文字列で書式設定，たとえば:192.168.1.0/24,10.1.1.1-10.1.1.20"
+"最初に一致するIPアドレスは、作成された資産のIPとして使用されます。<br>デフォ"
+"ルト*はランダムマッチングを表します。<br> カンマで区切られた文字列で書式設"
+"定，たとえば:192.168.1.0/24,10.1.1.1-10.1.1.20"
 
 #: xpack/plugins/cloud/serializers/task.py:35
 msgid "History count"
