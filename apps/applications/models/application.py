@@ -20,6 +20,7 @@ class ApplicationTreeNodeMixin:
     name: str
     type: str
     category: str
+    attrs: dict
 
     @staticmethod
     def create_tree_id(pid, type, v):
@@ -173,12 +174,17 @@ class ApplicationTreeNodeMixin:
         pid = self.create_tree_id(pid, 'type', self.type)
         return pid
 
-    def as_tree_node(self, pid, is_luna=False):
-        if is_luna and self.type == const.AppType.k8s:
+    def as_tree_node(self, pid, k8s_as_tree=False):
+        if self.type == const.AppType.k8s and k8s_as_tree:
             node = KubernetesTree(pid).as_tree_node(self)
         else:
             node = self._as_tree_node(pid)
         return node
+
+    def _attrs_to_tree(self):
+        if self.category == const.AppCategory.db:
+            return {'database': self.attrs.get('database')}
+        return {}
 
     def _as_tree_node(self, pid):
         icon_skin_category_mapper = {
@@ -201,6 +207,7 @@ class ApplicationTreeNodeMixin:
                 'data': {
                     'category': self.category,
                     'type': self.type,
+                    'attrs': self._attrs_to_tree()
                 }
             }
         })
