@@ -311,6 +311,8 @@ class Config(dict):
         'TERMINAL_COMMAND_STORAGE': {},
         'TERMINAL_RDP_ADDR': lambda: urlparse(settings.SITE_URL).hostname + ':3389',
         'XRDP_ENABLED': True,
+        'TERMINAL_KOKO_HOST': lambda: urlparse(settings.SITE_URL).hostname,
+        'TERMINAL_KOKO_SSH_PORT': 2222,
 
         'TERMINAL_MAGNUS_ENABLED': True,
         'TERMINAL_MAGNUS_HOST': lambda: urlparse(settings.SITE_URL).hostname,

@@ -64,6 +64,8 @@ class PublicSettingApi(generics.RetrieveAPIView):
                 "AUTH_FEISHU": settings.AUTH_FEISHU,
                 # Terminal
                 "XRDP_ENABLED": settings.XRDP_ENABLED,
+                "TERMINAL_KOKO_HOST": settings.TERMINAL_KOKO_HOST,
+                "TERMINAL_KOKO_SSH_PORT": settings.TERMINAL_KOKO_SSH_PORT,
                 "TERMINAL_MAGNUS_ENABLED": settings.TERMINAL_MAGNUS_ENABLED,
                 "TERMINAL_MAGNUS_HOST": settings.TERMINAL_MAGNUS_HOST,
                 "TERMINAL_MAGNUS_MYSQL_PORT": settings.TERMINAL_MAGNUS_MYSQL_PORT,

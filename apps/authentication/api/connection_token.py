@@ -159,6 +159,25 @@ class ClientProtocolMixin:
             content += f'{k}:{v}\n'
         return name, content
 
+    def get_ssh_token(self, serializer):
+        asset, application, system_user, user = self.get_request_resource(serializer)
+        token, secret = self.create_token(user, asset, application, system_user)
+        if asset:
+            name = asset.hostname
+        elif application:
+            name = application.name
+        else:
+            name = '*'
+
+        content = {
+            'ip': settings.TERMINAL_KOKO_HOST,
+            'port': str(settings.TERMINAL_KOKO_SSH_PORT),
+            'username': f'JMS-{token}',
+            'password': secret
+        }
+        token = json.dumps(content)
+        return name, token
+
     def get_encrypt_cmdline(self, app: Application):
         parameters = app.get_rdp_remote_app_setting()['parameters']
         parameters = parameters.encode('ascii')
@@ -200,13 +219,11 @@ class ClientProtocolMixin:
         asset, application, system_user, user = self.get_request_resource(serializer)
         protocol = system_user.protocol
         username = user.username
-
+        config, token = '', ''
         if protocol == 'rdp':
             name, config = self.get_rdp_file_content(serializer)
         elif protocol == 'ssh':
-            # Todo:
-            name = ''
-            config = 'ssh://system_user@asset@user@jumpserver-ssh'
+            name, token = self.get_ssh_token(serializer)
         else:
             raise ValueError('Protocol not support: {}'.format(protocol))
 
@@ -215,6 +232,7 @@ class ClientProtocolMixin:
             "filename": filename,
             "protocol": system_user.protocol,
             "username": username,
+            "token": token,
             "config": config
         }
         return data
