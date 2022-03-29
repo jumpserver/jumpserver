@@ -7,15 +7,11 @@ from common.tree import TreeNode
 from orgs.models import Organization
 from assets.models import SystemUser
 from applications.utils import KubernetesTree
+from applications.models import Application
 from perms.utils.application.permission import get_application_system_user_ids
 
-from ..models import Application
 
-__all__ = ['SerializeApplicationToTreeNodeMixin']
-
-
-class SerializeApplicationToTreeNodeMixin:
-
+class GrantedAppTreeUtil:
     @staticmethod
     def filter_organizations(applications):
         organization_ids = set(applications.values_list('org_id', flat=True))
@@ -61,7 +57,7 @@ class SerializeApplicationToTreeNodeMixin:
         tree_nodes = KubernetesTree(tree_id).async_tree_node(parent_info)
         return tree_nodes
 
-    def serialize_applications_with_org(self, applications):
+    def create_tree_nodes(self, applications):
         tree_nodes = []
         if not applications:
             return tree_nodes

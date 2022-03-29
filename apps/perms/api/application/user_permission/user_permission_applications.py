@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 #
+from typing import Callable
+
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 
 from common.mixins.api import CommonApiMixin
 from common.tree import TreeNodeSerializer
-from applications.api.mixin import (
-    SerializeApplicationToTreeNodeMixin
-)
 from perms import serializers
-from .mixin import AppRoleAdminMixin, AppRoleUserMixin
+from perms.tree.app import GrantedAppTreeUtil
 from perms.utils.application.user_permission import (
     get_user_granted_all_applications
 )
+from .mixin import AppRoleAdminMixin, AppRoleUserMixin
 
 
 __all__ = [
@@ -23,7 +23,7 @@ __all__ = [
 ]
 
 
-class AllGrantedApplicationsMixin(CommonApiMixin, ListAPIView):
+class AllGrantedApplicationsApi(CommonApiMixin, ListAPIView):
     only_fields = serializers.AppGrantedSerializer.Meta.only_fields
     serializer_class = serializers.AppGrantedSerializer
     filterset_fields = {
@@ -41,28 +41,34 @@ class AllGrantedApplicationsMixin(CommonApiMixin, ListAPIView):
         return queryset.only(*self.only_fields)
 
 
-class UserAllGrantedApplicationsApi(AppRoleAdminMixin, AllGrantedApplicationsMixin):
+class UserAllGrantedApplicationsApi(AppRoleAdminMixin, AllGrantedApplicationsApi):
     pass
 
 
-class MyAllGrantedApplicationsApi(AppRoleUserMixin, AllGrantedApplicationsMixin):
+class MyAllGrantedApplicationsApi(AppRoleUserMixin, AllGrantedApplicationsApi):
     pass
 
 
-class ApplicationsAsTreeMixin(SerializeApplicationToTreeNodeMixin):
+class ApplicationsAsTreeMixin:
     """
     将应用序列化成树的结构返回
     """
     serializer_class = TreeNodeSerializer
     user: None
+    filter_queryset: Callable
+    get_queryset: Callable
+    get_serializer: Callable
 
     def list(self, request, *args, **kwargs):
         tree_id = request.query_params.get('tree_id', None)
         parent_info = request.query_params.get('parentInfo', None)
         queryset = self.filter_queryset(self.get_queryset())
-        tree_nodes = self.serialize_applications_with_org(
-            queryset, tree_id, parent_info, self.user
-        )
+        util = GrantedAppTreeUtil()
+
+        if not tree_id:
+            tree_nodes = util.create_tree_nodes(queryset)
+        else:
+            tree_nodes = util.get_children_nodes(tree_id, parent_info, self.user)
         serializer = self.get_serializer(tree_nodes, many=True)
         return Response(data=serializer.data)
 

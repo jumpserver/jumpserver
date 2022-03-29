@@ -145,7 +145,6 @@ class ApplicationTreeNodeMixin:
             pid, counts, show_empty=show_empty,
             show_count=show_count
         )
-
         return tree_nodes
 
     @classmethod
@@ -183,7 +182,7 @@ class ApplicationTreeNodeMixin:
 
     def _attrs_to_tree(self):
         if self.category == const.AppCategory.db:
-            return {'database': self.attrs.get('database')}
+            return self.attrs
         return {}
 
     def _as_tree_node(self, pid):
