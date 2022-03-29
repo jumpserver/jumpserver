@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-29 12:58+0800\n"
+"POT-Creation-Date: 2022-03-29 18:26+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -22,7 +22,7 @@ msgid "Acls"
 msgstr "访问控制"
 
 #: acls/models/base.py:25 acls/serializers/login_asset_acl.py:47
-#: applications/models/application.py:211 assets/models/asset.py:138
+#: applications/models/application.py:217 assets/models/asset.py:138
 #: assets/models/base.py:175 assets/models/cluster.py:18
 #: assets/models/cmd_filter.py:27 assets/models/domain.py:23
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
@@ -56,7 +56,7 @@ msgstr "优先级可选范围为 1-100 (数值越小越优先)"
 msgid "Active"
 msgstr "激活中"
 
-#: acls/models/base.py:32 applications/models/application.py:224
+#: acls/models/base.py:32 applications/models/application.py:230
 #: assets/models/asset.py:143 assets/models/asset.py:231
 #: assets/models/backup.py:54 assets/models/base.py:180
 #: assets/models/cluster.py:29 assets/models/cmd_filter.py:48
@@ -135,7 +135,7 @@ msgstr "系统用户"
 
 #: acls/models/login_asset_acl.py:22
 #: applications/serializers/attrs/application_category/remote_app.py:36
-#: assets/models/asset.py:355 assets/models/authbook.py:19
+#: assets/models/asset.py:383 assets/models/authbook.py:19
 #: assets/models/backup.py:31 assets/models/cmd_filter.py:38
 #: assets/models/gathered_user.py:14 assets/serializers/label.py:30
 #: assets/serializers/system_user.py:264 audits/models.py:39
@@ -251,11 +251,7 @@ msgstr ""
 msgid "Time Period"
 msgstr "时段"
 
-#: applications/api/mixin.py:28
-msgid "My applications"
-msgstr "我的应用"
-
-#: applications/apps.py:9 applications/models/application.py:62
+#: applications/apps.py:9 applications/models/application.py:63
 msgid "Applications"
 msgstr "应用管理"
 
@@ -274,7 +270,7 @@ msgstr "远程应用"
 msgid "Custom"
 msgstr "自定义"
 
-#: applications/models/account.py:12 applications/models/application.py:228
+#: applications/models/account.py:12 applications/models/application.py:234
 #: assets/models/backup.py:32 assets/models/cmd_filter.py:45
 #: perms/models/application_permission.py:28
 msgid "Application"
@@ -298,7 +294,7 @@ msgid "System user"
 msgstr "系统用户"
 
 #: applications/models/account.py:17 assets/models/authbook.py:21
-#: settings/serializers/auth/cas.py:15
+#: settings/serializers/auth/cas.py:18
 msgid "Version"
 msgstr "版本"
 
@@ -314,7 +310,7 @@ msgstr "可以查看应用账号密码"
 msgid "Can change application account secret"
 msgstr "可以查看应用账号密码"
 
-#: applications/models/application.py:213
+#: applications/models/application.py:219
 #: applications/serializers/application.py:99 assets/models/label.py:21
 #: perms/models/application_permission.py:21
 #: perms/serializers/application/user_permission.py:33
@@ -323,7 +319,7 @@ msgstr "可以查看应用账号密码"
 msgid "Category"
 msgstr "类别"
 
-#: applications/models/application.py:216
+#: applications/models/application.py:222
 #: applications/serializers/application.py:101 assets/models/backup.py:49
 #: assets/models/cmd_filter.py:82 assets/models/user.py:246
 #: perms/models/application_permission.py:24
@@ -336,21 +332,21 @@ msgstr "类别"
 msgid "Type"
 msgstr "类型"
 
-#: applications/models/application.py:220 assets/models/asset.py:217
+#: applications/models/application.py:226 assets/models/asset.py:217
 #: assets/models/domain.py:29 assets/models/domain.py:63
 msgid "Domain"
 msgstr "网域"
 
-#: applications/models/application.py:222 xpack/plugins/cloud/models.py:33
+#: applications/models/application.py:228 xpack/plugins/cloud/models.py:33
 #: xpack/plugins/cloud/serializers/account.py:58
 msgid "Attrs"
 msgstr "属性"
 
-#: applications/models/application.py:232
+#: applications/models/application.py:238
 msgid "Can match application"
 msgstr "匹配应用"
 
-#: applications/models/application.py:280
+#: applications/models/application.py:286
 msgid "Application user"
 msgstr "应用用户"
 
@@ -638,27 +634,27 @@ msgstr "标签管理"
 msgid "Created by"
 msgstr "创建者"
 
-#: assets/models/asset.py:358
+#: assets/models/asset.py:386
 msgid "Can refresh asset hardware info"
 msgstr "可以更新资产硬件信息"
 
-#: assets/models/asset.py:359
+#: assets/models/asset.py:387
 msgid "Can test asset connectivity"
 msgstr "可以测试资产连接性"
 
-#: assets/models/asset.py:360
+#: assets/models/asset.py:388
 msgid "Can push system user to asset"
 msgstr "可以推送系统用户到资产"
 
-#: assets/models/asset.py:361
+#: assets/models/asset.py:389
 msgid "Can match asset"
 msgstr "可以匹配资产"
 
-#: assets/models/asset.py:362
+#: assets/models/asset.py:390
 msgid "Add asset to node"
 msgstr "添加资产到节点"
 
-#: assets/models/asset.py:363
+#: assets/models/asset.py:391
 msgid "Move asset to node"
 msgstr "移动资产到节点"
 
@@ -1045,7 +1041,7 @@ msgstr "SFTP根路径"
 
 #: assets/models/user.py:254 authentication/models.py:48
 msgid "Token"
-msgstr ""
+msgstr "Token"
 
 #: assets/models/user.py:255
 msgid "Home"
@@ -1479,7 +1475,7 @@ msgstr "启用"
 
 #: audits/models.py:111
 msgid "-"
-msgstr ""
+msgstr "-"
 
 #: audits/models.py:120
 msgid "Login type"
@@ -1572,19 +1568,19 @@ msgstr "SSH 密钥"
 
 #: audits/signal_handlers.py:69
 msgid "SSO"
-msgstr ""
+msgstr "SSO"
 
 #: audits/signal_handlers.py:70
 msgid "Auth Token"
 msgstr "认证令牌"
 
 #: audits/signal_handlers.py:71 authentication/notifications.py:73
-#: authentication/views/login.py:164 authentication/views/wecom.py:158
+#: authentication/views/login.py:164 authentication/views/wecom.py:181
 #: notifications/backends/__init__.py:11 users/models/user.py:718
 msgid "WeCom"
 msgstr "企业微信"
 
-#: audits/signal_handlers.py:72 authentication/views/dingtalk.py:160
+#: audits/signal_handlers.py:72 authentication/views/dingtalk.py:182
 #: authentication/views/login.py:170 notifications/backends/__init__.py:12
 #: users/models/user.py:719
 msgid "DingTalk"
@@ -1777,21 +1773,21 @@ msgstr "认证"
 
 #: authentication/backends/drf.py:56
 msgid "Invalid signature header. No credentials provided."
-msgstr ""
+msgstr "不合法的签名头"
 
 #: authentication/backends/drf.py:59
 msgid "Invalid signature header. Signature string should not contain spaces."
-msgstr ""
+msgstr "不合法的签名头"
 
 #: authentication/backends/drf.py:66
 msgid "Invalid signature header. Format like AccessKeyId:Signature"
-msgstr ""
+msgstr "不合法的签名头"
 
 #: authentication/backends/drf.py:70
 msgid ""
 "Invalid signature header. Signature string should not contain invalid "
 "characters."
-msgstr ""
+msgstr "不合法的签名头"
 
 #: authentication/backends/drf.py:90 authentication/backends/drf.py:106
 msgid "Invalid signature."
@@ -1799,7 +1795,7 @@ msgstr "签名无效"
 
 #: authentication/backends/drf.py:97
 msgid "HTTP header: Date not provide or not %a, %d %b %Y %H:%M:%S GMT"
-msgstr ""
+msgstr "HTTP header not valid"
 
 #: authentication/backends/drf.py:102
 msgid "Expired, more than 15 minutes"
@@ -2062,7 +2058,7 @@ msgstr "过期时间"
 
 #: authentication/models.py:53
 msgid "SSO token"
-msgstr ""
+msgstr "SSO token"
 
 #: authentication/models.py:61
 msgid "Connection token"
@@ -2319,40 +2315,40 @@ msgid ""
 "The system configuration is incorrect. Please contact your administrator"
 msgstr "企业配置错误，请联系系统管理员"
 
-#: authentication/views/dingtalk.py:92
+#: authentication/views/dingtalk.py:78
 msgid "DingTalk is already bound"
 msgstr "钉钉已经绑定"
 
-#: authentication/views/dingtalk.py:105 authentication/views/feishu.py:99
-#: authentication/views/wecom.py:104
+#: authentication/views/dingtalk.py:127 authentication/views/feishu.py:99
+#: authentication/views/wecom.py:127
 msgid "Please verify your password first"
 msgstr "请检查密码"
 
-#: authentication/views/dingtalk.py:129 authentication/views/wecom.py:128
+#: authentication/views/dingtalk.py:151 authentication/views/wecom.py:151
 msgid "Invalid user_id"
 msgstr "无效的 user_id"
 
-#: authentication/views/dingtalk.py:145
+#: authentication/views/dingtalk.py:167
 msgid "DingTalk query user failed"
 msgstr "钉钉查询用户失败"
 
-#: authentication/views/dingtalk.py:154
+#: authentication/views/dingtalk.py:176
 msgid "The DingTalk is already bound to another user"
 msgstr "该钉钉已经绑定其他用户"
 
-#: authentication/views/dingtalk.py:161
+#: authentication/views/dingtalk.py:183
 msgid "Binding DingTalk successfully"
 msgstr "绑定 钉钉 成功"
 
-#: authentication/views/dingtalk.py:213
+#: authentication/views/dingtalk.py:235 authentication/views/dingtalk.py:289
 msgid "Failed to get user from DingTalk"
 msgstr "从钉钉获取用户失败"
 
-#: authentication/views/dingtalk.py:219
+#: authentication/views/dingtalk.py:241 authentication/views/dingtalk.py:295
 msgid "DingTalk is not bound"
 msgstr "钉钉没有绑定"
 
-#: authentication/views/dingtalk.py:220
+#: authentication/views/dingtalk.py:242 authentication/views/dingtalk.py:296
 msgid "Please login with a password and then bind the DingTalk"
 msgstr "请使用密码登录，然后绑定钉钉"
 
@@ -2433,31 +2429,31 @@ msgstr "企业微信错误，请联系系统管理员"
 msgid "WeCom Error"
 msgstr "企业微信错误"
 
-#: authentication/views/wecom.py:91
+#: authentication/views/wecom.py:78
 msgid "WeCom is already bound"
 msgstr "企业微信已经绑定"
 
-#: authentication/views/wecom.py:143
+#: authentication/views/wecom.py:166
 msgid "WeCom query user failed"
 msgstr "企业微信查询用户失败"
 
-#: authentication/views/wecom.py:152
+#: authentication/views/wecom.py:175
 msgid "The WeCom is already bound to another user"
 msgstr "该企业微信已经绑定其他用户"
 
-#: authentication/views/wecom.py:159
+#: authentication/views/wecom.py:182
 msgid "Binding WeCom successfully"
 msgstr "绑定 企业微信 成功"
 
-#: authentication/views/wecom.py:208
+#: authentication/views/wecom.py:231 authentication/views/wecom.py:285
 msgid "Failed to get user from WeCom"
 msgstr "从企业微信获取用户失败"
 
-#: authentication/views/wecom.py:214
+#: authentication/views/wecom.py:237 authentication/views/wecom.py:291
 msgid "WeCom is not bound"
 msgstr "没有绑定企业微信"
 
-#: authentication/views/wecom.py:215
+#: authentication/views/wecom.py:238 authentication/views/wecom.py:292
 msgid "Please login with a password and then bind the WeCom"
 msgstr "请使用密码登录，然后绑定企业微信"
 
@@ -2473,7 +2469,7 @@ msgstr "%(name)s 更新成功"
 
 #: common/db/encoder.py:17
 msgid "ugettext_lazy"
-msgstr ""
+msgstr "ugettext_lazy"
 
 #: common/db/models.py:112
 msgid "Updated by"
@@ -3094,6 +3090,10 @@ msgstr ""
 msgid "If you have any question, please contact the administrator"
 msgstr "如果有疑问或需求，请联系系统管理员"
 
+#: perms/tree/app.py:24
+msgid "My applications"
+msgstr "我的应用"
+
 #: rbac/api/role.py:32
 msgid "Internal role, can't be destroy"
 msgstr "内部角色，不能删除"
@@ -3430,35 +3430,35 @@ msgstr "忘记密码 URL"
 msgid "Enable login redirect msg"
 msgstr "启用登录跳转提示"
 
-#: settings/serializers/auth/cas.py:11
+#: settings/serializers/auth/cas.py:10
 msgid "Enable CAS Auth"
 msgstr "启用 CAS 认证"
 
-#: settings/serializers/auth/cas.py:12 settings/serializers/auth/oidc.py:32
+#: settings/serializers/auth/cas.py:11 settings/serializers/auth/oidc.py:32
 msgid "Server url"
 msgstr "服务端地址"
 
-#: settings/serializers/auth/cas.py:13
+#: settings/serializers/auth/cas.py:14
 msgid "Proxy server url"
 msgstr "回调地址"
 
-#: settings/serializers/auth/cas.py:14 settings/serializers/auth/saml2.py:32
+#: settings/serializers/auth/cas.py:16 settings/serializers/auth/saml2.py:32
 msgid "Logout completely"
 msgstr "同步注销"
 
-#: settings/serializers/auth/cas.py:16
+#: settings/serializers/auth/cas.py:21
 msgid "Username attr"
 msgstr "用户名属性"
 
-#: settings/serializers/auth/cas.py:17
+#: settings/serializers/auth/cas.py:24
 msgid "Enable attributes map"
 msgstr "启用属性映射"
 
-#: settings/serializers/auth/cas.py:18 settings/serializers/auth/saml2.py:31
+#: settings/serializers/auth/cas.py:26 settings/serializers/auth/saml2.py:31
 msgid "Rename attr"
 msgstr "映射属性"
 
-#: settings/serializers/auth/cas.py:19
+#: settings/serializers/auth/cas.py:27
 msgid "Create user if not"
 msgstr "创建用户(如果不存在)"
 
@@ -4231,16 +4231,24 @@ msgid "MySQL port"
 msgstr "MySQL 协议端口"
 
 #: settings/serializers/terminal.py:52
-msgid "Database proxy MySQL protocol port"
-msgstr "数据库组件 MySQL 协议监听的端口"
+msgid "MySQL protocol listen port"
+msgstr "MySQL 协议监听端口"
 
 #: settings/serializers/terminal.py:55
+msgid "MariaDB port"
+msgstr "MariaDB 端口"
+
+#: settings/serializers/terminal.py:56
+msgid "MariaDB protocol listen port"
+msgstr "MariaDB 协议监听的端口"
+
+#: settings/serializers/terminal.py:59
 msgid "PostgreSQL port"
 msgstr "PostgreSQL 端口"
 
-#: settings/serializers/terminal.py:56
-msgid "Database proxy PostgreSQL port"
-msgstr "数据库组件 PostgreSQL 协议监听的端口"
+#: settings/serializers/terminal.py:60
+msgid "PostgreSQL protocol listen port"
+msgstr "PostgreSQL 协议监听端口"
 
 #: settings/utils/ldap.py:417
 msgid "ldap:// or ldaps:// protocol is used."
@@ -4981,7 +4989,7 @@ msgstr "参数"
 
 #: terminal/models/task.py:18
 msgid "Kwargs"
-msgstr ""
+msgstr "其它参数"
 
 #: terminal/models/terminal.py:103
 msgid "type"
@@ -5647,7 +5655,7 @@ msgstr "SSH公钥"
 
 #: users/forms/profile.py:131
 msgid "ssh-rsa AAAA..."
-msgstr ""
+msgstr "ssh-rsa AAAA..."
 
 #: users/forms/profile.py:132
 msgid "Paste your id_rsa.pub here."
@@ -6204,7 +6212,7 @@ msgstr "重置密码成功，返回到登录页面"
 
 #: xpack/apps.py:8
 msgid "XPACK"
-msgstr ""
+msgstr "XPack"
 
 #: xpack/plugins/change_auth_plan/api/app.py:112
 #: xpack/plugins/change_auth_plan/api/asset.py:95
@@ -6423,11 +6431,11 @@ msgstr "腾讯云"
 
 #: xpack/plugins/cloud/const.py:16
 msgid "VMware"
-msgstr ""
+msgstr "VMware"
 
 #: xpack/plugins/cloud/const.py:17 xpack/plugins/cloud/providers/nutanix.py:13
 msgid "Nutanix"
-msgstr ""
+msgstr "Nutanix"
 
 #: xpack/plugins/cloud/const.py:18
 msgid "Huawei Private Cloud"
@@ -6742,11 +6750,11 @@ msgstr "服务商显示"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:13
 msgid "AccessKey ID"
-msgstr ""
+msgstr "Access key ID"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:16
 msgid "AccessKey Secret"
-msgstr ""
+msgstr "Access key secret"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:31
 msgid "Client ID"
@@ -6771,7 +6779,7 @@ msgstr "认证地址"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:103
 msgid "eg: http://openstack.example.com:5000/v3"
-msgstr ""
+msgstr "如: http://openstack.example.com:5000/v3"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:106
 msgid "User domain"
@@ -6898,3 +6906,11 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Database proxy MySQL protocol listen port"
+#~ msgstr "MySQL 协议监听的端口"
+
+#, fuzzy
+#~| msgid "Database proxy PostgreSQL port"
+#~ msgid "Database proxy PostgreSQL listen port"
+#~ msgstr "数据库组件 PostgreSQL 协议监听的端口"

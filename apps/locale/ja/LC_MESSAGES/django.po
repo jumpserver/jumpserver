@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-29 12:58+0800\n"
+"POT-Creation-Date: 2022-03-29 18:26+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,7 +23,7 @@ msgid "Acls"
 msgstr "Acls"
 
 #: acls/models/base.py:25 acls/serializers/login_asset_acl.py:47
-#: applications/models/application.py:211 assets/models/asset.py:138
+#: applications/models/application.py:217 assets/models/asset.py:138
 #: assets/models/base.py:175 assets/models/cluster.py:18
 #: assets/models/cmd_filter.py:27 assets/models/domain.py:23
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
@@ -57,7 +57,7 @@ msgstr "1-100、低い値は最初に一致します"
 msgid "Active"
 msgstr "アクティブ"
 
-#: acls/models/base.py:32 applications/models/application.py:224
+#: acls/models/base.py:32 applications/models/application.py:230
 #: assets/models/asset.py:143 assets/models/asset.py:231
 #: assets/models/backup.py:54 assets/models/base.py:180
 #: assets/models/cluster.py:29 assets/models/cmd_filter.py:48
@@ -136,7 +136,7 @@ msgstr "システムユーザー"
 
 #: acls/models/login_asset_acl.py:22
 #: applications/serializers/attrs/application_category/remote_app.py:36
-#: assets/models/asset.py:355 assets/models/authbook.py:19
+#: assets/models/asset.py:383 assets/models/authbook.py:19
 #: assets/models/backup.py:31 assets/models/cmd_filter.py:38
 #: assets/models/gathered_user.py:14 assets/serializers/label.py:30
 #: assets/serializers/system_user.py:264 audits/models.py:39
@@ -256,11 +256,7 @@ msgstr ""
 msgid "Time Period"
 msgstr "期間"
 
-#: applications/api/mixin.py:28
-msgid "My applications"
-msgstr "私のアプリケーション"
-
-#: applications/apps.py:9 applications/models/application.py:62
+#: applications/apps.py:9 applications/models/application.py:63
 msgid "Applications"
 msgstr "アプリケーション"
 
@@ -279,7 +275,7 @@ msgstr "リモートアプリ"
 msgid "Custom"
 msgstr "カスタム"
 
-#: applications/models/account.py:12 applications/models/application.py:228
+#: applications/models/account.py:12 applications/models/application.py:234
 #: assets/models/backup.py:32 assets/models/cmd_filter.py:45
 #: perms/models/application_permission.py:28
 msgid "Application"
@@ -303,7 +299,7 @@ msgid "System user"
 msgstr "システムユーザー"
 
 #: applications/models/account.py:17 assets/models/authbook.py:21
-#: settings/serializers/auth/cas.py:15
+#: settings/serializers/auth/cas.py:18
 msgid "Version"
 msgstr "バージョン"
 
@@ -319,7 +315,7 @@ msgstr "アプリケーションアカウントの秘密を表示できます"
 msgid "Can change application account secret"
 msgstr "アプリケーションアカウントの秘密を変更できます"
 
-#: applications/models/application.py:213
+#: applications/models/application.py:219
 #: applications/serializers/application.py:99 assets/models/label.py:21
 #: perms/models/application_permission.py:21
 #: perms/serializers/application/user_permission.py:33
@@ -328,7 +324,7 @@ msgstr "アプリケーションアカウントの秘密を変更できます"
 msgid "Category"
 msgstr "カテゴリ"
 
-#: applications/models/application.py:216
+#: applications/models/application.py:222
 #: applications/serializers/application.py:101 assets/models/backup.py:49
 #: assets/models/cmd_filter.py:82 assets/models/user.py:246
 #: perms/models/application_permission.py:24
@@ -341,21 +337,21 @@ msgstr "カテゴリ"
 msgid "Type"
 msgstr "タイプ"
 
-#: applications/models/application.py:220 assets/models/asset.py:217
+#: applications/models/application.py:226 assets/models/asset.py:217
 #: assets/models/domain.py:29 assets/models/domain.py:63
 msgid "Domain"
 msgstr "ドメイン"
 
-#: applications/models/application.py:222 xpack/plugins/cloud/models.py:33
+#: applications/models/application.py:228 xpack/plugins/cloud/models.py:33
 #: xpack/plugins/cloud/serializers/account.py:58
 msgid "Attrs"
 msgstr "ツールバーの"
 
-#: applications/models/application.py:232
+#: applications/models/application.py:238
 msgid "Can match application"
 msgstr "アプリケーションを一致させることができます"
 
-#: applications/models/application.py:280
+#: applications/models/application.py:286
 msgid "Application user"
 msgstr "アプリケーションユーザー"
 
@@ -643,27 +639,27 @@ msgstr "ラベル"
 msgid "Created by"
 msgstr "によって作成された"
 
-#: assets/models/asset.py:358
+#: assets/models/asset.py:386
 msgid "Can refresh asset hardware info"
 msgstr "資産ハードウェア情報を更新できます"
 
-#: assets/models/asset.py:359
+#: assets/models/asset.py:387
 msgid "Can test asset connectivity"
 msgstr "資産接続をテストできます"
 
-#: assets/models/asset.py:360
+#: assets/models/asset.py:388
 msgid "Can push system user to asset"
 msgstr "システムユーザーを資産にプッシュできます"
 
-#: assets/models/asset.py:361
+#: assets/models/asset.py:389
 msgid "Can match asset"
 msgstr "アセットを一致させることができます"
 
-#: assets/models/asset.py:362
+#: assets/models/asset.py:390
 msgid "Add asset to node"
 msgstr "ノードにアセットを追加する"
 
-#: assets/models/asset.py:363
+#: assets/models/asset.py:391
 msgid "Move asset to node"
 msgstr "アセットをノードに移動する"
 
@@ -1591,12 +1587,12 @@ msgid "Auth Token"
 msgstr "認証トークン"
 
 #: audits/signal_handlers.py:71 authentication/notifications.py:73
-#: authentication/views/login.py:164 authentication/views/wecom.py:158
+#: authentication/views/login.py:164 authentication/views/wecom.py:181
 #: notifications/backends/__init__.py:11 users/models/user.py:718
 msgid "WeCom"
 msgstr "企業微信"
 
-#: audits/signal_handlers.py:72 authentication/views/dingtalk.py:160
+#: audits/signal_handlers.py:72 authentication/views/dingtalk.py:182
 #: authentication/views/login.py:170 notifications/backends/__init__.py:12
 #: users/models/user.py:719
 msgid "DingTalk"
@@ -1812,7 +1808,7 @@ msgstr "署名が無効です。"
 
 #: authentication/backends/drf.py:97
 msgid "HTTP header: Date not provide or not %a, %d %b %Y %H:%M:%S GMT"
-msgstr ""
+msgstr "HTTP header: Date not provide or not"
 
 #: authentication/backends/drf.py:102
 msgid "Expired, more than 15 minutes"
@@ -2083,7 +2079,7 @@ msgstr "期限切れ"
 
 #: authentication/models.py:53
 msgid "SSO token"
-msgstr ""
+msgstr "SSO token"
 
 #: authentication/models.py:61
 msgid "Connection token"
@@ -2349,40 +2345,40 @@ msgid ""
 "The system configuration is incorrect. Please contact your administrator"
 msgstr "システム設定が正しくありません。管理者に連絡してください"
 
-#: authentication/views/dingtalk.py:92
+#: authentication/views/dingtalk.py:78
 msgid "DingTalk is already bound"
 msgstr "DingTalkはすでにバインドされています"
 
-#: authentication/views/dingtalk.py:105 authentication/views/feishu.py:99
-#: authentication/views/wecom.py:104
+#: authentication/views/dingtalk.py:127 authentication/views/feishu.py:99
+#: authentication/views/wecom.py:127
 msgid "Please verify your password first"
 msgstr "最初にパスワードを確認してください"
 
-#: authentication/views/dingtalk.py:129 authentication/views/wecom.py:128
+#: authentication/views/dingtalk.py:151 authentication/views/wecom.py:151
 msgid "Invalid user_id"
 msgstr "無効なuser_id"
 
-#: authentication/views/dingtalk.py:145
+#: authentication/views/dingtalk.py:167
 msgid "DingTalk query user failed"
 msgstr "DingTalkクエリユーザーが失敗しました"
 
-#: authentication/views/dingtalk.py:154
+#: authentication/views/dingtalk.py:176
 msgid "The DingTalk is already bound to another user"
 msgstr "DingTalkはすでに別のユーザーにバインドされています"
 
-#: authentication/views/dingtalk.py:161
+#: authentication/views/dingtalk.py:183
 msgid "Binding DingTalk successfully"
 msgstr "DingTalkのバインドに成功"
 
-#: authentication/views/dingtalk.py:213
+#: authentication/views/dingtalk.py:235 authentication/views/dingtalk.py:289
 msgid "Failed to get user from DingTalk"
 msgstr "DingTalkからユーザーを取得できませんでした"
 
-#: authentication/views/dingtalk.py:219
+#: authentication/views/dingtalk.py:241 authentication/views/dingtalk.py:295
 msgid "DingTalk is not bound"
 msgstr "DingTalkはバインドされていません"
 
-#: authentication/views/dingtalk.py:220
+#: authentication/views/dingtalk.py:242 authentication/views/dingtalk.py:296
 msgid "Please login with a password and then bind the DingTalk"
 msgstr "パスワードでログインし、DingTalkをバインドしてください"
 
@@ -2463,31 +2459,31 @@ msgstr "企業微信エラー、システム管理者に連絡してください
 msgid "WeCom Error"
 msgstr "企業微信エラー"
 
-#: authentication/views/wecom.py:91
+#: authentication/views/wecom.py:78
 msgid "WeCom is already bound"
 msgstr "企業の微信はすでにバインドされています"
 
-#: authentication/views/wecom.py:143
+#: authentication/views/wecom.py:166
 msgid "WeCom query user failed"
 msgstr "企業微信ユーザーの問合せに失敗しました"
 
-#: authentication/views/wecom.py:152
+#: authentication/views/wecom.py:175
 msgid "The WeCom is already bound to another user"
 msgstr "この企業の微信はすでに他のユーザーをバインドしている。"
 
-#: authentication/views/wecom.py:159
+#: authentication/views/wecom.py:182
 msgid "Binding WeCom successfully"
 msgstr "企業の微信のバインドに成功"
 
-#: authentication/views/wecom.py:208
+#: authentication/views/wecom.py:231 authentication/views/wecom.py:285
 msgid "Failed to get user from WeCom"
 msgstr "企業の微信からユーザーを取得できませんでした"
 
-#: authentication/views/wecom.py:214
+#: authentication/views/wecom.py:237 authentication/views/wecom.py:291
 msgid "WeCom is not bound"
 msgstr "企業の微信をバインドしていません"
 
-#: authentication/views/wecom.py:215
+#: authentication/views/wecom.py:238 authentication/views/wecom.py:292
 msgid "Please login with a password and then bind the WeCom"
 msgstr "パスワードでログインしてからWeComをバインドしてください"
 
@@ -2503,7 +2499,7 @@ msgstr "%(name)s は正常に更新されました"
 
 #: common/db/encoder.py:17
 msgid "ugettext_lazy"
-msgstr ""
+msgstr "ugettext_lazy"
 
 #: common/db/models.py:112
 msgid "Updated by"
@@ -3131,6 +3127,10 @@ msgstr ""
 msgid "If you have any question, please contact the administrator"
 msgstr "質問があったら、管理者に連絡して下さい"
 
+#: perms/tree/app.py:24
+msgid "My applications"
+msgstr "私のアプリケーション"
+
 #: rbac/api/role.py:32
 msgid "Internal role, can't be destroy"
 msgstr "内部の役割は、破壊することはできません"
@@ -3468,35 +3468,35 @@ msgstr "パスワードのURLを忘れた"
 msgid "Enable login redirect msg"
 msgstr "ログインリダイレクトの有効化msg"
 
-#: settings/serializers/auth/cas.py:11
+#: settings/serializers/auth/cas.py:10
 msgid "Enable CAS Auth"
 msgstr "CAS 認証の有効化"
 
-#: settings/serializers/auth/cas.py:12 settings/serializers/auth/oidc.py:32
+#: settings/serializers/auth/cas.py:11 settings/serializers/auth/oidc.py:32
 msgid "Server url"
 msgstr "サービス側アドレス"
 
-#: settings/serializers/auth/cas.py:13
+#: settings/serializers/auth/cas.py:14
 msgid "Proxy server url"
 msgstr "コールバックアドレス"
 
-#: settings/serializers/auth/cas.py:14 settings/serializers/auth/saml2.py:32
+#: settings/serializers/auth/cas.py:16 settings/serializers/auth/saml2.py:32
 msgid "Logout completely"
 msgstr "同期ログアウト"
 
-#: settings/serializers/auth/cas.py:16
+#: settings/serializers/auth/cas.py:21
 msgid "Username attr"
 msgstr "ユーザー名のプロパティ"
 
-#: settings/serializers/auth/cas.py:17
+#: settings/serializers/auth/cas.py:24
 msgid "Enable attributes map"
 msgstr "属性マップの有効化"
 
-#: settings/serializers/auth/cas.py:18 settings/serializers/auth/saml2.py:31
+#: settings/serializers/auth/cas.py:26 settings/serializers/auth/saml2.py:31
 msgid "Rename attr"
 msgstr "マッピングのプロパティ"
 
-#: settings/serializers/auth/cas.py:19
+#: settings/serializers/auth/cas.py:27
 msgid "Create user if not"
 msgstr "そうでない場合はユーザーを作成"
 
@@ -4274,17 +4274,15 @@ msgstr "KOKO ホストアドレス"
 
 #: settings/serializers/terminal.py:43
 msgid "Koko ssh port"
-msgstr "KOKO ssh ポート"
+msgstr "Koko ssh ポート"
 
 #: settings/serializers/terminal.py:45
 msgid "Enable database proxy"
 msgstr "属性マップの有効化"
 
 #: settings/serializers/terminal.py:47
-#, fuzzy
-#| msgid "DatabaseApp"
 msgid "Database proxy host"
-msgstr "データベースの適用"
+msgstr "データベースエージェントホスト"
 
 #: settings/serializers/terminal.py:48
 msgid "Database proxy host, eg: dev.jumpserver.org"
@@ -4292,19 +4290,27 @@ msgstr "RDP訪問先住所、例: dev.jumpserver.org:3389"
 
 #: settings/serializers/terminal.py:51
 msgid "MySQL port"
-msgstr "SMTPポート"
+msgstr "MySQLポート"
 
 #: settings/serializers/terminal.py:52
-msgid "Database proxy MySQL protocol port"
-msgstr ""
+msgid "MySQL protocol listen port"
+msgstr "MySQLプロトコルリッスンポート"
 
 #: settings/serializers/terminal.py:55
-msgid "PostgreSQL port"
-msgstr ""
+msgid "MariaDB port"
+msgstr "MariaDBポート"
 
 #: settings/serializers/terminal.py:56
-msgid "Database proxy PostgreSQL port"
-msgstr ""
+msgid "MariaDB protocol listen port"
+msgstr "MariaDBプロトコルリッスンポート"
+
+#: settings/serializers/terminal.py:59
+msgid "PostgreSQL port"
+msgstr "PostgreSQLポート"
+
+#: settings/serializers/terminal.py:60
+msgid "PostgreSQL protocol listen port"
+msgstr "PostgreSQLプロトコルリッスンポート"
 
 #: settings/utils/ldap.py:417
 msgid "ldap:// or ldaps:// protocol is used."
@@ -5726,7 +5732,7 @@ msgstr "ssh公開キー"
 
 #: users/forms/profile.py:131
 msgid "ssh-rsa AAAA..."
-msgstr ""
+msgstr "ssh-rsa AAAA.."
 
 #: users/forms/profile.py:132
 msgid "Paste your id_rsa.pub here."
@@ -6296,7 +6302,7 @@ msgstr "パスワードの成功をリセットし、ログインページに戻
 
 #: xpack/apps.py:8
 msgid "XPACK"
-msgstr ""
+msgstr "XPack"
 
 #: xpack/plugins/change_auth_plan/api/app.py:112
 #: xpack/plugins/change_auth_plan/api/asset.py:95
@@ -6515,11 +6521,11 @@ msgstr "テンセント雲"
 
 #: xpack/plugins/cloud/const.py:16
 msgid "VMware"
-msgstr ""
+msgstr "VMware"
 
 #: xpack/plugins/cloud/const.py:17 xpack/plugins/cloud/providers/nutanix.py:13
 msgid "Nutanix"
-msgstr ""
+msgstr "Nutanix"
 
 #: xpack/plugins/cloud/const.py:18
 msgid "Huawei Private Cloud"
@@ -6531,7 +6537,7 @@ msgstr "青雲私有雲"
 
 #: xpack/plugins/cloud/const.py:20
 msgid "OpenStack"
-msgstr ""
+msgstr "OpenStack"
 
 #: xpack/plugins/cloud/const.py:21
 msgid "Google Cloud Platform"
@@ -6834,11 +6840,11 @@ msgstr "プロバイダ表示"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:13
 msgid "AccessKey ID"
-msgstr ""
+msgstr "アクセスキーID"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:16
 msgid "AccessKey Secret"
-msgstr ""
+msgstr "アクセスキーシークレット"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:31
 msgid "Client ID"
