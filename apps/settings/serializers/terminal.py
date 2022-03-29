@@ -51,6 +51,10 @@ class TerminalSettingSerializer(serializers.Serializer):
         required=False, label=_("MySQL port"), default=33060,
         help_text=_('Database proxy MySQL protocol port')
     )
+    TERMINAL_MAGNUS_MARIADB_PORT = serializers.IntegerField(
+        required=False, label=_("MariaDB port"), default=33061,
+        help_text=_('Database proxy MySQL protocol port')
+    )
     TERMINAL_MAGNUS_POSTGRE_PORT = serializers.IntegerField(
         required=False, label=_("PostgreSQL port"), default=54320,
         help_text=_('Database proxy PostgreSQL port')
