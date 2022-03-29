@@ -317,6 +317,7 @@ class Config(dict):
         'TERMINAL_MAGNUS_ENABLED': True,
         'TERMINAL_MAGNUS_HOST': lambda: urlparse(settings.SITE_URL).hostname,
         'TERMINAL_MAGNUS_MYSQL_PORT': 33060,
+        'TERMINAL_MAGNUS_MARIADB_PORT': 33061,
         'TERMINAL_MAGNUS_POSTGRE_PORT': 54320,
 
         # 安全配置
