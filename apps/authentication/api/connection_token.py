@@ -30,7 +30,7 @@ from common.http import is_true
 from perms.models.base import Action
 from perms.utils.application.permission import get_application_actions
 from perms.utils.asset.permission import get_asset_actions
-
+from common.const.http import PATCH
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
 )
@@ -344,18 +344,55 @@ class SecretDetailMixin:
         return Response(data=serializer.data, status=200)
 
 
+class TokenCacheMixin:
+    CACHE_KEY_PREFIX = 'CONNECTION_TOKEN_{}'
+
+    def get_token_cache_key(self, token):
+        return self.CACHE_KEY_PREFIX.format(token)
+
+    def get_token_ttl(self, token):
+        key = self.get_token_cache_key(token)
+        return cache.ttl(key)
+
+    def set_token_to_cache(self, token, value, ttl=5*60):
+        key = self.get_token_cache_key(token)
+        cache.set(key, value, timeout=ttl)
+
+    def get_token_from_cache(self, token):
+        key = self.get_token_cache_key(token)
+        value = cache.get(key, None)
+        return value
+
+    def renewal_token(self, token, ttl=5*60):
+        value = self.get_token_from_cache(token)
+        if value:
+            pre_ttl = self.get_token_ttl(token)
+            self.set_token_to_cache(token, value, ttl)
+            post_ttl = self.get_token_ttl(token)
+            ok = True
+            msg = f'{pre_ttl}s is renewed to {post_ttl}s.'
+        else:
+            ok = False
+            msg = 'Token is not found.'
+        data = {
+            'ok': ok,
+            'msg': msg
+        }
+        return data
+
+
 class UserConnectionTokenViewSet(
     RootOrgViewMixin, SerializerMixin, ClientProtocolMixin,
-    SecretDetailMixin, GenericViewSet
+    SecretDetailMixin, TokenCacheMixin, GenericViewSet
 ):
     serializer_classes = {
         'default': ConnectionTokenSerializer,
         'get_secret_detail': ConnectionTokenSecretSerializer,
     }
-    CACHE_KEY_PREFIX = 'CONNECTION_TOKEN_{}'
     rbac_perms = {
         'GET': 'authentication.view_connectiontoken',
         'create': 'authentication.add_connectiontoken',
+        'renewal': 'authentication.add_superconnectiontoken',
         'get_secret_detail': 'authentication.view_connectiontokensecret',
         'get_rdp_file': 'authentication.add_connectiontoken',
         'get_client_protocol_url': 'authentication.add_connectiontoken',
@@ -376,7 +413,18 @@ class UserConnectionTokenViewSet(
             raise PermissionDenied(error)
         return True
 
-    def create_token(self, user, asset, application, system_user, ttl=5 * 60):
+    @action(methods=[PATCH], detail=False)
+    def renewal(self, request, *args, **kwargs):
+        """ 续期 Token """
+        perm_required = 'authentication.add_superconnectiontoken'
+        if not request.user.has_perm(perm_required):
+            raise PermissionDenied('No permissions for authentication.add_superconnectiontoken')
+        token = request.data.get('token', '')
+        data = self.renewal_token(token)
+        status_code = 200 if data.get('ok') else 404
+        return Response(data=data, status=status_code)
+
+    def create_token(self, user, asset, application, system_user, ttl=5*60):
         # 再次强调一下权限
         perm_required = 'authentication.add_superconnectiontoken'
         if user != self.request.user and not self.request.user.has_perm(perm_required):
@@ -408,8 +456,7 @@ class UserConnectionTokenViewSet(
                 'application_name': str(application)
             })
 
-        key = self.CACHE_KEY_PREFIX.format(token)
-        cache.set(key, value, timeout=ttl)
+        self.set_token_to_cache(token, value, ttl)
         return token, secret
 
     def create(self, request, *args, **kwargs):
@@ -432,8 +479,7 @@ class UserConnectionTokenViewSet(
         from perms.utils.asset.permission import validate_permission as asset_validate_permission
         from perms.utils.application.permission import validate_permission as app_validate_permission
 
-        key = self.CACHE_KEY_PREFIX.format(token)
-        value = cache.get(key, None)
+        value = self.get_token_from_cache(token)
         if not value:
             raise serializers.ValidationError('Token not found')
 
@@ -459,9 +505,7 @@ class UserConnectionTokenViewSet(
 
     def get(self, request):
         token = request.query_params.get('token')
-        key = self.CACHE_KEY_PREFIX.format(token)
-        value = cache.get(key, None)
-
+        value = self.get_token_from_cache(token)
         if not value:
             return Response('', status=404)
         return Response(value)
