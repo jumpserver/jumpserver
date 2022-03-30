@@ -210,8 +210,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
         if not request or not request.user.is_authenticated:
             return is_active
 
-        user = request.user
-        if user.id == self.instance.id and not is_active:
+        if self.instance and request.user.id == self.instance.id and not is_active:
             # 用户自己不能禁用启用自己
             raise serializers.ValidationError("Cannot inactive self")
         return is_active
