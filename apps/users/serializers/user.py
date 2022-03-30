@@ -132,6 +132,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
             'date_joined', 'last_login', 'created_by', 'is_first_login',
             'wecom_id', 'dingtalk_id', 'feishu_id'
         ]
+        disallow_self_update_fields = ['is_active', 'username']
         extra_kwargs = {
             'password': {'write_only': True, 'required': False, 'allow_null': True, 'allow_blank': True},
             'public_key': {'write_only': True},
@@ -180,7 +181,23 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
                 attrs.pop(field, None)
         return attrs
 
+    def check_disallow_self_update_fields(self, attrs):
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            return attrs
+        if not self.instance:
+            return attrs
+        if request.user.id != self.instance.id:
+            return attrs
+        disallow_fields = set(list(attrs.keys())) & set(self.Meta.disallow_self_update_fields)
+        if not disallow_fields:
+            return attrs
+        # 用户自己不能更新自己的一些字段
+        error = 'User Cannot self-update fields: {}'.format(disallow_fields)
+        raise serializers.ValidationError(error)
+
     def validate(self, attrs):
+        attrs = self.check_disallow_self_update_fields(attrs)
         attrs = self.change_password_to_raw(attrs)
         attrs = self.clean_auth_fields(attrs)
         attrs.pop('password_strategy', None)
@@ -209,11 +226,6 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
         request = self.context.get('request')
         if not request or not request.user.is_authenticated:
             return is_active
-
-        user = request.user
-        if user.id == self.instance.id and not is_active:
-            # 用户自己不能禁用启用自己
-            raise serializers.ValidationError("Cannot inactive self")
         return is_active
 
     def update(self, instance, validated_data):
