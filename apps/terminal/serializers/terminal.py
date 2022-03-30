@@ -111,10 +111,11 @@ class TerminalRegistrationSerializer(serializers.ModelSerializer):
         valid = super().is_valid(raise_exception=raise_exception)
         if not valid:
             return valid
-        name = self.validated_data.get('name')
-        self.validated_data['name'] = pretty_string(name)
-        if len(name) > 128:
-            self.validated_data['comment'] = name
+        raw_name = self.validated_data.get('name')
+        name = pretty_string(raw_name)
+        self.validated_data['name'] = name
+        if len(raw_name) > 128:
+            self.validated_data['comment'] = raw_name
         data = {'name': name}
         kwargs = {'data': data}
         if self.instance and self.instance.user:

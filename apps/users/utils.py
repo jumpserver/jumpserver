@@ -11,7 +11,7 @@ from django.conf import settings
 from django.core.cache import cache
 
 from common.tasks import send_mail_async
-from common.utils import reverse, get_object_or_none, ip
+from common.utils import reverse, get_object_or_none, ip, pretty_string
 from .models import User
 
 logger = logging.getLogger('jumpserver')
@@ -229,12 +229,14 @@ class LoginIpBlockUtil(BlockGlobalIpUtilBase):
     BLOCK_KEY_TMPL = "_LOGIN_BLOCK_{}"
 
 
-def construct_user_email(username, email):
-    if '@' not in email:
-        if '@' in username:
-            email = username
-        else:
-            email = '{}@{}'.format(username, settings.EMAIL_SUFFIX)
+def construct_user_email(username, email, email_suffix=''):
+    if '@' in email:
+        return email
+    if '@' in username:
+        return username
+    if not email_suffix:
+        email_suffix = settings.EMAIL_SUFFIX
+    email = f'{username}@{email_suffix}'
     return email
 
 
