@@ -6,6 +6,7 @@ from rest_framework import serializers
 
 from common.mixins import CommonBulkSerializerMixin
 from common.validators import PhoneValidator
+from common.utils import pretty_string
 from rbac.builtin import BuiltinRole
 from rbac.permissions import RBACPermission
 from rbac.models import OrgRoleBinding, SystemRoleBinding, Role
@@ -268,7 +269,9 @@ class ServiceAccountSerializer(serializers.ModelSerializer):
 
     def get_email(self):
         name = self.initial_data.get('name')
-        return '{}@serviceaccount.local'.format(name)
+        name_max_length = 128 - len(User.service_account_email_suffix)
+        name = pretty_string(name, max_length=name_max_length, ellipsis_str='-')
+        return '{}{}'.format(name, User.service_account_email_suffix)
 
     def validate_name(self, name):
         email = self.get_email()
@@ -283,6 +286,7 @@ class ServiceAccountSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         name = validated_data['name']
+        email = self.get_email()
         comment = validated_data.get('comment', '')
-        user, ak = User.create_service_account(name, comment)
+        user, ak = User.create_service_account(name, email, comment)
         return user

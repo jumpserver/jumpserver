@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from common.drf.serializers import BulkModelSerializer, AdaptedBulkListSerializer
 from common.utils import is_uuid
 from users.serializers import ServiceAccountSerializer
-from common.utils import get_request_ip
+from common.utils import get_request_ip, pretty_string
 from .. import const
 
 from ..models import (
@@ -111,12 +111,11 @@ class TerminalRegistrationSerializer(serializers.ModelSerializer):
         valid = super().is_valid(raise_exception=raise_exception)
         if not valid:
             return valid
-        name = self.validated_data.get('name')
-        if len(name) > 128:
-            self.validated_data['comment'] = name
-            name = '{}...{}'.format(name[:32], name[-32:])
-            self.validated_data['name'] = name
-
+        raw_name = self.validated_data.get('name')
+        name = pretty_string(raw_name)
+        self.validated_data['name'] = name
+        if len(raw_name) > 128:
+            self.validated_data['comment'] = raw_name
         data = {'name': name}
         kwargs = {'data': data}
         if self.instance and self.instance.user:

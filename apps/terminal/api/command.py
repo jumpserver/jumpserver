@@ -14,7 +14,7 @@ from terminal.filters import CommandFilter
 from orgs.utils import current_org
 from common.drf.api import JMSBulkModelViewSet
 from common.utils import get_logger
-from terminal.serializers import InsecureCommandAlertSerializer
+from terminal.backends.command.serializers import InsecureCommandAlertSerializer
 from terminal.exceptions import StorageInvalid
 from ..backends import (
     get_command_storage, get_multi_command_storage,
