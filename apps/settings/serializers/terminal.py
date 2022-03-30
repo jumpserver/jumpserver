@@ -39,8 +39,12 @@ class TerminalSettingSerializer(serializers.Serializer):
     )
     XRDP_ENABLED = serializers.BooleanField(label=_("Enable XRDP"))
 
-    TERMINAL_KOKO_HOST = serializers.BooleanField(label=_("Koko host"))
-    TERMINAL_KOKO_SSH_PORT = serializers.BooleanField(label=_("Koko ssh port"))
+    TERMINAL_KOKO_HOST = serializers.CharField(
+        required=False, label=_("Koko host"), max_length=1024
+    )
+    TERMINAL_KOKO_SSH_PORT = serializers.CharField(
+        required=False, label=_("Koko ssh port"), max_length=1024
+    )
 
     TERMINAL_MAGNUS_ENABLED = serializers.BooleanField(label=_("Enable database proxy"))
     TERMINAL_MAGNUS_HOST = serializers.CharField(
@@ -55,4 +59,3 @@ class TerminalSettingSerializer(serializers.Serializer):
         required=False, label=_("PostgreSQL port"), default=54320,
         help_text=_('Database proxy PostgreSQL port')
     )
-
