@@ -11,7 +11,7 @@ class SimpleSessionCommandSerializer(serializers.Serializer):
     """ 简单Session命令序列类, 用来提取公共字段 """
     user = serializers.CharField(label=_("User"))  # 限制 64 字符，见 validate_user
     asset = serializers.CharField(max_length=128, label=_("Asset"))
-    input = serializers.CharField(max_length=1024, label=_("Command"))
+    input = serializers.CharField(max_length=2048, label=_("Command"))
     session = serializers.CharField(max_length=36, label=_("Session ID"))
     risk_level = serializers.ChoiceField(
         required=False, label=_("Risk level"), choices=AbstractSessionCommand.RISK_LEVEL_CHOICES
@@ -33,7 +33,7 @@ class SessionCommandSerializer(SimpleSessionCommandSerializer):
 
     id = serializers.UUIDField(read_only=True)
     system_user = serializers.CharField(max_length=64, label=_("System user"))
-    output = serializers.CharField(max_length=1024, allow_blank=True, label=_("Output"))
+    output = serializers.CharField(max_length=2048, allow_blank=True, label=_("Output"))
     risk_level_display = serializers.SerializerMethodField(label=_('Risk level display'))
     timestamp = serializers.IntegerField(label=_('Timestamp'))
     remote_addr = serializers.CharField(read_only=True, label=_('Remote Address'))
