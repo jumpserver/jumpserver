@@ -18,15 +18,6 @@ class SimpleSessionCommandSerializer(serializers.Serializer):
     )
     org_id = serializers.CharField(max_length=36, required=False, default='', allow_null=True, allow_blank=True)
 
-    def validate_input(self, data):
-        max_length = 128
-        if len(data) <= max_length:
-            return data
-        ellipsis_str = '...'
-        half = (max_length - len(ellipsis_str)) // 2
-        data = '{}{}{}'.format(data[:half], ellipsis_str, data[-half:])
-        return data
-
     def validate_user(self, value):
         if len(value) > 64:
             value = value[:32] + value[-32:]
