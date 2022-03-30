@@ -4,6 +4,7 @@ import datetime
 from django.db import transaction
 from django.utils import timezone
 from django.db.utils import OperationalError
+from common.utils.common import pretty_string
 
 from .base import CommandBase
 
@@ -32,9 +33,11 @@ class CommandStore(CommandBase):
         """
         _commands = []
         for c in commands:
+            cmd_input = pretty_string(c['input'])
+            cmd_output = pretty_string(c['output'], max_length=1024)
             _commands.append(self.model(
                 user=c["user"], asset=c["asset"], system_user=c["system_user"],
-                input=c["input"], output=c["output"], session=c["session"],
+                input=cmd_input, output=cmd_output, session=c["session"],
                 risk_level=c.get("risk_level", 0), org_id=c["org_id"],
                 timestamp=c["timestamp"]
             ))
