@@ -366,7 +366,7 @@ class RoleMixin:
         """
         由于这里用了 cache ，所以不能改成 self.system_roles.filter().exists() 会查询的
         """
-        if not self._is_superuser:
+        if self._is_superuser is not None:
             return self._is_superuser
 
         from rbac.builtin import BuiltinRole
