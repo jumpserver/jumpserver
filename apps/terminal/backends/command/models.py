@@ -19,7 +19,7 @@ class AbstractSessionCommand(OrgModelMixin):
     user = models.CharField(max_length=64, db_index=True, verbose_name=_("User"))
     asset = models.CharField(max_length=128, db_index=True, verbose_name=_("Asset"))
     system_user = models.CharField(max_length=64, db_index=True, verbose_name=_("System user"))
-    input = models.CharField(max_length=128, db_index=True, verbose_name=_("Input"))
+    input = models.CharField(max_length=1024, db_index=True, verbose_name=_("Input"))
     output = models.CharField(max_length=1024, blank=True, verbose_name=_("Output"))
     session = models.CharField(max_length=36, db_index=True, verbose_name=_("Session"))
     risk_level = models.SmallIntegerField(default=RISK_LEVEL_ORDINARY, choices=RISK_LEVEL_CHOICES, db_index=True, verbose_name=_("Risk level"))
