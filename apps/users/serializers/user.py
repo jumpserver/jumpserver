@@ -194,7 +194,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
         if not disallow_fields:
             return attrs
         # 用户自己不能更新自己的一些字段
-        error = 'User Cannot self-update fields: {}'.format(disallow_fields)
+        error = _('User cannot self-update fields: {}').format(disallow_fields)
         raise serializers.ValidationError(error)
 
     def validate(self, attrs):
