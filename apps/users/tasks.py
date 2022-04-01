@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 
-import sys
 from celery import shared_task
 from django.conf import settings
 
@@ -11,6 +10,7 @@ from ops.celery.utils import (
 )
 from ops.celery.decorator import after_app_ready_start
 from common.utils import get_logger
+from orgs.models import Organization
 from .models import User
 from users.notifications import UserExpirationReminderMsg
 from settings.utils import LDAPServerUtil, LDAPImportUtil
@@ -81,7 +81,9 @@ def import_ldap_user():
     util_server = LDAPServerUtil()
     util_import = LDAPImportUtil()
     users = util_server.search()
-    errors = util_import.perform_import(users)
+    org_id = settings.AUTH_LDAP_SYNC_ORG_ID
+    org = Organization.get_instance(org_id)
+    errors = util_import.perform_import(users, org)
     if errors:
         logger.error("Imported LDAP users errors: {}".format(errors))
     else:
