@@ -195,7 +195,9 @@ class LDAPUserImportAPI(APIView):
     def get_ldap_users(self):
         username_list = self.request.data.get('username_list', [])
         cache_police = self.request.query_params.get('cache_police', True)
-        if cache_police in LDAP_USE_CACHE_FLAGS:
+        if '*' in username_list:
+            users = LDAPServerUtil().search()
+        elif cache_police in LDAP_USE_CACHE_FLAGS:
             users = LDAPCacheUtil().search(search_users=username_list)
         else:
             users = LDAPServerUtil().search(search_users=username_list)
@@ -234,4 +236,3 @@ class LDAPCacheRefreshAPI(generics.RetrieveAPIView):
             logger.error(str(e))
             return Response(data={'msg': str(e)}, status=400)
         return Response(data={'msg': 'success'})
-
