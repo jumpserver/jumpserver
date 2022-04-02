@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-31 11:21+0800\n"
+"POT-Creation-Date: 2022-04-02 10:01+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -343,7 +343,7 @@ msgid "Domain"
 msgstr "ドメイン"
 
 #: applications/models/application.py:228 xpack/plugins/cloud/models.py:33
-#: xpack/plugins/cloud/serializers/account.py:58
+#: xpack/plugins/cloud/serializers/account.py:59
 msgid "Attrs"
 msgstr "ツールバーの"
 
@@ -767,11 +767,11 @@ msgstr "OK"
 #: assets/models/base.py:32 audits/models.py:116
 #: xpack/plugins/change_auth_plan/serializers/app.py:88
 #: xpack/plugins/change_auth_plan/serializers/asset.py:198
-#: xpack/plugins/cloud/const.py:30
+#: xpack/plugins/cloud/const.py:31
 msgid "Failed"
 msgstr "失敗しました"
 
-#: assets/models/base.py:38
+#: assets/models/base.py:38 assets/serializers/domain.py:46
 msgid "Connectivity"
 msgstr "接続性"
 
@@ -6520,58 +6520,62 @@ msgid "Baidu Cloud"
 msgstr "百度雲"
 
 #: xpack/plugins/cloud/const.py:15
+msgid "JD Cloud"
+msgstr "京東雲"
+
+#: xpack/plugins/cloud/const.py:16
 msgid "Tencent Cloud"
 msgstr "テンセント雲"
 
-#: xpack/plugins/cloud/const.py:16
+#: xpack/plugins/cloud/const.py:17
 msgid "VMware"
 msgstr "VMware"
 
-#: xpack/plugins/cloud/const.py:17 xpack/plugins/cloud/providers/nutanix.py:13
+#: xpack/plugins/cloud/const.py:18 xpack/plugins/cloud/providers/nutanix.py:13
 msgid "Nutanix"
 msgstr "Nutanix"
 
-#: xpack/plugins/cloud/const.py:18
+#: xpack/plugins/cloud/const.py:19
 msgid "Huawei Private Cloud"
 msgstr "華為私有雲"
 
-#: xpack/plugins/cloud/const.py:19
+#: xpack/plugins/cloud/const.py:20
 msgid "Qingyun Private Cloud"
 msgstr "青雲私有雲"
 
-#: xpack/plugins/cloud/const.py:20
+#: xpack/plugins/cloud/const.py:21
 msgid "OpenStack"
 msgstr "OpenStack"
 
-#: xpack/plugins/cloud/const.py:21
+#: xpack/plugins/cloud/const.py:22
 msgid "Google Cloud Platform"
 msgstr "谷歌雲"
 
-#: xpack/plugins/cloud/const.py:25
+#: xpack/plugins/cloud/const.py:26
 msgid "Instance name"
 msgstr "インスタンス名"
 
-#: xpack/plugins/cloud/const.py:26
+#: xpack/plugins/cloud/const.py:27
 msgid "Instance name and Partial IP"
 msgstr "インスタンス名と部分IP"
 
-#: xpack/plugins/cloud/const.py:31
+#: xpack/plugins/cloud/const.py:32
 msgid "Succeed"
 msgstr "成功"
 
-#: xpack/plugins/cloud/const.py:35
+#: xpack/plugins/cloud/const.py:36
 msgid "Unsync"
 msgstr "同期していません"
 
-#: xpack/plugins/cloud/const.py:36
+#: xpack/plugins/cloud/const.py:37
 msgid "New Sync"
 msgstr "新しい同期"
 
-#: xpack/plugins/cloud/const.py:37
+#: xpack/plugins/cloud/const.py:38
 msgid "Synced"
 msgstr "同期済み"
 
-#: xpack/plugins/cloud/const.py:38
+#: xpack/plugins/cloud/const.py:39
 msgid "Released"
 msgstr "リリース済み"
 
@@ -6744,11 +6748,13 @@ msgid "South America (São Paulo)"
 msgstr "南米 (サンパウロ)"
 
 #: xpack/plugins/cloud/providers/baiducloud.py:54
+#: xpack/plugins/cloud/providers/jdcloud.py:127
 msgid "CN North-Beijing"
 msgstr "華北-北京"
 
 #: xpack/plugins/cloud/providers/baiducloud.py:55
 #: xpack/plugins/cloud/providers/huaweicloud.py:40
+#: xpack/plugins/cloud/providers/jdcloud.py:130
 msgid "CN South-Guangzhou"
 msgstr "華南-広州"
 
@@ -6770,6 +6776,7 @@ msgid "CN North-Baoding"
 msgstr "華北-保定"
 
 #: xpack/plugins/cloud/providers/baiducloud.py:60
+#: xpack/plugins/cloud/providers/jdcloud.py:129
 msgid "CN East-Shanghai"
 msgstr "華東-上海"
 
@@ -6834,11 +6841,15 @@ msgstr "華北-ウランチャブ一"
 msgid "CN South-Guangzhou-InvitationOnly"
 msgstr "華南-広州-友好ユーザー環境"
 
-#: xpack/plugins/cloud/serializers/account.py:59
+#: xpack/plugins/cloud/providers/jdcloud.py:128
+msgid "CN East-Suqian"
+msgstr "華東-宿遷"
+
+#: xpack/plugins/cloud/serializers/account.py:60
 msgid "Validity display"
 msgstr "有効表示"
 
-#: xpack/plugins/cloud/serializers/account.py:60
+#: xpack/plugins/cloud/serializers/account.py:61
 msgid "Provider display"
 msgstr "プロバイダ表示"
 
