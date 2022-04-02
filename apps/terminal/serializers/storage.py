@@ -13,8 +13,6 @@ from rest_framework.validators import UniqueValidator
 
 # Replay storage serializers
 # --------------------------
-
-
 def replay_storage_endpoint_format_validator(endpoint):
     h = urlparse(endpoint)
     if h.path:
@@ -116,9 +114,8 @@ class ReplayStorageTypeAzureSerializer(serializers.Serializer):
         label=_('Endpoint suffix'), allow_null=True,
     )
 
+
 # mapping
-
-
 replay_storage_type_serializer_classes_mapping = {
     const.ReplayStorageTypeChoices.s3.value: ReplayStorageTypeS3Serializer,
     const.ReplayStorageTypeChoices.ceph.value: ReplayStorageTypeCephSerializer,
@@ -129,10 +126,9 @@ replay_storage_type_serializer_classes_mapping = {
     const.ReplayStorageTypeChoices.cos.value: ReplayStorageTypeCOSSerializer
 }
 
+
 # Command storage serializers
 # ---------------------------
-
-
 def command_storage_es_host_format_validator(host):
     h = urlparse(host)
     default_error_msg = _('The address format is incorrect')
@@ -151,7 +147,6 @@ def command_storage_es_host_format_validator(host):
 
 
 class CommandStorageTypeESSerializer(serializers.Serializer):
-
     hosts_help_text = '''
         Tip: If there are multiple hosts, use a comma (,) to separate them. <br>
         (eg: http://www.jumpserver.a.com:9100, http://www.jumpserver.b.com:9100)
@@ -169,17 +164,14 @@ class CommandStorageTypeESSerializer(serializers.Serializer):
         source='OTHER.IGNORE_VERIFY_CERTS', allow_null=True,
     )
 
+
 # mapping
-
-
 command_storage_type_serializer_classes_mapping = {
     const.CommandStorageTypeChoices.es.value: CommandStorageTypeESSerializer
 }
 
 
 # BaseStorageSerializer
-
-
 class BaseStorageSerializer(serializers.ModelSerializer):
     storage_type_serializer_classes_mapping = {}
     meta = MethodSerializer()
@@ -223,8 +215,6 @@ class BaseStorageSerializer(serializers.ModelSerializer):
 
 
 # CommandStorageSerializer
-
-
 class CommandStorageSerializer(BaseStorageSerializer):
     storage_type_serializer_classes_mapping = command_storage_type_serializer_classes_mapping
 
@@ -236,8 +226,6 @@ class CommandStorageSerializer(BaseStorageSerializer):
 
 
 # ReplayStorageSerializer
-
-
 class ReplayStorageSerializer(BaseStorageSerializer):
     storage_type_serializer_classes_mapping = replay_storage_type_serializer_classes_mapping
 
