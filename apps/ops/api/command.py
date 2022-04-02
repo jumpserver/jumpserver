@@ -59,7 +59,7 @@ class CommandExecutionViewSet(RootOrgViewMixin, viewsets.ModelViewSet):
             raise ValidationError({"hosts": msg})
 
     def check_permissions(self, request):
-        if not settings.SECURITY_COMMAND_EXECUTION and request.user.is_common_user:
+        if not settings.SECURITY_COMMAND_EXECUTION:
             return self.permission_denied(request, "Command execution disabled")
         return super().check_permissions(request)
 
