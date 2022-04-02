@@ -29,7 +29,6 @@ auditor_perms = user_perms + (
     ('ops', 'commandexecution', 'view', 'commandexecution')
 )
 
-
 app_exclude_perms = [
     ('users', 'user', 'add,delete', 'user'),
     ('orgs', 'org', 'add,delete,change', 'org'),
@@ -59,7 +58,8 @@ class PredefineRole:
         from rbac.models import Role
         return Role.objects.get(id=self.id)
 
-    def _get_defaults(self):
+    @property
+    def default_perms(self):
         from rbac.models import Permission
         q = Permission.get_define_permissions_q(self.perms)
         permissions = Permission.get_permissions(self.scope)
@@ -72,6 +72,10 @@ class PredefineRole:
             permissions = permissions.exclude(q)
 
         perms = permissions.values_list('id', flat=True)
+        return perms
+
+    def _get_defaults(self):
+        perms = self.default_perms
         defaults = {
             'id': self.id, 'name': self.name, 'scope': self.scope,
             'builtin': True, 'permissions': perms
