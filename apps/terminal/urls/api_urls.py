@@ -22,6 +22,8 @@ router.register(r'replay-storages', api.ReplayStorageViewSet, 'replay-storage')
 router.register(r'command-storages', api.CommandStorageViewSet, 'command-storage')
 router.register(r'session-sharings', api.SessionSharingViewSet, 'session-sharing')
 router.register(r'session-join-records', api.SessionJoinRecordsViewSet, 'session-sharing-record')
+router.register(r'endpoints', api.EndpointViewSet, 'endpoint')
+router.register(r'endpoint-rules', api.EndpointRuleViewSet, 'endpoint-rule')
 
 urlpatterns = [
     path('my-sessions/', api.MySessionAPIView.as_view(), name='my-session'),

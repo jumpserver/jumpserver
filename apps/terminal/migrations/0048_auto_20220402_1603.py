@@ -7,6 +7,7 @@ from django.db import migrations, models
 import django.db.models.deletion
 import uuid
 from django.conf import settings
+from copy import deepcopy
 
 
 def util_urlparse(url, default_port=80):
@@ -44,10 +45,15 @@ class ProtocolChoices(models.TextChoices):
 
 def initial_default_protocols(apps, schema_editor):
     EndpointProtocol = apps.get_model("terminal", "EndpointProtocol")
-    data = [
-        {'name': p.name, 'port': p.default_port, 'builtin': True, 'enabled': True}
-        for p in ProtocolChoices
-    ]
+    data = []
+    for p in ProtocolChoices:
+        d = {'name': p.name, 'port': p.default_port, 'builtin': True, 'enabled': False}
+        data.append(d)
+
+        d_enabled = deepcopy(d)
+        d_enabled.update({'enabled': True})
+        data.append(d_enabled)
+    print('>> Initial default protocols ', data)
     protocols = [EndpointProtocol(**d) for d in data]
     EndpointProtocol.objects.bulk_create(protocols)
 
@@ -62,9 +68,11 @@ def initial_site_endpoints_to_db_if_need(apps, schema_editor):
         'name': _('Migrate Site Endpoint'),
         'host': site.hostname,
         'comment': _('Migrate site endpoint'),
+        'created_by': 'System'
     }
+    print('>> Initial endpoint site', site_data)
     endpoint, created = Endpoint.objects.get_or_create(host=site.hostname, defaults=site_data)
-    default_protocols = EndpointProtocol.objects.filter(builtin=True)
+    default_protocols = EndpointProtocol.objects.filter(builtin=True, enabled=True)
     endpoint.protocols.set(default_protocols)
 
 
@@ -76,6 +84,7 @@ def initial_xrdp_endpoints_to_db_if_need(apps, schema_editor):
 
     if not (settings.XRDP_ENABLED and xrdp_addr):
         return
+    EndpointProtocol = apps.get_model("terminal", "EndpointProtocol")
     Protocol = apps.get_model("terminal", "EndpointProtocol")
     Endpoint = apps.get_model("terminal", "Endpoint")
     xrdp = util_urlparse(xrdp_addr, default_port=3389)
@@ -83,20 +92,18 @@ def initial_xrdp_endpoints_to_db_if_need(apps, schema_editor):
         'name': _('Migrate XRDP Endpoint'),
         'host': xrdp.hostname,
         'comment': _('Migrate xrdp endpoint'),
+        'created_by': 'System'
     }
+    print('>> Initial endpoint xrdp', xrdp_data)
     endpoint, created = Endpoint.objects.get_or_create(host=xrdp.hostname, defaults=xrdp_data)
-    default_rdp_protocol = {
-        'name': ProtocolChoices.rdp,
-        'port': ProtocolChoices.rdp.default_port,
-        'builtin': True,
-        'enabled': True
-    }
-    default_rdp_protocol = Protocol.objects.filter(**default_rdp_protocol).first()
+    default_protocols = EndpointProtocol.objects \
+        .filter(builtin=True, enabled=False) \
+        .exclude(name=ProtocolChoices.rdp)
+    endpoint.protocols.set(default_protocols)
     xrdp_protocol = {
         'name': ProtocolChoices.rdp, 'port': xrdp.port, 'enabled': True
     }
     xrdp_protocol, created = Protocol.objects.get_or_create(**xrdp_protocol, defaults=xrdp_protocol)
-    endpoint.protocols.remove(default_rdp_protocol)
     endpoint.protocols.add(xrdp_protocol)
 
 
@@ -113,17 +120,20 @@ def initial_default_endpoint_rules(apps, schema_editor):
     rules = []
     for priority, endpoint in enumerate(endpoints, 21):
         data = {
-            'name': _('Default rules {}').format(endpoint.name),
+            'name': _('Default rules for endpoint {}').format(endpoint.name),
             'ip_group': '*',
             'priority': priority,
             'endpoint': endpoint,
+            'created_by': 'System'
         }
+        print('>> Initial endpoint rules', data)
         rule = EndpointRule(**data)
         rules.append(rule)
     EndpointRule.objects.bulk_create(rules)
 
 
 def initial_default_data_to_db(apps, schema_editor):
+    print()
     initial_default_protocols(apps, schema_editor)
     initial_default_endpoints(apps, schema_editor)
     initial_default_endpoint_rules(apps, schema_editor)
