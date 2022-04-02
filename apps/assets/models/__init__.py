@@ -1,4 +1,5 @@
 from .base import *
+from .platform import *
 from .asset import *
 from .label import Label
 from .user import *

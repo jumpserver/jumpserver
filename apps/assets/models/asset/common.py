@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 
 import uuid
 import logging
@@ -11,18 +11,17 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import ValidationError
 
-from common.fields.model import JsonDictTextField
 from common.utils import lazyproperty
 from orgs.mixins.models import OrgModelMixin, OrgManager
+from ..platform import Platform
+from ..base import AbsConnectivity
 
-from .base import AbsConnectivity
-
-__all__ = ['Asset', 'ProtocolsMixin', 'Platform', 'AssetQuerySet']
+__all__ = ['Asset', 'ProtocolsMixin', 'AssetQuerySet', 'default_node', 'default_cluster']
 logger = logging.getLogger(__name__)
 
 
 def default_cluster():
-    from .cluster import Cluster
+    from assets.models import Cluster
     name = "Default"
     defaults = {"name": name}
     cluster, created = Cluster.objects.get_or_create(
@@ -33,7 +32,7 @@ def default_cluster():
 
 def default_node():
     try:
-        from .node import Node
+        from assets.models import Node
         root = Node.org_root()
         return Node.objects.filter(id=root.id)
     except:
@@ -106,7 +105,7 @@ class NodesRelationMixin:
     _all_nodes_keys = None
 
     def get_nodes(self):
-        from .node import Node
+        from assets.models import Node
         nodes = self.nodes.all()
         if not nodes:
             nodes = Node.objects.filter(id=Node.org_root().id)
@@ -122,104 +121,25 @@ class NodesRelationMixin:
         return nodes
 
 
-class Platform(models.Model):
-    CHARSET_CHOICES = (
-        ('utf8', 'UTF-8'),
-        ('gbk', 'GBK'),
-    )
-    BASE_CHOICES = (
-        ('Linux', 'Linux'),
-        ('Unix', 'Unix'),
-        ('MacOS', 'MacOS'),
-        ('BSD', 'BSD'),
-        ('Windows', 'Windows'),
-        ('Other', 'Other'),
-    )
-    name = models.SlugField(verbose_name=_("Name"), unique=True, allow_unicode=True)
-    base = models.CharField(choices=BASE_CHOICES, max_length=16, default='Linux', verbose_name=_("Base"))
-    charset = models.CharField(default='utf8', choices=CHARSET_CHOICES, max_length=8, verbose_name=_("Charset"))
-    meta = JsonDictTextField(blank=True, null=True, verbose_name=_("Meta"))
-    internal = models.BooleanField(default=False, verbose_name=_("Internal"))
-    comment = models.TextField(blank=True, null=True, verbose_name=_("Comment"))
-
-    @classmethod
-    def default(cls):
-        linux, created = cls.objects.get_or_create(
-            defaults={'name': 'Linux'}, name='Linux'
-        )
-        return linux.id
-
-    def is_windows(self):
-        return self.base.lower() in ('windows',)
-
-    def is_unixlike(self):
-        return self.base.lower() in ("linux", "unix", "macos", "bsd")
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = _("Platform")
-        # ordering = ('name',)
-
-
-class AbsHardwareInfo(models.Model):
-    # Collect
-    vendor = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('Vendor'))
-    model = models.CharField(max_length=54, null=True, blank=True, verbose_name=_('Model'))
-    sn = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Serial number'))
-
-    cpu_model = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('CPU model'))
-    cpu_count = models.IntegerField(null=True, verbose_name=_('CPU count'))
-    cpu_cores = models.IntegerField(null=True, verbose_name=_('CPU cores'))
-    cpu_vcpus = models.IntegerField(null=True, verbose_name=_('CPU vcpus'))
-    memory = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('Memory'))
-    disk_total = models.CharField(max_length=1024, null=True, blank=True, verbose_name=_('Disk total'))
-    disk_info = models.CharField(max_length=1024, null=True, blank=True, verbose_name=_('Disk info'))
-
-    os = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('OS'))
-    os_version = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('OS version'))
-    os_arch = models.CharField(max_length=16, blank=True, null=True, verbose_name=_('OS arch'))
-    hostname_raw = models.CharField(max_length=128, blank=True, null=True, verbose_name=_('Hostname raw'))
-
-    class Meta:
-        abstract = True
-
-    @property
-    def cpu_info(self):
-        info = ""
-        if self.cpu_model:
-            info += self.cpu_model
-        if self.cpu_count and self.cpu_cores:
-            info += "{}*{}".format(self.cpu_count, self.cpu_cores)
-        return info
-
-    @property
-    def hardware_info(self):
-        if self.cpu_count:
-            return '{} Core {} {}'.format(
-                self.cpu_vcpus or self.cpu_count * self.cpu_cores,
-                self.memory, self.disk_total
-            )
-        else:
-            return ''
-
-
-class Asset(AbsConnectivity, AbsHardwareInfo, ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
+class Asset(AbsConnectivity, ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    ip = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
     hostname = models.CharField(max_length=128, verbose_name=_('Hostname'))
+    ip = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
     protocol = models.CharField(max_length=128, default=ProtocolsMixin.Protocol.ssh,
                                 choices=ProtocolsMixin.Protocol.choices, verbose_name=_('Protocol'))
     port = models.IntegerField(default=22, verbose_name=_('Port'))
     protocols = models.CharField(max_length=128, default='ssh/22', blank=True, verbose_name=_("Protocols"))
-    platform = models.ForeignKey(Platform, default=Platform.default, on_delete=models.PROTECT, verbose_name=_("Platform"), related_name='assets')
-    domain = models.ForeignKey("assets.Domain", null=True, blank=True, related_name='assets', verbose_name=_("Domain"), on_delete=models.SET_NULL)
-    nodes = models.ManyToManyField('assets.Node', default=default_node, related_name='assets', verbose_name=_("Nodes"))
+    platform = models.ForeignKey(Platform, default=Platform.default, on_delete=models.PROTECT,
+                                 verbose_name=_("Platform"), related_name='assets')
+    domain = models.ForeignKey("assets.Domain", null=True, blank=True, related_name='assets',
+                               verbose_name=_("Domain"), on_delete=models.SET_NULL)
+    nodes = models.ManyToManyField('assets.Node', default=default_node, related_name='assets',
+                                   verbose_name=_("Nodes"))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
 
     # Auth
-    admin_user = models.ForeignKey('assets.SystemUser', on_delete=models.SET_NULL, null=True, verbose_name=_("Admin user"), related_name='admin_assets')
+    admin_user = models.ForeignKey('assets.SystemUser', on_delete=models.SET_NULL, null=True,
+                                   verbose_name=_("Admin user"), related_name='admin_assets')
 
     # Some information
     public_ip = models.CharField(max_length=128, blank=True, null=True, verbose_name=_('Public IP'))
@@ -236,7 +156,7 @@ class Asset(AbsConnectivity, AbsHardwareInfo, ProtocolsMixin, NodesRelationMixin
         return '{0.hostname}({0.ip})'.format(self)
 
     def set_admin_user_relation(self):
-        from .authbook import AuthBook
+        from assets.models import AuthBook
         if not self.admin_user:
             return
         if self.admin_user.type != 'admin':
@@ -333,7 +253,7 @@ class Asset(AbsConnectivity, AbsHardwareInfo, ProtocolsMixin, NodesRelationMixin
         return names
 
     def as_node(self):
-        from .node import Node
+        from assets.models import Node
         fake_node = Node()
         fake_node.id = self.id
         fake_node.key = self.id
@@ -372,7 +292,7 @@ class Asset(AbsConnectivity, AbsHardwareInfo, ProtocolsMixin, NodesRelationMixin
         return tree_node
 
     def get_all_system_users(self):
-        from .user import SystemUser
+        from assets.models import SystemUser
         system_user_ids = SystemUser.assets.through.objects.filter(asset=self)\
             .values_list('systemuser_id', flat=True)
         system_users = SystemUser.objects.filter(id__in=system_user_ids)

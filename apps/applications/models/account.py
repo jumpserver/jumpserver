@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from common.utils import lazyproperty
 from assets.models.base import BaseUser
+from assets.models import SystemUser
 
 
 class Account(BaseUser):
@@ -108,3 +109,9 @@ class Account(BaseUser):
 
     def __str__(self):
         return self.smart_name
+
+
+class ApplicationUser(SystemUser):
+    class Meta:
+        proxy = True
+        verbose_name = _('Application user')

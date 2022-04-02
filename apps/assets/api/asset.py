@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import RetrieveAPIView, ListAPIView
+from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
@@ -27,8 +27,7 @@ from ..filters import FilterAssetByNodeFilterBackend, LabelFilterBackend, IpInFi
 logger = get_logger(__file__)
 __all__ = [
     'AssetViewSet', 'AssetPlatformRetrieveApi',
-    'AssetGatewayListApi', 'AssetPlatformViewSet',
-    'AssetTaskCreateApi', 'AssetsTaskCreateApi',
+    'AssetGatewayListApi', 'AssetTaskCreateApi', 'AssetsTaskCreateApi',
     'AssetPermUserListApi', 'AssetPermUserPermissionsListApi',
     'AssetPermUserGroupListApi', 'AssetPermUserGroupPermissionsListApi',
 ]
@@ -52,7 +51,8 @@ class AssetViewSet(SuggestionMixin, FilterAssetByNodeMixin, OrgBulkModelViewSet)
     ordering = ('hostname', )
     serializer_classes = {
         'default': serializers.AssetSerializer,
-        'suggestion': serializers.MiniAssetSerializer
+        'suggestion': serializers.MiniAssetSerializer,
+        'platform': serializers.PlatformSerializer
     }
     rbac_perms = {
         'match': 'assets.match_asset'
@@ -74,6 +74,10 @@ class AssetViewSet(SuggestionMixin, FilterAssetByNodeMixin, OrgBulkModelViewSet)
         assets = serializer.save()
         self.set_assets_node(assets)
 
+    @action(methods='GET', detail=True, url_path='platform')
+    def platform(self, request, *args, **kwargs):
+        pass
+
 
 class AssetPlatformRetrieveApi(RetrieveAPIView):
     queryset = Platform.objects.all()
@@ -86,20 +90,6 @@ class AssetPlatformRetrieveApi(RetrieveAPIView):
         asset_pk = self.kwargs.get('pk')
         asset = get_object_or_404(Asset, pk=asset_pk)
         return asset.platform
-
-
-class AssetPlatformViewSet(ModelViewSet):
-    queryset = Platform.objects.all()
-    serializer_class = serializers.PlatformSerializer
-    filterset_fields = ['name', 'base']
-    search_fields = ['name']
-
-    def check_object_permissions(self, request, obj):
-        if request.method.lower() in ['delete', 'put', 'patch'] and obj.internal:
-            self.permission_denied(
-                request, message={"detail": "Internal platform"}
-            )
-        return super().check_object_permissions(request, obj)
 
 
 class AssetsTaskMixin:
@@ -246,7 +236,7 @@ class AssetPermUserGroupListApi(BaseAssetPermUserOrUserGroupListApi):
         return user_groups
 
 
-class BaseAssetPermUserOrUserGroupPermissionsListApiMixin(generics.ListAPIView):
+class BasePermedAssetListApi(generics.ListAPIView):
     model = AssetPermission
     serializer_class = AssetPermissionSerializer
     filterset_class = AssetPermissionFilter
@@ -272,7 +262,7 @@ class BaseAssetPermUserOrUserGroupPermissionsListApiMixin(generics.ListAPIView):
         return queryset
 
 
-class AssetPermUserPermissionsListApi(BaseAssetPermUserOrUserGroupPermissionsListApiMixin):
+class AssetPermUserPermissionsListApi(BasePermedAssetListApi):
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
         queryset = self.filter_user_related(queryset)
@@ -291,7 +281,7 @@ class AssetPermUserPermissionsListApi(BaseAssetPermUserOrUserGroupPermissionsLis
         return user
 
 
-class AssetPermUserGroupPermissionsListApi(BaseAssetPermUserOrUserGroupPermissionsListApiMixin):
+class AssetPermUserGroupPermissionsListApi(BasePermedAssetListApi):
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
         queryset = self.filter_user_group_related(queryset)

@@ -5,7 +5,7 @@ from django.core.validators import RegexValidator
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-from ..models import Asset, Node, Platform, SystemUser
+from ...models import Asset, Node, Platform, SystemUser
 
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',
@@ -82,12 +82,6 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'protocol', 'port', 'protocols', 'is_active',
             'public_ip', 'number', 'comment',
         ]
-        fields_hardware = [
-            'vendor', 'model', 'sn', 'cpu_model', 'cpu_count',
-            'cpu_cores', 'cpu_vcpus', 'memory', 'disk_total', 'disk_info',
-            'os', 'os_version', 'os_arch', 'hostname_raw',
-            'cpu_info', 'hardware_info',
-        ]
         fields_fk = [
             'domain', 'domain_display', 'platform', 'admin_user', 'admin_user_display'
         ]
@@ -95,16 +89,13 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'nodes', 'nodes_display', 'labels', 'labels_display',
         ]
         read_only_fields = [
-            'connectivity', 'date_verified', 'cpu_info', 'hardware_info',
-            'created_by', 'date_created',
+            'connectivity', 'date_verified', 'created_by', 'date_created',
         ]
-        fields = fields_small + fields_hardware + fields_fk + fields_m2m + read_only_fields
+        fields = fields_small + fields_fk + fields_m2m + read_only_fields
         extra_kwargs = {
             'protocol': {'write_only': True},
             'port': {'write_only': True},
-            'hardware_info': {'label': _('Hardware info'), 'read_only': True},
             'admin_user_display': {'label': _('Admin user display'), 'read_only': True},
-            'cpu_info': {'label': _('CPU info')},
         }
 
     def get_fields(self):

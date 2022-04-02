@@ -17,6 +17,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='asset',
             name='cluster',
-            field=models.ForeignKey(default=assets.models.asset.default_cluster, on_delete=django.db.models.deletion.SET_DEFAULT, related_name='assets', to='assets.Cluster', verbose_name='Cluster'),
+            field=models.ForeignKey(default=assets.models.default_cluster, on_delete=django.db.models.deletion.SET_DEFAULT, related_name='assets', to='assets.Cluster', verbose_name='Cluster'),
         ),
     ]
