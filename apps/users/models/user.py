@@ -20,6 +20,8 @@ from django.shortcuts import reverse
 from orgs.utils import current_org
 from orgs.models import Organization
 from rbac.const import Scope
+from rbac.builtin import BuiltinRole
+from rbac.models import Permission
 from common import fields
 from common.utils import (
     date_expired_default, get_logger, lazyproperty, random_string, bulk_create_with_signal
@@ -392,6 +394,15 @@ class RoleMixin:
         ids = [str(r.id) for r in self.org_roles.all()]
         yes = BuiltinRole.org_admin.id in ids
         return yes
+
+    @lazyproperty
+    def is_common_user(self):
+        from rbac.builtin import BuiltinRole
+        from rbac.models import Permission
+        system_user_perms = BuiltinRole.system_user.default_perms
+        org_user_perms = BuiltinRole.org_user.default_perms
+        default_user_perms = Permission.to_perms(system_user_perms | org_user_perms)
+        return not bool(set(self.perms) - set(default_user_perms))
 
     @property
     def is_staff(self):
