@@ -83,7 +83,8 @@ class RelationMixin:
 
 
 class CommonApiMixin(SerializerMixin, ExtraFilterFieldsMixin,
-                     QuerySetMixin, RenderToJsonMixin):
+                     QuerySetMixin, RenderToJsonMixin,
+                     PaginatedResponseMixin):
     pass
 
 
