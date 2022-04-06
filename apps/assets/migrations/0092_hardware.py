@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='HostInfo',
+            name='DeviceInfo',
             fields=[
                 ('vendor', models.CharField(blank=True, max_length=64, null=True, verbose_name='Vendor')),
                 ('model', models.CharField(blank=True, max_length=54, null=True, verbose_name='Model')),
@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
                 ('host', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='assets.host', related_name='info', verbose_name='Host')),
             ],
             options={
-                'verbose_name': 'HostInfo',
+                'verbose_name': 'DeviceInfo',
             },
         ),
     ]

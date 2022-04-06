@@ -7,7 +7,7 @@ from django.db import migrations
 def migrate_hardware(apps, *args):
     host_model = apps.get_model('assets', 'Host')
     asset_model = apps.get_model('assets', 'Asset')
-    hardware_model = apps.get_model('assets', 'HostInfo')
+    hardware_model = apps.get_model('assets', 'DeviceInfo')
 
     created = 0
     batch_size = 1000

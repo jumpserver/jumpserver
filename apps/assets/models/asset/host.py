@@ -9,8 +9,8 @@ class Host(Asset):
     pass
 
 
-class HostInfo(CommonModelMixin):
-    host = models.OneToOneField(Host, related_name='info', on_delete=models.CASCADE,
+class DeviceInfo(CommonModelMixin):
+    host = models.OneToOneField(Host, related_name='device_info', on_delete=models.CASCADE,
                                 verbose_name=_("Host"), unique=True)
     # Collect
     vendor = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('Vendor'))
@@ -53,4 +53,4 @@ class HostInfo(CommonModelMixin):
         return '{} of {}'.format(self.hardware_info, self.host.hostname)
 
     class Meta:
-        verbose_name = _("HostInfo")
+        verbose_name = _("DeviceInfo")

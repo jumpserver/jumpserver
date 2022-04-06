@@ -1,12 +1,14 @@
 from rest_framework import serializers
 
 from .common import AssetSerializer
-from assets.models import HostInfo
+from assets.models import DeviceInfo, Host
+
+__all__ = ['DeviceSerializer', 'HostSerializer']
 
 
-class HardwareSerializer(serializers.ModelSerializer):
+class DeviceSerializer(serializers.ModelSerializer):
     class Meta:
-        model = HostInfo
+        model = DeviceInfo
         fields = [
             'id', 'vendor', 'model', 'sn', 'cpu_model', 'cpu_count',
             'cpu_cores', 'cpu_vcpus', 'memory', 'disk_total', 'disk_info',
@@ -16,4 +18,8 @@ class HardwareSerializer(serializers.ModelSerializer):
 
 
 class HostSerializer(AssetSerializer):
-    hardware_info = HardwareSerializer(read_only=True)
+    device_info = DeviceSerializer(read_only=True, allow_null=True)
+
+    class Meta(AssetSerializer.Meta):
+        model = Host
+        fields = AssetSerializer.Meta.fields + ['device_info']

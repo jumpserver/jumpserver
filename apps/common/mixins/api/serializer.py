@@ -15,8 +15,12 @@ class SerializerMixin:
     serializer_classes = None
     single_actions = ['put', 'retrieve', 'patch']
 
+    def get_serializer_classes(self):
+        return getattr(self, 'serializer_classes', None)
+
     def get_serializer_class_by_view_action(self):
-        if not hasattr(self, 'serializer_classes'):
+        serializer_classes = self.get_serializer_classes()
+        if serializer_classes is None:
             return None
         if not isinstance(self.serializer_classes, dict):
             return None

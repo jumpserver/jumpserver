@@ -36,7 +36,7 @@ class AssetViewSet(SuggestionMixin, FilterAssetByNodeMixin, OrgBulkModelViewSet)
         'protocols': ['exact', 'icontains']
     }
     search_fields = ("hostname", "ip")
-    ordering_fields = ("hostname", "ip", "port", "cpu_cores")
+    ordering_fields = ("hostname", "ip", "port")
     ordering = ('hostname', )
     serializer_classes = {
         'default': serializers.AssetSerializer,
