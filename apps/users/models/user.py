@@ -22,6 +22,7 @@ from orgs.models import Organization
 from common.utils import date_expired_default, get_logger, lazyproperty, random_string
 from common import fields
 from django.db.models import TextChoices
+from rbac.const import Scope
 from ..signals import post_user_change_password, post_user_leave_org, pre_user_leave_org
 
 __all__ = ['User', 'UserPasswordHistory']
@@ -204,6 +205,13 @@ class RoleManager(models.Manager):
             return
         return self.role_bindings.delete()
 
+    def refresh_user_amount_cache(self):
+        from orgs.signal_handlers.cache import refresh_user_amount_cache, refresh_cache
+        if current_org.is_root():
+            refresh_cache('users_amount', current_org)
+        elif self.scope == Scope.org:
+            refresh_user_amount_cache(self.user)
+
     def add(self, *roles):
         from rbac.models import RoleBinding
         items = []
@@ -226,6 +234,7 @@ class RoleManager(models.Manager):
             logger.error('Create role binding error: {}'.format(e))
         finally:
             self.user.expire_users_rbac_perms_cache()
+            self.refresh_user_amount_cache()
 
     def set(self, roles):
         self.clear()
