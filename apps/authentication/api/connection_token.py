@@ -31,6 +31,7 @@ from perms.models.base import Action
 from perms.utils.application.permission import get_application_actions
 from perms.utils.asset.permission import get_asset_actions
 from common.const.http import PATCH
+from terminal.models import EndpointRule
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
 )
@@ -122,10 +123,23 @@ class ClientProtocolMixin:
         options['screen mode id:i'] = '2' if full_screen else '1'
 
         # RDP Server 地址
-        address = settings.TERMINAL_RDP_ADDR
-        if not address or address == 'localhost:3389':
-            address = self.request.get_host().split(':')[0] + ':3389'
-        options['full address:s'] = address
+        default_host = self.request.get_host().split(':')[0]
+        default_port = 3389
+        default_address = {
+            'host': default_host,
+            'port': default_port,
+            'url': f'{default_host}:{default_port}'
+        }
+        if asset:
+            target_ip = asset.get_target_ip()
+        elif application:
+            target_ip = application.get_target_ip()
+        else:
+            target_ip = ''
+        address = EndpointRule.get_endpoint_data(
+            target_ip=target_ip, protocol='rdp', default=default_address
+        )
+        options['full address:s'] = address['url']
         # 用户名
         options['username:s'] = '{}|{}'.format(user.username, token)
         if system_user.ad_domain:

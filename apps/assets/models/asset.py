@@ -235,6 +235,9 @@ class Asset(AbsConnectivity, AbsHardwareInfo, ProtocolsMixin, NodesRelationMixin
     def __str__(self):
         return '{0.hostname}({0.ip})'.format(self)
 
+    def get_target_ip(self):
+        return self.ip
+
     def set_admin_user_relation(self):
         from .authbook import AuthBook
         if not self.admin_user:
