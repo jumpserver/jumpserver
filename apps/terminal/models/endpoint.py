@@ -7,7 +7,7 @@ from common.fields.model import PortField
 
 class Endpoint(JMSModel):
     name = models.CharField(max_length=256, verbose_name=_('Name'), unique=True)
-    host = models.CharField(max_length=256, null=True, blank=True, verbose_name=_('Host'))
+    host = models.CharField(max_length=256, verbose_name=_('Host'))
     # disabled value=0
     https_port = PortField(default=8443, verbose_name=_('HTTPS Port'))
     http_port = PortField(default=80, verbose_name=_('HTTP Port'))
