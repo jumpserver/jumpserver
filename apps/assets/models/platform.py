@@ -1,17 +1,10 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from assets.const import Category, AllTypes
 from common.fields.model import JsonDictTextField
 
 __all__ = ['Platform']
-
-
-class Category(models.TextChoices):
-    Host = 'host', _('Host')
-    Network = 'network', _('Network device')
-    Database = 'database', _('Database')
-    RemoteApp = 'remote_app', _('Microsoft remote app')
-    Cloud = 'cloud', _("Cloud")
 
 
 class Platform(models.Model):
@@ -28,7 +21,8 @@ class Platform(models.Model):
         ('Other', 'Other'),
     )
     name = models.SlugField(verbose_name=_("Name"), unique=True, allow_unicode=True)
-    base = models.CharField(choices=BASE_CHOICES, max_length=16, default='Linux', verbose_name=_("Base"))
+    category = models.CharField(max_length=16, choices=Category.choices, verbose_name=_("Category"))
+    type = models.CharField(choices=AllTypes.choices, max_length=32, default='Linux', verbose_name=_("Base"))
     charset = models.CharField(default='utf8', choices=CHARSET_CHOICES, max_length=8, verbose_name=_("Charset"))
     meta = JsonDictTextField(blank=True, null=True, verbose_name=_("Meta"))
     internal = models.BooleanField(default=False, verbose_name=_("Internal"))

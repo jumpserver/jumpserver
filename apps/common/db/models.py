@@ -13,57 +13,34 @@ import uuid
 from functools import reduce, partial
 import inspect
 
-from django.db.models import *
+from django.db import models
+from django.db.models import F, Value, ExpressionWrapper
+from enum import _EnumDict
 from django.db.models import QuerySet
 from django.db.models.functions import Concat
 from django.utils.translation import ugettext_lazy as _
 
 
-class Choice(str):
-    def __new__(cls, value, label=''):  # `deepcopy` 的时候不会传 `label`
-        self = super().__new__(cls, value)
-        self.label = label
-        return self
+class IncludesTextChoicesMeta(type):
+    def __new__(metacls, classname, bases, classdict):
+        includes = classdict.pop('includes', None)
+        assert includes
 
+        attrs = _EnumDict()
+        for k, v in classdict.items():
+            attrs[k] = v
 
-class ChoiceSetType(type):
-    def __new__(cls, name, bases, attrs):
-        _choices = []
-        collected = set()
-        new_attrs = {}
-        for k, v in attrs.items():
-            if isinstance(v, tuple):
-                v = Choice(*v)
-                assert v not in collected, 'Cannot be defined repeatedly'
-                _choices.append(v)
-                collected.add(v)
-            new_attrs[k] = v
-        for base in bases:
-            if hasattr(base, '_choices'):
-                for c in base._choices:
-                    if c not in collected:
-                        _choices.append(c)
-                        collected.add(c)
-        new_attrs['_choices'] = _choices
-        new_attrs['_choices_dict'] = {c: c.label for c in _choices}
-        return type.__new__(cls, name, bases, new_attrs)
+        for cls in includes:
+            _member_names_ = cls._member_names_
+            _member_map_ = cls._member_map_
+            _value2label_map_ = cls._value2label_map_
 
-    def __contains__(self, item):
-        return self._choices_dict.__contains__(item)
-
-    def __getitem__(self, item):
-        return self._choices_dict.__getitem__(item)
-
-    def get(self, item, default=None):
-        return self._choices_dict.get(item, default)
-
-    @property
-    def choices(self):
-        return [(c, c.label) for c in self._choices]
-
-
-class ChoiceSet(metaclass=ChoiceSetType):
-    choices = None  # 用于 Django Model 中的 choices 配置， 为了代码提示在此声明
+            for name in _member_names_:
+                value = str(_member_map_[name])
+                label = _value2label_map_[value]
+                attrs[name] = value, label
+        bases = (models.TextChoices,)
+        return type(classname, bases, attrs)
 
 
 class BitOperationChoice:
@@ -107,18 +84,18 @@ class BitOperationChoice:
         return [(cls.NAME_MAP[i], j) for i, j in cls.DB_CHOICES]
 
 
-class JMSBaseModel(Model):
-    created_by = CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
-    updated_by = CharField(max_length=32, null=True, blank=True, verbose_name=_('Updated by'))
-    date_created = DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
-    date_updated = DateTimeField(auto_now=True, verbose_name=_('Date updated'))
+class BaseCreateUpdateModel(models.Model):
+    created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
+    updated_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Updated by'))
+    date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
+    date_updated = models.DateTimeField(auto_now=True, verbose_name=_('Date updated'))
 
     class Meta:
         abstract = True
 
 
-class JMSModel(JMSBaseModel):
-    id = UUIDField(default=uuid.uuid4, primary_key=True)
+class JMSBaseModel(BaseCreateUpdateModel):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
 
     class Meta:
         abstract = True
@@ -129,7 +106,7 @@ def concated_display(name1, name2):
 
 
 def output_as_string(field_name):
-    return ExpressionWrapper(F(field_name), output_field=CharField())
+    return ExpressionWrapper(F(field_name), output_field=models.CharField())
 
 
 class UnionQuerySet(QuerySet):

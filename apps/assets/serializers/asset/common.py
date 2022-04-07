@@ -70,6 +70,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     labels_display = serializers.ListField(
         child=serializers.CharField(), label=_('Labels name'), required=False, read_only=True
     )
+    category_display = serializers.ReadOnlyField(source='get_category_display', label=_("Category display"))
+    type_display = serializers.ReadOnlyField(source='get_type_display', label=_("Type display"))
 
     """
     资产的数据结构
@@ -78,7 +80,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     class Meta:
         model = Asset
         fields_mini = [
-            'id', 'category', 'category_display', 'type',
+            'id', 'category', 'category_display', 'type', 'type_display',
             'hostname', 'ip', 'platform', 'protocols'
         ]
         fields_small = fields_mini + [

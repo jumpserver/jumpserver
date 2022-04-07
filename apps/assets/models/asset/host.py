@@ -1,12 +1,15 @@
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 
+from assets.const import Category
 from common.mixins.models import CommonModelMixin
 from .common import Asset
 
 
 class Host(Asset):
-    pass
+    def save(self, *args, **kwargs):
+        self.category = Category.HOST
+        return super().save(*args, **kwargs)
 
 
 class DeviceInfo(CommonModelMixin):

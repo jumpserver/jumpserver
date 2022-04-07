@@ -3,8 +3,9 @@ import uuid
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.authtoken.models import Token
 from django.conf import settings
+from django.db import models
 
-from common.db import models
+from common.db.models import BaseCreateUpdateModel
 
 
 class AccessKey(models.Model):
@@ -40,7 +41,7 @@ class PrivateToken(Token):
         verbose_name = _('Private Token')
 
 
-class SSOToken(models.JMSBaseModel):
+class SSOToken(BaseCreateUpdateModel):
     """
     类似腾讯企业邮的 [单点登录](https://exmail.qq.com/qy_mng_logic/doc#10036)
     出于安全考虑，这里的 `token` 使用一次随即过期。但我们保留每一个生成过的 `token`。
@@ -53,7 +54,7 @@ class SSOToken(models.JMSBaseModel):
         verbose_name = _('SSO token')
 
 
-class ConnectionToken(models.JMSBaseModel):
+class ConnectionToken(BaseCreateUpdateModel):
     # Todo: 未来可能放到这里，不记录到 redis 了，虽然方便，但是不易于审计
     # Todo: add connection token 可能要授权给 普通用户, 或者放开就行
 

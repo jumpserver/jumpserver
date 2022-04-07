@@ -2,10 +2,11 @@ import logging
 
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import F, TextChoices
+from django.db import models
 
 from orgs.mixins.models import OrgModelMixin
-from common.db import models
 from common.utils import lazyproperty
+from common.db.models import BaseCreateUpdateModel
 from assets.models import Asset, SystemUser, Node, FamilyMixin
 
 from .base import BasePermission
@@ -89,7 +90,7 @@ class AssetPermission(BasePermission):
         return names
 
 
-class UserAssetGrantedTreeNodeRelation(OrgModelMixin, FamilyMixin, models.JMSBaseModel):
+class UserAssetGrantedTreeNodeRelation(OrgModelMixin, FamilyMixin, BaseCreateUpdateModel):
     class NodeFrom(TextChoices):
         granted = 'granted', 'Direct node granted'
         child = 'child', 'Have children node'

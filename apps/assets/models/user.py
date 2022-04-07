@@ -10,6 +10,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.cache import cache
 
 from common.utils import signer, get_object_or_none
+from assets.const import Protocol
 from .base import BaseUser
 from .asset import Asset
 from .authbook import AuthBook
@@ -21,20 +22,7 @@ logger = logging.getLogger(__name__)
 
 class ProtocolMixin:
     protocol: str
-
-    class Protocol(models.TextChoices):
-        ssh = 'ssh', 'SSH'
-        rdp = 'rdp', 'RDP'
-        telnet = 'telnet', 'Telnet'
-        vnc = 'vnc', 'VNC'
-        mysql = 'mysql', 'MySQL'
-        oracle = 'oracle', 'Oracle'
-        mariadb = 'mariadb', 'MariaDB'
-        postgresql = 'postgresql', 'PostgreSQL'
-        sqlserver = 'sqlserver', 'SQLServer'
-        redis = 'redis', 'Redis'
-        mongodb = 'mongodb', 'MongoDB'
-        k8s = 'k8s', 'K8S'
+    Protocol = Protocol
 
     SUPPORT_PUSH_PROTOCOLS = [Protocol.ssh, Protocol.rdp]
 
@@ -245,7 +233,7 @@ class SystemUser(ProtocolMixin, AuthMixin, BaseUser):
     groups = models.ManyToManyField('users.UserGroup', blank=True, verbose_name=_("User groups"))
     type = models.CharField(max_length=16, choices=Type.choices, default=Type.common, verbose_name=_('Type'))
     priority = models.IntegerField(default=81, verbose_name=_("Priority"), help_text=_("1-100, the lower the value will be match first"), validators=[MinValueValidator(1), MaxValueValidator(100)])
-    protocol = models.CharField(max_length=16, choices=ProtocolMixin.Protocol.choices, default='ssh', verbose_name=_('Protocol'))
+    protocol = models.CharField(max_length=16, choices=Protocol.choices, default='ssh', verbose_name=_('Protocol'))
     auto_push = models.BooleanField(default=True, verbose_name=_('Auto push'))
     sudo = models.TextField(default='/bin/whoami', verbose_name=_('Sudo'))
     shell = models.CharField(max_length=64,  default='/bin/bash', verbose_name=_('Shell'))

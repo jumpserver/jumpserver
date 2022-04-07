@@ -1,9 +1,11 @@
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
+
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-from assets.models import SystemUser
-from acls import models
 from orgs.models import Organization
+from assets.models import SystemUser
+from assets.const import Protocol
+from acls import models
 
 
 __all__ = ['LoginAssetACLSerializer']
@@ -54,7 +56,7 @@ class LoginAssetACLSystemUsersSerializer(serializers.Serializer):
     protocol_group = serializers.ListField(
         default=['*'], child=serializers.CharField(max_length=16), label=_('Protocol'),
         help_text=protocol_group_help_text.format(
-            ', '.join([SystemUser.Protocol.ssh, SystemUser.Protocol.telnet])
+            ', '.join([Protocol.ssh, Protocol.telnet])
         )
     )
 

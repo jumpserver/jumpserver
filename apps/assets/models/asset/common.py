@@ -13,9 +13,9 @@ from rest_framework.exceptions import ValidationError
 
 from common.utils import lazyproperty
 from orgs.mixins.models import OrgModelMixin, OrgManager
+from assets.const import Category, AllTypes
 from ..platform import Platform
 from ..base import AbsConnectivity
-from ._category import Category, AllTypes
 
 __all__ = ['Asset', 'ProtocolsMixin', 'AssetQuerySet', 'default_node', 'default_cluster']
 logger = logging.getLogger(__name__)
@@ -123,11 +123,12 @@ class NodesRelationMixin:
 
 
 class Asset(AbsConnectivity, ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
+    Category = Category
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     hostname = models.CharField(max_length=128, verbose_name=_('Hostname'))
     ip = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
     category = models.CharField(max_length=16, choices=Category.choices, verbose_name=_("Category"))
-    type = models.CharField(max_length=128, choices=AllTypes.choices(), verbose_name=_("Type"))
+    type = models.CharField(max_length=128, choices=AllTypes.choices, verbose_name=_("Type"))
     protocol = models.CharField(max_length=128, default=ProtocolsMixin.Protocol.ssh,
                                 choices=ProtocolsMixin.Protocol.choices, verbose_name=_('Protocol'))
     port = models.IntegerField(default=22, verbose_name=_('Port'))
@@ -182,14 +183,6 @@ class Asset(AbsConnectivity, ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
         if warning:
             return False, warning
         return True, warning
-
-    @property
-    def category_display(self):
-        return self.get_category_display()
-
-    @property
-    def type_display(self):
-        pass
 
     @lazyproperty
     def platform_base(self):

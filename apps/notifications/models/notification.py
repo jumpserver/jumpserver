@@ -1,11 +1,11 @@
 from django.db import models
 
-from common.db.models import JMSModel
+from common.db.models import JMSBaseModel
 
 __all__ = ('SystemMsgSubscription', 'UserMsgSubscription')
 
 
-class UserMsgSubscription(JMSModel):
+class UserMsgSubscription(JMSBaseModel):
     user = models.OneToOneField('users.User', related_name='user_msg_subscription', on_delete=models.CASCADE)
     receive_backends = models.JSONField(default=list)
 
@@ -13,7 +13,7 @@ class UserMsgSubscription(JMSModel):
         return f'{self.user} subscription: {self.receive_backends}'
 
 
-class SystemMsgSubscription(JMSModel):
+class SystemMsgSubscription(JMSBaseModel):
     message_type = models.CharField(max_length=128, unique=True)
     users = models.ManyToManyField('users.User', related_name='system_msg_subscriptions')
     groups = models.ManyToManyField('users.UserGroup', related_name='system_msg_subscriptions')

@@ -5,6 +5,7 @@ import forgery_py
 from .base import FakeDataGenerator
 
 from assets.models import *
+from assets.const import Protocol
 
 
 class AdminUsersGenerator(FakeDataGenerator):
@@ -28,7 +29,7 @@ class AdminUsersGenerator(FakeDataGenerator):
 class SystemUsersGenerator(FakeDataGenerator):
     def do_generate(self, batch, batch_size):
         system_users = []
-        protocols = list(dict(SystemUser.Protocol.choices).keys())
+        protocols = list(dict(Protocol.choices).keys())
         for i in batch:
             username = forgery_py.internet.user_name(True)
             protocol = random.choice(protocols)

@@ -6,4 +6,3 @@ from .common import Asset
 
 class Database(Asset):
     database = models.CharField(max_length=1024, verbose_name=_("Database"), blank=True)
-

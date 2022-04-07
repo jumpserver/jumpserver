@@ -11,6 +11,7 @@ from django.core.files.storage import default_storage
 from django.core.cache import cache
 
 from assets.models import Asset
+from assets.const import Protocol
 from users.models import User
 from orgs.mixins.models import OrgModelMixin
 from django.db.models import TextChoices
@@ -23,20 +24,6 @@ class Session(OrgModelMixin):
         RT = 'RT', 'RDP Terminal'
         WT = 'WT', 'Web Terminal'
         DT = 'DT', 'DB Terminal'
-
-    class PROTOCOL(TextChoices):
-        SSH = 'ssh', 'ssh'
-        RDP = 'rdp', 'rdp'
-        VNC = 'vnc', 'vnc'
-        TELNET = 'telnet', 'telnet'
-        MYSQL = 'mysql', 'mysql'
-        ORACLE = 'oracle', 'oracle'
-        MARIADB = 'mariadb', 'mariadb'
-        SQLSERVER = 'sqlserver', 'sqlserver'
-        POSTGRESQL = 'postgresql', 'postgresql'
-        REDIS = 'redis', 'redis'
-        MONGODB = 'mongodb', 'MongoDB'
-        K8S = 'k8s', 'kubernetes'
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     user = models.CharField(max_length=128, verbose_name=_("User"), db_index=True)
@@ -52,7 +39,7 @@ class Session(OrgModelMixin):
     has_replay = models.BooleanField(default=False, verbose_name=_("Replay"))
     has_command = models.BooleanField(default=False, verbose_name=_("Command"))
     terminal = models.ForeignKey('terminal.Terminal', null=True, on_delete=models.DO_NOTHING, db_constraint=False)
-    protocol = models.CharField(choices=PROTOCOL.choices, default='ssh', max_length=16, db_index=True)
+    protocol = models.CharField(choices=Protocol.choices, default='ssh', max_length=16, db_index=True)
     date_start = models.DateTimeField(verbose_name=_("Date start"), db_index=True, default=timezone.now)
     date_end = models.DateTimeField(verbose_name=_("Date end"), null=True)
 
@@ -131,29 +118,20 @@ class Session(OrgModelMixin):
 
     @property
     def can_join(self):
-        _PROTOCOL = self.PROTOCOL
         if self.is_finished:
             return False
         if self.login_from == self.LOGIN_FROM.RT:
             return False
-        if self.protocol in [
-            _PROTOCOL.SSH, _PROTOCOL.VNC, _PROTOCOL.RDP,
-            _PROTOCOL.TELNET, _PROTOCOL.K8S
+        if Protocol in [
+            Protocol.SSH, Protocol.VNC, Protocol.RDP,
+            Protocol.TELNET, Protocol.K8S
         ]:
             return True
         else:
             return False
 
     @property
-    def db_protocols(self):
-        _PROTOCOL = self.PROTOCOL
-        return [_PROTOCOL.MYSQL, _PROTOCOL.MARIADB, _PROTOCOL.ORACLE,
-                _PROTOCOL.POSTGRESQL, _PROTOCOL.SQLSERVER,
-                _PROTOCOL.REDIS, _PROTOCOL.MONGODB]
-
-    @property
     def can_terminate(self):
-        _PROTOCOL = self.PROTOCOL
         if self.is_finished:
             return False
         else:

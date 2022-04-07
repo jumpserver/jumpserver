@@ -10,6 +10,7 @@ from common.mixins.api import SuggestionMixin
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
 from orgs.utils import tmp_to_root_org
+from assets.const import Protocol
 from ..models import SystemUser, CommandFilterRule
 from .. import serializers
 from ..serializers import SystemUserWithAuthInfoSerializer, SystemUserTempAuthSerializer
@@ -56,7 +57,7 @@ class SystemUserViewSet(SuggestionMixin, OrgBulkModelViewSet):
         """ API 获取可选的 su_from 系统用户"""
         queryset = self.filter_queryset(self.get_queryset())
         queryset = queryset.filter(
-            protocol=SystemUser.Protocol.ssh, login_mode=SystemUser.LOGIN_AUTO
+            protocol=Protocol.ssh, login_mode=SystemUser.LOGIN_AUTO
         )
         return self.get_paginate_response_if_need(queryset)
 

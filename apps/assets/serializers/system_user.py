@@ -6,6 +6,7 @@ from common.mixins.serializers import BulkSerializerMixin
 from common.utils import ssh_pubkey_gen
 from common.validators import alphanumeric_re, alphanumeric_cn_re, alphanumeric_win_re
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
+from assets.const import Protocol
 from ..models import SystemUser, Asset
 from .utils import validate_password_contains_left_double_curly_bracket
 from .base import AuthSerializerMixin
@@ -107,9 +108,9 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     def validate_username(self, username):
         protocol = self.get_initial_value("protocol")
         if username:
-            if protocol == SystemUser.Protocol.telnet:
+            if protocol == Protocol.telnet:
                 regx = alphanumeric_cn_re
-            elif protocol == SystemUser.Protocol.rdp:
+            elif protocol == Protocol.rdp:
                 regx = alphanumeric_win_re
             else:
                 regx = alphanumeric_re
@@ -122,8 +123,8 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             return ''
 
         login_mode = self.get_initial_value("login_mode")
-        if login_mode == SystemUser.LOGIN_AUTO and protocol != SystemUser.Protocol.vnc \
-                and protocol != SystemUser.Protocol.redis:
+        if login_mode == SystemUser.LOGIN_AUTO and protocol != Protocol.vnc \
+                and protocol != Protocol.redis:
             msg = _('* Automatic login mode must fill in the username.')
             raise serializers.ValidationError(msg)
         return username
@@ -163,8 +164,8 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             error = _('This field is required.')
             raise serializers.ValidationError(error)
         # self: protocol ssh
-        protocol = self.get_initial_value('protocol', default=SystemUser.Protocol.ssh.value)
-        if protocol not in [SystemUser.Protocol.ssh.value]:
+        protocol = self.get_initial_value('protocol', default=Protocol.ssh.value)
+        if protocol not in [Protocol.ssh.value]:
             error = _('Only ssh protocol system users are allowed')
             raise serializers.ValidationError(error)
         # su_from: protocol same
@@ -184,7 +185,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             tp = attrs.get('type')
         if tp != SystemUser.Type.admin:
             return attrs
-        attrs['protocol'] = SystemUser.Protocol.ssh
+        attrs['protocol'] = Protocol.ssh
         attrs['login_mode'] = SystemUser.LOGIN_AUTO
         attrs['username_same_with_user'] = False
         attrs['auto_push'] = False
@@ -202,7 +203,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         if auto_gen_key and not self.instance:
             password = SystemUser.gen_password()
             attrs['password'] = password
-            if protocol == SystemUser.Protocol.ssh:
+            if protocol == Protocol.ssh:
                 private_key, public_key = SystemUser.gen_key(username)
                 attrs['private_key'] = private_key
                 attrs['public_key'] = public_key
