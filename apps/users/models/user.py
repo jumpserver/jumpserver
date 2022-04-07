@@ -78,7 +78,7 @@ class AuthMixin:
     def is_history_password(self, password):
         allow_history_password_count = settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT
         history_passwords = self.history_passwords.all() \
-            .order_by('-date_created')[:int(allow_history_password_count)]
+                                .order_by('-date_created')[:int(allow_history_password_count)]
 
         for history_password in history_passwords:
             if check_password(password, history_password.password):
@@ -726,7 +726,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
 
     @classmethod
     def get_group_ids_by_user_id(cls, user_id):
-        group_ids = cls.groups.through.objects.filter(user_id=user_id)\
+        group_ids = cls.groups.through.objects.filter(user_id=user_id) \
             .distinct().values_list('usergroup_id', flat=True)
         group_ids = list(group_ids)
         return group_ids
@@ -866,20 +866,20 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     @property
     def all_orgs(self):
         from rbac.builtin import BuiltinRole
-        has_system_role = self.system_roles.all()\
-            .exclude(name=BuiltinRole.system_user.name)\
+        has_system_role = self.system_roles.all() \
+            .exclude(name=BuiltinRole.system_user.name) \
             .exists()
         if has_system_role:
             orgs = list(Organization.objects.all())
         else:
-            orgs = list(self.orgs.all().distinct())
+            orgs = list(self.orgs.distinct())
         if self.has_perm('orgs.view_rootorg'):
             orgs = [Organization.root()] + orgs
         return orgs
 
     @property
     def my_orgs(self):
-        return list(self.orgs.all().distinct())
+        return list(self.orgs.distinct())
 
     class Meta:
         ordering = ['username']
