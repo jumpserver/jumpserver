@@ -31,6 +31,8 @@ def combine_seq(s1, s2, callback=None):
 
 
 def get_logger(name=''):
+    if '/' in name:
+        name = os.path.basename(name).replace('.py', '')
     return logging.getLogger('jumpserver.%s' % name)
 
 

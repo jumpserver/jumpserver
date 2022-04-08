@@ -14,7 +14,7 @@ from ..base import JMSModelBackend
 
 __all__ = ['SAML2Backend']
 
-logger = get_logger(__file__)
+logger = get_logger(__name__)
 
 
 class SAML2Backend(JMSModelBackend):

@@ -1,8 +1,8 @@
 import uuid
 
 from django.utils.translation import ugettext_lazy as _
-from rest_framework.authtoken.models import Token
 from django.conf import settings
+from rest_framework.authtoken.models import Token
 
 from common.db import models
 
@@ -62,6 +62,21 @@ class ConnectionToken(models.JMSBaseModel):
         permissions = [
             ('view_connectiontokensecret', _('Can view connection token secret'))
         ]
+
+
+class TempToken(models.JMSBaseModel):
+    username = models.CharField(max_length=128, verbose_name=_("Username"))
+    secret = models.CharField(max_length=64, verbose_name=_("Secret"))
+    verified = models.BooleanField(default=False, verbose_name=_("Verified"))
+    date_verified = models.DateTimeField(null=True, verbose_name=_("Date verified"))
+
+    class Meta:
+        verbose_name = _("One time token")
+
+    @property
+    def user(self):
+        from users.models import User
+        return User.objects.filter(username=self.username).first()
 
 
 class SuperConnectionToken(ConnectionToken):

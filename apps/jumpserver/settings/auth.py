@@ -159,6 +159,7 @@ AUTH_BACKEND_DINGTALK = 'authentication.backends.sso.DingTalkAuthentication'
 AUTH_BACKEND_FEISHU = 'authentication.backends.sso.FeiShuAuthentication'
 AUTH_BACKEND_AUTH_TOKEN = 'authentication.backends.sso.AuthorizationTokenAuthentication'
 AUTH_BACKEND_SAML2 = 'authentication.backends.saml2.SAML2Backend'
+AUTH_BACKEND_TEMP_TOKEN = 'authentication.backends.token.TempTokenAuthBackend'
 
 
 AUTHENTICATION_BACKENDS = [
@@ -171,7 +172,7 @@ AUTHENTICATION_BACKENDS = [
     # 扫码模式
     AUTH_BACKEND_WECOM, AUTH_BACKEND_DINGTALK, AUTH_BACKEND_FEISHU,
     # Token模式
-    AUTH_BACKEND_AUTH_TOKEN, AUTH_BACKEND_SSO,
+    AUTH_BACKEND_AUTH_TOKEN, AUTH_BACKEND_SSO, AUTH_BACKEND_TEMP_TOKEN
 ]
 
 ONLY_ALLOW_EXIST_USER_AUTH = CONFIG.ONLY_ALLOW_EXIST_USER_AUTH

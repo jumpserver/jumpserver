@@ -16,6 +16,7 @@ user_perms = (
     ('applications', 'application', 'match', 'application'),
     ('ops', 'commandexecution', 'add', 'commandexecution'),
     ('authentication', 'connectiontoken', 'add', 'connectiontoken'),
+    ('authentication', 'temptoken', 'add', 'temptoken'),
     ('tickets', 'ticket', 'view', 'ticket'),
 )
 
