@@ -7,7 +7,7 @@ from common.utils.ip import contains_ip
 
 
 class Endpoint(JMSModel):
-    name = models.CharField(max_length=256, verbose_name=_('Name'), unique=True)
+    name = models.CharField(max_length=128, verbose_name=_('Name'), unique=True)
     host = models.CharField(max_length=256, verbose_name=_('Host'))
     # disabled value=0
     https_port = PortField(default=8443, verbose_name=_('HTTPS Port'))
@@ -28,8 +28,8 @@ class Endpoint(JMSModel):
 
 
 class EndpointRule(JMSModel):
-    name = models.CharField(max_length=256, verbose_name=_('Name'), unique=True)
-    ip_group = models.TextField(default='', blank=True, verbose_name=_('IP group'))
+    name = models.CharField(max_length=128, verbose_name=_('Name'), unique=True)
+    ip_group = models.JSONField(default=list, verbose_name=_('IP group'))
     priority = models.IntegerField(
         verbose_name=_("Priority"), validators=[MinValueValidator(1), MaxValueValidator(100)],
         unique=True, help_text=_("1-100, the lower the value will be match first"),
@@ -50,13 +50,13 @@ class EndpointRule(JMSModel):
     @classmethod
     def match(cls, target_ip, protocol):
         for endpoint_rule in cls.objects.all().prefetch_related('endpoint'):
-            if not contains_ip(target_ip, endpoint_rule.ip_group):
-                continue
             if not endpoint_rule.endpoint:
                 continue
             if not endpoint_rule.endpoint.host:
                 continue
             if getattr(endpoint_rule.endpoint, f'{protocol}_port', 0) == 0:
+                continue
+            if not contains_ip(target_ip, endpoint_rule.ip_group):
                 continue
             return endpoint_rule
 

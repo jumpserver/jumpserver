@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 from common.drf.serializers import BulkModelSerializer
+from acls.serializers.rules import ip_group_help_text, ip_group_child_validator
 from ..models import Endpoint, EndpointRule
 
 __all__ = ['EndpointSerializer', 'EndpointRuleSerializer']
@@ -32,6 +33,10 @@ class EndpointSerializer(BulkModelSerializer):
 
 
 class EndpointRuleSerializer(BulkModelSerializer):
+    ip_group = serializers.ListField(
+        default=['*'], label=_('IP'), help_text=ip_group_help_text,
+        child=serializers.CharField(max_length=1024, validators=[ip_group_child_validator])
+    )
     endpoint_display = serializers.ReadOnlyField(source='endpoint.name', label=_('Endpoint'))
 
     class Meta:

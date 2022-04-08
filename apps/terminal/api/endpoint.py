@@ -46,13 +46,19 @@ class EndpointViewSet(JMSBulkModelViewSet):
             instance = get_object_or_none(model, pk=instance_id)
             target_ip = instance.get_target_ip()
 
-        default_url = request.get_host().split(':')[0]
-        data = EndpointRule.get_endpoint_data(target_ip, protocol, default=default_url)
+        default_host = request.get_host().split(':')[0]
+        default_port = 80
+        default_data = {
+            'host': default_host,
+            'port': default_port,
+            'url': f'{default_host}:{default_port}'
+        }
+        data = EndpointRule.get_endpoint_data(target_ip, protocol, default=default_data)
         return Response(data)
 
 
 class EndpointRuleViewSet(JMSBulkModelViewSet):
-    filterset_fields = ('name', 'ip_group')
+    filterset_fields = ('name',)
     search_fields = filterset_fields
     serializer_class = serializers.EndpointRuleSerializer
     queryset = EndpointRule.objects.all()

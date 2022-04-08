@@ -33,7 +33,7 @@ def migrate_site_endpoint_if_need(apps, schema_editor):
     endpoint = Endpoint.objects.create(**endpoint_data)
     endpoint_rule_data = {
         'name': _('Default rule'),
-        'ip_group': '*',
+        'ip_group': ['*'],
         'priority': 21,
         'endpoint': endpoint,
         'created_by': 'System'
@@ -63,7 +63,7 @@ def migrate_xrdp_endpoint_if_need(apps, schema_editor):
     if created:
         endpoint_rule_data = {
             'name': _('XRDP rule'),
-            'ip_group': '*',
+            'ip_group': ['*'],
             'priority': 22,
             'endpoint': endpoint,
             'created_by': 'System'
@@ -94,8 +94,8 @@ class Migration(migrations.Migration):
                 ('date_created', models.DateTimeField(auto_now_add=True, null=True, verbose_name='Date created')),
                 ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=256, unique=True, verbose_name='Name')),
-                ('host', models.CharField(blank=True, max_length=256, null=True, verbose_name='Host')),
+                ('name', models.CharField(max_length=128, unique=True, verbose_name='Name')),
+                ('host', models.CharField(max_length=256, verbose_name='Host')),
                 ('https_port', common.fields.model.PortField(default=8443, validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(65535)], verbose_name='HTTPS Port')),
                 ('http_port', common.fields.model.PortField(default=80, validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(65535)], verbose_name='HTTP Port')),
                 ('ssh_port', common.fields.model.PortField(default=22, validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(65535)], verbose_name='SSH Port')),
@@ -118,8 +118,8 @@ class Migration(migrations.Migration):
                 ('date_created', models.DateTimeField(auto_now_add=True, null=True, verbose_name='Date created')),
                 ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=256, unique=True, verbose_name='Name')),
-                ('ip_group', models.TextField(blank=True, default='', verbose_name='IP group')),
+                ('name', models.CharField(max_length=128, unique=True, verbose_name='Name')),
+                ('ip_group', models.JSONField(default=list, verbose_name='IP group')),
                 ('priority', models.IntegerField(help_text='1-100, the lower the value will be match first', unique=True, validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(100)], verbose_name='Priority')),
                 ('comment', models.TextField(blank=True, default='', verbose_name='Comment')),
                 ('endpoint', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='rules', to='terminal.endpoint', verbose_name='Endpoint')),
