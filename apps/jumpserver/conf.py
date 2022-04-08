@@ -255,6 +255,8 @@ class Config(dict):
         'AUTH_SAML2_PROVIDER_AUTHORIZATION_ENDPOINT': '/',
         'AUTH_SAML2_AUTHENTICATION_FAILURE_REDIRECT_URI': '/',
 
+        'AUTH_TEMP_TOKEN': False,
+
         # 企业微信
         'AUTH_WECOM': False,
         'WECOM_CORPID': '',

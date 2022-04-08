@@ -71,7 +71,7 @@ class TempToken(models.JMSModel):
     date_verified = models.DateTimeField(null=True, verbose_name=_("Date verified"))
 
     class Meta:
-        verbose_name = _("One time token")
+        verbose_name = _("Temporary token")
 
     @property
     def user(self):

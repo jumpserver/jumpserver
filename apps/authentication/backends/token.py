@@ -1,4 +1,5 @@
 from django.utils import timezone
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
 
 from authentication.models import TempToken
@@ -22,4 +23,4 @@ class TempTokenAuthBackend(JMSModelBackend):
 
     @staticmethod
     def is_enabled():
-        return True
+        return settings.AUTH_TEMP_TOKEN
