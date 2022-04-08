@@ -2,10 +2,10 @@ from django.utils import timezone
 from django.core.exceptions import PermissionDenied
 
 from authentication.models import TempToken
-from .base import JMSBaseAuthBackend
+from .base import JMSModelBackend
 
 
-class TempTokenAuthBackend(JMSBaseAuthBackend):
+class TempTokenAuthBackend(JMSModelBackend):
     model = TempToken
 
     def authenticate(self, request, username='', password='', *args, **kwargs):

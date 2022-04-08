@@ -64,7 +64,7 @@ class ConnectionToken(models.JMSBaseModel):
         ]
 
 
-class TempToken(models.JMSBaseModel):
+class TempToken(models.JMSModel):
     username = models.CharField(max_length=128, verbose_name=_("Username"))
     secret = models.CharField(max_length=64, verbose_name=_("Secret"))
     verified = models.BooleanField(default=False, verbose_name=_("Verified"))
