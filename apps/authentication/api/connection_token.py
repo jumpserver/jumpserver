@@ -52,6 +52,25 @@ class ClientProtocolMixin:
     request: Request
     get_serializer: Callable
     create_token: Callable
+    get_serializer_context: Callable
+
+    def get_endpoint_url(self, asset=None, application=None):
+        if asset:
+            target_ip = asset.get_target_ip()
+        elif application:
+            target_ip = application.get_target_ip()
+        else:
+            target_ip = ''
+        from terminal.serializers.endpoint import SmartEndpointSerializer
+        serializer = SmartEndpointSerializer(
+            data={
+                'match_protocol': 'rdp',
+                'match_target_ip': target_ip
+            },
+            context=self.get_serializer_context()
+        )
+        serializer.is_valid()
+        return serializer.data.get('smart_url')
 
     def get_request_resource(self, serializer):
         asset = serializer.validated_data.get('asset')
@@ -123,23 +142,7 @@ class ClientProtocolMixin:
         options['screen mode id:i'] = '2' if full_screen else '1'
 
         # RDP Server 地址
-        default_host = self.request.get_host().split(':')[0]
-        default_port = 3389
-        default_address = {
-            'host': default_host,
-            'port': default_port,
-            'url': f'{default_host}:{default_port}'
-        }
-        if asset:
-            target_ip = asset.get_target_ip()
-        elif application:
-            target_ip = application.get_target_ip()
-        else:
-            target_ip = ''
-        address = EndpointRule.get_endpoint_data(
-            target_ip=target_ip, protocol='rdp', default=default_address
-        )
-        options['full address:s'] = address['url']
+        options['full address:s'] = self.get_endpoint_url(asset=asset, application=application)
         # 用户名
         options['username:s'] = '{}|{}'.format(user.username, token)
         if system_user.ad_domain:

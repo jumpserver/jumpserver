@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from common.drf.api import JMSBulkModelViewSet
 from common.utils import get_object_or_none
+from django.shortcuts import get_object_or_404
 from assets.models import Asset
 from orgs.utils import tmp_to_root_org
 from applications.models import Application
@@ -20,41 +21,53 @@ class EndpointViewSet(JMSBulkModelViewSet):
     serializer_class = serializers.EndpointSerializer
     queryset = Endpoint.objects.all()
     rbac_perms = {
-        'get_connect_url': 'terminal.view_endpoint'
+        'smart': 'terminal.view_endpoint'
     }
 
-    @action(methods=['get'], detail=False, url_path='connect-url')
-    def get_connect_url(self, request, *args, **kwargs):
-        protocol = request.GET.get('protocol', 'https')
+    @staticmethod
+    def get_target_ip(request):
+        target_ip = request.GET.get('target_ip')
+        if target_ip:
+            return target_ip
         asset_id = request.GET.get('asset_id')
-        application_id = request.GET.get('application_id')
+        application_id = request.GET.get('app_id')
         session_id = request.GET.get('session_id')
         if asset_id:
-            instance_id = asset_id
+            pk = asset_id
             model = Asset
         elif application_id:
-            instance_id = application_id
+            pk = application_id
             model = Application
         elif session_id:
-            instance_id = session_id
+            pk = session_id
             model = Session
         else:
-            resp = Response(data={'error': 'Not found instance'}, status=status.HTTP_404_NOT_FOUND)
+            resp = Response(
+                data={'error': 'Not found instance'},
+                status=status.HTTP_404_NOT_FOUND
+            )
             return resp
 
         with tmp_to_root_org():
-            instance = get_object_or_none(model, pk=instance_id)
+            instance = get_object_or_404(model, pk=pk)
             target_ip = instance.get_target_ip()
+            return target_ip
 
-        default_host = request.get_host().split(':')[0]
-        default_port = 80
-        default_data = {
-            'host': default_host,
-            'port': default_port,
-            'url': f'{default_host}:{default_port}'
-        }
-        data = EndpointRule.get_endpoint_data(target_ip, protocol, default=default_data)
-        return Response(data)
+    @action(methods=['get'], detail=False, url_path='smart')
+    def smart(self, request, *args, **kwargs):
+        protocol = request.GET.get('protocol')
+        if not protocol:
+            return Response(
+                data={'error': _('Not found protocol query params')},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        target_ip = self.get_target_ip(request)
+        serializer = serializers.SmartEndpointSerializer(
+            data={'match_protocol': protocol, 'match_target_ip': target_ip},
+            context=self.get_serializer_context()
+        )
+        serializer.is_valid()
+        return Response(serializer.data)
 
 
 class EndpointRuleViewSet(JMSBulkModelViewSet):

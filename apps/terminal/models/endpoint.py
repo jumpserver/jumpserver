@@ -26,6 +26,9 @@ class Endpoint(JMSModel):
     def __str__(self):
         return self.name
 
+    def get_port(self, protocol):
+        return getattr(self, f'{protocol}_port', 0)
+
 
 class EndpointRule(JMSModel):
     name = models.CharField(max_length=128, verbose_name=_('Name'), unique=True)
@@ -61,21 +64,7 @@ class EndpointRule(JMSModel):
             return endpoint_rule
 
     @classmethod
-    def get_endpoint(cls, target_ip, protocol):
+    def match_endpoint(cls, target_ip, protocol):
         endpoint_rule = cls.match(target_ip, protocol)
         endpoint = endpoint_rule.endpoint if endpoint_rule else None
         return endpoint
-
-    @classmethod
-    def get_endpoint_data(cls, target_ip, protocol, default=None):
-        endpoint = cls.get_endpoint(target_ip, protocol)
-        if not endpoint:
-            return default
-        host = endpoint.host
-        port = getattr(endpoint, f'{protocol}_port', 0)
-        data = {
-            'host': endpoint.host,
-            'port': port,
-            'url': f'{host}:{port}'
-        }
-        return data
