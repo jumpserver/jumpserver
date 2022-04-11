@@ -18,7 +18,6 @@ from common.utils import get_logger
 from common.exceptions import JMSException
 from .models import AbstractSessionCommand
 
-
 logger = get_logger(__file__)
 
 
@@ -27,7 +26,7 @@ class InvalidElasticsearch(JMSException):
     default_detail = _('Invalid elasticsearch config')
 
 
-class CommandStore():
+class CommandStore(object):
     def __init__(self, config):
         hosts = config.get("HOSTS")
         kwargs = config.get("OTHER", {})
@@ -208,7 +207,7 @@ class CommandStore():
         elif org_id in (real_default_org_id, ''):
             match.pop('org_id')
             should.append({
-                'bool':{
+                'bool': {
                     'must_not': [
                         {
                             'wildcard': {'org_id': '*'}
@@ -226,20 +225,20 @@ class CommandStore():
                     ],
                     'should': should,
                     'filter': [
-                        {
-                            'term': {k: v}
-                        } for k, v in exact.items()
-                    ] + [
-                        {
-                            'range': {
-                                'timestamp': timestamp_range
-                            }
-                        }
-                    ] + [
-                        {
-                            'ids': {k: v}
-                        } for k, v in index.items()
-                    ]
+                                  {
+                                      'term': {k: v}
+                                  } for k, v in exact.items()
+                              ] + [
+                                  {
+                                      'range': {
+                                          'timestamp': timestamp_range
+                                      }
+                                  }
+                              ] + [
+                                  {
+                                      'ids': {k: v}
+                                  } for k, v in index.items()
+                              ]
                 }
             },
         }
@@ -326,8 +325,8 @@ class QuerySet(DJQuerySet):
 
     def __getattribute__(self, item):
         if any((
-            item.startswith('__'),
-            item in QuerySet.__dict__,
+                item.startswith('__'),
+                item in QuerySet.__dict__,
         )):
             return object.__getattribute__(self, item)
 

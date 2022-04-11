@@ -41,7 +41,7 @@ def import_string(dotted_path):
     except AttributeError as err:
         raise ImportError('Module "%s" does not define a "%s" attribute/class' % (
             module_path, class_name)
-        ) from err
+                          ) from err
 
 
 def is_absolute_uri(uri):
@@ -176,6 +176,7 @@ class Config(dict):
         'AUTH_LDAP_SYNC_IS_PERIODIC': False,
         'AUTH_LDAP_SYNC_INTERVAL': None,
         'AUTH_LDAP_SYNC_CRONTAB': None,
+        'AUTH_LDAP_SYNC_ORG_ID': '00000000-0000-0000-0000-000000000002',
         'AUTH_LDAP_USER_LOGIN_ONLY_IN_USERS': False,
         'AUTH_LDAP_OPTIONS_OPT_REFERRALS': -1,
 
@@ -272,7 +273,7 @@ class Config(dict):
         'FEISHU_APP_ID': '',
         'FEISHU_APP_SECRET': '',
 
-        'LOGIN_REDIRECT_TO_BACKEND':  '',  # 'OPENID / CAS / SAML2
+        'LOGIN_REDIRECT_TO_BACKEND': '',  # 'OPENID / CAS / SAML2
         'LOGIN_REDIRECT_MSG_ENABLED': True,
 
         'SMS_ENABLED': False,

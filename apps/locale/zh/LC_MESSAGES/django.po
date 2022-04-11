@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-11 17:08+0800\n"
+"POT-Creation-Date: 2022-04-11 19:19+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -92,7 +92,7 @@ msgstr "登录复核"
 #: assets/models/cmd_filter.py:30 assets/models/label.py:15 audits/models.py:37
 #: audits/models.py:60 audits/models.py:85 audits/serializers.py:100
 #: authentication/models.py:50 orgs/models.py:214 perms/models/base.py:84
-#: rbac/builtin.py:101 rbac/models/rolebinding.py:40 templates/index.html:78
+#: rbac/builtin.py:105 rbac/models/rolebinding.py:40 templates/index.html:78
 #: terminal/backends/command/models.py:19
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:44
 #: terminal/notifications.py:91 terminal/notifications.py:139
@@ -219,7 +219,7 @@ msgstr "格式为逗号分隔的字符串, * 表示匹配所有. 可选的协议
 #: acls/serializers/login_asset_acl.py:55 assets/models/asset.py:213
 #: assets/models/domain.py:62 assets/models/user.py:248
 #: terminal/serializers/endpoint.py:37 terminal/serializers/session.py:30
-#: terminal/serializers/storage.py:69
+#: terminal/serializers/storage.py:67
 msgid "Protocol"
 msgstr "协议"
 
@@ -781,7 +781,7 @@ msgstr "校验日期"
 #: assets/models/base.py:177 audits/signal_handlers.py:68
 #: authentication/forms.py:22
 #: authentication/templates/authentication/login.html:181
-#: settings/serializers/auth/ldap.py:44 users/forms/profile.py:21
+#: settings/serializers/auth/ldap.py:43 users/forms/profile.py:21
 #: users/templates/users/_msg_user_created.html:13
 #: users/templates/users/user_password_update.html:43
 #: users/templates/users/user_password_verify.html:18
@@ -1136,7 +1136,7 @@ msgid "Actions"
 msgstr "动作"
 
 #: assets/serializers/backup.py:31 ops/mixin.py:106 ops/mixin.py:147
-#: settings/serializers/auth/ldap.py:59
+#: settings/serializers/auth/ldap.py:62
 #: xpack/plugins/change_auth_plan/serializers/base.py:42
 msgid "Periodic perform"
 msgstr "定时执行"
@@ -1550,7 +1550,7 @@ msgstr "主机名称"
 msgid "Result"
 msgstr "结果"
 
-#: audits/serializers.py:98 terminal/serializers/storage.py:161
+#: audits/serializers.py:98 terminal/serializers/storage.py:156
 msgid "Hosts"
 msgstr "主机"
 
@@ -2048,7 +2048,7 @@ msgstr "该 MFA ({}) 方式没有启用"
 msgid "Please change your password"
 msgstr "请修改密码"
 
-#: authentication/models.py:33 terminal/serializers/storage.py:30
+#: authentication/models.py:33 terminal/serializers/storage.py:28
 msgid "Access key"
 msgstr "API key"
 
@@ -2172,7 +2172,7 @@ msgstr "代码错误"
 #: authentication/templates/authentication/_msg_reset_password.html:3
 #: authentication/templates/authentication/_msg_rest_password_success.html:2
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:2
-#: jumpserver/conf.py:295 ops/tasks.py:145 ops/tasks.py:148
+#: jumpserver/conf.py:296 ops/tasks.py:145 ops/tasks.py:148
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: perms/templates/perms/_msg_permed_items_expire.html:3
 #: users/templates/users/_msg_account_expire_reminder.html:4
@@ -2624,11 +2624,11 @@ msgstr "不能包含特殊字符"
 msgid "The mobile phone number format is incorrect"
 msgstr "手机号格式不正确"
 
-#: jumpserver/conf.py:294
+#: jumpserver/conf.py:295
 msgid "Create account successfully"
 msgstr "创建账号成功"
 
-#: jumpserver/conf.py:296
+#: jumpserver/conf.py:297
 msgid "Your account has been created successfully"
 msgstr "你的账号已创建成功"
 
@@ -2689,12 +2689,12 @@ msgid "App ops"
 msgstr "作业中心"
 
 #: ops/mixin.py:29 ops/mixin.py:92 ops/mixin.py:162
-#: settings/serializers/auth/ldap.py:66
+#: settings/serializers/auth/ldap.py:69
 msgid "Cycle perform"
 msgstr "周期执行"
 
 #: ops/mixin.py:33 ops/mixin.py:90 ops/mixin.py:109 ops/mixin.py:150
-#: settings/serializers/auth/ldap.py:63
+#: settings/serializers/auth/ldap.py:66
 msgid "Regularly perform"
 msgstr "定期执行"
 
@@ -2881,7 +2881,8 @@ msgstr "组织管理"
 
 #: orgs/mixins/models.py:46 orgs/mixins/serializers.py:25 orgs/models.py:80
 #: orgs/models.py:211 rbac/const.py:7 rbac/models/rolebinding.py:47
-#: rbac/serializers/rolebinding.py:40 tickets/serializers/ticket/ticket.py:77
+#: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:59
+#: tickets/serializers/ticket/ticket.py:77
 msgid "Organization"
 msgstr "组织"
 
@@ -3118,27 +3119,27 @@ msgstr "{} 至少有一个系统角色"
 msgid "RBAC"
 msgstr "RBAC"
 
-#: rbac/builtin.py:92
+#: rbac/builtin.py:96
 msgid "SystemAdmin"
 msgstr "系统管理员"
 
-#: rbac/builtin.py:95
+#: rbac/builtin.py:99
 msgid "SystemAuditor"
 msgstr "系统审计员"
 
-#: rbac/builtin.py:98
+#: rbac/builtin.py:102
 msgid "SystemComponent"
 msgstr "系统组件"
 
-#: rbac/builtin.py:104
+#: rbac/builtin.py:108
 msgid "OrgAdmin"
 msgstr "组织管理员"
 
-#: rbac/builtin.py:107
+#: rbac/builtin.py:111
 msgid "OrgAuditor"
 msgstr "组织审计员"
 
-#: rbac/builtin.py:110
+#: rbac/builtin.py:114
 msgid "OrgUser"
 msgstr "组织用户"
 
@@ -3342,11 +3343,11 @@ msgstr "同步正在运行，请稍等"
 msgid "Synchronization error: {}"
 msgstr "同步错误: {}"
 
-#: settings/api/ldap.py:211
+#: settings/api/ldap.py:213
 msgid "Get ldap users is None"
 msgstr "获取 LDAP 用户为 None"
 
-#: settings/api/ldap.py:220
+#: settings/api/ldap.py:222
 msgid "Imported {} users successfully (Organization: {})"
 msgstr "成功导入 {} 个用户 ( 组织: {} )"
 
@@ -3474,15 +3475,15 @@ msgstr "启用钉钉认证"
 msgid "Enable FeiShu Auth"
 msgstr "启用飞书认证"
 
-#: settings/serializers/auth/ldap.py:39
+#: settings/serializers/auth/ldap.py:38
 msgid "LDAP server"
 msgstr "LDAP 地址"
 
-#: settings/serializers/auth/ldap.py:40
+#: settings/serializers/auth/ldap.py:39
 msgid "eg: ldap://localhost:389"
 msgstr "如: ldap://localhost:389"
 
-#: settings/serializers/auth/ldap.py:42
+#: settings/serializers/auth/ldap.py:41
 msgid "Bind DN"
 msgstr "绑定 DN"
 
@@ -3515,15 +3516,15 @@ msgstr ""
 "用户属性映射代表怎样将LDAP中用户属性映射到jumpserver用户上，username, name,"
 "email 是jumpserver的用户需要属性"
 
-#: settings/serializers/auth/ldap.py:70
+#: settings/serializers/auth/ldap.py:73
 msgid "Connect timeout"
 msgstr "连接超时时间"
 
-#: settings/serializers/auth/ldap.py:72
+#: settings/serializers/auth/ldap.py:75
 msgid "Search paged size"
 msgstr "搜索分页数量"
 
-#: settings/serializers/auth/ldap.py:74
+#: settings/serializers/auth/ldap.py:77
 msgid "Enable LDAP auth"
 msgstr "启用 LDAP 认证"
 
@@ -4669,7 +4670,7 @@ msgstr "Jmservisor 是在 windows 远程应用发布服务器中用来拉起远�
 msgid "Filters"
 msgstr "过滤"
 
-#: terminal/api/endpoint.py:54
+#: terminal/api/endpoint.py:57
 msgid "Not found protocol query params"
 msgstr ""
 
@@ -4729,7 +4730,7 @@ msgstr "有在线会话"
 msgid "Terminals"
 msgstr "终端管理"
 
-#: terminal/backends/command/es.py:27
+#: terminal/backends/command/es.py:26
 msgid "Invalid elasticsearch config"
 msgstr "无效的 Elasticsearch 配置"
 
@@ -4851,9 +4852,9 @@ msgid "PostgreSQL Port"
 msgstr "PostgreSQL 端口"
 
 #: terminal/models/endpoint.py:23 terminal/models/endpoint.py:42
-#: terminal/serializers/endpoint.py:88 terminal/serializers/storage.py:39
-#: terminal/serializers/storage.py:51 terminal/serializers/storage.py:81
-#: terminal/serializers/storage.py:91 terminal/serializers/storage.py:99
+#: terminal/serializers/endpoint.py:88 terminal/serializers/storage.py:37
+#: terminal/serializers/storage.py:49 terminal/serializers/storage.py:79
+#: terminal/serializers/storage.py:89 terminal/serializers/storage.py:97
 msgid "Endpoint"
 msgstr "端点"
 
@@ -5078,59 +5079,59 @@ msgstr "是否可中断"
 msgid "Command amount"
 msgstr "命令数量"
 
-#: terminal/serializers/storage.py:21
+#: terminal/serializers/storage.py:19
 msgid "Endpoint invalid: remove path `{}`"
 msgstr "端点无效: 移除路径 `{}`"
 
-#: terminal/serializers/storage.py:27
+#: terminal/serializers/storage.py:25
 msgid "Bucket"
 msgstr "桶名称"
 
-#: terminal/serializers/storage.py:34 users/models/user.py:695
+#: terminal/serializers/storage.py:32 users/models/user.py:695
 msgid "Secret key"
 msgstr "密钥"
 
-#: terminal/serializers/storage.py:66 xpack/plugins/cloud/models.py:220
+#: terminal/serializers/storage.py:64 xpack/plugins/cloud/models.py:220
 msgid "Region"
 msgstr "地域"
 
-#: terminal/serializers/storage.py:110
+#: terminal/serializers/storage.py:108
 msgid "Container name"
 msgstr "容器名称"
 
-#: terminal/serializers/storage.py:112
+#: terminal/serializers/storage.py:110
 msgid "Account name"
 msgstr "账号名称"
 
-#: terminal/serializers/storage.py:113
+#: terminal/serializers/storage.py:111
 msgid "Account key"
 msgstr "账号密钥"
 
-#: terminal/serializers/storage.py:116
+#: terminal/serializers/storage.py:114
 msgid "Endpoint suffix"
 msgstr "端点后缀"
 
-#: terminal/serializers/storage.py:138
+#: terminal/serializers/storage.py:134
 msgid "The address format is incorrect"
 msgstr "地址格式不正确"
 
-#: terminal/serializers/storage.py:145
+#: terminal/serializers/storage.py:141
 msgid "Host invalid"
 msgstr "主机无效"
 
-#: terminal/serializers/storage.py:148
+#: terminal/serializers/storage.py:144
 msgid "Port invalid"
 msgstr "端口无效"
 
-#: terminal/serializers/storage.py:164
+#: terminal/serializers/storage.py:159
 msgid "Index"
 msgstr "索引"
 
-#: terminal/serializers/storage.py:166
+#: terminal/serializers/storage.py:161
 msgid "Doc type"
 msgstr "文档类型"
 
-#: terminal/serializers/storage.py:168
+#: terminal/serializers/storage.py:163
 msgid "Ignore Certificate Verification"
 msgstr "忽略证书认证"
 
@@ -6923,3 +6924,9 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "JD Cloud"
+#~ msgstr "京东云"
+
+#~ msgid "CN East-Suqian"
+#~ msgstr "华东-宿迁"
