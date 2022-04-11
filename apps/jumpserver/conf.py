@@ -309,9 +309,11 @@ class Config(dict):
         'TERMINAL_HOST_KEY': '',
         'TERMINAL_TELNET_REGEX': '',
         'TERMINAL_COMMAND_STORAGE': {},
-        # 废弃
+        # 未来废弃(当下迁移会用)
         'TERMINAL_RDP_ADDR': lambda: urlparse(settings.SITE_URL).hostname + ':3389',
-        # 废弃
+        # 保留(Luna还在用)
+        'TERMINAL_MAGNUS_ENABLED': True,
+        # 保留(Luna还在用)
         'XRDP_ENABLED': True,
 
         # 安全配置

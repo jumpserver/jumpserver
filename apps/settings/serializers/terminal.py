@@ -33,4 +33,5 @@ class TerminalSettingSerializer(serializers.Serializer):
         help_text=_("The login success message varies with devices. "
                     "if you cannot log in to the device through Telnet, set this parameter")
     )
+    TERMINAL_MAGNUS_ENABLED = serializers.BooleanField(label=_("Enable database proxy"))
     XRDP_ENABLED = serializers.BooleanField(label=_("Enable XRDP"))
