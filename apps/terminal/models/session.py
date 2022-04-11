@@ -197,13 +197,11 @@ class Session(OrgModelMixin):
         return self.get_login_from_display()
 
     def get_target_ip(self):
-        asset = get_object_or_none(Asset, pk=self.asset_id)
-        if asset:
-            return asset.ip
-        application = get_object_or_none(Application, pk=self.asset_id)
-        if application:
-            return application.get_target_ip()
-        return ''
+        instance = get_object_or_none(Asset, pk=self.asset_id)
+        if not instance:
+            instance = get_object_or_none(Application, pk=self.asset_id)
+        target_ip = instance.get_target_ip() if instance else ''
+        return target_ip
 
     @classmethod
     def generate_fake(cls, count=100, is_finished=True):

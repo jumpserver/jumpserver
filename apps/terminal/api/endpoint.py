@@ -30,23 +30,16 @@ class EndpointViewSet(JMSBulkModelViewSet):
         if target_ip:
             return target_ip
         asset_id = request.GET.get('asset_id')
-        application_id = request.GET.get('app_id')
+        app_id = request.GET.get('app_id')
         session_id = request.GET.get('session_id')
         if asset_id:
-            pk = asset_id
-            model = Asset
-        elif application_id:
-            pk = application_id
-            model = Application
+            pk, model = asset_id, Asset
+        elif app_id:
+            pk, model = app_id, Application
         elif session_id:
-            pk = session_id
-            model = Session
+            pk, model = session_id, Session
         else:
-            resp = Response(
-                data={'error': 'Not found instance'},
-                status=status.HTTP_404_NOT_FOUND
-            )
-            return resp
+            return ''
 
         with tmp_to_root_org():
             instance = get_object_or_404(model, pk=pk)

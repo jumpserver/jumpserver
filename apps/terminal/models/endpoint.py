@@ -53,13 +53,13 @@ class EndpointRule(JMSModel):
     @classmethod
     def match(cls, target_ip, protocol):
         for endpoint_rule in cls.objects.all().prefetch_related('endpoint'):
+            if not contains_ip(target_ip, endpoint_rule.ip_group):
+                continue
             if not endpoint_rule.endpoint:
                 continue
             if not endpoint_rule.endpoint.host:
                 continue
-            if getattr(endpoint_rule.endpoint, f'{protocol}_port', 0) == 0:
-                continue
-            if not contains_ip(target_ip, endpoint_rule.ip_group):
+            if endpoint_rule.endpoint.get_port(protocol) == 0:
                 continue
             return endpoint_rule
 

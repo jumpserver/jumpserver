@@ -37,7 +37,7 @@ class SmartEndpointSerializer(serializers.Serializer):
         max_length=1024, allow_null=False, allow_blank=False, label=_('Protocol')
     )
     match_target_ip = serializers.CharField(
-        max_length=1024, allow_null=False, allow_blank=False, label=_('Target IP')
+        max_length=1024, allow_null=False, allow_blank=True, label=_('Target IP')
     )
     smart_host = serializers.SerializerMethodField(label=_('Host'))
     smart_port = serializers.SerializerMethodField(label=_('Port'))
