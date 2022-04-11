@@ -3,7 +3,7 @@
 import common.fields.model
 import django.core.validators
 from django.db import migrations, models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_noop
 import django.db.models.deletion
 from django.conf import settings
 from urllib.parse import urlparse
@@ -25,14 +25,14 @@ def migrate_site_endpoint_if_need(apps, schema_editor):
     site = parse_url(settings.BASE_SITE_URL)
     site_port = site.port or 8443
     endpoint_data = {
-        'name': _('Default Endpoint'),
+        'name': ugettext_noop('Default Endpoint'),
         'host': site.hostname,
         'https_port': site_port,
         'created_by': 'System'
     }
     endpoint = Endpoint.objects.create(**endpoint_data)
     endpoint_rule_data = {
-        'name': _('Default rule'),
+        'name': ugettext_noop('Default rule'),
         'ip_group': ['*'],
         'priority': 21,
         'endpoint': endpoint,
@@ -54,7 +54,7 @@ def migrate_xrdp_endpoint_if_need(apps, schema_editor):
     xrdp = parse_url(xrdp_addr)
     xrdp_port = xrdp.port or 3389
     endpoint_data = {
-        'name': _('XRDP Endpoint'),
+        'name': ugettext_noop('XRDP Endpoint'),
         'host': xrdp.hostname,
         'rdp_port': xrdp_port,
         'created_by': 'System'
@@ -62,7 +62,7 @@ def migrate_xrdp_endpoint_if_need(apps, schema_editor):
     endpoint, created = Endpoint.objects.get_or_create(host=xrdp.hostname, defaults=endpoint_data)
     if created:
         endpoint_rule_data = {
-            'name': _('XRDP rule'),
+            'name': ugettext_noop('XRDP rule'),
             'ip_group': ['*'],
             'priority': 22,
             'endpoint': endpoint,
