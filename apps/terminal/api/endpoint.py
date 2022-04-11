@@ -32,12 +32,15 @@ class EndpointViewSet(JMSBulkModelViewSet):
         asset_id = request.GET.get('asset_id')
         app_id = request.GET.get('app_id')
         session_id = request.GET.get('session_id')
+        token = request.GET.get('token')
         if asset_id:
             pk, model = asset_id, Asset
         elif app_id:
             pk, model = app_id, Application
         elif session_id:
             pk, model = session_id, Session
+        elif token:
+            pk, model = None, None
         else:
             return ''
 
