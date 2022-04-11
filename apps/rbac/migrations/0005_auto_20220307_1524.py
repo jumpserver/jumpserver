@@ -12,6 +12,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='menupermission',
-            options={'default_permissions': [], 'permissions': [('view_console', 'Can view console view'), ('view_audit', 'Can view audit view'), ('view_workspace', 'Can view workspace view'), ('view_webterminal', 'Can view web terminal'), ('view_filemanager', 'Can view file manager')], 'verbose_name': 'Menu permission'},
+            options={'default_permissions': [], 'permissions': [('view_console', 'Can view console view'), ('view_audit', 'Can view audit view'), ('view_workspace', 'Can view workbench view'), ('view_webterminal', 'Can view web terminal'), ('view_filemanager', 'Can view file manager')], 'verbose_name': 'Menu permission'},
         ),
     ]
