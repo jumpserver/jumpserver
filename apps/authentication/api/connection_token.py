@@ -54,7 +54,7 @@ class ClientProtocolMixin:
     create_token: Callable
     get_serializer_context: Callable
 
-    def get_endpoint_url(self, asset=None, application=None):
+    def get_smart_endpoint(self, protocol, asset=None, application=None):
         if asset:
             target_ip = asset.get_target_ip()
         elif application:
@@ -64,13 +64,13 @@ class ClientProtocolMixin:
         from terminal.serializers.endpoint import SmartEndpointSerializer
         serializer = SmartEndpointSerializer(
             data={
-                'match_protocol': 'rdp',
+                'match_protocol': protocol,
                 'match_target_ip': target_ip
             },
             context=self.get_serializer_context()
         )
         serializer.is_valid()
-        return serializer.data.get('smart_url')
+        return serializer.data
 
     def get_request_resource(self, serializer):
         asset = serializer.validated_data.get('asset')
@@ -142,7 +142,10 @@ class ClientProtocolMixin:
         options['screen mode id:i'] = '2' if full_screen else '1'
 
         # RDP Server 地址
-        options['full address:s'] = self.get_endpoint_url(asset=asset, application=application)
+        smart_endpoint = self.get_smart_endpoint(
+            protocol='rdp', asset=asset, application=application
+        )
+        options['full address:s'] = smart_endpoint.get('smart_url')
         # 用户名
         options['username:s'] = '{}|{}'.format(user.username, token)
         if system_user.ad_domain:
@@ -186,9 +189,12 @@ class ClientProtocolMixin:
         else:
             name = '*'
 
+        smart_endpoint = self.get_smart_endpoint(
+            protocol='ssh', asset=asset, application=application
+        )
         content = {
-            'ip': settings.TERMINAL_KOKO_HOST,
-            'port': str(settings.TERMINAL_KOKO_SSH_PORT),
+            'ip': smart_endpoint.get('smart_host'),
+            'port': smart_endpoint.get('smart_port'),
             'username': f'JMS-{token}',
             'password': secret
         }

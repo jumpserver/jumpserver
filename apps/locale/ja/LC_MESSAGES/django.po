@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-31 11:21+0800\n"
+"POT-Creation-Date: 2022-04-11 16:38+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,6 +29,7 @@ msgstr "Acls"
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
 #: orgs/models.py:65 perms/models/base.py:83 rbac/models/role.py:29
 #: settings/models.py:29 settings/serializers/sms.py:6
+#: terminal/models/endpoint.py:10 terminal/models/endpoint.py:34
 #: terminal/models/storage.py:23 terminal/models/task.py:16
 #: terminal/models/terminal.py:100 users/forms/profile.py:32
 #: users/models/group.py:15 users/models/user.py:661
@@ -41,12 +42,12 @@ msgid "Name"
 msgstr "名前"
 
 #: acls/models/base.py:27 assets/models/cmd_filter.py:84
-#: assets/models/user.py:247
+#: assets/models/user.py:247 terminal/models/endpoint.py:37
 msgid "Priority"
 msgstr "優先順位"
 
 #: acls/models/base.py:28 assets/models/cmd_filter.py:84
-#: assets/models/user.py:247
+#: assets/models/user.py:247 terminal/models/endpoint.py:38
 msgid "1-100, the lower the value will be match first"
 msgstr "1-100、低い値は最初に一致します"
 
@@ -65,6 +66,7 @@ msgstr "アクティブ"
 #: assets/models/domain.py:64 assets/models/group.py:23
 #: assets/models/label.py:23 ops/models/adhoc.py:38 orgs/models.py:68
 #: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:34
+#: terminal/models/endpoint.py:20 terminal/models/endpoint.py:44
 #: terminal/models/storage.py:26 terminal/models/terminal.py:114
 #: tickets/models/comment.py:24 tickets/models/ticket.py:154
 #: users/models/group.py:16 users/models/user.py:698
@@ -93,7 +95,7 @@ msgstr "ログイン確認"
 #: authentication/models.py:50 orgs/models.py:214 perms/models/base.py:84
 #: rbac/builtin.py:101 rbac/models/rolebinding.py:40 templates/index.html:78
 #: terminal/backends/command/models.py:19
-#: terminal/backends/command/serializers.py:12 terminal/models/session.py:42
+#: terminal/backends/command/serializers.py:12 terminal/models/session.py:44
 #: terminal/notifications.py:91 terminal/notifications.py:139
 #: tickets/models/comment.py:17 users/const.py:14 users/models/user.py:886
 #: users/models/user.py:917 users/serializers/group.py:19
@@ -136,13 +138,13 @@ msgstr "システムユーザー"
 
 #: acls/models/login_asset_acl.py:22
 #: applications/serializers/attrs/application_category/remote_app.py:36
-#: assets/models/asset.py:383 assets/models/authbook.py:19
+#: assets/models/asset.py:386 assets/models/authbook.py:19
 #: assets/models/backup.py:31 assets/models/cmd_filter.py:38
 #: assets/models/gathered_user.py:14 assets/serializers/label.py:30
 #: assets/serializers/system_user.py:264 audits/models.py:39
 #: perms/models/asset_permission.py:23 templates/index.html:82
 #: terminal/backends/command/models.py:20
-#: terminal/backends/command/serializers.py:13 terminal/models/session.py:44
+#: terminal/backends/command/serializers.py:13 terminal/models/session.py:46
 #: terminal/notifications.py:90
 #: users/templates/users/user_asset_permission.html:40
 #: users/templates/users/user_asset_permission.html:70
@@ -196,7 +198,7 @@ msgstr ""
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
 #: authentication/templates/authentication/_msg_rest_password_success.html:8
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:8
-#: settings/serializers/terminal.py:8
+#: settings/serializers/terminal.py:8 terminal/serializers/endpoint.py:85
 #: users/templates/users/_granted_assets.html:26
 #: users/templates/users/user_asset_permission.html:156
 msgid "IP"
@@ -220,7 +222,8 @@ msgstr ""
 
 #: acls/serializers/login_asset_acl.py:55 assets/models/asset.py:213
 #: assets/models/domain.py:62 assets/models/user.py:248
-#: terminal/serializers/session.py:30 terminal/serializers/storage.py:69
+#: terminal/serializers/endpoint.py:37 terminal/serializers/session.py:30
+#: terminal/serializers/storage.py:69
 msgid "Protocol"
 msgstr "プロトコル"
 
@@ -285,7 +288,7 @@ msgstr "アプリケーション"
 #: assets/models/cmd_filter.py:42 assets/models/user.py:338 audits/models.py:40
 #: perms/models/application_permission.py:33
 #: perms/models/asset_permission.py:25 terminal/backends/command/models.py:21
-#: terminal/backends/command/serializers.py:35 terminal/models/session.py:46
+#: terminal/backends/command/serializers.py:35 terminal/models/session.py:48
 #: users/templates/users/_granted_assets.html:27
 #: users/templates/users/user_asset_permission.html:42
 #: users/templates/users/user_asset_permission.html:76
@@ -351,7 +354,7 @@ msgstr "ツールバーの"
 msgid "Can match application"
 msgstr "アプリケーションを一致させることができます"
 
-#: applications/models/application.py:286
+#: applications/models/application.py:306
 msgid "Application user"
 msgstr "アプリケーションユーザー"
 
@@ -409,6 +412,7 @@ msgstr "クラスター"
 
 #: applications/serializers/attrs/application_category/db.py:11
 #: ops/models/adhoc.py:157 settings/serializers/auth/radius.py:14
+#: terminal/models/endpoint.py:11 terminal/serializers/endpoint.py:42
 #: xpack/plugins/cloud/serializers/account_attrs.py:68
 msgid "Host"
 msgstr "ホスト"
@@ -422,7 +426,7 @@ msgstr "ホスト"
 #: applications/serializers/attrs/application_type/redis.py:10
 #: applications/serializers/attrs/application_type/sqlserver.py:10
 #: assets/models/asset.py:214 assets/models/domain.py:61
-#: settings/serializers/auth/radius.py:15
+#: settings/serializers/auth/radius.py:15 terminal/serializers/endpoint.py:43
 #: xpack/plugins/cloud/serializers/account_attrs.py:69
 msgid "Port"
 msgstr "ポート"
@@ -639,27 +643,27 @@ msgstr "ラベル"
 msgid "Created by"
 msgstr "によって作成された"
 
-#: assets/models/asset.py:386
+#: assets/models/asset.py:389
 msgid "Can refresh asset hardware info"
 msgstr "資産ハードウェア情報を更新できます"
 
-#: assets/models/asset.py:387
+#: assets/models/asset.py:390
 msgid "Can test asset connectivity"
 msgstr "資産接続をテストできます"
 
-#: assets/models/asset.py:388
+#: assets/models/asset.py:391
 msgid "Can push system user to asset"
 msgstr "システムユーザーを資産にプッシュできます"
 
-#: assets/models/asset.py:389
+#: assets/models/asset.py:392
 msgid "Can match asset"
 msgstr "アセットを一致させることができます"
 
-#: assets/models/asset.py:390
+#: assets/models/asset.py:393
 msgid "Add asset to node"
 msgstr "ノードにアセットを追加する"
 
-#: assets/models/asset.py:391
+#: assets/models/asset.py:394
 msgid "Move asset to node"
 msgstr "アセットをノードに移動する"
 
@@ -706,7 +710,7 @@ msgid "Timing trigger"
 msgstr "タイミングトリガー"
 
 #: assets/models/backup.py:105 audits/models.py:44 ops/models/command.py:31
-#: perms/models/base.py:89 terminal/models/session.py:56
+#: perms/models/base.py:89 terminal/models/session.py:58
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:55
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:57
 #: xpack/plugins/change_auth_plan/models/base.py:112
@@ -771,7 +775,7 @@ msgstr "OK"
 msgid "Failed"
 msgstr "失敗しました"
 
-#: assets/models/base.py:38
+#: assets/models/base.py:38 assets/serializers/domain.py:46
 msgid "Connectivity"
 msgstr "接続性"
 
@@ -866,7 +870,7 @@ msgid "Regex"
 msgstr "正規情報"
 
 #: assets/models/cmd_filter.py:68 ops/models/command.py:26
-#: terminal/backends/command/serializers.py:14 terminal/models/session.py:53
+#: terminal/backends/command/serializers.py:14 terminal/models/session.py:55
 #: terminal/templates/terminal/_msg_command_alert.html:12
 #: terminal/templates/terminal/_msg_command_execute_alert.html:10
 msgid "Command"
@@ -1418,7 +1422,7 @@ msgid "Symlink"
 msgstr "Symlink"
 
 #: audits/models.py:38 audits/models.py:64 audits/models.py:87
-#: terminal/models/session.py:49 terminal/models/sharing.py:82
+#: terminal/models/session.py:51 terminal/models/sharing.py:82
 msgid "Remote addr"
 msgstr "リモートaddr"
 
@@ -1767,7 +1771,7 @@ msgstr "{ApplicationPermission} 追加 {SystemUser}"
 msgid "{ApplicationPermission} REMOVE {SystemUser}"
 msgstr "{ApplicationPermission} 削除 {SystemUser}"
 
-#: authentication/api/connection_token.py:313
+#: authentication/api/connection_token.py:330
 msgid "Invalid token"
 msgstr "無効なトークン"
 
@@ -4786,6 +4790,10 @@ msgstr ""
 msgid "Filters"
 msgstr "フィルター"
 
+#: terminal/api/endpoint.py:54
+msgid "Not found protocol query params"
+msgstr ""
+
 #: terminal/api/session.py:211
 msgid "Session does not exist: {}"
 msgstr "セッションが存在しません: {}"
@@ -4915,9 +4923,90 @@ msgstr "一括作成非サポート"
 msgid "Storage is invalid"
 msgstr "ストレージが無効です"
 
+#: terminal/migrations/0048_endpoint_endpointrule.py:28
+#, fuzzy
+#| msgid "Endpoint"
+msgid "Default Endpoint"
+msgstr "エンドポイント"
+
+#: terminal/migrations/0048_endpoint_endpointrule.py:35
+#, fuzzy
+#| msgid "Default Cluster"
+msgid "Default rule"
+msgstr "デフォルトクラスター"
+
+#: terminal/migrations/0048_endpoint_endpointrule.py:57
+#, fuzzy
+#| msgid "API Endpoint"
+msgid "XRDP Endpoint"
+msgstr "APIエンドポイント"
+
+#: terminal/migrations/0048_endpoint_endpointrule.py:65
+#, fuzzy
+#| msgid "RDP address"
+msgid "XRDP rule"
+msgstr "RDPアドレス"
+
 #: terminal/models/command.py:53
 msgid "Command record"
 msgstr "コマンドレコード"
+
+#: terminal/models/endpoint.py:13
+#, fuzzy
+#| msgid "HTTP Port"
+msgid "HTTPS Port"
+msgstr "HTTPポート"
+
+#: terminal/models/endpoint.py:14 terminal/models/terminal.py:107
+msgid "HTTP Port"
+msgstr "HTTPポート"
+
+#: terminal/models/endpoint.py:15 terminal/models/terminal.py:106
+msgid "SSH Port"
+msgstr "SSHポート"
+
+#: terminal/models/endpoint.py:16
+#, fuzzy
+#| msgid "HTTP Port"
+msgid "RDP Port"
+msgstr "HTTPポート"
+
+#: terminal/models/endpoint.py:17
+#, fuzzy
+#| msgid "MySQL port"
+msgid "MySQL Port"
+msgstr "MySQLポート"
+
+#: terminal/models/endpoint.py:18
+#, fuzzy
+#| msgid "MariaDB port"
+msgid "MariaDB Port"
+msgstr "MariaDBポート"
+
+#: terminal/models/endpoint.py:19
+#, fuzzy
+#| msgid "PostgreSQL port"
+msgid "PostgreSQL Port"
+msgstr "PostgreSQLポート"
+
+#: terminal/models/endpoint.py:23 terminal/models/endpoint.py:42
+#: terminal/serializers/endpoint.py:88 terminal/serializers/storage.py:39
+#: terminal/serializers/storage.py:51 terminal/serializers/storage.py:81
+#: terminal/serializers/storage.py:91 terminal/serializers/storage.py:99
+msgid "Endpoint"
+msgstr "エンドポイント"
+
+#: terminal/models/endpoint.py:35
+#, fuzzy
+#| msgid "User group"
+msgid "IP group"
+msgstr "ユーザーグループ"
+
+#: terminal/models/endpoint.py:47
+#, fuzzy
+#| msgid "Endpoint"
+msgid "Endpoint rule"
+msgstr "エンドポイント"
 
 #: terminal/models/replay.py:12
 msgid "Session replay"
@@ -4931,35 +5020,35 @@ msgstr "セッションのリプレイをアップロードできます"
 msgid "Can download session replay"
 msgstr "セッション再生をダウンロードできます"
 
-#: terminal/models/session.py:48 terminal/models/sharing.py:87
+#: terminal/models/session.py:50 terminal/models/sharing.py:87
 msgid "Login from"
 msgstr "ログイン元"
 
-#: terminal/models/session.py:52
+#: terminal/models/session.py:54
 msgid "Replay"
 msgstr "リプレイ"
 
-#: terminal/models/session.py:57
+#: terminal/models/session.py:59
 msgid "Date end"
 msgstr "終了日"
 
-#: terminal/models/session.py:242
+#: terminal/models/session.py:251
 msgid "Session record"
 msgstr "セッション記録"
 
-#: terminal/models/session.py:244
+#: terminal/models/session.py:253
 msgid "Can monitor session"
 msgstr "セッションを監視できます"
 
-#: terminal/models/session.py:245
+#: terminal/models/session.py:254
 msgid "Can share session"
 msgstr "セッションを共有できます"
 
-#: terminal/models/session.py:246
+#: terminal/models/session.py:255
 msgid "Can terminate session"
 msgstr "セッションを終了できます"
 
-#: terminal/models/session.py:247
+#: terminal/models/session.py:256
 msgid "Can validate session action perm"
 msgstr "セッションアクションのパーマを検証できます"
 
@@ -5068,14 +5157,6 @@ msgstr "クワーグ"
 msgid "type"
 msgstr "タイプ"
 
-#: terminal/models/terminal.py:106
-msgid "SSH Port"
-msgstr "SSHポート"
-
-#: terminal/models/terminal.py:107
-msgid "HTTP Port"
-msgstr "HTTPポート"
-
 #: terminal/models/terminal.py:183 terminal/serializers/session.py:38
 msgid "Terminal"
 msgstr "ターミナル"
@@ -5099,6 +5180,16 @@ msgstr "レベル"
 #: terminal/notifications.py:110
 msgid "Batch danger command alert"
 msgstr "一括危険コマンド警告"
+
+#: terminal/serializers/endpoint.py:40
+#, fuzzy
+#| msgid "Target URL"
+msgid "Target IP"
+msgstr "ターゲットURL"
+
+#: terminal/serializers/endpoint.py:44
+msgid "Url"
+msgstr ""
 
 #: terminal/serializers/session.py:31
 msgid "User ID"
@@ -5143,12 +5234,6 @@ msgstr "バケット"
 #: terminal/serializers/storage.py:34 users/models/user.py:695
 msgid "Secret key"
 msgstr "秘密キー"
-
-#: terminal/serializers/storage.py:39 terminal/serializers/storage.py:51
-#: terminal/serializers/storage.py:81 terminal/serializers/storage.py:91
-#: terminal/serializers/storage.py:99
-msgid "Endpoint"
-msgstr "エンドポイント"
 
 #: terminal/serializers/storage.py:66 xpack/plugins/cloud/models.py:220
 msgid "Region"

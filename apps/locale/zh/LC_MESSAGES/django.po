@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-31 11:19+0800\n"
+"POT-Creation-Date: 2022-04-11 16:38+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -28,6 +28,7 @@ msgstr "访问控制"
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
 #: orgs/models.py:65 perms/models/base.py:83 rbac/models/role.py:29
 #: settings/models.py:29 settings/serializers/sms.py:6
+#: terminal/models/endpoint.py:10 terminal/models/endpoint.py:34
 #: terminal/models/storage.py:23 terminal/models/task.py:16
 #: terminal/models/terminal.py:100 users/forms/profile.py:32
 #: users/models/group.py:15 users/models/user.py:661
@@ -40,12 +41,12 @@ msgid "Name"
 msgstr "名称"
 
 #: acls/models/base.py:27 assets/models/cmd_filter.py:84
-#: assets/models/user.py:247
+#: assets/models/user.py:247 terminal/models/endpoint.py:37
 msgid "Priority"
 msgstr "优先级"
 
 #: acls/models/base.py:28 assets/models/cmd_filter.py:84
-#: assets/models/user.py:247
+#: assets/models/user.py:247 terminal/models/endpoint.py:38
 msgid "1-100, the lower the value will be match first"
 msgstr "优先级可选范围为 1-100 (数值越小越优先)"
 
@@ -64,6 +65,7 @@ msgstr "激活中"
 #: assets/models/domain.py:64 assets/models/group.py:23
 #: assets/models/label.py:23 ops/models/adhoc.py:38 orgs/models.py:68
 #: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:34
+#: terminal/models/endpoint.py:20 terminal/models/endpoint.py:44
 #: terminal/models/storage.py:26 terminal/models/terminal.py:114
 #: tickets/models/comment.py:24 tickets/models/ticket.py:154
 #: users/models/group.py:16 users/models/user.py:698
@@ -92,7 +94,7 @@ msgstr "登录复核"
 #: authentication/models.py:50 orgs/models.py:214 perms/models/base.py:84
 #: rbac/builtin.py:101 rbac/models/rolebinding.py:40 templates/index.html:78
 #: terminal/backends/command/models.py:19
-#: terminal/backends/command/serializers.py:12 terminal/models/session.py:42
+#: terminal/backends/command/serializers.py:12 terminal/models/session.py:44
 #: terminal/notifications.py:91 terminal/notifications.py:139
 #: tickets/models/comment.py:17 users/const.py:14 users/models/user.py:886
 #: users/models/user.py:917 users/serializers/group.py:19
@@ -135,13 +137,13 @@ msgstr "系统用户"
 
 #: acls/models/login_asset_acl.py:22
 #: applications/serializers/attrs/application_category/remote_app.py:36
-#: assets/models/asset.py:383 assets/models/authbook.py:19
+#: assets/models/asset.py:386 assets/models/authbook.py:19
 #: assets/models/backup.py:31 assets/models/cmd_filter.py:38
 #: assets/models/gathered_user.py:14 assets/serializers/label.py:30
 #: assets/serializers/system_user.py:264 audits/models.py:39
 #: perms/models/asset_permission.py:23 templates/index.html:82
 #: terminal/backends/command/models.py:20
-#: terminal/backends/command/serializers.py:13 terminal/models/session.py:44
+#: terminal/backends/command/serializers.py:13 terminal/models/session.py:46
 #: terminal/notifications.py:90
 #: users/templates/users/user_asset_permission.html:40
 #: users/templates/users/user_asset_permission.html:70
@@ -194,7 +196,7 @@ msgstr ""
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
 #: authentication/templates/authentication/_msg_rest_password_success.html:8
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:8
-#: settings/serializers/terminal.py:8
+#: settings/serializers/terminal.py:8 terminal/serializers/endpoint.py:85
 #: users/templates/users/_granted_assets.html:26
 #: users/templates/users/user_asset_permission.html:156
 msgid "IP"
@@ -216,7 +218,8 @@ msgstr "格式为逗号分隔的字符串, * 表示匹配所有. 可选的协议
 
 #: acls/serializers/login_asset_acl.py:55 assets/models/asset.py:213
 #: assets/models/domain.py:62 assets/models/user.py:248
-#: terminal/serializers/session.py:30 terminal/serializers/storage.py:69
+#: terminal/serializers/endpoint.py:37 terminal/serializers/session.py:30
+#: terminal/serializers/storage.py:69
 msgid "Protocol"
 msgstr "协议"
 
@@ -280,7 +283,7 @@ msgstr "应用程序"
 #: assets/models/cmd_filter.py:42 assets/models/user.py:338 audits/models.py:40
 #: perms/models/application_permission.py:33
 #: perms/models/asset_permission.py:25 terminal/backends/command/models.py:21
-#: terminal/backends/command/serializers.py:35 terminal/models/session.py:46
+#: terminal/backends/command/serializers.py:35 terminal/models/session.py:48
 #: users/templates/users/_granted_assets.html:27
 #: users/templates/users/user_asset_permission.html:42
 #: users/templates/users/user_asset_permission.html:76
@@ -346,7 +349,7 @@ msgstr "属性"
 msgid "Can match application"
 msgstr "匹配应用"
 
-#: applications/models/application.py:286
+#: applications/models/application.py:306
 msgid "Application user"
 msgstr "应用用户"
 
@@ -404,6 +407,7 @@ msgstr "集群"
 
 #: applications/serializers/attrs/application_category/db.py:11
 #: ops/models/adhoc.py:157 settings/serializers/auth/radius.py:14
+#: terminal/models/endpoint.py:11 terminal/serializers/endpoint.py:42
 #: xpack/plugins/cloud/serializers/account_attrs.py:68
 msgid "Host"
 msgstr "主机"
@@ -417,7 +421,7 @@ msgstr "主机"
 #: applications/serializers/attrs/application_type/redis.py:10
 #: applications/serializers/attrs/application_type/sqlserver.py:10
 #: assets/models/asset.py:214 assets/models/domain.py:61
-#: settings/serializers/auth/radius.py:15
+#: settings/serializers/auth/radius.py:15 terminal/serializers/endpoint.py:43
 #: xpack/plugins/cloud/serializers/account_attrs.py:69
 msgid "Port"
 msgstr "端口"
@@ -634,27 +638,27 @@ msgstr "标签管理"
 msgid "Created by"
 msgstr "创建者"
 
-#: assets/models/asset.py:386
+#: assets/models/asset.py:389
 msgid "Can refresh asset hardware info"
 msgstr "可以更新资产硬件信息"
 
-#: assets/models/asset.py:387
+#: assets/models/asset.py:390
 msgid "Can test asset connectivity"
 msgstr "可以测试资产连接性"
 
-#: assets/models/asset.py:388
+#: assets/models/asset.py:391
 msgid "Can push system user to asset"
 msgstr "可以推送系统用户到资产"
 
-#: assets/models/asset.py:389
+#: assets/models/asset.py:392
 msgid "Can match asset"
 msgstr "可以匹配资产"
 
-#: assets/models/asset.py:390
+#: assets/models/asset.py:393
 msgid "Add asset to node"
 msgstr "添加资产到节点"
 
-#: assets/models/asset.py:391
+#: assets/models/asset.py:394
 msgid "Move asset to node"
 msgstr "移动资产到节点"
 
@@ -701,7 +705,7 @@ msgid "Timing trigger"
 msgstr "定时触发"
 
 #: assets/models/backup.py:105 audits/models.py:44 ops/models/command.py:31
-#: perms/models/base.py:89 terminal/models/session.py:56
+#: perms/models/base.py:89 terminal/models/session.py:58
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:55
 #: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:57
 #: xpack/plugins/change_auth_plan/models/base.py:112
@@ -766,7 +770,7 @@ msgstr "成功"
 msgid "Failed"
 msgstr "失败"
 
-#: assets/models/base.py:38
+#: assets/models/base.py:38 assets/serializers/domain.py:46
 msgid "Connectivity"
 msgstr "可连接性"
 
@@ -861,7 +865,7 @@ msgid "Regex"
 msgstr "正则表达式"
 
 #: assets/models/cmd_filter.py:68 ops/models/command.py:26
-#: terminal/backends/command/serializers.py:14 terminal/models/session.py:53
+#: terminal/backends/command/serializers.py:14 terminal/models/session.py:55
 #: terminal/templates/terminal/_msg_command_alert.html:12
 #: terminal/templates/terminal/_msg_command_execute_alert.html:10
 msgid "Command"
@@ -1406,7 +1410,7 @@ msgid "Symlink"
 msgstr "建立软链接"
 
 #: audits/models.py:38 audits/models.py:64 audits/models.py:87
-#: terminal/models/session.py:49 terminal/models/sharing.py:82
+#: terminal/models/session.py:51 terminal/models/sharing.py:82
 msgid "Remote addr"
 msgstr "远端地址"
 
@@ -1755,7 +1759,7 @@ msgstr "{ApplicationPermission} 添加 {SystemUser}"
 msgid "{ApplicationPermission} REMOVE {SystemUser}"
 msgstr "{ApplicationPermission} 移除 {SystemUser}"
 
-#: authentication/api/connection_token.py:313
+#: authentication/api/connection_token.py:330
 msgid "Invalid token"
 msgstr "无效的令牌"
 
@@ -4713,6 +4717,10 @@ msgstr "Jmservisor 是在 windows 远程应用发布服务器中用来拉起远�
 msgid "Filters"
 msgstr "过滤"
 
+#: terminal/api/endpoint.py:54
+msgid "Not found protocol query params"
+msgstr ""
+
 #: terminal/api/session.py:211
 msgid "Session does not exist: {}"
 msgstr "会话不存在: {}"
@@ -4842,9 +4850,90 @@ msgstr "不支持批量创建"
 msgid "Storage is invalid"
 msgstr "存储无效"
 
+#: terminal/migrations/0048_endpoint_endpointrule.py:28
+#, fuzzy
+#| msgid "Endpoint"
+msgid "Default Endpoint"
+msgstr "端点"
+
+#: terminal/migrations/0048_endpoint_endpointrule.py:35
+#, fuzzy
+#| msgid "Default Cluster"
+msgid "Default rule"
+msgstr "默认Cluster"
+
+#: terminal/migrations/0048_endpoint_endpointrule.py:57
+#, fuzzy
+#| msgid "API Endpoint"
+msgid "XRDP Endpoint"
+msgstr "API 端点"
+
+#: terminal/migrations/0048_endpoint_endpointrule.py:65
+#, fuzzy
+#| msgid "RDP address"
+msgid "XRDP rule"
+msgstr "RDP 地址"
+
 #: terminal/models/command.py:53
 msgid "Command record"
 msgstr "命令记录"
+
+#: terminal/models/endpoint.py:13
+#, fuzzy
+#| msgid "HTTP Port"
+msgid "HTTPS Port"
+msgstr "HTTP端口"
+
+#: terminal/models/endpoint.py:14 terminal/models/terminal.py:107
+msgid "HTTP Port"
+msgstr "HTTP端口"
+
+#: terminal/models/endpoint.py:15 terminal/models/terminal.py:106
+msgid "SSH Port"
+msgstr "SSH端口"
+
+#: terminal/models/endpoint.py:16
+#, fuzzy
+#| msgid "HTTP Port"
+msgid "RDP Port"
+msgstr "HTTP端口"
+
+#: terminal/models/endpoint.py:17
+#, fuzzy
+#| msgid "MySQL port"
+msgid "MySQL Port"
+msgstr "MySQL 协议端口"
+
+#: terminal/models/endpoint.py:18
+#, fuzzy
+#| msgid "MariaDB port"
+msgid "MariaDB Port"
+msgstr "MariaDB 端口"
+
+#: terminal/models/endpoint.py:19
+#, fuzzy
+#| msgid "PostgreSQL port"
+msgid "PostgreSQL Port"
+msgstr "PostgreSQL 端口"
+
+#: terminal/models/endpoint.py:23 terminal/models/endpoint.py:42
+#: terminal/serializers/endpoint.py:88 terminal/serializers/storage.py:39
+#: terminal/serializers/storage.py:51 terminal/serializers/storage.py:81
+#: terminal/serializers/storage.py:91 terminal/serializers/storage.py:99
+msgid "Endpoint"
+msgstr "端点"
+
+#: terminal/models/endpoint.py:35
+#, fuzzy
+#| msgid "User group"
+msgid "IP group"
+msgstr "用户组"
+
+#: terminal/models/endpoint.py:47
+#, fuzzy
+#| msgid "Endpoint"
+msgid "Endpoint rule"
+msgstr "端点"
 
 #: terminal/models/replay.py:12
 msgid "Session replay"
@@ -4858,35 +4947,35 @@ msgstr "可以上传会话录像"
 msgid "Can download session replay"
 msgstr "可以下载会话录像"
 
-#: terminal/models/session.py:48 terminal/models/sharing.py:87
+#: terminal/models/session.py:50 terminal/models/sharing.py:87
 msgid "Login from"
 msgstr "登录来源"
 
-#: terminal/models/session.py:52
+#: terminal/models/session.py:54
 msgid "Replay"
 msgstr "回放"
 
-#: terminal/models/session.py:57
+#: terminal/models/session.py:59
 msgid "Date end"
 msgstr "结束日期"
 
-#: terminal/models/session.py:242
+#: terminal/models/session.py:251
 msgid "Session record"
 msgstr "会话记录"
 
-#: terminal/models/session.py:244
+#: terminal/models/session.py:253
 msgid "Can monitor session"
 msgstr "可以监控会话"
 
-#: terminal/models/session.py:245
+#: terminal/models/session.py:254
 msgid "Can share session"
 msgstr "可以分享会话"
 
-#: terminal/models/session.py:246
+#: terminal/models/session.py:255
 msgid "Can terminate session"
 msgstr "可以终断会话"
 
-#: terminal/models/session.py:247
+#: terminal/models/session.py:256
 msgid "Can validate session action perm"
 msgstr "可以验证会话动作权限"
 
@@ -4995,14 +5084,6 @@ msgstr "其它参数"
 msgid "type"
 msgstr "类型"
 
-#: terminal/models/terminal.py:106
-msgid "SSH Port"
-msgstr "SSH端口"
-
-#: terminal/models/terminal.py:107
-msgid "HTTP Port"
-msgstr "HTTP端口"
-
 #: terminal/models/terminal.py:183 terminal/serializers/session.py:38
 msgid "Terminal"
 msgstr "终端"
@@ -5026,6 +5107,16 @@ msgstr "级别"
 #: terminal/notifications.py:110
 msgid "Batch danger command alert"
 msgstr "批量危险命令告警"
+
+#: terminal/serializers/endpoint.py:40
+#, fuzzy
+#| msgid "Target URL"
+msgid "Target IP"
+msgstr "目标URL"
+
+#: terminal/serializers/endpoint.py:44
+msgid "Url"
+msgstr ""
 
 #: terminal/serializers/session.py:31
 msgid "User ID"
@@ -5070,12 +5161,6 @@ msgstr "桶名称"
 #: terminal/serializers/storage.py:34 users/models/user.py:695
 msgid "Secret key"
 msgstr "密钥"
-
-#: terminal/serializers/storage.py:39 terminal/serializers/storage.py:51
-#: terminal/serializers/storage.py:81 terminal/serializers/storage.py:91
-#: terminal/serializers/storage.py:99
-msgid "Endpoint"
-msgstr "端点"
 
 #: terminal/serializers/storage.py:66 xpack/plugins/cloud/models.py:220
 msgid "Region"
