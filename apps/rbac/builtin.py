@@ -17,6 +17,7 @@ user_perms = (
     ('ops', 'commandexecution', 'add', 'commandexecution'),
     ('authentication', 'connectiontoken', 'add', 'connectiontoken'),
     ('tickets', 'ticket', 'view', 'ticket'),
+    ('orgs', 'organization', 'view', 'rootorg'),
 )
 
 auditor_perms = user_perms + (
