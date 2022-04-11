@@ -53,9 +53,20 @@ class SSOToken(models.JMSBaseModel):
         verbose_name = _('SSO token')
 
 
-class ConnectionToken(models.JMSBaseModel):
-    # Todo: 未来可能放到这里，不记录到 redis 了，虽然方便，但是不易于审计
-    # Todo: add connection token 可能要授权给 普通用户, 或者放开就行
+class ConnectionToken(models.JMSModel):
+    class Types(models.TextChoices):
+        asset = 'asset', 'Asset'
+        app = 'app', 'App'
+
+    secret = models.CharField(max_length=64, verbose_name=_("Secret"))
+    user = models.CharField(max_length=36, verbose_name=_("User id"))
+    user_display = models.CharField(max_length=128, verbose_name=_("User display"))
+    system_user = models.CharField(max_length=36, verbose_name=_("System user"))
+    system_user_display = models.CharField(max_length=128, verbose_name=_("System user display"))
+    asset = models.CharField(max_length=36, verbose_name=_("Asset"))
+    asset_display = models.CharField(max_length=128, verbose_name=_("Asset display"))
+    type = models.CharField(max_length=16, choices=Types.choices, verbose_name=_("Type"))
+    date_expired = models.DateTimeField(verbose_name=_("Datetime expired"))
 
     class Meta:
         verbose_name = _('Connection token')

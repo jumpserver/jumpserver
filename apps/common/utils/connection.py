@@ -28,7 +28,7 @@ def get_redis_client(db=0):
 
 
 class Subscription:
-    def __init__(self, ch, sub, ):
+    def __init__(self, ch, sub):
         self.ch = ch
         self.sub = sub
 

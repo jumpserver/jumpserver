@@ -11,8 +11,8 @@ from django.conf import settings
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
-from django.utils import timezone
 from django.utils.translation import ugettext as _
+from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.viewsets import GenericViewSet
@@ -34,6 +34,7 @@ from common.const.http import PATCH
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
 )
+from ..models import ConnectionToken
 
 logger = get_logger(__name__)
 __all__ = ['UserConnectionTokenViewSet']
@@ -432,43 +433,45 @@ class UserConnectionTokenViewSet(
         self.check_resource_permission(user, asset, application, system_user)
         token = random_string(36)
         secret = random_string(16)
-        value = {
+        kwargs = {
             'id': token,
             'secret': secret,
             'user': str(user.id),
-            'username': user.username,
+            'user_display': user.username,
             'system_user': str(system_user.id),
-            'system_user_name': system_user.name,
+            'system_user_display': system_user.name,
             'created_by': str(self.request.user),
-            'date_created': str(timezone.now())
+            'date_expired': timezone.now() + timezone.timedelta(seconds=ttl)
         }
 
         if asset:
-            value.update({
+            kwargs.update({
                 'type': 'asset',
                 'asset': str(asset.id),
-                'hostname': asset.hostname,
+                'asset_display': asset.hostname,
             })
         elif application:
-            value.update({
-                'type': 'application',
-                'application': application.id,
-                'application_name': str(application)
+            kwargs.update({
+                'type': 'app',
+                'asset': application.id,
+                'asset_display': str(application)
             })
 
-        self.set_token_to_cache(token, value, ttl)
-        return token, secret
+        token = ConnectionToken.objects.create(**kwargs)
+        return token
+
+    def perform_create(self):
+        pass
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         asset, application, system_user, user = self.get_request_resource(serializer)
-        token, secret = self.create_token(user, asset, application, system_user)
-        tp = 'app' if application else 'asset'
+        token = self.create_token(user, asset, application, system_user)
         data = {
-            "id": token, 'secret': secret,
-            'type': tp, 'protocol': system_user.protocol
+            "id": token.id, 'secret': token.secret,
+            'type': token.type, 'protocol': system_user.protocol
         }
         return Response(data, status=201)
 
