@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-11 16:38+0800\n"
+"POT-Creation-Date: 2022-04-11 17:08+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1759,7 +1759,7 @@ msgstr "{ApplicationPermission} 添加 {SystemUser}"
 msgid "{ApplicationPermission} REMOVE {SystemUser}"
 msgstr "{ApplicationPermission} 移除 {SystemUser}"
 
-#: authentication/api/connection_token.py:330
+#: authentication/api/connection_token.py:336
 msgid "Invalid token"
 msgstr "无效的令牌"
 
@@ -4198,61 +4198,13 @@ msgid ""
 "device through Telnet, set this parameter"
 msgstr "不同设备登录成功提示不一样，所以如果 telnet 不能正常登录，可以这里设置"
 
-#: settings/serializers/terminal.py:37
-msgid "RDP address"
-msgstr "RDP 地址"
-
-#: settings/serializers/terminal.py:38
-msgid "RDP visit address, eg: dev.jumpserver.org:3389"
-msgstr "RDP 访问地址, 如: dev.jumpserver.org:3389"
-
-#: settings/serializers/terminal.py:40
-msgid "Enable XRDP"
-msgstr "启用 XRDP 服务"
-
-#: settings/serializers/terminal.py:43
-msgid "Koko host"
-msgstr "KOKO 主机地址"
-
-#: settings/serializers/terminal.py:46
-msgid "Koko ssh port"
-msgstr "KOKO ssh 端口"
-
-#: settings/serializers/terminal.py:49
+#: settings/serializers/terminal.py:36
 msgid "Enable database proxy"
 msgstr "启用数据库组件"
 
-#: settings/serializers/terminal.py:51
-msgid "Database proxy host"
-msgstr "数据库主机地址"
-
-#: settings/serializers/terminal.py:52
-msgid "Database proxy host, eg: dev.jumpserver.org"
-msgstr "数据库组件地址, 如: dev.jumpserver.org (没有端口, 不同协议端口不同)"
-
-#: settings/serializers/terminal.py:55
-msgid "MySQL port"
-msgstr "MySQL 协议端口"
-
-#: settings/serializers/terminal.py:56
-msgid "MySQL protocol listen port"
-msgstr "MySQL 协议监听端口"
-
-#: settings/serializers/terminal.py:59
-msgid "MariaDB port"
-msgstr "MariaDB 端口"
-
-#: settings/serializers/terminal.py:60
-msgid "MariaDB protocol listen port"
-msgstr "MariaDB 协议监听的端口"
-
-#: settings/serializers/terminal.py:63
-msgid "PostgreSQL port"
-msgstr "PostgreSQL 端口"
-
-#: settings/serializers/terminal.py:64
-msgid "PostgreSQL protocol listen port"
-msgstr "PostgreSQL 协议监听端口"
+#: settings/serializers/terminal.py:37
+msgid "Enable XRDP"
+msgstr "启用 XRDP 服务"
 
 #: settings/utils/ldap.py:417
 msgid "ldap:// or ldaps:// protocol is used."
@@ -4851,68 +4803,50 @@ msgid "Storage is invalid"
 msgstr "存储无效"
 
 #: terminal/migrations/0048_endpoint_endpointrule.py:28
-#, fuzzy
-#| msgid "Endpoint"
 msgid "Default Endpoint"
-msgstr "端点"
+msgstr "默认端点"
 
 #: terminal/migrations/0048_endpoint_endpointrule.py:35
-#, fuzzy
-#| msgid "Default Cluster"
 msgid "Default rule"
-msgstr "默认Cluster"
+msgstr "默认规则"
 
 #: terminal/migrations/0048_endpoint_endpointrule.py:57
-#, fuzzy
-#| msgid "API Endpoint"
 msgid "XRDP Endpoint"
-msgstr "API 端点"
+msgstr "XRDP 端点"
 
 #: terminal/migrations/0048_endpoint_endpointrule.py:65
-#, fuzzy
-#| msgid "RDP address"
 msgid "XRDP rule"
-msgstr "RDP 地址"
+msgstr "XRDP 规则"
 
 #: terminal/models/command.py:53
 msgid "Command record"
 msgstr "命令记录"
 
 #: terminal/models/endpoint.py:13
-#, fuzzy
-#| msgid "HTTP Port"
 msgid "HTTPS Port"
-msgstr "HTTP端口"
+msgstr "HTTPS 端口"
 
 #: terminal/models/endpoint.py:14 terminal/models/terminal.py:107
 msgid "HTTP Port"
-msgstr "HTTP端口"
+msgstr "HTTP 端口"
 
 #: terminal/models/endpoint.py:15 terminal/models/terminal.py:106
 msgid "SSH Port"
-msgstr "SSH端口"
+msgstr "SSH 端口"
 
 #: terminal/models/endpoint.py:16
-#, fuzzy
-#| msgid "HTTP Port"
 msgid "RDP Port"
-msgstr "HTTP端口"
+msgstr "RDP 端口"
 
 #: terminal/models/endpoint.py:17
-#, fuzzy
-#| msgid "MySQL port"
 msgid "MySQL Port"
-msgstr "MySQL 协议端口"
+msgstr "MySQL 端口"
 
 #: terminal/models/endpoint.py:18
-#, fuzzy
-#| msgid "MariaDB port"
 msgid "MariaDB Port"
 msgstr "MariaDB 端口"
 
 #: terminal/models/endpoint.py:19
-#, fuzzy
-#| msgid "PostgreSQL port"
 msgid "PostgreSQL Port"
 msgstr "PostgreSQL 端口"
 
@@ -4924,16 +4858,12 @@ msgid "Endpoint"
 msgstr "端点"
 
 #: terminal/models/endpoint.py:35
-#, fuzzy
-#| msgid "User group"
 msgid "IP group"
-msgstr "用户组"
+msgstr "IP 组"
 
 #: terminal/models/endpoint.py:47
-#, fuzzy
-#| msgid "Endpoint"
 msgid "Endpoint rule"
-msgstr "端点"
+msgstr "端点规则"
 
 #: terminal/models/replay.py:12
 msgid "Session replay"
@@ -5109,10 +5039,8 @@ msgid "Batch danger command alert"
 msgstr "批量危险命令告警"
 
 #: terminal/serializers/endpoint.py:40
-#, fuzzy
-#| msgid "Target URL"
 msgid "Target IP"
-msgstr "目标URL"
+msgstr "目标 IP"
 
 #: terminal/serializers/endpoint.py:44
 msgid "Url"
@@ -6995,11 +6923,3 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
-
-#~ msgid "Database proxy MySQL protocol listen port"
-#~ msgstr "MySQL 协议监听的端口"
-
-#, fuzzy
-#~| msgid "Database proxy PostgreSQL port"
-#~ msgid "Database proxy PostgreSQL listen port"
-#~ msgstr "数据库组件 PostgreSQL 协议监听的端口"

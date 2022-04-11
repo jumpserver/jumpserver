@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-11 16:38+0800\n"
+"POT-Creation-Date: 2022-04-11 17:08+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1771,7 +1771,7 @@ msgstr "{ApplicationPermission} 追加 {SystemUser}"
 msgid "{ApplicationPermission} REMOVE {SystemUser}"
 msgstr "{ApplicationPermission} 削除 {SystemUser}"
 
-#: authentication/api/connection_token.py:330
+#: authentication/api/connection_token.py:336
 msgid "Invalid token"
 msgstr "無効なトークン"
 
@@ -4260,61 +4260,13 @@ msgstr ""
 "ログイン成功メッセージはデバイスによって異なります。Telnet経由でデバイスにロ"
 "グインできない場合は、このパラメーターを設定します。"
 
-#: settings/serializers/terminal.py:37
-msgid "RDP address"
-msgstr "RDPアドレス"
-
-#: settings/serializers/terminal.py:38
-msgid "RDP visit address, eg: dev.jumpserver.org:3389"
-msgstr "RDP訪問先住所、例: dev.jumpserver.org:3389"
-
-#: settings/serializers/terminal.py:40
-msgid "Enable XRDP"
-msgstr "XRDPの有効化"
-
-#: settings/serializers/terminal.py:43
-msgid "Koko host"
-msgstr "KOKO ホストアドレス"
-
-#: settings/serializers/terminal.py:46
-msgid "Koko ssh port"
-msgstr "Koko ssh ポート"
-
-#: settings/serializers/terminal.py:49
+#: settings/serializers/terminal.py:36
 msgid "Enable database proxy"
 msgstr "属性マップの有効化"
 
-#: settings/serializers/terminal.py:51
-msgid "Database proxy host"
-msgstr "データベースエージェントホスト"
-
-#: settings/serializers/terminal.py:52
-msgid "Database proxy host, eg: dev.jumpserver.org"
-msgstr "RDP訪問先住所、例: dev.jumpserver.org:3389"
-
-#: settings/serializers/terminal.py:55
-msgid "MySQL port"
-msgstr "MySQLポート"
-
-#: settings/serializers/terminal.py:56
-msgid "MySQL protocol listen port"
-msgstr "MySQLプロトコルリッスンポート"
-
-#: settings/serializers/terminal.py:59
-msgid "MariaDB port"
-msgstr "MariaDBポート"
-
-#: settings/serializers/terminal.py:60
-msgid "MariaDB protocol listen port"
-msgstr "MariaDBプロトコルリッスンポート"
-
-#: settings/serializers/terminal.py:63
-msgid "PostgreSQL port"
-msgstr "PostgreSQLポート"
-
-#: settings/serializers/terminal.py:64
-msgid "PostgreSQL protocol listen port"
-msgstr "PostgreSQLプロトコルリッスンポート"
+#: settings/serializers/terminal.py:37
+msgid "Enable XRDP"
+msgstr "XRDPの有効化"
 
 #: settings/utils/ldap.py:417
 msgid "ldap:// or ldaps:// protocol is used."
@@ -4924,70 +4876,52 @@ msgid "Storage is invalid"
 msgstr "ストレージが無効です"
 
 #: terminal/migrations/0048_endpoint_endpointrule.py:28
-#, fuzzy
-#| msgid "Endpoint"
 msgid "Default Endpoint"
-msgstr "エンドポイント"
+msgstr "デフォルトのエンドポイント"
 
 #: terminal/migrations/0048_endpoint_endpointrule.py:35
-#, fuzzy
-#| msgid "Default Cluster"
 msgid "Default rule"
-msgstr "デフォルトクラスター"
+msgstr "デフォルトのルール"
 
 #: terminal/migrations/0048_endpoint_endpointrule.py:57
-#, fuzzy
-#| msgid "API Endpoint"
 msgid "XRDP Endpoint"
-msgstr "APIエンドポイント"
+msgstr "XRDP エンドポイント"
 
 #: terminal/migrations/0048_endpoint_endpointrule.py:65
-#, fuzzy
-#| msgid "RDP address"
 msgid "XRDP rule"
-msgstr "RDPアドレス"
+msgstr "XRDP ルール"
 
 #: terminal/models/command.py:53
 msgid "Command record"
 msgstr "コマンドレコード"
 
 #: terminal/models/endpoint.py:13
-#, fuzzy
-#| msgid "HTTP Port"
 msgid "HTTPS Port"
-msgstr "HTTPポート"
+msgstr "HTTPS ポート"
 
 #: terminal/models/endpoint.py:14 terminal/models/terminal.py:107
 msgid "HTTP Port"
-msgstr "HTTPポート"
+msgstr "HTTP ポート"
 
 #: terminal/models/endpoint.py:15 terminal/models/terminal.py:106
 msgid "SSH Port"
-msgstr "SSHポート"
+msgstr "SSH ポート"
 
 #: terminal/models/endpoint.py:16
-#, fuzzy
-#| msgid "HTTP Port"
 msgid "RDP Port"
-msgstr "HTTPポート"
+msgstr "RDP ポート"
 
 #: terminal/models/endpoint.py:17
-#, fuzzy
-#| msgid "MySQL port"
 msgid "MySQL Port"
-msgstr "MySQLポート"
+msgstr "MySQL ポート"
 
 #: terminal/models/endpoint.py:18
-#, fuzzy
-#| msgid "MariaDB port"
 msgid "MariaDB Port"
-msgstr "MariaDBポート"
+msgstr "MariaDB ポート"
 
 #: terminal/models/endpoint.py:19
-#, fuzzy
-#| msgid "PostgreSQL port"
 msgid "PostgreSQL Port"
-msgstr "PostgreSQLポート"
+msgstr "PostgreSQL ポート"
 
 #: terminal/models/endpoint.py:23 terminal/models/endpoint.py:42
 #: terminal/serializers/endpoint.py:88 terminal/serializers/storage.py:39
@@ -4997,16 +4931,12 @@ msgid "Endpoint"
 msgstr "エンドポイント"
 
 #: terminal/models/endpoint.py:35
-#, fuzzy
-#| msgid "User group"
 msgid "IP group"
-msgstr "ユーザーグループ"
+msgstr "IP グループ"
 
 #: terminal/models/endpoint.py:47
-#, fuzzy
-#| msgid "Endpoint"
 msgid "Endpoint rule"
-msgstr "エンドポイント"
+msgstr "エンドポイントルール"
 
 #: terminal/models/replay.py:12
 msgid "Session replay"
@@ -5182,10 +5112,8 @@ msgid "Batch danger command alert"
 msgstr "一括危険コマンド警告"
 
 #: terminal/serializers/endpoint.py:40
-#, fuzzy
-#| msgid "Target URL"
 msgid "Target IP"
-msgstr "ターゲットURL"
+msgstr "ターゲットIP"
 
 #: terminal/serializers/endpoint.py:44
 msgid "Url"
