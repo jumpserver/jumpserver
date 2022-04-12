@@ -311,7 +311,7 @@ class Config(dict):
         'TERMINAL_TELNET_REGEX': '',
         'TERMINAL_COMMAND_STORAGE': {},
         # 未来废弃(当下迁移会用)
-        'TERMINAL_RDP_ADDR': lambda: urlparse(settings.SITE_URL).hostname + ':3389',
+        'TERMINAL_RDP_ADDR': '',
         # 保留(Luna还在用)
         'TERMINAL_MAGNUS_ENABLED': True,
         # 保留(Luna还在用)

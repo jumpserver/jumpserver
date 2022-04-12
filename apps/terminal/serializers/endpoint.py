@@ -22,7 +22,7 @@ class EndpointSerializer(BulkModelSerializer):
             'comment', 'date_created', 'date_updated', 'created_by'
         ]
         extra_kwargs = {
-            'https_port': {'default': 8443},
+            'https_port': {'default': 443},
             'http_port': {'default': 80},
             'ssh_port': {'default': 2222},
             'rdp_port': {'default': 3389},

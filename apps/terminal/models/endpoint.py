@@ -8,9 +8,9 @@ from common.utils.ip import contains_ip
 
 class Endpoint(JMSModel):
     name = models.CharField(max_length=128, verbose_name=_('Name'), unique=True)
-    host = models.CharField(max_length=256, verbose_name=_('Host'))
+    host = models.CharField(max_length=256, blank=True, verbose_name=_('Host'))
     # disabled value=0
-    https_port = PortField(default=8443, verbose_name=_('HTTPS Port'))
+    https_port = PortField(default=443, verbose_name=_('HTTPS Port'))
     http_port = PortField(default=80, verbose_name=_('HTTP Port'))
     ssh_port = PortField(default=2222, verbose_name=_('SSH Port'))
     rdp_port = PortField(default=3389, verbose_name=_('RDP Port'))
@@ -18,6 +18,8 @@ class Endpoint(JMSModel):
     mariadb_port = PortField(default=33061, verbose_name=_('MariaDB Port'))
     postgresql_port = PortField(default=54320, verbose_name=_('PostgreSQL Port'))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
+
+    default_id = '00000000-0000-0000-0000-000000000001'
 
     class Meta:
         verbose_name = _('Endpoint')
@@ -29,12 +31,22 @@ class Endpoint(JMSModel):
     def get_port(self, protocol):
         return getattr(self, f'{protocol}_port', 0)
 
-    @staticmethod
-    def get_default(request):
-        return Endpoint(**{
+    def delete(self, using=None, keep_parents=False):
+        if self.id == self.default_id:
+            return
+        return super().delete(using, keep_parents)
+
+    @classmethod
+    def get_or_create_default(cls, request=None):
+        data = {
+            'id': cls.default_id,
             'name': 'Default',
-            'host': request.get_host().split(':')[0]
-        })
+            'host': request.get_host().split(':')[0] if request else '',
+            'https_port': 0,
+            'http_port': 0,
+        }
+        default, created = cls.objects.get_or_create(id=cls.default_id, defaults=data)
+        return default
 
 
 class EndpointRule(JMSModel):
@@ -76,7 +88,7 @@ class EndpointRule(JMSModel):
         if endpoint_rule:
             endpoint = endpoint_rule.endpoint
         elif request:
-            endpoint = Endpoint.get_default(request)
+            endpoint = Endpoint.get_or_create_default(request)
         else:
             endpoint = None
         return endpoint
