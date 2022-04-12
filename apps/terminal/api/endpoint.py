@@ -66,11 +66,8 @@ class EndpointViewSet(JMSBulkModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
         target_ip = self.get_target_ip(request)
-        serializer = serializers.SmartEndpointSerializer(
-            data={'match_protocol': protocol, 'match_target_ip': target_ip},
-            context=self.get_serializer_context()
-        )
-        serializer.is_valid()
+        endpoint = EndpointRule.match_endpoint(target_ip, protocol, request)
+        serializer = self.get_serializer(endpoint)
         return Response(serializer.data)
 
 

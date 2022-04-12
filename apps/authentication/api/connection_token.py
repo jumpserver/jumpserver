@@ -61,16 +61,8 @@ class ClientProtocolMixin:
             target_ip = application.get_target_ip()
         else:
             target_ip = ''
-        from terminal.serializers.endpoint import SmartEndpointSerializer
-        serializer = SmartEndpointSerializer(
-            data={
-                'match_protocol': protocol,
-                'match_target_ip': target_ip
-            },
-            context=self.get_serializer_context()
-        )
-        serializer.is_valid()
-        return serializer.data
+        endpoint = EndpointRule.match_endpoint(target_ip, protocol, self.request)
+        return endpoint
 
     def get_request_resource(self, serializer):
         asset = serializer.validated_data.get('asset')
@@ -142,10 +134,10 @@ class ClientProtocolMixin:
         options['screen mode id:i'] = '2' if full_screen else '1'
 
         # RDP Server 地址
-        smart_endpoint = self.get_smart_endpoint(
+        endpoint = self.get_smart_endpoint(
             protocol='rdp', asset=asset, application=application
         )
-        options['full address:s'] = smart_endpoint.get('smart_url')
+        options['full address:s'] = f'{endpoint.host}:{endpoint.rdp_port}'
         # 用户名
         options['username:s'] = '{}|{}'.format(user.username, token)
         if system_user.ad_domain:
@@ -189,12 +181,12 @@ class ClientProtocolMixin:
         else:
             name = '*'
 
-        smart_endpoint = self.get_smart_endpoint(
+        endpoint = self.get_smart_endpoint(
             protocol='ssh', asset=asset, application=application
         )
         content = {
-            'ip': smart_endpoint.get('smart_host'),
-            'port': smart_endpoint.get('smart_port'),
+            'ip': endpoint.host,
+            'port': endpoint.ssh_port,
             'username': f'JMS-{token}',
             'password': secret
         }

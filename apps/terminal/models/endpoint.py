@@ -12,11 +12,11 @@ class Endpoint(JMSModel):
     # disabled value=0
     https_port = PortField(default=8443, verbose_name=_('HTTPS Port'))
     http_port = PortField(default=80, verbose_name=_('HTTP Port'))
-    ssh_port = PortField(default=22, verbose_name=_('SSH Port'))
+    ssh_port = PortField(default=2222, verbose_name=_('SSH Port'))
     rdp_port = PortField(default=3389, verbose_name=_('RDP Port'))
-    mysql_port = PortField(default=3306, verbose_name=_('MySQL Port'))
-    mariadb_port = PortField(default=3306, verbose_name=_('MariaDB Port'))
-    postgresql_port = PortField(default=5432, verbose_name=_('PostgreSQL Port'))
+    mysql_port = PortField(default=33060, verbose_name=_('MySQL Port'))
+    mariadb_port = PortField(default=33061, verbose_name=_('MariaDB Port'))
+    postgresql_port = PortField(default=54320, verbose_name=_('PostgreSQL Port'))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
     class Meta:
@@ -28,6 +28,13 @@ class Endpoint(JMSModel):
 
     def get_port(self, protocol):
         return getattr(self, f'{protocol}_port', 0)
+
+    @staticmethod
+    def get_default(request):
+        return Endpoint(**{
+            'name': 'Default',
+            'host': request.get_host().split(':')[0]
+        })
 
 
 class EndpointRule(JMSModel):
@@ -64,7 +71,12 @@ class EndpointRule(JMSModel):
             return endpoint_rule
 
     @classmethod
-    def match_endpoint(cls, target_ip, protocol):
+    def match_endpoint(cls, target_ip, protocol, request=None):
         endpoint_rule = cls.match(target_ip, protocol)
-        endpoint = endpoint_rule.endpoint if endpoint_rule else None
+        if endpoint_rule:
+            endpoint = endpoint_rule.endpoint
+        elif request:
+            endpoint = Endpoint.get_default(request)
+        else:
+            endpoint = None
         return endpoint

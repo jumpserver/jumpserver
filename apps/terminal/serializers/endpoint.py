@@ -4,7 +4,7 @@ from common.drf.serializers import BulkModelSerializer
 from acls.serializers.rules import ip_group_help_text, ip_group_child_validator
 from ..models import Endpoint, EndpointRule
 
-__all__ = ['EndpointSerializer', 'EndpointRuleSerializer', 'SmartEndpointSerializer']
+__all__ = ['EndpointSerializer', 'EndpointRuleSerializer']
 
 
 class EndpointSerializer(BulkModelSerializer):
@@ -24,60 +24,12 @@ class EndpointSerializer(BulkModelSerializer):
         extra_kwargs = {
             'https_port': {'default': 8443},
             'http_port': {'default': 80},
-            'ssh_port': {'default': 22},
+            'ssh_port': {'default': 2222},
             'rdp_port': {'default': 3389},
-            'mysql_port': {'default': 3306},
-            'mariadb_port': {'default': 3306},
-            'postgresql_port': {'default': 5432},
+            'mysql_port': {'default': 33060},
+            'mariadb_port': {'default': 33061},
+            'postgresql_port': {'default': 54320},
         }
-
-
-class SmartEndpointSerializer(serializers.Serializer):
-    match_protocol = serializers.CharField(
-        max_length=1024, allow_null=False, allow_blank=False, label=_('Protocol')
-    )
-    match_target_ip = serializers.CharField(
-        max_length=1024, allow_null=False, allow_blank=True, label=_('Target IP')
-    )
-    smart_host = serializers.SerializerMethodField(label=_('Host'))
-    smart_port = serializers.SerializerMethodField(label=_('Port'))
-    smart_url = serializers.SerializerMethodField(label=_('Url'))
-
-    _endpoint = None
-
-    class Meta:
-        fields = [
-            'match_protocol', 'match_target_ip',
-            'smart_host', 'smart_port', 'smart_url',
-        ]
-
-    def match_endpoint(self, obj):
-        if self._endpoint:
-            return self._endpoint
-        protocol = obj.get('match_protocol')
-        target_ip = obj.get('match_target_ip')
-        endpoint = EndpointRule.match_endpoint(target_ip, protocol)
-        if not endpoint:
-            endpoint = Endpoint(**{
-                'name': 'Default endpoint (tmp)',
-                'host': self.context['request'].get_host().split(':')[0]
-            })
-        self._endpoint = endpoint
-        return self._endpoint
-
-    def get_smart_host(self, obj):
-        endpoint = self.match_endpoint(obj)
-        return endpoint.host
-
-    def get_smart_port(self, obj):
-        protocol = obj.get('match_protocol')
-        endpoint = self.match_endpoint(obj)
-        return endpoint.get_port(protocol)
-
-    def get_smart_url(self, obj):
-        host = self.get_smart_host(obj)
-        port = self.get_smart_port(obj)
-        return f'{host}:{port}'
 
 
 class EndpointRuleSerializer(BulkModelSerializer):
