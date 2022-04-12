@@ -31,12 +31,13 @@ from perms.models.base import Action
 from perms.utils.application.permission import get_application_actions
 from perms.utils.asset.permission import get_asset_actions
 from common.const.http import PATCH
+from terminal.models import EndpointRule
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
 )
 
 logger = get_logger(__name__)
-__all__ = ['UserConnectionTokenViewSet']
+__all__ = ['UserConnectionTokenViewSet', 'TokenCacheMixin']
 
 
 class ClientProtocolMixin:
@@ -51,6 +52,17 @@ class ClientProtocolMixin:
     request: Request
     get_serializer: Callable
     create_token: Callable
+    get_serializer_context: Callable
+
+    def get_smart_endpoint(self, protocol, asset=None, application=None):
+        if asset:
+            target_ip = asset.get_target_ip()
+        elif application:
+            target_ip = application.get_target_ip()
+        else:
+            target_ip = ''
+        endpoint = EndpointRule.match_endpoint(target_ip, protocol, self.request)
+        return endpoint
 
     def get_request_resource(self, serializer):
         asset = serializer.validated_data.get('asset')
@@ -122,10 +134,10 @@ class ClientProtocolMixin:
         options['screen mode id:i'] = '2' if full_screen else '1'
 
         # RDP Server 地址
-        address = settings.TERMINAL_RDP_ADDR
-        if not address or address == 'localhost:3389':
-            address = self.request.get_host().split(':')[0] + ':3389'
-        options['full address:s'] = address
+        endpoint = self.get_smart_endpoint(
+            protocol='rdp', asset=asset, application=application
+        )
+        options['full address:s'] = f'{endpoint.host}:{endpoint.rdp_port}'
         # 用户名
         options['username:s'] = '{}|{}'.format(user.username, token)
         if system_user.ad_domain:
@@ -169,9 +181,12 @@ class ClientProtocolMixin:
         else:
             name = '*'
 
+        endpoint = self.get_smart_endpoint(
+            protocol='ssh', asset=asset, application=application
+        )
         content = {
-            'ip': settings.TERMINAL_KOKO_HOST,
-            'port': str(settings.TERMINAL_KOKO_SSH_PORT),
+            'ip': endpoint.host,
+            'port': endpoint.ssh_port,
             'username': f'JMS-{token}',
             'password': secret
         }
@@ -345,6 +360,7 @@ class SecretDetailMixin:
 
 
 class TokenCacheMixin:
+    """ endpoint smart view 用到此类来解析token中的资产、应用 """
     CACHE_KEY_PREFIX = 'CONNECTION_TOKEN_{}'
 
     def get_token_cache_key(self, token):

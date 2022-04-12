@@ -6,3 +6,4 @@ from .task import *
 from .terminal import *
 from .sharing import *
 from .replay import *
+from .endpoint import *

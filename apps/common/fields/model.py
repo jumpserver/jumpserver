@@ -4,7 +4,7 @@ import json
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import force_text
-
+from django.core.validators import MinValueValidator, MaxValueValidator
 from ..utils import signer, crypto
 
 
@@ -13,7 +13,7 @@ __all__ = [
     'JsonCharField', 'JsonTextField', 'JsonListCharField', 'JsonListTextField',
     'JsonDictCharField', 'JsonDictTextField', 'EncryptCharField',
     'EncryptTextField', 'EncryptMixin', 'EncryptJsonDictTextField',
-    'EncryptJsonDictCharField',
+    'EncryptJsonDictCharField', 'PortField'
 ]
 
 
@@ -179,4 +179,14 @@ class EncryptJsonDictTextField(EncryptMixin, JsonDictTextField):
 
 class EncryptJsonDictCharField(EncryptMixin, JsonDictCharField):
     pass
+
+
+class PortField(models.IntegerField):
+    def __init__(self, *args, **kwargs):
+        kwargs.update({
+            'blank': False,
+            'null': False,
+            'validators': [MinValueValidator(0), MaxValueValidator(65535)]
+        })
+        super().__init__(*args, **kwargs)
 

@@ -310,16 +310,12 @@ class Config(dict):
         'TERMINAL_HOST_KEY': '',
         'TERMINAL_TELNET_REGEX': '',
         'TERMINAL_COMMAND_STORAGE': {},
-        'TERMINAL_RDP_ADDR': lambda: urlparse(settings.SITE_URL).hostname + ':3389',
-        'XRDP_ENABLED': True,
-        'TERMINAL_KOKO_HOST': lambda: urlparse(settings.SITE_URL).hostname,
-        'TERMINAL_KOKO_SSH_PORT': 2222,
-
+        # 未来废弃(当下迁移会用)
+        'TERMINAL_RDP_ADDR': '',
+        # 保留(Luna还在用)
         'TERMINAL_MAGNUS_ENABLED': True,
-        'TERMINAL_MAGNUS_HOST': lambda: urlparse(settings.SITE_URL).hostname,
-        'TERMINAL_MAGNUS_MYSQL_PORT': 33060,
-        'TERMINAL_MAGNUS_MARIADB_PORT': 33061,
-        'TERMINAL_MAGNUS_POSTGRE_PORT': 54320,
+        # 保留(Luna还在用)
+        'XRDP_ENABLED': True,
 
         # 安全配置
         'SECURITY_MFA_AUTH': 0,  # 0 不开启 1 全局开启 2 管理员开启
