@@ -37,7 +37,7 @@ from ..serializers import (
 )
 
 logger = get_logger(__name__)
-__all__ = ['UserConnectionTokenViewSet']
+__all__ = ['UserConnectionTokenViewSet', 'TokenCacheMixin']
 
 
 class ClientProtocolMixin:
@@ -368,6 +368,7 @@ class SecretDetailMixin:
 
 
 class TokenCacheMixin:
+    """ endpoint smart view 用到此类来解析token中的资产、应用 """
     CACHE_KEY_PREFIX = 'CONNECTION_TOKEN_{}'
 
     def get_token_cache_key(self, token):

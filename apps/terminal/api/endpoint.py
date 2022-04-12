@@ -8,6 +8,7 @@ from assets.models import Asset
 from orgs.utils import tmp_to_root_org
 from applications.models import Application
 from terminal.models import Session
+from authentication.api.connection_token import TokenCacheMixin
 from ..models import Endpoint, EndpointRule
 from .. import serializers
 
@@ -26,21 +27,28 @@ class EndpointViewSet(JMSBulkModelViewSet):
 
     @staticmethod
     def get_target_ip(request):
+        # 用来方便测试
         target_ip = request.GET.get('target_ip')
         if target_ip:
             return target_ip
+
         asset_id = request.GET.get('asset_id')
         app_id = request.GET.get('app_id')
         session_id = request.GET.get('session_id')
         token = request.GET.get('token')
+        if token:
+            value = TokenCacheMixin().get_token_from_cache(token)
+            if value:
+                if value.get('type') == 'asset':
+                    asset_id = value.get('asset')
+                else:
+                    app_id = value.get('application')
         if asset_id:
             pk, model = asset_id, Asset
         elif app_id:
             pk, model = app_id, Application
         elif session_id:
             pk, model = session_id, Session
-        elif token:
-            pk, model = None, None
         else:
             return ''
 
