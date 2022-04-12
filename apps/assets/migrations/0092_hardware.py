@@ -33,7 +33,6 @@ class Migration(migrations.Migration):
                 ('created_by', models.CharField(blank=True, max_length=32, null=True, verbose_name='Created by')),
                 ('date_created', models.DateTimeField(auto_now_add=True, null=True, verbose_name='Date created')),
                 ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
-                ('host', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='assets.host', related_name='device_info', verbose_name='Host')),
             ],
             options={
                 'verbose_name': 'DeviceInfo',
