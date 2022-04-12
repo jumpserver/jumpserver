@@ -14,3 +14,5 @@ jobs:
       - uses: micnncim/action-lgtm-reaction@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          trigger: '["^.?lgtm$"]'
