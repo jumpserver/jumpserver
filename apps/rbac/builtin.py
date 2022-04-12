@@ -79,7 +79,7 @@ class PredefineRole:
         perms = self.default_perms
         defaults = {
             'id': self.id, 'name': self.name, 'scope': self.scope,
-            'builtin': True, 'permissions': perms
+            'builtin': True, 'permissions': perms, 'created_by': 'System',
         }
         return defaults
 
