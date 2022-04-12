@@ -41,12 +41,14 @@ class Endpoint(JMSModel):
         data = {
             'id': cls.default_id,
             'name': 'Default',
-            'host': request.get_host().split(':')[0] if request else '',
+            'host': '',
             'https_port': 0,
             'http_port': 0,
         }
-        default, created = cls.objects.get_or_create(id=cls.default_id, defaults=data)
-        return default
+        endpoint, created = cls.objects.get_or_create(id=cls.default_id, defaults=data)
+        if not endpoint.host and request:
+            endpoint.host = request.get_host().split(':')[0]
+        return endpoint
 
 
 class EndpointRule(JMSModel):
@@ -87,8 +89,6 @@ class EndpointRule(JMSModel):
         endpoint_rule = cls.match(target_ip, protocol)
         if endpoint_rule:
             endpoint = endpoint_rule.endpoint
-        elif request:
-            endpoint = Endpoint.get_or_create_default(request)
         else:
-            endpoint = None
+            endpoint = Endpoint.get_or_create_default(request)
         return endpoint
