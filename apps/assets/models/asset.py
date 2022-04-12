@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 
 import uuid
 import logging
@@ -223,7 +223,7 @@ class Asset(AbsConnectivity, AbsHardwareInfo, ProtocolsMixin, NodesRelationMixin
 
     # Some information
     public_ip = models.CharField(max_length=128, blank=True, null=True, verbose_name=_('Public IP'))
-    number = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Asset number'))
+    number = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Asset number'))
 
     labels = models.ManyToManyField('assets.Label', blank=True, related_name='assets', verbose_name=_("Labels"))
     created_by = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Created by'))
