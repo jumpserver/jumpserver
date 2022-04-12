@@ -3188,7 +3188,7 @@ msgid "Can view audit view"
 msgstr "監査ビューを表示できます"
 
 #: rbac/models/menu.py:17
-msgid "Can view workspace view"
+msgid "Can view workbench view"
 msgstr "ワークスペースビューを表示できます"
 
 #: rbac/models/menu.py:18
@@ -3271,7 +3271,7 @@ msgid "Console view"
 msgstr "コンソールビュー"
 
 #: rbac/tree.py:27
-msgid "Workspace view"
+msgid "Workbench view"
 msgstr "ワークスペースビュー"
 
 #: rbac/tree.py:28

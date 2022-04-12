@@ -22,7 +22,3 @@ class AppRoleUserMixin(_RoleUserMixin):
         ('get_tree', 'perms.view_myapps'),
         ('GET', 'perms.view_myapps'),
     )
-
-    def dispatch(self, *args, **kwargs):
-        with tmp_to_root_org():
-            return super().dispatch(*args, **kwargs)
