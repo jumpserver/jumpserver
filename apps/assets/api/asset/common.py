@@ -31,7 +31,6 @@ class AssetViewSet(SuggestionMixin, FilterAssetByNodeMixin, OrgBulkModelViewSet)
         'hostname': ['exact'],
         'ip': ['exact'],
         'system_users__id': ['exact'],
-        'platform__base': ['exact'],
         'is_active': ['exact'],
         'protocols': ['exact', 'icontains']
     }

@@ -182,7 +182,7 @@ class PlatformSerializer(serializers.ModelSerializer):
     class Meta:
         model = Platform
         fields = [
-            'id', 'name', 'base', 'charset',
+            'id', 'name', 'category', 'type', 'charset',
             'internal', 'meta', 'comment'
         ]
 

@@ -12,17 +12,9 @@ class Platform(models.Model):
         ('utf8', 'UTF-8'),
         ('gbk', 'GBK'),
     )
-    BASE_CHOICES = (
-        ('Linux', 'Linux'),
-        ('Unix', 'Unix'),
-        ('MacOS', 'MacOS'),
-        ('BSD', 'BSD'),
-        ('Windows', 'Windows'),
-        ('Other', 'Other'),
-    )
     name = models.SlugField(verbose_name=_("Name"), unique=True, allow_unicode=True)
     category = models.CharField(max_length=16, choices=Category.choices, verbose_name=_("Category"))
-    type = models.CharField(choices=AllTypes.choices, max_length=32, default='Linux', verbose_name=_("Base"))
+    type = models.CharField(choices=AllTypes.choices, max_length=32, default='Linux', verbose_name=_("Type"))
     charset = models.CharField(default='utf8', choices=CHARSET_CHOICES, max_length=8, verbose_name=_("Charset"))
     meta = JsonDictTextField(blank=True, null=True, verbose_name=_("Meta"))
     internal = models.BooleanField(default=False, verbose_name=_("Internal"))
@@ -36,10 +28,10 @@ class Platform(models.Model):
         return linux.id
 
     def is_windows(self):
-        return self.base.lower() in ('windows',)
+        return self.type.lower() in ('windows',)
 
     def is_unixlike(self):
-        return self.base.lower() in ("linux", "unix", "macos", "bsd")
+        return self.type.lower() in ("linux", "unix", "macos", "bsd")
 
     def __str__(self):
         return self.name
