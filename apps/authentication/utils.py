@@ -9,8 +9,7 @@ from django.conf import settings
 from .notifications import DifferentCityLoginMessage
 from audits.models import UserLoginLog
 from audits.const import DEFAULT_CITY
-from common.utils import get_request_ip
-from common.utils import validate_ip, get_ip_city
+from common.utils import validate_ip, get_ip_city, get_request_ip
 from common.utils import get_logger
 
 logger = get_logger(__file__)

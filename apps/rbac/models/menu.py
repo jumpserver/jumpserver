@@ -14,7 +14,7 @@ class MenuPermission(models.Model):
         permissions = [
             ('view_console', _('Can view console view')),
             ('view_audit', _('Can view audit view')),
-            ('view_workspace', _('Can view workspace view')),
+            ('view_workbench', _('Can view workbench view')),
             ('view_webterminal', _('Can view web terminal')),
             ('view_filemanager', _('Can view file manager')),
         ]

@@ -24,10 +24,11 @@ class TicketSessionApi(views.APIView):
 
     def get(self, request, *args, **kwargs):
         with tmp_to_root_org():
-            ticketsession = TicketSession.objects.filter(ticket=self.kwargs['ticket_id']).first()
-            if not ticketsession:
+            tid = self.kwargs['ticket_id']
+            ticket_session = TicketSession.objects.filter(ticket=tid).first()
+            if not ticket_session:
                 return Response(status=status.HTTP_404_NOT_FOUND)
 
-            session = ticketsession.session
+            session = ticket_session.session
             serializer = SessionSerializer(session)
             return Response(serializer.data)

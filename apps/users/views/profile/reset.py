@@ -21,7 +21,7 @@ from ... import forms
 
 
 __all__ = [
-    'UserLoginView', 'UserResetPasswordView', 'UserForgotPasswordView', 'UserFirstLoginView',
+    'UserLoginView', 'UserResetPasswordView', 'UserForgotPasswordView',
 ]
 
 
@@ -130,8 +130,3 @@ class UserResetPasswordView(FormView):
             'auto_redirect': True,
         }
         return FlashMessageUtil.gen_message_url(message_data)
-
-
-class UserFirstLoginView(PermissionsMixin, TemplateView):
-    template_name = 'users/first_login.html'
-    permission_classes = [IsValidUser]
