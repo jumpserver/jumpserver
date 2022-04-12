@@ -8,7 +8,6 @@ from assets.models import Asset
 from orgs.utils import tmp_to_root_org
 from applications.models import Application
 from terminal.models import Session
-from authentication.api.connection_token import TokenCacheMixin
 from ..models import Endpoint, EndpointRule
 from .. import serializers
 
@@ -37,7 +36,8 @@ class EndpointViewSet(JMSBulkModelViewSet):
         session_id = request.GET.get('session_id')
         token = request.GET.get('token')
         if token:
-            value = TokenCacheMixin().get_token_from_cache(token)
+            from authentication.api.connection_token import TokenCacheMixin as TokenUtil
+            value = TokenUtil().get_token_from_cache(token)
             if value:
                 if value.get('type') == 'asset':
                     asset_id = value.get('asset')
