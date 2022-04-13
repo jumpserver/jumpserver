@@ -36,6 +36,7 @@ class SessionCommandSerializer(SimpleSessionCommandSerializer):
     output = serializers.CharField(max_length=2048, allow_blank=True, label=_("Output"))
     risk_level_display = serializers.SerializerMethodField(label=_('Risk level display'))
     timestamp = serializers.IntegerField(label=_('Timestamp'))
+    timestamp_display = serializers.DateTimeField(label=_('Datetime'))
     remote_addr = serializers.CharField(read_only=True, label=_('Remote Address'))
 
     @staticmethod

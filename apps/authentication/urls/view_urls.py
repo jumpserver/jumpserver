@@ -55,7 +55,6 @@ urlpatterns = [
     path('profile/otp/enable/bind/', users_view.UserOtpEnableBindView.as_view(), name='user-otp-enable-bind'),
     path('profile/otp/disable/', users_view.UserOtpDisableView.as_view(),
          name='user-otp-disable'),
-    path('first-login/', users_view.UserFirstLoginView.as_view(), name='user-first-login'),
 
     # openid
     path('cas/', include(('authentication.backends.cas.urls', 'authentication'), namespace='cas')),

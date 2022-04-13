@@ -247,6 +247,14 @@ class Application(CommonModelMixin, OrgModelMixin, ApplicationTreeNodeMixin):
     def category_remote_app(self):
         return self.category == const.AppCategory.remote_app.value
 
+    @property
+    def category_cloud(self):
+        return self.category == const.AppCategory.cloud.value
+
+    @property
+    def category_db(self):
+        return self.category == const.AppCategory.db.value
+
     def get_rdp_remote_app_setting(self):
         from applications.serializers.attrs import get_serializer_class_by_application_type
         if not self.category_remote_app:
@@ -278,6 +286,18 @@ class Application(CommonModelMixin, OrgModelMixin, ApplicationTreeNodeMixin):
             return Asset.objects.filter(id=asset_id).first()
         if raise_exception:
             raise ValueError("Remote App not has asset attr")
+
+    def get_target_ip(self):
+        if self.category_remote_app:
+            asset = self.get_remote_app_asset()
+            target_ip = asset.ip
+        elif self.category_cloud:
+            target_ip = self.attrs.get('cluster')
+        elif self.category_db:
+            target_ip = self.attrs.get('host')
+        else:
+            target_ip = ''
+        return target_ip
 
 
 class ApplicationUser(SystemUser):

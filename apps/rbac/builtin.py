@@ -5,7 +5,7 @@ from .const import Scope, system_exclude_permissions, org_exclude_permissions
 # Todo: 获取应该区分 系统用户，和组织用户的权限
 # 工作台也区分组织后再考虑
 user_perms = (
-    ('rbac', 'menupermission', 'view', 'workspace'),
+    ('rbac', 'menupermission', 'view', 'workbench'),
     ('rbac', 'menupermission', 'view', 'webterminal'),
     ('rbac', 'menupermission', 'view', 'filemanager'),
     ('perms', 'permedasset', 'view,connect', 'myassets'),
@@ -18,6 +18,7 @@ user_perms = (
     ('authentication', 'connectiontoken', 'add', 'connectiontoken'),
     ('authentication', 'temptoken', 'add', 'temptoken'),
     ('tickets', 'ticket', 'view', 'ticket'),
+    ('orgs', 'organization', 'view', 'rootorg'),
 )
 
 auditor_perms = user_perms + (
@@ -79,7 +80,7 @@ class PredefineRole:
         perms = self.default_perms
         defaults = {
             'id': self.id, 'name': self.name, 'scope': self.scope,
-            'builtin': True, 'permissions': perms
+            'builtin': True, 'permissions': perms, 'created_by': 'System',
         }
         return defaults
 

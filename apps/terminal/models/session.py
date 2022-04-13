@@ -11,9 +11,11 @@ from django.core.files.storage import default_storage
 from django.core.cache import cache
 
 from assets.models import Asset
+from applications.models import Application
 from users.models import User
 from orgs.mixins.models import OrgModelMixin
 from django.db.models import TextChoices
+from common.utils import get_object_or_none
 from ..backends import get_multi_command_storage
 
 
@@ -193,6 +195,13 @@ class Session(OrgModelMixin):
     @property
     def login_from_display(self):
         return self.get_login_from_display()
+
+    def get_target_ip(self):
+        instance = get_object_or_none(Asset, pk=self.asset_id)
+        if not instance:
+            instance = get_object_or_none(Application, pk=self.asset_id)
+        target_ip = instance.get_target_ip() if instance else ''
+        return target_ip
 
     @classmethod
     def generate_fake(cls, count=100, is_finished=True):

@@ -41,7 +41,7 @@ def import_string(dotted_path):
     except AttributeError as err:
         raise ImportError('Module "%s" does not define a "%s" attribute/class' % (
             module_path, class_name)
-        ) from err
+                          ) from err
 
 
 def is_absolute_uri(uri):
@@ -176,6 +176,7 @@ class Config(dict):
         'AUTH_LDAP_SYNC_IS_PERIODIC': False,
         'AUTH_LDAP_SYNC_INTERVAL': None,
         'AUTH_LDAP_SYNC_CRONTAB': None,
+        'AUTH_LDAP_SYNC_ORG_ID': '00000000-0000-0000-0000-000000000002',
         'AUTH_LDAP_USER_LOGIN_ONLY_IN_USERS': False,
         'AUTH_LDAP_OPTIONS_OPT_REFERRALS': -1,
 
@@ -274,7 +275,7 @@ class Config(dict):
         'FEISHU_APP_ID': '',
         'FEISHU_APP_SECRET': '',
 
-        'LOGIN_REDIRECT_TO_BACKEND':  '',  # 'OPENID / CAS / SAML2
+        'LOGIN_REDIRECT_TO_BACKEND': '',  # 'OPENID / CAS / SAML2
         'LOGIN_REDIRECT_MSG_ENABLED': True,
 
         'SMS_ENABLED': False,
@@ -311,16 +312,12 @@ class Config(dict):
         'TERMINAL_HOST_KEY': '',
         'TERMINAL_TELNET_REGEX': '',
         'TERMINAL_COMMAND_STORAGE': {},
-        'TERMINAL_RDP_ADDR': lambda: urlparse(settings.SITE_URL).hostname + ':3389',
-        'XRDP_ENABLED': True,
-        'TERMINAL_KOKO_HOST': lambda: urlparse(settings.SITE_URL).hostname,
-        'TERMINAL_KOKO_SSH_PORT': 2222,
-
+        # 未来废弃(当下迁移会用)
+        'TERMINAL_RDP_ADDR': '',
+        # 保留(Luna还在用)
         'TERMINAL_MAGNUS_ENABLED': True,
-        'TERMINAL_MAGNUS_HOST': lambda: urlparse(settings.SITE_URL).hostname,
-        'TERMINAL_MAGNUS_MYSQL_PORT': 33060,
-        'TERMINAL_MAGNUS_MARIADB_PORT': 33061,
-        'TERMINAL_MAGNUS_POSTGRE_PORT': 54320,
+        # 保留(Luna还在用)
+        'XRDP_ENABLED': True,
 
         # 安全配置
         'SECURITY_MFA_AUTH': 0,  # 0 不开启 1 全局开启 2 管理员开启
