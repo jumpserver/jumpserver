@@ -13,8 +13,8 @@ class TempTokenAuthBackend(JMSModelBackend):
         token = self.model.objects.filter(username=username, secret=password).first()
         if not token:
             return None
-        if token.verified:
-            raise PermissionDenied('Token has verified at: {}'.format(token.date_verified))
+        if not token.is_valid:
+            raise PermissionDenied('Token is invalid, expired at {}'.format(token.date_expired))
 
         token.verified = True
         token.date_verified = timezone.now()

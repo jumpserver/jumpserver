@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-13 20:01+0800\n"
+"POT-Creation-Date: 2022-04-13 20:21+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1552,170 +1552,174 @@ msgstr "企业微信"
 msgid "DingTalk"
 msgstr "钉钉"
 
-#: audits/signal_handlers.py:106
+#: audits/signal_handlers.py:73 authentication/models.py:76
+msgid "Temporary token"
+msgstr "临时 Token"
+
+#: audits/signal_handlers.py:107
 msgid "User and Group"
 msgstr "用户与用户组"
 
-#: audits/signal_handlers.py:107
+#: audits/signal_handlers.py:108
 #, python-brace-format
 msgid "{User} JOINED {UserGroup}"
 msgstr "{User} 加入 {UserGroup}"
 
-#: audits/signal_handlers.py:108
+#: audits/signal_handlers.py:109
 #, python-brace-format
 msgid "{User} LEFT {UserGroup}"
 msgstr "{User} 离开 {UserGroup}"
 
-#: audits/signal_handlers.py:111
+#: audits/signal_handlers.py:112
 msgid "Asset and SystemUser"
 msgstr "资产与系统用户"
 
-#: audits/signal_handlers.py:112
+#: audits/signal_handlers.py:113
 #, python-brace-format
 msgid "{Asset} ADD {SystemUser}"
 msgstr "{Asset} 添加 {SystemUser}"
 
-#: audits/signal_handlers.py:113
+#: audits/signal_handlers.py:114
 #, python-brace-format
 msgid "{Asset} REMOVE {SystemUser}"
 msgstr "{Asset} 移除 {SystemUser}"
 
-#: audits/signal_handlers.py:116
+#: audits/signal_handlers.py:117
 msgid "Node and Asset"
 msgstr "节点与资产"
 
-#: audits/signal_handlers.py:117
+#: audits/signal_handlers.py:118
 #, python-brace-format
 msgid "{Node} ADD {Asset}"
 msgstr "{Node} 添加 {Asset}"
 
-#: audits/signal_handlers.py:118
+#: audits/signal_handlers.py:119
 #, python-brace-format
 msgid "{Node} REMOVE {Asset}"
 msgstr "{Node} 移除 {Asset}"
 
-#: audits/signal_handlers.py:121
+#: audits/signal_handlers.py:122
 msgid "User asset permissions"
 msgstr "用户资产授权"
 
-#: audits/signal_handlers.py:122
+#: audits/signal_handlers.py:123
 #, python-brace-format
 msgid "{AssetPermission} ADD {User}"
 msgstr "{AssetPermission} 添加 {User}"
 
-#: audits/signal_handlers.py:123
+#: audits/signal_handlers.py:124
 #, python-brace-format
 msgid "{AssetPermission} REMOVE {User}"
 msgstr "{AssetPermission} 移除 {User}"
 
-#: audits/signal_handlers.py:126
+#: audits/signal_handlers.py:127
 msgid "User group asset permissions"
 msgstr "用户组资产授权"
 
-#: audits/signal_handlers.py:127
+#: audits/signal_handlers.py:128
 #, python-brace-format
 msgid "{AssetPermission} ADD {UserGroup}"
 msgstr "{AssetPermission} 添加 {UserGroup}"
 
-#: audits/signal_handlers.py:128
+#: audits/signal_handlers.py:129
 #, python-brace-format
 msgid "{AssetPermission} REMOVE {UserGroup}"
 msgstr "{AssetPermission} 移除 {UserGroup}"
 
-#: audits/signal_handlers.py:131 perms/models/asset_permission.py:29
+#: audits/signal_handlers.py:132 perms/models/asset_permission.py:29
 msgid "Asset permission"
 msgstr "资产授权"
 
-#: audits/signal_handlers.py:132
+#: audits/signal_handlers.py:133
 #, python-brace-format
 msgid "{AssetPermission} ADD {Asset}"
 msgstr "{AssetPermission} 添加 {Asset}"
 
-#: audits/signal_handlers.py:133
+#: audits/signal_handlers.py:134
 #, python-brace-format
 msgid "{AssetPermission} REMOVE {Asset}"
 msgstr "{AssetPermission} 移除 {Asset}"
 
-#: audits/signal_handlers.py:136
+#: audits/signal_handlers.py:137
 msgid "Node permission"
 msgstr "节点授权"
 
-#: audits/signal_handlers.py:137
+#: audits/signal_handlers.py:138
 #, python-brace-format
 msgid "{AssetPermission} ADD {Node}"
 msgstr "{AssetPermission} 添加 {Node}"
 
-#: audits/signal_handlers.py:138
+#: audits/signal_handlers.py:139
 #, python-brace-format
 msgid "{AssetPermission} REMOVE {Node}"
 msgstr "{AssetPermission} 移除 {Node}"
 
-#: audits/signal_handlers.py:141
+#: audits/signal_handlers.py:142
 msgid "Asset permission and SystemUser"
 msgstr "资产授权与系统用户"
 
-#: audits/signal_handlers.py:142
+#: audits/signal_handlers.py:143
 #, python-brace-format
 msgid "{AssetPermission} ADD {SystemUser}"
 msgstr "{AssetPermission} 添加 {SystemUser}"
 
-#: audits/signal_handlers.py:143
+#: audits/signal_handlers.py:144
 #, python-brace-format
 msgid "{AssetPermission} REMOVE {SystemUser}"
 msgstr "{AssetPermission} 移除 {SystemUser}"
 
-#: audits/signal_handlers.py:146
+#: audits/signal_handlers.py:147
 msgid "User application permissions"
 msgstr "用户应用授权"
 
-#: audits/signal_handlers.py:147
+#: audits/signal_handlers.py:148
 #, python-brace-format
 msgid "{ApplicationPermission} ADD {User}"
 msgstr "{ApplicationPermission} 添加 {User}"
 
-#: audits/signal_handlers.py:148
+#: audits/signal_handlers.py:149
 #, python-brace-format
 msgid "{ApplicationPermission} REMOVE {User}"
 msgstr "{ApplicationPermission} 移除 {User}"
 
-#: audits/signal_handlers.py:151
+#: audits/signal_handlers.py:152
 msgid "User group application permissions"
 msgstr "用户组应用授权"
 
-#: audits/signal_handlers.py:152
+#: audits/signal_handlers.py:153
 #, python-brace-format
 msgid "{ApplicationPermission} ADD {UserGroup}"
 msgstr "{ApplicationPermission} 添加 {UserGroup}"
 
-#: audits/signal_handlers.py:153
+#: audits/signal_handlers.py:154
 #, python-brace-format
 msgid "{ApplicationPermission} REMOVE {UserGroup}"
 msgstr "{ApplicationPermission} 移除 {UserGroup}"
 
-#: audits/signal_handlers.py:156 perms/models/application_permission.py:38
+#: audits/signal_handlers.py:157 perms/models/application_permission.py:38
 msgid "Application permission"
 msgstr "应用授权"
 
-#: audits/signal_handlers.py:157
+#: audits/signal_handlers.py:158
 #, python-brace-format
 msgid "{ApplicationPermission} ADD {Application}"
 msgstr "{ApplicationPermission} 添加 {Application}"
 
-#: audits/signal_handlers.py:158
+#: audits/signal_handlers.py:159
 #, python-brace-format
 msgid "{ApplicationPermission} REMOVE {Application}"
 msgstr "{ApplicationPermission} 移除 {Application}"
 
-#: audits/signal_handlers.py:161
+#: audits/signal_handlers.py:162
 msgid "Application permission and SystemUser"
 msgstr "应用授权与系统用户"
 
-#: audits/signal_handlers.py:162
+#: audits/signal_handlers.py:163
 #, python-brace-format
 msgid "{ApplicationPermission} ADD {SystemUser}"
 msgstr "{ApplicationPermission} 添加 {SystemUser}"
 
-#: audits/signal_handlers.py:163
+#: audits/signal_handlers.py:164
 #, python-brace-format
 msgid "{ApplicationPermission} REMOVE {SystemUser}"
 msgstr "{ApplicationPermission} 移除 {SystemUser}"
@@ -2049,10 +2053,6 @@ msgstr "已校验"
 #: users/models/user.py:703
 msgid "Date expired"
 msgstr "失效日期"
-
-#: authentication/models.py:76
-msgid "Temporary token"
-msgstr "临时 Token"
 
 #: authentication/models.py:92
 msgid "Super connection token"

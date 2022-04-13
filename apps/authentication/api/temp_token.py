@@ -11,7 +11,7 @@ from ..serializers import TempTokenSerializer
 class TempTokenViewSet(JMSModelViewSet):
     serializer_class = TempTokenSerializer
     permission_classes = [IsValidUser]
-    http_method_names = ['post', 'get', 'option', 'patch']
+    http_method_names = ['post', 'get', 'options', 'patch']
 
     def get_queryset(self):
         username = self.request.user.username
