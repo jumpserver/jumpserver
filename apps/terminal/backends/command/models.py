@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+from datetime import datetime
 import uuid
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -27,6 +28,10 @@ class AbstractSessionCommand(OrgModelMixin):
 
     class Meta:
         abstract = True
+
+    @lazyproperty
+    def timestamp_display(self):
+        return datetime.fromtimestamp(self.timestamp)
 
     @lazyproperty
     def remote_addr(self):
