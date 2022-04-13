@@ -186,7 +186,7 @@ class ClientProtocolMixin:
         )
         content = {
             'ip': endpoint.host,
-            'port': endpoint.ssh_port,
+            'port': str(endpoint.ssh_port),
             'username': f'JMS-{token}',
             'password': secret
         }
