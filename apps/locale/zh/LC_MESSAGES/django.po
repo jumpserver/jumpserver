@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-12 17:03+0800\n"
+"POT-Creation-Date: 2022-04-13 20:21+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -28,25 +28,25 @@ msgstr "访问控制"
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
 #: orgs/models.py:65 perms/models/base.py:83 rbac/models/role.py:29
 #: settings/models.py:29 settings/serializers/sms.py:6
-#: terminal/models/endpoint.py:10 terminal/models/endpoint.py:53
+#: terminal/models/endpoint.py:10 terminal/models/endpoint.py:55
 #: terminal/models/storage.py:23 terminal/models/task.py:16
 #: terminal/models/terminal.py:100 users/forms/profile.py:32
 #: users/models/group.py:15 users/models/user.py:661
-#: xpack/plugins/cloud/models.py:28
+#: xpack/plugins/cloud/models.py:27
 msgid "Name"
 msgstr "名称"
 
 #: acls/models/base.py:27 assets/models/cmd_filter.py:84
-#: assets/models/user.py:247 terminal/models/endpoint.py:56
+#: assets/models/user.py:247 terminal/models/endpoint.py:58
 msgid "Priority"
 msgstr "优先级"
 
 #: acls/models/base.py:28 assets/models/cmd_filter.py:84
-#: assets/models/user.py:247 terminal/models/endpoint.py:57
+#: assets/models/user.py:247 terminal/models/endpoint.py:59
 msgid "1-100, the lower the value will be match first"
 msgstr "优先级可选范围为 1-100 (数值越小越优先)"
 
-#: acls/models/base.py:31 authentication/models.py:17
+#: acls/models/base.py:31 authentication/models.py:18
 #: authentication/templates/authentication/_access_key_modal.html:32
 #: perms/models/base.py:88 terminal/models/sharing.py:26
 msgid "Active"
@@ -60,12 +60,12 @@ msgstr "激活中"
 #: assets/models/domain.py:64 assets/models/group.py:23
 #: assets/models/label.py:23 ops/models/adhoc.py:38 orgs/models.py:68
 #: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:34
-#: terminal/models/endpoint.py:20 terminal/models/endpoint.py:63
+#: terminal/models/endpoint.py:20 terminal/models/endpoint.py:65
 #: terminal/models/storage.py:26 terminal/models/terminal.py:114
 #: tickets/models/comment.py:24 tickets/models/ticket.py:154
 #: users/models/group.py:16 users/models/user.py:698
 #: xpack/plugins/change_auth_plan/models/base.py:44
-#: xpack/plugins/cloud/models.py:35 xpack/plugins/cloud/models.py:116
+#: xpack/plugins/cloud/models.py:34 xpack/plugins/cloud/models.py:115
 #: xpack/plugins/gathered_user/models.py:26
 msgid "Comment"
 msgstr "备注"
@@ -86,9 +86,9 @@ msgstr "登录复核"
 #: acls/models/login_acl.py:24 acls/models/login_asset_acl.py:20
 #: assets/models/cmd_filter.py:30 assets/models/label.py:15 audits/models.py:37
 #: audits/models.py:60 audits/models.py:85 audits/serializers.py:100
-#: authentication/models.py:50 orgs/models.py:214 perms/models/base.py:84
-#: rbac/builtin.py:106 rbac/models/rolebinding.py:40
-#: terminal/backends/command/models.py:19
+#: authentication/models.py:51 orgs/models.py:214 perms/models/base.py:84
+#: rbac/builtin.py:107 rbac/models/rolebinding.py:40
+#: terminal/backends/command/models.py:20
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:44
 #: terminal/notifications.py:91 terminal/notifications.py:139
 #: tickets/models/comment.py:17 users/const.py:14 users/models/user.py:886
@@ -128,12 +128,12 @@ msgstr "系统用户"
 #: assets/models/backup.py:31 assets/models/cmd_filter.py:38
 #: assets/models/gathered_user.py:14 assets/serializers/label.py:30
 #: assets/serializers/system_user.py:264 audits/models.py:39
-#: perms/models/asset_permission.py:23 terminal/backends/command/models.py:20
+#: perms/models/asset_permission.py:23 terminal/backends/command/models.py:21
 #: terminal/backends/command/serializers.py:13 terminal/models/session.py:46
 #: terminal/notifications.py:90
 #: xpack/plugins/change_auth_plan/models/asset.py:199
 #: xpack/plugins/change_auth_plan/serializers/asset.py:180
-#: xpack/plugins/cloud/models.py:223
+#: xpack/plugins/cloud/models.py:222
 msgid "Asset"
 msgstr "资产"
 
@@ -153,6 +153,7 @@ msgstr "格式为逗号分隔的字符串, * 表示匹配所有. "
 #: acls/serializers/login_asset_acl.py:51 assets/models/base.py:176
 #: assets/models/gathered_user.py:15 audits/models.py:119
 #: authentication/forms.py:15 authentication/forms.py:17
+#: authentication/models.py:69
 #: authentication/templates/authentication/_msg_different_city.html:9
 #: authentication/templates/authentication/_msg_oauth_bind.html:9
 #: ops/models/adhoc.py:159 users/forms/profile.py:31 users/models/user.py:659
@@ -260,7 +261,7 @@ msgstr "应用程序"
 #: applications/models/account.py:15 assets/models/authbook.py:20
 #: assets/models/cmd_filter.py:42 assets/models/user.py:338 audits/models.py:40
 #: perms/models/application_permission.py:33
-#: perms/models/asset_permission.py:25 terminal/backends/command/models.py:21
+#: perms/models/asset_permission.py:25 terminal/backends/command/models.py:22
 #: terminal/backends/command/serializers.py:35 terminal/models/session.py:48
 #: xpack/plugins/change_auth_plan/models/app.py:36
 #: xpack/plugins/change_auth_plan/models/app.py:147
@@ -312,7 +313,7 @@ msgstr "类型"
 msgid "Domain"
 msgstr "网域"
 
-#: applications/models/application.py:228 xpack/plugins/cloud/models.py:33
+#: applications/models/application.py:228 xpack/plugins/cloud/models.py:32
 #: xpack/plugins/cloud/serializers/account.py:58
 msgid "Attrs"
 msgstr "属性"
@@ -351,7 +352,7 @@ msgstr "类型名称"
 #: common/mixins/models.py:50 ops/models/adhoc.py:39 ops/models/command.py:30
 #: orgs/models.py:67 orgs/models.py:217 perms/models/base.py:92
 #: users/models/group.py:18 users/models/user.py:918
-#: xpack/plugins/cloud/models.py:125
+#: xpack/plugins/cloud/models.py:124
 msgid "Date created"
 msgstr "创建日期"
 
@@ -566,7 +567,7 @@ msgstr "主机名原始"
 
 #: assets/models/asset.py:215 assets/serializers/account.py:16
 #: assets/serializers/asset.py:65 perms/serializers/asset/user_permission.py:41
-#: xpack/plugins/cloud/models.py:107 xpack/plugins/cloud/serializers/task.py:42
+#: xpack/plugins/cloud/models.py:106 xpack/plugins/cloud/serializers/task.py:42
 msgid "Protocols"
 msgstr "协议组"
 
@@ -606,7 +607,7 @@ msgstr "标签管理"
 #: orgs/models.py:219 perms/models/base.py:91 users/models/user.py:706
 #: users/serializers/group.py:33
 #: xpack/plugins/change_auth_plan/models/base.py:48
-#: xpack/plugins/cloud/models.py:122 xpack/plugins/gathered_user/models.py:30
+#: xpack/plugins/cloud/models.py:121 xpack/plugins/gathered_user/models.py:30
 msgid "Created by"
 msgstr "创建者"
 
@@ -710,7 +711,7 @@ msgstr "触发模式"
 #: xpack/plugins/change_auth_plan/models/base.py:201
 #: xpack/plugins/change_auth_plan/serializers/app.py:66
 #: xpack/plugins/change_auth_plan/serializers/asset.py:179
-#: xpack/plugins/cloud/models.py:179
+#: xpack/plugins/cloud/models.py:178
 msgid "Reason"
 msgstr "原因"
 
@@ -746,7 +747,7 @@ msgstr "失败"
 msgid "Connectivity"
 msgstr "可连接性"
 
-#: assets/models/base.py:40
+#: assets/models/base.py:40 authentication/models.py:72
 msgid "Date verified"
 msgstr "校验日期"
 
@@ -948,7 +949,7 @@ msgid "Parent key"
 msgstr "ssh私钥"
 
 #: assets/models/node.py:559 assets/serializers/system_user.py:263
-#: xpack/plugins/cloud/models.py:96 xpack/plugins/cloud/serializers/task.py:69
+#: xpack/plugins/cloud/models.py:95 xpack/plugins/cloud/serializers/task.py:69
 msgid "Node"
 msgstr "节点"
 
@@ -1006,7 +1007,7 @@ msgstr "认证方式"
 msgid "SFTP Root"
 msgstr "SFTP根路径"
 
-#: assets/models/user.py:254 authentication/models.py:48
+#: assets/models/user.py:254 authentication/models.py:49
 msgid "Token"
 msgstr "Token"
 
@@ -1414,6 +1415,7 @@ msgid "Resource"
 msgstr "资源"
 
 #: audits/models.py:65 audits/models.py:88
+#: terminal/backends/command/serializers.py:39
 msgid "Datetime"
 msgstr "日期"
 
@@ -1468,8 +1470,8 @@ msgid "MFA"
 msgstr "MFA"
 
 #: audits/models.py:126 terminal/models/status.py:33
-#: tickets/models/ticket.py:140 xpack/plugins/cloud/models.py:175
-#: xpack/plugins/cloud/models.py:227
+#: tickets/models/ticket.py:140 xpack/plugins/cloud/models.py:174
+#: xpack/plugins/cloud/models.py:226
 msgid "Status"
 msgstr "状态"
 
@@ -1506,7 +1508,7 @@ msgid "Hosts display"
 msgstr "主机名称"
 
 #: audits/serializers.py:96 ops/models/command.py:27
-#: xpack/plugins/cloud/models.py:173
+#: xpack/plugins/cloud/models.py:172
 msgid "Result"
 msgstr "结果"
 
@@ -1550,170 +1552,174 @@ msgstr "企业微信"
 msgid "DingTalk"
 msgstr "钉钉"
 
-#: audits/signal_handlers.py:106
+#: audits/signal_handlers.py:73 authentication/models.py:76
+msgid "Temporary token"
+msgstr "临时 Token"
+
+#: audits/signal_handlers.py:107
 msgid "User and Group"
 msgstr "用户与用户组"
 
-#: audits/signal_handlers.py:107
+#: audits/signal_handlers.py:108
 #, python-brace-format
 msgid "{User} JOINED {UserGroup}"
 msgstr "{User} 加入 {UserGroup}"
 
-#: audits/signal_handlers.py:108
+#: audits/signal_handlers.py:109
 #, python-brace-format
 msgid "{User} LEFT {UserGroup}"
 msgstr "{User} 离开 {UserGroup}"
 
-#: audits/signal_handlers.py:111
+#: audits/signal_handlers.py:112
 msgid "Asset and SystemUser"
 msgstr "资产与系统用户"
 
-#: audits/signal_handlers.py:112
+#: audits/signal_handlers.py:113
 #, python-brace-format
 msgid "{Asset} ADD {SystemUser}"
 msgstr "{Asset} 添加 {SystemUser}"
 
-#: audits/signal_handlers.py:113
+#: audits/signal_handlers.py:114
 #, python-brace-format
 msgid "{Asset} REMOVE {SystemUser}"
 msgstr "{Asset} 移除 {SystemUser}"
 
-#: audits/signal_handlers.py:116
+#: audits/signal_handlers.py:117
 msgid "Node and Asset"
 msgstr "节点与资产"
 
-#: audits/signal_handlers.py:117
+#: audits/signal_handlers.py:118
 #, python-brace-format
 msgid "{Node} ADD {Asset}"
 msgstr "{Node} 添加 {Asset}"
 
-#: audits/signal_handlers.py:118
+#: audits/signal_handlers.py:119
 #, python-brace-format
 msgid "{Node} REMOVE {Asset}"
 msgstr "{Node} 移除 {Asset}"
 
-#: audits/signal_handlers.py:121
+#: audits/signal_handlers.py:122
 msgid "User asset permissions"
 msgstr "用户资产授权"
 
-#: audits/signal_handlers.py:122
+#: audits/signal_handlers.py:123
 #, python-brace-format
 msgid "{AssetPermission} ADD {User}"
 msgstr "{AssetPermission} 添加 {User}"
 
-#: audits/signal_handlers.py:123
+#: audits/signal_handlers.py:124
 #, python-brace-format
 msgid "{AssetPermission} REMOVE {User}"
 msgstr "{AssetPermission} 移除 {User}"
 
-#: audits/signal_handlers.py:126
+#: audits/signal_handlers.py:127
 msgid "User group asset permissions"
 msgstr "用户组资产授权"
 
-#: audits/signal_handlers.py:127
+#: audits/signal_handlers.py:128
 #, python-brace-format
 msgid "{AssetPermission} ADD {UserGroup}"
 msgstr "{AssetPermission} 添加 {UserGroup}"
 
-#: audits/signal_handlers.py:128
+#: audits/signal_handlers.py:129
 #, python-brace-format
 msgid "{AssetPermission} REMOVE {UserGroup}"
 msgstr "{AssetPermission} 移除 {UserGroup}"
 
-#: audits/signal_handlers.py:131 perms/models/asset_permission.py:29
+#: audits/signal_handlers.py:132 perms/models/asset_permission.py:29
 msgid "Asset permission"
 msgstr "资产授权"
 
-#: audits/signal_handlers.py:132
+#: audits/signal_handlers.py:133
 #, python-brace-format
 msgid "{AssetPermission} ADD {Asset}"
 msgstr "{AssetPermission} 添加 {Asset}"
 
-#: audits/signal_handlers.py:133
+#: audits/signal_handlers.py:134
 #, python-brace-format
 msgid "{AssetPermission} REMOVE {Asset}"
 msgstr "{AssetPermission} 移除 {Asset}"
 
-#: audits/signal_handlers.py:136
+#: audits/signal_handlers.py:137
 msgid "Node permission"
 msgstr "节点授权"
 
-#: audits/signal_handlers.py:137
+#: audits/signal_handlers.py:138
 #, python-brace-format
 msgid "{AssetPermission} ADD {Node}"
 msgstr "{AssetPermission} 添加 {Node}"
 
-#: audits/signal_handlers.py:138
+#: audits/signal_handlers.py:139
 #, python-brace-format
 msgid "{AssetPermission} REMOVE {Node}"
 msgstr "{AssetPermission} 移除 {Node}"
 
-#: audits/signal_handlers.py:141
+#: audits/signal_handlers.py:142
 msgid "Asset permission and SystemUser"
 msgstr "资产授权与系统用户"
 
-#: audits/signal_handlers.py:142
+#: audits/signal_handlers.py:143
 #, python-brace-format
 msgid "{AssetPermission} ADD {SystemUser}"
 msgstr "{AssetPermission} 添加 {SystemUser}"
 
-#: audits/signal_handlers.py:143
+#: audits/signal_handlers.py:144
 #, python-brace-format
 msgid "{AssetPermission} REMOVE {SystemUser}"
 msgstr "{AssetPermission} 移除 {SystemUser}"
 
-#: audits/signal_handlers.py:146
+#: audits/signal_handlers.py:147
 msgid "User application permissions"
 msgstr "用户应用授权"
 
-#: audits/signal_handlers.py:147
+#: audits/signal_handlers.py:148
 #, python-brace-format
 msgid "{ApplicationPermission} ADD {User}"
 msgstr "{ApplicationPermission} 添加 {User}"
 
-#: audits/signal_handlers.py:148
+#: audits/signal_handlers.py:149
 #, python-brace-format
 msgid "{ApplicationPermission} REMOVE {User}"
 msgstr "{ApplicationPermission} 移除 {User}"
 
-#: audits/signal_handlers.py:151
+#: audits/signal_handlers.py:152
 msgid "User group application permissions"
 msgstr "用户组应用授权"
 
-#: audits/signal_handlers.py:152
+#: audits/signal_handlers.py:153
 #, python-brace-format
 msgid "{ApplicationPermission} ADD {UserGroup}"
 msgstr "{ApplicationPermission} 添加 {UserGroup}"
 
-#: audits/signal_handlers.py:153
+#: audits/signal_handlers.py:154
 #, python-brace-format
 msgid "{ApplicationPermission} REMOVE {UserGroup}"
 msgstr "{ApplicationPermission} 移除 {UserGroup}"
 
-#: audits/signal_handlers.py:156 perms/models/application_permission.py:38
+#: audits/signal_handlers.py:157 perms/models/application_permission.py:38
 msgid "Application permission"
 msgstr "应用授权"
 
-#: audits/signal_handlers.py:157
+#: audits/signal_handlers.py:158
 #, python-brace-format
 msgid "{ApplicationPermission} ADD {Application}"
 msgstr "{ApplicationPermission} 添加 {Application}"
 
-#: audits/signal_handlers.py:158
+#: audits/signal_handlers.py:159
 #, python-brace-format
 msgid "{ApplicationPermission} REMOVE {Application}"
 msgstr "{ApplicationPermission} 移除 {Application}"
 
-#: audits/signal_handlers.py:161
+#: audits/signal_handlers.py:162
 msgid "Application permission and SystemUser"
 msgstr "应用授权与系统用户"
 
-#: audits/signal_handlers.py:162
+#: audits/signal_handlers.py:163
 #, python-brace-format
 msgid "{ApplicationPermission} ADD {SystemUser}"
 msgstr "{ApplicationPermission} 添加 {SystemUser}"
 
-#: audits/signal_handlers.py:163
+#: audits/signal_handlers.py:164
 #, python-brace-format
 msgid "{ApplicationPermission} REMOVE {SystemUser}"
 msgstr "{ApplicationPermission} 移除 {SystemUser}"
@@ -2007,31 +2013,48 @@ msgstr "该 MFA ({}) 方式没有启用"
 msgid "Please change your password"
 msgstr "请修改密码"
 
-#: authentication/models.py:33 terminal/serializers/storage.py:28
+#: authentication/models.py:34 terminal/serializers/storage.py:28
 msgid "Access key"
 msgstr "API key"
 
-#: authentication/models.py:40
+#: authentication/models.py:41
 msgid "Private Token"
 msgstr "SSH密钥"
 
-#: authentication/models.py:49
+#: authentication/models.py:50
 msgid "Expired"
 msgstr "过期时间"
 
-#: authentication/models.py:53
+#: authentication/models.py:54
 msgid "SSO token"
 msgstr "SSO token"
 
-#: authentication/models.py:61
+#: authentication/models.py:62
 msgid "Connection token"
 msgstr "连接令牌"
 
-#: authentication/models.py:63
+#: authentication/models.py:64
 msgid "Can view connection token secret"
 msgstr "可以查看连接令牌密文"
 
 #: authentication/models.py:70
+#: authentication/templates/authentication/_access_key_modal.html:31
+#: settings/serializers/auth/radius.py:17
+msgid "Secret"
+msgstr "密钥"
+
+#: authentication/models.py:71
+msgid "Verified"
+msgstr "已校验"
+
+#: authentication/models.py:73 perms/models/base.py:90
+#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:58
+#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:60
+#: users/models/user.py:703
+msgid "Date expired"
+msgstr "失效日期"
+
+#: authentication/models.py:92
 msgid "Super connection token"
 msgstr "超级连接令牌"
 
@@ -2042,6 +2065,14 @@ msgstr "异地登录提醒"
 #: authentication/notifications.py:52
 msgid "binding reminder"
 msgstr "绑定提醒"
+
+#: authentication/serializers/token.py:79
+#: perms/serializers/application/permission.py:20
+#: perms/serializers/application/permission.py:41
+#: perms/serializers/asset/permission.py:19
+#: perms/serializers/asset/permission.py:45 users/serializers/user.py:141
+msgid "Is valid"
+msgstr "账号是否有效"
 
 #: authentication/templates/authentication/_access_key_modal.html:6
 msgid "API key list"
@@ -2059,11 +2090,6 @@ msgstr "文档"
 #: users/serializers/group.py:35
 msgid "ID"
 msgstr "ID"
-
-#: authentication/templates/authentication/_access_key_modal.html:31
-#: settings/serializers/auth/radius.py:17
-msgid "Secret"
-msgstr "密钥"
 
 #: authentication/templates/authentication/_access_key_modal.html:33
 #: terminal/notifications.py:93 terminal/notifications.py:141
@@ -2130,7 +2156,7 @@ msgstr "代码错误"
 #: authentication/templates/authentication/_msg_reset_password.html:3
 #: authentication/templates/authentication/_msg_rest_password_success.html:2
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:2
-#: jumpserver/conf.py:296 ops/tasks.py:145 ops/tasks.py:148
+#: jumpserver/conf.py:298 ops/tasks.py:145 ops/tasks.py:148
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: perms/templates/perms/_msg_permed_items_expire.html:3
 #: users/templates/users/_msg_account_expire_reminder.html:4
@@ -2582,11 +2608,11 @@ msgstr "不能包含特殊字符"
 msgid "The mobile phone number format is incorrect"
 msgstr "手机号格式不正确"
 
-#: jumpserver/conf.py:295
+#: jumpserver/conf.py:297
 msgid "Create account successfully"
 msgstr "创建账号成功"
 
-#: jumpserver/conf.py:297
+#: jumpserver/conf.py:299
 msgid "Your account has been created successfully"
 msgstr "你的账号已创建成功"
 
@@ -2937,13 +2963,6 @@ msgstr "剪贴板粘贴"
 msgid "Clipboard copy paste"
 msgstr "剪贴板复制粘贴"
 
-#: perms/models/base.py:90
-#: tickets/serializers/ticket/meta/ticket_type/apply_application.py:58
-#: tickets/serializers/ticket/meta/ticket_type/apply_asset.py:60
-#: users/models/user.py:703
-msgid "Date expired"
-msgstr "失效日期"
-
 #: perms/models/base.py:94
 msgid "From ticket"
 msgstr "来自工单"
@@ -2979,13 +2998,6 @@ msgstr "应用授权规则即将过期"
 #: perms/notifications.py:130
 msgid "application permissions of organization {}"
 msgstr "组织 ({}) 的应用授权"
-
-#: perms/serializers/application/permission.py:20
-#: perms/serializers/application/permission.py:41
-#: perms/serializers/asset/permission.py:19
-#: perms/serializers/asset/permission.py:45 users/serializers/user.py:141
-msgid "Is valid"
-msgstr "账号是否有效"
 
 #: perms/serializers/application/permission.py:21
 #: perms/serializers/application/permission.py:40
@@ -3077,27 +3089,27 @@ msgstr "{} 至少有一个系统角色"
 msgid "RBAC"
 msgstr "RBAC"
 
-#: rbac/builtin.py:97
+#: rbac/builtin.py:98
 msgid "SystemAdmin"
 msgstr "系统管理员"
 
-#: rbac/builtin.py:100
+#: rbac/builtin.py:101
 msgid "SystemAuditor"
 msgstr "系统审计员"
 
-#: rbac/builtin.py:103
+#: rbac/builtin.py:104
 msgid "SystemComponent"
 msgstr "系统组件"
 
-#: rbac/builtin.py:109
+#: rbac/builtin.py:110
 msgid "OrgAdmin"
 msgstr "组织管理员"
 
-#: rbac/builtin.py:112
+#: rbac/builtin.py:113
 msgid "OrgAuditor"
 msgstr "组织审计员"
 
-#: rbac/builtin.py:115
+#: rbac/builtin.py:116
 msgid "OrgUser"
 msgstr "组织用户"
 
@@ -4528,30 +4540,30 @@ msgstr "终端管理"
 msgid "Invalid elasticsearch config"
 msgstr "无效的 Elasticsearch 配置"
 
-#: terminal/backends/command/models.py:15
+#: terminal/backends/command/models.py:16
 msgid "Ordinary"
 msgstr "普通"
 
-#: terminal/backends/command/models.py:16
+#: terminal/backends/command/models.py:17
 msgid "Dangerous"
 msgstr "危险"
 
-#: terminal/backends/command/models.py:22
+#: terminal/backends/command/models.py:23
 msgid "Input"
 msgstr "输入"
 
-#: terminal/backends/command/models.py:23
+#: terminal/backends/command/models.py:24
 #: terminal/backends/command/serializers.py:36
 msgid "Output"
 msgstr "输出"
 
-#: terminal/backends/command/models.py:24 terminal/models/replay.py:9
+#: terminal/backends/command/models.py:25 terminal/models/replay.py:9
 #: terminal/models/sharing.py:17 terminal/models/sharing.py:64
 #: terminal/templates/terminal/_msg_command_alert.html:10
 msgid "Session"
 msgstr "会话"
 
-#: terminal/backends/command/models.py:25
+#: terminal/backends/command/models.py:26
 #: terminal/backends/command/serializers.py:17
 msgid "Risk level"
 msgstr "风险等级"
@@ -4568,7 +4580,7 @@ msgstr "风险等级名称"
 msgid "Timestamp"
 msgstr "时间戳"
 
-#: terminal/backends/command/serializers.py:39 terminal/models/terminal.py:105
+#: terminal/backends/command/serializers.py:40 terminal/models/terminal.py:105
 msgid "Remote Address"
 msgstr "远端地址"
 
@@ -4628,18 +4640,18 @@ msgstr "MariaDB 端口"
 msgid "PostgreSQL Port"
 msgstr "PostgreSQL 端口"
 
-#: terminal/models/endpoint.py:25 terminal/models/endpoint.py:61
+#: terminal/models/endpoint.py:25 terminal/models/endpoint.py:63
 #: terminal/serializers/endpoint.py:40 terminal/serializers/storage.py:37
 #: terminal/serializers/storage.py:49 terminal/serializers/storage.py:79
 #: terminal/serializers/storage.py:89 terminal/serializers/storage.py:97
 msgid "Endpoint"
 msgstr "端点"
 
-#: terminal/models/endpoint.py:54
+#: terminal/models/endpoint.py:56
 msgid "IP group"
 msgstr "IP 组"
 
-#: terminal/models/endpoint.py:66
+#: terminal/models/endpoint.py:68
 msgid "Endpoint rule"
 msgstr "端点规则"
 
@@ -4860,7 +4872,7 @@ msgstr "桶名称"
 msgid "Secret key"
 msgstr "密钥"
 
-#: terminal/serializers/storage.py:64 xpack/plugins/cloud/models.py:220
+#: terminal/serializers/storage.py:64 xpack/plugins/cloud/models.py:219
 msgid "Region"
 msgstr "地域"
 
@@ -6174,79 +6186,79 @@ msgstr "已释放"
 msgid "Cloud center"
 msgstr "云管中心"
 
-#: xpack/plugins/cloud/models.py:30
+#: xpack/plugins/cloud/models.py:29
 msgid "Provider"
 msgstr "云服务商"
 
-#: xpack/plugins/cloud/models.py:34
+#: xpack/plugins/cloud/models.py:33
 msgid "Validity"
 msgstr "有效"
 
-#: xpack/plugins/cloud/models.py:39
+#: xpack/plugins/cloud/models.py:38
 msgid "Cloud account"
 msgstr "云账号"
 
-#: xpack/plugins/cloud/models.py:41
+#: xpack/plugins/cloud/models.py:40
 msgid "Test cloud account"
 msgstr "测试云账号"
 
-#: xpack/plugins/cloud/models.py:85 xpack/plugins/cloud/serializers/task.py:66
+#: xpack/plugins/cloud/models.py:84 xpack/plugins/cloud/serializers/task.py:66
 msgid "Account"
 msgstr "账号"
 
-#: xpack/plugins/cloud/models.py:88 xpack/plugins/cloud/serializers/task.py:37
+#: xpack/plugins/cloud/models.py:87 xpack/plugins/cloud/serializers/task.py:37
 msgid "Regions"
 msgstr "地域"
 
-#: xpack/plugins/cloud/models.py:91
+#: xpack/plugins/cloud/models.py:90
 msgid "Hostname strategy"
 msgstr "主机名策略"
 
-#: xpack/plugins/cloud/models.py:100 xpack/plugins/cloud/serializers/task.py:67
+#: xpack/plugins/cloud/models.py:99 xpack/plugins/cloud/serializers/task.py:67
 msgid "Unix admin user"
 msgstr "Unix 管理员"
 
-#: xpack/plugins/cloud/models.py:104 xpack/plugins/cloud/serializers/task.py:68
+#: xpack/plugins/cloud/models.py:103 xpack/plugins/cloud/serializers/task.py:68
 msgid "Windows admin user"
 msgstr "Windows 管理员"
 
-#: xpack/plugins/cloud/models.py:110 xpack/plugins/cloud/serializers/task.py:45
+#: xpack/plugins/cloud/models.py:109 xpack/plugins/cloud/serializers/task.py:45
 msgid "IP network segment group"
 msgstr "IP网段组"
 
-#: xpack/plugins/cloud/models.py:113 xpack/plugins/cloud/serializers/task.py:71
+#: xpack/plugins/cloud/models.py:112 xpack/plugins/cloud/serializers/task.py:71
 msgid "Always update"
 msgstr "总是更新"
 
-#: xpack/plugins/cloud/models.py:119
+#: xpack/plugins/cloud/models.py:118
 msgid "Date last sync"
 msgstr "最后同步日期"
 
-#: xpack/plugins/cloud/models.py:130 xpack/plugins/cloud/models.py:171
+#: xpack/plugins/cloud/models.py:129 xpack/plugins/cloud/models.py:170
 msgid "Sync instance task"
 msgstr "同步实例任务"
 
-#: xpack/plugins/cloud/models.py:182 xpack/plugins/cloud/models.py:230
+#: xpack/plugins/cloud/models.py:181 xpack/plugins/cloud/models.py:229
 msgid "Date sync"
 msgstr "同步日期"
 
-#: xpack/plugins/cloud/models.py:186
+#: xpack/plugins/cloud/models.py:185
 msgid "Sync instance task execution"
 msgstr "同步实例任务执行"
 
-#: xpack/plugins/cloud/models.py:210
+#: xpack/plugins/cloud/models.py:209
 msgid "Sync task"
 msgstr "同步任务"
 
-#: xpack/plugins/cloud/models.py:214
+#: xpack/plugins/cloud/models.py:213
 msgid "Sync instance task history"
 msgstr "同步实例任务历史"
 
-#: xpack/plugins/cloud/models.py:217
+#: xpack/plugins/cloud/models.py:216
 msgid "Instance"
 msgstr "实例"
 
-#: xpack/plugins/cloud/models.py:234
+#: xpack/plugins/cloud/models.py:233
 msgid "Sync instance detail"
 msgstr "同步实例详情"
 
@@ -6599,3 +6611,23 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Inherit"
+#~ msgstr "继承"
+
+#~ msgid "Include"
+#~ msgstr "包含"
+
+#~ msgid "Exclude"
+#~ msgstr "不包含"
+
+#~ msgid "DatabaseApp"
+#~ msgstr "数据库应用"
+
+#~ msgid "Database proxy MySQL protocol listen port"
+#~ msgstr "MySQL 协议监听的端口"
+
+#, fuzzy
+#~| msgid "Database proxy PostgreSQL port"
+#~ msgid "Database proxy PostgreSQL listen port"
+#~ msgstr "数据库组件 PostgreSQL 协议监听的端口"

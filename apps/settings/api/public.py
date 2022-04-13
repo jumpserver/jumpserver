@@ -67,6 +67,7 @@ class PublicSettingApi(generics.RetrieveAPIView):
                 # Announcement
                 "ANNOUNCEMENT_ENABLED": settings.ANNOUNCEMENT_ENABLED,
                 "ANNOUNCEMENT": settings.ANNOUNCEMENT,
+                "AUTH_TEMP_TOKEN": settings.AUTH_TEMP_TOKEN,
             }
         }
         return instance
