@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.utils import get_object_or_none, random_string
@@ -75,14 +76,16 @@ class SSOTokenSerializer(serializers.Serializer):
 
 
 class TempTokenSerializer(serializers.ModelSerializer):
+    is_valid = serializers.BooleanField(label=_("Is valid"), read_only=True)
+
     class Meta:
         model = TempToken
-        fields = '__all__'
-        read_only_fields = [
-            'id', 'username', 'secret', 'verified',
-            'date_create', 'date_updated',
-            'date_verified',
+        fields = [
+            'id', 'username', 'secret', 'verified', 'is_valid',
+            'date_created', 'date_updated', 'date_verified',
+            'date_expired',
         ]
+        read_only_fields = fields
 
     def create(self, validated_data):
         request = self.context.get('request')
@@ -91,6 +94,10 @@ class TempTokenSerializer(serializers.ModelSerializer):
 
         secret = random_string(36)
         username = request.user.username
-        token = TempToken(username=username, secret=secret)
+        kwargs = {
+            'username': username, 'secret': secret,
+            'date_expired': timezone.now() + timezone.timedelta(seconds=5*60),
+        }
+        token = TempToken(**kwargs)
         token.save()
         return token
