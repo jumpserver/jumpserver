@@ -17,7 +17,7 @@ p {
     <div class="group">
         <h2>JumpServer {% trans 'Client' %}</h2>
         <p>
-            {% trans 'JumpServer Client, currently used to launch the client, now only support launch RDP client, The SSH client will next' %}
+            {% trans 'JumpServer Client, currently used to launch the client, now only support launch RDP SSH client, The Telnet client will next' %}
 {#            //JumpServer 客户端，支持 RDP 的本地拉起，后续会支持拉起 ssh。#}
         </p>
         <ul>
@@ -33,6 +33,16 @@ p {
         </p>
         <ul>
             <li><a href="/download/Microsoft_Remote_Desktop_10.6.7_installer.pkg">Microsoft_Remote_Desktop_10.6.7_installer.pkg</a></li>
+        </ul>
+    </div>
+
+    <div class="group">
+        <h2>SSH {% trans 'Client' %}</h2>
+        <p>
+            {% trans 'Windows needs to download the client to connect SSH assets, and the MacOS system uses its own terminal' %}
+        </p>
+        <ul>
+            <li><a href="/download/Putty.exe">Putty.exe</a></li>
         </ul>
     </div>
 
