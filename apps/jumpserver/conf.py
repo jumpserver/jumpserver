@@ -16,8 +16,10 @@ import json
 import yaml
 import copy
 from importlib import import_module
-from django.urls import reverse_lazy
 from urllib.parse import urljoin, urlparse
+
+from django.urls import reverse_lazy
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -39,7 +41,7 @@ def import_string(dotted_path):
     except AttributeError as err:
         raise ImportError('Module "%s" does not define a "%s" attribute/class' % (
             module_path, class_name)
-        ) from err
+                          ) from err
 
 
 def is_absolute_uri(uri):
@@ -174,6 +176,7 @@ class Config(dict):
         'AUTH_LDAP_SYNC_IS_PERIODIC': False,
         'AUTH_LDAP_SYNC_INTERVAL': None,
         'AUTH_LDAP_SYNC_CRONTAB': None,
+        'AUTH_LDAP_SYNC_ORG_ID': '00000000-0000-0000-0000-000000000002',
         'AUTH_LDAP_USER_LOGIN_ONLY_IN_USERS': False,
         'AUTH_LDAP_OPTIONS_OPT_REFERRALS': -1,
 
@@ -253,6 +256,8 @@ class Config(dict):
         'AUTH_SAML2_PROVIDER_AUTHORIZATION_ENDPOINT': '/',
         'AUTH_SAML2_AUTHENTICATION_FAILURE_REDIRECT_URI': '/',
 
+        'AUTH_TEMP_TOKEN': False,
+
         # 企业微信
         'AUTH_WECOM': False,
         'WECOM_CORPID': '',
@@ -270,7 +275,7 @@ class Config(dict):
         'FEISHU_APP_ID': '',
         'FEISHU_APP_SECRET': '',
 
-        'LOGIN_REDIRECT_TO_BACKEND':  '',  # 'OPENID / CAS / SAML2
+        'LOGIN_REDIRECT_TO_BACKEND': '',  # 'OPENID / CAS / SAML2
         'LOGIN_REDIRECT_MSG_ENABLED': True,
 
         'SMS_ENABLED': False,
@@ -307,7 +312,11 @@ class Config(dict):
         'TERMINAL_HOST_KEY': '',
         'TERMINAL_TELNET_REGEX': '',
         'TERMINAL_COMMAND_STORAGE': {},
+        # 未来废弃(当下迁移会用)
         'TERMINAL_RDP_ADDR': '',
+        # 保留(Luna还在用)
+        'TERMINAL_MAGNUS_ENABLED': True,
+        # 保留(Luna还在用)
         'XRDP_ENABLED': True,
 
         # 安全配置
@@ -392,6 +401,7 @@ class Config(dict):
 
         'FORGOT_PASSWORD_URL': '',
         'HEALTH_CHECK_TOKEN': '',
+
     }
 
     @staticmethod
@@ -540,7 +550,8 @@ class Config(dict):
         value = self.get_from_env(item)
         if value is not None:
             return value
-        return self.defaults.get(item)
+        value = self.defaults.get(item)
+        return value
 
     def __getitem__(self, item):
         return self.get(item)

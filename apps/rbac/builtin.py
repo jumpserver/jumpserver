@@ -5,7 +5,7 @@ from .const import Scope, system_exclude_permissions, org_exclude_permissions
 # Todo: 获取应该区分 系统用户，和组织用户的权限
 # 工作台也区分组织后再考虑
 user_perms = (
-    ('rbac', 'menupermission', 'view', 'workspace'),
+    ('rbac', 'menupermission', 'view', 'workbench'),
     ('rbac', 'menupermission', 'view', 'webterminal'),
     ('rbac', 'menupermission', 'view', 'filemanager'),
     ('perms', 'permedasset', 'view,connect', 'myassets'),
@@ -16,7 +16,9 @@ user_perms = (
     ('applications', 'application', 'match', 'application'),
     ('ops', 'commandexecution', 'add', 'commandexecution'),
     ('authentication', 'connectiontoken', 'add', 'connectiontoken'),
+    ('authentication', 'temptoken', 'add', 'temptoken'),
     ('tickets', 'ticket', 'view', 'ticket'),
+    ('orgs', 'organization', 'view', 'rootorg'),
 )
 
 auditor_perms = user_perms + (
@@ -28,7 +30,6 @@ auditor_perms = user_perms + (
     ('terminal', 'command', '*', '*'),
     ('ops', 'commandexecution', 'view', 'commandexecution')
 )
-
 
 app_exclude_perms = [
     ('users', 'user', 'add,delete', 'user'),
@@ -59,7 +60,8 @@ class PredefineRole:
         from rbac.models import Role
         return Role.objects.get(id=self.id)
 
-    def _get_defaults(self):
+    @property
+    def default_perms(self):
         from rbac.models import Permission
         q = Permission.get_define_permissions_q(self.perms)
         permissions = Permission.get_permissions(self.scope)
@@ -72,9 +74,13 @@ class PredefineRole:
             permissions = permissions.exclude(q)
 
         perms = permissions.values_list('id', flat=True)
+        return perms
+
+    def _get_defaults(self):
+        perms = self.default_perms
         defaults = {
             'id': self.id, 'name': self.name, 'scope': self.scope,
-            'builtin': True, 'permissions': perms
+            'builtin': True, 'permissions': perms, 'created_by': 'System',
         }
         return defaults
 

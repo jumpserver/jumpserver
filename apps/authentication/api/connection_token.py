@@ -30,13 +30,14 @@ from common.http import is_true
 from perms.models.base import Action
 from perms.utils.application.permission import get_application_actions
 from perms.utils.asset.permission import get_asset_actions
-
+from common.const.http import PATCH
+from terminal.models import EndpointRule
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
 )
 
 logger = get_logger(__name__)
-__all__ = ['UserConnectionTokenViewSet']
+__all__ = ['UserConnectionTokenViewSet', 'TokenCacheMixin']
 
 
 class ClientProtocolMixin:
@@ -51,6 +52,17 @@ class ClientProtocolMixin:
     request: Request
     get_serializer: Callable
     create_token: Callable
+    get_serializer_context: Callable
+
+    def get_smart_endpoint(self, protocol, asset=None, application=None):
+        if asset:
+            target_ip = asset.get_target_ip()
+        elif application:
+            target_ip = application.get_target_ip()
+        else:
+            target_ip = ''
+        endpoint = EndpointRule.match_endpoint(target_ip, protocol, self.request)
+        return endpoint
 
     def get_request_resource(self, serializer):
         asset = serializer.validated_data.get('asset')
@@ -92,7 +104,7 @@ class ClientProtocolMixin:
             'autoreconnection enabled:i': '1',
             'bookmarktype:i': '3',
             'use redirection server name:i': '0',
-            'smart sizing:i': '0',
+            'smart sizing:i': '1',
             #'drivestoredirect:s': '*',
             # 'domain:s': ''
             # 'alternate shell:s:': '||MySQLWorkbench',
@@ -122,10 +134,10 @@ class ClientProtocolMixin:
         options['screen mode id:i'] = '2' if full_screen else '1'
 
         # RDP Server 地址
-        address = settings.TERMINAL_RDP_ADDR
-        if not address or address == 'localhost:3389':
-            address = self.request.get_host().split(':')[0] + ':3389'
-        options['full address:s'] = address
+        endpoint = self.get_smart_endpoint(
+            protocol='rdp', asset=asset, application=application
+        )
+        options['full address:s'] = f'{endpoint.host}:{endpoint.rdp_port}'
         # 用户名
         options['username:s'] = '{}|{}'.format(user.username, token)
         if system_user.ad_domain:
@@ -134,8 +146,7 @@ class ClientProtocolMixin:
         if width and height:
             options['desktopwidth:i'] = width
             options['desktopheight:i'] = height
-        else:
-            options['smart sizing:i'] = '1'
+            options['winposstr:s:'] = f'0,1,0,0,{width},{height}'
 
         options['session bpp:i'] = os.getenv('JUMPSERVER_COLOR_DEPTH', '32')
         options['audiomode:i'] = self.parse_env_bool('JUMPSERVER_DISABLE_AUDIO', 'false', '2', '0')
@@ -159,6 +170,28 @@ class ClientProtocolMixin:
         for k, v in options.items():
             content += f'{k}:{v}\n'
         return name, content
+
+    def get_ssh_token(self, serializer):
+        asset, application, system_user, user = self.get_request_resource(serializer)
+        token, secret = self.create_token(user, asset, application, system_user)
+        if asset:
+            name = asset.hostname
+        elif application:
+            name = application.name
+        else:
+            name = '*'
+
+        endpoint = self.get_smart_endpoint(
+            protocol='ssh', asset=asset, application=application
+        )
+        content = {
+            'ip': endpoint.host,
+            'port': str(endpoint.ssh_port),
+            'username': f'JMS-{token}',
+            'password': secret
+        }
+        token = json.dumps(content)
+        return name, token
 
     def get_encrypt_cmdline(self, app: Application):
         parameters = app.get_rdp_remote_app_setting()['parameters']
@@ -201,13 +234,11 @@ class ClientProtocolMixin:
         asset, application, system_user, user = self.get_request_resource(serializer)
         protocol = system_user.protocol
         username = user.username
-
+        config, token = '', ''
         if protocol == 'rdp':
             name, config = self.get_rdp_file_content(serializer)
         elif protocol == 'ssh':
-            # Todo:
-            name = ''
-            config = 'ssh://system_user@asset@user@jumpserver-ssh'
+            name, token = self.get_ssh_token(serializer)
         else:
             raise ValueError('Protocol not support: {}'.format(protocol))
 
@@ -216,6 +247,7 @@ class ClientProtocolMixin:
             "filename": filename,
             "protocol": system_user.protocol,
             "username": username,
+            "token": token,
             "config": config
         }
         return data
@@ -327,18 +359,56 @@ class SecretDetailMixin:
         return Response(data=serializer.data, status=200)
 
 
+class TokenCacheMixin:
+    """ endpoint smart view 用到此类来解析token中的资产、应用 """
+    CACHE_KEY_PREFIX = 'CONNECTION_TOKEN_{}'
+
+    def get_token_cache_key(self, token):
+        return self.CACHE_KEY_PREFIX.format(token)
+
+    def get_token_ttl(self, token):
+        key = self.get_token_cache_key(token)
+        return cache.ttl(key)
+
+    def set_token_to_cache(self, token, value, ttl=5*60):
+        key = self.get_token_cache_key(token)
+        cache.set(key, value, timeout=ttl)
+
+    def get_token_from_cache(self, token):
+        key = self.get_token_cache_key(token)
+        value = cache.get(key, None)
+        return value
+
+    def renewal_token(self, token, ttl=5*60):
+        value = self.get_token_from_cache(token)
+        if value:
+            pre_ttl = self.get_token_ttl(token)
+            self.set_token_to_cache(token, value, ttl)
+            post_ttl = self.get_token_ttl(token)
+            ok = True
+            msg = f'{pre_ttl}s is renewed to {post_ttl}s.'
+        else:
+            ok = False
+            msg = 'Token is not found.'
+        data = {
+            'ok': ok,
+            'msg': msg
+        }
+        return data
+
+
 class UserConnectionTokenViewSet(
     RootOrgViewMixin, SerializerMixin, ClientProtocolMixin,
-    SecretDetailMixin, GenericViewSet
+    SecretDetailMixin, TokenCacheMixin, GenericViewSet
 ):
     serializer_classes = {
         'default': ConnectionTokenSerializer,
         'get_secret_detail': ConnectionTokenSecretSerializer,
     }
-    CACHE_KEY_PREFIX = 'CONNECTION_TOKEN_{}'
     rbac_perms = {
         'GET': 'authentication.view_connectiontoken',
         'create': 'authentication.add_connectiontoken',
+        'renewal': 'authentication.add_superconnectiontoken',
         'get_secret_detail': 'authentication.view_connectiontokensecret',
         'get_rdp_file': 'authentication.add_connectiontoken',
         'get_client_protocol_url': 'authentication.add_connectiontoken',
@@ -359,7 +429,18 @@ class UserConnectionTokenViewSet(
             raise PermissionDenied(error)
         return True
 
-    def create_token(self, user, asset, application, system_user, ttl=5 * 60):
+    @action(methods=[PATCH], detail=False)
+    def renewal(self, request, *args, **kwargs):
+        """ 续期 Token """
+        perm_required = 'authentication.add_superconnectiontoken'
+        if not request.user.has_perm(perm_required):
+            raise PermissionDenied('No permissions for authentication.add_superconnectiontoken')
+        token = request.data.get('token', '')
+        data = self.renewal_token(token)
+        status_code = 200 if data.get('ok') else 404
+        return Response(data=data, status=status_code)
+
+    def create_token(self, user, asset, application, system_user, ttl=5*60):
         # 再次强调一下权限
         perm_required = 'authentication.add_superconnectiontoken'
         if user != self.request.user and not self.request.user.has_perm(perm_required):
@@ -391,8 +472,7 @@ class UserConnectionTokenViewSet(
                 'application_name': str(application)
             })
 
-        key = self.CACHE_KEY_PREFIX.format(token)
-        cache.set(key, value, timeout=ttl)
+        self.set_token_to_cache(token, value, ttl)
         return token, secret
 
     def create(self, request, *args, **kwargs):
@@ -415,8 +495,7 @@ class UserConnectionTokenViewSet(
         from perms.utils.asset.permission import validate_permission as asset_validate_permission
         from perms.utils.application.permission import validate_permission as app_validate_permission
 
-        key = self.CACHE_KEY_PREFIX.format(token)
-        value = cache.get(key, None)
+        value = self.get_token_from_cache(token)
         if not value:
             raise serializers.ValidationError('Token not found')
 
@@ -442,9 +521,7 @@ class UserConnectionTokenViewSet(
 
     def get(self, request):
         token = request.query_params.get('token')
-        key = self.CACHE_KEY_PREFIX.format(token)
-        value = cache.get(key, None)
-
+        value = self.get_token_from_cache(token)
         if not value:
             return Response('', status=404)
         return Response(value)

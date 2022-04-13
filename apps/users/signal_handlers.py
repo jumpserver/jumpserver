@@ -60,15 +60,26 @@ def save_passwd_change(sender, instance: User, **kwargs):
         )
 
 
+def update_role_superuser_if_need(user):
+    if not user._update_superuser:
+        return
+    value = user._is_superuser
+    if value:
+        user.system_roles.add_role_system_admin()
+    else:
+        user.system_roles.remove_role_system_admin()
+
+
 @receiver(post_save, sender=User)
 @on_transaction_commit
 def on_user_create_set_default_system_role(sender, instance, created, **kwargs):
+    update_role_superuser_if_need(instance)
     if not created:
         return
     has_system_role = instance.system_roles.all().exists()
     if not has_system_role:
         logger.debug("Receive user create signal, set default role")
-        instance.set_default_system_role()
+        instance.system_roles.add_role_system_user()
 
 
 @receiver(post_user_create)

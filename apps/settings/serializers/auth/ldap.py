@@ -1,4 +1,3 @@
-
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
@@ -40,8 +39,9 @@ class LDAPSettingSerializer(serializers.Serializer):
         help_text=_('eg: ldap://localhost:389')
     )
     AUTH_LDAP_BIND_DN = serializers.CharField(required=False, max_length=1024, label=_('Bind DN'))
-    AUTH_LDAP_BIND_PASSWORD = serializers.CharField(max_length=1024, write_only=True, required=False,
-                                                    label=_('Password'))
+    AUTH_LDAP_BIND_PASSWORD = serializers.CharField(
+        max_length=1024, write_only=True, required=False, label=_('Password')
+    )
     AUTH_LDAP_SEARCH_OU = serializers.CharField(
         max_length=1024, allow_blank=True, required=False, label=_('User OU'),
         help_text=_('Use | split multi OUs')
@@ -54,6 +54,9 @@ class LDAPSettingSerializer(serializers.Serializer):
         required=True, label=_('User attr map'),
         help_text=_('User attr map present how to map LDAP user attr to '
                     'jumpserver, username,name,email is jumpserver attr')
+    )
+    AUTH_LDAP_SYNC_ORG_ID = serializers.CharField(
+        required=False, label=_('Organization'), max_length=36
     )
     AUTH_LDAP_SYNC_IS_PERIODIC = serializers.BooleanField(
         required=False, label=_('Periodic perform')

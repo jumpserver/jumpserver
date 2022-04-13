@@ -1,7 +1,7 @@
 #!/usr/bin/python
+import os
 from collections import defaultdict
 from typing import Callable
-import os
 
 from django.utils.translation import gettext_lazy as _, gettext, get_language
 from django.conf import settings
@@ -24,7 +24,7 @@ root_node_data = {
 # 第二层 view 节点，手动创建的
 view_nodes_data = [
     {'id': 'view_console', 'name': _('Console view')},
-    {'id': 'view_workspace', 'name': _('Workspace view')},
+    {'id': 'view_workbench', 'name': _('Workbench view')},
     {'id': 'view_audit', 'name': _('Audit view')},
     {'id': 'view_setting', 'name': _('System setting')},
     {'id': 'view_other', 'name': _('Other')},
@@ -55,8 +55,8 @@ extra_nodes_data = [
     {"id": "app_change_plan_node", "name": _("App change auth"), "pId": "accounts"},
     {"id": "asset_change_plan_node", "name": _("Asset change auth"), "pId": "accounts"},
     {"id": "terminal_node", "name": _("Terminal setting"), "pId": "view_setting"},
-    {'id': "my_assets", "name": _("My assets"), "pId": "view_workspace"},
-    {'id': "my_apps", "name": _("My apps"), "pId": "view_workspace"},
+    {'id': "my_assets", "name": _("My assets"), "pId": "view_workbench"},
+    {'id': "my_apps", "name": _("My apps"), "pId": "view_workbench"},
 ]
 
 # 将 model 放到其它节点下，而不是本来的 app 中
@@ -87,10 +87,9 @@ special_pid_mapper = {
     'terminal.status': 'terminal_node',
     'terminal.task': 'terminal_node',
     'audits.ftplog': 'terminal',
-    'rbac.menupermission': 'view_other',
     'perms.view_myassets': 'my_assets',
     'perms.view_myapps': 'my_apps',
-    'ops.add_commandexecution': 'view_workspace',
+    'ops.add_commandexecution': 'view_workbench',
     'ops.view_commandexecution': 'audits',
     "perms.view_mykubernetsapp": "my_apps",
     "perms.connect_mykubernetsapp": "my_apps",
@@ -103,9 +102,9 @@ special_pid_mapper = {
     "settings.view_setting": "view_setting",
     "rbac.view_console": "view_console",
     "rbac.view_audit": "view_audit",
-    "rbac.view_workspace": "view_workspace",
-    "rbac.view_webterminal": "view_workspace",
-    "rbac.view_filemanager": "view_workspace",
+    "rbac.view_workbench": "view_workbench",
+    "rbac.view_webterminal": "view_workbench",
+    "rbac.view_filemanager": "view_workbench",
     'tickets.view_ticket': 'tickets'
 }
 

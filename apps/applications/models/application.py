@@ -8,6 +8,7 @@ from django.conf import settings
 from orgs.mixins.models import OrgModelMixin
 from common.mixins import CommonModelMixin
 from common.tree import TreeNode
+from common.utils import is_uuid
 from assets.models import Asset, SystemUser
 
 from ..utils import KubernetesTree
@@ -19,6 +20,7 @@ class ApplicationTreeNodeMixin:
     name: str
     type: str
     category: str
+    attrs: dict
 
     @staticmethod
     def create_tree_id(pid, type, v):
@@ -99,6 +101,7 @@ class ApplicationTreeNodeMixin:
         temp_pid = pid
         type_category_mapper = const.AppType.type_category_mapper()
         types = const.AppType.type_category_mapper().keys()
+
         for tp in types:
             if not settings.XPACK_ENABLED and const.AppType.is_xpack(tp):
                 continue
@@ -142,7 +145,6 @@ class ApplicationTreeNodeMixin:
             pid, counts, show_empty=show_empty,
             show_count=show_count
         )
-
         return tree_nodes
 
     @classmethod
@@ -171,12 +173,17 @@ class ApplicationTreeNodeMixin:
         pid = self.create_tree_id(pid, 'type', self.type)
         return pid
 
-    def as_tree_node(self, pid, is_luna=False):
-        if is_luna and self.type == const.AppType.k8s:
+    def as_tree_node(self, pid, k8s_as_tree=False):
+        if self.type == const.AppType.k8s and k8s_as_tree:
             node = KubernetesTree(pid).as_tree_node(self)
         else:
             node = self._as_tree_node(pid)
         return node
+
+    def _attrs_to_tree(self):
+        if self.category == const.AppCategory.db:
+            return self.attrs
+        return {}
 
     def _as_tree_node(self, pid):
         icon_skin_category_mapper = {
@@ -199,6 +206,7 @@ class ApplicationTreeNodeMixin:
                 'data': {
                     'category': self.category,
                     'type': self.type,
+                    'attrs': self._attrs_to_tree()
                 }
             }
         })
@@ -239,6 +247,14 @@ class Application(CommonModelMixin, OrgModelMixin, ApplicationTreeNodeMixin):
     def category_remote_app(self):
         return self.category == const.AppCategory.remote_app.value
 
+    @property
+    def category_cloud(self):
+        return self.category == const.AppCategory.cloud.value
+
+    @property
+    def category_db(self):
+        return self.category == const.AppCategory.db.value
+
     def get_rdp_remote_app_setting(self):
         from applications.serializers.attrs import get_serializer_class_by_application_type
         if not self.category_remote_app:
@@ -264,12 +280,24 @@ class Application(CommonModelMixin, OrgModelMixin, ApplicationTreeNodeMixin):
             'parameters': parameters
         }
 
-    def get_remote_app_asset(self):
+    def get_remote_app_asset(self, raise_exception=True):
         asset_id = self.attrs.get('asset')
-        if not asset_id:
+        if is_uuid(asset_id):
+            return Asset.objects.filter(id=asset_id).first()
+        if raise_exception:
             raise ValueError("Remote App not has asset attr")
-        asset = Asset.objects.filter(id=asset_id).first()
-        return asset
+
+    def get_target_ip(self):
+        if self.category_remote_app:
+            asset = self.get_remote_app_asset()
+            target_ip = asset.ip
+        elif self.category_cloud:
+            target_ip = self.attrs.get('cluster')
+        elif self.category_db:
+            target_ip = self.attrs.get('host')
+        else:
+            target_ip = ''
+        return target_ip
 
 
 class ApplicationUser(SystemUser):

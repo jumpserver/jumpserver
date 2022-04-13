@@ -53,7 +53,7 @@ class LDAPAuthorizationBackend(JMSBaseAuthBackend, LDAPBackend):
         else:
             built = False
 
-        return (user, built)
+        return user, built
 
     def pre_check(self, username, password):
         if not settings.AUTH_LDAP:
@@ -75,6 +75,9 @@ class LDAPAuthorizationBackend(JMSBaseAuthBackend, LDAPBackend):
 
     def authenticate(self, request=None, username=None, password=None, **kwargs):
         logger.info('Authentication LDAP backend')
+        if username is None or password is None:
+            logger.info('No username or password')
+            return None
         match, msg = self.pre_check(username, password)
         if not match:
             logger.info('Authenticate failed: {}'.format(msg))

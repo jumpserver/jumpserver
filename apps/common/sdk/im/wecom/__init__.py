@@ -19,6 +19,7 @@ class URL:
     GET_TOKEN = 'https://qyapi.weixin.qq.com/cgi-bin/gettoken'
     SEND_MESSAGE = 'https://qyapi.weixin.qq.com/cgi-bin/message/send'
     QR_CONNECT = 'https://open.work.weixin.qq.com/wwopen/sso/qrConnect'
+    OAUTH_CONNECT = 'https://open.weixin.qq.com/connect/oauth2/authorize'
 
     # https://open.work.weixin.qq.com/api/doc/90000/90135/91437
     GET_USER_ID_BY_CODE = 'https://qyapi.weixin.qq.com/cgi-bin/user/getuserinfo'

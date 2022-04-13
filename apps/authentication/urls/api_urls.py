@@ -9,6 +9,7 @@ app_name = 'authentication'
 router = DefaultRouter()
 router.register('access-keys', api.AccessKeyViewSet, 'access-key')
 router.register('sso', api.SSOViewSet, 'sso')
+router.register('temp-tokens', api.TempTokenViewSet, 'temp-token')
 router.register('connection-token', api.UserConnectionTokenViewSet, 'connection-token')
 
 

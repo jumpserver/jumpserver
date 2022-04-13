@@ -1,10 +1,11 @@
-from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth.backends import ModelBackend
+from django.contrib.auth import get_user_model
 
 from users.models import User
 from common.utils import get_logger
 
 
+UserModel = get_user_model()
 logger = get_logger(__file__)
 
 

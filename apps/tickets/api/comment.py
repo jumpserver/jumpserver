@@ -6,7 +6,7 @@ from common.exceptions import JMSException
 from common.utils import lazyproperty
 from rbac.permissions import RBACPermission
 from tickets import serializers
-from tickets.models import Ticket
+from tickets.models import Ticket, Comment
 from tickets.permissions.comment import IsAssignee, IsApplicant, IsSwagger
 
 
@@ -36,5 +36,7 @@ class CommentViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
         return context
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Comment.objects.none()
         queryset = self.ticket.comments.all()
         return queryset

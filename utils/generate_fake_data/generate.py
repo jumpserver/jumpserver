@@ -15,6 +15,7 @@ django.setup()
 from resources.assets import AssetsGenerator, NodesGenerator, SystemUsersGenerator, AdminUsersGenerator
 from resources.users import UserGroupGenerator, UserGenerator
 from resources.perms import AssetPermissionGenerator
+from resources.terminal import CommandGenerator
 # from resources.system import StatGenerator
 
 
@@ -26,6 +27,7 @@ resource_generator_mapper = {
     'user': UserGenerator,
     'user_group': UserGroupGenerator,
     'asset_permission': AssetPermissionGenerator,
+    'command': CommandGenerator,
     # 'stat': StatGenerator
 }
 

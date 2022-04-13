@@ -42,10 +42,9 @@ class MySessionAPIView(generics.ListAPIView):
     serializer_class = serializers.SessionSerializer
 
     def get_queryset(self):
-        with tmp_to_root_org():
-            user = self.request.user
-            qs = Session.objects.filter(user_id=user.id)
-            return qs
+        user = self.request.user
+        qs = Session.objects.filter(user_id=user.id)
+        return qs
 
 
 class SessionViewSet(OrgBulkModelViewSet):

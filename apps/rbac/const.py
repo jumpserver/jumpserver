@@ -22,7 +22,6 @@ exclude_permissions = (
     ('common', 'setting', '*', '*'),
 
     ('authentication', 'privatetoken', '*', '*'),
-    ('authentication', 'accesskey', 'change,delete', 'accesskey'),
     ('authentication', 'connectiontoken', 'change,delete', 'connectiontoken'),
     ('authentication', 'ssotoken', '*', '*'),
     ('authentication', 'superconnectiontoken', 'change,delete', 'superconnectiontoken'),
@@ -49,6 +48,8 @@ exclude_permissions = (
     ('rbac', 'contenttype', '*', '*'),
     ('rbac', 'permission', 'add,delete,change', 'permission'),
     ('rbac', 'rolebinding', '*', '*'),
+    ('rbac', 'systemrolebinding', 'change', 'systemrolebinding'),
+    ('rbac', 'orgrolebinding', 'change', 'orgrolebinding'),
     ('rbac', 'role', '*', '*'),
     ('ops', 'adhoc', 'delete,change', '*'),
     ('ops', 'adhocexecution', 'add,delete,change', '*'),
@@ -99,6 +100,7 @@ only_system_permissions = (
     ('orgs', 'organization', '*', '*'),
     ('xpack', 'license', '*', '*'),
     ('settings', 'setting', '*', '*'),
+    ('tickets', '*', '*', '*'),
     ('ops', 'task', 'view', 'taskmonitor'),
     ('terminal', 'terminal', '*', '*'),
     ('terminal', 'commandstorage', '*', '*'),
@@ -106,6 +108,7 @@ only_system_permissions = (
     ('terminal', 'status', '*', '*'),
     ('terminal', 'task', '*', '*'),
     ('authentication', '*', '*', '*'),
+    ('tickets', '*', '*', '*'),
 )
 
 only_org_permissions = (

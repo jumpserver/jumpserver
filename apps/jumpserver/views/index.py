@@ -1,4 +1,4 @@
-from django.views.generic import TemplateView
+from django.views.generic import View
 from django.shortcuts import redirect
 from common.permissions import IsValidUser
 from common.mixins.views import PermissionsMixin
@@ -6,8 +6,7 @@ from common.mixins.views import PermissionsMixin
 __all__ = ['IndexView']
 
 
-class IndexView(PermissionsMixin, TemplateView):
-    template_name = 'index.html'
+class IndexView(PermissionsMixin, View):
     permission_classes = [IsValidUser]
 
     def get(self, request, *args, **kwargs):

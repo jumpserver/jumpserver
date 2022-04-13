@@ -70,6 +70,7 @@ class AuthBackendLabelMapping(LazyObject):
         backend_label_mapping[settings.AUTH_BACKEND_AUTH_TOKEN] = _('Auth Token')
         backend_label_mapping[settings.AUTH_BACKEND_WECOM] = _('WeCom')
         backend_label_mapping[settings.AUTH_BACKEND_DINGTALK] = _('DingTalk')
+        backend_label_mapping[settings.AUTH_BACKEND_TEMP_TOKEN] = _('Temporary token')
         return backend_label_mapping
 
     def _setup(self):

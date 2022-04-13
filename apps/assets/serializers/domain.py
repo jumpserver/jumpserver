@@ -43,7 +43,7 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
 
 
 class GatewaySerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
-    is_connective = serializers.BooleanField(required=False)
+    is_connective = serializers.BooleanField(required=False, label=_('Connectivity'))
 
     class Meta:
         model = Gateway

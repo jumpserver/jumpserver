@@ -4,11 +4,11 @@ from django.utils.translation import ugettext_lazy as _
 from common.drf.serializers import BulkModelSerializer, AdaptedBulkListSerializer
 from common.utils import is_uuid
 from users.serializers import ServiceAccountSerializer
-from common.utils import get_request_ip
+from common.utils import get_request_ip, pretty_string
 from .. import const
 
 from ..models import (
-    Terminal, Status, Session, Task, CommandStorage, ReplayStorage
+    Terminal, Status, Task, CommandStorage, ReplayStorage
 )
 
 
@@ -53,13 +53,11 @@ class TerminalSerializer(BulkModelSerializer):
             'type', 'remote_addr', 'http_port', 'ssh_port',
             'session_online', 'command_storage', 'replay_storage',
             'is_accepted', "is_active", 'is_alive',
-            'date_created',
-            'comment',
+            'date_created', 'comment',
         ]
         fields_fk = ['status', 'status_display', 'stat']
         fields = fields_small + fields_fk
         read_only_fields = ['type', 'date_created']
-
         extra_kwargs = {
             'command_storage': {'required': True, },
             'replay_storage': {'required': True, },
@@ -113,12 +111,11 @@ class TerminalRegistrationSerializer(serializers.ModelSerializer):
         valid = super().is_valid(raise_exception=raise_exception)
         if not valid:
             return valid
-        name = self.validated_data.get('name')
-        if len(name) > 128:
-            self.validated_data['comment'] = name
-            name = '{}...{}'.format(name[:32], name[-32:])
-            self.validated_data['name'] = name
-
+        raw_name = self.validated_data.get('name')
+        name = pretty_string(raw_name)
+        self.validated_data['name'] = name
+        if len(raw_name) > 128:
+            self.validated_data['comment'] = raw_name
         data = {'name': name}
         kwargs = {'data': data}
         if self.instance and self.instance.user:
@@ -134,7 +131,7 @@ class TerminalRegistrationSerializer(serializers.ModelSerializer):
         if request:
             instance.remote_addr = get_request_ip(request)
         sa = self.service_account.create(validated_data)
-        sa.set_component_role()
+        sa.system_roles.add_role_system_component()
         instance.user = sa
         instance.command_storage = CommandStorage.default().name
         instance.replay_storage = ReplayStorage.default().name

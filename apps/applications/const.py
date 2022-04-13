@@ -41,7 +41,7 @@ class AppType(models.TextChoices):
     def category_types_mapper(cls):
         return {
             AppCategory.db: [
-                cls.mysql, cls.oracle, cls.pgsql, cls.mariadb,
+                cls.mysql, cls.mariadb, cls.oracle, cls.pgsql,
                 cls.sqlserver, cls.redis, cls.mongodb
             ],
             AppCategory.remote_app: [
