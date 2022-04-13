@@ -83,3 +83,14 @@ class AppType(models.TextChoices):
         if AppCategory.is_xpack(category):
             return True
         return tp in ['oracle', 'postgresql', 'sqlserver']
+
+    @classmethod
+    def type_xpack_community_mapper(cls) -> dict:
+        from collections import defaultdict
+        mapper = defaultdict(list)
+        for tp, category in cls.type_category_mapper().items():
+            if cls.is_xpack(tp):
+                mapper['xpack'].append(tp.value)
+            else:
+                mapper['community'].append(tp.value)
+        return mapper
