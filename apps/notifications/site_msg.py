@@ -1,4 +1,4 @@
-from django.db.models import F
+from django.db.models import F, Q
 from django.db import transaction
 
 from common.utils.timezone import local_now
@@ -80,11 +80,11 @@ class SiteMessageUtil:
         return site_msgs_count
 
     @classmethod
-    def mark_msgs_as_read(cls, user_id, msg_ids):
-        site_msg_users = SiteMessageUsers.objects.filter(
-            user_id=user_id, sitemessage_id__in=msg_ids,
-            has_read=False
-        )
+    def mark_msgs_as_read(cls, user_id, msg_ids=None):
+        q = Q(user_id=user_id) & Q(has_read=False)
+        if msg_ids is not None:
+            q &= Q(sitemessage_id__in=msg_ids)
+        site_msg_users = SiteMessageUsers.objects.filter(q)
 
         for site_msg_user in site_msg_users:
             site_msg_user.has_read = True

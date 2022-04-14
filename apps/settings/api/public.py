@@ -64,6 +64,7 @@ class PublicSettingApi(generics.RetrieveAPIView):
                 "AUTH_FEISHU": settings.AUTH_FEISHU,
                 # Terminal
                 "XRDP_ENABLED": settings.XRDP_ENABLED,
+                "TERMINAL_MAGNUS_ENABLED": settings.TERMINAL_MAGNUS_ENABLED,
                 # Announcement
                 "ANNOUNCEMENT_ENABLED": settings.ANNOUNCEMENT_ENABLED,
                 "ANNOUNCEMENT": settings.ANNOUNCEMENT,
