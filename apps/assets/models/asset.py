@@ -142,6 +142,10 @@ class Platform(models.Model):
     internal = models.BooleanField(default=False, verbose_name=_("Internal"))
     comment = models.TextField(blank=True, null=True, verbose_name=_("Comment"))
 
+    @property
+    def algorithm(self):
+        return self.meta.get('algorithm')
+
     @classmethod
     def default(cls):
         linux, created = cls.objects.get_or_create(

@@ -186,10 +186,27 @@ def make_signature(access_key_secret, date=None):
     return content_md5(data)
 
 
-def encrypt_password(password, salt=None):
-    from passlib.hash import sha512_crypt
-    if password:
+def encrypt_password(password, salt=None, algorithm='sha512'):
+    from passlib.hash import sha512_crypt, des_crypt
+
+    def sha512():
         return sha512_crypt.using(rounds=5000).hash(password, salt=salt)
+
+    def des():
+        return des_crypt.hash(password, salt=salt[:2])
+
+    support_algorithm = {
+        'sha512': sha512, 'des': des
+    }
+
+    if isinstance(algorithm, str):
+        algorithm = algorithm.lower()
+
+    if algorithm not in support_algorithm.keys():
+        algorithm = 'sha512'
+
+    if password and support_algorithm[algorithm]:
+        return support_algorithm[algorithm]()
     return None
 
 
