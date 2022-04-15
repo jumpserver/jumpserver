@@ -91,6 +91,7 @@ MIDDLEWARE = [
     'jumpserver.middleware.RequestMiddleware',
     'jumpserver.middleware.RefererCheckMiddleware',
     'orgs.middleware.OrgMiddleware',
+    'common.middleware.SessionCookieMiddleware',
     'authentication.backends.oidc.middleware.OIDCRefreshIDTokenMiddleware',
     'authentication.backends.cas.middleware.CASMiddleware',
     'authentication.middleware.MFAMiddleware',
@@ -98,6 +99,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'jumpserver.urls'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -127,6 +129,16 @@ LOGIN_URL = reverse_lazy('authentication:login')
 
 SESSION_COOKIE_DOMAIN = CONFIG.SESSION_COOKIE_DOMAIN
 CSRF_COOKIE_DOMAIN = CONFIG.SESSION_COOKIE_DOMAIN
+
+# 设置 SESSION_COOKIE_NAME_PREFIX_KEY
+# 解决 不同域 session csrf cookie 获取混乱问题
+SESSION_COOKIE_NAME_PREFIX_KEY = 'SESSION_COOKIE_NAME_PREFIX'
+SESSION_COOKIE_NAME_PREFIX = CONFIG.SESSION_COOKIE_NAME_PREFIX
+if SESSION_COOKIE_DOMAIN is not None and SESSION_COOKIE_NAME_PREFIX == 'jms_':
+    SESSION_COOKIE_NAME_PREFIX = SESSION_COOKIE_DOMAIN.split('.')[0]
+CSRF_COOKIE_NAME = '{}csrftoken'.format(SESSION_COOKIE_NAME_PREFIX)
+SESSION_COOKIE_NAME = '{}sessionid'.format(SESSION_COOKIE_NAME_PREFIX)
+
 SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # 自定义的配置，SESSION_EXPIRE_AT_BROWSER_CLOSE 始终为 True, 下面这个来控制是否强制关闭后过期 cookie
