@@ -100,6 +100,24 @@ class RoleBinding(JMSModel):
     def is_scope_org(self):
         return self.scope == Scope.org
 
+    @classmethod
+    def get_user_has_the_perm_orgs(cls, perm, user):
+        from orgs.models import Organization
+
+        roles = Role.get_roles_by_perm(perm)
+        bindings = list(cls.objects.filter(role__in=roles, user=user))
+        system_bindings = [b for b in bindings if b.scope == Role.Scope.system.value]
+
+        if perm == 'rbac.view_workbench':
+            all_orgs = user.orgs.all()
+        else:
+            all_orgs = Organization.objects.all()
+        if system_bindings:
+            return all_orgs
+        else:
+            org_ids = [b.org.id for b in bindings if b.org]
+            return all_orgs.filter(id__in=org_ids)
+
 
 class OrgRoleBindingManager(RoleBindingManager):
     def get_queryset(self):
