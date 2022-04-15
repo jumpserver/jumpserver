@@ -101,7 +101,7 @@ CHANNEL_LAYERS = {
             "hosts": [{
                 'address': (CONFIG.REDIS_HOST, CONFIG.REDIS_PORT),
                 'db': CONFIG.REDIS_DB_WS,
-                'password': CONFIG.REDIS_PASSWORD,
+                'password': CONFIG.REDIS_PASSWORD or None,
                 'ssl':  context
             }],
         },
