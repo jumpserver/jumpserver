@@ -484,7 +484,8 @@ class UserConnectionTokenViewSet(
         tp = 'app' if application else 'asset'
         data = {
             "id": token, 'secret': secret,
-            'type': tp, 'protocol': system_user.protocol
+            'type': tp, 'protocol': system_user.protocol,
+            'expire_time': self.get_token_ttl(token),
         }
         return Response(data, status=201)
 
