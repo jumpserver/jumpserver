@@ -91,10 +91,10 @@ MIDDLEWARE = [
     'jumpserver.middleware.RequestMiddleware',
     'jumpserver.middleware.RefererCheckMiddleware',
     'orgs.middleware.OrgMiddleware',
-    'common.middleware.SessionCookieMiddleware',
     'authentication.backends.oidc.middleware.OIDCRefreshIDTokenMiddleware',
     'authentication.backends.cas.middleware.CASMiddleware',
     'authentication.middleware.MFAMiddleware',
+    'authentication.middleware.SessionCookieMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
 ]
 
@@ -134,8 +134,12 @@ CSRF_COOKIE_DOMAIN = CONFIG.SESSION_COOKIE_DOMAIN
 # 解决 不同域 session csrf cookie 获取混乱问题
 SESSION_COOKIE_NAME_PREFIX_KEY = 'SESSION_COOKIE_NAME_PREFIX'
 SESSION_COOKIE_NAME_PREFIX = CONFIG.SESSION_COOKIE_NAME_PREFIX
-if SESSION_COOKIE_DOMAIN is not None and SESSION_COOKIE_NAME_PREFIX == 'jms_':
+if SESSION_COOKIE_NAME_PREFIX is not None:
+    pass
+elif SESSION_COOKIE_DOMAIN is not None:
     SESSION_COOKIE_NAME_PREFIX = SESSION_COOKIE_DOMAIN.split('.')[0]
+else:
+    SESSION_COOKIE_NAME_PREFIX = 'jms_'
 CSRF_COOKIE_NAME = '{}csrftoken'.format(SESSION_COOKIE_NAME_PREFIX)
 SESSION_COOKIE_NAME = '{}sessionid'.format(SESSION_COOKIE_NAME_PREFIX)
 

@@ -1,5 +1,7 @@
 from django.shortcuts import redirect, reverse
+from django.utils.deprecation import MiddlewareMixin
 from django.http import HttpResponse
+from django.conf import settings
 
 
 class MFAMiddleware:
@@ -34,3 +36,15 @@ class MFAMiddleware:
 
         url = reverse('authentication:login-mfa') + '?_=middleware'
         return redirect(url)
+
+
+class SessionCookieMiddleware(MiddlewareMixin):
+
+    @staticmethod
+    def process_response(request, response: HttpResponse):
+        key = settings.SESSION_COOKIE_NAME_PREFIX_KEY
+        value = settings.SESSION_COOKIE_NAME_PREFIX
+        if request.COOKIES.get(key) == value:
+            return response
+        response.set_cookie(key, value)
+        return response
