@@ -8,6 +8,7 @@ from assets.models import Asset
 from orgs.utils import tmp_to_root_org
 from applications.models import Application
 from terminal.models import Session
+from common.permissions import IsValidUser
 from ..models import Endpoint, EndpointRule
 from .. import serializers
 
@@ -20,9 +21,6 @@ class EndpointViewSet(JMSBulkModelViewSet):
     search_fields = filterset_fields
     serializer_class = serializers.EndpointSerializer
     queryset = Endpoint.objects.all()
-    rbac_perms = {
-        'smart': 'terminal.view_endpoint'
-    }
 
     @staticmethod
     def get_target_ip(request):
@@ -57,7 +55,7 @@ class EndpointViewSet(JMSBulkModelViewSet):
             target_ip = instance.get_target_ip()
             return target_ip
 
-    @action(methods=['get'], detail=False, url_path='smart')
+    @action(methods=['get'], detail=False, permission_classes=[IsValidUser], url_path='smart')
     def smart(self, request, *args, **kwargs):
         protocol = request.GET.get('protocol')
         if not protocol:
