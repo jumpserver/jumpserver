@@ -50,6 +50,12 @@ class SiteMessageViewSet(ListModelMixin, RetrieveModelMixin, JMSGenericViewSet):
         SiteMessageUtil.mark_msgs_as_read(user.id, ids)
         return Response({'detail': 'ok'})
 
+    @action(methods=[PATCH], detail=False, url_path='mark-as-read-all')
+    def mark_as_read_all(self, request, **kwargs):
+        user = request.user
+        SiteMessageUtil.mark_msgs_as_read(user.id)
+        return Response({'detail': 'ok'})
+
     @action(methods=[POST], detail=False)
     def send(self, request, **kwargs):
         seri = self.get_serializer(data=request.data)
