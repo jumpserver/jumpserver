@@ -15,7 +15,7 @@ class TempTokenViewSet(JMSModelViewSet):
 
     def get_queryset(self):
         username = self.request.user.username
-        return TempToken.objects.filter(username=username)
+        return TempToken.objects.filter(username=username).order_by('-date_created')
 
     @action(methods=['PATCH'], detail=True, url_path='expire')
     def expire(self, *args, **kwargs):
@@ -24,4 +24,3 @@ class TempTokenViewSet(JMSModelViewSet):
         instance.save()
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
-
