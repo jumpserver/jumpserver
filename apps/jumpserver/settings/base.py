@@ -94,6 +94,7 @@ MIDDLEWARE = [
     'authentication.backends.oidc.middleware.OIDCRefreshIDTokenMiddleware',
     'authentication.backends.cas.middleware.CASMiddleware',
     'authentication.middleware.MFAMiddleware',
+    'authentication.middleware.SessionCookieMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
 ]
 
@@ -128,6 +129,20 @@ LOGIN_URL = reverse_lazy('authentication:login')
 
 SESSION_COOKIE_DOMAIN = CONFIG.SESSION_COOKIE_DOMAIN
 CSRF_COOKIE_DOMAIN = CONFIG.SESSION_COOKIE_DOMAIN
+
+# 设置 SESSION_COOKIE_NAME_PREFIX_KEY
+# 解决 不同域 session csrf cookie 获取混乱问题
+SESSION_COOKIE_NAME_PREFIX_KEY = 'SESSION_COOKIE_NAME_PREFIX'
+SESSION_COOKIE_NAME_PREFIX = CONFIG.SESSION_COOKIE_NAME_PREFIX
+if SESSION_COOKIE_NAME_PREFIX is not None:
+    pass
+elif SESSION_COOKIE_DOMAIN is not None:
+    SESSION_COOKIE_NAME_PREFIX = SESSION_COOKIE_DOMAIN.split('.')[0]
+else:
+    SESSION_COOKIE_NAME_PREFIX = 'jms_'
+CSRF_COOKIE_NAME = '{}csrftoken'.format(SESSION_COOKIE_NAME_PREFIX)
+SESSION_COOKIE_NAME = '{}sessionid'.format(SESSION_COOKIE_NAME_PREFIX)
+
 SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # 自定义的配置，SESSION_EXPIRE_AT_BROWSER_CLOSE 始终为 True, 下面这个来控制是否强制关闭后过期 cookie

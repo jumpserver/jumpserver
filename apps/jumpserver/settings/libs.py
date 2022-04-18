@@ -96,12 +96,12 @@ else:
 
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'BACKEND': 'common.cache.RedisChannelLayer',
         'CONFIG': {
             "hosts": [{
                 'address': (CONFIG.REDIS_HOST, CONFIG.REDIS_PORT),
                 'db': CONFIG.REDIS_DB_WS,
-                'password': CONFIG.REDIS_PASSWORD,
+                'password': CONFIG.REDIS_PASSWORD or None,
                 'ssl':  context
             }],
         },
