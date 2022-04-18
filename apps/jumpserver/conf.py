@@ -313,7 +313,7 @@ class Config(dict):
         'TERMINAL_HOST_KEY': '',
         'TERMINAL_TELNET_REGEX': '',
         'TERMINAL_COMMAND_STORAGE': {},
-        # 未来废弃(当下迁移会用)
+        # 未来废弃(目前迁移会用)
         'TERMINAL_RDP_ADDR': '',
         # 保留(Luna还在用)
         'TERMINAL_MAGNUS_ENABLED': True,
