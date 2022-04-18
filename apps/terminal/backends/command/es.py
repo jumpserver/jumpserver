@@ -59,10 +59,15 @@ class CommandStore(object):
             data = self.es.indices.get_mapping(self.index)
         except NotFoundError:
             return False
-
+        info = self.es.info()
+        version = info['version']['number'].split('.')[0]
         try:
-            # 检测索引是不是新的类型
-            properties = data[self.index]['mappings']['properties']
+            if version == '6':
+                # 检测索引是不是新的类型 es6
+                properties = data[self.index]['mappings']['data']['properties']
+            else:
+                # 检测索引是不是新的类型 es7 default index type: _doc
+                properties = data[self.index]['mappings']['properties']
             if properties['session']['type'] == 'keyword' \
                     and properties['org_id']['type'] == 'keyword':
                 return True
@@ -75,27 +80,30 @@ class CommandStore(object):
         self._ensure_index_exists()
 
     def _ensure_index_exists(self):
-        mappings = {
-            "mappings": {
-                "properties": {
-                    "session": {
-                        "type": "keyword"
-                    },
-                    "org_id": {
-                        "type": "keyword"
-                    },
-                    "@timestamp": {
-                        "type": "date"
-                    },
-                    "timestamp": {
-                        "type": "long"
-                    }
-                }
+        properties = {
+            "session": {
+                "type": "keyword"
+            },
+            "org_id": {
+                "type": "keyword"
+            },
+            "@timestamp": {
+                "type": "date"
+            },
+            "timestamp": {
+                "type": "long"
             }
         }
+        info = self.es.info()
+        version = info['version']['number'].split('.')[0]
+        if version == '6':
+            mappings = {'mappings': {'data': {'properties': properties}}}
+        else:
+            mappings = {'mappings': {'properties': properties}}
 
         try:
             self.es.indices.create(self.index, body=mappings)
+            return
         except RequestError as e:
             logger.exception(e)
 
