@@ -121,14 +121,16 @@ class UserProfileSerializer(UserSerializer):
     mfa_level = serializers.ChoiceField(choices=MFA_LEVEL_CHOICES, label=_('MFA'), required=False)
     guide_url = serializers.SerializerMethodField()
     receive_backends = serializers.ListField(child=serializers.CharField(), read_only=True)
-    orgs = UserOrgSerializer(many=True, read_only=True, source='all_orgs')
-    myorgs = UserOrgSerializer(many=True, read_only=True, source='my_orgs')
+    console_orgs = UserOrgSerializer(many=True, read_only=True)
+    audit_orgs = UserOrgSerializer(many=True, read_only=True)
+    workbench_orgs = UserOrgSerializer(many=True, read_only=True)
     perms = serializers.ListField(label=_("Perms"), read_only=True)
 
     class Meta(UserSerializer.Meta):
         read_only_fields = [
             'date_joined', 'last_login', 'created_by', 'source',
-            'receive_backends', 'orgs', 'myorgs', 'perms',
+            'console_orgs', 'audit_orgs', 'workbench_orgs',
+            'receive_backends', 'perms',
         ]
         fields = UserSerializer.Meta.fields + [
             'public_key_comment', 'public_key_hash_md5', 'guide_url',
