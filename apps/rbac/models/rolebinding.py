@@ -105,18 +105,22 @@ class RoleBinding(JMSModel):
         from orgs.models import Organization
 
         roles = Role.get_roles_by_perm(perm)
-        bindings = list(cls.objects.filter(role__in=roles, user=user))
+        bindings = list(cls.objects.root_all().filter(role__in=roles, user=user))
         system_bindings = [b for b in bindings if b.scope == Role.Scope.system.value]
 
         if perm == 'rbac.view_workbench':
             all_orgs = user.orgs.all()
         else:
             all_orgs = Organization.objects.all()
+
         if system_bindings:
-            return all_orgs
+            orgs = all_orgs
         else:
             org_ids = [b.org.id for b in bindings if b.org]
-            return all_orgs.filter(id__in=org_ids)
+            orgs = all_orgs.filter(id__in=org_ids)
+        if orgs and user.has_perm('orgs.view_rootorg'):
+            orgs = [Organization.root(), *list(orgs)]
+        return orgs
 
 
 class OrgRoleBindingManager(RoleBindingManager):
