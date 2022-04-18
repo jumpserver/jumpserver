@@ -4,6 +4,7 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.decorators import action
 
 from common.drf.api import JMSModelViewSet
+from ..filters import RoleFilter
 from ..serializers import RoleSerializer, RoleUserSerializer
 from ..models import Role, SystemRole, OrgRole
 from .permission import PermissionViewSet
@@ -20,8 +21,8 @@ class RoleViewSet(JMSModelViewSet):
         'default': RoleSerializer,
         'users': RoleUserSerializer,
     }
-    filterset_fields = ['name', 'scope', 'builtin']
-    search_fields = filterset_fields
+    filterset_class = RoleFilter
+    search_fields = ('name', 'scope', 'builtin')
     rbac_perms = {
         'users': 'rbac.view_rolebinding'
     }
