@@ -2,6 +2,13 @@ from django.utils.translation import ugettext_noop
 
 from .const import Scope, system_exclude_permissions, org_exclude_permissions
 
+system_user_perms = (
+    ('authentication', 'connectiontoken', 'add', 'connectiontoken'),
+    ('authentication', 'temptoken', 'add', 'temptoken'),
+    ('tickets', 'ticket', 'view', 'ticket'),
+    ('orgs', 'organization', 'view', 'rootorg'),
+)
+
 # Todo: 获取应该区分 系统用户，和组织用户的权限
 # 工作台也区分组织后再考虑
 user_perms = (
@@ -15,10 +22,6 @@ user_perms = (
     ('assets', 'node', 'match', 'node'),
     ('applications', 'application', 'match', 'application'),
     ('ops', 'commandexecution', 'add', 'commandexecution'),
-    ('authentication', 'connectiontoken', 'add', 'connectiontoken'),
-    ('authentication', 'temptoken', 'add', 'temptoken'),
-    ('tickets', 'ticket', 'view', 'ticket'),
-    ('orgs', 'organization', 'view', 'rootorg'),
 )
 
 auditor_perms = user_perms + (
@@ -104,7 +107,7 @@ class BuiltinRole:
         '4', ugettext_noop('SystemComponent'), Scope.system, app_exclude_perms, 'exclude'
     )
     system_user = PredefineRole(
-        '3', ugettext_noop('User'), Scope.system, user_perms
+        '3', ugettext_noop('User'), Scope.system, system_user_perms
     )
     org_admin = PredefineRole(
         '5', ugettext_noop('OrgAdmin'), Scope.org, []

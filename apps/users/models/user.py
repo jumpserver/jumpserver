@@ -863,23 +863,20 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
             return None
         return self.SOURCE_BACKEND_MAPPING.get(self.source, [])
 
-    @property
-    def all_orgs(self):
-        from rbac.builtin import BuiltinRole
-        has_system_role = self.system_roles.all() \
-            .exclude(name=BuiltinRole.system_user.name) \
-            .exists()
-        if has_system_role:
-            orgs = list(Organization.objects.all())
-        else:
-            orgs = list(self.orgs.distinct())
-        if self.has_perm('orgs.view_rootorg'):
-            orgs = [Organization.root()] + orgs
-        return orgs
+    @lazyproperty
+    def console_orgs(self):
+        from rbac.models import RoleBinding
+        return RoleBinding.get_user_has_the_perm_orgs('rbac.view_console', self)
 
-    @property
-    def my_orgs(self):
-        return list(self.orgs.distinct())
+    @lazyproperty
+    def audit_orgs(self):
+        from rbac.models import RoleBinding
+        return RoleBinding.get_user_has_the_perm_orgs('rbac.view_audit', self)
+
+    @lazyproperty
+    def workbench_orgs(self):
+        from rbac.models import RoleBinding
+        return RoleBinding.get_user_has_the_perm_orgs('rbac.view_workbench', self)
 
     class Meta:
         ordering = ['username']

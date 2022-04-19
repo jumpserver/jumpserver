@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                 ('secret', models.CharField(max_length=64, verbose_name='Secret')),
                 ('verified', models.BooleanField(default=False, verbose_name='Verified')),
                 ('date_verified', models.DateTimeField(null=True, verbose_name='Date verified')),
-                ('date_expired', models.DateTimeField(verbose_name='Date verified')),
+                ('date_expired', models.DateTimeField(verbose_name='Date expired')),
             ],
             options={
                 'verbose_name': 'Temporary token',
