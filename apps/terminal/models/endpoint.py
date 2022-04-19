@@ -31,8 +31,11 @@ class Endpoint(JMSModel):
     def get_port(self, protocol):
         return getattr(self, f'{protocol}_port', 0)
 
+    def is_default(self):
+        return self.id == self.default_id
+
     def delete(self, using=None, keep_parents=False):
-        if self.id == self.default_id:
+        if self.is_default():
             return
         return super().delete(using, keep_parents)
 
@@ -78,6 +81,8 @@ class EndpointRule(JMSModel):
                 continue
             if not endpoint_rule.endpoint:
                 continue
+            if endpoint_rule.endpoint.is_default():
+                return endpoint_rule
             if not endpoint_rule.endpoint.host:
                 continue
             if endpoint_rule.endpoint.get_port(protocol) == 0:
