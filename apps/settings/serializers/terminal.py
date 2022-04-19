@@ -30,8 +30,9 @@ class TerminalSettingSerializer(serializers.Serializer):
     )
     TERMINAL_TELNET_REGEX = serializers.CharField(
         allow_blank=True, max_length=1024, required=False, label=_('Telnet login regex'),
-        help_text=_("The login success message varies with devices. "
+        help_text=_("Tips: The login success message varies with devices. "
                     "if you cannot log in to the device through Telnet, set this parameter")
     )
     TERMINAL_MAGNUS_ENABLED = serializers.BooleanField(label=_("Enable database proxy"))
     XRDP_ENABLED = serializers.BooleanField(label=_("Enable XRDP"))
+    TERMINAL_KOKO_SSH_ENABLED = serializers.BooleanField(label=_("Enable KoKo SSH"))
