@@ -1570,7 +1570,7 @@ msgstr "DingTalk"
 
 #: audits/signal_handlers.py:73 authentication/models.py:76
 msgid "Temporary token"
-msgstr "一時的なトークン"
+msgstr "仮パスワード"
 
 #: audits/signal_handlers.py:107
 msgid "User and Group"
