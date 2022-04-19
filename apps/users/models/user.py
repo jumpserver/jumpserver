@@ -455,7 +455,7 @@ class RoleMixin:
         if org is None:
             org = current_org
         if not org.is_root():
-            queryset = current_org.get_members()
+            queryset = org.get_members()
         queryset = cls.filter_not_service_account(queryset)
         return queryset
 
