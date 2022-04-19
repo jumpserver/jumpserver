@@ -65,6 +65,7 @@ class PublicSettingApi(generics.RetrieveAPIView):
                 # Terminal
                 "XRDP_ENABLED": settings.XRDP_ENABLED,
                 "TERMINAL_MAGNUS_ENABLED": settings.TERMINAL_MAGNUS_ENABLED,
+                "TERMINAL_KOKO_SSH_ENABLED": settings.TERMINAL_KOKO_SSH_ENABLED,
                 # Announcement
                 "ANNOUNCEMENT_ENABLED": settings.ANNOUNCEMENT_ENABLED,
                 "ANNOUNCEMENT": settings.ANNOUNCEMENT,
