@@ -20,7 +20,7 @@ def migrate_endpoints(apps, schema_editor):
         'http_port': 0,
         'created_by': 'System'
     }
-    default_endpoint = Endpoint.objects.create(**default_data)
+    Endpoint.objects.create(**default_data)
 
     if not settings.XRDP_ENABLED:
         return
@@ -81,8 +81,8 @@ class Migration(migrations.Migration):
                 ('date_created', models.DateTimeField(auto_now_add=True, null=True, verbose_name='Date created')),
                 ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=128, unique=True, blank=True, verbose_name='Name')),
-                ('host', models.CharField(max_length=256, verbose_name='Host')),
+                ('name', models.CharField(max_length=128, unique=True, verbose_name='Name')),
+                ('host', models.CharField(max_length=256, verbose_name='Host', blank=True)),
                 ('https_port', common.fields.model.PortField(default=443, validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(65535)], verbose_name='HTTPS Port')),
                 ('http_port', common.fields.model.PortField(default=80, validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(65535)], verbose_name='HTTP Port')),
                 ('ssh_port', common.fields.model.PortField(default=2222, validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(65535)], verbose_name='SSH Port')),
