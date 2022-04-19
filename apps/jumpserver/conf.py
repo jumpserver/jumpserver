@@ -317,6 +317,7 @@ class Config(dict):
         'TERMINAL_RDP_ADDR': '',
         # 保留(Luna还在用)
         'TERMINAL_MAGNUS_ENABLED': True,
+        'TERMINAL_KOKO_SSH_ENABLED': True,
         # 保留(Luna还在用)
         'XRDP_ENABLED': True,
 

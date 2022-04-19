@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-13 20:35+0800\n"
+"POT-Creation-Date: 2022-04-19 15:57+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -88,12 +88,12 @@ msgstr "ログイン確認"
 #: assets/models/cmd_filter.py:30 assets/models/label.py:15 audits/models.py:37
 #: audits/models.py:60 audits/models.py:85 audits/serializers.py:100
 #: authentication/models.py:51 orgs/models.py:214 perms/models/base.py:84
-#: rbac/builtin.py:107 rbac/models/rolebinding.py:40
+#: rbac/builtin.py:110 rbac/models/rolebinding.py:40
 #: terminal/backends/command/models.py:20
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:44
 #: terminal/notifications.py:91 terminal/notifications.py:139
-#: tickets/models/comment.py:17 users/const.py:14 users/models/user.py:886
-#: users/models/user.py:917 users/serializers/group.py:19
+#: tickets/models/comment.py:17 users/const.py:14 users/models/user.py:883
+#: users/models/user.py:914 users/serializers/group.py:19
 msgid "User"
 msgstr "ユーザー"
 
@@ -327,7 +327,7 @@ msgstr "ツールバーの"
 msgid "Can match application"
 msgstr "アプリケーションを一致させることができます"
 
-#: applications/models/application.py:306
+#: applications/models/application.py:305
 msgid "Application user"
 msgstr "アプリケーションユーザー"
 
@@ -340,8 +340,8 @@ msgstr "カテゴリ表示"
 
 #: applications/serializers/application.py:71
 #: applications/serializers/application.py:102
-#: assets/serializers/system_user.py:27 audits/serializers.py:29
-#: perms/serializers/application/permission.py:19
+#: assets/serializers/cmd_filter.py:34 assets/serializers/system_user.py:27
+#: audits/serializers.py:29 perms/serializers/application/permission.py:19
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:33
 #: tickets/serializers/ticket/ticket.py:21
 #: tickets/serializers/ticket/ticket.py:173
@@ -353,17 +353,17 @@ msgstr "タイプ表示"
 #: assets/models/domain.py:26 assets/models/gathered_user.py:19
 #: assets/models/group.py:22 assets/models/label.py:25
 #: assets/serializers/account.py:18 assets/serializers/cmd_filter.py:28
-#: assets/serializers/cmd_filter.py:49 common/db/models.py:113
+#: assets/serializers/cmd_filter.py:48 common/db/models.py:113
 #: common/mixins/models.py:50 ops/models/adhoc.py:39 ops/models/command.py:30
 #: orgs/models.py:67 orgs/models.py:217 perms/models/base.py:92
-#: users/models/group.py:18 users/models/user.py:918
+#: users/models/group.py:18 users/models/user.py:915
 #: xpack/plugins/cloud/models.py:125
 msgid "Date created"
 msgstr "作成された日付"
 
 #: applications/serializers/application.py:104 assets/models/base.py:182
 #: assets/models/gathered_user.py:20 assets/serializers/account.py:21
-#: assets/serializers/cmd_filter.py:29 assets/serializers/cmd_filter.py:50
+#: assets/serializers/cmd_filter.py:29 assets/serializers/cmd_filter.py:49
 #: common/db/models.py:114 common/mixins/models.py:51 ops/models/adhoc.py:40
 #: orgs/models.py:218
 msgid "Date updated"
@@ -815,7 +815,7 @@ msgid "Default"
 msgstr "デフォルト"
 
 #: assets/models/cluster.py:36 assets/models/label.py:14 rbac/const.py:6
-#: users/models/user.py:903
+#: users/models/user.py:900
 msgid "System"
 msgstr "システム"
 
@@ -1126,9 +1126,13 @@ msgstr "キーパスワード"
 msgid "private key invalid or passphrase error"
 msgstr "秘密鍵が無効またはpassphraseエラー"
 
-#: assets/serializers/cmd_filter.py:51
+#: assets/serializers/cmd_filter.py:35 assets/serializers/cmd_filter.py:50
 msgid "Action display"
 msgstr "アクション表示"
+
+#: assets/serializers/cmd_filter.py:51 ops/models/adhoc.py:155
+msgid "Pattern"
+msgstr "パターン"
 
 #: assets/serializers/domain.py:13 assets/serializers/label.py:12
 #: assets/serializers/system_user.py:59
@@ -1566,7 +1570,7 @@ msgstr "DingTalk"
 
 #: audits/signal_handlers.py:73 authentication/models.py:76
 msgid "Temporary token"
-msgstr "一時的なトークン"
+msgstr "仮パスワード"
 
 #: audits/signal_handlers.py:107
 msgid "User and Group"
@@ -2177,7 +2181,7 @@ msgstr "コードエラー"
 #: authentication/templates/authentication/_msg_reset_password.html:3
 #: authentication/templates/authentication/_msg_rest_password_success.html:2
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:2
-#: jumpserver/conf.py:298 ops/tasks.py:145 ops/tasks.py:148
+#: jumpserver/conf.py:299 ops/tasks.py:145 ops/tasks.py:148
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: perms/templates/perms/_msg_permed_items_expire.html:3
 #: users/templates/users/_msg_account_expire_reminder.html:4
@@ -2638,11 +2642,11 @@ msgstr "特殊文字を含むべきではない"
 msgid "The mobile phone number format is incorrect"
 msgstr "携帯電話番号の形式が正しくありません"
 
-#: jumpserver/conf.py:297
+#: jumpserver/conf.py:298
 msgid "Create account successfully"
 msgstr "アカウントを正常に作成"
 
-#: jumpserver/conf.py:299
+#: jumpserver/conf.py:300
 msgid "Your account has been created successfully"
 msgstr "アカウントが正常に作成されました"
 
@@ -2764,10 +2768,6 @@ msgstr "タスクモニターを表示できます"
 #: ops/models/adhoc.py:154
 msgid "Tasks"
 msgstr "タスク"
-
-#: ops/models/adhoc.py:155
-msgid "Pattern"
-msgstr "パターン"
 
 #: ops/models/adhoc.py:156
 msgid "Options"
@@ -3106,15 +3106,15 @@ msgstr "質問があったら、管理者に連絡して下さい"
 msgid "My applications"
 msgstr "私のアプリケーション"
 
-#: rbac/api/role.py:32
+#: rbac/api/role.py:33
 msgid "Internal role, can't be destroy"
 msgstr "内部の役割は、破壊することはできません"
 
-#: rbac/api/role.py:36
+#: rbac/api/role.py:37
 msgid "The role has been bound to users, can't be destroy"
 msgstr "ロールはユーザーにバインドされており、破壊することはできません"
 
-#: rbac/api/role.py:43
+#: rbac/api/role.py:44
 msgid "Internal role, can't be update"
 msgstr "内部ロール、更新できません"
 
@@ -3126,27 +3126,27 @@ msgstr "{} 少なくとも1つのシステムロール"
 msgid "RBAC"
 msgstr "RBAC"
 
-#: rbac/builtin.py:98
+#: rbac/builtin.py:101
 msgid "SystemAdmin"
 msgstr "システム管理者"
 
-#: rbac/builtin.py:101
+#: rbac/builtin.py:104
 msgid "SystemAuditor"
 msgstr "システム監査人"
 
-#: rbac/builtin.py:104
+#: rbac/builtin.py:107
 msgid "SystemComponent"
 msgstr "システムコンポーネント"
 
-#: rbac/builtin.py:110
+#: rbac/builtin.py:113
 msgid "OrgAdmin"
 msgstr "組織管理者"
 
-#: rbac/builtin.py:113
+#: rbac/builtin.py:116
 msgid "OrgAuditor"
 msgstr "監査員を組織する"
 
-#: rbac/builtin.py:116
+#: rbac/builtin.py:119
 msgid "OrgUser"
 msgstr "組織ユーザー"
 
@@ -3190,11 +3190,11 @@ msgstr "権限"
 msgid "Built-in"
 msgstr "内蔵"
 
-#: rbac/models/role.py:130
+#: rbac/models/role.py:144
 msgid "System role"
 msgstr "システムの役割"
 
-#: rbac/models/role.py:138
+#: rbac/models/role.py:152
 msgid "Organization role"
 msgstr "組織の役割"
 
@@ -3202,22 +3202,22 @@ msgstr "組織の役割"
 msgid "Role binding"
 msgstr "ロールバインディング"
 
-#: rbac/models/rolebinding.py:128
+#: rbac/models/rolebinding.py:150
 msgid ""
 "User last role in org, can not be delete, you can remove user from org "
 "instead"
 msgstr ""
 "ユーザーの最後のロールは削除できません。ユーザーを組織から削除できます。"
 
-#: rbac/models/rolebinding.py:135
+#: rbac/models/rolebinding.py:157
 msgid "Organization role binding"
 msgstr "組織の役割バインディング"
 
-#: rbac/models/rolebinding.py:150
+#: rbac/models/rolebinding.py:172
 msgid "System role binding"
 msgstr "システムロールバインディング"
 
-#: rbac/serializers/permission.py:26 users/serializers/profile.py:126
+#: rbac/serializers/permission.py:26 users/serializers/profile.py:127
 msgid "Perms"
 msgstr "パーマ"
 
@@ -4225,10 +4225,10 @@ msgstr "Telnetログインregex"
 
 #: settings/serializers/terminal.py:33
 msgid ""
-"The login success message varies with devices. if you cannot log in to the "
-"device through Telnet, set this parameter"
+"Tips: The login success message varies with devices. if you cannot log in to "
+"the device through Telnet, set this parameter"
 msgstr ""
-"ログイン成功メッセージはデバイスによって異なります。Telnet経由でデバイスにロ"
+"ヒント: ログイン成功メッセージはデバイスによって異なります。Telnet経由でデバイスにロ"
 "グインできない場合は、このパラメーターを設定します。"
 
 #: settings/serializers/terminal.py:36
@@ -4238,6 +4238,10 @@ msgstr "属性マップの有効化"
 #: settings/serializers/terminal.py:37
 msgid "Enable XRDP"
 msgstr "XRDPの有効化"
+
+#: settings/serializers/terminal.py:38
+msgid "Enable KoKo SSH"
+msgstr "KoKo SSHの有効化"
 
 #: settings/utils/ldap.py:417
 msgid "ldap:// or ldaps:// protocol is used."
@@ -4541,11 +4545,11 @@ msgstr ""
 "WindowsはクライアントをダウンロードしてSSH資産に接続する必要があり、macOSシス"
 "テムは独自のTerminalを採用している。"
 
-#: templates/resource_download.html:51
+#: templates/resource_download.html:53
 msgid "Windows Remote application publisher tools"
 msgstr "Windowsリモートアプリケーション発行者ツール"
 
-#: templates/resource_download.html:52
+#: templates/resource_download.html:54
 msgid ""
 "Jmservisor is the program used to pull up remote applications in Windows "
 "Remote Application publisher"
@@ -4557,7 +4561,7 @@ msgstr ""
 msgid "Filters"
 msgstr "フィルター"
 
-#: terminal/api/endpoint.py:65
+#: terminal/api/endpoint.py:63
 msgid "Not found protocol query params"
 msgstr ""
 
@@ -5546,7 +5550,7 @@ msgid "Public key should not be the same as your old one."
 msgstr "公開鍵は古いものと同じであってはなりません。"
 
 #: users/forms/profile.py:149 users/serializers/profile.py:95
-#: users/serializers/profile.py:176 users/serializers/profile.py:203
+#: users/serializers/profile.py:178 users/serializers/profile.py:205
 msgid "Not a valid ssh public key"
 msgstr "有効なssh公開鍵ではありません"
 
@@ -5590,27 +5594,27 @@ msgstr "最終更新日パスワード"
 msgid "Need update password"
 msgstr "更新パスワードが必要"
 
-#: users/models/user.py:888
+#: users/models/user.py:885
 msgid "Can invite user"
 msgstr "ユーザーを招待できます"
 
-#: users/models/user.py:889
+#: users/models/user.py:886
 msgid "Can remove user"
 msgstr "ユーザーを削除できます"
 
-#: users/models/user.py:890
+#: users/models/user.py:887
 msgid "Can match user"
 msgstr "ユーザーに一致できます"
 
-#: users/models/user.py:899
+#: users/models/user.py:896
 msgid "Administrator"
 msgstr "管理者"
 
-#: users/models/user.py:902
+#: users/models/user.py:899
 msgid "Administrator is the super user of system"
 msgstr "管理者はシステムのスーパーユーザーです"
 
-#: users/models/user.py:927
+#: users/models/user.py:924
 msgid "User password history"
 msgstr "ユーザーパスワード履歴"
 
@@ -5649,7 +5653,7 @@ msgstr "MFAのリセット"
 msgid "The old password is incorrect"
 msgstr "古いパスワードが正しくありません"
 
-#: users/serializers/profile.py:36 users/serializers/profile.py:190
+#: users/serializers/profile.py:36 users/serializers/profile.py:192
 msgid "Password does not match security rules"
 msgstr "パスワードがセキュリティルールと一致しない"
 
@@ -5661,7 +5665,7 @@ msgstr "新しいパスワードを最後の {} 個のパスワードにする�
 msgid "The newly set password is inconsistent"
 msgstr "新しく設定されたパスワードが一致しない"
 
-#: users/serializers/profile.py:142 users/serializers/user.py:140
+#: users/serializers/profile.py:144 users/serializers/user.py:140
 msgid "Is first login"
 msgstr "最初のログインです"
 
@@ -6721,20 +6725,3 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "コミュニティ版"
-
-#~ msgid "Inherit"
-#~ msgstr "継承"
-
-#~ msgid "Include"
-#~ msgstr "含める"
-
-#~ msgid "Exclude"
-#~ msgstr "除外"
-
-#~ msgid "DatabaseApp"
-#~ msgstr "データベースの適用"
-
-#, fuzzy
-#~| msgid "Connection token"
-#~ msgid "One time token"
-#~ msgstr "接続トークン"

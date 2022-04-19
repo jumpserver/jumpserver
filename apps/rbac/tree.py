@@ -86,6 +86,8 @@ special_pid_mapper = {
     'terminal.replaystorage': 'terminal_node',
     'terminal.status': 'terminal_node',
     'terminal.task': 'terminal_node',
+    'terminal.endpoint': 'terminal_node',
+    'terminal.endpointrule': 'terminal_node',
     'audits.ftplog': 'terminal',
     'perms.view_myassets': 'my_assets',
     'perms.view_myapps': 'my_apps',

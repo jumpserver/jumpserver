@@ -141,7 +141,6 @@ class UserGrantedAssetSystemUsersForAdminApi(ListAPIView):
         return queryset_list
 
 
-@method_decorator(tmp_to_root_org(), name='list')
 class MyGrantedAssetSystemUsersApi(UserGrantedAssetSystemUsersForAdminApi):
     permission_classes = (IsValidUser,)
 

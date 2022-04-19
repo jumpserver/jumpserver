@@ -25,6 +25,7 @@ exclude_permissions = (
     ('authentication', 'connectiontoken', 'change,delete', 'connectiontoken'),
     ('authentication', 'ssotoken', '*', '*'),
     ('authentication', 'superconnectiontoken', 'change,delete', 'superconnectiontoken'),
+    ('authentication', 'temptoken', 'delete', 'temptoken'),
     ('users', 'userpasswordhistory', '*', '*'),
     ('applications', 'applicationuser', '*', '*'),
     ('applications', 'historicalaccount', '*', '*'),
