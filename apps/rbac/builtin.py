@@ -4,7 +4,8 @@ from .const import Scope, system_exclude_permissions, org_exclude_permissions
 
 system_user_perms = (
     ('authentication', 'connectiontoken', 'add', 'connectiontoken'),
-    ('authentication', 'temptoken', 'add', 'temptoken'),
+    ('authentication', 'temptoken', 'add,change,view', 'temptoken'),
+    ('authentication', 'accesskey', '*', '*'),
     ('tickets', 'ticket', 'view', 'ticket'),
     ('orgs', 'organization', 'view', 'rootorg'),
 )

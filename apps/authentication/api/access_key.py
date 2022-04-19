@@ -2,14 +2,14 @@
 #
 
 from rest_framework.viewsets import ModelViewSet
-
-from common.permissions import IsValidUser
 from .. import serializers
+from rbac.permissions import RBACPermission
 
 
 class AccessKeyViewSet(ModelViewSet):
     serializer_class = serializers.AccessKeySerializer
     search_fields = ['^id', '^secret']
+    permission_classes = [RBACPermission]
 
     def get_queryset(self):
         return self.request.user.access_keys.all()
