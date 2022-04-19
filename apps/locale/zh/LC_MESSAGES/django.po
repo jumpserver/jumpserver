@@ -1558,7 +1558,7 @@ msgstr "钉钉"
 
 #: audits/signal_handlers.py:73 authentication/models.py:76
 msgid "Temporary token"
-msgstr "临时 Token"
+msgstr "临时密码"
 
 #: audits/signal_handlers.py:107
 msgid "User and Group"
