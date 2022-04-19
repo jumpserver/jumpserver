@@ -65,7 +65,6 @@ class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
         all_assets = all_assets.annotate(parent_key=F('nodes__key')).prefetch_related('platform')
         data.extend(self.serialize_assets(all_assets))
 
-    @tmp_to_root_org()
     def list(self, request: Request, *args, **kwargs):
         """
         此算法依赖 UserGrantedMappingNode
