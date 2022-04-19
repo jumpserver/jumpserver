@@ -125,8 +125,9 @@ function csrfSafeMethod(method) {
 }
 
 function setAjaxCSRFToken() {
-    var csrftoken = getCookie('csrftoken');
-    var sessionid = getCookie('sessionid');
+    const prefix = getCookie('SESSION_COOKIE_NAME_PREFIX', '')
+    var csrftoken = getCookie(`${prefix}csrftoken`);
+    var sessionid = getCookie(`${prefix}sessionid`);
 
     $.ajaxSetup({
         beforeSend: function (xhr, settings) {
