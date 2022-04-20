@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-20 16:23+0800\n"
+"POT-Creation-Date: 2022-04-20 16:35+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -2855,15 +2855,15 @@ msgstr "更新任务内容: {}"
 msgid "The current organization ({}) cannot be deleted"
 msgstr "当前组织 ({}) 不能被删除"
 
-#: orgs/api.py:77
-msgid "The organization have resource ({}) cannot be deleted"
-msgstr "组织存在资源 ({}) 不能被删除"
-
-#: orgs/api.py:83
+#: orgs/api.py:74
 msgid ""
 "LDAP synchronization is set to the current organization. Please switch to "
 "another organization before deleting"
-msgstr "LDAP同步设置组织为当前组织，请切换其他组织后再进行删除操作"
+msgstr "LDAP 同步设置组织为当前组织，请切换其他组织后再进行删除操作"
+
+#: orgs/api.py:83
+msgid "The organization have resource ({}) cannot be deleted"
+msgstr "组织存在资源 ({}) 不能被删除"
 
 #: orgs/apps.py:7 rbac/tree.py:114
 msgid "App organizations"
@@ -4188,104 +4188,104 @@ msgstr "启用 XRDP 服务"
 msgid "Enable KoKo SSH"
 msgstr "启用 KoKo SSH"
 
-#: settings/utils/ldap.py:417
+#: settings/utils/ldap.py:419
 msgid "ldap:// or ldaps:// protocol is used."
 msgstr "使用 ldap:// 或 ldaps:// 协议"
 
-#: settings/utils/ldap.py:428
+#: settings/utils/ldap.py:430
 msgid "Host or port is disconnected: {}"
 msgstr "主机或端口不可连接: {}"
 
-#: settings/utils/ldap.py:430
+#: settings/utils/ldap.py:432
 msgid "The port is not the port of the LDAP service: {}"
 msgstr "端口不是LDAP服务端口: {}"
 
-#: settings/utils/ldap.py:432
+#: settings/utils/ldap.py:434
 msgid "Please add certificate: {}"
 msgstr "请添加证书"
 
-#: settings/utils/ldap.py:436 settings/utils/ldap.py:463
-#: settings/utils/ldap.py:493 settings/utils/ldap.py:521
+#: settings/utils/ldap.py:438 settings/utils/ldap.py:465
+#: settings/utils/ldap.py:495 settings/utils/ldap.py:523
 msgid "Unknown error: {}"
 msgstr "未知错误: {}"
 
-#: settings/utils/ldap.py:450
+#: settings/utils/ldap.py:452
 msgid "Bind DN or Password incorrect"
 msgstr "绑定DN或密码错误"
 
-#: settings/utils/ldap.py:457
+#: settings/utils/ldap.py:459
 msgid "Please enter Bind DN: {}"
 msgstr "请输入绑定DN: {}"
 
-#: settings/utils/ldap.py:459
+#: settings/utils/ldap.py:461
 msgid "Please enter Password: {}"
 msgstr "请输入密码: {}"
 
-#: settings/utils/ldap.py:461
+#: settings/utils/ldap.py:463
 msgid "Please enter correct Bind DN and Password: {}"
 msgstr "请输入正确的绑定DN和密码: {}"
 
-#: settings/utils/ldap.py:479
+#: settings/utils/ldap.py:481
 msgid "Invalid User OU or User search filter: {}"
 msgstr "不合法的用户OU或用户过滤器: {}"
 
-#: settings/utils/ldap.py:510
+#: settings/utils/ldap.py:512
 msgid "LDAP User attr map not include: {}"
 msgstr "LDAP属性映射没有包含: {}"
 
-#: settings/utils/ldap.py:517
+#: settings/utils/ldap.py:519
 msgid "LDAP User attr map is not dict"
 msgstr "LDAP属性映射不合法"
 
-#: settings/utils/ldap.py:536
+#: settings/utils/ldap.py:538
 msgid "LDAP authentication is not enabled"
 msgstr "LDAP认证没有启用"
 
-#: settings/utils/ldap.py:554
+#: settings/utils/ldap.py:556
 msgid "Error (Invalid LDAP server): {}"
 msgstr "错误 （不合法的LDAP服务器地址）: {}"
 
-#: settings/utils/ldap.py:556
+#: settings/utils/ldap.py:558
 msgid "Error (Invalid Bind DN): {}"
 msgstr "错误（不合法的绑定DN）: {}"
 
-#: settings/utils/ldap.py:558
+#: settings/utils/ldap.py:560
 msgid "Error (Invalid LDAP User attr map): {}"
 msgstr "错误（不合法的LDAP属性映射）: {}"
 
-#: settings/utils/ldap.py:560
+#: settings/utils/ldap.py:562
 msgid "Error (Invalid User OU or User search filter): {}"
 msgstr "错误（不合法的用户OU或用户过滤器）: {}"
 
-#: settings/utils/ldap.py:562
+#: settings/utils/ldap.py:564
 msgid "Error (Not enabled LDAP authentication): {}"
 msgstr "错误（没有启用LDAP认证）: {}"
 
-#: settings/utils/ldap.py:564
+#: settings/utils/ldap.py:566
 msgid "Error (Unknown): {}"
 msgstr "错误（未知）: {}"
 
-#: settings/utils/ldap.py:567
+#: settings/utils/ldap.py:569
 msgid "Succeed: Match {} s user"
 msgstr "成功匹配 {} 个用户"
 
-#: settings/utils/ldap.py:600
+#: settings/utils/ldap.py:602
 msgid "Authentication failed (configuration incorrect): {}"
 msgstr "认证失败（配置错误）: {}"
 
-#: settings/utils/ldap.py:602
+#: settings/utils/ldap.py:604
 msgid "Authentication failed (before login check failed): {}"
 msgstr "认证失败（登录前检查失败）: {}"
 
-#: settings/utils/ldap.py:604
+#: settings/utils/ldap.py:606
 msgid "Authentication failed (username or password incorrect): {}"
 msgstr "认证失败 (用户名或密码不正确): {}"
 
-#: settings/utils/ldap.py:606
+#: settings/utils/ldap.py:608
 msgid "Authentication failed (Unknown): {}"
 msgstr "认证失败: (未知): {}"
 
-#: settings/utils/ldap.py:609
+#: settings/utils/ldap.py:611
 msgid "Authentication success: {}"
 msgstr "认证成功: {}"
 
