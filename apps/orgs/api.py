@@ -2,6 +2,7 @@
 #
 
 from django.utils.translation import ugettext as _
+from django.conf import settings
 from rest_framework_bulk import BulkModelViewSet
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.exceptions import PermissionDenied
@@ -75,6 +76,11 @@ class OrgViewSet(BulkModelViewSet):
             msg = _(
                 'The organization have resource ({}) cannot be deleted'
             ).format(model._meta.verbose_name)
+            raise PermissionDenied(detail=msg)
+        if str(instance.id) == settings.AUTH_LDAP_SYNC_ORG_ID:
+            msg = _(
+                'LDAP synchronization is set to the current organization. Please switch to another organization before deleting'
+            )
             raise PermissionDenied(detail=msg)
 
         super().perform_destroy(instance)
