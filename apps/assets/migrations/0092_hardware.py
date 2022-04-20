@@ -15,6 +15,10 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='DeviceInfo',
             fields=[
+                ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
+                ('created_by', models.CharField(blank=True, max_length=32, null=True, verbose_name='Created by')),
+                ('date_created', models.DateTimeField(auto_now_add=True, null=True, verbose_name='Date created')),
+                ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
                 ('vendor', models.CharField(blank=True, max_length=64, null=True, verbose_name='Vendor')),
                 ('model', models.CharField(blank=True, max_length=54, null=True, verbose_name='Model')),
                 ('sn', models.CharField(blank=True, max_length=128, null=True, verbose_name='Serial number')),
@@ -29,10 +33,7 @@ class Migration(migrations.Migration):
                 ('os_version', models.CharField(blank=True, max_length=16, null=True, verbose_name='OS version')),
                 ('os_arch', models.CharField(blank=True, max_length=16, null=True, verbose_name='OS arch')),
                 ('hostname_raw', models.CharField(blank=True, max_length=128, null=True, verbose_name='Hostname raw')),
-                ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('created_by', models.CharField(blank=True, max_length=32, null=True, verbose_name='Created by')),
-                ('date_created', models.DateTimeField(auto_now_add=True, null=True, verbose_name='Date created')),
-                ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
+                ('host', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='assets.host', verbose_name='Host')),
             ],
             options={
                 'verbose_name': 'DeviceInfo',

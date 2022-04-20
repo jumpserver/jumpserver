@@ -4,14 +4,6 @@ from itertools import groupby
 from django.db import migrations
 from django.db.models import F
 
-
-# ('Linux', 'Linux'),
-# ('Unix', 'Unix'),
-# ('MacOS', 'MacOS'),
-# ('BSD', 'BSD'),
-# ('Windows', 'Windows'),
-# ('Other', 'Other'),
-
 category_mapper = {
     'Linux': ('host', 'linux'),
     'Unix': ('host', 'unix'),

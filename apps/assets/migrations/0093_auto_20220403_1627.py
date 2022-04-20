@@ -27,6 +27,7 @@ def migrate_hardware(apps, *args):
         if not hosts:
             break
 
+        hardware_infos = []
         for host in hosts:
             hardware = hardware_model()
             asset = asset_mapper[host.asset_ptr_id]
@@ -34,9 +35,10 @@ def migrate_hardware(apps, *args):
             hardware.date_updated = timezone.now()
             for name in fields:
                 setattr(hardware, name, getattr(asset, name))
-            hardware.save()
-            host.device_info = hardware
-            host.save()
+            hardware_infos.append(hardware)
+
+        hardware_model.objects.bulk_create(hardware_infos, ignore_conflicts=True)
+        created += len(hardware_infos)
 
 
 class Migration(migrations.Migration):
@@ -46,10 +48,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='host',
-            name='device_info',
-            field=models.ForeignKey(null=True, on_delete=models.deletion.SET_NULL, to='assets.deviceinfo', verbose_name='Device info'),
-        ),
         migrations.RunPython(migrate_hardware)
     ]
