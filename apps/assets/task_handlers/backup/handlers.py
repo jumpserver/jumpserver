@@ -156,10 +156,7 @@ class AccountBackupHandler:
         logger.info('步骤完成: 用时 {}s'.format(timedelta))
         return files
 
-    def send_backup_mail(self, files):
-        recipients = self.execution.plan_snapshot.get('recipients')
-        if not recipients:
-            return
+    def send_backup_mail(self, files, recipients):
         if not files:
             return
         recipients = User.objects.filter(id__in=list(recipients))
@@ -198,8 +195,16 @@ class AccountBackupHandler:
         is_success = False
         error = '-'
         try:
-            files = self.create_excel()
-            self.send_backup_mail(files)
+            recipients = self.execution.plan_snapshot.get('recipients')
+            if not recipients:
+                logger.info(
+                    '\n'
+                    '\033[32m>>> 该备份任务未分配收件人\033[0m'
+                    ''
+                )
+            else:
+                files = self.create_excel()
+                self.send_backup_mail(files, recipients)
         except Exception as e:
             self.is_frozen = True
             logger.error('任务执行被异常中断')
