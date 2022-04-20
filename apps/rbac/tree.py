@@ -181,7 +181,7 @@ class PermissionTreeUtil:
         self.permissions = self.prefetch_permissions(permissions)
         self.all_permissions = self.prefetch_permissions(
             Permission.get_permissions(scope)
-        ).distinct()
+        )
         self.check_disabled = check_disabled
         self.total_counts = defaultdict(int)
         self.checked_counts = defaultdict(int)
