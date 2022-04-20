@@ -2,15 +2,6 @@ from django.utils.translation import ugettext_noop
 
 from .const import Scope, system_exclude_permissions, org_exclude_permissions
 
-system_user_perms = (
-    ('authentication', 'connectiontoken', 'add', 'connectiontoken'),
-    ('authentication', 'temptoken', 'add,change,view', 'temptoken'),
-    ('authentication', 'accesskey', '*', '*'),
-    ('tickets', 'ticket', 'view', 'ticket'),
-    ('orgs', 'organization', 'view', 'rootorg'),
-)
-
-# Todo: 获取应该区分 系统用户，和组织用户的权限
 # 工作台也区分组织后再考虑
 user_perms = (
     ('rbac', 'menupermission', 'view', 'workbench'),
@@ -24,6 +15,14 @@ user_perms = (
     ('applications', 'application', 'match', 'application'),
     ('ops', 'commandexecution', 'add', 'commandexecution'),
 )
+
+system_user_perms = (
+    ('authentication', 'connectiontoken', 'add', 'connectiontoken'),
+    ('authentication', 'temptoken', 'add,change,view', 'temptoken'),
+    ('authentication', 'accesskey', '*', '*'),
+    ('tickets', 'ticket', 'view', 'ticket'),
+    ('orgs', 'organization', 'view', 'rootorg'),
+) + user_perms
 
 auditor_perms = user_perms + (
     ('rbac', 'menupermission', 'view', 'audit'),
