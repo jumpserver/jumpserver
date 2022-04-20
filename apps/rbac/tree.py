@@ -181,7 +181,7 @@ class PermissionTreeUtil:
         self.permissions = self.prefetch_permissions(permissions)
         self.all_permissions = self.prefetch_permissions(
             Permission.get_permissions(scope)
-        )
+        ).distinct()
         self.check_disabled = check_disabled
         self.total_counts = defaultdict(int)
         self.checked_counts = defaultdict(int)
@@ -258,6 +258,7 @@ class PermissionTreeUtil:
         content_types = ContentType.objects.all()
 
         nodes = []
+        model_total = 0
         for ct in content_types:
             model_id = '{}.{}'.format(ct.app_label, ct.model)
             if not self._check_model_xpack(model_id):
@@ -268,6 +269,7 @@ class PermissionTreeUtil:
             if total_count == 0:
                 continue
 
+            model_total += total_count
             # 获取 pid
             app = ct.app_label
             if model_id in special_pid_mapper:
@@ -286,6 +288,7 @@ class PermissionTreeUtil:
                 'pId': app,
             }, total_count, checked_count, 'model', is_open=False)
             nodes.append(node)
+        print("Model total: ", model_total)
         return nodes
 
     def _get_permission_name_icon(self, p: Permission, content_types_name_mapper: dict):
@@ -335,9 +338,11 @@ class PermissionTreeUtil:
                 pid = special_pid_mapper[title]
 
             self.total_counts[pid] += 1
+            self.total_counts['ROOT'] += 1
             checked = p.id in permissions_id
             if checked:
                 self.checked_counts[pid] += 1
+                self.checked_counts['ROOT'] += 1
 
             node = TreeNode(**{
                 'id': p.id,
@@ -384,8 +389,13 @@ class PermissionTreeUtil:
         return node
 
     def _create_root_tree_node(self):
-        total_count = self.all_permissions.count()
-        checked_count = self.permissions.count()
+        # total_count = self.all_permissions.count()
+        # checked_count = self.permissions.count()
+        import json
+        with open('/tmp/abc.json', 'w') as f:
+            f.write(json.dumps(self.total_counts))
+        total_count = self.total_counts['ROOT']
+        checked_count = self.checked_counts['ROOT']
         node = self._create_node(root_node_data, total_count, checked_count, 'root')
         return node
 
