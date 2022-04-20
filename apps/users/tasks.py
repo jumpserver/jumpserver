@@ -81,8 +81,14 @@ def import_ldap_user():
     util_server = LDAPServerUtil()
     util_import = LDAPImportUtil()
     users = util_server.search()
-    org_id = settings.AUTH_LDAP_SYNC_ORG_ID
-    org = Organization.get_instance(org_id)
+    if settings.XPACK_ENABLED:
+        org_id = settings.AUTH_LDAP_SYNC_ORG_ID
+        default_org = None
+    else:
+        # 社区版默认导入Default组织
+        org_id = Organization.DEFAULT_ID
+        default_org = Organization.default()
+    org = Organization.get_instance(org_id, default=default_org)
     errors = util_import.perform_import(users, org)
     if errors:
         logger.error("Imported LDAP users errors: {}".format(errors))
@@ -106,6 +112,9 @@ def import_ldap_user_periodic():
     else:
         interval = None
     crontab = settings.AUTH_LDAP_SYNC_CRONTAB
+    if crontab:
+        # 优先使用 crontab
+        interval = None
     tasks = {
         task_name: {
             'task': import_ldap_user.name,

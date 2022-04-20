@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-19 15:57+0800\n"
+"POT-Creation-Date: 2022-04-20 16:35+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,7 +29,7 @@ msgstr "Acls"
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
 #: orgs/models.py:65 perms/models/base.py:83 rbac/models/role.py:29
 #: settings/models.py:29 settings/serializers/sms.py:6
-#: terminal/models/endpoint.py:10 terminal/models/endpoint.py:55
+#: terminal/models/endpoint.py:10 terminal/models/endpoint.py:58
 #: terminal/models/storage.py:23 terminal/models/task.py:16
 #: terminal/models/terminal.py:100 users/forms/profile.py:32
 #: users/models/group.py:15 users/models/user.py:661
@@ -38,12 +38,12 @@ msgid "Name"
 msgstr "名前"
 
 #: acls/models/base.py:27 assets/models/cmd_filter.py:84
-#: assets/models/user.py:247 terminal/models/endpoint.py:58
+#: assets/models/user.py:247 terminal/models/endpoint.py:61
 msgid "Priority"
 msgstr "優先順位"
 
 #: acls/models/base.py:28 assets/models/cmd_filter.py:84
-#: assets/models/user.py:247 terminal/models/endpoint.py:59
+#: assets/models/user.py:247 terminal/models/endpoint.py:62
 msgid "1-100, the lower the value will be match first"
 msgstr "1-100、低い値は最初に一致します"
 
@@ -61,7 +61,7 @@ msgstr "アクティブ"
 #: assets/models/domain.py:64 assets/models/group.py:23
 #: assets/models/label.py:23 ops/models/adhoc.py:38 orgs/models.py:68
 #: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:34
-#: terminal/models/endpoint.py:20 terminal/models/endpoint.py:65
+#: terminal/models/endpoint.py:20 terminal/models/endpoint.py:68
 #: terminal/models/storage.py:26 terminal/models/terminal.py:114
 #: tickets/models/comment.py:24 tickets/models/ticket.py:154
 #: users/models/group.py:16 users/models/user.py:698
@@ -1360,7 +1360,7 @@ msgstr "監査"
 
 #: audits/models.py:27 audits/models.py:57
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:166
+#: rbac/tree.py:168
 msgid "Delete"
 msgstr "削除"
 
@@ -1413,11 +1413,11 @@ msgstr "ファイル転送ログ"
 
 #: audits/models.py:55
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:163
+#: rbac/tree.py:165
 msgid "Create"
 msgstr "作成"
 
-#: audits/models.py:56 rbac/tree.py:165 templates/_csv_import_export.html:18
+#: audits/models.py:56 rbac/tree.py:167 templates/_csv_import_export.html:18
 #: templates/_csv_update_modal.html:6
 msgid "Update"
 msgstr "更新"
@@ -2886,15 +2886,22 @@ msgstr "タスクログ"
 msgid "Update task content: {}"
 msgstr "タスク内容の更新: {}"
 
-#: orgs/api.py:68
+#: orgs/api.py:69
 msgid "The current organization ({}) cannot be deleted"
 msgstr "現在の組織 ({}) は削除できません"
 
-#: orgs/api.py:76
+#: orgs/api.py:74
+msgid ""
+"LDAP synchronization is set to the current organization. Please switch to "
+"another organization before deleting"
+msgstr ""
+"LDAP 同期は現在の組織に設定されます。削除する前に別の組織に切り替えてください"
+
+#: orgs/api.py:83
 msgid "The organization have resource ({}) cannot be deleted"
 msgstr "組織のリソース ({}) は削除できません"
 
-#: orgs/apps.py:7 rbac/tree.py:112
+#: orgs/apps.py:7 rbac/tree.py:114
 msgid "App organizations"
 msgstr "アプリ組織"
 
@@ -3202,18 +3209,18 @@ msgstr "組織の役割"
 msgid "Role binding"
 msgstr "ロールバインディング"
 
-#: rbac/models/rolebinding.py:150
+#: rbac/models/rolebinding.py:151
 msgid ""
 "User last role in org, can not be delete, you can remove user from org "
 "instead"
 msgstr ""
 "ユーザーの最後のロールは削除できません。ユーザーを組織から削除できます。"
 
-#: rbac/models/rolebinding.py:157
+#: rbac/models/rolebinding.py:158
 msgid "Organization role binding"
 msgstr "組織の役割バインディング"
 
-#: rbac/models/rolebinding.py:172
+#: rbac/models/rolebinding.py:173
 msgid "System role binding"
 msgstr "システムロールバインディング"
 
@@ -3301,27 +3308,27 @@ msgstr "私の資産"
 msgid "My apps"
 msgstr "マイアプリ"
 
-#: rbac/tree.py:113
+#: rbac/tree.py:115
 msgid "Ticket comment"
 msgstr "チケットコメント"
 
-#: rbac/tree.py:114 tickets/models/ticket.py:163
+#: rbac/tree.py:116 tickets/models/ticket.py:163
 msgid "Ticket"
 msgstr "チケット"
 
-#: rbac/tree.py:115
+#: rbac/tree.py:117
 msgid "Common setting"
 msgstr "共通設定"
 
-#: rbac/tree.py:116
+#: rbac/tree.py:118
 msgid "View permission tree"
 msgstr "権限ツリーの表示"
 
-#: rbac/tree.py:117
+#: rbac/tree.py:119
 msgid "Execute batch command"
 msgstr "バッチ実行コマンド"
 
-#: rbac/tree.py:164
+#: rbac/tree.py:166
 msgid "View"
 msgstr "表示"
 
@@ -4228,8 +4235,8 @@ msgid ""
 "Tips: The login success message varies with devices. if you cannot log in to "
 "the device through Telnet, set this parameter"
 msgstr ""
-"ヒント: ログイン成功メッセージはデバイスによって異なります。Telnet経由でデバイスにロ"
-"グインできない場合は、このパラメーターを設定します。"
+"ヒント: ログイン成功メッセージはデバイスによって異なります。Telnet経由でデバ"
+"イスにログインできない場合は、このパラメーターを設定します。"
 
 #: settings/serializers/terminal.py:36
 msgid "Enable database proxy"
@@ -4243,104 +4250,104 @@ msgstr "XRDPの有効化"
 msgid "Enable KoKo SSH"
 msgstr "KoKo SSHの有効化"
 
-#: settings/utils/ldap.py:417
+#: settings/utils/ldap.py:419
 msgid "ldap:// or ldaps:// protocol is used."
 msgstr "ldap:// または ldaps:// プロトコルが使用されます。"
 
-#: settings/utils/ldap.py:428
+#: settings/utils/ldap.py:430
 msgid "Host or port is disconnected: {}"
 msgstr "ホストまたはポートが切断されました: {}"
 
-#: settings/utils/ldap.py:430
+#: settings/utils/ldap.py:432
 msgid "The port is not the port of the LDAP service: {}"
 msgstr "ポートはLDAPサービスのポートではありません: {}"
 
-#: settings/utils/ldap.py:432
+#: settings/utils/ldap.py:434
 msgid "Please add certificate: {}"
 msgstr "証明書を追加してください: {}"
 
-#: settings/utils/ldap.py:436 settings/utils/ldap.py:463
-#: settings/utils/ldap.py:493 settings/utils/ldap.py:521
+#: settings/utils/ldap.py:438 settings/utils/ldap.py:465
+#: settings/utils/ldap.py:495 settings/utils/ldap.py:523
 msgid "Unknown error: {}"
 msgstr "不明なエラー: {}"
 
-#: settings/utils/ldap.py:450
+#: settings/utils/ldap.py:452
 msgid "Bind DN or Password incorrect"
 msgstr "DNまたはパスワードのバインドが正しくありません"
 
-#: settings/utils/ldap.py:457
+#: settings/utils/ldap.py:459
 msgid "Please enter Bind DN: {}"
 msgstr "バインドDN: {} を入力してください"
 
-#: settings/utils/ldap.py:459
+#: settings/utils/ldap.py:461
 msgid "Please enter Password: {}"
 msgstr "パスワードを入力してください: {}"
 
-#: settings/utils/ldap.py:461
+#: settings/utils/ldap.py:463
 msgid "Please enter correct Bind DN and Password: {}"
 msgstr "正しいバインドDNとパスワードを入力してください: {}"
 
-#: settings/utils/ldap.py:479
+#: settings/utils/ldap.py:481
 msgid "Invalid User OU or User search filter: {}"
 msgstr "無効なユーザー OU またはユーザー検索フィルター: {}"
 
-#: settings/utils/ldap.py:510
+#: settings/utils/ldap.py:512
 msgid "LDAP User attr map not include: {}"
 msgstr "LDAP ユーザーattrマップは含まれません: {}"
 
-#: settings/utils/ldap.py:517
+#: settings/utils/ldap.py:519
 msgid "LDAP User attr map is not dict"
 msgstr "LDAPユーザーattrマップはdictではありません"
 
-#: settings/utils/ldap.py:536
+#: settings/utils/ldap.py:538
 msgid "LDAP authentication is not enabled"
 msgstr "LDAP 認証が有効になっていない"
 
-#: settings/utils/ldap.py:554
+#: settings/utils/ldap.py:556
 msgid "Error (Invalid LDAP server): {}"
 msgstr "エラー (LDAPサーバーが無効): {}"
 
-#: settings/utils/ldap.py:556
+#: settings/utils/ldap.py:558
 msgid "Error (Invalid Bind DN): {}"
 msgstr "エラー (DNのバインドが無効): {}"
 
-#: settings/utils/ldap.py:558
+#: settings/utils/ldap.py:560
 msgid "Error (Invalid LDAP User attr map): {}"
 msgstr "エラー (LDAPユーザーattrマップが無効): {}"
 
-#: settings/utils/ldap.py:560
+#: settings/utils/ldap.py:562
 msgid "Error (Invalid User OU or User search filter): {}"
 msgstr "エラー (ユーザーOUまたはユーザー検索フィルターが無効): {}"
 
-#: settings/utils/ldap.py:562
+#: settings/utils/ldap.py:564
 msgid "Error (Not enabled LDAP authentication): {}"
 msgstr "エラー (LDAP認証が有効化されていません): {}"
 
-#: settings/utils/ldap.py:564
+#: settings/utils/ldap.py:566
 msgid "Error (Unknown): {}"
 msgstr "エラー (不明): {}"
 
-#: settings/utils/ldap.py:567
+#: settings/utils/ldap.py:569
 msgid "Succeed: Match {} s user"
 msgstr "成功: {} 人のユーザーに一致"
 
-#: settings/utils/ldap.py:600
+#: settings/utils/ldap.py:602
 msgid "Authentication failed (configuration incorrect): {}"
 msgstr "認証に失敗しました (設定が正しくありません): {}"
 
-#: settings/utils/ldap.py:602
+#: settings/utils/ldap.py:604
 msgid "Authentication failed (before login check failed): {}"
 msgstr "認証に失敗しました (ログインチェックが失敗する前): {}"
 
-#: settings/utils/ldap.py:604
+#: settings/utils/ldap.py:606
 msgid "Authentication failed (username or password incorrect): {}"
 msgstr "認証に失敗しました (ユーザー名またはパスワードが正しくありません): {}"
 
-#: settings/utils/ldap.py:606
+#: settings/utils/ldap.py:608
 msgid "Authentication failed (Unknown): {}"
 msgstr "認証に失敗しました (不明): {}"
 
-#: settings/utils/ldap.py:609
+#: settings/utils/ldap.py:611
 msgid "Authentication success: {}"
 msgstr "認証成功: {}"
 
@@ -4725,18 +4732,18 @@ msgstr "MariaDB ポート"
 msgid "PostgreSQL Port"
 msgstr "PostgreSQL ポート"
 
-#: terminal/models/endpoint.py:25 terminal/models/endpoint.py:63
+#: terminal/models/endpoint.py:25 terminal/models/endpoint.py:66
 #: terminal/serializers/endpoint.py:40 terminal/serializers/storage.py:37
 #: terminal/serializers/storage.py:49 terminal/serializers/storage.py:79
 #: terminal/serializers/storage.py:89 terminal/serializers/storage.py:97
 msgid "Endpoint"
 msgstr "エンドポイント"
 
-#: terminal/models/endpoint.py:56
+#: terminal/models/endpoint.py:59
 msgid "IP group"
 msgstr "IP グループ"
 
-#: terminal/models/endpoint.py:68
+#: terminal/models/endpoint.py:71
 msgid "Endpoint rule"
 msgstr "エンドポイントルール"
 

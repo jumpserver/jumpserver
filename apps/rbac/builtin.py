@@ -2,15 +2,10 @@ from django.utils.translation import ugettext_noop
 
 from .const import Scope, system_exclude_permissions, org_exclude_permissions
 
-system_user_perms = (
-    ('authentication', 'connectiontoken', 'add', 'connectiontoken'),
-    ('authentication', 'temptoken', 'add,change,view', 'temptoken'),
-    ('authentication', 'accesskey', '*', '*'),
-    ('tickets', 'ticket', 'view', 'ticket'),
+_view_root_perms = (
     ('orgs', 'organization', 'view', 'rootorg'),
 )
 
-# Todo: 获取应该区分 系统用户，和组织用户的权限
 # 工作台也区分组织后再考虑
 user_perms = (
     ('rbac', 'menupermission', 'view', 'workbench'),
@@ -25,15 +20,27 @@ user_perms = (
     ('ops', 'commandexecution', 'add', 'commandexecution'),
 )
 
-auditor_perms = user_perms + (
+system_user_perms = (
+    ('authentication', 'connectiontoken', 'add', 'connectiontoken'),
+    ('authentication', 'temptoken', 'add,change,view', 'temptoken'),
+    ('authentication', 'accesskey', '*', '*'),
+    ('tickets', 'ticket', 'view', 'ticket'),
+) + user_perms
+
+_auditor_perms = (
     ('rbac', 'menupermission', 'view', 'audit'),
     ('audits', '*', '*', '*'),
     ('terminal', 'commandstorage', 'view', 'commandstorage'),
     ('terminal', 'sessionreplay', 'view,download', 'sessionreplay'),
     ('terminal', 'session', '*', '*'),
     ('terminal', 'command', '*', '*'),
-    ('ops', 'commandexecution', 'view', 'commandexecution')
+    ('ops', 'commandexecution', 'view', 'commandexecution'),
 )
+
+auditor_perms = user_perms + _auditor_perms
+
+system_auditor_perms = system_user_perms + _auditor_perms + _view_root_perms
+
 
 app_exclude_perms = [
     ('users', 'user', 'add,delete', 'user'),
@@ -102,7 +109,7 @@ class BuiltinRole:
         '1', ugettext_noop('SystemAdmin'), Scope.system, []
     )
     system_auditor = PredefineRole(
-        '2', ugettext_noop('SystemAuditor'), Scope.system, auditor_perms
+        '2', ugettext_noop('SystemAuditor'), Scope.system, system_auditor_perms
     )
     system_component = PredefineRole(
         '4', ugettext_noop('SystemComponent'), Scope.system, app_exclude_perms, 'exclude'

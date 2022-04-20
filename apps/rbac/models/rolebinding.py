@@ -6,7 +6,7 @@ from rest_framework.serializers import ValidationError
 
 from common.db.models import JMSModel
 from common.utils import lazyproperty
-from orgs.utils import current_org
+from orgs.utils import current_org, tmp_to_root_org
 from .role import Role
 from ..const import Scope
 
@@ -105,20 +105,25 @@ class RoleBinding(JMSModel):
         from orgs.models import Organization
 
         roles = Role.get_roles_by_perm(perm)
-        bindings = list(cls.objects.root_all().filter(role__in=roles, user=user))
-        system_bindings = [b for b in bindings if b.scope == Role.Scope.system.value]
+        with tmp_to_root_org():
+            bindings = list(cls.objects.root_all().filter(role__in=roles, user=user))
 
+        system_bindings = [b for b in bindings if b.scope == Role.Scope.system.value]
+        # 工作台仅限于自己加入的组织
         if perm == 'rbac.view_workbench':
             all_orgs = user.orgs.all()
         else:
             all_orgs = Organization.objects.all()
 
+        # 有系统级别的绑定，就代表在所有组织有这个权限
         if system_bindings:
             orgs = all_orgs
         else:
             org_ids = [b.org.id for b in bindings if b.org]
             orgs = all_orgs.filter(id__in=org_ids)
-        if orgs and user.has_perm('orgs.view_rootorg'):
+
+        # 全局组织
+        if orgs and perm != 'rbac.view_workbench' and user.has_perm('orgs.view_rootorg'):
             orgs = [Organization.root(), *list(orgs)]
         return orgs
 

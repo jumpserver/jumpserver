@@ -90,7 +90,7 @@ class SystemRolePermissionsViewSet(BaseRolePermissionsViewSet):
     role_pk = 'system_role_pk'
     model = SystemRole
     rbac_perms = (
-        ('get_tree', 'rbac.view_systemrole'),
+        ('get_tree', 'rbac.view_permission'),
     )
 
 
@@ -99,6 +99,6 @@ class OrgRolePermissionsViewSet(BaseRolePermissionsViewSet):
     role_pk = 'org_role_pk'
     model = OrgRole
     rbac_perms = (
-        ('get_tree', 'rbac.view_orgrole'),
+        ('get_tree', 'rbac.view_permission'),
     )
 
