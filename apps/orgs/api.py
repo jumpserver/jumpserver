@@ -69,6 +69,12 @@ class OrgViewSet(BulkModelViewSet):
             msg = _('The current organization ({}) cannot be deleted').format(current_org)
             raise PermissionDenied(detail=msg)
 
+        if str(instance.id) == settings.AUTH_LDAP_SYNC_ORG_ID:
+            msg = _(
+                'LDAP synchronization is set to the current organization. Please switch to another organization before deleting'
+            )
+            raise PermissionDenied(detail=msg)
+
         for model in org_related_models:
             data = self.get_data_from_model(instance, model)
             if not data:
@@ -76,11 +82,6 @@ class OrgViewSet(BulkModelViewSet):
             msg = _(
                 'The organization have resource ({}) cannot be deleted'
             ).format(model._meta.verbose_name)
-            raise PermissionDenied(detail=msg)
-        if str(instance.id) == settings.AUTH_LDAP_SYNC_ORG_ID:
-            msg = _(
-                'LDAP synchronization is set to the current organization. Please switch to another organization before deleting'
-            )
             raise PermissionDenied(detail=msg)
 
         super().perform_destroy(instance)
