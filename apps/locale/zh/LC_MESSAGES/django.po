@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-19 15:57+0800\n"
+"POT-Creation-Date: 2022-04-20 16:23+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -28,7 +28,7 @@ msgstr "访问控制"
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
 #: orgs/models.py:65 perms/models/base.py:83 rbac/models/role.py:29
 #: settings/models.py:29 settings/serializers/sms.py:6
-#: terminal/models/endpoint.py:10 terminal/models/endpoint.py:55
+#: terminal/models/endpoint.py:10 terminal/models/endpoint.py:58
 #: terminal/models/storage.py:23 terminal/models/task.py:16
 #: terminal/models/terminal.py:100 users/forms/profile.py:32
 #: users/models/group.py:15 users/models/user.py:661
@@ -37,12 +37,12 @@ msgid "Name"
 msgstr "名称"
 
 #: acls/models/base.py:27 assets/models/cmd_filter.py:84
-#: assets/models/user.py:247 terminal/models/endpoint.py:58
+#: assets/models/user.py:247 terminal/models/endpoint.py:61
 msgid "Priority"
 msgstr "优先级"
 
 #: acls/models/base.py:28 assets/models/cmd_filter.py:84
-#: assets/models/user.py:247 terminal/models/endpoint.py:59
+#: assets/models/user.py:247 terminal/models/endpoint.py:62
 msgid "1-100, the lower the value will be match first"
 msgstr "优先级可选范围为 1-100 (数值越小越优先)"
 
@@ -60,7 +60,7 @@ msgstr "激活中"
 #: assets/models/domain.py:64 assets/models/group.py:23
 #: assets/models/label.py:23 ops/models/adhoc.py:38 orgs/models.py:68
 #: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:34
-#: terminal/models/endpoint.py:20 terminal/models/endpoint.py:65
+#: terminal/models/endpoint.py:20 terminal/models/endpoint.py:68
 #: terminal/models/storage.py:26 terminal/models/terminal.py:114
 #: tickets/models/comment.py:24 tickets/models/ticket.py:154
 #: users/models/group.py:16 users/models/user.py:698
@@ -1348,7 +1348,7 @@ msgstr "日志审计"
 
 #: audits/models.py:27 audits/models.py:57
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:166
+#: rbac/tree.py:168
 msgid "Delete"
 msgstr "删除"
 
@@ -1401,11 +1401,11 @@ msgstr "文件管理"
 
 #: audits/models.py:55
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:163
+#: rbac/tree.py:165
 msgid "Create"
 msgstr "创建"
 
-#: audits/models.py:56 rbac/tree.py:165 templates/_csv_import_export.html:18
+#: audits/models.py:56 rbac/tree.py:167 templates/_csv_import_export.html:18
 #: templates/_csv_update_modal.html:6
 msgid "Update"
 msgstr "更新"
@@ -2851,15 +2851,21 @@ msgstr "任务列表"
 msgid "Update task content: {}"
 msgstr "更新任务内容: {}"
 
-#: orgs/api.py:68
+#: orgs/api.py:69
 msgid "The current organization ({}) cannot be deleted"
 msgstr "当前组织 ({}) 不能被删除"
 
-#: orgs/api.py:76
+#: orgs/api.py:77
 msgid "The organization have resource ({}) cannot be deleted"
 msgstr "组织存在资源 ({}) 不能被删除"
 
-#: orgs/apps.py:7 rbac/tree.py:112
+#: orgs/api.py:83
+msgid ""
+"LDAP synchronization is set to the current organization. Please switch to "
+"another organization before deleting"
+msgstr "LDAP同步设置组织为当前组织，请切换其他组织后再进行删除操作"
+
+#: orgs/apps.py:7 rbac/tree.py:114
 msgid "App organizations"
 msgstr "组织管理"
 
@@ -3165,17 +3171,17 @@ msgstr "组织角色"
 msgid "Role binding"
 msgstr "角色绑定"
 
-#: rbac/models/rolebinding.py:150
+#: rbac/models/rolebinding.py:151
 msgid ""
 "User last role in org, can not be delete, you can remove user from org "
 "instead"
 msgstr "用户最后一个角色，不能删除，你可以将用户从组织移除"
 
-#: rbac/models/rolebinding.py:157
+#: rbac/models/rolebinding.py:158
 msgid "Organization role binding"
 msgstr "组织角色绑定"
 
-#: rbac/models/rolebinding.py:172
+#: rbac/models/rolebinding.py:173
 msgid "System role binding"
 msgstr "系统角色绑定"
 
@@ -3263,27 +3269,27 @@ msgstr "我的资产"
 msgid "My apps"
 msgstr "我的应用"
 
-#: rbac/tree.py:113
+#: rbac/tree.py:115
 msgid "Ticket comment"
 msgstr "工单评论"
 
-#: rbac/tree.py:114 tickets/models/ticket.py:163
+#: rbac/tree.py:116 tickets/models/ticket.py:163
 msgid "Ticket"
 msgstr "工单管理"
 
-#: rbac/tree.py:115
+#: rbac/tree.py:117
 msgid "Common setting"
 msgstr "一般设置"
 
-#: rbac/tree.py:116
+#: rbac/tree.py:118
 msgid "View permission tree"
 msgstr "查看授权树"
 
-#: rbac/tree.py:117
+#: rbac/tree.py:119
 msgid "Execute batch command"
 msgstr "执行批量命令"
 
-#: rbac/tree.py:164
+#: rbac/tree.py:166
 msgid "View"
 msgstr "查看"
 
@@ -4167,7 +4173,8 @@ msgstr "Telnet 成功正则表达式"
 msgid ""
 "Tips: The login success message varies with devices. if you cannot log in to "
 "the device through Telnet, set this parameter"
-msgstr "提示: 不同设备登录成功提示不一样，所以如果 telnet 不能正常登录，可以这里设置"
+msgstr ""
+"提示: 不同设备登录成功提示不一样，所以如果 telnet 不能正常登录，可以这里设置"
 
 #: settings/serializers/terminal.py:36
 msgid "Enable database proxy"
@@ -4651,18 +4658,18 @@ msgstr "MariaDB 端口"
 msgid "PostgreSQL Port"
 msgstr "PostgreSQL 端口"
 
-#: terminal/models/endpoint.py:25 terminal/models/endpoint.py:63
+#: terminal/models/endpoint.py:25 terminal/models/endpoint.py:66
 #: terminal/serializers/endpoint.py:40 terminal/serializers/storage.py:37
 #: terminal/serializers/storage.py:49 terminal/serializers/storage.py:79
 #: terminal/serializers/storage.py:89 terminal/serializers/storage.py:97
 msgid "Endpoint"
 msgstr "端点"
 
-#: terminal/models/endpoint.py:56
+#: terminal/models/endpoint.py:59
 msgid "IP group"
 msgstr "IP 组"
 
-#: terminal/models/endpoint.py:68
+#: terminal/models/endpoint.py:71
 msgid "Endpoint rule"
 msgstr "端点规则"
 
