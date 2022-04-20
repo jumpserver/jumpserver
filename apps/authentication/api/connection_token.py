@@ -70,6 +70,8 @@ class ClientProtocolMixin:
         system_user = serializer.validated_data['system_user']
 
         user = serializer.validated_data.get('user')
+        if not user or not self.request.user.is_superuser:
+            user = self.request.user
         return asset, application, system_user, user
 
     @staticmethod
