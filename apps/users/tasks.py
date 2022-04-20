@@ -112,6 +112,9 @@ def import_ldap_user_periodic():
     else:
         interval = None
     crontab = settings.AUTH_LDAP_SYNC_CRONTAB
+    if crontab:
+        # 优先使用 crontab
+        interval = None
     tasks = {
         task_name: {
             'task': import_ldap_user.name,
