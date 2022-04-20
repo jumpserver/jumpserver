@@ -6,7 +6,7 @@ from rest_framework.serializers import ValidationError
 
 from common.db.models import JMSModel
 from common.utils import lazyproperty
-from orgs.utils import current_org
+from orgs.utils import current_org, tmp_to_root_org
 from .role import Role
 from ..const import Scope
 
@@ -105,7 +105,8 @@ class RoleBinding(JMSModel):
         from orgs.models import Organization
 
         roles = Role.get_roles_by_perm(perm)
-        bindings = list(cls.objects.root_all().filter(role__in=roles, user=user))
+        with tmp_to_root_org():
+            bindings = list(cls.objects.root_all().filter(role__in=roles, user=user))
         system_bindings = [b for b in bindings if b.scope == Role.Scope.system.value]
 
         if perm == 'rbac.view_workbench':
