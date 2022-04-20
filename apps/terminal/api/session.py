@@ -63,7 +63,7 @@ class SessionViewSet(OrgBulkModelViewSet):
     ]
     extra_filter_backends = [DatetimeRangeFilter]
     rbac_perms = {
-        'download': ['terminal.download_sessionreplay|terminal.view_sessionreplay']
+        'download': ['terminal.download_sessionreplay']
     }
 
     @staticmethod
