@@ -125,7 +125,8 @@ function csrfSafeMethod(method) {
 }
 
 function setAjaxCSRFToken() {
-    const prefix = getCookie('SESSION_COOKIE_NAME_PREFIX', '')
+    let prefix = getCookie('SESSION_COOKIE_NAME_PREFIX');
+    if (!prefix || [`""`, `''`].indexOf(prefix) > -1) { prefix = ''; }
     var csrftoken = getCookie(`${prefix}csrftoken`);
     var sessionid = getCookie(`${prefix}sessionid`);
 
