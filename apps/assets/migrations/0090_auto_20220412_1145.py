@@ -3,6 +3,20 @@
 from django.db import migrations, models
 
 
+def create_internal_platform(apps, schema_editor):
+    model = apps.get_model("assets", "Platform")
+    db_alias = schema_editor.connection.alias
+    type_platforms = (
+        ('AIX', 'Unix', None),
+    )
+    for name, base, meta in type_platforms:
+        defaults = {'name': name, 'base': base, 'meta': meta, 'internal': True}
+        model.objects.using(db_alias).update_or_create(
+            name=name, defaults=defaults
+        )
+        migrations.RunPython(create_internal_platform)
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -15,4 +29,5 @@ class Migration(migrations.Migration):
             name='number',
             field=models.CharField(blank=True, max_length=128, null=True, verbose_name='Asset number'),
         ),
+        migrations.RunPython(create_internal_platform)
     ]

@@ -244,7 +244,7 @@ def push_system_user_util(system_user, assets, task_name, username=None):
         for u in usernames:
             for a in _assets:
                 system_user.load_asset_special_auth(a, u)
-                algorithm = a.platform.algorithm
+                algorithm = 'des' if a.platform.name == 'AIX' else 'sha512'
                 tasks = get_push_system_user_tasks(
                     system_user, platform, username=u,
                     algorithm=algorithm
