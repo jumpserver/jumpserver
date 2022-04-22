@@ -74,6 +74,7 @@ ADD . .
 RUN cd utils \
     && bash -ixeu build.sh \
     && mv ../release/jumpserver /opt/jumpserver \
+    && rm -rf /tmp/build \
     && echo > /opt/jumpserver/config.yml
 
 WORKDIR /opt/jumpserver
