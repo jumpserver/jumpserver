@@ -13,23 +13,15 @@ __all__ = [
     'ConnectionTokenUserSerializer', 'ConnectionTokenFilterRuleSerializer',
     'ConnectionTokenAssetSerializer', 'ConnectionTokenSystemUserSerializer',
     'ConnectionTokenDomainSerializer', 'ConnectionTokenRemoteAppSerializer',
-    'ConnectionTokenGatewaySerializer', 'ConnectionTokenSecretSerializer'
+    'ConnectionTokenGatewaySerializer', 'ConnectionTokenSecretSerializer',
+    'SuperConnectionTokenSerializer'
 ]
 
 
 class ConnectionTokenSerializer(serializers.Serializer):
-    user = serializers.CharField(max_length=128, required=False, allow_blank=True)
     system_user = serializers.CharField(max_length=128, required=True)
     asset = serializers.CharField(max_length=128, required=False)
     application = serializers.CharField(max_length=128, required=False)
-
-    @staticmethod
-    def validate_user(user_id):
-        from users.models import User
-        user = User.objects.filter(id=user_id).first()
-        if user is None:
-            raise serializers.ValidationError('user id not exist')
-        return user
 
     @staticmethod
     def validate_system_user(system_user_id):
@@ -63,6 +55,18 @@ class ConnectionTokenSerializer(serializers.Serializer):
         if asset and application:
             raise serializers.ValidationError('asset and application should only one')
         return super().validate(attrs)
+
+
+class SuperConnectionTokenSerializer(ConnectionTokenSerializer):
+    user = serializers.CharField(max_length=128, required=False, allow_blank=True)
+
+    @staticmethod
+    def validate_user(user_id):
+        from users.models import User
+        user = User.objects.filter(id=user_id).first()
+        if user is None:
+            raise serializers.ValidationError('user id not exist')
+        return user
 
 
 class ConnectionTokenUserSerializer(serializers.ModelSerializer):
@@ -114,7 +118,6 @@ class ConnectionTokenDomainSerializer(serializers.ModelSerializer):
 
 
 class ConnectionTokenFilterRuleSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = CommandFilterRule
         fields = [
