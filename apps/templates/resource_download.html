@@ -15,45 +15,33 @@ p {
 </style>
 <div style="margin: 0 200px">
     <div class="group">
-        <h2>JumpServer {% trans 'Client' %}</h2>
+        <h2>JumpServer {% trans 'Client' %} v1.1.4</h2>
         <p>
             {% trans 'JumpServer Client, currently used to launch the client, now only support launch RDP SSH client, The Telnet client will next' %}
-{#            //JumpServer 客户端，支持 RDP 的本地拉起，后续会支持拉起 ssh。#}
         </p>
         <ul>
-            <li> <a href="/download/JumpServer-Client-Installer.msi">Windows {% trans 'Client' %}</a></li>
-            <li> <a href="/download/JumpServer-Client-Installer.dmg">macOS {% trans 'Client' %}</a></li>
+            <li> <a href="/download/JumpServer-Client-Installer-x86_64.msi">jumpserver-client-windows-x86_64.msi</a></li>
+            <li> <a href="/download/JumpServer-Client-Installer-arm64.msi">jumpserver-client-windows-arm64.msi</a></li>
+            <li> <a href="/download/JumpServer-Client-Installer.dmg">jumpserver-client-darwin.dmg</a></li>
         </ul>
     </div>
 
     <div class="group">
-        <h2>{% trans 'Microsoft' %} RDP {% trans 'Official' %}{% trans 'Client' %}</h2>
+        <h2>{% trans 'Microsoft' %} RDP {% trans 'Official' %}{% trans 'Client' %} v10.6.7</h2>
         <p>
             {% trans 'macOS needs to download the client to connect RDP asset, which comes with Windows' %}
         </p>
         <ul>
-            <li><a href="/download/Microsoft_Remote_Desktop_10.6.7_installer.pkg">Microsoft_Remote_Desktop_10.6.7_installer.pkg</a></li>
-        </ul>
-    </div>
-
-    <div class="group">
-        <h2>SSH {% trans 'Client' %}</h2>
-        <p>
-            {% trans 'Windows needs to download the client to connect SSH assets, and the MacOS system uses its own terminal' %}
-        </p>
-        <ul>
-            <li><a href="/download/putty/w64/putty.exe">64-bit x86:  Putty.exe</a></li>
-            <li><a href="/download/putty/wa64/putty.exe">64-bit Arm: Putty.exe</a></li>
-            <li><a href="/download/putty/w32/putty.exe">32-bit x86:  Putty.exe</a></li>
+            <li><a href="/download/Microsoft_Remote_Desktop_10.6.7_installer.pkg">microsoft-remote-desktop-installer.pkg</a></li>
         </ul>
     </div>
 
     {% if XPACK_ENABLED  %}
         <div class="group">
-            <h2>{% trans 'Windows Remote application publisher tools' %}</h2>
+            <h2>{% trans 'Windows Remote application publisher tools' %} v2.0</h2>
             <p>{% trans 'Jmservisor is the program used to pull up remote applications in Windows Remote Application publisher' %}</p>
             <ul>
-                <li><a href="/download/Jmservisor.msi">Jmservisor</a></li>
+                <li><a href="/download/Jmservisor.msi">jmservisor.msi</a></li>
             </ul>
         </div>
     {% endif %}
