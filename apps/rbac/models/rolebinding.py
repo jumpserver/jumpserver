@@ -112,7 +112,7 @@ class RoleBinding(JMSModel):
         system_bindings = [b for b in bindings if b.scope == Role.Scope.system.value]
         # 工作台仅限于自己加入的组织
         if perm == 'rbac.view_workbench':
-            all_orgs = user.orgs.all()
+            all_orgs = user.orgs.all().distinct()
         else:
             all_orgs = Organization.objects.all()
 
