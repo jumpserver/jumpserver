@@ -186,7 +186,7 @@ class Asset(AbsConnectivity, ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
 
     @lazyproperty
     def platform_base(self):
-        return self.platform.base
+        return self.platform.type
 
     @lazyproperty
     def admin_user_username(self):
@@ -301,6 +301,11 @@ class Asset(AbsConnectivity, ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
             .values_list('systemuser_id', flat=True)
         system_users = SystemUser.objects.filter(id__in=system_user_ids)
         return system_users
+
+    def save(self, *args, **kwargs):
+        self.type = self.platform.type
+        self.category = self.platform.category
+        return super().save(*args, **kwargs)
 
     class Meta:
         unique_together = [('org_id', 'hostname')]

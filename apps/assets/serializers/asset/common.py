@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 from rest_framework import serializers
-from django.core.validators import RegexValidator
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
@@ -9,7 +8,6 @@ from ...models import Asset, Node, Platform, SystemUser
 
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',
-    'ProtocolsField', 'PlatformSerializer',
     'AssetTaskSerializer', 'AssetsTaskSerializer', 'ProtocolsField',
 ]
 
@@ -95,6 +93,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
         ]
         read_only_fields = [
             'connectivity', 'date_verified', 'created_by', 'date_created',
+            'category', 'type'
         ]
         fields = fields_small + fields_fk + fields_m2m + read_only_fields
         extra_kwargs = {
@@ -111,6 +110,13 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
         if admin_user_field:
             admin_user_field.queryset = SystemUser.objects.filter(type=SystemUser.Type.admin)
         return fields
+
+    def validate_type(self, value):
+        print(self.initial_data)
+        return value
+
+    def validate_category(self, value):
+        return value
 
     @classmethod
     def setup_eager_loading(cls, queryset):
@@ -166,25 +172,6 @@ class MiniAssetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Asset
         fields = AssetSerializer.Meta.fields_mini
-
-
-class PlatformSerializer(serializers.ModelSerializer):
-    meta = serializers.DictField(required=False, allow_null=True, label=_('Meta'))
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # TODO 修复 drf SlugField RegexValidator bug，之后记得删除
-        validators = self.fields['name'].validators
-        if isinstance(validators[-1], RegexValidator):
-            validators.pop()
-
-    class Meta:
-        model = Platform
-        fields = [
-            'id', 'name', 'category', 'type', 'charset',
-            'internal', 'meta', 'comment'
-        ]
 
 
 class AssetSimpleSerializer(serializers.ModelSerializer):
