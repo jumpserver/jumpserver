@@ -4247,8 +4247,8 @@ msgid "Enable XRDP"
 msgstr "XRDPの有効化"
 
 #: settings/serializers/terminal.py:38
-msgid "Enable KoKo SSH"
-msgstr "KoKo SSHの有効化"
+msgid "Enable SSH Client"
+msgstr "SSH Clientの有効化"
 
 #: settings/utils/ldap.py:419
 msgid "ldap:// or ldaps:// protocol is used."
