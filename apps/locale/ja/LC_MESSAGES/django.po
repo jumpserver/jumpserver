@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-20 16:35+0800\n"
+"POT-Creation-Date: 2022-04-27 10:32+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -86,9 +86,9 @@ msgstr "ログイン確認"
 
 #: acls/models/login_acl.py:24 acls/models/login_asset_acl.py:20
 #: assets/models/cmd_filter.py:30 assets/models/label.py:15 audits/models.py:37
-#: audits/models.py:60 audits/models.py:85 audits/serializers.py:100
+#: audits/models.py:62 audits/models.py:87 audits/serializers.py:100
 #: authentication/models.py:51 orgs/models.py:214 perms/models/base.py:84
-#: rbac/builtin.py:110 rbac/models/rolebinding.py:40
+#: rbac/builtin.py:118 rbac/models/rolebinding.py:41
 #: terminal/backends/command/models.py:20
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:44
 #: terminal/notifications.py:91 terminal/notifications.py:139
@@ -103,7 +103,7 @@ msgstr "ルール"
 
 #: acls/models/login_acl.py:31 acls/models/login_asset_acl.py:26
 #: acls/serializers/login_acl.py:17 acls/serializers/login_asset_acl.py:75
-#: assets/models/cmd_filter.py:89 audits/models.py:61 audits/serializers.py:51
+#: assets/models/cmd_filter.py:89 audits/models.py:63 audits/serializers.py:51
 #: authentication/templates/authentication/_access_key_modal.html:34
 msgid "Action"
 msgstr "アクション"
@@ -152,7 +152,7 @@ msgstr "コンマ区切り文字列の形式。* はすべて一致すること�
 
 #: acls/serializers/login_acl.py:15 acls/serializers/login_asset_acl.py:17
 #: acls/serializers/login_asset_acl.py:51 assets/models/base.py:176
-#: assets/models/gathered_user.py:15 audits/models.py:119
+#: assets/models/gathered_user.py:15 audits/models.py:121
 #: authentication/forms.py:15 authentication/forms.py:17
 #: authentication/models.py:69
 #: authentication/templates/authentication/_msg_different_city.html:9
@@ -711,7 +711,7 @@ msgstr "アカウントのバックアップスナップショット"
 msgid "Trigger mode"
 msgstr "トリガーモード"
 
-#: assets/models/backup.py:119 audits/models.py:125
+#: assets/models/backup.py:119 audits/models.py:127
 #: terminal/models/sharing.py:94
 #: xpack/plugins/change_auth_plan/models/base.py:201
 #: xpack/plugins/change_auth_plan/serializers/app.py:66
@@ -741,7 +741,7 @@ msgstr "不明"
 msgid "Ok"
 msgstr "OK"
 
-#: assets/models/base.py:32 audits/models.py:116
+#: assets/models/base.py:32 audits/models.py:118
 #: xpack/plugins/change_auth_plan/serializers/app.py:88
 #: xpack/plugins/change_auth_plan/serializers/asset.py:198
 #: xpack/plugins/cloud/const.py:31
@@ -756,7 +756,7 @@ msgstr "接続性"
 msgid "Date verified"
 msgstr "確認済みの日付"
 
-#: assets/models/base.py:177 audits/signal_handlers.py:68
+#: assets/models/base.py:177 audits/signal_handlers.py:48
 #: authentication/forms.py:22
 #: authentication/templates/authentication/login.html:181
 #: settings/serializers/auth/ldap.py:43 users/forms/profile.py:21
@@ -1358,9 +1358,9 @@ msgstr "一致する資産がない、タスクを停止"
 msgid "Audits"
 msgstr "監査"
 
-#: audits/models.py:27 audits/models.py:57
+#: audits/models.py:27 audits/models.py:59
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:168
+#: rbac/tree.py:228
 msgid "Delete"
 msgstr "削除"
 
@@ -1388,7 +1388,7 @@ msgstr "Mkdir"
 msgid "Symlink"
 msgstr "Symlink"
 
-#: audits/models.py:38 audits/models.py:64 audits/models.py:87
+#: audits/models.py:38 audits/models.py:66 audits/models.py:89
 #: terminal/models/session.py:51 terminal/models/sharing.py:82
 msgid "Remote addr"
 msgstr "リモートaddr"
@@ -1401,7 +1401,7 @@ msgstr "操作"
 msgid "Filename"
 msgstr "ファイル名"
 
-#: audits/models.py:43 audits/models.py:115 terminal/models/sharing.py:90
+#: audits/models.py:43 audits/models.py:117 terminal/models/sharing.py:90
 #: xpack/plugins/change_auth_plan/serializers/app.py:87
 #: xpack/plugins/change_auth_plan/serializers/asset.py:197
 msgid "Success"
@@ -1411,95 +1411,99 @@ msgstr "成功"
 msgid "File transfer log"
 msgstr "ファイル転送ログ"
 
-#: audits/models.py:55
+#: audits/models.py:56
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:165
+#: rbac/tree.py:225
 msgid "Create"
 msgstr "作成"
 
-#: audits/models.py:56 rbac/tree.py:167 templates/_csv_import_export.html:18
+#: audits/models.py:57 rbac/tree.py:226
+msgid "View"
+msgstr "表示"
+
+#: audits/models.py:58 rbac/tree.py:227 templates/_csv_import_export.html:18
 #: templates/_csv_update_modal.html:6
 msgid "Update"
 msgstr "更新"
 
-#: audits/models.py:62 audits/serializers.py:63
+#: audits/models.py:64 audits/serializers.py:63
 msgid "Resource Type"
 msgstr "リソースタイプ"
 
-#: audits/models.py:63
+#: audits/models.py:65
 msgid "Resource"
 msgstr "リソース"
 
-#: audits/models.py:65 audits/models.py:88
+#: audits/models.py:67 audits/models.py:90
 #: terminal/backends/command/serializers.py:39
 msgid "Datetime"
 msgstr "時間"
 
-#: audits/models.py:80
+#: audits/models.py:82
 msgid "Operate log"
 msgstr "ログの操作"
 
-#: audits/models.py:86
+#: audits/models.py:88
 msgid "Change by"
 msgstr "による変更"
 
-#: audits/models.py:94
+#: audits/models.py:96
 msgid "Password change log"
 msgstr "パスワード変更ログ"
 
-#: audits/models.py:109
+#: audits/models.py:111
 msgid "Disabled"
 msgstr "無効"
 
-#: audits/models.py:110 settings/models.py:33
+#: audits/models.py:112 settings/models.py:33
 msgid "Enabled"
 msgstr "有効化"
 
-#: audits/models.py:111
+#: audits/models.py:113
 msgid "-"
 msgstr "-"
 
-#: audits/models.py:120
+#: audits/models.py:122
 msgid "Login type"
 msgstr "ログインタイプ"
 
-#: audits/models.py:121
+#: audits/models.py:123
 #: tickets/serializers/ticket/meta/ticket_type/login_confirm.py:14
 msgid "Login ip"
 msgstr "ログインIP"
 
-#: audits/models.py:122
+#: audits/models.py:124
 #: authentication/templates/authentication/_msg_different_city.html:11
 #: tickets/serializers/ticket/meta/ticket_type/login_confirm.py:17
 msgid "Login city"
 msgstr "ログイン都市"
 
-#: audits/models.py:123 audits/serializers.py:44
+#: audits/models.py:125 audits/serializers.py:44
 msgid "User agent"
 msgstr "ユーザーエージェント"
 
-#: audits/models.py:124
+#: audits/models.py:126
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
 #: users/forms/profile.py:64 users/models/user.py:684
 #: users/serializers/profile.py:121
 msgid "MFA"
 msgstr "MFA"
 
-#: audits/models.py:126 terminal/models/status.py:33
+#: audits/models.py:128 terminal/models/status.py:33
 #: tickets/models/ticket.py:140 xpack/plugins/cloud/models.py:175
 #: xpack/plugins/cloud/models.py:227
 msgid "Status"
 msgstr "ステータス"
 
-#: audits/models.py:127
+#: audits/models.py:129
 msgid "Date login"
 msgstr "日付ログイン"
 
-#: audits/models.py:128 audits/serializers.py:46
+#: audits/models.py:130 audits/serializers.py:46
 msgid "Authentication backend"
 msgstr "認証バックエンド"
 
-#: audits/models.py:167
+#: audits/models.py:169
 msgid "User login log"
 msgstr "ユーザーログインログ"
 
@@ -1544,198 +1548,198 @@ msgstr "ディスプレイとして実行する"
 msgid "User display"
 msgstr "ユーザー表示"
 
-#: audits/signal_handlers.py:67
+#: audits/signal_handlers.py:47
 msgid "SSH Key"
 msgstr "SSHキー"
 
-#: audits/signal_handlers.py:69
+#: audits/signal_handlers.py:49
 msgid "SSO"
 msgstr "SSO"
 
-#: audits/signal_handlers.py:70
+#: audits/signal_handlers.py:50
 msgid "Auth Token"
 msgstr "認証トークン"
 
-#: audits/signal_handlers.py:71 authentication/notifications.py:73
+#: audits/signal_handlers.py:51 authentication/notifications.py:73
 #: authentication/views/login.py:164 authentication/views/wecom.py:181
 #: notifications/backends/__init__.py:11 users/models/user.py:720
 msgid "WeCom"
 msgstr "企業微信"
 
-#: audits/signal_handlers.py:72 authentication/views/dingtalk.py:182
+#: audits/signal_handlers.py:52 authentication/views/dingtalk.py:182
 #: authentication/views/login.py:170 notifications/backends/__init__.py:12
 #: users/models/user.py:721
 msgid "DingTalk"
 msgstr "DingTalk"
 
-#: audits/signal_handlers.py:73 authentication/models.py:76
+#: audits/signal_handlers.py:53 authentication/models.py:76
 msgid "Temporary token"
 msgstr "仮パスワード"
 
-#: audits/signal_handlers.py:107
+#: audits/signal_handlers.py:65
 msgid "User and Group"
 msgstr "ユーザーとグループ"
 
-#: audits/signal_handlers.py:108
+#: audits/signal_handlers.py:66
 #, python-brace-format
 msgid "{User} JOINED {UserGroup}"
 msgstr "{User} に参加 {UserGroup}"
 
-#: audits/signal_handlers.py:109
+#: audits/signal_handlers.py:67
 #, python-brace-format
 msgid "{User} LEFT {UserGroup}"
 msgstr "{User} のそばを通る {UserGroup}"
 
-#: audits/signal_handlers.py:112
+#: audits/signal_handlers.py:70
 msgid "Asset and SystemUser"
 msgstr "資産およびシステム・ユーザー"
 
-#: audits/signal_handlers.py:113
+#: audits/signal_handlers.py:71
 #, python-brace-format
 msgid "{Asset} ADD {SystemUser}"
 msgstr "{Asset} 追加 {SystemUser}"
 
-#: audits/signal_handlers.py:114
+#: audits/signal_handlers.py:72
 #, python-brace-format
 msgid "{Asset} REMOVE {SystemUser}"
 msgstr "{Asset} 削除 {SystemUser}"
 
-#: audits/signal_handlers.py:117
+#: audits/signal_handlers.py:75
 msgid "Node and Asset"
 msgstr "ノードと資産"
 
-#: audits/signal_handlers.py:118
+#: audits/signal_handlers.py:76
 #, python-brace-format
 msgid "{Node} ADD {Asset}"
 msgstr "{Node} 追加 {Asset}"
 
-#: audits/signal_handlers.py:119
+#: audits/signal_handlers.py:77
 #, python-brace-format
 msgid "{Node} REMOVE {Asset}"
 msgstr "{Node} 削除 {Asset}"
 
-#: audits/signal_handlers.py:122
+#: audits/signal_handlers.py:80
 msgid "User asset permissions"
 msgstr "ユーザー資産の権限"
 
-#: audits/signal_handlers.py:123
+#: audits/signal_handlers.py:81
 #, python-brace-format
 msgid "{AssetPermission} ADD {User}"
 msgstr "{AssetPermission} 追加 {User}"
 
-#: audits/signal_handlers.py:124
+#: audits/signal_handlers.py:82
 #, python-brace-format
 msgid "{AssetPermission} REMOVE {User}"
 msgstr "{AssetPermission} 削除 {User}"
 
-#: audits/signal_handlers.py:127
+#: audits/signal_handlers.py:85
 msgid "User group asset permissions"
 msgstr "ユーザーグループの資産権限"
 
-#: audits/signal_handlers.py:128
+#: audits/signal_handlers.py:86
 #, python-brace-format
 msgid "{AssetPermission} ADD {UserGroup}"
 msgstr "{AssetPermission} 追加 {UserGroup}"
 
-#: audits/signal_handlers.py:129
+#: audits/signal_handlers.py:87
 #, python-brace-format
 msgid "{AssetPermission} REMOVE {UserGroup}"
 msgstr "{AssetPermission} 削除 {UserGroup}"
 
-#: audits/signal_handlers.py:132 perms/models/asset_permission.py:29
+#: audits/signal_handlers.py:90 perms/models/asset_permission.py:29
 msgid "Asset permission"
 msgstr "資産権限"
 
-#: audits/signal_handlers.py:133
+#: audits/signal_handlers.py:91
 #, python-brace-format
 msgid "{AssetPermission} ADD {Asset}"
 msgstr "{AssetPermission} 追加 {Asset}"
 
-#: audits/signal_handlers.py:134
+#: audits/signal_handlers.py:92
 #, python-brace-format
 msgid "{AssetPermission} REMOVE {Asset}"
 msgstr "{AssetPermission} 削除 {Asset}"
 
-#: audits/signal_handlers.py:137
+#: audits/signal_handlers.py:95
 msgid "Node permission"
 msgstr "ノード権限"
 
-#: audits/signal_handlers.py:138
+#: audits/signal_handlers.py:96
 #, python-brace-format
 msgid "{AssetPermission} ADD {Node}"
 msgstr "{AssetPermission} 追加 {Node}"
 
-#: audits/signal_handlers.py:139
+#: audits/signal_handlers.py:97
 #, python-brace-format
 msgid "{AssetPermission} REMOVE {Node}"
 msgstr "{AssetPermission} 削除 {Node}"
 
-#: audits/signal_handlers.py:142
+#: audits/signal_handlers.py:100
 msgid "Asset permission and SystemUser"
 msgstr "資産権限とSystemUser"
 
-#: audits/signal_handlers.py:143
+#: audits/signal_handlers.py:101
 #, python-brace-format
 msgid "{AssetPermission} ADD {SystemUser}"
 msgstr "{AssetPermission} 追加 {SystemUser}"
 
-#: audits/signal_handlers.py:144
+#: audits/signal_handlers.py:102
 #, python-brace-format
 msgid "{AssetPermission} REMOVE {SystemUser}"
 msgstr "{AssetPermission} 削除 {SystemUser}"
 
-#: audits/signal_handlers.py:147
+#: audits/signal_handlers.py:105
 msgid "User application permissions"
 msgstr "ユーザーアプリケーションの権限"
 
-#: audits/signal_handlers.py:148
+#: audits/signal_handlers.py:106
 #, python-brace-format
 msgid "{ApplicationPermission} ADD {User}"
 msgstr "{ApplicationPermission} 追加 {User}"
 
-#: audits/signal_handlers.py:149
+#: audits/signal_handlers.py:107
 #, python-brace-format
 msgid "{ApplicationPermission} REMOVE {User}"
 msgstr "{ApplicationPermission} 削除 {User}"
 
-#: audits/signal_handlers.py:152
+#: audits/signal_handlers.py:110
 msgid "User group application permissions"
 msgstr "ユーザーグループアプリケーションの権限"
 
-#: audits/signal_handlers.py:153
+#: audits/signal_handlers.py:111
 #, python-brace-format
 msgid "{ApplicationPermission} ADD {UserGroup}"
 msgstr "{ApplicationPermission} 追加 {UserGroup}"
 
-#: audits/signal_handlers.py:154
+#: audits/signal_handlers.py:112
 #, python-brace-format
 msgid "{ApplicationPermission} REMOVE {UserGroup}"
 msgstr "{ApplicationPermission} 削除 {UserGroup}"
 
-#: audits/signal_handlers.py:157 perms/models/application_permission.py:38
+#: audits/signal_handlers.py:115 perms/models/application_permission.py:38
 msgid "Application permission"
 msgstr "申請許可"
 
-#: audits/signal_handlers.py:158
+#: audits/signal_handlers.py:116
 #, python-brace-format
 msgid "{ApplicationPermission} ADD {Application}"
 msgstr "{ApplicationPermission} 追加 {Application}"
 
-#: audits/signal_handlers.py:159
+#: audits/signal_handlers.py:117
 #, python-brace-format
 msgid "{ApplicationPermission} REMOVE {Application}"
 msgstr "{ApplicationPermission} 削除 {Application}"
 
-#: audits/signal_handlers.py:162
+#: audits/signal_handlers.py:120
 msgid "Application permission and SystemUser"
 msgstr "アプリケーション権限とSystemUser"
 
-#: audits/signal_handlers.py:163
+#: audits/signal_handlers.py:121
 #, python-brace-format
 msgid "{ApplicationPermission} ADD {SystemUser}"
 msgstr "{ApplicationPermission} 追加 {SystemUser}"
 
-#: audits/signal_handlers.py:164
+#: audits/signal_handlers.py:122
 #, python-brace-format
 msgid "{ApplicationPermission} REMOVE {SystemUser}"
 msgstr "{ApplicationPermission} 削除 {SystemUser}"
@@ -2578,6 +2582,19 @@ msgstr "は破棄されます"
 msgid "discard time"
 msgstr "時間を捨てる"
 
+#: common/mixins/views.py:41
+msgid "Export all"
+msgstr "すべてエクスポート"
+
+#: common/mixins/views.py:43
+msgid "Export only selected items"
+msgstr "選択項目のみエクスポート"
+
+#: common/mixins/views.py:48
+#, python-format
+msgid "Export filtered: %s"
+msgstr "検索のエクスポート: %s"
+
 #: common/sdk/im/exceptions.py:23
 msgid "Network error, please contact system administrator"
 msgstr "ネットワークエラー、システム管理者に連絡してください"
@@ -2901,12 +2918,12 @@ msgstr ""
 msgid "The organization have resource ({}) cannot be deleted"
 msgstr "組織のリソース ({}) は削除できません"
 
-#: orgs/apps.py:7 rbac/tree.py:114
+#: orgs/apps.py:7 rbac/tree.py:115
 msgid "App organizations"
 msgstr "アプリ組織"
 
 #: orgs/mixins/models.py:46 orgs/mixins/serializers.py:25 orgs/models.py:80
-#: orgs/models.py:211 rbac/const.py:7 rbac/models/rolebinding.py:47
+#: orgs/models.py:211 rbac/const.py:7 rbac/models/rolebinding.py:48
 #: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:59
 #: tickets/serializers/ticket/ticket.py:77
 msgid "Organization"
@@ -2920,7 +2937,7 @@ msgstr "グローバル組織"
 msgid "Can view root org"
 msgstr "グローバル組織を表示できます"
 
-#: orgs/models.py:216 rbac/models/role.py:46 rbac/models/rolebinding.py:43
+#: orgs/models.py:216 rbac/models/role.py:46 rbac/models/rolebinding.py:44
 #: users/models/user.py:671
 msgid "Role"
 msgstr "ロール"
@@ -3133,27 +3150,27 @@ msgstr "{} 少なくとも1つのシステムロール"
 msgid "RBAC"
 msgstr "RBAC"
 
-#: rbac/builtin.py:101
+#: rbac/builtin.py:109
 msgid "SystemAdmin"
 msgstr "システム管理者"
 
-#: rbac/builtin.py:104
+#: rbac/builtin.py:112
 msgid "SystemAuditor"
 msgstr "システム監査人"
 
-#: rbac/builtin.py:107
+#: rbac/builtin.py:115
 msgid "SystemComponent"
 msgstr "システムコンポーネント"
 
-#: rbac/builtin.py:113
+#: rbac/builtin.py:121
 msgid "OrgAdmin"
 msgstr "組織管理者"
 
-#: rbac/builtin.py:116
+#: rbac/builtin.py:124
 msgid "OrgAuditor"
 msgstr "監査員を組織する"
 
-#: rbac/builtin.py:119
+#: rbac/builtin.py:127
 msgid "OrgUser"
 msgstr "組織ユーザー"
 
@@ -3185,7 +3202,7 @@ msgstr "ファイルマネージャを表示できます"
 msgid "Permission"
 msgstr "権限"
 
-#: rbac/models/role.py:31 rbac/models/rolebinding.py:37
+#: rbac/models/role.py:31 rbac/models/rolebinding.py:38
 msgid "Scope"
 msgstr "スコープ"
 
@@ -3205,22 +3222,22 @@ msgstr "システムの役割"
 msgid "Organization role"
 msgstr "組織の役割"
 
-#: rbac/models/rolebinding.py:52
+#: rbac/models/rolebinding.py:53
 msgid "Role binding"
 msgstr "ロールバインディング"
 
-#: rbac/models/rolebinding.py:151
+#: rbac/models/rolebinding.py:159
 msgid ""
 "User last role in org, can not be delete, you can remove user from org "
 "instead"
 msgstr ""
 "ユーザーの最後のロールは削除できません。ユーザーを組織から削除できます。"
 
-#: rbac/models/rolebinding.py:158
+#: rbac/models/rolebinding.py:166
 msgid "Organization role binding"
 msgstr "組織の役割バインディング"
 
-#: rbac/models/rolebinding.py:173
+#: rbac/models/rolebinding.py:181
 msgid "System role binding"
 msgstr "システムロールバインディング"
 
@@ -3244,93 +3261,89 @@ msgstr "ロール表示"
 msgid "Has bound this role"
 msgstr "この役割をバインドしました"
 
-#: rbac/tree.py:19 rbac/tree.py:20
+#: rbac/tree.py:20 rbac/tree.py:21
 msgid "All permissions"
 msgstr "すべての権限"
 
-#: rbac/tree.py:26
+#: rbac/tree.py:27
 msgid "Console view"
 msgstr "コンソールビュー"
 
-#: rbac/tree.py:27
+#: rbac/tree.py:28
 msgid "Workbench view"
 msgstr "ワークスペースビュー"
 
-#: rbac/tree.py:28
+#: rbac/tree.py:29
 msgid "Audit view"
 msgstr "監査ビュー"
 
-#: rbac/tree.py:29 settings/models.py:140
+#: rbac/tree.py:30 settings/models.py:140
 msgid "System setting"
 msgstr "システム設定"
 
-#: rbac/tree.py:30
+#: rbac/tree.py:31
 msgid "Other"
 msgstr "その他"
 
-#: rbac/tree.py:38
+#: rbac/tree.py:39
 msgid "Accounts"
 msgstr "アカウント"
 
-#: rbac/tree.py:42
+#: rbac/tree.py:43
 msgid "Session audits"
 msgstr "セッション監査"
 
-#: rbac/tree.py:52
+#: rbac/tree.py:53
 msgid "Cloud import"
 msgstr "クラウドインポート"
 
-#: rbac/tree.py:53
+#: rbac/tree.py:54
 msgid "Backup account"
 msgstr "バックアップアカウント"
 
-#: rbac/tree.py:54
+#: rbac/tree.py:55
 msgid "Gather account"
 msgstr "アカウントを集める"
 
-#: rbac/tree.py:55
+#: rbac/tree.py:56
 msgid "App change auth"
 msgstr "応用改密"
 
-#: rbac/tree.py:56
+#: rbac/tree.py:57
 msgid "Asset change auth"
 msgstr "資産の改ざん"
 
-#: rbac/tree.py:57
+#: rbac/tree.py:58
 msgid "Terminal setting"
 msgstr "ターミナル設定"
 
-#: rbac/tree.py:58
+#: rbac/tree.py:59
 msgid "My assets"
 msgstr "私の資産"
 
-#: rbac/tree.py:59
+#: rbac/tree.py:60
 msgid "My apps"
 msgstr "マイアプリ"
 
-#: rbac/tree.py:115
+#: rbac/tree.py:116
 msgid "Ticket comment"
 msgstr "チケットコメント"
 
-#: rbac/tree.py:116 tickets/models/ticket.py:163
+#: rbac/tree.py:117 tickets/models/ticket.py:163
 msgid "Ticket"
 msgstr "チケット"
 
-#: rbac/tree.py:117
+#: rbac/tree.py:118
 msgid "Common setting"
 msgstr "共通設定"
 
-#: rbac/tree.py:118
+#: rbac/tree.py:119
 msgid "View permission tree"
 msgstr "権限ツリーの表示"
 
-#: rbac/tree.py:119
+#: rbac/tree.py:120
 msgid "Execute batch command"
 msgstr "バッチ実行コマンド"
-
-#: rbac/tree.py:166
-msgid "View"
-msgstr "表示"
 
 #: settings/api/alibaba_sms.py:31 settings/api/tencent_sms.py:35
 msgid "test_phone is required"
@@ -4513,9 +4526,7 @@ msgstr "ホームページ"
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: templates/resource_download.html:18 templates/resource_download.html:24
-#: templates/resource_download.html:25 templates/resource_download.html:30
-#: templates/resource_download.html:40
+#: templates/resource_download.html:18 templates/resource_download.html:30
 msgid "Client"
 msgstr "クライアント"
 
@@ -4544,19 +4555,11 @@ msgstr ""
 "MacOSは、Windowsに付属のRDPアセットを接続するためにクライアントをダウンロード"
 "する必要があります"
 
-#: templates/resource_download.html:42
-msgid ""
-"Windows needs to download the client to connect SSH assets, and the MacOS "
-"system uses its own terminal"
-msgstr ""
-"WindowsはクライアントをダウンロードしてSSH資産に接続する必要があり、macOSシス"
-"テムは独自のTerminalを採用している。"
-
-#: templates/resource_download.html:53
+#: templates/resource_download.html:41
 msgid "Windows Remote application publisher tools"
 msgstr "Windowsリモートアプリケーション発行者ツール"
 
-#: templates/resource_download.html:54
+#: templates/resource_download.html:42
 msgid ""
 "Jmservisor is the program used to pull up remote applications in Windows "
 "Remote Application publisher"

@@ -49,10 +49,12 @@ class FTPLog(OrgModelMixin):
 
 class OperateLog(OrgModelMixin):
     ACTION_CREATE = 'create'
+    ACTION_VIEW = 'view'
     ACTION_UPDATE = 'update'
     ACTION_DELETE = 'delete'
     ACTION_CHOICES = (
         (ACTION_CREATE, _("Create")),
+        (ACTION_VIEW, _("View")),
         (ACTION_UPDATE, _("Update")),
         (ACTION_DELETE, _("Delete"))
     )

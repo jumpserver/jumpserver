@@ -6,6 +6,7 @@ from django.db.models import F, Q
 
 from common.drf.filters import BaseFilterSet
 from common.drf.api import JMSBulkModelViewSet
+from common.mixins import RecordViewLogMixin
 from rbac.permissions import RBACPermission
 from assets.models import SystemUser
 from ..models import Account
@@ -54,7 +55,7 @@ class SystemUserAppRelationViewSet(ApplicationAccountViewSet):
     perm_model = SystemUser
 
 
-class ApplicationAccountSecretViewSet(ApplicationAccountViewSet):
+class ApplicationAccountSecretViewSet(RecordViewLogMixin, ApplicationAccountViewSet):
     serializer_class = serializers.AppAccountSecretSerializer
     permission_classes = [RBACPermission, NeedMFAVerify]
     http_method_names = ['get', 'options']
