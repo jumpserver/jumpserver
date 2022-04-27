@@ -91,7 +91,7 @@ exclude_permissions = (
 
 
 only_system_permissions = (
-    ('assets', 'platform', '*', '*'),
+    ('assets', 'platform', 'add,change,delete', 'platform'),
     ('users', 'user', 'delete', 'user'),
     ('rbac', 'role', 'delete,add,change', 'role'),
     ('rbac', 'systemrole', '*', '*'),
