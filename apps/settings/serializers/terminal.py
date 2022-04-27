@@ -35,4 +35,4 @@ class TerminalSettingSerializer(serializers.Serializer):
     )
     TERMINAL_MAGNUS_ENABLED = serializers.BooleanField(label=_("Enable database proxy"))
     XRDP_ENABLED = serializers.BooleanField(label=_("Enable XRDP"))
-    TERMINAL_KOKO_SSH_ENABLED = serializers.BooleanField(label=_("Enable KoKo SSH"))
+    TERMINAL_KOKO_SSH_ENABLED = serializers.BooleanField(label=_("Enable SSH Client"))
