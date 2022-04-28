@@ -42,11 +42,11 @@ class AssetPaginationBase(LimitOffsetPagination):
 class NodeAssetTreePagination(AssetPaginationBase):
     def get_count_from_nodes(self, queryset):
         is_query_all = self._view.is_query_node_all_assets
-        if is_query_all:
-            node = self._view.node
-            if not node:
-                node = Node.org_root()
-            if node:
-                logger.debug(f'Hit node.assets_amount[{node.assets_amount}] -> {self._request.get_full_path()}')
-                return node.assets_amount
-        return None
+        if not is_query_all:
+            return None
+        node = self._view.node
+        if not node:
+            node = Node.org_root()
+        if node:
+            logger.debug(f'Hit node assets_amount cache: [{node.assets_amount}]')
+            return node.assets_amount

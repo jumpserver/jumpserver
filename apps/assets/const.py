@@ -46,9 +46,9 @@ class DatabaseTypes(models.TextChoices):
 
 class RemoteAppTypes(models.TextChoices):
     CHROME = 'chrome', 'Chrome'
-    VSPHERE = 'vsphere', 'vSphere client'
+    VSPHERE = 'vmware_client', 'vSphere client'
     MYSQL_WORKBENCH = 'mysql_workbench', 'MySQL workbench'
-    CUSTOM_REMOTE_APP = 'custom_remote_app', _("Custom")
+    GENERAL_REMOTE_APP = 'general_remote_app', _("Custom")
 
 
 class CloudTypes(models.TextChoices):

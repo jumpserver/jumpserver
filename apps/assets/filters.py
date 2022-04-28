@@ -68,6 +68,7 @@ class FilterAssetByNodeFilterBackend(filters.BaseFilterBackend):
                 Q(nodes__key=node.key)
             ).distinct()
         else:
+            print("Query query origin: ", queryset.count())
             return queryset.filter(nodes__key=node.key).distinct()
 
 

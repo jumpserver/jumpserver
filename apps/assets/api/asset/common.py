@@ -49,7 +49,8 @@ class AssetViewSet(SuggestionMixin, FilterAssetByNodeMixin, OrgBulkModelViewSet)
         'gateways': 'assets.view_gateway'
     }
     extra_filter_backends = [
-        FilterAssetByNodeFilterBackend, LabelFilterBackend,
+        FilterAssetByNodeFilterBackend,
+        LabelFilterBackend,
         IpInFilterBackend,
     ]
 

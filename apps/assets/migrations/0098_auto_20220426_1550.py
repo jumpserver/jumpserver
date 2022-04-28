@@ -36,8 +36,20 @@ class Migration(migrations.Migration):
             name='RemoteApp',
             fields=[
                 ('asset_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='assets.asset')),
+                ('connect_host', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='assets.host')),
                 ('app_path', models.CharField(max_length=1024, verbose_name='App path')),
                 ('attrs', models.JSONField(default=dict, verbose_name='Attrs')),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=('assets.asset',),
+        ),
+        migrations.CreateModel(
+            name='Cloud',
+            fields=[
+                ('asset_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='assets.asset')),
+                ('cluster', models.CharField(max_length=4096, verbose_name='Cluster')),
             ],
             options={
                 'abstract': False,
