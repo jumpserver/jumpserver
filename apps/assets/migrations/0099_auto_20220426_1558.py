@@ -101,6 +101,7 @@ def migrate_remote_app_to_asset(apps, *args):
         print("Create remote app: {}".format(app.name))
         remote_app = remote_app_model(
             id=app.id, hostname=app.name, ip='',
+            protocols='',
             category='remote_app', type=tp,
             platform=platforms_map[tp],
             org_id=app.org_id,
@@ -130,6 +131,7 @@ def migrate_cloud_to_asset(apps, *args):
         cloud = cloud_model(
             id=app.id, hostname=app.name, ip='',
             category='remote_app', type='k8s',
+            protocols='',
             platform=platform,
             org_id=app.org_id,
             cluster=attrs.get('cluster', '')

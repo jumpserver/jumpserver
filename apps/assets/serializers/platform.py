@@ -3,6 +3,7 @@ from django.core.validators import RegexValidator
 from django.utils.translation import gettext_lazy as _
 
 from assets.models import Platform
+from assets.const import AllTypes
 
 __all__ = ['PlatformSerializer']
 
@@ -11,6 +12,7 @@ class PlatformSerializer(serializers.ModelSerializer):
     category_display = serializers.ReadOnlyField(source='get_category_display', label=_("Category display"))
     type_display = serializers.ReadOnlyField(source='get_type_display', label=_("Type display"))
     meta = serializers.DictField(required=False, allow_null=True, label=_('Meta'))
+    type = serializers.ChoiceField(choices=AllTypes.grouped_choices(), label=_("Type"))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

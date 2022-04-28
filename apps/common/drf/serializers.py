@@ -3,10 +3,11 @@ from rest_framework import serializers
 from rest_framework.serializers import Serializer
 from rest_framework.serializers import ModelSerializer
 from rest_framework_bulk.serializers import BulkListSerializer
-
-from common.mixins import BulkListSerializerMixin
+from django.utils.translation import gettext_lazy as _
 from django.utils.functional import cached_property
 from rest_framework.utils.serializer_helpers import BindingDict
+
+from common.mixins import BulkListSerializerMixin
 from common.mixins.serializers import BulkSerializerMixin
 
 __all__ = [
@@ -82,4 +83,12 @@ class AdaptedBulkListSerializer(BulkListSerializerMixin, BulkListSerializer):
 class CeleryTaskSerializer(serializers.Serializer):
     task = serializers.CharField(read_only=True)
 
+
+class ChoiceSerializer(serializers.Serializer):
+    display_name = serializers.CharField(label=_("Display name"))
+    value = serializers.CharField(label=_("Value"))
+
+
+class GroupedChoiceSerailizer(ChoiceSerializer):
+    children = ChoiceSerializer(many=True, label=_("Children"))
 

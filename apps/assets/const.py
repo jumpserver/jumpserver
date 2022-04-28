@@ -11,7 +11,7 @@ __all__ = [
 
 class Category(models.TextChoices):
     HOST = 'host', _('Host')
-    NETWORK = 'network', _("Networking")
+    NETWORK = 'network', _("NetworkDevice")
     DATABASE = 'database', _("Database")
     REMOTE_APP = 'remote_app', _("Remote app")
     CLOUD = 'cloud', _("Clouding")
@@ -61,6 +61,32 @@ class AllTypes(metaclass=IncludesTextChoicesMeta):
         HostTypes, NetworkTypes, DatabaseTypes,
         RemoteAppTypes, CloudTypes
     ]
+
+    @classmethod
+    def grouped_choices(cls):
+        grouped_types= [
+            (Category.HOST.value, HostTypes.choices),
+            (Category.NETWORK.value, NetworkTypes.choices),
+            (Category.DATABASE.value, DatabaseTypes.choices),
+            (Category.REMOTE_APP.value, RemoteAppTypes.choices),
+            (Category.CLOUD.value, CloudTypes.choices),
+        ]
+        return grouped_types
+
+    @classmethod
+    def grouped_choices_to_objs(cls):
+        choices = cls.serialize_to_objs(Category.choices)
+        mapper = dict(cls.grouped_choices())
+        for choice in choices:
+            children = cls.serialize_to_objs(mapper[choice['value']])
+            choice['children'] = children
+        return choices
+
+    @staticmethod
+    def serialize_to_objs(choices):
+        title = ['value', 'display_name']
+        return [dict(zip(title, choice)) for choice in choices]
+
 
 
 class Protocol(models.TextChoices):
