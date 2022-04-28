@@ -197,9 +197,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # migrations.RunPython(create_app_platform),
-        # migrations.RunPython(migrate_database_to_asset),
-        # migrations.RunPython(migrate_remote_app_to_asset),
-        # migrations.RunPython(migrate_cloud_to_asset),
+        migrations.RunPython(create_app_platform),
+        migrations.RunPython(migrate_database_to_asset),
+        migrations.RunPython(migrate_remote_app_to_asset),
+        migrations.RunPython(migrate_cloud_to_asset),
         migrations.RunPython(migrate_to_nodes)
     ]
