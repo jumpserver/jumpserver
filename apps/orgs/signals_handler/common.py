@@ -45,19 +45,7 @@ def subscribe_orgs_mapping_expire(sender, **kwargs):
     logger.debug("Start subscribe for expire orgs mapping from memory")
 
     def keep_subscribe():
-        while True:
-            try:
-                subscribe = orgs_mapping_for_memory_pub_sub.subscribe()
-                for message in subscribe.listen():
-                    if message['type'] != 'message':
-                        continue
-                    if message['data'] == b'error':
-                        raise ValueError
-                    Organization.expire_orgs_mapping()
-                    logger.debug('Expire orgs mapping')
-            except Exception as e:
-                logger.exception(f'subscribe_orgs_mapping_expire: {e}')
-                Organization.expire_orgs_mapping()
+        orgs_mapping_for_memory_pub_sub.subscribe(lambda org_id: Organization.expire_orgs_mapping())
 
     t = threading.Thread(target=keep_subscribe)
     t.daemon = True

@@ -1,4 +1,7 @@
+from contextlib import contextmanager
 from common.utils import get_logger
+from django.db import connections
+
 
 logger = get_logger(__file__)
 
@@ -38,3 +41,16 @@ def get_objects(model, pks):
         not_found_pks = pks - exists_pks
         logger.error(f'DoesNotExist: <{model.__name__}: {not_found_pks}>')
     return objs
+
+
+# 复制 django.db.close_old_connections, 因为它没有导出，ide 提示有问题
+def close_old_connections():
+    for conn in connections.all():
+        conn.close_if_unusable_or_obsolete()
+
+
+@contextmanager
+def safe_db_connection():
+    close_old_connections()
+    yield
+    close_old_connections()

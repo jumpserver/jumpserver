@@ -6,7 +6,6 @@ import threading
 from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save
 from django.utils.functional import LazyObject
-from django.db import close_old_connections
 
 from jumpserver.utils import current_request
 from common.decorator import on_transaction_commit
@@ -72,20 +71,7 @@ def subscribe_settings_change(sender, **kwargs):
     logger.debug("Start subscribe setting change")
 
     def keep_subscribe():
-        while True:
-            try:
-                sub = setting_pub_sub.subscribe()
-                for msg in sub.listen():
-                    close_old_connections()
-                    if msg["type"] != "message":
-                        continue
-                    item = msg['data'].decode()
-                    logger.debug("Found setting change: {}".format(str(item)))
-                    Setting.refresh_item(item)
-            except Exception as e:
-                logger.exception(f'subscribe_settings_change: {e}')
-                close_old_connections()
-                Setting.refresh_all_settings()
+        setting_pub_sub.subscribe(lambda name: Setting.refresh_item(name))
 
     t = threading.Thread(target=keep_subscribe)
     t.daemon = True

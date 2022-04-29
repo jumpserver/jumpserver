@@ -1,9 +1,9 @@
 import threading
 import json
-
 from channels.generic.websocket import JsonWebsocketConsumer
 
 from common.utils import get_logger
+from common.db.utils import safe_db_connection
 from .site_msg import SiteMessageUtil
 from .signals_handler import new_site_msg_chan
 
@@ -11,17 +11,14 @@ logger = get_logger(__name__)
 
 
 class SiteMsgWebsocket(JsonWebsocketConsumer):
-    disconnected = False
     refresh_every_seconds = 10
-    subscribe = None
+    sub = None
 
     def connect(self):
         user = self.scope["user"]
         if user.is_authenticated:
             self.accept()
-
-            thread = threading.Thread(target=self.unread_site_msg_count)
-            thread.start()
+            self.sub = self.watch_recv_new_site_msg()
         else:
             self.close()
 
@@ -44,30 +41,23 @@ class SiteMsgWebsocket(JsonWebsocketConsumer):
         logger.debug('Send unread count to user: {} {}'.format(user_id, unread_count))
         self.send_json({'type': 'unread_count', 'unread_count': unread_count})
 
-    def unread_site_msg_count(self):
+    def watch_recv_new_site_msg(self):
+        ws = self
         user_id = str(self.scope["user"].id)
-        self.send_unread_msg_count()
 
-        while not self.disconnected:
-            subscribe = new_site_msg_chan.subscribe()
-            self.subscribe = subscribe
-            for message in subscribe.listen():
-                if message['type'] != 'message':
-                    continue
-                try:
-                    msg = json.loads(message['data'].decode())
-                    logger.debug('New site msg recv, may be mine: {}'.format(msg))
-                    if not msg:
-                        continue
-                    users = msg.get('users', [])
-                    logger.debug('Message users: {}'.format(users))
-                    if user_id in users:
-                        self.send_unread_msg_count()
-                except json.JSONDecoder as e:
-                    logger.debug('Decode json error: ', e)
+        # 先发一个消息再说
+        with safe_db_connection():
+            self.send_unread_msg_count()
 
-    def disconnect(self, close_code):
-        self.disconnected = True
-        self.close()
-        if self.subscribe:
-            self.subscribe.close()
+        def handle_new_site_msg_recv(msg):
+            users = msg.get('users', [])
+            logger.debug('New site msg recv, message users: {}'.format(users))
+            if user_id in users:
+                ws.send_unread_msg_count()
+
+        return new_site_msg_chan.subscribe(handle_new_site_msg_recv)
+
+    def disconnect(self, code):
+        if self.sub:
+            self.sub.unsubscribe()
+
