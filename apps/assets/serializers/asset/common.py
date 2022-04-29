@@ -57,9 +57,6 @@ class ProtocolsField(serializers.ListField):
 
 
 class AssetSerializer(BulkOrgResourceModelSerializer):
-    platform = serializers.SlugRelatedField(
-        slug_field='name', queryset=Platform.objects.all(), label=_("Platform")
-    )
     protocols = ProtocolsField(label=_('Protocols'), required=False, default=['ssh/22'])
     domain_display = serializers.ReadOnlyField(source='domain.name', label=_('Domain name'))
     nodes_display = serializers.ListField(
@@ -97,6 +94,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
         ]
         fields = fields_small + fields_fk + fields_m2m + read_only_fields
         extra_kwargs = {
+            'hostname': {'label': _("Name")},
+            'ip': {'label': 'Address'},
             'protocol': {'write_only': True},
             'port': {'write_only': True},
             'admin_user_display': {'label': _('Admin user display'), 'read_only': True},
@@ -177,7 +176,10 @@ class MiniAssetSerializer(serializers.ModelSerializer):
 class AssetSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Asset
-        fields = ['id', 'hostname', 'ip', 'port', 'connectivity', 'date_verified']
+        fields = [
+            'id', 'hostname', 'ip', 'port',
+            'connectivity', 'date_verified'
+        ]
 
 
 class AssetsTaskSerializer(serializers.Serializer):

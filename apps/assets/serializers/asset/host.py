@@ -1,9 +1,9 @@
 from rest_framework import serializers
 
 from .common import AssetSerializer
-from assets.models import DeviceInfo, Host
+from assets.models import DeviceInfo, Host, Database
 
-__all__ = ['DeviceSerializer', 'HostSerializer']
+__all__ = ['DeviceSerializer', 'HostSerializer', 'DatabaseSerializer']
 
 
 class DeviceSerializer(serializers.ModelSerializer):
@@ -23,3 +23,9 @@ class HostSerializer(AssetSerializer):
     class Meta(AssetSerializer.Meta):
         model = Host
         fields = AssetSerializer.Meta.fields + ['device_info']
+
+
+class DatabaseSerializer(AssetSerializer):
+    class Meta(AssetSerializer.Meta):
+        model = Database
+        fields = AssetSerializer.Meta.fields + ['db_name']
