@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-20 16:35+0800\n"
+"POT-Creation-Date: 2022-04-29 12:49+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -88,7 +88,7 @@ msgstr "ログイン確認"
 #: assets/models/cmd_filter.py:30 assets/models/label.py:15 audits/models.py:37
 #: audits/models.py:60 audits/models.py:85 audits/serializers.py:100
 #: authentication/models.py:51 orgs/models.py:214 perms/models/base.py:84
-#: rbac/builtin.py:110 rbac/models/rolebinding.py:40
+#: rbac/builtin.py:118 rbac/models/rolebinding.py:41
 #: terminal/backends/command/models.py:20
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:44
 #: terminal/notifications.py:91 terminal/notifications.py:139
@@ -1360,7 +1360,7 @@ msgstr "監査"
 
 #: audits/models.py:27 audits/models.py:57
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:168
+#: rbac/tree.py:228
 msgid "Delete"
 msgstr "削除"
 
@@ -1413,11 +1413,11 @@ msgstr "ファイル転送ログ"
 
 #: audits/models.py:55
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:165
+#: rbac/tree.py:225
 msgid "Create"
 msgstr "作成"
 
-#: audits/models.py:56 rbac/tree.py:167 templates/_csv_import_export.html:18
+#: audits/models.py:56 rbac/tree.py:227 templates/_csv_import_export.html:18
 #: templates/_csv_update_modal.html:6
 msgid "Update"
 msgstr "更新"
@@ -2181,7 +2181,7 @@ msgstr "コードエラー"
 #: authentication/templates/authentication/_msg_reset_password.html:3
 #: authentication/templates/authentication/_msg_rest_password_success.html:2
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:2
-#: jumpserver/conf.py:299 ops/tasks.py:145 ops/tasks.py:148
+#: jumpserver/conf.py:301 ops/tasks.py:145 ops/tasks.py:148
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: perms/templates/perms/_msg_permed_items_expire.html:3
 #: users/templates/users/_msg_account_expire_reminder.html:4
@@ -2642,11 +2642,11 @@ msgstr "特殊文字を含むべきではない"
 msgid "The mobile phone number format is incorrect"
 msgstr "携帯電話番号の形式が正しくありません"
 
-#: jumpserver/conf.py:298
+#: jumpserver/conf.py:300
 msgid "Create account successfully"
 msgstr "アカウントを正常に作成"
 
-#: jumpserver/conf.py:300
+#: jumpserver/conf.py:302
 msgid "Your account has been created successfully"
 msgstr "アカウントが正常に作成されました"
 
@@ -2901,12 +2901,12 @@ msgstr ""
 msgid "The organization have resource ({}) cannot be deleted"
 msgstr "組織のリソース ({}) は削除できません"
 
-#: orgs/apps.py:7 rbac/tree.py:114
+#: orgs/apps.py:7 rbac/tree.py:115
 msgid "App organizations"
 msgstr "アプリ組織"
 
 #: orgs/mixins/models.py:46 orgs/mixins/serializers.py:25 orgs/models.py:80
-#: orgs/models.py:211 rbac/const.py:7 rbac/models/rolebinding.py:47
+#: orgs/models.py:211 rbac/const.py:7 rbac/models/rolebinding.py:48
 #: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:59
 #: tickets/serializers/ticket/ticket.py:77
 msgid "Organization"
@@ -2920,7 +2920,7 @@ msgstr "グローバル組織"
 msgid "Can view root org"
 msgstr "グローバル組織を表示できます"
 
-#: orgs/models.py:216 rbac/models/role.py:46 rbac/models/rolebinding.py:43
+#: orgs/models.py:216 rbac/models/role.py:46 rbac/models/rolebinding.py:44
 #: users/models/user.py:671
 msgid "Role"
 msgstr "ロール"
@@ -3133,27 +3133,27 @@ msgstr "{} 少なくとも1つのシステムロール"
 msgid "RBAC"
 msgstr "RBAC"
 
-#: rbac/builtin.py:101
+#: rbac/builtin.py:109
 msgid "SystemAdmin"
 msgstr "システム管理者"
 
-#: rbac/builtin.py:104
+#: rbac/builtin.py:112
 msgid "SystemAuditor"
 msgstr "システム監査人"
 
-#: rbac/builtin.py:107
+#: rbac/builtin.py:115
 msgid "SystemComponent"
 msgstr "システムコンポーネント"
 
-#: rbac/builtin.py:113
+#: rbac/builtin.py:121
 msgid "OrgAdmin"
 msgstr "組織管理者"
 
-#: rbac/builtin.py:116
+#: rbac/builtin.py:124
 msgid "OrgAuditor"
 msgstr "監査員を組織する"
 
-#: rbac/builtin.py:119
+#: rbac/builtin.py:127
 msgid "OrgUser"
 msgstr "組織ユーザー"
 
@@ -3185,7 +3185,7 @@ msgstr "ファイルマネージャを表示できます"
 msgid "Permission"
 msgstr "権限"
 
-#: rbac/models/role.py:31 rbac/models/rolebinding.py:37
+#: rbac/models/role.py:31 rbac/models/rolebinding.py:38
 msgid "Scope"
 msgstr "スコープ"
 
@@ -3205,22 +3205,22 @@ msgstr "システムの役割"
 msgid "Organization role"
 msgstr "組織の役割"
 
-#: rbac/models/rolebinding.py:52
+#: rbac/models/rolebinding.py:53
 msgid "Role binding"
 msgstr "ロールバインディング"
 
-#: rbac/models/rolebinding.py:151
+#: rbac/models/rolebinding.py:159
 msgid ""
 "User last role in org, can not be delete, you can remove user from org "
 "instead"
 msgstr ""
 "ユーザーの最後のロールは削除できません。ユーザーを組織から削除できます。"
 
-#: rbac/models/rolebinding.py:158
+#: rbac/models/rolebinding.py:166
 msgid "Organization role binding"
 msgstr "組織の役割バインディング"
 
-#: rbac/models/rolebinding.py:173
+#: rbac/models/rolebinding.py:181
 msgid "System role binding"
 msgstr "システムロールバインディング"
 
@@ -3244,91 +3244,91 @@ msgstr "ロール表示"
 msgid "Has bound this role"
 msgstr "この役割をバインドしました"
 
-#: rbac/tree.py:19 rbac/tree.py:20
+#: rbac/tree.py:20 rbac/tree.py:21
 msgid "All permissions"
 msgstr "すべての権限"
 
-#: rbac/tree.py:26
+#: rbac/tree.py:27
 msgid "Console view"
 msgstr "コンソールビュー"
 
-#: rbac/tree.py:27
+#: rbac/tree.py:28
 msgid "Workbench view"
 msgstr "ワークスペースビュー"
 
-#: rbac/tree.py:28
+#: rbac/tree.py:29
 msgid "Audit view"
 msgstr "監査ビュー"
 
-#: rbac/tree.py:29 settings/models.py:140
+#: rbac/tree.py:30 settings/models.py:140
 msgid "System setting"
 msgstr "システム設定"
 
-#: rbac/tree.py:30
+#: rbac/tree.py:31
 msgid "Other"
 msgstr "その他"
 
-#: rbac/tree.py:38
+#: rbac/tree.py:39
 msgid "Accounts"
 msgstr "アカウント"
 
-#: rbac/tree.py:42
+#: rbac/tree.py:43
 msgid "Session audits"
 msgstr "セッション監査"
 
-#: rbac/tree.py:52
+#: rbac/tree.py:53
 msgid "Cloud import"
 msgstr "クラウドインポート"
 
-#: rbac/tree.py:53
+#: rbac/tree.py:54
 msgid "Backup account"
 msgstr "バックアップアカウント"
 
-#: rbac/tree.py:54
+#: rbac/tree.py:55
 msgid "Gather account"
 msgstr "アカウントを集める"
 
-#: rbac/tree.py:55
+#: rbac/tree.py:56
 msgid "App change auth"
 msgstr "応用改密"
 
-#: rbac/tree.py:56
+#: rbac/tree.py:57
 msgid "Asset change auth"
 msgstr "資産の改ざん"
 
-#: rbac/tree.py:57
+#: rbac/tree.py:58
 msgid "Terminal setting"
 msgstr "ターミナル設定"
 
-#: rbac/tree.py:58
+#: rbac/tree.py:59
 msgid "My assets"
 msgstr "私の資産"
 
-#: rbac/tree.py:59
+#: rbac/tree.py:60
 msgid "My apps"
 msgstr "マイアプリ"
 
-#: rbac/tree.py:115
+#: rbac/tree.py:116
 msgid "Ticket comment"
 msgstr "チケットコメント"
 
-#: rbac/tree.py:116 tickets/models/ticket.py:163
+#: rbac/tree.py:117 tickets/models/ticket.py:163
 msgid "Ticket"
 msgstr "チケット"
 
-#: rbac/tree.py:117
+#: rbac/tree.py:118
 msgid "Common setting"
 msgstr "共通設定"
 
-#: rbac/tree.py:118
+#: rbac/tree.py:119
 msgid "View permission tree"
 msgstr "権限ツリーの表示"
 
-#: rbac/tree.py:119
+#: rbac/tree.py:120
 msgid "Execute batch command"
 msgstr "バッチ実行コマンド"
 
-#: rbac/tree.py:166
+#: rbac/tree.py:226
 msgid "View"
 msgstr "表示"
 
@@ -3454,7 +3454,7 @@ msgstr "ログインリダイレクトの有効化msg"
 msgid "Enable CAS Auth"
 msgstr "CAS 認証の有効化"
 
-#: settings/serializers/auth/cas.py:11 settings/serializers/auth/oidc.py:32
+#: settings/serializers/auth/cas.py:11 settings/serializers/auth/oidc.py:40
 msgid "Server url"
 msgstr "サービス側アドレス"
 
@@ -3556,79 +3556,83 @@ msgstr "クライアントID"
 msgid "Client Secret"
 msgstr "クライアント秘密"
 
-#: settings/serializers/auth/oidc.py:20
+#: settings/serializers/auth/oidc.py:26
+msgid "Client authentication method"
+msgstr "クライアント認証方式"
+
+#: settings/serializers/auth/oidc.py:28
 msgid "Share session"
 msgstr "セッションの共有"
 
-#: settings/serializers/auth/oidc.py:22
+#: settings/serializers/auth/oidc.py:30
 msgid "Ignore ssl verification"
 msgstr "Ssl検証を無視する"
 
-#: settings/serializers/auth/oidc.py:29
+#: settings/serializers/auth/oidc.py:37
 msgid "Use Keycloak"
 msgstr "Keycloakを使用する"
 
-#: settings/serializers/auth/oidc.py:35
+#: settings/serializers/auth/oidc.py:43
 msgid "Realm name"
 msgstr "レルム名"
 
-#: settings/serializers/auth/oidc.py:41
+#: settings/serializers/auth/oidc.py:49
 msgid "Enable OPENID Auth"
 msgstr "OIDC認証の有効化"
 
-#: settings/serializers/auth/oidc.py:43
+#: settings/serializers/auth/oidc.py:51
 msgid "Provider endpoint"
 msgstr "プロバイダーエンドポイント"
 
-#: settings/serializers/auth/oidc.py:46
+#: settings/serializers/auth/oidc.py:54
 msgid "Provider auth endpoint"
 msgstr "認証エンドポイントアドレス"
 
-#: settings/serializers/auth/oidc.py:49
+#: settings/serializers/auth/oidc.py:57
 msgid "Provider token endpoint"
 msgstr "プロバイダートークンエンドポイント"
 
-#: settings/serializers/auth/oidc.py:52
+#: settings/serializers/auth/oidc.py:60
 msgid "Provider jwks endpoint"
 msgstr "プロバイダーjwksエンドポイント"
 
-#: settings/serializers/auth/oidc.py:55
+#: settings/serializers/auth/oidc.py:63
 msgid "Provider userinfo endpoint"
 msgstr "プロバイダーuserinfoエンドポイント"
 
-#: settings/serializers/auth/oidc.py:58
+#: settings/serializers/auth/oidc.py:66
 msgid "Provider end session endpoint"
 msgstr "プロバイダーのセッション終了エンドポイント"
 
-#: settings/serializers/auth/oidc.py:61
+#: settings/serializers/auth/oidc.py:69
 msgid "Provider sign alg"
 msgstr "プロビダーサインalg"
 
-#: settings/serializers/auth/oidc.py:64
+#: settings/serializers/auth/oidc.py:72
 msgid "Provider sign key"
 msgstr "プロバイダ署名キー"
 
-#: settings/serializers/auth/oidc.py:66
+#: settings/serializers/auth/oidc.py:74
 msgid "Scopes"
 msgstr "スコープ"
 
-#: settings/serializers/auth/oidc.py:68
+#: settings/serializers/auth/oidc.py:76
 msgid "Id token max age"
 msgstr "IDトークンの最大年齢"
 
-#: settings/serializers/auth/oidc.py:71
+#: settings/serializers/auth/oidc.py:79
 msgid "Id token include claims"
 msgstr "IDトークンにはクレームが含まれます"
 
-#: settings/serializers/auth/oidc.py:73
+#: settings/serializers/auth/oidc.py:81
 msgid "Use state"
 msgstr "使用状態"
 
-#: settings/serializers/auth/oidc.py:74
+#: settings/serializers/auth/oidc.py:82
 msgid "Use nonce"
 msgstr "Nonceを使用"
 
-#: settings/serializers/auth/oidc.py:76 settings/serializers/auth/saml2.py:33
+#: settings/serializers/auth/oidc.py:84 settings/serializers/auth/saml2.py:33
 msgid "Always update user"
 msgstr "常にユーザーを更新"
 
@@ -4513,9 +4517,7 @@ msgstr "ホームページ"
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: templates/resource_download.html:18 templates/resource_download.html:24
-#: templates/resource_download.html:25 templates/resource_download.html:30
-#: templates/resource_download.html:40
+#: templates/resource_download.html:18 templates/resource_download.html:30
 msgid "Client"
 msgstr "クライアント"
 
@@ -4544,19 +4546,11 @@ msgstr ""
 "MacOSは、Windowsに付属のRDPアセットを接続するためにクライアントをダウンロード"
 "する必要があります"
 
-#: templates/resource_download.html:42
-msgid ""
-"Windows needs to download the client to connect SSH assets, and the MacOS "
-"system uses its own terminal"
-msgstr ""
-"WindowsはクライアントをダウンロードしてSSH資産に接続する必要があり、macOSシス"
-"テムは独自のTerminalを採用している。"
-
-#: templates/resource_download.html:53
+#: templates/resource_download.html:41
 msgid "Windows Remote application publisher tools"
 msgstr "Windowsリモートアプリケーション発行者ツール"
 
-#: templates/resource_download.html:54
+#: templates/resource_download.html:42
 msgid ""
 "Jmservisor is the program used to pull up remote applications in Windows "
 "Remote Application publisher"
@@ -6732,3 +6726,10 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "コミュニティ版"
+
+#~ msgid ""
+#~ "Windows needs to download the client to connect SSH assets, and the MacOS "
+#~ "system uses its own terminal"
+#~ msgstr ""
+#~ "WindowsはクライアントをダウンロードしてSSH資産に接続する必要があり、macOS"
+#~ "システムは独自のTerminalを採用している。"
