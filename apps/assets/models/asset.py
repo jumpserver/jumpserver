@@ -301,7 +301,7 @@ class Asset(AbsConnectivity, AbsHardwareInfo, ProtocolsMixin, NodesRelationMixin
             'private_key': auth_user.private_key_file
         }
 
-        if not with_become:
+        if not with_become or self.is_windows():
             return info
 
         if become_user:
