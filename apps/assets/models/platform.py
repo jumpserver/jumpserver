@@ -20,6 +20,27 @@ class Platform(models.Model):
     meta = JsonDictTextField(blank=True, null=True, verbose_name=_("Meta"))
     internal = models.BooleanField(default=False, verbose_name=_("Internal"))
     comment = models.TextField(blank=True, null=True, verbose_name=_("Comment"))
+    domain_enabled = models.BooleanField(default=True, verbose_name=_("Domain enabled"))
+    domain_default = models.ForeignKey(
+        'assets.Domain', null=True, on_delete=models.SET_NULL,
+        verbose_name=_("Domain default")
+    )
+    protocols_enabled = models.BooleanField(default=True, verbose_name=_("Protocols enabled"))
+    protocols_default = models.CharField(
+        max_length=128, default='', blank=True, verbose_name=_("Protocols default")
+    )
+    admin_user_enabled = models.BooleanField(default=True, verbose_name=_("Admin user enabled"))
+    admin_user_default = models.ForeignKey(
+        'assets.SystemUser', null=True, on_delete=models.SET_NULL,
+        verbose_name=_("Admin user default")
+    )
+
+    def get_type_meta(self):
+        meta = Category.platform_meta().get(self.category, {})
+        types = dict(AllTypes.category_types())[self.category]
+        type_meta = types.platform_meta().get(self.type, {})
+        meta.update(type_meta)
+        return meta
 
     @classmethod
     def default(cls):

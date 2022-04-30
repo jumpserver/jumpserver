@@ -3,8 +3,9 @@
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
-from orgs.mixins.serializers import BulkOrgResourceModelSerializer
+from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from ...models import Asset, Node, Platform, SystemUser
+from ..mixin import CategoryDisplayMixin
 
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',
@@ -56,17 +57,17 @@ class ProtocolsField(serializers.ListField):
         return value.split(' ')
 
 
-class AssetSerializer(BulkOrgResourceModelSerializer):
+class AssetSerializer(CategoryDisplayMixin, OrgResourceModelSerializerMixin):
     protocols = ProtocolsField(label=_('Protocols'), required=False, default=['ssh/22'])
     domain_display = serializers.ReadOnlyField(source='domain.name', label=_('Domain name'))
     nodes_display = serializers.ListField(
         child=serializers.CharField(), label=_('Nodes name'), required=False
     )
     labels_display = serializers.ListField(
-        child=serializers.CharField(), label=_('Labels name'), required=False, read_only=True
+        child=serializers.CharField(), label=_('Labels name'),
+        required=False, read_only=True
     )
-    category_display = serializers.ReadOnlyField(source='get_category_display', label=_("Category display"))
-    type_display = serializers.ReadOnlyField(source='get_type_display', label=_("Type display"))
+    platform_display = serializers.SlugField(source='platform.name', label=_("Platform display"), read_only=True)
 
     """
     资产的数据结构
@@ -75,27 +76,28 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     class Meta:
         model = Asset
         fields_mini = [
-            'id', 'category', 'category_display', 'type', 'type_display',
-            'hostname', 'ip', 'platform', 'protocols'
+            'id', 'hostname', 'ip', 'platform', 'protocols'
         ]
         fields_small = fields_mini + [
             'protocol', 'port', 'is_active',
             'public_ip', 'number', 'comment',
         ]
         fields_fk = [
-            'domain', 'domain_display', 'platform', 'admin_user', 'admin_user_display'
+            'domain', 'domain_display', 'platform', 'platform_display',
+            'admin_user', 'admin_user_display'
         ]
         fields_m2m = [
             'nodes', 'nodes_display', 'labels', 'labels_display',
         ]
         read_only_fields = [
-            'connectivity', 'date_verified', 'created_by', 'date_created',
-            'category', 'type'
+            'category', 'category_display', 'type', 'type_display',
+            'connectivity', 'date_verified',
+            'created_by', 'date_created',
         ]
         fields = fields_small + fields_fk + fields_m2m + read_only_fields
         extra_kwargs = {
             'hostname': {'label': _("Name")},
-            'ip': {'label': 'Address'},
+            'ip': {'label': _('IP/Host')},
             'protocol': {'write_only': True},
             'port': {'write_only': True},
             'admin_user_display': {'label': _('Admin user display'), 'read_only': True},

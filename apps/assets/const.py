@@ -9,15 +9,43 @@ __all__ = [
 ]
 
 
-class Category(models.TextChoices):
+class PlatformMixin:
+    @classmethod
+    def platform_meta(cls):
+        return {}
+
+
+class Category(PlatformMixin, models.TextChoices):
     HOST = 'host', _('Host')
     NETWORK = 'network', _("NetworkDevice")
     DATABASE = 'database', _("Database")
     REMOTE_APP = 'remote_app', _("Remote app")
     CLOUD = 'cloud', _("Clouding")
 
+    @classmethod
+    def platform_meta(cls):
+        return {
+            cls.HOST: {
+                'has_domain': True,
+                'protocols_limit': ['ssh', 'rdp', 'vnc', 'telnet']
+            },
+            cls.NETWORK: {
+                'has_domain': True,
+                'protocols_limit': ['ssh', 'telnet']
+            },
+            cls.DATABASE: {
+                'has_domain': True
+            },
+            cls.REMOTE_APP: {
+                'has_domain': True
+            },
+            cls.CLOUD: {
+                'has_domain': False
+            }
+        }
 
-class HostTypes(models.TextChoices):
+
+class HostTypes(PlatformMixin, models.TextChoices):
     LINUX = 'linux', 'Linux'
     WINDOWS = 'windows', 'Windows'
     UNIX = 'unix', 'Unix'
@@ -26,15 +54,30 @@ class HostTypes(models.TextChoices):
     MAINFRAME = 'mainframe', _("Mainframe")
     OTHER_HOST = 'other_host', _("Other host")
 
+    @classmethod
+    def platform_meta(cls):
+        return {}
 
-class NetworkTypes(models.TextChoices):
+    @classmethod
+    def get_default_port(cls):
+        defaults = {
+            cls.LINUX: 22,
+            cls.WINDOWS: 3389,
+            cls.UNIX: 22,
+            cls.BSD: 22,
+            cls.MACOS: 22,
+            cls.MAINFRAME: 22,
+        }
+
+
+class NetworkTypes(PlatformMixin, models.TextChoices):
     SWITCH = 'switch', _("Switch")
     ROUTER = 'router', _("Router")
     FIREWALL = 'firewall', _("Firewall")
     OTHER_NETWORK = 'other_network', _("Other device")
 
 
-class DatabaseTypes(models.TextChoices):
+class DatabaseTypes(PlatformMixin, models.TextChoices):
     MYSQL = 'mysql', 'MySQL'
     MARIADB = 'mariadb', 'MariaDB'
     POSTGRESQL = 'postgresql', 'PostgreSQL'
@@ -43,15 +86,23 @@ class DatabaseTypes(models.TextChoices):
     MONGODB = 'mongodb', 'MongoDB'
     REDIS = 'redis', 'Redis'
 
+    @classmethod
+    def platform_meta(cls):
+        meta = {}
+        for name, labal in cls.choices:
+            meta[name] = {
+                'protocols_limit': [name]
+            }
 
-class RemoteAppTypes(models.TextChoices):
+
+class RemoteAppTypes(PlatformMixin, models.TextChoices):
     CHROME = 'chrome', 'Chrome'
     VSPHERE = 'vmware_client', 'vSphere client'
     MYSQL_WORKBENCH = 'mysql_workbench', 'MySQL workbench'
     GENERAL_REMOTE_APP = 'general_remote_app', _("Custom")
 
 
-class CloudTypes(models.TextChoices):
+class CloudTypes(PlatformMixin, models.TextChoices):
     K8S = 'k8s', 'Kubernetes'
 
 
@@ -63,14 +114,18 @@ class AllTypes(metaclass=IncludesTextChoicesMeta):
     ]
 
     @classmethod
+    def category_types(cls):
+        return (
+            (Category.HOST, HostTypes),
+            (Category.NETWORK, NetworkTypes),
+            (Category.DATABASE, DatabaseTypes),
+            (Category.REMOTE_APP, RemoteAppTypes),
+            (Category.CLOUD, CloudTypes)
+        )
+
+    @classmethod
     def grouped_choices(cls):
-        grouped_types= [
-            (Category.HOST.value, HostTypes.choices),
-            (Category.NETWORK.value, NetworkTypes.choices),
-            (Category.DATABASE.value, DatabaseTypes.choices),
-            (Category.REMOTE_APP.value, RemoteAppTypes.choices),
-            (Category.CLOUD.value, CloudTypes.choices),
-        ]
+        grouped_types = [(str(ca), tp.choices) for ca, tp in cls.category_types()]
         return grouped_types
 
     @classmethod
@@ -86,7 +141,6 @@ class AllTypes(metaclass=IncludesTextChoicesMeta):
     def serialize_to_objs(choices):
         title = ['value', 'display_name']
         return [dict(zip(title, choice)) for choice in choices]
-
 
 
 class Protocol(models.TextChoices):
@@ -115,4 +169,23 @@ class Protocol(models.TextChoices):
             cls.mysql, cls.mariadb, cls.postgresql, cls.oracle,
             cls.sqlserver, cls.redis, cls.mongodb,
         ]
+
+    @classmethod
+    def default_ports(cls):
+        return {
+            cls.ssh: 22,
+            cls.rdp: 3389,
+            cls.vnc: 5900,
+            cls.telnet: 21,
+
+            cls.mysql: 3306,
+            cls.mariadb: 3306,
+            cls.postgresql: 5432,
+            cls.oracle: 1521,
+            cls.sqlserver: 1433,
+            cls.mongodb: 27017,
+            cls.redis: 6379,
+
+            cls.k8s: 0
+        }
 

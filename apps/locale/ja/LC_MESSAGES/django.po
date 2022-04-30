@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-29 10:04+0800\n"
+"POT-Creation-Date: 2022-04-30 22:42+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,11 +27,12 @@ msgstr "Acls"
 #: assets/models/cluster.py:18 assets/models/cmd_filter.py:27
 #: assets/models/domain.py:23 assets/models/group.py:20
 #: assets/models/label.py:18 assets/models/platform.py:16
-#: assets/models/protocol.py:8 ops/mixin.py:24 orgs/models.py:65
-#: perms/models/base.py:83 rbac/models/role.py:29 settings/models.py:29
-#: settings/serializers/sms.py:6 terminal/models/storage.py:23
-#: terminal/models/task.py:16 terminal/models/terminal.py:100
-#: users/forms/profile.py:32 users/models/group.py:15 users/models/user.py:659
+#: assets/models/protocol.py:8 assets/serializers/asset/common.py:99
+#: ops/mixin.py:24 orgs/models.py:65 perms/models/base.py:83
+#: rbac/models/role.py:29 settings/models.py:29 settings/serializers/sms.py:6
+#: terminal/models/storage.py:23 terminal/models/task.py:16
+#: terminal/models/terminal.py:100 users/forms/profile.py:32
+#: users/models/group.py:15 users/models/user.py:659
 #: users/templates/users/_select_user_modal.html:13
 #: users/templates/users/user_asset_permission.html:37
 #: users/templates/users/user_asset_permission.html:154
@@ -264,17 +265,17 @@ msgstr "アプリケーション"
 #: applications/models/database.py:13
 #: applications/serializers/attrs/application_category/db.py:14
 #: applications/serializers/attrs/application_type/mysql_workbench.py:25
-#: assets/const.py:15 assets/models/asset/database.py:8
+#: assets/const.py:21 assets/models/asset/database.py:8
 #: assets/models/asset/database.py:14
 #: xpack/plugins/change_auth_plan/models/app.py:32
 msgid "Database"
 msgstr "データベース"
 
-#: applications/const.py:9 assets/const.py:16
+#: applications/const.py:9 assets/const.py:22
 msgid "Remote app"
 msgstr "リモートアプリ"
 
-#: applications/const.py:35 assets/const.py:51
+#: applications/const.py:35 assets/const.py:102
 msgid "Custom"
 msgstr "カスタム"
 
@@ -336,8 +337,7 @@ msgstr "カテゴリ"
 #: applications/serializers/application.py:101
 #: assets/models/asset/common.py:131 assets/models/backup.py:49
 #: assets/models/cmd_filter.py:82 assets/models/platform.py:18
-#: assets/models/user.py:234 assets/serializers/platform.py:15
-#: perms/models/application_permission.py:24
+#: assets/models/user.py:234 perms/models/application_permission.py:24
 #: perms/serializers/application/user_permission.py:34
 #: terminal/models/storage.py:55 terminal/models/storage.py:119
 #: tickets/models/flow.py:56 tickets/models/ticket.py:131
@@ -364,7 +364,7 @@ msgstr "アプリケーションを一致させることができます"
 
 #: applications/models/database.py:8
 #: applications/serializers/attrs/application_category/db.py:11
-#: assets/const.py:13 assets/models/asset/host.py:16 ops/models/adhoc.py:157
+#: assets/const.py:19 assets/models/asset/host.py:16 ops/models/adhoc.py:157
 #: settings/serializers/auth/radius.py:14
 #: xpack/plugins/cloud/serializers/account_attrs.py:68
 msgid "Host"
@@ -386,17 +386,14 @@ msgid "Port"
 msgstr "ポート"
 
 #: applications/serializers/application.py:70
-#: applications/serializers/application.py:100
-#: assets/serializers/asset/common.py:71 assets/serializers/label.py:13
-#: assets/serializers/platform.py:12
-#: perms/serializers/application/permission.py:18
+#: applications/serializers/application.py:100 assets/serializers/label.py:13
+#: assets/serializers/mixin.py:7 perms/serializers/application/permission.py:18
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:26
 msgid "Category display"
 msgstr "カテゴリ表示"
 
 #: applications/serializers/application.py:71
-#: applications/serializers/application.py:102
-#: assets/serializers/asset/common.py:72 assets/serializers/platform.py:13
+#: applications/serializers/application.py:102 assets/serializers/mixin.py:10
 #: assets/serializers/system_user.py:28 audits/serializers.py:29
 #: perms/serializers/application/permission.py:19
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:33
@@ -527,53 +524,53 @@ msgstr "削除に失敗し、ノードにアセットが含まれています。
 msgid "App assets"
 msgstr "アプリ資産"
 
-#: assets/const.py:14
+#: assets/const.py:20
 msgid "NetworkDevice"
 msgstr ""
 
-#: assets/const.py:17
+#: assets/const.py:23
 #, fuzzy
 #| msgid "Loading"
 msgid "Clouding"
 msgstr "読み込み中"
 
-#: assets/const.py:26
+#: assets/const.py:54
 msgid "Mainframe"
 msgstr ""
 
-#: assets/const.py:27
+#: assets/const.py:55
 #, fuzzy
 #| msgid "Other"
 msgid "Other host"
 msgstr "その他"
 
-#: assets/const.py:31
+#: assets/const.py:74
 #, fuzzy
 #| msgid "Switch from"
 msgid "Switch"
 msgstr "から切り替え"
 
-#: assets/const.py:32
+#: assets/const.py:75
 msgid "Router"
 msgstr ""
 
-#: assets/const.py:33
+#: assets/const.py:76
 msgid "Firewall"
 msgstr ""
 
-#: assets/const.py:34
+#: assets/const.py:77
 msgid "Other device"
 msgstr ""
 
 #: assets/models/asset/common.py:135 assets/serializers/account.py:16
-#: assets/serializers/asset/common.py:63
+#: assets/serializers/asset/common.py:61
 #: perms/serializers/asset/user_permission.py:41
 #: xpack/plugins/cloud/models.py:107 xpack/plugins/cloud/serializers/task.py:42
 msgid "Protocols"
 msgstr "プロトコル"
 
-#: assets/models/asset/common.py:137 assets/models/platform.py:41
-#: assets/serializers/account.py:15 assets/serializers/asset/common.py:61
+#: assets/models/asset/common.py:137 assets/models/platform.py:62
+#: assets/serializers/account.py:15
 #: perms/serializers/asset/user_permission.py:43
 msgid "Platform"
 msgstr "プラットフォーム"
@@ -1044,7 +1041,7 @@ msgstr "ノードを一致させることができます"
 msgid "Charset"
 msgstr "シャーセット"
 
-#: assets/models/platform.py:20 assets/serializers/platform.py:14
+#: assets/models/platform.py:20 assets/serializers/platform.py:13
 #: tickets/models/ticket.py:133
 msgid "Meta"
 msgstr "メタ"
@@ -1052,6 +1049,42 @@ msgstr "メタ"
 #: assets/models/platform.py:21
 msgid "Internal"
 msgstr "内部"
+
+#: assets/models/platform.py:23
+#, fuzzy
+#| msgid "Domain name"
+msgid "Domain enabled"
+msgstr "ドメイン名"
+
+#: assets/models/platform.py:26
+#, fuzzy
+#| msgid "Default"
+msgid "Domain default"
+msgstr "デフォルト"
+
+#: assets/models/platform.py:28
+#, fuzzy
+#| msgid "Protocols"
+msgid "Protocols enabled"
+msgstr "プロトコル"
+
+#: assets/models/platform.py:30
+#, fuzzy
+#| msgid "Protocols"
+msgid "Protocols default"
+msgstr "プロトコル"
+
+#: assets/models/platform.py:32
+#, fuzzy
+#| msgid "Admin user"
+msgid "Admin user enabled"
+msgstr "管理ユーザー"
+
+#: assets/models/platform.py:35
+#, fuzzy
+#| msgid "Admin user display"
+msgid "Admin user default"
+msgstr "管理者ユーザー表示"
 
 #: assets/models/user.py:217
 msgid "Automatic managed"
@@ -1158,27 +1191,39 @@ msgstr ""
 msgid "System user display"
 msgstr "システムユーザー表示"
 
-#: assets/serializers/asset/common.py:18
+#: assets/serializers/asset/common.py:19
 msgid "Protocol format should {}/{}"
 msgstr "プロトコル形式は {}/{}"
 
-#: assets/serializers/asset/common.py:35
+#: assets/serializers/asset/common.py:36
 msgid "Protocol duplicate: {}"
 msgstr "プロトコル重複: {}"
 
-#: assets/serializers/asset/common.py:64
+#: assets/serializers/asset/common.py:62
 msgid "Domain name"
 msgstr "ドメイン名"
 
-#: assets/serializers/asset/common.py:66
+#: assets/serializers/asset/common.py:64
 msgid "Nodes name"
 msgstr "ノード名"
 
-#: assets/serializers/asset/common.py:69
+#: assets/serializers/asset/common.py:67
 msgid "Labels name"
 msgstr "ラベル名"
 
-#: assets/serializers/asset/common.py:102
+#: assets/serializers/asset/common.py:70
+#, fuzzy
+#| msgid "Category display"
+msgid "Platform display"
+msgstr "カテゴリ表示"
+
+#: assets/serializers/asset/common.py:100
+#, fuzzy
+#| msgid "Host"
+msgid "IP/Host"
+msgstr "ホスト"
+
+#: assets/serializers/asset/common.py:103
 msgid "Admin user display"
 msgstr "管理者ユーザー表示"
 
