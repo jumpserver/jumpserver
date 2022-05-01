@@ -9,6 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from common.mixins import CommonModelMixin
 from common.utils import get_logger
+from common.utils.timezone import local_now_date_display
 from common.fields.model import EncryptJsonDictTextField
 from terminal.backends import TYPE_ENGINE_MAPPING
 from .terminal import Terminal
@@ -64,6 +65,10 @@ class CommandStorage(CommonStorageModelMixin, CommonModelMixin):
         return self.type == const.CommandStorageTypeChoices.server.value
 
     @property
+    def type_es(self):
+        return self.type == const.CommandStorageTypeChoices.es.value
+
+    @property
     def type_null_or_server(self):
         return self.type_null or self.type_server
 
@@ -71,6 +76,18 @@ class CommandStorage(CommonStorageModelMixin, CommonModelMixin):
     def config(self):
         config = self.meta
         config.update({'TYPE': self.type})
+        if self.type_es and config.get('IS_INDEX_BY_DAY'):
+            index_prefix = config.get('INDEX_PREFIX') or 'jumpserver'
+            date = local_now_date_display()
+            config['INDEX'] = '%s-%s' % (index_prefix, date)
+        return config
+
+    @property
+    def valid_config(self):
+        config = self.config
+        engine_mod = import_module(TYPE_ENGINE_MAPPING[self.type])
+        store = engine_mod.CommandStore(config)
+        store._ensure_index_exists()
         return config
 
     def is_valid(self):

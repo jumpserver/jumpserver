@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-20 16:35+0800\n"
+"POT-Creation-Date: 2022-05-01 20:19+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,7 +30,7 @@ msgstr "Acls"
 #: orgs/models.py:65 perms/models/base.py:83 rbac/models/role.py:29
 #: settings/models.py:29 settings/serializers/sms.py:6
 #: terminal/models/endpoint.py:10 terminal/models/endpoint.py:58
-#: terminal/models/storage.py:23 terminal/models/task.py:16
+#: terminal/models/storage.py:24 terminal/models/task.py:16
 #: terminal/models/terminal.py:100 users/forms/profile.py:32
 #: users/models/group.py:15 users/models/user.py:661
 #: xpack/plugins/cloud/models.py:28
@@ -62,7 +62,7 @@ msgstr "アクティブ"
 #: assets/models/label.py:23 ops/models/adhoc.py:38 orgs/models.py:68
 #: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:34
 #: terminal/models/endpoint.py:20 terminal/models/endpoint.py:68
-#: terminal/models/storage.py:26 terminal/models/terminal.py:114
+#: terminal/models/storage.py:27 terminal/models/terminal.py:114
 #: tickets/models/comment.py:24 tickets/models/ticket.py:154
 #: users/models/group.py:16 users/models/user.py:698
 #: xpack/plugins/change_auth_plan/models/base.py:44
@@ -88,7 +88,7 @@ msgstr "ログイン確認"
 #: assets/models/cmd_filter.py:30 assets/models/label.py:15 audits/models.py:37
 #: audits/models.py:60 audits/models.py:85 audits/serializers.py:100
 #: authentication/models.py:51 orgs/models.py:214 perms/models/base.py:84
-#: rbac/builtin.py:110 rbac/models/rolebinding.py:40
+#: rbac/builtin.py:118 rbac/models/rolebinding.py:41
 #: terminal/backends/command/models.py:20
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:44
 #: terminal/notifications.py:91 terminal/notifications.py:139
@@ -305,7 +305,7 @@ msgstr "カテゴリ"
 #: assets/models/cmd_filter.py:82 assets/models/user.py:246
 #: perms/models/application_permission.py:24
 #: perms/serializers/application/user_permission.py:34
-#: terminal/models/storage.py:55 terminal/models/storage.py:119
+#: terminal/models/storage.py:56 terminal/models/storage.py:136
 #: tickets/models/flow.py:56 tickets/models/ticket.py:131
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:29
 #: xpack/plugins/change_auth_plan/models/app.py:28
@@ -1360,7 +1360,7 @@ msgstr "監査"
 
 #: audits/models.py:27 audits/models.py:57
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:168
+#: rbac/tree.py:228
 msgid "Delete"
 msgstr "削除"
 
@@ -1413,11 +1413,11 @@ msgstr "ファイル転送ログ"
 
 #: audits/models.py:55
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:165
+#: rbac/tree.py:225
 msgid "Create"
 msgstr "作成"
 
-#: audits/models.py:56 rbac/tree.py:167 templates/_csv_import_export.html:18
+#: audits/models.py:56 rbac/tree.py:227 templates/_csv_import_export.html:18
 #: templates/_csv_update_modal.html:6
 msgid "Update"
 msgstr "更新"
@@ -2901,12 +2901,12 @@ msgstr ""
 msgid "The organization have resource ({}) cannot be deleted"
 msgstr "組織のリソース ({}) は削除できません"
 
-#: orgs/apps.py:7 rbac/tree.py:114
+#: orgs/apps.py:7 rbac/tree.py:115
 msgid "App organizations"
 msgstr "アプリ組織"
 
 #: orgs/mixins/models.py:46 orgs/mixins/serializers.py:25 orgs/models.py:80
-#: orgs/models.py:211 rbac/const.py:7 rbac/models/rolebinding.py:47
+#: orgs/models.py:211 rbac/const.py:7 rbac/models/rolebinding.py:48
 #: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:59
 #: tickets/serializers/ticket/ticket.py:77
 msgid "Organization"
@@ -2920,7 +2920,7 @@ msgstr "グローバル組織"
 msgid "Can view root org"
 msgstr "グローバル組織を表示できます"
 
-#: orgs/models.py:216 rbac/models/role.py:46 rbac/models/rolebinding.py:43
+#: orgs/models.py:216 rbac/models/role.py:46 rbac/models/rolebinding.py:44
 #: users/models/user.py:671
 msgid "Role"
 msgstr "ロール"
@@ -3133,27 +3133,27 @@ msgstr "{} 少なくとも1つのシステムロール"
 msgid "RBAC"
 msgstr "RBAC"
 
-#: rbac/builtin.py:101
+#: rbac/builtin.py:109
 msgid "SystemAdmin"
 msgstr "システム管理者"
 
-#: rbac/builtin.py:104
+#: rbac/builtin.py:112
 msgid "SystemAuditor"
 msgstr "システム監査人"
 
-#: rbac/builtin.py:107
+#: rbac/builtin.py:115
 msgid "SystemComponent"
 msgstr "システムコンポーネント"
 
-#: rbac/builtin.py:113
+#: rbac/builtin.py:121
 msgid "OrgAdmin"
 msgstr "組織管理者"
 
-#: rbac/builtin.py:116
+#: rbac/builtin.py:124
 msgid "OrgAuditor"
 msgstr "監査員を組織する"
 
-#: rbac/builtin.py:119
+#: rbac/builtin.py:127
 msgid "OrgUser"
 msgstr "組織ユーザー"
 
@@ -3185,7 +3185,7 @@ msgstr "ファイルマネージャを表示できます"
 msgid "Permission"
 msgstr "権限"
 
-#: rbac/models/role.py:31 rbac/models/rolebinding.py:37
+#: rbac/models/role.py:31 rbac/models/rolebinding.py:38
 msgid "Scope"
 msgstr "スコープ"
 
@@ -3205,22 +3205,22 @@ msgstr "システムの役割"
 msgid "Organization role"
 msgstr "組織の役割"
 
-#: rbac/models/rolebinding.py:52
+#: rbac/models/rolebinding.py:53
 msgid "Role binding"
 msgstr "ロールバインディング"
 
-#: rbac/models/rolebinding.py:151
+#: rbac/models/rolebinding.py:159
 msgid ""
 "User last role in org, can not be delete, you can remove user from org "
 "instead"
 msgstr ""
 "ユーザーの最後のロールは削除できません。ユーザーを組織から削除できます。"
 
-#: rbac/models/rolebinding.py:158
+#: rbac/models/rolebinding.py:166
 msgid "Organization role binding"
 msgstr "組織の役割バインディング"
 
-#: rbac/models/rolebinding.py:173
+#: rbac/models/rolebinding.py:181
 msgid "System role binding"
 msgstr "システムロールバインディング"
 
@@ -3244,91 +3244,91 @@ msgstr "ロール表示"
 msgid "Has bound this role"
 msgstr "この役割をバインドしました"
 
-#: rbac/tree.py:19 rbac/tree.py:20
+#: rbac/tree.py:20 rbac/tree.py:21
 msgid "All permissions"
 msgstr "すべての権限"
 
-#: rbac/tree.py:26
+#: rbac/tree.py:27
 msgid "Console view"
 msgstr "コンソールビュー"
 
-#: rbac/tree.py:27
+#: rbac/tree.py:28
 msgid "Workbench view"
 msgstr "ワークスペースビュー"
 
-#: rbac/tree.py:28
+#: rbac/tree.py:29
 msgid "Audit view"
 msgstr "監査ビュー"
 
-#: rbac/tree.py:29 settings/models.py:140
+#: rbac/tree.py:30 settings/models.py:140
 msgid "System setting"
 msgstr "システム設定"
 
-#: rbac/tree.py:30
+#: rbac/tree.py:31
 msgid "Other"
 msgstr "その他"
 
-#: rbac/tree.py:38
+#: rbac/tree.py:39
 msgid "Accounts"
 msgstr "アカウント"
 
-#: rbac/tree.py:42
+#: rbac/tree.py:43
 msgid "Session audits"
 msgstr "セッション監査"
 
-#: rbac/tree.py:52
+#: rbac/tree.py:53
 msgid "Cloud import"
 msgstr "クラウドインポート"
 
-#: rbac/tree.py:53
+#: rbac/tree.py:54
 msgid "Backup account"
 msgstr "バックアップアカウント"
 
-#: rbac/tree.py:54
+#: rbac/tree.py:55
 msgid "Gather account"
 msgstr "アカウントを集める"
 
-#: rbac/tree.py:55
+#: rbac/tree.py:56
 msgid "App change auth"
 msgstr "応用改密"
 
-#: rbac/tree.py:56
+#: rbac/tree.py:57
 msgid "Asset change auth"
 msgstr "資産の改ざん"
 
-#: rbac/tree.py:57
+#: rbac/tree.py:58
 msgid "Terminal setting"
 msgstr "ターミナル設定"
 
-#: rbac/tree.py:58
+#: rbac/tree.py:59
 msgid "My assets"
 msgstr "私の資産"
 
-#: rbac/tree.py:59
+#: rbac/tree.py:60
 msgid "My apps"
 msgstr "マイアプリ"
 
-#: rbac/tree.py:115
+#: rbac/tree.py:116
 msgid "Ticket comment"
 msgstr "チケットコメント"
 
-#: rbac/tree.py:116 tickets/models/ticket.py:163
+#: rbac/tree.py:117 tickets/models/ticket.py:163
 msgid "Ticket"
 msgstr "チケット"
 
-#: rbac/tree.py:117
+#: rbac/tree.py:118
 msgid "Common setting"
 msgstr "共通設定"
 
-#: rbac/tree.py:118
+#: rbac/tree.py:119
 msgid "View permission tree"
 msgstr "権限ツリーの表示"
 
-#: rbac/tree.py:119
+#: rbac/tree.py:120
 msgid "Execute batch command"
 msgstr "バッチ実行コマンド"
 
-#: rbac/tree.py:166
+#: rbac/tree.py:226
 msgid "View"
 msgstr "表示"
 
@@ -4513,9 +4513,7 @@ msgstr "ホームページ"
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: templates/resource_download.html:18 templates/resource_download.html:24
-#: templates/resource_download.html:25 templates/resource_download.html:30
-#: templates/resource_download.html:40
+#: templates/resource_download.html:18 templates/resource_download.html:30
 msgid "Client"
 msgstr "クライアント"
 
@@ -4544,19 +4542,11 @@ msgstr ""
 "MacOSは、Windowsに付属のRDPアセットを接続するためにクライアントをダウンロード"
 "する必要があります"
 
-#: templates/resource_download.html:42
-msgid ""
-"Windows needs to download the client to connect SSH assets, and the MacOS "
-"system uses its own terminal"
-msgstr ""
-"WindowsはクライアントをダウンロードしてSSH資産に接続する必要があり、macOSシス"
-"テムは独自のTerminalを採用している。"
-
-#: templates/resource_download.html:53
+#: templates/resource_download.html:41
 msgid "Windows Remote application publisher tools"
 msgstr "Windowsリモートアプリケーション発行者ツール"
 
-#: templates/resource_download.html:54
+#: templates/resource_download.html:42
 msgid ""
 "Jmservisor is the program used to pull up remote applications in Windows "
 "Remote Application publisher"
@@ -4628,7 +4618,7 @@ msgstr "オンラインセッションを持つ"
 msgid "Terminals"
 msgstr "ターミナル管理"
 
-#: terminal/backends/command/es.py:26
+#: terminal/backends/command/es.py:28
 msgid "Invalid elasticsearch config"
 msgstr "無効なElasticsearch構成"
 
@@ -4872,15 +4862,15 @@ msgstr "スレッド"
 msgid "Boot Time"
 msgstr "ブート時間"
 
-#: terminal/models/storage.py:25
+#: terminal/models/storage.py:26
 msgid "Default storage"
 msgstr "デフォルトのストレージ"
 
-#: terminal/models/storage.py:113 terminal/models/terminal.py:108
+#: terminal/models/storage.py:130 terminal/models/terminal.py:108
 msgid "Command storage"
 msgstr "コマンドストレージ"
 
-#: terminal/models/storage.py:173 terminal/models/terminal.py:109
+#: terminal/models/storage.py:190 terminal/models/terminal.py:109
 msgid "Replay storage"
 msgstr "再生ストレージ"
 
@@ -4997,14 +4987,26 @@ msgid "Port invalid"
 msgstr "ポートが無効"
 
 #: terminal/serializers/storage.py:159
+msgid "Index by date"
+msgstr "日付による索引付け"
+
+#: terminal/serializers/storage.py:160
+msgid "Whether to create an index by date"
+msgstr "現在の日付に基づいてインデックスを動的に作成するかどうか"
+
+#: terminal/serializers/storage.py:163
+msgid "Index prefix"
+msgstr "インデックス接頭辞"
+
+#: terminal/serializers/storage.py:166
 msgid "Index"
 msgstr "インデックス"
 
-#: terminal/serializers/storage.py:161
+#: terminal/serializers/storage.py:168
 msgid "Doc type"
 msgstr "Docタイプ"
 
-#: terminal/serializers/storage.py:163
+#: terminal/serializers/storage.py:170
 msgid "Ignore Certificate Verification"
 msgstr "証明書の検証を無視する"
 
