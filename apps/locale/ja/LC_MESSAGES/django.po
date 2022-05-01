@@ -2181,7 +2181,7 @@ msgstr "コードエラー"
 #: authentication/templates/authentication/_msg_reset_password.html:3
 #: authentication/templates/authentication/_msg_rest_password_success.html:2
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:2
-#: jumpserver/conf.py:299 ops/tasks.py:145 ops/tasks.py:148
+#: jumpserver/conf.py:301 ops/tasks.py:145 ops/tasks.py:148
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: perms/templates/perms/_msg_permed_items_expire.html:3
 #: users/templates/users/_msg_account_expire_reminder.html:4
@@ -2642,11 +2642,11 @@ msgstr "特殊文字を含むべきではない"
 msgid "The mobile phone number format is incorrect"
 msgstr "携帯電話番号の形式が正しくありません"
 
-#: jumpserver/conf.py:298
+#: jumpserver/conf.py:300
 msgid "Create account successfully"
 msgstr "アカウントを正常に作成"
 
-#: jumpserver/conf.py:300
+#: jumpserver/conf.py:302
 msgid "Your account has been created successfully"
 msgstr "アカウントが正常に作成されました"
 
@@ -3454,7 +3454,7 @@ msgstr "ログインリダイレクトの有効化msg"
 msgid "Enable CAS Auth"
 msgstr "CAS 認証の有効化"
 
-#: settings/serializers/auth/cas.py:11 settings/serializers/auth/oidc.py:32
+#: settings/serializers/auth/cas.py:11 settings/serializers/auth/oidc.py:40
 msgid "Server url"
 msgstr "サービス側アドレス"
 
@@ -3556,79 +3556,83 @@ msgstr "クライアントID"
 msgid "Client Secret"
 msgstr "クライアント秘密"
 
-#: settings/serializers/auth/oidc.py:20
+#: settings/serializers/auth/oidc.py:26
+msgid "Client authentication method"
+msgstr "クライアント認証方式"
+
+#: settings/serializers/auth/oidc.py:28
 msgid "Share session"
 msgstr "セッションの共有"
 
-#: settings/serializers/auth/oidc.py:22
+#: settings/serializers/auth/oidc.py:30
 msgid "Ignore ssl verification"
 msgstr "Ssl検証を無視する"
 
-#: settings/serializers/auth/oidc.py:29
+#: settings/serializers/auth/oidc.py:37
 msgid "Use Keycloak"
 msgstr "Keycloakを使用する"
 
-#: settings/serializers/auth/oidc.py:35
+#: settings/serializers/auth/oidc.py:43
 msgid "Realm name"
 msgstr "レルム名"
 
-#: settings/serializers/auth/oidc.py:41
+#: settings/serializers/auth/oidc.py:49
 msgid "Enable OPENID Auth"
 msgstr "OIDC認証の有効化"
 
-#: settings/serializers/auth/oidc.py:43
+#: settings/serializers/auth/oidc.py:51
 msgid "Provider endpoint"
 msgstr "プロバイダーエンドポイント"
 
-#: settings/serializers/auth/oidc.py:46
+#: settings/serializers/auth/oidc.py:54
 msgid "Provider auth endpoint"
 msgstr "認証エンドポイントアドレス"
 
-#: settings/serializers/auth/oidc.py:49
+#: settings/serializers/auth/oidc.py:57
 msgid "Provider token endpoint"
 msgstr "プロバイダートークンエンドポイント"
 
-#: settings/serializers/auth/oidc.py:52
+#: settings/serializers/auth/oidc.py:60
 msgid "Provider jwks endpoint"
 msgstr "プロバイダーjwksエンドポイント"
 
-#: settings/serializers/auth/oidc.py:55
+#: settings/serializers/auth/oidc.py:63
 msgid "Provider userinfo endpoint"
 msgstr "プロバイダーuserinfoエンドポイント"
 
-#: settings/serializers/auth/oidc.py:58
+#: settings/serializers/auth/oidc.py:66
 msgid "Provider end session endpoint"
 msgstr "プロバイダーのセッション終了エンドポイント"
 
-#: settings/serializers/auth/oidc.py:61
+#: settings/serializers/auth/oidc.py:69
 msgid "Provider sign alg"
 msgstr "プロビダーサインalg"
 
-#: settings/serializers/auth/oidc.py:64
+#: settings/serializers/auth/oidc.py:72
 msgid "Provider sign key"
 msgstr "プロバイダ署名キー"
 
-#: settings/serializers/auth/oidc.py:66
+#: settings/serializers/auth/oidc.py:74
 msgid "Scopes"
 msgstr "スコープ"
 
-#: settings/serializers/auth/oidc.py:68
+#: settings/serializers/auth/oidc.py:76
 msgid "Id token max age"
 msgstr "IDトークンの最大年齢"
 
-#: settings/serializers/auth/oidc.py:71
+#: settings/serializers/auth/oidc.py:79
 msgid "Id token include claims"
 msgstr "IDトークンにはクレームが含まれます"
 
-#: settings/serializers/auth/oidc.py:73
+#: settings/serializers/auth/oidc.py:81
 msgid "Use state"
 msgstr "使用状態"
 
-#: settings/serializers/auth/oidc.py:74
+#: settings/serializers/auth/oidc.py:82
 msgid "Use nonce"
 msgstr "Nonceを使用"
 
-#: settings/serializers/auth/oidc.py:76 settings/serializers/auth/saml2.py:33
+#: settings/serializers/auth/oidc.py:84 settings/serializers/auth/saml2.py:33
 msgid "Always update user"
 msgstr "常にユーザーを更新"
 
@@ -4247,8 +4251,8 @@ msgid "Enable XRDP"
 msgstr "XRDPの有効化"
 
 #: settings/serializers/terminal.py:38
-msgid "Enable KoKo SSH"
-msgstr "KoKo SSHの有効化"
+msgid "Enable SSH Client"
+msgstr "SSH Clientの有効化"
 
 #: settings/utils/ldap.py:419
 msgid "ldap:// or ldaps:// protocol is used."
@@ -6734,3 +6738,10 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "コミュニティ版"
+
+#~ msgid ""
+#~ "Windows needs to download the client to connect SSH assets, and the MacOS "
+#~ "system uses its own terminal"
+#~ msgstr ""
+#~ "WindowsはクライアントをダウンロードしてSSH資産に接続する必要があり、macOS"
+#~ "システムは独自のTerminalを採用している。"
