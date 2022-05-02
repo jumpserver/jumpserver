@@ -93,6 +93,7 @@ class DatabaseTypes(PlatformMixin, models.TextChoices):
             meta[name] = {
                 'protocols_limit': [name]
             }
+        return meta
 
 
 class RemoteAppTypes(PlatformMixin, models.TextChoices):

@@ -3,6 +3,14 @@
 from django.db import migrations, models
 
 
+def migrate_platform_type_to_lower(apps, *args):
+    platform_model = apps.get_model('assets', 'Platform')
+    platforms = platform_model.objects.all()
+    for p in platforms:
+        p.type = p.type.lower()
+        p.save()
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -31,4 +39,5 @@ class Migration(migrations.Migration):
             name='protocol',
             field=models.CharField(choices=[('ssh', 'SSH'), ('rdp', 'RDP'), ('telnet', 'Telnet'), ('vnc', 'VNC'), ('mysql', 'MySQL'), ('mariadb', 'MariaDB'), ('oracle', 'Oracle'), ('postgresql', 'PostgreSQL'), ('sqlserver', 'SQLServer'), ('redis', 'Redis'), ('mongodb', 'MongoDB'), ('k8s', 'K8S')], default='ssh', max_length=16, verbose_name='Protocol'),
         ),
+        migrations.RunPython(migrate_platform_type_to_lower)
     ]

@@ -33,6 +33,7 @@ class SimpleMetadataWithFilters(SimpleMetadata):
         """
         actions = {}
         view.raw_action = getattr(view, 'action', None)
+        print("Request in metadata: ", request.path, request.GET)
         for method in self.methods & set(view.allowed_methods):
             if hasattr(view, 'action_map'):
                 view.action = view.action_map.get(method.lower(), view.action)
@@ -80,14 +81,14 @@ class SimpleMetadataWithFilters(SimpleMetadata):
         elif getattr(field, 'fields', None):
             field_info['children'] = self.get_serializer_info(field)
 
-        if not isinstance(field, (serializers.RelatedField, serializers.ManyRelatedField)) \
-                and hasattr(field, 'choices'):
+        is_related_field = isinstance(field, (serializers.RelatedField, serializers.ManyRelatedField))
+        if not is_related_field and hasattr(field, 'choices'):
             field_info['choices'] = [
                 {
                     'value': choice_value,
                     'display_name': force_text(choice_name, strings_only=True)
                 }
-                for choice_value, choice_name in field.choices.items()
+                for choice_value, choice_name in dict(field.choices).items()
             ]
 
         return field_info

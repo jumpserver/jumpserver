@@ -14,11 +14,10 @@ __all__ = [
 
 
 class ProtocolField(serializers.RegexField):
-    protocols = '|'.join(dict(Asset.Protocol.choices).keys())
     default_error_messages = {
-        'invalid': _('Protocol format should {}/{}').format(protocols, '1-65535')
+        'invalid': _('Protocol format should {}/{}').format('protocol', '1-65535')
     }
-    regex = r'^(%s)/(\d{1,5})$' % protocols
+    regex = r'^(\w+)/(\d{1,5})$'
 
     def __init__(self, *args, **kwargs):
         super().__init__(self.regex, **kwargs)
@@ -43,18 +42,28 @@ def validate_duplicate_protocols(values):
 class ProtocolsField(serializers.ListField):
     default_validators = [validate_duplicate_protocols]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, protocols=None, *args, **kwargs):
+        self.choices = []
+        self.set_protocols(protocols)
         kwargs['child'] = ProtocolField()
         kwargs['allow_null'] = True
         kwargs['allow_empty'] = True
         kwargs['min_length'] = 1
-        kwargs['max_length'] = 4
+        kwargs['max_length'] = 32
         super().__init__(*args, **kwargs)
+
+    def set_protocols(self, protocols):
+        if protocols is None:
+            protocols = []
+        self.choices = [(c, c) for c in protocols]
+        print("Chocies: ", self.choices)
 
     def to_representation(self, value):
         if not value:
             return []
-        return value.split(' ')
+        if isinstance(value, str):
+            return value.split(' ')
+        return value
 
 
 class AssetSerializer(CategoryDisplayMixin, OrgResourceModelSerializerMixin):
@@ -139,7 +148,7 @@ class AssetSerializer(CategoryDisplayMixin, OrgResourceModelSerializerMixin):
             validated_data["protocol"] = protocol[0]
             validated_data["port"] = int(protocol[1])
         if protocols_data:
-            validated_data["protocols"] = ' '.join(protocols_data)
+            validated_data["protocols"] = protocols_data
 
     def perform_nodes_display_create(self, instance, nodes_display):
         if not nodes_display:

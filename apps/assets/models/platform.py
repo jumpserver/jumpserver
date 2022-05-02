@@ -35,12 +35,19 @@ class Platform(models.Model):
         verbose_name=_("Admin user default")
     )
 
-    def get_type_meta(self):
-        meta = Category.platform_meta().get(self.category, {})
-        types = dict(AllTypes.category_types())[self.category]
-        type_meta = types.platform_meta().get(self.type, {})
+    @classmethod
+    def get_type_meta(cls, category, tp):
+        meta = Category.platform_meta().get(category, {})
+        types = dict(AllTypes.category_types()).get(category)
+        # if not types:
+        #     return {}
+        types_meta = types.platform_meta() or {}
+        type_meta = types_meta.get(tp, {})
         meta.update(type_meta)
         return meta
+
+    def get_meta(self):
+        return self.__class__.get_type_meta(self.category, self.type)
 
     @classmethod
     def default(cls):
