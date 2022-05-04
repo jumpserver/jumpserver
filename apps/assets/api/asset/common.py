@@ -37,17 +37,17 @@ class AssetViewSet(SuggestionMixin, FilterAssetByNodeMixin, OrgBulkModelViewSet)
     search_fields = ("hostname", "ip")
     ordering_fields = ("hostname", "ip", "port")
     ordering = ('hostname', )
-    serializer_classes = {
-        'default': serializers.AssetSerializer,
-        'suggestion': serializers.MiniAssetSerializer,
-        'platform': serializers.PlatformSerializer,
-        'gateways': serializers.GatewayWithAuthSerializer
-    }
-    rbac_perms = {
-        'match': 'assets.match_asset',
-        'platform': 'assets.view_platform',
-        'gateways': 'assets.view_gateway'
-    }
+    serializer_classes = (
+        ('default', serializers.AssetSerializer),
+        ('suggestion', serializers.MiniAssetSerializer),
+        ('platform', serializers.PlatformSerializer),
+        ('gateways', serializers.GatewayWithAuthSerializer)
+    )
+    rbac_perms = (
+        ('match', 'assets.match_asset'),
+        ('platform', 'assets.view_platform'),
+        ('gateways', 'assets.view_gateway')
+    )
     extra_filter_backends = [
         FilterAssetByNodeFilterBackend,
         LabelFilterBackend,

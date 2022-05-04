@@ -52,17 +52,3 @@ class DatabaseSerializer(AssetSerializer):
             **AssetSerializer.Meta.extra_kwargs,
             'db_name': {'required': True}
         }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if not self.instance:
-            self.set_port_default()
-
-    def set_port_default(self):
-        port = self.fields['port']
-        type_port_mapper = {
-            'mysql': 3306,
-            'postgresql': 5432,
-            'oracle': 22
-        }
-        port.default = ''
