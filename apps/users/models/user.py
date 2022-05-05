@@ -20,7 +20,7 @@ from django.shortcuts import reverse
 from orgs.utils import current_org
 from orgs.models import Organization
 from rbac.const import Scope
-from common import fields
+from common.db import fields
 from common.utils import (
     date_expired_default, get_logger, lazyproperty, random_string, bulk_create_with_signal
 )

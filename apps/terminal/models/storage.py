@@ -9,7 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from common.mixins import CommonModelMixin
 from common.utils import get_logger
-from common.fields.model import EncryptJsonDictTextField
+from common.db.fields import EncryptJsonDictTextField
 from terminal.backends import TYPE_ENGINE_MAPPING
 from .terminal import Terminal
 from .command import Command

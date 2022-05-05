@@ -6,6 +6,28 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from captcha.fields import CaptchaField, CaptchaTextInput
 
+from jumpserver.utils import current_request
+from common.utils import get_logger
+from .const import RSA_PRIVATE_KEY
+from .utils import rsa_decrypt
+
+logger = get_logger(__name__)
+
+
+class EncryptedField(forms.CharField):
+    def to_python(self, value):
+        value = super().to_python(value)
+        private_key = current_request.session.get(RSA_PRIVATE_KEY)
+        if not private_key:
+            return value
+
+        try:
+            value= rsa_decrypt(value, private_key)
+        except Exception as e:
+            logger.error('Decrypt field error: ', e)
+            pass
+        return value
+
 
 class UserLoginForm(forms.Form):
     days_auto_login = int(settings.SESSION_COOKIE_AGE / 3600 / 24)
@@ -18,7 +40,7 @@ class UserLoginForm(forms.Form):
             'autofocus': 'autofocus'
         })
     )
-    password = forms.CharField(
+    password = EncryptedField(
         label=_('Password'), widget=forms.PasswordInput,
         max_length=1024, strip=False
     )

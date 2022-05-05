@@ -15,12 +15,12 @@ from common.utils import get_logger
 logger = get_logger(__file__)
 
 
-def gen_key_pair():
+def gen_key_pair(length=1024):
     """ 生成加密key
     用于登录页面提交用户名/密码时，对密码进行加密（前端）/解密（后端）
     """
     random_generator = Random.new().read
-    rsa = RSA.generate(1024, random_generator)
+    rsa = RSA.generate(length, random_generator)
     rsa_private_key = rsa.exportKey().decode()
     rsa_public_key = rsa.publickey().exportKey().decode()
     return rsa_private_key, rsa_public_key
