@@ -27,7 +27,9 @@ def validate_duplicate_protocols(values):
     errors = []
     names = []
 
-    for value in values:
+    print("Value is: ", values)
+
+    for value in values.split(' '):
         if not value or '/' not in value:
             continue
         name = value.split('/')[0]
@@ -42,9 +44,7 @@ def validate_duplicate_protocols(values):
 class ProtocolsField(serializers.ListField):
     default_validators = [validate_duplicate_protocols]
 
-    def __init__(self, protocols=None, *args, **kwargs):
-        self.choices = []
-        self.set_protocols(protocols)
+    def __init__(self, *args, **kwargs):
         kwargs['child'] = ProtocolField()
         kwargs['allow_null'] = True
         kwargs['allow_empty'] = True
@@ -52,18 +52,15 @@ class ProtocolsField(serializers.ListField):
         kwargs['max_length'] = 32
         super().__init__(*args, **kwargs)
 
-    def set_protocols(self, protocols):
-        if protocols is None:
-            protocols = []
-        self.choices = [(c, c) for c in protocols]
-        print("Chocies: ", self.choices)
-
     def to_representation(self, value):
         if not value:
             return []
         if isinstance(value, str):
             return value.split(' ')
         return value
+
+    def to_internal_value(self, data):
+        return ' '.join(data)
 
 
 class AssetSerializer(CategoryDisplayMixin, OrgResourceModelSerializerMixin):
@@ -76,7 +73,9 @@ class AssetSerializer(CategoryDisplayMixin, OrgResourceModelSerializerMixin):
         child=serializers.CharField(), label=_('Labels name'),
         required=False, read_only=True
     )
-    platform_display = serializers.SlugField(source='platform.name', label=_("Platform display"), read_only=True)
+    platform_display = serializers.SlugField(
+        source='platform.name', label=_("Platform display"), read_only=True
+    )
 
     """
     资产的数据结构
@@ -100,8 +99,7 @@ class AssetSerializer(CategoryDisplayMixin, OrgResourceModelSerializerMixin):
         ]
         read_only_fields = [
             'category', 'category_display', 'type', 'type_display',
-            'connectivity', 'date_verified',
-            'created_by', 'date_created',
+            'connectivity', 'date_verified', 'created_by', 'date_created',
         ]
         fields = fields_small + fields_fk + fields_m2m + read_only_fields
         extra_kwargs = {

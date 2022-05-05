@@ -11,7 +11,7 @@ __all__ = [
 
 class PlatformMixin:
     @classmethod
-    def platform_meta(cls):
+    def platform_limits(cls):
         return {}
 
 
@@ -23,7 +23,7 @@ class Category(PlatformMixin, models.TextChoices):
     CLOUD = 'cloud', _("Clouding")
 
     @classmethod
-    def platform_meta(cls):
+    def platform_limits(cls):
         return {
             cls.HOST: {
                 'has_domain': True,
@@ -40,7 +40,8 @@ class Category(PlatformMixin, models.TextChoices):
                 'has_domain': True
             },
             cls.CLOUD: {
-                'has_domain': False
+                'has_domain': False,
+                'protocol_limit': []
             }
         }
 
@@ -55,7 +56,7 @@ class HostTypes(PlatformMixin, models.TextChoices):
     OTHER_HOST = 'other_host', _("Other host")
 
     @classmethod
-    def platform_meta(cls):
+    def platform_limits(cls):
         return {}
 
     @classmethod
@@ -87,9 +88,9 @@ class DatabaseTypes(PlatformMixin, models.TextChoices):
     REDIS = 'redis', 'Redis'
 
     @classmethod
-    def platform_meta(cls):
+    def platform_limits(cls):
         meta = {}
-        for name, labal in cls.choices:
+        for name, label in cls.choices:
             meta[name] = {
                 'protocols_limit': [name]
             }
@@ -113,6 +114,25 @@ class AllTypes(metaclass=IncludesTextChoicesMeta):
         HostTypes, NetworkTypes, DatabaseTypes,
         RemoteAppTypes, CloudTypes
     ]
+
+    @classmethod
+    def get_type_limits(cls, category, tp):
+        limits = Category.platform_limits().get(category, {})
+        types_cls = dict(cls.category_types()).get(category)
+        if not types_cls:
+            return {}
+        types_limits = types_cls.platform_limits() or {}
+        type_limits = types_limits.get(tp, {})
+        limits.update(type_limits)
+
+        _protocols_limit = limits.get('protocols_limit', [])
+        default_ports = Protocol.default_ports()
+        protocols_limit = []
+        for p in _protocols_limit:
+            port = default_ports.get(p, 0)
+            protocols_limit.append(f'{p}/{port}')
+        limits['protocols_limit'] = protocols_limit
+        return limits
 
     @classmethod
     def category_types(cls):

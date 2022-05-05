@@ -20,7 +20,8 @@ class AssetPlatformViewSet(JMSModelViewSet):
     filterset_fields = ['name']
     search_fields = ['name']
     rbac_perms = {
-        'categories': 'assets.view_platform'
+        'categories': 'assets.view_platform',
+        'type_limits': 'assets-view_platform'
     }
 
     @action(methods=['GET'], detail=False)
@@ -28,6 +29,14 @@ class AssetPlatformViewSet(JMSModelViewSet):
         data = AllTypes.grouped_choices_to_objs()
         serializer = self.get_serializer(data, many=True)
         return Response(serializer.data)
+
+    @action(methods=['GET'], detail=False, url_path='type-limits')
+    def type_limits(self, request, *args, **kwargs):
+        category = request.query_params.get('category')
+        tp = request.query_params.get('type')
+        limits = AllTypes.get_type_limits(category, tp)
+        return Response(limits)
+
 
     def check_object_permissions(self, request, obj):
         if request.method.lower() in ['delete', 'put', 'patch'] and obj.internal:

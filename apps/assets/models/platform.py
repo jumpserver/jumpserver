@@ -39,15 +39,14 @@ class Platform(models.Model):
     def get_type_meta(cls, category, tp):
         meta = Category.platform_meta().get(category, {})
         types = dict(AllTypes.category_types()).get(category)
-        # if not types:
-        #     return {}
         types_meta = types.platform_meta() or {}
         type_meta = types_meta.get(tp, {})
         meta.update(type_meta)
         return meta
 
-    def get_meta(self):
-        return self.__class__.get_type_meta(self.category, self.type)
+    @property
+    def type_limits(self):
+        return AllTypes.get_type_limits(self.category, self.type)
 
     @classmethod
     def default(cls):
