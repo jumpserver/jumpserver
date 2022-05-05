@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-27 10:32+0800\n"
+"POT-Creation-Date: 2022-05-05 13:03+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1389,7 +1389,8 @@ msgstr "操作"
 msgid "Filename"
 msgstr "文件名"
 
-#: audits/models.py:43 audits/models.py:117 terminal/models/sharing.py:90
+#: audits/models.py:43 audits/models.py:115 terminal/models/sharing.py:90
+#: tickets/views/approve.py:93
 #: xpack/plugins/change_auth_plan/serializers/app.py:87
 #: xpack/plugins/change_auth_plan/serializers/asset.py:197
 msgid "Success"
@@ -1405,11 +1406,7 @@ msgstr "文件管理"
 msgid "Create"
 msgstr "创建"
 
-#: audits/models.py:57 rbac/tree.py:226
-msgid "View"
-msgstr "查看"
-
-#: audits/models.py:58 rbac/tree.py:227 templates/_csv_import_export.html:18
+#: audits/models.py:56 rbac/tree.py:227 templates/_csv_import_export.html:18
 #: templates/_csv_update_modal.html:6
 msgid "Update"
 msgstr "更新"
@@ -1548,13 +1545,13 @@ msgstr "SSO"
 msgid "Auth Token"
 msgstr "认证令牌"
 
-#: audits/signal_handlers.py:51 authentication/notifications.py:73
-#: authentication/views/login.py:164 authentication/views/wecom.py:181
+#: audits/signal_handlers.py:71 authentication/notifications.py:73
+#: authentication/views/login.py:164 authentication/views/wecom.py:182
 #: notifications/backends/__init__.py:11 users/models/user.py:720
 msgid "WeCom"
 msgstr "企业微信"
 
-#: audits/signal_handlers.py:52 authentication/views/dingtalk.py:182
+#: audits/signal_handlers.py:72 authentication/views/dingtalk.py:183
 #: authentication/views/login.py:170 notifications/backends/__init__.py:12
 #: users/models/user.py:721
 msgid "DingTalk"
@@ -1732,7 +1729,7 @@ msgstr "{ApplicationPermission} 添加 {SystemUser}"
 msgid "{ApplicationPermission} REMOVE {SystemUser}"
 msgstr "{ApplicationPermission} 移除 {SystemUser}"
 
-#: authentication/api/connection_token.py:328
+#: authentication/api/connection_token.py:326
 msgid "Invalid token"
 msgstr "无效的令牌"
 
@@ -2164,9 +2161,10 @@ msgstr "代码错误"
 #: authentication/templates/authentication/_msg_reset_password.html:3
 #: authentication/templates/authentication/_msg_rest_password_success.html:2
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:2
-#: jumpserver/conf.py:299 ops/tasks.py:145 ops/tasks.py:148
+#: jumpserver/conf.py:301 ops/tasks.py:145 ops/tasks.py:148
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: perms/templates/perms/_msg_permed_items_expire.html:3
+#: tickets/templates/tickets/approve_check_password.html:23
 #: users/templates/users/_msg_account_expire_reminder.html:4
 #: users/templates/users/_msg_password_expire_reminder.html:4
 #: users/templates/users/_msg_reset_mfa.html:4
@@ -2297,54 +2295,54 @@ msgstr "返回"
 msgid "Copy success"
 msgstr "复制成功"
 
-#: authentication/views/dingtalk.py:39
+#: authentication/views/dingtalk.py:40
 msgid "DingTalk Error, Please contact your system administrator"
 msgstr "钉钉错误，请联系系统管理员"
 
-#: authentication/views/dingtalk.py:42
+#: authentication/views/dingtalk.py:43
 msgid "DingTalk Error"
 msgstr "钉钉错误"
 
-#: authentication/views/dingtalk.py:54 authentication/views/feishu.py:50
-#: authentication/views/wecom.py:54
+#: authentication/views/dingtalk.py:55 authentication/views/feishu.py:50
+#: authentication/views/wecom.py:55
 msgid ""
 "The system configuration is incorrect. Please contact your administrator"
 msgstr "企业配置错误，请联系系统管理员"
 
-#: authentication/views/dingtalk.py:78
+#: authentication/views/dingtalk.py:79
 msgid "DingTalk is already bound"
 msgstr "钉钉已经绑定"
 
-#: authentication/views/dingtalk.py:127 authentication/views/feishu.py:99
-#: authentication/views/wecom.py:127
+#: authentication/views/dingtalk.py:128 authentication/views/feishu.py:99
+#: authentication/views/wecom.py:128
 msgid "Please verify your password first"
 msgstr "请检查密码"
 
-#: authentication/views/dingtalk.py:151 authentication/views/wecom.py:151
+#: authentication/views/dingtalk.py:152 authentication/views/wecom.py:152
 msgid "Invalid user_id"
 msgstr "无效的 user_id"
 
-#: authentication/views/dingtalk.py:167
+#: authentication/views/dingtalk.py:168
 msgid "DingTalk query user failed"
 msgstr "钉钉查询用户失败"
 
-#: authentication/views/dingtalk.py:176
+#: authentication/views/dingtalk.py:177
 msgid "The DingTalk is already bound to another user"
 msgstr "该钉钉已经绑定其他用户"
 
-#: authentication/views/dingtalk.py:183
+#: authentication/views/dingtalk.py:184
 msgid "Binding DingTalk successfully"
 msgstr "绑定 钉钉 成功"
 
-#: authentication/views/dingtalk.py:235 authentication/views/dingtalk.py:289
+#: authentication/views/dingtalk.py:239 authentication/views/dingtalk.py:293
 msgid "Failed to get user from DingTalk"
 msgstr "从钉钉获取用户失败"
 
-#: authentication/views/dingtalk.py:241 authentication/views/dingtalk.py:295
+#: authentication/views/dingtalk.py:245 authentication/views/dingtalk.py:299
 msgid "DingTalk is not bound"
 msgstr "钉钉没有绑定"
 
-#: authentication/views/dingtalk.py:242 authentication/views/dingtalk.py:296
+#: authentication/views/dingtalk.py:246 authentication/views/dingtalk.py:300
 msgid "Please login with a password and then bind the DingTalk"
 msgstr "请使用密码登录，然后绑定钉钉"
 
@@ -2417,39 +2415,39 @@ msgstr "退出登录成功"
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
-#: authentication/views/wecom.py:39
+#: authentication/views/wecom.py:40
 msgid "WeCom Error, Please contact your system administrator"
 msgstr "企业微信错误，请联系系统管理员"
 
-#: authentication/views/wecom.py:42
+#: authentication/views/wecom.py:43
 msgid "WeCom Error"
 msgstr "企业微信错误"
 
-#: authentication/views/wecom.py:78
+#: authentication/views/wecom.py:79
 msgid "WeCom is already bound"
 msgstr "企业微信已经绑定"
 
-#: authentication/views/wecom.py:166
+#: authentication/views/wecom.py:167
 msgid "WeCom query user failed"
 msgstr "企业微信查询用户失败"
 
-#: authentication/views/wecom.py:175
+#: authentication/views/wecom.py:176
 msgid "The WeCom is already bound to another user"
 msgstr "该企业微信已经绑定其他用户"
 
-#: authentication/views/wecom.py:182
+#: authentication/views/wecom.py:183
 msgid "Binding WeCom successfully"
 msgstr "绑定 企业微信 成功"
 
-#: authentication/views/wecom.py:231 authentication/views/wecom.py:285
+#: authentication/views/wecom.py:235 authentication/views/wecom.py:289
 msgid "Failed to get user from WeCom"
 msgstr "从企业微信获取用户失败"
 
-#: authentication/views/wecom.py:237 authentication/views/wecom.py:291
+#: authentication/views/wecom.py:241 authentication/views/wecom.py:295
 msgid "WeCom is not bound"
 msgstr "没有绑定企业微信"
 
-#: authentication/views/wecom.py:238 authentication/views/wecom.py:292
+#: authentication/views/wecom.py:242 authentication/views/wecom.py:296
 msgid "Please login with a password and then bind the WeCom"
 msgstr "请使用密码登录，然后绑定企业微信"
 
@@ -2629,11 +2627,11 @@ msgstr "不能包含特殊字符"
 msgid "The mobile phone number format is incorrect"
 msgstr "手机号格式不正确"
 
-#: jumpserver/conf.py:298
+#: jumpserver/conf.py:300
 msgid "Create account successfully"
 msgstr "创建账号成功"
 
-#: jumpserver/conf.py:300
+#: jumpserver/conf.py:302
 msgid "Your account has been created successfully"
 msgstr "你的账号已创建成功"
 
@@ -3306,6 +3304,10 @@ msgstr "查看授权树"
 msgid "Execute batch command"
 msgstr "执行批量命令"
 
+#: rbac/tree.py:226
+msgid "View"
+msgstr "查看"
+
 #: settings/api/alibaba_sms.py:31 settings/api/tencent_sms.py:35
 msgid "test_phone is required"
 msgstr "测试手机号 该字段是必填项。"
@@ -3428,7 +3430,7 @@ msgstr "启用登录跳转提示"
 msgid "Enable CAS Auth"
 msgstr "启用 CAS 认证"
 
-#: settings/serializers/auth/cas.py:11 settings/serializers/auth/oidc.py:32
+#: settings/serializers/auth/cas.py:11 settings/serializers/auth/oidc.py:40
 msgid "Server url"
 msgstr "服务端地址"
 
@@ -3530,79 +3532,83 @@ msgstr "客户端 ID"
 msgid "Client Secret"
 msgstr "客户端密钥"
 
-#: settings/serializers/auth/oidc.py:20
+#: settings/serializers/auth/oidc.py:26
+msgid "Client authentication method"
+msgstr "客户端认证方式"
+
+#: settings/serializers/auth/oidc.py:28
 msgid "Share session"
 msgstr "共享会话"
 
-#: settings/serializers/auth/oidc.py:22
+#: settings/serializers/auth/oidc.py:30
 msgid "Ignore ssl verification"
 msgstr "忽略 SSL 证书验证"
 
-#: settings/serializers/auth/oidc.py:29
+#: settings/serializers/auth/oidc.py:37
 msgid "Use Keycloak"
 msgstr "使用 Keycloak"
 
-#: settings/serializers/auth/oidc.py:35
+#: settings/serializers/auth/oidc.py:43
 msgid "Realm name"
 msgstr "域"
 
-#: settings/serializers/auth/oidc.py:41
+#: settings/serializers/auth/oidc.py:49
 msgid "Enable OPENID Auth"
 msgstr "启用 OIDC 认证"
 
-#: settings/serializers/auth/oidc.py:43
+#: settings/serializers/auth/oidc.py:51
 msgid "Provider endpoint"
 msgstr "端点地址"
 
-#: settings/serializers/auth/oidc.py:46
+#: settings/serializers/auth/oidc.py:54
 msgid "Provider auth endpoint"
 msgstr "授权端点地址"
 
-#: settings/serializers/auth/oidc.py:49
+#: settings/serializers/auth/oidc.py:57
 msgid "Provider token endpoint"
 msgstr "token 端点地址"
 
-#: settings/serializers/auth/oidc.py:52
+#: settings/serializers/auth/oidc.py:60
 msgid "Provider jwks endpoint"
 msgstr "jwks 端点地址"
 
-#: settings/serializers/auth/oidc.py:55
+#: settings/serializers/auth/oidc.py:63
 msgid "Provider userinfo endpoint"
 msgstr "用户信息端点地址"
 
-#: settings/serializers/auth/oidc.py:58
+#: settings/serializers/auth/oidc.py:66
 msgid "Provider end session endpoint"
 msgstr "注销会话端点地址"
 
-#: settings/serializers/auth/oidc.py:61
+#: settings/serializers/auth/oidc.py:69
 msgid "Provider sign alg"
 msgstr "签名算法"
 
-#: settings/serializers/auth/oidc.py:64
+#: settings/serializers/auth/oidc.py:72
 msgid "Provider sign key"
 msgstr "签名 Key"
 
-#: settings/serializers/auth/oidc.py:66
+#: settings/serializers/auth/oidc.py:74
 msgid "Scopes"
 msgstr "连接范围"
 
-#: settings/serializers/auth/oidc.py:68
+#: settings/serializers/auth/oidc.py:76
 msgid "Id token max age"
 msgstr "令牌有效时间"
 
-#: settings/serializers/auth/oidc.py:71
+#: settings/serializers/auth/oidc.py:79
 msgid "Id token include claims"
 msgstr "声明"
 
-#: settings/serializers/auth/oidc.py:73
+#: settings/serializers/auth/oidc.py:81
 msgid "Use state"
 msgstr "使用状态"
 
-#: settings/serializers/auth/oidc.py:74
+#: settings/serializers/auth/oidc.py:82
 msgid "Use nonce"
 msgstr "临时使用"
 
-#: settings/serializers/auth/oidc.py:76 settings/serializers/auth/saml2.py:33
+#: settings/serializers/auth/oidc.py:84 settings/serializers/auth/saml2.py:33
 msgid "Always update user"
 msgstr "总是更新用户信息"
 
@@ -4198,8 +4204,8 @@ msgid "Enable XRDP"
 msgstr "启用 XRDP 服务"
 
 #: settings/serializers/terminal.py:38
-msgid "Enable KoKo SSH"
-msgstr "启用 KoKo SSH"
+msgid "Enable SSH Client"
+msgstr "启用 SSH Client"
 
 #: settings/utils/ldap.py:419
 msgid "ldap:// or ldaps:// protocol is used."
@@ -5230,19 +5236,19 @@ msgstr "请再次尝试"
 msgid "Super ticket"
 msgstr "超级工单"
 
-#: tickets/notifications.py:63
+#: tickets/notifications.py:72
 msgid "Your has a new ticket, applicant - {}"
 msgstr "你有一个新的工单, 申请人 - {}"
 
-#: tickets/notifications.py:69
+#: tickets/notifications.py:78
 msgid "New Ticket - {} ({})"
 msgstr "新工单 - {} ({})"
 
-#: tickets/notifications.py:91
+#: tickets/notifications.py:123
 msgid "Your ticket has been processed, processor - {}"
 msgstr "你的工单已被处理, 处理人 - {}"
 
-#: tickets/notifications.py:95
+#: tickets/notifications.py:127
 msgid "Ticket has processed - {} ({})"
 msgstr "你的工单已被处理, 处理人 - {} ({})"
 
@@ -5377,9 +5383,50 @@ msgid "The current organization type already exists"
 msgstr "当前组织已存在该类型"
 
 #: tickets/templates/tickets/_base_ticket_body.html:17
-#: tickets/templates/tickets/_msg_ticket.html:12
 msgid "Click here to review"
 msgstr "点击查看"
+
+#: tickets/templates/tickets/_msg_ticket.html:12
+msgid "View details"
+msgstr "查看详情"
+
+#: tickets/templates/tickets/_msg_ticket.html:17
+msgid "Direct approval"
+msgstr "直接批准"
+
+#: tickets/templates/tickets/approve_check_password.html:11
+msgid "Ticket information"
+msgstr "工单信息"
+
+#: tickets/templates/tickets/approve_check_password.html:19
+msgid "Ticket approval"
+msgstr "工单审批"
+
+#: tickets/templates/tickets/approve_check_password.html:35
+#: tickets/views/approve.py:25
+msgid "Ticket direct approval"
+msgstr "工单直接审批"
+
+#: tickets/templates/tickets/approve_check_password.html:40
+msgid "Go Login"
+msgstr "去登录"
+
+#: tickets/views/approve.py:26
+msgid ""
+"This ticket does not exist, the process has ended, or this link has expired"
+msgstr "工单不存在，或者工单流程已经结束，或者此链接已经过期"
+
+#: tickets/views/approve.py:55
+msgid "Click the button to approve directly"
+msgstr "点击按钮，即可直接审批成功"
+
+#: tickets/views/approve.py:57
+msgid "After successful authentication, this ticket can be approved directly"
+msgstr "认证成功后，工单可直接审批"
+
+#: tickets/views/approve.py:84
+msgid "This user is not authorized to approve this ticket"
+msgstr "此用户无权审批此工单"
 
 #: users/api/user.py:183
 msgid "Could not reset self otp, use profile reset instead"
@@ -6645,3 +6692,8 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid ""
+#~ "Windows needs to download the client to connect SSH assets, and the MacOS "
+#~ "system uses its own terminal"
+#~ msgstr "Windows 需要下载客户端来连接SSH资产，macOS系统采用自带的Terminal"
