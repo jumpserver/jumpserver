@@ -22,4 +22,5 @@ urlpatterns = [
 
     path('setting/', api.SettingsApi.as_view(), name='settings-setting'),
     path('public/', api.PublicSettingApi.as_view(), name='public-setting'),
+    path('public/open/', api.OpenPublicSettingApi.as_view(), name='open-public-setting'),
 ]
