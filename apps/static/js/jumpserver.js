@@ -1501,3 +1501,22 @@ function getStatusIcon(status, mapping, title) {
     }
     return icon;
 }
+
+function encryptPassword(password) {
+    if (!password) {
+        return ''
+    }
+    var rsaPublicKeyText = getCookie('rsa_public_key')
+        .replaceAll('"', '')
+    var rsaPublicKey = atob(rsaPublicKeyText)
+    console.log('Pubkey: ', rsaPublicKey)
+    var jsencrypt = new JSEncrypt(); //加密对象
+    jsencrypt.setPublicKey(rsaPublicKey); // 设置密钥
+    var value = jsencrypt.encrypt(password); //加密
+    console.log("Encrypt value")
+    alert(value)
+    return value
+}
+
+
+window.encryptPassword = encryptPassword

@@ -1,37 +1,47 @@
 # -*- coding: utf-8 -*-
 #
-
+import base64
+import logging
 from django import forms
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from captcha.fields import CaptchaField, CaptchaTextInput
 
 from jumpserver.utils import current_request
-from common.utils import get_logger
-from .const import RSA_PRIVATE_KEY
-from .utils import rsa_decrypt
+from common.utils import get_logger, rsa_decrypt, rsa_encrypt
 
 logger = get_logger(__name__)
 
 
 class EncryptedField(forms.CharField):
     def to_python(self, value):
+        import json
+        print("Origin text 1: ", json.dumps({'v': value}))
         value = super().to_python(value)
-        private_key = current_request.session.get(RSA_PRIVATE_KEY)
+        private_key_name = settings.SESSION_RSA_PRIVATE_KEY_NAME
+        private_key = current_request.session.get(private_key_name)
+        print("Private key: ", json.dumps({'v': private_key}))
+        public_key = current_request.session.get(settings.SESSION_RSA_PUBLIC_KEY_NAME)
+        public_key = base64.b64decode(public_key)
+        print("Pub key: ", public_key)
+        data = rsa_encrypt('Hello', public_key)
+        text = rsa_decrypt(data, private_key)
+        print("Text: ", text)
+
         if not private_key:
             return value
 
         try:
             value= rsa_decrypt(value, private_key)
         except Exception as e:
-            logger.error('Decrypt field error: ', e)
-            pass
+            logging.error('Decrypt field error: {}'.format(e))
         return value
 
 
 class UserLoginForm(forms.Form):
     days_auto_login = int(settings.SESSION_COOKIE_AGE / 3600 / 24)
-    disable_days_auto_login = settings.SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE or days_auto_login < 1
+    disable_days_auto_login = settings.SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE \
+                              or days_auto_login < 1
 
     username = forms.CharField(
         label=_('Username'), max_length=100,

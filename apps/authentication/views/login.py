@@ -95,8 +95,9 @@ class UserLoginView(mixins.AuthMixin, FormView):
         # https://docs.djangoproject.com/en/3.1/topics/http/sessions/#setting-test-cookies
         self.request.session.delete_test_cookie()
 
+        raise ValueError('Error: ' + str(form.cleaned_data))
         try:
-            self.check_user_auth(decrypt_passwd=True)
+            self.check_user_auth(form.cleaned_data)
         except errors.AuthFailedError as e:
             form.add_error(None, e.msg)
             self.set_login_failed_mark()
@@ -219,9 +220,11 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         try:
-            user = self.check_user_auth_if_need()
+            user = self.get_user_from_session()
             self.check_user_mfa_if_need(user)
             self.check_user_login_confirm_if_need(user)
+        except errors.AuthRequireError:
+            return self.format_redirect_url(self.login_url)
         except (errors.CredentialError, errors.SessionEmptyError) as e:
             print("Error: ", e)
             return self.format_redirect_url(self.login_url)
