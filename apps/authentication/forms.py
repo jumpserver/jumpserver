@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 #
-import base64
-import logging
 from django import forms
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from captcha.fields import CaptchaField, CaptchaTextInput
 
-from jumpserver.utils import current_request
-from common.utils import get_logger, rsa_decrypt, rsa_encrypt
+from common.utils import get_logger, rsa_decrypt_by_session_pkey
 
 logger = get_logger(__name__)
 
@@ -16,17 +13,7 @@ logger = get_logger(__name__)
 class EncryptedField(forms.CharField):
     def to_python(self, value):
         value = super().to_python(value)
-        private_key_name = settings.SESSION_RSA_PRIVATE_KEY_NAME
-        private_key = current_request.session.get(private_key_name)
-
-        if not private_key:
-            return value
-
-        try:
-            value= rsa_decrypt(value, private_key)
-        except Exception as e:
-            logging.error('Decrypt field error: {}'.format(e))
-        return value
+        return rsa_decrypt_by_session_pkey(value)
 
 
 class UserLoginForm(forms.Form):

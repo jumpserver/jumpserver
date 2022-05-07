@@ -1,4 +1,5 @@
 import base64
+import logging
 from Cryptodome.Cipher import AES, PKCS1_v1_5
 from Cryptodome.Util.Padding import pad
 from Cryptodome.Random import get_random_bytes
@@ -229,6 +230,21 @@ def rsa_decrypt(cipher_text, rsa_private_key=None):
         cipher_decoded = base64.b16decode(hex_fixed.upper())
     message = cipher.decrypt(cipher_decoded, b'error').decode()
     return message
+
+
+def rsa_decrypt_by_session_pkey(value):
+    from jumpserver.utils import current_request
+    private_key_name = settings.SESSION_RSA_PRIVATE_KEY_NAME
+    private_key = current_request.session.get(private_key_name)
+
+    if not private_key or not value:
+        return value
+
+    try:
+        value= rsa_decrypt(value, private_key)
+    except Exception as e:
+        logging.error('Decrypt field error: {}'.format(e))
+    return value
 
 
 crypto = Crypto()
