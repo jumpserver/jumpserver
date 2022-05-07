@@ -141,7 +141,6 @@ class CommonMixin:
         ip = self.get_request_ip()
         self._set_partial_credential_error(username=username, ip=ip, request=request)
         password = password + challenge.strip()
-        print("password is: ", password)
         return username, password, public_key, ip, auto_login
 
 
