@@ -161,6 +161,7 @@
                 <span style="font-size: 21px;font-weight:400;color: #151515;letter-spacing: 0;">{{ JMS_TITLE }}</span>
             </div>
             <div class="contact-form col-md-10 col-md-offset-1">
+
                 <form id="login-form" action="" method="post" role="form" novalidate="novalidate">
                     {% csrf_token %}
                     <div style="line-height: 17px;margin-bottom: 20px;color: #999999;">
@@ -241,20 +242,10 @@
 {% include '_foot_js.html' %}
 <script type="text/javascript" src="/static/js/plugins/jsencrypt/jsencrypt.min.js"></script>
 <script>
-    function encryptLoginPassword(password, rsaPublicKey) {
-        if (!password) {
-            return ''
-        }
-        var jsencrypt = new JSEncrypt(); //加密对象
-        jsencrypt.setPublicKey(rsaPublicKey); // 设置密钥
-        return jsencrypt.encrypt(password); //加密
-    }
-
     function doLogin() {
         //公钥加密
-        var rsaPublicKey = "{{ rsa_public_key }}"
         var password = $('#password').val(); //明文密码
-        var passwordEncrypted = encryptLoginPassword(password, rsaPublicKey)
+        var passwordEncrypted = encryptPassword(password)
         $('#password-hidden').val(passwordEncrypted); //返回给密码输入input
         $('#login-form').submit(); //post提交
     }

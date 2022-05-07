@@ -1,7 +1,11 @@
+import base64
+
 from django.shortcuts import redirect, reverse
 from django.utils.deprecation import MiddlewareMixin
 from django.http import HttpResponse
 from django.conf import settings
+
+from common.utils import gen_key_pair
 
 
 class MFAMiddleware:
@@ -47,4 +51,29 @@ class SessionCookieMiddleware(MiddlewareMixin):
         if request.COOKIES.get(key) == value:
             return response
         response.set_cookie(key, value)
+        return response
+
+
+class EncryptedMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    @staticmethod
+    def check_key_pair(request, response):
+        pub_key_name = settings.SESSION_RSA_PUBLIC_KEY_NAME
+        public_key = request.session.get(pub_key_name)
+        cookie_key = request.COOKIES.get(pub_key_name)
+        if public_key and public_key == cookie_key:
+            return
+
+        pri_key_name = settings.SESSION_RSA_PRIVATE_KEY_NAME
+        private_key, public_key = gen_key_pair()
+        public_key_decode = base64.b64encode(public_key.encode()).decode()
+        request.session[pub_key_name] = public_key_decode
+        request.session[pri_key_name] = private_key
+        response.set_cookie(pub_key_name, public_key_decode)
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        self.check_key_pair(request, response)
         return response
