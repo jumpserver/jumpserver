@@ -1,6 +1,8 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
+from common.drf.fields import EncryptedField
+
 __all__ = [
     'LDAPTestConfigSerializer', 'LDAPUserSerializer', 'LDAPTestLoginSerializer',
     'LDAPSettingSerializer',
@@ -20,7 +22,7 @@ class LDAPTestConfigSerializer(serializers.Serializer):
 
 class LDAPTestLoginSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=1024, required=True)
-    password = serializers.CharField(max_length=2014, required=True)
+    password = EncryptedField(max_length=2014, required=True)
 
 
 class LDAPUserSerializer(serializers.Serializer):

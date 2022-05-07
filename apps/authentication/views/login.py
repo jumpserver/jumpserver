@@ -95,7 +95,6 @@ class UserLoginView(mixins.AuthMixin, FormView):
         # https://docs.djangoproject.com/en/3.1/topics/http/sessions/#setting-test-cookies
         self.request.session.delete_test_cookie()
 
-        raise ValueError('Error: ' + str(form.cleaned_data))
         try:
             self.check_user_auth(form.cleaned_data)
         except errors.AuthFailedError as e:

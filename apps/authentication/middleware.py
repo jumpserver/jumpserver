@@ -63,8 +63,6 @@ class EncryptedMiddleware:
         pub_key_name = settings.SESSION_RSA_PUBLIC_KEY_NAME
         public_key = request.session.get(pub_key_name)
         cookie_key = request.COOKIES.get(pub_key_name)
-        print("Session key: ", public_key)
-        print("Cooke key: ", cookie_key)
         if public_key and public_key == cookie_key:
             return
 
@@ -74,7 +72,6 @@ class EncryptedMiddleware:
         request.session[pub_key_name] = public_key_decode
         request.session[pri_key_name] = private_key
         response.set_cookie(pub_key_name, public_key_decode)
-        response.set_cookie(pri_key_name, private_key)
 
     def __call__(self, request):
         response = self.get_response(request)
