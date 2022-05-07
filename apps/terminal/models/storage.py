@@ -89,16 +89,20 @@ class CommandStorage(CommonStorageModelMixin, CommonModelMixin):
         return Terminal.objects.filter(command_storage=self.name, is_deleted=False).exists()
 
     def get_command_queryset(self):
+        if self.type_null:
+            return Command.objects.none()
+
         if self.type_server:
-            qs = Command.objects.all()
-        else:
-            if self.type not in TYPE_ENGINE_MAPPING:
-                logger.error(f'Command storage `{self.type}` not support')
-                return Command.objects.none()
+            return Command.objects.all()
+
+        if self.type not in TYPE_ENGINE_MAPPING:
             engine_mod = import_module(TYPE_ENGINE_MAPPING[self.type])
             qs = engine_mod.QuerySet(self.config)
             qs.model = Command
-        return qs
+            return qs
+
+        logger.error(f'Command storage `{self.type}` not support')
+        return Command.objects.none()
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
