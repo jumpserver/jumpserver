@@ -233,11 +233,6 @@ class MFARequiredError(NeedMoreInfoError):
         }
 
 
-class AuthRequireError(Exception):
-    error = 'auth_required'
-    msg = 'Require auth'
-
-
 class ACLError(AuthFailedNeedLogMixin, AuthFailedError):
     msg = reason_acl_not_allow
     error = 'acl_error'
