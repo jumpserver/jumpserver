@@ -8,6 +8,7 @@ from rest_framework.generics import CreateAPIView
 from orgs.mixins.api import OrgBulkModelViewSet
 from rbac.permissions import RBACPermission
 from common.drf.filters import BaseFilterSet
+from common.mixins import RecordViewLogMixin
 from common.permissions import NeedMFAVerify
 from ..tasks.account_connectivity import test_accounts_connectivity_manual
 from ..models import AuthBook, Node
@@ -79,7 +80,7 @@ class AccountViewSet(OrgBulkModelViewSet):
         return Response(data={'task': task.id})
 
 
-class AccountSecretsViewSet(AccountViewSet):
+class AccountSecretsViewSet(RecordViewLogMixin, AccountViewSet):
     """
     因为可能要导出所有账号，所以单独建立了一个 viewset
     """

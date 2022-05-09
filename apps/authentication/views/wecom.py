@@ -21,6 +21,7 @@ from common.utils.common import get_request_ip
 from authentication import errors
 from authentication.mixins import AuthMixin
 from authentication.notifications import OAuthBindMessage
+from .mixins import METAMixin
 
 logger = get_logger(__file__)
 
@@ -196,14 +197,17 @@ class WeComEnableStartView(UserVerifyPasswordView):
         return success_url
 
 
-class WeComQRLoginView(WeComQRMixin, View):
+class WeComQRLoginView(WeComQRMixin, METAMixin, View):
     permission_classes = (AllowAny,)
 
     def get(self,  request: HttpRequest):
         redirect_url = request.GET.get('redirect_url')
 
         redirect_uri = reverse('authentication:wecom-qr-login-callback', external=True)
-        redirect_uri += '?' + urlencode({'redirect_url': redirect_url})
+        redirect_uri += '?' + urlencode({
+            'redirect_url': redirect_url,
+            'next': self.get_next_url_from_meta()
+        })
 
         url = self.get_qr_url(redirect_uri)
         return HttpResponseRedirect(url)

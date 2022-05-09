@@ -21,6 +21,7 @@ from authentication.mixins import AuthMixin
 from common.sdk.im.dingtalk import DingTalk
 from common.utils.common import get_request_ip
 from authentication.notifications import OAuthBindMessage
+from .mixins import METAMixin
 
 logger = get_logger(__file__)
 
@@ -200,14 +201,17 @@ class DingTalkEnableStartView(UserVerifyPasswordView):
         return success_url
 
 
-class DingTalkQRLoginView(DingTalkQRMixin, View):
+class DingTalkQRLoginView(DingTalkQRMixin, METAMixin, View):
     permission_classes = (AllowAny,)
 
     def get(self,  request: HttpRequest):
         redirect_url = request.GET.get('redirect_url')
 
         redirect_uri = reverse('authentication:dingtalk-qr-login-callback', external=True)
-        redirect_uri += '?' + urlencode({'redirect_url': redirect_url})
+        redirect_uri += '?' + urlencode({
+            'redirect_url': redirect_url,
+            'next': self.get_next_url_from_meta()
+        })
 
         url = self.get_qr_url(redirect_uri)
         return HttpResponseRedirect(url)

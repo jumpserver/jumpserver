@@ -10,8 +10,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from common.mixins import CommonModelMixin
 from common.utils import get_logger
+from common.db.fields import EncryptJsonDictTextField
 from common.utils.timezone import local_now_date_display
-from common.fields.model import EncryptJsonDictTextField
 from terminal.backends import TYPE_ENGINE_MAPPING
 from .terminal import Terminal
 from .command import Command
@@ -107,16 +107,20 @@ class CommandStorage(CommonStorageModelMixin, CommonModelMixin):
         return Terminal.objects.filter(command_storage=self.name, is_deleted=False).exists()
 
     def get_command_queryset(self):
+        if self.type_null:
+            return Command.objects.none()
+
         if self.type_server:
-            qs = Command.objects.all()
-        else:
-            if self.type not in TYPE_ENGINE_MAPPING:
-                logger.error(f'Command storage `{self.type}` not support')
-                return Command.objects.none()
+            return Command.objects.all()
+
+        if self.type in TYPE_ENGINE_MAPPING:
             engine_mod = import_module(TYPE_ENGINE_MAPPING[self.type])
             qs = engine_mod.QuerySet(self.config)
             qs.model = Command
-        return qs
+            return qs
+
+        logger.error(f'Command storage `{self.type}` not support')
+        return Command.objects.none()
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):

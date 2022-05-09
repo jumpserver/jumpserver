@@ -2,6 +2,8 @@
 #
 from rest_framework import serializers
 
+from common.drf.fields import EncryptedField
+
 
 __all__ = [
     'OtpVerifySerializer', 'MFAChallengeSerializer', 'MFASelectTypeSerializer',
@@ -10,7 +12,7 @@ __all__ = [
 
 
 class PasswordVerifySerializer(serializers.Serializer):
-    password = serializers.CharField()
+    password = EncryptedField()
 
 
 class MFASelectTypeSerializer(serializers.Serializer):

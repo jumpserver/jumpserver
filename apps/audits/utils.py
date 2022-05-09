@@ -1,9 +1,17 @@
 import csv
 import codecs
-from django.http import HttpResponse
 
-from .const import DEFAULT_CITY
-from common.utils import validate_ip, get_ip_city
+from django.http import HttpResponse
+from django.db import transaction
+from django.utils import translation
+
+from audits.models import OperateLog
+from common.utils import validate_ip, get_ip_city, get_request_ip, get_logger
+from jumpserver.utils import current_request
+from .const import DEFAULT_CITY, MODELS_NEED_RECORD
+
+
+logger = get_logger(__name__)
 
 
 def get_excel_response(filename):
@@ -36,3 +44,25 @@ def write_login_log(*args, **kwargs):
         city = get_ip_city(ip) or DEFAULT_CITY
     kwargs.update({'ip': ip, 'city': city})
     UserLoginLog.objects.create(**kwargs)
+
+
+def create_operate_log(action, sender, resource):
+    user = current_request.user if current_request else None
+    if not user or not user.is_authenticated:
+        return
+    model_name = sender._meta.object_name
+    if model_name not in MODELS_NEED_RECORD:
+        return
+    with translation.override('en'):
+        resource_type = sender._meta.verbose_name
+    remote_addr = get_request_ip(current_request)
+
+    data = {
+        "user": str(user), 'action': action, 'resource_type': resource_type,
+        'resource': str(resource), 'remote_addr': remote_addr,
+    }
+    with transaction.atomic():
+        try:
+            OperateLog.objects.create(**data)
+        except Exception as e:
+            logger.error("Create operate log error: {}".format(e))
