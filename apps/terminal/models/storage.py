@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import os
+
 from importlib import import_module
 
 import jms_storage
@@ -76,10 +77,6 @@ class CommandStorage(CommonStorageModelMixin, CommonModelMixin):
     def config(self):
         config = self.meta
         config.update({'TYPE': self.type})
-        if self.type_es and config.get('IS_INDEX_BY_DAY'):
-            index_prefix = config.get('INDEX_PREFIX') or 'jumpserver'
-            date = local_now_date_display()
-            config['INDEX'] = '%s-%s' % (index_prefix, date)
         return config
 
     @property
@@ -88,6 +85,10 @@ class CommandStorage(CommonStorageModelMixin, CommonModelMixin):
         engine_mod = import_module(TYPE_ENGINE_MAPPING[self.type])
         store = engine_mod.CommandStore(config)
         store._ensure_index_exists()
+        if self.type_es and config.get('INDEX_BY_DATE'):
+            index_prefix = config.get('INDEX') or 'jumpserver'
+            date = local_now_date_display()
+            config['INDEX'] = '%s-%s' % (index_prefix, date)
         return config
 
     def is_valid(self):

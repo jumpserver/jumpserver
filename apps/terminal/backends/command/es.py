@@ -31,8 +31,8 @@ class InvalidElasticsearch(JMSException):
 class CommandStore(object):
     def __init__(self, config):
         self.doc_type = config.get("DOC_TYPE") or '_doc'
-        self.index_prefix = config.get('INDEX_PREFIX') or 'jumpserver'
-        self.is_index_by_date = bool(config.get('IS_INDEX_BY_DAY'))
+        self.index_prefix = config.get('INDEX') or 'jumpserver'
+        self.is_index_by_date = bool(config.get('INDEX_BY_DATE'))
         self.exact_fields = {}
         self.match_fields = {}
         hosts = config.get("HOSTS")
