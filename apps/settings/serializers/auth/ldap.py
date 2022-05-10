@@ -30,6 +30,7 @@ class LDAPUserSerializer(serializers.Serializer):
     username = serializers.CharField()
     name = serializers.CharField()
     email = serializers.CharField()
+    groups = serializers.ListField(child=serializers.CharField(), default=[])
     existing = serializers.BooleanField(read_only=True)
 
 
