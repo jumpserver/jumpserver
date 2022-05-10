@@ -75,7 +75,7 @@ class TicketDirectApproveView(TemplateView):
         user = request.user
         token = kwargs.get('token')
         action = request.POST.get('action')
-        if action not in ['agree', 'refuse']:
+        if action not in ['approve', 'reject']:
             msg = _('Illegal approval action')
             return self.redirect_message_response(error=str(msg))
 
@@ -87,10 +87,7 @@ class TicketDirectApproveView(TemplateView):
             ticket = Ticket.all().get(id=ticket_id)
             if not ticket.has_current_assignee(user):
                 raise Exception(_("This user is not authorized to approve this ticket"))
-            if action == 'agree':
-                ticket.approve(user)
-            else:
-                ticket.reject(user)
+            getattr(ticket, action)(user)
         except AlreadyClosed as e:
             self.clear(token)
             return self.redirect_message_response(error=str(e), redirect_url=self.login_url)
