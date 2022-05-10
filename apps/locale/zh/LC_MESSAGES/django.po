@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-10 09:04+0800\n"
+"POT-Creation-Date: 2022-05-10 10:45+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1390,7 +1390,7 @@ msgid "Filename"
 msgstr "文件名"
 
 #: audits/models.py:43 audits/models.py:117 terminal/models/sharing.py:90
-#: tickets/views/approve.py:101
+#: tickets/views/approve.py:98
 #: xpack/plugins/change_auth_plan/serializers/app.py:87
 #: xpack/plugins/change_auth_plan/serializers/asset.py:197
 msgid "Success"
@@ -5429,7 +5429,7 @@ msgid ""
 msgstr "工单不存在，或者工单流程已经结束，或者此链接已经过期"
 
 #: tickets/views/approve.py:55
-msgid "Click the button below to agree or reject"
+msgid "Click the button below to approve or reject"
 msgstr "点击下方按钮同意或者拒绝"
 
 #: tickets/views/approve.py:57

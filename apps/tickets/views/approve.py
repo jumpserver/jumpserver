@@ -52,7 +52,7 @@ class TicketDirectApproveView(TemplateView):
         token = kwargs.get('token')
         ticket_info = cache.get(token, {}).get('body', '')
         if self.request.user.is_authenticated:
-            prompt_msg = _('Click the button below to agree or reject')
+            prompt_msg = _('Click the button below to approve or reject')
         else:
             prompt_msg = _('After successful authentication, this ticket can be approved directly')
         kwargs.update({

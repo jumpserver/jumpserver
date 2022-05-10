@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-10 09:04+0800\n"
+"POT-Creation-Date: 2022-05-10 10:46+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1402,7 +1402,7 @@ msgid "Filename"
 msgstr "ファイル名"
 
 #: audits/models.py:43 audits/models.py:117 terminal/models/sharing.py:90
-#: tickets/views/approve.py:101
+#: tickets/views/approve.py:98
 #: xpack/plugins/change_auth_plan/serializers/app.py:87
 #: xpack/plugins/change_auth_plan/serializers/asset.py:197
 msgid "Success"
@@ -5507,7 +5507,7 @@ msgstr ""
 "なっています"
 
 #: tickets/views/approve.py:55
-msgid "Click the button below to agree or reject"
+msgid "Click the button below to approve or reject"
 msgstr "下のボタンをクリックして同意または拒否。"
 
 #: tickets/views/approve.py:57
