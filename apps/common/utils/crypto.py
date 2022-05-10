@@ -241,7 +241,7 @@ def rsa_decrypt_by_session_pkey(value):
         return value
 
     try:
-        value= rsa_decrypt(value, private_key)
+        value = rsa_decrypt(value, private_key)
     except Exception as e:
         logging.error('Decrypt field error: {}'.format(e))
     return value

@@ -27,6 +27,10 @@ class ReadableHiddenField(serializers.HiddenField):
 
 
 class EncryptedField(serializers.CharField):
+    def __init__(self, *args, **kwargs):
+        kwargs['write_only'] = True
+        super().__init__(*args, **kwargs)
+
     def to_internal_value(self, value):
         value = super().to_internal_value(value)
         return rsa_decrypt_by_session_pkey(value)

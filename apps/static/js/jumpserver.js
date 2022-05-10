@@ -1502,18 +1502,81 @@ function getStatusIcon(status, mapping, title) {
     return icon;
 }
 
+function fillKey(key) {
+    let keySize = 128;
+    // 如果超过 key 16 位, 最大取 32 位，需要更改填充
+    if (key.length > 16) {
+        key = key.slice(0, 32);
+        keySize = keySize * 2;
+    }
+    key = key.slice(0, keySize);
+    const filledKey = Buffer.alloc(keySize / 8);
+    const keys = Buffer.from(key);
+    if (keys.length < filledKey.length) {
+        filledKey.map((b, i) => filledKey[i] = keys[i]);
+        return filledKey;
+    } else {
+        return keys;
+    }
+}
+
+function aesEncrypt(text, originKey) {
+    const key = CryptoJS.enc.Utf8.parse(fillKey(originKey));
+    return CryptoJS.AES.encrypt(text, key, {
+        mode: CryptoJS.mode.ECB,
+        padding: CryptoJS.pad.ZeroPadding
+    }).toString();
+}
+
+function rsaEncrypt(text, pubKey) {
+    if (!text) {
+        return text
+    }
+    const jsEncrypt = new JSEncrypt();
+    jsEncrypt.setPublicKey(pubKey);
+    return jsEncrypt.encrypt(text);
+}
+
+function rsaDecrypt(cipher, prikey) {
+    const jsEncrypt = new JSEncrypt();
+    jsEncrypt.setPrivateKey(prikey);
+    return jsEncrypt.decrypt(cipher)
+}
+
+
+window.rsaEncrypt = rsaEncrypt
+window.rsaDecrypt = rsaDecrypt
+
 function encryptPassword(password) {
     if (!password) {
         return ''
     }
-    var rsaPublicKeyText = getCookie('jms_public_key')
+    const aesKey = (Math.random() + 1).toString(36).substring(2)
+    const rsaPublicKeyText = getCookie('jms_public_key')
         .replaceAll('"', '')
-    var rsaPublicKey = atob(rsaPublicKeyText)
-    var jsencrypt = new JSEncrypt(); //加密对象
-    jsencrypt.setPublicKey(rsaPublicKey); // 设置密钥
-    var value = jsencrypt.encrypt(password); //加密
-    return value
+    const rsaPublicKey = atob(rsaPublicKeyText)
+    return rsaEncrypt(password, rsaPublicKey)
 }
 
-
 window.encryptPassword = encryptPassword
+
+
+function aesEncrypt() {
+    // An example 128-bit key
+    var key = 'redhat';
+
+    key = new TextEncoder().encode(key)
+    // Convert text to bytes
+    var text = 'Calong@2015';
+    var textBytes = aesjs.utils.utf8.toBytes(text);
+
+    var aesEcb = new aesjs.ModeOfOperation.ecb(key);
+    var encryptedBytes = aesEcb.encrypt(textBytes);
+
+    // To print or store the binary data, you may convert it to hex
+    var encryptedHex = aesjs.utils.hex.fromBytes(encryptedBytes);
+    console.log(encryptedHex);
+    // "a7d93b35368519fac347498dec18b458"
+}
+
+// window.encryptPassword = encryptPassword

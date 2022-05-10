@@ -56,6 +56,7 @@ def authenticate(request=None, **credentials):
 
     for backend, backend_path in _get_backends(return_tuples=True):
         # 检查用户名是否允许认证 (预先检查，不浪费认证时间)
+        logger.info('Try using auth backend: {}'.format(str(backend)))
         if not backend.username_allow_authenticate(username):
             continue
 
