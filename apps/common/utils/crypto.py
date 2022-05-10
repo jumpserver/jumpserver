@@ -241,10 +241,21 @@ def rsa_decrypt_by_session_pkey(value):
         return value
 
     try:
-        value= rsa_decrypt(value, private_key)
+        value = rsa_decrypt(value, private_key)
     except Exception as e:
         logging.error('Decrypt field error: {}'.format(e))
     return value
+
+
+def decrypt_password(value):
+    cipher = value.split(':')
+    if len(cipher) != 2:
+        return value
+    key_cipher, password_cipher = cipher
+    aes_key = rsa_decrypt_by_session_pkey(key_cipher)
+    aes = get_aes_crypto(aes_key, 'ECB')
+    password = aes.decrypt(password_cipher)
+    return password
 
 
 crypto = Crypto()
