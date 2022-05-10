@@ -1502,30 +1502,6 @@ function getStatusIcon(status, mapping, title) {
     return icon;
 }
 
-function fillKey2(key) {
-    let keySize = 128;
-    // 如果超过 key 16 位, 最大取 32 位，需要更改填充
-    if (key.length > 16) {
-        key = key.slice(0, 32);
-        keySize = keySize * 2;
-    }
-    // Key 最大就是 256
-    const filledKeyLength = keySize / 8
-    if (key.length >= filledKeyLength) {
-        return key.slice(0, filledKeyLength);
-    }
-    // Key 长度小于 16 或者 32 位，填充 0
-    const filledKey = []
-    const keyLength = key.length
-    for (let i=0, j=filledKeyLength; i<j; ++i) {
-        if (i < keyLength) {
-            filledKey.push(key.charCodeAt(i))
-        } else {
-            filledKey.push(0)
-        }
-    }
-    return new Uint8Array(filledKey)
-}
 
 function fillKey(key) {
     let keySize = 128
@@ -1537,14 +1513,13 @@ function fillKey(key) {
     const filledKeyLength = keySize / 8
     if (key.length >= filledKeyLength) {
         return key.slice(0, filledKeyLength)
-    } else {
-        const filledKey = Buffer.alloc(keySize / 8)
-        const keys = Buffer.from(key)
-        for (let i = 0; i < filledKey.length; i++) {
-            filledKey[i] = keys[i]
-        }
-        return filledKey
     }
+    const filledKey = Buffer.alloc(keySize / 8)
+    const keys = Buffer.from(key)
+    for (let i = 0; i < keys.length; i++) {
+        filledKey[i] = keys[i]
+    }
+    return filledKey
 }
 
 function aesEncrypt(text, originKey) {
@@ -1588,9 +1563,9 @@ function encryptPassword(password) {
     return `${keyCipher}:${passwordCipher}`
 }
 
-const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
 function randomString(length) {
+    const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let result = '';
     const charactersLength = characters.length;
     for ( let i = 0; i < length; i++ ) {
