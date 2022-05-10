@@ -68,7 +68,7 @@ class StorageMixin:
     def get_command_storage_config(self):
         s = self.get_command_storage()
         if s:
-            config = s.config
+            config = s.valid_config
         else:
             config = settings.DEFAULT_TERMINAL_COMMAND_STORAGE
         return config

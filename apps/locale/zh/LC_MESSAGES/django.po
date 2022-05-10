@@ -29,7 +29,7 @@ msgstr "访问控制"
 #: orgs/models.py:65 perms/models/base.py:83 rbac/models/role.py:29
 #: settings/models.py:29 settings/serializers/sms.py:6
 #: terminal/models/endpoint.py:10 terminal/models/endpoint.py:58
-#: terminal/models/storage.py:23 terminal/models/task.py:16
+#: terminal/models/storage.py:24 terminal/models/task.py:16
 #: terminal/models/terminal.py:100 users/forms/profile.py:32
 #: users/models/group.py:15 users/models/user.py:661
 #: xpack/plugins/cloud/models.py:28
@@ -61,7 +61,7 @@ msgstr "激活中"
 #: assets/models/label.py:23 ops/models/adhoc.py:38 orgs/models.py:68
 #: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:34
 #: terminal/models/endpoint.py:20 terminal/models/endpoint.py:68
-#: terminal/models/storage.py:26 terminal/models/terminal.py:114
+#: terminal/models/storage.py:27 terminal/models/terminal.py:114
 #: tickets/models/comment.py:24 tickets/models/ticket.py:154
 #: users/models/group.py:16 users/models/user.py:698
 #: xpack/plugins/change_auth_plan/models/base.py:44
@@ -300,7 +300,7 @@ msgstr "类别"
 #: assets/models/cmd_filter.py:82 assets/models/user.py:246
 #: perms/models/application_permission.py:24
 #: perms/serializers/application/user_permission.py:34
-#: terminal/models/storage.py:55 terminal/models/storage.py:119
+#: terminal/models/storage.py:56 terminal/models/storage.py:136
 #: tickets/models/flow.py:56 tickets/models/ticket.py:131
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:29
 #: xpack/plugins/change_auth_plan/models/app.py:28
@@ -4565,7 +4565,7 @@ msgstr "有在线会话"
 msgid "Terminals"
 msgstr "终端管理"
 
-#: terminal/backends/command/es.py:26
+#: terminal/backends/command/es.py:28
 msgid "Invalid elasticsearch config"
 msgstr "无效的 Elasticsearch 配置"
 
@@ -4809,15 +4809,15 @@ msgstr "线程数"
 msgid "Boot Time"
 msgstr "运行时间"
 
-#: terminal/models/storage.py:25
+#: terminal/models/storage.py:26
 msgid "Default storage"
 msgstr "默认存储"
 
-#: terminal/models/storage.py:113 terminal/models/terminal.py:108
+#: terminal/models/storage.py:130 terminal/models/terminal.py:108
 msgid "Command storage"
 msgstr "命令存储"
 
-#: terminal/models/storage.py:173 terminal/models/terminal.py:109
+#: terminal/models/storage.py:190 terminal/models/terminal.py:109
 msgid "Replay storage"
 msgstr "录像存储"
 
@@ -4934,14 +4934,26 @@ msgid "Port invalid"
 msgstr "端口无效"
 
 #: terminal/serializers/storage.py:159
+msgid "Index by date"
+msgstr "按日期建索引"
+
+#: terminal/serializers/storage.py:160
+msgid "Whether to create an index by date"
+msgstr "是否根据日期动态建立索引"
+
+#: terminal/serializers/storage.py:163
+msgid "Index prefix"
+msgstr "索引前缀"
+
+#: terminal/serializers/storage.py:166
 msgid "Index"
 msgstr "索引"
 
-#: terminal/serializers/storage.py:161
+#: terminal/serializers/storage.py:168
 msgid "Doc type"
 msgstr "文档类型"
 
-#: terminal/serializers/storage.py:163
+#: terminal/serializers/storage.py:170
 msgid "Ignore Certificate Verification"
 msgstr "忽略证书认证"
 
