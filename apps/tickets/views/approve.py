@@ -22,7 +22,7 @@ class TicketDirectApproveView(TemplateView):
     @property
     def message_data(self):
         return {
-            'title': _('Ticket direct approval'),
+            'title': _('Ticket approval'),
             'error': _("This ticket does not exist, "
                        "the process has ended, or this link has expired"),
             'redirect_url': self.login_url,
@@ -52,7 +52,7 @@ class TicketDirectApproveView(TemplateView):
         token = kwargs.get('token')
         ticket_info = cache.get(token, {}).get('body', '')
         if self.request.user.is_authenticated:
-            prompt_msg = _('Click the button to approve directly')
+            prompt_msg = _('Click the button below to approve or reject')
         else:
             prompt_msg = _('After successful authentication, this ticket can be approved directly')
         kwargs.update({
@@ -74,6 +74,11 @@ class TicketDirectApproveView(TemplateView):
     def post(self, request, **kwargs):
         user = request.user
         token = kwargs.get('token')
+        action = request.POST.get('action')
+        if action not in ['approve', 'reject']:
+            msg = _('Illegal approval action')
+            return self.redirect_message_response(error=str(msg))
+
         ticket_info = cache.get(token)
         if not ticket_info:
             return self.redirect_message_response(redirect_url=self.login_url)
@@ -82,7 +87,7 @@ class TicketDirectApproveView(TemplateView):
             ticket = Ticket.all().get(id=ticket_id)
             if not ticket.has_current_assignee(user):
                 raise Exception(_("This user is not authorized to approve this ticket"))
-            ticket.approve(user)
+            getattr(ticket, action)(user)
         except AlreadyClosed as e:
             self.clear(token)
             return self.redirect_message_response(error=str(e), redirect_url=self.login_url)
