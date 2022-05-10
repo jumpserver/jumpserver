@@ -247,4 +247,15 @@ def rsa_decrypt_by_session_pkey(value):
     return value
 
 
+def decrypt_password(value):
+    cipher = value.split(':')
+    if len(cipher) != 2:
+        return value
+    key_cipher, password_cipher = cipher
+    aes_key = rsa_decrypt_by_session_pkey(key_cipher)
+    aes = get_aes_crypto(aes_key, 'ECB')
+    password = aes.decrypt(password_cipher)
+    return password
+
+
 crypto = Crypto()

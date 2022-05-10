@@ -1502,21 +1502,48 @@ function getStatusIcon(status, mapping, title) {
     return icon;
 }
 
-function fillKey(key) {
+function fillKey2(key) {
     let keySize = 128;
     // 如果超过 key 16 位, 最大取 32 位，需要更改填充
     if (key.length > 16) {
         key = key.slice(0, 32);
         keySize = keySize * 2;
     }
-    key = key.slice(0, keySize);
-    const filledKey = Buffer.alloc(keySize / 8);
-    const keys = Buffer.from(key);
-    if (keys.length < filledKey.length) {
-        filledKey.map((b, i) => filledKey[i] = keys[i]);
-        return filledKey;
+    // Key 最大就是 256
+    const filledKeyLength = keySize / 8
+    if (key.length >= filledKeyLength) {
+        return key.slice(0, filledKeyLength);
+    }
+    // Key 长度小于 16 或者 32 位，填充 0
+    const filledKey = []
+    const keyLength = key.length
+    for (let i=0, j=filledKeyLength; i<j; ++i) {
+        if (i < keyLength) {
+            filledKey.push(key.charCodeAt(i))
+        } else {
+            filledKey.push(0)
+        }
+    }
+    return new Uint8Array(filledKey)
+}
+
+function fillKey(key) {
+    let keySize = 128
+    // 如果超过 key 16 位, 最大取 32 位，需要更改填充
+    if (key.length > 16) {
+        key = key.slice(0, 32)
+        keySize = keySize * 2
+    }
+    const filledKeyLength = keySize / 8
+    if (key.length >= filledKeyLength) {
+        return key.slice(0, filledKeyLength)
     } else {
-        return keys;
+        const filledKey = Buffer.alloc(keySize / 8)
+        const keys = Buffer.from(key)
+        for (let i = 0; i < filledKey.length; i++) {
+            filledKey[i] = keys[i]
+        }
+        return filledKey
     }
 }
 
@@ -1537,9 +1564,9 @@ function rsaEncrypt(text, pubKey) {
     return jsEncrypt.encrypt(text);
 }
 
-function rsaDecrypt(cipher, prikey) {
+function rsaDecrypt(cipher, pkey) {
     const jsEncrypt = new JSEncrypt();
-    jsEncrypt.setPrivateKey(prikey);
+    jsEncrypt.setPrivateKey(pkey);
     return jsEncrypt.decrypt(cipher)
 }
 
@@ -1552,31 +1579,37 @@ function encryptPassword(password) {
         return ''
     }
     const aesKey = (Math.random() + 1).toString(36).substring(2)
+    // public key 是 base64 存储的
     const rsaPublicKeyText = getCookie('jms_public_key')
         .replaceAll('"', '')
     const rsaPublicKey = atob(rsaPublicKeyText)
-    return rsaEncrypt(password, rsaPublicKey)
+    const keyCipher = rsaEncrypt(aesKey, rsaPublicKey)
+    const passwordCipher = aesEncrypt(password, aesKey)
+    return `${keyCipher}:${passwordCipher}`
+}
+
+const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+function randomString(length) {
+    let result = '';
+    const charactersLength = characters.length;
+    for ( let i = 0; i < length; i++ ) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+
+    return result;
+}
+
+function testEncrypt() {
+    const radio = []
+    const len2 = []
+    for (let i=1;i<4096;i++) {
+        const password = randomString(i)
+        const cipher = encryptPassword(password)
+        len2.push([password.length, cipher.length])
+        radio.push(cipher.length/password.length)
+    }
+    return radio
 }
 
 window.encryptPassword = encryptPassword
-
-
-function aesEncrypt() {
-    // An example 128-bit key
-    var key = 'redhat';
-
-    key = new TextEncoder().encode(key)
-    // Convert text to bytes
-    var text = 'Calong@2015';
-    var textBytes = aesjs.utils.utf8.toBytes(text);
-
-    var aesEcb = new aesjs.ModeOfOperation.ecb(key);
-    var encryptedBytes = aesEcb.encrypt(textBytes);
-
-    // To print or store the binary data, you may convert it to hex
-    var encryptedHex = aesjs.utils.hex.fromBytes(encryptedBytes);
-    console.log(encryptedHex);
-    // "a7d93b35368519fac347498dec18b458"
-}
-
-// window.encryptPassword = encryptPassword
