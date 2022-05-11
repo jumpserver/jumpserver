@@ -27,34 +27,31 @@ class OpenPublicSettingApi(generics.RetrieveAPIView):
         interface = get_interface_setting()
         return interface['login_title']
 
-    def get_open_public_settings(self):
+    def get_object(self):
         return {
             "XPACK_ENABLED": settings.XPACK_ENABLED,
             "LOGIN_TITLE": self.get_login_title(),
             "LOGO_URLS": self.get_logo_urls(),
-            'SECURITY_WATERMARK_ENABLED': settings.SECURITY_WATERMARK_ENABLED,
         }
-
-    def get_object(self):
-        return self.get_open_public_settings()
 
 
 class PublicSettingApi(OpenPublicSettingApi):
     permission_classes = (IsAuthenticated,)
     serializer_class = serializers.PrivateSettingSerializer
 
-    @staticmethod
-    def get_public_settings():
-        return {
-            # Security
-            "WINDOWS_SKIP_ALL_MANUAL_PASSWORD": settings.WINDOWS_SKIP_ALL_MANUAL_PASSWORD,
-            "OLD_PASSWORD_HISTORY_LIMIT_COUNT": settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT,
-            "SECURITY_MAX_IDLE_TIME": settings.SECURITY_MAX_IDLE_TIME,
-            "SECURITY_VIEW_AUTH_NEED_MFA": settings.SECURITY_VIEW_AUTH_NEED_MFA,
-            "SECURITY_MFA_VERIFY_TTL": settings.SECURITY_MFA_VERIFY_TTL,
-            "SECURITY_COMMAND_EXECUTION": settings.SECURITY_COMMAND_EXECUTION,
-            "SECURITY_PASSWORD_EXPIRATION_TIME": settings.SECURITY_PASSWORD_EXPIRATION_TIME,
-            "SECURITY_LUNA_REMEMBER_AUTH": settings.SECURITY_LUNA_REMEMBER_AUTH,
+    def get_object(self):
+        values = super().get_object()
+
+        serializer = self.serializer_class()
+        field_names = list(serializer.fields.keys())
+
+        for name in field_names:
+            if hasattr(settings, name):
+                values[name] = getattr(settings, name)
+
+        values.update({
+            "XPACK_LICENSE_IS_VALID": has_valid_xpack_license(),
+            "XPACK_LICENSE_INFO": get_xpack_license_info(),
             "PASSWORD_RULE": {
                 'SECURITY_PASSWORD_MIN_LENGTH': settings.SECURITY_PASSWORD_MIN_LENGTH,
                 'SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH': settings.SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH,
@@ -63,32 +60,7 @@ class PublicSettingApi(OpenPublicSettingApi):
                 'SECURITY_PASSWORD_NUMBER': settings.SECURITY_PASSWORD_NUMBER,
                 'SECURITY_PASSWORD_SPECIAL_CHAR': settings.SECURITY_PASSWORD_SPECIAL_CHAR,
             },
-            'SECURITY_SESSION_SHARE': settings.SECURITY_SESSION_SHARE,
-            # XPACK
-            "XPACK_LICENSE_IS_VALID": has_valid_xpack_license(),
-            "XPACK_LICENSE_INFO": get_xpack_license_info(),
-            # Performance
-            "HELP_DOCUMENT_URL": settings.HELP_DOCUMENT_URL,
-            "HELP_SUPPORT_URL": settings.HELP_SUPPORT_URL,
-            # Auth
-            "AUTH_WECOM": settings.AUTH_WECOM,
-            "AUTH_DINGTALK": settings.AUTH_DINGTALK,
-            "AUTH_FEISHU": settings.AUTH_FEISHU,
-            # Terminal
-            "XRDP_ENABLED": settings.XRDP_ENABLED,
-            "TERMINAL_MAGNUS_ENABLED": settings.TERMINAL_MAGNUS_ENABLED,
-            "TERMINAL_KOKO_SSH_ENABLED": settings.TERMINAL_KOKO_SSH_ENABLED,
-            # Announcement
-            "ANNOUNCEMENT_ENABLED": settings.ANNOUNCEMENT_ENABLED,
-            "ANNOUNCEMENT": settings.ANNOUNCEMENT,
-            "AUTH_TEMP_TOKEN": settings.AUTH_TEMP_TOKEN,
-        }
+        })
+        return values
 
-    def get_object(self):
-        open_public = self.get_open_public_settings()
-        public = self.get_public_settings()
-        return {
-            **open_public,
-            **public
-        }
 

@@ -1,5 +1,5 @@
 # coding: utf-8
-# 
+#
 
 from rest_framework import serializers
 
@@ -8,7 +8,6 @@ __all__ = ['PublicSettingSerializer', 'PrivateSettingSerializer']
 
 class PublicSettingSerializer(serializers.Serializer):
     XPACK_ENABLED = serializers.BooleanField()
-    SECURITY_WATERMARK_ENABLED = serializers.BooleanField()
     LOGIN_TITLE = serializers.CharField()
     LOGO_URLS = serializers.DictField()
 
@@ -22,6 +21,8 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     SECURITY_COMMAND_EXECUTION = serializers.BooleanField()
     SECURITY_PASSWORD_EXPIRATION_TIME = serializers.IntegerField()
     SECURITY_LUNA_REMEMBER_AUTH = serializers.BooleanField()
+    SECURITY_WATERMARK_ENABLED = serializers.BooleanField()
+    SESSION_EXPIRE_AT_BROWSER_CLOSE = serializers.BooleanField()
     PASSWORD_RULE = serializers.DictField()
     SECURITY_SESSION_SHARE = serializers.BooleanField()
     XPACK_LICENSE_IS_VALID = serializers.BooleanField()
