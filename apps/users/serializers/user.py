@@ -7,6 +7,7 @@ from rest_framework import serializers
 from common.mixins import CommonBulkSerializerMixin
 from common.validators import PhoneValidator
 from common.utils import pretty_string
+from common.drf.fields import EncryptedField
 from rbac.builtin import BuiltinRole
 from rbac.permissions import RBACPermission
 from rbac.models import OrgRoleBinding, SystemRoleBinding, Role
@@ -87,6 +88,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
     can_public_key_auth = serializers.ReadOnlyField(
         source='can_use_ssh_key_login', label=_('Can public key authentication')
     )
+    password = EncryptedField(required=False, allow_blank=True, allow_null=True, max_length=1024)
     # Todo: 这里看看该怎么搞
     # can_update = serializers.SerializerMethodField(label=_('Can update'))
     # can_delete = serializers.SerializerMethodField(label=_('Can delete'))
