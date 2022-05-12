@@ -7,13 +7,21 @@ from ..models import SessionSharing, SessionJoinRecord
 __all__ = ['SessionSharingSerializer', 'SessionJoinRecordSerializer']
 
 
+class SessionSharingMetaSerializer(serializers.Serializer):
+    users = serializers.ListSerializer(
+        child=serializers.CharField(max_length=36), write_only=True, default=dict
+    )
+
+
 class SessionSharingSerializer(OrgResourceModelSerializerMixin):
+    meta = SessionSharingMetaSerializer()
+
     class Meta:
         model = SessionSharing
         fields_mini = ['id']
         fields_small = fields_mini + [
             'verify_code', 'is_active', 'expired_time', 'created_by',
-            'date_created', 'date_updated'
+            'date_created', 'date_updated', 'meta'
         ]
         fields_fk = ['session', 'creator']
         fields = fields_small + fields_fk

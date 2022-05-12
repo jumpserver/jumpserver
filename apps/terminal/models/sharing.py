@@ -4,6 +4,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
+from common.db.encoder import ModelJSONFieldEncoder
 from common.mixins import CommonModelMixin
 from orgs.mixins.models import OrgModelMixin
 from .session import Session
@@ -28,6 +29,7 @@ class SessionSharing(CommonModelMixin, OrgModelMixin):
     expired_time = models.IntegerField(
         default=0, verbose_name=_('Expired time (min)'), db_index=True
     )
+    meta = models.JSONField(encoder=ModelJSONFieldEncoder, default=dict, verbose_name=_("Meta"))
 
     class Meta:
         ordering = ('-date_created', )
@@ -49,11 +51,14 @@ class SessionSharing(CommonModelMixin, OrgModelMixin):
             return False
         return True
 
-    def can_join(self):
+    def can_join(self, joiner):
         if not self.is_active:
             return False, _('Link not active')
         if not self.is_expired:
             return False, _('Link expired')
+        allow_users = self.meta.get('users', [])
+        if allow_users and str(joiner.id) not in allow_users:
+            return False, _('User not allowed to join')
         return True, ''
 
 
@@ -110,7 +115,7 @@ class SessionJoinRecord(CommonModelMixin, OrgModelMixin):
 
     def can_join(self):
         # sharing
-        sharing_can_join, reason = self.sharing.can_join()
+        sharing_can_join, reason = self.sharing.can_join(self.joiner)
         if not sharing_can_join:
             return False, reason
         # self
