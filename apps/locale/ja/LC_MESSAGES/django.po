@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-11 10:44+0800\n"
+"POT-Creation-Date: 2022-05-12 14:39+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,7 +29,7 @@ msgstr "Acls"
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
 #: orgs/models.py:65 perms/models/base.py:83 rbac/models/role.py:29
 #: settings/models.py:29 settings/serializers/sms.py:6
-#: terminal/models/endpoint.py:10 terminal/models/endpoint.py:58
+#: terminal/models/endpoint.py:10 terminal/models/endpoint.py:59
 #: terminal/models/storage.py:25 terminal/models/task.py:16
 #: terminal/models/terminal.py:100 users/forms/profile.py:33
 #: users/models/group.py:15 users/models/user.py:661
@@ -38,12 +38,12 @@ msgid "Name"
 msgstr "名前"
 
 #: acls/models/base.py:27 assets/models/cmd_filter.py:84
-#: assets/models/user.py:247 terminal/models/endpoint.py:61
+#: assets/models/user.py:247 terminal/models/endpoint.py:62
 msgid "Priority"
 msgstr "優先順位"
 
 #: acls/models/base.py:28 assets/models/cmd_filter.py:84
-#: assets/models/user.py:247 terminal/models/endpoint.py:62
+#: assets/models/user.py:247 terminal/models/endpoint.py:63
 msgid "1-100, the lower the value will be match first"
 msgstr "1-100、低い値は最初に一致します"
 
@@ -61,7 +61,7 @@ msgstr "アクティブ"
 #: assets/models/domain.py:64 assets/models/group.py:23
 #: assets/models/label.py:23 ops/models/adhoc.py:38 orgs/models.py:68
 #: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:34
-#: terminal/models/endpoint.py:20 terminal/models/endpoint.py:68
+#: terminal/models/endpoint.py:21 terminal/models/endpoint.py:69
 #: terminal/models/storage.py:28 terminal/models/terminal.py:114
 #: tickets/models/comment.py:24 tickets/models/ticket.py:154
 #: users/models/group.py:16 users/models/user.py:698
@@ -182,7 +182,7 @@ msgstr ""
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
 #: authentication/templates/authentication/_msg_rest_password_success.html:8
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:8
-#: settings/serializers/terminal.py:8 terminal/serializers/endpoint.py:37
+#: settings/serializers/terminal.py:8 terminal/serializers/endpoint.py:38
 msgid "IP"
 msgstr "IP"
 
@@ -759,7 +759,7 @@ msgstr "確認済みの日付"
 #: assets/models/base.py:177 audits/signal_handlers.py:48
 #: authentication/forms.py:32
 #: authentication/templates/authentication/login.html:182
-#: settings/serializers/auth/ldap.py:45 users/forms/profile.py:22
+#: settings/serializers/auth/ldap.py:46 users/forms/profile.py:22
 #: users/templates/users/_msg_user_created.html:13
 #: users/templates/users/user_password_verify.html:18
 #: xpack/plugins/change_auth_plan/models/base.py:42
@@ -1108,7 +1108,7 @@ msgid "Actions"
 msgstr "アクション"
 
 #: assets/serializers/backup.py:31 ops/mixin.py:106 ops/mixin.py:147
-#: settings/serializers/auth/ldap.py:64
+#: settings/serializers/auth/ldap.py:65
 #: xpack/plugins/change_auth_plan/serializers/base.py:42
 msgid "Periodic perform"
 msgstr "定期的なパフォーマンス"
@@ -2731,12 +2731,12 @@ msgid "App ops"
 msgstr "アプリ操作"
 
 #: ops/mixin.py:29 ops/mixin.py:92 ops/mixin.py:162
-#: settings/serializers/auth/ldap.py:71
+#: settings/serializers/auth/ldap.py:72
 msgid "Cycle perform"
 msgstr "サイクル実行"
 
 #: ops/mixin.py:33 ops/mixin.py:90 ops/mixin.py:109 ops/mixin.py:150
-#: settings/serializers/auth/ldap.py:68
+#: settings/serializers/auth/ldap.py:69
 msgid "Regularly perform"
 msgstr "定期的に実行する"
 
@@ -2926,7 +2926,7 @@ msgstr "アプリ組織"
 
 #: orgs/mixins/models.py:46 orgs/mixins/serializers.py:25 orgs/models.py:80
 #: orgs/models.py:211 rbac/const.py:7 rbac/models/rolebinding.py:48
-#: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:61
+#: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:62
 #: tickets/serializers/ticket/ticket.py:77
 msgid "Organization"
 msgstr "組織"
@@ -3505,40 +3505,40 @@ msgstr "ピン認証の有効化"
 msgid "Enable FeiShu Auth"
 msgstr "飛本認証の有効化"
 
-#: settings/serializers/auth/ldap.py:40
+#: settings/serializers/auth/ldap.py:41
 msgid "LDAP server"
 msgstr "LDAPサーバー"
 
-#: settings/serializers/auth/ldap.py:41
+#: settings/serializers/auth/ldap.py:42
 msgid "eg: ldap://localhost:389"
 msgstr "例: ldap://localhost:389"
 
-#: settings/serializers/auth/ldap.py:43
+#: settings/serializers/auth/ldap.py:44
 msgid "Bind DN"
 msgstr "DN のバインド"
 
-#: settings/serializers/auth/ldap.py:48
+#: settings/serializers/auth/ldap.py:49
 msgid "User OU"
 msgstr "ユーザー OU"
 
-#: settings/serializers/auth/ldap.py:49
+#: settings/serializers/auth/ldap.py:50
 msgid "Use | split multi OUs"
 msgstr "使用 | splitマルチ OU"
 
-#: settings/serializers/auth/ldap.py:52
+#: settings/serializers/auth/ldap.py:53
 msgid "User search filter"
 msgstr "ユーザー検索フィルター"
 
-#: settings/serializers/auth/ldap.py:53
+#: settings/serializers/auth/ldap.py:54
 #, python-format
 msgid "Choice may be (cn|uid|sAMAccountName)=%(user)s)"
 msgstr "選択は (cnまたはuidまたはsAMAccountName)=%(user)s)"
 
-#: settings/serializers/auth/ldap.py:56
+#: settings/serializers/auth/ldap.py:57
 msgid "User attr map"
 msgstr "ユーザー属性マッピング"
 
-#: settings/serializers/auth/ldap.py:57
+#: settings/serializers/auth/ldap.py:58
 msgid ""
 "User attr map present how to map LDAP user attr to jumpserver, username,name,"
 "email is jumpserver attr"
@@ -3546,15 +3546,15 @@ msgstr ""
 "ユーザー属性マッピングは、LDAPのユーザー属性をjumpserverユーザーにマッピング"
 "する方法、username, name,emailはjumpserverのユーザーが必要とする属性です"
 
-#: settings/serializers/auth/ldap.py:75
+#: settings/serializers/auth/ldap.py:76
 msgid "Connect timeout"
 msgstr "接続タイムアウト"
 
-#: settings/serializers/auth/ldap.py:77
+#: settings/serializers/auth/ldap.py:78
 msgid "Search paged size"
 msgstr "ページサイズを検索"
 
-#: settings/serializers/auth/ldap.py:79
+#: settings/serializers/auth/ldap.py:80
 msgid "Enable LDAP auth"
 msgstr "LDAP認証の有効化"
 
@@ -4269,104 +4269,104 @@ msgstr "XRDPの有効化"
 msgid "Enable SSH Client"
 msgstr "SSH Clientの有効化"
 
-#: settings/utils/ldap.py:419
+#: settings/utils/ldap.py:467
 msgid "ldap:// or ldaps:// protocol is used."
 msgstr "ldap:// または ldaps:// プロトコルが使用されます。"
 
-#: settings/utils/ldap.py:430
+#: settings/utils/ldap.py:478
 msgid "Host or port is disconnected: {}"
 msgstr "ホストまたはポートが切断されました: {}"
 
-#: settings/utils/ldap.py:432
+#: settings/utils/ldap.py:480
 msgid "The port is not the port of the LDAP service: {}"
 msgstr "ポートはLDAPサービスのポートではありません: {}"
 
-#: settings/utils/ldap.py:434
+#: settings/utils/ldap.py:482
 msgid "Please add certificate: {}"
 msgstr "証明書を追加してください: {}"
 
-#: settings/utils/ldap.py:438 settings/utils/ldap.py:465
-#: settings/utils/ldap.py:495 settings/utils/ldap.py:523
+#: settings/utils/ldap.py:486 settings/utils/ldap.py:513
+#: settings/utils/ldap.py:543 settings/utils/ldap.py:571
 msgid "Unknown error: {}"
 msgstr "不明なエラー: {}"
 
-#: settings/utils/ldap.py:452
+#: settings/utils/ldap.py:500
 msgid "Bind DN or Password incorrect"
 msgstr "DNまたはパスワードのバインドが正しくありません"
 
-#: settings/utils/ldap.py:459
+#: settings/utils/ldap.py:507
 msgid "Please enter Bind DN: {}"
 msgstr "バインドDN: {} を入力してください"
 
-#: settings/utils/ldap.py:461
+#: settings/utils/ldap.py:509
 msgid "Please enter Password: {}"
 msgstr "パスワードを入力してください: {}"
 
-#: settings/utils/ldap.py:463
+#: settings/utils/ldap.py:511
 msgid "Please enter correct Bind DN and Password: {}"
 msgstr "正しいバインドDNとパスワードを入力してください: {}"
 
-#: settings/utils/ldap.py:481
+#: settings/utils/ldap.py:529
 msgid "Invalid User OU or User search filter: {}"
 msgstr "無効なユーザー OU またはユーザー検索フィルター: {}"
 
-#: settings/utils/ldap.py:512
+#: settings/utils/ldap.py:560
 msgid "LDAP User attr map not include: {}"
 msgstr "LDAP ユーザーattrマップは含まれません: {}"
 
-#: settings/utils/ldap.py:519
+#: settings/utils/ldap.py:567
 msgid "LDAP User attr map is not dict"
 msgstr "LDAPユーザーattrマップはdictではありません"
 
-#: settings/utils/ldap.py:538
+#: settings/utils/ldap.py:586
 msgid "LDAP authentication is not enabled"
 msgstr "LDAP 認証が有効になっていない"
 
-#: settings/utils/ldap.py:556
+#: settings/utils/ldap.py:604
 msgid "Error (Invalid LDAP server): {}"
 msgstr "エラー (LDAPサーバーが無効): {}"
 
-#: settings/utils/ldap.py:558
+#: settings/utils/ldap.py:606
 msgid "Error (Invalid Bind DN): {}"
 msgstr "エラー (DNのバインドが無効): {}"
 
-#: settings/utils/ldap.py:560
+#: settings/utils/ldap.py:608
 msgid "Error (Invalid LDAP User attr map): {}"
 msgstr "エラー (LDAPユーザーattrマップが無効): {}"
 
-#: settings/utils/ldap.py:562
+#: settings/utils/ldap.py:610
 msgid "Error (Invalid User OU or User search filter): {}"
 msgstr "エラー (ユーザーOUまたはユーザー検索フィルターが無効): {}"
 
-#: settings/utils/ldap.py:564
+#: settings/utils/ldap.py:612
 msgid "Error (Not enabled LDAP authentication): {}"
 msgstr "エラー (LDAP認証が有効化されていません): {}"
 
-#: settings/utils/ldap.py:566
+#: settings/utils/ldap.py:614
 msgid "Error (Unknown): {}"
 msgstr "エラー (不明): {}"
 
-#: settings/utils/ldap.py:569
+#: settings/utils/ldap.py:617
 msgid "Succeed: Match {} s user"
 msgstr "成功: {} 人のユーザーに一致"
 
-#: settings/utils/ldap.py:602
+#: settings/utils/ldap.py:650
 msgid "Authentication failed (configuration incorrect): {}"
 msgstr "認証に失敗しました (設定が正しくありません): {}"
 
-#: settings/utils/ldap.py:604
+#: settings/utils/ldap.py:652
 msgid "Authentication failed (before login check failed): {}"
 msgstr "認証に失敗しました (ログインチェックが失敗する前): {}"
 
-#: settings/utils/ldap.py:606
+#: settings/utils/ldap.py:654
 msgid "Authentication failed (username or password incorrect): {}"
 msgstr "認証に失敗しました (ユーザー名またはパスワードが正しくありません): {}"
 
-#: settings/utils/ldap.py:608
+#: settings/utils/ldap.py:656
 msgid "Authentication failed (Unknown): {}"
 msgstr "認証に失敗しました (不明): {}"
 
-#: settings/utils/ldap.py:611
+#: settings/utils/ldap.py:659
 msgid "Authentication success: {}"
 msgstr "認証成功: {}"
 
@@ -4741,18 +4741,22 @@ msgstr "MariaDB ポート"
 msgid "PostgreSQL Port"
 msgstr "PostgreSQL ポート"
 
-#: terminal/models/endpoint.py:25 terminal/models/endpoint.py:66
-#: terminal/serializers/endpoint.py:40 terminal/serializers/storage.py:37
+#: terminal/models/endpoint.py:20
+msgid "Redis Port"
+msgstr "Redis ポート"
+
+#: terminal/models/endpoint.py:26 terminal/models/endpoint.py:67
+#: terminal/serializers/endpoint.py:41 terminal/serializers/storage.py:37
 #: terminal/serializers/storage.py:49 terminal/serializers/storage.py:79
 #: terminal/serializers/storage.py:89 terminal/serializers/storage.py:97
 msgid "Endpoint"
 msgstr "エンドポイント"
 
-#: terminal/models/endpoint.py:59
+#: terminal/models/endpoint.py:60
 msgid "IP group"
 msgstr "IP グループ"
 
-#: terminal/models/endpoint.py:71
+#: terminal/models/endpoint.py:72
 msgid "Endpoint rule"
 msgstr "エンドポイントルール"
 
