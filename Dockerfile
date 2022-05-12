@@ -1,20 +1,5 @@
-# 编译代码
-FROM python:3.8-slim as stage-build
-MAINTAINER JumpServer Team <ibuler@qq.com>
-ARG VERSION
-ENV VERSION=$VERSION
-
-WORKDIR /opt/jumpserver
-ADD . .
-RUN cd utils && bash -ixeu build.sh
-
 FROM python:3.8-slim
-ARG PIP_MIRROR=https://pypi.douban.com/simple
-ENV PIP_MIRROR=$PIP_MIRROR
-ARG PIP_JMS_MIRROR=https://pypi.douban.com/simple
-ENV PIP_JMS_MIRROR=$PIP_JMS_MIRROR
-
-WORKDIR /opt/jumpserver
+MAINTAINER JumpServer Team <ibuler@qq.com>
 
 ARG BUILD_DEPENDENCIES="              \
     g++                               \
@@ -62,21 +47,37 @@ RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
     && mv /bin/sh /bin/sh.bak  \
     && ln -s /bin/bash /bin/sh
 
-RUN mkdir -p /opt/jumpserver/oracle/ \
+RUN mkdir -p /opt/oracle/ \
     && wget https://download.jumpserver.org/public/instantclient-basiclite-linux.x64-21.1.0.0.0.tar \
-    && tar xf instantclient-basiclite-linux.x64-21.1.0.0.0.tar -C /opt/jumpserver/oracle/ \
-    && echo "/opt/jumpserver/oracle/instantclient_21_1" > /etc/ld.so.conf.d/oracle-instantclient.conf \
+    && tar xf instantclient-basiclite-linux.x64-21.1.0.0.0.tar -C /opt/oracle/ \
+    && echo "/opt/oracle/instantclient_21_1" > /etc/ld.so.conf.d/oracle-instantclient.conf \
     && ldconfig \
     && rm -f instantclient-basiclite-linux.x64-21.1.0.0.0.tar
 
-COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/jumpserver
+WORKDIR /tmp/build
+COPY ./requirements ./requirements
 
-RUN echo > config.yml \
-    && pip install --upgrade pip==20.2.4 setuptools==49.6.0 wheel==0.34.2 -i ${PIP_MIRROR} \
+ARG PIP_MIRROR=https://mirrors.aliyun.com/pypi/simple/
+ENV PIP_MIRROR=$PIP_MIRROR
+ARG PIP_JMS_MIRROR=https://mirrors.aliyun.com/pypi/simple/
+ENV PIP_JMS_MIRROR=$PIP_JMS_MIRROR
+# 因为以 jms 或者 jumpserver 开头的 mirror 上可能没有
+RUN pip install --upgrade pip==20.2.4 setuptools==49.6.0 wheel==0.34.2 -i ${PIP_MIRROR} \
     && pip install --no-cache-dir $(grep -E 'jms|jumpserver' requirements/requirements.txt) -i ${PIP_JMS_MIRROR} \
     && pip install --no-cache-dir -r requirements/requirements.txt -i ${PIP_MIRROR} \
     && rm -rf ~/.cache/pip
 
+ARG VERSION
+ENV VERSION=$VERSION
+
+ADD . .
+RUN cd utils \
+    && bash -ixeu build.sh \
+    && mv ../release/jumpserver /opt/jumpserver \
+    && rm -rf /tmp/build \
+    && echo > /opt/jumpserver/config.yml
+
+WORKDIR /opt/jumpserver
 VOLUME /opt/jumpserver/data
 VOLUME /opt/jumpserver/logs
 

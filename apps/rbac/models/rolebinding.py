@@ -1,6 +1,7 @@
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.db.models import Q
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from rest_framework.serializers import ValidationError
 
@@ -111,9 +112,12 @@ class RoleBinding(JMSModel):
         system_bindings = [b for b in bindings if b.scope == Role.Scope.system.value]
         # 工作台仅限于自己加入的组织
         if perm == 'rbac.view_workbench':
-            all_orgs = user.orgs.all()
+            all_orgs = user.orgs.all().distinct()
         else:
             all_orgs = Organization.objects.all()
+
+        if not settings.XPACK_ENABLED:
+            all_orgs = all_orgs.filter(id=Organization.DEFAULT_ID)
 
         # 有系统级别的绑定，就代表在所有组织有这个权限
         if system_bindings:

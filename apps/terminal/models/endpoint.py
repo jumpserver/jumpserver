@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 from common.db.models import JMSModel
-from common.fields.model import PortField
+from common.db.fields import PortField
 from common.utils.ip import contains_ip
 
 
@@ -17,6 +17,7 @@ class Endpoint(JMSModel):
     mysql_port = PortField(default=33060, verbose_name=_('MySQL Port'))
     mariadb_port = PortField(default=33061, verbose_name=_('MariaDB Port'))
     postgresql_port = PortField(default=54320, verbose_name=_('PostgreSQL Port'))
+    redis_port = PortField(default=63790, verbose_name=_('Redis Port'))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
     default_id = '00000000-0000-0000-0000-000000000001'

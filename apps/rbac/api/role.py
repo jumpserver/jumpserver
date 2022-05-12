@@ -8,6 +8,7 @@ from ..filters import RoleFilter
 from ..serializers import RoleSerializer, RoleUserSerializer
 from ..models import Role, SystemRole, OrgRole
 from .permission import PermissionViewSet
+from common.mixins.api import PaginatedResponseMixin
 
 __all__ = [
     'RoleViewSet', 'SystemRoleViewSet', 'OrgRoleViewSet',
@@ -15,7 +16,7 @@ __all__ = [
 ]
 
 
-class RoleViewSet(JMSModelViewSet):
+class RoleViewSet(PaginatedResponseMixin, JMSModelViewSet):
     queryset = Role.objects.all()
     serializer_classes = {
         'default': RoleSerializer,
@@ -54,7 +55,7 @@ class RoleViewSet(JMSModelViewSet):
     def users(self, *args, **kwargs):
         role = self.get_object()
         queryset = role.users
-        return self.get_paginated_response_with_query_set(queryset)
+        return self.get_paginated_response_from_queryset(queryset)
 
 
 class SystemRoleViewSet(RoleViewSet):

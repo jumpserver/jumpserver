@@ -155,6 +155,10 @@ class CommandStorageTypeESSerializer(serializers.Serializer):
         child=serializers.CharField(validators=[command_storage_es_host_format_validator]),
         label=_('Hosts'), help_text=_(hosts_help_text), allow_null=True
     )
+    INDEX_BY_DATE = serializers.BooleanField(
+        default=False, label=_('Index by date'),
+        help_text=_('Whether to create an index by date')
+    )
     INDEX = serializers.CharField(
         max_length=1024, default='jumpserver', label=_('Index'), allow_null=True
     )

@@ -17,6 +17,14 @@ class CommonSettingSerializer(serializers.Serializer):
     AUTH_OPENID_CLIENT_SECRET = serializers.CharField(
         required=False, max_length=1024,  write_only=True, label=_('Client Secret')
     )
+    AUTH_OPENID_CLIENT_AUTH_METHOD = serializers.ChoiceField(
+        default='client_secret_basic',
+        choices=(
+            ('client_secret_basic', 'Client Secret Basic'),
+            ('client_secret_post', 'Client Secret Post')
+        ),
+        label=_('Client authentication method')
+    )
     AUTH_OPENID_SHARE_SESSION = serializers.BooleanField(required=False, label=_('Share session'))
     AUTH_OPENID_IGNORE_SSL_VERIFICATION = serializers.BooleanField(
         required=False, label=_('Ignore ssl verification')

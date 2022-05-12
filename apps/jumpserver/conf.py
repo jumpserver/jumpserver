@@ -187,6 +187,8 @@ class Config(dict):
         'BASE_SITE_URL': None,
         'AUTH_OPENID_CLIENT_ID': 'client-id',
         'AUTH_OPENID_CLIENT_SECRET': 'client-secret',
+        # https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication
+        'AUTH_OPENID_CLIENT_AUTH_METHOD': 'client_secret_basic',
         'AUTH_OPENID_SHARE_SESSION': True,
         'AUTH_OPENID_IGNORE_SSL_VERIFICATION': True,
 

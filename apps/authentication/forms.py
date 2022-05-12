@@ -1,15 +1,25 @@
 # -*- coding: utf-8 -*-
 #
-
 from django import forms
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from captcha.fields import CaptchaField, CaptchaTextInput
 
+from common.utils import get_logger, decrypt_password
+
+logger = get_logger(__name__)
+
+
+class EncryptedField(forms.CharField):
+    def to_python(self, value):
+        value = super().to_python(value)
+        return decrypt_password(value)
+
 
 class UserLoginForm(forms.Form):
     days_auto_login = int(settings.SESSION_COOKIE_AGE / 3600 / 24)
-    disable_days_auto_login = settings.SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE or days_auto_login < 1
+    disable_days_auto_login = settings.SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE \
+                              or days_auto_login < 1
 
     username = forms.CharField(
         label=_('Username'), max_length=100,
@@ -18,7 +28,7 @@ class UserLoginForm(forms.Form):
             'autofocus': 'autofocus'
         })
     )
-    password = forms.CharField(
+    password = EncryptedField(
         label=_('Password'), widget=forms.PasswordInput,
         max_length=1024, strip=False
     )

@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from common.utils import validate_ssh_public_key
+from common.drf.fields import EncryptedField
 from ..models import User
 
 from .user import UserSerializer
@@ -16,9 +17,9 @@ class UserOrgSerializer(serializers.Serializer):
 
 
 class UserUpdatePasswordSerializer(serializers.ModelSerializer):
-    old_password = serializers.CharField(required=True, max_length=128, write_only=True)
-    new_password = serializers.CharField(required=True, max_length=128, write_only=True)
-    new_password_again = serializers.CharField(required=True, max_length=128, write_only=True)
+    old_password = EncryptedField(required=True, max_length=128, write_only=True)
+    new_password = EncryptedField(required=True, max_length=128, write_only=True)
+    new_password_again = EncryptedField(required=True, max_length=128, write_only=True)
 
     class Meta:
         model = User
@@ -41,11 +42,13 @@ class UserUpdatePasswordSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(msg)
         return value
 
-    def validate_new_password_again(self, value):
-        if value != self.initial_data.get('new_password', ''):
+    def validate(self, values):
+        new_password = values.get('new_password', '')
+        new_password_again = values.get('new_password_again', '')
+        if new_password != new_password_again:
             msg = _('The newly set password is inconsistent')
-            raise serializers.ValidationError(msg)
-        return value
+            raise serializers.ValidationError({'new_password_again': msg})
+        return values
 
     def update(self, instance, validated_data):
         new_password = self.validated_data.get('new_password')

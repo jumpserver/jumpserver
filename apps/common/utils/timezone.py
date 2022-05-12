@@ -32,6 +32,10 @@ def local_now_display(fmt='%Y-%m-%d %H:%M:%S'):
     return local_now().strftime(fmt)
 
 
+def local_now_date_display(fmt='%Y-%m-%d'):
+    return local_now().strftime(fmt)
+
+
 _rest_dt_field = DateTimeField()
 dt_parser = _rest_dt_field.to_internal_value
 dt_formatter = _rest_dt_field.to_representation

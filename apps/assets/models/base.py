@@ -19,7 +19,7 @@ from common.utils import (
 )
 from common.utils.encode import ssh_pubkey_gen
 from common.validators import alphanumeric
-from common import fields
+from common.db import fields
 from orgs.mixins.models import OrgModelMixin
 
 

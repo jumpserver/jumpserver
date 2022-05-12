@@ -11,7 +11,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import ValidationError
 
-from common.fields.model import JsonDictTextField
+from common.db.fields import JsonDictTextField
 from common.utils import lazyproperty
 from orgs.mixins.models import OrgModelMixin, OrgManager
 
@@ -301,7 +301,7 @@ class Asset(AbsConnectivity, AbsHardwareInfo, ProtocolsMixin, NodesRelationMixin
             'private_key': auth_user.private_key_file
         }
 
-        if not with_become:
+        if not with_become or self.is_windows():
             return info
 
         if become_user:

@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from captcha.fields import CaptchaField
 
 from common.utils import validate_ssh_public_key
+from authentication.forms import EncryptedField
 from ..models import User
 
 
@@ -17,7 +18,7 @@ __all__ = [
 
 
 class UserCheckPasswordForm(forms.Form):
-    password = forms.CharField(
+    password = EncryptedField(
         label=_('Password'), widget=forms.PasswordInput,
         max_length=1024, strip=False
     )
@@ -77,12 +78,12 @@ UserFirstLoginFinishForm.verbose_name = _("Finish")
 
 
 class UserTokenResetPasswordForm(forms.Form):
-    new_password = forms.CharField(
+    new_password = EncryptedField(
         min_length=5, max_length=128,
         widget=forms.PasswordInput,
         label=_("New password")
     )
-    confirm_password = forms.CharField(
+    confirm_password = EncryptedField(
         min_length=5, max_length=128,
         widget=forms.PasswordInput,
         label=_("Confirm password")
@@ -103,7 +104,7 @@ class UserForgotPasswordForm(forms.Form):
 
 
 class UserPasswordForm(UserTokenResetPasswordForm):
-    old_password = forms.CharField(
+    old_password = EncryptedField(
         max_length=128, widget=forms.PasswordInput,
         label=_("Old password")
     )
