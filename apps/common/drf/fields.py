@@ -3,7 +3,7 @@
 
 from rest_framework import serializers
 
-from common.utils import rsa_decrypt_by_session_pkey
+from common.utils import decrypt_password
 
 __all__ = [
     'ReadableHiddenField', 'EncryptedField'
@@ -29,4 +29,4 @@ class ReadableHiddenField(serializers.HiddenField):
 class EncryptedField(serializers.CharField):
     def to_internal_value(self, value):
         value = super().to_internal_value(value)
-        return rsa_decrypt_by_session_pkey(value)
+        return decrypt_password(value)

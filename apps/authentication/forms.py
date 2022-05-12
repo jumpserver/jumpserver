@@ -5,7 +5,7 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from captcha.fields import CaptchaField, CaptchaTextInput
 
-from common.utils import get_logger, rsa_decrypt_by_session_pkey
+from common.utils import get_logger, decrypt_password
 
 logger = get_logger(__name__)
 
@@ -13,7 +13,7 @@ logger = get_logger(__name__)
 class EncryptedField(forms.CharField):
     def to_python(self, value):
         value = super().to_python(value)
-        return rsa_decrypt_by_session_pkey(value)
+        return decrypt_password(value)
 
 
 class UserLoginForm(forms.Form):
