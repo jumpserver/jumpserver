@@ -41,14 +41,6 @@ class PublicSettingApi(OpenPublicSettingApi):
 
     def get_object(self):
         values = super().get_object()
-
-        serializer = self.serializer_class()
-        field_names = list(serializer.fields.keys())
-
-        for name in field_names:
-            if hasattr(settings, name):
-                values[name] = getattr(settings, name)
-
         values.update({
             "XPACK_LICENSE_IS_VALID": has_valid_xpack_license(),
             "XPACK_LICENSE_INFO": get_xpack_license_info(),
@@ -61,6 +53,15 @@ class PublicSettingApi(OpenPublicSettingApi):
                 'SECURITY_PASSWORD_SPECIAL_CHAR': settings.SECURITY_PASSWORD_SPECIAL_CHAR,
             },
         })
+
+        serializer = self.serializer_class()
+        field_names = list(serializer.fields.keys())
+        for name in field_names:
+            if name in values:
+                continue
+            # 提前把异常爆出来
+            values[name] = getattr(settings, name)
         return values
+
 
 
