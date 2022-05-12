@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-11 10:44+0800\n"
+"POT-Creation-Date: 2022-05-12 14:39+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -28,7 +28,7 @@ msgstr "访问控制"
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
 #: orgs/models.py:65 perms/models/base.py:83 rbac/models/role.py:29
 #: settings/models.py:29 settings/serializers/sms.py:6
-#: terminal/models/endpoint.py:10 terminal/models/endpoint.py:58
+#: terminal/models/endpoint.py:10 terminal/models/endpoint.py:59
 #: terminal/models/storage.py:25 terminal/models/task.py:16
 #: terminal/models/terminal.py:100 users/forms/profile.py:33
 #: users/models/group.py:15 users/models/user.py:661
@@ -37,12 +37,12 @@ msgid "Name"
 msgstr "名称"
 
 #: acls/models/base.py:27 assets/models/cmd_filter.py:84
-#: assets/models/user.py:247 terminal/models/endpoint.py:61
+#: assets/models/user.py:247 terminal/models/endpoint.py:62
 msgid "Priority"
 msgstr "优先级"
 
 #: acls/models/base.py:28 assets/models/cmd_filter.py:84
-#: assets/models/user.py:247 terminal/models/endpoint.py:62
+#: assets/models/user.py:247 terminal/models/endpoint.py:63
 msgid "1-100, the lower the value will be match first"
 msgstr "优先级可选范围为 1-100 (数值越小越优先)"
 
@@ -60,7 +60,7 @@ msgstr "激活中"
 #: assets/models/domain.py:64 assets/models/group.py:23
 #: assets/models/label.py:23 ops/models/adhoc.py:38 orgs/models.py:68
 #: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:34
-#: terminal/models/endpoint.py:20 terminal/models/endpoint.py:68
+#: terminal/models/endpoint.py:21 terminal/models/endpoint.py:69
 #: terminal/models/storage.py:28 terminal/models/terminal.py:114
 #: tickets/models/comment.py:24 tickets/models/ticket.py:154
 #: users/models/group.py:16 users/models/user.py:698
@@ -180,7 +180,7 @@ msgstr ""
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
 #: authentication/templates/authentication/_msg_rest_password_success.html:8
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:8
-#: settings/serializers/terminal.py:8 terminal/serializers/endpoint.py:37
+#: settings/serializers/terminal.py:8 terminal/serializers/endpoint.py:38
 msgid "IP"
 msgstr "IP"
 
@@ -754,7 +754,7 @@ msgstr "校验日期"
 #: assets/models/base.py:177 audits/signal_handlers.py:48
 #: authentication/forms.py:32
 #: authentication/templates/authentication/login.html:182
-#: settings/serializers/auth/ldap.py:45 users/forms/profile.py:22
+#: settings/serializers/auth/ldap.py:46 users/forms/profile.py:22
 #: users/templates/users/_msg_user_created.html:13
 #: users/templates/users/user_password_verify.html:18
 #: xpack/plugins/change_auth_plan/models/base.py:42
@@ -1100,7 +1100,7 @@ msgid "Actions"
 msgstr "动作"
 
 #: assets/serializers/backup.py:31 ops/mixin.py:106 ops/mixin.py:147
-#: settings/serializers/auth/ldap.py:64
+#: settings/serializers/auth/ldap.py:65
 #: xpack/plugins/change_auth_plan/serializers/base.py:42
 msgid "Periodic perform"
 msgstr "定时执行"
@@ -2696,12 +2696,12 @@ msgid "App ops"
 msgstr "作业中心"
 
 #: ops/mixin.py:29 ops/mixin.py:92 ops/mixin.py:162
-#: settings/serializers/auth/ldap.py:71
+#: settings/serializers/auth/ldap.py:72
 msgid "Cycle perform"
 msgstr "周期执行"
 
 #: ops/mixin.py:33 ops/mixin.py:90 ops/mixin.py:109 ops/mixin.py:150
-#: settings/serializers/auth/ldap.py:68
+#: settings/serializers/auth/ldap.py:69
 msgid "Regularly perform"
 msgstr "定期执行"
 
@@ -2890,7 +2890,7 @@ msgstr "组织管理"
 
 #: orgs/mixins/models.py:46 orgs/mixins/serializers.py:25 orgs/models.py:80
 #: orgs/models.py:211 rbac/const.py:7 rbac/models/rolebinding.py:48
-#: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:61
+#: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:62
 #: tickets/serializers/ticket/ticket.py:77
 msgid "Organization"
 msgstr "组织"
@@ -3466,40 +3466,40 @@ msgstr "启用钉钉认证"
 msgid "Enable FeiShu Auth"
 msgstr "启用飞书认证"
 
-#: settings/serializers/auth/ldap.py:40
+#: settings/serializers/auth/ldap.py:41
 msgid "LDAP server"
 msgstr "LDAP 地址"
 
-#: settings/serializers/auth/ldap.py:41
+#: settings/serializers/auth/ldap.py:42
 msgid "eg: ldap://localhost:389"
 msgstr "如: ldap://localhost:389"
 
-#: settings/serializers/auth/ldap.py:43
+#: settings/serializers/auth/ldap.py:44
 msgid "Bind DN"
 msgstr "绑定 DN"
 
-#: settings/serializers/auth/ldap.py:48
+#: settings/serializers/auth/ldap.py:49
 msgid "User OU"
 msgstr "用户 OU"
 
-#: settings/serializers/auth/ldap.py:49
+#: settings/serializers/auth/ldap.py:50
 msgid "Use | split multi OUs"
 msgstr "多个 OU 使用 | 分割"
 
-#: settings/serializers/auth/ldap.py:52
+#: settings/serializers/auth/ldap.py:53
 msgid "User search filter"
 msgstr "用户过滤器"
 
-#: settings/serializers/auth/ldap.py:53
+#: settings/serializers/auth/ldap.py:54
 #, python-format
 msgid "Choice may be (cn|uid|sAMAccountName)=%(user)s)"
 msgstr "可能的选项是(cn或uid或sAMAccountName=%(user)s)"
 
-#: settings/serializers/auth/ldap.py:56
+#: settings/serializers/auth/ldap.py:57
 msgid "User attr map"
 msgstr "用户属性映射"
 
-#: settings/serializers/auth/ldap.py:57
+#: settings/serializers/auth/ldap.py:58
 msgid ""
 "User attr map present how to map LDAP user attr to jumpserver, username,name,"
 "email is jumpserver attr"
@@ -3507,15 +3507,15 @@ msgstr ""
 "用户属性映射代表怎样将LDAP中用户属性映射到jumpserver用户上，username, name,"
 "email 是jumpserver的用户需要属性"
 
-#: settings/serializers/auth/ldap.py:75
+#: settings/serializers/auth/ldap.py:76
 msgid "Connect timeout"
 msgstr "连接超时时间"
 
-#: settings/serializers/auth/ldap.py:77
+#: settings/serializers/auth/ldap.py:78
 msgid "Search paged size"
 msgstr "搜索分页数量"
 
-#: settings/serializers/auth/ldap.py:79
+#: settings/serializers/auth/ldap.py:80
 msgid "Enable LDAP auth"
 msgstr "启用 LDAP 认证"
 
@@ -4207,104 +4207,104 @@ msgstr "启用 XRDP 服务"
 msgid "Enable SSH Client"
 msgstr "启用 SSH Client"
 
-#: settings/utils/ldap.py:419
+#: settings/utils/ldap.py:467
 msgid "ldap:// or ldaps:// protocol is used."
 msgstr "使用 ldap:// 或 ldaps:// 协议"
 
-#: settings/utils/ldap.py:430
+#: settings/utils/ldap.py:478
 msgid "Host or port is disconnected: {}"
 msgstr "主机或端口不可连接: {}"
 
-#: settings/utils/ldap.py:432
+#: settings/utils/ldap.py:480
 msgid "The port is not the port of the LDAP service: {}"
 msgstr "端口不是LDAP服务端口: {}"
 
-#: settings/utils/ldap.py:434
+#: settings/utils/ldap.py:482
 msgid "Please add certificate: {}"
 msgstr "请添加证书"
 
-#: settings/utils/ldap.py:438 settings/utils/ldap.py:465
-#: settings/utils/ldap.py:495 settings/utils/ldap.py:523
+#: settings/utils/ldap.py:486 settings/utils/ldap.py:513
+#: settings/utils/ldap.py:543 settings/utils/ldap.py:571
 msgid "Unknown error: {}"
 msgstr "未知错误: {}"
 
-#: settings/utils/ldap.py:452
+#: settings/utils/ldap.py:500
 msgid "Bind DN or Password incorrect"
 msgstr "绑定DN或密码错误"
 
-#: settings/utils/ldap.py:459
+#: settings/utils/ldap.py:507
 msgid "Please enter Bind DN: {}"
 msgstr "请输入绑定DN: {}"
 
-#: settings/utils/ldap.py:461
+#: settings/utils/ldap.py:509
 msgid "Please enter Password: {}"
 msgstr "请输入密码: {}"
 
-#: settings/utils/ldap.py:463
+#: settings/utils/ldap.py:511
 msgid "Please enter correct Bind DN and Password: {}"
 msgstr "请输入正确的绑定DN和密码: {}"
 
-#: settings/utils/ldap.py:481
+#: settings/utils/ldap.py:529
 msgid "Invalid User OU or User search filter: {}"
 msgstr "不合法的用户OU或用户过滤器: {}"
 
-#: settings/utils/ldap.py:512
+#: settings/utils/ldap.py:560
 msgid "LDAP User attr map not include: {}"
 msgstr "LDAP属性映射没有包含: {}"
 
-#: settings/utils/ldap.py:519
+#: settings/utils/ldap.py:567
 msgid "LDAP User attr map is not dict"
 msgstr "LDAP属性映射不合法"
 
-#: settings/utils/ldap.py:538
+#: settings/utils/ldap.py:586
 msgid "LDAP authentication is not enabled"
 msgstr "LDAP认证没有启用"
 
-#: settings/utils/ldap.py:556
+#: settings/utils/ldap.py:604
 msgid "Error (Invalid LDAP server): {}"
 msgstr "错误 （不合法的LDAP服务器地址）: {}"
 
-#: settings/utils/ldap.py:558
+#: settings/utils/ldap.py:606
 msgid "Error (Invalid Bind DN): {}"
 msgstr "错误（不合法的绑定DN）: {}"
 
-#: settings/utils/ldap.py:560
+#: settings/utils/ldap.py:608
 msgid "Error (Invalid LDAP User attr map): {}"
 msgstr "错误（不合法的LDAP属性映射）: {}"
 
-#: settings/utils/ldap.py:562
+#: settings/utils/ldap.py:610
 msgid "Error (Invalid User OU or User search filter): {}"
 msgstr "错误（不合法的用户OU或用户过滤器）: {}"
 
-#: settings/utils/ldap.py:564
+#: settings/utils/ldap.py:612
 msgid "Error (Not enabled LDAP authentication): {}"
 msgstr "错误（没有启用LDAP认证）: {}"
 
-#: settings/utils/ldap.py:566
+#: settings/utils/ldap.py:614
 msgid "Error (Unknown): {}"
 msgstr "错误（未知）: {}"
 
-#: settings/utils/ldap.py:569
+#: settings/utils/ldap.py:617
 msgid "Succeed: Match {} s user"
 msgstr "成功匹配 {} 个用户"
 
-#: settings/utils/ldap.py:602
+#: settings/utils/ldap.py:650
 msgid "Authentication failed (configuration incorrect): {}"
 msgstr "认证失败（配置错误）: {}"
 
-#: settings/utils/ldap.py:604
+#: settings/utils/ldap.py:652
 msgid "Authentication failed (before login check failed): {}"
 msgstr "认证失败（登录前检查失败）: {}"
 
-#: settings/utils/ldap.py:606
+#: settings/utils/ldap.py:654
 msgid "Authentication failed (username or password incorrect): {}"
 msgstr "认证失败 (用户名或密码不正确): {}"
 
-#: settings/utils/ldap.py:608
+#: settings/utils/ldap.py:656
 msgid "Authentication failed (Unknown): {}"
 msgstr "认证失败: (未知): {}"
 
-#: settings/utils/ldap.py:611
+#: settings/utils/ldap.py:659
 msgid "Authentication success: {}"
 msgstr "认证成功: {}"
 
@@ -4669,18 +4669,22 @@ msgstr "MariaDB 端口"
 msgid "PostgreSQL Port"
 msgstr "PostgreSQL 端口"
 
-#: terminal/models/endpoint.py:25 terminal/models/endpoint.py:66
-#: terminal/serializers/endpoint.py:40 terminal/serializers/storage.py:37
+#: terminal/models/endpoint.py:20
+msgid "Redis Port"
+msgstr "Redis 端口"
+
+#: terminal/models/endpoint.py:26 terminal/models/endpoint.py:67
+#: terminal/serializers/endpoint.py:41 terminal/serializers/storage.py:37
 #: terminal/serializers/storage.py:49 terminal/serializers/storage.py:79
 #: terminal/serializers/storage.py:89 terminal/serializers/storage.py:97
 msgid "Endpoint"
 msgstr "端点"
 
-#: terminal/models/endpoint.py:59
+#: terminal/models/endpoint.py:60
 msgid "IP group"
 msgstr "IP 组"
 
-#: terminal/models/endpoint.py:71
+#: terminal/models/endpoint.py:72
 msgid "Endpoint rule"
 msgstr "端点规则"
 
