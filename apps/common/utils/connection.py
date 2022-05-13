@@ -19,7 +19,7 @@ def get_redis_client(db=0):
         'password': CONFIG.REDIS_PASSWORD,
         'db': db,
         "ssl": is_true(CONFIG.REDIS_USE_SSL),
-        'ssl_cert_reqs': CONFIG.REDIS_SSL_REQUIRED,
+        'ssl_cert_reqs': getattr(settings, 'REDIS_SSL_REQUIRED'),
         'ssl_keyfile': getattr(settings, 'REDIS_SSL_KEYFILE'),
         'ssl_certfile': getattr(settings, 'REDIS_SSL_CERTFILE'),
         'ssl_ca_certs': getattr(settings, 'REDIS_SSL_CA_CERTS'),
