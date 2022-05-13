@@ -277,6 +277,11 @@ REDIS_SSL_CA_CERTS = os.path.join(PROJECT_DIR, 'data', 'certs', 'redis_ca.crt')
 if not os.path.exists(REDIS_SSL_CA_CERTS):
     REDIS_SSL_CA_CERTS = os.path.join(PROJECT_DIR, 'data', 'certs', 'redis_ca.pem')
 
+if not os.path.exists(REDIS_SSL_CA_CERTS):
+    REDIS_SSL_CA_CERTS = None
+
+REDIS_SSL_REQUIRED = CONFIG.REDIS_SSL_REQUIRED or 'none'
+
 CACHES = {
     'default': {
         # 'BACKEND': 'redis_cache.RedisCache',
@@ -291,7 +296,7 @@ CACHES = {
         'OPTIONS': {
             "REDIS_CLIENT_KWARGS": {"health_check_interval": 30},
             "CONNECTION_POOL_KWARGS": {
-                'ssl_cert_reqs': CONFIG.REDIS_SSL_REQUIRED,
+                'ssl_cert_reqs': REDIS_SSL_REQUIRED,
                 "ssl_keyfile": REDIS_SSL_KEYFILE,
                 "ssl_certfile": REDIS_SSL_CERTFILE,
                 "ssl_ca_certs": REDIS_SSL_CA_CERTS
