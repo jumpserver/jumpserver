@@ -88,7 +88,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
     can_public_key_auth = serializers.ReadOnlyField(
         source='can_use_ssh_key_login', label=_('Can public key authentication')
     )
-    password = EncryptedField(required=False, allow_blank=True, allow_null=True, max_length=1024)
+    password = EncryptedField(required=False, allow_blank=True, allow_null=True, max_length=1024, label=_("Password"))
     # Todo: 这里看看该怎么搞
     # can_update = serializers.SerializerMethodField(label=_('Can update'))
     # can_delete = serializers.SerializerMethodField(label=_('Can delete'))
