@@ -1,2 +1,3 @@
 *.mmdb filter=lfs diff=lfs merge=lfs -text
 *.mo filter=lfs diff=lfs merge=lfs -text
+*.ipdb filter=lfs diff=lfs merge=lfs -text
