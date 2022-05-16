@@ -22,7 +22,7 @@ class LDAPTestConfigSerializer(serializers.Serializer):
 
 class LDAPTestLoginSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=1024, required=True)
-    password = EncryptedField(max_length=2014, required=True)
+    password = EncryptedField(max_length=2014, required=True, label=_("Password"))
 
 
 class LDAPUserSerializer(serializers.Serializer):

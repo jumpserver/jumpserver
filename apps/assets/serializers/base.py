@@ -11,8 +11,8 @@ from assets.models import Type
 
 
 class AuthSerializer(serializers.ModelSerializer):
-    password = EncryptedField(required=False, allow_blank=True, allow_null=True, max_length=1024)
-    private_key = EncryptedField(required=False, allow_blank=True, allow_null=True, max_length=4096)
+    password = EncryptedField(required=False, allow_blank=True, allow_null=True, max_length=1024, label=_('Password'))
+    private_key = EncryptedField(required=False, allow_blank=True, allow_null=True, max_length=4096, label=_('Private key'))
 
     def gen_keys(self, private_key=None, password=None):
         if private_key is None:
