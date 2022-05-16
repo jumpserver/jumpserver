@@ -8,11 +8,11 @@ from geoip2.errors import GeoIP2Error
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-__all__ = ['get_ip_city']
+__all__ = ['get_ip_city_by_geoip']
 reader = None
 
 
-def get_ip_city(ip):
+def get_ip_city_by_geoip(ip):
     if not ip or '.' not in ip or not isinstance(ip, str):
         return _("Invalid ip")
     if ':' in ip:
@@ -32,15 +32,13 @@ def get_ip_city(ip):
     try:
         response = reader.city(ip)
     except GeoIP2Error:
-        return _("Unknown ip")
+        return {}
 
-    names = response.city.names
-    if not names:
-        names = response.country.names
+    city_names = response.city.names or {}
+    lang = settings.LANGUAGE_CODE[:2]
+    if lang == 'zh':
+        lang = 'zh-CN'
+    city = city_names.get(lang, _("Unknown"))
+    return city
 
-    if 'en' in settings.LANGUAGE_CODE and 'en' in names:
-        return names['en']
-    elif 'zh-CN' in names:
-        return names['zh-CN']
-    return _("Unknown ip")
 
