@@ -9,7 +9,7 @@ from users.models import UserGroup, User
 from users.signals import pre_user_leave_org
 from applications.models import Application
 from terminal.models import Session
-from rbac.models import OrgRoleBinding, SystemRoleBinding
+from rbac.models import OrgRoleBinding, SystemRoleBinding, RoleBinding
 from assets.models import Asset, SystemUser, Domain, Gateway
 from orgs.caches import OrgResourceStatisticsCache
 from orgs.utils import current_org
@@ -85,6 +85,7 @@ class OrgResourceStatisticsRefreshUtil:
         Node: ['nodes_amount'],
         Asset: ['assets_amount'],
         UserGroup: ['groups_amount'],
+        RoleBinding: ['users_amount']
     }
 
     @classmethod
