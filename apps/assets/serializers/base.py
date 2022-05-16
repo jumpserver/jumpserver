@@ -32,8 +32,12 @@ class AuthSerializer(serializers.ModelSerializer):
 
 
 class AuthSerializerMixin(serializers.ModelSerializer):
-    password = EncryptedField(required=False, allow_blank=True, allow_null=True, max_length=1024)
-    private_key = EncryptedField(required=False, allow_blank=True, allow_null=True, max_length=4096)
+    password = EncryptedField(
+        label=_('Password'), required=False, allow_blank=True, allow_null=True, max_length=1024
+    )
+    private_key = EncryptedField(
+        label=_('SSH private key'), required=False, allow_blank=True, allow_null=True, max_length=4096
+    )
     passphrase = serializers.CharField(
         allow_blank=True, allow_null=True, required=False, max_length=512,
         write_only=True, label=_('Key password')
