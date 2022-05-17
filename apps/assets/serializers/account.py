@@ -7,6 +7,7 @@ from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from .base import AuthSerializerMixin
 from .utils import validate_password_contains_left_double_curly_bracket
 from common.utils.encode import ssh_pubkey_gen
+from common.drf.serializers import SecretReadableMixin
 
 
 class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
@@ -70,7 +71,7 @@ class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         return super().to_representation(instance)
 
 
-class AccountSecretSerializer(AccountSerializer):
+class AccountSecretSerializer(SecretReadableMixin, AccountSerializer):
     class Meta(AccountSerializer.Meta):
         fields_backup = [
             'hostname', 'ip', 'platform', 'protocols', 'username', 'password',

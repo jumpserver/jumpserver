@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-16 17:43+0800\n"
+"POT-Creation-Date: 2022-05-17 18:02+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -753,10 +753,12 @@ msgstr "可连接性"
 msgid "Date verified"
 msgstr "校验日期"
 
-#: assets/models/base.py:177 audits/signal_handlers.py:48
+#: assets/models/base.py:177 assets/serializers/base.py:14
+#: assets/serializers/base.py:36 audits/signal_handlers.py:48
 #: authentication/forms.py:32
 #: authentication/templates/authentication/login.html:182
-#: settings/serializers/auth/ldap.py:46 users/forms/profile.py:22
+#: settings/serializers/auth/ldap.py:25 settings/serializers/auth/ldap.py:46
+#: users/forms/profile.py:22 users/serializers/user.py:92
 #: users/templates/users/_msg_user_created.html:13
 #: users/templates/users/user_password_verify.html:18
 #: xpack/plugins/change_auth_plan/models/base.py:42
@@ -766,7 +768,8 @@ msgstr "校验日期"
 msgid "Password"
 msgstr "密码"
 
-#: assets/models/base.py:178 xpack/plugins/change_auth_plan/models/asset.py:53
+#: assets/models/base.py:178 assets/serializers/base.py:39
+#: xpack/plugins/change_auth_plan/models/asset.py:53
 #: xpack/plugins/change_auth_plan/models/asset.py:130
 #: xpack/plugins/change_auth_plan/models/asset.py:206
 msgid "SSH private key"
@@ -1112,11 +1115,15 @@ msgstr "定时执行"
 msgid "Currently only mail sending is supported"
 msgstr "当前只支持邮件发送"
 
-#: assets/serializers/base.py:39
+#: assets/serializers/base.py:15 users/models/user.py:689
+msgid "Private key"
+msgstr "ssh私钥"
+
+#: assets/serializers/base.py:43
 msgid "Key password"
 msgstr "密钥密码"
 
-#: assets/serializers/base.py:52
+#: assets/serializers/base.py:56
 msgid "private key invalid or passphrase error"
 msgstr "密钥不合法或密钥密码错误"
 
@@ -2081,7 +2088,7 @@ msgstr "绑定提醒"
 #: perms/serializers/application/permission.py:20
 #: perms/serializers/application/permission.py:41
 #: perms/serializers/asset/permission.py:19
-#: perms/serializers/asset/permission.py:45 users/serializers/user.py:143
+#: perms/serializers/asset/permission.py:45 users/serializers/user.py:145
 msgid "Is valid"
 msgstr "账号是否有效"
 
@@ -3027,7 +3034,7 @@ msgstr "组织 ({}) 的应用授权"
 #: perms/serializers/application/permission.py:40
 #: perms/serializers/asset/permission.py:20
 #: perms/serializers/asset/permission.py:44 users/serializers/user.py:87
-#: users/serializers/user.py:145
+#: users/serializers/user.py:147
 msgid "Is expired"
 msgstr "已过期"
 
@@ -3732,6 +3739,10 @@ msgstr "启用公告"
 #: settings/serializers/basic.py:45
 msgid "Announcement"
 msgstr "公告"
+
+#: settings/serializers/basic.py:46
+msgid "Enable tickets"
+msgstr "启用工单"
 
 #: settings/serializers/cleaning.py:10
 msgid "Login log keep days"
@@ -5562,7 +5573,7 @@ msgstr "强制启用"
 msgid "Local"
 msgstr "数据库"
 
-#: users/models/user.py:673 users/serializers/user.py:144
+#: users/models/user.py:673 users/serializers/user.py:146
 msgid "Is service account"
 msgstr "服务账号"
 
@@ -5573,10 +5584,6 @@ msgstr "头像"
 #: users/models/user.py:678
 msgid "Wechat"
 msgstr "微信"
-
-#: users/models/user.py:689
-msgid "Private key"
-msgstr "ssh私钥"
 
 #: users/models/user.py:711
 msgid "Source"
@@ -5661,7 +5668,7 @@ msgstr "新密码不能是最近 {} 次的密码"
 msgid "The newly set password is inconsistent"
 msgstr "两次密码不一致"
 
-#: users/serializers/profile.py:147 users/serializers/user.py:142
+#: users/serializers/profile.py:147 users/serializers/user.py:144
 msgid "Is first login"
 msgstr "首次登录"
 
@@ -5699,63 +5706,63 @@ msgstr "登录被阻塞"
 msgid "Can public key authentication"
 msgstr "能否公钥认证"
 
-#: users/serializers/user.py:146
+#: users/serializers/user.py:148
 msgid "Avatar url"
 msgstr "头像路径"
 
-#: users/serializers/user.py:148
+#: users/serializers/user.py:150
 msgid "Groups name"
 msgstr "用户组名"
 
-#: users/serializers/user.py:149
+#: users/serializers/user.py:151
 msgid "Source name"
 msgstr "用户来源名"
 
-#: users/serializers/user.py:150
+#: users/serializers/user.py:152
 msgid "Organization role name"
 msgstr "组织角色名称"
 
-#: users/serializers/user.py:151
+#: users/serializers/user.py:153
 msgid "Super role name"
 msgstr "超级角色名称"
 
-#: users/serializers/user.py:152
+#: users/serializers/user.py:154
 msgid "Total role name"
 msgstr "汇总角色名称"
 
-#: users/serializers/user.py:154
+#: users/serializers/user.py:156
 msgid "Is wecom bound"
 msgstr "是否绑定了企业微信"
 
-#: users/serializers/user.py:155
+#: users/serializers/user.py:157
 msgid "Is dingtalk bound"
 msgstr "是否绑定了钉钉"
 
-#: users/serializers/user.py:156
+#: users/serializers/user.py:158
 msgid "Is feishu bound"
 msgstr "是否绑定了飞书"
 
-#: users/serializers/user.py:157
+#: users/serializers/user.py:159
 msgid "Is OTP bound"
 msgstr "是否绑定了虚拟 MFA"
 
-#: users/serializers/user.py:159
+#: users/serializers/user.py:161
 msgid "System role name"
 msgstr "系统角色名称"
 
-#: users/serializers/user.py:199
+#: users/serializers/user.py:201
 msgid "User cannot self-update fields: {}"
 msgstr "用户不能更新自己的字段: {}"
 
-#: users/serializers/user.py:256
+#: users/serializers/user.py:258
 msgid "Select users"
 msgstr "选择用户"
 
-#: users/serializers/user.py:257
+#: users/serializers/user.py:259
 msgid "For security, only list several users"
 msgstr "为了安全，仅列出几个用户"
 
-#: users/serializers/user.py:292
+#: users/serializers/user.py:294
 msgid "name not unique"
 msgstr "名称重复"
 

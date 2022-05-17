@@ -43,6 +43,7 @@ class BasicSettingSerializer(serializers.Serializer):
     )
     ANNOUNCEMENT_ENABLED = serializers.BooleanField(label=_('Enable announcement'), default=True)
     ANNOUNCEMENT = AnnouncementSerializer(label=_("Announcement"))
+    TICKETS_ENABLED = serializers.BooleanField(required=False, default=True, label=_("Enable tickets"))
 
     @staticmethod
     def validate_SITE_URL(s):
