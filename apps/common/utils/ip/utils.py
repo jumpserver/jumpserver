@@ -1,4 +1,9 @@
 from ipaddress import ip_network, ip_address
+from django.conf import settings
+from django.utils.translation import gettext_lazy as _
+
+from .ipip import get_ip_city_by_ipip
+from .geoip import get_ip_city_by_geoip
 
 
 def is_ip_address(address):
@@ -66,3 +71,16 @@ def contains_ip(ip, ip_group):
                 return True
 
     return False
+
+
+def get_ip_city(ip):
+    info = get_ip_city_by_ipip(ip)
+    city = info.get('city', _("Unknown"))
+    country = info.get('country')
+
+    # 国内城市 并且 语言是中文就使用国内
+    is_zh = settings.LANGUAGE_CODE.startswith('zh')
+    if country == '中国' and is_zh:
+        return city
+    else:
+        return get_ip_city_by_geoip(ip)

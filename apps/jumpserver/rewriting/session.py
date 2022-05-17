@@ -18,7 +18,7 @@ class RedisServer(_RedisServer):
         ssl_params = {}
         if CONFIG.REDIS_USE_SSL:
             ssl_params = {
-                'ssl_cert_reqs': CONFIG.REDIS_SSL_REQUIRED,
+                'ssl_cert_reqs': getattr(settings, 'REDIS_SSL_REQUIRED'),
                 'ssl_keyfile': getattr(settings, 'REDIS_SSL_KEYFILE'),
                 'ssl_certfile': getattr(settings, 'REDIS_SSL_CERTFILE'),
                 'ssl_ca_certs': getattr(settings, 'REDIS_SSL_CA_CERTS'),
