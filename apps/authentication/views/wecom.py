@@ -201,12 +201,12 @@ class WeComQRLoginView(WeComQRMixin, METAMixin, View):
     permission_classes = (AllowAny,)
 
     def get(self,  request: HttpRequest):
-        redirect_url = request.GET.get('redirect_url')
-
+        redirect_url = request.GET.get('redirect_url') or reverse('index')
+        next_url = self.get_next_url_from_meta() or reverse('index')
         redirect_uri = reverse('authentication:wecom-qr-login-callback', external=True)
         redirect_uri += '?' + urlencode({
             'redirect_url': redirect_url,
-            'next': self.get_next_url_from_meta()
+            'next': next_url,
         })
 
         url = self.get_qr_url(redirect_uri)

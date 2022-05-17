@@ -46,11 +46,13 @@ def get_user_or_pre_auth_user(request):
 
 
 def redirect_user_first_login_or_index(request, redirect_field_name):
-    url_in_post = request.POST.get(redirect_field_name)
-    if url_in_post:
-        return url_in_post
-    url_in_get = request.GET.get(redirect_field_name, reverse('index'))
-    return url_in_get
+    url = request.POST.get(redirect_field_name)
+    if not url:
+        url = request.GET.get(redirect_field_name)
+    # 防止 next 地址为 None
+    if not url or url.lower() in ['none']:
+        url = reverse('index')
+    return url
 
 
 def generate_otp_uri(username, otp_secret_key=None, issuer="JumpServer"):
