@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from assets.serializers.base import AuthSerializerMixin
-from common.drf.serializers import MethodSerializer
+from common.drf.serializers import MethodSerializer, SecretReadableMixin
 from .attrs import (
     category_serializer_classes_mapping,
     type_serializer_classes_mapping,
@@ -152,7 +152,7 @@ class AppAccountSerializer(AppSerializerMixin, AuthSerializerMixin, BulkOrgResou
         return super().to_representation(instance)
 
 
-class AppAccountSecretSerializer(AppAccountSerializer):
+class AppAccountSecretSerializer(SecretReadableMixin, AppAccountSerializer):
     class Meta(AppAccountSerializer.Meta):
         fields_backup = [
             'id', 'app_display', 'attrs', 'username', 'password', 'private_key',
