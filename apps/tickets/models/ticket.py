@@ -188,22 +188,30 @@ class Ticket(CommonModelMixin, StatusMixin, OrgModelMixin):
             .exclude(state=ProcessStatus.notified).first()
         return processor.assignee if processor else None
 
-    def create_related_node(self):
+    def ignore_applicant(self, assignees, applicant=None):
+        applicant = applicant if applicant else self.applicant
+        if len(assignees) != 1:
+            assignees = set(assignees) - {applicant, }
+        return list(assignees)
+
+    def create_related_node(self, applicant=None):
         org_id = self.flow.org_id
         approval_rule = self.get_current_ticket_flow_approve()
         ticket_step = TicketStep.objects.create(ticket=self, level=self.approval_step)
         ticket_assignees = []
         assignees = approval_rule.get_assignees(org_id=org_id)
+        assignees = self.ignore_applicant(assignees, applicant)
         for assignee in assignees:
             ticket_assignees.append(TicketAssignee(step=ticket_step, assignee=assignee))
         TicketAssignee.objects.bulk_create(ticket_assignees)
 
-    def create_process_map(self):
+    def create_process_map(self, applicant=None):
         org_id = self.flow.org_id
         approval_rules = self.flow.rules.order_by('level')
         nodes = list()
         for node in approval_rules:
             assignees = node.get_assignees(org_id=org_id)
+            assignees = self.ignore_applicant(assignees, applicant)
             assignee_ids = [assignee.id for assignee in assignees]
             assignees_display = [str(assignee) for assignee in assignees]
             nodes.append(
@@ -217,7 +225,8 @@ class Ticket(CommonModelMixin, StatusMixin, OrgModelMixin):
         return nodes
 
     # TODO 兼容不存在流的工单
-    def create_process_map_and_node(self, assignees):
+    def create_process_map_and_node(self, assignees, applicant):
+        assignees = self.ignore_applicant(assignees, applicant)
         self.process_map = [{
             'approval_level': 1,
             'state': 'notified',

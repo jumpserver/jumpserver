@@ -27,8 +27,10 @@ class ReadableHiddenField(serializers.HiddenField):
 
 
 class EncryptedField(serializers.CharField):
-    def __init__(self, **kwargs):
-        kwargs['write_only'] = kwargs.get('write_only', True)
+    def __init__(self, write_only=None, **kwargs):
+        if write_only is None:
+            write_only = True
+        kwargs['write_only'] = write_only
         super().__init__(**kwargs)
 
     def to_internal_value(self, value):
