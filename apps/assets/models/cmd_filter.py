@@ -181,8 +181,10 @@ class CommandFilterRule(OrgModelMixin):
             'org_id': org_id,
         }
         ticket = Ticket.objects.create(**data)
-        ticket.create_process_map_and_node(self.reviewers.all())
-        ticket.open(applicant=session.user_obj)
+        applicant = session.user_obj
+        assignees = self.reviewers.all()
+        ticket.create_process_map_and_node(assignees, applicant)
+        ticket.open(applicant)
         return ticket
 
     @classmethod
