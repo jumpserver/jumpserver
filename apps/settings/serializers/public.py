@@ -40,4 +40,6 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     TERMINAL_KOKO_SSH_ENABLED = serializers.BooleanField()
 
     ANNOUNCEMENT_ENABLED = serializers.BooleanField()
-    ANNOUNCEMENT = serializers.DictField()
+    ANNOUNCEMENT = serializers.CharField()
+    
+    TICKETS_ENABLED = serializers.BooleanField()

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-16 17:43+0800\n"
+"POT-Creation-Date: 2022-05-17 18:02+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -758,10 +758,12 @@ msgstr "接続性"
 msgid "Date verified"
 msgstr "確認済みの日付"
 
-#: assets/models/base.py:177 audits/signal_handlers.py:48
+#: assets/models/base.py:177 assets/serializers/base.py:14
+#: assets/serializers/base.py:36 audits/signal_handlers.py:48
 #: authentication/forms.py:32
 #: authentication/templates/authentication/login.html:182
-#: settings/serializers/auth/ldap.py:46 users/forms/profile.py:22
+#: settings/serializers/auth/ldap.py:25 settings/serializers/auth/ldap.py:46
+#: users/forms/profile.py:22 users/serializers/user.py:92
 #: users/templates/users/_msg_user_created.html:13
 #: users/templates/users/user_password_verify.html:18
 #: xpack/plugins/change_auth_plan/models/base.py:42
@@ -771,7 +773,8 @@ msgstr "確認済みの日付"
 msgid "Password"
 msgstr "パスワード"
 
-#: assets/models/base.py:178 xpack/plugins/change_auth_plan/models/asset.py:53
+#: assets/models/base.py:178 assets/serializers/base.py:39
+#: xpack/plugins/change_auth_plan/models/asset.py:53
 #: xpack/plugins/change_auth_plan/models/asset.py:130
 #: xpack/plugins/change_auth_plan/models/asset.py:206
 msgid "SSH private key"
@@ -1120,11 +1123,15 @@ msgstr "定期的なパフォーマンス"
 msgid "Currently only mail sending is supported"
 msgstr "現在、メール送信のみがサポートされています"
 
-#: assets/serializers/base.py:39
+#: assets/serializers/base.py:15 users/models/user.py:689
+msgid "Private key"
+msgstr "ssh秘密鍵"
+
+#: assets/serializers/base.py:43
 msgid "Key password"
 msgstr "キーパスワード"
 
-#: assets/serializers/base.py:52
+#: assets/serializers/base.py:56
 msgid "private key invalid or passphrase error"
 msgstr "秘密鍵が無効またはpassphraseエラー"
 
@@ -2102,7 +2109,7 @@ msgstr "バインディングリマインダー"
 #: perms/serializers/application/permission.py:20
 #: perms/serializers/application/permission.py:41
 #: perms/serializers/asset/permission.py:19
-#: perms/serializers/asset/permission.py:45 users/serializers/user.py:143
+#: perms/serializers/asset/permission.py:45 users/serializers/user.py:145
 msgid "Is valid"
 msgstr "有効です"
 
@@ -3063,7 +3070,7 @@ msgstr "Organization {} のアプリケーション権限"
 #: perms/serializers/application/permission.py:40
 #: perms/serializers/asset/permission.py:20
 #: perms/serializers/asset/permission.py:44 users/serializers/user.py:87
-#: users/serializers/user.py:145
+#: users/serializers/user.py:147
 msgid "Is expired"
 msgstr "期限切れです"
 
@@ -3772,6 +3779,10 @@ msgstr "アナウンスの有効化"
 #: settings/serializers/basic.py:45
 msgid "Announcement"
 msgstr "発表"
+
+#: settings/serializers/basic.py:46
+msgid "Enable tickets"
+msgstr "チケットを有効にする"
 
 #: settings/serializers/cleaning.py:10
 msgid "Login log keep days"
@@ -5640,7 +5651,7 @@ msgstr "強制有効"
 msgid "Local"
 msgstr "ローカル"
 
-#: users/models/user.py:673 users/serializers/user.py:144
+#: users/models/user.py:673 users/serializers/user.py:146
 msgid "Is service account"
 msgstr "サービスアカウントです"
 
@@ -5651,10 +5662,6 @@ msgstr "アバター"
 #: users/models/user.py:678
 msgid "Wechat"
 msgstr "微信"
-
-#: users/models/user.py:689
-msgid "Private key"
-msgstr "ssh秘密鍵"
 
 #: users/models/user.py:711
 msgid "Source"
@@ -5739,7 +5746,7 @@ msgstr "新しいパスワードを最後の {} 個のパスワードにする�
 msgid "The newly set password is inconsistent"
 msgstr "新しく設定されたパスワードが一致しない"
 
-#: users/serializers/profile.py:147 users/serializers/user.py:142
+#: users/serializers/profile.py:147 users/serializers/user.py:144
 msgid "Is first login"
 msgstr "最初のログインです"
 
@@ -5777,63 +5784,63 @@ msgstr "ログインブロック"
 msgid "Can public key authentication"
 msgstr "公開鍵認証が可能"
 
-#: users/serializers/user.py:146
+#: users/serializers/user.py:148
 msgid "Avatar url"
 msgstr "アバターURL"
 
-#: users/serializers/user.py:148
+#: users/serializers/user.py:150
 msgid "Groups name"
 msgstr "グループ名"
 
-#: users/serializers/user.py:149
+#: users/serializers/user.py:151
 msgid "Source name"
 msgstr "ソース名"
 
-#: users/serializers/user.py:150
+#: users/serializers/user.py:152
 msgid "Organization role name"
 msgstr "組織の役割名"
 
-#: users/serializers/user.py:151
+#: users/serializers/user.py:153
 msgid "Super role name"
 msgstr "スーパーロール名"
 
-#: users/serializers/user.py:152
+#: users/serializers/user.py:154
 msgid "Total role name"
 msgstr "合計ロール名"
 
-#: users/serializers/user.py:154
+#: users/serializers/user.py:156
 msgid "Is wecom bound"
 msgstr "企業の微信をバインドしているかどうか"
 
-#: users/serializers/user.py:155
+#: users/serializers/user.py:157
 msgid "Is dingtalk bound"
 msgstr "ピンをバインドしているかどうか"
 
-#: users/serializers/user.py:156
+#: users/serializers/user.py:158
 msgid "Is feishu bound"
 msgstr "飛本を縛ったかどうか"
 
-#: users/serializers/user.py:157
+#: users/serializers/user.py:159
 msgid "Is OTP bound"
 msgstr "仮想MFAがバインドされているか"
 
-#: users/serializers/user.py:159
+#: users/serializers/user.py:161
 msgid "System role name"
 msgstr "システムロール名"
 
-#: users/serializers/user.py:199
+#: users/serializers/user.py:201
 msgid "User cannot self-update fields: {}"
 msgstr "ユーザーは自分のフィールドを更新できません: {}"
 
-#: users/serializers/user.py:256
+#: users/serializers/user.py:258
 msgid "Select users"
 msgstr "ユーザーの選択"
 
-#: users/serializers/user.py:257
+#: users/serializers/user.py:259
 msgid "For security, only list several users"
 msgstr "セキュリティのために、複数のユーザーのみをリストします"
 
-#: users/serializers/user.py:292
+#: users/serializers/user.py:294
 msgid "name not unique"
 msgstr "名前が一意ではない"
 
