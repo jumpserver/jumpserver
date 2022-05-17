@@ -97,7 +97,7 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
             'org_id': org_id,
         }
         ticket = Ticket.objects.create(**data)
-        ticket.create_process_map_and_node(assignees)
+        ticket.create_process_map_and_node(assignees, user)
         ticket.open(applicant=user)
         return ticket
 
