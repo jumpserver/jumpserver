@@ -95,7 +95,6 @@ MIDDLEWARE = [
     'authentication.backends.cas.middleware.CASMiddleware',
     'authentication.middleware.MFAMiddleware',
     'authentication.middleware.SessionCookieMiddleware',
-    'authentication.middleware.EncryptedMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
 ]
 
