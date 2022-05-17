@@ -8,7 +8,6 @@ from common.mixins import CommonBulkSerializerMixin
 from common.validators import PhoneValidator
 from common.utils import pretty_string
 from common.drf.fields import EncryptedField
-from common.drf.serializers import SecretReadableMixin
 from rbac.builtin import BuiltinRole
 from rbac.permissions import RBACPermission
 from rbac.models import OrgRoleBinding, SystemRoleBinding, Role
