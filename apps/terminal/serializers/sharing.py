@@ -7,25 +7,26 @@ from ..models import SessionSharing, SessionJoinRecord
 __all__ = ['SessionSharingSerializer', 'SessionJoinRecordSerializer']
 
 
-class SessionSharingMetaSerializer(serializers.Serializer):
-    users = serializers.ListSerializer(
-        child=serializers.CharField(max_length=36), write_only=True, default=dict
-    )
-
-
 class SessionSharingSerializer(OrgResourceModelSerializerMixin):
-    meta = SessionSharingMetaSerializer()
+    users = serializers.ListSerializer(
+        child=serializers.CharField(max_length=36), write_only=True, default=list, allow_null=True
+    )
 
     class Meta:
         model = SessionSharing
         fields_mini = ['id']
         fields_small = fields_mini + [
             'verify_code', 'is_active', 'expired_time', 'created_by',
-            'date_created', 'date_updated', 'meta'
+            'date_created', 'date_updated', 'users'
         ]
         fields_fk = ['session', 'creator']
         fields = fields_small + fields_fk
         read_only_fields = ['verify_code']
+
+    def save(self, **kwargs):
+        users = self.validated_data.get('users', [])
+        self.validated_data['users'] = ','.join(users)
+        return super().save(**kwargs)
 
     def create(self, validated_data):
         validated_data['verify_code'] = random_string(4)
