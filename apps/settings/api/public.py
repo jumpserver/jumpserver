@@ -56,6 +56,7 @@ class PublicSettingApi(generics.RetrieveAPIView):
                 # Performance
                 "LOGIN_TITLE": self.get_login_title(),
                 "LOGO_URLS": self.get_logo_urls(),
+                "TICKETS_ENABLED": settings.TICKETS_ENABLED,
                 "HELP_DOCUMENT_URL": settings.HELP_DOCUMENT_URL,
                 "HELP_SUPPORT_URL": settings.HELP_SUPPORT_URL,
                 # Auth
