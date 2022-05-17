@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from common.validators import alphanumeric
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
+from common.drf.serializers import SecretReadableMixin
 from ..models import Domain, Gateway
 from .base import AuthSerializerMixin
 
@@ -67,7 +68,7 @@ class GatewaySerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         }
 
 
-class GatewayWithAuthSerializer(GatewaySerializer):
+class GatewayWithAuthSerializer(SecretReadableMixin, GatewaySerializer):
     class Meta(GatewaySerializer.Meta):
         extra_kwargs = {
             'password': {'write_only': False},
