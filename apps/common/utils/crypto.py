@@ -91,12 +91,13 @@ class AESCrypto:
 
     def encrypt(self, text):
         aes = self.aes()
-        return str(base64.encodebytes(aes.encrypt(self.to_16(text))),
-                   encoding='utf8').replace('\n', '')  # 加密
+        cipher = base64.encodebytes(aes.encrypt(self.to_16(text)))
+        return str(cipher, encoding='utf8').replace('\n', '')  # 加密
 
     def decrypt(self, text):
         aes = self.aes()
-        return str(aes.decrypt(base64.decodebytes(bytes(text, encoding='utf8'))).rstrip(b'\0').decode("utf8"))  # 解密
+        text_decoded = base64.decodebytes(bytes(text, encoding='utf8'))
+        return str(aes.decrypt(text_decoded).rstrip(b'\0').decode("utf8"))
 
 
 class AESCryptoGCM:
@@ -234,6 +235,8 @@ def rsa_decrypt(cipher_text, rsa_private_key=None):
 
 def rsa_decrypt_by_session_pkey(value):
     from jumpserver.utils import current_request
+    if not current_request:
+        return value
     private_key_name = settings.SESSION_RSA_PRIVATE_KEY_NAME
     private_key = current_request.session.get(private_key_name)
 
@@ -254,7 +257,11 @@ def decrypt_password(value):
     key_cipher, password_cipher = cipher
     aes_key = rsa_decrypt_by_session_pkey(key_cipher)
     aes = get_aes_crypto(aes_key, 'ECB')
-    password = aes.decrypt(password_cipher)
+    try:
+        password = aes.decrypt(password_cipher)
+    except UnicodeDecodeError as e:
+        logging.error("Decript password error: {}, {}".format(password_cipher, e))
+        return value
     return password
 
 
