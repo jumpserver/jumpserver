@@ -41,3 +41,5 @@ class PrivateSettingSerializer(PublicSettingSerializer):
 
     ANNOUNCEMENT_ENABLED = serializers.BooleanField()
     ANNOUNCEMENT = serializers.CharField()
+
+    TICKETS_ENABLED = serializers.BooleanField()
