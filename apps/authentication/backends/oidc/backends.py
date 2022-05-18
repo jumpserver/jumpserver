@@ -281,6 +281,11 @@ class OIDCAuthPasswordBackend(OIDCBaseBackend):
         try:
             claims_response.raise_for_status()
             claims = claims_response.json()
+            preferred_username = claims.get('preferred_username')
+            if preferred_username and \
+                    preferred_username.lower() == username.lower() and \
+                    preferred_username != username:
+                return
         except Exception as e:
             error = "Json claims response error, claims response " \
                     "content is: {}, error is: {}".format(claims_response.content, str(e))
@@ -309,5 +314,3 @@ class OIDCAuthPasswordBackend(OIDCBaseBackend):
             openid_user_login_failed.send(
                 sender=self.__class__, request=request, username=username, reason="User is invalid"
             )
-            return None
-
