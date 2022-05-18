@@ -28,6 +28,11 @@ class InvalidElasticsearch(JMSException):
     default_detail = _('Invalid elasticsearch config')
 
 
+class NotSupportElasticsearch8(JMSException):
+    default_code = 'not_support_elasticsearch8'
+    default_detail = _('Not Support Elasticsearch8')
+
+
 class CommandStore(object):
     def __init__(self, config):
         self.doc_type = config.get("DOC_TYPE") or '_doc'
@@ -68,13 +73,18 @@ class CommandStore(object):
         if not self.ping(timeout=3):
             return False
 
+        info = self.es.info()
+        version = info['version']['number'].split('.')[0]
+
+        if version == '8':
+            raise NotSupportElasticsearch8
+
         try:
             # 获取索引信息，如果没有定义，直接返回
             data = self.es.indices.get_mapping(self.index)
         except NotFoundError:
             return False
-        info = self.es.info()
-        version = info['version']['number'].split('.')[0]
+
         try:
             if version == '6':
                 # 检测索引是不是新的类型 es6
