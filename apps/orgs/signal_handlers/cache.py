@@ -91,10 +91,11 @@ class OrgResourceStatisticsRefreshUtil:
     @classmethod
     def refresh_if_need(cls, instance):
         cache_field_name = cls.model_cache_field_mapper.get(type(instance))
-        if cache_field_name:
-            org_cache = OrgResourceStatisticsCache(instance.org)
-            org_cache.expire(*cache_field_name)
-            OrgResourceStatisticsCache(Organization.root()).expire(*cache_field_name)
+        if not cache_field_name:
+            return
+        OrgResourceStatisticsCache(Organization.root()).expire(*cache_field_name)
+        if instance.org:
+            OrgResourceStatisticsCache(instance.org).expire(*cache_field_name)
 
 
 @receiver(post_save)
