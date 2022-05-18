@@ -4579,6 +4579,10 @@ msgstr "终端管理"
 msgid "Invalid elasticsearch config"
 msgstr "无效的 Elasticsearch 配置"
 
+#: terminal/backends/command/es.py:33
+msgid "Not Support Elasticsearch8"
+msgstr "不支持 Elasticsearch8"
+
 #: terminal/backends/command/models.py:16
 msgid "Ordinary"
 msgstr "普通"
