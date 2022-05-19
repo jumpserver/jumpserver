@@ -3741,6 +3741,10 @@ msgstr "启用公告"
 msgid "Announcement"
 msgstr "公告"
 
+#: settings/serializers/basic.py:46
+msgid "Enable tickets"
+msgstr "启用工单"
+
 #: settings/serializers/cleaning.py:10
 msgid "Login log keep days"
 msgstr "登录日志"
@@ -4595,6 +4599,10 @@ msgstr "终端管理"
 #: terminal/backends/command/es.py:28
 msgid "Invalid elasticsearch config"
 msgstr "无效的 Elasticsearch 配置"
+
+#: terminal/backends/command/es.py:33
+msgid "Not Support Elasticsearch8"
+msgstr "不支持 Elasticsearch8"
 
 #: terminal/backends/command/models.py:16
 msgid "Ordinary"

@@ -3781,6 +3781,10 @@ msgstr "アナウンスの有効化"
 msgid "Announcement"
 msgstr "発表"
 
+#: settings/serializers/basic.py:46
+msgid "Enable tickets"
+msgstr "チケットを有効にする"
+
 #: settings/serializers/cleaning.py:10
 msgid "Login log keep days"
 msgstr "ログインログは日数を保持します"
@@ -4667,6 +4671,10 @@ msgstr "ターミナル管理"
 #: terminal/backends/command/es.py:28
 msgid "Invalid elasticsearch config"
 msgstr "無効なElasticsearch構成"
+
+#: terminal/backends/command/es.py:33
+msgid "Not Support Elasticsearch8"
+msgstr "サポートされていません Elasticsearch8"
 
 #: terminal/backends/command/models.py:16
 msgid "Ordinary"

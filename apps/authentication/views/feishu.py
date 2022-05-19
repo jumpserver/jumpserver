@@ -170,10 +170,11 @@ class FeiShuQRLoginView(FeiShuQRMixin, View):
     permission_classes = (AllowAny,)
 
     def get(self,  request: HttpRequest):
-        redirect_url = request.GET.get('redirect_url')
-
+        redirect_url = request.GET.get('redirect_url') or reverse('index')
         redirect_uri = reverse('authentication:feishu-qr-login-callback', external=True)
-        redirect_uri += '?' + urlencode({'redirect_url': redirect_url})
+        redirect_uri += '?' + urlencode({
+            'redirect_url': redirect_url,
+        })
 
         url = self.get_qr_url(redirect_uri)
         return HttpResponseRedirect(url)

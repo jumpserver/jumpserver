@@ -4,6 +4,8 @@ from django.db.models import Count
 
 from common.mixins.serializers import BulkSerializerMixin
 from common.utils import ssh_pubkey_gen
+from common.drf.fields import EncryptedField
+from common.drf.serializers import SecretReadableMixin
 from common.validators import alphanumeric_re, alphanumeric_cn_re, alphanumeric_win_re
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import SystemUser, Asset
@@ -26,6 +28,9 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     auto_generate_key = serializers.BooleanField(initial=True, required=False, write_only=True)
     type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type display'))
     ssh_key_fingerprint = serializers.ReadOnlyField(label=_('SSH key fingerprint'))
+    token = EncryptedField(
+        label=_('Token'), required=False, write_only=True, style={'base_template': 'textarea.html'}
+    )
     applications_amount = serializers.IntegerField(
         source='apps_amount', read_only=True, label=_('Apps amount')
     )
@@ -248,7 +253,7 @@ class MiniSystemUserSerializer(serializers.ModelSerializer):
         fields = SystemUserSerializer.Meta.fields_mini
 
 
-class SystemUserWithAuthInfoSerializer(SystemUserSerializer):
+class SystemUserWithAuthInfoSerializer(SecretReadableMixin, SystemUserSerializer):
     class Meta(SystemUserSerializer.Meta):
         fields_mini = ['id', 'name', 'username']
         fields_write_only = ['password', 'public_key', 'private_key']
@@ -264,6 +269,9 @@ class SystemUserWithAuthInfoSerializer(SystemUserSerializer):
             'assets_amount': {'label': _('Asset')},
             'login_mode_display': {'label': _('Login mode display')},
             'created_by': {'read_only': True},
+            'password': {'write_only': False},
+            'private_key': {'write_only': False},
+            'token': {'write_only': False}
         }
 
 

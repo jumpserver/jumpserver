@@ -391,6 +391,8 @@ class Config(dict):
         'FTP_LOG_KEEP_DAYS': 200,
         'CLOUD_SYNC_TASK_EXECUTION_KEEP_DAYS': 30,
 
+        'TICKETS_ENABLED': True,
+
         # 废弃的
         'DEFAULT_ORG_SHOW_ALL_USERS': True,
         'ORG_CHANGE_TO_URL': '',
