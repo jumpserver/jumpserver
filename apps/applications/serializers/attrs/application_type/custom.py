@@ -21,7 +21,7 @@ class CustomSerializer(RemoteAppSerializer):
         allow_null=True,
     )
     custom_password = EncryptedField(
-        max_length=128, allow_blank=True, required=False, write_only=True,
+        max_length=128, allow_blank=True, required=False,
         label=_('Custom password'), allow_null=True,
     )
 

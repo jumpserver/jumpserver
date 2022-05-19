@@ -1,6 +1,7 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
+from common.drf.fields import EncryptedField
 from common.sdk.sms import BACKENDS
 
 __all__ = ['SMSSettingSerializer', 'AlibabaSMSSettingSerializer', 'TencentSMSSettingSerializer']
@@ -29,8 +30,8 @@ class BaseSMSSettingSerializer(serializers.Serializer):
 
 class AlibabaSMSSettingSerializer(BaseSMSSettingSerializer):
     ALIBABA_ACCESS_KEY_ID = serializers.CharField(max_length=256, required=True, label='AccessKeyId')
-    ALIBABA_ACCESS_KEY_SECRET = serializers.CharField(
-        max_length=256, required=False, label='AccessKeySecret', write_only=True
+    ALIBABA_ACCESS_KEY_SECRET = EncryptedField(
+        max_length=256, required=False, label='AccessKeySecret',
     )
     ALIBABA_VERIFY_SIGN_NAME = serializers.CharField(max_length=256, required=True, label=_('Signature'))
     ALIBABA_VERIFY_TEMPLATE_CODE = serializers.CharField(max_length=256, required=True, label=_('Template code'))
@@ -38,7 +39,7 @@ class AlibabaSMSSettingSerializer(BaseSMSSettingSerializer):
 
 class TencentSMSSettingSerializer(BaseSMSSettingSerializer):
     TENCENT_SECRET_ID = serializers.CharField(max_length=256, required=True, label='Secret id')
-    TENCENT_SECRET_KEY = serializers.CharField(max_length=256, required=False, label='Secret key', write_only=True)
+    TENCENT_SECRET_KEY = EncryptedField(max_length=256, required=False, label='Secret key')
     TENCENT_SDKAPPID = serializers.CharField(max_length=256, required=True, label='SDK app id')
     TENCENT_VERIFY_SIGN_NAME = serializers.CharField(max_length=256, required=True, label=_('Signature'))
     TENCENT_VERIFY_TEMPLATE_CODE = serializers.CharField(max_length=256, required=True, label=_('Template code'))

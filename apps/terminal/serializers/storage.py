@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 #
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 from urllib.parse import urlparse
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import TextChoices
+
 from common.drf.serializers import MethodSerializer
-from common.drf.fields import ReadableHiddenField
+from common.drf.fields import ReadableHiddenField, EncryptedField
 from ..models import ReplayStorage, CommandStorage
 from .. import const
-from rest_framework.validators import UniqueValidator
 
 
 # Replay storage serializers
@@ -25,12 +26,12 @@ class ReplayStorageTypeBaseSerializer(serializers.Serializer):
         required=True, max_length=1024, label=_('Bucket'), allow_null=True
     )
     ACCESS_KEY = serializers.CharField(
-        max_length=1024, required=False, allow_blank=True, write_only=True, label=_('Access key'),
-        allow_null=True,
+        max_length=1024, required=False, allow_blank=True,
+        label=_('Access key id'), allow_null=True,
     )
-    SECRET_KEY = serializers.CharField(
-        max_length=1024, required=False, allow_blank=True, write_only=True, label=_('Secret key'),
-        allow_null=True,
+    SECRET_KEY = EncryptedField(
+        max_length=1024, required=False, allow_blank=True,
+        label=_('Access key secret'), allow_null=True,
     )
     ENDPOINT = serializers.CharField(
         validators=[replay_storage_endpoint_format_validator],
@@ -108,7 +109,7 @@ class ReplayStorageTypeAzureSerializer(serializers.Serializer):
         max_length=1024, label=_('Container name'), allow_null=True
     )
     ACCOUNT_NAME = serializers.CharField(max_length=1024, label=_('Account name'), allow_null=True)
-    ACCOUNT_KEY = serializers.CharField(max_length=1024, label=_('Account key'), allow_null=True)
+    ACCOUNT_KEY = EncryptedField(max_length=1024, label=_('Account key'), allow_null=True)
     ENDPOINT_SUFFIX = serializers.ChoiceField(
         choices=EndpointSuffixChoices.choices, default=EndpointSuffixChoices.china.value,
         label=_('Endpoint suffix'), allow_null=True,
