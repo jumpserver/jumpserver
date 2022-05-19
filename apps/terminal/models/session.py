@@ -15,7 +15,7 @@ from applications.models import Application
 from users.models import User
 from orgs.mixins.models import OrgModelMixin
 from django.db.models import TextChoices
-from common.utils import get_object_or_none
+from common.utils import get_object_or_none, timezone as jms_timezone
 from ..backends import get_multi_command_storage
 
 
@@ -130,6 +130,27 @@ class Session(OrgModelMixin):
 
     def can_replay(self):
         return self.has_replay
+
+    @property
+    def _watermark_timestamp(self):
+        return int(timezone.now().timestamp() * 1000)
+
+    @property
+    def _watermark_session_start(self):
+        return jms_timezone.dt_formatter(self.date_start)
+
+    @property
+    def watermark(self):
+        content = ''
+        options = list(settings.SECURITY_WATERMARK_DISPLAY_OPTION)
+        for o in sorted(options):
+            info = getattr(self, o, None)
+            if info is None:
+                info = getattr(self, '_watermark_%s' % o, '')
+            content += '%s\n' % info
+        if settings.SECURITY_WATERMARK_DISPLAY_CONTENT:
+            content += settings.SECURITY_WATERMARK_DISPLAY_CONTENT
+        return content
 
     @property
     def can_join(self):

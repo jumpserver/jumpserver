@@ -24,7 +24,7 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
             "date_start", "date_end",
         ]
         fields_fk = ["terminal",]
-        fields_custom = ["can_replay", "can_join", "can_terminate",]
+        fields_custom = ["can_replay", "can_join", "can_terminate", 'watermark']
         fields = fields_small + fields_fk + fields_custom
         extra_kwargs = {
             "protocol": {'label': _('Protocol')},

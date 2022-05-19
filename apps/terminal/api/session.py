@@ -166,6 +166,7 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
             'date_start': session.date_start,
             'date_end': session.date_end,
             'download_url': download_url,
+            'watermark': session.watermark
         }
         return data
 

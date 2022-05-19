@@ -143,6 +143,13 @@ class SecurityAuthSerializer(serializers.Serializer):
 
 
 class SecuritySettingSerializer(SecurityPasswordRuleSerializer, SecurityAuthSerializer):
+    WATERMARK_DISPLAY_OPTION_CHOICES = (
+        ('asset', _('Assets display')),
+        ('session_start', '%s%s' % (_('Session'), _('Start time'))),
+        ('timestamp', _('Timestamp')),
+        ('user', _('User')),
+    )
+
     SECURITY_SERVICE_ACCOUNT_REGISTRATION = serializers.BooleanField(
         required=True, label=_('Enable terminal register'),
         help_text=_(
@@ -152,6 +159,13 @@ class SecuritySettingSerializer(SecurityPasswordRuleSerializer, SecurityAuthSeri
     SECURITY_WATERMARK_ENABLED = serializers.BooleanField(
         required=True, label=_('Enable watermark'),
         help_text=_('Enabled, the web session and replay contains watermark information')
+    )
+    SECURITY_WATERMARK_DISPLAY_OPTION = serializers.MultipleChoiceField(
+        WATERMARK_DISPLAY_OPTION_CHOICES, label=_('Watermark dynamic content'), required=False
+    )
+    SECURITY_WATERMARK_DISPLAY_CONTENT = serializers.CharField(
+        max_length=12, required=False, allow_blank=True,
+        label=_('Watermark custom content')
     )
     SECURITY_MAX_IDLE_TIME = serializers.IntegerField(
         min_value=1, max_value=99999, required=False,

@@ -55,6 +55,8 @@ class Setting(models.Model):
     @cleaned_value.setter
     def cleaned_value(self, item):
         try:
+            if isinstance(item, set):
+                item = list(item)
             v = json.dumps(item)
             if self.encrypted:
                 v = signer.sign(v)
