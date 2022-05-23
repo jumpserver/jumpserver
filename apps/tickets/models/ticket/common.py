@@ -4,17 +4,18 @@ from typing import Callable
 
 from django.db import models
 from django.db.models import Q
+from django.db.models.signals import post_save
 from django.utils.translation import ugettext_lazy as _
 from django.db.utils import IntegrityError
+from django.db.models.fields.related import RelatedField
 
 from common.exceptions import JMSException
 from common.utils.timezone import as_current_tz
 from common.mixins.models import CommonModelMixin
 from common.db.encoder import ModelJSONFieldEncoder
-from orgs.mixins.models import OrgModelMixin
-from orgs.utils import tmp_to_root_org, tmp_to_org
 from tickets.const import (
-    TicketType, TicketStatus, TicketState, TicketApprovalLevel, ProcessStatus, TicketAction
+    TicketType, TicketStatus, TicketState, TicketApprovalLevel,
+    ProcessStatus, TicketAction,
 )
 from tickets.signals import post_change_ticket_action
 from tickets.handler import get_ticket_handler
@@ -126,7 +127,7 @@ class StatusMixin:
         post_change_ticket_action.send(sender=self.__class__, ticket=self, action=action)
 
 
-class Ticket(CommonModelMixin, StatusMixin, OrgModelMixin):
+class Ticket(CommonModelMixin, StatusMixin):
     title = models.CharField(max_length=256, verbose_name=_("Title"))
     type = models.CharField(
         max_length=64, choices=TicketType.choices,
@@ -159,7 +160,8 @@ class Ticket(CommonModelMixin, StatusMixin, OrgModelMixin):
         verbose_name=_("TicketFlow")
     )
     serial_num = models.CharField(max_length=128, unique=True, null=True, verbose_name=_('Serial number'))
-    snapshot = models.JSONField(verbose_name=_("Snapshot"), default=dict)
+    rel_snapshot = models.JSONField(verbose_name=_("Relation snapshot"), default=dict)
+    org_id = models.CharField(max_length=36, blank=True, default='', verbose_name=_("Organization"), db_index=True)
 
     class Meta:
         ordering = ('-date_created',)
@@ -167,13 +169,6 @@ class Ticket(CommonModelMixin, StatusMixin, OrgModelMixin):
 
     def __str__(self):
         return '{}({})'.format(self.title, self.applicant_display)
-
-    def get_snapshot(self):
-        snapshot = {}
-        fields = self._meta.fields
-        for field in fields:
-            pass
-
 
     # type
     @property
@@ -259,7 +254,7 @@ class Ticket(CommonModelMixin, StatusMixin, OrgModelMixin):
     @classmethod
     def get_user_related_tickets(cls, user):
         queries = Q(applicant=user) | Q(ticket_steps__ticket_assignees__assignee=user)
-        tickets = cls.all().filter(queries).distinct()
+        tickets = cls.objects.all().filter(queries).distinct()
         return tickets
 
     def get_current_ticket_flow_approve(self):
@@ -267,13 +262,28 @@ class Ticket(CommonModelMixin, StatusMixin, OrgModelMixin):
 
     @classmethod
     def all(cls):
-        with tmp_to_root_org():
-            return Ticket.objects.all()
+        return cls.objects.all()
 
-    def save(self, *args, **kwargs):
-        """ 确保保存的org_id的是自身的值 """
-        with tmp_to_org(self.org_id):
-            return super().save(*args, **kwargs)
+    def set_rel_snapshot(self, save=True):
+        rel_fields = [field.name for field in self._meta.fields
+                      if isinstance(field, RelatedField)]
+        m2m_fields = [field.name for field in self._meta.fields
+                      if isinstance(field, models.ManyToManyField)]
+        snapshot = {}
+        for field in rel_fields:
+            value = getattr(self, field)
+            if not value:
+                continue
+
+            if field in m2m_fields:
+                value = [str(v) for v in value.all()]
+            else:
+                value = str(value)
+            snapshot[field] = value
+
+        self.rel_snapshot = snapshot
+        if save:
+            self.save()
 
     @property
     def handler(self):
@@ -290,11 +300,11 @@ class Ticket(CommonModelMixin, StatusMixin, OrgModelMixin):
         date = date_created.strftime('%Y%m%d')
         return date
 
-    def get_last_serail_num(self):
+    def get_last_serial_num(self):
         date_created = as_current_tz(self.date_created)
         date_prefix = date_created.strftime('%Y%m%d')
 
-        ticket = Ticket.all().select_for_update().filter(
+        ticket = Ticket.objects.all().select_for_update().filter(
             serial_num__startswith=date_prefix
         ).order_by('-date_created').first()
 
@@ -305,15 +315,15 @@ class Ticket(CommonModelMixin, StatusMixin, OrgModelMixin):
             return num
         return None
 
-    def get_next_serail_num(self):
-        num = self.get_last_serail_num()
+    def get_next_serial_num(self):
+        num = self.get_last_serial_num()
         if num is None:
             num = 0
         return '%04d' % (num + 1)
 
     def construct_serial_num(self):
         date_prefix = self.get_serial_num_date()
-        num_suffix = self.get_next_serail_num()
+        num_suffix = self.get_next_serial_num()
         return date_prefix + num_suffix
 
     def update_serial_num_if_need(self):
