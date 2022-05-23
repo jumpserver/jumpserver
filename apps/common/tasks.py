@@ -1,9 +1,9 @@
 import os
 
-from django.core.mail import send_mail, EmailMultiAlternatives
 from django.conf import settings
 from celery import shared_task
 
+from common.mail import send_mail, EmailMultiAlternatives
 from .utils import get_logger
 
 logger = get_logger(__file__)

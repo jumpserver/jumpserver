@@ -63,6 +63,7 @@ exclude_permissions = (
     ('audits', 'passwordchangelog', 'add,change,delete', 'passwordchangelog'),
     ('audits', 'userloginlog', 'add,change,delete,change', 'userloginlog'),
     ('audits', 'ftplog', 'change,delete', 'ftplog'),
+    ('audits', 'tasklog', 'add,change,delete', 'tasklog'),
     ('tickets', 'ticketassignee', '*', 'ticketassignee'),
     ('tickets', 'ticketflow', 'add,delete', 'ticketflow'),
     ('tickets', 'comment', '*', '*'),

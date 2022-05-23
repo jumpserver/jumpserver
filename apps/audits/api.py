@@ -12,9 +12,11 @@ from common.api import CommonGenericViewSet
 from orgs.mixins.api import OrgGenericViewSet, OrgBulkModelViewSet, OrgRelationMixin
 from orgs.utils import current_org
 from ops.models import CommandExecution
-from .models import FTPLog, UserLoginLog, OperateLog, PasswordChangeLog
-from .serializers import FTPLogSerializer, UserLoginLogSerializer, CommandExecutionSerializer
-from .serializers import OperateLogSerializer, PasswordChangeLogSerializer, CommandExecutionHostsRelationSerializer
+from .models import FTPLog, UserLoginLog, OperateLog, PasswordChangeLog, TaskLog
+from .serializers import (
+    FTPLogSerializer, UserLoginLogSerializer, CommandExecutionSerializer, TaskLogSerializer,
+    OperateLogSerializer, PasswordChangeLogSerializer, CommandExecutionHostsRelationSerializer
+)
 
 
 class FTPLogViewSet(CreateModelMixin,
@@ -29,6 +31,18 @@ class FTPLogViewSet(CreateModelMixin,
     filterset_fields = ['user', 'asset', 'system_user', 'filename']
     search_fields = filterset_fields
     ordering = ['-date_start']
+
+
+class TaskLogViewSet(ListModelMixin, OrgGenericViewSet):
+    model = TaskLog
+    serializer_class = TaskLogSerializer
+    extra_filter_backends = [DatetimeRangeFilter]
+    date_range_filter_fields = [
+        ('datetime', ('date_from', 'date_to'))
+    ]
+    filterset_fields = ['type', 'event', 'result']
+    search_fields = filterset_fields
+    ordering = ['-datetime']
 
 
 class UserLoginCommonMixin:

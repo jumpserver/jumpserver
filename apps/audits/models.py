@@ -10,7 +10,7 @@ from orgs.mixins.models import OrgModelMixin, Organization
 from orgs.utils import current_org
 
 __all__ = [
-    'FTPLog', 'OperateLog', 'PasswordChangeLog', 'UserLoginLog',
+    'FTPLog', 'OperateLog', 'PasswordChangeLog', 'UserLoginLog', 'TaskLog'
 ]
 
 
@@ -167,3 +167,21 @@ class UserLoginLog(models.Model):
     class Meta:
         ordering = ['-datetime', 'username']
         verbose_name = _('User login log')
+
+
+class TaskLog(models.Model):
+    EMAIL = 'email'
+    TYPE_CHOICES = (
+        (EMAIL, _('Email')),
+    )
+
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    type = models.CharField(max_length=16, default=EMAIL, choices=TYPE_CHOICES, verbose_name=_("Type"))
+    event = models.TextField(blank=True, null=True, verbose_name=_('Event'))
+    result = models.TextField(blank=True, null=True, verbose_name=_('Result'))
+    datetime = models.DateTimeField(auto_now=True, verbose_name=_('Datetime'))
+    is_success = models.BooleanField(default=True, verbose_name=_("Success"))
+
+    class Meta:
+        ordering = ['-datetime']
+        verbose_name = _('Task log')

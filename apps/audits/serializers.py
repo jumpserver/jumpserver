@@ -25,6 +25,18 @@ class FTPLogSerializer(serializers.ModelSerializer):
         fields = fields_small
 
 
+class TaskLogSerializer(serializers.ModelSerializer):
+    type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type display'))
+
+    class Meta:
+        model = models.TaskLog
+        fields_mini = ['id']
+        fields_small = fields_mini + [
+            'type', 'event', 'result', 'datetime', 'is_success', 'type_display'
+        ]
+        fields = fields_small
+
+
 class UserLoginLogSerializer(serializers.ModelSerializer):
     type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type display'))
     status_display = serializers.ReadOnlyField(source='get_status_display', label=_('Status display'))
