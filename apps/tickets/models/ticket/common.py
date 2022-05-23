@@ -13,7 +13,9 @@ from common.mixins.models import CommonModelMixin
 from common.db.encoder import ModelJSONFieldEncoder
 from orgs.mixins.models import OrgModelMixin
 from orgs.utils import tmp_to_root_org, tmp_to_org
-from tickets.const import TicketType, TicketStatus, TicketState, TicketApprovalLevel, ProcessStatus, TicketAction
+from tickets.const import (
+    TicketType, TicketStatus, TicketState, TicketApprovalLevel, ProcessStatus, TicketAction
+)
 from tickets.signals import post_change_ticket_action
 from tickets.handler import get_ticket_handler
 from tickets.errors import AlreadyClosed
@@ -157,6 +159,7 @@ class Ticket(CommonModelMixin, StatusMixin, OrgModelMixin):
         verbose_name=_("TicketFlow")
     )
     serial_num = models.CharField(max_length=128, unique=True, null=True, verbose_name=_('Serial number'))
+    snapshot = models.JSONField(verbose_name=_("Snapshot"), default=dict)
 
     class Meta:
         ordering = ('-date_created',)
@@ -164,6 +167,13 @@ class Ticket(CommonModelMixin, StatusMixin, OrgModelMixin):
 
     def __str__(self):
         return '{}({})'.format(self.title, self.applicant_display)
+
+    def get_snapshot(self):
+        snapshot = {}
+        fields = self._meta.fields
+        for field in fields:
+            pass
+
 
     # type
     @property
@@ -184,7 +194,7 @@ class Ticket(CommonModelMixin, StatusMixin, OrgModelMixin):
 
     @property
     def processor(self):
-        processor = self.current_node.first().ticket_assignees\
+        processor = self.current_node.first().ticket_assignees \
             .exclude(state=ProcessStatus.notified).first()
         return processor.assignee if processor else None
 

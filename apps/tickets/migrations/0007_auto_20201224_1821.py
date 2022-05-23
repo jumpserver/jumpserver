@@ -3,7 +3,7 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import tickets.models.ticket
+import common.db.encoder
 
 TICKET_TYPE_APPLY_ASSET = 'apply_asset'
 
@@ -116,7 +116,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='ticket',
             name='assignees_display_new',
-            field=models.JSONField(default=list, encoder=tickets.models.ticket.ModelJSONFieldEncoder, verbose_name='Assignees display'),
+            field=models.JSONField(default=list, encoder=common.db.encoder.ModelJSONFieldEncoder, verbose_name='Assignees display'),
         ),
         migrations.AlterField(
             model_name='ticket',
@@ -126,7 +126,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='ticket',
             name='meta',
-            field=models.JSONField(default=dict, encoder=tickets.models.ticket.ModelJSONFieldEncoder, verbose_name='Meta'),
+            field=models.JSONField(default=dict, encoder=common.db.encoder.ModelJSONFieldEncoder, verbose_name='Meta'),
         ),
         migrations.AlterField(
             model_name='ticket',
