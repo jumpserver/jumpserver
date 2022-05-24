@@ -1,24 +1,23 @@
 from django.utils.translation import ugettext as _
+
 from common.utils import get_logger
 from tickets.utils import (
-    send_ticket_processed_mail_to_applicant, send_ticket_applied_mail_to_assignees
+    send_ticket_processed_mail_to_applicant,
+    send_ticket_applied_mail_to_assignees
 )
 from tickets.const import TicketAction
+from tickets.models import Ticket
 
 logger = get_logger(__name__)
 
 
-class BaseHandler(object):
+class BaseHandler:
 
-    def __init__(self, ticket):
+    def __init__(self, ticket: Ticket):
         self.ticket = ticket
 
     # on action
     def _on_open(self):
-        self.ticket.applicant_display = str(self.ticket.applicant)
-        meta_display = getattr(self, '_construct_meta_display_of_open', lambda: {})()
-        self.ticket.meta.update(meta_display)
-        self.ticket.save()
         self._send_applied_mail_to_assignees()
 
     def _on_approve(self):

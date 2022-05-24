@@ -13,11 +13,11 @@ from common.utils.timezone import as_current_tz
 from common.mixins.models import CommonModelMixin
 from common.db.encoder import ModelJSONFieldEncoder
 from tickets.const import (
-    TicketType, TicketStatus, TicketState, TicketApprovalLevel,
-    ProcessStatus, TicketAction,
+    TicketType, TicketStatus, TicketState, TicketLevel,
+    ProcessState, TicketAction,
 )
 from tickets.signals import post_change_ticket_action
-from tickets.handler import get_ticket_handler
+from tickets.handlers import get_ticket_handler
 from tickets.errors import AlreadyClosed
 
 __all__ = ['Ticket', 'TicketStep', 'TicketAssignee', 'SuperTicket']
@@ -25,13 +25,17 @@ __all__ = ['Ticket', 'TicketStep', 'TicketAssignee', 'SuperTicket']
 
 class TicketStep(CommonModelMixin):
     ticket = models.ForeignKey(
-        'Ticket', related_name='ticket_steps', on_delete=models.CASCADE, verbose_name='Ticket'
+        'Ticket', related_name='ticket_steps', on_delete=models.CASCADE,
+        verbose_name='Ticket'
     )
     level = models.SmallIntegerField(
-        default=TicketApprovalLevel.one, choices=TicketApprovalLevel.choices,
+        default=TicketLevel.one, choices=TicketLevel.choices,
         verbose_name=_('Approve level')
     )
-    state = models.CharField(choices=ProcessStatus.choices, max_length=64, default=ProcessStatus.notified)
+    state = models.CharField(
+        choices=ProcessState.choices, max_length=64,
+        default=ProcessState.pending
+    )
 
     class Meta:
         verbose_name = _("Ticket step")
@@ -39,10 +43,17 @@ class TicketStep(CommonModelMixin):
 
 class TicketAssignee(CommonModelMixin):
     assignee = models.ForeignKey(
-        'users.User', related_name='ticket_assignees', on_delete=models.CASCADE, verbose_name='Assignee'
+        'users.User', related_name='ticket_assignees',
+        on_delete=models.CASCADE, verbose_name='Assignee'
     )
-    state = models.CharField(choices=ProcessStatus.choices, max_length=64, default=ProcessStatus.notified)
-    step = models.ForeignKey('tickets.TicketStep', related_name='ticket_assignees', on_delete=models.CASCADE)
+    state = models.CharField(
+        choices=ProcessState.choices, max_length=64,
+        default=ProcessState.notified
+    )
+    step = models.ForeignKey(
+        'tickets.TicketStep', related_name='ticket_assignees',
+        on_delete=models.CASCADE
+    )
 
     class Meta:
         verbose_name = _('Ticket assignee')
@@ -141,22 +152,21 @@ class Ticket(CommonModelMixin, StatusMixin):
         max_length=16, choices=TicketStatus.choices,
         default=TicketStatus.open, verbose_name=_("Status")
     )
-    approval_step = models.SmallIntegerField(
-        default=TicketApprovalLevel.one, choices=TicketApprovalLevel.choices,
-        verbose_name=_('Approval step')
-    )
     # 申请人
     applicant = models.ForeignKey(
         'users.User', related_name='applied_tickets', on_delete=models.SET_NULL, null=True,
         verbose_name=_("Applicant")
     )
     applicant_display = models.CharField(max_length=256, default='', verbose_name=_("Applicant display"))
-    process_map = models.JSONField(encoder=ModelJSONFieldEncoder, default=list, verbose_name=_("Process"))
-    # 评论
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
     flow = models.ForeignKey(
         'TicketFlow', related_name='tickets', on_delete=models.SET_NULL, null=True,
         verbose_name=_("TicketFlow")
+    )
+    process_map = models.JSONField(encoder=ModelJSONFieldEncoder, default=list, verbose_name=_("Process"))
+    approval_step = models.SmallIntegerField(
+        default=TicketLevel.one, choices=TicketLevel.choices,
+        verbose_name=_('Approval step')
     )
     serial_num = models.CharField(max_length=128, unique=True, null=True, verbose_name=_('Serial number'))
     rel_snapshot = models.JSONField(verbose_name=_("Relation snapshot"), default=dict)
@@ -189,7 +199,7 @@ class Ticket(CommonModelMixin, StatusMixin):
     @property
     def processor(self):
         processor = self.current_node.first().ticket_assignees \
-            .exclude(state=ProcessStatus.notified).first()
+            .exclude(state=ProcessState.notified).first()
         return processor.assignee if processor else None
 
     def ignore_applicant(self, assignees, applicant=None):
@@ -221,7 +231,7 @@ class Ticket(CommonModelMixin, StatusMixin):
             nodes.append(
                 {
                     'approval_level': node.level,
-                    'state': ProcessStatus.notified,
+                    'state': ProcessState.notified,
                     'assignees': assignee_ids,
                     'assignees_display': assignees_display
                 }
@@ -286,7 +296,7 @@ class Ticket(CommonModelMixin, StatusMixin):
 
         self.rel_snapshot = snapshot
         if save:
-            self.save()
+            self.save(update_fields=('rel_snapshot',))
 
     @property
     def handler(self):
