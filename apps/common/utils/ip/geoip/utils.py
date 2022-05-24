@@ -13,10 +13,6 @@ reader = None
 
 
 def get_ip_city_by_geoip(ip):
-    if not ip or '.' not in ip or not isinstance(ip, str):
-        return _("Invalid ip")
-    if ':' in ip:
-        return 'IPv6'
     global reader
     if reader is None:
         path = os.path.join(os.path.dirname(__file__), 'GeoLite2-City.mmdb')
@@ -32,7 +28,7 @@ def get_ip_city_by_geoip(ip):
     try:
         response = reader.city(ip)
     except GeoIP2Error:
-        return {}
+        return _("Unknown")
 
     city_names = response.city.names or {}
     lang = settings.LANGUAGE_CODE[:2]
