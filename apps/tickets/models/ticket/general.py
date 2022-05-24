@@ -154,23 +154,24 @@ class Ticket(CommonModelMixin, StatusMixin):
     )
     # 申请人
     applicant = models.ForeignKey(
-        'users.User', related_name='applied_tickets', on_delete=models.SET_NULL, null=True,
-        verbose_name=_("Applicant")
+        'users.User', related_name='applied_tickets', on_delete=models.SET_NULL,
+        null=True, verbose_name=_("Applicant")
     )
     applicant_display = models.CharField(max_length=256, default='', verbose_name=_("Applicant display"))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
     flow = models.ForeignKey(
-        'TicketFlow', related_name='tickets', on_delete=models.SET_NULL, null=True,
-        verbose_name=_("TicketFlow")
+        'TicketFlow', related_name='tickets', on_delete=models.SET_NULL,
+        null=True, verbose_name=_("TicketFlow")
     )
     process_map = models.JSONField(encoder=ModelJSONFieldEncoder, default=list, verbose_name=_("Process"))
     approval_step = models.SmallIntegerField(
-        default=TicketLevel.one, choices=TicketLevel.choices,
-        verbose_name=_('Approval step')
+        default=TicketLevel.one, choices=TicketLevel.choices, verbose_name=_('Approval step')
     )
     serial_num = models.CharField(max_length=128, unique=True, null=True, verbose_name=_('Serial number'))
     rel_snapshot = models.JSONField(verbose_name=_("Relation snapshot"), default=dict)
-    org_id = models.CharField(max_length=36, blank=True, default='', verbose_name=_("Organization"), db_index=True)
+    org_id = models.CharField(
+        max_length=36, blank=True, default='', verbose_name=_("Organization"), db_index=True
+    )
 
     class Meta:
         ordering = ('-date_created',)
@@ -255,7 +256,10 @@ class Ticket(CommonModelMixin, StatusMixin):
         TicketAssignee.objects.bulk_create(ticket_assignees)
 
     def has_current_assignee(self, assignee):
-        return self.ticket_steps.filter(ticket_assignees__assignee=assignee, level=self.approval_step).exists()
+        return self.ticket_steps.filter(
+            ticket_assignees__assignee=assignee,
+            level=self.approval_step
+        ).exists()
 
     def has_all_assignee(self, assignee):
         return self.ticket_steps.filter(ticket_assignees__assignee=assignee).exists()
