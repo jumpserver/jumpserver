@@ -4,7 +4,7 @@ from typing import Callable
 
 from django.db import models
 from django.db.models import Q
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.utils.translation import ugettext_lazy as _
 from django.db.utils import IntegrityError
 from django.db.models.fields.related import RelatedField
@@ -263,6 +263,12 @@ class Ticket(CommonModelMixin, StatusMixin):
     @classmethod
     def all(cls):
         return cls.objects.all()
+    #
+    # def save(self, **kwargs):
+    #     created = self.date_created is None
+    #     pre_save.send(sender=Ticket, instance=self)
+    #     super().save(**kwargs)
+    #     post_save.send(sender=Ticket, instance=self, created=created)
 
     def set_rel_snapshot(self, save=True):
         rel_fields = [field.name for field in self._meta.fields
@@ -295,12 +301,7 @@ class Ticket(CommonModelMixin, StatusMixin):
         _body = self.handler.get_body()
         return _body
 
-    def get_serial_num_date(self):
-        date_created = as_current_tz(self.date_created)
-        date = date_created.strftime('%Y%m%d')
-        return date
-
-    def get_last_serial_num(self):
+    def get_next_serial_num(self):
         date_created = as_current_tz(self.date_created)
         date_prefix = date_created.strftime('%Y%m%d')
 
@@ -308,37 +309,27 @@ class Ticket(CommonModelMixin, StatusMixin):
             serial_num__startswith=date_prefix
         ).order_by('-date_created').first()
 
+        last_num = 0
         if ticket:
-            # 202212010001
-            num_str = ticket.serial_num[8:]
-            num = int(num_str)
-            return num
-        return None
+            last_num = ticket.serial_num[8:]
+            last_num = int(last_num)
+        num = '%04d' % (last_num + 1)
+        # 202212010001
+        return '{}{}'.format(date_prefix, num)
 
-    def get_next_serial_num(self):
-        num = self.get_last_serial_num()
-        if num is None:
-            num = 0
-        return '%04d' % (num + 1)
-
-    def construct_serial_num(self):
-        date_prefix = self.get_serial_num_date()
-        num_suffix = self.get_next_serial_num()
-        return date_prefix + num_suffix
-
-    def update_serial_num_if_need(self):
+    def set_serial_num(self, save=True):
         if self.serial_num:
             return
 
         try:
-            self.serial_num = self.construct_serial_num()
-            self.save(update_fields=('serial_num',))
+            self.serial_num = self.get_next_serial_num()
+            if save:
+                self.save(update_fields=('serial_num',))
         except IntegrityError as e:
             if e.args[0] == 1062:
                 # 虽然做了 `select_for_update` 但是每天的第一条工单仍可能造成冲突
                 # 但概率小，这里只报错，用户重新提交即可
                 raise JMSException(detail=_('Please try again'), code='please_try_again')
-
             raise e
 
 

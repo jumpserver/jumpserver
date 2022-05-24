@@ -18,19 +18,20 @@ def on_post_change_ticket_action(sender, ticket, action, **kwargs):
 
 @receiver(post_save, sender=Ticket)
 def on_pre_save_ensure_serial_num(sender, instance: Ticket, **kwargs):
-    instance.update_serial_num_if_need()
+    instance.set_serial_num()
 
 
-@receiver(post_save, sender=Ticket)
 @on_transaction_commit
 def after_save_set_rel_snapshot(sender, instance, created=False, **kwargs):
-    print("Ticket save siagnal rewith ")
-    if created:
-        instance.set_rel_snapshot()
+    instance.set_rel_snapshot()
 
 
-@receiver(m2m_changed, sender=Ticket)
 @on_transaction_commit
-def on_m2m_change(sender, action, instance, reverse, **kwargs):
+def on_m2m_change(sender, action, instance, reverse=False, **kwargs):
     if action.startswith('post'):
         instance.set_rel_snapshot()
+
+
+for ticket_cls in Ticket.__subclasses__():
+    post_save.connect(after_save_set_rel_snapshot, sender=ticket_cls)
+    m2m_changed.connect(on_m2m_change, sender=ticket_cls)
