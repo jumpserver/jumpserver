@@ -4,7 +4,6 @@ from typing import Callable
 
 from django.db import models
 from django.db.models import Q
-from django.db.models.signals import post_save, pre_save
 from django.utils.translation import ugettext_lazy as _
 from django.db.utils import IntegrityError
 from django.db.models.fields.related import RelatedField
@@ -263,18 +262,16 @@ class Ticket(CommonModelMixin, StatusMixin):
     @classmethod
     def all(cls):
         return cls.objects.all()
-    #
-    # def save(self, **kwargs):
-    #     created = self.date_created is None
-    #     pre_save.send(sender=Ticket, instance=self)
-    #     super().save(**kwargs)
-    #     post_save.send(sender=Ticket, instance=self, created=created)
 
     def set_rel_snapshot(self, save=True):
-        rel_fields = [field.name for field in self._meta.fields
-                      if isinstance(field, RelatedField)]
-        m2m_fields = [field.name for field in self._meta.fields
-                      if isinstance(field, models.ManyToManyField)]
+        rel_fields = [
+            field.name for field in self._meta.fields
+            if isinstance(field, RelatedField)
+        ]
+        m2m_fields = [
+            field.name for field in self._meta.fields
+            if isinstance(field, models.ManyToManyField)
+        ]
         snapshot = {}
         for field in rel_fields:
             value = getattr(self, field)
