@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from perms.models import Action
-from .common import Ticket
+from .general import Ticket
 
 __all__ = ['ApplyAssetTicket']
 

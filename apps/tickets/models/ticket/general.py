@@ -241,6 +241,14 @@ class Ticket(CommonModelMixin, StatusMixin):
 
     # TODO 兼容不存在流的工单
     def create_process_map_and_node(self, assignees, applicant):
+        """
+        工单有两种，一种是用户申请的主动工单，一种是系统帮用户申请的。
+        用户主动申请的，像申请资产，申请应用，有工单流程定义，确定复核人
+        系统申请的的，像用户登录复核，命令复核，登录资产 复核，有单独的 ACL，指定的复核人
+        :param assignees:
+        :param applicant:
+        :return:
+        """
         assignees = self.ignore_applicant(assignees, applicant)
         self.process_map = [{
             'approval_level': 1,
