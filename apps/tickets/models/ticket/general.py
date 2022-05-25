@@ -215,16 +215,16 @@ class Ticket(CommonModelMixin, StatusMixin):
         return self.type == TicketType.login_confirm.value
 
     @property
-    def current_node(self):
+    def current_step(self):
         return self.ticket_steps.filter(level=self.approval_step)
 
     @property
     def processor(self):
-        processor = self.current_node.first().ticket_assignees \
+        processor = self.current_step.first().ticket_assignees \
             .exclude(state=StepState.notified).first()
         return processor.assignee if processor else None
 
-    def ignore_applicant(self, assignees, applicant=None):
+    def exclude_applicant(self, assignees, applicant=None):
         applicant = applicant if applicant else self.applicant
         if len(assignees) != 1:
             assignees = set(assignees) - {applicant, }
@@ -243,7 +243,7 @@ class Ticket(CommonModelMixin, StatusMixin):
         steps[0].set_active()
 
     def create_process_steps_by_assignees(self, assignees):
-        assignees = self.ignore_applicant(assignees, self.applicant)
+        assignees = self.exclude_applicant(assignees, self.applicant)
         step = TicketStep.objects.create(ticket=self, level=1)
         ticket_assignees = [TicketAssignee(step=step, assignee=user) for user in assignees]
         TicketAssignee.objects.bulk_create(ticket_assignees)
@@ -255,7 +255,7 @@ class Ticket(CommonModelMixin, StatusMixin):
         ticket_step = TicketStep.objects.create(ticket=self, level=self.approval_step)
         ticket_assignees = []
         assignees = approval_rule.get_assignees(org_id=org_id)
-        assignees = self.ignore_applicant(assignees, applicant)
+        assignees = self.exclude_applicant(assignees, applicant)
         for assignee in assignees:
             ticket_assignees.append(TicketAssignee(step=ticket_step, assignee=assignee))
         TicketAssignee.objects.bulk_create(ticket_assignees)
@@ -266,7 +266,7 @@ class Ticket(CommonModelMixin, StatusMixin):
         nodes = list()
         for node in approval_rules:
             assignees = node.get_assignees(org_id=org_id)
-            assignees = self.ignore_applicant(assignees, applicant)
+            assignees = self.exclude_applicant(assignees, applicant)
             assignee_ids = [assignee.id for assignee in assignees]
             assignees_display = [str(assignee) for assignee in assignees]
             nodes.append(
@@ -289,7 +289,7 @@ class Ticket(CommonModelMixin, StatusMixin):
         :param applicant:
         :return:
         """
-        assignees = self.ignore_applicant(assignees, applicant)
+        assignees = self.exclude_applicant(assignees, applicant)
         self.process_map = [{
             'approval_level': 1,
             'state': 'notified',

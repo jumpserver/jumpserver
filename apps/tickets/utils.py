@@ -9,7 +9,7 @@ logger = get_logger(__file__)
 
 
 def send_ticket_applied_mail_to_assignees(ticket):
-    ticket_assignees = ticket.current_node.first().ticket_assignees.all()
+    ticket_assignees = ticket.current_step.first().ticket_assignees.all()
     if not ticket_assignees:
         logger.debug(
             "Not found assignees, ticket: {}({}), assignees: {}".format(ticket, str(ticket.id), ticket_assignees)

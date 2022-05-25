@@ -48,7 +48,7 @@ class BaseHandler:
 
     def dispatch(self, action):
         processor = self.ticket.processor
-        current_node = self.ticket.current_node.first()
+        current_node = self.ticket.current_step.first()
         self.ticket.process_map[self.ticket.approval_step - 1].update({
             'approval_date': str(current_node.date_updated),
             'state': current_node.state,
@@ -62,7 +62,7 @@ class BaseHandler:
 
     # email
     def _send_applied_mail_to_assignees(self):
-        assignees = self.ticket.current_node.first().ticket_assignees.all()
+        assignees = self.ticket.current_step.first().ticket_assignees.all()
         assignees_display = ', '.join([str(i.assignee) for i in assignees])
         logger.debug('Send applied email to assignees: {}'.format(assignees_display))
         send_ticket_applied_mail_to_assignees(self.ticket)
