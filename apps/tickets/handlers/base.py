@@ -16,10 +16,6 @@ class BaseHandler:
     def __init__(self, ticket: Ticket):
         self.ticket = ticket
 
-    # on action
-    def _on_open(self):
-        self._send_applied_mail_to_assignees()
-
     def _on_approve(self):
         if self.ticket.approval_step != len(self.ticket.process_map):
             self._send_processed_mail_to_applicant(self.ticket.processor)

@@ -1,8 +1,14 @@
 from django.utils.translation import ugettext as _
+
+from tickets.models import ApplyCommandTicket
 from .base import BaseHandler
 
 
 class Handler(BaseHandler):
+    ticket: ApplyCommandTicket
+
+    def _on_open(self):
+        pass
 
     # body
     def _construct_meta_body_of_open(self):

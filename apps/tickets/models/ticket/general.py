@@ -14,9 +14,9 @@ from common.mixins.models import CommonModelMixin
 from common.db.encoder import ModelJSONFieldEncoder
 from tickets.const import (
     TicketType, TicketStatus, TicketState, TicketLevel,
-    ProcessState, TicketAction,
+    StepState, TicketAction, StepStatus
 )
-from tickets.signals import post_change_ticket_action
+from tickets.signals import post_change_ticket_action, active_step
 from tickets.handlers import get_ticket_handler
 from tickets.errors import AlreadyClosed
 
@@ -33,9 +33,23 @@ class TicketStep(CommonModelMixin):
         verbose_name=_('Approve level')
     )
     state = models.CharField(
-        choices=ProcessState.choices, max_length=64,
-        default=ProcessState.pending
+        choices=StepState.choices, max_length=64,
+        default=StepState.pending
     )
+    status = models.CharField(
+        choices=StepStatus.choices, max_length=16,
+        default=StepState.pending
+    )
+
+    def set_active(self):
+        self.status = StepStatus.active
+        self.save(update_fields=['status'])
+        self.send_msg_to_assignees()
+
+    def send_msg_to_assignees(self):
+        # Todo: send msg
+        self.state = StepState.notified
+        self.save(update_fields=['state'])
 
     class Meta:
         verbose_name = _("Ticket step")
@@ -47,8 +61,8 @@ class TicketAssignee(CommonModelMixin):
         on_delete=models.CASCADE, verbose_name='Assignee'
     )
     state = models.CharField(
-        choices=ProcessState.choices, max_length=64,
-        default=ProcessState.notified
+        choices=StepState.choices, max_length=64,
+        default=StepState.notified
     )
     step = models.ForeignKey(
         'tickets.TicketStep', related_name='ticket_assignees',
@@ -68,6 +82,9 @@ class StatusMixin:
     applicant: models.ForeignKey
     current_node: models.Manager
     save: Callable
+    create_process_steps_by_flow: Callable
+    create_process_steps_by_assignees: Callable
+    assignees: Callable
 
     def set_state_approve(self):
         self.state = TicketState.approved
@@ -106,10 +123,14 @@ class StatusMixin:
     def state_close(self):
         return self.state == TicketState.closed.value
 
-    # action changed
-    def open(self, applicant):
+    def open(self, applicant=None):
         self.applicant = applicant
         self._change_action(TicketAction.open)
+        self.create_process_steps_by_flow()
+
+    def open_by_assignees(self, assignees):
+        self._change_action(TicketAction.open)
+        self.create_process_steps_by_assignees(assignees)
 
     def approve(self, processor):
         self.update_current_step_state_and_assignee(processor, TicketState.approved)
@@ -146,7 +167,7 @@ class Ticket(CommonModelMixin, StatusMixin):
     meta = models.JSONField(encoder=ModelJSONFieldEncoder, default=dict, verbose_name=_("Meta"))
     state = models.CharField(
         max_length=16, choices=TicketState.choices,
-        default=TicketState.open, verbose_name=_("State")
+        default=TicketState.pending, verbose_name=_("State")
     )
     status = models.CharField(
         max_length=16, choices=TicketStatus.choices,
@@ -200,7 +221,7 @@ class Ticket(CommonModelMixin, StatusMixin):
     @property
     def processor(self):
         processor = self.current_node.first().ticket_assignees \
-            .exclude(state=ProcessState.notified).first()
+            .exclude(state=StepState.notified).first()
         return processor.assignee if processor else None
 
     def ignore_applicant(self, assignees, applicant=None):
@@ -208,6 +229,25 @@ class Ticket(CommonModelMixin, StatusMixin):
         if len(assignees) != 1:
             assignees = set(assignees) - {applicant, }
         return list(assignees)
+
+    def create_process_steps_by_flow(self):
+        org_id = self.flow.org_id
+        flow_rules = self.flow.rules.order_by('level')
+        steps = []
+        for rule in flow_rules:
+            step = TicketStep.objects.create(ticket=self, level=rule.level)
+            assignees = rule.get_assignees(org_id=org_id)
+            step_assignees = [TicketAssignee(step=step, assignee=user) for user in assignees]
+            TicketAssignee.objects.bulk_create(step_assignees)
+            steps.append(step)
+        steps[0].set_active()
+
+    def create_process_steps_by_assignees(self, assignees):
+        assignees = self.ignore_applicant(assignees, self.applicant)
+        step = TicketStep.objects.create(ticket=self, level=1)
+        ticket_assignees = [TicketAssignee(step=step, assignee=user) for user in assignees]
+        TicketAssignee.objects.bulk_create(ticket_assignees)
+        step.set_active()
 
     def create_related_node(self, applicant=None):
         org_id = self.flow.org_id
@@ -232,7 +272,7 @@ class Ticket(CommonModelMixin, StatusMixin):
             nodes.append(
                 {
                     'approval_level': node.level,
-                    'state': ProcessState.notified,
+                    'state': StepState.notified,
                     'assignees': assignee_ids,
                     'assignees_display': assignees_display
                 }

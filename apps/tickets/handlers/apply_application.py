@@ -27,6 +27,7 @@ class Handler(BaseHandler):
         meta_display = dict(zip(meta_display_fields, meta_display_values))
         apply_system_users = self.ticket.meta.get('apply_system_users')
         apply_applications = self.ticket.meta.get('apply_applications')
+
         with tmp_to_org(self.ticket.org_id):
             meta_display.update({
                 'apply_system_users_display': [str(i) for i in SystemUser.objects.filter(id__in=apply_system_users)],

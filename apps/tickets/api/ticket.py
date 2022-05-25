@@ -54,8 +54,8 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     def perform_create(self, serializer):
         instance = serializer.save()
         applicant = self.request.user
-        instance.create_related_node(applicant)
-        instance.process_map = instance.create_process_map(applicant)
+        # instance.create_related_node(applicant)
+        # instance.process_map = instance.create_process_map(applicant)
         instance.open(applicant)
 
     @action(detail=False, methods=[POST], permission_classes=[RBACPermission, ])
