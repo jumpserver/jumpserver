@@ -24,8 +24,8 @@ class BaseHandler:
             self._send_applied_mail_to_assignees()
             is_finished = False
         else:
-            self.ticket.set_state_approve()
-            self.ticket.set_status_closed()
+            self.ticket.set_state(Ticket.State.approved)
+            self.ticket.set_status(Ticket.Status.closed)
             self._send_processed_mail_to_applicant(self.ticket.processor)
             is_finished = True
 
@@ -33,13 +33,13 @@ class BaseHandler:
         return is_finished
 
     def _on_reject(self):
-        self.ticket.set_state_reject()
-        self.ticket.set_status_closed()
+        self.ticket.set_state(Ticket.State.rejected)
+        self.ticket.set_status(Ticket.Status.closed)
         self.__on_process(self.ticket.processor)
 
     def _on_close(self):
-        self.ticket.set_state_closed()
-        self.ticket.set_status_closed()
+        self.ticket.set_state(Ticket.State.closed)
+        self.ticket.set_status(Ticket.Status.closed)
         self.__on_process(self.ticket.processor)
 
     def __on_process(self, processor):

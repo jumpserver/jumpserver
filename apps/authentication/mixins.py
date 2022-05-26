@@ -348,7 +348,7 @@ class AuthACLMixin:
 
     def get_ticket_or_create(self, confirm_setting):
         ticket = self.get_ticket()
-        if not ticket or ticket.status_closed:
+        if not ticket or ticket.is_status(ticket.Status.closed):
             ticket = confirm_setting.create_confirm_ticket(self.request)
             self.request.session['auth_ticket_id'] = str(ticket.id)
         return ticket
@@ -357,16 +357,17 @@ class AuthACLMixin:
         ticket = self.get_ticket()
         if not ticket:
             raise errors.LoginConfirmOtherError('', "Not found")
-        if ticket.status_open:
+
+        if ticket.is_status(ticket.Status.open):
             raise errors.LoginConfirmWaitError(ticket.id)
-        elif ticket.state_approve:
+        elif ticket.is_state(ticket.State.approved):
             self.request.session["auth_confirm"] = "1"
             return
-        elif ticket.state_reject:
+        elif ticket.is_state(ticket.State.rejected):
             raise errors.LoginConfirmOtherError(
                 ticket.id, ticket.get_state_display()
             )
-        elif ticket.state_close:
+        elif ticket.is_state(ticket.State.closed):
             raise errors.LoginConfirmOtherError(
                 ticket.id, ticket.get_state_display()
             )

@@ -14,9 +14,9 @@ from common.mixins.models import CommonModelMixin
 from common.db.encoder import ModelJSONFieldEncoder
 from tickets.const import (
     TicketType, TicketStatus, TicketState, TicketLevel,
-    StepState, TicketAction, StepStatus
+    StepState, StepStatus
 )
-from tickets.signals import post_change_ticket_action, active_step
+from tickets.signals import post_ticket_state_changed
 from tickets.handlers import get_ticket_handler
 from tickets.errors import AlreadyClosed
 
@@ -25,30 +25,45 @@ __all__ = ['Ticket', 'TicketStep', 'TicketAssignee', 'SuperTicket']
 
 class TicketStep(CommonModelMixin):
     ticket = models.ForeignKey(
-        'Ticket', related_name='ticket_steps', on_delete=models.CASCADE,
-        verbose_name='Ticket'
+        'Ticket', related_name='ticket_steps',
+        on_delete=models.CASCADE, verbose_name='Ticket'
     )
     level = models.SmallIntegerField(
         default=TicketLevel.one, choices=TicketLevel.choices,
         verbose_name=_('Approve level')
     )
     state = models.CharField(
-        choices=StepState.choices, max_length=64,
-        default=StepState.pending
+        max_length=64, choices=StepState.choices,
+        default=StepState.pending, verbose_name=_("State")
     )
     status = models.CharField(
-        choices=StepStatus.choices, max_length=16,
-        default=StepState.pending
+        max_length=16, verbose_name=_("Status"),
+        choices=StepStatus.choices, default=StepStatus.pending,
     )
 
     def set_active(self):
-        self.status = StepStatus.active
+        self.status = TicketStatus.active
         self.save(update_fields=['status'])
+        self._on_active()
+
+    def change_state(self, state):
+        self.state = state
+        self.status = StepStatus.pending
+        self.save(update_fields=['state', 'status'])
+
+    def need_next(self):
+        return self.state == TicketState.approved
+
+    def next(self):
+        kwargs = dict(ticket=self.ticket, level=self.level+1, status=StepStatus.pending)
+        return self.__class__.objects.filter(**kwargs).first()
+
+    def _on_active(self):
         self.send_msg_to_assignees()
 
     def send_msg_to_assignees(self):
         # Todo: send msg
-        self.state = StepState.notified
+        self.state = TicketState.notified
         self.save(update_fields=['state'])
 
     class Meta:
@@ -61,8 +76,8 @@ class TicketAssignee(CommonModelMixin):
         on_delete=models.CASCADE, verbose_name='Assignee'
     )
     state = models.CharField(
-        choices=StepState.choices, max_length=64,
-        default=StepState.notified
+        choices=TicketState.choices, max_length=64,
+        default=TicketState.pending
     )
     step = models.ForeignKey(
         'tickets.TicketStep', related_name='ticket_assignees',
@@ -77,88 +92,65 @@ class TicketAssignee(CommonModelMixin):
 
 
 class StatusMixin:
+    State = TicketState
+    Status = TicketStatus
+
     state: str
     status: str
     applicant: models.ForeignKey
-    current_node: models.Manager
+    current_step: TicketStep
     save: Callable
     create_process_steps_by_flow: Callable
     create_process_steps_by_assignees: Callable
     assignees: Callable
 
-    def set_state_approve(self):
-        self.state = TicketState.approved
+    def set_state(self, state: TicketState):
+        self.state = state
 
-    def set_state_reject(self):
-        self.state = TicketState.rejected
+    def set_status(self, status: TicketStatus):
+        self.state = status
 
-    def set_state_closed(self):
-        self.state = TicketState.closed
+    def is_state(self, state: TicketState):
+        return self.state == state
 
-    def set_status_closed(self):
-        self.status = TicketStatus.closed
-
-    # status
-    @property
-    def status_open(self):
-        return self.status == TicketStatus.open.value
-
-    @property
-    def status_closed(self):
-        return self.status == TicketStatus.closed.value
-
-    @property
-    def state_open(self):
-        return self.state == TicketState.open.value
-
-    @property
-    def state_approve(self):
-        return self.state == TicketState.approved.value
-
-    @property
-    def state_reject(self):
-        return self.state == TicketState.rejected.value
-
-    @property
-    def state_close(self):
-        return self.state == TicketState.closed.value
+    def is_status(self, status: TicketStatus):
+        return self.status == status
 
     def open(self, applicant=None):
-        self.applicant = applicant
-        self._change_action(TicketAction.open)
+        self._change_state(TicketState.open, applicant)
         self.create_process_steps_by_flow()
 
     def open_by_assignees(self, assignees):
-        self._change_action(TicketAction.open)
+        self._change_state(TicketState.open, None)
         self.create_process_steps_by_assignees(assignees)
 
     def approve(self, processor):
-        self.update_current_step_state_and_assignee(processor, TicketState.approved)
-        self._change_action(TicketAction.approve)
+        self._change_state(TicketState.approved, processor)
 
     def reject(self, processor):
-        self.update_current_step_state_and_assignee(processor, TicketState.rejected)
-        self._change_action(TicketAction.reject)
+        self._change_state(TicketState.rejected, processor)
 
     def close(self, processor):
-        self.update_current_step_state_and_assignee(processor, TicketState.closed)
-        self._change_action(TicketAction.close)
+        self._change_state(TicketState.closed, processor)
 
-    def update_current_step_state_and_assignee(self, processor, state):
-        if self.status_closed:
+    def _change_state(self, state, processor):
+        if self.is_status(self.Status.closed):
             raise AlreadyClosed
-        if state != TicketState.approved:
-            self.state = state
-        current_node = self.current_node
-        current_node.update(state=state)
-        current_node.first().ticket_assignees.filter(assignee=processor).update(state=state)
 
-    def _change_action(self, action):
-        self.save()
-        post_change_ticket_action.send(sender=self.__class__, ticket=self, action=action)
+        self._update_step_state(state, processor)
+        self._update_status(state, processor)
+
+    def _update_step_state(self, processor, state):
+        self.current_step.change_state(state)
+        self.current_step.ticket_assignees\
+            .filter(assignee=processor)\
+            .update(state=state)
+
+    def _update_status(self, state, processor):
+        pass
 
 
-class Ticket(CommonModelMixin, StatusMixin):
+class Ticket(StatusMixin, CommonModelMixin):
     title = models.CharField(max_length=256, verbose_name=_("Title"))
     type = models.CharField(
         max_length=64, choices=TicketType.choices,
@@ -216,12 +208,13 @@ class Ticket(CommonModelMixin, StatusMixin):
 
     @property
     def current_step(self):
-        return self.ticket_steps.filter(level=self.approval_step)
+        return self.ticket_steps.filter(level=self.approval_step).first()
 
     @property
     def processor(self):
-        processor = self.current_step.first().ticket_assignees \
-            .exclude(state=StepState.notified).first()
+        processor = self.current_step.ticket_assignees \
+            .exclude(state=TicketState.notified)\
+            .first()
         return processor.assignee if processor else None
 
     def exclude_applicant(self, assignees, applicant=None):
@@ -248,60 +241,6 @@ class Ticket(CommonModelMixin, StatusMixin):
         ticket_assignees = [TicketAssignee(step=step, assignee=user) for user in assignees]
         TicketAssignee.objects.bulk_create(ticket_assignees)
         step.set_active()
-
-    def create_related_node(self, applicant=None):
-        org_id = self.flow.org_id
-        approval_rule = self.get_current_ticket_flow_approve()
-        ticket_step = TicketStep.objects.create(ticket=self, level=self.approval_step)
-        ticket_assignees = []
-        assignees = approval_rule.get_assignees(org_id=org_id)
-        assignees = self.exclude_applicant(assignees, applicant)
-        for assignee in assignees:
-            ticket_assignees.append(TicketAssignee(step=ticket_step, assignee=assignee))
-        TicketAssignee.objects.bulk_create(ticket_assignees)
-
-    def create_process_map(self, applicant=None):
-        org_id = self.flow.org_id
-        approval_rules = self.flow.rules.order_by('level')
-        nodes = list()
-        for node in approval_rules:
-            assignees = node.get_assignees(org_id=org_id)
-            assignees = self.exclude_applicant(assignees, applicant)
-            assignee_ids = [assignee.id for assignee in assignees]
-            assignees_display = [str(assignee) for assignee in assignees]
-            nodes.append(
-                {
-                    'approval_level': node.level,
-                    'state': StepState.notified,
-                    'assignees': assignee_ids,
-                    'assignees_display': assignees_display
-                }
-            )
-        return nodes
-
-    # TODO 兼容不存在流的工单
-    def create_process_map_and_node(self, assignees, applicant):
-        """
-        工单有两种，一种是用户申请的主动工单，一种是系统帮用户申请的。
-        用户主动申请的，像申请资产，申请应用，有工单流程定义，确定复核人
-        系统申请的的，像用户登录复核，命令复核，登录资产 复核，有单独的 ACL，指定的复核人
-        :param assignees:
-        :param applicant:
-        :return:
-        """
-        assignees = self.exclude_applicant(assignees, applicant)
-        self.process_map = [{
-            'approval_level': 1,
-            'state': 'notified',
-            'assignees': [assignee.id for assignee in assignees],
-            'assignees_display': [str(assignee) for assignee in assignees]
-        }, ]
-        self.save()
-        ticket_step = TicketStep.objects.create(ticket=self, level=1)
-        ticket_assignees = []
-        for assignee in assignees:
-            ticket_assignees.append(TicketAssignee(step=ticket_step, assignee=assignee))
-        TicketAssignee.objects.bulk_create(ticket_assignees)
 
     def has_current_assignee(self, assignee):
         return self.ticket_steps.filter(

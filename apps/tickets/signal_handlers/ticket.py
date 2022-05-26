@@ -6,12 +6,12 @@ from django.db.models.signals import post_save, m2m_changed
 from common.decorator import on_transaction_commit
 from common.utils import get_logger
 from tickets.models import Ticket
-from ..signals import post_change_ticket_action
+from ..signals import post_ticket_state_changed
 
 logger = get_logger(__name__)
 
 
-@receiver(post_change_ticket_action, sender=Ticket)
+@receiver(post_ticket_state_changed, sender=Ticket)
 def on_post_change_ticket_action(sender, ticket, action, **kwargs):
     ticket.handler.dispatch(action)
 
