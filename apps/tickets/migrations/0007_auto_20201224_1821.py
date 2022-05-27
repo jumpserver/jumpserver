@@ -84,6 +84,10 @@ def migrate_tickets_fields_name(apps, schema_editor):
     ticket_model.origin_objects.bulk_update(tickets, fields)
 
 
+def migrate_meta(apps, *args):
+    pass
+
+
 class Migration(migrations.Migration):
 
     dependencies = [

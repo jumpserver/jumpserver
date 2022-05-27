@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                 ('user_display', models.CharField(max_length=128, verbose_name='User display name')),
                 ('title', models.CharField(max_length=256, verbose_name='Title')),
                 ('body', models.TextField(verbose_name='Body')),
-                ('meta', common.db.fields.JsonDictTextField(default='{}', verbose_name='Meta')),
+                ('meta', models.JSONField(default={}, verbose_name='Meta')),
                 ('assignee_display', models.CharField(blank=True, max_length=128, null=True, verbose_name='Assignee display name')),
                 ('assignees_display', models.CharField(blank=True, max_length=128, verbose_name='Assignees display name')),
                 ('type', models.CharField(choices=[('general', 'General'), ('login_confirm', 'Login confirm')], default='general', max_length=16, verbose_name='Type')),
