@@ -5,6 +5,7 @@
   <a href="https://www.gnu.org/licenses/gpl-3.0.html"><img src="https://img.shields.io/github/license/jumpserver/jumpserver" alt="License: GPLv3"></a>
   <a href="https://shields.io/github/downloads/jumpserver/jumpserver/total"><img src="https://shields.io/github/downloads/jumpserver/jumpserver/total" alt=" release"></a>
   <a href="https://hub.docker.com/u/jumpserver"><img src="https://img.shields.io/docker/pulls/jumpserver/jms_all.svg" alt="Codacy"></a>
+  <a href="https://github.com/jumpserver/jumpserver/commits"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/jumpserver/jumpserver.svg" /></a>
   <a href="https://github.com/jumpserver/jumpserver"><img src="https://img.shields.io/github/stars/jumpserver/jumpserver?color=%231890FF&style=flat-square" alt="Stars"></a>
 </p>
 
@@ -55,12 +56,15 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 - [手动安装](https://github.com/jumpserver/installer)
 
 ### 组件项目
-- [Lina](https://github.com/jumpserver/lina) JumpServer Web UI 项目
-- [Luna](https://github.com/jumpserver/luna) JumpServer Web Terminal 项目
-- [KoKo](https://github.com/jumpserver/koko) JumpServer 字符协议 Connector 项目，替代原来 Python 版本的 [Coco](https://github.com/jumpserver/coco)
-- [Lion](https://github.com/jumpserver/lion-release) JumpServer 图形协议 Connector 项目，依赖 [Apache Guacamole](https://guacamole.apache.org/)
-- [Clients](https://github.com/jumpserver/clients) JumpServer 客户端 项目
-- [Installer](https://github.com/jumpserver/installer) JumpServer 安装包 项目
+| 项目                                                                          |  状态          | 描述                                     |
+| ---------------------------------------------------------------------------  |  -------------------   | ---------------------------------------- |
+| [Lina](https://github.com/jumpserver/lina) | <a href="https://github.com/jumpserver/lina/releases"><img alt="Lina release" src="https://img.shields.io/github/release/jumpserver/lina.svg" /></a> | JumpServer Web UI 项目 |
+| [Luna](https://github.com/jumpserver/luna) | <a href="https://github.com/jumpserver/luna/releases"><img alt="Luna release" src="https://img.shields.io/github/release/jumpserver/luna.svg" /></a> | JumpServer Web Terminal 项目 |
+| [KoKo](https://github.com/jumpserver/koko) | <a href="https://github.com/jumpserver/koko/releases"><img alt="Koko release" src="https://img.shields.io/github/release/jumpserver/koko.svg" /></a> | JumpServer 字符协议 Connector 项目，替代原来 Python 版本的 [Coco](https://github.com/jumpserver/coco) |
+| [Lion](https://github.com/jumpserver/lion-release) | <a href="https://github.com/jumpserver/lion-release/releases"><img alt="Lion release" src="https://img.shields.io/github/release/jumpserver/lion-release.svg" /></a>  | JumpServer 图形协议 Connector 项目，依赖 [Apache Guacamole](https://guacamole.apache.org/) |
+| [Magnus](https://github.com/jumpserver/magnus-release) | <a href="https://github.com/jumpserver/magnus-release/releases"><img alt="Magnus release" src="https://img.shields.io/github/release/jumpserver/magnus-release.svg" /> | JumpServer 数据库 Proxy Connector 项目) |
+| [Clients](https://github.com/jumpserver/clients) | <a href="https://github.com/jumpserver/clients/releases"><img alt="Clients release" src="https://img.shields.io/github/release/jumpserver/clients.svg" /> | JumpServer 客户端 项目 |
+| [Installer](https://github.com/jumpserver/installer)| <a href="https://github.com/jumpserver/installer/releases"><img alt="Installer release" src="https://img.shields.io/github/release/jumpserver/installer.svg" /> | JumpServer 安装包 项目 |
 
 ### 社区
 
@@ -75,21 +79,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 
 感谢以下贡献者，让 JumpServer 更加完善
 
-<a href="https://github.com/jumpserver/jumpserver/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=jumpserver/jumpserver" />
-</a>
-
-<a href="https://github.com/jumpserver/koko/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=jumpserver/koko" />
-</a>
-
-<a href="https://github.com/jumpserver/lina/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=jumpserver/lina" />
-</a>
-
-<a href="https://github.com/jumpserver/luna/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=jumpserver/luna" />
-</a>
+<a href="https://github.com/halo-dev/halo/graphs/contributors"><img src="https://opencollective.com/jumpserver/contributors.svg?width=890&button=false" /></a>
 
 
 
