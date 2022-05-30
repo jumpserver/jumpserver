@@ -47,6 +47,7 @@ class SessionGenerator(FakeDataGenerator):
                 org_id=self.org.id,
                 date_start=date_start,
                 date_end=date_end,
+                is_finished=True
             )
             objects.append(Session(**data))
         creates = Session.objects.bulk_create(objects, ignore_conflicts=True)
