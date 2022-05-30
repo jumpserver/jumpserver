@@ -157,6 +157,8 @@ class LDAPUser(_LDAPUser):
 
     def _populate_user_from_attributes(self):
         for field, attr in self.settings.USER_ATTR_MAP.items():
+            if field in ['groups']:
+                continue
             try:
                 value = self.attrs[attr][0]
                 value = value.strip()
