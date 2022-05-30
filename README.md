@@ -57,13 +57,13 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 ### 组件项目
 | 项目                                                                          |  状态          | 描述                                     |
 | ---------------------------------------------------------------------------  |  -------------------   | ---------------------------------------- |
-| [Lina](https://github.com/jumpserver/lina) | <a href="https://github.com/jumpserver/lina/releases"><img alt="Lina release" src="https://img.shields.io/github/release/jumpserver/lina.svg?style=flat-square" /></a> | JumpServer Web UI 项目 |
-| [Luna](https://github.com/jumpserver/luna) | <a href="https://github.com/jumpserver/luna/releases"><img alt="Luna release" src="https://img.shields.io/github/release/jumpserver/luna.svg?style=flat-square" /></a> | JumpServer Web Terminal 项目 |
-| [KoKo](https://github.com/jumpserver/koko) | <a href="https://github.com/jumpserver/koko/releases"><img alt="Koko release" src="https://img.shields.io/github/release/jumpserver/koko.svg?style=flat-square" /></a> | JumpServer 字符协议 Connector 项目，替代原来 Python 版本的 [Coco](https://github.com/jumpserver/coco) |
-| [Lion](https://github.com/jumpserver/lion-release) | <a href="https://github.com/jumpserver/lion-release/releases"><img alt="Lion release" src="https://img.shields.io/github/release/jumpserver/lion-release.svg?style=flat-square" /></a>  | JumpServer 图形协议 Connector 项目，依赖 [Apache Guacamole](https://guacamole.apache.org/) |
-| [Magnus](https://github.com/jumpserver/magnus-release) | <a href="https://github.com/jumpserver/magnus-release/releases"><img alt="Magnus release" src="https://img.shields.io/github/release/jumpserver/magnus-release.svg?style=flat-square" /> | JumpServer 数据库 Proxy Connector 项目) |
-| [Clients](https://github.com/jumpserver/clients) | <a href="https://github.com/jumpserver/clients/releases"><img alt="Clients release" src="https://img.shields.io/github/release/jumpserver/clients.svg?style=flat-square" /> | JumpServer 客户端 项目 |
-| [Installer](https://github.com/jumpserver/installer)| <a href="https://github.com/jumpserver/installer/releases"><img alt="Installer release" src="https://img.shields.io/github/release/jumpserver/installer.svg?style=flat-square" /> | JumpServer 安装包 项目 |
+| [Lina](https://github.com/jumpserver/lina) | <a href="https://github.com/jumpserver/lina/releases"><img alt="Lina release" src="https://img.shields.io/github/release/jumpserver/lina.svg" /></a> | JumpServer Web UI 项目 |
+| [Luna](https://github.com/jumpserver/luna) | <a href="https://github.com/jumpserver/luna/releases"><img alt="Luna release" src="https://img.shields.io/github/release/jumpserver/luna.svg" /></a> | JumpServer Web Terminal 项目 |
+| [KoKo](https://github.com/jumpserver/koko) | <a href="https://github.com/jumpserver/koko/releases"><img alt="Koko release" src="https://img.shields.io/github/release/jumpserver/koko.svg" /></a> | JumpServer 字符协议 Connector 项目，替代原来 Python 版本的 [Coco](https://github.com/jumpserver/coco) |
+| [Lion](https://github.com/jumpserver/lion-release) | <a href="https://github.com/jumpserver/lion-release/releases"><img alt="Lion release" src="https://img.shields.io/github/release/jumpserver/lion-release.svg" /></a>  | JumpServer 图形协议 Connector 项目，依赖 [Apache Guacamole](https://guacamole.apache.org/) |
+| [Magnus](https://github.com/jumpserver/magnus-release) | <a href="https://github.com/jumpserver/magnus-release/releases"><img alt="Magnus release" src="https://img.shields.io/github/release/jumpserver/magnus-release.svg" /> | JumpServer 数据库 Proxy Connector 项目) |
+| [Clients](https://github.com/jumpserver/clients) | <a href="https://github.com/jumpserver/clients/releases"><img alt="Clients release" src="https://img.shields.io/github/release/jumpserver/clients.svg" /> | JumpServer 客户端 项目 |
+| [Installer](https://github.com/jumpserver/installer)| <a href="https://github.com/jumpserver/installer/releases"><img alt="Installer release" src="https://img.shields.io/github/release/jumpserver/installer.svg" /> | JumpServer 安装包 项目 |
 
 ### 社区
 
