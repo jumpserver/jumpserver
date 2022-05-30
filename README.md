@@ -79,21 +79,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 
 感谢以下贡献者，让 JumpServer 更加完善
 
-<a href="https://github.com/jumpserver/jumpserver/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=jumpserver/jumpserver" />
-</a>
-
-<a href="https://github.com/jumpserver/koko/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=jumpserver/koko" />
-</a>
-
-<a href="https://github.com/jumpserver/lina/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=jumpserver/lina" />
-</a>
-
-<a href="https://github.com/jumpserver/luna/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=jumpserver/luna" />
-</a>
+<a href="https://github.com/halo-dev/halo/graphs/contributors"><img src="https://opencollective.com/jumpserver/contributors.svg?width=890&button=false" /></a>
 
 
 
