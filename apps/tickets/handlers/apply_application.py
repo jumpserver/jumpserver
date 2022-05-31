@@ -5,45 +5,26 @@ from applications.const import AppCategory, AppType
 from applications.models import Application
 from perms.models import ApplicationPermission
 from assets.models import SystemUser
-
+from tickets.models import ApplyApplicationTicket
 from .base import BaseHandler
 
 
 class Handler(BaseHandler):
+    ticket: ApplyApplicationTicket
 
     def _on_approve(self):
-        is_finished = super()._on_approve()
+        is_finished = super()._on_approved()
         if is_finished:
             self._create_application_permission()
 
-    # display
-    def _construct_meta_display_of_open(self):
-        meta_display_fields = ['apply_category_display', 'apply_type_display']
-        apply_category = self.ticket.meta.get('apply_category')
-        apply_category_display = AppCategory.get_label(apply_category)
-        apply_type = self.ticket.meta.get('apply_type')
-        apply_type_display = AppType.get_label(apply_type)
-        meta_display_values = [apply_category_display, apply_type_display]
-        meta_display = dict(zip(meta_display_fields, meta_display_values))
-        apply_system_users = self.ticket.meta.get('apply_system_users')
-        apply_applications = self.ticket.meta.get('apply_applications')
-
-        with tmp_to_org(self.ticket.org_id):
-            meta_display.update({
-                'apply_system_users_display': [str(i) for i in SystemUser.objects.filter(id__in=apply_system_users)],
-                'apply_applications_display': [str(i) for i in Application.objects.filter(id__in=apply_applications)]
-            })
-
-        return meta_display
-
     # body
     def _construct_meta_body_of_open(self):
-        apply_category_display = self.ticket.meta.get('apply_category_display')
-        apply_type_display = self.ticket.meta.get('apply_type_display')
-        apply_applications = self.ticket.meta.get('apply_applications_display', [])
-        apply_system_users = self.ticket.meta.get('apply_system_users_display', [])
-        apply_date_start = self.ticket.meta.get('apply_date_start')
-        apply_date_expired = self.ticket.meta.get('apply_date_expired')
+        apply_category_display = self.ticket.apply_category_display
+        apply_type_display = self.ticket.apply_type_display
+        apply_applications = self.ticket.rel_snapshot.get('apply_applications', [])
+        apply_system_users = self.ticket.rel_snapshot.get('apply_system_users', [])
+        apply_date_start = self.ticket.apply_date_start
+        apply_date_expired = self.ticket.apply_date_expired
         applied_body = '''{}: {},
             {}: {}
             {}: {}
@@ -67,13 +48,13 @@ class Handler(BaseHandler):
             if application_permission:
                 return application_permission
 
-        apply_category = self.ticket.meta.get('apply_category')
-        apply_type = self.ticket.meta.get('apply_type')
-        apply_permission_name = self.ticket.meta.get('apply_permission_name', '')
-        apply_applications = self.ticket.meta.get('apply_applications', [])
-        apply_system_users = self.ticket.meta.get('apply_system_users', [])
-        apply_date_start = self.ticket.meta.get('apply_date_start')
-        apply_date_expired = self.ticket.meta.get('apply_date_expired')
+        apply_permission_name = self.ticket.apply_permission_name
+        apply_category = self.ticket.apply_category
+        apply_type = self.ticket.apply_type
+        apply_applications = self.ticket.apply_applications
+        apply_system_users = self.ticket.apply_system_users
+        apply_date_start = self.ticket.apply_date_start
+        apply_date_expired = self.ticket.apply_date_expired
         permission_created_by = '{}:{}'.format(
             str(self.ticket.__class__.__name__), str(self.ticket.id)
         )
@@ -85,7 +66,7 @@ class Handler(BaseHandler):
             'ticket ID: {}'
         ).format(
             self.ticket.title,
-            self.ticket.applicant_display,
+            self.ticket.applicant,
             ','.join([i['processor_display'] for i in self.ticket.process_map]),
             str(self.ticket.id)
         )

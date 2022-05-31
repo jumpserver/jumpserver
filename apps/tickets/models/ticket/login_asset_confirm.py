@@ -8,7 +8,7 @@ __all__ = ['ApplyLoginAssetTicket']
 
 class ApplyLoginAssetTicket(Ticket):
     apply_login_user = models.ForeignKey(
-        'users.User',  on_delete=models.SET_NULL, null=True,
+        'users.User', on_delete=models.SET_NULL, null=True,
         verbose_name=_('Login user'),
     )
     apply_login_asset = models.ForeignKey(

@@ -1,31 +1,31 @@
 # -*- coding: utf-8 -*-
 #
-from rest_framework import viewsets
+from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
-from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.response import Response
 
 from common.const.http import POST, PUT
 from common.mixins.api import CommonApiMixin
-from common.drf.api import JMSBulkModelViewSet
 
 from rbac.permissions import RBACPermission
 
 from tickets import serializers
-from tickets.models import Ticket, TicketFlow
-from tickets.filters import TicketFilter
+from tickets import filters
 from tickets.permissions.ticket import IsAssignee, IsApplicant
+from tickets.models import (
+    Ticket, ApplyAssetTicket, ApplyApplicationTicket,
+    ApplyLoginTicket, ApplyLoginAssetTicket, ApplyCommandTicket
+)
 
-__all__ = ['TicketViewSet', 'TicketFlowViewSet']
+__all__ = ['TicketViewSet']
 
 
-class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
+class TicketViewSet(CommonApiMixin, viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = serializers.TicketDisplaySerializer
     serializer_classes = {
-        'open': serializers.TicketApplySerializer,
-        'approve': serializers.TicketApproveSerializer,
+        'open': serializers.TicketApplySerializer
     }
-    filterset_class = TicketFilter
+    filterset_class = filters.TicketFilter
     search_fields = [
         'title', 'action', 'type', 'status', 'applicant_display'
     ]
@@ -37,25 +37,15 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     rbac_perms = {
         'open': 'tickets.view_ticket',
     }
-
-    def create(self, request, *args, **kwargs):
-        raise MethodNotAllowed(self.action)
-
-    def update(self, request, *args, **kwargs):
-        raise MethodNotAllowed(self.action)
-
-    def destroy(self, request, *args, **kwargs):
-        raise MethodNotAllowed(self.action)
+    model = Ticket
 
     def get_queryset(self):
-        queryset = Ticket.get_user_related_tickets(self.request.user)
+        queryset = self.model.get_user_related_tickets(self.request.user)
         return queryset
 
     def perform_create(self, serializer):
         instance = serializer.save()
         applicant = self.request.user
-        # instance.create_related_node(applicant)
-        # instance.process_map = instance.create_process_map(applicant)
         instance.open(applicant)
 
     @action(detail=False, methods=[POST], permission_classes=[RBACPermission, ])
@@ -84,25 +74,19 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class TicketFlowViewSet(JMSBulkModelViewSet):
-    serializer_class = serializers.TicketFlowSerializer
+class ApplyAssetTicketViewSet(TicketViewSet):
+    serializer_class = serializers.ApplyAssetDisplaySerializer
+    serializer_classes = {
+        'open': serializers.ApplyAssetSerializer
+    }
+    model = ApplyAssetTicket
+    filterset_class = filters.ApplyAssetTicketFilter
 
-    filterset_fields = ['id', 'type']
-    search_fields = ['id', 'type']
 
-    def destroy(self, request, *args, **kwargs):
-        raise MethodNotAllowed(self.action)
-
-    def get_queryset(self):
-        queryset = TicketFlow.get_org_related_flows()
-        return queryset
-
-    def perform_create_or_update(self, serializer):
-        instance = serializer.save()
-        instance.save()
-
-    def perform_create(self, serializer):
-        self.perform_create_or_update(serializer)
-
-    def perform_update(self, serializer):
-        self.perform_create_or_update(serializer)
+class ApplyApplicationTicketViewSet(TicketViewSet):
+    serializer_class = serializers.ApplyApplicationDisplaySerializer
+    serializer_classes = {
+        'open': serializers.ApplyApplicationSerializer
+    }
+    model = ApplyApplicationTicket
+    filterset_class = filters.ApplyApplicationTicketFilter

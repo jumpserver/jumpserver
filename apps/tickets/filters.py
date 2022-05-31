@@ -1,7 +1,7 @@
 from django_filters import rest_framework as filters
 from common.drf.filters import BaseFilterSet
 
-from tickets.models import Ticket
+from tickets.models import Ticket, ApplyAssetTicket, ApplyApplicationTicket
 
 
 class TicketFilter(BaseFilterSet):
@@ -10,9 +10,20 @@ class TicketFilter(BaseFilterSet):
     class Meta:
         model = Ticket
         fields = (
-            'id', 'title', 'type', 'status', 'state', 'applicant', 'assignees__id',
-            'applicant_display',
+            'id', 'title', 'type', 'status', 'state', 'applicant', 'assignees__id'
         )
 
     def filter_assignees_id(self, queryset, name, value):
         return queryset.filter(ticket_steps__ticket_assignees__assignee__id=value)
+
+
+class ApplyAssetTicketFilter(BaseFilterSet):
+    class Meta:
+        model = ApplyAssetTicket
+        fields = ('id',)
+
+
+class ApplyApplicationTicketFilter(BaseFilterSet):
+    class Meta:
+        model = ApplyApplicationTicket
+        fields = ('id',)

@@ -1,11 +1,12 @@
 from django.utils.translation import ugettext as _
 
 from common.utils import get_logger
+from users.models import User
 from tickets.utils import (
     send_ticket_processed_mail_to_applicant,
     send_ticket_applied_mail_to_assignees
 )
-from tickets.const import TicketAction
+from tickets.const import StepState
 from tickets.models import Ticket
 
 logger = get_logger(__name__)
@@ -13,74 +14,77 @@ logger = get_logger(__name__)
 
 class BaseHandler:
 
-    def __init__(self, ticket: Ticket):
+    def __init__(self, ticket):
         self.ticket = ticket
 
-    def _on_approve(self):
+    def _on_pending(self):
+        self._send_applied_mail_to_assignees()
+
+    def _on_approved(self):
         if self.ticket.approval_step != len(self.ticket.process_map):
-            self._send_processed_mail_to_applicant(self.ticket.processor)
+            self._send_processed_mail_to_applicant()
             self.ticket.approval_step += 1
-            self.ticket.create_related_node()
             self._send_applied_mail_to_assignees()
             is_finished = False
         else:
             self.ticket.set_state(Ticket.State.approved)
             self.ticket.set_status(Ticket.Status.closed)
-            self._send_processed_mail_to_applicant(self.ticket.processor)
+            self._send_processed_mail_to_applicant()
             is_finished = True
 
         self.ticket.save()
         return is_finished
 
-    def _on_reject(self):
+    def _on_rejected(self):
         self.ticket.set_state(Ticket.State.rejected)
         self.ticket.set_status(Ticket.Status.closed)
-        self.__on_process(self.ticket.processor)
+        self.__on_process()
 
-    def _on_close(self):
+    def _on_closed(self):
         self.ticket.set_state(Ticket.State.closed)
         self.ticket.set_status(Ticket.Status.closed)
-        self.__on_process(self.ticket.processor)
+        self.__on_process()
 
-    def __on_process(self, processor):
-        self._send_processed_mail_to_applicant(processor)
+    def __on_process(self):
+        self._send_processed_mail_to_applicant()
         self.ticket.save()
 
-    def dispatch(self, action):
+    def dispatch(self, state):
         processor = self.ticket.processor
-        current_node = self.ticket.current_step.first()
+        current_step = self.ticket.current_step
         self.ticket.process_map[self.ticket.approval_step - 1].update({
-            'approval_date': str(current_node.date_updated),
-            'state': current_node.state,
+            'approval_date': str(current_step.date_updated),
+            'state': current_step.state,
             'processor': processor.id if processor else '',
             'processor_display': str(processor) if processor else '',
         })
         self.ticket.save()
-        self._create_comment_on_action(action)
-        method = getattr(self, f'_on_{action}', lambda: None)
+        self._create_comment_on_state(state)
+        method = getattr(self, f'_on_{state}', lambda: None)
         return method()
 
     # email
     def _send_applied_mail_to_assignees(self):
-        assignees = self.ticket.current_step.first().ticket_assignees.all()
-        assignees_display = ', '.join([str(i.assignee) for i in assignees])
+        current_process = self.ticket.process_map[self.ticket.approval_step - 1]
+        assignees_display = current_process['assignees_display']
         logger.debug('Send applied email to assignees: {}'.format(assignees_display))
-        send_ticket_applied_mail_to_assignees(self.ticket)
+        assignees = User.objects.filter(id__in=current_process['assignees'])
+        send_ticket_applied_mail_to_assignees(self.ticket, assignees)
 
-    def _send_processed_mail_to_applicant(self, processor):
-        logger.debug('Send processed mail to applicant: {}'.format(self.ticket.applicant_display))
+    def _send_processed_mail_to_applicant(self):
+        logger.debug('Send processed mail to applicant: {}'.format(self.ticket.applicant))
+        processor = self.ticket.processor
         send_ticket_processed_mail_to_applicant(self.ticket, processor)
 
-    # comments
-    def _create_comment_on_action(self, action):
+    def _create_comment_on_state(self, state):
         user = self.ticket.processor
         # 打开或关闭工单，备注显示是自己，其他是受理人
-        if action == TicketAction.open or action == TicketAction.close:
+        if state == StepState.pending or state == StepState.close:
             user = self.ticket.applicant
         user_display = str(user)
-        action_display = getattr(TicketAction, action).label
+        state_display = getattr(StepState, state).label
         data = {
-            'body': _('{} {} the ticket').format(user_display, action_display),
+            'body': _('{} {} the ticket').format(user_display, state_display),
             'user': user,
             'user_display': user_display
         }
@@ -111,7 +115,7 @@ class BaseHandler:
             _('Ticket title'), self.ticket.title,
             _('Ticket type'), self.ticket.get_type_display(),
             _('Ticket status'), self.ticket.get_status_display(),
-            _('Ticket applicant'), self.ticket.applicant_display,
+            _('Ticket applicant'), self.ticket.applicant,
         ).strip()
         body = self.body_html_format.format(_("Ticket basic info"), basic_body)
         return body

@@ -1,14 +1,15 @@
 from django.utils.translation import ugettext as _
+from tickets.models import ApplyLoginAssetTicket
 from .base import BaseHandler
 
 
 class Handler(BaseHandler):
+    ticket: ApplyLoginAssetTicket
 
-    # body
     def _construct_meta_body_of_open(self):
-        apply_login_user = self.ticket.meta.get('apply_login_user')
-        apply_login_asset = self.ticket.meta.get('apply_login_asset')
-        apply_login_system_user = self.ticket.meta.get('apply_login_system_user')
+        apply_login_user = self.ticket.rel_snapshot['apply_login_user']
+        apply_login_asset = self.ticket.rel_snapshot['apply_login_asset']
+        apply_login_system_user = self.ticket.rel_snapshot['apply_login_system_user']
         applied_body = '''
             {}: {}
             {}: {}

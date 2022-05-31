@@ -7,18 +7,14 @@ from .base import BaseHandler
 class Handler(BaseHandler):
     ticket: ApplyCommandTicket
 
-    def _on_open(self):
-        pass
-
-    # body
     def _construct_meta_body_of_open(self):
-        apply_run_user = self.ticket.meta.get('apply_run_user')
-        apply_run_asset = self.ticket.meta.get('apply_run_asset')
-        apply_run_system_user = self.ticket.meta.get('apply_run_system_user')
-        apply_run_command = self.ticket.meta.get('apply_run_command')
-        apply_from_session_id = self.ticket.meta.get('apply_from_session_id')
-        apply_from_cmd_filter_rule_id = self.ticket.meta.get('apply_from_cmd_filter_rule_id')
-        apply_from_cmd_filter_id = self.ticket.meta.get('apply_from_cmd_filter_id')
+        apply_run_user = self.ticket.rel_snapshot['apply_run_user']
+        apply_run_asset = self.ticket.rel_snapshot['apply_run_asset']
+        apply_run_system_user = self.ticket.rel_snapshot['apply_run_system_user']
+        apply_run_command = self.ticket.apply_run_command
+        apply_from_session_id = self.ticket.rel_snapshot['apply_from_session_id']
+        apply_from_cmd_filter_rule_id = self.ticket.rel_snapshot['apply_from_cmd_filter_rule_id']
+        apply_from_cmd_filter_id = self.ticket.rel_snapshot['apply_from_cmd_filter_id']
 
         applied_body = '''
             {}: {}
