@@ -18,6 +18,7 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework import serializers
+from django.conf import settings
 
 from applications.models import Application
 from authentication.signals import post_auth_failed
@@ -361,23 +362,7 @@ class TokenCacheMixin:
     """ endpoint smart view 用到此类来解析token中的资产、应用 """
     CACHE_KEY_PREFIX = 'CONNECTION_TOKEN_{}'
 
-    def get_token_cache_key(self, token):
-        return self.CACHE_KEY_PREFIX.format(token)
-
-    def get_token_ttl(self, token):
-        key = self.get_token_cache_key(token)
-        return cache.ttl(key)
-
-    def set_token_to_cache(self, token, value, ttl=5 * 60):
-        key = self.get_token_cache_key(token)
-        cache.set(key, value, timeout=ttl)
-
-    def get_token_from_cache(self, token):
-        key = self.get_token_cache_key(token)
-        value = cache.get(key, None)
-        return value
-
-    def renewal_token(self, token, ttl=5 * 60):
+    def renewal_token(self, token, ttl=None):
         value = self.get_token_from_cache(token)
         if value:
             pre_ttl = self.get_token_ttl(token)
@@ -393,6 +378,23 @@ class TokenCacheMixin:
             'msg': msg
         }
         return data
+
+    def get_token_ttl(self, token):
+        key = self.get_token_cache_key(token)
+        return cache.ttl(key)
+
+    def set_token_to_cache(self, token, value, ttl=None):
+        key = self.get_token_cache_key(token)
+        ttl = ttl or settings.CONNECTION_TOKEN_EXPIRATION
+        cache.set(key, value, timeout=ttl)
+
+    def get_token_from_cache(self, token):
+        key = self.get_token_cache_key(token)
+        value = cache.get(key, None)
+        return value
+
+    def get_token_cache_key(self, token):
+        return self.CACHE_KEY_PREFIX.format(token)
 
 
 class BaseUserConnectionTokenViewSet(
@@ -415,7 +417,7 @@ class BaseUserConnectionTokenViewSet(
             raise PermissionDenied(error)
         return True
 
-    def create_token(self, user, asset, application, system_user, ttl=5 * 60):
+    def create_token(self, user, asset, application, system_user, ttl=None):
         self.check_resource_permission(user, asset, application, system_user)
         token = random_string(36)
         secret = random_string(16)
