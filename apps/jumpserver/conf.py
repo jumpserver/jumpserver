@@ -161,6 +161,7 @@ class Config(dict):
         'SESSION_COOKIE_AGE': 3600 * 24,
         'SESSION_EXPIRE_AT_BROWSER_CLOSE': False,
         'LOGIN_URL': reverse_lazy('authentication:login'),
+        'CONNECTION_TOKEN_EXPIRATION': 5 * 60,
 
         # Custom Config
         # Auth LDAP settings
