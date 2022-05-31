@@ -176,7 +176,6 @@ class Ticket(StatusMixin, CommonModelMixin):
         'TicketFlow', related_name='tickets', on_delete=models.SET_NULL,
         null=True, verbose_name=_("TicketFlow")
     )
-    process_map = models.JSONField(encoder=ModelJSONFieldEncoder, default=list, verbose_name=_("Process"))
     approval_step = models.SmallIntegerField(
         default=TicketLevel.one, choices=TicketLevel.choices, verbose_name=_('Approval step')
     )
