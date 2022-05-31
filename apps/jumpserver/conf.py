@@ -191,6 +191,9 @@ class Config(dict):
         'AUTH_OPENID_CLIENT_AUTH_METHOD': 'client_secret_basic',
         'AUTH_OPENID_SHARE_SESSION': True,
         'AUTH_OPENID_IGNORE_SSL_VERIFICATION': True,
+        'AUTH_OPENID_USER_ATTR_MAP': {
+            'name': 'name', 'username': 'preferred_username', 'email': 'email'
+        },
 
         # OpenID 新配置参数 (version >= 1.5.9)
         'AUTH_OPENID_PROVIDER_ENDPOINT': 'https://oidc.example.com/',
