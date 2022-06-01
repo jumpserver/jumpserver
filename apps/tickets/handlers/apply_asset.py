@@ -9,15 +9,15 @@ from .base import BaseHandler
 class Handler(BaseHandler):
     ticket: ApplyAssetTicket
 
-    def _on_approve(self):
+    def _on_approved(self):
         is_finished = super()._on_approved()
         if is_finished:
             self._create_asset_permission()
 
     def _construct_meta_body_of_open(self):
-        apply_nodes = self.ticket.rel_snapshot.get('apply_nodes', [])
-        apply_assets = self.ticket.rel_snapshot.get('apply_assets', [])
-        apply_system_users = self.ticket.rel_snapshot.get('apply_system_users', [])
+        apply_nodes = self.ticket.rel_snapshot['apply_nodes']
+        apply_assets = self.ticket.rel_snapshot['apply_assets']
+        apply_system_users = self.ticket.rel_snapshot['apply_system_users']
         apply_actions_display = self.ticket.apply_actions_display
         apply_date_start = self.ticket.apply_date_start
         apply_date_expired = self.ticket.apply_date_expired

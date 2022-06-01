@@ -17,7 +17,9 @@ class ApplyAssetTicket(Ticket):
     apply_system_users = models.ManyToManyField(
         'assets.SystemUser', verbose_name=_('Apply system users')
     )
-    apply_actions = models.IntegerField(choices=Action.DB_CHOICES, default=Action.ALL, verbose_name=_("Actions"))
+    apply_actions = models.IntegerField(
+        choices=Action.DB_CHOICES, default=Action.ALL, verbose_name=_('Actions')
+    )
     apply_date_start = models.DateTimeField(verbose_name=_('Date start'), null=True)
     apply_date_expired = models.DateTimeField(verbose_name=_('Date expired'), null=True)
 

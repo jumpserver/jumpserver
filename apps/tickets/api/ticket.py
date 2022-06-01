@@ -3,6 +3,7 @@
 from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.exceptions import MethodNotAllowed
 
 from common.const.http import POST, PUT
 from common.mixins.api import CommonApiMixin
@@ -17,10 +18,10 @@ from tickets.models import (
     ApplyLoginTicket, ApplyLoginAssetTicket, ApplyCommandTicket
 )
 
-__all__ = ['TicketViewSet']
+__all__ = ['TicketViewSet', 'ApplyAssetTicketViewSet']
 
 
-class TicketViewSet(CommonApiMixin, viewsets.GenericViewSet, mixins.ListModelMixin):
+class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     serializer_class = serializers.TicketDisplaySerializer
     serializer_classes = {
         'open': serializers.TicketApplySerializer
@@ -38,6 +39,15 @@ class TicketViewSet(CommonApiMixin, viewsets.GenericViewSet, mixins.ListModelMix
         'open': 'tickets.view_ticket',
     }
     model = Ticket
+
+    def create(self, request, *args, **kwargs):
+        raise MethodNotAllowed(self.action)
+
+    def update(self, request, *args, **kwargs):
+        raise MethodNotAllowed(self.action)
+
+    def destroy(self, request, *args, **kwargs):
+        raise MethodNotAllowed(self.action)
 
     def get_queryset(self):
         queryset = self.model.get_user_related_tickets(self.request.user)

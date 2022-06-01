@@ -1,10 +1,7 @@
 from django.utils.translation import ugettext as _
 
 from orgs.utils import tmp_to_org, tmp_to_root_org
-from applications.const import AppCategory, AppType
-from applications.models import Application
 from perms.models import ApplicationPermission
-from assets.models import SystemUser
 from tickets.models import ApplyApplicationTicket
 from .base import BaseHandler
 
@@ -12,7 +9,7 @@ from .base import BaseHandler
 class Handler(BaseHandler):
     ticket: ApplyApplicationTicket
 
-    def _on_approve(self):
+    def _on_approved(self):
         is_finished = super()._on_approved()
         if is_finished:
             self._create_application_permission()
@@ -21,8 +18,8 @@ class Handler(BaseHandler):
     def _construct_meta_body_of_open(self):
         apply_category_display = self.ticket.apply_category_display
         apply_type_display = self.ticket.apply_type_display
-        apply_applications = self.ticket.rel_snapshot.get('apply_applications', [])
-        apply_system_users = self.ticket.rel_snapshot.get('apply_system_users', [])
+        apply_applications = self.ticket.rel_snapshot['apply_applications']
+        apply_system_users = self.ticket.rel_snapshot['apply_system_users']
         apply_date_start = self.ticket.apply_date_start
         apply_date_expired = self.ticket.apply_date_expired
         applied_body = '''{}: {},

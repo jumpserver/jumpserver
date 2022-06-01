@@ -12,9 +12,9 @@ class Handler(BaseHandler):
         apply_run_asset = self.ticket.rel_snapshot['apply_run_asset']
         apply_run_system_user = self.ticket.rel_snapshot['apply_run_system_user']
         apply_run_command = self.ticket.apply_run_command
-        apply_from_session_id = self.ticket.rel_snapshot['apply_from_session_id']
-        apply_from_cmd_filter_rule_id = self.ticket.rel_snapshot['apply_from_cmd_filter_rule_id']
-        apply_from_cmd_filter_id = self.ticket.rel_snapshot['apply_from_cmd_filter_id']
+        apply_from_session_id = self.ticket.apply_from_session_id
+        apply_from_cmd_filter_rule_id = self.ticket.apply_from_cmd_filter_rule_id
+        apply_from_cmd_filter_id = self.ticket.apply_from_cmd_filter_id
 
         applied_body = '''
             {}: {}
