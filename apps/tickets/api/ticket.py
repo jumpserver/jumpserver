@@ -21,6 +21,7 @@ __all__ = ['TicketViewSet']
 
 
 class TicketViewSet(CommonApiMixin, viewsets.GenericViewSet, mixins.ListModelMixin):
+    model = Ticket
     serializer_class = serializers.TicketDisplaySerializer
     serializer_classes = {
         'open': serializers.TicketApplySerializer
@@ -30,14 +31,13 @@ class TicketViewSet(CommonApiMixin, viewsets.GenericViewSet, mixins.ListModelMix
         'title', 'action', 'type', 'status', 'applicant_display'
     ]
     ordering_fields = (
-        'title', 'applicant_display', 'status', 'state', 'action_display',
-        'date_created', 'serial_num',
+        'title', 'applicant_display', 'status', 'state',
+        'action_display', 'date_created', 'serial_num',
     )
     ordering = ('-date_created',)
     rbac_perms = {
         'open': 'tickets.view_ticket',
     }
-    model = Ticket
 
     def get_queryset(self):
         queryset = self.model.get_user_related_tickets(self.request.user)
