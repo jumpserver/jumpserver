@@ -302,10 +302,8 @@ class Ticket(StatusMixin, CommonModelMixin):
     def handler(self):
         return get_ticket_handler(ticket=self)
 
-    # body
     @property
     def body(self):
-        return ''
         _body = self.handler.get_body()
         return _body
 
