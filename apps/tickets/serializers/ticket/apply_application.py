@@ -14,13 +14,15 @@ class ApplyApplicationSerializer(BaseApplyAssetApplicationSerializer, TicketAppl
     class Meta:
         model = ApplyApplicationTicket
         writeable_fields = [
-            'id', 'title', 'type', 'apply_permission_name', 'apply_category',
+            'id', 'title', 'type', 'apply_category',
             'apply_type', 'apply_applications', 'apply_system_users',
             'apply_date_start', 'apply_date_expired', 'org_id'
         ]
-        fields = TicketApplySerializer.Meta.fields + writeable_fields
+        fields = TicketApplySerializer.Meta.fields + writeable_fields + ['apply_permission_name']
         read_only_fields = list(set(fields) - set(writeable_fields))
-        extra_kwargs = TicketApplySerializer.Meta.extra_kwargs
+        ticket_extra_kwargs = TicketApplySerializer.Meta.extra_kwargs
+        extra_kwargs = {}
+        extra_kwargs.update(ticket_extra_kwargs)
 
     def validate_apply_applications(self, apply_applications):
         type = self.initial_data.get('apply_type')

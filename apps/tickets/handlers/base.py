@@ -79,7 +79,7 @@ class BaseHandler:
     def _create_comment_on_state(self, state):
         user = self.ticket.processor
         # 打开或关闭工单，备注显示是自己，其他是受理人
-        if state == StepState.pending or state == StepState.close:
+        if state == StepState.pending or state == StepState.closed:
             user = self.ticket.applicant
         user_display = str(user)
         state_display = getattr(StepState, state).label

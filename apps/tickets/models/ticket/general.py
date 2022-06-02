@@ -6,7 +6,7 @@ from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.db.utils import IntegrityError
-from django.db.models.fields.related import RelatedField
+from django.db.models.fields import related
 
 from common.exceptions import JMSException
 from common.utils.timezone import as_current_tz
@@ -39,7 +39,7 @@ class TicketStep(CommonModelMixin):
 
     def change_state(self, state):
         self.state = state
-        self.save(update_fields=['state'])
+        self.save()
 
     def _on_active(self):
         self.send_msg_to_assignees()
@@ -47,7 +47,7 @@ class TicketStep(CommonModelMixin):
     def send_msg_to_assignees(self):
         # Todo: send msg
         self.state = TicketState.notified
-        self.save(update_fields=['state'])
+        self.save()
 
     class Meta:
         verbose_name = _("Ticket step")
@@ -86,12 +86,14 @@ class StatusMixin:
     create_process_steps_by_flow: Callable
     create_process_steps_by_assignees: Callable
     assignees: Callable
+    set_serial_num: Callable
+    handler: None
 
     def set_state(self, state: TicketState):
         self.state = state
 
     def set_status(self, status: TicketStatus):
-        self.state = status
+        self.status = status
 
     def is_state(self, state: TicketState):
         return self.state == state
@@ -100,11 +102,13 @@ class StatusMixin:
         return self.status == status
 
     def open(self, applicant=None):
+        self.set_serial_num()
         self.applicant = applicant
         self.create_process_steps_by_flow()
         self._change_state(StepState.pending, applicant)
 
     def open_by_assignees(self, assignees):
+        self.set_serial_num()
         self.create_process_steps_by_assignees(assignees)
         self._change_state(StepState.pending, None)
 
@@ -126,8 +130,9 @@ class StatusMixin:
 
         self._update_step_state(state, processor)
         self.save()
+        self.handler.dispatch(state)
 
-    def _update_step_state(self, processor, state):
+    def _update_step_state(self, state, processor):
         self.current_step.change_state(state)
         self.current_step.ticket_assignees \
             .filter(assignee=processor) \
@@ -270,24 +275,23 @@ class Ticket(StatusMixin, CommonModelMixin):
         return cls.objects.all()
 
     def set_rel_snapshot(self, save=True):
-        rel_fields = [
-            field.name for field in self._meta.fields
-            if isinstance(field, RelatedField)
-        ]
-        m2m_fields = [
-            field.name for field in self._meta.fields
-            if isinstance(field, models.ManyToManyField)
-        ]
+        rel_fields = set()
+        m2m_fields = set()
+        for field in self._meta._forward_fields_map.values():
+            name = field.name
+            if isinstance(field, related.RelatedField):
+                rel_fields.add(name)
+            if isinstance(field, related.ManyToManyField):
+                m2m_fields.add(name)
+
         snapshot = {}
         for field in rel_fields:
             value = getattr(self, field)
-            if not value:
-                continue
 
             if field in m2m_fields:
                 value = [str(v) for v in value.all()]
             else:
-                value = str(value)
+                value = str(value) if value else ''
             snapshot[field] = value
 
         self.rel_snapshot = snapshot
@@ -321,14 +325,13 @@ class Ticket(StatusMixin, CommonModelMixin):
         # 202212010001
         return '{}{}'.format(date_prefix, num)
 
-    def set_serial_num(self, save=True):
+    def set_serial_num(self):
         if self.serial_num:
             return
 
         try:
             self.serial_num = self.get_next_serial_num()
-            if save:
-                self.save(update_fields=('serial_num',))
+            self.save(update_fields=('serial_num',))
         except IntegrityError as e:
             if e.args[0] == 1062:
                 # 虽然做了 `select_for_update` 但是每天的第一条工单仍可能造成冲突
