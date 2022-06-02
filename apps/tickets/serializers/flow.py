@@ -27,12 +27,14 @@ class TicketFlowApproveSerializer(serializers.ModelSerializer):
             'assignees': {'write_only': True, 'allow_empty': True, 'required': False}
         }
 
-    def get_assignees_display(self, obj):
-        return [str(assignee) for assignee in obj.get_assignees()]
+    @staticmethod
+    def get_assignees_display(instance):
+        return [str(assignee) for assignee in instance.get_assignees()]
 
-    def get_assignees_read_only(self, obj):
-        if obj.strategy == TicketApprovalStrategy.custom_user:
-            return obj.assignees.values_list('id', flat=True)
+    @staticmethod
+    def get_assignees_read_only(instance):
+        if instance.strategy == TicketApprovalStrategy.custom_user:
+            return instance.assignees.values_list('id', flat=True)
         return []
 
     def validate(self, attrs):

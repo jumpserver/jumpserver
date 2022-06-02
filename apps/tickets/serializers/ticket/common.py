@@ -1,4 +1,5 @@
 from django.db.transaction import atomic
+from django.db.models import Model
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
@@ -34,7 +35,7 @@ class DefaultPermissionName(object):
 
 
 class BaseApplyAssetApplicationSerializer(serializers.Serializer):
-    permission_model: None
+    permission_model: Model
 
     def validate(self, attrs):
         attrs = super().validate(attrs)

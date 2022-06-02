@@ -18,7 +18,10 @@ from tickets.models import (
     ApplyLoginTicket, ApplyLoginAssetTicket, ApplyCommandTicket
 )
 
-__all__ = ['TicketViewSet', 'ApplyAssetTicketViewSet']
+__all__ = [
+    'TicketViewSet', 'ApplyAssetTicketViewSet', 'ApplyApplicationTicketViewSet',
+    'ApplyLoginTicketViewSet', 'ApplyLoginAssetTicketViewSet', 'ApplyCommandTicketViewSet'
+]
 
 
 class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
@@ -100,3 +103,21 @@ class ApplyApplicationTicketViewSet(TicketViewSet):
     }
     model = ApplyApplicationTicket
     filterset_class = filters.ApplyApplicationTicketFilter
+
+
+class ApplyLoginTicketViewSet(TicketViewSet):
+    serializer_class = serializers.LoginConfirmSerializer
+    model = ApplyLoginTicket
+    filterset_class = filters.ApplyLoginTicketFilter
+
+
+class ApplyLoginAssetTicketViewSet(TicketViewSet):
+    serializer_class = serializers.LoginAssetConfirmSerializer
+    model = ApplyLoginAssetTicket
+    filterset_class = filters.ApplyLoginAssetTicketFilter
+
+
+class ApplyCommandTicketViewSet(TicketViewSet):
+    serializer_class = serializers.CommandConfirmSerializer
+    model = ApplyCommandTicket
+    filterset_class = filters.ApplyCommandTicketFilter
