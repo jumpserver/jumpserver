@@ -10,14 +10,8 @@ from tickets.models import Ticket
 logger = get_logger(__name__)
 
 
-@receiver(post_save, sender=Ticket)
-def on_pre_save_ensure_serial_num(sender, instance: Ticket, created=False, **kwargs):
-    if created:
-        instance.set_serial_num()
-
-
 @on_transaction_commit
-def after_save_set_rel_snapshot(sender, instance, created=False, update_fields=None, **kwargs):
+def after_save_set_rel_snapshot(sender, instance, update_fields=None, **kwargs):
     if update_fields and list(update_fields)[0] == 'rel_snapshot':
         return
     instance.set_rel_snapshot()

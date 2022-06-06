@@ -287,8 +287,7 @@ class Ticket(StatusMixin, CommonModelMixin):
     def set_rel_snapshot(self, save=True):
         rel_fields = set()
         m2m_fields = set()
-        for field in self._meta._forward_fields_map.values():
-            name = field.name
+        for name, field in self._meta._forward_fields_map.items():
             if isinstance(field, related.RelatedField):
                 rel_fields.add(name)
             if isinstance(field, related.ManyToManyField):
