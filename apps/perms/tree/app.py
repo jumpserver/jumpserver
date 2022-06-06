@@ -28,6 +28,7 @@ class GrantedAppTreeUtil:
             'title': name,
             'pId': '',
             'open': True,
+            'iconSkin': 'applications',
             'isParent': True,
             'meta': {
                 'type': 'root'
