@@ -1,7 +1,6 @@
 from django.utils.translation import ugettext as _
 
 from common.utils import get_logger
-from users.models import User
 from tickets.utils import (
     send_ticket_processed_mail_to_applicant,
     send_ticket_applied_mail_to_assignees
@@ -16,6 +15,10 @@ class BaseHandler:
 
     def __init__(self, ticket):
         self.ticket = ticket
+
+    def on_state_change(self, state):
+        method = getattr(self, f'_on_{state}', lambda: None)
+        return method()
 
     def _on_pending(self):
         self._send_applied_mail_to_assignees()
@@ -48,6 +51,23 @@ class BaseHandler:
     def __on_process(self):
         self._send_processed_mail_to_applicant()
         self.ticket.save()
+
+    def on_step_state_change(self, state):
+        pass
+
+    def _on_step_pending(self, step):
+        # Todo:
+        pass
+
+    def _on_step_rejected(self, step):
+        # Todo:
+        pass
+
+    def _on_step_approved(self, step):
+        pass
+
+    def _on_comment_create(self, step):
+        pass
 
     def dispatch(self, state):
         self._create_comment_on_state(state)

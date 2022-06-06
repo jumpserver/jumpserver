@@ -40,6 +40,7 @@ class TicketStep(CommonModelMixin):
     def change_state(self, state):
         self.state = state
         self.save()
+        self.ticket.handler.on_step_change(self)
 
     def _on_active(self):
         self.send_msg_to_assignees()
@@ -48,6 +49,13 @@ class TicketStep(CommonModelMixin):
         # Todo: send msg
         self.state = TicketState.notified
         self.save()
+
+    def next(self):
+        kwargs = dict(ticket=self.ticket, level=self.level+1, status=StepStatus.pending)
+        return self.__class__.objects.filter(**kwargs).first()
+
+    def need_next(self):
+        return self.state == TicketState.approved
 
     class Meta:
         verbose_name = _("Ticket step")
@@ -121,16 +129,17 @@ class StatusMixin:
     def close(self, processor):
         self._change_state(StepState.closed, processor)
 
+    def _update_state(self, state, processor):
+        if state != TicketState.approved:
+            self.state = state
+        self.handler.on_state_change(state)
+
     def _change_state(self, state, processor):
         if self.is_status(self.Status.closed):
             raise AlreadyClosed
 
-        if state != TicketState.approved:
-            self.state = state
-
         self._update_step_state(state, processor)
-        self.save()
-        self.handler.dispatch(state)
+        self._update_state(state, processor)
 
     def _update_step_state(self, state, processor):
         self.current_step.change_state(state)
