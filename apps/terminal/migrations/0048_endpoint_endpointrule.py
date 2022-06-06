@@ -21,7 +21,7 @@ def migrate_endpoints(apps, schema_editor):
     }
     Endpoint.objects.create(**default_data)
 
-    if not settings.XRDP_ENABLED:
+    if not settings.TERMINAL_RAZOR_ENABLED:
         return
     # migrate xrdp
     xrdp_addr = settings.TERMINAL_RDP_ADDR
@@ -41,7 +41,7 @@ def migrate_endpoints(apps, schema_editor):
     else:
         rdp_port = 3389
     xrdp_data = {
-        'name': 'XRDP',
+        'name': 'Razor',
         'host': host,
         'https_port': 0,
         'http_port': 0,
@@ -56,7 +56,7 @@ def migrate_endpoints(apps, schema_editor):
 
     EndpointRule = apps.get_model("terminal", "EndpointRule")
     xrdp_rule_data = {
-        'name': 'XRDP',
+        'name': 'Razor',
         'ip_group': ['*'],
         'priority': 20,
         'endpoint': xrdp_endpoint,
