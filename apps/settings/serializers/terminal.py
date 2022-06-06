@@ -34,5 +34,5 @@ class TerminalSettingSerializer(serializers.Serializer):
                     "if you cannot log in to the device through Telnet, set this parameter")
     )
     TERMINAL_MAGNUS_ENABLED = serializers.BooleanField(label=_("Enable database proxy"))
-    XRDP_ENABLED = serializers.BooleanField(label=_("Enable XRDP"))
+    TERMINAL_RAZOR_ENABLED = serializers.BooleanField(label=_("Enable Razor"))
     TERMINAL_KOKO_SSH_ENABLED = serializers.BooleanField(label=_("Enable SSH Client"))
