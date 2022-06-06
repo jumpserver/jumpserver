@@ -21,7 +21,7 @@ class BaseHandler:
         self._send_applied_mail_to_assignees()
 
     def _on_approved(self):
-        if self.ticket.approval_step != len(self.ticket.process_map):
+        if self.ticket.approval_step != self.ticket.ticket_steps.count:
             self._send_processed_mail_to_applicant()
             self.ticket.approval_step += 1
             self._send_applied_mail_to_assignees()
@@ -50,25 +50,14 @@ class BaseHandler:
         self.ticket.save()
 
     def dispatch(self, state):
-        processor = self.ticket.processor
-        current_step = self.ticket.current_step
-        self.ticket.process_map[self.ticket.approval_step - 1].update({
-            'approval_date': str(current_step.date_updated),
-            'state': current_step.state,
-            'processor': processor.id if processor else '',
-            'processor_display': str(processor) if processor else '',
-        })
-        self.ticket.save()
         self._create_comment_on_state(state)
         method = getattr(self, f'_on_{state}', lambda: None)
         return method()
 
-    # email
     def _send_applied_mail_to_assignees(self):
-        current_process = self.ticket.process_map[self.ticket.approval_step - 1]
-        assignees_display = current_process['assignees_display']
+        assignees = self.ticket.current_assignees
+        assignees_display = ', '.join([str(assignee) for assignee in assignees])
         logger.debug('Send applied email to assignees: {}'.format(assignees_display))
-        assignees = User.objects.filter(id__in=current_process['assignees'])
         send_ticket_applied_mail_to_assignees(self.ticket, assignees)
 
     def _send_processed_mail_to_applicant(self):

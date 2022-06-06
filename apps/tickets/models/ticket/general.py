@@ -171,7 +171,6 @@ class Ticket(StatusMixin, CommonModelMixin):
     org_id = models.CharField(
         max_length=36, blank=True, default='', verbose_name=_('Organization'), db_index=True
     )
-    process_map = models.JSONField(encoder=ModelJSONFieldEncoder, default=list, verbose_name=_("Process"))
 
     class Meta:
         ordering = ('-date_created',)
@@ -186,7 +185,6 @@ class Ticket(StatusMixin, CommonModelMixin):
         org = Organization.get_instance(self.org_id)
         return org.name
 
-    # type
     @property
     def type_apply_asset(self):
         return self.type == TicketType.apply_asset.value
@@ -204,11 +202,43 @@ class Ticket(StatusMixin, CommonModelMixin):
         return self.ticket_steps.filter(level=self.approval_step).first()
 
     @property
+    def current_assignees(self):
+        ticket_assignees = self.current_step.ticket_assignees.all()
+        return [i.assignee for i in ticket_assignees]
+
+    @property
     def processor(self):
         processor = self.current_step.ticket_assignees \
             .exclude(state=StepState.pending) \
             .first()
         return processor.assignee if processor else None
+
+    @property
+    def process_map(self):
+        process_map = []
+        steps = self.ticket_steps.all()
+        for step in steps:
+            assignee_ids = []
+            assignees_display = []
+            ticket_assignees = step.ticket_assignees.all()
+            processor = None
+            state = step.state
+            for i in ticket_assignees:
+                assignee_ids.append(i.assignee.id)
+                assignees_display.append(str(i.assignee))
+                if state != StepState.pending and state == i.state:
+                    processor = i.assignee
+            step_info = {
+                'state': state,
+                'approval_level': step.level,
+                'assignees': assignee_ids,
+                'assignees_display': assignees_display,
+                'approval_date': str(step.date_updated),
+                'processor': processor.id if processor else '',
+                'processor_display': str(processor) if processor else ''
+            }
+            process_map.append(step_info)
+        return process_map
 
     def exclude_applicant(self, assignees, applicant=None):
         applicant = applicant if applicant else self.applicant
@@ -219,35 +249,15 @@ class Ticket(StatusMixin, CommonModelMixin):
     def create_process_steps_by_flow(self):
         org_id = self.flow.org_id
         flow_rules = self.flow.rules.order_by('level')
-        process_map = []
         for rule in flow_rules:
             step = TicketStep.objects.create(ticket=self, level=rule.level)
             assignees = rule.get_assignees(org_id=org_id)
             assignees = self.exclude_applicant(assignees, self.applicant)
-            assignee_ids = [user.id for user in assignees]
-            assignees_display = [str(user) for user in assignees]
             step_assignees = [TicketAssignee(step=step, assignee=user) for user in assignees]
             TicketAssignee.objects.bulk_create(step_assignees)
-            process_map.append(
-                {
-                    'approval_level': rule.level,
-                    'state': StepState.pending,
-                    'assignees': assignee_ids,
-                    'assignees_display': assignees_display
-                }
-            )
-        self.process_map = process_map
 
     def create_process_steps_by_assignees(self, assignees):
         assignees = self.exclude_applicant(assignees, self.applicant)
-        assignee_ids = [user.id for user in assignees]
-        assignees_display = [str(user) for user in assignees]
-        self.process_map = [{
-            'approval_level': TicketLevel.one,
-            'state': StepState.pending,
-            'assignees': assignee_ids,
-            'assignees_display': assignees_display
-        }]
         step = TicketStep.objects.create(ticket=self, level=1)
         ticket_assignees = [TicketAssignee(step=step, assignee=user) for user in assignees]
         TicketAssignee.objects.bulk_create(ticket_assignees)
