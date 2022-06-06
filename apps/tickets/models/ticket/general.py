@@ -10,12 +10,11 @@ from django.db.models.fields import related
 
 from common.exceptions import JMSException
 from common.utils.timezone import as_current_tz
-from common.db.encoder import ModelJSONFieldEncoder
 from common.mixins.models import CommonModelMixin
 from orgs.models import Organization
 from tickets.const import (
     TicketType, TicketStatus, TicketState,
-    TicketLevel, StepState
+    TicketLevel, StepState, StepStatus
 )
 from tickets.handlers import get_ticket_handler
 from tickets.errors import AlreadyClosed
@@ -218,8 +217,7 @@ class Ticket(StatusMixin, CommonModelMixin):
     @property
     def processor(self):
         processor = self.current_step.ticket_assignees \
-            .exclude(state=StepState.pending) \
-            .first()
+            .exclude(state=StepState.pending).first()
         return processor.assignee if processor else None
 
     @property

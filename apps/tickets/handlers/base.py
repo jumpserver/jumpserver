@@ -51,6 +51,7 @@ class BaseHandler:
     def __on_process(self):
         self._send_processed_mail_to_applicant()
         self.ticket.save()
+        self._on_comment_create(self.ticket.state)
 
     def on_step_state_change(self, state):
         pass
@@ -66,14 +67,6 @@ class BaseHandler:
     def _on_step_approved(self, step):
         pass
 
-    def _on_comment_create(self, step):
-        pass
-
-    def dispatch(self, state):
-        self._create_comment_on_state(state)
-        method = getattr(self, f'_on_{state}', lambda: None)
-        return method()
-
     def _send_applied_mail_to_assignees(self):
         assignees = self.ticket.current_assignees
         assignees_display = ', '.join([str(assignee) for assignee in assignees])
@@ -85,7 +78,7 @@ class BaseHandler:
         processor = self.ticket.processor
         send_ticket_processed_mail_to_applicant(self.ticket, processor)
 
-    def _create_comment_on_state(self, state):
+    def _on_comment_create(self, state):
         user = self.ticket.processor
         # 打开或关闭工单，备注显示是自己，其他是受理人
         if state == StepState.pending or state == StepState.closed:
@@ -106,10 +99,6 @@ class BaseHandler:
     '''
 
     def get_body(self):
-        old_body = self.ticket.meta.get('body')
-        if old_body:
-            # 之前版本的body
-            return old_body
         basic_body = self._construct_basic_body()
         meta_body = self._construct_meta_body()
         return basic_body + meta_body

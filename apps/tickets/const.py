@@ -32,6 +32,12 @@ class StepState(TextChoices):
     closed = 'closed', _("Closed")
 
 
+class StepStatus(TextChoices):
+    active = 'active', _('Active')
+    pending = 'pending', _('Pending')
+    closed = 'closed', _("Closed")
+
+
 class TicketAction(TextChoices):
     open = 'open', _("Open")
     close = 'close', _("Close")
