@@ -39,6 +39,21 @@ class RoleViewSet(PaginatedResponseMixin, JMSModelViewSet):
                 raise PermissionDenied(error)
         return super().perform_destroy(instance)
 
+    def perform_create(self, serializer):
+        super(RoleViewSet, self).perform_create(serializer)
+        self.set_permissions_if_need(serializer.instance)
+
+    def set_permissions_if_need(self, instance):
+        if not isinstance(instance, Role):
+            return
+        clone_from = self.request.query_params.get('clone_from')
+        if not clone_from:
+            return
+        clone = Role.objects.filter(id=clone_from).first()
+        if not clone:
+            return
+        instance.permissions.set(clone.permissions.all())
+
     def perform_update(self, serializer):
         instance = serializer.instance
         if instance.builtin:
