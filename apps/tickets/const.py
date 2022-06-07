@@ -17,12 +17,12 @@ class TicketState(TextChoices):
     pending = 'pending', _('Pending')
     approved = 'approved', _('Approved')
     rejected = 'rejected', _('Rejected')
-    closed = 'closed', _("Closed")
+    closed = 'closed', _("Cancel")
 
 
 class TicketStatus(TextChoices):
     open = 'open', _("Open")
-    closed = 'closed', _("Closed")
+    closed = 'closed', _("Finished")
 
 
 class StepState(TextChoices):
@@ -33,8 +33,8 @@ class StepState(TextChoices):
 
 
 class StepStatus(TextChoices):
-    active = 'active', _('Active')
     pending = 'pending', _('Pending')
+    active = 'active', _('Active')
     closed = 'closed', _("Closed")
 
 
