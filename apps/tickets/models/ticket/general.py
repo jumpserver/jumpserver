@@ -101,6 +101,7 @@ class StatusMixin:
     create_process_steps_by_assignees: Callable
     assignees: Callable
     set_serial_num: Callable
+    approval_step: int
     handler: None
 
     def set_state(self, state: TicketState):
@@ -152,9 +153,12 @@ class StatusMixin:
         if state != TicketState.approved or not next_step:
             self.state = state
             self.status = TicketStatus.closed
+            self.save(update_fields=['state', 'status'])
             self.handler.on_state_change(state)
         else:
             next_step.set_active()
+            self.approval_step += 1
+            self.save(update_fields=['approval_step'])
 
 
 class Ticket(StatusMixin, CommonModelMixin):
