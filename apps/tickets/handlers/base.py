@@ -17,6 +17,7 @@ class BaseHandler:
         self.ticket = ticket
 
     def on_state_change(self, state):
+        self._on_comment_create(state)
         method = getattr(self, f'_on_{state}', lambda: None)
         return method()
 
@@ -24,34 +25,25 @@ class BaseHandler:
         self._send_applied_mail_to_assignees()
 
     def _on_approved(self):
-        if self.ticket.approval_step != self.ticket.ticket_steps.count:
+        next_step = self.ticket.current_step.next()
+        is_finished = not bool(next_step)
+        if is_finished:
+            self._send_processed_mail_to_applicant()
+        else:
             self._send_processed_mail_to_applicant()
             self.ticket.approval_step += 1
             self._send_applied_mail_to_assignees()
-            is_finished = False
-        else:
-            self.ticket.set_state(Ticket.State.approved)
-            self.ticket.set_status(Ticket.Status.closed)
-            self._send_processed_mail_to_applicant()
-            is_finished = True
-
         self.ticket.save()
         return is_finished
 
     def _on_rejected(self):
-        self.ticket.set_state(Ticket.State.rejected)
-        self.ticket.set_status(Ticket.Status.closed)
         self.__on_process()
 
     def _on_closed(self):
-        self.ticket.set_state(Ticket.State.closed)
-        self.ticket.set_status(Ticket.Status.closed)
         self.__on_process()
 
     def __on_process(self):
         self._send_processed_mail_to_applicant()
-        self.ticket.save()
-        self._on_comment_create(self.ticket.state)
 
     def on_step_state_change(self, state):
         pass

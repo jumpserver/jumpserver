@@ -36,7 +36,7 @@ class TicketStep(CommonModelMixin):
         default=StepState.pending, verbose_name=_("State")
     )
     status = models.CharField(
-        max_length=16, choices=StepState.choices,
+        max_length=16, choices=StepStatus.choices,
         default=StepStatus.pending
     )
 
@@ -47,6 +47,10 @@ class TicketStep(CommonModelMixin):
             .update(state=state)
         self.save(update_fields=['state'])
         self.ticket.handler.on_step_change(self)
+
+    def set_active(self):
+        self.status = StepState.active
+        self.save(update_fields=['status'])
 
     def _on_active(self):
         self.send_msg_to_assignees()
@@ -140,19 +144,20 @@ class StatusMixin:
             raise AlreadyClosed
 
         self._update_step_state(state, processor)
-        self._update_self_state(state, processor)
+        self._update_self_state(state)
 
     def _update_step_state(self, state, processor):
         self.current_step.change_state(state, processor)
 
-    def _update_self_state(self, state, processor):
+    def _update_self_state(self, state):
         next_step = self.current_step.next()
 
         # 提前结束，或者最后一步
-        if state != TicketState.approved or not next_step:
-            self.state = state
-            self.status = TicketStatus.closed
-            self.handler.on_state_change(state)
+        if state in [TicketState.rejected, TicketState.closed] or \
+                (state == TicketState.approved and not next_step):
+            self.set_state(state)
+            self.set_status(Ticket.Status.closed)
+            self.save(update_fields=['state', 'status'])
         else:
             next_step.set_active()
 
