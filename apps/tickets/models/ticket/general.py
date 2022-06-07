@@ -41,13 +41,13 @@ class TicketStep(CommonModelMixin):
     )
 
     def change_state(self, state, processor):
-        self.state = state
-
         assignees = self.ticket_assignees.filter(assignee=processor)
         if not assignees:
             raise PermissionError('Only assignees can do this')
         assignees.update(state=state)
-        self.save(update_fields=['state'])
+        self.status = StepStatus.closed
+        self.state = state
+        self.save(update_fields=['state', 'status'])
         self.ticket.handler.on_step_change(self)
 
     def set_active(self):
@@ -131,9 +131,9 @@ class StatusMixin:
             raise AlreadyClosed
 
         self.current_step.change_state(state, processor)
-        self._update_self_state(state)
+        self._finish_or_next(state)
 
-    def _update_self_state(self, state):
+    def _finish_or_next(self, state):
         next_step = self.current_step.next()
 
         # 提前结束，或者最后一步
