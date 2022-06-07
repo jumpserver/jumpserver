@@ -135,11 +135,6 @@ class StatusMixin:
     def close(self, processor):
         self._change_state(StepState.closed, processor)
 
-    def _update_self_state(self, state, processor):
-        if state != TicketState.approved:
-            self.state = state
-        self.handler.on_state_change(state)
-
     def _change_state(self, state, processor):
         if self.is_status(self.Status.closed):
             raise AlreadyClosed
@@ -148,7 +143,18 @@ class StatusMixin:
         self._update_self_state(state, processor)
 
     def _update_step_state(self, state, processor):
-        self.current_step.change_state(state)
+        self.current_step.change_state(state, processor)
+
+    def _update_self_state(self, state, processor):
+        next_step = self.current_step.next()
+
+        # 提前结束，或者最后一步
+        if state != TicketState.approved or not next_step:
+            self.state = state
+            self.status = TicketStatus.closed
+            self.handler.on_state_change(state)
+        else:
+            next_step.set_active()
 
 
 class Ticket(StatusMixin, CommonModelMixin):
