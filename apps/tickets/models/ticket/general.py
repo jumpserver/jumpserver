@@ -36,32 +36,27 @@ class TicketStep(CommonModelMixin):
         default=StepState.pending, verbose_name=_("State")
     )
     status = models.CharField(
-        max_length=16, choices=StepState.choices,
+        max_length=16, choices=StepStatus.choices,
         default=StepStatus.pending
     )
 
     def change_state(self, state, processor):
         self.state = state
-        self.ticket_assignees \
-            .filter(assignee=processor) \
-            .update(state=state)
+
+        assignees = self.ticket_assignees.filter(assignee=processor)
+        if not assignees:
+            raise PermissionError('Only assignees can do this')
+        assignees.update(state=state)
         self.save(update_fields=['state'])
         self.ticket.handler.on_step_change(self)
 
-    def _on_active(self):
-        self.send_msg_to_assignees()
-
-    def send_msg_to_assignees(self):
-        # Todo: send msg
-        self.state = TicketState.notified
-        self.save()
+    def set_active(self):
+        self.status = StepStatus.active
+        self.save(update_fields=['status'])
 
     def next(self):
         kwargs = dict(ticket=self.ticket, level=self.level+1, status=StepStatus.pending)
         return self.__class__.objects.filter(**kwargs).first()
-
-    def need_next(self):
-        return self.state == TicketState.approved
 
     class Meta:
         verbose_name = _("Ticket step")
@@ -135,21 +130,17 @@ class StatusMixin:
         if self.is_status(self.Status.closed):
             raise AlreadyClosed
 
-        self._update_step_state(state, processor)
-        self._update_self_state(state, processor)
-
-    def _update_step_state(self, state, processor):
         self.current_step.change_state(state, processor)
+        self._update_self_state(state)
 
-    def _update_self_state(self, state, processor):
+    def _update_self_state(self, state):
         next_step = self.current_step.next()
 
         # 提前结束，或者最后一步
-        if state != TicketState.approved or not next_step:
+        if state in [TicketState.rejected, TicketState.closed] or not next_step:
             self.state = state
-            self.status = TicketStatus.closed
+            self.status = Ticket.Status.closed
             self.save(update_fields=['state', 'status'])
-            self.handler.on_state_change(state)
         else:
             next_step.set_active()
             self.approval_step += 1
