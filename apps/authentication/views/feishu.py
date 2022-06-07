@@ -8,7 +8,7 @@ from django.db.utils import IntegrityError
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.exceptions import APIException
 
-from users.utils import is_auth_password_time_valid
+from users.permissions import IsAuthConfirmTimeValid
 from users.views import UserVerifyPasswordView
 from users.models import User
 from common.utils import get_logger, FlashMessageUtil
@@ -89,16 +89,11 @@ class FeiShuQRMixin(PermissionsMixin, View):
 
 
 class FeiShuQRBindView(FeiShuQRMixin, View):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, IsAuthConfirmTimeValid)
 
     def get(self, request: HttpRequest):
         user = request.user
         redirect_url = request.GET.get('redirect_url')
-
-        if not is_auth_password_time_valid(request.session):
-            msg = _('Please verify your password first')
-            response = self.get_failed_response(redirect_url, msg, msg)
-            return response
 
         redirect_uri = reverse('authentication:feishu-qr-bind-callback', external=True)
         redirect_uri += '?' + urlencode({'redirect_url': redirect_url})

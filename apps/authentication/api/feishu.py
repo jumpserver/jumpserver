@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from users.permissions import IsAuthPasswdTimeValid
+from users.permissions import IsAuthConfirmTimeValid
 from users.models import User
 from common.utils import get_logger
 from common.mixins.api import RoleUserMixin, RoleAdminMixin
@@ -26,7 +26,7 @@ class FeiShuQRUnBindBase(APIView):
 
 
 class FeiShuQRUnBindForUserApi(RoleUserMixin, FeiShuQRUnBindBase):
-    permission_classes = (IsAuthPasswdTimeValid,)
+    permission_classes = (IsAuthConfirmTimeValid,)
 
 
 class FeiShuQRUnBindForAdminApi(RoleAdminMixin, FeiShuQRUnBindBase):
