@@ -97,7 +97,7 @@ class LoginACL(BaseACL):
 
         return allow, reject_type
 
-    def create_confirm_ticket(self, request=None):
+    def create_confirm_ticket(self, request):
         from tickets import const
         from tickets.models import ApplyCommandTicket
         from orgs.models import Organization
@@ -117,5 +117,5 @@ class LoginACL(BaseACL):
         }
         ticket = ApplyCommandTicket.objects.create(**data)
         assignees = self.reviewers.all()
-        ticket.open_by_assignees(assignees)
+        ticket.open_by_system(assignees, request.user)
         return ticket

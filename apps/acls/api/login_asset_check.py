@@ -47,7 +47,8 @@ class LoginAssetCheckAPI(CreateAPIView):
             asset=self.serializer.asset,
             system_user=self.serializer.system_user,
             assignees=acl.reviewers.all(),
-            org_id=self.serializer.org.id
+            org_id=self.serializer.org.id,
+            svc_account=self.request.user
         )
         confirm_status_url = reverse(
             view_name='api-tickets:super-ticket-status',

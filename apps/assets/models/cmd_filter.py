@@ -163,7 +163,7 @@ class CommandFilterRule(OrgModelMixin):
     def __str__(self):
         return '{} % {}'.format(self.type, self.content)
 
-    def create_command_confirm_ticket(self, run_command, session, cmd_filter_rule, org_id):
+    def create_command_confirm_ticket(self, run_command, session, cmd_filter_rule, org_id, svc):
         from tickets.const import TicketType
         from tickets.models import ApplyCommandTicket
         data = {
@@ -181,7 +181,7 @@ class CommandFilterRule(OrgModelMixin):
         }
         ticket = ApplyCommandTicket.objects.create(**data)
         assignees = self.reviewers.all()
-        ticket.open_by_assignees(assignees)
+        ticket.open_by_system(assignees, svc)
         return ticket
 
     @classmethod

@@ -104,28 +104,23 @@ class StatusMixin:
     approval_step: int
     handler: None
 
-    def set_state(self, state: TicketState):
-        self.state = state
-
-    def set_status(self, status: TicketStatus):
-        self.status = status
-
     def is_state(self, state: TicketState):
         return self.state == state
 
     def is_status(self, status: TicketStatus):
         return self.status == status
 
-    def open(self, applicant=None):
+    def _open(self, applicant):
         self.set_serial_num()
-        self.applicant = applicant
-        self.create_process_steps_by_flow()
         self._change_state(StepState.pending, applicant)
 
-    def open_by_assignees(self, assignees):
-        self.set_serial_num()
+    def open(self):
+        self.create_process_steps_by_flow()
+        self._open(self.applicant)
+
+    def open_by_system(self, assignees, svc):
         self.create_process_steps_by_assignees(assignees)
-        self._change_state(StepState.pending, None)
+        self._open(svc)
 
     def approve(self, processor):
         self._change_state(StepState.approved, processor)
