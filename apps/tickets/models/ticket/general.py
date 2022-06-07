@@ -105,17 +105,16 @@ class StatusMixin:
     def is_status(self, status: TicketStatus):
         return self.status == status
 
-    def _open(self, applicant):
+    def _open(self):
         self.set_serial_num()
-        self._change_state(StepState.pending, applicant)
 
     def open(self):
         self.create_process_steps_by_flow()
-        self._open(self.applicant)
+        self._open()
 
-    def open_by_system(self, assignees, svc):
+    def open_by_system(self, assignees):
         self.create_process_steps_by_assignees(assignees)
-        self._open(svc)
+        self._open()
 
     def approve(self, processor):
         self._change_state(StepState.approved, processor)
@@ -123,13 +122,27 @@ class StatusMixin:
     def reject(self, processor):
         self._change_state(StepState.rejected, processor)
 
-    def close(self, processor):
-        self._change_state(StepState.closed, processor)
+    def reopen(self):
+        self._change_state_by_applicant(TicketState.reopen)
+
+    def close(self):
+        self._change_state_by_applicant(TicketState.closed)
+
+    def _change_state_by_applicant(self, state):
+        if state == TicketState.closed:
+            self.status = TicketStatus.closed
+        elif state == TicketState.reopen:
+            self.status = TicketStatus.open
+        else:
+            raise ValueError("Not supported state: {}".format(state))
+
+        self.state = state
+        self.save(update_fields=['status', 'status'])
+        self.handler.on_change_state(state)
 
     def _change_state(self, state, processor):
         if self.is_status(self.Status.closed):
             raise AlreadyClosed
-
         self.current_step.change_state(state, processor)
         self._finish_or_next(state)
 
@@ -137,10 +150,11 @@ class StatusMixin:
         next_step = self.current_step.next()
 
         # 提前结束，或者最后一步
-        if state in [TicketState.rejected, TicketState.closed] or not next_step:
+        if state == TicketState.rejected or not next_step:
             self.state = state
             self.status = Ticket.Status.closed
             self.save(update_fields=['state', 'status'])
+            self.handler.on_change_state(state)
         else:
             next_step.set_active()
             self.approval_step += 1

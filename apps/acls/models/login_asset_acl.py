@@ -83,7 +83,7 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
         return queryset
 
     @classmethod
-    def create_login_asset_confirm_ticket(cls, user, asset, system_user, assignees, org_id, svc):
+    def create_login_asset_confirm_ticket(cls, user, asset, system_user, assignees, org_id):
         from tickets.const import TicketType
         from tickets.models import ApplyLoginAssetTicket
         title = _('Login asset confirm') + ' ({})'.format(user)
@@ -97,6 +97,6 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
             'org_id': org_id,
         }
         ticket = ApplyLoginAssetTicket.objects.create(**data)
-        ticket.open_by_system(assignees, svc)
+        ticket.open_by_system(assignees)
         return ticket
 

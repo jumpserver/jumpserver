@@ -117,5 +117,5 @@ class LoginACL(BaseACL):
         }
         ticket = ApplyCommandTicket.objects.create(**data)
         assignees = self.reviewers.all()
-        ticket.open_by_system(assignees, request.user)
+        ticket.open_by_system(assignees)
         return ticket

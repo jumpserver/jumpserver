@@ -6,7 +6,6 @@ from tickets.utils import (
     send_ticket_applied_mail_to_assignees
 )
 from tickets.const import StepState
-from tickets.models import Ticket
 
 logger = get_logger(__name__)
 
@@ -17,50 +16,37 @@ class BaseHandler:
         self.ticket = ticket
 
     def on_state_change(self, state):
-        self._on_comment_create(state)
+        self._create_state_change_comment(state)
         method = getattr(self, f'_on_{state}', lambda: None)
         return method()
 
-    def _on_pending(self):
-        self._send_applied_mail_to_assignees()
-
     def _on_approved(self):
-        next_step = self.ticket.current_step.next()
-        is_finished = not bool(next_step)
-        if is_finished:
-            self._send_processed_mail_to_applicant()
-        else:
-            self._send_processed_mail_to_applicant()
-            self.ticket.approval_step += 1
-            self._send_applied_mail_to_assignees()
-        self.ticket.save()
-        return is_finished
-
-    def _on_rejected(self):
-        self.__on_process()
-
-    def _on_closed(self):
-        self.__on_process()
-
-    def __on_process(self):
         self._send_processed_mail_to_applicant()
 
-    def on_step_state_change(self, state):
+    def _on_rejected(self):
+        self._send_processed_mail_to_applicant()
+
+    def _on_closed(self):
         pass
 
+    def on_step_state_change(self, state):
+        handler = getattr(self, f'_on_step_{state}', lambda: None)
+        handler()
+
     def _on_step_pending(self, step):
-        # Todo:
         pass
 
     def _on_step_rejected(self, step):
-        # Todo:
         pass
+
+    def _on_step_active(self, step):
+        self._send_applied_mail_to_assignees(step)
 
     def _on_step_approved(self, step):
         pass
 
-    def _send_applied_mail_to_assignees(self):
-        assignees = self.ticket.current_assignees
+    def _send_applied_mail_to_assignees(self, step):
+        assignees = [a.assignee for a in step.ticket_assignees.all()]
         assignees_display = ', '.join([str(assignee) for assignee in assignees])
         logger.debug('Send applied email to assignees: {}'.format(assignees_display))
         send_ticket_applied_mail_to_assignees(self.ticket, assignees)
@@ -70,7 +56,7 @@ class BaseHandler:
         processor = self.ticket.processor
         send_ticket_processed_mail_to_applicant(self.ticket, processor)
 
-    def _on_comment_create(self, state):
+    def _create_state_change_comment(self, state):
         user = self.ticket.processor
         # 打开或关闭工单，备注显示是自己，其他是受理人
         if state == StepState.pending or state == StepState.closed:
@@ -80,7 +66,9 @@ class BaseHandler:
         data = {
             'body': _('{} {} the ticket').format(user_display, state_display),
             'user': user,
-            'user_display': user_display
+            'user_display': user_display,
+            'type': 'status',
+            'status': state
         }
         return self.ticket.comments.create(**data)
 

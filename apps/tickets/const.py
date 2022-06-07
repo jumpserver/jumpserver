@@ -18,6 +18,7 @@ class TicketState(TextChoices):
     approved = 'approved', _('Approved')
     rejected = 'rejected', _('Rejected')
     closed = 'closed', _("Cancel")
+    reopen = 'reopen', _("Reopen")
 
 
 class TicketStatus(TextChoices):
