@@ -161,7 +161,6 @@ class ClientProtocolMixin:
             options['alternate shell:s'] = app
             options['remoteapplicationprogram:s'] = app
             options['remoteapplicationname:s'] = name
-            options['remoteapplicationcmdline:s'] = '- ' + self.get_encrypt_cmdline(application)
         else:
             name = '*'
 
