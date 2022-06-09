@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from users.permissions import IsAuthPasswdTimeValid
+from users.permissions import IsAuthConfirmTimeValid
 from users.models import User
 from common.utils import get_logger
 from common.mixins.api import RoleUserMixin, RoleAdminMixin
@@ -26,9 +26,8 @@ class WeComQRUnBindBase(APIView):
 
 
 class WeComQRUnBindForUserApi(RoleUserMixin, WeComQRUnBindBase):
-    permission_classes = (IsAuthPasswdTimeValid,)
+    permission_classes = (IsAuthConfirmTimeValid,)
 
 
 class WeComQRUnBindForAdminApi(RoleAdminMixin, WeComQRUnBindBase):
     user_id_url_kwarg = 'user_id'
-    

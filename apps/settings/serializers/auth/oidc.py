@@ -1,6 +1,8 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
+from common.drf.fields import EncryptedField
+
 __all__ = [
     'OIDCSettingSerializer', 'KeycloakSettingSerializer',
 ]
@@ -14,8 +16,8 @@ class CommonSettingSerializer(serializers.Serializer):
     AUTH_OPENID_CLIENT_ID = serializers.CharField(
         required=False, max_length=1024, label=_('Client Id')
     )
-    AUTH_OPENID_CLIENT_SECRET = serializers.CharField(
-        required=False, max_length=1024,  write_only=True, label=_('Client Secret')
+    AUTH_OPENID_CLIENT_SECRET = EncryptedField(
+        required=False, max_length=1024, label=_('Client Secret')
     )
     AUTH_OPENID_CLIENT_AUTH_METHOD = serializers.ChoiceField(
         default='client_secret_basic',
@@ -28,6 +30,11 @@ class CommonSettingSerializer(serializers.Serializer):
     AUTH_OPENID_SHARE_SESSION = serializers.BooleanField(required=False, label=_('Share session'))
     AUTH_OPENID_IGNORE_SSL_VERIFICATION = serializers.BooleanField(
         required=False, label=_('Ignore ssl verification')
+    )
+    AUTH_OPENID_USER_ATTR_MAP = serializers.DictField(
+        required=True, label=_('User attr map'),
+        help_text=_('User attr map present how to map OpenID user attr to '
+                    'jumpserver, username,name,email is jumpserver attr')
     )
 
 

@@ -14,7 +14,6 @@ def create_internal_platform(apps, schema_editor):
         model.objects.using(db_alias).update_or_create(
             name=name, defaults=defaults
         )
-        migrations.RunPython(create_internal_platform)
 
 
 class Migration(migrations.Migration):

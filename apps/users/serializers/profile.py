@@ -17,9 +17,9 @@ class UserOrgSerializer(serializers.Serializer):
 
 
 class UserUpdatePasswordSerializer(serializers.ModelSerializer):
-    old_password = EncryptedField(required=True, max_length=128, write_only=True)
-    new_password = EncryptedField(required=True, max_length=128, write_only=True)
-    new_password_again = EncryptedField(required=True, max_length=128, write_only=True)
+    old_password = EncryptedField(required=True, max_length=128)
+    new_password = EncryptedField(required=True, max_length=128)
+    new_password_again = EncryptedField(required=True, max_length=128)
 
     class Meta:
         model = User
@@ -57,18 +57,20 @@ class UserUpdatePasswordSerializer(serializers.ModelSerializer):
 
 
 class UserUpdateSecretKeySerializer(serializers.ModelSerializer):
-    new_secret_key = serializers.CharField(required=True, max_length=128, write_only=True)
-    new_secret_key_again = serializers.CharField(required=True, max_length=128, write_only=True)
+    new_secret_key = EncryptedField(required=True, max_length=128)
+    new_secret_key_again = EncryptedField(required=True, max_length=128)
 
     class Meta:
         model = User
         fields = ['new_secret_key', 'new_secret_key_again']
 
-    def validate_new_secret_key_again(self, value):
-        if value != self.initial_data.get('new_secret_key', ''):
+    def validate(self, values):
+        new_secret_key = values.get('new_secret_key', '')
+        new_secret_key_again = values.get('new_secret_key_again', '')
+        if new_secret_key != new_secret_key_again:
             msg = _('The newly set password is inconsistent')
-            raise serializers.ValidationError(msg)
-        return value
+            raise serializers.ValidationError({'new_secret_key_again': msg})
+        return values
 
     def update(self, instance, validated_data):
         new_secret_key = self.validated_data.get('new_secret_key')

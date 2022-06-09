@@ -12,7 +12,7 @@ __all__ = [
 class LDAPTestConfigSerializer(serializers.Serializer):
     AUTH_LDAP_SERVER_URI = serializers.CharField(max_length=1024)
     AUTH_LDAP_BIND_DN = serializers.CharField(max_length=1024, required=False, allow_blank=True)
-    AUTH_LDAP_BIND_PASSWORD = serializers.CharField(required=False, allow_blank=True)
+    AUTH_LDAP_BIND_PASSWORD = EncryptedField(required=False, allow_blank=True)
     AUTH_LDAP_SEARCH_OU = serializers.CharField()
     AUTH_LDAP_SEARCH_FILTER = serializers.CharField()
     AUTH_LDAP_USER_ATTR_MAP = serializers.CharField()
@@ -42,8 +42,8 @@ class LDAPSettingSerializer(serializers.Serializer):
         help_text=_('eg: ldap://localhost:389')
     )
     AUTH_LDAP_BIND_DN = serializers.CharField(required=False, max_length=1024, label=_('Bind DN'))
-    AUTH_LDAP_BIND_PASSWORD = serializers.CharField(
-        max_length=1024, write_only=True, required=False, label=_('Password')
+    AUTH_LDAP_BIND_PASSWORD = EncryptedField(
+        max_length=1024, required=False, label=_('Password')
     )
     AUTH_LDAP_SEARCH_OU = serializers.CharField(
         max_length=1024, allow_blank=True, required=False, label=_('User OU'),

@@ -28,6 +28,7 @@ class GrantedAppTreeUtil:
             'title': name,
             'pId': '',
             'open': True,
+            'iconSkin': 'applications',
             'isParent': True,
             'meta': {
                 'type': 'root'
@@ -63,7 +64,6 @@ class GrantedAppTreeUtil:
             return tree_nodes
 
         root_node = self.create_root_node()
-        tree_nodes.append(root_node)
         organizations = self.filter_organizations(applications)
 
         for i, org in enumerate(organizations):

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 18:02+0800\n"
+"POT-Creation-Date: 2022-05-31 16:02+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -128,12 +128,12 @@ msgstr "系统用户"
 #: assets/models/asset.py:386 assets/models/authbook.py:19
 #: assets/models/backup.py:31 assets/models/cmd_filter.py:38
 #: assets/models/gathered_user.py:14 assets/serializers/label.py:30
-#: assets/serializers/system_user.py:264 audits/models.py:39
+#: assets/serializers/system_user.py:269 audits/models.py:39
 #: perms/models/asset_permission.py:23 terminal/backends/command/models.py:21
 #: terminal/backends/command/serializers.py:13 terminal/models/session.py:46
 #: terminal/notifications.py:90
 #: xpack/plugins/change_auth_plan/models/asset.py:199
-#: xpack/plugins/change_auth_plan/serializers/asset.py:180
+#: xpack/plugins/change_auth_plan/serializers/asset.py:181
 #: xpack/plugins/cloud/models.py:223
 msgid "Asset"
 msgstr "资产"
@@ -161,7 +161,7 @@ msgstr "格式为逗号分隔的字符串, * 表示匹配所有. "
 #: users/templates/users/_msg_user_created.html:12
 #: xpack/plugins/change_auth_plan/models/asset.py:34
 #: xpack/plugins/change_auth_plan/models/asset.py:195
-#: xpack/plugins/cloud/serializers/account_attrs.py:22
+#: xpack/plugins/cloud/serializers/account_attrs.py:24
 msgid "Username"
 msgstr "用户名"
 
@@ -175,9 +175,9 @@ msgstr ""
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 （支持网域）"
 
 #: acls/serializers/login_asset_acl.py:31 acls/serializers/rules/rules.py:33
-#: applications/serializers/attrs/application_type/mysql_workbench.py:17
+#: applications/serializers/attrs/application_type/mysql_workbench.py:18
 #: assets/models/asset.py:210 assets/models/domain.py:60
-#: assets/serializers/account.py:13
+#: assets/serializers/account.py:14
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
 #: authentication/templates/authentication/_msg_rest_password_success.html:8
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:8
@@ -186,7 +186,7 @@ msgid "IP"
 msgstr "IP"
 
 #: acls/serializers/login_asset_acl.py:35 assets/models/asset.py:211
-#: assets/serializers/account.py:14 assets/serializers/gathered_user.py:23
+#: assets/serializers/account.py:15 assets/serializers/gathered_user.py:23
 #: settings/serializers/terminal.py:7
 msgid "Hostname"
 msgstr "主机名"
@@ -199,7 +199,7 @@ msgstr "格式为逗号分隔的字符串, * 表示匹配所有. 可选的协议
 
 #: acls/serializers/login_asset_acl.py:55 assets/models/asset.py:213
 #: assets/models/domain.py:62 assets/models/user.py:248
-#: terminal/serializers/session.py:30 terminal/serializers/storage.py:67
+#: terminal/serializers/session.py:30 terminal/serializers/storage.py:68
 msgid "Protocol"
 msgstr "协议"
 
@@ -240,7 +240,7 @@ msgstr "应用管理"
 
 #: applications/const.py:8
 #: applications/serializers/attrs/application_category/db.py:14
-#: applications/serializers/attrs/application_type/mysql_workbench.py:25
+#: applications/serializers/attrs/application_type/mysql_workbench.py:26
 #: xpack/plugins/change_auth_plan/models/app.py:32
 msgid "Database"
 msgstr "数据库"
@@ -315,7 +315,7 @@ msgid "Domain"
 msgstr "网域"
 
 #: applications/models/application.py:228 xpack/plugins/cloud/models.py:33
-#: xpack/plugins/cloud/serializers/account.py:59
+#: xpack/plugins/cloud/serializers/account.py:60
 msgid "Attrs"
 msgstr "属性"
 
@@ -336,7 +336,7 @@ msgstr "类别名称"
 
 #: applications/serializers/application.py:71
 #: applications/serializers/application.py:102
-#: assets/serializers/cmd_filter.py:34 assets/serializers/system_user.py:27
+#: assets/serializers/cmd_filter.py:34 assets/serializers/system_user.py:29
 #: audits/serializers.py:29 perms/serializers/application/permission.py:19
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:33
 #: tickets/serializers/ticket/ticket.py:21
@@ -348,7 +348,7 @@ msgstr "类型名称"
 #: assets/models/base.py:181 assets/models/cluster.py:26
 #: assets/models/domain.py:26 assets/models/gathered_user.py:19
 #: assets/models/group.py:22 assets/models/label.py:25
-#: assets/serializers/account.py:18 assets/serializers/cmd_filter.py:28
+#: assets/serializers/account.py:19 assets/serializers/cmd_filter.py:28
 #: assets/serializers/cmd_filter.py:48 common/db/models.py:113
 #: common/mixins/models.py:50 ops/models/adhoc.py:39 ops/models/command.py:30
 #: orgs/models.py:67 orgs/models.py:217 perms/models/base.py:92
@@ -358,7 +358,7 @@ msgid "Date created"
 msgstr "创建日期"
 
 #: applications/serializers/application.py:104 assets/models/base.py:182
-#: assets/models/gathered_user.py:20 assets/serializers/account.py:21
+#: assets/models/gathered_user.py:20 assets/serializers/account.py:22
 #: assets/serializers/cmd_filter.py:29 assets/serializers/cmd_filter.py:49
 #: common/db/models.py:114 common/mixins/models.py:51 ops/models/adhoc.py:40
 #: orgs/models.py:218
@@ -382,88 +382,88 @@ msgstr "集群"
 #: applications/serializers/attrs/application_category/db.py:11
 #: ops/models/adhoc.py:157 settings/serializers/auth/radius.py:14
 #: terminal/models/endpoint.py:11
-#: xpack/plugins/cloud/serializers/account_attrs.py:68
+#: xpack/plugins/cloud/serializers/account_attrs.py:70
 msgid "Host"
 msgstr "主机"
 
 #: applications/serializers/attrs/application_category/db.py:12
 #: applications/serializers/attrs/application_type/mongodb.py:10
 #: applications/serializers/attrs/application_type/mysql.py:10
-#: applications/serializers/attrs/application_type/mysql_workbench.py:21
+#: applications/serializers/attrs/application_type/mysql_workbench.py:22
 #: applications/serializers/attrs/application_type/oracle.py:10
 #: applications/serializers/attrs/application_type/pgsql.py:10
 #: applications/serializers/attrs/application_type/redis.py:10
 #: applications/serializers/attrs/application_type/sqlserver.py:10
 #: assets/models/asset.py:214 assets/models/domain.py:61
 #: settings/serializers/auth/radius.py:15
-#: xpack/plugins/cloud/serializers/account_attrs.py:69
+#: xpack/plugins/cloud/serializers/account_attrs.py:71
 msgid "Port"
 msgstr "端口"
 
 #: applications/serializers/attrs/application_category/remote_app.py:39
-#: applications/serializers/attrs/application_type/chrome.py:13
-#: applications/serializers/attrs/application_type/mysql_workbench.py:13
-#: applications/serializers/attrs/application_type/vmware_client.py:17
+#: applications/serializers/attrs/application_type/chrome.py:14
+#: applications/serializers/attrs/application_type/mysql_workbench.py:14
+#: applications/serializers/attrs/application_type/vmware_client.py:18
 msgid "Application path"
 msgstr "应用路径"
 
 #: applications/serializers/attrs/application_category/remote_app.py:44
-#: assets/serializers/system_user.py:163
-#: xpack/plugins/change_auth_plan/serializers/asset.py:66
-#: xpack/plugins/change_auth_plan/serializers/asset.py:69
-#: xpack/plugins/change_auth_plan/serializers/asset.py:72
-#: xpack/plugins/change_auth_plan/serializers/asset.py:103
-#: xpack/plugins/cloud/serializers/account_attrs.py:52
+#: assets/serializers/system_user.py:168
+#: xpack/plugins/change_auth_plan/serializers/asset.py:67
+#: xpack/plugins/change_auth_plan/serializers/asset.py:70
+#: xpack/plugins/change_auth_plan/serializers/asset.py:73
+#: xpack/plugins/change_auth_plan/serializers/asset.py:104
+#: xpack/plugins/cloud/serializers/account_attrs.py:54
 msgid "This field is required."
 msgstr "该字段是必填项。"
 
-#: applications/serializers/attrs/application_type/chrome.py:16
-#: applications/serializers/attrs/application_type/vmware_client.py:21
+#: applications/serializers/attrs/application_type/chrome.py:18
+#: applications/serializers/attrs/application_type/vmware_client.py:22
 msgid "Target URL"
 msgstr "目标URL"
 
-#: applications/serializers/attrs/application_type/chrome.py:19
+#: applications/serializers/attrs/application_type/chrome.py:22
 msgid "Chrome username"
 msgstr "Chrome 用户名"
 
-#: applications/serializers/attrs/application_type/chrome.py:22
-#: applications/serializers/attrs/application_type/chrome.py:29
+#: applications/serializers/attrs/application_type/chrome.py:26
+#: applications/serializers/attrs/application_type/chrome.py:33
 msgid "Chrome password"
 msgstr "Chrome 密码"
 
-#: applications/serializers/attrs/application_type/custom.py:11
+#: applications/serializers/attrs/application_type/custom.py:12
 msgid "Operating parameter"
 msgstr "运行参数"
 
-#: applications/serializers/attrs/application_type/custom.py:15
+#: applications/serializers/attrs/application_type/custom.py:16
 msgid "Target url"
 msgstr "目标URL"
 
-#: applications/serializers/attrs/application_type/custom.py:19
+#: applications/serializers/attrs/application_type/custom.py:20
 msgid "Custom Username"
 msgstr "自定义用户名"
 
-#: applications/serializers/attrs/application_type/custom.py:23
-#: applications/serializers/attrs/application_type/custom.py:30
+#: applications/serializers/attrs/application_type/custom.py:25
+#: applications/serializers/attrs/application_type/custom.py:32
 #: xpack/plugins/change_auth_plan/models/base.py:27
 msgid "Custom password"
 msgstr "自定义密码"
 
-#: applications/serializers/attrs/application_type/mysql_workbench.py:29
+#: applications/serializers/attrs/application_type/mysql_workbench.py:30
 msgid "Mysql workbench username"
 msgstr "Mysql 工作台 用户名"
 
-#: applications/serializers/attrs/application_type/mysql_workbench.py:33
-#: applications/serializers/attrs/application_type/mysql_workbench.py:40
+#: applications/serializers/attrs/application_type/mysql_workbench.py:35
+#: applications/serializers/attrs/application_type/mysql_workbench.py:42
 msgid "Mysql workbench password"
 msgstr "Mysql 工作台 密码"
 
-#: applications/serializers/attrs/application_type/vmware_client.py:25
+#: applications/serializers/attrs/application_type/vmware_client.py:26
 msgid "Vmware username"
 msgstr "Vmware 用户名"
 
-#: applications/serializers/attrs/application_type/vmware_client.py:29
-#: applications/serializers/attrs/application_type/vmware_client.py:36
+#: applications/serializers/attrs/application_type/vmware_client.py:31
+#: applications/serializers/attrs/application_type/vmware_client.py:38
 msgid "Vmware password"
 msgstr "Vmware 密码"
 
@@ -505,7 +505,7 @@ msgid "Internal"
 msgstr "内部的"
 
 #: assets/models/asset.py:162 assets/models/asset.py:216
-#: assets/serializers/account.py:15 assets/serializers/asset.py:63
+#: assets/serializers/account.py:16 assets/serializers/asset.py:63
 #: perms/serializers/asset/user_permission.py:43
 msgid "Platform"
 msgstr "系统平台"
@@ -566,7 +566,7 @@ msgstr "系统架构"
 msgid "Hostname raw"
 msgstr "主机名原始"
 
-#: assets/models/asset.py:215 assets/serializers/account.py:16
+#: assets/models/asset.py:215 assets/serializers/account.py:17
 #: assets/serializers/asset.py:65 perms/serializers/asset/user_permission.py:41
 #: xpack/plugins/cloud/models.py:107 xpack/plugins/cloud/serializers/task.py:42
 msgid "Protocols"
@@ -660,7 +660,7 @@ msgstr "全部"
 #: assets/models/backup.py:52 assets/serializers/backup.py:32
 #: xpack/plugins/change_auth_plan/models/app.py:41
 #: xpack/plugins/change_auth_plan/models/asset.py:62
-#: xpack/plugins/change_auth_plan/serializers/base.py:44
+#: xpack/plugins/change_auth_plan/serializers/base.py:49
 msgid "Recipient"
 msgstr "收件人"
 
@@ -703,7 +703,7 @@ msgstr "账号备份快照"
 
 #: assets/models/backup.py:116 assets/serializers/backup.py:40
 #: xpack/plugins/change_auth_plan/models/base.py:125
-#: xpack/plugins/change_auth_plan/serializers/base.py:73
+#: xpack/plugins/change_auth_plan/serializers/base.py:82
 msgid "Trigger mode"
 msgstr "触发模式"
 
@@ -711,7 +711,7 @@ msgstr "触发模式"
 #: terminal/models/sharing.py:94
 #: xpack/plugins/change_auth_plan/models/base.py:201
 #: xpack/plugins/change_auth_plan/serializers/app.py:66
-#: xpack/plugins/change_auth_plan/serializers/asset.py:179
+#: xpack/plugins/change_auth_plan/serializers/asset.py:180
 #: xpack/plugins/cloud/models.py:179
 msgid "Reason"
 msgstr "原因"
@@ -721,7 +721,7 @@ msgstr "原因"
 #: terminal/serializers/session.py:35
 #: xpack/plugins/change_auth_plan/models/base.py:202
 #: xpack/plugins/change_auth_plan/serializers/app.py:67
-#: xpack/plugins/change_auth_plan/serializers/asset.py:181
+#: xpack/plugins/change_auth_plan/serializers/asset.py:182
 msgid "Is success"
 msgstr "是否成功"
 
@@ -730,7 +730,8 @@ msgid "Account backup execution"
 msgstr "账号备份执行"
 
 #: assets/models/base.py:30 assets/tasks/const.py:51 audits/const.py:5
-#: common/utils/ip/geoip/utils.py:41 common/utils/ip/utils.py:78
+#: common/utils/ip/geoip/utils.py:31 common/utils/ip/geoip/utils.py:37
+#: common/utils/ip/utils.py:84
 msgid "Unknown"
 msgstr "未知"
 
@@ -740,12 +741,12 @@ msgstr "成功"
 
 #: assets/models/base.py:32 audits/models.py:118
 #: xpack/plugins/change_auth_plan/serializers/app.py:88
-#: xpack/plugins/change_auth_plan/serializers/asset.py:198
-#: xpack/plugins/cloud/const.py:31
+#: xpack/plugins/change_auth_plan/serializers/asset.py:199
+#: xpack/plugins/cloud/const.py:32
 msgid "Failed"
 msgstr "失败"
 
-#: assets/models/base.py:38 assets/serializers/domain.py:46
+#: assets/models/base.py:38 assets/serializers/domain.py:47
 msgid "Connectivity"
 msgstr "可连接性"
 
@@ -764,7 +765,9 @@ msgstr "校验日期"
 #: xpack/plugins/change_auth_plan/models/base.py:42
 #: xpack/plugins/change_auth_plan/models/base.py:121
 #: xpack/plugins/change_auth_plan/models/base.py:196
-#: xpack/plugins/cloud/serializers/account_attrs.py:24
+#: xpack/plugins/change_auth_plan/serializers/base.py:22
+#: xpack/plugins/change_auth_plan/serializers/base.py:77
+#: xpack/plugins/cloud/serializers/account_attrs.py:26
 msgid "Password"
 msgstr "密码"
 
@@ -828,7 +831,7 @@ msgstr "默认Cluster"
 msgid "User group"
 msgstr "用户组"
 
-#: assets/models/cmd_filter.py:60 assets/serializers/system_user.py:54
+#: assets/models/cmd_filter.py:60 assets/serializers/system_user.py:59
 msgid "Command filter"
 msgstr "命令过滤器"
 
@@ -893,7 +896,7 @@ msgstr "测试网关"
 msgid "Unable to connect to port {port} on {ip}"
 msgstr "无法连接到 {ip} 上的端口 {port}"
 
-#: assets/models/domain.py:133
+#: assets/models/domain.py:133 xpack/plugins/cloud/providers/fc.py:48
 msgid "Authentication failed"
 msgstr "认证失败"
 
@@ -953,7 +956,7 @@ msgstr "全称"
 msgid "Parent key"
 msgstr "ssh私钥"
 
-#: assets/models/node.py:559 assets/serializers/system_user.py:263
+#: assets/models/node.py:559 assets/serializers/system_user.py:268
 #: xpack/plugins/cloud/models.py:96 xpack/plugins/cloud/serializers/task.py:69
 msgid "Node"
 msgstr "节点"
@@ -978,7 +981,7 @@ msgstr "普通用户"
 msgid "Username same with user"
 msgstr "用户名与用户相同"
 
-#: assets/models/user.py:240 assets/serializers/domain.py:29
+#: assets/models/user.py:240 assets/serializers/domain.py:30
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 #: xpack/plugins/change_auth_plan/models/asset.py:39
 msgid "Assets"
@@ -1012,7 +1015,8 @@ msgstr "认证方式"
 msgid "SFTP Root"
 msgstr "SFTP根路径"
 
-#: assets/models/user.py:254 authentication/models.py:49
+#: assets/models/user.py:254 assets/serializers/system_user.py:32
+#: authentication/models.py:49
 msgid "Token"
 msgstr "Token"
 
@@ -1060,7 +1064,7 @@ msgstr ""
 "{} - 账号备份任务已完成: 未设置加密密码 - 请前往个人信息 -> 文件加密密码中设"
 "置加密密码"
 
-#: assets/serializers/account.py:40 assets/serializers/account.py:83
+#: assets/serializers/account.py:41 assets/serializers/account.py:84
 msgid "System user display"
 msgstr "系统用户名称"
 
@@ -1106,12 +1110,12 @@ msgstr "动作"
 
 #: assets/serializers/backup.py:31 ops/mixin.py:106 ops/mixin.py:147
 #: settings/serializers/auth/ldap.py:65
-#: xpack/plugins/change_auth_plan/serializers/base.py:42
+#: xpack/plugins/change_auth_plan/serializers/base.py:47
 msgid "Periodic perform"
 msgstr "定时执行"
 
 #: assets/serializers/backup.py:33
-#: xpack/plugins/change_auth_plan/serializers/base.py:45
+#: xpack/plugins/change_auth_plan/serializers/base.py:50
 msgid "Currently only mail sending is supported"
 msgstr "当前只支持邮件发送"
 
@@ -1135,17 +1139,17 @@ msgstr "动作名称"
 msgid "Pattern"
 msgstr "模式"
 
-#: assets/serializers/domain.py:13 assets/serializers/label.py:12
-#: assets/serializers/system_user.py:59
+#: assets/serializers/domain.py:14 assets/serializers/label.py:12
+#: assets/serializers/system_user.py:64
 #: perms/serializers/asset/permission.py:49
 msgid "Assets amount"
 msgstr "资产数量"
 
-#: assets/serializers/domain.py:14
+#: assets/serializers/domain.py:15
 msgid "Applications amount"
 msgstr "应用数量"
 
-#: assets/serializers/domain.py:15
+#: assets/serializers/domain.py:16
 msgid "Gateways count"
 msgstr "网关数量"
 
@@ -1161,78 +1165,78 @@ msgstr "不能包含: /"
 msgid "The same level node name cannot be the same"
 msgstr "同级别节点名字不能重复"
 
-#: assets/serializers/system_user.py:28
+#: assets/serializers/system_user.py:30
 msgid "SSH key fingerprint"
 msgstr "密钥指纹"
 
-#: assets/serializers/system_user.py:30
+#: assets/serializers/system_user.py:35
 #: perms/serializers/application/permission.py:46
 msgid "Apps amount"
 msgstr "应用数量"
 
-#: assets/serializers/system_user.py:58
+#: assets/serializers/system_user.py:63
 #: perms/serializers/asset/permission.py:50
 msgid "Nodes amount"
 msgstr "节点数量"
 
-#: assets/serializers/system_user.py:60 assets/serializers/system_user.py:265
+#: assets/serializers/system_user.py:65 assets/serializers/system_user.py:270
 msgid "Login mode display"
 msgstr "认证方式名称"
 
-#: assets/serializers/system_user.py:62
+#: assets/serializers/system_user.py:67
 msgid "Ad domain"
 msgstr "Ad 网域"
 
-#: assets/serializers/system_user.py:63
+#: assets/serializers/system_user.py:68
 msgid "Is asset protocol"
 msgstr "资产协议"
 
-#: assets/serializers/system_user.py:64
+#: assets/serializers/system_user.py:69
 msgid "Only ssh and automatic login system users are supported"
 msgstr "仅支持ssh协议和自动登录的系统用户"
 
-#: assets/serializers/system_user.py:104
+#: assets/serializers/system_user.py:109
 msgid "Username same with user with protocol {} only allow 1"
 msgstr "用户名和用户相同的一种协议只允许存在一个"
 
-#: assets/serializers/system_user.py:117 common/validators.py:14
+#: assets/serializers/system_user.py:122 common/validators.py:14
 msgid "Special char not allowed"
 msgstr "不能包含特殊字符"
 
-#: assets/serializers/system_user.py:127
+#: assets/serializers/system_user.py:132
 msgid "* Automatic login mode must fill in the username."
 msgstr "自动登录模式，必须填写用户名"
 
-#: assets/serializers/system_user.py:142
+#: assets/serializers/system_user.py:147
 msgid "Path should starts with /"
 msgstr "路径应该以 / 开头"
 
-#: assets/serializers/system_user.py:154
+#: assets/serializers/system_user.py:159
 msgid "Password or private key required"
 msgstr "密码或密钥密码需要一个"
 
-#: assets/serializers/system_user.py:168
+#: assets/serializers/system_user.py:173
 msgid "Only ssh protocol system users are allowed"
 msgstr "仅允许ssh协议的系统用户"
 
-#: assets/serializers/system_user.py:172
+#: assets/serializers/system_user.py:177
 msgid "The protocol must be consistent with the current user: {}"
 msgstr "协议必须和当前用户保持一致: {}"
 
-#: assets/serializers/system_user.py:176
+#: assets/serializers/system_user.py:181
 msgid "Only system users with automatic login are allowed"
 msgstr "仅允许自动登录的系统用户"
 
-#: assets/serializers/system_user.py:281
+#: assets/serializers/system_user.py:289
 msgid "System user name"
 msgstr "系统用户名称"
 
-#: assets/serializers/system_user.py:282 orgs/mixins/serializers.py:26
+#: assets/serializers/system_user.py:290 orgs/mixins/serializers.py:26
 #: rbac/serializers/rolebinding.py:23
 msgid "Org name"
 msgstr "组织名称"
 
-#: assets/serializers/system_user.py:291
+#: assets/serializers/system_user.py:299
 msgid "Asset hostname"
 msgstr "资产主机名"
 
@@ -1401,7 +1405,7 @@ msgstr "文件名"
 #: audits/models.py:43 audits/models.py:117 terminal/models/sharing.py:90
 #: tickets/views/approve.py:98
 #: xpack/plugins/change_auth_plan/serializers/app.py:87
-#: xpack/plugins/change_auth_plan/serializers/asset.py:197
+#: xpack/plugins/change_auth_plan/serializers/asset.py:198
 msgid "Success"
 msgstr "成功"
 
@@ -1483,7 +1487,7 @@ msgstr "用户代理"
 #: audits/models.py:126
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
 #: users/forms/profile.py:65 users/models/user.py:684
-#: users/serializers/profile.py:124
+#: users/serializers/profile.py:126
 msgid "MFA"
 msgstr "MFA"
 
@@ -1530,7 +1534,7 @@ msgstr "主机名称"
 msgid "Result"
 msgstr "结果"
 
-#: audits/serializers.py:98 terminal/serializers/storage.py:156
+#: audits/serializers.py:98 terminal/serializers/storage.py:157
 msgid "Hosts"
 msgstr "主机"
 
@@ -2031,9 +2035,9 @@ msgstr "该 MFA ({}) 方式没有启用"
 msgid "Please change your password"
 msgstr "请修改密码"
 
-#: authentication/models.py:34 terminal/serializers/storage.py:28
+#: authentication/models.py:34
 msgid "Access key"
-msgstr "API key"
+msgstr "Access key"
 
 #: authentication/models.py:41
 msgid "Private Token"
@@ -2120,13 +2124,13 @@ msgstr "显示"
 
 #: authentication/templates/authentication/_access_key_modal.html:66
 #: settings/serializers/security.py:39 users/models/user.py:556
-#: users/serializers/profile.py:114 users/templates/users/mfa_setting.html:61
+#: users/serializers/profile.py:116 users/templates/users/mfa_setting.html:61
 #: users/templates/users/user_verify_mfa.html:36
 msgid "Disable"
 msgstr "禁用"
 
 #: authentication/templates/authentication/_access_key_modal.html:67
-#: users/models/user.py:557 users/serializers/profile.py:115
+#: users/models/user.py:557 users/serializers/profile.py:117
 #: users/templates/users/mfa_setting.html:26
 #: users/templates/users/mfa_setting.html:68
 msgid "Enable"
@@ -2174,7 +2178,7 @@ msgstr "代码错误"
 #: authentication/templates/authentication/_msg_reset_password.html:3
 #: authentication/templates/authentication/_msg_rest_password_success.html:2
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:2
-#: jumpserver/conf.py:301 ops/tasks.py:145 ops/tasks.py:148
+#: jumpserver/conf.py:304 ops/tasks.py:145 ops/tasks.py:148
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: perms/templates/perms/_msg_permed_items_expire.html:3
 #: tickets/templates/tickets/approve_check_password.html:23
@@ -2347,15 +2351,15 @@ msgstr "该钉钉已经绑定其他用户"
 msgid "Binding DingTalk successfully"
 msgstr "绑定 钉钉 成功"
 
-#: authentication/views/dingtalk.py:239 authentication/views/dingtalk.py:293
+#: authentication/views/dingtalk.py:240 authentication/views/dingtalk.py:294
 msgid "Failed to get user from DingTalk"
 msgstr "从钉钉获取用户失败"
 
-#: authentication/views/dingtalk.py:245 authentication/views/dingtalk.py:299
+#: authentication/views/dingtalk.py:246 authentication/views/dingtalk.py:300
 msgid "DingTalk is not bound"
 msgstr "钉钉没有绑定"
 
-#: authentication/views/dingtalk.py:246 authentication/views/dingtalk.py:300
+#: authentication/views/dingtalk.py:247 authentication/views/dingtalk.py:301
 msgid "Please login with a password and then bind the DingTalk"
 msgstr "请使用密码登录，然后绑定钉钉"
 
@@ -2384,15 +2388,15 @@ msgstr "飞书"
 msgid "Binding FeiShu successfully"
 msgstr "绑定 飞书 成功"
 
-#: authentication/views/feishu.py:200
+#: authentication/views/feishu.py:201
 msgid "Failed to get user from FeiShu"
 msgstr "从飞书获取用户失败"
 
-#: authentication/views/feishu.py:206
+#: authentication/views/feishu.py:207
 msgid "FeiShu is not bound"
 msgstr "没有绑定飞书"
 
-#: authentication/views/feishu.py:207
+#: authentication/views/feishu.py:208
 msgid "Please login with a password and then bind the FeiShu"
 msgstr "请使用密码登录，然后绑定飞书"
 
@@ -2616,14 +2620,13 @@ msgstr "验证码错误"
 msgid "Please wait {} seconds before sending"
 msgstr "请在 {} 秒后发送"
 
-#: common/utils/ip/geoip/utils.py:17 common/utils/ip/geoip/utils.py:30
-#: common/utils/ip/ipip/utils.py:15
-msgid "Invalid ip"
-msgstr "无效IP"
-
-#: common/utils/ip/geoip/utils.py:28
+#: common/utils/ip/geoip/utils.py:24
 msgid "LAN"
 msgstr "LAN"
+
+#: common/utils/ip/geoip/utils.py:26 common/utils/ip/utils.py:78
+msgid "Invalid ip"
+msgstr "无效IP"
 
 #: common/validators.py:32
 msgid "This field must be unique."
@@ -2637,11 +2640,11 @@ msgstr "不能包含特殊字符"
 msgid "The mobile phone number format is incorrect"
 msgstr "手机号格式不正确"
 
-#: jumpserver/conf.py:300
+#: jumpserver/conf.py:303
 msgid "Create account successfully"
 msgstr "创建账号成功"
 
-#: jumpserver/conf.py:302
+#: jumpserver/conf.py:305
 msgid "Your account has been created successfully"
 msgstr "你的账号已创建成功"
 
@@ -3210,7 +3213,7 @@ msgstr "组织角色绑定"
 msgid "System role binding"
 msgstr "系统角色绑定"
 
-#: rbac/serializers/permission.py:26 users/serializers/profile.py:130
+#: rbac/serializers/permission.py:26 users/serializers/profile.py:132
 msgid "Perms"
 msgstr "权限"
 
@@ -3436,7 +3439,7 @@ msgstr "启用登录跳转提示"
 msgid "Enable CAS Auth"
 msgstr "启用 CAS 认证"
 
-#: settings/serializers/auth/cas.py:11 settings/serializers/auth/oidc.py:40
+#: settings/serializers/auth/cas.py:11 settings/serializers/auth/oidc.py:47
 msgid "Server url"
 msgstr "服务端地址"
 
@@ -3464,11 +3467,11 @@ msgstr "映射属性"
 msgid "Create user if not"
 msgstr "创建用户(如果不存在)"
 
-#: settings/serializers/auth/dingtalk.py:11
+#: settings/serializers/auth/dingtalk.py:13
 msgid "Enable DingTalk Auth"
 msgstr "启用钉钉认证"
 
-#: settings/serializers/auth/feishu.py:10
+#: settings/serializers/auth/feishu.py:12
 msgid "Enable FeiShu Auth"
 msgstr "启用飞书认证"
 
@@ -3501,7 +3504,7 @@ msgstr "用户过滤器"
 msgid "Choice may be (cn|uid|sAMAccountName)=%(user)s)"
 msgstr "可能的选项是(cn或uid或sAMAccountName=%(user)s)"
 
-#: settings/serializers/auth/ldap.py:57
+#: settings/serializers/auth/ldap.py:57 settings/serializers/auth/oidc.py:35
 msgid "User attr map"
 msgstr "用户属性映射"
 
@@ -3525,96 +3528,104 @@ msgstr "搜索分页数量"
 msgid "Enable LDAP auth"
 msgstr "启用 LDAP 认证"
 
-#: settings/serializers/auth/oidc.py:12
+#: settings/serializers/auth/oidc.py:14
 msgid "Base site url"
 msgstr "JumpServer 地址"
 
-#: settings/serializers/auth/oidc.py:15
+#: settings/serializers/auth/oidc.py:17
 msgid "Client Id"
 msgstr "客户端 ID"
 
-#: settings/serializers/auth/oidc.py:18
-#: xpack/plugins/cloud/serializers/account_attrs.py:34
+#: settings/serializers/auth/oidc.py:20
+#: xpack/plugins/cloud/serializers/account_attrs.py:36
 msgid "Client Secret"
 msgstr "客户端密钥"
 
-#: settings/serializers/auth/oidc.py:26
+#: settings/serializers/auth/oidc.py:28
 msgid "Client authentication method"
 msgstr "客户端认证方式"
 
-#: settings/serializers/auth/oidc.py:28
+#: settings/serializers/auth/oidc.py:30
 msgid "Share session"
 msgstr "共享会话"
 
-#: settings/serializers/auth/oidc.py:30
+#: settings/serializers/auth/oidc.py:32
 msgid "Ignore ssl verification"
 msgstr "忽略 SSL 证书验证"
 
-#: settings/serializers/auth/oidc.py:37
+#: settings/serializers/auth/oidc.py:36
+msgid ""
+"User attr map present how to map OpenID user attr to jumpserver, username,"
+"name,email is jumpserver attr"
+msgstr ""
+"用户属性映射代表怎样将OpenID中用户属性映射到jumpserver用户上，username, name,"
+"email 是jumpserver的用户需要属性"
+
+#: settings/serializers/auth/oidc.py:44
 msgid "Use Keycloak"
 msgstr "使用 Keycloak"
 
-#: settings/serializers/auth/oidc.py:43
+#: settings/serializers/auth/oidc.py:50
 msgid "Realm name"
 msgstr "域"
 
-#: settings/serializers/auth/oidc.py:49
+#: settings/serializers/auth/oidc.py:56
 msgid "Enable OPENID Auth"
 msgstr "启用 OIDC 认证"
 
-#: settings/serializers/auth/oidc.py:51
+#: settings/serializers/auth/oidc.py:58
 msgid "Provider endpoint"
 msgstr "端点地址"
 
-#: settings/serializers/auth/oidc.py:54
+#: settings/serializers/auth/oidc.py:61
 msgid "Provider auth endpoint"
 msgstr "授权端点地址"
 
-#: settings/serializers/auth/oidc.py:57
+#: settings/serializers/auth/oidc.py:64
 msgid "Provider token endpoint"
 msgstr "token 端点地址"
 
-#: settings/serializers/auth/oidc.py:60
+#: settings/serializers/auth/oidc.py:67
 msgid "Provider jwks endpoint"
 msgstr "jwks 端点地址"
 
-#: settings/serializers/auth/oidc.py:63
+#: settings/serializers/auth/oidc.py:70
 msgid "Provider userinfo endpoint"
 msgstr "用户信息端点地址"
 
-#: settings/serializers/auth/oidc.py:66
+#: settings/serializers/auth/oidc.py:73
 msgid "Provider end session endpoint"
 msgstr "注销会话端点地址"
 
-#: settings/serializers/auth/oidc.py:69
+#: settings/serializers/auth/oidc.py:76
 msgid "Provider sign alg"
 msgstr "签名算法"
 
-#: settings/serializers/auth/oidc.py:72
+#: settings/serializers/auth/oidc.py:79
 msgid "Provider sign key"
 msgstr "签名 Key"
 
-#: settings/serializers/auth/oidc.py:74
+#: settings/serializers/auth/oidc.py:81
 msgid "Scopes"
 msgstr "连接范围"
 
-#: settings/serializers/auth/oidc.py:76
+#: settings/serializers/auth/oidc.py:83
 msgid "Id token max age"
 msgstr "令牌有效时间"
 
-#: settings/serializers/auth/oidc.py:79
+#: settings/serializers/auth/oidc.py:86
 msgid "Id token include claims"
 msgstr "声明"
 
-#: settings/serializers/auth/oidc.py:81
+#: settings/serializers/auth/oidc.py:88
 msgid "Use state"
 msgstr "使用状态"
 
-#: settings/serializers/auth/oidc.py:82
+#: settings/serializers/auth/oidc.py:89
 msgid "Use nonce"
 msgstr "临时使用"
 
-#: settings/serializers/auth/oidc.py:84 settings/serializers/auth/saml2.py:33
+#: settings/serializers/auth/oidc.py:91 settings/serializers/auth/saml2.py:33
 msgid "Always update user"
 msgstr "总是更新用户信息"
 
@@ -3650,25 +3661,25 @@ msgstr "SP 密钥"
 msgid "SP cert"
 msgstr "SP 证书"
 
-#: settings/serializers/auth/sms.py:10
+#: settings/serializers/auth/sms.py:11
 msgid "Enable SMS"
 msgstr "启用 SMS"
 
-#: settings/serializers/auth/sms.py:12
+#: settings/serializers/auth/sms.py:13
 msgid "SMS provider"
 msgstr "短信服务商"
 
-#: settings/serializers/auth/sms.py:17 settings/serializers/auth/sms.py:35
-#: settings/serializers/auth/sms.py:43 settings/serializers/email.py:63
+#: settings/serializers/auth/sms.py:18 settings/serializers/auth/sms.py:36
+#: settings/serializers/auth/sms.py:44 settings/serializers/email.py:65
 msgid "Signature"
 msgstr "签名"
 
-#: settings/serializers/auth/sms.py:18 settings/serializers/auth/sms.py:36
-#: settings/serializers/auth/sms.py:44
+#: settings/serializers/auth/sms.py:19 settings/serializers/auth/sms.py:37
+#: settings/serializers/auth/sms.py:45
 msgid "Template code"
 msgstr "模板"
 
-#: settings/serializers/auth/sms.py:22
+#: settings/serializers/auth/sms.py:23
 msgid "Test phone"
 msgstr "测试手机号"
 
@@ -3688,7 +3699,7 @@ msgstr "Token 有效期"
 msgid "Unit: second"
 msgstr "单位: 秒"
 
-#: settings/serializers/auth/wecom.py:11
+#: settings/serializers/auth/wecom.py:13
 msgid "Enable WeCom Auth"
 msgstr "启用企业微信认证"
 
@@ -3782,85 +3793,85 @@ msgstr ""
 "单位：天。 会话、录像、命令记录超过该时长将会被删除(仅影响数据库存储, oss等不"
 "受影响)"
 
-#: settings/serializers/email.py:18
+#: settings/serializers/email.py:20
 msgid "SMTP host"
 msgstr "SMTP 主机"
 
-#: settings/serializers/email.py:19
+#: settings/serializers/email.py:21
 msgid "SMTP port"
 msgstr "SMTP 端口"
 
-#: settings/serializers/email.py:20
+#: settings/serializers/email.py:22
 msgid "SMTP account"
 msgstr "SMTP 账号"
 
-#: settings/serializers/email.py:22
+#: settings/serializers/email.py:24
 msgid "SMTP password"
 msgstr "SMTP 密码"
 
-#: settings/serializers/email.py:23
+#: settings/serializers/email.py:25
 msgid "Tips: Some provider use token except password"
 msgstr "提示：一些邮件提供商需要输入的是授权码"
 
-#: settings/serializers/email.py:26
+#: settings/serializers/email.py:28
 msgid "Send user"
 msgstr "发件人"
 
-#: settings/serializers/email.py:27
+#: settings/serializers/email.py:29
 msgid "Tips: Send mail account, default SMTP account as the send account"
 msgstr "提示：发送邮件账号，默认使用 SMTP 账号作为发送账号"
 
-#: settings/serializers/email.py:30
+#: settings/serializers/email.py:32
 msgid "Test recipient"
 msgstr "测试收件人"
 
-#: settings/serializers/email.py:31
+#: settings/serializers/email.py:33
 msgid "Tips: Used only as a test mail recipient"
 msgstr "提示：仅用来作为测试邮件收件人"
 
-#: settings/serializers/email.py:34
+#: settings/serializers/email.py:36
 msgid "Use SSL"
 msgstr "使用 SSL"
 
-#: settings/serializers/email.py:35
+#: settings/serializers/email.py:37
 msgid "If SMTP port is 465, may be select"
 msgstr "如果SMTP端口是465，通常需要启用 SSL"
 
-#: settings/serializers/email.py:38
+#: settings/serializers/email.py:40
 msgid "Use TLS"
 msgstr "使用 TLS"
 
-#: settings/serializers/email.py:39
+#: settings/serializers/email.py:41
 msgid "If SMTP port is 587, may be select"
 msgstr "如果SMTP端口是587，通常需要启用 TLS"
 
-#: settings/serializers/email.py:42
+#: settings/serializers/email.py:44
 msgid "Subject prefix"
 msgstr "主题前缀"
 
-#: settings/serializers/email.py:49
+#: settings/serializers/email.py:51
 msgid "Create user email subject"
 msgstr "邮件主题"
 
-#: settings/serializers/email.py:50
+#: settings/serializers/email.py:52
 msgid ""
 "Tips: When creating a user, send the subject of the email (eg:Create account "
 "successfully)"
 msgstr "提示: 创建用户时，发送设置密码邮件的主题 (例如: 创建用户成功)"
 
-#: settings/serializers/email.py:54
+#: settings/serializers/email.py:56
 msgid "Create user honorific"
 msgstr "邮件问候语"
 
-#: settings/serializers/email.py:55
+#: settings/serializers/email.py:57
 msgid "Tips: When creating a user, send the honorific of the email (eg:Hello)"
 msgstr "提示: 创建用户时，发送设置密码邮件的敬语 (例如: 你好)"
 
-#: settings/serializers/email.py:59
+#: settings/serializers/email.py:61
 msgid "Create user email content"
 msgstr "邮件的内容"
 
-#: settings/serializers/email.py:60
+#: settings/serializers/email.py:62
 #, python-brace-format
 msgid ""
 "Tips: When creating a user, send the content of the email, support "
@@ -3868,7 +3879,7 @@ msgid ""
 msgstr ""
 "提示: 创建用户时，发送设置密码邮件的内容, 支持 {username} {name} {email} 标签"
 
-#: settings/serializers/email.py:64
+#: settings/serializers/email.py:66
 msgid "Tips: Email signature (eg:jumpserver)"
 msgstr "邮件署名 (如:jumpserver)"
 
@@ -4688,9 +4699,9 @@ msgid "Redis Port"
 msgstr "Redis 端口"
 
 #: terminal/models/endpoint.py:26 terminal/models/endpoint.py:67
-#: terminal/serializers/endpoint.py:41 terminal/serializers/storage.py:37
-#: terminal/serializers/storage.py:49 terminal/serializers/storage.py:79
-#: terminal/serializers/storage.py:89 terminal/serializers/storage.py:97
+#: terminal/serializers/endpoint.py:41 terminal/serializers/storage.py:38
+#: terminal/serializers/storage.py:50 terminal/serializers/storage.py:80
+#: terminal/serializers/storage.py:90 terminal/serializers/storage.py:98
 msgid "Endpoint"
 msgstr "端点"
 
@@ -4907,67 +4918,73 @@ msgstr "是否可中断"
 msgid "Command amount"
 msgstr "命令数量"
 
-#: terminal/serializers/storage.py:19
+#: terminal/serializers/storage.py:20
 msgid "Endpoint invalid: remove path `{}`"
 msgstr "端点无效: 移除路径 `{}`"
 
-#: terminal/serializers/storage.py:25
+#: terminal/serializers/storage.py:26
 msgid "Bucket"
 msgstr "桶名称"
 
-#: terminal/serializers/storage.py:32 users/models/user.py:695
-msgid "Secret key"
-msgstr "密钥"
+#: terminal/serializers/storage.py:30
+#: xpack/plugins/cloud/serializers/account_attrs.py:15
+msgid "Access key id"
+msgstr "访问密钥 ID(AK)"
 
-#: terminal/serializers/storage.py:64 xpack/plugins/cloud/models.py:220
+#: terminal/serializers/storage.py:34
+#: xpack/plugins/cloud/serializers/account_attrs.py:18
+msgid "Access key secret"
+msgstr "访问密钥密文(SK)"
+
+#: terminal/serializers/storage.py:65 xpack/plugins/cloud/models.py:220
 msgid "Region"
 msgstr "地域"
 
-#: terminal/serializers/storage.py:108
+#: terminal/serializers/storage.py:109
 msgid "Container name"
 msgstr "容器名称"
 
-#: terminal/serializers/storage.py:110
+#: terminal/serializers/storage.py:111
 msgid "Account name"
 msgstr "账号名称"
 
-#: terminal/serializers/storage.py:111
+#: terminal/serializers/storage.py:112
 msgid "Account key"
 msgstr "账号密钥"
 
-#: terminal/serializers/storage.py:114
+#: terminal/serializers/storage.py:115
 msgid "Endpoint suffix"
 msgstr "端点后缀"
 
-#: terminal/serializers/storage.py:134
+#: terminal/serializers/storage.py:135
 msgid "The address format is incorrect"
 msgstr "地址格式不正确"
 
-#: terminal/serializers/storage.py:141
+#: terminal/serializers/storage.py:142
 msgid "Host invalid"
 msgstr "主机无效"
 
-#: terminal/serializers/storage.py:144
+#: terminal/serializers/storage.py:145
 msgid "Port invalid"
 msgstr "端口无效"
 
-#: terminal/serializers/storage.py:159
+#: terminal/serializers/storage.py:160
 msgid "Index by date"
 msgstr "按日期建索引"
 
-#: terminal/serializers/storage.py:160
+#: terminal/serializers/storage.py:161
 msgid "Whether to create an index by date"
 msgstr "是否根据日期动态建立索引"
 
-#: terminal/serializers/storage.py:163
+#: terminal/serializers/storage.py:164
 msgid "Index"
 msgstr "索引"
 
-#: terminal/serializers/storage.py:165
+#: terminal/serializers/storage.py:166
 msgid "Doc type"
 msgstr "文档类型"
 
-#: terminal/serializers/storage.py:167
+#: terminal/serializers/storage.py:168
 msgid "Ignore Certificate Verification"
 msgstr "忽略证书认证"
 
@@ -5254,11 +5271,11 @@ msgstr "流程"
 msgid "TicketFlow"
 msgstr "工单流程"
 
-#: tickets/models/ticket.py:311
+#: tickets/models/ticket.py:320
 msgid "Please try again"
 msgstr "请再次尝试"
 
-#: tickets/models/ticket.py:319
+#: tickets/models/ticket.py:328
 msgid "Super ticket"
 msgstr "超级工单"
 
@@ -5560,8 +5577,8 @@ msgstr "复制你的公钥到这里"
 msgid "Public key should not be the same as your old one."
 msgstr "不能和原来的密钥相同"
 
-#: users/forms/profile.py:150 users/serializers/profile.py:98
-#: users/serializers/profile.py:181 users/serializers/profile.py:208
+#: users/forms/profile.py:150 users/serializers/profile.py:100
+#: users/serializers/profile.py:183 users/serializers/profile.py:210
 msgid "Not a valid ssh public key"
 msgstr "SSH密钥不合法"
 
@@ -5588,6 +5605,10 @@ msgstr "头像"
 #: users/models/user.py:678
 msgid "Wechat"
 msgstr "微信"
+
+#: users/models/user.py:695
+msgid "Secret key"
+msgstr "Secret key"
 
 #: users/models/user.py:711
 msgid "Source"
@@ -5660,7 +5681,7 @@ msgstr "重置 MFA"
 msgid "The old password is incorrect"
 msgstr "旧密码错误"
 
-#: users/serializers/profile.py:37 users/serializers/profile.py:195
+#: users/serializers/profile.py:37 users/serializers/profile.py:197
 msgid "Password does not match security rules"
 msgstr "密码不满足安全规则"
 
@@ -5668,11 +5689,11 @@ msgstr "密码不满足安全规则"
 msgid "The new password cannot be the last {} passwords"
 msgstr "新密码不能是最近 {} 次的密码"
 
-#: users/serializers/profile.py:49 users/serializers/profile.py:69
+#: users/serializers/profile.py:49 users/serializers/profile.py:71
 msgid "The newly set password is inconsistent"
 msgstr "两次密码不一致"
 
-#: users/serializers/profile.py:147 users/serializers/user.py:144
+#: users/serializers/profile.py:149 users/serializers/user.py:144
 msgid "Is first login"
 msgstr "首次登录"
 
@@ -5686,7 +5707,7 @@ msgstr "组织角色"
 
 #: users/serializers/user.py:79
 #: xpack/plugins/change_auth_plan/models/base.py:35
-#: xpack/plugins/change_auth_plan/serializers/base.py:22
+#: xpack/plugins/change_auth_plan/serializers/base.py:27
 msgid "Password strategy"
 msgstr "密码策略"
 
@@ -6058,7 +6079,7 @@ msgid "Replace (The key generated by JumpServer) "
 msgstr "替换 (由 JumpServer 生成的密钥)"
 
 #: xpack/plugins/change_auth_plan/models/asset.py:49
-#: xpack/plugins/change_auth_plan/serializers/asset.py:35
+#: xpack/plugins/change_auth_plan/serializers/asset.py:36
 msgid "SSH Key strategy"
 msgstr "SSH 密钥策略"
 
@@ -6150,23 +6171,23 @@ msgstr ""
 "{} - 改密任务已完成: 未设置加密密码 - 请前往个人信息 -> 文件加密密码中设置加"
 "密密码"
 
-#: xpack/plugins/change_auth_plan/serializers/asset.py:32
+#: xpack/plugins/change_auth_plan/serializers/asset.py:33
 msgid "Change Password"
 msgstr "更改密码"
 
-#: xpack/plugins/change_auth_plan/serializers/asset.py:33
+#: xpack/plugins/change_auth_plan/serializers/asset.py:34
 msgid "Change SSH Key"
 msgstr "修改 SSH Key"
 
-#: xpack/plugins/change_auth_plan/serializers/base.py:43
+#: xpack/plugins/change_auth_plan/serializers/base.py:48
 msgid "Run times"
 msgstr "执行次数"
 
-#: xpack/plugins/change_auth_plan/serializers/base.py:57
+#: xpack/plugins/change_auth_plan/serializers/base.py:62
 msgid "* Please enter the correct password length"
 msgstr "* 请输入正确的密码长度"
 
-#: xpack/plugins/change_auth_plan/serializers/base.py:60
+#: xpack/plugins/change_auth_plan/serializers/base.py:65
 msgid "* Password length range 6-30 bits"
 msgstr "* 密码长度范围 6-30 位"
 
@@ -6254,31 +6275,35 @@ msgstr "OpenStack"
 msgid "Google Cloud Platform"
 msgstr "谷歌云"
 
-#: xpack/plugins/cloud/const.py:26
+#: xpack/plugins/cloud/const.py:23
+msgid "Fusion Compute"
+msgstr ""
+
+#: xpack/plugins/cloud/const.py:27
 msgid "Instance name"
 msgstr "实例名称"
 
-#: xpack/plugins/cloud/const.py:27
+#: xpack/plugins/cloud/const.py:28
 msgid "Instance name and Partial IP"
 msgstr "实例名称和部分IP"
 
-#: xpack/plugins/cloud/const.py:32
+#: xpack/plugins/cloud/const.py:33
 msgid "Succeed"
 msgstr "成功"
 
-#: xpack/plugins/cloud/const.py:36
+#: xpack/plugins/cloud/const.py:37
 msgid "Unsync"
 msgstr "未同步"
 
-#: xpack/plugins/cloud/const.py:37
+#: xpack/plugins/cloud/const.py:38
 msgid "New Sync"
 msgstr "新同步"
 
-#: xpack/plugins/cloud/const.py:38
+#: xpack/plugins/cloud/const.py:39
 msgid "Synced"
 msgstr "已同步"
 
-#: xpack/plugins/cloud/const.py:39
+#: xpack/plugins/cloud/const.py:40
 msgid "Released"
 msgstr "已释放"
 
@@ -6552,56 +6577,49 @@ msgstr "华南-广州-友好用户环境"
 msgid "CN East-Suqian"
 msgstr "华东-宿迁"
 
-#: xpack/plugins/cloud/serializers/account.py:60
+#: xpack/plugins/cloud/serializers/account.py:61
 msgid "Validity display"
 msgstr "有效性显示"
 
-#: xpack/plugins/cloud/serializers/account.py:61
+#: xpack/plugins/cloud/serializers/account.py:62
 msgid "Provider display"
 msgstr "服务商显示"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:13
-msgid "AccessKey ID"
-msgstr "Access key ID"
-
-#: xpack/plugins/cloud/serializers/account_attrs.py:16
-msgid "AccessKey Secret"
-msgstr "Access key secret"
-
-#: xpack/plugins/cloud/serializers/account_attrs.py:31
+#: xpack/plugins/cloud/serializers/account_attrs.py:33
 msgid "Client ID"
 msgstr "客户端 ID"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:37
+#: xpack/plugins/cloud/serializers/account_attrs.py:39
 msgid "Tenant ID"
 msgstr "租户 ID"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:40
+#: xpack/plugins/cloud/serializers/account_attrs.py:42
 msgid "Subscription ID"
 msgstr "订阅 ID"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:91
-#: xpack/plugins/cloud/serializers/account_attrs.py:96
+#: xpack/plugins/cloud/serializers/account_attrs.py:93
+#: xpack/plugins/cloud/serializers/account_attrs.py:98
+#: xpack/plugins/cloud/serializers/account_attrs.py:122
 msgid "API Endpoint"
 msgstr "API 端点"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:102
+#: xpack/plugins/cloud/serializers/account_attrs.py:104
 msgid "Auth url"
 msgstr "认证地址"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:103
+#: xpack/plugins/cloud/serializers/account_attrs.py:105
 msgid "eg: http://openstack.example.com:5000/v3"
 msgstr "如: http://openstack.example.com:5000/v3"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:106
+#: xpack/plugins/cloud/serializers/account_attrs.py:108
 msgid "User domain"
 msgstr "用户域"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:113
+#: xpack/plugins/cloud/serializers/account_attrs.py:115
 msgid "Service account key"
 msgstr "服务账号密钥"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:114
+#: xpack/plugins/cloud/serializers/account_attrs.py:116
 msgid "The file is in JSON format"
 msgstr "JSON 格式的文件"
 
@@ -6718,6 +6736,9 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "AccessKey ID"
+#~ msgstr "Access key ID"
 
 #~ msgid "Unknown ip"
 #~ msgstr "未知ip"

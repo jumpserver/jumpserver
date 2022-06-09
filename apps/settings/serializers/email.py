@@ -1,8 +1,10 @@
 # coding: utf-8
-# 
+#
 
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
+
+from common.drf.fields import EncryptedField
 
 __all__ = ['MailTestSerializer', 'EmailSettingSerializer', 'EmailContentSettingSerializer']
 
@@ -18,8 +20,8 @@ class EmailSettingSerializer(serializers.Serializer):
     EMAIL_HOST = serializers.CharField(max_length=1024, required=True, label=_("SMTP host"))
     EMAIL_PORT = serializers.CharField(max_length=5, required=True, label=_("SMTP port"))
     EMAIL_HOST_USER = serializers.CharField(max_length=128, required=True, label=_("SMTP account"))
-    EMAIL_HOST_PASSWORD = serializers.CharField(
-        max_length=1024, write_only=True, required=False, label=_("SMTP password"),
+    EMAIL_HOST_PASSWORD = EncryptedField(
+        max_length=1024, required=False, label=_("SMTP password"),
         help_text=_("Tips: Some provider use token except password")
     )
     EMAIL_FROM = serializers.CharField(

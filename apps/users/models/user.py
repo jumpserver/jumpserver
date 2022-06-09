@@ -791,6 +791,11 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     def is_local(self):
         return self.source == self.Source.local.value
 
+    def is_password_authenticate(self):
+        cas = self.Source.cas
+        saml2 = self.Source.saml2
+        return self.source not in [cas, saml2]
+
     def set_unprovide_attr_if_need(self):
         if not self.name:
             self.name = self.username
