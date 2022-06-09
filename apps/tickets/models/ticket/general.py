@@ -334,7 +334,7 @@ class Ticket(StatusMixin, CommonModelMixin):
 
     @property
     def body(self):
-        _body = self.handler.get_body()
+        _body = self.handler.get_msg_content()
         return _body
 
     def get_next_serial_num(self):

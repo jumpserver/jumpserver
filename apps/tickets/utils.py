@@ -11,7 +11,9 @@ logger = get_logger(__file__)
 def send_ticket_applied_mail_to_assignees(ticket, assignees):
     if not assignees:
         logger.debug(
-            "Not found assignees, ticket: {}({}), assignees: {}".format(ticket, str(ticket.id), assignees)
+            "Not found assignees, ticket: {}({}), assignees: {}".format(
+                ticket, str(ticket.id), assignees
+            )
         )
         return
 

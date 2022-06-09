@@ -69,9 +69,7 @@ class TicketAppliedToAssignee(BaseTicketMessage):
 
     @property
     def content_title(self):
-        return _('Your has a new ticket, applicant - {}').format(
-            str(self.ticket.applicant)
-        )
+        return _('Your has a new ticket')
 
     @property
     def subject(self):

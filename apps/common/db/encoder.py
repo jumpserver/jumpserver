@@ -7,12 +7,14 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
+lazy_type = type(_('ugettext_lazy'))
+
 
 class ModelJSONFieldEncoder(json.JSONEncoder):
     """ 解决一些类型的字段不能序列化的问题 """
 
     def default(self, obj):
-        str_cls = (models.Model, type(_('ugettext_lazy')), models.ImageField, uuid.UUID)
+        str_cls = (models.Model, lazy_type, models.ImageField, uuid.UUID)
         if isinstance(obj, str_cls):
             return str(obj)
         elif isinstance(obj, datetime):
