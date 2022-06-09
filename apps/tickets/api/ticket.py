@@ -58,8 +58,9 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         instance = serializer.save()
-        applicant = self.request.user
-        instance.open(applicant)
+        instance.applicant = self.request.user
+        instance.save(update_fields=['applicant'])
+        instance.open()
 
     @action(detail=False, methods=[POST], permission_classes=[RBACPermission, ])
     def open(self, request, *args, **kwargs):
@@ -83,7 +84,7 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     def close(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
-        instance.close(processor=request.user)
+        instance.close()
         return Response(serializer.data)
 
 

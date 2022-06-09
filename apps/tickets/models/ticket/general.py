@@ -48,15 +48,19 @@ class TicketStep(CommonModelMixin):
         self.status = StepStatus.closed
         self.state = state
         self.save(update_fields=['state', 'status'])
-        self.ticket.handler.on_step_change(self)
 
     def set_active(self):
         self.status = StepStatus.active
         self.save(update_fields=['status'])
 
     def next(self):
-        kwargs = dict(ticket=self.ticket, level=self.level+1, status=StepStatus.pending)
+        kwargs = dict(ticket=self.ticket, level=self.level + 1, status=StepStatus.pending)
         return self.__class__.objects.filter(**kwargs).first()
+
+    @property
+    def processor(self):
+        processor = self.ticket_assignees.exclude(state=StepState.pending).first()
+        return processor.assignee if processor else None
 
     class Meta:
         verbose_name = _("Ticket step")
@@ -107,6 +111,7 @@ class StatusMixin:
 
     def _open(self):
         self.set_serial_num()
+        self._change_state_by_applicant(TicketState.pending)
 
     def open(self):
         self.create_process_steps_by_flow()
@@ -131,19 +136,21 @@ class StatusMixin:
     def _change_state_by_applicant(self, state):
         if state == TicketState.closed:
             self.status = TicketStatus.closed
-        elif state == TicketState.reopen:
+        elif state in [TicketState.reopen, TicketState.pending]:
             self.status = TicketStatus.open
         else:
             raise ValueError("Not supported state: {}".format(state))
 
         self.state = state
-        self.save(update_fields=['status', 'status'])
+        self.save(update_fields=['state', 'status'])
         self.handler.on_change_state(state)
 
     def _change_state(self, state, processor):
         if self.is_status(self.Status.closed):
             raise AlreadyClosed
-        self.current_step.change_state(state, processor)
+        current_step = self.current_step
+        current_step.change_state(state, processor)
+        self.handler.on_step_state_change(current_step)
         self._finish_or_next(state)
 
     def _finish_or_next(self, state):
