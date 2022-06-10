@@ -133,6 +133,15 @@ class AuthMixin:
             self.password = password
 
     def load_app_more_auth(self, app_id=None, username=None, user_id=None):
+        # 清除认证信息
+        self._clean_auth_info_if_manual_login_mode()
+
+        # 先加载临时认证信息
+        if self.login_mode == self.LOGIN_MANUAL:
+            self._load_tmp_auth_if_has(app_id, user_id)
+            return
+
+        # Remote app
         from applications.models import Application
         app = get_object_or_none(Application, pk=app_id)
         if app and app.category_remote_app:
@@ -141,11 +150,6 @@ class AuthMixin:
             return
 
         # Other app
-        self._clean_auth_info_if_manual_login_mode()
-        # 加载临时认证信息
-        if self.login_mode == self.LOGIN_MANUAL:
-            self._load_tmp_auth_if_has(app_id, user_id)
-            return
         # 更新用户名
         from users.models import User
         user = get_object_or_none(User, pk=user_id) if user_id else None
