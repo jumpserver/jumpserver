@@ -27,9 +27,10 @@ class ApplyApplicationSerializer(BaseApplyAssetApplicationSerializer, TicketAppl
     def validate_apply_applications(self, apply_applications):
         type = self.initial_data.get('apply_type')
         org_id = self.initial_data.get('org_id')
+        application_ids = [app.id for app in apply_applications]
         with tmp_to_org(org_id):
             applications = Application.objects.filter(
-                id__in=apply_applications, type=type
+                id__in=application_ids, type=type
             ).values_list('id', flat=True)
         return list(applications)
 

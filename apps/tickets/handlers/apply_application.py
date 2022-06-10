@@ -9,8 +9,8 @@ from .base import BaseHandler
 class Handler(BaseHandler):
     ticket: ApplyApplicationTicket
 
-    def _on_approved(self):
-        is_finished = super()._on_approved()
+    def _on_step_approved(self, step):
+        is_finished = super()._on_step_approved(step)
         if is_finished:
             self._create_application_permission()
 
@@ -48,8 +48,8 @@ class Handler(BaseHandler):
         apply_permission_name = self.ticket.apply_permission_name
         apply_category = self.ticket.apply_category
         apply_type = self.ticket.apply_type
-        apply_applications = self.ticket.apply_applications
-        apply_system_users = self.ticket.apply_system_users
+        apply_applications = self.ticket.apply_applications.all()
+        apply_system_users = self.ticket.apply_system_users.all()
         apply_date_start = self.ticket.apply_date_start
         apply_date_expired = self.ticket.apply_date_expired
         permission_created_by = '{}:{}'.format(

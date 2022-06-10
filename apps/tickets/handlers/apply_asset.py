@@ -9,8 +9,8 @@ from .base import BaseHandler
 class Handler(BaseHandler):
     ticket: ApplyAssetTicket
 
-    def _on_approved(self):
-        is_finished = super()._on_approved()
+    def _on_step_approved(self, step):
+        is_finished = super()._on_step_approved(step)
         if is_finished:
             self._create_asset_permission()
 
@@ -44,9 +44,9 @@ class Handler(BaseHandler):
                 return asset_permission
 
         apply_permission_name = self.ticket.apply_permission_name
-        apply_nodes = self.ticket.apply_nodes
-        apply_assets = self.ticket.apply_assets
-        apply_system_users = self.ticket.apply_system_users
+        apply_nodes = self.ticket.apply_nodes.all()
+        apply_assets = self.ticket.apply_assets.all()
+        apply_system_users = self.ticket.apply_system_users.all()
         apply_actions = self.ticket.apply_actions
         apply_date_start = self.ticket.apply_date_start
         apply_date_expired = self.ticket.apply_date_expired
@@ -79,6 +79,7 @@ class Handler(BaseHandler):
         with tmp_to_org(self.ticket.org_id):
             asset_permission = AssetPermission.objects.create(**permission_data)
             asset_permission.users.add(self.ticket.applicant)
+            print(apply_nodes)
             asset_permission.nodes.set(apply_nodes)
             asset_permission.assets.set(apply_assets)
             asset_permission.system_users.set(apply_system_users)
