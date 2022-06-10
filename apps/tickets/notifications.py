@@ -1,13 +1,16 @@
 from urllib.parse import urljoin
+import json
 
 from django.conf import settings
 from django.core.cache import cache
 from django.shortcuts import reverse
 from django.template.loader import render_to_string
+from django.forms import model_to_dict
 from django.utils.translation import ugettext_lazy as _
 
 from notifications.notifications import UserMessage
 from common.utils import get_logger, random_string
+from common.db.encoder import ModelJSONFieldEncoder
 from .models import Ticket
 from . import const
 
@@ -54,8 +57,38 @@ class BaseTicketMessage(UserMessage):
     def gen_test_msg(cls):
         return None
 
+    def _get_fields_items(self, item_names):
+        fields = self.ticket._meta._forward_fields_map
+        items = []
+        json_data = json.dumps(model_to_dict(self), cls=ModelJSONFieldEncoder)
+        data = json.loads(json_data)
 
-class TicketAppliedToAssignee(BaseTicketMessage):
+        for name in item_names:
+            field = fields[name]
+            item = {'name': name, 'title': field.verbose_name}
+
+            value = data.get(name)
+            if hasattr(self, f'get_{name}_display'):
+                value = getattr(self, f'get_{name}_display')
+            item['value'] = value
+
+            items.append(item)
+        return items
+
+    @property
+    def basic_items(self):
+        item_names = ['serial_num', 'title', 'type', 'state', 'applicant', 'comment']
+        return self._get_fields_items(item_names)
+
+    @property
+    def spec_items(self):
+        fields = self.ticket._meta.local_fields + self.ticket._meta.local_many_to_many
+        excludes = ['ticket_ptr']
+        item_names = [field.name for field in fields if field.name not in excludes]
+        return self._get_fields_items(item_names)
+
+
+class TicketAppliedToAssigneeMessage(BaseTicketMessage):
     def __init__(self, user, ticket):
         self.ticket = ticket
         super().__init__(user)
@@ -73,8 +106,10 @@ class TicketAppliedToAssignee(BaseTicketMessage):
 
     @property
     def subject(self):
-        title = _('New Ticket - {} ({})').format(
-            self.ticket.title, self.ticket.get_type_display()
+        title = _('{}: New Ticket - {} ({})').format(
+            self.ticket.applicant,
+            self.ticket.title,
+            self.ticket.get_type_display()
         )
         return title
 
@@ -86,6 +121,8 @@ class TicketAppliedToAssignee(BaseTicketMessage):
         body = self.ticket.body.replace('\n', '<br/>')
         context = dict(
             title=self.content_title,
+            basic_items=self.basic_items,
+            spec_items=self.spec_items,
             ticket_detail_url=self.ticket_detail_url,
             body=body,
         )
@@ -110,7 +147,7 @@ class TicketAppliedToAssignee(BaseTicketMessage):
         return cls(user, ticket)
 
 
-class TicketProcessedToApplicant(BaseTicketMessage):
+class TicketProcessedToApplicantMessage(BaseTicketMessage):
     def __init__(self, user, ticket, processor):
         self.ticket = ticket
         self.processor = processor

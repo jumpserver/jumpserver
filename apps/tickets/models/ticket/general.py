@@ -18,6 +18,7 @@ from tickets.const import (
 )
 from tickets.handlers import get_ticket_handler
 from tickets.errors import AlreadyClosed
+from ..flow import TicketFlow
 
 __all__ = ['Ticket', 'TicketStep', 'TicketAssignee', 'SuperTicket']
 
@@ -98,6 +99,8 @@ class StatusMixin:
     set_serial_num: Callable
     approval_step: int
     handler: None
+    flow: TicketFlow
+    ticket_steps: models.Manager
 
     def is_state(self, state: TicketState):
         return self.state == state
@@ -160,80 +163,6 @@ class StatusMixin:
             self.approval_step += 1
             self.save(update_fields=['approval_step'])
 
-
-class Ticket(StatusMixin, CommonModelMixin):
-    title = models.CharField(max_length=256, verbose_name=_('Title'))
-    type = models.CharField(
-        max_length=64, choices=TicketType.choices,
-        default=TicketType.general, verbose_name=_('Type')
-    )
-    state = models.CharField(
-        max_length=16, choices=TicketState.choices,
-        default=TicketState.pending, verbose_name=_('State')
-    )
-    status = models.CharField(
-        max_length=16, choices=TicketStatus.choices,
-        default=TicketStatus.open, verbose_name=_('Status')
-    )
-    # 申请人
-    applicant = models.ForeignKey(
-        'users.User', related_name='applied_tickets', on_delete=models.SET_NULL,
-        null=True, verbose_name=_("Applicant")
-    )
-    comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
-    flow = models.ForeignKey(
-        'TicketFlow', related_name='tickets', on_delete=models.SET_NULL,
-        null=True, verbose_name=_('TicketFlow')
-    )
-    approval_step = models.SmallIntegerField(
-        default=TicketLevel.one, choices=TicketLevel.choices, verbose_name=_('Approval step')
-    )
-    serial_num = models.CharField(max_length=128, unique=True, null=True, verbose_name=_('Serial number'))
-    rel_snapshot = models.JSONField(verbose_name=_('Relation snapshot'), default=dict)
-    org_id = models.CharField(
-        max_length=36, blank=True, default='', verbose_name=_('Organization'), db_index=True
-    )
-
-    class Meta:
-        ordering = ('-date_created',)
-        verbose_name = _('Ticket')
-
-    def __str__(self):
-        return '{}({})'.format(self.title, self.applicant)
-
-    # TODO 先单独处理一下
-    @property
-    def org_name(self):
-        org = Organization.get_instance(self.org_id)
-        return org.name
-
-    @property
-    def type_apply_asset(self):
-        return self.type == TicketType.apply_asset.value
-
-    @property
-    def type_apply_application(self):
-        return self.type == TicketType.apply_application.value
-
-    @property
-    def type_login_confirm(self):
-        return self.type == TicketType.login_confirm.value
-
-    @property
-    def current_step(self):
-        return self.ticket_steps.filter(level=self.approval_step).first()
-
-    @property
-    def current_assignees(self):
-        ticket_assignees = self.current_step.ticket_assignees.all()
-        return [i.assignee for i in ticket_assignees]
-
-    @property
-    def processor(self):
-        processor = self.current_step.ticket_assignees \
-            .exclude(state=StepState.pending).first()
-        return processor.assignee if processor else None
-
     @property
     def process_map(self):
         process_map = []
@@ -283,6 +212,22 @@ class Ticket(StatusMixin, CommonModelMixin):
         ticket_assignees = [TicketAssignee(step=step, assignee=user) for user in assignees]
         TicketAssignee.objects.bulk_create(ticket_assignees)
 
+    @property
+    def current_step(self):
+        return self.ticket_steps.filter(level=self.approval_step).first()
+
+    @property
+    def current_assignees(self):
+        ticket_assignees = self.current_step.ticket_assignees.all()
+        return [i.assignee for i in ticket_assignees]
+
+    @property
+    def processor(self):
+        processor = self.current_step.ticket_assignees \
+            .exclude(state=StepState.pending) \
+            .first()
+        return processor.assignee if processor else None
+
     def has_current_assignee(self, assignee):
         return self.ticket_steps.filter(
             ticket_assignees__assignee=assignee,
@@ -291,6 +236,65 @@ class Ticket(StatusMixin, CommonModelMixin):
 
     def has_all_assignee(self, assignee):
         return self.ticket_steps.filter(ticket_assignees__assignee=assignee).exists()
+
+    @property
+    def handler(self):
+        return get_ticket_handler(ticket=self)
+
+
+class Ticket(StatusMixin, CommonModelMixin):
+    title = models.CharField(max_length=256, verbose_name=_('Title'))
+    type = models.CharField(
+        max_length=64, choices=TicketType.choices,
+        default=TicketType.general, verbose_name=_('Type')
+    )
+    state = models.CharField(
+        max_length=16, choices=TicketState.choices,
+        default=TicketState.pending, verbose_name=_('State')
+    )
+    status = models.CharField(
+        max_length=16, choices=TicketStatus.choices,
+        default=TicketStatus.open, verbose_name=_('Status')
+    )
+    # 申请人
+    applicant = models.ForeignKey(
+        'users.User', related_name='applied_tickets', on_delete=models.SET_NULL,
+        null=True, verbose_name=_("Applicant")
+    )
+    comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
+    flow = models.ForeignKey(
+        'TicketFlow', related_name='tickets', on_delete=models.SET_NULL,
+        null=True, verbose_name=_('TicketFlow')
+    )
+    approval_step = models.SmallIntegerField(
+        default=TicketLevel.one, choices=TicketLevel.choices, verbose_name=_('Approval step')
+    )
+    serial_num = models.CharField(_('Serial number'), max_length=128, unique=True, null=True)
+    rel_snapshot = models.JSONField(verbose_name=_('Relation snapshot'), default=dict)
+    org_id = models.CharField(
+        max_length=36, blank=True, default='', verbose_name=_('Organization'), db_index=True
+    )
+
+    class Meta:
+        ordering = ('-date_created',)
+        verbose_name = _('Ticket')
+
+    def __str__(self):
+        return '{}({})'.format(self.title, self.applicant)
+
+    @property
+    def spec_ticket(self):
+        attr = self.type.replace('_', '') + 'ticket'
+        return getattr(self, attr)
+
+    # TODO 先单独处理一下
+    @property
+    def org_name(self):
+        org = Organization.get_instance(self.org_id)
+        return org.name
+
+    def is_type(self, tp: TicketType):
+        return self.type == tp
 
     @classmethod
     def get_user_related_tickets(cls, user):
@@ -328,15 +332,6 @@ class Ticket(StatusMixin, CommonModelMixin):
         if save:
             self.save(update_fields=('rel_snapshot',))
 
-    @property
-    def handler(self):
-        return get_ticket_handler(ticket=self)
-
-    @property
-    def body(self):
-        _body = self.handler.get_msg_content()
-        return _body
-
     def get_next_serial_num(self):
         date_created = as_current_tz(self.date_created)
         date_prefix = date_created.strftime('%Y%m%d')
@@ -350,7 +345,6 @@ class Ticket(StatusMixin, CommonModelMixin):
             last_num = ticket.serial_num[8:]
             last_num = int(last_num)
         num = '%04d' % (last_num + 1)
-        # 202212010001
         return '{}{}'.format(date_prefix, num)
 
     def set_serial_num(self):

@@ -4,7 +4,7 @@
         {{ title | safe }}
     </p>
     <div>
-        <p class="basic-items">
+        <div class="basic-items">
             <b>{% trans 'Ticket basic info' %}</b>
             <hr>
             {% for item in basic_items %}
@@ -12,9 +12,9 @@
                     <em>{{ item.title }}: </em> {{ item.value }}
                 </li>
             {% endfor %}
-        </p>
+        </div>
 
-        <p class="spec-items">
+        <div class="spec-items">
             <b>{% trans 'Ticket applied info' %}</b>
             <hr>
             {% for item in spec_items %}
@@ -22,7 +22,7 @@
                     <em>{{ item.title }}: </em> {{ item.value }}
                 </li>
             {% endfor %}
-        </p>
+        </div>
     </div>
     <br>
     <div>

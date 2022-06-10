@@ -3,7 +3,7 @@
 from django.conf import settings
 
 from common.utils import get_logger
-from .notifications import TicketAppliedToAssignee, TicketProcessedToApplicant
+from .notifications import TicketAppliedToAssigneeMessage, TicketProcessedToApplicantMessage
 
 logger = get_logger(__file__)
 
@@ -18,7 +18,7 @@ def send_ticket_applied_mail_to_assignees(ticket, assignees):
         return
 
     for user in assignees:
-        instance = TicketAppliedToAssignee(user, ticket)
+        instance = TicketAppliedToAssigneeMessage(user, ticket)
         if settings.DEBUG:
             logger.debug(instance)
         instance.publish_async()
@@ -29,7 +29,7 @@ def send_ticket_processed_mail_to_applicant(ticket, processor):
         logger.error("Not found applicant: {}({})".format(ticket.title, ticket.id))
         return
 
-    instance = TicketProcessedToApplicant(ticket.applicant, ticket, processor)
+    instance = TicketProcessedToApplicantMessage(ticket.applicant, ticket, processor)
     if settings.DEBUG:
         logger.debug(instance)
     instance.publish_async()
