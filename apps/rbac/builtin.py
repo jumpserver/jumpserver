@@ -126,6 +126,8 @@ class BuiltinRole:
     org_user = PredefineRole(
         '7', ugettext_noop('OrgUser'), Scope.org, user_perms
     )
+    system_role_mapper = None
+    org_role_mapper = None
 
     @classmethod
     def get_roles(cls):
@@ -138,22 +140,24 @@ class BuiltinRole:
 
     @classmethod
     def get_system_role_by_old_name(cls, name):
-        mapper = {
-            'App': cls.system_component,
-            'Admin': cls.system_admin,
-            'User': cls.system_user,
-            'Auditor': cls.system_auditor
-        }
-        return mapper[name].get_role()
+        if not cls.system_role_mapper:
+            cls.system_role_mapper = {
+                'App': cls.system_component.get_role(),
+                'Admin': cls.system_admin.get_role(),
+                'User': cls.system_user.get_role(),
+                'Auditor': cls.system_auditor.get_role()
+            }
+        return cls.system_role_mapper[name]
 
     @classmethod
     def get_org_role_by_old_name(cls, name):
-        mapper = {
-            'Admin': cls.org_admin,
-            'User': cls.org_user,
-            'Auditor': cls.org_auditor,
-        }
-        return mapper[name].get_role()
+        if not cls.org_role_mapper:
+            cls.org_role_mapper = {
+                'Admin': cls.org_admin.get_role(),
+                'User': cls.org_user.get_role(),
+                'Auditor': cls.org_auditor.get_role(),
+            }
+        return cls.org_role_mapper[name]
 
     @classmethod
     def sync_to_db(cls, show_msg=False):
