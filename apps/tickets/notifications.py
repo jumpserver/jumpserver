@@ -116,21 +116,17 @@ class TicketAppliedToAssigneeMessage(BaseTicketMessage):
         return urljoin(settings.SITE_URL, url)
 
     def get_html_msg(self) -> dict:
-        body = self.ticket.body.replace('\n', '<br/>')
         context = dict(
             title=self.content_title,
             basic_items=self.basic_items,
             spec_items=self.spec_items,
-            ticket_detail_url=self.ticket_detail_url,
-            body=body,
+            ticket_detail_url=self.ticket_detail_url
         )
 
         ticket_approval_url = self.get_ticket_approval_url()
         context.update({'ticket_approval_url': ticket_approval_url})
         message = render_to_string('tickets/_msg_ticket.html', context)
-        cache.set(self.token, {
-            'body': body, 'ticket_id': self.ticket.id
-        }, 3600)
+        cache.set(self.token, {'ticket_id': self.ticket.id}, 3600)
         return {
             'subject': self.subject,
             'message': message

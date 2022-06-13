@@ -20,7 +20,7 @@ class BaseHandler:
         handler = getattr(self, f'_on_{state}', lambda: None)
         return handler()
 
-    def _on_approved(self):
+    def _on_pending(self):
         self._send_processed_mail_to_applicant()
 
     def _on_closed(self):
