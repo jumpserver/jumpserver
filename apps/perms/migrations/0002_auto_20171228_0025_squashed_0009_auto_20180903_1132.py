@@ -68,27 +68,6 @@ class Migration(migrations.Migration):
             name='users',
             field=models.ManyToManyField(blank=True, related_name='asset_permissions', to=settings.AUTH_USER_MODEL, verbose_name='User'),
         ),
-        migrations.CreateModel(
-            name='NodePermission',
-            fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('is_active', models.BooleanField(default=True, verbose_name='Active')),
-                ('date_expired', models.DateTimeField(default=common.utils.django.date_expired_default, verbose_name='Date expired')),
-                ('created_by', models.CharField(blank=True, max_length=128, verbose_name='Created by')),
-                ('date_created', models.DateTimeField(auto_now_add=True, verbose_name='Date created')),
-                ('comment', models.TextField(blank=True, verbose_name='Comment')),
-                ('node', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='assets.Node', verbose_name='Node')),
-                ('system_user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='assets.SystemUser', verbose_name='System user')),
-                ('user_group', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='users.UserGroup', verbose_name='User group')),
-            ],
-            options={
-                'verbose_name': 'Asset permission',
-            },
-        ),
-        migrations.AlterUniqueTogether(
-            name='nodepermission',
-            unique_together={('node', 'user_group', 'system_user')},
-        ),
         migrations.RemoveField(
             model_name='assetpermission',
             name='asset_groups',
@@ -124,11 +103,6 @@ class Migration(migrations.Migration):
             name='org_id',
             field=models.CharField(blank=True, default=None, max_length=36, null=True),
         ),
-        migrations.AddField(
-            model_name='nodepermission',
-            name='org_id',
-            field=models.CharField(blank=True, default=None, max_length=36, null=True),
-        ),
         migrations.AlterField(
             model_name='assetpermission',
             name='name',
@@ -138,17 +112,8 @@ class Migration(migrations.Migration):
             name='assetpermission',
             unique_together={('org_id', 'name')},
         ),
-        migrations.AlterUniqueTogether(
-            name='nodepermission',
-            unique_together=set(),
-        ),
         migrations.AlterField(
             model_name='assetpermission',
-            name='org_id',
-            field=models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization'),
-        ),
-        migrations.AlterField(
-            model_name='nodepermission',
             name='org_id',
             field=models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization'),
         ),

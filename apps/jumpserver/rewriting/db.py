@@ -12,5 +12,12 @@ def atomic(using=None, savepoint=False):
     return db_atomic(using=using, savepoint=savepoint)
 
 
+class OneToOneField(models.OneToOneField):
+    def __init__(self, *args, **kwargs):
+        kwargs['db_constraint'] = False
+        super().__init__(*args, **kwargs)
+
+
 transaction.atomic = atomic
 models.ForeignKey = ForeignKey
+models.OneToOneField = OneToOneField
