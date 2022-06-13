@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .general import Ticket
+from .general import Ticket, SubTicketManager
 
 __all__ = ['ApplyLoginTicket']
 
