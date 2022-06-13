@@ -7,6 +7,7 @@ from django.utils import timezone as dj_timezone
 from django.db import migrations, models
 import django.db.models.deletion
 
+from orgs.utils import tmp_to_org
 from tickets.const import TicketType
 from assets.models import Node, Asset, SystemUser, CommandFilterRule, CommandFilter
 from applications.models import Application
@@ -86,7 +87,7 @@ def apply_application_migrate(apps):
         meta = instance.meta
         org_id = instance.org_id
         data = {
-            'ticket_ptr_id': instance.id,
+            'ticket_ptr_id': instance.pk,
             'apply_permission_name': meta.get('apply_permission_name', ''),
             'apply_category': meta.get('apply_category'),
             'apply_type': meta.get('apply_type'),
@@ -117,7 +118,7 @@ def login_confirm_migrate(apps):
     for instance in tickets:
         meta = instance.meta
         data = {
-            'ticket_ptr_id': instance.id,
+            'ticket_ptr_id': instance.pk,
             'apply_login_ip': meta.get('apply_login_ip'),
             'apply_login_city': meta.get('apply_login_city'),
             'apply_login_datetime': time_conversion(meta.get('apply_login_datetime')),
@@ -149,25 +150,26 @@ def login_asset_confirm_migrate(apps):
     for instance in tickets:
         meta = instance.meta
         try:
-            apply_login_user_name = analysis_instance_name(meta.get('apply_login_user'))
-            apply_login_user = user_model.objects.filter(
-                name=apply_login_user_name[0], username=apply_login_user_name[1][:-1]
-            ).first() if apply_login_user_name else None
+            with tmp_to_org(instance.org_id):
+                apply_login_user_name = analysis_instance_name(meta.get('apply_login_user'))
+                apply_login_user = user_model.objects.filter(
+                    name=apply_login_user_name[0], username=apply_login_user_name[1]
+                ).first() if apply_login_user_name else None
 
-            apply_login_asset_name = analysis_instance_name(meta.get('apply_login_asset'))
-            apply_login_asset = asset_model.objects.filter(
-                hostname=apply_login_asset_name[0], ip=apply_login_asset_name[1][:-1]
-            ).first() if apply_login_asset_name else None
+                apply_login_asset_name = analysis_instance_name(meta.get('apply_login_asset'))
+                apply_login_asset = asset_model.objects.filter(
+                    hostname=apply_login_asset_name[0], ip=apply_login_asset_name[1]
+                ).first() if apply_login_asset_name else None
 
-            apply_login_system_user_name = analysis_instance_name(meta.get('apply_login_system_user'))
-            apply_login_system_user = system_user_model.objects.filter(
-                name=apply_login_system_user_name[0], username=apply_login_system_user_name[1][:-1]
-            ).first() if apply_login_system_user_name else None
-        except Exception as e:
+                apply_login_system_user_name = analysis_instance_name(meta.get('apply_login_system_user'))
+                apply_login_system_user = system_user_model.objects.filter(
+                    name=apply_login_system_user_name[0], username=apply_login_system_user_name[1]
+                ).first() if apply_login_system_user_name else None
+        except Exception:
             instance.delete()
             continue
         data = {
-            'ticket_ptr_id': instance.id,
+            'ticket_ptr_id': instance.pk,
             'apply_login_user': apply_login_user,
             'apply_login_asset': apply_login_asset,
             'apply_login_system_user': apply_login_system_user,
@@ -199,20 +201,21 @@ def command_confirm_migrate(apps):
         meta = instance.meta
         try:
             apply_run_user_name = analysis_instance_name(meta.get('apply_run_user'))
-            apply_run_user = user_model.objects.filter(
-                name=apply_run_user_name[0], username=apply_run_user_name[1][:-1]
-            ).first() if apply_run_user_name else None
+            with tmp_to_org(instance.org_id):
+                apply_run_user = user_model.objects.filter(
+                    name=apply_run_user_name[0], username=apply_run_user_name[1]
+                ).first() if apply_run_user_name else None
 
-            apply_run_asset_name = analysis_instance_name(meta.get('apply_run_asset'))
-            apply_run_asset = asset_model.objects.filter(
-                hostname=apply_run_asset_name[0], ip=apply_run_asset_name[1][:-1]
-            ).first() if apply_run_asset_name else None
+                apply_run_asset_name = analysis_instance_name(meta.get('apply_run_asset'))
+                apply_run_asset = asset_model.objects.filter(
+                    hostname=apply_run_asset_name[0], ip=apply_run_asset_name[1]
+                ).first() if apply_run_asset_name else None
 
-            apply_run_system_user_name = analysis_instance_name(meta.get('apply_run_system_user'))
-            apply_run_system_user = system_user_model.objects.filter(
-                name=apply_run_system_user_name[0], username=apply_run_system_user_name[1][:-1]
-            ).first() if apply_run_system_user_name else None
-        except Exception as e:
+                apply_run_system_user_name = analysis_instance_name(meta.get('apply_run_system_user'))
+                apply_run_system_user = system_user_model.objects.filter(
+                    name=apply_run_system_user_name[0], username=apply_run_system_user_name[1]
+                ).first() if apply_run_system_user_name else None
+        except Exception:
             instance.delete()
             continue
         apply_from_session_id = meta.get('apply_from_session_id')
@@ -224,7 +227,7 @@ def command_confirm_migrate(apps):
             instance.delete()
             continue
         data = {
-            'ticket_ptr_id': instance.id,
+            'ticket_ptr_id': instance.pk,
             'apply_run_user': apply_run_user,
             'apply_run_asset': apply_run_asset,
             'apply_run_system_user': apply_run_system_user,
