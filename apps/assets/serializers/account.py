@@ -8,9 +8,14 @@ from .base import AuthSerializerMixin
 from .utils import validate_password_contains_left_double_curly_bracket
 from common.utils.encode import ssh_pubkey_gen
 from common.drf.serializers import SecretReadableMixin
+from common.drf.fields import EncryptedField
 
 
 class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
+    password = EncryptedField(
+        label=_('Password'), required=False, allow_blank=True, allow_null=True, max_length=1024,
+        write_only=True, validators=[validate_password_contains_left_double_curly_bracket]
+    )
     ip = serializers.ReadOnlyField(label=_("IP"))
     hostname = serializers.ReadOnlyField(label=_("Hostname"))
     platform = serializers.ReadOnlyField(label=_("Platform"))
@@ -32,10 +37,6 @@ class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         fields = fields_small + fields_fk
         extra_kwargs = {
             'username': {'required': True},
-            'password': {
-                'write_only': True,
-                "validators": [validate_password_contains_left_double_curly_bracket]
-            },
             'private_key': {'write_only': True},
             'public_key': {'write_only': True},
             'systemuser_display': {'label': _('System user display')}
