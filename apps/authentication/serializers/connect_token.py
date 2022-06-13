@@ -86,7 +86,10 @@ class ConnectionTokenAssetSerializer(serializers.ModelSerializer):
 class ConnectionTokenSystemUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = SystemUser
-        fields = ['id', 'name', 'username', 'password', 'private_key', 'protocol', 'ad_domain', 'org_id']
+        fields = [
+            'id', 'name', 'username', 'password', 'private_key',
+            'protocol', 'ad_domain', 'org_id'
+        ]
 
 
 class ConnectionTokenGatewaySerializer(serializers.ModelSerializer):
@@ -122,8 +125,7 @@ class ConnectionTokenFilterRuleSerializer(serializers.ModelSerializer):
         model = CommandFilterRule
         fields = [
             'id', 'type', 'content', 'ignore_case', 'pattern',
-            'priority', 'action',
-            'date_created',
+            'priority', 'action', 'date_created',
         ]
 
 

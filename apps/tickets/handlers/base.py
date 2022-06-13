@@ -26,10 +26,9 @@ class BaseHandler:
     def _on_closed(self):
         self._send_processed_mail_to_applicant()
 
-    def on_step_state_change(self, step):
-        state = step.state
+    def on_step_state_change(self, step, state):
         self._create_state_change_comment(state)
-        handler = getattr(self, f'_on_step_{state}', lambda: None)
+        handler = getattr(self, f'_on_step_{state}', lambda x, y: None)
         return handler(step)
 
     def _on_step_approved(self, step):
@@ -78,15 +77,3 @@ class BaseHandler:
             'ticket': self.ticket
         }
         return self.ticket.comments.create(**data)
-
-    def _basic_items(self):
-        items = [
-            (_('Title'), self.ticket.title),
-            (_('Type'), self.ticket.get_type_display()),
-            (_('Status'), self.ticket.get_status_display()),
-            (_('Applicant'), self.ticket.applicant)
-        ]
-        return items
-
-    def _spec_items(self) -> list:
-        raise NotImplemented()

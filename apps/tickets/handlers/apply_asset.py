@@ -14,28 +14,6 @@ class Handler(BaseHandler):
         if is_finished:
             self._create_asset_permission()
 
-    def _construct_meta_body_of_open(self):
-        apply_nodes = self.ticket.rel_snapshot['apply_nodes']
-        apply_assets = self.ticket.rel_snapshot['apply_assets']
-        apply_system_users = self.ticket.rel_snapshot['apply_system_users']
-        apply_actions_display = self.ticket.apply_actions_display
-        apply_date_start = self.ticket.apply_date_start
-        apply_date_expired = self.ticket.apply_date_expired
-        applied_body = '''{}: {},
-            {}: {},
-            {}: {},
-            {}: {},
-            {}: {}
-        '''.format(
-            _("Applied node group"), ','.join(apply_nodes),
-            _("Applied hostname group"), ','.join(apply_assets),
-            _("Applied system user group"), ','.join(apply_system_users),
-            _("Applied actions"), ','.join(apply_actions_display),
-            _('Applied date start'), apply_date_start,
-            _('Applied date expired'), apply_date_expired,
-        )
-        return applied_body
-
     # permission
     def _create_asset_permission(self):
         with tmp_to_root_org():

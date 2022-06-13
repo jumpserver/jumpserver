@@ -9,34 +9,10 @@ from .base import BaseHandler
 class Handler(BaseHandler):
     ticket: ApplyApplicationTicket
 
-    def _on_step_approved(self, step):
+    def _on_step_approved(self, step, state):
         is_finished = super()._on_step_approved(step)
         if is_finished:
             self._create_application_permission()
-
-    # body
-    def _construct_meta_body_of_open(self):
-        apply_category_display = self.ticket.apply_category_display
-        apply_type_display = self.ticket.apply_type_display
-        apply_applications = self.ticket.rel_snapshot['apply_applications']
-        apply_system_users = self.ticket.rel_snapshot['apply_system_users']
-        apply_date_start = self.ticket.apply_date_start
-        apply_date_expired = self.ticket.apply_date_expired
-        applied_body = '''{}: {},
-            {}: {}
-            {}: {}
-            {}: {}
-            {}: {}
-            {}: {}
-        '''.format(
-            _('Applied category'), apply_category_display,
-            _('Applied type'), apply_type_display,
-            _('Applied application group'), ','.join(apply_applications),
-            _('Applied system user group'), ','.join(apply_system_users),
-            _('Applied date start'), apply_date_start,
-            _('Applied date expired'), apply_date_expired,
-        )
-        return applied_body
 
     # permission
     def _create_application_permission(self):

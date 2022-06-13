@@ -153,7 +153,7 @@ class StatusMixin:
             raise AlreadyClosed
         current_step = self.current_step
         current_step.change_state(state, processor)
-        self.handler.on_step_state_change(current_step)
+        self.handler.on_step_state_change(current_step, state)
         self._finish_or_next(state)
 
     def _finish_or_next(self, state):

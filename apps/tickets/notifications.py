@@ -59,19 +59,17 @@ class BaseTicketMessage(UserMessage):
 
     def _get_fields_items(self, item_names):
         fields = self.ticket._meta._forward_fields_map
-        items = []
         json_data = json.dumps(model_to_dict(self), cls=ModelJSONFieldEncoder)
         data = json.loads(json_data)
+        items = []
 
         for name in item_names:
             field = fields[name]
             item = {'name': name, 'title': field.verbose_name}
-
             value = data.get(name)
             if hasattr(self, f'get_{name}_display'):
                 value = getattr(self, f'get_{name}_display')
             item['value'] = value
-
             items.append(item)
         return items
 
