@@ -4,16 +4,6 @@ import common.db.fields
 from django.db import migrations, models
 
 
-def migrate_private_key_data(apps, *args):
-    user_model = apps.get_model('users', 'User')
-    users = user_model.objects.all()
-
-    for user in users:
-        user._private_key_ = user._private_key
-        user._public_key_ = user._public_key
-        user.save(update_fields=['_private_key_', '_public_key_'])
-
-
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -26,34 +16,15 @@ class Migration(migrations.Migration):
             name='_otp_secret_key',
             field=common.db.fields.EncryptCharField(blank=True, max_length=128, null=True),
         ),
-        migrations.AddField(
-            model_name='user',
-            name='_private_key_',
-            field=common.db.fields.EncryptTextField(blank=True, null=True, verbose_name='Private key'),
-        ),
-        migrations.AddField(
-            model_name='user',
-            name='_public_key_',
-            field=common.db.fields.EncryptTextField(blank=True, null=True, verbose_name='Public key'),
-        ),
-        migrations.RunPython(migrate_private_key_data),
-        migrations.RemoveField(
+        migrations.AlterField(
             model_name='user',
             name='_private_key',
+            field=common.db.fields.EncryptTextField(blank=True, null=True, verbose_name='Private key'),
         ),
-        migrations.RemoveField(
+        migrations.AlterField(
             model_name='user',
             name='_public_key',
-        ),
-        migrations.RenameField(
-            model_name='user',
-            old_name='_private_key_',
-            new_name='_private_key',
-        ),
-        migrations.RenameField(
-            model_name='user',
-            old_name='_public_key_',
-            new_name='_public_key',
+            field=common.db.fields.EncryptTextField(blank=True, null=True, verbose_name='Public key'),
         ),
         migrations.AlterField(
             model_name='user',
