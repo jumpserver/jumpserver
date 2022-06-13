@@ -25,6 +25,11 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     """
     系统用户
     """
+    password = EncryptedField(
+        label=_('Password'), required=False, allow_blank=True, allow_null=True, max_length=1024,
+        trim_whitespace=False, validators=[validate_password_contains_left_double_curly_bracket],
+        write_only=True
+    )
     auto_generate_key = serializers.BooleanField(initial=True, required=False, write_only=True)
     type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type display'))
     ssh_key_fingerprint = serializers.ReadOnlyField(label=_('SSH key fingerprint'))
@@ -51,15 +56,9 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         fields_m2m = ['cmd_filters', 'assets_amount', 'applications_amount', 'nodes']
         fields = fields_small + fields_m2m
         extra_kwargs = {
-            'password': {
-                "write_only": True,
-                'trim_whitespace': False,
-                "validators": [validate_password_contains_left_double_curly_bracket]
-            },
             'cmd_filters': {"required": False, 'label': _('Command filter')},
             'public_key': {"write_only": True},
             'private_key': {"write_only": True},
-            'token': {"write_only": True},
             'nodes_amount': {'label': _('Nodes amount')},
             'assets_amount': {'label': _('Assets amount')},
             'login_mode_display': {'label': _('Login mode display')},
