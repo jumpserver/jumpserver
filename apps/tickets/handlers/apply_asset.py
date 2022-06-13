@@ -79,7 +79,6 @@ class Handler(BaseHandler):
         with tmp_to_org(self.ticket.org_id):
             asset_permission = AssetPermission.objects.create(**permission_data)
             asset_permission.users.add(self.ticket.applicant)
-            print(apply_nodes)
             asset_permission.nodes.set(apply_nodes)
             asset_permission.assets.set(apply_assets)
             asset_permission.system_users.set(apply_system_users)

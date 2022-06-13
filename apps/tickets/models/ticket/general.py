@@ -19,7 +19,7 @@ from tickets.const import (
 from tickets.handlers import get_ticket_handler
 from tickets.errors import AlreadyClosed
 
-__all__ = ['Ticket', 'TicketStep', 'TicketAssignee', 'SuperTicket']
+__all__ = ['Ticket', 'TicketStep', 'TicketAssignee', 'SuperTicket', 'SubTicketManager']
 
 
 class TicketStep(CommonModelMixin):
@@ -379,3 +379,7 @@ class SuperTicket(Ticket):
     class Meta:
         proxy = True
         verbose_name = _("Super ticket")
+
+
+class SubTicketManager(models.Manager):
+    pass
