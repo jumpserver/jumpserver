@@ -1,3 +1,5 @@
+import os
+
 from django.db import models, transaction
 from django.db.transaction import atomic as db_atomic
 
@@ -18,6 +20,7 @@ class OneToOneField(models.OneToOneField):
         super().__init__(*args, **kwargs)
 
 
-transaction.atomic = atomic
-models.ForeignKey = ForeignKey
-models.OneToOneField = OneToOneField
+if os.getenv('FK_CONSTRAINT', '1') == '0':
+    transaction.atomic = atomic
+    models.ForeignKey = ForeignKey
+    models.OneToOneField = OneToOneField
