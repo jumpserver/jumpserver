@@ -109,9 +109,9 @@ class NodeAssetsAmountUtils:
                         ancestor_keys.remove(parent_key)
                         parent_key = compute_parent_key(parent_key)
 
-        Node.objects.filter(key__in=to_update_keys).update(
-            assets_amount=operator(F('assets_amount'), 1)
-        )
+        assets_amount = operator(F('assets_amount'), 1)
+        assets_amount = 0 if assets_amount <= 0 else assets_amount
+        Node.objects.filter(key__in=to_update_keys).update(assets_amount=assets_amount)
 
     @classmethod
     @ensure_in_real_or_default_org
@@ -155,6 +155,8 @@ class NodeAssetsAmountUtils:
                 # 而且既然它包含了，它的祖先节点肯定也包含了，所以祖先节点都不用
                 # 处理了
                 break
-            ancestor.assets_amount = operator(F('assets_amount'), len(asset_pk_set))
+            assets_amount = operator(F('assets_amount'), len(asset_pk_set))
+            assets_amount = 0 if assets_amount <= 0 else assets_amount
+            ancestor.assets_amount = assets_amount
             to_update.append(ancestor)
         Node.objects.bulk_update(to_update, fields=('assets_amount', 'parent_key'))
