@@ -9,7 +9,7 @@ from .base import BaseHandler
 class Handler(BaseHandler):
     ticket: ApplyApplicationTicket
 
-    def _on_step_approved(self, step, state):
+    def _on_step_approved(self, step):
         is_finished = super()._on_step_approved(step)
         if is_finished:
             self._create_application_permission()

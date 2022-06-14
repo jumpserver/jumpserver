@@ -134,7 +134,7 @@ class StatusMixin:
         self._change_state_by_applicant(TicketState.reopen)
 
     def close(self):
-        self._change_state_by_applicant(TicketState.closed)
+        self._change_state(TicketState.closed, self.applicant)
 
     def _change_state_by_applicant(self, state):
         if state == TicketState.closed:
@@ -160,11 +160,10 @@ class StatusMixin:
         next_step = self.current_step.next()
 
         # 提前结束，或者最后一步
-        if state == TicketState.rejected or not next_step:
+        if state in [TicketState.rejected, TicketState.closed] or not next_step:
             self.state = state
             self.status = Ticket.Status.closed
             self.save(update_fields=['state', 'status'])
-            self.handler.on_change_state(state)
         else:
             next_step.set_active()
             self.approval_step += 1
@@ -319,7 +318,10 @@ class Ticket(StatusMixin, CommonModelMixin):
     def set_rel_snapshot(self, save=True):
         rel_fields = set()
         m2m_fields = set()
+        excludes = ['ticket_ptr_id', 'ticket_ptr', 'flow_id', 'flow', 'applicant_id']
         for name, field in self._meta._forward_fields_map.items():
+            if name in excludes:
+                continue
             if isinstance(field, related.RelatedField):
                 rel_fields.add(name)
             if isinstance(field, related.ManyToManyField):
@@ -335,7 +337,7 @@ class Ticket(StatusMixin, CommonModelMixin):
                 value = str(value) if value else ''
             snapshot[field] = value
 
-        self.rel_snapshot = snapshot
+        self.rel_snapshot.update(snapshot)
         if save:
             self.save(update_fields=('rel_snapshot',))
 

@@ -4,6 +4,7 @@ import json
 from django.conf import settings
 from django.core.cache import cache
 from django.shortcuts import reverse
+from django.db.models.fields import related
 from django.template.loader import render_to_string
 from django.forms import model_to_dict
 from django.utils.translation import ugettext_lazy as _
@@ -44,8 +45,9 @@ class BaseTicketMessage(UserMessage):
     def get_html_msg(self) -> dict:
         context = dict(
             title=self.content_title,
-            ticket_detail_url=self.ticket_detail_url,
-            body=self.ticket.body.replace('\n', '<br/>'),
+            basic_items=self.basic_items,
+            spec_items=self.spec_items,
+            ticket_detail_url=self.ticket_detail_url
         )
         message = render_to_string('tickets/_msg_ticket.html', context)
         return {
@@ -59,7 +61,7 @@ class BaseTicketMessage(UserMessage):
 
     def _get_fields_items(self, item_names):
         fields = self.ticket._meta._forward_fields_map
-        json_data = json.dumps(model_to_dict(self), cls=ModelJSONFieldEncoder)
+        json_data = json.dumps(model_to_dict(self.ticket), cls=ModelJSONFieldEncoder)
         data = json.loads(json_data)
         items = []
 
@@ -67,8 +69,12 @@ class BaseTicketMessage(UserMessage):
             field = fields[name]
             item = {'name': name, 'title': field.verbose_name}
             value = data.get(name)
-            if hasattr(self, f'get_{name}_display'):
-                value = getattr(self, f'get_{name}_display')
+            if hasattr(self.ticket, f'get_{name}_display'):
+                value = getattr(self.ticket, f'get_{name}_display')()
+            elif isinstance(field, related.ForeignKey):
+                value = self.ticket.rel_snapshot[name]
+            elif isinstance(field, related.ManyToManyField):
+                value = ', '.join(self.ticket.rel_snapshot[name])
             item['value'] = value
             items.append(item)
         return items

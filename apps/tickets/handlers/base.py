@@ -23,12 +23,9 @@ class BaseHandler:
     def _on_pending(self):
         self._send_processed_mail_to_applicant()
 
-    def _on_closed(self):
-        self._send_processed_mail_to_applicant()
-
     def on_step_state_change(self, step, state):
         self._create_state_change_comment(state)
-        handler = getattr(self, f'_on_step_{state}', lambda x, y: None)
+        handler = getattr(self, f'_on_step_{state}', lambda: None)
         return handler(step)
 
     def _on_step_approved(self, step):
@@ -43,6 +40,9 @@ class BaseHandler:
 
     def _on_step_rejected(self, step):
         self._send_processed_mail_to_applicant(step)
+
+    def _on_step_closed(self, step):
+        self._send_processed_mail_to_applicant()
 
     def _send_applied_mail_to_assignees(self, step=None):
         if step:
@@ -64,16 +64,18 @@ class BaseHandler:
 
     def _create_state_change_comment(self, state):
         # 打开或关闭工单，备注显示是自己，其他是受理人
-        if state == TicketState.reopen or state == TicketState.closed:
+        if state in [TicketState.reopen, TicketState.pending, TicketState.closed]:
             user = self.ticket.applicant
         else:
             user = self.ticket.processor
 
+        user_display = str(user)
+        state_display = getattr(TicketState, state).label
         data = {
+            'body': _('{} {} the ticket').format(user_display, state_display),
             'user': user,
             'user_display': str(user),
-            'type': 'status',
-            'status': state,
-            'ticket': self.ticket
+            'type': 'state',
+            'state': state
         }
         return self.ticket.comments.create(**data)
