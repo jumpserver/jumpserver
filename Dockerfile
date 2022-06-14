@@ -48,7 +48,8 @@ RUN sed -i 's@http://.*.debian.org@http://mirrors.aliyun.com@g' /etc/apt/sources
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /opt/oracle/ \
+RUN mkdir -p /opt/oracle \
+    && cd /opt/oracle \
     && wget https://download.jumpserver.org/public/instantclient-basiclite-linux.${TARGETARCH}-19.10.0.0.0.zip \
     && unzip instantclient-basiclite-linux.${TARGETARCH}-19.10.0.0.0.zip \
     && sh -c "echo /opt/oracle/instantclient_19_10 > /etc/ld.so.conf.d/oracle-instantclient.conf" \
