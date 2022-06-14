@@ -9,7 +9,7 @@ from common.drf.serializers import SecretReadableMixin
 from common.validators import alphanumeric_re, alphanumeric_cn_re, alphanumeric_win_re
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import SystemUser, Asset
-from .utils import validate_password_contains_left_double_curly_bracket
+from .utils import validate_password_for_ansible
 from .base import AuthSerializerMixin
 
 __all__ = [
@@ -27,7 +27,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     """
     password = EncryptedField(
         label=_('Password'), required=False, allow_blank=True, allow_null=True, max_length=1024,
-        trim_whitespace=False, validators=[validate_password_contains_left_double_curly_bracket],
+        trim_whitespace=False, validators=[validate_password_for_ansible],
         write_only=True
     )
     auto_generate_key = serializers.BooleanField(initial=True, required=False, write_only=True)
