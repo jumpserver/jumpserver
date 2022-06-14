@@ -30,10 +30,6 @@ class Migration(migrations.Migration):
                 ('user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),
-        migrations.RemoveField(
-            model_name='adhoc',
-            name='run_as',
-        ),
         migrations.AddField(
             model_name='adhoc',
             name='hosts',

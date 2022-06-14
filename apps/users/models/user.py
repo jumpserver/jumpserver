@@ -717,9 +717,9 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     need_update_password = models.BooleanField(
         default=False, verbose_name=_('Need update password')
     )
-    wecom_id = models.CharField(null=True, default=None, unique=True, max_length=128, verbose_name=_('WeCom'))
-    dingtalk_id = models.CharField(null=True, default=None, unique=True, max_length=128, verbose_name=_('DingTalk'))
-    feishu_id = models.CharField(null=True, default=None, unique=True, max_length=128, verbose_name=_('FeiShu'))
+    wecom_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('WeCom'))
+    dingtalk_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('DingTalk'))
+    feishu_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('FeiShu'))
 
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
@@ -886,6 +886,11 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
             ('remove_user', _('Can remove user')),
             ('match_user', _('Can match user')),
         ]
+        unique_together = (
+            ('dingtalk_id',),
+            ('wecom_id',),
+            ('feishu_id',),
+        )
 
     #: Use this method initial user
     @classmethod

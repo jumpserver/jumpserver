@@ -12,9 +12,4 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='adhoc',
-            name='run_as',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='assets.SystemUser'),
-        ),
     ]

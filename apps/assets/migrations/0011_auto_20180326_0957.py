@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
                 ('date_created', models.DateTimeField(auto_now_add=True)),
                 ('date_updated', models.DateTimeField(auto_now=True)),
                 ('created_by', models.CharField(max_length=128, null=True, verbose_name='Created by')),
-                ('ip', models.GenericIPAddressField(db_index=True, verbose_name='IP')),
+                ('ip', models.CharField(db_index=True, max_length=39, verbose_name='IP')),
                 ('port', models.IntegerField(default=22, verbose_name='Port')),
                 ('protocol', models.CharField(choices=[('ssh', 'ssh'), ('rdp', 'rdp')], default='ssh', max_length=16, verbose_name='Protocol')),
                 ('comment', models.CharField(blank=True, max_length=128, null=True, verbose_name='Comment')),

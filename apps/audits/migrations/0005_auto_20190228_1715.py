@@ -31,11 +31,11 @@ class Migration(migrations.Migration):
                 ('mfa', models.SmallIntegerField(
                     choices=[(0, 'Disabled'), (1, 'Enabled'), (2, '-')],
                     default=2, verbose_name='MFA')),
-                ('reason', models.SmallIntegerField(
-                    choices=[(0, '-'), (1, 'Username/password check failed'),
-                             (2, 'MFA authentication failed'),
-                             (3, 'Username does not exist'),
-                             (4, 'Password expired')], default=0,
+                ('reason', models.CharField(
+                    choices=[('0', '-'), ('1', 'Username/password check failed'),
+                             ('2', 'MFA authentication failed'),
+                             ('3', 'Username does not exist'),
+                             ('4', 'Password expired')], default='0',
                     verbose_name='Reason')),
                 ('status', models.BooleanField(
                     choices=[(True, 'Success'), (False, 'Failed')],

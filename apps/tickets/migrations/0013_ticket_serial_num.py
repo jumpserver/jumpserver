@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='ticket',
             name='serial_num',
-            field=models.CharField(max_length=128, null=True, unique=True, verbose_name='Serial number'),
+            field=models.CharField(max_length=128, null=True, verbose_name='Serial number'),
         ),
         migrations.RunPython(fill_ticket_serial_number),
     ]

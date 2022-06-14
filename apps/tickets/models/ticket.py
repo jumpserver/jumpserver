@@ -156,11 +156,14 @@ class Ticket(CommonModelMixin, StatusMixin, OrgModelMixin):
         'TicketFlow', related_name='tickets', on_delete=models.SET_NULL, null=True,
         verbose_name=_("TicketFlow")
     )
-    serial_num = models.CharField(max_length=128, unique=True, null=True, verbose_name=_('Serial number'))
+    serial_num = models.CharField(max_length=128, null=True, verbose_name=_('Serial number'))
 
     class Meta:
         ordering = ('-date_created',)
         verbose_name = _('Ticket')
+        unique_together = (
+            ('serial_num',),
+        )
 
     def __str__(self):
         return '{}({})'.format(self.title, self.applicant_display)
