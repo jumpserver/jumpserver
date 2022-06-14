@@ -18,7 +18,8 @@ class ForeignKey(models.ForeignKey):
 class OneToOneField(models.OneToOneField, ForeignKey):
     def __init__(self, *args, **kwargs):
         kwargs['unique'] = False
-        kwargs['db_constraint'] = False
+        if os.getenv('DB_UNIQUE', '1') == '0':
+            kwargs['db_constraint'] = False
         ForeignKey.__init__(self, *args, **kwargs)
 
 
