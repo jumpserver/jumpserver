@@ -30,6 +30,7 @@ ARG TOOLS="                           \
     procps                            \
     redis-tools                       \
     telnet                            \
+    unzip                             \
     vim                               \
     wget"
 
