@@ -1,6 +1,8 @@
 FROM python:3.8-slim
 MAINTAINER JumpServer Team <ibuler@qq.com>
 
+ARG TARGETARCH
+
 ARG BUILD_DEPENDENCIES="              \
     g++                               \
     make                              \
@@ -48,11 +50,12 @@ RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
     && ln -s /bin/bash /bin/sh
 
 RUN mkdir -p /opt/oracle/ \
-    && wget https://download.jumpserver.org/public/instantclient-basiclite-linux.x64-21.1.0.0.0.tar \
-    && tar xf instantclient-basiclite-linux.x64-21.1.0.0.0.tar -C /opt/oracle/ \
-    && echo "/opt/oracle/instantclient_21_1" > /etc/ld.so.conf.d/oracle-instantclient.conf \
+    && cd /opt/oracle \
+    && wget https://download.jumpserver.org/public/instantclient-basiclite-linux.${TARGETARCH}-19.10.0.0.0.zip \
+    && unzip instantclient-basiclite-linux.${TARGETARCH}-19.10.0.0.0.zip \
+    && sh -c "echo /opt/oracle/instantclient_19_10 > /etc/ld.so.conf.d/oracle-instantclient.conf" \
     && ldconfig \
-    && rm -f instantclient-basiclite-linux.x64-21.1.0.0.0.tar
+    && rm -f instantclient-basiclite-linux.${TARGETARCH}-19.10.0.0.0.zip
 
 WORKDIR /tmp/build
 COPY ./requirements ./requirements
@@ -69,6 +72,7 @@ RUN pip install --upgrade pip==20.2.4 setuptools==49.6.0 wheel==0.34.2 -i ${PIP_
 
 ARG VERSION
 ENV VERSION=$VERSION
+ENV ORACLE_INSTANT_CLIENT_DIR=/opt/oracle/instantclient_19_10
 
 ADD . .
 RUN cd utils \
