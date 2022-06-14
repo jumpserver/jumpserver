@@ -182,14 +182,15 @@ def migrate_to_nodes(apps, *args):
             category__in=['remote_app', 'database', 'cloud'],
             org_id=org.id
         )
+        if not node:
+            continue
         print("Set node asset: ", node)
-        if node:
-            node.assets_amount = len(assets)
-            node.save()
-            node.assets.set(assets)
-            parent = node.parent
-            parent.assets_amount += len(assets)
-            parent.save()
+        node.assets_amount = len(assets)
+        node.save()
+        node.assets.set(assets)
+        parent = node.parent
+        parent.assets_amount += len(assets)
+        parent.save()
 
 
 class Migration(migrations.Migration):
