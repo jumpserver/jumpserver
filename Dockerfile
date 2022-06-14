@@ -1,6 +1,8 @@
 FROM python:3.8-slim
 MAINTAINER JumpServer Team <ibuler@qq.com>
 
+ARG TARGETARCH
+
 ARG BUILD_DEPENDENCIES="              \
     g++                               \
     make                              \
@@ -28,39 +30,30 @@ ARG TOOLS="                           \
     procps                            \
     redis-tools                       \
     telnet                            \
+    unzip                             \
     vim                               \
-    zip                               \
     wget"
 
-RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
-    && sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
+RUN sed -i 's@http://.*.debian.org@http://mirrors.aliyun.com@g' /etc/apt/sources.list \
     && apt update \
     && apt -y install ${BUILD_DEPENDENCIES} \
     && apt -y install ${DEPENDENCIES} \
     && apt -y install ${TOOLS} \
-    && localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8 \
     && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && mkdir -p /root/.ssh/ \
     && echo "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null" > /root/.ssh/config \
     && sed -i "s@# alias l@alias l@g" ~/.bashrc \
     && echo "set mouse-=a" > ~/.vimrc \
+    && echo "no" | dpkg-reconfigure dash \
+    && apt-get clean all \
     && rm -rf /var/lib/apt/lists/* \
-    && mv /bin/sh /bin/sh.bak  \
-    && ln -s /bin/bash /bin/sh
-
-ARG TARGETARCH
-ARG ORACLE_LIB_MAJOR=19
-ARG ORACLE_LIB_MINOR=10
-ENV ORACLE_FILE="instantclient-basiclite-linux.${TARGETARCH:-amd64}-${ORACLE_LIB_MAJOR}.${ORACLE_LIB_MINOR}.0.0.0dbru.zip"
 
 RUN mkdir -p /opt/oracle/ \
-    && cd /opt/oracle/ \
-    && wget https://download.jumpserver.org/files/oracle/${ORACLE_FILE} \
-    && unzip instantclient-basiclite-linux.${TARGETARCH-amd64}-19.10.0.0.0dbru.zip \
-    && mv instantclient_${ORACLE_LIB_MAJOR}_${ORACLE_LIB_MINOR} instantclient \
-    && echo "/opt/oracle/instantclient" > /etc/ld.so.conf.d/oracle-instantclient.conf \
+    && wget https://download.jumpserver.org/public/instantclient-basiclite-linux.${TARGETARCH}-19.10.0.0.0.zip \
+    && unzip instantclient-basiclite-linux.${TARGETARCH}-19.10.0.0.0.zip \
+    && sh -c "echo /opt/oracle/instantclient_19_10 > /etc/ld.so.conf.d/oracle-instantclient.conf" \
     && ldconfig \
-    && rm -f ${ORACLE_FILE}
+    && rm -f instantclient-basiclite-linux.${TARGETARCH}-19.10.0.0.0.zip
 
 WORKDIR /tmp/build
 COPY ./requirements ./requirements
@@ -77,6 +70,7 @@ RUN pip install --upgrade pip==20.2.4 setuptools==49.6.0 wheel==0.34.2 -i ${PIP_
 
 ARG VERSION
 ENV VERSION=$VERSION
+ENV ORACLE_INSTANT_CLIENT_DIR=/opt/oracle/instantclient_19_10
 
 ADD . .
 RUN cd utils \
@@ -89,7 +83,7 @@ WORKDIR /opt/jumpserver
 VOLUME /opt/jumpserver/data
 VOLUME /opt/jumpserver/logs
 
-ENV LANG=zh_CN.UTF-8
+ENV LANG=en_US.UTF-8
 
 EXPOSE 8070
 EXPOSE 8080
