@@ -23,7 +23,7 @@ class OneToOneField(models.OneToOneField, ForeignKey):
 
 
 def set_db_constraint_false():
-    if os.getenv('FK_CONSTRAINT', '1') != '0':
+    if os.getenv('DB_CONSTRAINT', '1') != '0':
         return
     if sys.argv == 2 and sys.argv[1] == 'makemigrations':
         return
