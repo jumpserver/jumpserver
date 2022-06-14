@@ -46,7 +46,7 @@ RUN sed -i 's@http://.*.debian.org@http://mirrors.aliyun.com@g' /etc/apt/sources
     && echo "set mouse-=a" > ~/.vimrc \
     && echo "no" | dpkg-reconfigure dash \
     && apt-get clean all \
-    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /opt/oracle/ \
     && wget https://download.jumpserver.org/public/instantclient-basiclite-linux.${TARGETARCH}-19.10.0.0.0.zip \
