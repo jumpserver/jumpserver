@@ -37,6 +37,22 @@ class GrantedAppTreeUtil:
         return node
 
     @staticmethod
+    def create_empty_node():
+        name = _("Empty")
+        node = TreeNode(**{
+            'id': 'empty',
+            'name': name,
+            'title': name,
+            'pId': '',
+            'isParent': True,
+            'children': [],
+            'meta': {
+                'type': 'application'
+            }
+        })
+        return node
+
+    @staticmethod
     def get_children_nodes(tree_id, parent_info, user):
         tree_nodes = []
         parent_info = dict(parse_qsl(parent_info))
@@ -61,7 +77,7 @@ class GrantedAppTreeUtil:
     def create_tree_nodes(self, applications):
         tree_nodes = []
         if not applications:
-            return tree_nodes
+            return [self.create_empty_node()]
 
         root_node = self.create_root_node()
         organizations = self.filter_organizations(applications)
