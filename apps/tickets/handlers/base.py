@@ -21,7 +21,7 @@ class BaseHandler:
         return handler()
 
     def _on_pending(self):
-        self._send_processed_mail_to_applicant()
+        self._send_applied_mail_to_assignees()
 
     def on_step_state_change(self, step, state):
         self._create_state_change_comment(state)

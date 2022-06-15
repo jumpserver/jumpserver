@@ -101,6 +101,7 @@ class StatusMixin:
     create_process_steps_by_assignees: Callable
     assignees: Callable
     set_serial_num: Callable
+    set_rel_snapshot: Callable
     approval_step: int
     handler: None
     flow: TicketFlow
@@ -114,6 +115,7 @@ class StatusMixin:
 
     def _open(self):
         self.set_serial_num()
+        self.set_rel_snapshot()
         self._change_state_by_applicant(TicketState.pending)
 
     def open(self):
