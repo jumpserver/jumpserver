@@ -46,7 +46,7 @@ class UserMixin:
         for field, attr in settings.AUTH_OPENID_USER_ATTR_MAP.items():
             user_attrs[field] = claims.get(attr, sub)
         email = user_attrs.get('email', '')
-        email = construct_user_email(user_attrs.get('username'), email, 'jumpserver.openid')
+        email = construct_user_email(user_attrs.get('username'), email)
         user_attrs.update({'email': email})
 
         logger.debug(log_prompt.format(user_attrs))
