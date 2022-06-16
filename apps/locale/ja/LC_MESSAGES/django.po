@@ -4299,7 +4299,7 @@ msgstr "属性マップの有効化"
 
 #: settings/serializers/terminal.py:37
 msgid "Enable Razor"
-msgstr "XRDPの有効化"
+msgstr "Razor の有効化"
 
 #: settings/serializers/terminal.py:38
 msgid "Enable SSH Client"
