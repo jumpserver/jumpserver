@@ -1756,11 +1756,11 @@ msgstr "{ApplicationPermission} 移除 {SystemUser}"
 
 #: authentication/api/confirm.py:40
 msgid "Authentication failed password incorrect"
-msgstr "认证失败 (用户名或密码不正确): {}"
+msgstr "认证失败 (用户名或密码不正确)"
 
 #: authentication/api/confirm.py:48
 msgid "Login time has exceeded {} minutes, please login again"
-msgstr ""
+msgstr "登录时长已超过 {} 分钟，请重新登录"
 
 #: authentication/api/confirm.py:72 common/exceptions.py:47
 msgid "This action require verify your MFA"
@@ -4237,7 +4237,7 @@ msgstr "启用数据库组件"
 
 #: settings/serializers/terminal.py:37
 msgid "Enable Razor"
-msgstr "启用 XRDP 服务"
+msgstr "启用 Razor 服务"
 
 #: settings/serializers/terminal.py:38
 msgid "Enable SSH Client"

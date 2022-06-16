@@ -274,7 +274,7 @@ def push_system_user_a_asset_manual(system_user, asset, username=None):
     # if username is None:
     #     username = system_user.username
     task_name = gettext_noop("Push system users to asset: ") + "{}({}) => {}".format(
-        system_user.name, username or '', asset
+        system_user.name, username or system_user.username, asset
     )
     return push_system_user_util(system_user, [asset], task_name=task_name, username=username)
 

@@ -1768,11 +1768,11 @@ msgstr "{ApplicationPermission} 削除 {SystemUser}"
 
 #: authentication/api/confirm.py:40
 msgid "Authentication failed password incorrect"
-msgstr "認証に失敗しました (ユーザー名またはパスワードが正しくありません): {}"
+msgstr "認証に失敗しました (ユーザー名またはパスワードが正しくありません)"
 
 #: authentication/api/confirm.py:48
 msgid "Login time has exceeded {} minutes, please login again"
-msgstr ""
+msgstr "ログイン時間が {} 分を超えました。もう一度ログインしてください"
 
 #: authentication/api/confirm.py:72 common/exceptions.py:47
 msgid "This action require verify your MFA"
@@ -4299,7 +4299,7 @@ msgstr "属性マップの有効化"
 
 #: settings/serializers/terminal.py:37
 msgid "Enable Razor"
-msgstr "XRDPの有効化"
+msgstr "Razor の有効化"
 
 #: settings/serializers/terminal.py:38
 msgid "Enable SSH Client"
