@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-14 15:48+0800\n"
+"POT-Creation-Date: 2022-06-16 10:20+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -660,7 +660,7 @@ msgstr "全部"
 #: assets/models/backup.py:52 assets/serializers/backup.py:32
 #: xpack/plugins/change_auth_plan/models/app.py:41
 #: xpack/plugins/change_auth_plan/models/asset.py:62
-#: xpack/plugins/change_auth_plan/serializers/base.py:49
+#: xpack/plugins/change_auth_plan/serializers/base.py:45
 msgid "Recipient"
 msgstr "收件人"
 
@@ -703,7 +703,7 @@ msgstr "账号备份快照"
 
 #: assets/models/backup.py:116 assets/serializers/backup.py:40
 #: xpack/plugins/change_auth_plan/models/base.py:125
-#: xpack/plugins/change_auth_plan/serializers/base.py:82
+#: xpack/plugins/change_auth_plan/serializers/base.py:78
 msgid "Trigger mode"
 msgstr "触发模式"
 
@@ -765,8 +765,8 @@ msgstr "校验日期"
 #: xpack/plugins/change_auth_plan/models/base.py:42
 #: xpack/plugins/change_auth_plan/models/base.py:121
 #: xpack/plugins/change_auth_plan/models/base.py:196
-#: xpack/plugins/change_auth_plan/serializers/base.py:22
-#: xpack/plugins/change_auth_plan/serializers/base.py:77
+#: xpack/plugins/change_auth_plan/serializers/base.py:21
+#: xpack/plugins/change_auth_plan/serializers/base.py:73
 #: xpack/plugins/cloud/serializers/account_attrs.py:26
 msgid "Password"
 msgstr "密码"
@@ -1110,12 +1110,12 @@ msgstr "动作"
 
 #: assets/serializers/backup.py:31 ops/mixin.py:106 ops/mixin.py:147
 #: settings/serializers/auth/ldap.py:65
-#: xpack/plugins/change_auth_plan/serializers/base.py:47
+#: xpack/plugins/change_auth_plan/serializers/base.py:43
 msgid "Periodic perform"
 msgstr "定时执行"
 
 #: assets/serializers/backup.py:33
-#: xpack/plugins/change_auth_plan/serializers/base.py:50
+#: xpack/plugins/change_auth_plan/serializers/base.py:46
 msgid "Currently only mail sending is supported"
 msgstr "当前只支持邮件发送"
 
@@ -1240,8 +1240,20 @@ msgstr "组织名称"
 msgid "Asset hostname"
 msgstr "资产主机名"
 
-#: assets/serializers/utils.py:9
+#: assets/serializers/utils.py:11
 msgid "Password can not contains `{{` "
+msgstr "密码不能包含 `{{` 字符"
+
+#: assets/serializers/utils.py:14
+#, fuzzy
+#| msgid "Password can not contains `{{` "
+msgid "Password can not contains `'` "
+msgstr "密码不能包含 `{{` 字符"
+
+#: assets/serializers/utils.py:16
+#, fuzzy
+#| msgid "Password can not contains `{{` "
+msgid "Password can not contains `\"` "
 msgstr "密码不能包含 `{{` 字符"
 
 #: assets/tasks/account_connectivity.py:30
@@ -3032,7 +3044,7 @@ msgstr "授权的应用"
 msgid "Application permissions is about to expire"
 msgstr "应用授权规则即将过期"
 
-#: perms/notifications.py:137
+#: perms/notifications.py:138
 msgid "application permissions of organization {}"
 msgstr "组织 ({}) 的应用授权"
 
@@ -3088,6 +3100,7 @@ msgstr "系统用户名称"
 
 #: perms/templates/perms/_msg_item_permissions_expire.html:7
 #: perms/templates/perms/_msg_permed_items_expire.html:7
+#, python-format
 msgid ""
 "\n"
 "        The following %(item_type)s will expire in %(count)s days\n"
@@ -3104,6 +3117,10 @@ msgstr "如果有疑问或需求，请联系系统管理员"
 #: perms/tree/app.py:24
 msgid "My applications"
 msgstr "我的应用"
+
+#: perms/tree/app.py:41
+msgid "Empty"
+msgstr "空"
 
 #: perms/utils/asset/user_permission.py:620 rbac/tree.py:59
 msgid "My assets"
@@ -4488,7 +4505,7 @@ msgstr "首页"
 msgid "Cancel"
 msgstr "取消"
 
-#: templates/resource_download.html:18 templates/resource_download.html:30
+#: templates/resource_download.html:18 templates/resource_download.html:31
 msgid "Client"
 msgstr "客户端"
 
@@ -4500,25 +4517,25 @@ msgstr ""
 "JumpServer 客户端，目前用来唤起 特定客户端程序 连接资产, 目前仅支持 RDP SSH "
 "客户端，Telnet 会在未来支持"
 
-#: templates/resource_download.html:30
+#: templates/resource_download.html:31
 msgid "Microsoft"
 msgstr "微软"
 
-#: templates/resource_download.html:30
+#: templates/resource_download.html:31
 msgid "Official"
 msgstr "官方"
 
-#: templates/resource_download.html:32
+#: templates/resource_download.html:33
 msgid ""
 "macOS needs to download the client to connect RDP asset, which comes with "
 "Windows"
 msgstr "macOS 需要下载客户端来连接 RDP 资产，Windows 系统默认安装了该程序"
 
-#: templates/resource_download.html:41
+#: templates/resource_download.html:42
 msgid "Windows Remote application publisher tools"
 msgstr "Windows 远程应用发布服务器工具"
 
-#: templates/resource_download.html:42
+#: templates/resource_download.html:43
 msgid ""
 "Jmservisor is the program used to pull up remote applications in Windows "
 "Remote Application publisher"
@@ -6181,15 +6198,15 @@ msgstr "更改密码"
 msgid "Change SSH Key"
 msgstr "修改 SSH Key"
 
-#: xpack/plugins/change_auth_plan/serializers/base.py:48
+#: xpack/plugins/change_auth_plan/serializers/base.py:44
 msgid "Run times"
 msgstr "执行次数"
 
-#: xpack/plugins/change_auth_plan/serializers/base.py:62
+#: xpack/plugins/change_auth_plan/serializers/base.py:58
 msgid "* Please enter the correct password length"
 msgstr "* 请输入正确的密码长度"
 
-#: xpack/plugins/change_auth_plan/serializers/base.py:65
+#: xpack/plugins/change_auth_plan/serializers/base.py:61
 msgid "* Password length range 6-30 bits"
 msgstr "* 密码长度范围 6-30 位"
 
