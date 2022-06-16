@@ -4237,7 +4237,7 @@ msgstr "启用数据库组件"
 
 #: settings/serializers/terminal.py:37
 msgid "Enable Razor"
-msgstr "启用 XRDP 服务"
+msgstr "启用 Razor 服务"
 
 #: settings/serializers/terminal.py:38
 msgid "Enable SSH Client"
