@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-16 10:20+0800\n"
+"POT-Creation-Date: 2022-06-16 11:12+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1254,11 +1254,11 @@ msgstr "パスワードには '{{' を含まない"
 
 #: assets/serializers/utils.py:14
 msgid "Password can not contains `'` "
-msgstr "パスワードには '{{' を含まない"
+msgstr "パスワードには `'` を含まない"
 
 #: assets/serializers/utils.py:16
 msgid "Password can not contains `\"` "
-msgstr "パスワードには '{{' を含まない"
+msgstr "パスワードには `\"` を含まない"
 
 #: assets/tasks/account_connectivity.py:30
 msgid "The asset {} system platform {} does not support run Ansible tasks"
@@ -6843,19 +6843,3 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "コミュニティ版"
-
-#~ msgid "Please verify your password first"
-#~ msgstr "最初にパスワードを確認してください"
-
-#~ msgid "AccessKey ID"
-#~ msgstr "アクセスキーID"
-
-#~ msgid "Unknown ip"
-#~ msgstr "不明なip"
-
-#~ msgid ""
-#~ "Windows needs to download the client to connect SSH assets, and the MacOS "
-#~ "system uses its own terminal"
-#~ msgstr ""
-#~ "WindowsはクライアントをダウンロードしてSSH資産に接続する必要があり、macOS"
-#~ "システムは独自のTerminalを採用している。"

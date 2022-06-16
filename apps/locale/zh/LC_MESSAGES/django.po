@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-16 10:20+0800\n"
+"POT-Creation-Date: 2022-06-16 11:12+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1245,16 +1245,12 @@ msgid "Password can not contains `{{` "
 msgstr "密码不能包含 `{{` 字符"
 
 #: assets/serializers/utils.py:14
-#, fuzzy
-#| msgid "Password can not contains `{{` "
 msgid "Password can not contains `'` "
-msgstr "密码不能包含 `{{` 字符"
+msgstr "密码不能包含 `'` 字符"
 
 #: assets/serializers/utils.py:16
-#, fuzzy
-#| msgid "Password can not contains `{{` "
 msgid "Password can not contains `\"` "
-msgstr "密码不能包含 `{{` 字符"
+msgstr "密码不能包含 `\"` 字符"
 
 #: assets/tasks/account_connectivity.py:30
 msgid "The asset {} system platform {} does not support run Ansible tasks"
@@ -6755,17 +6751,3 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
-
-#~ msgid "Please verify your password first"
-#~ msgstr "请检查密码"
-
-#~ msgid "AccessKey ID"
-#~ msgstr "Access key ID"
-
-#~ msgid "Unknown ip"
-#~ msgstr "未知ip"
-
-#~ msgid ""
-#~ "Windows needs to download the client to connect SSH assets, and the MacOS "
-#~ "system uses its own terminal"
-#~ msgstr "Windows 需要下载客户端来连接SSH资产，macOS系统采用自带的Terminal"
