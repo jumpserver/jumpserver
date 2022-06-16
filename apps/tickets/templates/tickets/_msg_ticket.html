@@ -4,25 +4,15 @@
         {{ title | safe }}
     </p>
     <div>
-        <div class="basic-items">
-            <b>{% trans 'Ticket basic info' %}</b>
+        {% for child in content %}
+            <h2>{{ child.title }}</h2>
             <hr>
-            {% for item in basic_items %}
-                <li>
+            {% for item in child.content %}
+                <li style="list-style-type:none">
                     <b>{{ item.title }}: </b> {{ item.value }}
                 </li>
             {% endfor %}
-        </div>
-
-        <div class="spec-items">
-            <b>{% trans 'Ticket applied info' %}</b>
-            <hr>
-            {% for item in spec_items %}
-                <li>
-                    <b>{{ item.title }}: </b> {{ item.value }}
-                </li>
-            {% endfor %}
-        </div>
+        {% endfor %}
     </div>
     <br>
     <div>

@@ -99,7 +99,7 @@ class LoginACL(BaseACL):
 
     def create_confirm_ticket(self, request):
         from tickets import const
-        from tickets.models import ApplyCommandTicket
+        from tickets.models import ApplyLoginTicket
         from orgs.models import Organization
         title = _('Login confirm') + ' {}'.format(self.user)
         login_ip = get_request_ip(request) if request else ''
@@ -115,7 +115,7 @@ class LoginACL(BaseACL):
             'apply_login_datetime': login_datetime,
             'org_id': Organization.ROOT_ID,
         }
-        ticket = ApplyCommandTicket.objects.create(**data)
+        ticket = ApplyLoginTicket.objects.create(**data)
         assignees = self.reviewers.all()
         ticket.open_by_system(assignees)
         return ticket

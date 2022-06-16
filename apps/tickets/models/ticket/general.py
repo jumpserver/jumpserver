@@ -155,18 +155,19 @@ class StatusMixin:
             raise AlreadyClosed
         current_step = self.current_step
         current_step.change_state(state, processor)
-        self.handler.on_step_state_change(current_step, state)
-        self._finish_or_next(state)
+        self._finish_or_next(current_step, state)
 
-    def _finish_or_next(self, state):
-        next_step = self.current_step.next()
+    def _finish_or_next(self, current_step, state):
+        next_step = current_step.next()
 
         # 提前结束，或者最后一步
         if state in [TicketState.rejected, TicketState.closed] or not next_step:
             self.state = state
             self.status = Ticket.Status.closed
             self.save(update_fields=['state', 'status'])
+            self.handler.on_step_state_change(current_step, state)
         else:
+            self.handler.on_step_state_change(current_step, state)
             next_step.set_active()
             self.approval_step += 1
             self.save(update_fields=['approval_step'])
@@ -182,7 +183,7 @@ class StatusMixin:
             processor = None
             state = step.state
             for i in ticket_assignees:
-                assignee_ids.append(i.assignee.id)
+                assignee_ids.append(i.assignee_id)
                 assignees_display.append(str(i.assignee))
                 if state != StepState.pending and state == i.state:
                     processor = i.assignee

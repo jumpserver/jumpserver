@@ -45,8 +45,7 @@ class BaseTicketMessage(UserMessage):
     def get_html_msg(self) -> dict:
         context = dict(
             title=self.content_title,
-            basic_items=self.basic_items,
-            spec_items=self.spec_items,
+            content=self.content,
             ticket_detail_url=self.ticket_detail_url
         )
         message = render_to_string('tickets/_msg_ticket.html', context)
@@ -58,6 +57,14 @@ class BaseTicketMessage(UserMessage):
     @classmethod
     def gen_test_msg(cls):
         return None
+
+    @property
+    def content(self):
+        content = [
+            {'title': _('Ticket basic info'), 'content': self.basic_items},
+            {'title': _('Ticket applied info'), 'content': self.spec_items},
+        ]
+        return content
 
     def _get_fields_items(self, item_names):
         fields = self.ticket._meta._forward_fields_map
@@ -124,15 +131,14 @@ class TicketAppliedToAssigneeMessage(BaseTicketMessage):
     def get_html_msg(self) -> dict:
         context = dict(
             title=self.content_title,
-            basic_items=self.basic_items,
-            spec_items=self.spec_items,
+            content=self.content,
             ticket_detail_url=self.ticket_detail_url
         )
 
         ticket_approval_url = self.get_ticket_approval_url()
         context.update({'ticket_approval_url': ticket_approval_url})
         message = render_to_string('tickets/_msg_ticket.html', context)
-        cache.set(self.token, {'ticket_id': self.ticket.id}, 3600)
+        cache.set(self.token, {'ticket_id': self.ticket.id, 'content': self.content}, 3600)
         return {
             'subject': self.subject,
             'message': message
