@@ -6157,7 +6157,7 @@ msgstr "启用 MFA(OTP)"
 
 #: users/templates/users/user_otp_enable_bind.html:6
 msgid "Bind one-time password authenticator"
-msgstr "绑定MFA验证器"
+msgstr "绑定 MFA 验证器"
 
 #: users/templates/users/user_otp_enable_bind.html:13
 msgid ""

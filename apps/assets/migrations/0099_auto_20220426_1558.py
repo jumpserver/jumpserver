@@ -71,7 +71,6 @@ def migrate_database_to_asset(apps, *args):
         except:
             failed_apps.append(app)
             pass
-                # db.hostname = 'DB-' + db.hostname
 
 
 def migrate_remote_app_to_asset(apps, *args):
@@ -154,11 +153,11 @@ def create_app_nodes(apps, org_id):
     if not node_keys:
         return
     node_key_split = [key.split(':') for key in node_keys]
-    next_value = int(max([k[1] for k in node_key_split])) + 1
+    next_value = max([int(k[1]) for k in node_key_split]) + 1
     parent_key = node_key_split[0][0]
-    parent = node_model.objects.get(key=parent_key)
-    next_key = '{}:{}'.format(node_key_split[0][0], next_value)
+    next_key = '{}:{}'.format(parent_key, next_value)
     name = 'Apps'
+    parent = node_model.objects.get(key=parent_key)
     full_value = parent.full_value + '/' + name
     defaults = {
         'key': next_key, 'value': name, 'parent_key': parent_key,
@@ -176,6 +175,7 @@ def migrate_to_nodes(apps, *args):
     asset_model = apps.get_model('assets', 'Asset')
     orgs = org_model.objects.all()
 
+    # Todo: 优化一些
     for org in orgs:
         node = create_app_nodes(apps, org.id)
         assets = asset_model.objects.filter(
