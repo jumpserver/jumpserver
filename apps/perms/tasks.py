@@ -80,7 +80,7 @@ def check_asset_permission_will_expired():
         if org in org_perm_remain_day_mapper[remain_days]:
             org_perm_remain_day_mapper[remain_days][org].add(asset_perm)
         else:
-            org_perm_remain_day_mapper[remain_days][org] = set()
+            org_perm_remain_day_mapper[remain_days][org] = {asset_perm, }
 
         # 计算每个用户即将过期的资产
         users = asset_perm.get_all_users()
@@ -90,7 +90,7 @@ def check_asset_permission_will_expired():
             if u in user_asset_remain_day_mapper[remain_days]:
                 user_asset_remain_day_mapper[remain_days][u].update(assets)
             else:
-                user_asset_remain_day_mapper[remain_days][u] = set()
+                user_asset_remain_day_mapper[remain_days][u] = set(assets)
 
     for day_count, user_asset_mapper in user_asset_remain_day_mapper.items():
         for user, assets in user_asset_mapper.items():
@@ -127,7 +127,7 @@ def check_app_permission_will_expired():
         if org in org_perm_remain_day_mapper[remain_days]:
             org_perm_remain_day_mapper[remain_days][org].add(app_perm)
         else:
-            org_perm_remain_day_mapper[remain_days][org] = set()
+            org_perm_remain_day_mapper[remain_days][org] = {app_perm, }
 
         users = app_perm.get_all_users()
         apps = app_perm.applications.all()
@@ -135,7 +135,7 @@ def check_app_permission_will_expired():
             if u in user_app_remain_day_mapper[remain_days]:
                 user_app_remain_day_mapper[remain_days][u].update(apps)
             else:
-                user_app_remain_day_mapper[remain_days][u] = set()
+                user_app_remain_day_mapper[remain_days][u] = set(apps)
 
     for day_count, user_app_mapper in user_app_remain_day_mapper.items():
         for user, apps in user_app_mapper.items():
