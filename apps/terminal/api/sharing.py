@@ -43,6 +43,9 @@ class SessionJoinRecordsViewSet(OrgModelViewSet):
     )
     filterset_fields = search_fields
     model = models.SessionJoinRecord
+    rbac_perms = {
+        'finished': 'terminal.change_sessionjoinrecord'
+    }
 
     def create(self, request, *args, **kwargs):
         try:
